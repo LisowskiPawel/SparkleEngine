@@ -8,7 +8,9 @@ The source is `CornellBox.zip` from [Morgan McGuire's Computer Graphics Archive]
 
 `ConvertCornellBox.py` converts the original OBJ/MTL pair to one atomically published, tracked GLB 2.0 artifact. It validates the selected variant's source and material inventories, resolves OBJ indices, triangulates polygons in authored order, generates flat face normals, preserves diffuse colors and Phong roughness intent, and maps the ceiling panel emission through `KHR_materials_emissive_strength`. The other publisher variants stay in the external pack for future explicit levels; this level does not silently substitute them.
 
-Run from the repository root after syncing the Cornell Box pack:
+**Normal use:** the level uses the tracked, self-contained GLB and does not require the Publisher OBJ archive. Launcher selected-map sync therefore performs no Cornell download. The catalog retains the pinned Cornell archive recipe only for explicit source regeneration; the original server is currently unavailable from this workspace.
+
+Run from the repository root after explicitly acquiring the Cornell Box publisher pack for regeneration:
 
 ```powershell
 python Projects/Showcase/Assets/Meshes/CornellBox/Conversion/ConvertCornellBox.py
@@ -23,3 +25,5 @@ Expected conversion inventory:
 The source archive is pinned in `Projects/Showcase/Levels.catalog` by byte count and SHA-256. Re-run the conversion only when that source identity or conversion policy changes, then update the output hashes above and validate the cooked scene before publishing the result.
 
 **Verification (2026-10-10):** [ITER-CORNELL-01](../../../../../../Docs/Acceptance/ReleaseScope/Evidence.md#cornell-license-and-format-iter-cornell-01) reproduced the tracked GLB byte-for-byte and checked its container, inventory, finite vertex data, index bounds and embedded attribution. The retained original OBJ/MTL match an independently pinned mirror after CRLF normalization; this is not an exact ZIP receipt. The publisher ZIP still needs reacquisition against the unchanged catalog identity. Cooked rendering, single-emitter semantics and package notice inclusion remain separate checks.
+
+[ITER-REL-01-06](../../../../../../Docs/Acceptance/ReleaseScope/Evidence.md#fr-01-exit-recheck-iter-rel-01-06) verifies selected-map sync from a checkout without `Publisher/`. The archive hash and GLB bytes are unchanged.

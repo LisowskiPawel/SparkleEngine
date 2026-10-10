@@ -35,6 +35,9 @@ Projects/**/*.hxx text eol=lf
 Projects/**/*.hlsl text eol=lf
 Projects/**/*.hlsli text eol=lf
 
+CMake/**/*.h text eol=lf
+CMake/**/*.cpp text eol=lf
+
 # The code-style manifest excludes the vendored D3D12 subtree.
 Engine/RHI/Private/D3D12/ThirdParty/** text=auto !eol
 
@@ -97,3 +100,26 @@ Engine/RHI/Private/D3D12/ThirdParty/** text=auto !eol
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+# Public source archives retain acquisition recipes, not uncleared sample bytes.
+Projects/Showcase/Assets/Meshes/Sponza/Sponza.gltf export-ignore
+Projects/Showcase/Assets/Meshes/Sponza/Sponza.bin export-ignore
+Projects/Showcase/Assets/Textures/Sponza export-ignore
+Projects/Showcase/Launcher/Thumbnails/Sponza.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/ModernSponza* export-ignore
+
+# Excluded development content with unqualified public-source receipts.
+Projects/Showcase/Assets/Meshes/DamagedHelmet export-ignore
+Projects/Showcase/Assets/Textures/DamagedHelmet export-ignore
+Projects/Showcase/Launcher/Thumbnails/AnisotropyBarnLamp.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/BistroExterior.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/BistroInteriorWine.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/DamagedHelmet.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/JungleRuins.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/ModernSponzaCandles.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/ModernSponzaKnight.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/SanMiguelHigh.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/SanMiguelLow.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/SheenCloth.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/StanfordBunnySubsurface.jpg export-ignore
+Projects/Showcase/Launcher/Thumbnails/StanfordDragonSubsurface.jpg export-ignore

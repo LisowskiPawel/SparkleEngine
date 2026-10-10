@@ -168,7 +168,8 @@ namespace SparkleLauncher
 		errorCode.clear();
 		plan.Readiness.ContentDirectoryReady = std::filesystem::exists(plan.WorkingDirectory / std::string(Filesystem::kProjectMarker), errorCode);
 		const CookedContentReadiness cookedContent = InspectCookedContentReadiness(plan.Request.RepositoryRoot, plan.Request.ContentId);
-		plan.Readiness.CookedMeshesReady = cookedContent.MeshesReady;
+		// GameFramework always registers built-in Empty without imported scene assets.
+		plan.Readiness.CookedMeshesReady = plan.Request.LevelId == "Empty" || cookedContent.MeshesReady;
 		plan.Readiness.CookedTexturesReady = cookedContent.TexturesReady;
 		plan.Readiness.CookedShadersReady = cookedContent.Shaders == CookedShaderPublicationState::Ready;
 

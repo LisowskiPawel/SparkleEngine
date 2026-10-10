@@ -129,7 +129,7 @@ endfunction()
 # CMake's set(ENV{...} "") unsets variables, so GIT_CONFIG_COUNT can't set
 # empty values - GIT_CONFIG_PARAMETERS uses a format that supports them.
 set(ENV{GIT_LFS_SKIP_SMUDGE} 1)
-set(ENV{GIT_CONFIG_PARAMETERS} "'filter.lfs.process=' 'filter.lfs.smudge=' 'filter.lfs.clean=' 'filter.lfs.required=false'")
+set(ENV{GIT_CONFIG_PARAMETERS} "'filter.lfs.process=' 'filter.lfs.smudge=' 'filter.lfs.clean=' 'filter.lfs.required=false' 'core.longpaths=true'")
 
 # Locate Git once - used by FetchContent, recovery loops, and sparse checkout.
 # Fresh Windows machines often have Git installed in the standard Program Files
@@ -182,33 +182,29 @@ else()
     message(STATUS "Third-party dependencies: checking cache (set SPARKLE_VERBOSE_DEPENDENCIES=ON for details)")
 endif()
 
-function(download_sparkle_editor_asset url output_path display_name)
-    set(_needs_download TRUE)
+function(download_sparkle_editor_asset url output_path display_name expected_sha256)
     if(EXISTS "${output_path}")
-        file(SIZE "${output_path}" _asset_size)
-        if(_asset_size GREATER 0)
-            set(_needs_download FALSE)
+        file(SHA256 "${output_path}" _asset_sha256)
+        if(NOT _asset_sha256 STREQUAL expected_sha256)
+            message(FATAL_ERROR "Cached ${display_name} fails its pinned SHA-256; preserved ${output_path} for inspection.")
         endif()
+        return()
     endif()
 
-    if(_needs_download)
-        get_filename_component(_asset_dir "${output_path}" DIRECTORY)
-        file(MAKE_DIRECTORY "${_asset_dir}")
-        message(STATUS "    Downloading ${display_name}...")
-        file(DOWNLOAD
-            "${url}"
-            "${output_path}"
-            STATUS _download_status
-            TLS_VERIFY ON
-            SHOW_PROGRESS
-        )
-        list(GET _download_status 0 _download_code)
-        list(GET _download_status 1 _download_message)
-        if(NOT _download_code EQUAL 0)
-            file(REMOVE "${output_path}")
-            message(FATAL_ERROR "Failed to download ${display_name}: ${_download_message}")
-        endif()
+    get_filename_component(_asset_dir "${output_path}" DIRECTORY)
+    file(MAKE_DIRECTORY "${_asset_dir}")
+    set(_temporary_path "${output_path}.download")
+    message(STATUS "    Downloading ${display_name}...")
+    file(DOWNLOAD "${url}" "${_temporary_path}"
+        STATUS _download_status TLS_VERIFY ON SHOW_PROGRESS
+        EXPECTED_HASH "SHA256=${expected_sha256}")
+    list(GET _download_status 0 _download_code)
+    list(GET _download_status 1 _download_message)
+    if(NOT _download_code EQUAL 0)
+        file(REMOVE "${_temporary_path}")
+        message(FATAL_ERROR "Failed to download ${display_name}: ${_download_message}")
     endif()
+    file(RENAME "${_temporary_path}" "${output_path}")
 endfunction()
 
 function(sparkle_collect_missing_relative_paths root_path out_missing_paths)
@@ -776,7 +772,11 @@ if(_sparkle_fetch_assimp AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYN
     set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "" FORCE)
     set(ASSIMP_BUILD_FBX_IMPORTER ON CACHE BOOL "" FORCE)
     set(ASSIMP_BUILD_PLY_IMPORTER ON CACHE BOOL "" FORCE)
+    # Pinned Assimp uses the legacy POST_BUILD default; make that supported policy explicit.
+    set(_sparkle_previous_cmp0175_default "${CMAKE_POLICY_DEFAULT_CMP0175}")
+    set(CMAKE_POLICY_DEFAULT_CMP0175 OLD)
     sparkle_add_dependency_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
+    set(CMAKE_POLICY_DEFAULT_CMP0175 "${_sparkle_previous_cmp0175_default}")
 
     if(TARGET assimp AND NOT TARGET assimp::assimp)
         add_library(assimp::assimp ALIAS assimp)
@@ -1077,14 +1077,16 @@ set(SPARKLE_FONT_AWESOME_SOLID_TTF "${_sparkle_editor_icons_dir}/fa-solid-900.tt
 set(SPARKLE_FONT_AWESOME_LICENSE "${_sparkle_editor_icons_dir}/LICENSE.txt" CACHE FILEPATH "Font Awesome Free license path" FORCE)
 
 download_sparkle_editor_asset(
-    "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.7.1/webfonts/fa-solid-900.ttf"
+    "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/3447c58c6b3ff327b35171d866ec70c25c72f4ef/webfonts/fa-solid-900.ttf"
     "${SPARKLE_FONT_AWESOME_SOLID_TTF}"
     "Font Awesome Free Solid TTF"
+    "b111a8fdb5f70aefb2b1922a390176d1bca439338d485386a7674583ef9acb7c"
 )
 download_sparkle_editor_asset(
-    "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.7.1/LICENSE.txt"
+    "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/3447c58c6b3ff327b35171d866ec70c25c72f4ef/LICENSE.txt"
     "${SPARKLE_FONT_AWESOME_LICENSE}"
     "Font Awesome Free license"
+    "9b914eae88817d63b576eab5aafde7068c7a1abae125d7cdfb034f1da43a9afc"
 )
 
 sparkle_log_dependency_ready("Font Awesome" "${SPARKLE_FONT_AWESOME_SOLID_TTF}" "~0.5 MB asset-only")

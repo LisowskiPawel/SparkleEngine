@@ -1,6 +1,6 @@
 # Release Scope Evidence
 
-**Current FR-01:** [ITER-REL-01-05 follow-up](#fr-01-blocker-follow-up-iter-rel-01-05). Local owner checks, three-product PE identity and warm Empty Game activation pass. Rights/receipt, qualified payloads and clean-baseline gates remain blocked.
+**Current FR-01:** [ITER-REL-01-07 closure work](#fr-01-closure-work-iter-rel-01-07). Clean Shipping Game/tools build, owner checks, Empty cook and Launcher/Game activation pass. Export exclusions and pinned acquisition recipes address current release inputs; public repository history and trusted signing issuance remain unresolved.
 
 **Status:** dated source audit and iteration records; release acceptance remains blocked
 
@@ -9,6 +9,66 @@
 **Snapshot:** reconciled 2026-10-10 at `aa9fcd94f219e8a3d4dbe7c51457680ad9300783`. Earlier iterations retain their own revisions and dirty-state descriptions.
 
 These records prove only the inspection or document checks they name. Current product choices and next actions belong in [Release Scope](README.md#approval-and-next-work); this page does not grant redistribution permission or build/runtime acceptance.
+
+## FR-01 Closure Work: ITER-REL-01-07
+
+**Decision, 2026-10-11:** baseline observations **PASS**; `REL-01` and ordered `REL-02` admission **BLOCKED**. No FR-02 acceptance or publication. The remaining external actions are listed below; do not repeat the closed Cornell/dependency/baseline blockers.
+
+**Exact candidates:** root `9734e6d469c09f65fcfe66ce3ee481075e6e3925` plus retained worktree edits; clean local baseline commit/tag `263dfbf8ee509b883a78d43d09d47a50a48190b8` / `validation/fr01-closed-baseline-20261011`; source-export child `bbec6c12ae34a31f159961a12ad64079cb589ea1` / `validation/fr01-source-export-20261011`. The child changes export policy/documentation only and was not cold-built. Tags/commits are local validation artifacts; the user's branch/index was not committed or pushed. Five pre-existing modified files are recorded in `control.json` and preserved.
+
+| Check / oracle | Candidate-bound result and receipt |
+| --- | --- |
+| `CHK-FR0107-01` immutable acquisition | **PASS:** absent build/dependency cache; full configure exit `0`, 108.169 s. Sixteen acquired source groups retain revision/notice hashes; SDK archives and 14 required extracted members match their pinned hashes. Font Awesome font/license now use immutable commit URLs and expected SHA-256. `closed-cold-configure.*`, `closed-input-inventory.json`, `closed-sdk-archive-verification.json`. |
+| `CHK-FR0107-02` Shipping build | **PASS:** clean `ShippingGame` / `ShowcaseGame`, exit `0`, 263.498 s; `ShippingEditor` / Launcher and three cook helpers, exit `0`, 378.125 s. PE identity is `0.1.0`, Pawel Lisowski for Launcher/Game. They are unsigned. Editor was not built in this baseline. `closed-shipping-*-build.*`, `closed-output-inventory.json`. |
+| `CHK-FR0107-03` owner checks | **PASS:** existing architecture boundary, code-style and ShaderCompiler CLI targets, wrapper exit `0`, 69.990 s; warm disconnected replay exit `0`, 73.821 s. No gate semantics or new test executable. `closed-owner-checks.*`, `closed-offline-owner-checks.*`. |
+| `CHK-FR0107-04` cook and activation | **PASS, built-in Empty:** cook exit `0`, six products; Launcher exit `0`, exact newly started Game PID `11860` closed normally with exit `0`. Source status remains empty. This observes activation/normal shutdown, not a rendered frame, seven-map correctness or FPS. `closed-empty-cook.*`, `closed-local-activation.*`. |
+| `CHK-FR0107-05` cache replay | **PASS:** `FETCHCONTENT_FULLY_DISCONNECTED=ON` configure and Shipping Game rebuild exit `0`; owner replay above passes. Process HTTP-denied configure/build/owner-check/cook replay all exit `0`, recorded separately as `denied-replay-*`; probes establish failure of attempted CMake/Git HTTPS acquisition. Executable/cooked payload hashes remain unchanged; only two `recook.signal` notification files change (`replay-output-comparison.json`). This is not an OS firewall, an all-protocol offline-host test or independent-build bit identity. |
+| `CHK-FR0107-06` content boundary | **PASS, bounded membership:** classic Sponza's 71 old tracked mesh/texture files are replaced by a pinned 72-file acquisition recipe; fresh acquisition verifies every byte/hash. Empty has no initial selected packs. Source export excludes Sponza bytes/thumbnails, DamagedHelmet and unqualified development thumbnails; recipes/notices remain. Reviewed ZIP SHA-256 `4f8db1d1cb5343a5e9b7c82b6f368f77d64421602e8be88edaf447d25a1d77b7`, 3223 entries. `sponza-acquisition.*`, `reviewed-source-export.json`. |
+| `CHK-FR0107-07` provenance / failure controls | **PASS:** retained selected-model notices, exact publisher matches for four Poly Haven skies, Font Awesome cache corruption rejection with bytes preserved, traversal rejection before download, non-Empty missing-mesh rejection, Empty missing-shader rejection. `selected-model-notices.json`, `sky-publisher-identities.json`, `negative-controls.json`, `readiness-negative-controls.json`. Cornell's tracked licensed GLB remains unchanged; optional OBJ archive receipt remains unavailable and is not a launch prerequisite. |
+| `REL-01` external closure | **BLOCKED:** the existing GitHub repository is public and its raw history still distributes uncleared historical asset bytes. Reviewed release export exclusions do not clear that surface. An applicable grant or an owner-authorized repository/history remediation is required; no remote visibility/history change was made. SDK/Qt redistribution obligations are inventoried, but a complete admitted notice/payload review is still required. `repository-visibility.json`, notice inventories and [release input owner](../../Architecture/Modules/BuildAndPackaging/ReleaseInputs.md). |
+| Signing decision / availability | **PASS for route choice; issuance unavailable:** owner delegated selection; choose Certum Standard Code Signing in the Cloud for individual Pawel Lisowski, Windows SDK SignTool, SHA-256 and RFC 3161 timestamp. Both signing certificate stores are empty. Purchase/identity verification/issuance must be completed directly with Certum before signing can run; no purchase, enrollment or test certificate was substituted. Signing execution/package verification belongs to FR-02. |
+| `REL-02` ordered admission | **BLOCKED by REL-01:** the baseline path above passes locally under its exact clean candidate. Fresh-host installed prerequisites, Editor, seven maps, native validation/FPS, staged package/SBOM/signatures and consumer adoption are unqualified. |
+
+**Run the baseline:** on a sufficiently short Windows source/build path, with CMake `4.3.3`, Git `2.54.0.windows.1`, VS 18 2026 / MSVC `19.51.36247`, Windows SDK `10.0.26100.0`, Qt `6.11.1` and Vulkan SDK `1.4.350.0`; owner style check uses clang-format `22.1.3`. This host is Windows 11 Home build `26200`, Ryzen 9 8940HX / RTX 5070 Ti Laptop, NVIDIA driver `32.0.16.1047`. Exact installed paths/versions are in `environment.json`; executable/cooked hashes in `closed-output-inventory.json`.
+
+```powershell
+# $taskCheckout is the clean, tagged candidate root; its build/artifacts initially do not exist.
+cmake -S $taskCheckout -B "$taskCheckout/build" -G "Visual Studio 18 2026" -A x64 -DCMAKE_PREFIX_PATH=C:/Qt/6.11.1/msvc2022_64
+cmake --build "$taskCheckout/build" --config ShippingGame --target ShowcaseGame --parallel 4
+cmake --build "$taskCheckout/build" --config ShippingEditor --target AssetCooker TextureCooker ShaderCompiler SparkleLauncher --parallel 4
+powershell -NoProfile -File "$taskCheckout/CMake/RunBaselineChecks.ps1" -Configuration ShippingEditor
+& "$taskCheckout/artifacts/dev/tools/AssetCooker/ShippingEditor/AssetCooker.exe" cook-project Showcase ShippingGame --tool-profile ShippingEditor --root $taskCheckout
+& "$taskCheckout/artifacts/dev/launcher/ShippingEditor/SparkleLauncher.exe" --root $taskCheckout --level Empty --product game --game-profile ShippingGame --graphics-api d3d12 --run levels.run
+cmake -S $taskCheckout -B "$taskCheckout/build" -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+# Repeat Game build and owner checks, retaining the same source/cache/configuration.
+```
+
+**Artifacts and cleanup:** `build/validation/fr01-closure-20261011/` retains exact per-step command/exit/time/status JSON, raw logs, input/output hashes, local tags/worktrees, exports and byte-verified backups of retired content. Task-created Game processes were closed normally; negative-control modifications restored. Temporary validation harnesses are removed at handoff. `commands.md`, `handoff-manifest.json` and `cleanup.json` provide the final inventory/cleanup boundary. No assets/shaders gained internal versions. Root/validation build trees and Launcher diagnostic state remain for review; they are not source or consumer payload.
+
+**Failed attempts retained, superseded for this baseline:** earlier cold style checks exposed checkout CRLF; later configure exposed Git path handling; a longer build path hit MSBuild `MSB3491`/MAX_PATH. Fixes are explicit LF policy for CMake C++ sources, scoped Git `core.longpaths=true`, pinned Assimp CMP0175 default, scoped Qt deployment environment, and a shorter validation root. Zlib's upstream configure renames tracked `zconf.h` to ignored `zconf.h.included`; `generated-input-state.json` verifies the retained bytes against the pinned object after declared EOL normalization. This generated cache state is disclosed, not claimed clean. Arbitrarily long Windows checkout/build paths are not qualified.
+
+## FR-01 Exit Recheck: ITER-REL-01-06
+
+**Candidate:** `9734e6d469c09f65fcfe66ce3ee481075e6e3925`, clean at start on 2026-10-10; tests use that detached checkout, then the exact Cornell catalog patch. Scope: phase admission, two formerly mutable dependency acquisitions and removal of Cornell's unused map prerequisite. Owner: Launcher catalog/acquisition and Acceptance. Preserve seven maps, GLB bytes, optional archive recipe/hash, existing owner semantics and prior bounded results. No asset/shader versioning, public asset removal, package implementation or release publication.
+
+| Check / criterion | Candidate-bound result |
+| --- | --- |
+| `AC/CHK-REL0106-01`: fresh immutable dependency acquisition | **PASS, bounded:** fresh detached checkout and initially absent `build/_deps`; existing CMake single-dependency owner acquires `stb` at `2c980bb59875b0d32144a71867fbdebb2f77cd20` and sparse Compressonator at `f4b53d79ec5abbb50924f58aebb7bf2793200b94`. Both source trees have clean tracked status and exact HEAD. Cold and cache replay commands exit `0`; `stb` replay uses `FETCHCONTENT_FULLY_DISCONNECTED=ON`, Compressonator's existing-cache branch validates without cloning. No OS network isolation or whole dependency/Shipping baseline is asserted. |
+| `AC/CHK-REL0106-02`: Cornell map has only real source prerequisites | **PASS:** level source refers to `CornellBox/CornellBox`; tracked GLB is self-contained and already license/format-verified. Only its catalog `AssetPack = CornellBox` line is removed. Optional pack definition, ZIP hash, map ID/selection and GLB stay unchanged. Before: fresh checkout dry-run schedules unavailable publisher ZIP. After: dry-run schedules no acquisition; actual `levels.sync --level CornellBox` exits `0` with no Publisher directory. Both use the existing Launcher operation owner, not a new no-op implementation. |
+| Original ZIP check | **Unavailable for optional regeneration:** four further publisher requests (HTTPS, www, HTTP and download query) return `406`. The original ZIP is not replaced or certified. It is no longer a normal Cornell map dependency; this does not assert recovered archive provenance. |
+| `REL-00` / `REL-01` | **BLOCKED:** exact technical package/helper/configuration/content-store freeze and public asset-byte/payload rights closure remain unaccepted. Public source/archive inclusion of classic Sponza still needs an exclusion policy or an applicable grant; modern samples can follow the existing acquisition-recipe rule. Full notices/dependency/SDK/SBOM/signing decisions remain open. |
+| `REL-02` / phase transition | **BLOCKED:** clean tagged-source complete cold configure/Shipping build/check and warm/offline replay is unrun. The two-dependency probe is prerequisite evidence only. FR-02 must not start with unresolved rights/payload identity/discovery. |
+
+Exact CMake command shape, using `$taskCheckout = <repo>/build/validation/fr01-exit-recheck-20261010/checkout` and `$taskDependency = stb` then `compressonator`:
+
+```powershell
+cmake -S $taskCheckout -B "$taskCheckout/build/_dependency-sync/$taskDependency" -G "Visual Studio 18 2026" -A x64 "-DSPARKLE_SYNC_SOURCE_DEPENDENCY=$taskDependency" "-DFETCHCONTENT_BASE_DIR=$taskCheckout/build/_deps"
+# Replay the same command with -DFETCHCONTENT_FULLY_DISCONNECTED=ON.
+& .\artifacts\dev\launcher\DevelopmentEditor\SparkleLauncher.exe --root $taskCheckout --level CornellBox --dry-run levels.sync
+& .\artifacts\dev\launcher\DevelopmentEditor\SparkleLauncher.exe --root $taskCheckout --level CornellBox --run levels.sync
+```
+
+**Environment / control:** CMake `4.3.3`, Visual Studio 18 2026 x64, MSVC `19.51.36247.0`, Windows SDK `10.0.26100.0`; cache selects local Qt `6.11.1`. The single-dependency probe does not qualify those installed SDKs on a fresh host. Existing Launcher executable SHA-256 `b60951c09b713ed972480130c5502fe514d7298a67d85f869a20eed2885c504c`, from the earlier locally built candidate; its source owner is unchanged. This is not a Launcher build from the fresh checkout. `build/validation/fr01-exit-recheck-20261010/` retains `control.json`, exact command/exit/time records, cold/replay logs, before/after sync, HTTP failures and a final hash manifest. Wrong dependency revision, renewed unused acquisition, changed GLB or unresolved rights stops qualification (`FM-REL0106-01..03`). The real absent-cache and absent-Publisher observations detect warm-machine contamination. Isolated checkout/cache and Launcher diagnostic state are retained for replay; the original workspace caches were not modified. Decision: two acquisition uncertainties and Cornell's unnecessary prerequisite addressed; next stage remains blocked at the named gates.
 
 ## Cornell License And Format: ITER-CORNELL-01
 

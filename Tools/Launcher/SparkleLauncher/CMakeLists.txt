@@ -333,8 +333,16 @@ if(WIN32)
         REQUIRED
     )
 
+    set(_sparkle_qt_deploy_command "${SPARKLE_WINDEPLOYQT_EXECUTABLE}")
+    if(CMAKE_GENERATOR MATCHES "^Visual Studio" AND CMAKE_GENERATOR_INSTANCE)
+        string(REGEX REPLACE ",.*$" "" _sparkle_visual_studio_root "${CMAKE_GENERATOR_INSTANCE}")
+        set(_sparkle_qt_deploy_command
+            "${CMAKE_COMMAND}" -E env "VCINSTALLDIR=${_sparkle_visual_studio_root}/VC/"
+            "${SPARKLE_WINDEPLOYQT_EXECUTABLE}")
+    endif()
+
     add_custom_command(TARGET SparkleLauncher POST_BUILD
-        COMMAND "${SPARKLE_WINDEPLOYQT_EXECUTABLE}"
+        COMMAND ${_sparkle_qt_deploy_command}
             --verbose 0
             --dir "$<TARGET_FILE_DIR:SparkleLauncher>"
             "$<TARGET_FILE:SparkleLauncher>"

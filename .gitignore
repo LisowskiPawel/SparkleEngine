@@ -81,3 +81,6 @@ venv/
 .DS_Store
 Desktop.ini
 Thumbs.db
+
+# User-selected classic Sponza publisher acquisition (recipe stays tracked).
+/Projects/Showcase/Assets/Meshes/Sponza/Publisher/

@@ -28,4 +28,4 @@ DirectionalLight1AngularSizeRadians = 0.145438284
 DirectionalLight1CastShadow = true
 
 [SceneAssets]
-Asset = Sponza/Sponza
+Asset = Sponza/Publisher/glTF/Sponza

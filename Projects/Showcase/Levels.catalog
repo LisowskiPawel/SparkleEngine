@@ -3,7 +3,7 @@ Id = Empty
 DisplayName = Empty
 Description = Start with a clean scene for experiments, tools, and new content.
 Source = Levels/Empty.level
-Selected = true
+Selected = false
 
 [Level]
 Id = ModernSponza
@@ -15,7 +15,7 @@ SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/
 AssetPack = ModernSponzaCurtains
 Family = Modern Sponza
 VariantKind = Base
-Selected = true
+Selected = false
 
 [Level]
 Id = ModernSponzaCandles
@@ -27,7 +27,7 @@ SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/
 AssetPack = ModernSponzaCandles
 Family = Modern Sponza
 VariantKind = AddOn
-Selected = true
+Selected = false
 
 [Level]
 Id = ModernSponzaKnight
@@ -39,7 +39,7 @@ SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/
 AssetPack = ModernSponzaKnight
 Family = Modern Sponza
 VariantKind = AddOn
-Selected = true
+Selected = false
 
 [Level]
 Id = JungleRuins
@@ -61,7 +61,7 @@ SourcePage = https://developer.nvidia.com/orca/amazon-lumberyard-bistro
 AssetPack = Bistro
 Family = Bistro
 VariantKind = Base
-Selected = true
+Selected = false
 
 [Level]
 Id = BistroInteriorWine
@@ -73,7 +73,7 @@ SourcePage = https://developer.nvidia.com/orca/amazon-lumberyard-bistro
 AssetPack = Bistro
 Family = Bistro
 VariantKind = SceneVariant
-Selected = true
+Selected = false
 
 [Level]
 Id = SanMiguelHigh
@@ -104,9 +104,9 @@ Id = Sponza
 DisplayName = Sponza
 Description = Test lighting, materials, and rendering features in the classic Sponza atrium.
 Source = Levels/Sponza.level
-Thumbnail = Launcher/Thumbnails/Sponza.jpg
-SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Sponza
-Selected = true
+SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/Sponza
+AssetPack = Sponza
+Selected = false
 
 [Level]
 Id = ABeautifulGame
@@ -115,7 +115,7 @@ Description = Browse a stylized glTF showcase with varied materials and scene co
 Source = Levels/ABeautifulGame.level
 Thumbnail = Launcher/Thumbnails/ABeautifulGame.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ABeautifulGame
-Selected = true
+Selected = false
 
 [Level]
 Id = DamagedHelmet
@@ -124,7 +124,7 @@ Description = Inspect a compact physically based material sample built around th
 Source = Levels/DamagedHelmet.level
 Thumbnail = Launcher/Thumbnails/DamagedHelmet.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DamagedHelmet
-Selected = true
+Selected = false
 
 [Level]
 Id = LPSHead
@@ -134,7 +134,7 @@ Source = Levels/LPSHead.level
 Thumbnail = Launcher/Thumbnails/LPSHead.jpg
 SourcePage = https://casual-effects.com/g3d/data10/index.html
 AssetPack = LPSHead
-Selected = true
+Selected = false
 
 [Level]
 Id = CornellBox
@@ -143,8 +143,7 @@ Description = Exercise indirect lighting, material response, and reference rende
 Source = Levels/CornellBox.level
 Thumbnail = Launcher/Thumbnails/CornellBox.png
 SourcePage = https://casual-effects.com/g3d/data10/index.html
-AssetPack = CornellBox
-Selected = true
+Selected = false
 
 [Level]
 Id = DiffuseTransmissionPlant
@@ -153,7 +152,7 @@ Description = Study diffuse transmission and layered plant materials in a focuse
 Source = Levels/DiffuseTransmissionPlant.level
 Thumbnail = Launcher/Thumbnails/DiffuseTransmissionPlant.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DiffuseTransmissionPlant
-Selected = true
+Selected = false
 
 [Level]
 Id = CesiumMan
@@ -162,7 +161,7 @@ Description = Explore an animated glTF character sample with skinning and author
 Source = Levels/CesiumMan.level
 Thumbnail = Launcher/Thumbnails/CesiumMan.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CesiumMan
-Selected = true
+Selected = false
 
 [Level]
 Id = StanfordBunnySubsurface
@@ -174,7 +173,7 @@ SourcePage = https://graphics.stanford.edu/data/3Dscanrep/#bunny
 AssetPack = StanfordBunny
 Family = Subsurface
 VariantKind = Base
-Selected = true
+Selected = false
 
 [Level]
 Id = StanfordDragonSubsurface
@@ -186,7 +185,7 @@ SourcePage = https://graphics.stanford.edu/data/3Dscanrep/#dragon
 AssetPack = StanfordDragon
 Family = Subsurface
 VariantKind = Base
-Selected = true
+Selected = false
 
 [Level]
 Id = AnisotropyBarnLamp
@@ -198,7 +197,7 @@ SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c6
 AssetPack = AnisotropyBarnLamp
 Family = Material Reference
 VariantKind = Base
-Selected = true
+Selected = false
 
 [Level]
 Id = SheenCloth
@@ -210,7 +209,7 @@ SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c6
 AssetPack = SheenCloth
 Family = Material Reference
 VariantKind = Base
-Selected = true
+Selected = false
 
 [AssetPack]
 Id = Bistro
@@ -526,3 +525,19 @@ GameBlocker = USD composition and virtualized or out-of-core geometry support ar
 External = true
 DownloadSupported = true
 GameSupported = false
+
+[AssetPack]
+Id = Sponza
+DisplayName = Classic Sponza (publisher acquisition)
+Root = Assets/Meshes/Sponza/Publisher
+ExtractRoot = Assets/Meshes/Sponza/Publisher
+Required = .sparkle-acquisition.txt
+Kind = Scene
+SourceUrl = https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/Sponza/
+SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/Sponza
+SourceFiles = Assets/Meshes/Sponza/SourceFiles.txt
+Version = glTF-Sample-Assets edc7c9e67c639d230715049ee31f9a96a6babbbe
+License = Model/image/binary files: CRYENGINE agreement; metadata: CC BY 4.0; acquisition only, bundled redistribution unqualified
+External = true
+DownloadSupported = true
+GameSupported = true
