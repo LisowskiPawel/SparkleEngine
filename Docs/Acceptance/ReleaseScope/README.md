@@ -59,7 +59,7 @@ The intended examples are fixed; admission still requires rights, material and p
 | --- | --- |
 | `ModernSponza` | Principal showcase example; base plus colorful curtains. License wording and cooked size need resolution. Candle/knight variants are excluded. |
 | `Sponza` | Classic lighting scene; exact redistribution terms remain open. |
-| `CornellBox` | Reference/lighting scene; original archive receipt and single-emitter interpretation need closure. |
+| `CornellBox` | Reference/lighting scene; retained license and GLB format verified in [ITER-CORNELL-01](Evidence.md#cornell-license-and-format-iter-cornell-01). Original ZIP receipt and single-emitter interpretation remain open. |
 | `CesiumMan` | Animation scene; retain attribution/logo notice and freeze an exact pose for reference comparisons. |
 | `LPSHead` | Head/material scene; verify conversion/textures and material fidelity. Selection does not establish physical subsurface reference support. |
 | `DiffuseTransmissionPlant` | Plant/animation scene; diffuse-transmission fidelity remains open. |

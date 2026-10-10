@@ -1,6 +1,6 @@
 # Release Scope Evidence
 
-**Current FR-01:** [ITER-REL-01-03 blockers and fixes](../FirstRelease.md#current-fr-01-blockers). Git refs and source version identity are corrected; rights/receipt and clean-baseline gates remain blocked. The approval records below retain their original evidence boundaries.
+**Current FR-01:** [ITER-REL-01-05 follow-up](#fr-01-blocker-follow-up-iter-rel-01-05). Local owner checks, three-product PE identity and warm Empty Game activation pass. Rights/receipt, qualified payloads and clean-baseline gates remain blocked.
 
 **Status:** dated source audit and iteration records; release acceptance remains blocked
 
@@ -9,6 +9,50 @@
 **Snapshot:** reconciled 2026-10-10 at `aa9fcd94f219e8a3d4dbe7c51457680ad9300783`. Earlier iterations retain their own revisions and dirty-state descriptions.
 
 These records prove only the inspection or document checks they name. Current product choices and next actions belong in [Release Scope](README.md#approval-and-next-work); this page does not grant redistribution permission or build/runtime acceptance.
+
+## Cornell License And Format: ITER-CORNELL-01
+
+**Candidate:** `03409713168d1fcface79236f805b5d19a5fccfd`, 2026-10-10, plus the preceding two-document FR-01 report patch. Scope: retained Cornell license/attribution and expected conversion form only; preserve the existing archive identity and selected map. Owner: Cornell conversion / Acceptance. `NS-EVIDENCE`, `NS-OWNERSHIP`, `NS-ADOPTION`; preserve graphics proof boundaries, advance `REL-01` input clarity. Control and hashed command/input/output receipts: `build/validation/cornell-license-20261010/`.
+
+| Check | Result |
+| --- | --- |
+| `AC/CHK-CORNELL-01`: retained license and attribution | **PASS for the retained notices:** dataset notice explicitly names Guedis Cardenas/Morgan McGuire, Williams College 2011, CC BY 3.0; original OBJ/MTL additionally state public domain. [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) permits educational use, adaptation and redistribution with attribution. Exact notice is retained in [COPYRIGHT.txt](../../../Projects/Showcase/Assets/Meshes/CornellBox/COPYRIGHT.txt); [conversion owner](../../../Projects/Showcase/Assets/Meshes/CornellBox/Conversion/README.md) supplies title, source/license links and modifications. This is a retained-notice review, not a recovered archive receipt or package audit. |
+| `AC/CHK-CORNELL-02`: expected conversion form | **PASS:** existing converter reproduces the tracked `CornellBox.glb` byte-for-byte, SHA-256 `a2af112abeaa1b08087009afa3efef2c6b665c59bd7a6efe70d703e8f2349d91`. GLB 2.0 JSON/BIN boundaries, 8 materials/primitives, 72 vertices, 36 triangles, finite vertex data, index/buffer bounds and embedded author attribution checked. One scene/mesh, no animation/skin/textures, `KHR_materials_emissive_strength`; no new variant or output hash. |
+| Independent source comparison | The retained original OBJ/MTL match files at pinned mirror `yknishidate/single-file-vulkan-pathtracing`, commit `df3fda0d362fa3e90671c8e24208315fadaf05b5`, after CRLF normalization only. Exact byte hashes differ. The mirror corroborates source text/public-domain headers; it does not provide the original ZIP or archive-level notice. |
+| `AC/CHK-CORNELL-03`: acquisition boundary | **BLOCKED:** catalog ZIP receipt remains absent; prior publisher requests returned HTTP `406`. Original `224880`-byte / `f27eaf47afec74b5236ce3095ac02d4256e8ac8610bfdb5a53560c67c2e0d8f1` identity is unchanged. No fabricated ZIP, alternate digest or cache receipt was substituted. |
+| Gate / cleanup | `REL-01` and `REL-02` remain **BLOCKED** at their other named inputs/baseline checks. No native cook/render/FPS or package claim. Conversion output used only an ignored validation path; tracked GLB was unchanged. Temporary regenerated GLB removed after comparison; retained logs/manifests remain. |
+
+Exact command from the repository root:
+
+```powershell
+python Projects/Showcase/Assets/Meshes/CornellBox/Conversion/ConvertCornellBox.py --output build/validation/cornell-license-20261010/CornellBox.glb
+```
+
+The owning control maps missing attribution, changed conversion hash and unknown archive provenance to rejected admission; detects false clearance through distinct license/format/acquisition verdicts. Decision: license/attribution and local conversion form verified; exact archive reacquisition and cooked/package proof remain open.
+
+## FR-01 Blocker Follow-up: ITER-REL-01-05
+
+**Candidate:** `03409713168d1fcface79236f805b5d19a5fccfd`, initially clean and still clean during executable checks on 2026-10-10. The report patch changes documentation only. Scope: prerequisite/blocker follow-up; full FR-01 admission and `REL-00` technical closure remain unaccepted. Owner: Acceptance, invoking existing BuildAndPackaging/Launcher/shader-check owners. No production changes, new tests, feature fixes or asset/shader versioning.
+
+| Check | Observation / disposition |
+| --- | --- |
+| `CHK-FR0105-01`: original Cornell input | **BLOCKED:** exact publisher URL plus five variants returned HTTP `406`, with Apache Mod_Security response bodies. An inspected pinned mirror provides OBJ/MTL files but no matching archive or embedded-notice receipt. Neither its different byte hashes nor the local conversion replace the required `224880`-byte archive / `f27eaf47afec74b5236ce3095ac02d4256e8ac8610bfdb5a53560c67c2e0d8f1`. `cornell-fetch.json`, `cornell-source-probes.json`, `cornell-mirror-comparison.json`. |
+| `CHK-FR0105-02`: exact rights and delivery boundary | **BLOCKED for asset-byte redistribution:** Modern Base/Curtains notices expressly permit educational use but retain the previously observed mixed wording. The user again confirms educational intent; no grant or scope-removal approval was supplied. [Intel's page](https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html) does not replace those exact notices. [Pinned classic license](https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/Sponza/LICENSE.md) assigns model bytes to CRYENGINE terms, distinct from its CC BY metadata. The [existing contract](../FirstRelease.md#release-map-set) permits acquisition recipes instead of bundling uncleared bytes. Preserve seven selected maps; qualify recipe/notices and exclude uncleared bytes from public payloads. Classic has 71 tracked mesh/texture files (`classic-tracked-files.json`); source archives need this review too. Exact Modern notice hashes/preambles are retained in `retained-rights-notices.json`. No publisher was contacted or asset removed. |
+| `CHK-FR0105-03`: owner gates | **PASS**, exit `0`: architecture boundaries, style (2190 selected sources) and ShaderCompiler CLI validation. Shader checks exercise 37 registrations and both DXIL/SPIR-V routes, including the owner's determinism and negative/cancellation controls. `owner-gates.log`, `owner-gates-exit.txt`. These checks use existing caches. |
+| `CHK-FR0105-04`: PE identity | **PASS** on existing Launcher/Editor `DevelopmentEditor` and Game `ShippingGame` executables: correct product names, `0.1.0`, publisher Pawel Lisowski, 2026 copyright. `product-identities.json`; exact binary hashes in `local-inputs.json`. This does not qualify signatures, complete package contents or build provenance from a fresh checkout. |
+| `CHK-FR0105-05`: Launcher/Game activation and cleanup | **PASS, local warm Empty only:** Launcher operation `levels.run` reports requested activation, exit `0`, 4.139 s. Game PID `29708` was identified by exact executable and creation within this invocation; its parent was Launcher shadow PID `29216`, not the initial shell PID. `CloseMainWindow()` and `WaitForExit(10000)` completed, Game exit `0`. `local-game-launch.json/.log`, `local-game-cleanup.json`. Shipping Game log is empty; no rendered-frame, API-validation or FPS observation is asserted. |
+| `CHK-FR0105-06`: report consistency | **PASS:** UTF-8, 83 local links, 112 incoming document links and `git diff --check`; `document-verification.json`. Documentation checks do not qualify executable or release behavior. |
+| `REL-01` | **BLOCKED:** original Cornell receipt, exact selected-byte redistribution decisions/qualified payload, complete dependency/license/notices/SBOM/signing closure. Educational intent and acquisition recipes do not certify bundled asset rights. |
+| `REL-02` | **BLOCKED:** no clean tagged-source cold acquisition/configure/Shipping build/check route and warm/offline replay was executed. Unresolved admission/input evidence stops release qualification; the warm local checks above are retained separately. |
+
+**Exact local commands** (repository root, Windows 11 build `26200`; MSBuild `18.7.1+024f5b037`, selected Windows SDK `10.0.26100.0`, Qt cache `6.11.1`, Vulkan SDK cache `1.4.350.0`; executable versions/cache paths in `environment.json`; owner style check used clang-format `22.1.3`, although it is not on the shell PATH):
+
+```powershell
+powershell -NoProfile -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor
+& .\artifacts\dev\launcher\DevelopmentEditor\SparkleLauncher.exe --root $PWD.Path --level Empty --product game --game-profile ShippingGame --graphics-api d3d12 --run levels.run
+```
+
+**Control and artifacts:** `build/validation/fr01-unblock-20261010/control.json` owns `AC-FR0105-01..03` (exact archive or attributed failure; rights receipt or explicit blocker; exact local owner/activation result). Failure controls reject wrong archive identity, ambiguous rights, owner-gate failure or wrong requested process identity; no simulated new production tests were added. Warm-state contamination and false legal clearance remain the risks. `local-inputs.json` retains clean revision/configuration plus six executable/cooked-shader byte identities; `manifest.json` hashes retained receipts and records final report-only dirty state. Shader validation regenerated local shared cooked outputs. The test Game was closed normally; caches and receipt artifacts remain. No clean cache, seven-map cook, full backend matrix, package, independent host or performance check passed or was claimed. Decision: bounded local checks complete; both release gates remain blocked at the named owners.
 
 ## Editor/Game Naming: ITER-GAME-NAMING-01
 
