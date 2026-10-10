@@ -1,12 +1,16 @@
 # Direct Lighting Staged Implementation Plan
 
+Replace unreliable raw direct lighting with an independently checked estimator, then add reuse and reconstruction.
+
 **Status:** implementation-ready sequence, conditionally blocked by `DIR-D0` and repository release admission; stages are not implementation evidence
 
-**Responsibility:** own dependency order, stage scope, prerequisites, estimates, clean-break work, non-goals, exit gates, prompts, and stop rules
+## Work This Plan
 
-**Authority boundary:** this plan consumes accepted Discovery/Semantics/Architecture/User Experience and cannot change them; code/build proves implementation and `FCR-REN-06` alone owns candidate results
-
-**Plan revision:** `DIR-PLAN-02`, deepened 2026-09-13 from repository revision `8b650c7450f8a59fb3bcc18edbb4d217a7b11ed5`
+| What to do | Working route |
+| --- | --- |
+| First action | [Stage 0 discovery](#stage-0--close-discovery-and-authorize-the-first-slice): reproduce/localize the raw failure and close DIR-D0 light, surface, sampling and check decisions. |
+| Result to reach | Accepted discovery and analytic/exhaustive truth before replacing reservoirs or adding temporal/spatial reuse. |
+| Start / stop | DIR-D0 and release admission remain required. Reference direct-light output and provider-dependent comparisons need their own accepted oracle inputs. |
 
 ## Outcome
 
@@ -37,6 +41,9 @@ The Reference Path Tracer is helpful for scene-level comparison only after its o
 
 ## Planning Envelope
 
+<details>
+<summary>Expand planning envelope</summary>
+
 | Item | Estimate after gate | Principal uncertainty |
 | --- | ---: | --- |
 | Stage 0 discovery | 4–8 engineering days | reproduction, oracle readiness, product admission |
@@ -48,6 +55,8 @@ The Reference Path Tracer is helpful for scene-level comparison only after its o
 | Stage 8 evidence/adoption | 6–15 days | backend/hardware/workload availability |
 
 These are planning ranges, not commitments. `DIR-D0` replaces them with owner-reviewed estimates after experiments. Every stage is one reviewable production slice; split a stage if its hook ledger or validation cannot be reviewed coherently.
+
+</details>
 
 ## Universal Execution Contract
 
@@ -64,6 +73,9 @@ Every stage prompt inherits these rules:
 
 ## Stage Delivery Contract Matrix
 
+<details>
+<summary>Expand stage delivery contract matrix</summary>
+
 This matrix is part of each stage, not optional guidance. “Production delta” names the responsibility to change; Stage 0 must replace it with exact files and build/generated members before authorizing that stage.
 
 | Stage | Prerequisites | Required production delta and deletion | Explicit non-goals | Retained deliverables | Smallest stage falsifier |
@@ -77,6 +89,8 @@ This matrix is part of each stage, not optional guidance. “Production delta”
 | 6 | Stages 4/5 pass; frozen portable reconstruction signal/history/UX and optional-provider policy | add portable reconstruction through existing provider owner, exact guides/confidence/history/status and optional RR adapter; delete temporary filter experiments | feeding filtered values to estimator, tuning around raw bias, learned sole path | raw/reconstructed sequences, guide manifests, lag/detail/error/time/memory, provider fault/bypass/reload results, first-use/automation UX | filter hides failed raw estimator, stale guides survive, or portable baseline is unavailable on a mandatory profile |
 | 7 | Stage 6 pass; exactly one `DIR-D0` expansion admitted from a reproduced failing workload | add only environment candidates, emissive triangles, ReGIR, or another specifically admitted increment through existing scene/content owners; delete failed experiment if gate misses | bundling expansions, shadow architecture, new material lobes, “unlimited” claim | source/provenance record, distribution/update/generation tests, equal-time A/B, mutation/retirement, hook/removal ledger | no frozen equal-time benefit, duplicated light/content ownership, unsupported zero-probability source, or budget breach |
 | 8 | all included stages pass; exact candidate/configuration/hardware/content/reference ready; `FCR-REN-06` owner available | no feature redesign; only candidate-bound fixes explicitly re-admitted as a new candidate; update current docs/build/package/generated surfaces and remove stale prototype names | opportunistic tuning/refactor, borrowing proof across backends/providers, repairing unrelated failures | complete FCR evidence bundle, UX/automation/accessibility, workload/backend/native-validation, time/memory distributions, enclosure/removal and package results | any included AC/FM/CHK lacks observed candidate-bound disposition or any production claim exceeds evidence |
+
+</details>
 
 ## Required Stage Handoff
 
@@ -323,6 +337,9 @@ Prove the complete candidate in representative content and publish an honest `FC
 
 ## Stage-To-Acceptance Traceability
 
+<details>
+<summary>Expand stage-to-acceptance traceability</summary>
+
 | Stage | Acceptance | Failures/checks |
 | --- | --- | --- |
 | 0 | scope for all | `DIR-X-*`; `FM-DIR-D0-*`; discovery package |
@@ -334,6 +351,8 @@ Prove the complete candidate in representative content and publish an honest `FC
 | 6 | `AC-DIR-07/09` | `FM-DIR-06/07`; `CHK-DIR-06/07` |
 | 7 | `AC-DIR-08/09/11` | increment-specific plus `CHK-DIR-07/09` |
 | 8 | `AC-DIR-10/11/12` and closure | `CHK-DIR-08/09`; `FCR-REN-06` |
+
+</details>
 
 ## Stop And Escalation Rules
 
@@ -352,3 +371,16 @@ Record the exact blocker and preserve the last valid candidate. Do not widen the
 ## Completion Rule
 
 The plan is complete only when Stage 8 closes the required cells in `FCR-REN-06`. Research, accepted architecture, compiled code, a responsive process, a stable screenshot, or performance on one GPU is insufficient alone.
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Responsibility:** own dependency order, stage scope, prerequisites, estimates, clean-break work, non-goals, exit gates, prompts, and stop rules
+
+**Authority boundary:** this plan consumes accepted Discovery/Semantics/Architecture/User Experience and cannot change them; code/build proves implementation and `FCR-REN-06` alone owns candidate results
+
+**Plan revision:** `DIR-PLAN-02`, deepened 2026-09-13 from repository revision `8b650c7450f8a59fb3bcc18edbb4d217a7b11ed5`
+
+</details>

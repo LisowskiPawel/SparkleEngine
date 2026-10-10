@@ -1,16 +1,18 @@
 # Renderer Geometry And Ray-Tracing Closure Plan
 
-**Status:** implementation plan; not visual, native-validation, performance, or release evidence
+Make raster and ray rendering consume the same correct geometry and materials, then add the required decals.
 
-**Families:** `FCR-REN-04`, `FCR-REN-05`, `FCR-REN-12`, `FCR-REN-17`, `FCR-REN-21`, `FCR-REN-23`
+**Status:** implementation plan; not visual, native-validation, performance, or release evidence
 
 **Current readiness:** section projection **38/100**; substantial raster/residency source and partial ray routes, while deferred decals are absent; all six families are `Blocked`
 
-**Responsibility:** sequence resident visible geometry through raster and ray GBuffer production with one identity and material contract
+## Work This Plan
 
-**Parent:** [First Release Renderer Plans](README.md)
-
-**Architecture:** [Geometry And Resources](../Features/GeometryAndResources/README.md), [Renderer Ray Tracing](../Features/RayTracing/README.md), and [RHI Ray Tracing](../../RHI/Features/PipelineAndExecution/RayTracing.md)
+| What to do | Working route |
+| --- | --- |
+| First action | [GR-0 semantic review](#gr-0--freeze-geometry-material-and-traversal-semantics): freeze geometry, material and traversal correspondence before repairing residency or GBuffer production. |
+| Result to reach | Shared comparison inputs and exact contracts for raster, inline rays and native ray pipelines; later phases close residency, traversal and decals. |
+| Start / stop | Use the selected release phase and its prerequisites. Raster output alone cannot establish ray correctness; missing material/identity decisions stop implementation. |
 
 ## Plan At A Glance
 
@@ -50,9 +52,14 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute GR-0 without implementation. Create ITER-REN-GR-00 mapped to the six FCRs and their AC/FM/CHK. Inspect imported/cooked geometry and materials, world publication, Renderer scene/GPU scene, residency, visibility/draw preparation, raster GBuffer, decal composition, motion data, BLAS/TLAS, SBT, ray GBuffer, selectors, RHI, shaders, and CMake. Record one identity/generation and semantic matrix across raster/inline/RGS/D3D12/Vulkan, plus negative capabilities. Select minimal deterministic fixtures and independent or analytic oracles. Fix stale Architecture wording only. Stop on divergent semantics or an unowned identity.
 ```
+
+</details>
 
 ## `GR-1` — Mesh And Texture Residency
 
@@ -68,9 +75,14 @@ Execute GR-0 without implementation. Create ITER-REN-GR-00 mapped to the six FCR
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement GR-1 in current mesh/texture residency, task/decode, upload, activation, replacement, and retirement owners. Reconcile asset and GPU generations plus all queue-completion edges. Keep immutable input and one active generation; bound jobs/backlog/staging/memory and make refusal/placeholder state explicit. Exercise empty/small/large assets, exact and over budgets, 16 concurrent jobs, 256 backlog, decode/task/upload/token failures, cancellation, stale generation, replacement, eviction in flight, and repeated reload. Measure CPU/GPU high-water and stability. Delete superseded queues/caches and stop on partial activation or ambiguous completion.
 ```
+
+</details>
 
 ## `GR-2` — Visibility, Draw Preparation, And Raster GBuffer
 
@@ -86,9 +98,14 @@ Implement GR-1 in current mesh/texture residency, task/decode, upload, activatio
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement GR-2 through existing visibility classification, draw preparation, raster mesh/GBuffer passes, shader bindings, and RHI draw lowering. Start from FCR-REN-21/04 AC/FM/CHK and the GR-0 semantic fixtures. Preserve authored groups where eligible, deterministic opaque order, transparent single-item order, and explicit negative feature claims. Exercise inside/outside/intersecting/invalid bounds, stale identities, fallback groups, cancellation/failure, static/skinned/morph, material variants, alpha/two-sided, tangent/normal/UV/precision, motion, and backend validation. Compare serial/parallel outputs and measure cull/build/draw costs. Stop on partial draw publication or semantic mismatch.
 ```
+
+</details>
 
 ## `GR-3` — Renderer TLAS Policy And Publication
 
@@ -104,9 +121,14 @@ Implement GR-2 through existing visibility classification, draw preparation, ras
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement GR-3 with Renderer owning scene/TLAS policy and RHI owning native mechanics. Audit persistent scene geometry/instances, BLAS generations, classic/refit/partitioned planner, operation buffers, contribution/SBT mapping, scratch/result lifetime, queue tokens, publication, consumers, and selectors. Exercise initial build, transform-only update, topology/material/geometry change, move/delete/reuse/reload, exact/over operation bounds, allocation/submit failure, unsupported capability, and in-flight replacement on D3D12/Vulkan. Verify active-state truth and deterministic instance mapping; measure build/update/traversal and memory. Stop on identity or lifetime ambiguity.
 ```
+
+</details>
 
 ## `GR-4` — Ray-Traced GBuffer
 
@@ -122,9 +144,14 @@ Implement GR-3 with Renderer owning scene/TLAS policy and RHI owning native mech
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement GR-4 in the current ray GBuffer semantic owner with thin inline-query and native-pipeline adapters. Reconcile selectors, capabilities, TLAS/SBT mapping, shader registration/bindings, material decode, miss/hit outputs, alpha/two-sided/skinned/morph/motion handling, graph dependencies, and RHI commands. Use GR-0 fixtures and identical sample/ray identities to compare intermediate and final results across inline/RGS and D3D12/Vulkan. Inject unsupported capability, bad identity, missing shader/pipeline, submit failure, and stale TLAS. Record native validation and quality/time/memory crossover. Delete duplicated route logic; stop on semantic divergence.
 ```
+
+</details>
 
 ## `GR-5` — Deferred GBuffer Decals
 
@@ -140,9 +167,14 @@ Implement GR-4 in the current ray GBuffer semantic owner with thin inline-query 
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement GR-5 by executing Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/Plan.md against the Architecture DeferredDecals dossier and AC-DECAL/FM-DECAL/CHK-DECAL contract. Extend the existing asset, cook, Scene publication, persistent GPU-scene, visibility, frame-graph, GBuffer, material, ray-hit, shader, RHI, and editor owners without creating a parallel scene or material authority. Implement one bounded generation-qualified decal representation, deterministic sort/layer policy, volume raster pass after base GBuffer and before every consumer, channel/normal-safe blending, and the admitted secondary-ray composition route. Exercise empty, single, overlapping, inside/outside, clipped, moved/deleted/reloaded, masked-channel, normal, overflow, missing-resource, allocation/pipeline/submit failure, D3D12/Vulkan, raster/ray, and packaged-content cases. Capture raw GBuffer and identity artifacts plus cost/memory. Stop on ambiguous blend semantics, stale lifetime, silent omission, or raster/ray divergence.
 ```
+
+</details>
 
 ## `GR-6` — Geometry, Ray, And Decal Candidate Closure
 
@@ -156,6 +188,26 @@ Implement GR-5 by executing Docs/Architecture/Modules/Engine/Renderer/Features/D
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute GR-6 on the frozen candidate. Reconcile FCR-REN-04/05/12/17/21/23 artifacts and run only missing integrated cases from cooked asset generation through residency, visibility, raster GBuffer, TLAS, ray GBuffer, and deferred-decal composition. Compare raw channels and identity before lighting/post; include static/skinned/morph, alpha/two-sided, decals and overlap, move/delete/reload, pressure/failure, inline/RGS, and D3D12/Vulkan. Verify selector active state, memory return, native validation, and exact content/shader/package identity. Any change invalidates affected evidence. File explicit decisions and retain negative capability truth.
 ```
+
+</details>
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Families:** `FCR-REN-04`, `FCR-REN-05`, `FCR-REN-12`, `FCR-REN-17`, `FCR-REN-21`, `FCR-REN-23`
+
+**Responsibility:** sequence resident visible geometry through raster and ray GBuffer production with one identity and material contract
+
+**Parent:** [First Release Renderer Plans](README.md)
+
+**Architecture:** [Geometry And Resources](../Features/GeometryAndResources/README.md), [Renderer Ray Tracing](../Features/RayTracing/README.md), and [RHI Ray Tracing](../../RHI/Features/PipelineAndExecution/RayTracing.md)
+
+</details>

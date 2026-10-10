@@ -1,12 +1,16 @@
 # Indirect Lighting And ReSTIR GI Staged Implementation Plan
 
+Replace seed replay with an explicit indirect-transport estimator whose reuse and reconstruction can be checked.
+
 **Status:** implementation-ready sequence, blocked by `IND-D0`, applicable release admission, and stage-specific oracle/provider gates
 
-**Responsibility:** own dependency order, staged clean break, prerequisites, estimates, non-goals, exit evidence, copy-ready prompts, and stop rules
+## Work This Plan
 
-**Authority boundary:** this plan consumes accepted Discovery/Semantics/Architecture/User Experience without changing them; code/build proves implementation and `FCR-REN-07` owns candidate results
-
-**Plan revision:** `IND-PLAN-02`, deepened 2026-09-13 from repository revision `8b650c7450f8a59fb3bcc18edbb4d217a7b11ed5`
+| What to do | Working route |
+| --- | --- |
+| First action | [Stage 0 discovery](#stage-0--close-ind-d0): close IND-D0 path accounting, shift mappings, validity and the initial comparison route. |
+| Result to reach | A frozen transport/check contract, followed by explicit path records, isolated shifts and mutation-safe reuse. |
+| Start / stop | IND-D0 and applicable release admission block production. Analytic/external pinned checks can support early stages; scene-level claims in Stages 5/8 require accepted Reference output. |
 
 ## Outcome
 
@@ -30,6 +34,9 @@ The accepted Reference Path Tracer is required before scene-level reference clai
 
 ## Planning Envelope
 
+<details>
+<summary>Expand planning envelope</summary>
+
 | Work | Estimate after discovery | Key uncertainty |
 | --- | ---: | --- |
 | Stage 0 | 5–10 engineering days | current technique accounting and oracle state |
@@ -41,6 +48,8 @@ The accepted Reference Path Tracer is required before scene-level reference clai
 | Stage 8 | 8–18 days | accepted reference, backend/hardware/workload availability |
 
 Ranges are hypotheses until Stage 0 measures the route. Each stage remains a coherent change; split work when its production hook/deletion ledger or claim needs independent review.
+
+</details>
 
 ## Universal Execution Contract
 
@@ -59,6 +68,9 @@ New test-only files/classes/executables may be local-only but must not be submit
 
 ## Stage Delivery Contract Matrix
 
+<details>
+<summary>Expand stage delivery contract matrix</summary>
+
 This matrix is normative for the stage. Stage 0 replaces responsibility names with exact files, CMake/shader registration/generated members and hooks before Stage 1 is authorized.
 
 | Stage | Prerequisites | Required production delta and deletion | Explicit non-goals | Retained deliverables | Smallest stage falsifier |
@@ -72,6 +84,8 @@ This matrix is normative for the stage. Stage 0 replaces responsibility names wi
 | 6 | included Stage 5 domain passes; portable reconstruction and optional-provider contract accepted | add portable lobe reconstruction through existing provider owner, guides/confidence/history/status and optional RR adapter | filter feedback into estimator, using denoising to admit unsupported transport, sole vendor path | raw/reconstructed motion/disocclusion/glossy/emissive/sky sequences, guide/fault manifests, lag/detail/time/memory, UX route | raw failure is hidden, guides/history mismatch, or mandatory portable profile cannot recover safely |
 | 7 | Stage 6 pass; one named failing workload and one optimization admission with frozen A/B | integrate only selected enhanced reuse/splatting/guiding/cache mechanism; update semantics/history/hooks/tests; remove entirely on failure | another GI architecture, bundled optimizations, permanent experiment switch | reproduced baseline failure, equal-time A/B, correlation/lag/time/memory/backend regressions, provenance/hook/removal record | no measured benefit, semantic core changes, duplicate scene/GI state, or any required regression fails |
 | 8 | all included stages pass; exact candidate/hardware/content/reference/provider matrix; `FCR-REN-07` owner ready | evidence and stale-state closure only; production fix requires new candidate/re-admission; remove final prototype names/docs | redesign/tuning during evidence, borrowed proof across domains/backends, unrelated repair | full FCR bundle, path/domain/status UX, backend/native validation, workload/raw/reference, convergence/time/memory/package/enclosure results | any included AC/FM/CHK or exclusion lacks candidate-bound disposition, or seed-replay residue remains |
+
+</details>
 
 ## Required Stage Handoff
 
@@ -301,6 +315,9 @@ Publish evidence for the exact product claim and close or block `FCR-REN-07` hon
 
 ## Stage Traceability
 
+<details>
+<summary>Expand stage traceability</summary>
+
 | Stage | Acceptance | Checks |
 | --- | --- | --- |
 | 0 | all scope/gate fields | `IND-X-*`, discovery failures |
@@ -313,6 +330,8 @@ Publish evidence for the exact product claim and close or block `FCR-REN-07` hon
 | 7 | admitted subset | A/B plus all affected regression checks |
 | 8 | `AC-IND-10/11/12/13` closure | `CHK-IND-06/07/08`, `FCR-REN-07` |
 
+</details>
+
 ## Stop Rules
 
 Stop if an equation/mapping/domain/tolerance is unresolved; a reference is dependent or unaccepted; one-bounce accounting fails; path identity cannot be retained safely; an optimization exceeds its admission; a backend/provider changes semantics; history cannot remain transactional within budget; or concurrent changes overlap the owned boundary. Preserve the last valid candidate and report the exact blocker—never widen the stage or call a denoised preview proof.
@@ -320,3 +339,16 @@ Stop if an equation/mapping/domain/tolerance is unresolved; a reference is depen
 ## Completion Rule
 
 Only an evidence-backed `FCR-REN-07` can close this plan. Documentation, compiled code, a working screenshot, or a paper-derived implementation cannot.
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Responsibility:** own dependency order, staged clean break, prerequisites, estimates, non-goals, exit evidence, copy-ready prompts, and stop rules
+
+**Authority boundary:** this plan consumes accepted Discovery/Semantics/Architecture/User Experience without changing them; code/build proves implementation and `FCR-REN-07` owns candidate results
+
+**Plan revision:** `IND-PLAN-02`, deepened 2026-09-13 from repository revision `8b650c7450f8a59fb3bcc18edbb4d217a7b11ed5`
+
+</details>

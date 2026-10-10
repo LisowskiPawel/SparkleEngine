@@ -1,10 +1,18 @@
 # Graphics Workload Study Delivery Plan
 
+Turn real workload records into three causal graphics studies and one independently reproduced incident.
+
 **Status:** remaining discovery, analysis and study work; no calendar or capacity estimates
 
 **Prerequisites:** `REL-11` before new production tooling; correct workload/reference prerequisites for `M3/WL-04`; [WS-D0](README.md#discovery-gate-ws-d0) before implementation. Existing release/capture repairs retain their own authorization; this plan cannot bypass the parent diagnostics `P1-GATE` to add internal collectors.
 
-**Authority:** [workload-study contract](README.md), [Graphics Workloads](../../../../Acceptance/GraphicsWorkloads.md), [Diagnostics Acceptance](../Acceptance.md) and [Python dossier](../../../Modules/Tools/PythonAutomationAndAnalysis.md). Stage results belong to existing candidate/workload completion reports.
+## Work This Plan
+
+| What to do | Working route |
+| --- | --- |
+| First action | [WS-S0 freeze](#remaining-stages): select actual producer records and close the five WS-D0 decisions before building an analyzer. |
+| Result to reach | A fixed schema, statistics/observer rules and three selected causal questions; keep rejected or inconclusive findings. |
+| Start / stop | New production tooling waits for REL-11, WS-D0 and workload/reference inputs. This route cannot bypass parent capture gates or invent a collector. |
 
 ## Stage Contract
 
@@ -34,22 +42,51 @@ Choose exactly three distinct causal questions for `WS-S2`, retaining the existi
 
 ## Ready-To-Use Prompts
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute WS-S0 only in Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md. Research/planning only. Inspect GraphicsWorkloads, diagnostics comparison/data-spine status, external capture/runbook, Python dossier, real product launch and current installed tool/hardware environment. Close WS-D01..05 against an exact source revision and real producer sample; freeze units/identity/schema, missing-data policy, numeric comparison/observer rules, bounds and consumer/hook/copy/deletion ledger. Keep REL-11 and existing parent gates authoritative. No production code or guessed exporter. Validate docs/style/traceability and hand off WS-D0 or exact unresolved owners.
 
 Select three distinct causal questions using this plan's reference-guided table. For each selected NVR card record exact source, local assumption/differences, rights, measurable output and falsifier before candidate results. Do not mandate a vendor feature or copy a sample architecture.
 ```
 
+</details>
+
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute WS-S1 only after accepted WS-D0 and production admission. Extend the existing Tools owner with one selected offline analysis CLI and real consumer. Reuse workload schemas; preserve run-level distributions and candidate/frame/settings/native-artifact joins. Reject partial/mismatched/missing/oversized inputs, preserve originals and clean interrupted publication. Run frozen AC-WS-01/04 and AC-PY controls, code style and narrow owner checks. Delete replaced supported analysis paths and remove probes. Stop on unowned schema, lost identity or duplicate collector/export. No runtime Python or public framework. Handoff exact commands/results/limitations.
 ```
+
+</details>
+
+<details>
+<summary>Copy the execution prompt</summary>
 
 ```text
 Execute WS-S2 only after the accepted input/analyzer and workload/reference prerequisites. Run the three predeclared causal studies on matched Windows D3D12/Vulkan configurations using frozen quality/sample/uncertainty/practical-effect and observer controls. Keep one change per hypothesis, preserve production parallel topology, retain native before/after identity and one rejected/inconclusive alternative. Repair only a demonstrated bounded defect under the existing owner, with code style and affected narrow checks. Stop on quality/settings drift, invalid reference or unfrozen threshold. Handoff AC-WS-02 and relevant workload cells, no invented performance win.
 ```
 
+</details>
+
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute WS-S3 only against accepted study artifacts. Close the one difficult incident from earliest wrong product through competing hypotheses, minimal fix/deletion and controlled regression; preserve exact source/shader/native identity. Obtain independent reproduction/review, record feedback and changes, and route report/plots/captures into the existing CASE/WL/completion owners. Run AC-WS-03/04 and applicable style/docs checks; remove probes. Stop on unproved root cause or absent adopter; keep valid individual results. No author self-certification or unrelated feature expansion.
 ```
 
+</details>
+
 Every prompt inherits this non-negotiable exit: one producer/schema/identity authority; source and native artifact joins; frozen statistical and observer policy; quality-equivalent comparisons; honest missing/inconclusive results; no duplicate live mechanisms; bounded failures and code style. Quote each clause with retained proof or `BLOCKED`. Research and documentation do not count as executed studies.
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Authority:** [workload-study contract](README.md), [Graphics Workloads](../../../../Acceptance/GraphicsWorkloads.md), [Diagnostics Acceptance](../Acceptance.md) and [Python dossier](../../../Modules/Tools/PythonAutomationAndAnalysis.md). Stage results belong to existing candidate/workload completion reports.
+
+</details>

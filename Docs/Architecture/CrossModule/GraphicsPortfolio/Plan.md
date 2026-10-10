@@ -1,12 +1,16 @@
 # Graphics Portfolio Delivery Plan
 
+Assemble existing evidence into three understandable case studies and a real non-author reproduction exercise.
+
 **Status:** planning scaffold; five evidence/audience decisions still need to be filled
 
-**Scope:** assemble existing evidence into three case studies and an independent reproduction/review exercise
+## Work This Plan
 
-Start by choosing the cases and reader. Then select the original artifacts, verify sharing rights, and prepare the smallest useful reproduction. Final delivery waits for those cases' accepted evidence; earlier planning can prepare the route under [Roadmap M0–M6](../../../Strategy/Roadmap.md#retained-advanced-graphics-roadmap).
-
-The [portfolio dossier](README.md) defines the result. The [catalog](../../../Strategy/FeatureDeliveryCatalog.md#three-headline-cases) gives examples; [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md) owns case/workload criteria and reports.
+| What to do | Working route |
+| --- | --- |
+| First action | [five open decisions](#fill-before-execution): choose cases/reader, original artifacts, shareable subset, reproduction and independent reviewer. |
+| Result to reach | A short case/evidence route whose claims can be reproduced from the original accepted artifacts. |
+| Start / stop | Planning may prepare the route under M0-M6; final delivery waits for accepted case evidence and rights. Publication and contacting reviewers need their own authorization. |
 
 ## Fill Before Execution
 
@@ -48,6 +52,9 @@ Execute the existing workload/adoption checks (`WL-07/08`), collect findings and
 
 ## First Permitted Prompt
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only step 1 of GraphicsPortfolio/Plan.md.
 Use Roadmap to select the objective and inspect the existing case/workload and
@@ -58,4 +65,19 @@ plan with exact inputs and checks. Do not fabricate results, create a new
 collector/schema, publish material or contact anyone.
 ```
 
+</details>
+
 For any implementation repair, follow [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md), [Change Integration](../../../Engineering/Workflow/ChangeIntegration.md) and [Code Style](../../../Engineering/Foundations/CodeStyle.md). Documentation-only assembly checks links/anchors, UTF-8, whitespace and `git diff --check`; broader builds need a changed executable claim.
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Scope:** assemble existing evidence into three case studies and an independent reproduction/review exercise
+
+Start by choosing the cases and reader. Then select the original artifacts, verify sharing rights, and prepare the smallest useful reproduction. Final delivery waits for those cases' accepted evidence; earlier planning can prepare the route under [Roadmap M0–M6](../../../Strategy/Roadmap.md#retained-advanced-graphics-roadmap).
+
+The [portfolio dossier](README.md) defines the result. The [catalog](../../../Strategy/FeatureDeliveryCatalog.md#three-headline-cases) gives examples; [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md) owns case/workload criteria and reports.
+
+</details>

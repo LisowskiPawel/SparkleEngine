@@ -1,18 +1,18 @@
 # Renderer Lighting Closure Plan
 
+Produce correct direct, indirect and progressive reference lighting before judging reconstruction or frame rate.
+
 **Status:** cross-feature release sequence for direct/indirect/reference closure; feature-local implementation order lives in the linked plans and no plan is evidence
-
-**Release requirement:** [Rendering closure](../../../../../Acceptance/FirstRelease.md#required-rendering-closure) requires Included realtime primary/secondary transport on both APIs under REL-RT-1080P, compared against an accepted progressive reference. Freeze the exact finite-depth/reuse policy and temporal quality thresholds before benchmark results; a raster GBuffer plus prototype seed reservoirs is not accepted path tracing.
-
-**Families:** `FCR-REN-06`, `FCR-REN-07`, `FCR-REN-08`
 
 **Current readiness:** section projection **37/100**; direct/indirect source routes exist, the Reference Path Tracer family is **20/100**, and all three remain `Blocked`
 
-**Responsibility:** sequence lighting closure, preserve accepted reference discovery and route remaining reference recovery/release work to its feature plan
+## Work This Plan
 
-**Parent:** [First Release Renderer Plans](README.md)
-
-**Architecture:** [Lighting](../Features/Lighting/README.md), [Direct Lighting](../Features/Lighting/DirectLighting/README.md), [Indirect Lighting](../Features/Lighting/IndirectLighting/README.md), [Volumetric Lighting](../Features/Lighting/VolumetricLighting/README.md), and [Reference Path Tracer](../Features/Lighting/ReferencePathTracer/README.md)
+| What to do | Working route |
+| --- | --- |
+| First action | [Reference recovery](../Features/Lighting/ReferencePathTracer/Plan.md#required-execution-order) handles the current recovery task. For release-wide lighting contracts, start with [LGT-0](#lgt-0--freeze-units-estimators-and-comparison-domain). |
+| Result to reach | Finite trustworthy raw radiance, shared units/material/light meanings, then the direct and indirect feature plans and candidate comparisons. |
+| Start / stop | Preserve accepted PTD-00 discovery and delivered source. Direct/indirect production work still needs its own discovery and release gates; realtime and reference are separate obligations. |
 
 ## Plan At A Glance
 
@@ -55,9 +55,14 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute LGT-0 without transport implementation. Create ITER-REN-LGT-00 mapped to FCR-REN-06/07/08 and current AC/FM/CHK. Inspect cooked/world light and material semantics, Renderer scene/GBuffer, direct/indirect shaders and reservoirs, sky/composite, ray spawn, temporal inputs, debug outputs, selectors, RHI routes, and package membership. Record units, spaces, lobe ownership, PDFs/weights, sample identity, raw outputs, reset/invalidation, backend/content matrix, analytic fixtures, and quality/time/memory oracles. Reconcile Architecture wording only. Keep FCR-REN-08 blocked and stop if PTD-00 assumptions would be invented.
 ```
+
+</details>
 
 ## `LGT-1` — Direct Lighting
 
@@ -73,9 +78,14 @@ Execute LGT-0 without transport implementation. Create ITER-REN-LGT-00 mapped to
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute exactly one authorized stage from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/Plan.md. Require accepted DIR-D0, the stage prerequisites, and the feature plan's universal execution contract. Keep LGT-0 shared units/oracles and FCR-REN-06 identity fixed; do not collapse or reorder stages, tune the current reservoir before its analytic baseline, or preserve a superseded estimator. Return the stage's exact checks, artifacts, hook/deletion ledger, unrun cells, and blocker/pass disposition before another stage begins.
 ```
+
+</details>
 
 ## `LGT-2` — Indirect Lighting
 
@@ -91,9 +101,14 @@ Execute exactly one authorized stage from Docs/Architecture/Modules/Engine/Rende
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute exactly one authorized stage from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/Plan.md. Require accepted IND-D0, its stage prerequisites, and the feature plan's universal execution contract. Keep LGT-0 shared units/oracles and FCR-REN-07 identity fixed; do not label the current seed replay ReSTIR GI, skip the explicit path/shift/GRIS clean break, expand path depth early, or use FCR-REN-08 before its accepted oracle gate. Return exact checks, artifacts, hook/deletion ledger, unrun cells, and blocker/pass disposition before another stage begins.
 ```
+
+</details>
 
 ## `LGT-3` — Preserve Discovery And Close The Required Reference
 
@@ -107,9 +122,14 @@ Execute exactly one authorized stage from Docs/Architecture/Modules/Engine/Rende
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Continue the current Reference Path Tracer recovery/validation plan at the exact candidate. Preserve accepted PTD-00-R1 and delivered source stages. Reconcile only changed transport/content/camera/backend decisions; do not replay discovery. Close invalid-sample/preflight, estimator/oracle/convergence, accumulation/reset/cancel and raw-export proof. Reconcile consumer mode, selected map/pose domain and both APIs through existing owners. Keep finite diagnostics labelled and separate from SurfaceTransportReference. Stage 10 waits for its named release prerequisites. Retain exact evidence and failures; no denoised image, progress state or source inspection can pass the reference. Realtime 30 FPS belongs to its own frozen transport/reconstruction preset and feature reports.
 ```
+
+</details>
 
 ## `LGT-4` — Lighting Candidate Closure
 
@@ -123,6 +143,28 @@ Continue the current Reference Path Tracer recovery/validation plan at the exact
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute LGT-4 only after PTD-01 implementation has a candidate-bound result. Freeze the candidate and reconcile FCR-REN-06/07/08 plus all RPT criteria/checks. Run missing analytic, deterministic, convergence, raw-lobe, direct/indirect/reference, failure, history/reset, inline/RGS, D3D12/Vulkan, packaged, and release-map comparisons. Keep sample identity, settings, input assets, camera, output domain, tolerances/confidence, and independent references explicit. Any lighting/material/ray/shader change invalidates affected evidence. File exact decisions, limitations, and blockers; never call the reference unbiased beyond its accepted scope.
 ```
+
+</details>
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Release requirement:** [Rendering closure](../../../../../Acceptance/FirstRelease.md#required-rendering-closure) requires Included realtime primary/secondary transport on both APIs under REL-RT-1080P, compared against an accepted progressive reference. Freeze the exact finite-depth/reuse policy and temporal quality thresholds before benchmark results; a raster GBuffer plus prototype seed reservoirs is not accepted path tracing.
+
+**Families:** `FCR-REN-06`, `FCR-REN-07`, `FCR-REN-08`
+
+**Responsibility:** sequence lighting closure, preserve accepted reference discovery and route remaining reference recovery/release work to its feature plan
+
+**Parent:** [First Release Renderer Plans](README.md)
+
+**Architecture:** [Lighting](../Features/Lighting/README.md), [Direct Lighting](../Features/Lighting/DirectLighting/README.md), [Indirect Lighting](../Features/Lighting/IndirectLighting/README.md), [Volumetric Lighting](../Features/Lighting/VolumetricLighting/README.md), and [Reference Path Tracer](../Features/Lighting/ReferencePathTracer/README.md)
+
+</details>

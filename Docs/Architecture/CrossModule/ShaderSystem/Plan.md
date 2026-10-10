@@ -1,26 +1,18 @@
 # Shader System Delivery Plan
 
+Prove the shader and pipeline path already delivered in source; repair demonstrated discrepancies instead of repeating the migration.
+
 **Status:** implementation plan; includes the migration ledger but is not architecture authority or proof of completion
-
-**Responsibility:** own the ordered cross-module shader, graphics-pipeline, and ray-tracing migration and its clean-break validation sequence
-
-**Architecture authority:** [Shader System Architecture](README.md)
-
-**Feature acceptance:** [Shader System — Acceptance](Acceptance.md)
-
-**Migration provenance:** [Shader System Migration Baseline](MigrationBaseline.md)
 
 **Related current readiness:** **50/100.** The compile/cook/map/library/runtime route is integrated in source; compiler/backend/ABI, failure, reload, package, and adoption evidence remains open. This plan adds no credit. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#foundation-world-content-shaders-and-tools).
 
-**Current-source reconciliation - 2026-10-06:** the Phase 5 draw-preparation trace now ends at `GBufferMeshPass::PreparedDraw`. Frame-graph preparation and recording share the same move-only collaborator; the separate batch-drawer shell has been removed. This reconciles source names and ownership, without changing phase verdicts or advancing Phase 12 graphics evidence. The frozen [Migration Baseline](MigrationBaseline.md) retains its historical names.
+## Work This Plan
 
-**2026-10-10 remaining-work reconciliation:** source inspection at `ec3d59be9b3089652467d857524a2f2e439275b0` confirms semantic shader directories, virtual source identities, the canonical acceleration-structure binding, and removal of the named shadow/package duplicates. Those completed changes are not instructions to repeat. Retained phase numbers identify their contracts and evidence dependencies; source-present work is revalidated only for drift or a demonstrable discrepancy. Existing Phase 2/7/8 checkpoint evidence remains bounded; Phase 12 executable closure is still open.
-
-## Reference Use For Remaining Evidence
-
-[Pinned source and authored-work cards](../../../Strategy/Research/RenderingReferenceExamples.md) provide study locations for the remaining ABI, native-execution, provenance and adoption obligations. `NVR-01/06/13` motivate tracing one host parameter/binding through the actual pipeline, acceleration structure, recording, execution and retirement; `NVR-18/19` motivate matching optimized executed bytecode to source before attributing a shader limiter. Keep GPU Trace and frame capture as distinct activities.
-
-Record the exact selected source/file/assumption, current consumer, rights and falsifier in the existing phase control record. Retain compiler/version/options, source closure, cooked blob/hash, reflection/layout and native pipeline identity; a missing source correlation remains explicit. This does not authorize another compiler/RHI wrapper, replay completed migration work, change Shipping symbol policy or turn shader cooking into compiler-backend expertise. Any actual product repair still follows the existing phase/admission and boundary contracts.
+| What to do | Working route |
+| --- | --- |
+| First action | [Phase 12 validation](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate): identify the unresolved compiler, ABI, native, lifetime or package check for the current candidate. |
+| Result to reach | Candidate-bound compiler/cook/runtime/failure evidence and clean ownership; use existing checkpoint proof while its inputs remain valid. |
+| Start / stop | Reconcile source drift and the clean Phase 11 floor before regeneration. Missing producers or duplicate authoring/map/pipeline authorities stop the affected check. |
 
 ## Delivery At A Glance
 
@@ -40,10 +32,6 @@ flowchart LR
 | phases 0-11 are source/static checkpoints | they do not claim build, cook, runtime, backend, capture, or performance success |
 | phase 12 is the executable closure | regeneration and focused-to-broad validation happen only after the legacy floor is clean |
 | architecture and acceptance remain external owners | this long file owns sequence and migration bookkeeping, not system meaning or a pass verdict |
-
-## Purpose And Authority
-
-This document owns the ordered shader, graphics-pipeline, and ray-tracing migration phases, their clean-break boundaries, review gates, and final validation sequence. It does not redefine the enduring architecture or turn a source-consistency checkpoint into executable evidence.
 
 ## Implementation Contract
 
@@ -642,3 +630,37 @@ Final acceptance is owned by the [Shader System — Acceptance](Acceptance.md) c
 A successful execution leaves the [Shader System Architecture](README.md) as the sole enduring design authority, the adjacent feature acceptance contract as the sole definition of done, and current code/build configuration as implementation truth. Deferred permutations, precaching, preload/streaming, and native driver-cache work require a new measured plan rather than extending this migration diary.
 
 
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Responsibility:** own the ordered cross-module shader, graphics-pipeline, and ray-tracing migration and its clean-break validation sequence
+
+**Architecture authority:** [Shader System Architecture](README.md)
+
+**Feature acceptance:** [Shader System — Acceptance](Acceptance.md)
+
+**Migration provenance:** [Shader System Migration Baseline](MigrationBaseline.md)
+
+**Current-source reconciliation - 2026-10-06:** the Phase 5 draw-preparation trace now ends at `GBufferMeshPass::PreparedDraw`. Frame-graph preparation and recording share the same move-only collaborator; the separate batch-drawer shell has been removed. This reconciles source names and ownership, without changing phase verdicts or advancing Phase 12 graphics evidence. The frozen [Migration Baseline](MigrationBaseline.md) retains its historical names.
+
+**2026-10-10 remaining-work reconciliation:** source inspection at `ec3d59be9b3089652467d857524a2f2e439275b0` confirms semantic shader directories, virtual source identities, the canonical acceleration-structure binding, and removal of the named shadow/package duplicates. Those completed changes are not instructions to repeat. Retained phase numbers identify their contracts and evidence dependencies; source-present work is revalidated only for drift or a demonstrable discrepancy. Existing Phase 2/7/8 checkpoint evidence remains bounded; Phase 12 executable closure is still open.
+
+</details>
+
+## Reference Use For Remaining Evidence
+
+<details>
+<summary>Expand reference use for remaining evidence</summary>
+
+[Pinned source and authored-work cards](../../../Strategy/Research/RenderingReferenceExamples.md) provide study locations for the remaining ABI, native-execution, provenance and adoption obligations. `NVR-01/06/13` motivate tracing one host parameter/binding through the actual pipeline, acceleration structure, recording, execution and retirement; `NVR-18/19` motivate matching optimized executed bytecode to source before attributing a shader limiter. Keep GPU Trace and frame capture as distinct activities.
+
+Record the exact selected source/file/assumption, current consumer, rights and falsifier in the existing phase control record. Retain compiler/version/options, source closure, cooked blob/hash, reflection/layout and native pipeline identity; a missing source correlation remains explicit. This does not authorize another compiler/RHI wrapper, replay completed migration work, change Shipping symbol policy or turn shader cooking into compiler-backend expertise. Any actual product repair still follows the existing phase/admission and boundary contracts.
+
+</details>
+
+## Purpose And Authority
+
+This document owns the ordered shader, graphics-pipeline, and ray-tracing migration phases, their clean-break boundaries, review gates, and final validation sequence. It does not redefine the enduring architecture or turn a source-consistency checkpoint into executable evidence.

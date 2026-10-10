@@ -1,10 +1,16 @@
 # Basic Vignette Remaining Delivery Plan
 
+Add one basic vignette through the existing display and settings owners, with no pass at neutral settings.
+
 **Status:** fillable target plan; numeric, settings, ownership and native check cards await freeze
 
-**Scope:** one basic artistic lens effect through the existing display/settings/graph route
+## Work This Plan
 
-**Order:** [Roadmap required feature priority](../../../../../../../../Strategy/Roadmap.md#required-feature-closure-priority), `DSP-6`. [Dossier](README.md) owns the proposed formula/placement and `AC-VIG/FM-VIG/CHK-VIG`; FCR-REN-25 owns the independent vignette and chromatic sub-results.
+| What to do | Working route |
+| --- | --- |
+| First action | [five freeze cards](#decisions-to-fill): resolve formula/domain, controls, graph ownership, numeric/cost checks and the change budget. |
+| Result to reach | Reviewed local decisions and real both-backend check cards; vignette evidence stays separate from chromatic aberration inside FCR-REN-25. |
+| Start / stop | Only the freeze row is currently ready to execute. Production waits for that accepted freeze and contributing display/graph contracts. |
 
 ## Decisions To Fill
 
@@ -28,6 +34,22 @@ Each future implementation exit follows [Change Lifecycle](../../../../../../../
 
 ## First Permitted Prompt
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only Vignette/Plan.md's freeze row. Inspect current display-product, settings/persistence/presenter and typed-graph owners. Resolve its five cards against the dossier, with numerical/cost rules frozen before results and one authority at each edge. Link AC-VIG/FM-VIG/CHK-VIG to real both-backend check cards. Keep the independent CHRD-00 contract and 49-family registry. Do not implement code/assets or claim acceptance. Handoff the reviewed local plan, file/hook/deletion/copy budget and exact unresolved owners.
 ```
+
+</details>
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Scope:** one basic artistic lens effect through the existing display/settings/graph route
+
+**Order:** [Roadmap required feature priority](../../../../../../../../Strategy/Roadmap.md#required-feature-closure-priority), `DSP-6`. [Dossier](README.md) owns the proposed formula/placement and `AC-VIG/FM-VIG/CHK-VIG`; FCR-REN-25 owns the independent vignette and chromatic sub-results.
+
+</details>

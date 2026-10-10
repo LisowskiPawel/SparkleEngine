@@ -1,5 +1,7 @@
 # Current Feature Readiness
 
+Use this dated dashboard to find what exists and which proof is missing. For the next task, open [Roadmap](../Strategy/Roadmap.md#where-we-are-and-what-is-next); for product choices, open [Release Scope](ReleaseScope/README.md#approval-and-next-work).
+
 **Status:** high-level readiness snapshot; orientation only, not feature acceptance or release approval
 
 **Snapshot:** base repository assessment from 2026-09-13 at `9689e6ba870a01ef703da723648d3837e6b20863`; the Reference Path Tracer row alone was reconciled 2026-09-26 against `abe538470fe4e3a3cc5b454f1c5aa54bbd888b60`; no release-approved candidate report was found

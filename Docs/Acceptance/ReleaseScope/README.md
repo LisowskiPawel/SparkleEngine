@@ -1,179 +1,144 @@
-# First Release Scope Record
+# First Release Scope
 
-**Status:** revised `REL-00` proposal with owner-directed rendering obligations; remaining scope/rights decisions unclosed, no release acceptance claimed
+This page decides what people get in SparkleEngine's first public release and what you promise to support. Start with the settled choices, then answer the numbered proposals below.
 
-**Identity:** `REL-00-v0.1.0-01`; inspected 2026-10-10 at `93e86b8113c3fcd0c4921729c3513538b95bc794`, initially clean worktree
+**Status:** scope proposal; `REL-00` (release-scope approval) remains **BLOCKED**. This edit records no new approval.
 
-**Responsibility:** select the finite first-release product, public surface, machines, maps and publication promises
+**Record:** `REL-00-v0.1.0-01`; latest source reconciliation 2026-10-10 at `aa9fcd94f219e8a3d4dbe7c51457680ad9300783`. [Evidence and earlier iterations](Evidence.md) retain their exact revisions and results.
 
-**Authority:** [First Release Acceptance Contract](../FirstRelease.md#release-scope-freeze) owns the requirements and gate verdict. [Capability Dispositions](CapabilityDispositions.md) owns the row-level choices beneath this record. Architecture inventories describe implementation; neither a scope choice nor source presence accepts a feature.
-
-## Read This Page
-
-- **See the selected product:** [Decision summary](#decision-summary), [machine/API matrix](#product-and-supported-matrix) and [map proposal](#releasemapset).
-- **Make the next decision:** [Approval and next work](#approval-and-next-work) separates approved choices from unresolved ones.
-- **Inspect policy or provenance:** The compatibility, budgets and support sections define the promises; iteration records retain the decision history.
+**Authority:** this page owns product choices; [Capability Dispositions](CapabilityDispositions.md) owns individual feature classifications; [First Release Acceptance](../FirstRelease.md#release-gates) owns the proof required to ship.
 
 ## Decision Summary
 
-The current proposal makes `v0.1.0` a portable Windows x64 `ShippingGame` Showcase demonstration with source-build instructions. The owner selected the existing laptop and then explicitly required reliable progressive reference tracing, realtime path tracing at >=30 FPS, complete DLSS/Ray Reconstruction, finished exposure/tone mapping, basic chromatic aberration/vignette, backend parity, a complete frame graph and principal-level whole-frame review. These are now Included obligations in the [acceptance owner](../FirstRelease.md#required-rendering-closure). Other product/map/support choices remain proposals; feature correctness and release acceptance are still unproved.
+**Already decided by you:**
 
-| Decision | Selected scope | Approval/evidence boundary |
-| --- | --- | --- |
-| Consumer product | `ShowcaseRuntime`; archive, checksums, manifest, notices, instructions and support route | Reuses the [PD-0 output freeze](../FirstRelease.md#frozen-product-and-output-classification); no package exists by this decision |
-| Source adopter | Public tag; one pinned Windows source toolchain; documented configure/build/cook/run journey | No private assistance, credentials or repository-local dependency assumptions in accepted reproduction |
-| Developer archive | Excluded; Launcher, Editor, import/cook/compiler tools remain source-build products | Never delays runtime publication solely to create a developer archive |
-| Performance machine | `MIN-01` and `REF-01` are the same existing laptop | Machine choice approved by user; performance and clean-machine adoption unrun |
-| APIs | D3D12 default; Vulkan explicitly selectable with required feature/semantic parity | Separate native/performance/provider evidence; unavailable required cells block closure |
-| Consumer modes | Lit, a verified realtime path-traced preset, and progressive Reference; controlled rendering settings | Reference and realtime tracing are Included, not experimental substitutes; diagnostic views remain source tools |
-| Default examples | Cornell Box first run; Cesium Man second example | Proposed `ReleaseMapSet`; exact imported bytes, environment assets, notices and rights still require `REL-01` proof |
-| Mandatory rendering closure | Reference and realtime tracing, DLSS SR/RR, exposure/tone mapping, complete frame graph and parity; decals/color grading/chromatic aberration/vignette/HDR10 | Concrete acceptance matrix in FirstRelease; no source-present or fallback acceptance |
-| Experimental features | PTLAS and source-only external capture | Limited vendor/debug tuples; mandatory tracing and reconstruction have been removed from this category |
+- Use your existing Ryzen 9 8940HX / RTX 5070 Ti Laptop GPU / 64 GB laptop for minimum and reference measurements.
+- Include seven maps: Cornell Box, Cesium Man, classic Sponza, Modern Sponza, LPS Head, Diffuse Transmission Plant and A Beautiful Game. Open Modern Sponza at native 1920x1080 in Lit mode. Postpone Bistro and Moana.
+- Require progressive reference tracing, realtime path tracing at >=30 FPS, complete DLSS Super Resolution/Ray Reconstruction, exposure/tone mapping, decals, color grading, chromatic aberration, vignette, HDR10, D3D12/Vulkan parity, a complete frame graph and principal-level frame review. The [rendering contract](../FirstRelease.md#required-rendering-closure) defines the exact obligations.
 
-No feature is Removed: development experiments have owners and remain useful. Excluded means excluded from this product promise and package, not deleted from source. Source-only features require their own source-adopter proof if advertised.
-
-## Product And Supported Matrix
-
-| Field | Frozen proposal |
-| --- | --- |
-| Product identity | SparkleEngine `v0.1.0`; portable Windows x64 `ShippingGame`; sole consumer executable `bin/ShowcaseRuntime.exe` |
-| Windows | Windows 11 x64 24H2/build 26100 or newer is the target prerequisite; observed machine is Windows 11 Home 25H2, build `26200.9457`. The earlier OS boundary still requires separate acceptance. |
-| Named hardware | `MIN-01` / `REF-01`: AMD Ryzen 9 8940HX, 16 cores/32 logical processors; 64 GB installed class, 67,833,212,928 bytes OS-reported physical memory; NVIDIA GeForce RTX 5070 Ti Laptop GPU, 12,227 MiB driver-reported VRAM; driver `610.47` |
-| Storage | Patriot P400L 2000GB NVMe SSD; NTFS; at least 16 GiB free for extract/stage/user data. Observed free space is not a reserved budget. |
-| Hardware support claim | Initial validated target is this named machine, not every 8 GiB GPU or 16 GiB PC. The former generic floor is a future qualification target, not an accepted minimum. Different desktop/mobile GPUs, drivers and integrated adapters require their own evidence before advertisement. |
-| D3D12 | Feature level 12_1, SM 6.6, DXR 1.1; reject missing required features before rendering; supported tuple is named machine plus recorded driver and candidate |
-| Vulkan | Vulkan 1.3 plus the [frozen Vulkan feature requirements](../FirstRelease.md#frozen-platform-and-toolchain-prerequisites); same named machine, distinct native validation and performance results |
-| Source toolchain | The exact [PD-0 source prerequisites](../FirstRelease.md#frozen-platform-and-toolchain-prerequisites): VS Community 2026 18.7.0/MSVC 14.51.36231, Windows SDK 10.0.26100.0, CMake 4.3.3, Git for Windows 2.54.0, Qt 6.11.1 `msvc2022_64`, Vulkan SDK 1.4.350.0/Slang 2026.8, DXC 1.9.0.5347 |
-| Optional development environments | Debug/Development Editor/Game profiles and Launcher remain source products. Alternate compilers/toolchain versions are unqualified, not supported substitutes. |
-
-Two identities on one machine do not produce independent-adopter evidence. `MIN-01` measures the native 1080p baseline; `REF-01` supplies comparison/capture evidence on the same hardware. HDR acceptance additionally requires a recorded HDR10-capable display and OS output configuration; the current display has not been qualified. No hardware purchase is authorized by this scope.
-
-## Baseline And Selection
-
-Release preset `REL-NATIVE-1080P` is 1920x1080 SDR, Lit, raster GBuffer, native render extent with Linear provider, RR Off, classic TLAS/refit On, PTLAS Off, auto batching On, Automatic Histogram exposure, ACES approximation and automatic SDR encoding. D3D12 is the first-run API; Vulkan must produce the same declared behavior. Direct/Indirect diffuse/specular, direct subsurface and shadows retain their declared default states. VSync defaults On for consumers and Off for performance controls. Grading is neutral, chromatic aberration/vignette disabled, no baseline decal actors; all remain Included selectable obligations. HDR10 is opt-in after qualification.
-
-`REL-RT-1080P` is the mandatory realtime path-traced performance preset: 1920x1080 output, traced primary/secondary transport, classic TLAS, DLSS Quality requested and RR On, fixed SDK-derived render extent/topology frozen before measurement, Frame Generation and dynamic resolution Off. The existing Lit/direct/indirect route is the implementation starting point, not proof that this preset exists. Native tracing and RR-Off controls separately measure quality/cost; reconstructed FPS must be labelled with the actual render extent. Neither a Ray GBuffer alone nor a Linear/Off fallback can pass this preset. Freeze finite-depth/reuse/approximation and SDK-supported SR/RR composition in the owning feature discovery, preserving exactly one final image product. Do not silently add a new controller or copy reference-tracer state into the realtime path.
-
-`REL-REFERENCE` exposes the progressive full admitted surface-transport reference in the consumer viewport, with sample/convergence/invalid state, explicit reset/cancel and reproducible raw-linear export. It does not use DLSS, RR, firefly clamping or artistic post effects to manufacture oracle output. Its [PTD-00 domain and two distinct products](../../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/TransportAndEstimator.md#claim-boundary) remain authoritative: full supported surface reflection is required; finite-depth output is diagnostic only. Freeze animated content to a named immutable pose, and reject/reset when contributing scene/camera/material/light generations change. Domain mismatches must close before a release map is used as a reference; “full” does not claim transmission, volume, spectral or physical subsurface transport currently excluded by that contract.
-
-The baseline is a target, not the current repository preset. `Config/DefaultEngine.ini` currently requests VSync Off, ACES filmic, DLSS/NativeAA, ray reconstruction On and PTLAS preference On. `LevelRegistry::EnsureDefaultLevel` currently selects Empty. `PD-1` must replace these consumer defaults without changing development defaults by accident, and prove first-run and unavailable-provider behavior. No production settings were changed in Stage 0.
-
-| Public route | Scope contract | Owning implementation |
-| --- | --- | --- |
-| API selection | `--graphics-api D3D12` or `--graphics-api Vulkan`; build default then `SPARKLE_RHI_BACKEND`, then CLI; invalid selection fails visibly | Application graphics launch; existing `--renderer` and `--rhi` spellings remain source-development conveniences, not new durable consumer promises |
-| First run | No arguments opens Cornell Box at its authored camera with a visible control/help affordance | Application consumer host and GameFramework level session; never treat built-in Empty as package success |
-| Map switching | In-product Examples menu lists exactly the two approved maps; switching has progress, failure and return to the previous valid level | Existing level request/session authority; no second map controller |
-| Settings | Resolution/window mode, VSync, tracing mode/preset, Included reconstruction and render/post controls with requested/active status; Save, Reset and restart-required indication | Application persistence and Renderer feature authority; consumer presentation and safe unavailable handling remain delivery work |
-| Help and quit | F1 help, Escape menu, explicit Quit and native close; input prompts are always discoverable | Application/Platform host |
-| Camera | W/S or Up/Down forward/back; A/D or Left/Right strafe; E/Space up, Q/C down; Shift sprint, right mouse held for look, wheel for speed; reset to authored view is required | [Existing Application input collector](../../../Engine/Application/Private/Input/CameraInputIntentCollector.cpp) and GameFramework camera controller; help/sensitivity/reset presentation remains `PD-1` work. Escape releases mouse-look before opening the consumer menu. |
-| Development controls | Generic CVar assignment, startup-level environment variable, capture flags, console, shader recook, debug views and authoring actions | Source-only; absent from consumer UI and optional Shipping payload; not a replacement for the public menu |
-
-Consumer input is keyboard/mouse, English UI/help, arbitrary Unicode installation/user paths, windowed and borderless on one active display. Resolution choices are 1280x720, 1920x1080 and 2560x1440 when available; only 1920x1080 carries the performance promise. Native monitor refresh and VSync are reported honestly. DPI checks cover 100%, 150% and 200%. Controller, exclusive fullscreen, multi-window/multi-GPU, VR, localization, screen-reader certification and a broad accessibility certification are excluded. Keyboard navigation, readable labels, scalable text and visible errors remain required basics. HDR10 requires a qualified display/OS tuple; no silent claim from swapchain format vocabulary.
-
-## ReleaseMapSet
-
-Only these two existing level families are proposed for the consumer package. Catalog selection is a development acquisition setting, not package membership. Source-only maps remain usable through development workflows. Rights classification is not legal clearance.
-
-| Level | Product classification | Fixed view/route | Input and rights decision |
-| --- | --- | --- | --- |
-| `CornellBox` | Included; first-run/default | Authored camera `(0, 1, 3.8)`, yaw pi, pitch 0, FOV 45; fixed camera, 300 warmup + 300 sampled frames, three repeats | Existing publisher archive revision 2011-07-27; catalog SHA-256 `f27eaf47afec74b5236ce3095ac02d4256e8ac8610bfdb5a53560c67c2e0d8f1`. Inspected local publisher notice states CC BY 3.0; original OBJ additionally states public domain. [Owned conversion/attribution record](../../../Projects/Showcase/Assets/Meshes/CornellBox/Conversion/README.md) names Guedis Cardenas/Morgan McGuire. Current GLB hash matches its documented `a2af112abeaa1b08087009afa3efef2c6b665c59bd7a6efe70d703e8f2349d91`. Retain complete redistribution/cook receipts in `REL-01`; rect-light behavior still needs its real feature proof. |
-| `CesiumMan` | Included; animation example | Authored camera `(0, 1.5, -3)`, yaw/pitch 0, FOV 60; stationary camera, animation running; same sampling protocol | [Pinned upstream metadata](https://github.com/KhronosGroup/glTF-Sample-Assets/blob/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/CesiumMan/README.md) identifies CC BY 4.0 and separate logo/trademark notice. Local model JSON matches this revision after external URI relocation; both referenced buffer/texture bytes match exactly. Retain attribution and separate logo notice; no endorsement claim. Cooked animation/material fidelity and final notices remain packaging proof. |
-
-The two proposed package routes are deterministic observations, not new camera-path infrastructure. Captures record level/cooked-generation identity, camera, animation time, resolution, settings, driver and backend. Reference comparison uses an exact frozen pose; realtime performance uses the running clip. Changes invalidate evidence. Small scenes alone cannot prove the requested whole-frame depth: existing [Bistro/San Miguel workloads](../GraphicsWorkloads.md) remain required flagship/cross-scene quality and frame-review inputs. `BistroExterior` is the additional source-workload performance target for `REL-RT-1080P`; freeze its existing authored camera and named motion/disocclusion cases through MAP-00 before runs. Its exclusion from the consumer archive is not exclusion from realtime/frame-review qualification, and shareable content/capture rights still apply.
-
-Retained local source receipts are `build/validation/release-scope-20261010/content-receipts.json`: Cesium Man input identity passes; Cornell archive re-fetch returns HTTP 406 both with the default request and explicit browser User-Agent/Accept headers. Its local notice/original OBJ/MTL and matching documented GLB hash are retained, but a fresh archive-to-source match is unproved. `REL-01` content owner must supply/verify the pinned archive receipt. This failure does not establish that the asset is unsupported or change its proposed product classification.
-
-| Other current level entries | Consumer decision and reason |
-| --- | --- |
-| `Empty` | Excluded; source smoke fixture, never an intentional consumer example or fallback success |
-| `Sponza` | Excluded pending exact redistribution decision; [pinned current upstream metadata](https://github.com/KhronosGroup/glTF-Sample-Assets/blob/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/Sponza/README.md) references a CRYENGINE-specific agreement, not a generic CC license |
-| `DamagedHelmet` | Excluded pending exact provenance/rights decision; [pinned current metadata](https://github.com/KhronosGroup/glTF-Sample-Assets/blob/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/DamagedHelmet/README.md) lists both attribution and an earlier noncommercial contribution |
-| `ABeautifulGame`, `DiffuseTransmissionPlant` | Excluded from consumer package; do not advertise transmission/volume support through a model that depends on those semantics. A Beautiful Game's upstream CC BY 4.0 notice does not prove local material fidelity. |
-| `ModernSponza`, `ModernSponzaCandles`, `ModernSponzaKnight`, `JungleRuins`, `BistroExterior`, `BistroInteriorWine`, `SanMiguelHigh`, `SanMiguelLow` | Excluded from the small consumer package; retained source/development workload families with acquisition, resource and rights obligations |
-| `LPSHead`, `StanfordBunnySubsurface`, `StanfordDragonSubsurface`, `AnisotropyBarnLamp`, `SheenCloth` | Excluded from consumer package; dedicated source workloads, not accepted subsurface/anisotropy/sheen product demonstrations |
-
-The live catalog has **20 `[Level]` records and 17 `[AssetPack]` records**. There is no claim that all are ready, cooked, legally cleared or runtime supported. Every record is accounted for above; future entries require a scope decision.
-
-## Mutable Data And Compatibility
-
-The [PD-0 path and budget freeze](../FirstRelease.md#frozen-paths-mutation-boundary-and-budgets) remains authoritative. Immutable package bytes may be extracted to a read-only standard-user location. User data belongs below `%LOCALAPPDATA%\SparkleEngine\Showcase\v0.1\`, with separate Settings, Logs, Captures, Crashes and Cache folders. No save-game promise. No repository, development SDK or writable extraction-root requirement.
-
-| Boundary | Publication promise |
-| --- | --- |
-| Package/map identity | Published tag, manifest schema identity, archive/checksums and cooked-generation hashes are immutable per version. Public map IDs are exactly `CornellBox` and `CesiumMan` for `v0.1.x`; schema and bytes can change only with a new release identity. |
-| User settings | Documented Included setting names remain interpretable within `v0.1.x`; invalid/out-of-range values yield a visible safe reset, not undefined behavior. New optional keys may be added. Development-only keys are unstable. No compatibility reader is introduced in this scope pass. |
-| Cache | Disposable, generation/version-qualified; invalidate/rebuild rather than promise cache-format compatibility. Clearing Cache does not remove settings. |
-| Saves | Excluded; no save-game migration, mod/save format or synchronized account state |
-| CLI/environment | `--graphics-api` and `SPARKLE_RHI_BACKEND` values/precedence documented for `v0.1.x`; unknown backend rejects. Other development CLI/env contracts are version-specific and unstable; packaging must not depend on them. |
-| Source API / binary ABI | Exact public tag builds on the pinned toolchain; unstable source API across `0.y.z`; no supported binary ABI/plugin SDK. Patch release does not rename documented consumer controls or silently alter accepted map semantics. |
-| Upgrade/rollback | Manual download, verify, extract into a new version directory; never overwrite the immutable prior archive. Revert by launching the previous verified extraction. Back up Settings before a patch; restore that backup if rolling back. No automatic update or destructive migration. |
-| Side-by-side | Separate extraction roots. `v0.1.x` shares the declared `v0.1` settings root; different minor versions use separate roots. Concurrent use of two versions writing the same settings is unsupported and must be stated. |
-| Reset/removal | Reset settings through the product action or remove only its user settings file; clear each optional data folder separately. Delete extraction to remove the product; separately opt in to deleting its per-user data. |
-
-## Budgets And Observation
-
-The [PD-0 operation budgets](../FirstRelease.md#frozen-paths-mutation-boundary-and-budgets) are preserved: first interactive UI <=15 s, first example <=30 s, other release map <=60 s, quit <=5 s; archive <=4 GiB/extracted <=8 GiB; process peak commit <=12 GiB; tracked local GPU peak <=7 GiB; no unbounded growth. Source cold/warm build-cook and Launcher deadlines remain in that owner. These are operation limits, not calendar delivery targets.
-
-Both `REL-NATIVE-1080P` and `REL-RT-1080P` must meet the [30 FPS contract](../FirstRelease.md#thirty-fps-performance-floor) on MIN-01: ShippingGame, VSync Off, no capture/validation/profiler, >=300 warmup and >=300 valid samples, three repeats per selected map **and per API**. The native baseline runs each consumer map; realtime also runs BistroExterior as above. AC power, fixed Windows/OEM performance mode and steady thermals are required. Presented/app p95 and separate CPU/GPU p95 must each be <=33.33 ms; report p99, 1% low, worst frames, memory and clocks. The native baseline uses no DLSS; realtime uses its declared fixed DLSS Quality/RR topology, with no generated frames, dynamic resolution, provider fallback or settings retuning after results. The progressive reference instead carries its own convergence/cancellation/resource budgets, not a 30 FPS requirement. The [principal review packet](../FirstRelease.md#principal-frame-review) consumes separate captures and observer-controlled timing records.
-
-## Network, Security, Publication And Support
-
-| Topic | Finite promise and owner |
-| --- | --- |
-| Runtime network | Offline runtime. No telemetry, account, analytics, remote asset acquisition, update polling or automatic crash upload. Support links open only on explicit user action. Application/package owner verifies actual traffic and imports. |
-| Source acquisition | HTTPS access for public Git/dependency/content acquisition; pinned revisions/hashes, no private credentials; offline consumer package remains independent. Build/content owners retain receipts and SBOM. |
-| Privacy | Local logs/captures/crashes may expose user paths, scene content and memory. Reports are voluntary; explain/redact before upload. Dumps and private shader/CPU symbols are retained locally or shared privately with explicit consent, never attached automatically to public issues. |
-| Distribution | Proposed repository GitHub Releases channel, immutable `v0.1.0` tag and versioned archives; exact repository URL and publisher identity must be fixed by `REL-01`, not inferred from this local folder. |
-| Trust | Trusted Authenticode for every shipped PE; SHA256SUMS, manifest, dependency/content notices, SBOM, build provenance and vulnerability/malware disposition. Separate symbols archive governed by consent/privacy policy. Keys/accounts remain outside source and archives. Unsigned builds remain developer prereleases. |
-| Support | Release owner is the repository maintainer. Public issues for reproducible non-sensitive defects; private security intake with published contact is mandatory before publication. No commercial SLA or always-on support promise. |
-| Supported version | Support the `v0.1.x` line until an accepted replacement is published and this line is explicitly retired; no calendar release target. Retain hashes/notices/known issues/advisories for published versions. |
-| Response policy | Preserve PD-0 acknowledgement targets: public defect <=5 business days, private security <=3 business days; confirmed S0 containment/withdrawal <=1 business day. Acknowledgement is not a promised fix date. |
-| Patch/withdrawal | Triage severity; fix within scope, cut a new immutable patch, rerun invalidated gates, and publish release notes/checksums. Unsafe payload is withdrawn with a visible advisory and verified rollback instructions. Never replace existing signed archive bytes silently. |
-| Consumer limitations | Named hardware/API matrix only; no guaranteed NVIDIA/AMD/Intel-wide support, neural training/inference platform, multiplayer, networking, mod ecosystem, stable SDK, installer/updater, Linux/macOS, mobile or VR. No new scene families; display additions are the five admitted decals/grading/chromatic/vignette/HDR10 targets. AMD specialist profiler work remains out of scope. |
-
-The support mailbox, publisher/signing credential, distribution URL and complete dependency/content rights are **unprovisioned obligations**, not working services. Current root `LICENSE.txt` uses MIT text with `[year] [fullname]` placeholders; `REL-01` must establish the actual copyright/publisher identity and third-party notices. It must also prove redistribution for the published source tree, not merely the two runtime models. This record chooses policy; it does not invent a contact address, copyright owner or signing certificate.
+These are delivery requirements. Map selection does not establish permission to redistribute the assets or prove they render correctly.
 
 ## Approval And Next Work
 
-| Item | Decision state / next owner |
+**Your remaining decisions are the proposals below.** All are unanswered. You can answer by number, approve a row, or replace its proposed value. A change to an existing acceptance requirement must also update its owner; this page cannot waive it.
+
+| # / decision | Current proposal | What accepting it commits us to |
+| --- | --- | --- |
+| 1. What do we publish? | A portable Windows x64 Showcase app (`ShowcaseRuntime.exe`), version `v0.1.0`, plus a public source tag and build instructions. Launcher, Editor and import/cook/compiler tools are built from source; no separate developer archive. | People can download and run the demo without a development environment, or reproduce it from source. No installer, automatic updater or stable plugin SDK. |
+| 2. Which Windows versions? | Windows 11 x64 **24H2/build 26100 or newer**, using the named laptop as the initial hardware target. | Your inspected machine runs 25H2. Supporting the earlier 24H2 boundary still needs validation; we cannot infer it from your laptop. Other hardware remains unqualified. |
+| 3. Which controls and display options? | English keyboard/mouse UI; one display; windowed/borderless; 720p, 1080p and 1440p when available. Help, example selection, camera reset, settings Save/Reset and Quit. | Build these consumer controls and check Unicode paths and 100/150/200% scaling. Performance is promised at 1080p only. Controller, exclusive fullscreen, VR, localization and broad accessibility certification are excluded. |
+| 4. What are the remaining startup defaults? | D3D12; VSync On; automatic histogram exposure; ACES approximation; SDR output; neutral grading; chromatic aberration/vignette Off; HDR opt-in. Exact render defaults are [below](#baseline-and-selection). | Implement these defaults and show requested/active settings and unavailable options clearly. Your Modern Sponza/native 1080p Lit choice is already settled. |
+| 5. What survives an update? | Keep documented consumer settings, controls and map IDs stable within `v0.1.x`. Manual download/extract updates, previous-version rollback, optional settings reset. Cache is disposable; no saves or stable source/binary API. | Maintain the [settings and update promises](#mutable-data-and-compatibility). Side-by-side patch versions share settings; concurrent writes are unsupported. |
+| 6. How do we distribute and handle privacy? | GitHub Releases; offline runtime; no telemetry, account, automatic asset downloads or crash uploads. Reports are voluntary; sensitive dumps/symbols shared privately with consent. | Verify offline operation and publish versioned archives, hashes and notices. Trusted executable signing is already required by the [acceptance contract](../FirstRelease.md#approval-rules); identity/contact/credentials still need provisioning. |
+| 7. What support do you offer? | You, as maintainer, own public bug reports and a private security contact. Support `v0.1.x` until an accepted replacement is published and this line is explicitly retired. | Existing acceptance targets are: acknowledge bugs within **5 business days**, security reports within **3 business days**, and contain/withdraw confirmed critical (`S0`) problems within **1 business day**. These are real commitments, not promised fix dates. No commercial SLA or always-on support. |
+
+### Work For The Agent And Technical Owners
+
+These tasks require investigation or implementation evidence. You do not need to approve a hash or declare a license valid.
+
+| Task / owner | Concrete missing result | Next action |
+| --- | --- | --- |
+| Cornell source receipt — content owner | The original 224,880-byte archive matching the catalog SHA-256. Publisher requests returned HTTP 406; the inspected cache did not contain it. | Reacquire/verify that archive and connect its source/notices to the local conversion. [Exact receipt](Evidence.md#selected-content-receipts). |
+| Asset/dependency rights — rights owner | Modern Sponza notices mix CC BY 4.0 with narrower usage wording; classic Sponza names CRYENGINE-specific terms. Complete source-tree/dependency notices remain open, including Cesium's separate logo notice. | Inspect exact terms and bytes, retain obligations and resolve ambiguous permission before redistribution. |
+| Publisher/contact — release owner | Root MIT license still has `[year] [fullname]`; publisher identity, repository URL, support/security contact and signing credentials are not provisioned. | Collect actual identity/contact information and establish the signing route. No invented owner or mailbox. |
+| Selected-map correctness — content/rendering owners | Plant and chess declare material effects outside the accepted reference domain; Cornell emitter interpretation, Cesium reference pose, LPS Head materials and exact cooked closure need proof. | Qualify them in the existing feature/workload owners. Any labelled reduced-domain variant needs your explicit decision. |
+| Package size and baseline — build/package owners | Cooked seven-map size, immutable dependencies and clean source/build/cook/run reproduction are unproved. Modern Sponza's source downloads alone exceed 4 GiB. | Measure cooked output against the unchanged limits; pin inputs and retain exact commands. Do not change budgets or strip assets silently. |
+
+**What can happen now:** source/dependency/rights discovery may gather these receipts. Full identity/baseline stage (`FR-01`) execution and product implementation wait for scope approval and their own prerequisites. Unresolved rights or mutable inputs stop package work. Approval of the numbered proposals does not itself clear those blockers.
+
+## ReleaseMapSet
+
+The intended examples are fixed; admission still requires rights, material and package checks.
+
+| Map | Purpose / current concern |
 | --- | --- |
-| Named minimum/reference laptop | **Approved by user** in this session; OS/storage/CPU/GPU inventory retained locally; no performance verdict |
-| Rendering amendment | **Owner-directed requirements recorded**: full admitted progressive reference, realtime >=30 FPS, complete SR/RR, exposure/tone/lens features, parity, graph and principal review. Required feature cells are Included; no correctness/acceptance promotion. |
-| Other scope, two-map set and support/compatibility proposals | Still proposed; the rendering amendment does not imply blanket approval of unrelated choices. |
-| `REL-00` | **BLOCKED for remaining scope approval/rights/domain/preset receipts**. Requested rendering requirements have been incorporated; no longer waiting to learn what the owner wanted changed. No `R`, `N` or `P` evidence is added. |
-| `REL-01` discovery | Ready to inspect the two selected assets and their dependency closure, repository license/publisher, exact acquisition pins, signing/distribution/security intake; retain receipts before any package claims |
-| `PD-1` implementation | Waits for approved `REL-00` and applicable mother-plan prerequisites. Consumer first-run/menu, settings validation, Shipping console isolation and changed defaults remain concrete TODOs. |
-| Later release gates | Build/cook/package, required missing rendering features, HDR display qualification, per-API performance, controlled failures, clean-machine adoption and publication remain unrun in Stage 0 |
+| `ModernSponza` | First-run scene; base plus colorful curtains. License wording and cooked size need resolution. Candle/knight variants are excluded. |
+| `Sponza` | Classic lighting scene; exact redistribution terms remain open. |
+| `CornellBox` | Reference/lighting scene; original archive receipt and single-emitter interpretation need closure. |
+| `CesiumMan` | Animation scene; retain attribution/logo notice and freeze an exact pose for reference comparisons. |
+| `LPSHead` | Head/material scene; verify conversion/textures and material fidelity. Selection does not establish physical subsurface reference support. |
+| `DiffuseTransmissionPlant` | Plant/animation scene; diffuse-transmission fidelity remains open. |
+| `ABeautifulGame` | Chess scene; transmission/volume fidelity remains open. |
 
-## ITER-REL-00-01 Control Record
+[Exact source hashes, authored cameras, notices and upstream metadata](Evidence.md#selected-content-receipts) are retained separately. The accepted reference domain covers surface reflection; transmission, volume, spectral and physical subsurface transport remain excluded. Unsupported material effects cannot be silently dropped.
 
-| Field | Record |
+Excluded from the initial consumer package: `Empty`, `DamagedHelmet` (rights unresolved), `ModernSponzaCandles`, `ModernSponzaKnight`, `JungleRuins`, `BistroExterior`, `BistroInteriorWine`, `SanMiguelHigh`, `SanMiguelLow`, `StanfordBunnySubsurface`, `StanfordDragonSubsurface`, `AnisotropyBarnLamp` and `SheenCloth`. Moana is deferred and has no current catalog level. These remain development/source workloads; no feature is marked Removed. The inspected catalog contains 20 levels and 17 asset packs.
+
+## Product And Supported Matrix
+
+<details>
+<summary>Exact machine, API and source-build requirements</summary>
+
+| Field | Selected machine / proposed boundary |
 | --- | --- |
-| Scope / owner | Stage 0 only; repository maintainer/release owner. Start revision above, clean tree. Documentation/source/host inspection, no production or build configuration changes. |
-| North Star / persona | `NS-REAL`, `NS-EVIDENCE`, `NS-OWNERSHIP`, `NS-ADOPTION`, `NS-SIMPLIFY`; `PGE-01`, `PGE-05`–`10`, `PGE-13`, `PGE-15` advance scope clarity only; mathematical/graphics proof preserved, not increased. |
-| Delivery mapping | `REL-00`, `FR-00`, `RISK-REL-01/05/09/11/12/13`; all inventory owners and `FCR-*` routes retained; `PTD-00` accepted development discovery preserved, not rerun or promoted to oracle proof. |
-| Complexity / preservation | Two subject-local scope/ledger documents; navigation edits only. No new production API, data copy, dependency, implementation plan, test harness, legacy alias or runtime mechanism. Preserve PD-0 budgets and mandatory feature obligations. |
-| Risk `RISK-SCOPE-01` | Historical inventory/count/default mistaken for live support -> overbroad product claim. High likelihood from dated snapshot; high impact. Detect via live catalog/settings/enums/target membership and exhaustive ID reconciliation; reduce/fix proposal and hold approval. Release owner retires with approved ledger and retained source inputs. |
-| Risk `RISK-SCOPE-02` | Third-party sample availability mistaken for redistribution/material fidelity -> invalid public package. High likelihood from mixed license and extension metadata; critical impact. Detect through primary metadata, asset hashes/notices and material-consumer trace; exclude ambiguous content pending receipts. Content owner retires through `REL-01`, not this source audit. |
-| `AC-SCOPE-01` | Every existing module inventory capability ID has exactly one disposition and module owner; all 20 level entries, 18 view enum values and 26 persisted selector names (25 common plus one conditional Editor setting) have an explicit distribution/classification decision. |
-| `AC-SCOPE-02` | Product/audiences, named machines, baseline, maps, budgets, mutable roots, compatibility/security/support policies are concrete and trace to the acceptance contract. Mandatory Included targets remain Included; no executable acceptance is inferred. |
-| `FM-SCOPE-01` | Missing/duplicate/unmatched row, new catalog entry or selector -> coverage check fails, retain source input, revise ledger before approval; an unexplained omission is a scope blocker. |
-| `FM-SCOPE-02` | Unknown asset right or unqualified feature -> explicitly unresolved/excluded, never approved by source presence; retain primary metadata and request owner disposition before package work. |
-| Checks | `CHK-SCOPE-01`: exact ID/set coverage, source-reference existence, catalog/view/settings reconciliation and mandatory-feature assertion. `CHK-SCOPE-02`: local Markdown links/anchors, UTF-8, stale names and whitespace. `CHK-SCOPE-03`: review against each `REL-00` clause, public-versus-source boundary and existing PD-0 constants. Negative controls reject missing/duplicate IDs and an invalid disposition using in-memory inputs; no permanent probes. |
-| Result / invalidation | **SUPERSEDED for amended documents:** the original 511-ID static slice remains retained in `build/validation/release-scope-20261010/`; amended requirements/classifications are rechecked in ITER-REL-00-02 below. Rights receipts remain useful within their stated identities. No build/cook/runtime/native/performance/package/adopter verdict is added. |
+| Executable/profile | `bin/ShowcaseRuntime.exe`, Windows x64 `ShippingGame` |
+| Observed OS | Windows 11 Home 25H2, build `26200.9457`; proposed target starts at Windows 11 x64 24H2/build 26100 |
+| `MIN-01` / `REF-01` | Same AMD Ryzen 9 8940HX laptop, 16 cores/32 logical processors; 67,833,212,928 bytes OS-reported RAM; NVIDIA GeForce RTX 5070 Ti Laptop GPU, 12,227 MiB reported VRAM; driver `610.47` |
+| Storage | Patriot P400L 2000GB NVMe SSD, NTFS; at least 16 GiB free for extraction/staging/user data |
+| D3D12 | Default; feature level 12_1, SM 6.6, DXR 1.1. Reject missing required features before rendering. |
+| Vulkan | Explicitly selectable; Vulkan 1.3 plus the [required feature set](../FirstRelease.md#frozen-platform-and-toolchain-prerequisites). Separate native/provider/performance proof required. |
+| Source build | Exact [toolchain](../FirstRelease.md#frozen-platform-and-toolchain-prerequisites): VS Community 2026 18.7.0/MSVC 14.51.36231, Windows SDK 10.0.26100.0, CMake 4.3.3, Git for Windows 2.54.0, Qt 6.11.1 `msvc2022_64`, Vulkan SDK 1.4.350.0/Slang 2026.8, DXC 1.9.0.5347 |
 
-## ITER-REL-00-02 Rendering Amendment
+This is an initial named-machine claim. Generic 8 GiB GPU/16 GiB PC floors and other hardware/drivers require qualification before advertisement. Two measurement roles on one machine do not count as independent adoption. HDR additionally requires a qualified HDR10 display/OS configuration; none is recorded. No hardware purchase is authorized. Debug/Development Editor/Game and Launcher are source products; alternate toolchains remain unqualified.
 
-| Field | Record |
+</details>
+
+## Baseline And Selection
+
+Three presets have distinct purposes: ordinary viewing, realtime path tracing, and progressive reference output. Their implementation and numerical qualification remain delivery work.
+
+<details>
+<summary>Exact presets and consumer controls</summary>
+
+- **`REL-NATIVE-1080P`:** 1920x1080 SDR Lit, raster GBuffer, native extent/Linear provider, Ray Reconstruction Off, classic TLAS/refit On, PTLAS Off, auto batching On, Automatic Histogram exposure, ACES approximation, automatic SDR encoding. Preserve declared direct/indirect diffuse/specular, direct subsurface and shadow defaults. Consumer VSync On; performance VSync Off. Grading neutral, chromatic aberration/vignette Off, no baseline decal actors; these remain Included selectable features. HDR10 opt-in after qualification.
+- **`REL-RT-1080P`:** 1920x1080 output, traced primary/secondary transport, classic TLAS, DLSS Quality requested, Ray Reconstruction On; fixed SDK-derived render extent/composition before measurement; Frame Generation and dynamic resolution Off. Freeze depth/reuse/approximation in the existing feature discoveries, keeping one final image. Native/RR-Off controls measure cost/quality. Ray GBuffer alone or Linear/Off fallback cannot satisfy this preset; current Lit lighting is only the starting implementation path.
+- **`REL-REFERENCE`:** progressive admitted surface transport in the consumer viewport; sample/convergence/invalid state, reset/cancel and reproducible raw-linear export. No DLSS, reconstruction, firefly clamping or artistic post effects in oracle output. Full admitted reflection is required; finite-depth output is diagnostic. Freeze animation pose and reset/reject contributing scene/camera/material/light changes. [Reference semantics](../../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/TransportAndEstimator.md#claim-boundary) owns the domain and two distinct products.
+
+The source snapshot differs: `DefaultEngine.ini` requests VSync Off, ACES filmic, DLSS/NativeAA, reconstruction On and PTLAS preference On; `LevelRegistry::EnsureDefaultLevel` selects Empty. The consumer-shell phase (`PD-1`) must implement the selected startup behavior and safe unavailable-provider handling.
+
+| Consumer route | Proposed behavior / owner |
 | --- | --- |
-| Scope / start | Owner-requested revision of Stage 0 only, at `93e86b8113c3fcd0c4921729c3513538b95bc794`; the preceding eight-document scope draft is pre-existing owned work and preserved. No production/CMake/configuration changes. |
-| Outcome / mappings | `NS-REAL`, `NS-MATH-DATA`, `NS-EVIDENCE`, `NS-OWNERSHIP`, `NS-ADOPTION`; `PGE-02/05/06/08/09/13/15` advance requirement precision only. `REL-00/04/06/07`, FCR-REN-02/06/07/08/09/10/14/15/25 and existing domain/feature checks. No score or native acceptance increase. |
-| Structural budget | Amend existing scope/ledger/feature/plan/report owners; one small Vignette dossier and target inventory ID REN-POST-14. FCR-REN-25 owns two independently proved lens results; retain 49 families, remove weaker Experimental/source-only classifications for mandatory rendering, preserve PTD-00 and separate graph/feature/native authority. |
-| `RISK-SCOPE-03` | Required reference/realtime/provider/parity work remains labelled experimental or source-only -> release escapes the requested quality target. High likelihood from previous proposal; critical impact. Detect via disposition/surface/mode assertions, numeric preset review and owner/phase crosswalk; fix docs and hold acceptance. Release owner retires through approved scope plus real feature/performance/review reports. |
-| `AC-SCOPE-03` | Required tracer/reconstruction rows and Reference mode are Included/runtime; vignette has one owner/ID/dossier; two independent lens proofs preserve the 49-family registry. Existing exclusions remain explicit. |
-| `AC-SCOPE-04` | Native/realtime/reference presets, >=30 FPS and reference truth have distinct proof contracts; parity requires both APIs; principal review requires retained independent identity/findings and full frame evidence. No fallback, finite diagnostic, generated frame, unrun reviewer or metadata can pass those gates. |
-| `FM-SCOPE-03` | Missing vignette/duplicate ID or a mandatory row reverted to Experimental -> static coverage/required-row checks reject; revise before freeze, no production mutation. |
-| `FM-SCOPE-04` | Source/SDK/example output treated as feature completeness -> retain the current D3D12-only initialization gap, PTD domain/uncertainty limits and unrun review/performance status; acceptance stays blocked. |
-| Checks / artifacts | Exact inventory/ledger/class/mode/settings coverage, negative in-memory omission/duplicate/weakened-class controls, local links/anchors, UTF-8, whitespace, production-input hash preservation and `git diff --check`; retained commands/results in `build/validation/release-scope-amendment-20261010/`. Native builds/runs/review are not appropriate proof for this documentation-only amendment and remain unrun. |
-| Static result | **PASS:** 138 checks, 22 changed/new documents, 622 local links, 152 anchors, 13 unchanged production inputs and three rejected in-memory negative controls at the revision above. Coverage is 512 capability IDs across 16 inventory owners; the existing 49 report families remain unchanged. This accepts documentation consistency only. |
-| Disposition / next work | Rendering requirements incorporated; REL-00 remains BLOCKED for remaining scope/rights/domain/preset freeze. Execute dependency-ready source/SDK/domain discovery through existing owners; implementation requires its own authorized phase and checks. Preserve numerical budgets and do not retune them to candidate results. |
+| API | `--graphics-api D3D12` or `--graphics-api Vulkan`; precedence: build default, then `SPARKLE_RHI_BACKEND`, then CLI. Invalid token fails visibly. Application graphics launch owns it. Existing `--renderer`/`--rhi` are development conveniences. |
+| Startup/examples | No arguments opens Modern Sponza at its authored camera; Examples menu lists the seven qualified maps. Switching shows progress/failure and returns to the previous valid level. Application host and GameFramework session own this; Empty cannot masquerade as package success. |
+| Settings | Resolution/window mode, VSync, tracing preset and Included render/post controls; requested/active status, Save/Reset, restart indication. Application persistence and Renderer features retain authority. |
+| Help/quit | F1 help, Escape menu, explicit Quit and native close. Escape releases mouse-look before opening the menu. |
+| Camera | W/S or Up/Down forward/back; A/D or Left/Right strafe; E/Space up; Q/C down; Shift sprint; hold right mouse to look; wheel adjusts speed. Discoverable help, sensitivity and authored-camera reset required. [Input collector](../../../Engine/Application/Private/Input/CameraInputIntentCollector.cpp) and GameFramework camera controller own movement. |
+
+Generic console/CVar assignment, startup-map environment selection, capture flags, shader recook, debug views and authoring actions remain source-only and absent from the consumer UI and shipped runtime payload. Consumer display/input limits are decision 3; readable labels, scalable text, keyboard navigation and visible errors remain required basics. Native refresh/VSync must be reported honestly.
+
+</details>
+
+## Mutable Data And Compatibility
+
+<details>
+<summary>Exact settings, update, rollback and removal promises</summary>
+
+The [path/budget contract](../FirstRelease.md#frozen-paths-mutation-boundary-and-budgets) owns immutable package bytes and `%LOCALAPPDATA%\SparkleEngine\Showcase\v0.1\` user data: separate Settings, Logs, Captures, Crashes and Cache folders. A standard user can run from read-only extraction; no repository, SDK or writable package root is required.
+
+Published tag, manifest schema identity, archive/checksums and cooked-generation hashes are immutable per release. The seven map IDs above remain the `v0.1.x` public IDs. Schema/bytes change only under a new release identity.
+
+Documented Included settings/controls remain interpretable within `v0.1.x`; invalid values visibly reset safely, optional keys may be added, and development keys are unstable. Cache is generation/version-qualified and disposable; clearing it preserves settings. No save-game/migration/account-state promise. Source APIs may change across `0.y.z`; no binary ABI/plugin SDK. Patches cannot rename documented controls or silently change accepted map semantics. `--graphics-api` and the documented backend environment selection retain their values/precedence within `v0.1.x`; other development flags remain unstable.
+
+Update by downloading, verifying and extracting a new directory. Back up Settings before a patch; roll back by launching the previous verified extraction and restoring its settings backup. Patch versions share `v0.1` settings; different minor versions have separate roots. Concurrent versions writing shared settings are unsupported. Reset through the product or remove only its settings file; clear optional data folders separately. Delete the extraction to uninstall; deleting user data is a separate opt-in action. No automatic update or destructive migration is proposed here.
+
+</details>
+
+## Budgets And Observation
+
+Keep the existing [operation limits](../FirstRelease.md#frozen-paths-mutation-boundary-and-budgets): first UI <=15 s, first example <=30 s, other map <=60 s, quit <=5 s, archive <=4 GiB, extracted <=8 GiB, process peak commit <=12 GiB, tracked local GPU peak <=7 GiB, no unbounded growth. Source/Launcher deadlines remain in that owner.
+
+Native and realtime presets must each satisfy the [30 FPS contract](../FirstRelease.md#thirty-fps-performance-floor) on all seven maps and both APIs: ShippingGame, VSync Off, >=300 warmup and >=300 valid sampled frames, three repeats; presented/app, CPU and GPU p95 each <=33.33 ms. Use AC power, fixed Windows/OEM performance mode and steady thermals. Record p99, 1% low, worst frames, memory/clocks, map/cooked generation, authored camera/animation time, render/output extents, settings, driver and backend. No capture/validation/profiler in timing runs, generated frames, dynamic resolution, fallback or post-result retuning. Native uses no DLSS; realtime uses its frozen Quality/reconstruction topology. Modern Sponza's detailed motion/disocclusion workload is frozen by `MAP-00`. Reference has convergence/cancellation/resource budgets rather than a 30 FPS promise. [Principal frame review](../FirstRelease.md#principal-frame-review) uses separate captures and observer-controlled timings.
+
+## Network, Security, Publication And Support
+
+Decisions 6 and 7 state the proposed public promises. Publication still requires the [existing trust/approval rules](../FirstRelease.md#approval-rules): trusted Authenticode on every shipped PE, SHA256SUMS, manifest, dependency/content notices, software bill of materials, build provenance and vulnerability/malware disposition. Keys/accounts stay outside source/archives; unsigned builds remain developer prereleases.
+
+Source acquisition uses public HTTPS inputs with pinned revisions/hashes and no private credentials. Runtime remains offline. Support links open only on user action. Logs/captures/crashes may contain paths, scene content or memory; explain/redact voluntary reports, and share dumps/private CPU/shader symbols only privately with consent. A separate symbols archive follows the same privacy boundary.
+
+Publish new immutable patches and rerun affected gates; retain version hashes/notices/known issues/advisories. Withdraw unsafe payloads with a visible advisory and verified rollback instructions. Never silently replace a published signed archive.
+
+Excluded product promises: general NVIDIA/AMD/Intel-wide support, neural training/inference platform, multiplayer/networking, mods, stable SDK, installer/updater, Linux/macOS, mobile and VR. No additional scene families or AMD specialist profiler work. PTLAS and source-only external capture remain experimental within their declared vendor/debug limits.
+
+## FR-00 Review Package
+
+The [reconciliation and iteration evidence](Evidence.md#fr-00-review-package) retains the source identities, license observations and historical checks. The latest audit accounted for 512 capability IDs, 20 levels, 18 view modes and 26 persisted names. Its static checks passed; final scope approval and rights remain **BLOCKED**. Accepted path-tracer development discovery remains preserved; reference release-oracle, native, build, cook, package, performance and adoption results remain unaccepted.

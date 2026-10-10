@@ -1,24 +1,10 @@
 # First Release Acceptance Contract
 
+Use this contract to decide whether exact release bytes may ship. Make product choices in [Release Scope](ReleaseScope/README.md#approval-and-next-work); choose implementation work in [Roadmap](../Strategy/Roadmap.md#where-we-are-and-what-is-next).
+
 **Status:** acceptance contract for the first public engine release; requirements are not completion claims
 
-**Responsibility:** define the complete evidence and approval boundary for the first public SparkleEngine release
-
 **Release target:** SparkleEngine `v0.1.0`, Windows x64
-
-**Stage 0 decision record:** [Release Scope](ReleaseScope/README.md) and [Capability Dispositions](ReleaseScope/CapabilityDispositions.md). The minimum/reference laptop and required rendering outcomes below are directed by the owner. Other scope choices remain proposed; no feature acceptance or passed `REL-00` gate is implied.
-
-**Roadmap and sequence:** [F. Release-First Principal Graphics Roadmap](../Strategy/Roadmap.md)
-
-**Implementation orchestrator:** [First Release Implementation Plan](../Architecture/CrossModule/FirstRelease/README.md)
-
-**Detailed graphics workloads:** [I. Bistro and San Miguel Acceptance Workloads](GraphicsWorkloads.md)
-
-**Validation policy:** [Validation, Performance, and Evidence](../Engineering/Verification/ValidationAndEvidence.md)
-
-**Per-feature polish and explanation:** [First Release Feature Completion Reports](FeatureCompletionReports.md)
-
-**Release risk and iteration order:** [Release Risk Register](../Strategy/Roadmap.md#release-risk-register)
 
 **Current readiness:** feature implementation/integration portfolio **40/100**; release acceptance **0/100**. All 49 tracked feature families remain Blocked, no candidate-bound report exists, and no release gate has passed. Deferred decals, color grading, chromatic aberration, basic vignette, and HDR10 output are mandatory **0/100** blockers. The newly admitted vignette does not automatically rescore the historical portfolio. See [Current Feature Readiness](CurrentReadiness.md).
 
@@ -36,7 +22,7 @@
 | What exists? | Broad engine, tooling, content, Renderer, and D3D12/Vulkan source paths plus focused development workflows. |
 | Where are we now? | Feature portfolio **40/100**, release acceptance **0/100**, `Blocked`; no frozen candidate has passed the clean build/cook/package, feature, map, backend, performance, stability, adoption, publication, and stabilization gates. |
 | What is the largest product gap? | There is no accepted manifest-owned release package or clean-machine consumer/source-adopter record. |
-| What is the reading rule? | Use the audit below for current blockers, then the release-gate table for the proof required to change a status. |
+| What is the reading rule? | Use [release gates](#release-gates) for the proof required to ship and the [dated audit](#current-release-audit) for recorded blockers. |
 
 ```mermaid
 flowchart LR
@@ -48,6 +34,42 @@ flowchart LR
     Native --> Adopt[Independent consumer<br/>and source adoption]
     Adopt --> Publish[Publish and stabilize]
 ```
+
+## Release Gates
+
+Gates are strictly ordered. A later gate may be prepared, but it cannot be accepted while an earlier gate is red.
+
+| Gate | Exit criteria | Required artifact |
+| --- | --- | --- |
+| `REL-00 Scope and freeze` | Runtime-consumer and source-adopter promises, platform/support/budget matrix, feature classifications, public/compatibility/non-goals, and release roles are frozen. | Approved [Release Scope](ReleaseScope/README.md) and [Capability Dispositions](ReleaseScope/CapabilityDispositions.md), exported into candidate `release-scope.md` with audience journeys and compatibility decisions; exact rights receipts remain required. |
+| `REL-01 Identity, rights, supply chain, and map set` | Version/publisher/license are real; exact `ReleaseMapSet`, immutable dependency closure, signing/distribution route, threat model, SBOM plan, notices, and redistribution decisions are reviewed. | Identity/signing decision, threat model, dependency/license/SBOM inventory, notices audit, and map manifest. |
+| `REL-02 Clean reproducible baseline` | Clean tagged-source candidate performs empty-cache dependency sync, configure, named Shipping build, approved checks, and warm/offline-cache replay; validation and any explicit test authorization are recorded. | Environment/provenance manifest and raw sync/build/check logs. |
+| `REL-03 Package spine` | One command performs Build, Cook, Stage, Sign, Verify, and Package; the allowlisted staged tree has immutable content, per-user writable state, dependency closure, SBOM, hashes, and no repository path dependency. | First non-candidate archive, package inventory, signatures, SBOM, and created-path record. |
+| `REL-04 Current feature closure` | Every current surface is `Included`, `Experimental`, `Excluded`, or `Removed`; every included/experimental row has a complete how-it-works/polish report and passes its subsystem integration/failure criteria. | Approved feature-closure matrix and candidate-bound completion reports. |
+| `REL-05 Map correctness and PBR` | Every release map passes end-to-end, artifact, PBR, debug-view, reference, and temporal review on each included backend. | Per-map evidence packages and defect disposition. |
+| `REL-06 Performance and stability` | Every release map meets the 30 FPS floor; load/soak/repeat/resize/switch/shutdown and memory gates pass on the supported matrix. | Raw timings, captures, memory records, and stability log. |
+| `REL-07 Native backend diagnostics` | D3D12 and Vulkan validation passes are clean or every finding is resolved/classified; crash/device-loss diagnostics are actionable. | API validation logs, captures, driver matrix, and incident records. |
+| `REL-08 Clean-machine candidate` | The signed frozen archive completes the consumer journey offline as a standard user on minimum/reference machines, with read-only install, per-user state, integrity, compatibility, and failure checks. | Candidate hashes/signatures, clean-machine record, filesystem/network inventory, screenshots, and logs. |
+| `REL-09 Independent release approval` | A non-author completes both consumer and source-adopter journeys from public instructions; all failure-mode checks pass; zero open `S0`/`S1`; waivers and known issues are approved. | Signed go/no-go checklist, consumer report, source-adopter report, and negative-test ledger. |
+| `REL-10 Publish and verify` | The installed-consumer compatibility policy is effective; tag/artifact bytes are immutable; uploaded hashes/signatures/attestation match; fresh downloads pass consumer and shortest source checks; notes/notices/security/support routes work. | Published URL/tag, checksums/signatures/attestation, retrieval logs, final policy, and support owner. |
+| `REL-11 Stabilize and close` | The frozen stabilization window ends with every report triaged, required patch/withdrawal completed, supported-version/security data current, and no unresolved `S0`/`S1`. | Support ledger, patch/withdraw records, retrospective, and approval to unlock new feature work. |
+
+### Gate Failure And Recovery Matrix
+
+| Gate | Representative failure modes | Required response before retry |
+| --- | --- | --- |
+| `REL-00` | Audience omitted; unlimited feature promise; no minimum hardware; runtime/source/SDK claims confused; update/support owner absent. | Reduce and classify scope, declare non-goals and budgets, assign owners, then reapprove the whole contract. |
+| `REL-01` | Placeholder identity; unclear map/dependency redistribution; moving dependency; no signing path; debug/vendor payload assumed redistributable. | Remove/replace/pin the input, obtain and record rights/signing route, regenerate inventory/notices, and reapprove. Unknown rights are a stop, not a waiver. |
+| `REL-02` | Dirty source; dependency resolves differently; empty-cache configure/build fails; warm cache hides missing input; warnings/check failures. | Fix the authoritative build/dependency path, recreate from clean state, retain the failed log, and rerun both cold and warm routes. |
+| `REL-03` | Missing DLL/content/manifest; extra debug/source/private file; writable install assumption; wrong signature; repository-relative lookup; nondeterministic membership. | Reject the stage, fix its single owner, regenerate/sign/verify/package from source, and never patch the archive manually. |
+| `REL-04` | Selectable unclassified feature; silent fallback; requested/active mismatch; happy path only; unsupported option schedules partial work. | Fix and prove the feature or remove it from package/UI/docs. Update every producer/consumer and invalidate dependent evidence. |
+| `REL-05` | Missing asset; PBR/reference mismatch; NaN/Inf; temporal artifact; backend divergence; fallback `Empty`; threshold chosen after viewing result. | Stop the map, classify owner, fix or remove map/feature, refreeze thresholds when the contract—not the result—was wrong, then rerun the full map/backend record. |
+| `REL-06` | Presented/CPU/GPU p95 over 33.33 ms; hitch cluster; load/startup budget miss; memory growth/thrash; thermal/dynamic-quality contamination. | Mark failed, capture bottleneck evidence, optimize the owner or reduce the preapproved scope/preset honestly, then rerun all three runs and stability loops. |
+| `REL-07` | D3D12/Vulkan validation message; device removal; descriptor/resource lifetime error; crash record lacks context; validation path changes behavior. | Fix the API/lifetime owner, preserve reduced evidence, rerun focused validation then affected maps; do not waive an uncategorized native error. |
+| `REL-08` | Smart App Control/antivirus block; no-admin/read-only/offline failure; settings write into install; corrupt-cache crash; unexpected network/file mutation; removal damages user data. | Reject candidate bytes, correct package/runtime ownership or supported scope, produce a new candidate ID, and rerun every invalidated gate. |
+| `REL-09` | Non-author needs private help; source build cannot reproduce; instructions omit a prerequisite; negative check misses its injected defect; open `S0`/`S1`. | No-go. Fix product/docs/evidence, generate a new candidate if bytes changed, and repeat independent acceptance with a clean state. |
+| `REL-10` | Uploaded bytes/hash/signature/tag differ; compatibility policy still assumes no consumers; broken release/support/security link; fresh download fails. | Stop announcement or withdraw affected assets, preserve incident evidence, publish corrected bytes only under a new version/candidate, then verify again. |
+| `REL-11` | New `S0`/`S1`, security report, repeat crash, bad notice, or support route failure during stabilization. | Triage within the declared response window; patch, withdraw, or publish advisory; verify the replacement and extend stabilization before unlocking features. |
 
 ## Purpose And Authority
 
@@ -205,7 +227,7 @@ Audit basis: static source/build/document inspection of committed `master` at `8
 | RHI | D3D12 and Vulkan implementations, native validation switches, timing, capture, and ray-tracing paths exist. | `Source present`: native validation cleanliness, capability failure, resource lifetime, and device-removal behavior require evidence. |
 | Renderer | Raster, deferred/PBR, exposure, tone mapping, debug views, Linear/DLSS upscaling, DLSS Ray Reconstruction, ray/path, ReSTIR, scene/view/frame, and GPU-scene paths are present. Deferred decals, color grading, chromatic aberration, and HDR10 output are absent but first-release admitted; volumetric lighting and frame generation remain excluded. | `Source present` or admitted target: each included mode needs a frozen feature row, map evidence, performance result, and backend disposition. Every admitted absent feature must be implemented and evidenced; exclusions cannot masquerade as support. |
 | World/content | World, scene, component, map catalog, import, cook, shader cook, and runtime asset paths exist. | `Source present`: deterministic clean cook, package-relative load, malformed-input handling, and bounded memory need proof. |
-| Showcase content | The catalog contains 16 level records; 13 are described by the current workload audit as runtime-supported and three as source-readiness-only. External packs have mixed licenses and support states. | `Blocked`: freeze a redistributable `ReleaseMapSet`; runtime support does not establish redistribution rights or visual acceptance. |
+| Showcase content | The current scope reconciliation inventories 20 level records and 17 asset packs. The owner selected seven maps; Modern Sponza/native 1080p Lit opens first. External packs have mixed licenses and support states; catalog flags are not runtime acceptance. | `Blocked`: freeze a redistributable `ReleaseMapSet`; runtime support does not establish redistribution rights or visual acceptance. |
 | Evidence harness | Level-selected launch and manual viewport capture exist; backend timestamp infrastructure exists. | `Blocked`: `MAP-00` still owns fixed resolution, readiness/settled identity, named capture sidecars, timing export, and a unified manifest. |
 | Feature completion reporting | A source-audited report registry and binding how-it-works/polish schema now cover product, foundation, world/content, RHI, Renderer, tools, delivery, and release maps. | `Blocked`: registry coverage is not completion. Every included/experimental feature still needs a candidate-bound report with code/evidence links and the downstream gate additions. |
 | Automated validation | No `enable_testing()` or `add_test()` registration was found; `ShaderCompilerCliValidation` is a focused custom target. | `Blocked` for regression confidence. The release owner must explicitly authorize any permanent submitted test code required by the binding test policy; until then, use approved executable checks and retained evidence without claiming automated coverage. |
@@ -392,7 +414,7 @@ The minimum release set covers these roles:
 | Lighting/reference | `CornellBox` or `Sponza` | Direct/indirect light, shadowing, exposure, tone mapping, and reference comparison. |
 | Representative scene | one legally cleared broader scene | Geometry, material variety, residency, traversal, load time, and stable 30 FPS delivery. |
 
-These are candidates, not approved members. `REL-01` selects the exact set after provenance, embedded license, attribution, modification, and redistribution review. Bistro, San Miguel, Modern Sponza, LPS Head, and other downloaded packs MUST NOT be bundled merely because the catalog can acquire or run them. If rights are incomplete, publish an acquisition recipe and hash instead of the asset bytes.
+The [scope record](ReleaseScope/README.md#releasemapset) owns the current seven-map/default selection and deferred complexity. The rows above are workload examples, not a second map set. `REL-01` admits selected bytes only after provenance, embedded license, attribution, modification and redistribution review. Bistro, San Miguel, Modern Sponza, LPS Head, and other downloaded packs MUST NOT be bundled merely because the catalog can acquire or run them. If rights are incomplete, publish an acquisition recipe and hash instead of the asset bytes.
 
 ## Per-Map Acceptance Criteria
 
@@ -498,42 +520,6 @@ Every negative check records its `FM-*` and `CHK-*`, expected failure, observed 
 
 The feature-closure record MUST include owner, public surface, classification, supported configurations, positive case, negative/failure case, evidence link, open defects, last evidence revision, and approval. If a current feature cannot meet this bar, exclude it from the release surface before proceeding.
 
-## Release Gates
-
-Gates are strictly ordered. A later gate may be prepared, but it cannot be accepted while an earlier gate is red.
-
-| Gate | Exit criteria | Required artifact |
-| --- | --- | --- |
-| `REL-00 Scope and freeze` | Runtime-consumer and source-adopter promises, platform/support/budget matrix, feature classifications, public/compatibility/non-goals, and release roles are frozen. | Approved [Release Scope](ReleaseScope/README.md) and [Capability Dispositions](ReleaseScope/CapabilityDispositions.md), exported into candidate `release-scope.md` with audience journeys and compatibility decisions; exact rights receipts remain required. |
-| `REL-01 Identity, rights, supply chain, and map set` | Version/publisher/license are real; exact `ReleaseMapSet`, immutable dependency closure, signing/distribution route, threat model, SBOM plan, notices, and redistribution decisions are reviewed. | Identity/signing decision, threat model, dependency/license/SBOM inventory, notices audit, and map manifest. |
-| `REL-02 Clean reproducible baseline` | Clean tagged-source candidate performs empty-cache dependency sync, configure, named Shipping build, approved checks, and warm/offline-cache replay; validation and any explicit test authorization are recorded. | Environment/provenance manifest and raw sync/build/check logs. |
-| `REL-03 Package spine` | One command performs Build, Cook, Stage, Sign, Verify, and Package; the allowlisted staged tree has immutable content, per-user writable state, dependency closure, SBOM, hashes, and no repository path dependency. | First non-candidate archive, package inventory, signatures, SBOM, and created-path record. |
-| `REL-04 Current feature closure` | Every current surface is `Included`, `Experimental`, `Excluded`, or `Removed`; every included/experimental row has a complete how-it-works/polish report and passes its subsystem integration/failure criteria. | Approved feature-closure matrix and candidate-bound completion reports. |
-| `REL-05 Map correctness and PBR` | Every release map passes end-to-end, artifact, PBR, debug-view, reference, and temporal review on each included backend. | Per-map evidence packages and defect disposition. |
-| `REL-06 Performance and stability` | Every release map meets the 30 FPS floor; load/soak/repeat/resize/switch/shutdown and memory gates pass on the supported matrix. | Raw timings, captures, memory records, and stability log. |
-| `REL-07 Native backend diagnostics` | D3D12 and Vulkan validation passes are clean or every finding is resolved/classified; crash/device-loss diagnostics are actionable. | API validation logs, captures, driver matrix, and incident records. |
-| `REL-08 Clean-machine candidate` | The signed frozen archive completes the consumer journey offline as a standard user on minimum/reference machines, with read-only install, per-user state, integrity, compatibility, and failure checks. | Candidate hashes/signatures, clean-machine record, filesystem/network inventory, screenshots, and logs. |
-| `REL-09 Independent release approval` | A non-author completes both consumer and source-adopter journeys from public instructions; all failure-mode checks pass; zero open `S0`/`S1`; waivers and known issues are approved. | Signed go/no-go checklist, consumer report, source-adopter report, and negative-test ledger. |
-| `REL-10 Publish and verify` | The installed-consumer compatibility policy is effective; tag/artifact bytes are immutable; uploaded hashes/signatures/attestation match; fresh downloads pass consumer and shortest source checks; notes/notices/security/support routes work. | Published URL/tag, checksums/signatures/attestation, retrieval logs, final policy, and support owner. |
-| `REL-11 Stabilize and close` | The frozen stabilization window ends with every report triaged, required patch/withdrawal completed, supported-version/security data current, and no unresolved `S0`/`S1`. | Support ledger, patch/withdraw records, retrospective, and approval to unlock new feature work. |
-
-### Gate Failure And Recovery Matrix
-
-| Gate | Representative failure modes | Required response before retry |
-| --- | --- | --- |
-| `REL-00` | Audience omitted; unlimited feature promise; no minimum hardware; runtime/source/SDK claims confused; update/support owner absent. | Reduce and classify scope, declare non-goals and budgets, assign owners, then reapprove the whole contract. |
-| `REL-01` | Placeholder identity; unclear map/dependency redistribution; moving dependency; no signing path; debug/vendor payload assumed redistributable. | Remove/replace/pin the input, obtain and record rights/signing route, regenerate inventory/notices, and reapprove. Unknown rights are a stop, not a waiver. |
-| `REL-02` | Dirty source; dependency resolves differently; empty-cache configure/build fails; warm cache hides missing input; warnings/check failures. | Fix the authoritative build/dependency path, recreate from clean state, retain the failed log, and rerun both cold and warm routes. |
-| `REL-03` | Missing DLL/content/manifest; extra debug/source/private file; writable install assumption; wrong signature; repository-relative lookup; nondeterministic membership. | Reject the stage, fix its single owner, regenerate/sign/verify/package from source, and never patch the archive manually. |
-| `REL-04` | Selectable unclassified feature; silent fallback; requested/active mismatch; happy path only; unsupported option schedules partial work. | Fix and prove the feature or remove it from package/UI/docs. Update every producer/consumer and invalidate dependent evidence. |
-| `REL-05` | Missing asset; PBR/reference mismatch; NaN/Inf; temporal artifact; backend divergence; fallback `Empty`; threshold chosen after viewing result. | Stop the map, classify owner, fix or remove map/feature, refreeze thresholds when the contract—not the result—was wrong, then rerun the full map/backend record. |
-| `REL-06` | Presented/CPU/GPU p95 over 33.33 ms; hitch cluster; load/startup budget miss; memory growth/thrash; thermal/dynamic-quality contamination. | Mark failed, capture bottleneck evidence, optimize the owner or reduce the preapproved scope/preset honestly, then rerun all three runs and stability loops. |
-| `REL-07` | D3D12/Vulkan validation message; device removal; descriptor/resource lifetime error; crash record lacks context; validation path changes behavior. | Fix the API/lifetime owner, preserve reduced evidence, rerun focused validation then affected maps; do not waive an uncategorized native error. |
-| `REL-08` | Smart App Control/antivirus block; no-admin/read-only/offline failure; settings write into install; corrupt-cache crash; unexpected network/file mutation; removal damages user data. | Reject candidate bytes, correct package/runtime ownership or supported scope, produce a new candidate ID, and rerun every invalidated gate. |
-| `REL-09` | Non-author needs private help; source build cannot reproduce; instructions omit a prerequisite; negative check misses its injected defect; open `S0`/`S1`. | No-go. Fix product/docs/evidence, generate a new candidate if bytes changed, and repeat independent acceptance with a clean state. |
-| `REL-10` | Uploaded bytes/hash/signature/tag differ; compatibility policy still assumes no consumers; broken release/support/security link; fresh download fails. | Stop announcement or withdraw affected assets, preserve incident evidence, publish corrected bytes only under a new version/candidate, then verify again. |
-| `REL-11` | New `S0`/`S1`, security report, repeat crash, bad notice, or support route failure during stabilization. | Triage within the declared response window; patch, withdraw, or publish advisory; verify the replacement and extend stabilization before unlocking features. |
-
 ## Candidate Stability Matrix
 
 The candidate package, not a development-tree executable, is the subject of final acceptance.
@@ -628,3 +614,26 @@ This contract adopts established delivery structure without copying another engi
 - Windows Error Reporting provides an OS-owned crash-reporting mechanism, while GitHub supports private vulnerability reports and a repository security policy. Sparkle may use these rather than building a bespoke uploader, but must declare consent, retention, symbols, response ownership, and public instructions. Sources: [Windows Error Reporting](https://learn.microsoft.com/en-us/windows/win32/wer/windows-error-reporting) and [GitHub private vulnerability reporting](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting).
 
 These sources are industry precedent. This document and the repository's executable configuration remain the local authority.
+
+## Reference And Ownership
+
+<details>
+<summary>Related authorities and evidence routes</summary>
+
+**Responsibility:** define the complete evidence and approval boundary for the first public SparkleEngine release
+
+**Decide what to release:** start with the [settled choices](ReleaseScope/README.md#decision-summary) and [seven unanswered proposals](ReleaseScope/README.md#approval-and-next-work). This contract defines the proof needed to ship; the [capability ledger](ReleaseScope/CapabilityDispositions.md) is reference detail. Scope approval (`REL-00`) remains blocked.
+
+**Roadmap and sequence:** [F. Release-First Principal Graphics Roadmap](../Strategy/Roadmap.md)
+
+**Implementation orchestrator:** [First Release Implementation Plan](../Architecture/CrossModule/FirstRelease/README.md)
+
+**Detailed graphics workloads:** [I. Bistro and San Miguel Acceptance Workloads](GraphicsWorkloads.md)
+
+**Validation policy:** [Validation, Performance, and Evidence](../Engineering/Verification/ValidationAndEvidence.md)
+
+**Per-feature polish and explanation:** [First Release Feature Completion Reports](FeatureCompletionReports.md)
+
+**Release risk and iteration order:** [Release Risk Register](../Strategy/Roadmap.md#release-risk-register)
+
+</details>

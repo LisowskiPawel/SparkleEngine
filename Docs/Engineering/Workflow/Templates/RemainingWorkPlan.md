@@ -9,6 +9,8 @@ Use this compact form for an admitted subject whose detailed stages have not yet
 ```markdown
 # {{Subject}} Remaining Delivery Plan
 
+{{One sentence explaining the observable result for the intended reader.}}
+
 **Status:** planning scaffold; {{specific unclosed discovery}} prevents implementation readiness
 
 **Scope:** {{one observable result and explicit non-goals}}
@@ -17,15 +19,28 @@ Use this compact form for an admitted subject whose detailed stages have not yet
 
 **Contract/result owners:** {{links to feature design and local AC/FM/CHK}}, {{existing candidate report}}
 
+## Work This Plan
+
+| What to do | Working route |
+| --- | --- |
+| First action | {{Concrete local action and direct stage/owner link.}} |
+| Result to reach | {{Observable output and owning phase exit.}} |
+| Start / stop | {{What is permitted now, missing prerequisites and what blocks dependent work.}} |
+
 ## Known Inputs And Decisions To Fill
 
-| Field | Known input | Unresolved decision / owner |
+| Field | Known input / actual proposal | Unresolved decision / owner and consequence |
 | --- | --- | --- |
 | Consumer/result | {{existing requester and exact output}} | {{selection or workflow still needing a decision}} |
 | Production owner/edges | {{current source/build paths, producers, consumers}} | {{lifetime, admission, publication, cleanup and hook/deletion/copy ledger}} |
 | Supported matrix | {{scope-approved API/profile/content/hardware}} | {{exact tested tuple and unavailable prerequisite}} |
 | Check card | {{existing AC/FM/CHK links and falsifier}} | {{initial state, action, oracle, numeric rule, artifact, deadline/resources and cleanup}} |
 | Release/provenance | {{existing source/cook/package/model identity}} | {{rights, source-symbol join and package membership}} |
+
+State which choices are settled. Number decisions that need an answer; put
+technical investigations in a separate short list with the required evidence.
+Remove template rows that have no real unresolved choice. Do not ask a user to
+approve rights, hashes or runtime results that the technical owner must verify.
 
 ## Remaining Stages
 
@@ -57,12 +72,17 @@ Split step 2 only for a real independent prerequisite or reviewable slice. Every
 
 ## First Permitted Prompt
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 Freeze only this subject's missing decisions. Inspect the existing owners and
 linked prerequisite revisions. Populate the cards above and the local stages
 using actual producers/consumers and defect-detecting checks. Reuse existing
 contracts, IDs and artifacts; do not create another global order or results
 ledger. Do not implement while a required contract is unresolved. Handoff the
 reviewable local plan and exact remaining decisions to the named owner.
+
+</details>
 ```
 
 When populating the scaffold, mark each unresolved value explicitly. Replace instructional placeholders before calling the plan implementation-ready. Delete completed stage instructions after preserving enduring design and valuable evidence under [Documentation Lifecycle](../DocumentationOrganization.md#lifecycle).

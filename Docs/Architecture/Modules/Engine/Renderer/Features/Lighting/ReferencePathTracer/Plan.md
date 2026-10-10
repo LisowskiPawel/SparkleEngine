@@ -1,20 +1,18 @@
 # Reference Path Tracer Remaining Recovery And Validation Plan
 
+Recover useful Lit and Reference images, then prove the existing tracer before using its output as a reference.
+
 **Status:** source stages delivered; recovery, deferred GPU validation, artifact integrity and final adoption remain open
 
 **Reconciled:** 2026-10-10 against source `34b6d8a7a34283fb4bf568be13307c741ca1bedd`. This cleanup reuses the existing source-delivery records and deferred-evidence disposition; it does not claim a fresh cook, launch, pixel, estimator or reference-authority result. The black-lighting observation remains dated 2026-09-26 until a new candidate disproves it.
 
-**Authority boundary:** [Transport And Estimator](TransportAndEstimator.md), [Execution Architecture](ExecutionArchitecture.md) and [User Experience](UserExperience.md) retain design; [Discovery](Discovery.md) retains `PTD-00-R1`; the [dossier](README.md) owns `RPT-FS-*`, `AC-RPT-*`, `FM-RPT-*` and `CHK-RPT-*`. This page orders unfinished work. Completed Stage 0–9 implementation prompts, migration steps and execution diaries are removed; necessary source evidence remains under `Evidence`.
+## Work This Plan
 
-## Remaining Work At A Glance
-
-**Research use for the remaining recovery/proof:** the [reference cards](../../../../../../../Strategy/Research/RenderingReferenceExamples.md) pin Falcor `NVR-04`, Quake II RTX `NVR-05`, RTXPT `NVR-15` and production sampling `NVR-17`. Consult their raw-versus-reconstructed products, material/transport domains and integration failures to form a discriminating hypothesis for the earliest wrong Sparkle output. These related renderers are not automatically independent oracles; shared estimator ancestry can conceal a shared defect. Record exact assumption, local differences, rights and falsifier in the current recovery card. Preserve accepted `PTD-00-R1` semantics and unfinished analytic/native/adoption checks; do not replay delivered stages or admit vendor caches/SDKs.
-
-Start with the recovery route below. The ordinary per-view mode, alternate frame middle, session/accumulation, shared transport, automatic traversal, UI and manual publication route are source-delivered; do not restart their implementation. Close identified invalid-result/preflight defects and execute the deferred analytic, lifecycle, backend, UX and publication checks against one real candidate. Source delivery remains distinct from executable acceptance.
-
-Reuse valid prior proof and re-run invalidated cells. `REL-03`, release maps, support identities, all included GPU validation and independent adoption remain mandatory before release/package/oracle claims. The [readiness dashboard](../../../../../../../Acceptance/CurrentReadiness.md#renderer) remains the score owner.
-
-
+| What to do | Working route |
+| --- | --- |
+| First action | [recovery execution order](#required-execution-order): verify the dated black-lighting symptom and find the first incorrect radiance or display product. |
+| Result to reach | Correct nontrivial radiance for one exact candidate, followed by backend, estimator, lifecycle and artifact-integrity evidence. |
+| Start / stop | Recheck cooker/Editor launch before rebuilding/cooking. Preserve delivered stages; Stage 10 still waits for its evidence candidate, release inputs and package prerequisites. |
 
 ## Current Recovery And Completion Route - 2026-09-26
 
@@ -204,6 +202,9 @@ Finish the product boundary, produce release-map references inside the accepted 
 
 ### Ready-to-use prompt
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only Stage 10 of Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md after Stage 9 evidence is complete and the exact `ReleaseMapSet`, support-machine identities, and `REL-03 PASS` package revision are accepted. Apply the Universal Execution Contract.
 
@@ -214,12 +215,18 @@ NON-NEGOTIABLE: ship only the scope proved by the accepted TransportAndEstimator
 Complete the clean break: remove or unambiguously relabel all old GBuffer-seeded reference producer/history/settings/shaders/selectors/docs and remove temporary probes; audit source/header/shader/generated/CMake/package/SBOM/license/docs membership and unrelated dirty work. Retain `FRAME-RPT-10` and `CORE-RPT-10`; run CHK-RPT-01, 14, 15, 16, 17, 18, 19, 20 plus every invalidated prior check, architecture_boundary_check, focused builds/runs required by the claims, and git diff --check. File FCR-REN-08 with exact PASS/BLOCKED/EXCLUDED evidence and limitations. Do not call the feature accepted unless every applicable AC-RPT-01 through 23 passes conjunctively and the acceptance owner approves the report.
 ```
 
+</details>
+
 ## Remaining Execution Prompt
+
+<details>
+<summary>Copy the execution prompt</summary>
 
 ```text
 Execute the earliest unfinished recovery/validation slice in Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md. Apply its Universal Execution Contract and current design owners. Do not repeat delivered Stage 0–9 implementation. Revalidate current code, cooked inputs and candidate evidence, locate the first incorrect product, and repair only the identified defect. Retain the existing frozen tolerances, capacities, matrix, source/bytecode identity and failure oracles; use the smallest required checks. Source presence or deferred execution is not PASS. Remove probes, pass the Stage Source-Style Gate for source changes, and remove completed tasks from this plan at handoff.
 ```
 
+</details>
 
 ## Stop And Escalation Rules
 
@@ -247,3 +254,25 @@ Escalation changes the smallest falsified surface first. It does not begin with 
 This plan is complete only when the acceptance owner records `FCR-REN-08 PASS` against one immutable evidence set and every applicable `AC-RPT-01` through `23` passes. If scope, math, sampler, material/light semantics, compiler/shader identity, backend/frontend, accumulation, artifact schema, architecture hooks, frame-recipe topology, shared path-tracing core, external precedent, or release content changes later, the completion report names the invalidated evidence and reruns the smallest affected checks, including `CHK-RPT-17` for any source-shape change, `CHK-RPT-18` for any recipe/resource-lineage change, `CHK-RPT-19` for any path-family semantic or ownership change, and `CHK-RPT-20` for any NVIDIA/Epic source or correspondence change.
 
 An implemented tracer with incomplete evidence is **not complete**. A fully evidenced finite-path diagnostic is **not the full surface reference**. A package workflow with a shared or post-processed oracle is **not trustworthy**. The plan is designed to make those substitutions impossible to hide.
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Authority boundary:** [Transport And Estimator](TransportAndEstimator.md), [Execution Architecture](ExecutionArchitecture.md) and [User Experience](UserExperience.md) retain design; [Discovery](Discovery.md) retains `PTD-00-R1`; the [dossier](README.md) owns `RPT-FS-*`, `AC-RPT-*`, `FM-RPT-*` and `CHK-RPT-*`. This page orders unfinished work. Completed Stage 0–9 implementation prompts, migration steps and execution diaries are removed; necessary source evidence remains under `Evidence`.
+
+</details>
+
+## Remaining Work At A Glance
+
+<details>
+<summary>Source-delivery boundary and research references</summary>
+
+**Research use for the remaining recovery/proof:** the [reference cards](../../../../../../../Strategy/Research/RenderingReferenceExamples.md) pin Falcor `NVR-04`, Quake II RTX `NVR-05`, RTXPT `NVR-15` and production sampling `NVR-17`. Consult their raw-versus-reconstructed products, material/transport domains and integration failures to form a discriminating hypothesis for the earliest wrong Sparkle output. These related renderers are not automatically independent oracles; shared estimator ancestry can conceal a shared defect. Record exact assumption, local differences, rights and falsifier in the current recovery card. Preserve accepted `PTD-00-R1` semantics and unfinished analytic/native/adoption checks; do not replay delivered stages or admit vendor caches/SDKs.
+
+Start with the recovery route below. The ordinary per-view mode, alternate frame middle, session/accumulation, shared transport, automatic traversal, UI and manual publication route are source-delivered; do not restart their implementation. Close identified invalid-result/preflight defects and execute the deferred analytic, lifecycle, backend, UX and publication checks against one real candidate. Source delivery remains distinct from executable acceptance.
+
+Reuse valid prior proof and re-run invalidated cells. `REL-03`, release maps, support identities, all included GPU validation and independent adoption remain mandatory before release/package/oracle claims. The [readiness dashboard](../../../../../../../Acceptance/CurrentReadiness.md#renderer) remains the score owner.
+
+</details>

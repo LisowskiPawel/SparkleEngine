@@ -1,16 +1,18 @@
 # Renderer Frame And Scene Closure Plan
 
-**Status:** implementation plan; not frame, threading, graph, or release evidence
+Keep each frame tied to the right world, camera and settings, and execute only valid graph work.
 
-**Families:** `FCR-REN-01`, `FCR-REN-02`, `FCR-REN-03`
+**Status:** implementation plan; not frame, threading, graph, or release evidence
 
 **Current readiness:** section projection **50/100**; substantial source routes, but all three families are `Blocked` with no candidate verification or delivery evidence
 
-**Responsibility:** sequence immutable frame admission, Scene/View/GPU-scene preparation, and frame-graph closure
+## Work This Plan
 
-**Parent:** [First Release Renderer Plans](README.md)
-
-**Architecture:** [Frame Execution](../Features/FrameExecution/README.md), [Scene And View Preparation](../Features/SceneAndViewPreparation/README.md), [feature acceptance](../Features/SceneAndViewPreparation/Acceptance.md), and [Frame Graph And Scheduling](../Features/FrameExecution/FrameGraphAndScheduling.md)
+| What to do | Working route |
+| --- | --- |
+| First action | [FS-0 identity review](#fs-0--contract-identity-and-serial-oracle): trace one world submission through scene/view preparation and the graph; define the serial comparison. |
+| Result to reach | A fixed frame identity, supported serial/threaded matrix and checks for queues, barriers and retirement. |
+| Start / stop | Reconcile current source and release admission before implementation. Crossed identities, hidden dependencies or missing lifetime proof stop the affected slice. |
 
 ## Plan At A Glance
 
@@ -46,9 +48,14 @@ Unreal's [parallel-rendering overview](https://dev.epicgames.com/documentation/e
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute FS-0 without code changes. Create ITER-REN-FS-00 and map FCR-REN-01/02/03 to current feature AC/FM/CHK, REL-04, workloads, and risks. Inspect world submission, RenderCoordinator, RendererHost, FramePipeline, Scene/View/GPU-scene preparation, BuildRenderFrameGraph, graph compile/execute, RHI submission, selectors, CMake, tests, and dirty work. Record identities, queues, mutable owners, publication/lifetime, copies, invalidation, serial oracle, backend/mode/content matrix, and candidate checks. Fix only stale Architecture contract language. Stop on any duplicate owner or undefined reference result.
 ```
+
+</details>
 
 ## `FS-1` — Frame Admission And Coordination
 
@@ -64,9 +71,14 @@ Execute FS-0 without code changes. Create ITER-REN-FS-00 and map FCR-REN-01/02/0
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement FS-1 in the current RenderCoordinator/RendererHost/FramePipeline admission path. Start with its ownership and transition ledger and exact FCR-REN-01 AC/FM/CHK. Preserve immutable input and one production route. Make frame/control/settings identities monotonic, queues bounded, pressure behavior explicit, failures observable, and shutdown settled; remove replaced queue/state paths. Exercise serial and threaded modes, stale/out-of-order submissions, pressure, settings changes in flight, injected render failure, cancellation, wake/sleep, and shutdown. Compare deterministic outputs and measure CPU, waits, queue high-water, and latency. Stop on partial publication or ambiguous ordering.
 ```
+
+</details>
 
 ## `FS-2` — Scene, View, And GPU-Scene Preparation
 
@@ -82,9 +94,14 @@ Implement FS-1 in the current RenderCoordinator/RendererHost/FramePipeline admis
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement FS-2 through the existing RenderScene, View preparation, persistent GPU scene, mesh/material/light/ray binding, and retirement owners. Map each mutable fact to Scene or View before edits. Use generation-qualified handles and completion tokens at real publication/lifetime boundaries; avoid duplicate snapshots and registries. Exercise structural create/update/delete/reuse, level reload, camera and two-view isolation, rigid/skin/morph dynamics, material/light changes, upload failure, stale generation, and all-queue retirement. Measure resolved copies, uploads, CPU, and memory high-water. Run Architecture boundary checks if World/Renderer/RHI ownership changes.
 ```
+
+</details>
 
 ## `FS-3` — Frame Graph Compile And Execution
 
@@ -100,9 +117,14 @@ Implement FS-2 through the existing RenderScene, View preparation, persistent GP
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement FS-3 in BuildRenderFrameGraph and current graph compile/execute/RHI lowering owners. Build an inventory of each included pass/resource with read/write, lifetime, queue, cull/side-effect, invalidation, marker, and failure policy. Reconcile it to FCR-REN-03 AC/FM/CHK and the serial schedule. Fix hidden dependencies and lifetime/barrier ownership without creating a second graph. Inject missing inputs, pass/record/submit failure, selector/extent/format changes, and history invalidation; inspect culling/aliasing and native D3D12/Vulkan validation. Measure graph build/compile/record costs. Stop on undeclared state or swallowed failure.
 ```
+
+</details>
 
 ## `FS-4` — Frame And Scene Candidate Closure
 
@@ -118,6 +140,26 @@ The [required whole-frame review](../../../../../Acceptance/FirstRelease.md#prin
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute FS-4 against the frozen candidate. Reconcile every FCR-REN-01/02/03 AC/FM/CHK artifact and run only missing joint routes: serial/threaded frame admission, create/update/delete/reload, two-view preparation, graph execute/present, pressure/failure/invalidation, and shutdown on D3D12/Vulkan. Verify frame/view/resource/generation identity across logs, captures, timings, and outputs. Any code/config/content change invalidates affected evidence. File exact decisions and blockers; do not infer correctness from a responsive process or one image.
 ```
+
+</details>
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Families:** `FCR-REN-01`, `FCR-REN-02`, `FCR-REN-03`
+
+**Responsibility:** sequence immutable frame admission, Scene/View/GPU-scene preparation, and frame-graph closure
+
+**Parent:** [First Release Renderer Plans](README.md)
+
+**Architecture:** [Frame Execution](../Features/FrameExecution/README.md), [Scene And View Preparation](../Features/SceneAndViewPreparation/README.md), [feature acceptance](../Features/SceneAndViewPreparation/Acceptance.md), and [Frame Graph And Scheduling](../Features/FrameExecution/FrameGraphAndScheduling.md)
+
+</details>

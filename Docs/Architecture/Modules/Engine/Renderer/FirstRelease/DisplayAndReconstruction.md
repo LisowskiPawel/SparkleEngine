@@ -1,18 +1,18 @@
 # Renderer Display And Reconstruction Closure Plan
 
-**Status:** implementation plan; not colorimetric, provider, visual-quality, performance, or release evidence
+Turn correct scene radiance into a stable, reconstructed SDR or HDR image with honest controls.
 
-**Families:** `FCR-REN-09`, `FCR-REN-10`, `FCR-REN-14`, `FCR-REN-15`, `FCR-REN-18`, `FCR-REN-22`, `FCR-REN-24`, `FCR-REN-25`, `FCR-REN-26`
+**Status:** implementation plan; not colorimetric, provider, visual-quality, performance, or release evidence
 
 **Current readiness:** section projection **29/100**; six source routes are present or provider-gated while grading, chromatic aberration, and HDR10 output are absent; all nine families are `Blocked`
 
-**Responsibility:** sequence view-owned temporal/display state from sampling and exposure through reconstruction, tone mapping, and output
+## Work This Plan
 
-**Owner-directed release amendment:** [Required rendering closure](../../../../../Acceptance/FirstRelease.md#required-rendering-closure) makes complete DLSS SR/RR on D3D12 and Vulkan mandatory; fallback/Experimental cannot close those cells. Basic vignette joins chromatic aberration under FCR-REN-25 with separate feature proofs. Existing domain/provider discovery still freezes actual SDK-supported topology before implementation or performance claims.
-
-**Parent:** [First Release Renderer Plans](README.md)
-
-**Architecture:** [Post Processing](../Features/PostProcessing/README.md), [Display Pipeline](../Features/PostProcessing/DisplayPipeline/README.md), [Reconstruction And Generation](../Features/PostProcessing/ReconstructionAndGeneration/README.md), and [Temporal Sampling And History](../Features/FrameExecution/TemporalSamplingAndHistory.md)
+| What to do | Working route |
+| --- | --- |
+| First action | [DSP-0 domain review](#dsp-0--freeze-domains-extents-and-active-state-truth): trace scene/display domains, render/output extents, history and requested versus active settings. |
+| Result to reach | One agreed transform/order and reset contract before exposure, DLSS/Ray Reconstruction, tone mapping, grading and lens work. |
+| Start / stop | The local discoveries must close before their feature slices. Both APIs remain required; HDR display proof additionally needs a qualified display/OS tuple. |
 
 ## Plan At A Glance
 
@@ -54,9 +54,14 @@ flowchart LR
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute DSP-0 without implementation. Create ITER-REN-DSP-00 mapped to the nine FCRs and their AC/FM/CHK. Inspect View state, settings/selectors, frame graph passes/resources, exposure, jitter/motion/history, resolution policy, reconstruction providers, grading/LUT assets, tone mapping, chromatic aberration, SDR/HDR presentation, debug replacement, viewport products, UI, capture, RHI formats/color spaces/metadata/present, shaders, CMake, and packaging. Record every stage's domain, format, extent, identity, lifetime, active state, reset, backend/provider, and output oracle. Preserve explicit negative frame-generation/AA boundaries and the current absence of the three admitted target stages. Stop on an ambiguous transform or active route.
 ```
+
+</details>
 
 ## `DSP-1` — Temporal Sampling, History, Resolution, And AA Truth
 
@@ -72,9 +77,14 @@ Execute DSP-0 without implementation. Create ITER-REN-DSP-00 mapped to the nine 
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement DSP-1 through the current View temporal state, sampling/extent resolver, camera/motion producers, frame graph attachments/dispatches, provider handoff, and output product owners. Start from FCR-REN-18/22 criteria. Make one view-owned sample identity and common validity contract; align matrices, shader convention, viewport/scissor/dispatch/product extents, quality ratio, and active sample count. Exercise known Halton points, static/camera/rigid/skin/morph/sky motion, two views, cut/resize/level/mode/provider changes, invalid ratios/extents, serial/threaded, D3D12/Vulkan, and negative AA claims. Stop on shared history or implicit resolve.
 ```
+
+</details>
 
 ## `DSP-2` — Exposure
 
@@ -90,9 +100,14 @@ Implement DSP-1 through the current View temporal state, sampling/extent resolve
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement DSP-2 in the existing exposure pass and View history owner. Map FCR-REN-09 AC/FM/CHK to luminance input, metering reduction, manual/auto settings, bounds, adaptation equation/timing, async graph edge, history generation, downstream consumers, and debug output. Use known uniform luminance ramps and timed step cases; inject empty/non-finite/extreme input and cut/resize/mode/view changes. Compare serial/async and D3D12/Vulkan results, inspect native validation, and measure pass/overlap cost. Do not compensate for upstream unit defects. Stop on domain ambiguity or shared history.
 ```
+
+</details>
 
 ## `DSP-3` — Image Reconstruction And Provider Integration
 
@@ -110,9 +125,14 @@ The amended Included matrix requires both APIs on the named machine, every expos
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement DSP-3 through the current reconstruction selector, Linear path, Streamline/provider integration, View/history state, frame graph resources, latency hooks, CMake, and package allowlist. Reconcile exact provider SDK/runtime versions and license/redistribution. Make requested/resolved/active/fallback and reasons observable. Validate every input semantic from DSP-0/1/2, extent, reset, lifecycle, and shutdown. Exercise unsupported backend/GPU, provider off, missing/corrupt DLL, init/evaluate failure, resize/cut/mode change, and package-relative load. Compare Linear/provider quality, time, latency, and memory. Stop on silent fallback or unverifiable redistribution.
 ```
+
+</details>
 
 ## `DSP-4` — Tone Mapping, Encoding, And Presentation
 
@@ -128,9 +148,14 @@ Implement DSP-3 through the current reconstruction selector, Linear path, Stream
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Implement DSP-4 in existing tone-map, debug replacement, presentation/output, viewport product, capture, UI composition, and RHI present owners. Start from FCR-REN-14/15 criteria and the DSP-0 domain map. Ensure exactly one operator and encoding, truthful invalid selection, finite output, explicit alpha, one generation-qualified product, and unambiguous capture metadata. Exercise known ramps/extremes/NaN/Inf, every operator and admitted encoding/format, exposure interaction, debug modes, resize/DPI, viewport generation mismatch, UI composition, and D3D12/Vulkan present/capture. Retain the explicit SDR/HDR and exact-debug limitations.
 ```
+
+</details>
 
 ## `DSP-5` — Color Grading
 
@@ -146,9 +171,14 @@ Implement DSP-4 in existing tone-map, debug replacement, presentation/output, vi
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute Color Grading Stage 0 only. Resolve CGRD-01 through CGRD-12, complete CGR-EXP-01 through CGR-EXP-06, and record the reviewed CGRD-00 disposition in the feature-local Discovery document. Reconcile the dossier, semantics, architecture, experience, conditional plan, DSP-5, and FCR-REN-24 with the accepted decisions. Do not change production code, assets, build membership, generated surfaces, or candidate evidence while CGRD-00 remains Blocked.
 ```
+
+</details>
 
 ## `DSP-6` — Chromatic Aberration And Vignette
 
@@ -166,9 +196,14 @@ Also deliver [Basic Vignette](../Features/PostProcessing/DisplayPipeline/Vignett
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute Chromatic Aberration Stage 0 only. Resolve CHRD-01 through CHRD-10, complete CHR-EXP-01 through CHR-EXP-06, and record the reviewed CHRD-00 disposition in the feature-local Discovery document. Reconcile the dossier, semantics, architecture, conditional plan, DSP-6, and FCR-REN-25 with the accepted decisions. Do not change production code, shaders, settings, build membership, generated surfaces, or candidate evidence while CHRD-00 remains Blocked.
 ```
+
+</details>
 
 The separate vignette freeze/stage cards and prompt live in the [feature-local plan](../Features/PostProcessing/DisplayPipeline/Vignette/Plan.md). DSP-6 composes the two independently proved results; it does not maintain a second vignette delivery sequence.
 
@@ -186,9 +221,14 @@ The separate vignette freeze/stage cards and prompt live in the [feature-local p
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute HDR Display Output Stage 0 only. Resolve HDRD-01 through HDRD-12, complete HDR-EXP-01 through HDR-EXP-08, and record the reviewed HDRD-00 disposition in the feature-local Discovery document. Reconcile the dossier, semantics, architecture, experience, conditional plan, DSP-7, and FCR-REN-26 with the accepted decisions. Do not change production code, shaders, RHI presentation, build membership, generated surfaces, or candidate evidence while HDRD-00 remains Blocked.
 ```
+
+</details>
 
 ## `DSP-8` — Display Candidate Closure
 
@@ -202,6 +242,28 @@ Execute HDR Display Output Stage 0 only. Resolve HDRD-01 through HDRD-12, comple
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute DSP-8 on the frozen candidate. Reconcile FCR-REN-09/10/14/15/18/22/24/25/26 evidence and run only missing end-to-end cases from view jitter/motion/extents through exposure, Linear/provider reconstruction, color grading, tone mapping, chromatic aberration, SDR/HDR output transforms, UI, back buffer/viewport product, and capture. Record every intermediate domain/format/extent, settings, history generation, provider binary, backend, display state, and candidate hash. Include reset/failure/transition and package routes plus raw and final oracles. Any shader/config/provider/code change invalidates affected evidence. File exact decisions and preserve all remaining negative capability boundaries.
 ```
+
+</details>
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Families:** `FCR-REN-09`, `FCR-REN-10`, `FCR-REN-14`, `FCR-REN-15`, `FCR-REN-18`, `FCR-REN-22`, `FCR-REN-24`, `FCR-REN-25`, `FCR-REN-26`
+
+**Responsibility:** sequence view-owned temporal/display state from sampling and exposure through reconstruction, tone mapping, and output
+
+**Owner-directed release amendment:** [Required rendering closure](../../../../../Acceptance/FirstRelease.md#required-rendering-closure) makes complete DLSS SR/RR on D3D12 and Vulkan mandatory; fallback/Experimental cannot close those cells. Basic vignette joins chromatic aberration under FCR-REN-25 with separate feature proofs. Existing domain/provider discovery still freezes actual SDK-supported topology before implementation or performance claims.
+
+**Parent:** [First Release Renderer Plans](README.md)
+
+**Architecture:** [Post Processing](../Features/PostProcessing/README.md), [Display Pipeline](../Features/PostProcessing/DisplayPipeline/README.md), [Reconstruction And Generation](../Features/PostProcessing/ReconstructionAndGeneration/README.md), and [Temporal Sampling And History](../Features/FrameExecution/TemporalSamplingAndHistory.md)
+
+</details>

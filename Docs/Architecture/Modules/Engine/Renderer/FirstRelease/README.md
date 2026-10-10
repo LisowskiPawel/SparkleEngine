@@ -1,5 +1,7 @@
 # First Release Renderer Plans
 
+Choose the renderer work by the result you need: a valid frame, correct surfaces, useful lighting, a finished image or usable controls. The [Roadmap](../../../../../Strategy/Roadmap.md#required-feature-closure-priority) selects global priority; the table below routes that work.
+
 **Status:** Renderer release-plan index; routing and dependency order, not feature evidence
 
 **Snapshot:** 2026-09-08; Renderer portfolio projection **36/100**; 26 of 26 families are `Blocked`
@@ -10,7 +12,7 @@
 
 ## Choose The Plan By Result
 
-| Plan | Primary families | Result boundary |
+| Plan | Primary families | Result you work toward |
 | --- | --- | --- |
 | [Frame And Scene](FrameAndScene.md) | `FCR-REN-01`, `02`, `03` | immutable admission, Scene/View/GPU-scene preparation, graph compile/execute |
 | [Geometry And Ray Tracing](GeometryAndRayTracing.md) | `FCR-REN-04`, `05`, `12`, `17`, `21`, `23` | resident visible geometry, raster/ray GBuffer, TLAS, traversal identity, and deferred decals |

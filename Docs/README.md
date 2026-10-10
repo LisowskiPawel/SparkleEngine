@@ -17,6 +17,7 @@ Use these pages to understand the engine, choose your next task and find the des
 | Understand D3D12/Vulkan and GPU services | [RHI](Architecture/Modules/Engine/RHI/README.md) — [RHI Feature Guide](Architecture/Modules/Engine/RHI/Features/README.md) |
 | See exactly what exists or is missing | [Module Capability Inventory](Architecture/Modules/README.md) — [Capability Evidence Plan](Architecture/Modules/CapabilityEvidencePlan.md) |
 | Compare current feature readiness | [Current Feature Readiness](Acceptance/CurrentReadiness.md) — open the linked Architecture dossier for the implementation and missing-work detail |
+| Answer the remaining release decisions | [Seven product/support proposals](Acceptance/ReleaseScope/README.md#approval-and-next-work) ? settled choices and agent investigations are separate |
 | Decide what to do next | [Master Delivery Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) — See current focus and global priority, then open its owning stage plan |
 | Implement a selected release piece | [First Release Stage Briefs](Architecture/CrossModule/FirstRelease/README.md) — Use the Roadmap-selected phase and its bounded prompt |
 | Build, cook, or launch Showcase | [Launcher Architecture](Architecture/Modules/Tools/Launcher/README.md) — [Build And Packaging](Architecture/Modules/BuildAndPackaging/README.md) |

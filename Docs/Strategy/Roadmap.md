@@ -14,7 +14,7 @@ Start here to choose your next task. Open its linked plan for the exact stages, 
 
 **Next technical task: restore correct Lit and Reference lighting.** The remaining tracer plan records a dated black-lighting failure. Check whether it still occurs with the current source and cooked inputs, find the first incorrect rendering product, then fix the responsible code. Continue from the [recovery plan's execution order](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md#required-execution-order); preserve the accepted design and delivered source stages.
 
-**Supporting task: finish the release definition.** Settle the remaining product/map choices, reference-domain compatibility, exact native/realtime presets and rights receipts using the [scope decisions](../Acceptance/ReleaseScope/README.md#approval-and-next-work) and [scope-stage prompt](../Architecture/CrossModule/FirstRelease/README.md#fr-00--scope-and-discovery).
+**Supporting task: finish the release definition.** The laptop, rendering requirements and seven maps are selected. Answer the [seven remaining product/support proposals](../Acceptance/ReleaseScope/README.md#approval-and-next-work); the same page lists the rights, material and package investigations for the technical owners. Use the [scope-stage prompt](../Architecture/CrossModule/FirstRelease/README.md#fr-00--scope-and-discovery) for that work.
 
 **Progress:** [Current Readiness](../Acceptance/CurrentReadiness.md) records what exists and what is unproved. [Release Acceptance](../Acceptance/FirstRelease.md#release-gates) records which release gates pass. This page chooses work; it does not award completion.
 

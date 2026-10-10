@@ -66,6 +66,17 @@ Use the [Documentation Page Template](Templates/Page.md) when creating or materi
 - Separate paragraphs, lists, tables, code blocks and expanded reference blocks with blank lines. Group one logical action or decision per paragraph or list item. Avoid both dense stacks and repeated empty headings.
 - State the answer once in its owner. Use links for exact contracts and results; simplifying the reading path MUST NOT change thresholds, evidence grades, supported scope or retained artifacts.
 
+### Documents Used To Do Work
+
+A plan, decision record or acceptance entry point MUST make the next useful action visible before process rules, audit history or identifier tables. Scale the opening to the task; do not add a generic checklist to every page.
+
+- State the observable result in plain language, then the current state and first local action with a direct link to its stage or owner.
+- For a decision, show the actual proposed value, who decides and what accepting it commits them to. Number multiple choices so a reader can answer by number. Keep settled choices distinct from unanswered proposals.
+- Separate decisions needing the user's answer from investigations needing source, license, hardware or runtime evidence. Approval cannot substitute for missing evidence.
+- Keep prerequisites and stop conditions visible. A future plan must state whether planning can proceed while production waits; a source-delivered slice must point to its remaining repair/proof instead of restarting implementation.
+- Put copyable prompts, source crosswalks, estimates and historical records after the working route or in labeled optional reference. Keep stage goals, work and exit conditions readable without opening the prompt. Move evidence to its existing report owner when it has an independent lifecycle; do not split a short page merely to hide text.
+- Remove repeated orientation/process prose when a direct owner link answers the same question. [Roadmap](../../Strategy/Roadmap.md) chooses global work; each plan explains its selected local task. Preserve exact contracts, thresholds, snapshots, IDs, artifacts and incoming links during cleanup.
+
 ## Visual Elements
 
 Use visuals when they reduce the work required to understand relationships:
@@ -204,3 +215,4 @@ Before handoff, verify:
 8. every materially changed feature passes the feature depth test rather than merely matching the template;
 9. UTF-8, whitespace, and `git diff --check` pass.
 10. the opening answers the reader's question, detailed reference is easy to find, and essential limits or stop conditions remain visible without expanding optional audit material.
+11. a reader can name the next action or answer the concrete proposal without interpreting an audit ledger; settled choices, open decisions and evidence investigations are distinguishable.

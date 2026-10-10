@@ -1,20 +1,18 @@
 # Deferred GBuffer Decals Delivery Plan
 
+Add authored decals that modify the right material surface consistently for raster and ray rendering.
+
 **Status:** implementation plan; not proof of implementation or acceptance
-
-**Scope:** staged delivery of decal authoring, scene/GPU data, deferred composition, ray-hit reuse, and validation
-
-**Architecture authority:** [Deferred GBuffer Decal Composition Architecture](CompositionArchitecture.md)
-
-**Cross-system shader sequence:** [Shader System Delivery Plan](../../../../../CrossModule/ShaderSystem/Plan.md)
-
-**Feature acceptance:** [Deferred GBuffer Decals — Acceptance](Acceptance.md)
-
-**First-release owner:** mandatory `FCR-REN-23`; selected by [`GR-5`](../../FirstRelease/GeometryAndRayTracing.md#gr-5--deferred-gbuffer-decals) under `REL-04`
 
 **Related current readiness:** **0/100 — first-release target, Blocked.** No decal data, publication, deferred composition, or ray-hit evaluation implementation was found; release admission and this plan add no implementation credit. See [Current Feature Readiness](../../../../../../Acceptance/CurrentReadiness.md#renderer).
 
-This plan owns feature-local delivery order, dependencies, and phase exit sequence. It does not redefine decal semantics, own the final acceptance criteria, or prove that any phase is complete.
+## Work This Plan
+
+| What to do | Working route |
+| --- | --- |
+| First action | [Phase 0 contracts](#phase-0---freeze-contracts-and-evidence): freeze projection/composition meanings, fixture, budgets and actual material consumers. |
+| Result to reach | Reviewed semantics and defect-detecting checks before authoring/scene data or a blend pass; then primary and secondary-ray proof. |
+| Start / stop | GR-5 and local predecessor gates remain required. A convincing screenshot does not establish ordering, residency or ray-hit correctness. |
 
 ## Delivery At A Glance
 
@@ -103,3 +101,22 @@ Exit: the same authored decal appears on the visible receiver and in an off-scre
 - reconcile the capability snapshot and architecture with proven behavior, record the acceptance result in its owning contract/report, and retire this plan when no active delivery consumer remains.
 
 Exit: the candidate is ready for judgment under [Deferred GBuffer Decals — Acceptance](Acceptance.md), with one authored contract, one runtime decal table, one primary resolve, one shared shader composition path, and one selected secondary lookup. Unavailable checks and unsupported surfaces remain stated rather than hidden by fallbacks.
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Scope:** staged delivery of decal authoring, scene/GPU data, deferred composition, ray-hit reuse, and validation
+
+**Architecture authority:** [Deferred GBuffer Decal Composition Architecture](CompositionArchitecture.md)
+
+**Cross-system shader sequence:** [Shader System Delivery Plan](../../../../../CrossModule/ShaderSystem/Plan.md)
+
+**Feature acceptance:** [Deferred GBuffer Decals — Acceptance](Acceptance.md)
+
+**First-release owner:** mandatory `FCR-REN-23`; selected by [`GR-5`](../../FirstRelease/GeometryAndRayTracing.md#gr-5--deferred-gbuffer-decals) under `REL-04`
+
+This plan owns feature-local delivery order, dependencies, and phase exit sequence. It does not redefine decal semantics, own the final acceptance criteria, or prove that any phase is complete.
+
+</details>

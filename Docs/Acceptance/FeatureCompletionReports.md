@@ -1,26 +1,12 @@
 # First Release Feature Completion Reports
 
-**Status:** acceptance contract; includes a source-audited initial registry whose entries are not completion claims
+Record what one feature actually proved for one candidate. Find its owner, fill the report with exact inputs/results/artifacts, then request review; a registry entry is not a passed report.
 
-**Responsibility:** define the per-feature completion report, evidence, approval, and initial registry used to close first-release capability claims
+**Status:** acceptance contract; includes a source-audited initial registry whose entries are not completion claims
 
 **Release target:** SparkleEngine `v0.1.0`, Windows x64
 
 **Source snapshot:** committed `master` revision `8414b5dc`, inspected 2026-09-06 while a separate documentation relocation was present in the worktree; no build, cook, runtime, capture, benchmark, or independent-adoption result was added by this report
-
-**Release authority:** [First Release Acceptance Contract](FirstRelease.md)
-
-**Capability authority:** [Principal Graphics Engineering Requirements](../Strategy/Requirements.md)
-
-**Operating model:** [Advanced Graphics Engineer Persona](../Strategy/EngineerPersona.md)
-
-**Current owner map:** [Whole Repository Architecture Map](../Architecture/WholeRepositoryMap.md)
-
-**Current feature-level source inventory:** [Current Capability Inventory](../Architecture/Modules/README.md)
-
-**Current readiness dashboard:** [Current Feature Readiness](CurrentReadiness.md)
-
-**Implementation routing:** [First Release Implementation Plan](../Architecture/CrossModule/FirstRelease/README.md) assigns every registry family to one staged owner plan; it does not own the criteria or verdicts defined here
 
 ## Read This Page
 
@@ -48,60 +34,6 @@ flowchart LR
 The registry is routing infrastructure. It does not mean any feature is complete.
 
 The readiness dashboard provides the 0–100 orientation view. Its score keeps implementation, integration, candidate verification, and delivery/adoption separate; it never replaces the conjunctive acceptance verdict defined here.
-
-## Purpose And Boundary
-
-This document defines the completion report required for every included or experimental first-release feature and seeds the report registry from current source. It answers two separate questions:
-
-1. Is the feature polished and shippable for its declared consumer, configuration, and fallback?
-2. What engineering/persona target does its evidence actually advance?
-
-The first question is mandatory for release. The second prevents substantial engine work from becoming an unexplained toggle, but it does not force unrelated portfolio targets into `v0.1.0`. Code and executable build configuration prove implementation; retained runtime evidence proves behavior; [Requirements](../Strategy/Requirements.md) alone controls `PGE-*` evidence level.
-
-A capability-inventory row says what the dated source scan found; an Architecture feature dossier defines what that feature must prove; a completion report says what the exact release candidate actually proved. They are not competing ledgers. Every included or experimental capability row and open capability-evidence plan item MUST map to exactly one primary `FCR-*` report, each report MUST list those IDs, and `REL-04` fails if either side has an orphan. One report may own several inseparable rows, but independently selectable modes, backends, providers, or materially different failure/performance routes require separate result subsections or separate reports.
-
-Stable `AC-*`, `FM-*`, and `CHK-*` definitions belong with the feature under [Architecture](../Architecture/README.md). The candidate report references those definitions, records exact outcomes and artifacts, and may add candidate-specific challenges without becoming a duplicate feature contract.
-
-A report is not accepted because it is long. Its job is to make the feature's outcome, complete execution path, quality, costs, failures, limitations, and adoption route reviewable without repository archaeology. When clearer code, one deletion, or an executable check communicates the truth better, do that work and keep the report short.
-
-## Polish Is A Conjunction, Not A Score
-
-A feature is polished only when every applicable dimension passes. An excellent image cannot average away broken shutdown; high FPS cannot average away wrong PBR; clean code cannot average away an undiscoverable consumer workflow. `N/A` requires a reason tied to frozen scope and reviewer approval.
-
-| Dimension | Required completion question | Minimum evidence |
-| --- | --- | --- |
-| Product intent | What user problem does this solve, who can select it, and what is deliberately not promised? | One-sentence outcome, audience, classification, supported matrix, and non-goals. |
-| Discoverability and control | Can the intended user find, understand, configure, reset, compare, and exit the feature without private knowledge? | Public workflow recording, controls/help, defaults, requested-versus-active state, and settings/reset result. |
-| Functional correctness | Does the feature produce the specified state/output deterministically and reject invalid inputs? | Reference or invariant checks, repeated route, boundary cases, and negative checks. |
-| Visual and PBR quality | Is the output physically/semantically correct and free of release-blocking artifacts? | Frozen cameras, debug views, reference comparison, image metrics, and expert observation record. |
-| Temporal quality | Does motion, animation, history, disocclusion, reset, resize, and scene change remain stable? | Sequence/video, history/reset identity, temporal metrics where applicable, and failure gallery. |
-| Performance and pacing | Does the whole delivered route meet startup, load, CPU, GPU, presented-frame, hitch, and latency budgets? | Frozen protocol, raw samples, p50/p95/p99/worst, timelines/captures, and causal analysis. |
-| Memory and residency | Are CPU/GPU high-water, transient/history/AS/provider allocations, lifetime, and pressure behavior bounded? | Budget comparison, time series, allocation ownership, repeat/soak result, and pressure failure. |
-| Concurrency and lifetime | Are publication, cancellation, synchronization, GPU completion, retirement, reload, and shutdown safe? | Owner/lifetime trace, 1/2/N or serial control where relevant, stress/fault result, and leak/late-work disposition. |
-| API, shader, and backend | Are resource states, bindings/ABI, queues, capabilities, compiler output, D3D12, and Vulkan behavior explicit? | Shader-to-command trace, reflection/layout check, native validation, paired result or approved backend exclusion. |
-| Fallback and failure | Is each unavailable, corrupt, unsupported, or failed state visible, bounded, honest, and recoverable? | Capability/failure matrix, injected fault, exact message/exit/recovery, and no silent false success. |
-| Content and delivery | Does source/import/cook/stage/package preserve semantics and ship every required byte without private paths? | Provenance, deterministic inventory, cook/package manifest, clean-package run, and missing-content rejection. |
-| Security, privacy, and compatibility | Are trust boundaries, mutable data, binary loading, signing, network/crash data, and version behavior controlled? | Threat/control record, signatures/SBOM, filesystem/network inventory, compatibility decision, and controlled abuse case. |
-| Diagnostics and support | Can another engineer identify the active feature, capture the right evidence, reproduce a failure, and seek help? | Stable identity, markers/logs/capture route, support bundle, troubleshooting, and issue/reproducer route. |
-| Code and ownership quality | Is there one owner and production path with narrow contracts, bounded copies/work, and no replaced residue? | Owner/producer/consumer map, public-surface review, cost model, deletion/simplification ledger, and applicable code/architecture checks. |
-| Adoption and explanation | Can a non-author understand the math/data/API tradeoffs and reproduce or integrate the supported result? | Public how-it-works route, integration/tuning guide, expected output, limitations, and independent criticism/reproduction. |
-
-## Iteration Traceability And Coverage
-
-Every candidate report is also the control record for the iterations that close that feature. It applies the [Change Lifecycle identifier contract](../Engineering/Workflow/ChangeLifecycle.md#create-the-iteration-control-record) and begins with this linked header:
-
-| Mark | Required feature-report value |
-| --- | --- |
-| North Star | Each applicable persona `NS-*` facet and `advance`, `preserve`, `not applicable`, or `blocked`. |
-| Persona/capability | Each applicable `PGE-*`, evidence level before/after, and proof or reason no level moved. |
-| Roadmap/acceptance | Current `ITER-*`, `REL-*`, `MAP-*`/`CASE-*`, `FCR-*`, capability row, and capability-evidence plan item. |
-| Risk | Applicable roadmap `RISK-REL-*` plus feature `RISK-<feature>-NN` entries and current exposure. |
-| Acceptance | Links to the owning Architecture feature dossier's binary `AC-<feature>-NN` criteria covering promised behavior and every applicable polish dimension, plus candidate results. |
-| Failure | Links to its `FM-<feature>-NN` feature faults plus applicable common [`FM-REL-*`](FirstRelease.md#failure-mode-acceptance-matrix) rows, with exercised outcomes. |
-| Checks | Links to `CHK-<feature>-NN` mappings that cover every criterion and failure through the [check/test design contract](../Engineering/Verification/ValidationAndEvidence.md#check-and-test-design-contract), with exact candidate evidence. |
-| Decision | Current state, exact blocker/pass reason, evidence links, invalidation triggers, and next permitted roadmap step. |
-
-Coverage is closed only when the report has no orphan target, risk, criterion, failure, check, artifact, defect, or waiver. A risk register without an observable trigger/retirement condition, acceptance prose without a binary oracle, or a test list without claim mappings is `Blocked`.
 
 ## Required Completion Report
 
@@ -164,6 +96,76 @@ consumer/editor/config request
 For tools and offline features, replace the frame path with source input -> validation -> import/plan -> bounded execution -> transactional publication -> runtime consumer, while keeping ownership, cancellation, failure, provenance, and adoption explicit.
 
 The trace answers who owns mutable state, who produces and consumes each representation, when it becomes immutable, which copies/transfers occur, what invalidates cached/history state, how both backends differ, and what happens when any boundary fails.
+
+## Report Closure And Review
+
+At `REL-04`, every registry row is split further if it contains independently selectable modes with different capability, quality, performance, or failure behavior. Every resulting row has a report owner and complete source trace. Later gates fill the candidate evidence:
+
+| Gate | Report closure added |
+| --- | --- |
+| `REL-04` | Finite scope, owner, implementation trace, contracts, requested/active/fallback, positive and negative focused integration. |
+| `REL-05` | Per-map correctness, PBR, debug-view, reference, temporal, and artifact disposition. |
+| `REL-06` | Startup/load/frame pacing, CPU/GPU, memory/residency, soak/repeat, and causal cost evidence. |
+| `REL-07` | Native D3D12/Vulkan diagnostics, capture/debug route, device-loss and backend-difference disposition. |
+| `REL-08` | Exact signed package, standard-user/read-only-install journey, integrity/security/filesystem/network and recovery proof. |
+| `REL-09` | Independent consumer/source-adopter use, explanation quality, criticism, and final defect/waiver disposition. |
+| `REL-10` | Published identity, immutable artifact links, public support/limitations, and fresh-download result. |
+| `REL-11` | Escaped-defect/support history, patch/withdraw/advisory result, retrospective, and next simplification/revalidation action. |
+
+No report may say `Verified`, `Shippable`, or `Published` until the corresponding evidence state in the [release acceptance contract](FirstRelease.md#completion-vocabulary) is satisfied. If the report cannot explain the complete feature in the graphics-specialist or adopter review budget, narrow the public feature, improve the navigation/code, or exclude it; do not compensate with more prose.
+## Purpose And Boundary
+
+This document defines the completion report required for every included or experimental first-release feature and seeds the report registry from current source. It answers two separate questions:
+
+1. Is the feature polished and shippable for its declared consumer, configuration, and fallback?
+2. What engineering/persona target does its evidence actually advance?
+
+The first question is mandatory for release. The second prevents substantial engine work from becoming an unexplained toggle, but it does not force unrelated portfolio targets into `v0.1.0`. Code and executable build configuration prove implementation; retained runtime evidence proves behavior; [Requirements](../Strategy/Requirements.md) alone controls `PGE-*` evidence level.
+
+A capability-inventory row says what the dated source scan found; an Architecture feature dossier defines what that feature must prove; a completion report says what the exact release candidate actually proved. They are not competing ledgers. Every included or experimental capability row and open capability-evidence plan item MUST map to exactly one primary `FCR-*` report, each report MUST list those IDs, and `REL-04` fails if either side has an orphan. One report may own several inseparable rows, but independently selectable modes, backends, providers, or materially different failure/performance routes require separate result subsections or separate reports.
+
+Stable `AC-*`, `FM-*`, and `CHK-*` definitions belong with the feature under [Architecture](../Architecture/README.md). The candidate report references those definitions, records exact outcomes and artifacts, and may add candidate-specific challenges without becoming a duplicate feature contract.
+
+A report is not accepted because it is long. Its job is to make the feature's outcome, complete execution path, quality, costs, failures, limitations, and adoption route reviewable without repository archaeology. When clearer code, one deletion, or an executable check communicates the truth better, do that work and keep the report short.
+
+## Polish Is A Conjunction, Not A Score
+
+A feature is polished only when every applicable dimension passes. An excellent image cannot average away broken shutdown; high FPS cannot average away wrong PBR; clean code cannot average away an undiscoverable consumer workflow. `N/A` requires a reason tied to frozen scope and reviewer approval.
+
+| Dimension | Required completion question | Minimum evidence |
+| --- | --- | --- |
+| Product intent | What user problem does this solve, who can select it, and what is deliberately not promised? | One-sentence outcome, audience, classification, supported matrix, and non-goals. |
+| Discoverability and control | Can the intended user find, understand, configure, reset, compare, and exit the feature without private knowledge? | Public workflow recording, controls/help, defaults, requested-versus-active state, and settings/reset result. |
+| Functional correctness | Does the feature produce the specified state/output deterministically and reject invalid inputs? | Reference or invariant checks, repeated route, boundary cases, and negative checks. |
+| Visual and PBR quality | Is the output physically/semantically correct and free of release-blocking artifacts? | Frozen cameras, debug views, reference comparison, image metrics, and expert observation record. |
+| Temporal quality | Does motion, animation, history, disocclusion, reset, resize, and scene change remain stable? | Sequence/video, history/reset identity, temporal metrics where applicable, and failure gallery. |
+| Performance and pacing | Does the whole delivered route meet startup, load, CPU, GPU, presented-frame, hitch, and latency budgets? | Frozen protocol, raw samples, p50/p95/p99/worst, timelines/captures, and causal analysis. |
+| Memory and residency | Are CPU/GPU high-water, transient/history/AS/provider allocations, lifetime, and pressure behavior bounded? | Budget comparison, time series, allocation ownership, repeat/soak result, and pressure failure. |
+| Concurrency and lifetime | Are publication, cancellation, synchronization, GPU completion, retirement, reload, and shutdown safe? | Owner/lifetime trace, 1/2/N or serial control where relevant, stress/fault result, and leak/late-work disposition. |
+| API, shader, and backend | Are resource states, bindings/ABI, queues, capabilities, compiler output, D3D12, and Vulkan behavior explicit? | Shader-to-command trace, reflection/layout check, native validation, paired result or approved backend exclusion. |
+| Fallback and failure | Is each unavailable, corrupt, unsupported, or failed state visible, bounded, honest, and recoverable? | Capability/failure matrix, injected fault, exact message/exit/recovery, and no silent false success. |
+| Content and delivery | Does source/import/cook/stage/package preserve semantics and ship every required byte without private paths? | Provenance, deterministic inventory, cook/package manifest, clean-package run, and missing-content rejection. |
+| Security, privacy, and compatibility | Are trust boundaries, mutable data, binary loading, signing, network/crash data, and version behavior controlled? | Threat/control record, signatures/SBOM, filesystem/network inventory, compatibility decision, and controlled abuse case. |
+| Diagnostics and support | Can another engineer identify the active feature, capture the right evidence, reproduce a failure, and seek help? | Stable identity, markers/logs/capture route, support bundle, troubleshooting, and issue/reproducer route. |
+| Code and ownership quality | Is there one owner and production path with narrow contracts, bounded copies/work, and no replaced residue? | Owner/producer/consumer map, public-surface review, cost model, deletion/simplification ledger, and applicable code/architecture checks. |
+| Adoption and explanation | Can a non-author understand the math/data/API tradeoffs and reproduce or integrate the supported result? | Public how-it-works route, integration/tuning guide, expected output, limitations, and independent criticism/reproduction. |
+
+## Iteration Traceability And Coverage
+
+Every candidate report is also the control record for the iterations that close that feature. It applies the [Change Lifecycle identifier contract](../Engineering/Workflow/ChangeLifecycle.md#create-the-iteration-control-record) and begins with this linked header:
+
+| Mark | Required feature-report value |
+| --- | --- |
+| North Star | Each applicable persona `NS-*` facet and `advance`, `preserve`, `not applicable`, or `blocked`. |
+| Persona/capability | Each applicable `PGE-*`, evidence level before/after, and proof or reason no level moved. |
+| Roadmap/acceptance | Current `ITER-*`, `REL-*`, `MAP-*`/`CASE-*`, `FCR-*`, capability row, and capability-evidence plan item. |
+| Risk | Applicable roadmap `RISK-REL-*` plus feature `RISK-<feature>-NN` entries and current exposure. |
+| Acceptance | Links to the owning Architecture feature dossier's binary `AC-<feature>-NN` criteria covering promised behavior and every applicable polish dimension, plus candidate results. |
+| Failure | Links to its `FM-<feature>-NN` feature faults plus applicable common [`FM-REL-*`](FirstRelease.md#failure-mode-acceptance-matrix) rows, with exercised outcomes. |
+| Checks | Links to `CHK-<feature>-NN` mappings that cover every criterion and failure through the [check/test design contract](../Engineering/Verification/ValidationAndEvidence.md#check-and-test-design-contract), with exact candidate evidence. |
+| Decision | Current state, exact blocker/pass reason, evidence links, invalidation triggers, and next permitted roadmap step. |
+
+Coverage is closed only when the report has no orphan target, risk, criterion, failure, check, artifact, defect, or waiver. A risk register without an observable trigger/retirement condition, acceptance prose without a binary oracle, or a test list without claim mappings is `Blocked`.
 
 ## Engineering And Persona Crosswalk
 
@@ -295,19 +297,26 @@ Use the detailed [RHI](../Architecture/Modules/Engine/RHI/CapabilityInventory.md
 
 Create one additional feature report for every accepted `ReleaseMapSet` member. Its how-it-works trace starts at source provenance and catalog selection, crosses import/cook/load/world/extraction/render/presentation, and links the per-map `MAP-A` through `MAP-H` evidence. A map is not polished because it loads or because one final screenshot looks plausible: every applicable material, geometry, animation, lighting, debug-view, reference, temporal, performance, memory, failure, redistribution, and consumer-navigation row must pass.
 
-## Report Closure And Review
 
-At `REL-04`, every registry row is split further if it contains independently selectable modes with different capability, quality, performance, or failure behavior. Every resulting row has a report owner and complete source trace. Later gates fill the candidate evidence:
+## Reference And Ownership
 
-| Gate | Report closure added |
-| --- | --- |
-| `REL-04` | Finite scope, owner, implementation trace, contracts, requested/active/fallback, positive and negative focused integration. |
-| `REL-05` | Per-map correctness, PBR, debug-view, reference, temporal, and artifact disposition. |
-| `REL-06` | Startup/load/frame pacing, CPU/GPU, memory/residency, soak/repeat, and causal cost evidence. |
-| `REL-07` | Native D3D12/Vulkan diagnostics, capture/debug route, device-loss and backend-difference disposition. |
-| `REL-08` | Exact signed package, standard-user/read-only-install journey, integrity/security/filesystem/network and recovery proof. |
-| `REL-09` | Independent consumer/source-adopter use, explanation quality, criticism, and final defect/waiver disposition. |
-| `REL-10` | Published identity, immutable artifact links, public support/limitations, and fresh-download result. |
-| `REL-11` | Escaped-defect/support history, patch/withdraw/advisory result, retrospective, and next simplification/revalidation action. |
+<details>
+<summary>Related authorities and evidence routes</summary>
 
-No report may say `Verified`, `Shippable`, or `Published` until the corresponding evidence state in the [release acceptance contract](FirstRelease.md#completion-vocabulary) is satisfied. If the report cannot explain the complete feature in the graphics-specialist or adopter review budget, narrow the public feature, improve the navigation/code, or exclude it; do not compensate with more prose.
+**Responsibility:** define the per-feature completion report, evidence, approval, and initial registry used to close first-release capability claims
+
+**Release authority:** [First Release Acceptance Contract](FirstRelease.md)
+
+**Capability authority:** [Principal Graphics Engineering Requirements](../Strategy/Requirements.md)
+
+**Operating model:** [Advanced Graphics Engineer Persona](../Strategy/EngineerPersona.md)
+
+**Current owner map:** [Whole Repository Architecture Map](../Architecture/WholeRepositoryMap.md)
+
+**Current feature-level source inventory:** [Current Capability Inventory](../Architecture/Modules/README.md)
+
+**Current readiness dashboard:** [Current Feature Readiness](CurrentReadiness.md)
+
+**Implementation routing:** [First Release Implementation Plan](../Architecture/CrossModule/FirstRelease/README.md) assigns every registry family to one staged owner plan; it does not own the criteria or verdicts defined here
+
+</details>

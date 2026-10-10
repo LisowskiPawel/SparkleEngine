@@ -1,14 +1,152 @@
 # First Release Product And Delivery Plan
 
+Turn the Showcase into a usable downloadable app, with a reproducible source build and a support route.
+
 **Status:** implementation plan; phase order and prompts, not feature or release evidence
 
 **Snapshot:** 2026-09-08; portfolio projection **33/100**; all six `FCR-PROD-*` families are `Blocked`
+
+## Work This Plan
+
+| What to do | Working route |
+| --- | --- |
+| First action | [PD-1 consumer shell](#pd-1--runtime-and-editor-product-shells) is the next product slice: first-run/menu/settings, required-content failure and Shipping console isolation. Preserve the completed PD-0 contract freeze. |
+| Result to reach | A consumer can start, choose an example, change/reset settings and quit; retain the phase checks before moving to source adoption and packaging. |
+| Start / stop | Scope approval and applicable release prerequisites must close first. PD-0 contract evidence does not pass REL-00 or the product families. |
+
+## `PD-1` — Runtime And Editor Product Shells
+
+**Goal:** close `FCR-PROD-01` and classify/close `FCR-PROD-04` so the first run, controls, settings, level selection, failure, reset, and exit are intentional.
+
+**Non-goals:** turning Showcase into a general sample browser framework, shipping Editor by default, or hiding engine failures behind generic dialogs.
+
+**Required work:**
+
+- preserve `RuntimeApplication` as runtime host and extend the current Showcase entry/product path rather than adding a second launcher;
+- make example/mode selection, loading state, controls/help, settings, reset, quit, and unsupported-state messaging discoverable;
+- ensure level failure cannot silently become successful `Empty` content and settings resolve requested versus active state truthfully;
+- keep Editor layering explicit; either prove its admitted journey or erase it from runtime payload/claims;
+- use representative fresh-user, standard-user, resize/DPI, missing/corrupt content, unsupported-provider, and shutdown routes from the owned contracts.
+
+**Failure modes to control:** blank first frame; trapped mouse/focus; stale settings; load failure shown as success; editor-only service required by runtime; quit leaves work or files in flight; fallback is active but hidden.
+
+**Phase exit criteria:** the feature-local checks for `FCR-PROD-01` and the selected `FCR-PROD-04` scope pass on the exact configuration; excluded editor behavior is absent from runtime archive and user claims; results are filed in candidate FCR reports.
+
+**Ready-to-use prompt:**
+
+<details>
+<summary>Copy the execution prompt</summary>
+
+```text
+Implement PD-1 as one product-journey vertical slice. Reconcile RuntimeApplication, EditorApplication, Showcase startup, level catalog/session, input/focus, settings, UI, renderer admission, shutdown, and target membership. Create the iteration record with the owning AC/FM/CHK. Extend current owners only; make requested/active state and failures visible, preserve standard-user paths, and delete replaced UI/control paths. Exercise first run, controls/help, select/load/reset/quit, malformed or missing content, resize/focus, unsupported selection, and shutdown. Use the smallest owning builds first; run broader runtime routes only when the mapped check requires them. Record exact candidate results and stop on an unresolved product choice.
+```
+
+</details>
+
+## `PD-2` — Source Build, Cook, And Launcher
+
+**Goal:** close `FCR-PROD-02` and `FCR-PROD-03` with one documented underlying operation model usable directly and, when selected, through the launcher.
+
+**Non-goals:** making launcher UI the only automation API, duplicating build/cook logic in GUI code, or accepting warmed author-machine state.
+
+**Required work:**
+
+- pin public prerequisites and dependency identities; define supported profiles, outputs, cleanup, and source compatibility statement;
+- add a fresh-checkout automation entry for the approved deterministic build/static/package gates; it invokes owner checks and reports failed, timed-out, cancelled, skipped, unavailable, and missing-artifact states without reinterpretation;
+- keep sync/configure/build/cook/run/clean as typed operations with one execution authority and truthful process result;
+- make launcher discovery, readiness, progress, cancellation, error detail, retry/restart, and concurrent-action exclusion explicit;
+- prove cold and warm build/cook paths plus missing tool, bad path, canceled operation, failed child, locked output, stale cook, and Unicode/path quoting behavior;
+- ensure direct command and launcher invoke equivalent underlying semantics and artifacts.
+
+**Failure modes to control:** false-success summary; launcher PID mistaken for launched runtime; partial cook published; cancel leaves child processes; clean deletes unowned files; prerequisite is fetched mutably; GUI command differs from documented CLI.
+
+**Phase exit criteria:** independent source-adopter rehearsal produces the named runtime through documented prerequisites; launcher classification is enforced; direct and GUI routes agree; exact logs/artifacts and negative results are in the FCR reports.
+
+**Ready-to-use prompt:**
+
+<details>
+<summary>Copy the execution prompt</summary>
+
+```text
+Implement PD-2 for FCR-PROD-02/03. Audit root CMake presets/options, dependency acquisition, tools, cook workspace, launcher typed operations, child-process lifecycle, output parsing, runtime handoff, and any existing automation entry. Record Reuse/Extend/ReplaceAndDelete decisions. Establish one operation contract used by documentation, launcher, and approved fresh-checkout automation; do not add parallel shell semantics or redefine owner checks. Fix prerequisite identity, cancellation, process/result truth, transactional cook publication, quoting, cleanup boundaries, handoff validation, and honest failed/timed-out/cancelled/skipped/unavailable/missing-artifact aggregation. Prove cold/warm and controlled failure routes with exact commands and artifacts, then perform the required non-author rehearsal. Stop on mutable inputs, destructive ambiguity, or a second execution authority.
+```
+
+</details>
+
+## `PD-3` — Package And Installation
+
+**Goal:** implement the missing `FCR-PROD-05` owner and pass `REL-03` with a portable Windows x64 runtime archive.
+
+**Non-goals:** an installer, registry integration, a binary SDK, package self-modification, or bundling developer tools/source/debug files without explicit admission.
+
+**Required work:**
+
+- select one existing build/delivery owner for build → cook → stage → verify → package; do not put packaging policy in renderer or application code;
+- add explicit install/stage membership, component/allowlist policy, package-relative discovery, per-user writable state, manifests, notices/SBOM, provenance, hashes, and symbols handling;
+- make staging fresh and transactional; reject stale, missing, extra, absolute, unlicensed, or incompatible products;
+- create the archive from an immutable verified stage, then verify archive contents against `manifests/sparkle-package-manifest.json`;
+- prove extract/run/remove with no source, toolchain, network, admin rights, environment variable, or author cache. CMake's [install rules](https://cmake.org/cmake/help/latest/command/install.html) are a mechanics reference, not an instruction to expose internal targets.
+
+**Failure modes to control:** stage accumulates leftovers; runtime writes beside executable; package relies on current directory; missing redistributable/provider DLL; manifest mismatch; source/private path leak; archive emitted after verification failure.
+
+**Phase exit criteria:** the Architecture-owned `FCR-PROD-05` criteria and `REL-03` pass for the exact archive; a clean standard-user machine route is retained; stage/package failure leaves no publishable partial artifact.
+
+**Ready-to-use prompt:**
+
+<details>
+<summary>Copy the execution prompt</summary>
+
+```text
+Implement PD-3 as the single release packaging spine. First reconcile CMake targets/install rules, cooked-product publication, runtime path discovery, provider redistribution, engine assets, configuration writes, and existing launcher staging behavior. Choose and document one owner. Add explicit components and an allowlist manifest; build/cook into owned outputs, create a fresh immutable stage transactionally, verify rights/dependencies/paths/hashes, and only then archive. Exclude editor/launcher/tools/source/debug material unless the frozen scope admits a separate developer package. Exercise stale/extra/missing/corrupt payloads and clean-machine extract/run/remove. Bind every result to the archive hash and record REL-03/FCR-PROD-05 evidence.
+```
+
+</details>
+
+## `PD-4` — Support, Incident Response, And Product Closure
+
+**Goal:** close `FCR-PROD-06`, prove operated support/security/crash/patch paths, and leave every product family candidate-ready.
+
+**Non-goals:** silent telemetry, collecting private state by default, promising perpetual compatibility, or calling documentation an operated process.
+
+**Required work:**
+
+- define public support and security intake, severity/response ownership, privacy/consent, retention, symbol handling, known-issue and workaround policy;
+- connect process crash/hang and GPU/device diagnostics to a bounded user-visible collection/export route without leaking paths or content;
+- define immutable patch identity, applicability, rollback/withdrawal/advisory, and evidence invalidation;
+- rehearse one crash, one hang/timeout if supported, one GPU/device diagnostic route, one security intake, and one patch/withdraw decision;
+- reconcile all six product FCR reports against the same candidate and package identity. Unreal's [crash-reporting architecture](https://dev.epicgames.com/documentation/en-us/unreal-engine/crash-reporting-in-unreal-engine) is a responsibility reference only; no Epic service is assumed.
+
+**Failure modes to control:** report loses candidate identity; consent bypass; private paths or content escape; symbols cannot match build; unsupported recovery promised; patch replaces public bytes under same version; intake has no owner.
+
+**Phase exit criteria:** support routes were operated, not merely written; failures preserve consent and identity; patch policy is reproducible; all six FCR reports have explicit candidate-bound verdicts and residual limitations.
+
+**Ready-to-use prompt:**
+
+<details>
+<summary>Copy the execution prompt</summary>
+
+```text
+Implement PD-4 against the package candidate. Reconcile Core/RHI diagnostics, crash boundaries, symbol outputs, user data paths, logs, public documentation, support/security intake, release identity, and patch mechanics. Create one privacy-aware export and incident identity path; do not add always-on telemetry. Define severity clocks, ownership, retention, redaction, patch/withdraw rules, and evidence invalidation. Exercise controlled crash/hang/GPU/support/security/patch scenarios using non-sensitive fixtures. Verify report-to-symbol-to-candidate correlation and package erasure rules. Update FCR-PROD-01 through 06 with exact verdicts; stop if any intake or privacy responsibility is unowned.
+```
+
+</details>
+
+## Plan Completion
+
+This plan is complete only when all six product FCRs have Architecture-owned contracts, exact candidate reports, and no unresolved blocker for their admitted scope. The release is not complete until the mother plan's remaining map, native, adoption, publication, and stabilization gates pass.
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
 
 **Responsibility:** sequence the first-release product journeys, developer workflows, runtime archive, and operated support boundary
 
 **Orchestrator:** [First Release Implementation Plan](README.md)
 
 **Architecture owners:** [Projects/Showcase](../../Modules/Projects/Showcase/README.md), [Application](../../Modules/Engine/Application/README.md), [Editor](../../Modules/Engine/Editor/README.md), [Launcher](../../Modules/Tools/Launcher/README.md), and [Build And Packaging](../../Modules/BuildAndPackaging/README.md)
+
+</details>
 
 ## Outcome And Order
 
@@ -34,7 +172,9 @@ Use the [common phase contract](README.md#phase-card-contract) for every phase. 
 
 ## `PD-0` — Freeze Product Contracts
 
-**Goal:** make every product journey and exclusion decidable before changing code.
+**Completed contract checkpoint:** preserve the recorded PD-0 freeze and its exact evidence below. Do not repeat its delivered iteration; reconcile only an affected contract if scope changes. PD-1 remains the next product slice after its prerequisites.
+
+**Historical goal:** make every product journey and exclusion decidable before changing code.
 
 **Non-goals:** UI redesign, packaging implementation, inventing an SDK promise, or making the launcher a shipped dependency.
 
@@ -52,9 +192,14 @@ Use the [common phase contract](README.md#phase-card-contract) for every phase. 
 
 **Ready-to-use prompt:**
 
+<details>
+<summary>Historical PD-0 prompt (reference only)</summary>
+
 ```text
 Execute PD-0 at the current revision. Create ITER-PROD-00-01 and map FCR-PROD-01 through 06, REL-00 through 03, and applicable persona requirements. Inspect actual application, Showcase, launcher, build/cook, package, diagnostics, and support entry points plus CMake membership. Trace every user journey and failure route. Add or refine binary AC/FM/CHK only in the owning Architecture documents where missing; do not implement code or copy release gates. Classify every product/output and record prerequisites, paths, budgets, ownership, and stop decisions. Exit only when a reviewer can decide each promised journey without interpreting intent.
 ```
+
+</details>
 
 ### `ITER-PROD-00-01` Control Record
 
@@ -69,6 +214,9 @@ Execute PD-0 at the current revision. Create ITER-PROD-00-01 and map FCR-PROD-01
 | Stop decisions | Do not start `PD-1` while Shipping console/first-run/fallback semantics are unresolved; do not call Qt optional while Launcher membership makes it configure-required; do not start `PD-3` without a single package owner; do not promise public support, installer, or SDK without their admitted owner and checks. |
 
 The exact pre-iteration dirty state was:
+
+<details>
+<summary>Historical pre-iteration worktree state</summary>
 
 ```text
  M Docs/Acceptance/CurrentReadiness.md
@@ -88,6 +236,8 @@ The exact pre-iteration dirty state was:
 ?? Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/HDRDisplayOutput.md
 ?? Docs/Plans/FirstRelease/
 ```
+
+</details>
 
 This is a frozen pre-iteration record, not a navigation route. The recorded `Docs/Plans/FirstRelease/` tree was relocated on 2026-09-09 into the owning Architecture subjects, led by [First Release](README.md), the [Renderer first-release plans](../../Modules/Engine/Renderer/FirstRelease/README.md), and the [RHI first-release plan](../../Modules/Engine/RHI/FirstReleasePlan.md).
 
@@ -133,104 +283,3 @@ The cross-module [persona journey freeze](../ProductExecutionTraces.md#pd-0-pers
 `ITER-PROD-00-01` is **PASS** because every requested product/output has one disposition, the Windows/source prerequisites and exact reference machine/toolchain are named, paths/budgets/support-role ownership are fixed, all five actor journeys reach an explicit success/failure/exit boundary, and each `FCR-PROD-*` family has complete owner-local criterion/failure/check coverage. The decision is invalidated by a changed product classification, prerequisite/path/budget, journey owner, or local AC/FM/CHK.
 
 This is documentation/static source evidence only. It does not pass `REL-00`–`03`, any `FCR-PROD-*`, build, cook, package, runtime, GPU, support, or independent-adoption gate. Within Product And Delivery, `PD-1` is the next phase once the mother plan's `FR-00`/`PTD-00` prerequisites permit implementation; its first implementation stop is structural Shipping console isolation and a consumer-owned first-run/required-content failure route, not Launcher or package work.
-
-## `PD-1` — Runtime And Editor Product Shells
-
-**Goal:** close `FCR-PROD-01` and classify/close `FCR-PROD-04` so the first run, controls, settings, level selection, failure, reset, and exit are intentional.
-
-**Non-goals:** turning Showcase into a general sample browser framework, shipping Editor by default, or hiding engine failures behind generic dialogs.
-
-**Required work:**
-
-- preserve `RuntimeApplication` as runtime host and extend the current Showcase entry/product path rather than adding a second launcher;
-- make example/mode selection, loading state, controls/help, settings, reset, quit, and unsupported-state messaging discoverable;
-- ensure level failure cannot silently become successful `Empty` content and settings resolve requested versus active state truthfully;
-- keep Editor layering explicit; either prove its admitted journey or erase it from runtime payload/claims;
-- use representative fresh-user, standard-user, resize/DPI, missing/corrupt content, unsupported-provider, and shutdown routes from the owned contracts.
-
-**Failure modes to control:** blank first frame; trapped mouse/focus; stale settings; load failure shown as success; editor-only service required by runtime; quit leaves work or files in flight; fallback is active but hidden.
-
-**Phase exit criteria:** the feature-local checks for `FCR-PROD-01` and the selected `FCR-PROD-04` scope pass on the exact configuration; excluded editor behavior is absent from runtime archive and user claims; results are filed in candidate FCR reports.
-
-**Ready-to-use prompt:**
-
-```text
-Implement PD-1 as one product-journey vertical slice. Reconcile RuntimeApplication, EditorApplication, Showcase startup, level catalog/session, input/focus, settings, UI, renderer admission, shutdown, and target membership. Create the iteration record with the owning AC/FM/CHK. Extend current owners only; make requested/active state and failures visible, preserve standard-user paths, and delete replaced UI/control paths. Exercise first run, controls/help, select/load/reset/quit, malformed or missing content, resize/focus, unsupported selection, and shutdown. Use the smallest owning builds first; run broader runtime routes only when the mapped check requires them. Record exact candidate results and stop on an unresolved product choice.
-```
-
-## `PD-2` — Source Build, Cook, And Launcher
-
-**Goal:** close `FCR-PROD-02` and `FCR-PROD-03` with one documented underlying operation model usable directly and, when selected, through the launcher.
-
-**Non-goals:** making launcher UI the only automation API, duplicating build/cook logic in GUI code, or accepting warmed author-machine state.
-
-**Required work:**
-
-- pin public prerequisites and dependency identities; define supported profiles, outputs, cleanup, and source compatibility statement;
-- add a fresh-checkout automation entry for the approved deterministic build/static/package gates; it invokes owner checks and reports failed, timed-out, cancelled, skipped, unavailable, and missing-artifact states without reinterpretation;
-- keep sync/configure/build/cook/run/clean as typed operations with one execution authority and truthful process result;
-- make launcher discovery, readiness, progress, cancellation, error detail, retry/restart, and concurrent-action exclusion explicit;
-- prove cold and warm build/cook paths plus missing tool, bad path, canceled operation, failed child, locked output, stale cook, and Unicode/path quoting behavior;
-- ensure direct command and launcher invoke equivalent underlying semantics and artifacts.
-
-**Failure modes to control:** false-success summary; launcher PID mistaken for launched runtime; partial cook published; cancel leaves child processes; clean deletes unowned files; prerequisite is fetched mutably; GUI command differs from documented CLI.
-
-**Phase exit criteria:** independent source-adopter rehearsal produces the named runtime through documented prerequisites; launcher classification is enforced; direct and GUI routes agree; exact logs/artifacts and negative results are in the FCR reports.
-
-**Ready-to-use prompt:**
-
-```text
-Implement PD-2 for FCR-PROD-02/03. Audit root CMake presets/options, dependency acquisition, tools, cook workspace, launcher typed operations, child-process lifecycle, output parsing, runtime handoff, and any existing automation entry. Record Reuse/Extend/ReplaceAndDelete decisions. Establish one operation contract used by documentation, launcher, and approved fresh-checkout automation; do not add parallel shell semantics or redefine owner checks. Fix prerequisite identity, cancellation, process/result truth, transactional cook publication, quoting, cleanup boundaries, handoff validation, and honest failed/timed-out/cancelled/skipped/unavailable/missing-artifact aggregation. Prove cold/warm and controlled failure routes with exact commands and artifacts, then perform the required non-author rehearsal. Stop on mutable inputs, destructive ambiguity, or a second execution authority.
-```
-
-## `PD-3` — Package And Installation
-
-**Goal:** implement the missing `FCR-PROD-05` owner and pass `REL-03` with a portable Windows x64 runtime archive.
-
-**Non-goals:** an installer, registry integration, a binary SDK, package self-modification, or bundling developer tools/source/debug files without explicit admission.
-
-**Required work:**
-
-- select one existing build/delivery owner for build → cook → stage → verify → package; do not put packaging policy in renderer or application code;
-- add explicit install/stage membership, component/allowlist policy, package-relative discovery, per-user writable state, manifests, notices/SBOM, provenance, hashes, and symbols handling;
-- make staging fresh and transactional; reject stale, missing, extra, absolute, unlicensed, or incompatible products;
-- create the archive from an immutable verified stage, then verify archive contents against `manifests/sparkle-package-manifest.json`;
-- prove extract/run/remove with no source, toolchain, network, admin rights, environment variable, or author cache. CMake's [install rules](https://cmake.org/cmake/help/latest/command/install.html) are a mechanics reference, not an instruction to expose internal targets.
-
-**Failure modes to control:** stage accumulates leftovers; runtime writes beside executable; package relies on current directory; missing redistributable/provider DLL; manifest mismatch; source/private path leak; archive emitted after verification failure.
-
-**Phase exit criteria:** the Architecture-owned `FCR-PROD-05` criteria and `REL-03` pass for the exact archive; a clean standard-user machine route is retained; stage/package failure leaves no publishable partial artifact.
-
-**Ready-to-use prompt:**
-
-```text
-Implement PD-3 as the single release packaging spine. First reconcile CMake targets/install rules, cooked-product publication, runtime path discovery, provider redistribution, engine assets, configuration writes, and existing launcher staging behavior. Choose and document one owner. Add explicit components and an allowlist manifest; build/cook into owned outputs, create a fresh immutable stage transactionally, verify rights/dependencies/paths/hashes, and only then archive. Exclude editor/launcher/tools/source/debug material unless the frozen scope admits a separate developer package. Exercise stale/extra/missing/corrupt payloads and clean-machine extract/run/remove. Bind every result to the archive hash and record REL-03/FCR-PROD-05 evidence.
-```
-
-## `PD-4` — Support, Incident Response, And Product Closure
-
-**Goal:** close `FCR-PROD-06`, prove operated support/security/crash/patch paths, and leave every product family candidate-ready.
-
-**Non-goals:** silent telemetry, collecting private state by default, promising perpetual compatibility, or calling documentation an operated process.
-
-**Required work:**
-
-- define public support and security intake, severity/response ownership, privacy/consent, retention, symbol handling, known-issue and workaround policy;
-- connect process crash/hang and GPU/device diagnostics to a bounded user-visible collection/export route without leaking paths or content;
-- define immutable patch identity, applicability, rollback/withdrawal/advisory, and evidence invalidation;
-- rehearse one crash, one hang/timeout if supported, one GPU/device diagnostic route, one security intake, and one patch/withdraw decision;
-- reconcile all six product FCR reports against the same candidate and package identity. Unreal's [crash-reporting architecture](https://dev.epicgames.com/documentation/en-us/unreal-engine/crash-reporting-in-unreal-engine) is a responsibility reference only; no Epic service is assumed.
-
-**Failure modes to control:** report loses candidate identity; consent bypass; private paths or content escape; symbols cannot match build; unsupported recovery promised; patch replaces public bytes under same version; intake has no owner.
-
-**Phase exit criteria:** support routes were operated, not merely written; failures preserve consent and identity; patch policy is reproducible; all six FCR reports have explicit candidate-bound verdicts and residual limitations.
-
-**Ready-to-use prompt:**
-
-```text
-Implement PD-4 against the package candidate. Reconcile Core/RHI diagnostics, crash boundaries, symbol outputs, user data paths, logs, public documentation, support/security intake, release identity, and patch mechanics. Create one privacy-aware export and incident identity path; do not add always-on telemetry. Define severity clocks, ownership, retention, redaction, patch/withdraw rules, and evidence invalidation. Exercise controlled crash/hang/GPU/support/security/patch scenarios using non-sensitive fixtures. Verify report-to-symbol-to-candidate correlation and package erasure rules. Update FCR-PROD-01 through 06 with exact verdicts; stop if any intake or privacy responsibility is unowned.
-```
-
-## Plan Completion
-
-This plan is complete only when all six product FCRs have Architecture-owned contracts, exact candidate reports, and no unresolved blocker for their admitted scope. The release is not complete until the mother plan's remaining map, native, adoption, publication, and stabilization gates pass.

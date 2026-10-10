@@ -1,10 +1,18 @@
 # External Capture Remaining Delivery Plan
 
+Finish the missing capture routes and prove the integrations already present in Editor source.
+
 **Status:** remaining discovery, implementation deltas and candidate acceptance; existing Editor integrations and engine repairs are delivered
 
 **Reconciled:** 2026-10-10 against `34b6d8a7a34283fb4bf568be13307c741ca1bedd`; source inspection and retained handoffs establish what is already delivered, not a new native or aggregate acceptance result.
 
-**Authority boundary:** [dossier](README.md) owns scope/acceptance; [Discovery](Discovery.md) owns environment decisions and retained gate records; [Semantics](Semantics.md), [Execution Architecture](ExecutionArchitecture.md) and [User Experience](UserExperience.md) own enduring design. This plan contains only remaining work. Completed UI/icon/startup iterations and repair prompts are removed; their source owners, decisions and necessary evidence remain in those documents and Git history.
+## Work This Plan
+
+| What to do | Working route |
+| --- | --- |
+| First action | [remaining provider discovery](#stage-0--close-remaining-provider-discovery): close only unresolved native completion, target/generation, interposer and configuration cells. |
+| Result to reach | PIX candidate evidence first, then the remaining Nsight/RenderDoc lifecycle, Game and delivery cells without repeating delivered engine repairs. |
+| Start / stop | Native finalization/lifetime must be proved before affected adapter work. Use installed tools/current hardware; unavailable specialist lanes and AMD profiling retain their stated exclusions. |
 
 ## Remaining Work At A Glance
 
@@ -45,11 +53,15 @@ Apply this to every prompt below; each prompt is standalone when pasted with its
 
 **Exit `EC-D0-PIX`:** All unresolved provider cells have exact decisions/artifacts or named unavailable prerequisites. Native completion, quiescence and target identity are proved before the affected adapter acceptance or implementation proceeds.
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only the remaining Stage 0 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
 ```
 
+</details>
 
 ## Stage 1 — Verify The Existing PIX Editor Workflow
 
@@ -57,11 +69,15 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Exit `EC-G1`:** `CHK-EC-LAUNCH/BOOT/TARGET/NATIVE/UX/ARCH` relevant PIX cases pass, including missing PIX, event-runtime-only, invalid provider intent, wrong/stale target and second-request Busy. Three finalized captures open and identify known Sponza pass/output/pipeline; narrow owning builds and configuration/source-erasure audit pass. Failure/lifetime rules needed by this slice are implemented; exhaustive stress and Game/adoption remain Stage 2.
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only the remaining Stage 1 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
 ```
 
+</details>
 
 ## Stage 2 — Close PIX Lifecycle, Game And Delivery
 
@@ -69,11 +85,15 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Exit `EC-G2`:** relevant `AC-EC-01`–`AC-EC-10` and `AC-EC-12` pass for PIX Editor/Game D3D12, mapped negative failures settle safely, package/observer controls pass and individual PIX acceptance is recorded in candidate report. Non-author adoption may be performed now or remain explicit aggregate Stage 8 evidence. The separate PIX Timing lane has a transcript/artifact or explicit blocked prerequisite and cannot revoke an accepted GPU Capture cell. No whole-map capture is needed for each repair; retain Empty/Sponza and defer the roster gate to Stage 8.
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only the remaining Stage 2 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
 ```
 
+</details>
 
 ## Stage 3 — Verify The Existing Nsight D3D12 Workflow
 
@@ -81,11 +101,15 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Exit `EC-G3`:** D3D12 Nsight cell has three opened native captures or a primary-source-and-smoke-backed unsupported disposition; missing SDK/hardware remains blocked. Relevant dossier checks and failure controls pass, Shipping/normal route remains tool-free, `Experimental SDK` is shown. Artifact APIs are verified against installed headers, not guessed from web snippets.
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only the remaining Stage 3 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
 ```
 
+</details>
 
 ## Stage 4 — Deliver The Missing Nsight Vulkan Route
 
@@ -93,11 +117,15 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Exit `EC-G4`:** relevant native/lifecycle/target/combination/symbol/observer/profile checks pass for the Vulkan tuple or evidence-backed unsupported disposition; D3D12-neutral meanings remain identical, Vulkan native validation passes on compatible validation route. GPU Trace/Systems each have a native transcript/artifact or explicit unavailable prerequisite without masquerading as Graphics Capture. Unsupported vendor features are explicit matrix cells, not silently disabled.
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only the remaining Stage 4 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
 ```
 
+</details>
 
 ## Stage 5 — Verify The Existing RenderDoc D3D12 Workflow
 
@@ -105,11 +133,15 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Exit `EC-G5`:** real three-capture/native-inspection route and controlled failure/feature support matrix; dynamic linkage, no-provider/Shipping behavior and one authority verified. RenderDoc may remain unable to capture a vendor feature cell; label that cell and never change renderer settings silently.
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only the remaining Stage 5 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
 ```
 
+</details>
 
 ## Stage 6 — Verify The Existing RenderDoc Vulkan Workflow
 
@@ -117,11 +149,15 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Exit `EC-G6`:** all relevant checks for Vulkan cell and artifact inspection, wrong/stale root/window negative control and compatible validation; all `EXT-00`–`EXT-05` have candidate dispositions or explicit remaining blockers. Aggregate parent P1 proof remains Stage 8.
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only the remaining Stage 6 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
 ```
 
+</details>
 
 ## Stage 7 — Finish Selected Specialist Handoffs
 
@@ -129,11 +165,15 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Exit `EC-G7`:** one repeatable transcript/artifact per available selected lane, unavailable lanes named with prerequisites; no universal “Capture next frame” success for timing/system/crash/static analysis. Newly necessary SDK instrumentation requires separate discovery and bounded future stage, not hidden additions to this stage.
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only the remaining Stage 7 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
 ```
 
+</details>
 
 ## Stage 8 — Close Remaining Matrix, Adoption And Parent Evidence
 
@@ -141,14 +181,27 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Exit `EC-G8`:** all relevant dossier criteria/failures/checks have retained results, no accepted cell lacks native artifact/identity/failure/Shipping/observer evidence, independent review/adoption complete. Record candidate disposition in existing completion report. Parent `P1-GATE` closes only with all selected `EXT-*` accepted or genuinely unsupported dispositions plus parent workload/erasure gates. Internal Phase 2 is then eligible under its own discovery/selection; Stage 8 does not implement it.
 
+<details>
+<summary>Copy the execution prompt</summary>
+
 ```text
 Execute only the remaining Stage 8 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
 ```
 
+</details>
 
 ## Traceability And Closure
 
 Use the dossier's `AC-EC-*`, `FM-EC-*` and `CHK-EC-*` cards, Discovery's frozen capacities/deadlines and the [operational runbook](../../../../Engineering/Verification/ExternalProfiling.md). Preserve provider priority and exact check thresholds; do not invent new budgets from candidate results. `CHK-EC-EVOLUTION`, `CHK-EC-LOCALITY` and `CHK-EC-ARCH` remain candidate gates when their claims apply.
 
 `EC-G0A/0B/0C` results remain in their [startup](Discovery.md#stage-0a-implementation-handoff--2026-10-07), [admission](Discovery.md#stage-0b-implementation-handoff---2026-10-08) and [publication](Discovery.md#stage-0c-implementation-handoff---2026-10-08) records. Reuse only valid candidate-bound proof. `EC-G1`–`EC-G8` are not closed merely by a working icon, a scheduling call or an installed tool. Parent Performance Phase 2 remains gated by its own [plan](../Plan.md).
+
+## Reference And Ownership
+
+<details>
+<summary>Exact owners, source snapshots and related contracts</summary>
+
+**Authority boundary:** [dossier](README.md) owns scope/acceptance; [Discovery](Discovery.md) owns environment decisions and retained gate records; [Semantics](Semantics.md), [Execution Architecture](ExecutionArchitecture.md) and [User Experience](UserExperience.md) own enduring design. This plan contains only remaining work. Completed UI/icon/startup iterations and repair prompts are removed; their source owners, decisions and necessary evidence remain in those documents and Git history.
+
+</details>
