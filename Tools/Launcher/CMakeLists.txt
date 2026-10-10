@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(SPARKLE_REPOSITORY_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 include(${SPARKLE_REPOSITORY_ROOT}/CMake/SparkleArtifactContract.cmake)
-project(SparkleLauncherProduct LANGUAGES C CXX)
+include(${SPARKLE_REPOSITORY_ROOT}/CMake/SparkleProductIdentity.cmake)
+project(SparkleLauncherProduct VERSION ${SPARKLE_VERSION} LANGUAGES C CXX)
+if(WIN32)
+    enable_language(RC)
+endif()
 
 include(${SPARKLE_REPOSITORY_ROOT}/CMake/SparkleBuildProfiles.cmake)
 include(${SPARKLE_REPOSITORY_ROOT}/CMake/SparkleQtDiscovery.cmake)

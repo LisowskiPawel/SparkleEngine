@@ -14,6 +14,8 @@
 
 ## `PD-0` Persona Journey Freeze
 
+**Historical freeze:** the runtime-only audience and Developer-only Launcher/Editor classifications below were superseded by the 2026-10-10 [scope amendment](../../Acceptance/ReleaseScope/Evidence.md#scope-amendment-iter-rel-00-05). Current product journeys are owned by [First Release](../../Acceptance/FirstRelease.md#release-audiences) and its linked module contracts; this source trace does not prove the new packaged route.
+
 The [release product classification, prerequisites, paths, and budgets](../../Acceptance/FirstRelease.md#frozen-product-and-output-classification) decide what each actor may expect. The trace below records the current source route through success, failure/recovery, and exit. A **Blocked** current route is still a decidable contract; it may not be described as a successful journey.
 
 | Actor/journey | Entry and preparation | Execution and success oracle | Failure/recovery | Exit and current verdict |

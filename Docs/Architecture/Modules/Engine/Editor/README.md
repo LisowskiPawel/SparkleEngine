@@ -110,26 +110,26 @@ World publishes immutable read view/change sequence -> `EditorSceneModelBuilder`
 
 ## `FCR-PROD-04` Editor Contract
 
-The Editor is **Developer-only** for `v0.1.0`. Its source-built journey must be truthful, but it is not a consumer prerequisite or runtime-archive component. [Application](../Application/README.md#product-contract-boundary) owns hosting; this section owns the feature-local verdict contract.
+Sparkle Editor is a **required shipped product** for `v0.1.0`, currently implemented by `ShowcaseEditor`. Qualify its package/workspace/dependency closure and the seven release-map workflows on a clean standard-user machine; intentional Empty startup needs no example download. Game remains structurally isolated from Editor code and tools. [Application](../Application/README.md#product-contract-boundary) owns hosting; this section owns the feature-local verdict contract.
 
 | ID | Binary acceptance criterion |
 | --- | --- |
-| `AC-PROD04-01` | A source adopter on the supported toolchain can build and start `ShowcaseEditor` from the documented repository/project context, identify its Developer-only status and workspace prerequisites before use, and exit while owned operations settle within the frozen Editor budget. |
+| `AC-PROD04-01` | A standard user can launch packaged Sparkle Editor without a source checkout or undeclared SDK, start Empty, and open each selected/synced release map with its correct identity. A source adopter can also build `ShowcaseEditor` using the documented toolchain. Workspace/helper requirements are explicit and owned operations settle within the frozen Editor budget. |
 | `AC-PROD04-02` | For one admitted authored level, open -> inspect -> supported typed edit -> undo -> redo -> explicit Save All -> reload produces the expected world/source result; only explicit Save All may mutate the selected `.level` source. |
 | `AC-PROD04-03` | Missing source/tool/shader/cooked content, stale world generation, rejected edit, failed save, cancelled recook/capture, and restart-required setting remain distinguishable and preserve the previous accepted world/source/generation. |
-| `AC-PROD04-04` | Runtime archive/import/file inspection contains no `ShowcaseEditor`, `SparkleEditor`, `SparkleApplicationEditor`, Editor UI/assets, shader-recook/capture operation, or Editor-only dependency. |
+| `AC-PROD04-04` | Game component/import inspection contains no Editor linkage, UI, shader-recook/capture operation or Editor-only dependency. The separate Editor component is present in the three-product bundle and its declared helpers are verified against the manifest. |
 
 | ID | Cause/injection, safe result, and affected criterion |
 | --- | --- |
 | `FM-PROD04-01` | Omit a required workspace/tool input. Configure/start/operation fails with the missing owner and recovery; it never degrades to a consumer promise or reports success (`AC-PROD04-01`, `AC-PROD04-03`). |
 | `FM-PROD04-02` | Change world generation or force an unsupported/stale edit. The command is rejected visibly, history stays coherent, and no optimistic UI state becomes source truth (`AC-PROD04-02`, `AC-PROD04-03`). |
 | `FM-PROD04-03` | Deny or fault the selected level save. The existing source bytes retain their hash and the failure remains actionable; no temp/partial file is accepted (`AC-PROD04-02`, `AC-PROD04-03`). |
-| `FM-PROD04-04` | Inspect the runtime archive for Editor targets/symbols/strings/imports. Any reachable or delivered Editor surface fails `AC-PROD04-04`. |
+| `FM-PROD04-04` | Inspect the Game component for Editor dependencies/UI/imports and the Editor component for missing declared inputs. Editor leakage into Game or omission from the bundle fails `AC-PROD04-04`. |
 
 | Check | Claims falsified | Smallest route and oracle |
 | --- | --- | --- |
-| `CHK-PROD04-01` | `AC-PROD04-01`, `AC-PROD04-02`, `AC-PROD04-03`; `FM-PROD04-01`–`03` | Focused supported-toolchain Editor build, then one scripted non-author open/edit/undo/redo/save/reload/exit route on a disposable source copy with each named fault. World/source hashes and operation results are the oracle. |
-| `CHK-PROD04-02` | `AC-PROD04-04`; `FM-PROD04-04` | Independently inventory the verified runtime stage/archive and `ShowcaseRuntime` dependency/import surface against an Editor denylist. Zero matches is required. |
+| `CHK-PROD04-01` | `AC-PROD04-01`, `AC-PROD04-02`, `AC-PROD04-03`; `FM-PROD04-01`–`03` | Focused supported-toolchain Editor build, then clean-machine packaged Empty/all-seven-map activation and one scripted non-author open/edit/undo/redo/save/reload/exit route on a disposable source copy with each named fault. World/source hashes and operation results are the oracle. |
+| `CHK-PROD04-02` | `AC-PROD04-04`; `FM-PROD04-04` | Independently inventory the verified three-product stage: require the declared Editor component/helpers and inspect Game (`ShowcaseRuntime`) imports against the Editor dependency denylist. Component presence and zero Editor linkage in Game are required. |
 
 Candidate results belong in `FCR-PROD-04`; no usability, build, runtime, save, or package result was produced by this contract pass.
 

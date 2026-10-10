@@ -149,13 +149,13 @@ The operation owner must classify every non-successful terminal result and provi
 
 ## `FCR-PROD-03` Launcher Contract
 
-Launcher is **Developer-only** and must remain an optional frontend over the source-owned operations. It is not shipped, cannot be a runtime prerequisite, and cannot become the package-policy owner.
+Sparkle Launcher is a **required shipped product** and remains a frontend over the existing operation owners. Users may start Empty, select any subset of the seven release maps to sync, and launch Sparkle Editor or Sparkle Game. Deliver required features and full content/helper closure for those maps; mark other choices development or unavailable. Game/Editor must run offline with synced content. Launcher does not become the package-policy owner.
 
 | ID | Binary acceptance criterion |
 | --- | --- |
-| `AC-PROD03-01` | From a documented repository root, the GUI and shell route discover the exact source/toolchain/project state, identify Developer-only status, and produce the same typed operation request/result for equivalent sync/configure/build/cook/run/clean intent. |
+| `AC-PROD03-01` | From a verified installation/content context, GUI and shell produce equivalent typed selection/sync/launch results without a source checkout or undeclared SDK. Select none (Empty), each of the seven maps and a subset; acquire only selected dependency closures and required features. Source configure/build/cook/clean routes retain explicit toolchain prerequisites; other choices are development or unavailable. |
 | `AC-PROD03-02` | Readiness distinguishes ready, missing, stale, unsupported, unavailable, failed, cancelled, timed out, skipped, and missing-artifact states; success requires zero exit plus every operation-specific final artifact/consumer oracle. |
-| `AC-PROD03-03` | Run follows the final `ShowcaseEditor`/`ShowcaseRuntime` child through requested-level activation or actionable failure; Launcher process creation/PID/exit alone is never success. |
+| `AC-PROD03-03` | Run follows the final Sparkle Editor/Game (`ShowcaseEditor`/`ShowcaseRuntime`) child through requested-level activation or actionable failure; Launcher process creation/PID/exit alone is never success. |
 | `AC-PROD03-04` | Cancellation and close settle the owned process tree/task scope once within budget, retain the final log/result, preserve the prior accepted products, and permit a clean retry. |
 | `AC-PROD03-05` | Clean/force-recook previews canonical contained targets and byte/file counts, requires explicit confirmation, honors preserved paths, changes no source, and touches per-user development state only when that typed scope is explicitly previewed. Packaged runtime state is outside workspace cleanup. |
 
@@ -169,7 +169,7 @@ Launcher is **Developer-only** and must remain an optional frontend over the sou
 
 | Check | Claims falsified | Smallest route and fixed oracle |
 | --- | --- | --- |
-| `CHK-PROD03-01` | `AC-PROD03-01`, `AC-PROD03-02`; `FM-PROD03-01`, `FM-PROD03-05` | Use GUI and `--dry-run`/`--run` against the same disposable repository states, then compare typed plan, requiredness, command, effects, final category, and artifacts for normal, missing-tool, stale, Unicode, and missing-artifact cases. |
+| `CHK-PROD03-01` | `AC-PROD03-01`, `AC-PROD03-02`; `FM-PROD03-01`, `FM-PROD03-05` | Use GUI and shell against the same clean packaged context for Empty, all seven maps and a selected subset; verify downloads, feature availability and unsupported-choice labels. Also use `--dry-run`/`--run` against the same disposable repository states, then compare typed plan, requiredness, command, effects, final category, and artifacts for normal, missing-tool, stale, Unicode, and missing-artifact cases. |
 | `CHK-PROD03-02` | `AC-PROD03-03`, `AC-PROD03-04`; `FM-PROD03-02`, `FM-PROD03-03` | Launch one requested level, follow child/handoff/activation identity, then inject early exit and cancel each external-operation class. Process-tree, operation-result, log, artifact hashes, and settlement time are the oracle. |
 | `CHK-PROD03-03` | `AC-PROD03-05`; `FM-PROD03-04` | Execute preview and confirmed clean/force recook in a disposable repository with containment fixtures. Diff the complete filesystem; only the exact approved roots may change and incomplete cleanup must fail. |
 

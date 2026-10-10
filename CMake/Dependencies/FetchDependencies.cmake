@@ -20,9 +20,9 @@
 #   Optional content pipeline (SPARKLE_ENABLE_CONTENT_PIPELINE):
 #   - cgltf          (v1.15)    - Single-header glTF 2.0 parser
 #   - MikkTSpace     (pinned)   - Canonical glTF tangent-space generation
-#   - stb            (master)   - stb_image + stb_image_resize2 (header-only)
+#   - stb            (pinned)   - stb_image + stb_image_resize2 (header-only)
 #   - Assimp         (v5.4.3)   - FBX and general 3D asset import
-#   - Compressonator (master)   - AMD BC1-BC7 block compression (CMP_Core only)
+#   - Compressonator (pinned)   - AMD BC1-BC7 block compression (CMP_Core only)
 #
 #   Optional KTX support (SPARKLE_ENABLE_KTX_SUPPORT):
 #   - KTX-Software   (v4.3.2)   - KTX2 texture container read/write
@@ -440,8 +440,8 @@ sparkle_source_dependency_selected("imgui" _sparkle_fetch_imgui)
 if(_sparkle_fetch_imgui)
 FetchContent_Declare(imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG        v1.92.5
-    GIT_SHALLOW    TRUE
+    GIT_TAG        6d910d5487d11ca567b61c7824b0c78c569d62f0 # v1.92.5
+    GIT_SHALLOW    FALSE
     GIT_PROGRESS   ${_sparkle_git_progress}
 )
 sparkle_log_dependency_step(1 12 "Dear ImGui" "v1.92.5" "~7 MB" "Immediate-mode UI core and Win32 platform backend" "https://github.com/ocornut/imgui.git")
@@ -504,8 +504,8 @@ if(_sparkle_fetch_cgltf AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYNC
     # ============================================================================
     FetchContent_Declare(cgltf
         GIT_REPOSITORY https://github.com/jkuhlmann/cgltf.git
-        GIT_TAG        v1.15
-        GIT_SHALLOW    TRUE
+        GIT_TAG        360db1a95480fe102ae9c69b27c5d101167ff5ba # v1.15
+        GIT_SHALLOW    FALSE
         GIT_PROGRESS   ${_sparkle_git_progress}
     )
     sparkle_log_dependency_step(2 12 "cgltf" "v1.15" "~1 MB" "Single-header glTF 2.0 parser for source scene imports" "https://github.com/jkuhlmann/cgltf.git")
@@ -580,11 +580,11 @@ if(_sparkle_fetch_stb AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYNC_S
     # ============================================================================
     FetchContent_Declare(stb
         GIT_REPOSITORY https://github.com/nothings/stb.git
-        GIT_TAG        master
-        GIT_SHALLOW    TRUE
+        GIT_TAG        2c980bb59875b0d32144a71867fbdebb2f77cd20
+        GIT_SHALLOW    FALSE
         GIT_PROGRESS   ${_sparkle_git_progress}
     )
-    sparkle_log_dependency_step(4 12 "stb" "master" "~5 MB" "Header-only image loading and mip resize helpers" "https://github.com/nothings/stb.git")
+    sparkle_log_dependency_step(4 12 "stb" "2c980bb59875b0d32144a71867fbdebb2f77cd20" "~5 MB" "Header-only image loading and mip resize helpers" "https://github.com/nothings/stb.git")
     FetchContent_Populate(stb)
 
     if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
@@ -647,8 +647,8 @@ sparkle_source_dependency_selected("spdlog" _sparkle_fetch_spdlog)
 if(_sparkle_fetch_spdlog)
 FetchContent_Declare(spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG        v1.14.1
-    GIT_SHALLOW    TRUE
+    GIT_TAG        27cb4c76708608465c413f6d0e6b8d99a4d84302 # v1.14.1
+    GIT_SHALLOW    FALSE
     GIT_PROGRESS   ${_sparkle_git_progress}
 )
 sparkle_log_dependency_step(6 12 "spdlog" "v1.14.1" "~3 MB" "Repo-wide logging backend" "https://github.com/gabime/spdlog.git")
@@ -708,8 +708,8 @@ if(_sparkle_fetch_zlib)
     # ============================================================================
     FetchContent_Declare(zlib
         GIT_REPOSITORY https://github.com/madler/zlib.git
-        GIT_TAG        v1.3.1
-        GIT_SHALLOW    TRUE
+        GIT_TAG        51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf # v1.3.1
+        GIT_SHALLOW    FALSE
         GIT_PROGRESS   ${_sparkle_git_progress}
     )
     sparkle_log_dependency_step(7 12 "zlib" "v1.3.1" "~1 MB" "Compression backend used by TinyEXR and Assimp" "https://github.com/madler/zlib.git")
@@ -756,8 +756,8 @@ if(_sparkle_fetch_assimp AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYN
     # ============================================================================
     FetchContent_Declare(assimp
         GIT_REPOSITORY https://github.com/assimp/assimp.git
-        GIT_TAG        v5.4.3
-        GIT_SHALLOW    TRUE
+        GIT_TAG        c35200e38ea8f058812b83de2ef32c6093b0ece2 # v5.4.3
+        GIT_SHALLOW    FALSE
         GIT_PROGRESS   ${_sparkle_git_progress}
     )
     sparkle_log_dependency_step(8 12 "Assimp" "v5.4.3" "~15 MB" "FBX and DCC scene import support" "https://github.com/assimp/assimp.git")
@@ -813,48 +813,54 @@ if(_sparkle_fetch_compressonator AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPA
     #          #include "cmp_core.h"
     # API:     CompressBlockBC7(), DecompressBlockBC7(), etc.
     # ============================================================================
-    sparkle_log_dependency_step(9 12 "Compressonator" "master (sparse)" "~5 MB" "AMD BC1-BC7 texture block compression; sparse checkout of cmp_core only" "https://github.com/GPUOpen-Tools/compressonator.git")
+    set(_comp_revision "f4b53d79ec5abbb50924f58aebb7bf2793200b94")
+    sparkle_log_dependency_step(9 12 "Compressonator" "${_comp_revision} (sparse)" "~5 MB" "AMD BC1-BC7 texture block compression; sparse checkout of cmp_core only" "https://github.com/GPUOpen-Tools/compressonator.git")
 
 set(_comp_src "${FETCHCONTENT_BASE_DIR}/compressonator-src")
-
-if(NOT EXISTS "${_comp_src}/cmp_core/source/cmp_core.cpp")
-    # Fresh clone or incomplete checkout - (re)clone with sparse checkout.
-    # --filter=blob:none  = partial clone (download trees only, fetch blobs on demand)
-    # --sparse            = enable sparse checkout (only materialize listed paths)
-    # --depth=1           = shallow (single commit, no history)
-    file(REMOVE_RECURSE "${_comp_src}")
-
-    if(SPARKLE_VERBOSE_DEPENDENCIES)
-        message(STATUS "    Cloning (partial + sparse)...")
-    endif()
+if(NOT EXISTS "${_comp_src}")
     execute_process(
-        COMMAND "${_git_exe}" clone
-            --depth=1 --filter=blob:none --sparse ${_sparkle_git_progress_args}
-            https://github.com/GPUOpen-Tools/compressonator.git
-            "${_comp_src}"
+        COMMAND "${_git_exe}" clone --no-checkout --filter=blob:none --sparse
+            ${_sparkle_git_progress_args}
+            https://github.com/GPUOpen-Tools/compressonator.git "${_comp_src}"
         RESULT_VARIABLE _rc
     )
     if(_rc)
-        message(FATAL_ERROR "Failed to clone compressonator (exit code ${_rc})")
-    endif()
-
-    if(SPARKLE_VERBOSE_DEPENDENCIES)
-        message(STATUS "    Setting sparse checkout paths: cmp_core, applications/_libs/cmp_math")
+        message(FATAL_ERROR "Failed to clone Compressonator (exit code ${_rc})")
     endif()
     execute_process(
-        COMMAND "${_git_exe}" sparse-checkout set
-            cmp_core
-            applications/_libs/cmp_math
-        WORKING_DIRECTORY "${_comp_src}"
-        RESULT_VARIABLE _rc
+        COMMAND "${_git_exe}" sparse-checkout set cmp_core applications/_libs/cmp_math
+        WORKING_DIRECTORY "${_comp_src}" RESULT_VARIABLE _rc
     )
     if(_rc)
-        message(FATAL_ERROR "Failed to set sparse checkout for compressonator (exit code ${_rc})")
+        message(FATAL_ERROR "Failed to set Compressonator sparse checkout (exit code ${_rc})")
     endif()
-else()
-    if(SPARKLE_VERBOSE_DEPENDENCIES)
-        message(STATUS "    Reusing existing sparse clone")
+    execute_process(
+        COMMAND "${_git_exe}" checkout --detach "${_comp_revision}"
+        WORKING_DIRECTORY "${_comp_src}" RESULT_VARIABLE _rc
+    )
+    if(_rc)
+        message(FATAL_ERROR "Failed to check out pinned Compressonator revision ${_comp_revision}")
     endif()
+endif()
+
+# A cached checkout is an input, not permission to reset or delete local edits.
+execute_process(
+    COMMAND "${_git_exe}" rev-parse HEAD
+    WORKING_DIRECTORY "${_comp_src}" RESULT_VARIABLE _comp_head_rc
+    OUTPUT_VARIABLE _comp_head OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
+)
+execute_process(
+    COMMAND "${_git_exe}" status --porcelain --untracked-files=all
+    WORKING_DIRECTORY "${_comp_src}" RESULT_VARIABLE _comp_status_rc
+    OUTPUT_VARIABLE _comp_status OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
+)
+if(NOT _comp_head_rc EQUAL 0 OR NOT _comp_status_rc EQUAL 0 OR
+   NOT _comp_head STREQUAL _comp_revision OR NOT "${_comp_status}" STREQUAL "" OR
+   NOT EXISTS "${_comp_src}/cmp_core/source/cmp_core.cpp" OR
+   NOT EXISTS "${_comp_src}/applications/_libs/cmp_math/cmp_math_common.cpp")
+    message(FATAL_ERROR
+        "Compressonator cache must be clean at ${_comp_revision}: ${_comp_src}. "
+        "Preserve any local work, move this cache aside, and retry Launcher dependency sync.")
 endif()
 
 set(compressonator_SOURCE_DIR "${_comp_src}")
@@ -964,8 +970,8 @@ if(_sparkle_fetch_ktx AND (SPARKLE_ENABLE_KTX_SUPPORT OR NOT SPARKLE_SYNC_SOURCE
     # ============================================================================
     FetchContent_Declare(ktx
     GIT_REPOSITORY https://github.com/KhronosGroup/KTX-Software.git
-    GIT_TAG        v4.3.2
-    GIT_SHALLOW    TRUE
+    GIT_TAG        91ace88675ac59a97e55d0378a6602a9ae6b98bd # v4.3.2
+    GIT_SHALLOW    FALSE
     GIT_PROGRESS   ${_sparkle_git_progress}
     GIT_SUBMODULES ""
 )
@@ -1024,8 +1030,8 @@ if(_sparkle_fetch_spirv_reflect AND (SPARKLE_ENABLE_SHADER_COMPILER OR NOT SPARK
     # ============================================================================
     FetchContent_Declare(spirv_reflect
     GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Reflect.git
-    GIT_TAG        vulkan-sdk-1.3.290.0
-    GIT_SHALLOW    TRUE
+    GIT_TAG        b4dc70d8e6ac30c719a2d05b8ad05e1d277c92b4 # vulkan-sdk-1.3.290.0
+    GIT_SHALLOW    FALSE
     GIT_PROGRESS   ${_sparkle_git_progress}
 )
 sparkle_log_dependency_step(11 12 "SPIRV-Reflect" "vulkan-sdk-1.3.290.0" "~2 MB" "SPIR-V reflection for offline shader compiler backends" "https://github.com/KhronosGroup/SPIRV-Reflect.git")

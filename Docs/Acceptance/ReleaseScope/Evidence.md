@@ -1,5 +1,7 @@
 # Release Scope Evidence
 
+**Current FR-01:** [ITER-REL-01-03 blockers and fixes](../FirstRelease.md#current-fr-01-blockers). Git refs and source version identity are corrected; rights/receipt and clean-baseline gates remain blocked. The approval records below retain their original evidence boundaries.
+
 **Status:** dated source audit and iteration records; release acceptance remains blocked
 
 **Responsibility:** retain source identities, rights observations and historical checks behind the [scope decisions](README.md).
@@ -7,6 +9,40 @@
 **Snapshot:** reconciled 2026-10-10 at `aa9fcd94f219e8a3d4dbe7c51457680ad9300783`. Earlier iterations retain their own revisions and dirty-state descriptions.
 
 These records prove only the inspection or document checks they name. Current product choices and next actions belong in [Release Scope](README.md#approval-and-next-work); this page does not grant redistribution permission or build/runtime acceptance.
+
+## Scope Approval: ITER-REL-00-06
+
+**Candidate context:** 2026-10-10, `d1c8c5b2a61768a0460983c854264380d5c1f6dc` plus the preserved 16 pre-existing modified documents and this approval edit.
+
+**Owner decision:** all six proposals approved. Resolution follows the user's display/selection; no product resolution is forced. Users are expected to launch through Sparkle Launcher. D3D12/Lit/VSync/histogram/ACES approximation/SDR/neutral grading/HDR opt-in defaults are accepted, with **chromatic aberration On and vignette On**. Other approved packaging, OS, controls, compatibility and distribution/privacy choices are in [the decision owner](README.md#approval-and-next-work). No further answer to those six choices is pending.
+
+**Superseded:** earlier unanswered-choice status, mandatory native 1080p internal rendering for normal viewing, and lens effects Off. The 1080p presets remain controlled laptop acceptance configurations, with exact render/output/provider extents recorded; the 30 FPS threshold and seven-map/both-API evidence obligations are preserved. This decision does not pass a performance test. Earlier iterations below are historical snapshots.
+
+| Gate | Current disposition |
+| --- | --- |
+| `REL-00` | **BLOCKED for technical closure only:** product choices approved; exact rights receipts and reviewed package/helper/configuration/content-store closure remain. No pending product approval is a blocker. |
+| `REL-01` | **BLOCKED:** real publisher/license/version, immutable dependencies, content rights and Shipping payload qualification remain unresolved. |
+| `REL-02` | **BLOCKED:** clean tagged-source cold/warm build/cook/runtime baseline not executed; input/admission prerequisites remain. |
+
+**Documentation checks: PASS.** 362 local links, 131 incoming links, stable identifiers and four negative controls passed; `git -c core.safecrlf=false diff --check` passed.
+
+**Evidence boundary:** documentation changes only. Exact pre-edit texts, control, validation command and changed-input hashes are retained in `build/validation/release-scope-approval-20261010/`. No production code, dependency acquisition, build, cook, runtime or package validation was performed; generated state was preserved.
+
+## Scope Amendment: ITER-REL-00-05
+
+**Candidate context:** 2026-10-10, `d1c8c5b2a61768a0460983c854264380d5c1f6dc` plus this documentation amendment. The initial dirty tree contained only the identity/baseline preflight in `Docs/Acceptance/FirstRelease.md`; that report and its input snapshot are preserved.
+
+**Release-owner decisions:** ship Sparkle Launcher, Sparkle Editor and Sparkle Game; Launcher selects/syncs any subset of the seven release maps and required features, including none with intentional Empty startup; mark other choices development or unavailable. Render internally at native 1920x1080, then scale for the selected display; measure 30 FPS on the named laptop. Offer no user support service. The owner confirmed both the native-resolution interpretation and seven-map boundary in follow-up replies.
+
+**Superseded:** the single runtime consumer package, source-only Launcher/Editor, mandatory Modern Sponza first launch, subnative DLSS Quality realtime performance preset and public support/security response clocks. Earlier dated receipts and inspections below remain historical evidence; their source identities/rights observations are unchanged. The earlier PD-0 PASS does not approve the amended product, path, helper or service boundary.
+
+| Gate | Candidate-bound disposition |
+| --- | --- |
+| `REL-00` | **BLOCKED, partially approved:** the decisions above are settled. Remaining package format/platform/controls/defaults/compatibility/distribution proposals, helper/configuration/content-store freeze and exact rights receipts still need closure. |
+| `REL-01` | **BLOCKED:** unresolved publisher/license identity, moving dependencies, selected-content rights and qualified payload closure remain. No rights or dependency fix was made. |
+| `REL-02` | **BLOCKED:** no clean tagged-source cold/warm build/cook/runtime baseline was executed. The amended three-product baseline must be admitted before execution. |
+
+**Documentation checks: PASS.** Sixteen documents were reconciled; 485 local links, 288 incoming links, stable identifiers and four negative controls passed. `git -c core.safecrlf=false diff --check` passed. Exact baseline, iteration control, changed-input hashes, validation command and results are retained in `build/validation/release-scope-amendment-20261010/`. This is scope/contract evidence only; no build, cook, runtime, GPU, performance, package or publication proof.
 
 ## Selected Content Receipts
 

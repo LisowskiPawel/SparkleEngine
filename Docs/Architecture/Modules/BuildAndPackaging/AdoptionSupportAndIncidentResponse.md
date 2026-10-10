@@ -1,8 +1,8 @@
 # Adoption, Support, And Incident Response
 
-**Status:** target product capability dossier; current developer routes exist, but the public adoption/support operation is incomplete
+**Status:** target product capability dossier; self-service adoption/local diagnostics remain unproved; ongoing support excluded
 
-**Scope:** define public onboarding, failure recovery, support/security intake, incident response, patch/withdrawal, and independent-reproduction responsibilities
+**Scope:** define public onboarding, failure recovery, local diagnostics, self-service recovery, release review, immutable replacement and independent reproduction
 
 **Owner:** release/product delivery; Launcher, Application, Core diagnostics, Docs, and project products provide owned parts of the route
 
@@ -10,67 +10,59 @@
 
 **Strategy and acceptance sources:** `NS-ADOPTION`, `NS-EVIDENCE`, and `NS-OWNERSHIP` in the [Engineer Persona](../../../Strategy/EngineerPersona.md); `FCR-PROD-01`, `FCR-PROD-02`, `FCR-PROD-06`; [First Release](../../../Acceptance/FirstRelease.md)
 
-**Current readiness:** **15/100** — developer diagnostics and partial onboarding exist; public adoption, support/security intake, incident, patch, and withdrawal operation do not. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
+**Current readiness:** **15/100** — developer diagnostics and partial onboarding exist; the dated public adoption/diagnostic/replacement snapshot is incomplete; the current scope excludes ongoing support. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
 
 ## At A Glance
 
-| User journey | Current state | Missing closure |
-| --- | --- | --- |
-| discover prerequisites and first-use route | partial Launcher/Docs developer path | public product identity, supported environment, controls, reset, and expected result |
-| recover from startup/content/backend failure | partial local diagnostics | stable public error categories, recovery steps, and verified first-user comprehension |
-| report a crash, hang, defect, or security issue | Not found | privacy/consent policy, support bundle, redaction, intake channels, and ownership |
-| receive response or product correction | Not found | severity model, response targets, advisory/patch/withdrawal and supported-version policy |
-| reproduce independently | Not found | clean public bytes, package identity, evidence bundle, and non-author result |
+The release owner offers **no user support service**. Deliver self-service onboarding, known issues, local diagnostics and reproducible recovery. Do not require a staffed bug/security inbox, maintained-version window, acknowledgement deadline or guaranteed fix. [Release Scope](../../../Acceptance/ReleaseScope/README.md#decision-summary) owns that decision.
 
-The capability begins before launch and continues after failure. A polished internal tool is only one component; adoption closes when a non-author can reach the result or produce an actionable privacy-safe report and understand what happens next.
+The source snapshot above remains historical; changing this contract does not improve readiness or prove implementation.
 
 ## Capability Identity
 
-| ID | Capability | Current state |
-| --- | --- | --- |
-| `ADOPT-01` | Public product identity, prerequisites, first-use, controls, reset, and exit | Partial developer route; public route incomplete |
-| `ADOPT-02` | Actionable unsupported/missing/corrupt/startup failure and recovery | Partial local diagnostics; public recovery route incomplete |
-| `ADOPT-03` | Privacy-safe crash/hang support bundle and issue/security intake | Not found |
-| `ADOPT-04` | Severity, response, patch/advisory/withdrawal, and supported-version operation | Not found |
+| ID | First-release boundary |
+| --- | --- |
+| `ADOPT-01` | Public identity, requirements, controls, first use, reset and exit for Launcher, Editor, Game and source adoption. |
+| `ADOPT-02` | Actionable local startup/content/backend failure and self-service recovery. |
+| `ADOPT-03` | Bounded, inspectable local diagnostics and candidate/symbol correlation; intake/upload service excluded. |
+| `ADOPT-04` | Finite maintainer release review and immutable replacement/withdrawal; ongoing response/maintenance service excluded. |
 
 ## Capability Boundary
 
-This feature begins when a non-author encounters Sparkle and ends when they can either reach the promised result or produce a privacy-safe, actionable failure report. It includes product identity, prerequisites, first-run selection, expected output, controls, troubleshooting, support/security intake, crash/hang collection, severity/response policy, patch or withdrawal, and independent reproduction. It does not make every internal tool a supported public product.
-
-Current Launcher readiness and Docs routes are partial building blocks. There is no root onboarding document, frozen public support channel, consented crash-report product, security intake, response clock, update/patch delivery, or independent first-user result in the inspected snapshot.
+A non-author can reach the promised product result or understand its failure without private guidance. Core/RHI/Application own diagnostic production; release delivery owns public instructions, local-data privacy, candidate-to-symbol identity and release review. No reporting channel or automatic upload is implied.
 
 ## Contract
 
-- Inputs: package/source-adopter classification, supported platform/backend/provider/content matrix, prerequisites, product/version identity, consent and privacy policy, diagnostic identity, and issue severity.
-- Outputs: successful first-use result or stable actionable failure; redacted support bundle; issue/security acknowledgement; reproducible case; resolution, advisory, patch, or withdrawal decision.
-- Runtime and tools own precise diagnostics. Delivery owns the user journey, support-bundle schema, consent, retention, routing, service expectation, and published support decision.
-- Logs/captures/crash data are bounded, inspectable before submission, opt-in where required, free of credentials/private paths, and associated with an exact product/revision/configuration identity.
+- Inputs: verified product/source identity, selected content, public prerequisites, exact configuration and local diagnostic records.
+- Outputs: successful first use or actionable failure, inspectable diagnostics, documented reset/removal and truthful known issues/no-support policy.
+- Local logs/captures/crash data are bounded and associated with the exact candidate. Explain sensitive paths/content before any voluntary sharing; retain originals locally.
+- Any voluntarily published correction has a new immutable identity, affected-gate revalidation and a documented user-state policy.
 
 ## `FCR-PROD-06` Support And Incident Contract
 
-The support/stabilization owner owns root `SUPPORT.md` and `SECURITY.md`, the public defect and private security channels they name, privacy/retention/redaction policy, candidate-to-symbol lookup, severity clocks, advisory/patch/withdraw decisions, and supported-version data. Core/RHI/Application own diagnostic production, not intake or response policy. The [frozen product contract](../../../Acceptance/FirstRelease.md#frozen-paths-mutation-boundary-and-budgets) owns paths and clocks.
+This stable family ID now covers adoption, local diagnostics and release review. Its former operating-service clocks and mandatory intake criteria are superseded by the release-owner amendment. [First Release](../../../Acceptance/FirstRelease.md#frozen-paths-mutation-boundary-and-budgets) owns paths/budgets and the no-support boundary.
 
 | ID | Binary acceptance criterion |
 | --- | --- |
-| `AC-ADOPT-01` | A runtime consumer and source adopter can reach the correct public onboarding/support route, identify product/version/package/source/configuration, expected result, prerequisites, reset/exit, known issues, and whether to use public defect or private security intake without private guidance. |
-| `AC-ADOPT-02` | A user can inspect and explicitly export a bounded redacted bundle for startup failure, process crash, hang/timeout, and GPU/device failure; no automatic upload/telemetry occurs and absence of a diagnostic is reported unavailable rather than successful. |
-| `AC-ADOPT-03` | Native/shader symbols, logs, dumps/captures when consented, and manifest/provenance map to the exact immutable candidate; a mismatched or insufficient bundle is rejected before submission with recovery. |
-| `AC-ADOPT-04` | Public defect and private security intake acknowledge within the frozen clocks, assign an owner/severity, preserve confidentiality/retention, and produce a reproducible resolution, known issue, advisory, patch, or withdrawal decision with version applicability. |
-| `AC-ADOPT-05` | A patch never changes bytes under an existing version; verify/apply/rollback or replace-side-by-side policy, evidence invalidation, user-state preservation/reset, and withdrawal are explicit and exercised for one isolated candidate copy. |
+| `AC-ADOPT-01` | A non-author reaches onboarding for all three products and source adoption; identifies exact version, requirements, controls, reset/exit, known issues and the absence of a user support service without private guidance. |
+| `AC-ADOPT-02` | Startup, crash, hang/timeout and GPU/device failure produce bounded inspectable local diagnostics where supported. No automatic upload occurs; unavailable diagnostics are reported explicitly. |
+| `AC-ADOPT-03` | Native/shader symbols, local logs, consented dumps/captures and manifest/provenance correlate to the exact immutable candidate; mismatched/insufficient data is rejected with recovery. |
+| `AC-ADOPT-04` | Maintainer release review records known defect severity, affected candidate/version and disposition. Public documentation promises no intake service, response deadline, supported-version period or fix. Known `S0`/`S1` blocks approval/closeout. |
+| `AC-ADOPT-05` | Any replacement uses a new version; hash applicability, user-state preservation/reset, rollback/side-by-side and withdrawal are explicit and exercised on an isolated candidate copy. Published bytes never change under an existing identity. |
 
-| ID | Cause/injection, safe result, and affected criterion |
+| ID | Cause/injection and safe result |
 | --- | --- |
-| `FM-ADOPT-01` | Remove `SUPPORT.md`/`SECURITY.md`, break an intake link, or omit a prerequisite. The journey is `Blocked`; docs/search/Launcher may not report readiness (`AC-ADOPT-01`, `AC-ADOPT-04`). |
-| `FM-ADOPT-02` | Inject username/private paths, tokens, arbitrary content, oversized logs, or wrong candidate identity into a bundle. Preview/redaction/validation rejects it before submission and leaves originals local (`AC-ADOPT-02`, `AC-ADOPT-03`). |
-| `FM-ADOPT-03` | Disable DRED/Vulkan/crash/hang collection or omit symbols. The route reports the unavailable item and alternative manual evidence; zero/empty output is never success (`AC-ADOPT-02`, `AC-ADOPT-03`). |
-| `FM-ADOPT-04` | File a controlled `S0`/security report with the operating owner unavailable or clock exceeded. Publication/stabilization blocks and affected bytes are contained/withdrawn; silence is not a response (`AC-ADOPT-04`). |
-| `FM-ADOPT-05` | Present a patch for the wrong hash/version or interrupt replacement. It is rejected before mutation; original bytes/user state remain, and no existing version is overwritten (`AC-ADOPT-05`). |
+| `FM-ADOPT-01` | Omit a prerequisite, break onboarding or insert an unsupported service promise. The journey blocks until accurate instructions/no-support boundaries are restored (`AC-ADOPT-01`, `AC-ADOPT-04`). |
+| `FM-ADOPT-02` | Add private paths/tokens, unrelated content, oversized logs or wrong candidate identity to a proposed diagnostic export. Preview/redaction/validation rejects it and leaves originals local (`AC-ADOPT-02`, `AC-ADOPT-03`). |
+| `FM-ADOPT-03` | Disable diagnostic collection or omit symbols. Report the unavailable item and manual recovery; empty output is never success (`AC-ADOPT-02`, `AC-ADOPT-03`). |
+| `FM-ADOPT-04` | Add a known `S0`/`S1` to a closeout fixture or an invented response deadline to release docs. Review blocks; preserve the record and correct/revalidate or withdraw affected bytes (`AC-ADOPT-04`). |
+| `FM-ADOPT-05` | Present a replacement for the wrong hash/version or interrupt it. Reject before mutation; preserve original bytes/user state and existing published versions (`AC-ADOPT-05`). |
 
-| Check | Claims falsified | Smallest route and fixed oracle |
+| Check | Coverage | Smallest route and oracle |
 | --- | --- | --- |
-| `CHK-ADOPT-01` | `AC-ADOPT-01`; `FM-ADOPT-01` | Script one non-author runtime and source journey from public entry through success and one prerequisite failure. Record every intervention; any private repair, dead link, false readiness, or missing distinction fails. |
-| `CHK-ADOPT-02` | `AC-ADOPT-02`, `AC-ADOPT-03`; `FM-ADOPT-02`, `FM-ADOPT-03` | On isolated user data, trigger startup/process/hang/GPU cases where supported, export with consent, inject private/mismatched/oversized/unavailable data, and inspect bundle schema, redaction, bounds, identity, symbols, and network activity. |
-| `CHK-ADOPT-03` | `AC-ADOPT-04`; `FM-ADOPT-04` | Submit controlled public and private fixtures through the named channels, retain acknowledgement/owner/severity/timestamps, and rehearse known-issue/advisory/withdraw decisions against the frozen clocks. |
-| `CHK-ADOPT-04` | `AC-ADOPT-05`; `FM-ADOPT-05` | Apply and interrupt a versioned replacement against copies with representative user state; verify hash applicability, atomicity, side-by-side/reset policy, evidence invalidation, rollback/withdraw result, and unchanged published bytes. |
+| `CHK-ADOPT-01` | `AC-ADOPT-01`; `FM-ADOPT-01` | Non-author packaged-product and source journeys through success and a missing prerequisite. Private repair, dead onboarding or misleading support claims fail. |
+| `CHK-ADOPT-02` | `AC-ADOPT-02`, `AC-ADOPT-03`; `FM-ADOPT-02`, `FM-ADOPT-03` | Isolated local startup/crash/hang/GPU diagnostics, with private/mismatched/oversized/unavailable fixtures. Inspect identity, symbols, redaction, bounds and absence of network uploads. |
+| `CHK-ADOPT-03` | `AC-ADOPT-04`; `FM-ADOPT-04` | Review exact candidate known-defect ledger and public policy, then inject an unresolved critical defect and a false support promise. Both must block closeout; no live inbox submission is required. |
+| `CHK-ADOPT-04` | `AC-ADOPT-05`; `FM-ADOPT-05` | Apply/interrupt a versioned replacement on copies with representative user state; verify applicability, atomicity, state policy, rollback/withdrawal and unchanged public bytes. |
 
-Every criterion/failure maps to a check. At this revision root `SUPPORT.md`, root `SECURITY.md`, a consented bundle/exporter, public crash/hang operation, assigned operating maintainer, and patch/withdraw route are absent, so `FCR-PROD-06` is `Blocked`; the frozen clocks are not claimed as an operating service.
+Candidate results remain in `FCR-PROD-06`. No onboarding, local diagnostic, replacement or closeout check ran in this documentation amendment. Missing intake channels alone are no longer a blocker.

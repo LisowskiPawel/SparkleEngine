@@ -1,6 +1,6 @@
 # First Release Capability Dispositions
 
-**Status:** proposed scope ledger for release-owner approval; no capability receives acceptance evidence here
+**Status:** scope ledger under the approved product choices; technical closure/native evidence remains required; no capability receives acceptance evidence here
 
 **Responsibility:** give every existing module inventory row one release classification and an owning module, then split compound user surfaces explicitly
 
@@ -8,11 +8,11 @@
 
 ## Interpretation
 
-Included is an obligation to deliver and accept the exact bounded path, not a statement that it works. Experimental still needs correctness within its declared limits and safe failure. Excluded has no first-release promise. No row is Removed. The Exposure column restricts distribution: Source only does not enter the ShippingGame UI/package; Runtime/source is only the subset consumed by the declared product. Internal mechanisms do not become standalone public features or a stable SDK.
+Included is an obligation to deliver and accept the exact bounded path, not a statement that it works. Experimental still needs correctness within its declared limits and safe failure. Excluded has no first-release promise. No row is Removed. The Exposure column restricts distribution: Source only does not enter a shipped component; Runtime/source covers Game and shared product mechanics; Editor/Launcher/source covers admitted shipped-tool workflows. The release-owner amendment includes Launcher and Editor, seven selectable examples plus built-in Empty, and only the features required by those release paths. Other choices are development or unavailable. Internal mechanisms do not become standalone public features or a stable SDK.
 
 The capability name and source link retain the existing inventory owner instead of copying its implementation narrative. A section names exactly one module owner; cross-module feature/report ownership remains in the existing FCR registry. Compound rows are split in the public-surface tables below. Old inventory evidence remains dated; a classification does not refresh all of its source assertions.
 
-No fixed function, data format or hidden low-level flag is a new public selector. Generic development CVar/CLI access is source-only; the consumer settings allowlist below is exhaustive. A new advertised/reachable consumer choice requires a row before scope approval.
+No fixed function, data format or hidden low-level flag is a new public selector. Generic development CVar/CLI access is absent from Game; the Game settings allowlist below is exhaustive. Editor/Launcher use their classified typed workflows; this does not admit every development flag or debug-build feature. A new advertised/reachable consumer choice requires a row before scope approval.
 
 ## Module Coverage
 
@@ -37,13 +37,13 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Application
 
-**Single row owner:** Application. [Existing source scope and limits](../../Architecture/Modules/Engine/Application/README.md); the release owner approves these proposals.
+**Single row owner:** Application. [Existing source scope and limits](../../Architecture/Modules/Engine/Application/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
 | `APP-001` | Shared application lifecycle | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `APP-002` | Cooked runtime host | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `APP-003` | Editor host | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `APP-003` | Editor host | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
 | `APP-004` | Build-time editor erasure | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `APP-005` | Frame pump | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `APP-006` | Task ownership | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
@@ -53,14 +53,14 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `APP-010` | Ordered shutdown | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `APP-011` | Command-line CVar assignment | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `APP-012` | Runtime console | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `APP-013` | Editor shader recook | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `APP-014` | Editor operation service | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `APP-015` | Viewport capture | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `APP-013` | Editor shader recook | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `APP-014` | Editor operation service | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `APP-015` | Viewport capture | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
 | `APP-016` | Rendering-settings persistence | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 
 ## Build and packaging
 
-**Single row owner:** Build/package. [Existing source scope and limits](../../Architecture/Modules/BuildAndPackaging/README.md); the release owner approves these proposals.
+**Single row owner:** Build/package. [Existing source scope and limits](../../Architecture/Modules/BuildAndPackaging/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -88,7 +88,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Core
 
-**Single row owner:** Core. [Existing source scope and limits](../../Architecture/Modules/Engine/Core/README.md); the release owner approves these proposals.
+**Single row owner:** Core. [Existing source scope and limits](../../Architecture/Modules/Engine/Core/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -113,38 +113,38 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Editor
 
-**Single row owner:** Editor. [Existing source scope and limits](../../Architecture/Modules/Engine/Editor/README.md); the release owner approves these proposals.
+**Single row owner:** Editor. [Existing source scope and limits](../../Architecture/Modules/Engine/Editor/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `ED-001` | Fixed workspace shell | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-002` | Native window controls | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-003` | Level open/save | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-004` | Level progress/failure gating | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-005` | Scene outliner | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-006` | Camera inspector | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-007` | Light inspector | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-008` | Mesh inspector | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-009` | Sky inspector | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-010` | Material variant selector | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-011` | Undo/redo | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-012` | Stale edit protection | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-013` | Editor viewport | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-014` | View modes | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-015` | Exposure overrides | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-016` | Rendering settings | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-017` | Restart service | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-018` | Viewport capture | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-019` | Editor console | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-020` | Shader tools | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-021` | Mesh diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-022` | Texture diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-023` | Memory/renderer diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `ED-024` | Icon/theme assets | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `ED-001` | Fixed workspace shell | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-002` | Native window controls | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-003` | Level open/save | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-004` | Level progress/failure gating | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-005` | Scene outliner | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-006` | Camera inspector | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-007` | Light inspector | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-008` | Mesh inspector | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-009` | Sky inspector | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-010` | Material variant selector | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-011` | Undo/redo | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-012` | Stale edit protection | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-013` | Editor viewport | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-014` | View modes | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-015` | Exposure overrides | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-016` | Rendering settings | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-017` | Restart service | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-018` | Viewport capture | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-019` | Editor console | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-020` | Shader tools | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-021` | Mesh diagnostics | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-022` | Texture diagnostics | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-023` | Memory/renderer diagnostics | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `ED-024` | Icon/theme assets | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
 
 ## Engine assets
 
-**Single row owner:** Assets/content. [Existing source scope and limits](../../Architecture/Modules/Engine/Assets/README.md); the release owner approves these proposals.
+**Single row owner:** Assets/content. [Existing source scope and limits](../../Architecture/Modules/Engine/Assets/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -156,7 +156,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## GameFramework
 
-**Single row owner:** GameFramework. [Existing source scope and limits](../../Architecture/Modules/Engine/GameFramework/README.md); the release owner approves these proposals.
+**Single row owner:** GameFramework. [Existing source scope and limits](../../Architecture/Modules/Engine/GameFramework/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -189,65 +189,65 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Launcher
 
-**Single row owner:** Launcher. [Existing source scope and limits](../../Architecture/Modules/Tools/Launcher/README.md); the release owner approves these proposals.
+**Single row owner:** Launcher. [Existing source scope and limits](../../Architecture/Modules/Tools/Launcher/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `LAUNCH-001` | Qt GUI | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-002` | Shell route | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-003` | Immutable operation plan | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-004` | Quick Start dependency graph | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-005` | Background operation service | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-006` | Repository/content discovery | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-007` | Toolchain detection | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-008` | Source dependency sync | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-009` | Build-file generation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-010` | Freshness diagnosis | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-011` | Workspace build | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-012` | Launcher self-build | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-013` | Host-tool install | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-014` | Level sync | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-015` | Cook workspace | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-016` | Focused/full cooks | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-017` | Force recook safety | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-018` | Run level | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-019` | Build profiles | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-020` | Graphics API choice | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-021` | Clean workspace | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `LAUNCH-022` | Logs/recovery | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `LAUNCH-001` | Qt GUI | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-002` | Shell route | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-003` | Immutable operation plan | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-004` | Quick Start dependency graph | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-005` | Background operation service | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-006` | Repository/content discovery | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-007` | Toolchain detection | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-008` | Source dependency sync | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-009` | Build-file generation | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-010` | Freshness diagnosis | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-011` | Workspace build | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-012` | Launcher self-build | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-013` | Host-tool install | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-014` | Level sync | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-015` | Cook workspace | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-016` | Focused/full cooks | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-017` | Force recook safety | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-018` | Run level | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-019` | Build profiles | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-020` | Graphics API choice | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-021` | Clean workspace | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
+| `LAUNCH-022` | Logs/recovery | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
 
 ## Cooking
 
-**Single row owner:** Cooking. [Existing source scope and limits](../../Architecture/Modules/Tools/Cooking/README.md); the release owner approves these proposals.
+**Single row owner:** Cooking. [Existing source scope and limits](../../Architecture/Modules/Tools/Cooking/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `COOK-001` | Project cook CLI | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-002` | Project discovery | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-003` | Capability preflight | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-004` | Shader stage delegation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-005` | Texture request planning | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-006` | Scene generation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-007` | Tool/output reporting | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-008` | Source texture formats | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-009` | Texture dimensions | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-010` | Mip policy | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-011` | Channel extraction | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-012` | Semantic format policy | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-013` | Parallel batch | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-014` | Memory bound | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-015` | Generation publication | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-016` | Request inspection | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-017` | Mesh | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-018` | Material | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-019` | Scene manifest | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-020` | Skeleton | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-021` | Animation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `COOK-022` | Registry | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `COOK-001` | Project cook CLI | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-002` | Project discovery | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-003` | Capability preflight | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-004` | Shader stage delegation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-005` | Texture request planning | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-006` | Scene generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-007` | Tool/output reporting | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-008` | Source texture formats | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-009` | Texture dimensions | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-010` | Mip policy | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-011` | Channel extraction | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-012` | Semantic format policy | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-013` | Parallel batch | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-014` | Memory bound | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-015` | Generation publication | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-016` | Request inspection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-017` | Mesh | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-018` | Material | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-019` | Scene manifest | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-020` | Skeleton | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-021` | Animation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-022` | Registry | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
 
 ## Platform
 
-**Single row owner:** Platform. [Existing source scope and limits](../../Architecture/Modules/Engine/Platform/README.md); the release owner approves these proposals.
+**Single row owner:** Platform. [Existing source scope and limits](../../Architecture/Modules/Engine/Platform/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -267,7 +267,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## RHI
 
-**Single row owner:** RHI. [Existing source scope and limits](../../Architecture/Modules/Engine/RHI/CapabilityInventory.md); the release owner approves these proposals.
+**Single row owner:** RHI. [Existing source scope and limits](../../Architecture/Modules/Engine/RHI/CapabilityInventory.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -359,7 +359,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Renderer
 
-**Single row owner:** Renderer. [Existing source scope and limits](../../Architecture/Modules/Engine/Renderer/CapabilityInventory.md); the release owner approves these proposals.
+**Single row owner:** Renderer. [Existing source scope and limits](../../Architecture/Modules/Engine/Renderer/CapabilityInventory.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -504,94 +504,94 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `REN-DIAG-07` | Mesh preview | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-SET-01` | Aggregate public settings state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-SET-02` | Application-owned rendering-settings persistence | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SET-03` | Startup and editor commit | Included | Runtime/source | Runtime startup Included; Editor commit/source producer retained, absent from consumer binary. |
+| `REN-SET-03` | Startup and editor commit | Included | Runtime/source | Game startup and Editor settings commit Included; keep Editor-only dependency isolation in the Game component. |
 | `REN-SET-04` | Serial/threaded settings handoff | Included | Runtime/source | Existing serial/threaded handoff retained; no public topology or concurrency tuning promise. |
 | `REN-SET-05` | Live versus restart-active state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 
 ## ShaderCompiler
 
-**Single row owner:** ShaderCompiler. [Existing source scope and limits](../../Architecture/Modules/Tools/ShaderCompiler/README.md); the release owner approves these proposals.
+**Single row owner:** ShaderCompiler. [Existing source scope and limits](../../Architecture/Modules/Tools/ShaderCompiler/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `SHD-BUILD-01` | Offline compiler executable | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-BUILD-02` | Shared shader contracts | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-BUILD-03` | Contract-only registrations | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `SHD-BUILD-01` | Offline compiler executable | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-BUILD-02` | Shared shader contracts | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-BUILD-03` | Contract-only registrations | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
 | `SHD-BUILD-04` | Runtime shader source dependency | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `SHD-BUILD-05` | Tool dependencies | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CLI-01` | `cook` | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CLI-02` | `list-backends` | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CLI-03` | `list-targets` | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CLI-04` | `list-shaders` | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CLI-05` | `inspect-shader` | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-OPT-01` | Selection | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-OPT-02` | Targets | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-OPT-03` | Backend | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-OPT-04` | Parallelism | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-OPT-05` | Diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-OPT-06` | Compiler policy | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-OPT-07` | Cancellation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-TGT-01` | DXC | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-TGT-02` | Slang | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CAT-01` | Compute | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CAT-02` | Vertex | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CAT-03` | Pixel | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CAT-04` | Ray generation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CAT-05` | Miss | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CAT-06` | Closest hit | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-CAT-07` | Any hit | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `SHD-BUILD-05` | Tool dependencies | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CLI-01` | `cook` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CLI-02` | `list-backends` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CLI-03` | `list-targets` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CLI-04` | `list-shaders` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CLI-05` | `inspect-shader` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-OPT-01` | Selection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-OPT-02` | Targets | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-OPT-03` | Backend | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-OPT-04` | Parallelism | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-OPT-05` | Diagnostics | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-OPT-06` | Compiler policy | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-OPT-07` | Cancellation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-TGT-01` | DXC | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-TGT-02` | Slang | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CAT-01` | Compute | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CAT-02` | Vertex | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CAT-03` | Pixel | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CAT-04` | Ray generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CAT-05` | Miss | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CAT-06` | Closest hit | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-CAT-07` | Any hit | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
 | `SHD-CAT-08` | Geometry | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `SHD-CAT-09` | Hull | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `SHD-CAT-10` | Domain | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `SHD-CAT-11` | Intersection | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `SHD-CAT-12` | Callable | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `SHD-REG-01` | Typed global registration | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-REG-02` | Registry validation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-REG-03` | Parameter-structure contract | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-REG-04` | Ray contract | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-REG-05` | Runtime registration closure | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PLAN-01` | Virtual shader roots | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PLAN-02` | Include preprocessing | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PLAN-03` | Immutable jobs | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PLAN-04` | Changed-source planning | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PLAN-05` | In-operation deduplication | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `SHD-REG-01` | Typed global registration | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-REG-02` | Registry validation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-REG-03` | Parameter-structure contract | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-REG-04` | Ray contract | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-REG-05` | Runtime registration closure | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PLAN-01` | Virtual shader roots | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PLAN-02` | Include preprocessing | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PLAN-03` | Immutable jobs | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PLAN-04` | Changed-source planning | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PLAN-05` | In-operation deduplication | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
 | `SHD-PLAN-06` | Persistent result cache | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `SHD-PLAN-07` | Parallel compilation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-01` | DXIL generation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-02` | SPIR-V generation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-03` | DXIL reflection | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-04` | SPIR-V reflection | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-05` | Resource reflection | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-06` | Constant data | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-07` | Stage inputs | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-08` | Specialization constants | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-09` | C++ parameter ABI validation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-ABI-10` | Vulkan descriptor normalization | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PUB-01` | `GlobalShaderMap.smap` | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PUB-02` | `CookedShaderLibrary.slib` | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PUB-03` | Shared publication hash | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PUB-04` | Staged validation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PUB-05` | Atomic file-set publish | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PUB-06` | Deterministic identity | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-PUB-07` | Incremental preservation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-DIAG-01` | DXC debug artifacts | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-DIAG-02` | Slang debug artifacts | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-DIAG-03` | Cook analysis | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-DIAG-04` | Cooked inspection | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-DIAG-05` | Out-of-process editor recook | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-DIAG-06` | Used Shaders UI | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-DIAG-07` | Runtime reload | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHD-DIAG-08` | Shipping tool erasure | Included | Source only | Included source workflow obligation: prove all compiler/editor payload absent from Shipping. |
-| `SHD-DIAG-09` | Cook progress | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `SHD-PLAN-07` | Parallel compilation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-01` | DXIL generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-02` | SPIR-V generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-03` | DXIL reflection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-04` | SPIR-V reflection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-05` | Resource reflection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-06` | Constant data | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-07` | Stage inputs | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-08` | Specialization constants | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-09` | C++ parameter ABI validation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-ABI-10` | Vulkan descriptor normalization | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PUB-01` | `GlobalShaderMap.smap` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PUB-02` | `CookedShaderLibrary.slib` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PUB-03` | Shared publication hash | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PUB-04` | Staged validation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PUB-05` | Atomic file-set publish | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PUB-06` | Deterministic identity | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PUB-07` | Incremental preservation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-DIAG-01` | DXC debug artifacts | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-DIAG-02` | Slang debug artifacts | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-DIAG-03` | Cook analysis | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-DIAG-04` | Cooked inspection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-DIAG-05` | Out-of-process editor recook | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-DIAG-06` | Used Shaders UI | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-DIAG-07` | Runtime reload | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-DIAG-08` | Shipping tool erasure | Included | Source/helper pending | Included source workflow obligation: prove all compiler/editor payload absent from Shipping. |
+| `SHD-DIAG-09` | Cook progress | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
 
 ## Showcase
 
-**Single row owner:** Showcase. [Existing source scope and limits](../../Architecture/Modules/Projects/Showcase/README.md); the release owner approves these proposals.
+**Single row owner:** Showcase. [Existing source scope and limits](../../Architecture/Modules/Projects/Showcase/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
 | `SHOW-001` | Project discovery | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `SHOW-002` | Editor product | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `SHOW-002` | Editor product | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
 | `SHOW-003` | Runtime product | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `SHOW-004` | Six-profile build naming | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `SHOW-005` | Startup level selection | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
@@ -600,33 +600,33 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## SourceImporters
 
-**Single row owner:** SourceImporters. [Existing source scope and limits](../../Architecture/Modules/Tools/SourceImporters/README.md); the release owner approves these proposals.
+**Single row owner:** SourceImporters. [Existing source scope and limits](../../Architecture/Modules/Tools/SourceImporters/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `IMP-001` | glTF 2.0 JSON | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-002` | GLB | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `IMP-001` | glTF 2.0 JSON | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-002` | GLB | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
 | `IMP-003` | FBX | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `IMP-004` | OBJ/USD/Alembic/OpenVDB | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `IMP-005` | Triangle geometry | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-006` | Tangent generation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-007` | Coordinate normalization | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-008` | Mesh instances | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-009` | GPU-authored instancing | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-010` | Metallic-roughness material | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-011` | Material textures | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-012` | Alpha | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-013` | Material variants | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-014` | Cameras | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-015` | Lights | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-016` | Skeleton/skin | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-017` | Morph targets | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `IMP-018` | Animation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `IMP-005` | Triangle geometry | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-006` | Tangent generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-007` | Coordinate normalization | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-008` | Mesh instances | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-009` | GPU-authored instancing | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-010` | Metallic-roughness material | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-011` | Material textures | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-012` | Alpha | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-013` | Material variants | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-014` | Cameras | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-015` | Lights | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-016` | Skeleton/skin | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-017` | Morph targets | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-018` | Animation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
 | `IMP-019` | Embedded FBX textures | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 
 ## Tasks
 
-**Single row owner:** Tasks. [Existing source scope and limits](../../Architecture/Modules/Engine/Tasks/README.md); the release owner approves these proposals.
+**Single row owner:** Tasks. [Existing source scope and limits](../../Architecture/Modules/Engine/Tasks/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -647,17 +647,17 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## ToolSupport
 
-**Single row owner:** ToolSupport. [Existing source scope and limits](../../Architecture/Modules/Tools/ToolSupport/README.md); the release owner approves these proposals.
+**Single row owner:** ToolSupport. [Existing source scope and limits](../../Architecture/Modules/Tools/ToolSupport/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `TOOL-001` | Severity-prefixed messages | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `TOOL-002` | Named fields | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `TOOL-003` | Progress records | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `TOOL-004` | Summaries and lists | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `TOOL-005` | Path display helpers | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `TOOL-006` | Current consumers | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `TOOL-007` | Game-profile isolation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `TOOL-001` | Severity-prefixed messages | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `TOOL-002` | Named fields | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `TOOL-003` | Progress records | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `TOOL-004` | Summaries and lists | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `TOOL-005` | Path display helpers | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `TOOL-006` | Current consumers | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `TOOL-007` | Game-profile isolation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
 
 ## Consumer And Development Surface Splits
 
@@ -683,7 +683,7 @@ This table takes precedence over a compound inventory title. It does not replace
 | Classic TLAS / refit | Included / runtime | Shared AS identity/lifetime; no new consumer acceleration-structure editor |
 | PTLAS and partition controls | Experimental / source only | Narrow installed capability and build/update semantics; Off consumer baseline; no performance savings claim |
 | Mesh batching / single-sample raster / fixed Halton jitter | Included / runtime | Existing mechanics; advanced occlusion/mesh shaders, MSAA, standalone TAA/FXAA and dynamic resolution excluded |
-| Color Grading / Chromatic Aberration / Vignette | Included / runtime targets | FCR-REN-24/25; neutral/Off baseline; each feature needs independent bounded controls, formula/order/failure and both-backend proof |
+| Color Grading / Chromatic Aberration / Vignette | Included / runtime targets | FCR-REN-24/25; neutral grading, chromatic aberration On and vignette On defaults; each feature needs independent bounded controls, formula/order/failure and both-backend proof |
 | SDR / HDR10 | Included / runtime | SDR default; HDR10 only with qualified display/OS/swapchain tuple and mandatory SDR fallback; FCR-REN-26 remains open |
 | PIX / Nsight Graphics / RenderDoc | Experimental / Debug and Development source products only | Existing external-capture authority, one selected provider None -> Nsight -> PIX -> RenderDoc; exact supported native cells only. No optional Shipping capture payload. |
 | PIX Timing / Nsight GPU Trace and Systems / WPR-WPA / PresentMon | Experimental / source runbooks only | Distinct tool-managed activities/artifacts; not universal frame-provider APIs; native evidence remains in owning external-capture report |
@@ -694,7 +694,7 @@ The [owner-directed rendering closure](../FirstRelease.md#required-rendering-clo
 
 ## Every View Mode
 
-**Owner:** Renderer semantic, Application runtime composition, Editor source presentation. [Actual enum](../../../Engine/Renderer/Public/Viewport/RenderViewMode.h) has 18 values; Count is not a mode.
+**Owner:** Renderer semantic, Application runtime composition, Editor presentation. [Actual enum](../../../Engine/Renderer/Public/Viewport/RenderViewMode.h) has 18 values; Count is not a mode.
 
 | Mode | Classification | Exposure |
 | --- | --- | --- |
@@ -754,7 +754,7 @@ The [owner-directed rendering closure](../FirstRelease.md#required-rendering-clo
 
 This revised proposal assigns **512 capability IDs** across **16 owners**: 475 Included, 8 Experimental, 29 Excluded, 0 Removed. The original 511 IDs are retained; REN-POST-14 is the newly admitted vignette target. Every capability ID is present once. This is coverage of the existing detailed inventory, not a claim that every implementation fact in its historical snapshot was freshly audited.
 
-Live supplemental closure covers the product CMake targets, graphics-launch parser, package/path contracts, 20 actual catalog levels, all 18 view modes, every persisted setting and the current external-capture path. All other registered developer CVar/CLI settings are source-only, unstable, and absent from the consumer control promise. Future source changes or an unmatched consumer option invalidate the scope check.
+Live supplemental closure covers the product CMake targets, graphics-launch parser, package/path contracts, 20 actual catalog levels, all 18 view modes, every persisted setting and the current external-capture path. All other registered developer CVar/CLI settings are development-only, unstable, and absent from the Game control promise. Shipping Editor/Launcher controls are bounded by their owning contracts; helper membership must be explicitly frozen, not inferred from this source inventory. Future source changes or an unmatched consumer option invalidate the scope check.
 
 Primary-source rights metadata does not prove the identity of locally acquired/cooked bytes. REL-01 must close that identity, credits, environment/texture/dependency closure, root license, publisher and redistribution receipts. Feature-local native proof, observer comparisons, failures and Shipping erasure remain in their existing acceptance owners. Approval adds A only for the disposition; never B/R/N/P.
 

@@ -92,8 +92,8 @@ This is the Architecture acceptance owner for the Showcase consumer journey. [Ap
 
 | ID | Binary acceptance criterion |
 | --- | --- |
-| `AC-PROD01-01` | From the included archive as a standard user, with no repository, environment override, administrator right, network, or developer tool, `bin/ShowcaseRuntime.exe` reaches the intentional first-run surface within the frozen startup budget and reports the exact product/package identity. |
-| `AC-PROD01-02` | Selecting each included example publishes the requested catalog identity and first correct frame within its load budget; missing, corrupt, unsupported, or unregistered content produces a distinct failure and never claims success through built-in `Empty`. |
+| `AC-PROD01-01` | From the included archive as a standard user, with no repository, environment override, administrator right, network, or developer tool, Sparkle Game (current source target `ShowcaseRuntime`, exact packaged path in the manifest) reaches intentional built-in Empty or the explicitly selected/synced map within the frozen startup budget and reports the exact product/package identity. |
+| `AC-PROD01-02` | Selecting each included example publishes the requested catalog identity and first correct frame within its load budget; missing, corrupt, unsupported, or unregistered content produces a distinct failure and never claims successful requested-map activation through built-in `Empty`; intentional Empty selection is valid. |
 | `AC-PROD01-03` | The consumer can discover controls/help, inspect requested versus active settings, restore documented defaults, return to the first-run surface, and quit without a console command; persistence and reset touch only the frozen per-user paths. |
 | `AC-PROD01-04` | `ShippingGame` contains and exposes no runtime/editor console, CVar authoring route, shader recook, editor panel, source importer/cooker, repository marker dependency, or developer-only command. |
 | `AC-PROD01-05` | Close/quit during idle and level load settles level/task/Renderer/RHI work within the shutdown budget, returns one success/failure exit status, and leaves immutable package/source bytes unchanged. |

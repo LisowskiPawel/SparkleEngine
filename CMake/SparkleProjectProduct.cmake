@@ -9,6 +9,15 @@ function(sparkle_configure_project_product target_name project_name product_role
     endif()
 
     sparkle_configure_project_artifacts("${target_name}" "${project_name}" "${product_role}")
+    if(project_name STREQUAL "Showcase")
+        if(product_role STREQUAL "editor")
+            sparkle_configure_product_identity(${target_name} "Sparkle Editor")
+        else()
+            sparkle_configure_product_identity(${target_name} "Sparkle Game")
+        endif()
+    else()
+        sparkle_configure_product_identity(${target_name} "${project_name} ${product_role}")
+    endif()
 
     if(product_role STREQUAL "editor")
         if(NOT DEFINED SPARKLE_FONT_AWESOME_SOLID_TTF OR NOT EXISTS "${SPARKLE_FONT_AWESOME_SOLID_TTF}")

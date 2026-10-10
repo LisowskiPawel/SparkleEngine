@@ -12,6 +12,8 @@
 
 **Current readiness:** **25/100** across build-to-release delivery — development build/staging foundations exist, but CI, package/install, verification, and operated delivery are absent. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
 
+**Identity amendment (2026-10-10):** [SparkleProductIdentity.cmake](../../../../CMake/SparkleProductIdentity.cmake) owns version `0.1.0`, publisher and copyright; root and standalone Launcher CMake entry points share it. Existing project-product and Launcher owners attach Windows version resources with public names Sparkle Editor, Sparkle Game and Sparkle Launcher. This adds executable identity, not a package/signing owner. [Current FR-01 report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) records validation and remaining blockers.
+
 ## At A Glance
 
 | Outcome | Current state | What is still missing |
@@ -221,7 +223,7 @@ This section owns the build-side source-adopter verdict. [Adoption](AdoptionSupp
 | `AC-PROD02-01` | From the immutable public tag/archive and root `README.md`, a non-author can identify the exact supported toolchain, network/cache/disk effects, unstable source API/no-binary-SDK boundary, and one minimal `ShippingGame` runtime route before running commands. |
 | `AC-PROD02-02` | On the supported source machine with empty dependency/build/cook caches, the documented commands sync immutable inputs, configure, build `ShowcaseRuntime` and required cook tools, cook the included products, and launch the requested example within the frozen source budget. Every step has an attributable exit and artifact identity. |
 | `AC-PROD02-03` | The same source/revision/toolchain replays from the declared warm cache without network, produces logically identical manifests/products, and does not depend on an author path, private cache, environment-only selection, or repository dirt. |
-| `AC-PROD02-04` | Launcher, Editor, import/cook tools, providers, alternate generators/compilers, and contributor checks are separately classified; omitting an optional Developer-only surface either removes its prerequisite at configure time or fails before work with one actionable reason. |
+| `AC-PROD02-04` | Launcher, Editor and Game are required release products; exact helper/provider membership is separately classified. Source-build prerequisites are public and pinned; packaged selection/sync/launch needs no undeclared toolchain. Omitting an optional development surface removes its prerequisite or rejects it before work with one actionable reason. |
 | `AC-PROD02-05` | Clean/reset operations enumerate and require confirmation for owned generated roots, preserve tracked/untracked source and user-declared preserved paths, and report missing/locked/partial deletion as failure. |
 
 | ID | Cause/injection, safe result, and affected criterion |
@@ -229,7 +231,7 @@ This section owns the build-side source-adopter verdict. [Adoption](AdoptionSupp
 | `FM-PROD02-01` | Remove or downgrade CMake, Git, MSVC/Windows SDK, Qt, Vulkan SDK/DXC/Slang, or a selected optional tool. Configure/preflight must identify the exact missing/unsupported prerequisite and exit nonzero; a skipped action or missing artifact cannot be summarized as success (`AC-PROD02-01`, `AC-PROD02-02`, `AC-PROD02-04`). |
 | `FM-PROD02-02` | Block network with an empty cache, corrupt a dependency checkout/archive, or replace a locked revision. Cold acquisition fails without partial acceptance; warm replay either uses verified cache or says network is required (`AC-PROD02-02`, `AC-PROD02-03`). |
 | `FM-PROD02-03` | Run from a Unicode/spaced clone and remove all `SPARKLE_*` path overrides. Any private path, author cache, or environment-only requirement fails the source route (`AC-PROD02-02`, `AC-PROD02-03`). |
-| `FM-PROD02-04` | At this revision `Tools/CMakeLists.txt` adds Launcher unconditionally and Launcher requires Qt 6.8, so even a runtime-focused configure requires Qt. Until membership makes Developer-only surfaces separately selectable, `AC-PROD02-04` is `BLOCKED`; instructions may not call Qt optional. |
+| `FM-PROD02-04` | At this revision `Tools/CMakeLists.txt` adds Launcher unconditionally and Launcher requires Qt 6.8, so even a runtime-focused configure requires Qt. Launcher is now a required release product; its source configure prerequisite is explicit and packaged Qt runtime closure still requires qualification. A Game-only configure cannot call Qt optional until target membership makes that route independent. |
 | `FM-PROD02-05` | Place sentinels and preserved paths beside every clean target, inject a locked file, and cancel. Any source/sentinel removal or false-success aggregate fails `AC-PROD02-05`. |
 | `FM-PROD02-06` | Inspect public wording and delivered files for SDK/install/ABI claims. Any binary SDK implication without installed headers/libraries/samples/version policy fails `AC-PROD02-01` and must be removed, not softened. |
 
@@ -248,7 +250,7 @@ CMake selects profile/options -> dependency owner resolves/fetches host and sour
 ## Explicit Non-Capabilities And Risks
 
 - There is no current release package, installer, signed manifest, binary provenance/SBOM, CI gate, or automated test runner.
-- FetchContent refs are not uniformly immutable commit hashes (some use tags/branches such as `master`); “pinned” must be verified per dependency before reproducibility claims.
+- As of `ITER-REL-01-03` (2026-10-10), declared Git refs use full commit hashes; Compressonator also validates cached revision, cleanliness and required paths. Cache overrides, archives, host SDKs and clean acquisition still require qualification. [Current FR-01 report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) owns the results.
 - Sanitizer options exist but the current Windows/MSVC product route does not make all sanitizer modes usable.
 - Development artifact staging can still rely on repository/project roots and does not prove redistributable clean-machine execution.
 - This inventory did not configure or build any target; current build health remains unknown in this pass.

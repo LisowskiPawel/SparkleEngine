@@ -15,7 +15,7 @@ Use this page to execute the release task selected in [Roadmap](../../../Strateg
 
 ## Read This Page
 
-- **Decide the product:** answer the [seven remaining scope proposals](../../../Acceptance/ReleaseScope/README.md#approval-and-next-work); source/rights investigations are listed separately.
+- **Review the approved product:** use the [six approved scope decisions](../../../Acceptance/ReleaseScope/README.md#approval-and-next-work); source/rights investigations are listed separately.
 - **Execute a release task:** use [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next), then the [stage prompts](#stage-prompts). Identity/baseline and package work still wait for their scope/rights prerequisites.
 - **Find a feature owner:** Expand the [work-package registry](#feature-work-package-registry).
 - **Check the execution boundary:** Read [phase requirements](#phase-card-contract) and [stop conditions](#global-stop-conditions).
@@ -33,8 +33,8 @@ This is the release-only route from the [master delivery table](../../../Strateg
 | `FR-04` | `REL-05` | freeze and accept the release maps and visible quality boundary | all applicable `MAP-*` reports and artifact galleries have independent verdicts |
 | `FR-05` | `REL-06`, `REL-07` | prove budgets, soak, recovery, and D3D12/Vulkan native behavior | performance/stability/backend evidence is candidate-bound and blockers are resolved |
 | `FR-06` | `REL-08`, `REL-09` | freeze the candidate and prove non-author runtime/source adoption | byte identity is frozen and independent journeys pass from documented prerequisites |
-| `FR-07` | `REL-10` | publish exact approved artifacts and verify the public surface | tag, archives, hashes, notices, notes, support routes, and download smoke agree |
-| `FR-08` | `REL-11` | operate stabilization and close the release | stabilization window completes with no unresolved release blocker |
+| `FR-07` | `REL-10` | publish exact approved artifacts and verify the public surface | tag, archives, hashes, notices, notes, no-support/self-service policy and download smoke agree |
+| `FR-08` | `REL-11` | review the release and close it | finite maintainer review completes with no unresolved release blocker |
 
 ## Stage Prompts
 
@@ -42,7 +42,7 @@ This is the release-only route from the [master delivery table](../../../Strateg
 
 **Goal:** approve one reviewable release scope of included, experimental, excluded, and removed behavior. Preserve the already accepted `PTD-00` development discovery; do not restart it or treat it as accepted release-map oracle evidence.
 
-**Current handoff:** [Release Scope](../../../Acceptance/ReleaseScope/README.md#decision-summary) starts with the settled laptop, rendering and seven-map choices. [Seven numbered proposals](../../../Acceptance/ReleaseScope/README.md#approval-and-next-work) name the remaining product/support decisions and separate them from technical investigations. Scope approval and rights remain blocked; [audit evidence](../../../Acceptance/ReleaseScope/Evidence.md#fr-00-review-package) is retained separately. Accepted PTD-00 development discovery is preserved.
+**Current handoff:** the owner approved all [six scope decisions](../../../Acceptance/ReleaseScope/README.md#approval-and-next-work): three shipped products, seven selected maps, Launcher entry, user/display-selected resolution, approved defaults with chromatic aberration/vignette On, and no user support service. The laptop retains a fixed recorded 30 FPS acceptance benchmark. No product-choice answer remains pending; exact rights receipts and package/helper/configuration/content-store closure still block FR-00. [Approval evidence](../../../Acceptance/ReleaseScope/Evidence.md#scope-approval-iter-rel-00-06) preserves the decision and prior snapshots. Accepted PTD-00 development discovery is preserved.
 
 **Non-goals:** implementation, optimistic scoring, adding target-only features, or treating the present reference path as an unbiased oracle.
 
@@ -98,7 +98,7 @@ Execute FR-01 only after FR-00 exits. Create an iteration record for REL-01/REL-
 <summary>Copy the execution prompt</summary>
 
 ```text
-Execute FR-02 through ProductAndDelivery PD-3. Reconcile current CMake, cook, launcher, and runtime discovery paths; choose one current owner for stage/package orchestration. Implement a clean-break manifest-owned pipeline with immutable stage input, allowlisted outputs, checksums/provenance, transactional failure, and package-relative runtime lookup. Keep developer tools outside the runtime archive unless scope explicitly includes them. Prove the exact archive on a clean standard-user machine route. Stop if rights, payload identity, or runtime discovery are unresolved.
+Execute FR-02 through ProductAndDelivery PD-3. Reconcile current CMake, cook, launcher, and runtime discovery paths; choose one current owner for stage/package orchestration. Implement a clean-break manifest-owned pipeline with immutable stage input, allowlisted outputs, checksums/provenance, transactional failure, and package-relative runtime lookup. Include all three required Launcher/Editor/Game components and only qualified helpers needed for admitted workflows; isolate Game dependencies. Freeze a verified user-selected content store separate from immutable product bytes. Prove the exact archive on a clean standard-user machine route. Stop if rights, payload identity, or runtime discovery are unresolved.
 ```
 
 </details>
@@ -189,11 +189,11 @@ Execute FR-06 only after all technical gates pass. Freeze and hash the candidate
 
 ### `FR-07` — Publish And Verify
 
-**Goal:** publish exactly the approved candidate and verify its public identity, downloads, documentation, and support entry points.
+**Goal:** publish exactly the approved candidate and verify its public identity, downloads, documentation, and truthful no-support/self-service entry points.
 
 **Non-goals:** last-minute feature work or replacing an approved artifact after publication.
 
-**Failure modes:** tag/archive mismatch; wrong hashes; missing notices; unavailable download; public docs describe excluded behavior; support/security route is not operated.
+**Failure modes:** tag/archive mismatch; wrong hashes; missing notices; unavailable download; public docs describe excluded behavior; public instructions invent a support service or omit self-service recovery.
 
 **Phase exit criteria:** `REL-10` passes against downloaded artifacts, not local staging outputs.
 
@@ -203,20 +203,20 @@ Execute FR-06 only after all technical gates pass. Freeze and hash the candidate
 <summary>Copy the execution prompt</summary>
 
 ```text
-Execute FR-07 with the approved immutable candidate. Verify tag, archive, symbols policy, manifest, SBOM/notices, checksums, release notes, known issues, prerequisites, support/security links, and compatibility statement. Publish without rebuilding. Download through the public path, verify hashes and signatures, and run the acceptance smoke as a standard user. Stop and withdraw on identity, rights, integrity, or support-route failure. Record the REL-10 verdict and artifacts.
+Execute FR-07 with the approved immutable candidate. Verify tag, archive, symbols policy, manifest, SBOM/notices, checksums, release notes, known issues, prerequisites, self-service/privacy instructions, explicit no-support statement and compatibility policy. Publish without rebuilding. Download through the public path, verify hashes and signatures, and run the acceptance smoke as a standard user. Stop and withdraw on identity, rights, integrity or public-instruction failure. Record the REL-10 verdict and artifacts.
 ```
 
 </details>
 
 ### `FR-08` — Stabilize And Close
 
-**Goal:** operate the declared stabilization window, resolve or disposition reports, and close the release without silently changing scope.
+**Goal:** perform finite maintainer release review, disposition known candidate defects and close the release. No ongoing user support or response window is offered.
 
 **Non-goals:** feature expansion, invisible archive replacement, or declaring success because no telemetry was collected.
 
-**Failure modes:** untriaged blocker; no severity clock; patch lacks provenance; report cannot be reproduced; public artifact differs without a new version; support owner disappears.
+**Failure modes:** known critical blocker omitted; replacement lacks provenance; defect cannot be reproduced; public bytes differ without a new version; false support promise.
 
-**Phase exit criteria:** `REL-11` passes with operated incident/patch records, no unresolved release blocker, and a final accepted release report.
+**Phase exit criteria:** `REL-11` passes with a bounded release-review ledger, any required replacement/withdrawal records, no unresolved release blocker and a final accepted release report.
 
 **Ready-to-use prompt:**
 
@@ -224,7 +224,7 @@ Execute FR-07 with the approved immutable candidate. Verify tag, archive, symbol
 <summary>Copy the execution prompt</summary>
 
 ```text
-Execute FR-08 using the published version and support policy. Monitor declared intake channels for the full stabilization window; classify every report, reproduce against exact public artifacts, and follow patch/withdraw/advisory policy. Any replacement gets a new immutable identity and proportional revalidation. Keep excluded features excluded. Exit only when REL-11 records the window, incidents, resolutions, residual limitations, ownership, and final release decision.
+Execute FR-08 using the published version and approved no-support policy. Perform a bounded maintainer review of known candidate defects and retrieved public bytes; record severity, affected identity and disposition, and exercise immutable replacement/withdrawal if needed. Do not add an intake service, maintenance window or response deadline. Any replacement gets a new immutable identity and proportional revalidation. Keep excluded features excluded. Exit only when REL-11 records the review boundary, known defects, resolutions, residual limitations, ownership and final release decision.
 ```
 
 </details>

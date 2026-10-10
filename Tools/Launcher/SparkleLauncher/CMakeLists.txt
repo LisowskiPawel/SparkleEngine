@@ -313,6 +313,7 @@ set_target_properties(SparkleLauncher PROPERTIES
     AUTOMOC ON
 )
 sparkle_configure_launcher_artifacts(SparkleLauncher)
+sparkle_configure_product_identity(SparkleLauncher "Sparkle Launcher")
 sparkle_declare_runtime_dll_owner(SparkleLauncher SparkleCore SparkleTasks)
 
 add_custom_command(TARGET SparkleLauncher POST_BUILD

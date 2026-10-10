@@ -74,7 +74,7 @@ Only these invariants transfer into Sparkle's local contract:
 - Shipping membership deliberately differs from development membership, including removal of developer console/debug/authoring surfaces.
 - cancellation/failure remains visible at the owning operation, and a failed prerequisite or node prevents dependent publication.
 
-Sparkle does **not** adopt UAT, BuildGraph XML, nodes/agents/triggers as public vocabulary, Unreal's directory/Pak layout, Editor-driven packaging, or a Launcher/package dependency. Local CMake/tool owners and the frozen Sparkle manifest remain authoritative.
+Sparkle does **not** adopt UAT, BuildGraph XML, nodes/agents/triggers as public vocabulary, Unreal's directory/Pak layout, Editor-driven packaging, or Launcher-owned package policy. The amended three-product bundle includes Launcher, with package orchestration owned by Build And Packaging. Local CMake/tool owners and the frozen Sparkle manifest remain authoritative.
 
 ## `FCR-PROD-05` Package Contract
 
@@ -82,14 +82,14 @@ Sparkle does **not** adopt UAT, BuildGraph XML, nodes/agents/triggers as public 
 | --- | --- |
 | `AC-PKG-01` | One command consumes a frozen revision/configuration/content set and produces Build -> Cook -> fresh Stage -> Sign -> Verify -> Package results with explicit predecessor/output identities; failure at any node prevents archive publication. |
 | `AC-PKG-02` | `manifests/sparkle-package-manifest.json` accounts for every staged path, byte size, hash, permission/role, owner, origin, license, signature expectation, and component; independent verification rejects missing, extra, changed, absolute, escaping, or forbidden entries. |
-| `AC-PKG-03` | The runtime archive matches the frozen product/layout classification exactly; symbols are a separate correlated archive and Installer/SDK/Launcher/Editor/authoring/source/debug products are absent. |
-| `AC-PKG-04` | Extracted immutable bytes run read-only, offline, as a standard user from Unicode/spaced/relocated paths with no repository/build/SDK/environment/admin dependency; writes occur only in the frozen per-user root. |
+| `AC-PKG-03` | The bundle contains all three manifest-owned Launcher, Editor and Game components with exact release configurations and declared helper closure. Game imports no Editor/authoring dependency. Selected content uses a verified writable store separate from immutable product bytes. Symbols are separate; installer/SDK/source/debug products and undeclared helpers are absent. |
+| `AC-PKG-04` | All three products start as a standard user with immutable extraction bytes read-only; Editor/Game run offline after selected content sync, from Unicode/spaced/relocated paths with no repository/build/SDK/environment/admin dependency; writes occur only in the frozen per-user root. |
 | `AC-PKG-05` | Normal extract/first/repeat run, side-by-side replacement policy, archive removal, retained-user-data policy, and missing/corrupt dependency/content paths are documented and stay within frozen size/time/memory budgets. |
 | `AC-PKG-06` | SBOM/provenance, notices/redistribution decisions, trusted PE signatures, checksums, archive/source/candidate identity, and native/shader symbol correlation all refer to the same immutable candidate. |
 
 | ID | Cause/injection, safe result, and affected criterion |
 | --- | --- |
-| `FM-PKG-01` | Seed stale/extra/source/editor/tool/debug files or omit a declared runtime file. Fresh staging plus manifest verification rejects the tree before signing/publication (`AC-PKG-01`–`03`). |
+| `FM-PKG-01` | Seed stale/extra/source/debug or undeclared helper files, or omit any declared Launcher/Editor/Game component or required input. Fresh staging plus manifest verification rejects the tree before signing/publication (`AC-PKG-01`–`03`). |
 | `FM-PKG-02` | Alter a copied PE/archive/manifest/license/signature after staging. Verification quarantines the output and no candidate/archive success is emitted (`AC-PKG-02`, `AC-PKG-06`). |
 | `FM-PKG-03` | Make package bytes read-only, remove overrides, relocate, and block network. Any package/repository write or external-path/SDK dependency fails `AC-PKG-04`. |
 | `FM-PKG-04` | Deny/fill/corrupt the per-user root. The runtime names the path/space, preserves immutable bytes and last accepted state, and exits or disables only the optional operation (`AC-PKG-04`, `AC-PKG-05`). |
@@ -99,6 +99,6 @@ Sparkle does **not** adopt UAT, BuildGraph XML, nodes/agents/triggers as public 
 | Check | Claims falsified | Smallest route and fixed oracle |
 | --- | --- | --- |
 | `CHK-PKG-01` | `AC-PKG-01`–`03`, `AC-PKG-06`; `FM-PKG-01`, `FM-PKG-02`, `FM-PKG-06` | Generate from a clean destination, retain per-node results, independently enumerate/verify allowlist, denylist, hashes, signatures, SBOM/notices/symbol identity, then inject stale/extra/missing/tampered inputs. No archive may exist after a failed node. |
-| `CHK-PKG-02` | `AC-PKG-04`, `AC-PKG-05`; `FM-PKG-03`–`05` | On a clean standard-user minimum machine, extract to Unicode/spaced and read-only locations, block network/remove overrides, inventory all file/network/process activity, run consumer first/repeat/fault cases, remove archive, and compare budgets/state hashes. |
+| `CHK-PKG-02` | `AC-PKG-04`, `AC-PKG-05`; `FM-PKG-03`–`05` | On a clean standard-user minimum machine, extract to Unicode/spaced and read-only locations, test user-selected sync, then block network/remove overrides, inventory all file/network/process activity, run consumer first/repeat/fault cases, remove archive, and compare budgets/state hashes. |
 
 No acceptance row is satisfied by this documentation pass. [`BUILD-E03`](../CapabilityEvidencePlan.md#product-workflow-and-delivery-evidence) is the smallest central proof destination; candidate-bound results belong in the release artifact path required by [First Release](../../../Acceptance/FirstRelease.md).

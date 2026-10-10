@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 include(${CMAKE_CURRENT_LIST_DIR}/CMake/SparkleArtifactContract.cmake)
-project(Sparkle LANGUAGES C CXX)
+include(${CMAKE_CURRENT_LIST_DIR}/CMake/SparkleProductIdentity.cmake)
+project(Sparkle VERSION ${SPARKLE_VERSION} LANGUAGES C CXX)
+if(WIN32)
+    enable_language(RC)
+endif()
 
 include(${CMAKE_SOURCE_DIR}/CMake/SparkleBuildProfiles.cmake)
 include(${CMAKE_SOURCE_DIR}/CMake/SparkleQtDiscovery.cmake)
