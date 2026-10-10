@@ -2,6 +2,8 @@
 
 This page defines the first release: three products, seven selectable maps, user-selected display resolution, a 30 FPS acceptance target on your laptop, and no user support service.
 
+**Use context (2026-10-10):** Pawel Lisowski describes Sparkle as a noncommercial learning project, with no plan to earn from it. This supports evaluating personal/educational asset terms for local work; it does not supply a redistribution grant or replace the approved public-delivery requirements.
+
 **Status:** all six product proposals **approved** by the release owner on 2026-10-10, with the amendments below. No product-choice answer is pending. `REL-00` remains **BLOCKED** for technical scope closure and exact rights receipts; approval is not executable or redistribution evidence.
 
 **Record:** `REL-00-v0.1.0-01`; latest approval `ITER-REL-00-06`, based on `d1c8c5b2a61768a0460983c854264380d5c1f6dc` plus the recorded documentation changes. [Evidence and earlier iterations](Evidence.md) retain their exact revisions and results.

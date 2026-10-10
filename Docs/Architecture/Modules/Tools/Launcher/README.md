@@ -16,6 +16,15 @@ Source ownership reconciled on 2026-10-06: maintenance core `BuildLevelCleanPath
 
 The 2026-10-10 external-capture change adds **GPU Capture** beside **Graphics API** in the footer: None, Nsight Graphics, PIX, RenderDoc. Private capture discovery scans standard installed tool locations without SDK loading and reuses cached host GPU discovery. Known options remain visible with setup or unsupported-context reasons. Existing typed level-run preflight and process lowering recheck one selection and emit its explicit startup token for eligible Editor; Game/Shipping cannot enable it. The [capture owner](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/ExecutionArchitecture.md#implemented-editor-viewport-composition) defines the boundary and retained proof limits. This does not increase the Launcher readiness projection.
 
+**Shell selection amendment (2026-10-10):** the existing shell now exposes `levels.run` and forwards `--level <catalog-id>`, `--product editor|game` and `--graphics-api d3d12|vulkan` to the existing level-run planner/executor. Product selects the corresponding `--editor-profile` or `--runtime-profile`. `levels.run` requires an explicit level, including `Empty`; it does not choose a remembered map. `levels.sync --level <id>` forwards that single requested map to the existing acquisition owner. Without `--level`, sync retains the catalog's existing selection behavior. These flags select the shell entry point, including when malformed. Backend/readiness and missing-level rejection remain with the run owner. `--level` does not scope `cook.all`; cook selection still belongs to its existing owner.
+
+```powershell
+SparkleLauncher --level Empty --product game --runtime-profile ShippingGame --graphics-api d3d12 --dry-run levels.run
+SparkleLauncher --level CornellBox --dry-run levels.sync
+```
+
+The source and negative controls are recorded in [current FR-01 results](../../../../Acceptance/FirstRelease.md#current-fr-01-blockers); dry-run readiness is not runtime or release acceptance.
+
 ## At A Glance
 
 | User intent | Launcher responsibility | Success boundary |

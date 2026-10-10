@@ -92,6 +92,7 @@ struct GlobalShaderMapHeader
 	std::uint32_t PushConstantRangeRecordCount = 0;
 	std::uint32_t SpecializationConstantRecordCount = 0;
 	std::uint32_t StringTableSizeInBytes = 0;
+	std::uint32_t Reserved = 0;
 };
 
 struct GlobalShaderMapEntry
@@ -116,6 +117,7 @@ struct GlobalShaderMapEntry
 	std::uint32_t RayAttributeSizeInBytes = 0;
 	std::uint32_t MinimumRayRecursionDepth = 0;
 	std::uint32_t LocalRecordSizeInBytes = 0;
+	std::uint32_t Reserved = 0;
 	ShaderParameterSignature LocalRecordSignature = 0;
 };
 
@@ -149,7 +151,9 @@ struct CookedShaderCodeRecord
 };
 
 static_assert(std::is_trivially_copyable_v<GlobalShaderMapHeader>);
+static_assert(sizeof(GlobalShaderMapHeader) == 56 && std::has_unique_object_representations_v<GlobalShaderMapHeader>, "serialized map headers must have no hidden padding.");
 static_assert(std::is_trivially_copyable_v<GlobalShaderMapEntry>);
+static_assert(sizeof(GlobalShaderMapEntry) == 120 && std::has_unique_object_representations_v<GlobalShaderMapEntry>, "serialized map entries must have no hidden padding.");
 static_assert(std::is_trivially_copyable_v<ShaderMapBindingRecord>);
 static_assert(sizeof(ShaderMapBindingRecord) == 28, "serialized binding records must have no hidden padding.");
 static_assert(std::is_trivially_copyable_v<CookedShaderLibraryHeader>);

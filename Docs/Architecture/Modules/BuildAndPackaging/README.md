@@ -14,6 +14,8 @@
 
 **Identity amendment (2026-10-10):** [SparkleProductIdentity.cmake](../../../../CMake/SparkleProductIdentity.cmake) owns version `0.1.0`, publisher and copyright; root and standalone Launcher CMake entry points share it. Existing project-product and Launcher owners attach Windows version resources with public names Sparkle Editor, Sparkle Game and Sparkle Launcher. This adds executable identity, not a package/signing owner. [Current FR-01 report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) records validation and remaining blockers.
 
+**Baseline owner checks:** after Launcher generates the canonical workspace, run `powershell -NoProfile -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor`. [RunBaselineChecks.ps1](../../../../CMake/RunBaselineChecks.ps1) prints the revision/dirty state and sequentially invokes `architecture_boundary_check`, `code_style_check` and `ShaderCompilerCliValidation`, stopping at the first owner failure. It adds no check semantics and does not certify fresh checkout, asset rights, full cook or runtime. Candidate/environment/artifact binding remains with the [acceptance report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers).
+
 ## At A Glance
 
 | Outcome | Current state | What is still missing |

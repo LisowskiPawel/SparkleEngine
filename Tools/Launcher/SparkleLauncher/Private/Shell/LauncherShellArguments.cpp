@@ -57,6 +57,13 @@ namespace SparkleLauncher
 			return false;
 		}
 
+		const std::string& operationId = m_outArguments->RunOperationId.empty() ? m_outArguments->DryRunOperationId : m_outArguments->RunOperationId;
+		if (!m_outArguments->LevelId.empty() && !operationId.empty() && operationId != "levels.sync" && operationId != "levels.run")
+		{
+			*m_error << "SparkleLauncher: --level applies only to levels.sync and levels.run; it does not select cook scopes.\n";
+			return false;
+		}
+
 		return true;
 	}
 
@@ -86,6 +93,32 @@ namespace SparkleLauncher
 		if (argument == "--runtime-profile")
 		{
 			return ParseProfile(BuildProfileTarget::Game, m_outArguments->RuntimeProfile);
+		}
+
+		if (argument == "--level" || argument == "--graphics-api")
+		{
+			const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: selection requires a value.\n");
+			if (value.has_value())
+			{
+				(argument == "--level" ? m_outArguments->LevelId : m_outArguments->GraphicsApi) = *value;
+			}
+			return value.has_value();
+		}
+
+		if (argument == "--product")
+		{
+			const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: --product requires editor or game.\n");
+			if (!value.has_value())
+			{
+				return false;
+			}
+			if (*value != "editor" && *value != "game")
+			{
+				*m_error << "SparkleLauncher: --product requires editor or game.\n";
+				return false;
+			}
+			m_outArguments->Product = *value == "editor" ? LevelRunMode::Editor : LevelRunMode::Game;
+			return true;
 		}
 
 		if (argument == "--dry-run")
@@ -254,11 +287,13 @@ namespace SparkleLauncher
 		output << "Usage:\n"
 		       << "  SparkleLauncher [--root <repo-root>] [--editor-profile <profile>] [--runtime-profile <profile>] "
 		          "[--ide <visual-studio|rider>] [--compiler <msvc|clang-cl>] "
+		          "[--level <catalog-id>] [--product <editor|game>] [--graphics-api <d3d12|vulkan>] "
 		          "[--clean-scope <scope>] "
 		          "[--confirm-clean] [--force-recook] [--confirm-force-recook] [--dry-run [operation-id]] [--run <operation-id>]\n"
 		       << "\n"
 		       << "Examples:\n"
 		       << "  SparkleLauncher --dry-run\n"
+		       << "  SparkleLauncher --level Empty --product game --graphics-api d3d12 --dry-run levels.run\n"
 		       << "  SparkleLauncher --runtime-profile DevelopmentGame --dry-run cook.shaders\n"
 		       << "  SparkleLauncher --force-recook --dry-run cook.all\n"
 		       << "  SparkleLauncher --clean-scope cooked --dry-run workspace.clean\n"

@@ -12,7 +12,8 @@ namespace SparkleLauncherMain
 		for (int index = 1; index < argc; ++index)
 		{
 			const std::string_view argument(argv[index]);
-			if (argument == "--dry-run" || argument == "--run" || argument == "--help" || argument == "-h" || argument == "/?")
+			if (argument == "--level" || argument == "--product" || argument == "--graphics-api" || argument == "--dry-run" || argument == "--run" || argument == "--help" || argument == "-h"
+			    || argument == "/?")
 			{
 				return true;
 			}

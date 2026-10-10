@@ -6,6 +6,7 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "SparkleLauncher/CookOperations.h"
 #include "SparkleLauncher/LevelOperations.h"
+#include "SparkleLauncher/LevelRunOperations.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
 #include "SparkleLauncher/OperationModel.h"
 #include "SparkleLauncher/ProcessRunner.h"
@@ -41,11 +42,27 @@ namespace SparkleLauncher
 		return request;
 	}
 
-	LevelOperationRequest BuildLevelShellRequest(const LauncherShellModel& model)
+	LevelOperationRequest BuildLevelShellRequest(const LauncherShellModel& model, const LauncherShellArguments& arguments)
 	{
 		LevelOperationRequest request;
 		request.RepositoryRoot = model.Repository.RootPath;
 		request.ContentId = model.ContentId;
+		if (!arguments.LevelId.empty())
+		{
+			request.RequestedLevelIds = {arguments.LevelId};
+		}
+		return request;
+	}
+
+	LevelRunOperationRequest BuildLevelRunShellRequest(const LauncherShellModel& model, const LauncherShellArguments& arguments)
+	{
+		LevelRunOperationRequest request;
+		request.RepositoryRoot = model.Repository.RootPath;
+		request.ContentId = model.ContentId;
+		request.LevelId = arguments.LevelId;
+		request.RunMode = arguments.Product;
+		request.ProductProfile = arguments.Product == LevelRunMode::Editor ? model.EditorProfile : model.RuntimeProfile;
+		request.GraphicsApi = arguments.GraphicsApi;
 		return request;
 	}
 
@@ -107,7 +124,26 @@ namespace SparkleLauncher
 	{
 		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.CanRun ? "Ready" : "Blocked") + "]");
 		model.JobOutput.push_back("Content: " + model.ContentId);
+		for (const std::string& levelId : plan.Request.RequestedLevelIds)
+		{
+			model.JobOutput.push_back("Requested level: " + levelId);
+		}
 		model.JobOutput.push_back("Latest log: " + plan.Operation.LogPath.string());
+		for (const std::string& message : plan.ReadinessMessages)
+		{
+			model.JobOutput.push_back("Readiness: " + message);
+		}
+		for (const std::string& effect : plan.PlannedEffects)
+		{
+			model.JobOutput.push_back("Effect: " + effect);
+		}
+		model.JobOutput.push_back(plan.Operation.DryRunText);
+		RecordLauncherShellActivity(model, plan.Operation.DisplayName + " dry-run planned");
+	}
+
+	void AppendLevelRunPlanDryRun(LauncherShellModel& model, const LevelRunOperationPlan& plan)
+	{
+		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.CanRun ? "Ready" : "Blocked") + "]");
 		for (const std::string& message : plan.ReadinessMessages)
 		{
 			model.JobOutput.push_back("Readiness: " + message);
@@ -170,7 +206,13 @@ namespace SparkleLauncher
 
 		if (FindLevelOperationDefinition(operation->Id).has_value())
 		{
-			AppendLevelPlanDryRun(model, PlanLevelOperation(operation->Id, BuildLevelShellRequest(model)));
+			AppendLevelPlanDryRun(model, PlanLevelOperation(operation->Id, BuildLevelShellRequest(model, arguments)));
+			return;
+		}
+
+		if (FindLevelRunOperationDefinition(operation->Id).has_value())
+		{
+			AppendLevelRunPlanDryRun(model, PlanLevelRunOperation(operation->Id, BuildLevelRunShellRequest(model, arguments)));
 			return;
 		}
 
@@ -233,7 +275,17 @@ namespace SparkleLauncher
 		if (FindLevelOperationDefinition(arguments.RunOperationId).has_value())
 		{
 			const OperationRecord operation = RunLevelOperationPlan(
-			    PlanLevelOperation(arguments.RunOperationId, BuildLevelShellRequest(model)),
+			    PlanLevelOperation(arguments.RunOperationId, BuildLevelShellRequest(model, arguments)),
+			    processRunner,
+			    [&output](std::string_view text) { output << text; });
+
+			return ReportLauncherShellOperationResult(operation, output, error);
+		}
+
+		if (FindLevelRunOperationDefinition(arguments.RunOperationId).has_value())
+		{
+			const OperationRecord operation = RunLevelRunOperationPlan(
+			    PlanLevelRunOperation(arguments.RunOperationId, BuildLevelRunShellRequest(model, arguments)),
 			    processRunner,
 			    [&output](std::string_view text) { output << text; });
 

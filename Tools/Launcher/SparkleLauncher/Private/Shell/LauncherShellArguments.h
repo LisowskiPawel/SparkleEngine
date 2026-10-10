@@ -3,6 +3,7 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "SparkleLauncher/CookOperations.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
+#include "SparkleLauncher/LevelRunOperations.h"
 
 #include <filesystem>
 #include <iosfwd>
@@ -19,6 +20,9 @@ namespace SparkleLauncher
 		WorkspaceCompiler WorkspaceCompilerPreference = WorkspaceCompiler::Msvc;
 		std::string DryRunOperationId;
 		std::string RunOperationId;
+		std::string LevelId;
+		LevelRunMode Product = LevelRunMode::Editor;
+		std::string GraphicsApi = "d3d12";
 		CookMode RequestedCookMode = CookMode::Incremental;
 		CleanScope RequestedCleanScope = CleanScope::CookedOutputs;
 		bool ForceRecookConfirmed = false;
