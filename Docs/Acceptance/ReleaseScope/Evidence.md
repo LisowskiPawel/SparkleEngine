@@ -12,17 +12,19 @@ These records prove only the inspection or document checks they name. Current pr
 
 ## Editor/Game Naming: ITER-GAME-NAMING-01
 
-**Scope:** replace the former standalone product name across Application/console hosts, Showcase targets and entry files, Launcher GUI/shell/build/clean plans, catalog fields and documentation. No aliases, asset/shader versions, migrations or feature changes. Technical execution and third-party library uses of ?runtime? retain their meaning.
+**Scope:** replace the former standalone product name across Application/console hosts, Showcase targets and entry files, Launcher GUI/shell/build/clean plans, catalog fields and documentation. No aliases, asset/shader versions, migrations or feature changes. Technical execution and third-party library uses of `runtime` retain their meaning.
 
-**Candidate:** 2026-10-10, `408e8df21fbb365d61b4db3a8624d5e8766a74e8` plus this worktree. The starting worktree was clean. Existing Application, Showcase, Launcher and catalog owners retain their responsibilities. Preserve `REL-01` identity and `PGE-01/07/13`; no feature evidence-level increase or release acceptance is claimed.
+**Candidate:** source/build candidate committed by the user as `c087aa6078ba05a62adbc683a79cb0c406c30398` during verification, plus the recorded final Launcher-label and evidence edits. Started at `408e8df21fbb365d61b4db3a8624d5e8766a74e8` on 2026-10-10. The starting worktree was clean. Existing Application, Showcase, Launcher and catalog owners retain their responsibilities. Preserve `REL-01` identity and `PGE-01/07/13`; no feature evidence-level increase or release acceptance is claimed.
 
 | Check / criterion | Evidence and decision |
 | --- | --- |
 | `AC-GAME-01` / `FM-GAME-01`: one current vocabulary; old profile/operation rejected | `GameApplication`, `GameConsole`, `ShowcaseGame`, `--game-profile`, `workspace.build.game`, `GameSupported`/`GameBlocker`; shell receipts include old-name rejection. No compatibility spellings. |
-| `AC-GAME-02` / `FM-GAME-02`: producers and consumers compile; plans resolve the renamed executable | Launcher build and configuration refresh passed; product and AssetCooker build results are recorded in the local receipt directory. Game run planning targets `artifacts/dev/projects/Showcase/game/ShippingGame/ShowcaseGame.exe`. Dry-run is not native launch proof. |
-| `AC-GAME-03`: owner checks and navigation retain their meaning | Architecture and C++ style owners passed; modified-document local links/anchors and whitespace are checked. |
-| Risk and cleanup | A missed role, field, include or target breaks planning/compilation. Owner checks, both host builds and catalog planning detect it; repair at the existing owner. Remove obsolete generated product outputs after replacement builds. Keep historical receipts and unrelated state. |
+| `AC-GAME-02` / `FM-GAME-02`: producers and consumers compile; plans resolve the renamed executable | **PASS:** `SparkleLauncher`/`ShowcaseEditor` in `DevelopmentEditor`, `ShowcaseGame` in `ShippingGame`, and `AssetCooker` in `ShippingEditor` built. Launcher configuration refresh and the final Empty/D3D12 Game readiness plan passed. Game run planning targets `artifacts/dev/projects/Showcase/game/ShippingGame/ShowcaseGame.exe`. Dry-run is not native launch proof. |
+| `AC-GAME-03`: owner checks and navigation retain their meaning | **PASS:** architecture owner; C++ style owner for 2,044 files; 2,268 local links across 99 modified documents with no missing file/anchor; final whitespace check. |
+| Risk and cleanup | A missed role, field, include or target breaks planning/compilation. Owner checks, both host builds and catalog planning detect it; repair at the existing owner. Obsolete product executable, DLL copies, IDE target files, object/log files and empty output directories were removed individually after replacement builds. Historical receipts and unrelated state were preserved. |
 | Release boundary | `REL-01`/`REL-02` remain **BLOCKED** by rights/archive receipts, payload qualification and a clean candidate baseline. Noncommercial learning intent supplies no public redistribution grant. This iteration does not execute a seven-map cook, FPS test or clean-machine acceptance. |
+
+**Decision: PASS for the product rename.** Native launch, rendering/FPS, seven-map cook and clean-machine results are outside this rename check. Qt deployment still warns that `VCINSTALLDIR` is unset; the initial Launcher link also reported missing debug PDBs. Neither warning is package qualification.
 
 **Receipts:** `build/validation/game-rename-20261010/` contains the control record, exact commands/exits, shell observations, owner logs, link checks and final candidate hashes. Historical sections below retain original candidate decisions; navigable code names use current spelling, while raw receipts retain observed spelling.
 

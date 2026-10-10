@@ -197,7 +197,7 @@ namespace SparkleLauncher
 				if (IncludesScope(plan, CookWorkspaceScope::Shaders))
 				{
 					AddPlannedEffect(plan, "Shader backend: " + plan.Request.ShaderBackend + ".");
-					AddPlannedEffect(plan, "Cook the global shader map and code library for the canonical runtime targets.");
+					AddPlannedEffect(plan, "Cook the global shader map and code library for the DXIL and SPIR-V targets.");
 				}
 				return;
 			}
@@ -207,7 +207,7 @@ namespace SparkleLauncher
 				AddPlannedEffect(plan, std::string("Shader optimizations: ") + (plan.Request.ShaderEnableOptimizations ? "enabled." : "disabled."));
 				AddPlannedEffect(plan, std::string("Warnings as errors: ") + (plan.Request.ShaderWarningsAsErrors ? "enabled." : "disabled."));
 				AddPlannedEffect(plan, std::string("Strip debug info: ") + (plan.Request.ShaderStripDebugInfo ? "enabled." : "disabled."));
-				AddPlannedEffect(plan, "Cook the global shader map and code library for the canonical runtime targets.");
+				AddPlannedEffect(plan, "Cook the global shader map and code library for the DXIL and SPIR-V targets.");
 				return;
 			case CookOperationKind::BuildTextures:
 				AddPlannedEffect(plan, "Cook texture assets for " + plan.Request.ContentId + ".");
@@ -335,8 +335,8 @@ namespace SparkleLauncher
 		    {CookOperationKind::CookWorkspace, "cook.workspace", "Cook", "Cook Workspace", "Cook the selected shader, texture, and scene outputs as one request."},
 		    {CookOperationKind::CookAllAssets, "cook.all", "Cook", "Cook All", "Prepare all selected level assets."},
 		    {CookOperationKind::CookShaders, "cook.shaders", "Cook", "Cook Shaders", "Validate and prepare the shader map and code library."},
-		    {CookOperationKind::BuildTextures, "cook.textures", "Cook", "Cook Textures", "Prepare texture assets for runtime use."},
-		    {CookOperationKind::BuildSceneAssets, "cook.assets", "Cook", "Cook Scenes And Meshes", "Prepare scene, mesh, and material assets for runtime use."},
+		    {CookOperationKind::BuildTextures, "cook.textures", "Cook", "Cook Textures", "Prepare texture assets for Editor and Game."},
+		    {CookOperationKind::BuildSceneAssets, "cook.assets", "Cook", "Cook Scenes And Meshes", "Prepare scene, mesh, and material assets for Editor and Game."},
 		};
 
 		return definitions;

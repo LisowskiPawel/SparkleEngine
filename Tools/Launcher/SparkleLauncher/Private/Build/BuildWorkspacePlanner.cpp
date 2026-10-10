@@ -266,7 +266,7 @@ namespace SparkleLauncher
 			case BuildWorkspaceOperationKind::CompileLauncher:
 				AddConfigureStep(plan);
 				AddBuildStep(plan, request.EditorProfile, {"SparkleLauncher"});
-				AddPlannedEffect(plan, "Configure the Launcher-owned product graph, then rebuild its executable and deployed runtime files.");
+				AddPlannedEffect(plan, "Configure the Launcher-owned product graph, then rebuild its executable and deployed support files.");
 				plan.CanRun = true;
 				return;
 			case BuildWorkspaceOperationKind::CompileEditor:

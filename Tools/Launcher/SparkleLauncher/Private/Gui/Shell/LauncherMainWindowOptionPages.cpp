@@ -213,7 +213,7 @@ namespace SparkleLauncher
 		const QStringList selectedScopes = m_settings.CookScopes().split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
 		QVector<QCheckBox*> scopeBoxes;
 
-		QVBoxLayout* cookLayout = AddOptionGroup(layout, "Choose outputs", "Select the runtime content to prepare.");
+		QVBoxLayout* cookLayout = AddOptionGroup(layout, "Choose outputs", "Select the cooked content to prepare.");
 
 		QFrame* selectionPanel = new QFrame(cookLayout->parentWidget());
 		selectionPanel->setObjectName("WorkflowSelectionPanel");
@@ -240,7 +240,7 @@ namespace SparkleLauncher
 		    *selectionLayout,
 		    "Textures",
 		    "textures",
-		    features.ContentPipelineEnabled ? "Create runtime-ready texture products." : "Texture cooking is not enabled by this workspace configuration.",
+		    features.ContentPipelineEnabled ? "Create cooked texture products." : "Texture cooking is not enabled by this workspace configuration.",
 		    features.ContentPipelineEnabled ? QStringLiteral("Asset + Texture cooker") : QStringLiteral("Unavailable"),
 		    features.ContentPipelineEnabled,
 		    selectedScopes,
