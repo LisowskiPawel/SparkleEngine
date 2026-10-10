@@ -77,7 +77,7 @@ Continue first-release stage FR-00 at the current repository revision. Read Docs
 <summary>Copy the execution prompt</summary>
 
 ```text
-Execute FR-01 only after FR-00 exits. Create an iteration record for REL-01/REL-02. Audit version identity, dependency locks, asset/source provenance, redistributable payloads, prerequisites, generated artifacts, current build/cook/runtime entry points, and approved fresh-checkout deterministic gates. Fix only ownership or reproducibility defects required by these gates; add automation that invokes owner checks without redefining their meaning. Use the smallest failing checks first, then the exact clean baseline required by acceptance. Record command, configuration, environment, artifacts, and unavailable checks. Stop for any unresolved right or mutable input. Exit with candidate-bound gate reports, not a prose claim.
+Execute FR-01 only after FR-00 exits. Create an iteration record for REL-01/REL-02. Audit version identity, dependency locks, asset/source provenance, redistributable payloads, prerequisites, generated artifacts, current build/cook/Game entry points, and approved fresh-checkout deterministic gates. Fix only ownership or reproducibility defects required by these gates; add automation that invokes owner checks without redefining their meaning. Use the smallest failing checks first, then the exact clean baseline required by acceptance. Record command, configuration, environment, artifacts, and unavailable checks. Stop for any unresolved right or mutable input. Exit with candidate-bound gate reports, not a prose claim.
 ```
 
 </details>
@@ -303,8 +303,8 @@ This is the exact one-to-one execution assignment. The phase owns implementation
 
 | FCR | Primary phase | FCR | Primary phase |
 | --- | --- | --- | --- |
-| `FCR-PROD-01` | [`PD-1`](ProductAndDelivery.md#pd-1--runtime-and-editor-product-shells) | `FCR-PROD-02` | [`PD-2`](ProductAndDelivery.md#pd-2--source-build-cook-and-launcher) |
-| `FCR-PROD-03` | [`PD-2`](ProductAndDelivery.md#pd-2--source-build-cook-and-launcher) | `FCR-PROD-04` | [`PD-1`](ProductAndDelivery.md#pd-1--runtime-and-editor-product-shells) |
+| `FCR-PROD-01` | [`PD-1`](ProductAndDelivery.md#pd-1--game-and-editor-product-shells) | `FCR-PROD-02` | [`PD-2`](ProductAndDelivery.md#pd-2--source-build-cook-and-launcher) |
+| `FCR-PROD-03` | [`PD-2`](ProductAndDelivery.md#pd-2--source-build-cook-and-launcher) | `FCR-PROD-04` | [`PD-1`](ProductAndDelivery.md#pd-1--game-and-editor-product-shells) |
 | `FCR-PROD-05` | [`PD-3`](ProductAndDelivery.md#pd-3--package-and-installation) | `FCR-PROD-06` | [`PD-4`](ProductAndDelivery.md#pd-4--support-incident-response-and-product-closure) |
 | `FCR-CORE-01` | [`FWC-1`](FoundationWorldAndContent.md#fwc-1--core-and-windows-platform) | `FCR-PLAT-01` | [`FWC-1`](FoundationWorldAndContent.md#fwc-1--core-and-windows-platform) |
 | `FCR-TASK-01` | [`FWC-2`](FoundationWorldAndContent.md#fwc-2--task-runtime-and-cancellation) | `FCR-WORLD-01` | [`FWC-3`](FoundationWorldAndContent.md#fwc-3--level-world-and-render-publication) |

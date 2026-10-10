@@ -17,7 +17,7 @@ The primary sources establish enough normative and platform vocabulary to design
 ## Research Questions
 
 1. Which signal/color/luminance rules are normative, and which remain Sparkle creative/product policy?
-2. Which Windows swapchain route is eligible for each editor/runtime/window/UI profile?
+2. Which Windows swapchain route is eligible for each editor/game/window/UI profile?
 3. Which facts must D3D12 and Vulkan expose without moving color policy into RHI?
 4. Which events invalidate output association, tuple, SDR white, metadata, and Renderer transform?
 5. Which artifacts prove pixel construction, native activation, OS/display behavior, and fallback independently?
@@ -133,7 +133,7 @@ These recommendations are non-binding until `HDRD-00 PASS`:
 
 | ID | Unknown | Why research does not answer it | Required closure |
 | --- | --- | --- | --- |
-| `HDR-U-01` | exact Windows versions, window modes, editor/runtime, alpha/UI/interposer profile matrix | platform guidance is conditional and local host composition matters | `HDR-EXP-02`, `HDRD-01/03/07` |
+| `HDR-U-01` | exact Windows versions, window modes, editor/game, alpha/UI/interposer profile matrix | platform guidance is conditional and local host composition matters | `HDR-EXP-02`, `HDRD-01/03/07` |
 | `HDR-U-02` | scene primaries/white/units/exposure/reference-white relation | source labels do not establish a full scene color contract | current shader/resource trace plus `HDRD-02` |
 | `HDR-U-03` | packed UINT10/PQ versus optional FP16/scRGB eligibility per cell | both are legitimate but semantically/native-distinct routes | platform probe and `HDRD-03` |
 | `HDR-U-04` | fixed 1000-nit, display-adaptive, or bounded hybrid creative target | standards/display capabilities do not choose authored tone policy | `HDR-EXP-04`, `HDRD-04` |

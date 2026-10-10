@@ -133,6 +133,6 @@ These ignored local products are disposable runtime inputs, not committed eviden
 
 - Independent architecture re-review returned **PASS** for `CHK-RPT-17`, confirmed all 57 live paths occur exactly once with no missing/extra/duplicate entry, independently reproduced the production diff identity and six generated-product hashes, and confirmed `PTD-00-R1` remains compatible.
 - Independent UX/evidence re-review returned **PASS** after the pseudo-generation was removed and stale current-state claims were corrected. It verified no clickable route, truthful generic `Unavailable` `0/0`, Lit-pixel non-authority, selected-mode filtering, and settings/UI/feature separation.
-- No runtime/editor launch, GPU dispatch, representative-map render, image, statistical convergence, paired-backend, accessibility interaction, Shipping/package, release-map, or accepted-reference check ran. Stage 1 makes none of those claims.
+- No game/editor launch, GPU dispatch, representative-map render, image, statistical convergence, paired-backend, accessibility interaction, Shipping/package, release-map, or accepted-reference check ran. Stage 1 makes none of those claims.
 
 `PTD-01-R2 PASS` accepts only this exact Stage-1 production identity and evidence record. Stage 2 is authorized; later acceptance gates and every non-claim above remain binding.

@@ -143,7 +143,7 @@ UiRenderPacket UI::Implementation::ConsumeRenderPacket()
 }
 
 UI::Implementation::Implementation(EditorHostServices hostServices) :
-    m_timer(&hostServices.RuntimeTimer),
+    m_timer(&hostServices.GameTimer),
     m_levelSession(hostServices.Levels),
     m_window(&hostServices.HostWindow),
     m_inputSystem(&hostServices.Input),

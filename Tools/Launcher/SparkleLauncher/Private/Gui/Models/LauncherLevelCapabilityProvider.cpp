@@ -38,7 +38,7 @@ namespace SparkleLauncher
 			        {
 				        return LauncherCapabilityEvaluation::Blocked("The requested catalog level does not exist.");
 			        }
-			        if (!found->RuntimeSupported || !found->CanSelect)
+			        if (!found->GameSupported || !found->CanSelect)
 			        {
 				        const QString reason = found->UnsupportedReason.isEmpty() ? found->Status : found->UnsupportedReason;
 				        return LauncherCapabilityEvaluation::Blocked(QStringLiteral("%1: %2").arg(found->DisplayName, reason).toStdString());

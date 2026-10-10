@@ -70,7 +70,7 @@ When implementation, scope, or evidence changes, update this snapshot, the ownin
 
 | ID | Feature | Score | `I/R/V/D` | Current state | Largest missing layer |
 | --- | --- | ---: | ---: | --- | --- |
-| `FCR-PROD-01` | Showcase runtime product | **50** | `35/15/0/0` | Integrated source path | intentional first-use, runtime, budget, failure, and release evidence |
+| `FCR-PROD-01` | Showcase game product | **50** | `35/15/0/0` | Integrated source path | intentional first-use, runtime, budget, failure, and release evidence |
 | `FCR-PROD-02` | source build and cook route | **40** | `30/10/0/0` | Partial development route | immutable prerequisites, clean adoption, reproducibility, and package-relative proof |
 | `FCR-PROD-03` | Launcher workflow | **50** | `35/15/0/0` | Integrated developer path | clean-machine workflow, failure/cancellation truth, and distribution classification |
 | `FCR-PROD-04` | Editor product | **45** | `30/15/0/0` | Integrated development path | usability, viewport/edit correctness, package classification, performance, and adoption |
@@ -147,7 +147,7 @@ These rows prevent adjacent infrastructure or a detailed target design from look
 | neural training/dataset pipeline | **0/100** | Target only; no production data/model workflow | [Neural Graphics](../Architecture/CrossModule/NeuralGraphics/README.md) |
 | neural runtime model/kernel path | **0/100** | Target only; no production inference feature | [Neural Graphics](../Architecture/CrossModule/NeuralGraphics/README.md) |
 | performance-diagnostics product | **20/100** | Instrumentation foundations plus source-present Editor external capture; joined internal UI/evidence product and aggregate acceptance remain open | [Performance Diagnostics](../Architecture/CrossModule/PerformanceDiagnostics/README.md) |
-| reusable Python automation and analysis | **10/100** | Two project-local conversion scripts; no repository automation, binding, or editor/runtime Python product | [Python Automation and Analysis](../Architecture/Modules/Tools/PythonAutomationAndAnalysis.md) |
+| reusable Python automation and analysis | **10/100** | Two project-local conversion scripts; no repository automation, binding, or editor/game Python product | [Python Automation and Analysis](../Architecture/Modules/Tools/PythonAutomationAndAnalysis.md) |
 | volumetric lighting/media | **0/100** | Not found; deep target/research/plan package exists but production is blocked by `REL-11` admission and `VOL-D0` | [Volumetric Lighting](../Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/README.md) |
 | frame generation | **0/100** | Not found | [Frame Generation](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/FrameGeneration.md) |
 | non-ray direct/indirect lighting fallback | **0/100** | Not found | [Lighting](../Architecture/Modules/Engine/Renderer/Features/Lighting/README.md) |

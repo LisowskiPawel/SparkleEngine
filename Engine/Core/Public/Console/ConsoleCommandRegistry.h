@@ -13,7 +13,7 @@
 
 enum class ConsoleCommandScope : std::uint8_t
 {
-	Runtime = 0,
+	Game = 0,
 	Editor,
 	Developer,
 };
@@ -51,7 +51,7 @@ struct SPARKLE_CORE_API ConsoleCommandDescriptor final
 	std::string Name;
 	std::string Help;
 	std::string ArgumentSyntax;
-	ConsoleCommandScope Scope = ConsoleCommandScope::Runtime;
+	ConsoleCommandScope Scope = ConsoleCommandScope::Game;
 	ConsoleCommandCallback Execute;
 	ConsoleAutocompleteCallback Complete;
 };

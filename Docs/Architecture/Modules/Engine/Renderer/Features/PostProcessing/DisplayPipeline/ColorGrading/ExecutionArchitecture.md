@@ -229,7 +229,7 @@ Support summaries are bounded snapshots. They do not emit every-frame logs, dupl
 | --- | --- |
 | D3D12 / Vulkan | one backend-neutral grade contract and identical shader semantics; native resource validation per backend |
 | Editor viewport | global defaults plus per-view override, live commit, requested/active/error state |
-| packaged Runtime | consume cooked grade/LUT state included by product scope; no source parser or editor dependency |
+| packaged Game | consume cooked grade/LUT state included by product scope; no source parser or editor dependency |
 | no LUT | parameter-only grade or full pass omission at neutral defaults |
 | invalid/missing LUT | visible unavailable/pending/failed request; retain explicit prior/default active state without claiming requested look |
 | SDR / HDR | identical scene-referred graded product feeds different target output transforms |
@@ -295,8 +295,8 @@ Exceeding a ceiling is a deterministic `Rejected` or `Unavailable` result before
 | --- | --- | --- | --- |
 | DevelopmentEditor D3D12 | global/default and per-view parameters + LUT | first use, raw oracle comparison, lifecycle/failure, capture | absent |
 | DevelopmentEditor Vulkan | same semantic contract and workflow | same plus backend comparison/native validation | absent |
-| packaged Runtime D3D12 | cooked selected grade, no source parser/editor | package manifest, clean-machine load/use/failure | absent |
-| packaged Runtime Vulkan | same if release matrix admits backend | package and backend evidence | absent |
+| packaged Game D3D12 | cooked selected grade, no source parser/editor | package manifest, clean-machine load/use/failure | absent |
+| packaged Game Vulkan | same if release matrix admits backend | package and backend evidence | absent |
 | neutral/no LUT | exact graph omission or parameter-only branch | graph/resource trace and raw identity | absent |
 | SDR/HDR output | same pre-tone graded product | matched raw stage identity under both output selections | HDR output itself blocked |
 | exact debug products | bypass or explicit Debug Views-owned policy | product classification and sentinel capture | unresolved in discovery |

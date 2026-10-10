@@ -66,7 +66,7 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 
 | ID | Architecture contract owner | Required contributors |
 | --- | --- | --- |
-| `FCR-PROD-01` | [Showcase runtime consumer](../../Modules/Projects/Showcase/README.md#fcr-prod-01-runtime-consumer-contract) | [Application host](../../Modules/Engine/Application/README.md#product-contract-boundary), GameFramework level/session, Renderer/RHI, Packaging |
+| `FCR-PROD-01` | [Showcase game consumer](../../Modules/Projects/Showcase/README.md#fcr-prod-01-game-consumer-contract) | [Application host](../../Modules/Engine/Application/README.md#product-contract-boundary), GameFramework level/session, Renderer/RHI, Packaging |
 | `FCR-PROD-02` | [Build/Packaging source adopter](../../Modules/BuildAndPackaging/README.md#fcr-prod-02-source-adopter-contract) | Adoption, CMake/dependencies, Cooking/ShaderCompiler, Showcase |
 | `FCR-PROD-03` | [Launcher](../../Modules/Tools/Launcher/README.md#fcr-prod-03-launcher-contract) | Core process/files, build/cook/content owners, Showcase child products |
 | `FCR-PROD-04` | [Editor](../../Modules/Engine/Editor/README.md#fcr-prod-04-editor-contract) | [Application host](../../Modules/Engine/Application/README.md#product-contract-boundary), GameFramework world/level, Renderer |

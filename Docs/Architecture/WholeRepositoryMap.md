@@ -35,14 +35,14 @@ SparkleEngine
 |-- Config/                engine defaults
 |-- Engine/                runtime modules and engine shaders/assets
 |-- Tools/                 launcher, shader compiler, importers, and cookers
-|-- Projects/Showcase/     editor/runtime products, level catalog, small source content
+|-- Projects/Showcase/     editor/game products, level catalog, small source content
 |-- Docs/                  strategy, architecture, engineering, acceptance, plan, and research knowledge
 |-- artifacts/             generated validation/development output; not source authority
 |-- build/                 generated build trees and dependency cache
 `-- .sparkle               repository marker used by tooling
 ```
 
-Mutable editor/runtime state is not repository content. Development products
+Mutable editor/game state is not repository content. Development products
 use `%LOCALAPPDATA%/SparkleEngine/Development/<repository-id>/<Product>/` and
 packaged `v0.1` products use `%LOCALAPPDATA%/SparkleEngine/<Product>/v0.1/`,
 with typed `Settings`, `Logs`, `Captures`, `Crashes`, and `Cache` children.
@@ -60,8 +60,8 @@ The top-level CMake project requires C++20, loads the Sparkle build profiles and
 | `Engine/GameFramework` | `SparkleGameFramework` | public Core and Tasks; no Renderer or Platform dependency |
 | `Engine/Renderer` | registration/provider targets and `SparkleRenderer` | public Core and RHI; private Platform, GameFramework, Tasks, providers, and ImGui |
 | `Engine/Editor` | `SparkleEditor` | public Core, RHI, Renderer, GameFramework, and Platform; private ImGui |
-| `Engine/Application` | `SparkleApplication`, `SparkleApplicationEditor` | runtime host publishes Renderer; editor host layers Editor over the runtime host |
-| `Projects/Showcase` | `ShowcaseEditor`, `ShowcaseRuntime` | explicit editor and runtime launch products |
+| `Engine/Application` | `SparkleApplication`, `SparkleApplicationEditor` | game host publishes Renderer; editor host layers Editor over the game host |
+| `Projects/Showcase` | `ShowcaseEditor`, `ShowcaseGame` | explicit editor and game launch products |
 
 The active RHI target split is:
 
@@ -76,11 +76,11 @@ flowchart TD
 
 `SparkleRHI` privately links the selected backend targets; each backend privately links `SparkleRHIDiagnostics`. `SparkleRHI_D3D12` is enabled by default. Vulkan is enabled when the SDK is found, or required explicitly by configuration. CMake assertions reject common/backend source leakage, and the root `architecture_boundary_check` target enforces the repository-level Renderer/RHI rules.
 
-## Runtime Product Flow
+## Editor And Game Product Flow
 
 ```mermaid
 flowchart TD
-    Product[ShowcaseEditor or ShowcaseRuntime] --> App[SparkleApplicationEditor<br/>or SparkleApplication]
+    Product[ShowcaseEditor or ShowcaseGame] --> App[SparkleApplicationEditor<br/>or SparkleApplication]
     App --> Session[LevelSession]
     Session --> World[GameWorld and compiled GameSystemGraph]
     World --> Extract[RenderFrameSubmissionExtractor]
@@ -226,13 +226,13 @@ LevelSession -> SceneLoadTaskGraph -> GameWorld
 
 `Projects/Showcase/Levels.catalog` is the single Showcase level/acquisition catalog. At the verified revision it contains 16 level records:
 
-- six asset-pack-free runtime levels: `Empty`, `Sponza`, `ABeautifulGame`, `DamagedHelmet`, `DiffuseTransmissionPlant`, and `CesiumMan`;
-- seven external-pack runtime-supported levels: `ModernSponza`, `ModernSponzaCandles`, `ModernSponzaKnight`, `BistroExterior`, `BistroInteriorWine`, `LPSHead`, and `CornellBox`;
-- three source-readiness records that are not runtime-supported: `JungleRuins`, `SanMiguelHigh`, and `SanMiguelLow`.
+- six asset-pack-free game levels: `Empty`, `Sponza`, `ABeautifulGame`, `DamagedHelmet`, `DiffuseTransmissionPlant`, and `CesiumMan`;
+- seven external-pack Game-supported levels: `ModernSponza`, `ModernSponzaCandles`, `ModernSponzaKnight`, `BistroExterior`, `BistroInteriorWine`, `LPSHead`, and `CornellBox`;
+- three source-readiness records that are not Game-supported: `JungleRuins`, `SanMiguelHigh`, and `SanMiguelLow`.
 
-The default runtime level is `Empty`; `SPARKLE_STARTUP_LEVEL` selects another catalog level. If catalog loading fails or `Empty` is absent, `LevelRegistry` creates the built-in empty fallback. External assets remain outside normal source history and are acquired through catalog metadata. Runtime support is distinct from download support and from the user's selected active set.
+The default game level is `Empty`; `SPARKLE_STARTUP_LEVEL` selects another catalog level. If catalog loading fails or `Empty` is absent, `LevelRegistry` creates the built-in empty fallback. External assets remain outside normal source history and are acquired through catalog metadata. Game support is distinct from download support and from the user's selected active set.
 
-The catalog also records disabled future Modern Sponza add-ons for Ivy, Trees, Flood, and Volumetric Explosion with explicit implementation blockers. Their presence in metadata is not runtime support.
+The catalog also records disabled future Modern Sponza add-ons for Ivy, Trees, Flood, and Volumetric Explosion with explicit implementation blockers. Their presence in metadata is not Game support.
 
 ## Tools And Launcher Map
 
@@ -256,7 +256,7 @@ grammar and platform/repository identity mechanics remain private
 implementations; consumers do not reconstruct those paths from repository or
 user-state roots.
 
-`ShowcaseEditor` links the editor host and `ShowcaseRuntime` links the runtime host. Distribution packaging remains manual and outside Launcher ownership.
+`ShowcaseEditor` links the editor host and `ShowcaseGame` links the game host. Distribution packaging remains manual and outside Launcher ownership.
 
 ## Validation And Evidence Boundaries
 
@@ -274,7 +274,7 @@ The repository-wide documentation reconciliation remains a static source/build-c
 - `CMakeLists.txt`, `Engine/CMakeLists.txt`, and each module/tool `CMakeLists.txt`
 - `CMake/ArchitectureBoundaryCheck.cmake`
 - `CMake/CodeStyle.ps1`
-- `Engine/Application/Public/RuntimeApplication.h`
+- `Engine/Application/Public/GameApplication.h`
 - `Engine/GameFramework/Public/World/GameWorld.h`
 - `Engine/GameFramework/Public/Rendering/RenderFrameSubmission.h`
 - `Engine/GameFramework/Private/World/Extraction/RenderFrameSubmissionExtractor.*`

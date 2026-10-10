@@ -72,7 +72,7 @@ Code and executable build configuration remain the authority for implementation.
 | Where is the implementation owner or build boundary? | Start with [Engine](Engine/README.md), [Tools](Tools/README.md), [Projects](Projects/README.md), or [Build And Packaging](BuildAndPackaging/README.md), then verify source/CMake. |
 | How does a graphics feature vary across backend or execution mode? | Use the [Graphics Feature Coverage Matrix](../CrossModule/GraphicsCoverageMatrix.md). |
 | How does a graphics feature execute end to end? | Use the [Graphics Feature Execution Traces](../CrossModule/FeatureExecutionTraces.md). |
-| Can a developer or user complete a build/content/editor/runtime/delivery journey? | Use [Product Workflow Coverage](../CrossModule/ProductWorkflowCoverage.md). |
+| Can a developer or user complete a build/content/editor/game/delivery journey? | Use [Product Workflow Coverage](../CrossModule/ProductWorkflowCoverage.md). |
 | Where does that product journey cross owners and fail or settle? | Use [Product Execution Traces](../CrossModule/ProductExecutionTraces.md). |
 | What question is still unanswered and what is the smallest next check? | Use the [Capability Evidence Plan](CapabilityEvidencePlan.md). |
 | What must this capability prove, and can it ship? | Use its Architecture feature dossier for the local proof contract, then its `FCR-*` report and the [First Release Acceptance Contract](../../Acceptance/FirstRelease.md) for actual approval. |
@@ -114,7 +114,7 @@ The initial detailed inventories carry `S` only. No `B`, `R`, `N`, `P`, or `A` e
 
 | Module | Depth in this snapshot | Document | Current evidence boundary |
 | --- | --- | --- | --- |
-| Application | Detailed | [Application Capability Inventory](Engine/Application/README.md) | Runtime/editor hosts, configuration, loop composition, console, recook, capture coordination, startup/shutdown, and build split reconciled; source-only. |
+| Application | Detailed | [Application Capability Inventory](Engine/Application/README.md) | Game/editor hosts, configuration, loop composition, console, recook, capture coordination, startup/shutdown, and build split reconciled; source-only. |
 | Build and packaging | Detailed | [Build And Packaging Capability Inventory](BuildAndPackaging/README.md) | CMake profiles, toolchains, dependencies, targets, artifacts, staging, discovery, checks, automation, tests, installation, and packaging reconciled; source-only. |
 | Core | Detailed | [Core Capability Inventory](Engine/Core/README.md) | Public/private source, CMake membership, diagnostics, configuration, files, processes, serialization, input, math, time, and thread vocabulary reconciled; source-only. |
 | Editor | Detailed | [Editor Capability Inventory](Engine/Editor/README.md) | Workspace, viewport, level/editing actions, settings, tools, console, capture, restart, runtime separation, and build surfaces reconciled; source-only. |
@@ -126,7 +126,7 @@ The initial detailed inventories carry `S` only. No `B`, `R`, `N`, `P`, or `A` e
 | RHI | Detailed | [RHI Capability Inventory](Engine/RHI/CapabilityInventory.md), reached through the [RHI module route](Engine/RHI/README.md) | Public contracts, both backend implementations, build switches, and Renderer consumers reconciled; source-only. |
 | Renderer | Detailed | [Renderer Capability Inventory](Engine/Renderer/CapabilityInventory.md), reached through the [Renderer module route](Engine/Renderer/README.md) | Whole-frame ownership plus feature families for surface production, Direct/Indirect/Volumetric Lighting, Ray Tracing, and Post Processing with distinct exposure, reconstruction/upscaling, tone mapping, color grading, chromatic aberration, frame generation, and output boundaries; source-only. |
 | Shader compilation and delivery | Detailed | [Shader Compilation Capability Inventory](Tools/ShaderCompiler/README.md) | Tool build, CLI, typed registrations, compiler backends, validation, publication, editor recook, and runtime loading reconciled; source-only. |
-| Showcase products | Detailed | [Showcase Product Capability Inventory](Projects/Showcase/README.md) | Editor/runtime targets, startup/selection, all 16 catalog levels, asset-pack readiness, and workload coverage reconciled; source-only. |
+| Showcase products | Detailed | [Showcase Product Capability Inventory](Projects/Showcase/README.md) | Editor/game targets, startup/selection, all 16 catalog levels, asset-pack readiness, and workload coverage reconciled; source-only. |
 | Source importers | Detailed | [Source Importers Capability Inventory](Tools/SourceImporters/README.md) | Formats, geometry, transforms, materials, textures, cameras, lights, deformation, animation, validation, dependencies, and known losses reconciled; source-only. |
 | Tasks | Detailed | [Tasks Capability Inventory](Engine/Tasks/README.md) | Task graphs, lanes, parallel ranges, cancellation, handles, events, shutdown, failure propagation, and tracing reconciled; source-only. |
 | Shared tool support | Detailed | [Shared Tool Support Capability Inventory](Tools/ToolSupport/README.md) | Common cooker/compiler console messages, fields, progress, summaries, consumers, and game-profile isolation reconciled; source-only. |
@@ -139,7 +139,7 @@ The initial detailed inventories carry `S` only. No `B`, `R`, `N`, `P`, or `A` e
 | Debug-view presentation | Current feature dossier | [Debug Views](Engine/Renderer/Features/DebugViews/README.md) | Existing modes, visualization products, exposure/tone/encoding limitation, viewport ownership, and target-presentation boundary reconciled; source-only. |
 | Cross-system graphics coverage | Deep horizontal | [Graphics Feature Coverage Matrix](../CrossModule/GraphicsCoverageMatrix.md) | Feature-by-feature selectors, passes, shaders, RHI gates, backend asymmetries, fallbacks, resources, and negative coverage reconciled; source-only. |
 | Feature execution | Deep vertical | [Graphics Feature Execution Traces](../CrossModule/FeatureExecutionTraces.md) | Frame, raster, ray GBuffer, ReSTIR, reference, provider, shader-delivery, and capture paths traced producer-to-consumer; source-only. |
-| Product/developer workflow coverage | Deep horizontal | [Product And Developer Workflow Coverage](../CrossModule/ProductWorkflowCoverage.md) | Discovery, build, content, cook, launch, editor, runtime, diagnostics, cancellation, package, release, and support journeys compared actor-by-actor; source-only. |
+| Product/developer workflow coverage | Deep horizontal | [Product And Developer Workflow Coverage](../CrossModule/ProductWorkflowCoverage.md) | Discovery, build, content, cook, launch, editor, game, diagnostics, cancellation, package, release, and support journeys compared actor-by-actor; source-only. |
 | Product/developer execution | Deep vertical | [Product And Developer Execution Traces](../CrossModule/ProductExecutionTraces.md) | Quick Start, asset-to-frame, editor transaction, settings, shader reload, capture, and settlement paths traced across owners; source-only. |
 | Registered Renderer programs | Exact catalog | [Renderer Shader Program Catalog](Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md) | All 35 registrations mapped to source, entry, stage, consumer, and binding/traversal boundary; source-only. |
 | Evidence closure | Plan | [Capability Evidence Plan](CapabilityEvidencePlan.md) | Missing source audits and the smallest proof needed to promote individual claims. It does not replace release gates or roadmap order. |
@@ -160,7 +160,7 @@ Every top-level implementation owner is routed above and has a source-depth capa
 | Volumetric/fog/atmosphere/sky coverage | [Volumetric Lighting](Engine/Renderer/Features/Lighting/VolumetricLighting/README.md), which owns the current absence and blocked post-release target |
 | Exposure, tone mapping, color grading, chromatic aberration, reconstruction/upscaling, frame generation, and output | [Post Processing](Engine/Renderer/Features/PostProcessing/README.md), including explicit negative dossiers for unsupported stages |
 | Shader language/stage/compiler/target/runtime coverage | [ShaderCompiler](Tools/ShaderCompiler/README.md) and [program catalog](Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md) |
-| Build/cook/editor/runtime/package user journey | [product workflow matrix](../CrossModule/ProductWorkflowCoverage.md) and [product traces](../CrossModule/ProductExecutionTraces.md) |
+| Build/cook/editor/game/package user journey | [product workflow matrix](../CrossModule/ProductWorkflowCoverage.md) and [product traces](../CrossModule/ProductExecutionTraces.md) |
 | Persona, roadmap, and gap completeness | [strategy coverage](../CrossModule/StrategyCoverage.md) |
 | Release inclusion or exclusion | [feature reports](../../Acceptance/FeatureCompletionReports.md) and [release acceptance](../../Acceptance/FirstRelease.md) |
 

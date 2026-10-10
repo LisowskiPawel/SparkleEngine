@@ -13,7 +13,7 @@
 
 ## Selection Contract
 
-A registered name is not automatically a feature. A trustworthy selector has a producer (console/config/editor/API), parser and valid domain, owned runtime consumer, requested-versus-active result, topology/history/invalidation behavior, visible failure/fallback, persistence/restart contract, and release classification. `REN-E23` keeps the selector inventory open until each row has that closure.
+A registered name is not automatically a feature. A trustworthy selector has a producer (console/config/editor/API), parser and valid domain, owned game consumer, requested-versus-active result, topology/history/invalidation behavior, visible failure/fallback, persistence/restart contract, and release classification. `REN-E23` keeps the selector inventory open until each row has that closure.
 
 ## Persisted Renderer Settings Section
 
@@ -39,7 +39,7 @@ The seven lighting leaves are also reachable through [Editor Show](../DebugViews
 
 | Selector | Default/domain | Current consumer and effect | Persistence/reachability boundary | Dossier |
 | --- | --- | --- | --- | --- |
-| `ViewportRenderRequest::ViewMode` | Lit, Reference Path Tracer, Wireframe, and 14 debug modes | `RenderViewBuilder` freezes the one mode into `RenderView`; frame composition, raster GBuffer, and debug shaders consume it only at their owning decisions | ordinary non-persisted per-view request; Editor and Game/runtime submit the same Renderer semantic; the Editor Reference row remains unavailable until Stage 7 | [Debug Views](../DebugViews/README.md) and [Reference Path Tracer](../Lighting/ReferencePathTracer/README.md) |
+| `ViewportRenderRequest::ViewMode` | Lit, Reference Path Tracer, Wireframe, and 14 debug modes | `RenderViewBuilder` freezes the one mode into `RenderView`; frame composition, raster GBuffer, and debug shaders consume it only at their owning decisions | ordinary non-persisted per-view request; Editor and Game submit the same Renderer semantic; the Editor Reference row remains unavailable until Stage 7 | [Debug Views](../DebugViews/README.md) and [Reference Path Tracer](../Lighting/ReferencePathTracer/README.md) |
 | `r.RayTracedShadows.NormalBias` | 0.01 world units | shadow ray input | console only; inspected frame binding does not clamp it | [Direct Lighting](../Lighting/DirectLighting/README.md) |
 | `r.RayTracedShadows.MaxDistance` | 100000 world units | directional shadow ray maximum | console only; inspected frame binding does not clamp it | [Direct Lighting](../Lighting/DirectLighting/README.md) |
 | `r.Lighting.Shadows.Direct` | true; bool | Shadows-owned retained intent; inactive with no direct family; accepted target omits exclusive signal allocation/producer and uses no-signal visibility one; current schema requires reconciliation | sequenced console and [Editor Show](../DebugViews/Controls/ShowFlags.md#editor-interaction) batch route; prior execution proof is candidate-bound | [Bounded Show evidence](../../../../../../Acceptance/Renderer/DebugViews.md#earlier-execution-evidence) |
@@ -55,7 +55,7 @@ The seven lighting leaves are also reachable through [Editor Show](../DebugViews
 | `r.Diagnostics.MarkerVerbosity` | FramePass; Off/FramePass/Detailed | frame/pass/detailed GPU marker emission | developer console; package exposure must be classified | [Diagnostics](../ViewportAndDiagnostics/DiagnosticsProductsAndCapture.md) |
 | `r.Diagnostics.GpuTiming` | off | timestamp collection/resolution | developer console; observer cost unmeasured | [Diagnostics](../ViewportAndDiagnostics/DiagnosticsProductsAndCapture.md) |
 | `r.FrameGraph.ParallelRecording` | on | Tasks-backed recording chunks | developer console; equivalence/scaling unproved | [Frame Graph](../FrameExecution/FrameGraphAndScheduling.md) |
-| `r.Material.BindingMode` | RayTracingOnly; also registers Everything | no runtime consumer found; capability report supports RayTracingOnly only | ineffective registered selector; `Everything` is not a feature | [Geometry/Materials](../GeometryAndResources/GeometryMaterialsAndGBuffer.md#material-contract) |
+| `r.Material.BindingMode` | RayTracingOnly; also registers Everything | no game consumer found; capability report supports RayTracingOnly only | ineffective registered selector; `Everything` is not a feature | [Geometry/Materials](../GeometryAndResources/GeometryMaterialsAndGBuffer.md#material-contract) |
 
 ## RHI Console Controls Outside The Renderer Settings State
 
@@ -71,7 +71,7 @@ These controls affect frame storage and presentation but are not proof that ever
 | Capability | Current selector state | Documentation owner |
 | --- | --- | --- |
 | Volumetric lighting, fog, atmosphere, aerial perspective | no Renderer/RHI setting, CVar, viewport request, or editor control was found | [Volumetric Lighting](../Lighting/VolumetricLighting/README.md); `REN-E24` audits continued absence and production remains roadmap-blocked |
-| Deferred decals | no authored/editor/runtime selector was found; `GR-5` must add truthful requested/active state with the implementation | [Deferred Decals](../DeferredDecals/README.md); `REN-E25` preserves current absence truth until `FCR-REN-23` is implemented |
+| Deferred decals | no authored/editor/game selector was found; `GR-5` must add truthful requested/active state with the implementation | [Deferred Decals](../DeferredDecals/README.md); `REN-E25` preserves current absence truth until `FCR-REN-23` is implemented |
 | Color grading | no grading parameter, LUT, transform, or editor selector exists; `DSP-5` must add the admitted surface | [Color Grading](../PostProcessing/DisplayPipeline/ColorGrading/README.md); `REN-E26` preserves current absence truth until `FCR-REN-24` is implemented |
 | Chromatic aberration | no lens/channel effect or viewport selector exists; `DSP-6` must add the admitted surface | [Chromatic Aberration](../PostProcessing/DisplayPipeline/ChromaticAberration/README.md); `REN-E27` preserves current absence truth until `FCR-REN-25` is implemented |
 | Frame generation | no provider, quality, pacing, or presentation selector exists; Reflex/PCL controls are not frame synthesis | [Frame Generation](../PostProcessing/ReconstructionAndGeneration/FrameGeneration.md); `REN-E28` audits continued absence |
@@ -94,7 +94,7 @@ These are current implementation contracts without a selector. They remain in th
 When adding or changing a selector:
 
 1. update this catalog and the owning feature dossier/capability ID;
-2. verify the producer, parser/domain, runtime consumer, requested/active diagnostic, topology/history/restart effect, and Shipping reachability;
+2. verify the producer, parser/domain, game consumer, requested/active diagnostic, topology/history/restart effect, and Shipping reachability;
 3. add or update the smallest `REN-E23` case and the feature-specific evidence item;
 4. remove unused names/values rather than retaining misleading compatibility vocabulary under the current clean-break policy.
 
@@ -105,7 +105,7 @@ When adding or changing a selector:
 - `AC-SEL-03` — requested and active state remain separately inspectable for capability-gated traversal/provider/PTLAS choices, including fallback/refusal reason.
 - `AC-SEL-04` — the 26-name owned INI section round-trips valid settings without modifying other sections; non-persisted/session/RHI-only controls remain absent by design.
 - `AC-SEL-05` — live changes apply on the next permitted frame, topology/history changes rebuild/reset their owners, and restart-required changes do not claim live activation.
-- `AC-SEL-06` — Editor, Runtime, Debug/Development/Shipping, workspace/package, D3D12/Vulkan reachability is independently classified; hidden console reachability still counts unless erased/locked.
+- `AC-SEL-06` — Editor, Game, Debug/Development/Shipping, workspace/package, D3D12/Vulkan reachability is independently classified; hidden console reachability still counts unless erased/locked.
 - `AC-SEL-07` — absent feature selectors remain absent and ineffective `r.Material.BindingMode` vocabulary is removed or visibly nonfunctional, never advertised as an active feature.
 
 ## Controlled Failure Modes And Checks

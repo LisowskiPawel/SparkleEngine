@@ -159,9 +159,9 @@ namespace SparkleLauncher
 				{
 					AddBuildStep(steps, plan, plan.Request.EditorProfile, editorProfileTargets);
 				}
-				if (HasSelectedScope(plan.Request, BuildWorkspaceScope::Runtime))
+				if (HasSelectedScope(plan.Request, BuildWorkspaceScope::Game))
 				{
-					AddBuildStep(steps, plan, plan.Request.RuntimeProfile, ResolveProjectTargets(plan.Request.ContentId, plan.Request.RuntimeProfile));
+					AddBuildStep(steps, plan, plan.Request.GameProfile, ResolveProjectTargets(plan.Request.ContentId, plan.Request.GameProfile));
 				}
 				return steps;
 			}
@@ -172,8 +172,8 @@ namespace SparkleLauncher
 			case BuildWorkspaceOperationKind::CompileEditor:
 				AddBuildStep(steps, plan, plan.Request.EditorProfile, ResolveBuildTargets(plan, plan.Request.EditorProfile));
 				return steps;
-			case BuildWorkspaceOperationKind::CompileRuntime:
-				AddBuildStep(steps, plan, plan.Request.RuntimeProfile, ResolveBuildTargets(plan, plan.Request.RuntimeProfile));
+			case BuildWorkspaceOperationKind::CompileGame:
+				AddBuildStep(steps, plan, plan.Request.GameProfile, ResolveBuildTargets(plan, plan.Request.GameProfile));
 				return steps;
 			case BuildWorkspaceOperationKind::BuildCookTools:
 			{

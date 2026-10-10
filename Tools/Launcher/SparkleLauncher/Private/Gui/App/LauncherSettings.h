@@ -17,7 +17,7 @@ namespace SparkleLauncher
 		const QString& RunMode() const;
 		const QString& BuildConfiguration() const;
 		const QString& EditorProfile() const;
-		const QString& RuntimeProfile() const;
+		const QString& GameProfile() const;
 		const QString& WorkspaceIde() const;
 		const QString& WorkspaceCompiler() const;
 		const QString& BuildScopes() const;
@@ -40,7 +40,7 @@ namespace SparkleLauncher
 		void SetRunMode(const QString& runMode);
 		void SetBuildConfiguration(const QString& configuration);
 		void SetEditorProfile(const QString& profileName);
-		void SetRuntimeProfile(const QString& profileName);
+		void SetGameProfile(const QString& profileName);
 		void SetWorkspaceIde(const QString& ide);
 		void SetWorkspaceCompiler(const QString& compiler);
 		void SetBuildScopes(const QString& scopes);

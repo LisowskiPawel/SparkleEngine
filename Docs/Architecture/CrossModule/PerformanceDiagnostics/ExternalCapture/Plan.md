@@ -65,9 +65,9 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 ## Stage 1 — Verify The Existing PIX Editor Workflow
 
-**Remaining work:** Bind the existing Launcher/direct CLI, selected viewport overlay and native PIX route to one candidate. Exercise missing PIX, event-runtime-only, invalid/duplicate intent, wrong/stale target and second-request Busy; retain three finalized/opened Sponza captures with pass/output/pipeline identity. Repair only defects exposed by these checks. The neutral contract, bootstrap, presenter, Launcher selection and PIX adapter already exist.
+**Remaining work:** Bind the existing Launcher/direct CLI, selected viewport overlay and native PIX route to one candidate. Exercise missing PIX, event-Game-only, invalid/duplicate intent, wrong/stale target and second-request Busy; retain three finalized/opened Sponza captures with pass/output/pipeline identity. Repair only defects exposed by these checks. The neutral contract, bootstrap, presenter, Launcher selection and PIX adapter already exist.
 
-**Exit `EC-G1`:** `CHK-EC-LAUNCH/BOOT/TARGET/NATIVE/UX/ARCH` relevant PIX cases pass, including missing PIX, event-runtime-only, invalid provider intent, wrong/stale target and second-request Busy. Three finalized captures open and identify known Sponza pass/output/pipeline; narrow owning builds and configuration/source-erasure audit pass. Failure/lifetime rules needed by this slice are implemented; exhaustive stress and Game/adoption remain Stage 2.
+**Exit `EC-G1`:** `CHK-EC-LAUNCH/BOOT/TARGET/NATIVE/UX/ARCH` relevant PIX cases pass, including missing PIX, event-Game-only, invalid provider intent, wrong/stale target and second-request Busy. Three finalized captures open and identify known Sponza pass/output/pipeline; narrow owning builds and configuration/source-erasure audit pass. Failure/lifetime rules needed by this slice are implemented; exhaustive stress and Game/adoption remain Stage 2.
 
 <details>
 <summary>Copy the execution prompt</summary>
@@ -177,7 +177,7 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 ## Stage 8 — Close Remaining Matrix, Adoption And Parent Evidence
 
-**Remaining work:** Reuse valid narrow proof, then finish the runtime-supported-map and API/profile/native-feature/interposer/validation/provider matrix, actual ShippingEditor/Game import/package/optimized-callsite erasure, cold no-provider launch, user-state cleanliness, symbol mismatches, observer protocol, recovery and independent adoption/review. Review EVOLUTION/LOCALITY/ARCH against the delivered owners and remove actual residue. Missing or unrun cells remain open; independent adoption cannot be author self-certification. P1-GATE closes only under the parent contract.
+**Remaining work:** Reuse valid narrow proof, then finish the Game-supported-map and API/profile/native-feature/interposer/validation/provider matrix, actual ShippingEditor/Game import/package/optimized-callsite erasure, cold no-provider launch, user-state cleanliness, symbol mismatches, observer protocol, recovery and independent adoption/review. Review EVOLUTION/LOCALITY/ARCH against the delivered owners and remove actual residue. Missing or unrun cells remain open; independent adoption cannot be author self-certification. P1-GATE closes only under the parent contract.
 
 **Exit `EC-G8`:** all relevant dossier criteria/failures/checks have retained results, no accepted cell lacks native artifact/identity/failure/Shipping/observer evidence, independent review/adoption complete. Record candidate disposition in existing completion report. Parent `P1-GATE` closes only with all selected `EXT-*` accepted or genuinely unsupported dispositions plus parent workload/erasure gates. Internal Phase 2 is then eligible under its own discovery/selection; Stage 8 does not implement it.
 

@@ -23,7 +23,7 @@ SparkleEngine is a compact, renderer-first C++ engine built around a cooked-cont
 
 | You have in the source tree | You do not have yet |
 | --- | --- |
-| Runtime and editor applications, Launcher, Showcase project, importers, cookers, and shader compiler | A formal installed or portable release package |
+| Game and editor applications, Launcher, Showcase project, importers, cookers, and shader compiler | A formal installed or portable release package |
 | Windows platform layer with D3D12 and Vulkan RHI implementations | Native Linux/macOS platform products |
 | Deferred GBuffer rendering, ray-traced visibility, ReSTIR direct/indirect lighting, exposure, upscaling, tone mapping, debug views, and presentation | Volumetric lighting, deferred decals, color grading, chromatic aberration, frame generation, or HDR display output |
 | Serial and render-thread coordination, frame graph, GPU-scene publication, residency, shader generations, diagnostics, and capture mechanisms | Executed parity, correctness, stability, memory, performance, and clean native-validation proof for the release matrix |
@@ -42,7 +42,7 @@ flowchart LR
         Cook --> Products[Cooked products]
     end
 
-    subgraph Runtime[Runtime and editor]
+    subgraph Products[Game and Editor]
         Products --> World[GameFramework world]
         World --> Submit[Immutable render submission]
         Submit --> Renderer[Renderer scene, view, and frame policy]
@@ -70,12 +70,12 @@ The important boundary is that GameFramework publishes immutable scene/view inpu
 | --- | ---: | --- | --- | --- |
 | Build and delivery | **33/100** | Partial | Six build profiles, dependency acquisition, module/product targets, development artifacts | Formal stage/sign/verify/package/install, CI/tests, clean-source and clean-machine evidence |
 | Core and Tasks | **50/100** | Implemented path; unproved | paths, files, diagnostics, process support, task graphs, lanes, cancellation vocabulary | Stress, failure, shutdown, capacity, and package-location proof |
-| Platform and Application | **50/100** | Partial | Win32 window/input/DPI, runtime/editor hosts, serial/threaded frame loop | Non-Windows host, broad lifecycle tests, packaged standard-user behavior |
+| Platform and Application | **50/100** | Partial | Win32 window/input/DPI, game/editor hosts, serial/threaded frame loop | Non-Windows host, broad lifecycle tests, packaged standard-user behavior |
 | Assets, import, and cooking | **49/100** | Implemented path; unproved | glTF/GLB/FBX subsets, textures, meshes, materials, scenes, animation, shader products | Full fidelity, deterministic publication, malformed-input, license, and package completeness evidence |
 | GameFramework | **48/100** | Implemented path; unproved | levels, cooked loading, ECS/world updates, editing, render extraction | Cancellation/reload, malformed content, numerical and cross-worker determinism evidence |
 | Renderer | **36/100** | Broad established path plus four absent mandatory targets | raster/ray GBuffer, direct/indirect lighting, frame graph, post processing, diagnostics | Deferred decals, grading, chromatic aberration, HDR10, feature correctness, visual/temporal quality, backend parity, and performance |
 | RHI | **45/100** | Broad implemented path; capability-gated | D3D12/Vulkan resources, descriptors, pipelines, commands, ray tracing, presentation, diagnostics | Native validation, device/queue/lifetime faults, parity, performance, device-recovery scope |
-| Tools and products | **45/100** | Partial | Launcher, cookers, ShaderCompiler, editor, Showcase runtime/editor | polished first use, public support route, independent adoption, packaged operation |
+| Tools and products | **45/100** | Partial | Launcher, cookers, ShaderCompiler, editor, Showcase game/editor | polished first use, public support route, independent adoption, packaged operation |
 
 `Implemented path` means source and build membership contain the route. `Unproved` means its required executable evidence has not been retained and accepted.
 

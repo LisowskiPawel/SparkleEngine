@@ -166,7 +166,7 @@ Channel fields have persistent labels and a deterministic tab order. Numeric inp
 | --- | --- | --- | --- | --- | --- |
 | DevelopmentEditor | yes | through owning import/cook workflow | yes | yes | full admitted set |
 | noninteractive developer route | manifest/status only | no bypass; invokes admitted cook route when product permits | yes where explicitly requested | yes | full admitted set |
-| packaged Runtime | no player-facing editor controls | absent | absent | cooked selected state only | bounded product scope only |
+| packaged Game | no player-facing editor controls | absent | absent | cooked selected state only | bounded product scope only |
 | release consumer path | no developer console/file picker introduced | absent | absent | only if product config admits selected grade | no developer-only surface |
 
 Shipping or release reachability is not inferred from DevelopmentEditor success. Stage 0 and the release plan must explicitly decide which packaged products carry configurable grade state versus a cooked fixed selection.

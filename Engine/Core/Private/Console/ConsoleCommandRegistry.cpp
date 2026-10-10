@@ -127,7 +127,7 @@ std::vector<std::string> ConsoleCommandRegistry::CompleteLine(std::string_view i
 
 bool ConsoleCommandRegistry::IsScopeAllowed(ConsoleCommandScope commandScope, ConsoleCommandScope contextScope) noexcept
 {
-	if (commandScope == ConsoleCommandScope::Runtime)
+	if (commandScope == ConsoleCommandScope::Game)
 	{
 		return true;
 	}

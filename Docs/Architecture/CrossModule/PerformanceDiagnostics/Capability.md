@@ -43,7 +43,7 @@ The following is a static observation reconciled with the current checkout on 20
 | Thread names | Editor, Game, Render, Tool main, and every task lane worker call `SetCurrentThreadRole`; Windows receives the same thread description. | External CPU tools can already distinguish Sparkle-owned OS threads. |
 | Task profiling | `TaskProfiler` emits ETW `TaskDependency`, `TaskBegin`, and `TaskEnd` events under the `SparkleTasks` provider. | WPA can inspect named task work; live UI should not duplicate a full task trace viewer. |
 | Render topology | Threaded rendering defaults on with pipeline depth 1. A serial renderer is also supported. | Samples from simultaneous wall-clock columns may refer to different `FrameId` values. Mode and depth must always be visible. |
-| Editor/game ownership | `EditorApplication::Tick` calls `RuntimeApplication::UpdateRuntime` on `Sparkle.EditorThread`. Standalone runtime calls it on `Sparkle.GameThread`. | "Gameplay" is a logical phase on the current host owner, not a permanent editor-side OS thread. |
+| Editor/game ownership | `EditorApplication::Tick` calls `GameApplication::UpdateGame` on `Sparkle.EditorThread`. Standalone Game calls it on `Sparkle.GameThread`. | "Gameplay" is a logical phase on the current host owner, not a permanent editor-side OS thread. |
 | GPU markers | Frame-graph passes and selected detailed operations emit backend GPU diagnostic scopes. | Existing stable pass labels should be the profiler correlation vocabulary. |
 | GPU timestamps | D3D12 and Vulkan timestamp queries resolve into private `ResolvedGpuTiming` values when a frame slot retires; `r.Diagnostics.GpuTiming` defaults off. | The renderer needs a bounded immutable frame result; Editor must never read renderer-private state. |
 | GPU hierarchy fields | Resolved timings contain label, begin/end ticks, duration, queue, and nesting depth. Frame-graph pass labels include pass kind/index/name; selected pass-internal RT scopes add child labels. | This is enough to prove the foundation, but not enough for a durable product: add `FrameId`, stable token, explicit parent, source kind, submission identity, counts, and validity. |
@@ -60,7 +60,7 @@ The following is a static observation reconciled with the current checkout on 20
 
 Primary code landmarks for revalidation:
 
-- `Engine/Application/Private/RuntimeApplication.cpp`
+- `Engine/Application/Private/GameApplication.cpp`
 - `Engine/Application/Private/EditorApplication.cpp`
 - `Engine/Core/Private/Time/Timer.cpp`
 - `Engine/Core/Private/Threading/ThreadOwnership.cpp`
@@ -82,10 +82,10 @@ Revalidate this table with `rg` before implementation work and reconcile it into
 
 | Responsibility | Current owner/path | Delivery decision |
 | --- | --- | --- |
-| Monotonic application identity and unscaled delta | `Timer`, used by `RuntimeApplication::BeginFrame` and `UpdateRuntime` | Reuse `Timer::GetFrameCount()` as the host `FrameId` source. Measure explicit begin-to-begin and phase boundaries in Application; do not create another clock singleton. |
-| Runtime composition and lifetime | `RuntimeApplication` | Own the diagnostics session beside the existing Timer/Window/Renderer runtime. Create after host prerequisites, publish after available domain results, and destroy before those producers. |
+| Monotonic application identity and unscaled delta | `Timer`, used by `GameApplication::BeginFrame` and `UpdateGame` | Reuse `Timer::GetFrameCount()` as the host `FrameId` source. Measure explicit begin-to-begin and phase boundaries in Application; do not create another clock singleton. |
+| Game composition and lifetime | `GameApplication` | Own the diagnostics session beside the existing Timer/Window/Renderer runtime. Create after host prerequisites, publish after available domain results, and destroy before those producers. |
 | Editor composition | `EditorApplication` and `EditorUiFrameRenderer` | Adapt the Application-owned immutable snapshot and typed requests into Editor presentation. Do not make `SparkleEditor` depend upward on `SparkleApplication`. |
-| Console parsing | Core `ConsoleCommandRegistry`, hosted by `EditorConsoleSystem` and `RuntimeConsoleOverlay` | Add one registration function used by both composition roots. The UI sends typed requests directly; it never formats a console command. |
+| Console parsing | Core `ConsoleCommandRegistry`, hosted by `EditorConsoleSystem` and `GameConsoleOverlay` | Add one registration function used by both composition roots. The UI sends typed requests directly; it never formats a console command. |
 | Renderer cross-thread control/publication | `RenderCoordinator`, `RenderThreadCommandQueue`, and `PublishReadState` | Extend the existing bounded command/read-state route with diagnostics request/result products. Avoid synchronous per-frame queries and avoid a second mailbox framework. |
 | Renderer execution measurements | `FramePipeline`, frame-graph executor, and existing diagnostic scopes | Instrument fixed owner boundaries and publish one bounded frame result keyed by `FrameId`. Do not scan the graph after execution merely to populate counters. |
 | Content/feature authoring | Levels/content, gameplay systems, tasks, frame-graph passes, resources, and draws already declare real work to their owners | Derive facts at orchestration/compile/submit/allocator boundaries. Require zero diagnostics maintenance from content/feature authors; allow only a sparse static semantic token for a genuinely new owner boundary. Remove manual/dynamic instrumentation instead of copying it. |

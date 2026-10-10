@@ -249,15 +249,15 @@ namespace SparkleLauncher
 					AddBuildStep(plan, request.EditorProfile, editorProfileTargets);
 				}
 
-				if (HasSelectedScope(request, BuildWorkspaceScope::Runtime))
+				if (HasSelectedScope(request, BuildWorkspaceScope::Game))
 				{
-					const std::vector<std::string> runtimeTargets = ResolveProjectTargets(request.ContentId, request.RuntimeProfile);
-					if (runtimeTargets.empty())
+					const std::vector<std::string> gameTargets = ResolveProjectTargets(request.ContentId, request.GameProfile);
+					if (gameTargets.empty())
 					{
-						AddReadiness(plan, "No runtime build target could be resolved.");
+						AddReadiness(plan, "No game build target could be resolved.");
 						return;
 					}
-					AddBuildStep(plan, request.RuntimeProfile, runtimeTargets);
+					AddBuildStep(plan, request.GameProfile, gameTargets);
 				}
 				AddPlannedEffect(plan, "Build the selected workspace products in dependency order using incremental CMake builds.");
 				plan.CanRun = true;
@@ -293,7 +293,7 @@ namespace SparkleLauncher
 				plan.CanRun = true;
 				return;
 			}
-			case BuildWorkspaceOperationKind::CompileRuntime:
+			case BuildWorkspaceOperationKind::CompileGame:
 			{
 				if (!RequireSyncedSourceDependencies(plan))
 				{
@@ -307,13 +307,13 @@ namespace SparkleLauncher
 				{
 					return;
 				}
-				std::vector<std::string> targets = request.SelectedTargets.empty() ? ResolveProjectTargets(request.ContentId, request.RuntimeProfile) : request.SelectedTargets;
+				std::vector<std::string> targets = request.SelectedTargets.empty() ? ResolveProjectTargets(request.ContentId, request.GameProfile) : request.SelectedTargets;
 				if (targets.empty())
 				{
-					AddReadiness(plan, "No runtime build target could be resolved.");
+					AddReadiness(plan, "No game build target could be resolved.");
 					return;
 				}
-				AddBuildStep(plan, request.RuntimeProfile, targets);
+				AddBuildStep(plan, request.GameProfile, targets);
 				plan.CanRun = true;
 				return;
 			}
@@ -368,7 +368,7 @@ namespace SparkleLauncher
 		        "Build the selected editor, game, cooking-tool, and launcher scopes; refresh generated workspace files when needed."},
 		    {BuildWorkspaceOperationKind::CompileLauncher, "launcher.build.self", "Build", "Build Launcher", "Optional local rebuild of Sparkle Launcher for development or customization.", true},
 		    {BuildWorkspaceOperationKind::CompileEditor, "workspace.build.editor", "Build", "Build Editor", "Optional local rebuild of the editor target."},
-		    {BuildWorkspaceOperationKind::CompileRuntime, "workspace.build.runtime", "Build", "Build Runtime", "Optional local rebuild of the runtime target."},
+		    {BuildWorkspaceOperationKind::CompileGame, "workspace.build.game", "Build", "Build Game", "Optional local rebuild of the game target."},
 		    {BuildWorkspaceOperationKind::BuildCookTools, "cook.tools.prepare", "Build", "Build Cooking Tools", "Optional local build of tools required by recook workflows."},
 		    {BuildWorkspaceOperationKind::InstallHostTool,
 		        "workspace.install-host-tool",
@@ -404,7 +404,7 @@ namespace SparkleLauncher
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Operation.Inputs.push_back({"content", request.ContentId});
 		plan.Operation.Inputs.push_back({"editorProfile", request.EditorProfile});
-		plan.Operation.Inputs.push_back({"runtimeProfile", request.RuntimeProfile});
+		plan.Operation.Inputs.push_back({"gameProfile", request.GameProfile});
 		plan.Operation.Inputs.push_back({"workspaceIde", WorkspaceIdeCommandLineValue(request.PreferredIde)});
 		plan.Operation.Inputs.push_back({"workspaceCompiler", WorkspaceCompilerCommandLineValue(request.Compiler)});
 		if (plan.Kind == BuildWorkspaceOperationKind::BuildWorkspace && !request.SelectedScopes.empty())

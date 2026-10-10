@@ -12,11 +12,11 @@ namespace SparkleLauncher
 	{
 		static const std::vector<BuildProfile> profiles = {
 		    {.Name = "DevelopmentEditor", .State = BuildProfileState::Development, .Target = BuildProfileTarget::Editor, .TargetSuffix = "Editor"},
-		    {.Name = "DevelopmentGame", .State = BuildProfileState::Development, .Target = BuildProfileTarget::Game, .TargetSuffix = "Runtime"},
+		    {.Name = "DevelopmentGame", .State = BuildProfileState::Development, .Target = BuildProfileTarget::Game, .TargetSuffix = "Game"},
 		    {.Name = "DebugEditor", .State = BuildProfileState::Debug, .Target = BuildProfileTarget::Editor, .TargetSuffix = "Editor"},
-		    {.Name = "DebugGame", .State = BuildProfileState::Debug, .Target = BuildProfileTarget::Game, .TargetSuffix = "Runtime"},
+		    {.Name = "DebugGame", .State = BuildProfileState::Debug, .Target = BuildProfileTarget::Game, .TargetSuffix = "Game"},
 		    {.Name = "ShippingEditor", .State = BuildProfileState::Shipping, .Target = BuildProfileTarget::Editor, .TargetSuffix = "Editor"},
-		    {.Name = "ShippingGame", .State = BuildProfileState::Shipping, .Target = BuildProfileTarget::Game, .TargetSuffix = "Runtime"},
+		    {.Name = "ShippingGame", .State = BuildProfileState::Shipping, .Target = BuildProfileTarget::Game, .TargetSuffix = "Game"},
 		};
 
 		return profiles;

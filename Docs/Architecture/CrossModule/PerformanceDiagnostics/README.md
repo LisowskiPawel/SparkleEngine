@@ -77,7 +77,7 @@ It does not claim that the target is implemented, set performance targets for a 
 - [Performance Diagnostics Capability Inventory](Capability.md) owns the dated current-source snapshot and reconciliation gaps.
 - The adjacent [Performance Diagnostics — Acceptance](Acceptance.md) contract owns feature-local workload evidence requirements, baseline experiments, reviewer artifacts, and verification gates.
 
-Application owns the presentation-neutral live diagnostics product, cross-domain session orchestration, active stat-view selection, and the bounded runtime serialization mechanism used by an explicit benchmark. The acceptance workload owns the benchmark schema, route, destination/name, sample policy, analysis, and claim. Editor owns its viewport menu/window presentation. DevelopmentGame owns a compact presenter through its existing runtime console/UI packet path. Each engine domain remains the authority for its own measurements. These concrete product consumers justify compact stat views; they do not justify a general task browser, allocation explorer, or trace-viewer product.
+Application owns the presentation-neutral live diagnostics product, cross-domain session orchestration, active stat-view selection, and the bounded runtime serialization mechanism used by an explicit benchmark. The acceptance workload owns the benchmark schema, route, destination/name, sample policy, analysis, and claim. Editor owns its viewport menu/window presentation. DevelopmentGame owns a compact presenter through its existing game console/UI packet path. Each engine domain remains the authority for its own measurements. These concrete product consumers justify compact stat views; they do not justify a general task browser, allocation explorer, or trace-viewer product.
 
 ## Adversarial Review Standard
 
@@ -119,7 +119,7 @@ Sparkle adopts the following product behaviors:
 
 | Unreal precedent | Sparkle adaptation | Deliberately not copied |
 | --- | --- | --- |
-| A short console command toggles an on-screen stat group. | One case-insensitive, autocomplete-capable `Stat` command uses Sparkle's existing Editor and runtime console registries. The Editor viewport leads with typed task presets; `Customize Stats...` reaches the same fixed group requests. | A second console, hidden command parser, presenter-specific command implementation, or twelve raw groups presented as equal first-level choices. |
+| A short console command toggles an on-screen stat group. | One case-insensitive, autocomplete-capable `Stat` command uses Sparkle's existing Editor and game console registries. The Editor viewport leads with typed task presets; `Customize Stats...` reaches the same fixed group requests. | A second console, hidden command parser, presenter-specific command implementation, or twelve raw groups presented as equal first-level choices. |
 | `stat unit` rapidly compares frame, game, draw/render, RHI-thread, and GPU time. | `Stat Unit` compares frame interval, host/game phase wall, render wall, queue waits, presentation, and GPU queue span using honest Sparkle ownership labels. | Pretending Editor gameplay has its own OS thread, or treating the numerically largest pipelined column as proof by itself. |
 | Named groups expose GPU, RHI, scene rendering, memory, gameplay, and hitch information. | A small fixed internal catalog names Fps, Unit, UnitGraph, Threads, Tasks, Gpu, GpuPasses, Render, Scene, Rhi, Memory, and Hitches. Each group is admitted only when it has a real producer, bounded consumer, and tier evidence; normal users select an investigation intent rather than assembling this catalog. | An open-ended global stat registry, arbitrary module macros, hundreds of groups without an active product question, or making internal composition the primary navigation. |
 | Stat types distinguish cycle counters, per-frame counters, persistent accumulators, and memory values. | Every Sparkle row declares duration, count, bytes, ratio, state, high-water, sampling interval, and validity semantics. | Combining unlike kinds into a typeless number or assuming every value resets per frame. |
@@ -391,7 +391,7 @@ Application diagnostics session <---------+
 | External frame-capture bootstrap and native trigger | Existing process composition plus selected RHI private adapter | Normalize one provider before graphics creation, reject incompatible injected activities, bind the real target and publish one neutral observation. SDK loading and APIs remain private. |
 | Active stat groups and presentation-neutral row models | Application | Fixed catalog maps immutable diagnostic fields to bounded rows and required collection mode. No domain measurement authority. |
 | Editor live presentation and user intent | Editor | Reads one immutable model and submits semantic group/reset/export/external-capture requests from the viewport menu, capture overlay, console, or Performance window. No renderer/RHI pointers. |
-| DevelopmentGame live presentation | Application runtime console/UI packet owner | Reads the same immutable model and submits the same semantic group requests. It does not gain Editor dependencies. |
+| DevelopmentGame live presentation | Application game console/UI packet owner | Reads the same immutable model and submits the same semantic group requests. It does not gain Editor dependencies. |
 | Benchmark artifacts | Application evidence session | Written only for an explicit bounded request under the acceptance-workload artifact root. |
 
 External-first delivery does not require the full Application diagnostics session. The first capture slice extends `RendererExternalRuntime`, the existing Renderer bounded control/read-state route, backend-private RHI adapters, and one narrow immutable Application-to-Editor projection. It uses the product's existing `FrameId` and viewport/present-target identity but owns no internal timing or history. When the Application session arrives later, it composes that projection as a stable submodel; it does not copy provider state, move native lifetime, or create a second request/arbitration path.
@@ -417,7 +417,7 @@ RHI/<backend>/Private/Diagnostics
 Editor/Private
   Performance/Stat presenters, conditional provider icon group, and typed requests only
 DevelopmentGame Application presenter
-  compact rows through the existing runtime console/UI packet route
+  compact rows through the existing game console/UI packet route
 ```
 
 Core does not own a profiler service. Editor does not own engine measurements. RHI public contracts expose only the backend-neutral facts required by the Renderer/Application consumers; vendor SDK types and tool-specific state remain backend-private. A new file or public type requires a present consumer and cannot exist only to anticipate a future profiler.

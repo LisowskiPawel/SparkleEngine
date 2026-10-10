@@ -47,7 +47,7 @@ ViewportRenderRequest::ViewMode == ReferencePathTracer
   -> existing frame-graph execution and D3D12 or Vulkan RHI submission
 ```
 
-Editor `Scene` and Game/runtime `Game` continue to submit the same ordinary mode and camera/View contract. Neither host selects a shader, payload, estimator, backend lowering, or submission path.
+Editor `Scene` and Game `Game` continue to submit the same ordinary mode and camera/View contract. Neither host selects a shader, payload, estimator, backend lowering, or submission path.
 
 ## Source Checks And Deferred Evidence
 

@@ -460,7 +460,7 @@ add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui_draw.cpp
     ${imgui_SOURCE_DIR}/imgui_tables.cpp
     ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-    # Platform backend shared by editor/runtime UI. Renderer backends are owned by RHI implementations.
+    # Platform backend shared by editor/game UI. Renderer backends are owned by RHI implementations.
     ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
 )
 

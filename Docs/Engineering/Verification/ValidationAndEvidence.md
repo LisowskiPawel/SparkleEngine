@@ -52,7 +52,7 @@ CMake configuration must use `build/variants/<name>` together with
 root CMake contract rejects those locations so direct commands, IDEs, scripts,
 and agent workflows cannot silently create a second output architecture.
 
-Runtime/editor checks must not write mutable state into the repository. Product
+Game/editor checks must not write mutable state into the repository. Product
 settings, logs, captures, crashes, and caches belong under the typed per-user
 root documented by Build And Packaging. Shipped/source defaults are inputs and
 must never be used as persistence targets. Do not add path environment overrides

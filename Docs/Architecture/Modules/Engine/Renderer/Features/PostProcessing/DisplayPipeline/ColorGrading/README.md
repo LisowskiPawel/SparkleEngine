@@ -53,7 +53,7 @@ The feature is complete only as the conjunction of semantic correctness, transac
 | `CGR-FS-05` | parametric-plus-LUT composition | Included, order pending | exactly once; no blend stack |
 | `CGR-FS-06` | global default and per-view override | Included, pending state/digest schema | View owns selection; residency owns immutable LUT generation |
 | `CGR-FS-07` | DevelopmentEditor authoring/live update | Included, pending UX and settlement bounds | requested/resolving/active/failed truth; stale completion rejected |
-| `CGR-FS-08` | packaged Runtime consumption | Included, pending package manifest | consumes cooked data only; no source parser in Runtime |
+| `CGR-FS-08` | packaged Game consumption | Included, pending package manifest | consumes cooked data only; no source parser in Runtime |
 | `CGR-FS-09` | raw stage/capture diagnostics | Included, pending artifact schema | pre/post-grade remains distinct from tone/encoding/screenshot |
 | `CGR-FS-10` | D3D12 and Vulkan | Included, pending executable parity | one semantic shader contract; backend result cells remain unproved |
 | `CGR-FS-11` | local volumes, multi-LUT blending, curves, masks, timelines | Excluded | no selectors, serialized vocabulary, runtime graph, or claims |
@@ -65,8 +65,8 @@ The feature is complete only as the conjunction of semantic correctness, transac
 | --- | --- | --- | --- | --- |
 | DevelopmentEditor D3D12 | global/per-view parameters and optional source LUT | live generation-qualified scene grade with author diagnostics | keep last explicit good or neutral state according to `CGRD-09/11`; never label failed request active | target only |
 | DevelopmentEditor Vulkan | same serialized intent and cooked/runtime LUT semantics | numerically equivalent raw graded product | same terminal categories; backend-specific reason visible | target only |
-| packaged Runtime D3D12 | persisted settings plus packaged cooked LUT identity | no source parsing; active generation matches manifest | missing/corrupt bytes refuse the LUT and report exact state | target only |
-| packaged Runtime Vulkan | same as D3D12 | same semantic result and package identity | same safe state and reason vocabulary | target only |
+| packaged Game D3D12 | persisted settings plus packaged cooked LUT identity | no source parsing; active generation matches manifest | missing/corrupt bytes refuse the LUT and report exact state | target only |
+| packaged Game Vulkan | same as D3D12 | same semantic result and package identity | same safe state and reason vocabulary | target only |
 | offscreen/viewport capture | explicit pre/post-grade product request | domain/format/extent/alpha/generation manifest accompanies pixels | ambiguous or stale product is rejected | target only |
 | headless source conversion | `.cube` import/cook operation only if admitted by existing tools | transactional canonical cooked output | no renderer-active claim; stable error category and no partial publish | target only |
 | local-volume/multi-look/OCIO-runtime request | excluded intent | no active state | reject/omit visibly; never approximate with the global grade | excluded |

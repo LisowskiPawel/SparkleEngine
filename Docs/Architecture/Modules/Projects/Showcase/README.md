@@ -10,13 +10,13 @@
 
 **Evidence and disposition:** [Capability Evidence Plan](../../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../../Acceptance/FirstRelease.md)
 
-**Current readiness:** **50/100** for the tracked runtime product route — project/catalog/source integration exists; content readiness, executable workloads, package, first-use, and release evidence remain open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
+**Current readiness:** **50/100** for the tracked game product route — project/catalog/source integration exists; content readiness, executable workloads, package, first-use, and release evidence remain open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
 
 ## At A Glance
 
 | Product concern | Current state | Evidence boundary |
 | --- | --- | --- |
-| project products | separate minimal ShowcaseEditor and ShowcaseRuntime targets | source/build membership, not a successful or packaged launch |
+| project products | separate minimal ShowcaseEditor and ShowcaseGame targets | source/build membership, not a successful or packaged launch |
 | selection | environment/Launcher selects only registered ready catalog levels; an explicit unknown startup ID reports an error and activates no level | a valid catalog ID and actual first frame still require runtime proof |
 | content ladder | compact tracked scenes plus larger downloadable Modern Sponza, Bistro, LPS Head, and Cornell Box routes | selection/download support is not cook/runtime/readiness evidence |
 | material previews | Stanford Bunny/Dragon, Anisotropy Barn Lamp, and Sheen Cloth are selected generic-shading previews | launchability does not establish subsurface, anisotropy, clearcoat, transmission, volume, or sheen fidelity |
@@ -30,10 +30,10 @@ The project should stay thin: it selects content and composes engine/application
 | --- | --- | --- | --- | --- |
 | `SHOW-001` | Project discovery | Implemented path | `.sparkle-project` makes Showcase the current auto-discovered project and Launcher default content. | `S` |
 | `SHOW-002` | Editor product | Implemented path | `ShowcaseEditor` is a minimal `main` over `RunEditorApplication`, links ApplicationEditor/GameFramework, stages declared runtime owners and Streamline, and outputs under the editor artifact root. | `S` |
-| `SHOW-003` | Runtime product | Implemented path | `ShowcaseRuntime` is a minimal `main` over `RunRuntimeApplication`, does not link Editor/ApplicationEditor, and outputs under the runtime artifact root. | `S` |
+| `SHOW-003` | Game product | Implemented path | `ShowcaseGame` is a minimal `main` over `RunGameApplication`, does not link Editor/ApplicationEditor, and outputs under the game artifact root. | `S` |
 | `SHOW-004` | Six-profile build naming | Implemented path | Both products participate in Debug/Development/Shipping profile convention; Launcher resolves the matching target/profile and project working directory. | `S` |
 | `SHOW-005` | Startup level selection | Implemented path | `SPARKLE_STARTUP_LEVEL` requests a registered name; an absent value selects `Empty`, while an unknown explicit ID reports an error and activates no level. Only catalog entries marked Selected and currently ready register. | `S` |
-| `SHOW-006` | Runtime level switching | Implemented path | Editor menu/Launcher can choose registered catalog levels; LevelSession cancels an in-flight load when a new request arrives and rejects stale generation results. | `S` |
+| `SHOW-006` | Game level switching | Implemented path | Editor menu/Launcher can choose registered catalog levels; LevelSession cancels an in-flight load when a new request arrives and rejects stale generation results. | `S` |
 | `SHOW-007` | Authored level save | Implemented path | Editor Save All writes the active `.level` document through GameFramework. External source assets/cooked products are not authored by this operation. | `S` |
 
 ## Level Catalog
@@ -48,22 +48,22 @@ The catalog has 20 level records: 17 Selected and 3 not selected. Selection is i
 | `DamagedHelmet` | Yes | Tracked glTF/project textures | Compact metallic-roughness, normal/AO/emissive material | One asset cannot prove broad material coverage. |
 | `DiffuseTransmissionPlant` | Yes | Tracked glTF/project textures | Alpha/transmission-adjacent stress and layered plant source | True transmission/blend rendering is not implemented; the title must not imply it is. |
 | `CesiumMan` | Yes | Tracked glTF/project texture | Skeleton, skinning, animation, coordinate normalization | Needs raster/ray deformation equivalence evidence. |
-| `ModernSponza`, `ModernSponzaCandles`, `ModernSponzaKnight` | Yes | External packs marked download/runtime supported, including parent dependencies | Large scene/materials; emissive-instance stress; FBX skeletal animation | Multi-GB acquisition, license verification, cook/runtime and memory evidence remain open. |
-| `BistroExterior`, `BistroInteriorWine` | Yes | External Bistro pack marked download/runtime supported | Large FBX scene, outdoor/indoor lighting/material variants | Import fidelity and memory/performance evidence remain open. |
-| `LPSHead` | Yes | External pack marked download/runtime supported; conversion helper tracked | Skin/head shading | Conversion/provenance and final material correctness remain open. |
-| `CornellBox` | Yes | External pack marked download/runtime supported; conversion helper tracked | Indirect lighting, Reference Path Tracer, and convergence | Conversion and reference oracle must be recorded. |
-| `JungleRuins` | No | Download supported, runtime unsupported | Future dense USD/out-of-core scene | USD composition and virtualized/out-of-core geometry absent. |
-| `SanMiguelHigh`, `SanMiguelLow` | No | Download supported, runtime unsupported | Future large-scene tiers | Deterministic OBJ/MTL/PNG-to-glTF conversion absent. |
+| `ModernSponza`, `ModernSponzaCandles`, `ModernSponzaKnight` | Yes | External packs marked download/game supported, including parent dependencies | Large scene/materials; emissive-instance stress; FBX skeletal animation | Multi-GB acquisition, license verification, cook/runtime and memory evidence remain open. |
+| `BistroExterior`, `BistroInteriorWine` | Yes | External Bistro pack marked download/game supported | Large FBX scene, outdoor/indoor lighting/material variants | Import fidelity and memory/performance evidence remain open. |
+| `LPSHead` | Yes | External pack marked download/game supported; conversion helper tracked | Skin/head shading | Conversion/provenance and final material correctness remain open. |
+| `CornellBox` | Yes | External pack marked download/game supported; conversion helper tracked | Indirect lighting, Reference Path Tracer, and convergence | Conversion and reference oracle must be recorded. |
+| `JungleRuins` | No | Download supported, Game unsupported | Future dense USD/out-of-core scene | USD composition and virtualized/out-of-core geometry absent. |
+| `SanMiguelHigh`, `SanMiguelLow` | No | Download supported, Game unsupported | Future large-scene tiers | Deterministic OBJ/MTL/PNG-to-glTF conversion absent. |
 | `StanfordBunnySubsurface`, `StanfordDragonSubsurface` | Yes | Publisher PLY archives download and cook as generic triangle geometry | Future subsurface material and lighting references | No authored subsurface parameters or lobe; Dragon carries publisher noncommercial-use constraints. |
 | `AnisotropyBarnLamp` | Yes | Pinned publisher loose glTF files download and cook as generic metallic-roughness | Future anisotropic brushed-metal reference | Optional anisotropy, clearcoat, transmission, and volume data are explicitly omitted; core textures and emissive strength remain. |
 | `SheenCloth` | Yes | Pinned publisher loose glTF files download and cook as generic metallic-roughness | Future cloth-sheen reference | Core texture transforms are translated, but optional sheen data is explicitly omitted and grazing-angle sheen fidelity remains unsupported. |
 
 ## Asset-Pack Catalog
 
-The 17 asset-pack records encode root/extraction/required path, parent relation, source URL/page, an archive digest or a tracked per-file acquisition manifest, version, license, and explicit download/runtime flags/blockers. Loose-file packs verify every pinned byte count and SHA-256 before transactional publication of an acquisition receipt.
+The 17 asset-pack records encode root/extraction/required path, parent relation, source URL/page, an archive digest or a tracked per-file acquisition manifest, version, license, and explicit download/game flags/blockers. Loose-file packs verify every pinned byte count and SHA-256 before transactional publication of an acquisition receipt.
 
-- 13 packs are marked DownloadSupported; 11 are also RuntimeSupported. The four new packs are runtime-supported only for generic-shading preview, not their named specialty materials.
-- Unsupported families are explicit: Modern Sponza Ivy (density/residency/scaling), Trees (alpha foliage/transparency), Flood (Alembic/water/sequence), Explosion (OpenVDB/volume/streaming), Jungle Ruins (USD/out-of-core), and San Miguel runtime conversion. Stanford subsurface, Barn Lamp advanced lobes, and Sheen Cloth sheen are tracked as unsupported shading even though their generic previews are selectable.
+- 13 packs are marked DownloadSupported; 11 are also GameSupported. The four new packs are Game-supported only for generic-shading preview, not their named specialty materials.
+- Unsupported families are explicit: Modern Sponza Ivy (density/residency/scaling), Trees (alpha foliage/transparency), Flood (Alembic/water/sequence), Explosion (OpenVDB/volume/streaming), Jungle Ruins (USD/out-of-core), and San Miguel Game conversion. Stanford subsurface, Barn Lamp advanced lobes, and Sheen Cloth sheen are tracked as unsupported shading even though their generic previews are selectable.
 - External archive license strings are metadata, not proof that redistribution rights and notices are complete.
 
 ## Workload-To-Capability Coverage
@@ -84,18 +84,18 @@ The 17 asset-pack records encode root/extraction/required path, parent relation,
 
 ## Vertical Launch Trace
 
-Launcher loads `Levels.catalog` -> selected level/pack readiness is evaluated -> missing supported packs sync -> AssetCooker cooks the selected project -> Launcher verifies executable and cooked mesh/texture/shader roots -> `levels.run` sets project/level/API environment and starts ShowcaseEditor or ShowcaseRuntime in the project directory -> GameFramework registers only selected/ready levels -> requested level loads or an explicit error leaves no level active -> Renderer consumes the scene.
+Launcher loads `Levels.catalog` -> selected level/pack readiness is evaluated -> missing supported packs sync -> AssetCooker cooks the selected project -> Launcher verifies executable and cooked mesh/texture/shader roots -> `levels.run` sets project/level/API environment and starts ShowcaseEditor or ShowcaseGame in the project directory -> GameFramework registers only selected/ready levels -> requested level loads or an explicit error leaves no level active -> Renderer consumes the scene.
 
-## `FCR-PROD-01` Runtime Consumer Contract
+## `FCR-PROD-01` Game Consumer Contract
 
 This is the Architecture acceptance owner for the Showcase consumer journey. [Application](../../Engine/Application/README.md#product-contract-boundary) owns host construction and settlement; the [frozen product contract](../../../../Acceptance/FirstRelease.md#frozen-product-and-output-classification) owns release values; [release gates](../../../../Acceptance/FirstRelease.md#release-gates) are linked, not repeated.
 
 | ID | Binary acceptance criterion |
 | --- | --- |
-| `AC-PROD01-01` | From the included archive as a standard user, with no repository, environment override, administrator right, network, or developer tool, Sparkle Game (current source target `ShowcaseRuntime`, exact packaged path in the manifest) reaches intentional built-in Empty or the explicitly selected/synced map within the frozen startup budget and reports the exact product/package identity. |
+| `AC-PROD01-01` | From the included archive as a standard user, with no repository, environment override, administrator right, network, or developer tool, Sparkle Game (current source target `ShowcaseGame`, exact packaged path in the manifest) reaches intentional built-in Empty or the explicitly selected/synced map within the frozen startup budget and reports the exact product/package identity. |
 | `AC-PROD01-02` | Selecting each included example publishes the requested catalog identity and first correct frame within its load budget; missing, corrupt, unsupported, or unregistered content produces a distinct failure and never claims successful requested-map activation through built-in `Empty`; intentional Empty selection is valid. |
 | `AC-PROD01-03` | The consumer can discover controls/help, inspect requested versus active settings, restore documented defaults, return to the first-run surface, and quit without a console command; persistence and reset touch only the frozen per-user paths. |
-| `AC-PROD01-04` | `ShippingGame` contains and exposes no runtime/editor console, CVar authoring route, shader recook, editor panel, source importer/cooker, repository marker dependency, or developer-only command. |
+| `AC-PROD01-04` | `ShippingGame` contains and exposes no game/editor console, CVar authoring route, shader recook, editor panel, source importer/cooker, repository marker dependency, or developer-only command. |
 | `AC-PROD01-05` | Close/quit during idle and level load settles level/task/Renderer/RHI work within the shutdown budget, returns one success/failure exit status, and leaves immutable package/source bytes unchanged. |
 
 | ID | Cause/injection, detection boundary, safe result, and recovery |
@@ -119,5 +119,5 @@ Every criterion and failure above maps to at least one check. Candidate results 
 - Showcase is an evidence application, not a general game: no game rules, audio, physics, networking, save data, installer, or end-user onboarding loop exists.
 - A catalog description is product intent, not implementation proof. In particular, “Diffuse Transmission” and future volume/water/foliage descriptions exceed current Renderer capability.
 - Stanford, Barn Lamp, and Sheen Cloth are selectable generic previews. Their source/texture cooks passed locally in this working tree, but no first-frame, GBuffer capture, specialty-lobe, or release proof is recorded here.
-- Catalog Selected does not guarantee source pack presence, successful cook, registered runtime level, or release disposition.
+- Catalog Selected does not guarantee source pack presence, successful cook, registered game level, or release disposition.
 - This pass locally built SourceImporters, AssetCooker, ShowcaseEditor, SparkleLauncher, and ShaderCompiler and cooked Showcase source scenes, textures, and shaders. All 20 authored level names match their catalog IDs. A stale Showcase shader map initially caused startup contract failure for `Empty`, `Sponza`, and the new levels; a shader cook from the repository root published to `Shared`, not `Showcase`. After rebuilding ShaderCompiler and cooking from the Showcase working directory, D3D12 editor smoke runs activated `Sponza` and each of the four new levels and closed normally. These runs verify requested level activation and basic process lifetime, not correct first frame, GBuffer channel values, specialty shading, timing, Vulkan parity, or packaged-byte behavior.

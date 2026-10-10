@@ -265,9 +265,9 @@ void ProjectLevelCatalogReader::ParseAssetPackField(std::string_view key, std::s
 	{
 		m_currentPack->license = Strings::UnquoteCopy(value);
 	}
-	else if (key == "RuntimeBlocker")
+	else if (key == "GameBlocker")
 	{
-		m_currentPack->runtimeBlocker = Strings::UnquoteCopy(value);
+		m_currentPack->gameBlocker = Strings::UnquoteCopy(value);
 	}
 	else if (key == "DownloadBlocker")
 	{
@@ -281,9 +281,9 @@ void ProjectLevelCatalogReader::ParseAssetPackField(std::string_view key, std::s
 	{
 		m_currentPack->downloadSupported = ParseBool(value);
 	}
-	else if (key == "RuntimeSupported")
+	else if (key == "GameSupported")
 	{
-		m_currentPack->runtimeSupported = ParseBool(value);
+		m_currentPack->gameSupported = ParseBool(value);
 	}
 	else
 	{
@@ -315,7 +315,7 @@ void ProjectLevelCatalogReader::ValidateCurrentSection() const
 		requireField("Required");
 		requireField("External");
 		requireField("DownloadSupported");
-		requireField("RuntimeSupported");
+		requireField("GameSupported");
 	}
 }
 

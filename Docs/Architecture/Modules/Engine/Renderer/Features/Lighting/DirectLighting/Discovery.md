@@ -124,7 +124,7 @@ Every row is independently reviewed. `Proposed` means the documents contain a ca
 | `DIR-D0-09` | Inline, Pipeline and any separately admitted non-ray provider | finite-segment/alpha/two-sided parity and injected capability failures | ray semantics / RHI reviewers | Open | provider support matrix cannot be promoted |
 | `DIR-D0-10` | portable signal/filter plus optional DLSS RR | raw/guide contract, motion/disocclusion A/B and failure behavior | reconstruction owner / product reviewer | Open | no product-quality reconstructed claim |
 | `DIR-D0-11` | measured profile budgets and queue placement | fixed workload quality/rays/time/memory/replacement curves | performance owner / platform reviewers | Open | no default profile or performance promise |
-| `DIR-D0-12` | recommended/strict settings, status/reasons, debug/capture route | [UX](UserExperience.md) dry run, automation/accessibility/failure matrix | editor/runtime owners / artist and automation reviewers | Open | no durable public workflow |
+| `DIR-D0-12` | recommended/strict settings, status/reasons, debug/capture route | [UX](UserExperience.md) dry run, automation/accessibility/failure matrix | editor/game owners / artist and automation reviewers | Open | no durable public workflow |
 | `DIR-D0-13` | private feature home, exact hooks/deletions, bounded oracle retention | source/build graph, hook ledger, bounded-removal and stale-symbol audit | Renderer architecture / module owner | Open | Stage 1 file scope not authorized |
 | `DIR-D0-14` | metrics, masks, fixtures, hardware/backends and artifact schema | frozen candidate manifest, acceptance/check trace and FCR owner review | verification / `FCR-REN-06` owner | Open | no candidate may receive a pass verdict |
 

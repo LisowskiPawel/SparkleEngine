@@ -203,7 +203,7 @@ Reset/disable immediately publishes a neutral request whose older non-neutral pr
 | --- | --- |
 | D3D12 / Vulkan | identical math and typed binding; native validation and raw comparison |
 | SDR / HDR10 | same model over explicitly named target-linear domain; separate acceptance cells |
-| Editor / packaged Runtime | same resolved values and shader; editor authoring is development-only unless product scope says otherwise |
+| Editor / packaged Game | same resolved values and shader; editor authoring is development-only unless product scope says otherwise |
 | viewport/capture | output extent and product generation remain coherent; metadata names active state |
 | local volumes, spectral LUT, quality tiers, history | excluded and not selectable |
 
@@ -256,7 +256,7 @@ Extend the current display settings, View resolution, post-processing graph, sha
 | DevelopmentEditor D3D12 SDR | first use, CPU/GPU patterns, state/failure, capture, cost | absent |
 | DevelopmentEditor Vulkan SDR | same plus raw parity/native validation | absent |
 | admitted HDR target-linear D3D12/Vulkan | named domain and matched coordinate/filter/stage evidence | HDR output and effect absent |
-| packaged Runtime cells | cooked/configured values, program reachability, clean-machine operation | absent |
+| packaged Game cells | cooked/configured values, program reachability, clean-machine operation | absent |
 | neutral/invalid/minimized | graph omission and truthful result | absent |
 | two views/resize/subrect/DPI | isolation and immutable frame geometry | absent |
 | exact debug/UI/capture | bypass/composition/alpha/product lineage | absent |

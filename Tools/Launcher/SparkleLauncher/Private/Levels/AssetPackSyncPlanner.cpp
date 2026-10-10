@@ -59,9 +59,9 @@ namespace SparkleLauncher
 			}
 
 			const ProjectAssetPack& pack = m_catalog.assetPacks.at(level.assetPackId);
-			if (!pack.runtimeSupported)
+			if (!pack.gameSupported)
 			{
-				throw Diagnostics::Error("Selected level '" + level.id + "' requires runtime-unsupported asset pack '" + pack.id + "': " + pack.runtimeBlocker);
+				throw Diagnostics::Error("Selected level '" + level.id + "' requires game-unsupported asset pack '" + pack.id + "': " + pack.gameBlocker);
 			}
 			AppendPackAndParents(pack);
 		}

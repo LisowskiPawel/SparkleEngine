@@ -52,7 +52,7 @@ AssetCookerServiceResult AssetCookerService::Cook(const char* projectName, const
 	const std::string resolvedToolProfile = ResolveToolProfile(*expectedToolProfile);
 	if (resolvedToolProfile != *expectedToolProfile)
 	{
-		diagnostics.AddError(AssetCookerCategory::All, "Tool profile '" + resolvedToolProfile + "' does not match runtime profile '" + resolvedConfiguration + "'.");
+		diagnostics.AddError(AssetCookerCategory::All, "Tool profile '" + resolvedToolProfile + "' does not match game profile '" + resolvedConfiguration + "'.");
 		return Finish(false, diagnostics);
 	}
 

@@ -46,7 +46,7 @@ Included:
 - current owner, selector, source/cook/runtime asset, frame-graph, shader, View, capture, package, backend, lifetime, and failure traces;
 - a strict `.cube` subset with byte, line, token, dimension, sample-count, allocation, numeric, and path/provenance limits;
 - exact CPU/GPU semantic correspondence, asymmetric fixtures, raw-stage artifacts, and a defect-injection oracle ladder;
-- DevelopmentEditor authoring and packaged Runtime consumption with one serialized intent and truthful requested/resolved/active state;
+- DevelopmentEditor authoring and packaged Game consumption with one serialized intent and truthful requested/resolved/active state;
 - a dependency-ordered clean-break plan with estimates, stop rules, deletion targets, reviewers, and candidate handoff.
 
 Excluded:

@@ -12,7 +12,7 @@ These standards add rules for a particular implementation domain. Read the docum
 | Renderer feature -> native GPU command/resource | Renderer + RHI |
 | task graph -> owning subsystem publication | Tasks + the producing module |
 | editor intent -> world/settings/render result | Editor + affected GameFramework/Renderer owner |
-| source asset -> cooked/runtime product | Tools + consuming GameFramework/Renderer/RHI owner |
+| source asset -> cooked/game product | Tools + consuming GameFramework/Renderer/RHI owner |
 
 Module rules compose; selecting the primary owner does not waive the rules of another boundary the data or lifetime actually crosses.
 

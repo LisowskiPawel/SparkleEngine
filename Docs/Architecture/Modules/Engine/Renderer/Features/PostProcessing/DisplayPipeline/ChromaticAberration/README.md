@@ -56,8 +56,8 @@ The claim excludes physical lens calibration, wavelength transport, spectral sen
 | --- | --- | --- | --- |
 | DevelopmentEditor D3D12 | global/default and per-view | target when active | full semantic, workflow, capture, failure, and cost evidence |
 | DevelopmentEditor Vulkan | same contract | target when active | same plus raw backend comparison and native validation |
-| packaged Runtime D3D12 | cooked/configured values only if product scope admits them | target | dependency/configuration reachability and clean-machine result |
-| packaged Runtime Vulkan | same if release backend is admitted | target | package plus backend evidence |
+| packaged Game D3D12 | cooked/configured values only if product scope admits them | target | dependency/configuration reachability and clean-machine result |
+| packaged Game Vulkan | same if release backend is admitted | target | package plus backend evidence |
 | SDR / HDR output | one effect model over explicitly named target-linear domains | separate matrix cells | matched coordinate behavior and correct stage/product lineage |
 | exact debug views | no artistic distortion unless Debug Views explicitly owns an exception | bypass target | selector/topology/capture proof |
 | UI | no distortion | downstream composition | alpha/UI sentinel capture |

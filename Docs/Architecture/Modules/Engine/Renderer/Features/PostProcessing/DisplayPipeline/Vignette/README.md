@@ -22,7 +22,7 @@ The user can enable a basic vignette, adjust its intensity and inner radius, res
 | Mask | `w = smoothstep(innerRadius, 1, r)`; `RGB_out = RGB_in * (1 - intensity * w)`. Copy alpha unchanged. No sampling beyond the input pixel and no new history. |
 | Neutral state | Intensity zero schedules no effect pass/resource/copy; its output is the same input product. The image must be bit-identical to the disabled route. |
 | Composition | Multiplication applies once in the declared linear domain. No metering, DLSS guide, raw reference, HUD or UI darkening. Chromatic aberration retains its own coordinates and alpha policy. |
-| Ownership | Renderer-private display feature owns pixel policy/parameters and typed frame-graph pass. Existing settings authority owns values; Application owns persistence; Editor/runtime settings presenters own controls only. No native API or feature policy enters generic graph/host code. |
+| Ownership | Renderer-private display feature owns pixel policy/parameters and typed frame-graph pass. Existing settings authority owns values; Application owns persistence; Editor/game settings presenters own controls only. No native API or feature policy enters generic graph/host code. |
 
 The formula and placement are proposed design choices, not SDK facts. Before code, freeze formats, dispatch coverage, floating-point tolerances, supported extent/aspect range, HDR treatment and pass-cost budget in this owner using the existing display-domain contract. Do not choose thresholds after seeing candidate results.
 

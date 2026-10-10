@@ -20,7 +20,7 @@ namespace SparkleLauncher
 		QString UnsupportedReason;
 		bool Selected = false;
 		bool SourceReady = false;
-		bool RuntimeSupported = true;
+		bool GameSupported = true;
 		bool Ready = false;
 		bool CanSelect = true;
 		bool CanSync = false;

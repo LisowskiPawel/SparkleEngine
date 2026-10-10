@@ -112,7 +112,7 @@ namespace SparkleLauncher
 		BuildWorkspace,
 		CompileLauncher,
 		CompileEditor,
-		CompileRuntime,
+		CompileGame,
 		BuildCookTools,
 		InstallHostTool
 	};
@@ -120,7 +120,7 @@ namespace SparkleLauncher
 	enum class BuildWorkspaceScope : std::uint8_t
 	{
 		Editor,
-		Runtime,
+		Game,
 		CookTools,
 		Launcher
 	};
@@ -140,10 +140,10 @@ namespace SparkleLauncher
 		std::filesystem::path RepositoryRoot;
 		std::string ContentId = kDefaultContentId;
 		std::string EditorProfile = "DevelopmentEditor";
-		std::string RuntimeProfile = "DevelopmentGame";
+		std::string GameProfile = "DevelopmentGame";
 		WorkspaceIde PreferredIde = WorkspaceIde::VisualStudio;
 		WorkspaceCompiler Compiler = WorkspaceCompiler::Msvc;
-		std::vector<BuildWorkspaceScope> SelectedScopes = {BuildWorkspaceScope::Editor, BuildWorkspaceScope::Runtime, BuildWorkspaceScope::CookTools};
+		std::vector<BuildWorkspaceScope> SelectedScopes = {BuildWorkspaceScope::Editor, BuildWorkspaceScope::Game, BuildWorkspaceScope::CookTools};
 		std::vector<std::string> SelectedTargets;
 		std::string SourceDependencyId;
 		std::string HostToolId;

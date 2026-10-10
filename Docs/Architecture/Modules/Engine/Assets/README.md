@@ -2,7 +2,7 @@
 
 **Status:** capability snapshot; current source corpus, not proof of cooked or packaged inclusion
 
-**Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; tracked `Engine/Assets` files and their known compiler/cooker/runtime consumers inspected; evidence `S` only
+**Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; tracked `Engine/Assets` files and their known compiler/cooker/game consumers inspected; evidence `S` only
 
 **Scope:** engine-owned shader source, default textures, sky environments, and small geometry fixtures
 
@@ -10,7 +10,7 @@
 
 **Evidence and disposition:** [Capability Evidence Plan](../../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../../Acceptance/FirstRelease.md)
 
-`Engine/Assets` is a source corpus, not a C++ module or asset-manager implementation. Its capabilities are useful only when the corresponding cook and runtime consumer are present.
+`Engine/Assets` is a source corpus, not a C++ module or asset-manager implementation. Its capabilities are useful only when the corresponding cook and game consumer are present.
 
 **Current readiness:** **45/100** — the source corpus and consumers exist; release allowlist, provenance, corrupt/missing behavior, cooked identity, and package proof remain open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#foundation-world-content-shaders-and-tools).
 

@@ -14,7 +14,7 @@
 class SPARKLE_CORE_API ConsoleSession final : public ConsoleOutputSink
 {
 public:
-	ConsoleSession(ConsoleCommandRegistry& commandRegistry, ConsoleCommandScope scope = ConsoleCommandScope::Runtime);
+	ConsoleSession(ConsoleCommandRegistry& commandRegistry, ConsoleCommandScope scope = ConsoleCommandScope::Game);
 
 	void SubmitLine(std::string_view line);
 	std::vector<std::string> CompleteLine(std::string_view line) const;
@@ -41,7 +41,7 @@ private:
 	static constexpr std::size_t kMaxOutputRecords = 512;
 
 	ConsoleCommandRegistry* m_commandRegistry = nullptr;
-	ConsoleCommandScope m_scope = ConsoleCommandScope::Runtime;
+	ConsoleCommandScope m_scope = ConsoleCommandScope::Game;
 	ConsoleHistoryBuffer m_history;
 	std::vector<ConsoleOutputRecord> m_outputRecords;
 };

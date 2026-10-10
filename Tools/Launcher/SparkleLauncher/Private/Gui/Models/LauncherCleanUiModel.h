@@ -26,7 +26,7 @@ namespace SparkleLauncher
 		QString OperationId;
 		QString ContentId;
 		QString EditorProfile;
-		QString RuntimeProfile;
+		QString GameProfile;
 		QString BuildScopes;
 		QString CookScopes;
 		QString SelectedTargets;

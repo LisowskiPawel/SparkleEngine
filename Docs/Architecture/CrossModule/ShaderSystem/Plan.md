@@ -121,7 +121,7 @@ No former RT task is deferred back to the target-state document:
 | --- | --- | --- |
 | freeze RT contract/current baseline | Phase 0 | one inventory and provenance authority covers shader, inline query, compiler-only metadata, RHI/backend absence, effects, and final blocked claims |
 | graphics-state ownership and materialization | Phase 5 | final map-backed shader references, graph attachments, mesh/material facts, and pass state replace the caller aggregate before RT adds another pipeline kind |
-| complete RT-library compiler toolchain | Phase 6 | implementing it against the Phase 4-deleted package schema would be throwaway work; final map/library records land with their first runtime consumer |
+| complete RT-library compiler toolchain | Phase 6 | implementing it against the Phase 4-deleted package schema would be throwaway work; final map/library records land with their first game consumer |
 | backend-neutral RT contract | Phase 6 | a public contract with no paired backend/graph consumer would be a disabled placeholder |
 | D3D12/Vulkan native pipelines and tables | Phase 6 | both backends, neutral arithmetic, and all-stage sentinels form one honest capability gate |
 | frame graph/runtime cache/lifetime | Phase 6 | native execution cannot bypass graph/resource/generation ownership even temporarily |
@@ -427,7 +427,7 @@ Suggested title: `Shader Tools: deliver Apply Changed and shader-to-GPU provenan
 #### Phase exit criteria
 
 - Repository-wide exact searches return zero definitions/uses/build entries/generated records/frontend fields/current-doc endorsements for every phase-owned rejected spelling, including all package/pass-wrapper/dual-name/source-path/AS-variant/fallback/ambiguous-capability/graphics-state/eager-variant/native-bypass spellings.
-- Semantic searches and bidirectional traces prove no equivalent survives under a rename: each user-authored fact has one authority, each generated fact has one derivation, and each runtime product has one materialization/publication/retirement route.
+- Semantic searches and bidirectional traces prove no equivalent survives under a rename: each user-authored fact has one authority, each generated fact has one derivation, and each game product has one materialization/publication/retirement route.
 - `RasterPassRenderState` remains narrow, attachments remain authoritative, prepared mesh work owns geometry/topology, the complete graphics descriptor is internal, and exact requested pipelines are the only materialized variants. No backend default silently changes declared semantics.
 - Shader and RT routes have no package/program/duplicate parameter/parallel registry or generation path; both frontend mechanisms share the intended shader/map/scene concepts and the automatic resolver schedules one real producer. Missing mandatory work fails before graph scheduling.
 - Application/Editor/CLI expose semantic intent and bounded state only; package paths, artifact directories, native handles, cache controls, per-shader implementation tables, and duplicate operation truth are absent.

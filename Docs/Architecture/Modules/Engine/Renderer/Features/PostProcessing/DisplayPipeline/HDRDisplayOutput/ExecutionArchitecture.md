@@ -366,7 +366,7 @@ Add one neutral RHI presentation contract and extend both backends; do not creat
 | monitor move/straddle/hotplug/OS toggle | event-driven facts invalidation, generation join, bounded revalidation/fallback | absent |
 | resize/fullscreen/minimize/suspend/device/interposer | transaction/rollback/retirement/no-loop evidence | absent |
 | DevelopmentEditor UI composition | admitted profile/alpha/interposer route and SDR-white mapping | unresolved/absent |
-| packaged Runtime D3D12/Vulkan | exact config/dependencies/profile activation and clean-machine fallback | absent |
+| packaged Game D3D12/Vulkan | exact config/dependencies/profile activation and clean-machine fallback | absent |
 | raw/native/compositor/external evidence | class-specific manifests/oracles and limitations | absent |
 | excluded HLG/Dolby/dynamic metadata/calibration/export/non-Windows/player controls | no selectors/types/shaders/native/package claims | must remain absent |
 

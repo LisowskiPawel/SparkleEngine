@@ -10,7 +10,7 @@ Use this contract to decide whether exact release bytes may ship. Make product c
 
 ## Current FR-01 Blockers
 
-**Iteration:** `ITER-REL-01-03`, 2026-10-10. Candidate: `d1c8c5b2a61768a0460983c854264380d5c1f6dc` plus the retained worktree patch. This supersedes the moving-Git-input and absent-source-version findings in the earlier audits below; it does not close either release gate.
+**Identity/rights audit:** `ITER-REL-01-03`, 2026-10-10. Candidate: `d1c8c5b2a61768a0460983c854264380d5c1f6dc` plus the retained worktree patch. This supersedes the moving-Git-input and absent-source-version findings in the earlier audits below; it does not close either release gate.
 
 | Item | Result / next action |
 | --- | --- |
@@ -20,9 +20,9 @@ Use this contract to decide whether exact release bytes may ship. Make product c
 | Modern Sponza | **BLOCKED:** Base and Curtains embed narrower use wording alongside CC BY 4.0. Obtain an exact grant/clarification covering the approved public Sparkle distribution, or approve replacement/removal of these assets. The current Intel landing page alone does not resolve the retained notices. |
 | Classic Sponza | **BLOCKED:** the pinned Khronos license reference redirects to a mutable CRYENGINE agreement. Retain an asset-specific grant applicable to this exact conversion and use; do not treat the engine agreement or a historical availability statement as that receipt. |
 | Cornell Box | **BLOCKED:** reacquisition of the catalog's exact archive still returns HTTP 406. Recover the 224,880-byte archive with SHA-256 `f27eaf47afec74b5236ce3095ac02d4256e8ac8610bfdb5a53560c67c2e0d8f1`, retain its embedded notice, and verify the local conversion against it. |
-| `REL-01` / `REL-02` | **BLOCKED:** rights/receipt closure, qualified payloads and a clean candidate baseline remain open. Shell map/product/backend selection is still unavailable. No seven-map cook/runtime, fresh-checkout gate automation or performance result is claimed. |
+| `REL-01` / `REL-02` | **BLOCKED:** rights/receipt closure, qualified payloads and a clean candidate baseline remain open. Shell map/product/backend selection and owner-gate invocation now exist; see [the Game naming iteration](ReleaseScope/Evidence.md#editorgame-naming-iter-game-naming-01). No clean seven-map cook/runtime or performance result is claimed. |
 
-**Receipts:** `build/validation/fr01-blocker-fixes-20261010/` retains before hashes, upstream tag responses, dependency negative controls, DLL identities/signatures, build/style logs, commands and candidate hashes. Temporary validation fixtures are removed. Earlier audits below are historical; use this table for remaining work.
+**Receipts:** `build/validation/fr01-blocker-fixes-20261010/` retains before hashes, upstream tag responses, dependency negative controls, DLL identities/signatures, build/style logs, commands and candidate hashes. Temporary validation fixtures are removed. Earlier audits below are historical; use this table for remaining work. Product terminology and navigable source links are normalized to Editor/Game; retained historical command/log receipts preserve the names actually observed.
 
 ## Read This Page
 
@@ -161,21 +161,21 @@ All three main products are required binary outputs. Launcher selects and syncs 
 
 ### Frozen Product And Output Classification
 
-The release-owner amendment replaces the earlier runtime-only PD-0 freeze. Public names are Sparkle Launcher, Sparkle Editor and Sparkle Game. Current source targets remain unchanged by this documentation decision; bind public names to exact files/configurations in the package manifest. Approved format/platform/privacy choices are recorded in [Release Scope](ReleaseScope/README.md#approval-and-next-work).
+The release-owner amendment replaces the earlier Game-only PD-0 freeze. Public names are Sparkle Launcher, Sparkle Editor and Sparkle Game. Current source targets are `SparkleLauncher`, `ShowcaseEditor` and `ShowcaseGame`; bind public names to exact files/configurations in the package manifest. Approved format/platform/privacy choices are recorded in [Release Scope](ReleaseScope/README.md#approval-and-next-work).
 
 | Product or output | Classification | Exact `v0.1.0` boundary |
 | --- | --- | --- |
-| Sparkle Game and cleared cooked Showcase content | **Included** | Runtime product, currently `ShowcaseRuntime` in `ShippingGame`. Built-in Empty starts without example downloads; the seven selected maps require complete verified content closure before activation. |
-| Showcase project source, catalog, and authored levels | **Included** | Part of the immutable source tag/archive and the source-adopter route; only cleared runtime products enter the binary archive. |
+| Sparkle Game and cleared cooked Showcase content | **Included** | Game product, currently `ShowcaseGame` in `ShippingGame`. Built-in Empty starts without example downloads; the seven selected maps require complete verified content closure before activation. |
+| Showcase project source, catalog, and authored levels | **Included** | Part of the immutable source tag/archive and the source-adopter route; only cleared game products enter the binary archive. |
 | Sparkle Launcher | **Included** | Shipped selection/sync/launch frontend over the existing operation owners. All seven release maps and required features must be deliverable; other choices are development or unavailable. Launcher does not own package policy. |
 | Sparkle Editor | **Included** | Shipped authoring/inspection product, currently `ShowcaseEditor` using `SparkleEditor`. Its clean-machine workspace/edit/settings/capture and required tool routes must pass; Game retains structural Editor isolation. |
 | ShaderCompiler, AssetCooker, texture/mesh/material/scene cookers, SourceImporters, and ToolConsoleSupport | **Bounded helper membership pending** | Source routes remain Included. Ship only exact redistributable helpers required by admitted Launcher/Editor operations, qualified without hidden SDK/repository prerequisites; alternatively acquire verified cooked content. No standalone tool/SDK product is promised. |
 | Immutable tagged source tree | **Included** | Public source-adopter output with unstable `0.y.z` source API, no binary ABI promise, and no installed integration contract. |
 | `SparkleEngine-v0.1.0-windows-x64.zip` | **Included; format approved** | Three-product portable bundle with immutable product bytes and separately verified user-selected content. Game/Editor run offline after sync; archive/store membership must be frozen before REL-03. |
-| `SparkleEngine-v0.1.0-symbols.zip` | **Included, separate** | Exact-candidate native and shader symbols retained or published under the local-diagnostics/privacy decision; never mixed into the runtime archive. |
+| `SparkleEngine-v0.1.0-symbols.zip` | **Included, separate** | Exact-candidate native and shader symbols retained or published under the local-diagnostics/privacy decision; never mixed into the Game archive. |
 | Installer, updater, registry integration, file associations, and prerequisite bootstrapper | **Excluded** | The user extracts/removes the portable archive. Launcher is included; no installer or prerequisite bootstrapper is implied. |
 | Binary SDK, plugin ABI, installed headers/libraries, templates, or redistributable development kit | **Excluded** | Public source headers are not an SDK. No compatibility, installation, or external binary-link promise exists for `v0.1.0`. |
-| Runtime/editor developer console, shader recook, capture/debug panels, and authoring commands in `ShippingGame` | **Excluded** | They must be unreachable and absent from the runtime package/import surface; a consumer quit/settings/help path cannot depend on them. |
+| Game/editor developer console, shader recook, capture/debug panels, and authoring commands in `ShippingGame` | **Excluded** | They must be unreachable and absent from the runtime package/import surface; a consumer quit/settings/help path cannot depend on them. |
 
 No requested product is classified **Removed** at `PD-0`. `Removed` remains the required disposition for a later-discovered reachable product or claim that has neither an admitted audience nor an owner; it may not be relabelled Developer-only to avoid deletion.
 
@@ -197,14 +197,14 @@ The release owner selected this existing laptop as both `MIN-01` and `REF-01` on
 
 ### Frozen Paths, Mutation Boundary, And Budgets
 
-The prior runtime layout identifies the current `bin/ShowcaseRuntime.exe` path, but it is no longer the complete release allowlist. Freeze separate Launcher, Editor and Game components, exact executables/configurations/helpers, a writable selected-content store outside the immutable extraction, and manifest-owned discovery before REL-03. Keep `manifests/sparkle-package-manifest.json`, notices and documentation authoritative; never infer membership by scanning development artifacts. Public source entry and support paths are repository-root `README.md`, `Docs/README.md`, `SUPPORT.md`, and `SECURITY.md`; these are approved public entry/policy paths. Publish self-service onboarding and a truthful no-support statement; private security intake is not a release promise. Missing onboarding/privacy instructions block the journey; absence of an intake service alone does not.
+The prior runtime layout identifies the current `bin/ShowcaseGame.exe` path, but it is no longer the complete release allowlist. Freeze separate Launcher, Editor and Game components, exact executables/configurations/helpers, a writable selected-content store outside the immutable extraction, and manifest-owned discovery before REL-03. Keep `manifests/sparkle-package-manifest.json`, notices and documentation authoritative; never infer membership by scanning development artifacts. Public source entry and support paths are repository-root `README.md`, `Docs/README.md`, `SUPPORT.md`, and `SECURITY.md`; these are approved public entry/policy paths. Publish self-service onboarding and a truthful no-support statement; private security intake is not a release promise. Missing onboarding/privacy instructions block the journey; absence of an intake service alone does not.
 
 | State or operation | Frozen location/effect |
 | --- | --- |
-| Runtime immutable bytes | User-selected extraction root; read-only operation must succeed. Game/Editor do not modify extraction bytes; Launcher writes selected content only to the separately frozen verified content store. |
-| Runtime mutable root | `%LOCALAPPDATA%\SparkleEngine\Showcase\v0.1\` |
+| Game immutable bytes | User-selected extraction root; read-only operation must succeed. Game/Editor do not modify extraction bytes; Launcher writes selected content only to the separately frozen verified content store. |
+| Game mutable root | `%LOCALAPPDATA%\SparkleEngine\Showcase\v0.1\` |
 | Runtime settings | `Settings\EngineRendering.ini`; shipped `Config\DefaultEngine.ini` remains immutable, user values overlay it, and writes affect only the per-user file. **Reset settings** affects only this file and returns documented defaults. |
-| Runtime logs/captures/crashes/cache | `Logs\`, `Captures\`, `Crashes\`, and `Cache\` below the mutable root; each has a separate retention/clear action. No `v0.1.0` save-game product exists. |
+| Game logs/captures/crashes/cache | `Logs\`, `Captures\`, `Crashes\`, and `Cache\` below the mutable root; each has a separate retention/clear action. No `v0.1.0` save-game product exists. |
 | Launcher state | `%LOCALAPPDATA%\SparkleEngine\LauncherState\<repository-key>\{Settings.json,Activity.json,Logs\}`; current source route is repository-keyed; the packaged route must bind state to its verified installation/content context without requiring a source checkout. |
 | Source build/cook products | Repository-owned `build\` and `artifacts\`; development mutable state uses the repository-keyed `%LOCALAPPDATA%` root. Editor **Save All** may change the explicitly selected authored `.level` source, while clean/recook/reset may change only previewed generated roots. |
 | Remove runtime | Delete the extracted immutable root; user state remains until the user invokes the separately labelled data-removal action. |
@@ -213,15 +213,15 @@ The prior runtime layout identifies the current `bin/ShowcaseRuntime.exe` path, 
 | --- | --- |
 | First interactive consumer surface | At most 15.0 s from process creation to responsive intentional UI on the minimum machine with cold OS file cache. Deliberate built-in Empty is valid; a developer console or failed-map fallback is not. |
 | Default accepted example active | At most 30.0 s from explicit selection to published active-level identity and first correct presented frame; any other `ReleaseMapSet` member has a 60.0 s ceiling. |
-| Shutdown/cancellation | Runtime exits within 5.0 s of quit/close; Editor and Launcher settle owned child/task work within 10.0 s after explicit cancellation/close. |
-| Runtime bytes/storage | Runtime archive at most 4 GiB; extracted immutable tree at most 8 GiB; documented free-space prerequisite 16 GiB. |
+| Shutdown/cancellation | Game exits within 5.0 s of quit/close; Editor and Launcher settle owned child/task work within 10.0 s after explicit cancellation/close. |
+| Game bytes/storage | Game archive at most 4 GiB; extracted immutable tree at most 8 GiB; documented free-space prerequisite 16 GiB. |
 | Runtime memory | Process committed-memory high-water at most 12 GiB and tracked local GPU-memory high-water at most 7 GiB on the minimum machine; no unbounded growth across the stability loop. |
 | Runtime frame rate | Use the existing [30 FPS release floor](#thirty-fps-performance-floor); this row does not weaken its p95/p99, hitch, or measurement rules. |
 | Source-adopter cold/warm route | Cold sync/configure/build/cook at most 120 min, warm no-change replay at most 15 min, peak system memory at most 32 GiB, and owned working storage at most 100 GiB on the supported source machine. |
 | Launcher local planning | A non-network readiness/preflight refresh completes within 5.0 s; external process/download time is reported separately and never converted into ready/success. |
 | User support | **None offered.** No acknowledgement, fix, security-response deadline or maintained-version window. Publish known issues, local diagnostic/privacy instructions and self-service recovery; release review is a finite maintainer task. |
 
-Product/release scope is owned by the release owner; Application/Showcase own the runtime journey; Build And Packaging owns source/package orchestration; Launcher and Editor own their shipped workflows; release delivery owns truthful no-support/privacy documentation, candidate symbols, release review and any versioned replacement/withdrawal. No staffed public channels or ongoing service are required or claimed.
+Product/release scope is owned by the release owner; Application/Showcase own the Game journey; Build And Packaging owns source/package orchestration; Launcher and Editor own their shipped workflows; release delivery owns truthful no-support/privacy documentation, candidate symbols, release review and any versioned replacement/withdrawal. No staffed public channels or ongoing service are required or claimed.
 
 ## Release Audiences
 
@@ -230,7 +230,7 @@ Calling this an engine release creates two required acceptance paths. Passing on
 | Audience | Required promise | Required shortest journey |
 | --- | --- | --- |
 | Product user | All three packaged products start without source/build prerequisites; Launcher acquires only selected cleared content, and Editor/Game run offline once it is synced. | Download -> verify -> extract -> start Launcher -> choose Empty or select/sync a map -> launch Editor/Game -> inspect controls/settings -> exit -> remove. |
-| Source adopter | The tagged source can produce the documented engine, tools, cooked content, and Showcase runtime using only public prerequisites and instructions. | Clone/download -> verify dependencies -> configure -> build -> cook -> run one example -> locate architecture/API stability/support policy. |
+| Source adopter | The tagged source can produce the documented engine, tools, cooked content, and Showcase Game using only public prerequisites and instructions. | Clone/download -> verify dependencies -> configure -> build -> cook -> run one example -> locate architecture/API stability/support policy. |
 | Contributor | Contribution workflow is discoverable and failures are actionable. | Optional for `v0.1.0`; if advertised, it receives its own accepted workflow. |
 | Binary SDK/plugin consumer | Stable installed headers, libraries, ABI, samples, and compatibility rules. | Excluded from `v0.1.0` unless explicitly added and proven; exported C++ symbols alone are not an SDK. |
 
@@ -282,10 +282,10 @@ Audit basis: static source/build/document inspection of committed `master` at `8
 | Release area | Current source-inspected state | Release status and consequence |
 | --- | --- | --- |
 | Product identity | The CMake project has no declared version, the root license retains `[year] [fullname]`, no root README exists, and no Windows version-resource file was found. | `Blocked`: freeze name, semantic version, publisher, license, support promise, and executable metadata. |
-| Build profiles | `DevelopmentEditor`, `DevelopmentGame`, `DebugEditor`, `DebugGame`, `ShippingEditor`, and `ShippingGame` profiles exist. Showcase editor/runtime and launcher executable targets exist. | `Source present`: a profile name is not a reproducible release build. |
+| Build profiles | `DevelopmentEditor`, `DevelopmentGame`, `DebugEditor`, `DebugGame`, `ShippingEditor`, and `ShippingGame` profiles exist. Showcase editor/game and launcher executable targets exist. | `Source present`: a profile name is not a reproducible release build. |
 | Package discovery | Runtime source recognizes `manifests/sparkle-package-manifest.json`. | `Source present`: no owned CMake `install()` rules, CPack configuration, staging contract, or produced release archive was found. |
 | Package writable state | Package mode resolves logs, captures, settings, crashes, cache, and any shader-symbol cache beneath `%LOCALAPPDATA%\SparkleEngine\Showcase\v0.1\`; shipped `Config/DefaultEngine.ini` is read-only and user settings overlay it. | `Source present`: the ownership defect is removed, but read-only extraction, standard-user operation, retention/reset, and packaged-run evidence remain required. |
-| Consumer first run | The runtime defaults to `Empty`; startup-map selection is environment-driven, the launcher owns discoverable per-level run actions, and the runtime console option defaults enabled. | `Blocked`: freeze one consumer-safe first-run, example-selection, controls/help, settings/reset, and quit path. Do not expose development console/tool operations accidentally. |
+| Consumer first run | The runtime defaults to `Empty`; startup-map selection is environment-driven, the launcher owns discoverable per-level run actions, and the game console option defaults enabled. | `Blocked`: freeze one consumer-safe first-run, example-selection, controls/help, settings/reset, and quit path. Do not expose development console/tool operations accidentally. |
 | Missing-content behavior | Catalog/load failures can fall back to the built-in `Empty` level. | `Blocked`: a required packaged map, catalog, shader, or content failure must not masquerade as a successful empty scene. Reserve fallback only for an explicitly requested recovery path. |
 | Core/platform/tasks | Platform, application, task, filesystem, logging, input, and lifecycle owners exist. | `Source present`: standard-user paths, shutdown, cancellation, resize, and repeated-run behavior remain unproven as release claims. |
 | RHI | D3D12 and Vulkan implementations, native validation switches, timing, capture, and ray-tracing paths exist. | `Source present`: native validation cleanliness, capability failure, resource lifetime, and device-removal behavior require evidence. |
@@ -315,14 +315,14 @@ The static scan found the following closure families. The [Current Capability In
 
 | Family | Source-present surfaces to classify |
 | --- | --- |
-| Build and products | Six build profiles; shared engine DLLs; Showcase editor/runtime; launcher; import, cook, shader, and support tools; dependency/runtime staging. |
+| Build and products | Six build profiles; shared engine DLLs; Showcase editor/game; launcher; import, cook, shader, and support tools; dependency/runtime staging. |
 | Core, platform, and tasks | Math/memory/events/logging; filesystem/project discovery; Win32 window/input/focus; task graph, scopes, events, parallel-for, workers, cancellation, and profiling hooks. |
 | World and scene | Entity/component/world ownership; transforms; cameras; directional/point/spot/rect lights; sky; static/skeletal meshes; materials; animation/skinning/morph data; level parsing/loading/session and cooked registries. |
 | RHI and presentation | D3D12 and Vulkan devices, queues, resources, descriptors, bindings, command lists, swapchain/presentation, frame latency, timestamps, captures, classic/partitioned TLAS, inline ray queries, and native ray-tracing pipelines. |
 | Renderer | Scene/view/frame submission; persistent GPU scene and caches; scene depth/GBuffer; deferred PBR; sky; direct lighting/shadows; lighting composite; exposure; tone mapping; output encoding; buffer visualization; linear upscaling; DLSS SR/RR provider routes; ray-traced GBuffer; path-traced direct/indirect; reference accumulation; direct/indirect ReSTIR routes. Mandatory target rows cover deferred decals, Color Grading, Chromatic Aberration, and HDR10 display output; explicit excluded rows cover Volumetric Lighting and Frame Generation. |
-| Editor and application | Editor viewport/session/camera; rendering/upscaling settings; scene selection/transactions; viewport capture; UI frame; runtime/editor hosts; shader source-change and recook coordination. |
+| Editor and application | Editor viewport/session/camera; rendering/upscaling settings; scene selection/transactions; viewport capture; UI frame; game/editor hosts; shader source-change and recook coordination. |
 | Import and cooking | Source importers; scene, mesh, material, texture, and asset cookers; texture decoding/shape/mips/channels/BC compression; cooked scene/mesh/material/texture/animation/skeleton/shader products. |
-| Launcher | Toolchain/source discovery; configure/build/cook; level catalog and asset-pack sync; editor/runtime launch; progress/cancel/failure; maintenance and clean operations. |
+| Launcher | Toolchain/source discovery; configure/build/cook; level catalog and asset-pack sync; editor/game launch; progress/cancel/failure; maintenance and clean operations. |
 | Project and content | Showcase configurations, 16 catalog level records, built-in assets, external pack recipes, level thumbnails/descriptions, and startup-level selection. |
 | Documentation and delivery | Architecture/standards/workload routes; package discovery manifest; user quick start, requirements, notices, package/readme, support, crash handling, checksums, and release publication. |
 
@@ -338,7 +338,7 @@ The current [scope proposal](ReleaseScope/README.md) supplies that record, with 
 
 - public product name, version, platform, architecture, minimum Windows version, and supported GPU/API matrix;
 - minimum and reference CPU, memory, GPU, driver, and storage configurations;
-- the exact runtime executable and default graphics configuration;
+- the exact Game executable and default graphics configuration;
 - required audiences, supported source toolchain, public API/ABI stability, persisted-data compatibility, reset, update, downgrade, and side-by-side-install policy;
 - every selectable render mode, debug view, upscaler, lighting path, post-processing stage, presentation path, and backend as `Included`, `Experimental`, or `Excluded`; deferred decals, Color Grading, Chromatic Aberration, and HDR10 output are required `Included` results, while Frame Generation and Volumetric Lighting remain explicit exclusions;
 - the `ReleaseMapSet`, meaningful first-run/default map, consumer map-selection path, fixed cameras/routes, and redistribution disposition;
@@ -426,7 +426,7 @@ The engine-adopter journey is accepted separately from the binary package:
 - every fetched dependency is pinned to an immutable commit or archive hash, appears in the dependency/provenance inventory, and has a resolved license/notice disposition;
 - the documented Windows, compiler, SDK, CMake, generator, Git, Qt, Vulkan, and optional-vendor prerequisites distinguish required, optional, and auto-fetched inputs;
 - an empty dependency/build cache can perform the documented sync, configure, Shipping build, shader/content cook, and Showcase run without private knowledge. A second run proves the warm/offline-cache path or clearly states that network is required;
-- one minimal command path builds the runtime; optional editor, launcher, import/cook, ray-tracing, and vendor-provider paths are separately selectable and fail at configure time when prerequisites are absent;
+- one minimal command path builds the Game; optional editor, launcher, import/cook, ray-tracing, and vendor-provider paths are separately selectable and fail at configure time when prerequisites are absent;
 - `Showcase` is the supported sample project. The instructions identify where to add a project, where generated/cooked data lives, how to clean it, and which interfaces are stable or deliberately unstable;
 - warnings, failed downloads, missing tools, unsupported CPUs/GPUs, bad cached dependencies, and cook errors stop with actionable ownership and recovery instructions;
 - a non-author completes the journey and reports elapsed time, download/build/disk cost, commands, failures, and one technical criticism.
@@ -456,7 +456,7 @@ The decision MUST classify:
 - Review known vulnerabilities for shipped/reachable components. Known exploited or critical issues block; a high-severity waiver requires reachability analysis, mitigation, owner, expiry, and public impact statement.
 - Scan source and staged output for credentials/private keys, unexpected executables, malware, debug/provider DLL contamination, absolute developer paths, and files absent from the allowlisted stage manifest.
 - Sign first-party Windows PE files with the approved trusted identity, timestamp where applicable, then verify every first- and third-party PE after staging. Signing occurs after final binary mutation; the verified hashes become candidate identity.
-- Verify the intended Shipping compiler/linker mitigations and PE flags for every first-party executable/DLL, including stack protection, DEP/NX compatibility, ASLR/high-entropy VA, and Control Flow Guard where supported. Record any disabled protection and rationale; keep PDB/private source paths outside the runtime archive.
+- Verify the intended Shipping compiler/linker mitigations and PE flags for every first-party executable/DLL, including stack protection, DEP/NX compatibility, ASLR/high-entropy VA, and Control Flow Guard where supported. Record any disabled protection and rationale; keep PDB/private source paths outside the Game archive.
 - Restrict DLL and child-process resolution to trusted application/system or explicitly registered directories. Package manifests, catalogs, settings, and command-line/environment paths must reject traversal, root escape, unexpected reparse targets, oversized input, and untrusted binary side-loading before use.
 - Publish cryptographic hashes and verifiable build provenance. When GitHub Actions produces the release, publish and independently verify an artifact attestation; an attestation proves provenance, not software safety.
 - Runtime networking is deny-by-default for `v0.1.0`. Any required endpoint, payload, authentication, retention, retry, offline behavior, and privacy notice must be explicitly approved and tested.

@@ -83,8 +83,8 @@ namespace SparkleLauncher
 				return "CompileLauncher";
 			case BuildWorkspaceOperationKind::CompileEditor:
 				return "CompileEditor";
-			case BuildWorkspaceOperationKind::CompileRuntime:
-				return "CompileRuntime";
+			case BuildWorkspaceOperationKind::CompileGame:
+				return "CompileGame";
 			case BuildWorkspaceOperationKind::BuildCookTools:
 				return "BuildCookTools";
 			case BuildWorkspaceOperationKind::InstallHostTool:
@@ -100,8 +100,8 @@ namespace SparkleLauncher
 		{
 			case BuildWorkspaceScope::Editor:
 				return "editor";
-			case BuildWorkspaceScope::Runtime:
-				return "runtime";
+			case BuildWorkspaceScope::Game:
+				return "game";
 			case BuildWorkspaceScope::CookTools:
 				return "cook-tools";
 			case BuildWorkspaceScope::Launcher:
@@ -118,9 +118,9 @@ namespace SparkleLauncher
 			outScope = BuildWorkspaceScope::Editor;
 			return true;
 		}
-		if (text == "runtime")
+		if (text == "game")
 		{
-			outScope = BuildWorkspaceScope::Runtime;
+			outScope = BuildWorkspaceScope::Game;
 			return true;
 		}
 		if (text == "cook-tools")

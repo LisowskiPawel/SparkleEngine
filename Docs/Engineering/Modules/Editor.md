@@ -28,7 +28,7 @@ The public UI host surface exposes bounded host operations and result contracts.
 - The panel-owned `ViewportRenderRequest` is the single publication boundary. A mode change writes `ViewportRenderRequest::ViewMode` and advances that request's generation once; Renderer freezes the value into the corresponding `RenderView`. No mode value enters Renderer settings, Application command translation, or RHI.
 - A mode must not be decomposed into overlapping target and flag authorities. If future independently selectable visibility controls are required, Editor may own their presentation and overrides, but they must have distinct Renderer consumers and must not reproduce the selected mode.
 - A normal view-mode action never mutates process-global Renderer CVars. Renderer settings/CVars remain algorithm, scalability, or explicit developer policy; a genuinely global action uses the sequenced Renderer control boundary rather than direct Editor mutation.
-- Renderer remains usable by Game/runtime code submitting the same `RenderViewMode` without loading Editor. The Editor menu is a presentation of that contract, not its owner.
+- Renderer remains usable by Game code submitting the same `RenderViewMode` without loading Editor. The Editor menu is a presentation of that contract, not its owner.
 - Copy ImGui draw data into packet-owned vertices, indices, clip rectangles, texture handles, and commands.
 - Never send `ImDrawData*` or a live editor pointer to the render coordinator.
 - Viewport requests/products use stable IDs or tokens plus explicit release or bounded retirement.

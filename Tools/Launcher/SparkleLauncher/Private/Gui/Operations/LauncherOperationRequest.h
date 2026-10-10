@@ -24,7 +24,7 @@ namespace SparkleLauncher
 		QString ContentId;
 		QString RunMode = "editor";
 		QString EditorProfile;
-		QString RuntimeProfile;
+		QString GameProfile;
 		QString WorkspaceIde;
 		QString WorkspaceCompiler;
 		QString BuildScopes;

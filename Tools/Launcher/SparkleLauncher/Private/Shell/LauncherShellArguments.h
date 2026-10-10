@@ -15,7 +15,7 @@ namespace SparkleLauncher
 	{
 		std::filesystem::path StartPath;
 		std::string EditorProfile = "DevelopmentEditor";
-		std::string RuntimeProfile = "DevelopmentGame";
+		std::string GameProfile = "DevelopmentGame";
 		WorkspaceIde WorkspaceIdePreference = WorkspaceIde::VisualStudio;
 		WorkspaceCompiler WorkspaceCompilerPreference = WorkspaceCompiler::Msvc;
 		std::string DryRunOperationId;

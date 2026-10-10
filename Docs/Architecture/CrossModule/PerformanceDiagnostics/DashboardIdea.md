@@ -51,7 +51,7 @@ This keeps the first useful product small: a reproducible run and an honest comp
 
 | Owner | Responsibilities | Must not own |
 | --- | --- | --- |
-| Sparkle runtime and Editor | Physical measurements at current owners, stable identities, validity/loss, bounded live views, explicit evidence export, profiler handoff. | Historical database, background benchmark service, anomaly verdicts, vendor-profiler replacement. |
+| Sparkle Game and Editor | Physical measurements at current owners, stable identities, validity/loss, bounded live views, explicit evidence export, profiler handoff. | Historical database, background benchmark service, anomaly verdicts, vendor-profiler replacement. |
 | External runner and analyzer | Launch matrix, workload invocation, artifact validation, cohort matching, comparison, thresholds, generated reports, CI exit status. | Alternate metric semantics, hidden collection, UI-specific schema, implicit acceptance. |
 | Future dashboard | Browse accepted runs, filter exact cohorts, display trends, link evidence, submit approved jobs. | Mutable copies of engine truth, its own capture path, arbitrary remote execution, automatic root-cause claims. |
 

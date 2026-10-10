@@ -8,7 +8,7 @@
 
 ## Interpretation
 
-Included is an obligation to deliver and accept the exact bounded path, not a statement that it works. Experimental still needs correctness within its declared limits and safe failure. Excluded has no first-release promise. No row is Removed. The Exposure column restricts distribution: Source only does not enter a shipped component; Runtime/source covers Game and shared product mechanics; Editor/Launcher/source covers admitted shipped-tool workflows. The release-owner amendment includes Launcher and Editor, seven selectable examples plus built-in Empty, and only the features required by those release paths. Other choices are development or unavailable. Internal mechanisms do not become standalone public features or a stable SDK.
+Included is an obligation to deliver and accept the exact bounded path, not a statement that it works. Experimental still needs correctness within its declared limits and safe failure. Excluded has no first-release promise. No row is Removed. The Exposure column restricts distribution: Source only does not enter a shipped component; Game/source covers Game and shared product mechanics; Editor/Launcher/source covers admitted shipped-tool workflows. The release-owner amendment includes Launcher and Editor, seven selectable examples plus built-in Empty, and only the features required by those release paths. Other choices are development or unavailable. Internal mechanisms do not become standalone public features or a stable SDK.
 
 The capability name and source link retain the existing inventory owner instead of copying its implementation narrative. A section names exactly one module owner; cross-module feature/report ownership remains in the existing FCR registry. Compound rows are split in the public-surface tables below. Old inventory evidence remains dated; a classification does not refresh all of its source assertions.
 
@@ -41,22 +41,22 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `APP-001` | Shared application lifecycle | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `APP-002` | Cooked runtime host | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-001` | Shared application lifecycle | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-002` | Cooked game host | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `APP-003` | Editor host | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
-| `APP-004` | Build-time editor erasure | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `APP-005` | Frame pump | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `APP-006` | Task ownership | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `APP-007` | Renderer execution selection | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `APP-008` | Camera input bridge | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `APP-009` | Viewport request/products | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `APP-010` | Ordered shutdown | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-004` | Build-time editor erasure | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-005` | Frame pump | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-006` | Task ownership | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-007` | Renderer execution selection | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-008` | Camera input bridge | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-009` | Viewport request/products | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-010` | Ordered shutdown | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `APP-011` | Command-line CVar assignment | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `APP-012` | Runtime console | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `APP-012` | Game console | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `APP-013` | Editor shader recook | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
 | `APP-014` | Editor operation service | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
 | `APP-015` | Viewport capture | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
-| `APP-016` | Rendering-settings persistence | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `APP-016` | Rendering-settings persistence | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 
 ## Build and packaging
 
@@ -64,27 +64,27 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `BUILD-001` | CMake baseline | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-002` | Six profiles | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-003` | Profile optimization/debug policy | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-004` | Compiler routes | Included | Runtime/source | Only the pinned MSVC toolchain is promised; alternate compiler routes remain unqualified. |
-| `BUILD-005` | Static/shared engine modules | Included | Runtime/source | Use the selected product linkage; no binary SDK or stable exported ABI. |
-| `BUILD-006` | Optional tool/features | Included | Runtime/source | Only classified options and exact eligible profiles; new options reopen scope. |
-| `BUILD-007` | Project discovery | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-008` | Target layering | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-009` | Host-tool exclusion | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-010` | Dependency acquisition | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-011` | Selective dependency sync | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-012` | Development artifact contract | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-013` | Product layout | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-014` | Runtime support staging | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-015` | Tool bundles | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-016` | Architecture check | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-017` | Code-style targets | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `BUILD-018` | Install/stage/package | Included | Runtime/source | Required delivery obligation; source absence/partial path cannot accept this row. |
+| `BUILD-001` | CMake baseline | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-002` | Six profiles | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-003` | Profile optimization/debug policy | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-004` | Compiler routes | Included | Game/source | Only the pinned MSVC toolchain is promised; alternate compiler routes remain unqualified. |
+| `BUILD-005` | Static/shared engine modules | Included | Game/source | Use the selected product linkage; no binary SDK or stable exported ABI. |
+| `BUILD-006` | Optional tool/features | Included | Game/source | Only classified options and exact eligible profiles; new options reopen scope. |
+| `BUILD-007` | Project discovery | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-008` | Target layering | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-009` | Host-tool exclusion | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-010` | Dependency acquisition | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-011` | Selective dependency sync | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-012` | Development artifact contract | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-013` | Product layout | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-014` | Runtime support staging | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-015` | Tool bundles | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-016` | Architecture check | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-017` | Code-style targets | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `BUILD-018` | Install/stage/package | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
 | `BUILD-019` | Automated tests | Excluded | No release promise | No new permanent test framework in this scope; existing/future claim-specific checks do not inherit this exclusion. |
 | `BUILD-020` | CI | Excluded | No release promise | No hosted CI service promise; reproducible build/verification remains required. |
-| `BUILD-021` | Root onboarding | Included | Runtime/source | Required delivery obligation; source absence/partial path cannot accept this row. |
+| `BUILD-021` | Root onboarding | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
 
 ## Core
 
@@ -92,24 +92,24 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `CORE-001` | Named diagnostics | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-002` | Console-variable registry | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-001` | Named diagnostics | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-002` | Console-variable registry | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `CORE-003` | Console command/session | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `CORE-004` | Event dispatch | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-005` | Whole-file I/O | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-006` | Bounded binary decode/encode | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-007` | Lightweight JSON helpers | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-008` | Workspace/project path model | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-009` | Typed asset path resolution | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-004` | Event dispatch | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-005` | Whole-file I/O | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-006` | Bounded binary decode/encode | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-007` | Lightweight JSON helpers | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-008` | Workspace/project path model | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-009` | Typed asset path resolution | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `CORE-010` | Child-process execution | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `CORE-011` | Environment and command-line utilities | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-012` | Project level catalog | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-013` | Input vocabulary/state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-014` | Math and coordinate helpers | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-015` | Pixel conversions | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-016` | Timer | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-017` | Thread ownership assertions | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-018` | Stable hashing/string tables | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-011` | Environment and command-line utilities | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-012` | Project level catalog | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-013` | Input vocabulary/state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-014` | Math and coordinate helpers | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-015` | Pixel conversions | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-016` | Timer | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-017` | Thread ownership assertions | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `CORE-018` | Stable hashing/string tables | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 
 ## Editor
 
@@ -148,10 +148,10 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `EASSET-001` | Shader entry sources | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `EASSET-002` | Shader includes/contracts | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `EASSET-003` | Default textures | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `EASSET-004` | Sky environments | Included | Runtime/source | Only a rights-cleared dependency of ReleaseMapSet may enter the runtime package; do not ship the entire sky corpus. |
+| `EASSET-001` | Shader entry sources | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `EASSET-002` | Shader includes/contracts | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `EASSET-003` | Default textures | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `EASSET-004` | Sky environments | Included | Game/source | Only a rights-cleared dependency of ReleaseMapSet may enter the runtime package; do not ship the entire sky corpus. |
 | `EASSET-005` | Cube fixtures | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 
 ## GameFramework
@@ -160,32 +160,32 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `GF-001` | Level documents | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-002` | Level registry/session | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-003` | Asynchronous scene load | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-004` | Cooked-only runtime | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-005` | Cooked format identification | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-006` | Scene registry | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-007` | File lifetime during load | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-008` | Manifest validation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-009` | Entity identity/lifetime | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-010` | Fixed component schema | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-011` | Typed queries and frozen structure | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-012` | Compiled system graph | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-013` | Parallel world evaluation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-014` | Transform hierarchy evaluation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-015` | Camera simulation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-016` | Lighting model | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-017` | Material model and variants | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-018` | Static/instanced meshes | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-019` | Skeletal animation | Included | Runtime/source | Cesium Man skeletal animation is an Included example; exact clip and pose require cook/runtime proof. |
-| `GF-020` | Morph animation | Included | Runtime/source | Existing source morph capability; no consumer morph demonstration or arbitrary animation-format promise. |
+| `GF-001` | Level documents | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-002` | Level registry/session | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-003` | Asynchronous scene load | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-004` | Cooked-only runtime | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-005` | Cooked format identification | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-006` | Scene registry | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-007` | File lifetime during load | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-008` | Manifest validation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-009` | Entity identity/lifetime | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-010` | Fixed component schema | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-011` | Typed queries and frozen structure | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-012` | Compiled system graph | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-013` | Parallel world evaluation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-014` | Transform hierarchy evaluation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-015` | Camera simulation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-016` | Lighting model | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-017` | Material model and variants | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-018` | Static/instanced meshes | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-019` | Skeletal animation | Included | Game/source | Cesium Man skeletal animation is an Included example; exact clip and pose require cook/runtime proof. |
+| `GF-020` | Morph animation | Included | Game/source | Existing source morph capability; no consumer morph demonstration or arbitrary animation-format promise. |
 | `GF-021` | World edits | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `GF-022` | Read snapshots/change journal | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-023` | Structural publication | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-024` | Dynamic publication | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-025` | View publication | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `GF-026` | Stable render identity | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-022` | Read snapshots/change journal | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-023` | Structural publication | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-024` | Dynamic publication | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-025` | View publication | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-026` | Stable render identity | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 
 ## Launcher
 
@@ -251,19 +251,19 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `PLAT-001` | Native Win32 window | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-002` | Message pump | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-003` | Size/state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-004` | Window controls | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-005` | DPI awareness/events | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-006` | Window event contracts | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-007` | Win32 keyboard/mouse backend | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-008` | Per-frame input state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-009` | Immediate/deferred dispatch | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-010` | Layer routing | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-011` | UI capture integration | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-012` | Mouse/cursor control | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `PLAT-013` | Owner-thread enforcement | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-001` | Native Win32 window | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-002` | Message pump | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-003` | Size/state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-004` | Window controls | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-005` | DPI awareness/events | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-006` | Window event contracts | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-007` | Win32 keyboard/mouse backend | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-008` | Per-frame input state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-009` | Immediate/deferred dispatch | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-010` | Layer routing | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-011` | UI capture integration | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-012` | Mouse/cursor control | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `PLAT-013` | Owner-thread enforcement | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 
 ## RHI
 
@@ -271,91 +271,91 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `RHI-BACK-01` | Common public RHI | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BACK-02` | Diagnostics implementation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BACK-03` | D3D12 backend | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BACK-04` | Vulkan backend | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BACK-05` | Backend selection | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BACK-06` | Backend parity | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-DEV-01` | API/version identity | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-DEV-02` | Shader binary | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-DEV-03` | Queue kinds | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-DEV-04` | Synchronization | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-DEV-05` | Dynamic rendering | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-DEV-06` | Descriptor indexing | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BACK-01` | Common public RHI | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BACK-02` | Diagnostics implementation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BACK-03` | D3D12 backend | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BACK-04` | Vulkan backend | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BACK-05` | Backend selection | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BACK-06` | Backend parity | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-DEV-01` | API/version identity | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-DEV-02` | Shader binary | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-DEV-03` | Queue kinds | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-DEV-04` | Synchronization | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-DEV-05` | Dynamic rendering | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-DEV-06` | Descriptor indexing | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-DEV-07` | Mesh shaders | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `RHI-DEV-08` | Task shaders | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `RHI-DEV-09` | Adapter preference | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-LIFE-01` | Aggregate service ownership | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-LIFE-02` | Atomic creation/publication | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-LIFE-03` | Ordered settlement and destruction | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-LIFE-04` | Swapchain recovery | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-LIFE-05` | Device-loss diagnostics | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-DEV-09` | Adapter preference | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-LIFE-01` | Aggregate service ownership | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-LIFE-02` | Atomic creation/publication | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-LIFE-03` | Ordered settlement and destruction | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-LIFE-04` | Swapchain recovery | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-LIFE-05` | Device-loss diagnostics | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-LIFE-06` | In-process device recreation | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `RHI-RES-01` | 2D textures | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RES-02` | Buffers | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RES-03` | Resource views | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RES-04` | Upload | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RES-05` | Readback | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RES-06` | Persistent allocation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RES-07` | Transient allocation and aliasing | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RES-08` | Residency pressure | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RES-09` | Samplers | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-FMT-01` | Float/color | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-FMT-02` | 8-bit color | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-FMT-03` | Depth/stencil | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-FMT-04` | BC color | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-FMT-05` | BC scalar/vector | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-FMT-06` | BC HDR | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BIND-01` | Bindful descriptor sets/tables | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BIND-02` | Fixed descriptor arrays | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BIND-03` | Non-uniform indexing | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BIND-04` | Partially-bound arrays | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BIND-05` | Renderer material texture table | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-BIND-06` | Raster-material coverage | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RES-01` | 2D textures | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RES-02` | Buffers | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RES-03` | Resource views | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RES-04` | Upload | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RES-05` | Readback | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RES-06` | Persistent allocation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RES-07` | Transient allocation and aliasing | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RES-08` | Residency pressure | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RES-09` | Samplers | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-FMT-01` | Float/color | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-FMT-02` | 8-bit color | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-FMT-03` | Depth/stencil | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-FMT-04` | BC color | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-FMT-05` | BC scalar/vector | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-FMT-06` | BC HDR | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BIND-01` | Bindful descriptor sets/tables | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BIND-02` | Fixed descriptor arrays | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BIND-03` | Non-uniform indexing | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BIND-04` | Partially-bound arrays | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BIND-05` | Renderer material texture table | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-BIND-06` | Raster-material coverage | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-BIND-07` | Runtime-sized bindless | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `RHI-PIPE-01` | Graphics pipeline | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PIPE-02` | Primitive topology | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PIPE-03` | Vertex inputs | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PIPE-04` | Index formats | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PIPE-05` | Raster state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PIPE-06` | Depth/stencil | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PIPE-07` | Blending | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PIPE-08` | Compute pipeline | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PIPE-01` | Graphics pipeline | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PIPE-02` | Primitive topology | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PIPE-03` | Vertex inputs | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PIPE-04` | Index formats | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PIPE-05` | Raster state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PIPE-06` | Depth/stencil | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PIPE-07` | Blending | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PIPE-08` | Compute pipeline | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-PIPE-09` | Geometry/hull/domain stages | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `RHI-PIPE-10` | Mesh/task shaders | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `RHI-CMD-01` | Recording leases | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-CMD-02` | Raster commands | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-CMD-03` | Compute commands | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-CMD-04` | Ray commands | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-CMD-05` | Copy commands | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-CMD-06` | Explicit state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-CMD-07` | Diagnostic scopes | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RT-01` | Bottom-level AS | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RT-02` | BLAS update/refit | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RT-03` | Classic TLAS | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RT-04` | Inline ray query | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RT-05` | Native RT pipeline | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RT-06` | Shader table | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RT-07` | Triangle hit groups | Included | Runtime/source | Triangle geometry only; procedural/intersection/callable generality is excluded. |
+| `RHI-CMD-01` | Recording leases | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-CMD-02` | Raster commands | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-CMD-03` | Compute commands | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-CMD-04` | Ray commands | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-CMD-05` | Copy commands | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-CMD-06` | Explicit state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-CMD-07` | Diagnostic scopes | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RT-01` | Bottom-level AS | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RT-02` | BLAS update/refit | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RT-03` | Classic TLAS | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RT-04` | Inline ray query | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RT-05` | Native RT pipeline | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RT-06` | Shader table | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RT-07` | Triangle hit groups | Included | Game/source | Triangle geometry only; procedural/intersection/callable generality is excluded. |
 | `RHI-RT-08` | Partitioned TLAS | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
-| `RHI-RTC-01` | Ray-traced GBuffer | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RTC-02` | Direct-shadow visibility | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RTC-03` | Reference path-traced direct/indirect | Included | Runtime/source | Required native lowering for full admitted reference transport; no finite-depth diagnostic substituted as oracle. |
-| `RHI-RTC-04` | ReSTIR indirect temporal/spatial/resolve | Included | Runtime/source | Required native execution of accepted realtime indirect paths/reuse; paired backend correctness and bounded costs. |
-| `RHI-PRES-01` | Swapchain | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PRES-02` | VSync | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PRES-03` | Frame pacing | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PRES-04` | Back-buffer commands | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-PRES-05` | HDR presentation | Included | Runtime/source | Required delivery obligation; source absence/partial path cannot accept this row. |
-| `RHI-DIAG-01` | Object naming and GPU events | Included | Runtime/source | Native names/markers retained as mechanics; capture SDK/event-runtime package inclusion is separately allowlisted. |
+| `RHI-RTC-01` | Ray-traced GBuffer | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RTC-02` | Direct-shadow visibility | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RTC-03` | Reference path-traced direct/indirect | Included | Game/source | Required native lowering for full admitted reference transport; no finite-depth diagnostic substituted as oracle. |
+| `RHI-RTC-04` | ReSTIR indirect temporal/spatial/resolve | Included | Game/source | Required native execution of accepted realtime indirect paths/reuse; paired backend correctness and bounded costs. |
+| `RHI-PRES-01` | Swapchain | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PRES-02` | VSync | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PRES-03` | Frame pacing | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PRES-04` | Back-buffer commands | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-PRES-05` | HDR presentation | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
+| `RHI-DIAG-01` | Object naming and GPU events | Included | Game/source | Native names/markers retained as mechanics; capture SDK/event-runtime package inclusion is separately allowlisted. |
 | `RHI-DIAG-02` | Timestamp queries | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `RHI-DIAG-03` | Validation messages | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `RHI-DIAG-04` | D3D12 crash diagnostics | Included | Runtime/source | Local actionable device-loss diagnostics; no automatic upload or crash SDK. |
+| `RHI-DIAG-04` | D3D12 crash diagnostics | Included | Game/source | Local actionable device-loss diagnostics; no automatic upload or crash SDK. |
 | `RHI-DIAG-05` | Live-object reporting | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `RHI-DIAG-06` | Texture capture | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `RHI-DIAG-07` | External provider handles | Experimental | Runtime/source | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
-| `RHI-DIAG-08` | ImGui backend | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-DIAG-07` | External provider handles | Experimental | Game/source | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
+| `RHI-DIAG-08` | ImGui backend | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 
 ## Renderer
 
@@ -363,134 +363,134 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `REN-OWN-01` | Public renderer facade | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-OWN-02` | Scene ownership | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-OWN-03` | View ownership | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-OWN-04` | Frame ownership | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-OWN-05` | Threaded or serial execution | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-OWN-06` | Renderer/RHI boundary | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FG-01` | Typed graph authoring | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FG-02` | Compiled pass kinds | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FG-03` | Resource model | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FG-04` | Dependency compilation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FG-05` | Transient aliasing | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FG-06` | Multi-queue submission | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FG-07` | Parallel command recording | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FG-08` | Graph rebuild and retirement | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PIPE-01` | Typed pass parameter contract | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PIPE-02` | Runtime shader and binding-layout validation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PIPE-03` | Graphics and compute materialization | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PIPE-04` | Native ray-pipeline and table materialization | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-OWN-01` | Public renderer facade | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-OWN-02` | Scene ownership | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-OWN-03` | View ownership | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-OWN-04` | Frame ownership | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-OWN-05` | Threaded or serial execution | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-OWN-06` | Renderer/RHI boundary | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FG-01` | Typed graph authoring | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FG-02` | Compiled pass kinds | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FG-03` | Resource model | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FG-04` | Dependency compilation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FG-05` | Transient aliasing | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FG-06` | Multi-queue submission | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FG-07` | Parallel command recording | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FG-08` | Graph rebuild and retirement | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PIPE-01` | Typed pass parameter contract | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PIPE-02` | Runtime shader and binding-layout validation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PIPE-03` | Graphics and compute materialization | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PIPE-04` | Native ray-pipeline and table materialization | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-PIPE-05` | Atomic shader-generation replacement | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-DIAG-08` | Shader hot reload | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-SCENE-01` | Persistent GPU scene | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SCENE-02` | Parallel scene preparation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SCENE-03` | Static meshes | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SCENE-04` | Skeletal meshes | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SCENE-05` | Morph targets | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SCENE-06` | Ray-traced deforming geometry | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SCENE-07` | Static BLAS reuse | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SCENE-08` | Mesh residency | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SCENE-09` | Texture residency | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SCENE-10` | Automatic mesh batching | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-VIS-01` | Per-view frustum visibility | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-VIS-02` | Material visibility classification | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-VIS-03` | Raster candidate validation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-VIS-04` | Authored/preserved groups | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-VIS-05` | Opaque sorting and auto batching | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-VIS-06` | Transparent draw preparation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-VIS-07` | Visibility task/failure bounds | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-01` | Persistent GPU scene | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-02` | Parallel scene preparation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-03` | Static meshes | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-04` | Skeletal meshes | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-05` | Morph targets | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-06` | Ray-traced deforming geometry | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-07` | Static BLAS reuse | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-08` | Mesh residency | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-09` | Texture residency | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SCENE-10` | Automatic mesh batching | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-VIS-01` | Per-view frustum visibility | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-VIS-02` | Material visibility classification | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-VIS-03` | Raster candidate validation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-VIS-04` | Authored/preserved groups | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-VIS-05` | Opaque sorting and auto batching | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-VIS-06` | Transparent draw preparation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-VIS-07` | Visibility task/failure bounds | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-VIS-08` | Visibility/batch workload facts | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-VIS-09` | Advanced visibility/draw generation | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `REN-TEMP-01` | Per-view previous-camera state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-TEMP-02` | Active temporal jitter | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-TEMP-03` | Common history invalidation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-TEMP-04` | Motion and reprojection convention | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-TEMP-05` | Provider temporal constants | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-RESO-01` | Output extent resolution | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-RESO-02` | Render extent resolution | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-RESO-03` | Extent-driven topology and history | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-RESO-04` | Active raster sample count | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-TEMP-01` | Per-view previous-camera state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-TEMP-02` | Active temporal jitter | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-TEMP-03` | Common history invalidation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-TEMP-04` | Motion and reprojection convention | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-TEMP-05` | Provider temporal constants | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-RESO-01` | Output extent resolution | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-RESO-02` | Render extent resolution | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-RESO-03` | Extent-driven topology and history | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-RESO-04` | Active raster sample count | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-RESO-05` | Renderer MSAA | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `REN-RESO-06` | Standalone post-process AA | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `REN-RESO-07` | Dynamic resolution | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `REN-MAT-01` | Base color | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-MAT-02` | Tangent-space normal | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-MAT-03` | Roughness | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-MAT-04` | Metallic | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-MAT-05` | Ambient occlusion | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-MAT-06` | Dielectric F0 | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-MAT-07` | Emissive | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-MAT-08` | Subsurface | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-MAT-09` | Alpha mask | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-MAT-10` | Double-sided | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-GBUF-01` | Base color | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-GBUF-02` | Normal | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-GBUF-03` | Material | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-GBUF-04` | Emissive | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-GBUF-05` | Subsurface | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-GBUF-06` | Motion vector | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-GBUF-07` | Device depth | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-GBUF-08` | Scene depth | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FRONT-01` | Raster GBuffer | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-FRONT-02` | Ray GBuffer: inline | Included | Runtime/source | Required traced surface frontend for realtime/native parity; complete owned hit/material/traversal contract. |
-| `REN-FRONT-03` | Ray GBuffer: native pipeline | Included | Runtime/source | Required traced surface frontend for realtime/native parity; complete owned hit/material/traversal contract. |
-| `REN-FRONT-04` | Automatic ray execution | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-01` | Base color | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-02` | Tangent-space normal | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-03` | Roughness | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-04` | Metallic | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-05` | Ambient occlusion | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-06` | Dielectric F0 | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-07` | Emissive | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-08` | Subsurface | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-09` | Alpha mask | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-MAT-10` | Double-sided | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-GBUF-01` | Base color | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-GBUF-02` | Normal | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-GBUF-03` | Material | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-GBUF-04` | Emissive | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-GBUF-05` | Subsurface | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-GBUF-06` | Motion vector | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-GBUF-07` | Device depth | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-GBUF-08` | Scene depth | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FRONT-01` | Raster GBuffer | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-FRONT-02` | Ray GBuffer: inline | Included | Game/source | Required traced surface frontend for realtime/native parity; complete owned hit/material/traversal contract. |
+| `REN-FRONT-03` | Ray GBuffer: native pipeline | Included | Game/source | Required traced surface frontend for realtime/native parity; complete owned hit/material/traversal contract. |
+| `REN-FRONT-04` | Automatic ray execution | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-FRONT-05` | Transparent blending | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `REN-FRONT-06` | Wireframe | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-FRONT-07` | Material binding mode selector | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `REN-PBR-01` | Active direct specular BRDF | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PBR-02` | Active direct diffuse BRDF | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PBR-03` | Active subsurface approximation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PBR-01` | Active direct specular BRDF | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PBR-02` | Active direct diffuse BRDF | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PBR-03` | Active subsurface approximation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-PBR-04` | Alternate BRDF implementations | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `REN-PBR-05` | Indirect approximation helpers | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PBR-06` | Directional lights | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PBR-07` | Point lights | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PBR-08` | Spot lights | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PBR-09` | Rect lights | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PBR-05` | Indirect approximation helpers | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PBR-06` | Directional lights | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PBR-07` | Point lights | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PBR-08` | Spot lights | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-PBR-09` | Rect lights | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-PBR-10` | Non-ray lighting fallback | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `REN-LGT-01` | Source-named ReSTIR lighting route | Included | Runtime/source | Required direct/composite and realtime transport; actual estimator correctness must pass its owner contract, not ReSTIR naming. |
-| `REN-LGT-04` | Reference Path Tracer | Included | Runtime/source | Required consumer progressive SurfaceTransportReference and raw export; accepted domain, independent oracle, uncertainty and invalid-sample proof. |
-| `REN-LGT-05` | Accumulation invalidation | Included | Runtime/source | Required progressive/realtime reset and accumulation identity; no stale generations or invalid-sample advancement. |
-| `REN-LGT-06` | Lighting composite | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-LGT-02` | Direct shadow visibility | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-LGT-03` | Source-named ReSTIR indirect prototype | Included | Runtime/source | Required realtime transport/reuse closure under the 30 FPS preset; current seed-replay prototype is not accepted path tracing. |
-| `REN-LGT-07` | Sky | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-LGT-01` | Source-named ReSTIR lighting route | Included | Game/source | Required direct/composite and realtime transport; actual estimator correctness must pass its owner contract, not ReSTIR naming. |
+| `REN-LGT-04` | Reference Path Tracer | Included | Game/source | Required consumer progressive SurfaceTransportReference and raw export; accepted domain, independent oracle, uncertainty and invalid-sample proof. |
+| `REN-LGT-05` | Accumulation invalidation | Included | Game/source | Required progressive/realtime reset and accumulation identity; no stale generations or invalid-sample advancement. |
+| `REN-LGT-06` | Lighting composite | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-LGT-02` | Direct shadow visibility | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-LGT-03` | Source-named ReSTIR indirect prototype | Included | Game/source | Required realtime transport/reuse closure under the 30 FPS preset; current seed-replay prototype is not accepted path tracing. |
+| `REN-LGT-07` | Sky | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-VOL-01` | Participating media and fog volumes | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `REN-VOL-02` | Volumetric light transport | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `REN-VOL-03` | Atmosphere and aerial perspective | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `REN-DECAL-01` | Authored and scene decal data | Included | Runtime/source | Required delivery obligation; source absence/partial path cannot accept this row. |
-| `REN-DECAL-02` | Primary deferred GBuffer composition | Included | Runtime/source | Required delivery obligation; source absence/partial path cannot accept this row. |
-| `REN-DECAL-03` | Secondary-ray decal evaluation | Included | Runtime/source | Required delivery obligation; source absence/partial path cannot accept this row. |
-| `REN-RT-01` | Classic TLAS | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-DECAL-01` | Authored and scene decal data | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
+| `REN-DECAL-02` | Primary deferred GBuffer composition | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
+| `REN-DECAL-03` | Secondary-ray decal evaluation | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
+| `REN-RT-01` | Classic TLAS | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-RT-02` | Partitioned TLAS | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
-| `REN-RT-03` | Shared scene identity | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-RT-04` | Shader-table plan | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-RT-05` | Hit-group coverage | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-RT-06` | Plan invalidation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-POST-01` | Manual exposure | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-POST-02` | Automatic exposure | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-POST-03` | Async exposure | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-POST-04` | Linear upscaler | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-POST-05` | NVIDIA DLSS Super Resolution | Included | Runtime/source | Required complete DLSS SR quality/lifecycle/package/input contract on both D3D12 and Vulkan; fallback cannot pass the provider cell. |
-| `REN-POST-06` | NVIDIA DLSS Ray Reconstruction | Included | Runtime/source | Required complete RR guide/extent/frame/reset/quality contract on both APIs; SDK-supported composition must be frozen before performance runs. |
-| `REN-POST-07` | Tone mapping | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-POST-11` | Color grading | Included | Runtime/source | Required delivery obligation; source absence/partial path cannot accept this row. |
-| `REN-POST-12` | Chromatic aberration | Included | Runtime/source | Required delivery obligation; source absence/partial path cannot accept this row. |
-| `REN-POST-14` | Basic vignette | Included | Runtime/source | Required basic lens example; independent AC-VIG contract under FCR-REN-25, neutral-work erasure, both-backend formula/order/package proof. |
+| `REN-RT-03` | Shared scene identity | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-RT-04` | Shader-table plan | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-RT-05` | Hit-group coverage | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-RT-06` | Plan invalidation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-POST-01` | Manual exposure | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-POST-02` | Automatic exposure | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-POST-03` | Async exposure | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-POST-04` | Linear upscaler | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-POST-05` | NVIDIA DLSS Super Resolution | Included | Game/source | Required complete DLSS SR quality/lifecycle/package/input contract on both D3D12 and Vulkan; fallback cannot pass the provider cell. |
+| `REN-POST-06` | NVIDIA DLSS Ray Reconstruction | Included | Game/source | Required complete RR guide/extent/frame/reset/quality contract on both APIs; SDK-supported composition must be frozen before performance runs. |
+| `REN-POST-07` | Tone mapping | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-POST-11` | Color grading | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
+| `REN-POST-12` | Chromatic aberration | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
+| `REN-POST-14` | Basic vignette | Included | Game/source | Required basic lens example; independent AC-VIG contract under FCR-REN-25, neutral-work erasure, both-backend formula/order/package proof. |
 | `REN-POST-13` | Frame generation | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `REN-POST-08` | Output encoding | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-POST-09` | HDR display output | Included | Runtime/source | Required delivery obligation; source absence/partial path cannot accept this row. |
+| `REN-POST-08` | Output encoding | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-POST-09` | HDR display output | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
 | `REN-POST-10` | Exact debug presentation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-DBG-01` | Final/material | Included | Source only | Lit is consumer Included; Wireframe source-only. This compound row is split in the view-mode table. |
 | `REN-DBG-02` | GBuffer | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-DBG-03` | Lighting | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-DBG-04` | Scene diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-UI-01` | UI render packets | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-UI-02` | Host overlay | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-UI-01` | UI render packets | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-UI-02` | Host overlay | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-UI-03` | Editor viewport presentation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-UI-04` | Editor texture handles | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-LAT-01` | Logical frame latency markers | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-LAT-01` | Logical frame latency markers | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-LAT-02` | Streamline PCL marker route | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `REN-LAT-03` | Reflex simulation sleep | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `REN-LAT-04` | Provider call/shutdown lifetime | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
@@ -499,14 +499,14 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `REN-DIAG-02` | Mesh diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-DIAG-03` | Texture diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-DIAG-04` | Memory diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-DIAG-05` | Viewport products | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-DIAG-05` | Viewport products | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-DIAG-06` | Async captures | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `REN-DIAG-07` | Mesh preview | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-SET-01` | Aggregate public settings state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SET-02` | Application-owned rendering-settings persistence | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-SET-03` | Startup and editor commit | Included | Runtime/source | Game startup and Editor settings commit Included; keep Editor-only dependency isolation in the Game component. |
-| `REN-SET-04` | Serial/threaded settings handoff | Included | Runtime/source | Existing serial/threaded handoff retained; no public topology or concurrency tuning promise. |
-| `REN-SET-05` | Live versus restart-active state | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SET-01` | Aggregate public settings state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SET-02` | Application-owned rendering-settings persistence | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-SET-03` | Startup and editor commit | Included | Game/source | Game startup and Editor settings commit Included; keep Editor-only dependency isolation in the Game component. |
+| `REN-SET-04` | Serial/threaded settings handoff | Included | Game/source | Existing serial/threaded handoff retained; no public topology or concurrency tuning promise. |
+| `REN-SET-05` | Live versus restart-active state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 
 ## ShaderCompiler
 
@@ -590,12 +590,12 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `SHOW-001` | Project discovery | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `SHOW-001` | Project discovery | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `SHOW-002` | Editor product | Included | Editor/Launcher/source | Required shipped Editor/Launcher workflow within the release-map scope; qualify exact helper/dependency membership and clean-machine behavior. |
-| `SHOW-003` | Runtime product | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `SHOW-003` | Game product | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `SHOW-004` | Six-profile build naming | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `SHOW-005` | Startup level selection | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `SHOW-006` | Runtime level switching | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `SHOW-005` | Startup level selection | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `SHOW-006` | Game level switching | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `SHOW-007` | Authored level save | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 
 ## SourceImporters
@@ -630,19 +630,19 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `TASK-001` | Three-lane execution | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-002` | Deterministic serial reference path | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-003` | Compiled DAG | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-004` | Lane dependency safety | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-005` | Parallel ranges | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-006` | Logical nested completion | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-007` | Failure propagation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-008` | Cooperative cancellation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-009` | Structured scopes | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-010` | Execution observation | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-011` | Blocking event | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-012` | Drain/cancel shutdown | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `TASK-013` | Capacity policy | Included | Runtime/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-001` | Three-lane execution | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-002` | Deterministic serial reference path | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-003` | Compiled DAG | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-004` | Lane dependency safety | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-005` | Parallel ranges | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-006` | Logical nested completion | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-007` | Failure propagation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-008` | Cooperative cancellation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-009` | Structured scopes | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-010` | Execution observation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-011` | Blocking event | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-012` | Drain/cancel shutdown | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `TASK-013` | Capacity policy | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `TASK-014` | Windows task tracing | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 
 ## ToolSupport
@@ -672,7 +672,7 @@ This table takes precedence over a compound inventory title. It does not replace
 | Indirect diffuse/specular, indirect shadows, temporal/spatial reservoir reuse | Included / runtime | Indirect-lighting owner; exact estimator limits; no ReSTIR GI/GRIS equivalence or unbiasedness claim |
 | Directional, point, spot, rect lights; sky | Included / runtime | Light/scene owners; only supported units/geometry and rights-cleared scene inputs |
 | Volumetric Lighting / Frame Generation | Excluded | Existing release contract; no setting, dependency or advertised output |
-| Deferred decals including secondary-ray semantics | Included / runtime target | Existing mandatory FCR-REN-23 obligation; initial maps have no decal actors; no silent omission of required ray semantics |
+| Deferred decals including secondary-ray semantics | Included / game target | Existing mandatory FCR-REN-23 obligation; initial maps have no decal actors; no silent omission of required ray semantics |
 | Progressive Reference Path Tracer | Included / runtime | Reliable full admitted SurfaceTransportReference, consumer mode/raw export, independent convergence/oracle/lifetime proof. Preserve PTD-00 and finish recovery/Stage 10; no finite diagnostic or denoised image substituted. |
 | Manual/Automatic exposure; Histogram/DownsamplePyramid | Included / runtime | Exposure owner; all current enumerators retained with validated values/history behavior |
 | Reinhard / AcesApprox / AcesFilmic | Included / runtime | Tone-mapping owner; AcesApprox release default, exactly one transform |
@@ -683,7 +683,7 @@ This table takes precedence over a compound inventory title. It does not replace
 | Classic TLAS / refit | Included / runtime | Shared AS identity/lifetime; no new consumer acceleration-structure editor |
 | PTLAS and partition controls | Experimental / source only | Narrow installed capability and build/update semantics; Off consumer baseline; no performance savings claim |
 | Mesh batching / single-sample raster / fixed Halton jitter | Included / runtime | Existing mechanics; advanced occlusion/mesh shaders, MSAA, standalone TAA/FXAA and dynamic resolution excluded |
-| Color Grading / Chromatic Aberration / Vignette | Included / runtime targets | FCR-REN-24/25; neutral grading, chromatic aberration On and vignette On defaults; each feature needs independent bounded controls, formula/order/failure and both-backend proof |
+| Color Grading / Chromatic Aberration / Vignette | Included / game targets | FCR-REN-24/25; neutral grading, chromatic aberration On and vignette On defaults; each feature needs independent bounded controls, formula/order/failure and both-backend proof |
 | SDR / HDR10 | Included / runtime | SDR default; HDR10 only with qualified display/OS/swapchain tuple and mandatory SDR fallback; FCR-REN-26 remains open |
 | PIX / Nsight Graphics / RenderDoc | Experimental / Debug and Development source products only | Existing external-capture authority, one selected provider None -> Nsight -> PIX -> RenderDoc; exact supported native cells only. No optional Shipping capture payload. |
 | PIX Timing / Nsight GPU Trace and Systems / WPR-WPA / PresentMon | Experimental / source runbooks only | Distinct tool-managed activities/artifacts; not universal frame-provider APIs; native evidence remains in owning external-capture report |
@@ -694,12 +694,12 @@ The [owner-directed rendering closure](../FirstRelease.md#required-rendering-clo
 
 ## Every View Mode
 
-**Owner:** Renderer semantic, Application runtime composition, Editor presentation. [Actual enum](../../../Engine/Renderer/Public/Viewport/RenderViewMode.h) has 18 values; Count is not a mode.
+**Owner:** Renderer semantic, Application Game composition, Editor presentation. [Actual enum](../../../Engine/Renderer/Public/Viewport/RenderViewMode.h) has 18 values; Count is not a mode.
 
 | Mode | Classification | Exposure |
 | --- | --- | --- |
-| `Lit = 0` | Included | Runtime/source |
-| `ReferencePathTracer = 1` | Included | Runtime/source |
+| `Lit = 0` | Included | Game/source |
+| `ReferencePathTracer = 1` | Included | Game/source |
 | `Wireframe = 2` | Included | Source only |
 | `GBufferDiffuse = 3` | Included | Source only |
 | `GBufferWorldNormal = 4` | Included | Source only |

@@ -151,7 +151,7 @@ Cauldron is a static framework used by many FidelityFX sample projects. Fidelity
 Sparkle comparison:
 
 - Sparkle has already externalized/cataloged the heavy Bistro/San Miguel acceptance content while retaining bounded smoke/reviewer routes.
-- The external pattern remains a regression guard: uncataloged optional media must not drift back into the default clone/runtime product.
+- The external pattern remains a regression guard: uncataloged optional media must not drift back into the default clone/game product.
 
 Action:
 

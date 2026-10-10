@@ -122,7 +122,7 @@ Parallel CPU recording does not prove GPU overlap. Add GPU queue concurrency onl
 
 - Renderer owns rendering-state values, GPU work, immutable UI draw packets, UI texture bindings, and the exact post-graph presentation operation. It does not own Editor interaction models, labels, panels, restart messages, filesystem persistence, codecs, manifests, output destinations, or background workflow policy.
 - Public viewport render products contain only rendering semantics and immutable rendering metadata. UI presentation bindings cross the focused Renderer UI seam and never become fields on `RenderProduct`.
-- Renderer source has no `Public/Editor` or `Private/Editor` subsystem. A capability required only by Editor belongs to Editor or Application; a genuinely reusable drawing capability uses rendering/UI terminology and remains independently usable by runtime hosts.
+- Renderer source has no `Public/Editor` or `Private/Editor` subsystem. A capability required only by Editor belongs to Editor or Application; a genuinely reusable drawing capability uses rendering/UI terminology and remains independently usable by game hosts.
 - Rendering settings split by responsibility: Renderer owns the value contract and capture/apply behavior, Editor owns its private mutable settings interaction model, and Application owns persistence plus startup/save ordering.
 
 ## Path Tracing And Neural Kernels

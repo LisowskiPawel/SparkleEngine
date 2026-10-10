@@ -154,7 +154,7 @@ Editor display respects locale, while persisted/manifests use the frozen locale-
 | --- | --- | --- | --- |
 | DevelopmentEditor | full admitted controls and per-view override | yes on admitted backend/domain | full bounded workflow |
 | noninteractive developer route | manifest fields only | same prepared/runtime path | machine-readable result and admitted products |
-| packaged Runtime | fixed/cooked configuration only if product scope admits it | same shader semantics | bounded product-supported result only |
+| packaged Game | fixed/cooked configuration only if product scope admits it | same shader semantics | bounded product-supported result only |
 | release consumer UI | no new player-facing control | product-configured behavior only | no developer panel/console promise |
 
 ## Stage-0 First-Use Dry Run

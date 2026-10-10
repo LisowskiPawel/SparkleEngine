@@ -247,8 +247,8 @@ namespace SparkleLauncher
 		const bool preparing = m_quickStartExecution.has_value() && m_quickStartExecution->GoalRequest().RequestedLevelIds.section(',', 0, 0).trimmed() == level.Id;
 		button.setObjectName("MapCardActionButton");
 		button.setFixedSize(LauncherUi::Row::StatusActionWidth, LauncherUi::Row::StatusActionHeight);
-		const bool syncAvailable = !level.SourceReady && level.CanSync && level.RuntimeSupported;
-		const bool explainBlocker = !level.RuntimeSupported || !level.CanSelect;
+		const bool syncAvailable = !level.SourceReady && level.CanSync && level.GameSupported;
+		const bool explainBlocker = !level.GameSupported || !level.CanSelect;
 		button.setProperty("ActionIntent", preparing ? QStringLiteral("none") : syncAvailable ? QStringLiteral("sync") : explainBlocker ? QStringLiteral("details") : QStringLiteral("run"));
 		const bool editorMode = m_settings.RunMode() != QStringLiteral("game");
 		const QString actionName = editorMode ? QStringLiteral("Open") : QStringLiteral("Run");

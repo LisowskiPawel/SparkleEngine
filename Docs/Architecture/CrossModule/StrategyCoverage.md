@@ -25,7 +25,7 @@ Unused enums, empty registries, future interfaces, and source files with no curr
 
 | Persona outcome | Current capability coverage | Principal gap before a credible claim |
 | --- | --- | --- |
-| `NS-REAL` complete real-time systems | D3D12/Vulkan RHI, deferred/ray rendering, world extraction, cooked delivery, editor/runtime hosts, Launcher vertical route | Packaged product, clean-machine run, representative correctness/stability/performance gates |
+| `NS-REAL` complete real-time systems | D3D12/Vulkan RHI, deferred/ray rendering, world extraction, cooked delivery, editor/game hosts, Launcher vertical route | Packaged product, clean-machine run, representative correctness/stability/performance gates |
 | `NS-MATH-DATA` math/data reasoning | BRDF/lighting, ray traversal/SBT, ReSTIR reservoirs, exposure, transforms/animation, import normalization, explicit buffer/ABI contracts | Canonical numerical oracles, sensitivity/convergence evidence, written derivations tied to results |
 | `NS-EVIDENCE` rigorous evidence | Native RHI diagnostics/capture hooks, shader validation, task ETW, inventories, acceptance contracts, workload catalog | Actual retained build/runtime/native-validation/performance/package artifacts; automated regression path |
 | `NS-OWNERSHIP` end-to-end ownership | Module boundaries and vertical traces now cover source -> cook -> world -> renderer -> product/tool | Release disposition for every reachable selector and one owner/reviewer per evidence item |
@@ -100,7 +100,7 @@ This table refreshes volatile observations from the dated Gap Assessment without
 The inventory now favors release closure over feature expansion. The next decisions should be made in this order:
 
 1. freeze Included/Experimental/Excluded/Removed disposition for every reachable selector and Showcase level;
-2. close clean configure/build plus cooked-runtime and editor/runtime erasure claims;
+2. close clean configure/build plus cooked-game and editor/game erasure claims;
 3. create and run the package/install path from clean bytes;
 4. execute correctness/native-validation/stability evidence for the frozen graphics matrix;
 5. measure the accepted workload set and write one end-to-end principal-level case study;

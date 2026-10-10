@@ -75,7 +75,7 @@ namespace SparkleLauncher
 		QString DisplayName;
 		QString Value;
 		bool HasEditorProfile = false;
-		bool HasRuntimeProfile = false;
+		bool HasGameProfile = false;
 	};
 
 	static QVector<LauncherSelectionOption> BuildConfigurationOptions()
@@ -98,28 +98,28 @@ namespace SparkleLauncher
 			}
 
 			found->HasEditorProfile = found->HasEditorProfile || profile.Target == BuildProfileTarget::Editor;
-			found->HasRuntimeProfile = found->HasRuntimeProfile || profile.Target == BuildProfileTarget::Game;
+			found->HasGameProfile = found->HasGameProfile || profile.Target == BuildProfileTarget::Game;
 		}
 
 		QVector<LauncherSelectionOption> options;
 		options.reserve(supportedConfigurations.size());
 		for (const BuildConfigurationSupport& configuration : supportedConfigurations)
 		{
-			const bool available = configuration.HasEditorProfile && configuration.HasRuntimeProfile;
+			const bool available = configuration.HasEditorProfile && configuration.HasGameProfile;
 			QStringList missingProfiles;
 			if (!configuration.HasEditorProfile)
 			{
 				missingProfiles.push_back("editor");
 			}
-			if (!configuration.HasRuntimeProfile)
+			if (!configuration.HasGameProfile)
 			{
-				missingProfiles.push_back("runtime");
+				missingProfiles.push_back("game");
 			}
 
 			options.push_back(
 			    {configuration.DisplayName,
 			        configuration.Value,
-			        available ? QStringLiteral("Editor and runtime profiles can be prepared automatically.") : QStringLiteral("Missing %1 build profile support.").arg(missingProfiles.join(" and ")),
+			        available ? QStringLiteral("Editor and game profiles can be prepared automatically.") : QStringLiteral("Missing %1 build profile support.").arg(missingProfiles.join(" and ")),
 			        available});
 		}
 		return options;

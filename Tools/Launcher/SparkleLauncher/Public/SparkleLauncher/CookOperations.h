@@ -49,7 +49,7 @@ namespace SparkleLauncher
 	{
 		std::filesystem::path RepositoryRoot;
 		std::string ContentId = kDefaultContentId;
-		std::string RuntimeProfile = "DevelopmentGame";
+		std::string GameProfile = "DevelopmentGame";
 		CookMode Mode = CookMode::Incremental;
 		bool ForceRecookConfirmed = false;
 		std::vector<CookWorkspaceScope> SelectedScopes;

@@ -80,7 +80,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 		mapped.RepositoryRoot = request.RepositoryRoot;
 		mapped.ContentId = request.ContentId.toStdString();
 		mapped.EditorProfile = request.EditorProfile.toStdString();
-		mapped.RuntimeProfile = request.RuntimeProfile.toStdString();
+		mapped.GameProfile = request.GameProfile.toStdString();
 		mapped.PreferredIde = workspaceIde;
 		mapped.Compiler = workspaceCompiler;
 		mapped.SelectedScopes = ParseBuildScopes(request.BuildScopes);
@@ -106,7 +106,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 		mapped.RepositoryRoot = request.RepositoryRoot;
 		mapped.ContentId = request.ContentId.toStdString();
 		mapped.RunMode = request.RunMode == "game" ? LevelRunMode::Game : LevelRunMode::Editor;
-		mapped.ProductProfile = mapped.RunMode == LevelRunMode::Game ? request.RuntimeProfile.toStdString() : request.EditorProfile.toStdString();
+		mapped.ProductProfile = mapped.RunMode == LevelRunMode::Game ? request.GameProfile.toStdString() : request.EditorProfile.toStdString();
 		const std::vector<std::string> requestedLevels = SplitList(request.RequestedLevelIds);
 		if (!requestedLevels.empty())
 		{
@@ -122,7 +122,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 		CookOperationRequest mapped;
 		mapped.RepositoryRoot = request.RepositoryRoot;
 		mapped.ContentId = request.ContentId.toStdString();
-		mapped.RuntimeProfile = request.RuntimeProfile.toStdString();
+		mapped.GameProfile = request.GameProfile.toStdString();
 		mapped.Mode = request.ForceRecook ? CookMode::Force : CookMode::Incremental;
 		mapped.ForceRecookConfirmed = request.ConfirmForceRecook;
 		mapped.SelectedScopes = ParseCookScopes(request.CookScopes);

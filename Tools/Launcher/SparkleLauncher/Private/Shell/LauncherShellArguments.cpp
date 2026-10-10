@@ -90,9 +90,9 @@ namespace SparkleLauncher
 			return ParseProfile(BuildProfileTarget::Editor, m_outArguments->EditorProfile);
 		}
 
-		if (argument == "--runtime-profile")
+		if (argument == "--game-profile")
 		{
-			return ParseProfile(BuildProfileTarget::Game, m_outArguments->RuntimeProfile);
+			return ParseProfile(BuildProfileTarget::Game, m_outArguments->GameProfile);
 		}
 
 		if (argument == "--level" || argument == "--graphics-api")
@@ -184,7 +184,7 @@ namespace SparkleLauncher
 
 	bool LauncherShellArgumentParser::ParseProfile(BuildProfileTarget target, std::string& outProfile)
 	{
-		const std::string_view option = target == BuildProfileTarget::Editor ? "--editor-profile" : "--runtime-profile";
+		const std::string_view option = target == BuildProfileTarget::Editor ? "--editor-profile" : "--game-profile";
 		const std::string missingValueMessage = "SparkleLauncher: " + std::string(option) + " requires a profile.\n";
 		const std::optional<std::string_view> profile = ReadRequiredValue(missingValueMessage);
 		if (!profile.has_value())
@@ -194,7 +194,7 @@ namespace SparkleLauncher
 
 		if (!IsProfileTarget(*profile, target))
 		{
-			*m_error << "SparkleLauncher: unsupported " << (target == BuildProfileTarget::Editor ? "editor" : "runtime") << " profile '" << *profile << "'.\n";
+			*m_error << "SparkleLauncher: unsupported " << (target == BuildProfileTarget::Editor ? "editor" : "game") << " profile '" << *profile << "'.\n";
 			return false;
 		}
 
@@ -285,7 +285,7 @@ namespace SparkleLauncher
 	void PrintLauncherShellUsage(std::ostream& output)
 	{
 		output << "Usage:\n"
-		       << "  SparkleLauncher [--root <repo-root>] [--editor-profile <profile>] [--runtime-profile <profile>] "
+		       << "  SparkleLauncher [--root <repo-root>] [--editor-profile <profile>] [--game-profile <profile>] "
 		          "[--ide <visual-studio|rider>] [--compiler <msvc|clang-cl>] "
 		          "[--level <catalog-id>] [--product <editor|game>] [--graphics-api <d3d12|vulkan>] "
 		          "[--clean-scope <scope>] "
@@ -294,7 +294,7 @@ namespace SparkleLauncher
 		       << "Examples:\n"
 		       << "  SparkleLauncher --dry-run\n"
 		       << "  SparkleLauncher --level Empty --product game --graphics-api d3d12 --dry-run levels.run\n"
-		       << "  SparkleLauncher --runtime-profile DevelopmentGame --dry-run cook.shaders\n"
+		       << "  SparkleLauncher --game-profile DevelopmentGame --dry-run cook.shaders\n"
 		       << "  SparkleLauncher --force-recook --dry-run cook.all\n"
 		       << "  SparkleLauncher --clean-scope cooked --dry-run workspace.clean\n"
 		       << "  SparkleLauncher --clean-scope clean-all --dry-run workspace.clean\n";

@@ -14,17 +14,17 @@ namespace SparkleLauncher
 
 	QString LauncherCapabilityContext::ProductBuildOperationId() const
 	{
-		return UsesEditorProduct() ? QStringLiteral("workspace.build.editor") : QStringLiteral("workspace.build.runtime");
+		return UsesEditorProduct() ? QStringLiteral("workspace.build.editor") : QStringLiteral("workspace.build.game");
 	}
 
 	std::string LauncherCapabilityContext::ProductCapabilityId() const
 	{
-		return std::string(UsesEditorProduct() ? LauncherCapabilityId::EditorProduct : LauncherCapabilityId::RuntimeProduct);
+		return std::string(UsesEditorProduct() ? LauncherCapabilityId::EditorProduct : LauncherCapabilityId::GameProduct);
 	}
 
 	std::string LauncherCapabilityContext::ProjectCapabilityId() const
 	{
-		return UsesEditorProduct() ? "content.project.editor" : "content.project.runtime";
+		return UsesEditorProduct() ? "content.project.editor" : "content.project.game";
 	}
 
 	std::string BuildCapabilityReadinessSummary(const std::vector<std::string>& messages)

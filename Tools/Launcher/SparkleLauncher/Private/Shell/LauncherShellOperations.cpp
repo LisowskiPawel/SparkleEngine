@@ -23,7 +23,7 @@ namespace SparkleLauncher
 		request.RepositoryRoot = model.Repository.RootPath;
 		request.ContentId = model.ContentId;
 		request.EditorProfile = model.EditorProfile;
-		request.RuntimeProfile = model.RuntimeProfile;
+		request.GameProfile = model.GameProfile;
 		request.PreferredIde = model.WorkspaceIdePreference;
 		request.Compiler = model.WorkspaceCompilerPreference;
 		request.ForceConfigure = false;
@@ -35,7 +35,7 @@ namespace SparkleLauncher
 		CookOperationRequest request;
 		request.RepositoryRoot = model.Repository.RootPath;
 		request.ContentId = model.ContentId;
-		request.RuntimeProfile = model.RuntimeProfile;
+		request.GameProfile = model.GameProfile;
 		request.Mode = arguments.RequestedCookMode;
 		request.ForceRecookConfirmed = arguments.ForceRecookConfirmed;
 		request.SelectedScopes = {CookWorkspaceScope::Shaders, CookWorkspaceScope::Textures, CookWorkspaceScope::SceneAssets};
@@ -61,7 +61,7 @@ namespace SparkleLauncher
 		request.ContentId = model.ContentId;
 		request.LevelId = arguments.LevelId;
 		request.RunMode = arguments.Product;
-		request.ProductProfile = arguments.Product == LevelRunMode::Editor ? model.EditorProfile : model.RuntimeProfile;
+		request.ProductProfile = arguments.Product == LevelRunMode::Editor ? model.EditorProfile : model.GameProfile;
 		request.GraphicsApi = arguments.GraphicsApi;
 		return request;
 	}
@@ -81,7 +81,7 @@ namespace SparkleLauncher
 	{
 		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.CanRun ? "Ready" : "Blocked") + "]");
 		model.JobOutput.push_back("Editor profile: " + model.EditorProfile);
-		model.JobOutput.push_back("Runtime profile: " + model.RuntimeProfile);
+		model.JobOutput.push_back("Game profile: " + model.GameProfile);
 		model.JobOutput.push_back("Workspace IDE: " + DisplayName(model.WorkspaceIdePreference));
 		model.JobOutput.push_back("Workspace compiler: " + DisplayName(model.WorkspaceCompilerPreference));
 		model.JobOutput.push_back("Latest log: " + plan.Operation.LogPath.string());
@@ -100,7 +100,7 @@ namespace SparkleLauncher
 	void AppendCookPlanDryRun(LauncherShellModel& model, const CookOperationPlan& plan)
 	{
 		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.CanRun ? "Ready" : "Blocked") + "]");
-		model.JobOutput.push_back("Runtime profile: " + model.RuntimeProfile);
+		model.JobOutput.push_back("Game profile: " + model.GameProfile);
 		model.JobOutput.push_back("Cook mode: " + ToString(plan.Request.Mode));
 		model.JobOutput.push_back("Cooked output: " + plan.CookedOutputDirectory.string());
 		model.JobOutput.push_back("Latest log: " + plan.Operation.LogPath.string());

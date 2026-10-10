@@ -277,7 +277,7 @@ This plan completes only when `FCR-REN-24` is decided against one immutable cand
 <details>
 <summary>Exact owners, source snapshots and related contracts</summary>
 
-**Responsibility:** order discovery, semantics, ownership, parametric grade, LUT workflow, editor/runtime integration, evidence, packaging, and closure for `FCR-REN-24`
+**Responsibility:** order discovery, semantics, ownership, parametric grade, LUT workflow, editor/game integration, evidence, packaging, and closure for `FCR-REN-24`
 
 **Authority boundary:** [Discovery](Discovery.md) authorizes the accepted design revision; [README](README.md) owns feature acceptance; [Display And Reconstruction](../../../../FirstRelease/DisplayAndReconstruction.md#dsp-5--color-grading) owns release-wide order; this plan owns only feature-local delivery
 

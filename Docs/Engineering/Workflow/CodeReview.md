@@ -161,7 +161,7 @@ Apply [System Core And Client Separation](../Foundations/ModuleOwnership.md#syst
 - Does the real production path deliver the requested behavior, or only scaffolding, a test double, a debug path, or an unused API?
 - Are inputs, outputs, invariants, units, coordinate spaces, errors, fallback, and unsupported states explicit?
 - Are edge cases and failure paths correct without preserving partially published state?
-- Are D3D12/Vulkan, serial/parallel, runtime/editor, cold/warm, and feature variants preserved where applicable?
+- Are D3D12/Vulkan, serial/parallel, game/editor, cold/warm, and feature variants preserved where applicable?
 - Do tests exercise observable behavior and fail when the claimed invariant is deliberately broken?
 
 ### 6. Review Ownership, Decomposition, and Bloat

@@ -59,7 +59,7 @@ This is a verified source-backed absence. It does not establish which Advanced C
 
 | ID | Decision | Required disposition |
 | --- | --- | --- |
-| `HDRD-01` | product and profile | freeze supported Windows versions, window/fullscreen behavior, DevelopmentEditor and packaged Runtime scope, D3D12/Vulkan cells, and explicit scRGB/HLG/dynamic-metadata exclusions |
+| `HDRD-01` | product and profile | freeze supported Windows versions, window/fullscreen behavior, DevelopmentEditor and packaged Game scope, D3D12/Vulkan cells, and explicit scRGB/HLG/dynamic-metadata exclusions |
 | `HDRD-02` | scene-working contract | name Renderer scene primaries/white/units, exposure relation, reference diffuse white, legal range, and conversion into the HDR output transform |
 | `HDRD-03` | output approach | freeze the packed 10-bit Rec.2020/PQ route required to satisfy the admitted HDR10 result; decide whether any DevelopmentEditor/UI profile additionally uses FP16/scRGB or is explicitly ineligible, and state fallback per profile/backend without calling the two signal encodings equivalent |
 | `HDRD-04` | target luminance | ratify fixed 1000-nit mastering, adapt tone mapping to queried output luminance, or define a bounded hybrid; freeze black/peak/FALL policy and user control |

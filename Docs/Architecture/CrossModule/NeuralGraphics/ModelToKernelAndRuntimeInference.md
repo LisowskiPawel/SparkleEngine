@@ -23,7 +23,7 @@
 | GPU execution | RHI materializes resources/pipeline/dispatch/barriers | attributable timing, memory, queue, and completion tokens |
 | delivery | Build/Packaging manifests model/kernel/runtime bytes and licenses | clean product readiness or explicit unavailable state |
 
-The target is not “compile a model somehow.” It is a reversible, inspectable chain in which every optimization can be compared numerically and every runtime artifact can be tied to the accepted model.
+The target is not “compile a model somehow.” It is a reversible, inspectable chain in which every optimization can be compared numerically and every game artifact can be tied to the accepted model.
 
 ## Capability Boundary
 
@@ -31,7 +31,7 @@ This dossier owns the boundary from one accepted model/operator artifact to exec
 
 ## Intended Route
 
-Accepted model/operator -> validated intermediate/export schema -> operator/legalization/fusion/layout/precision plan -> generated or selected kernels -> ShaderCompiler/build publication -> immutable runtime artifact -> Renderer typed inputs/outputs/history -> RHI dispatch/resources/barriers -> result validation -> completion-safe retirement.
+Accepted model/operator -> validated intermediate/export schema -> operator/legalization/fusion/layout/precision plan -> generated or selected kernels -> ShaderCompiler/build publication -> immutable game artifact -> Renderer typed inputs/outputs/history -> RHI dispatch/resources/barriers -> result validation -> completion-safe retirement.
 
 ## Contracts
 

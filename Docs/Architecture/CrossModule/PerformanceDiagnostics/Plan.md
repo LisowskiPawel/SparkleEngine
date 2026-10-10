@@ -34,7 +34,7 @@ flowchart LR
 | --- | --- |
 | external capture comes first | the current renderer is observable before internal instrumentation can obscure or perturb it |
 | packages are selected independently | unneeded UI, capture, GPU-detail, or provider depth does not become framework debt |
-| one meaning has one owner and history | Editor/runtime presenters read one bounded product instead of creating competing performance truths |
+| one meaning has one owner and history | Editor/game presenters read one bounded product instead of creating competing performance truths |
 | Shipping erasure is a gate | diagnostics implementation and optional SDK payload do not leak into the shipped runtime by default |
 
 This plan is not currently implemented by virtue of being detailed. Each phase remains gated by its own smallest checks and roadmap authorization.
@@ -198,7 +198,7 @@ Acceptance: deterministic tests cover generation changes, delayed/out-of-order r
 
 Value: separates begin-to-begin frame interval from actual Application-owned phase wall time and exposes the Editor/Game physical-owner distinction.
 
-Instrument fixed orchestration boundaries in `RuntimeApplication`/`EditorApplication`; reuse `Timer` identity and a steady monotonic clock. Names must distinguish physical thread (`Sparkle.EditorThread` or `Sparkle.GameThread`) from logical `Gameplay.*`, Editor, wait, and presentation phases. Do not turn arbitrary scoped timers into a public macro system.
+Instrument fixed orchestration boundaries in `GameApplication`/`EditorApplication`; reuse `Timer` identity and a steady monotonic clock. Names must distinguish physical thread (`Sparkle.EditorThread` or `Sparkle.GameThread`) from logical `Gameplay.*`, Editor, wait, and presentation phases. Do not turn arbitrary scoped timers into a public macro system.
 
 Acceptance: a controlled injected-clock test proves units and inclusion rules; serial and threaded runs preserve the same semantic labels.
 
@@ -268,7 +268,7 @@ the touched-path record before adding the feature. P0-GATE, P1-GATE, and all har
 are accepted; preserve the completed external-capture path without widening it.
 Keep authoring code intent-only, derive facts at existing low-level owners, and
 prove each diagnostic implementation/seam is absent from optimized Shipping
-objects, links, packages, and runtime. Extend RuntimeApplication, the existing
+objects, links, packages, and runtime. Extend GameApplication, the existing
 RenderCoordinator control/read-state path, Renderer diagnostics, RHI diagnostics,
 and Platform only where their current responsibility requires it. Application
 owns session/demand/join/publication; domains own measurements. Use bounded fixed
@@ -328,7 +328,7 @@ Replace the ImGui-derived FPS/delta block in `ViewportToolbar::DrawFrameStats` a
 
 #### `ORI-06` DevelopmentGame presenter
 
-Render selected compact groups through the existing runtime console/UI packet path. It shares command registration and Application truth with Editor, while retaining its own presentation composition. Shipping builds remain off by default unless a later explicit eligibility decision says otherwise.
+Render selected compact groups through the existing game console/UI packet path. It shares command registration and Application truth with Editor, while retaining its own presentation composition. Shipping builds remain off by default unless a later explicit eligibility decision says otherwise.
 
 ### Positive guardrails
 
@@ -371,7 +371,7 @@ path. Prove zero authoring work and strip
 the command/catalog/model/presenters/UI/assets plus their collection calls from
 Shipping rather than hiding them. Use the accepted Application
 diagnostics snapshot and typed request path; do not add collectors.
-Register one Stat command family through the existing Editor and runtime console
+Register one Stat command family through the existing Editor and game console
 composition. Replace overlapping ImGui FPS truth when ORI-05 is selected. Follow
 the compact layouts, row caps, validity, keyboard, and responsive behavior in the
 wireframes. Measure presenter/collection overhead against the P0 control. Do not
@@ -706,7 +706,7 @@ The performance diagnostics delivery is complete for the chosen scope when:
 3. the final authority/candidate ledger has zero unresolved rows and proves zero competing semantic authorities or unjustified duplicate implementations; every retained separation has a named data/lifetime boundary and passing test;
 4. every accepted package closes its touched-path record and satisfies the applicable Engineering standards;
 5. representative content/feature authoring remains intent-first with automatic low-level collection, and optimized Shipping source/link/object/package/runtime evidence proves all optional diagnostics and provider payload is absent;
-6. every accepted package has passed its Sponza shakedown and current runtime-supported catalog sweep, with no map silently omitted;
+6. every accepted package has passed its Sponza shakedown and current Game-supported catalog sweep, with no map silently omitted;
 7. the user has completed or explicitly delegated each package's reading task and the decision cites the populated sweep evidence;
 8. all superseded and failed experimental paths, APIs, build links, flags, tests, aliases, and copied documentation are removed;
 9. the selected product/backend/build matrix and observer-cost suite pass or record a scoped, honest limitation;
@@ -817,7 +817,7 @@ This is the reconciled 2026-09-29 starting inventory. Revalidate it rather than 
 | --- | --- | --- |
 | Frame interval and FPS | `ViewportToolbar::DrawFrameStats` reads ImGui `Framerate`/`DeltaTime`, while `Timer` is the host timing authority. | `ReplaceAndDelete`: derive FPS only from the valid Application-owned unscaled interval and remove the ImGui-derived product path. ImGui may retain its internal timing for ImGui itself, never as Sparkle performance truth. |
 | Diagnostics session and history | No accepted session exists yet; future groups, graphs, workspaces, and export could each be tempted to retain samples. | `Extend` Application once: one demand/generation/join/ring/snapshot authority. `UnitGraph`, workspace views, compact presenters, and export read that ring; none owns a second history. No Core global profiler singleton. |
-| Console command semantics | Core `ConsoleCommandRegistry` is hosted separately by `EditorConsoleSystem` and `RuntimeConsoleOverlay`. | `KeepSeparateWithBoundary` for product-local registry/session/presentation lifetimes; `Merge` performance command registration and parsing into one Application-owned registration function that produces the same typed request for both. No UI-formatted command strings. |
+| Console command semantics | Core `ConsoleCommandRegistry` is hosted separately by `EditorConsoleSystem` and `GameConsoleOverlay`. | `KeepSeparateWithBoundary` for product-local registry/session/presentation lifetimes; `Merge` performance command registration and parsing into one Application-owned registration function that produces the same typed request for both. No UI-formatted command strings. |
 | Renderer request and publication transport | `RenderCoordinator`, its bounded control queue, and `PublishReadState` already cross the Renderer thread boundary. | `Extend` the existing route. Reject a second diagnostics mailbox, synchronous query facade, event bus, or UI callback channel. |
 | GPU events, markers, and timing | `FrameExecutionDiagnostics`, `PassExecutionDiagnostics`, and backend `RenderTimingDiagnostics` already form the production path; current timing uses dynamic labels/containers/completion and disables parallel recording when enabled. | `ReplaceAndDelete` inside this path: one fixed token catalog feeds both markers and timing, fixed records/ranges replace dynamic/mutexed completion, bounded loss replaces ordinary exhaustion fatality, and the topology-changing `!CVarRendererDiagnosticGpuTiming` path is removed before detailed timing is accepted. No second GPU profiler. |
 | GPU memory facts | RHI `RenderMemoryDiagnostics`, Renderer `RendererMemoryMonitor`, and a synchronous Renderer-to-Editor snapshot callback expose related facts. `FramePipeline` now supplies the monitor's monotonic submission `FrameId`. | `Reuse` the corrected cadence and RHI allocator facts. `Extend` the existing monitor with the selected neutral segment product; Application retains sampled history. `ReplaceAndDelete` the overlapping synchronous performance callback after its consumers migrate; do not add another poller or allocation tracker. |
@@ -948,7 +948,7 @@ The evidence harness replaces manual repetition once `EVD-01` is accepted. It mu
 
 ### Current supported-map sweep
 
-At the start of every package, regenerate the sweep roster from [the Showcase catalog](../../../../Projects/Showcase/Levels.catalog): include each level with no asset pack or with a referenced asset pack whose `RuntimeSupported` value is true. Source availability and selection are different from runtime support. A required external pack that is not present must be acquired through the launcher; it is not a reason to silently omit the map.
+At the start of every package, regenerate the sweep roster from [the Showcase catalog](../../../../Projects/Showcase/Levels.catalog): include each level with no asset pack or with a referenced asset pack whose `GameSupported` value is true. Source availability and selection are different from runtime support. A required external pack that is not present must be acquired through the launcher; it is not a reason to silently omit the map.
 
 The roster reconciled on 2026-08-16 contains 13 levels:
 
@@ -968,13 +968,13 @@ The roster reconciled on 2026-08-16 contains 13 levels:
 | `ModernSponzaCandles` | Emissive-density stress | Emissive/source-light workload, repeated content, lighting-pass cost, and memory change. |
 | `ModernSponzaKnight` | Large scene plus animation | Modern Sponza baseline plus animation/skinning/update and temporal stability. |
 
-`SanMiguelHigh`, `SanMiguelLow`, and `JungleRuins` remain source-readiness checks, not runtime performance sweeps, while their catalog asset packs are `RuntimeSupported = false`. Future Ivy, Trees, Flood, and Explosion content is likewise excluded until its declared blocker closes. If the catalog changes, update the workload roster in the same change and test the newly supported level from that package onward.
+`SanMiguelHigh`, `SanMiguelLow`, and `JungleRuins` remain source-readiness checks, not runtime performance sweeps, while their catalog asset packs are `GameSupported = false`. Future Ivy, Trees, Flood, and Explosion content is likewise excluded until its declared blocker closes. If the catalog changes, update the workload roster in the same change and test the newly supported level from that package onward.
 
 ### Run ladder for every selected package
 
 1. **Automated contract:** run deterministic unit/concurrency/serialization tests and deliberate invalid, overflow, stale-generation, and failure cases owned by the package.
 2. **Sponza shakedown:** exercise the exact user action on Sponza first. Fix crashes, missing data, wrong units, stale identity, and unusable interaction before spending time on the full roster.
-3. **All-map functional sweep:** use the action on every runtime-supported map. Prove the requested level became active, wait for settled state when available, and verify the feature publishes or explicitly explains unavailability. No map may disappear from the result table.
+3. **All-map functional sweep:** use the action on every Game-supported map. Prove the requested level became active, wait for settled state when available, and verify the feature publishes or explicitly explains unavailability. No map may disappear from the result table.
 4. **Quantitative sweep:** for packages that report timing, distribution, memory, or comparison data, use the workload profile: fixed initial camera, fixed resolution once supported, VSync/presentation policy recorded, at least 300 warm-up frames after readiness, then at least 300 valid samples. One run validates wiring; at least three runs are required for a performance conclusion.
 5. **Backend sweep:** use D3D12 for the first package shakedown. A Renderer/RHI/backend-neutral package runs the full supported-map sweep on D3D12 and Vulkan before its phase gate. Backend-specific provider packages run only their declared backend but must state the excluded cells.
 6. **Editor/Game sweep:** measurements intended to represent the game use `DevelopmentGame`. Editor-only UI is exercised on every map in `DevelopmentEditor`; compare at least Empty, Sponza, and the worst measured map against DevelopmentGame before attributing editor overhead.

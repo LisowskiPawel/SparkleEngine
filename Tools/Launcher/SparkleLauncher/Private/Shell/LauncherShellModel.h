@@ -32,7 +32,7 @@ namespace SparkleLauncher
 		RepositoryRoot Repository;
 		std::string ContentId;
 		std::string EditorProfile = "DevelopmentEditor";
-		std::string RuntimeProfile = "DevelopmentGame";
+		std::string GameProfile = "DevelopmentGame";
 		WorkspaceIde WorkspaceIdePreference = WorkspaceIde::VisualStudio;
 		WorkspaceCompiler WorkspaceCompilerPreference = WorkspaceCompiler::Msvc;
 		std::vector<LauncherShellOperationRow> Operations;

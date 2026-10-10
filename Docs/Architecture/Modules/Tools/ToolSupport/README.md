@@ -26,7 +26,7 @@ The library standardizes presentation and one deliberately narrow cross-process 
 
 ## Module Boundary
 
-`ToolConsoleSupport` is a C++20 static host-tool library. CMake includes it only when host tools are enabled and excludes it from default game-profile builds. AssetCooker, TextureCooker, ShaderCompiler, and Launcher host-tool code link it; runtime and Editor logging remain separate Core/Application facilities.
+`ToolConsoleSupport` is a C++20 static host-tool library. CMake includes it only when host tools are enabled and excludes it from default game-profile builds. AssetCooker, TextureCooker, ShaderCompiler, and Launcher host-tool code link it; Game and Editor logging remain separate Core/Application facilities.
 
 ## Capability Surface
 

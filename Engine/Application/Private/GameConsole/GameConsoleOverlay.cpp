@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "RuntimeConsole/RuntimeConsoleOverlay.h"
+#include "GameConsole/GameConsoleOverlay.h"
 
 #include "Core/Public/Console/ConsoleBuiltinCommands.h"
 #include "Core/Public/Console/ConsoleSession.h"
@@ -18,18 +18,18 @@
 
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-RuntimeConsoleOverlay::RuntimeConsoleOverlay(Timer& timer, Window& window, CVarControlExecutor executor) :
+GameConsoleOverlay::GameConsoleOverlay(Timer& timer, Window& window, CVarControlExecutor executor) :
     m_timer(timer),
     m_window(window)
 {
 	if (!m_window.GetHWND())
 	{
-		throw Diagnostics::Error("Runtime console requires a valid host window.");
+		throw Diagnostics::Error("Game console requires a valid host window.");
 	}
 	ConsoleBuiltinCommands::Register(m_commandRegistry, std::move(executor));
-	m_consoleSession = std::make_unique<ConsoleSession>(m_commandRegistry, ConsoleCommandScope::Runtime);
+	m_consoleSession = std::make_unique<ConsoleSession>(m_commandRegistry, ConsoleCommandScope::Game);
 	m_renderPacketBuilder = std::make_unique<ImGuiRenderPacketBuilder>();
-	m_consoleSession->AddOutput(ConsoleCommandSeverity::Info, "Runtime console ready. Press tilde to close.");
+	m_consoleSession->AddOutput(ConsoleCommandSeverity::Info, "Game console ready. Press tilde to close.");
 
 	try
 	{
@@ -50,12 +50,12 @@ RuntimeConsoleOverlay::RuntimeConsoleOverlay(Timer& timer, Window& window, CVarC
 	}
 }
 
-RuntimeConsoleOverlay::~RuntimeConsoleOverlay() noexcept
+GameConsoleOverlay::~GameConsoleOverlay() noexcept
 {
 	ShutdownImGui();
 }
 
-void RuntimeConsoleOverlay::ShutdownImGui() noexcept
+void GameConsoleOverlay::ShutdownImGui() noexcept
 {
 	m_windowDpiScaleHandle.Reset();
 	m_windowMessageHandle.Reset();
@@ -73,7 +73,7 @@ void RuntimeConsoleOverlay::ShutdownImGui() noexcept
 	}
 }
 
-void RuntimeConsoleOverlay::HandleWindowMessage(WindowMessageEvent& event) noexcept
+void GameConsoleOverlay::HandleWindowMessage(WindowMessageEvent& event) noexcept
 {
 	if (ProcessWindowMessage(event.hWnd, event.msg, event.wParam, event.lParam))
 	{
@@ -81,7 +81,7 @@ void RuntimeConsoleOverlay::HandleWindowMessage(WindowMessageEvent& event) noexc
 	}
 }
 
-bool RuntimeConsoleOverlay::ProcessWindowMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+bool GameConsoleOverlay::ProcessWindowMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	if (msg == WM_KEYDOWN && wParam == VK_OEM_3)
 	{
@@ -101,7 +101,7 @@ bool RuntimeConsoleOverlay::ProcessWindowMessage(HWND hWnd, UINT msg, WPARAM wPa
 	return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam) != 0;
 }
 
-void RuntimeConsoleOverlay::InitializeImGuiContext()
+void GameConsoleOverlay::InitializeImGuiContext()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -113,16 +113,16 @@ void RuntimeConsoleOverlay::InitializeImGuiContext()
 	ImGuiRenderPacketBuilder::ConfigureProducerContext();
 }
 
-void RuntimeConsoleOverlay::InitializeWin32Backend()
+void GameConsoleOverlay::InitializeWin32Backend()
 {
 	if (!ImGui_ImplWin32_Init(m_window.GetHWND()))
 	{
-		throw Diagnostics::Error("Runtime console failed to initialize the Win32 ImGui backend.");
+		throw Diagnostics::Error("Game console failed to initialize the Win32 ImGui backend.");
 	}
 	m_isWin32BackendInitialized = true;
 }
 
-void RuntimeConsoleOverlay::ApplyDpiScale(float dpiScale) noexcept
+void GameConsoleOverlay::ApplyDpiScale(float dpiScale) noexcept
 {
 	ImGuiStyle& style = ImGui::GetStyle();
 	style = ImGuiStyle{};
@@ -131,13 +131,13 @@ void RuntimeConsoleOverlay::ApplyDpiScale(float dpiScale) noexcept
 	style.ScaleAllSizes(dpiScale);
 }
 
-void RuntimeConsoleOverlay::ToggleVisibility() noexcept
+void GameConsoleOverlay::ToggleVisibility() noexcept
 {
 	m_isVisible = !m_isVisible;
 	m_focusInput = m_isVisible;
 }
 
-void RuntimeConsoleOverlay::Update()
+void GameConsoleOverlay::Update()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.DeltaTime = static_cast<float>(m_timer.GetDelta(TimeDomain::Unscaled, TimeUnit::Seconds));
@@ -152,12 +152,12 @@ void RuntimeConsoleOverlay::Update()
 	m_renderPacket = m_renderPacketBuilder->Build(*ImGui::GetDrawData(), UiPresentationMode::HostOverlay);
 }
 
-UiRenderPacket RuntimeConsoleOverlay::ConsumeRenderPacket()
+UiRenderPacket GameConsoleOverlay::ConsumeRenderPacket()
 {
 	return std::move(m_renderPacket);
 }
 
-void RuntimeConsoleOverlay::BuildUI()
+void GameConsoleOverlay::BuildUI()
 {
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	if (viewport != nullptr)
@@ -168,7 +168,7 @@ void RuntimeConsoleOverlay::BuildUI()
 	}
 
 	const ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
-	if (!ImGui::Begin("Runtime Console", &m_isVisible, flags))
+	if (!ImGui::Begin("Game Console", &m_isVisible, flags))
 	{
 		ImGui::End();
 		return;
@@ -187,7 +187,7 @@ void RuntimeConsoleOverlay::BuildUI()
 	}
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(220.0f);
-	ImGui::InputTextWithHint("##RuntimeConsoleFilter", "Filter output", m_filterBuffer.data(), m_filterBuffer.size());
+	ImGui::InputTextWithHint("##GameConsoleFilter", "Filter output", m_filterBuffer.data(), m_filterBuffer.size());
 	ImGui::SameLine();
 	ImGui::TextDisabled("Tilde toggles");
 
@@ -200,7 +200,7 @@ void RuntimeConsoleOverlay::BuildUI()
 	ImGui::End();
 }
 
-void RuntimeConsoleOverlay::DrawOutputRecords()
+void GameConsoleOverlay::DrawOutputRecords()
 {
 	const std::vector<ConsoleOutputRecord>& records = m_consoleSession->GetOutputRecords();
 	if (records.size() != m_seenOutputCount)
@@ -209,7 +209,7 @@ void RuntimeConsoleOverlay::DrawOutputRecords()
 		m_scrollToBottom = true;
 	}
 
-	ImGui::BeginChild("##RuntimeConsoleScrollback", ImVec2(0.0f, -52.0f), ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar);
+	ImGui::BeginChild("##GameConsoleScrollback", ImVec2(0.0f, -52.0f), ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar);
 	const std::string_view filter(m_filterBuffer.data());
 	for (const ConsoleOutputRecord& record : records)
 	{
@@ -231,7 +231,7 @@ void RuntimeConsoleOverlay::DrawOutputRecords()
 	ImGui::EndChild();
 }
 
-void RuntimeConsoleOverlay::DrawInputLine()
+void GameConsoleOverlay::DrawInputLine()
 {
 	if (m_focusInput)
 	{
@@ -241,13 +241,13 @@ void RuntimeConsoleOverlay::DrawInputLine()
 
 	ImGui::SetNextItemWidth(-1.0f);
 	const ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_CallbackCompletion;
-	if (ImGui::InputTextWithHint("##RuntimeConsoleInput", "Type command, press Enter. Use Tab for completion.", m_inputBuffer.data(), m_inputBuffer.size(), flags, &HandleInputTextCallback, this))
+	if (ImGui::InputTextWithHint("##GameConsoleInput", "Type command, press Enter. Use Tab for completion.", m_inputBuffer.data(), m_inputBuffer.size(), flags, &HandleInputTextCallback, this))
 	{
 		SubmitInput();
 	}
 }
 
-void RuntimeConsoleOverlay::DrawAutocompletePreview()
+void GameConsoleOverlay::DrawAutocompletePreview()
 {
 	const std::vector<std::string> completions = GetCurrentCompletions();
 	if (completions.empty())
@@ -275,7 +275,7 @@ void RuntimeConsoleOverlay::DrawAutocompletePreview()
 	}
 }
 
-void RuntimeConsoleOverlay::SubmitInput()
+void GameConsoleOverlay::SubmitInput()
 {
 	const std::string_view input(m_inputBuffer.data());
 	m_consoleSession->SubmitLine(input);
@@ -284,7 +284,7 @@ void RuntimeConsoleOverlay::SubmitInput()
 	m_focusInput = true;
 }
 
-std::vector<std::string> RuntimeConsoleOverlay::GetCurrentCompletions() const
+std::vector<std::string> GameConsoleOverlay::GetCurrentCompletions() const
 {
 	if (m_inputBuffer[0] == '\0')
 	{
@@ -293,7 +293,7 @@ std::vector<std::string> RuntimeConsoleOverlay::GetCurrentCompletions() const
 	return m_consoleSession->CompleteLine(m_inputBuffer.data());
 }
 
-std::string RuntimeConsoleOverlay::BuildCompletionList(const std::vector<std::string>& completions) const
+std::string GameConsoleOverlay::BuildCompletionList(const std::vector<std::string>& completions) const
 {
 	std::string output = "matches:";
 	const std::size_t maxOutputCount = (std::min) (completions.size(), static_cast<std::size_t>(12));
@@ -309,14 +309,14 @@ std::string RuntimeConsoleOverlay::BuildCompletionList(const std::vector<std::st
 	return output;
 }
 
-int RuntimeConsoleOverlay::HandleInputTextCallback(ImGuiInputTextCallbackData* data)
+int GameConsoleOverlay::HandleInputTextCallback(ImGuiInputTextCallbackData* data)
 {
 	if (data == nullptr || data->UserData == nullptr)
 	{
 		return 0;
 	}
 
-	auto* overlay = static_cast<RuntimeConsoleOverlay*>(data->UserData);
+	auto* overlay = static_cast<GameConsoleOverlay*>(data->UserData);
 	if (data->EventFlag == ImGuiInputTextFlags_CallbackHistory)
 	{
 		return overlay->HandleHistoryCallback(*data);
@@ -328,7 +328,7 @@ int RuntimeConsoleOverlay::HandleInputTextCallback(ImGuiInputTextCallbackData* d
 	return 0;
 }
 
-int RuntimeConsoleOverlay::HandleHistoryCallback(ImGuiInputTextCallbackData& data)
+int GameConsoleOverlay::HandleHistoryCallback(ImGuiInputTextCallbackData& data)
 {
 	std::optional<std::string> replacement;
 	if (data.EventKey == ImGuiKey_UpArrow)
@@ -347,7 +347,7 @@ int RuntimeConsoleOverlay::HandleHistoryCallback(ImGuiInputTextCallbackData& dat
 	return 0;
 }
 
-int RuntimeConsoleOverlay::HandleCompletionCallback(ImGuiInputTextCallbackData& data)
+int GameConsoleOverlay::HandleCompletionCallback(ImGuiInputTextCallbackData& data)
 {
 	const std::string input(data.Buf, static_cast<std::size_t>(data.BufTextLen));
 	const std::vector<std::string> completions = m_consoleSession->CompleteLine(input);
@@ -373,7 +373,7 @@ int RuntimeConsoleOverlay::HandleCompletionCallback(ImGuiInputTextCallbackData& 
 	return 0;
 }
 
-ImVec4 RuntimeConsoleOverlay::GetSeverityColor(ConsoleCommandSeverity severity) noexcept
+ImVec4 GameConsoleOverlay::GetSeverityColor(ConsoleCommandSeverity severity) noexcept
 {
 	switch (severity)
 	{
@@ -387,7 +387,7 @@ ImVec4 RuntimeConsoleOverlay::GetSeverityColor(ConsoleCommandSeverity severity) 
 	}
 }
 
-std::size_t RuntimeConsoleOverlay::FindCompletionTokenStart(const std::string& input) noexcept
+std::size_t GameConsoleOverlay::FindCompletionTokenStart(const std::string& input) noexcept
 {
 	for (std::size_t index = input.size(); index > 0; --index)
 	{
@@ -399,7 +399,7 @@ std::size_t RuntimeConsoleOverlay::FindCompletionTokenStart(const std::string& i
 	return 0;
 }
 
-void RuntimeConsoleOverlay::ReplaceInputText(ImGuiInputTextCallbackData& data, const std::string& text)
+void GameConsoleOverlay::ReplaceInputText(ImGuiInputTextCallbackData& data, const std::string& text)
 {
 	data.DeleteChars(0, data.BufTextLen);
 	data.InsertChars(0, text.c_str());

@@ -126,7 +126,7 @@ The [Post Processing family dossier](../Modules/Engine/Renderer/Features/PostPro
 | Registration | Renderer contract target | Typed class -> virtual source, entry, stage, feature flags, ray metadata, parameter metadata | Duplicate/empty/inconsistent registration is rejected |
 | Source resolution | ShaderCompiler | `/Engine` and `/Project` virtual roots -> canonical file/include closure | Mount escape, missing include, or invalid virtual path fails the job |
 | Planning | ShaderCompiler cook planner | All, one shader ID, or reverse-dependency closure from changed paths -> immutable jobs | Removed registrations are not preserved; unaffected valid entries are preserved in incremental cook |
-| Compilation | DXC or Slang backend | Source + target + policy + binding remaps -> binary, reflection, diagnostics, hashes | Current runtime targets are DXIL SM6.6 and SPIR-V 1.6; Slang stage mapping is vertex/pixel/compute only |
+| Compilation | DXC or Slang backend | Source + target + policy + binding remaps -> binary, reflection, diagnostics, hashes | Current game targets are DXIL SM6.6 and SPIR-V 1.6; Slang stage mapping is vertex/pixel/compute only |
 | ABI validation | Shared validators | Reflected resources/constants/stage/ray contract compared with typed C++ metadata | Mismatch prevents publication |
 | Staging | Publisher | Map, library, dependency data, and recook signal are written as a candidate file set | Staged map/library must open together and share publication identity |
 | Commit | Atomic publication | Candidate file set replaces current products | Cancellation/failure cleanup preserves prior valid generation by design; executable fault tests remain open |

@@ -156,7 +156,7 @@ namespace SparkleLauncher
 		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(plan.Request.RepositoryRoot);
 
 		plan.ExecutablePath = FirstExistingOrPreferred({
-		    outputs.ProjectTargetOutputs(plan.Request.ContentId, plan.Request.RunMode == LevelRunMode::Editor ? "editor" : "runtime", plan.Request.ProductProfile).BinaryDirectory / fileName,
+		    outputs.ProjectTargetOutputs(plan.Request.ContentId, plan.Request.RunMode == LevelRunMode::Editor ? "editor" : "game", plan.Request.ProductProfile).BinaryDirectory / fileName,
 		    ResolveSparkleToolPath(plan.Request.RepositoryRoot, plan.Request.ProductProfile, plan.TargetName),
 		});
 

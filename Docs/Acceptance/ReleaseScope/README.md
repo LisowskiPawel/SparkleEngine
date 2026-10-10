@@ -15,7 +15,7 @@ This page defines the first release: three products, seven selectable maps, user
 **Already decided by you:**
 
 - Use your existing Ryzen 9 8940HX / RTX 5070 Ti Laptop GPU / 64 GB laptop for minimum and reference measurements.
-- Ship **Sparkle Launcher, Sparkle Editor and Sparkle Game**. Game is the runtime product; use Game in public product naming. Existing source targets are still `SparkleLauncher`, `ShowcaseEditor` and `ShowcaseRuntime`; packaging must bind each public name to its exact executable and configuration.
+- Ship **Sparkle Launcher, Sparkle Editor and Sparkle Game**. Game is the standalone product. Source targets are `SparkleLauncher`, `ShowcaseEditor` and `ShowcaseGame`; packaging must bind each public name to its exact executable and configuration.
 - Users are expected to start through **Sparkle Launcher**, then choose Editor or Game. Launcher lets users choose what content to sync and which product/map to launch. Start with built-in **Empty** if no example is selected. Deliver the seven release maps and all features they require; mark other Launcher choices development or unavailable. Selecting a missing or failed map must report failure.
 - The seven maps are Cornell Box, Cesium Man, classic Sponza, Modern Sponza, LPS Head, Diffuse Transmission Plant and A Beautiful Game. Modern Sponza remains the principal showcase/performance example, rather than a mandatory first-launch download. Postpone Bistro and Moana.
 - Use the user's display resolution and allow resolution changes; do not force 1080p or a fixed internal render extent. The selected rendering/upscaling mode owns internal resolution. **30 FPS on the named laptop** is the release acceptance target, measured with a fixed recorded benchmark configuration; it is not a guarantee at every user resolution or on unqualified hardware.
@@ -78,7 +78,7 @@ Excluded from release example selection: `DamagedHelmet` (rights unresolved), `M
 
 | Field | Selected machine / approved boundary |
 | --- | --- |
-| Products / current source targets | Sparkle Launcher / `SparkleLauncher`; Sparkle Editor / `ShowcaseEditor`; Sparkle Game / `ShowcaseRuntime` (`ShippingGame`). Exact shipped filenames, Editor/Launcher configurations and component membership require a reviewed package manifest. |
+| Products / current source targets | Sparkle Launcher / `SparkleLauncher`; Sparkle Editor / `ShowcaseEditor`; Sparkle Game / `ShowcaseGame` (`ShippingGame`). Exact shipped filenames, Editor/Launcher configurations and component membership require a reviewed package manifest. |
 | Observed OS | Windows 11 Home 25H2, build `26200.9457`; approved target starts at Windows 11 x64 24H2/build 26100 |
 | `MIN-01` / `REF-01` | Same AMD Ryzen 9 8940HX laptop, 16 cores/32 logical processors; 67,833,212,928 bytes OS-reported RAM; NVIDIA GeForce RTX 5070 Ti Laptop GPU, 12,227 MiB reported VRAM; driver `610.47` |
 | Storage | Patriot P400L 2000GB NVMe SSD, NTFS; at least 16 GiB free for extraction/staging/user data |

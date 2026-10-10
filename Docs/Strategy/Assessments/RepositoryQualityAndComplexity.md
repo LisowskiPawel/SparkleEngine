@@ -75,7 +75,7 @@ No recommendation in this assessment authorizes removal of a user-visible or gra
 - the one shared task runtime, serial/threaded modes, and existing deterministic execution semantics;
 - the editor viewport, scene inspection/editing, rendering settings, asset inspection, console, capture, and essential diagnostics workflows;
 - launcher sync, build, cook, clean, quick-start, level, dependency, maintenance, preview, cancellation, and activity workflows;
-- Showcase runtime/editor hosts, fallback behavior, and the Sponza, Bistro, and San Miguel evidence route;
+- Showcase game/editor hosts, fallback behavior, and the Sponza, Bistro, and San Miguel evidence route;
 - the current source assets and optional research entries, even when they are not part of the default acceptance path.
 
 What may be removed is **structural residue**: unused public exposure, duplicate metadata, redundant snapshots, forwarding-only wrappers, one-consumer generic machinery, dead flags, stale documents, and superseded paths. Such removal is valid only after current producers and consumers are traced and feature equivalence is demonstrated.
@@ -122,7 +122,7 @@ This combination matters. SparkleEngine does not have one simple â€œlarge filesâ
 | Graphics algorithms and dual backends | Strong capability, incomplete evidence | Protect; simplify only through measured vertical slices. |
 | Frame graph and task runtime | Valuable singular infrastructure | Maintain and harden; do not create competing convenience layers. |
 | Persistent scene/view/frame path | Directionally correct recent ownership work | Consolidate navigation and remove migration residue; do not restart the architecture. |
-| Runtime host and world extraction | Sound one-way flow with leaky public seams | Narrow contracts and collapse closed-world coordination. |
+| Game host and world extraction | Sound one-way flow with leaky public seams | Narrow contracts and collapse closed-world coordination. |
 | Content and shader pipeline | Essential deterministic boundary | Preserve formats and products; remove duplicate discovery, metadata, and publication decisions. |
 | Editor and launcher | Useful supporting workflows, oversized coordination surface | Freeze breadth; simplify existing tasks within the roadmap's supporting-work budget. |
 | Diagnostics | Useful raw observations, too much product-shaped surface | Keep bounded facts and capture handoff; delete or privatize unconsumed policy projections. |
@@ -146,14 +146,14 @@ Showcase entry point
   -> D3D12 or Vulkan backend
 ```
 
-This is the architecture to keep. `RuntimeApplication`, `GameWorld`, the submission extractor, `RenderCoordinator`, `FramePipeline`, the frame graph, and the RHI are recognizable owners. The largest gains will come from making their seams honest and removing auxiliary machinery around them, not replacing the flow.
+This is the architecture to keep. `GameApplication`, `GameWorld`, the submission extractor, `RenderCoordinator`, `FramePipeline`, the frame graph, and the RHI are recognizable owners. The largest gains will come from making their seams honest and removing auxiliary machinery around them, not replacing the flow.
 
 ### 2. Public headers and the build graph do not always describe the same dependency
 
 Several exported surfaces rely on types from modules that CMake marks private:
 
 - [Renderer.h](../../../Engine/Renderer/Public/Renderer.h) exposes `RenderFrameSubmission`, which physically lives in GameFramework, while Renderer links GameFramework privately.
-- [RuntimeApplication.h](../../../Engine/Application/Public/RuntimeApplication.h) includes GameFramework camera types, while Application describes and links GameFramework as implementation-only. Showcase explicitly links GameFramework, which masks the mismatch for the current product.
+- [GameApplication.h](../../../Engine/Application/Public/GameApplication.h) includes GameFramework camera types, while Application describes and links GameFramework as implementation-only. Showcase explicitly links GameFramework, which masks the mismatch for the current product.
 - [UI.h](../../../Engine/Editor/Public/UI.h) directly includes GameFramework world/edit/view types, while Editor links GameFramework privately.
 - GameFramework publicly links Platform even though its public headers do not expose a Platform contract; Tasks is a real public dependency because public constructors use `TaskExecutor` and `TaskScope`.
 
@@ -228,7 +228,7 @@ Structural work is justified when it does at least one of the following:
 **Current path**
 
 ```text
-RuntimeApplication::BeginFrame / UpdateRuntime
+GameApplication::BeginFrame / UpdateGame
   -> GameWorld::Update
   -> typed world systems through SparkleTasks
   -> GameWorld::ExtractRenderFrameSubmission
@@ -246,7 +246,7 @@ RuntimeApplication::BeginFrame / UpdateRuntime
 
 **Current complexity tax**
 
-- RuntimeApplication publicly exposes Timer, Window, InputSystem, LevelSession, Renderer, TaskExecutor, and TaskScope accessors. Current consumers are EditorApplication internals, not independent products.
+- GameApplication publicly exposes Timer, Window, InputSystem, LevelSession, Renderer, TaskExecutor, and TaskScope accessors. Current consumers are EditorApplication internals, not independent products.
 - Application's public camera and viewport types expose private target dependencies.
 - The world-system descriptor, binding, and compiler paths repeat knowledge for one fixed topology.
 - Some task metadata, such as scope kind, has no behavioral reader in the current tree.
@@ -257,7 +257,7 @@ Keep the public launch/options entry and the frame lifecycle needed by real host
 
 **Proof**
 
-Use serial, one-worker, and normal-worker world/frame runs; compare produced submission identity and ordering; exercise runtime and editor hosts; verify public-header compilation from declared target dependencies.
+Use serial, one-worker, and normal-worker world/frame runs; compare produced submission identity and ordering; exercise game and editor hosts; verify public-header compilation from declared target dependencies.
 
 ### Renderer scene, view, frame graph, and passes
 
@@ -394,7 +394,7 @@ renderer shader registrations + HLSL/Slang source
 
 - Static backend registration, shader registration, contract catalog assembly, package layout, command registry, inspection models, analysis reports, and editor recook coordination form a long path for a currently fixed product set.
 - Renderer shader-registration targets reach into Renderer private headers through special build access, while much of the enabling type system is public.
-- Application owns more than half of its private code in editor operations, shader recook, and runtime console support, blurring the minimal runtime-host story.
+- Application owns more than half of its private code in editor operations, shader recook, and game console support, blurring the minimal runtime-host story.
 
 **Target**
 
@@ -437,7 +437,7 @@ Expose one focused Editor session/frame contract to Application. Keep ImGui, pan
 
 **Proof**
 
-Exercise viewport navigation, scene read/edit/undo, settings, shader reload/recook, asset inspection, capture, DPI, and input routing. Verify the runtime host remains editor-free and the editor target's public header closure matches CMake.
+Exercise viewport navigation, scene read/edit/undo, settings, shader reload/recook, asset inspection, capture, DPI, and input routing. Verify the game host remains editor-free and the editor target's public header closure matches CMake.
 
 ### Launcher, build, cook, and quick start
 
@@ -472,7 +472,7 @@ Make one operation descriptor the source for ID, category, display, readiness, e
 
 **Proof**
 
-Preview, run, cancel, fail, retry, and clean each operation category; verify exact commands, scope, confirmation, output, refresh, and quick-start handoff. A responsive initial launcher process is not sufficient evidence that the generated editor/runtime path launched.
+Preview, run, cancel, fail, retry, and clean each operation category; verify exact commands, scope, confirmation, output, refresh, and quick-start handoff. A responsive initial launcher process is not sufficient evidence that the generated editor/game path launched.
 
 ### Diagnostics, capture, and portfolio evidence
 
@@ -504,14 +504,14 @@ Demonstrate that raw values originate from the owning allocator/resource system,
 | `Engine/RHI` | Explicit API contract, D3D12/Vulkan backends, native lifetimes, ray tracing, diagnostics facts, presentation. | Audit one native lifecycle at a time; trim unqueried capabilities/virtual methods and duplicate backend state; no second abstraction. | P2, evidence-driven |
 | `Engine/Renderer` | Scene/view/frame/frame graph, raster/ray paths, reference/ReSTIR, providers/fallback, settings, capture. | Privatize internal graph/pass types; consolidate capability-local helpers; separate runtime submission from editor diagnostics; reconcile satellite folders. | P1 |
 | `Engine/Editor` | Viewport, semantic scene editing, settings, console, asset inspection, capture. | Replace exported god UI/callback bags with a narrow session boundary; keep panels/models/providers private; retire catch-all utilities. | P1 boundary, P2 internals |
-| `Engine/Application` | Minimal runtime and editor composition, frame lifecycle, cooked-only runtime. | Privatize editor-only service access; move recook/editor coordination behind the editor host; publish only real host contracts. | P0/P1 |
+| `Engine/Application` | Minimal game and editor composition, frame lifecycle, cooked-only runtime. | Privatize editor-only service access; move recook/editor coordination behind the editor host; publish only real host contracts. | P0/P1 |
 | `Engine/Assets` | Current shaders, includes, source meshes/textures, defaults, and evidence inputs. | Organize by the capabilities that consume them; do not duplicate shader truth in documentation or generated registries. | Maintain |
 | `Tools/Import` | glTF/FBX support, canonical coordinate/unit normalization, imported-domain model. | Share domain-neutral parsing/math only; keep format translation explicit; remove duplicate intermediate copies where ownership permits moves/views. | P1 with content gates |
 | `Tools/Cooking` | Deterministic texture/material/mesh/scene/asset products and atomic publication. | One cook plan, one identity, one diagnostics record, one publication path; avoid permanent reports without acceptance consumers. | P1 with content gates |
 | `Tools/Shaders` | DXC/Slang, typed contracts, packages, registry, inspection, compile-every-input policy. | One shader identity/catalog; internalize registration support; keep CLI and analysis as thin views over the same product. | P1 with shader gates |
 | `Tools/Launcher` | All current workflow capabilities and typed operation execution. | One metadata authority; workflow-local UI state; thin composition shell; derive readiness/status rather than switch on IDs. | P2 / <=10% support lane |
 | `Tools/Support` | Shared console-process conventions. | Keep at current small scope. | Protect |
-| `Projects/Showcase` | Separate runtime/editor launch products and evidence entry point. | Keep entry points thin; remove compensating module links only after public target closure is corrected. | P0 build truth |
+| `Projects/Showcase` | Separate game/editor launch products and evidence entry point. | Keep entry points thin; remove compensating module links only after public target closure is corrected. | P0 build truth |
 | CMake/configuration | Profiles, artifact contract, explicit product targets, boundary check, pinned dependencies. | Make PUBLIC/PRIVATE closure truthful; review always-built editor/launcher cost; break dependency acquisition only by vendor/lifetime owner, not arbitrary size. | P0 |
 | Documentation | One authority per decision, reviewer routes, standards, workload gates, dated plans. | Repair missing routes; remove completed implementation prompts; merge durable truth into current owners; delete superseded documents in the same change. | P0 |
 
@@ -531,7 +531,7 @@ P0 is small, reviewable, and mostly behavior-neutral. It raises trust immediatel
 
 Run these as independent clean-break changelists, with one primary work item at a time:
 
-1. **Runtime/editor host seam:** keep RuntimeApplication's product API narrow; replace public internal getters and Editor callback bags with focused private host bridges.
+1. **Game/editor host seam:** keep GameApplication's product API narrow; replace public internal getters and Editor callback bags with focused private host bridges.
 2. **GameFramework execution:** replace duplicate fixed-system descriptors/bindings and open-ended compilation machinery with one closed topology while retaining hazards and parallel behavior.
 3. **Renderer capability cohesion:** start with a roadmap-touched path such as lighting, view preparation, or presentation; collapse one-use forwarding layers and reconcile satellite folders without combining independent passes.
 4. **Content identity and cook path:** make project/level/asset identity singular from launcher selection through cooker publication and runtime load; reuse syntax only where actually shared.
@@ -595,7 +595,7 @@ The safest high-leverage order is:
 
 ```text
 truthful docs and target boundaries
-  -> narrow public runtime/editor/renderer seams
+  -> narrow public game/editor/renderer seams
   -> simplify one fixed GameFramework execution path
   -> consolidate one roadmap-touched renderer/content/shader slice
   -> simplify launcher/editor projections around the now-stable contracts

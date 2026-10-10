@@ -53,7 +53,7 @@ The numerical bounds are implementation contracts immediately. A development mac
 
 ## Product Pillar
 
-A user selects **Reference Path Tracer** through the current host's ordinary View Mode control—immediately after **Lit** in Editor, or through the approved development view selector in a Game/runtime host—and receives a progressively refined image with truthful sample progress. Any effective camera or radiance-affecting scene change invalidates the old prefix before it can mix with the new view. Switching back to Lit enables immediate comparison; returning resumes only a retained exact-identity prefix, while a disclosed no-retention exit restarts at ordinal zero.
+A user selects **Reference Path Tracer** through the current host's ordinary View Mode control—immediately after **Lit** in Editor, or through the approved development view selector in a Game host—and receives a progressively refined image with truthful sample progress. Any effective camera or radiance-affecting scene change invalidates the old prefix before it can mix with the new view. Switching back to Lit enables immediate comparison; returning resumes only a retained exact-identity prefix, while a disclosed no-retention exit restarts at ordinal zero.
 
 The normal route requires no IDE, developer console, CVar sequence, mandatory setup workspace, or manual `Validate`/`Start` ceremony. Correct defaults, capability validation, accumulation, reset, and preview presentation are consequences of selecting the view mode. A details surface exists for current state, route/backend truth, raw-versus-display meaning, pause/restart, and actionable unavailability, but is not a prerequisite for first use. Export remains a later Evidence/Output capability.
 
@@ -64,7 +64,7 @@ Four distinctions remain impossible to miss:
 - **complete current-view result versus partial prefix, checkpoint, export staging, failure, or accepted oracle evidence**;
 - **viewport comparison session versus a durable exported artifact**.
 
-The Renderer semantic is host-agnostic and supports both Editor `Scene` views and Game/runtime `Game` views. `RenderViewKind` identifies the ordinary camera producer; it never chooses a different path tracer. `RenderViewMode::ReferencePathTracer` selects the same frame composition, session semantics, and estimator for either kind. DevelopmentEditor exposes the mode through its viewport UI, while DebugGame/DevelopmentGame may submit the same value through their approved control. Shipping reachability remains a separate release-policy gate, not an architecture fork.
+The Renderer semantic is host-agnostic and supports both Editor `Scene` views and Game `Game` views. `RenderViewKind` identifies the ordinary camera producer; it never chooses a different path tracer. `RenderViewMode::ReferencePathTracer` selects the same frame composition, session semantics, and estimator for either kind. DevelopmentEditor exposes the mode through its viewport UI, while DebugGame/DevelopmentGame may submit the same value through their approved control. Shipping reachability remains a separate release-policy gate, not an architecture fork.
 
 ## Intended People And Jobs
 
@@ -198,7 +198,7 @@ There is no epsilon for reference-camera movement: if canonical ray-generation i
 
 ## Editor And Non-Editor Cameras
 
-Editor free-fly navigation, an Editor-piloted scene camera, and a Game/runtime camera are producers of one canonical `RenderViewInput.Camera` contract. The Reference Path Tracer observes the resolved View identity and camera fields after their normal owner has updated them. It does not poll Editor widgets, gameplay objects, or input devices independently.
+Editor free-fly navigation, an Editor-piloted scene camera, and a Game camera are producers of one canonical `RenderViewInput.Camera` contract. The Reference Path Tracer observes the resolved View identity and camera fields after their normal owner has updated them. It does not poll Editor widgets, gameplay objects, or input devices independently.
 
 - Editor translation, orbit, rotation, focus, bookmark recall, pilot/eject, projection edit, and scene-camera property edit all reset when they change the effective camera.
 - Runtime camera animation, controller movement, camera cuts, teleports, active-camera replacement, projection/lens edits, and viewport resize follow the same rule.
@@ -315,7 +315,7 @@ An independent read-only reviewer attempted to reconstruct first use from source
 
 ## Stage-7 Source Reconciliation
 
-The current source exposes the mode immediately after Lit, starts the feature session automatically, reports exact committed/target SPP, distinguishes reset/accumulation/pause/completion/unavailability, retains the latest reset and discarded prefix, estimates throughput/ETA, explains raw-versus-display meaning, and provides pause/resume/restart plus explicit single-session transfer. Unsupported selection offers a direct return to Lit and never relabels Lit output as Reference. Editor strings and controls live in one private feature overlay; the viewport panel contains one call. Game/runtime continues through the same public `ViewportRenderRequest` and `RuntimeApplication::SubmitViewportRenderRequest` route without importing Editor code. The current overlay does not yet present the automatically resolved frontend/backend details required by the frozen details contract.
+The current source exposes the mode immediately after Lit, starts the feature session automatically, reports exact committed/target SPP, distinguishes reset/accumulation/pause/completion/unavailability, retains the latest reset and discarded prefix, estimates throughput/ETA, explains raw-versus-display meaning, and provides pause/resume/restart plus explicit single-session transfer. Unsupported selection offers a direct return to Lit and never relabels Lit output as Reference. Editor strings and controls live in one private feature overlay; the viewport panel contains one call. Game continues through the same public `ViewportRenderRequest` and `GameApplication::SubmitViewportRenderRequest` route without importing Editor code. The current overlay does not yet present the automatically resolved frontend/backend details required by the frozen details contract.
 
 This remains primarily source evidence. A D3D12 DevelopmentEditor owner run reached selection and progressive state after the presentation and sampler crash fixes, but it did not produce a successful first-use result: Reference showed sky with effectively black scene geometry, and Lit was also effectively black while GBuffer diffuse remained populated. No interactive camera matrix, response-budget measurement, keyboard/focus/DPI/accessibility review, Game host workflow, Vulkan/backend comparison, artifact round trip, or Shipping exclusion proof has passed.
 
@@ -330,7 +330,7 @@ This remains primarily source evidence. A D3D12 DevelopmentEditor owner run reac
 | Switch Lit -> Reference -> Lit -> Reference | The one-mode frame route and suspension contract exist, but comparison is not meaningful while both lighting views are black. | **Unproved.** Retention and exact revalidation still need direct observation. |
 | Pause, resume, restart, transfer, and close | Controls and session states exist. Settlement, resource retention, second-view ownership, shutdown, and recovery budgets have not passed. | **Unproved.** |
 | Save raw output/checkpoint | Buttons and source workflow exist. No exact-prefix EXR/checkpoint round trip or failure recovery has passed. | **Unproved and secondary to the viewport blocker.** |
-| Use Game/runtime and Vulkan | The same request semantic exists in source. | **Not executed for the current candidate.** |
+| Use Game and Vulkan | The same request semantic exists in source. | **Not executed for the current candidate.** |
 
 The next UX evidence run begins only after both lighting routes produce visibly nontrivial, finite scene results. It then exercises the full happy path and each state/action on the same immutable candidate; reopening the menu or watching progress advance is not sufficient.
 
@@ -362,7 +362,7 @@ Epic's official Unreal Engine 5.8 Path Tracer documentation is the primary inter
 
 - ordinary viewport View Mode selection, automatic progressive accumulation, a visible target-SPP progress bar, and immediate noisy feedback;
 - invalidation on effective camera, view, object, material, light, environment, or admitted deformation change;
-- the same semantic being reachable from an approved Game/runtime viewport rather than existing only as an Editor batch tool;
+- the same semantic being reachable from an approved Game viewport rather than existing only as an Editor batch tool;
 - raw radiance remaining distinct from denoised radiance, albedo/normal/variance guides, display transforms, screenshots, and final file output;
 - bounce/sample/filter controls being mode semantics rather than mutations of the user's Lit configuration; and
 - bounded GPU work so camera interaction and the operating-system watchdog are not hostage to one uninterruptible render.
@@ -386,7 +386,7 @@ This correspondence originally guided Stages 6/7. The current source contains ac
 | Selecting the mode mutates persistent Lit settings | Returning to Lit is surprising and comparison is no longer controlled. | Resolve mode-internal reference semantics; restore untouched Lit state on exit. |
 | User must click Validate and Start for the supported default | Routine comparison carries batch-tool ceremony. | Automatic preflight and start on view-mode selection; block only with an actionable reason. |
 | Viewport freezes, displays the old composition, or turns black throughout camera movement | The feature behaves like an offline dialog instead of a view mode and makes composition search impractical. | Prioritize the newest camera identity, visibly mark transition state, present its newest committed prefix at bounded cadence, and refine automatically when motion stops. |
-| Camera input is detected but effective camera changes are not, or vice versa | Editor/runtime producers can leave stale history or reset needlessly. | Canonical post-resolution camera identity is authority; producer cut/motion signals refine reasons only. |
+| Camera input is detected but effective camera changes are not, or vice versa | Editor/game producers can leave stale history or reset needlessly. | Canonical post-resolution camera identity is authority; producer cut/motion signals refine reasons only. |
 | Small camera changes use an epsilon | Samples from different measurements mix. | Any canonical ray-generation change resets; no movement tolerance. |
 | TAA jitter or frame index resets reference history | A stationary view never converges. | Path-tracer film samples own jitter; ordinary temporal jitter/frame count stay outside identity. |
 | Animated content does not invalidate | Blurring or streaking is presented as reference. | Generation-complete dynamic-content invalidation or explicit unsupported/frozen-time rejection. |
@@ -415,7 +415,7 @@ The implementation sequence has two non-interchangeable gates. The primary viewp
 
 The complete workflow is ready for `FCR-REN-08` consideration only when the primary gate remains passing and:
 
-9. `CHK-RPT-02` proves Editor and runtime viewport intents resolve to the same semantic digest and sample stream;
+9. `CHK-RPT-02` proves Editor and Game viewport intents resolve to the same semantic digest and sample stream;
 10. `CHK-RPT-13` exercises capability, capacity, timeout, cancellation, device, checkpoint, disk, and publication failures with bounded cleanup/recovery;
 11. `CHK-RPT-10` proves every display/save/open/compare action keeps raw and presentation lineage separate; and
 12. full-resolution manual raw save, locale, spaces, non-ASCII, read-only install, support, and output discovery pass their declared evidence matrices.

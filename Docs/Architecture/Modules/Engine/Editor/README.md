@@ -129,7 +129,7 @@ Sparkle Editor is a **required shipped product** for `v0.1.0`, currently impleme
 | Check | Claims falsified | Smallest route and oracle |
 | --- | --- | --- |
 | `CHK-PROD04-01` | `AC-PROD04-01`, `AC-PROD04-02`, `AC-PROD04-03`; `FM-PROD04-01`–`03` | Focused supported-toolchain Editor build, then clean-machine packaged Empty/all-seven-map activation and one scripted non-author open/edit/undo/redo/save/reload/exit route on a disposable source copy with each named fault. World/source hashes and operation results are the oracle. |
-| `CHK-PROD04-02` | `AC-PROD04-04`; `FM-PROD04-04` | Independently inventory the verified three-product stage: require the declared Editor component/helpers and inspect Game (`ShowcaseRuntime`) imports against the Editor dependency denylist. Component presence and zero Editor linkage in Game are required. |
+| `CHK-PROD04-02` | `AC-PROD04-04`; `FM-PROD04-04` | Independently inventory the verified three-product stage: require the declared Editor component/helpers and inspect Game (`ShowcaseGame`) imports against the Editor dependency denylist. Component presence and zero Editor linkage in Game are required. |
 
 Candidate results belong in `FCR-PROD-04`; no usability, build, runtime, save, or package result was produced by this contract pass.
 

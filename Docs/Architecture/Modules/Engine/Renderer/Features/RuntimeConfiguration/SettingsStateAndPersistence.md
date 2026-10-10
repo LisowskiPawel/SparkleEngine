@@ -69,7 +69,7 @@ Consequences that must remain explicit:
 - This dossier owns the cross-module aggregate state route. Each feature dossier owns value meaning, clamps, graph/history impact, capability fallback, and output evidence.
 - [Feature Selector Catalog](FeatureSelectorCatalog.md) owns exact names, defaults, domains, persistence membership, consumers, and absent/ineffective controls.
 - Application owns persistence, filesystem location, startup ordering, and save-before-submit policy; Editor owns the private interaction model and restart presentation; Renderer owns the value contract, capture/apply operation, cross-thread delivery, and rendering consumers. CVar/feature owners remain the active runtime authority.
-- Adding a setting requires the state field, setter/UI, CVar/parser, persistence decision, runtime consumer, requested/active report, topology/history/restart behavior, and feature dossier to change together.
+- Adding a setting requires the state field, setter/UI, CVar/parser, persistence decision, game consumer, requested/active report, topology/history/restart behavior, and feature dossier to change together.
 
 ## Horizontal Coverage
 
@@ -79,7 +79,7 @@ Consequences that must remain explicit:
 | persistence | missing/existing file, unrelated sections/comments, first/last owned section, malformed/unknown/duplicate values, read-only/full/concurrently edited file | unrelated data is preserved and failure never masquerades as saved state |
 | lifecycle | startup, command-line override, live edit, topology/history change, pending restart, restart, package run | requested, CVar, resolved active, and session-active state remain distinguishable |
 | surface | editor/public state, console-only Renderer, RHI-only controls, absent features | no hidden or orphan selector is inferred as supported UI capability |
-| configuration | Debug/Development/Shipping, editor/runtime, workspace/package, D3D12/Vulkan | reachability and writable location are explicitly classified |
+| configuration | Debug/Development/Shipping, editor/game, workspace/package, D3D12/Vulkan | reachability and writable location are explicitly classified |
 
 ## Acceptance Criteria
 
@@ -88,7 +88,7 @@ Consequences that must remain explicit:
 - `AC-SET-03` — malformed, unknown, duplicate, unreadable, unwritable, partial-write, and concurrent-edit cases return an actionable result and preserve a valid prior file/state rather than silently succeeding.
 - `AC-SET-04` — startup persisted values apply before command-line overrides; serial and threaded commits produce equivalent ordered CVar and next-frame resolved states.
 - `AC-SET-05` — live, topology/history-affecting, capability-gated, and restart-required changes expose requested/CVar/resolved/session-active state and reason without false activation.
-- `AC-SET-06` — editor/runtime and workspace/package reachability plus writable configuration location are classified for every supported build/backend cell.
+- `AC-SET-06` — editor/game and workspace/package reachability plus writable configuration location are classified for every supported build/backend cell.
 - `AC-SET-07` — adding/removing a selector leaves no orphan state field, setter, persisted name, UI control, CVar, consumer, or stale compatibility alias.
 
 ## Controlled Failure Modes And Checks

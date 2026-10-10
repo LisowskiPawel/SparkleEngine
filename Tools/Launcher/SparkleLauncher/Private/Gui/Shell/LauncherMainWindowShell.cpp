@@ -147,7 +147,7 @@ namespace SparkleLauncher
 
 		m_graphicsApiCombo = CreateContextCombo(&LauncherSettings::SetGraphicsApi);
 		m_graphicsApiCombo->setAccessibleName("Graphics API");
-		m_graphicsApiCombo->setToolTip("Graphics API passed to a level runtime launched from Quick Start.");
+		m_graphicsApiCombo->setToolTip("Graphics API passed to a Game launched from Quick Start.");
 		addContextItem("Graphics API", *m_graphicsApiCombo, LauncherUi::ContextSelector::GraphicsApiComboMinWidth, LauncherUi::ContextSelector::GraphicsApiComboMaxWidth);
 
 		m_captureProviderCombo = CreateContextCombo(&LauncherSettings::SetCaptureProvider);
@@ -163,7 +163,7 @@ namespace SparkleLauncher
 
 		m_buildConfigurationCombo = CreateContextCombo(&LauncherSettings::SetBuildConfiguration);
 		m_buildConfigurationCombo->setAccessibleName("Build Configuration");
-		m_buildConfigurationCombo->setToolTip("Global editor and runtime configuration. Only configurations backed by both product profiles are selectable.");
+		m_buildConfigurationCombo->setToolTip("Global editor and game configuration. Only configurations backed by both product profiles are selectable.");
 		addContextItem("Configuration", *m_buildConfigurationCombo, LauncherUi::ContextSelector::ConfigurationComboMinWidth, LauncherUi::ContextSelector::ConfigurationComboMaxWidth);
 
 		m_workspaceCompilerCombo = CreateContextCombo(&LauncherSettings::SetWorkspaceCompiler);
@@ -208,7 +208,7 @@ namespace SparkleLauncher
 		const LauncherContextUiModel model = LauncherContextUiModel::Build(toolchain);
 		PopulateBoundContextCombo(m_runModeCombo, model.RunModes, m_settings.RunMode(), m_settings, &LauncherSettings::SetRunMode);
 		PopulateBoundContextCombo(m_graphicsApiCombo, model.GraphicsApis, m_settings.GraphicsApi(), m_settings, &LauncherSettings::SetGraphicsApi);
-		const QString profile = m_settings.RunMode() == "editor" ? m_settings.EditorProfile() : m_settings.RuntimeProfile();
+		const QString profile = m_settings.RunMode() == "editor" ? m_settings.EditorProfile() : m_settings.GameProfile();
 
 		PopulateBoundContextCombo(
 		    m_captureProviderCombo,

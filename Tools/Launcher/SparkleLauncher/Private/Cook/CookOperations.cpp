@@ -86,17 +86,17 @@ namespace SparkleLauncher
 		}
 	}
 
-	static std::string ResolveCookToolProfile(std::string_view runtimeProfileName)
+	static std::string ResolveCookToolProfile(std::string_view gameProfileName)
 	{
-		const std::optional<BuildProfile> runtimeProfile = FindBuildProfile(runtimeProfileName);
-		if (!runtimeProfile.has_value())
+		const std::optional<BuildProfile> gameProfile = FindBuildProfile(gameProfileName);
+		if (!gameProfile.has_value())
 		{
 			return "DevelopmentEditor";
 		}
 
 		for (const BuildProfile& profile : GetBuildProfileCatalog())
 		{
-			if (profile.State == runtimeProfile->State && profile.Target == BuildProfileTarget::Editor)
+			if (profile.State == gameProfile->State && profile.Target == BuildProfileTarget::Editor)
 			{
 				return profile.Name;
 			}
@@ -375,12 +375,12 @@ namespace SparkleLauncher
 				}
 			}
 		}
-		plan.ToolProfile = ResolveCookToolProfile(request.RuntimeProfile);
+		plan.ToolProfile = ResolveCookToolProfile(request.GameProfile);
 		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(request.RepositoryRoot);
 		plan.CookedOutputDirectory = workspaceOutputs.CookedProjectDirectory(request.ContentId);
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Operation.Inputs.push_back({"content", request.ContentId});
-		plan.Operation.Inputs.push_back({"runtimeProfile", request.RuntimeProfile});
+		plan.Operation.Inputs.push_back({"gameProfile", request.GameProfile});
 		plan.Operation.Inputs.push_back({"cookMode", ToString(request.Mode)});
 		plan.Operation.Inputs.push_back({"toolProfile", plan.ToolProfile});
 		plan.Operation.Inputs.push_back({"shaderBackend", request.ShaderBackend});

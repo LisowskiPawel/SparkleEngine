@@ -10,11 +10,11 @@ Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected rel
 
 | What to do | Working route |
 | --- | --- |
-| First action | [PD-1 consumer shell](#pd-1--runtime-and-editor-product-shells) is the next product slice: first-run/menu/settings, required-content failure and Shipping console isolation. Reconcile the amended product boundary; the historical runtime-only PD-0 freeze is superseded where it conflicts. |
+| First action | [PD-1 consumer shell](#pd-1--game-and-editor-product-shells) is the next product slice: first-run/menu/settings, required-content failure and Shipping console isolation. Reconcile the amended product boundary; the historical Game-only PD-0 freeze is superseded where it conflicts. |
 | Result to reach | A consumer can start, choose an example, change/reset settings and quit; retain the phase checks before moving to source adoption and packaging. |
 | Start / stop | Scope approval and applicable release prerequisites must close first. PD-0 contract evidence does not pass REL-00 or the product families. |
 
-## `PD-1` — Runtime And Editor Product Shells
+## `PD-1` — Game And Editor Product Shells
 
 **Goal:** close `FCR-PROD-01` and the required shipped Editor family `FCR-PROD-04` so the first run, controls, settings, level selection, failure, reset, and exit are intentional.
 
@@ -22,13 +22,13 @@ Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected rel
 
 **Required work:**
 
-- preserve `RuntimeApplication` as runtime host and extend the current Showcase entry/product path rather than adding a second launcher;
+- preserve `GameApplication` as game host and extend the current Showcase entry/product path rather than adding a second launcher;
 - make the expected Launcher -> Editor/Game entry, selected-map activation, loading state, controls/help, settings/reset/quit and unsupported-state messaging discoverable; use user/display-selected resolution and approved chromatic aberration/vignette On defaults; keep benchmark resolution separate;
 - ensure level failure cannot silently become successful `Empty` content and settings resolve requested versus active state truthfully;
 - keep Editor layering explicit; prove its required shipped journey and keep Editor dependencies isolated from the Game component;
 - use representative fresh-user, standard-user, resize/DPI, missing/corrupt content, unsupported-provider, and shutdown routes from the owned contracts.
 
-**Failure modes to control:** blank first frame; trapped mouse/focus; stale settings; load failure shown as success; editor-only service required by runtime; quit leaves work or files in flight; fallback is active but hidden.
+**Failure modes to control:** blank first frame; trapped mouse/focus; stale settings; load failure shown as success; editor-only service required by Game; quit leaves work or files in flight; fallback is active but hidden.
 
 **Phase exit criteria:** the feature-local checks for `FCR-PROD-01` and the selected `FCR-PROD-04` scope pass on the exact configuration; all three products are represented truthfully and Game imports no Editor/authoring dependency; results are filed in candidate FCR reports.
 
@@ -38,7 +38,7 @@ Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected rel
 <summary>Copy the execution prompt</summary>
 
 ```text
-Implement PD-1 as one product-journey vertical slice. Reconcile RuntimeApplication, EditorApplication, Showcase startup, level catalog/session, input/focus, settings, UI, renderer admission, shutdown, and target membership. Create the iteration record with the owning AC/FM/CHK. Extend current owners only; make requested/active state and failures visible, preserve standard-user paths, and delete replaced UI/control paths. Exercise first run, controls/help, select/load/reset/quit, malformed or missing content, resize/focus, unsupported selection, and shutdown. Use the smallest owning builds first; run broader runtime routes only when the mapped check requires them. Record exact candidate results and stop on an unresolved product choice.
+Implement PD-1 as one product-journey vertical slice. Reconcile GameApplication, EditorApplication, Showcase startup, level catalog/session, input/focus, settings, UI, renderer admission, shutdown, and target membership. Create the iteration record with the owning AC/FM/CHK. Extend current owners only; make requested/active state and failures visible, preserve standard-user paths, and delete replaced UI/control paths. Exercise first run, controls/help, select/load/reset/quit, malformed or missing content, resize/focus, unsupported selection, and shutdown. Use the smallest owning builds first; run broader runtime routes only when the mapped check requires them. Record exact candidate results and stop on an unresolved product choice.
 ```
 
 </details>
@@ -140,7 +140,7 @@ This plan is complete only when all six product FCRs have Architecture-owned con
 <details>
 <summary>Exact owners, source snapshots and related contracts</summary>
 
-**Responsibility:** sequence the first-release product journeys, developer workflows, runtime archive, and operated support boundary
+**Responsibility:** sequence the first-release product journeys, developer workflows, Game archive, and operated support boundary
 
 **Orchestrator:** [First Release Implementation Plan](README.md)
 
@@ -150,11 +150,11 @@ This plan is complete only when all six product FCRs have Architecture-owned con
 
 ## Outcome And Order
 
-Deliver one understandable Showcase runtime, one reproducible source-adopter route, explicitly classified developer products, one manifest-owned release archive, and an operated support boundary.
+Deliver one understandable Showcase Game, one reproducible source-adopter route, explicitly classified developer products, one manifest-owned release archive, and an operated support boundary.
 
 ```mermaid
 flowchart LR
-    P0[PD-0<br/>freeze contracts] --> P1[PD-1<br/>runtime and editor]
+    P0[PD-0<br/>freeze contracts] --> P1[PD-1<br/>game and editor]
     P1 --> P2[PD-2<br/>source, cook, launcher]
     P2 --> P3[PD-3<br/>package]
     P3 --> P4[PD-4<br/>support and closure]
@@ -163,7 +163,7 @@ flowchart LR
 | Phase | Primary families | Current starting point | Dependency |
 | --- | --- | --- | --- |
 | `PD-0` | all six | [`ITER-PROD-00-01`](#iter-prod-00-01-control-record) passed the contract freeze only; every product family remains `Blocked` for executable evidence | `FR-00` |
-| `PD-1` | `FCR-PROD-01`, `FCR-PROD-04` | runtime/editor source paths are integrated; product UX and delivery evidence are open | frozen product classification |
+| `PD-1` | `FCR-PROD-01`, `FCR-PROD-04` | game/editor source paths are integrated; product UX and delivery evidence are open | frozen product classification |
 | `PD-2` | `FCR-PROD-02`, `FCR-PROD-03` | development build/cook/launcher paths exist; independent adoption and distribution truth are open | `PD-1`, foundation build/content readiness |
 | `PD-3` | `FCR-PROD-05` | no install/package authority found | `PD-2`, rights and payload allowlists |
 | `PD-4` | `FCR-PROD-06` and family closure | engine diagnostics exist; public crash/support/security/patch operation is incomplete | immutable candidate/package identity |
@@ -172,7 +172,7 @@ Use the [common phase contract](README.md#phase-card-contract) for every phase. 
 
 ## `PD-0` — Freeze Product Contracts
 
-**Historical scope superseded on 2026-10-10:** the current release includes Launcher, Editor and Game, intentional Empty/user-selected sync, native 1080p scaled for display and no user support service. The former runtime-only product classification and response-clock freeze are invalidated. Preserve this dated record as history; current contracts are [Release Scope](../../../Acceptance/ReleaseScope/README.md) and the linked feature owners.
+**Historical scope superseded on 2026-10-10:** the current release includes Launcher, Editor and Game, intentional Empty/user-selected sync, native 1080p scaled for display and no user support service. The former Game-only product classification and response-clock freeze are invalidated. Preserve this dated record as history; current contracts are [Release Scope](../../../Acceptance/ReleaseScope/README.md) and the linked feature owners.
 
 **Completed contract checkpoint:** preserve the recorded PD-0 freeze and its exact evidence below. Do not repeat its delivered iteration; reconcile only an affected contract if scope changes. PD-1 remains the next product slice after its prerequisites.
 
@@ -182,8 +182,8 @@ Use the [common phase contract](README.md#phase-card-contract) for every phase. 
 
 **Required work:**
 
-- trace the runtime consumer, source adopter, optional contributor, launcher, and editor journeys from entry point through failure/exit;
-- classify Showcase, launcher, editor, authoring tools, source tree, runtime archive, symbols, installer, and SDK as included, developer-only, excluded, or removed;
+- trace the game consumer, source adopter, optional contributor, launcher, and editor journeys from entry point through failure/exit;
+- classify Showcase, launcher, editor, authoring tools, source tree, Game archive, symbols, installer, and SDK as included, developer-only, excluded, or removed;
 - reconcile feature-local `AC/FM/CHK` in the Architecture owners for `FCR-PROD-01`–`06`; link rather than copy the release gates;
 - name supported Windows/CPU/GPU/toolchain prerequisites, per-user state locations, public paths, budgets, and support owners;
 - record exact external reference revisions and only transfer relevant invariants from Unreal Engine 5.8's [packaging pipeline](https://dev.epicgames.com/documentation/unreal-engine/packaging-your-project?application_version=5.8) and [BuildGraph](https://dev.epicgames.com/documentation/unreal-engine/buildgraph-for-unreal-engine?lang=en-US&application_version=5.8).
@@ -208,7 +208,7 @@ Execute PD-0 at the current revision. Create ITER-PROD-00-01 and map FCR-PROD-01
 | Field | Record |
 | --- | --- |
 | Identity | `ITER-PROD-00-01`; owner: product/release delivery; status: **PASS for contract freeze only**; started 2026-09-08 at committed `master` `ffe60e3ad6647f5435458224203ad3f513bfd571`. |
-| Scope | Trace and decide the runtime consumer, source adopter, optional contributor, Launcher, and Editor journeys; freeze product/output classification, supported prerequisites, paths, budgets, owners, and feature-local proof mappings. No product code, package implementation, candidate result, score change, or release-gate approval. |
+| Scope | Trace and decide the game consumer, source adopter, optional contributor, Launcher, and Editor journeys; freeze product/output classification, supported prerequisites, paths, budgets, owners, and feature-local proof mappings. No product code, package implementation, candidate result, score change, or release-gate approval. |
 | Intended decision | A reviewer can answer what is promised, what is Developer-only/Excluded, where every journey starts/stops, which owner detects each failure, and which exact check would falsify it. |
 | North Star | `NS-REAL`, `NS-EVIDENCE`, `NS-OWNERSHIP`, `NS-ADOPTION`, and `NS-SIMPLIFY` **advance in contract clarity only**: false success, hidden prerequisites, duplicate product authority, and accidental shipped surface now have binary stop rules. No runtime or evidence level advances. `NS-MATH-DATA` is not applicable because no algorithm/data-semantic claim changed. |
 | Complexity/copy budget | Documentation-only; no runtime state, public API, copy, target, adapter, diagnostic, or compatibility path added. One acceptance-owned release-value table, one cross-module trace owner, and one primary Architecture contract owner per FCR prevent duplicate authority. |
@@ -255,14 +255,14 @@ This is a frozen pre-iteration record, not a navigation route. The recorded `Doc
 | `PGE-15` | **Advance documentation only**; six families now have one contract owner and explicit stop decisions, with no completion claim. |
 | `REL-00` | Product audiences, outputs, prerequisites, paths, budgets, and owners are frozen in [First Release](../../../Acceptance/FirstRelease.md#frozen-product-and-output-classification). [Stage 0 scope/ledger](../../../Acceptance/ReleaseScope/README.md) now supplies 512 classifications, exact live selectors/maps and the owner-approved minimum/reference laptop. Overall gate remains **Blocked** for approval of the remaining proposal and selected-content rights receipts; neither PD-0 nor the scope draft is runtime acceptance. |
 | `REL-01` | Exact external precedent is versioned and rejected differences are recorded. Product identity, dependency/content rights, signing, SBOM, and `ReleaseMapSet` remain **Blocked**. |
-| `REL-02` | The source-adopter contract and exact supported toolchain are frozen. Cold/warm clean reproduction is unrun and runtime-only configure still requires Launcher/Qt, so the gate remains **Blocked**. |
+| `REL-02` | The source-adopter contract and exact supported toolchain are frozen. Cold/warm clean reproduction is unrun and game-only configure still requires Launcher/Qt, so the gate remains **Blocked**. |
 | `REL-03` | Package products, layout, state, budgets, owner boundary, and negative checks are frozen. No install/stage/sign/verify/package implementation exists, so the gate remains **Blocked**. |
 
 #### Feature Contract Map
 
 | Family | Primary Architecture owner and complete local mapping | Current candidate verdict |
 | --- | --- | --- |
-| `FCR-PROD-01` | [Showcase runtime consumer `AC/FM/CHK`](../../Modules/Projects/Showcase/README.md#fcr-prod-01-runtime-consumer-contract), with [Application host boundary](../../Modules/Engine/Application/README.md#product-contract-boundary) | `Blocked`; no package/consumer UI, console erasure, state, or journey evidence. |
+| `FCR-PROD-01` | [Showcase game consumer `AC/FM/CHK`](../../Modules/Projects/Showcase/README.md#fcr-prod-01-game-consumer-contract), with [Application host boundary](../../Modules/Engine/Application/README.md#product-contract-boundary) | `Blocked`; no package/consumer UI, console erasure, state, or journey evidence. |
 | `FCR-PROD-02` | [Build/Packaging source adopter `AC/FM/CHK`](../../Modules/BuildAndPackaging/README.md#fcr-prod-02-source-adopter-contract) | `Blocked`; no clean cold/warm result and optional Launcher membership is not separated. |
 | `FCR-PROD-03` | [Launcher `AC/FM/CHK`](../../Modules/Tools/Launcher/README.md#fcr-prod-03-launcher-contract) | `Blocked`; no non-author failure/cancel/clean/handoff result. |
 | `FCR-PROD-04` | [Editor `AC/FM/CHK`](../../Modules/Engine/Editor/README.md#fcr-prod-04-editor-contract), with [Application host boundary](../../Modules/Engine/Application/README.md#product-contract-boundary) | `Blocked`; Developer-only source path exists, but build/journey/package-erasure proof is absent. |

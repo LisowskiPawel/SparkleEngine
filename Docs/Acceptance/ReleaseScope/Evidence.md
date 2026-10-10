@@ -10,6 +10,22 @@
 
 These records prove only the inspection or document checks they name. Current product choices and next actions belong in [Release Scope](README.md#approval-and-next-work); this page does not grant redistribution permission or build/runtime acceptance.
 
+## Editor/Game Naming: ITER-GAME-NAMING-01
+
+**Scope:** replace the former standalone product name across Application/console hosts, Showcase targets and entry files, Launcher GUI/shell/build/clean plans, catalog fields and documentation. No aliases, asset/shader versions, migrations or feature changes. Technical execution and third-party library uses of ?runtime? retain their meaning.
+
+**Candidate:** 2026-10-10, `408e8df21fbb365d61b4db3a8624d5e8766a74e8` plus this worktree. The starting worktree was clean. Existing Application, Showcase, Launcher and catalog owners retain their responsibilities. Preserve `REL-01` identity and `PGE-01/07/13`; no feature evidence-level increase or release acceptance is claimed.
+
+| Check / criterion | Evidence and decision |
+| --- | --- |
+| `AC-GAME-01` / `FM-GAME-01`: one current vocabulary; old profile/operation rejected | `GameApplication`, `GameConsole`, `ShowcaseGame`, `--game-profile`, `workspace.build.game`, `GameSupported`/`GameBlocker`; shell receipts include old-name rejection. No compatibility spellings. |
+| `AC-GAME-02` / `FM-GAME-02`: producers and consumers compile; plans resolve the renamed executable | Launcher build and configuration refresh passed; product and AssetCooker build results are recorded in the local receipt directory. Game run planning targets `artifacts/dev/projects/Showcase/game/ShippingGame/ShowcaseGame.exe`. Dry-run is not native launch proof. |
+| `AC-GAME-03`: owner checks and navigation retain their meaning | Architecture and C++ style owners passed; modified-document local links/anchors and whitespace are checked. |
+| Risk and cleanup | A missed role, field, include or target breaks planning/compilation. Owner checks, both host builds and catalog planning detect it; repair at the existing owner. Remove obsolete generated product outputs after replacement builds. Keep historical receipts and unrelated state. |
+| Release boundary | `REL-01`/`REL-02` remain **BLOCKED** by rights/archive receipts, payload qualification and a clean candidate baseline. Noncommercial learning intent supplies no public redistribution grant. This iteration does not execute a seven-map cook, FPS test or clean-machine acceptance. |
+
+**Receipts:** `build/validation/game-rename-20261010/` contains the control record, exact commands/exits, shell observations, owner logs, link checks and final candidate hashes. Historical sections below retain original candidate decisions; navigable code names use current spelling, while raw receipts retain observed spelling.
+
 ## Scope Approval: ITER-REL-00-06
 
 **Candidate context:** 2026-10-10, `d1c8c5b2a61768a0460983c854264380d5c1f6dc` plus the preserved 16 pre-existing modified documents and this approval edit.
@@ -34,7 +50,7 @@ These records prove only the inspection or document checks they name. Current pr
 
 **Release-owner decisions:** ship Sparkle Launcher, Sparkle Editor and Sparkle Game; Launcher selects/syncs any subset of the seven release maps and required features, including none with intentional Empty startup; mark other choices development or unavailable. Render internally at native 1920x1080, then scale for the selected display; measure 30 FPS on the named laptop. Offer no user support service. The owner confirmed both the native-resolution interpretation and seven-map boundary in follow-up replies.
 
-**Superseded:** the single runtime consumer package, source-only Launcher/Editor, mandatory Modern Sponza first launch, subnative DLSS Quality realtime performance preset and public support/security response clocks. Earlier dated receipts and inspections below remain historical evidence; their source identities/rights observations are unchanged. The earlier PD-0 PASS does not approve the amended product, path, helper or service boundary.
+**Superseded:** the single game consumer package, source-only Launcher/Editor, mandatory Modern Sponza first launch, subnative DLSS Quality realtime performance preset and public support/security response clocks. Earlier dated receipts and inspections below remain historical evidence; their source identities/rights observations are unchanged. The earlier PD-0 PASS does not approve the amended product, path, helper or service boundary.
 
 | Gate | Candidate-bound disposition |
 | --- | --- |

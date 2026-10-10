@@ -44,7 +44,7 @@ namespace SparkleLauncher
 	bool LauncherMainWindow::UsesBuildEnvironmentStatus(const QString& operationId)
 	{
 		return operationId == "workspace.generate-build-files" || operationId == "workspace.sync-code" || operationId == "workspace.build" || operationId == "workspace.build.editor"
-		    || operationId == "launcher.build.self" || operationId == "workspace.build.runtime" || operationId.startsWith("cook.");
+		    || operationId == "launcher.build.self" || operationId == "workspace.build.game" || operationId.startsWith("cook.");
 	}
 
 	void LauncherMainWindow::AddOptionsForOperation(QVBoxLayout& layout, const QString& operationId)
@@ -103,7 +103,7 @@ namespace SparkleLauncher
 		QCheckBox* selectAllBox = selectAllBoxes.front();
 
 		AddWorkflowScopeRow(*selectionLayout, "Editor", "editor", "Authoring, inspection, and developer tools.", m_settings.EditorProfile(), true, selectedScopes, scopeBoxes);
-		AddWorkflowScopeRow(*selectionLayout, "Game", "runtime", "Standalone runtime used by Game mode.", m_settings.RuntimeProfile(), true, selectedScopes, scopeBoxes);
+		AddWorkflowScopeRow(*selectionLayout, "Game", "game", "Standalone Game product.", m_settings.GameProfile(), true, selectedScopes, scopeBoxes);
 
 		AddWorkflowScopeRow(
 		    *selectionLayout,

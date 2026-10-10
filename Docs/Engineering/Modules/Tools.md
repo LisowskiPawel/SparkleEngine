@@ -13,7 +13,7 @@ Interactive tool frontends also follow the [intent-first workflow rules](Editor.
 | Change | Primary owner | Boundary that must remain visible |
 | --- | --- | --- |
 | discover or normalize source | SourceImporters/importer registry | source parsing ends at a deterministic imported product; runtime never reads authoring formats |
-| create runtime artifacts | Cooking and the asset/shader-specific cooker | validation and atomic publication precede replacement of the accepted generation |
+| create game artifacts | Cooking and the asset/shader-specific cooker | validation and atomic publication precede replacement of the accepted generation |
 | compile shaders | ShaderCompiler plus its compiler subprocess boundary | registration/dependency intent stays distinct from compiler-native execution and diagnostics |
 | build, cook, or launch a project | Launcher operation owner | immutable request, explicit stage/result, cancellation, process lifetime, and retained log identity |
 | shared file/process helpers | ToolSupport or Platform when genuinely reusable | helpers do not become a second workflow, task, publication, or status authority |

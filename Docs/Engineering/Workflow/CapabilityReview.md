@@ -73,7 +73,7 @@ Use four dossier-field answers consistently: **Answered**, **Partial**, **Unknow
 
 Create matrix cells only for dimensions that can change behavior or evidence. Typical axes are:
 
-- product and profile: Editor/Runtime, Debug/Development/Shipping, workspace/package;
+- product and profile: Editor/Game, Debug/Development/Shipping, workspace/package;
 - platform and GPU: Windows version, D3D12/Vulkan, adapter tier/vendor, driver/SDK;
 - execution: serial/threaded, graphics/compute/copy, raster/inline/native ray pipeline;
 - content: source format, material/alpha type, static/instanced/skinned/morphed geometry, light type, map;
@@ -106,7 +106,7 @@ user/CLI/editor request
   -> plan/import/compile/cook work
   -> bounded concurrency and cancellation
   -> transactional publication
-  -> downstream invalidation and runtime consumer
+  -> downstream invalidation and game consumer
   -> visible success/failure, recovery, cleanup, and retained evidence
 ```
 

@@ -63,7 +63,7 @@ Completion claims signal construction and native activation on the frozen machin
 | `HDR-FS-07` | requested/supported/eligible/activating/active/fallback/error state | included | shared presentation result and UX checks |
 | `HDR-FS-08` | output association and display/OS/window/device revalidation | included | state-machine fault/transition evidence |
 | `HDR-FS-09` | static metadata | omit, best-effort diagnostic, or required remains blocked; never pixel/activation authority | `HDRD-09`, native consistency evidence |
-| `HDR-FS-10` | DevelopmentEditor and packaged Runtime reachability | admitted only per frozen backend/window/UI/profile matrix | package/clean-machine and UI-composition evidence |
+| `HDR-FS-10` | DevelopmentEditor and packaged Game reachability | admitted only per frozen backend/window/UI/profile matrix | package/clean-machine and UI-composition evidence |
 | `HDR-FS-11` | HLG, Dolby Vision, dynamic metadata, automatic calibration/mastering profiles | excluded | selector/type/shader/native/package absence audit |
 | `HDR-FS-12` | HDR offscreen/export/screenshot guarantee and non-Windows platforms | excluded unless separately admitted | capture/product/platform claim audit |
 
@@ -73,8 +73,8 @@ Completion claims signal construction and native activation on the frozen machin
 | --- | --- | --- |
 | DevelopmentEditor + D3D12 + eligible HDR display | HDR10 UINT10/PQ or explicitly selected FP16/scRGB editor route | output/UI/interposer eligibility, transform/tuple/state/transition evidence |
 | DevelopmentEditor + Vulkan + eligible HDR display | exact enumerated HDR surface tuple or explicit ineligible/fallback | extension/surface/Win32 output association and paired semantic evidence |
-| packaged Runtime + D3D12 | admitted HDR10 tuple with cooked transform/config | package/clean-machine activation, UI, transitions, fallback |
-| packaged Runtime + Vulkan | same only if frozen release matrix admits it | package plus native extension/surface proof |
+| packaged Game + D3D12 | admitted HDR10 tuple with cooked transform/config | package/clean-machine activation, UI, transitions, fallback |
+| packaged Game + Vulkan | same only if frozen release matrix admits it | package plus native extension/surface proof |
 | SDR display / OS HDR off / remote or ineligible session | known-good SDR tuple | explicit unsupported/ineligible/fallback state and unchanged SDR pixels |
 | windowed/fullscreen/minimized/straddling/moved | policy frozen per cell | output-generation revalidation and bounded black-frame/latency result |
 | SDR-authored UI | system/current or bounded fallback white mapping | target-linear composition and measured/reference patch evidence |

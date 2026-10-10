@@ -236,7 +236,7 @@ Adopt:
 
 - write a self-contained replay bundle for failed as well as successful compile jobs
 - store source mappings and separate debug symbols by shader/code hash so PIX, RenderDoc, and Nsight can resolve the exact cooked binary
-- keep symbols and analysis products outside the lean runtime artifact unless an explicit development mode embeds them
+- keep symbols and analysis products outside the lean game artifact unless an explicit development mode embeds them
 - make representative DXIL and SPIR-V inspection first-class verification outputs
 - feed exact shipped compile requests to RGA, Nsight, PIX, or equivalent analysis rather than recompiling an approximate shader by hand
 - preserve complete D3D12/Vulkan pipeline descriptions and measure current lazy materialization so a later cache/precache proposal has evidence

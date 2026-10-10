@@ -12,7 +12,7 @@ class InputSystem;
 class GameWorld;
 class Renderer;
 class LevelSession;
-class RuntimeConsoleHost;
+class GameConsoleHost;
 class TaskExecutor;
 class TaskScope;
 class ApplicationTaskRuntime;
@@ -21,35 +21,35 @@ class EditorApplication;
 struct CameraInputIntent;
 struct RenderViewCameraData;
 
-enum class RuntimeApplicationFrameResult : std::uint8_t
+enum class GameApplicationFrameResult : std::uint8_t
 {
 	Exit = 0,
 	SkipRender = 1,
 	Ready = 2,
 };
 
-struct RuntimeApplicationOptions final
+struct GameApplicationOptions final
 {
-	bool EnableRuntimeConsole = true;
+	bool EnableGameConsole = true;
 	bool AllowThreadedRenderer = true;
 	bool EnableUiRenderPackets = false;
 };
 
-class SPARKLE_APPLICATION_API RuntimeApplication final : public Application
+class SPARKLE_APPLICATION_API GameApplication final : public Application
 {
 public:
-	RuntimeApplication();
-	explicit RuntimeApplication(RuntimeApplicationOptions options) noexcept;
-	~RuntimeApplication();
+	GameApplication();
+	explicit GameApplication(GameApplicationOptions options) noexcept;
+	~GameApplication();
 
-	RuntimeApplication(const RuntimeApplication&) = delete;
-	RuntimeApplication& operator=(const RuntimeApplication&) = delete;
-	RuntimeApplication(RuntimeApplication&&) = delete;
-	RuntimeApplication& operator=(RuntimeApplication&&) = delete;
+	GameApplication(const GameApplication&) = delete;
+	GameApplication& operator=(const GameApplication&) = delete;
+	GameApplication(GameApplication&&) = delete;
+	GameApplication& operator=(GameApplication&&) = delete;
 
 	void Initialize() override;
-	RuntimeApplicationFrameResult BeginFrame();
-	void UpdateRuntime() noexcept;
+	GameApplicationFrameResult BeginFrame();
+	void UpdateGame() noexcept;
 	void SubmitViewportRenderRequest(ViewportRenderRequest request) noexcept;
 	Timer& GetTimer() noexcept;
 	Window& GetWindow() noexcept;
@@ -67,12 +67,12 @@ private:
 	static bool WantsImGuiInputCapture() noexcept;
 	void InitializeHost();
 	void InitializeInput();
-	void InitializeGameRuntime();
+	void InitializeGameWorld();
 	void InitializeRenderer();
-	void InitializeRuntimeConsole();
+	void InitializeGameConsole();
 	CameraInputIntent CollectCameraInputIntent(float aspectRatio) noexcept;
-	void UpdateRuntimeFrame(const CameraInputIntent* worldCameraIntent, const RenderViewCameraData* renderCameraOverride) noexcept;
-	void UpdateEditorRuntime(const RenderViewCameraData& renderCamera) noexcept;
+	void UpdateGameFrame(const CameraInputIntent* worldCameraIntent, const RenderViewCameraData* renderCameraOverride) noexcept;
+	void UpdateEditorGame(const RenderViewCameraData& renderCamera) noexcept;
 	void SubmitRenderFrame(std::uint64_t frameId, const RenderViewCameraData* renderCameraOverride);
 	GameWorld& GetWorldForEditor() noexcept;
 
@@ -82,9 +82,9 @@ private:
 	std::unique_ptr<GameWorld> m_gameWorld;
 	std::unique_ptr<LevelSession> m_levelSession;
 	std::unique_ptr<Renderer> m_renderer;
-	std::unique_ptr<RuntimeConsoleHost> m_runtimeConsoleHost;
+	std::unique_ptr<GameConsoleHost> m_gameConsoleHost;
 	std::unique_ptr<ApplicationTaskRuntime> m_taskRuntime;
 	std::unique_ptr<CameraInputIntentCollector> m_cameraInputIntentCollector;
-	RuntimeApplicationOptions m_options;
+	GameApplicationOptions m_options;
 	bool m_isInitialized = false;
 };

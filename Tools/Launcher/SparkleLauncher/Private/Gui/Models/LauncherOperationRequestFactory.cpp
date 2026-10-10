@@ -50,7 +50,7 @@ namespace SparkleLauncher
 		request.RepositoryRoot = repositoryRoot;
 		request.ContentId = contentModel.ContentId().toStdString();
 		request.EditorProfile = settings.EditorProfile().toStdString();
-		request.RuntimeProfile = settings.RuntimeProfile().toStdString();
+		request.GameProfile = settings.GameProfile().toStdString();
 		request.PreferredIde = ResolveSelectedWorkspaceIde(settings);
 		request.Compiler = ResolveSelectedWorkspaceCompiler(settings);
 		request.SelectedScopes = ResolveSelectedBuildScopes(settings);
@@ -89,7 +89,7 @@ namespace SparkleLauncher
 		request.ContentId = contentModel.ContentId();
 		request.RunMode = settings.RunMode();
 		request.EditorProfile = settings.EditorProfile();
-		request.RuntimeProfile = settings.RuntimeProfile();
+		request.GameProfile = settings.GameProfile();
 		request.WorkspaceIde = settings.WorkspaceIde();
 		request.WorkspaceCompiler = settings.WorkspaceCompiler();
 		request.BuildScopes = settings.BuildScopes();
@@ -124,7 +124,7 @@ namespace SparkleLauncher
 		    operationId,
 		    contentModel.ContentId(),
 		    settings.EditorProfile(),
-		    settings.RuntimeProfile(),
+		    settings.GameProfile(),
 		    settings.BuildScopes(),
 		    settings.CookScopes(),
 		    settings.SelectedTargets()};

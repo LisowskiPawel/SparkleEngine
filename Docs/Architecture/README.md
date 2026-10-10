@@ -19,7 +19,7 @@ This tree explains what each system does, how data and responsibility move throu
 | Cross-system trace | A workflow or GPU feature spanning several owners — [Cross-Module Architecture](CrossModule/README.md) |
 | Documentation coverage | Whether every strategy, plan, acceptance, and research feature has an Architecture owner — [Feature Documentation Coverage](CrossModule/FeatureDocumentation/README.md) |
 | First-release implementation | Release order plus module-owned work packages — [First Release Implementation Plan](CrossModule/FirstRelease/README.md) |
-| Product journey | Build, content, editor, runtime, and delivery handoffs — [Product Workflow Coverage](CrossModule/ProductWorkflowCoverage.md) and [Product Execution Traces](CrossModule/ProductExecutionTraces.md) |
+| Product journey | Build, content, editor, game, and delivery handoffs — [Product Workflow Coverage](CrossModule/ProductWorkflowCoverage.md) and [Product Execution Traces](CrossModule/ProductExecutionTraces.md) |
 | Accepted invariant | Why a boundary must remain true — [Architecture Decisions](Decisions/README.md) |
 
 

@@ -49,7 +49,7 @@ The viewport header is a projection of `EditorViewportSession`; it owns no camer
 
 ## Navigation And Projection
 
-`CameraNavigation` owns shared pose math for runtime and editor navigation. The consuming session supplies immutable navigation settings: `GameWorld` for runtime and `EditorViewportSession` for editor navigation. `CameraInputIntent` contains only transient input samples. Navigation settings never become authored scene-camera component data.
+`CameraNavigation` owns shared pose math for game and editor navigation. The consuming session supplies immutable navigation settings: `GameWorld` for runtime and `EditorViewportSession` for editor navigation. `CameraInputIntent` contains only transient input samples. Navigation settings never become authored scene-camera component data.
 
 Perspective uses the viewport camera's vertical FOV and actual viewport aspect ratio. Orthographic uses a viewport-owned world-space height and derives width from that aspect ratio. Switching projection does not mutate the scene camera.
 

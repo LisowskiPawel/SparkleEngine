@@ -1,30 +1,30 @@
 # Showcase project CMake configuration
 
-# Explicit editor and runtime launch targets keep the host split visible at the
+# Explicit editor and game launch targets keep the host split visible at the
 # project boundary instead of hiding it behind a single mixed executable.
 add_executable(ShowcaseEditor
     Src/EditorMain.cpp
 )
 
-add_executable(ShowcaseRuntime
-    Src/RuntimeMain.cpp
+add_executable(ShowcaseGame
+    Src/GameMain.cpp
 )
 
 target_compile_features(ShowcaseEditor PRIVATE cxx_std_20)
-target_compile_features(ShowcaseRuntime PRIVATE cxx_std_20)
+target_compile_features(ShowcaseGame PRIVATE cxx_std_20)
 
 target_link_libraries(ShowcaseEditor PRIVATE
     SparkleApplicationEditor
     SparkleGameFramework
 )
 
-target_link_libraries(ShowcaseRuntime PRIVATE
+target_link_libraries(ShowcaseGame PRIVATE
     SparkleApplication
     SparkleGameFramework
 )
 
 sparkle_configure_project_product(ShowcaseEditor Showcase editor)
-sparkle_configure_project_product(ShowcaseRuntime Showcase runtime)
+sparkle_configure_project_product(ShowcaseGame Showcase game)
 sparkle_declare_runtime_dll_owner(
     ShowcaseEditor
     SparkleApplicationEditor
@@ -37,7 +37,7 @@ sparkle_declare_runtime_dll_owner(
     SparkleCore
 )
 sparkle_declare_runtime_dll_owner(
-    ShowcaseRuntime
+    ShowcaseGame
     SparkleApplication
     SparkleRenderer
     SparkleRHI
@@ -47,14 +47,14 @@ sparkle_declare_runtime_dll_owner(
 )
 
 sparkle_stage_nvidia_streamline_runtime(ShowcaseEditor)
-sparkle_stage_nvidia_streamline_runtime(ShowcaseRuntime)
+sparkle_stage_nvidia_streamline_runtime(ShowcaseGame)
 
 if(MSVC)
     set_target_properties(ShowcaseEditor PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     )
 
-    set_target_properties(ShowcaseRuntime PROPERTIES
+    set_target_properties(ShowcaseGame PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     )
 endif()

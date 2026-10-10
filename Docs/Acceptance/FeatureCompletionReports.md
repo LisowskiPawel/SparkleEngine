@@ -93,7 +93,7 @@ consumer/editor/config request
     -> failure/fallback/recovery/support path
 ```
 
-For tools and offline features, replace the frame path with source input -> validation -> import/plan -> bounded execution -> transactional publication -> runtime consumer, while keeping ownership, cancellation, failure, provenance, and adoption explicit.
+For tools and offline features, replace the frame path with source input -> validation -> import/plan -> bounded execution -> transactional publication -> game consumer, while keeping ownership, cancellation, failure, provenance, and adoption explicit.
 
 The trace answers who owns mutable state, who produces and consumes each representation, when it becomes immutable, which copies/transfers occur, what invalidates cached/history state, how both backends differ, and what happens when any boundary fails.
 
@@ -198,10 +198,10 @@ Architecture also contains explicit target/negative dossiers for capabilities su
 
 | ID | Surface and current how-it-works route | Required polish focus | Primary targets |
 | --- | --- | --- | --- |
-| `FCR-PROD-01` | Showcase runtime -> [`RunRuntimeApplication`](../../Projects/Showcase/Src/RuntimeMain.cpp) -> [`RuntimeApplication`](../../Engine/Application/Private/RuntimeApplication.cpp) -> level/world/renderer loop. | Intentional first run, example/mode selection, controls/help/settings/reset/quit, no development console leakage, startup/load/exit budgets. | `PGE-01`, `PGE-07`, `PGE-13`, `PGE-15` |
-| `FCR-PROD-02` | Tagged source -> CMake options/profiles -> dependency fetch -> engine/tools/project targets -> cook -> Showcase runtime. | Root quick start, immutable prerequisites/dependencies, cold/warm build/cook, actionable failures, supported source API/ABI boundary, non-author adoption. | `PGE-01`, `PGE-07`, `PGE-13`, `PGE-14`, `PGE-15` |
+| `FCR-PROD-01` | Showcase Game -> [`RunGameApplication`](../../Projects/Showcase/Src/GameMain.cpp) -> [`GameApplication`](../../Engine/Application/Private/GameApplication.cpp) -> level/world/renderer loop. | Intentional first run, example/mode selection, controls/help/settings/reset/quit, no development console leakage, startup/load/exit budgets. | `PGE-01`, `PGE-07`, `PGE-13`, `PGE-15` |
+| `FCR-PROD-02` | Tagged source -> CMake options/profiles -> dependency fetch -> engine/tools/project targets -> cook -> Showcase Game. | Root quick start, immutable prerequisites/dependencies, cold/warm build/cook, actionable failures, supported source API/ABI boundary, non-author adoption. | `PGE-01`, `PGE-07`, `PGE-13`, `PGE-14`, `PGE-15` |
 | `FCR-PROD-03` | [`SparkleLauncher`](../../Tools/Launcher/SparkleLauncher) discovers repository/toolchains/content and composes typed sync/build/cook/run/clean operations into child processes. | Required shipped Launcher: Empty/seven-map/subset selection and sync, complete required-feature/helper closure, truthful development/unavailable choices, progress/cancel/failure/restart and clean-machine launch; no duplicate operation semantics. | `PGE-01`, `PGE-07`, `PGE-13`, `PGE-15` |
-| `FCR-PROD-04` | [`EditorApplication`](../../Engine/Application/Private/EditorApplication.cpp) layers Editor UI, viewport, settings, capture, scene inspection, and transactions over the runtime host. | Required shipped Sparkle Editor: clean-machine Empty/selected-map activation, discoverability, save/settings ownership, viewport/edit/undo/failure workflows and independent use. Keep Editor dependencies isolated from Game. | `PGE-07`, `PGE-13`, `PGE-15` |
+| `FCR-PROD-04` | [`EditorApplication`](../../Engine/Application/Private/EditorApplication.cpp) layers Editor UI, viewport, settings, capture, scene inspection, and transactions over the game host. | Required shipped Sparkle Editor: clean-machine Empty/selected-map activation, discoverability, save/settings ownership, viewport/edit/undo/failure workflows and independent use. Keep Editor dependencies isolated from Game. | `PGE-07`, `PGE-13`, `PGE-15` |
 | `FCR-PROD-05` | CMake profiles and module/product targets build artifacts; no current install/CPack owner produces the public archive. | One Build-Cook-Stage-Sign-Verify-Package path, immutable stage, per-user state, allowlist/SBOM/signatures, logical reproducibility, archive size and clean-machine result. | `PGE-07`, `PGE-13`, `PGE-14`, `PGE-15` |
 | `FCR-PROD-06` | Core/RHI logs and DRED/Vulkan diagnostics expose failures; self-service adoption, local diagnostics and finite release review remain unproved; user support service is excluded. | Local process/hang/device diagnostics, consent/privacy, candidate symbols, known issues/no-support statement and immutable replacement/withdrawal proof; no intake service, maintenance window or response deadline. | `PGE-01`, `PGE-06`, `PGE-13`, `PGE-15` |
 
@@ -269,7 +269,7 @@ The family rows above keep the source map readable; they are not permission to h
 
 | Family | Results that remain independently visible |
 | --- | --- |
-| Product and tools | Runtime consumer, source adopter, editor, launcher, each cooker/compiler command, package/sign/verify, support/crash/security operation. Excluded tools need erasure evidence rather than a runtime pass. |
+| Product and tools | Game consumer, source adopter, editor, launcher, each cooker/compiler command, package/sign/verify, support/crash/security operation. Excluded tools need erasure evidence rather than a runtime pass. |
 | Content and world | glTF, GLB, and FBX import; each cooked product family; default assets; static, skeletal, morph, animation, camera, sky, and every light/material class; activation, reload, switch, and malformed/missing input. |
 | RHI | D3D12 and Vulkan; graphics/compute/copy queues; persistent/transient resources; bindful/fixed-array material binding; raster/compute/ray pipelines; classic/PTLAS; present/resize; capture/diagnostics. A backend pass cannot mask the other's failure. |
 | Pipeline/binding | Runtime versus contract-only registration membership; graphics/compute/ray materialization; every typed field and binding domain; every complete PSO-key input; cache hit/miss, reload success/failure, and all-queue retirement independently. |

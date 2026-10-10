@@ -184,8 +184,8 @@ namespace SparkleLauncher
 		const QStringList buildScopes = context.BuildScopes.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
 		const QStringList cookScopes = context.CookScopes.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
 		const bool workspaceBuild = context.OperationId == "workspace.build";
-		const bool buildsContentProduct = workspaceBuild && (buildScopes.contains("editor") || buildScopes.contains("runtime"));
-		if ((buildsContentProduct || context.OperationId == "workspace.build.editor" || context.OperationId == "workspace.build.runtime" || context.OperationId.startsWith("cook."))
+		const bool buildsContentProduct = workspaceBuild && (buildScopes.contains("editor") || buildScopes.contains("game"));
+		if ((buildsContentProduct || context.OperationId == "workspace.build.editor" || context.OperationId == "workspace.build.game" || context.OperationId.startsWith("cook."))
 		    && context.ContentId.isEmpty())
 		{
 			return targets;
@@ -209,7 +209,7 @@ namespace SparkleLauncher
 			{
 				return;
 			}
-			const QString productRole = profile->Target == BuildProfileTarget::Game ? "runtime" : "editor";
+			const QString productRole = profile->Target == BuildProfileTarget::Game ? "game" : "editor";
 			AddProjectTargetArtifactOutputs(
 			    targets,
 			    context.RepositoryRoot,
@@ -257,15 +257,15 @@ namespace SparkleLauncher
 			}
 		}
 
-		if (context.OperationId == "workspace.build.runtime" || (workspaceBuild && buildScopes.contains("runtime")))
+		if (context.OperationId == "workspace.build.game" || (workspaceBuild && buildScopes.contains("game")))
 		{
-			if (context.OperationId == "workspace.build.runtime" && !context.SelectedTargets.trimmed().isEmpty())
+			if (context.OperationId == "workspace.build.game" && !context.SelectedTargets.trimmed().isEmpty())
 			{
-				addNamedTargets(context.RuntimeProfile, context.SelectedTargets.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts), "Selected runtime build target outputs.");
+				addNamedTargets(context.GameProfile, context.SelectedTargets.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts), "Selected game build target outputs.");
 			}
 			else
 			{
-				addProjectArtifacts(context.RuntimeProfile, context.ContentId, "Runtime target outputs.");
+				addProjectArtifacts(context.GameProfile, context.ContentId, "Game target outputs.");
 			}
 		}
 

@@ -22,7 +22,7 @@ Workflow banner asset slots:
 - `workflow-build-all.png`: Selectable workspace build workflow banner.
 - `workflow-launcher-build.png`: Launcher build workflow banner.
 - `workflow-editor-build.png`: Editor build workflow banner.
-- `workflow-runtime-build.png`: Runtime build workflow banner.
+- `workflow-game-build.png`: Game build workflow banner.
 - `workflow-cook-tools.png`: Cook tool build workflow banner.
 - `workflow-cook-all.png`: Full content cook workflow banner.
 - `workflow-cook-shaders.png`: Shader cook workflow banner.

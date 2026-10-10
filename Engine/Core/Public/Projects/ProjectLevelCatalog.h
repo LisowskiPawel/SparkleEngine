@@ -39,12 +39,12 @@ struct SPARKLE_CORE_API ProjectAssetPack final
 	std::string archiveSha256;
 	std::string version;
 	std::string license;
-	std::string runtimeBlocker;
+	std::string gameBlocker;
 	std::string downloadBlocker;
 	std::uintmax_t archiveBytes = 0;
 	bool external = false;
 	bool downloadSupported = false;
-	bool runtimeSupported = false;
+	bool gameSupported = false;
 };
 
 struct SPARKLE_CORE_API ProjectLevelCatalog final

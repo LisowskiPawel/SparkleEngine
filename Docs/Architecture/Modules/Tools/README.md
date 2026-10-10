@@ -20,7 +20,7 @@ flowchart LR
     Launcher[Launcher orchestration] --> Import
     Launcher --> Cook
     Launcher --> Shader
-    Products --> Runtime[Project runtime/editor]
+    Products --> Hosts[Project Game/Editor]
 ```
 
 Tools transform or orchestrate offline products. They do not become runtime semantic owners: every cooked schema is validated by its owning consumer, and Launcher success requires the expected product rather than only a child-process exit.

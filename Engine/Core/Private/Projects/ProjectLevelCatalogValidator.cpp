@@ -97,13 +97,13 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 	{
 		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' has an invalid SHA-256 digest.", pack.id));
 	}
-	if (!pack.runtimeSupported && pack.runtimeBlocker.empty())
+	if (!pack.gameSupported && pack.gameBlocker.empty())
 	{
-		throw Diagnostics::Error(std::format("Runtime-unsupported asset pack '{}' must declare a runtime blocker.", pack.id));
+		throw Diagnostics::Error(std::format("Game-unsupported asset pack '{}' must declare a game blocker.", pack.id));
 	}
-	if (pack.runtimeSupported && !pack.runtimeBlocker.empty())
+	if (pack.gameSupported && !pack.gameBlocker.empty())
 	{
-		throw Diagnostics::Error(std::format("Runtime-supported asset pack '{}' declares a contradictory blocker.", pack.id));
+		throw Diagnostics::Error(std::format("Game-supported asset pack '{}' declares a contradictory blocker.", pack.id));
 	}
 	if (pack.external && !pack.downloadSupported && pack.downloadBlocker.empty())
 	{
@@ -144,9 +144,9 @@ static void ValidateParentChain(const ProjectLevelCatalog& catalog, const Projec
 			throw Diagnostics::Error(std::format("Asset pack '{}' has a cyclic parent chain.", pack.id));
 		}
 		ancestor = &catalog.assetPacks.at(ancestor->parentPackId);
-		if (pack.runtimeSupported && !ancestor->runtimeSupported)
+		if (pack.gameSupported && !ancestor->gameSupported)
 		{
-			throw Diagnostics::Error(std::format("Runtime-supported asset pack '{}' depends on runtime-unsupported parent '{}'.", pack.id, ancestor->id));
+			throw Diagnostics::Error(std::format("Game-supported asset pack '{}' depends on game-unsupported parent '{}'.", pack.id, ancestor->id));
 		}
 	}
 }

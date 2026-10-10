@@ -37,7 +37,7 @@ The C++ authority is [`RenderViewMode.h`](../../../../../../../../Engine/Rendere
 ## Ownership Path
 
 ```text
-Editor or Game/runtime viewport owner
+Editor or Game viewport owner
         |
         | selects RenderViewMode
         v

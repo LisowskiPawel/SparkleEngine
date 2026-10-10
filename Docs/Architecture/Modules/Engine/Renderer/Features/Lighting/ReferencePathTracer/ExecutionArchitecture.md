@@ -67,7 +67,7 @@ This is a code-inspected map at the document's verified revision, not a successf
 
 | Boundary | Lit route | Reference route | Common downstream or owner |
 | --- | --- | --- | --- |
-| View selection | `RenderViewMode::Lit` is frozen by the ordinary View producer. | The same request/View boundary freezes `RenderViewMode::ReferencePathTracer`. | Editor owns the menu; Game/runtime may submit the same Renderer value. The RHI has no view-mode concept. |
+| View selection | `RenderViewMode::Lit` is frozen by the ordinary View producer. | The same request/View boundary freezes `RenderViewMode::ReferencePathTracer`. | Editor owns the menu; Game may submit the same Renderer value. The RHI has no view-mode concept. |
 | Middle frame | `AddRealTimePathTracerPasses` builds GBuffer, clears lighting targets, runs ReSTIR direct/indirect lighting, composites the lobe targets, then adds sky. | `AddReferencePathTracerPasses` reserves feature-local working/committed mean and second-moment textures, dispatches independent camera-ray transport, and builds the committed display. | `AddSceneRenderingPasses` selects exactly one middle; neither branch consumes the other's GBuffer or accumulated radiance. |
 | Raw producer | `PublishRealTimePathTracerProducts` exposes Lit `SceneColor` as generic `Radiance`. | `PublishReferencePathTracerProducts` exposes `CommittedMean` as `Radiance`, `CommittedM2` as `RadianceSecondMoment`, and no Reference scene depth. | `ViewportRenderProductPublication` publishes the generic product and optional exact-prefix metadata; the existing capture service can read a selected product. |
 | Human-visible result | The Lit `SceneColor` continues through the common exposure, applicable scene visualization/denoising, configured upscaler, and presentation route. | The Reference `SceneColor` is a derivative of `CommittedMean`; it continues through the same high-level tail, but Reference bypasses ReSTIR reconstruction and uses the color-only Linear resolve at output extent. | `FinalColorLdr` is for display. It is not a radiance oracle or a substitute for `Radiance` readback. |
@@ -81,7 +81,7 @@ The source also exposes a contract gap that cannot be closed by presentation alo
 
 | Concern | Current source route | Required target |
 | --- | --- | --- |
-| Invocation | The current working source carries one `RenderViewMode` per view. Editor exposes `ReferencePathTracer = 1` immediately after Lit; Game/runtime can submit the same value through `RuntimeApplication::SubmitViewportRenderRequest`; `RenderViewBuilder` freezes it into View; and `AddSceneRenderingPasses` owns the Lit-versus-Reference execution branch below the generic frame composition. | Retain this one request route and prove both hosts, navigation, progress, comparison, capability, and package behavior through executable evidence. No `LightingMode`, Editor mirror enum, target/show-flag split, selector CVar, or dedicated command may return. |
+| Invocation | The current working source carries one `RenderViewMode` per view. Editor exposes `ReferencePathTracer = 1` immediately after Lit; Game can submit the same value through `GameApplication::SubmitViewportRenderRequest`; `RenderViewBuilder` freezes it into View; and `AddSceneRenderingPasses` owns the Lit-versus-Reference execution branch below the generic frame composition. | Retain this one request route and prove both hosts, navigation, progress, comparison, capability, and package behavior through executable evidence. No `LightingMode`, Editor mirror enum, target/show-flag split, selector CVar, or dedicated command may return. |
 | Traversal frontend | The Reference middle uses the engine-wide automatic resolver: Pipeline when complete, otherwise Inline, with no feature-specific setting. Two thin entry adapters invoke one shared estimator kernel; Pipeline reuses generic material payload/hit shaders, scene SBT, and RHI pipeline/table/dispatch mechanisms. | Prove every applicable D3D12/Vulkan automatic route, both adapters through focused evidence, and unsupported-capability refusal. Source presence is not parity evidence. |
 | Primary visibility | The Reference kernel generates a canonical camera ray from the immutable View camera and traces the shared ray-tracing scene directly. It does not consume the Lit GBuffer or reconstruction output. | Prove center/edge/corner camera rays, hit semantics, and GBuffer independence through `CHK-RPT-03`. |
 | Estimator | One Reference transport kernel orders emission/environment hits, next-event estimation, MIS, BSDF continuation, compensated roulette, and invalid-result handling over shared path primitives. | Complete the equation-to-code, analytic, injected-fault, and independent numeric review; source correspondence alone is not estimator authority. |
@@ -129,7 +129,7 @@ flowchart LR
     RGS --> RHI
     Session --> Overlay[Progress and reset snapshot]
     Session --> Readback[Generic Radiance readback]
-    Overlay --> UI[Editor or approved runtime presentation]
+    Overlay --> UI[Editor or approved Game presentation]
     Readback --> Encode[Shared Application image encoding]
     Encode --> Schema[Reference checkpoint and manifest schema]
     Schema --> Publish[Shared atomic bundle publication]
@@ -254,7 +254,7 @@ Do not create a top-level `PathTracer` engine, a new executable, a parallel `Ref
 ## End-To-End View Route
 
 ```text
-Editor or Game/runtime viewport selects RenderViewMode::ReferencePathTracer
+Editor or Game viewport selects RenderViewMode::ReferencePathTracer
     -> View owner preserves Lit settings and resolves canonical RenderView identity/camera/extent
     -> Renderer resolves the accepted reference preset and validates domain/capability/resource budget
     -> acquire immutable SceneGeneration + View semantic identities + shader/asset identities
@@ -283,7 +283,7 @@ Names are illustrative until implementation review, but responsibilities are fix
 
 | Contract | Required content |
 | --- | --- |
-| `RenderViewMode::ReferencePathTracer` | The only transport selector. Editor selection remains in `EditorViewportSession` and submits this value through the ordinary `ViewportRenderRequest`; a Game/runtime host may submit the same value. `RenderView` freezes it for pass consumption. No Editor mirror enum, selector CVar, target/flag translation, graph-settings copy, capture field, or RHI value exists. |
+| `RenderViewMode::ReferencePathTracer` | The only transport selector. Editor selection remains in `EditorViewportSession` and submits this value through the ordinary `ViewportRenderRequest`; a Game host may submit the same value. `RenderView` freezes it for pass consumption. No Editor mirror enum, selector CVar, target/flag translation, graph-settings copy, capture field, or RHI value exists. |
 | `RenderFrame` | The canonical prepared-frame boundary for execution and feature integration. Reference identity/session code reads accepted View, prepared Scene, frame identity/time, and ray bindings from this object instead of receiving a parallel component list. Only the focused one-shot viewport action and its sequence may accompany it; the complete mutable request does not. |
 | Feature-local configuration | Accepted camera/extent/crop/filter semantics, target product/SPP, seed/replicate, backend/frontend policy, included domain, and bounded batch/memory/checkpoint/readback policy. It remains Private until a concrete UI or command consumer requires a narrow boundary. |
 | `ReferencePathTracerInputDigest` | Private canonical hash of every transport-affecting scene, view, asset, shader, compiler, estimator, backend/frontend, sampler, domain, and resolution value. View-mode selection, target SPP, presentation settings, wall clock, batch size, and invocation-only fields do not enter this digest. |
@@ -497,7 +497,7 @@ The engine-wide automatic policy selects Pipeline when complete, otherwise Inlin
 [User Experience](UserExperience.md) owns the complete interaction contract. Architecture requires two interactive consumers in priority order:
 
 1. **Editor viewport adapter:** `Reference Path Tracer` is the second top-level Editor view-mode item, immediately after Lit. It selects `RenderViewMode::ReferencePathTracer`, preserves Lit settings, performs automatic preflight, starts accumulation on success, remains responsive while the camera moves, and displays the newest accepted composition with a compact progress/reset/completion overlay. Details expose exact settings and pause/restart without becoming a prerequisite; checkpoint/save appear later under a secondary Evidence/Output group.
-2. **Game/runtime adapter:** a Game-kind RenderView uses the same `RenderViewMode::ReferencePathTracer` through its approved viewport owner. Its UI may differ, but frame composition, estimator/session behavior, canonical camera identity, invalidation, progress, target completion, raw/presentation separation, and failure states cannot.
+2. **Game adapter:** a Game-kind RenderView uses the same `RenderViewMode::ReferencePathTracer` through its approved viewport owner. Its UI may differ, but frame composition, estimator/session behavior, canonical camera identity, invalidation, progress, target completion, raw/presentation separation, and failure states cannot.
 The primary comparison loop is Reference Path Tracer -> Lit -> Reference Path Tracer on one unchanged View. Leaving Reference Path Tracer restores untouched Lit state and, only when retention is admitted, suspends after a complete range. Without retention it settles/releases and return validates from ordinal zero. A retained prefix resumes only when the full digest still matches; scene/camera changes made while in Lit invalidate it. Memory-policy eviction and single-active-view capacity are explicit events, never silent loss.
 
 While Reference Path Tracer is selected, navigation is a first-class state transition rather than cancellation of a render job. The viewport may show low-SPP noise during movement, but not an unlabeled old composition or a frozen final frame. After the last movement update, the final identity accumulates immediately without a `Start` or `Restart` action.
@@ -566,7 +566,7 @@ Exact source deletions are frozen by the plan stage that inspects the live tree.
 | D3D12 + Pipeline | Required strict route | Reference Pipeline adapter and shared-kernel route are source-present; unproved on GPU. |
 | Vulkan + Pipeline | Required strict route | Reference Pipeline adapter and shared-kernel route are source-present; unproved on GPU. |
 | Editor viewport view mode and progress overlay | Required primary development-product route | Menu row, automatic start, progress/actions, and feature-local overlay are source-present; build and interaction evidence is deferred. |
-| Game-kind view semantic | Required shared camera/session behavior; product exposure gated separately | `RuntimeApplication` accepts the same ordinary request/mode and reaches the same frame/session; a concrete host workflow has not been exercised. |
+| Game-kind view semantic | Required shared camera/session behavior; product exposure gated separately | `GameApplication` accepts the same ordinary request/mode and reaches the same frame/session; a concrete host workflow has not been exercised. |
 | `ShippingEditor`, `ShippingGame` | Public source-header enum value remains; all producers/session factories and user/export/package routes are excluded | Must remain unreachable and free of optional artifact dependencies. |
 | Reference-produced `Radiance` EXR/manifest/checkpoint | Required for final evidence; secondary product surface after the live viewport milestone | Source-present through generic product readback and the private ApplicationEditor transaction; decoder round trip, corruption/failure injection, and publication evidence are deferred. |
 | Numerical/statistical/runtime/package proof | Required by `FCR-REN-08` | Not produced by this architecture work. |

@@ -47,7 +47,7 @@ namespace SparkleLauncher
 		return developmentProfile;
 	}
 
-	const QString& LauncherSettings::RuntimeProfile() const
+	const QString& LauncherSettings::GameProfile() const
 	{
 		static QString debugProfile = "DebugGame";
 		static QString developmentProfile = "DevelopmentGame";
@@ -189,7 +189,7 @@ namespace SparkleLauncher
 		SetBuildConfiguration(profileName);
 	}
 
-	void LauncherSettings::SetRuntimeProfile(const QString& profileName)
+	void LauncherSettings::SetGameProfile(const QString& profileName)
 	{
 		SetBuildConfiguration(profileName);
 	}

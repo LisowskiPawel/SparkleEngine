@@ -41,7 +41,7 @@ namespace SparkleLauncher
 		process.ExecutablePath = ResolveSparkleToolPath(plan.RepositoryRoot, plan.ToolProfile, "AssetCooker");
 		process.WorkingDirectory = plan.RepositoryRoot;
 		process.LogPath = ResolveLauncherOperationLogPath(plan.RepositoryRoot, plan.Operation.Id, logFileName);
-		process.Arguments = {std::string(command), plan.Request.ContentId, plan.Request.RuntimeProfile, "--tool-profile", plan.ToolProfile, "--root", plan.RepositoryRoot.string()};
+		process.Arguments = {std::string(command), plan.Request.ContentId, plan.Request.GameProfile, "--tool-profile", plan.ToolProfile, "--root", plan.RepositoryRoot.string()};
 		return process;
 	}
 

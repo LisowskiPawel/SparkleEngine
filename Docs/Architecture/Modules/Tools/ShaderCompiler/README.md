@@ -36,9 +36,9 @@ Source ownership reconciled on 2026-10-06: the five fixed CLI verbs are function
 | Capability ID | Capability | State | Exact current coverage and limit | Evidence | Release disposition |
 | --- | --- | --- | --- | --- | --- |
 | `SHD-BUILD-01` | Offline compiler executable | Capability-gated | `ShaderCompiler` builds when `SPARKLE_ENABLE_SHADER_COMPILER` is enabled. It is a host tool, not a runtime in-process compiler. | `S` | Pending |
-| `SHD-BUILD-02` | Shared shader contracts | Implemented path | `ShaderContracts` defines target, stage, feature, reflection, parameter-layout, map/library, dependency, and publication identities shared by registration, tool, and runtime consumers. | `S` | Pending |
+| `SHD-BUILD-02` | Shared shader contracts | Implemented path | `ShaderContracts` defines target, stage, feature, reflection, parameter-layout, map/library, dependency, and publication identities shared by registration, tool, and game consumers. | `S` | Pending |
 | `SHD-BUILD-03` | Contract-only registrations | Implemented path | Renderer shader registrations compile into a separate object target that the host tool can link without linking the full runtime Renderer implementation. | `S` | Pending |
-| `SHD-BUILD-04` | Runtime shader source dependency | Not found for intended Shipping path | Runtime opens cooked map/library products and materializes RHI programs/pipelines. Application shader-recook sources are excluded from the runtime target. This needs package inspection before it becomes a Shipping proof. | `S` | Pending |
+| `SHD-BUILD-04` | Runtime shader source dependency | Not found for intended Shipping path | Runtime opens cooked map/library products and materializes RHI programs/pipelines. Application shader-recook sources are excluded from the game target. This needs package inspection before it becomes a Shipping proof. | `S` | Pending |
 | `SHD-BUILD-05` | Tool dependencies | Capability-gated | DXC, Slang and SPIRV-Tools are found from configured dependency/Vulkan SDK routes; required DLLs and Slang standard modules are staged for the tool. Launcher SDK discovery and cooked-tool readiness consume one required-file inventory, with binary-directory entries selecting the deployed runtime bundle; they share standard-module directory detection and reject directories substituted for required files. Clean-machine discovery is unproven. | `S` | Pending |
 
 ## Command-Line Surface
@@ -49,7 +49,7 @@ Source ownership reconciled on 2026-10-06: the five fixed CLI verbs are function
 | `SHD-CLI-02` | `list-backends` | Print registered compiler backends and reported binary/ray capability flags. | `S` | Pending |
 | `SHD-CLI-03` | `list-targets` | Print all target descriptors supported by the tool vocabulary. | `S` | Pending |
 | `SHD-CLI-04` | `list-shaders` | Print global registrations; optional `--validate` runs registration/contract validation. | `S` | Pending |
-| `SHD-CLI-05` | `inspect-shader` | Look up one shader ID in the cooked publication and report each runtime target's code hash, parameter signature, and compile-input hash. | `S` | Pending |
+| `SHD-CLI-05` | `inspect-shader` | Look up one shader ID in the cooked publication and report each game target's code hash, parameter signature, and compile-input hash. | `S` | Pending |
 
 ### `cook` options
 
@@ -192,7 +192,7 @@ This describes what the validation target is designed to exercise. It was **not 
 - Stage vocabulary beyond the 35 registrations is not a current Renderer feature.
 - Contract/reflection validation is strong source machinery, but only the exact staged toolchain and both runtime backends can close ABI/pipeline evidence.
 - In-operation deduplication and content-addressed storage are not a persistent cross-invocation compile cache.
-- Editor recook/hot reload must not leak into the Shipping runtime product.
+- Editor recook/hot reload must not leak into the Shipping game product.
 - Atomic publication code must still be tested against cancellation, locked files, partial writes, stale artifacts, and concurrent reader behavior on the supported Windows filesystem path.
 - The [Shader System feature acceptance contract](../../../CrossModule/ShaderSystem/Acceptance.md) remains unproved; source consistency is not completion.
 

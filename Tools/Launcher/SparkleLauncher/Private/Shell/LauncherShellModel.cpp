@@ -123,7 +123,7 @@ namespace SparkleLauncher
 		model.Repository = std::move(repository);
 		model.ContentId = std::move(content.Id);
 		model.EditorProfile = arguments.EditorProfile;
-		model.RuntimeProfile = arguments.RuntimeProfile;
+		model.GameProfile = arguments.GameProfile;
 		model.WorkspaceIdePreference = arguments.WorkspaceIdePreference;
 		model.WorkspaceCompilerPreference = arguments.WorkspaceCompilerPreference;
 		model.Operations = BuildLauncherShellOperationRows();

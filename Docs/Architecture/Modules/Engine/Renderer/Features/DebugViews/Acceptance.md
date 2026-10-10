@@ -21,7 +21,7 @@ Candidate results belong in `FCR-REN-11`. Source inspection does not prove build
 - `AC-DVP-01` - every non-sentinel `RenderViewMode` has one contract row and a real production consumer; numeric C++ and HLSL values match exactly, `ReferencePathTracer` is `1`, and values are contiguous through `Count = 18`;
 - `AC-DVP-02` - the selected mode has one representation on `ViewportRenderRequest` and immutable `RenderView`; two viewport requests may hold different modes without global cross-talk;
 - `AC-DVP-03` - no Editor mirror enum, preset translator, visualization target, mode-shaped show flag, selector CVar, command bridge, settings copy, compatibility alias, or RHI field competes with `RenderViewMode`;
-- `AC-DVP-04` - Editor owns labels, icons, grouping, shortcuts, and interaction while Game/runtime may submit the same rendering semantic without an Editor dependency;
+- `AC-DVP-04` - Editor owns labels, icons, grouping, shortcuts, and interaction while Game may submit the same rendering semantic without an Editor dependency;
 - `AC-DVP-05` - the Reference mode schedules only the private Reference middle and Lit schedules only GBuffer/ReSTIR/reconstruction inside the same frame shell;
 - `AC-DVP-06` - Wireframe affects only raster fill; buffer/lobe/instance modes select their focused debug resolve, while World Tangent additionally requires its named raster and ray-traced GBuffer producers without replacing the lighting normal;
 - `AC-DVP-07` - feature mechanism remains enclosed; outside-feature edits are only accepted integration hooks, build/generated membership, or documentation/evidence;

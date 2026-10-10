@@ -21,7 +21,7 @@ namespace SparkleLauncher
 		inline static constexpr std::string_view CookingTools = "content.cooking-tools";
 		inline static constexpr std::string_view CookedContent = "content.cooked";
 		inline static constexpr std::string_view EditorProduct = "product.editor";
-		inline static constexpr std::string_view RuntimeProduct = "product.runtime";
+		inline static constexpr std::string_view GameProduct = "product.game";
 	};
 
 	struct LauncherCapabilityContext

@@ -31,7 +31,7 @@ class Window;
 
 struct EditorHostServices final
 {
-	Timer& RuntimeTimer;
+	Timer& GameTimer;
 	LevelSession* Levels = nullptr;
 	std::function<WorldReadView()> AcquireWorldReadView;
 	std::function<WorldChangeBatch(const WorldChangeCursor&)> ReadWorldChanges;

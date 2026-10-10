@@ -184,7 +184,7 @@ Automation also freezes target window/display selection policy, timeout, allowed
 | --- | --- | --- | --- |
 | DevelopmentEditor | full admitted request/status and policy controls | only eligible profile/backend/window/UI cell | full developer artifact/support surface |
 | noninteractive developer route | manifest only | same RHI/Renderer transaction | machine-readable full admitted artifacts |
-| packaged Runtime | product/user request per release scope; no developer console dependency | same admitted backend/profile | bounded runtime status; clean-machine evidence route |
+| packaged Game | product/user request per release scope; no developer console dependency | same admitted backend/profile | bounded runtime status; clean-machine evidence route |
 | release consumer UI | only explicitly product-approved control | no backend details/native forcing | no developer-only calibration/probe panel |
 | unsupported/non-Windows/excluded profiles | no active claim | absent/ineligible/fallback | clear negative result, no selector advertisement |
 
@@ -216,7 +216,7 @@ The dry run passes only when reviewers can identify current pixels/profile, curr
 - UI is composed/encoded in the wrong domain and becomes dim, clipped, or overbright;
 - metadata failure is reported as pixel failure, or success is reported as display proof;
 - a compositor screenshot is offered as raw PQ or physical luminance evidence;
-- the editor works only with a specific interposer/bypass while packaged Runtime differs;
+- the editor works only with a specific interposer/bypass while packaged Game differs;
 - support output lacks exact output/profile/generation/validity/native reason;
 - automation allows fallback while the requested contract required active HDR.
 

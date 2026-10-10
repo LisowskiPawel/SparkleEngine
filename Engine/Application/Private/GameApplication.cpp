@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "RuntimeApplication.h"
+#include "GameApplication.h"
 #include "ApplicationGraphicsLaunch.h"
 
 #include "Core/Public/Diagnostics/Logger.h"
@@ -7,7 +7,7 @@
 #include "Core/Public/Process/ProcessReadiness.h"
 #include "Window/Window.h"
 #include "Renderer.h"
-#include "RuntimeConsole/RuntimeConsoleHost.h"
+#include "GameConsole/GameConsoleHost.h"
 #include "Input/InputSystem.h"
 #include "World/GameWorld.h"
 #include "Input/CameraInputIntentCollector.h"
@@ -30,62 +30,62 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogApplicationConcurrency, "Application.Concurrency");
 
-bool RuntimeApplication::WantsImGuiInputCapture() noexcept
+bool GameApplication::WantsImGuiInputCapture() noexcept
 {
 	const ImGuiContext* currentContext = ImGui::GetCurrentContext();
 	return currentContext != nullptr && (ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantCaptureMouse);
 }
 
-RuntimeApplication::RuntimeApplication() = default;
+GameApplication::GameApplication() = default;
 
-RuntimeApplication::RuntimeApplication(RuntimeApplicationOptions options) noexcept :
+GameApplication::GameApplication(GameApplicationOptions options) noexcept :
     m_options(options)
 {
 }
 
-RuntimeApplication::~RuntimeApplication() = default;
+GameApplication::~GameApplication() = default;
 
-Timer& RuntimeApplication::GetTimer() noexcept
+Timer& GameApplication::GetTimer() noexcept
 {
 	return *m_timer;
 }
 
-Window& RuntimeApplication::GetWindow() noexcept
+Window& GameApplication::GetWindow() noexcept
 {
 	return *m_window;
 }
 
-InputSystem& RuntimeApplication::GetInputSystem() noexcept
+InputSystem& GameApplication::GetInputSystem() noexcept
 {
 	return *m_inputSystem;
 }
 
-GameWorld& RuntimeApplication::GetWorldForEditor() noexcept
+GameWorld& GameApplication::GetWorldForEditor() noexcept
 {
 	return *m_gameWorld;
 }
 
-LevelSession* RuntimeApplication::GetLevelSession() const noexcept
+LevelSession* GameApplication::GetLevelSession() const noexcept
 {
 	return m_levelSession.get();
 }
 
-Renderer& RuntimeApplication::GetRenderer() noexcept
+Renderer& GameApplication::GetRenderer() noexcept
 {
 	return *m_renderer;
 }
 
-TaskExecutor& RuntimeApplication::GetTaskExecutor() noexcept
+TaskExecutor& GameApplication::GetTaskExecutor() noexcept
 {
 	return m_taskRuntime->GetExecutor();
 }
 
-TaskScope& RuntimeApplication::GetApplicationTaskScope() noexcept
+TaskScope& GameApplication::GetApplicationTaskScope() noexcept
 {
 	return m_taskRuntime->GetApplicationScope();
 }
 
-void RuntimeApplication::Initialize()
+void GameApplication::Initialize()
 {
 	if (m_isInitialized)
 	{
@@ -94,26 +94,26 @@ void RuntimeApplication::Initialize()
 
 	InitializeHost();
 	InitializeInput();
-	InitializeGameRuntime();
+	InitializeGameWorld();
 	InitializeRenderer();
-	InitializeRuntimeConsole();
+	InitializeGameConsole();
 	m_isInitialized = true;
 }
 
-void RuntimeApplication::InitializeHost()
+void GameApplication::InitializeHost()
 {
 	m_timer = std::make_unique<Timer>();
 	m_window = std::make_unique<Window>("Sparkle Engine");
 }
 
-void RuntimeApplication::InitializeInput()
+void GameApplication::InitializeInput()
 {
 	m_inputSystem = InputSystem::Create();
 	m_inputSystem->SetInputCaptureQuery(WantsImGuiInputCapture);
 	m_inputSystem->SubscribeToWindow(*m_window);
 }
 
-void RuntimeApplication::InitializeGameRuntime()
+void GameApplication::InitializeGameWorld()
 {
 	m_taskRuntime = std::make_unique<ApplicationTaskRuntime>();
 	m_gameWorld = std::make_unique<GameWorld>(m_taskRuntime->GetExecutor());
@@ -123,7 +123,7 @@ void RuntimeApplication::InitializeGameRuntime()
 	m_levelSession->GetLevelChangeEvents().OnLevelChanged.Add([](const LevelChangedEventArgs& event) noexcept { Process::SignalParentReadiness(event.activeLevelName); });
 }
 
-void RuntimeApplication::InitializeRenderer()
+void GameApplication::InitializeRenderer()
 {
 	const RendererGraphicsLaunch graphicsLaunch = ResolveApplicationGraphicsLaunch();
 	RendererExecutionConfig rendererConfig;
@@ -142,25 +142,25 @@ void RuntimeApplication::InitializeRenderer()
 		}
 	}
 
-	rendererConfig.EnableUiRenderPackets = m_options.EnableUiRenderPackets || m_options.EnableRuntimeConsole;
+	rendererConfig.EnableUiRenderPackets = m_options.EnableUiRenderPackets || m_options.EnableGameConsole;
 	rendererConfig.AssetTaskExecutor = &m_taskRuntime->GetExecutor();
 	rendererConfig.AssetTaskParentScope = &m_taskRuntime->GetApplicationScope();
 	m_renderer = std::make_unique<Renderer>(*m_timer, *m_window, graphicsLaunch, rendererConfig);
 }
 
-void RuntimeApplication::InitializeRuntimeConsole()
+void GameApplication::InitializeGameConsole()
 {
-	if (m_options.EnableRuntimeConsole)
+	if (m_options.EnableGameConsole)
 	{
-		m_runtimeConsoleHost = std::make_unique<RuntimeConsoleHost>(*m_timer, *m_window, [this](CVarControlRequest request) { return m_renderer->ExecuteConsoleVariables(std::move(request)); });
+		m_gameConsoleHost = std::make_unique<GameConsoleHost>(*m_timer, *m_window, [this](CVarControlRequest request) { return m_renderer->ExecuteConsoleVariables(std::move(request)); });
 	}
 }
 
-RuntimeApplicationFrameResult RuntimeApplication::BeginFrame()
+GameApplicationFrameResult GameApplication::BeginFrame()
 {
 	if (!m_isInitialized)
 	{
-		return RuntimeApplicationFrameResult::Exit;
+		return GameApplicationFrameResult::Exit;
 	}
 
 	m_inputSystem->BeginFrame();
@@ -170,13 +170,13 @@ RuntimeApplicationFrameResult RuntimeApplication::BeginFrame()
 
 	if (m_window->ShouldClose())
 	{
-		return RuntimeApplicationFrameResult::Exit;
+		return GameApplicationFrameResult::Exit;
 	}
 
 	if (m_window->IsMinimized() || !m_window->HasValidSize())
 	{
 		m_window->WaitForEvent();
-		return RuntimeApplicationFrameResult::SkipRender;
+		return GameApplicationFrameResult::SkipRender;
 	}
 
 	if (m_levelSession)
@@ -184,28 +184,28 @@ RuntimeApplicationFrameResult RuntimeApplication::BeginFrame()
 		m_levelSession->ProcessPendingLevelChange();
 	}
 
-	return RuntimeApplicationFrameResult::Ready;
+	return GameApplicationFrameResult::Ready;
 }
 
-void RuntimeApplication::UpdateRuntime() noexcept
+void GameApplication::UpdateGame() noexcept
 {
 	const float width = static_cast<float>(m_window->GetWidth());
 	const float height = static_cast<float>(m_window->GetHeight());
 	const CameraInputIntent cameraIntent = CollectCameraInputIntent(height > 0.0f ? width / height : 1.0f);
-	UpdateRuntimeFrame(&cameraIntent, nullptr);
+	UpdateGameFrame(&cameraIntent, nullptr);
 }
 
-CameraInputIntent RuntimeApplication::CollectCameraInputIntent(float aspectRatio) noexcept
+CameraInputIntent GameApplication::CollectCameraInputIntent(float aspectRatio) noexcept
 {
 	return m_cameraInputIntentCollector != nullptr ? m_cameraInputIntentCollector->Collect(aspectRatio) : CameraInputIntent{};
 }
 
-void RuntimeApplication::UpdateEditorRuntime(const RenderViewCameraData& renderCamera) noexcept
+void GameApplication::UpdateEditorGame(const RenderViewCameraData& renderCamera) noexcept
 {
-	UpdateRuntimeFrame(nullptr, &renderCamera);
+	UpdateGameFrame(nullptr, &renderCamera);
 }
 
-void RuntimeApplication::UpdateRuntimeFrame(const CameraInputIntent* worldCameraIntent, const RenderViewCameraData* renderCameraOverride) noexcept
+void GameApplication::UpdateGameFrame(const CameraInputIntent* worldCameraIntent, const RenderViewCameraData* renderCameraOverride) noexcept
 {
 	if (m_gameWorld && m_timer)
 	{
@@ -219,7 +219,7 @@ void RuntimeApplication::UpdateRuntimeFrame(const CameraInputIntent* worldCamera
 	}
 }
 
-void RuntimeApplication::SubmitRenderFrame(std::uint64_t frameId, const RenderViewCameraData* renderCameraOverride)
+void GameApplication::SubmitRenderFrame(std::uint64_t frameId, const RenderViewCameraData* renderCameraOverride)
 {
 	RenderFrameSubmission submission = m_gameWorld->ExtractRenderFrameSubmission(frameId);
 	if (renderCameraOverride != nullptr)
@@ -229,7 +229,7 @@ void RuntimeApplication::SubmitRenderFrame(std::uint64_t frameId, const RenderVi
 	m_renderer->SubmitRenderFrame(std::move(submission));
 }
 
-void RuntimeApplication::SubmitViewportRenderRequest(ViewportRenderRequest request) noexcept
+void GameApplication::SubmitViewportRenderRequest(ViewportRenderRequest request) noexcept
 {
 	if (m_renderer)
 	{
@@ -237,23 +237,23 @@ void RuntimeApplication::SubmitViewportRenderRequest(ViewportRenderRequest reque
 	}
 }
 
-bool RuntimeApplication::Tick()
+bool GameApplication::Tick()
 {
 	switch (BeginFrame())
 	{
-		case RuntimeApplicationFrameResult::Exit:
+		case GameApplicationFrameResult::Exit:
 			return false;
-		case RuntimeApplicationFrameResult::SkipRender:
+		case GameApplicationFrameResult::SkipRender:
 			return true;
-		case RuntimeApplicationFrameResult::Ready:
+		case GameApplicationFrameResult::Ready:
 		default:
 			break;
 	}
 
-	UpdateRuntime();
-	if (m_runtimeConsoleHost != nullptr)
+	UpdateGame();
+	if (m_gameConsoleHost != nullptr)
 	{
-		if (auto packet = m_runtimeConsoleHost->Update())
+		if (auto packet = m_gameConsoleHost->Update())
 		{
 			m_renderer->SubmitUiRenderPacket(std::move(*packet));
 		}
@@ -262,14 +262,14 @@ bool RuntimeApplication::Tick()
 	return true;
 }
 
-void RuntimeApplication::Shutdown()
+void GameApplication::Shutdown()
 {
 	if (!m_isInitialized)
 	{
 		return;
 	}
 
-	m_runtimeConsoleHost.reset();
+	m_gameConsoleHost.reset();
 	m_renderer.reset();
 	m_levelSession.reset();
 	m_cameraInputIntentCollector.reset();

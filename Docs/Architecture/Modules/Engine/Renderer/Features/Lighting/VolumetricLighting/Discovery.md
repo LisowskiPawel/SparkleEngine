@@ -35,7 +35,7 @@
 
 ### `VOL-D0-01` Roadmap, Product, And Platform Admission
 
-After `REL-11`, freeze release/milestone, mandatory D3D12/Vulkan/device profile, runtime/editor reachability, and `Required/Deferred/Excluded` table for baseline fog, local media, atmosphere, heterogeneous volumes, Volumetric ReSTIR, and clouds. Assign an FCR/evidence owner before a production claim.
+After `REL-11`, freeze release/milestone, mandatory D3D12/Vulkan/device profile, game/editor reachability, and `Required/Deferred/Excluded` table for baseline fog, local media, atmosphere, heterogeneous volumes, Volumetric ReSTIR, and clouds. Assign an FCR/evidence owner before a production claim.
 
 ### `VOL-D0-02` World, Units, And Medium Semantics
 

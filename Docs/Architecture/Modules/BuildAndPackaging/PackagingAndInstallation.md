@@ -43,7 +43,7 @@ The target capability is one Build -> Cook -> Stage -> Sign -> Verify -> Package
 
 - Inputs: frozen source revision, profile/toolchain/options, dependency identities, selected product, cooked-content manifest, redistribution policy, signing identity, and package version.
 - Outputs: immutable staging tree, byte/permission/hash manifest, license/SBOM inventory, signatures, archive or installer, verification result, and clean-machine evidence reference.
-- Build/release configuration owns membership and publication. Individual modules own declarations of their required runtime products; no consumer may scan development directories to infer membership.
+- Build/release configuration owns membership and publication. Individual modules own declarations of their required game products; no consumer may scan development directories to infer membership.
 - Package bytes are immutable. Logs, settings, caches, captures, saves, and crash data live in an explicit per-user writable root and survive or reset only by declared policy.
 
 ## Requested And Active State
@@ -58,10 +58,10 @@ Missing, extra, unsigned, hash-mismatched, license-incomplete, path-escaping, so
 
 | Decision | Benefit | Cost or constraint |
 | --- | --- | --- |
-| manifest-driven membership | reproducibility and review do not depend on directory scans | every contributing target must declare its runtime products |
+| manifest-driven membership | reproducibility and review do not depend on directory scans | every contributing target must declare its game products |
 | immutable installed bytes plus separate user state | verification, update, and uninstall behavior stay deterministic | paths/configuration must be designed for relocation and standard users |
 | verify before candidate publication | corrupt, unsigned, or license-incomplete output cannot escape as a release | staging adds time, storage, signing, and provenance infrastructure |
-| classify editor/runtime/tools/symbols independently | product contents match the intended audience and redistribution policy | multiple product profiles need explicit package matrices |
+| classify editor/game/tools/symbols independently | product contents match the intended audience and redistribution policy | multiple product profiles need explicit package matrices |
 
 ## External Precedent And Transfer Boundary
 

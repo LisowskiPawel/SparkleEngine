@@ -148,18 +148,18 @@ namespace SparkleLauncher
 			    "Creates the local editor artifact used for development work.",
 			    "workflow-editor-build.png");
 		}
-		if (operationId == "workspace.build.runtime")
+		if (operationId == "workspace.build.game")
 		{
 			return MakeOperationUiModel(
 			    operationId,
-			    "Build Runtime",
+			    "Build Game",
 			    "Build",
 			    LauncherWorkflowPageKind::Build,
 			    LauncherActionImpactKind::BuildOutputs,
-			    "Build outputs: optional local rebuild of the runtime for development work.",
+			    "Build outputs: optional local rebuild of the game for development work.",
 			    "Build outputs",
-			    "Creates the local runtime artifact used for development work.",
-			    "workflow-runtime-build.png");
+			    "Creates the local game artifact used for development work.",
+			    "workflow-game-build.png");
 		}
 		if (operationId == "cook.tools.prepare")
 		{

@@ -37,7 +37,7 @@ Recommended prompt attachment:
 
 Every integration MUST:
 
-- deliver or preserve a real runtime, editor, renderer, RHI, cooking, launcher, capture, debugging, or validation workflow;
+- deliver or preserve a real game, editor, renderer, RHI, cooking, launcher, capture, debugging, or validation workflow;
 - fail before scheduling or publication when required work has no real producer; never manufacture apparent success with a no-op, clear, copy, dummy value, or swallowed failure;
 - extend the existing owner and production path instead of creating a parallel subsystem or duplicate authority;
 - keep one mutable authority and explicit lifetime/publication boundaries;

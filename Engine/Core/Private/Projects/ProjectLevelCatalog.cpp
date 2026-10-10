@@ -51,7 +51,7 @@ bool ProjectLevelCatalog::IsAssetPackReady(std::string_view packId) const
 	while (!packId.empty())
 	{
 		const auto pack = assetPacks.find(packId);
-		if (pack == assetPacks.end() || !pack->second.runtimeSupported)
+		if (pack == assetPacks.end() || !pack->second.gameSupported)
 		{
 			return false;
 		}

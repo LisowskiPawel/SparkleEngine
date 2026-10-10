@@ -8,7 +8,7 @@
 #   Shipping   - optimized for runtime performance with shipping diagnostics policy.
 #
 #   Editor     - builds editor-capable launch targets.
-#   Game       - builds editorless runtime launch targets.
+#   Game       - builds editorless game launch targets.
 
 set(SPARKLE_BUILD_CONFIGURATIONS
     DevelopmentEditor

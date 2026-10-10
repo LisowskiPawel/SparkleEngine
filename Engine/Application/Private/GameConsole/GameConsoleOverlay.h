@@ -20,16 +20,16 @@ struct ImGuiInputTextCallbackData;
 struct ImVec4;
 struct WindowMessageEvent;
 
-class RuntimeConsoleOverlay final
+class GameConsoleOverlay final
 {
 public:
-	RuntimeConsoleOverlay(Timer& timer, Window& window, CVarControlExecutor executor);
-	~RuntimeConsoleOverlay() noexcept;
+	GameConsoleOverlay(Timer& timer, Window& window, CVarControlExecutor executor);
+	~GameConsoleOverlay() noexcept;
 
-	RuntimeConsoleOverlay(const RuntimeConsoleOverlay&) = delete;
-	RuntimeConsoleOverlay& operator=(const RuntimeConsoleOverlay&) = delete;
-	RuntimeConsoleOverlay(RuntimeConsoleOverlay&&) = delete;
-	RuntimeConsoleOverlay& operator=(RuntimeConsoleOverlay&&) = delete;
+	GameConsoleOverlay(const GameConsoleOverlay&) = delete;
+	GameConsoleOverlay& operator=(const GameConsoleOverlay&) = delete;
+	GameConsoleOverlay(GameConsoleOverlay&&) = delete;
+	GameConsoleOverlay& operator=(GameConsoleOverlay&&) = delete;
 
 	void Update();
 	UiRenderPacket ConsumeRenderPacket();

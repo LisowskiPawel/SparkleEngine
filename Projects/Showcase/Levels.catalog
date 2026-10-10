@@ -228,7 +228,7 @@ Version = v5.2
 License = CC BY 4.0
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = StanfordBunny
@@ -246,7 +246,7 @@ Version = Archive revision 1998-12-05
 License = Stanford Bunny terms permit use and redistribution; credit Stanford Computer Graphics Laboratory
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = StanfordDragon
@@ -264,7 +264,7 @@ Version = Archive revision 1996-08-15
 License = Stanford research-use and redistribution terms; noncommercial restriction applies; credit Stanford Computer Graphics Laboratory
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = AnisotropyBarnLamp
@@ -280,7 +280,7 @@ Version = glTF-Sample-Assets edc7c9e67c639d230715049ee31f9a96a6babbbe
 License = CC BY 4.0; copyright 2023 Wayfair LLC; model and textures by Eric Chadwick
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = SheenCloth
@@ -296,7 +296,7 @@ Version = glTF-Sample-Assets edc7c9e67c639d230715049ee31f9a96a6babbbe
 License = CC0 1.0; donated by Microsoft for glTF testing
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = SanMiguel
@@ -312,10 +312,10 @@ ArchiveBytes = 535519642
 ArchiveSha256 = 85874077735808150e679b3c71d70a37a270cb8833f4911325aa1099da3f7d4a
 Version = 2.0 (2017-07-02)
 License = CC BY 3.0
-RuntimeBlocker = Deterministic OBJ/MTL/PNG-to-glTF conversion is not implemented yet.
+GameBlocker = Deterministic OBJ/MTL/PNG-to-glTF conversion is not implemented yet.
 External = true
 DownloadSupported = true
-RuntimeSupported = false
+GameSupported = false
 
 [AssetPack]
 Id = LPSHead
@@ -333,7 +333,7 @@ Version = Archive revision 2012-02-23
 License = CC BY 3.0; credit Infinite Realities / Lee Perry-Smith and the McGuire archive conversion
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = CornellBox
@@ -351,7 +351,7 @@ Version = Archive revision 2011-07-27
 License = CC BY 3.0 archive distribution; credit Guedis Cardenas and Morgan McGuire
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = ModernSponza
@@ -369,7 +369,7 @@ Version = Intel GPU Research Samples 2025-06-16
 License = Creative Commons Attribution; verify embedded archive terms
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = ModernSponzaCurtains
@@ -388,7 +388,7 @@ Version = Intel GPU Research Samples 2025-06-16
 License = Creative Commons Attribution; verify embedded archive terms
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = ModernSponzaIvy
@@ -404,11 +404,11 @@ Archive = pkg_b_ivy1.zip
 ArchiveBytes = 1383921436
 Version = Intel GPU Research Samples 2025-06-16
 License = Creative Commons Attribution; verify embedded archive terms
-RuntimeBlocker = Foliage-density, residency, and geometry-scaling support are not implemented yet.
+GameBlocker = Foliage-density, residency, and geometry-scaling support are not implemented yet.
 DownloadBlocker = Future foliage-density, residency, and geometry-scaling support is required.
 External = true
 DownloadSupported = false
-RuntimeSupported = false
+GameSupported = false
 
 [AssetPack]
 Id = ModernSponzaTrees
@@ -424,11 +424,11 @@ Archive = pkg_c_trees.zip
 ArchiveBytes = 951147802
 Version = Intel GPU Research Samples 2025-06-16
 License = Creative Commons Attribution; verify embedded archive terms
-RuntimeBlocker = Alpha-card foliage and transparent-material rendering are not implemented yet.
+GameBlocker = Alpha-card foliage and transparent-material rendering are not implemented yet.
 DownloadBlocker = Future alpha-card foliage and transparency support is required.
 External = true
 DownloadSupported = false
-RuntimeSupported = false
+GameSupported = false
 
 [AssetPack]
 Id = ModernSponzaCandles
@@ -447,7 +447,7 @@ Version = Intel GPU Research Samples 2025-06-16
 License = Creative Commons Attribution; verify embedded archive terms
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = ModernSponzaKnight
@@ -466,7 +466,7 @@ Version = Intel GPU Research Samples 2025-06-16
 License = Creative Commons Attribution; verify embedded archive terms
 External = true
 DownloadSupported = true
-RuntimeSupported = true
+GameSupported = true
 
 [AssetPack]
 Id = ModernSponzaFlood
@@ -482,11 +482,11 @@ Archive = pkg_f_flood1.zip
 ArchiveBytes = 2928478705
 Version = Intel GPU Research Samples 2025-06-16
 License = Creative Commons Attribution; verify embedded archive terms
-RuntimeBlocker = Alembic animation, water shading, and simulation playback are not implemented yet.
+GameBlocker = Alembic animation, water shading, and simulation playback are not implemented yet.
 DownloadBlocker = Future Alembic animation, water shading, and simulation playback support is required.
 External = true
 DownloadSupported = false
-RuntimeSupported = false
+GameSupported = false
 
 [AssetPack]
 Id = ModernSponzaExplosion
@@ -502,11 +502,11 @@ Archive = PKG_G_Explosion.zip
 ArchiveBytes = 9805168555
 Version = Intel GPU Research Samples 2025-06-16
 License = Creative Commons Attribution; verify embedded archive terms
-RuntimeBlocker = OpenVDB import, volume rendering, and sequence streaming are not implemented yet.
+GameBlocker = OpenVDB import, volume rendering, and sequence streaming are not implemented yet.
 DownloadBlocker = Future OpenVDB import, volume rendering, and sequence streaming support is required.
 External = true
 DownloadSupported = false
-RuntimeSupported = false
+GameSupported = false
 
 [AssetPack]
 Id = JungleRuins
@@ -522,7 +522,7 @@ ArchiveBytes = 4254165506
 ArchiveSha256 = f6b44e81af0515161eb9e2a5cf6f7c24bb82beda439fb8e82c4e5ad479881bee
 Version = 1.0.1b
 License = Creative Commons Attribution; verify embedded archive terms
-RuntimeBlocker = USD composition and virtualized or out-of-core geometry support are not implemented yet.
+GameBlocker = USD composition and virtualized or out-of-core geometry support are not implemented yet.
 External = true
 DownloadSupported = true
-RuntimeSupported = false
+GameSupported = false

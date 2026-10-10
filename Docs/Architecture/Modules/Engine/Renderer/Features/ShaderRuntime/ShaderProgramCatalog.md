@@ -8,7 +8,7 @@
 
 **Membership update:** 2026-10-07 exposure repair: three histogram programs replace the two obsolete parallel-reduction programs. Registration names, virtual paths, stages, and total membership are reconciled with current source; this is not a whole-program runtime acceptance result.
 
-**Scope:** the exact Renderer global-program membership linked into the shader-contract target, including source, entry point, stage, consumer, traversal model, runtime target expectation, and important binding boundary
+**Scope:** the exact Renderer global-program membership linked into the shader-contract target, including source, entry point, stage, consumer, traversal model, game target expectation, and important binding boundary
 
 **Owners:** `Engine/Renderer/ShaderRegistrations` for registration membership, typed declarations and pass consumers in `Engine/Renderer`, and `Tools/Shaders` for compilation/publication
 
@@ -27,7 +27,7 @@ There are exactly 37 registrations: 29 Compute, one Vertex, one Pixel, three Ray
 
 ## Utility, GBuffer, And Debug
 
-| Program | Virtual source | Entry | Stage | Runtime consumer and boundary |
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
 | --- | --- | --- | --- | --- |
 | `ComputeClearCS` | `/Engine/Passes/Compute/ComputeClear.hlsl` | `main` | Compute | Generic frame-graph texture clear used for lighting/reservoir initialization. |
 | `GBufferVS` | `/Engine/Passes/GBuffer/Raster/GBufferVS.hlsl` | `main` | Vertex | Raster GBuffer mesh pass; consumes mesh/instance/deformation data through the graphics layout. |
@@ -45,7 +45,7 @@ There are exactly 37 registrations: 29 Compute, one Vertex, one Pixel, three Ray
 
 ## ReSTIR Direct Lighting And Shadows
 
-| Program | Virtual source | Entry | Stage | Runtime consumer and boundary |
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
 | --- | --- | --- | --- | --- |
 | `DirectLightReservoirTemporalCS` | `/Engine/Passes/Lighting/Direct/DirectLightReservoirTemporal.hlsl` | `main` | Compute | Direct-light temporal candidate/reprojection stage; reads prior direct reservoir history. |
 | `DirectLightReservoirSpatialCS` | `/Engine/Passes/Lighting/Direct/DirectLightReservoirSpatial.hlsl` | `main` | Compute | Direct-light spatial reuse stage. |
@@ -55,7 +55,7 @@ There are exactly 37 registrations: 29 Compute, one Vertex, one Pixel, three Ray
 
 ## ReSTIR Indirect Lighting
 
-| Program | Virtual source | Entry | Stage | Runtime consumer and boundary |
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
 | --- | --- | --- | --- | --- |
 | `RestirIndirectTemporalCS` | `/Engine/Passes/Lighting/Restir/Indirect/RestirIndirectTemporal.hlsl` | `main` | Compute | Inline-query indirect temporal stage; reads history, TLAS, hit/deformation/material/light/sky resources. |
 | `RestirIndirectSpatialCS` | `/Engine/Passes/Lighting/Restir/Indirect/RestirIndirectSpatial.hlsl` | `main` | Compute | Inline-query spatial reuse stage over the current indirect reservoir. |
@@ -66,7 +66,7 @@ See [Indirect Lighting](../Lighting/IndirectLighting/README.md) for the current 
 
 ## Reference Path Tracer Programs
 
-| Program | Virtual source | Entry | Stage | Runtime consumer and boundary |
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
 | --- | --- | --- | --- | --- |
 | `ReferencePathTracerInlineCS` | `/Engine/Passes/Lighting/ReferencePathTracer/ReferencePathTracerInline.hlsl` | `ReferencePathTracerInline` | Compute | Inline RayQuery adapter that invokes the shared Reference transport kernel. |
 | `ReferencePathTracerRGS` | `/Engine/Passes/Lighting/ReferencePathTracer/ReferencePathTracerPipeline.hlsl` | `ReferencePathTracerRayGeneration` | RayGeneration | Native-pipeline adapter that invokes the same Reference transport kernel and composes shared material hit shaders. |
@@ -76,7 +76,7 @@ These rows are current source and registration membership only. Shader cooking, 
 
 ## Lighting Composite And Sky
 
-| Program | Virtual source | Entry | Stage | Runtime consumer and boundary |
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
 | --- | --- | --- | --- | --- |
 | `LightingCompositeCS` | `/Engine/Passes/Lighting/LightingComposite.hlsl` | `main` | Compute | Fixed five initialized lighting inputs plus GBuffer alpha/emissive into HDR scene color. Disabled lobes contribute their intentionally cleared zero outputs. |
 | `SkyCS` | `/Engine/Passes/Lighting/Sky/Sky.hlsl` | `main` | Compute | Fills background using linear scene depth, sky texture, and view/sky uniforms. |
@@ -84,7 +84,7 @@ These rows are current source and registration membership only. Shader cooking, 
 
 ## Exposure
 
-| Program | Virtual source | Entry | Stage | Runtime consumer and boundary |
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
 | --- | --- | --- | --- | --- |
 | `ExposureHistogramClearCS` | `/Engine/Passes/PostProcessing/Exposure/ExposureHistogramClear.hlsl` | `main` | Compute | Clears the fixed 512-bin luminance histogram. |
 | `ExposureHistogramBuildCS` | `/Engine/Passes/PostProcessing/Exposure/ExposureHistogramBuild.hlsl` | `main` | Compute | Builds finite scene-linear luminance counts through group-local atomics. |
@@ -97,7 +97,7 @@ See [Exposure](../PostProcessing/DisplayPipeline/Exposure.md) for metering, hist
 
 ## Image Reconstruction And Upscaling
 
-| Program | Virtual source | Entry | Stage | Runtime consumer and boundary |
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
 | --- | --- | --- | --- | --- |
 | `LinearUpscaleCS` | `/Engine/Passes/Presentation/Upscaling/LinearUpscale.hlsl` | `main` | Compute | Engine baseline render-extent to output-extent resolve. External providers are not represented by a shader registration. |
 | `PointUpscaleCS` | `/Engine/Passes/Presentation/Upscaling/PointUpscale.hlsl` | `main` | Compute | Exact debug-view resolve that preserves authored scalar, normal, material-color, and category values across extents. |
@@ -106,7 +106,7 @@ DLSS Super Resolution and DLSS Ray Reconstruction are external provider evaluati
 
 ## Tone Mapping
 
-| Program | Virtual source | Entry | Stage | Runtime consumer and boundary |
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
 | --- | --- | --- | --- | --- |
 | `ToneMappingCS` | `/Engine/Passes/Presentation/Display/ToneMapping.hlsl` | `main` | Compute | Exposure plus selected mapper converts HDR resolved scene color to display-linear RGBA16F. |
 
@@ -114,7 +114,7 @@ See [Tone Mapping](../PostProcessing/DisplayPipeline/ToneMapping.md) for the thr
 
 ## Presentation And Output
 
-| Program | Virtual source | Entry | Stage | Runtime consumer and boundary |
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
 | --- | --- | --- | --- | --- |
 | `OutputEncodingCS` | `/Engine/Passes/Presentation/Display/OutputEncoding.hlsl` | `main` | Compute | Applies Automatic/Linear/sRGB encoding into the linear-format counterpart of the selected output target before copy. |
 
@@ -165,7 +165,7 @@ The compiler/tool owns deterministic compilation and library publication. [Pipel
 ## Acceptance Criteria
 
 - `AC-SHD-01` — the catalog contains every and only CMake-linked Renderer registration, with unique logical name/source/entry/stage identity and an owning typed declaration/consumer or explicit utility role.
-- `AC-SHD-02` — the derived stage totals equal the registration ledger and both required runtime targets exist for every logical program before paired-backend publication.
+- `AC-SHD-02` — the derived stage totals equal the registration ledger and both required game targets exist for every logical program before paired-backend publication.
 - `AC-SHD-03` — every registration declares the reflection, thread-group/stage, and ray metadata required for its owning typed declaration and consumer; runtime agreement is delegated to `AC-PIP-01`.
 - `AC-SHD-07` — absent Geometry/Hull/Domain/Intersection/Callable/Mesh/Task stages remain explicit zero-registration capability cells and are not inferred from compiler/RHI vocabulary.
 

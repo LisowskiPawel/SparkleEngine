@@ -57,8 +57,8 @@ The current build graph is useful engineering infrastructure, not yet a product-
 | `BUILD-004` | Compiler routes | Partial | CMake has MSVC and Clang/GNU flag branches; Launcher explicitly models MSVC and clang-cl on Windows. No current Linux/macOS platform product path exists. | `S` |
 | `BUILD-005` | Static/shared engine modules | Implemented path | `SPARKLE_BUILD_SHARED` selects static default or engine DLLs; product targets copy declared runtime DLL owners beside executables in shared mode. | `S` |
 | `BUILD-006` | Optional tool/features | Implemented path | Content pipeline ON, shader compiler ON, KTX support OFF, NVIDIA Streamline ON by default; strict warnings and sanitizer instrumentation are opt-in. RHI owns D3D12/Vulkan/NVAPI switches. | `S` |
-| `BUILD-007` | Project discovery | Implemented path | Direct children of `Projects` with `.sparkle-project` are added; TemplateProject is skipped; editor/runtime target convention is supported. Showcase is the only current marked product. | `S` |
-| `BUILD-008` | Target layering | Implemented path | Separate Core, Tasks, Platform, RHI common/backends/facade, Renderer, GameFramework, Editor, runtime/editor Application, Launcher core/GUI, import/cook/shader tools, and Showcase products. | `S` |
+| `BUILD-007` | Project discovery | Implemented path | Direct children of `Projects` with `.sparkle-project` are added; TemplateProject is skipped; editor/game target convention is supported. Showcase is the only current marked product. | `S` |
+| `BUILD-008` | Target layering | Implemented path | Separate Core, Tasks, Platform, RHI common/backends/facade, Renderer, GameFramework, Editor, game/editor Application, Launcher core/GUI, import/cook/shader tools, and Showcase products. | `S` |
 | `BUILD-009` | Host-tool exclusion | Implemented path | Launcher and cook/shader tool targets are excluded from default Game-profile builds; runtime Application source membership excludes editor/import/cook paths. | `S` |
 | `BUILD-010` | Dependency acquisition | Capability-gated | FetchContent owns pinned/tagged ImGui, spdlog, Font Awesome, NVAPI/Streamline, cgltf, MikkTSpace, stb, tinyexr, zlib, Assimp, Compressonator, optional KTX, and SPIRV-Reflect; DXC/Slang/Vulkan/Qt discovery has separate host/SDK routes. | `S` |
 | `BUILD-011` | Selective dependency sync | Implemented path | `SPARKLE_SYNC_SOURCE_DEPENDENCY` configures one cache and returns before workspace generation, enabling Launcher dependency repair. | `S` |
@@ -87,7 +87,7 @@ The products intended for direct use are published by owner and profile under
     |   |-- tools/<Tool>/<Profile>/          developer tools
     |   |-- projects/<Project>/
     |   |   |-- editor/<Profile>/            editor product
-    |   |   |-- runtime/<Profile>/           runtime product
+    |   |   |-- game/<Profile>/              game product
     |   |   `-- cooked/                      project-owned cooked content
     |   `-- libraries/<Owner>/<Profile>/     import and development libraries
     |-- diagnostics/                         generated diagnostic artifacts
@@ -96,7 +96,7 @@ The products intended for direct use are published by owner and profile under
 
 Launcher settings, activity, and operation logs are user-local state under
 `%LOCALAPPDATA%/SparkleEngine/LauncherState/<repository-id>/`; they are not
-build products. Editor and development-runtime mutable state is isolated per
+build products. Editor and development-game mutable state is isolated per
 repository and product under
 `%LOCALAPPDATA%/SparkleEngine/Development/<repository-id>/<Product>/`; packaged
 `v0.1` runtime state uses `%LOCALAPPDATA%/SparkleEngine/<Product>/v0.1/`.
@@ -205,7 +205,7 @@ relocation, clean-machine verification, and the release workflow remain absent.
 | --- | --- | --- | --- | --- |
 | `BUILD-012` | Development artifact contract | Implemented path | Runnable outputs go to `artifacts/dev`: launcher, tools, projects, runtime-support, libraries; diagnostics and symbols have separate roots; optional validated artifact variant namespaces alternate build trees. | `S` |
 | `BUILD-012A` | Mutable-state isolation | Implemented path | Logs, settings, captures, ImGui layout, crashes, and caches resolve beneath typed per-user roots; engine defaults remain read-only. CMake rejects known legacy generated paths in the source tree, and ignored-path policy no longer hides them. | `S` |
-| `BUILD-013` | Product layout | Implemented path | Showcase products emit to `artifacts/dev/projects/Showcase/editor/<Profile>` or `artifacts/dev/projects/Showcase/runtime/<Profile>`; Windows manifest is attached; project working directory is set for VS debugging. | `S` |
+| `BUILD-013` | Product layout | Implemented path | Showcase products emit to `artifacts/dev/projects/Showcase/editor/<Profile>` or `artifacts/dev/projects/Showcase/game/<Profile>`; Windows manifest is attached; project working directory is set for VS debugging. | `S` |
 | `BUILD-014` | Runtime support staging | Implemented path | Shared Sparkle DLL owners and enabled NVIDIA Streamline DLLs copy beside project products; editor products stage their icon font; Launcher declares Core and Tasks runtime ownership, embeds its icon font, runs `windeployqt`, and copies visual resources. Existing development artifacts must be rebuilt to receive a changed bundle. | `S` |
 | `BUILD-014A` | Launcher product graph | Implemented path | The Launcher-owned top-level CMake entry point composes only Core, Tasks, Launcher, and its declared source dependencies in `build/private/tools/SparkleLauncher/`; the repository root independently owns the full workspace graph. Runtime repository discovery contains no build-machine path. | `S` |
 | `BUILD-015` | Tool bundles | Implemented path | Tool executables/libraries/symbols have target-owned locations and declared runtime DLL ownership; Launcher preflights required support files/directories before cooking. | `S` |
@@ -223,7 +223,7 @@ This section owns the build-side source-adopter verdict. [Adoption](AdoptionSupp
 | ID | Binary acceptance criterion |
 | --- | --- |
 | `AC-PROD02-01` | From the immutable public tag/archive and root `README.md`, a non-author can identify the exact supported toolchain, network/cache/disk effects, unstable source API/no-binary-SDK boundary, and one minimal `ShippingGame` runtime route before running commands. |
-| `AC-PROD02-02` | On the supported source machine with empty dependency/build/cook caches, the documented commands sync immutable inputs, configure, build `ShowcaseRuntime` and required cook tools, cook the included products, and launch the requested example within the frozen source budget. Every step has an attributable exit and artifact identity. |
+| `AC-PROD02-02` | On the supported source machine with empty dependency/build/cook caches, the documented commands sync immutable inputs, configure, build `ShowcaseGame` and required cook tools, cook the included products, and launch the requested example within the frozen source budget. Every step has an attributable exit and artifact identity. |
 | `AC-PROD02-03` | The same source/revision/toolchain replays from the declared warm cache without network, produces logically identical manifests/products, and does not depend on an author path, private cache, environment-only selection, or repository dirt. |
 | `AC-PROD02-04` | Launcher, Editor and Game are required release products; exact helper/provider membership is separately classified. Source-build prerequisites are public and pinned; packaged selection/sync/launch needs no undeclared toolchain. Omitting an optional development surface removes its prerequisite or rejects it before work with one actionable reason. |
 | `AC-PROD02-05` | Clean/reset operations enumerate and require confirmation for owned generated roots, preserve tracked/untracked source and user-declared preserved paths, and report missing/locked/partial deletion as failure. |
@@ -233,7 +233,7 @@ This section owns the build-side source-adopter verdict. [Adoption](AdoptionSupp
 | `FM-PROD02-01` | Remove or downgrade CMake, Git, MSVC/Windows SDK, Qt, Vulkan SDK/DXC/Slang, or a selected optional tool. Configure/preflight must identify the exact missing/unsupported prerequisite and exit nonzero; a skipped action or missing artifact cannot be summarized as success (`AC-PROD02-01`, `AC-PROD02-02`, `AC-PROD02-04`). |
 | `FM-PROD02-02` | Block network with an empty cache, corrupt a dependency checkout/archive, or replace a locked revision. Cold acquisition fails without partial acceptance; warm replay either uses verified cache or says network is required (`AC-PROD02-02`, `AC-PROD02-03`). |
 | `FM-PROD02-03` | Run from a Unicode/spaced clone and remove all `SPARKLE_*` path overrides. Any private path, author cache, or environment-only requirement fails the source route (`AC-PROD02-02`, `AC-PROD02-03`). |
-| `FM-PROD02-04` | At this revision `Tools/CMakeLists.txt` adds Launcher unconditionally and Launcher requires Qt 6.8, so even a runtime-focused configure requires Qt. Launcher is now a required release product; its source configure prerequisite is explicit and packaged Qt runtime closure still requires qualification. A Game-only configure cannot call Qt optional until target membership makes that route independent. |
+| `FM-PROD02-04` | At this revision `Tools/CMakeLists.txt` adds Launcher unconditionally and Launcher requires Qt 6.8, so even a Game-focused configure requires Qt. Launcher is now a required release product; its source configure prerequisite is explicit and packaged Qt runtime closure still requires qualification. A Game-only configure cannot call Qt optional until target membership makes that route independent. |
 | `FM-PROD02-05` | Place sentinels and preserved paths beside every clean target, inject a locked file, and cancel. Any source/sentinel removal or false-success aggregate fails `AC-PROD02-05`. |
 | `FM-PROD02-06` | Inspect public wording and delivered files for SDK/install/ABI claims. Any binary SDK implication without installed headers/libraries/samples/version policy fails `AC-PROD02-01` and must be removed, not softened. |
 

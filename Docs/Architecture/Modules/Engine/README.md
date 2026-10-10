@@ -31,7 +31,7 @@ Read the graph as responsibility flow rather than exact link visibility. Core an
 
 | Module | Owns | Module documentation |
 | --- | --- | --- |
-| Application | runtime/editor host composition, configuration, loop, startup, and shutdown | [Application](Application/README.md) |
+| Application | game/editor host composition, configuration, loop, startup, and shutdown | [Application](Application/README.md) |
 | Assets | engine-authored shaders, defaults, environments, and fixtures | [Assets](Assets/README.md) |
 | Core | common infrastructure, diagnostics, files, processes, serialization, math, input, and time | [Core](Core/README.md) |
 | Editor | workspace, viewport sessions, editing UX, settings, and editor tool entry points | [Editor](Editor/README.md) |

@@ -168,7 +168,7 @@ namespace SparkleLauncher
 
 		if (operationId == "workspace.build")
 		{
-			return m_settings.BuildScopes().contains("editor") || m_settings.BuildScopes().contains("runtime");
+			return m_settings.BuildScopes().contains("editor") || m_settings.BuildScopes().contains("game");
 		}
 
 		return operationId == LauncherHomeOperationId() || operationId == "levels.sync" || operationId == "levels.run" || operationId.startsWith("workspace.build.") || operationId.startsWith("cook.");

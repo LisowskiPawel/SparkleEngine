@@ -65,7 +65,7 @@ The Knight evidence record includes source and cooked bytes, track/sample/vertex
 
 | Failure ID | Controlled setup | Accepted behavior | Covering check |
 |---|---|---|---|
-| `FM-GCA-01` | Import changing topology, mismatched face/material slots, invalid transforms/time, or missing samples. | Cook rejects the asset with track/sample identity before runtime products exist; no partial/frozen fallback is published. | `CHK-GCA-01`–`CHK-GCA-03` |
+| `FM-GCA-01` | Import changing topology, mismatched face/material slots, invalid transforms/time, or missing samples. | Cook rejects the asset with track/sample identity before game products exist; no partial/frozen fallback is published. | `CHK-GCA-01`–`CHK-GCA-03` |
 | `FM-GCA-02` | Truncate/corrupt the copied cooked asset, alter offsets/counts/checksum, or request an invalid sample. | Load/seek rejects before out-of-bounds access or scene publication and identifies the failed contract. | `CHK-GCA-04` |
 | `FM-GCA-03` | Cancel/reload during decode/upload, delay GPU completion, and force generation replacement. | Stale work cannot publish or free in-use ranges; owned work settles and memory returns within the declared bound. | `CHK-GCA-06`, `CHK-GCA-09` |
 | `FM-GCA-04` | Pause, loop, reverse/rate-change if supported, and seek across a discontinuity. | Current/previous identity follows the stated reset rule with no temporal spike, one-frame static pose, or old-generation sample. | `CHK-GCA-05`, `CHK-GCA-07`, `CHK-GCA-08` |

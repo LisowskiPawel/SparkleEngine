@@ -8,7 +8,7 @@ Projects compose engine and tool modules into user-facing products and represent
 
 ## At A Glance
 
-The repository currently has one discovered product project, Showcase. Its thin targets select the shared editor/runtime hosts and its catalog chooses representative content; it must not contain scene-specific engine fixes or duplicate importer, world, Renderer, RHI, or delivery policy.
+The repository currently has one discovered product project, Showcase. Its thin targets select the shared editor/game hosts and its catalog chooses representative content; it must not contain scene-specific engine fixes or duplicate importer, world, Renderer, RHI, or delivery policy.
 
 | Question | Owner |
 | --- | --- |
@@ -22,6 +22,6 @@ The repository currently has one discovered product project, Showcase. Its thin 
 
 | Project | Owns | Project documentation |
 | --- | --- | --- |
-| Showcase | editor/runtime targets, startup and selection, level catalog, asset-pack readiness, and workload coverage | [Showcase](Showcase/README.md) |
+| Showcase | editor/game targets, startup and selection, level catalog, asset-pack readiness, and workload coverage | [Showcase](Showcase/README.md) |
 
 Reusable implementation policy belongs with the relevant Engine or Tools module; completion criteria belong in [Acceptance](../../../Acceptance/README.md).

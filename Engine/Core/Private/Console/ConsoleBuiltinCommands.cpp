@@ -18,7 +18,7 @@ void ConsoleBuiltinCommands::Register(ConsoleCommandRegistry& commandRegistry, C
 	        .Name = "Help",
 	        .Help = "Lists console commands or filters command help.",
 	        .ArgumentSyntax = "[filter]",
-	        .Scope = ConsoleCommandScope::Runtime,
+	        .Scope = ConsoleCommandScope::Game,
 	        .Execute = [&commandRegistry](ConsoleCommandScope scope, std::span<const std::string_view> arguments) { return ExecuteHelp(commandRegistry, scope, arguments); },
 	    });
 
@@ -27,7 +27,7 @@ void ConsoleBuiltinCommands::Register(ConsoleCommandRegistry& commandRegistry, C
 	        .Name = "ListCVars",
 	        .Help = "Lists registered console variables.",
 	        .ArgumentSyntax = "[filter]",
-	        .Scope = ConsoleCommandScope::Runtime,
+	        .Scope = ConsoleCommandScope::Game,
 	        .Execute = [executor](ConsoleCommandScope, std::span<const std::string_view> arguments) { return ExecuteListCVars(executor, arguments); },
 	        .Complete = [&cvarRegistry](ConsoleCommandScope, const ConsoleAutocompleteRequest& request) { return CompleteCVarName(cvarRegistry, request.CurrentToken); },
 	    });
@@ -37,7 +37,7 @@ void ConsoleBuiltinCommands::Register(ConsoleCommandRegistry& commandRegistry, C
 	        .Name = "GetCVar",
 	        .Help = "Prints a console variable value.",
 	        .ArgumentSyntax = "<name>",
-	        .Scope = ConsoleCommandScope::Runtime,
+	        .Scope = ConsoleCommandScope::Game,
 	        .Execute = [executor](ConsoleCommandScope, std::span<const std::string_view> arguments) { return ExecuteGetCVar(executor, arguments); },
 	        .Complete = [&cvarRegistry](ConsoleCommandScope, const ConsoleAutocompleteRequest& request) { return CompleteCVarName(cvarRegistry, request.CurrentToken); },
 	    });
@@ -47,7 +47,7 @@ void ConsoleBuiltinCommands::Register(ConsoleCommandRegistry& commandRegistry, C
 	        .Name = "SetCVar",
 	        .Help = "Sets a console variable value.",
 	        .ArgumentSyntax = "<name> <value>",
-	        .Scope = ConsoleCommandScope::Runtime,
+	        .Scope = ConsoleCommandScope::Game,
 	        .Execute = [executor](ConsoleCommandScope, std::span<const std::string_view> arguments) { return ExecuteSetCVar(executor, arguments); },
 	        .Complete = [&cvarRegistry](ConsoleCommandScope, const ConsoleAutocompleteRequest& request) { return CompleteCVarName(cvarRegistry, request.CurrentToken); },
 	    });

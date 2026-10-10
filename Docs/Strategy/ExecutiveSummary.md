@@ -17,7 +17,7 @@ The [public engineering study](Research/README.md#public-engineering-study) grou
 The engine should make it easy for a reviewer to answer:
 
 - Where do game, renderer, frame graph, RHI, and backend authority begin and end?
-- How do source assets and shaders become deterministic runtime artifacts?
+- How do source assets and shaders become deterministic game artifacts?
 - How are D3D12 and Vulkan behavior compared and debugged?
 - Which path-tracing and neural features are real, supported, and measured?
 - What do CPU/GPU time, pacing, memory, quality, and failure behavior look like on declared workloads?

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Application.h"
-#include "RuntimeApplication.h"
+#include "GameApplication.h"
 
 #include <memory>
 
@@ -11,7 +11,7 @@ class SPARKLE_APPLICATION_API EditorApplication final : public Application
 {
 public:
 	EditorApplication();
-	explicit EditorApplication(RuntimeApplicationOptions options) noexcept;
+	explicit EditorApplication(GameApplicationOptions options) noexcept;
 	~EditorApplication();
 
 	EditorApplication(const EditorApplication&) = delete;
@@ -24,7 +24,7 @@ public:
 	void Shutdown() override;
 
 private:
-	void InitializeRuntimeApplication();
+	void InitializeGameApplication();
 	void InitializeEditorOperations();
 	void InitializeUi();
 	void ConfigureUiDiagnostics(Renderer& renderer);
@@ -33,6 +33,6 @@ private:
 
 	struct State;
 	std::unique_ptr<State> m_state;
-	RuntimeApplicationOptions m_runtimeOptions;
+	GameApplicationOptions m_gameOptions;
 	bool m_isEditorSessionActive = false;
 };

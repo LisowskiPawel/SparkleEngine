@@ -33,7 +33,7 @@ namespace SparkleLauncher
 			return;
 		}
 
-		if (!level.RuntimeSupported || !level.CanSelect)
+		if (!level.GameSupported || !level.CanSelect)
 		{
 			return;
 		}

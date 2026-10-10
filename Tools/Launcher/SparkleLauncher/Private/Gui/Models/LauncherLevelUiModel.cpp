@@ -55,10 +55,10 @@ namespace SparkleLauncher
 			std::error_code sourceError;
 			const bool levelSourceReady = std::filesystem::exists(level.sourcePath, sourceError) && !sourceError;
 			const bool packSourceReady = assetPack == nullptr || m_catalog.IsAssetPackSourceReady(assetPack->id);
-			const bool runtimeSupported = assetPack == nullptr || assetPack->runtimeSupported;
+			const bool gameSupported = assetPack == nullptr || assetPack->gameSupported;
 			const bool acquisitionSupported = assetPack != nullptr && assetPack->downloadSupported;
 			const bool sourceReady = levelSourceReady && packSourceReady;
-			const bool canSelect = levelSourceReady && runtimeSupported && (assetPack == nullptr || packSourceReady || acquisitionSupported);
+			const bool canSelect = levelSourceReady && gameSupported && (assetPack == nullptr || packSourceReady || acquisitionSupported);
 			const bool canSync = levelSourceReady && assetPack != nullptr && acquisitionSupported && !packSourceReady;
 			const bool canClean = levelSourceReady && assetPack != nullptr && packSourceReady;
 
@@ -72,7 +72,7 @@ namespace SparkleLauncher
 			    .UnsupportedReason = ResolveUnavailableReason(level, assetPack, levelSourceReady, packSourceReady, canSelect),
 			    .Selected = level.selected,
 			    .SourceReady = sourceReady,
-			    .RuntimeSupported = runtimeSupported,
+			    .GameSupported = gameSupported,
 			    .Ready = m_catalog.IsLevelReady(level),
 			    .CanSelect = canSelect,
 			    .CanSync = canSync,
@@ -99,11 +99,11 @@ namespace SparkleLauncher
 			}
 			if (!packSourceReady && !pack->downloadSupported)
 			{
-				return QString::fromStdString(pack->downloadBlocker) + (pack->runtimeSupported ? QString() : QStringLiteral("\n\n") + QString::fromStdString(pack->runtimeBlocker));
+				return QString::fromStdString(pack->downloadBlocker) + (pack->gameSupported ? QString() : QStringLiteral("\n\n") + QString::fromStdString(pack->gameBlocker));
 			}
-			if (!pack->runtimeSupported)
+			if (!pack->gameSupported)
 			{
-				return QString::fromStdString(pack->runtimeBlocker);
+				return QString::fromStdString(pack->gameBlocker);
 			}
 			return QString::fromStdString(pack->downloadBlocker);
 		}
@@ -162,9 +162,9 @@ namespace SparkleLauncher
 
 		QString ResolveLevelStatus(const LauncherLevelUiEntry& level) const
 		{
-			if (!level.RuntimeSupported)
+			if (!level.GameSupported)
 			{
-				return QStringLiteral("Runtime unsupported");
+				return QStringLiteral("Game unsupported");
 			}
 			if (!level.CanSelect)
 			{
@@ -183,7 +183,7 @@ namespace SparkleLauncher
 
 		QString ResolveLevelState(const LauncherLevelUiEntry& level) const
 		{
-			if (!level.RuntimeSupported || !level.CanSelect)
+			if (!level.GameSupported || !level.CanSelect)
 			{
 				return "warning";
 			}

@@ -47,7 +47,7 @@ namespace SparkleLauncher
 		output << "Repository: " << model.Repository.RootPath.string() << "\n\n";
 		output << "Profile selectors\n";
 		output << "  Editor: " << model.EditorProfile << " | options: " << BuildProfileOptionText(BuildProfileTarget::Editor) << '\n';
-		output << "  Runtime/Cook: " << model.RuntimeProfile << " | options: " << BuildProfileOptionText(BuildProfileTarget::Game) << '\n';
+		output << "  Game/Cook: " << model.GameProfile << " | options: " << BuildProfileOptionText(BuildProfileTarget::Game) << '\n';
 		output << "  Workspace IDE: " << DisplayName(model.WorkspaceIdePreference) << " | options: Visual Studio, Rider\n";
 		output << "  Workspace compiler: " << DisplayName(model.WorkspaceCompilerPreference) << " | options: MSVC, clang-cl\n\n";
 
