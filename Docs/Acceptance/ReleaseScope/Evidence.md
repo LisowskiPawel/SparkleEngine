@@ -1,6 +1,6 @@
 # Release Scope Evidence
 
-**Current FR-01:** [ITER-REL-01-11 public contributor checks](#public-contributor-checks-iter-rel-01-11) adds bounded source automation and fixes Launcher onboarding. [ITER-REL-01-10 single public repository setup](#single-public-repository-setup-iter-rel-01-10) records the contributor setup and unavailable extra-repository deletion. [ITER-REL-01-09 public repository decision](#public-repository-restored-iter-rel-01-09) supersedes the private-history plan. SparkleEngine is public with its original history. [ITER-REL-01-08](#feature-preserving-licensing-iter-rel-01-08) retains the NVIDIA notice and Qt provenance results; certificate enrollment remains final pre-release work. Historical asset rights and packaged compliance remain unqualified. Earlier baseline results retain their exact candidate.
+**Current FR-01:** [ITER-REL-01-12](#current-candidate-baseline-iter-rel-01-12) passes the local baseline at `fec29052?`: all three products and required cook helpers build, owner checks pass, Empty cook/activation passes and cached replay preserves hashes. Rights and exact package payload admission remain blocked. Earlier records keep their original candidate and scope.
 
 **Status:** dated source audit and iteration records; release acceptance remains blocked
 
@@ -9,6 +9,24 @@
 **Snapshot:** reconciled 2026-10-10 at `aa9fcd94f219e8a3d4dbe7c51457680ad9300783`. Earlier iterations retain their own revisions and dirty-state descriptions.
 
 These records prove only the inspection or document checks they name. Current product choices and next actions belong in [Release Scope](README.md#approval-and-next-work); this page does not grant redistribution permission or build/runtime acceptance.
+
+## Current Candidate Baseline: ITER-REL-01-12
+
+**Candidate:** `fec29052c6f6195547f2062da9def86e520dc0df`, clean start, 2026-10-11. Owner BuildAndPackaging / Acceptance; FR-01 / REL-01 / REL-02. `NS-OWNERSHIP`, `NS-EVIDENCE`, `NS-ADOPTION`; graphics targets preserved. Existing earlier records retain their own candidates. Risks: reusing stale baseline evidence or treating source/notice identity as asset permission; checks below bind the fresh path and leave unknown permissions blocked.
+
+**Fresh path:** detached worktree `C:/src/SparkleFR01-fec29052`, initially absent build/dependency/artifact roots. Original branch/index/history are unchanged. Commands/environment/input revisions/hashes/output hashes: `build/validation/fr01-readiness-fec29052/`. Raw logs: `C:/src/SparkleFR01-fec29052-*.log`, enumerated in `control.json`. Retain the worktree and logs for review; generated outputs remain in its ignored build/artifact roots. No temporary harness source was added.
+
+| Check | Result and limit |
+| --- | --- |
+| `CHK-REL0112-01` cold configure | **PASS:** VS 18 2026 x64 / Qt 6.11.1; configure exit `0`, 83.0 seconds. Fifteen fresh source groups inventoried, revisions and root-notice hashes retained. Zlib's generated deletion of tracked `zconf.h` is disclosed in `source-inputs.json`; it is not hidden as a clean dependency tree. |
+| `CHK-REL0112-02` Shipping build | **PASS:** ShippingGame / ShowcaseGame; ShippingEditor / ShowcaseEditor, SparkleLauncher, AssetCooker, TextureCooker, ShaderCompiler; all build commands exit `0`. All three product PE identities are `0.1.0`, Pawel Lisowski. Editor build is now observed for this candidate; Editor activation is not. |
+| `CHK-REL0112-03` owner checks | **PASS:** initial architecture/style checks, then existing `RunBaselineChecks.ps1 -Configuration ShippingEditor`, exit `0`; includes shader CLI validation and 37 typed registrations. No owner semantics changed. |
+| `CHK-REL0112-04` cook / activation | **PASS, Empty only:** cook exits `0`, six products. Native Launcher subprocess exits `0`; new Game PID `23484` closes normally, exit `0`, with requested D3D12 / ShippingGame / Empty. First launch also closed normally but PowerShell failed to retain Launcher exit code; its receipt is retained, not counted as a fully passing probe. Corrected native exit capture is in `launcher-native.json` / `activation-native.json`. No rendered-frame, seven-map, FPS or clean-machine claim. |
+| `CHK-REL0112-05` cache replay | **PASS:** `FETCHCONTENT_FULLY_DISCONNECTED=ON` configure and incremental ShippingGame build exit `0`. All 147 inventoried product/helper file hashes are unchanged; source status stays clean. This tests cached FetchContent replay, not an OS-level network denial or independent bit-identical rebuild. |
+| `CHK-REL0112-06` input preparation | **PASS, identities:** portable CMake 4.3.3 archive matches publisher SHA-256 `935ade9e5e8723583c07f44c5592cea2a1c8f65c56ca7e07b34c025c880e0bd6`; version and license members retained. Installed compiler/CRT bytes are hashed; pinned DXC, Slang and SPIRV-Tools source notices retained. These observations do not prove the exact SDK binary/source mapping or complete transitive package/notice closure. The SDK licensing URL returned a site shell; it is not retained as a completed component license review. |
+| `REL-01` / ordered `REL-02` admission | **BLOCKED:** no new applicable grant for historical Sponza bytes was found. [Khronos's model license](https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/Sponza/LICENSE.md) separates model files under CryEngine terms from CC BY metadata. Existing Intel archive wording remains unresolved. Exact redistributable/helper admission is still unqualified; package-relative lookup and clean-machine archive tests remain FR-02 work. Certificate issuance is deferred. |
+
+**Decision:** the current candidate has a complete recorded local baseline path. The stale-current-baseline finding is superseded. Full FR-02 admission is not approved: publisher rights and remaining exact payload/notice review cannot be inferred from successful builds. No asset replacement/removal, remote visibility change, history rewrite, archive publication or signing was performed.
 
 ## FR-02 Readiness Review: ITER-REL-03-03
 
