@@ -74,7 +74,7 @@ namespace ReferencePathTracer
 				break;
 			}
 
-			const RayTracingHitSurfaceData hitSurface = ReconstructRayTracingHitSurface(trace, path.DirectionWorld);
+			const RayTracingHitSurfaceData hitSurface = ReconstructRayTracingHitSurface(trace);
 			if (!hitSurface.Valid)
 			{
 				return PathTracer::InvalidRadiance().rgb;

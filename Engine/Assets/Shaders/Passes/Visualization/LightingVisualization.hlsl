@@ -18,6 +18,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	{
 		return;
 	}
+
 	const int3 pixel = int3(dispatchThreadId.xy, 0);
 	float3 outputColor = 0.0f;
 	switch (RenderViewModeIndex)

@@ -1,6 +1,6 @@
 # Current Feature Readiness
 
-Use this dated dashboard to find what exists and which proof is missing. For the next task, open [Roadmap](../Strategy/Roadmap.md#where-we-are-and-what-is-next); for product choices, open [Release Scope](ReleaseScope/README.md#approval-and-next-work).
+Use this dated dashboard to find what exists and which proof is missing. For the next task, open [Roadmap](../Strategy/Roadmap.md#where-we-are-and-what-is-next); for product choices, open [Release Scope](FirstRelease.md#approval-and-next-work).
 
 **Status:** high-level readiness snapshot; orientation only, not feature acceptance or release approval
 
@@ -142,7 +142,7 @@ These rows prevent adjacent infrastructure or a detailed target design from look
 | Capability | Readiness | Current state | Current owner or boundary |
 | --- | ---: | --- | --- |
 | release installation/package | **0/100** | Not found | [Build and Packaging](../Architecture/Modules/BuildAndPackaging/README.md) and `FCR-PROD-05` |
-| continuous integration and regression service | **0/100** | Not found | [CI and Regression](../Architecture/Modules/BuildAndPackaging/ContinuousIntegrationAndRegression.md) |
+| continuous integration and regression service | **0/100** | Not found | [CI and Regression](../Architecture/Modules/BuildAndPackaging/README.md#automation) |
 | geometry-cache animation | **0/100** | Target only; not implemented or roadmap-admitted | [Geometry Cache Animation](../Architecture/CrossModule/GeometryCacheAnimation/README.md) |
 | neural training/dataset pipeline | **0/100** | Target only; no production data/model workflow | [Neural Graphics](../Architecture/CrossModule/NeuralGraphics/README.md) |
 | neural runtime model/kernel path | **0/100** | Target only; no production inference feature | [Neural Graphics](../Architecture/CrossModule/NeuralGraphics/README.md) |

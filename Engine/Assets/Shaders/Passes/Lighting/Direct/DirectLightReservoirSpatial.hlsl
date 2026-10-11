@@ -6,7 +6,31 @@ RWTexture2D<float4> CurrentReservoirSample;
 RWTexture2D<float4> CurrentReservoirWeight;
 RWTexture2D<float4> CurrentReservoirSurface;
 
-static const int2 SpatialOffsets[8] = {int2(1, 0), int2(-1, 0), int2(0, 1), int2(0, -1), int2(2, 1), int2(-2, 1), int2(2, -1), int2(-2, -1)};
+void ReuseSpatialReservoir(uint2 pixelCoord, uint2 extent, DirectLightReservoir::Surface surface, inout DirectLightReservoir::Reservoir reservoir)
+{
+	uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x5A71A1u);
+	const uint offsetStart = (uint)(CommonRandom::Random01(rng) * 8.0f) & 7u;
+	[unroll]
+	for (uint sampleIndex = 0u; sampleIndex < RestirReservoirCommon::SpatialNeighborCount; ++sampleIndex)
+	{
+		const int2 neighborCoord = int2(pixelCoord) + RestirReservoirCommon::SpatialOffsets[(offsetStart + sampleIndex * 2u) & 7u];
+		if (neighborCoord.x < 0 || neighborCoord.y < 0 || neighborCoord.x >= (int)extent.x || neighborCoord.y >= (int)extent.y)
+		{
+			continue;
+		}
+
+		const DirectLightReservoir::Surface neighborSurface = DirectLightReservoir::LoadSurface((uint2)neighborCoord);
+		if (!DirectLightReservoir::AreSurfacesCompatible(surface, DirectLightReservoir::PackSurface(neighborSurface)))
+		{
+			continue;
+		}
+
+		const DirectLightReservoir::Reservoir neighborReservoir = DirectLightReservoir::UnpackReservoir(TemporalReservoirSample.Load(int3(neighborCoord, 0)),
+		                                                                                                TemporalReservoirWeight.Load(int3(neighborCoord, 0)));
+
+		DirectLightReservoir::CombineReservoir(reservoir, neighborReservoir, surface, RestirReservoirCommon::MaxSpatialM, CommonRandom::Random01(rng));
+	}
+}
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -33,28 +57,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 
 	DirectLightReservoir::Reservoir reservoir = DirectLightReservoir::UnpackReservoir(TemporalReservoirSample.Load(int3(pixelCoord, 0)), TemporalReservoirWeight.Load(int3(pixelCoord, 0)));
 
-	uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x5A71A1u);
-	const uint offsetStart = (uint)(CommonRandom::Random01(rng) * 8.0f) & 7u;
-	[unroll]
-	for (uint sampleIndex = 0u; sampleIndex < RestirReservoirCommon::SpatialNeighborCount; ++sampleIndex)
-	{
-		const int2 neighborCoord = int2(pixelCoord) + SpatialOffsets[(offsetStart + sampleIndex * 2u) & 7u];
-		if (neighborCoord.x < 0 || neighborCoord.y < 0 || neighborCoord.x >= (int)width || neighborCoord.y >= (int)height)
-		{
-			continue;
-		}
-
-		const DirectLightReservoir::Surface neighborSurface = DirectLightReservoir::LoadSurface((uint2)neighborCoord);
-		if (!DirectLightReservoir::AreSurfacesCompatible(surface, DirectLightReservoir::PackSurface(neighborSurface)))
-		{
-			continue;
-		}
-
-		const DirectLightReservoir::Reservoir neighborReservoir = DirectLightReservoir::UnpackReservoir(TemporalReservoirSample.Load(int3(neighborCoord, 0)),
-		                                                                                                TemporalReservoirWeight.Load(int3(neighborCoord, 0)));
-
-		DirectLightReservoir::CombineReservoir(reservoir, neighborReservoir, surface, RestirReservoirCommon::MaxSpatialM, CommonRandom::Random01(rng));
-	}
+	ReuseSpatialReservoir(pixelCoord, uint2(width, height), surface, reservoir);
 
 	CurrentReservoirSample[pixelCoord] = DirectLightReservoir::PackReservoirSample(reservoir);
 	CurrentReservoirWeight[pixelCoord] = DirectLightReservoir::PackReservoirWeight(reservoir);

@@ -26,6 +26,7 @@ void main(uint3 groupId : SV_GroupID, uint3 groupThreadId : SV_GroupThreadID)
 			InterlockedAdd(LocalHistogram[ExposureHistogram::FindBin(luminance)], 1u);
 		}
 	}
+
 	GroupMemoryBarrierWithGroupSync();
 
 	[unroll(2)]

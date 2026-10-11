@@ -1,5 +1,6 @@
-#include "/Engine/Resources/ObjectShaderData.hlsli"
 #pragma once
+
+#include "/Engine/Resources/ObjectShaderData.hlsli"
 
 #include "/Engine/Resources/Samplers.hlsli"
 #include "/Engine/Geometry/Basis.hlsli"
@@ -171,12 +172,14 @@ namespace Material
 		props.Alpha = baseColor.a;
 		props.AlphaMode = AlphaMode;
 		ApplyAlphaMode(props.Alpha);
+
 		props.NormalTangent = SampleNormalTangent(Input.TexCoord);
 		props.NormalWorld = TransformTangentNormalToWorld(props.NormalTangent, Input.NormalWorld, Input.TangentWorld.xyz, Input.BitangentWorld);
 		if (!Input.IsFrontFace)
 		{
 			props.NormalWorld = -props.NormalWorld;
 		}
+
 		props.Roughness = SampleRoughness(Input.TexCoord);
 		props.Metallic = SampleMetallic(Input.TexCoord);
 		props.DielectricF0 = saturate(F0);

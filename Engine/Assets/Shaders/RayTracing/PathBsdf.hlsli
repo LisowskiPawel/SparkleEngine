@@ -141,12 +141,10 @@ namespace PathBsdf
 
 	float3 SampleVisibleGGXHalfVector(RayTracingPathSurface surface, float2 sample)
 	{
-		float3 tangentWorld;
-		float3 bitangentWorld;
-		CommonSampling::BuildOrthonormalBasis(surface.NormalWorld, tangentWorld, bitangentWorld);
+		const CommonSampling::OrthonormalBasis basis = CommonSampling::BuildOrthonormalBasis(surface.NormalWorld);
 
 		const float alpha = surface.Roughness * surface.Roughness;
-		const float3 localView = float3(dot(surface.ViewDirWorld, tangentWorld), dot(surface.ViewDirWorld, bitangentWorld), dot(surface.ViewDirWorld, surface.NormalWorld));
+		const float3 localView = float3(dot(surface.ViewDirWorld, basis.Tangent), dot(surface.ViewDirWorld, basis.Bitangent), dot(surface.ViewDirWorld, surface.NormalWorld));
 		const float3 stretchedView = normalize(float3(alpha * localView.xy, localView.z));
 		const float length2 = dot(stretchedView.xy, stretchedView.xy);
 		const float3 orthogonalView = float3(-stretchedView.y, stretchedView.x, 0.0f);
@@ -162,7 +160,7 @@ namespace PathBsdf
 		const float projectedZ = sqrt(max(0.0f, 1.0f - diskX * diskX - diskY * diskY));
 		const float3 visibleNormal = diskX * basis1 + diskY * basis2 + projectedZ * stretchedView;
 		const float3 localHalfVector = normalize(float3(alpha * visibleNormal.xy, max(visibleNormal.z, 0.0f)));
-		const float3 halfVectorWorld = tangentWorld * localHalfVector.x + bitangentWorld * localHalfVector.y + surface.NormalWorld * localHalfVector.z;
+		const float3 halfVectorWorld = basis.Tangent * localHalfVector.x + basis.Bitangent * localHalfVector.y + surface.NormalWorld * localHalfVector.z;
 
 		return normalize(halfVectorWorld);
 	}

@@ -98,12 +98,21 @@ namespace AreaLights
 		    PunctualLights::ComputeRangeAttenuation(distanceToSample, light.Range) * PunctualLights::ComputeAreaDistanceAttenuationCorrection(distanceToSample, light.DistanceAttenuationCoefficients));
 	}
 
-	void BuildRectFrame(RectLightGpuData light, out float3 normalWorld, out float3 tangentWorld, out float3 bitangentWorld)
+	struct RectLightFrame
 	{
-		normalWorld = normalize(light.Direction);
-		tangentWorld = light.Tangent - normalWorld * dot(light.Tangent, normalWorld);
-		tangentWorld = normalize(tangentWorld);
-		bitangentWorld = normalize(cross(normalWorld, tangentWorld));
+		float3 NormalWorld;
+		float3 TangentWorld;
+		float3 BitangentWorld;
+	};
+
+	RectLightFrame BuildRectFrame(RectLightGpuData light)
+	{
+		RectLightFrame frame;
+		frame.NormalWorld = normalize(light.Direction);
+		frame.TangentWorld = light.Tangent - frame.NormalWorld * dot(light.Tangent, frame.NormalWorld);
+		frame.TangentWorld = normalize(frame.TangentWorld);
+		frame.BitangentWorld = normalize(cross(frame.NormalWorld, frame.TangentWorld));
+		return frame;
 	}
 
 	LightSampling::DirectLightSample SampleRectLight(float3 positionWorld, uint lightIndex, float2 sample)
@@ -113,12 +122,9 @@ namespace AreaLights
 		const float height = light.Height;
 		const float area = width * height;
 
-		float3 normalWorld;
-		float3 tangentWorld;
-		float3 bitangentWorld;
-		BuildRectFrame(light, normalWorld, tangentWorld, bitangentWorld);
-		const float3 samplePositionWorld = light.Position + tangentWorld * ((sample.x - 0.5f) * width) + bitangentWorld * ((sample.y - 0.5f) * height);
-		return LightSampling::AreaDirectLightSample(positionWorld, samplePositionWorld, normalWorld, light.Color * light.Luminance, rcp(area), 1.0f);
+		const RectLightFrame frame = BuildRectFrame(light);
+		const float3 samplePositionWorld = light.Position + frame.TangentWorld * ((sample.x - 0.5f) * width) + frame.BitangentWorld * ((sample.y - 0.5f) * height);
+		return LightSampling::AreaDirectLightSample(positionWorld, samplePositionWorld, frame.NormalWorld, light.Color * light.Luminance, rcp(area), 1.0f);
 	}
 }
 

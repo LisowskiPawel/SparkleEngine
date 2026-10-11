@@ -12,6 +12,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	{
 		return;
 	}
+
 	float4 color = DisplayLinearColor.Load(int3(pixelCoord, 0));
 	const float2 centeredUv = (float2(pixelCoord) + 0.5f) / float2(width, height) * 2.0f - 1.0f;
 	const int2 offset = int2(round(centeredUv * dot(centeredUv, centeredUv) * 1.5f));

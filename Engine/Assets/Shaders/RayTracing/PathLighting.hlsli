@@ -35,7 +35,7 @@ namespace RayTracingPathLighting
 
 		if (trace.Hit)
 		{
-			const RayTracingHitSurfaceData hitSurface = ReconstructRayTracingHitSurface(trace, directionWorld);
+			const RayTracingHitSurfaceData hitSurface = ReconstructRayTracingHitSurface(trace);
 			outHitSurface = hitSurface;
 			result.Hit = hitSurface.Valid;
 			result.HitPositionWorld = hitSurface.Valid ? hitSurface.PositionWorld : 0.0f.xxx;

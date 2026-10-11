@@ -54,6 +54,7 @@ namespace ToneMapping
 		{
 			return AcesFilmic(color);
 		}
+
 		return AcesApprox(color);
 	}
 }

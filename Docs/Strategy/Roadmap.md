@@ -10,7 +10,7 @@ Start here to choose your next task. Open its linked plan for the exact stages, 
 
 ## Where We Are And What Is Next
 
-**Next: qualify package inputs, finish PD-3, and produce the archive for your clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/ReleaseInputs.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/ProductAndDelivery.md#pd-3--package-and-installation). No verified product archive exists yet.
+**Next: qualify package inputs, finish PD-3, and produce the archive for your clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/README.md#pd-3--package-and-installation). No verified product archive exists yet.
 
 **Renderer work:** continue [Lit/Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md#required-execution-order). Recheck dated failures against current source before fixing their owner.
 
@@ -28,7 +28,7 @@ Start here to choose your next task. Open its linked plan for the exact stages, 
 | PD-4: diagnostics | Local export, retention, symbols and replacement/review tools; fixture checks. | Native packaged crash/hang/GPU/privacy and self-service journeys; full symbol correlation. Automatic crash/hang collection and shader-symbol correlation are unavailable. |
 | FR-03?08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
 
-All six product reports remain blocked; implemented source is not release acceptance. The earlier local baseline at `fec29052c6f6195547f2062da9def86e520dc0df` does not qualify later changes. Reuse valid work, rerun checks affected by changed inputs, and keep future results bound to their exact candidate/archive. [Release gates](../Acceptance/FirstRelease.md#release-gates) decide shipment; [approved scope](../Acceptance/ReleaseScope/README.md) fixes the promises.
+All six product reports remain blocked; implemented source is not release acceptance. The earlier local baseline at `fec29052c6f6195547f2062da9def86e520dc0df` does not qualify later changes. Reuse valid work, rerun checks affected by changed inputs, and keep future results bound to their exact candidate/archive. [Release gates](../Acceptance/FirstRelease.md#release-gates) decide shipment; [approved scope](../Acceptance/FirstRelease.md#approved-release-scope) fixes the promises.
 
 ## Ordered Delivery
 
@@ -65,7 +65,7 @@ Use this order within release step 3. A demonstrated dependency defect comes bef
 | Order | Focus and intended result | Detailed stages |
 | --- | --- | --- |
 | 1 | **Reference correctness.** Restore usable lighting, reject invalid samples and qualify raw reference output before relying on it. | [Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md#required-execution-order), [reference closure](../Architecture/Modules/Engine/Renderer/FirstRelease/Lighting.md#lgt-3--preserve-discovery-and-close-the-required-reference) |
-| 2 | **Blocking dependencies.** Fix proven content, shader, foundation or native-lifetime defects needed by the selected frame. | [Foundation/content](../Architecture/CrossModule/FirstRelease/FoundationWorldAndContent.md), [RHI](../Architecture/Modules/Engine/RHI/FirstReleasePlan.md), [Shader System](../Architecture/CrossModule/ShaderSystem/Plan.md) |
+| 2 | **Blocking dependencies.** Fix proven content, shader, foundation or native-lifetime defects needed by the selected frame. | [Foundation/content](../Architecture/CrossModule/FirstRelease/README.md#foundation-world-and-content), [RHI](../Architecture/Modules/Engine/RHI/FirstReleasePlan.md), [Shader System](../Architecture/CrossModule/ShaderSystem/Plan.md) |
 | 3 | **Frame execution.** Reliable frame admission, scene/view publication, graph dependencies, barriers, aliasing and retirement. | [Frame and scene](../Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndScene.md) — `FS-0–4` |
 | 4 | **Geometry and materials.** Correct residency, raster/ray inputs, TLAS and material correspondence. | [Geometry and ray tracing](../Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracing.md) — `GR-0–4` |
 | 5 | **Realtime transport.** Correct primary/secondary paths, direct/indirect lighting, temporal reuse and disocclusion behavior. | [Temporal/history](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-1--temporal-sampling-history-resolution-and-aa-truth), [lighting](../Architecture/Modules/Engine/Renderer/FirstRelease/Lighting.md) — `DSP-1`, `LGT-0–2` |
@@ -74,7 +74,7 @@ Use this order within release step 3. A demonstrated dependency defect comes bef
 | 8 | **Decals and grading.** Complete the required material/display features with raw, temporal and backend checks. | [Decals](../Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracing.md#gr-5--deferred-gbuffer-decals), [grading](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-5--color-grading) — `GR-5`, `DSP-5` |
 | 9 | **Basic lens effects.** Independently prove chromatic aberration and vignette, including no work at neutral settings. | [Lens effects](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-6--chromatic-aberration-and-vignette), [vignette plan](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/Plan.md) — `DSP-6` |
 | 10 | **HDR and SDR recovery.** Finish output behavior; HDR proof requires a qualified display/OS tuple. | [HDR output](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-7--hdr10-display-output) — `DSP-7` |
-| 11 | **Product controls and capture.** Responsive settings/UI/debug/capture/latency consumers with one state authority and honest tool support. | [Runtime/diagnostics](../Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnostics.md), [product controls](../Architecture/CrossModule/FirstRelease/ProductAndDelivery.md), [external capture](../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md) |
+| 11 | **Product controls and capture.** Responsive settings/UI/debug/capture/latency consumers with one state authority and honest tool support. | [Runtime/diagnostics](../Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnostics.md), [product controls](../Architecture/CrossModule/FirstRelease/README.md#product-and-delivery), [external capture](../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md) |
 | 12 | **Whole-frame closure.** Complete integration, failure checks, review findings and the remaining feature reports. | `FS-4`, `LGT-4`, `DSP-8`, `RD-6` in their plans; [aggregate closure](../Architecture/CrossModule/FirstRelease/README.md#fr-03--feature-closure) |
 
 Check D3D12 and Vulkan throughout these stages. Measure cost as each feature changes; release step 5 closes the fixed whole-product performance protocol. Reference Stage 10 still waits for its release inputs and package prerequisites.
@@ -126,7 +126,7 @@ A finite-depth diagnostic, accumulation count or post-processed image does not q
 | --- | --- |
 | What to do next | This Roadmap |
 | What the professional output should demonstrate | [Feature Delivery Catalog](FeatureDeliveryCatalog.md) |
-| What the release promises | [Release scope](../Acceptance/ReleaseScope/README.md), [capability dispositions](../Acceptance/ReleaseScope/CapabilityDispositions.md) |
+| What the release promises | [Release scope](../Acceptance/FirstRelease.md#approved-release-scope), [capability dispositions](../Acceptance/ReleaseScope/CapabilityDispositions.md) |
 | Exact implementation steps | The feature plan linked from the chosen task |
 | Correct behavior and passed proof | The owning feature contract and [Release Acceptance](../Acceptance/FirstRelease.md) |
 | How to perform and submit the change | [Change Lifecycle](../Engineering/Workflow/ChangeLifecycle.md), [Change Integration](../Engineering/Workflow/ChangeIntegration.md) and selected standards |

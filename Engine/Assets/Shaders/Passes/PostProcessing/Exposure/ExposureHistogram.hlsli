@@ -17,6 +17,7 @@ namespace ExposureHistogram
 		{
 			return 0u;
 		}
+
 		const float normalized = saturate((log2(luminance) - MinimumLogLuminance) / (MaximumLogLuminance - MinimumLogLuminance));
 		return 1u + min(uint(normalized * float(BinCount - 1u)), BinCount - 2u);
 	}
@@ -27,6 +28,7 @@ namespace ExposureHistogram
 		{
 			return 0.0f;
 		}
+
 		const float normalized = (float(bin - 1u) + 0.5f) / float(BinCount - 1u);
 		return exp2(lerp(MinimumLogLuminance, MaximumLogLuminance, normalized));
 	}

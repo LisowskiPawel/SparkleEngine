@@ -1,5 +1,6 @@
-#include "/Engine/Resources/ObjectShaderData.hlsli"
 #pragma once
+
+#include "/Engine/Resources/ObjectShaderData.hlsli"
 
 #include "/Engine/Resources/ViewCameraUniformData.hlsli"
 

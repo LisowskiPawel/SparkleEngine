@@ -23,17 +23,13 @@ namespace PathLightSampling
 		float Area;
 	};
 
-	uint CountAnalyticLights()
-	{
-		return SceneLighting.DirectionalLightCount + SceneLighting.PointLightCount + SceneLighting.SpotLightCount + SceneLighting.RectLightCount;
-	}
-
 	uint CountEmissiveTriangles(uint instanceId)
 	{
 		if (EmissiveEnabled == 0u)
 		{
 			return 0u;
 		}
+
 		const RayTracingHitInstance instance = RayTracingHitInstances[instanceId];
 
 		return (instance.Flags & RayTracingHitSurface::InstanceFlagValid) != 0u && (RayTracingHitMaterials[instance.MaterialSlot].Flags & RayTracingHitSurface::MaterialFlagEmissive) != 0u
@@ -47,58 +43,41 @@ namespace PathLightSampling
 		{
 			return 0u;
 		}
+
 		uint count = 0u;
 		[loop]
 		for (uint instanceId = 0u; instanceId < RayTracingHitInstanceCount; ++instanceId)
 		{
 			count += CountEmissiveTriangles(instanceId);
 		}
+
 		return count;
 	}
 
-	void FindAnalyticLight(uint ordinal, out uint lightType, out uint lightIndex)
+	struct EmissiveTriangleId
 	{
-		lightType = LightSampling::LightTypeDirectional;
-		lightIndex = 0u;
-		if (ordinal < SceneLighting.DirectionalLightCount)
-		{
-			lightIndex = ordinal;
-			return;
-		}
-		ordinal -= SceneLighting.DirectionalLightCount;
-		if (ordinal < SceneLighting.PointLightCount)
-		{
-			lightType = LightSampling::LightTypePoint;
-			lightIndex = ordinal;
-			return;
-		}
-		ordinal -= SceneLighting.PointLightCount;
-		if (ordinal < SceneLighting.SpotLightCount)
-		{
-			lightType = LightSampling::LightTypeSpot;
-			lightIndex = ordinal;
-			return;
-		}
-		lightType = LightSampling::LightTypeRect;
-		lightIndex = ordinal - SceneLighting.SpotLightCount;
-	}
+		uint InstanceId;
+		uint PrimitiveIndex;
+	};
 
-	void FindEmissiveTriangle(uint ordinal, out uint instanceId, out uint primitiveIndex)
+	EmissiveTriangleId FindEmissiveTriangle(uint ordinal)
 	{
-		instanceId = 0u;
-		primitiveIndex = 0u;
+		EmissiveTriangleId triangle = (EmissiveTriangleId)0;
 		[loop]
 		for (uint candidateInstance = 0u; candidateInstance < RayTracingHitInstanceCount; ++candidateInstance)
 		{
 			const uint primitiveCount = CountEmissiveTriangles(candidateInstance);
 			if (ordinal < primitiveCount)
 			{
-				instanceId = candidateInstance;
-				primitiveIndex = ordinal;
-				return;
+				triangle.InstanceId = candidateInstance;
+				triangle.PrimitiveIndex = ordinal;
+				return triangle;
 			}
+
 			ordinal -= primitiveCount;
 		}
+
+		return triangle;
 	}
 
 	float3 DirectionalIrradiance(uint lightIndex)
@@ -181,6 +160,7 @@ namespace PathLightSampling
 		{
 			return (LightSampling::DirectLightSample)0;
 		}
+
 		const EmissiveTriangle emissiveTriangle = LoadEmissiveTriangle(instanceId, primitiveIndex);
 		const float root = sqrt(sample.x);
 		const float3 barycentrics = float3(1.0f - root, root * (1.0f - sample.y), root * sample.y);
@@ -192,6 +172,7 @@ namespace PathLightSampling
 		{
 			return (LightSampling::DirectLightSample)0;
 		}
+
 		float3 emittedRadiance = emissiveTriangle.Material.EmissiveColor;
 		if (MaterialTextureTableSampling::HasTexture(emissiveTriangle.Material.TextureFlags, MaterialTextureTableSampling::TextureSlotEmissive))
 		{
@@ -221,6 +202,7 @@ namespace PathLightSampling
 		{
 			return 0.0f;
 		}
+
 		const EmissiveTriangle emissiveTriangle = LoadEmissiveTriangle(instanceId, primitiveIndex);
 		const bool twoSided = (emissiveTriangle.Instance.Flags & RayTracingHitSurface::InstanceFlagTwoSided) != 0u;
 

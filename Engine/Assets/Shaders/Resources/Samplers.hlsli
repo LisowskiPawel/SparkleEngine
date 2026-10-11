@@ -1,23 +1,5 @@
 #pragma once
 
-// Common Samplers (Copy-Paste Reference)
-// Point:
-//   SamplerPointMipPointWrap       SamplerPointMipPointClamp
-//   SamplerPointNoMipWrap          SamplerPointNoMipClamp
-//
-// Linear (Trilinear):
-//   SamplerLinearMipLinearWrap     SamplerLinearMipLinearClamp
-//   SamplerLinearNoMipWrap         SamplerLinearNoMipClamp
-//
-// Bilinear:
-//   SamplerLinearMipPointWrap      SamplerLinearMipPointClamp
-//
-// Anisotropic:
-//   SamplerAniso4xWrap             SamplerAniso4xClamp
-//   SamplerAniso8xWrap             SamplerAniso8xClamp
-//   SamplerAniso16xWrap            SamplerAniso16xClamp
-
-// Sampler Declarations
 // Shared sampler symbols are reflected during cook. Runtime pass code selects
 // the shared sampler by typed options; shader authors do not assign registers.
 //
@@ -28,8 +10,6 @@
 //
 // Anisotropic: SamplerAniso<Level>x<Address>
 //   Level: 1, 2, 4, 8, 16
-
-// Point MinMag (s0-s8)
 
 // Point MinMag, Point Mip
 SamplerState SamplerPointMipPointWrap;
@@ -46,8 +26,6 @@ SamplerState SamplerPointNoMipWrap;
 SamplerState SamplerPointNoMipClamp;
 SamplerState SamplerPointNoMipMirror;
 
-// Linear MinMag (s9-s17)
-
 // Linear MinMag, Point Mip (Bilinear)
 SamplerState SamplerLinearMipPointWrap;
 SamplerState SamplerLinearMipPointClamp;
@@ -62,8 +40,6 @@ SamplerState SamplerLinearMipLinearMirror;
 SamplerState SamplerLinearNoMipWrap;
 SamplerState SamplerLinearNoMipClamp;
 SamplerState SamplerLinearNoMipMirror;
-
-// Anisotropic (s18-s32)
 
 // Anisotropic 1x
 SamplerState SamplerAniso1xWrap;
@@ -90,5 +66,4 @@ SamplerState SamplerAniso16xWrap;
 SamplerState SamplerAniso16xClamp;
 SamplerState SamplerAniso16xMirror;
 
-// Sampler Count
 static const uint kSamplerCount = 33;

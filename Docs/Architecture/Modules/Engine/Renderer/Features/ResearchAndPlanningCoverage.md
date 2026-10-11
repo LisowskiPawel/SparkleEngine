@@ -214,7 +214,7 @@ Only roadmap/product admission opens a `D` capability for production. Research, 
 | `CHK-FDOC-02` | Color Grading, Chromatic Aberration, and HDR Display Output each have seven direct Markdown siblings; every file declares status, responsibility, and authority, and no package exceeds the seven-sibling budget. |
 | `CHK-FDOC-03` | all 20 cited external URLs returned HTTP `200`; the six repository `HEAD` revisions matched the hashes recorded in Research; rights, permitted transfer, and non-inference boundaries are explicit. |
 | `CHK-FDOC-04` | all expected discovery, acceptance, failure, and check ID ranges were present; prohibited authoring placeholders were absent; all three production plans remain gated by `CGRD-00`, `CHRD-00`, or `HDRD-00`. |
-| `CHK-FDOC-05` | repository-wide local Markdown validation found zero missing paths and zero missing anchors; the only old `.md` display paths are verbatim historical status evidence in `ProductAndDelivery.md`; strict UTF-8 found zero failures; `git diff --check` found no whitespace errors. |
+| `CHK-FDOC-05` | repository-wide local Markdown validation found zero missing paths and zero missing anchors; strict UTF-8 found zero failures; `git diff --check` found no whitespace errors. |
 | `CHK-FDOC-06` | start/end revision and status were rechecked; the concurrent Reference Path Tracer package was excluded from this pass's edits and preserved when revision `30597d7d` integrated both workstreams. |
 
 ## Deepening Validation Result

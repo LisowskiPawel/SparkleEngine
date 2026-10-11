@@ -69,6 +69,7 @@ namespace RayTracingPathSampling
 		{
 			return InvalidSample();
 		}
+
 		uint selectedLobe = RayTracingPathSample::LobeSpecular;
 		if (randomSamples.Lobe < diffuseMass)
 		{

@@ -16,25 +16,15 @@ RWTexture2D<float4> ShadowVisibilitySignal;
 Texture2D<float4> CurrentReservoirSample;
 Texture2D<float4> CurrentReservoirWeight;
 
-bool PrepareDirectShadowSignal(uint2 pixelCoord, out bool validPixel, out RayTracedShadowRequest request, out ShadowVisibilitySample immediateSignal)
+RayTracedShadowPreparation PrepareDirectShadowSignal(uint2 pixelCoord)
 {
-	validPixel = false;
-	request = (RayTracedShadowRequest)0;
-	immediateSignal = RayTracedShadowSignals::BuildUnshadowedSignal(0.0f);
-	uint width = 0;
-	uint height = 0;
-	ShadowVisibilitySignal.GetDimensions(width, height);
-
-	if (pixelCoord.x >= width || pixelCoord.y >= height)
-	{
-		return false;
-	}
-	validPixel = true;
+	RayTracedShadowPreparation preparation = (RayTracedShadowPreparation)0;
+	preparation.ImmediateSignal = RayTracedShadowSignals::BuildUnshadowedSignal(0.0f);
 
 	const float sceneDepth = LoadSceneDepth(pixelCoord);
 	if (IsSkyPixel(sceneDepth))
 	{
-		return false;
+		return preparation;
 	}
 
 	const float3 positionWorld = ReconstructGBufferWorldPosition(pixelCoord, sceneDepth, InvViewMTX, InvProjectionMTX);
@@ -42,31 +32,31 @@ bool PrepareDirectShadowSignal(uint2 pixelCoord, out bool validPixel, out RayTra
 	const DirectLightReservoir::Reservoir reservoir = DirectLightReservoir::UnpackReservoir(CurrentReservoirSample.Load(int3(pixelCoord, 0)), CurrentReservoirWeight.Load(int3(pixelCoord, 0)));
 	if (!DirectLightReservoir::IsValid(reservoir))
 	{
-		return false;
+		return preparation;
 	}
 
 	const LightSampling::DirectLightSample lightSample = DirectLightReservoir::ReplayLightSample(reservoir, positionWorld);
-	return RayTracedShadows::BuildDirectLightRequest(positionWorld, normalWorld, lightSample, DirectLightSampling::CastsShadow(reservoir.Candidate.Light), request, immediateSignal);
-}
-
-void StoreDirectShadowSignal(uint2 pixelCoord, ShadowVisibilitySample signal)
-{
-	ShadowVisibilitySignal[pixelCoord] = RayTracedShadowSignalPacking::PackShadowSignal(signal);
+	return RayTracedShadows::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, DirectLightSampling::CastsShadow(reservoir.Candidate.Light));
 }
 
 void TraceAndStoreDirectShadowSignal(uint2 pixelCoord)
 {
-	RayTracedShadowRequest request = (RayTracedShadowRequest)0;
-	ShadowVisibilitySample signal = RayTracedShadowSignals::BuildUnshadowedSignal(0.0f);
-	bool validPixel = false;
-	if (PrepareDirectShadowSignal(pixelCoord, validPixel, request, signal))
+	uint width = 0;
+	uint height = 0;
+	ShadowVisibilitySignal.GetDimensions(width, height);
+	if (pixelCoord.x >= width || pixelCoord.y >= height)
 	{
-		signal = RayTracedShadows::TraceShadowRay(request);
+		return;
 	}
-	if (validPixel)
+
+	const RayTracedShadowPreparation preparation = PrepareDirectShadowSignal(pixelCoord);
+	ShadowVisibilitySample signal = preparation.ImmediateSignal;
+	if (preparation.TraceRequired)
 	{
-		StoreDirectShadowSignal(pixelCoord, signal);
+		signal = RayTracedShadows::TraceShadowRay(preparation.Request);
 	}
+
+	ShadowVisibilitySignal[pixelCoord] = RayTracedShadowSignalPacking::PackShadowSignal(signal);
 }
 
 #endif

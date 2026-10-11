@@ -14,13 +14,15 @@
 
 **Identity amendment (2026-10-10):** [SparkleProductIdentity.cmake](../../../../CMake/SparkleProductIdentity.cmake) owns version `0.1.0`, publisher and copyright; root and standalone Launcher CMake entry points share it. Existing project-product and Launcher owners attach Windows version resources with public names Sparkle Editor, Sparkle Game and Sparkle Launcher. This adds executable identity, not a package/signing owner. [Current FR-01 report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) records validation and remaining blockers.
 
-**Release inputs:** [First Release Inputs](ReleaseInputs.md) names product profiles, helper admission, acquisition-only Sponza/source-export boundaries, notices/SBOM, signing inputs and threat controls. Candidate results remain in Acceptance.
+**Release inputs:** [First Release Inputs](PackagingAndInstallation.md#release-inputs) names product profiles, helper admission, acquisition-only Sponza/source-export boundaries, notices/SBOM, signing inputs and threat controls. Candidate results remain in Acceptance.
 
 **Package owner (2026-10-11):** [CMake/Packaging](../../../../CMake/Packaging/Package.ps1) now owns the reviewed-input build/cook/stage/verify/archive route. [Packaging And Installation](PackagingAndInstallation.md#current-package-entry) describes current checks and remaining admission/runtime gaps. Historical Not found entries below retain their snapshot; source presence does not pass PD-3 or REL-03.
 
-**Public development setup (2026-10-11):** the [root README](../../../../README.md) uses the standalone Launcher entry; [Contributing](../../../../CONTRIBUTING.md) routes public review. A [bounded source workflow](ContinuousIntegrationAndRegression.md) is prepared; historical absence-of-CI rows below predate it. Hosted/build/GPU acceptance remains unproved.
+**Public development setup (2026-10-11):** the [root README](../../../../README.md) uses the standalone Launcher entry; [Contributing](../../../../CONTRIBUTING.md) routes public review. A [bounded source workflow](#automation) is prepared; historical absence-of-CI rows below predate it. Hosted/build/GPU acceptance remains unproved.
 
 **Baseline owner checks:** after Launcher generates the canonical workspace, run `powershell -NoProfile -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor`. [RunBaselineChecks.ps1](../../../../CMake/RunBaselineChecks.ps1) prints the revision/dirty state and sequentially invokes `architecture_boundary_check`, `code_style_check` and `ShaderCompilerCliValidation`, stopping at the first owner failure. It adds no check semantics and does not certify fresh checkout, asset rights, full cook or runtime. Candidate/environment/artifact binding remains with the [acceptance report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers).
+
+Use [build/profile rules](#build-contract), [generated-output layout](#canonical-generated-output-layout), [automation](#automation), or [packaging and diagnostics](PackagingAndInstallation.md).
 
 ## At A Glance
 
@@ -50,8 +52,8 @@ The current build graph is useful engineering infrastructure, not yet a product-
 | --- | --- |
 | Build graph, profiles, dependencies, development artifacts | This inventory |
 | Public stage, package, signing, installation, and clean-machine operation | [Packaging And Installation](PackagingAndInstallation.md) |
-| Continuous integration, automated regression, and retained results | [Continuous Integration And Regression](ContinuousIntegrationAndRegression.md) |
-| Self-service recovery, local export/privacy, finite review and immutable replacement/withdrawal; no support service | [Adoption Support And Incident Response](AdoptionSupportAndIncidentResponse.md) |
+| Continuous integration, automated regression, and retained results | [Continuous Integration And Regression](#automation) |
+| Self-service recovery, local export/privacy, finite review and immutable replacement/withdrawal; no support service | [Adoption Support And Incident Response](PackagingAndInstallation.md#local-diagnostics-and-release-review) |
 
 ## Build Contract
 
@@ -224,7 +226,7 @@ relocation, clean-machine verification, and the release workflow remain absent.
 
 ## `FCR-PROD-02` Source-Adopter Contract
 
-This section owns the build-side source-adopter verdict. [Adoption](AdoptionSupportAndIncidentResponse.md) owns public recovery/support after a failure; [First Release](../../../Acceptance/FirstRelease.md#frozen-platform-and-toolchain-prerequisites) owns the frozen prerequisite values.
+This section owns the build-side source-adopter verdict. [Adoption](PackagingAndInstallation.md#local-diagnostics-and-release-review) owns public recovery/support after a failure; [First Release](../../../Acceptance/FirstRelease.md#frozen-platform-and-toolchain-prerequisites) owns the frozen prerequisite values.
 
 | ID | Binary acceptance criterion |
 | --- | --- |
@@ -262,3 +264,72 @@ CMake selects profile/options -> dependency owner resolves/fetches host and sour
 - Sanitizer options exist but the current Windows/MSVC product route does not make all sanitizer modes usable.
 - Development artifact staging can still rely on repository/project roots and does not prove redistributable clean-machine execution.
 - This inventory did not configure or build any target; current build health remains unknown in this pass.
+
+## Automation
+
+**Scope:** define reproducible check selection, isolated matrix execution, cancellation, aggregation, artifact retention, and regression-reporting boundaries
+
+**Owner:** repository build/verification automation, with checks implemented by their owning modules
+
+**Current readiness:** **0/100** — target only; no tracked CI workflow or registered CMake test service was found. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
+
+**Open-source setup amendment (2026-10-11):** [repository-checks.yml](../../../../.github/workflows/repository-checks.yml) invokes the existing architecture script and Git whitespace checks on ordinary pull requests, main-branch pushes and manual dispatch. It uses a commit-pinned checkout action, read-only token, no persisted credentials, hosted Windows runner, timeout and cancellation. It does not acquire assets, require signing secrets, run GPU work or redefine owner assertions. Tool versions and candidate identity are logged; the hosted runner image is mutable and no deterministic build claim follows. Workflow source is prepared locally; no hosted run or branch-protection requirement is claimed. The readiness/snapshot below remains historical. [GitHub's workflow security guidance](https://docs.github.com/en/actions/reference/security/secure-use) informs these permission and pinning choices.
+
+### Automation: At A Glance
+
+| Capability | Current state | Target behavior |
+| --- | --- | --- |
+| automation entry point | Not found | clean, reproducible invocation from frozen revision/toolchain/dependencies |
+| check selection | documented manual principle only | change and claim select the cheapest falsifying checks plus required escalation |
+| execution matrix | Not found | isolated profile/backend/module jobs with bounded concurrency and cancellation |
+| aggregation | Not found | pass, fail, unavailable, skipped, flaky, timeout, and inconclusive remain distinct |
+| retained evidence | Not found | machine-readable result plus attributable logs/artifacts and expiry policy |
+
+```mermaid
+flowchart LR
+    Change[Revision, dirty policy, and changed claims] --> Select[Select required checks and matrix]
+    Select --> Isolate[Create isolated build/artifact/user roots]
+    Isolate --> Run[Run bounded jobs with timeout and cancellation]
+    Run --> Aggregate[Aggregate without evidence inflation]
+    Aggregate --> Retain[Retain logs, manifests, captures, and terminal result]
+```
+
+CI is not a new test authority: each module owns what its check means, while automation owns reproducible selection, isolation, scheduling, failure propagation, and retention.
+
+### Capability Identity
+
+| ID | Capability | Current state |
+| --- | --- | --- |
+| `CI-01` | Clean reproducible automation entry point | Not found |
+| `CI-02` | Change- and release-claim-driven check selection | Not found |
+| `CI-03` | Isolated matrix execution, cancellation, and honest aggregation | Not found |
+| `CI-04` | Attributable machine-readable results and retained artifacts | Not found |
+
+### Capability Boundary
+
+Current custom checks, manual workloads, and documented evidence plans are useful inputs but do not form an automated regression product. The target is a reproducible automation layer that selects the cheapest claim-falsifying checks, reports unavailable gates honestly, retains attributable artifacts, and escalates only when a changed claim requires broader build/runtime/native/performance/package evidence.
+
+### Contract
+
+- Inputs: exact revision, dirty-state policy, toolchain/profile/backend matrix, dependency lock state, changed ownership boundaries, selected checks, workload identity, machine/driver identity, and secrets policy.
+- Outputs: machine-readable check results, logs, diagnostics, manifests, captures/metrics when required, retention links, flaky/inconclusive classification, and one terminal job result.
+- Each module owns its assertions and fixtures. Automation owns selection, isolation, scheduling, timeout/cancellation, artifact retention, and aggregation; it must not reinterpret a failing owner check as success.
+- Parallel jobs must use isolated build/artifact/user-state roots and bounded concurrency. Cancellation settles child processes and publishes an incomplete result rather than a pass.
+
+### Current State And Missing Surface
+
+The inspected tree has no `.github` workflow and no CMake `enable_testing()`/`add_test()` registration. Therefore there is no current active CI matrix, automated regression baseline, flaky-test policy, protected-gate result, or retained automated release artifact. Manual source checks remain source evidence only.
+
+### Acceptance Handoff
+
+- `AC-CI-01`: a clean revision can run the documented baseline without private machine state and produces attributable retained results.
+- `AC-CI-02`: required profile/backend/module matrices are explicit; skipped, unavailable, flaky, timed-out, and inconclusive checks cannot appear as passed.
+- `AC-CI-03`: changed ownership boundaries select architecture/link/style checks, and release candidates select their frozen build/runtime/native/package gates.
+- `AC-CI-04`: concurrency, cancellation, failure propagation, artifact retention, credential redaction, and result expiry are bounded and observable.
+- `FM-CI-01`: dependency/toolchain acquisition is mutable or unavailable; the job stops with an acquisition failure.
+- `FM-CI-02`: a child check crashes, hangs, or is cancelled; the aggregate remains failed or inconclusive and retains diagnostics.
+- `FM-CI-03`: a required matrix leg or artifact is missing; the candidate is incomplete.
+- `CHK-CI-01`: run the baseline from clean bytes twice and compare selected work, outcomes, manifests, and retained-artifact identity.
+- `CHK-CI-02`: inject failing, timed-out, cancelled, unavailable, and missing-artifact cases and verify terminal aggregation.
+
+No automated result is claimed here. [`BUILD-E04`](../CapabilityEvidencePlan.md#product-workflow-and-delivery-evidence) is the central evidence destination; check design follows [Validation And Evidence](../../../Engineering/Verification/ValidationAndEvidence.md).

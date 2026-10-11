@@ -9,6 +9,7 @@ namespace RestirReservoirCommon
 {
 	static const uint InitialCandidateCount = 4u;
 	static const uint SpatialNeighborCount = 4u;
+	static const int2 SpatialOffsets[8] = {int2(1, 0), int2(-1, 0), int2(0, 1), int2(0, -1), int2(2, 1), int2(-2, 1), int2(2, -1), int2(-2, -1)};
 	static const float MaxTemporalM = 20.0f;
 	static const float MaxSpatialM = 32.0f;
 	static const float NormalSimilarityThreshold = 0.85f;

@@ -18,6 +18,7 @@ float3 TransformSkinnedNormal(const float3 normal, const float4x4 skinningMatrix
 	{
 		return normalize(mul(normal, linearTransform));
 	}
+
 	return normalize(mul(normal, cofactorMatrix) * (determinant < 0.0f ? -1.0f : 1.0f));
 }
 

@@ -29,6 +29,7 @@ namespace ReferencePathTracer
 		{
 			return surface.EmissiveColor;
 		}
+
 		const float lightPdfW = EmissiveTrianglePdfW(lightCounts, previousEvent.PositionWorld, surface);
 		return surface.EmissiveColor * PathTracer::PowerHeuristic(previousEvent.BsdfPdfW, lightPdfW);
 	}

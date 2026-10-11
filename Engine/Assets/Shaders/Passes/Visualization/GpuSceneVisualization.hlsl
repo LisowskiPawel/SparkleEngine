@@ -1,5 +1,6 @@
-RWTexture2D<float4> SceneColor;
 #include "/Engine/Common/Hash.hlsli"
+
+RWTexture2D<float4> SceneColor;
 Texture2D<uint> GBufferInstanceIdentity;
 
 [numthreads(8, 8, 1)]

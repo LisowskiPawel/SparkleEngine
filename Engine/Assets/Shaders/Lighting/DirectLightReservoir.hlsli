@@ -192,7 +192,6 @@ namespace DirectLightReservoir
 
 		return reservoir;
 	}
-
 }
 
 #endif

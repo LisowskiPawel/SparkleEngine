@@ -80,7 +80,7 @@ RayTracingMaterialSample EvaluateRayTracingHitMaterial(RayTracingHitMaterial mat
 	return result;
 }
 
-RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult trace, float3 rayDirectionWorld)
+RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult trace)
 {
 	const RayTracingEvaluatedTriangle evaluatedTriangle = EvaluateRayTracingTriangle(trace.InstanceId, trace.PrimitiveIndex, trace.Barycentrics);
 	const MeshInstanceData mesh = MeshInstances[trace.InstanceId];
@@ -173,9 +173,9 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	return surface;
 }
 
-RayTracingHitSurfaceData ReconstructRayTracingHitSurfaceWithPrevious(RayTracingTraceResult trace, float3 rayDirectionWorld)
+RayTracingHitSurfaceData ReconstructRayTracingHitSurfaceWithPrevious(RayTracingTraceResult trace)
 {
-	RayTracingHitSurfaceData surface = ReconstructRayTracingHitSurface(trace, rayDirectionWorld);
+	RayTracingHitSurfaceData surface = ReconstructRayTracingHitSurface(trace);
 	if (surface.Valid)
 	{
 		const RayTracingHitTriangle hitTriangle = LoadRayTracingHitTriangle(trace.InstanceId, trace.PrimitiveIndex, trace.Barycentrics);

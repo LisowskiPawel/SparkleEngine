@@ -35,5 +35,6 @@ bool ResolveRayTracingCandidateAlpha(uint instanceId, uint primitiveIndex, float
 	{
 		return false;
 	}
+
 	return PassesRayTracingMaterialAlpha(hitTriangle.Material, InterpolateRayTracingHitTexCoord0(hitTriangle), InterpolateRayTracingHitColor(hitTriangle));
 }

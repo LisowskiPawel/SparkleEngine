@@ -10,13 +10,13 @@ namespace RayTracedShadowVisibility
 {
 	ShadowVisibilitySample TraceDirectLightSample(float3 positionWorld, float3 normalWorld, LightSampling::DirectLightSample lightSample, bool castsShadow)
 	{
-		RayTracedShadowRequest request = (RayTracedShadowRequest)0;
-		ShadowVisibilitySample signal = RayTracedShadowSignals::BuildUnshadowedSignal(0.0f);
-		if (RayTracedShadows::BuildDirectLightRequest(positionWorld, normalWorld, lightSample, castsShadow, request, signal))
+		const RayTracedShadowPreparation preparation = RayTracedShadows::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, castsShadow);
+		if (preparation.TraceRequired)
 		{
-			return RayTracedShadows::TraceShadowRay(request);
+			return RayTracedShadows::TraceShadowRay(preparation.Request);
 		}
-		return signal;
+
+		return preparation.ImmediateSignal;
 	}
 }
 

@@ -4,7 +4,7 @@
 
 **Responsibility:** give every existing module inventory row one release classification and an owning module, then split compound user surfaces explicitly
 
-**Parent decisions:** [Release Scope Record](README.md). **Requirement authority:** [First Release](../FirstRelease.md). **Source meaning:** [Module inventory](../../Architecture/Modules/README.md).
+**Parent decisions:** [Release Scope Record](../FirstRelease.md#approved-release-scope). **Requirement authority:** [First Release](../FirstRelease.md). **Source meaning:** [Module inventory](../../Architecture/Modules/README.md).
 
 ## Interpretation
 
@@ -757,4 +757,3 @@ This revised proposal assigns **512 capability IDs** across **16 owners**: 475 I
 Live supplemental closure covers the product CMake targets, graphics-launch parser, package/path contracts, 20 actual catalog levels, all 18 view modes, every persisted setting and the current external-capture path. All other registered developer CVar/CLI settings are development-only, unstable, and absent from the Game control promise. Shipping Editor/Launcher controls are bounded by their owning contracts; helper membership must be explicitly frozen, not inferred from this source inventory. Future source changes or an unmatched consumer option invalidate the scope check.
 
 Primary-source rights metadata does not prove the identity of locally acquired/cooked bytes. REL-01 must close that identity, credits, environment/texture/dependency closure, root license, publisher and redistribution receipts. Feature-local native proof, observer comparisons, failures and Shipping erasure remain in their existing acceptance owners. Approval adds A only for the disposition; never B/R/N/P.
-

@@ -1,13 +1,36 @@
-
 Texture2D<float4> CurrentReservoirSampleTexture;
 Texture2D<float4> CurrentReservoirWeightTexture;
 Texture2D SkyTexture;
 SamplerState SamplerLinearClamp;
 
 #include "/Engine/Lighting/RestirIndirectReservoir.hlsli"
+
 RWTexture2D<float4> IndirectDiffuse;
 RWTexture2D<float4> IndirectSpecular;
+
 #include "/Engine/Lighting/RayReconstructionGuides.hlsli"
+
+void StoreIndirectLighting(uint2 pixelCoord, RestirIndirectReservoir::Surface surface, RayTracingPathLighting::Result path, float reservoirWeight)
+{
+	if (RestirIndirectEvaluateDiffuse != 0u)
+	{
+		const float3 diffuse = path.DiffuseContribution * reservoirWeight;
+		IndirectDiffuse[pixelCoord] = float4(diffuse, any(diffuse > 0.0f) ? 1.0f : 0.0f);
+	}
+
+	bool hasSpecular = false;
+	if (RestirIndirectEvaluateSpecular != 0u)
+	{
+		const float3 specular = path.SpecularContribution * reservoirWeight;
+		hasSpecular = any(specular > 0.0f);
+		IndirectSpecular[pixelCoord] = float4(specular, hasSpecular ? 1.0f : 0.0f);
+	}
+
+	if (WriteRayReconstructionGuides != 0u)
+	{
+		RayReconstructionGuides::WriteSpecularHitDistance(pixelCoord, path.FirstLighting.HitPositionWorld, surface.PathSurface.PositionWorld, hasSpecular && path.FirstLighting.Hit);
+	}
+}
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -49,25 +72,8 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	RayTracingPathLighting::Result path = RestirIndirectReservoir::EvaluateCandidate(surface, reservoir.Selected, SkyTexture, SamplerLinearClamp);
+	const RayTracingPathLighting::Result path = RestirIndirectReservoir::EvaluateCandidate(surface, reservoir.Selected, SkyTexture, SamplerLinearClamp);
 	const float reservoirWeight = RestirIndirectReservoir::GetFinalWeight(reservoir);
 
-	if (RestirIndirectEvaluateDiffuse != 0u)
-	{
-		const float3 diffuse = path.DiffuseContribution * reservoirWeight;
-		IndirectDiffuse[pixelCoord] = float4(diffuse, any(diffuse > 0.0f) ? 1.0f : 0.0f);
-	}
-
-	bool hasSpecular = false;
-	if (RestirIndirectEvaluateSpecular != 0u)
-	{
-		const float3 specular = path.SpecularContribution * reservoirWeight;
-		hasSpecular = any(specular > 0.0f);
-		IndirectSpecular[pixelCoord] = float4(specular, hasSpecular ? 1.0f : 0.0f);
-	}
-
-	if (WriteRayReconstructionGuides != 0u)
-	{
-		RayReconstructionGuides::WriteSpecularHitDistance(pixelCoord, path.FirstLighting.HitPositionWorld, surface.PathSurface.PositionWorld, hasSpecular && path.FirstLighting.Hit);
-	}
+	StoreIndirectLighting(pixelCoord, surface, path, reservoirWeight);
 }

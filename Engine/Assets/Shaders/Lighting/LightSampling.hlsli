@@ -183,6 +183,7 @@ namespace LightSampling
 		{
 			return (DirectLightSample)0;
 		}
+
 		result.Valid = true;
 		result.DirectionWorld = directionWorld;
 		result.Distance = distance;

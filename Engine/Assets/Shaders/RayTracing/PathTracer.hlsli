@@ -32,6 +32,7 @@ namespace PathTracer
 		{
 			return 0.0f;
 		}
+
 		const float selected = selectedProbability / scale;
 		const float competing = competingProbability / scale;
 		const float selected2 = selected * selected;

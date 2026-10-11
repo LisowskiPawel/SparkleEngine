@@ -10,6 +10,28 @@ Texture2D<float4> PreviousReservoirWeight;
 Texture2D<float4> PreviousReservoirSurface;
 Texture2D GBufferMotionVector;
 
+void ReuseTemporalReservoir(uint2 pixelCoord, uint2 extent, DirectLightReservoir::Surface surface, inout DirectLightReservoir::Reservoir reservoir)
+{
+	if (HistoryValid != 0u)
+	{
+		const float2 motionPixels = GBufferMotionVector.Load(int3(pixelCoord, 0)).xy;
+		const float2 previousPixel = MotionVectors::ReprojectToPreviousPixelCenter(pixelCoord, motionPixels, float2(extent.x, extent.y));
+		const int2 previousPixelCoord = int2(floor(previousPixel));
+		if (previousPixelCoord.x >= 0 && previousPixelCoord.y >= 0 && previousPixelCoord.x < (int)extent.x && previousPixelCoord.y < (int)extent.y)
+		{
+			const float4 previousSurface = PreviousReservoirSurface.Load(int3(previousPixelCoord, 0));
+			if (DirectLightReservoir::AreSurfacesCompatible(surface, previousSurface))
+			{
+				const DirectLightReservoir::Reservoir previousReservoir = DirectLightReservoir::UnpackReservoir(PreviousReservoirSample.Load(int3(previousPixelCoord, 0)),
+				                                                                                                PreviousReservoirWeight.Load(int3(previousPixelCoord, 0)));
+
+				uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x7151u);
+				DirectLightReservoir::CombineReservoir(reservoir, previousReservoir, surface, RestirReservoirCommon::MaxTemporalM, CommonRandom::Random01(rng));
+			}
+		}
+	}
+}
+
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 {
@@ -33,24 +55,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 
 	DirectLightReservoir::Reservoir reservoir = DirectLightReservoir::BuildInitialReservoir(surface, pixelCoord);
 
-	if (HistoryValid != 0u)
-	{
-		const float2 motionPixels = GBufferMotionVector.Load(int3(pixelCoord, 0)).xy;
-		const float2 previousPixel = MotionVectors::ReprojectToPreviousPixelCenter(pixelCoord, motionPixels, float2(width, height));
-		const int2 previousPixelCoord = int2(floor(previousPixel));
-		if (previousPixelCoord.x >= 0 && previousPixelCoord.y >= 0 && previousPixelCoord.x < (int)width && previousPixelCoord.y < (int)height)
-		{
-			const float4 previousSurface = PreviousReservoirSurface.Load(int3(previousPixelCoord, 0));
-			if (DirectLightReservoir::AreSurfacesCompatible(surface, previousSurface))
-			{
-				const DirectLightReservoir::Reservoir previousReservoir = DirectLightReservoir::UnpackReservoir(PreviousReservoirSample.Load(int3(previousPixelCoord, 0)),
-				                                                                                                PreviousReservoirWeight.Load(int3(previousPixelCoord, 0)));
-
-				uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x7151u);
-				DirectLightReservoir::CombineReservoir(reservoir, previousReservoir, surface, RestirReservoirCommon::MaxTemporalM, CommonRandom::Random01(rng));
-			}
-		}
-	}
+	ReuseTemporalReservoir(pixelCoord, uint2(width, height), surface, reservoir);
 
 	TemporalReservoirSample[pixelCoord] = DirectLightReservoir::PackReservoirSample(reservoir);
 	TemporalReservoirWeight[pixelCoord] = DirectLightReservoir::PackReservoirWeight(reservoir);

@@ -106,7 +106,7 @@ try
 
     if ([string]::IsNullOrWhiteSpace($InputsPath) -or !(Test-Path -LiteralPath $InputsPath -PathType Leaf))
     {
-        throw 'Missing reviewed release inputs. Rights, exact helper/DLL closure and symbol correlation must be admitted before build/cook/stage. See ReleaseInputs.md.'
+        throw 'Missing reviewed release inputs. Rights, exact helper/DLL closure and symbol correlation must be admitted before build/cook/stage. See Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs.'
     }
     $inputSnapshot = Join-Path $transactionRoot 'release-inputs.json'
     [IO.File]::Copy([IO.Path]::GetFullPath($InputsPath), $inputSnapshot, $false)

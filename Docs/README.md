@@ -4,8 +4,7 @@
 
 Use these pages to understand the engine, choose your next task and find the design or proof behind a feature.
 
-> [!IMPORTANT]
-> Start with [SparkleEngine At A Glance](Architecture/EngineAtAGlance.md). It summarizes the engine, Renderer, RHI, major strengths, missing capabilities, tradeoffs, and first-release blockers without requiring you to read the detailed ledgers. Open [Current Feature Readiness](Acceptance/CurrentReadiness.md) for the evidence-weighted 0–100 view.
+For first-release work, use three pages: [Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) for progress/next, [release plan](Architecture/CrossModule/FirstRelease/README.md) for work, and [release contract](Acceptance/FirstRelease.md) for approved scope/checks. Package inputs and diagnostics are together in the [packaging guide](Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md).
 
 ## Start Here
 
@@ -20,7 +19,7 @@ Public onboarding starts in the [repository README](../README.md); the [contribu
 | Understand D3D12/Vulkan and GPU services | [RHI](Architecture/Modules/Engine/RHI/README.md) — [RHI Feature Guide](Architecture/Modules/Engine/RHI/Features/README.md) |
 | See exactly what exists or is missing | [Module Capability Inventory](Architecture/Modules/README.md) — [Capability Evidence Plan](Architecture/Modules/CapabilityEvidencePlan.md) |
 | Compare current feature readiness | [Current Feature Readiness](Acceptance/CurrentReadiness.md) — open the linked Architecture dossier for the implementation and missing-work detail |
-| Review release scope and technical blockers | [Six approved product decisions](Acceptance/ReleaseScope/README.md#approval-and-next-work); source/rights investigations have their own owners |
+| Review release scope and technical blockers | [Six approved product decisions](Acceptance/FirstRelease.md#approval-and-next-work); source/rights investigations have their own owners |
 | Decide what to do next | [Master Delivery Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) — See current focus and global priority, then open its owning stage plan |
 | Implement a selected release piece | [First Release Stage Briefs](Architecture/CrossModule/FirstRelease/README.md) — Use the Roadmap-selected phase and its work/exit criteria |
 | Build, cook, or launch Showcase | [Launcher Architecture](Architecture/Modules/Tools/Launcher/README.md) — [Build And Packaging](Architecture/Modules/BuildAndPackaging/README.md) |

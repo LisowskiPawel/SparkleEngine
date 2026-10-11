@@ -2,6 +2,7 @@
 #define SPARKLE_REFERENCE_PATH_TRACER_LIGHT_SAMPLING_HLSLI
 
 #include "/Engine/Common/Random.hlsli"
+#include "/Engine/Lighting/DirectLightSampling.hlsli"
 #include "/Engine/Lighting/EnvironmentSampling.hlsli"
 #include "/Engine/RayTracing/PathLightSampling.hlsli"
 
@@ -32,7 +33,7 @@ namespace ReferencePathTracer
 	LightCounts GetLightCounts()
 	{
 		LightCounts result;
-		result.Analytic = PathLightSampling::CountAnalyticLights();
+		result.Analytic = DirectLightSampling::GetDirectLightCount();
 		result.EmissiveTriangle = PathLightSampling::CountEmissiveTriangles();
 		result.Environment = SkyEnabled;
 		result.Total = result.Analytic + result.EmissiveTriangle + result.Environment;
@@ -47,17 +48,23 @@ namespace ReferencePathTracer
 		uint ordinal = category.Index;
 		if (ordinal < counts.Analytic)
 		{
+			const DirectLightSampling::LightId light = DirectLightSampling::GetDirectLightId(ordinal);
 			result.Kind = KindAnalytic;
-			PathLightSampling::FindAnalyticLight(ordinal, result.LightType, result.LightIndex);
+			result.LightType = light.Type;
+			result.LightIndex = light.Index;
 			return result;
 		}
+
 		ordinal -= counts.Analytic;
 		if (ordinal < counts.EmissiveTriangle)
 		{
+			const PathLightSampling::EmissiveTriangleId triangle = PathLightSampling::FindEmissiveTriangle(ordinal);
 			result.Kind = KindEmissiveTriangle;
-			PathLightSampling::FindEmissiveTriangle(ordinal, result.InstanceId, result.PrimitiveIndex);
+			result.InstanceId = triangle.InstanceId;
+			result.PrimitiveIndex = triangle.PrimitiveIndex;
 			return result;
 		}
+
 		result.Kind = KindEnvironment;
 		return result;
 	}

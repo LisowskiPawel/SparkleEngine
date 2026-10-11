@@ -34,6 +34,7 @@ float3 RayTracingDebugReasonColor(uint reason)
 	{
 		return float3(0.05f, 0.25f, 1.0f);
 	}
+
 	return float3(0.2f, 0.65f, 1.0f);
 }
 
@@ -59,6 +60,7 @@ float3 RayTracingDebugGeometryClassColor(uint geometryFlags)
 	{
 		return float3(0.85f, 0.85f, 0.85f);
 	}
+
 	return float3(0.2f, 0.2f, 0.2f);
 }
 

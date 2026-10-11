@@ -1,4 +1,3 @@
-
 Texture2D<float4> TemporalReservoirSampleTexture;
 Texture2D<float4> TemporalReservoirWeightTexture;
 RWTexture2D<float4> CurrentReservoirSampleTexture;
@@ -9,7 +8,34 @@ SamplerState SamplerLinearClamp;
 
 #include "/Engine/Lighting/RestirIndirectReservoir.hlsli"
 
-static const int2 SpatialOffsets[8] = {int2(1, 0), int2(-1, 0), int2(0, 1), int2(0, -1), int2(2, 1), int2(-2, 1), int2(2, -1), int2(-2, -1)};
+void ReuseSpatialReservoir(uint2 pixelCoord, uint2 extent, RestirIndirectReservoir::Surface surface, inout RestirIndirectReservoir::Reservoir reservoir)
+{
+	if (surface.Valid && RestirIndirectSpatialReuse != 0u)
+	{
+		uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x5A71A1u);
+		const uint offsetStart = uint(CommonRandom::Random01(rng) * 8.0f) & 7u;
+		[unroll]
+		for (uint sampleIndex = 0u; sampleIndex < RestirReservoirCommon::SpatialNeighborCount; ++sampleIndex)
+		{
+			const int2 neighborCoord = int2(pixelCoord) + RestirReservoirCommon::SpatialOffsets[(offsetStart + sampleIndex * 2u) & 7u];
+			if (neighborCoord.x < 0 || neighborCoord.y < 0 || neighborCoord.x >= int(extent.x) || neighborCoord.y >= int(extent.y))
+			{
+				continue;
+			}
+
+			const RestirIndirectReservoir::Surface neighborSurface = RestirIndirectReservoir::LoadSurface(uint2(neighborCoord));
+			if (!RestirIndirectReservoir::AreSurfacesCompatible(surface, RestirIndirectReservoir::PackSurface(neighborSurface)))
+			{
+				continue;
+			}
+
+			const RestirIndirectReservoir::Reservoir neighbor = RestirIndirectReservoir::UnpackReservoir(TemporalReservoirSampleTexture.Load(int3(neighborCoord, 0)),
+			                                                                                             TemporalReservoirWeightTexture.Load(int3(neighborCoord, 0)));
+
+			RestirIndirectReservoir::CombineReservoir(reservoir, neighbor, surface, SkyTexture, SamplerLinearClamp, RestirReservoirCommon::MaxSpatialM, CommonRandom::Random01(rng));
+		}
+	}
+}
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -28,31 +54,8 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	RestirIndirectReservoir::Reservoir reservoir = RestirIndirectReservoir::UnpackReservoir(TemporalReservoirSampleTexture.Load(int3(pixelCoord, 0)),
 	                                                                                        TemporalReservoirWeightTexture.Load(int3(pixelCoord, 0)));
 
-	if (surface.Valid && RestirIndirectSpatialReuse != 0u)
-	{
-		uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x5A71A1u);
-		const uint offsetStart = uint(CommonRandom::Random01(rng) * 8.0f) & 7u;
-		[unroll]
-		for (uint sampleIndex = 0u; sampleIndex < RestirReservoirCommon::SpatialNeighborCount; ++sampleIndex)
-		{
-			const int2 neighborCoord = int2(pixelCoord) + SpatialOffsets[(offsetStart + sampleIndex * 2u) & 7u];
-			if (neighborCoord.x < 0 || neighborCoord.y < 0 || neighborCoord.x >= int(width) || neighborCoord.y >= int(height))
-			{
-				continue;
-			}
+	ReuseSpatialReservoir(pixelCoord, uint2(width, height), surface, reservoir);
 
-			const RestirIndirectReservoir::Surface neighborSurface = RestirIndirectReservoir::LoadSurface(uint2(neighborCoord));
-			if (!RestirIndirectReservoir::AreSurfacesCompatible(surface, RestirIndirectReservoir::PackSurface(neighborSurface)))
-			{
-				continue;
-			}
-
-			const RestirIndirectReservoir::Reservoir neighbor = RestirIndirectReservoir::UnpackReservoir(TemporalReservoirSampleTexture.Load(int3(neighborCoord, 0)),
-			                                                                                             TemporalReservoirWeightTexture.Load(int3(neighborCoord, 0)));
-
-			RestirIndirectReservoir::CombineReservoir(reservoir, neighbor, surface, SkyTexture, SamplerLinearClamp, RestirReservoirCommon::MaxSpatialM, CommonRandom::Random01(rng));
-		}
-	}
 	CurrentReservoirSampleTexture[pixelCoord] = RestirIndirectReservoir::PackSample(reservoir);
 	CurrentReservoirWeightTexture[pixelCoord] = RestirIndirectReservoir::PackWeight(reservoir);
 	CurrentReservoirSurfaceTexture[pixelCoord] = RestirIndirectReservoir::PackSurface(surface);

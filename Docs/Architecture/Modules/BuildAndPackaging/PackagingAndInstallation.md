@@ -2,16 +2,16 @@
 
 **Status:** package contract and current implementation route; consumer package acceptance remains blocked
 
-**Scope:** define deterministic staging, manifests, integrity/signing, packaging, installation, writable state, relocation, and clean-machine operation
+**Scope:** define release inputs, deterministic packaging, clean-machine operation and local diagnostics/replacement
 
 **Owner:** repository build and release-delivery configuration; product contributors are Launcher, Showcase, Application, Tools, and the engine modules whose runtime bytes enter the package
-
-**Snapshot:** 2026-09-08 at committed `master` revision `ffe60e3a`; root/module `CMakeLists.txt`, artifact/path discovery, product membership, and `CMake/*.cmake` were inspected; no `install(...)`, CPack, stage, manifest generation, or package owner was found; source evidence `S` only
 
 **Strategy and acceptance sources:** [`PGE-01`, `PGE-13`, `PGE-14`, `PGE-15`](../../../Strategy/Requirements.md), [First Release](../../../Acceptance/FirstRelease.md), and `FCR-PROD-02`/`FCR-PROD-05` in [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md)
 
 **Acceptance:** blocked. The implementation below has local structural checks; no three-product archive or clean-machine package result exists. See [Release progress](../../../Strategy/Roadmap.md#release-progress).
 
+
+Use [reviewed inputs](#reviewed-package-inputs) to prepare the package, [package command](#current-package-entry) to assemble it, [package checks](#fcr-prod-05-package-contract) to qualify it, and [local diagnostics](#local-diagnostics-and-release-review) for incident/export/replacement behavior.
 
 ## Current Package Entry
 
@@ -22,7 +22,7 @@ cmake -S . -B build -DSPARKLE_RELEASE_INPUTS=<reviewed-inputs.json>
 cmake --build build --config ShippingEditor --target release_package
 ```
 
-The input contract is in [Release Inputs](ReleaseInputs.md#reviewed-package-inputs). Missing rights, dependency or symbol admission stops before build/cook/stage. Each retained owner receipt must pass and identify the exact source candidate. Discovery/content-store acceptance follows the produced archive; it is not a prerequisite that requires an archive before one can be made.
+The input contract is in [Release Inputs](#reviewed-package-inputs). Missing rights, dependency or symbol admission stops before build/cook/stage. Each retained owner receipt must pass and identify the exact source candidate. Discovery/content-store acceptance follows the produced archive; it is not a prerequisite that requires an archive before one can be made.
 
 The stage verifier checks paths, hashes, notices, components, read-only attributes, x64 PE headers and vendor signatures. It reads ordinary/delay imports and requires app-local closure or explicit Windows/driver prerequisites; Game cannot import Editor/tool dependencies. SPDX file hashes/licenses and provenance product/source identities must match the manifest. These checks do not replace legal review or complete SPDX schema validation.
 
@@ -122,3 +122,185 @@ Sparkle does **not** adopt UAT, BuildGraph XML, nodes/agents/triggers as public 
 | `CHK-PKG-02` | `AC-PKG-04`, `AC-PKG-05`; `FM-PKG-03`–`05` | On a clean standard-user minimum machine, extract to Unicode/spaced and read-only locations, test user-selected sync, then block network/remove overrides, inventory all file/network/process activity, run consumer first/repeat/fault cases, remove archive, and compare budgets/state hashes. |
 
 No acceptance row is satisfied by this documentation pass. [`BUILD-E03`](../CapabilityEvidencePlan.md#product-workflow-and-delivery-evidence) is the smallest central proof destination; candidate-bound results belong in the release artifact path required by [First Release](../../../Acceptance/FirstRelease.md).
+
+## Release Inputs
+
+This page owns the input choices needed to implement the package spine. [Release Scope](../../../Acceptance/FirstRelease.md#approved-release-scope) owns product promises; [First Release](../../../Acceptance/FirstRelease.md) owns candidate verdicts. Keep the supported seven maps and Launcher entry; start Empty until the user selects content.
+
+**PD-4 package inputs:** `ExportDiagnostics.ps1`, `IncidentIdentity.ps1` and `PackageVerification.ps1` under `tools/Diagnostics/` (Shared/Helper); root `SUPPORT.md`, `SECURITY.md` and `KNOWN_ISSUES.md` under `docs/` (Shared/Metadata). Require source hashes, notices and SBOM entries. `ReviewRelease.ps1` stays maintainer-only; PDBs stay in the separate symbol companion. Local prerequisites: PowerShell 5.1 and System32 DbgHelp; no symbol-server lookup. [Diagnostic owner](#current-local-route).
+
+**Open-source license boundary:** Sparkle-owned code remains MIT, including commercial use. Free educational delivery describes the maintainer's intent, not an added use restriction. Third-party content and SDK terms remain separate.
+
+**Free educational delivery (2026-10-11):** preserve all approved features, both backends and seven map choices. License compliance changes notices, source availability and how content is acquired; it must not disable DLSS/Ray Reconstruction, remove a map, substitute assets or silently lower quality. Selected publisher downloads stay inside Launcher, with progress, retry and offline reuse after acquisition. A free release still needs the applicable component terms. Certificate enrollment is deferred to the final pre-release work before signed candidate/adoption checks; it does not block input discovery or unsigned internal package development.
+
+### Product And Helper Membership
+
+| Component | Source product/profile | Admission rule |
+| --- | --- | --- |
+| Sparkle Launcher | `SparkleLauncher`, `ShippingEditor` | Mandatory; package-relative discovery and selected sync must work without a source checkout. Include Qt's exact release DLL/plugin closure and its LGPL notices/source/relink obligations. |
+| Sparkle Editor | `ShowcaseEditor`, `ShippingEditor` | Mandatory; use the same identity/configuration owner as Game. Include its exact declared runtime closure; no undeclared developer SDK requirement. |
+| Sparkle Game | `ShowcaseGame`, `ShippingGame` | Mandatory; no Editor/tool-only payload. Include all eight pinned Streamline runtime DLLs required by the provider owner, including `sl.dlss_d.dll`; keep NVIDIA/NGX terms and signatures. |
+| Selected-content cook helpers | `AssetCooker`, `TextureCooker`, `ShaderCompiler`, `ShippingEditor` | All three helpers are mandatory for the selected source-content sync/cook journey, plus their exact redistributable DLL/SDK closure. Headers, compiler development tools, examples and arbitrary SDK directories are excluded. |
+| Acquisition helper | Portable CMake `4.3.3`, used by the existing sync owner; publisher archive SHA-256 `935ade9e5e8723583c07f44c5592cea2a1c8f65c56ca7e07b34c025c880e0bd6` | Mandatory for the admitted acquisition scripts; include its license. Package-relative discovery and byte-level qualification are FR-02 work. An author-machine CMake installation is not the consumer contract. |
+| Symbols / private intermediates | Separate archive / private build tree | No PDB, source/private absolute path payload, cache, build tree or development executable in the consumer archive. |
+
+Release identity remains `0.1.0`, publisher Pawel Lisowski, copyright 2026. Use the existing identity owner; source and package signing identities must agree. Public window/display behavior and the laptop performance criterion remain in Release Scope. Do not replace the 30 FPS proof with this input inventory.
+
+### Package And Writable Paths
+
+The immutable extraction contains `launcher/SparkleLauncher.exe`, `editor/ShowcaseEditor.exe`, `game/ShowcaseGame.exe`, the three helpers under `tools/<tool>/<tool>.exe`, and portable CMake under `tools/CMake/`. Each component carries its declared release DLL/plugin closure. The package manifest owns these paths; do not reconstruct them from development artifacts.
+
+Selected source and cooked content live under `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`, outside the extraction. Downloads are explicit Launcher selections, verified and transactionally published by the existing acquisition/cook owners. Keep source and cooked subtrees distinct; use the existing project/asset identities without introducing asset or shader versions. Existing settings/log owners remain per-user. FR-02 must implement this layout and qualify offline use, read-only extraction, containment and helper discovery. These target paths do not describe current source-workspace behavior.
+
+
+### Reviewed Package Inputs
+
+The [package owner](PackagingAndInstallation.md#current-package-entry) consumes a reviewed JSON input file. Keep it outside the source snapshot, under ignored release evidence. CMake generates exact product paths under `build/private/release-products/<configuration>.json`; package membership is not inferred from development directories.
+
+| Input field | Required meaning |
+| --- | --- |
+| `Revision`, `SourceInputsSha256` | Exact Git revision and deterministic hash of repository-relative tracked/untracked nonignored file hashes, including deletions. The admission run retains `source-inputs.json` and the fingerprint in `report.json`; review that snapshot before admitting payloads. |
+| `Admissions` | `Rights`, `DependencyClosure`, `SymbolCorrelation`: each names repository-relative `Report`, `Size`, `Sha256`. The hashed JSON owner receipt carries `Gate`, `Status`, `Revision`, `SourceInputsSha256`; it must pass for the exact input candidate. These fields transport the owner result, not new acceptance criteria. A license filename or successful build is insufficient. |
+| `Files` | Explicit complete allowlist; each entry has repository-relative `Source`, package-relative `Path`, `Size`, lowercase `Sha256`, `Component`, `Role`, `Permission`, `Owner`, logical `Origin`, SPDX `License`, package-relative `Notice`, `Signature`. No absolute source path goes into the package manifest. |
+| `SystemImports` | Exact DLL names supplied by Windows or the supported graphics driver; each has `Name`, `Owner` (Windows/GraphicsDriver), `Requirement`. CRT, Qt, NVIDIA plugins and compiler-helper DLLs cannot use this exemption. This declaration requires minimum-machine qualification; it never scans the host to supply missing files. |
+
+Components are Launcher, Editor, Game, the three admitted cook helpers, CMake, Engine and Shared. Roles are Runtime, Helper, EngineContent, Recipe, Defaults, Notice and Metadata. Permission is ReadOnly. Signature policy is UnsignedFirstParty, VendorSigned or NotApplicable (non-PE only); unsigned first-party archives are internal development products. VendorSigned bytes require valid Authenticode. Required entries include all six generated executables, `tools/CMake/bin/cmake.exe`, `manifests/sparkle-sbom.spdx.json` and `manifests/sparkle-provenance.json`. Notices must themselves be admitted members.
+
+The SPDX 2.3 SBOM must identify its document/software components and enumerate every payload file with SHA-256 and the manifest license. Its own file and the provenance document are omitted from that list to avoid digest cycles; the package manifest binds both. Provenance names `Version`, `Revision`, `SourceInputsSha256` and the six exact `Products` (Component/Target/Configuration/Path). Static/embedded dependency completeness, redistribution terms and symbol correlation still require owner review. The verifier checks these bindings; it does not infer grants or replace a complete SPDX schema check.
+
+The manifest owns `ProjectPath=content/Showcase`, `EnginePath=engine`, `ContentStore=Content/Showcase`. ContentStore is relative to the platform per-user SparkleEngine root. Core uses it for `Cooked/`; immutable recipes include `.sparkle-project` and `Levels.catalog`. Recipe/engine membership is checked before assembly. Launcher store population and package-relative helper/product discovery remain unfinished. Runtime acceptance follows the exact archive through CHK-PKG-02; no archive-bound runtime receipt is required before archive creation. Current input admissions remain unresolved.
+
+### Content And Source Distribution
+
+- Product archives carry engine-owned mandatory defaults and only legally admitted content. A requested map remains available through a verified user-selected acquisition recipe; no automatic first-launch download is required.
+- Modern Sponza Base/Curtains and classic Sponza are acquisition-only until bundled redistribution is established. Exclude source, textures, cooked derivatives and their thumbnails from product archives. Publisher terms remain applicable to users; an acquisition recipe is not a new license grant.
+- Classic Sponza uses the pinned Khronos recipe under `Assets/Meshes/Sponza/SourceFiles.txt`; the level reads `Sponza/Publisher/glTF/Sponza`. The replaced bundled model/texture files are removed from the current source tree. The acquired tree is gitignored.
+- Cornell consumes the tracked self-contained GLB with `COPYRIGHT.txt` and conversion attribution. Its publisher OBJ ZIP is optional for regeneration. Do not turn the unavailable regeneration archive into a normal launch prerequisite.
+- Retain the selected Cesium/plant/chess copyright, attribution and logo notices; retain LPS Head's publisher/conversion notice. Retain Poly Haven CC0 environment provenance and Font Awesome's font license. Package copies must preserve notices for source and cooked derivatives.
+- Public release source is a reviewed exported archive from the exact candidate. `.gitattributes` excludes unqualified Sponza bytes, the excluded DamagedHelmet payload and development thumbnails without reviewed export receipts; new acquisition recipes/notices must be committed and present before export acceptance. Raw repository clones/history are a separate distribution surface, not certified by `export-ignore`.
+
+**Public repository decision (2026-10-11):** [SparkleEngine](https://github.com/stoleckipawel/SparkleEngine) remains the main public, open-source repository with its existing history. The owner superseded the private-history plan; no private source repository or separate publication workflow is required. The owner requested removal of the extra SparkleEngine-Source repository; it is not a development or release destination. Keep production features, seven map definitions and acquisition recipes available publicly. Review historical asset rights separately; public visibility and export exclusions do not establish redistribution permission.
+
+### Supply Chain And Signing
+
+| Input family | Distribution decision / proof still required |
+| --- | --- |
+| Permissive source dependencies and PIX | Carry exact retained copyright/license notices for the compiled components, including embedded third-party notices. An entire dependency checkout is not the admitted payload. |
+| Streamline / NGX / Reflex | Streamline's MIT notice does not license every bundled plugin. Preserve the pinned NGX/Reflex runtime terms and applicable notices; distribute only admitted application runtime binaries, not a standalone SDK. The [NVIDIA component notice](../../../../CMake/Notices/NVIDIA/README.md) preserves the separation from Sparkle's MIT license and is staged with the full retained license texts. Product distribution terms must preserve their restrictions separately from Sparkle's first-party MIT license. The pinned NGX license's distribution section requires this; release terms and their acceptance remain unqualified. Do not include `sl_nvperf.dll` or development capture tools without separate admission. |
+| Qt `6.11.1` | Use dynamically linked LGPL-eligible modules/plugins; keep notices/license text and a prominent Qt notice, the exact corresponding library source and a documented replacement/relink route. [Qt's LGPL obligations](https://www.qt.io/development/open-source-lgpl-obligations) apply even with dynamic linking. The source companion below is identified. Launcher now stages LGPL/GPL license texts and [Qt source/replacement instructions](../../../../CMake/Notices/Qt/README.md); root onboarding prominently identifies Qt. Package source publication, full third-party closure and replacement/relink execution still need acceptance. |
+| MSVC / DXC / portable CMake | Package only the exact redistribution-authorized runtime/compiler-helper files needed by the admitted journeys, with their terms. Local SDK installation and `windeployqt` output are discovery, not an allowlist or a license receipt. Qualify app-local CRT for the portable, standard-user promise; a staged `vc_redist.x64.exe` does not prove that journey. |
+
+- Resolve declared Git dependencies at full commit hashes; hash-check downloaded SDK archives and both Font Awesome inputs. Wrong cache bytes are a failure, never a substitute input. Keep the failed cache for diagnosis.
+- Produce a component inventory from the exact staged bytes: first-party products, linked/static third-party components, dynamic DLLs/plugins, helpers, source/cooked content and notices. Use SPDX JSON for the package SBOM with exact versions/revisions/hashes and relationships; no guessed `NOASSERTION` license is admission evidence. The dependency audit feeds this inventory, not a directory copy of every downloaded SDK.
+- Preserve the exact installed toolchain/SDK versions and prerequisites independently of redistributable components. Dependency license files and inline notices (including MikkTSpace, tinyexr and CMP_Core) must reach the notice bundle. NVIDIA SDK redistribution conditions and Qt LGPL/source/relink obligations must be satisfied for their admitted bytes.
+- Signing choice (owner delegated selection, 2026-10-11): **Certum Standard Code Signing in the Cloud, individual subscriber Pawel Lisowski**, through SimplySign Desktop and Windows SDK SignTool. This preserves the named publisher without assuming eligibility for an open-source-only certificate. [Certum's individual enrollment](https://support.certum.eu/en/code-signing-required-documents/) requires purchase and identity/address verification. Enrollment, payment and issuance have not occurred; no account or certificate was fabricated. The maintainer completes verification directly with Certum; identity documents and credentials never enter this repository.
+- Sign staged first-party PE files with the issued certificate's explicit thumbprint, SHA-256 file digest and RFC 3161 SHA-256 timestamp at `http://time.certum.pl/`, as in [Certum's cloud signing instructions](https://files.certum.eu/documents/manual_pl/Podpisywanie_narzedziem_signtool_i_jarsign_Code_Signing_w_chmurze.pdf). Keep valid third-party signatures. The package owner supplies the allowlisted file paths; signing is FR-02 work after issuance. Verify every signature with Authenticode policy, timestamp and expected publisher. Unsigned local builds are development evidence.
+- No configured signing certificate exists on the audited host. The route is decided; execution remains unavailable until issuance and SimplySign activation. The [candidate report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) records this distinction. A self-signed certificate does not close it.
+
+#### Qt Source Companion And Component Terms
+
+The audited Launcher uses Qt Core, Gui, Network, Widgets and Svg with their platform/style/image/TLS plugins. Preserve these modules and plugins. Qt's installed vendor SBOMs identify the following source archives; publish the matching sources as an optional companion download alongside the products. Normal users need not download or build Qt source. Recheck this closure if deployed modules change.
+
+| Module / exact source revision | Publisher archive / SHA-256 |
+| --- | --- |
+| qtbase `59c81a3c2247b821b9b84b4eb8d939b77e07e276` | [qtbase 6.11.1 ZIP](https://download.qt.io/archive/qt/6.11/6.11.1/submodules/qtbase-everywhere-src-6.11.1.zip), `3529cc37297a5a7aae4486843b9fd41c30df1d79a770f85e240b537dcc327ca5` |
+| qtsvg `2596f43da2dc72d2afecc084355b0f5f87922a6c` | [qtsvg 6.11.1 ZIP](https://download.qt.io/archive/qt/6.11/6.11.1/submodules/qtsvg-everywhere-src-6.11.1.zip), `767730188d4610a89bf8da502f87acf1c8881a3ac54f1e0eb167ab1e08b03a75` |
+
+Package the applicable `LICENSES/` texts, vendor/third-party notices and SBOMs, plus a prominent Qt notice and source-companion location. Allow replacement of the dynamically loaded Qt DLLs/plugins with compatible user builds and provide the build/install instructions necessary to run them; qualify this journey before consumer acceptance. Sparkle's MIT grant covers its first-party source. NVIDIA runtime restrictions apply to those NVIDIA components, not to users' LGPL rights over Qt. Keep NVIDIA notices/terms distinct and preserve signatures; do not describe the whole archive as MIT-only. The existing Streamline staging owner now carries its five runtime notice files beside the unchanged DLL set; this is not full package compliance proof.
+
+After issuance, the package owner invokes these commands for each allowlisted first-party PE (`$signTool` is the exact Windows SDK executable; `$certificateThumbprint` is the issued, verified certificate; `$stagedPe` is a manifest path):
+
+```powershell
+& $signTool sign /sha1 $certificateThumbprint /fd SHA256 /tr http://time.certum.pl/ /td SHA256 $stagedPe
+& $signTool verify /pa /all /v $stagedPe
+```
+
+`/sha1` selects the certificate by thumbprint; the file digest is SHA-256. A failed signing or verification command stops package publication. Record the issued subject/thumbprint, tool version, signed-byte hashes, timestamp and verification output before accepting signatures.
+
+### Threat And Failure Boundary
+
+Source/dependency acquisition, publisher content, cache bytes, staged files and signing credentials are distinct trust boundaries. Verify hashes and contained paths before publication; do not execute tools from user content, accept traversal/reparse escapes, stage unknown DLLs, or weaken a digest after failure. Missing content stops the requested map visibly; Empty must not masquerade as successful activation of that map. Keep logs local and preserve the approved offline/privacy/no-support promises.
+
+FR-02 implements transactional stage/verify/archive and package-relative discovery from these named inputs. FR-01 inspection or a successful local source build does not prove the consumer package, complete notices/SBOM, trusted signature or clean-machine journey.
+
+## Local Diagnostics And Release Review
+
+**Scope:** self-service onboarding, recovery, local diagnostics and release review
+
+**Owner:** release/product delivery; Launcher, Application, Core diagnostics, Docs, and project products provide owned parts of the route
+
+### Diagnostics: At A Glance
+
+Deliver self-service onboarding, diagnostics and recovery. **No user support service** is offered; [Release Scope](../../../Acceptance/FirstRelease.md#approval-and-next-work) owns that decision.
+
+Package and native-incident acceptance remain open.
+
+### Current Local Route
+
+**Source slice:** `ITER-PD4-01`, 2026-10-11; [Release progress](../../../Strategy/Roadmap.md#release-progress). Public instructions: [recovery/privacy](../../../../SUPPORT.md), [known issues](../../../../KNOWN_ISSUES.md), [security](../../../../SECURITY.md).
+
+BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,ReviewRelease}.ps1`. [Release Inputs](#release-inputs) defines shipped helper/policy membership; review remains a maintainer source-side task.
+
+| Responsibility | Current owner and boundary |
+| --- | --- |
+| Logs/retention | Core Logger rotates logs; Launcher owns operation logs. [Public retention/removal rules](../../../../SUPPORT.md#retention-and-replacement) apply. Keep private symbols with candidate evidence through release review. |
+| GPU faults | D3D12 resource service drains supported bounded DRED records into logs; Vulkan records device loss. No automatic recovery. |
+| Export | Local fixed projection of verified package identity and counts; preview digest binds consent. Originals stay local. [User command and privacy limits](../../../../SUPPORT.md#preview-and-export-local-diagnostics). |
+| Symbols | Shipping MSVC emits `/Zi`/full PDBs into the separate symbol root. DbgHelp checks PE/PDB GUID-age; embedded paths are excluded. Full candidate/shader correlation remains unqualified. |
+| Crash/hang | User-reported categories; automatic collection unavailable. Native incident rehearsal remains required. |
+| Review | Pawel Lisowski reviews each proposed release/replacement and closeout. Unresolved S0/S1 blocks approval. Results are local review records; publication and aggregate acceptance are separate. |
+
+Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply; interrupted replacement and public withdrawal remain unproved.
+
+Invoke `ReviewRelease.ps1` with `-PackageRoot`, `-ArchivePath`, `-ArchiveSha256`, `-LedgerPath`, `-Decision Approve|Replace|Withdraw` and an existing local `-OutputDirectory`. Replacement also needs `-ReplacementRoot`, `-ReplacementArchive`, `-ReplacementSha256`, `-ReplacementLedgerPath` and a state policy.
+
+Ledger: `ArchiveSha256` and `Defects` with `Id: ISSUE-<number>`, `Severity: S0..S3`, `Disposition: Unresolved|Resolved`. Resolved entries require `EvidencePath` to a bounded receipt with matching `ArchiveSha256`, `DefectId` and `Status: PASS`. Only its hash is exported.
+
+### Diagnostics: Capability Identity
+
+| ID | First-release boundary |
+| --- | --- |
+| `ADOPT-01` | Public identity, requirements, controls, first use, reset and exit for Launcher, Editor, Game and source adoption. |
+| `ADOPT-02` | Actionable local startup/content/backend failure and self-service recovery. |
+| `ADOPT-03` | Bounded, inspectable local diagnostics and candidate/symbol correlation; intake/upload service excluded. |
+| `ADOPT-04` | Finite maintainer release review and immutable replacement/withdrawal; ongoing response/maintenance service excluded. |
+
+### Diagnostics: Capability Boundary
+
+A non-author can reach the promised product result or understand its failure without private guidance. Core/RHI/Application own diagnostic production; release delivery owns public instructions, local-data privacy, candidate-to-symbol identity and release review. No reporting channel or automatic upload is implied.
+
+### Contract
+
+- Inputs: verified product/source identity, selected content, public prerequisites, exact configuration and local diagnostic records.
+- Outputs: successful first use or actionable failure, inspectable diagnostics, documented reset/removal and truthful known issues/no-support policy.
+- Local logs/captures/crash data are bounded and associated with the exact candidate. Explain sensitive paths/content before any voluntary sharing; retain originals locally.
+- Any voluntarily published correction has a new immutable identity, affected-gate revalidation and a documented user-state policy.
+
+### `FCR-PROD-06` Support And Incident Contract
+
+This stable family ID now covers adoption, local diagnostics and release review. Its former operating-service clocks and mandatory intake criteria are superseded by the release-owner amendment. [First Release](../../../Acceptance/FirstRelease.md#frozen-paths-mutation-boundary-and-budgets) owns paths/budgets and the no-support boundary.
+
+| ID | Binary acceptance criterion |
+| --- | --- |
+| `AC-ADOPT-01` | A non-author reaches onboarding for all three products and source adoption; identifies exact version, requirements, controls, reset/exit, known issues and the absence of a user support service without private guidance. |
+| `AC-ADOPT-02` | Startup, crash, hang/timeout and GPU/device failure produce bounded inspectable local diagnostics where supported. No automatic upload occurs; unavailable diagnostics are reported explicitly. |
+| `AC-ADOPT-03` | Native/shader symbols, local logs, consented dumps/captures and manifest/provenance correlate to the exact immutable candidate; mismatched/insufficient data is rejected with recovery. |
+| `AC-ADOPT-04` | Maintainer release review records known defect severity, affected candidate/version and disposition. Public documentation promises no intake service, response deadline, supported-version period or fix. Known `S0`/`S1` blocks approval/closeout. |
+| `AC-ADOPT-05` | Any replacement uses a new version; hash applicability, user-state preservation/reset, rollback/side-by-side and withdrawal are explicit and exercised on an isolated candidate copy. Published bytes never change under an existing identity. |
+
+| ID | Cause/injection and safe result |
+| --- | --- |
+| `FM-ADOPT-01` | Omit a prerequisite, break onboarding or insert an unsupported service promise. The journey blocks until accurate instructions/no-support boundaries are restored (`AC-ADOPT-01`, `AC-ADOPT-04`). |
+| `FM-ADOPT-02` | Add private paths/tokens, unrelated content, oversized logs or wrong candidate identity to a proposed diagnostic export. Preview/redaction/validation rejects it and leaves originals local (`AC-ADOPT-02`, `AC-ADOPT-03`). |
+| `FM-ADOPT-03` | Disable diagnostic collection or omit symbols. Report the unavailable item and manual recovery; empty output is never success (`AC-ADOPT-02`, `AC-ADOPT-03`). |
+| `FM-ADOPT-04` | Add a known `S0`/`S1` to a closeout fixture or an invented response deadline to release docs. Review blocks; preserve the record and correct/revalidate or withdraw affected bytes (`AC-ADOPT-04`). |
+| `FM-ADOPT-05` | Present a replacement for the wrong hash/version or interrupt it. Reject before mutation; preserve original bytes/user state and existing published versions (`AC-ADOPT-05`). |
+
+| Check | Coverage | Smallest route and oracle |
+| --- | --- | --- |
+| `CHK-ADOPT-01` | `AC-ADOPT-01`; `FM-ADOPT-01` | Non-author packaged-product and source journeys through success and a missing prerequisite. Private repair, dead onboarding or misleading support claims fail. |
+| `CHK-ADOPT-02` | `AC-ADOPT-02`, `AC-ADOPT-03`; `FM-ADOPT-02`, `FM-ADOPT-03` | Isolated local startup/crash/hang/GPU diagnostics, with private/mismatched/oversized/unavailable fixtures. Inspect identity, symbols, redaction, bounds and absence of network uploads. |
+| `CHK-ADOPT-03` | `AC-ADOPT-04`; `FM-ADOPT-04` | Review exact candidate known-defect ledger and public policy, then inject an unresolved critical defect and a false support promise. Both must block closeout; no live inbox submission is required. |
+| `CHK-ADOPT-04` | `AC-ADOPT-05`; `FM-ADOPT-05` | Apply/interrupt a versioned replacement on copies with representative user state; verify applicability, atomicity, state policy, rollback/withdrawal and unchanged public bytes. |
+
+Candidate results remain in `FCR-PROD-06`. No onboarding, local diagnostic, replacement or closeout check ran in this documentation amendment. Missing intake channels alone are no longer a blocker.

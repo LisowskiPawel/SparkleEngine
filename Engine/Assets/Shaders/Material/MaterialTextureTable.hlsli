@@ -49,6 +49,7 @@ namespace MaterialTextureTableSampling
 			const int wrapped = ((texel % period) + period) % period;
 			return wrapped < size ? wrapped : period - 1 - wrapped;
 		}
+
 		return ((texel % size) + size) % size;
 	}
 

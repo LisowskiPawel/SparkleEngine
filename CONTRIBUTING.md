@@ -42,6 +42,6 @@ The [CI workflow](.github/workflows/repository-checks.yml) checks whitespace and
 
 Contributions to Sparkle-owned code use [MIT](LICENSE.txt). You retain your copyright; no separate contributor agreement is required.
 
-For third-party code or assets, include the source URL, revision/hash and license notices. Follow [Release Inputs](Docs/Architecture/Modules/BuildAndPackaging/ReleaseInputs.md). Do not commit publisher downloads, generated builds, PDBs, credentials or personal diagnostics.
+For third-party code or assets, include the source URL, revision/hash and license notices. Follow [Release Inputs](Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#release-inputs). Do not commit publisher downloads, generated builds, PDBs, credentials or personal diagnostics.
 
 Review and test all submitted code, including generated code. Identify copied sources and generated portions that need explanation during review.

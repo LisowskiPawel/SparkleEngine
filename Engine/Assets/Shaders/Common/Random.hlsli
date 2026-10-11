@@ -113,6 +113,7 @@ namespace CommonRandom
 		{
 			return 1.0f;
 		}
+
 		const uint lower = CategoricalBoundary(index, count);
 		const uint bucketSize = index + 1u == count ? 0u - lower : CategoricalBoundary(index + 1u, count) - lower;
 		return (float)bucketSize * 0x1.0p-32f;

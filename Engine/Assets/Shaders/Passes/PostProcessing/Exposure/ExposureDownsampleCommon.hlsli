@@ -33,6 +33,7 @@ namespace ExposureDownsample
 				}
 			}
 		}
+
 		return moments;
 	}
 

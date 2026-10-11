@@ -16,6 +16,7 @@ namespace Exposure
 		{
 			return 0.0f.xx;
 		}
+
 		const float luminance = max(CommonColor::LuminanceRec709(CommonColor::ClampPositive(linearHdrColor)), MinimumMeteredLuminance);
 		return float2(log(luminance), 1.0f);
 	}
@@ -49,6 +50,7 @@ namespace Exposure
 		{
 			return targetExposure;
 		}
+
 		const float safePreviousExposure = previousExposure;
 		const float safeTargetExposure = max(targetExposure, 1.0e-20f);
 		const float adaptationSpeed = max(safeTargetExposure > safePreviousExposure ? adaptationSpeedUp : adaptationSpeedDown, 0.0f);

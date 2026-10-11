@@ -11,12 +11,14 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	{
 		return;
 	}
+
 	const GBufferData gBuffer = LoadGBuffer(pixelCoord);
 	if (IsSkyPixel(gBuffer.SceneDepth))
 	{
 		RayReconstructionGuides::Clear(pixelCoord);
 		return;
 	}
+
 	const float3 positionWorld = ReconstructGBufferWorldPosition(pixelCoord, gBuffer.SceneDepth, InvViewMTX, InvProjectionMTX);
 	const float3 cameraToSurface = positionWorld - Position;
 	const float viewDistance = length(cameraToSurface);

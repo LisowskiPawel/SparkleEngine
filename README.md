@@ -5,7 +5,7 @@ A Windows graphics learning project with **Sparkle Launcher, Sparkle Editor and 
 ## Start here
 
 - [Engine at a glance](Docs/Architecture/EngineAtAGlance.md): features and current limits.
-- [Release scope](Docs/Acceptance/ReleaseScope/README.md) and [evidence](Docs/Acceptance/FirstRelease.md): planned release and remaining blockers.
+- [Release scope](Docs/Acceptance/FirstRelease.md#approved-release-scope) and [evidence](Docs/Acceptance/FirstRelease.md): planned release and remaining blockers.
 - [Contributing](CONTRIBUTING.md): changes, review and verification.
 - [Using Sparkle](SUPPORT.md): controls, recovery and local diagnostics.
 - [Known issues](KNOWN_ISSUES.md) and [security](SECURITY.md).
@@ -27,6 +27,6 @@ This builds Launcher; use it to configure/build the engine, select content, cook
 
 ## License and third-party content
 
-Sparkle-owned code uses the [MIT license](LICENSE.txt), including commercial use. Libraries, SDKs and assets keep their own licenses. See [Qt license/source instructions](CMake/Notices/Qt/README.md) and [redistribution requirements](Docs/Architecture/Modules/BuildAndPackaging/ReleaseInputs.md), including unresolved asset rights in repository history.
+Sparkle-owned code uses the [MIT license](LICENSE.txt), including commercial use. Libraries, SDKs and assets keep their own licenses. See [Qt license/source instructions](CMake/Notices/Qt/README.md) and [redistribution requirements](Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#release-inputs), including unresolved asset rights in repository history.
 
 No user support service or guaranteed fix is offered. Issues and pull requests are voluntary collaboration.

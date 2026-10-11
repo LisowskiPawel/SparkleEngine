@@ -119,6 +119,7 @@ namespace RestirIndirectReservoir
 		{
 			return false;
 		}
+
 		const float newWeightSum = reservoir.WeightSum + target;
 		const bool selected = random * newWeightSum <= target;
 		reservoir.WeightSum = newWeightSum;
@@ -137,6 +138,7 @@ namespace RestirIndirectReservoir
 		{
 			return false;
 		}
+
 		const float candidateM = candidateReservoir.M;
 		const float acceptedM = min(candidateM, maxM);
 		reservoir.M += acceptedM;
@@ -144,12 +146,14 @@ namespace RestirIndirectReservoir
 		{
 			return false;
 		}
+
 		const RayTracingPathLighting::Result replay = EvaluateCandidate(surface, candidateReservoir.Selected, skyTexture, skySampler);
 		const float target = EvaluateTarget(replay);
 		if (target <= MinTarget)
 		{
 			return false;
 		}
+
 		const float sampleWeight = candidateReservoir.WeightSum * (acceptedM / candidateM) * target / max(candidateReservoir.Target, MinTarget);
 		const float newWeightSum = reservoir.WeightSum + sampleWeight;
 		const bool selected = random * newWeightSum <= sampleWeight;
@@ -170,6 +174,7 @@ namespace RestirIndirectReservoir
 		{
 			return reservoir;
 		}
+
 		uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x1D1EEC7u);
 		[unroll]
 		for (uint candidateIndex = 0u; candidateIndex < RestirReservoirCommon::InitialCandidateCount; ++candidateIndex)
