@@ -93,6 +93,7 @@ namespace Filesystem::Private
 		{
 			return std::nullopt;
 		}
+
 		for (const auto& entry : std::filesystem::directory_iterator(projectsRoot, ec))
 		{
 			if (ec)
@@ -137,6 +138,7 @@ namespace Filesystem
 			{
 				return {};
 			}
+
 			if (length < buffer.size())
 			{
 				buffer.resize(length);
@@ -196,6 +198,7 @@ namespace Filesystem
 		{
 			return Paths::Normalize(*workingRoot);
 		}
+
 		return std::nullopt;
 	}
 
@@ -240,6 +243,7 @@ namespace Filesystem
 		{
 			return Paths::Normalize(*workspaceProjectRoot);
 		}
+
 		return std::nullopt;
 	}
 

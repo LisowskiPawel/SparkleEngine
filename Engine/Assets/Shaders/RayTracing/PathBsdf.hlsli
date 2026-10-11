@@ -57,6 +57,7 @@ namespace PathBsdf
 		{
 			return 0.0f;
 		}
+
 		const float noX2 = noX * noX;
 		const float tanTheta2 = (1.0f - noX2) / noX2;
 		return 2.0f / (1.0f + sqrt(1.0f + alpha * alpha * tanTheta2));
@@ -89,6 +90,7 @@ namespace PathBsdf
 		{
 			return result;
 		}
+
 		const float3 halfVector = halfVectorUnnormalized * rsqrt(halfVectorLength2);
 		const float noH = dot(surface.NormalWorld, halfVector);
 		const float voH = dot(surface.ViewDirWorld, halfVector);
@@ -99,11 +101,13 @@ namespace PathBsdf
 
 		const float3 f0 = lerp(surface.DielectricF0.xxx, surface.BaseColor, surface.Metallic);
 		const float3 fresnel = BRDF::Fresnel::Schlick(voH, f0);
+
 		float3 diffuse = 0.0f.xxx;
 		if (evaluateDiffuse)
 		{
 			diffuse = (1.0f.xxx - fresnel) * (1.0f - surface.Metallic) * surface.BaseColor * INV_PI;
 		}
+
 		float3 specular = 0.0f.xxx;
 		float specularPdfW = 0.0f;
 		if (!masses.SpecularDelta && masses.Specular > 0.0f)
@@ -131,6 +135,7 @@ namespace PathBsdf
 		result.PdfW = masses.Diffuse * noL * INV_PI + masses.Specular * specularPdfW;
 		result.Cosine = ngL;
 		result.HasSupport = result.PdfW > 0.0f && any(result.Diffuse + result.Specular > 0.0f);
+
 		return result;
 	}
 
@@ -139,6 +144,7 @@ namespace PathBsdf
 		float3 tangentWorld;
 		float3 bitangentWorld;
 		CommonSampling::BuildOrthonormalBasis(surface.NormalWorld, tangentWorld, bitangentWorld);
+
 		const float alpha = surface.Roughness * surface.Roughness;
 		const float3 localView = float3(dot(surface.ViewDirWorld, tangentWorld), dot(surface.ViewDirWorld, bitangentWorld), dot(surface.ViewDirWorld, surface.NormalWorld));
 		const float3 stretchedView = normalize(float3(alpha * localView.xy, localView.z));
@@ -187,6 +193,7 @@ namespace PathBsdf
 				result.HasSupport = any(result.SpecularThroughput > 0.0f);
 				return result;
 			}
+
 			const float3 halfVector = SampleVisibleGGXHalfVector(surface, sample);
 			result.DirectionWorld = normalize(reflect(-surface.ViewDirWorld, halfVector));
 		}

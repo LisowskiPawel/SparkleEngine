@@ -4,15 +4,11 @@ Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected rel
 
 **Status:** implementation plan; phase order and prompts, not feature or release evidence
 
-**Snapshot:** 2026-09-08; portfolio projection **33/100**; all six `FCR-PROD-*` families are `Blocked`
-
 ## Work This Plan
 
-| What to do | Working route |
-| --- | --- |
-| First action | [PD-1 consumer shell](#pd-1--game-and-editor-product-shells) is the next product slice: first-run/menu/settings, required-content failure and Shipping console isolation. Reconcile the amended product boundary; the historical Game-only PD-0 freeze is superseded where it conflicts. |
-| Result to reach | A consumer can start, choose an example, change/reset settings and quit; retain the phase checks before moving to source adoption and packaging. |
-| Start / stop | Scope approval and applicable release prerequisites must close first. PD-0 contract evidence does not pass REL-00 or the product families. |
+[Current progress](../../../Acceptance/FirstRelease.md#current-progress) separates implemented work from missing acceptance checks. Do not use the phase order below as a claim that earlier source work is absent.
+
+**Next:** qualify [reviewed package inputs](../../Modules/BuildAndPackaging/ReleaseInputs.md#reviewed-package-inputs), then continue [PD-3](#pd-3--package-and-installation) to produce the exact archive. Complete missing PD-1/PD-2 checks in their existing owners; PD-4's native package checks wait for that archive. Admission blockers remain stops, not waivers.
 
 ## `PD-1` — Game And Editor Product Shells
 

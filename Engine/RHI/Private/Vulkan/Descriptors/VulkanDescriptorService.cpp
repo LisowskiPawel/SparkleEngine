@@ -163,6 +163,7 @@ RhiResourceViewHandle VulkanDescriptorService::CreateResourceView(const RhiResou
 		case ERhiResourceViewKind::BufferUnorderedAccess:
 			return CreateBufferDescriptorView(desc);
 	}
+
 	Diagnostics::Fatal(g_vulkanDescriptorServiceLogger, __FILE__, __LINE__, "Vulkan resource view uses an unknown view kind.");
 }
 
@@ -173,6 +174,7 @@ RhiResourceViewHandle VulkanDescriptorService::CreateTextureDescriptorView(const
 	{
 		return {};
 	}
+
 	const RhiGpuDescriptorHandle descriptorHandle = m_allocator.RegisterImageDescriptor(desc.Kind, imageView);
 	if (!descriptorHandle)
 	{
@@ -221,6 +223,7 @@ RhiResourceViewHandle VulkanDescriptorService::CreateBufferDescriptorView(const 
 	{
 		return {};
 	}
+
 	return AddResourceView(ResourceViewRecord{.Kind = desc.Kind, .Buffer = buffer, .DescriptorHandle = descriptorHandle});
 }
 
@@ -462,6 +465,7 @@ RhiResourceViewHandle VulkanDescriptorService::AddResourceView(ResourceViewRecor
 		DestroyResourceView(record);
 		return {};
 	}
+
 	m_resourceViewRecords.push_back(record);
 	return RhiResourceViewHandle::Make(static_cast<std::uint32_t>(m_resourceViewRecords.size() - 1u), 0u);
 }
@@ -474,6 +478,7 @@ VulkanDescriptorService::ResourceViewRecord* VulkanDescriptorService::FindResour
 	{
 		return nullptr;
 	}
+
 	ResourceViewRecord& record = m_resourceViewRecords[recordIndex];
 	return record.IsAllocated() && record.Generation == generation ? &record : nullptr;
 }
@@ -486,6 +491,7 @@ const VulkanDescriptorService::ResourceViewRecord* VulkanDescriptorService::Find
 	{
 		return nullptr;
 	}
+
 	const ResourceViewRecord& record = m_resourceViewRecords[recordIndex];
 	return record.IsAllocated() && record.Generation == generation ? &record : nullptr;
 }

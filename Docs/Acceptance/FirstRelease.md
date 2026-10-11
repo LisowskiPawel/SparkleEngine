@@ -6,27 +6,33 @@ Use this contract to decide whether exact release bytes may ship. Make product c
 
 **Release target:** SparkleEngine `v0.1.0`, Windows x64
 
-**Current readiness:** feature implementation/integration portfolio **40/100**; release acceptance **0/100**. All 49 tracked feature families remain Blocked, no passing candidate-bound feature report exists, and no release gate has passed. Deferred decals, color grading, chromatic aberration, basic vignette, and HDR10 output are mandatory **0/100** blockers. The newly admitted vignette does not automatically rescore the historical portfolio. See [Current Feature Readiness](CurrentReadiness.md).
+## Current Progress
+
+**Next release task: qualify the package inputs, then finish PD-3 and produce the archive.** You will run the clean-machine rehearsal once that archive is ready. Do not restart the implemented product work.
+
+Implementation and acceptance are separate: source and local checks exist, but no verified release archive or completed clean-machine rehearsal is recorded. Earlier results apply to their recorded revisions, not automatically to today's working tree.
+
+| Work | Already recorded | Still needed |
+| --- | --- | --- |
+| Scope / FR-00 | Your six product choices are approved. | Technical scope and rights closure. [Decisions](ReleaseScope/README.md#approval-and-next-work). |
+| Identity / FR-01 | Identity, dependency pins, notices and an earlier local Shipping/Empty baseline. | Remaining rights/input admission and qualification of the final source candidate. [Baseline receipts](ReleaseScope/Evidence.md#current-candidate-baseline-iter-rel-01-12). |
+| PD-1: Game / Editor | Product shells and separate post-processing passes; bounded builds and startup checks. | Full input, settings, content-failure and Editor journey checks. [Recorded work](ReleaseScope/Evidence.md#product-shells-and-post-processing-iter-pd1-01). |
+| PD-2: source / Launcher | Existing typed build/cook/run operations and owner-check entry points. | Independent source-adopter rehearsal and cold/warm/failure-route closure. PD-2 acceptance is not established. |
+| PD-3 / FR-02: package | Transactional staging, manifests, dependency checks and archive verification are implemented. | Reviewed inputs, installed Launcher content-store journey and the exact archive rehearsal. [Recorded work](ReleaseScope/Evidence.md#package-spine-iter-pd3-01). |
+| PD-4: diagnostics / closure | Local diagnostic export and immutable replacement/review tools; controlled fixture checks. | Native packaged crash/hang/GPU and self-service journeys; all six product reports remain blocked. [Recorded work](ReleaseScope/Evidence.md#local-diagnostics-and-release-review-iter-pd4-01). |
+| FR-03?08 | Feature, map, performance, adoption and publication plans exist. | Their candidate-bound checks and approval; these phases are not accepted. |
+
+**Do next:** use [Release Inputs](../Architecture/Modules/BuildAndPackaging/ReleaseInputs.md#reviewed-package-inputs) to qualify the exact rights, dependency/helper and symbol receipts. Continue the existing [PD-3 package owner](../Architecture/CrossModule/FirstRelease/ProductAndDelivery.md#pd-3--package-and-installation); retain failed admission results rather than bypassing them. Product and renderer defects uncovered by those checks go back to their existing owners.
 
 ## Current FR-01 Blockers
 
-**Latest repository decision:** [ITER-REL-01-09](ReleaseScope/Evidence.md#public-repository-restored-iter-rel-01-09) restores the original public repository and supersedes the private-history plan.
+- Historical public asset rights remain unresolved; acquisition recipes do not qualify old repository bytes.
+- Exact Qt/NVIDIA/helper/CRT redistribution and symbol admission remain open. [Input contract](../Architecture/Modules/BuildAndPackaging/ReleaseInputs.md).
+- The passing baseline at `fec29052c6f6195547f2062da9def86e520dc0df` is historical. Later source changes need their own applicable checks.
 
-**Latest baseline:** [ITER-REL-01-12](ReleaseScope/Evidence.md#current-candidate-baseline-iter-rel-01-12), candidate `fec29052c6f6195547f2062da9def86e520dc0df`, passes fresh local Shipping builds of all three products/cook helpers, owner checks, Empty cook/activation and cached replay. Historical asset rights and exact redistributable/helper admission remain blocked. Package discovery and clean-machine archive testing are FR-02 work.
+Certificate enrollment is deferred until before public release. It does not prevent unsigned internal package development. [Roadmap](../Strategy/Roadmap.md#where-we-are-and-what-is-next).
 
-**Earlier licensing work:** [ITER-REL-01-08](ReleaseScope/Evidence.md#feature-preserving-licensing-iter-rel-01-08), 2026-10-11, at `7cfceb32d10e487637ed482fbc80d6dcce5f88e2` plus the recorded patch. Earlier baseline evidence remains candidate-bound: Clean baseline candidate `263dfbf8ee509b883a78d43d09d47a50a48190b8`; source-export child `bbec6c12ae34a31f159961a12ad64079cb589ea1`. `REL-01` and ordered `REL-02` admission remain **BLOCKED**; the local baseline itself passes.
-
-| Item | Result / next action |
-| --- | --- |
-| Clean baseline | **PASS, current candidate `fec29052?`:** absent-cache configure; Shipping Game, Editor, Launcher and three cook-tool builds; owner checks; six-product Empty cook; Launcher/Game startup and normal exit; cached disconnected replay. Source stays clean and 147 product/helper hashes remain unchanged. [Exact commands and receipts](ReleaseScope/Evidence.md#current-candidate-baseline-iter-rel-01-12). Editor activation, rendered frames, seven maps, FPS and clean-machine package operation are not claimed. |
-| Immutable inputs / provenance | **PASS, audited baseline:** source revisions and SDK archive members are verified; Font Awesome font/license URLs and hashes are now pinned. Selected-model notices and four exact Poly Haven sky-source matches are retained. Expected zlib generated cache mutation is disclosed. Installed toolchain prerequisites remain host-specific. |
-| Sponza and source export | **PASS for acquisition recipe/export membership:** seven maps remain supported selections; initial selection is Empty. Classic Sponza uses a pinned, verified 72-file recipe; old bundled mesh/texture files are removed with local byte-verified backups. Reviewed source export excludes uncleared Sponza bytes/thumbnails and other unqualified development content. **Public repository preserved:** the owner superseded the private-history plan. [SparkleEngine](https://github.com/stoleckipawel/SparkleEngine) is public with its original history; historical asset rights remain unresolved. Export exclusions do not qualify raw history. |
-| Cornell Box | **Normal launch prerequisite fixed:** tracked licensed GLB and attribution retained, unnecessary OBJ download removed. Optional regeneration archive receipt is still unavailable; it does not block normal map sync. Cornell render/package proof belongs to later gates. |
-| Redistribution review | **Prepared:** NVIDIA staging copies the same eight runtime DLLs with five verified notice files; exact Qt source companions/vendor provenance are verified. Package notice/source publication, prominent Qt notice, compatible DLL replacement and NVIDIA distribution terms still require acceptance. Pinned dependencies, notice inventories and the [release input owner](../Architecture/Modules/BuildAndPackaging/ReleaseInputs.md) provide inputs; development deployment is not an accepted package. Keep `sl.dlss_d.dll` as the required Ray Reconstruction plugin. |
-| Signing | **Route decided:** Certum Standard Code Signing in the Cloud for individual Pawel Lisowski, SimplySign/Windows SDK SignTool, SHA-256/RFC 3161. **Deferred by owner:** enrollment/payment/identity verification is a final pre-release roadmap task before signed candidate freeze/adoption. Certificate absence does not block FR-01 or unsigned internal package development; final public bytes still require trusted signatures. |
-| Phase transition | **Remaining:** finish historical asset rights and admitted-component notice/terms review. The current-candidate local baseline now passes. Certificate scheduling is addressed. The original source repository stays public; historical asset rights still require review. Local build/cook/activation success does not authorize publication or accept FR-02. |
-
-**Latest receipts:** `build/validation/fr01-nonprofit-20261011/`; [ITER-REL-01-08](ReleaseScope/Evidence.md#feature-preserving-licensing-iter-rel-01-08). Earlier baseline receipts: `build/validation/fr01-closure-20261011/`, retaining their original candidate and unavailable checks. Earlier reports remain historical.
+Use this progress section for the current work list. [Evidence](ReleaseScope/Evidence.md) retains dated iterations and their limitations; older audits below are historical, not instructions to repeat completed fixes. Generated logs, snapshots and candidate reports live in ignored `artifacts/` or `build/` output, outside the maintained documentation.
 
 ## Read This Page
 
@@ -40,7 +46,7 @@ Use this contract to decide whether exact release bytes may ship. Make product c
 | --- | --- |
 | What is the intended product? | Sparkle Launcher, Sparkle Editor and Sparkle Game, with seven user-selected release maps, intentional Empty startup and user/display-selected resolution; Launcher is the expected user entry point. Game targets 30 FPS on the named laptop. No user support service is offered. |
 | What exists? | Broad engine, tooling, content, Renderer, and D3D12/Vulkan source paths plus focused development workflows. |
-| Where are we now? | Feature portfolio **40/100**, release acceptance **0/100**, `Blocked`; no frozen candidate has passed the clean build/cook/package, feature, map, backend, performance, stability, adoption, publication, and stabilization gates. |
+| Where are we now? | Product and packaging source work exists; archive and release acceptance remain open. See [current progress](#current-progress). |
 | What is the largest product gap? | There is no accepted manifest-owned release package or clean-machine consumer/source-adopter record. |
 | What is the reading rule? | Use [release gates](#release-gates) for the proof required to ship and the [dated audit](#current-release-audit) for recorded blockers. |
 

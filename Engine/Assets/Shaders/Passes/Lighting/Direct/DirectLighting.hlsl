@@ -90,6 +90,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	{
 		visibility = RayTracedShadowSignalPacking::UnpackShadowSignal(ShadowVisibilitySignal.Load(int3(dispatchThreadId.xy, 0))).Visibility;
 	}
+
 	const bool evaluateSubsurface = DirectLightingEvaluateSubsurface != 0u && HasSubsurface(gBuffer);
 	if (DirectLightReservoir::IsValid(reservoir))
 	{

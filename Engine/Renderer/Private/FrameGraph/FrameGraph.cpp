@@ -41,20 +41,22 @@ const FrameGraphPlan& FrameGraph::Compile()
 	PrepareTextureHistories(m_compiledPlan);
 	SyncImportedResourceAccesses();
 	BuildTransientMaterializationPlan(m_compiledPlan);
+
+	CompileFramePlan();
+
+	return m_compiledPlan;
+}
+
+void FrameGraph::CompileFramePlan()
+{
 	const RhiQueueCapabilities queueCapabilities = m_renderHardwareInterface != nullptr ? m_renderHardwareInterface->GetCapabilities().Queues : RhiQueueCapabilities{};
 	FrameGraphCompiler compiler(m_compiledPlan, m_resourceRegistry, m_resourceStateTracker, queueCapabilities);
+
 	compiler.CompileResourcePlan();
-	if (m_transientAllocator->Prepare(m_compiledPlan.transients))
-	{
-		// Barrier planning must use the initial states of replacement GPU resources.
-		for (const FrameGraphTransientResourcePlan& transient : m_compiledPlan.transients.resources)
-		{
-			m_resourceStateTracker.UpdateCurrentState(transient.handle, transient.physicalAllocation.initialState);
-		}
-	}
+	PrepareTransientAllocations(m_compiledPlan.transients);
 	compiler.CompileExecutionPlan();
+
 	m_submissionBatchTokens.resize(m_compiledPlan.submissionBatches.size());
-	return m_compiledPlan;
 }
 
 void FrameGraph::ExportTexture(FrameGraphTextureHandle handle, std::string_view name) noexcept
@@ -75,6 +77,7 @@ PixelFormat FrameGraph::GetTextureFormat(FrameGraphTextureHandle handle) const n
 	{
 		return PixelFormat::Unknown;
 	}
+
 	return m_resourceRegistry.GetMetadata(resourceHandle).textureDesc.format;
 }
 

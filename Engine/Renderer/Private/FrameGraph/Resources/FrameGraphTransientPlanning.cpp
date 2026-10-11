@@ -149,6 +149,20 @@ FrameGraphTransientResourcePlan FrameGraph::BuildTransientResourcePlan(
 	        .initialState = resourceMetadata.initialState}};
 }
 
+void FrameGraph::PrepareTransientAllocations(const FrameGraphTransientPlan& plan) noexcept
+{
+	if (!m_transientAllocator->Prepare(plan))
+	{
+		return;
+	}
+
+	// Barrier planning must use the initial states of replacement GPU resources.
+	for (const FrameGraphTransientResourcePlan& transient : plan.resources)
+	{
+		m_resourceStateTracker.UpdateCurrentState(transient.handle, transient.physicalAllocation.initialState);
+	}
+}
+
 void FrameGraph::EnsureTransientResourcesMaterialized(const FrameGraphPlan& plan) const noexcept
 {
 	assert(m_transientAllocator != nullptr);

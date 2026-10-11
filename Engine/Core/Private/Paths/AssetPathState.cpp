@@ -124,6 +124,7 @@ namespace Filesystem::Private
 		{
 			return;
 		}
+
 		if (required)
 		{
 			Diagnostics::Fatal(logger, __FILE__, __LINE__, "[MISSING]  " + paddedLabel + ": " + path.string());

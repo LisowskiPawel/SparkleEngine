@@ -27,6 +27,7 @@ void VulkanRenderCommandList::BindVertexBuffer(const RhiVertexBufferView& view) 
 	{
 		return;
 	}
+
 	constexpr VkDeviceSize offset = 0;
 	vkCmdBindVertexBuffers(m_commandBuffer, 0, 1, &buffer, &offset);
 }
@@ -43,6 +44,7 @@ void VulkanRenderCommandList::BindIndexBuffer(const RhiIndexBufferView& view) no
 	{
 		return;
 	}
+
 	vkCmdBindIndexBuffer(m_commandBuffer, buffer, 0, VulkanTypeConversions::ToVkIndexType(view.Format));
 }
 
@@ -99,6 +101,7 @@ void VulkanRenderCommandList::ClearRenderTarget(RhiCpuDescriptorHandle renderTar
 	{
 		return;
 	}
+
 	BeginDynamicRenderingIfNeeded();
 	if (!m_dynamicRenderingActive)
 	{
@@ -110,6 +113,7 @@ void VulkanRenderCommandList::ClearRenderTarget(RhiCpuDescriptorHandle renderTar
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan attachment clear requires descriptor metadata.");
 	}
+
 	const PixelFormat format = m_descriptorService->ResolveRecordingImageView(imageView).Format;
 	for (std::size_t component = 0; component < 4u; ++component)
 	{
@@ -122,6 +126,7 @@ void VulkanRenderCommandList::ClearRenderTarget(RhiCpuDescriptorHandle renderTar
 			clearValue.color.float32[component] = color[component];
 		}
 	}
+
 	const VkClearAttachment clearAttachment{.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, .colorAttachment = colorAttachment, .clearValue = clearValue};
 	const VkClearRect clearRect{.rect = m_scissorRect, .baseArrayLayer = 0, .layerCount = 1};
 	vkCmdClearAttachments(m_commandBuffer, 1, &clearAttachment, 1, &clearRect);
@@ -139,6 +144,7 @@ void VulkanRenderCommandList::ClearDepthStencil(RhiCpuDescriptorHandle depthSten
 	{
 		return;
 	}
+
 	VkClearValue clearValue = {};
 	clearValue.depthStencil.depth = depth;
 	clearValue.depthStencil.stencil = stencil;
@@ -198,6 +204,7 @@ void VulkanRenderCommandList::DrawIndexedInstanced(
 	{
 		return;
 	}
+
 	FlushGraphicsDescriptorSets();
 	vkCmdDrawIndexed(m_commandBuffer, indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
@@ -214,6 +221,7 @@ void VulkanRenderCommandList::DrawInstanced(std::uint32_t vertexCountPerInstance
 	{
 		return;
 	}
+
 	FlushGraphicsDescriptorSets();
 	vkCmdDraw(m_commandBuffer, vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
@@ -295,11 +303,13 @@ VkImageAspectFlags VulkanRenderCommandList::ResolveDepthStencilAspectMask(VkImag
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan depth-stencil aspect resolution requires an active descriptor manager.");
 	}
+
 	const VkImageAspectFlags aspectMask = m_descriptorService->ResolveRecordingImageView(imageView).AspectMask;
 	if (aspectMask == 0)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan depth-stencil view has no registered image aspect.");
 	}
+
 	return aspectMask;
 }
 

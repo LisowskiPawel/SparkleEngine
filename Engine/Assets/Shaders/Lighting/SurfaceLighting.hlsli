@@ -40,11 +40,13 @@ namespace SurfaceLighting
 		{
 			return result;
 		}
+
 		const float samplePdf = lightSample.PdfW * lightSample.LightSelectionPdf;
 		if (samplePdf <= 0.0f)
 		{
 			return result;
 		}
+
 		const float3 f0 = BuildF0(surface.BaseColor, surface.Metallic, surface.DielectricF0);
 		const BRDF::ShadingData shadingData = BRDF::ComputeShadingData(surface.NormalWorld, surface.ViewDirWorld, lightSample.DirectionWorld);
 		if (shadingData.NoL <= 0.0f || shadingData.NoV <= 0.0f)
@@ -68,6 +70,7 @@ namespace SurfaceLighting
 		result.Diffuse = response.Diffuse * incidentRadiance;
 		result.Specular = response.Specular * incidentRadiance;
 		result.Subsurface = response.Subsurface * incidentRadiance;
+
 		return result;
 	}
 }

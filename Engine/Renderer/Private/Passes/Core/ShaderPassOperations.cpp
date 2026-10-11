@@ -11,6 +11,7 @@ namespace ShaderPassOperations
 		{
 			bindingNames.push_back(bindingLayout.GetBindings()[index].Name);
 		}
+
 		return bindingNames;
 	}
 }

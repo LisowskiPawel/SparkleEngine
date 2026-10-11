@@ -256,6 +256,7 @@ void BuildRenderGpuRayTracingPayloads(const PreparedRenderScene& preparedScene, 
 	{
 		Diagnostics::Fatal(g_renderGpuRayTracingPayloadBuilderLogger, __FILE__, __LINE__, "Ray-tracing work produced no geometry payload.");
 	}
+
 	payloads.InstanceCount = static_cast<std::uint32_t>(payloads.Instances.size());
 	payloads.MaterialCount = static_cast<std::uint32_t>(payloads.Materials.size());
 }

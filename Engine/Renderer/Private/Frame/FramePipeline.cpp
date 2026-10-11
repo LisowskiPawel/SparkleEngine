@@ -145,6 +145,7 @@ void FramePipeline::OnRender(RenderFrameSubmission submission, const RenderFrame
 	{
 		return;
 	}
+
 	PrepareFrame(submission.View, time);
 	ExecuteFrame();
 	SubmitAndPresent(ui);
@@ -157,9 +158,11 @@ bool FramePipeline::BeginFrame(RenderFrameSubmission& submission) noexcept
 	{
 		return false;
 	}
+
 	ApplyPendingResize();
 	RefreshFrameResources();
 	BeginBackendFrame();
+
 	return true;
 }
 
@@ -193,6 +196,7 @@ bool FramePipeline::AcceptFrameSubmission(RenderFrameSubmission& submission) noe
 		m_textureCache->UnloadSceneTextures();
 		InvalidateViewHistory(RenderViewInvalidationReason::SceneGeneration);
 	}
+
 	return true;
 }
 
@@ -227,6 +231,7 @@ void FramePipeline::PrepareRenderingState(RenderFrame& frame)
 {
 	UpdateFrameHistory(*m_frameGraph, m_frameResources.History, frame.View);
 	m_restirLightingHistory.Update(*m_frameGraph, m_frameResources.History, frame, *m_imageProviders);
+
 	m_frameGraphExecutable = m_referencePathTracerSession->PrepareFrame(frame, m_viewportRenderRequest.RenderAction, m_viewportRenderRequest.RenderActionSequence);
 	if (m_frameGraphExecutable)
 	{

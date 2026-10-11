@@ -10,6 +10,8 @@ This page defines the first release: three products, seven selectable maps, user
 
 **Authority:** this page owns product choices; [Capability Dispositions](CapabilityDispositions.md) owns individual feature classifications; [First Release Acceptance](../FirstRelease.md#release-gates) owns the proof required to ship.
 
+For completed work and the next task, open [current progress](../FirstRelease.md#current-progress). This page records choices, not the implementation work list.
+
 ## Decision Summary
 
 **Already decided by you:**

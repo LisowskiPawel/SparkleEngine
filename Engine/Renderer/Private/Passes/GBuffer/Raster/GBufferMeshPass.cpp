@@ -91,6 +91,7 @@ bool GBufferMeshPass::HasValidSkinning(const PreparedRenderScene& preparedScene,
 		{
 			return false;
 		}
+
 		const MeshDraw& draw = preparedScene.primitives[drawIndex].Draw;
 		if (draw.Geometry.MeshKind != RenderMeshKind::Skeletal || draw.Skinning.JointMatrixOffset == kInvalidMeshInstanceJointMatrixOffset)
 		{
@@ -171,6 +172,7 @@ void GBufferMeshPass::MaterializePipelines(const RenderPassRuntimeCache& runtime
 	{
 		return;
 	}
+
 	for (const MeshInstanceBatch& batch : view.meshInstanceBatches)
 	{
 		if (batch.materialClassification != RenderMaterialClassification::Opaque && batch.materialClassification != RenderMaterialClassification::AlphaTested)

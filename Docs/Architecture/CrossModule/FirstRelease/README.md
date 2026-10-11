@@ -2,16 +2,9 @@
 
 **Status:** release implementation orchestrator; ordered work, not implementation evidence or release approval
 
-**Historical basis:** 2026-09-08 release phase structure at `ffe60e3a`; current readiness/results come from the owners linked below. Planning responsibilities reconciled at `acf530742fc0f2a9e6cdcd9d27e1f88d9abccfff`; no new executable evidence.
+Start with [current progress](../../../Acceptance/FirstRelease.md#current-progress) for delivered work and missing checks. [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) selects the next task; this page supplies its execution prompt.
 
-Use this page to execute the release task selected in [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next). Each stage below says what it delivers, what blocks it and which prompt to use.
-
-**Acceptance authority:** [First Release Acceptance](../../../Acceptance/FirstRelease.md), [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md), and feature-local Architecture `AC-*`/`FM-*`/`CHK-*`
-
-**Current state:** [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md)
-
-> [!IMPORTANT]
-> Start with [Roadmap current/next](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) to select work. This plan details **how to execute the selected release phase and when to stop**. It never changes a readiness score or acceptance verdict. A phase exits only through its named evidence; a release gate passes only in its acceptance owner.
+[First Release Acceptance](../../../Acceptance/FirstRelease.md#release-gates) owns release verdicts. Feature-local Architecture checks and [candidate reports](../../../Acceptance/FeatureCompletionReports.md) own feature proof.
 
 ## Read This Page
 

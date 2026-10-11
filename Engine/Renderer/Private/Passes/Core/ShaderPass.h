@@ -89,6 +89,7 @@ template <typename TParameterBindings> bool SetupShaderParameters(PassResourceBu
 	{
 		return false;
 	}
+
 	return DeclareShaderPassParameterUsages(builder, parameterSet, passName);
 }
 

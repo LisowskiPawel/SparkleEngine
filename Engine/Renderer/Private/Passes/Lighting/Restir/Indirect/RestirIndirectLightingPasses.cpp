@@ -17,10 +17,12 @@ void AddRestirIndirectLightingPasses(FrameGraphBuilder& builder, const RenderFra
 	CreateIndirectLightingResources(builder, sceneExtent, resources);
 	CreateRayReconstructionGuideRenderTargets(builder, sceneExtent, resources);
 	AddRayReconstructionSurfaceGuidesPass(builder, frame, sceneExtent, resources);
+
 	if (!IsIndirectLightingAdmitted())
 	{
 		return;
 	}
+
 	CreateRestirIndirectHistoryResources(builder, sceneExtent, resources);
 	const RestirIndirectWorkingReservoirs workingReservoirs = AddRestirIndirectReservoirPasses(builder, sceneExtent, resources);
 

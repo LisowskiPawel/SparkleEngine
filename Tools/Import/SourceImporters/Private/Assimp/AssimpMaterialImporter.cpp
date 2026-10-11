@@ -88,6 +88,7 @@ static std::optional<std::string> ReadTextureReference(const aiMaterial& materia
 	{
 		throw Diagnostics::Error(std::format("Assimp material {} has an empty {} texture path.", materialIndex, slotName));
 	}
+
 	return authoredPath;
 }
 
@@ -219,12 +220,15 @@ static std::optional<std::filesystem::path> ResolvePreferredTexturePath(
 		{
 			throw Diagnostics::Error(std::format("Assimp material {} assigns conflicting {} and {} textures.", materialIndex, preferredSlotName, alternateSlotName));
 		}
+
 		return preferredPath;
 	}
+
 	if (hasPreferred)
 	{
 		return ResolveTexturePath(material, materialIndex, textureContext, preferredType, preferredSlotName);
 	}
+
 	return hasAlternate ? ResolveTexturePath(material, materialIndex, textureContext, alternateType, alternateSlotName) : std::nullopt;
 }
 

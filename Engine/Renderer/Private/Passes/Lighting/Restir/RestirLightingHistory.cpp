@@ -32,6 +32,7 @@ void RestirLightingHistory::Update(FrameGraph& frameGraph, const FrameHistoryRes
 	{
 		m_invalidationHash.reset();
 	}
+
 	if (!IsDirectLightingAdmitted() && !IsIndirectLightingAdmitted())
 	{
 		return;

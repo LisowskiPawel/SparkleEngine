@@ -24,6 +24,7 @@ void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, Re
 	const std::size_t pointLightCount = preparedScene.pointLights.size();
 	const std::size_t spotLightCount = preparedScene.spotLights.size();
 	const std::size_t rectLightCount = preparedScene.rectLights.size();
+
 	ValidateLightCount("directional", directionalLightCount, 2u);
 	ValidateLightCount("point", pointLightCount, 1024u);
 	ValidateLightCount("spot", spotLightCount, 1024u);

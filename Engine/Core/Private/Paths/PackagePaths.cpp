@@ -41,6 +41,7 @@ namespace Filesystem::Private
 		{
 			return std::nullopt;
 		}
+
 		const std::filesystem::path manifestPath = packageRoot / "manifests" / "sparkle-package-manifest.json";
 		std::error_code errorCode;
 		const auto size = std::filesystem::file_size(manifestPath, errorCode);
@@ -48,6 +49,7 @@ namespace Filesystem::Private
 		{
 			return std::nullopt;
 		}
+
 		std::string document;
 		std::string failure;
 		std::string relative;
@@ -57,6 +59,7 @@ namespace Filesystem::Private
 		{
 			return std::nullopt;
 		}
+
 		const std::filesystem::path path = Strings::ToWide(std::string_view(relative));
 		for (const auto& part : path)
 		{
@@ -82,12 +85,14 @@ namespace Filesystem::Private
 		{
 			return std::nullopt;
 		}
+
 		const std::filesystem::path result = Paths::Normalize(packageRoot / *relative);
 		std::error_code errorCode;
 		if (!Paths::IsUnderRoot(result, packageRoot) || !std::filesystem::is_directory(result, errorCode) || errorCode)
 		{
 			return std::nullopt;
 		}
+
 		return result;
 	}
 
@@ -108,11 +113,13 @@ namespace Filesystem::Private
 		{
 			return std::nullopt;
 		}
+
 		const std::filesystem::path userStateRoot = ResolveSparkleUserStateRoot();
 		if (HasReparsePath(userStateRoot, *relative))
 		{
 			return std::nullopt;
 		}
+
 		const std::filesystem::path result = Paths::Normalize(userStateRoot / *relative);
 		return Paths::IsUnderRoot(result, userStateRoot) ? std::optional(result) : std::nullopt;
 	}

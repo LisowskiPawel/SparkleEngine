@@ -280,7 +280,11 @@ private:
 
 	RhiGpuDescriptorHandle ResolveShaderResourceView(FrameGraphResourceHandle handle) const noexcept;
 	RhiResourceHandle ResolveResource(FrameGraphResourceHandle handle) const noexcept;
+
 	void SyncImportedResourceAccesses() const noexcept;
+	void CompileFramePlan();
+
+	void PrepareTransientAllocations(const FrameGraphTransientPlan& plan) noexcept;
 	void BuildTransientMaterializationPlan(FrameGraphPlan& plan) const noexcept;
 	FrameGraphTransientResourcePlan BuildTransientResourcePlan(
 	    const VirtualTransientResource& transientResource,

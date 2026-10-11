@@ -215,6 +215,7 @@ private:
 			{
 				throw Diagnostics::Error("Ray-tracing shader-table region arithmetic overflowed before graph dispatch.");
 			}
+
 			return region.OffsetInBytes + region.SizeInBytes;
 		};
 
@@ -249,7 +250,9 @@ private:
 			    {
 				    ReportInvalidShaderPassParameterSet(diagnosticLabel.c_str(), passParameters.GetPassParameterSet());
 			    }
+
 			    ValidateShaderParameters(passParameters.GetPassParameterSet(), diagnosticLabel.c_str());
+
 			    BindRayTracingShaderPass(context.Commands, context.Resources, runtime.BindingLayout, runtime.Pipeline, passParameters.GetPassParameterSet());
 			    context.Commands.TraceRays(
 			        TraceRaysDesc{

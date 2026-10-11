@@ -16,8 +16,10 @@ void AddRayReconstructionSurfaceGuidesPass(FrameGraphBuilder& builder, const Ren
 	{
 		return;
 	}
+
 	const auto& gbuffer = resources.Transient.GBuffer;
 	const auto& guides = resources.Transient.Lighting.ReconstructionGuides;
+
 	auto& parameters = builder.AllocParameters<RayReconstructionSurfaceGuidesCS>();
 	parameters->GBufferBaseColor = builder.CreateSRV(gbuffer.BaseColor);
 	parameters->GBufferWorldNormal = builder.CreateSRV(gbuffer.WorldNormal);
@@ -28,5 +30,6 @@ void AddRayReconstructionSurfaceGuidesPass(FrameGraphBuilder& builder, const Ren
 	parameters->RayReconstructionRoughness = builder.CreateUAV(guides.Roughness);
 	parameters->RayReconstructionSpecularHitDistance = builder.CreateUAV(guides.SpecularHitDistance);
 	BindSceneShaderParameters(builder, frame, parameters, resources);
+
 	builder.Dispatch<RayReconstructionSurfaceGuidesCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u});
 }
