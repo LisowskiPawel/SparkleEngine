@@ -152,7 +152,7 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 
 **Phase exit criteria:** `REL-08` and `REL-09` pass; any fix creates a new candidate and invalidates affected evidence.
 
-**Pre-release prerequisite:** obtain the deferred Windows publisher certificate, sign/timestamp and verify the final bytes before freezing this candidate. Enrollment is scheduled here by the release owner (2026-10-11), not as an FR-01 prerequisite. Unsigned development archives may exercise FR-02 packaging; they cannot satisfy this signed consumer/adoption gate. See the [roadmap task](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next).
+**Candidate:** independent adoption may use the unsigned internal archive. Windows signing is deferred to FR-07; changed bytes require renewed identity and affected checks before publication.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -174,6 +174,8 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 **Failure modes:** tag/archive mismatch; wrong hashes; missing notices; unavailable download; public docs describe excluded behavior; public instructions invent a support service or omit self-service recovery.
 
 **Phase exit criteria:** `REL-10` passes against downloaded artifacts, not local staging outputs.
+
+**Final publication prerequisites:** obtain the Windows publisher certificate, sign/timestamp the admitted PE files, regenerate manifests and archive hashes, and verify the signed bundle. Resolve public redistribution obligations here. Repeat affected integrity, trust and consumer checks against the final bytes before uploading; unsigned internal adoption is not signed-release proof.
 
 <details>
 <summary>Copy implementation prompt</summary>

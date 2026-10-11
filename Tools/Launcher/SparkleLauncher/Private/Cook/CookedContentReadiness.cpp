@@ -4,6 +4,7 @@
 #include "Core/Public/FileSystemUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Json/JsonReader.h"
+#include "Core/Public/Paths/PackagePaths.h"
 #include "Core/Public/Paths/WorkspaceOutputPaths.h"
 #include "Core/Public/Paths/ProductPaths.h"
 
@@ -79,13 +80,38 @@ namespace SparkleLauncher
 		    && Hash::Fnv1a64(mapBytes.data(), mapBytes.size()) == expectedMapHash && Hash::Fnv1a64(libraryBytes.data(), libraryBytes.size()) == expectedLibraryHash;
 	}
 
-	static CookedShaderPublicationState InspectCookedShaderPublication(const std::filesystem::path& cookedShaderDirectory)
+	static bool ShaderPublicationMatchesPackageSeed(const std::filesystem::path& packageRoot, const std::filesystem::path& cookedShaderDirectory)
+	{
+		const auto engine = Filesystem::DiscoverPackageEngineRoot(packageRoot);
+		std::string document;
+		if (!engine || !Filesystem::TryReadPackageManifest(packageRoot, document))
+		{
+			return false;
+		}
+		for (const auto& path :
+		    {Filesystem::BuildGlobalShaderMapPath(cookedShaderDirectory),
+		        Filesystem::BuildCookedShaderLibraryPath(cookedShaderDirectory),
+		        Filesystem::BuildShaderDependencyManifestPath(cookedShaderDirectory)})
+		{
+			const auto relative = (*engine / "Cooked/Shaders" / path.filename()).lexically_relative(packageRoot).generic_string();
+			const auto seed = Filesystem::ResolvePackageFilePath(packageRoot, relative, document);
+			Hash::Sha256Digest seedHash;
+			Hash::Sha256Digest cookedHash;
+			std::string error;
+			if (!seed || !Hash::TrySha256File(*seed, seedHash, error) || !Hash::TrySha256File(path, cookedHash, error) || seedHash != cookedHash)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	static CookedShaderPublicationState InspectCookedShaderPublication(const std::filesystem::path& repositoryRoot, const std::filesystem::path& cookedShaderDirectory)
 	{
 		const std::array requiredArtifacts = {
 		    Filesystem::BuildGlobalShaderMapPath(cookedShaderDirectory),
 		    Filesystem::BuildCookedShaderLibraryPath(cookedShaderDirectory),
-		    Filesystem::BuildShaderDependencyManifestPath(cookedShaderDirectory),
-		    Filesystem::BuildShaderRecookSignalPath(cookedShaderDirectory)};
+		    Filesystem::BuildShaderDependencyManifestPath(cookedShaderDirectory)};
 
 		for (const std::filesystem::path& artifactPath : requiredArtifacts)
 		{
@@ -95,7 +121,16 @@ namespace SparkleLauncher
 				return CookedShaderPublicationState::Missing;
 			}
 		}
-		if (!ShaderPublicationMatchesSignal(cookedShaderDirectory))
+		std::error_code errorCode;
+		if (!std::filesystem::exists(Filesystem::BuildShaderRecookSignalPath(cookedShaderDirectory), errorCode))
+		{
+			if (errorCode || Filesystem::IsSourceWorkspace(repositoryRoot))
+			{
+				return CookedShaderPublicationState::Missing;
+			}
+			return ShaderPublicationMatchesPackageSeed(repositoryRoot, cookedShaderDirectory) ? CookedShaderPublicationState::Ready : CookedShaderPublicationState::Invalid;
+		}
+		if (errorCode || !ShaderPublicationMatchesSignal(cookedShaderDirectory))
 		{
 			return CookedShaderPublicationState::Invalid;
 		}
@@ -111,6 +146,6 @@ namespace SparkleLauncher
 		return CookedContentReadiness{
 		    .MeshesReady = CookedAssetScopeHasFiles(cooked, shared, "Meshes"),
 		    .TexturesReady = CookedAssetScopeHasFiles(cooked, shared, "Textures"),
-		    .Shaders = cooked.empty() ? CookedShaderPublicationState::Missing : InspectCookedShaderPublication(cooked / "Shaders")};
+		    .Shaders = cooked.empty() ? CookedShaderPublicationState::Missing : InspectCookedShaderPublication(repositoryRoot, cooked / "Shaders")};
 	}
 }

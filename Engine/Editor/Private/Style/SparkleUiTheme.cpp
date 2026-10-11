@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Strings/StringUtils.h"
 #include "Style/SparkleUiPalette.h"
 #include "Style/SparkleUiTheme.h"
 
@@ -63,7 +64,7 @@ namespace SparkleUiTheme
 		iconConfig.GlyphMinAdvanceX = baseSizePixels;
 
 		const float iconSize = baseSizePixels * 0.86f;
-		const std::string fontPathString = fontPath.string();
+		const std::string fontPathString = Strings::ToNarrow(fontPath.wstring());
 		io.Fonts->AddFontFromFileTTF(fontPathString.c_str(), iconSize, &iconConfig, kFontAwesomeRanges);
 	}
 

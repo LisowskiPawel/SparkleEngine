@@ -181,7 +181,7 @@ try
 
     if ([string]::IsNullOrWhiteSpace($InputsPath) -or !(Test-Path -LiteralPath $InputsPath -PathType Leaf))
     {
-        throw 'Missing reviewed release inputs. Rights, exact helper/DLL closure and symbol correlation must be admitted before build/cook/stage. See Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs.'
+        throw 'Missing reviewed release inputs. Exact helper/DLL closure and symbol correlation must be admitted before internal build/cook/stage. See Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs.'
     }
     $inputSnapshot = Join-Path $transactionRoot 'release-inputs.json'
     [IO.File]::Copy([IO.Path]::GetFullPath($InputsPath), $inputSnapshot, $false)
@@ -195,7 +195,7 @@ try
     $products = @(Get-PackageProducts $BuildDirectory $version)
     $manifest = New-PackageManifest $repositoryRoot $version $report.Revision $report.SourceInputsSha256 $products $inputs
     $report.PayloadSha256 = Get-ReleaseSourceHash ($manifest | ConvertTo-Json -Depth 20 -Compress)
-    foreach ($name in @('Rights','DependencyClosure','SymbolCorrelation'))
+    foreach ($name in @('DependencyClosure','SymbolCorrelation'))
     {
         $admission = $inputs.Admissions.$name
         $receiptPath = Assert-PackageFile $repositoryRoot $admission.Report $admission.Size $admission.Sha256

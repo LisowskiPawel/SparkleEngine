@@ -273,8 +273,7 @@ private:
 		preferences.featuresToLoad = features;
 		preferences.numFeaturesToLoad = static_cast<std::uint32_t>(std::size(features));
 
-		preferences.flags = sl::PreferenceFlags::eDisableCLStateTracking | sl::PreferenceFlags::eUseManualHooking | sl::PreferenceFlags::eUseFrameBasedResourceTagging | sl::PreferenceFlags::eAllowOTA
-		    | sl::PreferenceFlags::eLoadDownloadedPlugins;
+		preferences.flags = sl::PreferenceFlags::eDisableCLStateTracking | sl::PreferenceFlags::eUseManualHooking | sl::PreferenceFlags::eUseFrameBasedResourceTagging;
 
 		preferences.engine = sl::EngineType::eCustom;
 		preferences.engineVersion = "SparkleEngine-Development";

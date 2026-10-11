@@ -10,11 +10,13 @@ Stages: [PD-1](#pd-1--game-and-editor-product-shells) / [PD-2](#pd-2--source-bui
 
 Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected release content, a reproducible source build and self-service recovery.
 
+**Delivery boundary:** PD-1 through PD-4 qualify an unsigned internal archive. Windows publisher signing and unresolved public redistribution obligations belong to [FR-07, immediately before publication](ImplementationPlan.md#fr-07--publish-and-verify). They do not block this implementation plan or count as resolved by it. Payload hashes, vendor signatures, notices and dependency checks remain required.
+
 ## Product Work
 
 [Current progress](../../../Strategy/Roadmap.md#release-progress) separates implemented work from missing acceptance checks. Do not use the phase order below as a claim that earlier source work is absent.
 
-**Next:** qualify [reviewed package inputs](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then continue [PD-3](#pd-3--package-and-installation) to produce the exact archive. Complete missing PD-1/PD-2 checks in their existing owners; PD-4's native package checks wait for that archive. Admission blockers remain stops, not waivers.
+**Next:** finish dependency and symbol [input checks](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then produce the PD-3 archive. Test minimum-machine operation against that archive; the user will run the clean-machine rehearsal. Complete missing PD-1/PD-2 checks in their existing owners, then exercise PD-4 against the same archive.
 
 ## `PD-1` — Game And Editor Product Shells
 
@@ -86,7 +88,7 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 - select one existing build/delivery owner for build → cook → stage → verify → package; do not put packaging policy in renderer or application code;
 - add explicit install/stage membership, component/allowlist policy, package-relative discovery, per-user writable state, manifests, notices/SBOM, provenance, hashes, and symbols handling;
 - preserve the local binary layout in archives; verify precompiled import into those locations and local compilation replacing the same products;
-- make staging fresh and transactional; reject stale, missing, extra, absolute, unlicensed, or incompatible products;
+- make staging fresh and transactional; reject stale, missing, extra, absolute, notice-incomplete, or incompatible products;
 - create the archive from an immutable verified stage, then verify archive contents against `manifests/sparkle-package-manifest.json`;
 - freeze exact Launcher/Editor/Game release configurations, executable names, helper closure and content-store/workspace paths; prove extract/start/selective-sync/offline-run/remove with no source checkout, undeclared toolchain, admin rights, environment override or author cache. CMake's [install rules](https://cmake.org/cmake/help/latest/command/install.html) are a mechanics reference, not an instruction to expose internal targets.
 
