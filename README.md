@@ -26,6 +26,6 @@ Use Launcher to build, select content, cook and start Editor or Game. Initial co
 
 ## License and third-party content
 
-Sparkle-owned code is under the [MIT license](LICENSE.txt), including permission for commercial use. The project's educational purpose adds no noncommercial restriction. Dependencies, SDK binaries, fonts and sample assets retain their own licenses; the root license does not relicense them. See [release inputs and redistribution obligations](Docs/Architecture/Modules/BuildAndPackaging/ReleaseInputs.md). Public Git history and source archives are distinct distribution surfaces; archive exclusions do not remove historical files.
+Sparkle-owned code is under the [MIT license](LICENSE.txt), including permission for commercial use. The project's educational purpose adds no noncommercial restriction. Launcher uses dynamically linked Qt; its [license and source instructions](CMake/Notices/Qt/README.md) describe library replacement and corresponding source. Dependencies, SDK binaries, fonts and sample assets retain their own licenses; the root license does not relicense them. See [release inputs and redistribution obligations](Docs/Architecture/Modules/BuildAndPackaging/ReleaseInputs.md). Public Git history and source archives are distinct distribution surfaces; archive exclusions do not remove historical files.
 
 The project offers no user support service, response deadline or guaranteed fix. Public issues and pull requests are voluntary collaboration, not a support contract. Share only diagnostics you have reviewed for private data.

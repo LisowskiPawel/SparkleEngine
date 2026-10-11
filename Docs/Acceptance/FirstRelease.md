@@ -12,7 +12,9 @@ Use this contract to decide whether exact release bytes may ship. Make product c
 
 **Latest repository decision:** [ITER-REL-01-09](ReleaseScope/Evidence.md#public-repository-restored-iter-rel-01-09) restores the original public repository and supersedes the private-history plan.
 
-**Latest licensing work:** [ITER-REL-01-08](ReleaseScope/Evidence.md#feature-preserving-licensing-iter-rel-01-08), 2026-10-11, at `7cfceb32d10e487637ed482fbc80d6dcce5f88e2` plus the recorded patch. Earlier baseline evidence remains candidate-bound: Clean baseline candidate `263dfbf8ee509b883a78d43d09d47a50a48190b8`; source-export child `bbec6c12ae34a31f159961a12ad64079cb589ea1`. `REL-01` and ordered `REL-02` admission remain **BLOCKED**; the local baseline itself passes.
+**Latest readiness review:** [ITER-REL-03-03](ReleaseScope/Evidence.md#fr-02-readiness-review-iter-rel-03-03) verifies Qt/NVIDIA notice deployment and distinguishes admission from package acceptance. Full FR-02 admission remains blocked.
+
+**Earlier licensing work:** [ITER-REL-01-08](ReleaseScope/Evidence.md#feature-preserving-licensing-iter-rel-01-08), 2026-10-11, at `7cfceb32d10e487637ed482fbc80d6dcce5f88e2` plus the recorded patch. Earlier baseline evidence remains candidate-bound: Clean baseline candidate `263dfbf8ee509b883a78d43d09d47a50a48190b8`; source-export child `bbec6c12ae34a31f159961a12ad64079cb589ea1`. `REL-01` and ordered `REL-02` admission remain **BLOCKED**; the local baseline itself passes.
 
 | Item | Result / next action |
 | --- | --- |

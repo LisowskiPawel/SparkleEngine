@@ -341,6 +341,31 @@ if(WIN32)
             "${SPARKLE_WINDEPLOYQT_EXECUTABLE}")
     endif()
 
+    set(_sparkle_qt_notice_files
+        "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/README.md"
+        "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/LGPL-3.0-only.txt"
+        "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/GPL-3.0-only.txt")
+    foreach(_notice IN LISTS _sparkle_qt_notice_files)
+        if(NOT EXISTS "${_notice}")
+            message(FATAL_ERROR "Qt deployment notice is missing: '${_notice}'")
+        endif()
+    endforeach()
+    file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/QtRuntimeVersion.txt"
+        CONTENT "${Qt6_VERSION}\n")
+
+    add_custom_target(SparkleLauncherQtNotices
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt"
+            "$<TARGET_FILE_DIR:SparkleLauncher>/Notices/Qt"
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${CMAKE_CURRENT_BINARY_DIR}/QtRuntimeVersion.txt"
+            "$<TARGET_FILE_DIR:SparkleLauncher>/Notices/Qt/QtRuntimeVersion.txt"
+        DEPENDS ${_sparkle_qt_notice_files} "${CMAKE_CURRENT_BINARY_DIR}/QtRuntimeVersion.txt"
+        COMMENT "Deploying Qt notices"
+        VERBATIM
+    )
+    add_dependencies(SparkleLauncher SparkleLauncherQtNotices)
+
     add_custom_command(TARGET SparkleLauncher POST_BUILD
         COMMAND ${_sparkle_qt_deploy_command}
             --verbose 0

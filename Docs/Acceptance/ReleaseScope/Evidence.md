@@ -10,6 +10,48 @@
 
 These records prove only the inspection or document checks they name. Current product choices and next actions belong in [Release Scope](README.md#approval-and-next-work); this page does not grant redistribution permission or build/runtime acceptance.
 
+## FR-02 Readiness Review: ITER-REL-03-03
+
+**Control:** 2026-10-11; candidate `611974ecaadeb8be8502037f26ceaa73c3c752e2` plus retained FR-02 notice/prompt changes. Owner BuildAndPackaging / Acceptance; FR-02 / REL-03; `NS-OWNERSHIP`, `NS-ADOPTION`, `NS-EVIDENCE`; preserve graphics targets. Scope: source/license identity, deployment and admission review. Risk: wrong-version source instructions or stale deployed notices; detect with byte/version checks and dedicated deployment targets.
+
+| Review | Result |
+| --- | --- |
+| Source and terms | **PASS, notice identity:** retained Qt Base source hash matches the prior receipt; both tracked LGPL/GPL texts match archive entries byte-for-byte. Instructions distinguish audited 6.11.1 source from other supported development versions and retain Qt replacement rights. NVIDIA restrictions remain component-specific. No complete package rights verdict follows. |
+| Deployment | **PASS:** focused Launcher DevelopmentEditor build, root configure, `ShowcaseGameNvidiaNotices` in ShippingGame and `SparkleLauncherQtNotices` all exit `0`. All source/deployed notices match; `QtRuntimeVersion.txt` records `6.11.1`. Dedicated dependency targets refresh notices even without C++ changes. `build/validation/fr02-20261011/triple-review.json` retains hashes. No Game build was required for notice deployment. |
+| Admission versus phase work | **BLOCKED for full admission:** historical asset rights, exact redistributable/helper closure and current-candidate baseline admission remain open. Package manifest/runtime discovery and transactional stage/archive are FR-02 implementation tasks; compatible Qt replacement, source-companion publication and exact-archive clean-machine runtime are package acceptance checks. Their absence alone is not a separate pre-implementation permission requirement. Certificate issuance stays deferred. |
+
+**Decision:** notice deployment is verified; full FR-02 readiness is not claimed. Next permitted work is exact component/payload admission and the manifest/discovery design. No archive or clean-machine result exists. UTF-8/local-file links and `git diff --check` pass; no temporary test source introduced. Retained notices/build receipts are not public source-companion publication.
+
+## Redistribution Notices: ITER-REL-03-02
+
+**Candidate:** `611974ecaadeb8be8502037f26ceaa73c3c752e2` plus retained patch, 2026-10-11. Owner: BuildAndPackaging. Start state retains ITER-REL-03-01 report/prompt changes. Scope: fix missing Qt deployment notices and explicit NVIDIA component terms without dropping features; `NS-OWNERSHIP`, `NS-ADOPTION`, `NS-EVIDENCE`; graphics targets preserved. REL-03 remains unaccepted.
+
+**Risk / acceptance:** do not apply NVIDIA restrictions to Sparkle MIT or Qt LGPL rights; do not describe source links as fulfilled corresponding-source publication. Qt notice staging must preserve exact license bytes and name source identities/replacement rights. Missing package review stays a blocker.
+
+| Check | Result / boundary |
+| --- | --- |
+| Qt notice artifacts | **PASS:** LGPLv3/GPLv3 texts extracted from the previously hash-verified Qt Base source archive; Launcher deployment copies them and source/replacement instructions into `Notices/Qt`. Root README identifies Qt. Source-byte hashes and staged matches: `build/validation/fr02-20261011/qt-notice-stage.json`. |
+| Launcher build | **PASS:** `cmake --build build/private/tools/SparkleLauncher --config DevelopmentEditor --target SparkleLauncher --parallel 4`, exit `0`; `SparkleLauncher.exe --help`, exit `0`. This is development deployment, not a portable package or compatible-library replacement test. |
+| NVIDIA terms | Component-specific notice added alongside retained full SDK license texts through the existing Streamline staging owner. Root `cmake -S . -B build` exits `0`. No DLL or feature removed. The new NVIDIA notice copy command was generated but its product post-build staging was not run in this iteration. No end-user agreement enforcement or full redistribution verdict is claimed. |
+| Remaining acceptance | **BLOCKED:** exact package payload/notice closure, corresponding Qt source publication, compatible Qt replacement, package-relative discovery and the clean-machine exact-archive route remain unfinished. Historical asset grants remain unresolved; no history or visibility changes were made. |
+
+**Checks / cleanup:** license/source inspection, byte comparison, focused Launcher build/help, root configure, UTF-8/local-link checks and `git diff --check`. Retained build/notice receipts under `build/validation/fr02-20261011/`; no temporary source harness introduced. These results supersede the missing Qt notice artifacts only, not REL-01/REL-02/REL-03 admission.
+
+## Package Spine Admission: ITER-REL-03-01
+
+**Candidate:** `611974ecaadeb8be8502037f26ceaa73c3c752e2`, clean start, 2026-10-11. Owner: BuildAndPackaging / Acceptance. Scope: FR-02 / ProductAndDelivery PD-3 / REL-03 admission inspection. `NS-OWNERSHIP`, `NS-ADOPTION`, `NS-EVIDENCE`; graphics targets preserved, no evidence increase.
+
+**Criterion / risk:** implement only from admitted payload identities and an agreed discovery contract. A repository-dependent archive or unreviewed redistribution is a failure, not an internal-package pass. Detect through input-owner and discovery inspection; stop before staging and keep source unchanged except the conflicting prompt correction.
+
+| Check | Result / next action |
+| --- | --- |
+| Rights and payload admission | **BLOCKED:** ReleaseInputs still marks NVIDIA distribution terms, Qt prominent notices/source publication/replacement and complete admitted payload review unqualified. FirstRelease retains unresolved historical asset rights. Public MIT code and free delivery do not qualify those inputs. Finish the applicable terms/notice and payload review before staging. Certificate enrollment is deferred and is not this blocker. |
+| Runtime discovery | **BLOCKED:** `RepositoryLocator.cpp` requires workspace/engine markers and `Engine`, `Tools`, `Projects` directories. Current repository lookup is not manifest-owned package lookup. ReleaseInputs names target package/content paths but no implemented consumer discovery route is established. Resolve that contract and its Launcher/Application/tool consumers before claiming repository-free operation. |
+| Component contract | **PASS, document reconciliation:** corrected the old PD-3 execution prompt to include required Launcher/Editor/Game and only admitted acquisition/cook helpers, matching current scope and ReleaseInputs. Removed the conflicting blanket exclusion of Editor/Launcher. |
+| Exact archive / clean standard-user route | **BLOCKED:** no FR-02 archive was produced; no archive hash, relocated runtime or independent clean-machine result exists for this candidate. No build/cook/package work ran after the stop condition. |
+
+**Decision:** FR-02 / PD-3 / REL-03 remains BLOCKED at admission. No package owner implementation, release gate pass or phase advance is claimed. Inspection commands: `git status --short`, `git rev-parse HEAD`, scoped `rg`, reads of ProductAndDelivery, ReleaseInputs and RepositoryLocator; document check: `git diff --check`. Receipts are this report and the scoped prompt diff; no temporary harness or generated stage needs cleanup.
+
 ## Public Contributor Checks: ITER-REL-01-11
 
 **Control:** 2026-10-11, owner BuildAndPackaging / Engineering, candidate `7cfceb32d10e487637ed482fbc80d6dcce5f88e2` plus retained patch. Start state: prior FR-01/open-source changes already modified `.gitattributes`, `.gitignore`, dependency/artifact CMake, FirstRelease, ReleaseScope, release inputs, roadmap and docs index; README, CONTRIBUTING and `.github` were untracked. Preserve them. Scope: contributor bootstrap, bounded CI and documentation; `NS-ADOPTION`, `NS-EVIDENCE`, `NS-OWNERSHIP`; graphics targets preserved with no evidence increase. Delivery: FR-01 / REL-01 / REL-02 source workflow, not gate closure.
