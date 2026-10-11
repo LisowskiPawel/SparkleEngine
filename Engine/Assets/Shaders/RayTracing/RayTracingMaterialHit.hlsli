@@ -94,7 +94,6 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	RayTracingHitSurfaceData surface = (RayTracingHitSurfaceData)0;
 	if (!trace.FrontFace && !twoSided)
 	{
-		surface.RejectionReason = RayTracingHitSurface::ReasonOneSidedBackface;
 		return surface;
 	}
 
@@ -121,7 +120,7 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	}
 
 	tangentWorld = OrthonormalizeTangent(tangentWorld, vertexNormal);
-	float3 bitangentWorld = ComputeBitangentFromSign(vertexNormal, tangentWorld, tangentSign);
+	const float3 bitangentWorld = ComputeBitangentFromSign(vertexNormal, tangentWorld, tangentSign);
 
 	const float2 texCoord0 = InterpolateRayTracingTexCoord0(evaluatedTriangle);
 	const RayTracingMaterialSample material = EvaluateRayTracingHitMaterial(evaluatedTriangle.Material, texCoord0, InterpolateRayTracingColor(evaluatedTriangle));
@@ -129,11 +128,9 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	float3 shadingNormal = TransformTangentNormalToWorld(material.NormalTangent, vertexNormal, tangentWorld, bitangentWorld);
 	shadingNormal *= faceSign;
 	tangentWorld *= faceSign;
-	bitangentWorld *= faceSign;
 
 	if (dot(shadingNormal, geometricNormal) <= 0.0f)
 	{
-		surface.RejectionReason = RayTracingHitSurface::ReasonInvalidHitData;
 		return surface;
 	}
 
@@ -145,14 +142,6 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	surface.PositionError = RayEndpoints::SurfaceErrorBound(evaluatedTriangle, mesh, positionObject, positionWorld, normalObject);
 	surface.NormalWorld = shadingNormal;
 	surface.TangentWorld = tangentWorld;
-	surface.BitangentWorld = bitangentWorld;
-	surface.NormalTangent = material.NormalTangent;
-	surface.TangentSign = tangentSign;
-	surface.TexCoord0 = texCoord0;
-
-	surface.MaterialSlot = evaluatedTriangle.Instance.MaterialSlot;
-	surface.GeometryFlags = evaluatedTriangle.Instance.GeometryFlags;
-	surface.RejectionReason = RayTracingHitSurface::ReasonNone;
 
 	surface.BaseColor = material.BaseColor.rgb;
 	surface.EmissiveColor = material.Emissive;

@@ -2,6 +2,8 @@
 
 [Docs](../../../../../../../README.md) / [Up](IndirectLightingDesign.md)
 
+Stages: [Stage 0](#stage-0--close-ind-d0) / [Stage 1](#stage-1--prove-initial-transport-and-technique-accounting) / [Stage 2](#stage-2--introduce-the-explicit-path-record-and-delete-seed-replay) / [Stage 3](#stage-3--implement-shift-mappings-and-gris-in-isolation) / [Stage 4](#stage-4--add-temporal-and-spatial-product-reuse) / [Stage 5](#stage-5--expand-to-the-admitted-multi-bounce-and-glossy-domain) / [Stage 6](#stage-6--deliver-portable-reconstruction) / [Stage 7](#stage-7--evaluate-advanced-reuse-guiding-or-caching) / [Stage 8](#stage-8--backend-workload-adoption-and-fcr-closure).
+
 Replace seed replay with an explicit indirect-transport estimator whose reuse and reconstruction can be checked.
 
 **Status:** implementation-ready sequence, blocked by `IND-D0`, applicable release admission, and stage-specific oracle/provider gates
@@ -123,7 +125,15 @@ Freeze product/path domain and prove what the current seed-replay route does bef
 
 ### Ready-To-Use Prompt
 
-> Execute Indirect Lighting Stage 0 from `IndirectLighting/Plan.md`. Treat this as discovery, not an estimator rewrite. Decode and trace the current seed-replay paths, targets, weights, technique accounting, history, and raw outputs; run `IND-X-01` through `IND-X-07`; freeze every `IND-D0-*` decision and threshold before candidate observation; name the exact replacement/deletion ledger; reconcile release and Reference Path Tracer gates; and obtain independent review. Report unknowns and unrun checks explicitly.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-0--close-ind-d0 and apply this plan's shared execution contract.
+Execute Indirect Lighting Stage 0 from `IndirectLighting/ImplementationPlan.md`. Treat this as discovery, not an estimator rewrite. Decode and trace the current seed-replay paths, targets, weights, technique accounting, history, and raw outputs; run `IND-X-01` through `IND-X-07`; freeze every `IND-D0-*` decision and threshold before candidate observation; name the exact replacement/deletion ledger; reconcile release and Reference Path Tracer gates; and obtain independent review. Report unknowns and unrun checks explicitly.
+```
+
+</details>
 
 ## Stage 1 — Prove Initial Transport And Technique Accounting
 
@@ -147,7 +157,15 @@ Build independent one-bounce truth before reservoirs.
 
 ### Ready-To-Use Prompt
 
-> Implement Indirect Lighting Stage 1 only. Establish the accepted CPU/analytic/metamorphic cases and a bounded GPU one-bounce initial estimator with explicit BSDF, NEE, emissive/environment, MIS, lobe, throughput, depth, and roulette accounting. Produce raw `IndirectDiffuse`/`IndirectSpecular` artifacts without reservoir reuse or reconstruction. Fix only proved semantic defects in the frozen hook ledger. Do not introduce the new reservoir yet or increase path scope.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-1--prove-initial-transport-and-technique-accounting and apply this plan's shared execution contract.
+Implement Indirect Lighting Stage 1 only. Establish the accepted CPU/analytic/metamorphic cases and a bounded GPU one-bounce initial estimator with explicit BSDF, NEE, emissive/environment, MIS, lobe, throughput, depth, and roulette accounting. Produce raw `IndirectDiffuse`/`IndirectSpecular` artifacts without reservoir reuse or reconstruction. Fix only proved semantic defects in the frozen hook ledger. Do not introduce the new reservoir yet or increase path scope.
+```
+
+</details>
 
 ## Stage 2 — Introduce The Explicit Path Record And Delete Seed Replay
 
@@ -171,7 +189,15 @@ Replace the float-packed random identity with one auditable initial path sample 
 
 ### Ready-To-Use Prompt
 
-> Implement Indirect Lighting Stage 2. Create the accepted private feature owner and explicit path-sample/initial-reservoir record with integer logical identities and the exact factors needed by future shifts. Add packing and long-run round-trip tests. Feed the proved Stage-1 initial estimator through it, then delete the old float-packed seed identity and all seed-replay code in the same change. Keep temporal/spatial reuse disabled; no compatibility schema or legacy selector.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-2--introduce-the-explicit-path-record-and-delete-seed-replay and apply this plan's shared execution contract.
+Implement Indirect Lighting Stage 2. Create the accepted private feature owner and explicit path-sample/initial-reservoir record with integer logical identities and the exact factors needed by future shifts. Add packing and long-run round-trip tests. Feed the proved Stage-1 initial estimator through it, then delete the old float-packed seed identity and all seed-replay code in the same change. Keep temporal/spatial reuse disabled; no compatibility schema or legacy selector.
+```
+
+</details>
 
 ## Stage 3 — Implement Shift Mappings And GRIS In Isolation
 
@@ -195,7 +221,15 @@ Prove reconnection/replay mapping and generalized reservoir math before temporal
 
 ### Ready-To-Use Prompt
 
-> Implement Indirect Lighting Stage 3 on the explicit Stage-2 path record. Add only the ratified reconnection and any required hybrid/replay mapping, including inverse, support, Jacobian, visibility, and deterministic rejection. Implement the exact GRIS target/contribution/resampling weight and bounded reservoir update. Validate in CPU/deterministic same-frame fixtures and statistical tests without temporal history. Stop if the pinned equation cannot be mapped unambiguously to code.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-3--implement-shift-mappings-and-gris-in-isolation and apply this plan's shared execution contract.
+Implement Indirect Lighting Stage 3 on the explicit Stage-2 path record. Add only the ratified reconnection and any required hybrid/replay mapping, including inverse, support, Jacobian, visibility, and deterministic rejection. Implement the exact GRIS target/contribution/resampling weight and bounded reservoir update. Validate in CPU/deterministic same-frame fixtures and statistical tests without temporal history. Stop if the pinned equation cannot be mapped unambiguously to code.
+```
+
+</details>
 
 ## Stage 4 — Add Temporal And Spatial Product Reuse
 
@@ -219,7 +253,15 @@ Publish generation-safe per-View reuse that handles motion, disocclusion, animat
 
 ### Ready-To-Use Prompt
 
-> Implement Indirect Lighting Stage 4 after static shift/GRIS proof. Add the accepted per-View temporal proposal, current-scene shift, spatial neighbors, disocclusion policy, confidence, full generation identity, transactional history publication, and retirement. Run the entire `CHK-IND-03/04` mutation and long-run matrix and measure diversity/correlation as well as raw error. Do not add reconstruction or expand path depth in this stage.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-4--add-temporal-and-spatial-product-reuse and apply this plan's shared execution contract.
+Implement Indirect Lighting Stage 4 after static shift/GRIS proof. Add the accepted per-View temporal proposal, current-scene shift, spatial neighbors, disocclusion policy, confidence, full generation identity, transactional history publication, and retirement. Run the entire `CHK-IND-03/04` mutation and long-run matrix and measure diversity/correlation as well as raw error. Do not add reconstruction or expand path depth in this stage.
+```
+
+</details>
 
 ## Stage 5 — Expand To The Admitted Multi-Bounce And Glossy Domain
 
@@ -243,7 +285,15 @@ Deliver the exact path depth and rough-specular support promised by the product,
 
 ### Ready-To-Use Prompt
 
-> Implement only the next Indirect Lighting Stage-5 path-depth/lobe increment admitted by `IND-D0`. Extend the path record, technique accounting, shift, and GRIS equations together; add hybrid replay only with inverse/support/PDF tests. Compare raw diffuse/specular against accepted independent reference artifacts over roughness, environment/emissive, occlusion, animation, and depth cells. Preserve explicit exclusions for delta, transmission, and caustics.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-5--expand-to-the-admitted-multi-bounce-and-glossy-domain and apply this plan's shared execution contract.
+Implement only the next Indirect Lighting Stage-5 path-depth/lobe increment admitted by `IND-D0`. Extend the path record, technique accounting, shift, and GRIS equations together; add hybrid replay only with inverse/support/PDF tests. Compare raw diffuse/specular against accepted independent reference artifacts over roughness, environment/emissive, occlusion, animation, and depth cells. Preserve explicit exclusions for delta, transmission, and caustics.
+```
+
+</details>
 
 ## Stage 6 — Deliver Portable Reconstruction
 
@@ -267,7 +317,15 @@ Make the proved raw indirect estimator product-usable under motion while retaini
 
 ### Ready-To-Use Prompt
 
-> Implement Indirect Lighting Stage 6 using the frozen portable reconstruction contract, then connect optional DLSS Ray Reconstruction through the existing provider boundary. Preserve raw lobe/path/reservoir evidence and separate histories. Exercise invalid guide/provider faults plus static, camera motion, disocclusion, environment/emissive change, glossy detail, and thin geometry. Report raw versus reconstructed error, lag, time, and memory.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-6--deliver-portable-reconstruction and apply this plan's shared execution contract.
+Implement Indirect Lighting Stage 6 using the frozen portable reconstruction contract, then connect optional DLSS Ray Reconstruction through the existing provider boundary. Preserve raw lobe/path/reservoir evidence and separate histories. Exercise invalid guide/provider faults plus static, camera motion, disocclusion, environment/emissive change, glossy detail, and thin geometry. Report raw versus reconstructed error, lag, time, and memory.
+```
+
+</details>
 
 ## Stage 7 — Evaluate Advanced Reuse, Guiding, Or Caching
 
@@ -288,7 +346,15 @@ Run an A/B experiment against Stage 6 with frozen error/lag/time/memory metrics.
 
 ### Ready-To-Use Prompt
 
-> Evaluate the single Indirect Lighting Stage-7 optimization named by the accepted admission record. First reproduce the failing workload and freeze A/B metrics/budgets. Implement the smallest integration into existing path/reservoir/history owners, update equations and failure tests, and report quality/correlation/lag/time/memory across all required regressions. Remove the experiment if it does not pass; do not bundle another GI system.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-7--evaluate-advanced-reuse-guiding-or-caching and apply this plan's shared execution contract.
+Evaluate the single Indirect Lighting Stage-7 optimization named by the accepted admission record. First reproduce the failing workload and freeze A/B metrics/budgets. Implement the smallest integration into existing path/reservoir/history owners, update equations and failure tests, and report quality/correlation/lag/time/memory across all required regressions. Remove the experiment if it does not pass; do not bundle another GI system.
+```
+
+</details>
 
 ## Stage 8 — Backend, Workload, Adoption, And FCR Closure
 
@@ -313,7 +379,15 @@ Publish evidence for the exact product claim and close or block `FCR-REN-07` hon
 
 ### Ready-To-Use Prompt
 
-> Execute Indirect Lighting Stage 8 as candidate validation. Freeze exact candidate/configuration/reference identity and metrics before runs. Exercise analytic/Cornell, Sponza, Bistro, San Miguel, motion/disocclusion/animation/environment/emissive/glossy/failure and supported D3D12/Vulkan cells with native validation. Retain raw and reconstructed artifacts and separate estimator, convergence, temporal, visual, performance, memory, backend, and release verdicts. Update `FCR-REN-07` only from observed evidence.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-8--backend-workload-adoption-and-fcr-closure and apply this plan's shared execution contract.
+Execute Indirect Lighting Stage 8 as candidate validation. Freeze exact candidate/configuration/reference identity and metrics before runs. Exercise analytic/Cornell, Sponza, Bistro, San Miguel, motion/disocclusion/animation/environment/emissive/glossy/failure and supported D3D12/Vulkan cells with native validation. Retain raw and reconstructed artifacts and separate estimator, convergence, temporal, visual, performance, memory, backend, and release verdicts. Update `FCR-REN-07` only from observed evidence.
+```
+
+</details>
 
 ## Stage Traceability
 

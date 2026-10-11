@@ -1,6 +1,6 @@
 # Renderer Latency Coordination
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](FrameExecutionDesign.md)
 
 **Status:** current capability-gated feature dossier; source-backed, not end-to-end latency, pacing, or release evidence
 

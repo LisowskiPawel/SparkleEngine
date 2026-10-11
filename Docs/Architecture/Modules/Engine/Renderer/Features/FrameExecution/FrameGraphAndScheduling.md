@@ -1,6 +1,6 @@
 # Renderer Frame Graph and GPU Scheduling
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](FrameExecutionDesign.md)
 
 **Status:** current feature dossier; source-backed, not native-validation, overlap, performance, or release evidence
 

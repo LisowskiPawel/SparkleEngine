@@ -16,7 +16,17 @@ Use these pages to understand the engine, choose your next task and find the des
 | Contribute or review | [Contributing](../CONTRIBUTING.md) -> [engineering rules](Engineering/README.md#choose-by-task) |
 | Find results or workload checks | [Acceptance](Acceptance/README.md) |
 
-Each page has a **Docs / Up** route. Combined guides link directly to their sections. Open detailed research or reports only when the task needs them.
+## Design Or Implementation?
+
+| File | Use it for |
+| --- | --- |
+| `README.md` | Navigation: choose the document to open. |
+| `*Design.md`, `*Capabilities.md` or a named contract | What it does, why it exists, how it works, limits and checks. |
+| `*ImplementationPlan.md` | Ordered stages, prerequisites, work, exit criteria and copyable prompts. |
+| [Roadmap](Strategy/Roadmap.md) | Current task and global order; direct links to implementation stages. |
+| Acceptance reports | What the exact candidate proved or still lacks. |
+
+Each page has a **Docs / Up** route. Keep design open as reference while executing one linked implementation stage.
 
 ## How The Documentation Fits Together
 
@@ -44,7 +54,7 @@ Code and executable build configuration are the authority for implemented behavi
 | --- | --- | --- |
 | [Strategy](Strategy/README.md) | desired capabilities, priorities, roadmap, operating model, dated assessments | implementation rules or system internals |
 | [Architecture subject tree](Architecture/README.md) | module/feature ownership and navigation; current maps, design, decisions, capability snapshots, and feature-local proof contracts | release results or proof that source-present behavior ran |
-| Colocated `Plan.md` or named plan | ordered delivery, dependencies, stop conditions, migration and validation sequence for its owning subject | enduring design decisions or completion claims |
+| Colocated `*ImplementationPlan.md` | ordered delivery, dependencies, stop conditions, migration and validation sequence for its owning subject | enduring design decisions or completion claims |
 | Colocated research document | external precedent, option studies, visual exploration, and dated baselines for its owning subject | local decisions, implementation state, or evidence grades |
 | [Engineering](Engineering/README.md) | workflow, implementation standards, module rules, verification, engineering decisions | release scope, system design, or product research |
 | [Acceptance](Acceptance/README.md) | shared completion language, candidate reports, workload/release gates, high-level progress | duplicate feature architecture or local feature criteria |

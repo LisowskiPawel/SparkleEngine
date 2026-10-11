@@ -1,6 +1,12 @@
-# Foundation, World And Content
+# First Release Foundation And Content Implementation Plan
 
-[Docs](../../../README.md) / [Up](../README.md)
+[Docs](../../../README.md) / [Up](ImplementationPlan.md)
+
+Stages: [FWC-0](#fwc-0--reconcile-feature-contracts-and-boundaries) / [FWC-1](#fwc-1--core-and-windows-platform) / [FWC-2](#fwc-2--task-runtime-and-cancellation) / [FWC-3](#fwc-3--level-world-and-render-publication) / [FWC-4](#fwc-4--import-cook-and-engine-assets) / [FWC-5](#fwc-5--shader-route-and-shared-tool-output) / [FWC-6](#fwc-6--foundation-candidate-closure).
+
+**Status:** implementation stages; candidate results remain in Acceptance.
+
+**Design and checks:** [module contracts](../../Modules/ModuleInventory.md), [shader system](../ShaderSystem/ShaderSystemDesign.md). Open the owner named by the selected FWC stage.
 
 Make paths, tasks, worlds, content and shaders dependable enough for the selected release.
 
@@ -30,6 +36,17 @@ Make paths, tasks, worlds, content and shaders dependable enough for the selecte
 
 **Phase exit criteria:** each family has an owner, end-to-end trace, matrix, binary criteria, controlled failures, mapped checks, current-state verdict, and stop decisions.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FWC-0 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-0--reconcile-feature-contracts-and-boundaries.
+Goal: make the 11 foundation families independently decidable and trace their real production edges before edits. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `FWC-1` — Core And Windows Platform
 
 **Goal:** close `FCR-CORE-01` and `FCR-PLAT-01` for standard-user Windows x64 operation and safe platform failure.
@@ -47,6 +64,17 @@ Make paths, tasks, worlds, content and shaders dependable enough for the selecte
 **Failure modes to control:** current-directory dependence; user path truncation; config corruption destroys last good state; input remains captured after focus loss; zero-size resize reaches Renderer; handle leak; log growth is unbounded.
 
 **Phase exit criteria:** the defined path/Unicode/config/window/input/DPI/focus/resize/shutdown matrices pass; package stays immutable; native Linux remains truthfully unavailable; candidate reports carry exact environment/results.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FWC-1 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-1--core-and-windows-platform.
+Goal: close FCR-CORE-01 and FCR-PLAT-01 for standard-user Windows x64 operation and safe platform failure. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `FWC-2` — Task Runtime And Cancellation
 
@@ -66,6 +94,17 @@ Make paths, tasks, worlds, content and shaders dependable enough for the selecte
 
 **Phase exit criteria:** all owned task criteria pass for serial/1/2/N and pressure/failure/shutdown matrices; consumer parity is demonstrated; performance conclusions include raw measurements and crossover.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FWC-2 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-2--task-runtime-and-cancellation.
+Goal: close FCR-TASK-01 with one deterministic-enough task contract across serial and 1/2/N worker modes. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `FWC-3` — Level, World, And Render Publication
 
 **Goal:** close `FCR-WORLD-01`, `02`, and `03` from catalog selection through deterministic activation and immutable render submission.
@@ -83,6 +122,17 @@ Make paths, tasks, worlds, content and shaders dependable enough for the selecte
 **Failure modes to control:** stale entity generation; new level partially visible; canceled load activates; delete/reuse aliases old GPU data; malformed asset becomes valid default silently; animation bounds/history lag; extraction races consumer.
 
 **Phase exit criteria:** lifecycle, semantic, identity, cancellation, reload, concurrency, and cost checks pass for the admitted map/content set; Renderer consumes only published frame data; reports for all three families agree on candidate identity.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FWC-3 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication.
+Goal: close FCR-WORLD-01, 02, and 03 from catalog selection through deterministic activation and immutable render submission. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `FWC-4` — Import, Cook, And Engine Assets
 
@@ -102,6 +152,17 @@ Make paths, tasks, worlds, content and shaders dependable enough for the selecte
 
 **Phase exit criteria:** supported inputs produce complete package-relative products; negative inputs fail without partial publication; manifests and rights are complete; clean regeneration and runtime consumption pass for the frozen content set.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FWC-4 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-4--import-cook-and-engine-assets.
+Goal: close FCR-CONT-01, 02, and 03 with deterministic, provenance-preserving, transactional source-to-package products. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `FWC-5` — Shader Route And Shared Tool Output
 
 **Goal:** close `FCR-SHDR-01` and `FCR-TOOL-01` from registration through cooked code/reflection to runtime pipeline consumers, with truthful script-readable tool behavior.
@@ -120,6 +181,17 @@ Make paths, tasks, worlds, content and shaders dependable enough for the selecte
 
 **Phase exit criteria:** admitted shader matrix compiles, reflects, publishes, materializes, replaces/fails safely, and packages on both backends; every tool consumer obeys the shared output/exit contract; exact reports are candidate-bound.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FWC-5 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-5--shader-route-and-shared-tool-output.
+Goal: close FCR-SHDR-01 and FCR-TOOL-01 from registration through cooked code/reflection to runtime pipeline consumers, with truthful script-readable tool behavior. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `FWC-6` — Foundation Candidate Closure
 
 **Goal:** reconcile all 11 families on the same package candidate and prove their cross-boundary invariants.
@@ -131,6 +203,17 @@ Make paths, tasks, worlds, content and shaders dependable enough for the selecte
 **Failure modes to control:** individually passing components disagree on identity; author cache masks dependency; candidate changed after a report; unavailable check marked pass; one backend consumes a different cooked/shader generation.
 
 **Phase exit criteria:** every foundation FCR has a complete candidate report with criteria/failures/checks, limitations, invalidation triggers, and a `PASS`, `BLOCKED`, `EXCLUDED`, or `SUPERSEDED` decision.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FWC-6 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-6--foundation-candidate-closure.
+Goal: reconcile all 11 families on the same package candidate and prove their cross-boundary invariants. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Foundation: Reference And Ownership
 

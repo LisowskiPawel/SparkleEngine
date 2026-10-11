@@ -48,7 +48,7 @@ Notice the direction of authority: research informs decisions, discovery freezes
 | Feature shape | Recommended documents | Do not do |
 | --- | --- | --- |
 | Small, one-owner behavior with no independent research or rollout | One dossier using the [page template](Page.md), with compact design and acceptance sections. | Create empty companion documents for appearance. |
-| Moderate feature with a known algorithm and one user route | `README.md`, `ExecutionArchitecture.md`, `Plan.md`; add `Research.md` or `UserExperience.md` only when independently maintained. | Mix current state, future stages, and executed results into one diary. |
+| Moderate feature with a known algorithm and one user route | `FeatureDesign.md`, `ExecutionArchitecture.md`, `ImplementationPlan.md`; add `Research.md` or `UserExperience.md` only when independently maintained. | Mix current state, future stages, and executed results into one diary. |
 | Algorithmically sensitive feature | Add `Semantics.md` for equations, protocol, state-machine, data-format, or deterministic-behavior authority. | Leave correctness-defining choices to implementation prompts. |
 | Product/tool workflow | Add `UserExperience.md` for discovery, setup, progress, interruption, results, accessibility, and automation equivalence. | Treat a debug panel, CVar, or happy-path screenshot as product completion. |
 | High-assurance reference, infrastructure, release, security, or evidence feature | Use all seven feature-local roles below unless a documented combination preserves one owner and one lifecycle. | Reduce rigor because the feature is internal or technically impressive. |
@@ -59,13 +59,13 @@ The full package has seven direct Markdown files, matching the active-folder sib
 
 | Feature-local file | Owns | Must not own |
 | --- | --- | --- |
-| `README.md` | Feature identity, reader route, bounded promise, current disposition, feature matrix, binary acceptance, controlled failures, check coverage, and conjunctive definition of done. | Detailed precedent, implementation order, or candidate results. |
+| `FeatureDesign.md` | Feature identity, reader route, bounded promise, current disposition, feature matrix, binary acceptance, controlled failures, check coverage, and conjunctive definition of done. | Detailed precedent, implementation order, or candidate results. |
 | `Discovery.md` | The blocking questions, decision records, experiments, risks, evidence package, and exact gate that authorize planning or implementation. | Production implementation or a silent assumption disguised as a default. |
 | `Research.md` | Revision-pinned current-source findings, primary external precedent, comparison, permitted transfer, non-inference, and rights/provenance notes. | Local design authority, implementation claims, or acceptance verdicts. |
 | `Semantics.md` | Exact algorithm, equations, protocol, format, units, invariants, edge cases, reference procedure, and rule-to-code ledger when these deserve an independent lifecycle. | System ownership, delivery order, or proof that code conforms. |
 | `ExecutionArchitecture.md` | Current and target owners, producer/consumer boundaries, identity, lifetime, state, execution, capacity, failure, backend/mode, package, and clean-break shape. | Equation details already owned by `Semantics.md`, UI behavior, or completion results. |
 | `UserExperience.md` | Intended people, discoverability, setup, preflight, state/action truth, progress, interruption, errors, results, accessibility, support, and UI/CLI/API equivalence. | Renderer/runtime mutable truth or duplicated architecture. |
-| `Plan.md` | Dependency order, stage scope/budgets, prerequisites, deletions, non-goals, prompts, exit gates and handoff shape; estimates only when requested. | Enduring design decisions, research claims, or feature acceptance. |
+| `ImplementationPlan.md` | Dependency order, stage scope/budgets, prerequisites, deletions, non-goals, prompts, exit gates and handoff shape; estimates only when requested. | Enduring design decisions, research claims, or feature acceptance. |
 
 When a role is omitted, put its necessary facts in the nearest coherent owner and state that no independent document is needed. Do not leave a broken link to a document that does not exist.
 
@@ -146,7 +146,7 @@ Inspect first: git status and revision; the nearest Architecture owner and index
 
 Research current local implementation before external precedent. Use original papers/specifications, official vendor documentation, and revision-pinned primary source repositories. For every source record the observed fact, permitted transfer, forbidden inference, exact revision/date, and license/provenance action. Research is not local implementation or acceptance proof.
 
-Choose the smallest honest set of feature-local documents from README.md, Discovery.md, Research.md, Semantics.md, ExecutionArchitecture.md, UserExperience.md, and Plan.md. Keep one owner per current fact, decision, semantic rule, architecture contract, UX behavior, plan item, and result; link instead of copying. Do not exceed seven direct Markdown siblings.
+Choose the smallest honest set of feature-local documents from FeatureDesign.md, Discovery.md, Research.md, Semantics.md, ExecutionArchitecture.md, UserExperience.md, and ImplementationPlan.md. Keep one owner per current fact, decision, semantic rule, architecture contract, UX behavior, plan item, and result; link instead of copying. Do not exceed seven direct Markdown siblings.
 
 Populate the package end to end: plain-language product and non-promises; revision-pinned current route; complete feature/support matrix; blocking discovery questions and risks; exact semantics, units, edge/invalid behavior, and reference procedure where applicable; ownership, identity, lifetime, state, execution, capacity, backend/mode, failure/recovery, security/package, and clean-break architecture; intended first-use and automation experience; binary AC/FM/CHK coverage; dependency-ordered stages, scope budgets, deletions, non-goals, stop conditions, and copy-ready implementation prompts. Use prerequisite/exit gates; include calendar planning or estimates only when requested.
 
@@ -170,9 +170,9 @@ Validate local links and anchors, placeholder disposition, IDs and no-orphan tra
 
 Avoid bare “supported,” “complete,” “production ready,” “reference,” “ground truth,” “deterministic,” “safe,” or “fast.” Each needs a domain, claimant, matrix, threshold, and evidence state.
 
-## Scaffold: `README.md` — Feature Dossier And Acceptance
+## Scaffold: `FeatureDesign.md` — Feature Dossier And Acceptance
 
-Copy this structure into the feature folder's `README.md`. Delete instructions and inapplicable sections only after their absence is justified.
+Copy this structure into the feature folder's `<Feature>Design.md`. Delete instructions and inapplicable sections only after their absence is justified.
 
 ````markdown
 # {{FEATURE_NAME}} Feature Dossier
@@ -766,7 +766,7 @@ Define keyboard/focus order, non-color status, accessible names/announcements, h
 Require a clean first-use transcript, invalid-input and failure/recovery matrix, automation equivalence, accessibility matrix, output discovery, support-record quality, package/profile reachability, and proof that UI owns no duplicated runtime truth.
 ````
 
-## Scaffold: `Plan.md` — Staged Delivery And Copy-Ready Prompts
+## Scaffold: `ImplementationPlan.md` — Staged Delivery And Copy-Ready Prompts
 
 The plan begins with decisions and ends with adoption. It is not a chronological wish list.
 
@@ -882,7 +882,7 @@ State one observable vertical-slice outcome, not a list of files or mechanisms.
 ### Ready-To-Use Implementation Prompt
 
 ```text
-Implement only Stage {{N}} of {{FEATURE_PATH}}/Plan.md after verifying {{EXACT_PREREQUISITES}}. Apply the plan's Universal Execution Contract and all selected repository standards.
+Implement only Stage {{N}} of {{FEATURE_PATH}}/ImplementationPlan.md after verifying {{EXACT_PREREQUISITES}}. Apply the plan's Universal Execution Contract and all selected repository standards.
 
 Outcome: {{ONE_OBSERVABLE_VERTICAL_SLICE}}.
 

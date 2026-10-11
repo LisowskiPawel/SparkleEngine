@@ -73,14 +73,7 @@ namespace CommonSampling
 		return center + basis.Tangent * (sampleRadius * cos(phi)) + basis.Bitangent * (sampleRadius * sin(phi));
 	}
 
-	struct CosineHemisphereSample
-	{
-		float3 DirectionWorld;
-		float Pdf;
-		float Cosine;
-	};
-
-	CosineHemisphereSample SampleCosineHemisphere(float3 normal, float2 sample)
+	float3 SampleCosineHemisphereDirection(float3 normal, float2 sample)
 	{
 		const float phi = TWO_PI * sample.x;
 		const float cosTheta = sqrt(saturate(1.0f - sample.y));
@@ -88,10 +81,6 @@ namespace CommonSampling
 
 		const OrthonormalBasis basis = BuildOrthonormalBasis(normal);
 
-		CosineHemisphereSample result;
-		result.DirectionWorld = SafeNormalize(basis.Tangent * (cos(phi) * sinTheta) + basis.Bitangent * (sin(phi) * sinTheta) + SafeNormalize(normal) * cosTheta, SafeNormalize(normal));
-		result.Cosine = saturate(dot(SafeNormalize(normal), result.DirectionWorld));
-		result.Pdf = result.Cosine * INV_PI;
-		return result;
+		return SafeNormalize(basis.Tangent * (cos(phi) * sinTheta) + basis.Bitangent * (sin(phi) * sinTheta) + SafeNormalize(normal) * cosTheta, SafeNormalize(normal));
 	}
 }

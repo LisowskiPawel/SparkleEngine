@@ -1,6 +1,6 @@
 # First Release Renderer Plans
 
-[Docs](../../../../../README.md) / [Up](../RendererDesign.md) / [Implementation](DisplayAndReconstructionImplementationPlan.md)
+[Docs](../../../../../README.md) / [Up](../RendererDesign.md)
 
 Choose the renderer work by the result you need: a valid frame, correct surfaces, useful lighting, a finished image or usable controls. The [Roadmap](../../../../../Strategy/Roadmap.md#required-feature-closure-priority) selects global priority; the table below routes that work.
 
@@ -40,20 +40,9 @@ flowchart LR
 
 The file boundaries group cohesive features; they do not force whole-file execution. Close `RD-1` before pipeline consumers, then Frame/Scene, Geometry/Ray, Lighting, Display, and the remaining runtime/diagnostic phases. A phase may move earlier only when its dependencies and candidate identity remain explicit.
 
-## Common Renderer Rules
-
-- Scene owns persistent scene truth; View owns view/camera/display/temporal truth. GPU resources mirror those authorities with generation-qualified lifetime.
-- World publishes immutable render input. Renderer does not query ECS storage. RHI lowers commands and native mechanics; it does not choose scene, lighting, debug, or fallback semantics.
-- Raster, inline ray query, and native ray pipeline are traversal adapters beneath shared semantic feature contracts; do not fork effect logic.
-- Requested, resolved, active, unsupported, fallback, and restart-required state must be distinguishable.
-- Every pass declares inputs, outputs, lifetime, queue, invalidation, failure, and observer identity. Do not hide dependencies in side effects.
-- Use feature-local `AC/FM/CHK`; phase exit criteria in these plans are sequencing gates only.
-- Run [architecture boundary check](../../../../../Engineering/Verification/ValidationAndEvidence.md) when Renderer/RHI responsibilities move, plus proportional native checks required by the affected claim.
 
 ## Relationship To Existing Renderer Plans
 
 [Debug Views](../Features/DebugViews/DebugViewsDesign.md) owns current presentation and control contracts; its completed Show slice is recorded in [Bounded Show evidence](../../../../../Acceptance/Renderer/DebugViews.md). `RD-3` selects remaining work from current feature acceptance. [Deferred GBuffer Decals](../Features/DeferredDecals/ImplementationPlan.md) is the detailed subplan selected by `GR-5` for first-release `FCR-REN-23`. Plan presence alone is not scope admission; the mother plan and FCR registry provide that admission.
 
-## Renderer-Wide Stop Conditions
-
-Stop when scene/view ownership is ambiguous; a pass reads undeclared state; a selector lies about the active route; an RHI capability is assumed rather than queried; one traversal path implements different material/lighting semantics; history lacks identity/reset; native validation is unavailable for a required backend; or a visual result has no numerical/reference/controlled comparison required by its dossier.
+Follow the [shared Renderer rules and stop conditions](../RendererDesign.md#release-implementation-rules).

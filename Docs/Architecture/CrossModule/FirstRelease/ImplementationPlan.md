@@ -2,9 +2,7 @@
 
 [Docs](../../../README.md) / [Up](../README.md)
 
-Implementation stages: [FoundationImplementationPlan](FoundationImplementationPlan.md).
-
-Implementation stages: [ProductImplementationPlan](ProductImplementationPlan.md).
+Stages: [FR-00](#fr-00--scope-and-discovery) / [FR-01](#fr-01--identity-rights-and-baseline) / [FR-02](#fr-02--package-spine) / [FR-03](#fr-03--feature-closure) / [FR-04](#fr-04--release-maps) / [FR-05](#fr-05--performance-stability-and-native-proof) / [FR-06](#fr-06--candidate-freeze-and-independent-adoption) / [FR-07](#fr-07--publish-and-verify) / [FR-08](#fr-08--stabilize-and-close).
 
 **Status:** release implementation orchestrator; ordered work, not implementation evidence or release approval
 
@@ -12,7 +10,7 @@ Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for
 
 [First Release Acceptance](../../../Acceptance/FirstRelease.md#release-gates) owns release verdicts. Feature-local Architecture checks and [candidate reports](../../../Acceptance/FeatureCompletionReports.md) own feature proof.
 
-Choose the section for your current task: [release phases](#release-tasks), [Game/Editor/Launcher/package](ProductImplementationPlan.md#product-and-delivery), [paths/tasks/world/cook/shaders](FoundationImplementationPlan.md#foundation-world-and-content), or [feature owners](#complete-feature-routing).
+Choose the section for your current task: [release phases](#release-tasks), [Game/Editor/Launcher/package](ProductImplementationPlan.md#first-release-product-implementation-plan), [paths/tasks/world/cook/shaders](FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan), or [feature owners](#complete-feature-routing).
 
 ## Release Tasks
 
@@ -28,6 +26,17 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 
 **Phase exit criteria:** `REL-00` criteria are mapped to checks; every reachable option has a product classification; the release package contents are named; `PTD-00` records `PASS` or a blocking/re-scope decision.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FR-00 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-00--scope-and-discovery.
+Reconcile the six approved choices, selected maps, reachable-option classifications and exact package/helper/rights decisions. Preserve accepted PTD-00 discovery. Map REL-00 checks; stop on unresolved admission.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### `FR-01` — Identity, Rights, And Baseline
 
 **Goal:** make source, dependencies, assets, licenses, version identity, the initial build/cook/Game baseline, and approved fresh-checkout gate automation reproducible enough to start package work.
@@ -37,6 +46,17 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 **Failure modes:** mutable dependency; unidentified asset; dirty/generated state hidden; author-machine-only prerequisite; runtime result recorded without exact revision/configuration.
 
 **Phase exit criteria:** `REL-01` and `REL-02` candidate records pass or name blockers; one baseline path has exact commands, versions, hashes, outputs, and cleanup.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FR-01 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-01--identity-rights-and-baseline.
+After FR-00 exits, audit pinned inputs, identity, provenance, redistributable payloads, prerequisites and generated state. Invoke existing owner checks; qualify the exact clean build/cook/Game baseline. Record REL-01/02 blockers; stop on unresolved rights or mutable inputs.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### `FR-02` — Package Spine
 
@@ -48,6 +68,17 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 
 **Phase exit criteria:** [Product phase `PD-3`](ProductImplementationPlan.md#pd-3--package-and-installation) passes and `REL-03` has clean-machine runtime evidence for the exact archive.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FR-02 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-02--package-spine.
+Execute the existing ProductImplementationPlan PD-3 route after package inputs are admitted. Complete the current single packaging owner and exact-archive REL-03 evidence; do not add another packaging authority.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### `FR-03` — Feature Closure
 
 **Goal:** close every included FCR family against its Architecture-owned contract in dependency order.
@@ -57,6 +88,17 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 **Failure modes:** orphan FCR; missing feature-local criterion; backend/mode/content gap; silent fallback; stale evidence reused after a change; feature passes but packaged route fails.
 
 **Phase exit criteria:** all 49 primary owners in [Complete Feature Routing](#complete-feature-routing) have a candidate-bound result and `REL-04` passes.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FR-03 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-03--feature-closure.
+Select the next admitted incomplete family from Complete Feature Routing. Execute its primary implementation stage and owning AC/FM/CHK in dependency order. Reuse valid proof, invalidate changed claims and reconcile all 49 candidate results for REL-04.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### `FR-04` — Release Maps
 
@@ -68,6 +110,17 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 
 **Phase exit criteria:** every applicable `MAP-*` and specialist case has exact candidate identity, settings, references, artifacts, verdict, and invalidation triggers; `REL-05` passes.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FR-04 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-04--release-maps.
+Freeze the selected map/settings/reference identities, then exercise the applicable MAP and specialist cases. Repair each failing content or renderer owner. Retain exact candidate comparisons and invalidation triggers for REL-05.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### `FR-05` — Performance, Stability, And Native Proof
 
 **Goal:** prove declared budgets, failure/recovery behavior, soaks, and native D3D12/Vulkan correctness for the same candidate.
@@ -77,6 +130,17 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 **Failure modes:** observer changes result; no cold/steady distinction; validation warning dismissed; device loss called recovered; memory high-water omitted; backend divergence hidden.
 
 **Phase exit criteria:** `REL-06`/`REL-07` pass with causal measurements, native diagnostics, controlled failure evidence, and exact candidate identity.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FR-05 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-05--performance-stability-and-native-proof.
+Run the REL-06/07 budget, stability, recovery and paired-native checks for one candidate and declared laptop benchmark. Separate cold and steady results, observer effects and unsupported rows. Retain raw timings, memory and validation findings.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### `FR-06` — Candidate Freeze And Independent Adoption
 
@@ -90,6 +154,17 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 
 **Pre-release prerequisite:** obtain the deferred Windows publisher certificate, sign/timestamp and verify the final bytes before freezing this candidate. Enrollment is scheduled here by the release owner (2026-10-11), not as an FR-01 prerequisite. Unsigned development archives may exercise FR-02 packaging; they cannot satisfy this signed consumer/adoption gate. See the [roadmap task](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next).
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FR-06 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-06--candidate-freeze-and-independent-adoption.
+Freeze one package identity after prerequisite gates pass. Run the documented independent consumer and source-adopter journeys for REL-08/09 without private repair or author caches. Invalidate dependent proof if bytes or configuration change.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### `FR-07` — Publish And Verify
 
 **Goal:** publish exactly the approved candidate and verify its public identity, downloads, documentation, and truthful no-support/self-service entry points.
@@ -100,6 +175,17 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 
 **Phase exit criteria:** `REL-10` passes against downloaded artifacts, not local staging outputs.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FR-07 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-07--publish-and-verify.
+Prepare the already approved candidate for publication under REL-10. Verify signatures, immutable downloads, public identity and truthful self-service policy. Perform authorized publication only, then verify the downloaded bytes against the frozen archive.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### `FR-08` — Stabilize And Close
 
 **Goal:** perform finite maintainer release review, disposition known candidate defects and close the release. No ongoing user support or response window is offered.
@@ -109,6 +195,17 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 **Failure modes:** known critical blocker omitted; replacement lacks provenance; defect cannot be reproduced; public bytes differ without a new version; false support promise.
 
 **Phase exit criteria:** `REL-11` passes with a bounded release-review ledger, any required replacement/withdrawal records, no unresolved release blocker and a final accepted release report.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FR-08 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-08--stabilize-and-close.
+Perform the finite maintainer review under REL-11: disposition known defects, rehearse required replacement/withdrawal decisions and reconcile invalidated evidence. Record the closeout decision before admitting the next program; promise no support service.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Global Stop Conditions
 
@@ -135,8 +232,8 @@ Every current `FCR-*` family has exactly one primary execution owner:
 
 | Plan | Primary families | Count |
 | --- | --- | ---: |
-| [Product And Delivery](ProductImplementationPlan.md#product-and-delivery) | `FCR-PROD-01`–`06` | 6 |
-| [Foundation, World, And Content](FoundationImplementationPlan.md#foundation-world-and-content) | `FCR-CORE-01`, `FCR-PLAT-01`, `FCR-TASK-01`, `FCR-WORLD-01`–`03`, `FCR-CONT-01`–`03`, `FCR-SHDR-01`, `FCR-TOOL-01` | 11 |
+| [Product And Delivery](ProductImplementationPlan.md#first-release-product-implementation-plan) | `FCR-PROD-01`–`06` | 6 |
+| [Foundation, World, And Content](FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan) | `FCR-CORE-01`, `FCR-PLAT-01`, `FCR-TASK-01`, `FCR-WORLD-01`–`03`, `FCR-CONT-01`–`03`, `FCR-SHDR-01`, `FCR-TOOL-01` | 11 |
 | [RHI And GPU Execution](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md) | `FCR-RHI-01`–`06` | 6 |
 | [Renderer: Frame And Scene](../../Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md) | `FCR-REN-01`–`03` | 3 |
 | [Renderer: Geometry And Ray Tracing](../../Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md) | `FCR-REN-04`, `05`, `12`, `17`, `21`, `23` | 6 |

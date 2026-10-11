@@ -41,9 +41,10 @@ The module hierarchy mirrors [Engine](Modules/Engine/README.md), [Tools](Modules
 
 | Document role | Conventional name | Authority |
 | --- | --- | --- |
-| feature or module entry | `README.md` | current/target design, ownership, limits, and navigation |
+| navigation | `README.md` | short routes to named design, implementation and proof documents |
+| feature or module design | `*Design.md` or `*Capabilities.md` | what, why, how, ownership and limits |
 | dated source ledger | `Capability.md` or `CapabilityInventory.md` | source/build presence and explicit gaps at its named snapshot |
-| delivery sequence | `Plan.md` or a narrowly named `*Plan.md` | phase order, dependencies, stop rules, and phase exits |
+| delivery sequence | `ImplementationPlan.md` or a scoped `*ImplementationPlan.md` | phase order, dependencies, stop rules, and phase exits |
 | external or historical study | `Research.md` or a descriptive `*Research.md` | precedent, options, visual exploration, or dated baseline only |
 | feature-local proof contract | `Acceptance.md` | criteria, controlled failures, checks, and definition of done |
 

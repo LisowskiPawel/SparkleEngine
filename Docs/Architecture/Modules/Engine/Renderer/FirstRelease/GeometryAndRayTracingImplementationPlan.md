@@ -1,6 +1,8 @@
 # Renderer Geometry And Ray-Tracing Closure Plan
 
-[Docs](../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../README.md) / [Up](README.md) / [Design](../RendererDesign.md)
+
+Stages: [GR-0](#gr-0--freeze-geometry-material-and-traversal-semantics) / [GR-1](#gr-1--mesh-and-texture-residency) / [GR-2](#gr-2--visibility-draw-preparation-and-raster-gbuffer) / [GR-3](#gr-3--renderer-tlas-policy-and-publication) / [GR-4](#gr-4--ray-traced-gbuffer) / [GR-5](#gr-5--deferred-gbuffer-decals) / [GR-6](#gr-6--geometry-ray-and-decal-candidate-closure).
 
 Make raster and ray rendering consume the same correct geometry and materials, then add the required decals.
 
@@ -52,6 +54,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Phase exit criteria:** fixtures and analytic/reference oracles cover admitted static/skinned/morph, material, alpha, two-sided, transform, visibility, and traversal cells; every family contract is binary and current.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only GR-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-0--freeze-geometry-material-and-traversal-semantics.
+Goal: establish one authored-to-GPU semantic contract and deterministic fixtures shared by raster, inline ray query, and native ray pipeline. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `GR-1` — Mesh And Texture Residency
 
 **Goal:** close `FCR-REN-17` with bounded CPU work, upload, activation, replacement, cancellation, and completion-safe eviction.
@@ -63,6 +76,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 **Failure modes:** stale generation activates; cancellation leaks staging; upload token failure publishes; resource evicted while another queue uses it; backlog exceeds bound; placeholder changes silently; memory never returns after reload.
 
 **Phase exit criteria:** all residency criteria and negative checks pass at/below/above limits; activation is transactional; memory and queue high-water are bounded; reload/eviction leaves no stale binding.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only GR-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-1--mesh-and-texture-residency.
+Goal: close FCR-REN-17 with bounded CPU work, upload, activation, replacement, cancellation, and completion-safe eviction. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `GR-2` — Visibility, Draw Preparation, And Raster GBuffer
 
@@ -76,6 +100,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Phase exit criteria:** analytic visibility cases, serial/parallel draw equivalence, batching correctness/benefit, controlled failures, deterministic GBuffer fixtures, and native validation pass for admitted content on both backends.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only GR-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-2--visibility-draw-preparation-and-raster-gbuffer.
+Goal: close FCR-REN-21 and FCR-REN-04 with deterministic visible work and a semantically correct PBR GBuffer. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `GR-3` — Renderer TLAS Policy And Publication
 
 **Goal:** close `FCR-REN-12` by converting current scene generations into the correct acceleration structure and operation plan consumed by every ray effect.
@@ -87,6 +122,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 **Failure modes:** refit after topology change; deleted instance persists; contribution maps wrong hit group; operation buffer overflows; new TLAS publishes before completion; old TLAS retires early; unsupported partitioned path lies about active state.
 
 **Phase exit criteria:** selection, identity, update policy, bounds, failure, synchronization, native validation, and cost criteria pass across both backends and admitted TLAS routes.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only GR-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-3--renderer-tlas-policy-and-publication.
+Goal: close FCR-REN-12 by converting current scene generations into the correct acceleration structure and operation plan consumed by every ray effect. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `GR-4` — Ray-Traced GBuffer
 
@@ -100,6 +146,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Phase exit criteria:** shared semantic criteria and controlled failures pass for every admitted route/backend/content cell; route state is observable; differences are within owned numerical tolerances and cost evidence supports defaults.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only GR-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-4--ray-traced-gbuffer.
+Goal: close FCR-REN-05 with automatic/inline/native-pipeline traversal adapters producing one shared semantic GBuffer result. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `GR-5` — Deferred GBuffer Decals
 
 **Goal:** close `FCR-REN-23` by implementing the authored decal path, bounded scene/GPU representation, deterministic post-GBuffer composition, and equivalent secondary-ray material resolution defined by the [deferred-decals contract](../Features/DeferredDecals/Acceptance.md).
@@ -112,6 +169,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Phase exit criteria:** `AC-DECAL-01` through `AC-DECAL-08` and their failure/check matrix pass for deterministic overlap, channel-mask, normal, edge, motion, lifetime, overflow, secondary-ray, backend, performance, and package cases; `FCR-REN-23` records candidate-bound evidence and limitations.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only GR-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-5--deferred-gbuffer-decals.
+Goal: close FCR-REN-23 by implementing the authored decal path, bounded scene/GPU representation, deterministic post-GBuffer composition, and equivalent secondary-ray material resolution defined by the deferred-decals contract (../Features/DeferredDecals/Acceptance.md). Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `GR-6` — Geometry, Ray, And Decal Candidate Closure
 
 **Goal:** prove that residency, visibility, raster, TLAS, ray GBuffer, and deferred decals agree for one candidate and release content set.
@@ -121,6 +189,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 **Failure modes:** route uses different cooked generation; residency report predates GBuffer fix; raster/ray comparison is post-tonemapped; one route/backend unavailable; memory evidence omits reload/soak.
 
 **Phase exit criteria:** all six FCR reports have exact criteria/failure/check matrices, raw comparison artifacts, native diagnostics, performance/memory records, limitations, and candidate-bound decisions.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only GR-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-6--geometry-ray-and-decal-candidate-closure.
+Goal: prove that residency, visibility, raster, TLAS, ray GBuffer, and deferred decals agree for one candidate and release content set. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Reference And Ownership
 
@@ -133,6 +212,6 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Parent:** [First Release Renderer Plans](README.md)
 
-**Architecture:** [Geometry And Resources](../Features/GeometryAndResources/README.md), [Renderer Ray Tracing](../Features/RayTracing/RayTracingDesign.md), and [RHI Ray Tracing](../../RHI/Features/PipelineAndExecution/PipelineAndExecutionDesign.md#ray-tracing)
+**Architecture:** [Geometry And Resources](../Features/GeometryAndResources/GeometryAndResourcesDesign.md), [Renderer Ray Tracing](../Features/RayTracing/RayTracingDesign.md), and [RHI Ray Tracing](../../RHI/Features/PipelineAndExecution/PipelineAndExecutionDesign.md#ray-tracing)
 
 </details>

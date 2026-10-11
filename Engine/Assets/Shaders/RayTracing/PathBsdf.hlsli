@@ -171,8 +171,7 @@ namespace PathBsdf
 
 		if (selectedLobe == RayTracingPathSample::LobeDiffuse)
 		{
-			const CommonSampling::CosineHemisphereSample direction = CommonSampling::SampleCosineHemisphere(surface.NormalWorld, sample);
-			result.DirectionWorld = direction.DirectionWorld;
+			result.DirectionWorld = CommonSampling::SampleCosineHemisphereDirection(surface.NormalWorld, sample);
 		}
 		else
 		{

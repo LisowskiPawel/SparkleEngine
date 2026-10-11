@@ -2,6 +2,8 @@
 
 [Docs](../../../README.md) / [Up](PerformanceDiagnosticsDesign.md)
 
+Stages: [Phase 0](#phase-0--reconcile-and-choose) / [Phase 1](#phase-1--prove-external-capture-end-to-end) / [Phase 2](#phase-2--build-the-bounded-data-spine) / [Phase 3](#phase-3--ship-the-first-orientation-surface) / [Phase 4](#phase-4--deliver-reproducible-evidence) / [Phase 5](#phase-5--add-selected-internal-investigation-depth) / [Phase 6](#phase-6--harden-and-close-the-selected-product).
+
 Make the existing renderer observable with trustworthy external captures before adding selected internal diagnostics.
 
 **Status:** implementation plan; not proof of implementation or shipment
@@ -116,10 +118,10 @@ Close uncertainty before code without creating speculative frozen contracts. The
 ### Ready-to-use implementation prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
-Execute the external part of Performance Diagnostics P0-GATE through Stage 0 of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md and its complete prompt. Close PIX-relevant EC-D01-09 first; inventory later Nsight/RenderDoc cells and close their delta before each adapter stage. Apply the Universal Execution Contract and retain exact installed-header/API/target/finalization/lifetime/budget/build decisions and artifacts. Preserve the parent baseline and all-map procedure for aggregate closure; a narrow Empty/Sponza control may establish the first PIX slice, and no internal metric/history/session implementation is required. A missing later tool or hardware remains BLOCKED for that cell and never silently rejects the feature or invalidates accepted PIX. Report exact commands, unsupported/unavailable distinctions and next permitted stage. Do not implement production code during discovery or start all adapters together.
+Execute the external part of Performance Diagnostics P0-GATE through Stage 0 of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md and its complete prompt. Close PIX-relevant EC-D01-09 first; inventory later Nsight/RenderDoc cells and close their delta before each adapter stage. Apply the Universal Execution Contract and retain exact installed-header/API/target/finalization/lifetime/budget/build decisions and artifacts. Preserve the parent baseline and all-map procedure for aggregate closure; a narrow Empty/Sponza control may establish the first PIX slice, and no internal metric/history/session implementation is required. A missing later tool or hardware remains BLOCKED for that cell and never silently rejects the feature or invalidates accepted PIX. Report exact commands, unsupported/unavailable distinctions and next permitted stage. Do not implement production code during discovery or start all adapters together.
 ```
 
 </details>
@@ -158,10 +160,10 @@ Individual PIX acceptance does not wait for missing later tooling. Internal Phas
 ### Ready-To-Use Entry Prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
-Execute only the earliest remaining dependency-ready stage of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md. Revalidate current source and retained gate artifacts; do not repeat completed engine repairs or source-present adapters. Refresh discovery only where stale/missing facts affect the selected delta. Preserve EXT identities and delivery priority PIX, Nsight, RenderDoc, then selected specialist tools. Apply the delegated Universal Execution Contract, retained EC-G0A/0B/0C controls and actual later-provider locality proof. Do not implement internal Performance phases 2-6 or all adapters in one change. Report per-provider evidence separately from aggregate P1-GATE; missing/unrun evidence remains BLOCKED and user-excluded lanes remain EXCLUDED.
+Execute only the earliest remaining dependency-ready stage of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md. Revalidate current source and retained gate artifacts; do not repeat completed engine repairs or source-present adapters. Refresh discovery only where stale/missing facts affect the selected delta. Preserve EXT identities and delivery priority PIX, Nsight, RenderDoc, then selected specialist tools. Apply the delegated Universal Execution Contract, retained EC-G0A/0B/0C controls and actual later-provider locality proof. Do not implement internal Performance phases 2-6 or all adapters in one change. Report per-provider evidence separately from aggregate P1-GATE; missing/unrun evidence remains BLOCKED and user-excluded lanes remain EXCLUDED.
 ```
 
 </details>
@@ -258,7 +260,7 @@ Acceptance: cadence and regressed-frame tests, source inspection proving no fram
 ### Ready-to-use implementation prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Implement only these selected phase-2 packages: <FND IDs>. Before editing, fill
@@ -360,7 +362,7 @@ Render selected compact groups through the existing game console/UI packet path.
 ### Ready-to-use implementation prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Implement only these phase-3 orientation packages: <ORI IDs>. Begin with the test
@@ -452,7 +454,7 @@ Add only the analysis needed by a selected benchmark consumer: per-run distribut
 ### Ready-to-use implementation prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Implement only these phase-4 evidence packages: <EVD IDs>. Begin with the test
@@ -560,7 +562,7 @@ Implement one typed one-shot state machine over accepted `CAP-00`: `Idle -> Arme
 ### Ready-to-use implementation prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Implement only these phase-5 internal investigation packages: <INV IDs and CAP-00/CAP-01 if
@@ -721,7 +723,7 @@ Closing with deferred packages means the selected product is finished, not that 
 ### Ready-to-use implementation prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute Performance Diagnostics phase 6 for the currently Accepted/Selected

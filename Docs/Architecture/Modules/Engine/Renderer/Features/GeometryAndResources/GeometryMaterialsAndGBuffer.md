@@ -1,6 +1,6 @@
 # Renderer Geometry, Materials, and GBuffer
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](GeometryAndResourcesDesign.md)
 
 **Status:** current feature dossier; source-backed, not visual fidelity, raster/ray parity, performance, or release evidence
 

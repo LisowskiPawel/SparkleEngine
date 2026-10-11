@@ -96,7 +96,7 @@ Three headline cases, quality/latency/memory frontier and failure gallery, exact
 
 **Evidence boundary:** No owned neural evaluation/adoption result is claimed.
 
-**Delivery route:** `M6`, `WL-07/08`; [portfolio plan](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#graphics-portfolio-delivery-plan) assembles accepted [Neural](../Architecture/CrossModule/NeuralGraphics/NeuralGraphicsDesign.md#neural-graphics-acceptance), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/README.md) and [Graphics Workloads](../Acceptance/GraphicsWorkloads.md) evidence.
+**Delivery route:** `M6`, `WL-07/08`; [portfolio plan](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#graphics-portfolio-delivery-plan) assembles accepted [Neural](../Architecture/CrossModule/NeuralGraphics/NeuralGraphicsDesign.md#neural-graphics-acceptance), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/WorkloadStudiesDesign.md) and [Graphics Workloads](../Acceptance/GraphicsWorkloads.md) evidence.
 
 **Requirements:** `PGE-01`, `03..05`, `08`, `11..13`, `15`
 

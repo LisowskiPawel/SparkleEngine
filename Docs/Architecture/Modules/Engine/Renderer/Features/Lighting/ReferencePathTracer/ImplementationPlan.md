@@ -2,6 +2,8 @@
 
 [Docs](../../../../../../../README.md) / [Up](ReferencePathTracerDesign.md)
 
+Stages: [Stage 3](#stage-3---validate-the-semantic-integrator) / [Stage 4](#stage-4---validate-surface-transport) / [Stage 5](#stage-5---validate-content-and-numeric-robustness) / [Stage 6](#stage-6---validate-per-view-accumulation-and-mode-authority) / [Stage 7](#stage-7---validate-live-viewport-and-lit-comparison) / [Stage 8](#stage-8---prove-traversal-and-backend-parity) / [Stage 9](#stage-9---prove-manual-publication-and-evidence-candidate-integrity) / [Stage 10](#stage-10---adopt-references-verify-packaging-remove-superseded-paths-and-close).
+
 Recover useful Lit and Reference images, then prove the existing tracer before using its output as a reference.
 
 **Status:** source stages delivered; recovery, deferred GPU validation, artifact integrity and final adoption remain open
@@ -103,6 +105,17 @@ If source reality proves a plan instruction wrong, correct the owning architectu
 - Focused `CHK-RPT-03`, `04`, `05`, `18`, and `19` cover the minimal portions of `AC-RPT-05` through `10`, retained `AC-RPT-22`/`23`, `FM-RPT-02` through `06`, and `FM-RPT-21`/`22`.
 
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Stage 3 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-3---validate-the-semantic-integrator.
+Task: Validate The Semantic Integrator. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## Stage 4 - Validate Surface Transport
 
 **Remaining work:** exercise the existing production route against the following retained exit requirements; repair only demonstrated failures. This is deferred validation, not another implementation of the delivered feature.
@@ -114,6 +127,17 @@ If source reality proves a plan instruction wrong, correct the owning architectu
 - `CHK-RPT-04`, `05`, early `11`, `18`, and `19` cover `AC-RPT-06` through `10`, `15`, retained `AC-RPT-22`/`23`, `FM-RPT-05`, `06`, `11`, `16`, `21`, and `22`.
 
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Stage 4 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-4---validate-surface-transport.
+Task: Validate Surface Transport. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## Stage 5 - Validate Content And Numeric Robustness
 
 **Remaining work:** exercise the existing production route against the following retained exit requirements; repair only demonstrated failures. This is deferred validation, not another implementation of the delivered feature.
@@ -124,6 +148,17 @@ If source reality proves a plan instruction wrong, correct the owning architectu
 - `CORE-RPT-5` proves that material decoding, hit/path-surface reconstruction, alpha/sidedness, deformation snapshots, normal handling, and robust-ray math have one shared owner with affected non-Reference consumers updated.
 - `CHK-RPT-03`, `04`, `08`, `18`, and `19` cover `AC-RPT-05` through `08`, `12`, `15`, retained `AC-RPT-22`/`23`, `FM-RPT-04`, `08`, `16`, `19`, `21`, and `22`.
 
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Stage 5 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-5---validate-content-and-numeric-robustness.
+Task: Validate Content And Numeric Robustness. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Stage 6 - Validate Per-View Accumulation And Mode Authority
 
@@ -141,6 +176,17 @@ If source reality proves a plan instruction wrong, correct the owning architectu
 - `CHK-RPT-09`, focused `CHK-RPT-15`, `CHK-RPT-18`, and `CHK-RPT-19` cover accumulation/lifecycle portions of `AC-RPT-13`, `15`, `18`, retained `AC-RPT-22`/`23`, and `FM-RPT-06`, `09`, `10`, `14`, `15`, `21`, `22` without requiring disk output.
 
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Stage 6 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-6---validate-per-view-accumulation-and-mode-authority.
+Task: Validate Per-View Accumulation And Mode Authority. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## Stage 7 - Validate Live Viewport And Lit Comparison
 
 **Remaining work:** exercise the existing production route against the following retained exit requirements; repair only demonstrated failures. This is deferred validation, not another implementation of the delivered feature.
@@ -153,6 +199,17 @@ If source reality proves a plan instruction wrong, correct the owning architectu
 - Focused `CHK-RPT-02`, `09`, `15`, `16`, `18`, `19`, and `20` close the primary viewport portions of `AC-RPT-02`, `04`, `13`, `18`, `20`, retained `AC-RPT-22`/`23`, and `FM-RPT-09`, `14`, `17`, `18`, `21`, `22`.
 
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Stage 7 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-7---validate-live-viewport-and-lit-comparison.
+Task: Validate Live Viewport And Lit Comparison. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## Stage 8 - Prove Traversal And Backend Parity
 
 **Remaining work:** exercise the existing production route against the following retained exit requirements; repair only demonstrated failures. This is deferred validation, not another implementation of the delivered feature.
@@ -162,6 +219,17 @@ If source reality proves a plan instruction wrong, correct the owning architectu
 - No fallback, backend drift, payload/SBT mismatch, viewport-state divergence, or unexplained native validation message remains.
 - `CHK-RPT-07`, `08`, `12`, focused `16`, `18`, and `19` cover `AC-RPT-11`, `12`, `17`, `20`, retained `AC-RPT-22`/`23`, and `FM-RPT-07`, `08`, `13`, `18`, `21`, `22`.
 
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Stage 8 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-8---prove-traversal-and-backend-parity.
+Task: Prove Traversal And Backend Parity. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Stage 9 - Prove Manual Publication And Evidence-Candidate Integrity
 
@@ -176,6 +244,17 @@ If source reality proves a plan instruction wrong, correct the owning architectu
 - External comparisons retain exact source revisions/configurations/licenses and semantic equivalence; agreement is supporting evidence, not derivation proof. `CHK-RPT-20` confirms every NVIDIA/Epic lesson remains implemented, stage-owned, deliberately different, or excluded rather than silently omitted.
 - No unexplained native validation, crash/hang, invalid-result state, statistical disagreement, or plausible partial result remains.
 
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Stage 9 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-9---prove-manual-publication-and-evidence-candidate-integrity.
+Task: Prove Manual Publication And Evidence-Candidate Integrity. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Stage 10 - Adopt References, Verify Packaging, Remove Superseded Paths, And Close
 
@@ -205,10 +284,10 @@ Finish the product boundary, produce release-map references inside the accepted 
 ### Ready-to-use prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 10 of Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md after Stage 9 evidence is complete and the exact `ReleaseMapSet`, support-machine identities, and `REL-03 PASS` package revision are accepted. Apply the Universal Execution Contract.
+Execute only Stage 10 of Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md after Stage 9 evidence is complete and the exact `ReleaseMapSet`, support-machine identities, and `REL-03 PASS` package revision are accepted. Apply the Universal Execution Contract.
 
 Freeze every applicable release-map camera/configuration within the accepted transport domain and produce PTD-03 raw references with independent replicates, convergence/uncertainty, complete provenance, hashes, full frames/crops, artifact review, and shared-dependency oracle statements. Exercise the exact clean-machine DevelopmentEditor/package workflow, writable-root/read-only-install and spaces/non-ASCII paths, both backends, first use, user-facing error/support output, budgets, and controlled failures. Keep `ShippingEditor` and `ShippingGame` free of every producer/session factory and user/export/package route unless release scope explicitly admits them.
 
@@ -222,10 +301,10 @@ Complete the clean break: remove or unambiguously relabel all old GBuffer-seeded
 ## Remaining Execution Prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
-Execute the earliest unfinished recovery/validation slice in Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md. Apply its Universal Execution Contract and current design owners. Do not repeat delivered Stage 0–9 implementation. Revalidate current code, cooked inputs and candidate evidence, locate the first incorrect product, and repair only the identified defect. Retain the existing frozen tolerances, capacities, matrix, source/bytecode identity and failure oracles; use the smallest required checks. Source presence or deferred execution is not PASS. Remove probes, pass the Stage Source-Style Gate for source changes, and remove completed tasks from this plan at handoff.
+Execute the earliest unfinished recovery/validation slice in Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md. Apply its Universal Execution Contract and current design owners. Do not repeat delivered Stage 0–9 implementation. Revalidate current code, cooked inputs and candidate evidence, locate the first incorrect product, and repair only the identified defect. Retain the existing frozen tolerances, capacities, matrix, source/bytecode identity and failure oracles; use the smallest required checks. Source presence or deferred execution is not PASS. Remove probes, pass the Stage Source-Style Gate for source changes, and remove completed tasks from this plan at handoff.
 ```
 
 </details>

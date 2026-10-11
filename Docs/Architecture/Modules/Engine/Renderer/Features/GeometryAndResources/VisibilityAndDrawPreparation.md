@@ -1,6 +1,6 @@
 # Renderer Visibility And Draw Preparation
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](GeometryAndResourcesDesign.md)
 
 **Status:** current feature dossier; source-backed, not visibility correctness, batching benefit, transparency, multi-view, or performance evidence
 

@@ -1,6 +1,8 @@
 # Renderer Lighting Closure Plan
 
-[Docs](../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../README.md) / [Up](README.md) / [Design](../RendererDesign.md)
+
+Stages: [LGT-0](#lgt-0--freeze-units-estimators-and-comparison-domain) / [LGT-1](#lgt-1--direct-lighting) / [LGT-2](#lgt-2--indirect-lighting) / [LGT-3](#lgt-3--preserve-discovery-and-close-the-required-reference) / [LGT-4](#lgt-4--lighting-candidate-closure).
 
 Produce correct direct, indirect and progressive reference lighting before judging reconstruction or frame rate.
 
@@ -55,6 +57,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Phase exit criteria:** analytic fixtures and raw observables exist for every currently admitted direct/indirect cell; `FCR-REN-08` remains unaccepted until remaining recovery, estimator/oracle and release evidence closes; no undocumented transport claim enters implementation.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only LGT-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md#lgt-0--freeze-units-estimators-and-comparison-domain.
+Goal: establish one testable material/light/sky/unit, sampling identity, raw-output, and comparison contract for all three families. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `LGT-1` — Direct Lighting
 
 **Goal:** sequence the accepted [Direct Lighting plan](../Features/Lighting/DirectLighting/ImplementationPlan.md) to close `FCR-REN-06` for all admitted analytic light kinds, material lobes, reservoir reuse, visibility, reconstruction, and many-light behavior.
@@ -66,6 +79,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 **Failure modes:** zero/negative/non-finite weight; stale reservoir after identity/reset; self-intersection/acne or light leak; unsupported traversal hidden; light beyond limit corrupts buffer; one lobe receives duplicate/missing energy.
 
 **Phase exit criteria:** `DIR-D0` is accepted and every required stage/criterion in the feature plan passes or produces an explicit blocker in `FCR-REN-06`.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only LGT-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md#lgt-1--direct-lighting.
+Goal: sequence the accepted Direct Lighting plan (../Features/Lighting/DirectLighting/ImplementationPlan.md) to close FCR-REN-06 for all admitted analytic light kinds, material lobes, reservoir reuse, visibility, reconstruction, and many-light behavior. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `LGT-2` — Indirect Lighting
 
@@ -79,6 +103,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Phase exit criteria:** `IND-D0` is accepted and every required stage/criterion in the feature plan passes or produces an explicit blocker in `FCR-REN-07`.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only LGT-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md#lgt-2--indirect-lighting.
+Goal: sequence the accepted Indirect Lighting plan (../Features/Lighting/IndirectLighting/ImplementationPlan.md) to close FCR-REN-07 for the explicitly admitted path, shift, GRIS, reuse, material, sky, temporal, reconstruction, and failure domain. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `LGT-3` — Preserve Discovery And Close The Required Reference
 
 **Goal:** finish the existing progressive Reference recovery/validation and Stage-10 delivery against the accepted PTD-00-R1 transport contract; this phase cannot substitute finite-depth/denoised output for full admitted reference truth.
@@ -89,6 +124,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Phase exit criteria:** required Reference feature criteria pass on both APIs and the actual candidate; no invalid/unconverged/finite diagnostic is admitted as reference. Full reference usability and realtime >=30 FPS remain separately required in the release owner. No score is awarded by completing this plan text.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only LGT-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md#lgt-3--preserve-discovery-and-close-the-required-reference.
+Goal: finish the existing progressive Reference recovery/validation and Stage-10 delivery against the accepted PTD-00-R1 transport contract; this phase cannot substitute finite-depth/denoised output for full admitted reference truth. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `LGT-4` — Lighting Candidate Closure
 
 **Goal:** after `FCR-REN-08` implementation through the authorized `PTD-01`, compare direct/indirect results with the accepted Reference Path Tracer and close all three families for one candidate.
@@ -98,6 +144,17 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 **Failure modes:** reference/candidate share unverified input; accumulation not converged; exposure/tone confounds raw result; one backend/provider differs; artifact gallery is cherry-picked; path-tracer evidence predates lighting changes.
 
 **Phase exit criteria:** direct, indirect, and Reference Path Tracer reports satisfy their complete Architecture contracts; raw/reference, convergence, analytic/independent, failure, backend, package, quality/time/memory, and release-map evidence share one candidate identity.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only LGT-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md#lgt-4--lighting-candidate-closure.
+Goal: after FCR-REN-08 implementation through the authorized PTD-01, compare direct/indirect results with the accepted Reference Path Tracer and close all three families for one candidate. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Reference And Ownership
 

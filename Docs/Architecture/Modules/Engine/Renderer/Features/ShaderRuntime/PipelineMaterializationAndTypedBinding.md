@@ -1,6 +1,6 @@
 # Renderer Pipeline Materialization and Typed Binding
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](ShaderRuntimeDesign.md)
 
 **Status:** current feature dossier; source-backed, not backend-validation, hot-reload stress, or release evidence
 

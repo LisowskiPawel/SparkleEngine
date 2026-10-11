@@ -57,7 +57,7 @@ Primary sources: [TinyEXR v1.0.7 release](https://github.com/syoyo/tinyexr/relea
 
 | Check | Result |
 | --- | --- |
-| Exact Stage-9 prompt versus live `Plan.md` | Matched before edits. |
+| Exact Stage-9 prompt versus live `ImplementationPlan.md` | Matched before edits. |
 | `git ls-remote https://github.com/syoyo/tinyexr.git refs/tags/v1.0.7^{}` | Resolved the release tag to exact commit `6e8cac308cdf4d717078f3f37c4aa39bf3b356b4`, now used by FetchContent. |
 | Scoped source/ownership inspection | Completed for frame products, Reference committed resources, generic Renderer/RHI capture, ApplicationEditor operation ownership, Editor UI, Showcase launch, build membership, hashes, and dependency pin. The refinement pass separated manifest interpretation from execution, extracted generic image-buffer codecs and atomic bundle publication from the feature, unified repeated operation launch/settlement privately, removed destination/filesystem state and bitmap encoding from Renderer/RHI capture, made each capture consumer retain and poll its exact bounded ticket, moved ordinary viewport writing out of the scheduler, unified provenance on Core's SHA-256 digest type, and made completed native map failures terminal on both backends. No new RHI or detached-renderer owner was introduced. |
 | Digest/provenance race inspection | Corrected the View digest component to exclude viewport/host identity, retained viewport identity only for session ownership/actions, and bound every accepted readback to the exact requested digest/prefix/target before publication. This is source inspection, not Editor/game equivalence evidence. |

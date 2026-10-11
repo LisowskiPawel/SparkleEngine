@@ -2,6 +2,8 @@
 
 [Docs](../../../README.md) / [Up](ShaderSystemDesign.md)
 
+Stages: [Phase 0](#phase-0---freeze-the-lean-shadermapgraphics-pipeline-contract-and-inventory) / [Phase 1](#phase-1---establish-virtual-sources-semantic-navigation-and-one-as-binding) / [Phase 2](#phase-2---make-the-shader-class-the-complete-lean-frontend) / [Phase 3](#phase-3---establish-reproducible-compile-jobs-and-changed-dependencies) / [Phase 4](#phase-4---replace-cooked-packages-with-the-global-shader-map) / [Phase 5](#phase-5---split-raster-intent-attachment-compatibility-and-graphics-pipeline-materialization) / [Phase 6](#phase-6---deliver-the-complete-paired-ray-tracing-runtime-foundation) / [Phase 7](#phase-7---deliver-dual-execution-ray-traced-gbuffer-parity) / [Phase 8](#phase-8---add-production-hit-semantics-shadow-rays-and-scene-to-sbt-indexing) / [Phase 9](#phase-9---migrate-eligible-effects-and-deliver-one-whole-frame-execution-plan) / [Phase 10](#phase-10---deliver-apply-changed-and-one-shader-to-gpu-provenance-trace) / [Phase 11](#phase-11---eradicate-legacy-and-compatibility-surfaces) / [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate).
+
 Prove the shader and pipeline path already delivered in source; repair demonstrated discrepancies instead of repeating the migration.
 
 **Status:** implementation plan; includes the migration ledger but is not architecture authority or proof of completion
@@ -139,7 +141,15 @@ No former RT task is deferred back to the target-state document:
 
 #### Implementation prompt
 
-> Implement Phase 0 as one documentation and inventory CL directly in the unstaged `master` worktree. Apply the [common phase delivery contract](#common-phase-delivery-contract), including its pre-edit ledger, semantic-equivalent search, and mandatory Code Review `PASS`/`BLOCKED` gate. Re-run exact shader class/parameter, pass-wrapper, package, source/include, registration, compile/cache/cook, publication, runtime-generation, graph-dispatch/draw/trace, graphics-state/attachment/mesh/pipeline, editor, build-membership, generated-artifact, diagnostic, and documentation searches. Freeze the owner map and assign every old field/type/file/consumer to one later phase. Reconcile stale documentation and baseline provenance. Do not edit runtime/tool source or run executable checks.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-0---freeze-the-lean-shadermapgraphics-pipeline-contract-and-inventory and apply this plan's shared execution contract.
+Implement Phase 0 as one documentation and inventory CL directly in the unstaged `master` worktree. Apply the [common phase delivery contract](#common-phase-delivery-contract), including its pre-edit ledger, semantic-equivalent search, and mandatory Code Review `PASS`/`BLOCKED` gate. Re-run exact shader class/parameter, pass-wrapper, package, source/include, registration, compile/cache/cook, publication, runtime-generation, graph-dispatch/draw/trace, graphics-state/attachment/mesh/pipeline, editor, build-membership, generated-artifact, diagnostic, and documentation searches. Freeze the owner map and assign every old field/type/file/consumer to one later phase. Reconcile stale documentation and baseline provenance. Do not edit runtime/tool source or run executable checks.
+```
+
+</details>
 
 #### Phase-specific references
 
@@ -196,7 +206,15 @@ Suggested title: `Shaders: freeze lean shader and pipeline migration contract`.
 
 #### Implementation prompt
 
-> Reconcile only an identified remaining Phase 1 source-contract discrepancy. The semantic source layout, virtual identities, canonical AS binding and named duplicate-shadow deletion are already source-present. Apply the common phase contract to any justified delta, keep one existing authority, and retain precise unresolved oracles for Phase 12. Do not recreate delivered code or move the deleted Deferred directory again; source inspection does not close native/backend acceptance.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-1---establish-virtual-sources-semantic-navigation-and-one-as-binding and apply this plan's shared execution contract.
+Reconcile only an identified remaining Phase 1 source-contract discrepancy. The semantic source layout, virtual identities, canonical AS binding and named duplicate-shadow deletion are already source-present. Apply the common phase contract to any justified delta, keep one existing authority, and retain precise unresolved oracles for Phase 12. Do not recreate delivered code or move the deleted Deferred directory again; source inspection does not close native/backend acceptance.
+```
+
+</details>
 
 #### Phase-specific references
 
@@ -256,11 +274,33 @@ The implementation instructions for this recorded source slice are retired. Its 
 
 **Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 2 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-2---make-the-shader-class-the-complete-lean-frontend.
+Task: Make the shader class the complete lean frontend. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 3 - Establish reproducible compile jobs and changed dependencies
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-3-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
 **Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 3 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-3---establish-reproducible-compile-jobs-and-changed-dependencies.
+Task: Establish reproducible compile jobs and changed dependencies. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### Phase 4 - Replace cooked packages with the global shader map
 
@@ -268,11 +308,33 @@ The implementation instructions for this recorded source slice are retired. Its 
 
 **Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 4 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-4---replace-cooked-packages-with-the-global-shader-map.
+Task: Replace cooked packages with the global shader map. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 5 - Split raster intent, attachment compatibility, and graphics pipeline materialization
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-5-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
 **Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 5 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-5---split-raster-intent-attachment-compatibility-and-graphics-pipeline-materialization.
+Task: Split raster intent, attachment compatibility, and graphics pipeline materialization. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### Phase 6 - Deliver the complete paired ray-tracing runtime foundation
 
@@ -280,11 +342,33 @@ The implementation instructions for this recorded source slice are retired. Its 
 
 **Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 6 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-6---deliver-the-complete-paired-ray-tracing-runtime-foundation.
+Task: Deliver the complete paired ray-tracing runtime foundation. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 7 - Deliver dual-execution ray-traced GBuffer parity
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-7-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
 **Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 7 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-7---deliver-dual-execution-ray-traced-gbuffer-parity.
+Task: Deliver dual-execution ray-traced GBuffer parity. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### Phase 8 - Add production hit semantics, shadow rays, and scene-to-SBT indexing
 
@@ -292,11 +376,30 @@ The implementation instructions for this recorded source slice are retired. Its 
 
 **Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 8 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-8---add-production-hit-semantics-shadow-rays-and-scene-to-sbt-indexing.
+Task: Add production hit semantics, shadow rays, and scene-to-SBT indexing. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 9 - Migrate eligible effects and deliver one whole-frame execution plan
 
 #### Implementation prompt
 
-> Implement Phase 9 as one whole-frame ray-tracing selection and eligible-effect migration CL directly in the unstaged `master` worktree. Apply the [common phase delivery contract](#common-phase-delivery-contract), including whole-frame selection reachability, strict-mode negative-oracle coverage, and the mandatory source-only Code Review gate. Classify every current ray-query effect, migrate only effects with a coherent pipeline design and accepted parity/quality oracle, resolve one immutable strict/automatic execution plan before graph construction, preserve all temporal and supported-alternate ownership, and delete deep feature-specific API selection. Update the Phase 12 validation route, but do not configure, build, compile shaders, cook, launch, run tests, capture, or collect performance evidence. Do not require a mega-pipeline or force unsuitable effects into pipeline mode.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-9---migrate-eligible-effects-and-deliver-one-whole-frame-execution-plan and apply this plan's shared execution contract.
+Implement Phase 9 as one whole-frame ray-tracing selection and eligible-effect migration CL directly in the unstaged `master` worktree. Apply the [common phase delivery contract](#common-phase-delivery-contract), including whole-frame selection reachability, strict-mode negative-oracle coverage, and the mandatory source-only Code Review gate. Classify every current ray-query effect, migrate only effects with a coherent pipeline design and accepted parity/quality oracle, resolve one immutable strict/automatic execution plan before graph construction, preserve all temporal and supported-alternate ownership, and delete deep feature-specific API selection. Update the Phase 12 validation route, but do not configure, build, compile shaders, cook, launch, run tests, capture, or collect performance evidence. Do not require a mega-pipeline or force unsuitable effects into pipeline mode.
+```
+
+</details>
 
 #### Phase-specific references
 
@@ -344,7 +447,15 @@ Suggested title: `Renderer: deliver whole-frame ray execution planning`.
 
 #### Implementation prompt
 
-> Implement Phase 10 as one Application/Editor shader-workflow and provenance CL directly in the unstaged `master` worktree. Apply the [common phase delivery contract](#common-phase-delivery-contract), including intent-to-owner trace proof, frontend implementation-detail audit, and the mandatory source-only Code Review gate. Starting from the package-free vocabulary and complete raster/compute/RT runtime delivered by Phases 4-9, replace parallel recook/reload controls, artifact-directory scans, and the implementation-record table with one semantic `Apply Changed` workflow, immutable operation/catalog read models, automatic activation after renderer validation, contextual expert inspection, and one provenance trace from shader/effect identity through map, native pipeline/table generation, graph event, and capture. Delete manual normal-path reload, duplicate status formatting, and obsolete presentation fields. Update the Phase 12 workflow validation route, but do not configure, build, compile shaders, cook, launch, run tests, capture, or collect performance evidence. Do not add another panel, cache browser, log stream, permutation UI, backend-control surface, or executable-bypass path.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-10---deliver-apply-changed-and-one-shader-to-gpu-provenance-trace and apply this plan's shared execution contract.
+Implement Phase 10 as one Application/Editor shader-workflow and provenance CL directly in the unstaged `master` worktree. Apply the [common phase delivery contract](#common-phase-delivery-contract), including intent-to-owner trace proof, frontend implementation-detail audit, and the mandatory source-only Code Review gate. Starting from the package-free vocabulary and complete raster/compute/RT runtime delivered by Phases 4-9, replace parallel recook/reload controls, artifact-directory scans, and the implementation-record table with one semantic `Apply Changed` workflow, immutable operation/catalog read models, automatic activation after renderer validation, contextual expert inspection, and one provenance trace from shader/effect identity through map, native pipeline/table generation, graph event, and capture. Delete manual normal-path reload, duplicate status formatting, and obsolete presentation fields. Update the Phase 12 workflow validation route, but do not configure, build, compile shaders, cook, launch, run tests, capture, or collect performance evidence. Do not add another panel, cache browser, log stream, permutation UI, backend-control surface, or executable-bypass path.
+```
+
+</details>
 
 #### Phase-specific references
 
@@ -391,7 +502,15 @@ Suggested title: `Shader Tools: deliver Apply Changed and shader-to-GPU provenan
 
 #### Implementation prompt
 
-> Implement Phase 11 as one adversarial legacy-eradication and ownership-closure CL directly in the unstaged `master` worktree after Phases 0-10 are complete. Apply the [common phase delivery contract](#common-phase-delivery-contract), including repository-wide exact and semantic-equivalent searches, bidirectional owner traces, generated/build/frontend inspection, and the mandatory Code Review gate. Delete every residual legacy, compatibility, duplicate, bypass, fallback, eager-variant, diagnostic-scaffold, and renamed-equivalent surface from the shader, graphics-pipeline, ray-tracing, cook, runtime, graph, and Shader Tools migration. Fix each finding at its current owning responsibility and update all consumers in the same CL. Do not use this phase to defer deletions assigned to earlier phases, introduce a third design, or preserve an old path because final validation has not run; do not stage, commit, push, or submit.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-11---eradicate-legacy-and-compatibility-surfaces and apply this plan's shared execution contract.
+Implement Phase 11 as one adversarial legacy-eradication and ownership-closure CL directly in the unstaged `master` worktree after Phases 0-10 are complete. Apply the [common phase delivery contract](#common-phase-delivery-contract), including repository-wide exact and semantic-equivalent searches, bidirectional owner traces, generated/build/frontend inspection, and the mandatory Code Review gate. Delete every residual legacy, compatibility, duplicate, bypass, fallback, eager-variant, diagnostic-scaffold, and renamed-equivalent surface from the shader, graphics-pipeline, ray-tracing, cook, runtime, graph, and Shader Tools migration. Fix each finding at its current owning responsibility and update all consumers in the same CL. Do not use this phase to defer deletions assigned to earlier phases, introduce a third design, or preserve an old path because final validation has not run; do not stage, commit, push, or submit.
+```
+
+</details>
 
 #### Phase-specific references
 
@@ -445,7 +564,15 @@ Suggested title: `Shaders: eradicate legacy shader and pipeline architecture`.
 
 #### Implementation prompt
 
-> Implement Phase 12 directly in the unstaged `master` worktree against the complete Phase 0-11 candidate. Apply the [common phase delivery contract](#common-phase-delivery-contract) as the final whole-system gate, including rechecking the clean Phase 11 legacy floor and a mandatory Code Review `PASS`. Delete obsolete disposable shader and cooked output, regenerate the one current catalog/map/library once, then perform claim-driven formatting, architecture, compiler, cook, raster/compute/inline/RT-pipeline runtime, graphics-state, reload, lifetime, alternate-path/failure, capture, and performance validation. Fix failures at their owning responsibility without compatibility and return to Phase 11 if any old or duplicate path is exposed. Remove temporary harnesses, fault injectors, verbose logging, reports, and excessive diagnostics before handoff. Do not stage, commit, push, or submit.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate and apply this plan's shared execution contract.
+Implement Phase 12 directly in the unstaged `master` worktree against the complete Phase 0-11 candidate. Apply the [common phase delivery contract](#common-phase-delivery-contract) as the final whole-system gate, including rechecking the clean Phase 11 legacy floor and a mandatory Code Review `PASS`. Delete obsolete disposable shader and cooked output, regenerate the one current catalog/map/library once, then perform claim-driven formatting, architecture, compiler, cook, raster/compute/inline/RT-pipeline runtime, graphics-state, reload, lifetime, alternate-path/failure, capture, and performance validation. Fix failures at their owning responsibility without compatibility and return to Phase 11 if any old or duplicate path is exposed. Remove temporary harnesses, fault injectors, verbose logging, reports, and excessive diagnostics before handoff. Do not stage, commit, push, or submit.
+```
+
+</details>
 
 #### Phase-specific references
 

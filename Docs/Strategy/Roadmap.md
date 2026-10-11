@@ -1,6 +1,6 @@
-# F. Principal Graphics Delivery Roadmap
+# Implementation Roadmap
 
-[Docs](../README.md) / [Up](README.md)
+[Docs](../README.md) / [Up](README.md) / [Design targets](Requirements.md) / [Release implementation](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md)
 
 **Status:** master roadmap; planning priorities, not completion results
 
@@ -8,11 +8,25 @@
 
 **Updated:** 2026-10-11; progress summarizes recorded source work, not release approval
 
-Start here to choose your next task. Open its linked plan for the exact stages, prerequisites and work and exit criteria. Work is ordered by dependencies, with no delivery dates or hour estimates.
+Choose one task below, open its **implementation stage**, and copy that stage's prompt. The linked **design** explains the behavior and checks to preserve. This roadmap owns priority and brief progress; implementation plans own the steps.
+
+## How To Execute A Stage
+
+1. Open the stage linked under **Where We Are And What Is Next**.
+2. Read its prerequisites and linked design. A blocked prerequisite stays blocked; completed source work is reused.
+3. Expand **Copy implementation prompt**, paste it, and work only that stage.
+4. Run its exit checks. Record the candidate result in Acceptance and update the short progress row here.
+5. Continue to the next admitted stage in the plan. Source changes alone do not pass a release gate.
 
 ## Where We Are And What Is Next
 
 **Next: qualify package inputs, finish PD-3, and produce the archive for your clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation). No verified product archive exists yet.
+
+| Current work | Design / acceptance reference | Implementation stages |
+| --- | --- | --- |
+| Qualify inputs, then finish the three-product archive | [Package design and reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs) | [PD-3: package and installation](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation) |
+| Close missing product and source journeys | [Approved product scope](../Acceptance/FirstRelease.md#approved-release-scope) | [PD-1: Game/Editor](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells), [PD-2: source/Launcher](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-2--source-build-cook-and-launcher) |
+| After the archive: local diagnostics and closure | [Self-service and diagnostic contract](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md) | [PD-4: local diagnostics](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-4--support-incident-response-and-product-closure) |
 
 **Renderer work:** continue [Lit/Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#required-execution-order). Recheck dated failures against current source before fixing their owner.
 
@@ -28,7 +42,7 @@ Start here to choose your next task. Open its linked plan for the exact stages, 
 | PD-2: source / Launcher | Typed sync/configure/build/cook/run/clean and owner-check routes exist. | Cold/warm and controlled failures; independent source-adopter rehearsal. |
 | PD-3 / FR-02: package | Transactional stage, manifests, dependency and ZIP verification exist. | Reviewed inputs; installed content-store sync/cook/run/remove; exact archive and clean-machine rehearsal. |
 | PD-4: diagnostics | Local export, retention, symbols and replacement/review tools; fixture checks. | Native packaged crash/hang/GPU/privacy and self-service journeys; full symbol correlation. Automatic crash/hang collection and shader-symbol correlation are unavailable. |
-| FR-03?08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
+| FR-03 to FR-08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
 
 All six product reports remain blocked; implemented source is not release acceptance. The earlier local baseline at `fec29052c6f6195547f2062da9def86e520dc0df` does not qualify later changes. Reuse valid work, rerun checks affected by changed inputs, and keep future results bound to their exact candidate/archive. [Release gates](../Acceptance/FirstRelease.md#release-gates) decide shipment; [approved scope](../Acceptance/FirstRelease.md#approved-release-scope) fixes the promises.
 
@@ -44,7 +58,7 @@ flowchart LR
     Publish --> Advanced[Advanced graphics]
 ```
 
-| Step | What you deliver | Open the detailed plan |
+| Step | What you deliver | Open the implementation stage |
 | --- | --- | --- |
 | 0. Define | A finite product, map set, feature scope and supported presets. | [Scope and discovery](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-00--scope-and-discovery) — `REL-00` |
 | 1. Establish trust | Clear asset/dependency rights, product identity and a reproducible source build. | [Identity and baseline](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-01--identity-rights-and-baseline) — `REL-01/02` |
@@ -64,10 +78,10 @@ Each plan states when its work may start and how it exits. The [release contract
 
 Use this order within release step 3. A demonstrated dependency defect comes before the feature it blocks. Reuse completed work and valid proof; do not replay entire implementations.
 
-| Order | Focus and intended result | Detailed stages |
+| Order | Focus and intended result | Implementation stages |
 | --- | --- | --- |
 | 1 | **Reference correctness.** Restore usable lighting, reject invalid samples and qualify raw reference output before relying on it. | [Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#required-execution-order), [reference closure](../Architecture/Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md#lgt-3--preserve-discovery-and-close-the-required-reference) |
-| 2 | **Blocking dependencies.** Fix proven content, shader, foundation or native-lifetime defects needed by the selected frame. | [Foundation/content](../Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#foundation-world-and-content), [RHI](../Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md), [Shader System](../Architecture/CrossModule/ShaderSystem/ImplementationPlan.md) |
+| 2 | **Blocking dependencies.** Fix proven content, shader, foundation or native-lifetime defects needed by the selected frame. | [Foundation/content](../Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan), [RHI](../Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md), [Shader System](../Architecture/CrossModule/ShaderSystem/ImplementationPlan.md) |
 | 3 | **Frame execution.** Reliable frame admission, scene/view publication, graph dependencies, barriers, aliasing and retirement. | [Frame and scene](../Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md) — `FS-0–4` |
 | 4 | **Geometry and materials.** Correct residency, raster/ray inputs, TLAS and material correspondence. | [Geometry and ray tracing](../Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md) — `GR-0–4` |
 | 5 | **Realtime transport.** Correct primary/secondary paths, direct/indirect lighting, temporal reuse and disocclusion behavior. | [Temporal/history](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-1--temporal-sampling-history-resolution-and-aa-truth), [lighting](../Architecture/Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md) — `DSP-1`, `LGT-0–2` |
@@ -76,7 +90,7 @@ Use this order within release step 3. A demonstrated dependency defect comes bef
 | 8 | **Decals and grading.** Complete the required material/display features with raw, temporal and backend checks. | [Decals](../Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-5--deferred-gbuffer-decals), [grading](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-5--color-grading) — `GR-5`, `DSP-5` |
 | 9 | **Basic lens effects.** Independently prove chromatic aberration and vignette, including no work at neutral settings. | [Lens effects](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-6--chromatic-aberration-and-vignette), [vignette plan](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#basic-vignette-remaining-delivery-plan) — `DSP-6` |
 | 10 | **HDR and SDR recovery.** Finish output behavior; HDR proof requires a qualified display/OS tuple. | [HDR output](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-7--hdr10-display-output) — `DSP-7` |
-| 11 | **Product controls and capture.** Responsive settings/UI/debug/capture/latency consumers with one state authority and honest tool support. | [Runtime/diagnostics](../Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md), [product controls](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#product-and-delivery), [external capture](../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md) |
+| 11 | **Product controls and capture.** Responsive settings/UI/debug/capture/latency consumers with one state authority and honest tool support. | [Runtime/diagnostics](../Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md), [product controls](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#first-release-product-implementation-plan), [external capture](../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md) |
 | 12 | **Whole-frame closure.** Complete integration, failure checks, review findings and the remaining feature reports. | `FS-4`, `LGT-4`, `DSP-8`, `RD-6` in their plans; [aggregate closure](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-03--feature-closure) |
 
 Check D3D12 and Vulkan throughout these stages. Measure cost as each feature changes; release step 5 closes the fixed whole-product performance protocol. Reference Stage 10 still waits for its release inputs and package prerequisites.

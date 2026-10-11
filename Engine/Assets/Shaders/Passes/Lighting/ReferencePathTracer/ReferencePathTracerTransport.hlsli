@@ -47,7 +47,7 @@ namespace ReferencePathTracer
 		return true;
 	}
 
-	float3 TraceSurfaceTransport(RaytracingAccelerationStructure sceneTlas, Texture2D skyTexture, SamplerState skySampler, RayEndpoints::Ray traversal, SampleIdentity sampleIdentity)
+	float3 TraceSurfaceTransport(RaytracingAccelerationStructure sceneTlas, Texture2D skyTexture, SamplerState skySampler, RayDesc traversal, SampleIdentity sampleIdentity)
 	{
 		const LightCounts lightCounts = GetLightCounts();
 		PathTracer::PathState path;

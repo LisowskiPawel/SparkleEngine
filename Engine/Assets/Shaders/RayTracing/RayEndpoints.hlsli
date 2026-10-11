@@ -10,29 +10,11 @@ namespace RayEndpoints
 	static const float TriangleIntersectionError = 0x1.8p-23f;
 	static const float TransformError = 0x1.0p-23f;
 
-	struct Ray
-	{
-		float3 Origin;
-		float3 Direction;
-		float TMin;
-		float TMax;
-	};
-
 	struct SurfaceEndpointError
 	{
 		float BaseOffset;
 		float4 TraversalSensitivity;
 	};
-
-	Ray Primary(float3 origin, float3 direction, float tMin, float tMax)
-	{
-		Ray ray;
-		ray.Origin = origin;
-		ray.Direction = direction;
-		ray.TMin = tMin;
-		ray.TMax = tMax;
-		return ray;
-	}
 
 	float3 TransformPosition(float3 position, row_major float4x4 transform)
 	{
@@ -84,9 +66,9 @@ namespace RayEndpoints
 		return result;
 	}
 
-	Ray Continuation(float3 position, float3 geometricNormal, float errorBound, float3 direction)
+	RayDesc Continuation(float3 position, float3 geometricNormal, float errorBound, float3 direction)
 	{
-		Ray ray;
+		RayDesc ray;
 		ray.Origin = OffsetSurface(position, geometricNormal, errorBound, direction);
 		ray.Direction = direction;
 		ray.TMin = 0.0f;
@@ -94,7 +76,7 @@ namespace RayEndpoints
 		return ray;
 	}
 
-	Ray Connection(float3 position, float3 geometricNormal, float errorBound, float3 targetPosition, float3 targetGeometricNormal, float targetBaseOffset, float4 targetTraversalSensitivity)
+	RayDesc Connection(float3 position, float3 geometricNormal, float errorBound, float3 targetPosition, float3 targetGeometricNormal, float targetBaseOffset, float4 targetTraversalSensitivity)
 	{
 		const float3 semanticDirection = normalize(targetPosition - position);
 		const float3 source = OffsetSurface(position, geometricNormal, errorBound, semanticDirection);
@@ -102,7 +84,7 @@ namespace RayEndpoints
 		const float targetError = targetBaseOffset + dot(float4(abs(source) + abs(direction), 1.0f), targetTraversalSensitivity);
 		const float targetSide = dot(-direction, targetGeometricNormal) >= 0.0f ? 1.0f : -1.0f;
 		direction = mad(targetSide * targetError, targetGeometricNormal, direction);
-		Ray ray;
+		RayDesc ray;
 		ray.Origin = source;
 		ray.Direction = direction;
 		ray.TMin = 0.0f;

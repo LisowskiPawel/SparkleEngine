@@ -1,6 +1,8 @@
 # Renderer Runtime And Diagnostics Closure Plan
 
-[Docs](../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../README.md) / [Up](README.md) / [Design](../RendererDesign.md)
+
+Stages: [RD-0](#rd-0--freeze-runtime-state-and-observation-contracts) / [RD-1](#rd-1--pipeline-materialization-and-typed-binding) / [RD-2](#rd-2--settings-state-and-persistence) / [RD-3](#rd-3--debug-views-diagnostics-products-and-capture) / [RD-4](#rd-4--ui-and-viewport-composition) / [RD-5](#rd-5--latency-coordination) / [RD-6](#rd-6--runtime-and-diagnostics-candidate-closure).
 
 Make shader binding, settings, debug views, capture and viewport controls agree about the frame the user sees.
 
@@ -52,6 +54,17 @@ flowchart LR
 
 **Phase exit criteria:** one identity/state diagram and matrix covers all five families; each mutable owner and immutable observer is named; missing or conflicting acceptance blocks implementation.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RD-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-0--freeze-runtime-state-and-observation-contracts.
+Goal: reconcile how a user request becomes active shader/pipeline/feature state and how that exact frame is identified in UI, debug, capture, and latency artifacts. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `RD-1` — Pipeline Materialization And Typed Binding
 
 **Goal:** close `FCR-REN-16` so every admitted graphics/compute/ray pipeline validates cooked ABI, materializes correctly, binds complete current resources, and replaces generations safely.
@@ -63,6 +76,17 @@ flowchart LR
 **Failure modes:** registered program missing; reflection/ABI mismatch accepted; cache key omits state; wrong resource domain binds; unsupported ray pipeline materializes; reload partially replaces; old generation retires while in flight; cache grows forever.
 
 **Phase exit criteria:** complete program/parameter/domain matrix, invalid/missing/corrupt/capability/reload failures, cache key/retirement, native backend validation, and performance/memory checks pass.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RD-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-1--pipeline-materialization-and-typed-binding.
+Goal: close FCR-REN-16 so every admitted graphics/compute/ray pipeline validates cooked ABI, materializes correctly, binds complete current resources, and replaces generations safely. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `RD-2` — Settings State And Persistence
 
@@ -76,6 +100,17 @@ flowchart LR
 
 **Phase exit criteria:** field/consumer coverage, valid and malformed round trip, precedence, atomic failure, concurrent/pressure/shutdown, package path, and requested-to-active state checks pass.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RD-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-2--settings-state-and-persistence.
+Goal: close FCR-REN-19 with one aggregate requested state, deterministic precedence, durable atomic persistence, and truthful resolution/activation. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `RD-3` — Debug Views, Diagnostics Products, And Capture
 
 **Goal:** close `FCR-REN-11` with exact mode semantics, correct display treatment, explicit unavailable state, and reproducible capture metadata.
@@ -87,6 +122,17 @@ flowchart LR
 **Failure modes:** process-global mode leaks across viewports; unavailable resource displays stale data; mode goes through wrong tone/encoding; legend/range changes without metadata; capture generation mismatches frame; private path/content leaks; observer changes timing materially.
 
 **Phase exit criteria:** every admitted mode/resource/view/display/capture/unavailable/privacy/cost cell passes; sidecars identify candidate/frame/view/settings/domain/encoding; Shipping behavior matches scope.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RD-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-3--debug-views-diagnostics-products-and-capture.
+Goal: close FCR-REN-11 with exact mode semantics, correct display treatment, explicit unavailable state, and reproducible capture metadata. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `RD-4` — UI And Viewport Composition
 
@@ -100,6 +146,17 @@ flowchart LR
 
 **Phase exit criteria:** packet lifetime/copy, handle/generation/bounds, blend/color/DPI, missing/stale/failure, resize/switch/shutdown, and Shipping classification checks pass.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RD-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-4--ui-and-viewport-composition.
+Goal: close FCR-REN-13 with immutable host/editor packets, generation-safe viewport products and texture handles, and correct blend/color/DPI composition. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `RD-5` — Latency Coordination
 
 **Goal:** close `FCR-REN-20` for the explicitly supported Streamline PCL/Reflex boundary, with correct six-marker frame identity and independently measured benefit.
@@ -112,6 +169,17 @@ flowchart LR
 
 **Phase exit criteria:** marker order/identity, misuse/provider/failure/shutdown, backend/package, requested-active state, and controlled latency measurements pass for admitted cells; unsupported cells remain explicit.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RD-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-5--latency-coordination.
+Goal: close FCR-REN-20 for the explicitly supported Streamline PCL/Reflex boundary, with correct six-marker frame identity and independently measured benefit. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `RD-6` — Runtime And Diagnostics Candidate Closure
 
 **Goal:** prove that bound pipelines, settings, debug/capture, UI composition, and latency artifacts all describe the same active frame and candidate.
@@ -121,6 +189,17 @@ flowchart LR
 **Failure modes:** requested state differs from active but capture omits it; pipeline/provider DLL differs from manifest; UI/debug observe stale generation; latency token cannot join capture; evidence predates settings/shader change.
 
 **Phase exit criteria:** all five FCR reports carry complete candidate-bound criteria/failure/check coverage, package/native/provider matrices, identity joins, performance/observer data, limitations, and explicit decisions.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RD-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-6--runtime-and-diagnostics-candidate-closure.
+Goal: prove that bound pipelines, settings, debug/capture, UI composition, and latency artifacts all describe the same active frame and candidate. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Reference And Ownership
 
@@ -133,6 +212,6 @@ flowchart LR
 
 **Parent:** [First Release Renderer Plans](README.md)
 
-**Architecture:** [Shader Runtime](../Features/ShaderRuntime/README.md), [Runtime Configuration](../Features/RuntimeConfiguration/RuntimeConfigurationDesign.md), [Debug Views](../Features/DebugViews/DebugViewsDesign.md), [Viewport And Diagnostics](../Features/ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md), and [Latency Coordination](../Features/FrameExecution/LatencyCoordination.md)
+**Architecture:** [Shader Runtime](../Features/ShaderRuntime/ShaderRuntimeDesign.md), [Runtime Configuration](../Features/RuntimeConfiguration/RuntimeConfigurationDesign.md), [Debug Views](../Features/DebugViews/DebugViewsDesign.md), [Viewport And Diagnostics](../Features/ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md), and [Latency Coordination](../Features/FrameExecution/LatencyCoordination.md)
 
 </details>

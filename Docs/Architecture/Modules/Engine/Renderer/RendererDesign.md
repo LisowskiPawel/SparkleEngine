@@ -73,15 +73,15 @@ Start with [Rendering A Sparkle Frame](RenderingASparkleFrame.md) for the comple
 
 | Family | What it contributes | Current boundary | Read next |
 | --- | --- | --- | --- |
-| Frame execution | admission, serial/render-thread coordination, frame graph, history, latency markers, submission lifetime | Implemented path; equivalence, overlap, rebuild, and shutdown remain unproved | [Frame Execution](Features/FrameExecution/README.md) |
+| Frame execution | admission, serial/render-thread coordination, frame graph, history, latency markers, submission lifetime | Implemented path; equivalence, overlap, rebuild, and shutdown remain unproved | [Frame Execution](Features/FrameExecution/FrameExecutionDesign.md) |
 | Scene and view preparation | persistent scene identity, view-local state, GPU-scene publication | Implemented path; capacity, failure, deformation, and multi-view evidence open | [Scene And View Preparation](Features/SceneAndViewPreparation/SceneAndViewPreparationDesign.md) |
-| Geometry and resources | residency, visibility, batching, raster/ray GBuffer material contract | Partial; broad source path, but advanced visibility/draw features and transparent blending absent | [Geometry And Resources](Features/GeometryAndResources/README.md) |
+| Geometry and resources | residency, visibility, batching, raster/ray GBuffer material contract | Partial; broad source path, but advanced visibility/draw features and transparent blending absent | [Geometry And Resources](Features/GeometryAndResources/GeometryAndResourcesDesign.md) |
 | Ray tracing | BLAS/TLAS/PTLAS planning plus inline and native traversal | Capability-gated; effect/backend parity and lifecycle proof open | [Ray Tracing](Features/RayTracing/RayTracingDesign.md) |
 | Lighting | direct/indirect surface transport, ReSTIR and Reference Path Tracer modes, sky/emissive composition | Implemented path but ray-dependent and unproved; volumetrics absent | [Lighting](Features/Lighting/LightingDesign.md) |
 | Post processing | exposure, resolution, reconstruction/upscaling, tone mapping, encoding, presentation | Mixed current/gated/absent capabilities | [Post Processing](Features/PostProcessing/PostProcessingDesign.md) |
 | Viewport and diagnostics | products, timing/memory observations, capture, UI packet composition | Implemented path; truthfulness, lifetime, observer cost, and package scope unproved | [Viewport And Diagnostics](Features/ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md) |
 | Runtime configuration | selectors, requested state, persistence, active-state resolution | Partial; one known ineffective selector and package-safe persistence gaps remain | [Runtime Configuration](Features/RuntimeConfiguration/RuntimeConfigurationDesign.md) |
-| Shader runtime | registered program catalog, typed binding, graphics/compute/ray pipeline materialization, generation replacement | Implemented path; ABI, backend, cache, reload, and build-member evidence open | [Shader Runtime](Features/ShaderRuntime/README.md) |
+| Shader runtime | registered program catalog, typed binding, graphics/compute/ray pipeline materialization, generation replacement | Implemented path; ABI, backend, cache, reload, and build-member evidence open | [Shader Runtime](Features/ShaderRuntime/ShaderRuntimeDesign.md) |
 | Debug views and decals | intermediate visualization plus the admitted deferred-decal target | Debug path exists but is unproved; deferred decals are mandatory but not implemented | [Debug Views](Features/DebugViews/DebugViewsDesign.md), [Deferred Decals](Features/DeferredDecals/DeferredDecalsDesign.md) |
 
 The [complete feature guide](Features/RendererFeatureGuide.md) maps every `REN-*` family, source owner, local acceptance contract, and missing evidence item.
@@ -149,3 +149,15 @@ Silent substitution is not support. A requested ray/provider/debug path that can
 | Candidate/release status | `FCR-REN-*` families in [Feature Completion Reports](../../../../Acceptance/FeatureCompletionReports.md) and [First Release](../../../../Acceptance/FirstRelease.md) |
 
 Primary implementation routes are `Engine/Renderer/Public`, `Engine/Renderer/Private`, `Engine/Renderer/ShaderRegistrations`, and `Engine/Renderer/CMakeLists.txt`. Verify those paths before changing a current-state claim. Treat `Public` as a budgeted host contract and start implementation headers in the narrowest owning `Private` subsystem or feature capsule.
+
+## Release Implementation Rules
+
+- Scene owns persistent scene truth; View owns view/camera/display/temporal truth. GPU resources mirror those authorities with generation-qualified lifetime.
+- World publishes immutable render input. Renderer does not query ECS storage. RHI lowers commands and native mechanics; it does not choose scene, lighting, debug, or fallback semantics.
+- Raster, inline ray query, and native ray pipeline are traversal adapters beneath shared semantic feature contracts; do not fork effect logic.
+- Requested, resolved, active, unsupported, fallback, and restart-required state must be distinguishable.
+- Every pass declares inputs, outputs, lifetime, queue, invalidation, failure, and observer identity. Do not hide dependencies in side effects.
+- Use feature-local `AC/FM/CHK`; phase exit criteria in these plans are sequencing gates only.
+- Run [architecture boundary check](../../../../Engineering/Verification/ValidationAndEvidence.md) when Renderer/RHI responsibilities move, plus proportional native checks required by the affected claim.
+
+Stop when scene/view ownership is ambiguous; a pass reads undeclared state; a selector lies about the active route; an RHI capability is assumed rather than queried; one traversal path implements different material/lighting semantics; history lacks identity/reset; native validation is unavailable for a required backend; or a visual result has no numerical/reference/controlled comparison required by its dossier.

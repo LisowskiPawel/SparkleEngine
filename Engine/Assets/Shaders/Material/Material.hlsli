@@ -52,7 +52,6 @@ namespace Material
 	struct Properties
 	{
 		float3 BaseColor;
-		float3 NormalTangent;
 		float3 NormalWorld;
 		float Roughness;
 		float Metallic;
@@ -66,24 +65,6 @@ namespace Material
 		float Alpha;
 		uint AlphaMode;
 	};
-
-	Properties MakeDefault()
-	{
-		Properties props;
-		props.BaseColor = float3(1.0f, 1.0f, 1.0f);
-		props.NormalTangent = float3(0.0f, 0.0f, 1.0f);
-		props.NormalWorld = float3(0.0f, 0.0f, 1.0f);
-		props.Roughness = 1.0f;
-		props.Metallic = 0.0f;
-		props.DielectricF0 = saturate(F0);
-		props.AmbientOcclusion = 1.0f;
-		props.SubsurfaceColor = float3(0.0f, 0.0f, 0.0f);
-		props.SubsurfaceStrength = 0.0f;
-		props.Emissive = float3(0.0f, 0.0f, 0.0f);
-		props.Alpha = BaseColor.a;
-		props.AlphaMode = AlphaModeOpaque;
-		return props;
-	}
 
 	float4 SampleBaseColor(float2 UV)
 	{
@@ -166,15 +147,15 @@ namespace Material
 
 	Properties Sample(PS::Input Input)
 	{
-		Properties props = MakeDefault();
+		Properties props;
 		const float4 baseColor = SampleBaseColor(Input.TexCoord);
 		props.BaseColor = baseColor.rgb;
 		props.Alpha = baseColor.a;
 		props.AlphaMode = AlphaMode;
 		ApplyAlphaMode(props.Alpha);
 
-		props.NormalTangent = SampleNormalTangent(Input.TexCoord);
-		props.NormalWorld = TransformTangentNormalToWorld(props.NormalTangent, Input.NormalWorld, Input.TangentWorld.xyz, Input.BitangentWorld);
+		const float3 normalTangent = SampleNormalTangent(Input.TexCoord);
+		props.NormalWorld = TransformTangentNormalToWorld(normalTangent, Input.NormalWorld, Input.TangentWorld.xyz, Input.BitangentWorld);
 		if (!Input.IsFrontFace)
 		{
 			props.NormalWorld = -props.NormalWorld;

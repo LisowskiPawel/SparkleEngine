@@ -1,6 +1,6 @@
 # Renderer Mesh and Texture Residency
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](GeometryAndResourcesDesign.md)
 
 **Status:** current feature dossier; source-backed, not streaming-throughput, memory-pressure, or release evidence
 

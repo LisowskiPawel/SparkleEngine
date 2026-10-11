@@ -2,6 +2,8 @@
 
 [Docs](../../../../../../../../README.md) / [Up](HDRDisplayOutputDesign.md)
 
+Stages: [Stage 0](#stage-0--close-discovery) / [Stage 1](#stage-1--add-neutral-presentation-state-without-hdr-activation) / [Stage 2](#stage-2--activate-and-recover-the-d3d12-tuple) / [Stage 3](#stage-3--activate-and-recover-the-vulkan-tuple) / [Stage 4](#stage-4--implement-the-renderer-hdr-transform) / [Stage 5](#stage-5--join-active-state-and-complete-the-experience) / [Stage 6](#stage-6--harden-transitions-recovery-backend-parity-and-package) / [Stage 7](#stage-7--earn-candidate-evidence-and-close).
+
 Make HDR output activate truthfully on supported displays and recover to a usable SDR image when it cannot.
 
 **Status:** conditional implementation plan; Stage 0 is permitted, Stages 1-7 are blocked until `HDRD-00 PASS` and `DSP-7` prerequisites
@@ -124,7 +126,7 @@ Run `HDR-EXP-01` through `08`; disposition `HDRD-01` through `12`; freeze exact 
 **Exit:** all `AC-HDRD-*` pass; fixed 1000/200, UINT10/FP16, and metadata choices are explicit; no implementation prompt has to choose platform or color policy.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only HDR Display Output Stage 0. Do not change production code. Inspect current Renderer/RHI/window/swapchain/interposer/settings/UI/capture/package paths; run all HDR discovery probes on named Windows/display/backend cells; freeze scene and target color semantics, UINT10 versus FP16 eligibility, peak/black and SDR-white policy, metadata role, native contracts, state transitions, budgets, fixtures, tolerances, and evidence lineage. Reconcile owning docs and stop on any unresolved active/fallback or color-domain choice.
@@ -140,7 +142,7 @@ Extend RHI presentation types/services/capabilities with the accepted neutral re
 **Exit:** the existing SDR route is byte/behavior preserved; stale output generations reject; requested/support/eligible/active/fallback states are distinct; both backends and interposer expose coherent neutral facts; failure queries retain usable SDR.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only HDR Stage 1 from accepted HDRD-00 revisions. Add one backend-neutral presentation request/capability/result and output-generation contract at RHI, with platform output/Advanced Color/SDR-white facts and typed failures. Surface it through existing settings/Renderer/UI without activating HDR. Exercise SDR preservation, invalid/stale output identities, query failure, display change, two windows if admitted, D3D12/Vulkan/interposer cells, and bounded diagnostics. Do not add PQ, 10-bit/FP16 formats, metadata, or alternate state stores.
@@ -156,7 +158,7 @@ Add the accepted PixelFormat/DXGI tuple, swapchain interface checks, output/colo
 **Exit:** D3D12 never reports active without the complete current tuple; unsupported/set/recreate/metadata/output-change faults yield the accepted result and usable SDR; resize/display changes reapply state; native diagnostics are clean.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only HDR Stage 2 in RHI D3D12 presentation owners. Implement the accepted packed-10 or FP16 tuple, current-output association, CheckColorSpaceSupport/SetColorSpace1 lifecycle, accepted metadata policy, generation publication, interposer interface contract, and atomic SDR fallback. Inject unsupported display, stale output, interface, create/resize, color-space, metadata, minimize/restore, monitor-change, and device failures. Inspect native state/validation. Do not add Renderer tone/PQ logic or call DXGI outside RHI.
@@ -172,7 +174,7 @@ Enable the accepted instance/device extensions, enumerate/select the exact surfa
 **Exit:** Vulkan never substitutes sRGB for requested HDR while reporting active; extension/tuple/call/recreate/present faults produce explicit fallback; current output generation and Windows display facts remain coherent; validation is clean.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only HDR Stage 3 in RHI Vulkan and shared Windows presentation owners. Implement the accepted extension gates, HDR surface format/color-space tuple, swapchain lifecycle, optional vkSetHdrMetadataEXT policy, result generation, and SDR fallback. Exercise missing extension/tuple, query/create/recreate/metadata/present failure, resize/minimize, monitor/OS change, suspend/resume, and device recovery with Vulkan validation. Keep color policy out of RHI and never report HDR active on an SRGB_NONLINEAR tuple.
@@ -188,7 +190,7 @@ Implement accepted scene-to-target/gamut/tone/Rec.2020/PQ semantics and SDR UI m
 **Exit:** `HDR-MATH-*` matches high-precision ramps/patches/matrices; wrong constants/scale/gamut/double transform/UI white/alpha defects are detected; SDR path remains unchanged; D3D12/Vulkan shader outputs agree before native presentation.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only HDR Stage 4 from accepted Semantics. Add one Renderer-owned HDR target/gamut/PQ output path and accepted SDR-UI white mapping through existing settings/View/frame graph/shader/UI/capture owners. Compare an independent high-precision oracle over ramps, wedges, peaks, black, diffuse/SDR white, alpha, invalid values, and seeded transform defects. Keep native display APIs in RHI and preserve current SDR tone/encoding exactly. Stop on unnamed scene units or output domain.
@@ -204,7 +206,7 @@ Make Renderer choose SDR/HDR transform from the current immutable RHI active res
 **Exit:** first use and every state are truthful; no mixed-generation frame publishes; UI is readable at accepted white; captures cannot be mistaken across domains; automation returns failure when required HDR does not activate.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only HDR Stage 5. Join the accepted RHI active-result generation to Renderer transform selection, then implement the existing-settings UI, state/reason vocabulary, debug/capture classification, bounded support record, persistence, and automation. Exercise enable/disable, unsupported/ineligible, activation pending/failure, two output generations, UI white, exact debug modes, every capture boundary, and require-active manifests. Do not let request alone select PQ or duplicate native state in Renderer.
@@ -220,7 +222,7 @@ Exercise and repair monitor move/straddle policy, OS HDR toggle, resize/fullscre
 **Exit:** every transition reaches current HDR active or usable SDR fallback within frozen bounds; D3D12/Vulkan state semantics agree; no stale tuple, indefinite black output, leak, or package-only failure remains.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only HDR Stage 6 on the frozen transition/backend/package matrix. Inject every accepted output/OS/window/swapchain/metadata/device/interposer failure and transition, verify generation ordering and atomic SDR recovery, and measure black-frame/latency/memory/steady-state budgets. Run D3D12 and Vulkan native validation plus clean packaged first-use. Fix defects at their owner; do not hide a backend or transition with silent disable.
@@ -236,7 +238,7 @@ Run the complete `CHK-HDR-*` protocol for one immutable candidate: raw numeric p
 **Exit:** all `AC-HDR-01` through `08` pass conjunctively; every `FM-HDR-*`/risk has detecting evidence; SDR remains proven; external/display limitations are explicit; acceptance owner records the verdict.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only HDR Stage 7 for one frozen candidate and hardware/software matrix. Run all CHK-HDR checks with seeded color/native/state/fallback/capture defects; retain raw scene/target/PQ values, native tuple/query results, transition artifacts, external display measurements, UI patches, backend/package/performance evidence, hashes, and limitations. Remove temporary test-only code, reconcile source/header/shader/generated/CMake/settings/package/docs, and file FCR-REN-26. Metadata success, screenshots, responsive presentation, or one backend cannot substitute for the full oracle.

@@ -9,13 +9,6 @@ struct RayTracingHitSurfaceData
 	float PositionError;
 	float3 NormalWorld;
 	float3 TangentWorld;
-	float3 BitangentWorld;
-	float3 NormalTangent;
-	float TangentSign;
-	float2 TexCoord0;
-	uint MaterialSlot;
-	uint GeometryFlags;
-	uint RejectionReason;
 	float3 BaseColor;
 	float3 EmissiveColor;
 	float3 SubsurfaceColor;

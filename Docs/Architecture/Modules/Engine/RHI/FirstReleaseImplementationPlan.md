@@ -2,6 +2,8 @@
 
 [Docs](../../../../README.md) / [Up](RHIDesign.md)
 
+Stages: [RHI-0](#rhi-0--freeze-the-service-and-backend-matrix) / [RHI-1](#rhi-1--device-resources-descriptors-and-lifetime) / [RHI-2](#rhi-2--command-recording-synchronization-resize-and-present) / [RHI-3](#rhi-3--paired-backend-lowering) / [RHI-4](#rhi-4--ray-tracing-and-acceleration-structure-execution) / [RHI-5](#rhi-5--diagnostics-capture-device-loss-and-recovery) / [RHI-6](#rhi-6--candidate-closure).
+
 Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely when requirements are missing.
 
 **Status:** implementation plan; ordered backend closure, not native-validation or release evidence
@@ -34,6 +36,17 @@ Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely wh
 
 **Phase exit criteria:** every admitted service has a current source route, both-backend disposition, capability/failure behavior, and mapped check; unknown cells block later phases.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RHI-0 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-0--freeze-the-service-and-backend-matrix.
+Goal: reconcile every public RHI service and every Renderer consumer into an admitted D3D12/Vulkan/capability matrix before changing implementation. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `RHI-1` — Device, Resources, Descriptors, And Lifetime
 
 **Goal:** close `FCR-RHI-01` and the resource/lifecycle base of `FCR-RHI-06` with one published backend aggregate and completion-safe ownership.
@@ -51,6 +64,17 @@ Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely wh
 **Failure modes to control:** partial device publishes; descriptor out of bounds; freed resource remains in flight; mapped range misuse; allocation failure corrupts prior state; dependent outlives device; native object leaks.
 
 **Phase exit criteria:** all admitted resource/descriptor/lifetime criteria pass on both backends; partial creation and allocation/invalid-handle failures settle cleanly; memory and live-object records are retained.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RHI-1 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-1--device-resources-descriptors-and-lifetime.
+Goal: close FCR-RHI-01 and the resource/lifecycle base of FCR-RHI-06 with one published backend aggregate and completion-safe ownership. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `RHI-2` — Command Recording, Synchronization, Resize, And Present
 
@@ -71,6 +95,17 @@ Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely wh
 
 **Phase exit criteria:** serial and normal frame paths, resize/minimize/restore, queue ordering, failure, shutdown, and pacing checks pass on both backends with clean native validation.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RHI-2 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-2--command-recording-synchronization-resize-and-present.
+Goal: close FCR-RHI-02 from frame begin through recording leases, submission tokens, completion, resize, present, and retirement. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `RHI-3` — Paired Backend Lowering
 
 **Goal:** close `FCR-RHI-03` by proving that common contracts produce equivalent declared results while backend-specific mechanics remain contained.
@@ -88,6 +123,17 @@ Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely wh
 **Failure modes to control:** one backend silently no-ops; format/state maps differently; validation suppression hides defect; capability advertised before dependency; fallback changes feature result; backend fix changes shared semantics.
 
 **Phase exit criteria:** every included matrix cell is `PASS` or explicitly excluded before scope freeze; deterministic outputs and failures agree within owned tolerances; native validation is clean or has an accepted, scoped disposition.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RHI-3 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-3--paired-backend-lowering.
+Goal: close FCR-RHI-03 by proving that common contracts produce equivalent declared results while backend-specific mechanics remain contained. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `RHI-4` — Ray-Tracing And Acceleration-Structure Execution
 
@@ -107,6 +153,17 @@ Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely wh
 
 **Phase exit criteria:** all admitted ray criteria/failures pass for both APIs and traversal routes; identity and lifetime ledgers reconcile; costs and capability boundaries are recorded.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RHI-4 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-4--ray-tracing-and-acceleration-structure-execution.
+Goal: close FCR-RHI-04 for admitted BLAS/TLAS, update/refit/partitioned policy, inline query, native pipeline, shader table, and trace commands. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `RHI-5` — Diagnostics, Capture, Device Loss, And Recovery
 
 **Goal:** close `FCR-RHI-05` and `FCR-RHI-06` with bounded observation, truthful recoverable swapchain events, and terminal device-loss handling.
@@ -125,6 +182,17 @@ Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely wh
 
 **Phase exit criteria:** feature checks pass on both APIs; recoverable versus terminal paths are unmistakable; native objects settle; diagnostic artifacts identify candidate/frame without privacy breach; external profiler handoff is demonstrated where applicable.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RHI-5 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-5--diagnostics-capture-device-loss-and-recovery.
+Goal: close FCR-RHI-05 and FCR-RHI-06 with bounded observation, truthful recoverable swapchain events, and terminal device-loss handling. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `RHI-6` — Candidate Closure
 
 **Goal:** bind all RHI claims to one package candidate, hardware/driver matrix, and paired-backend evidence index.
@@ -136,6 +204,17 @@ Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely wh
 **Failure modes to control:** evidence uses different binary or shader/content; driver/tool version missing; backend failure hidden by auto-selection; unavailable hardware marked pass; debug-only route differs from Shipping package.
 
 **Phase exit criteria:** each RHI FCR has a complete candidate-bound decision, paired matrices and limitations are explicit, and all Renderer dependencies have a stable accepted contract.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only RHI-6 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-6--candidate-closure.
+Goal: bind all RHI claims to one package candidate, hardware/driver matrix, and paired-backend evidence index. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Reference And Ownership
 

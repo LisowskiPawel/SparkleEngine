@@ -1,6 +1,12 @@
-# Product And Delivery
+# First Release Product Implementation Plan
 
-[Docs](../../../README.md) / [Up](../README.md)
+[Docs](../../../README.md) / [Up](ImplementationPlan.md)
+
+Stages: [PD-1](#pd-1--game-and-editor-product-shells) / [PD-2](#pd-2--source-build-cook-and-launcher) / [PD-3](#pd-3--package-and-installation) / [PD-4](#pd-4--support-incident-response-and-product-closure).
+
+**Status:** implementation stages; candidate results remain in Acceptance.
+
+**Design and checks:** [Game/Editor journey](../../Modules/Projects/Showcase/ShowcaseCapabilities.md), [Launcher operations](../../Modules/Tools/Launcher/LauncherCapabilities.md), [package and diagnostics](../../Modules/BuildAndPackaging/PackagingAndInstallation.md).
 
 Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected release content, a reproducible source build and self-service recovery.
 
@@ -28,6 +34,17 @@ Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected rel
 
 **Phase exit criteria:** the feature-local checks for `FCR-PROD-01` and the selected `FCR-PROD-04` scope pass on the exact configuration; all three products are represented truthfully and Game imports no Editor/authoring dependency; results are filed in candidate FCR reports.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only PD-1 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells.
+Finish the existing Launcher -> Editor/Game journey: selected-map loading, controls/help, shared settings/reset/quit and truthful failures. Preserve display-selected resolution, approved lens-effect defaults and Game/Editor dependency isolation. Prove the listed fresh-user, focus/DPI, corrupt-content, unsupported-provider and shutdown routes.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `PD-2` — Source Build, Cook, And Launcher
 
 **Goal:** close `FCR-PROD-02` and `FCR-PROD-03` with one documented underlying operation model usable directly and through the required shipped Launcher for the seven release maps.
@@ -47,9 +64,20 @@ Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected rel
 
 **Phase exit criteria:** independent source-adopter rehearsal produces the named runtime through documented prerequisites; launcher classification is enforced; direct and GUI routes agree; exact logs/artifacts and negative results are in the FCR reports.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only PD-2 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-2--source-build-cook-and-launcher.
+Finish the existing typed source/Launcher operations with one execution authority. Qualify pinned prerequisites, cold/warm build/cook, cancellation, child results, quoting, bounded cleanup and handoff. Prove direct/GUI equivalence and the independent source-adopter journey for Empty, the seven maps and a selected subset.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `PD-3` — Package And Installation
 
-**Goal:** implement the missing `FCR-PROD-05` owner and pass `REL-03` with a manifest-owned three-product portable Windows x64 bundle and verified user-selected content store.
+**Goal:** complete `FCR-PROD-05` through its current packaging owner and pass `REL-03` with a manifest-owned three-product portable Windows x64 bundle and verified user-selected content store.
 
 **Non-goals:** an installer, registry integration, a binary SDK, package self-modification, or bundling developer tools/source/debug files without explicit admission.
 
@@ -64,6 +92,17 @@ Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected rel
 **Failure modes to control:** stage accumulates leftovers; runtime writes beside executable; package relies on current directory; missing redistributable/provider DLL; manifest mismatch; source/private path leak; archive emitted after verification failure.
 
 **Phase exit criteria:** the Architecture-owned `FCR-PROD-05` criteria and `REL-03` pass for the exact archive; a clean standard-user machine route is retained; stage/package failure leaves no publishable partial artifact.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only PD-3 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation.
+Qualify reviewed package inputs first. Complete the existing three-product portable packaging owner, selective content-store route and transactional negative checks. Bind the verified archive and clean standard-user rehearsal to one hash; the user will perform that rehearsal when the archive is ready.
+Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `PD-4` — Support, Incident Response, And Product Closure
 
@@ -82,6 +121,17 @@ Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected rel
 **Failure modes to control:** report loses candidate identity; consent bypass; private paths or content escape; symbols cannot match build; unsupported recovery promised; patch replaces public bytes under same version; public policy invents an intake or response promise.
 
 **Phase exit criteria:** all three self-service journeys and local-diagnostic routes were exercised; no service deadline is advertised; failures preserve consent and identity; patch policy is reproducible; all six FCR reports have explicit candidate-bound verdicts and residual limitations.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only PD-4 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-4--support-incident-response-and-product-closure.
+After the package candidate exists, exercise consent-bound local crash/hang/GPU diagnostics, privacy and symbol correlation. Rehearse critical-defect review and immutable replacement/withdrawal. Reconcile all six candidate product reports; retain the no-support policy and unavailable diagnostic limits.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Plan Completion
 

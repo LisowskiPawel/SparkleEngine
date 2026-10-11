@@ -1,6 +1,8 @@
 # Renderer Frame And Scene Closure Plan
 
-[Docs](../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../README.md) / [Up](README.md) / [Design](../RendererDesign.md)
+
+Stages: [FS-0](#fs-0--contract-identity-and-serial-oracle) / [FS-1](#fs-1--frame-admission-and-coordination) / [FS-2](#fs-2--scene-view-and-gpu-scene-preparation) / [FS-3](#fs-3--frame-graph-compile-and-execution) / [FS-4](#fs-4--frame-and-scene-candidate-closure).
 
 Keep each frame tied to the right world, camera and settings, and execute only valid graph work.
 
@@ -48,6 +50,17 @@ Unreal's [parallel-rendering overview](https://dev.epicgames.com/documentation/e
 
 **Phase exit criteria:** all three families have current owner/producer/consumer/lifetime and checks; serial oracle and matrices are explicit; contradictions block implementation.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FS-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-0--contract-identity-and-serial-oracle.
+Goal: freeze the world-submission → coordinator → host → Scene/View → graph identity and the serial reference result. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `FS-1` — Frame Admission And Coordination
 
 **Goal:** close `FCR-REN-01` with monotonic, bounded, failure-aware admission and equivalent serial/threaded results.
@@ -59,6 +72,17 @@ Unreal's [parallel-rendering overview](https://dev.epicgames.com/documentation/e
 **Failure modes:** older frame overwrites newer; settings apply to wrong frame; queue grows; blocked producer deadlocks shutdown; thread fails silently; canceled frame publishes; serial/threaded visible output differs.
 
 **Phase exit criteria:** monotonic and bounded behavior, serial/threaded parity, queue pressure, failure, cancellation, invalidation, and shutdown checks pass; CPU/latency evidence meets the dossier budgets or blocks.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FS-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-1--frame-admission-and-coordination.
+Goal: close FCR-REN-01 with monotonic, bounded, failure-aware admission and equivalent serial/threaded results. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `FS-2` — Scene, View, And GPU-Scene Preparation
 
@@ -72,6 +96,17 @@ Unreal's [parallel-rendering overview](https://dev.epicgames.com/documentation/e
 
 **Phase exit criteria:** every scene/view acceptance criterion and controlled failure passes across create/update/delete/reuse/reload/dynamic/two-view cases; identity/copy/upload/memory ledgers reconcile.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FS-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-2--scene-view-and-gpu-scene-preparation.
+Goal: close FCR-REN-02 with Scene-owned persistent truth, View-owned view/temporal truth, and generation-safe GPU mirrors. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## `FS-3` — Frame Graph Compile And Execution
 
 **Goal:** close `FCR-REN-03` with declared pass/resource dependencies, valid scheduling/lifetimes, observable execution, and faithful RHI lowering.
@@ -83,6 +118,17 @@ Unreal's [parallel-rendering overview](https://dev.epicgames.com/documentation/e
 **Failure modes:** undeclared read; write/write ambiguity; transient alias overlaps lifetime; history culled; pass failure ignored; marker lacks frame/view; rebuild misses selector/extent/format; backend produces different dependency result.
 
 **Phase exit criteria:** graph structural checks, resource lifetime/barrier/native validation, pass failure/invalidation, serial/parallel recording, culling/aliasing where admitted, markers, and backend-equivalent results pass.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FS-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-3--frame-graph-compile-and-execution.
+Goal: close FCR-REN-03 with declared pass/resource dependencies, valid scheduling/lifetimes, observable execution, and faithful RHI lowering. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## `FS-4` — Frame And Scene Candidate Closure
 
@@ -96,6 +142,17 @@ The [required whole-frame review](../../../../../Acceptance/FirstRelease.md#prin
 
 **Phase exit criteria:** `FCR-REN-01`–`03` reports contain full criteria/failure/check coverage, exact candidate identity, matrices, performance data, limitations, invalidation triggers, and decisions.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only FS-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-4--frame-and-scene-candidate-closure.
+Goal: bind admission, preparation, and graph execution to one candidate and prove their joint failure and lifetime behavior. Follow this stage's work, non-goals and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## Reference And Ownership
 
 <details>
@@ -107,6 +164,6 @@ The [required whole-frame review](../../../../../Acceptance/FirstRelease.md#prin
 
 **Parent:** [First Release Renderer Plans](README.md)
 
-**Architecture:** [Frame Execution](../Features/FrameExecution/README.md), [Scene And View Preparation](../Features/SceneAndViewPreparation/SceneAndViewPreparationDesign.md), [feature acceptance](../Features/SceneAndViewPreparation/SceneAndViewPreparationDesign.md#scene-and-view-preparation-acceptance), and [Frame Graph And Scheduling](../Features/FrameExecution/FrameGraphAndScheduling.md)
+**Architecture:** [Frame Execution](../Features/FrameExecution/FrameExecutionDesign.md), [Scene And View Preparation](../Features/SceneAndViewPreparation/SceneAndViewPreparationDesign.md), [feature acceptance](../Features/SceneAndViewPreparation/SceneAndViewPreparationDesign.md#scene-and-view-preparation-acceptance), and [Frame Graph And Scheduling](../Features/FrameExecution/FrameGraphAndScheduling.md)
 
 </details>

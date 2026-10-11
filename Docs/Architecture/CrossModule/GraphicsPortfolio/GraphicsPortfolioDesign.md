@@ -34,7 +34,7 @@ The [delivery catalog](../../../Strategy/FeatureDeliveryCatalog.md#three-headlin
 | --- | --- |
 | [First Release](../../../Acceptance/FirstRelease.md) | Exact product/source, rights, package and adoption records |
 | [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md) | Existing case identities and evaluation/adoption criteria |
-| [Workload Studies](../PerformanceDiagnostics/WorkloadStudies/README.md) | Original runs/captures, causal comparisons and incident evidence |
+| [Workload Studies](../PerformanceDiagnostics/WorkloadStudies/WorkloadStudiesDesign.md) | Original runs/captures, causal comparisons and incident evidence |
 | [Neural Graphics](../NeuralGraphics/NeuralGraphicsDesign.md) | Dataset/model/operator/runtime joins and held-out results |
 | [Persona](../../../Strategy/EngineerPersona.md), [Requirements](../../../Strategy/Requirements.md) | Personal ownership, explanation and principal judgment targets |
 

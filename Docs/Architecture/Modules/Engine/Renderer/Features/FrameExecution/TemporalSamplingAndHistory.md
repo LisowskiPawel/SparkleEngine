@@ -1,6 +1,6 @@
 # Renderer Temporal Sampling and History
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](FrameExecutionDesign.md)
 
 **Status:** current feature dossier; source-backed, not visual-stability, reconstruction-quality, or release evidence
 

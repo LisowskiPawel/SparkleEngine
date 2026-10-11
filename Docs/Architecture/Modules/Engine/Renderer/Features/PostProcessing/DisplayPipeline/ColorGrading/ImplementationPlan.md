@@ -2,6 +2,8 @@
 
 [Docs](../../../../../../../../README.md) / [Up](ColorGradingDesign.md)
 
+Stages: [Stage 0](#stage-0--close-discovery) / [Stage 1](#stage-1--establish-types-identity-and-the-inactive-seam) / [Stage 2](#stage-2--deliver-the-parameter-only-grade) / [Stage 3](#stage-3--add-the-typed-lut-source-and-cooked-contract) / [Stage 4](#stage-4--join-residency-and-apply-the-lut) / [Stage 5](#stage-5--complete-the-development-experience) / [Stage 6](#stage-6--evidence-package-and-close).
+
 Add predictable color controls and a typed LUT workflow, with no rendering work when the grade is neutral.
 
 **Status:** conditional implementation plan; Stage 0 is permitted, production Stages 1-6 are blocked until `CGRD-00 PASS` and `DSP-5` prerequisites
@@ -118,7 +120,7 @@ Every stage is independently reviewable. Its report must list production files c
 **Exit:** all `AC-CGRD-*` pass, no implementation-shaping unknown remains, and the accepted document revisions are named. Otherwise record `Blocked` with the exact owner and next experiment.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Color Grading Stage 0. Do not change production code. Inspect current Renderer/display/settings/shader/asset/cook/residency/editor/capture/package owners; run the seven discovery experiments; freeze every CGRD decision, risk, fixture, tolerance, budget, and invalidation trigger. Update only the owning feature documents. Stop rather than choosing working space, negative math, LUT grammar/layout/interpolation, ownership, UX, or evidence thresholds by convenience.
@@ -134,7 +136,7 @@ NON-NEGOTIABLE: production remains untouched, every implementation-shaping unkno
 **Exit:** neutral state adds no pass/resource; identical intent hashes identically; distinct view/asset/semantic generations do not alias; invalid requests never report active; no second settings or residency owner exists.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Color Grading Stage 1 from the accepted CGRD-00 revisions. Extend existing display settings, View preparation, frame-graph resource vocabulary, shader catalog, and build membership with the smallest grade state/identity seam. Keep runtime output exactly neutral and omit work. Prove settings round trip, digest stability, two-view isolation, requested/resolved/active truth, invalid enum/value rejection, and clean package/build membership. Do not add parsing, LUT upload, non-neutral math, or a manager singleton.
@@ -150,7 +152,7 @@ NON-NEGOTIABLE: no pixel changes or GPU grade work, no second state/residency ow
 **Exit:** `AC-CGR-01/02/05` parameter portions and `FM-CGR-01/03` pass; seeded wrong order, weights, negative rule, channel, alpha, and double-application defects are detected; cost remains within the Stage-0 budget.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Color Grading Stage 2. Implement the accepted CGR-MATH parameter transform once, after the accepted reconstruction/exposure boundary and before target tone mapping. Use typed binding and an independent double-precision oracle. Keep LUT absent. Exercise neutral omission, analytic colors/ramps/negative/HDR/non-finite values, alpha sentinel, wrong-order/weight/rule defects, debug classifications, output extents, D3D12/Vulkan shader paths, native validation, and pass cost. Stop on any semantic or stage ambiguity.
@@ -166,7 +168,7 @@ NON-NEGOTIABLE: one accepted semantic transform, one exact stage, independent de
 **Exit:** valid fixtures produce deterministic bytes; malformed/hostile/unsupported cases fail before publication/allocation; dimension/domain/count/axis data are unambiguous; package planning sees the logical dependency; old schema paths do not survive.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Color Grading Stage 3. Add the accepted .cube source parser and canonical cooked grade-LUT format at the existing asset/cook owner. Enforce checked counts and byte/dimension limits, finite/domain/directive rules, deterministic bytes, provenance, transactional publication, and clear errors. Exercise identity/asymmetric known-cell plus malformed/truncated/extra/non-finite/overflow/unsupported fixtures. Do not upload, render, embed OCIO, or accept extra formats.
@@ -182,7 +184,7 @@ NON-NEGOTIABLE: every token/count/allocation is bounded before publication, cook
 **Exit:** `AC-CGR-03/04/06` runtime portions pass; no partial/stale generation activates; requested/active identities stay truthful; LUT application detects axis, half-texel, interpolation, domain, order, and stale-generation defects.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Color Grading Stage 4. Reuse existing residency to publish a checked cooked LUT generation and bind it to the one grading pass. Implement the accepted LUT mapping/composition exactly. Exercise known asymmetric cells and interpolation points, boundary/out-of-domain values, missing/corrupt cooked data, upload/OOM/capacity/device loss, randomized replacement completion, two views, and delayed GPU retirement. Preserve the explicit last-good/default state and never claim the pending request active.
@@ -198,7 +200,7 @@ NON-NEGOTIABLE: only complete current immutable generations activate, CPU/GPU ax
 **Exit:** first use, all control states, keyboard/text access, rapid edit, failure/recovery, reset, two-view isolation, capture lineage, and editor/manifest equivalence pass; no console-only step or silent substitute remains.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Color Grading Stage 5. Add the accepted DevelopmentEditor controls and automation fields over the existing settings and active-state owners. Show semantic domain, neutral values, LUT metadata/identity, requested versus active/pending/unavailable reason, and reset. Exercise first use, invalid source, recook/upload failure, rapid edits/cancel, two views, capture metadata, package-missing state, accessibility, and manifest equivalence. Do not create a color-suite, volume system, runtime player UI, or alternate state cache.
@@ -214,7 +216,7 @@ NON-NEGOTIABLE: visible/editor/automation truth derives from the same runtime ow
 **Exit:** all applicable `AC-CGR-01` through `08` pass conjunctively, every failure/risk has detecting evidence, all excluded surfaces remain absent, and the acceptance owner records the real verdict. Documentation, a successful build, or one attractive screenshot cannot close the feature.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Color Grading Stage 6 for one frozen candidate. Run CHK-CGR-01 through 06 with seeded defect controls, raw pre/post-grade products, backend comparisons, two-view and replacement stress, package/clean-machine route, cost/memory, capture lineage, and excluded-feature audit. Remove temporary test-only code and reconcile source/header/shader/generated/CMake/asset/package/docs membership. File FCR-REN-24 with exact PASS/BLOCKED/EXCLUDED evidence and limitations; do not tune thresholds after candidate output.

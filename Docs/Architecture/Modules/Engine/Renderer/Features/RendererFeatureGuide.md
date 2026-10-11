@@ -57,10 +57,10 @@ A Renderer feature dossier must answer—or explicitly mark unanswered—what re
 
 | Feature family | Why it is grouped here |
 | --- | --- |
-| [Frame Execution](FrameExecution/README.md) | frame graph, temporal continuity, and latency coordination share frame identity and ordering |
-| [Geometry And Resources](GeometryAndResources/README.md) | residency, visibility/draw preparation, and surface/GBuffer production form the resource-to-surface route |
+| [Frame Execution](FrameExecution/FrameExecutionDesign.md) | frame graph, temporal continuity, and latency coordination share frame identity and ordering |
+| [Geometry And Resources](GeometryAndResources/GeometryAndResourcesDesign.md) | residency, visibility/draw preparation, and surface/GBuffer production form the resource-to-surface route |
 | [Runtime Configuration](RuntimeConfiguration/RuntimeConfigurationDesign.md) | settings state/persistence and exact selector reachability are separate views of requested and active configuration |
-| [Shader Runtime](ShaderRuntime/README.md) | exact program membership feeds pipeline materialization, typed binding, generation, and retirement |
+| [Shader Runtime](ShaderRuntime/ShaderRuntimeDesign.md) | exact program membership feeds pipeline materialization, typed binding, generation, and retirement |
 | [Viewport And Diagnostics](ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md) | products, capture, observations, UI packets, and viewport publication meet at the host-facing boundary |
 | [Scene And View Preparation](SceneAndViewPreparation/SceneAndViewPreparationDesign.md) | persistent scene, per-frame scene/view derivation, GPU-scene publication, and their integration acceptance |
 | [Lighting](Lighting/LightingDesign.md) | shared lighting composition routes direct, indirect, volumetric, and Reference Path Tracer capabilities |
@@ -217,6 +217,6 @@ When a new Renderer selector, pass family, provider, persistent product, or outp
 - The Renderer root owns only module-level navigation, the whole-frame narrative, and the exact capability ledger.
 - A single current feature responsibility stays as one descriptive file directly under `Features`.
 - A durable feature family or a feature with multiple knowledge owners receives a named subfolder and `README.md`. The family entry defines shared ordering and invariants; child files own independently selectable or independently provable capabilities. Target architecture uses a descriptive filename such as `ExecutionArchitecture.md` or `PresentationArchitecture.md`.
-- Architecture owns each feature's local acceptance contract. Keep compact criteria in the dossier; when the matrix is large, place `Acceptance.md` beside the dossier and route it from the `README.md`. Put feature delivery in adjacent `Plan.md` and research in adjacent `Research.md` or a descriptive research filename. Candidate results, workload status, and release approval remain in `Docs/Acceptance`.
+- Architecture owns each feature's local acceptance contract. Keep compact criteria in the dossier; when the matrix is large, place `Acceptance.md` beside the dossier and route it from the `README.md`. Put feature delivery in adjacent `ImplementationPlan.md` and research in adjacent `Research.md` or a descriptive research filename. Candidate results, workload status, and release approval remain in `Docs/Acceptance`.
 - A target-only feature still gets a current gap dossier when readers could otherwise mistake its design for shipped behavior. Deferred Decals follows this rule.
 - Split by responsibility, not file size. Lighting separates Direct, Indirect, Volumetric, and Reference Path Tracer work. Post Processing separates Exposure, Reconstruction/Upscaling, Tone Mapping, Color Grading, Chromatic Aberration, Frame Generation, and Presentation/Output because their results, ordering, capability states, inputs, algorithms, and evidence differ.

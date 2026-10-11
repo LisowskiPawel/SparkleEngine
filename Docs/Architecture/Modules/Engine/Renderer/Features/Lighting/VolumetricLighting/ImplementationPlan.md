@@ -2,6 +2,8 @@
 
 [Docs](../../../../../../../README.md) / [Up](VolumetricLightingDesign.md)
 
+Stages: [Stage 0](#stage-0--obtain-admission-and-close-vol-d0) / [Stage 1](#stage-1--deliver-analytic-medium-truth-and-first-fog-composition) / [Stage 2](#stage-2--establish-unified-froxels-local-media-and-direct-lights) / [Stage 3](#stage-3--make-the-froxel-product-temporally-stable) / [Stage 4](#stage-4--deliver-physical-atmosphere-aerial-perspective-and-environment-bridge) / [Stage 5](#stage-5--add-heterogeneous-media-and-reference-tracking) / [Stage 6](#stage-6--evaluate-and-if-admitted-deliver-volumetric-restir) / [Stage 7](#stage-7--admit-clouds-as-a-separate-product-increment) / [Stage 8](#stage-8--backend-workload-adoption-and-evidence-closure).
+
 **Status:** implementation-ready conditional plan; all production stages are blocked until `REL-11` unlocks new features and `VOL-D0` is accepted
 
 **Responsibility:** own the post-admission dependency order, stage scopes, estimates, non-goals, gates, copy-ready prompts, optional-tier decisions, and stop rules
@@ -113,7 +115,15 @@ Convert the research target into an approved post-release product slice with exa
 
 ### Ready-To-Use Prompt
 
-> Execute Volumetric Lighting Stage 0 from `VolumetricLighting/Plan.md`. First verify that `REL-11` has an approved closeout and new-feature work is explicitly unlocked; if not, stop with a blocker and perform no production change. Run the bounded `VOL-X-*` discovery experiments, freeze every `VOL-D0-*` decision needed by the admitted first slice, assign the FCR owner, budgets, thresholds, backend/workload cells, and exact hook/deletion ledger, then obtain independent review. Do not raise readiness or implement the renderer feature.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md#stage-0--obtain-admission-and-close-vol-d0 and apply this plan's shared execution contract.
+Execute Volumetric Lighting Stage 0 from `VolumetricLighting/ImplementationPlan.md`. First verify that `REL-11` has an approved closeout and new-feature work is explicitly unlocked; if not, stop with a blocker and perform no production change. Run the bounded `VOL-X-*` discovery experiments, freeze every `VOL-D0-*` decision needed by the admitted first slice, assign the FCR owner, budgets, thresholds, backend/workload cells, and exact hook/deletion ledger, then obtain independent review. Do not raise readiness or implement the renderer feature.
+```
+
+</details>
 
 ## Stage 1 — Deliver Analytic Medium Truth And First Fog Composition
 
@@ -138,7 +148,15 @@ Prove one end-to-end physical medium from authored intent to scene-linear compos
 
 ### Ready-To-Use Prompt
 
-> Implement Volumetric Lighting Stage 1 only after its gates are evidenced. Deliver the accepted minimal global homogeneous/height fog from GameFramework intent through RenderScene/preparation to one current-frame directional single-scatter integration and raw premultiplied in-scatter/transmittance composition. Add analytic Beer/phase/height and invalid-input checks, explicit Off/active/rejected status, and update exact capability docs. Do not add temporal history, local volumes, atmosphere, VDB, ReSTIR, clouds, or a generic volume framework.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md#stage-1--deliver-analytic-medium-truth-and-first-fog-composition and apply this plan's shared execution contract.
+Implement Volumetric Lighting Stage 1 only after its gates are evidenced. Deliver the accepted minimal global homogeneous/height fog from GameFramework intent through RenderScene/preparation to one current-frame directional single-scatter integration and raw premultiplied in-scatter/transmittance composition. Add analytic Beer/phase/height and invalid-input checks, explicit Off/active/rejected status, and update exact capability docs. Do not add temporal history, local volumes, atmosphere, VDB, ReSTIR, clouds, or a generic volume framework.
+```
+
+</details>
 
 ## Stage 2 — Establish Unified Froxels, Local Media, And Direct Lights
 
@@ -163,7 +181,15 @@ Extend the proved medium into one bounded froxel owner supporting local media an
 
 ### Ready-To-Use Prompt
 
-> Implement Volumetric Lighting Stage 2 from the accepted froxel/light contract. Add the tested grid mapping, local media shapes, deterministic coefficient overlap, all admitted analytic light injection, geometry shadow and medium transmittance, and bounded capacity/status. Reuse immutable existing light semantics/distributions only through the frozen bridge; keep volume receiver state local. Capture raw intermediates for tests, report scaling memory/time, and do not add temporal reconstruction, atmosphere, heterogeneous assets, or path-space ReSTIR.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md#stage-2--establish-unified-froxels-local-media-and-direct-lights and apply this plan's shared execution contract.
+Implement Volumetric Lighting Stage 2 from the accepted froxel/light contract. Add the tested grid mapping, local media shapes, deterministic coefficient overlap, all admitted analytic light injection, geometry shadow and medium transmittance, and bounded capacity/status. Reuse immutable existing light semantics/distributions only through the frozen bridge; keep volume receiver state local. Capture raw intermediates for tests, report scaling memory/time, and do not add temporal reconstruction, atmosphere, heterogeneous assets, or path-space ReSTIR.
+```
+
+</details>
 
 ## Stage 3 — Make The Froxel Product Temporally Stable
 
@@ -187,7 +213,15 @@ Add per-View jitter/reprojection/reconstruction that responds correctly to camer
 
 ### Ready-To-Use Prompt
 
-> Implement Volumetric Lighting Stage 3 after static froxel correctness. Add the accepted per-View jitter, reprojection, compatibility/confidence, responsive handling, clamp, bounded history, transactional publication, and retirement. Run the full camera/depth/density/emission/light/shadow/resize/dual-view/reload/provider/cancel matrix and compare raw versus reconstructed `T/Lscatter`. Do not add atmosphere, heterogeneous assets, or ReSTIR in this stage.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md#stage-3--make-the-froxel-product-temporally-stable and apply this plan's shared execution contract.
+Implement Volumetric Lighting Stage 3 after static froxel correctness. Add the accepted per-View jitter, reprojection, compatibility/confidence, responsive handling, clamp, bounded history, transactional publication, and retirement. Run the full camera/depth/density/emission/light/shadow/resize/dual-view/reload/provider/cancel matrix and compare raw versus reconstructed `T/Lscatter`. Do not add atmosphere, heterogeneous assets, or ReSTIR in this stage.
+```
+
+</details>
 
 ## Stage 4 — Deliver Physical Atmosphere, Aerial Perspective, And Environment Bridge
 
@@ -212,7 +246,15 @@ Replace the background-only gap with an explicit physical-atmosphere mode that s
 
 ### Ready-To-Use Prompt
 
-> Implement Volumetric Lighting Stage 4. Add the frozen atmosphere records and atomic LUT generation, physical sky/sun/aerial perspective, explicit image-versus-physical background selection, and one immutable environment generation consumed by Direct/Indirect Lighting. Prove raw radiance/transmittance against the accepted analytic/Bruneton/Hillaire cells, including horizon, ground, altitude/space, edits, and failure. Preserve one composition path and prevent sky/sun/transmittance double counting.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md#stage-4--deliver-physical-atmosphere-aerial-perspective-and-environment-bridge and apply this plan's shared execution contract.
+Implement Volumetric Lighting Stage 4. Add the frozen atmosphere records and atomic LUT generation, physical sky/sun/aerial perspective, explicit image-versus-physical background selection, and one immutable environment generation consumed by Direct/Indirect Lighting. Prove raw radiance/transmittance against the accepted analytic/Bruneton/Hillaire cells, including horizon, ground, altitude/space, edits, and failure. Preserve one composition path and prevent sky/sun/transmittance double counting.
+```
+
+</details>
 
 ## Stage 5 — Add Heterogeneous Media And Reference Tracking
 
@@ -236,7 +278,15 @@ Deliver the admitted dense/sparse density content path and a trustworthy stochas
 
 ### Ready-To-Use Prompt
 
-> Implement Volumetric Lighting Stage 5 for the exact density representation admitted by `VOL-D0`. Add one validated cooked asset path, transform/units/channel/range/filter/bounds/majorant semantics, generation-safe scene/GPU lifetime, fixed-march product sampling, and the accepted stochastic tracking reference. Test missing/corrupt/reload, thin/high-frequency/empty/extreme/emissive/moving cases and majorant violations. Do not add both dense and sparse canonical forms or Volumetric ReSTIR yet.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md#stage-5--add-heterogeneous-media-and-reference-tracking and apply this plan's shared execution contract.
+Implement Volumetric Lighting Stage 5 for the exact density representation admitted by `VOL-D0`. Add one validated cooked asset path, transform/units/channel/range/filter/bounds/majorant semantics, generation-safe scene/GPU lifetime, fixed-march product sampling, and the accepted stochastic tracking reference. Test missing/corrupt/reload, thin/high-frequency/empty/extreme/emissive/moving cases and majorant violations. Do not add both dense and sparse canonical forms or Volumetric ReSTIR yet.
+```
+
+</details>
 
 ## Stage 6 — Evaluate And, If Admitted, Deliver Volumetric ReSTIR
 
@@ -263,7 +313,15 @@ Determine whether reservoir-resampled volume paths or per-froxel light reservoir
 
 ### Ready-To-Use Prompt
 
-> Execute Volumetric Lighting Stage 6 for the single estimator domain admitted by `VOL-D0-13`. Freeze equal-time A/B metrics and budgets first. Implement the exact volume path or froxel-light sample, proposal, shift/inverse/Jacobian/support, GRIS/reservoir weight, current generation identity, and separate approximate-candidate versus final evaluation. Run analytic/statistical/reference and camera/density/light/environment/emission/majorant mutation tests. Ship only if it beats the accepted baseline; otherwise remove it and record rejection.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md#stage-6--evaluate-and-if-admitted-deliver-volumetric-restir and apply this plan's shared execution contract.
+Execute Volumetric Lighting Stage 6 for the single estimator domain admitted by `VOL-D0-13`. Freeze equal-time A/B metrics and budgets first. Implement the exact volume path or froxel-light sample, proposal, shift/inverse/Jacobian/support, GRIS/reservoir weight, current generation identity, and separate approximate-candidate versus final evaluation. Run analytic/statistical/reference and camera/density/light/environment/emission/majorant mutation tests. Ship only if it beats the accepted baseline; otherwise remove it and record rejection.
+```
+
+</details>
 
 ## Stage 7 — Admit Clouds As A Separate Product Increment
 
@@ -281,7 +339,15 @@ The separately assigned cloud acceptance set passes on approved workloads/backen
 
 ### Ready-To-Use Prompt
 
-> Execute Volumetric Lighting Stage 7 only with a separately accepted cloud admission record. Extend the existing atmosphere and heterogeneous medium owners with the frozen weather/density/detail/LOD/lighting/shadow/temporal contracts; exercise close, inside, below, above, horizon, fast flight, time/light/weather change, and failure cells; and report raw/reconstructed quality, time, and memory. Do not create a parallel cloud renderer or change unrelated surface sky semantics.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md#stage-7--admit-clouds-as-a-separate-product-increment and apply this plan's shared execution contract.
+Execute Volumetric Lighting Stage 7 only with a separately accepted cloud admission record. Extend the existing atmosphere and heterogeneous medium owners with the frozen weather/density/detail/LOD/lighting/shadow/temporal contracts; exercise close, inside, below, above, horizon, fast flight, time/light/weather change, and failure cells; and report raw/reconstructed quality, time, and memory. Do not create a parallel cloud renderer or change unrelated surface sky semantics.
+```
+
+</details>
 
 ## Stage 8 — Backend, Workload, Adoption, And Evidence Closure
 
@@ -306,7 +372,15 @@ Validate every included tier against its exact product claim and publish the ass
 
 ### Ready-To-Use Prompt
 
-> Execute Volumetric Lighting Stage 8 as candidate validation for the exact included tiers. Freeze candidate/configuration/content/reference identities and metrics before runs. Exercise analytic/Cornell, Sponza, Bistro, San Miguel, motion/failure/extreme, and only the admitted heterogeneous/ReSTIR/cloud cells on supported D3D12/Vulkan profiles with native validation. Retain raw through composed artifacts and separate semantic, temporal, visual, performance, memory, backend, adoption, and release verdicts. Update the assigned FCR/readiness only from observed evidence.
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md#stage-8--backend-workload-adoption-and-evidence-closure and apply this plan's shared execution contract.
+Execute Volumetric Lighting Stage 8 as candidate validation for the exact included tiers. Freeze candidate/configuration/content/reference identities and metrics before runs. Exercise analytic/Cornell, Sponza, Bistro, San Miguel, motion/failure/extreme, and only the admitted heterogeneous/ReSTIR/cloud cells on supported D3D12/Vulkan profiles with native validation. Retain raw through composed artifacts and separate semantic, temporal, visual, performance, memory, backend, adoption, and release verdicts. Update the assigned FCR/readiness only from observed evidence.
+```
+
+</details>
 
 ## Stage Traceability
 

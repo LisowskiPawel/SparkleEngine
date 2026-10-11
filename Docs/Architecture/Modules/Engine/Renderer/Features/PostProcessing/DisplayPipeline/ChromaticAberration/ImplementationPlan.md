@@ -2,6 +2,8 @@
 
 [Docs](../../../../../../../../README.md) / [Up](ChromaticAberrationDesign.md)
 
+Stages: [Stage 0](#stage-0--close-chrd-00) / [Stage 1](#stage-1--add-state-and-a-neutral-seam) / [Stage 2](#stage-2--implement-and-prove-the-lens-pass) / [Stage 3](#stage-3--complete-experience-and-integration) / [Stage 4](#stage-4--candidate-evidence-and-closure).
+
 Add a small lens effect with defined channel offsets, clamp behavior and a zero-cost neutral state.
 
 **Status:** conditional implementation plan; Stage 0 is permitted, Stages 1-4 are blocked until `CHRD-00 PASS` and `DSP-6` prerequisites
@@ -98,7 +100,7 @@ Run `CHR-EXP-01` through `06`, disposition `CHRD-01` through `10`, freeze model/
 **Exit:** the semantics can be independently implemented without choosing a constant or coordinate rule, and every risk/criterion/failure has a defect-detecting check.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Chromatic Aberration Stage 0. Inspect current post/display/settings/View/shader/debug/capture/UI/package paths, compare simple RGB and spectral precedent, and freeze every CHRD decision, model constant, control range, domain, unit, edge rule, matrix, budget, fixture, tolerance, and invalidation trigger. Update only the owning documents. Stop instead of choosing from visual preference alone.
@@ -114,7 +116,7 @@ Extend public display settings, persistence, per-view overrides, immutable View 
 **Exit:** neutral and invalid states are truthful; two views isolate; settings round-trip; output extent is the only geometry input; no second state owner or persistent resource appears.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Chromatic Aberration Stage 1 from accepted CHRD-00 revisions. Add the smallest typed settings/View/graph/shader-catalog state and requested/resolved/active result. Keep output unchanged and omit the pass. Exercise neutral, invalid/non-finite/range values, persistence, per-view override, two views, resize/minimize, missing program membership, and package surface. Do not implement sampling yet.
@@ -130,7 +132,7 @@ Implement `CHR-MATH-*` in one shader with an independent CPU coordinate/filter o
 **Exit:** `AC-CHR-01` through `04` semantic portions pass; swapped channel, wrong scale/aspect/stage, wrap, alpha, and zero-work defects are detected; D3D12/Vulkan shaders compile through owned routes and cost meets the frozen budget.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Chromatic Aberration Stage 2. Implement the accepted three-channel model at the accepted target-linear boundary with output-extent pixel units, bilinear clamp, alpha preservation, and exact zero omission. Compare an independent double-precision CPU evaluator over impulse/grid/edge/alpha patterns, all admitted aspects/resolutions/centers/offsets/strengths, and seeded semantic defects. Inspect typed bindings, native validation, raw pre/post products, and pass cost on both backends. Stop on any unexplained mismatch.
@@ -146,7 +148,7 @@ Add the narrow DevelopmentEditor controls to the existing rendering settings sur
 **Exit:** `AC-CHR-05/06/08` and all controlled failure paths pass; a developer can identify whether the intentional effect is active; ordinary artifacts cannot be mislabeled.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Chromatic Aberration Stage 3. Wire accepted controls and status through the existing settings/editor/View owners, classify every debug mode, keep UI downstream, and publish bounded capture/automation metadata. Exercise first use, reset, invalid values, two views, rapid edits, resize/DPI/minimize, mode/debug changes, missing pipeline, capture lineage, and packaged settings. Do not add a player-facing menu or generic post-process framework.
@@ -162,7 +164,7 @@ Run `CHK-CHR-01` through `05` for one immutable candidate, including analytic de
 **Exit:** all `AC-CHR-01` through `08` pass conjunctively, each failure/risk has detecting evidence, and the acceptance owner records the verdict.
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Chromatic Aberration Stage 4 for one frozen candidate. Run the complete predeclared CHK-CHR matrix and seeded defects across domains, resolutions, aspects, views, debug/UI/capture, backends, package, and cost. Remove temporary test-only code; reconcile source/header/shader/generated/CMake/settings/package/docs membership; and file FCR-REN-25 with exact evidence and limitations. Do not retune the model or thresholds after seeing candidate output.

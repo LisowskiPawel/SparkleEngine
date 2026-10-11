@@ -2,6 +2,8 @@
 
 [Docs](../../../README.md) / [Up](GeometryCacheAnimationDesign.md)
 
+Stages: [Phase 0](#phase-0---freeze-source-authoring-and-evidence-contracts) / [Phase 1](#phase-1---tools-only-alembic-import) / [Phase 2](#phase-2---native-cook-codec-and-range-reader) / [Phase 3](#phase-3---playback-residency-and-shared-deformation-foundation) / [Phase 4](#phase-4---rasterized-gbuffer-and-temporal-acceptance) / [Phase 5](#phase-5---ray-traced-gbuffer-reflections-and-gi) / [Phase 6](#phase-6---modern-sponza-knight-acceptance-preparation-and-cleanup).
+
 **Status:** implementation plan; not proof of implementation or acceptance
 
 **Scope:** staged delivery of geometry-cache import, cooking, playback, residency, shared deformation, ray integration, and validation
@@ -43,6 +45,17 @@ Each phase is independently reviewable. A later phase starts only after the prec
 
 Exit: contracts and fixtures are reviewed, archive facts are recorded, budgets are named, and there is no runtime feature claim.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 0 from Docs/Architecture/CrossModule/GeometryCacheAnimation/ImplementationPlan.md#phase-0---freeze-source-authoring-and-evidence-contracts.
+Task: Freeze source, authoring, and evidence contracts. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 1 - Tools-only Alembic import
 
 - add one pinned Alembic dependency to the content-pipeline build only, with license and reproducible dependency configuration;
@@ -53,6 +66,17 @@ Exit: contracts and fixtures are reviewed, archive facts are recorded, budgets a
 - add deterministic importer tests for coordinates, time, attributes, face sets, multi-track input, and negative cases.
 
 Exit: the tiny fixture and Knight source import deterministically into the canonical model; no cooked/runtime support is claimed; Alembic symbols are absent from Engine, Renderer, and game binaries.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 1 from Docs/Architecture/CrossModule/GeometryCacheAnimation/ImplementationPlan.md#phase-1---tools-only-alembic-import.
+Task: Tools-only Alembic import. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### Phase 2 - Native cook, codec, and range reader
 
@@ -65,6 +89,17 @@ Exit: the tiny fixture and Knight source import deterministically into the canon
 
 Exit: cook/read/seek/decode tests reproduce source samples within the frozen numeric tolerance; compressed size, peak cook memory, range-read bytes, and decode time meet the Phase 0 budgets; no runtime draw is claimed.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 2 from Docs/Architecture/CrossModule/GeometryCacheAnimation/ImplementationPlan.md#phase-2---native-cook-codec-and-range-reader.
+Task: Native cook, codec, and range reader. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 3 - Playback, residency, and shared deformation foundation
 
 - add geometry-cache asset/resource handles, scene-manifest records, instance construction, playback component, system ordering, and compact extraction requests;
@@ -75,6 +110,17 @@ Exit: cook/read/seek/decode tests reproduce source samples within the frozen num
 - test pause, play rate, loop wrap, seek, unload/reload, cancellation, starvation, zero-content omission, and current/previous output on a compute-readback fixture.
 
 Exit: deterministic GPU readback matches the CPU sample oracle on D3D12 and Vulkan; bounds/visibility and history resets are correct; memory remains bounded during long playback and random seeks; rendering is not yet accepted.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 3 from Docs/Architecture/CrossModule/GeometryCacheAnimation/ImplementationPlan.md#phase-3---playback-residency-and-shared-deformation-foundation.
+Task: Playback, residency, and shared deformation foundation. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### Phase 4 - Rasterized GBuffer and temporal acceptance
 
@@ -87,6 +133,17 @@ Exit: deterministic GPU readback matches the CPU sample oracle on D3D12 and Vulk
 
 Exit: the fixture and Knight visibly deform at correct scale, placement, material slots, and time in rasterized GBuffer on both backends; motion/discontinuity tests pass; no static or first-frame fallback is active.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 4 from Docs/Architecture/CrossModule/GeometryCacheAnimation/ImplementationPlan.md#phase-4---rasterized-gbuffer-and-temporal-acceptance.
+Task: Rasterized GBuffer and temporal acceptance. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 5 - Ray-traced GBuffer, reflections, and GI
 
 - add generic RHI bottom-level build/update flags and modes with D3D12/Vulkan contract tests;
@@ -97,6 +154,17 @@ Exit: the fixture and Knight visibly deform at correct scale, placement, materia
 - record BLAS full/update time, scratch/resident bytes, TLAS cost, ray-hit cost, and raster-versus-ray image comparisons.
 
 Exit: raster and ray-primary surfaces agree within the recorded tolerance; the animated Knight appears correctly in reflections and GI on D3D12 and Vulkan; measured BLAS cost meets the Phase 0 budget. A backend that fails remains unsupported explicitly rather than receiving a static substitution.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 5 from Docs/Architecture/CrossModule/GeometryCacheAnimation/ImplementationPlan.md#phase-5---ray-traced-gbuffer-reflections-and-gi.
+Task: Ray-traced GBuffer, reflections, and GI. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### Phase 6 - Modern Sponza Knight acceptance preparation and cleanup
 
@@ -109,3 +177,14 @@ Exit: raster and ray-primary surfaces agree within the recorded tolerance; the a
 Exit: the candidate is ready for judgment under [Geometry Cache Animation — Acceptance](Acceptance.md), with one tools source path, one cooked asset contract, one runtime playback state, one streamed residency owner, and one shared deformed-geometry product. Unavailable or failed checks remain recorded.
 
 Only after this exit should the paused deferred-decal implementation proceed.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 6 from Docs/Architecture/CrossModule/GeometryCacheAnimation/ImplementationPlan.md#phase-6---modern-sponza-knight-acceptance-preparation-and-cleanup.
+Task: Modern Sponza Knight acceptance preparation and cleanup. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>

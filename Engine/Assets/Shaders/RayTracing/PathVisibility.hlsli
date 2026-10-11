@@ -10,7 +10,7 @@ namespace PathVisibility
 {
 	bool IsUnoccluded(RaytracingAccelerationStructure sceneTlas, RayTracingPathSurface surface, LightSampling::DirectLightSample lightSample)
 	{
-		RayEndpoints::Ray ray;
+		RayDesc ray;
 		if (lightSample.IsDirectional)
 		{
 			ray = RayEndpoints::Continuation(surface.PositionWorld, surface.GeometricNormalWorld, surface.PositionError, lightSample.DirectionWorld);

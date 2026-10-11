@@ -2,6 +2,8 @@
 
 [Docs](../../../../../../README.md) / [Up](DeferredDecalsDesign.md)
 
+Stages: [Phase 0](#phase-0---freeze-contracts-and-evidence) / [Phase 1](#phase-1---authoring-scene-ownership-and-gpu-data) / [Phase 2](#phase-2---rasterized-deferred-decals) / [Phase 3](#phase-3---ray-traced-primary-gbuffer-parity) / [Phase 4](#phase-4---reflections-and-gi-material-hits) / [Phase 5](#phase-5---evidence-preparation-and-cleanup).
+
 Add authored decals that modify the right material surface consistently for raster and ray rendering.
 
 **Status:** implementation plan; not proof of implementation or acceptance
@@ -46,6 +48,17 @@ Deliver documentation and executable contract tests before runtime decal output:
 
 Exit: contracts are reviewed, test data is deterministic, workload/cameras are named, and there is no runtime feature claim.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 0 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-0---freeze-contracts-and-evidence.
+Task: Freeze contracts and evidence. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 1 - Authoring, scene ownership, and GPU data
 
 - add the decal ECS/cooked schema using an ordinary material reference;
@@ -61,6 +74,17 @@ Exit: cook/load/extract/create/update/destroy round trips pass; zero decals publ
 
 If a scene contains decals but the required scene material table is unsupported, readiness fails once with the missing capability and source scene identified. There is no silent omission and no forward fallback.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 1 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-1---authoring-scene-ownership-and-gpu-data.
+Task: Authoring, scene ownership, and GPU data. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 2 - Rasterized deferred decals
 
 - introduce `SurfaceMaterial` and shared projection/composition HLSL;
@@ -73,6 +97,17 @@ If a scene contains decals but the required scene material table is unsupported,
 
 Exit: raster image tests pass for every channel group, overlap, near-plane/camera-inside volumes, projection edges, jitter, receiver opt-out, and zero-decal identity. The chosen tile plan meets the recorded CPU/GPU/memory budget on the fixture and an overlap stress case.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 2 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-2---rasterized-deferred-decals.
+Task: Rasterized deferred decals. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 3 - Ray-traced primary GBuffer parity
 
 - exercise the same post-producer pass with `GBufferAlgorithm::RayTracing` under every automatically selected frontend, using a temporary focused capability harness where required to cover the non-selected adapter;
@@ -81,6 +116,17 @@ Exit: raster image tests pass for every channel group, overlap, near-plane/camer
 - keep `RayTracingGBuffer` base-hit reconstruction decal-free so primary decals are not applied twice.
 
 Exit: paired primary images agree within the recorded format/tolerance budget, pass ordering is identical, and there is still exactly one primary decal pass.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 3 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-3---ray-traced-primary-gbuffer-parity.
+Task: Ray-traced primary GBuffer parity. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### Phase 4 - Reflections and GI material hits
 
@@ -94,6 +140,17 @@ Exit: paired primary images agree within the recorded format/tolerance budget, p
 
 Exit: the same authored decal appears on the visible receiver and in an off-screen reflection, changes indirect material response where expected, and matches the CPU projection/composition reference. Candidate spans meet the recorded budget on Modern Sponza and the overlap stress case.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 4 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-4---reflections-and-gi-material-hits.
+Task: Reflections and GI material hits. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### Phase 5 - Evidence preparation and cleanup
 
 - run the full raster/ray-primary/ray-secondary matrix on D3D12 and Vulkan;
@@ -103,6 +160,17 @@ Exit: the same authored decal appears on the visible receiver and in an off-scre
 - reconcile the capability snapshot and architecture with proven behavior, record the acceptance result in its owning contract/report, and retire this plan when no active delivery consumer remains.
 
 Exit: the candidate is ready for judgment under [Deferred GBuffer Decals — Acceptance](Acceptance.md), with one authored contract, one runtime decal table, one primary resolve, one shared shader composition path, and one selected secondary lookup. Unavailable checks and unsupported surfaces remain stated rather than hidden by fallbacks.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only Phase 5 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-5---evidence-preparation-and-cleanup.
+Task: Evidence preparation and cleanup. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ## Reference And Ownership
 

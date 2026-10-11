@@ -30,22 +30,13 @@ namespace RayTracingGBuffer
 	static const uint InstanceMask = 0xFFu;
 	static const float MinimumT = 0.001f;
 
-	struct PrimaryRay
+	RayDesc BuildPrimaryRay(uint2 pixelCoord)
 	{
-		float3 OriginWorld;
-		float3 DirectionWorld;
-		RayDesc Description;
-	};
-
-	PrimaryRay BuildPrimaryRay(uint2 pixelCoord)
-	{
-		PrimaryRay ray;
-		ray.OriginWorld = Position;
-		ray.DirectionWorld = ComputeSkyViewDirectionWorld(pixelCoord);
-		ray.Description.Origin = ray.OriginWorld;
-		ray.Description.Direction = normalize(ray.DirectionWorld);
-		ray.Description.TMin = MinimumT;
-		ray.Description.TMax = FarZ;
+		RayDesc ray;
+		ray.Origin = Position;
+		ray.Direction = ComputeSkyViewDirectionWorld(pixelCoord);
+		ray.TMin = MinimumT;
+		ray.TMax = FarZ;
 		return ray;
 	}
 
@@ -88,7 +79,7 @@ namespace RayTracingGBuffer
 		GBufferInstanceIdentity[pixelCoord] = GBufferWriteInstanceIdentity != 0u ? surface.GpuSceneSlot + 1u : 0u;
 	}
 
-	void StoreTraceResult(uint2 pixelCoord, RayTracingTraceResult trace, PrimaryRay ray)
+	void StoreTraceResult(uint2 pixelCoord, RayTracingTraceResult trace)
 	{
 		if (!trace.Hit)
 		{
@@ -108,9 +99,9 @@ namespace RayTracingGBuffer
 
 	void TraceAndStore(uint2 pixelCoord)
 	{
-		const PrimaryRay ray = BuildPrimaryRay(pixelCoord);
-		const RayTracingTraceResult trace = TraceSceneRay(SceneTlas, ray.OriginWorld, ray.DirectionWorld, ray.Description.TMin, ray.Description.TMax, CullFlags, InstanceMask);
-		StoreTraceResult(pixelCoord, trace, ray);
+		const RayDesc ray = BuildPrimaryRay(pixelCoord);
+		const RayTracingTraceResult trace = TraceSceneRay(SceneTlas, ray.Origin, ray.Direction, ray.TMin, ray.TMax, CullFlags, InstanceMask);
+		StoreTraceResult(pixelCoord, trace);
 	}
 }
 

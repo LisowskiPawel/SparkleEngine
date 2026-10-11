@@ -116,8 +116,9 @@ Within an Architecture subject folder, keep knowledge roles explicit:
 
 | Role | Conventional file | Owns | Does not own |
 | --- | --- | --- | --- |
-| dossier/current/target design | `README.md`, `Capability.md`, or a descriptive architecture page | behavior, ownership, current state, decisions, and feature-local contract routing | delivery order, external precedent, or candidate results |
-| plan | `Plan.md` or a scoped `*Plan.md` | ordered delivery slices, dependencies, stop rules, migration and validation sequence | enduring decisions or completion claims |
+| navigation | `README.md` | document routes and a short explanation of when to open each | substantive design, implementation stages or candidate results |
+| dossier/current/target design | `*Design.md`, `*Capabilities.md`, or a descriptive contract | behavior, ownership, current state, decisions, and feature-local contract routing | delivery order, external precedent, or candidate results |
+| plan | `ImplementationPlan.md` or a scoped `*ImplementationPlan.md` | ordered delivery slices, dependencies, stop rules, migration and validation sequence | enduring decisions or completion claims |
 | research | `Research.md` or a descriptive `*Research.md` | external precedent, option studies, visual exploration, dated migration baselines | binding local policy, implementation state, or evidence grades |
 | feature-local acceptance | `Acceptance.md` when too large for the dossier | criteria, controlled failures, checks, and definition of done | candidate or release verdicts |
 
@@ -169,17 +170,15 @@ Split a document when sections have different owners, audiences, lifecycles, aut
 
 Length alone is not a split rule. A short file without an independent responsibility is fragmentation; a long file containing architecture, phase history, research, and acceptance is mixed authority. Prefer one cohesive owner over both extremes. Delivery plans call their intermediate gates **phase exit criteria**; they must not label those gates feature acceptance or retain a second final definition of done.
 
-Direct sibling count is a navigation signal even though it is not an authority boundary. An active, non-archive folder MUST NOT retain more than seven directly owned Markdown files. Before adding an eighth, form durable subject or document-class subfolders and give each multi-document folder a local `README.md`. The subdivision groups documents; it MUST NOT merge independently maintained contracts merely to reduce the visible count. A closed generated catalog or legally required archive may exceed the budget only when its index states why semantic subdivision would damage its responsibility.
+Direct sibling count is a navigation signal even though it is not an authority boundary. An active, non-archive folder MUST NOT retain more than seven directly owned Markdown files. Before adding an eighth, form durable subject or document-class subfolders and route them from a short local index when readers need a choice. The subdivision groups documents; it MUST NOT merge independently maintained contracts merely to reduce the visible count. A closed generated catalog or legally required archive may exceed the budget only when its index states why semantic subdivision would damage its responsibility.
 
-A subfolder MUST represent a durable subject, repository module, or document class. A module folder MAY contain only its `README.md` when it mirrors a durable source/build module and that page owns the module inventory; this consistency is intentional, not fragmentation. `Acceptance` MAY likewise use a single-`README.md` module progress folder when it mirrors a durable module and contains only high-level dossier/report/disposition routing. Other categorization folders need at least two owned documents. When a durable feature has two or more independently maintained files in one area, group them under `<Feature>/`: use `README.md` as the feature dossier and role names such as `Capability.md` or `Acceptance.md` for companions instead of repeating the feature name across flat siblings. Every multi-document folder needs a `README.md`; it may own the dossier when the folder path names the subject, otherwise it is a short route whose contents are not already completely routed by the parent index.
-
-A feature family with child capabilities that have different inputs/results, selectors, capability states, failure modes, or proof obligations SHOULD use one named folder. Its `README.md` owns shared ordering and invariants; each independently reviewable child owns a descriptive document. Do not represent one family partly as loose peer files and partly as a same-level folder. Expected but absent capabilities receive explicit negative dossiers when omission could be mistaken for support from an adjacent feature.
+A subfolder MUST represent a durable subject, repository module, or document class. Keep one named design/contract and one separate implementation plan when the subject has staged work. A short `README.md` is useful when readers need to choose among several documents; do not add an index that merely repeats a parent's single route. A family design owns shared invariants; independently reviewed child contracts stay separate. Expected but absent capabilities remain explicit so adjacent support cannot be mistaken for their implementation.
 
 ## Naming
 
-- Use descriptive PascalCase filenames consistent with repository code and existing stable documents. A module inventory uses `README.md` inside its exact module folder so the path carries the module identity.
+- Use descriptive PascalCase filenames. `README.md` is navigation only. Put substantive module knowledge in `<Module>Capabilities.md` or `<Subject>Design.md`; keep existing named contracts when their role is clear.
 - Name the subject, not the author, date, state of mind, or editing action.
-- Use `Plan.md` when a subject folder has one delivery authority. Use a narrow name such as `FirstReleasePlan.md` when a module contains several independently maintained plans.
+- Use `ImplementationPlan.md` for the local staged delivery authority, or `<Scope>ImplementationPlan.md` when several plans share a folder. Keep it separate from design: design explains what, why and how; implementation orders the changes. Each stage needs prerequisites, bounded work, an exit check and a copyable prompt that names its exact file/stage. A prompt refers to the owning contracts instead of redefining them.
 - Use `Research.md` when a subject has one study, or a descriptive `*Research.md`, `*Precedent.md`, or `*Baseline.md` when several studies coexist.
 - Do not create parallel top-level `Plans` or `Research` taxonomies. The owning module/feature path supplies subject context; the filename and status header supply knowledge type.
 - Put historical dates and revisions in document metadata, not filenames, unless multiple retained snapshots require date identity.
@@ -188,7 +187,7 @@ A feature family with child capabilities that have different inputs/results, sel
 
 ## Navigation And Links
 
-The required route is `Docs/README.md` -> Architecture/Engineering/Strategy/Acceptance index -> module or cross-module subject index -> owning document. Every non-index document MUST be reachable from its nearest index, and every index entry MUST state why a reader would open it. A reader MUST be able to distinguish module-owned and cross-module knowledge from the path, and architecture/plan/research/acceptance roles from the filename and status header.
+The required route is `Docs/README.md` -> Architecture/Engineering/Strategy/Acceptance index -> module or cross-module subject index -> owning document. Every document MUST be reachable from its nearest index or named subject guide, and every index entry MUST state why a reader would open it. A reader MUST be able to distinguish module-owned and cross-module knowledge from the path, and architecture/plan/research/acceptance roles from the filename and status header.
 
 Retained pages link to Docs and their nearest parent guide. Combine short pages for the same subject when section links are enough; keep independent research or large contracts separate. Consolidation preserves section status, goals, checks and provenance.
 

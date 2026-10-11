@@ -2,6 +2,8 @@
 
 [Docs](../../../README.md) / [Up](GraphicsPortfolioDesign.md)
 
+Stages: [1](#1-freeze-the-case-and-evidence-route) / [2](#2-assemble-the-three-cases) / [3](#3-reproduce-review-and-revise).
+
 Assemble existing evidence into three understandable case studies and a real non-author reproduction exercise.
 
 **Status:** planning scaffold; five evidence/audience decisions still need to be filled
@@ -36,6 +38,17 @@ Fill the decisions above, identify missing accepted artifacts and assign each ga
 
 **Exit:** a reviewable local assembly plan with exact inputs, rights and check cards. Required unresolved decisions remain visible.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only 1 from Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#1-freeze-the-case-and-evidence-route.
+Task: Freeze The Case And Evidence Route. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ### 2. Assemble The Three Cases
 
 **Start when:** the selected evidence and sharing rights are accepted.
@@ -43,6 +56,17 @@ Fill the decisions above, identify missing accepted artifacts and assign each ga
 For each case, explain the question, your change or derivation, the relevant rendering product, source/native/model lineage, measurements, negative result and limitations. Add exact reproduction commands. Validate links and hashes, reject mixed candidates and preserve the originals.
 
 **Exit:** three inspectable case packages built from the accepted evidence, with missing cells explicitly identified.
+
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only 2 from Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#2-assemble-the-three-cases.
+Task: Assemble The Three Cases. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
 
 ### 3. Reproduce, Review And Revise
 
@@ -52,13 +76,24 @@ Execute the existing workload/adoption checks (`WL-07/08`), collect findings and
 
 **Exit:** retained independent reproduction/review and a disposition for every finding, under the existing proof owners.
 
+<details>
+<summary>Copy implementation prompt</summary>
+
+```text
+Execute only 3 from Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#3-reproduce-review-and-revise.
+Task: Reproduce, Review And Revise. Complete only its remaining work using the stage requirements and owning checks.
+Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+```
+
+</details>
+
 ## First Permitted Prompt
 
 <details>
-<summary>Copy the execution prompt</summary>
+<summary>Copy implementation prompt</summary>
 
 ```text
-Execute only step 1 of GraphicsPortfolio/Plan.md.
+Execute only step 1 of GraphicsPortfolio/ImplementationPlan.md.
 Use Roadmap to select the objective and inspect the existing case/workload and
 release/study/neural reports. Fill all five decisions: cases/reader, original
 evidence, shareable subset, reproduction and independent review. Link original
