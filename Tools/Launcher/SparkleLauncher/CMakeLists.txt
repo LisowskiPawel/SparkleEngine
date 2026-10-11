@@ -345,6 +345,7 @@ if(WIN32)
 
     set(_sparkle_qt_notice_files
         "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/README.md"
+        "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/ThirdPartyNotices.txt"
         "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/LGPL-3.0-only.txt"
         "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/GPL-3.0-only.txt")
     foreach(_notice IN LISTS _sparkle_qt_notice_files)

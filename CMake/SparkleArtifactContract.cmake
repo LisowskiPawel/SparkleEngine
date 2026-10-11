@@ -180,9 +180,6 @@ function(_sparkle_set_target_artifact_directories target_name runtime_root symbo
 
     get_target_property(_sparkle_target_type ${target_name} TYPE)
     if(MSVC AND _sparkle_target_type MATCHES "^(EXECUTABLE|SHARED_LIBRARY|MODULE_LIBRARY)$")
-        # Keep the PE/PDB join without embedding the author's absolute PDB path.
-        target_link_options(${target_name} PRIVATE
-            "$<$<CONFIG:ShippingEditor,ShippingGame>:/PDBALTPATH:$<TARGET_PDB_FILE_NAME:${target_name}>>")
         set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
         set(CMAKE_INSTALL_DEBUG_LIBRARIES FALSE)
         set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY FALSE)

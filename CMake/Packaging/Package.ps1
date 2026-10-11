@@ -25,7 +25,7 @@ $transactionRoot = Join-Path $outputRoot ".partial-$transaction"
 $report = [ordered]@{
     Version = $version; Revision = ''; SourceInputsSha256 = ''; Signing = 'UnsignedInternal'; Status = 'BLOCKED'; Steps = @(); Archive = $null
     Environment = @{ OperatingSystem = [Environment]::OSVersion.VersionString; PowerShell = $PSVersionTable.PSVersion.ToString() }
-    Configurations = @('ShippingEditor', 'ShippingGame'); ReleaseInputs = $null; BuildCache = $null
+    Configurations = @('ShippingEditor', 'ShippingGame'); ReleaseInputs = $null; PayloadSha256 = $null; BuildCache = $null
 }
 $phase = 'Admission'
 $lock = $null
@@ -35,9 +35,15 @@ function Invoke-ReleaseCommand
 {
     param([string] $Executable, [string[]] $Arguments, [string] $LogName)
     $log = Join-Path $transactionRoot $LogName
-    & $Executable @Arguments *> $log
+    # Windows PowerShell wraps native stderr in ErrorRecords; only the child exit decides success.
+    $ErrorActionPreference = 'Continue'
+    $global:LASTEXITCODE = $null
+    try { & $Executable @Arguments *> $log }
+    catch { $_ | Out-File -LiteralPath $log -ErrorAction Stop }
+    $ErrorActionPreference = 'Stop'
     $code = $LASTEXITCODE
     $report.Steps += @{ Name = $phase; Command = @($Executable) + $Arguments; ExitCode = $code; Log = $LogName; Status = $(if ($code -eq 0) { 'PASS' } else { 'BLOCKED' }) }
+    if ($null -eq $code) { throw "$phase could not start; see '$log'." }
     if ($code -ne 0) { throw "$phase failed with exit $code; see '$log'." }
 }
 
@@ -186,16 +192,18 @@ try
     {
         throw 'Release inputs do not match the exact current source candidate.'
     }
+    $products = @(Get-PackageProducts $BuildDirectory $version)
+    $manifest = New-PackageManifest $repositoryRoot $version $report.Revision $report.SourceInputsSha256 $products $inputs
+    $report.PayloadSha256 = Get-ReleaseSourceHash ($manifest | ConvertTo-Json -Depth 20 -Compress)
     foreach ($name in @('Rights','DependencyClosure','SymbolCorrelation'))
     {
         $admission = $inputs.Admissions.$name
         $receiptPath = Assert-PackageFile $repositoryRoot $admission.Report $admission.Size $admission.Sha256
         $receipt = Get-Content -LiteralPath $receiptPath -Raw -Encoding UTF8 | ConvertFrom-Json
         if ($receipt.Status -cne 'PASS' -or $receipt.Gate -cne $name -or $receipt.Revision -cne $report.Revision -or
-            $receipt.SourceInputsSha256 -cne $report.SourceInputsSha256) { throw "Unresolved or stale $name admission." }
+            $receipt.SourceInputsSha256 -cne $report.SourceInputsSha256 -or
+            $receipt.PayloadSha256 -cne $report.PayloadSha256) { throw "Unresolved or stale $name admission." }
     }
-    $products = @(Get-PackageProducts $BuildDirectory $version)
-    $manifest = New-PackageManifest $repositoryRoot $version $report.Revision $report.SourceInputsSha256 $products $inputs
     $report.Steps += @{ Name = 'Admission'; Status = 'PASS' }
 
     $phase = 'Build'

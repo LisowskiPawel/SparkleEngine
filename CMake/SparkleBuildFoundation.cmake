@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(MSVC)
     add_compile_options(/Zc:__cplusplus)
+    add_link_options("$<$<CONFIG:ShippingEditor,ShippingGame>:/PDBALTPATH:$<TARGET_PDB_FILE_NAME:$<TARGET_PROPERTY:NAME>>>")
 endif()
 
 function(sparkle_target_precompile_headers target_name)

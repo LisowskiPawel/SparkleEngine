@@ -77,6 +77,10 @@ set(SPARKLE_MSVC_SHIPPING_COMPILE_OPTIONS
     /FS      # Serialize compiler PDB writes.
     /DNDEBUG # Disable standard assert paths for shipping-style builds.
 )
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}" _sparkle_source_prefix)
+    list(APPEND SPARKLE_MSVC_SHIPPING_COMPILE_OPTIONS "/d1trimfile:\"${_sparkle_source_prefix}\"")
+endif()
 
 set(SPARKLE_CLANG_DEBUG_COMPILE_OPTIONS
     -O0      # Disable optimization for straightforward source-level debugging.

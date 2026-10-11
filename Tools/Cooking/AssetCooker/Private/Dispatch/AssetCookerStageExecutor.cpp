@@ -113,7 +113,7 @@ bool AssetCookerStageExecutor::ValidateCapabilities(const AssetCookerProjectCook
 
 bool AssetCookerStageExecutor::RunShaders(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord>& outputs)
 {
-	if (AssetCookerToolProcess::Run(plan.shaderCompilerPath, {"cook"}, plan.projectRoot) != 0)
+	if (AssetCookerToolProcess::Run(plan.shaderCompilerPath, {"cook", "--debug-info"}, plan.projectRoot) != 0)
 	{
 		diagnostics.AddError(AssetCookerCategory::Shaders, "Shader cooking failed.");
 		return false;

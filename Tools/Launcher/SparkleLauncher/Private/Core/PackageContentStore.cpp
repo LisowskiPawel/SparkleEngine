@@ -100,8 +100,7 @@ namespace SparkleLauncher
 		    sourceRelative / "Levels.catalog",
 		    std::filesystem::path("Cooked/Shaders/GlobalShaderMap.smap"),
 		    std::filesystem::path("Cooked/Shaders/CookedShaderLibrary.slib"),
-		    std::filesystem::path("Cooked/Shaders/ShaderDependencies.sdep"),
-		    std::filesystem::path("Cooked/Shaders/recook.signal")};
+		    std::filesystem::path("Cooked/Shaders/ShaderDependencies.sdep")};
 
 		for (const auto& path : required)
 		{

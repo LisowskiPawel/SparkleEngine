@@ -54,7 +54,8 @@ function Assert-PackageManifest
         {
             throw "Duplicate or reserved manifest path: '$($file.Path)'."
         }
-        if ($file.Path -match '\.(pdb|ilk|obj|lib|exp|cpp|cxx|h|hpp)$' -or
+        if ($file.Path -eq 'Engine/Cooked/Shaders/recook.signal' -or
+            $file.Path -match '\.(pdb|ilk|obj|lib|exp|cpp|cxx|h|hpp)$' -or
             $file.Path -match '(^|/)(build|_deps|\.git|Cache|Logs|Settings)(/|$)' -or
             $file.Path -match '(^|/)(Sponza|ModernSponza)/.*\.(glb|gltf|bin|dds|png|jpg|ktx2)$')
         {
@@ -98,8 +99,7 @@ function Assert-PackageLayout
     }
     foreach ($path in @('Tools/Content/SyncAssetPack.cmake', 'Tools/Content/SyncAssetPackFiles.cmake',
                         'Tools/Content/SyncAssetPackArchive.cmake', 'Engine/Cooked/Shaders/GlobalShaderMap.smap',
-                        'Engine/Cooked/Shaders/CookedShaderLibrary.slib', 'Engine/Cooked/Shaders/ShaderDependencies.sdep',
-                        'Engine/Cooked/Shaders/recook.signal'))
+                        'Engine/Cooked/Shaders/CookedShaderLibrary.slib', 'Engine/Cooked/Shaders/ShaderDependencies.sdep'))
     {
         if (@($Manifest.Files | Where-Object Path -ceq $path).Count -ne 1) { throw "Missing installed content input: '$path'." }
     }

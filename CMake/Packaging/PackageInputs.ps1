@@ -38,8 +38,19 @@ function New-PackageManifest
         {
             throw "Missing/incompatible product admission: '$($product.Component)'."
         }
+        $directory = $product.Path.Substring(0, $product.Path.LastIndexOf('/') + 1)
+        foreach ($support in $product.RuntimeSupport)
+        {
+            Assert-PackagePath $support
+            $member = @($Inputs.Files | Where-Object Path -ceq ($directory + $support))
+            if ($member.Count -ne 1 -or $member[0].Component -cne $product.Component -or $member[0].Role -cne 'Helper')
+            {
+                throw "Missing/incompatible runtime support: '$($directory + $support)'."
+            }
+        }
     }
-    foreach ($path in @('Tools/CMake/bin/cmake.exe','manifests/sparkle-sbom.spdx.json','manifests/sparkle-provenance.json'))
+    foreach ($path in @('Tools/CMake/bin/cmake.exe','Tools/CMake/share/cmake-4.3/Modules/CMake.cmake',
+                        'manifests/sparkle-sbom.spdx.json','manifests/sparkle-provenance.json'))
     {
         if (@($Inputs.Files | Where-Object Path -eq $path).Count -ne 1) { throw "Missing required input: '$path'." }
     }
@@ -84,7 +95,7 @@ function Get-PackageInputAudit
         $fact = [ordered]@{
             Component = $product.Component; Target = $product.Target; Configuration = $product.Configuration
             Path = $product.Path; Status = 'BLOCKED'; Binary = $null; NativeSymbols = $null
-            Imports = @(); RuntimeFiles = @(); CompilerRuntime = @(); MissingAppLocalImports = @(); Error = $null
+            Imports = @(); RuntimeFiles = @(); SupportFiles = @(); CompilerRuntime = @(); MissingAppLocalImports = @(); Error = $null
         }
         try
         {
@@ -108,8 +119,14 @@ function Get-PackageInputAudit
                     Signature = (Get-AuthenticodeSignature -LiteralPath $file.FullName).Status.ToString()
                     Imports = @(Get-PackagePeImports $file.FullName) }
             })
+            $fact.SupportFiles = @(foreach ($support in $product.RuntimeSupport)
+            {
+                Assert-PackagePath $support
+                $file = Get-IncidentFile (Join-Path $binary.DirectoryName $support) ([long]::MaxValue)
+                @{ Path = $support; Size = $file.Length; Sha256 = (Get-FileHash -LiteralPath $file.FullName).Hash.ToLowerInvariant() }
+            })
             $fact.MissingAppLocalImports = @($fact.Imports | Where-Object {
-                $_ -match '^(vcruntime|msvcp|concrt|Qt[56]|dxcompiler|dxil|slang|sl\.|nvngx|Sparkle)' -and
+                $_ -match '^(vcruntime|msvcp|concrt|Qt[56]|dxcompiler|dxil|slang|sl\.|nvngx|NvLowLatencyVk|Sparkle)' -and
                 !(Test-Path -LiteralPath (Join-Path $binary.DirectoryName $_) -PathType Leaf)
             })
             $fact.CompilerRuntime = @(foreach ($runtime in $product.MSVCRuntime)

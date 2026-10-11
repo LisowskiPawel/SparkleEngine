@@ -45,6 +45,20 @@ set(SLANG_RUNTIME_SUPPORT_FILES
     "${SLANG_RT_RUNTIME_LIBRARY}"
     "${SLANG_STANDARD_LIBRARY_FILE}")
 
+set(_shader_runtime_support)
+foreach(_support IN LISTS SLANG_RUNTIME_SUPPORT_FILES)
+    get_filename_component(_name "${_support}" NAME)
+    list(APPEND _shader_runtime_support "${_name}")
+endforeach()
+foreach(_module IN LISTS SLANG_STANDARD_MODULE_DIRECTORIES)
+    file(GLOB_RECURSE _module_files CONFIGURE_DEPENDS RELATIVE "${SLANG_SDK_ROOT}/Bin" "${_module}/*")
+    if(NOT _module_files)
+        message(FATAL_ERROR "Slang standard module is empty: ${_module}")
+    endif()
+    list(APPEND _shader_runtime_support ${_module_files})
+endforeach()
+set_property(TARGET ShaderCompiler PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES ${_shader_runtime_support})
+
 add_library(slang::slang SHARED IMPORTED GLOBAL)
 set_target_properties(slang::slang PROPERTIES
     IMPORTED_IMPLIB "${SLANG_IMPORT_LIBRARY}"
