@@ -28,6 +28,8 @@ VkFormat VulkanTypeConversions::ToVkFormat(PixelFormat format) noexcept
 			return VK_FORMAT_D32_SFLOAT;
 		case PixelFormat::R32_Float:
 			return VK_FORMAT_R32_SFLOAT;
+		case PixelFormat::R32_UInt:
+			return VK_FORMAT_R32_UINT;
 		case PixelFormat::D24_UNorm_S8_UInt:
 			return VK_FORMAT_D24_UNORM_S8_UINT;
 		case PixelFormat::BC1_UNorm:

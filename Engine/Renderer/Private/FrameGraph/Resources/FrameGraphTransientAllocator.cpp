@@ -50,7 +50,7 @@ void FrameGraphTransientAllocator::Reset() noexcept
 	m_planEntries.clear();
 }
 
-void FrameGraphTransientAllocator::Prepare(const FrameGraphTransientPlan& plan) noexcept
+bool FrameGraphTransientAllocator::Prepare(const FrameGraphTransientPlan& plan) noexcept
 {
 	std::vector<PlanEntry> planEntries;
 	planEntries.reserve(plan.resources.size());
@@ -68,11 +68,12 @@ void FrameGraphTransientAllocator::Prepare(const FrameGraphTransientPlan& plan) 
 
 	if (planEntries == m_planEntries)
 	{
-		return;
+		return false;
 	}
 
 	Reset();
 	m_planEntries = std::move(planEntries);
+	return true;
 }
 
 void FrameGraphTransientAllocator::ReleaseAllocations() noexcept

@@ -16,7 +16,6 @@ void AddRayReconstructionSurfaceGuidesPass(FrameGraphBuilder& builder, const Ren
 	{
 		return;
 	}
-	CreateRayReconstructionGuideRenderTargets(builder, sceneExtent, resources);
 	const auto& gbuffer = resources.Transient.GBuffer;
 	const auto& guides = resources.Transient.Lighting.ReconstructionGuides;
 	auto& parameters = builder.AllocParameters<RayReconstructionSurfaceGuidesCS>();

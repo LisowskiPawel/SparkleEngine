@@ -10,12 +10,17 @@
 #include "RayTracing/RayTracingMaterialPass.h"
 #include "Scene/RayTracing/RenderRayTracingScene.h"
 #include "ShaderData/SceneShaderParameters.h"
+#include "Passes/Visualization/GpuSceneVisualization.h"
 
 template <typename TShader> static auto& BuildRayTracingGBufferParameters(FrameGraphBuilder& builder, const RenderFrame& frame, const RenderFrameGraphResources& resources)
 {
 	const GBufferRenderTargets& targets = resources.Transient.GBuffer;
 
 	auto& parameters = builder.AllocParameters<TShader>();
+
+	parameters->GBufferInstanceIdentity = builder.CreateUAV(targets.InstanceIdentity);
+	parameters->GBufferWriteInstanceIdentity = IsGpuSceneVisualizationActive(frame.View.viewMode) ? 1u : 0u;
+
 	parameters->GBufferBaseColor = builder.CreateUAV(targets.BaseColor);
 	parameters->GBufferWorldNormal = builder.CreateUAV(targets.WorldNormal);
 	parameters->GBufferWorldTangent = builder.CreateUAV(targets.WorldTangent);

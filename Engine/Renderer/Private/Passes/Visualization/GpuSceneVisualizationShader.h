@@ -8,6 +8,6 @@ class GpuSceneVisualizationCS final : public GlobalShader<GpuSceneVisualizationC
 public:
 	BEGIN_SHADER_PARAMETER_STRUCT(Parameters, )
 	SHADER_PARAMETER_TEXTURE_UAV(RWTexture2D, SceneColor)
-	SHADER_PARAMETER_TEXTURE_SRV(Texture2D, GBufferBaseColor)
+	SHADER_PARAMETER_TEXTURE_SRV(Texture2D, GBufferInstanceIdentity)
 	END_SHADER_PARAMETER_STRUCT()
 };

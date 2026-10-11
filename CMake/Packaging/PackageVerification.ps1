@@ -69,14 +69,43 @@ function Assert-PackageManifest
         {
             throw "Incomplete or private-path payload declaration: '$($file.Path)'."
         }
-        if ($file.Path.StartsWith('game/') -and $file.Path -match '(?i)(Qt6|SparkleEditor|AssetCooker|TextureCooker|ShaderCompiler)')
+        if ($file.Path.StartsWith('game/', [StringComparison]::OrdinalIgnoreCase) -and $file.Path -match '(?i)(Qt6|SparkleEditor|AssetCooker|TextureCooker|ShaderCompiler)')
         {
             throw "Editor/authoring dependency in Game component: '$($file.Path)'."
+        }
+        if ($file.Path -match '\.(exe|dll)$' -and $file.Role -notin @('Runtime','Helper'))
+        {
+            throw "PE payload has a non-executable role: '$($file.Path)'."
         }
     }
     foreach ($file in $Manifest.Files)
     {
         if (!$paths.Contains($file.Notice)) { throw "Notice is not admitted for '$($file.Path)'." }
+    }
+}
+
+function Assert-PackageLayout
+{
+    param($Manifest)
+    foreach ($path in @($Manifest.ProjectPath, $Manifest.EnginePath, $Manifest.ContentStore)) { Assert-PackagePath $path }
+    if ($Manifest.ProjectPath -cne 'content/Showcase' -or $Manifest.EnginePath -cne 'engine' -or $Manifest.ContentStore -cne 'Content/Showcase')
+    {
+        throw 'Package layout differs from the frozen three-product content-store contract.'
+    }
+    foreach ($path in @('content/Showcase/.sparkle-project', 'content/Showcase/Levels.catalog'))
+    {
+        if (@($Manifest.Files | Where-Object Path -ceq $path).Count -ne 1) { throw "Missing package recipe input: '$path'." }
+    }
+    if (!@($Manifest.Files | Where-Object { $_.Path.StartsWith('engine/Assets/') -and $_.Role -eq 'EngineContent' }).Count)
+    {
+        throw 'Missing immutable engine assets.'
+    }
+    foreach ($file in $Manifest.Files)
+    {
+        if ($file.Path -match '^content/Showcase/(Cooked|Cache|Downloads)(/|$)')
+        {
+            throw "Writable selected-content output inside immutable package: '$($file.Path)'."
+        }
     }
 }
 
@@ -171,4 +200,53 @@ function Test-PackageArchive
         if ($expected.Count -ne 0) { throw 'Missing archive members.' }
     }
     finally { $zip.Dispose() }
+}
+
+function Test-PackageMetadata
+{
+    param([string] $Stage, $Manifest)
+    $sbom = Get-Content -LiteralPath (Join-Path $Stage 'manifests/sparkle-sbom.spdx.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($sbom.spdxVersion -cne 'SPDX-2.3' -or $sbom.dataLicense -cne 'CC0-1.0' -or $sbom.SPDXID -cne 'SPDXRef-DOCUMENT' -or
+        $sbom.documentNamespace -notmatch '^https://[^ ]+$' -or !@($sbom.creationInfo.creators).Count -or !@($sbom.packages).Count)
+    {
+        throw 'Incomplete SPDX 2.3 document identity.'
+    }
+    $inventory = @{}
+    foreach ($file in $sbom.files)
+    {
+        if (!$file.fileName.StartsWith('./')) { throw 'SPDX file names must be package relative.' }
+        $path = $file.fileName.Substring(2)
+        Assert-PackagePath $path
+        if ($inventory.ContainsKey($path)) { throw 'Duplicate SPDX file.' }
+        $inventory[$path] = $file
+    }
+    foreach ($file in $Manifest.Files | Where-Object Path -notin @('manifests/sparkle-sbom.spdx.json','manifests/sparkle-provenance.json'))
+    {
+        if (!$inventory.ContainsKey($file.Path)) { throw "Missing SPDX file: '$($file.Path)'." }
+        $entry = $inventory[$file.Path]
+        $checksum = @($entry.checksums | Where-Object algorithm -ceq 'SHA256')
+        if ($checksum.Count -ne 1 -or $checksum[0].checksumValue -cne $file.Sha256 -or $entry.licenseConcluded -cne $file.License)
+        {
+            throw "SPDX file identity differs from manifest: '$($file.Path)'."
+        }
+        $inventory.Remove($file.Path)
+    }
+    if ($inventory.Count -ne 0) { throw 'Extra SPDX file; metadata self-digests belong only in the package manifest.' }
+    foreach ($component in $sbom.packages)
+    {
+        if ([string]::IsNullOrWhiteSpace($component.name) -or [string]::IsNullOrWhiteSpace($component.versionInfo) -or
+            $component.licenseDeclared -match '^(|NONE|NOASSERTION)$') { throw 'Unqualified SPDX software component.' }
+    }
+    $provenance = Get-Content -LiteralPath (Join-Path $Stage 'manifests/sparkle-provenance.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($provenance.Revision -cne $Manifest.Revision -or $provenance.SourceInputsSha256 -cne $Manifest.SourceInputsSha256 -or
+        $provenance.Version -cne $Manifest.Version) { throw 'Provenance belongs to a different source candidate.' }
+    foreach ($product in $Manifest.Products)
+    {
+        $entry = @($provenance.Products | Where-Object Component -ceq $product.Component)
+        if ($entry.Count -ne 1 -or $entry[0].Target -cne $product.Target -or $entry[0].Configuration -cne $product.Configuration -or $entry[0].Path -cne $product.Path)
+        {
+            throw "Wrong provenance product: '$($product.Component)'."
+        }
+    }
+    if (@($provenance.Products).Count -ne @($Manifest.Products).Count) { throw 'Extra provenance product.' }
 }

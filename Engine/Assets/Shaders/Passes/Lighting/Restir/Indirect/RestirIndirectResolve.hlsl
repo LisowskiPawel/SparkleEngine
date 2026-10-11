@@ -27,20 +27,20 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 
 	if (!surface.Valid)
 	{
-		if (RestirIndirectWriteReconstructionGuides != 0u)
+		if (WriteRayReconstructionGuides != 0u)
 		{
 			RayReconstructionGuides::Clear(pixelCoord);
 		}
 		return;
 	}
 
-	if (RestirIndirectWriteReconstructionGuides != 0u)
+	if (WriteRayReconstructionGuides != 0u)
 	{
 		RayReconstructionGuides::WriteSurface(pixelCoord, surface.GBuffer, surface.PathSurface.ViewDirWorld);
 	}
 	if (!RestirIndirectReservoir::IsValid(reservoir))
 	{
-		if (RestirIndirectWriteReconstructionGuides != 0u)
+		if (WriteRayReconstructionGuides != 0u)
 		{
 			RayReconstructionGuides::ClearSpecularHitDistance(pixelCoord);
 		}
@@ -61,7 +61,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		hasSpecular = any(specular > 0.0f);
 		IndirectSpecular[pixelCoord] = float4(specular, hasSpecular ? 1.0f : 0.0f);
 	}
-	if (RestirIndirectWriteReconstructionGuides != 0u)
+	if (WriteRayReconstructionGuides != 0u)
 	{
 		RayReconstructionGuides::WriteSpecularHitDistance(pixelCoord, path.FirstLighting.HitPositionWorld, surface.PathSurface.PositionWorld, hasSpecular && path.FirstLighting.Hit);
 	}

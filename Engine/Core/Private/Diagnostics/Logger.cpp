@@ -14,7 +14,7 @@
 #include <vector>
 
 #include <spdlog/sinks/base_sink.h>
-#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
 
 #if defined(_WIN32)
@@ -119,7 +119,7 @@ namespace Logging
 			Environment::TryGetVariable("SPARKLE_LOG_FILE", configuredFile);
 			const std::filesystem::path logPath = Paths::Private::ResolveBootstrapLogFile(configuredFile, Paths::Private::LogParentDirectoryPolicy::EnsureExists);
 
-			auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath.string(), true);
+			auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logPath.string(), 5 * 1024 * 1024, 2);
 			fileSink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] %s:%# %v");
 			sinks.push_back(fileSink);
 			registry.ActiveLogFilePath = logPath;

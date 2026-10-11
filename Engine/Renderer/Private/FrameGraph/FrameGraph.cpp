@@ -43,7 +43,16 @@ const FrameGraphPlan& FrameGraph::Compile()
 	BuildTransientMaterializationPlan(m_compiledPlan);
 	const RhiQueueCapabilities queueCapabilities = m_renderHardwareInterface != nullptr ? m_renderHardwareInterface->GetCapabilities().Queues : RhiQueueCapabilities{};
 	FrameGraphCompiler compiler(m_compiledPlan, m_resourceRegistry, m_resourceStateTracker, queueCapabilities);
-	compiler.Compile();
+	compiler.CompileResourcePlan();
+	if (m_transientAllocator->Prepare(m_compiledPlan.transients))
+	{
+		// Barrier planning must use the initial states of replacement GPU resources.
+		for (const FrameGraphTransientResourcePlan& transient : m_compiledPlan.transients.resources)
+		{
+			m_resourceStateTracker.UpdateCurrentState(transient.handle, transient.physicalAllocation.initialState);
+		}
+	}
+	compiler.CompileExecutionPlan();
 	m_submissionBatchTokens.resize(m_compiledPlan.submissionBatches.size());
 	return m_compiledPlan;
 }

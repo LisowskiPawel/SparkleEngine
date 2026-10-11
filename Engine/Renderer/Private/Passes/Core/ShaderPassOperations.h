@@ -12,7 +12,7 @@
 
 namespace ShaderPassOperations
 {
-	std::vector<const char*> BuildBoundBindingNames(const RenderBindingLayout& bindingLayout, const PassParameterSet& parameters, const PassBindingOverrides* overrides) noexcept;
+	std::vector<const char*> BuildCompiledBindingNames(const RenderBindingLayout& bindingLayout) noexcept;
 
 	template <typename TRasterPipelineRuntime> bool BindRasterPassWithRuntime(
 	    const FrameGraphResourceCommands& resources,
@@ -28,7 +28,7 @@ namespace ShaderPassOperations
 		return BindRasterShader(resources, commandContext, runtime.BindingLayout, runtime.Pipeline, parameters, bindingNames, bindingNameCount, overrides, passName, bindLayout);
 	}
 
-	template <typename TRasterPipelineRuntime> bool BindAvailableRasterPassWithRuntime(
+	template <typename TRasterPipelineRuntime> bool BindCompiledRasterPassWithRuntime(
 	    const FrameGraphResourceCommands& resources,
 	    RenderCommandContext& commandContext,
 	    const TRasterPipelineRuntime& runtime,
@@ -37,7 +37,7 @@ namespace ShaderPassOperations
 	    const char* passName = nullptr,
 	    bool bindLayout = true) noexcept
 	{
-		const std::vector<const char*> bindingNames = BuildBoundBindingNames(runtime.BindingLayout, parameters, overrides);
+		const std::vector<const char*> bindingNames = BuildCompiledBindingNames(runtime.BindingLayout);
 		return BindRasterPassWithRuntime(resources, commandContext, runtime, parameters, bindingNames.data(), static_cast<std::uint32_t>(bindingNames.size()), overrides, passName, bindLayout);
 	}
 

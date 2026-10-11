@@ -10,7 +10,7 @@
 
 **Strategy and acceptance sources:** [`PGE-01`, `PGE-13`, `PGE-14`, `PGE-15`](../../../Strategy/Requirements.md), [First Release](../../../Acceptance/FirstRelease.md), and `FCR-PROD-02`/`FCR-PROD-05` in [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md)
 
-**Current readiness:** **0/100** — target only; no public stage/sign/verify/package/install product path was found. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
+**Acceptance:** blocked. The implementation below has local structural checks; no three-product archive or clean-machine package result exists. See [candidate evidence](../../../Acceptance/ReleaseScope/Evidence.md#package-spine-iter-pd3-01).
 
 
 ## Current Package Entry
@@ -22,21 +22,25 @@ cmake -S . -B build -DSPARKLE_RELEASE_INPUTS=<reviewed-inputs.json>
 cmake --build build --config ShippingEditor --target release_package
 ```
 
-The input contract is in [Release Inputs](ReleaseInputs.md#reviewed-package-inputs). Missing rights, dependency, discovery, content-store or symbol admission stops before build/cook/stage. These are candidate-bound owner reviews, not permission flags to set to make the command pass.
+The input contract is in [Release Inputs](ReleaseInputs.md#reviewed-package-inputs). Missing rights, dependency or symbol admission stops before build/cook/stage. Each retained owner receipt must pass and identify the exact source candidate. Discovery/content-store acceptance follows the produced archive; it is not a prerequisite that requires an archive before one can be made.
 
-The stage verifier checks declared paths, hashes, notices, required components, read-only attributes, x64 PE headers and requested vendor signatures. It rejects missing/extra/duplicate members, traversal/reparse paths, source/debug/user-state files and known Editor/tool dependencies under Game. ZIP creation uses sorted membership and fixed timestamps; independent ZIP enumeration checks membership, size, hashes and attributes before publication. The manifest excludes its own digest; ZIP verification checks its exact staged bytes, and the external report binds the archive hash.
+The stage verifier checks paths, hashes, notices, components, read-only attributes, x64 PE headers and vendor signatures. It reads ordinary/delay imports and requires app-local closure or explicit Windows/driver prerequisites; Game cannot import Editor/tool dependencies. SPDX file hashes/licenses and provenance product/source identities must match the manifest. These checks do not replace legal review or complete SPDX schema validation.
 
-Outputs stay under `artifacts/releases/<version>/`. Failed transactions remain under `.partial-<id>/` with reports/logs; they never publish a ZIP. The script does not delete or overwrite earlier output. A successful route publishes a hash-named **unsigned internal** archive. This does not prove trusted signing, complete transitive imports, private-path erasure, symbol correlation, runtime relocation, LGPL replacement, or a clean standard-user journey. Those require the admitted reports and native acceptance below. No product archive has been produced by this iteration.
+ZIP creation uses sorted membership and fixed timestamps. Independent ZIP enumeration checks membership, size, hashes and attributes before publication. The manifest excludes its own digest; ZIP verification checks its exact staged bytes, and the external report binds the archive hash.
+
+Outputs stay under `artifacts/releases/<version>/`. Failed transactions remain under `.partial-<id>/` with reports/logs and no published ZIP. Earlier output is not overwritten. Successful assembly produces a hash-named **unsigned internal** archive; it does not pass REL-03 automatically. Trusted signing remains a pre-release step.
+
+Core reads `ProjectPath`, `EnginePath` and `ContentStore` from the manifest. Project/engine paths are extraction-relative; cooked content is under the per-user store. Malformed/missing paths cannot fall back to a source checkout. Launcher still uses repository-only discovery and sync/cook paths: consumer entry, store initialization, selective/offline sync and removal remain unfinished. Exact payload rights, app-local CRT/helper closure, symbol correlation, private-path inspection and LGPL replacement remain unqualified. The maintainer will run CHK-PKG-02 after an archive is ready.
 
 ## At A Glance
 
 | Product boundary | Current state | Required result |
 | --- | --- | --- |
 | development artifacts | implemented workspace-oriented output/copy routes | remain inputs only; never advertised as a release package |
-| immutable staging | Not found | declared membership and one manifest account for every byte, permission, hash, and license |
-| trust/publication | Not found | SBOM/provenance, signing identity, integrity verification, and quarantined failure |
-| installation and writable state | Not found | standard-user install/update/uninstall plus explicit per-user state outside immutable bytes |
-| relocation and clean-machine use | Not found | offline operation without repository, build tree, SDK, or private path dependencies |
+| immutable staging | source route and structural rejection checks exist | qualify exact three-product bytes through the complete route |
+| trust/publication | integrity, import and metadata verification exist | complete notices/SBOM/source obligations, symbols and pre-release signing |
+| installation and writable state | Core manifest paths and per-user state exist | Launcher store initialization/sync/cook/run/remove |
+| relocation and clean-machine use | unqualified | retained standard-user rehearsal of the exact archive |
 
 The target route is one directional transaction: Build -> Cook -> Stage -> Verify/Sign -> Package -> Install/Run. Each step consumes a declared predecessor product and must never scan unrelated development directories to infer missing membership.
 
@@ -44,14 +48,14 @@ The target route is one directional transaction: Build -> Cook -> Stage -> Verif
 
 | ID | Capability | Current state |
 | --- | --- | --- |
-| `PKG-01` | Deterministic immutable staging tree and manifest | Not found |
-| `PKG-02` | License/SBOM, signature, integrity, and publication verification | Not found |
-| `PKG-03` | Standard-user install/update/uninstall with separate writable state | Not found |
-| `PKG-04` | Relocated, read-only, offline, clean-machine product operation | Not found |
+| `PKG-01` | Deterministic immutable staging tree and manifest | implemented source route; product archive unqualified |
+| `PKG-02` | License/SBOM, signature, integrity, and publication verification | partial; legal/symbol/signing closure unqualified |
+| `PKG-03` | Standard-user extract/run/remove with separate writable state | partial Core paths; Launcher journey unfinished |
+| `PKG-04` | Relocated, read-only, offline, clean-machine product operation | blocked; native rehearsal unavailable until archive creation |
 
 ## Capability Boundary
 
-The current CMake graph produces development artifacts and copies selected runtime support beside executables. It does not currently own a formal immutable stage, archive or installer, manifest, signing flow, SBOM, installation/update contract, or clean-machine package verification. Those absences are part of this feature dossier rather than implied future behavior.
+The CMake package owner consumes reviewed development outputs and creates a separate immutable stage/archive. An installer, registry integration and binary SDK are outside scope. Source discovery remains a separate development route; package consumers must not inherit its fallback or cleanup behavior.
 
 The target capability is one Build -> Cook -> Stage -> Sign -> Verify -> Package route. It must classify the runtime, editor, Launcher, host tools, symbols, source/debug material, licenses, vendor binaries, cooked content, configuration, and writable per-user state independently.
 
@@ -64,7 +68,7 @@ The target capability is one Build -> Cook -> Stage -> Sign -> Verify -> Package
 
 ## Requested And Active State
 
-Packaging is currently **absent**, not Experimental or Included. A development artifact directory is not an active package. Any future candidate must publish the selected product, profile, backend/provider support, content set, package identity, and signature status in both its manifest and completion report.
+The source packaging route is implemented but unqualified. A development artifact directory is not a package. The manifest and completion report must name the exact products/profiles, backend/provider support, content set, candidate and signature status before acceptance.
 
 ## Failure, Capacity, And Observability
 

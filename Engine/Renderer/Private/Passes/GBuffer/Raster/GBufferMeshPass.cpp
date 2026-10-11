@@ -33,6 +33,7 @@ void GBufferGraphParameters::Describe(ShaderParameterStructBuilder<GBufferGraphP
 	builder.RenderTarget("Emissive", &GBufferGraphParameters::Emissive, ShaderStageVisibility::AllGraphics);
 	builder.RenderTarget("Subsurface", &GBufferGraphParameters::Subsurface, ShaderStageVisibility::AllGraphics);
 	builder.RenderTarget("MotionVector", &GBufferGraphParameters::MotionVector, ShaderStageVisibility::AllGraphics);
+	builder.RenderTarget("InstanceIdentity", &GBufferGraphParameters::InstanceIdentity, ShaderStageVisibility::AllGraphics);
 	builder.DepthTarget("DeviceZ", &GBufferGraphParameters::DeviceZ, ShaderStageVisibility::AllGraphics);
 	builder.Include(&GBufferGraphParameters::Shader);
 }
@@ -123,7 +124,7 @@ bool GBufferMeshPass::BindBatchPipeline(const FrameGraphResourceCommands& resour
 	overrides.SetDescriptorTable("MorphTargetDeltas", mesh.GetMorphTargetDeltasShaderResourceView());
 
 	const RasterPassRuntime runtime{draw.BindingLayout.get(), draw.Pipeline.get()};
-	return ShaderPassOperations::BindAvailableRasterPassWithRuntime(resources, commandContext, runtime, drawParameters.GetPassParameterSet(), &overrides, "GBuffer", true);
+	return ShaderPassOperations::BindCompiledRasterPassWithRuntime(resources, commandContext, runtime, drawParameters.GetPassParameterSet(), &overrides, "GBuffer", true);
 }
 
 void GBufferMeshPass::DrawBatch(

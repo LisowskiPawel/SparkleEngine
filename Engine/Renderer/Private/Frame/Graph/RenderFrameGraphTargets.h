@@ -10,6 +10,8 @@ struct SceneRenderTargets
 
 struct GBufferRenderTargets
 {
+	// Instance identity: slot + 1; zero denotes background or disabled writes.
+	FrameGraphTextureHandle InstanceIdentity = FrameGraphTextureHandle::Invalid();
 	FrameGraphTextureHandle BaseColor = FrameGraphTextureHandle::Invalid();
 	FrameGraphTextureHandle WorldNormal = FrameGraphTextureHandle::Invalid();
 	FrameGraphTextureHandle WorldTangent = FrameGraphTextureHandle::Invalid();

@@ -9,7 +9,6 @@
 #include "Passes/Lighting/ReferencePathTracer/ReferencePathTracerSession.h"
 #include "Passes/Lighting/ReferencePathTracer/ReferencePathTracerShader.h"
 #include "Passes/Lighting/ReferencePathTracer/ReferencePathTracerWork.h"
-#include "RayTracing/RayTracingExecutionFrontend.h"
 #include "RayTracing/RayTracingMaterialPass.h"
 #include "RHI/Public/Samplers/RhiSamplerDesc.h"
 #include "Scene/RayTracing/RenderRayTracingScene.h"
@@ -55,11 +54,6 @@ void AddReferencePathTracerTransportPass(
     const ReferencePathTracerWork& work,
     RenderRayTracingScene& rayTracingScene)
 {
-	if (rayTracingScene.GetExecutionFrontend() == RayTracingExecutionFrontend::None)
-	{
-		return;
-	}
-
 	AddRayTracingMaterialPass<ReferencePathTracerInlineCS, ReferencePathTracerRGS>(
 	    builder,
 	    "ReferencePathTracer.SurfaceTransportReference",

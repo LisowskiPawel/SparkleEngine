@@ -1,51 +1,16 @@
 #include "PCH.h"
-
 #include "Passes/Core/ShaderPassOperations.h"
-
-#include <algorithm>
-#include <string_view>
 
 namespace ShaderPassOperations
 {
-	static void AppendBindingNameIfCompiled(std::vector<const char*>& bindingNames, const RenderBindingLayout& bindingLayout, const char* bindingName) noexcept
-	{
-		if (bindingName == nullptr || bindingName[0] == '\0' || bindingLayout.FindBinding(bindingName) == nullptr)
-		{
-			return;
-		}
-
-		const auto existing = std::ranges::find_if(bindingNames, [bindingName](const char* existingName) { return std::string_view(existingName != nullptr ? existingName : "") == bindingName; });
-		if (existing == bindingNames.end())
-		{
-			bindingNames.push_back(bindingName);
-		}
-	}
-
-	std::vector<const char*> BuildBoundBindingNames(const RenderBindingLayout& bindingLayout, const PassParameterSet& parameters, const PassBindingOverrides* overrides) noexcept
+	std::vector<const char*> BuildCompiledBindingNames(const RenderBindingLayout& bindingLayout) noexcept
 	{
 		std::vector<const char*> bindingNames;
-		if (const PassParameterLayout* parameterLayout = parameters.GetLayout())
+		bindingNames.reserve(bindingLayout.GetBindingCount());
+		for (std::size_t index = 0; index < bindingLayout.GetBindingCount(); ++index)
 		{
-			const std::vector<PassParameterDesc>& parameterDescs = parameterLayout->GetParameters();
-			for (std::size_t index = 0; index < parameterDescs.size() && index < parameters.GetBindingCount(); ++index)
-			{
-				const PassParameterBinding* binding = parameters.GetBinding(static_cast<std::uint32_t>(index));
-				if (binding != nullptr && binding->IsBound())
-				{
-					AppendBindingNameIfCompiled(bindingNames, bindingLayout, parameterDescs[index].Name.c_str());
-				}
-			}
+			bindingNames.push_back(bindingLayout.GetBindings()[index].Name);
 		}
-
-		if (overrides != nullptr)
-		{
-			for (const PassBindingOverride& bindingOverride : overrides->GetOverrides())
-			{
-				AppendBindingNameIfCompiled(bindingNames, bindingLayout, bindingOverride.Name.c_str());
-			}
-		}
-
 		return bindingNames;
 	}
-
 }

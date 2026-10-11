@@ -24,6 +24,8 @@ const char* PixelFormatName(PixelFormat format) noexcept
 			return "D32_Float";
 		case PixelFormat::R32_Float:
 			return "R32_Float";
+		case PixelFormat::R32_UInt:
+			return "R32_UInt";
 		case PixelFormat::D24_UNorm_S8_UInt:
 			return "D24_UNorm_S8_UInt";
 		case PixelFormat::BC1_UNorm:
@@ -68,6 +70,7 @@ bool IsColorAttachmentPixelFormat(PixelFormat format) noexcept
 		case PixelFormat::R8G8B8A8_UNorm_Srgb:
 		case PixelFormat::R16G16_Float:
 		case PixelFormat::R32_Float:
+		case PixelFormat::R32_UInt:
 		case PixelFormat::B8G8R8A8_UNorm:
 		case PixelFormat::B8G8R8A8_UNorm_Srgb:
 			return true;
@@ -130,6 +133,7 @@ std::uint32_t PixelFormatBytesPerTexel(PixelFormat format) noexcept
 		case PixelFormat::R16G16_Float:
 		case PixelFormat::D32_Float:
 		case PixelFormat::R32_Float:
+		case PixelFormat::R32_UInt:
 		case PixelFormat::D24_UNorm_S8_UInt:
 		case PixelFormat::B8G8R8A8_UNorm:
 		case PixelFormat::B8G8R8A8_UNorm_Srgb:
@@ -157,6 +161,8 @@ PixelFormat PixelFormatFromSerializedTextureFormat(std::uint32_t value) noexcept
 			return PixelFormat::D32_Float;
 		case 41u:
 			return PixelFormat::R32_Float;
+		case 42u:
+			return PixelFormat::R32_UInt;
 		case 45u:
 			return PixelFormat::D24_UNorm_S8_UInt;
 		case 71u:

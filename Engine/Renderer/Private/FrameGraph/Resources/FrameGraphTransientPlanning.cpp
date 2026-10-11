@@ -152,7 +152,6 @@ FrameGraphTransientResourcePlan FrameGraph::BuildTransientResourcePlan(
 void FrameGraph::EnsureTransientResourcesMaterialized(const FrameGraphPlan& plan) const noexcept
 {
 	assert(m_transientAllocator != nullptr);
-	m_transientAllocator->Prepare(plan.transients);
 
 	for (const FrameGraphTransientResourcePlan& transientPlan : plan.transients.resources)
 	{

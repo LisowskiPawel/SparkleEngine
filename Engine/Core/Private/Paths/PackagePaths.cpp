@@ -52,15 +52,22 @@ namespace Filesystem::Private
 		std::string failure;
 		std::string relative;
 		if (!Files::TryReadAllText(manifestPath, document, failure) || !Json::TryReadStringProperty(document, property, relative) || relative.empty()
-		    || relative.find_first_of("\\:") != std::string::npos || relative.front() == '/' || relative.back() == '/')
+		    || relative.find_first_of("\\:") != std::string::npos || relative.find("//") != std::string::npos || relative.front() == '/' || relative.back() == '/'
+		    || std::any_of(relative.begin(), relative.end(), [](unsigned char character) { return character < 0x20u; }))
 		{
 			return std::nullopt;
 		}
-		const std::filesystem::path path = Strings::ToWide(relative);
+		const std::filesystem::path path = Strings::ToWide(std::string_view(relative));
 		for (const auto& part : path)
 		{
 			const std::string name = Strings::ToNarrow(part.wstring());
+			const std::string device = Strings::ToLowerCopy(std::string_view(name).substr(0u, name.find('.')));
 			if (name.empty() || name == "." || name == ".." || name.find_first_of("<>\"|?*") != std::string::npos || name.back() == '.' || name.back() == ' ')
+			{
+				return std::nullopt;
+			}
+			if (device == "con" || device == "prn" || device == "aux" || device == "nul"
+			    || (device.size() == 4u && (device.starts_with("com") || device.starts_with("lpt")) && device.back() >= '1' && device.back() <= '9'))
 			{
 				return std::nullopt;
 			}

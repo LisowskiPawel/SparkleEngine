@@ -10,6 +10,8 @@
 
 **Per-frame compilation amendment, 2026-10-11:** declaration, setup and compilation run for each rendered execution; compiled plans are not reused between frames. Pass-admission keys for scene rendering, lighting and post processing are removed. Resource configuration and provider/shader/SBT generations still govern retained GPU resource replacement; view mode belongs to temporal view identity, not graph reuse. This source reconciliation adds no native or performance proof.
 
+Graph parameter allocations own their metadata for the current shader stage. A shared parameter schema used by compute and ray generation does not retain the first stage's visibility. Compilation first derives resource lifetimes and physical placement, then prepares allocation reuse before planning barriers and recording. Replaced transient backing resources restart at their declared native initial states; retained allocations keep their tracked states. Both compiler phases run each executable frame. These ownership rules do not establish full scheduling or performance acceptance.
+
 **Scope:** `REN-FG-01` through `REN-FG-08` and the frame-graph portion of `REN-OWN-04`/`REN-OWN-06`; defines how Renderer feature declarations become resources, dependencies, barriers, queue submissions, and retirement
 
 **Current readiness:** **50/100** — dependency compilation, barriers, transients, queues, recording, and submission exist in source; correctness, failure, parity, and cost evidence does not. See [Current Feature Readiness](../../../../../../Acceptance/CurrentReadiness.md#renderer).

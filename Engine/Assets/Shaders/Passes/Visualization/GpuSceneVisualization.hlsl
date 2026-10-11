@@ -1,5 +1,6 @@
 RWTexture2D<float4> SceneColor;
-Texture2D GBufferBaseColor;
+#include "/Engine/Common/Hash.hlsli"
+Texture2D<uint> GBufferInstanceIdentity;
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -13,6 +14,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const float4 instanceColor = GBufferBaseColor.Load(int3(dispatchThreadId.xy, 0));
-	SceneColor[dispatchThreadId.xy] = float4(saturate(instanceColor.rgb), instanceColor.a);
+	const uint identity = GBufferInstanceIdentity.Load(int3(dispatchThreadId.xy, 0));
+	const float3 color = identity == 0u ? 0.0f.xxx : HashIdColor(identity - 1u, 0u);
+	SceneColor[dispatchThreadId.xy] = float4(color, identity == 0u ? 0.0f : 1.0f);
 }

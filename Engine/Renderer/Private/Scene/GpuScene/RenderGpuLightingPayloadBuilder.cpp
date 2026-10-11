@@ -10,39 +10,24 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderGpuLightingPayloadBuilderLogger, "Renderer.RenderGpuLightingPayloadBuilder");
 
-class RenderGpuLightingContract final
+static void ValidateLightCount(std::string_view lightKind, std::size_t count, std::size_t limit)
 {
-public:
-	static void ValidateCounts(std::size_t directionalLightCount, std::size_t pointLightCount, std::size_t spotLightCount, std::size_t rectLightCount)
+	if (count > limit)
 	{
-		ValidateCount("directional", directionalLightCount, MaximumDirectionalLightCount);
-		ValidateCount("point", pointLightCount, MaximumLocalLightCountPerType);
-		ValidateCount("spot", spotLightCount, MaximumLocalLightCountPerType);
-		ValidateCount("rect", rectLightCount, MaximumLocalLightCountPerType);
-	}
-
-private:
-	static void ValidateCount(std::string_view lightKind, std::size_t count, std::size_t limit)
-	{
-		if (count <= limit)
-		{
-			return;
-		}
-
 		Diagnostics::Fatal(g_renderGpuLightingPayloadBuilderLogger, __FILE__, __LINE__, std::format("Scene contains {} {} lights, exceeding the renderer limit of {}.", count, lightKind, limit));
 	}
+}
 
-	static constexpr std::size_t MaximumDirectionalLightCount = 2u;
-	static constexpr std::size_t MaximumLocalLightCountPerType = 1024u;
-};
-
-void RenderGpuLightingPayloadBuilder::Build(const PreparedRenderScene& preparedScene, RenderGpuLightingPayloads& payloads)
+void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, RenderGpuLightingPayloads& payloads)
 {
 	const std::size_t directionalLightCount = preparedScene.directionalLights.size();
 	const std::size_t pointLightCount = preparedScene.pointLights.size();
 	const std::size_t spotLightCount = preparedScene.spotLights.size();
 	const std::size_t rectLightCount = preparedScene.rectLights.size();
-	RenderGpuLightingContract::ValidateCounts(directionalLightCount, pointLightCount, spotLightCount, rectLightCount);
+	ValidateLightCount("directional", directionalLightCount, 2u);
+	ValidateLightCount("point", pointLightCount, 1024u);
+	ValidateLightCount("spot", spotLightCount, 1024u);
+	ValidateLightCount("rect", rectLightCount, 1024u);
 
 	payloads.DirectionalLights.clear();
 	payloads.PointLights.clear();

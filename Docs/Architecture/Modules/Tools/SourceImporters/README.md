@@ -73,6 +73,8 @@ Import is strict at required semantic boundaries. Optional advanced glTF materia
 
 The selector's immutable `SourceSceneFormats` table owns extension, importer identity, and import function together. `SupportsSourceScenePath` reads that same table for discovery; provenance is assigned from the selected entry. The current glTF/GLB, FBX, and PLY operations require no virtual importer objects or separate registration path. This source shape was rechecked on 2026-10-06; format coverage and the evidence limits above remain unchanged.
 
+Assimp material translation, rechecked on 2026-10-11, exposes only `AssimpMaterialImporter::ImportMaterials` to the FBX and PLY composition paths. Source-local operations own property translation, texture validation and preferred/alternate conflict resolution; the header does not expose the resolution context or Assimp material implementation. Resolved paths move into owned texture sources, while embedded references, slot order, channel masks and texture-driven metallic/roughness factors retain their existing semantics.
+
 ## Explicit Non-Capabilities And Risks
 
 - FBX support does not include FBX morph targets or every Assimp shading/texture mapping; glTF support does not include every Khronos extension. PLY support is geometry-oriented and does not imply subsurface shading.

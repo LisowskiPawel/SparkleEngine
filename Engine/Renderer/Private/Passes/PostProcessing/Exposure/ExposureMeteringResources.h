@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FrameGraph/FrameGraphTextureHandle.h"
+#include "FrameGraph/FrameGraphBufferHandle.h"
 
 #include <cstdint>
 
@@ -14,3 +15,4 @@ struct ExposureMomentTexture final
 };
 
 ExposureMomentTexture CreateExposureMomentTexture(FrameGraphBuilder& builder, const char* prefix, std::uint32_t level, std::uint32_t width, std::uint32_t height);
+FrameGraphBufferHandle CreateExposureHistogramBuffer(FrameGraphBuilder& builder);

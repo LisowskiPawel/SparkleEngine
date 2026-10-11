@@ -80,7 +80,10 @@ void VulkanDescriptorService::PublishRecordingReadView() noexcept
 		}
 
 		const RhiResourceViewDesc viewDesc{.Kind = record.Kind, .Resource = RhiResourceHandle{record.Image}, .Format = record.Format, .Texture = record.Texture};
-		readView->ImageViews.push_back(RecordingImageView{.ImageViewValue = reinterpret_cast<std::uintptr_t>(record.ImageView), .AspectMask = ResolveViewAspectMask(viewDesc)});
+
+		readView->ImageViews.push_back(
+		    RecordingImageView{.ImageViewValue = reinterpret_cast<std::uintptr_t>(record.ImageView), .Format = record.Format, .AspectMask = ResolveViewAspectMask(viewDesc)});
+
 		if (record.Image != VK_NULL_HANDLE)
 		{
 			const VulkanGpuAllocationRecord* const allocation = m_memoryAllocator.FindAllocationRecord(RhiResourceHandle{record.Image});
@@ -319,22 +322,22 @@ VkImageView VulkanDescriptorService::GetRegisteredImageView(RhiGpuDescriptorHand
 	return VK_NULL_HANDLE;
 }
 
-VkImageAspectFlags VulkanDescriptorService::ResolveImageViewAspectMask(VkImageView imageView) const noexcept
+VulkanDescriptorService::RecordingImageView VulkanDescriptorService::ResolveRecordingImageView(VkImageView imageView) const noexcept
 {
 	if (imageView == VK_NULL_HANDLE)
 	{
-		return 0;
+		return {};
 	}
 
 	const std::shared_ptr<const RecordingReadView> readView = m_recordingReadView.load(std::memory_order_acquire);
 	if (readView == nullptr)
 	{
-		return 0;
+		return {};
 	}
 
 	const std::uintptr_t imageViewValue = reinterpret_cast<std::uintptr_t>(imageView);
 	const auto found = std::ranges::lower_bound(readView->ImageViews, imageViewValue, {}, &RecordingImageView::ImageViewValue);
-	return found != readView->ImageViews.end() && found->ImageViewValue == imageViewValue ? found->AspectMask : 0;
+	return found != readView->ImageViews.end() && found->ImageViewValue == imageViewValue ? *found : RecordingImageView{};
 }
 
 bool VulkanDescriptorService::ResolveRegisteredImageResource(RhiResourceHandle resource, VulkanRecordingResource& outResource) const noexcept

@@ -96,7 +96,7 @@ struct RenderGpuScene::Impl final
 
 	void UpdateLighting(const PreparedRenderScene& preparedScene, RenderGpuDynamicFrameStorage& storage)
 	{
-		RenderGpuLightingPayloadBuilder::Build(preparedScene, LightingPayloads);
+		BuildRenderGpuLightingPayloads(preparedScene, LightingPayloads);
 
 		storage.DirectionalLights.Update(*ResourceService, std::span{LightingPayloads.DirectionalLights}, L"DirectionalLights");
 		storage.PointLights.Update(*ResourceService, std::span{LightingPayloads.PointLights}, L"PointLights");
@@ -158,7 +158,7 @@ struct RenderGpuScene::Impl final
 		const bool payloadChanged = topologyChanged || preparedScene.materialRevision != RayTracingMaterialRevision || textureGeneration != RayTracingTextureGeneration;
 		if (payloadChanged)
 		{
-			RenderGpuRayTracingPayloadBuilder::Build(preparedScene, *Meshes, RayTracingPayloads);
+			BuildRenderGpuRayTracingPayloads(preparedScene, *Meshes, RayTracingPayloads);
 			if (topologyChanged || RayTracingPayloads.InstanceCount == 0u || !RayTracing.Vertices.GetBinding() || !RayTracing.MorphTargetDeltas.GetBinding())
 			{
 				UpdateRayTracingTopology();

@@ -64,7 +64,7 @@ void BindRayTracingShaderPass(
     const RayTracingPipeline& pipeline,
     const PassParameterSet& parameterSet) noexcept;
 
-void ReportInvalidShaderPassParameterSet(const char* passName, const PassParameterSet& parameterSet) noexcept;
+[[noreturn]] void ReportInvalidShaderPassParameterSet(const char* passName, const PassParameterSet& parameterSet, const char* requiredBinding = nullptr) noexcept;
 
 namespace ShaderPassDetail
 {

@@ -6,134 +6,69 @@
 
 namespace SurfaceLighting
 {
+	struct Surface
+	{
+		float3 ViewDirWorld;
+		float3 NormalWorld;
+		float3 BaseColor;
+		float Roughness;
+		float Metallic;
+		float DielectricF0;
+		float3 SubsurfaceColor;
+		float SubsurfaceStrength;
+		bool EvaluateDiffuse;
+		bool EvaluateSpecular;
+		bool EvaluateSubsurface;
+	};
+
+	struct Contribution
+	{
+		float3 Diffuse;
+		float3 Specular;
+		float3 Subsurface;
+	};
+
 	float3 BuildF0(float3 baseColor, float metallic, float dielectricF0)
 	{
 		return lerp(saturate(dielectricF0).xxx, saturate(baseColor), saturate(metallic));
 	}
 
-	void EvaluateDirectLightWithF0(float3 viewDirWorld,
-	                               float3 normalWorld,
-	                               float3 baseColor,
-	                               float roughness,
-	                               float metallic,
-	                               float3 f0,
-	                               float3 subsurfaceColor,
-	                               float subsurfaceStrength,
-	                               bool evaluateDiffuse,
-	                               bool evaluateSpecular,
-	                               bool evaluateSubsurface,
-	                               float3 lightDirection,
-	                               float3 radiance,
-	                               out float3 outDiffuse,
-	                               out float3 outSpecular,
-	                               out float3 outSubsurface)
+	Contribution EvaluateDirectLightSample(Surface surface, LightSampling::DirectLightSample lightSample, float shadowVisibility)
 	{
-		BRDF::ShadingData shadingData = BRDF::ComputeShadingData(normalWorld, viewDirWorld, lightDirection);
-
-		if (shadingData.NoL <= 0.0f || shadingData.NoV <= 0.0f)
-		{
-			outDiffuse = 0.0f;
-			outSpecular = 0.0f;
-			outSubsurface = 0.0f;
-			return;
-		}
-
-		const BRDF::Direct::Response
-		    response = BRDF::Direct::Evaluate(shadingData, baseColor, roughness, metallic, f0, subsurfaceColor, subsurfaceStrength, evaluateDiffuse, evaluateSpecular, evaluateSubsurface);
-
-		const float3 incidentRadiance = radiance * shadingData.NoL;
-		outDiffuse = response.Diffuse * incidentRadiance;
-		outSpecular = response.Specular * incidentRadiance;
-		outSubsurface = response.Subsurface * incidentRadiance;
-	}
-
-	void EvaluateDirectLight(float3 viewDirWorld,
-	                         float3 normalWorld,
-	                         float3 baseColor,
-	                         float roughness,
-	                         float metallic,
-	                         float dielectricF0,
-	                         float3 subsurfaceColor,
-	                         float subsurfaceStrength,
-	                         bool evaluateDiffuse,
-	                         bool evaluateSpecular,
-	                         bool evaluateSubsurface,
-	                         float3 lightDirection,
-	                         float3 radiance,
-	                         out float3 outDiffuse,
-	                         out float3 outSpecular,
-	                         out float3 outSubsurface)
-	{
-		const float3 f0 = BuildF0(baseColor, metallic, dielectricF0);
-
-		EvaluateDirectLightWithF0(viewDirWorld,
-		                          normalWorld,
-		                          baseColor,
-		                          roughness,
-		                          metallic,
-		                          f0,
-		                          subsurfaceColor,
-		                          subsurfaceStrength,
-		                          evaluateDiffuse,
-		                          evaluateSpecular,
-		                          evaluateSubsurface,
-		                          lightDirection,
-		                          radiance,
-		                          outDiffuse,
-		                          outSpecular,
-		                          outSubsurface);
-	}
-
-	void AccumulateDirectLightSample(float3 viewDirWorld,
-	                                 float3 normalWorld,
-	                                 float3 baseColor,
-	                                 float roughness,
-	                                 float metallic,
-	                                 float dielectricF0,
-	                                 float3 subsurfaceColor,
-	                                 float subsurfaceStrength,
-	                                 bool evaluateDiffuse,
-	                                 bool evaluateSpecular,
-	                                 bool evaluateSubsurface,
-	                                 LightSampling::DirectLightSample lightSample,
-	                                 float shadowVisibility,
-	                                 out float3 outDiffuse,
-	                                 out float3 outSpecular,
-	                                 out float3 outSubsurface)
-	{
+		Contribution result = (Contribution)0;
 		if (!lightSample.Valid || shadowVisibility <= 0.0f)
 		{
-			outDiffuse = 0.0f.xxx;
-			outSpecular = 0.0f.xxx;
-			outSubsurface = 0.0f.xxx;
-			return;
+			return result;
 		}
-
 		const float samplePdf = lightSample.PdfW * lightSample.LightSelectionPdf;
 		if (samplePdf <= 0.0f)
 		{
-			outDiffuse = 0.0f.xxx;
-			outSpecular = 0.0f.xxx;
-			outSubsurface = 0.0f.xxx;
-			return;
+			return result;
+		}
+		const float3 f0 = BuildF0(surface.BaseColor, surface.Metallic, surface.DielectricF0);
+		const BRDF::ShadingData shadingData = BRDF::ComputeShadingData(surface.NormalWorld, surface.ViewDirWorld, lightSample.DirectionWorld);
+		if (shadingData.NoL <= 0.0f || shadingData.NoV <= 0.0f)
+		{
+			return result;
 		}
 
-		EvaluateDirectLight(viewDirWorld,
-		                    normalWorld,
-		                    baseColor,
-		                    roughness,
-		                    metallic,
-		                    dielectricF0,
-		                    subsurfaceColor,
-		                    subsurfaceStrength,
-		                    evaluateDiffuse,
-		                    evaluateSpecular,
-		                    evaluateSubsurface,
-		                    lightSample.DirectionWorld,
-		                    lightSample.IncidentRadiance * shadowVisibility / samplePdf,
-		                    outDiffuse,
-		                    outSpecular,
-		                    outSubsurface);
+		const BRDF::Direct::Response response = BRDF::Direct::Evaluate(shadingData,
+		                                                               surface.BaseColor,
+		                                                               surface.Roughness,
+		                                                               surface.Metallic,
+		                                                               f0,
+		                                                               surface.SubsurfaceColor,
+		                                                               surface.SubsurfaceStrength,
+		                                                               surface.EvaluateDiffuse,
+		                                                               surface.EvaluateSpecular,
+		                                                               surface.EvaluateSubsurface);
+
+		const float3 radiance = lightSample.IncidentRadiance * shadowVisibility / samplePdf;
+		const float3 incidentRadiance = radiance * shadingData.NoL;
+		result.Diffuse = response.Diffuse * incidentRadiance;
+		result.Specular = response.Specular * incidentRadiance;
+		result.Subsurface = response.Subsurface * incidentRadiance;
+		return result;
 	}
 }
 

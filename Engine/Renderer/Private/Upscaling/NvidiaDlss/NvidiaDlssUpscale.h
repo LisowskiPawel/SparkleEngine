@@ -1,13 +1,14 @@
 #pragma once
 
-#include "Upscaling/UpscalerPass.h"
+#include "Renderer/Public/Viewport/ViewportContracts.h"
 
 class FrameGraphBuilder;
 class RendererImageProviderStack;
+struct RenderFrameGraphResources;
 
 void AddNvidiaDlssUpscalePass(
     FrameGraphBuilder& builder,
     RenderViewportExtent renderExtent,
     RenderViewportExtent outputExtent,
     RendererImageProviderStack& imageProviders,
-    const UpscalerPassResources& inputs);
+    const RenderFrameGraphResources& resources);

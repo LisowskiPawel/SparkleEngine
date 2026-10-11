@@ -6,9 +6,6 @@
 
 class FrameGraph;
 class FrameGraphBuilder;
-class RendererImageProviderStack;
-class RenderViewState;
-struct PreparedRenderScene;
 struct RenderView;
 
 struct FrameGraphReservoirHistoryHandles final
@@ -29,11 +26,5 @@ FrameHistoryResourceLayout DeclareFrameHistoryResources(FrameGraphBuilder& build
 FrameGraphReservoirHistoryHandles DeclareLightingReservoirHistory(FrameGraphBuilder& builder, RenderViewportExtent renderExtent, std::string_view name);
 
 void InvalidateFrameHistory(FrameGraph& frameGraph, const FrameHistoryResourceLayout& history) noexcept;
-void InvalidateRestirLightingHistory(FrameGraph& frameGraph, const FrameHistoryResourceLayout& history) noexcept;
-void UpdateFrameHistory(
-    FrameGraph& frameGraph,
-    const FrameHistoryResourceLayout& history,
-    const PreparedRenderScene& preparedScene,
-    const RenderView& view,
-    RenderViewState& viewState,
-    RendererImageProviderStack& imageProviders);
+void InvalidateReservoirHistory(FrameGraph& frameGraph, const FrameGraphReservoirHistoryHandles& history) noexcept;
+void UpdateFrameHistory(FrameGraph& frameGraph, const FrameHistoryResourceLayout& history, const RenderView& view);

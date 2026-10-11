@@ -2,21 +2,42 @@
 
 **Status:** target product capability dossier; self-service adoption/local diagnostics remain unproved; ongoing support excluded
 
-**Scope:** define public onboarding, failure recovery, local diagnostics, self-service recovery, release review, immutable replacement and independent reproduction
+**Scope:** self-service onboarding, recovery, local diagnostics and release review
 
 **Owner:** release/product delivery; Launcher, Application, Core diagnostics, Docs, and project products provide owned parts of the route
 
-**Snapshot:** 2026-09-08 at committed `master` revision `ffe60e3a`; current product/workflow inventories, repository/public entry points, Core/RHI diagnostics, symbols, and First Release failure/support surfaces reconciled; source evidence `S` only
+**Original snapshot:** 2026-09-08, `ffe60e3a`; source inspection only. Current route below: 2026-10-11.
 
 **Strategy and acceptance sources:** `NS-ADOPTION`, `NS-EVIDENCE`, and `NS-OWNERSHIP` in the [Engineer Persona](../../../Strategy/EngineerPersona.md); `FCR-PROD-01`, `FCR-PROD-02`, `FCR-PROD-06`; [First Release](../../../Acceptance/FirstRelease.md)
 
-**Current readiness:** **15/100** — developer diagnostics and partial onboarding exist; the dated public adoption/diagnostic/replacement snapshot is incomplete; the current scope excludes ongoing support. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
+**Readiness:** [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
 
 ## At A Glance
 
-The release owner offers **no user support service**. Deliver self-service onboarding, known issues, local diagnostics and reproducible recovery. Do not require a staffed bug/security inbox, maintained-version window, acknowledgement deadline or guaranteed fix. [Release Scope](../../../Acceptance/ReleaseScope/README.md#decision-summary) owns that decision.
+Deliver self-service onboarding, diagnostics and recovery. **No user support service** is offered; [Release Scope](../../../Acceptance/ReleaseScope/README.md#decision-summary) owns that decision.
 
-The source snapshot above remains historical; changing this contract does not improve readiness or prove implementation.
+Package and native-incident acceptance remain open.
+
+## Current Local Route
+
+**Source slice:** `ITER-PD4-01`, 2026-10-11; [candidate results](../../../Acceptance/ReleaseScope/Evidence.md#local-diagnostics-and-release-review-iter-pd4-01). Public instructions: [recovery/privacy](../../../../SUPPORT.md), [known issues](../../../../KNOWN_ISSUES.md), [security](../../../../SECURITY.md).
+
+BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,ReviewRelease}.ps1`. [Release Inputs](ReleaseInputs.md) defines shipped helper/policy membership; review remains a maintainer source-side task.
+
+| Responsibility | Current owner and boundary |
+| --- | --- |
+| Logs/retention | Core Logger rotates logs; Launcher owns operation logs. [Public retention/removal rules](../../../../SUPPORT.md#retention-and-replacement) apply. Keep private symbols with candidate evidence through release review. |
+| GPU faults | D3D12 resource service drains supported bounded DRED records into logs; Vulkan records device loss. No automatic recovery. |
+| Export | Local fixed projection of verified package identity and counts; preview digest binds consent. Originals stay local. [User command and privacy limits](../../../../SUPPORT.md#preview-and-export-local-diagnostics). |
+| Symbols | Shipping MSVC emits `/Zi`/full PDBs into the separate symbol root. DbgHelp checks PE/PDB GUID-age; embedded paths are excluded. Full candidate/shader correlation remains unqualified. |
+| Crash/hang | User-reported categories; automatic collection unavailable. Native incident rehearsal remains required. |
+| Review | Pawel Lisowski reviews each proposed release/replacement and closeout. Unresolved S0/S1 blocks approval. Results are local review records; publication and aggregate acceptance are separate. |
+
+Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply; interrupted replacement and public withdrawal remain unproved.
+
+Invoke `ReviewRelease.ps1` with `-PackageRoot`, `-ArchivePath`, `-ArchiveSha256`, `-LedgerPath`, `-Decision Approve|Replace|Withdraw` and an existing local `-OutputDirectory`. Replacement also needs `-ReplacementRoot`, `-ReplacementArchive`, `-ReplacementSha256`, `-ReplacementLedgerPath` and a state policy.
+
+Ledger: `ArchiveSha256` and `Defects` with `Id: ISSUE-<number>`, `Severity: S0..S3`, `Disposition: Unresolved|Resolved`. Resolved entries require `EvidencePath` to a bounded receipt with matching `ArchiveSha256`, `DefectId` and `Status: PASS`. Only its hash is exported.
 
 ## Capability Identity
 

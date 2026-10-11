@@ -4,8 +4,4 @@
 
 struct PreparedRenderScene;
 
-class RenderGpuLightingPayloadBuilder final
-{
-public:
-	static void Build(const PreparedRenderScene& preparedScene, RenderGpuLightingPayloads& payloads);
-};
+void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, RenderGpuLightingPayloads& payloads);

@@ -23,14 +23,14 @@ struct RenderGpuMeshHitDataOffsets final
 	std::uint32_t IndexCount = 0;
 };
 
-struct RenderGpuRayTracingPayloadBuilder::BuildState final
+struct BuildState final
 {
 	std::unordered_map<const GpuMesh*, RenderGpuMeshHitDataOffsets> MeshOffsets;
 
 	RenderGpuMeshHitDataOffsets ResolveMeshOffsets(const GpuMesh& mesh, RenderGpuRayTracingPayloads& payloads);
 };
 
-RenderGpuMeshHitDataOffsets RenderGpuRayTracingPayloadBuilder::BuildState::ResolveMeshOffsets(const GpuMesh& mesh, RenderGpuRayTracingPayloads& payloads)
+RenderGpuMeshHitDataOffsets BuildState::ResolveMeshOffsets(const GpuMesh& mesh, RenderGpuRayTracingPayloads& payloads)
 {
 	if (const auto existing = MeshOffsets.find(&mesh); existing != MeshOffsets.end())
 	{
@@ -75,7 +75,67 @@ RenderGpuMeshHitDataOffsets RenderGpuRayTracingPayloadBuilder::BuildState::Resol
 	return offsets;
 }
 
-void RenderGpuRayTracingPayloadBuilder::AppendMaterials(const PreparedRenderScene& preparedScene, RenderGpuRayTracingPayloads& payloads)
+static std::uint32_t BuildMaterialFlags(const MaterialData& material) noexcept
+{
+	std::uint32_t flags = material.doubleSided ? RayTracingHitData::MaterialFlag_DoubleSided : 0u;
+	if (material.alphaMode == 0)
+	{
+		flags |= RayTracingHitData::MaterialFlag_Opaque;
+	}
+	else if (material.alphaMode == 1)
+	{
+		flags |= RayTracingHitData::MaterialFlag_AlphaTested;
+	}
+	else if (material.alphaMode == 2)
+	{
+		flags |= RayTracingHitData::MaterialFlag_AlphaBlended;
+	}
+	if (material.textureFlags != 0)
+	{
+		flags |= RayTracingHitData::MaterialFlag_Textured;
+	}
+	if (material.emissiveColor.x > 0.0f || material.emissiveColor.y > 0.0f || material.emissiveColor.z > 0.0f)
+	{
+		flags |= RayTracingHitData::MaterialFlag_Emissive;
+	}
+	return flags;
+}
+
+static std::uint32_t BuildGeometryFlags(const MeshDraw& draw, const MaterialData& material) noexcept
+{
+	std::uint32_t flags = draw.Geometry.MeshKind == RenderMeshKind::Skeletal ? RayTracingHitData::GeometryFlag_SkinnedMesh : RayTracingHitData::GeometryFlag_StaticMesh;
+	if (material.alphaMode == 1)
+	{
+		flags |= RayTracingHitData::GeometryFlag_AlphaTested;
+	}
+	else if (material.alphaMode == 2)
+	{
+		flags |= RayTracingHitData::GeometryFlag_AlphaBlended;
+	}
+	if (material.textureFlags != 0)
+	{
+		flags |= RayTracingHitData::GeometryFlag_TexturedMaterial;
+	}
+	if (material.doubleSided)
+	{
+		flags |= RayTracingHitData::GeometryFlag_DoubleSided;
+	}
+	return flags;
+}
+
+static void Clear(RenderGpuRayTracingPayloads& payloads) noexcept
+{
+	payloads.Vertices.clear();
+	payloads.SkinInfluences.clear();
+	payloads.MorphTargetDeltas.clear();
+	payloads.Indices.clear();
+	payloads.Instances.clear();
+	payloads.Materials.clear();
+	payloads.InstanceCount = 0u;
+	payloads.MaterialCount = 0u;
+}
+
+static void AppendMaterials(const PreparedRenderScene& preparedScene, RenderGpuRayTracingPayloads& payloads)
 {
 	payloads.Materials.reserve(preparedScene.materials.size());
 	for (const MaterialData& material : preparedScene.materials)
@@ -110,7 +170,7 @@ void RenderGpuRayTracingPayloadBuilder::AppendMaterials(const PreparedRenderScen
 	}
 }
 
-void RenderGpuRayTracingPayloadBuilder::PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpuRayTracingPayloads& payloads, BuildState& state)
+static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpuRayTracingPayloads& payloads, BuildState& state)
 {
 	std::uint32_t instanceCapacity = 1;
 	std::unordered_set<std::uint32_t> occupiedGpuSceneSlots;
@@ -127,12 +187,7 @@ void RenderGpuRayTracingPayloadBuilder::PrepareInstances(const PreparedRenderSce
 	state.MeshOffsets.reserve(preparedScene.rayTracingWork.BlasInputs.size());
 }
 
-void RenderGpuRayTracingPayloadBuilder::AppendInstance(
-    const RenderRayTracingBlasInput& input,
-    const PreparedRenderScene& preparedScene,
-    const GpuMeshCache& meshes,
-    RenderGpuRayTracingPayloads& payloads,
-    BuildState& state)
+static void AppendInstance(const RenderRayTracingBlasInput& input, const PreparedRenderScene& preparedScene, const GpuMeshCache& meshes, RenderGpuRayTracingPayloads& payloads, BuildState& state)
 {
 	if (input.PrimitiveIndex >= preparedScene.primitives.size())
 	{
@@ -174,7 +229,7 @@ void RenderGpuRayTracingPayloadBuilder::AppendInstance(
 	instance.MorphTargetDeltaOffset = offsets.FirstMorphTargetDelta;
 }
 
-void RenderGpuRayTracingPayloadBuilder::Build(const PreparedRenderScene& preparedScene, const GpuMeshCache& meshes, RenderGpuRayTracingPayloads& payloads)
+void BuildRenderGpuRayTracingPayloads(const PreparedRenderScene& preparedScene, const GpuMeshCache& meshes, RenderGpuRayTracingPayloads& payloads)
 {
 	Clear(payloads);
 
@@ -203,64 +258,4 @@ void RenderGpuRayTracingPayloadBuilder::Build(const PreparedRenderScene& prepare
 	}
 	payloads.InstanceCount = static_cast<std::uint32_t>(payloads.Instances.size());
 	payloads.MaterialCount = static_cast<std::uint32_t>(payloads.Materials.size());
-}
-
-std::uint32_t RenderGpuRayTracingPayloadBuilder::BuildMaterialFlags(const MaterialData& material) noexcept
-{
-	std::uint32_t flags = material.doubleSided ? RayTracingHitData::MaterialFlag_DoubleSided : 0u;
-	if (material.alphaMode == 0)
-	{
-		flags |= RayTracingHitData::MaterialFlag_Opaque;
-	}
-	else if (material.alphaMode == 1)
-	{
-		flags |= RayTracingHitData::MaterialFlag_AlphaTested;
-	}
-	else if (material.alphaMode == 2)
-	{
-		flags |= RayTracingHitData::MaterialFlag_AlphaBlended;
-	}
-	if (material.textureFlags != 0)
-	{
-		flags |= RayTracingHitData::MaterialFlag_Textured;
-	}
-	if (material.emissiveColor.x > 0.0f || material.emissiveColor.y > 0.0f || material.emissiveColor.z > 0.0f)
-	{
-		flags |= RayTracingHitData::MaterialFlag_Emissive;
-	}
-	return flags;
-}
-
-std::uint32_t RenderGpuRayTracingPayloadBuilder::BuildGeometryFlags(const MeshDraw& draw, const MaterialData& material) noexcept
-{
-	std::uint32_t flags = draw.Geometry.MeshKind == RenderMeshKind::Skeletal ? RayTracingHitData::GeometryFlag_SkinnedMesh : RayTracingHitData::GeometryFlag_StaticMesh;
-	if (material.alphaMode == 1)
-	{
-		flags |= RayTracingHitData::GeometryFlag_AlphaTested;
-	}
-	else if (material.alphaMode == 2)
-	{
-		flags |= RayTracingHitData::GeometryFlag_AlphaBlended;
-	}
-	if (material.textureFlags != 0)
-	{
-		flags |= RayTracingHitData::GeometryFlag_TexturedMaterial;
-	}
-	if (material.doubleSided)
-	{
-		flags |= RayTracingHitData::GeometryFlag_DoubleSided;
-	}
-	return flags;
-}
-
-void RenderGpuRayTracingPayloadBuilder::Clear(RenderGpuRayTracingPayloads& payloads) noexcept
-{
-	payloads.Vertices.clear();
-	payloads.SkinInfluences.clear();
-	payloads.MorphTargetDeltas.clear();
-	payloads.Indices.clear();
-	payloads.Instances.clear();
-	payloads.Materials.clear();
-	payloads.InstanceCount = 0u;
-	payloads.MaterialCount = 0u;
 }

@@ -5,17 +5,11 @@
 #include "FrameGraph/FrameGraph.h"
 #include "FrameGraph/FrameGraphTextureDesc.h"
 #include "RHI/Public/Formats/PixelFormat.h"
-#include "Passes/Lighting/Restir/RestirLightingInvalidation.h"
-#include "Passes/Lighting/Direct/DirectLightingControls.h"
-#include "Passes/Lighting/Restir/Indirect/IndirectLightingControls.h"
-#include "Providers/RendererImageProviderStack.h"
-#include "Scene/Preparation/PreparedRenderScene.h"
 #include "View/RenderView.h"
-#include "View/RenderViewState.h"
 
 #include <string>
 
-static void InvalidateReservoir(FrameGraph& frameGraph, const FrameGraphReservoirHistoryHandles& history) noexcept
+void InvalidateReservoirHistory(FrameGraph& frameGraph, const FrameGraphReservoirHistoryHandles& history) noexcept
 {
 	frameGraph.InvalidateTextureHistory(history.Sample);
 	frameGraph.InvalidateTextureHistory(history.Weight);
@@ -43,28 +37,12 @@ FrameGraphReservoirHistoryHandles DeclareLightingReservoirHistory(FrameGraphBuil
 void InvalidateFrameHistory(FrameGraph& frameGraph, const FrameHistoryResourceLayout& history) noexcept
 {
 	frameGraph.InvalidateTextureHistory(history.Exposure);
-	InvalidateRestirLightingHistory(frameGraph, history);
+	InvalidateReservoirHistory(frameGraph, history.DirectLightReservoir);
+	InvalidateReservoirHistory(frameGraph, history.RestirIndirectReservoir);
 }
 
-void InvalidateRestirLightingHistory(FrameGraph& frameGraph, const FrameHistoryResourceLayout& history) noexcept
+void UpdateFrameHistory(FrameGraph& frameGraph, const FrameHistoryResourceLayout& history, const RenderView& view)
 {
-	InvalidateReservoir(frameGraph, history.DirectLightReservoir);
-	InvalidateReservoir(frameGraph, history.RestirIndirectReservoir);
-}
-
-void UpdateFrameHistory(
-    FrameGraph& frameGraph,
-    const FrameHistoryResourceLayout& history,
-    const PreparedRenderScene& preparedScene,
-    const RenderView& view,
-    RenderViewState& viewState,
-    RendererImageProviderStack& imageProviders)
-{
-	if ((IsDirectLightingAdmitted() || IsIndirectLightingAdmitted()) && viewState.UpdateRestirLightingHistory(BuildRestirLightingHistoryInvalidationHash(preparedScene)))
-	{
-		InvalidateRestirLightingHistory(frameGraph, history);
-		imageProviders.ResetHistory();
-	}
 	if (view.temporalUniform.HistoryValid == 0u)
 	{
 		InvalidateFrameHistory(frameGraph, history);

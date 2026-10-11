@@ -34,25 +34,12 @@ RenderViewInvalidationReason RenderViewState::CombineInvalidationReasons(RenderV
 void RenderViewState::Invalidate(RenderViewInvalidationReason reason) noexcept
 {
 	m_pendingInvalidationReasons = CombineInvalidationReasons(m_pendingInvalidationReasons, reason);
-	m_restirLightingHistoryInvalidationHash.reset();
 	m_rayTracingPlanner->Reset();
 }
 
 RayTracingPtlasPartitionPlan RenderViewState::BuildRayTracingPlan(const PreparedRenderScene& preparedScene, const DirectX::XMFLOAT3& cameraPosition) noexcept
 {
 	return m_rayTracingPlanner->Build(preparedScene, cameraPosition);
-}
-
-bool RenderViewState::UpdateHistoryInvalidationHash(std::optional<std::uint64_t>& previousHash, std::uint64_t currentHash) noexcept
-{
-	const bool invalidated = !previousHash || *previousHash != currentHash;
-	previousHash = currentHash;
-	return invalidated;
-}
-
-bool RenderViewState::UpdateRestirLightingHistory(std::uint64_t invalidationHash) noexcept
-{
-	return UpdateHistoryInvalidationHash(m_restirLightingHistoryInvalidationHash, invalidationHash);
 }
 
 void RenderViewState::ObserveIdentityAndGenerations(const RenderViewStateBuildInput& input) noexcept

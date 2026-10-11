@@ -4,9 +4,24 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "SourceTexturePathResolver.h"
+#include "SourceImportOutput.h"
+
+#include <assimp/material.h>
+#include <assimp/scene.h>
 
 #include <array>
 #include <format>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+
+struct TextureResolutionContext final
+{
+	const aiScene& scene;
+	const std::filesystem::path& sourceDirectory;
+	std::span<const std::filesystem::path> embeddedTexturePaths;
+};
 
 struct AssimpMaterialTextureMapping final
 {
@@ -42,73 +57,41 @@ static constexpr std::array<AssimpMaterialTextureMapping, 6> g_assimpMaterialTex
         .AlternateType = aiTextureType_EMISSIVE,
         .AlternateName = "emissive"}};
 
-class AssimpMaterialTextureReferenceReader final
+static std::optional<std::string> ReadTextureReference(const aiMaterial& material, ImportedMaterialIndex materialIndex, aiTextureType textureType, std::string_view slotName)
 {
-public:
-	static std::optional<std::string> Read(const aiMaterial& material, ImportedMaterialIndex materialIndex, aiTextureType textureType, std::string_view slotName)
+	const unsigned int textureCount = material.GetTextureCount(textureType);
+	if (textureCount == 0)
 	{
-		const unsigned int textureCount = material.GetTextureCount(textureType);
-		if (textureCount == 0)
-		{
-			return std::nullopt;
-		}
-		if (textureCount > 1)
-		{
-			throw Diagnostics::Error(std::format("Assimp material {} has multiple {} textures.", materialIndex, slotName));
-		}
-
-		aiString texturePath;
-		aiTextureMapping mapping = aiTextureMapping_UV;
-		unsigned int uvIndex = 0;
-		ai_real blend = 1.0f;
-		aiTextureOp operation = aiTextureOp_Multiply;
-		if (material.GetTexture(textureType, 0, &texturePath, &mapping, &uvIndex, &blend, &operation) != AI_SUCCESS)
-		{
-			throw Diagnostics::Error(std::format("Cannot read the {} texture reference for Assimp material {}.", slotName, materialIndex));
-		}
-		if (mapping != aiTextureMapping_UV || uvIndex != 0 || blend != 1.0f || operation != aiTextureOp_Multiply)
-		{
-			throw Diagnostics::Error(std::format("Assimp material {} uses an unsupported {} texture mapping.", materialIndex, slotName));
-		}
-
-		std::string authoredPath = texturePath.C_Str();
-		if (authoredPath.empty())
-		{
-			throw Diagnostics::Error(std::format("Assimp material {} has an empty {} texture path.", materialIndex, slotName));
-		}
-		return authoredPath;
+		return std::nullopt;
 	}
-};
-
-void AssimpMaterialImporter::ImportMaterials(
-    const aiScene& scene,
-    const std::filesystem::path& sourceDirectory,
-    std::span<const std::filesystem::path> embeddedTexturePaths,
-    SourceImportOutput& output)
-{
-	const TextureResolutionContext textureContext{scene, sourceDirectory, embeddedTexturePaths};
-	for (unsigned int materialIndex = 0; materialIndex < scene.mNumMaterials; ++materialIndex)
+	if (textureCount > 1)
 	{
-		if (scene.mMaterials[materialIndex] == nullptr)
-		{
-			throw Diagnostics::Error(std::format("Assimp material {} is null.", materialIndex));
-		}
-
-		ImportedMaterial importedMaterial = ExtractMaterial(*scene.mMaterials[materialIndex], materialIndex, textureContext);
-		output.scene.materials.push_back(std::move(importedMaterial));
+		throw Diagnostics::Error(std::format("Assimp material {} has multiple {} textures.", materialIndex, slotName));
 	}
+
+	aiString texturePath;
+	aiTextureMapping mapping = aiTextureMapping_UV;
+	unsigned int uvIndex = 0;
+	ai_real blend = 1.0f;
+	aiTextureOp operation = aiTextureOp_Multiply;
+	if (material.GetTexture(textureType, 0, &texturePath, &mapping, &uvIndex, &blend, &operation) != AI_SUCCESS)
+	{
+		throw Diagnostics::Error(std::format("Cannot read the {} texture reference for Assimp material {}.", slotName, materialIndex));
+	}
+	if (mapping != aiTextureMapping_UV || uvIndex != 0 || blend != 1.0f || operation != aiTextureOp_Multiply)
+	{
+		throw Diagnostics::Error(std::format("Assimp material {} uses an unsupported {} texture mapping.", materialIndex, slotName));
+	}
+
+	std::string authoredPath = texturePath.C_Str();
+	if (authoredPath.empty())
+	{
+		throw Diagnostics::Error(std::format("Assimp material {} has an empty {} texture path.", materialIndex, slotName));
+	}
+	return authoredPath;
 }
 
-ImportedMaterial AssimpMaterialImporter::ExtractMaterial(const aiMaterial& material, ImportedMaterialIndex materialIndex, const TextureResolutionContext& textureContext)
-{
-	ImportedMaterial importedMaterial;
-	ValidateShadingModel(material, materialIndex);
-	ApplyMaterialProperties(material, importedMaterial);
-	ApplyTextureMappings(material, materialIndex, textureContext, importedMaterial);
-	return importedMaterial;
-}
-
-void AssimpMaterialImporter::ValidateShadingModel(const aiMaterial& material, ImportedMaterialIndex materialIndex)
+static void ValidateShadingModel(const aiMaterial& material, ImportedMaterialIndex materialIndex)
 {
 	int shadingModel = 0;
 	if (material.Get(AI_MATKEY_SHADING_MODEL, shadingModel) != AI_SUCCESS)
@@ -126,19 +109,7 @@ void AssimpMaterialImporter::ValidateShadingModel(const aiMaterial& material, Im
 	throw Diagnostics::Error(std::format("Assimp material {} uses unsupported shading model {}.", materialIndex, shadingModel));
 }
 
-void AssimpMaterialImporter::ApplyMaterialProperties(const aiMaterial& material, ImportedMaterial& importedMaterial)
-{
-	aiString name;
-	if (material.Get(AI_MATKEY_NAME, name) == AI_SUCCESS)
-	{
-		importedMaterial.name = name.C_Str();
-	}
-
-	ApplyMaterialColors(material, importedMaterial);
-	ApplyMaterialFactors(material, importedMaterial);
-}
-
-void AssimpMaterialImporter::ApplyMaterialColors(const aiMaterial& material, ImportedMaterial& importedMaterial)
+static void ApplyMaterialColors(const aiMaterial& material, ImportedMaterial& importedMaterial)
 {
 	aiColor4D baseColor;
 	if (aiGetMaterialColor(&material, AI_MATKEY_BASE_COLOR, &baseColor) == AI_SUCCESS || aiGetMaterialColor(&material, AI_MATKEY_COLOR_DIFFUSE, &baseColor) == AI_SUCCESS)
@@ -153,7 +124,7 @@ void AssimpMaterialImporter::ApplyMaterialColors(const aiMaterial& material, Imp
 	}
 }
 
-void AssimpMaterialImporter::ApplyMaterialFactors(const aiMaterial& material, ImportedMaterial& importedMaterial)
+static void ApplyMaterialFactors(const aiMaterial& material, ImportedMaterial& importedMaterial)
 {
 	ai_real opacity = 1.0f;
 	if (material.Get(AI_MATKEY_OPACITY, opacity) == AI_SUCCESS)
@@ -184,29 +155,52 @@ void AssimpMaterialImporter::ApplyMaterialFactors(const aiMaterial& material, Im
 	}
 }
 
-void AssimpMaterialImporter::ApplyTextureMappings(const aiMaterial& material, ImportedMaterialIndex materialIndex, const TextureResolutionContext& textureContext, ImportedMaterial& importedMaterial)
+static void ApplyMaterialProperties(const aiMaterial& material, ImportedMaterial& importedMaterial)
 {
-	ValidateTextureMappings(material, materialIndex);
-
-	for (const AssimpMaterialTextureMapping& mapping : g_assimpMaterialTextureMappings)
+	aiString name;
+	if (material.Get(AI_MATKEY_NAME, name) == AI_SUCCESS)
 	{
-		const std::optional<std::filesystem::path> texturePath = mapping.AlternateType != aiTextureType_NONE
-		    ? ResolvePreferredTexturePath(material, materialIndex, textureContext, mapping.PreferredType, mapping.PreferredName, mapping.AlternateType, mapping.AlternateName)
-		    : ResolveTexturePath(material, materialIndex, textureContext, mapping.PreferredType, mapping.PreferredName);
-
-		SetTextureSource(importedMaterial, mapping.Group, texturePath, mapping.ChannelMask);
-		if (texturePath && mapping.Group == TextureGroup::Roughness)
-		{
-			importedMaterial.roughness = 1.0f;
-		}
-		if (texturePath && mapping.Group == TextureGroup::Metallic)
-		{
-			importedMaterial.metallic = 1.0f;
-		}
+		importedMaterial.name = name.C_Str();
 	}
+
+	ApplyMaterialColors(material, importedMaterial);
+	ApplyMaterialFactors(material, importedMaterial);
 }
 
-std::optional<std::filesystem::path> AssimpMaterialImporter::ResolvePreferredTexturePath(
+static std::optional<std::filesystem::path> ResolveTexturePath(
+    const aiMaterial& material,
+    ImportedMaterialIndex materialIndex,
+    const TextureResolutionContext& textureContext,
+    aiTextureType textureType,
+    std::string_view slotName)
+{
+	const std::optional<std::string> texturePath = ReadTextureReference(material, materialIndex, textureType, slotName);
+	if (!texturePath)
+	{
+		return std::nullopt;
+	}
+
+	const auto [embeddedTexture, embeddedTextureIndex] = textureContext.scene.GetEmbeddedTextureAndIndex(texturePath->c_str());
+	if (embeddedTexture != nullptr)
+	{
+		if (embeddedTextureIndex < 0 || static_cast<std::size_t>(embeddedTextureIndex) >= textureContext.embeddedTexturePaths.size()
+		    || textureContext.embeddedTexturePaths[static_cast<std::size_t>(embeddedTextureIndex)].empty())
+		{
+			throw Diagnostics::Error(std::format("Assimp material {} has unresolved embedded {} texture '{}'.", materialIndex, slotName, *texturePath));
+		}
+
+		return textureContext.embeddedTexturePaths[static_cast<std::size_t>(embeddedTextureIndex)];
+	}
+
+	if (texturePath->front() == '*')
+	{
+		throw Diagnostics::Error(std::format("Assimp material {} refers to missing embedded {} texture '{}'.", materialIndex, slotName, *texturePath));
+	}
+
+	return SourceTexturePathResolver::ResolveExistingFile(textureContext.sourceDirectory, *texturePath);
+}
+
+static std::optional<std::filesystem::path> ResolvePreferredTexturePath(
     const aiMaterial& material,
     ImportedMaterialIndex materialIndex,
     const TextureResolutionContext& textureContext,
@@ -234,55 +228,7 @@ std::optional<std::filesystem::path> AssimpMaterialImporter::ResolvePreferredTex
 	return hasAlternate ? ResolveTexturePath(material, materialIndex, textureContext, alternateType, alternateSlotName) : std::nullopt;
 }
 
-void AssimpMaterialImporter::SetTextureSource(ImportedMaterial& importedMaterial, TextureGroup textureGroup, const std::optional<std::filesystem::path>& texturePath, TextureChannelMask channelMask)
-{
-	if (!texturePath)
-	{
-		return;
-	}
-
-	importedMaterial.textureSources.push_back({textureGroup, *texturePath, channelMask});
-}
-
-std::optional<std::filesystem::path> AssimpMaterialImporter::ResolveTexturePath(
-    const aiMaterial& material,
-    ImportedMaterialIndex materialIndex,
-    const TextureResolutionContext& textureContext,
-    aiTextureType textureType,
-    std::string_view slotName)
-{
-	const std::optional<std::string> texturePath = AssimpMaterialTextureReferenceReader::Read(material, materialIndex, textureType, slotName);
-	if (!texturePath)
-	{
-		return std::nullopt;
-	}
-
-	const auto [embeddedTexture, embeddedTextureIndex] = textureContext.scene.GetEmbeddedTextureAndIndex(texturePath->c_str());
-	if (embeddedTexture != nullptr)
-	{
-		if (embeddedTextureIndex < 0 || static_cast<std::size_t>(embeddedTextureIndex) >= textureContext.embeddedTexturePaths.size()
-		    || textureContext.embeddedTexturePaths[static_cast<std::size_t>(embeddedTextureIndex)].empty())
-		{
-			throw Diagnostics::Error(std::format("Assimp material {} has unresolved embedded {} texture '{}'.", materialIndex, slotName, *texturePath));
-		}
-
-		return textureContext.embeddedTexturePaths[static_cast<std::size_t>(embeddedTextureIndex)];
-	}
-
-	if (texturePath->front() == '*')
-	{
-		throw Diagnostics::Error(std::format("Assimp material {} refers to missing embedded {} texture '{}'.", materialIndex, slotName, *texturePath));
-	}
-
-	return ResolveExternalTexturePath(*texturePath, textureContext);
-}
-
-std::optional<std::filesystem::path> AssimpMaterialImporter::ResolveExternalTexturePath(std::string_view texturePath, const TextureResolutionContext& textureContext)
-{
-	return SourceTexturePathResolver::ResolveExistingFile(textureContext.sourceDirectory, texturePath);
-}
-
-void AssimpMaterialImporter::ValidateTextureMappings(const aiMaterial& material, ImportedMaterialIndex materialIndex)
+static void ValidateTextureMappings(const aiMaterial& material, ImportedMaterialIndex materialIndex)
 {
 	for (int textureTypeValue = static_cast<int>(aiTextureType_DIFFUSE); textureTypeValue <= static_cast<int>(AI_TEXTURE_TYPE_MAX); ++textureTypeValue)
 	{
@@ -315,5 +261,60 @@ void AssimpMaterialImporter::ValidateTextureMappings(const aiMaterial& material,
 		{
 			throw Diagnostics::Error(std::format("Assimp material {} uses unsupported texture resource type {}.", materialIndex, aiTextureTypeToString(textureType)));
 		}
+	}
+}
+
+static void ApplyTextureMappings(const aiMaterial& material, ImportedMaterialIndex materialIndex, const TextureResolutionContext& textureContext, ImportedMaterial& importedMaterial)
+{
+	ValidateTextureMappings(material, materialIndex);
+
+	for (const AssimpMaterialTextureMapping& mapping : g_assimpMaterialTextureMappings)
+	{
+		std::optional<std::filesystem::path> texturePath = mapping.AlternateType != aiTextureType_NONE
+		    ? ResolvePreferredTexturePath(material, materialIndex, textureContext, mapping.PreferredType, mapping.PreferredName, mapping.AlternateType, mapping.AlternateName)
+		    : ResolveTexturePath(material, materialIndex, textureContext, mapping.PreferredType, mapping.PreferredName);
+
+		if (!texturePath)
+		{
+			continue;
+		}
+
+		importedMaterial.textureSources.push_back({mapping.Group, std::move(*texturePath), mapping.ChannelMask});
+		if (mapping.Group == TextureGroup::Roughness)
+		{
+			importedMaterial.roughness = 1.0f;
+		}
+		if (mapping.Group == TextureGroup::Metallic)
+		{
+			importedMaterial.metallic = 1.0f;
+		}
+	}
+}
+
+static ImportedMaterial ExtractMaterial(const aiMaterial& material, ImportedMaterialIndex materialIndex, const TextureResolutionContext& textureContext)
+{
+	ImportedMaterial importedMaterial;
+	ValidateShadingModel(material, materialIndex);
+	ApplyMaterialProperties(material, importedMaterial);
+	ApplyTextureMappings(material, materialIndex, textureContext, importedMaterial);
+	return importedMaterial;
+}
+
+void AssimpMaterialImporter::ImportMaterials(
+    const aiScene& scene,
+    const std::filesystem::path& sourceDirectory,
+    std::span<const std::filesystem::path> embeddedTexturePaths,
+    SourceImportOutput& output)
+{
+	const TextureResolutionContext textureContext{scene, sourceDirectory, embeddedTexturePaths};
+	for (unsigned int materialIndex = 0; materialIndex < scene.mNumMaterials; ++materialIndex)
+	{
+		if (scene.mMaterials[materialIndex] == nullptr)
+		{
+			throw Diagnostics::Error(std::format("Assimp material {} is null.", materialIndex));
+		}
+
+		ImportedMaterial importedMaterial = ExtractMaterial(*scene.mMaterials[materialIndex], materialIndex, textureContext);
+		output.scene.materials.push_back(std::move(importedMaterial));
 	}
 }

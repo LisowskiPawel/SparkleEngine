@@ -9,6 +9,7 @@
 #include "RHI/Public/ShaderParameters/PassParameterLayout.h"
 
 #include "Core/Public/Diagnostics/Logger.h"
+#include "Core/Public/Diagnostics/Verify.h"
 #include "Pipeline/PassBinder.h"
 
 #include <cassert>
@@ -99,9 +100,9 @@ bool ValidateShaderParameters(
 		for (std::uint32_t index = 0; index < bindingNameCount; ++index)
 		{
 			const PassParameterBinding* binding = parameterSet.FindBinding(bindingNames[index]);
-			if (binding != nullptr && !binding->IsBound() && !HasBindingOverride(overrides, bindingNames[index]))
+			if ((binding == nullptr || !binding->IsBound()) && !HasBindingOverride(overrides, bindingNames[index]))
 			{
-				ReportInvalidShaderPassParameterSet(passName, parameterSet);
+				ReportInvalidShaderPassParameterSet(passName, parameterSet, bindingNames[index]);
 				return false;
 			}
 		}
@@ -185,7 +186,7 @@ void BindRayTracingShaderPass(
 	PassBinder::BindRayTracing(commandContext, resources, bindingLayout, parameterSet);
 }
 
-void ReportInvalidShaderPassParameterSet(const char* passName, const PassParameterSet& parameterSet) noexcept
+[[noreturn]] void ReportInvalidShaderPassParameterSet(const char* passName, const PassParameterSet& parameterSet, const char* requiredBinding) noexcept
 {
 	std::string message = "Shader pass parameter validation failed";
 	if (passName != nullptr && passName[0] != '\0')
@@ -195,21 +196,25 @@ void ReportInvalidShaderPassParameterSet(const char* passName, const PassParamet
 		message += "'";
 	}
 
+	if (requiredBinding != nullptr)
+	{
+		message += ": required binding '";
+		message += requiredBinding;
+		message += "' is absent or unbound.";
+		Diagnostics::Fatal(g_shaderPassLogger, __FILE__, __LINE__, message);
+	}
+
 	if (!parameterSet.HasLayout())
 	{
 		message += ": missing parameter layout.";
-		SPDLOG_LOGGER_ERROR(g_shaderPassLogger, "{}", message);
-		assert(false);
-		return;
+		Diagnostics::Fatal(g_shaderPassLogger, __FILE__, __LINE__, message);
 	}
 
 	const std::vector<std::string> missingBindings = parameterSet.GetMissingBindings();
 	if (missingBindings.empty())
 	{
 		message += ": parameter bindings are incomplete.";
-		SPDLOG_LOGGER_ERROR(g_shaderPassLogger, "{}", message);
-		assert(false);
-		return;
+		Diagnostics::Fatal(g_shaderPassLogger, __FILE__, __LINE__, message);
 	}
 
 	message += ": missing bindings ";
@@ -223,6 +228,5 @@ void ReportInvalidShaderPassParameterSet(const char* passName, const PassParamet
 		message += missingBindings[index];
 	}
 	message += ".";
-	SPDLOG_LOGGER_ERROR(g_shaderPassLogger, "{}", message);
-	assert(false);
+	Diagnostics::Fatal(g_shaderPassLogger, __FILE__, __LINE__, message);
 }

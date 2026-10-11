@@ -2,7 +2,7 @@
 
 struct RenderFrame;
 
-#include "Passes/PostProcessing/Exposure/ExposureMomentResources.h"
+#include "Passes/PostProcessing/Exposure/ExposureMeteringResources.h"
 
 class FrameGraphBuilder;
 struct RenderFrameGraphResources;

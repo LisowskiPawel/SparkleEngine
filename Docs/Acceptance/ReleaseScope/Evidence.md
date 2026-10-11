@@ -6,9 +6,31 @@
 
 **Responsibility:** retain source identities, rights observations and historical checks behind the [scope decisions](README.md).
 
+## Local Diagnostics And Release Review: ITER-PD4-01
+
+**Verdict: BLOCKED.** Candidate: `07004e8e074993f4746c1de7e0e5d1e4dbb2fff4` plus retained inputs. All six FCR reports are blocked; no product archive exists.
+
+**Source:** [local export, symbols, log retention and release review](../../Architecture/Modules/BuildAndPackaging/AdoptionSupportAndIncidentResponse.md#current-local-route), plus public self-service/privacy instructions.
+
+**Checks:** 24 fixture probes passed (6 export, 10 rejection/availability, 5 review, 3 replacement), plus Shipping Launcher build/native-symbol match, scoped Core Logger style and four PowerShell parsers. Native crash/hang/GPU, packaged onboarding, full symbols and rollback remain unproved.
+
+**Next:** qualify rights/payload/helper/symbol inputs and the current baseline; produce the archive for the owner's clean-machine rehearsal. Then exercise all three self-service journeys, native incident/privacy routes, symbol correlation, false-policy rejection and interrupted replacement/rollback. Automatic crash/hang collection and shader-symbol correlation are unavailable. Nothing was published or withdrawn.
+
+**Records:** `artifacts/validation/releases/0.1.0/07004e8e-pd4/` contains `candidate.json` and `features/FCR-PROD-01` through `06/completion.md`. Commands, hashes and probe/control records: `artifacts/validation/pd4-20261011/`. Fixture ZIPs are not product archives; later documentation edits do not rebind these results.
+
 **Snapshot:** reconciled 2026-10-10 at `aa9fcd94f219e8a3d4dbe7c51457680ad9300783`. Earlier iterations retain their own revisions and dirty-state descriptions.
 
 These records prove only the inspection or document checks they name. Current product choices and next actions belong in [Release Scope](README.md#approval-and-next-work); this page does not grant redistribution permission or build/runtime acceptance.
+
+## Package Spine: ITER-PD3-01
+
+**Verdict: BLOCKED — PD-3 is not delivered.** Build And Packaging now owns the source assembly route; no product archive exists. Reports and commands: `artifacts/validation/releases/0.1.0/62918f7b-pd3/features/FCR-PROD-05/completion.md` and `gates/REL-03/completion.md`. The directory retains the iteration's starting revision; current revision, retained source fingerprint and binary/log hashes belong to its control/report files. Historical receipts keep their original candidate.
+
+**Implemented:** `release_package` uses generated target/configuration declarations, frozen reviewed input bytes, a locked fresh transaction, allowlist/hash/notice checks, read-only staging and independent ZIP verification. PE imports require app-local or declared Windows/driver closure; Game rejects Editor/tool imports. SBOM file identities and provenance must match the manifest. Core reads manifest-owned project/engine paths and per-user cooked paths, with no guessed project or source-checkout fallback.
+
+**Local evidence:** structural stage/archive rejection probes, layout declarations and the PE reader have bounded checks. Microsoft `dumpbin` agrees with the reader for Game and all eight NVIDIA DLLs. A controlled closure check rejects the development output's missing app-local `MSVCP140.dll`. This identifies a real prerequisite; it does not qualify a release payload. Exact build/style/boundary/parser results and their limits are in the reports.
+
+**Remaining:** exact rights/notices/source obligations, app-local CRT and complete helper closure, symbols/private-path qualification; Launcher installed discovery and store initialization/sync/cook/run/remove; exact archive assembly and CHK-PKG-02. The maintainer will run the clean standard-user rehearsal once the archive is ready. Signing remains scheduled before public release. No map, provider or product was removed to bypass these checks.
 
 
 ## Rendering Settings Scope Correction: ITER-PD1-02

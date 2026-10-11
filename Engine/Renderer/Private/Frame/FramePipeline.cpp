@@ -225,7 +225,8 @@ void FramePipeline::UploadSceneAssets()
 
 void FramePipeline::PrepareRenderingState(RenderFrame& frame)
 {
-	UpdateFrameHistory(*m_frameGraph, m_frameResources.History, frame.PreparedScene, frame.View, *m_renderViewState, *m_imageProviders);
+	UpdateFrameHistory(*m_frameGraph, m_frameResources.History, frame.View);
+	m_restirLightingHistory.Update(*m_frameGraph, m_frameResources.History, frame, *m_imageProviders);
 	m_frameGraphExecutable = m_referencePathTracerSession->PrepareFrame(frame, m_viewportRenderRequest.RenderAction, m_viewportRenderRequest.RenderActionSequence);
 	if (m_frameGraphExecutable)
 	{

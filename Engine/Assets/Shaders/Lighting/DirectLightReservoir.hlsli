@@ -65,28 +65,22 @@ namespace DirectLightReservoir
 		}
 
 		const LightSampling::DirectLightSample lightSample = ReplayLightSample(reservoir, surface.PositionWorld);
-		float3 diffuse = 0.0f;
-		float3 specular = 0.0f;
-		float3 subsurface = 0.0f;
 
-		SurfaceLighting::AccumulateDirectLightSample(surface.ViewDirWorld,
-		                                             surface.GBuffer.NormalWorld,
-		                                             surface.GBuffer.BaseColor,
-		                                             surface.GBuffer.Roughness,
-		                                             surface.GBuffer.Metallic,
-		                                             surface.GBuffer.DielectricF0,
-		                                             surface.GBuffer.SubsurfaceColor,
-		                                             surface.GBuffer.SubsurfaceStrength,
-		                                             DirectLightingEvaluateDiffuse != 0u,
-		                                             DirectLightingEvaluateSpecular != 0u,
-		                                             surface.EvaluateSubsurface,
-		                                             lightSample,
-		                                             1.0f,
-		                                             diffuse,
-		                                             specular,
-		                                             subsurface);
+		SurfaceLighting::Surface lightingSurface = {surface.ViewDirWorld,
+		                                            surface.GBuffer.NormalWorld,
+		                                            surface.GBuffer.BaseColor,
+		                                            surface.GBuffer.Roughness,
+		                                            surface.GBuffer.Metallic,
+		                                            surface.GBuffer.DielectricF0,
+		                                            surface.GBuffer.SubsurfaceColor,
+		                                            surface.GBuffer.SubsurfaceStrength,
+		                                            DirectLightingEvaluateDiffuse != 0u,
+		                                            DirectLightingEvaluateSpecular != 0u,
+		                                            surface.EvaluateSubsurface};
 
-		return max(diffuse + specular + subsurface, 0.0f.xxx);
+		const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, 1.0f);
+
+		return max(contribution.Diffuse + contribution.Specular + contribution.Subsurface, 0.0f.xxx);
 	}
 
 	float EvaluateTargetPdf(Surface surface, Reservoir reservoir)

@@ -29,7 +29,7 @@
 | configure and build developer profiles | six Editor/Game profiles, modular targets, dependency/toolchain options, and development artifact layout exist | a clean reproducible build result is not retained by this snapshot |
 | prepare runnable development products | declared runtime support is copied beside Launcher/Showcase targets | development staging still depends on workspace conventions |
 | inspect architecture/style | custom boundary and code-style targets exist | no general automated regression runner or CI gate |
-| stage and distribute a release | not found | immutable manifest, licenses/SBOM, signing, archive/installer, relocation, and clean-machine proof |
+| stage and distribute a release | CMake/Packaging source route; exact bytes unqualified | reviewed payloads, Launcher installed journey, symbols/signing and clean-machine proof |
 | operate a released product | partial developer onboarding only | public first-use, support/security intake, incident, patch, and withdrawal operation |
 
 ```mermaid
@@ -37,9 +37,9 @@ flowchart LR
     Source[Frozen source and dependency identities] --> Configure[Configure profile, toolchain, and features]
     Configure --> Build[Build engine, tools, and product targets]
     Build --> Dev[Publish development artifacts]
-    Dev -. missing owner .-> Stage[Immutable release stage and manifest]
-    Stage -. missing owner .-> Package[Sign, package, install, and verify]
-    Package -. missing owner .-> Support[Operate support and incident response]
+    Dev --> Stage[Fresh allowlisted stage and manifest]
+    Stage --> Package[Verify and create unsigned internal archive]
+    Package -. qualification pending .-> Consumer[Clean standard-user rehearsal]
 ```
 
 The current build graph is useful engineering infrastructure, not yet a product-delivery system. The dossiers below separate those outcomes so a successful local executable cannot be mistaken for a distributable, supportable release.
@@ -51,7 +51,7 @@ The current build graph is useful engineering infrastructure, not yet a product-
 | Build graph, profiles, dependencies, development artifacts | This inventory |
 | Public stage, package, signing, installation, and clean-machine operation | [Packaging And Installation](PackagingAndInstallation.md) |
 | Continuous integration, automated regression, and retained results | [Continuous Integration And Regression](ContinuousIntegrationAndRegression.md) |
-| First-run adoption, support, crash/security intake, patching, and withdrawal | [Adoption Support And Incident Response](AdoptionSupportAndIncidentResponse.md) |
+| Self-service recovery, local export/privacy, finite review and immutable replacement/withdrawal; no support service | [Adoption Support And Incident Response](AdoptionSupportAndIncidentResponse.md) |
 
 ## Build Contract
 
@@ -59,7 +59,7 @@ The current build graph is useful engineering infrastructure, not yet a product-
 | --- | --- | --- | --- | --- |
 | `BUILD-001` | CMake baseline | Implemented path | CMake 3.20+, C/C++, C++20 required, compile commands exported. Current owned platform/backend sources make Windows the effective target. | `S` |
 | `BUILD-002` | Six profiles | Implemented path | DebugEditor, DebugGame, DevelopmentEditor, DevelopmentGame, ShippingEditor, ShippingGame; DevelopmentEditor is default. State and target macros are emitted globally. | `S` |
-| `BUILD-003` | Profile optimization/debug policy | Implemented path | MSVC Debug `/Od /Ob0 /Zi /RTC1`; Development `/O2 /Ob2 /Zi /DNDEBUG` plus full PDB/link optimization; Shipping `/O2 /Ob2 /DNDEBUG`. Clang-family Debug `-O0 -g`, Development `-O2 -g`, Shipping `-O3`. | `S` |
+| `BUILD-003` | Profile optimization/debug policy | Implemented path | MSVC Debug `/Od /Ob0 /Zi /RTC1`; Development and Shipping `/O2 /Ob2 /Zi /DNDEBUG` plus full separate PDB/link optimization. Shipping symbol retention amended by PD-4. Clang-family Debug `-O0 -g`, Development `-O2 -g`, Shipping `-O3`. | `S` |
 | `BUILD-004` | Compiler routes | Partial | CMake has MSVC and Clang/GNU flag branches; Launcher explicitly models MSVC and clang-cl on Windows. No current Linux/macOS platform product path exists. | `S` |
 | `BUILD-005` | Static/shared engine modules | Implemented path | `SPARKLE_BUILD_SHARED` selects static default or engine DLLs; product targets copy declared runtime DLL owners beside executables in shared mode. | `S` |
 | `BUILD-006` | Optional tool/features | Implemented path | Content pipeline ON, shader compiler ON, KTX support OFF, NVIDIA Streamline ON by default; strict warnings and sanitizer instrumentation are opt-in. RHI owns D3D12/Vulkan/NVAPI switches. | `S` |

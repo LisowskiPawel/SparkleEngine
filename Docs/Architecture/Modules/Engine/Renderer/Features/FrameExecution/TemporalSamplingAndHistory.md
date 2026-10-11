@@ -49,7 +49,7 @@ The source alternatives must not be advertised as user-selectable anti-aliasing 
 
 ## Persistent View State And Invalidation
 
-`RenderViewState` retains view identity, prior camera pose/matrices, prior NDC jitter, generation observations, the ReSTIR lighting-history hash, the ray partition planner, and pending/last invalidation flags. A continuing frame publishes previous matrices and sets `HistoryValid = 1` only when a previous pose exists and no invalidation is pending.
+`RenderViewState` retains view identity, prior camera pose/matrices, prior NDC jitter, generation observations, the ray partition planner, and pending/last invalidation flags. A continuing frame publishes previous matrices and sets `HistoryValid = 1` only when a previous pose exists and no invalidation is pending.
 
 | Invalidation cause | Detection owner | Required consequence |
 | --- | --- | --- |
@@ -63,7 +63,7 @@ The source alternatives must not be advertised as user-selectable anti-aliasing 
 | graph-topology generation | pass/resource topology changes | reject histories tied to the previous graph |
 | explicit reset | construction or owner-requested invalidation | begin with invalid history |
 
-An invalidation resets the ReSTIR history hash and the per-view ray partition planner as well as the common validity flag. Future feature-specific Reference Path Tracer history remains below that feature owner, may add stricter semantic identity, and cannot override an invalid common view history.
+An invalidation resets the per-view ray partition planner and common validity flag. `RestirLightingHistory`, owned for the same per-view `FramePipeline` lifetime, observes invalid common continuity and resets its feature hash. It owns lighting scene/control compatibility, reservoir invalidation, and the associated provider-history reset; generic View and FrameHistory do not construct lighting compatibility policy. Future feature-specific Reference Path Tracer history remains below that feature owner, may add stricter semantic identity, and cannot override an invalid common view history.
 
 ## Consumer And Coordinate Contract
 

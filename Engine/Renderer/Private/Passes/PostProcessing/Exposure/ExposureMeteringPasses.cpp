@@ -4,7 +4,6 @@
 #include "Core/Public/Math/MathUtils.h"
 #include "Frame/Graph/RenderFrameGraphResources.h"
 #include "FrameGraph/Builder/FrameGraphBuilder.h"
-#include "FrameGraph/FrameGraphBufferDesc.h"
 #include "Passes/PostProcessing/Exposure/ExposureHistogramPassDefinitions.h"
 #include "Passes/PostProcessing/Exposure/ExposureMomentPassDefinitions.h"
 
@@ -12,9 +11,7 @@
 
 ExposureMomentTexture AddExposureHistogramPasses(FrameGraphBuilder& builder, RenderViewportExtent sceneExtent, const RenderFrameGraphResources& resources)
 {
-	// Bin count matches the fixed layout in ExposureHistogram.hlsli.
-	constexpr std::uint32_t histogramBinCount = 512u;
-	const auto histogram = builder.CreateBuffer(FrameGraphBufferDesc::Create("ExposureHistogram", histogramBinCount * sizeof(std::uint32_t), sizeof(std::uint32_t)));
+	const auto histogram = CreateExposureHistogramBuffer(builder);
 	const auto moments = CreateExposureMomentTexture(builder, "ExposureHistogramMoments", 0u, 1u, 1u);
 	AddExposureHistogramClearPass(builder, histogram);
 	AddExposureHistogramBuildPass(builder, resources.Transient.Scene.SceneColor, sceneExtent, histogram);

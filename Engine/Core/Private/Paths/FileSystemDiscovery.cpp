@@ -129,11 +129,19 @@ namespace Filesystem
 	std::filesystem::path GetExecutablePath()
 	{
 #if defined(_WIN32)
-		wchar_t buffer[MAX_PATH];
-		const DWORD length = GetModuleFileNameW(nullptr, buffer, MAX_PATH);
-		if (length > 0 && length < MAX_PATH)
+		for (std::size_t capacity = 512u; capacity <= 32768u; capacity *= 2u)
 		{
-			return std::filesystem::path(buffer);
+			std::wstring buffer(capacity, L'\0');
+			const DWORD length = GetModuleFileNameW(nullptr, buffer.data(), static_cast<DWORD>(buffer.size()));
+			if (length == 0u)
+			{
+				return {};
+			}
+			if (length < buffer.size())
+			{
+				buffer.resize(length);
+				return std::filesystem::path(buffer);
+			}
 		}
 #endif
 		return {};

@@ -38,7 +38,7 @@ FrameGraphCompiler::FrameGraphCompiler(
 {
 }
 
-void FrameGraphCompiler::Compile() noexcept
+void FrameGraphCompiler::CompileResourcePlan() noexcept
 {
 	InitializeCompilation();
 	BuildResourceDependencies();
@@ -48,6 +48,10 @@ void FrameGraphCompiler::Compile() noexcept
 	BuildTransientResourceLifetimes();
 	BuildTransientPhysicalBlockAssignments();
 	BuildTransientAliasingBarriers();
+}
+
+void FrameGraphCompiler::CompileExecutionPlan() noexcept
+{
 	BuildResourceBarriers();
 	BuildSubmissionBatches();
 	FrameGraphRecordingPlanCompiler(m_plan).Compile();
@@ -108,6 +112,7 @@ void FrameGraphCompiler::ResetCompiledResourceStatesForBarrierPlanning() noexcep
 	for (FrameGraphResourceNode& compiledResource : m_plan.resources)
 	{
 		compiledResource.currentState = m_resourceStateTracker.GetRuntimeState(compiledResource.handle);
+		compiledResource.planningStartState = compiledResource.currentState;
 		compiledResource.pendingAccelerationStructureBarrier = false;
 		m_resourceStateTracker.UpdateCurrentState(compiledResource.handle, compiledResource.currentState);
 	}

@@ -64,6 +64,5 @@ public:
 	SHADER_PARAMETER(std::uint32_t, RestirIndirectEvaluateDiffuse)
 	SHADER_PARAMETER(std::uint32_t, RestirIndirectEvaluateSpecular)
 	SHADER_PARAMETER(std::uint32_t, RestirIndirectTraceSecondaryShadows)
-	SHADER_PARAMETER(std::uint32_t, RestirIndirectWriteReconstructionGuides)
 	END_SHADER_PARAMETER_STRUCT()
 };

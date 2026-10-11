@@ -70,7 +70,7 @@ namespace Filesystem::Private
 		state.sceneAssetRegistryPath = Paths::Normalize(state.cookedAssetRootPath / "SceneAssetRegistry.sreg");
 
 		state.shaderSymbolsOutputPath = state.installedProduct ? Paths::Normalize(state.productUserStatePaths.CacheRoot / "ShaderSymbols" / projectName)
-		                                                         : Paths::Normalize(workspaceOutputs.SymbolsRoot / "shaders" / projectName);
+		                                                       : Paths::Normalize(workspaceOutputs.SymbolsRoot / "shaders" / projectName);
 	}
 
 	void MaterializeOutputDirectories(const AssetPathState& state)

@@ -75,7 +75,7 @@ When implementation, scope, or evidence changes, update this snapshot, the ownin
 | `FCR-PROD-03` | Launcher workflow | **50** | `35/15/0/0` | Integrated developer path | clean-machine workflow, failure/cancellation truth, and distribution classification |
 | `FCR-PROD-04` | Editor product | **45** | `30/15/0/0` | Integrated development path | usability, viewport/edit correctness, package classification, performance, and adoption |
 | `FCR-PROD-05` | installation and release package | **0** | `0/0/0/0` | Not found | one stage/sign/verify/package/install owner and clean-machine result |
-| `FCR-PROD-06` | support, crash, security, and patch operation | **15** | `10/5/0/0` | Diagnostic foundations only | public intake, privacy/consent, symbols, severity, patch/withdrawal, and operated evidence |
+| `FCR-PROD-06` | self-service diagnostics and finite release review; no support service | **15** | `10/5/0/0` | Local export/review source and fixture checks; native package routes blocked | exact-archive onboarding, crash/hang/GPU/privacy, full symbol correlation and replacement/withdrawal rehearsal; score not reassessed by the source slice ([PD-4 evidence](ReleaseScope/Evidence.md#local-diagnostics-and-release-review-iter-pd4-01)) |
 
 ## Foundation, World, Content, Shaders, And Tools
 

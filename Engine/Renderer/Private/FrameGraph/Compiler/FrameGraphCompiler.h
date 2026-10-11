@@ -17,7 +17,8 @@ public:
 	    FrameGraphResourceStateTracker& resourceStateTracker,
 	    const RhiQueueCapabilities& queueCapabilities) noexcept;
 
-	void Compile() noexcept;
+	void CompileResourcePlan() noexcept;
+	void CompileExecutionPlan() noexcept;
 
 private:
 	struct LastResourceAccess final

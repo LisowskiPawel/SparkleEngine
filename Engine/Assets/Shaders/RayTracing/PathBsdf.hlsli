@@ -2,6 +2,7 @@
 #define SPARKLE_RAY_TRACING_PATH_BSDF_HLSLI
 
 #include "/Engine/Common/Constants.hlsli"
+#include "/Engine/BRDF/Fresnel.hlsli"
 #include "/Engine/Common/Sampling.hlsli"
 #include "/Engine/RayTracing/PathSurface.hlsli"
 #include "/Engine/RayTracing/RayTracingPathSample.hlsli"
@@ -40,13 +41,6 @@ namespace PathBsdf
 		}
 		result.SpecularDelta = surface.Roughness == 0.0f;
 		return result;
-	}
-
-	float3 FresnelSchlick(float cosine, float3 f0)
-	{
-		const float oneMinusCosine = 1.0f - cosine;
-		const float oneMinusCosine2 = oneMinusCosine * oneMinusCosine;
-		return f0 + (1.0f.xxx - f0) * oneMinusCosine2 * oneMinusCosine2 * oneMinusCosine;
 	}
 
 	float DistributionGGX(float noH, float alpha)
@@ -104,7 +98,7 @@ namespace PathBsdf
 		}
 
 		const float3 f0 = lerp(surface.DielectricF0.xxx, surface.BaseColor, surface.Metallic);
-		const float3 fresnel = FresnelSchlick(voH, f0);
+		const float3 fresnel = BRDF::Fresnel::Schlick(voH, f0);
 		float3 diffuse = 0.0f.xxx;
 		if (evaluateDiffuse)
 		{
@@ -187,7 +181,7 @@ namespace PathBsdf
 					const float3 f0 = lerp(surface.DielectricF0.xxx, surface.BaseColor, surface.Metallic);
 					const float cosine = abs(dot(surface.ViewDirWorld, surface.NormalWorld));
 					const float correction = ShadingNormalCorrection(surface, result.DirectionWorld);
-					result.SpecularThroughput = FresnelSchlick(cosine, f0) * correction / masses.Specular;
+					result.SpecularThroughput = BRDF::Fresnel::Schlick(cosine, f0) * correction / masses.Specular;
 				}
 				result.Delta = true;
 				result.HasSupport = any(result.SpecularThroughput > 0.0f);

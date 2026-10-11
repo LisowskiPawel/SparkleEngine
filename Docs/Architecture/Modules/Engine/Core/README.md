@@ -14,6 +14,8 @@
 
 Source ownership reconciled on 2026-10-06: `CommandLine::ReadToken` owns the borrowed wide-token view and advancing offset used by Application CVar parsing and RHI backend selection. Core also owns the immutable default texture product catalog shared by Renderer and AssetCooker; cooking and runtime policy remain with those consumers.
 
+Package path amendment (2026-10-11): Core discovers the manifest from executable ancestors, reads declared project/engine paths and resolves cooked content under per-user state. It rejects malformed, escaping or reparse paths and does not pick another project or source checkout when package data is missing. Windows LocalAppData failure is explicit. JSON property lookup now reads immediate object members, rejects malformed input/duplicate requested keys and retains UTF-8 string handling. This is source behavior with compile checks; the Launcher/store and clean-machine journeys remain [unqualified](../../BuildAndPackaging/PackagingAndInstallation.md#current-package-entry).
+
 ## At A Glance
 
 | Foundation | Current role | Deliberate boundary |

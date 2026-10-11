@@ -15,7 +15,7 @@ A valid neutral resource description becomes backend storage with explicit forma
 ## Cohesive Lifetime Contract
 
 - Textures, buffers, views, samplers, uploads, readbacks, transient blocks, and aliased placements share one allocation/use/retirement invariant; this is why they form one dossier.
-- Neutral format traits and use validation precede native creation. The public texture contract currently covers 2D/cube shapes, not a general 3D texture product.
+- Neutral format traits and use validation precede native creation. `R32_UInt` has four-byte texels, color-attachment and storage-image vocabulary, native D3D12/Vulkan mappings, and capability reporting. Vulkan attachment clear chooses the integer clear representation from the descriptor recording snapshot; this source contract does not prove native format/use support on a particular adapter. The public texture contract currently covers 2D/cube shapes, not a general 3D texture product.
 - D3D12MA and VMA own backend allocation mechanics; RHI handles and memory diagnostics preserve neutral identity and categories.
 - Upload/readback staging and recording-resource tables extend lifetime through recording and submission. Completion tokens, not C++ scope exit, authorize reuse/destruction.
 - Transient aliasing requires non-overlapping compiled lifetimes plus explicit alias/state barriers supplied through the command contract.

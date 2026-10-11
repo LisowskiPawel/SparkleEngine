@@ -24,6 +24,8 @@ public:
 	SHADER_PARAMETER_TEXTURE_UAV(RWTexture2D, GBufferSubsurface)
 	SHADER_PARAMETER_TEXTURE_UAV(RWTexture2D, GBufferDeviceZ)
 	SHADER_PARAMETER_TEXTURE_UAV(RWTexture2D, GBufferMotionVector)
+	SHADER_PARAMETER_TEXTURE_UAV(RWTexture2D, GBufferInstanceIdentity)
+	SHADER_PARAMETER(std::uint32_t, GBufferWriteInstanceIdentity)
 	SHADER_PARAMETER_ACCELERATION_STRUCTURE(SceneTlas)
 	SHADER_PARAMETER_CBUFFER(ViewUniformData, View)
 	SHADER_PARAMETER_CBUFFER(ViewCameraUniformData, ViewCamera)

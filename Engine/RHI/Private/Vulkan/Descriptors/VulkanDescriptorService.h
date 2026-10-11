@@ -98,6 +98,7 @@ private:
 	struct RecordingImageView final
 	{
 		std::uintptr_t ImageViewValue = 0;
+		PixelFormat Format = PixelFormat::Unknown;
 		VkImageAspectFlags AspectMask = 0;
 	};
 
@@ -124,7 +125,7 @@ private:
 	VkImageView CreateImageView(const RhiResourceViewDesc& desc) const;
 	VkFormat ResolveViewFormat(const RhiResourceViewDesc& desc) const noexcept;
 	VkImageAspectFlags ResolveViewAspectMask(const RhiResourceViewDesc& desc) const noexcept;
-	VkImageAspectFlags ResolveImageViewAspectMask(VkImageView imageView) const noexcept;
+	RecordingImageView ResolveRecordingImageView(VkImageView imageView) const noexcept;
 	bool ResolveRegisteredImageResource(RhiResourceHandle resource, VulkanRecordingResource& outResource) const noexcept;
 	void DestroyResourceView(ResourceViewRecord& record) noexcept;
 

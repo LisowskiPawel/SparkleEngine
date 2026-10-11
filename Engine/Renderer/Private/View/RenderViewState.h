@@ -10,7 +10,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <optional>
 
 class RenderRayTracingViewPlanner;
 struct PreparedRenderScene;
@@ -66,7 +65,6 @@ public:
 	void Invalidate(RenderViewInvalidationReason reason) noexcept;
 	ViewTemporalUniformData BuildTemporal(const RenderViewStateBuildInput& input) noexcept;
 	RayTracingPtlasPartitionPlan BuildRayTracingPlan(const PreparedRenderScene& preparedScene, const DirectX::XMFLOAT3& cameraPosition) noexcept;
-	bool UpdateRestirLightingHistory(std::uint64_t invalidationHash) noexcept;
 
 	RenderViewInvalidationReason GetLastInvalidationReasons() const noexcept { return m_lastInvalidationReasons; }
 
@@ -90,7 +88,6 @@ private:
 	static CameraPose CapturePose(const RenderViewStateBuildInput& input) noexcept;
 	static bool HasProjectionChange(const CameraPose& previousPose, const CameraPose& currentPose) noexcept;
 	static bool IsLikelyCameraCut(const CameraPose& previousPose, const CameraPose& currentPose) noexcept;
-	static bool UpdateHistoryInvalidationHash(std::optional<std::uint64_t>& previousHash, std::uint64_t currentHash) noexcept;
 
 	RenderViewStateIdentity m_identity = {};
 	CameraPose m_previousPose = {};
@@ -99,7 +96,6 @@ private:
 	std::uint64_t m_shaderGeneration = 0u;
 	std::uint64_t m_imageProviderGeneration = 0u;
 	std::uint64_t m_graphTopologyGeneration = 0u;
-	std::optional<std::uint64_t> m_restirLightingHistoryInvalidationHash;
 	std::unique_ptr<RenderRayTracingViewPlanner> m_rayTracingPlanner;
 	std::uint32_t m_temporalSampleIndex = 0u;
 	RenderViewInvalidationReason m_pendingInvalidationReasons = RenderViewInvalidationReason::ExplicitReset;

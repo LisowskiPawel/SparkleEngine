@@ -12,15 +12,19 @@
 #include "Scene/Preparation/PreparedRenderScene.h"
 #include "Scene/Materials/MaterialEmissionControls.h"
 #include "View/RenderView.h"
+#include "Passes/Visualization/GpuSceneVisualization.h"
 
 #include <cstdint>
 
-static TypedPassParameterInstance<GBufferGraphParameters>& BuildGBufferRasterParameters(FrameGraphBuilder& builder, const RenderFrame& frame, const RenderFrameGraphResources& resources)
+static auto& BuildGBufferRasterParameters(FrameGraphBuilder& builder, const RenderFrame& frame, const RenderFrameGraphResources& resources)
 {
 	const GBufferRenderTargets& targets = resources.Transient.GBuffer;
 	const RenderFrameGraphImportedSceneResources& externalResources = resources.ImportedScene;
 
 	auto& parameters = builder.AllocGraphParameters<GBufferGraphParameters>("GBuffer");
+
+	parameters->InstanceIdentity = builder.CreateRenderTarget(targets.InstanceIdentity, FrameGraphAttachmentLoadAction::Clear, FrameGraphAttachmentStoreAction::Store);
+
 	parameters->BaseColor = builder.CreateRenderTarget(targets.BaseColor, FrameGraphAttachmentLoadAction::Clear, FrameGraphAttachmentStoreAction::Store);
 	parameters->WorldNormal = builder.CreateRenderTarget(targets.WorldNormal, FrameGraphAttachmentLoadAction::Clear, FrameGraphAttachmentStoreAction::Store);
 	parameters->WorldTangent = builder.CreateRenderTarget(targets.WorldTangent, FrameGraphAttachmentLoadAction::Clear, FrameGraphAttachmentStoreAction::Store);
@@ -37,6 +41,7 @@ static TypedPassParameterInstance<GBufferGraphParameters>& BuildGBufferRasterPar
 	parameters->Shader.Vertex.MorphWeights = builder.CreateSRV<float>(externalResources.Scene.Geometry.MorphWeights);
 	parameters->Shader.Vertex.PreviousMorphWeights = builder.CreateSRV<float>(externalResources.Scene.Geometry.PreviousMorphWeights);
 	parameters->Shader.Pixel.SamplerAniso16xWrap = RhiSamplerDesc{.MaxAnisotropy = RhiSamplerAnisotropy::X16};
+	parameters->Shader.Pixel.GBufferWriteInstanceIdentity = IsGpuSceneVisualizationActive(frame.View.viewMode) ? 1u : 0u;
 	parameters->Shader.Pixel.EmissiveEnabled = CVarEmissiveEnabled.Get() ? 1u : 0u;
 
 	parameters->Shader.Vertex.ViewCamera = frame.View.cameraUniform;
@@ -60,7 +65,7 @@ static RasterPassRenderState CreateGBufferRasterState()
 
 void AddRasterizedGBufferMeshPass(FrameGraphBuilder& builder, const RenderFrame& frame, GpuMeshCache& gpuMeshCache, const RenderFrameGraphResources& resources)
 {
-	auto& parameters = BuildGBufferRasterParameters(builder, frame, resources);
 	const RasterPassRenderState renderState = CreateGBufferRasterState();
+	auto& parameters = BuildGBufferRasterParameters(builder, frame, resources);
 	builder.Draw<GBufferVS, GBufferPS>(parameters, renderState, GBufferMeshPass(gpuMeshCache, frame.PreparedScene, frame.View));
 }

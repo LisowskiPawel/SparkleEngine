@@ -10,10 +10,12 @@
 #include "Passes/Lighting/Restir/Indirect/IndirectLightingControls.h"
 #include "Passes/Lighting/Restir/Indirect/IndirectLightingResources.h"
 #include "Passes/Lighting/Restir/Reconstruction/RayReconstructionSurfaceGuides.h"
+#include "Passes/Lighting/Restir/Reconstruction/RestirRayReconstructionResources.h"
 
 void AddRestirIndirectLightingPasses(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, RenderFrameGraphResources& resources)
 {
 	CreateIndirectLightingResources(builder, sceneExtent, resources);
+	CreateRayReconstructionGuideRenderTargets(builder, sceneExtent, resources);
 	AddRayReconstructionSurfaceGuidesPass(builder, frame, sceneExtent, resources);
 	if (!IsIndirectLightingAdmitted())
 	{

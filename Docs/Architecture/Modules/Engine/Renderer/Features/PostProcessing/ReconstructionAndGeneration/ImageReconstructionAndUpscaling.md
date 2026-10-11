@@ -16,11 +16,11 @@ Use the official pinned Streamline `v2.11.1` [SR guide](https://github.com/NVIDI
 
 | Active producer | Eligibility | Output contract | Main limitation |
 | --- | --- | --- | --- |
-| Linear | built-in fallback/current route | one current-frame `ResolvedSceneColor` at output extent | filter/edge/alpha quality and scale range unproved |
+| Linear | built-in selectable route | one current-frame `ResolvedSceneColor` at output extent | filter/edge/alpha quality and scale range unproved |
 | DLSS Super Resolution | D3D12 plus built/runtime/device/interposer/provider readiness | one reconstructed current-frame output from color, depth, motion, exposure, camera, and extent tags | vendor/hardware/package constraints and no Vulkan route |
 | DLSS Ray Reconstruction | D3D12 provider readiness plus ReSTIR-specific guides | optional render-resolution `DenoisedSceneColor` consumed by the selected presentation upscaler | mode/guide restrictions and quality/history proof open |
 
-Only the selected presentation upscaler may own `ResolvedSceneColor` for a frame. Ray Reconstruction owns a separate render-resolution `DenoisedSceneColor`; it composes before Linear or DLSS Super Resolution instead of replacing either. Requested vendor mode can resolve to an explicit built-in fallback, but the active result and reason must remain visible; fallback success does not prove the requested provider.
+Only the selected presentation upscaler may own `ResolvedSceneColor` for a frame. Ray Reconstruction owns a separate render-resolution `DenoisedSceneColor`; it composes before Linear or DLSS Super Resolution instead of replacing either. Selected vendor initialization or evaluation failure is fatal and preserves the requested selection. Linear and RR Off are explicit user choices; they are not automatic recovery paths.
 
 **Parent family:** [Post Processing](../README.md)
 
@@ -33,27 +33,27 @@ Sparkle may first denoise eligible ReSTIR lighting into `DenoisedSceneColor` at 
 | Feature | Requested choices | Active/failure rule | Inputs |
 | --- | --- | --- | --- |
 | Linear upscale | baseline provider | always-available internal path | scene color |
-| NVIDIA DLSS Super Resolution | NativeAA, Quality, Balanced, Performance, UltraPerformance | Streamline/capability/native-interop gated; initialization failure resolves to Linear | color, device depth, motion, exposure, camera/temporal/extents |
-| NVIDIA DLSS Ray Reconstruction | Off or NVIDIA RR | ReSTIR-only render-resolution denoising; initialization failure resolves Off without changing the selected upscaler | color, depth, motion, diffuse/specular albedo, normal, roughness, specular hit distance, exposure |
+| NVIDIA DLSS Super Resolution | NativeAA, Quality, Balanced, Performance, UltraPerformance | Streamline/capability/native-interop gated; initialization failure is fatal; selection is unchanged | color, device depth, motion, exposure, camera/temporal/extents |
+| NVIDIA DLSS Ray Reconstruction | Off or NVIDIA RR | ReSTIR-only render-resolution denoising; initialization failure is fatal; RR and upscaler selections are unchanged | color, depth, motion, diffuse/specular albedo, normal, roughness, specular hit distance, exposure |
 
 Vulkan currently refuses the external Streamline evaluation route instead of claiming parity with D3D12 native interop. Provider source presence does not prove supported hardware, driver behavior, input tagging, binary staging, quality, performance, or redistribution.
 
 ## Ownership And Lifetime
 
 - Renderer settings/CVars express requested provider and quality; the provider stack owns readiness and resolved active state.
-- `AddSceneUpscalingPasses` visibly selects exactly one implemented presentation upscaler: Linear or NVIDIA DLSS. The selected provider and quality own the render extent, so DLSS NativeAA remains available at native resolution; generic provider evaluation remains below the concrete selector.
+- `AddSceneUpscalingPasses` visibly selects exactly one implemented presentation upscaler: Linear or NVIDIA DLSS. The selected provider and quality own the render extent, so DLSS NativeAA remains available at native resolution; the concrete NVIDIA operation maps and validates its color/depth/motion/exposure inputs before the generic provider evaluation bridge.
 - Scene composition encloses `AddRestirRayReconstructionPass` in Lit mode; the pass checks feature-owned reconstruction policy and inserts Ray Reconstruction when enabled. The frame-graph builder carries no view mode. Reconstruction consumes ReSTIR guides, writes a distinct render-resolution product, and changes only the input passed to the selected presentation upscaler.
 - Ray Reconstruction evaluates with equal input/output render extents and its provider's NativeAA mode. The selected presentation-upscaler quality controls only the later DLSS SR extent conversion; it does not turn Ray Reconstruction into the resolution owner.
-- Provider key/generation contributes to graph topology and prevents a graph from binding stale provider state.
+- Provider identity contributes to temporal continuity and resource lifetime. Graph declarations and compilation are fresh each executable frame; provider identity does not cache graph compilation.
 - Old provider generations retire after their last queue submissions complete.
-- Ray Reconstruction consumes ReSTIR guide products only when that topology is active. Linear/DLSS SR consume the selected raw or denoised scene color plus their normal depth/motion/exposure inputs.
+- The ReSTIR reconstruction resource owner declares and clears four guide targets even with RR Off. Indirect lighting uses one resolve shader with all four guide UAVs bound; a uniform enables guide writes when RR is selected and eligible. With indirect lighting disabled, the selected surface-guide pass remains the producer. Disabled guide resources remain declared under this uniform strategy; graph culling and GPU allocation reuse are separate mechanisms. Linear/DLSS SR consume the selected raw or denoised scene color plus their normal depth/motion/exposure inputs.
 - Tone mapping consumes the one resolved output; reconstruction/upscaling does not own tone mapping, color grading, chromatic aberration, output encoding, or frame generation.
 
 ## Failure, Tradeoffs, And Evidence
 
-- Unavailable provider initialization must reset to a named supported alternate and must not continue reporting the vendor path as active.
+- Unavailable selected-provider initialization and failed evaluation terminate through the explicit diagnostic failure path before a successful output can be published; selection is unchanged.
 - Resize, scene/view discontinuity, provider/shader/topology generation changes must reset affected temporal state.
-- The built-in Linear path provides a deterministic ownership fallback but has an unmeasured quality/cost envelope.
+- The built-in Linear path provides a deterministic selectable output path but has an unmeasured quality/cost envelope.
 - External providers reduce in-engine algorithm ownership but add adapter, SDK, binary, interop, packaging, and attribution dependencies.
 - DLSS Super Resolution and Ray Reconstruction reconstruct the current frame; neither is evidence of DLSS Frame Generation.
 - `REN-E14`, `REN-E15`, and `REN-E16` own Linear, DLSS SR, and DLSS RR execution evidence respectively; the proof contract is defined below.
@@ -63,10 +63,10 @@ Vulkan currently refuses the external Streamline evaluation route instead of cla
 | Provider/result | D3D12 | Vulkan | Required distinction |
 | --- | --- | --- | --- |
 | Linear | implemented baseline | implemented baseline | render/output extent, filtering, alpha, and cost |
-| DLSS Super Resolution | capability/SDK/driver/interposer gated | external evaluation refused | requested quality versus active provider, tagged inputs, reset, fallback to Linear |
-| DLSS Ray Reconstruction | capability-gated and ReSTIR-only | external evaluation refused | requested versus active mode, guide completeness, reset, fallback Off |
+| DLSS Super Resolution | capability/SDK/driver/interposer gated | external evaluation refused | requested quality versus active provider, tagged inputs, reset, fatal failure with unchanged selection |
+| DLSS Ray Reconstruction | capability-gated and ReSTIR-only | external evaluation refused | requested versus active mode, guide completeness, reset, fatal failure with unchanged selection |
 
-NativeAA and render-to-output scaling ratios need separate quality/cost cells. Unsupported provider/backend/lighting combinations require explicit inactive results rather than borrowed success from Linear or D3D12.
+NativeAA and render-to-output scaling ratios need separate quality/cost cells. Unsupported selected provider/backend/lighting combinations require explicit refusal; successful Linear or D3D12 execution cannot prove those combinations.
 
 ## Acceptance Criteria
 
@@ -74,7 +74,7 @@ NativeAA and render-to-output scaling ratios need separate quality/cost cells. U
 - `AC-IRU-02` — Linear produces finite in-bounds output for unity, down/upscale, odd dimensions, one-pixel edges, resize, and alpha fixtures with a predeclared filtering oracle.
 - `AC-IRU-03` — DLSS SR activates only with matching adapter/driver/SDK/interposer/backend readiness and complete color/depth/motion/exposure/camera/extent tags; requested quality and actual active provider are inspectable.
 - `AC-IRU-04` — DLSS RR activates only for ReSTIR with every required guide, writes only render-resolution `DenoisedSceneColor`, and leaves the independently selected Linear or DLSS SR stage responsible for output-resolution `ResolvedSceneColor`.
-- `AC-IRU-05` — initialization/evaluation failure resolves SR to Linear and RR to Off exactly as documented, reports the reason, rebuilds affected topology, and never reports the vendor path as active.
+- `AC-IRU-05` — selected-provider initialization/evaluation failure reports the reason and terminates before successful output publication, preserving SR/RR selection without automatic fallback.
 - `AC-IRU-06` — camera cut, resize, scene/view/provider/shader/topology change resets temporal provider state and prevents mixed-generation inputs or outputs.
 - `AC-IRU-07` — old provider generations remain alive through last-use queue tokens and are reclaimed within a declared bound during repeated switches/failures/shutdown.
 - `AC-IRU-08` — package/runtime evidence identifies binaries, versions, provenance, redistribution boundary, adapter/driver, backend, quality mode, extents, input tags, latency, quality metric, and observer configuration.
@@ -83,10 +83,10 @@ NativeAA and render-to-output scaling ratios need separate quality/cost cells. U
 
 | Failure ID | Injection or cause | Required safe behavior | Detecting check |
 | --- | --- | --- | --- |
-| `FM-IRU-01` | SDK/interposer/binary/capability absent or initialization fails | SR resolves Linear; RR resolves Off; reason and requested/active state remain visible | `CHK-IRU-02` |
+| `FM-IRU-01` | SDK/interposer/binary/capability absent or initialization fails | selected-provider initialization fails explicitly with the reason; selection remains unchanged and successful output is not published | `CHK-IRU-02` |
 | `FM-IRU-02` | missing/wrong-format/wrong-extent/stale guide or motion/depth/exposure input | graph construction or provider evaluation rejects before publication; no unrelated buffer, fabricated guide, silent provider substitution, or stale product is presented | `CHK-IRU-02`, `CHK-IRU-03` |
 | `FM-IRU-03` | resize/cut/provider or lighting-mode switch while work is in flight | temporal state resets, graph generation changes, and old provider retires by completion | `CHK-IRU-03` |
-| `FM-IRU-04` | external provider requested on Vulkan | active result explicitly refuses/falls back according to the documented provider rule, never claims parity | `CHK-IRU-02` |
+| `FM-IRU-04` | external provider requested on Vulkan | selected-provider initialization/evaluation fails explicitly according to its owner, never claims parity | `CHK-IRU-02` |
 | `FM-IRU-05` | Ray Reconstruction claims `ResolvedSceneColor`, changes presentation extent/provider policy, or suppresses the selected upscaler | graph/resource contract detects the ownership or stage-composition violation | `CHK-IRU-01` |
 
 | Check | Exercise and oracle | Covers |
@@ -96,7 +96,7 @@ NativeAA and render-to-output scaling ratios need separate quality/cost cells. U
 | `CHK-IRU-03` | temporal churn across motion, camera cut, resize, scene/view/provider/shader/topology changes and repeated failure/recovery; inspect tags, generations, queue tokens, and retention | `AC-IRU-06`, `AC-IRU-07`; `FM-IRU-02`, `FM-IRU-03` |
 | `CHK-IRU-04` | representative quality/performance/package run with predeclared metric and baseline at each supported extent/quality cell | `AC-IRU-02`, `AC-IRU-03`, `AC-IRU-04`, `AC-IRU-08` |
 
-This contract is **defined but unproved**. Linear, DLSS SR, and DLSS RR receive independent verdicts; a valid fallback proves recovery, not the requested vendor feature.
+This contract is **defined but unproved**. Linear, DLSS SR, and DLSS RR receive independent verdicts; a valid explicitly selected Linear or RR Off route does not prove vendor failure recovery.
 
 ## Primary Source Routes
 

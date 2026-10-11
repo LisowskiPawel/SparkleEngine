@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Passes/PostProcessing/Exposure/ExposureMomentResources.h"
+#include "Passes/PostProcessing/Exposure/ExposureMeteringResources.h"
 #include "Renderer/Public/Viewport/ViewportContracts.h"
 
 class FrameGraphBuilder;

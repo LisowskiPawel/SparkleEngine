@@ -3,6 +3,7 @@
 #include "Frame/Graph/RenderFrameGraphResources.h"
 #include "Frame/Graph/RenderFrameGraphSettings.h"
 #include "Frame/Retirement/FrameExecutionRetirementQueue.h"
+#include "Passes/Lighting/Restir/RestirLightingHistory.h"
 #include "Providers/ImageProviderGraphKey.h"
 #include "Renderer/Public/Settings/EngineRenderingRayTracingTypes.h"
 #include "Renderer/Public/Resources/Textures/TextureDiagnostics.h"
@@ -32,6 +33,7 @@ class RenderPassRuntimeCache;
 class RenderScene;
 class RenderScenePreparation;
 class RenderViewPreparation;
+class RenderViewState;
 class TaskExecutor;
 class TaskScope;
 class TextureCache;
@@ -145,6 +147,7 @@ private:
 	std::unique_ptr<UiFrameRenderer> m_uiFrameRenderer;
 	std::unique_ptr<ViewportCaptureService> m_viewportCaptureService;
 	std::unique_ptr<ReferencePathTracerSession> m_referencePathTracerSession;
+	RestirLightingHistory m_restirLightingHistory;
 	bool m_resizePending = false;
 	bool m_windowMinimized = false;
 	bool m_frameGraphExecutable = true;

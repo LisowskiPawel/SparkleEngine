@@ -13,14 +13,17 @@
 void AddRestirIndirectResolvePass(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, const RenderFrameGraphResources& resources)
 {
 	auto& parameters = builder.AllocParameters<RestirIndirectResolveCS>();
-	parameters->CurrentReservoirSampleTexture = builder.CreateSRV(resources.History.RestirIndirectReservoir.Sample.Current);
-	parameters->CurrentReservoirWeightTexture = builder.CreateSRV(resources.History.RestirIndirectReservoir.Weight.Current);
-	parameters->IndirectDiffuse = builder.CreateUAV(resources.Transient.Lighting.IndirectDiffuse);
-	parameters->IndirectSpecular = builder.CreateUAV(resources.Transient.Lighting.IndirectSpecular);
+
 	parameters->RayReconstructionDiffuseAlbedo = builder.CreateUAV(resources.Transient.Lighting.ReconstructionGuides.DiffuseAlbedo);
 	parameters->RayReconstructionSpecularAlbedo = builder.CreateUAV(resources.Transient.Lighting.ReconstructionGuides.SpecularAlbedo);
 	parameters->RayReconstructionRoughness = builder.CreateUAV(resources.Transient.Lighting.ReconstructionGuides.Roughness);
 	parameters->RayReconstructionSpecularHitDistance = builder.CreateUAV(resources.Transient.Lighting.ReconstructionGuides.SpecularHitDistance);
+	parameters->WriteRayReconstructionGuides = ShouldUseRayReconstruction(frame.View.viewMode) ? 1u : 0u;
+
+	parameters->CurrentReservoirSampleTexture = builder.CreateSRV(resources.History.RestirIndirectReservoir.Sample.Current);
+	parameters->CurrentReservoirWeightTexture = builder.CreateSRV(resources.History.RestirIndirectReservoir.Weight.Current);
+	parameters->IndirectDiffuse = builder.CreateUAV(resources.Transient.Lighting.IndirectDiffuse);
+	parameters->IndirectSpecular = builder.CreateUAV(resources.Transient.Lighting.IndirectSpecular);
 	parameters->GBufferBaseColor = builder.CreateSRV(resources.Transient.GBuffer.BaseColor);
 	parameters->GBufferWorldNormal = builder.CreateSRV(resources.Transient.GBuffer.WorldNormal);
 	parameters->GBufferMaterial = builder.CreateSRV(resources.Transient.GBuffer.Material);
@@ -30,8 +33,6 @@ void AddRestirIndirectResolvePass(FrameGraphBuilder& builder, const RenderFrame&
 	BindRayTracedShadowParameters(frame.PreparedScene, parameters);
 
 	BindRestirIndirectParameters(parameters, resources);
-
-	parameters->RestirIndirectWriteReconstructionGuides = ShouldUseRayReconstruction(frame.View.viewMode) ? 1u : 0u;
 
 	builder.Dispatch<RestirIndirectResolveCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u});
 }

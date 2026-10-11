@@ -25,28 +25,13 @@ void AccumulateRayTracingHitDirectLightSample(RayTracingHitSurfaceData surface,
 	{
 		visibility = RayTracedShadowVisibility::TraceDirectLightSample(surface.PositionWorld, surface.NormalWorld, lightSample, castsShadow).Visibility;
 	}
-	float3 diffuse = 0.0f.xxx;
-	float3 specular = 0.0f.xxx;
-	float3 subsurface = 0.0f.xxx;
 
-	SurfaceLighting::AccumulateDirectLightSample(viewDirWorld,
-	                                             surface.NormalWorld,
-	                                             surface.BaseColor,
-	                                             surface.Roughness,
-	                                             surface.Metallic,
-	                                             surface.DielectricF0,
-	                                             surface.SubsurfaceColor,
-	                                             surface.SubsurfaceStrength,
-	                                             true,
-	                                             true,
-	                                             true,
-	                                             lightSample,
-	                                             visibility,
-	                                             diffuse,
-	                                             specular,
-	                                             subsurface);
+	SurfaceLighting::Surface lightingSurface =
+	    {viewDirWorld, surface.NormalWorld, surface.BaseColor, surface.Roughness, surface.Metallic, surface.DielectricF0, surface.SubsurfaceColor, surface.SubsurfaceStrength, true, true, true};
 
-	incidentRadiance += diffuse + specular + subsurface;
+	const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, visibility);
+
+	incidentRadiance += contribution.Diffuse + contribution.Specular + contribution.Subsurface;
 }
 
 float3 ShadeRayTracingHitIncidentRadiance(RayTracingHitSurfaceData surface, float3 rayDirectionWorld, uint pathSampleIndex, uint bounceIndex, uint randomFrameIndex, bool traceShadows)

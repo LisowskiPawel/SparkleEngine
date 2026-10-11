@@ -5,4 +5,6 @@
 class FrameGraphBuilder;
 struct RenderFrameGraphResources;
 
+bool IsGpuSceneVisualizationActive(RenderViewMode viewMode) noexcept;
+
 void AddGpuSceneVisualizationPass(FrameGraphBuilder& builder, RenderViewportExtent sceneExtent, const RenderFrameGraphResources& resources);

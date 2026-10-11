@@ -14,6 +14,7 @@ enum class PixelFormat : std::uint16_t
 	R16G16_Float = 34,
 	D32_Float = 40,
 	R32_Float = 41,
+	R32_UInt = 42,
 	D24_UNorm_S8_UInt = 45,
 	BC1_UNorm = 71,
 	BC1_UNorm_Srgb = 72,

@@ -46,6 +46,8 @@ void CreateGBufferRenderTargets(FrameGraphBuilder& builder, RenderViewportExtent
 
 	targets.MotionVector = CreateGBufferColor(builder, "GBufferMotionVector", sceneExtent, GBufferFormats::MotionVector, {0.0f, 0.0f, 0.0f, 0.0f});
 
+	targets.InstanceIdentity = CreateGBufferColor(builder, "GBufferInstanceIdentity", sceneExtent, GBufferFormats::InstanceIdentity, {0.0f, 0.0f, 0.0f, 0.0f});
+
 	targets.DeviceZ = CreateGBufferDeviceZ(builder, sceneExtent, algorithm);
 
 	resources.ViewportProducts.Normals = targets.WorldNormal;

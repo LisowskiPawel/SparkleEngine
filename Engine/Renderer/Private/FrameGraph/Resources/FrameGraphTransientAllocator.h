@@ -34,7 +34,8 @@ public:
 	FrameGraphTransientAllocator& operator=(FrameGraphTransientAllocator&&) = delete;
 
 	void Reset() noexcept;
-	void Prepare(const FrameGraphTransientPlan& plan) noexcept;
+	// Returns true when replacing backing allocations; their native states restart.
+	bool Prepare(const FrameGraphTransientPlan& plan) noexcept;
 	AllocationRecord& Materialize(const FrameGraphTransientResourcePlan& transientPlan);
 	const AllocationRecord* FindAllocation(FrameGraphResourceHandle handle) const noexcept;
 

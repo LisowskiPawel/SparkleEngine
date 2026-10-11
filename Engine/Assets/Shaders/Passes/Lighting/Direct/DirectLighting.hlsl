@@ -26,30 +26,23 @@ void AddDirectLightSample(GBufferData gBuffer,
 		return;
 	}
 
-	float3 lightDiffuse;
-	float3 lightSpecular;
-	float3 lightSubsurface;
+	SurfaceLighting::Surface lightingSurface = {viewDirWorld,
+	                                            gBuffer.NormalWorld,
+	                                            gBuffer.BaseColor,
+	                                            gBuffer.Roughness,
+	                                            gBuffer.Metallic,
+	                                            gBuffer.DielectricF0,
+	                                            gBuffer.SubsurfaceColor,
+	                                            gBuffer.SubsurfaceStrength,
+	                                            DirectLightingEvaluateDiffuse != 0u,
+	                                            DirectLightingEvaluateSpecular != 0u,
+	                                            evaluateSubsurface};
 
-	SurfaceLighting::AccumulateDirectLightSample(viewDirWorld,
-	                                             gBuffer.NormalWorld,
-	                                             gBuffer.BaseColor,
-	                                             gBuffer.Roughness,
-	                                             gBuffer.Metallic,
-	                                             gBuffer.DielectricF0,
-	                                             gBuffer.SubsurfaceColor,
-	                                             gBuffer.SubsurfaceStrength,
-	                                             DirectLightingEvaluateDiffuse != 0u,
-	                                             DirectLightingEvaluateSpecular != 0u,
-	                                             evaluateSubsurface,
-	                                             lightSample,
-	                                             visibility,
-	                                             lightDiffuse,
-	                                             lightSpecular,
-	                                             lightSubsurface);
+	const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, visibility);
 
-	directDiffuse += lightDiffuse * sampleWeight;
-	directSpecular += lightSpecular * sampleWeight;
-	directSubsurface += lightSubsurface * sampleWeight;
+	directDiffuse += contribution.Diffuse * sampleWeight;
+	directSpecular += contribution.Specular * sampleWeight;
+	directSubsurface += contribution.Subsurface * sampleWeight;
 }
 
 [numthreads(8, 8, 1)]

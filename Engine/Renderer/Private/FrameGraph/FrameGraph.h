@@ -68,11 +68,13 @@ private:
 
 	template <typename TParameters> struct AllocatedParameterInstance final : AllocatedParameterInstanceBase
 	{
-		explicit AllocatedParameterInstance(const ShaderParameterStructMetadata<TParameters>& metadata) :
-		    Instance(metadata)
+		explicit AllocatedParameterInstance(const char* debugName, ShaderStageVisibility visibility) :
+		    Metadata(ShaderParameterStructBuilder<TParameters>::BuildMetadata(debugName, visibility)),
+		    Instance(Metadata)
 		{
 		}
 
+		ShaderParameterStructMetadata<TParameters> Metadata;
 		TypedPassParameterInstance<TParameters> Instance;
 	};
 
@@ -162,9 +164,7 @@ public:
 
 	template <typename TParameters> TypedPassParameterInstance<TParameters>& AllocParameters(const char* debugName, ShaderStageVisibility visibility = ShaderStageVisibility::None)
 	{
-		static const ShaderParameterStructMetadata<TParameters> metadata = ShaderParameterStructBuilder<TParameters>::BuildMetadata(debugName, visibility);
-
-		auto allocation = std::make_unique<AllocatedParameterInstance<TParameters>>(metadata);
+		auto allocation = std::make_unique<AllocatedParameterInstance<TParameters>>(debugName, visibility);
 		TypedPassParameterInstance<TParameters>& instance = allocation->Instance;
 		m_allocatedParameterInstances.push_back(std::unique_ptr<AllocatedParameterInstanceBase>(std::move(allocation)));
 		return instance;

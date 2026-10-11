@@ -76,6 +76,8 @@ The GBuffer, lighting, and GPU-scene visualization families independently produc
 
 When render and output extents differ, exact views use an explicit point selection so reconstruction does not invent category IDs, material values, or false colors. The producer must not assume source and destination extents match.
 
+GBuffer production declares one transient `R32_UInt` identity product in every mode. Raster binds an eighth attachment; inline and pipeline ray tracing bind a UAV. Each frontend uses one shader and a write uniform: GPU-instance visualization stores GPU-scene slot plus one, while other modes store zero; zero also denotes background. Ordinary material base color remains unchanged. The visualization shader owns the hash palette and maps zero to black. The identity product costs four bytes per pixel at render extent before allocation aliasing; its binding remains active when visualization is disabled. It is regenerated per frame and has no temporal history.
+
 The existing exposure owner continues to meter the ordinary Lit scene even while an exact diagnostic is visible. Exact presentation ignores the resulting exposure value, but keeping history warm prevents an unrelated adaptation reset when returning to Lit.
 
 ## Optional Independent Controls

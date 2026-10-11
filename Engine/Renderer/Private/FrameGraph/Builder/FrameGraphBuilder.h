@@ -103,8 +103,10 @@ public:
 		    parameters,
 		    [runtime, groupCount, diagnosticLabel](PassCommandContext& context, TypedPassParameterInstance<typename TShader::Parameters>& passParameters)
 		    {
-			    const bool valid = passParameters.Sync();
-			    assert(valid);
+			    if (!passParameters.Sync())
+			    {
+				    ReportInvalidShaderPassParameterSet(diagnosticLabel.c_str(), passParameters.GetPassParameterSet());
+			    }
 			    const bool dispatched = DispatchComputeShader(
 			        context.Resources,
 			        context.Commands,
@@ -243,8 +245,11 @@ private:
 		    shaderTableBuffer,
 		    [runtime, shaderTable, dimensions, diagnosticLabel](PassCommandContext& context, TypedPassParameterInstance<typename TRayGenerationShader::Parameters>& passParameters)
 		    {
-			    const bool valid = passParameters.Sync() && ValidateShaderParameters(passParameters.GetPassParameterSet(), diagnosticLabel.c_str());
-			    assert(valid);
+			    if (!passParameters.Sync())
+			    {
+				    ReportInvalidShaderPassParameterSet(diagnosticLabel.c_str(), passParameters.GetPassParameterSet());
+			    }
+			    ValidateShaderParameters(passParameters.GetPassParameterSet(), diagnosticLabel.c_str());
 			    BindRayTracingShaderPass(context.Commands, context.Resources, runtime.BindingLayout, runtime.Pipeline, passParameters.GetPassParameterSet());
 			    context.Commands.TraceRays(
 			        TraceRaysDesc{

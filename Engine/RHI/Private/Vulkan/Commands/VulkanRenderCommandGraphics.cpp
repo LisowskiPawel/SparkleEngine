@@ -106,10 +106,22 @@ void VulkanRenderCommandList::ClearRenderTarget(RhiCpuDescriptorHandle renderTar
 	}
 
 	VkClearValue clearValue = {};
-	clearValue.color.float32[0] = color[0];
-	clearValue.color.float32[1] = color[1];
-	clearValue.color.float32[2] = color[2];
-	clearValue.color.float32[3] = color[3];
+	if (m_descriptorService == nullptr)
+	{
+		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan attachment clear requires descriptor metadata.");
+	}
+	const PixelFormat format = m_descriptorService->ResolveRecordingImageView(imageView).Format;
+	for (std::size_t component = 0; component < 4u; ++component)
+	{
+		if (format == PixelFormat::R32_UInt)
+		{
+			clearValue.color.uint32[component] = static_cast<std::uint32_t>(color[component]);
+		}
+		else
+		{
+			clearValue.color.float32[component] = color[component];
+		}
+	}
 	const VkClearAttachment clearAttachment{.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, .colorAttachment = colorAttachment, .clearValue = clearValue};
 	const VkClearRect clearRect{.rect = m_scissorRect, .baseArrayLayer = 0, .layerCount = 1};
 	vkCmdClearAttachments(m_commandBuffer, 1, &clearAttachment, 1, &clearRect);
@@ -283,7 +295,7 @@ VkImageAspectFlags VulkanRenderCommandList::ResolveDepthStencilAspectMask(VkImag
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan depth-stencil aspect resolution requires an active descriptor manager.");
 	}
-	const VkImageAspectFlags aspectMask = m_descriptorService->ResolveImageViewAspectMask(imageView);
+	const VkImageAspectFlags aspectMask = m_descriptorService->ResolveRecordingImageView(imageView).AspectMask;
 	if (aspectMask == 0)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan depth-stencil view has no registered image aspect.");

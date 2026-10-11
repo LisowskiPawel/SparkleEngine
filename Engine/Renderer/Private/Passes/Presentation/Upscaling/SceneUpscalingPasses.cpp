@@ -9,7 +9,6 @@
 #include "Passes/Presentation/Upscaling/LinearUpscale.h"
 #include "Passes/Presentation/Upscaling/PointUpscale.h"
 #include "Upscaling/NvidiaDlss/NvidiaDlssUpscale.h"
-#include "Upscaling/UpscalerPass.h"
 #include "Upscaling/UpscalerSettings.h"
 
 void AddSceneUpscalingPasses(
@@ -41,18 +40,8 @@ void AddSceneUpscalingPasses(
 			AddLinearUpscalePass(builder, resources.Presentation.SceneColorInput, resources.Presentation.ResolvedSceneColor, settings.OutputExtent);
 			return;
 		case EUpscalerProviderKind::NvidiaDlss:
-		{
-			const UpscalerPassResources inputs{
-			    .InputColor = resources.Presentation.SceneColorInput,
-			    .OutputColor = resources.Presentation.ResolvedSceneColor,
-			    .Depth = resources.Transient.GBuffer.DeviceZ,
-			    .MotionVectors = resources.Transient.GBuffer.MotionVector,
-			    .Exposure = resources.Transient.Exposure};
-
-			AddNvidiaDlssUpscalePass(builder, settings.RenderExtent, settings.OutputExtent, imageProviders, inputs);
-
+			AddNvidiaDlssUpscalePass(builder, settings.RenderExtent, settings.OutputExtent, imageProviders, resources);
 			return;
-		}
 		default:
 			throw Diagnostics::Error("Scene upscaling graph construction received an invalid provider.");
 	}

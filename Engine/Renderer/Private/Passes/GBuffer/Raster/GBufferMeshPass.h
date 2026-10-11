@@ -43,6 +43,7 @@ struct GBufferGraphParameters final
 	ShaderRenderTarget Emissive;
 	ShaderRenderTarget Subsurface;
 	ShaderRenderTarget MotionVector;
+	ShaderRenderTarget InstanceIdentity;
 	ShaderDepthTarget DeviceZ;
 	GBufferShaderParameters Shader;
 

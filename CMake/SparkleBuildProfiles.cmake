@@ -73,6 +73,8 @@ set(SPARKLE_MSVC_DEVELOPMENT_COMPILE_OPTIONS
 set(SPARKLE_MSVC_SHIPPING_COMPILE_OPTIONS
     /O2      # Enable regular speed optimizations for final runtime performance.
     /Ob2     # Let the compiler expand suitable inline functions.
+    /Zi      # Retain matching native symbols outside the product package.
+    /FS      # Serialize compiler PDB writes.
     /DNDEBUG # Disable standard assert paths for shipping-style builds.
 )
 
@@ -133,7 +135,10 @@ endforeach()
 
 foreach(profile IN LISTS SPARKLE_SHIPPING_CONFIGURATIONS)
     if(MSVC)
-        sparkle_set_profile_flags(${profile} "${SPARKLE_MSVC_SHIPPING_COMPILE_FLAGS}" "${SPARKLE_MSVC_SHIPPING_COMPILE_FLAGS}" "" "" "" "")
+        sparkle_set_profile_flags(${profile} "${SPARKLE_MSVC_SHIPPING_COMPILE_FLAGS}" "${SPARKLE_MSVC_SHIPPING_COMPILE_FLAGS}"
+            "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF"
+            "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF"
+            "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF" "")
     else()
         sparkle_set_profile_flags(${profile} "${SPARKLE_CLANG_SHIPPING_COMPILE_FLAGS}" "${SPARKLE_CLANG_SHIPPING_COMPILE_FLAGS}" "" "" "" "")
     endif()

@@ -5,7 +5,6 @@
 #include "/Engine/Resources/ViewCameraUniformData.hlsli"
 #include "/Engine/Resources/ViewTemporalUniformData.hlsli"
 
-#include "/Engine/Debug/InstanceView.hlsli"
 #include "/Engine/Geometry/ScreenSpace.hlsli"
 #include "/Engine/Geometry/Transforms.hlsli"
 #include "/Engine/Passes/GBuffer/GBufferPacking.hlsli"
@@ -22,6 +21,7 @@ RWTexture2D<float4> GBufferEmissive;
 RWTexture2D<float4> GBufferSubsurface;
 RWTexture2D<float> GBufferDeviceZ;
 RWTexture2D<float2> GBufferMotionVector;
+RWTexture2D<uint> GBufferInstanceIdentity;
 RaytracingAccelerationStructure SceneTlas;
 
 namespace RayTracingGBuffer
@@ -72,12 +72,12 @@ namespace RayTracingGBuffer
 		GBufferSubsurface[pixelCoord] = GBufferPacking::PackSkySubsurface();
 		GBufferDeviceZ[pixelCoord] = GBufferPacking::PackSkyDeviceZ();
 		GBufferMotionVector[pixelCoord] = 0.0f.xx;
+		GBufferInstanceIdentity[pixelCoord] = 0u;
 	}
 
 	void StoreHit(uint2 pixelCoord, RayTracingHitSurfaceData surface)
 	{
-		const float3 baseColor = InstanceView::ApplyInstanceVisualization(surface.BaseColor, surface.GpuSceneSlot);
-		GBufferBaseColor[pixelCoord] = GBufferPacking::PackBaseColor(baseColor, surface.Alpha, surface.AlphaMode, RayTracingHitSurface::AlphaModeBlended);
+		GBufferBaseColor[pixelCoord] = GBufferPacking::PackBaseColor(surface.BaseColor, surface.Alpha, surface.AlphaMode, RayTracingHitSurface::AlphaModeBlended);
 		GBufferWorldNormal[pixelCoord] = GBufferPacking::PackWorldNormal(surface.NormalWorld);
 		GBufferWorldTangent[pixelCoord] = GBufferPacking::PackWorldTangent(surface.TangentWorld);
 		GBufferMaterial[pixelCoord] = GBufferPacking::PackMaterial(surface.Metallic, surface.Roughness, surface.AmbientOcclusion, surface.DielectricF0);
@@ -85,6 +85,7 @@ namespace RayTracingGBuffer
 		GBufferSubsurface[pixelCoord] = GBufferPacking::PackSubsurface(surface.SubsurfaceColor, surface.SubsurfaceStrength);
 		GBufferDeviceZ[pixelCoord] = ComputeDeviceZ(surface.PositionWorld);
 		GBufferMotionVector[pixelCoord] = ComputeMotionVector(surface);
+		GBufferInstanceIdentity[pixelCoord] = GBufferWriteInstanceIdentity != 0u ? surface.GpuSceneSlot + 1u : 0u;
 	}
 
 	void StoreTraceResult(uint2 pixelCoord, RayTracingTraceResult trace, PrimaryRay ray)
