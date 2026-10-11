@@ -40,7 +40,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 | Identity / FR-01 | Identity, dependency pins, notices; earlier Shipping/Empty baseline passed locally. | Historical asset rights, exact redistribution/helper/symbol admission and current-candidate qualification. |
 | PD-1: Game / Editor | Product shells, shared settings path, dedicated lens-effect passes; bounded build/startup checks. | Input/DPI, settings/failure routes, Editor edit/save, unsupported providers and visual proof. New effect toggles remain deferred. |
 | PD-2: source / Launcher | Typed sync/configure/build/cook/run/clean and owner-check routes exist. | Cold/warm and controlled failures; independent source-adopter rehearsal. |
-| PD-3 / FR-02: package | Transactional stage, manifests, dependency and ZIP verification exist. | Reviewed inputs; installed content-store sync/cook/run/remove; exact archive and clean-machine rehearsal. |
+| PD-3 / FR-02: package | Transactional stage, manifests, dependency/ZIP verification and input audit exist; compiler-selected app-local CRT and separate native symbols are declared. | Reviewed rights/closure/symbol inputs; installed content-store sync/cook/run/remove; exact archive and clean-machine rehearsal. |
 | PD-4: diagnostics | Local export, retention, symbols and replacement/review tools; fixture checks. | Native packaged crash/hang/GPU/privacy and self-service journeys; full symbol correlation. Automatic crash/hang collection and shader-symbol correlation are unavailable. |
 | FR-03 to FR-08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
 

@@ -173,7 +173,7 @@ function Test-PackageStage
 function Test-PackageArchive
 {
     param([string] $ArchivePath, [string] $Stage, $Manifest)
-    $expected = @{}
+    $expected = [Collections.Generic.Dictionary[string,object]]::new([StringComparer]::Ordinal)
     foreach ($file in $Manifest.Files) { $expected[$file.Path] = $file }
     $manifestPath = Join-Path $Stage 'manifests/sparkle-package-manifest.json'
     $expected['manifests/sparkle-package-manifest.json'] = @{
@@ -195,7 +195,7 @@ function Test-PackageArchive
             try { $digest = [BitConverter]::ToString($hash.ComputeHash($stream)).Replace('-','').ToLowerInvariant() }
             finally { $stream.Dispose(); $hash.Dispose() }
             if ($digest -cne $file.Sha256) { throw "Archive hash mismatch: '$($entry.FullName)'." }
-            $expected.Remove($entry.FullName)
+            [void] $expected.Remove($entry.FullName)
         }
         if ($expected.Count -ne 0) { throw 'Missing archive members.' }
     }

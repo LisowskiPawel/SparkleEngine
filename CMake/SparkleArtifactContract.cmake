@@ -179,6 +179,31 @@ function(_sparkle_set_target_artifact_directories target_name runtime_root symbo
         message(FATAL_ERROR "Unknown Sparkle target '${target_name}'")
     endif()
 
+    get_target_property(_sparkle_target_type ${target_name} TYPE)
+    if(MSVC AND _sparkle_target_type MATCHES "^(EXECUTABLE|SHARED_LIBRARY|MODULE_LIBRARY)$")
+        # Keep the PE/PDB join without embedding the author's absolute PDB path.
+        target_link_options(${target_name} PRIVATE
+            "$<$<CONFIG:ShippingEditor,ShippingGame>:/PDBALTPATH:$<TARGET_PDB_FILE_NAME:${target_name}>>")
+        set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+        set(CMAKE_INSTALL_DEBUG_LIBRARIES FALSE)
+        set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY FALSE)
+        set(CMAKE_INSTALL_UCRT_LIBRARIES FALSE)
+        set(CMAKE_INSTALL_MFC_LIBRARIES FALSE)
+        set(CMAKE_INSTALL_OPENMP_LIBRARIES FALSE)
+        include(InstallRequiredSystemLibraries)
+        if(NOT CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+            message(FATAL_ERROR "MSVC redistributable runtime is unavailable for ${target_name}")
+        endif()
+        add_custom_command(TARGET ${target_name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+                "$<TARGET_FILE_DIR:${target_name}>"
+            COMMAND_EXPAND_LISTS
+            VERBATIM)
+        set_property(TARGET ${target_name} PROPERTY
+            SPARKLE_MSVC_RUNTIME_FILES "${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}")
+    endif()
+
     set_target_properties(${target_name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${runtime_root}/$<CONFIG>"
         LIBRARY_OUTPUT_DIRECTORY "${runtime_root}/$<CONFIG>"

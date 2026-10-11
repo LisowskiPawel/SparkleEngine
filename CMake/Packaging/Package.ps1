@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string] $BuildDirectory = '',
-    [AllowEmptyString()][string] $InputsPath = ''
+    [AllowEmptyString()][string] $InputsPath = '',
+    [switch] $AuditInputs
 )
 
 Set-StrictMode -Version Latest
@@ -10,6 +11,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 Add-Type -AssemblyName System.IO.Compression
 . (Join-Path $PSScriptRoot 'PackageVerification.ps1')
 . (Join-Path $PSScriptRoot 'PackageDependencies.ps1')
+. (Join-Path $PSScriptRoot 'PackageInputs.ps1')
 
 $repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 if ($BuildDirectory -eq '') { $BuildDirectory = Join-Path $repositoryRoot 'build' }
@@ -77,6 +79,51 @@ function Assert-ReleaseCandidateUnchanged
     }
 }
 
+function New-PackageStage
+{
+    param([string] $RepositoryRoot, [string] $Stage, $Files, $Manifest)
+    [void] (New-Item -ItemType Directory -Path $Stage)
+    foreach ($file in $Files)
+    {
+        $source = Assert-PackageFile $RepositoryRoot $file.Source $file.Size $file.Sha256
+        $destination = Join-Path $Stage $file.Path
+        [void] (New-Item -ItemType Directory -Force -Path (Split-Path $destination))
+        [IO.File]::Copy($source, $destination, $false)
+        [IO.File]::SetAttributes($destination, [IO.FileAttributes]::ReadOnly)
+    }
+    [void] (New-Item -ItemType Directory -Force -Path (Join-Path $Stage 'manifests'))
+    $manifestPath = Join-Path $Stage 'manifests/sparkle-package-manifest.json'
+    $Manifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+    [IO.File]::SetAttributes($manifestPath, [IO.FileAttributes]::ReadOnly)
+}
+
+function Write-PackageArchive
+{
+    param([string] $ArchivePath, [string] $Stage, $Manifest)
+    $zip = [IO.Compression.ZipFile]::Open($ArchivePath, [IO.Compression.ZipArchiveMode]::Create)
+    try
+    {
+        $paths = [string[]] (@($Manifest.Files.Path) + @('manifests/sparkle-package-manifest.json'))
+        [Array]::Sort($paths, [StringComparer]::Ordinal)
+        foreach ($path in $paths)
+        {
+            $entry = $zip.CreateEntry($path, [IO.Compression.CompressionLevel]::Optimal)
+            $entry.LastWriteTime = [DateTimeOffset]::new(1980,1,1,0,0,0,[TimeSpan]::Zero)
+            $entry.ExternalAttributes = 1
+            $reader = [IO.File]::OpenRead((Join-Path $Stage $path))
+            try
+            {
+                $writer = $entry.Open()
+                try { $reader.CopyTo($writer) }
+                finally { $writer.Dispose() }
+            }
+            finally { $reader.Dispose() }
+        }
+    }
+    finally { $zip.Dispose() }
+    [IO.File]::SetAttributes($ArchivePath, [IO.FileAttributes]::ReadOnly)
+}
+
 try
 {
     # This entry owns only the canonical workspace; it never deletes an earlier stage/archive.
@@ -104,6 +151,13 @@ try
         $report.BuildCache = @{ Size = (Get-Item -LiteralPath $cache).Length; Sha256 = (Get-FileHash -LiteralPath $cache).Hash.ToLowerInvariant() }
     }
 
+    if ($AuditInputs)
+    {
+        $report.InputAudit = Get-PackageInputAudit $repositoryRoot $BuildDirectory $version
+        Assert-ReleaseCandidateUnchanged
+        throw 'Input audit retained. Review its remaining obligations; discovery does not admit release payloads.'
+    }
+
     if ([string]::IsNullOrWhiteSpace($InputsPath) -or !(Test-Path -LiteralPath $InputsPath -PathType Leaf))
     {
         throw 'Missing reviewed release inputs. Rights, exact helper/DLL closure and symbol correlation must be admitted before build/cook/stage. See Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs.'
@@ -125,52 +179,8 @@ try
         if ($receipt.Status -cne 'PASS' -or $receipt.Gate -cne $name -or $receipt.Revision -cne $report.Revision -or
             $receipt.SourceInputsSha256 -cne $report.SourceInputsSha256) { throw "Unresolved or stale $name admission." }
     }
-    $products = @()
-    foreach ($configuration in @('ShippingEditor','ShippingGame'))
-    {
-        $declaration = Get-Content -LiteralPath (Join-Path $BuildDirectory "private/release-products/$configuration.json") -Raw | ConvertFrom-Json
-        if ($declaration.Version -cne $version) { throw 'Configured release identity is stale.' }
-        $products += @($declaration.Products | Where-Object Configuration -eq $configuration)
-    }
-    $manifest = [ordered]@{
-        Version = $version; Revision = $report.Revision; SourceInputsSha256 = $report.SourceInputsSha256
-        Signing = 'UnsignedInternal'; ProjectPath = 'content/Showcase'; EnginePath = 'engine'; ContentStore = 'Content/Showcase'
-        Products = @($products | Select-Object Component, Target, Configuration, Path)
-        SystemImports = @($inputs.SystemImports)
-        Files = @($inputs.Files | Select-Object Path, Size, Sha256, Component, Role, Permission, Owner, Origin, License, Notice, Signature)
-    }
-    Assert-PackageManifest $manifest
-    Assert-PackageLayout $manifest
-    foreach ($product in $products)
-    {
-        $member = @($inputs.Files | Where-Object Path -eq $product.Path)
-        if ($member.Count -ne 1 -or $member[0].Component -cne $product.Component -or
-            [IO.Path]::GetFullPath((Join-Path $repositoryRoot $member[0].Source)) -ne $product.Source -or
-            $product.Source -eq '') { throw "Missing/incompatible product admission: '$($product.Component)'." }
-    }
-    foreach ($path in @('tools/CMake/bin/cmake.exe','manifests/sparkle-sbom.spdx.json','manifests/sparkle-provenance.json',
-        'tools/Diagnostics/ExportDiagnostics.ps1','tools/Diagnostics/IncidentIdentity.ps1','tools/Diagnostics/PackageVerification.ps1',
-        'docs/SUPPORT.md','docs/SECURITY.md','docs/KNOWN_ISSUES.md'))
-    {
-        if (@($inputs.Files | Where-Object Path -eq $path).Count -ne 1) { throw "Missing required input: '$path'." }
-    }
-    foreach ($file in $inputs.Files)
-    {
-        [void] (Assert-PackageFile $repositoryRoot $file.Source $file.Size $file.Sha256)
-    }
-    foreach ($binding in @(
-        @('tools/Diagnostics/ExportDiagnostics.ps1','CMake/Packaging/ExportDiagnostics.ps1'),
-        @('tools/Diagnostics/IncidentIdentity.ps1','CMake/Packaging/IncidentIdentity.ps1'),
-        @('tools/Diagnostics/PackageVerification.ps1','CMake/Packaging/PackageVerification.ps1'),
-        @('docs/SUPPORT.md','SUPPORT.md'), @('docs/SECURITY.md','SECURITY.md'), @('docs/KNOWN_ISSUES.md','KNOWN_ISSUES.md')))
-    {
-        $file = @($inputs.Files | Where-Object Path -ceq $binding[0])[0]
-        if ($file.Source -cne $binding[1] -or $file.Component -cne 'Shared' -or
-            $file.Role -cne $(if ($binding[0].EndsWith('.ps1')) { 'Helper' } else { 'Metadata' }))
-        {
-            throw 'Diagnostic helper/public policy admission differs from its source owner.'
-        }
-    }
+    $products = @(Get-PackageProducts $BuildDirectory $version)
+    $manifest = New-PackageManifest $repositoryRoot $version $report.Revision $report.SourceInputsSha256 $products $inputs
     $report.Steps += @{ Name = 'Admission'; Status = 'PASS' }
 
     $phase = 'Build'
@@ -191,45 +201,17 @@ try
     $phase = 'Stage'
     Assert-ReleaseCandidateUnchanged
     $stage = Join-Path $transactionRoot 'stage'
-    [void] (New-Item -ItemType Directory -Path $stage)
-    foreach ($file in $inputs.Files)
-    {
-        $source = Assert-PackageFile $repositoryRoot $file.Source $file.Size $file.Sha256
-        $destination = Join-Path $stage $file.Path
-        [void] (New-Item -ItemType Directory -Force -Path (Split-Path $destination))
-        [IO.File]::Copy($source, $destination, $false)
-        [IO.File]::SetAttributes($destination, [IO.FileAttributes]::ReadOnly)
-    }
-    [void] (New-Item -ItemType Directory -Force -Path (Join-Path $stage 'manifests'))
-    $manifestPath = Join-Path $stage 'manifests/sparkle-package-manifest.json'
-    $manifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
-    [IO.File]::SetAttributes($manifestPath, [IO.FileAttributes]::ReadOnly)
+    New-PackageStage $repositoryRoot $stage $inputs.Files $manifest
+    $report.Steps += @{ Name = 'Stage'; Status = 'PASS' }
     $phase = 'Verify'
     Test-PackageStage $stage $manifest
     Test-PackageDependencyClosure $stage $manifest
     Test-PackageMetadata $stage $manifest
-    $report.Steps += @{ Name = 'Stage/Verify'; Status = 'PASS' }
+    $report.Steps += @{ Name = 'Verify'; Status = 'PASS' }
 
     $phase = 'Package'
     $partial = Join-Path $transactionRoot 'archive.partial'
-    $zip = [IO.Compression.ZipFile]::Open($partial, [IO.Compression.ZipArchiveMode]::Create)
-    try
-    {
-        $paths = [string[]] (@($manifest.Files.Path) + @('manifests/sparkle-package-manifest.json'))
-        [Array]::Sort($paths, [StringComparer]::Ordinal)
-        foreach ($path in $paths)
-        {
-            $entry = $zip.CreateEntry($path, [IO.Compression.CompressionLevel]::Optimal)
-            $entry.LastWriteTime = [DateTimeOffset]::new(1980,1,1,0,0,0,[TimeSpan]::Zero)
-            $entry.ExternalAttributes = 1
-            $reader = [IO.File]::OpenRead((Join-Path $stage $path))
-            $writer = $entry.Open()
-            try { $reader.CopyTo($writer) }
-            finally { $reader.Dispose(); $writer.Dispose() }
-        }
-    }
-    finally { $zip.Dispose() }
-    [IO.File]::SetAttributes($partial, [IO.FileAttributes]::ReadOnly)
+    Write-PackageArchive $partial $stage $manifest
     Test-PackageArchive $partial $stage $manifest
     Test-PackageStage $stage $manifest
     Test-PackageDependencyClosure $stage $manifest
@@ -239,7 +221,7 @@ try
     $archive = Join-Path $outputRoot "SparkleEngine-v$version-windows-x64-unsigned-internal-$archiveHash.zip"
     [IO.File]::Move($partial, $archive)
     $report.Archive = @{ Path = [IO.Path]::GetFileName($archive); Sha256 = $archiveHash; Size = (Get-Item -LiteralPath $archive).Length }
-    $report.Steps += @{ Name = 'Package/ArchiveVerify'; Status = 'PASS' }
+    $report.Steps += @{ Name = 'Package'; Status = 'PASS' }
     $report.Status = 'PASS'
 }
 catch
@@ -247,21 +229,24 @@ catch
     $report.Steps += @{ Name = $phase; Status = 'BLOCKED'; Reason = $_.Exception.Message }
     foreach ($skipped in @('Build','Cook','Stage','Verify','Package'))
     {
-        if ($skipped -ne $phase -and !@($report.Steps | Where-Object Name -like "$skipped*").Count)
+        if ($skipped -ne $phase -and !@($report.Steps | Where-Object Name -eq $skipped).Count)
         {
             $report.Steps += @{ Name = $skipped; Status = 'SKIPPED'; Reason = "Predecessor $phase did not pass." }
         }
     }
-    Write-Error $_ -ErrorAction Continue
+    [Console]::Error.WriteLine($_.Exception.Message)
 }
 finally
 {
     # Failed transactions are retained for diagnosis under .partial; no ZIP is published from them.
-    if (Test-Path -LiteralPath $transactionRoot -PathType Container)
+    try
     {
-        $report | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $transactionRoot 'report.json') -Encoding UTF8
-        Write-Output "Release report: $transactionRoot/report.json"
+        if (Test-Path -LiteralPath $transactionRoot -PathType Container)
+        {
+            $report | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $transactionRoot 'report.json') -Encoding UTF8
+            Write-Output "Release report: $transactionRoot/report.json"
+        }
     }
-    if ($null -ne $lock) { $lock.Dispose() }
+    finally { if ($null -ne $lock) { $lock.Dispose() } }
 }
 if ($report.Status -ne 'PASS') { exit 1 }

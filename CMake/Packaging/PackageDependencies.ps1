@@ -94,7 +94,7 @@ function Test-PackageDependencyClosure
     {
         if ($dependency.Name -notmatch '^[a-zA-Z0-9_.-]+\.dll$' -or !$system.Add($dependency.Name) -or
             $dependency.Owner -notin @('Windows','GraphicsDriver') -or [string]::IsNullOrWhiteSpace($dependency.Requirement) -or
-            $dependency.Name -match '^(Qt[56]|vcruntime|msvcp|dxcompiler|dxil|slang|sl\.|nvngx|Sparkle)')
+            $dependency.Name -match '^(Qt[56]|vcruntime|msvcp|concrt|dxcompiler|dxil|slang|sl\.|nvngx|Sparkle)')
         {
             throw 'Unqualified or duplicate external runtime dependency.'
         }

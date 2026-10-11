@@ -369,6 +369,7 @@ if(WIN32)
     add_custom_command(TARGET SparkleLauncher POST_BUILD
         COMMAND ${_sparkle_qt_deploy_command}
             --verbose 0
+            --no-compiler-runtime
             --dir "$<TARGET_FILE_DIR:SparkleLauncher>"
             "$<TARGET_FILE:SparkleLauncher>"
         COMMENT "Deploying Qt runtime for SparkleLauncher artifact"

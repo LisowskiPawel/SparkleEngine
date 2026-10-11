@@ -159,6 +159,15 @@ Selected source and cooked content live under `%LOCALAPPDATA%/SparkleEngine/Cont
 
 The [package owner](#current-package-entry) consumes a reviewed JSON input file. Keep it outside the source snapshot, under ignored release evidence. CMake generates exact product paths under `build/private/release-products/<configuration>.json`; package membership is not inferred from development directories.
 
+Prepare those inputs with the same owner:
+
+```powershell
+cmake -S . -B build
+powershell -NoProfile -File CMake/Packaging/Package.ps1 -AuditInputs
+```
+
+The audit retains `artifacts/releases/0.1.0/.partial-<id>/report.json`: binary/DLL hashes and imports, compiler-selected app-local CRT hashes/signatures and native PE/PDB identities for the six configured products. Missing or mismatched inputs remain blocked. It exits 1 without building, cooking or publishing an archive; discovery does not approve rights, complete dependency closure or shader symbols. Build the named targets in their declared configurations before repeating the audit. Shipping binaries retain the PDB filename without the author's absolute symbol path; PDBs stay separate.
+
 | Input field | Required meaning |
 | --- | --- |
 | `Revision`, `SourceInputsSha256` | Exact Git revision and deterministic hash of repository-relative tracked/untracked nonignored file hashes, including deletions. The admission run retains `source-inputs.json` and the fingerprint in `report.json`; review that snapshot before admitting payloads. |
