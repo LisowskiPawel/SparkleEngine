@@ -1,5 +1,7 @@
 # Stable Identifier Architecture Coverage
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** exact identifier-to-owner routing ledger; no implementation or acceptance result is inferred
 
 **Scope:** exact source-authority identifiers and their Architecture owner; feature-local capability and acceptance IDs remain owned by their dossiers
@@ -20,10 +22,10 @@
 | `PGD-03` | [Workload Studies](../PerformanceDiagnostics/WorkloadStudies/README.md), [Renderer](../../Modules/Engine/Renderer/README.md), [RHI](../../Modules/Engine/RHI/README.md) |
 | `PGD-04` | [External Capture](../PerformanceDiagnostics/ExternalCapture/README.md), [Workload Studies](../PerformanceDiagnostics/WorkloadStudies/README.md) |
 | `PGD-05` | [Python Automation And Analysis](../../Modules/Tools/PythonAutomationAndAnalysis.md), [Workload Studies](../PerformanceDiagnostics/WorkloadStudies/README.md) |
-| `PGD-06` | [Neural Training/Evaluation](../NeuralGraphics/TrainingAndEvaluation.md), [Discovery](../NeuralGraphics/Discovery.md) |
-| `PGD-07` | [Model To Kernel/Runtime](../NeuralGraphics/ModelToKernelAndRuntimeInference.md), [Shader System](../ShaderSystem/README.md), [Neural plan](../NeuralGraphics/Plan.md) |
-| `PGD-08` | [Neural acceptance](../NeuralGraphics/Acceptance.md), [Workload Studies](../PerformanceDiagnostics/WorkloadStudies/README.md), [portfolio assembly plan](../GraphicsPortfolio/Plan.md); workload owners retain original case results |
-| `PGD-09` | [contribution](../GraphicsPortfolio/UpstreamContribution.md) and [transfer](../GraphicsPortfolio/KnowledgeTransfer.md) cards; actual personal/mentoring evidence remains external |
+| `PGD-06` | [Neural Training/Evaluation](../NeuralGraphics/README.md#neural-graphics-training-and-evaluation), [Discovery](../NeuralGraphics/Discovery.md) |
+| `PGD-07` | [Model To Kernel/Runtime](../NeuralGraphics/README.md#model-to-kernel-and-runtime-inference), [Shader System](../ShaderSystem/README.md), [Neural plan](../NeuralGraphics/Plan.md) |
+| `PGD-08` | [Neural acceptance](../NeuralGraphics/README.md#neural-graphics-acceptance), [Workload Studies](../PerformanceDiagnostics/WorkloadStudies/README.md), [portfolio assembly plan](../GraphicsPortfolio/README.md#graphics-portfolio-delivery-plan); workload owners retain original case results |
+| `PGD-09` | [contribution](../GraphicsPortfolio/README.md#upstream-graphics-contribution) and [transfer](../GraphicsPortfolio/README.md#graphics-knowledge-transfer) cards; actual personal/mentoring evidence remains external |
 
 ## Research Reference Routing
 
@@ -34,7 +36,7 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 | ID | Architecture coverage |
 | --- | --- |
 | `NS-REAL` | [RHI](../../Modules/Engine/RHI/README.md), [Renderer](../../Modules/Engine/Renderer/README.md), [Product Execution](../ProductExecutionTraces.md), [Build/Packaging](../../Modules/BuildAndPackaging/README.md) |
-| `NS-MATH-DATA` | [Core](../../Modules/Engine/Core/README.md), [Renderer Lighting](../../Modules/Engine/Renderer/Features/Lighting/README.md), [Temporal Sampling](../../Modules/Engine/Renderer/Features/FrameExecution/TemporalSamplingAndHistory.md), [Neural Training/Evaluation](../NeuralGraphics/TrainingAndEvaluation.md) |
+| `NS-MATH-DATA` | [Core](../../Modules/Engine/Core/README.md), [Renderer Lighting](../../Modules/Engine/Renderer/Features/Lighting/README.md), [Temporal Sampling](../../Modules/Engine/Renderer/Features/FrameExecution/TemporalSamplingAndHistory.md), [Neural Training/Evaluation](../NeuralGraphics/README.md#neural-graphics-training-and-evaluation) |
 | `NS-EVIDENCE` | [Performance Diagnostics](../PerformanceDiagnostics/README.md), [RHI Diagnostics](../../Modules/Engine/RHI/Features/DiagnosticsAndCapture/README.md), [CI And Regression](../../Modules/BuildAndPackaging/README.md#automation) |
 | `NS-OWNERSHIP` | [Whole Repository Map](../../WholeRepositoryMap.md), module inventories, [Feature Execution](../FeatureExecutionTraces.md), [Product Execution](../ProductExecutionTraces.md) |
 | `NS-ADOPTION` | [Adoption And Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review), [Packaging](../../Modules/BuildAndPackaging/PackagingAndInstallation.md), [Launcher](../../Modules/Tools/Launcher/README.md) |
@@ -45,17 +47,17 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 | ID | Architecture owner or explicit negative owner |
 | --- | --- |
 | `PGE-01` | [Adoption And Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review), [Launcher](../../Modules/Tools/Launcher/README.md), [Showcase](../../Modules/Projects/Showcase/README.md) |
-| `PGE-02` | [Renderer Lighting](../../Modules/Engine/Renderer/Features/Lighting/README.md), [Renderer Ray Tracing](../../Modules/Engine/Renderer/Features/RayTracing/README.md), [RHI Ray Tracing](../../Modules/Engine/RHI/Features/PipelineAndExecution/RayTracing.md) |
-| `PGE-03` | [Neural Graphics](../NeuralGraphics/README.md); current vendor-only inference remains under [Image Reconstruction](../../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ImageReconstructionAndUpscaling.md) |
-| `PGE-04` | [Model To Kernel And Runtime Inference](../NeuralGraphics/ModelToKernelAndRuntimeInference.md), currently absent |
+| `PGE-02` | [Renderer Lighting](../../Modules/Engine/Renderer/Features/Lighting/README.md), [Renderer Ray Tracing](../../Modules/Engine/Renderer/Features/RayTracing/README.md), [RHI Ray Tracing](../../Modules/Engine/RHI/Features/PipelineAndExecution/README.md#ray-tracing) |
+| `PGE-03` | [Neural Graphics](../NeuralGraphics/README.md); current vendor-only inference remains under [Image Reconstruction](../../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/README.md#image-reconstruction-and-upscaling) |
+| `PGE-04` | [Model To Kernel And Runtime Inference](../NeuralGraphics/README.md#model-to-kernel-and-runtime-inference), currently absent |
 | `PGE-05` | [Performance Diagnostics](../PerformanceDiagnostics/README.md), [Frame Execution](../../Modules/Engine/Renderer/Features/FrameExecution/README.md), [Tasks](../../Modules/Engine/Tasks/README.md) |
 | `PGE-06` | [RHI Diagnostics](../../Modules/Engine/RHI/Features/DiagnosticsAndCapture/README.md), [Renderer Diagnostics](../../Modules/Engine/Renderer/Features/ViewportAndDiagnostics/README.md), [ShaderCompiler](../../Modules/Tools/ShaderCompiler/README.md) |
 | `PGE-07` | [Build/Packaging](../../Modules/BuildAndPackaging/README.md), module C++ inventories, [Python Automation And Analysis](../../Modules/Tools/PythonAutomationAndAnalysis.md) |
-| `PGE-08` | [Core](../../Modules/Engine/Core/README.md), [Source Importers](../../Modules/Tools/SourceImporters/README.md), [Renderer](../../Modules/Engine/Renderer/README.md), [Neural Training](../NeuralGraphics/TrainingAndEvaluation.md) |
+| `PGE-08` | [Core](../../Modules/Engine/Core/README.md), [Source Importers](../../Modules/Tools/SourceImporters/README.md), [Renderer](../../Modules/Engine/Renderer/README.md), [Neural Training](../NeuralGraphics/README.md#neural-graphics-training-and-evaluation) |
 | `PGE-09` | [RHI](../../Modules/Engine/RHI/README.md), [Shader System](../ShaderSystem/README.md), [Shader Runtime](../../Modules/Engine/Renderer/Features/ShaderRuntime/README.md) |
 | `PGE-10` | [Tasks](../../Modules/Engine/Tasks/README.md), [Multithreaded Engine](../MultithreadedEngine.md), [Frame Execution](../../Modules/Engine/Renderer/Features/FrameExecution/README.md) |
-| `PGE-11` | [Neural Training And Evaluation](../NeuralGraphics/TrainingAndEvaluation.md), currently absent |
-| `PGE-12` | [Neural Training](../NeuralGraphics/TrainingAndEvaluation.md) and [Runtime Inference](../NeuralGraphics/ModelToKernelAndRuntimeInference.md), currently absent as an owned route |
+| `PGE-11` | [Neural Training And Evaluation](../NeuralGraphics/README.md#neural-graphics-training-and-evaluation), currently absent |
+| `PGE-12` | [Neural Training](../NeuralGraphics/README.md#neural-graphics-training-and-evaluation) and [Runtime Inference](../NeuralGraphics/README.md#model-to-kernel-and-runtime-inference), currently absent as an owned route |
 | `PGE-13` | Feature dossiers plus [ShaderCompiler](../../Modules/Tools/ShaderCompiler/README.md), [Cooking](../../Modules/Tools/Cooking/README.md), [Performance Diagnostics](../PerformanceDiagnostics/README.md), and [Adoption](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review) |
 | `PGE-14` | [Platform](../../Modules/Engine/Platform/README.md), [RHI](../../Modules/Engine/RHI/README.md), [Build/Packaging](../../Modules/BuildAndPackaging/README.md) |
 | `PGE-15` | [Whole Repository Map](../../WholeRepositoryMap.md), module/feature ownership routes, [Adoption And Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review) |
@@ -94,11 +96,11 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 | ID | Architecture owner |
 | --- | --- |
 | `FCR-RHI-01` | [RHI Capability Inventory](../../Modules/Engine/RHI/CapabilityInventory.md) and [RHI Features](../../Modules/Engine/RHI/Features/README.md) |
-| `FCR-RHI-02` | [Command Submission And Synchronization](../../Modules/Engine/RHI/Features/PipelineAndExecution/CommandSubmissionAndSynchronization.md) and [Presentation](../../Modules/Engine/RHI/Features/PresentationAndInterop/Presentation.md) |
-| `FCR-RHI-03` | [Backend Selection And Device Capabilities](../../Modules/Engine/RHI/Features/DeviceAndResources/BackendSelectionAndDeviceCapabilities.md) plus the RHI feature families |
-| `FCR-RHI-04` | [RHI Ray Tracing](../../Modules/Engine/RHI/Features/PipelineAndExecution/RayTracing.md) |
+| `FCR-RHI-02` | [Command Submission And Synchronization](../../Modules/Engine/RHI/Features/PipelineAndExecution/README.md#command-submission-and-synchronization) and [Presentation](../../Modules/Engine/RHI/Features/PresentationAndInterop/README.md#presentation) |
+| `FCR-RHI-03` | [Backend Selection And Device Capabilities](../../Modules/Engine/RHI/Features/DeviceAndResources/README.md#backend-selection-and-device-capabilities) plus the RHI feature families |
+| `FCR-RHI-04` | [RHI Ray Tracing](../../Modules/Engine/RHI/Features/PipelineAndExecution/README.md#ray-tracing) |
 | `FCR-RHI-05` | [RHI Diagnostics And Capture](../../Modules/Engine/RHI/Features/DiagnosticsAndCapture/README.md) |
-| `FCR-RHI-06` | [Device Lifecycle And Failure Recovery](../../Modules/Engine/RHI/Features/DeviceAndResources/DeviceLifecycleAndFailureRecovery.md) |
+| `FCR-RHI-06` | [Device Lifecycle And Failure Recovery](../../Modules/Engine/RHI/Features/DeviceAndResources/README.md#device-lifecycle-and-failure-recovery) |
 
 ### Renderer
 
@@ -112,20 +114,20 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 | `FCR-REN-06` | [Direct Lighting](../../Modules/Engine/Renderer/Features/Lighting/DirectLighting/README.md) |
 | `FCR-REN-07` | [Indirect Lighting](../../Modules/Engine/Renderer/Features/Lighting/IndirectLighting/README.md) |
 | `FCR-REN-08` | [Reference Path Tracer](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/README.md) |
-| `FCR-REN-09` | [Exposure](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Exposure.md) |
-| `FCR-REN-10` | [Image Reconstruction And Upscaling](../../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ImageReconstructionAndUpscaling.md) |
-| `FCR-REN-11` | [Debug Views](../../Modules/Engine/Renderer/Features/DebugViews/README.md) and [Diagnostics/Capture](../../Modules/Engine/Renderer/Features/ViewportAndDiagnostics/DiagnosticsProductsAndCapture.md) |
-| `FCR-REN-12` | [Renderer Ray Tracing](../../Modules/Engine/Renderer/Features/RayTracing/README.md) and [RHI Ray Tracing](../../Modules/Engine/RHI/Features/PipelineAndExecution/RayTracing.md) |
-| `FCR-REN-13` | [UI And Viewport Composition](../../Modules/Engine/Renderer/Features/ViewportAndDiagnostics/UiAndViewportComposition.md) |
-| `FCR-REN-14` | [Tone Mapping](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ToneMapping.md) |
-| `FCR-REN-15` | [Presentation And Output](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/PresentationAndOutput.md) |
+| `FCR-REN-09` | [Exposure](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/README.md#exposure) |
+| `FCR-REN-10` | [Image Reconstruction And Upscaling](../../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/README.md#image-reconstruction-and-upscaling) |
+| `FCR-REN-11` | [Debug Views](../../Modules/Engine/Renderer/Features/DebugViews/README.md) and [Diagnostics/Capture](../../Modules/Engine/Renderer/Features/ViewportAndDiagnostics/README.md#diagnostics-products-and-capture) |
+| `FCR-REN-12` | [Renderer Ray Tracing](../../Modules/Engine/Renderer/Features/RayTracing/README.md) and [RHI Ray Tracing](../../Modules/Engine/RHI/Features/PipelineAndExecution/README.md#ray-tracing) |
+| `FCR-REN-13` | [UI And Viewport Composition](../../Modules/Engine/Renderer/Features/ViewportAndDiagnostics/README.md#ui-and-viewport-composition) |
+| `FCR-REN-14` | [Tone Mapping](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/README.md#tone-mapping) |
+| `FCR-REN-15` | [Presentation And Output](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/README.md#presentation-and-output) |
 | `FCR-REN-16` | [Pipeline Materialization And Typed Binding](../../Modules/Engine/Renderer/Features/ShaderRuntime/PipelineMaterializationAndTypedBinding.md) |
 | `FCR-REN-17` | [Mesh And Texture Residency](../../Modules/Engine/Renderer/Features/GeometryAndResources/MeshAndTextureResidency.md) |
 | `FCR-REN-18` | [Temporal Sampling And History](../../Modules/Engine/Renderer/Features/FrameExecution/TemporalSamplingAndHistory.md) |
-| `FCR-REN-19` | [Settings State And Persistence](../../Modules/Engine/Renderer/Features/RuntimeConfiguration/SettingsStateAndPersistence.md) |
+| `FCR-REN-19` | [Settings State And Persistence](../../Modules/Engine/Renderer/Features/RuntimeConfiguration/README.md#settings-state-and-persistence) |
 | `FCR-REN-20` | [Latency Coordination](../../Modules/Engine/Renderer/Features/FrameExecution/LatencyCoordination.md) |
 | `FCR-REN-21` | [Visibility And Draw Preparation](../../Modules/Engine/Renderer/Features/GeometryAndResources/VisibilityAndDrawPreparation.md) |
-| `FCR-REN-22` | [Resolution, Sampling, And Anti-Aliasing](../../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ResolutionSamplingAndAntiAliasing.md) |
+| `FCR-REN-22` | [Resolution, Sampling, And Anti-Aliasing](../../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/README.md#resolution-sampling-and-anti-aliasing) |
 | `FCR-REN-23` | [Deferred Decals](../../Modules/Engine/Renderer/Features/DeferredDecals/README.md) |
 | `FCR-REN-24` | [Color Grading](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ColorGrading/README.md) |
 | `FCR-REN-25` | [Chromatic Aberration](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/README.md) |
@@ -142,7 +144,7 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 | `REL-04` | All module/feature dossiers; exact current families are mapped above |
 | `REL-05` | [Renderer Features](../../Modules/Engine/Renderer/Features/README.md), [Showcase](../../Modules/Projects/Showcase/README.md), [Reference Path Tracer](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/README.md) |
 | `REL-06` | [Performance Diagnostics](../PerformanceDiagnostics/README.md), [Frame Execution](../../Modules/Engine/Renderer/Features/FrameExecution/README.md), residency owners |
-| `REL-07` | [RHI Diagnostics](../../Modules/Engine/RHI/Features/DiagnosticsAndCapture/README.md), [Device Lifecycle](../../Modules/Engine/RHI/Features/DeviceAndResources/DeviceLifecycleAndFailureRecovery.md) |
+| `REL-07` | [RHI Diagnostics](../../Modules/Engine/RHI/Features/DiagnosticsAndCapture/README.md), [Device Lifecycle](../../Modules/Engine/RHI/Features/DeviceAndResources/README.md#device-lifecycle-and-failure-recovery) |
 | `REL-08` | [Packaging](../../Modules/BuildAndPackaging/PackagingAndInstallation.md), [Adoption](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review) |
 | `REL-09` | [Adoption And Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review), [Product Workflows](../ProductWorkflowCoverage.md) |
 | `REL-10` | [Packaging](../../Modules/BuildAndPackaging/PackagingAndInstallation.md), [Adoption/Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review) |
@@ -165,17 +167,17 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 
 | ID | Architecture owner |
 | --- | --- |
-| `FM-REL-01` | [Platform](../../Modules/Engine/Platform/README.md), [RHI device capability](../../Modules/Engine/RHI/Features/DeviceAndResources/BackendSelectionAndDeviceCapabilities.md) |
+| `FM-REL-01` | [Platform](../../Modules/Engine/Platform/README.md), [RHI device capability](../../Modules/Engine/RHI/Features/DeviceAndResources/README.md#backend-selection-and-device-capabilities) |
 | `FM-REL-02` | [Packaging And Installation](../../Modules/BuildAndPackaging/PackagingAndInstallation.md) |
 | `FM-REL-03` | [Packaging And Installation](../../Modules/BuildAndPackaging/PackagingAndInstallation.md) |
 | `FM-REL-04` | [Core](../../Modules/Engine/Core/README.md), [Packaging](../../Modules/BuildAndPackaging/PackagingAndInstallation.md) |
 | `FM-REL-05` | [Assets](../../Modules/Engine/Assets/README.md), [Shader System](../ShaderSystem/README.md), [Showcase](../../Modules/Projects/Showcase/README.md) |
 | `FM-REL-06` | [Packaging And Installation](../../Modules/BuildAndPackaging/PackagingAndInstallation.md), [Core](../../Modules/Engine/Core/README.md) |
-| `FM-REL-07` | [Core](../../Modules/Engine/Core/README.md), [Renderer Settings](../../Modules/Engine/Renderer/Features/RuntimeConfiguration/SettingsStateAndPersistence.md) |
-| `FM-REL-08` | [Feature Selectors](../../Modules/Engine/Renderer/Features/RuntimeConfiguration/FeatureSelectorCatalog.md), [Image Reconstruction](../../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ImageReconstructionAndUpscaling.md) |
-| `FM-REL-09` | [Device Lifecycle](../../Modules/Engine/RHI/Features/DeviceAndResources/DeviceLifecycleAndFailureRecovery.md), [RHI Diagnostics](../../Modules/Engine/RHI/Features/DiagnosticsAndCapture/README.md) |
-| `FM-REL-10` | [RHI Resource Lifetime](../../Modules/Engine/RHI/Features/DeviceAndResources/ResourceLifetimeAndMemory.md), [Renderer Residency](../../Modules/Engine/Renderer/Features/GeometryAndResources/MeshAndTextureResidency.md) |
-| `FM-REL-11` | [Platform](../../Modules/Engine/Platform/README.md), [RHI Presentation](../../Modules/Engine/RHI/Features/PresentationAndInterop/Presentation.md), [Frame Execution](../../Modules/Engine/Renderer/Features/FrameExecution/README.md) |
+| `FM-REL-07` | [Core](../../Modules/Engine/Core/README.md), [Renderer Settings](../../Modules/Engine/Renderer/Features/RuntimeConfiguration/README.md#settings-state-and-persistence) |
+| `FM-REL-08` | [Feature Selectors](../../Modules/Engine/Renderer/Features/RuntimeConfiguration/README.md#feature-selector-catalog), [Image Reconstruction](../../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/README.md#image-reconstruction-and-upscaling) |
+| `FM-REL-09` | [Device Lifecycle](../../Modules/Engine/RHI/Features/DeviceAndResources/README.md#device-lifecycle-and-failure-recovery), [RHI Diagnostics](../../Modules/Engine/RHI/Features/DiagnosticsAndCapture/README.md) |
+| `FM-REL-10` | [RHI Resource Lifetime](../../Modules/Engine/RHI/Features/DeviceAndResources/README.md#resource-lifetime-and-memory), [Renderer Residency](../../Modules/Engine/Renderer/Features/GeometryAndResources/MeshAndTextureResidency.md) |
+| `FM-REL-11` | [Platform](../../Modules/Engine/Platform/README.md), [RHI Presentation](../../Modules/Engine/RHI/Features/PresentationAndInterop/README.md#presentation), [Frame Execution](../../Modules/Engine/Renderer/Features/FrameExecution/README.md) |
 | `FM-REL-12` | [Adoption And Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review), [Packaging](../../Modules/BuildAndPackaging/PackagingAndInstallation.md) |
 | `FM-REL-13` | [Adoption And Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review), [RHI Diagnostics](../../Modules/Engine/RHI/Features/DiagnosticsAndCapture/README.md) |
 | `FM-REL-14` | [Build/Packaging](../../Modules/BuildAndPackaging/README.md), [CI/Regression](../../Modules/BuildAndPackaging/README.md#automation) |
@@ -188,7 +190,7 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 | --- | --- |
 | `MAP-00` | [Showcase](../../Modules/Projects/Showcase/README.md), [Performance Diagnostics](../PerformanceDiagnostics/README.md), Renderer/RHI diagnostics |
 | `MAP-01` | [Showcase](../../Modules/Projects/Showcase/README.md), [Geometry/GBuffer](../../Modules/Engine/Renderer/Features/GeometryAndResources/GeometryMaterialsAndGBuffer.md), [Lighting](../../Modules/Engine/Renderer/Features/Lighting/README.md) |
-| `MAP-02` | [Showcase](../../Modules/Projects/Showcase/README.md), [Presentation/Output](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/PresentationAndOutput.md) |
+| `MAP-02` | [Showcase](../../Modules/Projects/Showcase/README.md), [Presentation/Output](../../Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/README.md#presentation-and-output) |
 | `MAP-03` | [Showcase](../../Modules/Projects/Showcase/README.md), [Geometry/GBuffer](../../Modules/Engine/Renderer/Features/GeometryAndResources/GeometryMaterialsAndGBuffer.md) |
 | `MAP-04` | [Showcase](../../Modules/Projects/Showcase/README.md), [GameFramework](../../Modules/Engine/GameFramework/README.md), [Temporal Sampling](../../Modules/Engine/Renderer/Features/FrameExecution/TemporalSamplingAndHistory.md) |
 | `MAP-05` | [Showcase](../../Modules/Projects/Showcase/README.md), [Geometry/GBuffer](../../Modules/Engine/Renderer/Features/GeometryAndResources/GeometryMaterialsAndGBuffer.md), [Ray Tracing](../../Modules/Engine/Renderer/Features/RayTracing/README.md) |
@@ -208,14 +210,14 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 | `CASE-01` | SourceImporters, Cooking, Showcase, Geometry/GBuffer, Debug Views |
 | `CASE-02` | [RHI Features](../../Modules/Engine/RHI/Features/README.md), [Graphics Coverage](../GraphicsCoverageMatrix.md), [Feature Execution](../FeatureExecutionTraces.md) |
 | `CASE-03` | [Reference Path Tracer](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/README.md), [Performance Diagnostics](../PerformanceDiagnostics/README.md) |
-| `CASE-04` | [Neural Graphics](../NeuralGraphics/README.md), [Training/Evaluation](../NeuralGraphics/TrainingAndEvaluation.md), [Model To Kernel](../NeuralGraphics/ModelToKernelAndRuntimeInference.md) |
+| `CASE-04` | [Neural Graphics](../NeuralGraphics/README.md), [Training/Evaluation](../NeuralGraphics/README.md#neural-graphics-training-and-evaluation), [Model To Kernel](../NeuralGraphics/README.md#model-to-kernel-and-runtime-inference) |
 | `CASE-05` | [Packaging](../../Modules/BuildAndPackaging/PackagingAndInstallation.md), [Adoption/Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review), [Product Workflows](../ProductWorkflowCoverage.md) |
 | `WL-01` | [Assets](../../Modules/Engine/Assets/README.md), [Source Importers](../../Modules/Tools/SourceImporters/README.md), [Cooking](../../Modules/Tools/Cooking/README.md) |
 | `WL-02` | [Showcase](../../Modules/Projects/Showcase/README.md), source/cook owners |
 | `WL-03` | Showcase and Renderer/RHI feature owners, including [Reference Path Tracer](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/README.md) |
 | `WL-04` | [Performance Diagnostics](../PerformanceDiagnostics/README.md), [RHI](../../Modules/Engine/RHI/README.md), [Renderer](../../Modules/Engine/Renderer/README.md) |
-| `WL-05` | [Neural Training And Evaluation](../NeuralGraphics/TrainingAndEvaluation.md) |
-| `WL-06` | [Model To Kernel And Runtime Inference](../NeuralGraphics/ModelToKernelAndRuntimeInference.md) |
+| `WL-05` | [Neural Training And Evaluation](../NeuralGraphics/README.md#neural-graphics-training-and-evaluation) |
+| `WL-06` | [Model To Kernel And Runtime Inference](../NeuralGraphics/README.md#model-to-kernel-and-runtime-inference) |
 | `WL-07` | [Performance Diagnostics](../PerformanceDiagnostics/README.md), [CI/Regression](../../Modules/BuildAndPackaging/README.md#automation), [Adoption](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review) |
 | `WL-08` | Feature dossiers plus [Adoption/Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review); publication content remains a strategy/acceptance artifact, not an engine module |
 

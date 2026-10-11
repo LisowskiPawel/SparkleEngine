@@ -1,5 +1,7 @@
 # Reference Path Tracer Execution Architecture
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** Stage-0-frozen target architecture accepted by `PTD-00-R1 PASS`; source delivery through Stage 9 remains **IMPLEMENTED / VALIDATION DEFERRED** and structurally aligned, while usable rendering and Reference authority are blocked by the current black-lighting result and the retained executable evidence backlog
 
 **Scope:** define the owner, contracts, lifetime, execution, sampling, accumulation, viewport interaction, manual artifact, and clean-break boundaries for SparkleEngine's eventual Reference Path Tracer

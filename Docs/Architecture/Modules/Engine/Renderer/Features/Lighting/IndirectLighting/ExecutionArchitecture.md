@@ -1,5 +1,7 @@
 # Indirect Lighting And ReSTIR GI Execution Architecture
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** target architecture pending `IND-D0`; current route is source-present but its estimator conformance is unproved
 
 **Responsibility:** own the target feature enclosure, path/reservoir records, pass/resource graph, history, cross-feature boundaries, lifetime, failure, and integration hooks

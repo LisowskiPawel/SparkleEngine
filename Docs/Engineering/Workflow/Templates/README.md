@@ -1,5 +1,7 @@
 # Documentation Templates
 
+[Docs](../../../README.md) / [Up](../README.md)
+
 **Status:** writing-template index
 
 **Scope:** route authors to the smallest SparkleEngine documentation scaffold that fits the subject and its assurance needs

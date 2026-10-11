@@ -1,5 +1,7 @@
 # Renderer Lighting
 
+[Docs](../../../../../../README.md) / [Up](../README.md)
+
 **Status:** Renderer lighting feature-family index; source-backed, not numerical, convergence, visual, performance, or release evidence
 
 **Verified:** Direct, Indirect, and Volumetric package depth: 2026-09-13 at `709e04385c3d98aa3492fb3f09dc9caabe34cb3a`. Reference route and the shared composition source rechecked 2026-10-03 at `95ae2f9ec0232d61179773fba569ca74b4ab279e`; no new GPU result was produced by this documentation review.
@@ -76,7 +78,7 @@ Sky enablement affects environment radiance only; directional and local analytic
 - Absence of required ray capability prevents ordinary surface lighting and rejects Reference Path Tracer activation; the exact active frontend and backend still require runtime proof.
 - Direct-shadow traversal uses the engine-wide automatic frontend resolver and cannot silently substitute a different lighting product when neither route is complete.
 - Debug views expose the five lobe products, but current presentation can modify them through exposure, tone mapping, and encoding.
-- Exact selectors and persistence live in [Feature Selector Catalog](../RuntimeConfiguration/FeatureSelectorCatalog.md). Row-level states live in the [Capability Inventory](../../CapabilityInventory.md). Release proof remains in `REN-E06` through `REN-E10`, `REN-E18`, and the dedicated volumetric absence check `REN-E24`.
+- Exact selectors and persistence live in [Feature Selector Catalog](../RuntimeConfiguration/README.md#feature-selector-catalog). Row-level states live in the [Capability Inventory](../../CapabilityInventory.md). Release proof remains in `REN-E06` through `REN-E10`, `REN-E18`, and the dedicated volumetric absence check `REN-E24`.
 
 The ordinary surface-lighting family is complete only when [Direct Lighting](DirectLighting/README.md#acceptance-criteria) and [Indirect Lighting](IndirectLighting/README.md#acceptance-criteria) pass, the common composite/sky join preserves their documented scene-linear products, and active capability limitations remain visible. [Volumetric Lighting](VolumetricLighting/README.md) and [Reference Path Tracer](ReferencePathTracer/README.md) retain independent negative/blocked dispositions and cannot inherit that verdict.
 

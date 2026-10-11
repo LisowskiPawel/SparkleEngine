@@ -1,5 +1,7 @@
 # Core Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not release approval or runtime evidence
 
 **Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; `Engine/Core` public/private source and CMake membership inspected in the live working tree; evidence `S` only

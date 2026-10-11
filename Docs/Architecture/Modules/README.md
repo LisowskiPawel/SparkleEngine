@@ -1,5 +1,7 @@
 # Module Architecture And Capability Inventory
 
+[Docs](../../README.md) / [Up](../README.md)
+
 **Status:** module architecture index and dated capability snapshot; not release approval or executable evidence
 
 **Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; the detailed inventories listed below inspected their named source/build surfaces in the live working tree; no build, shader cook, launch, GPU capture, performance run, package run, or clean-machine run was performed for this inventory
@@ -134,7 +136,7 @@ The initial detailed inventories carry `S` only. No `B`, `R`, `N`, `P`, or `A` e
 | Persona/roadmap/gap coverage | Strategy crosswalk | [Capability Coverage Against Persona, Roadmap, And Gap Assessment](../CrossModule/StrategyCoverage.md) | All current module inventories mapped to `NS-*`, `PGE-*`, release subsystems, and refreshed volatile gap observations; source-only. |
 | Neural graphics | Negative/target dossier | [Neural Graphics](../CrossModule/NeuralGraphics/README.md) | Vendor reconstruction inference is separated from absent owned data/training, model-to-kernel lowering, kernels, and runtime inference. |
 | Performance diagnostics | Focused dated snapshot | [Performance Diagnostics Capability Inventory](../CrossModule/PerformanceDiagnostics/Capability.md) | Existing timing, marker, memory, editor, and external-capture surfaces reconciled at the document's stated snapshot; source-only and due for refresh before implementation. |
-| Geometry-cache animation | Focused dated snapshot | [Geometry Cache Animation Capability Snapshot](../CrossModule/GeometryCacheAnimation/Capability.md) | Existing import, cook, animation, scene-publication, deformation, residency, and workload-source seams reconciled; source-only. |
+| Geometry-cache animation | Focused dated snapshot | [Geometry Cache Animation Capability Snapshot](../CrossModule/GeometryCacheAnimation/README.md#geometry-cache-animation-capability-snapshot) | Existing import, cook, animation, scene-publication, deformation, residency, and workload-source seams reconciled; source-only. |
 | Deferred GBuffer decals | Current feature-gap dossier | [Deferred Decals](Engine/Renderer/Features/DeferredDecals/README.md) | No current decal feature; existing extension seams and separately labeled target architecture are reconciled without implying implementation. |
 | Debug-view presentation | Current feature dossier | [Debug Views](Engine/Renderer/Features/DebugViews/README.md) | Existing modes, visualization products, exposure/tone/encoding limitation, viewport ownership, and target-presentation boundary reconciled; source-only. |
 | Cross-system graphics coverage | Deep horizontal | [Graphics Feature Coverage Matrix](../CrossModule/GraphicsCoverageMatrix.md) | Feature-by-feature selectors, passes, shaders, RHI gates, backend asymmetries, fallbacks, resources, and negative coverage reconciled; source-only. |
@@ -153,7 +155,7 @@ Every top-level implementation owner is routed above and has a source-depth capa
 | Claim or reviewer concern | Owning detail |
 | --- | --- |
 | D3D12/Vulkan coverage or parity | [RHI capability inventory](Engine/RHI/CapabilityInventory.md), [RHI feature dossiers](Engine/RHI/Features/README.md), [graphics matrix](../CrossModule/GraphicsCoverageMatrix.md), and candidate evidence |
-| Ray tracing, inline/native pipelines, shader tables, classic/PTLAS | [Renderer ray-tracing dossier](Engine/Renderer/Features/RayTracing/README.md), [RHI ray-tracing dossier](Engine/RHI/Features/PipelineAndExecution/RayTracing.md), and [graphics traces](../CrossModule/FeatureExecutionTraces.md) |
+| Ray tracing, inline/native pipelines, shader tables, classic/PTLAS | [Renderer ray-tracing dossier](Engine/Renderer/Features/RayTracing/README.md), [RHI ray-tracing dossier](Engine/RHI/Features/PipelineAndExecution/README.md#ray-tracing), and [graphics traces](../CrossModule/FeatureExecutionTraces.md) |
 | Bindless/material binding coverage | [graphics matrix](../CrossModule/GraphicsCoverageMatrix.md#binding-and-material-coverage) |
 | PBR/material/direct-light coverage | [Geometry, Materials, and GBuffer](Engine/Renderer/Features/GeometryAndResources/GeometryMaterialsAndGBuffer.md), [Direct Lighting](Engine/Renderer/Features/Lighting/DirectLighting/README.md), and the [exact inventory](Engine/Renderer/CapabilityInventory.md) |
 | Indirect-light/history/environment coverage | [Indirect Lighting and ReSTIR GI](Engine/Renderer/Features/Lighting/IndirectLighting/README.md) and the [whole-frame route](Engine/Renderer/RenderingASparkleFrame.md) |

@@ -1,5 +1,7 @@
 # Renderer Geometry, Materials, and GBuffer
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** current feature dossier; source-backed, not visual fidelity, raster/ray parity, performance, or release evidence
 
 **Verified:** 2026-09-06 against committed `master` revision `d236da11`; `Engine/Renderer` is unchanged from the earlier `8414b5dc` source audit

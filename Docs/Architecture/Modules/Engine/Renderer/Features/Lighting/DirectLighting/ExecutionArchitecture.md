@@ -1,5 +1,7 @@
 # Direct Lighting Execution Architecture
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** target architecture pending `DIR-D0`; current source facts are revision-pinned, while target names and stage boundaries do not prove implementation
 
 **Responsibility:** own the target Direct Lighting feature enclosure, records, resources, execution, history, providers, lifetime, failure, and integration hooks

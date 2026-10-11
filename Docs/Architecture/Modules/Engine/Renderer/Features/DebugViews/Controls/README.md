@@ -1,5 +1,7 @@
 # Viewport Rendering Controls
 
+[Docs](../../../../../../../README.md) / [Up](../README.md)
+
 **Status:** architecture navigation index
 
 This folder separates the viewport's one mutually exclusive rendering mode from the Editor frontend for shared lighting-feature execution controls:

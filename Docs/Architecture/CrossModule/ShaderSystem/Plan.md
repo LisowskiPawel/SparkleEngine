@@ -1,5 +1,7 @@
 # Shader System Delivery Plan
 
+[Docs](../../../README.md) / [Up](README.md)
+
 Prove the shader and pipeline path already delivered in source; repair demonstrated discrepancies instead of repeating the migration.
 
 **Status:** implementation plan; includes the migration ledger but is not architecture authority or proof of completion
@@ -302,7 +304,7 @@ The implementation instructions for this recorded source slice are retired. Its 
 - [Ray-tracing target shared HLSL boundary](../../Modules/Engine/Renderer/Features/RayTracing/ExecutionArchitecture.md#shared-hlsl-boundary)
 - [NVIDIA RTX Path Tracing](https://github.com/NVIDIA-RTX/RTXPT)
 - [AMD Cauldron ray-tracing capability separation at `b92d559`](https://github.com/GPUOpen-LibrariesAndSDKs/Cauldron/blob/b92d559bd083f44df9f8f42a6ad149c1584ae94c/src/VK/base/ExtRayTracing.cpp)
-- [Debug View Presentation Architecture](../../Modules/Engine/Renderer/Features/DebugViews/PresentationArchitecture.md)
+- [Debug View Presentation Architecture](../../Modules/Engine/Renderer/Features/DebugViews/README.md#debug-view-presentation-architecture)
 
 #### Required work
 

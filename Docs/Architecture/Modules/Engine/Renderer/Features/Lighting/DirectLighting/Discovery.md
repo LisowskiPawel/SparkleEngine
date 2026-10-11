@@ -1,5 +1,7 @@
 # Direct Lighting Discovery Gate
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Gate:** `DIR-D0`
 
 **Status:** **Open / production replacement blocked**; research and source discovery may proceed, but Stage 1 implementation requires this gate plus the applicable release/admission decision

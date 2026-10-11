@@ -1,5 +1,7 @@
 # Application Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not release approval or executable evidence
 
 **Snapshot:** 2026-09-08 at committed `master` revision `ffe60e3a`; `Engine/Application` game/editor hosts, command-line/configuration, task ownership, console, shader-recook, CMake split, and shutdown inspected; evidence `S` only

@@ -1,5 +1,9 @@
 # Geometry Cache Animation Pipeline
 
+[Docs](../../../README.md) / [Up](../README.md)
+
+Sections: [Geometry Cache Animation Capability Snapshot](#geometry-cache-animation-capability-snapshot).
+
 **Status:** feature dossier; target architecture, not implemented behavior
 
 **Date:** 2026-08-17
@@ -15,7 +19,7 @@
 | Concern | Owner |
 | --- | --- |
 | target feature semantics and system shape | this page |
-| dated current-source capability and gaps | [Capability](Capability.md) |
+| dated current-source capability and gaps | [Capability](#geometry-cache-animation-capability-snapshot) |
 | feature-local criteria, failures, checks, and completion | [Acceptance](Acceptance.md) |
 | delivery order and phase exits | [Geometry Cache Animation Delivery Plan](Plan.md) |
 
@@ -70,7 +74,7 @@ It deliberately does not turn geometry caches into skeletal clips, morph-target 
 
 ## Implementation Snapshot
 
-The dated source inventory, absent capability, existing extension seams, and Modern Sponza Knight source facts live in the [Geometry Cache Animation Capability Snapshot](Capability.md). Refresh that snapshot before implementation begins; this architecture does not claim the path is implemented.
+The dated source inventory, absent capability, existing extension seams, and Modern Sponza Knight source facts live in the [Geometry Cache Animation Capability Snapshot](#geometry-cache-animation-capability-snapshot). Refresh that snapshot before implementation begins; this architecture does not claim the path is implemented.
 
 ## Requirements And Boundaries
 
@@ -359,3 +363,59 @@ Do not add `KnightImporter`, `ModernSponzaAnimation`, a geometry-cache renderer,
 | Changing-topology support in the first slice | Adds sample-varying indices, hit-data remapping, BLAS rebuild policy, and material-batch churn before a required workload demonstrates the need. |
 | New task pool, render scene, or residency state machine | Duplicates existing owners and complicates cancellation, budgets, and lifetime. |
 | Codec/playback/debug CVars from day one | Creates unsupported combinations and test burden without an accepted content requirement. |
+
+## Geometry Cache Animation Capability Snapshot
+
+**Status:** capability snapshot; not release approval or executable evidence
+
+**Snapshot:** 2026-08-28 at committed `master` revision `20814381`; source and executable build configuration were unchanged from implementation revision `99af6d5b`
+
+**Scope:** current import, cook, animation, render-scene, deformation, residency, and Modern Sponza source surfaces relevant to geometry-cache delivery
+
+**Architecture authority:** [Geometry Cache Animation Pipeline](README.md)
+
+**Delivery authority:** [Geometry Cache Animation Delivery Plan](Plan.md)
+
+**Feature acceptance:** [Geometry Cache Animation — Acceptance](Acceptance.md)
+
+**Current readiness:** **0/100** — the inspected seams are adjacent foundations, not a geometry-cache implementation. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
+
+Code and executable build configuration remain authoritative. Reinspect every listed owner and absence before using this dated snapshot for implementation or release claims.
+
+### Geometry Cache Animation Capability Snapshot: At A Glance
+
+| Pipeline stage | Current reusable seam | Missing geometry-cache capability |
+| --- | --- | --- |
+| import | glTF/FBX selector and structured imported scene/deformation records | Alembic dependency, cache tracks/samples/topology/material validation |
+| cook/publication | atomic scene generation writer and typed scene products | chunked native cache schema, codec, directory, checksums, range-read identity |
+| load/playback | level activation plus skeletal/morph animation components | header/directory-only activation and cache-specific time/sample playback state |
+| residency | shared bounded read/decode/upload/retirement machinery | cache chunk scheduling, interpolation windows, seek/cancel policy, CPU/GPU budgets |
+| Renderer geometry | raster skin/morph paths and CPU ray-deformation reconstruction | one GPU-produced current/previous vertex product shared by raster, motion, BLAS, and ray hits |
+| workload | Modern Sponza Knight Alembic/USD/Maya sources exist | no scene-specific fallback; provenance, scale, material, playback, backend, and cost evidence |
+
+The target extends existing owners but changes the deformation data shape: sampled vertex streams are neither skeleton poses nor morph-weight arrays. Treating frames as morph targets would multiply storage by vertex count times sample count and create the wrong runtime owner.
+
+### Source-Backed Snapshot
+
+The target architecture extends existing owners instead of adding a parallel animation or render scene:
+
+- [`SourceSceneImporter.cpp`](../../../../Tools/Import/SourceImporters/Private/SourceSceneImporter.cpp) selects glTF or FBX from a hard-coded importer list. [`ImportedScene.h`](../../../../Tools/Import/SourceImporters/Public/Types/ImportedScene.h) carries meshes, instances, materials, skeletons, and clips but no geometry-cache tracks. No Alembic dependency exists in the current source dependency manifest.
+- [`ImportedMeshDeformation.h`](../../../../Tools/Import/SourceImporters/Public/Types/ImportedMeshDeformation.h) contains skin influences and morph targets. Expanding one cache sample per frame into morph targets would misuse that contract and scale memory with `vertex count * sample count`.
+- [`ImportedSceneCooker.cpp`](../../../../Tools/Cooking/AssetCooker/Private/Cooking/ImportedSceneCooker.cpp) is the scene-cook orchestrator. [`CookedSceneBuild.h`](../../../../Tools/Cooking/SceneCooker/Public/CookedSceneBuild.h) and [`CookedSceneGenerationWriter.cpp`](../../../../Tools/Cooking/SceneCooker/Private/CookedSceneGenerationWriter.cpp) already stage one atomic generation of meshes, materials, skeletons, animations, and manifests.
+- [`SceneAssetFileReader.cpp`](../../../../Engine/GameFramework/Private/Assets/Loading/SceneAssetFileReader.cpp) currently reads complete mesh, material, skeleton, and animation products for scene activation. A geometry cache cannot join that full-file retention path; activation should read only its header and chunk directory.
+- [`AnimationComponents.h`](../../../../Engine/GameFramework/Private/World/ECS/Components/AnimationComponents.h) and the animation systems own skeletal and morph playback/output. Geometry-cache playback needs its own small component because its output is sampled vertex data, not a pose or weight vector.
+- [`RenderSceneDelta.h`](../../../../Engine/GameFramework/Public/Rendering/RenderSceneDelta.h) carries structural mesh/material state, while [`RenderSceneDynamicData.h`](../../../../Engine/GameFramework/Public/Rendering/RenderSceneDynamicData.h) carries per-frame transforms, joint matrices, and morph weights. Those are the existing structural and dynamic scene-publication seams to extend.
+- Historical `RenderDeformationPreparation` lived under `Renderer/Private/SceneData/Preparation`. The committed renderer migration moved scene deformation continuity beneath `RenderScene` and view-independent frame materialization beneath `Scene/Preparation/RenderScenePreparation`; geometry-cache preparation belongs in that owner or a focused collaborator owned by it, never another scene-preparation graph.
+- [`GBufferVS.hlsl`](../../../../Engine/Assets/Shaders/Passes/GBuffer/Raster/GBufferVS.hlsl) evaluates morphing and skinning in the raster vertex shader. [`RayTracingMaterialHit.hlsli`](../../../../Engine/Assets/Shaders/RayTracing/RayTracingMaterialHit.hlsli) repeats their attribute reconstruction at ray hits.
+- [`RayTracingBlasGeometryBuilder.cpp`](../../../../Engine/Renderer/Private/RayTracing/Acceleration/RayTracingBlasGeometryBuilder.cpp) currently reconstructs skinned positions on the CPU, and [`RayTracingBlasCache.cpp`](../../../../Engine/Renderer/Private/RayTracing/Acceleration/RayTracingBlasCache.cpp) uploads a replacement vertex buffer and rebuilds its BLAS. Geometry-cache delivery must not copy this CPU-versus-shader split.
+- [`BuildRenderFrameGraph.cpp`](../../../../Engine/Renderer/Private/Frame/Graph/BuildRenderFrameGraph.cpp) adds the ray-tracing scene before GBuffer feature setup. Shared deformed geometry must therefore be ready before both consumers rather than inserted inside either one.
+- [`AssetResidency`](../../../../Engine/Renderer/Private/Resources/Residency/AssetResidency.h) already owns read/decode/upload/resident/retirement state and byte budgets. [`SparkleTasks`](../../../../Engine/Tasks/Public/TaskTypes.h) already provides a bounded blocking-I/O lane. Geometry-cache streaming should reuse both instead of creating a cache-specific thread pool or second lifetime protocol.
+
+The Modern Sponza Animated Knight archive is the motivating workload, not a reason for a scene-specific fix:
+
+- `Knight_USD_002.fbx` contains renderable meshes and controller animation channels but no bones or skin weights. It can prove static FBX import and unit normalization; it cannot produce visible skeletal deformation.
+- `Knight_Animation_Data_Only_002.fbx` also has no deform skeleton or skin binding.
+- the Maya source contains skin clusters, bind-pose data, joints, and animation curves;
+- `Exports/alembic/knight_ANIM_001.rnd.abc` and the published USD contain baked vertex deformation. The Alembic is the source intended for a geometry-cache path.
+
+The knight remains unaccepted as an animated workload until [Geometry Cache Animation — Acceptance](Acceptance.md) passes. Loading the static FBX, baking one pose, remapping controller names, or scaling only the knight entity does not close that gate.

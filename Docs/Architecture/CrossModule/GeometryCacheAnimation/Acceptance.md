@@ -1,5 +1,7 @@
 # Geometry Cache Animation — Acceptance
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** feature-local acceptance contract; not proof that geometry-cache animation has passed
 
 **Scope:** feature-local verification matrix, controlled failures, and completion gates for geometry-cache animation

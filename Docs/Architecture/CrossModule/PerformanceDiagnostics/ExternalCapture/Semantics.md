@@ -1,5 +1,7 @@
 # External Capture Semantics
 
+[Docs](../../../../README.md) / [Up](README.md)
+
 **Status:** target architecture; normative capture protocol, pending discovery validation
 
 **Scope:** launch intent, capability, request identity, frame boundaries, exclusivity, result truth, and failure settlement for external tools.

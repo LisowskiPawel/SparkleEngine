@@ -1,5 +1,7 @@
 # Documentation Page Template
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** writing template; remove instructional placeholders when creating a real page
 
 **Scope:** reader-first structure for module overviews, feature dossiers, system concepts, and task-oriented guides

@@ -1,5 +1,7 @@
 # Engine Assets Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current source corpus, not proof of cooked or packaged inclusion
 
 **Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; tracked `Engine/Assets` files and their known compiler/cooker/game consumers inspected; evidence `S` only

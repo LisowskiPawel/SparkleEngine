@@ -1,5 +1,7 @@
 # Volumetric Lighting, Fog, Atmosphere, And Sky Discovery Gate
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Gate:** `VOL-D0`
 
 **Status:** **Blocked by `REL-11` roadmap admission; discovery package open**. Research and bounded non-production experiments may prepare decisions, but no production feature implementation starts until release work is explicitly unlocked.

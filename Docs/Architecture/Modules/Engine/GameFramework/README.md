@@ -1,5 +1,7 @@
 # GameFramework Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not release approval or runtime evidence
 
 **Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; `Engine/GameFramework` public/private source, CMake membership, Application/Renderer boundaries, and cooked loaders inspected; evidence `S` only

@@ -1,5 +1,7 @@
 # HDR Display Output Research
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** research; current primary-source platform/standard/implementation study, not SparkleEngine architecture, implementation, or HDR evidence
 
 **Responsibility:** compare normative HDR signal semantics, current Windows guidance, D3D12 source precedent, and Vulkan presentation contracts for `HDRD-00`

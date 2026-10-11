@@ -1,5 +1,7 @@
 # Renderer Lighting Closure Plan
 
+[Docs](../../../../../README.md) / [Up](README.md)
+
 Produce correct direct, indirect and progressive reference lighting before judging reconstruction or frame rate.
 
 **Status:** cross-feature release sequence for direct/indirect/reference closure; feature-local implementation order lives in the linked plans and no plan is evidence

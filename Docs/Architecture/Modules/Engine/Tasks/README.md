@@ -1,5 +1,7 @@
 # Tasks Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not release approval, stress evidence, or performance evidence
 
 **Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; `Engine/Tasks` public/private source, scheduling paths, consumers, and CMake membership inspected; evidence `S` only

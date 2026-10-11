@@ -1,5 +1,7 @@
 # Python Automation And Analysis
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** negative/target capability dossier; narrow project conversion scripts exist, but no repository-wide Python engineering layer was found
 
 **Scope:** distinguish the two project-local conversion scripts from absent reusable automation, analysis, bindings, editor scripting, and runtime Python capabilities

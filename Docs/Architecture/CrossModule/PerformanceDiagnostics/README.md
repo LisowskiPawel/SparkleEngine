@@ -1,5 +1,7 @@
 # Performance Diagnostics Architecture
 
+[Docs](../../../README.md) / [Up](../README.md)
+
 **Status:** feature dossier; target architecture, not proof of current implementation
 
 **Last source reconciliation:** 2026-09-29 against the working tree based on committed revision `d1d26dbb`; the capture-specific paths named below were inspected, while unrelated local Renderer changes are outside this reconciliation

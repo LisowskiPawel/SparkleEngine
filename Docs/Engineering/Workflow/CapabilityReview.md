@@ -1,5 +1,7 @@
 # Capability Documentation Review
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** operational review runbook
 
 **Scope:** evaluate whether a SparkleEngine capability is discoverable, accurately bounded, traceable through its real owners, and ready to receive executable evidence

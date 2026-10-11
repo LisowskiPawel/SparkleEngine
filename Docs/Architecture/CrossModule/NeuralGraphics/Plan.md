@@ -1,5 +1,7 @@
 # Owned Neural Denoising Delivery Plan
 
+[Docs](../../../README.md) / [Up](README.md)
+
 Build one owned diffuse-indirect denoiser, from a licensed dataset through checked shader inference and independent evaluation.
 
 **Status:** remaining target work; conditional stage plan awaiting `NG-D0`, `REL-11` and `M3`
@@ -97,7 +99,7 @@ Every production prompt inherits this non-negotiable exit: one identity and owne
 <details>
 <summary>Exact owners, source snapshots and related contracts</summary>
 
-**Authority:** [Discovery](Discovery.md) freezes the slice; [Training And Evaluation](TrainingAndEvaluation.md), [Model To Kernel And Runtime Inference](ModelToKernelAndRuntimeInference.md) and [Acceptance](Acceptance.md) own contracts. [Roadmap](../../../Strategy/Roadmap.md) owns admission. No stage has candidate acceptance here.
+**Authority:** [Discovery](Discovery.md) freezes the slice; [Training And Evaluation](README.md#neural-graphics-training-and-evaluation), [Model To Kernel And Runtime Inference](README.md#model-to-kernel-and-runtime-inference) and [Acceptance](README.md#neural-graphics-acceptance) own contracts. [Roadmap](../../../Strategy/Roadmap.md) owns admission. No stage has candidate acceptance here.
 
 This plan delivers one owned diffuse-indirect denoiser, with a useful classical fallback and both Windows graphics APIs. It deliberately has no calendar targets or time estimates. Shared engine repairs need an existing consumer and independently useful proof; do not hide a diagnostics/ML framework in this feature.
 

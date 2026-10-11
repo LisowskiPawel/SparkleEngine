@@ -1,5 +1,7 @@
 # Deferred GBuffer Decals — Acceptance
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** feature-local acceptance contract; not proof that deferred decals have passed
 
 **Scope:** validation fixture, producer/consumer matrix, controlled failures, and completion gates for deferred GBuffer decals

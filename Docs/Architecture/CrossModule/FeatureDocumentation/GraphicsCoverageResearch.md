@@ -1,5 +1,7 @@
 # RHI And Renderer Documentation Coverage Precedent
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** research; primary-source precedent and local coverage audit, not Sparkle architecture, implementation, or acceptance evidence
 
 **Research snapshot:** 2026-09-07

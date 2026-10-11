@@ -1,5 +1,7 @@
 # Renderer Frame Graph and GPU Scheduling
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** current feature dossier; source-backed, not native-validation, overlap, performance, or release evidence
 
 **Verified:** 2026-09-06 against committed `master` revision `d236da11`; `Engine/Renderer` is unchanged from the earlier `8414b5dc` source audit

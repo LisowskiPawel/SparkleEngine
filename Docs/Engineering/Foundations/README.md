@@ -1,5 +1,7 @@
 # Engineering Foundations
 
+[Docs](../../README.md) / [Up](../README.md)
+
 **Status:** foundation index
 
 These standards apply across source modules when their named concern is touched. Select them from the change surface; they are not a mandatory linear reading list.

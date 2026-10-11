@@ -1,5 +1,7 @@
 # Reference Path Tracer — Discovery Gate
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** acceptance contract; binding feature-local discovery gate for `PTD-00`, not feature implementation acceptance
 
 **Responsibility:** define the evidence required to decide what a complete, explicitly bounded and potentially unbiased Reference Path Tracer means for SparkleEngine, freeze the conditional implementation plan, and authorize production implementation

@@ -1,5 +1,7 @@
 # Stage 8 Source Evidence
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** source implementation complete; executable parity evidence deferred
 
 **Source input:** `1bfccd778e49fc425b344c490a30c2adf9513e33` plus the scoped post-integration cleanup working tree

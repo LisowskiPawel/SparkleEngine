@@ -1,5 +1,7 @@
 # First Release RHI And GPU Execution Plan
 
+[Docs](../../../../README.md) / [Up](README.md)
+
 Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely when requirements are missing.
 
 **Status:** implementation plan; ordered backend closure, not native-validation or release evidence
@@ -166,10 +168,10 @@ flowchart LR
 | --- | --- | --- |
 | `RHI-0` | all six | [Capability Inventory](CapabilityInventory.md), feature acceptance sections, Renderer consumers |
 | `RHI-1` | `FCR-RHI-01`, resource portion of `06` | [Device And Resources](Features/DeviceAndResources/README.md) |
-| `RHI-2` | `FCR-RHI-02` | [Command Submission](Features/PipelineAndExecution/CommandSubmissionAndSynchronization.md), [Presentation](Features/PresentationAndInterop/Presentation.md) |
-| `RHI-3` | `FCR-RHI-03` | [Backend Selection And Capabilities](Features/DeviceAndResources/BackendSelectionAndDeviceCapabilities.md) plus all admitted contracts |
-| `RHI-4` | `FCR-RHI-04` | [Ray Tracing](Features/PipelineAndExecution/RayTracing.md) |
-| `RHI-5` | `FCR-RHI-05`, `FCR-RHI-06` | [Diagnostics And Capture](Features/DiagnosticsAndCapture/README.md), [Device Lifecycle](Features/DeviceAndResources/DeviceLifecycleAndFailureRecovery.md) |
+| `RHI-2` | `FCR-RHI-02` | [Command Submission](Features/PipelineAndExecution/README.md#command-submission-and-synchronization), [Presentation](Features/PresentationAndInterop/README.md#presentation) |
+| `RHI-3` | `FCR-RHI-03` | [Backend Selection And Capabilities](Features/DeviceAndResources/README.md#backend-selection-and-device-capabilities) plus all admitted contracts |
+| `RHI-4` | `FCR-RHI-04` | [Ray Tracing](Features/PipelineAndExecution/README.md#ray-tracing) |
+| `RHI-5` | `FCR-RHI-05`, `FCR-RHI-06` | [Diagnostics And Capture](Features/DiagnosticsAndCapture/README.md), [Device Lifecycle](Features/DeviceAndResources/README.md#device-lifecycle-and-failure-recovery) |
 | `RHI-6` | all six | candidate reports and package matrix |
 
 Use the [common phase contract](../../../CrossModule/FirstRelease/README.md#phase-card-contract). The [NVRHI Programming Guide](https://github.com/NVIDIA-RTX/NVRHI/blob/8e8c36e37558acec333204619b95d9d2fcdc4a79/doc/ProgrammingGuide.md), [DirectX Graphics Samples](https://github.com/microsoft/DirectX-Graphics-Samples), and [Khronos Vulkan Samples](https://github.com/KhronosGroup/Vulkan-Samples) provide reference questions and native oracles. They do not authorize a wrapper migration, API imitation, or claim of local parity.

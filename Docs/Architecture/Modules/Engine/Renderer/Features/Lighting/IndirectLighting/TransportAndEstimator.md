@@ -1,5 +1,7 @@
 # Indirect Lighting Transport And Estimator Contract
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** target mathematical contract with discovery-gated path domains and mappings; no implementation/convergence claim
 
 **Responsibility:** own indirect path measurement, technique accounting, path records, shifts, GRIS/reservoir weights, reuse, environment/emission, reconstruction-signal, and numerical rules

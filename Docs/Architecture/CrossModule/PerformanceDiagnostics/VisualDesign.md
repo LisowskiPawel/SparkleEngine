@@ -1,5 +1,7 @@
 # Performance Diagnostics Visual Design And Tool Wireframes
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** research; target-product visual design, not proof of current implementation or measured performance
 
 **Last reconciled with the target architecture and current viewport:** 2026-09-29 at revision `d1d26dbb`

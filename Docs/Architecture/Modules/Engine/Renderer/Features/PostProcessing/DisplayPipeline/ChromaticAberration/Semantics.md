@@ -1,5 +1,7 @@
 # Chromatic Aberration Semantics
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** proposed semantic contract; blocked until `CHRD-00` accepts the model and constants
 
 **Responsibility:** define coordinate spaces, resolution-scaled displacement, channel sampling, filtering, edge behavior, alpha, identity, and independent reference evaluation

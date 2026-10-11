@@ -1,5 +1,7 @@
 # Packaging And Installation
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** package contract and current implementation route; consumer package acceptance remains blocked
 
 **Scope:** define release inputs, deterministic packaging, clean-machine operation and local diagnostics/replacement

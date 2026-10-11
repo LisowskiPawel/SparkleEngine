@@ -1,5 +1,7 @@
 # Volumetric Lighting, Fog, Atmosphere, And Sky Dossier
 
+[Docs](../../../../../../../README.md) / [Up](../README.md)
+
 **Status:** current negative capability plus target feature contract; research/discovery ready, production stages blocked by roadmap admission and `VOL-D0`
 
 **Responsibility:** own the bounded volume/fog/atmosphere/sky promise, negative state, feature tiers, acceptance, failures, checks, and definition of done

@@ -1,5 +1,7 @@
 # Source Importers Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not fidelity certification or runtime evidence
 
 **Snapshot:** 2026-10-04 working tree at base revision `9f1eff12`; source/importer, Assimp build configuration, and Showcase cook route inspected; evidence `S` and local tool execution only

@@ -1,5 +1,7 @@
 # Indirect Lighting And ReSTIR GI Discovery Gate
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Gate:** `IND-D0`
 
 **Status:** **Open / production replacement blocked**; current code remains an unproved prototype until this gate and applicable release admission close

@@ -1,5 +1,7 @@
 # Build And Packaging Capability Inventory
 
+[Docs](../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current build-system inventory, not a successful-build or release-package record
 
 **Snapshot:** 2026-09-08 at committed `master` revision `ffe60e3a`; root/module CMake, profile/artifact contracts, dependency fetches, project discovery, tool/product membership, and install/test/CI searches inspected; evidence `S` only

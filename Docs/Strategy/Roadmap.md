@@ -1,5 +1,7 @@
 # F. Principal Graphics Delivery Roadmap
 
+[Docs](../README.md) / [Up](README.md)
+
 **Status:** master roadmap; planning priorities, not completion results
 
 **Scope:** the order to follow from the current release work through advanced graphics and portfolio delivery
@@ -72,7 +74,7 @@ Use this order within release step 3. A demonstrated dependency defect comes bef
 | 6 | **Exposure and reconstruction.** Finish exposure, DLSS SR/RR inputs, resets and native lifetime on both APIs. | [Exposure](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-2--exposure), [DLSS/RR](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-3--image-reconstruction-and-provider-integration) — `DSP-2/3` |
 | 7 | **Tone and output.** One correct color/tone/output transform; display adjustments must not conceal bad transport. | [Tone mapping and presentation](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-4--tone-mapping-encoding-and-presentation) — `DSP-4` |
 | 8 | **Decals and grading.** Complete the required material/display features with raw, temporal and backend checks. | [Decals](../Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracing.md#gr-5--deferred-gbuffer-decals), [grading](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-5--color-grading) — `GR-5`, `DSP-5` |
-| 9 | **Basic lens effects.** Independently prove chromatic aberration and vignette, including no work at neutral settings. | [Lens effects](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-6--chromatic-aberration-and-vignette), [vignette plan](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/Plan.md) — `DSP-6` |
+| 9 | **Basic lens effects.** Independently prove chromatic aberration and vignette, including no work at neutral settings. | [Lens effects](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-6--chromatic-aberration-and-vignette), [vignette plan](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/README.md#basic-vignette-remaining-delivery-plan) — `DSP-6` |
 | 10 | **HDR and SDR recovery.** Finish output behavior; HDR proof requires a qualified display/OS tuple. | [HDR output](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-7--hdr10-display-output) — `DSP-7` |
 | 11 | **Product controls and capture.** Responsive settings/UI/debug/capture/latency consumers with one state authority and honest tool support. | [Runtime/diagnostics](../Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnostics.md), [product controls](../Architecture/CrossModule/FirstRelease/README.md#product-and-delivery), [external capture](../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md) |
 | 12 | **Whole-frame closure.** Complete integration, failure checks, review findings and the remaining feature reports. | `FS-4`, `LGT-4`, `DSP-8`, `RD-6` in their plans; [aggregate closure](../Architecture/CrossModule/FirstRelease/README.md#fr-03--feature-closure) |
@@ -85,13 +87,13 @@ Start this program after release stabilization (`REL-11`). Each milestone depend
 
 | Milestone | What you build or demonstrate | Detailed work |
 | --- | --- | --- |
-| **M0 — Reproducible entry** | A reviewer can obtain the product/source and reproduce the supported result. | Reuse product build/adoption proof; [portfolio preparation](../Architecture/CrossModule/GraphicsPortfolio/Plan.md) |
+| **M0 — Reproducible entry** | A reviewer can obtain the product/source and reproduce the supported result. | Reuse product build/adoption proof; [portfolio preparation](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-portfolio-delivery-plan) |
 | **M1 — Traceable evidence** | Frozen scene/camera/settings identities, content losses and original capture joins. | Revalidate `MAP-00`; [workload sequence](../Acceptance/GraphicsWorkloads.md#workload-gate-sequence) |
 | **M2 — Correct content and references** | Bistro/San Miguel results with a qualified raw reference and stated uncertainty. | Reference, material/light and map checks in their existing owners |
 | **M3 — Causal classical studies** | One analyzer, three matched-API studies and one difficult incident. Retain a rejected or inconclusive alternative. | [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md#remaining-stages) — `WS-S0–3`; freeze discovery and real producer inputs first |
 | **M4 — Owned data and model** | One diffuse-indirect dataset/model and a repeatable training recipe. | [Neural plan](../Architecture/CrossModule/NeuralGraphics/Plan.md#remaining-stages) — `NG-S0–2`; accepted neural discovery first |
 | **M5 — Model to shader** | Correct exported operators and FP32 shaders, one runtime, then measured optimization. | [Neural plan](../Architecture/CrossModule/NeuralGraphics/Plan.md#remaining-stages) — `NG-S3–5`; conformance precedes optimization |
-| **M6 — Evaluation and transfer** | Held-out results, three headline cases and independent reproduction/review. | Neural `NG-S6`, study `WS-S3`, [portfolio assembly](../Architecture/CrossModule/GraphicsPortfolio/Plan.md) |
+| **M6 — Evaluation and transfer** | Held-out results, three headline cases and independent reproduction/review. | Neural `NG-S6`, study `WS-S3`, [portfolio assembly](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-portfolio-delivery-plan) |
 
 The [delivery catalog](FeatureDeliveryCatalog.md) gives concrete artifact examples for each professional output. Original workload and feature reports retain the measurements and conclusions.
 
@@ -99,8 +101,8 @@ The [delivery catalog](FeatureDeliveryCatalog.md) gives concrete artifact exampl
 
 After M6, select additional work only for a demonstrated need:
 
-- **Upstream contribution or technical submission:** a real issue/recipient and bounded output. Use the [contribution card](../Architecture/CrossModule/GraphicsPortfolio/UpstreamContribution.md).
-- **Teaching, a second adopter or maintenance transfer:** actual audience, exercise and feedback. Use the [knowledge-transfer card](../Architecture/CrossModule/GraphicsPortfolio/KnowledgeTransfer.md). M6's first independent review remains required.
+- **Upstream contribution or technical submission:** a real issue/recipient and bounded output. Use the [contribution card](../Architecture/CrossModule/GraphicsPortfolio/README.md#upstream-graphics-contribution).
+- **Teaching, a second adopter or maintenance transfer:** actual audience, exercise and feedback. Use the [knowledge-transfer card](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-knowledge-transfer). M6's first independent review remains required.
 
 **Not selected:** native Linux support; AMD hardware acquisition or AMD specialist profiling; new physics/networking/audio/scripting systems; installer/updater; stable plugin SDK; broad Editor or ML frameworks. Additional hardware needs its own admitted question; [profiling guidance](../Engineering/Verification/ExternalProfiling.md) records available routes.
 
@@ -135,7 +137,7 @@ Update the result in its owner, then update this page's current/next pointer. Lo
 
 ## Planning Coverage And Fillable Files
 
-All 49 feature families retain their [existing phase assignments](../Architecture/CrossModule/FirstRelease/README.md#feature-work-package-registry). Reuse these plans. The remaining small scaffolds are [Vignette](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/Plan.md), [Graphics Portfolio](../Architecture/CrossModule/GraphicsPortfolio/Plan.md) and the contribution/transfer cards above.
+All 49 feature families retain their [existing phase assignments](../Architecture/CrossModule/FirstRelease/README.md#feature-work-package-registry). Reuse these plans. The remaining small scaffolds are [Vignette](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/README.md#basic-vignette-remaining-delivery-plan), [Graphics Portfolio](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-portfolio-delivery-plan) and the contribution/transfer cards above.
 
 To fill a missing plan, use the [remaining-work template](../Engineering/Workflow/Templates/RemainingWorkPlan.md). Resolve its decision owners and check cards before calling it implementation-ready. Retire completed instructions after preserving useful design and evidence.
 

@@ -1,5 +1,7 @@
 # Chromatic Aberration User Experience
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** proposed development-product experience; blocked until `CHRD-00`, not an implemented UI promise
 
 **Responsibility:** define discoverability, controls, active-state truth, first use, reset, error/recovery, debug/UI/capture interpretation, accessibility, support, and automation equivalence for the admitted lens effect

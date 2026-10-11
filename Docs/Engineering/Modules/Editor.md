@@ -1,5 +1,7 @@
 # Editor Engineering
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** binding Editor integration standard
 
 **Applies to:** `Engine/Editor`, ImGui, UI/render boundaries, editor background operations, capture UX, and interactive frontend workflows

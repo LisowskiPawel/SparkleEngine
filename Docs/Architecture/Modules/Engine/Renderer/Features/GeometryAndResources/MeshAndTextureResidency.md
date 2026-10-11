@@ -1,5 +1,7 @@
 # Renderer Mesh and Texture Residency
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** current feature dossier; source-backed, not streaming-throughput, memory-pressure, or release evidence
 
 **Verified:** 2026-09-06 through committed `master` revision `c28b33bd`; current mesh, texture, residency, diagnostic, and submission owners inspected; executable source is unchanged from the earlier `8414b5dc` audit

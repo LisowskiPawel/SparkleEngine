@@ -1,5 +1,7 @@
 # Engineering Workflow
 
+[Docs](../../README.md) / [Up](../README.md)
+
 **Status:** workflow index
 
 Use this folder for procedures that govern how work moves through the repository. These documents apply because of the activity being performed, not because of a source module.

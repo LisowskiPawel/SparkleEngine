@@ -1,5 +1,7 @@
 # Naming and Vocabulary
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** binding naming and cross-boundary vocabulary standard
 
 **Applies to:** owned C++, shaders, serialized fields, profiler labels, files, and public documentation

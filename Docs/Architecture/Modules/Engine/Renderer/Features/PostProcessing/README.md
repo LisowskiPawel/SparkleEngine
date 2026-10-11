@@ -1,5 +1,7 @@
 # Renderer Post Processing
 
+[Docs](../../../../../../README.md) / [Up](../README.md)
+
 **Status:** current feature-family dossier; source-backed taxonomy, not visual-quality, latency, performance, backend, or release evidence
 
 **Verified:** 2026-09-06 against source revision `d236da11`; `Engine/Renderer` is unchanged from the earlier `8414b5dc` source audit
@@ -52,27 +54,27 @@ Color grading, chromatic aberration, vignette, HDR10 output, and frame generatio
 
 | Feature | Capability IDs | Current state | Owning dossier |
 | --- | --- | --- | --- |
-| Exposure | `REN-POST-01` through `REN-POST-03` | Implemented path; proof open | [Exposure](DisplayPipeline/Exposure.md) |
-| Image denoising and upscaling | `REN-POST-04` through `REN-POST-06` | Linear implemented; NVIDIA RR/SR providers capability-gated and independently composed; proof open | [Image Reconstruction and Upscaling](ReconstructionAndGeneration/ImageReconstructionAndUpscaling.md) |
-| Resolution, sampling, and anti-aliasing | `REN-RESO-01` through `REN-RESO-07` plus shared `REN-TEMP-*`/provider boundaries | output/render extent and single-sample/Halton path implemented; MSAA, standalone post AA, and dynamic resolution not found | [Resolution, Sampling, and Anti-Aliasing](ReconstructionAndGeneration/ResolutionSamplingAndAntiAliasing.md) |
-| Tone mapping | `REN-POST-07` | Three selectable operators; proof open | [Tone Mapping](DisplayPipeline/ToneMapping.md) |
-| SDR output and presentation | `REN-POST-08`, `REN-POST-10` | SDR-oriented encoding/publication implemented; exact debug presentation partial | [Presentation and Output](DisplayPipeline/PresentationAndOutput.md) |
+| Exposure | `REN-POST-01` through `REN-POST-03` | Implemented path; proof open | [Exposure](DisplayPipeline/README.md#exposure) |
+| Image denoising and upscaling | `REN-POST-04` through `REN-POST-06` | Linear implemented; NVIDIA RR/SR providers capability-gated and independently composed; proof open | [Image Reconstruction and Upscaling](ReconstructionAndGeneration/README.md#image-reconstruction-and-upscaling) |
+| Resolution, sampling, and anti-aliasing | `REN-RESO-01` through `REN-RESO-07` plus shared `REN-TEMP-*`/provider boundaries | output/render extent and single-sample/Halton path implemented; MSAA, standalone post AA, and dynamic resolution not found | [Resolution, Sampling, and Anti-Aliasing](ReconstructionAndGeneration/README.md#resolution-sampling-and-anti-aliasing) |
+| Tone mapping | `REN-POST-07` | Three selectable operators; proof open | [Tone Mapping](DisplayPipeline/README.md#tone-mapping) |
+| SDR output and presentation | `REN-POST-08`, `REN-POST-10` | SDR-oriented encoding/publication implemented; exact debug presentation partial | [Presentation and Output](DisplayPipeline/README.md#presentation-and-output) |
 | HDR display output | `REN-POST-09` | First-release target; implementation not found; discovery blocked | [HDR Display Output](DisplayPipeline/HDRDisplayOutput/README.md) |
 | Color grading | `REN-POST-11` | First-release target; implementation not found; discovery blocked | [Color Grading](DisplayPipeline/ColorGrading/README.md) |
 | Chromatic aberration | `REN-POST-12` | First-release target; implementation not found; discovery blocked | [Chromatic Aberration](DisplayPipeline/ChromaticAberration/README.md) |
-| Frame generation | `REN-POST-13` | Not found; Reflex is not frame generation | [Frame Generation](ReconstructionAndGeneration/FrameGeneration.md) |
+| Frame generation | `REN-POST-13` | Not found; Reflex is not frame generation | [Frame Generation](ReconstructionAndGeneration/README.md#frame-generation) |
 
 ## Ordering And Ownership Invariants
 
 - Exposure reads the scene-linear lighting result before debug replacement and supplies one per-view multiplier to reconstruction/upscaling and tone mapping.
 - Ray Reconstruction and presentation upscaling are distinct composable stages. Ray Reconstruction may produce `DenoisedSceneColor` at render extent; Linear or DLSS Super Resolution always produces `ResolvedSceneColor` at output extent from the selected raw/denoised input.
-- Output extent, provider-resolved render extent, temporal sampling, and attachment sample count remain separate concepts. [Resolution, Sampling, and Anti-Aliasing](ReconstructionAndGeneration/ResolutionSamplingAndAntiAliasing.md) owns their combination and negative-mode boundary.
+- Output extent, provider-resolved render extent, temporal sampling, and attachment sample count remain separate concepts. [Resolution, Sampling, and Anti-Aliasing](ReconstructionAndGeneration/README.md#resolution-sampling-and-anti-aliasing) owns their combination and negative-mode boundary.
 - Debug visualization may replace render-resolution scene color after exposure measurement. [Debug Views](../DebugViews/README.md) owns its visualization and presentation
     - domain semantics : HDR modes retain configured reconstruction / display mapping,
     exact modes use point reconstruction and bypass exposure / tone mapping,
     and neither activates Lit ray-reconstruction denoising.
 - Color grading is admitted before tone mapping in scene-referred space; tone mapping owns the following scene-referred-to-display-linear mapping. Neither owns output-device encoding or publication.
-- Presentation owns output encoding and destination publication. [UI and Viewport Composition](../ViewportAndDiagnostics/UiAndViewportComposition.md) happens after graph execution and is not a post-processing effect.
+- Presentation owns output encoding and destination publication. [UI and Viewport Composition](../ViewportAndDiagnostics/README.md#ui-and-viewport-composition) happens after graph execution and is not a post-processing effect.
 - Frame generation would create additional presented frames and therefore requires pacing, latency, UI, swapchain, and provenance contracts beyond ordinary upscaling. No such owner exists today.
 
 ## Shared Failure And Completion Boundary
@@ -110,4 +112,3 @@ The family passes only when every applicable child contract passes and `CHK-POST
 - [`BuildRenderFrameGraph.cpp`](../../../../../../../Engine/Renderer/Private/Frame/Graph/BuildRenderFrameGraph.cpp)
 - [`PresentationPasses.cpp`](../../../../../../../Engine/Renderer/Private/Passes/Presentation/PresentationPasses.cpp), [`ToneMapping.cpp`](../../../../../../../Engine/Renderer/Private/Passes/Presentation/Display/ToneMapping.cpp), and [`OutputEncoding.cpp`](../../../../../../../Engine/Renderer/Private/Passes/Presentation/Display/OutputEncoding.cpp)
 - [`RendererImageProviderStack.cpp`](../../../../../../../Engine/Renderer/Private/Providers/RendererImageProviderStack.cpp)
-

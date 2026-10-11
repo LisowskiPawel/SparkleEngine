@@ -1,5 +1,7 @@
 # Debug View Presentation - Acceptance
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** feature-local acceptance contract; not a candidate result
 
 **Responsibility:** own binary completion criteria, controlled failures, checks, oracles, and evidence boundaries for Debug Views.
@@ -10,7 +12,7 @@
 
 **Control-contract revision:** 2026-10-06; lighting controls require feature execution removal, remain editable in every mode, and never invalidate the viewport solely because a feature is disabled. Disabled raw lighting shows its initialized zero contribution; reconstruction guide production remains owned by its real consumers. No candidate result is added.
 
-**Architecture:** [Viewport Rendering Controls](Controls/README.md) and [Debug View Presentation Architecture](PresentationArchitecture.md)
+**Architecture:** [Viewport Rendering Controls](Controls/README.md) and [Debug View Presentation Architecture](README.md#debug-view-presentation-architecture)
 
 **Remaining delivery:** [Runtime And Diagnostics](../../FirstRelease/RuntimeAndDiagnostics.md)
 

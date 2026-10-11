@@ -1,5 +1,7 @@
 # Renderer Runtime And Diagnostics Closure Plan
 
+[Docs](../../../../../README.md) / [Up](README.md)
+
 Make shader binding, settings, debug views, capture and viewport controls agree about the frame the user sees.
 
 **Status:** implementation plan; not shader, UX, capture, latency, performance, or release evidence

@@ -1,5 +1,7 @@
 # Shader System Design Precedent
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** research; external technical precedent and deferred pipeline-preparation options, not local architecture or implemented behavior
 
 **Responsibility:** preserve the source-backed Unreal, NVIDIA, and AMD comparisons and the deferred PSO-preparation options that informed Sparkle's shader-system decisions

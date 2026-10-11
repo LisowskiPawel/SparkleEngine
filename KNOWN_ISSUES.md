@@ -1,5 +1,7 @@
 # Known issues
 
+[README](README.md)
+
 No qualified portable release is available yet.
 
 | Limitation | What to do |

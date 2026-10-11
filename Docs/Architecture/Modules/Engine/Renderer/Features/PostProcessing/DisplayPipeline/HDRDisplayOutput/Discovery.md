@@ -1,5 +1,7 @@
 # HDR Display Output Discovery
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** acceptance contract; `HDRD-00` is `Blocked`, and production implementation is not authorized
 
 **Responsibility:** freeze the Windows HDR product, scene/display semantics, target and SDR-white policy, D3D12/Vulkan presentation contract, transitions, UX, budgets, and evidence before `DSP-7`
@@ -167,4 +169,3 @@ The gate report retains:
 ## Gate Decision
 
 `HDRD-00` is **Blocked**. A future `PASS` must name the accepted dossier/research/semantics/architecture/experience/plan revisions and the exact release hardware/software cells. It authorizes only Stage 1 of [Plan](Plan.md); `FCR-REN-26` remains blocked until all feature evidence passes.
-

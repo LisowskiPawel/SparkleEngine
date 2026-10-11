@@ -1,5 +1,7 @@
 # Color Grading Execution Architecture
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** proposed target architecture; blocked until `CGRD-00`, not implementation proof
 
 **Responsibility:** define color-grading owners, data flow, source/cooked/runtime identity, View publication, frame-graph execution, failure, lifetime, capacity, packaging, and clean-break shape

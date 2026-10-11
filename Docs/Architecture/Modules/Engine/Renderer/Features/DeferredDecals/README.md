@@ -1,5 +1,7 @@
 # Renderer Deferred Decals
 
+[Docs](../../../../../../README.md) / [Up](../README.md)
+
 **Status:** first-release target dossier plus source-backed absence record; not implementation proof or release approval
 
 **Snapshot:** absence and extension seams rechecked 2026-09-06 against source revision `d236da11`; Renderer/RHI/shader source is unchanged from the earlier `8414b5dc` audit

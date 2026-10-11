@@ -58,10 +58,8 @@ namespace ReferencePathTracer
 		ordinal -= counts.Analytic;
 		if (ordinal < counts.EmissiveTriangle)
 		{
-			const PathLightSampling::EmissiveTriangleId triangle = PathLightSampling::FindEmissiveTriangle(ordinal);
 			result.Kind = KindEmissiveTriangle;
-			result.InstanceId = triangle.InstanceId;
-			result.PrimitiveIndex = triangle.PrimitiveIndex;
+			PathLightSampling::FindEmissiveTriangle(ordinal, result.InstanceId, result.PrimitiveIndex);
 			return result;
 		}
 

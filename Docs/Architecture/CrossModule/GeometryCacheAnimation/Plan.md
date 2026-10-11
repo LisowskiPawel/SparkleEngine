@@ -1,5 +1,7 @@
 # Geometry Cache Animation Delivery Plan
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** implementation plan; not proof of implementation or acceptance
 
 **Scope:** staged delivery of geometry-cache import, cooking, playback, residency, shared deformation, ray integration, and validation

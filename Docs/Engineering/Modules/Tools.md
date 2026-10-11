@@ -1,5 +1,7 @@
 # Tools Engineering
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** binding Tools integration standard
 
 **Applies to:** `Tools`, source import, cooking, shader compilation, Launcher operations, command-line workflows, publication, and tool background work

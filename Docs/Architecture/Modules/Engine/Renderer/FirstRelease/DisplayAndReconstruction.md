@@ -1,5 +1,7 @@
 # Renderer Display And Reconstruction Closure Plan
 
+[Docs](../../../../../README.md) / [Up](README.md)
+
 Turn correct scene radiance into a stable, reconstructed SDR or HDR image with honest controls.
 
 **Status:** implementation plan; not colorimetric, provider, visual-quality, performance, or release evidence
@@ -128,7 +130,7 @@ Also deliver [Basic Vignette](../Features/PostProcessing/DisplayPipeline/Vignett
 
 **Phase exit criteria:** `AC-CHR-01` through `AC-CHR-08` and `AC-VIG-01` through `AC-VIG-06`, zero/known-pattern/edge/alpha/resolution/view/debug/backend/package/cost and controlled-negative checks pass; `FCR-REN-25` records the two candidate-bound sub-results.
 
-The separate vignette freeze/stage cards and prompt live in the [feature-local plan](../Features/PostProcessing/DisplayPipeline/Vignette/Plan.md). DSP-6 composes the two independently proved results; it does not maintain a second vignette delivery sequence.
+The separate vignette freeze/stage cards and prompt live in the [feature-local plan](../Features/PostProcessing/DisplayPipeline/Vignette/README.md#basic-vignette-remaining-delivery-plan). DSP-6 composes the two independently proved results; it does not maintain a second vignette delivery sequence.
 
 ## `DSP-7` — HDR10 Display Output
 

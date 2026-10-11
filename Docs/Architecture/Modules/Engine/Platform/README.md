@@ -1,5 +1,7 @@
 # Platform Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not portability or runtime evidence
 
 **Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; `Engine/Platform` public/private source and CMake membership inspected; evidence `S` only

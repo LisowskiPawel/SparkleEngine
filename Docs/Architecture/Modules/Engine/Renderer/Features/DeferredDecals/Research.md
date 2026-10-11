@@ -1,5 +1,7 @@
 # Deferred Decal Composition Precedent
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** research; external-source comparison, not Sparkle architecture or acceptance authority
 
 **Scope:** external precedent for projected deferred decals, programmable GBuffer composition, arbitrary ray-hit lookup, and representative workload selection

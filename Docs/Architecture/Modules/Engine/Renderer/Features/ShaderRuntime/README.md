@@ -1,5 +1,7 @@
 # Renderer Shader Runtime
 
+[Docs](../../../../../../README.md) / [Up](../README.md)
+
 **Status:** Renderer feature-family index
 
 **Scope:** route exact shader-program membership and the runtime materialization, binding, generation, and retirement contract

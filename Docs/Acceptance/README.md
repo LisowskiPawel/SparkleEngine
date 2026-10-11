@@ -1,5 +1,7 @@
 # Acceptance
 
+[Docs](../README.md) / [Up](../README.md)
+
 **Status:** acceptance navigation index
 
 Acceptance orchestrates progress across features, workloads, and releases. It owns shared completion vocabulary, candidate-report structure, workload gates, release gates, and high-level status; it does not maintain a second feature-documentation tree.

@@ -1,5 +1,7 @@
 # Renderer Color Grading
 
+[Docs](../../../../../../../../README.md) / [Up](../README.md)
+
 **Status:** first-release target feature dossier plus current source-backed absence; `CGRD-00` and production implementation are `Blocked`
 
 **Responsibility:** define the bounded color-grading product, current absence, target feature set, acceptance criteria, failures, checks, and conjunctive definition of done for `FCR-REN-24`

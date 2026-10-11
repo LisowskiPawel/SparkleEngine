@@ -1,5 +1,7 @@
 # A. Principal Graphics Engineering Requirements
 
+[Docs](../README.md) / [Up](README.md)
+
 **Status:** strategy contract; canonical vendor-neutral capability baseline
 
 **Current evidence:** the [readiness dashboard](../Acceptance/CurrentReadiness.md) owns feature scores. The requirements below are targets, not awarded capabilities.
@@ -8,7 +10,7 @@
 
 **Scope:** principal-level real-time graphics, developer technology, GPU systems, rendering research productization, workload tooling, and neural graphics
 
-**Research refinement:** 2026-10-10; [role depth](Research/GraphicsRoleDepth.md), [affiliation-checked public work](Research/GraphicsEngineerProfiles.md) and [pinned rendering examples](Research/RenderingReferenceExamples.md) strengthen the evidence targets below without upgrading any personal or feature result.
+**Research refinement:** 2026-10-10; [role depth](Research/GraphicsEngineerProfiles.md#graphics-role-depth-and-evidence), [affiliation-checked public work](Research/GraphicsEngineerProfiles.md) and [pinned rendering examples](Research/RenderingReferenceExamples.md) strengthen the evidence targets below without upgrading any personal or feature result.
 
 ## Read This Page
 
@@ -159,7 +161,7 @@ The first screen contains the result, not the architecture history.
 
 ### Research-Informed Evidence Depth
 
-The target is rendering/developer technology with GPU-system depth. Senior roles emphasize substantial production ownership; expert depth requires a defensible mathematical/native explanation; the inspected principal roles add ambiguous problem selection, technical direction, adoption and influence. This is a [source-backed strategic synthesis](Research/GraphicsRoleDepth.md), not NVIDIA's internal title framework.
+The target is rendering/developer technology with GPU-system depth. Senior roles emphasize substantial production ownership; expert depth requires a defensible mathematical/native explanation; the inspected principal roles add ambiguous problem selection, technical direction, adoption and influence. This is a [source-backed strategic synthesis](Research/GraphicsEngineerProfiles.md#graphics-role-depth-and-evidence), not NVIDIA's internal title framework.
 
 | Existing requirements | Added review obligation | Reference and selected delivery |
 | --- | --- | --- |

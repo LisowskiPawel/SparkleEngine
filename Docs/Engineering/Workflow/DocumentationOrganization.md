@@ -1,5 +1,7 @@
 # Documentation Organization
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** binding documentation organization and maintenance standard
 
 **Applies to:** authored Markdown and documentation-owned images under `Docs`
@@ -187,6 +189,8 @@ A feature family with child capabilities that have different inputs/results, sel
 ## Navigation And Links
 
 The required route is `Docs/README.md` -> Architecture/Engineering/Strategy/Acceptance index -> module or cross-module subject index -> owning document. Every non-index document MUST be reachable from its nearest index, and every index entry MUST state why a reader would open it. A reader MUST be able to distinguish module-owned and cross-module knowledge from the path, and architecture/plan/research/acceptance roles from the filename and status header.
+
+Retained pages link to Docs and their nearest parent guide. Combine short pages for the same subject when section links are enough; keep independent research or large contracts separate. Consolidation preserves section status, goals, checks and provenance.
 
 Use relative Markdown links. Link directly to the owning section where practical. When a file moves or splits, update every producer and consumer in the same change and remove the old path; do not retain alias files, duplicate copies, or compatibility indexes.
 

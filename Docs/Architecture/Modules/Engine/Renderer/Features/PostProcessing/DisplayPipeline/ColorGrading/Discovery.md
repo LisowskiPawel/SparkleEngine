@@ -1,5 +1,7 @@
 # Color Grading Discovery
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** acceptance contract; `CGRD-00` is `Blocked`, and production implementation is not authorized
 
 **Responsibility:** freeze the first-release color domain, transform semantics, LUT contract, ownership, experience, budgets, and evidence protocol before `DSP-5` implementation begins
@@ -172,4 +174,3 @@ The gate report is complete only when it retains:
 ## Gate Decision
 
 `CGRD-00` is **Blocked**. A reviewer may record `PASS` only when all discovery acceptance criteria pass conjunctively, the exact accepted revisions of the dossier, semantics, architecture, experience, and plan are named, and `DSP-5` plus release prerequisites permit work. A pass authorizes Stage 1 of [Plan](Plan.md), not the whole feature and not `FCR-REN-24`.
-

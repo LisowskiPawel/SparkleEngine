@@ -1,5 +1,7 @@
 # Deferred GBuffer Decals Delivery Plan
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 Add authored decals that modify the right material surface consistently for raster and ray rendering.
 
 **Status:** implementation plan; not proof of implementation or acceptance

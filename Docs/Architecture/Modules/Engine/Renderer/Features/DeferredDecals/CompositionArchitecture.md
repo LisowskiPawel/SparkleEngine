@@ -1,5 +1,7 @@
 # Deferred GBuffer Decal Composition Architecture
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** target architecture; not implemented behavior
 
 **Date:** 2026-08-17

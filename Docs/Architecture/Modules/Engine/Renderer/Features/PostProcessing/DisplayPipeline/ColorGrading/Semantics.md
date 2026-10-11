@@ -1,5 +1,7 @@
 # Color Grading Semantics
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** proposed semantic contract; blocked until `CGRD-00` accepts every open rule
 
 **Responsibility:** define the exact color domain, parametric transform, 3D-LUT mapping, identity, invalid-value behavior, and independent reference procedure for first-release color grading

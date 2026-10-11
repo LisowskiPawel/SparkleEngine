@@ -1,5 +1,7 @@
 # Launcher Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not workflow success or distribution evidence
 
 **Snapshot:** 2026-10-04 against base revision `26803f97` with the current Launcher change applied; Launcher public contracts, planners/executors, Qt GUI, shell path, capability graph, dependencies, level catalog, state paths, process handoff/progress decoding, clean containment, and CMake membership inspected; evidence `S` only

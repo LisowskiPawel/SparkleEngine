@@ -1,5 +1,7 @@
 # Clang-Format Decision Record
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** accepted decision record; executable authority lives in `.clang-format` and the binding coding-style standard
 
 **Date:** 2026-08-02

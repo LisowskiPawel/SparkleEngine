@@ -1,5 +1,7 @@
 # Shader System Architecture
 
+[Docs](../../../README.md) / [Up](../README.md)
+
 **Status:** feature dossier; target architecture, source-reconciled but not executable proof
 
 **Responsibility:** shader authoring identity, compilation inputs, cooked map/library shape, runtime materialization, typed graph use, ownership, failure policy, and capability boundaries
@@ -915,4 +917,3 @@ Rejected as a default because Sparkle already runs the cooker out of process and
 - [Shader System Delivery Plan](Plan.md) owns phase order, change boundaries, validation sequencing, and phase exits.
 - [Shader System Migration Baseline](MigrationBaseline.md) preserves the frozen pre-migration inventory and deletion ledger.
 - [Ray-Tracing Execution Architecture](../../Modules/Engine/Renderer/Features/RayTracing/ExecutionArchitecture.md) owns enduring dual-execution and shader-table semantics.
-

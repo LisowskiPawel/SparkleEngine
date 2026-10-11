@@ -1,5 +1,7 @@
 # Direct Lighting User Experience Contract
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** proposed experience; implementation and acceptance remain blocked by `DIR-D0`
 
 **Responsibility:** define how artists, rendering engineers, automation, and support select, understand, diagnose, capture, and recover the Direct Lighting feature

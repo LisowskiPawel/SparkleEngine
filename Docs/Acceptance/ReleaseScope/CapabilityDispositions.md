@@ -1,5 +1,7 @@
 # First Release Capability Dispositions
 
+[Docs](../../README.md) / [Up](../README.md)
+
 **Status:** scope ledger under the approved product choices; technical closure/native evidence remains required; no capability receives acceptance evidence here
 
 **Responsibility:** give every existing module inventory row one release classification and an owning module, then split compound user surfaces explicitly

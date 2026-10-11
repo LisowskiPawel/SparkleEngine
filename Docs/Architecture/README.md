@@ -1,5 +1,7 @@
 # SparkleEngine Architecture
 
+[Docs](../README.md) / [Up](../README.md)
+
 **Status:** subject-first system and feature knowledge index
 
 This tree explains what each system does, how data and responsibility move through the engine, which design choices were made, where current implementation stops, what informed those choices, and how remaining work is sequenced. Related architecture, plans, research, and feature-local proof contracts stay with their owning module or feature.

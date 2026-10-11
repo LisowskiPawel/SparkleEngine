@@ -1,5 +1,7 @@
 # Cross-Module Architecture
 
+[Docs](../../README.md) / [Up](../README.md)
+
 **Status:** cross-module architecture index
 
 **Current state:** this index is not a single feature score. Its owned feature dossiers range from **0/100** target-only geometry-cache/neural paths, through **20/100** performance diagnostics, to a **50/100** integrated shader-system route. See [Current Feature Readiness](../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).

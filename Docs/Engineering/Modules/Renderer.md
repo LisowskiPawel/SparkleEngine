@@ -1,5 +1,7 @@
 # Renderer Engineering
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** binding Renderer integration standard
 
 **Applies to:** `Engine/Renderer`, renderer-owned shaders, persistent GPU-scene policy, frame metadata, frame graphs, render products, path/neural rendering, captures, and graphics evidence

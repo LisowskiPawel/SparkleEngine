@@ -1,5 +1,7 @@
 # External Performance Profiler Runbook
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** runbook; version-sensitive operational guidance, not proof of current Sparkle implementation or tool support
 
 **Last external-source reconciliation:** provider protocol and Unreal/Unity/Godot integration research refreshed 2026-10-06 in [External Capture Research](../../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Research.md). The version table below retains its 2026-09-29 observations unless explicitly updated; it is not an installed support matrix.

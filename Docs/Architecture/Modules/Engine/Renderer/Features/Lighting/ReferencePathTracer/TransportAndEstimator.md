@@ -1,5 +1,7 @@
 # Reference Path Tracer Transport And Estimator Contract
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** Stage-0-frozen mathematical contract with the 2026-09-13 binary32 amendment and source correspondence through the implemented transport stages; executable estimator validation remains deferred, and the current black-lighting result blocks any usable-radiance or Reference-authority claim
 
 **Responsibility:** define one notation, estimator, event algorithm, probability-measure contract, PBR material boundary, numerical policy, equation-to-code ledger, and mathematical failure checklist for `SurfaceTransportReference` and `FinitePathDiagnostic`

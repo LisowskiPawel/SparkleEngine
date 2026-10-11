@@ -1,5 +1,7 @@
 # Repository Quality and Complexity Executive Assessment
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** dated assessment; strategy and refactoring decision brief
 
 **Current feature readiness:** **Not graded by this assessment.** Repository quality is not interchangeable with feature completion; use the current **40/100** portfolio projection in [Current Feature Readiness](../../Acceptance/CurrentReadiness.md) for implementation/evidence state.

@@ -1,5 +1,7 @@
 # Product And Developer Workflow Coverage
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** capability snapshot; horizontal workflow inventory; not usability, runtime, package, or release evidence
 
 **Snapshot:** 2026-09-08 at committed `master` revision `ffe60e3a`; current module inventories, build membership, product/tool entry points, frozen product dispositions, and release contracts reconciled; evidence `S` only

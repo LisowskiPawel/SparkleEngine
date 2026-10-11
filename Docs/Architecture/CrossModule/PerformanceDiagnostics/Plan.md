@@ -1,5 +1,7 @@
 # Performance Diagnostics Delivery Plan
 
+[Docs](../../../README.md) / [Up](README.md)
+
 Make the existing renderer observable with trustworthy external captures before adding selected internal diagnostics.
 
 **Status:** implementation plan; not proof of implementation or shipment

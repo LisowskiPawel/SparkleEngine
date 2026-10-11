@@ -1,5 +1,7 @@
 # HDR Display Output Semantics
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** proposed semantic contract; blocked until `HDRD-00` freezes scene, target, UI-white, gamut, tone, and output-route decisions
 
 **Responsibility:** define luminance/color domains, Rec.2020/PQ signal encoding, target mapping, UI reference white, alpha, finite behavior, metadata separation, and independent reference procedure

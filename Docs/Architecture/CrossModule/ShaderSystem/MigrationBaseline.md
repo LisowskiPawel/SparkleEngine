@@ -1,5 +1,7 @@
 # Shader System Migration Baseline
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** archive; dated migration snapshot, not current architecture, implementation status, or delivery authority
 
 **Responsibility:** preserve the frozen Phase 0 shader-system findings, counts, and deletion ledger as migration provenance
@@ -375,4 +377,3 @@ rg -n "Passes/Deferred|ShaderPackage|sparkshader|RendererSceneViewFrameArchitect
 | scoped documentation and review gate | documentation diff inspection, local target/anchor resolution for touched documents, staging/scope checks, and `git diff --check`; review route: [SparkleEngine Code Review](../../../Engineering/Workflow/CodeReview.md) | **PASS** - documentation-only scope, no P0-P2 finding, no runtime/tool/build/generated edit, and no executable evidence claimed |
 
 Phase 0 is documentation-only and has no runtime performance class. The target is not implemented by this evidence; it is now sufficiently owned, ordered, and falsifiable for Phase 1 to begin without an intermediate architecture or unassigned legacy cleanup.
-

@@ -1,5 +1,7 @@
 # Color Grading Research
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** research; primary-source precedent and discovery input, not SparkleEngine design authority, implementation proof, or acceptance evidence
 
 **Responsibility:** compare current Sparkle source with revision-pinned color-grading, CDL, LUT, ownership, and validation precedent that can inform `CGRD-00`
@@ -197,4 +199,3 @@ The sources are used as precedent and validation ideas. Any copied formula, pars
 [^8]: Academy Software Foundation, OpenColorIO, [Iridas `.cube` reader at `5a808fb57a94c7229640a97835c420c9a1fbd1fe`](https://github.com/AcademySoftwareFoundation/OpenColorIO/blob/5a808fb57a94c7229640a97835c420c9a1fbd1fe/src/OpenColorIO/fileformats/FileFormatIridasCube.cpp), accessed 2026-09-10.
 [^9]: Academy Software Foundation, OpenColorIO, [Iridas `.cube` CPU tests at `5a808fb57a94c7229640a97835c420c9a1fbd1fe`](https://github.com/AcademySoftwareFoundation/OpenColorIO/blob/5a808fb57a94c7229640a97835c420c9a1fbd1fe/tests/cpu/fileformats/FileFormatIridasCube_tests.cpp), accessed 2026-09-10.
 [^10]: OpenColorIO project, [stack-buffer-overflow advisory `GHSA-28jr-x9w2-5pc4`](https://github.com/AcademySoftwareFoundation/OpenColorIO/security/advisories/GHSA-28jr-x9w2-5pc4), published 2026-04-09 and accessed 2026-09-10.
-

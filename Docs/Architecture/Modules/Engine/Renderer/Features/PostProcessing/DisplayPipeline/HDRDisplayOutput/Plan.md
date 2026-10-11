@@ -1,5 +1,7 @@
 # HDR Display Output Delivery Plan
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 Make HDR output activate truthfully on supported displays and recover to a usable SDR image when it cannot.
 
 **Status:** conditional implementation plan; Stage 0 is permitted, Stages 1-7 are blocked until `HDRD-00 PASS` and `DSP-7` prerequisites

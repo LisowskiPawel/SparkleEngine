@@ -1,5 +1,7 @@
 # Volumetric Lighting, Fog, Atmosphere, And Sky Execution Architecture
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** target architecture pending `REL-11` admission and `VOL-D0`; current Renderer has no volume feature
 
 **Responsibility:** own the target feature enclosure, authored-to-GPU route, records, pass/resources, histories, sky/environment/content/backend boundaries, lifetime, failure, and integration hooks

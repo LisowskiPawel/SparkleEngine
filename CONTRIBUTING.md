@@ -1,5 +1,7 @@
 # Contributing to SparkleEngine
 
+[README](README.md) / [Docs](Docs/README.md)
+
 Submit bugs, documentation fixes and code changes to [SparkleEngine](https://github.com/stoleckipawel/SparkleEngine). Pawel Lisowski reviews contributions when available. There is no support service or response deadline.
 
 ## Bugs and proposals

@@ -1,5 +1,7 @@
 # Asset Cooking Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not deterministic-cook, package, or runtime evidence
 
 **Snapshot:** 2026-09-28 at committed `master` revision `452c1f32`; AssetCooker, TextureCooker, MeshCooker, MaterialCooker, SceneCooker, source import, progress, publication, and CMake membership inspected; evidence `S` only

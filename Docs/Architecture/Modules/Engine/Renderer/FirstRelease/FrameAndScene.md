@@ -1,5 +1,7 @@
 # Renderer Frame And Scene Closure Plan
 
+[Docs](../../../../../README.md) / [Up](README.md)
+
 Keep each frame tied to the right world, camera and settings, and execute only valid graph work.
 
 **Status:** implementation plan; not frame, threading, graph, or release evidence
@@ -105,6 +107,6 @@ The [required whole-frame review](../../../../../Acceptance/FirstRelease.md#prin
 
 **Parent:** [First Release Renderer Plans](README.md)
 
-**Architecture:** [Frame Execution](../Features/FrameExecution/README.md), [Scene And View Preparation](../Features/SceneAndViewPreparation/README.md), [feature acceptance](../Features/SceneAndViewPreparation/Acceptance.md), and [Frame Graph And Scheduling](../Features/FrameExecution/FrameGraphAndScheduling.md)
+**Architecture:** [Frame Execution](../Features/FrameExecution/README.md), [Scene And View Preparation](../Features/SceneAndViewPreparation/README.md), [feature acceptance](../Features/SceneAndViewPreparation/README.md#scene-and-view-preparation-acceptance), and [Frame Graph And Scheduling](../Features/FrameExecution/FrameGraphAndScheduling.md)
 
 </details>

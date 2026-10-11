@@ -1,5 +1,7 @@
 # Engineering Decisions
 
+[Docs](../../README.md) / [Up](../README.md)
+
 **Status:** engineering decision index
 
 Decision records preserve why an engineering choice was accepted. They do not override current standards or executable configuration.

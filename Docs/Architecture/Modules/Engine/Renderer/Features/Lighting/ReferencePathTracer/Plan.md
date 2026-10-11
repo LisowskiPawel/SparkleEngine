@@ -1,5 +1,7 @@
 # Reference Path Tracer Remaining Recovery And Validation Plan
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 Recover useful Lit and Reference images, then prove the existing tracer before using its output as a reference.
 
 **Status:** source stages delivered; recovery, deferred GPU validation, artifact integrity and final adoption remain open

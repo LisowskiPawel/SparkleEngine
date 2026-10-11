@@ -1,5 +1,7 @@
 # Renderer Ray Tracing
 
+[Docs](../../../../../../README.md) / [Up](../README.md)
+
 **Status:** current feature dossier; source-backed, not native execution, backend parity, visual correctness, performance, or release evidence
 
 **Verified:** 2026-09-06 against committed `master` revision `d236da11`; `Engine/Renderer` and `Engine/RHI` are unchanged from the earlier `8414b5dc` source audit
@@ -144,5 +146,4 @@ This current contract is **defined but unproved**. The target [Execution Archite
 - [`RayTracingShaderTablePlan.cpp`](../../../../../../../Engine/Renderer/Private/Scene/RayTracing/RayTracingShaderTablePlan.cpp)
 - [`RayTracingGBufferMesh.cpp`](../../../../../../../Engine/Renderer/Private/Passes/GBuffer/RayTracing/RayTracingGBufferMesh.cpp)
 - [`DirectShadowSignal.cpp`](../../../../../../../Engine/Renderer/Private/Passes/Lighting/Shadows/DirectShadowSignal.cpp)
-- [RHI Ray Tracing](../../../RHI/Features/PipelineAndExecution/RayTracing.md) for the mechanism and local proof contract, [RHI Capability Inventory](../../../RHI/CapabilityInventory.md#ray-tracing-coverage) for exact backend rows, and [Shader Program Catalog](../ShaderRuntime/ShaderProgramCatalog.md) for current ray stages.
-
+- [RHI Ray Tracing](../../../RHI/Features/PipelineAndExecution/README.md#ray-tracing) for the mechanism and local proof contract, [RHI Capability Inventory](../../../RHI/CapabilityInventory.md#ray-tracing-coverage) for exact backend rows, and [Shader Program Catalog](../ShaderRuntime/ShaderProgramCatalog.md) for current ray stages.

@@ -1,5 +1,7 @@
 # Editor Icon Assets And Service
 
+[Docs](../../../../README.md) / [Up](README.md)
+
 **Status:** implemented path; bounded DevelopmentEditor validation recorded in the [handoff](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/Discovery.md#shared-editor-icon-service-handoff)
 
 Editor clients select immutable artwork and ask a UI-owned icon service to draw it. Clients do not register atlas rectangles, copy pixels or retain texture coordinates. The first consumer is the external-capture viewport overlay; the service contains no capture/tool policy.

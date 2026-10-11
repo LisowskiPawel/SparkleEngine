@@ -1,5 +1,7 @@
 # Indirect Lighting And ReSTIR GI Staged Implementation Plan
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 Replace seed replay with an explicit indirect-transport estimator whose reuse and reconstruction can be checked.
 
 **Status:** implementation-ready sequence, blocked by `IND-D0`, applicable release admission, and stage-specific oracle/provider gates

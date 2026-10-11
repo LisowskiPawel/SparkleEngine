@@ -1,5 +1,7 @@
 # Feature Documentation Coverage
 
+[Docs](../../../README.md) / [Up](../README.md)
+
 **Status:** traceability index; this folder does not define feature behavior, sequencing, or release approval
 
 **Owner:** Architecture documentation routing

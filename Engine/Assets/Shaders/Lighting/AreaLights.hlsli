@@ -98,23 +98,6 @@ namespace AreaLights
 		    PunctualLights::ComputeRangeAttenuation(distanceToSample, light.Range) * PunctualLights::ComputeAreaDistanceAttenuationCorrection(distanceToSample, light.DistanceAttenuationCoefficients));
 	}
 
-	struct RectLightFrame
-	{
-		float3 NormalWorld;
-		float3 TangentWorld;
-		float3 BitangentWorld;
-	};
-
-	RectLightFrame BuildRectFrame(RectLightGpuData light)
-	{
-		RectLightFrame frame;
-		frame.NormalWorld = normalize(light.Direction);
-		frame.TangentWorld = light.Tangent - frame.NormalWorld * dot(light.Tangent, frame.NormalWorld);
-		frame.TangentWorld = normalize(frame.TangentWorld);
-		frame.BitangentWorld = normalize(cross(frame.NormalWorld, frame.TangentWorld));
-		return frame;
-	}
-
 	LightSampling::DirectLightSample SampleRectLight(float3 positionWorld, uint lightIndex, float2 sample)
 	{
 		const RectLightGpuData light = RectLights[lightIndex];
@@ -122,9 +105,12 @@ namespace AreaLights
 		const float height = light.Height;
 		const float area = width * height;
 
-		const RectLightFrame frame = BuildRectFrame(light);
-		const float3 samplePositionWorld = light.Position + frame.TangentWorld * ((sample.x - 0.5f) * width) + frame.BitangentWorld * ((sample.y - 0.5f) * height);
-		return LightSampling::AreaDirectLightSample(positionWorld, samplePositionWorld, frame.NormalWorld, light.Color * light.Luminance, rcp(area), 1.0f);
+		const float3 normalWorld = normalize(light.Direction);
+		float3 tangentWorld = light.Tangent - normalWorld * dot(light.Tangent, normalWorld);
+		tangentWorld = normalize(tangentWorld);
+		const float3 bitangentWorld = normalize(cross(normalWorld, tangentWorld));
+		const float3 samplePositionWorld = light.Position + tangentWorld * ((sample.x - 0.5f) * width) + bitangentWorld * ((sample.y - 0.5f) * height);
+		return LightSampling::AreaDirectLightSample(positionWorld, samplePositionWorld, normalWorld, light.Color * light.Luminance, rcp(area), 1.0f);
 	}
 }
 

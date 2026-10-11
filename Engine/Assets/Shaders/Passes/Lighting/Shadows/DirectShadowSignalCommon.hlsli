@@ -16,15 +16,15 @@ RWTexture2D<float4> ShadowVisibilitySignal;
 Texture2D<float4> CurrentReservoirSample;
 Texture2D<float4> CurrentReservoirWeight;
 
-RayTracedShadowPreparation PrepareDirectShadowSignal(uint2 pixelCoord)
+bool PrepareDirectShadowSignal(uint2 pixelCoord, out RayTracedShadowRequest request, out ShadowVisibilitySample immediateSignal)
 {
-	RayTracedShadowPreparation preparation = (RayTracedShadowPreparation)0;
-	preparation.ImmediateSignal = RayTracedShadowSignals::BuildUnshadowedSignal(0.0f);
+	request = (RayTracedShadowRequest)0;
+	immediateSignal = RayTracedShadowSignals::BuildUnshadowedSignal(0.0f);
 
 	const float sceneDepth = LoadSceneDepth(pixelCoord);
 	if (IsSkyPixel(sceneDepth))
 	{
-		return preparation;
+		return false;
 	}
 
 	const float3 positionWorld = ReconstructGBufferWorldPosition(pixelCoord, sceneDepth, InvViewMTX, InvProjectionMTX);
@@ -32,11 +32,11 @@ RayTracedShadowPreparation PrepareDirectShadowSignal(uint2 pixelCoord)
 	const DirectLightReservoir::Reservoir reservoir = DirectLightReservoir::UnpackReservoir(CurrentReservoirSample.Load(int3(pixelCoord, 0)), CurrentReservoirWeight.Load(int3(pixelCoord, 0)));
 	if (!DirectLightReservoir::IsValid(reservoir))
 	{
-		return preparation;
+		return false;
 	}
 
 	const LightSampling::DirectLightSample lightSample = DirectLightReservoir::ReplayLightSample(reservoir, positionWorld);
-	return RayTracedShadows::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, DirectLightSampling::CastsShadow(reservoir.Candidate.Light));
+	return RayTracedShadows::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, DirectLightSampling::CastsShadow(reservoir.Candidate.Light), request, immediateSignal);
 }
 
 void TraceAndStoreDirectShadowSignal(uint2 pixelCoord)
@@ -49,11 +49,11 @@ void TraceAndStoreDirectShadowSignal(uint2 pixelCoord)
 		return;
 	}
 
-	const RayTracedShadowPreparation preparation = PrepareDirectShadowSignal(pixelCoord);
-	ShadowVisibilitySample signal = preparation.ImmediateSignal;
-	if (preparation.TraceRequired)
+	RayTracedShadowRequest request;
+	ShadowVisibilitySample signal;
+	if (PrepareDirectShadowSignal(pixelCoord, request, signal))
 	{
-		signal = RayTracedShadows::TraceShadowRay(preparation.Request);
+		signal = RayTracedShadows::TraceShadowRay(request);
 	}
 
 	ShadowVisibilitySignal[pixelCoord] = RayTracedShadowSignalPacking::PackShadowSignal(signal);

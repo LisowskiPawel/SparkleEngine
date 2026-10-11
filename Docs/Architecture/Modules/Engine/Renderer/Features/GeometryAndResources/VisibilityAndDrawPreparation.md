@@ -1,5 +1,7 @@
 # Renderer Visibility And Draw Preparation
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** current feature dossier; source-backed, not visibility correctness, batching benefit, transparency, multi-view, or performance evidence
 
 **Verified:** 2026-09-07 at committed `master` revision `c28b33bd`
@@ -141,6 +143,4 @@ Primary evidence destination: `REN-E32` in the [Capability Evidence Plan](../../
 - [`MeshInstanceBatchBuilder.cpp`](../../../../../../../Engine/Renderer/Private/View/MeshInstanceBatchBuilder.cpp)
 - `Engine/Renderer/Private/View/RenderView.h`, `MeshInstanceBatchBuilder.h`, and prepared-scene contracts
 - [`GBufferMeshPass.cpp`](../../../../../../../Engine/Renderer/Private/Passes/GBuffer/Raster/GBufferMeshPass.cpp)
-- [Scene/View Acceptance](../SceneAndViewPreparation/Acceptance.md) and [Geometry, Materials, and GBuffer](GeometryMaterialsAndGBuffer.md)
-
-
+- [Scene/View Acceptance](../SceneAndViewPreparation/README.md#scene-and-view-preparation-acceptance) and [Geometry, Materials, and GBuffer](GeometryMaterialsAndGBuffer.md)

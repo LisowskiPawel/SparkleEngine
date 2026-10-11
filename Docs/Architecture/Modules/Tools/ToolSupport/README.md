@@ -1,5 +1,7 @@
 # Shared Tool Support Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not tool-output compatibility or integration evidence
 
 **Snapshot:** 2026-09-28 at committed `master` revision `452c1f32`; `Tools/Support/ToolConsoleSupport`, its CMake membership, and current Launcher, AssetCooker, TextureCooker, and ShaderCompiler consumers inspected; evidence `S` only

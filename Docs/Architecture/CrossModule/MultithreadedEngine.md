@@ -1,5 +1,7 @@
 # J. Multithreaded Engine Architecture
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** target architecture; includes canonical decisions but is not proof of current implementation
 
 **Last narrowed:** 2026-08-11

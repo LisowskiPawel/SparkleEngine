@@ -1,5 +1,7 @@
 # Showcase Product Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current product/catalog view, not evidence that every level is downloaded, cooked, runnable, or releasable
 
 **Snapshot:** 2026-10-04 working tree at base revision `9f1eff12`; catalog, level files, Launcher sync/readiness, source import and cooking inspected; evidence `S` and local tool execution only

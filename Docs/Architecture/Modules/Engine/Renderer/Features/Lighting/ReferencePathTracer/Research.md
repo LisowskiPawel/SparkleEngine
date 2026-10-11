@@ -1,5 +1,7 @@
 # Reference Path Tracer Completion Study
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** research; source-backed cross-vendor completion study and discovery input, not an architecture decision, implementation plan, feature-completion claim, or runtime proof
 
 **Responsibility:** compare primary NVIDIA, AMD, Epic, and neutral path-tracing precedents with SparkleEngine's current `ReferencePathTracer` route and identify the architecture, interaction, decisions, and evidence required for a trustworthy Reference Path Tracer

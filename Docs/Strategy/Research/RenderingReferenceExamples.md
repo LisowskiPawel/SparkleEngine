@@ -1,8 +1,10 @@
 # Rendering Reference Cards
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** inspected primary-source locations and delivery precedent; no SDK, algorithm replacement or production implementation is authorized
 
-**Inspected:** 2026-10-10. Sixteen repositories were resolved to exact commits; selected source and root license files were retrieved. This is a targeted source review, not a whole-repository audit, sample build or native performance reproduction. [Engineer profiles](GraphicsEngineerProfiles.md) own affiliation/attribution, [role study](GraphicsRoleDepth.md) explains expectations and [catalog](../FeatureDeliveryCatalog.md) owns selected outputs.
+**Inspected:** 2026-10-10. Sixteen repositories were resolved to exact commits; selected source and root license files were retrieved. This is a targeted source review, not a whole-repository audit, sample build or native performance reproduction. [Engineer profiles](GraphicsEngineerProfiles.md) own affiliation/attribution, [role study](GraphicsEngineerProfiles.md#graphics-role-depth-and-evidence) explains expectations and [catalog](../FeatureDeliveryCatalog.md) owns selected outputs.
 
 ## How To Use A Card
 

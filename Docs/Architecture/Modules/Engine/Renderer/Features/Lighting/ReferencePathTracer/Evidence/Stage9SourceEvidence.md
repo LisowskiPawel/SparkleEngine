@@ -1,5 +1,7 @@
 # Stage 9 Source Evidence
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** **IMPLEMENTED / VALIDATION DEFERRED** against source input `d1108d44de49d90313abb43a66f924f89d6c6bb2` plus the scoped responsibility/naming-refinement and manual-only clean-break working tree on 2026-09-19. The focused C++ build recorded below predates the final clean break; no post-removal build was run. This remains source evidence, not an evidence-candidate `PASS`, accepted Reference authority, shader-cook proof, GPU proof, artifact proof, backend parity, or Stage-10 authorization.
 
 > [!CAUTION]

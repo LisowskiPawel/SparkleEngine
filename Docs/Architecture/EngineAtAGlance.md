@@ -1,5 +1,7 @@
 # SparkleEngine At A Glance
 
+[Docs](../README.md) / [Up](README.md)
+
 **Status:** orientation; current source and documentation summary, not executable or release evidence
 
 **Scope:** explain the engine's product shape, major owners, current capability families, explicit gaps, design tradeoffs, and first-release blockers before the reader enters detailed ledgers

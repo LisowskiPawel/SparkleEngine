@@ -1,5 +1,7 @@
 # Renderer Shader Program Catalog
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** capability snapshot; exact registered-program ledger; not a successful cook, pipeline-creation record, or release approval
 
 **Snapshot:** 2026-09- 19 at source input revision `a884b6946802e933fafc9fe4c6cdfb93c4cde7e4` plus the current visualization / presentation worktree; all files in `Engine/Renderer/ShaderRegistrations` reconciled with their typed shader declarations and principal frame-graph consumers; evidence `S` only
@@ -93,7 +95,7 @@ These rows are current source and registration membership only. Shader cooking, 
 | `ExposureDownsampleTextureCS` | `/Engine/Passes/PostProcessing/Exposure/ExposureDownsampleTexture.hlsl` | `main` | Compute | Subsequent mip-chain downsample over intermediate moments. |
 | `ExposureCS` | `/Engine/Passes/PostProcessing/Exposure/Exposure.hlsl` | `main` | Compute | Resolves manual/automatic settings, luminance moments, prior history, clamps, compensation, and adaptation into current 1x1 exposure/history. |
 
-See [Exposure](../PostProcessing/DisplayPipeline/Exposure.md) for metering, history, scheduling, and evidence ownership.
+See [Exposure](../PostProcessing/DisplayPipeline/README.md#exposure) for metering, history, scheduling, and evidence ownership.
 
 ## Image Reconstruction And Upscaling
 
@@ -102,7 +104,7 @@ See [Exposure](../PostProcessing/DisplayPipeline/Exposure.md) for metering, hist
 | `LinearUpscaleCS` | `/Engine/Passes/Presentation/Upscaling/LinearUpscale.hlsl` | `main` | Compute | Engine baseline render-extent to output-extent resolve. External providers are not represented by a shader registration. |
 | `PointUpscaleCS` | `/Engine/Passes/Presentation/Upscaling/PointUpscale.hlsl` | `main` | Compute | Exact debug-view resolve that preserves authored scalar, normal, material-color, and category values across extents. |
 
-DLSS Super Resolution and DLSS Ray Reconstruction are external provider evaluations rather than global shader registrations. See [Image Reconstruction and Upscaling](../PostProcessing/ReconstructionAndGeneration/ImageReconstructionAndUpscaling.md).
+DLSS Super Resolution and DLSS Ray Reconstruction are external provider evaluations rather than global shader registrations. See [Image Reconstruction and Upscaling](../PostProcessing/ReconstructionAndGeneration/README.md#image-reconstruction-and-upscaling).
 
 ## Tone Mapping
 
@@ -110,7 +112,7 @@ DLSS Super Resolution and DLSS Ray Reconstruction are external provider evaluati
 | --- | --- | --- | --- | --- |
 | `ToneMappingCS` | `/Engine/Passes/Presentation/Display/ToneMapping.hlsl` | `main` | Compute | Exposure plus selected mapper converts HDR resolved scene color to display-linear RGBA16F. |
 
-See [Tone Mapping](../PostProcessing/DisplayPipeline/ToneMapping.md) for the three operators and the presentation-owned exact-debugbypass boundary.
+See [Tone Mapping](../PostProcessing/DisplayPipeline/README.md#tone-mapping) for the three operators and the presentation-owned exact-debugbypass boundary.
 
 ## Presentation And Output
 
@@ -124,7 +126,7 @@ See [Tone Mapping](../PostProcessing/DisplayPipeline/ToneMapping.md) for the thr
 | --- | --- | --- |
 | Color grading | No grading or LUT shader registration | [Color Grading](../PostProcessing/DisplayPipeline/ColorGrading/README.md) |
 | Chromatic aberration | No lens/channel-distortion shader registration | [Chromatic Aberration](../PostProcessing/DisplayPipeline/ChromaticAberration/README.md) |
-| Frame generation | No engine shader or external DLSS-G/frame-generation evaluation | [Frame Generation](../PostProcessing/ReconstructionAndGeneration/FrameGeneration.md) |
+| Frame generation | No engine shader or external DLSS-G/frame-generation evaluation | [Frame Generation](../PostProcessing/ReconstructionAndGeneration/README.md#frame-generation) |
 
 ## Registered Stage Coverage Versus Vocabulary
 

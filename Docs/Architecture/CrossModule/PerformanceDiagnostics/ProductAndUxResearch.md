@@ -1,5 +1,7 @@
 # Diagnostics Product And UX Research
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** research; external precedent and option analysis, not proof of current implementation
 
 **Research reconciliation:** 2026-09-29 for the Unreal viewport-capture precedent and PIX, RenderDoc, and Nsight Graphics capture APIs; broader diagnostics-product research retains its original dated evidence and revalidation rules

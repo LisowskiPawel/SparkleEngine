@@ -1,5 +1,7 @@
 # Graphics Workload Studies
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** target workflow and discovery contract; no implemented analysis tool or measured study is claimed
 
 **Scope:** the `PGD-03..05` [strategy outputs](../../../../Strategy/FeatureDeliveryCatalog.md): paired-API causal studies, one difficult incident and one useful offline analysis consumer. [Graphics Workloads](../../../../Acceptance/GraphicsWorkloads.md) owns `MAP/WL/CASE` definitions and benchmark schema/policy; [Diagnostics Acceptance](../Acceptance.md) owns comparison and observer semantics. This folder owns only the bounded study workflow and its [remaining plan](Plan.md).
@@ -33,4 +35,4 @@ Application remains the live diagnostics/serialization owner under the [diagnost
 
 `FM-WS-01` identity/schema mismatch maps to `CHK-WS-01`; `FM-WS-02` changed settings, incomplete observer or invalid statistics maps to `CHK-WS-02`; `FM-WS-03` an unproved incident root cause maps to `CHK-WS-03`; `FM-WS-04` partial publication or missing adopter maps to `CHK-WS-04`. Failures produce an explicit rejection/inconclusive/unrun disposition and preserve original inputs. A missing counter cannot be recast as zero or supported.
 
-Primary performance precedent is recorded in the [role study](../../../../Strategy/Research/PrincipalGraphicsRoles.md#technical-evidence-and-transfer-limits). All thresholds and actual results remain with their existing acceptance owners; this page does not pass `WL-04` or advance `PY-03`.
+Primary performance precedent is recorded in the [role study](../../../../Strategy/Research/GraphicsEngineerProfiles.md#technical-evidence-and-transfer-limits). All thresholds and actual results remain with their existing acceptance owners; this page does not pass `WL-04` or advance `PY-03`.

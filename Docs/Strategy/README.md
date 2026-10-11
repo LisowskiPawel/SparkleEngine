@@ -1,5 +1,7 @@
 # Principal Graphics Strategy
 
+[Docs](../README.md) / [Up](../README.md)
+
 **Status:** strategy index and responsibility map
 
 Use this section to decide what kind of graphics engineer you want to become and what Sparkle should deliver to demonstrate it.

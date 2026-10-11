@@ -1,5 +1,7 @@
 # Indirect Lighting And ReSTIR GI Feature Dossier
 
+[Docs](../../../../../../../README.md) / [Up](../README.md)
+
 **Status:** current source audit plus target completion contract; implementation, estimator-conformance, convergence, visual, performance, backend, and release proof remain open
 
 **Responsibility:** own the bounded indirect-lighting/ReSTIR GI promise, current prototype classification, feature scope, acceptance, failures, checks, and definition of done

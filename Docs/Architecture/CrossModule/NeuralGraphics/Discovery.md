@@ -1,10 +1,12 @@
 # Owned Neural Denoising Discovery
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** populated discovery backlog; `NG-D0` is open and production implementation is not authorized by this page
 
 **Admission:** after `REL-11` and the measured classical baseline `M3` in the [roadmap](../../../Strategy/Roadmap.md). Documentation research may proceed earlier. This is the selected `PGD-06/07` route in the [delivery catalog](../../../Strategy/FeatureDeliveryCatalog.md), not a generic ML platform.
 
-**Product candidate:** one fixed diffuse-indirect denoising model, trained on owned/provenanced samples and executed as inspectable shaders through the existing Renderer. The [training contract](TrainingAndEvaluation.md), [runtime contract](ModelToKernelAndRuntimeInference.md) and [acceptance](Acceptance.md) own enduring semantics and proof requirements. Topology, operator set and numerical budgets remain decisions to freeze here before implementation.
+**Product candidate:** one fixed diffuse-indirect denoising model, trained on owned/provenanced samples and executed as inspectable shaders through the existing Renderer. The [training contract](README.md#neural-graphics-training-and-evaluation), [runtime contract](README.md#model-to-kernel-and-runtime-inference) and [acceptance](README.md#neural-graphics-acceptance) own enduring semantics and proof requirements. Topology, operator set and numerical budgets remain decisions to freeze here before implementation.
 
 ## Known Facts And Boundaries
 
@@ -30,7 +32,7 @@ Every cell records decision, source revision, evidence, unresolved owner and inv
 
 ## Primary Precedent
 
-The [role and technical study](../../../Strategy/Research/PrincipalGraphicsRoles.md#technical-evidence-and-transfer-limits) records official PyTorch reproducibility, RTX neural shading, shader capability and Monte Carlo sources. These are precedent. When actually selecting a library, paper/model or compiler route, pin the original revision/specification, reproduce its relevant behavior and record rights here. No SDK, architecture or operator is adopted solely by mentioning that study.
+The [role and technical study](../../../Strategy/Research/GraphicsEngineerProfiles.md#technical-evidence-and-transfer-limits) records official PyTorch reproducibility, RTX neural shading, shader capability and Monte Carlo sources. These are precedent. When actually selecting a library, paper/model or compiler route, pin the original revision/specification, reproduce its relevant behavior and record rights here. No SDK, architecture or operator is adopted solely by mentioning that study.
 
 ### Reference Use In Remaining Discovery
 

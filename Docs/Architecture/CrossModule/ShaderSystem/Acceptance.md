@@ -1,5 +1,7 @@
 # Shader System — Acceptance
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** feature-local acceptance contract; not proof that the shader-system migration has passed
 
 **Scope:** final feature criteria, required evidence, controlled failure expectations, and completion handoff for the unified shader, graphics-pipeline, and ray-tracing system

@@ -1,5 +1,7 @@
 # Chromatic Aberration Discovery
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** acceptance contract; `CHRD-00` is `Blocked`, and production implementation is not authorized
 
 **Responsibility:** freeze the first-release lens model, units, color/order boundary, state, edge behavior, budgets, workflow, and evidence protocol before `DSP-6`
@@ -155,4 +157,3 @@ The gate report retains:
 ## Gate Decision
 
 The gate is currently **Blocked**. A future `PASS` requires all discovery criteria conjunctively, names the exact accepted dossier revisions, and authorizes only Stage 1 of [Plan](Plan.md)—not feature implementation, runtime support, or `FCR-REN-25`.
-

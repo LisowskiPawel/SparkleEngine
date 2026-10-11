@@ -1,5 +1,7 @@
 # Indirect Lighting And ReSTIR Path-Resampling Study
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** primary-source research and discovery input; no cited method is local implementation or acceptance evidence
 
 **Responsibility:** record current-source findings, primary path-resampling/GI precedent, alternatives, failure lessons, permitted transfers, and forbidden inference for `IND-D0`

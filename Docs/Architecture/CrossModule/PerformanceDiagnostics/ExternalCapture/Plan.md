@@ -1,5 +1,7 @@
 # External Capture Remaining Delivery Plan
 
+[Docs](../../../../README.md) / [Up](README.md)
+
 Finish the missing capture routes and prove the integrations already present in Editor source.
 
 **Status:** remaining discovery, implementation deltas and candidate acceptance; existing Editor integrations and engine repairs are delivered

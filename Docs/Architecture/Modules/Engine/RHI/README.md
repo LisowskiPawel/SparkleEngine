@@ -1,5 +1,7 @@
 # Render Hardware Interface
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** module index and current-system reading route; not executable backend or release evidence
 
 **Scope:** route backend-neutral GPU contracts, D3D12/Vulkan lowering, and each independently reviewable RHI capability to one documentation owner

@@ -1,5 +1,7 @@
 # Ray-Tracing Execution Architecture
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** target architecture; semantic contract, not proof of runtime support
 
 **Current-state audit provenance:** 2026-08-28 static source/build reconciliation at committed `master` revision `20814381`, whose source and executable build configuration are unchanged from implementation revision `99af6d5b`; migration history is recorded in the [Shader System Delivery Plan](../../../../../CrossModule/ShaderSystem/Plan.md)

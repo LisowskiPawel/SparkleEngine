@@ -1,5 +1,7 @@
 # External Capture Integration Research
 
+[Docs](../../../../README.md) / [Up](README.md)
+
 **Status:** research; primary-source precedent and a dated source audit
 
 **Scope:** PIX, Nsight, RenderDoc, Unreal, Unity, Godot, and the remaining specialist-tool routes that inform Sparkle's external capture integration.

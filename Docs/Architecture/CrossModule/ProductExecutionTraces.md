@@ -1,5 +1,7 @@
 # Product And Developer Execution Traces
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** capability snapshot; vertical cross-module traces; not workflow success, package proof, or release approval
 
 **Snapshot:** 2026-09-08 at committed `master` revision `ffe60e3a`; current module inventories, source/build ownership, product/tool routes, failure/exit boundaries, and CMake membership reconciled; evidence `S` only

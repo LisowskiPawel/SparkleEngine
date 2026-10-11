@@ -1,5 +1,7 @@
 # Volumetric Lighting, Atmosphere, And ReSTIR Study
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** primary-source research and discovery input; no implementation, budget, visual, or release claim
 
 **Responsibility:** record primary volume/fog/atmosphere/cloud/ReSTIR precedent, current gaps, alternatives, failure lessons, transfer boundaries, and discovery implications

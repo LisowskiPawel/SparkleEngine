@@ -4,29 +4,19 @@
 
 Use these pages to understand the engine, choose your next task and find the design or proof behind a feature.
 
-For first-release work, use three pages: [Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) for progress/next, [release plan](Architecture/CrossModule/FirstRelease/README.md) for work, and [release contract](Acceptance/FirstRelease.md) for approved scope/checks. Package inputs and diagnostics are together in the [packaging guide](Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md).
-
 ## Start Here
 
-Public onboarding starts in the [repository README](../README.md); the [contribution guide](../CONTRIBUTING.md) routes changes and review to existing owners.
-
-
-| Your task | Where to start |
+| I want to... | Open |
 | --- | --- |
-| Understand the whole engine | [Engine At A Glance](Architecture/EngineAtAGlance.md) — [Whole Repository Map](Architecture/WholeRepositoryMap.md) |
-| Understand how a frame is rendered | [Renderer](Architecture/Modules/Engine/Renderer/README.md) — [Rendering A Sparkle Frame](Architecture/Modules/Engine/Renderer/RenderingASparkleFrame.md) |
-| Compare Lit with the progressive Reference Path Tracer | [First-use and evidence walk](Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/UserExperience.md#readers-first-use-and-evidence-walk) — The [feature dossier](Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/README.md#what-to-do-next) separates the observed failed image from source and acceptance claims |
-| Understand D3D12/Vulkan and GPU services | [RHI](Architecture/Modules/Engine/RHI/README.md) — [RHI Feature Guide](Architecture/Modules/Engine/RHI/Features/README.md) |
-| See exactly what exists or is missing | [Module Capability Inventory](Architecture/Modules/README.md) — [Capability Evidence Plan](Architecture/Modules/CapabilityEvidencePlan.md) |
-| Compare current feature readiness | [Current Feature Readiness](Acceptance/CurrentReadiness.md) — open the linked Architecture dossier for the implementation and missing-work detail |
-| Review release scope and technical blockers | [Six approved product decisions](Acceptance/FirstRelease.md#approval-and-next-work); source/rights investigations have their own owners |
-| Decide what to do next | [Master Delivery Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) — See current focus and global priority, then open its owning stage plan |
-| Implement a selected release piece | [First Release Stage Briefs](Architecture/CrossModule/FirstRelease/README.md) — Use the Roadmap-selected phase and its work/exit criteria |
-| Build, cook, or launch Showcase | [Launcher Architecture](Architecture/Modules/Tools/Launcher/README.md) — [Build And Packaging](Architecture/Modules/BuildAndPackaging/README.md) |
-| Make an implementation change | [Change Integration](Engineering/Workflow/ChangeIntegration.md) — [Engineering Task Map](Engineering/README.md#choose-by-task) |
-| Open or close a release iteration | [Change Lifecycle control record](Engineering/Workflow/ChangeLifecycle.md#create-the-iteration-control-record) — [Roadmap traceability](Strategy/Roadmap.md#stage-target-and-evidence-traceability) |
-| See release progress and blockers | [Acceptance](Acceptance/README.md) — [First Release](Acceptance/FirstRelease.md) |
+| Continue the first release | [Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) -> [work plan](Architecture/CrossModule/FirstRelease/README.md) -> [shipping checks](Acceptance/FirstRelease.md) |
+| Understand the engine | [Engine at a glance](Architecture/EngineAtAGlance.md) -> [repository map](Architecture/WholeRepositoryMap.md) |
+| Find a module or feature | [Architecture](Architecture/README.md) -> [modules](Architecture/Modules/README.md) |
+| Work on rendering | [Renderer](Architecture/Modules/Engine/Renderer/README.md) or [RHI](Architecture/Modules/Engine/RHI/README.md) |
+| Build, cook or package | [Launcher](Architecture/Modules/Tools/Launcher/README.md) -> [build](Architecture/Modules/BuildAndPackaging/README.md) -> [package](Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md) |
+| Contribute or review | [Contributing](../CONTRIBUTING.md) -> [engineering rules](Engineering/README.md#choose-by-task) |
+| Find results or workload checks | [Acceptance](Acceptance/README.md) |
 
+Each page has a **Docs / Up** route. Combined guides link directly to their sections. Open detailed research or reports only when the task needs them.
 
 ## How The Documentation Fits Together
 
@@ -44,17 +34,6 @@ flowchart LR
 ```
 
 Code and executable build configuration are the authority for implemented behavior. Documentation explains intent, design, limits, procedures, and required evidence; it does not turn source presence into a successful build or runtime result.
-
-## Browse By Question
-
-| Question | Documentation area |
-| --- | --- |
-| What is Sparkle trying to become, and what is most important? | [Strategy](Strategy/README.md) |
-| What do I have now, what is missing, and how is it designed? | [Architecture](Architecture/README.md) |
-| What rules apply while I change or review it? | [Engineering](Engineering/README.md) |
-| What work is next and where is its detailed plan? | [Master Delivery Roadmap](Strategy/Roadmap.md); follow the selected row into its owning [Architecture plan](Architecture/README.md) |
-| What workloads, feature reports, and release gates track progress? | [Acceptance](Acceptance/README.md) |
-| What external precedent or option study informed a design? | The research document beside the owning [Architecture dossier](Architecture/README.md) |
 
 ## Authority Boundaries
 
@@ -86,33 +65,3 @@ Colocation changes how readers find related knowledge; it does not merge authori
 | `Blocked` | A named prerequisite prevents the next acceptance or delivery decision. |
 
 The numeric readiness score is separate from these state labels. It adds implementation, integration, verification, and delivery components for orientation; it does not turn acceptance into an average. See the [scoring model](Acceptance/CurrentReadiness.md#scoring-model).
-
-## Short Reviewer Routes
-
-### Understand The Product
-
-1. [Engine At A Glance](Architecture/EngineAtAGlance.md)
-2. [Renderer](Architecture/Modules/Engine/Renderer/README.md)
-3. [RHI](Architecture/Modules/Engine/RHI/README.md)
-4. [First Release Progress](Acceptance/FirstRelease.md)
-
-### External Technical Review
-
-1. [Advanced Graphics Engine Executive Summary](Strategy/ExecutiveSummary.md)
-2. [Whole Repository Architecture Map](Architecture/WholeRepositoryMap.md)
-3. [Current Capability Inventory](Architecture/Modules/README.md)
-4. [Engineering Task Map](Engineering/README.md#choose-by-task)
-5. [Acceptance](Acceptance/README.md)
-
-### Review A Change
-
-1. [Change Integration](Engineering/Workflow/ChangeIntegration.md)
-2. [Change Lifecycle](Engineering/Workflow/ChangeLifecycle.md)
-3. The affected [module or feature dossier](Architecture/Modules/README.md)
-4. [Code Review](Engineering/Workflow/CodeReview.md)
-
-### Write Or Restructure Documentation
-
-1. [Documentation Organization](Engineering/Workflow/DocumentationOrganization.md)
-2. [Documentation Templates](Engineering/Workflow/Templates/README.md)
-3. [Capability Documentation Review](Engineering/Workflow/CapabilityReview.md) when describing a feature or selectable mode

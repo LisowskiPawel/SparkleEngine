@@ -1,5 +1,7 @@
 # External Capture Discovery Gate
 
+[Docs](../../../../README.md) / [Up](README.md)
+
 **Status:** target architecture decision gate; source decisions recorded, installed-provider gates open
 
 **Scope:** establish the exact API, target, lifecycle, build, and evidence prerequisites before each bounded implementation stage.

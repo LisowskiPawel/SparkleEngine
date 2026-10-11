@@ -1,5 +1,7 @@
 # Color Grading Delivery Plan
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 Add predictable color controls and a typed LUT workflow, with no rendering work when the grade is neutral.
 
 **Status:** conditional implementation plan; Stage 0 is permitted, production Stages 1-6 are blocked until `CGRD-00 PASS` and `DSP-5` prerequisites

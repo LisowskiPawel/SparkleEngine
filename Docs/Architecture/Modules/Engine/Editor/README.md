@@ -1,5 +1,7 @@
 # Editor Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; current, but not usability, correctness, or packaged-editor evidence
 
 **Snapshot:** 2026-09-08 at committed `master` revision `ffe60e3a`; `Engine/Editor`, `SparkleApplicationEditor`, world-edit, Renderer diagnostic, save, shutdown, and CMake surfaces inspected; evidence `S` only

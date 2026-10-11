@@ -1,5 +1,7 @@
 # Renderer Chromatic Aberration
 
+[Docs](../../../../../../../../README.md) / [Up](../README.md)
+
 **Status:** first-release target feature dossier plus current source-backed absence; `CHRD-00` and production implementation are `Blocked`
 
 **Responsibility:** define the bounded lens-effect product, current absence, target surface, acceptance, failures, checks, and definition of done for `FCR-REN-25`

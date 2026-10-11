@@ -1,5 +1,7 @@
 # Performance Dashboard And Efficiency Hub Idea
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** research; target-product exploration only, not implementation authority or proof of current behavior
 
 **Date:** 2026-08-17

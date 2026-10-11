@@ -1,5 +1,7 @@
 # Chromatic Aberration Delivery Plan
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 Add a small lens effect with defined channel offsets, clamp behavior and a zero-cost neutral state.
 
 **Status:** conditional implementation plan; Stage 0 is permitted, Stages 1-4 are blocked until `CHRD-00 PASS` and `DSP-6` prerequisites

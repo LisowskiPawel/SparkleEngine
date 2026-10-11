@@ -1,5 +1,7 @@
 # Graphics Feature Execution Traces
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** capability snapshot; vertical producer-to-consumer traces; not runtime proof or release approval
 
 **Snapshot:** 2026-09-06 at committed `master` revision `c28b33bd`; current source and build membership inspected; executable Renderer source is unchanged from the earlier `8414b5dc` audit; evidence `S` only
@@ -185,7 +187,7 @@ The per-cache defaults and absence of global priority/LRU/pressure arbitration a
 | execution | coordinator -> CVar owners | serial applies directly; threaded mode queues `RenderSettingsChangedCommand` to render context | queue ordering/backpressure/shutdown equivalence is unproved |
 | resolution | CVar owners -> view/topology/provider/device | live values affect the next permitted frame; topology/history owners rebuild/reset; adapter/format report pending restart | requested/CVar/resolved/session-active states and reasons are not one unified result |
 
-The exact names/domains remain in the [Feature Selector Catalog](../Modules/Engine/Renderer/Features/RuntimeConfiguration/FeatureSelectorCatalog.md); aggregate transport and durability criteria are in [Settings State and Persistence](../Modules/Engine/Renderer/Features/RuntimeConfiguration/SettingsStateAndPersistence.md).
+The exact names/domains remain in the [Feature Selector Catalog](../Modules/Engine/Renderer/Features/RuntimeConfiguration/README.md#feature-selector-catalog); aggregate transport and durability criteria are in [Settings State and Persistence](../Modules/Engine/Renderer/Features/RuntimeConfiguration/README.md#settings-state-and-persistence).
 
 ## Trace 12: Host Simulation To Latency Provider Marker
 
@@ -211,7 +213,7 @@ The exact names/domains remain in the [Feature Selector Catalog](../Modules/Engi
 | settle/destroy | Renderer shutdown -> RHI queues/services/device | stop frame work, wait real completion/idle, clear recording lifetime state, destroy dependents before device | wait/device failure cannot fabricate completion or safe retirement |
 | device loss | native D3D12/Vulkan result -> diagnostics/fatal boundary | DRED/removal reason or Vulkan result can attribute the fault | no inspected device-generation/recreation path resumes the process |
 
-[Device Lifecycle and Failure Recovery](../Modules/Engine/RHI/Features/DeviceAndResources/DeviceLifecycleAndFailureRecovery.md) owns `AC-RHI-LIFE-*`, the distinction between recoverable presentation change and terminal device loss, and `RHI-E16`.
+[Device Lifecycle and Failure Recovery](../Modules/Engine/RHI/Features/DeviceAndResources/README.md#device-lifecycle-and-failure-recovery) owns `AC-RHI-LIFE-*`, the distinction between recoverable presentation change and terminal device loss, and `RHI-E16`.
 
 ## Trace 14: Prepared Primitive To Raster Batch
 
@@ -237,7 +239,7 @@ The exact names/domains remain in the [Feature Selector Catalog](../Modules/Engi
 | resolution output | lighting -> RR or upscaling -> `ResolvedSceneColor` | exactly one producer writes output-extent color, then common presentation continues | no standalone TAA/FXAA/SMAA or dynamic-resolution controller was found |
 | retirement/publication | queue completion -> old graph/provider resources; output -> product/swapchain | old generations retire after last use and current product carries matching extent/identity | mixed extents, stale history or implicit resolve blocks the route |
 
-[Resolution, Sampling, and Anti-Aliasing](../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ResolutionSamplingAndAntiAliasing.md) owns `REN-RESO-*` and `REN-E33`; the temporal and provider dossiers retain their narrower algorithms.
+[Resolution, Sampling, and Anti-Aliasing](../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/README.md#resolution-sampling-and-anti-aliasing) owns `REN-RESO-*` and `REN-E33`; the temporal and provider dossiers retain their narrower algorithms.
 
 ## Trace Closure Rule
 

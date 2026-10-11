@@ -1,5 +1,7 @@
 # Renderer Geometry And Ray-Tracing Closure Plan
 
+[Docs](../../../../../README.md) / [Up](README.md)
+
 Make raster and ray rendering consume the same correct geometry and materials, then add the required decals.
 
 **Status:** implementation plan; not visual, native-validation, performance, or release evidence
@@ -131,6 +133,6 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Parent:** [First Release Renderer Plans](README.md)
 
-**Architecture:** [Geometry And Resources](../Features/GeometryAndResources/README.md), [Renderer Ray Tracing](../Features/RayTracing/README.md), and [RHI Ray Tracing](../../RHI/Features/PipelineAndExecution/RayTracing.md)
+**Architecture:** [Geometry And Resources](../Features/GeometryAndResources/README.md), [Renderer Ray Tracing](../Features/RayTracing/README.md), and [RHI Ray Tracing](../../RHI/Features/PipelineAndExecution/README.md#ray-tracing)
 
 </details>

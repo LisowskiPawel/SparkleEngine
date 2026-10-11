@@ -1,5 +1,7 @@
 # Renderer
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** module index and current-system reading route; not executable or release evidence
 
 **Scope:** explain how Sparkle renders a frame, identify the Renderer features that contribute to it, and route exact capability, design, source, and evidence questions to one owner
@@ -104,9 +106,9 @@ The [complete feature guide](Features/README.md) maps every `REN-*` family, sour
 
 Renderer behavior is requested through startup/CVar configuration, persisted aggregate rendering settings, editor controls, and per-viewport state. The feature owner resolves that request against backend/device/provider readiness and must expose what actually became active.
 
-- [Feature Selector Catalog](Features/RuntimeConfiguration/FeatureSelectorCatalog.md) lists current controls, defaults, consumers, and known ineffective/absent selectors.
-- [Settings State And Persistence](Features/RuntimeConfiguration/SettingsStateAndPersistence.md) explains startup, editor commit, persistence, restart, and package-location behavior.
-- [Diagnostics, Products, And Capture](Features/ViewportAndDiagnostics/DiagnosticsProductsAndCapture.md) explains observable frame/pass/memory/product identity.
+- [Feature Selector Catalog](Features/RuntimeConfiguration/README.md#feature-selector-catalog) lists current controls, defaults, consumers, and known ineffective/absent selectors.
+- [Settings State And Persistence](Features/RuntimeConfiguration/README.md#settings-state-and-persistence) explains startup, editor commit, persistence, restart, and package-location behavior.
+- [Diagnostics, Products, And Capture](Features/ViewportAndDiagnostics/README.md#diagnostics-products-and-capture) explains observable frame/pass/memory/product identity.
 - [Debug Views](Features/DebugViews/README.md) explains intermediate render-output selection and presentation.
 
 Silent substitution is not support. A requested ray/provider/debug path that cannot activate must report the active path and reason or fail according to its dossier.

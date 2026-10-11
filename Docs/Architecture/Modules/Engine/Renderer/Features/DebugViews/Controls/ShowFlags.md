@@ -1,5 +1,7 @@
 # Show Menu And Feature Execution Controls
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** implemented controls contract; Show-flags delivery accepted by the user on 2026-10-06
 
 **Current readiness:** the fifteen-control Show menu is complete for the implemented feature set. Family and release readiness remain owned by the [Renderer readiness row](../../../../../../../Acceptance/CurrentReadiness.md#renderer); this closure does not promote those scores.

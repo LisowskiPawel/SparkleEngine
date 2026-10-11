@@ -1,5 +1,7 @@
 # SparkleEngine Code Review
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** workflow index; code-review entry point whose owning standards control
 
 **Applies to:** human or AI review of a SparkleEngine changelist

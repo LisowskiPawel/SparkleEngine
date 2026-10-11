@@ -1,5 +1,7 @@
 # I. Bistro And San Miguel Acceptance Workloads
 
+[Docs](../README.md) / [Up](README.md)
+
 Use these scene-specific contracts to freeze inputs and judge content, images and performance. First-release membership comes from [the selected seven maps](FirstRelease.md#releasemapset); Bistro and San Miguel remain source/advanced workloads outside the initial package.
 
 **Status:** acceptance contract for the canonical flagship workloads

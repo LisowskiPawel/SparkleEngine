@@ -1,5 +1,7 @@
 # G. Advanced Graphics Engine Executive Summary
 
+[Docs](../README.md) / [Up](README.md)
+
 **Status:** orientation; non-normative decision summary
 
 **Date:** 2026-08-02

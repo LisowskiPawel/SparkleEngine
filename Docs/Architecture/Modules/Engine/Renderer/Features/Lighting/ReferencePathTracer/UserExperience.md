@@ -1,5 +1,7 @@
 # Reference Path Tracer User Experience Contract
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** Stage-0-frozen development-product experience accepted by `PTD-00-R1 PASS`; Stage-7 menu/progress/action and Stage-9 manual evidence/output source remain **IMPLEMENTED / VALIDATION DEFERRED**, while the current candidate is **BLOCKED FOR FIRST-USE SUCCESS** because Lit and Reference do not yet present usable scene lighting
 
 **Responsibility:** define how a developer, lighting engineer, or technical artist discovers, enters, navigates, observes, compares, resets, pauses, diagnoses, and secondarily exports the Reference Path Tracer

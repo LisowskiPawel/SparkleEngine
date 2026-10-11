@@ -1,5 +1,7 @@
 # Feature Delivery Documentation Package Template
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** writing template; this page is workflow scaffolding, not feature authority or implementation evidence
 
 **Scope:** provide a reusable, copy-ready documentation package for researching, deciding, architecting, implementing, validating, and introducing a substantial SparkleEngine feature

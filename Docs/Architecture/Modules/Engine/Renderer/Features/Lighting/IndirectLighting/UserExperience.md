@@ -1,5 +1,7 @@
 # Indirect Lighting And ReSTIR GI User Experience Contract
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** proposed experience; implementation and acceptance remain blocked by `IND-D0`
 
 **Responsibility:** define how artists, rendering engineers, automation, and support select, understand, diagnose, capture, and recover real-time indirect lighting

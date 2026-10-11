@@ -1,5 +1,7 @@
 # External Capture User Experience
 
+[Docs](../../../../README.md) / [Up](README.md)
+
 **Status:** target architecture; launch, viewport, automation and recovery contract
 
 **Scope:** make the prioritized external tools discoverable and usable without exposing SDK or native-handle mechanics in normal user flows.

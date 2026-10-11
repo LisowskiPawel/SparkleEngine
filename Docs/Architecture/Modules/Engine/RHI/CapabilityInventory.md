@@ -1,5 +1,7 @@
 # RHI Capability Inventory
 
+[Docs](../../../../README.md) / [Up](README.md)
+
 **Status:** capability snapshot; not release approval or executable backend evidence
 
 **Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; current `Engine/RHI` public contracts, common implementation, diagnostics, D3D12/Vulkan backends, CMake membership, and representative Renderer consumers inspected; evidence `S` only
@@ -219,5 +221,3 @@ Ray tracing is not one boolean. The current contract separates acceleration stru
 - Build membership and backend switches: `Engine/RHI/CMakeLists.txt` and root CMake options/assertions.
 - Material descriptor coverage: `Engine/Renderer/Private/Scene/Materials`, `Engine/Renderer/Private/Passes/GBuffer/Raster/GBufferMeshPass.cpp`, and `Engine/Assets/Shaders/Material/MaterialTextureTable.hlsli`.
 - Effect traversal coverage: `Engine/Renderer/Private/Passes/GBuffer`, `Engine/Renderer/Private/Passes/Lighting`, and `Engine/Renderer/Private/RayTracing`.
-
-

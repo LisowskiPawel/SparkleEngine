@@ -1,5 +1,7 @@
 # Reference Path Tracer Stage 1 Evidence
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** **`PTD-01-R2 PASS` historical evidence, superseded architecture shape**. Accepted on 2026-09-10, then superseded by the 2026-09-13 clean break that moved view-mode identity entirely into Editor and replaced Renderer request/View transport with direct feature and visualization CVars. The file paths and claims below remain immutable evidence for that earlier candidate; they are not the current source contract.
 
 **Scope:** exact production-file ledger, focused command record, generated-product identities, and independent-review disposition for [Plan Stage 1](../Plan.md#remaining-work-at-a-glance)

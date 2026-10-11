@@ -1,5 +1,7 @@
 # Chromatic Aberration Research
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** research; revision-pinned implementation precedent and product comparison, not SparkleEngine design or proof
 
 **Responsibility:** identify transferable and rejected choices for a bounded real-time lens-fringe effect and its validation

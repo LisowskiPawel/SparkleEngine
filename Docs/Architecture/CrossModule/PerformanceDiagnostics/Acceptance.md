@@ -1,5 +1,7 @@
 # Performance Diagnostics — Acceptance
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** feature-local acceptance contract; not proof that diagnostics or workloads have passed
 
 **Scope:** feature-local diagnostic evidence fields, baseline experiments, benchmark artifacts, reviewer paths, and verification gates

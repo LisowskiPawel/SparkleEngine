@@ -1,5 +1,7 @@
 # External GPU Capture Integration
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** feature dossier; source-backed target design and conditional implementation package
 
 **Scope:** make native capture tools usable through Sparkle's existing launch and viewport routes in priority order **PIX -> Nsight -> RenderDoc -> specialist tools**.

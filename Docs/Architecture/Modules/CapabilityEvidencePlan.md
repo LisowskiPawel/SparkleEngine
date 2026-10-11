@@ -1,5 +1,7 @@
 # Capability Evidence Plan
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** implementation plan; not proof, release classification, or release-wide sequencing authority
 
 **Snapshot:** expanded 2026-09-07 from the repository-wide source-only capability inventory; original implementation baseline `8414b5dc`, with current documentation-owner and negative-capability routes reconciled against the live tree

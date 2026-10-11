@@ -1,5 +1,7 @@
 # Renderer and RHI Architecture Boundary
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** canonical architecture decision
 
 **Responsibility:** module authority and dependency direction among Renderer, public RHI contracts, the RHI facade, backends, diagnostics, and external-provider adapters

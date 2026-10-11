@@ -1,5 +1,7 @@
 # Using Sparkle
 
+[README](README.md)
+
 No user support service, response deadline or guaranteed fix is offered. Check [known issues](KNOWN_ISSUES.md) and [security](SECURITY.md).
 
 The portable release is not ready. For now, follow the source-build instructions in the [repository README](https://github.com/stoleckipawel/SparkleEngine#build-and-launch). Package instructions below apply once a verified archive is available.

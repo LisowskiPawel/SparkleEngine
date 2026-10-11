@@ -1,5 +1,7 @@
 # Direct Lighting Staged Implementation Plan
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 Replace unreliable raw direct lighting with an independently checked estimator, then add reuse and reconstruction.
 
 **Status:** implementation-ready sequence, conditionally blocked by `DIR-D0` and repository release admission; stages are not implementation evidence

@@ -1,5 +1,7 @@
 # Strategy Assessments
 
+[Docs](../../README.md) / [Up](../README.md)
+
 **Status:** dated-assessment index
 
 **Current-state rule:** assessment findings retain their named snapshot. They do not silently update to the current **40/100** portfolio projection; compare them with [Current Feature Readiness](../../Acceptance/CurrentReadiness.md).

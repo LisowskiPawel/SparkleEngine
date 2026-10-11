@@ -1,5 +1,7 @@
 # Direct Lighting Completion Study
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** primary-source research and decision input; precedent does not prove Sparkle implementation, suitability, performance, or release readiness
 
 **Responsibility:** record current-source findings, primary external precedent, alternatives, failure lessons, permitted transfers, and forbidden inferences for `DIR-D0`

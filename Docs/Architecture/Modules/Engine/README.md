@@ -1,5 +1,7 @@
 # Engine Module Architecture
 
+[Docs](../../../README.md) / [Up](../README.md)
+
 **Status:** Engine module index
 
 **Current state:** tracked Engine-owned feature families contribute to the repository's **40/100** readiness projection; local module/feature pages show their own values, including explicit **0/100** capabilities. This index is not a separately weighted score. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md).

@@ -1,10 +1,12 @@
 # Debug View Presentation Precedent
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** research; external-source comparison, not Sparkle architecture or acceptance authority
 
 **Scope:** Unreal Engine, NVIDIA RTXPT/Donut, and AMD Cauldron precedent for view-mode ownership, CVar access/thread delivery, exposure, tone curves, exact diagnostic presentation, and output conversion
 
-**Local decision owners:** [Viewport Rendering Controls](Controls/README.md) and [Debug View Presentation Architecture](PresentationArchitecture.md)
+**Local decision owners:** [Viewport Rendering Controls](Controls/README.md) and [Debug View Presentation Architecture](README.md#debug-view-presentation-architecture)
 
 **Reviewed:** 2026-10-04; Epic current documentation was reviewed at the published Unreal Engine 5.8 route, while repository sources below remain commit-pinned.
 

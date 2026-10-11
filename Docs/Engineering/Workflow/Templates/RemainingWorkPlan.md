@@ -1,5 +1,7 @@
 # Remaining Work Plan Template
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** fillable planning template; placeholders do not authorize implementation
 
 **Scope:** scaffold one missing delivery route while the [Roadmap](../../../Strategy/Roadmap.md) retains global priority and the owning feature/report retains contracts and results

@@ -1,5 +1,7 @@
 # Shader Compilation Capability Inventory
 
+[Docs](../../../../README.md) / [Up](../README.md)
+
 **Status:** capability snapshot; not a successful cook, runtime-load record, or release approval
 
 **Snapshot:** 2026-09-28 at committed `master` revision `452c1f32`; current shader contracts, Renderer registrations, compiler executable/CMake, DXC and Slang backends, cook/publication/progress code, CLI validation script, editor recook, and Renderer runtime loading inspected; evidence `S` only

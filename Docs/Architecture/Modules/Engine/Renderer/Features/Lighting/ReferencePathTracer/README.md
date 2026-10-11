@@ -1,5 +1,7 @@
 # Reference Path Tracer Feature Dossier
 
+[Docs](../../../../../../../README.md) / [Up](../README.md)
+
 **Status:** feature dossier for eventual `FCR-REN-08`; source delivery through Stage 9 remains **IMPLEMENTED / VALIDATION DEFERRED**, but the current executable candidate is **BLOCKED FOR USABLE/REFERENCE CLAIMS** by an unresolved black-lighting result observed in both Lit and Reference views
 
 **Responsibility:** keep the Reference Path Tracer's expected feature definition, acceptance criteria, runtime failure modes, evidence checks, and definition of done together under the Renderer lighting architecture

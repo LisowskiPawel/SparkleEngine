@@ -1,5 +1,7 @@
 # External Capture Execution Architecture
 
+[Docs](../../../../README.md) / [Up](README.md)
+
 **Status:** target architecture; source-backed responsibility decisions, pending installed-provider discovery gates
 
 **Scope:** one external-capture lifecycle through process bootstrap, Renderer control/read state, native diagnostics lowering, and Editor/Launcher consumers.

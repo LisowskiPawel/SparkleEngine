@@ -1,5 +1,7 @@
 # Chromatic Aberration Execution Architecture
 
+[Docs](../../../../../../../../README.md) / [Up](README.md)
+
 **Status:** proposed target architecture; blocked until `CHRD-00`, not implementation proof
 
 **Responsibility:** define per-view state, frame-graph placement, resource and shader ownership, active-state truth, debug/UI/capture joins, failure, and cost for the first-release lens pass

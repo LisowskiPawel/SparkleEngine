@@ -1,5 +1,7 @@
 # Current Feature Readiness
 
+[Docs](../README.md) / [Up](README.md)
+
 Use this dated dashboard to find what exists and which proof is missing. For the next task, open [Roadmap](../Strategy/Roadmap.md#where-we-are-and-what-is-next); for product choices, open [Release Scope](FirstRelease.md#approval-and-next-work).
 
 **Status:** high-level readiness snapshot; orientation only, not feature acceptance or release approval
@@ -149,10 +151,10 @@ These rows prevent adjacent infrastructure or a detailed target design from look
 | performance-diagnostics product | **20/100** | Instrumentation foundations plus source-present Editor external capture; joined internal UI/evidence product and aggregate acceptance remain open | [Performance Diagnostics](../Architecture/CrossModule/PerformanceDiagnostics/README.md) |
 | reusable Python automation and analysis | **10/100** | Two project-local conversion scripts; no repository automation, binding, or editor/game Python product | [Python Automation and Analysis](../Architecture/Modules/Tools/PythonAutomationAndAnalysis.md) |
 | volumetric lighting/media | **0/100** | Not found; deep target/research/plan package exists but production is blocked by `REL-11` admission and `VOL-D0` | [Volumetric Lighting](../Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/README.md) |
-| frame generation | **0/100** | Not found | [Frame Generation](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/FrameGeneration.md) |
+| frame generation | **0/100** | Not found | [Frame Generation](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/README.md#frame-generation) |
 | non-ray direct/indirect lighting fallback | **0/100** | Not found | [Lighting](../Architecture/Modules/Engine/Renderer/Features/Lighting/README.md) |
 | occlusion, LOD, GPU-driven/indirect drawing, stereo, and multiview | **0/100** | Not found | [Visibility and Draw Preparation](../Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/VisibilityAndDrawPreparation.md) |
-| Renderer MSAA, standalone TAA/FXAA/SMAA, and dynamic resolution | **0/100** | Not found | [Resolution, Sampling, and Anti-Aliasing](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ResolutionSamplingAndAntiAliasing.md) |
+| Renderer MSAA, standalone TAA/FXAA/SMAA, and dynamic resolution | **0/100** | Not found | [Resolution, Sampling, and Anti-Aliasing](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/README.md#resolution-sampling-and-anti-aliasing) |
 
 ## Update And Invalidation Rules
 

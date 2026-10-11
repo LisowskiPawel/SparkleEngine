@@ -1,5 +1,7 @@
 # Direct Lighting Feature Dossier
 
+[Docs](../../../../../../../README.md) / [Up](../README.md)
+
 **Status:** current source audit plus target completion contract; implementation, numerical, visual, performance, backend, and release proof remain open
 
 **Responsibility:** own the bounded direct-lighting promise, current state, capability decomposition, acceptance, controlled failures, checks, and definition of done
@@ -123,4 +125,3 @@ Direct Lighting is done only when `DIR-D0` is accepted, every included `DIR-FS-*
 - [`DirectShadowSignal.cpp`](../../../../../../../../Engine/Renderer/Private/Passes/Lighting/Shadows/DirectShadowSignal.cpp)
 - [`SurfaceLighting.hlsli`](../../../../../../../../Engine/Assets/Shaders/Lighting/SurfaceLighting.hlsli) and [`BRDF.hlsli`](../../../../../../../../Engine/Assets/Shaders/BRDF/BRDF.hlsli)
 - [`RenderGpuLightingPayloadBuilder.cpp`](../../../../../../../../Engine/Renderer/Private/Scene/GpuScene/RenderGpuLightingPayloadBuilder.cpp)
-

@@ -1,5 +1,7 @@
 # Renderer Pipeline Materialization and Typed Binding
 
+[Docs](../../../../../../README.md) / [Up](README.md)
+
 **Status:** current feature dossier; source-backed, not backend-validation, hot-reload stress, or release evidence
 
 **Parameter-model source update:** 2026-10-06; this update does not establish native binding or output acceptance.

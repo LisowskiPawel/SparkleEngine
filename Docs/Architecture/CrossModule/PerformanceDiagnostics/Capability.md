@@ -1,5 +1,7 @@
 # Performance Diagnostics Capability Inventory
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** capability snapshot; dated, and not architecture, release approval, or executable evidence
 
 **Snapshot:** 2026-09-29 against the working tree based on committed revision `d1d26dbb`; capture-specific source paths and launch composition were inspected, while unrelated local Renderer changes are outside this snapshot

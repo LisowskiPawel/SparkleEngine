@@ -12,38 +12,6 @@ Texture2D<float4> ShadowVisibilitySignal;
 Texture2D<float4> CurrentReservoirSample;
 Texture2D<float4> CurrentReservoirWeight;
 
-void AddDirectLightSample(GBufferData gBuffer,
-                          float3 viewDirWorld,
-                          bool evaluateSubsurface,
-                          LightSampling::DirectLightSample lightSample,
-                          float visibility,
-                          float sampleWeight,
-                          inout SurfaceLighting::Contribution directLighting)
-{
-	if (!lightSample.Valid || sampleWeight <= 0.0f)
-	{
-		return;
-	}
-
-	SurfaceLighting::Surface lightingSurface = {viewDirWorld,
-	                                            gBuffer.NormalWorld,
-	                                            gBuffer.BaseColor,
-	                                            gBuffer.Roughness,
-	                                            gBuffer.Metallic,
-	                                            gBuffer.DielectricF0,
-	                                            gBuffer.SubsurfaceColor,
-	                                            gBuffer.SubsurfaceStrength,
-	                                            DirectLightingEvaluateDiffuse != 0u,
-	                                            DirectLightingEvaluateSpecular != 0u,
-	                                            evaluateSubsurface};
-
-	const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, visibility);
-
-	directLighting.Diffuse += contribution.Diffuse * sampleWeight;
-	directLighting.Specular += contribution.Specular * sampleWeight;
-	directLighting.Subsurface += contribution.Subsurface * sampleWeight;
-}
-
 SurfaceLighting::Contribution EvaluateDirectLighting(uint2 pixelCoord, GBufferData gBuffer)
 {
 	const float3 positionWorld = ReconstructGBufferWorldPosition(pixelCoord, gBuffer.SceneDepth, InvViewMTX, InvProjectionMTX);
@@ -60,14 +28,35 @@ SurfaceLighting::Contribution EvaluateDirectLighting(uint2 pixelCoord, GBufferDa
 	}
 
 	const bool evaluateSubsurface = DirectLightingEvaluateSubsurface != 0u && HasSubsurface(gBuffer);
-	if (DirectLightReservoir::IsValid(reservoir))
+	if (!DirectLightReservoir::IsValid(reservoir))
 	{
-		const LightSampling::DirectLightSample lightSample = DirectLightReservoir::ReplayLightSample(reservoir, positionWorld);
-		const float reservoirWeight = DirectLightReservoir::GetFinalWeight(reservoir);
-
-		AddDirectLightSample(gBuffer, viewDirWorld, evaluateSubsurface, lightSample, visibility, reservoirWeight, directLighting);
+		return directLighting;
 	}
 
+	const LightSampling::DirectLightSample lightSample = DirectLightReservoir::ReplayLightSample(reservoir, positionWorld);
+	const float reservoirWeight = DirectLightReservoir::GetFinalWeight(reservoir);
+	if (!lightSample.Valid || reservoirWeight <= 0.0f)
+	{
+		return directLighting;
+	}
+
+	SurfaceLighting::Surface lightingSurface = {viewDirWorld,
+	                                            gBuffer.NormalWorld,
+	                                            gBuffer.BaseColor,
+	                                            gBuffer.Roughness,
+	                                            gBuffer.Metallic,
+	                                            gBuffer.DielectricF0,
+	                                            gBuffer.SubsurfaceColor,
+	                                            gBuffer.SubsurfaceStrength,
+	                                            DirectLightingEvaluateDiffuse != 0u,
+	                                            DirectLightingEvaluateSpecular != 0u,
+	                                            evaluateSubsurface};
+
+	const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, visibility);
+
+	directLighting.Diffuse += contribution.Diffuse * reservoirWeight;
+	directLighting.Specular += contribution.Specular * reservoirWeight;
+	directLighting.Subsurface += contribution.Subsurface * reservoirWeight;
 	return directLighting;
 }
 

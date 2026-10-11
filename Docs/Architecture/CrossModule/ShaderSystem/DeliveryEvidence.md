@@ -1,5 +1,7 @@
 # Shader System Delivery Checkpoints
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** retained historical source-checkpoint evidence; not current runtime, feature acceptance or release approval
 
 **Responsibility:** preserve the valuable Phase 2-8 source-consistency results and deferred proof contracts after retiring their implementation instructions.

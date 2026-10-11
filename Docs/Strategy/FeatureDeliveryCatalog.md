@@ -1,8 +1,10 @@
 # Principal Graphics Feature Delivery Catalog
 
+[Docs](../README.md) / [Up](README.md)
+
 **Status:** strategic deliverable targets and owner routing; no implementation authorization or acceptance results
 
-**Scope:** turn the [persona](EngineerPersona.md), [requirements](Requirements.md) and [role study](Research/PrincipalGraphicsRoles.md) into measurable, inspectable outputs. [Roadmap](Roadmap.md) owns order; feature dossiers own design and thresholds; Acceptance owns results.
+**Scope:** turn the [persona](EngineerPersona.md), [requirements](Requirements.md) and [role study](Research/GraphicsEngineerProfiles.md#principal-graphics-roles-and-portfolio-implications) into measurable, inspectable outputs. [Roadmap](Roadmap.md) owns order; feature dossiers own design and thresholds; Acceptance owns results.
 
 This is a gate-based plan. There are no delivery dates, hour estimates or calendar commitments. `PGD-*` are local strategic output IDs, not new runtime features or replacements for `PGE`, `REL`, `MAP`, `WL`, `CASE` or `FCR` identities.
 
@@ -94,7 +96,7 @@ Three headline cases, quality/latency/memory frontier and failure gallery, exact
 
 **Evidence boundary:** No owned neural evaluation/adoption result is claimed.
 
-**Delivery route:** `M6`, `WL-07/08`; [portfolio plan](../Architecture/CrossModule/GraphicsPortfolio/Plan.md) assembles accepted [Neural](../Architecture/CrossModule/NeuralGraphics/Acceptance.md), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/README.md) and [Graphics Workloads](../Acceptance/GraphicsWorkloads.md) evidence.
+**Delivery route:** `M6`, `WL-07/08`; [portfolio plan](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-portfolio-delivery-plan) assembles accepted [Neural](../Architecture/CrossModule/NeuralGraphics/README.md#neural-graphics-acceptance), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/README.md) and [Graphics Workloads](../Acceptance/GraphicsWorkloads.md) evidence.
 
 **Requirements:** `PGE-01`, `03..05`, `08`, `11..13`, `15`
 
@@ -104,7 +106,7 @@ Upstream contribution, a second adopter and teaching/mentoring records are separ
 
 **Evidence boundary:** Windows work does not prove another architecture, employment history or sustained external influence. Linux delivery is excluded.
 
-**Delivery route:** Conditional [contribution](../Architecture/CrossModule/GraphicsPortfolio/UpstreamContribution.md) and [knowledge-transfer](../Architecture/CrossModule/GraphicsPortfolio/KnowledgeTransfer.md) cards; [Requirements](Requirements.md#non-repository-requirements).
+**Delivery route:** Conditional [contribution](../Architecture/CrossModule/GraphicsPortfolio/README.md#upstream-graphics-contribution) and [knowledge-transfer](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-knowledge-transfer) cards; [Requirements](Requirements.md#non-repository-requirements).
 
 **Requirements:** `PGE-01`, `07`, `13..15`
 
@@ -123,7 +125,7 @@ These are concrete examples within the nine outputs above, not additional featur
 | `PGD-03/04`: Is shader live state, traffic or code size the actual limiter? | One exact source/bytecode/native join; hypothesis and alternative; counter/ISA evidence where available; quality-equivalent whole-frame result. A failure or inconclusive outcome is useful. | `NVR-18/19`; [Shader System plan](../Architecture/CrossModule/ShaderSystem/Plan.md), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md). SER is optional. |
 | `PGD-05`: Can another engineer compare the evidence correctly? | One bounded offline CLI, stable original-input hashes, run-level tables/plots, raw/display-domain distinction and mismatch/partial-input controls. | `NVR-12/14`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md), existing Python owner. No embedded viewer or general analyzer platform. |
 | `PGD-06/07`: Does a small owned model become correct, useful shader work? | Dataset/model/operator cards, held-out split, FP32 shader conformance, one layout/fusion/precision ablation, resource-retirement/fallback and quality/latency/memory frontier. | `NVR-03/10/11/13`; [Neural discovery](../Architecture/CrossModule/NeuralGraphics/Discovery.md) and [plan](../Architecture/CrossModule/NeuralGraphics/Plan.md). Do not add NeRF or OptiX. |
-| `PGD-08/09`: Can knowledge and maintenance transfer? | A short delivered-case exercise, one non-author transcript, independent review with changed decision, and an explicit support/retirement note. Later progression: second distinct consumer plus one feedback-driven post-adoption revision. | `NVR-17/20`; [Neural adoption](../Architecture/CrossModule/NeuralGraphics/Acceptance.md), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md), existing support owner. |
+| `PGD-08/09`: Can knowledge and maintenance transfer? | A short delivered-case exercise, one non-author transcript, independent review with changed decision, and an explicit support/retirement note. Later progression: second distinct consumer plus one feedback-driven post-adoption revision. | `NVR-17/20`; [Neural adoption](../Architecture/CrossModule/NeuralGraphics/README.md#neural-graphics-acceptance), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md), existing support owner. |
 | Conditional `PGD-03/09`: Would a GPU-driven geometry or memory change solve a measured problem? | First produce a visibility/draw-granularity or residency-pressure diagnosis. Admit a bounded feature only if the current path cannot meet a frozen consumer need. | `NVR-08/09/16`; [Visibility](../Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/VisibilityAndDrawPreparation.md), [Residency](../Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/MeshAndTextureResidency.md). Meshlets/DGC/new vendor SDKs remain study-only until separately admitted. |
 
 Every selected exercise records the source card, exact assumption, local differences, rights route, falsifier and result owner using the [reference-use record](Research/RenderingReferenceExamples.md#delivery-reference-use-record). An algorithm replacement requires its existing feature gate; a documentation precedent cannot reopen or silently change an accepted scope.

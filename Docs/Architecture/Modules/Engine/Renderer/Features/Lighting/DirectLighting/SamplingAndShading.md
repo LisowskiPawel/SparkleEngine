@@ -1,5 +1,7 @@
 # Direct Lighting Sampling And Shading Contract
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** target mathematical contract with explicit discovery parameters; no implementation or conformance claim
 
 **Responsibility:** own direct-light radiometry, BRDF/lobe, light sampling, reservoir, reuse, visibility, reconstruction-signal, precision, and equation-to-code rules

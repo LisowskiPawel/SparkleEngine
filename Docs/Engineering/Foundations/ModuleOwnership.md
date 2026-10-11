@@ -1,5 +1,7 @@
 # Module Ownership And Repository Structure
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** binding repository structure and ownership standard
 
 **Applies to:** modules, dependencies, subsystem decomposition, APIs, state authority, and lifetimes

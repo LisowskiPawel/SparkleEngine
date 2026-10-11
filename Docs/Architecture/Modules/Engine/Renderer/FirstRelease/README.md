@@ -1,5 +1,7 @@
 # First Release Renderer Plans
 
+[Docs](../../../../../README.md) / [Up](../README.md)
+
 Choose the renderer work by the result you need: a valid frame, correct surfaces, useful lighting, a finished image or usable controls. The [Roadmap](../../../../../Strategy/Roadmap.md#required-feature-closure-priority) selects global priority; the table below routes that work.
 
 **Status:** Renderer release-plan index; routing and dependency order, not feature evidence

@@ -1,5 +1,7 @@
 # Volumetric Lighting, Fog, Atmosphere, And ReSTIR Staged Plan
 
+[Docs](../../../../../../../README.md) / [Up](README.md)
+
 **Status:** implementation-ready conditional plan; all production stages are blocked until `REL-11` unlocks new features and `VOL-D0` is accepted
 
 **Responsibility:** own the post-admission dependency order, stage scopes, estimates, non-goals, gates, copy-ready prompts, optional-tier decisions, and stop rules

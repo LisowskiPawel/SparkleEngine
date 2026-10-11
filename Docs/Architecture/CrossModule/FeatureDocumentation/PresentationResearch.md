@@ -1,5 +1,7 @@
 # Unreal Engine Documentation Presentation Precedent
 
+[Docs](../../../README.md) / [Up](README.md)
+
 **Status:** external documentation research; informs Sparkle presentation, not local architecture or implementation state
 
 **Reviewed:** 2026-09-07 against the official Epic Games Unreal Engine documentation linked below

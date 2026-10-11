@@ -1,5 +1,7 @@
 # H. Advanced Graphics Engineer Persona
 
+[Docs](../README.md) / [Up](README.md)
+
 **Status:** operating model; personal target, not an implementation standard or evidence matrix
 
 **Current evidence:** [Current Feature Readiness](../Acceptance/CurrentReadiness.md) owns feature scores. This page describes the engineering judgment to develop.
@@ -103,7 +105,7 @@ Design integration surfaces, fallback behavior, diagnostic entry points, and doc
 
 ### Research-Informed Professional Focus
 
-The selected focus is rendering/developer technology with GPU-system depth, supported by neural productization and useful tools. [Actual role families](Research/GraphicsRoleDepth.md) distinguish this from compiler, driver and research-scientist specialties. [Public engineers](Research/GraphicsEngineerProfiles.md) show several valid shapes: research-to-game integration, explicit API optimization, mathematical reconstruction, high-performance kernels and small durable tools. Their titles and GitHub portfolios are examples, not an internal NVIDIA ladder or proof that copying their projects leads to hiring.
+The selected focus is rendering/developer technology with GPU-system depth, supported by neural productization and useful tools. [Actual role families](Research/GraphicsEngineerProfiles.md#graphics-role-depth-and-evidence) distinguish this from compiler, driver and research-scientist specialties. [Public engineers](Research/GraphicsEngineerProfiles.md) show several valid shapes: research-to-game integration, explicit API optimization, mathematical reconstruction, high-performance kernels and small durable tools. Their titles and GitHub portfolios are examples, not an internal NVIDIA ladder or proof that copying their projects leads to hiring.
 
 Develop depth through the existing three headline cases. For each, explain the problem selection, exact personal contribution, mathematical/API assumptions, executed source identity, quality/cost tradeoff and external feedback. A principal-shaped result includes the decision that limited scope, removed authority or rejected an attractive optimization. Do not turn every neighboring specialty into a new mandatory engine subsystem.
 
@@ -177,7 +179,7 @@ Every material iteration selects the applicable `NS-*` outcomes before implement
 
 ## Purpose and Authority Boundary
 
-The [current primary-source study](Research/PrincipalGraphicsRoles.md) checks this target against developer-technology, tools, neural-rendering and GPU-performance expectations. The [delivery catalog](FeatureDeliveryCatalog.md) gives observable outputs, and the [roadmap](Roadmap.md) orders them by proof gates without delivery dates or time estimates.
+The [current primary-source study](Research/GraphicsEngineerProfiles.md#principal-graphics-roles-and-portfolio-implications) checks this target against developer-technology, tools, neural-rendering and GPU-performance expectations. The [delivery catalog](FeatureDeliveryCatalog.md) gives observable outputs, and the [roadmap](Roadmap.md) orders them by proof gates without delivery dates or time estimates.
 
 This document describes how the target engineer thinks, builds, reviews, and communicates. It does not redefine:
 

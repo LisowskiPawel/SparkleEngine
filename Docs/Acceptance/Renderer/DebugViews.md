@@ -1,10 +1,12 @@
 # Debug Views Candidate Evidence
 
+[Docs](../../README.md) / [Up](README.md)
+
 **Status:** bounded delivery record; Show controls accepted, whole-family and release acceptance remain open
 
 **Responsibility:** retain the candidate identity, evidence limits, and artifact routes needed after retiring completed Show implementation instructions
 
-**Contract:** [Debug Views acceptance](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Acceptance.md). [Show controls](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Controls/ShowFlags.md) owns current behavior; [presentation architecture](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/PresentationArchitecture.md) owns output mapping. This report does not create another delivery plan.
+**Contract:** [Debug Views acceptance](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Acceptance.md). [Show controls](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Controls/ShowFlags.md) owns current behavior; [presentation architecture](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/README.md#debug-view-presentation-architecture) owns output mapping. This report does not create another delivery plan.
 
 ## Bounded Show Delivery
 
