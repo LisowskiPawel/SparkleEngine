@@ -44,17 +44,9 @@ ShaderRecookPublicationReadResult ShaderRecookPublicationReader::Read(const std:
 	}
 
 	const ShaderRecookPublication& publication = *result.Publication;
-	if (publication.GlobalShaderMapPath.lexically_normal() != Filesystem::GetGlobalShaderMapPath().lexically_normal()
-	    || publication.CookedShaderLibraryPath.lexically_normal() != Filesystem::GetCookedShaderLibraryPath().lexically_normal())
-	{
-		result.Publication.reset();
-		result.Diagnostic = "Shader recook publication names artifacts outside the active cooked shader authority; reload rejected.";
-		return result;
-	}
-
 	std::vector<std::uint8_t> mapBytes;
 	std::vector<std::uint8_t> libraryBytes;
-	if (!Files::TryReadAllBytes(publication.GlobalShaderMapPath, mapBytes, readErrorMessage) || !Files::TryReadAllBytes(publication.CookedShaderLibraryPath, libraryBytes, readErrorMessage))
+	if (!Files::TryReadAllBytes(Filesystem::GetGlobalShaderMapPath(), mapBytes, readErrorMessage) || !Files::TryReadAllBytes(Filesystem::GetCookedShaderLibraryPath(), libraryBytes, readErrorMessage))
 	{
 		result.Publication.reset();
 		result.Diagnostic = "Shader recook artifacts could not be read; reload rejected. " + readErrorMessage;
@@ -73,17 +65,14 @@ ShaderRecookPublicationReadResult ShaderRecookPublicationReader::Parse(std::stri
 	ShaderRecookPublicationReadResult result;
 	std::string schema;
 	std::string status;
-	std::string globalShaderMap;
 	std::string globalShaderMapHashText;
-	std::string cookedShaderLibrary;
 	std::string cookedShaderLibraryHashText;
 	std::uint64_t publicationId = 0;
 	std::uint64_t publishedAtUnixMs = 0;
 	std::uint64_t globalShaderMapHash = 0;
 	std::uint64_t cookedShaderLibraryHash = 0;
 	if (!Json::TryReadStringProperty(text, "schema", schema) || !Json::TryReadStringProperty(text, "status", status) || !Json::TryReadUInt64Property(text, "publicationId", publicationId)
-	    || !Json::TryReadUInt64Property(text, "publishedAtUnixMs", publishedAtUnixMs) || !Json::TryReadStringProperty(text, "globalShaderMap", globalShaderMap)
-	    || !Json::TryReadStringProperty(text, "globalShaderMapHash", globalShaderMapHashText) || !Json::TryReadStringProperty(text, "cookedShaderLibrary", cookedShaderLibrary)
+	    || !Json::TryReadUInt64Property(text, "publishedAtUnixMs", publishedAtUnixMs) || !Json::TryReadStringProperty(text, "globalShaderMapHash", globalShaderMapHashText)
 	    || !Json::TryReadStringProperty(text, "cookedShaderLibraryHash", cookedShaderLibraryHashText) || !Json::TryParseHexUInt64(globalShaderMapHashText, globalShaderMapHash)
 	    || !Json::TryParseHexUInt64(cookedShaderLibraryHashText, cookedShaderLibraryHash))
 	{
@@ -108,8 +97,6 @@ ShaderRecookPublicationReadResult ShaderRecookPublicationReader::Parse(std::stri
 	    .PublishedAtUnixMs = publishedAtUnixMs,
 	    .GlobalShaderMapHash = globalShaderMapHash,
 	    .CookedShaderLibraryHash = cookedShaderLibraryHash,
-	    .GlobalShaderMapPath = std::filesystem::path(globalShaderMap),
-	    .CookedShaderLibraryPath = std::filesystem::path(cookedShaderLibrary),
 	    .Status = std::move(status)};
 
 	return result;

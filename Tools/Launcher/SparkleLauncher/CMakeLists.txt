@@ -106,7 +106,7 @@ set(SPARKLE_LAUNCHER_CORE_MAINTENANCE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceOperationProcessRequests.h
 )
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 6.11.1 EXACT REQUIRED COMPONENTS Widgets)
 
 set(SPARKLE_LAUNCHER_GUI_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherBackend.cpp

@@ -503,7 +503,7 @@ ShaderCookOutput ShaderArtifactPublication::Publish(const ShaderCookPipelinePlan
 		const CookedShaderLibrary stagedLibrary = CookedShaderLibrary::Open(stagedLibraryPath);
 		(void) GlobalShaderMap::Open(stagedMapPath, stagedLibrary);
 		ShaderDependencyManifest::Write(plan.dependencyManifest, stagedDependencyPath);
-		ShaderRecookSignal::Write(stagedMapPath, mapPath, stagedLibraryPath, libraryPath, stagedSignalPath);
+		ShaderRecookSignal::Write(stagedMapPath, stagedLibraryPath, stagedSignalPath);
 		const std::vector<Files::FilePublication> files = {{stagedMapPath, mapPath}, {stagedLibraryPath, libraryPath}, {stagedDependencyPath, dependencyPath}, {stagedSignalPath, signalPath}};
 		std::string error;
 		if (!Files::TryPublishFileSet(files, error))

@@ -9,12 +9,7 @@
 
 #include <chrono>
 
-void ShaderRecookSignal::Write(
-    const std::filesystem::path& mapReadPath,
-    const std::filesystem::path& publishedMapPath,
-    const std::filesystem::path& libraryReadPath,
-    const std::filesystem::path& publishedLibraryPath,
-    const std::filesystem::path& signalStoragePath)
+void ShaderRecookSignal::Write(const std::filesystem::path& mapReadPath, const std::filesystem::path& libraryReadPath, const std::filesystem::path& signalStoragePath)
 {
 	std::vector<std::uint8_t> mapBytes;
 	std::vector<std::uint8_t> libraryBytes;
@@ -34,9 +29,7 @@ void ShaderRecookSignal::Write(
 	writer.WriteString("status", "succeeded");
 	writer.WriteUInt64("publicationId", static_cast<std::uint64_t>(nanoseconds));
 	writer.WriteUInt64("publishedAtUnixMs", static_cast<std::uint64_t>(milliseconds));
-	writer.WriteString("globalShaderMap", publishedMapPath.generic_string());
 	writer.WriteHexUInt64("globalShaderMapHash", mapHash);
-	writer.WriteString("cookedShaderLibrary", publishedLibraryPath.generic_string());
 	writer.WriteHexUInt64("cookedShaderLibraryHash", libraryHash);
 	const std::string contents = writer.Finish();
 

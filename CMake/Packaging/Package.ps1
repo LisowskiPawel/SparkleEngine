@@ -29,6 +29,7 @@ $report = [ordered]@{
 }
 $phase = 'Admission'
 $lock = $null
+$reportPath = Join-Path $transactionRoot 'report.json'
 
 function Invoke-ReleaseCommand
 {
@@ -122,6 +123,20 @@ function Write-PackageArchive
     }
     finally { $zip.Dispose() }
     [IO.File]::SetAttributes($ArchivePath, [IO.FileAttributes]::ReadOnly)
+}
+
+function Publish-Package
+{
+    param([string] $Partial, [string] $TransactionRoot, [string] $OutputRoot, [string] $Version, [string] $ArchiveHash, $Report)
+    $name = "SparkleEngine-v$Version-windows-x64-unsigned-internal.zip"
+    $destination = Join-Path $OutputRoot $ArchiveHash
+    $Report.Archive = @{ Path = $name; Sha256 = $ArchiveHash; Size = (Get-Item -LiteralPath $Partial).Length }
+    [IO.File]::Move($Partial, (Join-Path $TransactionRoot $Report.Archive.Path))
+    $Report.Steps += @{ Name = 'Package'; Status = 'PASS' }
+    $Report.Status = 'PASS'
+    $Report | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $TransactionRoot 'report.json') -Encoding UTF8
+    [IO.Directory]::Move($TransactionRoot, $destination)
+    return Join-Path $destination 'report.json'
 }
 
 try
@@ -218,14 +233,13 @@ try
     Test-PackageMetadata $stage $manifest
     Assert-ReleaseCandidateUnchanged
     $archiveHash = (Get-FileHash -LiteralPath $partial).Hash.ToLowerInvariant()
-    $archive = Join-Path $outputRoot "SparkleEngine-v$version-windows-x64-unsigned-internal-$archiveHash.zip"
-    [IO.File]::Move($partial, $archive)
-    $report.Archive = @{ Path = [IO.Path]::GetFileName($archive); Sha256 = $archiveHash; Size = (Get-Item -LiteralPath $archive).Length }
-    $report.Steps += @{ Name = 'Package'; Status = 'PASS' }
-    $report.Status = 'PASS'
+    $reportPath = Publish-Package $partial $transactionRoot $outputRoot $version $archiveHash $report
 }
 catch
 {
+    $report.Status = 'BLOCKED'
+    $report.Archive = $null
+    $report.Steps = @($report.Steps | Where-Object { $_.Name -ne $phase -or $_.Status -ne 'PASS' })
     $report.Steps += @{ Name = $phase; Status = 'BLOCKED'; Reason = $_.Exception.Message }
     foreach ($skipped in @('Build','Cook','Stage','Verify','Package'))
     {
@@ -241,12 +255,12 @@ finally
     # Failed transactions are retained for diagnosis under .partial; no ZIP is published from them.
     try
     {
-        if (Test-Path -LiteralPath $transactionRoot -PathType Container)
+        if ($report.Status -ne 'PASS' -and (Test-Path -LiteralPath $transactionRoot -PathType Container))
         {
-            $report | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $transactionRoot 'report.json') -Encoding UTF8
-            Write-Output "Release report: $transactionRoot/report.json"
+            $report | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $reportPath -Encoding UTF8
         }
     }
     finally { if ($null -ne $lock) { $lock.Dispose() } }
 }
+Write-Output "Release report: $reportPath"
 if ($report.Status -ne 'PASS') { exit 1 }
