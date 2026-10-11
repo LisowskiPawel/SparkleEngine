@@ -16,7 +16,7 @@ Deliver Sparkle Launcher, Sparkle Editor and Sparkle Game with user-selected rel
 
 [Current progress](../../../Strategy/Roadmap.md#release-progress) separates implemented work from missing acceptance checks. Do not use the phase order below as a claim that earlier source work is absent.
 
-**Next:** finish dependency and symbol [input checks](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then produce the PD-3 archive. Test minimum-machine operation against that archive; the user will run the clean-machine rehearsal. Complete missing PD-1/PD-2 checks in their existing owners, then exercise PD-4 against the same archive.
+**Next:** qualify the remaining product/source/failure journeys, regenerate the archive after affected source changes, and run PD-4 against those bytes. The user will perform the clean-machine rehearsal. [Current results](../../../Strategy/Roadmap.md#release-progress) distinguish passing checks from open work; a verified archive alone does not complete PD-1 through PD-4.
 
 ## `PD-1` — Game And Editor Product Shells
 

@@ -33,6 +33,8 @@ The source and negative controls are recorded in [current FR-01 results](../../.
 
 ## At A Glance
 
+**Map admission:** `ReleaseSupported` in [Levels.catalog](../../../../../Projects/Showcase/Levels.catalog) identifies Empty and the seven release maps. GUI cards label release/development maps; installed sync/run planners reject development maps, while source workflows retain them. Run requires the requested catalog map to be selected and source-ready before checking cooked products; Empty remains the built-in starting map.
+
 | User intent | Launcher responsibility | Success boundary |
 | --- | --- | --- |
 | prepare workspace | discover repository/project, inspect toolchain/dependencies, and propose the exact missing operation | readiness is revalidated immediately before execution |

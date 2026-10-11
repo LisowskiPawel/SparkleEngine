@@ -110,7 +110,7 @@ namespace SparkleLauncher
 
 		QString BuildLevelDetail(const ProjectLevelCatalogEntry& level, const ProjectAssetPack* pack) const
 		{
-			QStringList traits;
+			QStringList traits{level.releaseSupported ? QStringLiteral("Release map") : QStringLiteral("Development map")};
 			if (level.variantKind == "SceneVariant")
 			{
 				traits.push_back("variant");

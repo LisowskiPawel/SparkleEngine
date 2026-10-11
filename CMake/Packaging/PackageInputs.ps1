@@ -58,6 +58,27 @@ function New-PackageManifest
     {
         [void] (Assert-PackageFile $RepositoryRoot $file.Source $file.Size $file.Sha256)
     }
+    foreach ($file in $Inputs.Files | Where-Object Path -like '*.gltf')
+    {
+        $gltf = Get-Content -LiteralPath (Join-Path $RepositoryRoot $file.Source) -Raw -Encoding UTF8 | ConvertFrom-Json
+        $references = @($gltf.PSObject.Properties | Where-Object Name -in @('buffers','images') | ForEach-Object Value)
+        foreach ($reference in $references)
+        {
+            $uri = $reference.PSObject.Properties['uri']
+            if ($null -eq $uri -or $uri.Value.StartsWith('data:')) { continue }
+            $directory = [IO.Path]::GetDirectoryName((Join-Path $RepositoryRoot $file.Path))
+            $path = [IO.Path]::GetFullPath((Join-Path $directory ([Uri]::UnescapeDataString($uri.Value))))
+            if (!$path.StartsWith($RepositoryRoot.TrimEnd('\','/') + '\', [StringComparison]::OrdinalIgnoreCase))
+            {
+                throw "glTF reference escapes the package: '$($file.Path)'."
+            }
+            $relative = $path.Substring($RepositoryRoot.TrimEnd('\','/').Length + 1).Replace('\','/')
+            if (@($Inputs.Files | Where-Object { $_.Path -eq $relative -and $_.Role -in @('Recipe','EngineContent') }).Count -ne 1)
+            {
+                throw "Missing declared glTF buffer/image: '$relative' referenced by '$($file.Path)'."
+            }
+        }
+    }
     foreach ($binding in @(
         @('Tools/Diagnostics/ExportDiagnostics.ps1','CMake/Packaging/ExportDiagnostics.ps1'),
         @('Tools/Diagnostics/IncidentIdentity.ps1','CMake/Packaging/IncidentIdentity.ps1'),

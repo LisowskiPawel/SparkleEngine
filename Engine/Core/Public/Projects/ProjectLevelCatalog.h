@@ -20,6 +20,7 @@ struct SPARKLE_CORE_API ProjectLevelCatalogEntry final
 	std::string assetPackId;
 	std::string family;
 	std::string variantKind;
+	bool releaseSupported = false;
 	bool selected = false;
 };
 

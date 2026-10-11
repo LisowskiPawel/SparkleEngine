@@ -12,9 +12,10 @@ namespace SparkleLauncher
 	class AssetPackSyncPlanner final
 	{
 	public:
-		AssetPackSyncPlanner(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds) noexcept :
+		AssetPackSyncPlanner(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds, bool releaseOnly) noexcept :
 		    m_catalog(catalog),
-		    m_requestedLevelIds(requestedLevelIds)
+		    m_requestedLevelIds(requestedLevelIds),
+		    m_releaseOnly(releaseOnly)
 		{
 		}
 
@@ -36,7 +37,7 @@ namespace SparkleLauncher
 					{
 						throw Diagnostics::Error("Requested level '" + levelId + "' is not present in the level catalog.");
 					}
-					AppendRequestedLevelPack(*level);
+					AppendLevelPack(*level, false);
 				}
 				return;
 			}
@@ -47,33 +48,27 @@ namespace SparkleLauncher
 				{
 					continue;
 				}
-				AppendSelectedLevelPack(level);
+				AppendLevelPack(level, true);
 			}
 		}
 
-		void AppendSelectedLevelPack(const ProjectLevelCatalogEntry& level)
+		void AppendLevelPack(const ProjectLevelCatalogEntry& level, bool selected)
 		{
+			if (m_releaseOnly && !level.releaseSupported)
+			{
+				throw Diagnostics::Error("Level '" + level.id + "' is development-only; use a source checkout for this map.");
+			}
 			if (level.assetPackId.empty())
 			{
 				return;
 			}
 
 			const ProjectAssetPack& pack = m_catalog.assetPacks.at(level.assetPackId);
-			if (!pack.gameSupported)
+			if (selected && !pack.gameSupported)
 			{
 				throw Diagnostics::Error("Selected level '" + level.id + "' requires game-unsupported asset pack '" + pack.id + "': " + pack.gameBlocker);
 			}
 			AppendPackAndParents(pack);
-		}
-
-		void AppendRequestedLevelPack(const ProjectLevelCatalogEntry& level)
-		{
-			if (level.assetPackId.empty())
-			{
-				return;
-			}
-
-			AppendPackAndParents(m_catalog.assetPacks.at(level.assetPackId));
 		}
 
 		void AppendPackAndParents(const ProjectAssetPack& pack)
@@ -97,12 +92,13 @@ namespace SparkleLauncher
 
 		const ProjectLevelCatalog& m_catalog;
 		std::span<const std::string> m_requestedLevelIds;
+		bool m_releaseOnly;
 		std::set<std::string, std::less<>> m_appendedIds;
 		std::vector<std::string> m_packIds;
 	};
 
-	std::vector<std::string> BuildAssetPackSyncPlan(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds)
+	std::vector<std::string> BuildAssetPackSyncPlan(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds, bool releaseOnly)
 	{
-		return AssetPackSyncPlanner(catalog, requestedLevelIds).Build();
+		return AssetPackSyncPlanner(catalog, requestedLevelIds, releaseOnly).Build();
 	}
 }

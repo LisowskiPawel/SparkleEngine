@@ -2,6 +2,8 @@
 
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Paths/ProductPaths.h"
+#include "Core/Public/Projects/ProjectLevelCatalog.h"
+#include "Core/Public/Diagnostics/Error.h"
 #include "CookedContentReadiness.h"
 #include "LevelRunOperationProcessRequests.h"
 #include "ExternalCaptureDiscovery.h"
@@ -33,6 +35,36 @@ namespace SparkleLauncher
 		overrideValue.Name = std::move(name);
 		overrideValue.Value = std::move(value);
 		plan.Environment.push_back(std::move(overrideValue));
+	}
+
+	static bool InspectRequestedLevel(LevelRunOperationPlan& plan)
+	{
+		try
+		{
+			const auto catalog = ProjectLevelCatalogFile::Load(plan.WorkingDirectory);
+			const auto level = std::find_if(catalog.levels.begin(), catalog.levels.end(), [&plan](const ProjectLevelCatalogEntry& entry) { return entry.id == plan.Request.LevelId; });
+			if (level == catalog.levels.end())
+			{
+				AddReadiness(plan, "Requested level is not present in the catalog: " + plan.Request.LevelId);
+				return false;
+			}
+			if (!Filesystem::IsSourceWorkspace(plan.RepositoryRoot) && !level->releaseSupported)
+			{
+				AddReadiness(plan, "Requested level is development-only; use a source checkout: " + level->id);
+				return false;
+			}
+			if (level->id != "Empty" && (!level->selected || !catalog.IsLevelReady(*level)))
+			{
+				AddReadiness(plan, "Requested level must be selected with its complete source content ready: " + level->id);
+				return false;
+			}
+			return true;
+		}
+		catch (const Diagnostics::Error& error)
+		{
+			AddReadiness(plan, error.what());
+			return false;
+		}
 	}
 
 	static void PopulateRunStep(LevelRunOperationPlan& plan)
@@ -141,6 +173,10 @@ namespace SparkleLauncher
 		    plan.Request.ProductProfile);
 
 		plan.WorkingDirectory = Filesystem::ResolveProductProjectRoot(plan.Request.RepositoryRoot, plan.Request.ContentId);
+		if (!InspectRequestedLevel(plan))
+		{
+			return plan;
+		}
 		AddEnvironment(plan, "SPARKLE_STARTUP_LEVEL", plan.Request.LevelId);
 
 		std::error_code errorCode;

@@ -3,6 +3,7 @@ Id = Empty
 DisplayName = Empty
 Description = Start with a clean scene for experiments, tools, and new content.
 Source = Levels/Empty.level
+ReleaseSupported = true
 Selected = false
 
 [Level]
@@ -15,6 +16,7 @@ SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/
 AssetPack = ModernSponzaCurtains
 Family = Modern Sponza
 VariantKind = Base
+ReleaseSupported = true
 Selected = false
 
 [Level]
@@ -27,6 +29,7 @@ SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/
 AssetPack = ModernSponzaCandles
 Family = Modern Sponza
 VariantKind = AddOn
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -39,6 +42,7 @@ SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/
 AssetPack = ModernSponzaKnight
 Family = Modern Sponza
 VariantKind = AddOn
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -49,6 +53,7 @@ Source = Levels/JungleRuins.level
 Thumbnail = Launcher/Thumbnails/JungleRuins.jpg
 SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
 AssetPack = JungleRuins
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -61,6 +66,7 @@ SourcePage = https://developer.nvidia.com/orca/amazon-lumberyard-bistro
 AssetPack = Bistro
 Family = Bistro
 VariantKind = Base
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -73,6 +79,7 @@ SourcePage = https://developer.nvidia.com/orca/amazon-lumberyard-bistro
 AssetPack = Bistro
 Family = Bistro
 VariantKind = SceneVariant
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -85,6 +92,7 @@ SourcePage = https://casual-effects.com/g3d/data10/index.html
 AssetPack = SanMiguel
 Family = San Miguel
 VariantKind = Base
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -97,6 +105,7 @@ SourcePage = https://casual-effects.com/g3d/data10/index.html
 AssetPack = SanMiguel
 Family = San Miguel
 VariantKind = SceneVariant
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -106,6 +115,7 @@ Description = Test lighting, materials, and rendering features in the classic Sp
 Source = Levels/Sponza.level
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/Sponza
 AssetPack = Sponza
+ReleaseSupported = true
 Selected = false
 
 [Level]
@@ -115,6 +125,7 @@ Description = Browse a stylized glTF showcase with varied materials and scene co
 Source = Levels/ABeautifulGame.level
 Thumbnail = Launcher/Thumbnails/ABeautifulGame.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ABeautifulGame
+ReleaseSupported = true
 Selected = false
 
 [Level]
@@ -124,6 +135,7 @@ Description = Inspect a compact physically based material sample built around th
 Source = Levels/DamagedHelmet.level
 Thumbnail = Launcher/Thumbnails/DamagedHelmet.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DamagedHelmet
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -134,6 +146,7 @@ Source = Levels/LPSHead.level
 Thumbnail = Launcher/Thumbnails/LPSHead.jpg
 SourcePage = https://casual-effects.com/g3d/data10/index.html
 AssetPack = LPSHead
+ReleaseSupported = true
 Selected = false
 
 [Level]
@@ -143,6 +156,7 @@ Description = Exercise indirect lighting, material response, and reference rende
 Source = Levels/CornellBox.level
 Thumbnail = Launcher/Thumbnails/CornellBox.png
 SourcePage = https://casual-effects.com/g3d/data10/index.html
+ReleaseSupported = true
 Selected = false
 
 [Level]
@@ -152,6 +166,7 @@ Description = Study diffuse transmission and layered plant materials in a focuse
 Source = Levels/DiffuseTransmissionPlant.level
 Thumbnail = Launcher/Thumbnails/DiffuseTransmissionPlant.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DiffuseTransmissionPlant
+ReleaseSupported = true
 Selected = false
 
 [Level]
@@ -161,6 +176,7 @@ Description = Explore an animated glTF character sample with skinning and author
 Source = Levels/CesiumMan.level
 Thumbnail = Launcher/Thumbnails/CesiumMan.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CesiumMan
+ReleaseSupported = true
 Selected = false
 
 [Level]
@@ -173,6 +189,7 @@ SourcePage = https://graphics.stanford.edu/data/3Dscanrep/#bunny
 AssetPack = StanfordBunny
 Family = Subsurface
 VariantKind = Base
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -185,6 +202,7 @@ SourcePage = https://graphics.stanford.edu/data/3Dscanrep/#dragon
 AssetPack = StanfordDragon
 Family = Subsurface
 VariantKind = Base
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -197,6 +215,7 @@ SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c6
 AssetPack = AnisotropyBarnLamp
 Family = Material Reference
 VariantKind = Base
+ReleaseSupported = false
 Selected = false
 
 [Level]
@@ -209,6 +228,7 @@ SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c6
 AssetPack = SheenCloth
 Family = Material Reference
 VariantKind = Base
+ReleaseSupported = false
 Selected = false
 
 [AssetPack]

@@ -178,6 +178,10 @@ void ProjectLevelCatalogReader::ParseLevelField(std::string_view key, std::strin
 	{
 		m_currentLevel->variantKind = Strings::UnquoteCopy(value);
 	}
+	else if (key == "ReleaseSupported")
+	{
+		m_currentLevel->releaseSupported = ParseBool(value);
+	}
 	else if (key == "Selected")
 	{
 		m_currentLevel->selected = ParseBool(value);
@@ -306,6 +310,7 @@ void ProjectLevelCatalogReader::ValidateCurrentSection() const
 		requireField("Id");
 		requireField("Source");
 		requireField("Selected");
+		requireField("ReleaseSupported");
 	}
 	else if (m_section == Section::AssetPack)
 	{

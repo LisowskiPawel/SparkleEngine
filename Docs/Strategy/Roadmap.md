@@ -20,7 +20,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 
 ## Where We Are And What Is Next
 
-**Next: verify the regenerated PD-3 archive, run PD-4's package checks, then the user's clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation). [Current package results and archive identity](../../artifacts/validation/releases/0.1.0/19fd9698-pd3-internal-20261011/candidate.json) distinguish completed checks from remaining acceptance.
+**Next: verify the regenerated PD-3 archive, run PD-4's package checks, then the user's clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation). [Current package results and archive identity](../../artifacts/validation/releases/0.1.0/43219fc6-product-closure-20261012/candidate.json) distinguish completed checks from remaining acceptance.
 
 | Current work | Design / acceptance reference | Implementation stages |
 | --- | --- | --- |
@@ -40,7 +40,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 | Identity / FR-01 | Identity, dependency pins, notices; earlier Shipping/Empty baseline passed locally. | Historical asset rights, exact redistribution/helper/symbol admission and current-candidate qualification. |
 | PD-1: Game / Editor | Product shells, shared settings path, dedicated lens-effect passes; bounded build/startup checks. | Input/DPI, settings/failure routes, Editor edit/save, unsupported providers and visual proof. New effect toggles remain deferred. |
 | PD-2: source / Launcher | Typed sync/configure/build/cook/run/clean and owner-check routes exist. | Cold/warm and controlled failures; independent source-adopter rehearsal. |
-| PD-3 / FR-02: package | Six Shipping products pass the input audit. Original asset authorship recorded; compiled/SDK/Microsoft notices consolidated. ShaderCompiler no longer embeds SDK locations. [Current checks](../../artifacts/validation/releases/0.1.0/19fd9698-pd3-internal-20261011/candidate.json). | Regenerate after the first-run seed fix; qualify installed seven-map/offline/failure, LGPL replacement and user minimum-machine routes. Signing and public rights belong to FR-07. |
+| PD-3 / FR-02: package | Six Shipping products pass the input audit. Original asset authorship recorded; compiled/SDK/Microsoft notices consolidated. ShaderCompiler no longer embeds SDK locations. [Current checks](../../artifacts/validation/releases/0.1.0/43219fc6-product-closure-20261012/candidate.json). | Regenerate after catalog/planner changes; qualify installed seven-map/offline/failure, LGPL replacement and user minimum-machine routes. Signing and public rights belong to FR-07. |
 | PD-4: diagnostics | Local export, retention, symbols and replacement/review tools; fixture checks. | Waiting for the PD-3 archive, then native crash/hang/GPU/privacy, self-service and replacement checks. Automatic crash/hang collection is unavailable. |
 | FR-03 to FR-08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
 
