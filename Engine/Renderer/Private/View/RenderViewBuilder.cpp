@@ -90,6 +90,7 @@ void BuildRenderView(RenderView& output, RenderViewState& state, const RenderVie
 	                .ViewportId = output.viewportId,
 	                .Selection = output.selection.Value,
 	                .Kind = output.kind,
+	                .Mode = output.viewMode,
 	            },
 	        .Camera = output.cameraUniform,
 	        .RenderExtent = request.RenderExtent,

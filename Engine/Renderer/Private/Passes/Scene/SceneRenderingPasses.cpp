@@ -1,5 +1,4 @@
 #include "../../PCH.h"
-#include "Passes/Scene/SceneRenderingPasses.h"
 
 #include "Frame/FramePipeline.h"
 #include "Frame/RenderFrame.h"
@@ -16,13 +15,6 @@
 #include "Passes/Scene/SceneVisualizationPasses.h"
 #include "Passes/Presentation/PresentationPolicy.h"
 #include "Scene/RenderScene.h"
-
-std::uint64_t GetSceneRenderingGraphRebuildKey(RenderViewMode viewMode) noexcept
-{
-	constexpr std::uint32_t viewModeBitOffset = 8u;
-	const std::uint64_t realTimePathTracerKey = viewMode == RenderViewMode::ReferencePathTracer ? 0u : GetRealTimePathTracerGraphRebuildKey();
-	return (static_cast<std::uint64_t>(viewMode) << viewModeBitOffset) | realTimePathTracerKey;
-}
 
 void FramePipeline::AddSceneRenderingPasses(FrameGraphBuilder& builder, const RenderFrame& frame, RenderFrameGraphResources& resources)
 {

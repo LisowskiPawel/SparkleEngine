@@ -21,8 +21,5 @@ struct RenderFrameGraphSettings final
 	FramePresentationTarget PresentationTarget = FramePresentationTarget::ViewportProduct;
 	RenderOutputFlags RequestedOutputs = RenderOutputFlags::None;
 
-	bool VignetteActive = false;
-	bool ChromaticAberrationActive = false;
-
 	bool operator==(const RenderFrameGraphSettings&) const noexcept = default;
 };

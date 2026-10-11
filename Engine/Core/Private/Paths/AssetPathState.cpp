@@ -42,8 +42,20 @@ namespace Filesystem::Private
 		const std::filesystem::path projectName = state.projectPath.empty() ? std::filesystem::path("Shared") : state.projectPath.filename();
 		const WorkspaceOutputPaths workspaceOutputs = ResolveWorkspaceOutputPaths(state.workspacePath);
 
-		state.cookedAssetRootPath = state.packageRuntimeRoot ? Paths::Normalize(state.workspacePath / "Projects" / projectName / "Cooked")
-		                                                     : Paths::Normalize(workspaceOutputs.CookedProjectDirectory(projectName.string()));
+		if (state.installedProduct)
+		{
+			const auto contentRoot = ResolvePackageContentRoot(state.workspacePath);
+			SPARKLE_DEFINE_LOG_CATEGORY_STATIC(logger, "Core");
+			if (!contentRoot)
+			{
+				Diagnostics::Fatal(logger, __FILE__, __LINE__, "Invalid ContentStore in " + (state.workspacePath / "manifests/sparkle-package-manifest.json").string());
+			}
+			state.cookedAssetRootPath = Paths::Normalize(*contentRoot / "Cooked");
+		}
+		else
+		{
+			state.cookedAssetRootPath = Paths::Normalize(workspaceOutputs.CookedProjectDirectory(projectName.string()));
+		}
 
 		state.cookedShaderRootPath = Paths::Normalize(state.cookedAssetRootPath / "Shaders");
 		state.globalShaderMapPath = Filesystem::BuildGlobalShaderMapPath(state.cookedShaderRootPath);
@@ -57,13 +69,13 @@ namespace Filesystem::Private
 		state.cookedAnimationRootPath = Paths::Normalize(state.cookedAssetRootPath / "Animations");
 		state.sceneAssetRegistryPath = Paths::Normalize(state.cookedAssetRootPath / "SceneAssetRegistry.sreg");
 
-		state.shaderSymbolsOutputPath = state.packageRuntimeRoot ? Paths::Normalize(state.productUserStatePaths.CacheRoot / "ShaderSymbols" / projectName)
+		state.shaderSymbolsOutputPath = state.installedProduct ? Paths::Normalize(state.productUserStatePaths.CacheRoot / "ShaderSymbols" / projectName)
 		                                                         : Paths::Normalize(workspaceOutputs.SymbolsRoot / "shaders" / projectName);
 	}
 
 	void MaterializeOutputDirectories(const AssetPathState& state)
 	{
-		if (state.packageRuntimeRoot)
+		if (state.installedProduct)
 		{
 			std::error_code errorCode;
 			std::filesystem::create_directories(state.shaderSymbolsOutputPath, errorCode);
@@ -133,9 +145,9 @@ namespace Filesystem::Private
 		ValidatePath(logger, "Cooked Shader Root", state.cookedShaderRootPath, true);
 		ValidatePath(logger, "Cooked Skeleton Root", state.cookedSkeletonRootPath, true);
 		ValidatePath(logger, "Cooked Animation Root", state.cookedAnimationRootPath, true);
-		ValidatePath(logger, "Engine", state.enginePath, !state.packageRuntimeRoot);
-		ValidatePath(logger, "Engine Assets", state.engineAssetsPath, !state.packageRuntimeRoot);
-		ValidatePath(logger, "Project", state.projectPath, false);
+		ValidatePath(logger, "Engine", state.enginePath, true);
+		ValidatePath(logger, "Engine Assets", state.engineAssetsPath, true);
+		ValidatePath(logger, "Project", state.projectPath, state.installedProduct);
 		ValidatePath(logger, "Project Assets", state.projectAssetsPath, false);
 		ValidatePath(logger, "Shader Symbols Output", state.shaderSymbolsOutputPath, false);
 	}
@@ -147,10 +159,10 @@ namespace Filesystem::Private
 		state.executableDirectory = Filesystem::GetExecutableDirectory();
 
 		const std::optional<std::filesystem::path> packageRoot = DiscoverPackageRoot();
-		state.packageRuntimeRoot = packageRoot.has_value();
-		state.workspacePath = state.packageRuntimeRoot ? Paths::Normalize(*packageRoot) : Filesystem::ResolveWorkspaceRootPath();
+		state.installedProduct = packageRoot.has_value();
+		state.workspacePath = state.installedProduct ? Paths::Normalize(*packageRoot) : Filesystem::ResolveWorkspaceRootPath();
 		state.productUserStatePaths = ResolveCurrentProductUserStatePaths();
-		if (!state.packageRuntimeRoot)
+		if (!state.installedProduct)
 		{
 			if (const auto engineRoot = Filesystem::DiscoverEngineRoot())
 			{
@@ -159,11 +171,17 @@ namespace Filesystem::Private
 			}
 		}
 
-		if (state.packageRuntimeRoot)
+		if (state.installedProduct)
 		{
+			if (const auto engineRoot = DiscoverPackageEngineRoot(state.workspacePath))
+			{
+				state.enginePath = *engineRoot;
+				state.engineAssetsPath = state.enginePath / "Assets";
+			}
 			if (const auto projectRoot = DiscoverPackageProjectRoot(state.workspacePath))
 			{
 				state.projectPath = *projectRoot;
+				state.projectAssetsPath = state.projectPath / "Assets";
 			}
 		}
 		else if (const auto projectRoot = Filesystem::DiscoverProjectRoot())

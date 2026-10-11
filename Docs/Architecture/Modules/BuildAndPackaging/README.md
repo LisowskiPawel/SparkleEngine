@@ -16,6 +16,8 @@
 
 **Release inputs:** [First Release Inputs](ReleaseInputs.md) names product profiles, helper admission, acquisition-only Sponza/source-export boundaries, notices/SBOM, signing inputs and threat controls. Candidate results remain in Acceptance.
 
+**Package owner (2026-10-11):** [CMake/Packaging](../../../../CMake/Packaging/Package.ps1) now owns the reviewed-input build/cook/stage/verify/archive route. [Packaging And Installation](PackagingAndInstallation.md#current-package-entry) describes current checks and remaining admission/runtime gaps. Historical Not found entries below retain their snapshot; source presence does not pass PD-3 or REL-03.
+
 **Public development setup (2026-10-11):** the [root README](../../../../README.md) uses the standalone Launcher entry; [Contributing](../../../../CONTRIBUTING.md) routes public review. A [bounded source workflow](ContinuousIntegrationAndRegression.md) is prepared; historical absence-of-CI rows below predate it. Hosted/build/GPU acceptance remains unproved.
 
 **Baseline owner checks:** after Launcher generates the canonical workspace, run `powershell -NoProfile -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor`. [RunBaselineChecks.ps1](../../../../CMake/RunBaselineChecks.ps1) prints the revision/dirty state and sequentially invokes `architecture_boundary_check`, `code_style_check` and `ShaderCompilerCliValidation`, stopping at the first owner failure. It adds no check semantics and does not certify fresh checkout, asset rights, full cook or runtime. Candidate/environment/artifact binding remains with the [acceptance report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers).

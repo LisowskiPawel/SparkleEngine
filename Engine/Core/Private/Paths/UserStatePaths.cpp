@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <system_error>
 
@@ -37,6 +38,7 @@ namespace Filesystem::Private
 			CoTaskMemFree(knownFolderPath);
 			return result;
 		}
+		throw std::runtime_error("Cannot resolve Windows LocalAppData for Sparkle per-user state.");
 #else
 		if (const char* stateHome = std::getenv("XDG_STATE_HOME"); stateHome != nullptr && *stateHome != '\0')
 		{

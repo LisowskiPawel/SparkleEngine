@@ -10,5 +10,7 @@ namespace Filesystem::Private
 	std::string InferProjectNameFromExecutableStem(std::string executableStem);
 	std::optional<std::filesystem::path> DiscoverPackageRoot();
 	std::optional<std::filesystem::path> DiscoverPackageProjectRoot(const std::filesystem::path& packageRoot);
+	std::optional<std::filesystem::path> DiscoverPackageEngineRoot(const std::filesystem::path& packageRoot);
+	std::optional<std::filesystem::path> ResolvePackageContentRoot(const std::filesystem::path& packageRoot);
 	std::optional<std::filesystem::path> DiscoverWorkspaceProjectRoot();
 }

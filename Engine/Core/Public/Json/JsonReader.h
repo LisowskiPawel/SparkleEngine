@@ -12,7 +12,8 @@
 
 namespace Json
 {
-	SPARKLE_CORE_API std::size_t FindPropertyValue(std::string_view objectText, std::string_view key) noexcept;
+	// Reads an immediate member of a complete object; malformed input or a duplicate requested key fails.
+	SPARKLE_CORE_API std::size_t FindPropertyValue(std::string_view objectText, std::string_view key);
 	SPARKLE_CORE_API bool TryReadStringProperty(std::string_view objectText, std::string_view key, std::string& outValue);
 
 	template <typename TNumber> bool TryReadUnsignedIntegerProperty(std::string_view objectText, std::string_view key, TNumber& outValue)
@@ -29,6 +30,10 @@ namespace Json
 			++cursor;
 		}
 		if (cursor == numberStart)
+		{
+			return false;
+		}
+		if (cursor < objectText.size() && objectText[cursor] != ',' && objectText[cursor] != '}' && !std::isspace(static_cast<unsigned char>(objectText[cursor])))
 		{
 			return false;
 		}

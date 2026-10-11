@@ -1,6 +1,6 @@
 # Packaging And Installation
 
-**Status:** target capability dossier; no current public package or installer was found
+**Status:** package contract and current implementation route; consumer package acceptance remains blocked
 
 **Scope:** define deterministic staging, manifests, integrity/signing, packaging, installation, writable state, relocation, and clean-machine operation
 
@@ -11,6 +11,22 @@
 **Strategy and acceptance sources:** [`PGE-01`, `PGE-13`, `PGE-14`, `PGE-15`](../../../Strategy/Requirements.md), [First Release](../../../Acceptance/FirstRelease.md), and `FCR-PROD-02`/`FCR-PROD-05` in [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md)
 
 **Current readiness:** **0/100** — target only; no public stage/sign/verify/package/install product path was found. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
+
+
+## Current Package Entry
+
+`CMake/Packaging` is the Build And Packaging owner. Root CMake generates product inputs from actual targets and registers `release_package`. It invokes existing CMake builds and AssetCooker commands, then copies only reviewed file entries into a new stage. No install rule exposes internal targets, and Launcher/Renderer/Application do not own packaging policy.
+
+```powershell
+cmake -S . -B build -DSPARKLE_RELEASE_INPUTS=<reviewed-inputs.json>
+cmake --build build --config ShippingEditor --target release_package
+```
+
+The input contract is in [Release Inputs](ReleaseInputs.md#reviewed-package-inputs). Missing rights, dependency, discovery, content-store or symbol admission stops before build/cook/stage. These are candidate-bound owner reviews, not permission flags to set to make the command pass.
+
+The stage verifier checks declared paths, hashes, notices, required components, read-only attributes, x64 PE headers and requested vendor signatures. It rejects missing/extra/duplicate members, traversal/reparse paths, source/debug/user-state files and known Editor/tool dependencies under Game. ZIP creation uses sorted membership and fixed timestamps; independent ZIP enumeration checks membership, size, hashes and attributes before publication. The manifest excludes its own digest; ZIP verification checks its exact staged bytes, and the external report binds the archive hash.
+
+Outputs stay under `artifacts/releases/<version>/`. Failed transactions remain under `.partial-<id>/` with reports/logs; they never publish a ZIP. The script does not delete or overwrite earlier output. A successful route publishes a hash-named **unsigned internal** archive. This does not prove trusted signing, complete transitive imports, private-path erasure, symbol correlation, runtime relocation, LGPL replacement, or a clean standard-user journey. Those require the admitted reports and native acceptance below. No product archive has been produced by this iteration.
 
 ## At A Glance
 

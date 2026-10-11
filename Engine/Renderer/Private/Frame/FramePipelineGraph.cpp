@@ -6,9 +6,6 @@
 #include "FrameGraph/Builder/FrameGraphBuilder.h"
 #include "FrameGraph/FrameGraph.h"
 #include "Passes/Presentation/PresentationPolicy.h"
-#include "Passes/Presentation/PostProcessing/Vignette.h"
-#include "Passes/Presentation/PostProcessing/ChromaticAberration.h"
-#include "Passes/Scene/SceneRenderingPasses.h"
 #include "Providers/RendererImageProviderStack.h"
 #include "Pipeline/RenderPassRuntimeCache.h"
 #include "RHI/Public/Device/RenderDeviceServices.h"
@@ -42,9 +39,7 @@ RenderFrameGraphSettings FramePipeline::ResolveFrameGraphSettings() const noexce
 	    .OutputFormat = m_deviceServices.GetRenderHardwareInterface().GetPresentationService().GetPresentColorFormat(),
 	    .ExposureMeteringMethod = displaySettings.ExposureMeteringMethod,
 	    .PresentationTarget = ShouldOutputToBackBuffer() ? FramePresentationTarget::BackBuffer : FramePresentationTarget::ViewportProduct,
-	    .RequestedOutputs = m_viewportRenderRequest.RequestedOutputs,
-	    .VignetteActive = IsVignetteActive(m_viewportRenderRequest.ViewMode),
-	    .ChromaticAberrationActive = IsChromaticAberrationActive(m_viewportRenderRequest.ViewMode)};
+	    .RequestedOutputs = m_viewportRenderRequest.RequestedOutputs};
 }
 
 bool FramePipeline::ShouldOutputToBackBuffer() const noexcept
@@ -64,7 +59,6 @@ void FramePipeline::InitializeFrameGraph(const RenderFrameGraphSettings& setting
 	m_builtGBufferAlgorithm = CVarGBufferAlgorithm.Get();
 	m_builtRayTracingGraphGeneration = rayTracingScene.GetGraphGeneration();
 	m_builtShaderGeneration = m_renderPassRuntimeCache.GetShaderGeneration();
-	m_builtSceneRenderingGraphRebuildKey = GetSceneRenderingGraphRebuildKey(m_viewportRenderRequest.ViewMode);
 	m_imageProviderFrameGraphKey = m_imageProviders->GetFrameGraphKey();
 	m_frameGraph = std::move(frameGraph);
 	++m_graphTopologyGeneration;
@@ -117,7 +111,7 @@ void FramePipeline::ApplyPendingResize() noexcept
 	}
 }
 
-void FramePipeline::RefreshGraphForTopology() noexcept
+void FramePipeline::RefreshFrameResources() noexcept
 {
 	const ImageProviderGraphKey providerGraphKey = m_imageProviders->GetFrameGraphKey();
 	const bool providerChanged = providerGraphKey != m_imageProviderFrameGraphKey;
@@ -130,9 +124,8 @@ void FramePipeline::RefreshGraphForTopology() noexcept
 	const GBufferAlgorithm gBufferAlgorithm = CVarGBufferAlgorithm.Get();
 	const std::uint64_t rayTracingGraphGeneration = m_renderScene->GetRayTracingScene().GetGraphGeneration();
 	const std::uint64_t shaderGeneration = m_renderPassRuntimeCache.GetShaderGeneration();
-	const std::uint64_t sceneRenderingGraphRebuildKey = GetSceneRenderingGraphRebuildKey(m_viewportRenderRequest.ViewMode);
 	if (providerChanged || settings != m_frameGraphSettings || gBufferAlgorithm != m_builtGBufferAlgorithm || rayTracingGraphGeneration != m_builtRayTracingGraphGeneration
-	    || shaderGeneration != m_builtShaderGeneration || sceneRenderingGraphRebuildKey != m_builtSceneRenderingGraphRebuildKey)
+	    || shaderGeneration != m_builtShaderGeneration)
 	{
 		InvalidateViewHistory(RenderViewInvalidationReason::GraphTopology);
 		RefreshFrameExecution(settings);

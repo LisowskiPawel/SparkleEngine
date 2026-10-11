@@ -5,4 +5,5 @@
 namespace Filesystem::Private
 {
 	ProductUserStatePaths ResolveCurrentProductUserStatePaths();
+	std::filesystem::path ResolveSparkleUserStateRoot();
 }

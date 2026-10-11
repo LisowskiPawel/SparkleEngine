@@ -7,6 +7,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+Add-Type -AssemblyName System.IO.Compression
 . (Join-Path $PSScriptRoot 'PackageVerification.ps1')
 
 $repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
@@ -100,7 +101,7 @@ try
     }
     $manifest = [ordered]@{
         Version = $version; Revision = $report.Revision; SourceInputsSha256 = $report.SourceInputsSha256
-        Signing = 'UnsignedInternal'; ContentStore = '%LOCALAPPDATA%/SparkleEngine/Content/Showcase/'
+        Signing = 'UnsignedInternal'; ProjectPath = 'content/Showcase'; EnginePath = 'engine'; ContentStore = 'Content/Showcase'
         Products = @($products | Select-Object Component, Target, Configuration, Path)
         Files = @($inputs.Files | Select-Object Path, Size, Sha256, Component, Role, Permission, Owner, Origin, License, Notice, Signature)
     }

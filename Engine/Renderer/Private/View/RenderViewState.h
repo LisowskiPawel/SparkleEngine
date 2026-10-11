@@ -2,6 +2,7 @@
 
 #include "GameFramework/Public/Rendering/RenderViewInput.h"
 #include "Renderer/Public/Viewport/ViewportContracts.h"
+#include "Renderer/Public/Viewport/RenderViewMode.h"
 #include "ShaderData/ViewCameraUniformData.h"
 #include "ShaderData/ViewTemporalUniformData.h"
 
@@ -35,6 +36,7 @@ struct RenderViewStateIdentity final
 	std::uint64_t ViewportId = 0u;
 	std::uint64_t Selection = 0u;
 	RenderViewKind Kind = RenderViewKind::Game;
+	RenderViewMode Mode = RenderViewMode::Lit;
 
 	bool operator==(const RenderViewStateIdentity&) const noexcept = default;
 };

@@ -18,7 +18,7 @@ The Editor's **Show** menu is a convenient frontend for turning Renderer feature
 
 Owner amendment, 2026-10-11: dedicated effect widgets and the new Post Processing Show group are deferred. The existing fifteen-control Show menu remains unchanged. Internal `r.Vignette` and `r.ChromaticAberration` controls default On; `r.PostProcessing.DebugViews` defaults Off.
 
-`Passes/Presentation/PostProcessing` owns the effect CVars, activation and shaders. Each pass returns its input unchanged when inactive; presentation orchestration only orders passes. PresentationPolicy classifies diagnostic views; the feature policy enables effects by default for Lit and Reference and bypasses them in debug views. The frame-graph key retains effective activation only to detect topology changes. No effect state is copied into resolved display settings or public viewport products. Raw Reference radiance/moments remain unchanged.
+`Passes/Presentation/PostProcessing` owns the effect CVars, activation and shaders. Each pass returns its input unchanged when inactive; presentation orchestration only orders passes. PresentationPolicy classifies diagnostic views; the feature policy enables effects by default for Lit and Reference and bypasses them in debug views. Passes are declared and compiled each rendered frame, so effect activation needs no graph rebuild key. `RenderFrameGraphSettings` carries no copied effect toggles. No effect state is copied into resolved display settings or public viewport products. Raw Reference radiance/moments remain unchanged.
 
 A shared Game/Editor settings frontend is future work. Extend the current settings owner rather than retaining a second Game widget list or public settings-status bag.
 

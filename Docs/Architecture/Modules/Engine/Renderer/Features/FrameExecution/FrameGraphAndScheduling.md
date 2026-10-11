@@ -8,6 +8,8 @@
 
 **Frame-composition amendment:** reconciled 2026-10-06 against `2c4704b7` plus the scoped working tree. Frame preparation owns the declaration/binding lifecycle; graph construction and execution expose ordered semantic operations. This source update does not close the native scheduling or lifetime proof contract.
 
+**Per-frame compilation amendment, 2026-10-11:** declaration, setup and compilation run for each rendered execution; compiled plans are not reused between frames. Pass-admission keys for scene rendering, lighting and post processing are removed. Resource configuration and provider/shader/SBT generations still govern retained GPU resource replacement; view mode belongs to temporal view identity, not graph reuse. This source reconciliation adds no native or performance proof.
+
 **Scope:** `REN-FG-01` through `REN-FG-08` and the frame-graph portion of `REN-OWN-04`/`REN-OWN-06`; defines how Renderer feature declarations become resources, dependencies, barriers, queue submissions, and retirement
 
 **Current readiness:** **50/100** — dependency compilation, barriers, transients, queues, recording, and submission exist in source; correctness, failure, parity, and cost evidence does not. See [Current Feature Readiness](../../../../../../Acceptance/CurrentReadiness.md#renderer).
@@ -19,7 +21,7 @@
 | pass/resource declaration and versioned dependencies | one central execution authority for Renderer feature work | missing-producer, dead-work, and dependency fixtures not accepted |
 | queue assignment, barriers, waits, and recording chunks | explicit graphics/compute/copy/native-ray scheduling vocabulary | cross-queue correctness, useful overlap, and parallel equivalence unproved |
 | transient lifetime and alias placement | compiled first/last use plus alias/state barriers | aliased/non-aliased output equivalence and pressure benefit unproved |
-| topology keys, graph generations, and history invalidation | rebuilds on relevant extent/mode/provider/shader/SBT changes | churn safety, bounded retained generations, and exact invalidation unproved |
+| resource generations and history invalidation | replaces retained resources on extent/configuration/provider/shader/SBT changes; temporal identity handles view-mode changes | churn safety, bounded retained generations, and exact invalidation unproved |
 | submission tokens and retirement | old graphs/frame slots wait for all used queues | failure/shutdown settlement remains unproved |
 
 The frame graph is infrastructure rather than a visible effect. Its success criterion is that every enabled feature product is produced exactly once with valid ordering and lifetime; performance claims require separate timing evidence.
@@ -34,10 +36,10 @@ This is infrastructure used by features, not a visual feature by itself. Its obs
 
 | Phase | Current operation | Owned result |
 | --- | --- | --- |
-| Topology resolution | `FramePipeline` resolves extents, output target/format, lighting/GBuffer modes, ray frontends, provider key, shader generation, and relevant SBT-plan generation. | `RenderFrameGraphSettings` plus topology identity |
+| Resource configuration | `FramePipeline::RefreshFrameResources` resolves extents, output target/format, GBuffer algorithm, provider key, shader generation and relevant SBT-plan generation for persistent-resource replacement. Pass admission reads current controls during each frame's authoring. | `RenderFrameGraphSettings` plus GPU resource lifetime identity |
 | Per-frame authoring | After preparing the scene/view, `FramePipeline::PrepareFrameGraph` resets CPU declarations, builds resources through `BuildRenderFrameGraph`, and binds the current scene. The build function only orders semantic resource/pass/export operations and returns the assembled resources. `FramePipeline::AddSceneRenderingPasses`, in `SceneRenderingPasses.cpp`, uses the lifecycle owner's dependencies directly and owns the sole Lit-versus-Reference branch; the reference session publishes its own progress and sample prefix. Passes allocate and fill current parameters together before dispatch/draw. Named resources are reused within their graph generation by resource kind, ownership, and name; transient descriptors must agree. Common exposure history is declared before the branch, while ReSTIR reservoir histories are declared only inside Lit. | Execution-scoped pass/parameter declarations over persistent `RenderFrameGraphResources` handles |
 | Current inputs | Pass authoring borrows the prepared `RenderFrame` only where required, reads controls directly, and queries history validity from the selected history slot and generation. Current TLAS, sky, GPU-scene and Reference accumulation resources bind to persistent graph handles before setup/compile. | Fully populated current parameters and resource bindings; no parameter-refresh callbacks |
-| Setup and compile | Pass setup runs; texture histories and imported accesses synchronize; compiler builds resource dependencies, queues, transient lifetimes/blocks, aliasing/state barriers, submission batches, and recording plan. | `FrameGraphPlan` for this execution |
+| Setup and compile | Each executable frame clears the previous plan and runs pass setup; texture histories and imported accesses synchronize; compiler builds resource dependencies, queues, transient lifetimes/blocks, aliasing/state barriers, submission batches, and recording plan. No topology key skips compilation. | `FrameGraphPlan` for this execution |
 | Materialize and record | Transients are materialized, initial barriers recorded, batches recorded serially or through bounded Tasks chunks, and waits derived from producer batch tokens. | One or more RHI command-recording batches |
 | Submit and finish | Batches submit to graphics/compute/copy as assigned, final barriers record, texture histories commit, UI records, and device `SubmitFrame`/advance completes CPU submission. | Queue tokens and next history state |
 | Retire | CPU declarations/parameters reset after recording tasks have joined. Rebuilt graph resources, native shader tables, and their frame slots retain the last submitted state for every queue and are destroyed only when all tokens complete. | Separate CPU execution lifetime and completion-safe GPU reclamation |
@@ -99,7 +101,7 @@ Primary evidence: `REN-E19` for rebuild/recording/retirement, `RHI-E03` for queu
 - `AC-FGS-03` — transient placements overlap only for non-overlapping lifetimes; first use after aliasing receives the required initialization/alias transition and produces the serial non-aliased oracle.
 - `AC-FGS-04` — serial and parallel recording emit semantically identical pass order, parameters, barriers, submissions, and output for the same graph and frame identity.
 - `AC-FGS-05` — graphics, compute, and copy assignments preserve dependencies; async exposure agrees with graphics-queue exposure and is never reported as a performance benefit without timing evidence.
-- `AC-FGS-06` — every topology-key change rebuilds the graph exactly when required, invalidates affected history, and prevents old provider/shader/SBT resources from binding to the new graph.
+- `AC-FGS-06` — every rendered execution authors and compiles its current graph; resource-configuration changes replace retained resources when required, invalidate affected history and prevent old provider/shader/SBT resources from binding to the new generation. Pass-admission changes require no compiled-plan reuse key; view-mode changes invalidate temporal identity.
 - `AC-FGS-07` — rebuilt or failed graph generations, frame slots, histories, transients, providers, pipelines, and shader tables remain alive through their last queue token and are then reclaimed within a declared bound.
 - `AC-FGS-08` — invalid handles, missing imports, contradictory use, unsupported queue/pass combinations, and incomplete ray bindings fail before partial submission and identify the offending pass/resource.
 
@@ -120,13 +122,13 @@ Primary evidence: `REN-E19` for rebuild/recording/retirement, `RHI-E03` for queu
 | `CHK-FGS-01` | focused compiler fixtures for producer/version/dependency/queue/barrier/dead-root rules, including each invalid injection | `AC-FGS-01`, `AC-FGS-02`, `AC-FGS-05`, `AC-FGS-08`; `FM-FGS-01`, `FM-FGS-02` |
 | `CHK-FGS-02` | transient lifetime fixtures with aliased and deliberately non-aliased executions; compare outputs and inspect placement/alias barriers | `AC-FGS-03`; `FM-FGS-03` |
 | `CHK-FGS-03` | execute the same representative graph with parallel recording off/on and async exposure unavailable/available; compare plans, decoded products, diagnostics, and native validation | `AC-FGS-02`, `AC-FGS-04`, `AC-FGS-05`; `FM-FGS-02`, `FM-FGS-04` |
-| `CHK-FGS-04` | churn extent, provider, shader, lighting/frontend, and SBT-plan generations while work is in flight; assert history reset, binding identity, bounded retained generations, and completion-safe reclamation | `AC-FGS-06`, `AC-FGS-07`; `FM-FGS-04`, `FM-FGS-05` |
+| `CHK-FGS-04` | churn extent, provider, shader, lighting/frontend and SBT-plan generations while work is in flight; assert per-frame declaration/compilation, feature-owned history reset, binding identity, bounded retained resource generations and completion-safe reclamation | `AC-FGS-06`, `AC-FGS-07`; `FM-FGS-04`, `FM-FGS-05` |
 
 This contract is **defined but unproved**. `REN-E19`, `RHI-E03`, and `RHI-E05` may close it only with revision-pinned plans/captures, both applicable backends, controlled negative cases, and a candidate-bound verdict. Source presence, a successful compile, or GPU overlap inferred from queue assignment is insufficient.
 
 ## Primary Source Routes
 
-- [`FramePipelineGraph.cpp`](../../../../../../../Engine/Renderer/Private/Frame/FramePipelineGraph.cpp): topology key, rebuild, invalidation, retirement.
+- [`FramePipelineGraph.cpp`](../../../../../../../Engine/Renderer/Private/Frame/FramePipelineGraph.cpp): persistent-resource configuration, replacement, invalidation and retirement.
 - [`BuildRenderFrameGraph.cpp`](../../../../../../../Engine/Renderer/Private/Frame/Graph/BuildRenderFrameGraph.cpp): feature declaration order.
 - [`ExecuteRenderFrameGraph.cpp`](../../../../../../../Engine/Renderer/Private/Frame/Graph/ExecuteRenderFrameGraph.cpp): `FramePipeline::ExecuteFrame` admission, setup, compile, parameter preparation, and execution; current bindings are prepared before this step.
 - [`FrameGraphCompiler.cpp`](../../../../../../../Engine/Renderer/Private/FrameGraph/Compiler/FrameGraphCompiler.cpp): compiled plan construction.

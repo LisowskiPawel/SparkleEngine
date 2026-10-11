@@ -100,7 +100,7 @@ private:
 	void PollFrameServices() noexcept;
 	bool AcceptFrameSubmission(RenderFrameSubmission& submission) noexcept;
 	void ApplyPendingResize() noexcept;
-	void RefreshGraphForTopology() noexcept;
+	void RefreshFrameResources() noexcept;
 	void BeginBackendFrame() noexcept;
 	void PrepareFrame(const RenderViewInput& viewInput, const RenderFrameTime& time);
 	void UploadSceneAssets();
@@ -136,7 +136,6 @@ private:
 	GBufferAlgorithm m_builtGBufferAlgorithm = GBufferAlgorithm::Rasterized;
 	std::uint64_t m_builtRayTracingGraphGeneration = 0u;
 	std::uint64_t m_builtShaderGeneration = 0u;
-	std::uint64_t m_builtSceneRenderingGraphRebuildKey = 0u;
 	RenderViewportExtent m_windowExtent = {};
 	ViewportRenderRequest m_viewportRenderRequest = {};
 	ViewportRenderProducts m_viewportRenderProducts = {};

@@ -140,27 +140,184 @@ namespace Json
 		return false;
 	}
 
-	std::size_t FindPropertyValue(std::string_view objectText, std::string_view key) noexcept
+	static void SkipWhitespace(std::string_view document, std::size_t& cursor) noexcept
 	{
-		const std::string needle = "\"" + std::string(key) + "\"";
-		const std::size_t keyOffset = objectText.find(needle);
-		if (keyOffset == std::string_view::npos)
-		{
-			return std::string_view::npos;
-		}
-
-		std::size_t cursor = objectText.find(':', keyOffset + needle.size());
-		if (cursor == std::string_view::npos)
-		{
-			return std::string_view::npos;
-		}
-
-		++cursor;
-		while (cursor < objectText.size() && std::isspace(static_cast<unsigned char>(objectText[cursor])))
+		while (cursor < document.size() && (document[cursor] == ' ' || document[cursor] == '\t' || document[cursor] == '\r' || document[cursor] == '\n'))
 		{
 			++cursor;
 		}
-		return cursor;
+	}
+
+	static bool SkipValue(std::string_view document, std::size_t& cursor, std::size_t depth)
+	{
+		SkipWhitespace(document, cursor);
+		if (cursor == document.size() || depth > 64u)
+		{
+			return false;
+		}
+		if (document[cursor] == '"')
+		{
+			std::string ignored;
+			return TryReadString(document, cursor, ignored);
+		}
+		if (document[cursor] == '{' || document[cursor] == '[')
+		{
+			const bool isObject = document[cursor++] == '{';
+			const char end = isObject ? '}' : ']';
+			SkipWhitespace(document, cursor);
+			if (cursor < document.size() && document[cursor] == end)
+			{
+				++cursor;
+				return true;
+			}
+			while (cursor < document.size())
+			{
+				if (isObject)
+				{
+					std::string ignored;
+					if (!TryReadString(document, cursor, ignored))
+					{
+						return false;
+					}
+					SkipWhitespace(document, cursor);
+					if (cursor == document.size() || document[cursor++] != ':')
+					{
+						return false;
+					}
+				}
+				if (!SkipValue(document, cursor, depth + 1u))
+				{
+					return false;
+				}
+				SkipWhitespace(document, cursor);
+				if (cursor == document.size())
+				{
+					return false;
+				}
+				if (document[cursor] == end)
+				{
+					++cursor;
+					return true;
+				}
+				if (document[cursor++] != ',')
+				{
+					return false;
+				}
+				SkipWhitespace(document, cursor);
+			}
+			return false;
+		}
+		for (const std::string_view literal : {"true", "false", "null"})
+		{
+			if (document.substr(cursor).starts_with(literal))
+			{
+				cursor += literal.size();
+				return true;
+			}
+		}
+		if (document[cursor] == '-')
+		{
+			++cursor;
+		}
+		if (cursor == document.size() || document[cursor] < '0' || document[cursor] > '9')
+		{
+			return false;
+		}
+		if (document[cursor++] != '0')
+		{
+			while (cursor < document.size() && std::isdigit(static_cast<unsigned char>(document[cursor])))
+			{
+				++cursor;
+			}
+		}
+		if (cursor < document.size() && document[cursor] == '.')
+		{
+			const std::size_t fraction = ++cursor;
+			while (cursor < document.size() && std::isdigit(static_cast<unsigned char>(document[cursor])))
+			{
+				++cursor;
+			}
+			if (cursor == fraction)
+			{
+				return false;
+			}
+		}
+		if (cursor < document.size() && (document[cursor] == 'e' || document[cursor] == 'E'))
+		{
+			++cursor;
+			if (cursor < document.size() && (document[cursor] == '+' || document[cursor] == '-'))
+			{
+				++cursor;
+			}
+			const std::size_t exponent = cursor;
+			while (cursor < document.size() && std::isdigit(static_cast<unsigned char>(document[cursor])))
+			{
+				++cursor;
+			}
+			if (cursor == exponent)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	std::size_t FindPropertyValue(std::string_view objectText, std::string_view key)
+	{
+		std::size_t cursor = objectText.starts_with("\xef\xbb\xbf") ? 3u : 0u;
+		SkipWhitespace(objectText, cursor);
+		if (cursor == objectText.size() || objectText[cursor++] != '{')
+		{
+			return std::string_view::npos;
+		}
+		std::size_t result = std::string_view::npos;
+		SkipWhitespace(objectText, cursor);
+		while (cursor < objectText.size() && objectText[cursor] != '}')
+		{
+			std::string property;
+			if (!TryReadString(objectText, cursor, property))
+			{
+				return std::string_view::npos;
+			}
+			SkipWhitespace(objectText, cursor);
+			if (cursor == objectText.size() || objectText[cursor++] != ':')
+			{
+				return std::string_view::npos;
+			}
+			SkipWhitespace(objectText, cursor);
+			if (property == key)
+			{
+				if (result != std::string_view::npos)
+				{
+					return std::string_view::npos;
+				}
+				result = cursor;
+			}
+			if (!SkipValue(objectText, cursor, 0u))
+			{
+				return std::string_view::npos;
+			}
+			SkipWhitespace(objectText, cursor);
+			if (cursor < objectText.size() && objectText[cursor] == '}')
+			{
+				break;
+			}
+			if (cursor == objectText.size() || objectText[cursor++] != ',')
+			{
+				return std::string_view::npos;
+			}
+			SkipWhitespace(objectText, cursor);
+			if (cursor == objectText.size() || objectText[cursor] == '}')
+			{
+				return std::string_view::npos;
+			}
+		}
+		if (cursor == objectText.size() || objectText[cursor++] != '}')
+		{
+			return std::string_view::npos;
+		}
+		SkipWhitespace(objectText, cursor);
+		return cursor == objectText.size() ? result : std::string_view::npos;
 	}
 
 	bool TryReadStringProperty(std::string_view objectText, std::string_view key, std::string& outValue)

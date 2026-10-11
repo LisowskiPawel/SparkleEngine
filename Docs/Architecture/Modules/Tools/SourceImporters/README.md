@@ -14,6 +14,8 @@
 
 Source ownership reconciled on 2026-10-06: `ImportedScene::FindSkeletonJointForNode` owns source-node lookup across skeletons for both glTF and FBX animation import. First-match ordering and the invalid-index pair remain unchanged; importer-specific source translation stays in each importer.
 
+glTF texture mapping reconciled on 2026-10-11: `GltfMaterialTextureMapper::Apply` names the supported slots in import order. Source-local operations own validation, UV/sampler translation and reference assembly; packed roughness/metallic shares one resolved source while preserving green/blue channels. The per-group dispatch switch, optional-path insertion relay and stateless class shell are removed. Source URI text is borrowed during resolution; imported paths and mappings remain owned values. Format coverage and evidence labels are unchanged.
+
 ## At A Glance
 
 | Source family | Current coverage | Principal exclusions |

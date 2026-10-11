@@ -27,6 +27,21 @@ The immutable extraction contains `launcher/SparkleLauncher.exe`, `editor/Showca
 
 Selected source and cooked content live under `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`, outside the extraction. Downloads are explicit Launcher selections, verified and transactionally published by the existing acquisition/cook owners. Keep source and cooked subtrees distinct; use the existing project/asset identities without introducing asset or shader versions. Existing settings/log owners remain per-user. FR-02 must implement this layout and qualify offline use, read-only extraction, containment and helper discovery. These target paths do not describe current source-workspace behavior.
 
+
+## Reviewed Package Inputs
+
+The [package owner](PackagingAndInstallation.md#current-package-entry) consumes a reviewed JSON input file. Keep it outside the source snapshot, under ignored release evidence. CMake generates exact product paths under `build/private/release-products/<configuration>.json`; package membership is not inferred from development directories.
+
+| Input field | Required meaning |
+| --- | --- |
+| `Revision`, `SourceInputsSha256` | Exact Git revision and deterministic hash of repository-relative tracked/untracked nonignored file hashes, including deletions. The admission run retains `source-inputs.json` and the fingerprint in `report.json`; review that snapshot before admitting payloads. |
+| `Admissions` | `Rights`, `DependencyClosure`, `PackageDiscovery`, `ContentStore`, `SymbolCorrelation`: each has `Status`, repository-relative `Report`, `Size`, `Sha256`. Only an owning candidate review can record `PASS`; a license filename or successful build is insufficient. |
+| `Files` | Explicit complete allowlist; each entry has repository-relative `Source`, package-relative `Path`, `Size`, lowercase `Sha256`, `Component`, `Role`, `Permission`, `Owner`, logical `Origin`, SPDX `License`, package-relative `Notice`, `Signature`. No absolute source path goes into the package manifest. |
+
+Components are Launcher, Editor, Game, the three admitted cook helpers, CMake, Engine and Shared. Roles are Runtime, Helper, EngineContent, Recipe, Defaults, Notice and Metadata. Permission is ReadOnly. Signature policy is UnsignedFirstParty, VendorSigned or NotApplicable (non-PE only); unsigned first-party archives are internal development products. VendorSigned bytes require valid Authenticode. Required entries include all six generated executables, `tools/CMake/bin/cmake.exe`, `manifests/sparkle-sbom.spdx.json` and `manifests/sparkle-provenance.json`. Notices must themselves be admitted members.
+
+The SPDX SBOM, provenance, complete dependency closure, redistribution terms and symbol correlation require owner review of exact bytes. The verifier enforces the frozen file contract; it does not infer a legal grant, synthesize a SBOM, qualify a helper from its filename, or establish runtime discovery. Current admissions remain unresolved. Do not create passing receipts until their checks have run.
+
 ## Content And Source Distribution
 
 - Product archives carry engine-owned mandatory defaults and only legally admitted content. A requested map remains available through a verified user-selected acquisition recipe; no automatic first-launch download is required.

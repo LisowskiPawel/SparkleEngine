@@ -31,9 +31,9 @@ namespace Filesystem::Private
 		{
 			executableStem.resize(executableStem.size() - std::string_view("Editor").size());
 		}
-		else if (executableStem.size() > std::string_view("Runtime").size() && PathFormatting::EndsWithIgnoreCase(executableStem, "Runtime"))
+		else if (executableStem.size() > std::string_view("Game").size() && PathFormatting::EndsWithIgnoreCase(executableStem, "Game"))
 		{
-			executableStem.resize(executableStem.size() - std::string_view("Runtime").size());
+			executableStem.resize(executableStem.size() - std::string_view("Game").size());
 		}
 
 		if (executableStem.empty())
@@ -55,13 +55,9 @@ namespace Filesystem::Private
 
 		for (uint32_t depth = 0; depth < 8 && !currentDir.empty(); ++depth)
 		{
-			const bool hasPackageRoot = std::filesystem::exists(currentDir / Filesystem::kWorkspaceMarker, ec);
-			ec.clear();
 			const bool hasPackageManifest = std::filesystem::exists(currentDir / "manifests" / "sparkle-package-manifest.json", ec);
 			ec.clear();
-			const bool hasProjects = std::filesystem::exists(currentDir / "Projects", ec);
-			ec.clear();
-			if (hasPackageRoot && hasPackageManifest && hasProjects)
+			if (hasPackageManifest)
 			{
 				return Paths::Normalize(currentDir);
 			}
@@ -72,47 +68,6 @@ namespace Filesystem::Private
 				break;
 			}
 			currentDir = parentDir;
-		}
-
-		return std::nullopt;
-	}
-
-	std::optional<std::filesystem::path> DiscoverPackageProjectRoot(const std::filesystem::path& packageRoot)
-	{
-		if (packageRoot.empty())
-		{
-			return std::nullopt;
-		}
-
-		const std::filesystem::path projectsRoot = packageRoot / "Projects";
-		std::error_code ec;
-		if (!std::filesystem::exists(projectsRoot, ec) || ec)
-		{
-			return std::nullopt;
-		}
-
-		const std::string projectName = InferProjectNameFromExecutableStem(GetExecutableStem());
-		if (!projectName.empty())
-		{
-			const std::filesystem::path inferredProjectRoot = projectsRoot / projectName;
-			if (std::filesystem::exists(inferredProjectRoot / "Cooked", ec) && !ec)
-			{
-				return Paths::Normalize(inferredProjectRoot);
-			}
-			ec.clear();
-		}
-
-		for (const auto& entry : std::filesystem::directory_iterator(projectsRoot, ec))
-		{
-			if (ec)
-			{
-				break;
-			}
-			if (entry.is_directory(ec) && !ec && std::filesystem::exists(entry.path() / "Cooked", ec) && !ec)
-			{
-				return Paths::Normalize(entry.path());
-			}
-			ec.clear();
 		}
 
 		return std::nullopt;
@@ -133,7 +88,7 @@ namespace Filesystem::Private
 			return std::nullopt;
 		}
 
-		const std::string executableStem = GetExecutableStem();
+		const std::string executableStem = InferProjectNameFromExecutableStem(GetExecutableStem());
 		if (executableStem.empty())
 		{
 			return std::nullopt;

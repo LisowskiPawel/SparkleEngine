@@ -37,7 +37,7 @@ namespace Filesystem::Private
 		std::filesystem::path emptyPath;
 		std::array<std::filesystem::path, AssetTypeCount> projectTypedPaths{};
 		std::array<std::filesystem::path, AssetTypeCount> engineTypedPaths{};
-		bool packageRuntimeRoot = false;
+		bool installedProduct = false;
 	};
 
 	AssetPathState& GetAssetPathState();
