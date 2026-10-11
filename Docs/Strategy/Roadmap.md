@@ -4,19 +4,31 @@
 
 **Scope:** the order to follow from the current release work through advanced graphics and portfolio delivery
 
-**Reconciled:** 2026-10-10 at `acf530742fc0f2a9e6cdcd9d27e1f88d9abccfff`; documentation inspection only
+**Updated:** 2026-10-11; progress summarizes recorded source work, not release approval
 
-Start here to choose your next task. Open its linked plan for the exact stages, prerequisites and execution prompt. Work is ordered by dependencies, with no delivery dates or hour estimates.
+Start here to choose your next task. Open its linked plan for the exact stages, prerequisites and work and exit criteria. Work is ordered by dependencies, with no delivery dates or hour estimates.
 
 ## Where We Are And What Is Next
 
-**Next release task: qualify packaging inputs, then finish PD-3 and create the archive.** Product, package and diagnostic source work already exists; complete its missing checks rather than restarting it. [Current progress and blockers](../Acceptance/FirstRelease.md#current-progress) owns the work status. [PD-3](../Architecture/CrossModule/FirstRelease/ProductAndDelivery.md#pd-3--package-and-installation) gives the execution prompt. The owner will run the clean-machine rehearsal when the exact archive is ready.
+**Next: qualify package inputs, finish PD-3, and produce the archive for your clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/ReleaseInputs.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/ProductAndDelivery.md#pd-3--package-and-installation). No verified product archive exists yet.
 
-**Renderer priority: restore correct Lit and Reference lighting.** Recheck the dated black-lighting failure against current source/cooked inputs, find the first incorrect rendering product and fix its owner. Continue the [reference recovery order](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md#required-execution-order); preserve completed source work and valid evidence.
+**Renderer work:** continue [Lit/Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md#required-execution-order). Recheck dated failures against current source before fixing their owner.
 
-**Before public release: obtain the Windows publisher certificate.** Certum enrollment is deferred by the owner. Prepare signing during packaging; obtain the certificate, sign/timestamp and verify exact bytes before [candidate freeze and independent adoption](../Architecture/CrossModule/FirstRelease/README.md#fr-06--candidate-freeze-and-independent-adoption). Unsigned internal packaging can proceed; it does not qualify public release.
+**Before public release:** obtain the deferred Certum certificate, sign/timestamp and verify the final bytes before candidate freeze/adoption. Unsigned internal packaging can proceed.
 
-Open the progress page to see what remains, then one linked plan to execute it. The tables below give the larger delivery order.
+## Release Progress
+
+| Work | Implemented / recorded | Remaining |
+| --- | --- | --- |
+| Scope / FR-00 | Six product choices approved. | Technical scope and rights closure. |
+| Identity / FR-01 | Identity, dependency pins, notices; earlier Shipping/Empty baseline passed locally. | Historical asset rights, exact redistribution/helper/symbol admission and current-candidate qualification. |
+| PD-1: Game / Editor | Product shells, shared settings path, dedicated lens-effect passes; bounded build/startup checks. | Input/DPI, settings/failure routes, Editor edit/save, unsupported providers and visual proof. New effect toggles remain deferred. |
+| PD-2: source / Launcher | Typed sync/configure/build/cook/run/clean and owner-check routes exist. | Cold/warm and controlled failures; independent source-adopter rehearsal. |
+| PD-3 / FR-02: package | Transactional stage, manifests, dependency and ZIP verification exist. | Reviewed inputs; installed content-store sync/cook/run/remove; exact archive and clean-machine rehearsal. |
+| PD-4: diagnostics | Local export, retention, symbols and replacement/review tools; fixture checks. | Native packaged crash/hang/GPU/privacy and self-service journeys; full symbol correlation. Automatic crash/hang collection and shader-symbol correlation are unavailable. |
+| FR-03?08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
+
+All six product reports remain blocked; implemented source is not release acceptance. The earlier local baseline at `fec29052c6f6195547f2062da9def86e520dc0df` does not qualify later changes. Reuse valid work, rerun checks affected by changed inputs, and keep future results bound to their exact candidate/archive. [Release gates](../Acceptance/FirstRelease.md#release-gates) decide shipment; [approved scope](../Acceptance/ReleaseScope/README.md) fixes the promises.
 
 ## Ordered Delivery
 

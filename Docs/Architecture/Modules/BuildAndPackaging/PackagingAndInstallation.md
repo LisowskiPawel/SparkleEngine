@@ -10,7 +10,7 @@
 
 **Strategy and acceptance sources:** [`PGE-01`, `PGE-13`, `PGE-14`, `PGE-15`](../../../Strategy/Requirements.md), [First Release](../../../Acceptance/FirstRelease.md), and `FCR-PROD-02`/`FCR-PROD-05` in [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md)
 
-**Acceptance:** blocked. The implementation below has local structural checks; no three-product archive or clean-machine package result exists. See [candidate evidence](../../../Acceptance/ReleaseScope/Evidence.md#package-spine-iter-pd3-01).
+**Acceptance:** blocked. The implementation below has local structural checks; no three-product archive or clean-machine package result exists. See [Release progress](../../../Strategy/Roadmap.md#release-progress).
 
 
 ## Current Package Entry

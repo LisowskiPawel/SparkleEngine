@@ -46,17 +46,6 @@ Unreal's [parallel-rendering overview](https://dev.epicgames.com/documentation/e
 
 **Phase exit criteria:** all three families have current owner/producer/consumer/lifetime and checks; serial oracle and matrices are explicit; contradictions block implementation.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute FS-0 without code changes. Create ITER-REN-FS-00 and map FCR-REN-01/02/03 to current feature AC/FM/CHK, REL-04, workloads, and risks. Inspect world submission, RenderCoordinator, RendererHost, FramePipeline, Scene/View/GPU-scene preparation, BuildRenderFrameGraph, graph compile/execute, RHI submission, selectors, CMake, tests, and dirty work. Record identities, queues, mutable owners, publication/lifetime, copies, invalidation, serial oracle, backend/mode/content matrix, and candidate checks. Fix only stale Architecture contract language. Stop on any duplicate owner or undefined reference result.
-```
-
-</details>
-
 ## `FS-1` — Frame Admission And Coordination
 
 **Goal:** close `FCR-REN-01` with monotonic, bounded, failure-aware admission and equivalent serial/threaded results.
@@ -68,17 +57,6 @@ Execute FS-0 without code changes. Create ITER-REN-FS-00 and map FCR-REN-01/02/0
 **Failure modes:** older frame overwrites newer; settings apply to wrong frame; queue grows; blocked producer deadlocks shutdown; thread fails silently; canceled frame publishes; serial/threaded visible output differs.
 
 **Phase exit criteria:** monotonic and bounded behavior, serial/threaded parity, queue pressure, failure, cancellation, invalidation, and shutdown checks pass; CPU/latency evidence meets the dossier budgets or blocks.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement FS-1 in the current RenderCoordinator/RendererHost/FramePipeline admission path. Start with its ownership and transition ledger and exact FCR-REN-01 AC/FM/CHK. Preserve immutable input and one production route. Make frame/control/settings identities monotonic, queues bounded, pressure behavior explicit, failures observable, and shutdown settled; remove replaced queue/state paths. Exercise serial and threaded modes, stale/out-of-order submissions, pressure, settings changes in flight, injected render failure, cancellation, wake/sleep, and shutdown. Compare deterministic outputs and measure CPU, waits, queue high-water, and latency. Stop on partial publication or ambiguous ordering.
-```
-
-</details>
 
 ## `FS-2` — Scene, View, And GPU-Scene Preparation
 
@@ -92,17 +70,6 @@ Implement FS-1 in the current RenderCoordinator/RendererHost/FramePipeline admis
 
 **Phase exit criteria:** every scene/view acceptance criterion and controlled failure passes across create/update/delete/reuse/reload/dynamic/two-view cases; identity/copy/upload/memory ledgers reconcile.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement FS-2 through the existing RenderScene, View preparation, persistent GPU scene, mesh/material/light/ray binding, and retirement owners. Map each mutable fact to Scene or View before edits. Use generation-qualified handles and completion tokens at real publication/lifetime boundaries; avoid duplicate snapshots and registries. Exercise structural create/update/delete/reuse, level reload, camera and two-view isolation, rigid/skin/morph dynamics, material/light changes, upload failure, stale generation, and all-queue retirement. Measure resolved copies, uploads, CPU, and memory high-water. Run Architecture boundary checks if World/Renderer/RHI ownership changes.
-```
-
-</details>
-
 ## `FS-3` — Frame Graph Compile And Execution
 
 **Goal:** close `FCR-REN-03` with declared pass/resource dependencies, valid scheduling/lifetimes, observable execution, and faithful RHI lowering.
@@ -115,17 +82,6 @@ Implement FS-2 through the existing RenderScene, View preparation, persistent GP
 
 **Phase exit criteria:** graph structural checks, resource lifetime/barrier/native validation, pass failure/invalidation, serial/parallel recording, culling/aliasing where admitted, markers, and backend-equivalent results pass.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement FS-3 in BuildRenderFrameGraph and current graph compile/execute/RHI lowering owners. Build an inventory of each included pass/resource with read/write, lifetime, queue, cull/side-effect, invalidation, marker, and failure policy. Reconcile it to FCR-REN-03 AC/FM/CHK and the serial schedule. Fix hidden dependencies and lifetime/barrier ownership without creating a second graph. Inject missing inputs, pass/record/submit failure, selector/extent/format changes, and history invalidation; inspect culling/aliasing and native D3D12/Vulkan validation. Measure graph build/compile/record costs. Stop on undeclared state or swallowed failure.
-```
-
-</details>
-
 ## `FS-4` — Frame And Scene Candidate Closure
 
 The [required whole-frame review](../../../../../Acceptance/FirstRelease.md#principal-frame-review) must retain source-to-present lineage, both native captures, graph hazards/aliasing/queue ownership, serial/parallel equivalence, provider transitions and bounded rebuild/retirement costs. Close FrameGraph AC-FGS-01–08 against all Included frame topologies before declaring the graph complete. Source compiler-plan comparisons or a passing empty graph cannot substitute for production frame/lifetime proof.
@@ -137,17 +93,6 @@ The [required whole-frame review](../../../../../Acceptance/FirstRelease.md#prin
 **Failure modes:** evidence from different code/content/settings; serial oracle not captured; debug observer changes ordering; shutdown leak appears only after level switch; one backend validation absent.
 
 **Phase exit criteria:** `FCR-REN-01`–`03` reports contain full criteria/failure/check coverage, exact candidate identity, matrices, performance data, limitations, invalidation triggers, and decisions.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute FS-4 against the frozen candidate. Reconcile every FCR-REN-01/02/03 AC/FM/CHK artifact and run only missing joint routes: serial/threaded frame admission, create/update/delete/reload, two-view preparation, graph execute/present, pressure/failure/invalidation, and shutdown on D3D12/Vulkan. Verify frame/view/resource/generation identity across logs, captures, timings, and outputs. Any code/config/content change invalidates affected evidence. File exact decisions and blockers; do not infer correctness from a responsive process or one image.
-```
-
-</details>
 
 ## Reference And Ownership
 

@@ -32,17 +32,6 @@ Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely wh
 
 **Phase exit criteria:** every admitted service has a current source route, both-backend disposition, capability/failure behavior, and mapped check; unknown cells block later phases.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute RHI-0 without feature implementation. Create ITER-RHI-00-01 mapped to FCR-RHI-01 through 06 and the owning AC/FM/CHK. Search all RHI public headers, D3D12/Vulkan implementations, CMake membership, Renderer/Application/Editor consumers, selectors, tests, and diagnostics. Produce a service-by-backend-by-capability matrix with owner/lifetime and requested/active/unsupported behavior. Reconcile it against the Capability Inventory and feature dossiers; fix missing acceptance language only in Architecture. Record exact hardware/driver/tool versions and native reference questions. Stop on an unowned service or semantic divergence.
-```
-
-</details>
-
 ## `RHI-1` — Device, Resources, Descriptors, And Lifetime
 
 **Goal:** close `FCR-RHI-01` and the resource/lifecycle base of `FCR-RHI-06` with one published backend aggregate and completion-safe ownership.
@@ -60,17 +49,6 @@ Execute RHI-0 without feature implementation. Create ITER-RHI-00-01 mapped to FC
 **Failure modes to control:** partial device publishes; descriptor out of bounds; freed resource remains in flight; mapped range misuse; allocation failure corrupts prior state; dependent outlives device; native object leaks.
 
 **Phase exit criteria:** all admitted resource/descriptor/lifetime criteria pass on both backends; partial creation and allocation/invalid-handle failures settle cleanly; memory and live-object records are retained.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RHI-1 using the current RenderHardwareInterface/backend aggregate and resource owners. Audit construction, publication, dependencies, handles/generations, descriptors, uploads/readbacks, queue usage, retirement, and teardown. Keep Renderer policy above RHI and native lifetime below its backend. Fix one admitted resource path at a time and delete superseded wrappers. Exercise partial create, unsupported capability, invalid sizes/formats/ranges/handles, descriptor exhaustion, allocation failure, in-flight destruction, and shutdown. Run the smallest native validation needed for each slice on D3D12 and Vulkan; record memory high-water and live objects. Stop on ambiguous ownership or completion identity.
-```
-
-</details>
 
 ## `RHI-2` — Command Recording, Synchronization, Resize, And Present
 
@@ -91,17 +69,6 @@ Implement RHI-1 using the current RenderHardwareInterface/backend aggregate and 
 
 **Phase exit criteria:** serial and normal frame paths, resize/minimize/restore, queue ordering, failure, shutdown, and pacing checks pass on both backends with clean native validation.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RHI-2 for FCR-RHI-02 and its FCR-REN-26 HDR collaboration boundary. Reconcile RenderDeviceServices, frame state machine, recording leases, queue batches/tokens/fences, resource barriers, swapchain generations, present, retirement, resize, output capability, format/color space, metadata, and Renderer callers. Write the legal transition and dependency ledger before edits. Extend current owners and remove duplicate waits/state tracking. Exercise serial and normal submission, multi-batch dependencies, injected signal/wait/submit/present/color-space/metadata failures, cancellation, SDR/HDR supported and unsupported states, zero-size/minimize, monitor and OS HDR transitions, repeated resize/restore, out-of-date swapchain, and shutdown in flight. Use native API guidance only as backend oracle, not shared Renderer policy. Capture native validation and causal timing; stop on an unprovable cycle, lifetime, or false active state.
-```
-
-</details>
-
 ## `RHI-3` — Paired Backend Lowering
 
 **Goal:** close `FCR-RHI-03` by proving that common contracts produce equivalent declared results while backend-specific mechanics remain contained.
@@ -119,17 +86,6 @@ Implement RHI-2 for FCR-RHI-02 and its FCR-REN-26 HDR collaboration boundary. Re
 **Failure modes to control:** one backend silently no-ops; format/state maps differently; validation suppression hides defect; capability advertised before dependency; fallback changes feature result; backend fix changes shared semantics.
 
 **Phase exit criteria:** every included matrix cell is `PASS` or explicitly excluded before scope freeze; deterministic outputs and failures agree within owned tolerances; native validation is clean or has an accepted, scoped disposition.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RHI-3 from the frozen RHI-0 matrix. For each admitted common operation, inspect D3D12 and Vulkan lowering, native state/format/descriptor/pipeline semantics, capability declaration, and direct Renderer expectation. Fix the common owner when semantics are wrong and only the backend owner when lowering is wrong. Do not add backend checks to Renderer. Exercise paired deterministic oracles and representative frame paths with exact driver/tool versions, debug layer/DRED, and Vulkan validation. Record intentional divergence and tolerances. Stop on silent no-op, unowned fallback, suppressed validation, or a matrix cell that cannot be proven.
-```
-
-</details>
 
 ## `RHI-4` — Ray-Tracing And Acceleration-Structure Execution
 
@@ -149,17 +105,6 @@ Implement RHI-3 from the frozen RHI-0 matrix. For each admitted common operation
 
 **Phase exit criteria:** all admitted ray criteria/failures pass for both APIs and traversal routes; identity and lifetime ledgers reconcile; costs and capability boundaries are recorded.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RHI-4 for FCR-RHI-04 with the Renderer ray/TLAS owners as consumers. Audit BLAS/TLAS resources, classic/refit/partitioned operations, geometry and instance descriptors, contribution/SBT mapping, scratch/result/operation buffers, barriers, queues, retirement, inline query, pipeline/state object, shader tables, and TraceRays. Preserve semantic policy in Renderer and native mechanics in RHI. Exercise create/build/update/topology change/move/delete/reload, invalid bounds/identity, allocation/submit failure, unsupported hardware, and inline-versus-RGS deterministic cases on D3D12/Vulkan. Capture native validation, time, and memory. Stop on identity ambiguity or premature lifetime.
-```
-
-</details>
-
 ## `RHI-5` — Diagnostics, Capture, Device Loss, And Recovery
 
 **Goal:** close `FCR-RHI-05` and `FCR-RHI-06` with bounded observation, truthful recoverable swapchain events, and terminal device-loss handling.
@@ -178,17 +123,6 @@ Implement RHI-4 for FCR-RHI-04 with the Renderer ray/TLAS owners as consumers. A
 
 **Phase exit criteria:** feature checks pass on both APIs; recoverable versus terminal paths are unmistakable; native objects settle; diagnostic artifacts identify candidate/frame without privacy breach; external profiler handoff is demonstrated where applicable.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RHI-5 for FCR-RHI-05/06. Reconcile timing/messages/memory/naming/live objects, texture capture, readback/encoding, DRED/Vulkan diagnostics, device lifecycle state machine, queue settlement, swapchain recovery, device-loss terminal state, and Editor/Renderer consumers. Bound every observer and expose validity/drop/unsupported state. Inject capture/readback/timestamp/queue/device failures through safe harnesses, exercise repeated resize/out-of-date and teardown, and verify no post-loss use or leaks. Measure observer cost and record privacy/redaction. Do not build the separate Performance Diagnostics product unless a release criterion explicitly selects its plan.
-```
-
-</details>
-
 ## `RHI-6` — Candidate Closure
 
 **Goal:** bind all RHI claims to one package candidate, hardware/driver matrix, and paired-backend evidence index.
@@ -200,17 +134,6 @@ Implement RHI-5 for FCR-RHI-05/06. Reconcile timing/messages/memory/naming/live 
 **Failure modes to control:** evidence uses different binary or shader/content; driver/tool version missing; backend failure hidden by auto-selection; unavailable hardware marked pass; debug-only route differs from Shipping package.
 
 **Phase exit criteria:** each RHI FCR has a complete candidate-bound decision, paired matrices and limitations are explicit, and all Renderer dependencies have a stable accepted contract.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute RHI-6 against the frozen candidate. Reconcile FCR-RHI-01 through 06 with their Architecture AC/FM/CHK, candidate hash, backend, hardware, driver, validation configuration, content, and artifacts. Run only missing package-relative cross-boundary checks for device/resources, submission/present, backend lowering, ray execution, diagnostics, loss, and teardown. Verify selectors report active state and exclusions. Treat any implementation/config/provider change as evidence invalidation. File exact PASS/BLOCKED/EXCLUDED decisions; never substitute D3D12 evidence for Vulkan or vice versa.
-```
-
-</details>
 
 ## Reference And Ownership
 

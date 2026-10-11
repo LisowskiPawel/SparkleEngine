@@ -22,7 +22,7 @@ Public onboarding starts in the [repository README](../README.md); the [contribu
 | Compare current feature readiness | [Current Feature Readiness](Acceptance/CurrentReadiness.md) — open the linked Architecture dossier for the implementation and missing-work detail |
 | Review release scope and technical blockers | [Six approved product decisions](Acceptance/ReleaseScope/README.md#approval-and-next-work); source/rights investigations have their own owners |
 | Decide what to do next | [Master Delivery Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) — See current focus and global priority, then open its owning stage plan |
-| Implement a selected release piece | [First Release Stage Briefs](Architecture/CrossModule/FirstRelease/README.md) — Use the Roadmap-selected phase and its bounded prompt |
+| Implement a selected release piece | [First Release Stage Briefs](Architecture/CrossModule/FirstRelease/README.md) — Use the Roadmap-selected phase and its work/exit criteria |
 | Build, cook, or launch Showcase | [Launcher Architecture](Architecture/Modules/Tools/Launcher/README.md) — [Build And Packaging](Architecture/Modules/BuildAndPackaging/README.md) |
 | Make an implementation change | [Change Integration](Engineering/Workflow/ChangeIntegration.md) — [Engineering Task Map](Engineering/README.md#choose-by-task) |
 | Open or close a release iteration | [Change Lifecycle control record](Engineering/Workflow/ChangeLifecycle.md#create-the-iteration-control-record) — [Roadmap traceability](Strategy/Roadmap.md#stage-target-and-evidence-traceability) |

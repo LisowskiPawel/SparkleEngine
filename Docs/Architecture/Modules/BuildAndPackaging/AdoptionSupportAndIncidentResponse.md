@@ -14,13 +14,13 @@
 
 ## At A Glance
 
-Deliver self-service onboarding, diagnostics and recovery. **No user support service** is offered; [Release Scope](../../../Acceptance/ReleaseScope/README.md#decision-summary) owns that decision.
+Deliver self-service onboarding, diagnostics and recovery. **No user support service** is offered; [Release Scope](../../../Acceptance/ReleaseScope/README.md#approval-and-next-work) owns that decision.
 
 Package and native-incident acceptance remain open.
 
 ## Current Local Route
 
-**Source slice:** `ITER-PD4-01`, 2026-10-11; [candidate results](../../../Acceptance/ReleaseScope/Evidence.md#local-diagnostics-and-release-review-iter-pd4-01). Public instructions: [recovery/privacy](../../../../SUPPORT.md), [known issues](../../../../KNOWN_ISSUES.md), [security](../../../../SECURITY.md).
+**Source slice:** `ITER-PD4-01`, 2026-10-11; [Release progress](../../../Strategy/Roadmap.md#release-progress). Public instructions: [recovery/privacy](../../../../SUPPORT.md), [known issues](../../../../KNOWN_ISSUES.md), [security](../../../../SECURITY.md).
 
 BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,ReviewRelease}.ps1`. [Release Inputs](ReleaseInputs.md) defines shipped helper/policy membership; review remains a maintainer source-side task.
 

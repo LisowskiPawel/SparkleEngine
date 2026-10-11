@@ -50,17 +50,6 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Phase exit criteria:** fixtures and analytic/reference oracles cover admitted static/skinned/morph, material, alpha, two-sided, transform, visibility, and traversal cells; every family contract is binary and current.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute GR-0 without implementation. Create ITER-REN-GR-00 mapped to the six FCRs and their AC/FM/CHK. Inspect imported/cooked geometry and materials, world publication, Renderer scene/GPU scene, residency, visibility/draw preparation, raster GBuffer, decal composition, motion data, BLAS/TLAS, SBT, ray GBuffer, selectors, RHI, shaders, and CMake. Record one identity/generation and semantic matrix across raster/inline/RGS/D3D12/Vulkan, plus negative capabilities. Select minimal deterministic fixtures and independent or analytic oracles. Fix stale Architecture wording only. Stop on divergent semantics or an unowned identity.
-```
-
-</details>
-
 ## `GR-1` — Mesh And Texture Residency
 
 **Goal:** close `FCR-REN-17` with bounded CPU work, upload, activation, replacement, cancellation, and completion-safe eviction.
@@ -72,17 +61,6 @@ Execute GR-0 without implementation. Create ITER-REN-GR-00 mapped to the six FCR
 **Failure modes:** stale generation activates; cancellation leaks staging; upload token failure publishes; resource evicted while another queue uses it; backlog exceeds bound; placeholder changes silently; memory never returns after reload.
 
 **Phase exit criteria:** all residency criteria and negative checks pass at/below/above limits; activation is transactional; memory and queue high-water are bounded; reload/eviction leaves no stale binding.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement GR-1 in current mesh/texture residency, task/decode, upload, activation, replacement, and retirement owners. Reconcile asset and GPU generations plus all queue-completion edges. Keep immutable input and one active generation; bound jobs/backlog/staging/memory and make refusal/placeholder state explicit. Exercise empty/small/large assets, exact and over budgets, 16 concurrent jobs, 256 backlog, decode/task/upload/token failures, cancellation, stale generation, replacement, eviction in flight, and repeated reload. Measure CPU/GPU high-water and stability. Delete superseded queues/caches and stop on partial activation or ambiguous completion.
-```
-
-</details>
 
 ## `GR-2` — Visibility, Draw Preparation, And Raster GBuffer
 
@@ -96,17 +74,6 @@ Implement GR-1 in current mesh/texture residency, task/decode, upload, activatio
 
 **Phase exit criteria:** analytic visibility cases, serial/parallel draw equivalence, batching correctness/benefit, controlled failures, deterministic GBuffer fixtures, and native validation pass for admitted content on both backends.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement GR-2 through existing visibility classification, draw preparation, raster mesh/GBuffer passes, shader bindings, and RHI draw lowering. Start from FCR-REN-21/04 AC/FM/CHK and the GR-0 semantic fixtures. Preserve authored groups where eligible, deterministic opaque order, transparent single-item order, and explicit negative feature claims. Exercise inside/outside/intersecting/invalid bounds, stale identities, fallback groups, cancellation/failure, static/skinned/morph, material variants, alpha/two-sided, tangent/normal/UV/precision, motion, and backend validation. Compare serial/parallel outputs and measure cull/build/draw costs. Stop on partial draw publication or semantic mismatch.
-```
-
-</details>
-
 ## `GR-3` — Renderer TLAS Policy And Publication
 
 **Goal:** close `FCR-REN-12` by converting current scene generations into the correct acceleration structure and operation plan consumed by every ray effect.
@@ -118,17 +85,6 @@ Implement GR-2 through existing visibility classification, draw preparation, ras
 **Failure modes:** refit after topology change; deleted instance persists; contribution maps wrong hit group; operation buffer overflows; new TLAS publishes before completion; old TLAS retires early; unsupported partitioned path lies about active state.
 
 **Phase exit criteria:** selection, identity, update policy, bounds, failure, synchronization, native validation, and cost criteria pass across both backends and admitted TLAS routes.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement GR-3 with Renderer owning scene/TLAS policy and RHI owning native mechanics. Audit persistent scene geometry/instances, BLAS generations, classic/refit/partitioned planner, operation buffers, contribution/SBT mapping, scratch/result lifetime, queue tokens, publication, consumers, and selectors. Exercise initial build, transform-only update, topology/material/geometry change, move/delete/reuse/reload, exact/over operation bounds, allocation/submit failure, unsupported capability, and in-flight replacement on D3D12/Vulkan. Verify active-state truth and deterministic instance mapping; measure build/update/traversal and memory. Stop on identity or lifetime ambiguity.
-```
-
-</details>
 
 ## `GR-4` — Ray-Traced GBuffer
 
@@ -142,17 +98,6 @@ Implement GR-3 with Renderer owning scene/TLAS policy and RHI owning native mech
 
 **Phase exit criteria:** shared semantic criteria and controlled failures pass for every admitted route/backend/content cell; route state is observable; differences are within owned numerical tolerances and cost evidence supports defaults.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement GR-4 in the current ray GBuffer semantic owner with thin inline-query and native-pipeline adapters. Reconcile selectors, capabilities, TLAS/SBT mapping, shader registration/bindings, material decode, miss/hit outputs, alpha/two-sided/skinned/morph/motion handling, graph dependencies, and RHI commands. Use GR-0 fixtures and identical sample/ray identities to compare intermediate and final results across inline/RGS and D3D12/Vulkan. Inject unsupported capability, bad identity, missing shader/pipeline, submit failure, and stale TLAS. Record native validation and quality/time/memory crossover. Delete duplicated route logic; stop on semantic divergence.
-```
-
-</details>
-
 ## `GR-5` — Deferred GBuffer Decals
 
 **Goal:** close `FCR-REN-23` by implementing the authored decal path, bounded scene/GPU representation, deterministic post-GBuffer composition, and equivalent secondary-ray material resolution defined by the [deferred-decals contract](../Features/DeferredDecals/Acceptance.md).
@@ -165,17 +110,6 @@ Implement GR-4 in the current ray GBuffer semantic owner with thin inline-query 
 
 **Phase exit criteria:** `AC-DECAL-01` through `AC-DECAL-08` and their failure/check matrix pass for deterministic overlap, channel-mask, normal, edge, motion, lifetime, overflow, secondary-ray, backend, performance, and package cases; `FCR-REN-23` records candidate-bound evidence and limitations.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement GR-5 by executing Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/Plan.md against the Architecture DeferredDecals dossier and AC-DECAL/FM-DECAL/CHK-DECAL contract. Extend the existing asset, cook, Scene publication, persistent GPU-scene, visibility, frame-graph, GBuffer, material, ray-hit, shader, RHI, and editor owners without creating a parallel scene or material authority. Implement one bounded generation-qualified decal representation, deterministic sort/layer policy, volume raster pass after base GBuffer and before every consumer, channel/normal-safe blending, and the admitted secondary-ray composition route. Exercise empty, single, overlapping, inside/outside, clipped, moved/deleted/reloaded, masked-channel, normal, overflow, missing-resource, allocation/pipeline/submit failure, D3D12/Vulkan, raster/ray, and packaged-content cases. Capture raw GBuffer and identity artifacts plus cost/memory. Stop on ambiguous blend semantics, stale lifetime, silent omission, or raster/ray divergence.
-```
-
-</details>
-
 ## `GR-6` — Geometry, Ray, And Decal Candidate Closure
 
 **Goal:** prove that residency, visibility, raster, TLAS, ray GBuffer, and deferred decals agree for one candidate and release content set.
@@ -185,17 +119,6 @@ Implement GR-5 by executing Docs/Architecture/Modules/Engine/Renderer/Features/D
 **Failure modes:** route uses different cooked generation; residency report predates GBuffer fix; raster/ray comparison is post-tonemapped; one route/backend unavailable; memory evidence omits reload/soak.
 
 **Phase exit criteria:** all six FCR reports have exact criteria/failure/check matrices, raw comparison artifacts, native diagnostics, performance/memory records, limitations, and candidate-bound decisions.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute GR-6 on the frozen candidate. Reconcile FCR-REN-04/05/12/17/21/23 artifacts and run only missing integrated cases from cooked asset generation through residency, visibility, raster GBuffer, TLAS, ray GBuffer, and deferred-decal composition. Compare raw channels and identity before lighting/post; include static/skinned/morph, alpha/two-sided, decals and overlap, move/delete/reload, pressure/failure, inline/RGS, and D3D12/Vulkan. Verify selector active state, memory return, native validation, and exact content/shader/package identity. Any change invalidates affected evidence. File explicit decisions and retain negative capability truth.
-```
-
-</details>
 
 ## Reference And Ownership
 

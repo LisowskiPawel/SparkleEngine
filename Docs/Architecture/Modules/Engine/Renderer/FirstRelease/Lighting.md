@@ -53,17 +53,6 @@ NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main
 
 **Phase exit criteria:** analytic fixtures and raw observables exist for every currently admitted direct/indirect cell; `FCR-REN-08` remains unaccepted until remaining recovery, estimator/oracle and release evidence closes; no undocumented transport claim enters implementation.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute LGT-0 without transport implementation. Create ITER-REN-LGT-00 mapped to FCR-REN-06/07/08 and current AC/FM/CHK. Inspect cooked/world light and material semantics, Renderer scene/GBuffer, direct/indirect shaders and reservoirs, sky/composite, ray spawn, temporal inputs, debug outputs, selectors, RHI routes, and package membership. Record units, spaces, lobe ownership, PDFs/weights, sample identity, raw outputs, reset/invalidation, backend/content matrix, analytic fixtures, and quality/time/memory oracles. Reconcile Architecture wording only. Keep FCR-REN-08 blocked and stop if PTD-00 assumptions would be invented.
-```
-
-</details>
-
 ## `LGT-1` — Direct Lighting
 
 **Goal:** sequence the accepted [Direct Lighting plan](../Features/Lighting/DirectLighting/Plan.md) to close `FCR-REN-06` for all admitted analytic light kinds, material lobes, reservoir reuse, visibility, reconstruction, and many-light behavior.
@@ -75,17 +64,6 @@ Execute LGT-0 without transport implementation. Create ITER-REN-LGT-00 mapped to
 **Failure modes:** zero/negative/non-finite weight; stale reservoir after identity/reset; self-intersection/acne or light leak; unsupported traversal hidden; light beyond limit corrupts buffer; one lobe receives duplicate/missing energy.
 
 **Phase exit criteria:** `DIR-D0` is accepted and every required stage/criterion in the feature plan passes or produces an explicit blocker in `FCR-REN-06`.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute exactly one authorized stage from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/Plan.md. Require accepted DIR-D0, the stage prerequisites, and the feature plan's universal execution contract. Keep LGT-0 shared units/oracles and FCR-REN-06 identity fixed; do not collapse or reorder stages, tune the current reservoir before its analytic baseline, or preserve a superseded estimator. Return the stage's exact checks, artifacts, hook/deletion ledger, unrun cells, and blocker/pass disposition before another stage begins.
-```
-
-</details>
 
 ## `LGT-2` — Indirect Lighting
 
@@ -99,17 +77,6 @@ Execute exactly one authorized stage from Docs/Architecture/Modules/Engine/Rende
 
 **Phase exit criteria:** `IND-D0` is accepted and every required stage/criterion in the feature plan passes or produces an explicit blocker in `FCR-REN-07`.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute exactly one authorized stage from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/Plan.md. Require accepted IND-D0, its stage prerequisites, and the feature plan's universal execution contract. Keep LGT-0 shared units/oracles and FCR-REN-07 identity fixed; do not label the current seed replay ReSTIR GI, skip the explicit path/shift/GRIS clean break, expand path depth early, or use FCR-REN-08 before its accepted oracle gate. Return exact checks, artifacts, hook/deletion ledger, unrun cells, and blocker/pass disposition before another stage begins.
-```
-
-</details>
-
 ## `LGT-3` — Preserve Discovery And Close The Required Reference
 
 **Goal:** finish the existing progressive Reference recovery/validation and Stage-10 delivery against the accepted PTD-00-R1 transport contract; this phase cannot substitute finite-depth/denoised output for full admitted reference truth.
@@ -120,17 +87,6 @@ Execute exactly one authorized stage from Docs/Architecture/Modules/Engine/Rende
 
 **Phase exit criteria:** required Reference feature criteria pass on both APIs and the actual candidate; no invalid/unconverged/finite diagnostic is admitted as reference. Full reference usability and realtime >=30 FPS remain separately required in the release owner. No score is awarded by completing this plan text.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Continue the current Reference Path Tracer recovery/validation plan at the exact candidate. Preserve accepted PTD-00-R1 and delivered source stages. Reconcile only changed transport/content/camera/backend decisions; do not replay discovery. Close invalid-sample/preflight, estimator/oracle/convergence, accumulation/reset/cancel and raw-export proof. Reconcile consumer mode, selected map/pose domain and both APIs through existing owners. Keep finite diagnostics labelled and separate from SurfaceTransportReference. Stage 10 waits for its named release prerequisites. Retain exact evidence and failures; no denoised image, progress state or source inspection can pass the reference. Realtime 30 FPS belongs to its own frozen transport/reconstruction preset and feature reports.
-```
-
-</details>
-
 ## `LGT-4` — Lighting Candidate Closure
 
 **Goal:** after `FCR-REN-08` implementation through the authorized `PTD-01`, compare direct/indirect results with the accepted Reference Path Tracer and close all three families for one candidate.
@@ -140,17 +96,6 @@ Continue the current Reference Path Tracer recovery/validation plan at the exact
 **Failure modes:** reference/candidate share unverified input; accumulation not converged; exposure/tone confounds raw result; one backend/provider differs; artifact gallery is cherry-picked; path-tracer evidence predates lighting changes.
 
 **Phase exit criteria:** direct, indirect, and Reference Path Tracer reports satisfy their complete Architecture contracts; raw/reference, convergence, analytic/independent, failure, backend, package, quality/time/memory, and release-map evidence share one candidate identity.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute LGT-4 only after PTD-01 implementation has a candidate-bound result. Freeze the candidate and reconcile FCR-REN-06/07/08 plus all RPT criteria/checks. Run missing analytic, deterministic, convergence, raw-lobe, direct/indirect/reference, failure, history/reset, inline/RGS, D3D12/Vulkan, packaged, and release-map comparisons. Keep sample identity, settings, input assets, camera, output domain, tolerances/confidence, and independent references explicit. Any lighting/material/ray/shader change invalidates affected evidence. File exact decisions, limitations, and blockers; never call the reference unbiased beyond its accepted scope.
-```
-
-</details>
 
 ## Reference And Ownership
 

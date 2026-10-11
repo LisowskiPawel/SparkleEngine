@@ -24,6 +24,4 @@ Expected conversion inventory:
 
 The source archive is pinned in `Projects/Showcase/Levels.catalog` by byte count and SHA-256. Re-run the conversion only when that source identity or conversion policy changes, then update the output hashes above and validate the cooked scene before publishing the result.
 
-**Verification (2026-10-10):** [ITER-CORNELL-01](../../../../../../Docs/Acceptance/ReleaseScope/Evidence.md#cornell-license-and-format-iter-cornell-01) reproduced the tracked GLB byte-for-byte and checked its container, inventory, finite vertex data, index bounds and embedded attribution. The retained original OBJ/MTL match an independently pinned mirror after CRLF normalization; this is not an exact ZIP receipt. The publisher ZIP still needs reacquisition against the unchanged catalog identity. Cooked rendering, single-emitter semantics and package notice inclusion remain separate checks.
-
-[ITER-REL-01-06](../../../../../../Docs/Acceptance/ReleaseScope/Evidence.md#fr-01-exit-recheck-iter-rel-01-06) verifies selected-map sync from a checkout without `Publisher/`. The archive hash and GLB bytes are unchanged.
+**Verification:** the tracked GLB was reproduced byte-for-byte and checked for valid container, finite vertices, index bounds and embedded attribution. The OBJ/MTL match a pinned mirror after CRLF normalization; that is not a publisher ZIP receipt. The original archive remains optional regeneration input; cooked rendering, single-emitter semantics and package notices still need their own checks.

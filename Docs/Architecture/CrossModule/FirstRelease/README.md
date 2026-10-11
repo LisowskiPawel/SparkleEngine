@@ -2,40 +2,17 @@
 
 **Status:** release implementation orchestrator; ordered work, not implementation evidence or release approval
 
-Start with [current progress](../../../Acceptance/FirstRelease.md#current-progress) for delivered work and missing checks. [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) selects the next task; this page supplies its execution prompt.
+Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for delivered work and missing checks. [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) selects the next task; this page supplies its phase brief.
 
 [First Release Acceptance](../../../Acceptance/FirstRelease.md#release-gates) owns release verdicts. Feature-local Architecture checks and [candidate reports](../../../Acceptance/FeatureCompletionReports.md) own feature proof.
 
-## Read This Page
-
-- **Review the approved product:** use the [six approved scope decisions](../../../Acceptance/ReleaseScope/README.md#approval-and-next-work); source/rights investigations are listed separately.
-- **Execute a release task:** use [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next), then the [stage prompts](#stage-prompts). Identity/baseline and package work still wait for their scope/rights prerequisites.
-- **Find a feature owner:** Expand the [work-package registry](#feature-work-package-registry).
-- **Check the execution boundary:** Read [phase requirements](#phase-card-contract) and [stop conditions](#global-stop-conditions).
-
-## Ordered Release Stages
-
-This is the release-only route from the [master delivery table](../../../Strategy/Roadmap.md#ordered-delivery) to the prompts below. Select the next global piece there; revise both routes together if a release phase changes.
-
-| Stage | Roadmap gate | Goal | Phase exit |
-| --- | --- | --- | --- |
-| `FR-00` | `REL-00`; preserve accepted `PTD-00` | freeze remaining release scope/preset/domain/rights decisions without restarting tracer discovery | approved scope and exact decisions/receipts; changed tracer contract cells are explicitly re-reviewed |
-| `FR-01` | `REL-01`, `REL-02` | establish identity, rights, prerequisites, and a trustworthy baseline | candidate identity, allowlists, clean baseline route, and failure records exist |
-| `FR-02` | `REL-03` | implement one manifest-owned build-cook-stage-verify-package spine | immutable staged tree and clean-machine package smoke satisfy the acceptance gate |
-| `FR-03` | `REL-04` | close all 49 included feature families through their owner plans | every included FCR has a candidate-bound verdict; no unclassified reachable feature remains |
-| `FR-04` | `REL-05` | freeze and accept the release maps and visible quality boundary | all applicable `MAP-*` reports and artifact galleries have independent verdicts |
-| `FR-05` | `REL-06`, `REL-07` | prove budgets, soak, recovery, and D3D12/Vulkan native behavior | performance/stability/backend evidence is candidate-bound and blockers are resolved |
-| `FR-06` | `REL-08`, `REL-09` | freeze the candidate and prove non-author runtime/source adoption | byte identity is frozen and independent journeys pass from documented prerequisites |
-| `FR-07` | `REL-10` | publish exact approved artifacts and verify the public surface | tag, archives, hashes, notices, notes, no-support/self-service policy and download smoke agree |
-| `FR-08` | `REL-11` | review the release and close it | finite maintainer review completes with no unresolved release blocker |
-
-## Stage Prompts
+## Release Tasks
 
 ### `FR-00` — Scope And Discovery
 
 **Goal:** approve one reviewable release scope of included, experimental, excluded, and removed behavior. Preserve the already accepted `PTD-00` development discovery; do not restart it or treat it as accepted release-map oracle evidence.
 
-**Current handoff:** the owner approved all [six scope decisions](../../../Acceptance/ReleaseScope/README.md#approval-and-next-work): three shipped products, seven selected maps, Launcher entry, user/display-selected resolution, approved defaults with chromatic aberration/vignette On, and no user support service. The laptop retains a fixed recorded 30 FPS acceptance benchmark. No product-choice answer remains pending; exact rights receipts and package/helper/configuration/content-store closure still block FR-00. [Approval evidence](../../../Acceptance/ReleaseScope/Evidence.md#scope-approval-iter-rel-00-06) preserves the decision and prior snapshots. Accepted PTD-00 development discovery is preserved.
+**Current handoff:** the owner approved all [six scope decisions](../../../Acceptance/ReleaseScope/README.md#approval-and-next-work): three shipped products, seven selected maps, Launcher entry, user/display-selected resolution, approved defaults with chromatic aberration/vignette On, and no user support service. The laptop retains a fixed recorded 30 FPS acceptance benchmark. No product-choice answer remains pending; exact rights receipts and package/helper/configuration/content-store closure still block FR-00. Accepted PTD-00 development discovery is preserved.
 
 **Non-goals:** implementation, optimistic scoring, adding target-only features, or treating the present reference path as an unbiased oracle.
 
@@ -43,20 +20,9 @@ This is the release-only route from the [master delivery table](../../../Strateg
 
 **Phase exit criteria:** `REL-00` criteria are mapped to checks; every reachable option has a product classification; the release package contents are named; `PTD-00` records `PASS` or a blocking/re-scope decision.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Continue first-release stage FR-00 at the current repository revision. Read Docs/Acceptance/ReleaseScope/README.md and CapabilityDispositions.md, the acceptance contract, FCR registry, CurrentReadiness, selector catalogs and packaging/rights owners. Reconcile ITER-REL-00-01 and the scope proposal against the live tree, confirm owner approval and exact selected-content rights, and classify any new or changed surface. Preserve accepted PTD-00 development discovery and completed development work; inspect its remaining release dependencies without restarting discovery or promoting it to an oracle. Do not implement features. Exit with an approved version-controlled scope and honest REL-00 disposition, or exact remaining decisions and receipts. Stage 1 production work waits for its prerequisites; source/rights discovery can prepare them without claiming their gates passed.
-```
-
-</details>
-
 ### `FR-01` — Identity, Rights, And Baseline
 
-**Goal:** make source, dependencies, assets, licenses, version identity, the initial build/cook/runtime baseline, and approved fresh-checkout gate automation reproducible enough to start package work.
+**Goal:** make source, dependencies, assets, licenses, version identity, the initial build/cook/Game baseline, and approved fresh-checkout gate automation reproducible enough to start package work.
 
 **Non-goals:** broad feature fixes, performance tuning, or publication.
 
@@ -64,37 +30,15 @@ Continue first-release stage FR-00 at the current repository revision. Read Docs
 
 **Phase exit criteria:** `REL-01` and `REL-02` candidate records pass or name blockers; one baseline path has exact commands, versions, hashes, outputs, and cleanup.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute FR-01 only after FR-00 exits. Create an iteration record for REL-01/REL-02. Audit version identity, dependency locks, asset/source provenance, redistributable payloads, prerequisites, generated artifacts, current build/cook/Game entry points, and approved fresh-checkout deterministic gates. Fix only ownership or reproducibility defects required by these gates; add automation that invokes owner checks without redefining their meaning. Use the smallest failing checks first, then the exact clean baseline required by acceptance. Record command, configuration, environment, artifacts, and unavailable checks. Stop for any unresolved right or mutable input. Exit with candidate-bound gate reports, not a prose claim.
-```
-
-</details>
-
 ### `FR-02` — Package Spine
 
-**Goal:** implement the absent `FCR-PROD-05` route as one build → cook → stage → verify → package authority.
+**Goal:** complete `FCR-PROD-05` as one build → cook → stage → verify → package authority.
 
 **Non-goals:** an installer, binary SDK, silent best-effort staging, or distributing authoring tools by accident.
 
 **Failure modes:** source-tree mutation; stale stage contents; undeclared dependency; absolute/user path; manifest/archive mismatch; partial archive after failure; package works only with repository state.
 
 **Phase exit criteria:** [Product phase `PD-3`](ProductAndDelivery.md#pd-3--package-and-installation) passes and `REL-03` has clean-machine runtime evidence for the exact archive.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute FR-02 through ProductAndDelivery PD-3. Reconcile current CMake, cook, launcher, and runtime discovery paths; choose one current owner for stage/package orchestration. Implement a clean-break manifest-owned pipeline with immutable stage input, allowlisted outputs, checksums/provenance, transactional failure, and package-relative runtime lookup. Include all three required Launcher/Editor/Game components and only qualified helpers needed for admitted workflows; isolate Game dependencies. Freeze a verified user-selected content store separate from immutable product bytes. Prove the exact archive on a clean standard-user machine route. Stop if rights, payload identity, or runtime discovery are unresolved.
-```
-
-</details>
 
 ### `FR-03` — Feature Closure
 
@@ -106,17 +50,6 @@ Execute FR-02 through ProductAndDelivery PD-3. Reconcile current CMake, cook, la
 
 **Phase exit criteria:** all 49 primary owners in [Complete Feature Routing](#complete-feature-routing) have a candidate-bound result and `REL-04` passes.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute one FR-03 work package at a time. Select the earliest dependency-ready child-plan phase. Reconcile its Architecture dossier, feature AC/FM/CHK, source owner, consumers, selectors, build membership, current candidate, and dirty work. If the feature-local contract is missing or ambiguous, fix the Architecture contract before code. Implement one owner-sized vertical slice using the clean-break policy, exercise positive and controlled-negative checks, and update the exact FCR report. Do not start another family while this iteration is unresolved. Stop on an unowned semantic decision, unavailable required backend/provider/content, or evidence invalidation.
-```
-
-</details>
-
 ### `FR-04` — Release Maps
 
 **Goal:** turn the frozen `ReleaseMapSet` into representative correctness, artifact, and product-journey evidence.
@@ -127,17 +60,6 @@ Execute one FR-03 work package at a time. Select the earliest dependency-ready c
 
 **Phase exit criteria:** every applicable `MAP-*` and specialist case has exact candidate identity, settings, references, artifacts, verdict, and invalidation triggers; `REL-05` passes.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute FR-04 against the frozen candidate and ReleaseMapSet. Follow Docs/Acceptance/GraphicsWorkloads.md. For each applicable MAP/CASE, record input provenance, camera, settings, backend, warmup, capture, raw/reference output, numerical or visual oracle, performance context, and verdict. Route defects back to the owning feature plan; never patch a map-specific workaround. Re-run invalidated evidence only. Exit when independent review can reproduce every accepted map result and REL-05 has a recorded verdict.
-```
-
-</details>
-
 ### `FR-05` — Performance, Stability, And Native Proof
 
 **Goal:** prove declared budgets, failure/recovery behavior, soaks, and native D3D12/Vulkan correctness for the same candidate.
@@ -147,17 +69,6 @@ Execute FR-04 against the frozen candidate and ReleaseMapSet. Follow Docs/Accept
 **Failure modes:** observer changes result; no cold/steady distinction; validation warning dismissed; device loss called recovered; memory high-water omitted; backend divergence hidden.
 
 **Phase exit criteria:** `REL-06`/`REL-07` pass with causal measurements, native diagnostics, controlled failure evidence, and exact candidate identity.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute FR-05 on the frozen package candidate. Select budgets and failure matrices from the feature contracts and release acceptance, then use external tools and existing bounded diagnostics first. Capture cold, warm, steady, high-water, and soak behavior as applicable; enable native D3D12/Vulkan validation and exercise controlled resize, cancellation, allocation, provider, and device-failure routes. Attribute regressions before optimizing. Store exact tool versions/configuration/artifacts. Stop on unexplained backend divergence, validation errors, unstable identity, or measurement perturbation.
-```
-
-</details>
 
 ### `FR-06` — Candidate Freeze And Independent Adoption
 
@@ -171,17 +82,6 @@ Execute FR-05 on the frozen package candidate. Select budgets and failure matric
 
 **Pre-release prerequisite:** obtain the deferred Windows publisher certificate, sign/timestamp and verify the final bytes before freezing this candidate. Enrollment is scheduled here by the release owner (2026-10-11), not as an FR-01 prerequisite. Unsigned development archives may exercise FR-02 packaging; they cannot satisfy this signed consumer/adoption gate. See the [roadmap task](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next).
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute FR-06 only after all technical gates pass. Freeze and hash the candidate, evidence index, source snapshot, prerequisites, and instructions. Give the documented runtime and source-adopter journeys to independent reviewers without private guidance. Record timestamps, environment, actions, failures, artifacts, and support interaction. If code, content, configuration, archive, or instructions change, issue a new candidate and re-run the invalidated gates. Exit only with both independent PASS verdicts.
-```
-
-</details>
-
 ### `FR-07` — Publish And Verify
 
 **Goal:** publish exactly the approved candidate and verify its public identity, downloads, documentation, and truthful no-support/self-service entry points.
@@ -192,17 +92,6 @@ Execute FR-06 only after all technical gates pass. Freeze and hash the candidate
 
 **Phase exit criteria:** `REL-10` passes against downloaded artifacts, not local staging outputs.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute FR-07 with the approved immutable candidate. Verify tag, archive, symbols policy, manifest, SBOM/notices, checksums, release notes, known issues, prerequisites, self-service/privacy instructions, explicit no-support statement and compatibility policy. Publish without rebuilding. Download through the public path, verify hashes and signatures, and run the acceptance smoke as a standard user. Stop and withdraw on identity, rights, integrity or public-instruction failure. Record the REL-10 verdict and artifacts.
-```
-
-</details>
-
 ### `FR-08` — Stabilize And Close
 
 **Goal:** perform finite maintainer release review, disposition known candidate defects and close the release. No ongoing user support or response window is offered.
@@ -212,17 +101,6 @@ Execute FR-07 with the approved immutable candidate. Verify tag, archive, symbol
 **Failure modes:** known critical blocker omitted; replacement lacks provenance; defect cannot be reproduced; public bytes differ without a new version; false support promise.
 
 **Phase exit criteria:** `REL-11` passes with a bounded release-review ledger, any required replacement/withdrawal records, no unresolved release blocker and a final accepted release report.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute FR-08 using the published version and approved no-support policy. Perform a bounded maintainer review of known candidate defects and retrieved public bytes; record severity, affected identity and disposition, and exercise immutable replacement/withdrawal if needed. Do not add an intake service, maintenance window or response deadline. Any replacement gets a new immutable identity and proportional revalidation. Keep excluded features excluded. Exit only when REL-11 records the review boundary, known defects, resolutions, residual limitations, ownership and final release decision.
-```
-
-</details>
 
 ## Global Stop Conditions
 
@@ -238,38 +116,10 @@ Stop the current iteration when any of these is true:
 
 ## Explicitly Unscheduled Capabilities
 
-The first release does not automatically schedule geometry-cache animation, neural graphics, volumetric lighting, frame generation, native Linux, a binary SDK, an installer, a full CI/regression product beyond the approved deterministic release gates, or an internal performance-dashboard product. Linux is excluded from the roadmap. The other Architecture dossiers retain their negative/target contracts. Deferred decals, color grading, chromatic aberration, and HDR10 output are explicitly scheduled release blockers through `FCR-REN-23` through `FCR-REN-26`; their current score remains zero until implementation and evidence exist. Admit any other capability only by changing scope, adding/updating its FCR and feature-local acceptance, re-evaluating dependencies and risks, and invalidating affected release evidence.
-## Release Control At A Glance
-
-The [master Roadmap](../../../Strategy/Roadmap.md#ordered-delivery) supplies the global dependency graph. This page supplies the release-stage prompts and exact family routing below.
-
-| Start here when... | Open |
-| --- | --- |
-| deciding the one next iteration | [Roadmap current/next](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next), then the selected [stage brief](#ordered-release-stages) |
-| closing Showcase, build, launcher, editor, package, or support | [Product And Delivery](ProductAndDelivery.md) |
-| closing Core, Platform, Tasks, World, content, shader, or tool behavior | [Foundation, World, And Content](FoundationWorldAndContent.md) |
-| closing neutral RHI, queues, backends, ray tracing, diagnostics, or device failure | [RHI And GPU Execution](../../Modules/Engine/RHI/FirstReleasePlan.md) |
-| closing any of the 26 Renderer families | [Renderer First-Release Plans](../../Modules/Engine/Renderer/FirstRelease/README.md) |
-| deciding whether a result is accepted | [First Release Acceptance](../../../Acceptance/FirstRelease.md) and the owning feature dossier |
-
-## Authority And Working Rule
-
-The [Roadmap](../../../Strategy/Roadmap.md) owns global priority, admission and order across release and advanced work. This plan owns the selected release phase's local prerequisites, stop conditions and ready-to-use prompts; its stage table projects the Roadmap rather than choosing a second global order. Architecture owns behavior and feature acceptance. The FCR registry owns report identity; the release acceptance contract owns `REL-*` criteria/verdicts. Candidate artifacts own observed results. Do not copy an `AC-*`, `FM-*`, or `CHK-*` into a plan and edit it independently.
-
-Only one release-critical implementation iteration is active at a time. A second investigation may run only when it cannot modify, invalidate, or consume the same owner, candidate, content, or evidence surface. Every iteration follows [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md), begins from the current revision and dirty state, and ends `PASS`, `BLOCKED`, `EXCLUDED`, or `SUPERSEDED`.
-
+The first release does not automatically schedule geometry-cache animation, neural graphics, volumetric lighting, frame generation, native Linux, a binary SDK, an installer, a full CI/regression product beyond the approved deterministic release gates, or an internal performance-dashboard product. Linux is excluded from the roadmap. The other Architecture dossiers retain their negative/target contracts. Deferred decals, color grading, chromatic aberration, and HDR10 output are explicitly scheduled release blockers through `FCR-REN-23` through `FCR-REN-26`; their acceptance remains open until the required implementation and evidence pass. Admit any other capability only by changing scope, adding/updating its FCR and feature-local acceptance, re-evaluating dependencies and risks, and invalidating affected release evidence.
 ## Phase Card Contract
 
-Every implementation phase in this hierarchy uses this contract:
-
-1. **Reconcile:** inspect the current owner, producers, consumers, lifetime, selectors, CMake membership, direct tests, docs, and dirty work. Do not trust this snapshot as current without checking.
-2. **Create the iteration record:** map `NS-*`, `PGE-*`, `REL-*`, `FCR-*`, feature `AC-*`/`FM-*`/`CHK-*`, risks, and the cheapest claim-falsifying check.
-3. **Bound the outcome:** state goal, non-goals, included matrix, complexity/copy budget, preservation list, deletion list, and explicit stop conditions.
-4. **Implement one vertical slice:** extend the existing owner and production path; update producers, consumers, build membership, and docs; delete replaced paths in the same clean break.
-5. **Challenge failures:** exercise every applicable feature-local failure mode. An unavailable check remains `BLOCKED`, never `PASS`.
-6. **Prove the phase:** inspect the diff, run proportional checks, store candidate-bound artifacts where acceptance requires them, and update the applicable `FCR-*` report.
-
-The prompts below and in child plans are starting briefs. They require repository reconciliation before edits and do not authorize broad builds, submitted test-only code, architectural substitutions, or scope expansion.
+Follow [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md) and the owning feature checks. Inspect current source, preserve supported behavior, extend existing owners, delete replaced paths and record exact results. An unavailable check remains blocked. Phase briefs do not authorize scope expansion or broad builds unrelated to the affected claim.
 
 ## Complete Feature Routing
 
@@ -325,17 +175,3 @@ This is the exact one-to-one execution assignment. The phase owns implementation
 | `FCR-REN-26` | [`DSP-7`](../../Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-7--hdr10-display-output) | — | — |
 
 </details>
-
-## Reference-Implementation Rule
-
-References are used for invariants and review questions, not copied architecture:
-
-| Reference | What may be transferred | What must not be inferred |
-| --- | --- | --- |
-| Unreal Engine **5.8** documentation, retrieved 2026-09-08: [BuildGraph](https://dev.epicgames.com/documentation/unreal-engine/buildgraph-for-unreal-engine?lang=en-US&application_version=5.8), [script elements](https://dev.epicgames.com/documentation/unreal-engine/buildgraph-script-elements-reference-for-unreal-engine?lang=en-US&application_version=5.8), and [Packaging](https://dev.epicgames.com/documentation/unreal-engine/packaging-your-project?application_version=5.8) | explicit required predecessors/produced artifacts, terminal-target graph closure, and Build/Cook/Stage/Package separation; local adoption is recorded in [Packaging And Installation](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#external-precedent-and-transfer-boundary) | that Sparkle needs Unreal Automation Tool, BuildGraph XML/agents/triggers, Unreal's Pak/layout, Editor-driven packaging, or a Launcher/package dependency; no Unreal source revision was inspected |
-| [Unreal Render Dependency Graph](https://dev.epicgames.com/documentation/unreal-engine/render-dependency-graph-in-unreal-engine?lang=en-US) | declared dependencies, transient lifetime, barrier planning, culling, markers, validation | that a matching class name or feature exists locally |
-| [NVIDIA NVRHI guide](https://github.com/NVIDIA-RTX/NVRHI/blob/8e8c36e37558acec333204619b95d9d2fcdc4a79/doc/ProgrammingGuide.md) | backend-neutral resource/state/binding/lifetime questions | NVRHI adoption or local backend parity |
-| [Microsoft DirectX Graphics Samples](https://github.com/microsoft/DirectX-Graphics-Samples) and [Khronos Vulkan Samples](https://github.com/KhronosGroup/Vulkan-Samples) | small native oracles for D3D12/Vulkan behavior | production completeness, performance, or cross-backend equivalence |
-| [NVIDIA RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main/Doc/Integration.md) and [AMD Cauldron](https://github.com/GPUOpen-LibrariesAndSDKs/Cauldron) | explicit host-owned scene/material/GBuffer integration and graphics sample structure | that vendor sample choices define Sparkle semantics |
-
-Before using any external source, record the exact revision or documentation version, the local question it answers, the invariant adopted, the rejected differences, and license implications. Local source and Architecture remain authoritative.

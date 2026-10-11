@@ -50,17 +50,6 @@ flowchart LR
 
 **Phase exit criteria:** one identity/state diagram and matrix covers all five families; each mutable owner and immutable observer is named; missing or conflicting acceptance blocks implementation.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute RD-0 without implementation. Create ITER-REN-RD-00 mapped to the five FCRs and current AC/FM/CHK. Inspect shader registration/cook/runtime materialization, layouts/pipelines/bindings/caches, settings/config/CVars/commands/UI, RenderCoordinator transfer, debug views, capture, UI packets/viewport products, frame tokens, Streamline PCL/Reflex, selectors, CMake, package membership, and dirty work. Record mutable owners, identity/generation/lifetime, precedence, requested/resolved/active/fallback/restart state, observers, and matrices. Fix stale Architecture contracts only. Stop on duplicated state or uncorrelated frame identity.
-```
-
-</details>
-
 ## `RD-1` — Pipeline Materialization And Typed Binding
 
 **Goal:** close `FCR-REN-16` so every admitted graphics/compute/ray pipeline validates cooked ABI, materializes correctly, binds complete current resources, and replaces generations safely.
@@ -72,17 +61,6 @@ Execute RD-0 without implementation. Create ITER-REN-RD-00 mapped to the five FC
 **Failure modes:** registered program missing; reflection/ABI mismatch accepted; cache key omits state; wrong resource domain binds; unsupported ray pipeline materializes; reload partially replaces; old generation retires while in flight; cache grows forever.
 
 **Phase exit criteria:** complete program/parameter/domain matrix, invalid/missing/corrupt/capability/reload failures, cache key/retirement, native backend validation, and performance/memory checks pass.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RD-1 in current shader-program catalog, cooked code/reflection loader, pipeline/layout materialization, typed binding, cache, and generation-retirement owners. Reconcile FCR-REN-16 AC/FM/CHK and FCR-SHDR-01 dependencies. Ensure every registered program is built, every parameter/domain is validated, graphics/compute/ray keys are complete, and capability failure is explicit. Replace whole generations transactionally and delete obsolete layouts/caches/adapters. Exercise missing/corrupt/stale code, reflection/ABI mismatch, incomplete key/binding, unsupported feature, native create failure, reload in flight, repeated replacement, and shutdown on D3D12/Vulkan. Measure startup/cache/high-water and stop on partial replacement.
-```
-
-</details>
 
 ## `RD-2` — Settings State And Persistence
 
@@ -96,17 +74,6 @@ Implement RD-1 in current shader-program catalog, cooked code/reflection loader,
 
 **Phase exit criteria:** field/consumer coverage, valid and malformed round trip, precedence, atomic failure, concurrent/pressure/shutdown, package path, and requested-to-active state checks pass.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RD-2 in the existing renderer settings aggregate, persistence owner, CVar/command/UI adapters, RenderCoordinator transfer, and feature consumers. Inventory every field and exact consumer before edits. Establish deterministic defaults/precedence and requested/resolved/active/restart truth; use per-user paths and transactional save. Remove obsolete aliases/parallel parsers. Exercise clean first run, valid round trip, unknown/malformed/truncated/read-only save, command-line ordering, CVar/UI edits, concurrent changes, queue pressure, shutdown, unsupported provider/backend, and restart fields. Verify package immutability and report errors without false active state.
-```
-
-</details>
-
 ## `RD-3` — Debug Views, Diagnostics Products, And Capture
 
 **Goal:** close `FCR-REN-11` with exact mode semantics, correct display treatment, explicit unavailable state, and reproducible capture metadata.
@@ -118,17 +85,6 @@ Implement RD-2 in the existing renderer settings aggregate, persistence owner, C
 **Failure modes:** process-global mode leaks across viewports; unavailable resource displays stale data; mode goes through wrong tone/encoding; legend/range changes without metadata; capture generation mismatches frame; private path/content leaks; observer changes timing materially.
 
 **Phase exit criteria:** every admitted mode/resource/view/display/capture/unavailable/privacy/cost cell passes; sidecars identify candidate/frame/view/settings/domain/encoding; Shipping behavior matches scope.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RD-3 for FCR-REN-11. Reconcile current debug mode selector, per-view state, graph resources/replacement point, visualization shaders/ranges/legends, exposure/tone/encoding, RHI readback, capture writer/sidecar, Editor controls, privacy, and package selection. Use Docs/Architecture/Modules/Engine/Renderer/Features/DebugViews/Acceptance.md and current control contracts; Docs/Acceptance/Renderer/DebugViews.md retains bounded Show candidate evidence. Keep feature-owned global Show CVars and the per-view debug mode at their distinct current owners. Exercise remaining admitted mode, viewport, missing/cullable resource, resize/reload, invalid selector, capture failure, stable label/range, display mapping, and Shipping cells. Measure observer cost and bind captures to frame/candidate identity.
-```
-
-</details>
 
 ## `RD-4` — UI And Viewport Composition
 
@@ -142,17 +98,6 @@ Implement RD-3 for FCR-REN-11. Reconcile current debug mode selector, per-view s
 
 **Phase exit criteria:** packet lifetime/copy, handle/generation/bounds, blend/color/DPI, missing/stale/failure, resize/switch/shutdown, and Shipping classification checks pass.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RD-4 in existing host/editor packet producers, Renderer replay/composition pass, viewport product registry, texture-handle resolver, RHI submission, and package targets. Record ownership/lifetime and copy budget before edits. Keep packets immutable, validate generations and bounds, make missing/stale product behavior explicit, and align blend/color/DPI/extent semantics. Exercise empty and multi-element UI, invalid/stale handles, resize/DPI/monitor changes, viewport recreation, level switch, missing render product, packet producer shutdown, and Shipping targets. Delete duplicate registries/adapters and stop on mutable cross-thread ownership.
-```
-
-</details>
-
 ## `RD-5` — Latency Coordination
 
 **Goal:** close `FCR-REN-20` for the explicitly supported Streamline PCL/Reflex boundary, with correct six-marker frame identity and independently measured benefit.
@@ -165,17 +110,6 @@ Implement RD-4 in existing host/editor packet producers, Renderer replay/composi
 
 **Phase exit criteria:** marker order/identity, misuse/provider/failure/shutdown, backend/package, requested-active state, and controlled latency measurements pass for admitted cells; unsupported cells remain explicit.
 
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Implement RD-5 in existing host/render frame-token and Streamline PCL/Reflex owners. Reconcile FCR-REN-20 criteria, six marker sites/order, frame conversion bounds, feature readiness, sleep/marker calls, backend/provider guards, error and shutdown paths, CMake/runtime/package payload, and settings/UI state. Exercise provider on/off/unavailable/fault, host misuse, boundary token values, D3D12 and explicit Vulkan behavior, repeated startup/shutdown, and missing/corrupt package DLL. Verify ordering independently and measure latency with a controlled protocol; do not infer benefit from successful calls. Stop on identity alias or unsupported-provider ambiguity.
-```
-
-</details>
-
 ## `RD-6` — Runtime And Diagnostics Candidate Closure
 
 **Goal:** prove that bound pipelines, settings, debug/capture, UI composition, and latency artifacts all describe the same active frame and candidate.
@@ -185,17 +119,6 @@ Implement RD-5 in existing host/render frame-token and Streamline PCL/Reflex own
 **Failure modes:** requested state differs from active but capture omits it; pipeline/provider DLL differs from manifest; UI/debug observe stale generation; latency token cannot join capture; evidence predates settings/shader change.
 
 **Phase exit criteria:** all five FCR reports carry complete candidate-bound criteria/failure/check coverage, package/native/provider matrices, identity joins, performance/observer data, limitations, and explicit decisions.
-
-**Ready-to-use prompt:**
-
-<details>
-<summary>Copy the execution prompt</summary>
-
-```text
-Execute RD-6 on the frozen candidate. Reconcile FCR-REN-11/13/16/19/20 evidence and run only missing joint routes: restore/edit/activate settings, materialize/bind pipelines, render/debug/capture, compose UI/viewport, mark latency, resize/reload/fail/shutdown, and package launch on admitted backends/providers. Join candidate, frame, view, resource generation, shader library, settings, provider, capture, and latency identities. Verify Shipping erasure and requested-active truth. Any implementation/config/provider/package change invalidates affected evidence. File exact decisions without promoting the separate diagnostics product.
-```
-
-</details>
 
 ## Reference And Ownership
 

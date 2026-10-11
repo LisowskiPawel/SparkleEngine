@@ -13,7 +13,7 @@ A Windows graphics learning project with **Sparkle Launcher, Sparkle Editor and 
 
 ## Build and launch
 
-Use a short checkout path, such as `C:/src/SparkleEngine`. The [recorded build environment](Docs/Acceptance/ReleaseScope/Evidence.md#fr-01-closure-work-iter-rel-01-07) uses Windows 11, Visual Studio 2026 C++ tools, CMake 4.3.3, Qt 6.11.1 MSVC x64 and Vulkan SDK 1.4.350.0; other versions are unqualified.
+Use a short checkout path, such as `C:/src/SparkleEngine`. The [source prerequisites](Docs/Acceptance/FirstRelease.md#frozen-platform-and-toolchain-prerequisites) name Windows 11, Visual Studio 2026 C++ tools, CMake 4.3.3, Qt 6.11.1 MSVC x64 and Vulkan SDK 1.4.350.0; other versions are unqualified.
 
 Clone [SparkleEngine](https://github.com/stoleckipawel/SparkleEngine). From its root, run in PowerShell with your Qt path:
 

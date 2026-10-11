@@ -77,6 +77,10 @@ A plan, decision record or acceptance entry point MUST make the next useful acti
 - Put copyable prompts, source crosswalks, estimates and historical records after the working route or in labeled optional reference. Keep stage goals, work and exit conditions readable without opening the prompt. Move evidence to its existing report owner when it has an independent lifecycle; do not split a short page merely to hide text.
 - Remove repeated orientation/process prose when a direct owner link answers the same question. [Roadmap](../../Strategy/Roadmap.md) chooses global work; each plan explains its selected local task. Preserve exact contracts, thresholds, snapshots, IDs, artifacts and incoming links during cleanup.
 
+### Keep Maintained Docs Small
+
+Keep current goals, decisions, remaining work, supported behavior and required checks. Summarize completed work briefly in the roadmap; retire superseded audits and duplicate execution prompts. Put generated logs, source snapshots and candidate receipts in ignored output, not maintained Markdown. Preserve legal notices and reproducibility inputs; when retiring a page, update incoming links to the current owner. Do not turn a missing check into completion while shortening text.
+
 ## Visual Elements
 
 Use visuals when they reduce the work required to understand relationships:

@@ -6,23 +6,7 @@ Use this contract to decide whether exact release bytes may ship. Make product c
 
 **Release target:** SparkleEngine `v0.1.0`, Windows x64
 
-## Current Progress
-
-**Next release task: qualify the package inputs, then finish PD-3 and produce the archive.** You will run the clean-machine rehearsal once that archive is ready. Do not restart the implemented product work.
-
-Implementation and acceptance are separate: source and local checks exist, but no verified release archive or completed clean-machine rehearsal is recorded. Earlier results apply to their recorded revisions, not automatically to today's working tree.
-
-| Work | Already recorded | Still needed |
-| --- | --- | --- |
-| Scope / FR-00 | Your six product choices are approved. | Technical scope and rights closure. [Decisions](ReleaseScope/README.md#approval-and-next-work). |
-| Identity / FR-01 | Identity, dependency pins, notices and an earlier local Shipping/Empty baseline. | Remaining rights/input admission and qualification of the final source candidate. [Baseline receipts](ReleaseScope/Evidence.md#current-candidate-baseline-iter-rel-01-12). |
-| PD-1: Game / Editor | Product shells and separate post-processing passes; bounded builds and startup checks. | Full input, settings, content-failure and Editor journey checks. [Recorded work](ReleaseScope/Evidence.md#product-shells-and-post-processing-iter-pd1-01). |
-| PD-2: source / Launcher | Existing typed build/cook/run operations and owner-check entry points. | Independent source-adopter rehearsal and cold/warm/failure-route closure. PD-2 acceptance is not established. |
-| PD-3 / FR-02: package | Transactional staging, manifests, dependency checks and archive verification are implemented. | Reviewed inputs, installed Launcher content-store journey and the exact archive rehearsal. [Recorded work](ReleaseScope/Evidence.md#package-spine-iter-pd3-01). |
-| PD-4: diagnostics / closure | Local diagnostic export and immutable replacement/review tools; controlled fixture checks. | Native packaged crash/hang/GPU and self-service journeys; all six product reports remain blocked. [Recorded work](ReleaseScope/Evidence.md#local-diagnostics-and-release-review-iter-pd4-01). |
-| FR-03?08 | Feature, map, performance, adoption and publication plans exist. | Their candidate-bound checks and approval; these phases are not accepted. |
-
-**Do next:** use [Release Inputs](../Architecture/Modules/BuildAndPackaging/ReleaseInputs.md#reviewed-package-inputs) to qualify the exact rights, dependency/helper and symbol receipts. Continue the existing [PD-3 package owner](../Architecture/CrossModule/FirstRelease/ProductAndDelivery.md#pd-3--package-and-installation); retain failed admission results rather than bypassing them. Product and renderer defects uncovered by those checks go back to their existing owners.
+See [Roadmap progress and next work](../Strategy/Roadmap.md#release-progress). This page owns the checks required to ship; it does not repeat the work log.
 
 ## Current FR-01 Blockers
 
@@ -31,35 +15,6 @@ Implementation and acceptance are separate: source and local checks exist, but n
 - The passing baseline at `fec29052c6f6195547f2062da9def86e520dc0df` is historical. Later source changes need their own applicable checks.
 
 Certificate enrollment is deferred until before public release. It does not prevent unsigned internal package development. [Roadmap](../Strategy/Roadmap.md#where-we-are-and-what-is-next).
-
-Use this progress section for the current work list. [Evidence](ReleaseScope/Evidence.md) retains dated iterations and their limitations; older audits below are historical, not instructions to repeat completed fixes. Generated logs, snapshots and candidate reports live in ignored `artifacts/` or `build/` output, outside the maintained documentation.
-
-## Read This Page
-
-- **Understand the release:** [Product promises](#what-the-first-release-delivers) and [required rendering](#required-rendering-closure).
-- **Evaluate a candidate:** [Release gates](#release-gates), [failure controls](#failure-mode-acceptance-matrix) and [stability](#candidate-stability-matrix).
-- **Prepare approval:** [Evidence package](#release-evidence-package) and [approval rules](#approval-rules).
-
-## Release At A Glance
-
-| Question | Current answer |
-| --- | --- |
-| What is the intended product? | Sparkle Launcher, Sparkle Editor and Sparkle Game, with seven user-selected release maps, intentional Empty startup and user/display-selected resolution; Launcher is the expected user entry point. Game targets 30 FPS on the named laptop. No user support service is offered. |
-| What exists? | Broad engine, tooling, content, Renderer, and D3D12/Vulkan source paths plus focused development workflows. |
-| Where are we now? | Product and packaging source work exists; archive and release acceptance remain open. See [current progress](#current-progress). |
-| What is the largest product gap? | There is no accepted manifest-owned release package or clean-machine consumer/source-adopter record. |
-| What is the reading rule? | Use [release gates](#release-gates) for the proof required to ship and the [dated audit](#current-release-audit) for recorded blockers. |
-
-```mermaid
-flowchart LR
-    Scope[Freeze scope and identity] --> Build[Clean build and cook]
-    Build --> Package[Stage and package]
-    Package --> Features[Close included features]
-    Features --> Maps[Approve maps and quality]
-    Maps --> Native[Performance, stability,<br/>and backend proof]
-    Native --> Adopt[Independent consumer<br/>and source adoption]
-    Adopt --> Publish[Publish and stabilize]
-```
 
 ## Release Gates
 
@@ -97,66 +52,9 @@ Gates are strictly ordered. A later gate may be prepared, but it cannot be accep
 | `REL-10` | Uploaded bytes/hash/signature/tag differ; compatibility policy still assumes no consumers; broken release/onboarding link or false support promise; fresh download fails. | Stop announcement or withdraw affected assets, preserve incident evidence, publish corrected bytes only under a new version/candidate, then verify again. |
 | `REL-11` | Known `S0`/`S1`, security/rights defect, repeat crash or public-byte mismatch at closeout. | Block closure, preserve exact evidence, then fix/revalidate or withdraw affected bytes. No public response deadline is promised. |
 
-## Identity And Baseline Preflight
-
-**Candidate:** `d1c8c5b2a61768a0460983c854264380d5c1f6dc`, inspected 2026-10-10; clean worktree at the recorded inspection, not a tagged-source release candidate. The repository advanced from `aa9fcd94…` during inspection; the audited production paths did not change. Exact commands, dirty state and input/notice hashes are retained in `build/validation/fr01-preflight-20261010/manifest.json` and `commands.md`.
-
-**Historical iteration:** `ITER-REL-01-00`, permitted prerequisite discovery. At that inspection FR-00 had not exited: scope proposals and rights receipts remained open. Subsequent user decisions approved three shipped products, native 1080p/display scaling, seven selectable maps and no user support service; see [the amendment](ReleaseScope/Evidence.md#scope-amendment-iter-rel-00-05). The original preflight artifacts remain an inspection snapshot. This is not full FR-01 execution.
-
-| Gate | Current result | What must change before baseline/package work |
-| --- | --- | --- |
-| `REL-01` | **BLOCKED:** publisher/license identity and version metadata are unresolved; dependency acquisition includes moving branches; selected-content rights remain unresolved; generic Streamline payload includes a debug-named DLL. | Establish actual copyright/publisher/version identity, review immutable dependency revisions, resolve content rights and freeze the Shipping payload allowlist. |
-| `REL-02` | **BLOCKED:** scope/input prerequisites are unresolved; no clean tagged-source cold/warm baseline was executed. | Close phase prerequisites and immutable inputs, then run the exact accepted cold/warm route with complete environment and output provenance. |
-
-### Concrete Findings And Next Actions
-
-**Historical admission recheck — `ITER-REL-01-01`, 2026-10-10:** HEAD remains `d1c8c5b2a61768a0460983c854264380d5c1f6dc`; 16 pre-existing modified documentation files are preserved. The six audited production inputs and four Modern Sponza notice/acquisition hashes match the original preflight. `REL-00` remains **BLOCKED** for six unanswered proposals and unresolved rights/package closure; `REL-01` and `REL-02` remain **BLOCKED** as above. Full FR-01 was not admitted. Exact dirty state, input hashes, commands, tool versions, negative controls, unavailable checks and cleanup are recorded in `build/validation/fr01-admission-recheck-20261010/manifest.json`, `commands.md` and `control.md`. No dependency acquisition, production fixes, automation, configure, build, cook or runtime was performed.
-
-**Current scope decision — `ITER-REL-00-06`:** all six proposals are now approved, with user/display-selected resolution, expected Launcher entry and chromatic aberration/vignette On. The earlier unanswered-choice and forced-native-resolution findings are superseded. `REL-00` still requires exact technical scope/rights closure; `REL-01`/`REL-02` remain blocked by their identity, rights and mutable-input prerequisites. [Approval record](ReleaseScope/Evidence.md#scope-approval-iter-rel-00-06).
-
-| Finding | Source / next owner action |
-| --- | --- |
-| Root MIT license still says `[year] [fullname]`; root CMake `project(Sparkle LANGUAGES C CXX)` declares no version. | [License](../../LICENSE.txt) and [project declaration](../../CMakeLists.txt). Release owner supplies the real identity; build owner wires the approved version into product metadata. |
-| `stb` follows `master`; Compressonator clones its default branch and reuses an existing sparse checkout without choosing a revision. | [Dependency acquisition](../../CMake/Dependencies/FetchDependencies.cmake). Build owner must choose reviewed immutable inputs and verify cache identity; an installed cache is not a lock. Other Git tag references still need resolved source identities in the inventory. |
-| Modern Sponza base/curtains notices match the retained hashes and still contain CC BY 4.0 plus narrower usage wording. Cornell archive and classic Sponza rights remain unresolved in the prior record; neither was reacquired/re-cleared here. | [Content receipts](ReleaseScope/Evidence.md#selected-content-receipts). Content/rights owner retains exact permission and attribution evidence; map selection cannot clear it. |
-| The Streamline runtime list includes `sl.dlss_d.dll`; generic staging copies every listed DLL. | [Runtime list](../../CMake/Dependencies/FetchDependencies.cmake) and [staging owner](../../CMake/SparkleArtifactContract.cmake). Package owner must qualify the exact Shipping redistributable closure before treating staging as release membership. |
-| Root Tools membership includes Launcher; existing boundary/style and ShaderCompiler CLI targets have owners, but were not executed. | [Tools membership](../../Tools/CMakeLists.txt) and [ShaderCompiler check](../../Tools/Shaders/ShaderCompiler/CMakeLists.txt). Build owner must prove declared prerequisites and assemble approved fresh-checkout automation after admission; no second check semantics. |
-
-**Checks run:** source predicates and input/notice hashes; `git --version` = `2.54.0.windows.1`; `cmake --version` = `4.3.3`. In-memory controls rejected absent candidate identity, moving-input clean-baseline claims and changed input hashes. These establish the recorded blockers only.
-
-**Stopped before:** dependency acquisition/configure, production fixes, gate automation, build/cook/runtime, full environment/SBOM/rights inventory, cold/warm replay and native/package validation. No cache, asset, executable or security-policy cleanup was performed; only evidence and this report were written. Approval of scope alone does not resolve rights or mutable inputs.
-
-## FR-01 Input Audit: ITER-REL-01-02
-
-**Candidate:** `d1c8c5b2a61768a0460983c854264380d5c1f6dc` plus the retained working-tree patch, inspected 2026-10-10. All 16 pre-existing modified documents are preserved; this iteration corrects the root copyright and updates the owning reports. Exact input hashes, dirty state, patch hash, commands, environment observations and generated roots are in `build/validation/fr01-input-audit-20261010/manifest.json`.
-
-**Identity correction:** user supplied current year and name; [MIT license](../../LICENSE.txt) now says `Copyright (c) 2026 Pawel Lisowski`, with all terms unchanged and line endings normalized for the repository whitespace check. Publisher is Pawel Lisowski; `v0.1.0` is approved scope identity. CMake declarations and produced PE/package metadata do not yet establish that release identity. No signing credentials are inferred.
-
-| Gate | Candidate-bound result / next action |
-| --- | --- |
-| `REL-01` | **BLOCKED:** `stb` follows `master`; Compressonator clones its default branch and accepts a file-presence cache. Exact rights/receipts for Modern Sponza, classic Sponza and Cornell remain open; Streamline staging has no qualified Shipping allowlist. Choose reviewed immutable revisions, resolve exact rights and qualify version/signing/payload closure. |
-| `REL-02` | **BLOCKED:** no admitted clean/tagged candidate or cold/warm build/cook/runtime baseline. Current Launcher shell lacks explicit map/product/backend selection; deterministic selected-map runtime automation cannot be claimed. Close input/admission blockers and extend the existing owner only where required. |
-
-**Audit outputs:** 28 dependency-reference declarations and 13 observed cached Git revisions/dirty states (`dependency-inputs.json`); 20 catalog levels, 17 asset packs and four notice/acquisition identities matching retained hashes (`content-inputs.json`). Existing CMake cache selects VS 18 2026/x64 and Qt 6.11.1; live Git/CMake versions are `2.54.0.windows.1`/`4.3.3`, VS installer version `18.7.11903.348`, MSVC directory `14.51.36231`. Cache presence is not a dependency lock or fresh-host proof; full environment/SBOM/rights closure remains unavailable.
-
-**Baseline path:** `baseline-plan.md` records existing Launcher sync/build/cook operations, `architecture_boundary_check`, `code_style_check`, `ShaderCompilerCliValidation`, expected outputs and contained cleanup. It is a planned path, **not executed baseline evidence**. Exact clean revision, helper/content closure and selected-map runtime route are still unavailable. No new gate automation is added while these inputs are unresolved.
-
-**Checks: PASS** for normalized license-term preservation, source/input predicates, four retained notice/acquisition hashes, 78 local links, 94 incoming links, preserved identifiers and four documentation negative controls. `git -c core.safecrlf=false diff --check` passed. Exact report checks are retained in `check-command.md` and `verification.json`; no build/native/performance result is implied.
-
-**Stop and cleanup:** FR-00 technical rights/package exit remains blocked despite approved product choices. This was permitted prerequisite discovery plus the explicitly supplied copyright correction, not full FR-01 admission. No dependency acquisition, configure, build, cook, runtime, signing, package or cache cleanup was performed. Retain `commands.md`, `control.md`, `candidate.patch` and all prior evidence; unknown rights/mutable inputs block the next production step.
-
 ## Purpose And Authority
 
-This document defines the proof required to call the first SparkleEngine release shippable. It does not prove that any requirement currently passes, prescribe subsystem architecture, or authorize implementation by itself. Code and executable build configuration prove what exists; a release evidence package proves what was exercised.
-
-The first release is a product-delivery milestone, not a promise that every source-present experiment is production-ready. Every user-visible capability MUST be classified before the release candidate is cut:
-
-- **Included** — reachable in the shipped product and required to pass every applicable acceptance gate below;
-- **Experimental** — intentionally exposed, unmistakably labelled, bounded by documented limitations, and still required to fail safely;
-- **Excluded** — not selectable, packaged, advertised, or used by the release path;
-- **Removed** — deleted when it has no current owner or valid release purpose.
-
-An unclassified or silently broken option blocks release. Excluding an unfinished feature is acceptable; shipping it as if it were complete is not.
+Classify every reachable capability as Included, Experimental, Excluded or Removed in [Release Scope](ReleaseScope/CapabilityDispositions.md). Included/Experimental features need their applicable checks; an unclassified or silently broken option blocks release. Code proves implementation; candidate reports prove only their recorded configuration.
 
 ## What The First Release Delivers
 
@@ -279,66 +177,6 @@ The [Change Lifecycle iteration control record](../Engineering/Workflow/ChangeLi
 | `CHK-<scope>-NN` | One validation action designed under the [check and test contract](../Engineering/Verification/ValidationAndEvidence.md#check-and-test-design-contract). Feature dossiers own stable mappings; reports own candidate execution. It is not authorization for permanent submitted test code. |
 
 The candidate traceability ledger MUST map each included/experimental `FCR-*` and applicable `RISK-*` to at least one `AC-*` and `FM-*`, then map every criterion/failure to one or more `CHK-*` and retained artifacts. Every `CHK-*` maps back to the claim and risk it informs. An orphan target, risk, criterion, failure, check, result, or waiver keeps the owning `REL-*` gate `Blocked`.
-
-## Current Release Audit
-
-Audit date: 2026-09-06
-
-Audit basis: static source/build/document inspection of committed `master` at `8414b5dc`; a concurrent documentation relocation is present in the worktree and is not implementation evidence. No build, cook, package, clean-machine run, graphics capture, or benchmark was performed for this audit.
-
-<details>
-<summary>Expand current release audit</summary>
-
-| Release area | Current source-inspected state | Release status and consequence |
-| --- | --- | --- |
-| Product identity | The CMake project has no declared version, the root license retains `[year] [fullname]`, no root README exists, and no Windows version-resource file was found. | `Blocked`: freeze name, semantic version, publisher, license, support promise, and executable metadata. |
-| Build profiles | `DevelopmentEditor`, `DevelopmentGame`, `DebugEditor`, `DebugGame`, `ShippingEditor`, and `ShippingGame` profiles exist. Showcase editor/game and launcher executable targets exist. | `Source present`: a profile name is not a reproducible release build. |
-| Package discovery | Runtime source recognizes `manifests/sparkle-package-manifest.json`. | `Source present`: no owned CMake `install()` rules, CPack configuration, staging contract, or produced release archive was found. |
-| Package writable state | Package mode resolves logs, captures, settings, crashes, cache, and any shader-symbol cache beneath `%LOCALAPPDATA%\SparkleEngine\Showcase\v0.1\`; shipped `Config/DefaultEngine.ini` is read-only and user settings overlay it. | `Source present`: the ownership defect is removed, but read-only extraction, standard-user operation, retention/reset, and packaged-run evidence remain required. |
-| Consumer first run | The runtime defaults to `Empty`; startup-map selection is environment-driven, the launcher owns discoverable per-level run actions, and the game console option defaults enabled. | `Blocked`: freeze one consumer-safe first-run, example-selection, controls/help, settings/reset, and quit path. Do not expose development console/tool operations accidentally. |
-| Missing-content behavior | Catalog/load failures can fall back to the built-in `Empty` level. | `Blocked`: a required packaged map, catalog, shader, or content failure must not masquerade as a successful empty scene. Reserve fallback only for an explicitly requested recovery path. |
-| Core/platform/tasks | Platform, application, task, filesystem, logging, input, and lifecycle owners exist. | `Source present`: standard-user paths, shutdown, cancellation, resize, and repeated-run behavior remain unproven as release claims. |
-| RHI | D3D12 and Vulkan implementations, native validation switches, timing, capture, and ray-tracing paths exist. | `Source present`: native validation cleanliness, capability failure, resource lifetime, and device-removal behavior require evidence. |
-| Renderer | Raster, deferred/PBR, exposure, tone mapping, debug views, Linear/DLSS upscaling, DLSS Ray Reconstruction, ray/path, ReSTIR, scene/view/frame, and GPU-scene paths are present. Deferred decals, color grading, chromatic aberration, and HDR10 output are absent but first-release admitted; volumetric lighting and frame generation remain excluded. | `Source present` or admitted target: each included mode needs a frozen feature row, map evidence, performance result, and backend disposition. Every admitted absent feature must be implemented and evidenced; exclusions cannot masquerade as support. |
-| World/content | World, scene, component, map catalog, import, cook, shader cook, and runtime asset paths exist. | `Source present`: deterministic clean cook, package-relative load, malformed-input handling, and bounded memory need proof. |
-| Showcase content | The current scope reconciliation inventories 20 level records and 17 asset packs. The seven-map selection is retained; the later scope amendment permits intentional Empty startup and user-selected sync, with Modern Sponza as principal example. External packs have mixed licenses and support states; catalog flags are not runtime acceptance. | `Blocked`: freeze a redistributable `ReleaseMapSet`; runtime support does not establish redistribution rights or visual acceptance. |
-| Evidence harness | Level-selected launch and manual viewport capture exist; backend timestamp infrastructure exists. | `Blocked`: `MAP-00` still owns fixed resolution, readiness/settled identity, named capture sidecars, timing export, and a unified manifest. |
-| Feature completion reporting | A source-audited report registry and binding how-it-works/polish schema now cover product, foundation, world/content, RHI, Renderer, tools, delivery, and release maps. | `Blocked`: registry coverage is not completion. Every included/experimental feature still needs a candidate-bound report with code/evidence links and the downstream gate additions. |
-| Automated validation | No `enable_testing()` or `add_test()` registration was found; `ShaderCompilerCliValidation` is a focused custom target. | `Blocked` for regression confidence. The release owner must explicitly authorize any permanent submitted test code required by the binding test policy; until then, use approved executable checks and retained evidence without claiming automated coverage. |
-| Dependency integrity | Most dependencies name tags/commits or archive hashes, but `stb` uses `master` and the sparse Compressonator clone follows its default branch. | `Blocked`: a clean build can resolve different source over time. Pin every release input to an immutable commit/archive hash and record license/provenance. |
-| Optional provider payload | NVIDIA Streamline is enabled by default and the generic product staging list includes release and `_d` debug-suffixed DLLs. | `Blocked`: classify the provider, redistribution terms, hardware fallback, signing, and exact Shipping DLL closure; debug/development payload cannot enter by generic copy. |
-| Crash/support path | D3D12 DRED collection exists, but the focused scan found no first-party process-level minidump/unhandled-exception owner or public security/support route. | `Blocked`: choose an OS WER/local-dump or owned crash policy, consent/privacy boundary, support bundle, symbol retention, and hang/device-loss instructions. |
-| Installed-consumer policy | The clean-break standard currently assumes no active users, shipped compatibility contract, persisted user data, public SDK ABI, or installed consumer. | `Blocked before publication`: `REL-10` would invalidate that premise. Freeze the external compatibility/reset/update contract and update the standard before shipping. |
-| Source adoption | Public DLL headers and source-build machinery exist, but no root quick start, supported source toolchain matrix, installed SDK contract, or independent source-adopter record exists. | `Blocked`: prove the tagged clone/configure/build/cook/run journey and explicitly exclude binary ABI/plugin support if it remains unsupported. |
-| Distribution and support | Development artifact staging exists, but no release staging/package owner, dependency manifest, checksum set, clean-machine record, or support/crash policy was found. | `Blocked`: implement and prove the complete distribution path. |
-
-</details>
-
-Nothing in this table is accepted merely because a source route exists. The worktree must be deliberately reconciled into a clean candidate commit before reproducibility evidence begins.
-
-### Current Feature-Inventory Seed
-
-The static scan found the following closure families. The [Current Capability Inventory](../Architecture/Modules/README.md) now provides detailed source-reconciled rows for every release subsystem, plus horizontal graphics coverage, vertical execution traces, the shader catalog, and the [capability evidence plan](../Architecture/Modules/CapabilityEvidencePlan.md). They are inputs to `REL-00`, not substitutes for tracing actual UI, configuration, producers, consumers, package reachability, approval, or executable evidence.
-
-<details>
-<summary>Expand current feature-inventory seed</summary>
-
-| Family | Source-present surfaces to classify |
-| --- | --- |
-| Build and products | Six build profiles; shared engine DLLs; Showcase editor/game; launcher; import, cook, shader, and support tools; dependency/runtime staging. |
-| Core, platform, and tasks | Math/memory/events/logging; filesystem/project discovery; Win32 window/input/focus; task graph, scopes, events, parallel-for, workers, cancellation, and profiling hooks. |
-| World and scene | Entity/component/world ownership; transforms; cameras; directional/point/spot/rect lights; sky; static/skeletal meshes; materials; animation/skinning/morph data; level parsing/loading/session and cooked registries. |
-| RHI and presentation | D3D12 and Vulkan devices, queues, resources, descriptors, bindings, command lists, swapchain/presentation, frame latency, timestamps, captures, classic/partitioned TLAS, inline ray queries, and native ray-tracing pipelines. |
-| Renderer | Scene/view/frame submission; persistent GPU scene and caches; scene depth/GBuffer; deferred PBR; sky; direct lighting/shadows; lighting composite; exposure; tone mapping; output encoding; buffer visualization; linear upscaling; DLSS SR/RR provider routes; ray-traced GBuffer; path-traced direct/indirect; reference accumulation; direct/indirect ReSTIR routes. Mandatory target rows cover deferred decals, Color Grading, Chromatic Aberration, and HDR10 display output; explicit excluded rows cover Volumetric Lighting and Frame Generation. |
-| Editor and application | Editor viewport/session/camera; rendering/upscaling settings; scene selection/transactions; viewport capture; UI frame; game/editor hosts; shader source-change and recook coordination. |
-| Import and cooking | Source importers; scene, mesh, material, texture, and asset cookers; texture decoding/shape/mips/channels/BC compression; cooked scene/mesh/material/texture/animation/skeleton/shader products. |
-| Launcher | Toolchain/source discovery; configure/build/cook; level catalog and asset-pack sync; editor/game launch; progress/cancel/failure; maintenance and clean operations. |
-| Project and content | Showcase configurations, 16 catalog level records, built-in assets, external pack recipes, level thumbnails/descriptions, and startup-level selection. |
-| Documentation and delivery | Architecture/standards/workload routes; package discovery manifest; user quick start, requirements, notices, package/readme, support, crash handling, checksums, and release publication. |
-
-</details>
-
-Every item begins as `Source present`. `REL-00` splits compound rows into independently selectable features and finds any missing families before scope approval.
 
 ## Release Scope Freeze
 
@@ -670,25 +508,6 @@ artifacts/validation/releases/<version>/<candidate-id>/
 - The release owner gives the final go/no-go only after an independent reviewer completes `REL-09`.
 - `REL-10` proves publication; it does not unlock new features. Only the approved `REL-11` stabilization closeout does.
 
-## Shipping Precedent And Local Adoption
-
-This contract adopts established delivery structure without copying another engine's product scope:
-
-- Unreal Engine 5.8 documentation, retrieved 2026-09-08, describes packaging as Build, Cook, Stage, and Package, followed where needed by Deploy and Run. Sparkle adopts those named product boundaries and proves the resulting staged package rather than treating compilation as delivery. Source: [Packaging Your Project](https://dev.epicgames.com/documentation/unreal-engine/packaging-your-project?application_version=5.8).
-- CMake defines installation rules as the source for an installed tree, while CPack generates packages from those rules. Sparkle therefore requires one owned staging/install contract before selecting an archive generator. Sources: [CMake `install()`](https://cmake.org/cmake/help/latest/command/install.html) and [CPack](https://cmake.org/cmake/help/latest/module/CPack.html).
-- Microsoft recommends a D3D12 debug-layer-clean application and provides GPU-based validation for descriptor, resource-state, and related GPU-timeline errors; DRED provides breadcrumbs and page-fault data for device removal. Sparkle uses focused native-validation and incident gates, not validation-enabled performance numbers. Sources: [Direct3D 12 programming environment setup](https://learn.microsoft.com/en-us/windows/win32/direct3d12/directx-12-programming-environment-set-up), [GPU-based validation](https://learn.microsoft.com/en-us/windows/win32/direct3d12/using-d3d12-debug-layer-gpu-based-validation), and [DRED](https://learn.microsoft.com/en-us/windows/win32/api/d3d12/ns-d3d12-d3d12_device_removed_extended_data).
-- Khronos treats validation as a development requirement and notes that validation layers are not intended to ship with the application. Sparkle separates Vulkan validation runs from the final package and performance profile. Sources: [Vulkan validation overview](https://docs.vulkan.org/guide/latest/validation_overview.html) and [Vulkan development tools](https://docs.vulkan.org/guide/latest/development_tools.html).
-- GitHub releases bind a tag, release notes, and binary assets. Sparkle additionally requires checksums, a manifest, immutable candidate identity, and a post-upload retrieval smoke. Source: [Managing releases in a repository](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository).
-- Microsoft documents that Smart App Control trusts RSA signatures only when the certificate chains to a trusted provider, and that unsigned or self-signed binaries are unsuitable for public distribution. Sparkle therefore treats trusted Authenticode identity as a release requirement, while recording that SmartScreen reputation may still take time to build. Sources: [Smart App Control signing](https://learn.microsoft.com/en-us/windows/apps/develop/smart-app-control/code-signing-for-smart-app-control) and [Windows code-signing options](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/code-signing-options).
-- NIST SSDF separates preparing, protecting software, producing secured releases, and responding to residual vulnerabilities; it also calls for release-component provenance. Sparkle adopts a risk-sized dependency/SBOM/provenance record, vulnerability response route, and stabilization loop rather than treating security as a one-time scan. Source: [NIST Secure Software Development Framework](https://csrc.nist.gov/projects/ssdf).
-- GitHub artifact attestations establish provenance for binaries and SBOMs and can be verified against repository and workflow identity. Sparkle requires an attestation when the publication system supports it, but keeps hashes, signatures, and independent consumer checks as separate controls. Source: [GitHub artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations).
-- Microsoft Application Verifier exercises unmanaged applications for memory, handle, heap, lock, API, privilege, and resource errors. Sparkle uses applicable checks as failure diagnostics on the candidate path; it does not use instrumented runs for frame-rate claims. Source: [Application Verifier](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/application-verifier).
-- Microsoft documents DLL preloading risk when search paths include attacker-controlled directories and provides restricted search-directory APIs; MSVC exposes DEP, ASLR/high-entropy VA, and Control Flow Guard linker protections. Sparkle therefore proves loaded-module identity and first-party PE mitigations instead of assuming compiler defaults are preserved. Sources: [Dynamic-Link Library Security](https://learn.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-security) and [MSVC linker options](https://learn.microsoft.com/en-us/cpp/build/reference/linker-options).
-- Semantic Versioning states that released version contents must not be modified and that `0.y.z` public APIs may remain unstable. Sparkle therefore permits an explicitly unstable source API for `v0.1.0`, but never replacement of published bytes under the same version. Source: [Semantic Versioning 2.0.0](https://semver.org/).
-- Windows Error Reporting provides an OS-owned crash-reporting mechanism, while GitHub supports private vulnerability reports and a repository security policy. Sparkle may use local OS diagnostics. An optional reporting service would need a separate approved scope with consent, retention and ownership; it is not required by the no-support release decision. Sources: [Windows Error Reporting](https://learn.microsoft.com/en-us/windows/win32/wer/windows-error-reporting) and [GitHub private vulnerability reporting](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting).
-
-These sources are industry precedent. This document and the repository's executable configuration remain the local authority.
-
 ## Reference And Ownership
 
 <details>
@@ -696,7 +515,7 @@ These sources are industry precedent. This document and the repository's executa
 
 **Responsibility:** define the complete evidence and approval boundary for the first public SparkleEngine release
 
-**Review the approved release:** start with the [settled choices](ReleaseScope/README.md#decision-summary) and [six approved decisions](ReleaseScope/README.md#approval-and-next-work). This contract defines the proof needed to ship; the [capability ledger](ReleaseScope/CapabilityDispositions.md) is reference detail. Product choices are approved; technical scope/rights closure (`REL-00`) remains blocked.
+**Review the approved release:** start with the [settled choices](ReleaseScope/README.md#approval-and-next-work) and [six approved decisions](ReleaseScope/README.md#approval-and-next-work). This contract defines the proof needed to ship; the [capability ledger](ReleaseScope/CapabilityDispositions.md) is reference detail. Product choices are approved; technical scope/rights closure (`REL-00`) remains blocked.
 
 **Roadmap and sequence:** [F. Release-First Principal Graphics Roadmap](../Strategy/Roadmap.md)
 
