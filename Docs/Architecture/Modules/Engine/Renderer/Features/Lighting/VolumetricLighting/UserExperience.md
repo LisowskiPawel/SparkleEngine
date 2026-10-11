@@ -1,12 +1,12 @@
 # Volumetric Lighting, Fog, Atmosphere, And Sky User Experience Contract
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](VolumetricLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target experience only; current capability remains absent and production work remains blocked by `REL-11` and `VOL-D0`
 
 **Responsibility:** define authoring, selection, first use, diagnosis, capture, failure, automation, and accessibility for the admitted volumetric tiers
 
-**Authority boundary:** the [dossier](README.md) owns acceptance; [Transport And Composition](TransportAndComposition.md) owns physical/result meaning; [Execution Architecture](ExecutionArchitecture.md) owns runtime/content truth; [Discovery](Discovery.md) ratifies product choices; [Plan](Plan.md) owns delivery order
+**Authority boundary:** the [dossier](VolumetricLightingDesign.md) owns acceptance; [Transport And Composition](TransportAndComposition.md) owns physical/result meaning; [Execution Architecture](ExecutionArchitecture.md) owns runtime/content truth; [Discovery](Discovery.md) ratifies product choices; [Plan](ImplementationPlan.md) owns delivery order
 
 ## Experience Principles
 

@@ -1,6 +1,6 @@
 # Renderer Shader Runtime
 
-[Docs](../../../../../../README.md) / [Up](../README.md)
+[Docs](../../../../../../README.md) / [Up](../RendererFeatureGuide.md)
 
 **Status:** Renderer feature-family index
 
@@ -36,7 +36,7 @@ flowchart LR
 | [Shader Program Catalog](ShaderProgramCatalog.md) | exact registered program, source, entry, stage, target, and declared-metadata membership |
 | [Pipeline Materialization And Typed Binding](PipelineMaterializationAndTypedBinding.md) | runtime ABI validation, complete pipeline identity, typed binding, cache behavior, generation activation, and retirement |
 
-The catalog proves membership only. Runtime materialization owns readiness and use; it cannot infer a usable pipeline from a catalog row. The parent [Renderer Feature Dossiers](../README.md) index owns capability routing.
+The catalog proves membership only. Runtime materialization owns readiness and use; it cannot infer a usable pipeline from a catalog row. The parent [Renderer Feature Dossiers](../RendererFeatureGuide.md) index owns capability routing.
 
 ## Shared Risks
 

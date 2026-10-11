@@ -1,12 +1,12 @@
 # Chromatic Aberration Research
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ChromaticAberrationDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** research; revision-pinned implementation precedent and product comparison, not SparkleEngine design or proof
 
 **Responsibility:** identify transferable and rejected choices for a bounded real-time lens-fringe effect and its validation
 
-**Authority boundary:** [Discovery](Discovery.md) owns local decisions; [Semantics](Semantics.md) owns accepted equations; [README](README.md) owns scope and acceptance
+**Authority boundary:** [Discovery](Discovery.md) owns local decisions; [Semantics](Semantics.md) owns accepted equations; [README](ChromaticAberrationDesign.md) owns scope and acceptance
 
 **Researched:** 2026-09-10
 

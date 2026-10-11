@@ -47,7 +47,7 @@ The motivation is consistency. A sharp current sample, correct unjittered motion
 | Invalid extent | width or height at most 1 produces zero jitter | no fabricated divide-by-zero sample |
 | Source-only alternatives | 8-sample MSAA, R2, deterministic white noise, and None exist in `TemporalJitterPatterns` | vocabulary/internal callable paths only; no inspected active setting or graph choice selects them |
 
-The source alternatives must not be advertised as user-selectable anti-aliasing modes. The current product path is the Halton sequence only. [Resolution, Sampling, and Anti-Aliasing](../PostProcessing/ReconstructionAndGeneration/README.md#resolution-sampling-and-anti-aliasing) owns how this sampling identity combines with render/output extents, provider resolution, active single-sample attachments, and absent AA modes.
+The source alternatives must not be advertised as user-selectable anti-aliasing modes. The current product path is the Halton sequence only. [Resolution, Sampling, and Anti-Aliasing](../PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#resolution-sampling-and-anti-aliasing) owns how this sampling identity combines with render/output extents, provider resolution, active single-sample attachments, and absent AA modes.
 
 ## Persistent View State And Invalidation
 

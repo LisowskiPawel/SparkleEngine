@@ -1,12 +1,12 @@
 # Reference Path Tracer User Experience Contract
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](ReferencePathTracerDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** Stage-0-frozen development-product experience accepted by `PTD-00-R1 PASS`; Stage-7 menu/progress/action and Stage-9 manual evidence/output source remain **IMPLEMENTED / VALIDATION DEFERRED**, while the current candidate is **BLOCKED FOR FIRST-USE SUCCESS** because Lit and Reference do not yet present usable scene lighting
 
 **Responsibility:** define how a developer, lighting engineer, or technical artist discovers, enters, navigates, observes, compares, resets, pauses, diagnoses, and secondarily exports the Reference Path Tracer
 
-**Authority boundary:** the [feature dossier](README.md) owns binary acceptance and failure verdicts, [Transport And Estimator](TransportAndEstimator.md) owns mathematical meaning, [Execution Architecture](ExecutionArchitecture.md) owns per-view session/state/data ownership, [Discovery](Discovery.md) owns ratification, and the [staged plan](Plan.md) owns implementation order and prompts
+**Authority boundary:** the [feature dossier](ReferencePathTracerDesign.md) owns binary acceptance and failure verdicts, [Transport And Estimator](TransportAndEstimator.md) owns mathematical meaning, [Execution Architecture](ExecutionArchitecture.md) owns per-view session/state/data ownership, [Discovery](Discovery.md) owns ratification, and the [staged plan](ImplementationPlan.md) owns implementation order and prompts
 
 **Prepared:** source and owner-run first-use state reconciled 2026-09-26 against committed `master` revision `abe538470fe4e3a3cc5b454f1c5aa54bbd888b60`; current D3D12 observations are manual and do not substitute for retained interaction, artifact, accessibility, package, or clean-machine evidence
 
@@ -28,7 +28,7 @@ Delivery and review follow this strict order:
 3. **P2 — minimum acceptance evidence:** raw readback, immutable identity/provenance, statistical comparison, and explicit failure results exist only as needed to falsify correctness and retain completion evidence.
 4. **P3 — secondary artifact workflows:** polished manual save, checkpoint, and path management follow the usable viewport slice. They reuse its session and never become a prerequisite for ordinary comparison.
 
-P0 does not lower the mathematical bar: a responsive but physically wrong view is not usable. Conversely, artifact plumbing cannot be counted as progress toward the primary product while the live view is hidden, frozen during navigation, slow to reflect a new camera, unable to explain resets, or unsafe to compare with Lit. Final oracle authority still requires the evidence gates in the [feature dossier](README.md); this ordering controls implementation priority, not acceptance dilution.
+P0 does not lower the mathematical bar: a responsive but physically wrong view is not usable. Conversely, artifact plumbing cannot be counted as progress toward the primary product while the live view is hidden, frozen during navigation, slow to reflect a new camera, unable to explain resets, or unsafe to compare with Lit. Final oracle authority still requires the evidence gates in the [feature dossier](ReferencePathTracerDesign.md); this ordering controls implementation priority, not acceptance dilution.
 
 ## Frozen Defaults And Operational Budgets
 
@@ -341,13 +341,13 @@ The next UX evidence run begins only after both lighting routes produce visibly 
 The normal user action remains small: open a supported level, select **Reference Path Tracer** immediately after Lit, move the camera, stop, and watch the current view refine. The observation to retain is larger than a screenshot because target progress and an attractive preview are not radiance validity.
 
 1. Record the exact executable/cooked-content identity, backend, level, viewport extent, and camera. If cooking or launch is blocked by Windows application control, stop at that host prerequisite; do not call it a Renderer failure or report a GPU result.
-2. Compare **GBuffer Diffuse**, **GBuffer World Normal**, one direct-light lobe, **Lit**, and **Reference Path Tracer** at that unchanged camera. If a GBuffer view looks correct while all scene-linear lighting views are dark, record the distinction; do not infer that the Reference estimator itself is broken or correct. The [recovery decision table](Plan.md#current-recovery-and-completion-route---2026-09-26) assigns the next product boundary to inspect.
+2. Compare **GBuffer Diffuse**, **GBuffer World Normal**, one direct-light lobe, **Lit**, and **Reference Path Tracer** at that unchanged camera. If a GBuffer view looks correct while all scene-linear lighting views are dark, record the distinction; do not infer that the Reference estimator itself is broken or correct. The [recovery decision table](ImplementationPlan.md#current-recovery-and-completion-route---2026-09-26) assigns the next product boundary to inspect.
 3. In Reference, require a finite, nontrivial surface image **as well as** an increasing `committed / target SPP` value. A sky-only image, rising counter, or `Complete` label is not first-use success. The current [invalid-sample gap](TransportAndEstimator.md#current-invalid-sample-and-claim-gap) makes this distinction especially important.
 4. Translate and rotate the camera, then stop. Record whether the displayed prefix is discarded before the new view commits and whether the reset reason matches the effective camera change. Repeat a scene/material/light edit and a presentation-only exposure edit: the former must reset transport; the latter must not.
 5. Switch Reference -> Lit -> Reference without changing inputs. Record either a disclosed exact-identity retained prefix or an explicit retention release and restart at zero. Exercise Pause, Resume, Restart, resize, second-view capacity, and close on the same candidate. A completed target is not statistical convergence.
 6. Only after the live loop works, save a current or completed **raw radiance** prefix through the existing manual Evidence/Output action. Check finite float channels, sample identity/count, and artifact round trip separately from `FinalColorLdr`. Do not treat a save button, a file's existence, or an encoded screenshot as the oracle result.
 
-This is a manual review sequence, not new automation or an extra renderer UI. The frozen [state/action contract](#view-session-state-and-dominant-action) remains the authority for labels and actions; the [feature acceptance contract](README.md#acceptance-criteria) owns the pass/fail criteria.
+This is a manual review sequence, not new automation or an extra renderer UI. The frozen [state/action contract](#view-session-state-and-dominant-action) remains the authority for labels and actions; the [feature acceptance contract](ReferencePathTracerDesign.md#acceptance-criteria) owns the pass/fail criteria.
 
 ## Professional Defaults And Guardrails
 
@@ -422,7 +422,7 @@ The complete workflow is ready for `FCR-REN-08` consideration only when the prim
 11. `CHK-RPT-10` proves every display/save/open/compare action keeps raw and presentation lineage separate; and
 12. full-resolution manual raw save, locale, spaces, non-ASCII, read-only install, support, and output discovery pass their declared evidence matrices.
 
-This page defines the intended experience; the [feature dossier](README.md#acceptance-criteria) and signed `FCR-REN-08` report own the eventual verdict.
+This page defines the intended experience; the [feature dossier](ReferencePathTracerDesign.md#acceptance-criteria) and signed `FCR-REN-08` report own the eventual verdict.
 
 ## Sources And Precedent
 

@@ -1,6 +1,6 @@
 # External Capture Discovery Gate
 
-[Docs](../../../../README.md) / [Up](README.md)
+[Docs](../../../../README.md) / [Up](ExternalCaptureDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target architecture decision gate; source decisions recorded, installed-provider gates open
 
@@ -8,13 +8,13 @@
 
 **Prepared:** 2026-10-06 at `82528cbe5edbcf729464fbefe6998435730920eb`, initially clean.
 
-**Authority boundary:** [Research](Research.md) supplies precedent; this gate validates decisions/environment; [Plan](Plan.md) owns delivery order. Documentation alone does not pass this gate.
+**Authority boundary:** [Research](Research.md) supplies precedent; this gate validates decisions/environment; [Plan](ImplementationPlan.md) owns delivery order. Documentation alone does not pass this gate.
 
-**Current source:** existing Editor capture routes and the independent engine repairs are delivered; provider-wide candidate acceptance remains open. The [remaining plan](Plan.md) selects only unresolved discovery, production deltas and evidence. Historical native SDK observations do not close aggregate acceptance.
+**Current source:** existing Editor capture routes and the independent engine repairs are delivered; provider-wide candidate acceptance remains open. The [remaining plan](ImplementationPlan.md) selects only unresolved discovery, production deltas and evidence. Historical native SDK observations do not close aggregate acceptance.
 
 ## Read This Page
 
-- **Understand the current startup choice:** [Final startup and Launcher contract](#final-startup-selection-and-launcher-contract---2026-10-10); the [dossier](README.md) owns current behavior and limitations.
+- **Understand the current startup choice:** [Final startup and Launcher contract](#final-startup-selection-and-launcher-contract---2026-10-10); the [dossier](ExternalCaptureDesign.md) owns current behavior and limitations.
 - **Inspect native evidence:** [Installed-tool results](#installed-tool-workflow-results) and the dated stage records below. Read their candidate and unrun limits.
 - **Find a required decision:** [Gate rows](#gate-rows-and-required-artifacts) and [established decisions](#decisions-established-by-this-package).
 
@@ -144,7 +144,7 @@ Each row records candidate revision/dirty fingerprint, owner, exact command or w
 | `EC-D05` provider adapter owner | Inspect installed SDK attachment, native-busy, completion, cancel, artifact and open APIs. Compile a disposable local probe only if header/manual inspection is insufficient. | Actual completion/quiescence protocol for the chosen cell, including PIX scheduled-call versus finalized-file distinction and NGFX header/manual mismatch resolution. No native signal means blocked programmatic acceptance, with tool-managed route documented honestly. |
 | `EC-D06` build/package integrator | Resolve exact configuration-specific SDK/source/dependency exclusion and license-notice route. Inspect canonical output and user-state contracts. | Development can build/run no-provider without external tools; Shipping has no optional capture imports/assets/state/callsite. Stage 1 declares smallest build and package audit. |
 | `EC-D07` capture owner + code reviewer | Freeze integration file allowlist, neutral public delta, clone/copy inventory and dependency audit using architecture hook table. Review target/terminal/late-callback failure cases. | `CHK-EC-ARCH` check card is actionable; no orphan public facade or provider-specific generic state. Independent reviewer signoff is required before final adoption; not claimed in this preparation. |
-| `EC-D08` evidence owner | Freeze Sponza/Empty settings, readiness, identities, negative controls, observer runs, native-feature/interposer matrix and result destination. | Exact check cards for [AC-EC](README.md#acceptance-and-check-contract); external readiness depends only on relevant capture facts, not unimplemented internal metric definitions. |
+| `EC-D08` evidence owner | Freeze Sponza/Empty settings, readiness, identities, negative controls, observer runs, native-feature/interposer matrix and result destination. | Exact check cards for [AC-EC](ExternalCaptureDesign.md#acceptance-and-check-contract); external readiness depends only on relevant capture facts, not unimplemented internal metric definitions. |
 | `EC-D09` engine owners + code reviewer | Revalidate [E01–E11](Research.md#engine-absorption-scan--2026-10-07); freeze Q01–Q07 API, exact producer/consumer/file/deletion ledger, launch precedence and error policy, admission outcomes/sequence/rollback semantics, publication identity/copy bounds, and the smallest affected target/runtime oracle. Classify each finding as prerequisite repair, provider-slice hook, preserved seam, separate workstream or already resolved with equivalent proof. | Stages 0A/0B/0C have concrete existing consumers and independent no-capturer exits; changes do not smuggle in unrelated engine cleanup. Record admission Full/Closed versus Busy/native acceptance, shutdown progress, publication interleaving and actual second-provider locality checks. Stage 1 requires all three engine gates in addition to provider discovery. |
 
 `EC-D0-PIX` closes when all nine rows have the PIX-relevant disposition and artifacts. `EC-D0-NG-D3D12`, `EC-D0-NG-VK`, `EC-D0-RD-D3D12`, and `EC-D0-RD-VK` close each cell's delta before its adapter stage. A missing later SDK does not block delivery of accepted PIX. It does block claiming the complete parent `P1-GATE`.

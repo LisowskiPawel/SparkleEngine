@@ -1,12 +1,12 @@
 # External Capture Execution Architecture
 
-[Docs](../../../../README.md) / [Up](README.md)
+[Docs](../../../../README.md) / [Up](ExternalCaptureDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target architecture; source-backed responsibility decisions, pending installed-provider discovery gates
 
 **Scope:** one external-capture lifecycle through process bootstrap, Renderer control/read state, native diagnostics lowering, and Editor/Launcher consumers.
 
-**Authority boundary:** [Semantics](Semantics.md) owns protocol; [User Experience](UserExperience.md) owns interaction; [Plan](Plan.md) owns sequence; [Research](Research.md) owns dated current findings.
+**Authority boundary:** [Semantics](Semantics.md) owns protocol; [User Experience](UserExperience.md) owns interaction; [Plan](ImplementationPlan.md) owns sequence; [Research](Research.md) owns dated current findings.
 
 **Current readiness:** implemented Editor launch/button route with scoped native D3D12 results; provider-wide lifecycle, matrix, Shipping product and adoption acceptance remain open. The parent readiness projection is unchanged.
 
@@ -69,7 +69,7 @@ The stage ledger distinguishes a shared engine repair from a capture hook; neith
 
 ## Engine Evolution Contract
 
-**Implementation update - 2026-10-08:** the existing-consumer Q01/Q02 startup/events and Q03 queue admission repairs are implemented. [Stage 0B handoff](Discovery.md#stage-0b-implementation-handoff---2026-10-08) records the producer/consumer/lock/identity/deletion budget and scoped controls. [Stage 0C handoff](Discovery.md#stage-0c-implementation-handoff---2026-10-08) records implemented Q04: one 600-byte fixed viewport observation, monotonic independent publication sequence, migrated consumers and removal of the independent public getters/caches. The Editor native route is now implemented; wider lifecycle, Game, Nsight Vulkan and aggregate acceptance remain in the [remaining plan](Plan.md).
+**Implementation update - 2026-10-08:** the existing-consumer Q01/Q02 startup/events and Q03 queue admission repairs are implemented. [Stage 0B handoff](Discovery.md#stage-0b-implementation-handoff---2026-10-08) records the producer/consumer/lock/identity/deletion budget and scoped controls. [Stage 0C handoff](Discovery.md#stage-0c-implementation-handoff---2026-10-08) records implemented Q04: one 600-byte fixed viewport observation, monotonic independent publication sequence, migrated consumers and removal of the independent public getters/caches. The Editor native route is now implemented; wider lifecycle, Game, Nsight Vulkan and aggregate acceptance remain in the [remaining plan](ImplementationPlan.md).
 
 The [dated absorption scan](Research.md#engine-absorption-scan--2026-10-07) identifies the existing responsibilities that must improve as this feature lands. Shared engine mechanism stays with its existing owner; capture policy stays within the feature envelope. Preparatory stages must have an existing consumer and an independently observable benefit before a capturer is added. They cannot create dormant extensibility scaffolding.
 
@@ -83,7 +83,7 @@ The [dated absorption scan](Research.md#engine-absorption-scan--2026-10-07) iden
 | `EC-Q06` composed clients | Existing Application/UI/Launcher routes adapt neutral intent/read state; a focused capture presenter owns formatting and interaction. Provider compatibility and terminal state are read from the authority. | No per-provider callbacks spread through UI/Host services, no presenter polling native SDKs, no provider process executor beside LevelRun operations. UI composition remains bounded and unrelated panels/services are preserved. |
 | `EC-Q07` configuration ownership | Owning CMake target explicitly separates optional capture/event source/dependency membership from broad private globs for eligible profiles. Use existing build-profile/package/user-state authority. | Shipping has neither optional sources/calls nor staged runtime/dependencies. No all-module provider flags, duplicate profile catalog, private dependency accidentally made PUBLIC, or global source-glob rewrite. |
 
-`EC-D09` freezes the exact API/file/deletion deltas and invalidates this target if live source already solves a finding. Such a prerequisite closes through retained equivalent proof, not an empty new abstraction. [CHK-EC-EVOLUTION](README.md#executable-check-cards-to-freeze-before-implementation) verifies engine benefits without capture. `CHK-EC-LOCALITY` verifies the real second-provider change rather than an imagined fourth-provider framework. Neither a file count nor shorter functions is sufficient: state authority, dependency direction, failure settlement and production consumers must improve or be preserved.
+`EC-D09` freezes the exact API/file/deletion deltas and invalidates this target if live source already solves a finding. Such a prerequisite closes through retained equivalent proof, not an empty new abstraction. [CHK-EC-EVOLUTION](ExternalCaptureDesign.md#executable-check-cards-to-freeze-before-implementation) verifies engine benefits without capture. `CHK-EC-LOCALITY` verifies the real second-provider change rather than an imagined fourth-provider framework. Neither a file count nor shorter functions is sufficient: state authority, dependency direction, failure settlement and production consumers must improve or be preserved.
 
 ### Change Locality And Responsibility Rules
 
@@ -142,7 +142,7 @@ Debug profiles support correctness investigation; optimized DevelopmentEditor/Ga
 
 Development products stage only licensed event runtime/header support actually required by selected built adapters. PIX/Nsight/RenderDoc GUI/capture installations remain external prerequisites unless discovery records explicit redistribution permission. Pin external package/header hashes in executable configuration, use canonical dependency/artifact locations, and carry notices. Validate absolute installation paths; do not load an arbitrary same-named DLL from the working directory. Paths with spaces/Unicode use native API conventions. Never create repository-local captures or output-path environment escapes.
 
-Reuse [Shader System](../../ShaderSystem/README.md) provenance: exact CPU binary/PDB and active shader/code/cook hashes plus optimized symbol-bearing analysis artifacts. Source-debug shader compilation is an explicitly different observer product; do not recook all shaders merely to enable a capture button. If exact symbols cannot be resolved, capture remains a frame/state artifact with `SymbolsUnavailable`; source-correlation acceptance remains blocked.
+Reuse [Shader System](../../ShaderSystem/ShaderSystemDesign.md) provenance: exact CPU binary/PDB and active shader/code/cook hashes plus optimized symbol-bearing analysis artifacts. Source-debug shader compilation is an explicitly different observer product; do not recook all shaders merely to enable a capture button. If exact symbols cannot be resolved, capture remains a frame/state artifact with `SymbolsUnavailable`; source-correlation acceptance remains blocked.
 
 ## Clean Break And Refinement
 

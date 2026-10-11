@@ -1,6 +1,6 @@
 # Project Architecture
 
-[Docs](../../../README.md) / [Up](../README.md)
+[Docs](../../../README.md) / [Up](../ModuleInventory.md)
 
 **Status:** Projects module index
 
@@ -24,6 +24,6 @@ The repository currently has one discovered product project, Showcase. Its thin 
 
 | Project | Owns | Project documentation |
 | --- | --- | --- |
-| Showcase | editor/game targets, startup and selection, level catalog, asset-pack readiness, and workload coverage | [Showcase](Showcase/README.md) |
+| Showcase | editor/game targets, startup and selection, level catalog, asset-pack readiness, and workload coverage | [Showcase](Showcase/ShowcaseCapabilities.md) |
 
 Reusable implementation policy belongs with the relevant Engine or Tools module; completion criteria belong in [Acceptance](../../../Acceptance/README.md).

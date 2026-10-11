@@ -1,6 +1,6 @@
 # Tools Module Architecture
 
-[Docs](../../../README.md) / [Up](../README.md)
+[Docs](../../../README.md) / [Up](../ModuleInventory.md)
 
 **Status:** Tools module index
 
@@ -31,11 +31,11 @@ Tools transform or orchestrate offline products. They do not become runtime sema
 
 | Module | Owns | Module documentation |
 | --- | --- | --- |
-| Cooking | project, scene, mesh, material, texture, and animation cooking | [Cooking](Cooking/README.md) |
-| Launcher | discovery, readiness, configure/build/cook/acquire/run/clean workflows, cancellation, and handoff | [Launcher](Launcher/README.md) |
-| ShaderCompiler | shader compilation, validation, publication, recook, and runtime delivery contracts | [ShaderCompiler](ShaderCompiler/README.md) |
-| SourceImporters | source-format ingestion, transforms, materials, animation, validation, and known losses | [SourceImporters](SourceImporters/README.md) |
-| ToolSupport | shared command-line presentation and progress contracts used by tools | [ToolSupport](ToolSupport/README.md) |
+| Cooking | project, scene, mesh, material, texture, and animation cooking | [Cooking](Cooking/CookingCapabilities.md) |
+| Launcher | discovery, readiness, configure/build/cook/acquire/run/clean workflows, cancellation, and handoff | [Launcher](Launcher/LauncherCapabilities.md) |
+| ShaderCompiler | shader compilation, validation, publication, recook, and runtime delivery contracts | [ShaderCompiler](ShaderCompiler/ShaderCompilerCapabilities.md) |
+| SourceImporters | source-format ingestion, transforms, materials, animation, validation, and known losses | [SourceImporters](SourceImporters/SourceImportersCapabilities.md) |
+| ToolSupport | shared command-line presentation and progress contracts used by tools | [ToolSupport](ToolSupport/ToolSupportCapabilities.md) |
 
 **Cross-tool target capability:** [Python Automation And Analysis](PythonAutomationAndAnalysis.md) records the current narrow script boundary and the contract required before reusable Python automation, analysis, bindings, or embedded scripting can be claimed.
 

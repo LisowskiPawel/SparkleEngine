@@ -1,14 +1,14 @@
 # Geometry Cache Animation — Acceptance
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](GeometryCacheAnimationDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** feature-local acceptance contract; not proof that geometry-cache animation has passed
 
 **Scope:** feature-local verification matrix, controlled failures, and completion gates for geometry-cache animation
 
-**Feature architecture:** [Geometry Cache Animation Pipeline](README.md)
+**Feature architecture:** [Geometry Cache Animation Pipeline](GeometryCacheAnimationDesign.md)
 
-**Delivery authority:** [Geometry Cache Animation Delivery Plan](Plan.md)
+**Delivery authority:** [Geometry Cache Animation Delivery Plan](ImplementationPlan.md)
 
 **Release/workload orchestration:** [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md)
 

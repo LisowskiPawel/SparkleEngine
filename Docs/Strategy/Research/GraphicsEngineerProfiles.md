@@ -143,7 +143,7 @@ No inspected source establishes `Expert` as a universal NVIDIA rank. Here it mea
 | Transfer | Another developer can use the documented result. | Explain difficult internals and diagnose an adopter's failure. | Repeated external adoption/review, decision influence, stewardship and teaching with genuine feedback. |
 | Scope honesty | Identify tested APIs, hardware and failures. | Separate algorithm, compiler, driver and architecture effects. | Make reviewable support and investment decisions without inflating breadth or concealing missing evidence. |
 
-The [public engineer study](GraphicsEngineerProfiles.md) supplies examples of these behaviors. Titles, degrees, years, repository stars and paper counts are not repository acceptance thresholds. No feature count can turn self-authored work into evidence of managing organizational risk or developing other engineers.
+The [public engineer study]() supplies examples of these behaviors. Titles, degrees, years, repository stars and paper counts are not repository acceptance thresholds. No feature count can turn self-authored work into evidence of managing organizational risk or developing other engineers.
 
 ### Portfolio Review Questions
 
@@ -174,7 +174,7 @@ For a compiler-specialist claim, new GPU-driven pipeline or research publication
 
 **Owner:** Strategy research. The [supplied source archive](../RoleSources.md) remains unchanged in meaning; [Requirements](../Requirements.md) owns capability targets.
 
-**Expanded engineering study:** [role-family and level depth](#graphics-role-depth-and-evidence), [verified public engineer examples](GraphicsEngineerProfiles.md) and [twenty actionable source cards](RenderingReferenceExamples.md). The study distinguishes current publisher descriptions, historical affiliations, explicit former employees and uncertain identities. The original cross-employer study below remains useful; the expansion gives precise code/publication locations and existing delivery consumers.
+**Expanded engineering study:** [role-family and level depth](#graphics-role-depth-and-evidence), [verified public engineer examples]() and [twenty actionable source cards](RenderingReferenceExamples.md). The study distinguishes current publisher descriptions, historical affiliations, explicit former employees and uncertain identities. The original cross-employer study below remains useful; the expansion gives precise code/publication locations and existing delivery consumers.
 
 ### Employer Evidence
 

@@ -1,12 +1,12 @@
 # Reference Path Tracer Execution Architecture
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](ReferencePathTracerDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** Stage-0-frozen target architecture accepted by `PTD-00-R1 PASS`; source delivery through Stage 9 remains **IMPLEMENTED / VALIDATION DEFERRED** and structurally aligned, while usable rendering and Reference authority are blocked by the current black-lighting result and the retained executable evidence backlog
 
 **Scope:** define the owner, contracts, lifetime, execution, sampling, accumulation, viewport interaction, manual artifact, and clean-break boundaries for SparkleEngine's eventual Reference Path Tracer
 
-**Authority boundary:** [Transport And Estimator](TransportAndEstimator.md) owns equations and estimator semantics, [User Experience](UserExperience.md) owns the viewport/runtime/manual-export experience, [Discovery](Discovery.md) owns ratification, the [feature dossier](README.md) owns acceptance, and the [staged plan](Plan.md) owns delivery order
+**Authority boundary:** [Transport And Estimator](TransportAndEstimator.md) owns equations and estimator semantics, [User Experience](UserExperience.md) owns the viewport/runtime/manual-export experience, [Discovery](Discovery.md) owns ratification, the [feature dossier](ReferencePathTracerDesign.md) owns acceptance, and the [staged plan](ImplementationPlan.md) owns delivery order
 
 **Verified:** architecture and live ownership re-audited 2026-09-26 against committed `master` revision `abe538470fe4e3a3cc5b454f1c5aa54bbd888b60`; source-shape conclusions are inspection evidence, while the D3D12 observations are manual owner-run evidence only
 
@@ -25,7 +25,7 @@ The target is one bounded, restartable **per-view reference session** selected b
 > [!IMPORTANT]
 > **Current state:** `PTD-01-R2 PASS` established selector order and the obsolete-route/generated-product clean break under `CHK-RPT-17`. Stages 3-6 later established source-present GPU transport, identity, and accumulation. The 2026-09-15 one-mode clean break superseded the proposed target/show-flag split. Stage 7 exposes that single mode and its minimum operational progress/actions through the ordinary viewport boundary. Stage 8 adds Inline/Pipeline adapters over one kernel, one automatic shared frontend policy, and shared scene-trace mechanics. Stage 9 adds manual raw artifact capture without another renderer or RHI capture route. D3D12 has since reached the mode and live progress, but the current black-lighting result prevents usable-output, artifact-integrity, estimator-correctness, and parity claims.
 >
-> **Gate:** Stage 1 implementation may begin only after the [discovery contract](Discovery.md) records `PTD-00 PASS` and the [delivery plan](Plan.md) names that exact report revision.
+> **Gate:** Stage 1 implementation may begin only after the [discovery contract](Discovery.md) records `PTD-00 PASS` and the [delivery plan](ImplementationPlan.md) names that exact report revision.
 >
 > **Naming rule:** Until `FCR-REN-08` passes, current output remains a **candidate comparison**. Neither a UI label nor an artifact may call it unbiased, ground truth, or an accepted reference.
 
@@ -75,7 +75,7 @@ This is a code-inspected map at the document's verified revision, not a successf
 | Human-visible result | The Lit `SceneColor` continues through the common exposure, applicable scene visualization/denoising, configured upscaler, and presentation route. | The Reference `SceneColor` is a derivative of `CommittedMean`; it continues through the same high-level tail, but Reference bypasses ReSTIR reconstruction and uses the color-only Linear resolve at output extent. | `FinalColorLdr` is for display. It is not a radiance oracle or a substitute for `Radiance` readback. |
 | Cross-frame lifetime | Lit history belongs to the existing real-time consumers. | `ReferencePathTracerSession` owns identity, one allocation, row work, GPU-submission-token commit, prefix count, pause/suspend, and retention. | `FramePipeline` holds the feature owner and forwards only required preparation/submission hooks; no second frame loop exists. |
 
-The immediate visual observation has limited reach. A populated **GBuffer Diffuse** image establishes that some geometry/material attributes can be rendered and presented through a display-linear diagnostic route. It does **not** prove geometric/shading normals, light publication, shadow visibility, the scene-linear HDR presentation route, or Reference hit/material reconstruction. A visible sky establishes that some nonzero radiance can reach presentation, not that surface lighting or all HDR values are correct. Read [the recovery decision table](Plan.md#current-recovery-and-completion-route---2026-09-26) before choosing the repair owner.
+The immediate visual observation has limited reach. A populated **GBuffer Diffuse** image establishes that some geometry/material attributes can be rendered and presented through a display-linear diagnostic route. It does **not** prove geometric/shading normals, light publication, shadow visibility, the scene-linear HDR presentation route, or Reference hit/material reconstruction. A visible sky establishes that some nonzero radiance can reach presentation, not that surface lighting or all HDR values are correct. Read [the recovery decision table](ImplementationPlan.md#current-recovery-and-completion-route---2026-09-26) before choosing the repair owner.
 
 The source also exposes a contract gap that cannot be closed by presentation alone: `ReferencePathTracerTransport.hlsli` returns a NaN marker for an invalid reconstructed hit or exceeded safety depth; `ReferencePathTracerKernel.hlsli` feeds that value to `PathAccumulation::AddSample`; `ReferencePathTracerSession::CompletePendingCommit` advances the count when the GPU submission completes, with no validity result from that sample. `ImageEncoding::DecodeLinearRgb` later rejects non-finite RGB during manual artifact encoding. Thus **committed prefix currently means completed GPU work, not proven-valid radiance**. The accepted [mathematical failure contract](TransportAndEstimator.md#current-invalid-sample-and-claim-gap) requires an invalid sample to become a session/result failure before it can be labeled Complete or exported as a valid prefix. This is an identified source-to-contract gap, not a verified explanation of the black image.
 
@@ -90,7 +90,7 @@ The source also exposes a contract gap that cannot be closed by presentation alo
 | Identity | `ReferencePathTracerSampler` derives stateless session/pixel/sample/dimension identities independent of presentation frame index and scheduling. | Prove repeat, prefix, reorder, interruption, backend, and resume behavior through `CHK-RPT-07`. |
 | State | `ReferencePathTracerSession` owns exact committed/target prefix, reasoned identity invalidation, suspension/retention, bounded ownership, actions, and GPU-resource retirement. | Prove every lifecycle transition, response bound, reset/non-reset class, overflow, resize, checkpoint, and host-equivalence case. |
 | Output | Lit alone composites its lighting lobes and adds the Lit sky in its middle; Reference derives `SceneColor` from its committed mean and publishes generic `Radiance`/M2 before the common exposure and presentation tail. | Prove Reference's raw prefix is finite and valid, then prove raw-to-preview lineage. Do not mistake the Lit composite/sky passes or its reconstruction for common Reference work. |
-| Authority | Useful source-present candidate; no numerical or runtime oracle proof. | Authority is earned only by the [feature acceptance contract](README.md#acceptance-criteria) and retained `FCR-REN-08` evidence. |
+| Authority | Useful source-present candidate; no numerical or runtime oracle proof. | Authority is earned only by the [feature acceptance contract](ReferencePathTracerDesign.md#acceptance-criteria) and retained `FCR-REN-08` evidence. |
 
 The selector clean break is implemented in source; the remaining completion work is validity, observable behavior, and evidence. The old Lighting selector/frame-history estimator must not return as a second reference producer. The viewport mode selects the one Reference semantic directly; it does not mutate persistent Lit settings behind the user's back.
 
@@ -235,7 +235,7 @@ These are the only pre-authorized steady-state hooks. Every other outside-featur
 - a generic feature manager, plugin registry, open-ended recipe registry, service locator, callback collection, or job service introduced for this mode; and
 - a “thin facade” whose callers still manipulate feature internals.
 
-Every implementation stage runs [the architecture-fitness check](README.md#required-checks-and-external-reference-use) and retains an exact outside-feature hook ledger. A successful build, small files, or a clean formatter result cannot pass feature enclosure.
+Every implementation stage runs [the architecture-fitness check](ReferencePathTracerDesign.md#required-checks-and-external-reference-use) and retains an exact outside-feature hook ledger. A successful build, small files, or a clean formatter result cannot pass feature enclosure.
 
 ## Intended Source Shape
 
@@ -528,7 +528,7 @@ The feature is excluded from `ShippingEditor`, `ShippingGame`, and consumer firs
 | Corrupt or mismatched checkpoint | Reject without partial import, identify the first identity/hash mismatch, and offer a clean session restart. |
 | Backend disagreement or native validation output | Mark evidence `Blocked`/`Inconclusive`; do not average, threshold-tune, or silently prefer one backend. |
 
-These behaviors refine [the runtime failure ledger](README.md#runtime-failure-modes); the ledger, not this page, owns acceptance results.
+These behaviors refine [the runtime failure ledger](ReferencePathTracerDesign.md#runtime-failure-modes); the ledger, not this page, owns acceptance results.
 
 ## Clean-Break Migration
 
@@ -599,11 +599,11 @@ This document selects a target shape, not an implementation or verdict. Its sour
 
 Use:
 
-- [Feature dossier and acceptance](README.md) for `RPT-FS-*`, `AC-RPT-*`, `FM-RPT-*`, `CHK-RPT-*`, and definition of done;
+- [Feature dossier and acceptance](ReferencePathTracerDesign.md) for `RPT-FS-*`, `AC-RPT-*`, `FM-RPT-*`, `CHK-RPT-*`, and definition of done;
 - [Discovery contract](Discovery.md) for the `PTD-00` gate and evidence package;
 - [Transport And Estimator](TransportAndEstimator.md) for notation, formulas, core algorithm, PBR decisions, and mathematical failure points;
 - [User Experience](UserExperience.md) for viewport/runtime interaction, view-mode placement, camera invalidation, Lit comparison, defaults, state actions, error presentation, manual artifacts, accessibility, and first-use proof;
 - [Completion study](Research.md) for NVIDIA/AMD/neutral precedent and current-source gaps;
-- [Staged implementation plan](Plan.md) for dependency order, work packages, deletions, prompts, and exit gates;
+- [Staged implementation plan](ImplementationPlan.md) for dependency order, work packages, deletions, prompts, and exit gates;
 - [Ray Tracing Execution Architecture](../../RayTracing/ExecutionArchitecture.md) for shared semantic-effect and frontend policy;
 - [Validation And Evidence](../../../../../../../Engineering/Verification/ValidationAndEvidence.md) for check design and claim-driven escalation.

@@ -1,6 +1,6 @@
 # Editor Icon Assets And Service
 
-[Docs](../../../../README.md) / [Up](README.md)
+[Docs](../../../../README.md) / [Up](EditorCapabilities.md)
 
 **Status:** implemented path; bounded DevelopmentEditor validation recorded in the [handoff](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/Discovery.md#shared-editor-icon-service-handoff)
 

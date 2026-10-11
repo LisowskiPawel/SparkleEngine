@@ -1,6 +1,6 @@
 # Packaging And Installation
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](BuildAndPackagingCapabilities.md)
 
 **Status:** package contract and current implementation route; consumer package acceptance remains blocked
 
@@ -157,7 +157,7 @@ Selected source and cooked content live under `%LOCALAPPDATA%/SparkleEngine/Cont
 
 ### Reviewed Package Inputs
 
-The [package owner](PackagingAndInstallation.md#current-package-entry) consumes a reviewed JSON input file. Keep it outside the source snapshot, under ignored release evidence. CMake generates exact product paths under `build/private/release-products/<configuration>.json`; package membership is not inferred from development directories.
+The [package owner](#current-package-entry) consumes a reviewed JSON input file. Keep it outside the source snapshot, under ignored release evidence. CMake generates exact product paths under `build/private/release-products/<configuration>.json`; package membership is not inferred from development directories.
 
 | Input field | Required meaning |
 | --- | --- |

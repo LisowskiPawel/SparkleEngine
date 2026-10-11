@@ -6,7 +6,7 @@
 
 **Responsibility:** give every existing module inventory row one release classification and an owning module, then split compound user surfaces explicitly
 
-**Parent decisions:** [Release Scope Record](../FirstRelease.md#approved-release-scope). **Requirement authority:** [First Release](../FirstRelease.md). **Source meaning:** [Module inventory](../../Architecture/Modules/README.md).
+**Parent decisions:** [Release Scope Record](../FirstRelease.md#approved-release-scope). **Requirement authority:** [First Release](../FirstRelease.md). **Source meaning:** [Module inventory](../../Architecture/Modules/ModuleInventory.md).
 
 ## Interpretation
 
@@ -20,26 +20,26 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | Module / disposition owner | Rows | Inventory |
 | --- | ---: | --- |
-| Application / Application | 16 | [Inventory](../../Architecture/Modules/Engine/Application/README.md) |
-| Build and packaging / Build/package | 21 | [Inventory](../../Architecture/Modules/BuildAndPackaging/README.md) |
-| Core / Core | 18 | [Inventory](../../Architecture/Modules/Engine/Core/README.md) |
-| Editor / Editor | 24 | [Inventory](../../Architecture/Modules/Engine/Editor/README.md) |
-| Engine assets / Assets/content | 5 | [Inventory](../../Architecture/Modules/Engine/Assets/README.md) |
-| GameFramework / GameFramework | 26 | [Inventory](../../Architecture/Modules/Engine/GameFramework/README.md) |
-| Launcher / Launcher | 22 | [Inventory](../../Architecture/Modules/Tools/Launcher/README.md) |
-| Cooking / Cooking | 22 | [Inventory](../../Architecture/Modules/Tools/Cooking/README.md) |
-| Platform / Platform | 13 | [Inventory](../../Architecture/Modules/Engine/Platform/README.md) |
+| Application / Application | 16 | [Inventory](../../Architecture/Modules/Engine/Application/ApplicationCapabilities.md) |
+| Build and packaging / Build/package | 21 | [Inventory](../../Architecture/Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md) |
+| Core / Core | 18 | [Inventory](../../Architecture/Modules/Engine/Core/CoreCapabilities.md) |
+| Editor / Editor | 24 | [Inventory](../../Architecture/Modules/Engine/Editor/EditorCapabilities.md) |
+| Engine assets / Assets/content | 5 | [Inventory](../../Architecture/Modules/Engine/Assets/AssetsCapabilities.md) |
+| GameFramework / GameFramework | 26 | [Inventory](../../Architecture/Modules/Engine/GameFramework/GameFrameworkCapabilities.md) |
+| Launcher / Launcher | 22 | [Inventory](../../Architecture/Modules/Tools/Launcher/LauncherCapabilities.md) |
+| Cooking / Cooking | 22 | [Inventory](../../Architecture/Modules/Tools/Cooking/CookingCapabilities.md) |
+| Platform / Platform | 13 | [Inventory](../../Architecture/Modules/Engine/Platform/PlatformCapabilities.md) |
 | RHI / RHI | 85 | [Inventory](../../Architecture/Modules/Engine/RHI/CapabilityInventory.md) |
 | Renderer / Renderer | 144 | [Inventory](../../Architecture/Modules/Engine/Renderer/CapabilityInventory.md) |
-| ShaderCompiler / ShaderCompiler | 69 | [Inventory](../../Architecture/Modules/Tools/ShaderCompiler/README.md) |
-| Showcase / Showcase | 7 | [Inventory](../../Architecture/Modules/Projects/Showcase/README.md) |
-| SourceImporters / SourceImporters | 19 | [Inventory](../../Architecture/Modules/Tools/SourceImporters/README.md) |
-| Tasks / Tasks | 14 | [Inventory](../../Architecture/Modules/Engine/Tasks/README.md) |
-| ToolSupport / ToolSupport | 7 | [Inventory](../../Architecture/Modules/Tools/ToolSupport/README.md) |
+| ShaderCompiler / ShaderCompiler | 69 | [Inventory](../../Architecture/Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md) |
+| Showcase / Showcase | 7 | [Inventory](../../Architecture/Modules/Projects/Showcase/ShowcaseCapabilities.md) |
+| SourceImporters / SourceImporters | 19 | [Inventory](../../Architecture/Modules/Tools/SourceImporters/SourceImportersCapabilities.md) |
+| Tasks / Tasks | 14 | [Inventory](../../Architecture/Modules/Engine/Tasks/TasksCapabilities.md) |
+| ToolSupport / ToolSupport | 7 | [Inventory](../../Architecture/Modules/Tools/ToolSupport/ToolSupportCapabilities.md) |
 
 ## Application
 
-**Single row owner:** Application. [Existing source scope and limits](../../Architecture/Modules/Engine/Application/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Application. [Existing source scope and limits](../../Architecture/Modules/Engine/Application/ApplicationCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -62,7 +62,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Build and packaging
 
-**Single row owner:** Build/package. [Existing source scope and limits](../../Architecture/Modules/BuildAndPackaging/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Build/package. [Existing source scope and limits](../../Architecture/Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -90,7 +90,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Core
 
-**Single row owner:** Core. [Existing source scope and limits](../../Architecture/Modules/Engine/Core/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Core. [Existing source scope and limits](../../Architecture/Modules/Engine/Core/CoreCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -115,7 +115,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Editor
 
-**Single row owner:** Editor. [Existing source scope and limits](../../Architecture/Modules/Engine/Editor/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Editor. [Existing source scope and limits](../../Architecture/Modules/Engine/Editor/EditorCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -146,7 +146,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Engine assets
 
-**Single row owner:** Assets/content. [Existing source scope and limits](../../Architecture/Modules/Engine/Assets/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Assets/content. [Existing source scope and limits](../../Architecture/Modules/Engine/Assets/AssetsCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -158,7 +158,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## GameFramework
 
-**Single row owner:** GameFramework. [Existing source scope and limits](../../Architecture/Modules/Engine/GameFramework/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** GameFramework. [Existing source scope and limits](../../Architecture/Modules/Engine/GameFramework/GameFrameworkCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -191,7 +191,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Launcher
 
-**Single row owner:** Launcher. [Existing source scope and limits](../../Architecture/Modules/Tools/Launcher/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Launcher. [Existing source scope and limits](../../Architecture/Modules/Tools/Launcher/LauncherCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -220,7 +220,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Cooking
 
-**Single row owner:** Cooking. [Existing source scope and limits](../../Architecture/Modules/Tools/Cooking/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Cooking. [Existing source scope and limits](../../Architecture/Modules/Tools/Cooking/CookingCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -249,7 +249,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Platform
 
-**Single row owner:** Platform. [Existing source scope and limits](../../Architecture/Modules/Engine/Platform/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Platform. [Existing source scope and limits](../../Architecture/Modules/Engine/Platform/PlatformCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -512,7 +512,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## ShaderCompiler
 
-**Single row owner:** ShaderCompiler. [Existing source scope and limits](../../Architecture/Modules/Tools/ShaderCompiler/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** ShaderCompiler. [Existing source scope and limits](../../Architecture/Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -588,7 +588,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Showcase
 
-**Single row owner:** Showcase. [Existing source scope and limits](../../Architecture/Modules/Projects/Showcase/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Showcase. [Existing source scope and limits](../../Architecture/Modules/Projects/Showcase/ShowcaseCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -602,7 +602,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## SourceImporters
 
-**Single row owner:** SourceImporters. [Existing source scope and limits](../../Architecture/Modules/Tools/SourceImporters/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** SourceImporters. [Existing source scope and limits](../../Architecture/Modules/Tools/SourceImporters/SourceImportersCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -628,7 +628,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## Tasks
 
-**Single row owner:** Tasks. [Existing source scope and limits](../../Architecture/Modules/Engine/Tasks/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** Tasks. [Existing source scope and limits](../../Architecture/Modules/Engine/Tasks/TasksCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
@@ -649,7 +649,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 ## ToolSupport
 
-**Single row owner:** ToolSupport. [Existing source scope and limits](../../Architecture/Modules/Tools/ToolSupport/README.md); the approved scope bounds these rows; technical owners retain their proof obligations.
+**Single row owner:** ToolSupport. [Existing source scope and limits](../../Architecture/Modules/Tools/ToolSupport/ToolSupportCapabilities.md); the approved scope bounds these rows; technical owners retain their proof obligations.
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |

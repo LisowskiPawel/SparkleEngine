@@ -12,7 +12,7 @@
 
 **Horizontal companion:** [Graphics Feature Coverage Matrix](GraphicsCoverageMatrix.md)
 
-**Module inventories:** [RHI](../Modules/Engine/RHI/CapabilityInventory.md), [Renderer](../Modules/Engine/Renderer/CapabilityInventory.md), and [Shader Compilation](../Modules/Tools/ShaderCompiler/README.md)
+**Module inventories:** [RHI](../Modules/Engine/RHI/CapabilityInventory.md), [Renderer](../Modules/Engine/Renderer/CapabilityInventory.md), and [Shader Compilation](../Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md)
 
 Renderer-local frame intent, stage order, resource flow, and design tradeoffs: [Rendering a Sparkle Frame](../Modules/Engine/Renderer/RenderingASparkleFrame.md). This cross-module document owns only the handoffs among GameFramework, Renderer, ShaderCompiler, and RHI.
 
@@ -82,7 +82,7 @@ The native shader-table plan has exactly two current ray types, `Surface` and `S
 
 ReSTIR history invalidates when the prepared-scene invalidation hash changes, when temporal view validity is zero, or when the graph topology changes. The same invalidation also resets image-provider history.
 
-The [Direct Lighting package](../Modules/Engine/Renderer/Features/Lighting/DirectLighting/README.md) owns the direct reservoir/visibility/BRDF result and its replacement plan. The [Indirect Lighting package](../Modules/Engine/Renderer/Features/Lighting/IndirectLighting/README.md) owns the current seed-replay prototype and target path-resampling transport. No Volumetric Lighting stage participates in this trace; its [target and negative capability package](../Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/README.md) records the missing media/atmosphere ownership and post-release delivery gates.
+The [Direct Lighting package](../Modules/Engine/Renderer/Features/Lighting/DirectLighting/DirectLightingDesign.md) owns the direct reservoir/visibility/BRDF result and its replacement plan. The [Indirect Lighting package](../Modules/Engine/Renderer/Features/Lighting/IndirectLighting/IndirectLightingDesign.md) owns the current seed-replay prototype and target path-resampling transport. No Volumetric Lighting stage participates in this trace; its [target and negative capability package](../Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/VolumetricLightingDesign.md) records the missing media/atmosphere ownership and post-release delivery gates.
 
 ## Trace 4: Reference Path Tracer Contract Boundary
 
@@ -119,7 +119,7 @@ The [Direct Lighting package](../Modules/Engine/Renderer/Features/Lighting/Direc
 | Output | Automatic/Linear/sRGB encoding, then copy or product publication | display-linear color -> encoded back buffer or `FinalColorLdr` | No PQ/scRGB/HDR10/display-nit contract |
 | Explicit absent stages | no graph owner | no color-grading/LUT transform, chromatic-aberration lens effect, or generated-frame synthesis occurs | Reflex/PCL latency coordination and temporal reconstruction are not frame generation |
 
-The [Post Processing family dossier](../Modules/Engine/Renderer/Features/PostProcessing/README.md) owns this order. Its child dossiers keep each supported or absent capability independently reviewable.
+The [Post Processing family dossier](../Modules/Engine/Renderer/Features/PostProcessing/PostProcessingDesign.md) owns this order. Its child dossiers keep each supported or absent capability independently reviewable.
 
 ## Trace 7: Shader Authoring To Runtime Generation
 
@@ -187,7 +187,7 @@ The per-cache defaults and absence of global priority/LRU/pressure arbitration a
 | execution | coordinator -> CVar owners | serial applies directly; threaded mode queues `RenderSettingsChangedCommand` to render context | queue ordering/backpressure/shutdown equivalence is unproved |
 | resolution | CVar owners -> view/topology/provider/device | live values affect the next permitted frame; topology/history owners rebuild/reset; adapter/format report pending restart | requested/CVar/resolved/session-active states and reasons are not one unified result |
 
-The exact names/domains remain in the [Feature Selector Catalog](../Modules/Engine/Renderer/Features/RuntimeConfiguration/README.md#feature-selector-catalog); aggregate transport and durability criteria are in [Settings State and Persistence](../Modules/Engine/Renderer/Features/RuntimeConfiguration/README.md#settings-state-and-persistence).
+The exact names/domains remain in the [Feature Selector Catalog](../Modules/Engine/Renderer/Features/RuntimeConfiguration/RuntimeConfigurationDesign.md#feature-selector-catalog); aggregate transport and durability criteria are in [Settings State and Persistence](../Modules/Engine/Renderer/Features/RuntimeConfiguration/RuntimeConfigurationDesign.md#settings-state-and-persistence).
 
 ## Trace 12: Host Simulation To Latency Provider Marker
 
@@ -213,7 +213,7 @@ The exact names/domains remain in the [Feature Selector Catalog](../Modules/Engi
 | settle/destroy | Renderer shutdown -> RHI queues/services/device | stop frame work, wait real completion/idle, clear recording lifetime state, destroy dependents before device | wait/device failure cannot fabricate completion or safe retirement |
 | device loss | native D3D12/Vulkan result -> diagnostics/fatal boundary | DRED/removal reason or Vulkan result can attribute the fault | no inspected device-generation/recreation path resumes the process |
 
-[Device Lifecycle and Failure Recovery](../Modules/Engine/RHI/Features/DeviceAndResources/README.md#device-lifecycle-and-failure-recovery) owns `AC-RHI-LIFE-*`, the distinction between recoverable presentation change and terminal device loss, and `RHI-E16`.
+[Device Lifecycle and Failure Recovery](../Modules/Engine/RHI/Features/DeviceAndResources/DeviceAndResourcesDesign.md#device-lifecycle-and-failure-recovery) owns `AC-RHI-LIFE-*`, the distinction between recoverable presentation change and terminal device loss, and `RHI-E16`.
 
 ## Trace 14: Prepared Primitive To Raster Batch
 
@@ -239,7 +239,7 @@ The exact names/domains remain in the [Feature Selector Catalog](../Modules/Engi
 | resolution output | lighting -> RR or upscaling -> `ResolvedSceneColor` | exactly one producer writes output-extent color, then common presentation continues | no standalone TAA/FXAA/SMAA or dynamic-resolution controller was found |
 | retirement/publication | queue completion -> old graph/provider resources; output -> product/swapchain | old generations retire after last use and current product carries matching extent/identity | mixed extents, stale history or implicit resolve blocks the route |
 
-[Resolution, Sampling, and Anti-Aliasing](../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/README.md#resolution-sampling-and-anti-aliasing) owns `REN-RESO-*` and `REN-E33`; the temporal and provider dossiers retain their narrower algorithms.
+[Resolution, Sampling, and Anti-Aliasing](../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#resolution-sampling-and-anti-aliasing) owns `REN-RESO-*` and `REN-E33`; the temporal and provider dossiers retain their narrower algorithms.
 
 ## Trace Closure Rule
 

@@ -1,6 +1,6 @@
 # Direct Lighting Completion Study
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](DirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** primary-source research and decision input; precedent does not prove Sparkle implementation, suitability, performance, or release readiness
 

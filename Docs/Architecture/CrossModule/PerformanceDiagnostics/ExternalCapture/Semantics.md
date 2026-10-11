@@ -1,20 +1,20 @@
 # External Capture Semantics
 
-[Docs](../../../../README.md) / [Up](README.md)
+[Docs](../../../../README.md) / [Up](ExternalCaptureDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target architecture; normative capture protocol, pending discovery validation
 
 **Scope:** launch intent, capability, request identity, frame boundaries, exclusivity, result truth, and failure settlement for external tools.
 
-**Authority boundary:** this page owns protocol rules; [Execution Architecture](ExecutionArchitecture.md) owns placement; [User Experience](UserExperience.md) owns interaction; [dossier acceptance](README.md#acceptance-and-check-contract) owns proof.
+**Authority boundary:** this page owns protocol rules; [Execution Architecture](ExecutionArchitecture.md) owns placement; [User Experience](UserExperience.md) owns interaction; [dossier acceptance](ExternalCaptureDesign.md#acceptance-and-check-contract) owns proof.
 
-**Current implementation:** the Editor route implements single-provider startup, native request/lease and neutral observation. The detailed protocol below remains the acceptance contract; richer identity/cancellation observations and full provider-wide validation are not implied by the current snapshot. See [current composition](ExecutionArchitecture.md#production-route) and [remaining delivery](Plan.md).
+**Current implementation:** the Editor route implements single-provider startup, native request/lease and neutral observation. The detailed protocol below remains the acceptance contract; richer identity/cancellation observations and full provider-wide validation are not implied by the current snapshot. See [current composition](ExecutionArchitecture.md#production-route) and [remaining delivery](ImplementationPlan.md).
 
 ## Implemented Projection And Remaining Protocol
 
 The current neutral snapshot exposes one selected provider, state, request ID, host scheduling frame ID, scene context token, artifact path and message. Its states are Unavailable, Ready, Queued, Capturing, Completed, Failed and Quarantined; Busy/Full/Closed are admission outcomes. Armed/Finalizing/Cancelled in the target protocol below are not additional published enum states in the current implementation. The host frame ID is not a native tool frame ID.
 
-Detailed identity-certainty fields, complete provenance sidecar, cancellation/drain and exhaustive lifecycle/observer/package proof remain requirements to implement or verify through the [remaining plan](Plan.md). The current icon is not a provenance/results browser. Do not infer these richer products from the existence of a capture artifact or a successful scheduling call.
+Detailed identity-certainty fields, complete provenance sidecar, cancellation/drain and exhaustive lifecycle/observer/package proof remain requirements to implement or verify through the [remaining plan](ImplementationPlan.md). The current icon is not a provenance/results browser. Do not infer these richer products from the existence of a capture artifact or a successful scheduling call.
 
 ## Launch And Capability Rules
 

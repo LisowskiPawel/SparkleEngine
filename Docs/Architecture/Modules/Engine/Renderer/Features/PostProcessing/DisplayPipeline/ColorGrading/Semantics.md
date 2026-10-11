@@ -1,12 +1,12 @@
 # Color Grading Semantics
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ColorGradingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed semantic contract; blocked until `CGRD-00` accepts every open rule
 
 **Responsibility:** define the exact color domain, parametric transform, 3D-LUT mapping, identity, invalid-value behavior, and independent reference procedure for first-release color grading
 
-**Authority boundary:** [Discovery](Discovery.md) accepts or rejects these rules; [Execution Architecture](ExecutionArchitecture.md) maps accepted semantics to owners and execution; [Plan](Plan.md) orders implementation; this page does not prove conformance
+**Authority boundary:** [Discovery](Discovery.md) accepts or rejects these rules; [Execution Architecture](ExecutionArchitecture.md) maps accepted semantics to owners and execution; [Plan](ImplementationPlan.md) orders implementation; this page does not prove conformance
 
 **Current readiness:** **0/100 — target only**. No semantic implementation exists.
 

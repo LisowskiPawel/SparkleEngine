@@ -1,6 +1,6 @@
 # Capability Evidence Plan
 
-[Docs](../../README.md) / [Up](README.md)
+[Docs](../../README.md) / [Up](ModuleInventory.md)
 
 **Status:** implementation plan; not proof, release classification, or release-wide sequencing authority
 
@@ -8,7 +8,7 @@
 
 **Responsibility:** release-surface reconciliation, inventory refresh, and the claim-falsifying checks required to promote individual source-present capability claims
 
-**Inventory authority:** [Current Capability Inventory](README.md)
+**Inventory authority:** [Current Capability Inventory](ModuleInventory.md)
 
 **Release gates and evidence meaning:** [First Release Acceptance Contract](../../Acceptance/FirstRelease.md) and [Validation, Performance, and Evidence](../../Engineering/Verification/ValidationAndEvidence.md)
 
@@ -18,7 +18,7 @@
 
 **Release-wide sequencing authority:** [Release-First Principal Graphics Roadmap](../../Strategy/Roadmap.md)
 
-**Release implementation phases:** [First Release Implementation Plan](../CrossModule/FirstRelease/README.md) selects when an evidence item is needed and which feature phase consumes it
+**Release implementation phases:** [First Release Implementation Plan](../CrossModule/FirstRelease/ImplementationPlan.md) selects when an evidence item is needed and which feature phase consumes it
 
 ## At A Glance
 
@@ -59,11 +59,11 @@ If the smallest check falsifies the claim, stop and record the defect. Do not co
 | `INV-001` | Every user-reachable feature/backend/mode/tool is represented. | Enumerate public settings, editor controls, console commands/CVars, launcher actions, executable arguments, map catalog, and package manifest; diff against inventory IDs. | Any unmatched selector creates a new row before `REL-00` can close. | Open |
 | `INV-002` | Every row has one implementation owner and all producers/consumers are known. | For each detailed row, trace declaration, configuration producer, runtime producer, consumer, failure path, and CMake target. | A duplicated owner or alternate representation triggers a boundary review. | Open |
 | `INV-003` | Release vocabulary is finite. | Assign Included, Experimental, Excluded, or Removed to every user-reachable row; record the public promise and unsupported combinations. | Any Pending/reachable row keeps `REL-00` open. | Open |
-| `INV-004` | Core and Tasks source capabilities are understood. | Reconcile [Core](Engine/Core/README.md) and [Tasks](Engine/Tasks/README.md) against live public headers/CMake after relevant changes. | Concurrency or lifetime claims trigger focused stress evidence. | Source audit complete; executable evidence open below. |
-| `INV-005` | Platform and Application source capabilities are understood. | Reconcile [Platform](Engine/Platform/README.md) and [Application](Engine/Application/README.md) against live owners after relevant changes. | Package or privilege-sensitive paths move to clean-machine/package gates. | Source audit complete; executable evidence open below. |
-| `INV-006` | GameFramework/world and Editor source capabilities are understood. | Reconcile [GameFramework](Engine/GameFramework/README.md) and [Editor](Engine/Editor/README.md) after world/editor contract changes. | Any data-owner ambiguity triggers architecture reconciliation before evidence. | Source audit complete; executable evidence open below. |
-| `INV-007` | Assets, import, and cooking source capabilities are understood. | Reconcile [Engine Assets](Engine/Assets/README.md), [Importers](Tools/SourceImporters/README.md), and [Cooking](Tools/Cooking/README.md) after format/product changes. | Each advertised format/content family receives a clean import/cook/runtime fixture. | Source audit complete; executable evidence open below. |
-| `INV-008` | Launcher, Showcase, build, and package source capabilities are understood. | Reconcile [Launcher](Tools/Launcher/README.md), [Showcase](Projects/Showcase/README.md), and [Build](BuildAndPackaging/README.md) after workflow/product changes. | Any route dependent on workspace/private state moves to package correction before release proof. | Source audit complete; formal package path absent and evidence open below. |
+| `INV-004` | Core and Tasks source capabilities are understood. | Reconcile [Core](Engine/Core/CoreCapabilities.md) and [Tasks](Engine/Tasks/TasksCapabilities.md) against live public headers/CMake after relevant changes. | Concurrency or lifetime claims trigger focused stress evidence. | Source audit complete; executable evidence open below. |
+| `INV-005` | Platform and Application source capabilities are understood. | Reconcile [Platform](Engine/Platform/PlatformCapabilities.md) and [Application](Engine/Application/ApplicationCapabilities.md) against live owners after relevant changes. | Package or privilege-sensitive paths move to clean-machine/package gates. | Source audit complete; executable evidence open below. |
+| `INV-006` | GameFramework/world and Editor source capabilities are understood. | Reconcile [GameFramework](Engine/GameFramework/GameFrameworkCapabilities.md) and [Editor](Engine/Editor/EditorCapabilities.md) after world/editor contract changes. | Any data-owner ambiguity triggers architecture reconciliation before evidence. | Source audit complete; executable evidence open below. |
+| `INV-007` | Assets, import, and cooking source capabilities are understood. | Reconcile [Engine Assets](Engine/Assets/AssetsCapabilities.md), [Importers](Tools/SourceImporters/SourceImportersCapabilities.md), and [Cooking](Tools/Cooking/CookingCapabilities.md) after format/product changes. | Each advertised format/content family receives a clean import/cook/runtime fixture. | Source audit complete; executable evidence open below. |
+| `INV-008` | Launcher, Showcase, build, and package source capabilities are understood. | Reconcile [Launcher](Tools/Launcher/LauncherCapabilities.md), [Showcase](Projects/Showcase/ShowcaseCapabilities.md), and [Build](BuildAndPackaging/BuildAndPackagingCapabilities.md) after workflow/product changes. | Any route dependent on workspace/private state moves to package correction before release proof. | Source audit complete; formal package path absent and evidence open below. |
 | `INV-009` | Every advertised capability has a complete reviewer dossier. | Apply the [Capability Documentation Review dossier contract](../../Engineering/Workflow/CapabilityReview.md#capability-dossier-contract) to every independently selectable capability; mark Answered, Partial, Unknown, or Not applicable and link unresolved dimensions. | A blank owner, selector, input/output, lifetime, limit, backend, failure, diagnostic, evidence, or invalidation field blocks inventory closure. | Open |
 | `INV-010` | Every vital developer/user journey is represented horizontally. | Reconcile all executables, Launcher actions, editor workflows, runtime controls, importer/cooker commands, package/support operations, and catalog selections against [Product Workflow Coverage](../CrossModule/ProductWorkflowCoverage.md). | An unmatched journey or materially different actor outcome creates a new `WF-*` row and corresponding `FCR-*` coverage. | Open |
 | `INV-011` | Every vital journey has a complete vertical owner-to-outcome trace. | Apply the vertical template to build/cook/run, source-to-render, editor transaction, settings activation, shader reload, capture, cancellation/shutdown, and any newly admitted journey in [Product Execution Traces](../CrossModule/ProductExecutionTraces.md). | An unowned representation, silent fallback, undefined safe state, or unobservable final outcome blocks the journey. | Open |
@@ -306,7 +306,7 @@ This map names the primary RHI proof destination, not the whole release chain. E
 
 ## Neural Graphics Evidence
 
-These rows track the explicit absent/target [Neural Graphics](../CrossModule/NeuralGraphics/README.md) family. They do not authorize feature work ahead of the Roadmap and cannot be executed until one bounded neural graphics problem is admitted.
+These rows track the explicit absent/target [Neural Graphics](../CrossModule/NeuralGraphics/NeuralGraphicsDesign.md) family. They do not authorize feature work ahead of the Roadmap and cannot be executed until one bounded neural graphics problem is admitted.
 
 | Evidence item | Direct capability scope |
 | --- | --- |
@@ -324,6 +324,6 @@ These rows track the explicit absent/target [Neural Graphics](../CrossModule/Neu
 
 ## Evidence Handoff
 
-The [inventory evidence marks](README.md#evidence-state) describe the source snapshot; the [acceptance contract](../../Acceptance/FirstRelease.md) owns release evidence meaning and approval. Executed results belong in the applicable `FCR-*` candidate report with its iteration traceability, risk/AC/FM/check ledgers, and artifacts. This plan only identifies the next claim-falsifying check.
+The [inventory evidence marks](ModuleInventory.md#evidence-state) describe the source snapshot; the [acceptance contract](../../Acceptance/FirstRelease.md) owns release evidence meaning and approval. Executed results belong in the applicable `FCR-*` candidate report with its iteration traceability, risk/AC/FM/check ledgers, and artifacts. This plan only identifies the next claim-falsifying check.
 
 Evidence may close one row without promoting neighboring rows. For example, a successful D3D12 inline ray-GBuffer run does not prove Vulkan, native pipeline, direct shadows, the Reference Path Tracer, ReSTIR indirect, partitioned TLAS, or performance.

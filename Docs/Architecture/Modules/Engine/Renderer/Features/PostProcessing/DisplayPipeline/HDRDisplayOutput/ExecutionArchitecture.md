@@ -1,12 +1,12 @@
 # HDR Display Output Execution Architecture
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](HDRDisplayOutputDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed cross-boundary target architecture; blocked until `HDRD-00`, not implementation or backend-support proof
 
 **Responsibility:** define Renderer color-policy ownership, RHI presentation capability/activation, output identity, swapchain lifecycle, transitions, fallback, UI/capture joins, and D3D12/Vulkan parity
 
-**Authority boundary:** [Semantics](Semantics.md) owns pixels; Renderer owns target selection/transform; RHI owns native display/swapchain/color-space/metadata mechanics and returns facts; [User Experience](UserExperience.md) owns visible state; [Plan](Plan.md) owns delivery
+**Authority boundary:** [Semantics](Semantics.md) owns pixels; Renderer owns target selection/transform; RHI owns native display/swapchain/color-space/metadata mechanics and returns facts; [User Experience](UserExperience.md) owns visible state; [Plan](ImplementationPlan.md) owns delivery
 
 **Current readiness:** **0/100 — target only**.
 

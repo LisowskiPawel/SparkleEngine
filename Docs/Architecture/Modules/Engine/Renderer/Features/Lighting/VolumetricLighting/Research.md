@@ -1,6 +1,6 @@
 # Volumetric Lighting, Atmosphere, And ReSTIR Study
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](VolumetricLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** primary-source research and discovery input; no implementation, budget, visual, or release claim
 

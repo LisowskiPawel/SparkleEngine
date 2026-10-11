@@ -66,7 +66,7 @@ The public frame ID is 64-bit but the Streamline frame-token request currently c
 - Initialization or unsupported readiness returns an empty interposer/no-op route rather than failing the renderer. This is capability absence, not successful PCL/Reflex activation.
 - Shutdown stops new leases and waits for active provider calls before `slShutdown`; deadlock/bounded shutdown still needs stress evidence.
 - No selector, requested/active latency diagnostic, user-facing Reflex mode, marker counter, or measured latency product was found. SDK registration alone must not be presented as enabled low-latency mode.
-- This contract is independent from [Frame Generation](../PostProcessing/ReconstructionAndGeneration/README.md#frame-generation), which remains absent.
+- This contract is independent from [Frame Generation](../PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#frame-generation), which remains absent.
 
 ## Acceptance Criteria
 

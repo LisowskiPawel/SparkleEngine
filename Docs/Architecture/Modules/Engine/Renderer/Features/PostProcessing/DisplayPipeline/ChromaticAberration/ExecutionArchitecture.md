@@ -1,12 +1,12 @@
 # Chromatic Aberration Execution Architecture
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ChromaticAberrationDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed target architecture; blocked until `CHRD-00`, not implementation proof
 
 **Responsibility:** define per-view state, frame-graph placement, resource and shader ownership, active-state truth, debug/UI/capture joins, failure, and cost for the first-release lens pass
 
-**Authority boundary:** [Semantics](Semantics.md) owns the model; [User Experience](UserExperience.md) owns observable workflow/state behavior; [README](README.md) owns scope/acceptance; [Plan](Plan.md) owns delivery order; RHI owns command/resource mechanics only
+**Authority boundary:** [Semantics](Semantics.md) owns the model; [User Experience](UserExperience.md) owns observable workflow/state behavior; [README](ChromaticAberrationDesign.md) owns scope/acceptance; [Plan](ImplementationPlan.md) owns delivery order; RHI owns command/resource mechanics only
 
 **Current readiness:** **0/100 — target only**.
 

@@ -1,12 +1,12 @@
 # Shader System Delivery Checkpoints
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](ShaderSystemDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** retained historical source-checkpoint evidence; not current runtime, feature acceptance or release approval
 
 **Responsibility:** preserve the valuable Phase 2-8 source-consistency results and deferred proof contracts after retiring their implementation instructions.
 
-**Authority:** [Architecture](README.md) owns design, [Plan](Plan.md) owns remaining delivery, and [Acceptance](Acceptance.md) owns the feature proof contract. The distinct [Migration Baseline](MigrationBaseline.md) remains frozen Phase 0 provenance.
+**Authority:** [Architecture](ShaderSystemDesign.md) owns design, [Plan](ImplementationPlan.md) owns remaining delivery, and [Acceptance](Acceptance.md) owns the feature proof contract. The distinct [Migration Baseline](MigrationBaseline.md) remains frozen Phase 0 provenance.
 
 **Retention boundary - 2026-10-10:** copied from the plan at `ec3d59be9b3089652467d857524a2f2e439275b0` plus the documentation reconciliation. Original candidate/date/count/name limitations remain in each record. PASS below means only the original source checkpoint, never a fresh build/cook/runtime/native/performance result. Subsequent source drift requires revalidation; no phase or release gate is upgraded by moving this evidence.
 

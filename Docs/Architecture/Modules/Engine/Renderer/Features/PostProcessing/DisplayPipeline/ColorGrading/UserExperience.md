@@ -1,6 +1,6 @@
 # Color Grading User Experience
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ColorGradingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed development-product experience; blocked until `CGRD-00`, not an implemented UI promise
 

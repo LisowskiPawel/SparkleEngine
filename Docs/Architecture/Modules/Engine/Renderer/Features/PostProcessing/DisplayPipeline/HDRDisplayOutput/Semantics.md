@@ -1,6 +1,6 @@
 # HDR Display Output Semantics
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](HDRDisplayOutputDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed semantic contract; blocked until `HDRD-00` freezes scene, target, UI-white, gamut, tone, and output-route decisions
 

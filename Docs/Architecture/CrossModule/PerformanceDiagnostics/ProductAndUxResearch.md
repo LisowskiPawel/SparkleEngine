@@ -1,6 +1,6 @@
 # Diagnostics Product And UX Research
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](PerformanceDiagnosticsDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** research; external precedent and option analysis, not proof of current implementation
 
@@ -16,11 +16,11 @@
 
 ## Purpose And Authority Boundary
 
-The [External Capture Research](ExternalCapture/Research.md) is the 2026-10-06 provider/API and Unreal/Unity/Godot source study; this page retains the broader diagnostics product/visual precedent. Provider delivery follows the delegated [PIX-first plan](ExternalCapture/Plan.md).
+The [External Capture Research](ExternalCapture/Research.md) is the 2026-10-06 provider/API and Unreal/Unity/Godot source study; this page retains the broader diagnostics product/visual precedent. Provider delivery follows the delegated [PIX-first plan](ExternalCapture/ImplementationPlan.md).
 
 This document maps the diagnostic product space before implementation. It asks what information a developer needs, at what depth, in which visual form, and how the views should connect without turning the engine or Editor into a profiler framework.
 
-The selected Sparkle behavior belongs to [Performance Diagnostics Architecture](README.md). This document records precedent, alternatives, and reasons. It does not override:
+The selected Sparkle behavior belongs to [Performance Diagnostics Architecture](PerformanceDiagnosticsDesign.md). This document records precedent, alternatives, and reasons. It does not override:
 
 - [A. Principal Graphics Engineering Requirements](../../../Strategy/Requirements.md), including `PGE-05`, `PGE-06`, `PGE-10`, and `PGE-13`;
 - [Gap Assessment](../../../Strategy/Assessments/GapAssessment.md), which owns the role-source/profile audit, current evidence grade, and principal-readiness gaps;
@@ -330,12 +330,12 @@ The hybrid diagnostics ladder is the selected result of this research: cheap com
 
 | Selected concern | Adopted boundary | Canonical owner |
 | --- | --- | --- |
-| Product depth and surfaces | Task-first Quick/CPU/GPU/Memory entry, an initially bounded compact-overlay set, one fixed Overview/CPU/GPU/Memory workspace, and external tools for causal depth. Raw stat groups remain expert customization, not the first menu. | [Product information architecture](README.md#diagnostics-product-information-architecture) |
-| Physical/logical ownership and metric meaning | Physical CPU thread rows, logical phases inside their real owners, independent GPU queues, distinct memory definitions, explicit validity. | [Measurement and view contracts](README.md#measurement-vocabulary) |
-| Selection and interaction | One shared frame/range/object selection; hitches are frame selections; Sparkle GPU capture stays inside the GPU view; an attached external provider may add one targeted viewport action; filtering never changes totals. | [Workspace interaction contract](README.md#workspace-interaction-contract) |
-| Visual and failure behavior | Milliseconds lead, color is never the only signal, configuration remains visible, and pending/stale/unsupported/lost states never masquerade as zero. | [Visual and accessibility rules](README.md#visual-validity-and-accessibility-rules) |
+| Product depth and surfaces | Task-first Quick/CPU/GPU/Memory entry, an initially bounded compact-overlay set, one fixed Overview/CPU/GPU/Memory workspace, and external tools for causal depth. Raw stat groups remain expert customization, not the first menu. | [Product information architecture](PerformanceDiagnosticsDesign.md#diagnostics-product-information-architecture) |
+| Physical/logical ownership and metric meaning | Physical CPU thread rows, logical phases inside their real owners, independent GPU queues, distinct memory definitions, explicit validity. | [Measurement and view contracts](PerformanceDiagnosticsDesign.md#measurement-vocabulary) |
+| Selection and interaction | One shared frame/range/object selection; hitches are frame selections; Sparkle GPU capture stays inside the GPU view; an attached external provider may add one targeted viewport action; filtering never changes totals. | [Workspace interaction contract](PerformanceDiagnosticsDesign.md#workspace-interaction-contract) |
+| Visual and failure behavior | Milliseconds lead, color is never the only signal, configuration remains visible, and pending/stale/unsupported/lost states never masquerade as zero. | [Visual and accessibility rules](PerformanceDiagnosticsDesign.md#visual-validity-and-accessibility-rules) |
 | Concrete product presentation | Integrated graphical mockups, every compact group, fixed workspace views, evidence actions, keyboard baseline, and failure states. | [Performance Diagnostics Visual Design And Tool Wireframes](VisualDesign.md) |
-| Resource inspector boundary | Existing shader, mesh, and texture tools remain asset inspectors unless an accepted migration removes the old route; they do not own system performance truth. | [Product surfaces and depth boundary](README.md#product-surfaces-and-depth-boundary) |
+| Resource inspector boundary | Existing shader, mesh, and texture tools remain asset inspectors unless an accepted migration removes the old route; they do not own system performance truth. | [Product surfaces and depth boundary](PerformanceDiagnosticsDesign.md#product-surfaces-and-depth-boundary) |
 
 This handoff preserves the adopted decisions while keeping research focused on precedents, options, tradeoffs, and why the hybrid direction won. The following low-clutter principles remain here because they summarize the implementation consequences drawn from the research.
 

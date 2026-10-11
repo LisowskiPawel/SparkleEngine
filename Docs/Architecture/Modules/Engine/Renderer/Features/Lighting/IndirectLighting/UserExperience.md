@@ -1,12 +1,12 @@
 # Indirect Lighting And ReSTIR GI User Experience Contract
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](IndirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed experience; implementation and acceptance remain blocked by `IND-D0`
 
 **Responsibility:** define how artists, rendering engineers, automation, and support select, understand, diagnose, capture, and recover real-time indirect lighting
 
-**Authority boundary:** the [dossier](README.md) owns acceptance; [Transport And Estimator](TransportAndEstimator.md) owns path/result meaning; [Execution Architecture](ExecutionArchitecture.md) owns runtime truth; [Discovery](Discovery.md) ratifies public choices; [Plan](Plan.md) owns delivery order
+**Authority boundary:** the [dossier](IndirectLightingDesign.md) owns acceptance; [Transport And Estimator](TransportAndEstimator.md) owns path/result meaning; [Execution Architecture](ExecutionArchitecture.md) owns runtime truth; [Discovery](Discovery.md) ratifies public choices; [Plan](ImplementationPlan.md) owns delivery order
 
 ## Experience Principles
 

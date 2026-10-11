@@ -24,7 +24,7 @@ Certificate enrollment is deferred until before public release. It does not prev
 
 This page defines the first release: three products, seven selectable maps, user-selected display resolution, a 30 FPS acceptance target on your laptop, and no user support service.
 
-[Roadmap](../Strategy/Roadmap.md#release-progress) shows progress. [Capability Dispositions](ReleaseScope/CapabilityDispositions.md) owns feature classifications; [First Release](FirstRelease.md#release-gates) owns shipping checks.
+[Roadmap](../Strategy/Roadmap.md#release-progress) shows progress. [Capability Dispositions](ReleaseScope/CapabilityDispositions.md) owns feature classifications; [First Release](#release-gates) owns shipping checks.
 
 ### Approval And Next Work
 
@@ -77,8 +77,8 @@ Excluded from release example selection: `DamagedHelmet` (rights unresolved), `M
 | `MIN-01` / `REF-01` | Same AMD Ryzen 9 8940HX laptop, 16 cores/32 logical processors; 67,833,212,928 bytes OS-reported RAM; NVIDIA GeForce RTX 5070 Ti Laptop GPU, 12,227 MiB reported VRAM; driver `610.47` |
 | Storage | Patriot P400L 2000GB NVMe SSD, NTFS; at least 16 GiB free for extraction/staging/user data |
 | D3D12 | Default; feature level 12_1, SM 6.6, DXR 1.1. Reject missing required features before rendering. |
-| Vulkan | Explicitly selectable; Vulkan 1.3 plus the [required feature set](FirstRelease.md#frozen-platform-and-toolchain-prerequisites). Separate native/provider/performance proof required. |
-| Source build | Exact [toolchain](FirstRelease.md#frozen-platform-and-toolchain-prerequisites): VS Community 2026 18.7.0/MSVC 14.51.36231, Windows SDK 10.0.26100.0, CMake 4.3.3, Git for Windows 2.54.0, Qt 6.11.1 `msvc2022_64`, Vulkan SDK 1.4.350.0/Slang 2026.8, DXC 1.9.0.5347 |
+| Vulkan | Explicitly selectable; Vulkan 1.3 plus the [required feature set](#frozen-platform-and-toolchain-prerequisites). Separate native/provider/performance proof required. |
+| Source build | Exact [toolchain](#frozen-platform-and-toolchain-prerequisites): VS Community 2026 18.7.0/MSVC 14.51.36231, Windows SDK 10.0.26100.0, CMake 4.3.3, Git for Windows 2.54.0, Qt 6.11.1 `msvc2022_64`, Vulkan SDK 1.4.350.0/Slang 2026.8, DXC 1.9.0.5347 |
 
 This is an initial named-machine claim. Generic 8 GiB GPU/16 GiB PC floors and other hardware/drivers require qualification before advertisement. Two measurement roles on one machine do not count as independent adoption. HDR additionally requires a qualified HDR10 display/OS configuration; none is recorded. No hardware purchase is authorized. Debug/Development builds remain source products; all three public products need qualified release configurations. Alternate toolchains remain unqualified.
 
@@ -116,15 +116,15 @@ Game excludes developer console/CVar assignment, startup-map environment selecti
 
 Keep documented controls/settings/map IDs stable within `v0.1.x`; source APIs and development keys are unstable. No binary SDK, saves or migration promise. Update by verified extraction into a new directory; back up settings for rollback. Concurrent versions writing shared settings are unsupported. Reset/cache removal must preserve unrelated data; deleting the extraction does not delete user data.
 
-The [path and budget contract](FirstRelease.md#frozen-paths-mutation-boundary-and-budgets) owns per-user folders, immutable package bytes and deadlines. [Installed compatibility](FirstRelease.md#compatibility-boundary-created-by-shipping) owns the shipping boundary.
+The [path and budget contract](#frozen-paths-mutation-boundary-and-budgets) owns per-user folders, immutable package bytes and deadlines. [Installed compatibility](#compatibility-boundary-created-by-shipping) owns the shipping boundary.
 
 ### Budgets And Observation
 
-Use the unchanged [startup, size, memory and operation limits](FirstRelease.md#frozen-paths-mutation-boundary-and-budgets) and [30 FPS protocol](FirstRelease.md#thirty-fps-performance-floor). Measure combined product bytes and the seven-map content closure; freeze archive/store accounting before REL-03. User-selected display resolution remains separate from the fixed laptop benchmark. Both APIs and all seven maps require proof; no dynamic resolution, fallback or post-result retuning can manufacture a pass. Reference tracing has convergence/cancellation/resource checks instead of a 30 FPS promise. [Principal frame review](FirstRelease.md#principal-frame-review) remains required.
+Use the unchanged [startup, size, memory and operation limits](#frozen-paths-mutation-boundary-and-budgets) and [30 FPS protocol](#thirty-fps-performance-floor). Measure combined product bytes and the seven-map content closure; freeze archive/store accounting before REL-03. User-selected display resolution remains separate from the fixed laptop benchmark. Both APIs and all seven maps require proof; no dynamic resolution, fallback or post-result retuning can manufacture a pass. Reference tracing has convergence/cancellation/resource checks instead of a 30 FPS promise. [Principal frame review](#principal-frame-review) remains required.
 
 ### Network, Security, Publication And Support
 
-Decision 6 is approved. No user support service, response deadline or maintenance window is offered. Publication still requires the [trust/approval rules](FirstRelease.md#approval-rules): trusted Authenticode on every shipped PE, SHA256SUMS, manifest, dependency/content notices, software bill of materials, build provenance and vulnerability/malware disposition. Keys/accounts stay outside source/archives; unsigned builds remain developer prereleases.
+Decision 6 is approved. No user support service, response deadline or maintenance window is offered. Publication still requires the [trust/approval rules](#approval-rules): trusted Authenticode on every shipped PE, SHA256SUMS, manifest, dependency/content notices, software bill of materials, build provenance and vulnerability/malware disposition. Keys/accounts stay outside source/archives; unsigned builds remain developer prereleases.
 
 Source/content acquisition uses public HTTPS inputs with pinned revisions/hashes and no private credentials. Game and Editor run offline with synced content; Launcher network work is user-selected. Logs/captures/crashes may contain paths, scene content or memory; keep them local and explain privacy before any voluntary sharing. A separate symbols archive follows the same privacy boundary. No reporting channel or automated uploader is assumed.
 
@@ -326,7 +326,7 @@ The release owner's 2026-10-10 amendment makes the following **Included delivery
 | Realtime path tracer at >=30 FPS | `FCR-REN-06/07`, shared ray/surface owners and the [performance contract](#thirty-fps-performance-floor), using `REL-RT-1080P` on MIN-01. Freeze actual traced primary/secondary transport, finite-depth/reuse/approximation policy, quality thresholds and reconstruction topology before results. Existing Lit/indirect seed-replay source is a starting path, not an accepted realtime path tracer. Ray-traced GBuffer alone is insufficient. Static, motion/disocclusion and lobe/guide cases must agree with the accepted reference within the owned tolerances. |
 | Complete DLSS Super Resolution and Ray Reconstruction | `FCR-REN-10`: Included on the named NVIDIA hardware for **both D3D12 and Vulkan**. Prove every exposed quality mode and SDK-supported SR/RR combination; exact pinned runtime/header/license, early initialization, viewport/frame identity, exposure/depth/motion/jitter/normal/roughness/albedo/specular inputs, extent/reset, state restoration, queue/resource lifetime, failures and Shipping dependency closure. Optional SDK features outside the declared renderer domain are not implicitly admitted. A visible Linear/Off fallback is safe recovery, never a pass for a required provider cell. |
 | Finished exposure and tone mapping | `FCR-REN-09/14/15`: all exposed manual/automatic/metering and Reinhard/ACES approximation/ACES fitted choices, finite/range/step response, view isolation, reset, provider input domains, exactly one tone/output transform, alpha and SDR/HDR handoff. No post-process adjustment may conceal transport/units defects. |
-| Basic chromatic aberration and vignette | `FCR-REN-25` now covers two independently verified lens effects: the [chromatic contract](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/README.md) and [basic vignette](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/README.md). Both Included; neutral defaults erase effect work, raw reference/exact diagnostics/UI bypass effects, controls/reset/persistence and both-backend numerical/order/cost checks pass. Neither effect inherits the other's verdict. |
+| Basic chromatic aberration and vignette | `FCR-REN-25` now covers two independently verified lens effects: the [chromatic contract](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md) and [basic vignette](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/VignetteDesign.md). Both Included; neutral defaults erase effect work, raw reference/exact diagnostics/UI bypass effects, controls/reset/persistence and both-backend numerical/order/cost checks pass. Neither effect inherits the other's verdict. |
 | D3D12/Vulkan implementation parity | Same declared release modes, features, settings semantics, scene/camera/pose, providers and products on both APIs. Retain native validation and paired raw/temporal/display/performance/package evidence. Compare within predeclared numeric/statistical tolerances, not universal bitwise identity. A genuinely vendor-specific excluded feature such as PTLAS does not weaken parity for an Included feature; an unavailable required provider remains a blocker, not a quiet exclusion. |
 | Complete frame graph for the declared frame | `FCR-REN-03` and [AC-FGS-01–08](../Architecture/Modules/Engine/Renderer/Features/FrameExecution/FrameGraphAndScheduling.md#acceptance-criteria): dependencies/imports/export roots, culling, transient alias/initialization, state/UAV/queue waits, typed pass binding, serial/parallel recording equivalence, histories/rebuilds, external-provider work and token-safe retirement. Exercise negative compilation/recording/submission/lifetime cases. Native clean output alone cannot prove useful overlap or bounded resource/copy cost. |
 | Principal-level review of the entire frame | The [review package below](#principal-frame-review) is mandatory before `REL-04`/`REL-07` closure. Review the complete production frame and its failures, not just chosen shaders or a capability checklist. |
@@ -635,7 +635,7 @@ artifacts/validation/releases/<version>/<candidate-id>/
 
 **Roadmap and sequence:** [F. Release-First Principal Graphics Roadmap](../Strategy/Roadmap.md)
 
-**Implementation orchestrator:** [First Release Implementation Plan](../Architecture/CrossModule/FirstRelease/README.md)
+**Implementation orchestrator:** [First Release Implementation Plan](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md)
 
 **Detailed graphics workloads:** [I. Bistro and San Miguel Acceptance Workloads](GraphicsWorkloads.md)
 

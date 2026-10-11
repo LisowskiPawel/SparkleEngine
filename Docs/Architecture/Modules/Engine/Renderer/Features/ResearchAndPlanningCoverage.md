@@ -1,6 +1,6 @@
 # Renderer Feature Research And Planning Coverage
 
-[Docs](../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../README.md) / [Up](RendererFeatureGuide.md)
 
 **Status:** documentation package plan and current coverage assessment; implementation and feature evidence are unchanged
 
@@ -18,10 +18,10 @@ The goal is repeatable planning depth, not seven files per feature. A full packa
 
 | Result | Disposition |
 | --- | --- |
-| Reference quality bar | retained the seven-role [Reference Path Tracer](Lighting/ReferencePathTracer/README.md) and [Feature Delivery Package](../../../../../Engineering/Workflow/Templates/FeatureDeliveryPackage.md) as precedent |
-| Mandatory absent display features | expanded [Color Grading](PostProcessing/DisplayPipeline/ColorGrading/README.md), [Chromatic Aberration](PostProcessing/DisplayPipeline/ChromaticAberration/README.md), and [HDR Display Output](PostProcessing/DisplayPipeline/HDRDisplayOutput/README.md) into feature-local packages with blocked discovery and conditional delivery |
-| Critical lighting families | expanded [Direct Lighting](Lighting/DirectLighting/README.md), [Indirect Lighting/ReSTIR GI](Lighting/IndirectLighting/README.md), and [Volumetric Lighting/Fog/Atmosphere](Lighting/VolumetricLighting/README.md) into full seven-role packages with current-source audits, primary research, explicit discovery, mathematical contracts, execution architectures, user experience contracts, and conditional staged plans |
-| Existing substantial packages | preserved [Deferred Decals](DeferredDecals/README.md) and [Debug Views](DebugViews/README.md); their next implementation iteration should add/freeze discovery rather than rewrite stable architecture |
+| Reference quality bar | retained the seven-role [Reference Path Tracer](Lighting/ReferencePathTracer/ReferencePathTracerDesign.md) and [Feature Delivery Package](../../../../../Engineering/Workflow/Templates/FeatureDeliveryPackage.md) as precedent |
+| Mandatory absent display features | expanded [Color Grading](PostProcessing/DisplayPipeline/ColorGrading/ColorGradingDesign.md), [Chromatic Aberration](PostProcessing/DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md), and [HDR Display Output](PostProcessing/DisplayPipeline/HDRDisplayOutput/HDRDisplayOutputDesign.md) into feature-local packages with blocked discovery and conditional delivery |
+| Critical lighting families | expanded [Direct Lighting](Lighting/DirectLighting/DirectLightingDesign.md), [Indirect Lighting/ReSTIR GI](Lighting/IndirectLighting/IndirectLightingDesign.md), and [Volumetric Lighting/Fog/Atmosphere](Lighting/VolumetricLighting/VolumetricLightingDesign.md) into full seven-role packages with current-source audits, primary research, explicit discovery, mathematical contracts, execution architectures, user experience contracts, and conditional staged plans |
+| Existing substantial packages | preserved [Deferred Decals](DeferredDecals/DeferredDecalsDesign.md) and [Debug Views](DebugViews/DebugViewsDesign.md); their next implementation iteration should add/freeze discovery rather than rewrite stable architecture |
 | Implemented/current families | retained source-backed state while promoting direct and indirect lighting because the current estimators have real independent research, semantic, architecture, and clean-break decisions |
 | Explicit negative capabilities | retained absence contracts; the volumetric package has a conditional post-release plan whose production stages explicitly require `REL-11`, roadmap admission, `VOL-D0`, and an assigned FCR |
 | Navigation and governance | this page records the 26-family coverage decision so future work can find its correct package without duplicating release plans or current-state authority |
@@ -115,42 +115,42 @@ Promote a feature to a larger class when active work introduces an unresolved eq
 
 | FCR | Feature owner | Current package and delivery authority | Class / next depth action |
 | --- | --- | --- | --- |
-| `FCR-REN-01` | whole-frame production | [Rendering A Sparkle Frame](../RenderingASparkleFrame.md), [Frame And Scene `FS-1`](../FirstRelease/FrameAndScene.md#fs-1--frame-admission-and-coordination) | `C`; add research only for a new scheduler/publication model |
-| `FCR-REN-02` | scene/view/GPU-scene preparation | [Scene And View Preparation](SceneAndViewPreparation/README.md), local [Acceptance](SceneAndViewPreparation/README.md#scene-and-view-preparation-acceptance), `FS-2` | `C`; split semantics only if identity/deformation/publication rules materially change |
+| `FCR-REN-01` | whole-frame production | [Rendering A Sparkle Frame](../RenderingASparkleFrame.md), [Frame And Scene `FS-1`](../FirstRelease/FrameAndSceneImplementationPlan.md#fs-1--frame-admission-and-coordination) | `C`; add research only for a new scheduler/publication model |
+| `FCR-REN-02` | scene/view/GPU-scene preparation | [Scene And View Preparation](SceneAndViewPreparation/SceneAndViewPreparationDesign.md), local [Acceptance](SceneAndViewPreparation/SceneAndViewPreparationDesign.md#scene-and-view-preparation-acceptance), `FS-2` | `C`; split semantics only if identity/deformation/publication rules materially change |
 | `FCR-REN-03` | frame graph and scheduling | [Frame Graph And Scheduling](FrameExecution/FrameGraphAndScheduling.md), `FS-3` | `C`; discovery is required before queue/aliasing/scheduler redesign |
 | `FCR-REN-04` | raster/GBuffer surfaces | [Geometry, Materials, And GBuffer](GeometryAndResources/GeometryMaterialsAndGBuffer.md), `GR-2` | `C`; use a semantic companion when the material/GBuffer contract changes |
-| `FCR-REN-05` | ray-traced GBuffer | [Ray Tracing](RayTracing/README.md), [Execution Architecture](RayTracing/ExecutionArchitecture.md), `GR-4` | `B`; next active dual-execution change should add Research, Discovery, and Plan before code |
-| `FCR-REN-06` | direct lighting | [Direct Lighting package](Lighting/DirectLighting/README.md), `DIR-D0`, `DIR-PLAN-02` | `A`; seven-role ReSTIR DI/MegaLights-class research, semantics, UX, execution architecture, and staged clean-break plan exist; implementation/evidence remain gated |
-| `FCR-REN-07` | indirect lighting | [Indirect Lighting package](Lighting/IndirectLighting/README.md), `IND-D0`, `IND-PLAN-02` | `A`; seven-role seed-replay gap audit and target ReSTIR GI/GRIS transport, UX, architecture, and staged clean-break plan exist; implementation/evidence remain gated |
-| `FCR-REN-08` | Reference Path Tracer | [full feature package](Lighting/ReferencePathTracer/README.md), `PTD-00`, `LGT-3` | `A`; precedent; production remains blocked by its own discovery |
-| `FCR-REN-09` | exposure | [Exposure](PostProcessing/DisplayPipeline/README.md#exposure), [Exposure Semantics](PostProcessing/DisplayPipeline/README.md#exposure-semantics), `DSP-2` | `C`; histogram policy, multiplier/adaptation equations, invalid-value handling, and provider/display domains have a dedicated current contract |
-| `FCR-REN-10` | reconstruction/providers | [Image Reconstruction And Upscaling](PostProcessing/ReconstructionAndGeneration/README.md#image-reconstruction-and-upscaling), `DSP-3` | `C/B`; provider/version/product admission change requires discovery/research refresh |
-| `FCR-REN-11` | debug views and capture | [Debug Views package](DebugViews/README.md), [Bounded Show evidence](../../../../../Acceptance/Renderer/DebugViews.md), `RD-3` | `B`; Show delivery is complete and its bounded candidate evidence is retained; current control contracts and remaining family proof stay in the feature package |
-| `FCR-REN-12` | TLAS and ray scene | [Ray Tracing](RayTracing/README.md), [Execution Architecture](RayTracing/ExecutionArchitecture.md), `GR-3` | `B`; share the future ray-tracing discovery/research package, not a second TLAS plan |
-| `FCR-REN-13` | UI/viewport composition | [UI And Viewport Composition](ViewportAndDiagnostics/README.md#ui-and-viewport-composition), `RD-4` | `C`; add UX only if the product-facing interaction expands |
-| `FCR-REN-14` | tone mapping | [Tone Mapping](PostProcessing/DisplayPipeline/README.md#tone-mapping), `DSP-4` | `C`; semantic contract required before changing operators/color domain |
-| `FCR-REN-15` | presentation/output | [Presentation And Output](PostProcessing/DisplayPipeline/README.md#presentation-and-output), `DSP-4` | `C`; HDR has its separate `A` package below |
+| `FCR-REN-05` | ray-traced GBuffer | [Ray Tracing](RayTracing/RayTracingDesign.md), [Execution Architecture](RayTracing/ExecutionArchitecture.md), `GR-4` | `B`; next active dual-execution change should add Research, Discovery, and Plan before code |
+| `FCR-REN-06` | direct lighting | [Direct Lighting package](Lighting/DirectLighting/DirectLightingDesign.md), `DIR-D0`, `DIR-PLAN-02` | `A`; seven-role ReSTIR DI/MegaLights-class research, semantics, UX, execution architecture, and staged clean-break plan exist; implementation/evidence remain gated |
+| `FCR-REN-07` | indirect lighting | [Indirect Lighting package](Lighting/IndirectLighting/IndirectLightingDesign.md), `IND-D0`, `IND-PLAN-02` | `A`; seven-role seed-replay gap audit and target ReSTIR GI/GRIS transport, UX, architecture, and staged clean-break plan exist; implementation/evidence remain gated |
+| `FCR-REN-08` | Reference Path Tracer | [full feature package](Lighting/ReferencePathTracer/ReferencePathTracerDesign.md), `PTD-00`, `LGT-3` | `A`; precedent; production remains blocked by its own discovery |
+| `FCR-REN-09` | exposure | [Exposure](PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#exposure), [Exposure Semantics](PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#exposure-semantics), `DSP-2` | `C`; histogram policy, multiplier/adaptation equations, invalid-value handling, and provider/display domains have a dedicated current contract |
+| `FCR-REN-10` | reconstruction/providers | [Image Reconstruction And Upscaling](PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#image-reconstruction-and-upscaling), `DSP-3` | `C/B`; provider/version/product admission change requires discovery/research refresh |
+| `FCR-REN-11` | debug views and capture | [Debug Views package](DebugViews/DebugViewsDesign.md), [Bounded Show evidence](../../../../../Acceptance/Renderer/DebugViews.md), `RD-3` | `B`; Show delivery is complete and its bounded candidate evidence is retained; current control contracts and remaining family proof stay in the feature package |
+| `FCR-REN-12` | TLAS and ray scene | [Ray Tracing](RayTracing/RayTracingDesign.md), [Execution Architecture](RayTracing/ExecutionArchitecture.md), `GR-3` | `B`; share the future ray-tracing discovery/research package, not a second TLAS plan |
+| `FCR-REN-13` | UI/viewport composition | [UI And Viewport Composition](ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md#ui-and-viewport-composition), `RD-4` | `C`; add UX only if the product-facing interaction expands |
+| `FCR-REN-14` | tone mapping | [Tone Mapping](PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#tone-mapping), `DSP-4` | `C`; semantic contract required before changing operators/color domain |
+| `FCR-REN-15` | presentation/output | [Presentation And Output](PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#presentation-and-output), `DSP-4` | `C`; HDR has its separate `A` package below |
 | `FCR-REN-16` | pipeline materialization/binding | [Pipeline Materialization And Typed Binding](ShaderRuntime/PipelineMaterializationAndTypedBinding.md), `RD-1` | `C`; discovery required for ABI/cache/generation redesign |
 | `FCR-REN-17` | mesh/texture residency | [Mesh And Texture Residency](GeometryAndResources/MeshAndTextureResidency.md), `GR-1` | `C`; add plan/research for streaming/eviction architecture changes |
 | `FCR-REN-18` | temporal sampling/history | [Temporal Sampling And History](FrameExecution/TemporalSamplingAndHistory.md), `DSP-1` | `C`; semantics companion required for jitter/motion/history convention changes |
-| `FCR-REN-19` | settings/persistence | [Settings State And Persistence](RuntimeConfiguration/README.md#settings-state-and-persistence), `RD-2` | `C`; UX/plan split only for a product settings redesign |
+| `FCR-REN-19` | settings/persistence | [Settings State And Persistence](RuntimeConfiguration/RuntimeConfigurationDesign.md#settings-state-and-persistence), `RD-2` | `C`; UX/plan split only for a product settings redesign |
 | `FCR-REN-20` | latency coordination | [Latency Coordination](FrameExecution/LatencyCoordination.md), `RD-5` | `C/B`; provider timing-contract changes require current primary-source research |
 | `FCR-REN-21` | visibility/draw preparation | [Visibility And Draw Preparation](GeometryAndResources/VisibilityAndDrawPreparation.md), `GR-2` | `C`; each admitted LOD/occlusion/GPU-driven/multiview capability needs its own discovery decision |
-| `FCR-REN-22` | resolution/sampling/AA | [Resolution, Sampling, And Anti-Aliasing](PostProcessing/ReconstructionAndGeneration/README.md#resolution-sampling-and-anti-aliasing), `DSP-1` | `C`; absent AA/dynamic-resolution modes remain negative until admitted |
-| `FCR-REN-23` | deferred decals | [focused package](DeferredDecals/README.md), `GR-5` | `B`; add Discovery before Phase 1; add Semantics only if composition rules cannot remain in architecture |
-| `FCR-REN-24` | color grading | [full package](PostProcessing/DisplayPipeline/ColorGrading/README.md), `CGRD-00`, `DSP-5` | `A`; Stage 0 only until decisions pass |
-| `FCR-REN-25` | chromatic aberration | [full package](PostProcessing/DisplayPipeline/ChromaticAberration/README.md), `CHRD-00`, `DSP-6` | `A`; standalone UX is justified by active-state/artifact-classification workflow; Stage 0 only |
-| `FCR-REN-26` | HDR Display Output | [full package](PostProcessing/DisplayPipeline/HDRDisplayOutput/README.md), `HDRD-00`, `DSP-7` | `A`; Stage 0 only until platform/color/hardware decisions pass |
+| `FCR-REN-22` | resolution/sampling/AA | [Resolution, Sampling, And Anti-Aliasing](PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#resolution-sampling-and-anti-aliasing), `DSP-1` | `C`; absent AA/dynamic-resolution modes remain negative until admitted |
+| `FCR-REN-23` | deferred decals | [focused package](DeferredDecals/DeferredDecalsDesign.md), `GR-5` | `B`; add Discovery before Phase 1; add Semantics only if composition rules cannot remain in architecture |
+| `FCR-REN-24` | color grading | [full package](PostProcessing/DisplayPipeline/ColorGrading/ColorGradingDesign.md), `CGRD-00`, `DSP-5` | `A`; Stage 0 only until decisions pass |
+| `FCR-REN-25` | chromatic aberration | [full package](PostProcessing/DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md), `CHRD-00`, `DSP-6` | `A`; standalone UX is justified by active-state/artifact-classification workflow; Stage 0 only |
+| `FCR-REN-26` | HDR Display Output | [full package](PostProcessing/DisplayPipeline/HDRDisplayOutput/HDRDisplayOutputDesign.md), `HDRD-00`, `DSP-7` | `A`; Stage 0 only until platform/color/hardware decisions pass |
 
 ## Explicit Negative Capabilities
 
 | Capability | Current owner | Planning rule |
 | --- | --- | --- |
-| volumetric lighting/media | [Volumetric Lighting package](Lighting/VolumetricLighting/README.md), `VOL-D0`, `VOL-PLAN-02` | `A` target package; current capability remains 0/100 and production stages stay blocked until `REL-11` plus roadmap admission |
-| frame generation | [Frame Generation](PostProcessing/ReconstructionAndGeneration/README.md#frame-generation) | `D`; latency/provider adjacency is not support. Admission requires product, platform, fallback, pacing, UI, and evidence discovery. |
-| non-ray lighting fallback | [Lighting](Lighting/README.md) | `D`; admit as a separate traversal/product decision rather than hiding fallback inside direct/indirect plans. |
+| volumetric lighting/media | [Volumetric Lighting package](Lighting/VolumetricLighting/VolumetricLightingDesign.md), `VOL-D0`, `VOL-PLAN-02` | `A` target package; current capability remains 0/100 and production stages stay blocked until `REL-11` plus roadmap admission |
+| frame generation | [Frame Generation](PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#frame-generation) | `D`; latency/provider adjacency is not support. Admission requires product, platform, fallback, pacing, UI, and evidence discovery. |
+| non-ray lighting fallback | [Lighting](Lighting/LightingDesign.md) | `D`; admit as a separate traversal/product decision rather than hiding fallback inside direct/indirect plans. |
 | occlusion, LOD, GPU-driven/indirect, stereo, multiview | [Visibility And Draw Preparation](GeometryAndResources/VisibilityAndDrawPreparation.md) | `D` per capability; do not create one generic “advanced visibility” plan. |
-| Renderer MSAA, standalone TAA/FXAA/SMAA, dynamic resolution | [Resolution, Sampling, And Anti-Aliasing](PostProcessing/ReconstructionAndGeneration/README.md#resolution-sampling-and-anti-aliasing) | `D` per mode; current reconstruction/jitter infrastructure does not admit them. |
+| Renderer MSAA, standalone TAA/FXAA/SMAA, dynamic resolution | [Resolution, Sampling, And Anti-Aliasing](PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#resolution-sampling-and-anti-aliasing) | `D` per mode; current reconstruction/jitter infrastructure does not admit them. |
 
 ## Upgrade Sequence
 

@@ -1,12 +1,12 @@
 # Reference Path Tracer Transport And Estimator Contract
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](ReferencePathTracerDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** Stage-0-frozen mathematical contract with the 2026-09-13 binary32 amendment and source correspondence through the implemented transport stages; executable estimator validation remains deferred, and the current black-lighting result blocks any usable-radiance or Reference-authority claim
 
 **Responsibility:** define one notation, estimator, event algorithm, probability-measure contract, PBR material boundary, numerical policy, equation-to-code ledger, and mathematical failure checklist for `SurfaceTransportReference` and `FinitePathDiagnostic`
 
-**Authority boundary:** [Discovery](Discovery.md) owns ratification and implementation authorization, [Execution Architecture](ExecutionArchitecture.md) owns system ownership and lifetime, [User Experience](UserExperience.md) owns the interactive and manual-output workflow, the [feature dossier](README.md) owns acceptance, [Research](Research.md) owns precedent, and the [staged plan](Plan.md) owns delivery order and prompts
+**Authority boundary:** [Discovery](Discovery.md) owns ratification and implementation authorization, [Execution Architecture](ExecutionArchitecture.md) owns system ownership and lifetime, [User Experience](UserExperience.md) owns the interactive and manual-output workflow, the [feature dossier](ReferencePathTracerDesign.md) owns acceptance, [Research](Research.md) owns precedent, and the [staged plan](ImplementationPlan.md) owns delivery order and prompts
 
 **Prepared:** mathematical decisions frozen 2026-09-10 and source correspondence subsequently extended through Stage 6; current runtime disposition reconciled 2026-09-26 against committed revision `abe538470fe4e3a3cc5b454f1c5aa54bbd888b60`
 
@@ -546,7 +546,7 @@ The frozen estimator distinguishes a valid zero contribution from an invalid tra
 | Invalid surface or safety-ceiling sample | No valid estimator value exists for that ordinal. Replacing it with zero would bias the mean; including NaN corrupts the raw statistic. | NaN reaches the same accumulation operation as valid RGB; no per-session invalid verdict is produced before committed-count advancement. | Controlled invalid-hit and 4097th-vertex cases fail the session/result, do not publish `Complete`, and cannot yield a valid raw artifact. The failure path preserves the last separately verified prefix without claiming it includes the bad ordinal. |
 | Numerically invalid BSDF/light/throughput contribution | A non-finite or non-representable result cannot be accepted as reference radiance. | The inspected accumulation path has no finite-result gate; source inspection alone cannot enumerate every upstream producer of invalid values. | Fault-injected non-finite contribution is detected before an accepted prefix/result; recovery and artifact behavior follow `FM-RPT-*`, not a plausible black or sanitized value. |
 
-Do not "fix" these cases by clamping, dropping an ordinal, substituting zero, or re-labeling the preview. The design question is where the production GPU result communicates the **minimal** invalid status to the existing session owner without introducing a debug dashboard or general telemetry framework. The [current recovery plan](Plan.md#current-recovery-and-completion-route---2026-09-26) must close that production contract and falsify it with the declared controlled failures. This source finding does not establish that NaN is the cause of the observed black Lit/Reference frames; raw-product inspection must answer that separately.
+Do not "fix" these cases by clamping, dropping an ordinal, substituting zero, or re-labeling the preview. The design question is where the production GPU result communicates the **minimal** invalid status to the existing session owner without introducing a debug dashboard or general telemetry framework. The [current recovery plan](ImplementationPlan.md#current-recovery-and-completion-route---2026-09-26) must close that production contract and falsify it with the declared controlled failures. This source finding does not establish that NaN is the cause of the observed black Lit/Reference frames; raw-product inspection must answer that separately.
 
 | Symptom | Likely defect | Required first check |
 | --- | --- | --- |

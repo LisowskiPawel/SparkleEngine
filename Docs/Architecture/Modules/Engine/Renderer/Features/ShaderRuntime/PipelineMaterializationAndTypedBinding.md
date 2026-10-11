@@ -48,7 +48,7 @@ The benefit is fail-fast ABI and state validation with one cache owner. Feature 
 | `SparkleRenderer` | owns typed parameter instances, runtime materialization/cache, binding, graph execution, and reload facade | public dependencies are Core/RHI; Platform/GameFramework/Tasks/provider/imgui stay private |
 | RHI pipeline service | creates backend binding layouts and graphics/compute/ray pipeline/table objects | does not select Renderer feature technique, shader composition, or graph topology |
 
-The [Shader Program Catalog](ShaderProgramCatalog.md) owns exact program membership and entry points. This dossier owns how a selected program contract becomes executable. The [Ray-Tracing dossier](../RayTracing/README.md) owns effect semantics and scene-to-SBT identity; this dossier owns checked native materialization.
+The [Shader Program Catalog](ShaderProgramCatalog.md) owns exact program membership and entry points. This dossier owns how a selected program contract becomes executable. The [Ray-Tracing dossier](../RayTracing/RayTracingDesign.md) owns effect semantics and scene-to-SBT identity; this dossier owns checked native materialization.
 
 ## Parameter And Binding Model
 

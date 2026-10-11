@@ -1,16 +1,16 @@
 # Owned Neural Denoising Discovery
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](NeuralGraphicsDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** populated discovery backlog; `NG-D0` is open and production implementation is not authorized by this page
 
 **Admission:** after `REL-11` and the measured classical baseline `M3` in the [roadmap](../../../Strategy/Roadmap.md). Documentation research may proceed earlier. This is the selected `PGD-06/07` route in the [delivery catalog](../../../Strategy/FeatureDeliveryCatalog.md), not a generic ML platform.
 
-**Product candidate:** one fixed diffuse-indirect denoising model, trained on owned/provenanced samples and executed as inspectable shaders through the existing Renderer. The [training contract](README.md#neural-graphics-training-and-evaluation), [runtime contract](README.md#model-to-kernel-and-runtime-inference) and [acceptance](README.md#neural-graphics-acceptance) own enduring semantics and proof requirements. Topology, operator set and numerical budgets remain decisions to freeze here before implementation.
+**Product candidate:** one fixed diffuse-indirect denoising model, trained on owned/provenanced samples and executed as inspectable shaders through the existing Renderer. The [training contract](NeuralGraphicsDesign.md#neural-graphics-training-and-evaluation), [runtime contract](NeuralGraphicsDesign.md#model-to-kernel-and-runtime-inference) and [acceptance](NeuralGraphicsDesign.md#neural-graphics-acceptance) own enduring semantics and proof requirements. Topology, operator set and numerical budgets remain decisions to freeze here before implementation.
 
 ## Known Facts And Boundaries
 
-The [current dossier](README.md) distinguishes existing vendor reconstruction from absent owned data/model/lowering/runtime paths. The [Reference Path Tracer recovery plan](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md) records delivered source and unclosed oracle evidence; raw reference generation cannot be assumed reliable for training. [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md) already owns scenes, sample/benchmark policy and held-out generalization. [Shader System](../ShaderSystem/README.md) owns cook, reflection, ABI and published shader identity. Reuse these authorities.
+The [current dossier](NeuralGraphicsDesign.md) distinguishes existing vendor reconstruction from absent owned data/model/lowering/runtime paths. The [Reference Path Tracer recovery plan](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md) records delivered source and unclosed oracle evidence; raw reference generation cannot be assumed reliable for training. [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md) already owns scenes, sample/benchmark policy and held-out generalization. [Shader System](../ShaderSystem/ShaderSystemDesign.md) owns cook, reflection, ABI and published shader identity. Reuse these authorities.
 
 The initial matrix targets available Windows/NVIDIA hardware with both D3D12 and Vulkan. Record the actual installed environment during discovery; this page does not certify it. Missing tuple evidence is blocked. AMD hardware and profiler work are excluded from this selected program. Optional cooperative-vector or vendor-specific kernels need their own pinned capability cell after the generic shader baseline, not a new mandatory dependency.
 

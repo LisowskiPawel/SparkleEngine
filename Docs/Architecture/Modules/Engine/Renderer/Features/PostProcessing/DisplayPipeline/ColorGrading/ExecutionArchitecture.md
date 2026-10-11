@@ -1,12 +1,12 @@
 # Color Grading Execution Architecture
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ColorGradingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed target architecture; blocked until `CGRD-00`, not implementation proof
 
 **Responsibility:** define color-grading owners, data flow, source/cooked/runtime identity, View publication, frame-graph execution, failure, lifetime, capacity, packaging, and clean-break shape
 
-**Authority boundary:** [Semantics](Semantics.md) owns math and data interpretation; [User Experience](UserExperience.md) owns author-visible behavior; [Plan](Plan.md) owns delivery order; RHI owns resource and command mechanics but not grade policy
+**Authority boundary:** [Semantics](Semantics.md) owns math and data interpretation; [User Experience](UserExperience.md) owns author-visible behavior; [Plan](ImplementationPlan.md) owns delivery order; RHI owns resource and command mechanics but not grade policy
 
 **Current readiness:** **0/100 — target only**.
 

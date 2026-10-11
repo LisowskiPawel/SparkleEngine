@@ -1,6 +1,6 @@
 # Debug View Presentation - Acceptance
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](DebugViewsDesign.md)
 
 **Status:** feature-local acceptance contract; not a candidate result
 
@@ -12,9 +12,9 @@
 
 **Control-contract revision:** 2026-10-06; lighting controls require feature execution removal, remain editable in every mode, and never invalidate the viewport solely because a feature is disabled. Disabled raw lighting shows its initialized zero contribution; reconstruction guide production remains owned by its real consumers. No candidate result is added.
 
-**Architecture:** [Viewport Rendering Controls](Controls/README.md) and [Debug View Presentation Architecture](README.md#debug-view-presentation-architecture)
+**Architecture:** [Viewport Rendering Controls](Controls/README.md) and [Debug View Presentation Architecture](DebugViewsDesign.md#debug-view-presentation-architecture)
 
-**Remaining delivery:** [Runtime And Diagnostics](../../FirstRelease/RuntimeAndDiagnostics.md)
+**Remaining delivery:** [Runtime And Diagnostics](../../FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md)
 
 Candidate results belong in `FCR-REN-11`. Source inspection does not prove build, runtime, pixel, backend, or release behavior.
 

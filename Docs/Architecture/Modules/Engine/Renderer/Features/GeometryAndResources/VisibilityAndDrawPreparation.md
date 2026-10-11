@@ -8,7 +8,7 @@
 
 **Scope:** `REN-VIS-01` through `REN-VIS-09`; per-view frustum visibility, material classification, candidate validation, authored-group preservation, opaque sorting/automatic batching, transparent ordering, workload publication, task capacity, and explicit absent visibility/draw-generation paths
 
-**Parents and consumers:** [Scene and View Preparation](../SceneAndViewPreparation/README.md) owns scene/view construction; [Geometry, Materials, and GBuffer](GeometryMaterialsAndGBuffer.md) owns what accepted batches draw and publish
+**Parents and consumers:** [Scene and View Preparation](../SceneAndViewPreparation/SceneAndViewPreparationDesign.md) owns scene/view construction; [Geometry, Materials, and GBuffer](GeometryMaterialsAndGBuffer.md) owns what accepted batches draw and publish
 
 **Current readiness:** **45/100** — CPU frustum classification, validation, sorting, and batching exist; evidence is open and occlusion, LOD, GPU-driven/indirect, stereo, and multiview are **0/100**. See [Current Feature Readiness](../../../../../../Acceptance/CurrentReadiness.md#renderer).
 
@@ -143,4 +143,4 @@ Primary evidence destination: `REN-E32` in the [Capability Evidence Plan](../../
 - [`MeshInstanceBatchBuilder.cpp`](../../../../../../../Engine/Renderer/Private/View/MeshInstanceBatchBuilder.cpp)
 - `Engine/Renderer/Private/View/RenderView.h`, `MeshInstanceBatchBuilder.h`, and prepared-scene contracts
 - [`GBufferMeshPass.cpp`](../../../../../../../Engine/Renderer/Private/Passes/GBuffer/Raster/GBufferMeshPass.cpp)
-- [Scene/View Acceptance](../SceneAndViewPreparation/README.md#scene-and-view-preparation-acceptance) and [Geometry, Materials, and GBuffer](GeometryMaterialsAndGBuffer.md)
+- [Scene/View Acceptance](../SceneAndViewPreparation/SceneAndViewPreparationDesign.md#scene-and-view-preparation-acceptance) and [Geometry, Materials, and GBuffer](GeometryMaterialsAndGBuffer.md)

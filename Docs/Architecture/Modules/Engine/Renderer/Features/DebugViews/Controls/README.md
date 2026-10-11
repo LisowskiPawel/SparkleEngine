@@ -1,6 +1,6 @@
 # Viewport Rendering Controls
 
-[Docs](../../../../../../../README.md) / [Up](../README.md)
+[Docs](../../../../../../../README.md) / [Up](../DebugViewsDesign.md)
 
 **Status:** architecture navigation index
 

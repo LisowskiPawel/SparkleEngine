@@ -1,16 +1,16 @@
 # Graphics Workload Studies
 
-[Docs](../../../../README.md) / [Up](../README.md)
+[Docs](../../../../README.md) / [Up](../PerformanceDiagnosticsDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target workflow and discovery contract; no implemented analysis tool or measured study is claimed
 
-**Scope:** the `PGD-03..05` [strategy outputs](../../../../Strategy/FeatureDeliveryCatalog.md): paired-API causal studies, one difficult incident and one useful offline analysis consumer. [Graphics Workloads](../../../../Acceptance/GraphicsWorkloads.md) owns `MAP/WL/CASE` definitions and benchmark schema/policy; [Diagnostics Acceptance](../Acceptance.md) owns comparison and observer semantics. This folder owns only the bounded study workflow and its [remaining plan](Plan.md).
+**Scope:** the `PGD-03..05` [strategy outputs](../../../../Strategy/FeatureDeliveryCatalog.md): paired-API causal studies, one difficult incident and one useful offline analysis consumer. [Graphics Workloads](../../../../Acceptance/GraphicsWorkloads.md) owns `MAP/WL/CASE` definitions and benchmark schema/policy; [Diagnostics Acceptance](../Acceptance.md) owns comparison and observer semantics. This folder owns only the bounded study workflow and its [remaining plan](ImplementationPlan.md).
 
 ## Intended Consumer And Boundary
 
 A rendering engineer gives a narrow analysis CLI immutable workload records and referenced native captures, asks one predeclared comparison question, and receives inspectable per-run tables/plots plus a decision record. The CLI never collects live engine samples, owns capture-provider state, controls GPU timing or silently merges incompatible identities.
 
-Application remains the live diagnostics/serialization owner under the [diagnostics plan](../Plan.md). Workloads own experiment intent, schema, sample policy and destinations. Tools owns the offline parser/analysis implementation under [Python Automation And Analysis](../../../Modules/Tools/PythonAutomationAndAnalysis.md). External tools remain under the [profiling runbook](../../../../Engineering/Verification/ExternalProfiling.md). Do not create another exporter, history ring, collector or universal capture command.
+Application remains the live diagnostics/serialization owner under the [diagnostics plan](../ImplementationPlan.md). Workloads own experiment intent, schema, sample policy and destinations. Tools owns the offline parser/analysis implementation under [Python Automation And Analysis](../../../Modules/Tools/PythonAutomationAndAnalysis.md). External tools remain under the [profiling runbook](../../../../Engineering/Verification/ExternalProfiling.md). Do not create another exporter, history ring, collector or universal capture command.
 
 ## Discovery Gate `WS-D0`
 

@@ -1,12 +1,12 @@
 # Indirect Lighting And ReSTIR GI Execution Architecture
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](IndirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target architecture pending `IND-D0`; current route is source-present but its estimator conformance is unproved
 
 **Responsibility:** own the target feature enclosure, path/reservoir records, pass/resource graph, history, cross-feature boundaries, lifetime, failure, and integration hooks
 
-**Authority boundary:** [Transport And Estimator](TransportAndEstimator.md) owns math; [Discovery](Discovery.md) freezes choices; [Plan](Plan.md) orders changes; code/build and `FCR-REN-07` own implementation/evidence
+**Authority boundary:** [Transport And Estimator](TransportAndEstimator.md) owns math; [Discovery](Discovery.md) freezes choices; [Plan](ImplementationPlan.md) orders changes; code/build and `FCR-REN-07` own implementation/evidence
 
 **Priority:** initial transport truth → explicit path/shift → GRIS reuse → temporal safety → reconstruction → admitted multi-bounce optimization → evidence
 

@@ -1,12 +1,12 @@
 # Performance Diagnostics Visual Design And Tool Wireframes
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](PerformanceDiagnosticsDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** research; target-product visual design, not proof of current implementation or measured performance
 
 **Last reconciled with the target architecture and current viewport:** 2026-09-29 at revision `d1d26dbb`
 
-**Scope:** graphical product mockups, a system-scope map, and implementation-oriented ASCII layouts for the user-facing diagnostic tools defined by [Performance Diagnostics Architecture](README.md)
+**Scope:** graphical product mockups, a system-scope map, and implementation-oriented ASCII layouts for the user-facing diagnostic tools defined by [Performance Diagnostics Architecture](PerformanceDiagnosticsDesign.md)
 
 **Related current readiness:** **20/100.** The visuals describe a target over partial instrumentation foundations; no depicted dashboard/workspace/tool is implementation evidence. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
 

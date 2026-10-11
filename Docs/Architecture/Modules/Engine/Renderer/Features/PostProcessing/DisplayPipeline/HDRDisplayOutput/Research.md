@@ -1,12 +1,12 @@
 # HDR Display Output Research
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](HDRDisplayOutputDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** research; current primary-source platform/standard/implementation study, not SparkleEngine architecture, implementation, or HDR evidence
 
 **Responsibility:** compare normative HDR signal semantics, current Windows guidance, D3D12 source precedent, and Vulkan presentation contracts for `HDRD-00`
 
-**Authority boundary:** [Discovery](Discovery.md) owns local decisions; [Semantics](Semantics.md) owns accepted math; [Execution Architecture](ExecutionArchitecture.md) owns Renderer/RHI shape; [README](README.md) owns feature acceptance
+**Authority boundary:** [Discovery](Discovery.md) owns local decisions; [Semantics](Semantics.md) owns accepted math; [Execution Architecture](ExecutionArchitecture.md) owns Renderer/RHI shape; [README](HDRDisplayOutputDesign.md) owns feature acceptance
 
 **Researched:** 2026-09-10
 

@@ -28,7 +28,7 @@ Use [Tool Choice And Tradeoffs](#tool-choice-and-tradeoffs) for selection and [O
 
 This document answers two operational questions: which external tool can currently distinguish a performance hypothesis, and what must be preserved so the resulting capture is representative and auditable?
 
-It does not define Sparkle's metric meanings, owners, buffers, or product UX. Those belong to [Performance Diagnostics Architecture](../../Architecture/CrossModule/PerformanceDiagnostics/README.md). It does not own benchmark gates, artifact names, or claim acceptance; [I. Acceptance Workloads](../../Acceptance/GraphicsWorkloads.md) and [Validation, Performance, and Evidence](ValidationAndEvidence.md) remain authoritative. [Diagnostics Product And UX Research](../../Architecture/CrossModule/PerformanceDiagnostics/ProductAndUxResearch.md) records precedent and adopted/rejected product ideas.
+It does not define Sparkle's metric meanings, owners, buffers, or product UX. Those belong to [Performance Diagnostics Architecture](../../Architecture/CrossModule/PerformanceDiagnostics/PerformanceDiagnosticsDesign.md). It does not own benchmark gates, artifact names, or claim acceptance; [I. Acceptance Workloads](../../Acceptance/GraphicsWorkloads.md) and [Validation, Performance, and Evidence](ValidationAndEvidence.md) remain authoritative. [Diagnostics Product And UX Research](../../Architecture/CrossModule/PerformanceDiagnostics/ProductAndUxResearch.md) records precedent and adopted/rejected product ideas.
 
 External tools, drivers, SDKs, and operating-system providers change independently of Sparkle. Every capture therefore records the installed tool version, driver, API/runtime/SDK, hardware, OS, build, observer mode, and relevant capability result. This runbook is revalidated before use; its date is not a support promise.
 
@@ -146,7 +146,7 @@ RenderDoc is a frame debugger, not the CPU profiler for this design. Nsight Grap
 
 ## Attached Frame-Capture Provider Operations
 
-The implemented DebugEditor/DevelopmentEditor route selects one provider: None, Nsight Graphics, PIX or RenderDoc. Launcher GPU Capture and direct `--capture-provider <id>` share the selection; attachment aliases remain supported. Explicit CLI intent overrides the saved enum. One viewport overlay submits captures through the same authority. This runbook separates current mechanics from remaining native/lifecycle/matrix acceptance; [the feature dossier](../../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/README.md) owns those dispositions.
+The implemented DebugEditor/DevelopmentEditor route selects one provider: None, Nsight Graphics, PIX or RenderDoc. Launcher GPU Capture and direct `--capture-provider <id>` share the selection; attachment aliases remain supported. Explicit CLI intent overrides the saved enum. One viewport overlay submits captures through the same authority. This runbook separates current mechanics from remaining native/lifecycle/matrix acceptance; [the feature dossier](../../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ExternalCaptureDesign.md) owns those dispositions.
 
 ### Common Bootstrap And Capture Sequence
 
@@ -397,7 +397,7 @@ The conclusion is architecture-scoped. A result on one CPU topology does not jus
 
 ### PIX
 
-Implement integration using the [external capture package](../../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/README.md), not this runbook alone. The PIX frame action and PIX Timing are separate activities. Revalidate installed official headers for readiness, native-busy, target, completion and opening. An enqueued next-frame request or file existence is not a finalized artifact; retain a verified completion/native-handoff signal. Follow the declared containing-present scope and target identity, and never use a timeout as proof of native cancellation.
+Implement integration using the [external capture package](../../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ExternalCaptureDesign.md), not this runbook alone. The PIX frame action and PIX Timing are separate activities. Revalidate installed official headers for readiness, native-busy, target, completion and opening. An enqueued next-frame request or file existence is not a finalized artifact; retain a verified completion/native-handoff signal. Follow the declared containing-present scope and target identity, and never use a timeout as proof of native cancellation.
 
 - Use Timing Capture first for multi-frame D3D12 CPU/GPU overlap, scheduling, pacing, queue, or residency questions.
 - Use GPU Capture for one representative frame's API events, resources, descriptors, pipeline state, barriers, shaders, and outputs.

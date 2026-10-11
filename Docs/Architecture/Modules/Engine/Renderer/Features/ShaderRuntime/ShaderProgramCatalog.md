@@ -14,7 +14,7 @@
 
 **Owners:** `Engine/Renderer/ShaderRegistrations` for registration membership, typed declarations and pass consumers in `Engine/Renderer`, and `Tools/Shaders` for compilation/publication
 
-**Compilation inventory:** [Shader Compilation Capability Inventory](../../../../Tools/ShaderCompiler/README.md)
+**Compilation inventory:** [Shader Compilation Capability Inventory](../../../../Tools/ShaderCompiler/ShaderCompilerCapabilities.md)
 
 **Cross-system coverage:** [Graphics Feature Coverage Matrix](../../../../../CrossModule/GraphicsCoverageMatrix.md)
 
@@ -64,7 +64,7 @@ There are exactly 37 registrations: 29 Compute, one Vertex, one Pixel, three Ray
 | `RestirIndirectResolveCS` | `/Engine/Passes/Lighting/Restir/Indirect/RestirIndirectResolve.hlsl` | `main` | Compute | Two radiance and four render-extent guide UAVs; uniforms gate primary physical responses and requested guide writes. Guide allocation alone does not establish a provider product. |
 
 
-See [Indirect Lighting](../Lighting/IndirectLighting/README.md) for the current prototype audit, target algorithm, history, inputs, limits, and evidence boundary.
+See [Indirect Lighting](../Lighting/IndirectLighting/IndirectLightingDesign.md) for the current prototype audit, target algorithm, history, inputs, limits, and evidence boundary.
 
 ## Reference Path Tracer Programs
 
@@ -74,7 +74,7 @@ See [Indirect Lighting](../Lighting/IndirectLighting/README.md) for the current 
 | `ReferencePathTracerRGS` | `/Engine/Passes/Lighting/ReferencePathTracer/ReferencePathTracerPipeline.hlsl` | `ReferencePathTracerRayGeneration` | RayGeneration | Native-pipeline adapter that invokes the same Reference transport kernel and composes shared material hit shaders. |
 | `ReferencePathTracerDisplayCS` | `/Engine/Passes/Lighting/ReferencePathTracer/ReferencePathTracerDisplay.hlsl` | `main` | Compute | Publishes the committed accumulation derivative to the ordinary viewport product. |
 
-These rows are current source and registration membership only. Shader cooking, pipeline creation, four-route GPU parity, and accepted-reference behavior remain unproved. See the [Reference Path Tracer](../Lighting/ReferencePathTracer/README.md).
+These rows are current source and registration membership only. Shader cooking, pipeline creation, four-route GPU parity, and accepted-reference behavior remain unproved. See the [Reference Path Tracer](../Lighting/ReferencePathTracer/ReferencePathTracerDesign.md).
 
 ## Lighting Composite And Sky
 
@@ -95,7 +95,7 @@ These rows are current source and registration membership only. Shader cooking, 
 | `ExposureDownsampleTextureCS` | `/Engine/Passes/PostProcessing/Exposure/ExposureDownsampleTexture.hlsl` | `main` | Compute | Subsequent mip-chain downsample over intermediate moments. |
 | `ExposureCS` | `/Engine/Passes/PostProcessing/Exposure/Exposure.hlsl` | `main` | Compute | Resolves manual/automatic settings, luminance moments, prior history, clamps, compensation, and adaptation into current 1x1 exposure/history. |
 
-See [Exposure](../PostProcessing/DisplayPipeline/README.md#exposure) for metering, history, scheduling, and evidence ownership.
+See [Exposure](../PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#exposure) for metering, history, scheduling, and evidence ownership.
 
 ## Image Reconstruction And Upscaling
 
@@ -104,7 +104,7 @@ See [Exposure](../PostProcessing/DisplayPipeline/README.md#exposure) for meterin
 | `LinearUpscaleCS` | `/Engine/Passes/Presentation/Upscaling/LinearUpscale.hlsl` | `main` | Compute | Engine baseline render-extent to output-extent resolve. External providers are not represented by a shader registration. |
 | `PointUpscaleCS` | `/Engine/Passes/Presentation/Upscaling/PointUpscale.hlsl` | `main` | Compute | Exact debug-view resolve that preserves authored scalar, normal, material-color, and category values across extents. |
 
-DLSS Super Resolution and DLSS Ray Reconstruction are external provider evaluations rather than global shader registrations. See [Image Reconstruction and Upscaling](../PostProcessing/ReconstructionAndGeneration/README.md#image-reconstruction-and-upscaling).
+DLSS Super Resolution and DLSS Ray Reconstruction are external provider evaluations rather than global shader registrations. See [Image Reconstruction and Upscaling](../PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#image-reconstruction-and-upscaling).
 
 ## Tone Mapping
 
@@ -112,7 +112,7 @@ DLSS Super Resolution and DLSS Ray Reconstruction are external provider evaluati
 | --- | --- | --- | --- | --- |
 | `ToneMappingCS` | `/Engine/Passes/Presentation/Display/ToneMapping.hlsl` | `main` | Compute | Exposure plus selected mapper converts HDR resolved scene color to display-linear RGBA16F. |
 
-See [Tone Mapping](../PostProcessing/DisplayPipeline/README.md#tone-mapping) for the three operators and the presentation-owned exact-debugbypass boundary.
+See [Tone Mapping](../PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#tone-mapping) for the three operators and the presentation-owned exact-debugbypass boundary.
 
 ## Presentation And Output
 
@@ -124,9 +124,9 @@ See [Tone Mapping](../PostProcessing/DisplayPipeline/README.md#tone-mapping) for
 
 | Feature | Current program coverage | Owning dossier |
 | --- | --- | --- |
-| Color grading | No grading or LUT shader registration | [Color Grading](../PostProcessing/DisplayPipeline/ColorGrading/README.md) |
-| Chromatic aberration | No lens/channel-distortion shader registration | [Chromatic Aberration](../PostProcessing/DisplayPipeline/ChromaticAberration/README.md) |
-| Frame generation | No engine shader or external DLSS-G/frame-generation evaluation | [Frame Generation](../PostProcessing/ReconstructionAndGeneration/README.md#frame-generation) |
+| Color grading | No grading or LUT shader registration | [Color Grading](../PostProcessing/DisplayPipeline/ColorGrading/ColorGradingDesign.md) |
+| Chromatic aberration | No lens/channel-distortion shader registration | [Chromatic Aberration](../PostProcessing/DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md) |
+| Frame generation | No engine shader or external DLSS-G/frame-generation evaluation | [Frame Generation](../PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#frame-generation) |
 
 ## Registered Stage Coverage Versus Vocabulary
 
@@ -191,6 +191,6 @@ When adding, removing, or changing a program:
 
 1. update the typed declaration and `ShaderRegistrations` entry;
 2. update every frame-graph producer/consumer and pipeline composition;
-3. update this exact catalog and the stage counts in [Shader Compilation](../../../../Tools/ShaderCompiler/README.md);
+3. update this exact catalog and the stage counts in [Shader Compilation](../../../../Tools/ShaderCompiler/ShaderCompilerCapabilities.md);
 4. run registration validation, both runtime-target cooks, reflection/ABI checks, and the smallest consuming runtime path;
 5. record candidate-bound results through [Capability Evidence](../../../../CapabilityEvidencePlan.md) and [Feature Completion Reports](../../../../../../Acceptance/FeatureCompletionReports.md).

@@ -12,7 +12,7 @@
 
 | Question | Owning route |
 | --- | --- |
-| What does this module currently contain? | [Module Architecture And Capability Inventory](../../Architecture/Modules/README.md) |
+| What does this module currently contain? | [Module Architecture And Capability Inventory](../../Architecture/Modules/ModuleInventory.md) |
 | How does a graphics feature differ across modes or backends? | [Graphics Feature Coverage Matrix](../../Architecture/CrossModule/GraphicsCoverageMatrix.md) |
 | How does a graphics result travel from request to GPU retirement? | [Graphics Feature Execution Traces](../../Architecture/CrossModule/FeatureExecutionTraces.md) |
 | Can a developer or user complete an end-to-end product journey? | [Product Workflow Coverage](../../Architecture/CrossModule/ProductWorkflowCoverage.md) |

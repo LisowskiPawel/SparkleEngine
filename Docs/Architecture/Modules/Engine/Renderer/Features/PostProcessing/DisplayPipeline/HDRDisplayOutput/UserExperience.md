@@ -1,6 +1,6 @@
 # HDR Display Output User Experience
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](HDRDisplayOutputDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed product experience; blocked until `HDRD-00`, not an implemented UI or package claim
 

@@ -1,12 +1,12 @@
 # Volumetric Lighting Transport And Composition Contract
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](VolumetricLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target mathematical contract with `VOL-D0` parameters; no implementation or validation claim
 
 **Responsibility:** own medium units, radiative transfer, phase, overlap, direct volume light, froxel integration, temporal signal, atmosphere, heterogeneous tracking, reservoir, composition, and numerical rules
 
-**Authority boundary:** `VOL-D0` ratifies unresolved choices; [Execution Architecture](ExecutionArchitecture.md) owns system shape; [Plan](Plan.md) owns order; code/tests conform; a future assigned FCR owns results
+**Authority boundary:** `VOL-D0` ratifies unresolved choices; [Execution Architecture](ExecutionArchitecture.md) owns system shape; [Plan](ImplementationPlan.md) owns order; code/tests conform; a future assigned FCR owns results
 
 **Convention:** camera rays parameterize distance `s` in metres; radiance is scene-linear; volume results are premultiplied in-scattering plus scalar or RGB transmittance as frozen by discovery
 

@@ -1,12 +1,12 @@
 # HDR Display Output Discovery
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](HDRDisplayOutputDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** acceptance contract; `HDRD-00` is `Blocked`, and production implementation is not authorized
 
 **Responsibility:** freeze the Windows HDR product, scene/display semantics, target and SDR-white policy, D3D12/Vulkan presentation contract, transitions, UX, budgets, and evidence before `DSP-7`
 
-**Authority boundary:** [Research](Research.md) owns external findings; [Semantics](Semantics.md), [Execution Architecture](ExecutionArchitecture.md), and [User Experience](UserExperience.md) are conditional candidates; [Plan](Plan.md) orders delivery; [README](README.md) owns `AC-HDR-*`/`FM-HDR-*`; RHI owns native mechanics, not display policy
+**Authority boundary:** [Research](Research.md) owns external findings; [Semantics](Semantics.md), [Execution Architecture](ExecutionArchitecture.md), and [User Experience](UserExperience.md) are conditional candidates; [Plan](ImplementationPlan.md) orders delivery; [README](HDRDisplayOutputDesign.md) owns `AC-HDR-*`/`FM-HDR-*`; RHI owns native mechanics, not display policy
 
 **Verified:** 2026-09-10 against committed revision `ca55e7d8`; Renderer/RHI/settings/window/swapchain/UI/capture/package source inspected; no executable HDR hardware evidence was run; concurrent user-owned dirty paths remain outside this gate evidence
 
@@ -168,4 +168,4 @@ The gate report retains:
 
 ## Gate Decision
 
-`HDRD-00` is **Blocked**. A future `PASS` must name the accepted dossier/research/semantics/architecture/experience/plan revisions and the exact release hardware/software cells. It authorizes only Stage 1 of [Plan](Plan.md); `FCR-REN-26` remains blocked until all feature evidence passes.
+`HDRD-00` is **Blocked**. A future `PASS` must name the accepted dossier/research/semantics/architecture/experience/plan revisions and the exact release hardware/software cells. It authorizes only Stage 1 of [Plan](ImplementationPlan.md); `FCR-REN-26` remains blocked until all feature evidence passes.

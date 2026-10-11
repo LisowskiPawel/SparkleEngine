@@ -1,6 +1,6 @@
 # Chromatic Aberration User Experience
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ChromaticAberrationDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed development-product experience; blocked until `CHRD-00`, not an implemented UI promise
 

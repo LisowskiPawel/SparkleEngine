@@ -1,12 +1,12 @@
 # Direct Lighting Execution Architecture
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](DirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target architecture pending `DIR-D0`; current source facts are revision-pinned, while target names and stage boundaries do not prove implementation
 
 **Responsibility:** own the target Direct Lighting feature enclosure, records, resources, execution, history, providers, lifetime, failure, and integration hooks
 
-**Authority boundary:** [Sampling And Shading](SamplingAndShading.md) owns equations; [Discovery](Discovery.md) freezes choices; [Plan](Plan.md) orders changes; current code/build and `FCR-REN-06` own implementation/evidence
+**Authority boundary:** [Sampling And Shading](SamplingAndShading.md) owns equations; [Discovery](Discovery.md) freezes choices; [Plan](ImplementationPlan.md) orders changes; current code/build and `FCR-REN-06` own implementation/evidence
 
 **Priority:** correctness baseline → canonical reservoir replacement → temporal/visibility safety → reconstruction → many-light expansion → evidence
 

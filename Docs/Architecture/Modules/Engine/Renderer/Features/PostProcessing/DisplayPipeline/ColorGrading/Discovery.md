@@ -1,12 +1,12 @@
 # Color Grading Discovery
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ColorGradingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** acceptance contract; `CGRD-00` is `Blocked`, and production implementation is not authorized
 
 **Responsibility:** freeze the first-release color domain, transform semantics, LUT contract, ownership, experience, budgets, and evidence protocol before `DSP-5` implementation begins
 
-**Authority boundary:** [Research](Research.md) supplies precedent; [Semantics](Semantics.md), [Execution Architecture](ExecutionArchitecture.md), and [User Experience](UserExperience.md) are conditional design candidates; [Plan](Plan.md) orders work only after this gate passes; [README](README.md) owns feature acceptance; code and build configuration own implementation
+**Authority boundary:** [Research](Research.md) supplies precedent; [Semantics](Semantics.md), [Execution Architecture](ExecutionArchitecture.md), and [User Experience](UserExperience.md) are conditional design candidates; [Plan](ImplementationPlan.md) orders work only after this gate passes; [README](ColorGradingDesign.md) owns feature acceptance; code and build configuration own implementation
 
 **Verified:** 2026-09-10 against committed revision `ca55e7d8`; current Renderer, shader, texture-cooking, settings, editor, and package routes were re-inspected as source only; concurrent user-owned dirty work was present outside this package and was not treated as committed proof
 
@@ -26,7 +26,7 @@ Color grading cannot be reduced to adding a saturation value and a texture sampl
 | Product route | DevelopmentEditor authoring and packaged consumption are required | freeze first use, error state, automation equivalence, package policy, and support output |
 | Evidence | `AC-CGR-*` exists, but thresholds and fixtures are not frozen | predeclare numeric, visual, backend, package, memory, and cost oracles |
 
-`PASS` freezes one immutable `CGRD-00-R1` report and permits only Stage 1 of [Plan](Plan.md). It does not mean that a parser is safe, a shader compiles, a LUT is colorimetrically correct, a backend agrees, a package contains the asset, or `FCR-REN-24` passed. A decision that can change feature scope, color meaning, source grammar, identity, ownership, failure, cost, or evidence keeps the gate blocked.
+`PASS` freezes one immutable `CGRD-00-R1` report and permits only Stage 1 of [Plan](ImplementationPlan.md). It does not mean that a parser is safe, a shader compiles, a LUT is colorimetrically correct, a backend agrees, a package contains the asset, or `FCR-REN-24` passed. A decision that can change feature scope, color meaning, source grammar, identity, ownership, failure, cost, or evidence keeps the gate blocked.
 
 ## Iteration Control Record
 
@@ -173,4 +173,4 @@ The gate report is complete only when it retains:
 
 ## Gate Decision
 
-`CGRD-00` is **Blocked**. A reviewer may record `PASS` only when all discovery acceptance criteria pass conjunctively, the exact accepted revisions of the dossier, semantics, architecture, experience, and plan are named, and `DSP-5` plus release prerequisites permit work. A pass authorizes Stage 1 of [Plan](Plan.md), not the whole feature and not `FCR-REN-24`.
+`CGRD-00` is **Blocked**. A reviewer may record `PASS` only when all discovery acceptance criteria pass conjunctively, the exact accepted revisions of the dossier, semantics, architecture, experience, and plan are named, and `DSP-5` plus release prerequisites permit work. A pass authorizes Stage 1 of [Plan](ImplementationPlan.md), not the whole feature and not `FCR-REN-24`.

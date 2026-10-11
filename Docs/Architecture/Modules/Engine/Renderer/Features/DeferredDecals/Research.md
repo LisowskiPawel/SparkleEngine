@@ -1,6 +1,6 @@
 # Deferred Decal Composition Precedent
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](DeferredDecalsDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** research; external-source comparison, not Sparkle architecture or acceptance authority
 

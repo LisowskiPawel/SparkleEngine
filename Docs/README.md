@@ -8,11 +8,11 @@ Use these pages to understand the engine, choose your next task and find the des
 
 | I want to... | Open |
 | --- | --- |
-| Continue the first release | [Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) -> [work plan](Architecture/CrossModule/FirstRelease/README.md) -> [shipping checks](Acceptance/FirstRelease.md) |
+| Continue the first release | [Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) -> [work plan](Architecture/CrossModule/FirstRelease/ImplementationPlan.md) -> [shipping checks](Acceptance/FirstRelease.md) |
 | Understand the engine | [Engine at a glance](Architecture/EngineAtAGlance.md) -> [repository map](Architecture/WholeRepositoryMap.md) |
-| Find a module or feature | [Architecture](Architecture/README.md) -> [modules](Architecture/Modules/README.md) |
-| Work on rendering | [Renderer](Architecture/Modules/Engine/Renderer/README.md) or [RHI](Architecture/Modules/Engine/RHI/README.md) |
-| Build, cook or package | [Launcher](Architecture/Modules/Tools/Launcher/README.md) -> [build](Architecture/Modules/BuildAndPackaging/README.md) -> [package](Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md) |
+| Find a module or feature | [Architecture](Architecture/README.md) -> [modules](Architecture/Modules/ModuleInventory.md) |
+| Work on rendering | [Renderer](Architecture/Modules/Engine/Renderer/RendererDesign.md) or [RHI](Architecture/Modules/Engine/RHI/RHIDesign.md) |
+| Build, cook or package | [Launcher](Architecture/Modules/Tools/Launcher/LauncherCapabilities.md) -> [build](Architecture/Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md) -> [package](Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md) |
 | Contribute or review | [Contributing](../CONTRIBUTING.md) -> [engineering rules](Engineering/README.md#choose-by-task) |
 | Find results or workload checks | [Acceptance](Acceptance/README.md) |
 

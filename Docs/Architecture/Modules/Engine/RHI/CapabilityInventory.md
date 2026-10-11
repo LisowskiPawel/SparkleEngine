@@ -1,6 +1,6 @@
 # RHI Capability Inventory
 
-[Docs](../../../../README.md) / [Up](README.md)
+[Docs](../../../../README.md) / [Up](RHIDesign.md) / [Implementation](FirstReleaseImplementationPlan.md)
 
 **Status:** capability snapshot; not release approval or executable backend evidence
 
@@ -16,18 +16,18 @@
 
 **Traceability:** capability rows use durable `RHI-<family>-NN` identities; their primary proof destinations are listed in the [RHI capability-to-evidence map](../../CapabilityEvidencePlan.md#rhi-capability-to-evidence-map).
 
-**Module routes:** [RHI module index](README.md) and [RHI feature dossiers](Features/README.md)
+**Module routes:** [RHI module index](RHIDesign.md) and [RHI feature dossiers](Features/RHIFeatureGuide.md)
 
 **Deeper routes:** [cross-system backend/feature coverage](../../../CrossModule/GraphicsCoverageMatrix.md) and [producer-to-consumer execution traces](../../../CrossModule/FeatureExecutionTraces.md)
 
 > [!TIP]
-> This file is an exact backend/reference ledger, not the best introduction. Start with the [RHI overview](README.md), then search by `RHI-*` ID or contract heading. A neutral API row, a D3D12 cell, and a Vulkan cell are separate claims; read their limits and evidence before inferring support or parity.
+> This file is an exact backend/reference ledger, not the best introduction. Start with the [RHI overview](RHIDesign.md), then search by `RHI-*` ID or contract heading. A neutral API row, a D3D12 cell, and a Vulkan cell are separate claims; read their limits and evidence before inferring support or parity.
 
 **Current readiness:** **45/100** across the tracked RHI portfolio; this ledger proves source coverage only and adds no verification or delivery credit. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#rhi-and-gpu-execution).
 
 ## Read This Page
 
-- **Learn the backend contract:** Start with the [RHI overview](README.md) and [feature guide](Features/README.md).
+- **Learn the backend contract:** Start with the [RHI overview](RHIDesign.md) and [feature guide](Features/RHIFeatureGuide.md).
 - **Compare exact coverage:** Use a heading or `RHI-*` ID below. Neutral, D3D12 and Vulkan cells are separate claims.
 - **Find the next proof:** The [capability evidence map](../../CapabilityEvidencePlan.md#rhi-capability-to-evidence-map) owns pending checks.
 
@@ -35,9 +35,9 @@
 
 | Reader need | Owner |
 | --- | --- |
-| understand one RHI contract, its ownership/lifetime, or its feature-local completion requirements | [RHI Feature Dossiers](Features/README.md) |
+| understand one RHI contract, its ownership/lifetime, or its feature-local completion requirements | [RHI Feature Dossiers](Features/RHIFeatureGuide.md) |
 | inspect exact source-state, backend coverage, limits, and evidence destinations | this capability inventory |
-| understand Renderer policy above an RHI mechanism | [Renderer](../Renderer/README.md) |
+| understand Renderer policy above an RHI mechanism | [Renderer](../Renderer/RendererDesign.md) |
 | compare D3D12/Vulkan and execution-mode coverage | [Graphics Feature Coverage Matrix](../../../CrossModule/GraphicsCoverageMatrix.md) |
 | inspect an end-to-end producer/consumer path | [Graphics Feature Execution Traces](../../../CrossModule/FeatureExecutionTraces.md) |
 
@@ -185,7 +185,7 @@ Ray tracing is not one boolean. The current contract separates acceleration stru
 | `RHI-PRES-02` | VSync | Implemented path | Runtime setting reaches the presentation path. Tearing/present-mode behavior still needs backend/device evidence. | `S` | Pending |
 | `RHI-PRES-03` | Frame pacing | Implemented path | D3D12 exposes a frame-latency waitable object; Vulkan exposes acquisition throttling in its capability surface. | `S` | Pending |
 | `RHI-PRES-04` | Back-buffer commands | Implemented path | Back-buffer resource/RTV, format, viewport/scissor, transition, submit, and present are available to Renderer. | `S` | Pending |
-| `RHI-PRES-05` | HDR presentation | Not found | The inspected source does not establish an HDR surface/color-space contract or swapchain negotiation. Renderer [HDR Display Output](../Renderer/Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/README.md) owns the discovery-blocked target and `FCR-REN-26`; RHI owns native mechanics. | `S` | First-release target; Blocked |
+| `RHI-PRES-05` | HDR presentation | Not found | The inspected source does not establish an HDR surface/color-space contract or swapchain negotiation. Renderer [HDR Display Output](../Renderer/Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/HDRDisplayOutputDesign.md) owns the discovery-blocked target and `FCR-REN-26`; RHI owns native mechanics. | `S` | First-release target; Blocked |
 
 ## Diagnostics, Capture, And External Interop
 

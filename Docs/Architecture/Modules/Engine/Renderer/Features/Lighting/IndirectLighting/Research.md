@@ -1,6 +1,6 @@
 # Indirect Lighting And ReSTIR Path-Resampling Study
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](IndirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** primary-source research and discovery input; no cited method is local implementation or acceptance evidence
 

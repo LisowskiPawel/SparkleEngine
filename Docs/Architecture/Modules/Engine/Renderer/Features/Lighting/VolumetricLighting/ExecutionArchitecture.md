@@ -1,12 +1,12 @@
 # Volumetric Lighting, Fog, Atmosphere, And Sky Execution Architecture
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](VolumetricLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target architecture pending `REL-11` admission and `VOL-D0`; current Renderer has no volume feature
 
 **Responsibility:** own the target feature enclosure, authored-to-GPU route, records, pass/resources, histories, sky/environment/content/backend boundaries, lifetime, failure, and integration hooks
 
-**Authority boundary:** [Transport And Composition](TransportAndComposition.md) owns math; strategy and [Discovery](Discovery.md) admit/freeze the target; [Plan](Plan.md) orders work; code/build and a future FCR own implementation/evidence
+**Authority boundary:** [Transport And Composition](TransportAndComposition.md) owns math; strategy and [Discovery](Discovery.md) admit/freeze the target; [Plan](ImplementationPlan.md) orders work; code/build and a future FCR own implementation/evidence
 
 **Priority:** semantic/reference core → first fog slice → unified froxel/local lights → temporal product → atmosphere/environment → heterogeneous media → Volumetric ReSTIR → clouds only if admitted
 

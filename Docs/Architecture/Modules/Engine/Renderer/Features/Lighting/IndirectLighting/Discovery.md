@@ -1,6 +1,6 @@
 # Indirect Lighting And ReSTIR GI Discovery Gate
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](IndirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Gate:** `IND-D0`
 
@@ -142,7 +142,7 @@ An independent two-direction enumeration falsifies interpreting those labels as 
 
 **Bounded repair observation:** the subsequent dirty candidate removes stored proposal classification and publishes the separately accumulated physical response. A CPU adaptation of the authored path-accounting loop, with explicitly mocked BSDF samples and scene hits, passes one/three-bounce physical outputs `1/3`, total `4`, delta-only support, shared continuation and roulette compensation; rejected roulette stops before the third trace. A deliberately proposal-labelled combined-output negative control fails. This is an accounting probe, not execution of the real GGX sampler, traversal, reservoir reuse or provider. The 12-type/24-job focused DXIL/SPIR-V cook includes Reference inline/pipeline shaders and validates the changed shared ABI. Reference equations continue to consume the sum, but floating-point reassociation means bit-identical paths/images are not claimed. Candidate hashes, commands and these limits belong to the `FCR-REN-11` baseline report; `IND-D0-02/04/07` and DVP admission remain open.
 
-**Historical admission requirement, superseded only within the bounded Show-control slice:** before DVP-4A-5 admission, the owning baseline stages in [Plan](Plan.md) must prove physical per-lobe accounting, unchanged total within the frozen oracle, technique/PDF normalization and destination-target consistency. Separately prove the specular hit-distance guide meaning after attribution changes. `IND-D0-02` remains open; final-output masking, relabeling or a black guide does not close it.
+**Historical admission requirement, superseded only within the bounded Show-control slice:** before DVP-4A-5 admission, the owning baseline stages in [Plan](ImplementationPlan.md) must prove physical per-lobe accounting, unchanged total within the frozen oracle, technique/PDF normalization and destination-target consistency. Separately prove the specular hit-distance guide meaning after attribution changes. `IND-D0-02` remains open; final-output masking, relabeling or a black guide does not close it.
 
 **Bounded Stage-5 control execution, 2026-10-05:** [Bounded Show evidence](../../../../../../../Acceptance/Renderer/DebugViews.md#earlier-execution-evidence) records fresh physical-response, reuse-on, continuation, emission, delta, all-off, reset and selected-provider proof. The existing indirect uniform is now 32 bytes with primary evaluation words; one builder feeds generation/reuse/resolve. Full proposals and continuation material responses remain, and only the active primary sum drives target/weights. Ordinary resolve has no guide bindings; the genuine-guide schema allocates only real render-extent products. Native Vulkan secondary-hit checks exposed shared hit-record strides 80/368 versus uploaded 64/360; compiler buffer-layout policy and native scalar-layout admission were repaired at their owners and the selected matrix replayed. This is bounded control/ABI correctness, not IND-D0-02/04/07 or GRIS admission; no score or full estimator/provider/motion/performance claim is upgraded.
 

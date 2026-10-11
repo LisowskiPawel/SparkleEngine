@@ -1,6 +1,6 @@
 # Direct Lighting Discovery Gate
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](DirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Gate:** `DIR-D0`
 
@@ -139,7 +139,7 @@ The Debug Views admission audit at `32660b5ca030dc5f46d1888d96f6aabcc5ec87e5` ex
 - `SurfaceLighting.hlsli::EvaluateDirectLightWithF0` implements `evaluateSubsurface = false` by passing strength zero into `BRDF::Direct::Evaluate`. The default `BRDF_SUBSURFACE_WRAP` interprets strength as wrap width, not amplitude. At `NoL = 1`, base color and subsurface color both `0.5`, its response is `0.25 / pi = 0.07957747154594767`, even with strength zero. A zero-strength argument is neither zero response nor skipped evaluation.
 - The unchanged additive base layer fails even a conservative white-furnace bound. For white nonmetal, white subsurface, `F0 = 0`, `NoV = 1`, roughness zero and wrap width one, wrap hemispherical reflectance is `5/6`. Burley diffuse times Schlick's retained diffuse factor has reflectance at least `0.5 * (1 - (1 - sqrt(0.5))^5)`. Their sum exceeds `1.3322555869` before any specular contribution. This is a counterexample to the base-budget rule, not a full furnace sweep or an energy-conservation claim for other models.
 
-**Required resolution:** material disablement must branch before subsurface evaluation; width cannot impersonate amplitude. Ratify the diffuse/subsurface allocation under [Surface Lobe Contract](SamplingAndShading.md#surface-lobe-contract), update the shared evaluator and every consumer together, and establish a corrected raw baseline before freezing Debug Views all-on equivalence. A feature-off action must not reassign the disabled authored lobe's budget to another lobe. Fixing these material semantics is owned by `DIR-1/2` in [Plan](Plan.md), not by registering a Show CVar or silently changing allocation inside DVP-4A-2.
+**Required resolution:** material disablement must branch before subsurface evaluation; width cannot impersonate amplitude. Ratify the diffuse/subsurface allocation under [Surface Lobe Contract](SamplingAndShading.md#surface-lobe-contract), update the shared evaluator and every consumer together, and establish a corrected raw baseline before freezing Debug Views all-on equivalence. A feature-off action must not reassign the disabled authored lobe's budget to another lobe. Fixing these material semantics is owned by `DIR-1/2` in [Plan](ImplementationPlan.md), not by registering a Show CVar or silently changing allocation inside DVP-4A-2.
 
 **Bounded inspection/repair surface:** `BRDF/BRDF.hlsli`, `BRDF/Subsurface.hlsli`, `Lighting/SurfaceLighting.hlsli`; inspect their direct reservoir, direct resolve and shared hit-lighting callers. No new CVar, public API, frame state, provider, shader variant or feature framework is required to express the material decision. Any caller/parameter change must be ledgered before production admission. Existing `DIR-D0` gate requirements remain binding; this finding does not authorize the complete Direct Lighting replacement.
 

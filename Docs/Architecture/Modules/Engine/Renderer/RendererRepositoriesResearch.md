@@ -1,6 +1,6 @@
 # E. External Renderer Repository Comparison
 
-[Docs](../../../../README.md) / [Up](README.md)
+[Docs](../../../../README.md) / [Up](RendererDesign.md)
 
 **Status:** research; source-linked external comparison whose patterns are precedent, not local implementation proof
 

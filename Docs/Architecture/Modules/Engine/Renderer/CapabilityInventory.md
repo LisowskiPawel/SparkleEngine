@@ -1,6 +1,6 @@
 # Renderer Capability Inventory
 
-[Docs](../../../../README.md) / [Up](README.md)
+[Docs](../../../../README.md) / [Up](RendererDesign.md)
 
 **Status:** capability snapshot; not release approval, visual validation, or performance evidence
 
@@ -16,16 +16,16 @@
 
 **Traceability:** capability rows use durable `REN-<family>-NN` identities; their primary proof destinations are listed in the [Renderer capability-to-evidence map](../../CapabilityEvidencePlan.md#renderer-capability-to-evidence-map).
 
-**Deeper routes:** [Rendering a Sparkle Frame](RenderingASparkleFrame.md), [Renderer feature dossiers](Features/README.md), [pipeline materialization and typed binding](Features/ShaderRuntime/PipelineMaterializationAndTypedBinding.md), [scene and view preparation](Features/SceneAndViewPreparation/README.md), [mesh and texture residency](Features/GeometryAndResources/MeshAndTextureResidency.md), [temporal sampling and history](Features/FrameExecution/TemporalSamplingAndHistory.md), [latency coordination](Features/FrameExecution/LatencyCoordination.md), [settings lifecycle](Features/RuntimeConfiguration/README.md#settings-state-and-persistence), [cross-system graphics coverage](../../../CrossModule/GraphicsCoverageMatrix.md), [producer-to-consumer execution traces](../../../CrossModule/FeatureExecutionTraces.md), and the [exact shader program catalog](Features/ShaderRuntime/ShaderProgramCatalog.md)
+**Deeper routes:** [Rendering a Sparkle Frame](RenderingASparkleFrame.md), [Renderer feature dossiers](Features/RendererFeatureGuide.md), [pipeline materialization and typed binding](Features/ShaderRuntime/PipelineMaterializationAndTypedBinding.md), [scene and view preparation](Features/SceneAndViewPreparation/SceneAndViewPreparationDesign.md), [mesh and texture residency](Features/GeometryAndResources/MeshAndTextureResidency.md), [temporal sampling and history](Features/FrameExecution/TemporalSamplingAndHistory.md), [latency coordination](Features/FrameExecution/LatencyCoordination.md), [settings lifecycle](Features/RuntimeConfiguration/RuntimeConfigurationDesign.md#settings-state-and-persistence), [cross-system graphics coverage](../../../CrossModule/GraphicsCoverageMatrix.md), [producer-to-consumer execution traces](../../../CrossModule/FeatureExecutionTraces.md), and the [exact shader program catalog](Features/ShaderRuntime/ShaderProgramCatalog.md)
 
 > [!TIP]
-> This file is an exact reference ledger, not the best introduction. Start with the [Renderer overview](README.md), then search this page by `REN-*` ID or feature heading. Read the row's **state**, **coverage and limit**, **evidence**, and **release disposition** together; no single cell means “supported.”
+> This file is an exact reference ledger, not the best introduction. Start with the [Renderer overview](RendererDesign.md), then search this page by `REN-*` ID or feature heading. Read the row's **state**, **coverage and limit**, **evidence**, and **release disposition** together; no single cell means “supported.”
 
 **Current readiness:** **36/100** across the tracked Renderer portfolio; this inventory contributes source knowledge, not verification or delivery credit. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#renderer).
 
 ## Read This Page
 
-- **Learn the frame:** Start with the [Renderer overview](README.md) and [frame narrative](RenderingASparkleFrame.md).
+- **Learn the frame:** Start with the [Renderer overview](RendererDesign.md) and [frame narrative](RenderingASparkleFrame.md).
 - **Look up exact coverage:** Use a feature heading or `REN-*` ID below. Read state, limit, evidence and release disposition together.
 - **Find the next proof:** The [capability evidence map](../../CapabilityEvidencePlan.md#renderer-capability-to-evidence-map) owns pending checks.
 
@@ -33,13 +33,13 @@
 
 | Document | Responsibility |
 | --- | --- |
-| [Renderer module route](README.md) | reader-first navigation by frame, feature, exact inventory, evidence, or release question |
+| [Renderer module route](RendererDesign.md) | reader-first navigation by frame, feature, exact inventory, evidence, or release question |
 | [Rendering a Sparkle Frame](RenderingASparkleFrame.md) | canonical current frame narrative from submission through GPU retirement |
-| [Renderer Feature Dossiers](Features/README.md) | explicit feature-family definitions, algorithms, limits, decisions, and evidence routes |
+| [Renderer Feature Dossiers](Features/RendererFeatureGuide.md) | explicit feature-family definitions, algorithms, limits, decisions, and evidence routes |
 
-The Renderer root owns this module route, the canonical frame narrative, the exact capability ledger, module-wide research, and the first-release Renderer plan index. Current feature behavior, target architectures, catalogs, plans, research, and substantial feature-local acceptance contracts live under [Features](Features/README.md). Candidate results, cross-feature workloads, and release-wide acceptance remain under `Docs/Acceptance`.
+The Renderer root owns this module route, the canonical frame narrative, the exact capability ledger, module-wide research, and the first-release Renderer plan index. Current feature behavior, target architectures, catalogs, plans, research, and substantial feature-local acceptance contracts live under [Features](Features/RendererFeatureGuide.md). Candidate results, cross-feature workloads, and release-wide acceptance remain under `Docs/Acceptance`.
 
-The [RHI module](../RHI/README.md) owns backend-neutral GPU contracts and backend implementations. Cross-module graphics comparisons and end-to-end traces live under [CrossModule](../../../CrossModule/README.md).
+The [RHI module](../RHI/RHIDesign.md) owns backend-neutral GPU contracts and backend implementations. Cross-module graphics comparisons and end-to-end traces live under [CrossModule](../../../CrossModule/README.md).
 
 ## Ownership And Frame Production
 
@@ -203,7 +203,7 @@ Capacities above are hard implementation limits from this snapshot, not recommen
 | --- | --- | --- | --- | --- | --- |
 | `REN-LGT-02` | Direct shadow visibility | Capability-gated | Dual execution: inline ray query or native pipeline. Produces a visibility signal consumed by direct lighting. The four analytic light kinds and active direct BRDF lobes are enumerated under `REN-PBR-*`. | `S` | Pending |
 
-The current audit, target algorithm, light/BRDF/sampling/shadow/reconstruction contract, research, and staged plan are in [Direct Lighting](Features/Lighting/DirectLighting/README.md).
+The current audit, target algorithm, light/BRDF/sampling/shadow/reconstruction contract, research, and staged plan are in [Direct Lighting](Features/Lighting/DirectLighting/DirectLightingDesign.md).
 
 ## Indirect Lighting
 
@@ -212,7 +212,7 @@ The current audit, target algorithm, light/BRDF/sampling/shadow/reconstruction c
 | `REN-LGT-03` | Source-named ReSTIR indirect prototype | Capability-gated, conformance unproved | Inline ray-query path with a float-packed pixel/sample/frame seed, temporal and spatial reservoir reuse, and resolve; configurable bounce count is clamped to 8. No explicit path record, shift/inverse/Jacobian, GRIS contribution-weight proof, or native-pipeline adapter was found. | `S` | Pending replacement plan |
 | `REN-LGT-07` | Sky | Implemented path | Dedicated sky lighting and sky motion-vector production are in the graph. Environment/IBL asset breadth is not claimed by this row. | `S` | Pending |
 
-The current seed-replay audit and target ReSTIR GI/GRIS path, history, secondary-transport, environment, oracle, research, and staged plan are in [Indirect Lighting](Features/Lighting/IndirectLighting/README.md).
+The current seed-replay audit and target ReSTIR GI/GRIS path, history, secondary-transport, environment, oracle, research, and staged plan are in [Indirect Lighting](Features/Lighting/IndirectLighting/IndirectLightingDesign.md).
 
 ## Volumetric Lighting
 
@@ -222,7 +222,7 @@ The current seed-replay audit and target ReSTIR GI/GRIS path, history, secondary
 | `REN-VOL-02` | Volumetric light transport | Not found | No extinction, absorption, phase-function, in-scattering, transmittance, volumetric shadow, multiple-scattering, temporal reconstruction, or composite product was found. | `S` | Excluded unless later admitted |
 | `REN-VOL-03` | Atmosphere and aerial perspective | Not found | Sky background fill exists, but no atmospheric scattering, height fog, aerial perspective, or volumetric-cloud lighting path was found. | `S` | Excluded unless later admitted |
 
-The negative capability boundary and post-release research, semantics, architecture, and staged target for fog, atmosphere/sky, heterogeneous media, and Volumetric ReSTIR are in [Volumetric Lighting](Features/Lighting/VolumetricLighting/README.md).
+The negative capability boundary and post-release research, semantics, architecture, and staged target for fog, atmosphere/sky, heterogeneous media, and Volumetric ReSTIR are in [Volumetric Lighting](Features/Lighting/VolumetricLighting/VolumetricLightingDesign.md).
 
 ## Deferred Decals
 
@@ -232,7 +232,7 @@ The negative capability boundary and post-release research, semantics, architect
 | `REN-DECAL-02` | Primary deferred GBuffer composition | Not found | No decal pass modifies the shared raster/ray GBuffer before depth-derived and lighting consumers. | `S` | First-release target; `FCR-REN-23` Blocked |
 | `REN-DECAL-03` | Secondary-ray decal evaluation | Not found | Arbitrary ray hits evaluate base materials without decal candidate lookup or composition. | `S` | First-release target; `FCR-REN-23` Blocked |
 
-Current absence, extension seams, and the separately labeled target architecture are routed by [Deferred Decals](Features/DeferredDecals/README.md).
+Current absence, extension seams, and the separately labeled target architecture are routed by [Deferred Decals](Features/DeferredDecals/DeferredDecalsDesign.md).
 
 ## Ray-Tracing Scene And Shader Tables
 
@@ -283,7 +283,7 @@ Current absence, extension seams, and the separately labeled target architecture
 
 | Capability ID | Capability | State | Exact current coverage and limit | Evidence | Release disposition |
 | --- | --- | --- | --- | --- | --- |
-| `REN-POST-14` | Basic vignette | Target only; source implementation not found | Owner-directed first-release addition, 2026-10-10; [Vignette](Features/PostProcessing/DisplayPipeline/Vignette/README.md) owns the small mask/placement/neutral contract. | Source/name search only | Included obligation; FCR-REN-25 remains unaccepted |
+| `REN-POST-14` | Basic vignette | Target only; source implementation not found | Owner-directed first-release addition, 2026-10-10; [Vignette](Features/PostProcessing/DisplayPipeline/Vignette/VignetteDesign.md) owns the small mask/placement/neutral contract. | Source/name search only | Included obligation; FCR-REN-25 remains unaccepted |
 | `REN-POST-13` | Frame generation | Not found | No optical-flow/frame-synthesis provider, DLSS-G registration, generated-frame identity/resources, UI policy, pacing/present path, selector, or diagnostics were found. Streamline PCL/Reflex latency coordination is not frame generation. | `S` | Excluded unless later admitted |
 
 ## Presentation And Output
@@ -291,7 +291,7 @@ Current absence, extension seams, and the separately labeled target architecture
 | Capability ID | Capability | State | Exact current coverage and limit | Evidence | Release disposition |
 | --- | --- | --- | --- | --- | --- |
 | `REN-POST-08` | Output encoding | Implemented path | Automatic, Linear, and sRGB encoding selections. | `S` | Pending |
-| `REN-POST-09` | HDR display output | Not found | No PQ, HDR color-space/surface contract, display-nit contract, or HDR swapchain mode was found in the current Renderer/RHI output selections. [HDR Display Output](Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/README.md) owns the discovery-blocked target. | `S` | First-release target; `FCR-REN-26` Blocked |
+| `REN-POST-09` | HDR display output | Not found | No PQ, HDR color-space/surface contract, display-nit contract, or HDR swapchain mode was found in the current Renderer/RHI output selections. [HDR Display Output](Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/HDRDisplayOutputDesign.md) owns the discovery-blocked target. | `S` | First-release target; `FCR-REN-26` Blocked |
 | `REN-POST-10` | Exact debug presentation | Partial | Debug views flow through the existing exposure/tone/output chain. The separate exact display-linear versus scene-referred debug presentation described in the target design is not implemented in this snapshot. | `S` | Pending |
 
 ## Debug Views
@@ -352,11 +352,11 @@ Each selectable mode needs a representative screenshot/capture, expected-value d
 
 The inspected public settings cover VSync, back-buffer format, adapter preference, tone mapper, exposure, output encoding, upscaler and quality, ray reconstruction, GBuffer algorithm, automatic mesh batching, classic TLAS refit, and partitioned TLAS activation/planning controls. Ray-tracing frontend selection is one automatic Renderer policy with no public or per-effect setting. View mode is non-persisted per-viewport state carried as one `RenderViewMode` on `ViewportRenderRequest`; it is not an engine rendering setting or a second lighting-route type. `r.BackBufferCount` and `r.MaximumFramesInFlight` are RHI console controls outside the Renderer settings state/persistence. `r.Material.BindingMode` is registered but has no inspected game consumer; its `Everything` value is vocabulary, not an active selectable result.
 
-The settings section persists 26 named Renderer CVars in `/Script/SparkleRenderer.EngineRenderingSettings`. Immutable `Config/DefaultEngine.ini` supplies defaults; per-user `Settings/EngineRendering.ini` overlays them and is the only write target, retaining its other sections. View mode is session state and is not in that persisted set. Adapter preference and back-buffer format are written immediately but reported as pending restart; the other section values are applied to Renderer CVars on commit. The full lifecycle and known in-place-write/diagnostic gaps are owned by [Settings State and Persistence](Features/RuntimeConfiguration/README.md#settings-state-and-persistence).
+The settings section persists 26 named Renderer CVars in `/Script/SparkleRenderer.EngineRenderingSettings`. Immutable `Config/DefaultEngine.ini` supplies defaults; per-user `Settings/EngineRendering.ini` overlays them and is the only write target, retaining its other sections. View mode is session state and is not in that persisted set. Adapter preference and back-buffer format are written immediately but reported as pending restart; the other section values are applied to Renderer CVars on commit. The full lifecycle and known in-place-write/diagnostic gaps are owned by [Settings State and Persistence](Features/RuntimeConfiguration/RuntimeConfigurationDesign.md#settings-state-and-persistence).
 
 Release inventory must be generated from both UI/public settings and console/config surfaces. A hidden but reachable command or CVar is still a selectable capability unless Shipping erases or locks it.
 
-No current selector exists for Volumetric Lighting, deferred decals, color grading, chromatic aberration, frame generation, HDR display output, or a non-ray lighting fallback because those product paths are absent. Deferred decals, grading, chromatic aberration, and HDR10 are nevertheless first-release admitted; their implementation plans must add truthful selectors and active-state reporting before product claims. The exact current route, defaults, clamps, persistence, known unused selector, and deliberately absent selector set are in the [Feature Selector Catalog](Features/RuntimeConfiguration/README.md#feature-selector-catalog).
+No current selector exists for Volumetric Lighting, deferred decals, color grading, chromatic aberration, frame generation, HDR display output, or a non-ray lighting fallback because those product paths are absent. Deferred decals, grading, chromatic aberration, and HDR10 are nevertheless first-release admitted; their implementation plans must add truthful selectors and active-state reporting before product claims. The exact current route, defaults, clamps, persistence, known unused selector, and deliberately absent selector set are in the [Feature Selector Catalog](Features/RuntimeConfiguration/RuntimeConfigurationDesign.md#feature-selector-catalog).
 
 ## Explicit Non-Claims And Shipping Risks
 

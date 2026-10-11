@@ -29,4 +29,4 @@ Module rules compose; selecting the primary owner does not waive the rules of an
 | [Editor](Editor.md) | `Engine/Editor` | changing editor state, panels, UI/render publication, capture UX, or editor background operations |
 | [Tools](Tools.md) | `Tools` | changing import, cooking, shader compilation, Launcher, CLI workflows, or artifact publication |
 
-Current module ownership and capability maps live under [Architecture Modules](../../Architecture/Modules/README.md). These files own engineering rules, not current capability claims.
+Current module ownership and capability maps live under [Architecture Modules](../../Architecture/Modules/ModuleInventory.md). These files own engineering rules, not current capability claims.

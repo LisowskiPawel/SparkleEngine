@@ -1,6 +1,6 @@
 # Chromatic Aberration Semantics
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ChromaticAberrationDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed semantic contract; blocked until `CHRD-00` accepts the model and constants
 

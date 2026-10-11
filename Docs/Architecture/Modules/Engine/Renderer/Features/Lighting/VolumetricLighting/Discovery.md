@@ -1,6 +1,6 @@
 # Volumetric Lighting, Fog, Atmosphere, And Sky Discovery Gate
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](VolumetricLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Gate:** `VOL-D0`
 

@@ -23,7 +23,7 @@ cmake --build build/private/tools/SparkleLauncher --config DevelopmentEditor --t
 & ./artifacts/dev/launcher/DevelopmentEditor/SparkleLauncher.exe
 ```
 
-This builds Launcher; use it to configure/build the engine, select content, cook and start Editor or Game. Start with Empty. Only selected assets download; offline use requires completed sync/cook. See [Launcher workflows](Docs/Architecture/Modules/Tools/Launcher/README.md).
+This builds Launcher; use it to configure/build the engine, select content, cook and start Editor or Game. Start with Empty. Only selected assets download; offline use requires completed sync/cook. See [Launcher workflows](Docs/Architecture/Modules/Tools/Launcher/LauncherCapabilities.md).
 
 ## License and third-party content
 

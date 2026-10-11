@@ -1,12 +1,12 @@
 # Reference Path Tracer Completion Study
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](ReferencePathTracerDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** research; source-backed cross-vendor completion study and discovery input, not an architecture decision, implementation plan, feature-completion claim, or runtime proof
 
 **Responsibility:** compare primary NVIDIA, AMD, Epic, and neutral path-tracing precedents with SparkleEngine's current `ReferencePathTracer` route and identify the architecture, interaction, decisions, and evidence required for a trustworthy Reference Path Tracer
 
-**Authority boundary:** the [roadmap](../../../../../../../Strategy/Roadmap.md#reference-path-tracer-truth-first) owns priority, the [discovery acceptance contract](Discovery.md) owns `PTD-00` pass/fail, [Transport And Estimator](TransportAndEstimator.md) owns the proposed formula/algorithm contract, the [execution architecture](ExecutionArchitecture.md) owns the proposed system boundary, [User Experience](UserExperience.md) owns the proposed workflow, the [feature acceptance contract](README.md) owns eventual feature scope and definition of done, current code owns implemented behavior, and the [conditional plan](Plan.md) owns staged delivery without authorizing implementation before `PTD-00 PASS`
+**Authority boundary:** the [roadmap](../../../../../../../Strategy/Roadmap.md#reference-path-tracer-truth-first) owns priority, the [discovery acceptance contract](Discovery.md) owns `PTD-00` pass/fail, [Transport And Estimator](TransportAndEstimator.md) owns the proposed formula/algorithm contract, the [execution architecture](ExecutionArchitecture.md) owns the proposed system boundary, [User Experience](UserExperience.md) owns the proposed workflow, the [feature acceptance contract](ReferencePathTracerDesign.md) owns eventual feature scope and definition of done, current code owns implemented behavior, and the [conditional plan](ImplementationPlan.md) owns staged delivery without authorizing implementation before `PTD-00 PASS`
 
 **Research snapshot:** the full NVIDIA, AMD, Epic, and neutral study dates to 2026-09-13; a targeted primary-source/source-correspondence rereview on 2026-10-03 added the transfer checklist below without reopening that pinned study or claiming execution. The NVIDIA/Epic mid-delivery audit covers committed estimator revision `5e6badf03df44133eb75db54875417821a9909c8`, committed surface revision `78a2598a54b9ab70f0e9bbb91aaa15aeb3a11c99`, and committed correction revision `3b41476f04968e5affc1f5300efaa39252d6ee4a` as recorded in [Transport And Estimator](TransportAndEstimator.md#nvidia-and-epic-correspondence-audit--estimator-and-surface-slices)
 
@@ -14,13 +14,13 @@
 
 **Non-claims:** no shader was compiled, no renderer was launched, no image was captured, no estimator was numerically tested, and no D3D12/Vulkan parity, convergence, unbiasedness, performance, or feature-completion result was produced by this study
 
-**Readiness:** not owned by this research snapshot. Its earlier `20/100` projection and pending-`PTD-00` language below describe the 2026-09-13 study, not the current feature. Use the [feature dossier](README.md#current-completion-snapshot---2026-09-26) and [Current Feature Readiness](../../../../../../../Acceptance/CurrentReadiness.md#renderer) for the latest disposition; research adds no implementation or verification credit.
+**Readiness:** not owned by this research snapshot. Its earlier `20/100` projection and pending-`PTD-00` language below describe the 2026-09-13 study, not the current feature. Use the [feature dossier](ReferencePathTracerDesign.md#current-completion-snapshot---2026-09-26) and [Current Feature Readiness](../../../../../../../Acceptance/CurrentReadiness.md#renderer) for the latest disposition; research adds no implementation or verification credit.
 
 ## Research Decision
 
 SparkleEngine should make the Reference Path Tracer the first **technical feature-closure case**, but should not yet call the current `ReferencePathTracer` mode an unbiased renderer or correctness oracle.
 
-At this study's original snapshot, the first action was acceptance of `PTD-00-R1`: it froze what “Reference Path Tracer,” “unbiased,” “reference,” “converged,” and “feature complete” mean; audited dependencies; derived the estimator; and fixed falsifying fixtures and statistics. `PTD-00-R1` subsequently passed as the development prerequisite. The [current recovery route](Plan.md#current-recovery-and-completion-route---2026-09-26), not this historical research decision, orders the remaining work. Release identity, reproducible-build, package, map, support, and adoption evidence remain separate Stage-10 and `FCR-REN-08` gates.
+At this study's original snapshot, the first action was acceptance of `PTD-00-R1`: it froze what “Reference Path Tracer,” “unbiased,” “reference,” “converged,” and “feature complete” mean; audited dependencies; derived the estimator; and fixed falsifying fixtures and statistics. `PTD-00-R1` subsequently passed as the development prerequisite. The [current recovery route](ImplementationPlan.md#current-recovery-and-completion-route---2026-09-26), not this historical research decision, orders the remaining work. Release identity, reproducible-build, package, map, support, and adoption evidence remain separate Stage-10 and `FCR-REN-08` gates.
 
 This ordering is deliberate. A wrong oracle can make every later PBR, lighting, ReSTIR, map, and denoising comparison look authoritative while preserving the same error.
 
@@ -33,7 +33,7 @@ This ordering is deliberate. A wrong oracle can make every later PBR, lighting, 
 | [AMD Capsaicin's shared path-tracing kernel](https://github.com/GPUOpen-LibrariesAndSDKs/Capsaicin/blob/914b91596cd119eda85fbc1d3c7ee6ac391b1452/src/core/src/ray_tracing/path_tracing.hlsl) and [Baikal's explicit bias disclosure](https://github.com/GPUOpen-LibrariesAndSDKs/RadeonProRender-Baikal/blob/2d5a5d0eb2092d75adf637bf6f381d7e9307e986/README.md) | Reuse transport semantics across traversal frontends; label approximations honestly and keep progressive interaction responsive. | Capsaicin's D3D12 adapters do not prove Vulkan parity, and Baikal explicitly describes a biased tracer. Neither is a standalone Sparkle oracle. |
 | [Epic Unreal Path Tracer](https://dev.epicgames.com/documentation/en-us/unreal-engine/path-tracer-in-unreal-engine) | Make the viewport mode easy to select, accumulate live, display progress, and reset on camera/scene edits. | Epic also documents animated content that may streak instead of invalidating. Sparkle's [experience contract](UserExperience.md#live-navigation-contract) requires complete identity-driven reset or an honest unsupported result. |
 
-These are transfer decisions from pinned or official primary sources, not executable Sparkle results. The detailed ledgers below give exact revisions, licenses, rejected transfers, and evidence limits; the [plan](Plan.md#current-recovery-and-completion-route---2026-09-26) determines when each challenge is exercised.
+These are transfer decisions from pinned or official primary sources, not executable Sparkle results. The detailed ledgers below give exact revisions, licenses, rejected transfers, and evidence limits; the [plan](ImplementationPlan.md#current-recovery-and-completion-route---2026-09-26) determines when each challenge is exercised.
 
 ### What the precedents actually change in this engine
 
@@ -47,7 +47,7 @@ The sources answer different questions. [Falcor's guide](https://github.com/NVID
 | Is the product usable before export? | Adopt Epic's ordinary view mode and progress, but require complete effective-input invalidation rather than accepting its documented animated-content caveat. | `ViewportToolbar.cpp` now selects the mode; `ReferencePathTracerSession.cpp` owns identity/count; `ReferencePathTracerOverlay.cpp` presents state. | Camera/scene mutation displays or commits a stale prefix, or a user must export to see an image. |
 | Can progressive work remain responsive? | Baikal's one-sample progressive iteration and Epic's documented watchdog/dispatch sizing are operational precedents, not Sparkle performance measurements. | `ReferencePathTracerSession::WorkRowsPerDispatch` currently partitions an ordinal into 32-row quanta; only a complete ordinal becomes a committed prefix. | On an accepted support/map candidate, a submitted quantum exceeds the [UX hard bound](UserExperience.md#frozen-defaults-and-operational-budgets), camera response misses its bound, or partial rows are presented as a complete prefix. |
 
-This is a transfer checklist, not a claim that these four Sparkle checks passed. The exact source-to-product and numerical gaps are recorded in [Execution Architecture](ExecutionArchitecture.md#live-source-route-and-product-boundaries) and [Transport And Estimator](TransportAndEstimator.md#current-invalid-sample-and-claim-gap); the [plan](Plan.md#current-recovery-and-completion-route---2026-09-26) orders their falsification.
+This is a transfer checklist, not a claim that these four Sparkle checks passed. The exact source-to-product and numerical gaps are recorded in [Execution Architecture](ExecutionArchitecture.md#live-source-route-and-product-boundaries) and [Transport And Estimator](TransportAndEstimator.md#current-invalid-sample-and-claim-gap); the [plan](ImplementationPlan.md#current-recovery-and-completion-route---2026-09-26) orders their falsification.
 
 ## Research Method
 
@@ -71,7 +71,7 @@ Empirical tests can falsify a derivation or implementation, but cannot prove mat
 
 ## Primary NVIDIA Reference Ledger
 
-The sources below are precedent, not Sparkle authority. Every link is pinned to the inspected revision. The `NV-*` IDs are stable citations for the [eventual feature acceptance contract](README.md); they say how a reference may be used and what it cannot prove.
+The sources below are precedent, not Sparkle authority. Every link is pinned to the inspected revision. The `NV-*` IDs are stable citations for the [eventual feature acceptance contract](ReferencePathTracerDesign.md); they say how a reference may be used and what it cannot prove.
 
 <details>
 <summary>Expand primary nvidia reference ledger</summary>

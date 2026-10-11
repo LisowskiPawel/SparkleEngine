@@ -1,6 +1,6 @@
 # Performance Diagnostics Capability Inventory
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](PerformanceDiagnosticsDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** capability snapshot; dated, and not architecture, release approval, or executable evidence
 
@@ -8,9 +8,9 @@
 
 **Scope:** current timing, marker, memory, editor, benchmark-export, and attached-capture surfaces relevant to the target diagnostics system
 
-**Architecture authority:** [Performance Diagnostics Architecture](README.md)
+**Architecture authority:** [Performance Diagnostics Architecture](PerformanceDiagnosticsDesign.md)
 
-**Delivery authority:** [Performance Diagnostics Delivery Plan](Plan.md); external capture delegates to [External Capture Plan](ExternalCapture/Plan.md). Capture rows below were reconciled on 2026-10-10 against working-tree source at `34b6d8a7a34283fb4bf568be13307c741ca1bedd`; unrelated rows retain the original snapshot date. This is source inspection, not new runtime acceptance.
+**Delivery authority:** [Performance Diagnostics Delivery Plan](ImplementationPlan.md); external capture delegates to [External Capture Plan](ExternalCapture/ImplementationPlan.md). Capture rows below were reconciled on 2026-10-10 against working-tree source at `34b6d8a7a34283fb4bf568be13307c741ca1bedd`; unrelated rows retain the original snapshot date. This is source inspection, not new runtime acceptance.
 
 **Feature acceptance:** [Performance Diagnostics — Acceptance](Acceptance.md)
 

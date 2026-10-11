@@ -1,18 +1,18 @@
 # Direct Lighting Sampling And Shading Contract
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](DirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target mathematical contract with explicit discovery parameters; no implementation or conformance claim
 
 **Responsibility:** own direct-light radiometry, BRDF/lobe, light sampling, reservoir, reuse, visibility, reconstruction-signal, precision, and equation-to-code rules
 
-**Authority boundary:** `DIR-D0` ratifies unresolved parameters; [Execution Architecture](ExecutionArchitecture.md) owns system shape; [Plan](Plan.md) owns order; code/tests must conform; `FCR-REN-06` owns results
+**Authority boundary:** `DIR-D0` ratifies unresolved parameters; [Execution Architecture](ExecutionArchitecture.md) owns system shape; [Plan](ImplementationPlan.md) owns order; code/tests must conform; `FCR-REN-06` owns results
 
 **Notation:** directions point away from the surface point; `ng` is the geometric normal, `ns` the shading normal, `wo` the direction to the camera/previous vertex, and `wi` the direction to the sampled light
 
 ## Claim Boundary
 
-This page defines what a correct direct-light sample means before pass layout or optimization. It covers surface direct illumination only. Environment radiance may be an infinite-light candidate after admission; atmospheric and participating-media transport belongs to [Volumetric Lighting](../VolumetricLighting/README.md). Indirect paths belong to [Indirect Lighting](../IndirectLighting/README.md).
+This page defines what a correct direct-light sample means before pass layout or optimization. It covers surface direct illumination only. Environment radiance may be an infinite-light candidate after admission; atmospheric and participating-media transport belongs to [Volumetric Lighting](../VolumetricLighting/VolumetricLightingDesign.md). Indirect paths belong to [Indirect Lighting](../IndirectLighting/IndirectLightingDesign.md).
 
 Cells labeled `DIR-D0-*` are intentionally unresolved until discovery. Code must not choose them accidentally through constants or packing convenience.
 

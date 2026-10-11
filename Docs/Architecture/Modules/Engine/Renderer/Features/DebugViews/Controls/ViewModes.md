@@ -6,7 +6,7 @@
 
 **Date:** 2026-09-15
 
-**Current readiness:** see the [Debug Views dossier](../README.md); this page defines architecture and does not own a separate delivery score
+**Current readiness:** see the [Debug Views dossier](../DebugViewsDesign.md); this page defines architecture and does not own a separate delivery score
 
 **Responsibility:** the single per-view rendering-mode contract, its ownership path, and the boundary between rendering semantics and frontend presentation
 

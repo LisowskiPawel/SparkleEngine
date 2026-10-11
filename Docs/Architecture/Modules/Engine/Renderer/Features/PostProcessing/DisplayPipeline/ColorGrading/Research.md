@@ -1,12 +1,12 @@
 # Color Grading Research
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ColorGradingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** research; primary-source precedent and discovery input, not SparkleEngine design authority, implementation proof, or acceptance evidence
 
 **Responsibility:** compare current Sparkle source with revision-pinned color-grading, CDL, LUT, ownership, and validation precedent that can inform `CGRD-00`
 
-**Authority boundary:** [Discovery](Discovery.md) owns local decisions; [Semantics](Semantics.md) owns the selected math; [Execution Architecture](ExecutionArchitecture.md) owns target system shape; [README](README.md) owns the bounded feature and proof contract
+**Authority boundary:** [Discovery](Discovery.md) owns local decisions; [Semantics](Semantics.md) owns the selected math; [Execution Architecture](ExecutionArchitecture.md) owns target system shape; [README](ColorGradingDesign.md) owns the bounded feature and proof contract
 
 **Researched:** 2026-09-10; external repositories are pinned below, and mutable documentation is cited with its publisher
 

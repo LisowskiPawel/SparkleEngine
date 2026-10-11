@@ -12,9 +12,9 @@ Start here to choose your next task. Open its linked plan for the exact stages, 
 
 ## Where We Are And What Is Next
 
-**Next: qualify package inputs, finish PD-3, and produce the archive for your clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/README.md#pd-3--package-and-installation). No verified product archive exists yet.
+**Next: qualify package inputs, finish PD-3, and produce the archive for your clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation). No verified product archive exists yet.
 
-**Renderer work:** continue [Lit/Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md#required-execution-order). Recheck dated failures against current source before fixing their owner.
+**Renderer work:** continue [Lit/Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#required-execution-order). Recheck dated failures against current source before fixing their owner.
 
 **Before public release:** obtain the deferred Certum certificate, sign/timestamp and verify the final bytes before candidate freeze/adoption. Unsigned internal packaging can proceed.
 
@@ -46,15 +46,15 @@ flowchart LR
 
 | Step | What you deliver | Open the detailed plan |
 | --- | --- | --- |
-| 0. Define | A finite product, map set, feature scope and supported presets. | [Scope and discovery](../Architecture/CrossModule/FirstRelease/README.md#fr-00--scope-and-discovery) — `REL-00` |
-| 1. Establish trust | Clear asset/dependency rights, product identity and a reproducible source build. | [Identity and baseline](../Architecture/CrossModule/FirstRelease/README.md#fr-01--identity-rights-and-baseline) — `REL-01/02` |
-| 2. Package | One manifest-owned build, cook, stage and package route. | [Package spine](../Architecture/CrossModule/FirstRelease/README.md#fr-02--package-spine) — `REL-03` |
-| 3. Finish features | Required rendering and product behavior, including failures and resource lifetime. Follow the feature order below. | [Feature closure](../Architecture/CrossModule/FirstRelease/README.md#fr-03--feature-closure) — `REL-04` |
-| 4. Prove map quality | Correct content, trustworthy references and stable images on the selected maps. | [Release maps](../Architecture/CrossModule/FirstRelease/README.md#fr-04--release-maps) — `REL-05` |
-| 5. Prove the whole frame | Realtime >=30 FPS, bounded memory, stability, D3D12/Vulkan parity and principal-level frame review. | [Performance and native proof](../Architecture/CrossModule/FirstRelease/README.md#fr-05--performance-stability-and-native-proof) — `REL-06/07` |
-| 6. Obtain independent approval | Frozen package bytes and successful consumer/source journeys without private help. | [Candidate and adoption](../Architecture/CrossModule/FirstRelease/README.md#fr-06--candidate-freeze-and-independent-adoption) — `REL-08/09` |
-| 7. Publish | The approved release, verified after download. | [Publication](../Architecture/CrossModule/FirstRelease/README.md#fr-07--publish-and-verify) — `REL-10` |
-| 8. Stabilize | Finite maintainer closeout, resolved release blockers and approval to start the next program; no user support service. | [Release closeout](../Architecture/CrossModule/FirstRelease/README.md#fr-08--stabilize-and-close) — `REL-11` |
+| 0. Define | A finite product, map set, feature scope and supported presets. | [Scope and discovery](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-00--scope-and-discovery) — `REL-00` |
+| 1. Establish trust | Clear asset/dependency rights, product identity and a reproducible source build. | [Identity and baseline](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-01--identity-rights-and-baseline) — `REL-01/02` |
+| 2. Package | One manifest-owned build, cook, stage and package route. | [Package spine](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-02--package-spine) — `REL-03` |
+| 3. Finish features | Required rendering and product behavior, including failures and resource lifetime. Follow the feature order below. | [Feature closure](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-03--feature-closure) — `REL-04` |
+| 4. Prove map quality | Correct content, trustworthy references and stable images on the selected maps. | [Release maps](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-04--release-maps) — `REL-05` |
+| 5. Prove the whole frame | Realtime >=30 FPS, bounded memory, stability, D3D12/Vulkan parity and principal-level frame review. | [Performance and native proof](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-05--performance-stability-and-native-proof) — `REL-06/07` |
+| 6. Obtain independent approval | Frozen package bytes and successful consumer/source journeys without private help. | [Candidate and adoption](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-06--candidate-freeze-and-independent-adoption) — `REL-08/09` |
+| 7. Publish | The approved release, verified after download. | [Publication](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-07--publish-and-verify) — `REL-10` |
+| 8. Stabilize | Finite maintainer closeout, resolved release blockers and approval to start the next program; no user support service. | [Release closeout](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-08--stabilize-and-close) — `REL-11` |
 | 9. Build advanced evidence | Measured classical studies, an owned neural shader path and reproducible case studies. | [Advanced graphics below](#retained-advanced-graphics-roadmap) |
 | 10. Expand selectively | A justified contribution or deeper transfer activity. | [Conditional work below](#conditional-and-excluded-work) |
 
@@ -66,18 +66,18 @@ Use this order within release step 3. A demonstrated dependency defect comes bef
 
 | Order | Focus and intended result | Detailed stages |
 | --- | --- | --- |
-| 1 | **Reference correctness.** Restore usable lighting, reject invalid samples and qualify raw reference output before relying on it. | [Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md#required-execution-order), [reference closure](../Architecture/Modules/Engine/Renderer/FirstRelease/Lighting.md#lgt-3--preserve-discovery-and-close-the-required-reference) |
-| 2 | **Blocking dependencies.** Fix proven content, shader, foundation or native-lifetime defects needed by the selected frame. | [Foundation/content](../Architecture/CrossModule/FirstRelease/README.md#foundation-world-and-content), [RHI](../Architecture/Modules/Engine/RHI/FirstReleasePlan.md), [Shader System](../Architecture/CrossModule/ShaderSystem/Plan.md) |
-| 3 | **Frame execution.** Reliable frame admission, scene/view publication, graph dependencies, barriers, aliasing and retirement. | [Frame and scene](../Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndScene.md) — `FS-0–4` |
-| 4 | **Geometry and materials.** Correct residency, raster/ray inputs, TLAS and material correspondence. | [Geometry and ray tracing](../Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracing.md) — `GR-0–4` |
-| 5 | **Realtime transport.** Correct primary/secondary paths, direct/indirect lighting, temporal reuse and disocclusion behavior. | [Temporal/history](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-1--temporal-sampling-history-resolution-and-aa-truth), [lighting](../Architecture/Modules/Engine/Renderer/FirstRelease/Lighting.md) — `DSP-1`, `LGT-0–2` |
-| 6 | **Exposure and reconstruction.** Finish exposure, DLSS SR/RR inputs, resets and native lifetime on both APIs. | [Exposure](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-2--exposure), [DLSS/RR](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-3--image-reconstruction-and-provider-integration) — `DSP-2/3` |
-| 7 | **Tone and output.** One correct color/tone/output transform; display adjustments must not conceal bad transport. | [Tone mapping and presentation](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-4--tone-mapping-encoding-and-presentation) — `DSP-4` |
-| 8 | **Decals and grading.** Complete the required material/display features with raw, temporal and backend checks. | [Decals](../Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracing.md#gr-5--deferred-gbuffer-decals), [grading](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-5--color-grading) — `GR-5`, `DSP-5` |
-| 9 | **Basic lens effects.** Independently prove chromatic aberration and vignette, including no work at neutral settings. | [Lens effects](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-6--chromatic-aberration-and-vignette), [vignette plan](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/README.md#basic-vignette-remaining-delivery-plan) — `DSP-6` |
-| 10 | **HDR and SDR recovery.** Finish output behavior; HDR proof requires a qualified display/OS tuple. | [HDR output](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstruction.md#dsp-7--hdr10-display-output) — `DSP-7` |
-| 11 | **Product controls and capture.** Responsive settings/UI/debug/capture/latency consumers with one state authority and honest tool support. | [Runtime/diagnostics](../Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnostics.md), [product controls](../Architecture/CrossModule/FirstRelease/README.md#product-and-delivery), [external capture](../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md) |
-| 12 | **Whole-frame closure.** Complete integration, failure checks, review findings and the remaining feature reports. | `FS-4`, `LGT-4`, `DSP-8`, `RD-6` in their plans; [aggregate closure](../Architecture/CrossModule/FirstRelease/README.md#fr-03--feature-closure) |
+| 1 | **Reference correctness.** Restore usable lighting, reject invalid samples and qualify raw reference output before relying on it. | [Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#required-execution-order), [reference closure](../Architecture/Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md#lgt-3--preserve-discovery-and-close-the-required-reference) |
+| 2 | **Blocking dependencies.** Fix proven content, shader, foundation or native-lifetime defects needed by the selected frame. | [Foundation/content](../Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#foundation-world-and-content), [RHI](../Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md), [Shader System](../Architecture/CrossModule/ShaderSystem/ImplementationPlan.md) |
+| 3 | **Frame execution.** Reliable frame admission, scene/view publication, graph dependencies, barriers, aliasing and retirement. | [Frame and scene](../Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md) — `FS-0–4` |
+| 4 | **Geometry and materials.** Correct residency, raster/ray inputs, TLAS and material correspondence. | [Geometry and ray tracing](../Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md) — `GR-0–4` |
+| 5 | **Realtime transport.** Correct primary/secondary paths, direct/indirect lighting, temporal reuse and disocclusion behavior. | [Temporal/history](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-1--temporal-sampling-history-resolution-and-aa-truth), [lighting](../Architecture/Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md) — `DSP-1`, `LGT-0–2` |
+| 6 | **Exposure and reconstruction.** Finish exposure, DLSS SR/RR inputs, resets and native lifetime on both APIs. | [Exposure](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-2--exposure), [DLSS/RR](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-3--image-reconstruction-and-provider-integration) — `DSP-2/3` |
+| 7 | **Tone and output.** One correct color/tone/output transform; display adjustments must not conceal bad transport. | [Tone mapping and presentation](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-4--tone-mapping-encoding-and-presentation) — `DSP-4` |
+| 8 | **Decals and grading.** Complete the required material/display features with raw, temporal and backend checks. | [Decals](../Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-5--deferred-gbuffer-decals), [grading](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-5--color-grading) — `GR-5`, `DSP-5` |
+| 9 | **Basic lens effects.** Independently prove chromatic aberration and vignette, including no work at neutral settings. | [Lens effects](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-6--chromatic-aberration-and-vignette), [vignette plan](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#basic-vignette-remaining-delivery-plan) — `DSP-6` |
+| 10 | **HDR and SDR recovery.** Finish output behavior; HDR proof requires a qualified display/OS tuple. | [HDR output](../Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-7--hdr10-display-output) — `DSP-7` |
+| 11 | **Product controls and capture.** Responsive settings/UI/debug/capture/latency consumers with one state authority and honest tool support. | [Runtime/diagnostics](../Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md), [product controls](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#product-and-delivery), [external capture](../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md) |
+| 12 | **Whole-frame closure.** Complete integration, failure checks, review findings and the remaining feature reports. | `FS-4`, `LGT-4`, `DSP-8`, `RD-6` in their plans; [aggregate closure](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-03--feature-closure) |
 
 Check D3D12 and Vulkan throughout these stages. Measure cost as each feature changes; release step 5 closes the fixed whole-product performance protocol. Reference Stage 10 still waits for its release inputs and package prerequisites.
 
@@ -87,13 +87,13 @@ Start this program after release stabilization (`REL-11`). Each milestone depend
 
 | Milestone | What you build or demonstrate | Detailed work |
 | --- | --- | --- |
-| **M0 — Reproducible entry** | A reviewer can obtain the product/source and reproduce the supported result. | Reuse product build/adoption proof; [portfolio preparation](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-portfolio-delivery-plan) |
+| **M0 — Reproducible entry** | A reviewer can obtain the product/source and reproduce the supported result. | Reuse product build/adoption proof; [portfolio preparation](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#graphics-portfolio-delivery-plan) |
 | **M1 — Traceable evidence** | Frozen scene/camera/settings identities, content losses and original capture joins. | Revalidate `MAP-00`; [workload sequence](../Acceptance/GraphicsWorkloads.md#workload-gate-sequence) |
 | **M2 — Correct content and references** | Bistro/San Miguel results with a qualified raw reference and stated uncertainty. | Reference, material/light and map checks in their existing owners |
-| **M3 — Causal classical studies** | One analyzer, three matched-API studies and one difficult incident. Retain a rejected or inconclusive alternative. | [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md#remaining-stages) — `WS-S0–3`; freeze discovery and real producer inputs first |
-| **M4 — Owned data and model** | One diffuse-indirect dataset/model and a repeatable training recipe. | [Neural plan](../Architecture/CrossModule/NeuralGraphics/Plan.md#remaining-stages) — `NG-S0–2`; accepted neural discovery first |
-| **M5 — Model to shader** | Correct exported operators and FP32 shaders, one runtime, then measured optimization. | [Neural plan](../Architecture/CrossModule/NeuralGraphics/Plan.md#remaining-stages) — `NG-S3–5`; conformance precedes optimization |
-| **M6 — Evaluation and transfer** | Held-out results, three headline cases and independent reproduction/review. | Neural `NG-S6`, study `WS-S3`, [portfolio assembly](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-portfolio-delivery-plan) |
+| **M3 — Causal classical studies** | One analyzer, three matched-API studies and one difficult incident. Retain a rejected or inconclusive alternative. | [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#remaining-stages) — `WS-S0–3`; freeze discovery and real producer inputs first |
+| **M4 — Owned data and model** | One diffuse-indirect dataset/model and a repeatable training recipe. | [Neural plan](../Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#remaining-stages) — `NG-S0–2`; accepted neural discovery first |
+| **M5 — Model to shader** | Correct exported operators and FP32 shaders, one runtime, then measured optimization. | [Neural plan](../Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#remaining-stages) — `NG-S3–5`; conformance precedes optimization |
+| **M6 — Evaluation and transfer** | Held-out results, three headline cases and independent reproduction/review. | Neural `NG-S6`, study `WS-S3`, [portfolio assembly](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#graphics-portfolio-delivery-plan) |
 
 The [delivery catalog](FeatureDeliveryCatalog.md) gives concrete artifact examples for each professional output. Original workload and feature reports retain the measurements and conclusions.
 
@@ -101,12 +101,12 @@ The [delivery catalog](FeatureDeliveryCatalog.md) gives concrete artifact exampl
 
 After M6, select additional work only for a demonstrated need:
 
-- **Upstream contribution or technical submission:** a real issue/recipient and bounded output. Use the [contribution card](../Architecture/CrossModule/GraphicsPortfolio/README.md#upstream-graphics-contribution).
-- **Teaching, a second adopter or maintenance transfer:** actual audience, exercise and feedback. Use the [knowledge-transfer card](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-knowledge-transfer). M6's first independent review remains required.
+- **Upstream contribution or technical submission:** a real issue/recipient and bounded output. Use the [contribution card](../Architecture/CrossModule/GraphicsPortfolio/GraphicsPortfolioDesign.md#upstream-graphics-contribution).
+- **Teaching, a second adopter or maintenance transfer:** actual audience, exercise and feedback. Use the [knowledge-transfer card](../Architecture/CrossModule/GraphicsPortfolio/GraphicsPortfolioDesign.md#graphics-knowledge-transfer). M6's first independent review remains required.
 
 **Not selected:** native Linux support; AMD hardware acquisition or AMD specialist profiling; new physics/networking/audio/scripting systems; installer/updater; stable plugin SDK; broad Editor or ML frameworks. Additional hardware needs its own admitted question; [profiling guidance](../Engineering/Verification/ExternalProfiling.md) records available routes.
 
-Geometry-cache animation, volumetrics, frame generation and meshlets/DGC/SER remain outside the selected release. Their [geometry-cache](../Architecture/CrossModule/GeometryCacheAnimation/Plan.md), [volumetric](../Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/Plan.md) and [research](Research/RenderingReferenceExamples.md) documents preserve future context.
+Geometry-cache animation, volumetrics, frame generation and meshlets/DGC/SER remain outside the selected release. Their [geometry-cache](../Architecture/CrossModule/GeometryCacheAnimation/ImplementationPlan.md), [volumetric](../Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md) and [research](Research/RenderingReferenceExamples.md) documents preserve future context.
 
 ## Dependency And Work-In-Progress Rule
 
@@ -118,7 +118,7 @@ Keep required rendering outcomes required. Any scope change needs an explicit ow
 
 ## Reference Path Tracer Truth First
 
-Preserve accepted `PTD-00-R1` and delivered source stages. The [remaining plan](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md) owns recovery; [Discovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Discovery.md) owns the accepted design. Reopen only changed decisions. Remaining implementation/proof uses `PTD-02`; release-map reference adoption uses `PTD-03`.
+Preserve accepted `PTD-00-R1` and delivered source stages. The [remaining plan](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md) owns recovery; [Discovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Discovery.md) owns the accepted design. Reopen only changed decisions. Remaining implementation/proof uses `PTD-02`; release-map reference adoption uses `PTD-03`.
 
 A finite-depth diagnostic, accumulation count or post-processed image does not qualify reference truth. Dependent quality checks need the accepted raw result and uncertainty.
 
@@ -137,7 +137,7 @@ Update the result in its owner, then update this page's current/next pointer. Lo
 
 ## Planning Coverage And Fillable Files
 
-All 49 feature families retain their [existing phase assignments](../Architecture/CrossModule/FirstRelease/README.md#feature-work-package-registry). Reuse these plans. The remaining small scaffolds are [Vignette](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/README.md#basic-vignette-remaining-delivery-plan), [Graphics Portfolio](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-portfolio-delivery-plan) and the contribution/transfer cards above.
+All 49 feature families retain their [existing phase assignments](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#feature-work-package-registry). Reuse these plans. The remaining small scaffolds are [Vignette](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#basic-vignette-remaining-delivery-plan), [Graphics Portfolio](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#graphics-portfolio-delivery-plan) and the contribution/transfer cards above.
 
 To fill a missing plan, use the [remaining-work template](../Engineering/Workflow/Templates/RemainingWorkPlan.md). Resolve its decision owners and check cards before calling it implementation-ready. Retire completed instructions after preserving useful design and evidence.
 
@@ -159,7 +159,7 @@ Use this section when opening or closing an iteration. The everyday task order i
 | M6 | `WL-07/08`, `CASE-*`, `PGD-08` |
 | Conditional ecosystem work | `PGD-09` |
 
-The [catalog](FeatureDeliveryCatalog.md) maps outputs to `PGE-*`; the [phase registry](../Architecture/CrossModule/FirstRelease/README.md#feature-work-package-registry) maps `FCR-*`; [Graphics Workloads](../Acceptance/GraphicsWorkloads.md) owns `MAP/WL/CASE` proof. Join these in the [iteration record](../Engineering/Workflow/ChangeLifecycle.md#create-the-iteration-control-record) with the selected objective, risk, `AC/FM/CHK`, candidate and artifact.
+The [catalog](FeatureDeliveryCatalog.md) maps outputs to `PGE-*`; the [phase registry](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#feature-work-package-registry) maps `FCR-*`; [Graphics Workloads](../Acceptance/GraphicsWorkloads.md) owns `MAP/WL/CASE` proof. Join these in the [iteration record](../Engineering/Workflow/ChangeLifecycle.md#create-the-iteration-control-record) with the selected objective, risk, `AC/FM/CHK`, candidate and artifact.
 
 At handoff, record results/invalidation in their owner, retire delivered instructions, apply [Code Style](../Engineering/Foundations/CodeStyle.md) and update the next task here. Documentation checks do not pass runtime, GPU, performance, package or adoption criteria.
 

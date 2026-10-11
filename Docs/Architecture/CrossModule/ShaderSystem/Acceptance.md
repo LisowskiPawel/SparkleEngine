@@ -1,14 +1,14 @@
 # Shader System — Acceptance
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](ShaderSystemDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** feature-local acceptance contract; not proof that the shader-system migration has passed
 
 **Scope:** final feature criteria, required evidence, controlled failure expectations, and completion handoff for the unified shader, graphics-pipeline, and ray-tracing system
 
-**Architecture authority:** [Shader System Architecture](README.md)
+**Architecture authority:** [Shader System Architecture](ShaderSystemDesign.md)
 
-**Delivery authority:** [Shader System Delivery Plan](Plan.md)
+**Delivery authority:** [Shader System Delivery Plan](ImplementationPlan.md)
 
 **Evidence semantics:** [Validation And Evidence](../../../Engineering/Verification/ValidationAndEvidence.md)
 
@@ -32,7 +32,7 @@ Every arrow is part of the feature. “The shader compiles” does not prove det
 
 ## Evidence Contract
 
-The [Strategy Coverage crosswalk](../StrategyCoverage.md) owns portfolio-wide requirement status. The [Shader Compilation Capability Inventory](../../Modules/Tools/ShaderCompiler/README.md), [Renderer Shader Programs catalog](../../Modules/Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md), and [Shader System Delivery Plan](Plan.md) own current source claims and delivery reconciliation. The [Shader System Migration Baseline](MigrationBaseline.md) preserves the former pre-migration inventory. This contract keeps only the shader-system evidence requirements below.
+The [Strategy Coverage crosswalk](../StrategyCoverage.md) owns portfolio-wide requirement status. The [Shader Compilation Capability Inventory](../../Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md), [Renderer Shader Programs catalog](../../Modules/Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md), and [Shader System Delivery Plan](ImplementationPlan.md) own current source claims and delivery reconciliation. The [Shader System Migration Baseline](MigrationBaseline.md) preserves the former pre-migration inventory. This contract keeps only the shader-system evidence requirements below.
 
 ### Required Evidence Pack
 
@@ -51,7 +51,7 @@ Implementation is not accepted merely when the new API compiles. The completed s
 11. a generated support matrix proving backend/target/stage/shader-type/feature/policy status and a consumer report distinguishing registered, cooked, runtime-valid, selected, and captured shaders, supported alternates, and mandatory failures;
 12. runtime-generation and lazy-materialization lifetime evidence, including state-object/pipeline, SBT layout/index/update/memory, trace dispatch, alternate selection, mandatory-product failure, reload, and paired capture evidence, plus only compression/eviction metrics that actually exist.
 
-The [performance diagnostics architecture](../PerformanceDiagnostics/README.md) owns the shared measurement and capture infrastructure. This document owns the shader-specific identities and joins that make those captures traceable. Evidence records belong under the repository's evidence path selected by the acceptance workload; they must not be embedded here as claims that age with hardware, drivers, or compiler versions.
+The [performance diagnostics architecture](../PerformanceDiagnostics/PerformanceDiagnosticsDesign.md) owns the shared measurement and capture infrastructure. This document owns the shader-specific identities and joins that make those captures traceable. Evidence records belong under the repository's evidence path selected by the acceptance workload; they must not be embedded here as claims that age with hardware, drivers, or compiler versions.
 
 ## Controlled Failures And Key Checks
 

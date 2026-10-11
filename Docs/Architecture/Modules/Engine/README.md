@@ -1,6 +1,6 @@
 # Engine Module Architecture
 
-[Docs](../../../README.md) / [Up](../README.md)
+[Docs](../../../README.md) / [Up](../ModuleInventory.md)
 
 **Status:** Engine module index
 
@@ -33,14 +33,14 @@ Read the graph as responsibility flow rather than exact link visibility. Core an
 
 | Module | Owns | Module documentation |
 | --- | --- | --- |
-| Application | game/editor host composition, configuration, loop, startup, and shutdown | [Application](Application/README.md) |
-| Assets | engine-authored shaders, defaults, environments, and fixtures | [Assets](Assets/README.md) |
-| Core | common infrastructure, diagnostics, files, processes, serialization, math, input, and time | [Core](Core/README.md) |
-| Editor | workspace, viewport sessions, editing UX, settings, and editor tool entry points | [Editor](Editor/README.md) |
-| GameFramework | levels, worlds, ECS, editing, publication, and render extraction | [GameFramework](GameFramework/README.md) |
-| Platform | Windows application, window, DPI, message, input, cursor, and capture integration | [Platform](Platform/README.md) |
-| Renderer | whole-frame production plus explicit scene/view, geometry/GBuffer, ray tracing, Direct/Indirect/Volumetric Lighting, Post Processing subfeatures, presentation/UI, scheduling, shader-program, and diagnostic boundaries | [Renderer](Renderer/README.md) |
-| RHI | backend-neutral GPU contracts and D3D12/Vulkan implementations | [RHI](RHI/README.md) |
-| Tasks | task graphs, lanes, parallel ranges, cancellation, events, failure, and shutdown | [Tasks](Tasks/README.md) |
+| Application | game/editor host composition, configuration, loop, startup, and shutdown | [Application](Application/ApplicationCapabilities.md) |
+| Assets | engine-authored shaders, defaults, environments, and fixtures | [Assets](Assets/AssetsCapabilities.md) |
+| Core | common infrastructure, diagnostics, files, processes, serialization, math, input, and time | [Core](Core/CoreCapabilities.md) |
+| Editor | workspace, viewport sessions, editing UX, settings, and editor tool entry points | [Editor](Editor/EditorCapabilities.md) |
+| GameFramework | levels, worlds, ECS, editing, publication, and render extraction | [GameFramework](GameFramework/GameFrameworkCapabilities.md) |
+| Platform | Windows application, window, DPI, message, input, cursor, and capture integration | [Platform](Platform/PlatformCapabilities.md) |
+| Renderer | whole-frame production plus explicit scene/view, geometry/GBuffer, ray tracing, Direct/Indirect/Volumetric Lighting, Post Processing subfeatures, presentation/UI, scheduling, shader-program, and diagnostic boundaries | [Renderer](Renderer/RendererDesign.md) |
+| RHI | backend-neutral GPU contracts and D3D12/Vulkan implementations | [RHI](RHI/RHIDesign.md) |
+| Tasks | task graphs, lanes, parallel ranges, cancellation, events, failure, and shutdown | [Tasks](Tasks/TasksCapabilities.md) |
 
 Rules that apply while changing these modules live in [Engineering Modules](../../../Engineering/Modules/README.md). Cross-owner system designs live in [CrossModule](../../CrossModule/README.md).

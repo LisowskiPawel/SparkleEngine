@@ -1,14 +1,14 @@
 # Performance Diagnostics — Acceptance
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](PerformanceDiagnosticsDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** feature-local acceptance contract; not proof that diagnostics or workloads have passed
 
 **Scope:** feature-local diagnostic evidence fields, baseline experiments, benchmark artifacts, reviewer paths, and verification gates
 
-**Feature architecture:** [Performance Diagnostics Architecture](README.md)
+**Feature architecture:** [Performance Diagnostics Architecture](PerformanceDiagnosticsDesign.md)
 
-**Delivery authority:** [Performance Diagnostics Delivery Plan](Plan.md)
+**Delivery authority:** [Performance Diagnostics Delivery Plan](ImplementationPlan.md)
 
 **Release/workload orchestration:** [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md)
 
@@ -228,7 +228,7 @@ Every vertical slice passes the [authoring-isolation and Shipping-erasure](#auth
 
 ### Backend And Product Matrix
 
-External native-capture criteria/failures/checks are owned by the [External Capture dossier](ExternalCapture/README.md#acceptance-and-check-contract); the rows below retain the parent cross-diagnostics matrix and require that delegated contract. Capture request failure and native quiescence are distinct; a scene viewport maps to a containing present interval rather than an exclusive native scene capture.
+External native-capture criteria/failures/checks are owned by the [External Capture dossier](ExternalCapture/ExternalCaptureDesign.md#acceptance-and-check-contract); the rows below retain the parent cross-diagnostics matrix and require that delegated contract. Capture request failure and native quiescence are distinct; a scene viewport maps to a containing present interval rather than an exclusive native scene capture.
 
 - DevelopmentGame and DevelopmentEditor on D3D12 and Vulkan.
 - DevelopmentEditor external capture: PIX on D3D12; RenderDoc on D3D12 and Vulkan; Nsight Graphics Capture on its supported NVIDIA D3D12/Vulkan matrix while explicitly `Experimental`.

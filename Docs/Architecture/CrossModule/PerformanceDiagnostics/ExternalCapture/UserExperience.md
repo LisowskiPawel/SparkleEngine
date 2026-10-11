@@ -1,6 +1,6 @@
 # External Capture User Experience
 
-[Docs](../../../../README.md) / [Up](README.md)
+[Docs](../../../../README.md) / [Up](ExternalCaptureDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target architecture; launch, viewport, automation and recovery contract
 
@@ -35,7 +35,7 @@ Direct IDE/shortcut launches may persist the same enum under **Window -> Setting
 
 ### Remaining Presentation And Acceptance
 
-The following are target requirements, not controls already present in the overlay: a detailed result view with explicit identity certainty and observer/provenance data; separate `Open in tool` and `Show in folder` actions where an accessible artifact exists; accessible status/recovery and narrow-layout behavior. Keep native handoff separate from capture finalization, and never invent a precise tool frame ID from the host scheduling boundary. [Remaining delivery](Plan.md) owns their implementation/acceptance disposition.
+The following are target requirements, not controls already present in the overlay: a detailed result view with explicit identity certainty and observer/provenance data; separate `Open in tool` and `Show in folder` actions where an accessible artifact exists; accessible status/recovery and narrow-layout behavior. Keep native handoff separate from capture finalization, and never invent a precise tool frame ID from the host scheduling boundary. [Remaining delivery](ImplementationPlan.md) owns their implementation/acceptance disposition.
 
 Install/update the external tool through its normal vendor workflow. Sparkle does not silently download or elevate a tool, alter driver settings, scan arbitrary directories, or recreate a graphics device from a capture button. Optional trusted installation selection lives in setup/advanced preferences only when automatic supported discovery fails.
 

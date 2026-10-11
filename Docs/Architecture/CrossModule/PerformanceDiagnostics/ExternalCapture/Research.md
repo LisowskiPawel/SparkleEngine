@@ -1,6 +1,6 @@
 # External Capture Integration Research
 
-[Docs](../../../../README.md) / [Up](README.md)
+[Docs](../../../../README.md) / [Up](ExternalCaptureDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** research; primary-source precedent and a dated source audit
 
@@ -8,9 +8,9 @@
 
 **Observed:** 2026-10-06; Sparkle revision `82528cbe5edbcf729464fbefe6998435730920eb`, initially clean working tree.
 
-**Authority boundary:** this page records evidence and transfer limits. [Discovery](Discovery.md) closes choices; [Semantics](Semantics.md) and [Execution Architecture](ExecutionArchitecture.md) define the target; [Plan](Plan.md) orders delivery.
+**Authority boundary:** this page records evidence and transfer limits. [Discovery](Discovery.md) closes choices; [Semantics](Semantics.md) and [Execution Architecture](ExecutionArchitecture.md) define the target; [Plan](ImplementationPlan.md) orders delivery.
 
-**Current readiness:** Not applicable; research adds no implementation or verification credit to the [dossier](README.md).
+**Current readiness:** Not applicable; research adds no implementation or verification credit to the [dossier](ExternalCaptureDesign.md).
 
 ## Direct Editor Launch And Capture Buttons - 2026-10-10
 

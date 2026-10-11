@@ -1,12 +1,12 @@
 # Shader System Design Precedent
 
-[Docs](../../../README.md) / [Up](README.md)
+[Docs](../../../README.md) / [Up](ShaderSystemDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** research; external technical precedent and deferred pipeline-preparation options, not local architecture or implemented behavior
 
 **Responsibility:** preserve the source-backed Unreal, NVIDIA, and AMD comparisons and the deferred PSO-preparation options that informed Sparkle's shader-system decisions
 
-**Authority boundary:** [Shader System Architecture](README.md) owns the selected local design; the [delivery plan](Plan.md) owns sequencing; code and executable build configuration own implemented behavior
+**Authority boundary:** [Shader System Architecture](ShaderSystemDesign.md) owns the selected local design; the [delivery plan](ImplementationPlan.md) owns sequencing; code and executable build configuration own implemented behavior
 
 **Source review recorded:** 2026-08-15; version-sensitive claims must be revalidated before they drive a new decision
 

@@ -26,7 +26,7 @@ Exact approved source/product bytes, cleared rights, package manifest, clean con
 
 **Evidence boundary:** Build/source paths exist; no conjunctive release acceptance is inferred.
 
-**Delivery route:** [First Release stage briefs](../Architecture/CrossModule/FirstRelease/README.md), `REL-00..11`; [Build/Packaging](../Architecture/Modules/BuildAndPackaging/README.md).
+**Delivery route:** [First Release stage briefs](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md), `REL-00..11`; [Build/Packaging](../Architecture/Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md).
 
 **Requirements:** `PGE-01`, `07`, `13..15`
 
@@ -36,7 +36,7 @@ One content lineage case with exact import losses, material/transport domain, an
 
 **Evidence boundary:** Tracer source stages delivered; recovery, estimator/oracle and final adoption evidence remain open.
 
-**Delivery route:** Existing authorized recovery: [Reference Path Tracer plan](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md); release adoption `PTD-02/03`, `REL-04/05`; subsequent `M1/M2`, `WL-01..03`.
+**Delivery route:** Existing authorized recovery: [Reference Path Tracer plan](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md); release adoption `PTD-02/03`, `REL-04/05`; subsequent `M1/M2`, `WL-01..03`.
 
 **Requirements:** `PGE-02`, `06..09`, `13`
 
@@ -46,7 +46,7 @@ Matched Windows D3D12/Vulkan quality/cost cases on named hardware; three causal 
 
 **Evidence boundary:** D3D12/Vulkan and rendering paths exist; complete workload evidence is unclaimed.
 
-**Delivery route:** After release and correct references: `M3`, `WL-04`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md).
+**Delivery route:** After release and correct references: `M3`, `WL-04`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md).
 
 **Requirements:** `PGE-02`, `05`, `08..10`
 
@@ -56,7 +56,7 @@ One reproducible incident: symptom, earliest bad product, competing hypotheses, 
 
 **Evidence boundary:** Provider paths and known failures are documented; source presence is not aggregate provider acceptance.
 
-**Delivery route:** [External Capture plan](../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Plan.md) for its remaining checks; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md) for the case.
+**Delivery route:** [External Capture plan](../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md) for its remaining checks; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md) for the case.
 
 **Requirements:** `PGE-01`, `05..07`, `09..10`, `13`
 
@@ -66,7 +66,7 @@ One CLI consumes immutable workload records, rejects mismatched/partial data, em
 
 **Evidence boundary:** Existing narrow scripts do not establish a supported workload analyzer.
 
-**Delivery route:** After `REL-11`, frozen producer input and a real comparison consumer: [Workload Studies plan](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md); [Python dossier](../Architecture/Modules/Tools/PythonAutomationAndAnalysis.md), `PY-03`.
+**Delivery route:** After `REL-11`, frozen producer input and a real comparison consumer: [Workload Studies plan](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md); [Python dossier](../Architecture/Modules/Tools/PythonAutomationAndAnalysis.md), `PY-03`.
 
 **Requirements:** `PGE-05`, `07..08`, `13`
 
@@ -76,7 +76,7 @@ One diffuse-indirect denoiser, licensed immutable splits, held-out San Miguel, r
 
 **Evidence boundary:** Owned dataset/training/model family remains a target, distinct from vendor inference.
 
-**Delivery route:** `REL-11` and `M3`; [Neural discovery](../Architecture/CrossModule/NeuralGraphics/Discovery.md), then [plan](../Architecture/CrossModule/NeuralGraphics/Plan.md) Stages 1–2; `M4`, `WL-05`.
+**Delivery route:** `REL-11` and `M3`; [Neural discovery](../Architecture/CrossModule/NeuralGraphics/Discovery.md), then [plan](../Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md) Stages 1–2; `M4`, `WL-05`.
 
 **Requirements:** `PGE-03`, `07..08`, `11..12`
 
@@ -86,7 +86,7 @@ One fixed operator inventory exported and numerically checked against PyTorch an
 
 **Evidence boundary:** Owned lowering/kernels/runtime absent in the existing target dossier; no general ML runtime is requested.
 
-**Delivery route:** Accepted neural discovery and `PGD-06`; [Neural plan](../Architecture/CrossModule/NeuralGraphics/Plan.md) Stages 3–5; [Shader System](../Architecture/CrossModule/ShaderSystem/README.md); `M5`, `WL-06`.
+**Delivery route:** Accepted neural discovery and `PGD-06`; [Neural plan](../Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md) Stages 3–5; [Shader System](../Architecture/CrossModule/ShaderSystem/ShaderSystemDesign.md); `M5`, `WL-06`.
 
 **Requirements:** `PGE-03..04`, `09..10`, `12`
 
@@ -96,7 +96,7 @@ Three headline cases, quality/latency/memory frontier and failure gallery, exact
 
 **Evidence boundary:** No owned neural evaluation/adoption result is claimed.
 
-**Delivery route:** `M6`, `WL-07/08`; [portfolio plan](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-portfolio-delivery-plan) assembles accepted [Neural](../Architecture/CrossModule/NeuralGraphics/README.md#neural-graphics-acceptance), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/README.md) and [Graphics Workloads](../Acceptance/GraphicsWorkloads.md) evidence.
+**Delivery route:** `M6`, `WL-07/08`; [portfolio plan](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#graphics-portfolio-delivery-plan) assembles accepted [Neural](../Architecture/CrossModule/NeuralGraphics/NeuralGraphicsDesign.md#neural-graphics-acceptance), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/README.md) and [Graphics Workloads](../Acceptance/GraphicsWorkloads.md) evidence.
 
 **Requirements:** `PGE-01`, `03..05`, `08`, `11..13`, `15`
 
@@ -106,7 +106,7 @@ Upstream contribution, a second adopter and teaching/mentoring records are separ
 
 **Evidence boundary:** Windows work does not prove another architecture, employment history or sustained external influence. Linux delivery is excluded.
 
-**Delivery route:** Conditional [contribution](../Architecture/CrossModule/GraphicsPortfolio/README.md#upstream-graphics-contribution) and [knowledge-transfer](../Architecture/CrossModule/GraphicsPortfolio/README.md#graphics-knowledge-transfer) cards; [Requirements](Requirements.md#non-repository-requirements).
+**Delivery route:** Conditional [contribution](../Architecture/CrossModule/GraphicsPortfolio/GraphicsPortfolioDesign.md#upstream-graphics-contribution) and [knowledge-transfer](../Architecture/CrossModule/GraphicsPortfolio/GraphicsPortfolioDesign.md#graphics-knowledge-transfer) cards; [Requirements](Requirements.md#non-repository-requirements).
 
 **Requirements:** `PGE-01`, `07`, `13..15`
 
@@ -119,13 +119,13 @@ These are concrete examples within the nine outputs above, not additional featur
 
 | Output / example question | Deliverable a reviewer can inspect | Source precedent and actual owner |
 | --- | --- | --- |
-| `PGD-02`: Why is this reference pixel trustworthy? | One raw-linear pixel/product lineage, bounded transport/material table, estimator derivation, independent fixture and unconverged/invalid-sample rejection. Preserve the accepted tracer contract and finish its remaining proof. | `NVR-04/05/15/17`; [Reference Path Tracer plan](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/Plan.md). |
+| `PGD-02`: Why is this reference pixel trustworthy? | One raw-linear pixel/product lineage, bounded transport/material table, estimator derivation, independent fixture and unconverged/invalid-sample rejection. Preserve the accepted tracer contract and finish its remaining proof. | `NVR-04/05/15/17`; [Reference Path Tracer plan](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md). |
 | `PGD-02/03`: When is reservoir reuse valid? | Proposal/target/normalization and history/shift note; matched direct/indirect baseline; disocclusion/light-edit counterexample and quality/memory/cost comparison. | `NVR-02/03/17`; [Direct discovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/Discovery.md), [Indirect discovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/Discovery.md). |
-| `PGD-03`: Are CPU recording and binding work limiting the frame? | One declared study with thread/queue timeline, command-order/resource-retirement explanation, matched scene/settings and before/after per-run evidence. Retain the current production parallel topology. | `NVR-01/07/16`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md). The old CAD sample is deprecated; use its successor for current comparison. |
-| `PGD-03/04`: Is shader live state, traffic or code size the actual limiter? | One exact source/bytecode/native join; hypothesis and alternative; counter/ISA evidence where available; quality-equivalent whole-frame result. A failure or inconclusive outcome is useful. | `NVR-18/19`; [Shader System plan](../Architecture/CrossModule/ShaderSystem/Plan.md), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md). SER is optional. |
-| `PGD-05`: Can another engineer compare the evidence correctly? | One bounded offline CLI, stable original-input hashes, run-level tables/plots, raw/display-domain distinction and mismatch/partial-input controls. | `NVR-12/14`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md), existing Python owner. No embedded viewer or general analyzer platform. |
-| `PGD-06/07`: Does a small owned model become correct, useful shader work? | Dataset/model/operator cards, held-out split, FP32 shader conformance, one layout/fusion/precision ablation, resource-retirement/fallback and quality/latency/memory frontier. | `NVR-03/10/11/13`; [Neural discovery](../Architecture/CrossModule/NeuralGraphics/Discovery.md) and [plan](../Architecture/CrossModule/NeuralGraphics/Plan.md). Do not add NeRF or OptiX. |
-| `PGD-08/09`: Can knowledge and maintenance transfer? | A short delivered-case exercise, one non-author transcript, independent review with changed decision, and an explicit support/retirement note. Later progression: second distinct consumer plus one feedback-driven post-adoption revision. | `NVR-17/20`; [Neural adoption](../Architecture/CrossModule/NeuralGraphics/README.md#neural-graphics-acceptance), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Plan.md), existing support owner. |
+| `PGD-03`: Are CPU recording and binding work limiting the frame? | One declared study with thread/queue timeline, command-order/resource-retirement explanation, matched scene/settings and before/after per-run evidence. Retain the current production parallel topology. | `NVR-01/07/16`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md). The old CAD sample is deprecated; use its successor for current comparison. |
+| `PGD-03/04`: Is shader live state, traffic or code size the actual limiter? | One exact source/bytecode/native join; hypothesis and alternative; counter/ISA evidence where available; quality-equivalent whole-frame result. A failure or inconclusive outcome is useful. | `NVR-18/19`; [Shader System plan](../Architecture/CrossModule/ShaderSystem/ImplementationPlan.md), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md). SER is optional. |
+| `PGD-05`: Can another engineer compare the evidence correctly? | One bounded offline CLI, stable original-input hashes, run-level tables/plots, raw/display-domain distinction and mismatch/partial-input controls. | `NVR-12/14`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md), existing Python owner. No embedded viewer or general analyzer platform. |
+| `PGD-06/07`: Does a small owned model become correct, useful shader work? | Dataset/model/operator cards, held-out split, FP32 shader conformance, one layout/fusion/precision ablation, resource-retirement/fallback and quality/latency/memory frontier. | `NVR-03/10/11/13`; [Neural discovery](../Architecture/CrossModule/NeuralGraphics/Discovery.md) and [plan](../Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md). Do not add NeRF or OptiX. |
+| `PGD-08/09`: Can knowledge and maintenance transfer? | A short delivered-case exercise, one non-author transcript, independent review with changed decision, and an explicit support/retirement note. Later progression: second distinct consumer plus one feedback-driven post-adoption revision. | `NVR-17/20`; [Neural adoption](../Architecture/CrossModule/NeuralGraphics/NeuralGraphicsDesign.md#neural-graphics-acceptance), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md), existing support owner. |
 | Conditional `PGD-03/09`: Would a GPU-driven geometry or memory change solve a measured problem? | First produce a visibility/draw-granularity or residency-pressure diagnosis. Admit a bounded feature only if the current path cannot meet a frozen consumer need. | `NVR-08/09/16`; [Visibility](../Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/VisibilityAndDrawPreparation.md), [Residency](../Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/MeshAndTextureResidency.md). Meshlets/DGC/new vendor SDKs remain study-only until separately admitted. |
 
 Every selected exercise records the source card, exact assumption, local differences, rights route, falsifier and result owner using the [reference-use record](Research/RenderingReferenceExamples.md#delivery-reference-use-record). An algorithm replacement requires its existing feature gate; a documentation precedent cannot reopen or silently change an accepted scope.

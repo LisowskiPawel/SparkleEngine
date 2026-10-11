@@ -1,12 +1,12 @@
 # Indirect Lighting Transport And Estimator Contract
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](IndirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target mathematical contract with discovery-gated path domains and mappings; no implementation/convergence claim
 
 **Responsibility:** own indirect path measurement, technique accounting, path records, shifts, GRIS/reservoir weights, reuse, environment/emission, reconstruction-signal, and numerical rules
 
-**Authority boundary:** `IND-D0` ratifies the selected domain/equations; [Execution Architecture](ExecutionArchitecture.md) owns system shape; [Plan](Plan.md) owns order; code/tests conform; `FCR-REN-07` owns results
+**Authority boundary:** `IND-D0` ratifies the selected domain/equations; [Execution Architecture](ExecutionArchitecture.md) owns system shape; [Plan](ImplementationPlan.md) owns order; code/tests conform; `FCR-REN-07` owns results
 
 **Notation:** a camera path is `x0 ... xk`, directions point away from a surface, `ng/ns` are geometric/shading normals, and all radiance products are scene-linear
 

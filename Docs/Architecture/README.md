@@ -7,7 +7,7 @@
 This tree explains what each system does, how data and responsibility move through the engine, which design choices were made, where current implementation stops, what informed those choices, and how remaining work is sequenced. Related architecture, plans, research, and feature-local proof contracts stay with their owning module or feature.
 
 > [!TIP]
-> New to the repository? Read [SparkleEngine At A Glance](EngineAtAGlance.md), then follow either the [Renderer](Modules/Engine/Renderer/README.md) or [RHI](Modules/Engine/RHI/README.md) path.
+> New to the repository? Read [SparkleEngine At A Glance](EngineAtAGlance.md), then follow either the [Renderer](Modules/Engine/Renderer/RendererDesign.md) or [RHI](Modules/Engine/RHI/RHIDesign.md) path.
 
 ## Choose Your Depth
 
@@ -16,11 +16,11 @@ This tree explains what each system does, how data and responsibility move throu
 | 2-minute orientation | What exists, what is missing, and the largest tradeoffs — [Engine At A Glance](EngineAtAGlance.md) |
 | Current readiness | How far each tracked feature has progressed from implementation through delivery — [Current Feature Readiness](../Acceptance/CurrentReadiness.md) |
 | System understanding | Major owners and dependency direction — [Whole Repository Map](WholeRepositoryMap.md) |
-| Module understanding | One Engine, Tools, Projects, or build boundary — [Module Architecture](Modules/README.md) |
-| Feature understanding | One result, its selection, design, limits, and proof contract — [Renderer Features](Modules/Engine/Renderer/Features/README.md), [RHI Features](Modules/Engine/RHI/Features/README.md), or the owning module |
+| Module understanding | One Engine, Tools, Projects, or build boundary — [Module Architecture](Modules/ModuleInventory.md) |
+| Feature understanding | One result, its selection, design, limits, and proof contract — [Renderer Features](Modules/Engine/Renderer/Features/RendererFeatureGuide.md), [RHI Features](Modules/Engine/RHI/Features/RHIFeatureGuide.md), or the owning module |
 | Cross-system trace | A workflow or GPU feature spanning several owners — [Cross-Module Architecture](CrossModule/README.md) |
 | Documentation coverage | Whether every strategy, plan, acceptance, and research feature has an Architecture owner — [Feature Documentation Coverage](CrossModule/FeatureDocumentation/README.md) |
-| First-release implementation | Release order plus module-owned work packages — [First Release Implementation Plan](CrossModule/FirstRelease/README.md) |
+| First-release implementation | Release order plus module-owned work packages — [First Release Implementation Plan](CrossModule/FirstRelease/ImplementationPlan.md) |
 | Product journey | Build, content, editor, game, and delivery handoffs — [Product Workflow Coverage](CrossModule/ProductWorkflowCoverage.md) and [Product Execution Traces](CrossModule/ProductExecutionTraces.md) |
 | Accepted invariant | Why a boundary must remain true — [Architecture Decisions](Decisions/README.md) |
 
@@ -29,12 +29,12 @@ This tree explains what each system does, how data and responsibility move throu
 
 | Area | What you find |
 | --- | --- |
-| [Modules](Modules/README.md) | Who owns the capability and what does the current source path contain? — Renderer, RHI, Tasks, Launcher, Showcase |
+| [Modules](Modules/ModuleInventory.md) | Who owns the capability and what does the current source path contain? — Renderer, RHI, Tasks, Launcher, Showcase |
 | [CrossModule](CrossModule/README.md) | How does one result cross owners or backends? — graphics execution, product workflows, shader system |
 | [Decisions](Decisions/README.md) | Which dependency or ownership invariant was deliberately accepted? — Renderer/RHI boundary |
 | [Engine At A Glance](EngineAtAGlance.md) | What is the current overall shape, support state, and main gap? — source-present versus missing/unproved capability summary |
 
-The module hierarchy mirrors [Engine](Modules/Engine/README.md), [Tools](Modules/Tools/README.md), [Projects](Modules/Projects/README.md), and repository-wide [Build And Packaging](Modules/BuildAndPackaging/README.md) ownership. Links may cross those boundaries; document placement does not.
+The module hierarchy mirrors [Engine](Modules/Engine/README.md), [Tools](Modules/Tools/README.md), [Projects](Modules/Projects/README.md), and repository-wide [Build And Packaging](Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md) ownership. Links may cross those boundaries; document placement does not.
 
 
 ## What A Subject Folder Contains

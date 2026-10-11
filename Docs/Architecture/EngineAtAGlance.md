@@ -115,7 +115,7 @@ For the detailed lifecycle, read [Rendering A Sparkle Frame](Modules/Engine/Rend
 | Debug views and capture | **40/100** | Implemented path; unproved | Intermediate products are selectable/capturable; semantic display correctness and attribution remain open. |
 | Volumetrics, decals, grading, chromatic aberration, frame generation | **0/100** | Not found | Explicit negative dossiers prevent adjacent features or SDK presence from being mistaken for support. |
 
-See [Renderer Features](Modules/Engine/Renderer/Features/README.md) for the complete feature map and local proof contracts.
+See [Renderer Features](Modules/Engine/Renderer/Features/RendererFeatureGuide.md) for the complete feature map and local proof contracts.
 
 ## Design Decisions And Tradeoffs
 
@@ -144,9 +144,9 @@ Current gate state lives in [First Release Acceptance](../Acceptance/FirstReleas
 
 | If you want to... | Read next |
 | --- | --- |
-| Understand one rendered frame | [Renderer overview](Modules/Engine/Renderer/README.md) |
-| Understand GPU/backend responsibilities | [RHI overview](Modules/Engine/RHI/README.md) |
-| See exact current/missing capability rows | [Module Capability Inventory](Modules/README.md) |
+| Understand one rendered frame | [Renderer overview](Modules/Engine/Renderer/RendererDesign.md) |
+| Understand GPU/backend responsibilities | [RHI overview](Modules/Engine/RHI/RHIDesign.md) |
+| See exact current/missing capability rows | [Module Capability Inventory](Modules/ModuleInventory.md) |
 | Compare D3D12, Vulkan, raster, inline, and native ray paths | [Graphics Feature Coverage](CrossModule/GraphicsCoverageMatrix.md) |
 | Follow a request through execution and retirement | [Feature Execution Traces](CrossModule/FeatureExecutionTraces.md) |
 | See what remains to prove | [Capability Evidence Plan](Modules/CapabilityEvidencePlan.md) |

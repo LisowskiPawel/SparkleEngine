@@ -1,6 +1,6 @@
 # Deferred GBuffer Decal Composition Architecture
 
-[Docs](../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../README.md) / [Up](DeferredDecalsDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** target architecture; not implemented behavior
 
@@ -24,7 +24,7 @@ Sparkle should implement decals as material overlays, never as a forward-lit col
 
 This is a target design. Code, cooked schemas, build configuration, and executable tests remain the authority for what exists today.
 
-This document owns decal semantics, data flow, pass placement, and shared raster/ray composition. The adjacent [feature acceptance contract](Acceptance.md) owns the validation fixture, controlled failures, checks, and completion gates; the [Deferred GBuffer Decals Delivery Plan](Plan.md) owns feature-local phase order. [Shader System Architecture](../../../../../CrossModule/ShaderSystem/README.md) owns shader identity and publication; the [Shader System Delivery Plan](../../../../../CrossModule/ShaderSystem/Plan.md) owns the cross-system native RT pipeline/SBT/RHI sequence. The [Ray-Tracing Execution Architecture](../RayTracing/ExecutionArchitecture.md) owns the enduring inline-versus-pipeline and SBT semantics; adding decals must not create a third execution contract.
+This document owns decal semantics, data flow, pass placement, and shared raster/ray composition. The adjacent [feature acceptance contract](Acceptance.md) owns the validation fixture, controlled failures, checks, and completion gates; the [Deferred GBuffer Decals Delivery Plan](ImplementationPlan.md) owns feature-local phase order. [Shader System Architecture](../../../../../CrossModule/ShaderSystem/ShaderSystemDesign.md) owns shader identity and publication; the [Shader System Delivery Plan](../../../../../CrossModule/ShaderSystem/ImplementationPlan.md) owns the cross-system native RT pipeline/SBT/RHI sequence. The [Ray-Tracing Execution Architecture](../RayTracing/ExecutionArchitecture.md) owns the enduring inline-versus-pipeline and SBT semantics; adding decals must not create a third execution contract.
 
 ## Outcome
 
@@ -39,7 +39,7 @@ It deliberately does not implement forward decals, mesh decals, transparent-surf
 
 ## Implementation Snapshot
 
-The current source inventory, existing GBuffer/material seams, and absent decal path live in the [Deferred Decals feature dossier](README.md). Refresh that dossier before beginning a delivery phase; this architecture does not claim the path is implemented.
+The current source inventory, existing GBuffer/material seams, and absent decal path live in the [Deferred Decals feature dossier](DeferredDecalsDesign.md). Refresh that dossier before beginning a delivery phase; this architecture does not claim the path is implemented.
 
 ## Requirements And Boundaries
 

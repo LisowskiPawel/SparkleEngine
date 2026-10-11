@@ -1,12 +1,12 @@
 # Direct Lighting User Experience Contract
 
-[Docs](../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../README.md) / [Up](DirectLightingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** proposed experience; implementation and acceptance remain blocked by `DIR-D0`
 
 **Responsibility:** define how artists, rendering engineers, automation, and support select, understand, diagnose, capture, and recover the Direct Lighting feature
 
-**Authority boundary:** the [dossier](README.md) owns feature acceptance; [Sampling And Shading](SamplingAndShading.md) owns result meaning; [Execution Architecture](ExecutionArchitecture.md) owns runtime state and data truth; [Discovery](Discovery.md) ratifies public choices; [Plan](Plan.md) owns delivery order
+**Authority boundary:** the [dossier](DirectLightingDesign.md) owns feature acceptance; [Sampling And Shading](SamplingAndShading.md) owns result meaning; [Execution Architecture](ExecutionArchitecture.md) owns runtime state and data truth; [Discovery](Discovery.md) ratifies public choices; [Plan](ImplementationPlan.md) owns delivery order
 
 ## Experience Principles
 

@@ -6,7 +6,7 @@
 
 **Responsibility:** retain the candidate identity, evidence limits, and artifact routes needed after retiring completed Show implementation instructions
 
-**Contract:** [Debug Views acceptance](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Acceptance.md). [Show controls](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Controls/ShowFlags.md) owns current behavior; [presentation architecture](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/README.md#debug-view-presentation-architecture) owns output mapping. This report does not create another delivery plan.
+**Contract:** [Debug Views acceptance](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Acceptance.md). [Show controls](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Controls/ShowFlags.md) owns current behavior; [presentation architecture](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/DebugViewsDesign.md#debug-view-presentation-architecture) owns output mapping. This report does not create another delivery plan.
 
 ## Bounded Show Delivery
 
@@ -29,9 +29,9 @@ These are artifact references, not a claim that every artifact is available in a
 
 ## Remaining Evidence
 
-The current [acceptance contract](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Acceptance.md) and [Runtime And Diagnostics delivery](../../Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnostics.md) remain the work owners. Bind affected checks to the final candidate and retain renewed shader/source/cook lineage and native lighting/shadow omission, guide/provider and frame-ordering evidence after relevant schema changes; the remaining mode, display-domain, extent, backend, unavailable-product, capture/provenance and multi-viewport matrix; and applicable observer cost, Shipping/package and family/release evidence.
+The current [acceptance contract](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Acceptance.md) and [Runtime And Diagnostics delivery](../../Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md) remain the work owners. Bind affected checks to the final candidate and retain renewed shader/source/cook lineage and native lighting/shadow omission, guide/provider and frame-ordering evidence after relevant schema changes; the remaining mode, display-domain, extent, backend, unavailable-product, capture/provenance and multi-viewport matrix; and applicable observer cost, Shipping/package and family/release evidence.
 
-A historical control result does not certify those cells. Reference invalid pixels and estimator correctness remain with the [Reference Path Tracer](../../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/README.md).
+A historical control result does not certify those cells. Reference invalid pixels and estimator correctness remain with the [Reference Path Tracer](../../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ReferencePathTracerDesign.md).
 
 ## Recorded Numerical Prerequisite
 

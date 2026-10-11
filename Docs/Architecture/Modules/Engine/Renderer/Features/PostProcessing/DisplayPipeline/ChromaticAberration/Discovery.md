@@ -1,12 +1,12 @@
 # Chromatic Aberration Discovery
 
-[Docs](../../../../../../../../README.md) / [Up](README.md)
+[Docs](../../../../../../../../README.md) / [Up](ChromaticAberrationDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** acceptance contract; `CHRD-00` is `Blocked`, and production implementation is not authorized
 
 **Responsibility:** freeze the first-release lens model, units, color/order boundary, state, edge behavior, budgets, workflow, and evidence protocol before `DSP-6`
 
-**Authority boundary:** [Research](Research.md) provides precedent; [Semantics](Semantics.md) and [Execution Architecture](ExecutionArchitecture.md) are design candidates; [Plan](Plan.md) is conditional delivery order; [README](README.md) owns feature acceptance and exclusions
+**Authority boundary:** [Research](Research.md) provides precedent; [Semantics](Semantics.md) and [Execution Architecture](ExecutionArchitecture.md) are design candidates; [Plan](ImplementationPlan.md) is conditional delivery order; [README](ChromaticAberrationDesign.md) owns feature acceptance and exclusions
 
 **Verified:** 2026-09-10 against committed revision `ca55e7d8`; Renderer post-processing, display settings, shader, capture, viewport, and package paths were inspected as source only; concurrent user-owned dirty paths remain outside this gate evidence
 
@@ -156,4 +156,4 @@ The gate report retains:
 
 ## Gate Decision
 
-The gate is currently **Blocked**. A future `PASS` requires all discovery criteria conjunctively, names the exact accepted dossier revisions, and authorizes only Stage 1 of [Plan](Plan.md)—not feature implementation, runtime support, or `FCR-REN-25`.
+The gate is currently **Blocked**. A future `PASS` requires all discovery criteria conjunctively, names the exact accepted dossier revisions, and authorizes only Stage 1 of [Plan](ImplementationPlan.md)—not feature implementation, runtime support, or `FCR-REN-25`.
