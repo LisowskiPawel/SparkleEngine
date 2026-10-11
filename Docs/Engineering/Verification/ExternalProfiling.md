@@ -240,10 +240,10 @@ DebugEditor/DevelopmentEditor supports direct launch with one attachment flag. L
 
 ```powershell
 # Working directory: Projects/Showcase
-../../artifacts/dev/projects/Showcase/editor/DevelopmentEditor/ShowcaseEditor.exe --graphics-api d3d12 -AttachPix
-../../artifacts/dev/projects/Showcase/editor/DevelopmentEditor/ShowcaseEditor.exe --graphics-api d3d12 -AttachNSight
-../../artifacts/dev/projects/Showcase/editor/DevelopmentEditor/ShowcaseEditor.exe --graphics-api d3d12 -AttachRenderDoc
-../../artifacts/dev/projects/Showcase/editor/DevelopmentEditor/ShowcaseEditor.exe --graphics-api vulkan -AttachRenderDoc
+../../artifacts/dev/Projects/Showcase/Binaries/DevelopmentEditor/ShowcaseEditor.exe --graphics-api d3d12 -AttachPix
+../../artifacts/dev/Projects/Showcase/Binaries/DevelopmentEditor/ShowcaseEditor.exe --graphics-api d3d12 -AttachNSight
+../../artifacts/dev/Projects/Showcase/Binaries/DevelopmentEditor/ShowcaseEditor.exe --graphics-api d3d12 -AttachRenderDoc
+../../artifacts/dev/Projects/Showcase/Binaries/DevelopmentEditor/ShowcaseEditor.exe --graphics-api vulkan -AttachRenderDoc
 ```
 
 Wait for the desired scene, then click the tool icon at the viewport's upper right. Hooks initialize before graphics; no tool GUI or external launcher is required. Each click captures the host interval containing that scene viewport, including Editor UI, and hands the finalized artifact to the native tool. The icon disables while queued/capturing; tooltips describe capture and relevant pending/failure status. Captures use canonical product user-state `Captures/ExternalCapture`; Nsight uses a process subdirectory. Viewer handoff is not replay/analysis proof.
@@ -281,7 +281,7 @@ Use these inputs from the repository root. Set child environment `SPARKLE_STARTU
 
 ```powershell
 $profilingRepo = (Get-Location).Path
-$profilingEditor = Join-Path $profilingRepo 'artifacts/dev/projects/Showcase/editor/DevelopmentEditor/ShowcaseEditor.exe'
+$profilingEditor = Join-Path $profilingRepo 'artifacts/dev/Projects/Showcase/Binaries/DevelopmentEditor/ShowcaseEditor.exe'
 $profilingWorkingDirectory = Join-Path $profilingRepo 'Projects/Showcase'
 $profilingArguments = '--graphics-api d3d12 --cvar=r.Upscaler.Provider=0 --cvar=r.RayReconstruction.Mode=0 --cvar=r.RayTracing.PreferPartitionedTlas=false'
 $profilingCaptureRoot = Join-Path $env:LOCALAPPDATA 'SparkleEngine/Development/SparkleEngine-736b042528ba48b3/Showcase/Captures/ExternalCaptureReady-20261009'

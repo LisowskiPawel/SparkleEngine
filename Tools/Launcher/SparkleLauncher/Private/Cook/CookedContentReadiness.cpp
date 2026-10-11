@@ -5,6 +5,7 @@
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Json/JsonReader.h"
 #include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "Core/Public/Paths/ProductPaths.h"
 
 #include <array>
 #include <cstdint>
@@ -26,7 +27,7 @@ namespace SparkleLauncher
 		const std::filesystem::recursive_directory_iterator end;
 		while (iterator != end)
 		{
-			const std::filesystem::directory_entry entry = *iterator;
+			const std::filesystem::directory_entry& entry = *iterator;
 			if (entry.is_regular_file(errorCode))
 			{
 				return true;
@@ -38,10 +39,9 @@ namespace SparkleLauncher
 		return false;
 	}
 
-	static bool CookedAssetScopeHasFiles(const Filesystem::WorkspaceOutputPaths& outputs, std::string_view projectId, std::string_view relativeDirectory)
+	static bool CookedAssetScopeHasFiles(const std::filesystem::path& cooked, const std::filesystem::path& shared, std::string_view relativeDirectory)
 	{
-		const std::string relativeScope(relativeDirectory);
-		return DirectoryHasRegularFiles(outputs.CookedProjectDirectory(projectId) / relativeScope) || DirectoryHasRegularFiles(outputs.SharedCookedProjectDirectory() / relativeScope);
+		return (!cooked.empty() && DirectoryHasRegularFiles(cooked / relativeDirectory)) || (!shared.empty() && DirectoryHasRegularFiles(shared / relativeDirectory));
 	}
 
 	static bool ShaderPublicationMatchesSignal(const std::filesystem::path& cookedShaderDirectory)
@@ -105,11 +105,12 @@ namespace SparkleLauncher
 
 	CookedContentReadiness InspectCookedContentReadiness(const std::filesystem::path& repositoryRoot, std::string_view projectId)
 	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
+		const auto cooked = Filesystem::ResolveProductCookedRoot(repositoryRoot, projectId);
+		const auto shared = Filesystem::IsSourceWorkspace(repositoryRoot) ? Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot).SharedCookedProjectDirectory() : std::filesystem::path{};
 
 		return CookedContentReadiness{
-		    .MeshesReady = CookedAssetScopeHasFiles(outputs, projectId, "Meshes"),
-		    .TexturesReady = CookedAssetScopeHasFiles(outputs, projectId, "Textures"),
-		    .Shaders = InspectCookedShaderPublication(outputs.CookedProjectDirectory(projectId) / "Shaders")};
+		    .MeshesReady = CookedAssetScopeHasFiles(cooked, shared, "Meshes"),
+		    .TexturesReady = CookedAssetScopeHasFiles(cooked, shared, "Textures"),
+		    .Shaders = cooked.empty() ? CookedShaderPublicationState::Missing : InspectCookedShaderPublication(cooked / "Shaders")};
 	}
 }

@@ -398,7 +398,7 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 			VkQueue nativeQueue = VK_NULL_HANDLE;
 			vkGetDeviceQueue(m_device, queueLocation.FamilyIndex, queueLocation.QueueIndex, &nativeQueue);
 			nativeQueues[queueIndex] = std::make_shared<VulkanNativeQueue>();
-			nativeQueues[queueIndex]->Queue = nativeQueue;
+			*nativeQueues[queueIndex] = nativeQueue;
 		}
 		m_queues[queueIndex] = std::make_unique<VulkanCommandQueue>(*this, queueType, nativeQueues[queueIndex]);
 	}

@@ -1,6 +1,6 @@
 #include "LauncherContentModel.h"
 
-#include "SparkleLauncher/ContentDiscovery.h"
+#include "SparkleLauncher/ProjectResolver.h"
 
 #include <string>
 
@@ -29,14 +29,15 @@ namespace SparkleLauncher
 	void LauncherContentModel::Refresh(const std::filesystem::path& repositoryRoot)
 	{
 		std::string errorMessage;
-		const std::optional<SparkleContent> discoveredContent = DiscoverContentRoot(repositoryRoot, errorMessage);
+		const std::optional<LauncherProject> discoveredContent = ResolveLauncherProject(repositoryRoot, errorMessage);
 
 		LauncherContentSummary refreshedContent;
 		const bool hasRefreshedContent = discoveredContent.has_value();
 		if (hasRefreshedContent)
 		{
-			const SparkleContent& content = *discoveredContent;
-			refreshedContent = {QString::fromStdString(content.Id), QString::fromStdString(content.DisplayName), content.RootPath};
+			const LauncherProject& content = *discoveredContent;
+			const QString projectName = QString::fromStdString(content.Id);
+			refreshedContent = {projectName, projectName, content.RootPath};
 		}
 
 		const bool contentChanged = m_hasContent != hasRefreshedContent || (m_hasContent && !ContentMatches(m_content, refreshedContent));

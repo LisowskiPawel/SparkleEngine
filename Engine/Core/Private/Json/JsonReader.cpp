@@ -331,6 +331,35 @@ namespace Json
 		return TryReadUnsignedIntegerProperty(objectText, key, outValue);
 	}
 
+	bool TryReadArrayProperty(std::string_view objectText, std::string_view key, std::vector<std::string_view>& outElements)
+	{
+		outElements.clear();
+		std::size_t cursor = FindPropertyValue(objectText, key);
+		if (cursor == std::string_view::npos || objectText[cursor++] != '[')
+		{
+			return false;
+		}
+		SkipWhitespace(objectText, cursor);
+		while (cursor < objectText.size() && objectText[cursor] != ']')
+		{
+			const std::size_t start = cursor;
+			if (!SkipValue(objectText, cursor, 0u))
+			{
+				outElements.clear();
+				return false;
+			}
+			outElements.push_back(objectText.substr(start, cursor - start));
+			SkipWhitespace(objectText, cursor);
+			if (objectText[cursor] == ']')
+			{
+				break;
+			}
+			++cursor;
+			SkipWhitespace(objectText, cursor);
+		}
+		return true;
+	}
+
 	bool TryParseHexUInt64(std::string_view text, std::uint64_t& outValue) noexcept
 	{
 		return Formatting::TryParseHexUInt64(text, outValue);

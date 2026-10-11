@@ -1,9 +1,8 @@
 #include "SparkleLauncher/ToolResolver.h"
 
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <algorithm>
-#include <cctype>
 #include <cstdlib>
 #include <optional>
 #include <sstream>
@@ -164,20 +163,9 @@ namespace SparkleLauncher
 		}
 	}
 
-	static bool PathFilenameEquals(const std::filesystem::path& path, std::string_view filename)
-	{
-		std::string pathFilename = path.filename().string();
-		std::string expected(filename);
-		std::transform(pathFilename.begin(), pathFilename.end(), pathFilename.begin(), [](unsigned char value) { return static_cast<char>(std::tolower(value)); });
-		std::transform(expected.begin(), expected.end(), expected.begin(), [](unsigned char value) { return static_cast<char>(std::tolower(value)); });
-		return pathFilename == expected;
-	}
-
 	static std::string BuildPathSortKey(const std::filesystem::path& path)
 	{
-		std::string key = path.lexically_normal().generic_string();
-		std::transform(key.begin(), key.end(), key.begin(), [](unsigned char value) { return static_cast<char>(std::tolower(value)); });
-		return key;
+		return Strings::ToLowerCopy(path.lexically_normal().generic_string());
 	}
 
 	static void AddRecursiveExecutableMatches(std::vector<std::filesystem::path>& candidates, const std::filesystem::path& root, std::string_view filename, int maxDepth)
@@ -206,7 +194,7 @@ namespace SparkleLauncher
 			}
 
 			const std::filesystem::directory_entry entry = *iterator;
-			if (entry.is_regular_file(errorCode) && PathFilenameEquals(entry.path(), filename))
+			if (entry.is_regular_file(errorCode) && Strings::EqualsIgnoreCase(entry.path().filename().string(), filename))
 			{
 				matches.push_back(entry.path());
 			}
@@ -391,19 +379,4 @@ namespace SparkleLauncher
 		return result;
 	}
 
-	std::filesystem::path ResolveSparkleToolPath(const std::filesystem::path& repositoryRoot, std::string_view profileName, std::string_view executableName)
-	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		std::filesystem::path fileName(executableName);
-#if defined(_WIN32)
-		if (fileName.extension().empty())
-		{
-			fileName += ".exe";
-		}
-#endif
-		const Filesystem::WorkspaceTargetOutputPaths targetOutputs = executableName == "SparkleLauncher" ? outputs.LauncherTargetOutputs(profileName)
-		                                                                                                 : outputs.ToolTargetOutputs(executableName, profileName);
-
-		return targetOutputs.BinaryDirectory / fileName;
-	}
 }

@@ -101,5 +101,5 @@ void EditorSceneModel::RebuildEntries()
 		const auto& mesh = m_meshes[index];
 		m_meshEntries.push_back({"Mesh " + std::to_string(index + 1), mesh.Kind == SceneMeshKind::Skeletal ? "Skeletal Mesh" : "Static Mesh", SceneObjectSelection::Mesh(mesh.Entity), mesh.Visible});
 	}
-	m_skyEntry = {m_sky ? "Sky" : "Sky (Engine Default)", "Sky", SceneObjectSelection::Sky(), !m_sky || m_sky->Description.enabled};
+	m_skyEntry = {m_sky ? "Sky" : "Sky (Engine Default)", "Sky", SceneObjectSelection::Sky(), !m_sky || m_sky->enabled};
 }

@@ -20,7 +20,7 @@ namespace Filesystem
 		    .DependencyCacheRoot = buildRoot / "_deps",
 		    .ArtifactRoot = artifactRoot,
 		    .DevelopmentArtifactRoot = developmentArtifactRoot,
-		    .ProjectArtifactRoot = developmentArtifactRoot / "projects",
+		    .ProjectArtifactRoot = developmentArtifactRoot / "Projects",
 		    .DiagnosticsRoot = artifactRoot / "diagnostics",
 		    .SymbolsRoot = artifactRoot / "symbols"};
 	}
@@ -31,7 +31,7 @@ namespace Filesystem
 		const std::string profile(profileName);
 
 		return WorkspaceTargetOutputPaths{
-		    .BinaryDirectory = DevelopmentArtifactRoot / "runtime-support" / target / profile,
+		    .BinaryDirectory = DevelopmentArtifactRoot / "Engine" / "Binaries" / target / profile,
 		    .LibraryDirectory = DevelopmentArtifactRoot / "libraries" / "runtime-support" / target / profile,
 		    .SymbolDirectory = SymbolsRoot / "runtime-support" / target / profile};
 	}
@@ -41,7 +41,7 @@ namespace Filesystem
 		const std::string profile(profileName);
 
 		return WorkspaceTargetOutputPaths{
-		    .BinaryDirectory = DevelopmentArtifactRoot / "launcher" / profile,
+		    .BinaryDirectory = DevelopmentArtifactRoot / "Tools" / "SparkleLauncher" / "Binaries" / profile,
 		    .LibraryDirectory = DevelopmentArtifactRoot / "libraries" / "launcher" / profile,
 		    .SymbolDirectory = SymbolsRoot / "launcher" / profile};
 	}
@@ -52,7 +52,7 @@ namespace Filesystem
 		const std::string profile(profileName);
 
 		return WorkspaceTargetOutputPaths{
-		    .BinaryDirectory = DevelopmentArtifactRoot / "tools" / tool / profile,
+		    .BinaryDirectory = DevelopmentArtifactRoot / "Tools" / tool / "Binaries" / profile,
 		    .LibraryDirectory = DevelopmentArtifactRoot / "libraries" / "tools" / tool / profile,
 		    .SymbolDirectory = SymbolsRoot / "tools" / tool / profile};
 	}
@@ -79,14 +79,14 @@ namespace Filesystem
 		const std::string profile(profileName);
 
 		return WorkspaceTargetOutputPaths{
-		    .BinaryDirectory = ProjectArtifactRoot / project / role / profile,
+		    .BinaryDirectory = ProjectArtifactRoot / project / "Binaries" / profile,
 		    .LibraryDirectory = DevelopmentArtifactRoot / "libraries" / "projects" / project / role / profile,
 		    .SymbolDirectory = SymbolsRoot / "projects" / project / role / profile};
 	}
 
 	std::filesystem::path WorkspaceOutputPaths::CookedProjectDirectory(std::string_view projectName) const
 	{
-		return ProjectArtifactRoot / std::string(projectName) / "cooked";
+		return ProjectArtifactRoot / std::string(projectName) / "Cooked";
 	}
 
 	std::filesystem::path WorkspaceOutputPaths::SharedCookedProjectDirectory() const

@@ -85,6 +85,7 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 
 - select one existing build/delivery owner for build → cook → stage → verify → package; do not put packaging policy in renderer or application code;
 - add explicit install/stage membership, component/allowlist policy, package-relative discovery, per-user writable state, manifests, notices/SBOM, provenance, hashes, and symbols handling;
+- preserve the local binary layout in archives; verify precompiled import into those locations and local compilation replacing the same products;
 - make staging fresh and transactional; reject stale, missing, extra, absolute, unlicensed, or incompatible products;
 - create the archive from an immutable verified stage, then verify archive contents against `manifests/sparkle-package-manifest.json`;
 - freeze exact Launcher/Editor/Game release configurations, executable names, helper closure and content-store/workspace paths; prove extract/start/selective-sync/offline-run/remove with no source checkout, undeclared toolchain, admin rights, environment override or author cache. CMake's [install rules](https://cmake.org/cmake/help/latest/command/install.html) are a mechanics reference, not an instruction to expose internal targets.

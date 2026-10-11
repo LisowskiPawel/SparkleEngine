@@ -20,13 +20,15 @@ Clone [SparkleEngine](https://github.com/stoleckipawel/SparkleEngine). From its 
 ```powershell
 cmake -S Tools/Launcher -B build/private/tools/SparkleLauncher -G "Visual Studio 18 2026" -A x64 -DCMAKE_PREFIX_PATH=C:/Qt/6.11.1/msvc2022_64
 cmake --build build/private/tools/SparkleLauncher --config DevelopmentEditor --target SparkleLauncher --parallel 4
-& ./artifacts/dev/launcher/DevelopmentEditor/SparkleLauncher.exe
+& ./artifacts/dev/Tools/SparkleLauncher/Binaries/DevelopmentEditor/SparkleLauncher.exe
 ```
 
 This builds Launcher; use it to configure/build the engine, select content, cook and start Editor or Game. Start with Empty. Only selected assets download; offline use requires completed sync/cook. See [Launcher workflows](Docs/Architecture/Modules/Tools/Launcher/LauncherCapabilities.md).
 
+With an archive for your source revision, use the [precompiled-binary route](Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#work-with-precompiled-binaries). It writes the same binary locations as local compilation. No qualified downloadable archive is available yet.
+
 ## License and third-party content
 
-Sparkle-owned code uses the [MIT license](LICENSE.txt), including commercial use. Libraries, SDKs and assets keep their own licenses. See [Qt license/source instructions](CMake/Notices/Qt/README.md) and [redistribution requirements](Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#release-inputs), including unresolved asset rights in repository history.
+Sparkle-owned code uses the [MIT license](LICENSE.txt), including commercial use. Libraries, SDKs and assets keep their own licenses. See [Qt license/source instructions](CMake/Notices/Qt/README.md) and [redistribution requirements](Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), including unresolved asset rights in repository history.
 
 No user support service or guaranteed fix is offered. Issues and pull requests are voluntary collaboration.

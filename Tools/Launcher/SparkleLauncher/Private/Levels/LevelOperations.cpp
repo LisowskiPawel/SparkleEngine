@@ -6,6 +6,8 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "LauncherStatePaths.h"
 #include "SparkleLauncher/ToolResolver.h"
+#include "Core/Public/Paths/PackagePaths.h"
+#include "Core/Public/Paths/ProductPaths.h"
 
 #include <algorithm>
 #include <sstream>
@@ -87,7 +89,18 @@ namespace SparkleLauncher
 		}
 		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.RepositoryRoot, definition->Id, "Latest.txt");
 
-		const ToolResolveResult cmake = ResolveKnownTool(KnownTool::CMake);
+		ToolResolveResult cmake;
+		if (!Filesystem::IsSourceWorkspace(request.RepositoryRoot))
+		{
+			const auto path = Filesystem::ResolvePackageFilePath(request.RepositoryRoot, "Tools/CMake/bin/cmake.exe");
+			cmake.Found = path.has_value();
+			cmake.Path = path.value_or(std::filesystem::path{});
+			cmake.FailureReason = "The declared portable CMake payload is missing or corrupt.";
+		}
+		else
+		{
+			cmake = ResolveKnownTool(KnownTool::CMake);
+		}
 		if (cmake.Found)
 		{
 			plan.CMakePath = cmake.Path;

@@ -179,7 +179,7 @@ namespace Filesystem::Private
 				state.enginePath = *engineRoot;
 				state.engineAssetsPath = state.enginePath / "Assets";
 			}
-			if (const auto projectRoot = DiscoverPackageProjectRoot(state.workspacePath))
+			if (const auto projectRoot = ResolvePackageSourceRoot(state.workspacePath))
 			{
 				state.projectPath = *projectRoot;
 				state.projectAssetsPath = state.projectPath / "Assets";

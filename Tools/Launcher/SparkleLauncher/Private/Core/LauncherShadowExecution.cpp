@@ -1,5 +1,7 @@
 #include "LauncherShadowExecution.h"
 
+#include "Core/Public/Paths/ProductPaths.h"
+
 #include "LauncherStatePaths.h"
 
 #include <QtCore/QProcess>
@@ -53,6 +55,12 @@ namespace SparkleLauncher
 	LauncherShadowStartResult StartLauncherShadow(const std::filesystem::path& repositoryRoot, const std::vector<std::string>& arguments, LauncherShadowCompletionPolicy completionPolicy)
 	{
 		LauncherShadowStartResult result;
+		if (!Filesystem::IsSourceWorkspace(repositoryRoot))
+		{
+			result.State = LauncherShadowStartState::NotRequired;
+			result.ExitCode = 0;
+			return result;
+		}
 		const std::filesystem::path currentExecutable = CurrentLauncherExecutable();
 		if (currentExecutable.empty())
 		{
@@ -64,7 +72,7 @@ namespace SparkleLauncher
 		const std::filesystem::path shadowRoot = ResolveLauncherStatePaths(repositoryRoot).LiveInstancesRoot;
 		if (IsWithin(currentDirectory, shadowRoot))
 		{
-			result.State = LauncherShadowStartState::AlreadyRunningFromShadow;
+			result.State = LauncherShadowStartState::NotRequired;
 			result.ExitCode = 0;
 			return result;
 		}

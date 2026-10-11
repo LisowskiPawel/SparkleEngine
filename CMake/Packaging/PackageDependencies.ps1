@@ -109,7 +109,7 @@ function Test-PackageDependencyClosure
         $productDirectory = $(if ($product.Count -eq 1) { $product[0].Path.Substring(0, $product[0].Path.LastIndexOf('/') + 1) } else { $directory })
         foreach ($dll in @(Get-PackagePeImports (Join-Path $Stage $file.Path)))
         {
-            if ($file.Path.StartsWith('game/', [StringComparison]::OrdinalIgnoreCase) -and $dll -match '(Qt[56]|Editor|AssetCooker|TextureCooker|ShaderCompiler)')
+            if (($file.Component -eq 'Game' -or $file.Path -match '^Projects/[^/]+/Binaries/ShippingGame/') -and $dll -match '(Qt[56]|Editor|AssetCooker|TextureCooker|ShaderCompiler)')
             {
                 throw "Editor/authoring import '$dll' in '$($file.Path)'."
             }

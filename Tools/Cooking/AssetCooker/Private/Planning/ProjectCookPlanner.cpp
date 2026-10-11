@@ -1,8 +1,10 @@
-#include "AssetCookerDiscovery.h"
+#include "ProjectCookPlanner.h"
+#include "Core/Public/Paths/ProductPaths.h"
 
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "Core/Public/Paths/PackagePaths.h"
+#include "Core/Public/Strings/StringUtils.h"
 
-#include "CatalogedLevelSceneReader.h"
+#include "../Discovery/CatalogedLevelSceneReader.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/FileSystemUtils.h"
 #include "Core/Public/Paths/PathUtils.h"
@@ -15,7 +17,7 @@
 #include <system_error>
 #include <utility>
 
-bool AssetCookerDiscovery::TryFindRepositoryRoot(const std::filesystem::path& startPath, std::filesystem::path& outRepositoryRoot)
+bool ProjectCookPlanner::TryFindRepositoryRoot(const std::filesystem::path& startPath, std::filesystem::path& outRepositoryRoot)
 {
 	std::error_code error;
 	std::filesystem::path currentPath = Paths::Normalize(startPath.empty() ? std::filesystem::current_path(error) : startPath);
@@ -38,7 +40,7 @@ bool AssetCookerDiscovery::TryFindRepositoryRoot(const std::filesystem::path& st
 	return true;
 }
 
-std::optional<std::string_view> AssetCookerDiscovery::ResolveToolProfile(std::string_view configuration) noexcept
+std::optional<std::string_view> ProjectCookPlanner::ResolveToolProfile(std::string_view configuration) noexcept
 {
 	if (configuration == "DebugEditor" || configuration == "DebugGame")
 	{
@@ -55,9 +57,19 @@ std::optional<std::string_view> AssetCookerDiscovery::ResolveToolProfile(std::st
 	return std::nullopt;
 }
 
-std::vector<std::string> AssetCookerDiscovery::DiscoverProjects(const std::filesystem::path& repositoryRoot, AssetCookerDiagnostics& diagnostics)
+std::vector<std::string> ProjectCookPlanner::DiscoverProjects(const std::filesystem::path& repositoryRoot, AssetCookerDiagnostics& diagnostics)
 {
 	std::vector<std::string> projects;
+	if (!Filesystem::IsSourceWorkspace(repositoryRoot))
+	{
+		const auto source = Filesystem::ResolvePackageSourceRoot(repositoryRoot);
+		if (source && PathExists(*source / std::string(Filesystem::kProjectMarker)))
+		{
+			return {Strings::ToNarrow(source->filename().wstring())};
+		}
+		diagnostics.AddError(AssetCookerCategory::All, "Package content store is not initialized. Start Launcher first.");
+		return {};
+	}
 	const std::filesystem::path projectsRoot = repositoryRoot / "Projects";
 	if (!PathExists(projectsRoot))
 	{
@@ -84,7 +96,7 @@ std::vector<std::string> AssetCookerDiscovery::DiscoverProjects(const std::files
 	return projects;
 }
 
-bool AssetCookerDiscovery::BuildProjectCookPlan(
+bool ProjectCookPlanner::BuildProjectCookPlan(
     const std::filesystem::path& repositoryRoot,
     std::string_view projectName,
     std::string_view toolProfile,
@@ -92,7 +104,19 @@ bool AssetCookerDiscovery::BuildProjectCookPlan(
     AssetCookerProjectCookPlan& outPlan,
     AssetCookerDiagnostics& diagnostics)
 {
-	InitializePlan(repositoryRoot, projectName, toolProfile, category, outPlan);
+	outPlan = {};
+	outPlan.projectName = std::string(projectName);
+	outPlan.projectRoot = Filesystem::ResolveProductProjectRoot(repositoryRoot, projectName);
+	outPlan.cookedRoot = Filesystem::ResolveProductCookedRoot(repositoryRoot, projectName);
+	outPlan.shaderCompilerPath = Filesystem::ResolveProductToolPath(repositoryRoot, "ShaderCompiler", toolProfile);
+	outPlan.textureCookerPath = Filesystem::ResolveProductToolPath(repositoryRoot, "TextureCooker", toolProfile);
+	outPlan.temporaryRoot = Filesystem::ResolveProductToolScratch(repositoryRoot, "AssetCooker", toolProfile);
+	AddPlanSteps(category, outPlan.steps);
+	if (!Filesystem::IsSourceWorkspace(repositoryRoot) && (outPlan.projectRoot.empty() || outPlan.cookedRoot.empty() || outPlan.shaderCompilerPath.empty() || outPlan.textureCookerPath.empty()))
+	{
+		diagnostics.AddError(AssetCookerCategory::All, "Invalid package project, profile or cook-helper manifest entry.");
+		return false;
+	}
 
 	if (!PathExists(outPlan.projectRoot / std::string(Filesystem::kProjectMarker)))
 	{
@@ -108,36 +132,18 @@ bool AssetCookerDiscovery::BuildProjectCookPlan(
 	return CollectSceneEntries(outPlan.projectRoot, outPlan.sceneEntries, diagnostics);
 }
 
-bool AssetCookerDiscovery::PathExists(const std::filesystem::path& path)
+bool ProjectCookPlanner::PathExists(const std::filesystem::path& path)
 {
 	std::error_code error;
 	return std::filesystem::exists(path, error) && !error;
 }
 
-bool AssetCookerDiscovery::CategoryNeedsScenes(AssetCookerCategory category) noexcept
+bool ProjectCookPlanner::CategoryNeedsScenes(AssetCookerCategory category) noexcept
 {
 	return category == AssetCookerCategory::All || category == AssetCookerCategory::Textures || category == AssetCookerCategory::SceneAssets;
 }
 
-void AssetCookerDiscovery::InitializePlan(
-    const std::filesystem::path& repositoryRoot,
-    std::string_view projectName,
-    std::string_view toolProfile,
-    AssetCookerCategory category,
-    AssetCookerProjectCookPlan& outPlan)
-{
-	outPlan = {};
-	outPlan.projectName = std::string(projectName);
-	outPlan.projectRoot = repositoryRoot / "Projects" / outPlan.projectName;
-	const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-	outPlan.cookedRoot = outputs.CookedProjectDirectory(outPlan.projectName);
-	outPlan.shaderCompilerPath = outputs.ToolTargetOutputs("ShaderCompiler", toolProfile).BinaryDirectory / "ShaderCompiler.exe";
-	outPlan.textureCookerPath = outputs.ToolTargetOutputs("TextureCooker", toolProfile).BinaryDirectory / "TextureCooker.exe";
-	outPlan.temporaryRoot = outputs.ToolScratchDirectory("AssetCooker", toolProfile);
-	AddPlanSteps(category, outPlan.steps);
-}
-
-bool AssetCookerDiscovery::CollectSceneEntries(const std::filesystem::path& projectRoot, std::vector<AssetCookerSceneEntry>& outEntries, AssetCookerDiagnostics& diagnostics)
+bool ProjectCookPlanner::CollectSceneEntries(const std::filesystem::path& projectRoot, std::vector<AssetCookerSceneEntry>& outEntries, AssetCookerDiagnostics& diagnostics)
 {
 	std::vector<std::string> sceneIds;
 	if (!CollectSceneIds(projectRoot, sceneIds, diagnostics))
@@ -159,7 +165,7 @@ bool AssetCookerDiscovery::CollectSceneEntries(const std::filesystem::path& proj
 	return true;
 }
 
-void AssetCookerDiscovery::AddPlanSteps(AssetCookerCategory category, std::vector<AssetCookerPlanStep>& outSteps)
+void ProjectCookPlanner::AddPlanSteps(AssetCookerCategory category, std::vector<AssetCookerPlanStep>& outSteps)
 {
 	outSteps.clear();
 	if (category == AssetCookerCategory::All)
@@ -182,7 +188,7 @@ void AssetCookerDiscovery::AddPlanSteps(AssetCookerCategory category, std::vecto
 	}
 }
 
-bool AssetCookerDiscovery::CollectSceneIds(const std::filesystem::path& projectRoot, std::vector<std::string>& outSceneIds, AssetCookerDiagnostics& diagnostics)
+bool ProjectCookPlanner::CollectSceneIds(const std::filesystem::path& projectRoot, std::vector<std::string>& outSceneIds, AssetCookerDiagnostics& diagnostics)
 {
 	ProjectLevelCatalog catalog;
 	try
@@ -209,7 +215,7 @@ bool AssetCookerDiscovery::CollectSceneIds(const std::filesystem::path& projectR
 	return true;
 }
 
-bool AssetCookerDiscovery::AppendLevelSceneIds(const ProjectLevelCatalog& catalog, const ProjectLevelCatalogEntry& level, std::vector<std::string>& outSceneIds, AssetCookerDiagnostics& diagnostics)
+bool ProjectCookPlanner::AppendLevelSceneIds(const ProjectLevelCatalog& catalog, const ProjectLevelCatalogEntry& level, std::vector<std::string>& outSceneIds, AssetCookerDiagnostics& diagnostics)
 {
 	if (!level.selected)
 	{
@@ -232,7 +238,7 @@ bool AssetCookerDiscovery::AppendLevelSceneIds(const ProjectLevelCatalog& catalo
 	return false;
 }
 
-bool AssetCookerDiscovery::ResolveSceneEntry(const std::filesystem::path& projectRoot, std::string_view sceneId, AssetCookerSceneEntry& outEntry, AssetCookerDiagnostics& diagnostics)
+bool ProjectCookPlanner::ResolveSceneEntry(const std::filesystem::path& projectRoot, std::string_view sceneId, AssetCookerSceneEntry& outEntry, AssetCookerDiagnostics& diagnostics)
 {
 	const std::filesystem::path meshRoot = Paths::Normalize(projectRoot / "Assets" / "Meshes");
 	const std::filesystem::path relativeBase = std::filesystem::path(sceneId).lexically_normal();
@@ -267,12 +273,12 @@ bool AssetCookerDiscovery::ResolveSceneEntry(const std::filesystem::path& projec
 	return true;
 }
 
-bool AssetCookerDiscovery::IsSceneIdSafe(const std::filesystem::path& relativeScenePath) noexcept
+bool ProjectCookPlanner::IsSceneIdSafe(const std::filesystem::path& relativeScenePath) noexcept
 {
 	return !relativeScenePath.empty() && !relativeScenePath.is_absolute() && !relativeScenePath.generic_string().starts_with("..");
 }
 
-bool AssetCookerDiscovery::ResolveSceneSource(
+bool ProjectCookPlanner::ResolveSceneSource(
     const std::filesystem::path& meshRoot,
     const std::filesystem::path& relativeScenePath,
     std::string_view sceneId,

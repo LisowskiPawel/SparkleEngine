@@ -9,7 +9,7 @@ namespace SparkleLauncher
 {
 	enum class LauncherShadowStartState : std::uint8_t
 	{
-		AlreadyRunningFromShadow,
+		NotRequired,
 		Started,
 		Failed,
 	};

@@ -1,11 +1,12 @@
 #pragma once
 
+#include "GameFramework/Public/World/SkyEnvironment.h"
+
 #include <string>
 #include <cstdint>
 #include <optional>
 
 class EditorTransactionHistory;
-struct SkyEnvironment;
 
 class SceneSkyInspector final
 {

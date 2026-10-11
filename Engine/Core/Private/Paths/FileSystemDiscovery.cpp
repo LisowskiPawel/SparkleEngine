@@ -44,35 +44,6 @@ namespace Filesystem::Private
 		return executableStem;
 	}
 
-	std::optional<std::filesystem::path> DiscoverPackageRoot()
-	{
-		std::error_code ec;
-		auto currentDir = std::filesystem::weakly_canonical(Filesystem::GetExecutableDirectory(), ec);
-		if (ec)
-		{
-			currentDir = Filesystem::GetExecutableDirectory();
-		}
-
-		for (uint32_t depth = 0; depth < 8 && !currentDir.empty(); ++depth)
-		{
-			const bool hasPackageManifest = std::filesystem::exists(currentDir / "manifests" / "sparkle-package-manifest.json", ec);
-			ec.clear();
-			if (hasPackageManifest)
-			{
-				return Paths::Normalize(currentDir);
-			}
-
-			const auto parentDir = currentDir.parent_path();
-			if (parentDir == currentDir)
-			{
-				break;
-			}
-			currentDir = parentDir;
-		}
-
-		return std::nullopt;
-	}
-
 	std::optional<std::filesystem::path> DiscoverWorkspaceProjectRoot()
 	{
 		const auto workspaceRoot = Filesystem::DiscoverWorkspaceRoot();
@@ -228,6 +199,10 @@ namespace Filesystem
 
 	std::optional<std::filesystem::path> DiscoverProjectRoot()
 	{
+		if (const auto package = DiscoverPackageRoot())
+		{
+			return ResolvePackageSourceRoot(*package);
+		}
 		if (const auto executableRoot = FindAncestorWithMarker(GetExecutableDirectory(), kProjectMarker))
 		{
 			return Paths::Normalize(*executableRoot);

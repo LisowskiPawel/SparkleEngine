@@ -52,6 +52,7 @@ namespace Strings
 		return result.ec == std::errc{} && result.ptr == end;
 	}
 
+	// UTF-8 <-> native wide text; invalid encoding throws std::invalid_argument.
 	SPARKLE_CORE_API std::wstring ToWide(std::string_view str);
 	SPARKLE_CORE_API std::wstring ToWide(const std::filesystem::path& path);
 	SPARKLE_CORE_API std::string ToNarrow(std::wstring_view str);

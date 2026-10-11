@@ -31,5 +31,4 @@ namespace SparkleLauncher
 	std::vector<std::filesystem::path> GetExecutableSearchPath();
 	std::optional<std::filesystem::path> FindExecutableOnPath(std::string_view executableName);
 	ToolResolveResult ResolveKnownTool(KnownTool tool);
-	std::filesystem::path ResolveSparkleToolPath(const std::filesystem::path& repositoryRoot, std::string_view profileName, std::string_view executableName);
 }

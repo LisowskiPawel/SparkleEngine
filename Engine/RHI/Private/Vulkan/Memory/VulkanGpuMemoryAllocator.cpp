@@ -23,16 +23,6 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanMemoryLogger, "RHI.Vulkan.Memory");
 
 using VulkanMemoryCategoryAggregation = RhiMemoryCategoryAggregation<std::uint32_t>;
 
-struct VulkanGpuMemoryAllocator::PendingAllocationRelease final
-{
-	std::unique_ptr<VulkanGpuAllocationRecord> Record;
-};
-
-struct VulkanGpuMemoryAllocator::PendingMemoryBlockRelease final
-{
-	std::unique_ptr<VulkanGpuMemoryBlockRecord> Record;
-};
-
 struct VulkanGpuMemoryAllocator::Impl final
 {
 	VmaAllocator Allocator = nullptr;
@@ -219,18 +209,18 @@ RhiMemoryUsageSnapshot VulkanGpuMemoryAllocator::CreateMemoryUsageSnapshot() con
 
 		for (const PendingAllocationRelease& pendingRelease : m_impl->PendingReleases)
 		{
-			if (pendingRelease.Record != nullptr)
+			if (pendingRelease != nullptr)
 			{
-				snapshot.DelayedDestructionBytes += pendingRelease.Record->AllocatedBytes;
+				snapshot.DelayedDestructionBytes += pendingRelease->AllocatedBytes;
 				++snapshot.DelayedDestructionAllocationCount;
 			}
 		}
 
 		for (const PendingMemoryBlockRelease& pendingRelease : m_impl->PendingMemoryBlockReleases)
 		{
-			if (pendingRelease.Record != nullptr)
+			if (pendingRelease != nullptr)
 			{
-				snapshot.DelayedDestructionBytes += pendingRelease.Record->AllocatedBytes;
+				snapshot.DelayedDestructionBytes += pendingRelease->AllocatedBytes;
 				++snapshot.DelayedDestructionAllocationCount;
 			}
 		}
@@ -593,7 +583,7 @@ void VulkanGpuMemoryAllocator::QueueDestroyResource(std::unique_ptr<VulkanGpuAll
 
 	std::scoped_lock lock(m_impl->RecordsMutex);
 	record->PendingRelease = true;
-	m_impl->PendingReleases.push_back(PendingAllocationRelease{.Record = std::move(record)});
+	m_impl->PendingReleases.push_back(std::move(record));
 }
 
 void VulkanGpuMemoryAllocator::QueueDestroyMemoryBlock(std::unique_ptr<VulkanGpuMemoryBlockRecord> record) noexcept
@@ -605,7 +595,7 @@ void VulkanGpuMemoryAllocator::QueueDestroyMemoryBlock(std::unique_ptr<VulkanGpu
 	}
 
 	std::scoped_lock lock(m_impl->RecordsMutex);
-	m_impl->PendingMemoryBlockReleases.push_back(PendingMemoryBlockRelease{.Record = std::move(record)});
+	m_impl->PendingMemoryBlockReleases.push_back(std::move(record));
 }
 
 void VulkanGpuMemoryAllocator::DrainCompletedReleases(const std::array<std::uint64_t, RhiQueueTypeCount>& completedValues) noexcept
@@ -623,9 +613,9 @@ void VulkanGpuMemoryAllocator::DrainCompletedReleases(const std::array<std::uint
 		auto pending = m_impl->PendingReleases.begin();
 		while (pending != m_impl->PendingReleases.end())
 		{
-			if (pending->Record == nullptr || (pending->Record->RecordingReferenceCount.load(std::memory_order_relaxed) == 0 && pending->Record->LastUse.IsComplete(completedValues)))
+			if (*pending == nullptr || ((*pending)->RecordingReferenceCount.load(std::memory_order_relaxed) == 0 && (*pending)->LastUse.IsComplete(completedValues)))
 			{
-				readyReleases.push_back(std::move(pending->Record));
+				readyReleases.push_back(std::move(*pending));
 				pending = m_impl->PendingReleases.erase(pending);
 			}
 			else
@@ -637,11 +627,11 @@ void VulkanGpuMemoryAllocator::DrainCompletedReleases(const std::array<std::uint
 		auto pendingMemoryBlock = m_impl->PendingMemoryBlockReleases.begin();
 		while (pendingMemoryBlock != m_impl->PendingMemoryBlockReleases.end())
 		{
-			if (pendingMemoryBlock->Record == nullptr
-			    || (pendingMemoryBlock->Record->AliasingResourceCount == 0 && pendingMemoryBlock->Record->RecordingReferenceCount.load(std::memory_order_relaxed) == 0
-			        && pendingMemoryBlock->Record->LastUse.IsComplete(completedValues)))
+			if (*pendingMemoryBlock == nullptr
+			    || ((*pendingMemoryBlock)->AliasingResourceCount == 0 && (*pendingMemoryBlock)->RecordingReferenceCount.load(std::memory_order_relaxed) == 0
+			        && (*pendingMemoryBlock)->LastUse.IsComplete(completedValues)))
 			{
-				readyMemoryBlockReleases.push_back(std::move(pendingMemoryBlock->Record));
+				readyMemoryBlockReleases.push_back(std::move(*pendingMemoryBlock));
 				pendingMemoryBlock = m_impl->PendingMemoryBlockReleases.erase(pendingMemoryBlock);
 			}
 			else

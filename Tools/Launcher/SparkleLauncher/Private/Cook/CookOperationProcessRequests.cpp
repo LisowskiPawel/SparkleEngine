@@ -1,8 +1,9 @@
 #include "CookOperationProcessRequests.h"
+#include "Core/Public/Strings/StringUtils.h"
 
+#include "Core/Public/Paths/ProductPaths.h"
 #include "CMakeWorkflowProcessRequests.h"
 #include "LauncherStatePaths.h"
-#include "SparkleLauncher/ToolResolver.h"
 
 #include <algorithm>
 #include <utility>
@@ -38,18 +39,18 @@ namespace SparkleLauncher
 	static ProcessRequest MakeAssetCookerRequest(const CookOperationPlan& plan, std::string_view command, std::string_view logFileName)
 	{
 		ProcessRequest process;
-		process.ExecutablePath = ResolveSparkleToolPath(plan.RepositoryRoot, plan.ToolProfile, "AssetCooker");
+		process.ExecutablePath = Filesystem::ResolveProductToolPath(plan.RepositoryRoot, "AssetCooker", plan.ToolProfile);
 		process.WorkingDirectory = plan.RepositoryRoot;
 		process.LogPath = ResolveLauncherOperationLogPath(plan.RepositoryRoot, plan.Operation.Id, logFileName);
-		process.Arguments = {std::string(command), plan.Request.ContentId, plan.Request.GameProfile, "--tool-profile", plan.ToolProfile, "--root", plan.RepositoryRoot.string()};
+		process.Arguments = {std::string(command), plan.Request.ContentId, plan.Request.GameProfile, "--tool-profile", plan.ToolProfile, "--root", Strings::ToNarrow(plan.RepositoryRoot.wstring())};
 		return process;
 	}
 
 	static ProcessRequest MakeShaderCompilerCookAllRequest(const CookOperationPlan& plan)
 	{
 		ProcessRequest process;
-		process.ExecutablePath = ResolveSparkleToolPath(plan.RepositoryRoot, plan.ToolProfile, "ShaderCompiler");
-		process.WorkingDirectory = plan.RepositoryRoot / "Projects" / plan.Request.ContentId;
+		process.ExecutablePath = Filesystem::ResolveProductToolPath(plan.RepositoryRoot, "ShaderCompiler", plan.ToolProfile);
+		process.WorkingDirectory = Filesystem::ResolveProductProjectRoot(plan.RepositoryRoot, plan.Request.ContentId);
 		process.LogPath = ResolveLauncherOperationLogPath(plan.RepositoryRoot, plan.Operation.Id, "CookShaders.txt");
 		process.Arguments = {"cook"};
 		AppendCommonShaderCompilerArguments(plan, process.Arguments);

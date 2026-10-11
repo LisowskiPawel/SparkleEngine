@@ -243,7 +243,7 @@ void LevelSession::CaptureSceneToLevel() noexcept
 	{
 		desc.lights.push_back(light.Description);
 	}
-	desc.sky = view.GetSkyEnvironment() ? std::optional<SceneSkyDesc>(view.GetSkyEnvironment()->Description) : std::nullopt;
+	desc.sky = view.GetSkyEnvironment();
 	for (const WorldCameraReadData& camera : view.GetCameras())
 	{
 		if (camera.Active)

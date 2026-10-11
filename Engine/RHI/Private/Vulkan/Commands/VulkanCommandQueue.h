@@ -24,10 +24,7 @@ struct VulkanQueueSubmission final
 	VkSemaphore BinarySignalSemaphore = VK_NULL_HANDLE;
 };
 
-struct VulkanNativeQueue final
-{
-	VkQueue Queue = VK_NULL_HANDLE;
-};
+using VulkanNativeQueue = VkQueue;
 
 class VulkanCommandQueue final
 {

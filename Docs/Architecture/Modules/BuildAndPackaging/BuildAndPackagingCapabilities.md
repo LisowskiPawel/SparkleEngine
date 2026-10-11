@@ -77,7 +77,7 @@ The current build graph is useful engineering infrastructure, not yet a product-
 
 ### Canonical Generated-Output Layout
 
-SparkleLauncher owns one canonical local workspace layout. Generated CMake,
+CMake's artifact contract owns the generated layout; Core projects it into paths used by Launcher and products. Generated CMake,
 Visual Studio, Ninja, dependency, and intermediate files belong only in
 `build/`; developers should not search that private tree for runnable products.
 The products intended for direct use are published by owner and profile under
@@ -93,12 +93,11 @@ The products intended for direct use are published by owner and profile under
 |   `-- variants/<name>/                    isolated, temporary validation trees
 `-- artifacts/
     |-- dev/
-    |   |-- launcher/<Profile>/              SparkleLauncher and Qt runtime
-    |   |-- tools/<Tool>/<Profile>/          developer tools
-    |   |-- projects/<Project>/
-    |   |   |-- editor/<Profile>/            editor product
-    |   |   |-- game/<Profile>/              game product
-    |   |   `-- cooked/                      project-owned cooked content
+    |   |-- Engine/Binaries/<Module>/<Profile>/ shared engine DLLs, when enabled
+    |   |-- Tools/<Tool>/Binaries/<Profile>/ tools, including SparkleLauncher
+    |   |-- Projects/<Project>/
+    |   |   |-- Binaries/<Profile>/          Editor or Game executable and DLLs
+    |   |   `-- Cooked/                      project-owned cooked content
     |   `-- libraries/<Owner>/<Profile>/     import and development libraries
     |-- diagnostics/                         generated diagnostic artifacts
     `-- symbols/                             debug symbols, separated by owner
@@ -215,7 +214,7 @@ relocation, clean-machine verification, and the release workflow remain absent.
 | --- | --- | --- | --- | --- |
 | `BUILD-012` | Development artifact contract | Implemented path | Runnable outputs go to `artifacts/dev`: launcher, tools, projects, runtime-support, libraries; diagnostics and symbols have separate roots; optional validated artifact variant namespaces alternate build trees. | `S` |
 | `BUILD-012A` | Mutable-state isolation | Implemented path | Logs, settings, captures, ImGui layout, crashes, and caches resolve beneath typed per-user roots; engine defaults remain read-only. CMake rejects known legacy generated paths in the source tree, and ignored-path policy no longer hides them. | `S` |
-| `BUILD-013` | Product layout | Implemented path | Showcase products emit to `artifacts/dev/projects/Showcase/editor/<Profile>` or `artifacts/dev/projects/Showcase/game/<Profile>`; Windows manifest is attached; project working directory is set for VS debugging. | `S` |
+| `BUILD-013` | Product layout | Implemented path | Showcase Editor/Game emit to `artifacts/dev/Projects/Showcase/Binaries/<Profile>`; Windows manifest is attached; project working directory is set for VS debugging. | `S` |
 | `BUILD-014` | Runtime support staging | Implemented path | Shared Sparkle DLL owners and enabled NVIDIA Streamline DLLs copy beside project products; editor products stage their icon font; Launcher declares Core and Tasks runtime ownership, embeds its icon font, runs `windeployqt`, and copies visual resources. Existing development artifacts must be rebuilt to receive a changed bundle. | `S` |
 | `BUILD-014A` | Launcher product graph | Implemented path | The Launcher-owned top-level CMake entry point composes only Core, Tasks, Launcher, and its declared source dependencies in `build/private/tools/SparkleLauncher/`; the repository root independently owns the full workspace graph. Runtime repository discovery contains no build-machine path. | `S` |
 | `BUILD-015` | Tool bundles | Implemented path | Tool executables/libraries/symbols have target-owned locations and declared runtime DLL ownership; Launcher preflights required support files/directories before cooking. | `S` |

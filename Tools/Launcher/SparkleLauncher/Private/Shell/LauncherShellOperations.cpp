@@ -20,7 +20,7 @@ namespace SparkleLauncher
 	BuildWorkspaceOperationRequest BuildWorkspaceShellRequest(const LauncherShellModel& model)
 	{
 		BuildWorkspaceOperationRequest request;
-		request.RepositoryRoot = model.Repository.RootPath;
+		request.RepositoryRoot = model.RepositoryRoot;
 		request.ContentId = model.ContentId;
 		request.EditorProfile = model.EditorProfile;
 		request.GameProfile = model.GameProfile;
@@ -33,7 +33,7 @@ namespace SparkleLauncher
 	CookOperationRequest BuildCookShellRequest(const LauncherShellModel& model, const LauncherShellArguments& arguments)
 	{
 		CookOperationRequest request;
-		request.RepositoryRoot = model.Repository.RootPath;
+		request.RepositoryRoot = model.RepositoryRoot;
 		request.ContentId = model.ContentId;
 		request.GameProfile = model.GameProfile;
 		request.Mode = arguments.RequestedCookMode;
@@ -45,7 +45,7 @@ namespace SparkleLauncher
 	LevelOperationRequest BuildLevelShellRequest(const LauncherShellModel& model, const LauncherShellArguments& arguments)
 	{
 		LevelOperationRequest request;
-		request.RepositoryRoot = model.Repository.RootPath;
+		request.RepositoryRoot = model.RepositoryRoot;
 		request.ContentId = model.ContentId;
 		if (!arguments.LevelId.empty())
 		{
@@ -57,7 +57,7 @@ namespace SparkleLauncher
 	LevelRunOperationRequest BuildLevelRunShellRequest(const LauncherShellModel& model, const LauncherShellArguments& arguments)
 	{
 		LevelRunOperationRequest request;
-		request.RepositoryRoot = model.Repository.RootPath;
+		request.RepositoryRoot = model.RepositoryRoot;
 		request.ContentId = model.ContentId;
 		request.LevelId = arguments.LevelId;
 		request.RunMode = arguments.Product;
@@ -69,7 +69,7 @@ namespace SparkleLauncher
 	MaintenanceOperationRequest BuildMaintenanceShellRequest(const LauncherShellModel& model, const LauncherShellArguments& arguments)
 	{
 		MaintenanceOperationRequest request;
-		request.RepositoryRoot = model.Repository.RootPath;
+		request.RepositoryRoot = model.RepositoryRoot;
 		request.ContentId = model.ContentId;
 		request.EditorProfile = model.EditorProfile;
 		request.RequestedCleanScope = arguments.RequestedCleanScope;

@@ -1,6 +1,9 @@
 #include "PCH.h"
 
-#include "Paths/FileSystemDiscovery.h"
+#include "Core/Public/Paths/PackagePaths.h"
+#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "Core/Public/Hash/HashUtils.h"
 
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Json/JsonReader.h"
@@ -10,12 +13,13 @@
 
 #include <system_error>
 
-namespace Filesystem::Private
+namespace Filesystem
 {
 	static bool HasReparsePath(const std::filesystem::path& root, const std::filesystem::path& relative)
 	{
-		std::filesystem::path current = root;
-		for (const auto& part : relative)
+		const auto path = std::filesystem::absolute(root / relative).lexically_normal();
+		std::filesystem::path current = path.root_path();
+		for (const auto& part : path.relative_path())
 		{
 			current /= part;
 #if defined(_WIN32)
@@ -35,26 +39,22 @@ namespace Filesystem::Private
 		return false;
 	}
 
-	static std::optional<std::filesystem::path> ReadPackageRelativePath(const std::filesystem::path& packageRoot, std::string_view property)
+	bool TryReadPackageManifest(const std::filesystem::path& packageRoot, std::string& outDocument)
 	{
-		if (HasReparsePath(packageRoot, "manifests/sparkle-package-manifest.json"))
+		if (HasReparsePath(packageRoot.parent_path(), packageRoot.filename() / "manifests/sparkle-package-manifest.json"))
 		{
-			return std::nullopt;
+			return false;
 		}
-
-		const std::filesystem::path manifestPath = packageRoot / "manifests" / "sparkle-package-manifest.json";
 		std::error_code errorCode;
+		const auto manifestPath = packageRoot / "manifests/sparkle-package-manifest.json";
 		const auto size = std::filesystem::file_size(manifestPath, errorCode);
-		if (errorCode || size > 16u * 1024u * 1024u)
-		{
-			return std::nullopt;
-		}
-
-		std::string document;
 		std::string failure;
-		std::string relative;
-		if (!Files::TryReadAllText(manifestPath, document, failure) || !Json::TryReadStringProperty(document, property, relative) || relative.empty()
-		    || relative.find_first_of("\\:") != std::string::npos || relative.find("//") != std::string::npos || relative.front() == '/' || relative.back() == '/'
+		return !errorCode && size <= 16u * 1024u * 1024u && Files::TryReadAllText(manifestPath, outDocument, failure);
+	}
+
+	static std::optional<std::filesystem::path> ParsePackageRelativePath(std::string_view relative)
+	{
+		if (relative.empty() || relative.find_first_of("\\:") != std::string_view::npos || relative.find("//") != std::string_view::npos || relative.front() == '/' || relative.back() == '/'
 		    || std::any_of(relative.begin(), relative.end(), [](unsigned char character) { return character < 0x20u; }))
 		{
 			return std::nullopt;
@@ -76,6 +76,13 @@ namespace Filesystem::Private
 			}
 		}
 		return path;
+	}
+
+	static std::optional<std::filesystem::path> ReadPackageRelativePath(const std::filesystem::path& packageRoot, std::string_view property)
+	{
+		std::string document;
+		std::string relative;
+		return TryReadPackageManifest(packageRoot, document) && Json::TryReadStringProperty(document, property, relative) ? ParsePackageRelativePath(relative) : std::nullopt;
 	}
 
 	static std::optional<std::filesystem::path> ResolveContainedPackageDirectory(const std::filesystem::path& packageRoot, std::string_view property)
@@ -114,7 +121,7 @@ namespace Filesystem::Private
 			return std::nullopt;
 		}
 
-		const std::filesystem::path userStateRoot = ResolveSparkleUserStateRoot();
+		const std::filesystem::path userStateRoot = Private::ResolveSparkleUserStateRoot();
 		if (HasReparsePath(userStateRoot, *relative))
 		{
 			return std::nullopt;
@@ -122,5 +129,162 @@ namespace Filesystem::Private
 
 		const std::filesystem::path result = Paths::Normalize(userStateRoot / *relative);
 		return Paths::IsUnderRoot(result, userStateRoot) ? std::optional(result) : std::nullopt;
+	}
+
+	std::optional<std::filesystem::path> DiscoverPackageRoot(const std::filesystem::path& startPath)
+	{
+		const auto executableDirectory = Filesystem::GetExecutableDirectory();
+		if (startPath.empty() || Paths::Normalize(startPath) == Paths::Normalize(executableDirectory))
+		{
+			if (const auto source = FindAncestorWithMarker(executableDirectory, kWorkspaceMarker))
+			{
+				const auto outputs = ResolveWorkspaceOutputPaths(*source);
+				const auto relative = executableDirectory.lexically_relative(outputs.ArtifactRoot);
+				auto component = relative.begin();
+				if (component != relative.end() && *component != "..")
+				{
+					const bool canonical = *component == "dev";
+					++component;
+					if (canonical || (component != relative.end() && *component == "dev"))
+					{
+						return std::nullopt;
+					}
+				}
+			}
+			const auto profile = executableDirectory.filename();
+			if (profile == "ShippingEditor" || profile == "ShippingGame")
+			{
+				const auto productDirectory = executableDirectory.parent_path();
+				if (productDirectory.filename() == "Binaries"
+				    && (productDirectory.parent_path().parent_path().filename() == "Projects" || productDirectory.parent_path().parent_path().filename() == "Tools"))
+				{
+					return Paths::Normalize(productDirectory.parent_path().parent_path().parent_path());
+				}
+			}
+		}
+		std::error_code ec;
+		auto currentDir = std::filesystem::weakly_canonical((startPath.empty() ? Filesystem::GetExecutableDirectory() : startPath), ec);
+		if (ec)
+		{
+			currentDir = (startPath.empty() ? Filesystem::GetExecutableDirectory() : startPath);
+		}
+
+		for (uint32_t depth = 0; depth < 8 && !currentDir.empty(); ++depth)
+		{
+			const bool hasPackageManifest = std::filesystem::exists(currentDir / "manifests" / "sparkle-package-manifest.json", ec);
+			ec.clear();
+			if (hasPackageManifest)
+			{
+				return Paths::Normalize(currentDir);
+			}
+
+			const auto parentDir = currentDir.parent_path();
+			if (parentDir == currentDir)
+			{
+				break;
+			}
+			currentDir = parentDir;
+		}
+
+		return std::nullopt;
+	}
+
+	std::optional<std::filesystem::path> ResolvePackageFilePath(const std::filesystem::path& packageRoot, std::string_view relativePath, std::string_view manifest)
+	{
+		const auto relative = ParsePackageRelativePath(relativePath);
+		if (!relative || HasReparsePath(packageRoot, *relative))
+		{
+			return std::nullopt;
+		}
+		std::string document;
+		if (manifest.empty())
+		{
+			if (!TryReadPackageManifest(packageRoot, document))
+			{
+				return std::nullopt;
+			}
+			manifest = document;
+		}
+		std::vector<std::string_view> files;
+		if (!Json::TryReadArrayProperty(manifest, "Files", files))
+		{
+			return std::nullopt;
+		}
+		std::string_view entry;
+		for (const auto file : files)
+		{
+			std::string path;
+			if (!Json::TryReadStringProperty(file, "Path", path))
+			{
+				return std::nullopt;
+			}
+			if (path == relativePath)
+			{
+				if (!entry.empty())
+				{
+					return std::nullopt;
+				}
+				entry = file;
+			}
+		}
+		std::uint64_t size = 0u;
+		std::string expectedHash;
+		if (entry.empty() || !Json::TryReadUInt64Property(entry, "Size", size) || !Json::TryReadStringProperty(entry, "Sha256", expectedHash))
+		{
+			return std::nullopt;
+		}
+		const auto path = Paths::Normalize(packageRoot / *relative);
+		std::error_code errorCode;
+		Hash::Sha256Digest hash;
+		std::string failure;
+		if (!Paths::IsUnderRoot(path, packageRoot) || std::filesystem::file_size(path, errorCode) != size || errorCode || !Hash::TrySha256File(path, hash, failure)
+		    || Hash::Sha256ToHex(hash) != expectedHash)
+		{
+			return std::nullopt;
+		}
+		return path;
+	}
+
+	std::optional<std::filesystem::path> ResolvePackageSourceRoot(const std::filesystem::path& packageRoot)
+	{
+		const auto content = ResolvePackageContentRoot(packageRoot);
+		const auto project = DiscoverPackageProjectRoot(packageRoot);
+		if (!content || !project)
+		{
+			return std::nullopt;
+		}
+		const auto relative = std::filesystem::path("Source") / project->filename();
+		return HasReparsePath(*content, relative) ? std::nullopt : std::optional(*content / relative);
+	}
+
+	std::optional<std::filesystem::path> ResolvePackageProductPath(const std::filesystem::path& packageRoot, std::string_view target, std::string_view configuration)
+	{
+		std::string document;
+		std::vector<std::string_view> products;
+		if (!TryReadPackageManifest(packageRoot, document) || !Json::TryReadArrayProperty(document, "Products", products))
+		{
+			return std::nullopt;
+		}
+		std::string selectedPath;
+		for (const auto product : products)
+		{
+			std::string productTarget;
+			std::string profile;
+			std::string path;
+			if (!Json::TryReadStringProperty(product, "Target", productTarget) || !Json::TryReadStringProperty(product, "Configuration", profile)
+			    || !Json::TryReadStringProperty(product, "Path", path))
+			{
+				return std::nullopt;
+			}
+			if (productTarget == target && profile == configuration)
+			{
+				if (!selectedPath.empty())
+				{
+					return std::nullopt;
+				}
+				selectedPath = std::move(path);
+			}
+		}
+		return ResolvePackageFilePath(packageRoot, selectedPath, document);
 	}
 }

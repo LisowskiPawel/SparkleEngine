@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Core/Public/Math/MathUtils.h"
 #include "GameFramework/Public/Assets/Cooked/CookedAssetCommon.h"
@@ -36,10 +36,7 @@ namespace Assets
 		std::uint32_t reserved = 0;
 	};
 
-	struct SPARKLE_ENGINE_API CookedSceneMaterialAssetRef
-	{
-		CookedAssetId materialAssetId = InvalidCookedAssetId;
-	};
+	using CookedSceneMaterialAssetRef = CookedAssetId;
 
 	struct SPARKLE_ENGINE_API CookedSceneInstanceRecord
 	{

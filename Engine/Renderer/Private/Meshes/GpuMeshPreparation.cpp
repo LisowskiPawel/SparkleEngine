@@ -107,14 +107,14 @@ void GpuMeshPreparation::BuildMorphTargets(GpuMeshPreparedData& output)
 	}
 
 	const MeshMorphData& morphTargets = skeletalMesh->GetSkeletalMeshData().morphTargets;
-	if (!morphTargets.HasTargets())
+	if (morphTargets.empty())
 	{
 		return;
 	}
 
 	const std::size_t vertexCount = output.RayTracingVertices.size();
-	output.MorphTargetDeltas.reserve(vertexCount * morphTargets.targets.size());
-	for (const MeshMorphTarget& target : morphTargets.targets)
+	output.MorphTargetDeltas.reserve(vertexCount * morphTargets.size());
+	for (const MeshMorphTarget& target : morphTargets)
 	{
 		if (!target.IsValidForVertexCount(vertexCount))
 		{
@@ -127,7 +127,7 @@ void GpuMeshPreparation::BuildMorphTargets(GpuMeshPreparedData& output)
 		}
 	}
 
-	output.MorphTargetCount = static_cast<std::uint32_t>(morphTargets.targets.size());
+	output.MorphTargetCount = static_cast<std::uint32_t>(morphTargets.size());
 }
 
 VertexSkinInfluenceData GpuMeshPreparation::ConvertSkinInfluence(const VertexSkinInfluence& influence) noexcept

@@ -167,10 +167,9 @@ else()
 endif()
 
 set(_sparkle_development_artifact_root "${_sparkle_active_artifact_root}/dev")
-set(_sparkle_launcher_artifact_root "${_sparkle_development_artifact_root}/launcher")
-set(_sparkle_tool_artifact_root "${_sparkle_development_artifact_root}/tools")
-set(_sparkle_project_artifact_root "${_sparkle_development_artifact_root}/projects")
-set(_sparkle_runtime_support_artifact_root "${_sparkle_development_artifact_root}/runtime-support")
+set(_sparkle_tool_artifact_root "${_sparkle_development_artifact_root}/Tools")
+set(_sparkle_project_artifact_root "${_sparkle_development_artifact_root}/Projects")
+set(_sparkle_runtime_support_artifact_root "${_sparkle_development_artifact_root}/Engine/Binaries")
 set(_sparkle_library_artifact_root "${_sparkle_development_artifact_root}/libraries")
 set(_sparkle_symbol_artifact_root "${_sparkle_active_artifact_root}/symbols")
 
@@ -236,11 +235,11 @@ function(_sparkle_set_target_artifact_directories target_name runtime_root symbo
 endfunction()
 
 function(sparkle_configure_launcher_artifacts target_name)
-    _sparkle_set_target_artifact_directories(${target_name} "${_sparkle_launcher_artifact_root}" "launcher")
+    _sparkle_set_target_artifact_directories(${target_name} "${_sparkle_tool_artifact_root}/SparkleLauncher/Binaries" "launcher")
 endfunction()
 
 function(sparkle_configure_development_tool_artifacts target_name)
-    _sparkle_set_target_artifact_directories(${target_name} "${_sparkle_tool_artifact_root}/${target_name}" "tools/${target_name}")
+    _sparkle_set_target_artifact_directories(${target_name} "${_sparkle_tool_artifact_root}/${target_name}/Binaries" "tools/${target_name}")
 endfunction()
 
 function(sparkle_configure_runtime_support_artifacts target_name)
@@ -253,7 +252,7 @@ endfunction()
 function(sparkle_configure_project_artifacts target_name project_name product_role)
     _sparkle_set_target_artifact_directories(
         ${target_name}
-        "${_sparkle_project_artifact_root}/${project_name}/${product_role}"
+        "${_sparkle_project_artifact_root}/${project_name}/Binaries"
         "projects/${project_name}/${product_role}")
     sparkle_stage_d3d12_pix_event_runtime(${target_name})
     sparkle_stage_external_capture_notices(${target_name})
@@ -295,7 +294,7 @@ function(sparkle_stage_d3d12_pix_event_runtime product_target)
 endfunction()
 
 function(sparkle_get_project_cooked_directory output_variable project_name)
-    set(${output_variable} "${_sparkle_project_artifact_root}/${project_name}/cooked" PARENT_SCOPE)
+    set(${output_variable} "${_sparkle_project_artifact_root}/${project_name}/Cooked" PARENT_SCOPE)
 endfunction()
 
 function(sparkle_declare_runtime_dll_owner product_target)

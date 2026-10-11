@@ -24,7 +24,7 @@ std::optional<EditorCommandPair> SceneObjectCommandFactory::SetVisibility(const 
 	else if (selection.type == SceneObjectType::Sky)
 	{
 		SkyEnvironment after = model.GetSkyEnvironment().value_or(SkyEnvironment{});
-		after.Description.enabled = visible;
+		after.enabled = visible;
 		commands.Forward.Payload = SetSkyEnvironmentCommand{after};
 		commands.Inverse.Payload = SetSkyEnvironmentCommand{model.GetSkyEnvironment()};
 	}

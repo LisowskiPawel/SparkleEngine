@@ -27,7 +27,7 @@ namespace Assets
 			}
 			for (const CookedSceneMaterialAssetRef& reference : manifest.materialAssetReferences)
 			{
-				files.Read(Paths::CookedMaterialAsset(reference.materialAssetId));
+				files.Read(Paths::CookedMaterialAsset(reference));
 			}
 			for (const CookedSceneSkeletonRef& reference : manifest.skeletonRefs)
 			{

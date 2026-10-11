@@ -50,7 +50,7 @@ function Assert-PackageManifest
     foreach ($file in $Manifest.Files)
     {
         Assert-PackagePath $file.Path
-        if (!$paths.Add($file.Path) -or $file.Path -eq 'manifests/sparkle-package-manifest.json')
+        if (!$paths.Add($file.Path) -or $file.Path -in @('.sparkle', 'manifests/sparkle-package-manifest.json'))
         {
             throw "Duplicate or reserved manifest path: '$($file.Path)'."
         }
@@ -69,7 +69,7 @@ function Assert-PackageManifest
         {
             throw "Incomplete or private-path payload declaration: '$($file.Path)'."
         }
-        if ($file.Path.StartsWith('game/', [StringComparison]::OrdinalIgnoreCase) -and $file.Path -match '(?i)(Qt6|SparkleEditor|AssetCooker|TextureCooker|ShaderCompiler)')
+        if (($file.Component -eq 'Game' -or $file.Path -match '^Projects/[^/]+/Binaries/ShippingGame/') -and $file.Path -match '(?i)(Qt6|SparkleEditor|AssetCooker|TextureCooker|ShaderCompiler)')
         {
             throw "Editor/authoring dependency in Game component: '$($file.Path)'."
         }
@@ -88,21 +88,28 @@ function Assert-PackageLayout
 {
     param($Manifest)
     foreach ($path in @($Manifest.ProjectPath, $Manifest.EnginePath, $Manifest.ContentStore)) { Assert-PackagePath $path }
-    if ($Manifest.ProjectPath -cne 'content/Showcase' -or $Manifest.EnginePath -cne 'engine' -or $Manifest.ContentStore -cne 'Content/Showcase')
+    if ($Manifest.ProjectPath -cne 'Projects/Showcase' -or $Manifest.EnginePath -cne 'Engine' -or $Manifest.ContentStore -cne 'Content/Showcase')
     {
         throw 'Package layout differs from the frozen three-product content-store contract.'
     }
-    foreach ($path in @('content/Showcase/.sparkle-project', 'content/Showcase/Levels.catalog'))
+    foreach ($path in @('Projects/Showcase/.sparkle-project', 'Projects/Showcase/Levels.catalog'))
     {
         if (@($Manifest.Files | Where-Object Path -ceq $path).Count -ne 1) { throw "Missing package recipe input: '$path'." }
     }
-    if (!@($Manifest.Files | Where-Object { $_.Path.StartsWith('engine/Assets/') -and $_.Role -eq 'EngineContent' }).Count)
+    foreach ($path in @('Tools/Content/SyncAssetPack.cmake', 'Tools/Content/SyncAssetPackFiles.cmake',
+                        'Tools/Content/SyncAssetPackArchive.cmake', 'Engine/Cooked/Shaders/GlobalShaderMap.smap',
+                        'Engine/Cooked/Shaders/CookedShaderLibrary.slib', 'Engine/Cooked/Shaders/ShaderDependencies.sdep',
+                        'Engine/Cooked/Shaders/recook.signal'))
+    {
+        if (@($Manifest.Files | Where-Object Path -ceq $path).Count -ne 1) { throw "Missing installed content input: '$path'." }
+    }
+    if (!@($Manifest.Files | Where-Object { $_.Path.StartsWith('Engine/Assets/') -and $_.Role -eq 'EngineContent' }).Count)
     {
         throw 'Missing immutable engine assets.'
     }
     foreach ($file in $Manifest.Files)
     {
-        if ($file.Path -match '^content/Showcase/(Cooked|Cache|Downloads)(/|$)')
+        if ($file.Path -match '^Projects/Showcase/(Cooked|Cache|Downloads)(/|$)')
         {
             throw "Writable selected-content output inside immutable package: '$($file.Path)'."
         }

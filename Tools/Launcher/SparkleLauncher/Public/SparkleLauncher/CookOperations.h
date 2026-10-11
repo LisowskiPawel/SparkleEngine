@@ -1,6 +1,5 @@
 #pragma once
 
-#include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "SparkleLauncher/LauncherContentDefaults.h"
 #include "SparkleLauncher/OperationModel.h"
 #include "SparkleLauncher/ProcessRunner.h"
@@ -76,8 +75,6 @@ namespace SparkleLauncher
 		std::filesystem::path RepositoryRoot;
 		CookOperationRequest Request;
 		CookOperationKind Kind = CookOperationKind::CookAllAssets;
-		BuildToolchainStatus Toolchain;
-		BuildFilesFreshnessStatus Freshness;
 		std::string ToolProfile;
 		std::vector<std::filesystem::path> RequiredToolPaths;
 		std::filesystem::path CookedOutputDirectory;

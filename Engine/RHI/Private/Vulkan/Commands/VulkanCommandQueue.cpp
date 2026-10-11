@@ -59,7 +59,7 @@ VulkanCommandQueue::~VulkanCommandQueue() noexcept
 RhiSubmissionToken VulkanCommandQueue::Submit(const VulkanQueueSubmission& submission) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_nativeQueue == nullptr || m_nativeQueue->Queue == VK_NULL_HANDLE || submission.CommandBuffers.empty())
+	if (m_nativeQueue == nullptr || *m_nativeQueue == VK_NULL_HANDLE || submission.CommandBuffers.empty())
 	{
 		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, "Submit called without a queue or command buffer");
 		return {};
@@ -157,29 +157,29 @@ void VulkanCommandQueue::BuildNativeSubmission(const VulkanQueueSubmission& subm
 
 VkResult VulkanCommandQueue::SubmitNative(const VkSubmitInfo& submission) noexcept
 {
-	return vkQueueSubmit(m_nativeQueue->Queue, 1, &submission, VK_NULL_HANDLE);
+	return vkQueueSubmit(*m_nativeQueue, 1, &submission, VK_NULL_HANDLE);
 }
 
 VkResult VulkanCommandQueue::Present(const VkPresentInfoKHR& presentInfo) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_nativeQueue == nullptr || m_nativeQueue->Queue == VK_NULL_HANDLE)
+	if (m_nativeQueue == nullptr || *m_nativeQueue == VK_NULL_HANDLE)
 	{
 		return VK_ERROR_INITIALIZATION_FAILED;
 	}
 
-	return vkQueuePresentKHR(m_nativeQueue->Queue, &presentInfo);
+	return vkQueuePresentKHR(*m_nativeQueue, &presentInfo);
 }
 
 void VulkanCommandQueue::DrainForSwapChainRecreation() noexcept
 {
 	m_owner.AssertAccess();
-	if (m_nativeQueue == nullptr || m_nativeQueue->Queue == VK_NULL_HANDLE)
+	if (m_nativeQueue == nullptr || *m_nativeQueue == VK_NULL_HANDLE)
 	{
 		return;
 	}
 
-	const VkResult result = vkQueueWaitIdle(m_nativeQueue->Queue);
+	const VkResult result = vkQueueWaitIdle(*m_nativeQueue);
 
 	if (!VulkanResult::Succeeded(result))
 	{
@@ -255,7 +255,7 @@ std::uint64_t VulkanCommandQueue::GetCompletedSubmissionValue() const noexcept
 VkQueue VulkanCommandQueue::GetNativeQueue() const noexcept
 {
 	m_owner.AssertAccess();
-	return m_nativeQueue != nullptr ? m_nativeQueue->Queue : VK_NULL_HANDLE;
+	return m_nativeQueue != nullptr ? *m_nativeQueue : VK_NULL_HANDLE;
 }
 
 VkSemaphore VulkanCommandQueue::GetTimelineSemaphore() const noexcept

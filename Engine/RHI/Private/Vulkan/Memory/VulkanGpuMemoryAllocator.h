@@ -72,8 +72,8 @@ private:
 	friend class VulkanRenderTimingDiagnostics;
 
 	struct Impl;
-	struct PendingAllocationRelease;
-	struct PendingMemoryBlockRelease;
+	using PendingAllocationRelease = std::unique_ptr<VulkanGpuAllocationRecord>;
+	using PendingMemoryBlockRelease = std::unique_ptr<VulkanGpuMemoryBlockRecord>;
 
 	void PublishRecordingReadView() noexcept;
 	bool ResolveRecordingResource(RhiResourceHandle resource, VulkanRecordingResource& outResource) const noexcept;

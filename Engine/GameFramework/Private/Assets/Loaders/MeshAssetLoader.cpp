@@ -1,4 +1,4 @@
-﻿#include "PCH.h"
+#include "PCH.h"
 
 #include "Assets/Loaders/MeshAssetLoader.h"
 
@@ -75,7 +75,7 @@ namespace Assets
 		}
 
 		MeshMorphData morphTargets;
-		morphTargets.targets.reserve(cookedMorphTargets.size());
+		morphTargets.reserve(cookedMorphTargets.size());
 		for (const CookedMeshMorphTargetRecord& cookedMorphTarget : cookedMorphTargets)
 		{
 			if (cookedMorphTarget.firstDelta > header.morphTargetDeltaCount || cookedMorphTarget.deltaCount > header.morphTargetDeltaCount - cookedMorphTarget.firstDelta
@@ -96,7 +96,7 @@ namespace Assets
 				const CookedMeshMorphTargetDelta cookedDelta = MeshAssetLoaderDetail::ReadRecord<CookedMeshMorphTargetDelta>(cookedMorphTargetDeltas, cookedMorphTarget.firstDelta + deltaIndex);
 				morphTarget.deltas[deltaIndex] = MeshMorphTargetDelta{.position = cookedDelta.position, .normal = cookedDelta.normal, .tangent = cookedDelta.tangent};
 			}
-			morphTargets.targets.push_back(std::move(morphTarget));
+			morphTargets.push_back(std::move(morphTarget));
 		}
 		if (isSkeletal)
 		{
@@ -115,7 +115,7 @@ namespace Assets
 		}
 
 		StaticMeshData loadedStaticMesh;
-		loadedStaticMesh.geometry = std::move(geometry);
+		loadedStaticMesh = std::move(geometry);
 		return LoadedMeshAsset{.payload = std::move(loadedStaticMesh)};
 	}
 }

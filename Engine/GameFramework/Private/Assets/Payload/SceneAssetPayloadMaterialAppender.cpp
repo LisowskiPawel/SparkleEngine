@@ -23,7 +23,7 @@ namespace Assets
 
 		for (const CookedSceneMaterialAssetRef& materialReference : sceneManifest.materialAssetReferences)
 		{
-			const std::filesystem::path materialAssetPath = Paths::CookedMaterialAsset(materialReference.materialAssetId);
+			const std::filesystem::path materialAssetPath = Paths::CookedMaterialAsset(materialReference);
 			const LoadedMaterialAsset materialAsset = materialAssetLoader.Decode(materialAssetPath, files.Get(materialAssetPath));
 			sceneAssetPayload.materials.push_back(materialTranslator.Translate(materialAsset));
 			files.Release(materialAssetPath);

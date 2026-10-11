@@ -23,13 +23,6 @@ struct MeshMorphTarget
 	bool IsValidForVertexCount(std::uint32_t vertexCount) const noexcept { return deltas.size() == vertexCount; }
 };
 
-struct MeshMorphData
-{
-	std::vector<MeshMorphTarget> targets;
-
-	bool HasTargets() const noexcept { return !targets.empty(); }
-
-	std::uint32_t GetTargetCount() const noexcept { return static_cast<std::uint32_t>(targets.size()); }
-};
+using MeshMorphData = std::vector<MeshMorphTarget>;
 
 static_assert(std::is_trivially_copyable_v<MeshMorphTargetDelta>, "MeshMorphTargetDelta must be trivially copyable");

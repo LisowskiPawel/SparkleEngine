@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <memory>
 #include <span>
+#include <vector>
 
 using WorldSequence = std::uint64_t;
 
@@ -84,7 +85,7 @@ public:
 	std::span<const WorldChange> GetChanges() const noexcept;
 
 private:
-	struct Storage;
+	using Storage = std::vector<WorldChange>;
 	friend class ECS::WorldChangeJournal;
 	WorldChangeBatch(
 	    WorldChangeReadStatus status,

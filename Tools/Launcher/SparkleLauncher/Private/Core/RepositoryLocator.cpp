@@ -28,7 +28,7 @@ namespace SparkleLauncher
 		return hasWorkspaceMarker && hasEngineMarker && hasEngineDirectory && hasToolsDirectory && hasProjectsDirectory;
 	}
 
-	std::optional<RepositoryRoot> TryOpenRepositoryRoot(const std::filesystem::path& rootPath, std::string& outErrorMessage)
+	std::optional<std::filesystem::path> TryOpenRepositoryRoot(const std::filesystem::path& rootPath, std::string& outErrorMessage)
 	{
 		outErrorMessage.clear();
 		const std::filesystem::path normalizedRoot = Paths::Normalize(rootPath);
@@ -38,15 +38,10 @@ namespace SparkleLauncher
 			return std::nullopt;
 		}
 
-		RepositoryRoot root;
-		root.RootPath = normalizedRoot;
-		root.EnginePath = root.RootPath / "Engine";
-		root.ToolsPath = root.RootPath / "Tools";
-		root.ContentPath = root.RootPath / "Projects";
-		return root;
+		return normalizedRoot;
 	}
 
-	std::optional<RepositoryRoot> TryFindRepositoryRoot(const std::filesystem::path& startPath, std::string& outErrorMessage)
+	std::optional<std::filesystem::path> TryFindRepositoryRoot(const std::filesystem::path& startPath, std::string& outErrorMessage)
 	{
 		outErrorMessage.clear();
 

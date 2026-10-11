@@ -4,21 +4,28 @@ foreach(_profile IN LISTS _sparkle_release_profiles)
     set(_sparkle_release_products_${_profile})
 endforeach()
 foreach(_product IN ITEMS
-    "Launcher|SparkleLauncher|ShippingEditor|launcher"
-    "Editor|ShowcaseEditor|ShippingEditor|editor"
-    "Game|ShowcaseGame|ShippingGame|game"
-    "AssetCooker|AssetCooker|ShippingEditor|tools/AssetCooker"
-    "TextureCooker|TextureCooker|ShippingEditor|tools/TextureCooker"
-    "ShaderCompiler|ShaderCompiler|ShippingEditor|tools/ShaderCompiler")
+    "Launcher|SparkleLauncher|ShippingEditor"
+    "Editor|ShowcaseEditor|ShippingEditor"
+    "Game|ShowcaseGame|ShippingGame"
+    "AssetCooker|AssetCooker|ShippingEditor"
+    "TextureCooker|TextureCooker|ShippingEditor"
+    "ShaderCompiler|ShaderCompiler|ShippingEditor")
     string(REPLACE "|" ";" _fields "${_product}")
     list(GET _fields 0 _component)
     list(GET _fields 1 _target)
     list(GET _fields 2 _profile)
-    list(GET _fields 3 _directory)
+    set(_directory "")
     set(_source "")
     set(_symbols "")
     set(_runtime_json "")
     if(TARGET ${_target})
+
+        string(TOUPPER "${_profile}" _profile_upper)
+        get_target_property(_runtime_directory ${_target} RUNTIME_OUTPUT_DIRECTORY_${_profile_upper})
+        file(RELATIVE_PATH _directory "${_sparkle_development_artifact_root}" "${_runtime_directory}")
+        if(_directory MATCHES "^\\.\\." OR IS_ABSOLUTE "${_directory}")
+            message(FATAL_ERROR "Release product lies outside the canonical product layout: ${_target}")
+        endif()
         set(_source "$<TARGET_FILE:${_target}>")
         if(MSVC)
             set(_symbols "$<TARGET_PDB_FILE:${_target}>")

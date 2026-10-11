@@ -316,38 +316,11 @@ namespace SparkleLauncher
 
 		if (!missingCookTools.empty())
 		{
-			for (const ToolchainItemStatus& item : cookPlan.Toolchain.Items)
-			{
-				if (!item.Required || item.State == ToolchainItemState::Found)
-				{
-					continue;
-				}
-
-				AddStatusRow(
-				    *ensureIssueLayout(),
-				    QString::fromStdString(item.DisplayName),
-				    ToolchainStatusText(item.State, true),
-				    CompactToolchainDetail(item),
-				    ToolchainStatusState(item.State, true),
-				    CreateHostToolActionButton(item));
-			}
-
-			if (!cookPlan.Freshness.Current)
-			{
-				AddStatusRow(
-				    *ensureIssueLayout(),
-				    "Build files",
-				    "Needs refresh",
-				    CombineStatusDetail(QString::fromStdString(cookPlan.Freshness.Summary), BuildFilesExpectedAction(cookPlan.Freshness)),
-				    "warning",
-				    CreateStatusActionButton("workspace.generate-build-files", "Generate", "Generate Build Files"));
-			}
-
 			AddStatusRow(
 			    *ensureIssueLayout(),
 			    "Cooking tools",
 			    "Missing",
-			    "Build the required tools: " + missingCookTools.join(", ") + ".",
+			    "Import precompiled products or build the required tools: " + missingCookTools.join(", ") + ".",
 			    "bad",
 			    CreateStatusActionButton("cook.tools.prepare", "Build", "Build Cooking Tools"));
 		}

@@ -8,7 +8,7 @@
 
 **Scope:** repository discovery, toolchain/dependency readiness, configure/build, cooking, content acquisition, running products, cleaning, quick start, operation history, cancellation, and GUI/shell access
 
-**Owner:** `Tools/Launcher/SparkleLauncher` / `SparkleLauncherCore` and `SparkleLauncher`
+**Owner:** `Tools/Launcher/SparkleLauncher` / `SparkleLauncherCore` and `SparkleLauncher`; entry paths are resolved by [LauncherRootResolver](../../../../../Tools/Launcher/SparkleLauncher/Private/Core/LauncherRootResolver.cpp) and [ProjectResolver](../../../../../Tools/Launcher/SparkleLauncher/Private/Core/ProjectResolver.cpp).
 
 **Evidence and disposition:** [Capability Evidence Plan](../../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../../Acceptance/FirstRelease.md)
 

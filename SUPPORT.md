@@ -8,7 +8,7 @@ The portable release is not ready. For now, follow the source-build instructions
 
 ## Start, recover and exit
 
-Start `launcher/SparkleLauncher.exe`, select Editor or Game, then select content. Empty is the initial selection. Downloads require internet access; offline use requires completed sync/cook.
+Start `Tools/SparkleLauncher/Binaries/ShippingEditor/SparkleLauncher.exe`, select Editor or Game, then select content. Empty is the initial selection. Downloads require internet access; offline use requires completed sync/cook.
 
 In Game, Esc releases the mouse and opens the menu; F1 opens help. Hold right mouse to look; W/A/S/D or arrows move; E/Space and Q/C move up/down. Use the menu to select a level, reload the camera or Quit. Alt+F4 exits. Save Editor changes explicitly before exiting.
 
@@ -18,7 +18,7 @@ Packaged state is under `%LOCALAPPDATA%/SparkleEngine/Showcase/v0.1/`; source pr
 
 ## Preview and export local diagnostics
 
-Use Windows PowerShell 5.1, the retained ZIP, its independently recorded SHA-256 and an unchanged read-only extraction. The package helper is `tools/Diagnostics/ExportDiagnostics.ps1`; its source is `CMake/Packaging/ExportDiagnostics.ps1`.
+Use Windows PowerShell 5.1, the retained ZIP, its independently recorded SHA-256 and an unchanged read-only extraction. The package helper is `Tools/Diagnostics/ExportDiagnostics.ps1`; its source is `CMake/Packaging/ExportDiagnostics.ps1`.
 
 ```powershell
 $arguments = @{
@@ -29,10 +29,10 @@ $arguments = @{
     Incident = 'GpuDevice' # or Startup, Crash, HangTimeout
     LogPath = '<selected product log>' # optional
 }
-$preview = & C:/Sparkle/tools/Diagnostics/ExportDiagnostics.ps1 @arguments | ConvertFrom-Json
+$preview = & C:/Sparkle/Tools/Diagnostics/ExportDiagnostics.ps1 @arguments | ConvertFrom-Json
 $preview.Record | ConvertTo-Json -Depth 8
 # Inspect the preview before exporting:
-& C:/Sparkle/tools/Diagnostics/ExportDiagnostics.ps1 @arguments -Consent `
+& C:/Sparkle/Tools/Diagnostics/ExportDiagnostics.ps1 @arguments -Consent `
     -PreviewSha256 $preview.PreviewSha256 -OutputDirectory 'C:/Users/Public/Documents'
 ```
 

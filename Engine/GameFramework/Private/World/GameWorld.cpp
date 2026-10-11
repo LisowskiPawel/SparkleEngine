@@ -64,7 +64,7 @@ void GameWorld::InitializeStagedLevel(const LevelDesc& desc)
 	}
 	if (desc.sky)
 	{
-		m_state->WriteSkyEnvironment(SkyEnvironment{.Description = *desc.sky});
+		m_state->WriteSkyEnvironment(*desc.sky);
 	}
 	else
 	{

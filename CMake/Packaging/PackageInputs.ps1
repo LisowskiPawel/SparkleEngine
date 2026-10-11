@@ -22,7 +22,7 @@ function New-PackageManifest
     param([string] $RepositoryRoot, [string] $Version, [string] $Revision, [string] $SourceInputsSha256, $Products, $Inputs)
     $manifest = [ordered]@{
         Version = $Version; Revision = $Revision; SourceInputsSha256 = $SourceInputsSha256
-        Signing = 'UnsignedInternal'; ProjectPath = 'content/Showcase'; EnginePath = 'engine'; ContentStore = 'Content/Showcase'
+        Signing = 'UnsignedInternal'; ProjectPath = 'Projects/Showcase'; EnginePath = 'Engine'; ContentStore = 'Content/Showcase'
         Products = @($Products | Select-Object Component, Target, Configuration, Path)
         SystemImports = @($Inputs.SystemImports)
         Files = @($Inputs.Files | Select-Object Path, Size, Sha256, Component, Role, Permission, Owner, Origin, License, Notice, Signature)
@@ -39,7 +39,7 @@ function New-PackageManifest
             throw "Missing/incompatible product admission: '$($product.Component)'."
         }
     }
-    foreach ($path in @('tools/CMake/bin/cmake.exe','manifests/sparkle-sbom.spdx.json','manifests/sparkle-provenance.json'))
+    foreach ($path in @('Tools/CMake/bin/cmake.exe','manifests/sparkle-sbom.spdx.json','manifests/sparkle-provenance.json'))
     {
         if (@($Inputs.Files | Where-Object Path -eq $path).Count -ne 1) { throw "Missing required input: '$path'." }
     }
@@ -48,9 +48,9 @@ function New-PackageManifest
         [void] (Assert-PackageFile $RepositoryRoot $file.Source $file.Size $file.Sha256)
     }
     foreach ($binding in @(
-        @('tools/Diagnostics/ExportDiagnostics.ps1','CMake/Packaging/ExportDiagnostics.ps1'),
-        @('tools/Diagnostics/IncidentIdentity.ps1','CMake/Packaging/IncidentIdentity.ps1'),
-        @('tools/Diagnostics/PackageVerification.ps1','CMake/Packaging/PackageVerification.ps1'),
+        @('Tools/Diagnostics/ExportDiagnostics.ps1','CMake/Packaging/ExportDiagnostics.ps1'),
+        @('Tools/Diagnostics/IncidentIdentity.ps1','CMake/Packaging/IncidentIdentity.ps1'),
+        @('Tools/Diagnostics/PackageVerification.ps1','CMake/Packaging/PackageVerification.ps1'),
         @('docs/SUPPORT.md','SUPPORT.md'), @('docs/SECURITY.md','SECURITY.md'), @('docs/KNOWN_ISSUES.md','KNOWN_ISSUES.md')))
     {
         $file = @($Inputs.Files | Where-Object Path -ceq $binding[0])
@@ -58,6 +58,15 @@ function New-PackageManifest
             $file[0].Role -cne $(if ($binding[0].EndsWith('.ps1')) { 'Helper' } else { 'Metadata' }))
         {
             throw 'Diagnostic helper/public policy admission differs from its source owner.'
+        }
+    }
+    foreach ($name in @('SyncAssetPack.cmake','SyncAssetPackFiles.cmake','SyncAssetPackArchive.cmake'))
+    {
+        $file = @($Inputs.Files | Where-Object Path -ceq "Tools/Content/$name")
+        if ($file.Count -ne 1 -or $file[0].Source -cne "Tools/Launcher/SparkleLauncher/Scripts/$name" -or
+            $file[0].Component -cne 'Shared' -or $file[0].Role -cne 'Helper')
+        {
+            throw "Content acquisition helper differs from its source owner: '$name'."
         }
     }
     return $manifest

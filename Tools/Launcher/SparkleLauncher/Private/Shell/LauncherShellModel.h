@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
-#include "SparkleLauncher/ContentDiscovery.h"
+#include "SparkleLauncher/ProjectResolver.h"
 #include "SparkleLauncher/RepositoryLocator.h"
 
 #include <string>
@@ -29,7 +29,7 @@ namespace SparkleLauncher
 
 	struct LauncherShellModel final
 	{
-		RepositoryRoot Repository;
+		std::filesystem::path RepositoryRoot;
 		std::string ContentId;
 		std::string EditorProfile = "DevelopmentEditor";
 		std::string GameProfile = "DevelopmentGame";
@@ -40,7 +40,7 @@ namespace SparkleLauncher
 		std::vector<std::string> JobOutput;
 	};
 
-	LauncherShellModel BuildLauncherShellModel(RepositoryRoot repository, SparkleContent content, const LauncherShellArguments& arguments);
+	LauncherShellModel BuildLauncherShellModel(std::filesystem::path repository, LauncherProject content, const LauncherShellArguments& arguments);
 	const LauncherShellOperationRow* FindLauncherShellOperation(const LauncherShellModel& model, std::string_view operationId) noexcept;
 	void RecordLauncherShellActivity(LauncherShellModel& model, std::string summary);
 }

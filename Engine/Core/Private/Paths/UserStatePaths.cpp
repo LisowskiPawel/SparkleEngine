@@ -1,5 +1,6 @@
 #include "PCH.h"
 
+#include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Paths/WorkspaceUserStatePaths.h"
 
@@ -67,7 +68,7 @@ namespace Filesystem::Private
 	std::string MakeWorkspaceStateKey(const std::filesystem::path& workspaceRoot)
 	{
 		const std::filesystem::path normalizedRoot = Paths::Normalize(workspaceRoot);
-		std::string pathKey = normalizedRoot.generic_string();
+		std::string pathKey = Strings::ToNarrow(normalizedRoot.generic_wstring());
 #if defined(_WIN32)
 		for (char& character : pathKey)
 		{
@@ -81,7 +82,7 @@ namespace Filesystem::Private
 			hash *= 1099511628211ull;
 		}
 
-		std::string workspaceName = Paths::MakeSafePathComponent(normalizedRoot.filename().string());
+		std::string workspaceName = Paths::MakeSafePathComponent(Strings::ToNarrow(normalizedRoot.filename().wstring()));
 		if (workspaceName.empty())
 		{
 			workspaceName = "Workspace";
@@ -138,9 +139,9 @@ namespace Filesystem
 
 	ProductUserStatePaths Private::ResolveCurrentProductUserStatePaths()
 	{
-		if (const auto packageRoot = Private::DiscoverPackageRoot())
+		if (const auto packageRoot = DiscoverPackageRoot())
 		{
-			const auto projectRoot = Private::DiscoverPackageProjectRoot(*packageRoot);
+			const auto projectRoot = DiscoverPackageProjectRoot(*packageRoot);
 
 			return Private::BuildProductUserStatePaths(
 			    Private::ResolveSparkleUserStateRoot() / Private::ResolveProductName(projectRoot.value_or(std::filesystem::path{})) / Private::FirstReleaseStateVersion);

@@ -76,7 +76,7 @@ namespace SceneAssetMeshInstanceBuilder
 
 			instances.push_back(
 			    ECS::SceneMeshInstanceData{
-			        .Resource = std::make_unique<CookedMesh>(MeshData(asset.mesh.geometry), asset.assetId),
+			        .Resource = std::make_unique<CookedMesh>(MeshData(asset.mesh), asset.assetId),
 			        .LocalTransform = instance.transform,
 			        .Material = SceneAssetMaterialResolution::ResolveMaterial(instance.material, materialBaseHandle, materials),
 			        .MeshAssetId = asset.assetId,

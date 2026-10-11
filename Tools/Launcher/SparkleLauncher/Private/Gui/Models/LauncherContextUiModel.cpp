@@ -2,6 +2,7 @@
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
+#include "Core/Public/Paths/ProductPaths.h"
 
 #include <QtCore/QStringList>
 
@@ -36,21 +37,11 @@ namespace SparkleLauncher
 		};
 	}
 
-	static QVector<LauncherSelectionOption> BuildGraphicsApiOptions(const BuildToolchainStatus& toolchain)
+	static QVector<LauncherSelectionOption> BuildGraphicsApiOptions()
 	{
-		const bool d3d12Available = IsToolAvailable(toolchain, "windowssdk");
-		const bool vulkanAvailable = IsToolAvailable(toolchain, "vulkan-sdk");
-
 		return {
-		    {"D3D12",
-		        "d3d12",
-		        d3d12Available ? QStringLiteral("Windows SDK %1 is installed.").arg(QString::fromStdString(toolchain.WindowsSdkVersion))
-		                       : QStringLiteral("Install the Windows SDK through Visual Studio Installer, then reactivate the launcher."),
-		        d3d12Available},
-		    {"Vulkan",
-		        "vulkan",
-		        vulkanAvailable ? PathDetail(toolchain.VulkanSdkRoot, QStringLiteral("The Vulkan SDK is installed.")) : QStringLiteral("Install the Vulkan SDK, then reactivate the launcher."),
-		        vulkanAvailable},
+		    {"D3D12", "d3d12", "Device support is checked when the product starts.", true},
+		    {"Vulkan", "vulkan", "Device support is checked when the product starts.", true},
 		};
 	}
 
@@ -165,11 +156,20 @@ namespace SparkleLauncher
 		};
 	}
 
-	LauncherContextUiModel LauncherContextUiModel::Build(const BuildToolchainStatus& toolchain)
+	LauncherContextUiModel LauncherContextUiModel::Build(const BuildToolchainStatus& toolchain, const std::filesystem::path& root)
 	{
+		if (!Filesystem::IsSourceWorkspace(root))
+		{
+			return {
+			    .RunModes = BuildRunModeOptions(),
+			    .GraphicsApis = BuildGraphicsApiOptions(),
+			    .ShaderBackends = {{"DXC", "dxc", "Packaged compiler runtime.", true}, {"Slang", "slang", "Packaged compiler runtime.", true}},
+			    .BuildConfigurations = {{"Shipping", "shipping", "The installed product configuration.", true}}};
+		}
+
 		return {
 		    .RunModes = BuildRunModeOptions(),
-		    .GraphicsApis = BuildGraphicsApiOptions(toolchain),
+		    .GraphicsApis = BuildGraphicsApiOptions(),
 		    .ShaderBackends = BuildShaderBackendOptions(toolchain),
 		    .BuildConfigurations = BuildConfigurationOptions(),
 		    .Compilers = BuildCompilerOptions(toolchain),

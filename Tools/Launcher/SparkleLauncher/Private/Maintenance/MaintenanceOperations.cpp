@@ -1,5 +1,6 @@
 #include "SparkleLauncher/MaintenanceOperations.h"
 
+#include "Core/Public/Paths/ProductPaths.h"
 #include "MaintenanceOperationProcessRequests.h"
 #include "Core/Public/Projects/ProjectLevelCatalog.h"
 
@@ -375,6 +376,12 @@ namespace SparkleLauncher
 		for (const CleanScope scope : ResolveRequestedCleanScopes(request))
 		{
 			plan.Operation.Inputs.push_back({"cleanScope", ToString(scope)});
+		}
+		if (!Filesystem::IsSourceWorkspace(request.RepositoryRoot))
+		{
+			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Source workspace operations are unavailable in a portable package.", "Use a source checkout for this operation.");
+			AddReadiness(plan, plan.Operation.Failure->Summary);
+			return plan;
 		}
 		plan.Toolchain = DetectBuildToolchain(request.RepositoryRoot, WorkspaceIde::VisualStudio);
 		plan.Freshness = CheckBuildFilesFreshness(request.RepositoryRoot, plan.Toolchain);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameFramework/Public/Rendering/RenderSceneDelta.h"
+#include "GameFramework/Public/World/SkyEnvironment.h"
 
 #include <cstdint>
 #include <filesystem>
@@ -9,7 +10,6 @@
 
 class GameWorldResourceStores;
 struct SceneMeshInstanceGroupData;
-struct SkyEnvironment;
 
 namespace ECS
 {

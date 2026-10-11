@@ -6,7 +6,7 @@ set(ASSET_COOKER_CORE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureRequestPlanBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/AssetCookerDiagnostics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/CatalogedLevelSceneReader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/AssetCookerDiscovery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Planning/ProjectCookPlanner.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerDispatcher.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerStageExecutor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerToolProcess.cpp
@@ -21,7 +21,7 @@ set(ASSET_COOKER_CORE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureRequestPlanBuilder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/AssetCookerDiagnostics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/CatalogedLevelSceneReader.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/AssetCookerDiscovery.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Planning/ProjectCookPlanner.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerDispatcher.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerStageExecutor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerToolProcess.h

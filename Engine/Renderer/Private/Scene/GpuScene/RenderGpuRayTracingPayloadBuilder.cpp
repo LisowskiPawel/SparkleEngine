@@ -23,16 +23,11 @@ struct RenderGpuMeshHitDataOffsets final
 	std::uint32_t IndexCount = 0;
 };
 
-struct BuildState final
-{
-	std::unordered_map<const GpuMesh*, RenderGpuMeshHitDataOffsets> MeshOffsets;
+using MeshHitDataOffsets = std::unordered_map<const GpuMesh*, RenderGpuMeshHitDataOffsets>;
 
-	RenderGpuMeshHitDataOffsets ResolveMeshOffsets(const GpuMesh& mesh, RenderGpuRayTracingPayloads& payloads);
-};
-
-RenderGpuMeshHitDataOffsets BuildState::ResolveMeshOffsets(const GpuMesh& mesh, RenderGpuRayTracingPayloads& payloads)
+static RenderGpuMeshHitDataOffsets ResolveMeshOffsets(MeshHitDataOffsets& meshOffsets, const GpuMesh& mesh, RenderGpuRayTracingPayloads& payloads)
 {
-	if (const auto existing = MeshOffsets.find(&mesh); existing != MeshOffsets.end())
+	if (const auto existing = meshOffsets.find(&mesh); existing != meshOffsets.end())
 	{
 		return existing->second;
 	}
@@ -71,7 +66,7 @@ RenderGpuMeshHitDataOffsets BuildState::ResolveMeshOffsets(const GpuMesh& mesh, 
 	}
 	payloads.Indices.insert(payloads.Indices.end(), meshIndices.begin(), meshIndices.end());
 	payloads.MorphTargetDeltas.insert(payloads.MorphTargetDeltas.end(), morphTargetDeltas.begin(), morphTargetDeltas.end());
-	MeshOffsets.emplace(&mesh, offsets);
+	meshOffsets.emplace(&mesh, offsets);
 	return offsets;
 }
 
@@ -170,7 +165,7 @@ static void AppendMaterials(const PreparedRenderScene& preparedScene, RenderGpuR
 	}
 }
 
-static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpuRayTracingPayloads& payloads, BuildState& state)
+static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpuRayTracingPayloads& payloads, MeshHitDataOffsets& meshOffsets)
 {
 	std::uint32_t instanceCapacity = 1;
 	std::unordered_set<std::uint32_t> occupiedGpuSceneSlots;
@@ -184,10 +179,15 @@ static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpu
 	}
 
 	payloads.Instances.resize(instanceCapacity);
-	state.MeshOffsets.reserve(preparedScene.rayTracingWork.BlasInputs.size());
+	meshOffsets.reserve(preparedScene.rayTracingWork.BlasInputs.size());
 }
 
-static void AppendInstance(const RenderRayTracingBlasInput& input, const PreparedRenderScene& preparedScene, const GpuMeshCache& meshes, RenderGpuRayTracingPayloads& payloads, BuildState& state)
+static void AppendInstance(
+    const RenderRayTracingBlasInput& input,
+    const PreparedRenderScene& preparedScene,
+    const GpuMeshCache& meshes,
+    RenderGpuRayTracingPayloads& payloads,
+    MeshHitDataOffsets& meshOffsets)
 {
 	if (input.PrimitiveIndex >= preparedScene.primitives.size())
 	{
@@ -210,7 +210,7 @@ static void AppendInstance(const RenderRayTracingBlasInput& input, const Prepare
 	}
 
 	const MaterialData& material = preparedScene.materials[draw.MaterialSlot];
-	const RenderGpuMeshHitDataOffsets offsets = state.ResolveMeshOffsets(*gpuMesh, payloads);
+	const RenderGpuMeshHitDataOffsets offsets = ResolveMeshOffsets(meshOffsets, *gpuMesh, payloads);
 	RayTracingHitInstance& instance = payloads.Instances[input.GpuSceneSlot];
 
 	instance = RayTracingHitInstance{
@@ -245,11 +245,11 @@ void BuildRenderGpuRayTracingPayloads(const PreparedRenderScene& preparedScene, 
 
 	AppendMaterials(preparedScene, payloads);
 
-	BuildState state;
-	PrepareInstances(preparedScene, payloads, state);
+	MeshHitDataOffsets meshOffsets;
+	PrepareInstances(preparedScene, payloads, meshOffsets);
 	for (const RenderRayTracingBlasInput& input : work.BlasInputs)
 	{
-		AppendInstance(input, preparedScene, meshes, payloads, state);
+		AppendInstance(input, preparedScene, meshes, payloads, meshOffsets);
 	}
 
 	if (payloads.Vertices.empty() || payloads.Indices.empty())

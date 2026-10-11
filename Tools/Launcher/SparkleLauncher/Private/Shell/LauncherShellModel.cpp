@@ -6,6 +6,7 @@
 #include "SparkleLauncher/LevelOperations.h"
 #include "SparkleLauncher/LevelRunOperations.h"
 #include "LauncherStatePaths.h"
+#include "Core/Public/Paths/ProductPaths.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
 
 #include <algorithm>
@@ -102,7 +103,7 @@ namespace SparkleLauncher
 
 	void AppendLocalLauncherShellActivity(LauncherShellModel& model)
 	{
-		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(model.Repository.RootPath);
+		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(model.RepositoryRoot);
 		if (std::filesystem::exists(statePaths.ActivityFile))
 		{
 			model.Activity.push_back({"local", "Activity file: " + statePaths.ActivityFile.string()});
@@ -117,16 +118,27 @@ namespace SparkleLauncher
 		model.Activity.push_back({"local", latestLogPath.has_value() ? "Latest launcher log: " + latestLogPath->string() : "No launcher logs discovered yet."});
 	}
 
-	LauncherShellModel BuildLauncherShellModel(RepositoryRoot repository, SparkleContent content, const LauncherShellArguments& arguments)
+	LauncherShellModel BuildLauncherShellModel(std::filesystem::path repository, LauncherProject content, const LauncherShellArguments& arguments)
 	{
 		LauncherShellModel model;
-		model.Repository = std::move(repository);
+		model.RepositoryRoot = std::move(repository);
 		model.ContentId = std::move(content.Id);
-		model.EditorProfile = arguments.EditorProfile;
-		model.GameProfile = arguments.GameProfile;
+		model.EditorProfile = !Filesystem::IsSourceWorkspace(model.RepositoryRoot) ? "ShippingEditor" : arguments.EditorProfile;
+		model.GameProfile = !Filesystem::IsSourceWorkspace(model.RepositoryRoot) ? "ShippingGame" : arguments.GameProfile;
 		model.WorkspaceIdePreference = arguments.WorkspaceIdePreference;
 		model.WorkspaceCompilerPreference = arguments.WorkspaceCompilerPreference;
 		model.Operations = BuildLauncherShellOperationRows();
+		if (!Filesystem::IsSourceWorkspace(model.RepositoryRoot))
+		{
+			for (auto& operation : model.Operations)
+			{
+				if (FindBuildWorkspaceOperationDefinition(operation.Id) || FindMaintenanceOperationDefinition(operation.Id))
+				{
+					operation.Readiness = "Unavailable";
+					operation.NextEffect = "Requires a source checkout.";
+				}
+			}
+		}
 		AppendLocalLauncherShellActivity(model);
 		return model;
 	}

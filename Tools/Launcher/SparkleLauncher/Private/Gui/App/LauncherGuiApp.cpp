@@ -3,10 +3,11 @@
 #include "LauncherBackend.h"
 #include "LauncherMainWindow.h"
 #include "LauncherContentModel.h"
-#include "LauncherRepositoryContext.h"
+#include "LauncherRootResolver.h"
 #include "LauncherSettings.h"
 #include "LauncherShadowExecution.h"
 #include "SparkleLauncher/RepositoryLocator.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
@@ -54,7 +55,7 @@ namespace SparkleLauncher
 		{
 			if (std::string_view(argv[index]) == "--root")
 			{
-				return argv[index + 1];
+				return Strings::ToWide(std::string_view(argv[index + 1]));
 			}
 		}
 		return {};
@@ -68,9 +69,9 @@ namespace SparkleLauncher
 
 		std::string repositoryError;
 
-		const std::optional<RepositoryRoot> repository = TryResolveLauncherRepositoryContext(
+		const std::optional<std::filesystem::path> repository = TryResolveLauncherRoot(
 		    FindRequestedRepositoryRoot(argc, argv),
-		    std::filesystem::path(QCoreApplication::applicationDirPath().toStdString()),
+		    std::filesystem::path(QCoreApplication::applicationDirPath().toStdWString()),
 		    repositoryError);
 
 		if (!repository)
@@ -79,10 +80,10 @@ namespace SparkleLauncher
 			return 1;
 		}
 
-		const std::filesystem::path repositoryRoot = repository->RootPath;
+		const std::filesystem::path repositoryRoot = *repository;
 		std::error_code errorCode;
 		std::filesystem::current_path(repositoryRoot, errorCode);
-		if (errorCode || !QDir::setCurrent(QString::fromStdString(repositoryRoot.string())))
+		if (errorCode || !QDir::setCurrent(QString::fromStdWString(repositoryRoot.wstring())))
 		{
 			QMessageBox::critical(
 			    nullptr,

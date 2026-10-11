@@ -1,8 +1,10 @@
 #include "LauncherShellPresentation.h"
 
+#include "Core/Public/Strings/StringUtils.h"
 #include "LauncherShellModel.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
+#include "Core/Public/Paths/ProductPaths.h"
 
 #include <ostream>
 #include <string>
@@ -44,12 +46,16 @@ namespace SparkleLauncher
 	void RenderLauncherShell(const LauncherShellModel& model, std::ostream& output)
 	{
 		output << "Sparkle Launcher\n";
-		output << "Repository: " << model.Repository.RootPath.string() << "\n\n";
+		output << "Root: " << Strings::ToNarrow(model.RepositoryRoot.wstring()) << "\n\n";
+		const bool installed = !Filesystem::IsSourceWorkspace(model.RepositoryRoot);
 		output << "Profile selectors\n";
-		output << "  Editor: " << model.EditorProfile << " | options: " << BuildProfileOptionText(BuildProfileTarget::Editor) << '\n';
-		output << "  Game/Cook: " << model.GameProfile << " | options: " << BuildProfileOptionText(BuildProfileTarget::Game) << '\n';
-		output << "  Workspace IDE: " << DisplayName(model.WorkspaceIdePreference) << " | options: Visual Studio, Rider\n";
-		output << "  Workspace compiler: " << DisplayName(model.WorkspaceCompilerPreference) << " | options: MSVC, clang-cl\n\n";
+		output << "  Editor: " << model.EditorProfile << " | options: " << (installed ? model.EditorProfile : BuildProfileOptionText(BuildProfileTarget::Editor)) << '\n';
+		output << "  Game/Cook: " << model.GameProfile << " | options: " << (installed ? model.GameProfile : BuildProfileOptionText(BuildProfileTarget::Game)) << '\n';
+		if (!installed)
+		{
+			output << "  Workspace IDE: " << DisplayName(model.WorkspaceIdePreference) << " | options: Visual Studio, Rider\n";
+			output << "  Workspace compiler: " << DisplayName(model.WorkspaceCompilerPreference) << " | options: MSVC, clang-cl\n\n";
+		}
 
 		RenderLauncherOperationGroup(model, "Sync", output);
 		RenderLauncherOperationGroup(model, "Build", output);

@@ -29,7 +29,7 @@ void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, Edit
 		return;
 	}
 
-	SceneSkyDesc after = current->Description;
+	SceneSkyDesc after = *current;
 	bool changed = false;
 	if (UiUtil::MatchesDetailsFilter(filter, "Rendering", "sky texture color brightness enabled visible") && UiUtil::BeginDetailsCategory("Rendering"))
 	{

@@ -1,8 +1,9 @@
 #include "AssetCookerService.h"
+#include "Core/Public/Paths/PackagePaths.h"
 
 #include "AssetCookerTypes.h"
 #include "../Diagnostics/AssetCookerDiagnostics.h"
-#include "../Discovery/AssetCookerDiscovery.h"
+#include "../Planning/ProjectCookPlanner.h"
 #include "../Dispatch/AssetCookerDispatcher.h"
 #include "../Planning/ProjectCookPlan.h"
 
@@ -43,7 +44,7 @@ AssetCookerServiceResult AssetCookerService::Cook(const char* projectName, const
 	}
 
 	const std::string resolvedConfiguration = ResolveConfiguration(configuration);
-	const std::optional<std::string_view> expectedToolProfile = AssetCookerDiscovery::ResolveToolProfile(resolvedConfiguration);
+	const std::optional<std::string_view> expectedToolProfile = ProjectCookPlanner::ResolveToolProfile(resolvedConfiguration);
 	if (!expectedToolProfile.has_value())
 	{
 		diagnostics.AddError(AssetCookerCategory::All, "Unsupported configuration '" + resolvedConfiguration + "'.");
@@ -76,7 +77,7 @@ bool AssetCookerService::ResolveProjects(const std::filesystem::path& repository
 		return true;
 	}
 
-	outProjects = AssetCookerDiscovery::DiscoverProjects(repositoryRoot, diagnostics);
+	outProjects = ProjectCookPlanner::DiscoverProjects(repositoryRoot, diagnostics);
 	return !outProjects.empty();
 }
 
@@ -108,7 +109,7 @@ bool AssetCookerService::CookProject(
     std::vector<AssetCookerOutputRecord>& outOutputs) const
 {
 	AssetCookerProjectCookPlan plan;
-	if (!AssetCookerDiscovery::BuildProjectCookPlan(repositoryRoot, projectName, toolProfile, category, plan, diagnostics))
+	if (!ProjectCookPlanner::BuildProjectCookPlan(repositoryRoot, projectName, toolProfile, category, plan, diagnostics))
 	{
 		return false;
 	}
@@ -137,6 +138,16 @@ AssetCookerServiceResult AssetCookerService::Finish(bool succeeded, AssetCookerD
 
 bool AssetCookerService::ResolveRepositoryRoot(AssetCookerDiagnostics& diagnostics, std::filesystem::path& outRepositoryRoot) const
 {
+	if (const auto package = Filesystem::DiscoverPackageRoot())
+	{
+		if (!m_configuredRepositoryRoot.empty() && std::filesystem::absolute(m_configuredRepositoryRoot).lexically_normal() != *package)
+		{
+			diagnostics.AddError(AssetCookerCategory::All, "Installed cooker cannot select a source workspace.");
+			return false;
+		}
+		outRepositoryRoot = *package;
+		return true;
+	}
 	if (!m_configuredRepositoryRoot.empty())
 	{
 		outRepositoryRoot = std::filesystem::absolute(m_configuredRepositoryRoot).lexically_normal();
@@ -145,7 +156,7 @@ bool AssetCookerService::ResolveRepositoryRoot(AssetCookerDiagnostics& diagnosti
 
 	std::error_code currentPathError;
 	const std::filesystem::path currentPath = std::filesystem::current_path(currentPathError);
-	if (currentPathError || !AssetCookerDiscovery::TryFindRepositoryRoot(currentPath, outRepositoryRoot))
+	if (currentPathError || !ProjectCookPlanner::TryFindRepositoryRoot(currentPath, outRepositoryRoot))
 	{
 		diagnostics.AddError(AssetCookerCategory::All, "Failed to resolve repository root. Pass --root or set repositoryRoot.");
 		return false;

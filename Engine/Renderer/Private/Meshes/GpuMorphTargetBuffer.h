@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GameFramework/Public/Scene/Meshes/MeshMorphData.h"
+
 #include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
 #include "RHI/Public/Resources/RhiResourceHandles.h"
 #include "RHI/Public/Resources/RhiResourceView.h"
@@ -11,7 +13,6 @@
 
 class RenderHardwareInterface;
 class RenderCommandList;
-struct MeshMorphData;
 
 // Owns one immutable mesh generation's morph deltas in CPU and GPU forms.
 class GpuMorphTargetBuffer final

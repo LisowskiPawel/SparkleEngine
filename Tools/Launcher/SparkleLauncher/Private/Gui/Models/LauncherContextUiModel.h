@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+
 #include <QtCore/QString>
 #include <QtCore/QVector>
 
@@ -25,6 +27,6 @@ namespace SparkleLauncher
 		QVector<LauncherSelectionOption> Compilers;
 		QVector<LauncherSelectionOption> Ides;
 
-		static LauncherContextUiModel Build(const BuildToolchainStatus& toolchain);
+		static LauncherContextUiModel Build(const BuildToolchainStatus& toolchain, const std::filesystem::path& root);
 	};
 }

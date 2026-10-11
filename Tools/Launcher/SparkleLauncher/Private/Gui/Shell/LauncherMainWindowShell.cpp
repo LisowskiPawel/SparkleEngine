@@ -11,6 +11,7 @@
 #include "LauncherWorkflowCatalog.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
+#include "Core/Public/Paths/ProductPaths.h"
 
 #include <QtGui/QColor>
 #include <QtWidgets/QCheckBox>
@@ -204,8 +205,16 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::RefreshContextSelectors()
 	{
-		const BuildToolchainStatus toolchain = DetectBuildToolchain(m_repositoryRoot, ResolveSelectedWorkspaceIde(m_settings), ResolveSelectedWorkspaceCompiler(m_settings));
-		const LauncherContextUiModel model = LauncherContextUiModel::Build(toolchain);
+		const bool installed = !Filesystem::IsSourceWorkspace(m_repositoryRoot);
+		if (installed)
+		{
+			m_settings.SetBuildConfiguration("shipping");
+		}
+
+		const BuildToolchainStatus toolchain = installed ? BuildToolchainStatus{}
+		                                                 : DetectBuildToolchain(m_repositoryRoot, ResolveSelectedWorkspaceIde(m_settings), ResolveSelectedWorkspaceCompiler(m_settings));
+
+		const LauncherContextUiModel model = LauncherContextUiModel::Build(toolchain, m_repositoryRoot);
 		PopulateBoundContextCombo(m_runModeCombo, model.RunModes, m_settings.RunMode(), m_settings, &LauncherSettings::SetRunMode);
 		PopulateBoundContextCombo(m_graphicsApiCombo, model.GraphicsApis, m_settings.GraphicsApi(), m_settings, &LauncherSettings::SetGraphicsApi);
 		const QString profile = m_settings.RunMode() == "editor" ? m_settings.EditorProfile() : m_settings.GameProfile();

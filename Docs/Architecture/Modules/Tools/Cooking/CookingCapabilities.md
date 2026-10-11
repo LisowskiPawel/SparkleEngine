@@ -8,7 +8,7 @@
 
 **Scope:** project/category orchestration, texture/mesh/material/scene/skeleton/animation products, identity, validation, concurrency, publication, and runtime handoff
 
-**Owner:** `Tools/Cooking`; shader cooking is separately owned by [Shader Compilation](../ShaderCompiler/ShaderCompilerCapabilities.md)
+**Owner:** `Tools/Cooking`; [ProjectCookPlanner](../../../../../Tools/Cooking/AssetCooker/Private/Planning/ProjectCookPlanner.cpp) builds project/category plans. Shader cooking belongs to [Shader Compilation](../ShaderCompiler/ShaderCompilerCapabilities.md).
 
 **Evidence and disposition:** [Capability Evidence Plan](../../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../../Acceptance/FirstRelease.md)
 

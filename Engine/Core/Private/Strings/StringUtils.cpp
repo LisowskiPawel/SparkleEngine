@@ -7,6 +7,8 @@
 #include <cstddef>
 #include <filesystem>
 #include <span>
+#include <stdexcept>
+#include <limits>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -255,21 +257,7 @@ namespace Strings
 
 	bool StartsWithIgnoreCase(std::string_view value, std::string_view prefix) noexcept
 	{
-		if (prefix.size() > value.size())
-		{
-			return false;
-		}
-
-		for (std::size_t index = 0; index < prefix.size(); ++index)
-		{
-			const unsigned char valueCharacter = static_cast<unsigned char>(value[index]);
-			const unsigned char prefixCharacter = static_cast<unsigned char>(prefix[index]);
-			if (std::tolower(valueCharacter) != std::tolower(prefixCharacter))
-			{
-				return false;
-			}
-		}
-		return true;
+		return prefix.size() <= value.size() && EqualsIgnoreCase(value.substr(0, prefix.size()), prefix);
 	}
 
 	bool ContainsIgnoreCase(std::string_view haystack, std::string_view needle) noexcept
@@ -287,19 +275,7 @@ namespace Strings
 		const std::size_t finalStartIndex = haystack.size() - needle.size();
 		for (std::size_t startIndex = 0; startIndex <= finalStartIndex; ++startIndex)
 		{
-			bool matches = true;
-			for (std::size_t needleIndex = 0; needleIndex < needle.size(); ++needleIndex)
-			{
-				const unsigned char haystackCharacter = static_cast<unsigned char>(haystack[startIndex + needleIndex]);
-				const unsigned char needleCharacter = static_cast<unsigned char>(needle[needleIndex]);
-				if (std::tolower(haystackCharacter) != std::tolower(needleCharacter))
-				{
-					matches = false;
-					break;
-				}
-			}
-
-			if (matches)
+			if (EqualsIgnoreCase(haystack.substr(startIndex, needle.size()), needle))
 			{
 				return true;
 			}
@@ -310,14 +286,14 @@ namespace Strings
 
 	bool TryParseBool(std::string_view str, bool& outValue)
 	{
-		const std::string normalized = ToLowerCopy(TrimAsciiWhitespace(str));
-		if (normalized == "true" || normalized == "1" || normalized == "yes" || normalized == "on")
+		const std::string_view trimmed = TrimAsciiWhitespace(str);
+		if (EqualsIgnoreCase(trimmed, "true") || trimmed == "1" || EqualsIgnoreCase(trimmed, "yes") || EqualsIgnoreCase(trimmed, "on"))
 		{
 			outValue = true;
 			return true;
 		}
 
-		if (normalized == "false" || normalized == "0" || normalized == "no" || normalized == "off")
+		if (EqualsIgnoreCase(trimmed, "false") || trimmed == "0" || EqualsIgnoreCase(trimmed, "no") || EqualsIgnoreCase(trimmed, "off"))
 		{
 			outValue = false;
 			return true;
@@ -355,7 +331,43 @@ namespace Strings
 
 	std::wstring ToWide(std::string_view str)
 	{
-		return {str.begin(), str.end()};
+		if (str.empty())
+		{
+			return {};
+		}
+#if defined(_WIN32)
+		if (str.size() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
+		{
+			throw std::length_error("UTF-8 text is too long.");
+		}
+		const int size = static_cast<int>(str.size());
+		const int length = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str.data(), size, nullptr, 0);
+		if (length == 0)
+		{
+			throw std::invalid_argument("Invalid UTF-8 text.");
+		}
+		std::wstring result(static_cast<std::size_t>(length), L'\0');
+		MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str.data(), size, result.data(), length);
+		return result;
+#else
+		if (!IsValidUtf8(str))
+		{
+			throw std::invalid_argument("Invalid UTF-8 text.");
+		}
+		std::wstring result;
+		for (std::size_t cursor = 0; cursor < str.size();)
+		{
+			const auto lead = static_cast<std::uint8_t>(str[cursor++]);
+			const unsigned count = lead <= 0x7fu ? 0u : lead <= 0xdfu ? 1u : lead <= 0xefu ? 2u : 3u;
+			std::uint32_t codePoint = lead & (count == 0u ? 0x7fu : 0x7fu >> count);
+			for (unsigned index = 0; index < count; ++index)
+			{
+				codePoint = (codePoint << 6u) | (static_cast<std::uint8_t>(str[cursor++]) & 0x3fu);
+			}
+			result.push_back(static_cast<wchar_t>(codePoint));
+		}
+		return result;
+#endif
 	}
 
 	std::wstring ToWide(const std::filesystem::path& path)
@@ -365,12 +377,34 @@ namespace Strings
 
 	std::string ToNarrow(std::wstring_view str)
 	{
+		if (str.empty())
+		{
+			return {};
+		}
+#if defined(_WIN32)
+		if (str.size() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
+		{
+			throw std::length_error("Wide text is too long.");
+		}
+		const int size = static_cast<int>(str.size());
+		const int length = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, str.data(), size, nullptr, 0, nullptr, nullptr);
+		if (length == 0)
+		{
+			throw std::invalid_argument("Invalid wide text.");
+		}
+		std::string result(static_cast<std::size_t>(length), '\0');
+		WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, str.data(), size, result.data(), length, nullptr, nullptr);
+		return result;
+#else
 		std::string result;
-		result.reserve(str.size());
 		for (const wchar_t character : str)
 		{
-			result.push_back(static_cast<char>(character));
+			if (!AppendUtf8CodePoint(static_cast<std::uint32_t>(character), result))
+			{
+				throw std::invalid_argument("Invalid wide text.");
+			}
 		}
 		return result;
+#endif
 	}
 }

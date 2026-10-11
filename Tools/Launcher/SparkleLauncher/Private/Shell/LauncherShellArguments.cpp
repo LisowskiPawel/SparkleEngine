@@ -1,4 +1,5 @@
 #include "LauncherShellArguments.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
 
@@ -80,7 +81,7 @@ namespace SparkleLauncher
 			const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: --root requires a path.\n");
 			if (value.has_value())
 			{
-				m_outArguments->StartPath = *value;
+				m_outArguments->StartPath = Strings::ToWide(*value);
 			}
 			return value.has_value();
 		}

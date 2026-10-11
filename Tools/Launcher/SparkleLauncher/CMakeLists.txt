@@ -9,7 +9,7 @@ set(SPARKLE_LAUNCHER_CORE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/MaintenanceOperations.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/OperationModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/ProcessRunner.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/ContentDiscovery.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/ProjectResolver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/RepositoryLocator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/SourceDependencyState.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/ToolResolver.h
@@ -18,15 +18,17 @@ set(SPARKLE_LAUNCHER_CORE_PUBLIC_HEADERS
 set(SPARKLE_LAUNCHER_CORE_FOUNDATION_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/CapabilityGraph.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/BuildProfileCatalog.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherRepositoryContext.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherRepositoryContext.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherRootResolver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherRootResolver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherOperationProgress.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherOperationProgress.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherStatePaths.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherStatePaths.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/OperationModel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/ProcessRunner.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/ContentDiscovery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/ProjectResolver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/PackageContentStore.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/PackageContentStore.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/RepositoryLocator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/SourceDependencyState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/HostGraphicsCapabilities.cpp

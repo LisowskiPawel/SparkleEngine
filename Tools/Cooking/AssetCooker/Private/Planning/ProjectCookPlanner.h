@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Diagnostics/AssetCookerDiagnostics.h"
-#include "../Planning/ProjectCookPlan.h"
+#include "ProjectCookPlan.h"
 
 #include <filesystem>
 #include <optional>
@@ -12,7 +12,7 @@
 struct ProjectLevelCatalog;
 struct ProjectLevelCatalogEntry;
 
-class AssetCookerDiscovery final
+class ProjectCookPlanner final
 {
 public:
 	static bool TryFindRepositoryRoot(const std::filesystem::path& startPath, std::filesystem::path& outRepositoryRoot);
@@ -29,12 +29,6 @@ public:
 private:
 	static bool PathExists(const std::filesystem::path& path);
 	static bool CategoryNeedsScenes(AssetCookerCategory category) noexcept;
-	static void InitializePlan(
-	    const std::filesystem::path& repositoryRoot,
-	    std::string_view projectName,
-	    std::string_view toolProfile,
-	    AssetCookerCategory category,
-	    AssetCookerProjectCookPlan& outPlan);
 	static void AddPlanSteps(AssetCookerCategory category, std::vector<AssetCookerPlanStep>& outSteps);
 	static bool CollectSceneEntries(const std::filesystem::path& projectRoot, std::vector<AssetCookerSceneEntry>& outEntries, AssetCookerDiagnostics& diagnostics);
 	static bool CollectSceneIds(const std::filesystem::path& projectRoot, std::vector<std::string>& outSceneIds, AssetCookerDiagnostics& diagnostics);

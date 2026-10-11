@@ -5,8 +5,10 @@
 #include "LauncherShellOperations.h"
 #include "LauncherShellPresentation.h"
 #include "LauncherShadowExecution.h"
+#include "LauncherRootResolver.h"
+#include "Core/Public/FileSystemUtils.h"
 
-#include "SparkleLauncher/ContentDiscovery.h"
+#include "SparkleLauncher/ProjectResolver.h"
 #include "SparkleLauncher/RepositoryLocator.h"
 
 #include <filesystem>
@@ -34,8 +36,7 @@ namespace SparkleLauncher
 		}
 
 		std::string errorMessage;
-		const std::filesystem::path startPath = arguments.StartPath.empty() ? std::filesystem::current_path() : arguments.StartPath;
-		const std::optional<RepositoryRoot> repository = TryFindRepositoryRoot(startPath, errorMessage);
+		const std::optional<std::filesystem::path> repository = TryResolveLauncherRoot(arguments.StartPath, Filesystem::GetExecutableDirectory(), errorMessage);
 		if (!repository.has_value())
 		{
 			error << errorMessage << '\n';
@@ -56,7 +57,7 @@ namespace SparkleLauncher
 			{
 				shadowArguments.emplace_back(argv[index]);
 			}
-			const LauncherShadowStartResult shadow = StartLauncherShadow(repository->RootPath, shadowArguments, completionPolicy);
+			const LauncherShadowStartResult shadow = StartLauncherShadow(*repository, shadowArguments, completionPolicy);
 			if (shadow.State == LauncherShadowStartState::Started)
 			{
 				if (completionPolicy == LauncherShadowCompletionPolicy::ReleaseCallingArtifact)
@@ -72,7 +73,7 @@ namespace SparkleLauncher
 			}
 		}
 
-		std::optional<SparkleContent> content = DiscoverContentRoot(repository->RootPath, errorMessage);
+		std::optional<LauncherProject> content = ResolveLauncherProject(*repository, errorMessage);
 		if (!content.has_value())
 		{
 			error << errorMessage << '\n';

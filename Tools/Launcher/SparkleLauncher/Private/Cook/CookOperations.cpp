@@ -5,8 +5,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "SparkleLauncher/BuildProfileCatalog.h"
 #include "LauncherStatePaths.h"
-#include "SparkleLauncher/ToolResolver.h"
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "Core/Public/Paths/ProductPaths.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -376,8 +375,7 @@ namespace SparkleLauncher
 			}
 		}
 		plan.ToolProfile = ResolveCookToolProfile(request.GameProfile);
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(request.RepositoryRoot);
-		plan.CookedOutputDirectory = workspaceOutputs.CookedProjectDirectory(request.ContentId);
+		plan.CookedOutputDirectory = Filesystem::ResolveProductCookedRoot(request.RepositoryRoot, request.ContentId);
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Operation.Inputs.push_back({"content", request.ContentId});
 		plan.Operation.Inputs.push_back({"gameProfile", request.GameProfile});
@@ -407,11 +405,9 @@ namespace SparkleLauncher
 			plan.Operation.RequiresConfirmation = true;
 		}
 
-		plan.Toolchain = DetectBuildToolchain(request.RepositoryRoot, WorkspaceIde::VisualStudio);
-		plan.Freshness = CheckBuildFilesFreshness(request.RepositoryRoot, plan.Toolchain);
 		for (const std::string& toolName : GetRequiredCookToolNames(plan))
 		{
-			plan.RequiredToolPaths.push_back(ResolveSparkleToolPath(request.RepositoryRoot, plan.ToolProfile, toolName));
+			plan.RequiredToolPaths.push_back(Filesystem::ResolveProductToolPath(request.RepositoryRoot, toolName, plan.ToolProfile));
 		}
 		if (request.ContentId.empty())
 		{
@@ -475,7 +471,7 @@ namespace SparkleLauncher
 			if (!toolExists || errorCode)
 			{
 				requiredCookToolsAvailable = false;
-				AddReadiness(plan, "Cook tool is missing; run Build Cooking Tools first: " + toolPath.string());
+				AddReadiness(plan, "Cook tool is missing; import precompiled products or build cooking tools: " + toolPath.string());
 				continue;
 			}
 
@@ -496,7 +492,7 @@ namespace SparkleLauncher
 			AddReadiness(
 			    plan,
 			    "Cook tool runtime support bundle is incomplete beside " + toolPath.filename().string()
-			        + "; run Build Cooking Tools first after Sync shows the Vulkan SDK as ready: " + Strings::Join(missingSupportEntryViews, ", "));
+			        + "; import the complete precompiled bundle or rebuild cooking tools: " + Strings::Join(missingSupportEntryViews, ", "));
 		}
 		if (request.Mode == CookMode::Force && !request.ForceRecookConfirmed)
 		{

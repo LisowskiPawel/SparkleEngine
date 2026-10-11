@@ -23,13 +23,12 @@ namespace ECS
 	    RenderSceneDelta& delta)
 	{
 		PublishInstanceGroups(instanceGroups, delta);
-		const std::optional<SceneSkyDesc> skyDescription = sky ? std::optional<SceneSkyDesc>(sky->Description) : std::nullopt;
-		PublishSky(skyDescription, delta);
+		PublishSky(sky, delta);
 
 		std::optional<std::filesystem::path> skyTexturePath;
-		if (sky && sky->Description.skyTexture.IsValid())
+		if (sky && sky->skyTexture.IsValid())
 		{
-			skyTexturePath.emplace(sky->Description.skyTexture.texturePath);
+			skyTexturePath.emplace(sky->skyTexture.texturePath);
 		}
 		PublishChangedTables(resources, skyTexturePath, delta);
 	}

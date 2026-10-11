@@ -1,14 +1,32 @@
-#include "SparkleLauncher/ContentDiscovery.h"
+#include "SparkleLauncher/ProjectResolver.h"
 
 #include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/PackagePaths.h"
+#include "Core/Public/Paths/ProductPaths.h"
+#include "PackageContentStore.h"
 
 #include <system_error>
 
 namespace SparkleLauncher
 {
-	std::optional<SparkleContent> DiscoverContentRoot(const std::filesystem::path& repositoryRoot, std::string& outErrorMessage)
+	std::optional<LauncherProject> ResolveLauncherProject(const std::filesystem::path& repositoryRoot, std::string& outErrorMessage)
 	{
 		outErrorMessage.clear();
+
+		if (!Filesystem::IsSourceWorkspace(repositoryRoot))
+		{
+			if (!InitializePackageContentStore(repositoryRoot, outErrorMessage))
+			{
+				return std::nullopt;
+			}
+			const auto project = Filesystem::ResolvePackageSourceRoot(repositoryRoot);
+			if (!project)
+			{
+				outErrorMessage = "Invalid package content-store path.";
+				return std::nullopt;
+			}
+			return LauncherProject{project->filename().string(), *project};
+		}
 
 		const std::filesystem::path projectsDirectory = repositoryRoot / "Projects";
 		std::error_code errorCode;
@@ -39,12 +57,12 @@ namespace SparkleLauncher
 			return std::nullopt;
 		}
 
-		std::optional<SparkleContent> discoveredContent;
+		std::optional<LauncherProject> discoveredContent;
 		std::size_t contentCount = 0;
 		const std::filesystem::directory_iterator endIterator;
 		while (projectIterator != endIterator)
 		{
-			const std::filesystem::directory_entry entry = *projectIterator;
+			const std::filesystem::directory_entry& entry = *projectIterator;
 			errorCode.clear();
 			const bool isDirectory = entry.is_directory(errorCode);
 			if (errorCode)
@@ -69,11 +87,9 @@ namespace SparkleLauncher
 					++contentCount;
 					if (!discoveredContent)
 					{
-						discoveredContent = SparkleContent{
+						discoveredContent = LauncherProject{
 						    .Id = entry.path().filename().string(),
-						    .DisplayName = entry.path().filename().string(),
 						    .RootPath = entry.path(),
-						    .MarkerPath = markerPath,
 						};
 					}
 				}
@@ -95,4 +111,5 @@ namespace SparkleLauncher
 
 		return discoveredContent;
 	}
+
 }

@@ -1,5 +1,6 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
+#include "Core/Public/Paths/ProductPaths.h"
 #include "NativeBuildOutputReset.h"
 #include "BuildWorkspaceProcessRequests.h"
 #include "HostToolInstaller.h"
@@ -433,6 +434,12 @@ namespace SparkleLauncher
 		}
 		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.RepositoryRoot, definition->Id, "Latest.txt");
 		plan.Request = request;
+		if (!Filesystem::IsSourceWorkspace(request.RepositoryRoot))
+		{
+			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Source workspace operations are unavailable in a portable package.", "Use a source checkout for this operation.");
+			AddReadiness(plan, plan.Operation.Failure->Summary);
+			return plan;
+		}
 		plan.Toolchain = DetectBuildToolchain(request.RepositoryRoot, request.PreferredIde, request.Compiler);
 		plan.Freshness = CheckBuildFilesFreshness(request.RepositoryRoot, plan.Toolchain);
 		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(request.RepositoryRoot);

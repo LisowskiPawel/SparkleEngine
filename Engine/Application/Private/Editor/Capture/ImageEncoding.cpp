@@ -26,11 +26,6 @@ enum class ImagePixelEncoding : std::uint8_t
 	Bgra8Unorm,
 };
 
-struct ImagePixelFormat final
-{
-	ImagePixelEncoding Encoding = ImagePixelEncoding::Rgba8Unorm;
-};
-
 #pragma pack(push, 1)
 
 struct BmpFileHeader final
@@ -59,26 +54,26 @@ struct BmpInfoHeader final
 
 #pragma pack(pop)
 
-static bool ResolvePixelFormat(PixelFormat format, ImagePixelFormat& imageFormat) noexcept
+static bool ResolvePixelFormat(PixelFormat format, ImagePixelEncoding& imageFormat) noexcept
 {
 	switch (format)
 	{
 		case PixelFormat::R32G32B32A32_Float:
-			imageFormat.Encoding = ImagePixelEncoding::Rgba32Float;
+			imageFormat = ImagePixelEncoding::Rgba32Float;
 			return true;
 
 		case PixelFormat::R16G16B16A16_Float:
-			imageFormat.Encoding = ImagePixelEncoding::Rgba16Float;
+			imageFormat = ImagePixelEncoding::Rgba16Float;
 			return true;
 
 		case PixelFormat::R8G8B8A8_UNorm:
 		case PixelFormat::R8G8B8A8_UNorm_Srgb:
-			imageFormat.Encoding = ImagePixelEncoding::Rgba8Unorm;
+			imageFormat = ImagePixelEncoding::Rgba8Unorm;
 			return true;
 
 		case PixelFormat::B8G8R8A8_UNorm:
 		case PixelFormat::B8G8R8A8_UNorm_Srgb:
-			imageFormat.Encoding = ImagePixelEncoding::Bgra8Unorm;
+			imageFormat = ImagePixelEncoding::Bgra8Unorm;
 			return true;
 		default:
 			return false;
@@ -167,7 +162,7 @@ bool ImageEncoding::DecodeLinearRgb(const ImageBufferView& source, LinearRgbImag
 
 bool ImageEncoding::EncodeBmp(const ImageBufferView& image, std::vector<std::byte>& encodedBytes, std::string& errorMessage)
 {
-	ImagePixelFormat imageFormat;
+	ImagePixelEncoding imageFormat = ImagePixelEncoding::Rgba8Unorm;
 	const std::uint32_t bytesPerPixel = PixelFormatBytesPerTexel(image.Format);
 	const std::uint64_t requiredBytes = static_cast<std::uint64_t>(image.RowPitch) * image.Height;
 	if (!ResolvePixelFormat(image.Format, imageFormat) || image.Width == 0u || image.Height == 0u || image.RowPitch < static_cast<std::uint64_t>(image.Width) * bytesPerPixel
@@ -185,7 +180,7 @@ bool ImageEncoding::EncodeBmp(const ImageBufferView& image, std::vector<std::byt
 		std::byte* outputRow = outputPixels.data() + static_cast<std::size_t>(outputRowPitch) * y;
 		for (std::uint32_t x = 0; x < image.Width; ++x)
 		{
-			ConvertPixel(sourceRow + static_cast<std::size_t>(x) * bytesPerPixel, imageFormat.Encoding, outputRow + static_cast<std::size_t>(x) * 4u);
+			ConvertPixel(sourceRow + static_cast<std::size_t>(x) * bytesPerPixel, imageFormat, outputRow + static_cast<std::size_t>(x) * 4u);
 		}
 	}
 

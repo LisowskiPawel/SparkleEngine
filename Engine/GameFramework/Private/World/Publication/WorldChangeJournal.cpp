@@ -3,11 +3,6 @@
 
 #include <algorithm>
 
-struct WorldChangeBatch::Storage final
-{
-	std::vector<WorldChange> Changes;
-};
-
 WorldChangeBatch::WorldChangeBatch(
     WorldChangeReadStatus status,
     WorldSequence oldestAvailableSequence,
@@ -24,7 +19,7 @@ WorldChangeBatch::WorldChangeBatch(
 
 std::span<const WorldChange> WorldChangeBatch::GetChanges() const noexcept
 {
-	return m_storage != nullptr ? std::span<const WorldChange>(m_storage->Changes).subspan(m_firstChangeIndex) : std::span<const WorldChange>{};
+	return m_storage != nullptr ? std::span<const WorldChange>(*m_storage).subspan(m_firstChangeIndex) : std::span<const WorldChange>{};
 }
 
 namespace ECS
@@ -39,13 +34,13 @@ namespace ECS
 		auto storage = std::make_shared<WorldChangeBatch::Storage>();
 		if (changes.size() > MaxChangesPerBatch)
 		{
-			storage->Changes.push_back(WorldChange{.Kind = WorldChangeKind::WorldReset, .Data = WorldDataKind::World});
+			storage->push_back(WorldChange{.Kind = WorldChangeKind::WorldReset, .Data = WorldDataKind::World});
 		}
 		else
 		{
-			storage->Changes.assign(changes.begin(), changes.end());
+			storage->assign(changes.begin(), changes.end());
 		}
-		for (WorldChange& change : storage->Changes)
+		for (WorldChange& change : *storage)
 		{
 			change.Sequence = ++m_latestSequence;
 		}
@@ -64,22 +59,18 @@ namespace ECS
 		{
 			return WorldChangeBatch(WorldChangeReadStatus::UpToDate, m_latestSequence, m_latestSequence, nullptr);
 		}
-		const WorldSequence oldest = m_batches.front()->Changes.front().Sequence;
+		const WorldSequence oldest = m_batches.front()->front().Sequence;
 		if (oldest > 0 && acknowledgedSequence < oldest - 1)
 		{
 			return WorldChangeBatch(WorldChangeReadStatus::ResyncRequired, oldest, m_latestSequence, nullptr);
 		}
 		for (const std::shared_ptr<const WorldChangeBatch::Storage>& batch : m_batches)
 		{
-			if (batch->Changes.back().Sequence > acknowledgedSequence)
+			if (batch->back().Sequence > acknowledgedSequence)
 			{
-				const auto first = std::upper_bound(
-				    batch->Changes.begin(),
-				    batch->Changes.end(),
-				    acknowledgedSequence,
-				    [](WorldSequence sequence, const WorldChange& change) { return sequence < change.Sequence; });
+				const auto first = std::upper_bound(batch->begin(), batch->end(), acknowledgedSequence, [](WorldSequence sequence, const WorldChange& change) { return sequence < change.Sequence; });
 
-				return WorldChangeBatch(WorldChangeReadStatus::Available, oldest, m_latestSequence, batch, static_cast<std::size_t>(first - batch->Changes.begin()));
+				return WorldChangeBatch(WorldChangeReadStatus::Available, oldest, m_latestSequence, batch, static_cast<std::size_t>(first - batch->begin()));
 			}
 		}
 		return WorldChangeBatch(WorldChangeReadStatus::UpToDate, oldest, m_latestSequence, nullptr);

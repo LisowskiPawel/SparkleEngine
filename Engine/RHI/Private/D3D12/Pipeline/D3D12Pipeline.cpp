@@ -180,12 +180,7 @@ public:
 		return result;
 	}
 
-	struct ResolvedD3D12ShaderStage final
-	{
-		D3D12_SHADER_BYTECODE Bytecode = {};
-	};
-
-	static ResolvedD3D12ShaderStage ResolveD3D12ShaderStage(const RhiShaderStageDesc& shaderDesc, std::string_view pipelineName)
+	static D3D12_SHADER_BYTECODE ResolveD3D12ShaderStage(const RhiShaderStageDesc& shaderDesc, std::string_view pipelineName)
 	{
 		if (!shaderDesc.IsValid())
 		{
@@ -212,10 +207,7 @@ public:
 			    std::format("Pipeline '{}' has invalid cooked shader bytecode for stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));
 		}
 
-		ResolvedD3D12ShaderStage resolved{};
-		resolved.Bytecode.pShaderBytecode = bytecode.Data;
-		resolved.Bytecode.BytecodeLength = bytecode.Size;
-		return resolved;
+		return D3D12_SHADER_BYTECODE{.pShaderBytecode = bytecode.Data, .BytecodeLength = bytecode.Size};
 	}
 };
 
@@ -300,8 +292,8 @@ void D3D12Pipeline::Create(const GraphicsPipelineDesc& desc)
 	RhiContract::ValidateGraphicsPipelineDesc(desc);
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	const std::string pipelineName = desc.DebugName != nullptr ? Strings::ToNarrow(desc.DebugName) : "RHI_GraphicsPipeline";
-	const D3D12PipelineImplementation::ResolvedD3D12ShaderStage vertexShader = D3D12PipelineImplementation::ResolveD3D12ShaderStage(desc.VertexShader, pipelineName);
-	const D3D12PipelineImplementation::ResolvedD3D12ShaderStage pixelShader = D3D12PipelineImplementation::ResolveD3D12ShaderStage(desc.PixelShader, pipelineName);
+	const D3D12_SHADER_BYTECODE vertexShader = D3D12PipelineImplementation::ResolveD3D12ShaderStage(desc.VertexShader, pipelineName);
+	const D3D12_SHADER_BYTECODE pixelShader = D3D12PipelineImplementation::ResolveD3D12ShaderStage(desc.PixelShader, pipelineName);
 
 	const std::vector<D3D12_INPUT_ELEMENT_DESC> vertexLayout = D3D12PipelineImplementation::BuildVertexInput(desc.VertexInput);
 	psoDesc.InputLayout.NumElements = static_cast<UINT>(vertexLayout.size());
@@ -311,8 +303,8 @@ void D3D12Pipeline::Create(const GraphicsPipelineDesc& desc)
 	const auto* bindingLayout = static_cast<const D3D12BindingLayout*>(desc.BindingLayout);
 	psoDesc.pRootSignature = bindingLayout != nullptr ? bindingLayout->GetRootSignature().GetRaw() : nullptr;
 
-	psoDesc.VS = vertexShader.Bytecode;
-	psoDesc.PS = pixelShader.Bytecode;
+	psoDesc.VS = vertexShader;
+	psoDesc.PS = pixelShader;
 
 	psoDesc.PrimitiveTopologyType = D3D12PipelineImplementation::ToD3D12PrimitiveTopologyType(desc.PrimitiveTopology);
 	SetRasterizerState(psoDesc, desc.Rasterizer);
@@ -352,10 +344,10 @@ void D3D12Pipeline::Create(const ComputePipelineDesc& desc)
 	RhiContract::ValidateComputePipelineDesc(desc);
 	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
 	const std::string pipelineName = desc.DebugName != nullptr ? Strings::ToNarrow(desc.DebugName) : "RHI_ComputePipeline";
-	const D3D12PipelineImplementation::ResolvedD3D12ShaderStage computeShader = D3D12PipelineImplementation::ResolveD3D12ShaderStage(desc.ComputeShader, pipelineName);
+	const D3D12_SHADER_BYTECODE computeShader = D3D12PipelineImplementation::ResolveD3D12ShaderStage(desc.ComputeShader, pipelineName);
 	const auto* bindingLayout = static_cast<const D3D12BindingLayout*>(desc.BindingLayout);
 	psoDesc.pRootSignature = bindingLayout != nullptr ? bindingLayout->GetRootSignature().GetRaw() : nullptr;
-	psoDesc.CS = computeShader.Bytecode;
+	psoDesc.CS = computeShader;
 	psoDesc.NodeMask = 0;
 	psoDesc.CachedPSO = {};
 	psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;

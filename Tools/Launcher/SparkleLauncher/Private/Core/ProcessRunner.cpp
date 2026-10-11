@@ -1,5 +1,6 @@
 #include "SparkleLauncher/ProcessRunner.h"
 
+#include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Process/ChildProcess.h"
 
 #include <chrono>
@@ -88,7 +89,7 @@ namespace SparkleLauncher
 	std::string BuildDisplayCommandLine(const std::filesystem::path& executablePath, const std::vector<std::string>& arguments)
 	{
 		std::ostringstream commandLine;
-		commandLine << QuoteDisplayArgument(executablePath.string());
+		commandLine << QuoteDisplayArgument(Strings::ToNarrow(executablePath.wstring()));
 		for (const std::string& argument : arguments)
 		{
 			commandLine << ' ' << QuoteDisplayArgument(argument);

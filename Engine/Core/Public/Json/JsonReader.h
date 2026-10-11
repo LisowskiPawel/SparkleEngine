@@ -9,12 +9,15 @@
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <vector>
 
 namespace Json
 {
 	// Reads an immediate member of a complete object; malformed input or a duplicate requested key fails.
 	SPARKLE_CORE_API std::size_t FindPropertyValue(std::string_view objectText, std::string_view key);
 	SPARKLE_CORE_API bool TryReadStringProperty(std::string_view objectText, std::string_view key, std::string& outValue);
+	// Elements reference the caller's document.
+	SPARKLE_CORE_API bool TryReadArrayProperty(std::string_view objectText, std::string_view key, std::vector<std::string_view>& outElements);
 
 	template <typename TNumber> bool TryReadUnsignedIntegerProperty(std::string_view objectText, std::string_view key, TNumber& outValue)
 	{
