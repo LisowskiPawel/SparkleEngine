@@ -2,28 +2,21 @@
 
 #include "Core/Public/Console/ConsoleCommandRegistry.h"
 #include "Core/Public/Console/CVarControl.h"
-#include "Core/Public/Events/ScopedEventHandle.h"
-#include "Renderer/Public/UI/UiRenderPacket.h"
 
 #include <cstddef>
-#include <Windows.h>
 #include <array>
 #include <memory>
 #include <string>
 #include <vector>
 
 class ConsoleSession;
-class ImGuiRenderPacketBuilder;
-class Timer;
-class Window;
 struct ImGuiInputTextCallbackData;
 struct ImVec4;
-struct WindowMessageEvent;
 
 class GameConsoleOverlay final
 {
 public:
-	GameConsoleOverlay(Timer& timer, Window& window, CVarControlExecutor executor);
+	explicit GameConsoleOverlay(CVarControlExecutor executor);
 	~GameConsoleOverlay() noexcept;
 
 	GameConsoleOverlay(const GameConsoleOverlay&) = delete;
@@ -32,19 +25,11 @@ public:
 	GameConsoleOverlay& operator=(GameConsoleOverlay&&) = delete;
 
 	void Update();
-	UiRenderPacket ConsumeRenderPacket();
+	void ToggleVisibility() noexcept;
 
 	bool IsVisible() const noexcept { return m_isVisible; }
 
 private:
-	void HandleWindowMessage(WindowMessageEvent& event) noexcept;
-	bool ProcessWindowMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void InitializeImGuiContext();
-	void InitializeWin32Backend();
-	void ShutdownImGui() noexcept;
-	void ApplyDpiScale(float dpiScale) noexcept;
-	void ToggleVisibility() noexcept;
-
 	void BuildUI();
 	void DrawOutputRecords();
 	void DrawInputLine();
@@ -61,20 +46,12 @@ private:
 	static std::size_t FindCompletionTokenStart(const std::string& input) noexcept;
 	static void ReplaceInputText(ImGuiInputTextCallbackData& data, const std::string& text);
 
-	Timer& m_timer;
-	Window& m_window;
-	ScopedEventHandle m_windowMessageHandle;
-	ScopedEventHandle m_windowDpiScaleHandle;
 	ConsoleCommandRegistry m_commandRegistry;
 	std::unique_ptr<ConsoleSession> m_consoleSession;
-	std::unique_ptr<ImGuiRenderPacketBuilder> m_renderPacketBuilder;
-	UiRenderPacket m_renderPacket;
 	std::array<char, 512> m_inputBuffer{};
 	std::array<char, 128> m_filterBuffer{};
 	std::size_t m_seenOutputCount = 0;
 	bool m_isVisible = false;
 	bool m_scrollToBottom = true;
 	bool m_focusInput = false;
-	bool m_isImGuiContextInitialized = false;
-	bool m_isWin32BackendInitialized = false;
 };

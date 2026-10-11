@@ -17,10 +17,15 @@ public:
 	const EngineRenderingSettingsState& GetState() const noexcept { return m_state; }
 
 	void RefreshFromRuntimeState() noexcept;
+
 	bool HasPendingRestart() const noexcept;
+
+	const std::string& GetLastError() const noexcept { return m_lastError; }
+
 	std::string BuildPendingRestartMessage() const;
 
 	void SetVSync(bool enabled);
+	void ResetDefaults();
 	void SetBackBufferFormat(PixelFormat format);
 	void SetPreferHighPerformanceAdapter(bool enabled);
 	void SetToneMapper(EngineToneMapper toneMapper);
@@ -56,15 +61,20 @@ private:
 		{
 			return;
 		}
+		const TValue previous = destination;
 		destination = value;
-		CommitState();
+		if (!CommitState())
+		{
+			destination = previous;
+		}
 	}
 
-	void CommitState();
+	bool CommitState();
 	bool ComputePendingRestart() const noexcept;
 	std::string DescribePendingRestart() const;
 
 	EngineRenderingSettingsState m_state{};
+	std::string m_lastError;
 	PixelFormat m_sessionBackBufferFormat = RhiPresentationDefaults::DefaultBackBufferFormat;
 	bool m_sessionPreferHighPerformanceAdapter = true;
 #if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING

@@ -6,6 +6,8 @@
 #include "FrameGraph/Builder/FrameGraphBuilder.h"
 #include "FrameGraph/FrameGraph.h"
 #include "Passes/Presentation/PresentationPolicy.h"
+#include "Passes/Presentation/PostProcessing/Vignette.h"
+#include "Passes/Presentation/PostProcessing/ChromaticAberration.h"
 #include "Passes/Scene/SceneRenderingPasses.h"
 #include "Providers/RendererImageProviderStack.h"
 #include "Pipeline/RenderPassRuntimeCache.h"
@@ -40,7 +42,9 @@ RenderFrameGraphSettings FramePipeline::ResolveFrameGraphSettings() const noexce
 	    .OutputFormat = m_deviceServices.GetRenderHardwareInterface().GetPresentationService().GetPresentColorFormat(),
 	    .ExposureMeteringMethod = displaySettings.ExposureMeteringMethod,
 	    .PresentationTarget = ShouldOutputToBackBuffer() ? FramePresentationTarget::BackBuffer : FramePresentationTarget::ViewportProduct,
-	    .RequestedOutputs = m_viewportRenderRequest.RequestedOutputs};
+	    .RequestedOutputs = m_viewportRenderRequest.RequestedOutputs,
+	    .VignetteActive = IsVignetteActive(m_viewportRenderRequest.ViewMode),
+	    .ChromaticAberrationActive = IsChromaticAberrationActive(m_viewportRenderRequest.ViewMode)};
 }
 
 bool FramePipeline::ShouldOutputToBackBuffer() const noexcept

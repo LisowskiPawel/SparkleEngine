@@ -25,8 +25,6 @@ void EngineRenderingSettingsController::RefreshFromRuntimeState() noexcept
 		return;
 	}
 	m_state = m_refreshHandler();
-	m_sessionBackBufferFormat = m_state.BackBufferFormat;
-	m_sessionPreferHighPerformanceAdapter = m_state.PreferHighPerformanceAdapter;
 }
 
 bool EngineRenderingSettingsController::HasPendingRestart() const noexcept
@@ -39,11 +37,33 @@ std::string EngineRenderingSettingsController::BuildPendingRestartMessage() cons
 	return DescribePendingRestart();
 }
 
-void EngineRenderingSettingsController::CommitState()
+bool EngineRenderingSettingsController::CommitState()
 {
-	if (m_commitHandler)
+	try
 	{
+		if (!m_commitHandler)
+		{
+			m_lastError = "Settings persistence is unavailable.";
+			return false;
+		}
 		m_commitHandler(m_state);
+		m_lastError.clear();
+		return true;
+	}
+	catch (const std::exception& error)
+	{
+		m_lastError = error.what();
+		return false;
+	}
+}
+
+void EngineRenderingSettingsController::ResetDefaults()
+{
+	const auto previous = m_state;
+	m_state = EngineRenderingSettingsState{};
+	if (!CommitState())
+	{
+		m_state = previous;
 	}
 }
 

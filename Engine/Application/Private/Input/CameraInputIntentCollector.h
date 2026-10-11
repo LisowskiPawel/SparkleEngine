@@ -19,13 +19,13 @@ public:
 	CameraInputIntentCollector(const CameraInputIntentCollector&) = delete;
 	CameraInputIntentCollector& operator=(const CameraInputIntentCollector&) = delete;
 	CameraInputIntent Collect(float aspectRatio) noexcept;
+	void EndMouseLook() noexcept;
 
 private:
 	void OnMouseButton(const MouseButtonEvent& event) noexcept;
 	void OnKeyboard(const KeyboardEvent& event) noexcept;
 	void OnMouseMove(const MouseMoveEvent& event) noexcept;
 	void OnMouseWheel(const MouseWheelEvent& event) noexcept;
-	void EndMouseLook() noexcept;
 
 	InputSystem& m_inputSystem;
 	Window& m_window;

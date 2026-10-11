@@ -108,6 +108,10 @@ This source separation was reconciled on 2026-10-04; it does not establish runti
 
 World publishes immutable read view/change sequence -> `EditorSceneModelBuilder` creates presentation rows -> user selects an object -> inspector creates forward and inverse typed commands -> transaction history submits with current world generation -> GameWorld queues and commits accepted edits -> change journal advances -> editor rebuilds affected presentation -> Renderer receives the resulting structural/dynamic publication. Undo runs the stored inverse through the same path.
 
+## Product Journey Changes
+
+The PD-1 working candidate adds Help > Controls, File > Quit, a visible level-operation failure surface and Reset rendering defaults in the Settings toolbar. Dedicated vignette and chromatic aberration passes retain their approved defaults; effect widgets are deferred. Failed settings writes retain the previous settings and show the error; reopening Settings preserves restart-required state. Rendering settings retain the existing shared capture/apply owner; no additional viewport settings snapshot is published. These changes still require the candidate journey checks below.
+
 ## `FCR-PROD-04` Editor Contract
 
 Sparkle Editor is a **required shipped product** for `v0.1.0`, currently implemented by `ShowcaseEditor`. Qualify its package/workspace/dependency closure and the seven release-map workflows on a clean standard-user machine; intentional Empty startup needs no example download. Game remains structurally isolated from Editor code and tools. [Application](../Application/README.md#product-contract-boundary) owns hosting; this section owns the feature-local verdict contract.

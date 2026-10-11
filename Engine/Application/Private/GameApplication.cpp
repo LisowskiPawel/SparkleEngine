@@ -7,7 +7,7 @@
 #include "Core/Public/Process/ProcessReadiness.h"
 #include "Window/Window.h"
 #include "Renderer.h"
-#include "GameConsole/GameConsoleHost.h"
+#include "GameUi/GameUiHost.h"
 #include "Input/InputSystem.h"
 #include "World/GameWorld.h"
 #include "Input/CameraInputIntentCollector.h"
@@ -43,7 +43,10 @@ GameApplication::GameApplication(GameApplicationOptions options) noexcept :
 {
 }
 
-GameApplication::~GameApplication() = default;
+GameApplication::~GameApplication()
+{
+	Shutdown();
+}
 
 Timer& GameApplication::GetTimer() noexcept
 {
@@ -96,14 +99,14 @@ void GameApplication::Initialize()
 	InitializeInput();
 	InitializeGameWorld();
 	InitializeRenderer();
-	InitializeGameConsole();
+	InitializeGameUi();
 	m_isInitialized = true;
 }
 
 void GameApplication::InitializeHost()
 {
 	m_timer = std::make_unique<Timer>();
-	m_window = std::make_unique<Window>("Sparkle Engine");
+	m_window = std::make_unique<Window>(m_options.EnableGameUi ? "Sparkle Game" : "Sparkle Editor");
 }
 
 void GameApplication::InitializeInput()
@@ -142,17 +145,29 @@ void GameApplication::InitializeRenderer()
 		}
 	}
 
-	rendererConfig.EnableUiRenderPackets = m_options.EnableUiRenderPackets || m_options.EnableGameConsole;
+	rendererConfig.EnableUiRenderPackets = m_options.EnableUiRenderPackets || m_options.EnableGameUi;
 	rendererConfig.AssetTaskExecutor = &m_taskRuntime->GetExecutor();
 	rendererConfig.AssetTaskParentScope = &m_taskRuntime->GetApplicationScope();
 	m_renderer = std::make_unique<Renderer>(*m_timer, *m_window, graphicsLaunch, rendererConfig);
 }
 
-void GameApplication::InitializeGameConsole()
+void GameApplication::InitializeGameUi()
 {
-	if (m_options.EnableGameConsole)
+	if (m_options.EnableGameUi)
 	{
-		m_gameConsoleHost = std::make_unique<GameConsoleHost>(*m_timer, *m_window, [this](CVarControlRequest request) { return m_renderer->ExecuteConsoleVariables(std::move(request)); });
+		CVarControlExecutor consoleExecutor;
+#if !SPARKLE_BUILD_SHIPPING
+		if (m_options.EnableGameConsole)
+		{
+			consoleExecutor = [this](CVarControlRequest request)
+			{
+				return m_renderer->ExecuteConsoleVariables(std::move(request));
+			};
+		}
+#endif
+		m_gameUiHost = std::make_unique<GameUiHost>(*m_timer, *m_window, *m_levelSession, [this]() { m_cameraInputIntentCollector->EndMouseLook(); }, std::move(consoleExecutor));
+
+		m_inputSystem->SetInputCaptureQuery([this]() { return m_gameUiHost->WantsInputCapture(); });
 	}
 }
 
@@ -250,26 +265,22 @@ bool GameApplication::Tick()
 			break;
 	}
 
-	UpdateGame();
-	if (m_gameConsoleHost != nullptr)
+	if (m_gameUiHost != nullptr)
 	{
-		if (auto packet = m_gameConsoleHost->Update())
-		{
-			m_renderer->SubmitUiRenderPacket(std::move(*packet));
-		}
+		m_renderer->SubmitUiRenderPacket(m_gameUiHost->Update());
 	}
+	UpdateGame();
 	m_renderer->OnRender();
 	return true;
 }
 
 void GameApplication::Shutdown()
 {
-	if (!m_isInitialized)
+	if (m_inputSystem)
 	{
-		return;
+		m_inputSystem->ClearInputCaptureQuery();
 	}
-
-	m_gameConsoleHost.reset();
+	m_gameUiHost.reset();
 	m_renderer.reset();
 	m_levelSession.reset();
 	m_cameraInputIntentCollector.reset();

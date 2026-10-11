@@ -4,6 +4,8 @@
 #include "Core/Public/Console/CVar.h"
 #include "Core/Public/Console/CVarRegistry.h"
 #include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Files/FileUtils.h"
+#include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
@@ -12,6 +14,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <system_error>
 #include <type_traits>
 #include <utility>
@@ -35,6 +38,8 @@ std::span<const std::string_view> EngineRenderingSettingsPersistence::GetPersist
 	    "r.ExternalCapture.StartupProvider",
 #endif
 	    "r.VSync",
+	    "r.Vignette",
+	    "r.ChromaticAberration",
 	    "r.BackBufferFormat",
 	    "r.PreferHighPerformanceAdapter",
 	    "r.ToneMapper",
@@ -63,21 +68,29 @@ std::span<const std::string_view> EngineRenderingSettingsPersistence::GetPersist
 	return persistedNames;
 }
 
-void EngineRenderingSettingsPersistence::Apply() noexcept
+void EngineRenderingSettingsPersistence::Apply()
 {
 	ApplyFile(GetDefaultConfigPath());
 	ApplyFile(GetUserConfigPath());
 }
 
-void EngineRenderingSettingsPersistence::ApplyFile(const std::filesystem::path& path) noexcept
+void EngineRenderingSettingsPersistence::ApplyFile(const std::filesystem::path& path)
 {
-	std::ifstream input(path);
-	if (!input.is_open())
+	std::error_code statusError;
+	if (!std::filesystem::exists(path, statusError) && !statusError)
 	{
 		return;
 	}
-
+	std::string text;
+	std::string failure;
+	if (!Files::TryReadAllText(path, text, failure))
+	{
+		throw Diagnostics::Error(failure + " Repair or remove this settings file before retrying.");
+	}
+	std::istringstream input(text);
+	std::vector<std::pair<ConsoleVariableBase*, std::string>> assignments;
 	bool inTargetSection = false;
+	bool foundSection = false;
 	for (std::string line; std::getline(input, line);)
 	{
 		const std::string trimmed = Strings::TrimCopy(line);
@@ -85,34 +98,45 @@ void EngineRenderingSettingsPersistence::ApplyFile(const std::filesystem::path& 
 		{
 			continue;
 		}
-
 		if (trimmed.starts_with('[') && trimmed.ends_with(']'))
 		{
-			inTargetSection = trimmed.size() > 2 && trimmed.substr(1, trimmed.size() - 2) == GetSectionName();
+			inTargetSection = trimmed.substr(1, trimmed.size() - 2) == GetSectionName();
+			foundSection = foundSection || inTargetSection;
 			continue;
 		}
 		if (!inTargetSection)
 		{
 			continue;
 		}
-
 		const std::size_t separator = trimmed.find('=');
 		if (separator == std::string::npos)
 		{
-			continue;
+			throw Diagnostics::Error("Malformed settings in " + path.string() + ". Repair or remove this file before retrying.");
 		}
-
 		const std::string key = Strings::TrimCopy(std::string_view(trimmed).substr(0, separator));
 		if (!IsPersistedName(key))
 		{
 			continue;
 		}
-		if (ConsoleVariableBase* variable = ConsoleVariableRegistry::Get().Find(key))
+		ConsoleVariableBase* variable = ConsoleVariableRegistry::Get().Find(key);
+		if (!variable)
 		{
-			const std::string value = Strings::TrimCopy(std::string_view(trimmed).substr(separator + 1));
-			std::string errorMessage;
-			(void) variable->TrySetValueFromString(value, errorMessage);
+			continue;
 		}
+		const std::string value = Strings::TrimCopy(std::string_view(trimmed).substr(separator + 1));
+		if (!variable->ValidateValueFromString(value, failure))
+		{
+			throw Diagnostics::Error("Invalid " + key + " in " + path.string() + ": " + failure + ". Repair or remove this file before retrying.");
+		}
+		assignments.emplace_back(variable, value);
+	}
+	if (!foundSection || assignments.empty())
+	{
+		throw Diagnostics::Error("No valid rendering settings in " + path.string() + ". Repair or remove this file before retrying.");
+	}
+	for (const auto& [variable, value] : assignments)
+	{
+		variable->TrySetValueFromString(value, failure);
 	}
 }
 
@@ -154,6 +178,8 @@ void EngineRenderingSettingsPersistence::Write(const EngineRenderingSettingsStat
 	};
 
 	appendConfigValue("r.VSync", state.VSync);
+	appendConfigValue("r.Vignette", state.Vignette);
+	appendConfigValue("r.ChromaticAberration", state.ChromaticAberration);
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	appendConfigValue("r.ExternalCapture.StartupProvider", state.StartupCaptureProvider);
 #endif
@@ -222,10 +248,17 @@ void EngineRenderingSettingsPersistence::Write(const EngineRenderingSettingsStat
 		lines.insert(lines.end(), sectionLines.begin(), sectionLines.end());
 	}
 
-	std::ofstream output(configPath, std::ios::trunc);
+	std::string output;
 	for (const std::string& line : lines)
 	{
-		output << line << '\n';
+		output += line;
+		output += '\n';
+	}
+	std::string failure;
+	if (!Files::TryWriteAllTextAtomic(configPath, output, failure))
+	{
+		Files::CleanupTemporaryFile(Files::BuildTemporaryPath(configPath));
+		throw Diagnostics::Error(failure);
 	}
 }
 

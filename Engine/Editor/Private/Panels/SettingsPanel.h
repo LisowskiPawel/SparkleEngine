@@ -22,7 +22,7 @@ public:
 	void BuildUI(bool disableInteraction);
 
 private:
-	void DrawToolbar();
+	void DrawToolbar(bool disableInteraction);
 	bool HasPendingRestart() const noexcept;
 
 	EngineRenderingSettingsController* m_renderingSettings = nullptr;

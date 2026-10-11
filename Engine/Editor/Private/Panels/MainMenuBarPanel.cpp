@@ -163,6 +163,11 @@ void MainMenuBarPanel::BuildFileMenu() noexcept
 	{
 		m_viewportCaptureHandler();
 	}
+	ImGui::Separator();
+	if (ImGui::MenuItem("Quit", "Alt+F4", false, m_window != nullptr))
+	{
+		m_window->RequestClose();
+	}
 }
 
 void MainMenuBarPanel::BuildWindowsMenu() noexcept
@@ -291,7 +296,58 @@ void MainMenuBarPanel::BuildUI() noexcept
 		ImGui::EndMenu();
 	}
 
+	if (ImGui::BeginMenu("Help"))
+	{
+		const std::string controlsLabel = UiUtil::MakeIconLabel(UiUtil::EditorIcon::Help, "Controls");
+		if (ImGui::MenuItem(controlsLabel.c_str()))
+		{
+			m_helpOpen = true;
+		}
+		ImGui::EndMenu();
+	}
 	BuildWindowControls();
 
 	ImGui::EndMainMenuBar();
+	BuildHelpWindow();
+	BuildLevelStatus();
+}
+
+void MainMenuBarPanel::BuildHelpWindow() noexcept
+{
+	if (m_helpOpen)
+	{
+		ImGui::SetNextWindowSize(ImVec2(520.0f, 320.0f), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("Editor Help", &m_helpOpen))
+		{
+			ImGui::TextWrapped(
+			    "Start Editor or Game through Sparkle Launcher. File > Open Level selects a registered level; missing cooked content fails visibly. File > Save All explicitly saves the active level "
+			    "source. Use the scene inspector for supported edits and undo/redo.");
+
+			ImGui::TextWrapped(
+			    "Hold right mouse over the viewport to look. W/A/S/D or arrows move, E/Space up, Q/C down, Shift accelerates, wheel changes speed. Esc releases the mouse. Window > Settings changes "
+			    "rendering settings; Reset rendering defaults restores defaults. Quit or Alt+F4 closes Editor.");
+		}
+		ImGui::End();
+	}
+}
+
+void MainMenuBarPanel::BuildLevelStatus() noexcept
+{
+	if (m_levelSession && (m_levelSession->IsLevelChangeInProgress() || !m_levelSession->GetLastLoadDiagnostic().empty()))
+	{
+		if (ImGui::Begin("Level operation"))
+		{
+			if (m_levelSession->IsLevelChangeInProgress())
+			{
+				ImGui::TextUnformatted("Loading selected level. The previous level remains active until loading succeeds.");
+			}
+			ImGui::TextWrapped("%s", std::string(m_levelSession->GetLastLoadDiagnostic()).c_str());
+			ImGui::TextUnformatted("Use File > Open Level to retry or select another level. Sync/cook missing content through Sparkle Launcher.");
+			if (ImGui::Button("Quit Editor") && m_window)
+			{
+				m_window->RequestClose();
+			}
+		}
+		ImGui::End();
+	}
 }

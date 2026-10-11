@@ -66,7 +66,7 @@ Every production/configuration path in the scoped diff is listed once. `M` means
 | `M Engine/Renderer/Public/Settings/EngineRenderingSettings.h` | Deletes Lighting and ViewMode settings state/setters. |
 | `M Engine/Renderer/Private/Settings/EngineRenderingSettings.cpp` | Deletes obsolete settings mutations. |
 | `M Engine/Renderer/Private/Settings/EngineRenderingSettingsPersistence.cpp` | Deletes obsolete persisted Lighting selector. |
-| `M Engine/Renderer/Private/Settings/EngineRenderingSettingsRuntime.cpp` | Deletes Lighting/ViewMode settings capture and application. |
+| `M Engine/Renderer/Private/Settings/EngineRenderingSettingsControls.cpp` | Deletes Lighting/ViewMode settings capture and application. |
 | `M Engine/Renderer/Private/Frame/FramePipelineGraph.cpp` | Removes Lighting selector topology/provider branches and retains the ordinary ReSTIR Lit recipe. |
 | `M Engine/Renderer/Private/Passes/Lighting/Lighting.cpp` | Removes the GBuffer-seeded Reference Path Tracer graph branch and restores one ordinary Lit composition. |
 | `M Engine/Renderer/Private/Resources/History/FrameHistory.h` | Deletes the rejected reference accumulation history member. |

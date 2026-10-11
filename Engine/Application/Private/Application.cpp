@@ -10,7 +10,7 @@
 
 #include <cstdlib>
 
-void Application::ConfigureProcessFromCommandLine() noexcept
+void Application::ConfigureProcessFromCommandLine()
 {
 	if (Environment::GetFlag("SPARKLE_SUPPRESS_CRASH_DIALOGS"))
 	{
@@ -21,7 +21,9 @@ void Application::ConfigureProcessFromCommandLine() noexcept
 	ConcurrencyLaunchCVars::Register();
 	TaskRuntimeCVars::Register();
 	EngineRenderingSettingsPersistence::Apply();
+#if !SPARKLE_BUILD_SHIPPING
 	ApplicationCommandLineCVars::Apply();
+#endif
 }
 
 void Application::SaveRenderingSettings(const EngineRenderingSettingsState& settings)
@@ -31,15 +33,21 @@ void Application::SaveRenderingSettings(const EngineRenderingSettingsState& sett
 
 void Application::Run()
 {
-	Initialize();
-
-	for (;;)
+	try
 	{
-		if (!Tick())
+		Initialize();
+		for (;;)
 		{
-			break;
+			if (!Tick())
+			{
+				break;
+			}
 		}
 	}
-
+	catch (...)
+	{
+		Shutdown();
+		throw;
+	}
 	Shutdown();
 }

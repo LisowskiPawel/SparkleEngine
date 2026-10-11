@@ -3,133 +3,22 @@
 
 #include "Core/Public/Console/ConsoleBuiltinCommands.h"
 #include "Core/Public/Console/ConsoleSession.h"
-#include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "Renderer/Public/UI/ImGuiRenderPacketBuilder.h"
-#include "Time/Timer.h"
-#include "Window/Window.h"
 
-#include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
 #include <algorithm>
 #include <optional>
 #include <utility>
 
-IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-GameConsoleOverlay::GameConsoleOverlay(Timer& timer, Window& window, CVarControlExecutor executor) :
-    m_timer(timer),
-    m_window(window)
+GameConsoleOverlay::GameConsoleOverlay(CVarControlExecutor executor)
 {
-	if (!m_window.GetHWND())
-	{
-		throw Diagnostics::Error("Game console requires a valid host window.");
-	}
 	ConsoleBuiltinCommands::Register(m_commandRegistry, std::move(executor));
 	m_consoleSession = std::make_unique<ConsoleSession>(m_commandRegistry, ConsoleCommandScope::Game);
-	m_renderPacketBuilder = std::make_unique<ImGuiRenderPacketBuilder>();
 	m_consoleSession->AddOutput(ConsoleCommandSeverity::Info, "Game console ready. Press tilde to close.");
-
-	try
-	{
-		InitializeImGuiContext();
-		ApplyDpiScale(m_window.GetDpiScale());
-		InitializeWin32Backend();
-
-		auto handle = window.OnWindowMessage.Add([this](WindowMessageEvent& event) { HandleWindowMessage(event); });
-		m_windowMessageHandle = ScopedEventHandle(window.OnWindowMessage, handle);
-
-		auto dpiScaleHandle = window.OnDpiScaleChanged.Add([this](float dpiScale) { ApplyDpiScale(dpiScale); });
-		m_windowDpiScaleHandle = ScopedEventHandle(window.OnDpiScaleChanged, dpiScaleHandle);
-	}
-	catch (...)
-	{
-		ShutdownImGui();
-		throw;
-	}
 }
 
-GameConsoleOverlay::~GameConsoleOverlay() noexcept
-{
-	ShutdownImGui();
-}
-
-void GameConsoleOverlay::ShutdownImGui() noexcept
-{
-	m_windowDpiScaleHandle.Reset();
-	m_windowMessageHandle.Reset();
-
-	if (m_isWin32BackendInitialized)
-	{
-		ImGui_ImplWin32_Shutdown();
-		m_isWin32BackendInitialized = false;
-	}
-
-	if (m_isImGuiContextInitialized)
-	{
-		ImGui::DestroyContext();
-		m_isImGuiContextInitialized = false;
-	}
-}
-
-void GameConsoleOverlay::HandleWindowMessage(WindowMessageEvent& event) noexcept
-{
-	if (ProcessWindowMessage(event.hWnd, event.msg, event.wParam, event.lParam))
-	{
-		event.handled = true;
-	}
-}
-
-bool GameConsoleOverlay::ProcessWindowMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
-{
-	if (msg == WM_KEYDOWN && wParam == VK_OEM_3)
-	{
-		const bool isRepeat = (lParam & (1 << 30)) != 0;
-		if (!isRepeat)
-		{
-			ToggleVisibility();
-			return true;
-		}
-	}
-
-	if (!m_isVisible)
-	{
-		return false;
-	}
-
-	return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam) != 0;
-}
-
-void GameConsoleOverlay::InitializeImGuiContext()
-{
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	m_isImGuiContextInitialized = true;
-
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.IniFilename = nullptr;
-	ImGuiRenderPacketBuilder::ConfigureProducerContext();
-}
-
-void GameConsoleOverlay::InitializeWin32Backend()
-{
-	if (!ImGui_ImplWin32_Init(m_window.GetHWND()))
-	{
-		throw Diagnostics::Error("Game console failed to initialize the Win32 ImGui backend.");
-	}
-	m_isWin32BackendInitialized = true;
-}
-
-void GameConsoleOverlay::ApplyDpiScale(float dpiScale) noexcept
-{
-	ImGuiStyle& style = ImGui::GetStyle();
-	style = ImGuiStyle{};
-	ImGui::StyleColorsDark(&style);
-	style.FontScaleDpi = dpiScale;
-	style.ScaleAllSizes(dpiScale);
-}
+GameConsoleOverlay::~GameConsoleOverlay() noexcept = default;
 
 void GameConsoleOverlay::ToggleVisibility() noexcept
 {
@@ -139,22 +28,10 @@ void GameConsoleOverlay::ToggleVisibility() noexcept
 
 void GameConsoleOverlay::Update()
 {
-	ImGuiIO& io = ImGui::GetIO();
-	io.DeltaTime = static_cast<float>(m_timer.GetDelta(TimeDomain::Unscaled, TimeUnit::Seconds));
-
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
 	if (m_isVisible)
 	{
 		BuildUI();
 	}
-	ImGui::Render();
-	m_renderPacket = m_renderPacketBuilder->Build(*ImGui::GetDrawData(), UiPresentationMode::HostOverlay);
-}
-
-UiRenderPacket GameConsoleOverlay::ConsumeRenderPacket()
-{
-	return std::move(m_renderPacket);
 }
 
 void GameConsoleOverlay::BuildUI()

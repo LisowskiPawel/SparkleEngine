@@ -62,6 +62,11 @@ void RenderingSettingsPanel::BuildUI(bool disableInteraction, const char* filter
 		ImGui::Dummy(ImVec2(0.0f, 4.0f));
 	}
 
+	if (!m_settings->GetLastError().empty())
+	{
+		ImGui::TextWrapped("Settings were not saved: %s", m_settings->GetLastError().c_str());
+		ImGui::Dummy(ImVec2(0.0f, 4.0f));
+	}
 	ImGui::BeginDisabled(disableInteraction);
 	DrawDisplaySettingsSection(*m_settings, settings, filterText);
 	DrawExposureSettingsSection(*m_settings, settings, filterText);

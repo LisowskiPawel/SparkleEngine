@@ -10,6 +10,25 @@
 
 These records prove only the inspection or document checks they name. Current product choices and next actions belong in [Release Scope](README.md#approval-and-next-work); this page does not grant redistribution permission or build/runtime acceptance.
 
+
+## Rendering Settings Scope Correction: ITER-PD1-02
+
+**Candidate:** `62918f7b13ec38fbebf2f8b6b25fd8707e719930` plus retained worktree; 2026-10-11. Source hashes and checks: `artifacts/validation/releases/0.1.0/62918f7b-pd2/shared-settings-*`.
+
+The owner deferred new effect toggles and separate Game rendering-settings UI. The viewport status projection, its producer/consumers, effect widgets and new Show-menu group are removed. Editor retains the existing Renderer capture/apply and Application persistence path. Dedicated effect passes and approved defaults remain. Earlier PD-1 UI receipts describe their original candidate and do not qualify this correction.
+
+**Local checks:** scoped style, architecture boundaries and `git diff --check` pass. The full style gate is **BLOCKED** by concurrent ShaderCompiler formatting/policy failures recorded in `shared-settings-style.log`. `cmake --build build --config ShippingEditor --target ShowcaseEditor --parallel 4` and the corresponding `ShippingGame` / `ShowcaseGame` command both exit `0` (logs `shared-settings-editor-build.log` and `shared-settings-game-build.log`). Runtime journeys and PD-2 acceptance are not established by these checks.
+
+## Product Shells And Post Processing: ITER-PD1-01
+
+**Candidate:** `62918f7b13ec38fbebf2f8b6b25fd8707e719930` plus retained worktree, 2026-10-11. Reports: `artifacts/validation/releases/0.1.0/62918f7b-pd1/features/FCR-PROD-01/completion.md` and `FCR-PROD-04/completion.md` in that same features root. Source/output hashes and raw receipts remain in the iteration root; concurrent ShaderCompiler edits are included explicitly.
+
+**PASS, local only:** ShippingGame and ShippingEditor builds, architecture boundary check, style across 2,204 files and Empty shader/content cook. Earlier bounded Game/Editor startup, resize/minimize and close probes exit 0; invalid settings show the exact file/key diagnostic without overwriting the file. Final post-processing activation and shader CLI have separate receipts. No visual toggle matrix or clean-machine claim follows.
+
+**Source:** existing Game/Editor hosts now expose menu/help, settings/reset/quit and level failures. Effects have independent feature-owned passes and a [Post Processing Show group](../../Architecture/Modules/Engine/Renderer/Features/DebugViews/Controls/ShowFlags.md#post-processing): effects On by default, debug views Off by default, Lit/Reference display effects allowed. Tone mapping and raw Reference products retain their owners.
+
+**BLOCKED, full PD-1:** settings failure/round-trip routes, real input/DPI, corrupt/missing content, unsupported providers, Editor edit/save and exact visual workloads remain unqualified. Invalid-settings automated dismissal failed; no successful exit is claimed for that probe. Package/archive and clean-machine proof remain PD-3 work. Earlier FR-01 rights/payload findings are unchanged.
+
 ## Current Candidate Baseline: ITER-REL-01-12
 
 **Candidate:** `fec29052c6f6195547f2062da9def86e520dc0df`, clean start, 2026-10-11. Owner BuildAndPackaging / Acceptance; FR-01 / REL-01 / REL-02. `NS-OWNERSHIP`, `NS-EVIDENCE`, `NS-ADOPTION`; graphics targets preserved. Existing earlier records retain their own candidates. Risks: reusing stale baseline evidence or treating source/notice identity as asset permission; checks below bind the fresh path and leave unknown permissions blocked.

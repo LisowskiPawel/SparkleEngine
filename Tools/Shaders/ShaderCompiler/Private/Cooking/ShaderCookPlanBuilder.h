@@ -6,13 +6,7 @@
 class ShaderBackendPool;
 struct ShaderCookSettings;
 
-class ShaderCookPlanBuilder final
+namespace ShaderCookPlanBuilder
 {
-public:
-	ShaderCookPlanBuilder() = delete;
-
-	static ShaderCookPipelinePlan Build(const ShaderCookSettings& settings, ShaderBackendPool& backendPool, const ToolWorkProgressCallback& progress);
-
-private:
-	static void BuildDependencyManifest(ShaderCookPipelinePlan& plan);
-};
+	ShaderCookPipelinePlan Build(const ShaderCookSettings& settings, ShaderBackendPool& backendPool, const ToolWorkProgressCallback& progress);
+}

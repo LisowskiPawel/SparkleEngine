@@ -32,6 +32,10 @@ CameraInputIntentCollector::~CameraInputIntentCollector() noexcept
 
 CameraInputIntent CameraInputIntentCollector::Collect(float aspectRatio) noexcept
 {
+	if (GetForegroundWindow() != m_window.GetHWND() || m_inputSystem.GetState(InputLayer::Gameplay).IsMouseButtonDown(MouseButton::Right) == false)
+	{
+		EndMouseLook();
+	}
 	const InputState& inputState = m_inputSystem.GetState(InputLayer::Gameplay);
 	const bool forwardHeld = inputState.IsKeyDown(Key::W) || inputState.IsKeyDown(Key::Up);
 	const bool backwardHeld = inputState.IsKeyDown(Key::S) || inputState.IsKeyDown(Key::Down);

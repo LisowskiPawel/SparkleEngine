@@ -9,7 +9,7 @@ struct EngineRenderingSettingsState;
 class EngineRenderingSettingsPersistence final
 {
 public:
-	static void Apply() noexcept;
+	static void Apply();
 	static void Write(const EngineRenderingSettingsState& state);
 
 private:
@@ -17,7 +17,7 @@ private:
 
 	static std::filesystem::path GetDefaultConfigPath();
 	static std::filesystem::path GetUserConfigPath();
-	static void ApplyFile(const std::filesystem::path& path) noexcept;
+	static void ApplyFile(const std::filesystem::path& path);
 	static std::span<const std::string_view> GetPersistedNames() noexcept;
 	static bool IsPersistedName(std::string_view name) noexcept;
 };

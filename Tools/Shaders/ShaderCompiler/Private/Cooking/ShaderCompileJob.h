@@ -22,6 +22,9 @@ struct ShaderCompileJob final
 	std::uint64_t RequestHash = 0;
 	ShaderCompileInputHash InputHash = 0;
 	std::vector<std::string> VirtualDependencies;
+
+	// Publication destination in the selected catalog, excluded from compiler-input identity.
+	std::size_t ShaderIndex = 0;
 };
 
 struct ShaderCompileResult final
@@ -31,10 +34,4 @@ struct ShaderCompileResult final
 	ShaderCompileInputHash InputHash = 0;
 	CookedStageBuild Output;
 	ShaderDebugArtifactSet DebugArtifacts;
-};
-
-struct ShaderCompileConsumer final
-{
-	std::size_t JobIndex = 0;
-	std::size_t ShaderIndex = 0;
 };

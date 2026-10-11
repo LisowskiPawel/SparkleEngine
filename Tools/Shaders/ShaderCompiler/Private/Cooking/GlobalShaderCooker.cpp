@@ -10,7 +10,30 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/FileSystemUtils.h"
 
-#include <unordered_set>
+#include <span>
+
+void GlobalShaderCooker::PrepareShaderProducts(ShaderCookPipelinePlan& plan, std::span<ShaderCompileResult> compileResults)
+{
+	for (std::size_t jobIndex = 0; jobIndex < plan.jobs.size(); ++jobIndex)
+	{
+		const ShaderCompileJob& job = plan.jobs[jobIndex];
+		const ShaderCookDesc& shader = plan.shaders[job.ShaderIndex];
+		ShaderCompileResult& compiled = compileResults[jobIndex];
+		if (compiled.ShaderType != job.Request.ShaderType || compiled.Target != job.Request.Target || compiled.InputHash != job.InputHash)
+		{
+			throw Diagnostics::Error("Shader compile result does not match its immutable job identity.");
+		}
+		plan.shaderOutputs[job.ShaderIndex].push_back(
+		    ShaderCookProduct{
+		        .shaderTypeId = shader.shaderTypeId,
+		        .target = compiled.Target,
+		        .features = shader.features,
+		        .rayTracing = shader.rayTracing,
+		        .parameterLayout = shader.parameterLayout,
+		        .bindingRemaps = job.Request.DescriptorBindingRemaps,
+		        .compiled = std::move(compiled.Output)});
+	}
+}
 
 ShaderCookResult GlobalShaderCooker::CookAll(const ShaderCookSettings& settings, const ToolWorkProgressCallback& progress) const
 {
@@ -23,12 +46,7 @@ ShaderCookResult GlobalShaderCooker::CookAll(const ShaderCookSettings& settings,
 	ShaderBackendPool backendPool;
 	ShaderCookPipelinePlan plan = ShaderCookPlanBuilder::Build(settings, backendPool, progress);
 	result.compileJobCount = plan.jobs.size();
-	std::unordered_set<ShaderTypeId> selectedShaderTypes;
-	for (const ShaderCompileJob& job : plan.jobs)
-	{
-		selectedShaderTypes.insert(job.Request.ShaderType);
-	}
-	result.selectedShaderCount = selectedShaderTypes.size();
+	result.selectedShaderCount = plan.shaders.size();
 	if (plan.jobs.empty() && plan.removedShaderTypeCount == 0)
 	{
 		if (progress)
@@ -52,25 +70,7 @@ ShaderCookResult GlobalShaderCooker::CookAll(const ShaderCookSettings& settings,
 	{
 		progress({.Action = "Preparing shader publication", .Completed = totalWork - 1, .Total = totalWork});
 	}
-	for (const ShaderCompileConsumer& consumer : plan.consumers)
-	{
-		const ShaderCompileJob& job = plan.jobs[consumer.JobIndex];
-		const ShaderCookDesc& shader = plan.shaders[consumer.ShaderIndex];
-		ShaderCompileResult& compiled = compileResults[consumer.JobIndex];
-		if (compiled.ShaderType != job.Request.ShaderType || compiled.Target != job.Request.Target || compiled.InputHash != job.InputHash)
-		{
-			throw Diagnostics::Error("Shader compile result does not match its immutable job identity.");
-		}
-		plan.shaderOutputs[consumer.ShaderIndex].push_back(
-		    ShaderCookProduct{
-		        .shaderTypeId = shader.shaderTypeId,
-		        .target = compiled.Target,
-		        .features = shader.features,
-		        .rayTracing = shader.rayTracing,
-		        .parameterLayout = shader.parameterLayout,
-		        .bindingRemaps = job.Request.DescriptorBindingRemaps,
-		        .compiled = std::move(compiled.Output)});
-	}
+	PrepareShaderProducts(plan, compileResults);
 
 	ShaderCookCancellation::ThrowIfRequested(settings.cancellationSignalPath);
 	if (progress)

@@ -48,6 +48,7 @@ public:
 
 	void RequestLevelChange(std::string_view requestedLevelName) noexcept;
 	void ProcessPendingLevelChange() noexcept;
+	void RequestLevelReload() noexcept;
 
 	LevelAsset* GetActiveLevel() noexcept { return m_activeLevel; }
 

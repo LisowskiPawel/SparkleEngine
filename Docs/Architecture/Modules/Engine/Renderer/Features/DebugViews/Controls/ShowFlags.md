@@ -14,6 +14,14 @@
 
 The Editor's **Show** menu is a convenient frontend for turning Renderer features on and off. Turning a lighting component off should stop its exclusive evaluation, tracing, output writes, and dependent work wherever the selected rendering path permits—not calculate the effect and multiply its finished result by zero.
 
+## Post Processing
+
+Owner amendment, 2026-10-11: dedicated effect widgets and the new Post Processing Show group are deferred. The existing fifteen-control Show menu remains unchanged. Internal `r.Vignette` and `r.ChromaticAberration` controls default On; `r.PostProcessing.DebugViews` defaults Off.
+
+`Passes/Presentation/PostProcessing` owns the effect CVars, activation and shaders. Each pass returns its input unchanged when inactive; presentation orchestration only orders passes. PresentationPolicy classifies diagnostic views; the feature policy enables effects by default for Lit and Reference and bypasses them in debug views. The frame-graph key retains effective activation only to detect topology changes. No effect state is copied into resolved display settings or public viewport products. Raw Reference radiance/moments remain unchanged.
+
+A shared Game/Editor settings frontend is future work. Extend the current settings owner rather than retaining a second Game widget list or public settings-status bag.
+
 ## Current Gap And Delivery Scope
 
 The following execution description records the admitted Stage-2–6 candidate contracts and selected evidence. It must not be read as proof for the subsequently changed schemas: [Bounded Show evidence](../../../../../../../Acceptance/Renderer/DebugViews.md#earlier-execution-evidence) identifies the current contradictions. Menu/control behavior below has its own bounded executable result. Repair and replay the affected execution owners before carrying their omission/guide claims to the new candidate.

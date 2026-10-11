@@ -33,6 +33,11 @@ RenderViewPresentationDomain ResolveRenderViewPresentationDomain(RenderViewMode 
 	}
 }
 
+bool IsDiagnosticRenderView(RenderViewMode viewMode) noexcept
+{
+	return viewMode != RenderViewMode::Lit && viewMode != RenderViewMode::ReferencePathTracer;
+}
+
 SceneUpscalingMethod ResolveSceneUpscalingMethod(RenderViewMode viewMode)
 {
 	if (viewMode == RenderViewMode::ReferencePathTracer)

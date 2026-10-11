@@ -4,6 +4,8 @@
 
 **Responsibility:** debug-view signal domains, display mapping, output encoding, and producer requirements
 
+Post-processing runs after domain mapping and before output encoding. Effects default On in Lit and Reference display derivatives. Diagnostic views default to bypass via the [Post Processing policy](Controls/ShowFlags.md#post-processing); explicit debug opt-in changes the display derivative and is not an exact-value oracle. Raw Reference products are unaffected.
+
 ## Decision
 
 Every `RenderViewMode` has one presentation domain: scene-referred HDR or display-linear exact. Both domains use one display-mapping owner and one output-encoding owner.

@@ -3,6 +3,7 @@
 #include "Panels/SettingsPanel.h"
 
 #include "Panels/RenderingSettingsPanel.h"
+#include "Settings/EngineRenderingSettingsController.h"
 #include "Util/UiUtil.h"
 
 #include <imgui.h>
@@ -68,7 +69,7 @@ void SettingsPanel::BuildUI(bool disableInteraction)
 	const float restartBarHeight = showRestartBar ? 34.0f : 0.0f;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(14.0f, 10.0f));
 	ImGui::BeginChild("##SettingsContent", ImVec2(0.0f, -restartBarHeight));
-	DrawToolbar();
+	DrawToolbar(disableInteraction);
 	ImGui::Dummy(ImVec2(0.0f, 4.0f));
 	if (m_renderingPanel != nullptr)
 	{
@@ -98,8 +99,17 @@ void SettingsPanel::BuildUI(bool disableInteraction)
 	ImGui::End();
 }
 
-void SettingsPanel::DrawToolbar()
+void SettingsPanel::DrawToolbar(bool disableInteraction)
 {
+	ImGui::BeginDisabled(disableInteraction);
+	const std::string resetLabel = UiUtil::MakeIconLabel(UiUtil::EditorIcon::Reset, "Reset rendering defaults");
+	if (ImGui::Button(resetLabel.c_str()))
+	{
+		m_renderingSettings->ResetDefaults();
+	}
+	ImGui::EndDisabled();
+	ImGui::Dummy(ImVec2(0.0f, 4.0f));
+
 	std::array<char, 128> filterBuffer{};
 	const std::size_t copyLength = (std::min) (m_filterText.size(), filterBuffer.size() - 1);
 	if (copyLength > 0)

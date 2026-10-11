@@ -14,7 +14,7 @@ public:
 	Application(Application&&) = delete;
 	Application& operator=(Application&&) = delete;
 
-	static void ConfigureProcessFromCommandLine() noexcept;
+	static void ConfigureProcessFromCommandLine();
 
 	void Run();
 	virtual void Initialize() = 0;

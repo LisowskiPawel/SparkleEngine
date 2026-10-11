@@ -8,7 +8,7 @@
 #include "RHI/Public/Device/RhiDeviceLaunch.h"
 #include "Host/RendererHost.h"
 #include "Renderer/Public/Concurrency/RendererExecutionConfig.h"
-#include "Settings/EngineRenderingSettingsRuntime.h"
+#include "Settings/EngineRenderingSettingsControls.h"
 
 RendererExecutionContext::RendererExecutionContext(Window& window, const RhiDeviceLaunch& deviceLaunch, const RendererExecutionConfig& executionConfig)
 {
@@ -70,7 +70,7 @@ void RendererExecutionContext::ExecuteControl(RendererExecutionControl control) 
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderSettingsChangedCommand>)
 		    {
-			    EngineRenderingSettingsRuntime::Apply(command.Settings);
+			    EngineRenderingSettingsControls::Apply(command.Settings);
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderCVarCommand>)
 		    {
@@ -78,7 +78,7 @@ void RendererExecutionContext::ExecuteControl(RendererExecutionControl control) 
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderSettingsCaptureCommand>)
 		    {
-			    command.Completion->Complete(EngineRenderingSettingsRuntime::Capture());
+			    command.Completion->Complete(EngineRenderingSettingsControls::Capture());
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderExternalCaptureCommand>)
 		    {

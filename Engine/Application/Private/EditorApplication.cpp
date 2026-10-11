@@ -34,7 +34,10 @@ EditorApplication::EditorApplication(GameApplicationOptions options) noexcept :
 {
 }
 
-EditorApplication::~EditorApplication() = default;
+EditorApplication::~EditorApplication()
+{
+	Shutdown();
+}
 
 void EditorApplication::Initialize()
 {
@@ -61,6 +64,7 @@ void EditorApplication::InitializeGameApplication()
 	if (!m_state->Game)
 	{
 		GameApplicationOptions gameOptions = m_gameOptions;
+		gameOptions.EnableGameUi = false;
 		gameOptions.EnableGameConsole = false;
 		gameOptions.EnableUiRenderPackets = true;
 		m_state->Game = std::make_unique<GameApplication>(gameOptions);
@@ -187,15 +191,17 @@ void EditorApplication::RenderEditorFrame(Renderer& renderer)
 
 void EditorApplication::Shutdown()
 {
-	if (!m_isEditorSessionActive)
+	if (!m_state)
 	{
 		return;
 	}
-
 	m_state->Ui.reset();
 	m_state->ViewportOutput.reset();
 	m_state->ShaderRecook.reset();
 	m_state->OperationRuntime.reset();
-	m_state->Game->Shutdown();
+	if (m_state->Game)
+	{
+		m_state->Game->Shutdown();
+	}
 	m_isEditorSessionActive = false;
 }

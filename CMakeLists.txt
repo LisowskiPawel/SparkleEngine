@@ -148,3 +148,5 @@ if(DISCOVERED_PROJECTS)
 else()
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT SparkleEngine)
 endif()
+
+include(${CMAKE_SOURCE_DIR}/CMake/Packaging/ReleaseProducts.cmake)

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Cooking/ShaderCookContext.h"
+#include "Cooking/ShaderCompileJob.h"
+#include "Cooking/ShaderCookTypes.h"
+#include "ShaderContractCatalog.h"
 
-#include <cstddef>
 #include <cstdint>
 #include <string_view>
+#include <vector>
 
 class ShaderBackendPool;
 struct ShaderCookSettings;
@@ -12,13 +14,13 @@ struct ShaderCookSettings;
 class ShaderCompileJobBuilder final
 {
 public:
-	ShaderCompileJobBuilder() = delete;
+	explicit ShaderCompileJobBuilder(const ShaderContractCatalog& catalog);
 
-	static void BuildAndAdd(const ShaderCookSettings& settings, std::size_t shaderIndex, ShaderTarget target, ShaderBackendPool& backendPool, ShaderCookPipelinePlan& plan);
+	ShaderCompileJob Build(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target, ShaderBackendPool& backendPool) const;
 
 private:
-	static ShaderCompileRequest BuildRequest(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target);
-	static void AppendDescriptorBindingRemaps(const ShaderCookDesc& shader, ShaderCompileRequest& request);
+	ShaderCompileRequest BuildRequest(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target) const;
+	void AppendDescriptorBindingRemaps(const ShaderCookDesc& shader, ShaderCompileRequest& request) const;
 	static ShaderCompileFeatureFlags BuildRequiredFeatures(ShaderFeatureFlags features) noexcept;
 	static const ShaderSourceMountTable& GetSourceMounts();
 	static ShaderCompileInputHash BuildInputHash(
@@ -27,4 +29,7 @@ private:
 	    std::uint64_t requestHash,
 	    std::string_view backendName,
 	    std::uint64_t backendVersion);
+
+	// The validated catalog outlives this operation-local binding assignment.
+	std::vector<const PassParameterDesc*> m_descriptorBindings;
 };

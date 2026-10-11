@@ -9,6 +9,7 @@
 #include "FrameGraph/FrameGraph.h"
 #include "Passes/Lighting/ReferencePathTracer/ReferencePathTracerSession.h"
 #include "Passes/Scene/SceneRenderingPasses.h"
+#include "Passes/Presentation/PresentationPolicy.h"
 #include "Resources/History/FrameHistory.h"
 #include "Diagnostics/RendererMemoryMonitor.h"
 #include "Pipeline/RenderPassRuntimeCache.h"

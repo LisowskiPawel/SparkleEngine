@@ -86,6 +86,10 @@ The 17 asset-pack records encode root/extraction/required path, parent relation,
 
 Launcher loads `Levels.catalog` -> selected level/pack readiness is evaluated -> missing supported packs sync -> AssetCooker cooks the selected project -> Launcher verifies executable and cooked mesh/texture/shader roots -> `levels.run` sets project/level/API environment and starts ShowcaseEditor or ShowcaseGame in the project directory -> GameFramework registers only selected/ready levels -> requested level loads or an explicit error leaves no level active -> Renderer consumes the scene.
 
+## Game Menu
+
+In the PD-1 working candidate, Game opens its menu on first run. Esc or F1 returns to it; the menu exposes level selection, load failures, camera reload, help and quit. Rendering settings are configured in Editor through the shared settings owner; a Game settings frontend is deferred. Resolution follows the window. The developer console is excluded from Shipping builds. These source changes do not pass the packaged/clean-machine criteria below.
+
 ## `FCR-PROD-01` Game Consumer Contract
 
 This is the Architecture acceptance owner for the Showcase consumer journey. [Application](../../Engine/Application/README.md#product-contract-boundary) owns host construction and settlement; the [frozen product contract](../../../../Acceptance/FirstRelease.md#frozen-product-and-output-classification) owns release values; [release gates](../../../../Acceptance/FirstRelease.md#release-gates) are linked, not repeated.

@@ -8,6 +8,12 @@
 
 **Current readiness:** **40/100** — settings edit/load/save/handoff is reachable; durable error reporting, malformed/concurrent/package storage, queue pressure, and structured requested-versus-active state remain incomplete. See [Current Feature Readiness](../../../../../../Acceptance/CurrentReadiness.md#renderer).
 
+## PD-1 Settings Changes
+
+**Working candidate:** `62918f7b13ec38fbebf2f8b6b25fd8707e719930` plus the PD-1 patch. `EngineRenderingSettingsControls` captures and applies Renderer settings; Application owns startup validation and atomic per-user publication. Editor preserves the original session values for restart detection, rolls back rejected saves and exposes their diagnostic. Rendering settings remain in the existing Editor controller and shared settings/persistence owner. Game rendering-setting widgets and the separate viewport status projection were removed at the owner's request; a shared frontend is deferred.
+
+Vignette and chromatic aberration default to On. Each has a dedicated compute shader, registration and presentation pass; tone mapping is unchanged. The order is tone mapping (where the presentation domain requires it) -> chromatic aberration -> vignette -> output encoding -> UI. Lit and Reference enable both effects by default. Debug views bypass them by default (`r.PostProcessing.DebugViews`, default Off). Dedicated effect widgets and Show-menu additions are deferred. Raw Reference radiance and moment products stay unchanged. Vignette attenuates linear-display RGB by up to 20% at the corners; chromatic aberration offsets the red/blue pixel lookups radially in opposite directions, with clamped edge coordinates. Disabling an effect removes its pass from the graph. These are product defaults, not calibrated optical models or visual/performance acceptance.
+
 ## At A Glance
 
 | Question | Current answer |
@@ -114,6 +120,6 @@ This contract is **defined but unproved**. The current implementation does not y
 - [`EngineRenderingSettings.h`](../../../../../../../Engine/Renderer/Public/Settings/EngineRenderingSettings.h)
 - [`EngineRenderingSettingsController.cpp`](../../../../../../../Engine/Editor/Private/Settings/EngineRenderingSettingsController.cpp)
 - [`EngineRenderingSettingsPersistence.cpp`](../../../../../../../Engine/Application/Private/RenderingSettings/EngineRenderingSettingsPersistence.cpp)
-- [`EngineRenderingSettingsRuntime.cpp`](../../../../../../../Engine/Renderer/Private/Settings/EngineRenderingSettingsRuntime.cpp)
+- [`EngineRenderingSettingsControls.cpp`](../../../../../../../Engine/Renderer/Private/Settings/EngineRenderingSettingsControls.cpp)
 - [`RenderCoordinator.cpp`](../../../../../../../Engine/Renderer/Private/Concurrency/Coordinator/RenderCoordinator.cpp) and [`RendererExecutionContext.cpp`](../../../../../../../Engine/Renderer/Private/Concurrency/Coordinator/RendererExecutionContext.cpp)
 - [`Application.cpp`](../../../../../../../Engine/Application/Private/Application.cpp) and [`UI.cpp`](../../../../../../../Engine/Editor/Private/UI.cpp)

@@ -14,6 +14,8 @@
 struct EngineRenderingSettingsState final
 {
 	bool VSync = true;
+	bool Vignette = true;
+	bool ChromaticAberration = true;
 	PixelFormat BackBufferFormat = RhiPresentationDefaults::DefaultBackBufferFormat;
 	bool PreferHighPerformanceAdapter = true;
 	EngineToneMapper ToneMapper = EngineToneMapper::AcesApprox;

@@ -2,7 +2,7 @@
 
 struct EngineRenderingSettingsState;
 
-class EngineRenderingSettingsRuntime final
+class EngineRenderingSettingsControls final
 {
 public:
 	static EngineRenderingSettingsState Capture() noexcept;

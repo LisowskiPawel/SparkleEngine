@@ -34,6 +34,8 @@ public:
 private:
 	void BuildFileMenu() noexcept;
 	void BuildWindowsMenu() noexcept;
+	void BuildHelpWindow() noexcept;
+	void BuildLevelStatus() noexcept;
 	void BuildOpenLevelMenu() noexcept;
 	void BuildWindowControls() noexcept;
 	bool DrawTitleBarButton(const char* id, const ImVec2& size, const ImVec4& baseColor, const ImVec4& hoveredColor, const ImVec4& activeColor) noexcept;
@@ -49,5 +51,6 @@ private:
 	std::function<void()> m_settingsOpenHandler;
 	std::function<void()> m_consoleOpenHandler;
 	std::function<void()> m_viewportCaptureHandler;
+	bool m_helpOpen = false;
 	float m_heightPixels = 0.0f;
 };

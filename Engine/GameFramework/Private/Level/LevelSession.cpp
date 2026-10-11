@@ -9,6 +9,8 @@
 #include "Level/Loading/SceneLoadExecutor.h"
 #include "World/GameWorld.h"
 
+#include <format>
+
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_levelSessionLogger, "GameFramework.LevelSession");
 
 LevelSession::LevelSession(GameWorld& world, TaskExecutor& taskExecutor, TaskScope& applicationScope) :
@@ -29,6 +31,7 @@ void LevelSession::InitializeStartupLevel() noexcept
 	LevelAsset* startupLevel = m_levelRegistry->FindLevel(startupName);
 	if (!startupLevel && !requestedName.empty())
 	{
+		m_lastLoadDiagnostic = std::format("Requested level '{}' is unavailable. Select Empty or sync/cook this level through Sparkle Launcher.", requestedName);
 		SPDLOG_LOGGER_ERROR(g_levelSessionLogger, "Requested startup level '{}' is not registered; no level will be activated.", requestedName);
 		return;
 	}
@@ -53,6 +56,8 @@ void LevelSession::RequestLevelChange(std::string_view requestedLevelName) noexc
 	LevelAsset* requestedLevel = m_levelRegistry->FindLevel(requestedLevelName);
 	if (!requestedLevel)
 	{
+		m_lastLoadDiagnostic = std::format("Requested level '{}' is unavailable. The active level is unchanged. Sync/cook it through Sparkle Launcher.", requestedLevelName);
+		m_levelChangeEvents.OnLevelLoadFailed.Broadcast(requestedLevelName);
 		SPDLOG_LOGGER_WARN(g_levelSessionLogger, "Requested level '{}' is not registered.", std::string(requestedLevelName));
 		return;
 	}
@@ -65,6 +70,14 @@ void LevelSession::RequestLevelChange(std::string_view requestedLevelName) noexc
 		return;
 	}
 	m_pendingLevelChange = requestedLevel;
+}
+
+void LevelSession::RequestLevelReload() noexcept
+{
+	if (m_activeLevel && !m_levelChangeInProgress)
+	{
+		m_pendingLevelChange = m_activeLevel;
+	}
 }
 
 void LevelSession::ProcessPendingLevelChange() noexcept

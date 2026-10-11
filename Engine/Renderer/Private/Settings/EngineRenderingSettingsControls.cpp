@@ -1,7 +1,9 @@
 #include "PCH.h"
-#include "Settings/EngineRenderingSettingsRuntime.h"
+#include "Settings/EngineRenderingSettingsControls.h"
 
 #include "Passes/Presentation/Display/OutputEncodingCVars.h"
+#include "Passes/Presentation/PostProcessing/Vignette.h"
+#include "Passes/Presentation/PostProcessing/ChromaticAberration.h"
 #include "View/ViewportDisplayCVars.h"
 #include "RayReconstruction/RayReconstructionSettings.h"
 #include "Debug/RendererCVars.h"
@@ -11,10 +13,12 @@
 #include "Renderer/Public/ExternalCapture/ExternalCaptureStartup.h"
 #include "RHI/Public/Diagnostics/RhiExternalCapture.h"
 
-EngineRenderingSettingsState EngineRenderingSettingsRuntime::Capture() noexcept
+EngineRenderingSettingsState EngineRenderingSettingsControls::Capture() noexcept
 {
 	EngineRenderingSettingsState state;
 	state.VSync = CVarVSync.Get();
+	state.Vignette = CVarVignette.Get();
+	state.ChromaticAberration = CVarChromaticAberration.Get();
 	state.BackBufferFormat = CVarBackBufferFormat.Get();
 	state.PreferHighPerformanceAdapter = CVarPreferHighPerformanceAdapter.Get();
 	state.ToneMapper = CVarToneMapper.Get();
@@ -46,7 +50,7 @@ EngineRenderingSettingsState EngineRenderingSettingsRuntime::Capture() noexcept
 	return state;
 }
 
-void EngineRenderingSettingsRuntime::Apply(const EngineRenderingSettingsState& state) noexcept
+void EngineRenderingSettingsControls::Apply(const EngineRenderingSettingsState& state) noexcept
 {
 	const auto setCVarIfChanged = []<typename TCVar, typename TValue>(TCVar& cvar, const TValue& value) noexcept
 	{
@@ -57,6 +61,8 @@ void EngineRenderingSettingsRuntime::Apply(const EngineRenderingSettingsState& s
 	};
 
 	setCVarIfChanged(CVarVSync, state.VSync);
+	setCVarIfChanged(CVarVignette, state.Vignette);
+	setCVarIfChanged(CVarChromaticAberration, state.ChromaticAberration);
 	setCVarIfChanged(CVarBackBufferFormat, state.BackBufferFormat);
 	setCVarIfChanged(CVarPreferHighPerformanceAdapter, state.PreferHighPerformanceAdapter);
 	setCVarIfChanged(CVarToneMapper, state.ToneMapper);

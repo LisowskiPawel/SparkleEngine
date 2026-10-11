@@ -13,27 +13,39 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/FileSystemUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Shaders/Authoring/GlobalShader.h"
-#include "Shaders/ShaderParameterLayoutBuilder.h"
 
 #include <algorithm>
-#include <compare>
 #include <format>
 #include <iterator>
 #include <string>
+#include <tuple>
+#include <utility>
 #include <vector>
 
-struct ShaderDescriptorBindingIdentity final
+namespace ShaderDescriptorBindings
 {
-	std::string Name;
-	ShaderParameterSemanticKind Kind = ShaderParameterSemanticKind::ReadTexture;
-	ShaderParameterResourceDomain Domain = ShaderParameterResourceDomain::None;
-	ShaderParameterAccess Access = ShaderParameterAccess::None;
+	auto GetIdentity(const PassParameterDesc* parameter) noexcept
+	{
+		return std::tie(parameter->Name, parameter->Kind, parameter->ResourceDomain, parameter->Access);
+	}
+}
 
-	auto operator<=>(const ShaderDescriptorBindingIdentity&) const = default;
-
-	bool Matches(const PassParameterDesc& parameter) const noexcept { return Name == parameter.Name && Kind == parameter.Kind && Domain == parameter.ResourceDomain && Access == parameter.Access; }
-};
+ShaderCompileJobBuilder::ShaderCompileJobBuilder(const ShaderContractCatalog& catalog)
+{
+	for (const ShaderContract& shader : catalog)
+	{
+		for (const PassParameterDesc& parameter : shader.parameterLayout.GetParameters())
+		{
+			if (parameter.Kind != ShaderParameterSemanticKind::RenderTarget && parameter.Kind != ShaderParameterSemanticKind::DepthTarget)
+			{
+				m_descriptorBindings.push_back(&parameter);
+			}
+		}
+	}
+	std::ranges::sort(m_descriptorBindings, {}, ShaderDescriptorBindings::GetIdentity);
+	const auto duplicates = std::ranges::unique(m_descriptorBindings, {}, ShaderDescriptorBindings::GetIdentity);
+	m_descriptorBindings.erase(duplicates.begin(), duplicates.end());
+}
 
 ShaderCompileInputHash ShaderCompileJobBuilder::BuildInputHash(
     std::uint64_t sourceContentHash,
@@ -51,9 +63,8 @@ ShaderCompileInputHash ShaderCompileJobBuilder::BuildInputHash(
 	return Hash::FinalizeFnv1a64(hash);
 }
 
-void ShaderCompileJobBuilder::BuildAndAdd(const ShaderCookSettings& settings, std::size_t shaderIndex, ShaderTarget target, ShaderBackendPool& backendPool, ShaderCookPipelinePlan& plan)
+ShaderCompileJob ShaderCompileJobBuilder::Build(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target, ShaderBackendPool& backendPool) const
 {
-	const ShaderCookDesc& shader = plan.shaders[shaderIndex];
 	ShaderCompileRequest request = BuildRequest(settings, shader, target);
 	IShaderBackend& backend = backendPool.ResolveAndAcquire(request.VirtualSourcePath, request.Target, settings.backendName);
 	const IncludeClosureHash before = IncludeClosureHasher::Compute(request);
@@ -68,24 +79,20 @@ void ShaderCompileJobBuilder::BuildAndAdd(const ShaderCookSettings& settings, st
 	const std::string backendName(backend.GetBackendName());
 	const std::uint64_t backendVersion = backend.GetBackendVersion();
 	const std::string targetProfile = ShaderCompileProfile::BuildTargetProfile(request);
-	const std::size_t jobIndex = plan.jobs.size();
 
-	plan.jobs.push_back(
-	    ShaderCompileJob{
-	        .Request = std::move(request),
-	        .BackendName = backendName,
-	        .TargetProfile = targetProfile,
-	        .BackendVersion = backendVersion,
-	        .SourceContentHash = sourceHash,
-	        .DependencyClosureHash = closure.includeClosureHash,
-	        .RequestHash = requestHash,
-	        .InputHash = BuildInputHash(sourceHash, closure.includeClosureHash, requestHash, backendName, backendVersion),
-	        .VirtualDependencies = closure.virtualDependencies});
-
-	plan.consumers.push_back(ShaderCompileConsumer{.JobIndex = jobIndex, .ShaderIndex = shaderIndex});
+	return ShaderCompileJob{
+	    .Request = std::move(request),
+	    .BackendName = backendName,
+	    .TargetProfile = targetProfile,
+	    .BackendVersion = backendVersion,
+	    .SourceContentHash = sourceHash,
+	    .DependencyClosureHash = closure.includeClosureHash,
+	    .RequestHash = requestHash,
+	    .InputHash = BuildInputHash(sourceHash, closure.includeClosureHash, requestHash, backendName, backendVersion),
+	    .VirtualDependencies = closure.virtualDependencies};
 }
 
-ShaderCompileRequest ShaderCompileJobBuilder::BuildRequest(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target)
+ShaderCompileRequest ShaderCompileJobBuilder::BuildRequest(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target) const
 {
 	ShaderCompileRequest request(GetSourceMounts());
 	request.ShaderType = shader.shaderTypeId;
@@ -110,33 +117,15 @@ ShaderCompileRequest ShaderCompileJobBuilder::BuildRequest(const ShaderCookSetti
 	return request;
 }
 
-void ShaderCompileJobBuilder::AppendDescriptorBindingRemaps(const ShaderCookDesc& shader, ShaderCompileRequest& request)
+void ShaderCompileJobBuilder::AppendDescriptorBindingRemaps(const ShaderCookDesc& shader, ShaderCompileRequest& request) const
 {
-	std::vector<ShaderDescriptorBindingIdentity> bindings;
-	for (const ShaderRegistrationDesc& registration : GlobalShaderRegistry::GetRegistrations())
-	{
-		const PassParameterLayout layout = BuildShaderParameterLayout(registration);
-		for (const PassParameterDesc& parameter : layout.GetParameters())
-		{
-			if (parameter.Kind == ShaderParameterSemanticKind::RenderTarget || parameter.Kind == ShaderParameterSemanticKind::DepthTarget)
-			{
-				continue;
-			}
-			const auto existing = std::ranges::find_if(bindings, [&parameter](const ShaderDescriptorBindingIdentity& value) { return value.Matches(parameter); });
-			if (existing == bindings.end())
-			{
-				bindings.push_back(ShaderDescriptorBindingIdentity{parameter.Name, parameter.Kind, parameter.ResourceDomain, parameter.Access});
-			}
-		}
-	}
-	std::ranges::sort(bindings);
 	if (shader.parameterLayout.GetParameters().empty())
 	{
-		for (std::size_t index = 0; index < bindings.size(); ++index)
+		for (std::size_t index = 0; index < m_descriptorBindings.size(); ++index)
 		{
-			const ShaderDescriptorBindingIdentity& binding = bindings[index];
-			const bool duplicateBefore = index > 0 && bindings[index - 1].Name == binding.Name;
-			const bool duplicateAfter = index + 1 < bindings.size() && bindings[index + 1].Name == binding.Name;
+			const PassParameterDesc& binding = *m_descriptorBindings[index];
+			const bool duplicateBefore = index > 0 && m_descriptorBindings[index - 1]->Name == binding.Name;
+			const bool duplicateAfter = index + 1 < m_descriptorBindings.size() && m_descriptorBindings[index + 1]->Name == binding.Name;
 			if (!duplicateBefore && !duplicateAfter)
 			{
 				request.DescriptorBindingRemaps.push_back(ShaderDescriptorBindingRemap{.Name = binding.Name, .Set = 0, .Binding = static_cast<std::uint32_t>(index)});
@@ -150,12 +139,15 @@ void ShaderCompileJobBuilder::AppendDescriptorBindingRemaps(const ShaderCookDesc
 		{
 			continue;
 		}
-		const auto found = std::ranges::find_if(bindings, [&parameter](const ShaderDescriptorBindingIdentity& value) { return value.Matches(parameter); });
-		if (found == bindings.end())
+		const auto identity = ShaderDescriptorBindings::GetIdentity(&parameter);
+		const auto found = std::ranges::lower_bound(m_descriptorBindings, identity, {}, ShaderDescriptorBindings::GetIdentity);
+		if (found == m_descriptorBindings.end() || ShaderDescriptorBindings::GetIdentity(*found) != identity)
 		{
 			throw Diagnostics::Error(std::format("Shader parameter '{}' is missing from the global binding assignment.", parameter.Name));
 		}
-		request.DescriptorBindingRemaps.push_back(ShaderDescriptorBindingRemap{.Name = parameter.Name, .Set = 0, .Binding = static_cast<std::uint32_t>(std::distance(bindings.begin(), found))});
+
+		request.DescriptorBindingRemaps.push_back(
+		    ShaderDescriptorBindingRemap{.Name = parameter.Name, .Set = 0, .Binding = static_cast<std::uint32_t>(std::distance(m_descriptorBindings.begin(), found))});
 	}
 }
 

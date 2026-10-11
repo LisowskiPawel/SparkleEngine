@@ -12,7 +12,7 @@ class InputSystem;
 class GameWorld;
 class Renderer;
 class LevelSession;
-class GameConsoleHost;
+class GameUiHost;
 class TaskExecutor;
 class TaskScope;
 class ApplicationTaskRuntime;
@@ -30,7 +30,8 @@ enum class GameApplicationFrameResult : std::uint8_t
 
 struct GameApplicationOptions final
 {
-	bool EnableGameConsole = true;
+	bool EnableGameUi = true;
+	bool EnableGameConsole = !SPARKLE_BUILD_SHIPPING;
 	bool AllowThreadedRenderer = true;
 	bool EnableUiRenderPackets = false;
 };
@@ -69,7 +70,7 @@ private:
 	void InitializeInput();
 	void InitializeGameWorld();
 	void InitializeRenderer();
-	void InitializeGameConsole();
+	void InitializeGameUi();
 	CameraInputIntent CollectCameraInputIntent(float aspectRatio) noexcept;
 	void UpdateGameFrame(const CameraInputIntent* worldCameraIntent, const RenderViewCameraData* renderCameraOverride) noexcept;
 	void UpdateEditorGame(const RenderViewCameraData& renderCamera) noexcept;
@@ -82,7 +83,7 @@ private:
 	std::unique_ptr<GameWorld> m_gameWorld;
 	std::unique_ptr<LevelSession> m_levelSession;
 	std::unique_ptr<Renderer> m_renderer;
-	std::unique_ptr<GameConsoleHost> m_gameConsoleHost;
+	std::unique_ptr<GameUiHost> m_gameUiHost;
 	std::unique_ptr<ApplicationTaskRuntime> m_taskRuntime;
 	std::unique_ptr<CameraInputIntentCollector> m_cameraInputIntentCollector;
 	GameApplicationOptions m_options;
