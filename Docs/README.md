@@ -9,6 +9,9 @@ Use these pages to understand the engine, choose your next task and find the des
 
 ## Start Here
 
+Public onboarding starts in the [repository README](../README.md); the [contribution guide](../CONTRIBUTING.md) routes changes and review to existing owners.
+
+
 | Your task | Where to start |
 | --- | --- |
 | Understand the whole engine | [Engine At A Glance](Architecture/EngineAtAGlance.md) — [Whole Repository Map](Architecture/WholeRepositoryMap.md) |

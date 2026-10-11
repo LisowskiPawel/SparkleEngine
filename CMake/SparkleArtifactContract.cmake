@@ -310,6 +310,23 @@ function(sparkle_stage_nvidia_streamline_runtime product_target)
             "FetchDependencies.cmake must run before staging Streamline.")
     endif()
 
+    # The SDK's top-level MIT notice does not cover every runtime plugin.
+    foreach(_notice IN ITEMS license.txt 3rd-party-licenses.md
+            bin/x64/nis.license.txt bin/x64/nvngx_dlss.license.txt bin/x64/reflex.license.txt)
+        set(_notice_source "${SPARKLE_NVIDIA_STREAMLINE_ROOT}/${_notice}")
+        if(NOT EXISTS "${_notice_source}")
+            message(FATAL_ERROR "NVIDIA Streamline runtime notice is missing: '${_notice_source}'")
+        endif()
+        get_filename_component(_notice_name "${_notice}" NAME)
+        add_custom_command(TARGET ${product_target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${product_target}>/Notices/NVIDIA"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${_notice_source}" "$<TARGET_FILE_DIR:${product_target}>/Notices/NVIDIA/${_notice_name}"
+            COMMENT "Copying NVIDIA runtime notice ${_notice_name} for ${product_target}"
+            VERBATIM
+        )
+    endforeach()
+
     foreach(runtime_dll IN LISTS SPARKLE_NVIDIA_STREAMLINE_RUNTIME_DLLS)
         if(NOT EXISTS "${runtime_dll}")
             message(FATAL_ERROR "NVIDIA Streamline runtime DLL is missing: '${runtime_dll}'")

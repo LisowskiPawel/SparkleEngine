@@ -1,0 +1,45 @@
+name: Repository checks
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-boundaries:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Record candidate and tools
+        shell: pwsh
+        run: |
+          git rev-parse HEAD
+          git status --short
+          git --version
+          cmake --version
+      - name: Check change whitespace
+        shell: pwsh
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if ($env:PR_BASE) {
+            git diff --check $env:PR_BASE HEAD
+          } else {
+            git show --check --format=fuller HEAD
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Invoke architecture boundary owner
+        shell: pwsh
+        run: cmake -P CMake/ArchitectureBoundaryCheck.cmake

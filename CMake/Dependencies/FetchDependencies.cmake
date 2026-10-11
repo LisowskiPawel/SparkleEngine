@@ -1121,6 +1121,11 @@ if(_sparkle_fetch_nvidia_streamline AND (SPARKLE_ENABLE_NVIDIA_STREAMLINE OR NOT
         "bin/x64/sl.reflex.dll"
         "bin/x64/nvngx_dlss.dll"
         "bin/x64/nvngx_dlssd.dll"
+        "license.txt"
+        "3rd-party-licenses.md"
+        "bin/x64/nis.license.txt"
+        "bin/x64/nvngx_dlss.license.txt"
+        "bin/x64/reflex.license.txt"
     )
 
     sparkle_ensure_archive_dependency(

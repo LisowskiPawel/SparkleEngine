@@ -1,6 +1,6 @@
 # Release Scope Evidence
 
-**Current FR-01:** [ITER-REL-01-07 closure work](#fr-01-closure-work-iter-rel-01-07). Clean Shipping Game/tools build, owner checks, Empty cook and Launcher/Game activation pass. Export exclusions and pinned acquisition recipes address current release inputs; public repository history and trusted signing issuance remain unresolved.
+**Current FR-01:** [ITER-REL-01-11 public contributor checks](#public-contributor-checks-iter-rel-01-11) adds bounded source automation and fixes Launcher onboarding. [ITER-REL-01-10 single public repository setup](#single-public-repository-setup-iter-rel-01-10) records the contributor setup and unavailable extra-repository deletion. [ITER-REL-01-09 public repository decision](#public-repository-restored-iter-rel-01-09) supersedes the private-history plan. SparkleEngine is public with its original history. [ITER-REL-01-08](#feature-preserving-licensing-iter-rel-01-08) retains the NVIDIA notice and Qt provenance results; certificate enrollment remains final pre-release work. Historical asset rights and packaged compliance remain unqualified. Earlier baseline results retain their exact candidate.
 
 **Status:** dated source audit and iteration records; release acceptance remains blocked
 
@@ -9,6 +9,58 @@
 **Snapshot:** reconciled 2026-10-10 at `aa9fcd94f219e8a3d4dbe7c51457680ad9300783`. Earlier iterations retain their own revisions and dirty-state descriptions.
 
 These records prove only the inspection or document checks they name. Current product choices and next actions belong in [Release Scope](README.md#approval-and-next-work); this page does not grant redistribution permission or build/runtime acceptance.
+
+## Public Contributor Checks: ITER-REL-01-11
+
+**Control:** 2026-10-11, owner BuildAndPackaging / Engineering, candidate `7cfceb32d10e487637ed482fbc80d6dcce5f88e2` plus retained patch. Start state: prior FR-01/open-source changes already modified `.gitattributes`, `.gitignore`, dependency/artifact CMake, FirstRelease, ReleaseScope, release inputs, roadmap and docs index; README, CONTRIBUTING and `.github` were untracked. Preserve them. Scope: contributor bootstrap, bounded CI and documentation; `NS-ADOPTION`, `NS-EVIDENCE`, `NS-OWNERSHIP`; graphics targets preserved with no evidence increase. Delivery: FR-01 / REL-01 / REL-02 source workflow, not gate closure.
+
+**Risk / criterion:** avoid engine-wide acquisition during Launcher bootstrap and avoid presenting source checks as a qualified build. Acceptance: onboarding names the actual standalone owner and canonical path; automation invokes existing architecture assertions with no secrets/write permission; local links and whitespace pass. Failure controls: owner exit codes remain failures, job times out/cancels rather than passing; unavailable hosted/build results stay explicit. Maintainer owns review and recovery.
+
+| Check | Result and boundary |
+| --- | --- |
+| `CHK-OSS11-01` bootstrap inspection | **PASS, source:** README now uses `Tools/Launcher` and `build/private/tools/SparkleLauncher`, matching artifact contract and standalone dependency allowlist. Commands were inspected, not fresh-built in this iteration. |
+| `CHK-OSS11-02` owner invocation | **PASS:** `cmake -P CMake/ArchitectureBoundaryCheck.cmake`, exit `0`, no violations. An initial invocation with relative `SPARKLE_REPO_ROOT=.` failed because the script expects an absolute override; the final command lets the owner resolve its root. No check semantics changed. |
+| `CHK-OSS11-03` workflow preparation | Commit-pinned checkout `de0fac2e4500dabe0009e67214ff5f5447ce83dd` verified against publisher tag `v6.0.2`. Ordinary PR trigger, read-only contents, credentials disabled, bounded job and cancellation. **BLOCKED for hosted execution:** workflow remains local/uncommitted; no hosted run or branch protection configured. No build, style, shader, asset or GPU coverage claimed. |
+| `CHK-OSS11-04` document/export hygiene | `.gitattributes` retains active normalization and export exclusions while removing unused template comments. UTF-8, local links/anchors and `git diff --check` pass. No tracked asset or generated file removed by this slice. |
+
+**Decision:** contributor setup and local architecture checks pass within these boundaries. REL-01/REL-02 release verdicts are unchanged. Extra-repository deletion remains unavailable as recorded in ITER-REL-01-10; no blog, repository visibility, signing, original history or remote branch was changed. No temporary harness or new test source was introduced.
+
+## Single Public Repository Setup: ITER-REL-01-10
+
+**Candidate:** `7cfceb32d10e487637ed482fbc80d6dcce5f88e2` plus retained worktree changes, 2026-10-11. Owner decision: keep SparkleEngine and the existing blog; remove the extra source repository.
+
+| Check / decision | Result and boundary |
+| --- | --- |
+| Public contributor setup | Root README, contribution guide, defect and PR templates route public development to SparkleEngine. MIT commercial-use permission is retained; third-party terms remain separate. PDBs are ignored for future additions. No feature, map or build target is changed by this slice. |
+| Extra repository removal | **BLOCKED:** GitHub DELETE for `stoleckipawel/SparkleEngine-Source` returns HTTP `403`; the credential has `repo` but lacks required `delete_repo` scope. Main SparkleEngine remains public; blog and original history are untouched. Owner must delete the extra repository through GitHub Settings. No deletion is claimed. |
+| Verification boundary | Documentation and whitespace checks only; no build/cook/Game/performance result or hosted CI qualification. Existing rights and package acceptance blockers remain. |
+
+## Public Repository Restored: ITER-REL-01-09
+
+**Owner decision, 2026-10-11:** keep the original project public and open source; supersede the private-history/public-source split.
+
+**Candidate:** `7cfceb32d10e487637ed482fbc80d6dcce5f88e2` plus retained worktree changes. This iteration changes repository visibility and documents only.
+
+| Check / decision | Result and boundary |
+| --- | --- |
+| Original repository visibility | **PASS:** GitHub API changed `stoleckipawel/SparkleEngine` from private to public; an unauthenticated API read confirmed public access. Existing history, branch, index and origin are preserved. Receipt: `build/validation/fr01-nonprofit-20261011/repository-restored-public.json`. |
+| Source workflow | **SUPERSEDED:** the private-history plan in ITER-REL-01-08 is no longer approved. The original SparkleEngine repository is primary; the extra source repository is no longer part of the workflow. No history rewrite or feature/map removal accompanies this decision. |
+| Release gates | **BLOCKED:** historical asset rights and admitted-component redistribution review remain unresolved. Public source availability is restored; it does not grant asset permissions. No build, cook, Game, performance or package result is added. Certificate enrollment remains scheduled before final release. |
+
+## Feature-Preserving Licensing: ITER-REL-01-08
+
+**Candidate:** `7cfceb32d10e487637ed482fbc80d6dcce5f88e2`, initially clean, plus this iteration's retained patch, 2026-10-11. Owner: BuildAndPackaging / Acceptance. Scope: preserve the approved features/maps while fixing runtime notices, identifying Qt corresponding source and scheduling certificate enrollment. `NS-OWNERSHIP`, `NS-EVIDENCE`, `NS-ADOPTION`; preserve graphics capability targets, no rendering-level evidence increase. Controls, exact commands, hashes and cleanup: `build/validation/fr01-nonprofit-20261011/`. Risks: mistaking notice/source preparation for package acceptance; removing features or imposing undisclosed Windows warnings. Missing notices fail before staging; unknown rights remain blocked rather than substituted or waived.
+
+| Check / decision | Result and boundary |
+| --- | --- |
+| `CHK-FR0108-01` NVIDIA staging | **PASS:** existing `sparkle_stage_nvidia_streamline_runtime` owner configures/builds in a focused Release probe; all eight DLLs and five notice files copy byte-for-byte. SDK acquisition now requires the notices. Missing notice rejects configuration, exit `1`; restored SDK configuration exits `0`. `notice-verification.json`, `notice-negative.json`, raw configure/build logs. No feature switch or DLL removed. First negative attempt stopped at artifact-namespace validation; corrected probe reaches the intended missing-notice detector. No new permanent test target. |
+| `CHK-FR0108-02` Qt source identity | **PASS, provenance:** publisher qtbase/qtsvg ZIP SHA-256 and embedded `.tag` revisions match installed vendor SBOM source revisions. License texts/SBOMs are retained as a compliance companion. All 70 checked Qt DLLs match vendor SBOM SHA-1 after reconstructing the unsigned PE (remove trailing certificate, zero checksum/security-directory fields); raw signed-file hashes differ and are retained separately. This identifies signed vendor content, not bit-identical local Qt builds or a full license verdict. `qt-source-verification.json`, exact archives and `qt-compliance/`. |
+| `CHK-FR0108-03` scope and UX | **PASS, source boundary:** seven map choices, rendering code, feature switches, dependencies and Launcher controls remain unchanged by this patch. No map replacement, quality fallback or first-launch legal modal was added. Source companions are optional downloads for users, separate from the product. Actual package-relative selected sync/offline use and compatible Qt replacement remain FR-02/consumer checks, not source-review claims. |
+| Signing schedule | **Owner approved:** certificate enrollment/payment/identity verification happens in final pre-release work before signed candidate freeze/adoption (`FR-06`). Its absence does not block FR-01 or unsigned internal packaging. The final public consumer release still requires trusted signatures and clean-machine trust/UX checks. The [roadmap](../../Strategy/Roadmap.md#where-we-are-and-what-is-next) owns scheduling; Windows warnings on unsigned development builds are not promised absent. |
+| Public history remediation | **SUPERSEDED by ITER-REL-01-09. Historical observation:** owner approved keeping old history private and publishing reviewed clean source. `stoleckipawel/SparkleEngine` is now private (unauthenticated API `404`); [SparkleEngine-Source](https://github.com/stoleckipawel/SparkleEngine-Source) is public. Initial public commit `bce458263ef920f7063435cc55c9d2eed37f542d` has no parents; 2664 published files exclude the targeted unqualified asset payloads and PDBs. Reviewed ZIP SHA-256 `84a96ba25f32f0a1d485ce8dd11a1dfee33e27332939bfea3dc0a2c5e0bf6e25`; 3222 ZIP entries include directories. `.gitattributes` now excludes generated compiler PDBs. Root history/index/branch/origin remain intact. This stops exposure through the controlled repository; it supplies no retrospective grant and cannot recall third-party copies. Exact API/command receipts: `repository-migration.json`, `public-source-git.log`, `source-export.json`. |
+| Gate outcome | **Historical verdict; repository split superseded by ITER-REL-01-09.** The previous public-history and immediate-certificate blockers are **SUPERSEDED** by the executed repository split and owner-approved enrollment schedule. License routes/source/notices preparation are verified; no asset grant was fabricated. `REL-01` / `REL-02` final candidate admission remains **BLOCKED** pending complete admitted-component notice/terms review and binding baseline checks to the revised public source. Prior clean baseline evidence stays under its original candidate. Full notice bundle, Qt prominent notice/source publication/replacement journey, NVIDIA distribution terms, signed package and consumer UX require their owning later checks. |
+
+**Validation and cleanup:** exact focused CMake command arrays and source/output hashes are retained in `commands.json` and `notice-verification.json`; archive hashes/revisions in `qt-source-verification.json`. Documentation UTF-8/local links/anchors and `git diff --check` are recorded in `document-verification.json`. Temporary probe sources and scripts are removed. Automatic approval review rejected recursive cleanup and the explicit executable deletion without a more specific reason; the ignored probe executable/generated build trees remain, disclosed in `cleanup.json`. Receipts, SDK notice copies, reviewed source ZIP and Qt source/license companions remain for review. No Game/Editor build, cook, runtime, native backend, FPS, independent adoption, product-release publication or rewrite of the original history was performed. The explicitly authorized source-repository creation and visibility changes above were performed. Do not promote earlier baseline results to this revised candidate.
 
 ## FR-01 Closure Work: ITER-REL-01-07
 

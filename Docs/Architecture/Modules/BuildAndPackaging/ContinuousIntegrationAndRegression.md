@@ -1,6 +1,6 @@
 # Continuous Integration And Regression
 
-**Status:** target capability dossier; no tracked CI workflow or CMake test registration was found
+**Status:** target capability dossier with a bounded source-check workflow prepared; hosted execution unverified
 
 **Scope:** define reproducible check selection, isolated matrix execution, cancellation, aggregation, artifact retention, and regression-reporting boundaries
 
@@ -11,6 +11,8 @@
 **Strategy and acceptance sources:** `NS-EVIDENCE`, `NS-ADOPTION`, and `NS-OWNERSHIP` in the [Engineer Persona](../../../Strategy/EngineerPersona.md); [`PGE-01`, `PGE-05`, `PGE-06`, `PGE-13`](../../../Strategy/Requirements.md); [First Release](../../../Acceptance/FirstRelease.md)
 
 **Current readiness:** **0/100** — target only; no tracked CI workflow or registered CMake test service was found. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
+
+**Open-source setup amendment (2026-10-11):** [repository-checks.yml](../../../../.github/workflows/repository-checks.yml) invokes the existing architecture script and Git whitespace checks on ordinary pull requests, main-branch pushes and manual dispatch. It uses a commit-pinned checkout action, read-only token, no persisted credentials, hosted Windows runner, timeout and cancellation. It does not acquire assets, require signing secrets, run GPU work or redefine owner assertions. Tool versions and candidate identity are logged; the hosted runner image is mutable and no deterministic build claim follows. Workflow source is prepared locally; no hosted run or branch-protection requirement is claimed. The readiness/snapshot below remains historical. [GitHub's workflow security guidance](https://docs.github.com/en/actions/reference/security/secure-use) informs these permission and pinning choices.
 
 ## At A Glance
 

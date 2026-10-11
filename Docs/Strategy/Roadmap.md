@@ -18,6 +18,8 @@ Start here to choose your next task. Open its linked plan for the exact stages, 
 
 **Progress:** [Current Readiness](../Acceptance/CurrentReadiness.md) records what exists and what is unproved. [Release Acceptance](../Acceptance/FirstRelease.md#release-gates) records which release gates pass. This page chooses work; it does not award completion.
 
+**Final pre-release task: obtain the Windows publisher certificate.** Owner decision, 2026-10-11: defer Certum enrollment/payment/identity verification while developing the free educational release. Preserve all features and seven maps. Prepare the signing/verification route during packaging; obtain the certificate, sign and timestamp first-party PEs, verify retained third-party signatures, then freeze the exact signed archive for [FR-06 independent adoption](../Architecture/CrossModule/FirstRelease/README.md#fr-06--candidate-freeze-and-independent-adoption), immediately before publication. Certificate absence does not block FR-01 or unsigned internal package work. Public release and its clean-machine trust/UX checks still require signed bytes; Windows can warn on unsigned development builds.
+
 For everyday use: read this section, choose one task, and open its plan. Use the release order below for the larger picture, the feature order for rendering work, and the later sections when the release is accepted.
 
 ## Ordered Delivery
