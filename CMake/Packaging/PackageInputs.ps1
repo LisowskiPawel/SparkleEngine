@@ -49,7 +49,7 @@ function New-PackageManifest
             }
         }
     }
-    foreach ($path in @('Tools/CMake/bin/cmake.exe','Tools/CMake/share/cmake-4.3/Modules/CMake.cmake',
+    foreach ($path in @('notices/ThirdPartyNotices.txt','Tools/CMake/bin/cmake.exe','Tools/CMake/share/cmake-4.3/Modules/CMake.cmake',
                         'manifests/sparkle-sbom.spdx.json','manifests/sparkle-provenance.json'))
     {
         if (@($Inputs.Files | Where-Object Path -eq $path).Count -ne 1) { throw "Missing required input: '$path'." }

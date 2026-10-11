@@ -20,7 +20,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 
 ## Where We Are And What Is Next
 
-**Next: qualify package inputs, finish PD-3, and produce the archive for your clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation). No verified product archive exists yet.
+**Next: finish PD-3's internal archive and clean-machine rehearsal, then PD-4.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation). [Current package results and archive identity](../../artifacts/validation/releases/0.1.0/19fd9698-pd3-admission-20261011/candidate.json) distinguish completed checks from remaining acceptance.
 
 | Current work | Design / acceptance reference | Implementation stages |
 | --- | --- | --- |
@@ -40,7 +40,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 | Identity / FR-01 | Identity, dependency pins, notices; earlier Shipping/Empty baseline passed locally. | Historical asset rights, exact redistribution/helper/symbol admission and current-candidate qualification. |
 | PD-1: Game / Editor | Product shells, shared settings path, dedicated lens-effect passes; bounded build/startup checks. | Input/DPI, settings/failure routes, Editor edit/save, unsupported providers and visual proof. New effect toggles remain deferred. |
 | PD-2: source / Launcher | Typed sync/configure/build/cook/run/clean and owner-check routes exist. | Cold/warm and controlled failures; independent source-adopter rehearsal. |
-| PD-3 / FR-02: package | Shared layout, stable seeds, shader source/symbol checks, Slang support and Qt/Mesa notices. Payload-bound admissions, child exit handling and portable CMake helper repaired. Six Shipping products rebuilt; owned PDB source checksums match. Shipping source/PDB paths no longer embed the repository root. [Current checks](../../artifacts/validation/releases/0.1.0/ab3c0fb9-pd3-manifest-20261011/candidate.json). | Finish SDK/asset notices and Windows/driver/dynamic closure receipts for the draft membership. Then produce the archive, qualify seven-map/offline/failure routes and run the user's clean-machine rehearsal. |
+| PD-3 / FR-02: package | Six Shipping products pass the input audit. Original asset authorship recorded; compiled/SDK/Microsoft notices consolidated. ShaderCompiler no longer embeds SDK locations. [Current checks](../../artifacts/validation/releases/0.1.0/19fd9698-pd3-admission-20261011/candidate.json). | Complete rights/closure admissions, including Windows 11 24H2 minimum qualification; produce the archive, then seven-map/offline/failure, LGPL replacement and user rehearsal. Public distribution conditions remain pre-release gates. |
 | PD-4: diagnostics | Local export, retention, symbols and replacement/review tools; fixture checks. | Waiting for the PD-3 archive, then native crash/hang/GPU/privacy, self-service and replacement checks. Automatic crash/hang collection is unavailable. |
 | FR-03 to FR-08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
 

@@ -97,7 +97,6 @@ int ListShaderBackends(std::span<const std::string_view> args)
 		          << " available=" << (backend.IsAvailable ? "true" : "false") << " sourceExtensions='" << BuildStringList(backend.SourceExtensions) << "'"
 		          << " codegenTargets='" << BuildTargetList(backend.CodegenTargets) << "'"
 		          << " binaryFormats='" << BuildStringList(backend.BinaryFormats) << "'"
-		          << " dependencies='" << BuildStringList(backend.DependencyLocations) << "'"
 		          << " rt='" << BuildRayTracingFeatureList(backend.Capabilities) << "'"
 		          << " version=" << backend.Version;
 		if (!backend.UnavailableReason.empty())

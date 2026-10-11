@@ -1,3 +1,19 @@
+Source: https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/edc7c9e67c639d230715049ee31f9a96a6babbbe/LICENSES/LicenseRef-LegalMark-Cesium.txt
+
+Use of Logo or Trademark Image owned by Cesium
+
+The logo or trademark incorporated into this content is owned by
+Cesium and is used by permission in accordance with the
+Legal Mark Usage Guidelines at
+https://github.com/AnalyticalGraphicsInc/cesium/wiki/CesiumTrademark.pdf.
+Use in this model do not change the license of the model. The model
+license does not confer any usage rights on the Mark beyond that
+specified in the Guidelines. In particular, there is no right to
+use the Mark in any other context based on the usage here.
+
+Cesium reserves the right to remove the Mark or unilaterally
+change the terms of use.
+
 Source: https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/CesiumMan/LICENSE.md
 
 # LICENSE file for the model: Cesium Man

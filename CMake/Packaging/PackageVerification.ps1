@@ -64,7 +64,7 @@ function Assert-PackageManifest
         if ($file.Component -notin @('Launcher','Editor','Game','AssetCooker','TextureCooker','ShaderCompiler','CMake','Engine','Shared') -or
             $file.Role -notin @('Runtime','Helper','EngineContent','Recipe','Defaults','Notice','Metadata') -or
             $file.Permission -ne 'ReadOnly' -or $file.License -match '^(|NOASSERTION|NONE)$' -or
-            $file.Signature -notin @('UnsignedFirstParty','VendorSigned','NotApplicable') -or
+            $file.Signature -notin @('UnsignedBuild','VendorSigned','NotApplicable') -or
             [string]::IsNullOrWhiteSpace($file.Owner) -or [string]::IsNullOrWhiteSpace($file.Origin) -or
             $file.Origin -match '[\\:]' -or $file.Origin.StartsWith('/'))
         {

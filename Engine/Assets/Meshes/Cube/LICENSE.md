@@ -1,14 +1,16 @@
 # LICENSE file for the model: Box
 
+Copyright 2017 Cesium. Source: [Khronos Box](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/Box). `Cube.bin` and `Cube.glb` match the publisher bytes. `Cube.gltf` changes only the buffer URI from `Box0.bin` to `Cube.bin`.
+
 All files in this directory tree are licensed as indicated below.
 
 * All files directly associated with the model including all text, image and binary files:
 
-  * [CC BY 4.0 International]("https:/creativecommons.org/licenses/by/4.0/legalcode") [SPDX license identifier: "CC-BY-4.0"]
+  * [CC BY 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode) [SPDX license identifier: "CC-BY-4.0"]
 
 * This file and all other metadocumentation files including "metadata.json":
 
-  * [Creative Commons Attribtution 4.0 International]("https:/creativecommons.org/licenses/by/4.0/legalcode") [SPDX license identifier: "CC-BY-4.0"]
+  * [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode) [SPDX license identifier: "CC-BY-4.0"]
 
 Full license text of these licenses are available at the links above
 

@@ -97,7 +97,6 @@ std::vector<ShaderBackendDescriptor> ListShaderBackends()
 		descriptor.SourceExtensions = registration.Descriptor.SourceExtensions;
 		descriptor.CodegenTargets = registration.Descriptor.CodegenTargets;
 		descriptor.BinaryFormats = registration.Descriptor.BinaryFormats;
-		descriptor.DependencyLocations = registration.Descriptor.DependencyLocations;
 		descriptor.Capabilities = registration.Descriptor.Capabilities;
 		descriptor.IsAvailable = QueryBackendAvailability(registration.Descriptor, descriptor.UnavailableReason);
 		descriptor.Version = registration.Descriptor.QueryVersion != nullptr ? registration.Descriptor.QueryVersion() : 0;

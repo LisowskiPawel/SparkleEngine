@@ -2,7 +2,7 @@
 
 This folder owns curated imagery for the launcher Quick Start hero and contextual workflow surfaces.
 
-Current images are intentionally derived from Showcase source/cooked material and launcher validation captures so the NVIDIA-inspired shell has product visuals without hardcoding machine-local screenshots into the UI. The launcher applies crop, fade, and accent overlays at render time so images support text, CTAs, and status chips rather than compete with them.
+Pawel Lisowski confirmed on 2026-10-11 that these PNGs are his original work for Sparkle. They use the repository's MIT license.
 
 Quick Start asset slots:
 

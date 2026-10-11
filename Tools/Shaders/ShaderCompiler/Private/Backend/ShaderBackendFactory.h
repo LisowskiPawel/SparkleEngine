@@ -16,7 +16,6 @@ struct ShaderBackendDescriptor final
 	std::span<const std::string_view> SourceExtensions;
 	std::span<const ShaderTarget> CodegenTargets;
 	std::span<const std::string_view> BinaryFormats;
-	std::span<const std::string_view> DependencyLocations;
 	ShaderBackendCapabilities Capabilities;
 	std::uint64_t Version = 0;
 	bool IsAvailable = false;

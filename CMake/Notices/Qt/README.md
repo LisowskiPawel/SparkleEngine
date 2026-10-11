@@ -1,6 +1,6 @@
 # Qt notice
 
-Sparkle Launcher uses dynamically linked Qt libraries and plugins. Their LGPLv3 rights apply separately from Sparkle's MIT license. The included LGPLv3 and GPLv3 texts describe those rights. `ThirdPartyNotices.txt` retains Qt Base/SVG third-party attributions and license texts from the matching 6.11.1 sources and publisher SBOMs, plus Qt's Mesa attribution. Microsoft binaries still need their own terms; this directory alone is not the complete package notice bundle.
+Sparkle Launcher uses dynamically linked Qt libraries and plugins. Their LGPLv3 rights apply separately from Sparkle's MIT license. The included LGPLv3 and GPLv3 texts describe those rights. `ThirdPartyNotices.txt` retains Qt Base/SVG third-party attributions and license texts from the matching 6.11.1 sources and publisher SBOMs, plus Qt's Mesa attribution. The package's `notices/ThirdPartyNotices.txt` separately retains compiled-library, shader SDK and Microsoft runtime terms.
 
 ## Corresponding source
 
