@@ -23,7 +23,7 @@ namespace SparkleLauncher
 		{
 			AppendSelectedLevelPacks();
 			return std::move(m_packIds);
-		}
+		} 
 
 	private:
 		void AppendSelectedLevelPacks()
