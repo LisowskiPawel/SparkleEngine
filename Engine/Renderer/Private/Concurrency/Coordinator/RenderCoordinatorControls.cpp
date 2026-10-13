@@ -209,11 +209,8 @@ void RenderCoordinator::SubmitThreadCommand(RenderThreadCommandPayload payload)
 	m_producerOwner.AssertAccess();
 	const std::uint64_t sequenceNumber = IssueThreadCommandSequence();
 	std::shared_ptr<RenderControlCompletion> completion;
-	bool shutdown = false;
 	if (const auto* control = std::get_if<RendererExecutionControl>(&payload))
 	{
-		shutdown = std::holds_alternative<RenderShutdownCommand>(*control);
-
 		std::visit(
 		    [&completion](const auto& command)
 		    {
@@ -230,7 +227,7 @@ void RenderCoordinator::SubmitThreadCommand(RenderThreadCommandPayload payload)
 		{
 			completion->Cancel();
 		}
-		else if (!shutdown)
+		else
 		{
 			Diagnostics::Fatal(g_renderCoordinatorLogger, __FILE__, __LINE__, "Render-thread command queue rejected submission after closing.");
 		}

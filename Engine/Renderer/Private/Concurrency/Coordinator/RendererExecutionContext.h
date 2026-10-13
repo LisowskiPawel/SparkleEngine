@@ -36,12 +36,10 @@ private:
 	std::uint64_t GetShaderGeneration() const noexcept;
 	void CompleteShaderReload(const RenderReloadShadersCommand& command) noexcept;
 	void CompleteDiagnostics(const RenderDiagnosticsCommand& command);
-	void SettleRendererBeforeDestruction() noexcept;
 
 	Threading::OwnerThread m_owner{"RenderCoordinator renderer state"};
 	std::unique_ptr<RendererHost> m_rendererHost;
 	std::unique_ptr<FramePipeline> m_pipeline;
-	bool m_shutdownSettled = false;
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	RhiExternalCapture* m_externalCapture = nullptr;
 #endif

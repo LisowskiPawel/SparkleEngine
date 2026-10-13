@@ -2,6 +2,7 @@
 #include "Concurrency/FrameQueue/RenderFrameQueue.h"
 
 #include <limits>
+#include <vector>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderFrameQueueLogger, "Renderer.FrameQueue");
 
@@ -116,12 +117,18 @@ void RenderFrameQueue::Close() noexcept
 
 void RenderFrameQueue::SettleAll() noexcept
 {
+	std::vector<RenderExecutionRequest> abandoned;
+	abandoned.reserve(m_capacity);
 	{
 		std::lock_guard lock(m_mutex);
 		m_closed = true;
 		for (std::uint32_t slotIndex = 0; slotIndex < m_capacity; ++slotIndex)
 		{
 			Slot& slot = m_slots[slotIndex];
+			if (slot.Request)
+			{
+				abandoned.push_back(std::move(*slot.Request));
+			}
 			slot.Request.reset();
 			slot.State = RenderFrameSlotState::Free;
 		}

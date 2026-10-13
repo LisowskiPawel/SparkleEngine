@@ -79,13 +79,7 @@ void RenderCoordinator::RenderThreadMain()
 
 		while (std::optional<RenderThreadCommand> command = m_threadCommandQueue->WaitPop())
 		{
-			const RendererExecutionControl* control = std::get_if<RendererExecutionControl>(&command->Payload);
-			const bool shutdown = control != nullptr && std::holds_alternative<RenderShutdownCommand>(*control);
 			ProcessThreadedCommand(std::move(*command));
-			if (shutdown)
-			{
-				break;
-			}
 		}
 	}
 	catch (const std::exception& exception)

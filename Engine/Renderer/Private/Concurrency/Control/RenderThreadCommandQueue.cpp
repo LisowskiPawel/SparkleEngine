@@ -49,7 +49,7 @@ std::optional<RenderThreadCommand> RenderThreadCommandQueue::WaitPop()
 {
 	std::unique_lock lock(m_mutex);
 	m_notEmpty.wait(lock, [this] { return m_closed || !m_commands.empty(); });
-	if (m_commands.empty())
+	if (m_closed || m_commands.empty())
 	{
 		return std::nullopt;
 	}

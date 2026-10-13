@@ -31,9 +31,8 @@ RenderCoordinator::~RenderCoordinator() noexcept
 		return;
 	}
 
-	SubmitThreadCommand(RendererExecutionControl{RenderShutdownCommand{}});
-	m_frameQueue->Close();
 	m_threadCommandQueue->Close();
+	m_frameQueue->Close();
 	if (m_renderThread.joinable())
 	{
 		m_renderThread.join();

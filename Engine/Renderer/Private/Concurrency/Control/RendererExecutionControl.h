@@ -51,10 +51,6 @@ struct RenderSettingsChangedCommand final
 	EngineRenderingSettingsState Settings;
 };
 
-struct RenderShutdownCommand final
-{
-};
-
 struct RenderCVarCommand final
 {
 	CVarControlRequest Request;
@@ -73,7 +69,6 @@ using RendererExecutionControl = std::variant<
     RenderDiagnosticsCommand,
     RenderCaptureCommand,
     RenderSettingsChangedCommand,
-    RenderShutdownCommand,
     RenderCVarCommand,
     RenderSettingsCaptureCommand
 #if SPARKLE_WITH_EXTERNAL_CAPTURE

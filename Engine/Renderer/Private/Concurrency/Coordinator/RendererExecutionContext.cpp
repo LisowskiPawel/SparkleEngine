@@ -23,7 +23,7 @@ RendererExecutionContext::RendererExecutionContext(Window& window, const RhiDevi
 RendererExecutionContext::~RendererExecutionContext() noexcept
 {
 	m_owner.AssertAccess();
-	SettleRendererBeforeDestruction();
+	m_rendererHost->SettleForShutdown();
 	m_pipeline.reset();
 	m_rendererHost.reset();
 }
@@ -89,10 +89,6 @@ void RendererExecutionContext::ExecuteControl(RendererExecutionControl control) 
 			    }
 #endif
 		    }
-		    else if constexpr (std::is_same_v<TCommand, RenderShutdownCommand>)
-		    {
-			    SettleRendererBeforeDestruction();
-		    }
 	    },
 	    control);
 }
@@ -151,15 +147,4 @@ void RendererExecutionContext::CompleteDiagnostics(const RenderDiagnosticsComman
 			command.Completion->Complete(m_rendererHost->CaptureMemoryDiagnostics());
 			break;
 	}
-}
-
-void RendererExecutionContext::SettleRendererBeforeDestruction() noexcept
-{
-	if (m_shutdownSettled || m_rendererHost == nullptr)
-	{
-		return;
-	}
-
-	m_rendererHost->SettleForShutdown();
-	m_shutdownSettled = true;
 }
