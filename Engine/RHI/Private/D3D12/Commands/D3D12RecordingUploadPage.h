@@ -2,14 +2,14 @@
 
 #include "Resources/RhiResourceDesc.h"
 
+#include <cstddef>
 #include <cstdint>
-#include <d3d12.h>
 #include <memory>
 #include <thread>
-#include <wrl/client.h>
+#include <vector>
 
 class D3D12Rhi;
-struct D3D12GpuAllocationRecord;
+class D3D12GpuMemoryAllocator;
 
 class D3D12RecordingUploadPage final
 {
@@ -28,15 +28,13 @@ public:
 	void Reset() noexcept;
 	RhiGpuVirtualAddress AllocateAndCopy(const void* data, std::uint32_t sizeInBytes);
 
-	std::uint64_t GetCapacityInBytes() const noexcept { return m_capacityInBytes; }
-
-	std::uint64_t GetUsedBytes() const noexcept { return m_offset; }
-
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> m_resource;
-	std::unique_ptr<D3D12GpuAllocationRecord> m_allocation;
-	std::uint8_t* m_cpuBase = nullptr;
-	RhiGpuVirtualAddress m_gpuBase = 0;
+	struct Page;
+	void AddPage(std::uint64_t capacityInBytes, const wchar_t* debugName);
+
+	std::vector<std::unique_ptr<Page>> m_pages;
+	D3D12GpuMemoryAllocator* m_memoryAllocator = nullptr;
+	std::size_t m_pageIndex = 0;
 	std::thread::id m_recordingThread;
 	std::uint64_t m_capacityInBytes = 0;
 	std::uint64_t m_offset = 0;

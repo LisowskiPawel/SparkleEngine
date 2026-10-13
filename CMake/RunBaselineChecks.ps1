@@ -23,8 +23,9 @@ $OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
 if (Test-Path -LiteralPath $OutputDirectory) { throw "Choose a fresh baseline output directory." }
 [void] (New-Item -ItemType Directory -Path $OutputDirectory)
 $patchPath = Join-Path $OutputDirectory 'worktree.patch'
-& git -C $repositoryRoot diff --binary HEAD | Set-Content -LiteralPath $patchPath -Encoding UTF8
+$patch = @(& git -C $repositoryRoot diff --binary HEAD)
 if ($LASTEXITCODE -ne 0) { throw "Cannot retain the worktree patch." }
+[IO.File]::WriteAllText($patchPath, ($patch -join "`n"), [Text.UTF8Encoding]::new($false))
 $build = Join-Path $repositoryRoot 'build'
 $cmake = Get-Command cmake -CommandType Application -ErrorAction SilentlyContinue
 $checks = @("architecture_boundary_check", "code_style_check", "ShaderCompilerCliValidation") | ForEach-Object {

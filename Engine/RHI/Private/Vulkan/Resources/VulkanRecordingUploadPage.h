@@ -3,14 +3,13 @@
 #include "Resources/RhiResourceDesc.h"
 #include "Vulkan/VulkanIncludes.h"
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 class VulkanGpuMemoryAllocator;
 class VulkanRhi;
-struct VulkanGpuAllocationRecord;
 
 class VulkanRecordingUploadPage final
 {
@@ -27,22 +26,13 @@ public:
 	RhiGpuVirtualAddress AllocateAndCopy(const void* data, std::uint32_t sizeInBytes) noexcept;
 	bool Resolve(RhiGpuVirtualAddress address, VkBuffer& buffer, VkDeviceSize& offset, VkDeviceSize& range) const noexcept;
 
-	std::uint64_t GetCapacityInBytes() const noexcept { return m_capacityInBytes; }
-
 private:
-	struct Allocation final
-	{
-		VkDeviceSize Offset = 0;
-		VkDeviceSize Size = 0;
-	};
+	struct Page;
+	void AddPage(std::uint64_t capacityInBytes);
 
-	static constexpr std::size_t MaximumAllocations = 4096;
-
-	std::unique_ptr<VulkanGpuAllocationRecord> m_buffer;
+	std::vector<std::unique_ptr<Page>> m_pages;
 	VulkanGpuMemoryAllocator* m_memoryAllocator = nullptr;
-	std::array<Allocation, MaximumAllocations> m_allocations;
-	std::byte* m_mappedData = nullptr;
-	std::size_t m_allocationCount = 0;
+	std::size_t m_pageIndex = 0;
 	std::uint64_t m_capacityInBytes = 0;
 	VkDeviceSize m_alignment = 1;
 	VkDeviceSize m_offset = 0;
