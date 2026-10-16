@@ -1,14 +1,14 @@
 # D. Whole Repository Architecture Map
 
 [Docs](../README.md) / [Up](README.md)
-
+ 
 **Status:** current map; source-backed and descriptive, not a normative architecture or strategy contract
 
 **Last verified:** repository-wide map 2026-08-28 at committed `master` revision `20814381`; Launcher ownership and repository code-style routes reverified 2026-08-31 at committed `master` revision `61fe39d9`; build-module dependency visibility reverified 2026-09-03 against the current working tree
 
 **Scope:** implemented repository structure, target boundaries, runtime and tool flows, project catalog, and current source-evidence limits
 
-## Read This Page
+## Read This Page 
 
 - **Find an owner:** [Repository layout](#repository-at-a-glance) and [module boundaries](#build-and-module-boundaries).
 - **Follow a workflow:** Use the runtime and tool flows below, then open the owning module for its details.
