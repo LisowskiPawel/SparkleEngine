@@ -2,27 +2,21 @@
 #include "Diagnostics/ExternalCapture/ExternalCaptureAdapter.h"
 #include "Core/Public/Diagnostics/Verify.h"
 
-#include <Windows.h>
+#include "Diagnostics/ExternalToolActivity.h"
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_externalCaptureBootstrapLogger, "RHI.ExternalCapture.Bootstrap");
 
-static bool HasInjectedCaptureHooks() noexcept
-{
-	return GetModuleHandleW(L"WinPixGpuCapturer.dll") != nullptr || GetModuleHandleW(L"renderdoc.dll") != nullptr || GetModuleHandleW(L"ngfx-capture-injection.dll") != nullptr
-	    || GetModuleHandleW(L"ngfx-capture-interception.dll") != nullptr;
-}
-
 static bool ValidateInjectedCaptureActivity(ExternalCaptureProvider provider, std::string& error)
 {
-	if (GetModuleHandleW(L"WarpVizTarget.dll") != nullptr || GetModuleHandleW(L"ToolsInjection64.dll") != nullptr)
+	if (ExternalToolActivity::HasTrace())
 	{
 		error = "A trace/system activity is already injected. Graphics Capture requires a separate process.";
 		return false;
 	}
 
-	const bool pixLoaded = GetModuleHandleW(L"WinPixGpuCapturer.dll") != nullptr;
-	const bool renderDocLoaded = GetModuleHandleW(L"renderdoc.dll") != nullptr;
-	const bool nsightLoaded = GetModuleHandleW(L"ngfx-capture-interception.dll") != nullptr;
+	const bool pixLoaded = ExternalToolActivity::IsCaptureProviderLoaded(ExternalCaptureProvider::Pix);
+	const bool renderDocLoaded = ExternalToolActivity::IsCaptureProviderLoaded(ExternalCaptureProvider::RenderDoc);
+	const bool nsightLoaded = ExternalToolActivity::IsCaptureProviderLoaded(ExternalCaptureProvider::NsightGraphics);
 	if ((pixLoaded && provider != ExternalCaptureProvider::Pix) || (renderDocLoaded && provider != ExternalCaptureProvider::RenderDoc)
 	    || (nsightLoaded && provider != ExternalCaptureProvider::NsightGraphics))
 	{
@@ -69,7 +63,7 @@ std::unique_ptr<ExternalCaptureAdapter> CreateExternalCaptureAdapter(ERhiBackend
 	}
 
 	auto adapter = BootstrapCaptureProvider(api, provider, error);
-	if (adapter == nullptr && HasInjectedCaptureHooks())
+	if (adapter == nullptr && ExternalToolActivity::HasGraphicsCapture())
 	{
 		Diagnostics::Fatal(g_externalCaptureBootstrapLogger, __FILE__, __LINE__, error);
 	}

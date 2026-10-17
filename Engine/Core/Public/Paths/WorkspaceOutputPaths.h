@@ -36,4 +36,5 @@ namespace Filesystem
 	};
 
 	SPARKLE_CORE_API WorkspaceOutputPaths ResolveWorkspaceOutputPaths(const std::filesystem::path& repositoryRoot);
+	SPARKLE_CORE_API WorkspaceOutputPaths ResolveWorkspaceOutputPaths(const std::filesystem::path& repositoryRoot, std::string_view variant);
 }

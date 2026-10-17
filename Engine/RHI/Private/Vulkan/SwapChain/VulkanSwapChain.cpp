@@ -1,6 +1,9 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/SwapChain/VulkanSwapChain.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
+#endif
 
 #include "CVars/RHICVars.h"
 #include "Frame/RhiFrameConstants.h"
@@ -63,6 +66,9 @@ bool VulkanSwapChain::AcquireNextImage(std::uint32_t frameIndex) noexcept
 		return true;
 	}
 
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::ObserveLoss(m_rhi, ERhiQueueType::Graphics, result);
+#endif
 	Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkAcquireNextImageKHR", result));
 	return false;
 }

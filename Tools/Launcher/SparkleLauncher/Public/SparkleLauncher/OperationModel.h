@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Public/Process/ChildProcess.h"
+#include "SparkleLauncher/GpuCrashIncident.h"
 
 #include <chrono>
 #include <cstdint>
@@ -82,6 +83,8 @@ namespace SparkleLauncher
 		OperationDestructiveScope DestructiveScope = OperationDestructiveScope::None;
 		bool RequiresConfirmation = false;
 		std::optional<OperationFailure> Failure;
+		std::optional<GpuCrashIncident> GpuCrash;
+		std::filesystem::path ShaderExportPath;
 	};
 
 	OperationRecord MakeOperationRecord(std::string id, std::string displayName);

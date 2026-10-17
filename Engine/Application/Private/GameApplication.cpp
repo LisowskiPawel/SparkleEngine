@@ -1,6 +1,11 @@
 #include "PCH.h"
 #include "GameApplication.h"
 #include "ApplicationGraphicsLaunch.h"
+#include "ApplicationGpuCrashStartup.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Diagnostics/GpuCrash/GpuCrashIncidentSink.h"
+  #include "Diagnostics/GpuCrash/GpuCrashInputs.h"
+#endif
 
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
@@ -123,12 +128,23 @@ void GameApplication::InitializeGameWorld()
 	m_cameraInputIntentCollector = std::make_unique<CameraInputIntentCollector>(*m_inputSystem, *m_window);
 
 	m_levelSession = std::make_unique<LevelSession>(*m_gameWorld, m_taskRuntime->GetExecutor(), m_taskRuntime->GetApplicationScope());
-	m_levelSession->GetLevelChangeEvents().OnLevelChanged.Add([](const LevelChangedEventArgs& event) noexcept { Process::SignalParentReadiness(event.activeLevelName); });
+	m_levelSession->GetLevelChangeEvents().OnLevelChanged.Add([this](const LevelChangedEventArgs& event) { SignalLevelReadiness(event.activeLevelName); });
 }
 
 void GameApplication::InitializeRenderer()
 {
-	const RendererGraphicsLaunch graphicsLaunch = ResolveApplicationGraphicsLaunch();
+	RendererGraphicsLaunch graphicsLaunch = ResolveApplicationGraphicsLaunch();
+	[[maybe_unused]] const auto gpuCrashStartup = ResolveGpuCrashStartup();
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (!gpuCrashStartup.ShaderExport.empty())
+	{
+		graphicsLaunch.GpuCrash.Mode = RhiGpuCrashMode::Aftermath;
+		m_gpuCrashSink = std::make_unique<GpuCrashIncidentSink>(*m_taskRuntime, gpuCrashStartup, graphicsLaunch.BackendApi);
+		graphicsLaunch.GpuCrash.Sink = m_gpuCrashSink.get();
+		graphicsLaunch.GpuCrash.LibraryPath = ResolveAftermathLibraryPath();
+	}
+#endif
+
 	RendererExecutionConfig rendererConfig;
 	if (m_options.AllowThreadedRenderer && ConcurrencyLaunchCVars::UseThreadedRenderer())
 	{
@@ -148,7 +164,22 @@ void GameApplication::InitializeRenderer()
 	rendererConfig.EnableUiRenderPackets = m_options.EnableUiRenderPackets || m_options.EnableGameUi;
 	rendererConfig.AssetTaskExecutor = &m_taskRuntime->GetExecutor();
 	rendererConfig.AssetTaskParentScope = &m_taskRuntime->GetApplicationScope();
-	m_renderer = std::make_unique<Renderer>(*m_timer, *m_window, graphicsLaunch, rendererConfig);
+
+	try
+	{
+		m_renderer = std::make_unique<Renderer>(*m_timer, *m_window, graphicsLaunch, rendererConfig);
+	}
+	catch (...)
+	{
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+		if (m_gpuCrashSink != nullptr)
+		{
+			m_gpuCrashSink->AbortPreparation();
+			m_gpuCrashSink.reset();
+		}
+#endif
+		throw;
+	}
 }
 
 void GameApplication::InitializeGameUi()
@@ -199,8 +230,40 @@ GameApplicationFrameResult GameApplication::BeginFrame()
 		m_levelSession->ProcessPendingLevelChange();
 	}
 
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	ReportReadiness();
+#endif
 	return GameApplicationFrameResult::Ready;
 }
+
+void GameApplication::SignalLevelReadiness(std::string_view level)
+{
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (m_gpuCrashSink)
+	{
+		m_pendingReadiness = level;
+		return;
+	}
+#endif
+	Process::SignalParentReadiness(level);
+}
+
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+
+void GameApplication::ReportReadiness()
+{
+	if (m_pendingReadiness.empty())
+	{
+		return;
+	}
+	if (m_gpuCrashSink && !m_gpuCrashSink->IsReadyPublished())
+	{
+		return;
+	}
+	Process::SignalParentReadiness(m_pendingReadiness);
+	m_pendingReadiness.clear();
+}
+#endif
 
 void GameApplication::UpdateGame() noexcept
 {
@@ -282,6 +345,9 @@ void GameApplication::Shutdown()
 	}
 	m_gameUiHost.reset();
 	m_renderer.reset();
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	m_gpuCrashSink.reset();
+#endif
 	m_levelSession.reset();
 	m_cameraInputIntentCollector.reset();
 	m_gameWorld.reset();

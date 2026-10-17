@@ -25,10 +25,12 @@ namespace SparkleLauncher
 		ProcessOutputCallback OutputCallback;
 		std::stop_token Cancellation;
 		std::optional<std::string> ReadinessValue;
+		std::function<Process::ChildReadinessDecision(std::uint32_t, std::string_view, std::string&)> ReadinessValidator;
 	};
 
 	struct ProcessResult
 	{
+		std::uint32_t ProcessId = 0;
 		bool Launched = false;
 		bool Ready = false;
 		bool Canceled = false;
@@ -63,5 +65,6 @@ namespace SparkleLauncher
 	};
 
 	void AppendProcessOutputCallback(ProcessRequest& request, ProcessOutputCallback callback);
+	std::filesystem::path ReadProcessOutputPath(std::string_view output, std::string_view prefix);
 	std::string BuildDisplayCommandLine(const std::filesystem::path& executablePath, const std::vector<std::string>& arguments);
 }

@@ -400,3 +400,5 @@ function(sparkle_stage_external_capture_notices product_target)
             COMMAND_EXPAND_LISTS VERBATIM)
     endforeach()
 endfunction()
+
+include("${CMAKE_CURRENT_LIST_DIR}/Diagnostics/GpuCrashArtifacts.cmake")

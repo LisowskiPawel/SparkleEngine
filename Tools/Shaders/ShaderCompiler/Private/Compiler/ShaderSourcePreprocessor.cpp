@@ -51,6 +51,7 @@ void ShaderSourcePreprocessor::VisitFile(std::string_view filePath, const Shader
 	{
 		if (std::regex_search(line, pragmaOnceRegex))
 		{
+			outSource += '\n';
 			++lineNumber;
 			continue;
 		}

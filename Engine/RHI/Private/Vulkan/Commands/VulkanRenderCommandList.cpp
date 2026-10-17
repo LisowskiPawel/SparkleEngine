@@ -1,6 +1,9 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Commands/VulkanRenderCommandList.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
+#endif
 
 #include "Vulkan/Memory/VulkanGpuMemoryAllocator.h"
 #include "Vulkan/Pipeline/VulkanPipeline.h"
@@ -44,6 +47,9 @@ void VulkanRenderCommandList::SetNativeCommandBuffer(
     PFN_vkCmdInsertDebugUtilsLabelEXT insertLabel) noexcept
 {
 	m_commandBuffer = commandBuffer;
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	m_gpuCrashScopes.Reset();
+#endif
 	m_dynamicRenderingActive = false;
 	m_renderTargets = {};
 	m_renderTargetCount = 0;
@@ -117,21 +123,36 @@ NativeGraphicsCommandListHandle VulkanRenderCommandList::GetNativeHandle(const R
 
 bool VulkanRenderCommandList::SupportsDiagnosticScopes() const noexcept
 {
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (GpuCrashSession::Current() != nullptr)
+	{
+		return m_commandBuffer != VK_NULL_HANDLE;
+	}
+#endif
 	return VulkanDebugEvents::SupportsScopes(m_commandBuffer, m_debugEvents);
 }
 
 void VulkanRenderCommandList::BeginDiagnosticScope(std::string_view label, RhiDiagnosticLabelColor color) noexcept
 {
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::Checkpoint(m_commandBuffer, m_gpuCrashScopes.Begin(label));
+#endif
 	VulkanDebugEvents::BeginScope(m_commandBuffer, m_debugEvents, label, color);
 }
 
 void VulkanRenderCommandList::EndDiagnosticScope() noexcept
 {
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::Checkpoint(m_commandBuffer, m_gpuCrashScopes.End());
+#endif
 	VulkanDebugEvents::EndScope(m_commandBuffer, m_debugEvents);
 }
 
 void VulkanRenderCommandList::InsertDiagnosticMarker(std::string_view label, RhiDiagnosticLabelColor color) noexcept
 {
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::Checkpoint(m_commandBuffer, m_gpuCrashScopes.Insert(label));
+#endif
 	VulkanDebugEvents::InsertMarker(m_commandBuffer, m_debugEvents, label, color);
 }
 

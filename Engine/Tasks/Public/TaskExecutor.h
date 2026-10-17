@@ -2,6 +2,7 @@
 
 #include "TaskExecution.h"
 #include "TaskExecutionContext.h"
+#include "TaskDispatch.h"
 
 #include <cstdint>
 #include <memory>
@@ -41,12 +42,14 @@ public:
 	TaskExecution Submit(TaskDesc desc, TaskFunction function, TaskExecutionContext& context);
 	TaskExecution Launch(TaskScope& scope, const CompiledTaskGraph& graph, TaskExecutionContext context = {});
 	TaskExecution Launch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context = {});
+	TaskDispatch PrepareDispatch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context = {});
 
 	// Cancel prevents queued normal bodies from starting; running bodies finish and cleanup nodes still settle.
 	bool Shutdown(TaskExecutorShutdownMode mode = TaskExecutorShutdownMode::Drain) noexcept;
 	std::uint32_t GetWorkerCount(TaskLane lane) const noexcept;
 
 private:
+	friend class TaskDispatch;
 	struct Implementation;
 	std::unique_ptr<Implementation> m_implementation;
 };

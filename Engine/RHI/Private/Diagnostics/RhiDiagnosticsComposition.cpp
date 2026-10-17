@@ -1,6 +1,9 @@
 #include "PCH.h"
 
 #include "Diagnostics/RhiDiagnosticsComposition.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Diagnostics/GpuCrash/GpuCrashSession.h"
+#endif
 
 #include <cassert>
 #include <utility>
@@ -27,9 +30,14 @@ public:
 
 	RhiDiagnosticsCapabilities GetCapabilities() const noexcept override
 	{
+		bool requiresScopes = false;
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+		requiresScopes = GpuCrashSession::Current() != nullptr;
+#endif
 		return RhiDiagnosticsCapabilities{
 		    .SupportsObjectNames = m_objectDiagnostics->SupportsObjectNames(),
-		    .SupportsGpuEvents = m_supportsGpuEvents,
+		    .SupportsGpuEvents = m_supportsGpuEvents || requiresScopes,
+		    .RequiresBaselineScopes = requiresScopes,
 		    .SupportsTimestampQueries = GetTimingDiagnostics() != nullptr,
 		    .SupportsDebugMessages = GetMessageDiagnostics() != nullptr,
 		    .SupportsLiveObjectReports = m_failureDiagnostics != nullptr && m_failureDiagnostics->SupportsLiveObjectReports(),

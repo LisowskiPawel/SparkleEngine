@@ -1,4 +1,7 @@
 #include "PCH.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
+#endif
 
 #include "D3D12/Pipeline/D3D12RayTracingPipeline.h"
 
@@ -42,6 +45,9 @@ public:
 			    D3D12_DXIL_LIBRARY_DESC{.DXILLibrary = D3D12_SHADER_BYTECODE{.pShaderBytecode = bytecode.Data, .BytecodeLength = bytecode.Size}, .NumExports = 1, .pExports = &m_exportDescs.back()});
 
 			m_subobjects.push_back(D3D12_STATE_SUBOBJECT{.Type = D3D12_STATE_SUBOBJECT_TYPE_DXIL_LIBRARY, .pDesc = &m_libraryDescs.back()});
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+			D3D12GpuCrash::Shader(m_libraryDescs.back().DXILLibrary);
+#endif
 		}
 
 		for (const RhiRayTracingHitGroupDesc& hitGroup : desc.HitGroups)

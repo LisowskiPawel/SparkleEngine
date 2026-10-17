@@ -72,6 +72,8 @@ namespace SparkleLauncher
 	static LauncherOperationResult BuildOperationResult(const OperationRecord& operation)
 	{
 		LauncherOperationResult result;
+		result.GpuCrash = operation.GpuCrash;
+		result.ShaderExportPath = QString::fromStdWString(operation.ShaderExportPath.wstring());
 		result.Status = QString::fromStdString(ToString(operation.Status));
 		result.Succeeded = operation.Status == OperationStatus::Succeeded;
 		result.Skipped = operation.Status == OperationStatus::Skipped;
@@ -166,6 +168,14 @@ namespace SparkleLauncher
 		    title.toStdString(),
 		    [this, runId, operationIdText](std::string_view output) { QueueOperationOutput(runId, operationIdText, std::string(output)); },
 		    [this, runId, operationIdText, title](const OperationRecord& record) { QueueOperationFinished(runId, operationIdText, title, record); });
+	}
+
+	bool LauncherBackend::ObserveGpuCrash(GpuCrashIncident incident, std::function<void(const QString&)> completion)
+	{
+		return m_operationService->ObserveGpuCrash(
+		    std::move(incident),
+		    [this, completion = std::move(completion)](std::string state)
+		    { QMetaObject::invokeMethod(this, [completion, state = QString::fromStdString(state)]() { completion(state); }, Qt::QueuedConnection); });
 	}
 
 	bool LauncherBackend::CancelOperation(const QString& runId)

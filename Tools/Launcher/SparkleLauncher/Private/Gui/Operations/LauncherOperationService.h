@@ -27,6 +27,7 @@ namespace SparkleLauncher
 
 		void Launch(LauncherOperationCategory category, LauncherOperationRequest request, std::string title, OutputCallback outputCallback, CompletionCallback completionCallback);
 		bool Cancel(std::string_view runId) noexcept;
+		bool ObserveGpuCrash(GpuCrashIncident incident, std::function<void(std::string)> completion);
 
 	private:
 		struct Implementation;

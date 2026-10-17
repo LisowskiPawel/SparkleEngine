@@ -21,7 +21,6 @@ void RayTracingMaterialClosestHit(inout RayTracingMaterialPayload payload, Built
 [shader("anyhit")]
 void RayTracingMaterialAnyHit(inout RayTracingMaterialPayload payload, BuiltInTriangleIntersectionAttributes attributes)
 {
-	(void)payload;
 	if (!ResolveRayTracingCandidateAlpha(InstanceID(), PrimitiveIndex(), attributes.barycentrics, HitKind() == HIT_KIND_TRIANGLE_FRONT_FACE))
 	{
 		IgnoreHit();

@@ -10,6 +10,69 @@
 
 namespace Json
 {
+	static bool TryReadHexQuad(std::string_view document, std::size_t& cursor, std::uint32_t& codeUnit) noexcept
+	{
+		if (cursor + 4u > document.size())
+		{
+			return false;
+		}
+
+		codeUnit = 0u;
+		for (std::size_t index = 0; index < 4u; ++index)
+		{
+			const char hex = document[cursor++];
+			codeUnit <<= 4u;
+			if (hex >= '0' && hex <= '9')
+			{
+				codeUnit |= static_cast<std::uint32_t>(hex - '0');
+			}
+			else if (hex >= 'a' && hex <= 'f')
+			{
+				codeUnit |= static_cast<std::uint32_t>(hex - 'a' + 10);
+			}
+			else if (hex >= 'A' && hex <= 'F')
+			{
+				codeUnit |= static_cast<std::uint32_t>(hex - 'A' + 10);
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	static bool TryReadUnicodeEscape(std::string_view document, std::size_t& cursor, std::string& value)
+	{
+		std::uint32_t codePoint = 0u;
+		if (!TryReadHexQuad(document, cursor, codePoint))
+		{
+			return false;
+		}
+
+		if (codePoint >= 0xd800u && codePoint <= 0xdbffu)
+		{
+			if (cursor + 2u > document.size() || document[cursor] != '\\' || document[cursor + 1u] != 'u')
+			{
+				return false;
+			}
+
+			cursor += 2u;
+			std::uint32_t lowSurrogate = 0u;
+			if (!TryReadHexQuad(document, cursor, lowSurrogate) || lowSurrogate < 0xdc00u || lowSurrogate > 0xdfffu)
+			{
+				return false;
+			}
+			codePoint = 0x10000u + ((codePoint - 0xd800u) << 10u) + (lowSurrogate - 0xdc00u);
+		}
+		else if (codePoint >= 0xdc00u && codePoint <= 0xdfffu)
+		{
+			return false;
+		}
+
+		return Strings::AppendUtf8CodePoint(codePoint, value);
+	}
+
 	static bool TryReadString(std::string_view document, std::size_t& cursor, std::string& outValue)
 	{
 		if (cursor >= document.size() || document[cursor++] != '"')
@@ -73,61 +136,7 @@ namespace Json
 					break;
 				case 'u':
 				{
-					auto readHexQuad = [&document, &cursor](std::uint32_t& codeUnit) noexcept
-					{
-						if (cursor + 4u > document.size())
-						{
-							return false;
-						}
-						codeUnit = 0u;
-						for (std::size_t index = 0; index < 4u; ++index)
-						{
-							const char hex = document[cursor++];
-							codeUnit <<= 4u;
-							if (hex >= '0' && hex <= '9')
-							{
-								codeUnit |= static_cast<std::uint32_t>(hex - '0');
-							}
-							else if (hex >= 'a' && hex <= 'f')
-							{
-								codeUnit |= static_cast<std::uint32_t>(hex - 'a' + 10);
-							}
-							else if (hex >= 'A' && hex <= 'F')
-							{
-								codeUnit |= static_cast<std::uint32_t>(hex - 'A' + 10);
-							}
-							else
-							{
-								return false;
-							}
-						}
-						return true;
-					};
-
-					std::uint32_t codePoint = 0u;
-					if (!readHexQuad(codePoint))
-					{
-						return false;
-					}
-					if (codePoint >= 0xd800u && codePoint <= 0xdbffu)
-					{
-						if (cursor + 2u > document.size() || document[cursor] != '\\' || document[cursor + 1u] != 'u')
-						{
-							return false;
-						}
-						cursor += 2u;
-						std::uint32_t lowSurrogate = 0u;
-						if (!readHexQuad(lowSurrogate) || lowSurrogate < 0xdc00u || lowSurrogate > 0xdfffu)
-						{
-							return false;
-						}
-						codePoint = 0x10000u + ((codePoint - 0xd800u) << 10u) + (lowSurrogate - 0xdc00u);
-					}
-					else if (codePoint >= 0xdc00u && codePoint <= 0xdfffu)
-					{
-						return false;
-					}
-					if (!Strings::AppendUtf8CodePoint(codePoint, value))
+					if (!TryReadUnicodeEscape(document, cursor, value))
 					{
 						return false;
 					}
@@ -146,6 +155,56 @@ namespace Json
 		{
 			++cursor;
 		}
+	}
+
+	static bool SkipNumber(std::string_view document, std::size_t& cursor)
+	{
+		if (document[cursor] == '-')
+		{
+			++cursor;
+		}
+		if (cursor == document.size() || document[cursor] < '0' || document[cursor] > '9')
+		{
+			return false;
+		}
+		if (document[cursor++] != '0')
+		{
+			while (cursor < document.size() && std::isdigit(static_cast<unsigned char>(document[cursor])))
+			{
+				++cursor;
+			}
+		}
+
+		if (cursor < document.size() && document[cursor] == '.')
+		{
+			const std::size_t fraction = ++cursor;
+			while (cursor < document.size() && std::isdigit(static_cast<unsigned char>(document[cursor])))
+			{
+				++cursor;
+			}
+			if (cursor == fraction)
+			{
+				return false;
+			}
+		}
+		if (cursor < document.size() && (document[cursor] == 'e' || document[cursor] == 'E'))
+		{
+			++cursor;
+			if (cursor < document.size() && (document[cursor] == '+' || document[cursor] == '-'))
+			{
+				++cursor;
+			}
+			const std::size_t exponent = cursor;
+			while (cursor < document.size() && std::isdigit(static_cast<unsigned char>(document[cursor])))
+			{
+				++cursor;
+			}
+			if (cursor == exponent)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	static bool SkipValue(std::string_view document, std::size_t& cursor, std::size_t depth)
@@ -215,51 +274,7 @@ namespace Json
 				return true;
 			}
 		}
-		if (document[cursor] == '-')
-		{
-			++cursor;
-		}
-		if (cursor == document.size() || document[cursor] < '0' || document[cursor] > '9')
-		{
-			return false;
-		}
-		if (document[cursor++] != '0')
-		{
-			while (cursor < document.size() && std::isdigit(static_cast<unsigned char>(document[cursor])))
-			{
-				++cursor;
-			}
-		}
-		if (cursor < document.size() && document[cursor] == '.')
-		{
-			const std::size_t fraction = ++cursor;
-			while (cursor < document.size() && std::isdigit(static_cast<unsigned char>(document[cursor])))
-			{
-				++cursor;
-			}
-			if (cursor == fraction)
-			{
-				return false;
-			}
-		}
-		if (cursor < document.size() && (document[cursor] == 'e' || document[cursor] == 'E'))
-		{
-			++cursor;
-			if (cursor < document.size() && (document[cursor] == '+' || document[cursor] == '-'))
-			{
-				++cursor;
-			}
-			const std::size_t exponent = cursor;
-			while (cursor < document.size() && std::isdigit(static_cast<unsigned char>(document[cursor])))
-			{
-				++cursor;
-			}
-			if (cursor == exponent)
-			{
-				return false;
-			}
-		}
-		return true;
+		return SkipNumber(document, cursor);
 	}
 
 	std::size_t FindPropertyValue(std::string_view objectText, std::string_view key)
@@ -329,6 +344,23 @@ namespace Json
 	bool TryReadUInt64Property(std::string_view objectText, std::string_view key, std::uint64_t& outValue)
 	{
 		return TryReadUnsignedIntegerProperty(objectText, key, outValue);
+	}
+
+	bool TryReadObjectProperty(std::string_view objectText, std::string_view key, std::string_view& outValue)
+	{
+		outValue = {};
+		std::size_t cursor = FindPropertyValue(objectText, key);
+		if (cursor == std::string_view::npos || objectText[cursor] != '{')
+		{
+			return false;
+		}
+		const auto start = cursor;
+		if (!SkipValue(objectText, cursor, 0))
+		{
+			return false;
+		}
+		outValue = objectText.substr(start, cursor - start);
+		return true;
 	}
 
 	bool TryReadArrayProperty(std::string_view objectText, std::string_view key, std::vector<std::string_view>& outElements)

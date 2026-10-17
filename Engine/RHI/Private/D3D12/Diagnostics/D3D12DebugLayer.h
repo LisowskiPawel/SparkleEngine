@@ -1,6 +1,6 @@
 #pragma once
 
-#if ENGINE_GPU_VALIDATION
+#if ENGINE_GPU_VALIDATION || SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Device/RenderHardwareInterface.h"
 
   #include <deque>
@@ -13,7 +13,7 @@ using Microsoft::WRL::ComPtr;
 class D3D12DebugLayer final
 {
 public:
-	D3D12DebugLayer();
+	explicit D3D12DebugLayer(bool enableValidation = true);
 
 	~D3D12DebugLayer() noexcept;
 
@@ -24,19 +24,19 @@ public:
 
 	void InitializeInfoQueue(ID3D12Device* device);
 	bool SupportsDebugMessages() const noexcept;
-	bool TryPopMessage(RhiDiagnosticMessage& outMessage) noexcept;
+	bool TryPopMessage(RhiDiagnosticMessage& outMessage);
 	void ClearMessages() noexcept;
 	bool SupportsLiveObjectReports() const noexcept;
 	bool SupportsCrashDiagnostics() const noexcept;
 	void ReportLiveObjects(ID3D12Device* device);
-	void CollectCrashDiagnostics(ID3D12Device* device) noexcept;
+	void CollectCrashDiagnostics(ID3D12Device* device);
 
 	void ReportLiveDeviceObjects(ID3D12Device* device);
 
 	void ReportLiveDXGIObjects();
 
 private:
-	void DrainStoredMessages() noexcept;
+	void DrainStoredMessages();
 	void InitDredSettings() noexcept;
 	void InitD3D12Debug();
 	void InitDXGIDebug();

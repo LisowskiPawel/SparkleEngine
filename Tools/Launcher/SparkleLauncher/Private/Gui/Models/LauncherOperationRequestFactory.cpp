@@ -98,6 +98,8 @@ namespace SparkleLauncher
 		request.ShaderBackend = settings.ShaderBackend();
 		request.GraphicsApi = settings.GraphicsApi();
 		request.CaptureProvider = settings.CaptureProvider();
+		request.GpuCrashMode = settings.GpuCrashMode();
+		request.ShaderExportPath = request.GpuCrashMode == RhiGpuCrashMode::Off ? QString{} : settings.ShaderExportPath();
 		request.ShaderEnableDebugInfo = settings.ShaderEnableDebugInfo();
 		request.ShaderEnableOptimizations = settings.ShaderEnableOptimizations();
 		request.ShaderWarningsAsErrors = settings.ShaderWarningsAsErrors();

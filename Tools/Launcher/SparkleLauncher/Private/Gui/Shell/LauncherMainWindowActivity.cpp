@@ -2,6 +2,7 @@
 
 #include "LauncherActivityPanel.h"
 #include "Models/LauncherOperationResult.h"
+#include "LauncherSettings.h"
 
 namespace SparkleLauncher
 {
@@ -23,6 +24,15 @@ namespace SparkleLauncher
 	void LauncherMainWindow::DisplayOperationFinished(const QString& runId, const QString& operationId, const QString& title, const LauncherOperationResult& result)
 	{
 		const bool succeeded = result.Succeeded;
+		if (result.GpuCrash)
+		{
+			m_gpuCrashIncident = result.GpuCrash;
+			RefreshGpuCrashIncident();
+		}
+		if (succeeded && !result.ShaderExportPath.isEmpty())
+		{
+			m_settings.SetShaderExportPath(result.ShaderExportPath);
+		}
 		const QString effectiveTitle = m_activityPanel->DisplayOperationFinished(runId, title, result);
 
 		bool refreshesSourceDependencyState = false;

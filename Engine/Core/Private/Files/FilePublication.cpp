@@ -2,6 +2,8 @@
 
 #include "Core/Public/Files/FileUtils.h"
 
+#include <Windows.h>
+
 #include <format>
 #include <fstream>
 #include <unordered_set>
@@ -133,33 +135,11 @@ namespace Files
 
 	bool TryFinalizeTemporaryFile(const std::filesystem::path& temporaryPath, const std::filesystem::path& finalPath, std::string& outErrorMessage)
 	{
-		std::error_code errorCode;
-		std::filesystem::rename(temporaryPath, finalPath, errorCode);
-		if (!errorCode)
+		if (MoveFileExW(temporaryPath.c_str(), finalPath.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
 		{
 			outErrorMessage.clear();
 			return true;
 		}
-
-		if (std::filesystem::exists(finalPath))
-		{
-			errorCode.clear();
-			std::filesystem::remove(finalPath, errorCode);
-			if (errorCode)
-			{
-				outErrorMessage = std::format("Failed to replace existing output '{}'. The destination file may still be in use.", finalPath.string());
-				return false;
-			}
-
-			errorCode.clear();
-			std::filesystem::rename(temporaryPath, finalPath, errorCode);
-			if (!errorCode)
-			{
-				outErrorMessage.clear();
-				return true;
-			}
-		}
-
 		outErrorMessage = std::format("Failed to move temporary file '{}' into place as '{}'", temporaryPath.string(), finalPath.string());
 		return false;
 	}

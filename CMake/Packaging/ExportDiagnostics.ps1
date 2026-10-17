@@ -1,14 +1,19 @@
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName = 'Package')]
 param(
-    [Parameter(Mandatory)][string] $PackageRoot,
-    [Parameter(Mandatory)][string] $ArchivePath,
-    [Parameter(Mandatory)][string] $ArchiveSha256,
-    [Parameter(Mandatory)][ValidateSet('Launcher','Editor','Game')][string] $Component,
-    [Parameter(Mandatory)][ValidateSet('Startup','Crash','HangTimeout','GpuDevice')][string] $Incident,
+    [Parameter(Mandatory, ParameterSetName = 'Package')][string] $PackageRoot,
+    [Parameter(Mandatory, ParameterSetName = 'Package')][string] $ArchivePath,
+    [Parameter(Mandatory, ParameterSetName = 'Package')][string] $ArchiveSha256,
+    [Parameter(Mandatory, ParameterSetName = 'Package')][ValidateSet('Launcher','Editor','Game')][string] $Component,
+    [Parameter(Mandatory, ParameterSetName = 'Package')][ValidateSet('Startup','Crash','HangTimeout','GpuDevice')][string] $Incident,
     [string] $LogPath = '',
     [string] $NativePdbPath = '',
     [string] $OutputDirectory = '',
     [string] $PreviewSha256 = '',
+    [Parameter(Mandatory, ParameterSetName = 'GpuCrash')][string] $GpuCrashManifestPath,
+    [Parameter(ParameterSetName = 'GpuCrash')][switch] $IncludeGpuDump,
+    [Parameter(ParameterSetName = 'GpuCrash')][switch] $IncludeNvdbg,
+    [Parameter(ParameterSetName = 'GpuCrash')][switch] $IncludeSource,
+    [Parameter(ParameterSetName = 'GpuCrash')][switch] $IncludeSymbols,
     [switch] $Consent
 )
 
@@ -18,6 +23,27 @@ $ErrorActionPreference = 'Stop'
 
 try
 {
+    if ($PSCmdlet.ParameterSetName -eq 'GpuCrash')
+    {
+        . (Join-Path $PSScriptRoot '../Diagnostics/GpuCrashIncident.ps1')
+        $proposal = Get-GpuCrashExport $GpuCrashManifestPath $IncludeGpuDump.IsPresent $IncludeNvdbg.IsPresent $IncludeSource.IsPresent $IncludeSymbols.IsPresent
+        $json = $proposal.Record | ConvertTo-Json -Depth 12
+        $hash = [Security.Cryptography.SHA256]::Create()
+        try { $digest = [BitConverter]::ToString($hash.ComputeHash([Text.Encoding]::UTF8.GetBytes($json))).Replace('-','').ToLowerInvariant() }
+        finally { $hash.Dispose() }
+        if (!$Consent)
+        {
+            [ordered]@{ PreviewSha256 = $digest; Warning = 'Raw dumps, NVIDIA debug data and full source/symbols may contain private content and paths. Binary redaction is not provided.'
+                Record = $proposal.Record } | ConvertTo-Json -Depth 14
+            exit 0
+        }
+        if ($PreviewSha256 -cne $digest) { throw 'Preview or selected categories changed; preview again.' }
+        $output = [IO.Path]::GetFullPath($OutputDirectory).TrimEnd('\','/')
+        $incidentRoot = [IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($GpuCrashManifestPath))
+        if ($output -eq $incidentRoot -or $output.StartsWith($incidentRoot + '\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Export outside the incident.' }
+        Write-GpuCrashExport $output $json $proposal.Copies
+        exit 0
+    }
     $manifest = Get-IncidentPackage $PackageRoot $ArchivePath $ArchiveSha256
     $product = @($manifest.Products | Where-Object Component -ceq $Component)
     if ($product.Count -ne 1) { throw 'Product identity is missing or ambiguous.' }
@@ -82,6 +108,6 @@ try
 catch
 {
     # Do not echo filesystem exceptions: they may disclose private input paths.
-    [Console]::Error.WriteLine('Diagnostic export rejected. Check package/hash, file bounds, matching symbols and preview consent. Originals were not changed.')
+    [Console]::Error.WriteLine('Diagnostic export rejected. Check identities, file bounds, selected categories and preview consent. Originals were not changed.')
     exit 1
 }

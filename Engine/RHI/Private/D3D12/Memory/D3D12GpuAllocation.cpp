@@ -1,4 +1,7 @@
 #include "PCH.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
+#endif
 
 #include "D3D12/Memory/D3D12GpuAllocation.h"
 #include "D3D12/Memory/D3D12GpuMemoryAllocator.h"
@@ -85,6 +88,9 @@ void SetD3D12AllocationRecordDebugName(D3D12GpuAllocationRecord& record, std::ws
 	if (record.Resource != nullptr)
 	{
 		record.Resource->SetName(record.DebugName.c_str());
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+		D3D12GpuCrash::Resource(record.Resource.Get());
+#endif
 	}
 	if (record.Allocation != nullptr)
 	{

@@ -1,6 +1,9 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Commands/VulkanCommandQueue.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
+#endif
 
 #include "Vulkan/Core/VulkanResult.h"
 #include "Vulkan/Device/VulkanRhi.h"
@@ -78,6 +81,9 @@ RhiSubmissionToken VulkanCommandQueue::Submit(const VulkanQueueSubmission& submi
 	const VkResult submitResult = SubmitNative(nativeSubmission.SubmitInfo);
 	if (!VulkanResult::Succeeded(submitResult))
 	{
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+		VulkanGpuCrash::ObserveLoss(m_rhi, m_queueType, submitResult);
+#endif
 		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, VulkanResult::FormatFailure("vkQueueSubmit", submitResult));
 		return {};
 	}
@@ -168,7 +174,11 @@ VkResult VulkanCommandQueue::Present(const VkPresentInfoKHR& presentInfo) noexce
 		return VK_ERROR_INITIALIZATION_FAILED;
 	}
 
-	return vkQueuePresentKHR(*m_nativeQueue, &presentInfo);
+	const VkResult result = vkQueuePresentKHR(*m_nativeQueue, &presentInfo);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::ObserveLoss(m_rhi, m_queueType, result);
+#endif
+	return result;
 }
 
 void VulkanCommandQueue::DrainForSwapChainRecreation() noexcept
@@ -180,6 +190,9 @@ void VulkanCommandQueue::DrainForSwapChainRecreation() noexcept
 	}
 
 	const VkResult result = vkQueueWaitIdle(*m_nativeQueue);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::ObserveLoss(m_rhi, m_queueType, result);
+#endif
 
 	if (!VulkanResult::Succeeded(result))
 	{
@@ -208,6 +221,9 @@ void VulkanCommandQueue::WaitForSubmission(std::uint64_t submissionValue) noexce
 	    waitInfo{.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO, .pNext = nullptr, .flags = 0, .semaphoreCount = 1, .pSemaphores = &m_timelineSemaphore, .pValues = &submissionValue};
 
 	const VkResult result = vkWaitSemaphores(m_rhi.GetDevice(), &waitInfo, GetWaitTimeoutNanoseconds());
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::ObserveLoss(m_rhi, m_queueType, result);
+#endif
 	if (!VulkanResult::Succeeded(result))
 	{
 		Diagnostics::Fatal(
@@ -249,6 +265,13 @@ std::uint64_t VulkanCommandQueue::GetCompletedSubmissionValue() const noexcept
 	m_owner.AssertAccess();
 	std::uint64_t completedValue = 0;
 	const VkResult result = vkGetSemaphoreCounterValue(m_rhi.GetDevice(), m_timelineSemaphore, &completedValue);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::ObserveLoss(m_rhi, m_queueType, result);
+	if (result == VK_ERROR_DEVICE_LOST)
+	{
+		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, VulkanResult::FormatFailure("vkGetSemaphoreCounterValue", result));
+	}
+#endif
 	return VulkanResult::Succeeded(result) ? completedValue : 0;
 }
 

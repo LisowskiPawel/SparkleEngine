@@ -43,6 +43,11 @@ TaskExecution TaskExecutor::Launch(TaskScope& scope, TaskDesc desc, TaskFunction
 	return Launch(scope, builder.Compile(), std::move(context));
 }
 
+TaskDispatch TaskExecutor::PrepareDispatch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)
+{
+	return TaskDispatch(m_implementation->PrepareDispatch(scope, std::move(desc), std::move(function), std::move(context)));
+}
+
 bool TaskExecutor::Shutdown(TaskExecutorShutdownMode mode) noexcept
 {
 	return m_implementation->Shutdown(mode);

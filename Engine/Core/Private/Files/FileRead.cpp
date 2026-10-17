@@ -42,7 +42,7 @@ namespace Files
 		return true;
 	}
 
-	bool TryReadAllText(const std::filesystem::path& path, std::string& outText, std::string& outErrorMessage)
+	bool TryReadAllText(const std::filesystem::path& path, std::string& outText, std::string& outErrorMessage, std::size_t maximumBytes)
 	{
 		std::ifstream input(path, std::ios::binary | std::ios::ate);
 		if (!input)
@@ -52,7 +52,7 @@ namespace Files
 		}
 
 		const std::ifstream::pos_type fileSize = input.tellg();
-		if (fileSize == std::ifstream::pos_type(-1) || static_cast<std::uint64_t>(fileSize) > (std::numeric_limits<std::size_t>::max)())
+		if (fileSize == std::ifstream::pos_type(-1) || static_cast<std::uint64_t>(fileSize) > maximumBytes)
 		{
 			outErrorMessage = std::format("Failed to determine a supported size for '{}'", path.string());
 			return false;

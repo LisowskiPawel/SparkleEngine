@@ -1,4 +1,7 @@
 #include "PCH.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
+#endif
 
 #include "D3D12/Diagnostics/D3D12RenderDiagnostics.h"
 
@@ -37,7 +40,13 @@ public:
 		    debugName);
 	}
 
-	void SetDebugName(RhiResourceHandle resource, std::wstring_view debugName) noexcept override { SetD3D12ObjectDebugName(static_cast<ID3D12Object*>(resource.Value), debugName); }
+	void SetDebugName(RhiResourceHandle resource, std::wstring_view debugName) noexcept override
+	{
+		SetD3D12ObjectDebugName(static_cast<ID3D12Object*>(resource.Value), debugName);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+		D3D12GpuCrash::Resource(static_cast<ID3D12Resource*>(resource.Value));
+#endif
+	}
 
 	void SetDebugName(RhiOwnedMemoryBlockHandle memoryBlock, std::wstring_view debugName) noexcept override
 	{

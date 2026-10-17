@@ -57,6 +57,7 @@ struct RhiDiagnosticsCapabilities
 {
 	bool SupportsObjectNames = false;
 	bool SupportsGpuEvents = false;
+	bool RequiresBaselineScopes = false;
 	bool SupportsTimestampQueries = false;
 	bool SupportsDebugMessages = false;
 	bool SupportsLiveObjectReports = false;

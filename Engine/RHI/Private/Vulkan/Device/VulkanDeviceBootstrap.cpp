@@ -1,6 +1,9 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Device/VulkanRhi.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
+#endif
 
 #include "CVars/RHICVars.h"
 #include "Vulkan/Commands/VulkanCommandQueue.h"
@@ -271,6 +274,9 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 	}
 	AppendAvailableDeviceExtension(m_physicalDevice, deviceExtensions, NvidiaBinaryImportExtensionName);
 	AppendAvailableDeviceExtension(m_physicalDevice, deviceExtensions, NvidiaImageViewHandleExtensionName);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrashConfiguration gpuCrash(m_physicalDevice, deviceExtensions);
+#endif
 	for (const char* extension : deviceExtensions)
 	{
 		m_enabledDeviceExtensions.emplace_back(extension);
@@ -362,7 +368,7 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 		}
 	}
 
-	const VkDeviceCreateInfo createInfo{
+	VkDeviceCreateInfo createInfo{
 	    .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 	    .pNext = &enabledFeatures,
 	    .flags = 0,
@@ -373,6 +379,9 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 	    .enabledExtensionCount = static_cast<std::uint32_t>(deviceExtensions.size()),
 	    .ppEnabledExtensionNames = deviceExtensions.empty() ? nullptr : deviceExtensions.data(),
 	    .pEnabledFeatures = nullptr};
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	gpuCrash.Attach(createInfo, enabledFeatures);
+#endif
 
 	const VkResult result = vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_device);
 	if (!VulkanResult::Succeeded(result))

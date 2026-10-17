@@ -12,11 +12,15 @@
 
 class D3D12RenderHardwareInterface;
 class D3D12RecordingUploadPage;
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+class D3D12GpuCrashContext;
+#endif
 
 class D3D12RenderCommandList final : public RenderCommandList
 {
 public:
 	D3D12RenderCommandList(D3D12RenderHardwareInterface& owner, ID3D12GraphicsCommandList7* commandList, ERhiQueueType queueType = ERhiQueueType::Graphics) noexcept;
+	~D3D12RenderCommandList() noexcept override;
 
 	ERhiBackendApi GetBackendApi() const noexcept override;
 
@@ -110,6 +114,9 @@ private:
 	D3D12_RESOURCE_STATES ResolveResourceState(ResourceState state) const noexcept;
 	void OnResourceTrackingStarted(RhiResourceHandle resource) noexcept override;
 	void OnResourceTrackingFinished(RhiResourceHandle resource, RhiSubmissionToken submissionToken) noexcept override;
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	void BeginDiagnosticRecording() noexcept;
+#endif
 
 	D3D12RenderHardwareInterface* m_owner = nullptr;
 	ID3D12GraphicsCommandList7* m_commandList = nullptr;
@@ -119,4 +126,7 @@ private:
 	std::vector<RecordingResourceUse> m_recordingResourceUses;
 	std::size_t m_recordingResourceReleaseIndex = 0;
 	const RayTracingPipeline* m_boundRayTracingPipeline = nullptr;
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	std::unique_ptr<D3D12GpuCrashContext> m_gpuCrash;
+#endif
 };

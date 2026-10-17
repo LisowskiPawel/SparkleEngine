@@ -1,14 +1,14 @@
 # D. Whole Repository Architecture Map
 
 [Docs](../README.md) / [Up](README.md)
- 
+
 **Status:** current map; source-backed and descriptive, not a normative architecture or strategy contract
 
 **Last verified:** repository-wide map 2026-08-28 at committed `master` revision `20814381`; Launcher ownership and repository code-style routes reverified 2026-08-31 at committed `master` revision `61fe39d9`; build-module dependency visibility reverified 2026-09-03 against the current working tree
 
 **Scope:** implemented repository structure, target boundaries, runtime and tool flows, project catalog, and current source-evidence limits
 
-## Read This Page 
+## Read This Page
 
 - **Find an owner:** [Repository layout](#repository-at-a-glance) and [module boundaries](#build-and-module-boundaries).
 - **Follow a workflow:** Use the runtime and tool flows below, then open the owning module for its details.
@@ -25,7 +25,7 @@ Target capability belongs to [Principal Graphics Requirements](../Strategy/Requi
 - [World Coordinate, Units, and Transform Contract](Decisions/WorldCoordinateAndUnits.md) owns spatial semantics.
 - [Editor Viewport Camera Architecture](Decisions/EditorViewportCamera.md) owns the editor-view and scene-camera split.
 - [Shader System Architecture](CrossModule/ShaderSystem/ShaderSystemDesign.md) owns the enduring authoring, compilation, cooked-artifact, runtime-materialization, and graph-use design. The [capability inventory](Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md) owns the dated current-source view, and the [delivery plan](CrossModule/ShaderSystem/ImplementationPlan.md) owns phase order.
-- [GPU Crash Debugging Design](CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md) and its [implementation stages](CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md) own planned Aftermath collection, breadcrumbs and shader-symbol correlation; this is not an implemented capability.
+- [GPU Crash Debugging Design](CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md) owns Aftermath collection, breadcrumbs, shader/source correlation and remaining qualification; candidate scope and evidence stay with that owner.
 - [Bistro and San Miguel Acceptance Workloads](../Acceptance/GraphicsWorkloads.md) owns workload gates and evidence meaning.
 
 Dated assessments retain the source state they observed. They are not silently rewritten into current architecture claims.

@@ -224,9 +224,8 @@ void D3D12CommandRecordingContext::CreateNativeCommandObjects(CommandSlot& slot)
 	const D3D12_COMMAND_LIST_TYPE nativeType = D3D12CommandQueue::GetNativeCommandListType(slot.QueueType);
 	CHECK(m_rhi->GetDevice()->CreateCommandAllocator(nativeType, IID_PPV_ARGS(slot.Allocator.ReleaseAndGetAddressOf())));
 	CHECK(m_rhi->GetDevice()->CreateCommandList(0, nativeType, slot.Allocator.Get(), nullptr, IID_PPV_ARGS(slot.NativeCommandList.ReleaseAndGetAddressOf())));
-	CHECK(slot.NativeCommandList->Close());
-
 	slot.CommandList = std::make_unique<D3D12RenderCommandList>(*m_hardwareInterface, slot.NativeCommandList.Get(), slot.QueueType);
+	CHECK(slot.NativeCommandList->Close());
 }
 
 void D3D12CommandRecordingContext::InitializeSlotResources(CommandSlot& slot)
@@ -285,6 +284,9 @@ void D3D12CommandRecordingContext::BeginSlot(CommandSlot& slot) noexcept
 	assert(slot.RecordingThread == std::thread::id{});
 	CHECK(slot.Allocator->Reset());
 	CHECK(slot.NativeCommandList->Reset(slot.Allocator.Get(), nullptr));
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	slot.CommandList->BeginDiagnosticRecording();
+#endif
 
 	slot.CommandList->ResetTrackedResources();
 	slot.CommandList->ResetBoundState();

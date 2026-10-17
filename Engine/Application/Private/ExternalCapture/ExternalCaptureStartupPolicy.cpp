@@ -83,6 +83,7 @@ ExternalCaptureProvider ResolveExternalCaptureStartupProvider() noexcept
 		return *requested;
 	}
 
+#if SPARKLE_WITH_EXTERNAL_CAPTURE
 	const auto provider = CVarExternalCaptureStartupProvider.Get();
 	if (ExternalCaptureProviderToString(provider).empty())
 	{
@@ -90,4 +91,7 @@ ExternalCaptureProvider ResolveExternalCaptureStartupProvider() noexcept
 	}
 
 	return provider;
+#else
+	return ExternalCaptureProvider::None;
+#endif
 }

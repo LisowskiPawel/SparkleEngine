@@ -9,6 +9,7 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Slang/SlangReflectionExtractor.h"
+#include "Slang/SlangSourceFiles.h"
 
 #include <array>
 #include <filesystem>
@@ -126,7 +127,7 @@ Slang::ComPtr<slang::ISession> SlangShaderBackend::CreateSession(const ShaderCom
 		throw Diagnostics::Error("Slang backend does not support requested shader target");
 	}
 
-	std::array<slang::CompilerOptionEntry, 5> targetOptions{};
+	std::array<slang::CompilerOptionEntry, 6> targetOptions{};
 	std::uint32_t targetOptionCount = 0;
 	const auto optimization = request.EnableOptimizations ? SLANG_OPTIMIZATION_LEVEL_MAXIMAL : SLANG_OPTIMIZATION_LEVEL_NONE;
 	const auto debugInformation = request.EnableDebugInfo ? SLANG_DEBUG_INFO_LEVEL_STANDARD : SLANG_DEBUG_INFO_LEVEL_NONE;
@@ -135,6 +136,7 @@ Slang::ComPtr<slang::ISession> SlangShaderBackend::CreateSession(const ShaderCom
 	if (IsSpirVTarget(request.Target))
 	{
 		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::EmitSpirvDirectly, {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}};
+		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanUseEntryPointName, {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}};
 		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::ForceDXLayout, {slang::CompilerOptionValueKind::Int, ShaderCompileProfile::SpirVUseDirectXBufferLayout, 0, nullptr, nullptr}};
 
 		targetOptions[targetOptionCount++] = {
@@ -155,6 +157,12 @@ Slang::ComPtr<slang::ISession> SlangShaderBackend::CreateSession(const ShaderCom
 	sessionDesc.searchPathCount = 0;
 	sessionDesc.preprocessorMacros = macroDescs.data();
 	sessionDesc.preprocessorMacroCount = static_cast<SlangInt>(macroDescs.size());
+	Slang::ComPtr<ISlangFileSystem> sourceFiles;
+	if (request.CaptureDebugArtifacts)
+	{
+		sourceFiles.attach(new SlangSourceFiles(request.SourceFiles));
+		sessionDesc.fileSystem = sourceFiles.get();
+	}
 
 	Slang::ComPtr<slang::ISession> session;
 	if (SLANG_FAILED(m_globalSession->createSession(sessionDesc, session.writeRef())) || !session)
@@ -169,7 +177,8 @@ Slang::ComPtr<slang::IComponentType> SlangShaderBackend::LinkProgram(slang::ISes
 {
 	Slang::ComPtr<slang::IBlob> diagnosticBlob;
 	constexpr std::string_view moduleName = "SparkleShader";
-	const std::string& modulePath = request.VirtualSourcePath;
+	// The expanded input is not the original file named by its #line directives.
+	const std::string modulePath = request.CaptureDebugArtifacts ? "/SparkleCompilerInput.hlsl" : request.VirtualSourcePath;
 	slang::IModule* module = session.loadModuleFromSourceString(moduleName.data(), modulePath.c_str(), request.SourceCode.c_str(), diagnosticBlob.writeRef());
 	diagnostics += BlobToString(diagnosticBlob);
 	if (module == nullptr)
@@ -210,7 +219,7 @@ Slang::ComPtr<slang::IComponentType> SlangShaderBackend::LinkProgram(slang::ISes
 		for (SlangInt32 index = 0; index < module->getDependencyFileCount(); ++index)
 		{
 			const char* path = module->getDependencyFilePath(index);
-			if (path == nullptr || std::ranges::find(request.SourceFiles, std::string_view(path), &ShaderSourceFile::VirtualPath) == request.SourceFiles.end())
+			if (path == nullptr || (path != modulePath && std::ranges::find(request.SourceFiles, std::string_view(path), &ShaderSourceFile::VirtualPath) == request.SourceFiles.end()))
 			{
 				throw Diagnostics::Error("Slang read a source dependency outside the captured compile inputs.");
 			}
@@ -334,6 +343,7 @@ std::vector<std::string> SlangShaderBackend::BuildDebugArgumentStrings(const Sha
 	if (IsSpirVTarget(request.Target))
 	{
 		args.push_back("-emit-spirv-directly");
+		args.push_back("-fvk-use-entrypoint-name");
 		if constexpr (ShaderCompileProfile::SpirVUseDirectXBufferLayout)
 		{
 			args.push_back("-fvk-use-dx-layout");

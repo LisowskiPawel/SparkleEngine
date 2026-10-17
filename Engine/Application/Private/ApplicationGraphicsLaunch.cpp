@@ -7,7 +7,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Diagnostics/Verify.h"
 #include "RHI/Public/Core/RhiBackendSelection.h"
-#if SPARKLE_WITH_EXTERNAL_CAPTURE
+#if SPARKLE_WITH_EXTERNAL_CAPTURE || SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "ExternalCapture/ExternalCaptureStartupPolicy.h"
 #endif
 
@@ -82,6 +82,11 @@ RendererGraphicsLaunch ResolveApplicationGraphicsLaunch() noexcept
 	RendererGraphicsLaunch launch{.BackendApi = api};
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	launch.CaptureProvider = ResolveExternalCaptureStartupProvider();
+#elif SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (ResolveExternalCaptureStartupProvider() != ExternalCaptureProvider::None)
+	{
+		Diagnostics::Fatal(g_applicationGraphicsLogger, __FILE__, __LINE__, "Frame capture is unavailable in this profile; use a separate supported capture launch.");
+	}
 #endif
 	return launch;
 }

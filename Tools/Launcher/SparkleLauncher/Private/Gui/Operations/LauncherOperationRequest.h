@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RHI/Public/Diagnostics/ExternalCaptureProvider.h"
+#include "RHI/Public/Diagnostics/RhiGpuCrash.h"
 
 #include <QtCore/QString>
 #include <QtCore/QVector>
@@ -36,6 +37,8 @@ namespace SparkleLauncher
 		QString ShaderBackend;
 		QString GraphicsApi;
 		ExternalCaptureProvider CaptureProvider = ExternalCaptureProvider::None;
+		RhiGpuCrashMode GpuCrashMode = RhiGpuCrashMode::Off;
+		QString ShaderExportPath;
 		QString CleanScope = "cooked";
 		QVector<LauncherCleanTarget> CleanTargets;
 		QVector<QString> PreservedPaths;

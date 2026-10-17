@@ -133,6 +133,7 @@ private:
 	friend class FrameGraphExecutionDiagnostics;
 
 	bool SupportsGpuEvents() const noexcept;
+	bool RequiresBaselineScopes() const noexcept;
 	bool SupportsTimestampQueries() const noexcept;
 	ScopedGpuEvent BeginGpuEvent(RenderCommandContext& commands, std::string_view label, RhiDiagnosticLabelColor color = {}) noexcept;
 	ScopedGpuTimer BeginTimer(RenderCommandContext& commands, std::string_view label) noexcept;

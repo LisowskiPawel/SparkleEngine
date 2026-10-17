@@ -17,7 +17,7 @@ using Microsoft::WRL::ComPtr;
 
 struct RhiDiagnosticMessage;
 
-#if ENGINE_GPU_VALIDATION
+#if ENGINE_GPU_VALIDATION || SPARKLE_WITH_GPU_CRASH_DEBUGGING
 class D3D12DebugLayer;
 #endif
 
@@ -94,7 +94,7 @@ private:
 	void DisableInterposer() noexcept;
 	void ShutdownInterposer() noexcept;
 
-#if ENGINE_GPU_VALIDATION
+#if ENGINE_GPU_VALIDATION || SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	std::unique_ptr<D3D12DebugLayer> m_debugLayer;
 #endif
 

@@ -1,4 +1,7 @@
 #include "PCH.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
+#endif
 #include "D3D12/SwapChain/D3D12SwapChain.h"
 #include "CVars/RHICVars.h"
 #include "Window/Window.h"
@@ -204,7 +207,11 @@ void D3D12SwapChain::Present()
 		m_rhi.GetDxgiFactory()->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing));
 		presentFlags = (allowTearing == TRUE) ? DXGI_PRESENT_ALLOW_TEARING : 0u;
 	}
-	CHECK(GetPresentationInterface()->Present(presentInterval, presentFlags));
+	const HRESULT result = GetPresentationInterface()->Present(presentInterval, presentFlags);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	D3D12GpuCrash::ObserveLoss(m_rhi.GetDevice().Get(), result);
+#endif
+	CHECK(result);
 }
 
 void D3D12SwapChain::WaitForPresentationSlot() const noexcept

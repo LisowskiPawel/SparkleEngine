@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <string_view>
 
 class Timer;
 class Window;
@@ -18,6 +19,9 @@ class TaskScope;
 class ApplicationTaskRuntime;
 class CameraInputIntentCollector;
 class EditorApplication;
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+class GpuCrashIncidentSink;
+#endif
 struct CameraInputIntent;
 struct RenderViewCameraData;
 
@@ -71,6 +75,10 @@ private:
 	void InitializeGameWorld();
 	void InitializeRenderer();
 	void InitializeGameUi();
+	void SignalLevelReadiness(std::string_view level);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	void ReportReadiness();
+#endif
 	CameraInputIntent CollectCameraInputIntent(float aspectRatio) noexcept;
 	void UpdateGameFrame(const CameraInputIntent* worldCameraIntent, const RenderViewCameraData* renderCameraOverride) noexcept;
 	void UpdateEditorGame(const RenderViewCameraData& renderCamera) noexcept;
@@ -83,6 +91,10 @@ private:
 	std::unique_ptr<GameWorld> m_gameWorld;
 	std::unique_ptr<LevelSession> m_levelSession;
 	std::unique_ptr<Renderer> m_renderer;
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	std::unique_ptr<GpuCrashIncidentSink> m_gpuCrashSink;
+	std::string m_pendingReadiness;
+#endif
 	std::unique_ptr<GameUiHost> m_gameUiHost;
 	std::unique_ptr<ApplicationTaskRuntime> m_taskRuntime;
 	std::unique_ptr<CameraInputIntentCollector> m_cameraInputIntentCollector;

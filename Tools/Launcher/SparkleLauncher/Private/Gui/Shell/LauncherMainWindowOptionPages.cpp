@@ -55,6 +55,12 @@ namespace SparkleLauncher
 			return;
 		}
 
+		if (operationId == "levels.run")
+		{
+			AddGpuCrashOptions(layout);
+			return;
+		}
+
 		if (operationId == "workspace.build")
 		{
 			AddBuildOptions(layout);

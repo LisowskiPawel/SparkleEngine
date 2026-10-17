@@ -12,7 +12,7 @@ Finish the missing capture routes and prove the integrations already present in 
 
 ## Work This Plan
 
-For the current GPU hang blocker, follow [GPU Crash Debugging](../GpuCrashDebugging/ImplementationPlan.md) first. This frame-capture plan retains its provider scope; PIX assistance uses a separate session from Aftermath.
+GPU failure tooling and its remaining qualification use [GPU Crash Debugging](../GpuCrashDebugging/GpuCrashDebuggingDesign.md) route. This frame-capture plan retains its provider scope; PIX assistance uses a separate session from Aftermath.
 
 | What to do | Working route |
 | --- | --- |

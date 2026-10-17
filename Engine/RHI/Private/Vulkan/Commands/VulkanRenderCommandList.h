@@ -5,6 +5,9 @@
 #include "Vulkan/Diagnostics/VulkanDebugEvents.h"
 #include "Vulkan/Memory/VulkanRecordingResource.h"
 #include "Vulkan/VulkanIncludes.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Diagnostics/GpuCrash/GpuCrashSession.h"
+#endif
 
 #include <array>
 #include <cstddef>
@@ -218,6 +221,9 @@ private:
 	std::vector<RecordingResourceUse> m_recordingResourceUses;
 	std::size_t m_recordingResourceReleaseIndex = 0;
 	VulkanDebugEventFunctions m_debugEvents = {};
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	GpuCrashScopes m_gpuCrashScopes;
+#endif
 	std::array<VkImageView, MaxRenderTargets> m_renderTargets = {};
 	std::uint32_t m_renderTargetCount = 0;
 	VkImageView m_depthStencil = VK_NULL_HANDLE;

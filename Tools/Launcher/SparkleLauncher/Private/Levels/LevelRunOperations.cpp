@@ -7,6 +7,7 @@
 #include "CookedContentReadiness.h"
 #include "LevelRunOperationProcessRequests.h"
 #include "ExternalCaptureDiscovery.h"
+#include "GpuCrashLaunch.h"
 #include "Core/Public/FileSystemUtils.h"
 #include "LauncherStatePaths.h"
 #include "SparkleLauncher/ToolResolver.h"
@@ -19,24 +20,6 @@
 
 namespace SparkleLauncher
 {
-	static void AddReadiness(LevelRunOperationPlan& plan, std::string message)
-	{
-		plan.ReadinessMessages.push_back(std::move(message));
-	}
-
-	static void AddPlannedEffect(LevelRunOperationPlan& plan, std::string message)
-	{
-		plan.PlannedEffects.push_back(std::move(message));
-	}
-
-	static void AddEnvironment(LevelRunOperationPlan& plan, std::string name, std::string value)
-	{
-		Process::EnvironmentOverride overrideValue;
-		overrideValue.Name = std::move(name);
-		overrideValue.Value = std::move(value);
-		plan.Environment.push_back(std::move(overrideValue));
-	}
-
 	static bool InspectRequestedLevel(LevelRunOperationPlan& plan)
 	{
 		try
@@ -45,24 +28,24 @@ namespace SparkleLauncher
 			const auto level = std::find_if(catalog.levels.begin(), catalog.levels.end(), [&plan](const ProjectLevelCatalogEntry& entry) { return entry.id == plan.Request.LevelId; });
 			if (level == catalog.levels.end())
 			{
-				AddReadiness(plan, "Requested level is not present in the catalog: " + plan.Request.LevelId);
+				plan.ReadinessMessages.push_back("Requested level is not present in the catalog: " + plan.Request.LevelId);
 				return false;
 			}
 			if (!Filesystem::IsSourceWorkspace(plan.RepositoryRoot) && !level->releaseSupported)
 			{
-				AddReadiness(plan, "Requested level is development-only; use a source checkout: " + level->id);
+				plan.ReadinessMessages.push_back("Requested level is development-only; use a source checkout: " + level->id);
 				return false;
 			}
 			if (level->id != "Empty" && (!level->selected || !catalog.IsLevelReady(*level)))
 			{
-				AddReadiness(plan, "Requested level must be selected with its complete source content ready: " + level->id);
+				plan.ReadinessMessages.push_back("Requested level must be selected with its complete source content ready: " + level->id);
 				return false;
 			}
 			return true;
 		}
 		catch (const Diagnostics::Error& error)
 		{
-			AddReadiness(plan, error.what());
+			plan.ReadinessMessages.push_back(error.what());
 			return false;
 		}
 	}
@@ -82,6 +65,92 @@ namespace SparkleLauncher
 			step.LogPath = processStep.Request.LogPath;
 			plan.Steps.push_back(std::move(step));
 		}
+	}
+
+	static bool ResolveRunProduct(LevelRunOperationPlan& plan)
+	{
+		const BuildProfileTarget expectedTarget = plan.Request.RunMode == LevelRunMode::Editor ? BuildProfileTarget::Editor : BuildProfileTarget::Game;
+		const std::optional<BuildProfile> profile = FindBuildProfile(plan.Request.ProductProfile);
+		if (!profile.has_value() || profile->Target != expectedTarget)
+		{
+			plan.ReadinessMessages.push_back("Profile does not match the selected " + std::string(ToString(plan.Request.RunMode)) + " run mode: " + plan.Request.ProductProfile);
+			return false;
+		}
+
+		plan.TargetName = BuildProjectTargetName(plan.Request.ContentId, *profile);
+		if (plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath)
+		{
+			plan.TargetName += "GpuCrashReceipt";
+		}
+
+		plan.ExecutablePath = Filesystem::ResolveProjectProductPath(
+		    plan.RepositoryRoot,
+		    plan.Request.ContentId,
+		    plan.Request.RunMode == LevelRunMode::Editor ? "editor" : "game",
+		    plan.Request.ProductProfile,
+		    plan.Request.GpuCrashMode == RhiGpuCrashMode::Off ? "" : "gpu-crash");
+
+		plan.WorkingDirectory = Filesystem::ResolveProductProjectRoot(plan.Request.RepositoryRoot, plan.Request.ContentId);
+		return true;
+	}
+
+	static void InspectRunReadiness(LevelRunOperationPlan& plan)
+	{
+		std::error_code errorCode;
+		plan.Readiness.ExecutableReady = std::filesystem::is_regular_file(plan.ExecutablePath, errorCode);
+		errorCode.clear();
+		plan.Readiness.ContentDirectoryReady = std::filesystem::exists(plan.WorkingDirectory / std::string(Filesystem::kProjectMarker), errorCode);
+
+		const CookedContentReadiness cookedContent = InspectCookedContentReadiness(
+		    plan.Request.RepositoryRoot,
+		    plan.Request.ContentId,
+		    plan.Request.GpuCrashMode == RhiGpuCrashMode::Off ? "" : "gpu-crash");
+
+		// GameFramework always registers built-in Empty without imported scene assets.
+		plan.Readiness.CookedMeshesReady = plan.Request.LevelId == "Empty" || cookedContent.MeshesReady;
+		plan.Readiness.CookedTexturesReady = cookedContent.TexturesReady;
+		plan.Readiness.CookedShadersReady = cookedContent.Shaders == CookedShaderPublicationState::Ready;
+
+		plan.ReadinessMessages.push_back(plan.Readiness.ExecutableReady ? "Selected product executable is ready." : "Selected product executable is missing; compile " + plan.TargetName + " first.");
+
+		plan.ReadinessMessages.push_back(
+		    plan.Readiness.ContentDirectoryReady ? "Content working directory is valid." : "Content working directory is missing or invalid: " + Strings::ToNarrow(plan.WorkingDirectory.wstring()));
+
+		plan.ReadinessMessages.push_back(plan.Readiness.CookedMeshesReady ? "Cooked scenes and meshes are ready." : "Cooked scenes and meshes are missing.");
+		plan.ReadinessMessages.push_back(plan.Readiness.CookedTexturesReady ? "Cooked textures are ready." : "Cooked textures are missing.");
+		switch (cookedContent.Shaders)
+		{
+			case CookedShaderPublicationState::Ready:
+				plan.ReadinessMessages.push_back("Cooked shaders are ready.");
+				break;
+			case CookedShaderPublicationState::Invalid:
+				plan.ReadinessMessages.push_back("Cooked shader publication is incomplete or internally inconsistent.");
+				break;
+			case CookedShaderPublicationState::Missing:
+				plan.ReadinessMessages.push_back("The complete cooked shader generation is missing.");
+				break;
+		}
+	}
+
+	static std::string BuildRunDryRunText(const LevelRunOperationPlan& plan, std::string_view displayName)
+	{
+		std::ostringstream dryRun;
+		dryRun << "Dry-run plan for " << displayName << ":";
+		for (const LevelRunOperationStep& step : plan.Steps)
+		{
+			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
+			dryRun << "\n    Working directory: " << Strings::ToNarrow(plan.WorkingDirectory.wstring());
+			dryRun << "\n    Env: SPARKLE_STARTUP_LEVEL=" << plan.Request.LevelId;
+			if (!step.LogPath.empty())
+			{
+				dryRun << "\n    Log: " << Strings::ToNarrow(step.LogPath.wstring());
+			}
+		}
+		if (plan.Steps.empty())
+		{
+			dryRun << "\n  No command step is available until readiness issues are resolved.";
+		}
+		return dryRun.str();
 	}
 
 	std::string_view ToString(LevelRunMode mode) noexcept
@@ -121,7 +190,7 @@ namespace SparkleLauncher
 		{
 			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown level run operation");
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown level run operation id.", "Choose the registered Run Level operation, then retry.");
-			AddReadiness(plan, plan.Operation.Failure->Summary);
+			plan.ReadinessMessages.push_back(plan.Operation.Failure->Summary);
 			return plan;
 		}
 
@@ -140,100 +209,51 @@ namespace SparkleLauncher
 		plan.Operation.LogPath = ResolveLauncherOperationLogPath(plan.Request.RepositoryRoot, definition->Id, "Latest.txt");
 		if (plan.Request.LevelId.empty())
 		{
-			AddReadiness(plan, "A catalog level id is required.");
+			plan.ReadinessMessages.push_back("A catalog level id is required.");
 			return plan;
 		}
 		if (plan.Request.GraphicsApi != "d3d12" && plan.Request.GraphicsApi != "vulkan")
 		{
-			AddReadiness(plan, "Unknown graphics API: " + plan.Request.GraphicsApi);
+			plan.ReadinessMessages.push_back("Unknown graphics API: " + plan.Request.GraphicsApi);
+			return plan;
+		}
+
+		if (!PrepareGpuCrashLaunch(plan))
+		{
 			return plan;
 		}
 
 		const auto capture = InspectExternalCaptureProvider(plan.Request.CaptureProvider, plan.Request.GraphicsApi, plan.Request.ProductProfile);
 		if (!capture.Available())
 		{
-			AddReadiness(plan, capture.Detail);
+			plan.ReadinessMessages.push_back(capture.Detail);
 			return plan;
 		}
 
-		const BuildProfileTarget expectedTarget = plan.Request.RunMode == LevelRunMode::Editor ? BuildProfileTarget::Editor : BuildProfileTarget::Game;
-		const std::optional<BuildProfile> profile = FindBuildProfile(plan.Request.ProductProfile);
-		if (!profile.has_value() || profile->Target != expectedTarget)
+		if (!ResolveRunProduct(plan))
 		{
-			AddReadiness(plan, "Profile does not match the selected " + std::string(ToString(plan.Request.RunMode)) + " run mode: " + plan.Request.ProductProfile);
 			return plan;
 		}
-
-		plan.TargetName = BuildProjectTargetName(plan.Request.ContentId, *profile);
-
-		plan.ExecutablePath = Filesystem::ResolveProjectProductPath(
-		    plan.RepositoryRoot,
-		    plan.Request.ContentId,
-		    plan.Request.RunMode == LevelRunMode::Editor ? "editor" : "game",
-		    plan.Request.ProductProfile);
-
-		plan.WorkingDirectory = Filesystem::ResolveProductProjectRoot(plan.Request.RepositoryRoot, plan.Request.ContentId);
 		if (!InspectRequestedLevel(plan))
 		{
 			return plan;
 		}
-		AddEnvironment(plan, "SPARKLE_STARTUP_LEVEL", plan.Request.LevelId);
 
-		std::error_code errorCode;
-		plan.Readiness.ExecutableReady = std::filesystem::is_regular_file(plan.ExecutablePath, errorCode);
-		errorCode.clear();
-		plan.Readiness.ContentDirectoryReady = std::filesystem::exists(plan.WorkingDirectory / std::string(Filesystem::kProjectMarker), errorCode);
-		const CookedContentReadiness cookedContent = InspectCookedContentReadiness(plan.Request.RepositoryRoot, plan.Request.ContentId);
-		// GameFramework always registers built-in Empty without imported scene assets.
-		plan.Readiness.CookedMeshesReady = plan.Request.LevelId == "Empty" || cookedContent.MeshesReady;
-		plan.Readiness.CookedTexturesReady = cookedContent.TexturesReady;
-		plan.Readiness.CookedShadersReady = cookedContent.Shaders == CookedShaderPublicationState::Ready;
+		plan.Environment.push_back({"SPARKLE_STARTUP_LEVEL", plan.Request.LevelId});
 
-		AddReadiness(plan, plan.Readiness.ExecutableReady ? "Selected product executable is ready." : "Selected product executable is missing; compile " + plan.TargetName + " first.");
+		InspectRunReadiness(plan);
 
-		AddReadiness(
-		    plan,
-		    plan.Readiness.ContentDirectoryReady ? "Content working directory is valid." : "Content working directory is missing or invalid: " + Strings::ToNarrow(plan.WorkingDirectory.wstring()));
+		plan.PlannedEffects.push_back(
+		    "Run level " + plan.Request.LevelId + " in " + Strings::ToNarrow(plan.ExecutablePath.wstring()) + " from " + Strings::ToNarrow(plan.WorkingDirectory.wstring()) + ".");
 
-		AddReadiness(plan, plan.Readiness.CookedMeshesReady ? "Cooked scenes and meshes are ready." : "Cooked scenes and meshes are missing.");
-		AddReadiness(plan, plan.Readiness.CookedTexturesReady ? "Cooked textures are ready." : "Cooked textures are missing.");
-		switch (cookedContent.Shaders)
-		{
-			case CookedShaderPublicationState::Ready:
-				AddReadiness(plan, "Cooked shaders are ready.");
-				break;
-			case CookedShaderPublicationState::Invalid:
-				AddReadiness(plan, "Cooked shader publication is incomplete or internally inconsistent.");
-				break;
-			case CookedShaderPublicationState::Missing:
-				AddReadiness(plan, "The complete cooked shader generation is missing.");
-				break;
-		}
-		AddPlannedEffect(plan, "Run level " + plan.Request.LevelId + " in " + Strings::ToNarrow(plan.ExecutablePath.wstring()) + " from " + Strings::ToNarrow(plan.WorkingDirectory.wstring()) + ".");
-		AddPlannedEffect(plan, "Use graphics API: " + plan.Request.GraphicsApi + ".");
+		plan.PlannedEffects.push_back("Use graphics API: " + plan.Request.GraphicsApi + ".");
 
 		plan.CanRun = plan.Readiness.ExecutableReady && plan.Readiness.ContentDirectoryReady && plan.Readiness.CookedMeshesReady && plan.Readiness.CookedTexturesReady
 		    && plan.Readiness.CookedShadersReady;
 
 		PopulateRunStep(plan);
 
-		std::ostringstream dryRun;
-		dryRun << "Dry-run plan for " << definition->DisplayName << ":";
-		for (const LevelRunOperationStep& step : plan.Steps)
-		{
-			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
-			dryRun << "\n    Working directory: " << Strings::ToNarrow(plan.WorkingDirectory.wstring());
-			dryRun << "\n    Env: SPARKLE_STARTUP_LEVEL=" << plan.Request.LevelId;
-			if (!step.LogPath.empty())
-			{
-				dryRun << "\n    Log: " << Strings::ToNarrow(step.LogPath.wstring());
-			}
-		}
-		if (plan.Steps.empty())
-		{
-			dryRun << "\n  No command step is available until readiness issues are resolved.";
-		}
-		plan.Operation.DryRunText = dryRun.str();
+		plan.Operation.DryRunText = BuildRunDryRunText(plan, definition->DisplayName);
 		return plan;
 	}
 }

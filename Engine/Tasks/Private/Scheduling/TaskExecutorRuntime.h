@@ -27,6 +27,7 @@ struct TaskExecutor::Implementation::Runtime final
 	{
 		std::shared_ptr<ScheduledTaskExecution> Execution;
 		std::uint32_t TaskIndex = 0;
+		std::shared_ptr<TaskDispatch::State> Dispatch;
 	};
 
 	struct alignas(64) TaskWorker final
@@ -36,12 +37,15 @@ struct TaskExecutor::Implementation::Runtime final
 		std::mutex QueueMutex;
 		std::deque<ReadyTask> ReadyQueue;
 		std::thread Thread;
+		bool PreferDispatch = true;
 	};
 
 	struct TaskLaneState final
 	{
 		std::mutex InjectionMutex;
 		std::deque<ReadyTask> InjectionQueue;
+		TaskDispatch::State* DispatchHead = nullptr;
+		TaskDispatch::State* DispatchTail = nullptr;
 		std::mutex WakeMutex;
 		std::condition_variable WakeCondition;
 		std::uint64_t WakeEpoch = 0;
@@ -56,6 +60,9 @@ struct TaskExecutor::Implementation::Runtime final
 	Runtime& operator=(const Runtime&) = delete;
 
 	std::shared_ptr<TaskExecution::State> Launch(const CompiledTaskGraph& graph, TaskExecutionContext context, const std::shared_ptr<TaskScope::State>& scope);
+	std::shared_ptr<TaskDispatch::State> PrepareDispatch(const std::shared_ptr<TaskScope::State>& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context);
+	void EnqueueDispatch(TaskDispatch::State& dispatch) noexcept;
+	void ReleaseDispatch(TaskDispatch::State& dispatch) noexcept;
 	bool Shutdown(TaskExecutorShutdownMode mode) noexcept;
 	std::uint32_t GetWorkerCount(TaskLane lane) const noexcept;
 
@@ -96,6 +103,8 @@ private:
 	bool TryPopInjection(TaskLane lane, ReadyTask& task);
 	bool TrySteal(TaskWorker& worker, ReadyTask& task);
 	bool TryTakeWork(TaskWorker& worker, ReadyTask& task);
+	bool TryPopDispatch(TaskLane lane, ReadyTask& task);
+	void CloseDispatches() noexcept;
 	bool WaitForWork(TaskWorker& worker, ReadyTask& task);
 	void WorkerMain(TaskWorker& worker);
 	std::vector<std::shared_ptr<TaskExecution::State>> BeginShutdown(TaskExecutorShutdownMode mode);
@@ -114,6 +123,7 @@ private:
 	LifecycleState m_lifecycle = LifecycleState::Accepting;
 	std::uint32_t m_activeExecutions = 0;
 	std::vector<std::weak_ptr<TaskExecution::State>> m_executions;
+	std::vector<std::shared_ptr<TaskDispatch::State>> m_dispatches;
 	std::mutex m_shutdownMutex;
 	std::atomic_uint64_t m_nextExecutionGeneration{1};
 };

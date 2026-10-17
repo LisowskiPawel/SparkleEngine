@@ -2,6 +2,7 @@
 
 #include "LevelRunOperationProcessRequests.h"
 #include "LauncherOperationProgress.h"
+#include "GpuCrashLaunch.h"
 
 #include <optional>
 
@@ -32,6 +33,14 @@ namespace SparkleLauncher
 			AppendProcessOutputCallback(request, outputCallback);
 
 			const ProcessResult result = processRunner.Run(request);
+			if (plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath)
+			{
+				const auto path = ReadGpuCrashAnnouncement(result.CapturedOutput);
+				if (!ReadGpuCrashState(path, plan.SessionId, result.ProcessId).empty())
+				{
+					operation.GpuCrash = GpuCrashIncident{path, plan.SessionId, result.ProcessId};
+				}
+			}
 			if (!result.Launched || result.Canceled || !result.Ready)
 			{
 				if (result.Canceled)

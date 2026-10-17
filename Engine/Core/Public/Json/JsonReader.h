@@ -17,6 +17,7 @@ namespace Json
 	SPARKLE_CORE_API std::size_t FindPropertyValue(std::string_view objectText, std::string_view key);
 	SPARKLE_CORE_API bool TryReadStringProperty(std::string_view objectText, std::string_view key, std::string& outValue);
 	// Elements reference the caller's document.
+	SPARKLE_CORE_API bool TryReadObjectProperty(std::string_view objectText, std::string_view key, std::string_view& outValue);
 	SPARKLE_CORE_API bool TryReadArrayProperty(std::string_view objectText, std::string_view key, std::vector<std::string_view>& outElements);
 
 	template <typename TNumber> bool TryReadUnsignedIntegerProperty(std::string_view objectText, std::string_view key, TNumber& outValue)

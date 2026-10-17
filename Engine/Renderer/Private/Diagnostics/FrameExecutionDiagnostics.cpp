@@ -26,6 +26,11 @@ bool FrameExecutionDiagnostics::SupportsGpuEvents() const noexcept
 	return m_backendDiagnostics != nullptr && m_backendDiagnostics->GetCapabilities().SupportsGpuEvents;
 }
 
+bool FrameExecutionDiagnostics::RequiresBaselineScopes() const noexcept
+{
+	return m_backendDiagnostics != nullptr && m_backendDiagnostics->GetCapabilities().RequiresBaselineScopes;
+}
+
 bool FrameExecutionDiagnostics::SupportsTimestampQueries() const noexcept
 {
 	return m_timingDiagnostics != nullptr && m_timingDiagnostics->SupportsTimestampQueries();

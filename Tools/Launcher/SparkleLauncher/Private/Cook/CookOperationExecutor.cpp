@@ -142,6 +142,10 @@ namespace SparkleLauncher
 				MarkOperationFinished(operation, result.Canceled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 				return operation;
 			}
+			if (step.Id == "cook-shaders")
+			{
+				operation.ShaderExportPath = ReadProcessOutputPath(result.CapturedOutput, "SPARKLE_SHADER_EXPORT ");
+			}
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, processSteps.size());
 		}
 

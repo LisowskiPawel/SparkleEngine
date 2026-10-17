@@ -1,6 +1,7 @@
 #include "LauncherOperationService.h"
 
 #include "LauncherOperationExecution.h"
+#include "GpuCrashLaunch.h"
 #include "Tasks/Public/TaskExecutor.h"
 #include "Tasks/Public/TaskScope.h"
 
@@ -107,6 +108,21 @@ namespace SparkleLauncher
 			m_implementation->m_operationScopes.erase(runId);
 			throw;
 		}
+	}
+
+	bool LauncherOperationService::ObserveGpuCrash(GpuCrashIncident incident, std::function<void(std::string)> completion)
+	{
+		const auto execution = m_implementation->m_executor.Launch(
+		    m_implementation->m_rootScope,
+		    TaskDesc{TaskName("Read GPU crash session"), TaskLane::BlockingIo},
+		    [incident = std::move(incident), completion = std::move(completion)](TaskExecutionContext&)
+		    {
+			    std::string state = ReadGpuCrashCollectionState(incident);
+			    completion(std::move(state));
+			    return TaskResult::Success();
+		    });
+
+		return execution.IsValid() && execution.GetStatus() != TaskExecutionStatus::Rejected;
 	}
 
 	bool LauncherOperationService::Cancel(std::string_view runId) noexcept

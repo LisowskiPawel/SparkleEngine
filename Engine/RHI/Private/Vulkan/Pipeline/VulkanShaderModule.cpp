@@ -1,6 +1,9 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Pipeline/VulkanShaderModule.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
+#endif
 
 #include "Strings/StringUtils.h"
 #include "Vulkan/Core/VulkanResult.h"
@@ -52,6 +55,9 @@ VulkanShaderModule::VulkanShaderModule(VulkanRhi& rhi, const RhiShaderStageDesc&
 	    .codeSize = bytecode.Size,
 	    .pCode = static_cast<const std::uint32_t*>(bytecode.Data)};
 
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::Shader({static_cast<const std::byte*>(bytecode.Data), bytecode.Size});
+#endif
 	const VkResult result = vkCreateShaderModule(m_device, &createInfo, nullptr, &m_module);
 	if (!VulkanResult::Succeeded(result))
 	{

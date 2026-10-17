@@ -23,6 +23,7 @@ namespace SparkleLauncher
 		layout.addWidget(CreateHomeHeroCard(m_repositoryRoot, heroTitle, heroDetail, "neutral", nullptr, nullptr, "showcase-hero.png", this));
 
 		AddSyncLevelContentGroups(*bodyLayout);
+		AddGpuCrashOptions(*bodyLayout);
 		layout.addWidget(quickStartBody);
 	}
 }

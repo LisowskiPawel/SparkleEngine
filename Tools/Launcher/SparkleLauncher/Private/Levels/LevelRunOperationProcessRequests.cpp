@@ -1,6 +1,8 @@
 #include "LevelRunOperationProcessRequests.h"
 
 #include "LauncherStatePaths.h"
+#include "GpuCrashLaunch.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <utility>
 
@@ -24,6 +26,19 @@ namespace SparkleLauncher
 		{
 			request.Arguments.emplace_back("--capture-provider");
 			request.Arguments.emplace_back(ExternalCaptureProviderToString(plan.Request.CaptureProvider));
+		}
+		if (plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath)
+		{
+			request.Arguments.insert(
+			    request.Arguments.end(),
+			    {"--gpu-crash-debugging", "aftermath", "--shader-export", Strings::ToNarrow(plan.Request.ShaderExportPath.wstring()), "--gpu-crash-session", plan.SessionId});
+
+			const GpuCrashReadinessExpectation expected{plan.ExecutablePath, plan.Request.ShaderExportPath, plan.SessionId, plan.Request.ProductProfile, plan.Request.GraphicsApi};
+
+			request.ReadinessValidator = [expected](std::uint32_t pid, std::string_view output, std::string& error)
+			{
+				return VerifyGpuCrashReadiness(expected, pid, output, error);
+			};
 		}
 		request.ReadinessValue = plan.Request.LevelId;
 

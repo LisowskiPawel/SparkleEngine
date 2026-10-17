@@ -8,6 +8,10 @@ file(GLOB_RECURSE SHADER_COMPILER_PRIVATE_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Backends/*.h
 )
 
+if(NOT SPARKLE_WITH_GPU_CRASH_DEBUGGING)
+    list(FILTER SHADER_COMPILER_PRIVATE_SOURCES EXCLUDE REGEX "/Cooking/ShaderDebugSourceIdentity\\.cpp$")
+endif()
+
 add_executable(ShaderCompiler
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp
     ${SHADER_COMPILER_PRIVATE_SOURCES}
@@ -170,3 +174,5 @@ add_custom_target(ShaderCompilerCliValidation
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "" FILES ${SHADER_COMPILER_PRIVATE_SOURCES} ${SHADER_COMPILER_PRIVATE_HEADERS})
+
+sparkle_configure_gpu_crash_artifacts(ShaderCompiler)

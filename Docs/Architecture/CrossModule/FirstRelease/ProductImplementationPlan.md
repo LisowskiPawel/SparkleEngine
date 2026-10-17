@@ -6,7 +6,7 @@
 
 Deliver Launcher, Editor and Game in one unsigned internal archive, with selected content and self-service recovery. Public-release prerequisites belong to [FR-07](ImplementationPlan.md#fr-07--publish-and-verify).
 
-**Next prerequisite:** deliver [GPU crash debugging, GCD-0 through GCD-4](../PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md). Pause GPU hang investigation until native dumps, breadcrumbs and exact shader/source correlation are qualified. Then resume PD-1 below. Independent product checks may proceed; this plan remains open. Keep the existing owners; do not rebuild completed systems.
+**Prerequisite:** close the [remaining GPU crash check](../PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md#gcd-4--prove-native-crash-debugging). Then resume PD-1 with matched tooling. Collect Modern Sponza evidence, fix the owning defect and rerun affected journeys. This product plan remains open; keep the existing owners and reuse completed systems.
 
 Each stage follows [Change Lifecycle and its source-style gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate). Reuse evidence only when its candidate/configuration still matches; record changed-input invalidation and unavailable required checks before advancing.
 
@@ -23,7 +23,7 @@ Remaining:
 **Exit:** the owning product criteria pass for the recorded configuration. Preserve display-selected resolution, shared rendering settings and approved defaults; new effect toggles remain deferred.
 
 ```text
-Execute only PD-1 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md. GPU hang investigation requires GPU Crash Debugging GCD-4 to pass first.
+Execute only PD-1 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md. Use the qualified GPU crash tooling with matching product/shader/symbol receipts for native failures.
 Reuse the current product shells and settings owner. Reproduce the remaining failures, fix their owners, and exercise the journeys above. Record native child exits, timings and candidate-bound FCR-PROD-01/04 results.
 ```
 

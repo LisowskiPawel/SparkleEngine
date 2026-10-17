@@ -1,6 +1,9 @@
 #include "PCH.h"
 
 #include "D3D12/Commands/D3D12CommandQueue.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
+#endif
 
 #include <chrono>
 #include <format>
@@ -109,7 +112,11 @@ RhiSubmissionToken D3D12CommandQueue::Submit(std::span<ID3D12CommandList* const>
 	{
 		if (wait.ProducerQueue != nullptr && wait.ProducerQueue != this && wait.SubmissionValue != 0)
 		{
-			CHECK(m_queue->Wait(wait.ProducerQueue->m_fence.Get(), wait.SubmissionValue));
+			const HRESULT result = m_queue->Wait(wait.ProducerQueue->m_fence.Get(), wait.SubmissionValue);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+			D3D12GpuCrash::ObserveLoss(m_queue.Get(), result);
+#endif
+			CHECK(result);
 		}
 	}
 	m_queue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
@@ -126,7 +133,11 @@ RhiSubmissionToken D3D12CommandQueue::Signal() noexcept
 	}
 
 	const std::uint64_t submissionValue = m_nextSubmissionValue++;
-	CHECK(m_queue->Signal(m_fence.Get(), submissionValue));
+	const HRESULT result = m_queue->Signal(m_fence.Get(), submissionValue);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	D3D12GpuCrash::ObserveLoss(m_queue.Get(), result);
+#endif
+	CHECK(result);
 	m_lastSubmittedValue = submissionValue;
 	return RhiSubmissionToken{.Queue = m_queueType, .Value = submissionValue};
 }
@@ -149,7 +160,11 @@ void D3D12CommandQueue::WaitFor(const D3D12CommandQueue& executionQueue, std::ui
 		return;
 	}
 
-	CHECK(m_queue->Wait(executionQueue.m_fence.Get(), submissionValue));
+	const HRESULT result = m_queue->Wait(executionQueue.m_fence.Get(), submissionValue);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	D3D12GpuCrash::ObserveLoss(m_queue.Get(), result);
+#endif
+	CHECK(result);
 }
 
 void D3D12CommandQueue::WaitForSubmission(std::uint64_t submissionValue) noexcept
@@ -174,11 +189,18 @@ void D3D12CommandQueue::WaitForSubmission(std::uint64_t submissionValue) noexcep
 		return;
 	}
 
-	CHECK(m_fence->SetEventOnCompletion(submissionValue, m_fenceEvent));
+	const HRESULT result = m_fence->SetEventOnCompletion(submissionValue, m_fenceEvent);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	D3D12GpuCrash::ObserveLoss(m_fence.Get(), result);
+#endif
+	CHECK(result);
 	const auto waitStart = std::chrono::steady_clock::now();
 	const DWORD waitResult = WaitForSingleObject(m_fenceEvent, D3D12CommandQueuePolicy::GpuWaitTimeoutMilliseconds);
 	if (waitResult != WAIT_OBJECT_0)
 	{
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+		D3D12GpuCrash::ObserveLoss(m_fence.Get(), DXGI_ERROR_DEVICE_REMOVED);
+#endif
 		const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - waitStart);
 
 		Diagnostics::Fatal(
@@ -203,7 +225,7 @@ bool D3D12CommandQueue::HasSubmitted(std::uint64_t submissionValue) const noexce
 bool D3D12CommandQueue::IsSubmissionComplete(std::uint64_t submissionValue) const noexcept
 {
 	m_owner.AssertAccess();
-	return submissionValue == 0 || (m_fence != nullptr && m_fence->GetCompletedValue() >= submissionValue);
+	return submissionValue == 0 || GetCompletedSubmissionValue() >= submissionValue;
 }
 
 RhiSubmissionToken D3D12CommandQueue::GetLastSubmittedToken() const noexcept
@@ -215,5 +237,13 @@ RhiSubmissionToken D3D12CommandQueue::GetLastSubmittedToken() const noexcept
 std::uint64_t D3D12CommandQueue::GetCompletedSubmissionValue() const noexcept
 {
 	m_owner.AssertAccess();
-	return m_fence != nullptr ? m_fence->GetCompletedValue() : 0;
+	const auto value = m_fence != nullptr ? m_fence->GetCompletedValue() : 0;
+	if (value == UINT64_MAX)
+	{
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+		D3D12GpuCrash::ObserveLoss(m_fence.Get(), DXGI_ERROR_DEVICE_REMOVED);
+#endif
+		Diagnostics::Fatal(D3D12CommandQueuePolicy::Logger, __FILE__, __LINE__, "D3D12 fence reported device removal (UINT64_MAX), not completed work.");
+	}
+	return value;
 }

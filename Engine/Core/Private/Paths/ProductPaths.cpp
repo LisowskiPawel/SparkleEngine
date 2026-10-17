@@ -42,13 +42,13 @@ namespace Filesystem
 		return ResolveExecutable(root, outputs, product.BinaryDirectory, target, profile);
 	}
 
-	std::filesystem::path ResolveProjectProductPath(const std::filesystem::path& root, std::string_view project, std::string_view role, std::string_view profile)
+	std::filesystem::path ResolveProjectProductPath(const std::filesystem::path& root, std::string_view project, std::string_view role, std::string_view profile, std::string_view variant)
 	{
-		if (role != "editor" && role != "game")
+		if ((!variant.empty() && !IsSourceWorkspace(root)) || (role != "editor" && role != "game"))
 		{
 			return {};
 		}
-		const auto outputs = ResolveWorkspaceOutputPaths(root);
+		const auto outputs = ResolveWorkspaceOutputPaths(root, variant);
 		const auto product = outputs.ProjectTargetOutputs(project, role, profile);
 		return ResolveExecutable(root, outputs, product.BinaryDirectory, std::string(project) + (role == "editor" ? "Editor" : "Game"), profile);
 	}

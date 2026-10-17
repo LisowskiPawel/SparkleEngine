@@ -133,12 +133,12 @@ The reference execution uses the final graph and data contract serially. Paralle
 
 ### Prepared Task Dispatch
 
-**Target contract, not implemented.** This is the Tasks prerequisite for the [GPU crash writer](PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#architecture-and-lifetimes). GCD-2 implements it with its consumer; GCD-4 qualifies execution. Ordinary `Launch` retains owner-thread scope admission and worker self-submission rejection.
+**Implemented; prepared-dispatch and native-writer checks are recorded with the qualified GPU crash candidate.** The [GPU crash writer](PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#architecture-and-lifetimes) is its first consumer. Ordinary `Launch` retains owner-thread scope admission and worker self-submission rejection.
 
 A move-only `TaskDispatch` is one reusable, scope-owned invocation slot on the existing executor. Application prepares it before SDK callbacks. Notification makes work ready; an idle dispatch occupies no worker. No dispatch storage or worker is reserved until PrepareDispatch is called. This adds no thread, executor, callback bus or general asynchronous graph API.
 
 ```cpp
-// Target API shape; not a declaration of delivered source.
+// Prepared admission is owner-affine; Notify is allocation-free and thread-safe.
 TaskDispatch TaskExecutor::PrepareDispatch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context = {});
 bool TaskDispatch::Notify() noexcept;
 void TaskDispatch::Close() noexcept;
@@ -162,7 +162,7 @@ Keep the ready node in dispatch-owned storage; use an intrusive ready list insid
 
 Implement this mechanism under Tasks `Private/Scheduling`, extending existing `TaskExecutor`, `TaskScope` admission/settlement and lane worker selection. Keep callback payloads, byte limits, SDK types and artifact policy outside Tasks. The GCD hook ledger names this extension; it is not permission for an Application scheduler or private worker.
 
-Required final checks: foreign-thread and same-worker Notify; concurrent/coalesced wake; notification during body completion; prepare failure at each admission step; scope close/cancel and executor Drain/Cancel while idle/queued/running; stale handle after executor shutdown; capacity reuse; bounded storage after 10,000 notifications; no concurrent body; ordinary Launch guards unchanged. Inject delayed barriers and allocation failures in GCD-4. State/lock review in GCD-0 cannot qualify the future implementation.
+Required final checks: foreign-thread and same-worker Notify; concurrent/coalesced wake; notification during body completion; prepare failure at each admission step; scope close/cancel and executor Drain/Cancel while idle/queued/running; stale handle after executor shutdown; capacity reuse; bounded storage after 10,000 notifications; no concurrent body; ordinary Launch guards unchanged. Inject delayed barriers and allocation failures in GCD-4. Source review does not qualify asynchronous execution.
 
 ## Owner-Thread Commit and Publication
 

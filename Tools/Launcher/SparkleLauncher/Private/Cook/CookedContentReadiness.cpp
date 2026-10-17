@@ -138,10 +138,11 @@ namespace SparkleLauncher
 		return CookedShaderPublicationState::Ready;
 	}
 
-	CookedContentReadiness InspectCookedContentReadiness(const std::filesystem::path& repositoryRoot, std::string_view projectId)
+	CookedContentReadiness InspectCookedContentReadiness(const std::filesystem::path& repositoryRoot, std::string_view projectId, std::string_view variant)
 	{
-		const auto cooked = Filesystem::ResolveProductCookedRoot(repositoryRoot, projectId);
-		const auto shared = Filesystem::IsSourceWorkspace(repositoryRoot) ? Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot).SharedCookedProjectDirectory() : std::filesystem::path{};
+		const auto outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot, variant);
+		const auto cooked = variant.empty() ? Filesystem::ResolveProductCookedRoot(repositoryRoot, projectId) : outputs.CookedProjectDirectory(projectId);
+		const auto shared = Filesystem::IsSourceWorkspace(repositoryRoot) ? outputs.SharedCookedProjectDirectory() : std::filesystem::path{};
 
 		return CookedContentReadiness{
 		    .MeshesReady = CookedAssetScopeHasFiles(cooked, shared, "Meshes"),

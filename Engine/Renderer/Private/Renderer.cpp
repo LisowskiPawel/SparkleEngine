@@ -18,7 +18,7 @@ public:
 	RenderCoordinator Coordinator;
 };
 
-Renderer::Renderer(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config) noexcept :
+Renderer::Renderer(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config) :
     m_state(std::make_unique<RendererFacadeState>(timer, window, graphicsLaunch, config))
 {
 }

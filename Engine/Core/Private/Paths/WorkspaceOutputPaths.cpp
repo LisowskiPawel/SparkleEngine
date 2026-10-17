@@ -4,20 +4,35 @@
 
 #include "Core/Public/Paths/PathUtils.h"
 
+#include "Core/Public/Diagnostics/Error.h"
+
 #include <string>
+#include <algorithm>
+#include <cctype>
 
 namespace Filesystem
 {
 	WorkspaceOutputPaths ResolveWorkspaceOutputPaths(const std::filesystem::path& repositoryRoot)
 	{
+		return ResolveWorkspaceOutputPaths(repositoryRoot, SPARKLE_ARTIFACT_VARIANT_NAME);
+	}
+
+	WorkspaceOutputPaths ResolveWorkspaceOutputPaths(const std::filesystem::path& repositoryRoot, std::string_view variant)
+	{
+		if (variant == "." || variant == ".."
+		    || std::ranges::any_of(variant, [](unsigned char character) { return !std::isalnum(character) && character != '-' && character != '_' && character != '.'; }))
+		{
+			throw Diagnostics::Error("Invalid artifact variant.");
+		}
 		const std::filesystem::path normalizedRoot = Paths::Normalize(repositoryRoot);
-		const std::filesystem::path buildRoot = normalizedRoot / "build";
-		const std::filesystem::path artifactRoot = normalizedRoot / "artifacts";
+		const std::filesystem::path canonicalBuildRoot = normalizedRoot / "build";
+		const auto buildRoot = variant.empty() ? canonicalBuildRoot : canonicalBuildRoot / "variants" / variant;
+		const auto artifactRoot = variant.empty() ? normalizedRoot / "artifacts" : normalizedRoot / "artifacts" / variant;
 		const std::filesystem::path developmentArtifactRoot = artifactRoot / "dev";
 
 		return WorkspaceOutputPaths{
 		    .BuildRoot = buildRoot,
-		    .DependencyCacheRoot = buildRoot / "_deps",
+		    .DependencyCacheRoot = canonicalBuildRoot / "_deps",
 		    .ArtifactRoot = artifactRoot,
 		    .DevelopmentArtifactRoot = developmentArtifactRoot,
 		    .ProjectArtifactRoot = developmentArtifactRoot / "Projects",

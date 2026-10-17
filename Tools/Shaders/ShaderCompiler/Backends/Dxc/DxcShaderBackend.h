@@ -45,7 +45,7 @@ public:
 	CompiledShader Compile(const ShaderCompileRequest& request) override;
 
 private:
-	Microsoft::WRL::ComPtr<IDxcResult> CompileSource(const ShaderCompileRequest& request, const DxcBuffer& sourceBuffer, const std::vector<LPCWSTR>& args, std::string& compilerOutput);
+	Microsoft::WRL::ComPtr<IDxcResult> CompileSource(const ShaderCompileRequest& request, const DxcBuffer& sourceBuffer, std::span<LPCWSTR> args, std::string& compilerOutput);
 	static void BuildCompileArguments(
 	    const ShaderCompileRequest& request,
 	    const std::wstring& wSourcePath,

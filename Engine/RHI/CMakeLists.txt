@@ -105,6 +105,7 @@ function(sparkle_configure_rhi_implementation_target target_name)
     target_compile_definitions(${target_name}
         PRIVATE
             SPARKLE_RHI_WITH_D3D12=$<BOOL:${SPARKLE_RHI_WITH_D3D12}>
+            SPARKLE_WITH_GPU_CRASH_DEBUGGING=$<BOOL:${SPARKLE_WITH_GPU_CRASH_DEBUGGING}>
             SPARKLE_WITH_EXTERNAL_CAPTURE=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>
             SPARKLE_RHI_WITH_VULKAN=$<BOOL:${SPARKLE_RHI_WITH_VULKAN}>
             SPARKLE_RHI_DEFAULT_BACKEND_${SPARKLE_RHI_DEFAULT_BACKEND_UPPER}=1
@@ -118,6 +119,11 @@ function(sparkle_configure_rhi_implementation_target target_name)
         target_compile_definitions(${target_name} PRIVATE SPARKLE_RHI_EXPORTS)
     else()
         target_compile_definitions(${target_name} PRIVATE SPARKLE_STATIC)
+    endif()
+
+    if(SPARKLE_WITH_GPU_CRASH_DEBUGGING)
+        target_include_directories(${target_name} PRIVATE "${SPARKLE_AFTERMATH_SDK_ROOT}/include")
+        target_compile_definitions(${target_name} PRIVATE "SPARKLE_AFTERMATH_RUNTIME_SHA256=\"${SPARKLE_AFTERMATH_RUNTIME_SHA256}\"")
     endif()
 
 endfunction()
@@ -412,6 +418,7 @@ target_include_directories(SparkleRHI
 )
 
 target_compile_features(SparkleRHI PUBLIC cxx_std_20)
+target_compile_definitions(SparkleRHI PUBLIC SPARKLE_WITH_GPU_CRASH_DEBUGGING=$<BOOL:${SPARKLE_WITH_GPU_CRASH_DEBUGGING}>)
 
 # RHI publicly exposes Core-backed utility types only. Platform remains an
 # implementation detail behind forward-declared window/timer types.

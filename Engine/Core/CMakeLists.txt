@@ -105,3 +105,5 @@ sparkle_configure_runtime_support_artifacts(SparkleCore)
 # IDE organization
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_CORE_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${SPARKLE_CORE_PRIVATE_SOURCES} ${SPARKLE_CORE_PRIVATE_HEADERS})
+
+target_compile_definitions(SparkleCore PRIVATE "SPARKLE_ARTIFACT_VARIANT_NAME=\"${SPARKLE_ARTIFACT_VARIANT}\"")

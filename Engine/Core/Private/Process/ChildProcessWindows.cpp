@@ -282,6 +282,7 @@ public:
 		}
 
 		result.Launched = true;
+		result.ProcessId = information.dwProcessId;
 		outProcess.Process.Reset(information.hProcess);
 		Win32Handle processThread(information.hThread);
 		outProcess.Job.Reset(CreateJobObjectW(nullptr, nullptr));
@@ -423,6 +424,43 @@ static Process::ChildProcessResult RunWindowsChildProcessUntilReady(const Proces
 		}
 		if (waitResult == WAIT_OBJECT_0 + 1)
 		{
+			auto decision = Process::ChildReadinessDecision::Ready;
+			if (request.ReadinessValidator)
+			{
+				decision = Process::ChildReadinessDecision::Rejected;
+				try
+				{
+					decision = request.ReadinessValidator(result.ProcessId, result.CapturedOutput, result.FailureReason);
+				}
+				catch (...)
+				{
+					result.FailureReason = "Child readiness verification failed.";
+				}
+				if (decision == Process::ChildReadinessDecision::Rejected)
+				{
+					ChildProcessWindowsImplementation::TerminateOwnedProcess(child);
+					return result;
+				}
+			}
+			if (decision == Process::ChildReadinessDecision::Ready)
+			{
+				const DWORD childState = WaitForSingleObject(child.Process.Get(), 0);
+				if (childState == WAIT_OBJECT_0)
+				{
+					DWORD exitCode = 1;
+					GetExitCodeProcess(child.Process.Get(), &exitCode);
+					result.ExitCode = static_cast<int>(exitCode);
+					result.FailureReason = "Child exited during readiness verification.";
+					return result;
+				}
+				if (childState != WAIT_TIMEOUT)
+				{
+					const DWORD waitError = GetLastError();
+					ChildProcessWindowsImplementation::TerminateOwnedProcess(child);
+					result.FailureReason = "Child process observation failed during readiness verification: " + ChildProcessWindowsImplementation::FormatError(waitError);
+					return result;
+				}
+			}
 			JOBOBJECT_EXTENDED_LIMIT_INFORMATION releasedLimits{};
 			if (!SetInformationJobObject(child.Job.Get(), JobObjectExtendedLimitInformation, &releasedLimits, static_cast<DWORD>(sizeof(releasedLimits))))
 			{
@@ -431,8 +469,8 @@ static Process::ChildProcessResult RunWindowsChildProcessUntilReady(const Proces
 				result.FailureReason = "Application became ready, but process ownership could not be transferred: " + ChildProcessWindowsImplementation::FormatError(releaseError);
 				return result;
 			}
-			result.Ready = true;
-			result.ExitCode = 0;
+			result.Ready = decision == Process::ChildReadinessDecision::Ready;
+			result.ExitCode = result.Ready ? 0 : -1;
 			return result;
 		}
 		if (waitResult == WAIT_OBJECT_0 + 2)

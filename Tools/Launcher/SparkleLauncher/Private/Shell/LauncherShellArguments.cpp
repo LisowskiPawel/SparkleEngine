@@ -18,6 +18,7 @@ namespace SparkleLauncher
 
 	private:
 		bool ParseCurrentArgument(std::string_view argument);
+		bool ParseGpuCrashOption(std::string_view argument);
 		bool ParseProfile(BuildProfileTarget target, std::string& outProfile);
 		bool ParseWorkspaceIde();
 		bool ParseWorkspaceCompiler();
@@ -29,6 +30,8 @@ namespace SparkleLauncher
 		int m_argumentCount = 0;
 		char** m_arguments = nullptr;
 		int m_index = 1;
+		bool m_gpuCrashModeSelected = false;
+		bool m_shaderExportSelected = false;
 		LauncherShellArguments* m_outArguments = nullptr;
 		std::ostream* m_error = nullptr;
 	};
@@ -106,6 +109,11 @@ namespace SparkleLauncher
 			return value.has_value();
 		}
 
+		if (argument == "--gpu-crash-debugging" || argument == "--shader-export")
+		{
+			return ParseGpuCrashOption(argument);
+		}
+
 		if (argument == "--product")
 		{
 			const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: --product requires editor or game.\n");
@@ -181,6 +189,33 @@ namespace SparkleLauncher
 
 		*m_error << "SparkleLauncher: unexpected argument '" << argument << "'.\n";
 		return false;
+	}
+
+	bool LauncherShellArgumentParser::ParseGpuCrashOption(std::string_view argument)
+	{
+		const auto value = ReadRequiredValue("SparkleLauncher: GPU crash option requires one value.\n");
+		bool& selected = argument == "--shader-export" ? m_shaderExportSelected : m_gpuCrashModeSelected;
+		if (!value || selected)
+		{
+			*m_error << "SparkleLauncher: missing or duplicate GPU crash option.\n";
+			return false;
+		}
+		selected = true;
+
+		if (argument == "--shader-export")
+		{
+			m_outArguments->ShaderExportPath = Strings::ToWide(*value);
+		}
+		else if (*value == "off" || *value == "aftermath")
+		{
+			m_outArguments->GpuCrashMode = *value == "off" ? RhiGpuCrashMode::Off : RhiGpuCrashMode::Aftermath;
+		}
+		else
+		{
+			*m_error << "SparkleLauncher: use --gpu-crash-debugging off|aftermath.\n";
+			return false;
+		}
+		return true;
 	}
 
 	bool LauncherShellArgumentParser::ParseProfile(BuildProfileTarget target, std::string& outProfile)
@@ -285,6 +320,7 @@ namespace SparkleLauncher
 
 	void PrintLauncherShellUsage(std::ostream& output)
 	{
+		output << "GPU crash launch: --gpu-crash-debugging off|aftermath --shader-export <absolute shader-export.json>\n";
 		output << "Usage:\n"
 		       << "  SparkleLauncher [--root <repo-root>] [--editor-profile <profile>] [--game-profile <profile>] "
 		          "[--ide <visual-studio|rider>] [--compiler <msvc|clang-cl>] "

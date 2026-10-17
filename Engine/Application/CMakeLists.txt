@@ -45,7 +45,7 @@ list(FILTER SPARKLE_APPLICATION_GAME_PRIVATE_HEADERS EXCLUDE REGEX "/Private/Edi
 file(GLOB_RECURSE SPARKLE_APPLICATION_EDITOR_PRIVATE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Editor/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/ShaderRecook/*.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Private/EditorOperations/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/EditorOperations/*.cpp
 )
 list(APPEND SPARKLE_APPLICATION_EDITOR_PRIVATE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/EditorApplication.cpp
@@ -58,7 +58,7 @@ list(FILTER SPARKLE_APPLICATION_EDITOR_PRIVATE_SOURCES EXCLUDE REGEX "/Private/E
 file(GLOB_RECURSE SPARKLE_APPLICATION_EDITOR_PRIVATE_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Editor/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/ShaderRecook/*.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Private/EditorOperations/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/EditorOperations/*.h
 )
 
 if(SPARKLE_BUILD_SHARED)
@@ -97,14 +97,14 @@ sparkle_target_precompile_headers(SparkleApplication
 
 # Application publicly exposes renderer viewport contracts only. Core, platform,
 # game runtime, and editor dependencies stay implementation-only.
-target_link_libraries(SparkleApplication 
+target_link_libraries(SparkleApplication
     PUBLIC
         SparkleRenderer
     PRIVATE
         SparkleCore
         SparklePlatform
         SparkleGameFramework
-		SparkleTasks
+        SparkleTasks
         imgui
 )
 
@@ -171,11 +171,11 @@ if(SPARKLE_RHI_WITH_EXTERNAL_CAPTURE)
         target_sources(SparkleApplicationEditor PRIVATE
             "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>:${capture_source}>")
     endforeach()
-    foreach(capture_source IN LISTS SPARKLE_APPLICATION_CAPTURE_SOURCES)
-        target_sources(SparkleApplication PRIVATE
-            "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>:${capture_source}>")
-    endforeach()
 endif()
+foreach(capture_source IN LISTS SPARKLE_APPLICATION_CAPTURE_SOURCES)
+    target_sources(SparkleApplication PRIVATE
+        "$<$<OR:$<BOOL:${SPARKLE_WITH_GPU_CRASH_DEBUGGING}>,$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>>:${capture_source}>")
+endforeach()
 
 foreach(console_source IN LISTS SPARKLE_APPLICATION_CONSOLE_SOURCES)
     target_sources(SparkleApplication PRIVATE "$<$<NOT:$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>>:${console_source}>")

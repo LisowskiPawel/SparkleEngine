@@ -23,6 +23,8 @@ namespace SparkleLauncher
 		std::string LevelId;
 		LevelRunMode Product = LevelRunMode::Editor;
 		std::string GraphicsApi = "d3d12";
+		RhiGpuCrashMode GpuCrashMode = RhiGpuCrashMode::Off;
+		std::filesystem::path ShaderExportPath;
 		CookMode RequestedCookMode = CookMode::Incremental;
 		CleanScope RequestedCleanScope = CleanScope::CookedOutputs;
 		bool ForceRecookConfirmed = false;

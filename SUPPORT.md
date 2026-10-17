@@ -40,7 +40,9 @@ Preview writes nothing. Export requires the matching preview digest and an exist
 
 The JSON contains product/build identity, incident category, error counts and diagnostic availability. It excludes log text, private paths, settings, content, dumps and captures; originals stay untouched. Logs over 10 MiB or with lines over 64 Ki characters are rejected. Missing/empty data is identified explicitly. Incident categories are user observations, not proof of collection.
 
-Optional `-NativePdbPath` checks matching native symbols; mismatches reject export. Automatic crash/hang collection and shader-symbol correlation are unavailable. Review any files you voluntarily share; raw dumps/captures may contain private data.
+Optional `-NativePdbPath` checks matching native symbols; mismatches reject export. Ordinary packages have no automatic crash/hang collection or qualified shader-symbol correlation. Review any files you voluntarily share; raw dumps/captures may contain private data.
+
+For the opt-in source-only GPU crash variant, use the [launch and inspection route](Docs/Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#launch-and-inspection-route). It remains unqualified until GCD-4. The source export helper accepts `-GpuCrashManifestPath <incident.json>`; preview is sanitized metadata. Raw dump, NVIDIA debug data, source and symbols require their explicit category switches plus matching preview consent. Full symbols also require Source consent because they can embed source. Nothing is uploaded.
 
 ## Retention and replacement
 

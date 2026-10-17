@@ -88,6 +88,10 @@ namespace SparkleLauncher
 		QComboBox* CreateValueCombo(const QVector<QPair<QString, QString>>& options, const QString& currentValue, void (LauncherSettings::*setter)(const QString&));
 		QComboBox* CreateContextCombo(void (LauncherSettings::*setter)(const QString&));
 		void RefreshContextSelectors();
+		void AddGpuCrashOptions(QVBoxLayout& layout);
+		void OpenGpuCrashInspector(QPushButton& button);
+		void RefreshGpuCrashIncident();
+		void DisplayGpuCrashState(const QString& state);
 		static bool UsesBuildEnvironmentStatus(const QString& operationId);
 		void AddOptionsForOperation(QVBoxLayout& layout, const QString& operationId);
 		void AddBuildOptions(QVBoxLayout& layout);
@@ -190,6 +194,9 @@ namespace SparkleLauncher
 		QHash<QString, QPointer<QLabel>> m_sourceDependencyStatusLabels;
 		QHash<QString, QPointer<QPushButton>> m_sourceDependencyActionButtons;
 		QSet<QString> m_cleaningSourceDependencyRunIds;
+		std::optional<GpuCrashIncident> m_gpuCrashIncident;
+		QVector<QPointer<QLabel>> m_gpuCrashStatusLabels;
+		bool m_gpuCrashQueryPending = false;
 		QString m_selectedOperationId;
 		bool m_isRebuildingOptions = false;
 		bool m_isApplyingUiRefresh = false;

@@ -22,7 +22,9 @@ FrameGraphExecutionDiagnostics::FrameGraphExecutionDiagnostics(FrameExecutionDia
 bool FrameGraphExecutionDiagnostics::ShouldEmitFramePassMarkers() const noexcept
 {
 	const RendererDiagnosticMarkerVerbosity verbosity = GetMarkerVerbosity();
-	return verbosity == RendererDiagnosticMarkerVerbosity::FramePass || verbosity == RendererDiagnosticMarkerVerbosity::Detailed;
+
+	return (m_frameDiagnostics != nullptr && m_frameDiagnostics->RequiresBaselineScopes()) || verbosity == RendererDiagnosticMarkerVerbosity::FramePass
+	    || verbosity == RendererDiagnosticMarkerVerbosity::Detailed;
 }
 
 RendererDiagnosticMarkerVerbosity FrameGraphExecutionDiagnostics::GetMarkerVerbosity() const noexcept

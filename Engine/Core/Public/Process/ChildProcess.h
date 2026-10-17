@@ -22,6 +22,13 @@ namespace Process
 		OperatingSystemError
 	};
 
+	enum class ChildReadinessDecision : std::uint8_t
+	{
+		Ready,
+		Rejected,
+		ReleaseWithoutReadiness
+	};
+
 	struct EnvironmentOverride final
 	{
 		std::string Name;
@@ -40,10 +47,12 @@ namespace Process
 		ChildProcessOutputCallback OutputCallback;
 		std::stop_token Cancellation;
 		std::optional<std::string> ReadinessValue;
+		std::function<ChildReadinessDecision(std::uint32_t, std::string_view, std::string&)> ReadinessValidator;
 	};
 
 	struct ChildProcessResult final
 	{
+		std::uint32_t ProcessId = 0;
 		bool Launched = false;
 		bool Ready = false;
 		bool Cancelled = false;

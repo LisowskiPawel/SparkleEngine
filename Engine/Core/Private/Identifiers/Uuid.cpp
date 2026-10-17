@@ -33,4 +33,22 @@ namespace Identifiers
 		}
 		return stream.str();
 	}
+
+	bool IsUuidV4String(std::string_view value) noexcept
+	{
+		if (value.size() != 36 || value[14] != '4' || std::string_view("89ab").find(value[19]) == std::string_view::npos)
+		{
+			return false;
+		}
+		for (std::size_t index = 0; index < value.size(); ++index)
+		{
+			const bool separator = index == 8 || index == 13 || index == 18 || index == 23;
+			if (separator ? value[index] != '-' : std::string_view("0123456789abcdef").find(value[index]) == std::string_view::npos)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

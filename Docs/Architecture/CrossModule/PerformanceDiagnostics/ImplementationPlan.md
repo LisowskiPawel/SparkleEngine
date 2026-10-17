@@ -14,7 +14,7 @@ Make the existing renderer observable with trustworthy external captures before 
 
 ## Work This Plan
 
-**Current priority:** [GPU Crash Debugging GCD-0 through GCD-4](GpuCrashDebugging/ImplementationPlan.md) precedes renewed GPU hang investigation. It is a separate bounded crash workflow, not delivery of this plan's internal diagnostics product. The [roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) owns the global order.
+**Current priority:** [GPU crash debugging](GpuCrashDebugging/GpuCrashDebuggingDesign.md) has a remaining serial Vulkan source-mapping check. After it closes, resume the remaining product journeys through the [roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next); this internal diagnostics product remains unfinished.
 
 | What to do | Working route |
 | --- | --- |

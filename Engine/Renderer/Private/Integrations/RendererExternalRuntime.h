@@ -12,7 +12,7 @@
 class RendererExternalRuntime final
 {
 public:
-	explicit RendererExternalRuntime(RendererGraphicsLaunch graphicsLaunch) noexcept;
+	explicit RendererExternalRuntime(RendererGraphicsLaunch graphicsLaunch);
 	~RendererExternalRuntime() noexcept;
 
 	RendererExternalRuntime(const RendererExternalRuntime&) = delete;
@@ -26,6 +26,9 @@ private:
 	Threading::OwnerThread m_owner{"Renderer external runtime"};
 
 	RhiDeviceLaunch m_deviceLaunch;
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	std::unique_ptr<RhiGpuCrash> m_gpuCrash;
+#endif
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	std::unique_ptr<RhiExternalCapture> m_externalCapture;
 #endif

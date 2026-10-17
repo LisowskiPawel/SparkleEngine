@@ -18,6 +18,18 @@ namespace SparkleLauncher
 		}
 
 		const LauncherOperationRequest request = context.Request;
+		if (request.GpuCrashMode != RhiGpuCrashMode::Off)
+		{
+			return registry.Register(
+			    {request.OperationId.toStdString(),
+			        {},
+			        [request]()
+			        {
+				        const auto plan = PlanLevelRunOperation(request.OperationId.toStdString(), LauncherOperationRequestMapping::LevelRun(request));
+				        return plan.CanRun ? LauncherCapabilityEvaluation::RunOperation(BuildQuickStartOperationRequest(request, request.OperationId))
+				                           : LauncherCapabilityEvaluation::Blocked(BuildCapabilityReadinessSummary(plan.ReadinessMessages));
+			        }});
+		}
 
 		std::string error = registry.Register(
 		    {context.ProjectCapabilityId(),

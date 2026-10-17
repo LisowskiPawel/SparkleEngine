@@ -2,11 +2,49 @@
 
 #include "Core/Public/Files/FileUtils.h"
 
+#include <Windows.h>
+
+#include <algorithm>
 #include <format>
 #include <fstream>
 
 namespace Files
 {
+	bool TryWriteNewFileDurable(const std::filesystem::path& path, std::span<const std::byte> bytes, std::string& outErrorMessage)
+	{
+		const HANDLE file = CreateFileW(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH, nullptr);
+		if (file == INVALID_HANDLE_VALUE)
+		{
+			outErrorMessage = "Cannot create durable output file.";
+			return false;
+		}
+		std::size_t offset = 0;
+		bool success = true;
+		while (offset < bytes.size())
+		{
+			const DWORD count = static_cast<DWORD>(std::min<std::size_t>(bytes.size() - offset, 16u * 1024u * 1024u));
+			DWORD written = 0;
+			if (!WriteFile(file, bytes.data() + offset, count, &written, nullptr) || written != count)
+			{
+				success = false;
+				break;
+			}
+			offset += written;
+		}
+		if (success)
+		{
+			success = FlushFileBuffers(file) != FALSE;
+		}
+		const bool closed = CloseHandle(file) != FALSE;
+		if (!success || !closed)
+		{
+			outErrorMessage = "Durable output did not finish writing, flushing and closing.";
+			return false;
+		}
+		outErrorMessage.clear();
+		return true;
+	}
+
 	static bool TryOpenOutput(const std::filesystem::path& path, std::ios::openmode mode, std::ofstream& output, std::string& outErrorMessage)
 	{
 		std::error_code errorCode;

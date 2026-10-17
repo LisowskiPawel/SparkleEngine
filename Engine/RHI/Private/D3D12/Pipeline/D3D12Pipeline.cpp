@@ -1,4 +1,7 @@
 #include "PCH.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
+#endif
 #include "D3D12/Pipeline/D3D12Pipeline.h"
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/D3D12TypeConversions.h"
@@ -207,7 +210,11 @@ public:
 			    std::format("Pipeline '{}' has invalid cooked shader bytecode for stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));
 		}
 
-		return D3D12_SHADER_BYTECODE{.pShaderBytecode = bytecode.Data, .BytecodeLength = bytecode.Size};
+		const D3D12_SHADER_BYTECODE nativeCode{.pShaderBytecode = bytecode.Data, .BytecodeLength = bytecode.Size};
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+		D3D12GpuCrash::Shader(nativeCode);
+#endif
+		return nativeCode;
 	}
 };
 

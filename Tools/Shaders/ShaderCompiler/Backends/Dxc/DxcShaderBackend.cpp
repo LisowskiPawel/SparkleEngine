@@ -156,7 +156,7 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 	return compiledShader;
 }
 
-Microsoft::WRL::ComPtr<IDxcResult> DxcShaderBackend::CompileSource(const ShaderCompileRequest& request, const DxcBuffer& sourceBuffer, const std::vector<LPCWSTR>& args, std::string& compilerOutput)
+Microsoft::WRL::ComPtr<IDxcResult> DxcShaderBackend::CompileSource(const ShaderCompileRequest& request, const DxcBuffer& sourceBuffer, std::span<LPCWSTR> args, std::string& compilerOutput)
 {
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
 	if (!request.CaptureDebugArtifacts)

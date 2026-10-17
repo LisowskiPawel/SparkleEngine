@@ -1,6 +1,9 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Device/VulkanRhi.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
+#endif
 
 #include "Vulkan/Commands/VulkanCommandQueue.h"
 #include "Vulkan/Core/VulkanResult.h"
@@ -9,19 +12,14 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanRhiLogger, "RHI.Vulkan");
 
 VulkanRhi::VulkanRhi() noexcept
 {
-	{
-		CreateInstance();
-	}
-	{
-		CreateDebugMessenger();
-	}
-	{
-		SelectPhysicalDevice();
-	}
-	{
-		CreateLogicalDevice();
-	}
+	CreateInstance();
+	CreateDebugMessenger();
+	SelectPhysicalDevice();
+	CreateLogicalDevice();
 	LoadDeviceDebugFunctions();
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	VulkanGpuCrash::Initialize(m_device);
+#endif
 	LoadRayTracingFunctions();
 	BuildRayTracingCapabilities();
 	NameBootstrapObjects();
@@ -54,6 +52,13 @@ void VulkanRhi::WaitForIdle() noexcept
 	if (m_device != VK_NULL_HANDLE)
 	{
 		const VkResult result = vkDeviceWaitIdle(m_device);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+		VulkanGpuCrash::ObserveLoss(*this, ERhiQueueType::Graphics, result);
+		if (result == VK_ERROR_DEVICE_LOST)
+		{
+			Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkDeviceWaitIdle", result));
+		}
+#endif
 		if (!VulkanResult::Succeeded(result))
 		{
 			SPDLOG_LOGGER_WARN(g_vulkanRhiLogger, "vkDeviceWaitIdle failed: {}", VulkanResult::ToString(result));

@@ -63,6 +63,8 @@ namespace SparkleLauncher
 		request.RunMode = arguments.Product;
 		request.ProductProfile = arguments.Product == LevelRunMode::Editor ? model.EditorProfile : model.GameProfile;
 		request.GraphicsApi = arguments.GraphicsApi;
+		request.GpuCrashMode = arguments.GpuCrashMode;
+		request.ShaderExportPath = arguments.ShaderExportPath;
 		return request;
 	}
 

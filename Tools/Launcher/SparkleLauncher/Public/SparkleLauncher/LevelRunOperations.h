@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RHI/Public/Diagnostics/ExternalCaptureProvider.h"
+#include "RHI/Public/Diagnostics/RhiGpuCrash.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
 #include "SparkleLauncher/LauncherContentDefaults.h"
@@ -39,6 +40,8 @@ namespace SparkleLauncher
 		std::string LevelId;
 		std::string GraphicsApi = "d3d12";
 		ExternalCaptureProvider CaptureProvider = ExternalCaptureProvider::None;
+		RhiGpuCrashMode GpuCrashMode = RhiGpuCrashMode::Off;
+		std::filesystem::path ShaderExportPath;
 	};
 
 	struct LevelRunOperationStep
@@ -64,6 +67,7 @@ namespace SparkleLauncher
 		std::filesystem::path RepositoryRoot;
 		LevelRunOperationRequest Request;
 		std::string TargetName;
+		std::string SessionId;
 		std::filesystem::path ExecutablePath;
 		std::filesystem::path WorkingDirectory;
 		std::vector<Process::EnvironmentOverride> Environment;

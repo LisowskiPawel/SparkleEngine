@@ -2,6 +2,7 @@
 
 #include "ScheduledTaskExecution.h"
 #include "TaskWorkerContext.h"
+#include "TaskDispatchState.h"
 
 #include "Core/Public/Threading/ThreadOwnership.h"
 
@@ -113,7 +114,17 @@ bool TaskExecutor::Implementation::Runtime::TrySteal(TaskWorker& worker, ReadyTa
 
 bool TaskExecutor::Implementation::Runtime::TryTakeWork(TaskWorker& worker, ReadyTask& task)
 {
-	return TryPopLocal(worker, task) || TryPopInjection(worker.Lane, task) || TrySteal(worker, task);
+	if (worker.PreferDispatch && TryPopDispatch(worker.Lane, task))
+	{
+		worker.PreferDispatch = false;
+		return true;
+	}
+	if (TryPopLocal(worker, task) || TryPopInjection(worker.Lane, task) || TrySteal(worker, task))
+	{
+		worker.PreferDispatch = true;
+		return true;
+	}
+	return TryPopDispatch(worker.Lane, task);
 }
 
 bool TaskExecutor::Implementation::Runtime::WaitForWork(TaskWorker& worker, ReadyTask& task)
@@ -146,7 +157,16 @@ void TaskExecutor::Implementation::Runtime::WorkerMain(TaskWorker& worker)
 	ReadyTask task;
 	while (TryTakeWork(worker, task) || WaitForWork(worker, task))
 	{
-		task.Execution->Execute(task.TaskIndex, worker);
+		if (task.Dispatch != nullptr)
+		{
+			task.Dispatch->Execute();
+		}
+		else
+		{
+			task.Execution->Execute(task.TaskIndex, worker);
+		}
+		// Release captures outside every scheduler lock before taking another item.
+		task = {};
 	}
 
 	TaskWorkerContext::Leave();

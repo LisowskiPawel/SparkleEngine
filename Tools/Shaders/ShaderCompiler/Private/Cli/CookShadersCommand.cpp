@@ -1,4 +1,6 @@
 #include "PCH.h"
+#include "Core/Public/Json/JsonWriter.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include "Cli/CookShadersCommand.h"
 
@@ -73,7 +75,9 @@ static void PrintSummary(const ShaderCookResult& result, const ShaderCookSetting
 
 	if (!result.output.debugManifestPath.empty())
 	{
-		ToolConsole::Message(std::cout, ToolConsoleSeverity::Info, "Shader debug export", {ToolConsole::QuotedField("manifest", result.output.debugManifestPath.generic_string())});
+		const auto manifestPath = Strings::ToNarrow(result.output.debugManifestPath.wstring());
+		const auto quotedManifest = Json::QuoteString(manifestPath);
+		std::cout << "SPARKLE_SHADER_EXPORT " << quotedManifest << std::endl;
 	}
 }
 

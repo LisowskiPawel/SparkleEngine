@@ -41,6 +41,7 @@ public:
 
 private:
 	friend class TaskExecutor;
+	friend class TaskDispatch;
 	friend class TaskScope;
 	struct State;
 

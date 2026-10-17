@@ -1,5 +1,8 @@
 #pragma once
 
+#include "SparkleLauncher/GpuCrashIncident.h"
+#include <optional>
+
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 
@@ -8,6 +11,8 @@ namespace SparkleLauncher
 	struct LauncherOperationResult final
 	{
 		QString Status;
+		std::optional<GpuCrashIncident> GpuCrash;
+		QString ShaderExportPath;
 		QString ProblemKind;
 		QString Problem;
 		QString ExpectedAction;

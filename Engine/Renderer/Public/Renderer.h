@@ -27,7 +27,7 @@ struct RenderFrameSubmission;
 class SPARKLE_RENDERER_API Renderer final
 {
 public:
-	Renderer(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config = {}) noexcept;
+	Renderer(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config = {});
 	~Renderer() noexcept;
 
 	Renderer(const Renderer&) = delete;

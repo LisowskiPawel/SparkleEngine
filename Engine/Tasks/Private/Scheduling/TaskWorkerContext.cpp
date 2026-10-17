@@ -16,3 +16,8 @@ bool TaskWorkerContext::IsWorkerFor(const void* executorIdentity) noexcept
 {
 	return executorIdentity != nullptr && s_executorIdentity == executorIdentity;
 }
+
+bool TaskWorkerContext::IsWorker() noexcept
+{
+	return s_executorIdentity != nullptr;
+}

@@ -2,6 +2,7 @@
 
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Process/ChildProcess.h"
+#include "Core/Public/Json/JsonReader.h"
 
 #include <chrono>
 #include <filesystem>
@@ -52,8 +53,10 @@ namespace SparkleLauncher
 		        .LogPath = request.LogPath,
 		        .OutputCallback = request.OutputCallback,
 		        .Cancellation = request.Cancellation,
-		        .ReadinessValue = request.ReadinessValue});
+		        .ReadinessValue = request.ReadinessValue,
+		        .ReadinessValidator = request.ReadinessValidator});
 
+		result.ProcessId = childResult.ProcessId;
 		result.Launched = childResult.Launched;
 		result.Ready = childResult.Ready;
 		result.Canceled = childResult.Cancelled;
@@ -84,6 +87,32 @@ namespace SparkleLauncher
 			existingCallback(output);
 			callback(output);
 		};
+	}
+
+	std::filesystem::path ReadProcessOutputPath(std::string_view output, std::string_view prefix)
+	{
+		std::filesystem::path manifest;
+		while (!output.empty())
+		{
+			const auto end = output.find('\n');
+			const auto line = output.substr(0, end);
+			if (line.starts_with(prefix))
+			{
+				std::string path;
+				const auto json = "{\"manifest\":" + std::string(line.substr(prefix.size())) + "}";
+				if (!manifest.empty() || !Json::TryReadStringProperty(json, "manifest", path))
+				{
+					return {};
+				}
+				manifest = Strings::ToWide(std::string_view{path});
+			}
+			if (end == std::string_view::npos)
+			{
+				break;
+			}
+			output.remove_prefix(end + 1);
+		}
+		return manifest;
 	}
 
 	std::string BuildDisplayCommandLine(const std::filesystem::path& executablePath, const std::vector<std::string>& arguments)

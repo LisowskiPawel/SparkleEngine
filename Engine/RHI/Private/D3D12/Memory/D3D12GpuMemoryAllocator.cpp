@@ -1,4 +1,7 @@
 #include "PCH.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
+#endif
 
 #include "D3D12/Memory/D3D12GpuMemoryAllocator.h"
 
@@ -504,6 +507,9 @@ void D3D12GpuMemoryAllocator::ReleaseRecordingResource(D3D12RecordingResourceUse
 void D3D12GpuMemoryAllocator::RegisterAllocationRecord(D3D12GpuAllocationRecord& record) noexcept
 {
 	m_owner.AssertAccess();
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	D3D12GpuCrash::Resource(record.Resource.Get());
+#endif
 	if (m_impl == nullptr)
 	{
 		return;

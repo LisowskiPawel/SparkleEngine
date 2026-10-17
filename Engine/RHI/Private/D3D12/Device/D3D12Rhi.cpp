@@ -1,4 +1,7 @@
 #include "PCH.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
+#endif
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/Device/D3D12ExternalFeatureInteropCapabilities.h"
 #include "D3D12/Commands/D3D12CommandQueue.h"
@@ -16,30 +19,26 @@ static constexpr std::uint32_t kNvidiaVendorId = 0x10DE;
 D3D12Rhi::D3D12Rhi(RhiInterposerHooks interposerHooks) noexcept :
     m_interposerHooks(interposerHooks)
 {
-#if ENGINE_GPU_VALIDATION
-	m_debugLayer = std::make_unique<D3D12DebugLayer>();
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	m_debugLayer = D3D12GpuCrash::TakePreparedDred();
 #endif
+#if ENGINE_GPU_VALIDATION
+	if (m_debugLayer == nullptr)
 	{
-		CreateFactory();
+		m_debugLayer = std::make_unique<D3D12DebugLayer>();
 	}
-	{
-		CreateDevice();
-	}
+#endif
+	CreateFactory();
+	CreateDevice();
 
 #if ENGINE_GPU_VALIDATION
 	m_debugLayer->InitializeInfoQueue(m_device.Get());
 #endif
 
-	{
-		CreateMemoryAllocator();
-	}
+	CreateMemoryAllocator();
 
-	{
-		CheckShaderModel6Support();
-	}
-	{
-		CreateCommandQueues();
-	}
+	CheckShaderModel6Support();
+	CreateCommandQueues();
 	constexpr uint32_t kInitialFrameIndex = 0;
 	SetCurrentFrameIndex(kInitialFrameIndex);
 }
@@ -171,6 +170,9 @@ void D3D12Rhi::CreateDevice()
 	{
 		m_device = std::move(createdDevice);
 	}
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	D3D12GpuCrash::Initialize(m_device.Get());
+#endif
 	if (m_interposerHooks.DeviceCreated != nullptr)
 	{
 		m_interposerActive = m_interposerHooks.DeviceCreated(NativeGraphicsDeviceHandle{m_device.Get()}, BuildD3D12AdapterIdentity(this), m_interposerHooks.UserData);
@@ -621,7 +623,7 @@ bool D3D12Rhi::SupportsLiveObjectReports() const noexcept
 
 bool D3D12Rhi::SupportsCrashDiagnostics() const noexcept
 {
-#if ENGINE_GPU_VALIDATION
+#if ENGINE_GPU_VALIDATION || SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	return m_debugLayer != nullptr && m_debugLayer->SupportsCrashDiagnostics();
 #else
 	return false;
@@ -640,7 +642,7 @@ void D3D12Rhi::ReportLiveObjects() noexcept
 
 void D3D12Rhi::CollectCrashDiagnostics() noexcept
 {
-#if ENGINE_GPU_VALIDATION
+#if ENGINE_GPU_VALIDATION || SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	if (m_debugLayer != nullptr)
 	{
 		m_debugLayer->CollectCrashDiagnostics(m_device.Get());
@@ -661,7 +663,7 @@ D3D12Rhi::~D3D12Rhi() noexcept
 	m_externalDevice.Reset();
 	m_memoryAllocator.reset();
 
-#if ENGINE_GPU_VALIDATION
+#if ENGINE_GPU_VALIDATION || SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	m_debugLayer.reset();
 #endif
 

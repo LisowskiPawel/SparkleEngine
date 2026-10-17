@@ -114,6 +114,8 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 		}
 		mapped.GraphicsApi = request.GraphicsApi.toStdString();
 		mapped.CaptureProvider = request.CaptureProvider;
+		mapped.GpuCrashMode = request.GpuCrashMode;
+		mapped.ShaderExportPath = request.ShaderExportPath.toStdWString();
 		return mapped;
 	}
 

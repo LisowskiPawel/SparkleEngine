@@ -1,6 +1,9 @@
 #include "PCH.h"
 
 #include "D3D12/Commands/D3D12RenderCommandList.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
+#endif
 
 #include "D3D12/D3D12RenderHardwareInterface.h"
 #if SPARKLE_RHI_WITH_D3D12_PIX_EVENTS
@@ -23,7 +26,15 @@ D3D12RenderCommandList::D3D12RenderCommandList(D3D12RenderHardwareInterface& own
     m_queueType(queueType)
 {
 	m_recordingResourceUses.reserve(32);
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (GpuCrashSession::Current() != nullptr)
+	{
+		m_gpuCrash = std::make_unique<D3D12GpuCrashContext>(commandList, queueType);
+	}
+#endif
 }
+
+D3D12RenderCommandList::~D3D12RenderCommandList() noexcept = default;
 
 ERhiBackendApi D3D12RenderCommandList::GetBackendApi() const noexcept
 {
@@ -69,6 +80,12 @@ NativeGraphicsCommandListHandle D3D12RenderCommandList::GetNativeHandle(const Rh
 
 bool D3D12RenderCommandList::SupportsDiagnosticScopes() const noexcept
 {
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (m_gpuCrash != nullptr)
+	{
+		return true;
+	}
+#endif
 #if SPARKLE_RHI_WITH_D3D12_PIX_EVENTS
 	return m_commandList != nullptr;
 #else
@@ -78,6 +95,12 @@ bool D3D12RenderCommandList::SupportsDiagnosticScopes() const noexcept
 
 void D3D12RenderCommandList::BeginDiagnosticScope(std::string_view label, RhiDiagnosticLabelColor color) noexcept
 {
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (m_gpuCrash != nullptr)
+	{
+		m_gpuCrash->Begin(label);
+	}
+#endif
 #if SPARKLE_RHI_WITH_D3D12_PIX_EVENTS
 	if (!SupportsDiagnosticScopes() || label.empty())
 	{
@@ -91,6 +114,12 @@ void D3D12RenderCommandList::BeginDiagnosticScope(std::string_view label, RhiDia
 
 void D3D12RenderCommandList::EndDiagnosticScope() noexcept
 {
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (m_gpuCrash != nullptr)
+	{
+		m_gpuCrash->End();
+	}
+#endif
 #if SPARKLE_RHI_WITH_D3D12_PIX_EVENTS
 	if (SupportsDiagnosticScopes())
 	{
@@ -101,6 +130,12 @@ void D3D12RenderCommandList::EndDiagnosticScope() noexcept
 
 void D3D12RenderCommandList::InsertDiagnosticMarker(std::string_view label, RhiDiagnosticLabelColor color) noexcept
 {
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (m_gpuCrash != nullptr)
+	{
+		m_gpuCrash->Insert(label);
+	}
+#endif
 #if SPARKLE_RHI_WITH_D3D12_PIX_EVENTS
 	if (!SupportsDiagnosticScopes() || label.empty())
 	{
@@ -176,3 +211,13 @@ void D3D12RenderCommandList::ResetBoundState() noexcept
 {
 	m_boundRayTracingPipeline = nullptr;
 }
+
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+void D3D12RenderCommandList::BeginDiagnosticRecording() noexcept
+{
+	if (m_gpuCrash != nullptr)
+	{
+		m_gpuCrash->Reset();
+	}
+}
+#endif

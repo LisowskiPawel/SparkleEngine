@@ -58,3 +58,8 @@ if(MSVC)
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     )
 endif()
+
+sparkle_stage_aftermath_runtime(ShowcaseEditor)
+sparkle_stage_aftermath_runtime(ShowcaseGame)
+sparkle_configure_gpu_crash_artifacts(ShowcaseEditor)
+sparkle_configure_gpu_crash_artifacts(ShowcaseGame)

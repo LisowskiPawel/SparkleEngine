@@ -237,6 +237,7 @@ bool TaskExecutor::Implementation::Runtime::Shutdown(TaskExecutorShutdownMode mo
 	std::unique_lock shutdownLock(m_shutdownMutex);
 	const std::vector<std::shared_ptr<TaskExecution::State>> executionsToCancel = BeginShutdown(mode);
 	RequestCancellation(executionsToCancel);
+	CloseDispatches();
 	WaitForActiveExecutions();
 	FinishShutdown();
 	return true;

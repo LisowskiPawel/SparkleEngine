@@ -1,4 +1,5 @@
 set(SPARKLE_LAUNCHER_CORE_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/GpuCrashIncident.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/BuildWorkspaceOperations.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/ArtifactNaming.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/BuildProfileCatalog.h
@@ -69,6 +70,8 @@ set(SPARKLE_LAUNCHER_CORE_BUILD_HEADERS
 )
 
 set(SPARKLE_LAUNCHER_CORE_LEVEL_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash/GpuCrashLaunch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash/GpuCrashLaunch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/AssetPackSyncPlanner.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperationExecutor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperationProcessRequests.cpp
@@ -111,6 +114,7 @@ set(SPARKLE_LAUNCHER_CORE_MAINTENANCE_HEADERS
 find_package(Qt6 6.11.1 EXACT REQUIRED COMPONENTS Widgets)
 
 set(SPARKLE_LAUNCHER_GUI_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash/LauncherGpuCrashPanel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherBackend.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherGuiApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherSettings.cpp
@@ -240,6 +244,7 @@ target_include_directories(SparkleLauncherCore
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/ExternalCapture
+        ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook
@@ -290,6 +295,7 @@ target_include_directories(SparkleLauncher
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/ExternalCapture
+        ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models

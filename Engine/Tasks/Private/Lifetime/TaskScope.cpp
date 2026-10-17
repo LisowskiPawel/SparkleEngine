@@ -3,6 +3,7 @@
 #include "TaskScopeState.h"
 
 #include <cassert>
+#include <algorithm>
 #include <functional>
 #include <stdexcept>
 #include <utility>
@@ -23,6 +24,19 @@ bool TaskScope::State::RegisterExecution(const std::shared_ptr<TaskExecution::St
 	{
 		return false;
 	}
+
+	std::erase_if(
+	    Executions,
+	    [](const auto& item)
+	    {
+		    const auto state = item.lock();
+		    if (!state)
+		    {
+			    return true;
+		    }
+		    std::lock_guard lock(state->Mutex);
+		    return state->Settled;
+	    });
 
 	std::function<void()> onSettled = [scope = weak_from_this()]
 	{
@@ -47,6 +61,7 @@ bool TaskScope::State::RegisterChild(const std::shared_ptr<State>& child)
 	{
 		return false;
 	}
+
 	Children.emplace_back(child);
 	child->Parent = shared_from_this();
 	++OpenChildren;
@@ -59,6 +74,7 @@ void TaskScope::State::NotifyParentIfSettled(std::unique_lock<std::mutex>& lock)
 	{
 		return;
 	}
+
 	Settled = true;
 	Condition.notify_all();
 	auto parent = ParentNotified ? std::shared_ptr<State>{} : Parent.lock();
@@ -127,6 +143,7 @@ bool TaskScope::State::JoinFor(std::chrono::milliseconds timeout)
 	{
 		return false;
 	}
+
 	std::unique_lock lock(Mutex);
 	Closed = true;
 	NotifyParentIfSettled(lock);
@@ -140,6 +157,7 @@ void TaskScope::State::CancelAndJoin() noexcept
 	{
 		return;
 	}
+
 	std::unique_lock lock(Mutex);
 	Condition.wait(lock, [this] { return Settled; });
 }

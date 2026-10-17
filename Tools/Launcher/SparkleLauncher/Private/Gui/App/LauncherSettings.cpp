@@ -115,6 +115,53 @@ namespace SparkleLauncher
 		emit SettingsChanged();
 	}
 
+	RhiGpuCrashMode LauncherSettings::GpuCrashMode() const
+	{
+		return m_gpuCrashMode;
+	}
+
+	const QString& LauncherSettings::ShaderExportPath() const
+	{
+		return m_shaderExportPath;
+	}
+
+	const QString& LauncherSettings::GpuCrashInspectorPath() const
+	{
+		return m_gpuCrashInspectorPath;
+	}
+
+	void LauncherSettings::SetGpuCrashMode(const QString& mode)
+	{
+		if (mode != "off" && mode != "aftermath")
+		{
+			return;
+		}
+		const auto selected = mode == "off" ? RhiGpuCrashMode::Off : RhiGpuCrashMode::Aftermath;
+		if (m_gpuCrashMode != selected)
+		{
+			m_gpuCrashMode = selected;
+			emit SettingsChanged();
+		}
+	}
+
+	void LauncherSettings::SetShaderExportPath(const QString& path)
+	{
+		if (m_shaderExportPath != path)
+		{
+			m_shaderExportPath = path;
+			emit SettingsChanged();
+		}
+	}
+
+	void LauncherSettings::SetGpuCrashInspectorPath(const QString& path)
+	{
+		if (m_gpuCrashInspectorPath != path)
+		{
+			m_gpuCrashInspectorPath = path;
+			emit SettingsChanged();
+		}
+	}
+
 	const QString& LauncherSettings::CleanScope() const
 	{
 		return m_cleanScope;
