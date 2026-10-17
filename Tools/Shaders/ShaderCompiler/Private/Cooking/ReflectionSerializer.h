@@ -4,10 +4,15 @@
 #include "RHI/Public/Shaders/ShaderReflection.h"
 #include "ShaderReflection.h"
 
+#include <cstdint>
+#include <string>
 #include <span>
 #include <vector>
 
-// Flattens per-stage ShaderReflection into the global shader map POD arrays.
+class GlobalShaderMap;
+struct GlobalShaderMapEntry;
+
+// Encodes and decodes per-stage reflection in global shader map POD arrays.
 // Strings are interned through the caller-owned StringTableBuilder.
 class ReflectionSerializer final
 {
@@ -23,5 +28,10 @@ public:
 		std::vector<CookedShaderSpecializationConstantRecord> specializationConstants;
 	};
 
+	static ShaderReflection Decode(const GlobalShaderMap& map, const GlobalShaderMapEntry& entry);
+
 	static void Build(std::span<const ShaderReflection> reflections, Strings::StringTableBuilder& stringTable, Output& outOutput);
+
+private:
+	static std::string ResolveString(const GlobalShaderMap& map, std::uint32_t offset, std::uint32_t size);
 };

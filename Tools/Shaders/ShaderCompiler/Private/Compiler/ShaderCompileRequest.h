@@ -51,19 +51,23 @@ constexpr bool HasShaderCompileFeature(ShaderCompileFeatureFlags value, ShaderCo
 
 class ShaderSourceMountTable;
 
+struct ShaderSourceFile final
+{
+	std::string VirtualPath;
+	std::string Contents;
+};
+
 // Complete immutable input for one shader type and target compilation.
 struct ShaderCompileRequest final
 {
-	explicit ShaderCompileRequest(const ShaderSourceMountTable& sourceMounts) noexcept :
-	    SourceMounts(sourceMounts)
-	{
-	}
+	explicit ShaderCompileRequest(const ShaderSourceMountTable& sourceMounts) noexcept;
 
 	ShaderTypeId ShaderType = 0;
 	std::string ShaderTypeName;
 	std::string VirtualSourcePath;
 	std::reference_wrapper<const ShaderSourceMountTable> SourceMounts;
 	std::string SourceCode;
+	std::vector<ShaderSourceFile> SourceFiles;
 	std::string EntryPoint;
 	ShaderStage Stage = ShaderStage::Count;
 	ShaderTarget Target = kDefaultShaderTarget;

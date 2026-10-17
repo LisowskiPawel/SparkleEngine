@@ -20,7 +20,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 
 ## Where We Are And What Is Next
 
-**Next: build GPU crash debugging tooling, starting at [GCD-0](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md#gcd-0--qualify-inputs-and-freeze-hooks).** Pause Modern Sponza hang investigation until native dumps, breadcrumbs and exact shader/source correlation pass GCD-4. Then resume PD-1, verify quit times and regenerate the archive. The product plan remains open; tooling is its next GPU-dependent prerequisite. The approved fresh-repository rehearsal on this laptop does not establish clean-OS or independent-adopter acceptance.
+**Next: [GCD-2: collect dumps and breadcrumbs](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md#gcd-2--collect-dumps-and-breadcrumbs).** GCD-0/1 source work is complete. Pause Modern Sponza hang investigation until native dumps, breadcrumbs and exact shader/source correlation pass GCD-4. Then resume PD-1, verify quit times and regenerate the archive. The product plan remains open; tooling is its next GPU-dependent prerequisite. The approved fresh-repository rehearsal on this laptop does not establish clean-OS or independent-adopter acceptance.
 
 | Current work | Design / acceptance reference | Implementation stages |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 | --- | --- | --- |
 | Scope / FR-00 | Six product choices approved. | Remaining technical qualification; public rights close at FR-07. |
 | Identity / FR-01 | Identity, dependency pins and notices implemented; earlier baseline recorded. | Qualify the final source candidate. |
-| GPU crash tooling / GCD | Design, [NVIDIA/AMD/Epic implementation study](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/Research.md) and staged plan prepared; investigation paused. | Qualify SDK/compiler inputs, implement collection and prove dump-to-source inspection on D3D12/Vulkan. |
+| GPU crash tooling / GCD | GCD-0 input contracts and GCD-1 exact shader/source/symbol export implemented in source; no native tooling proof. | GCD-2 prepared dispatch/collection, GCD-3 launch/identity integration and GCD-4 dump-to-source proof. |
 | PD-1: Game / Editor | Product shells/shared settings implemented; seven-map archive cook passed. | Native crash/quit regression, controls/settings/failure and Editor edit/save checks. |
 | PD-2: source / Launcher | Cold clone configured, synced and built the products/tools; Empty cook passed. Restored MSBuild tracking; unchanged full Launcher build took 7.62 s. Earlier owner/runner checks retain their recorded identities. | Current cook/failure/GUI-equivalence checks and independent adoption. |
 | PD-3 / FR-02: package | Unsigned archive `de0cf4bc…` verified; selected seven-map cook passed on this laptop. | Regenerate after fixes; final archive/offline/precompiled/Qt replacement and minimum-machine checks. |

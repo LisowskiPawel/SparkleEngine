@@ -34,7 +34,6 @@ private:
 		std::string CompileRequest;
 	};
 
-	static std::filesystem::path FindArtifactDirectory(const RegisteredShaderRow& row);
 	static std::string ReadTextFileOrMessage(const std::filesystem::path& path);
 	static void DrawTextArtifact(const char* childId, const std::string& text) noexcept;
 

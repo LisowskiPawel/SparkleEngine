@@ -14,7 +14,6 @@ struct CookedStageBuild final
 	ShaderBinaryFormat format = ShaderBinaryFormat::Dxil;
 	std::string sourcePath;
 	std::string entryPoint;
-	std::string debugArtifact;
 	std::string backendName;
 	std::string codegenTarget;
 	std::uint64_t backendVersion = 0;

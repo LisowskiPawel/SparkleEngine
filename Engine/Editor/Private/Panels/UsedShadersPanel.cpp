@@ -9,7 +9,6 @@
 
 #include <fstream>
 #include <sstream>
-#include <system_error>
 #include <utility>
 
 void UsedShadersPanel::SetGenerationProvider(RegisteredShaderListModel::GenerationProvider provider)
@@ -60,20 +59,6 @@ void UsedShadersPanel::BuildUI(bool disableInteraction)
 	ImGui::SeparatorText(inspectionLabel.c_str());
 	DrawSelectedShaderArtifacts();
 	ImGui::End();
-}
-
-std::filesystem::path UsedShadersPanel::FindArtifactDirectory(const RegisteredShaderRow& row)
-{
-	if (!row.ArtifactDirectory.empty())
-	{
-		std::error_code errorCode;
-		if (std::filesystem::exists(row.ArtifactDirectory / "compile-request.json", errorCode) && !errorCode)
-		{
-			return row.ArtifactDirectory;
-		}
-	}
-
-	return {};
 }
 
 std::string UsedShadersPanel::ReadTextFileOrMessage(const std::filesystem::path& path)
@@ -205,7 +190,7 @@ void UsedShadersPanel::DrawTable(bool disableInteraction)
 		ImGui::TableNextColumn();
 		ImGui::Text("%llu", static_cast<unsigned long long>(row.RuntimeGeneration));
 		ImGui::TableNextColumn();
-		ImGui::TextUnformatted(row.ArtifactAvailable ? "available" : "missing");
+		ImGui::TextUnformatted(row.ArtifactDirectory.empty() ? "missing" : "available");
 	}
 	ImGui::EndDisabled();
 	ImGui::EndTable();
@@ -287,7 +272,7 @@ void UsedShadersPanel::RefreshSelectedShaderArtifacts()
 	}
 
 	m_loadedArtifactShaderId = selectedRow->ShaderId;
-	m_selectedArtifactDirectory = FindArtifactDirectory(*selectedRow);
+	m_selectedArtifactDirectory = RegisteredShaderListModel::HasDebugArtifacts(selectedRow->ArtifactDirectory) ? selectedRow->ArtifactDirectory : std::filesystem::path{};
 	if (m_selectedArtifactDirectory.empty())
 	{
 		m_artifactTexts = {};

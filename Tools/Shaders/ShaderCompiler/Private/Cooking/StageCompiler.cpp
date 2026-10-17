@@ -5,7 +5,6 @@
 #include "Backend/IShaderBackend.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Core/Public/Paths/PathUtils.h"
 
 CookedStageBuild StageCompiler::Compile(IShaderBackend& backend, const ShaderCompileRequest& request, ShaderDebugArtifactSet* outDebugArtifacts)
 {
@@ -30,17 +29,15 @@ CookedStageBuild StageCompiler::Compile(IShaderBackend& backend, const ShaderCom
 		throw Diagnostics::Error("Backend returned empty bytecode for shader source '" + request.VirtualSourcePath + "'.");
 	}
 
-	const auto* bytecodeBegin = static_cast<const std::uint8_t*>(bytecode.Data);
 	CookedStageBuild compiledStage;
 	compiledStage.stage = request.Stage;
 	compiledStage.format = IsSpirVTarget(request.Target) ? ShaderBinaryFormat::SpirV : ShaderBinaryFormat::Dxil;
 	compiledStage.sourcePath = request.VirtualSourcePath;
 	compiledStage.entryPoint = request.EntryPoint;
-	compiledStage.debugArtifact = Paths::MakeProjectRelativeString(compiledShader.GetDebugArtifactPath());
 	compiledStage.backendName.assign(backend.GetBackendName());
 	compiledStage.codegenTarget.assign(GetShaderTargetName(request.Target));
 	compiledStage.backendVersion = backend.GetBackendVersion();
-	compiledStage.bytecode.assign(bytecodeBegin, bytecodeBegin + bytecode.Size);
+	compiledStage.bytecode = compiledShader.TakeBytecode();
 	compiledStage.bytecodeHash = Hash::Fnv1a64(compiledStage.bytecode.data(), compiledStage.bytecode.size());
 	compiledStage.reflection = compiledShader.TakeReflection();
 

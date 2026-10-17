@@ -5,8 +5,6 @@
 #include "ShaderReflection.h"
 
 #include <cstdint>
-#include <filesystem>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -15,15 +13,11 @@
 class CompiledShader
 {
 public:
-	CompiledShader(std::vector<std::uint8_t>&& bytecode, std::filesystem::path debugArtifactPath = {}) :
-	    m_bytecode(std::move(bytecode)),
-	    m_debugArtifactPath(std::move(debugArtifactPath))
-	{
-	}
+	explicit CompiledShader(std::vector<std::uint8_t>&& bytecode);
 
 	ShaderBytecode GetBytecode() const noexcept { return {m_bytecode.data(), m_bytecode.size()}; }
 
-	const std::filesystem::path& GetDebugArtifactPath() const noexcept { return m_debugArtifactPath; }
+	std::vector<std::uint8_t>&& TakeBytecode() noexcept { return std::move(m_bytecode); }
 
 	const ShaderReflection& GetReflection() const noexcept { return m_reflection; }
 
@@ -39,7 +33,6 @@ public:
 
 private:
 	std::vector<std::uint8_t> m_bytecode;
-	std::filesystem::path m_debugArtifactPath;
 	ShaderReflection m_reflection;
 	ShaderDebugArtifactSet m_debugArtifacts;
 };

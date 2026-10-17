@@ -14,7 +14,6 @@
 #include <Unknwn.h>
 
 #include <dxcapi.h>
-#include <filesystem>
 #include <span>
 #include <string>
 #include <vector>
@@ -46,6 +45,7 @@ public:
 	CompiledShader Compile(const ShaderCompileRequest& request) override;
 
 private:
+	Microsoft::WRL::ComPtr<IDxcResult> CompileSource(const ShaderCompileRequest& request, const DxcBuffer& sourceBuffer, const std::vector<LPCWSTR>& args, std::string& compilerOutput);
 	static void BuildCompileArguments(
 	    const ShaderCompileRequest& request,
 	    const std::wstring& wSourcePath,
@@ -57,21 +57,19 @@ private:
 	static std::vector<std::uint8_t> ExtractBytecode(IDxcResult* result);
 
 	static std::string ExtractErrorMessage(IDxcResult* result);
+	static void ExtractSymbols(IDxcResult& result, ShaderDebugArtifactSet& artifacts);
 	static std::string ExtractTextOutput(IDxcResult* result, DXC_OUT_KIND kind);
-	static std::string ExtractPreprocessedSource(IDxcUtils& utils, IDxcCompiler3& compiler, const DxcBuffer& sourceBuffer, const std::vector<LPCWSTR>& compileArgs);
+	static std::string ExtractPreprocessedSource(IDxcCompiler3& compiler, const DxcBuffer& sourceBuffer, const std::vector<LPCWSTR>& compileArgs);
 	static std::string ExtractDisassembly(IDxcUtils& utils, IDxcCompiler3& compiler, std::span<const std::uint8_t> bytecode);
-	static ShaderDebugArtifactSet CaptureDebugArtifacts(
+	ShaderDebugArtifactSet CaptureDebugArtifacts(
 	    const ShaderCompileRequest& request,
-	    IDxcUtils& utils,
-	    IDxcCompiler3& compiler,
+	    IDxcResult& result,
 	    const DxcBuffer& sourceBuffer,
 	    std::span<const std::uint8_t> bytecode,
 	    const std::vector<LPCWSTR>& compileArgs,
-	    std::string_view compilerOutput);
+	    std::string_view compilerOutput) const;
 	static std::vector<std::string> BuildDebugArgumentStrings(const std::vector<LPCWSTR>& compileArgs);
 	static std::uint64_t QueryBackendVersion(IDxcCompiler3& compiler);
-
-	static std::filesystem::path SaveShaderSymbols(IDxcResult* result, const std::filesystem::path& sourcePath);
 
 	Microsoft::WRL::ComPtr<IDxcCompiler3> m_compiler;
 	Microsoft::WRL::ComPtr<IDxcUtils> m_utils;

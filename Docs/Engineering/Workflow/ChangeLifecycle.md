@@ -155,6 +155,8 @@ Keep the check proportional to the stage. Repository-wide formatting and broad b
 
 ## Review and Acceptance
 
+Review the final owned changelist at the end of **every implementation stage**, before handoff or advancement. Formatting alone is insufficient: resolve actionable review findings, repeat affected checks after repairs, and state any build/runtime checks deferred by the stage contract. Do not describe a source-only review as executable validation.
+
 Use the [SparkleEngine Code Review](CodeReview.md) procedure and run the review section or acceptance rules in every selected subject standard; do not recreate those checklists in the change description. Then verify the integration itself:
 
 - the requested outcome works through the authoritative production path;

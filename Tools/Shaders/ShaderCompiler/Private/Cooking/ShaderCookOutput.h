@@ -20,6 +20,7 @@ struct ShaderCookOutput final
 {
 	std::filesystem::path mapPath;
 	std::filesystem::path libraryPath;
+	std::filesystem::path debugManifestPath;
 	std::vector<ShaderCookedEntry> entries;
 	std::size_t uniqueCodeCount = 0;
 };

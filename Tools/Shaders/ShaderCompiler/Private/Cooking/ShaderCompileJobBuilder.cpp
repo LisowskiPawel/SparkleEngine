@@ -67,29 +67,36 @@ ShaderCompileJob ShaderCompileJobBuilder::Build(const ShaderCookSettings& settin
 {
 	ShaderCompileRequest request = BuildRequest(settings, shader, target);
 	IShaderBackend& backend = backendPool.ResolveAndAcquire(request.VirtualSourcePath, request.Target, settings.backendName);
-	const IncludeClosureHash before = IncludeClosureHasher::Compute(request);
-	request.SourceCode = ShaderSourcePreprocessor::Load(request.VirtualSourcePath, request);
-	const IncludeClosureHash closure = IncludeClosureHasher::Compute(request);
-	if (before.sourceHash != closure.sourceHash || before.includeClosureHash != closure.includeClosureHash || before.virtualDependencies != closure.virtualDependencies)
-	{
-		throw Diagnostics::Error(std::format("Shader source closure changed while constructing compile job for '{}'.", shader.shaderTypeName));
-	}
+	IncludeClosureHash closure = PreprocessSource(request);
 	const std::uint64_t sourceHash = Hash::Fnv1a64(request.SourceCode);
 	const std::uint64_t requestHash = ShaderCompileRequestHasher::Compute(request);
-	const std::string backendName(backend.GetBackendName());
+	std::string backendName(backend.GetBackendName());
 	const std::uint64_t backendVersion = backend.GetBackendVersion();
-	const std::string targetProfile = ShaderCompileProfile::BuildTargetProfile(request);
+	std::string targetProfile = ShaderCompileProfile::BuildTargetProfile(request);
+	const ShaderCompileInputHash inputHash = BuildInputHash(sourceHash, closure.includeClosureHash, requestHash, backendName, backendVersion);
 
 	return ShaderCompileJob{
 	    .Request = std::move(request),
-	    .BackendName = backendName,
-	    .TargetProfile = targetProfile,
+	    .BackendName = std::move(backendName),
+	    .TargetProfile = std::move(targetProfile),
 	    .BackendVersion = backendVersion,
 	    .SourceContentHash = sourceHash,
 	    .DependencyClosureHash = closure.includeClosureHash,
 	    .RequestHash = requestHash,
-	    .InputHash = BuildInputHash(sourceHash, closure.includeClosureHash, requestHash, backendName, backendVersion),
-	    .VirtualDependencies = closure.virtualDependencies};
+	    .InputHash = inputHash,
+	    .VirtualDependencies = std::move(closure.virtualDependencies)};
+}
+
+IncludeClosureHash ShaderCompileJobBuilder::PreprocessSource(ShaderCompileRequest& request)
+{
+	const IncludeClosureHash before = IncludeClosureHasher::Compute(request);
+	request.SourceCode = ShaderSourcePreprocessor::Load(request.VirtualSourcePath, request, request.CaptureDebugArtifacts ? &request.SourceFiles : nullptr);
+	IncludeClosureHash closure = IncludeClosureHasher::Compute(request);
+	if (before.sourceHash != closure.sourceHash || before.includeClosureHash != closure.includeClosureHash || before.virtualDependencies != closure.virtualDependencies)
+	{
+		throw Diagnostics::Error(std::format("Shader source closure changed while constructing compile job for '{}'.", request.ShaderTypeName));
+	}
+	return closure;
 }
 
 ShaderCompileRequest ShaderCompileJobBuilder::BuildRequest(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target) const
@@ -108,8 +115,8 @@ ShaderCompileRequest ShaderCompileJobBuilder::BuildRequest(const ShaderCookSetti
 		request.RequiredFeatures |= ShaderCompileFeatureFlags::RayTracingPipeline;
 	}
 	request.ParameterStruct = shader.parameterStruct;
-	request.CaptureDebugArtifacts = !settings.debugArtifactDirectory.empty();
-	request.EnableDebugInfo = settings.enableDebugInfo;
+	request.CaptureDebugArtifacts = settings.enableDebugInfo || !settings.debugArtifactDirectory.empty();
+	request.EnableDebugInfo = request.CaptureDebugArtifacts;
 	request.EnableOptimizations = settings.enableOptimizations;
 	request.TreatWarningsAsErrors = settings.treatWarningsAsErrors;
 	request.StripDebugInfo = settings.stripDebugInfo;

@@ -78,7 +78,7 @@ ShaderCookResult GlobalShaderCooker::CookAll(const ShaderCookSettings& settings,
 		progress({.Action = "Publishing cooked shaders", .Completed = totalWork - 1, .Total = totalWork});
 	}
 	const bool replaceCompleteCatalog = settings.shaderId.empty() && settings.changedVirtualPaths.empty();
-	result.output = ShaderArtifactPublication::Publish(plan, result.outputDirectory, replaceCompleteCatalog);
+	result.output = ShaderArtifactPublication::Publish(plan, compileResults, settings, result.outputDirectory, replaceCompleteCatalog);
 	if (progress)
 	{
 		progress({.Action = "Cooked shaders published", .Completed = totalWork, .Total = totalWork});

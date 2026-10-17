@@ -2,7 +2,7 @@
 
 [Docs](../../../../README.md) / [Design](GpuCrashDebuggingDesign.md) / [Research](Research.md) / [Roadmap](../../../../Strategy/Roadmap.md#where-we-are-and-what-is-next)
 
-**Status:** planned, not implemented. Start at `GCD-0`. Keep Modern Sponza hang investigation paused until `GCD-4` passes.
+**Status:** GCD-0/1 source gates complete. Next: [GCD-2](#gcd-2--collect-dumps-and-breadcrumbs). Executable/native proof remains GCD-4; Modern Sponza hang investigation stays paused.
 
 **Order:** qualify inputs → preserve symbols → implement collection → connect launch/inspection → validate the integrated tooling. This plan supplies tooling for the remaining product checks; it does not close them.
 
@@ -14,7 +14,7 @@ Follow [Change Lifecycle](../../../../Engineering/Workflow/ChangeLifecycle.md), 
 
 ### Stage Review Gate
 
-Before advancing from each stage:
+Before advancing, make the final owned changelist ready for submission under [Review and Acceptance](../../../../Engineering/Workflow/ChangeLifecycle.md#review-and-acceptance). Formatting alone does not close review findings:
 
 1. Review every changed producer, consumer, lifetime and CMake membership against the design. Check headers/API signatures against pinned inputs; remove dead paths, forwarding wrappers, duplicate state and orchestration detail. Follow neighboring names, includes and class responsibilities.
 2. Apply the [stage source-style gate](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) to **every added/modified source, header and shader, including untracked files**. Run `CMake\CodeStyle.bat -Mode Check -Path "<file>"` for each applicable path; do not stage user changes to manufacture coverage. Record manual review and any non-applicable files. A docs-only stage records source style as not applicable.
@@ -33,46 +33,11 @@ Keep records and disposable fixtures under ignored `artifacts/validation/gpu-cra
 
 ## GCD-0 — Qualify Inputs And Freeze Hooks
 
-**Goal:** resolve implementation-shaping inputs without pretending inspection proves native compatibility.
-
-**Work:**
-
-- Retain the exact Aftermath SDK `2026.3.26197.2318` headers, x64 runtime/library, license/notices and SHA-256 receipt; verify pinned DXC/Slang inputs through their current dependency owner. Extend that authority with an explicit SDK root and opt-in switch. No mutable acquisition, author path, PATH/CWD DLL search or new build-profile catalog.
-- Check installed headers and compiler documentation for initialization, supported flags, callback threading, context release and shutdown guarantees. Freeze DRED configuration **before devices**, Vulkan extension/device configuration and collection before Streamline-created devices. Record supported-device and active-capture rejection rules.
-- Inspect actual DXC/Slang invocation APIs, not just logged argument strings. Establish how full debug data is requested with unchanged optimization and how exact emitted bytes reach export and native shader creation. Document assumptions requiring the `GCD-4` compiler/inspector probe; do not require that future proof to exit this stage.
-- Ledger Reuse/Extend/ReplaceAndDelete decisions, the design's integration hooks and their `AC/FM/CHK`. Inspect Application task/runtime lifetime, asynchronous submission safety and an available BlockingIo lane. Freeze callback, context, task, sink and DLL teardown ordering; unresolved API/lifetime guarantees block source implementation.
-- Use `build/variants/gpu-crash`, `SPARKLE_ARTIFACT_VARIANT=gpu-crash` and the existing output layout. Explicitly filter optional sources from ordinary builds despite CMake globs. The standalone Launcher keeps its canonical build entry and no SDK dependency; its artifact contract rejects this variant. Plan diagnostic-product discovery through its existing typed launch path.
-
-**Validate now:** dependency receipts, header/API and source/membership review, hook ledger and the Stage Review Gate. Prepare `CHK-GCD-01/03/07` commands/oracles for final validation. No configure, SDK loading, shader compilation or deliberate fault.
-
-**Phase exit criteria:** inputs are immutable; ownership, API contracts and source-level lifetime ordering are consistent. Compiler output, native compatibility and SDK-absent builds remain explicitly unqualified. Missing inputs or contradictory SDK contracts block the stage; missing later native proof does not create a circular prerequisite.
-
-```text
-Execute only GCD-0 from Docs/Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md.
-Read the design, research and current owners. Pin inputs and inspect SDK/compiler contracts, pre-device ordering, task/callback lifetime, variant membership and the canonical Launcher boundary. Freeze the hook ledger and final validation oracles. Resolve contract contradictions before adding mechanisms.
-Non-negotiable exit: pass the Stage Review Gate with exact input receipts and no unresolved implementation-shaping contract. Do not configure, build, cook, run or investigate the hang. Record executable/native qualification as deferred to GCD-4, never as passed.
-```
+**Complete:** pinned SDK/compiler receipts, variant membership and the hook ledger are recorded in the [design](GpuCrashDebuggingDesign.md#frozen-inputs-and-api-boundaries). The [prepared dispatch contract](../../MultithreadedEngine.md#prepared-task-dispatch) is ready for implementation with the writer in GCD-2.
 
 ## GCD-1 — Preserve Exact Shaders And Symbols
 
-**Goal:** implement export from the actual compile result without a second compiler or shader catalog.
-
-**Work:**
-
-- Extend existing DXC/Slang compilation and `ShaderDebugArtifactWriter`. Apply full debug-information options to the **actual compiler API**; changing `BuildDebugArgumentStrings` alone does nothing. Preserve optimization, entry/permutation and raster/compute/ray-tracing coverage.
-- Export the exact DXIL/SPIR-V blob supplied to native creation, its compiler/debug data and transitive source identity through the current artifact owner. A requested diagnostic export that cannot be completed fails the relevant cook; it must not publish a complete bundle or silently omit data.
-- Keep archive/code SHA-256, native shader/debug identifiers, NVIDIA `.nvdbg` identifiers and CPU PE/PDB identity distinct. Join driver identifiers when available during native preparation; ShaderCompiler must remain SDK-independent. Use relative metadata and explicit private source retention, with no directory scan for a plausible recent build.
-- Remove replaced export paths. Prepare wrong/missing bundle and changed-permutation oracles using disposable fixtures; debug-enabled blobs have their own candidate identity.
-
-**Validate now:** trace compile option → emitted result → export → loaded blob in source; check field provenance, error propagation and membership. Pass the Stage Review Gate. Defer representative emitted-code inspection, artifact writes and inspector mapping (`CHK-GCD-03`) to `GCD-4`.
-
-**Phase exit criteria:** one source path owns exact code and debug export, with no compiler/optimization substitution or vendor dependency. Source review does not establish that Slang emitted usable debug information or that the inspector can resolve it.
-
-```text
-Execute only GCD-1 from Docs/Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md after GCD-0's source gate.
-Extend the existing compiler APIs and debug export for exact optimized DXIL/Slang SPIR-V, source data and separate native/CPU identities. Trace the same blob through export and native consumption; fail incomplete requested exports. Remove overlapping paths and prepare mismatch oracles.
-Non-negotiable exit: pass the Stage Review Gate with one SDK-independent compile/export authority. No build, cook or runtime checks yet. Mark emitted symbols and native source correlation unqualified until GCD-4.
-```
+**Complete in source:** actual DXC/Slang debug options, exact code/source/symbol export, archive/file receipts and transactional manifest publication. Backend PDB writes and duplicate identity JSON were removed. The [design](GpuCrashDebuggingDesign.md#shader-and-incident-identity) owns the export boundary; emitted artifacts, mismatch exercises and source mapping remain `CHK-GCD-03` work in GCD-4.
 
 ## GCD-2 — Collect Dumps And Breadcrumbs
 
@@ -80,20 +45,22 @@ Non-negotiable exit: pass the Stage Review Gate with one SDK-independent compile
 
 **Work:**
 
+- Implement the [Tasks prepared dispatch contract](../../MultithreadedEngine.md#prepared-task-dispatch) with the Application sink as its first consumer. Preallocate one scoped lane slot before callbacks; preserve ordinary Launch guards, transactional preparation, allocation-free Notify, fair execution and close/cancel/shutdown settlement. No separate scheduler or parked worker.
 - Add one private RHI session with backend-private Aftermath, D3D12 contexts/DRED and Vulkan configuration/checkpoints. Load the exact admitted DLL only for requested Aftermath mode; check required exports/identity before any device. Off and compiled-out paths must not acquire a required SDK import.
+- At existing native shader creation, join the exact exported code SHA-256 to driver shader/debug identifiers and `.nvdbg` keys. Keep compiler lookup keys and CPU PE/PDB identity separate; absent native identifiers stay unavailable.
 - Lower existing Begin/End scopes to copied D3D12 markers and immutable Vulkan semantic tokens. Extend the neutral scope-admission owner so baseline pass scopes work with timing, detailed markers, PIX events and validation off. Repeated frames cannot grow the dictionary; unknown frame/queue joins stay unknown. No vendor branches in passes or frame orchestration.
 - Extend existing backend resource naming and supported SDK metadata updates. Preserve ambiguous aliases/missing data. Do not add an allocation journal, custom GPU buffer or unrelated validation features.
-- Route native device-loss observations through the existing failure owner **before** Core's immediate abort. Inspect submit/present/fence paths, collect only once and preserve the original terminal error. No global fatal hook, recovery, lost-device idle wait or generic wrapper around every API error.
-- Implement the Application sink with existing SparkleTasks BlockingIo execution: bounded byte/count queue and at most one coalesced drain task, no task per callback or permanent worker. Reject requested mode when that asynchronous lane is unavailable. Contain exceptions/allocation failures at SDK C callbacks; never wait, decode, log recursively or perform synchronous disk I/O there.
-- Implement the design's fresh session identity, state transitions, reserved-slot cleanup and manifest-last publication. SDK Finished, callback quiescence and durable writes are separate obligations. Preserve live state/DLL on uncertain quiescence until terminal process exit. Bound cooperative polling; do not promise to preempt a blocked SDK/OS call.
+- Route native device-loss observations through the existing failure owner **before** Core's immediate abort. Trace submit/present/fence to the serial/render-thread host, collect only once and preserve the original terminal error. Failure finalization polls thread-safe sink/dispatch state there; no owner-affine join on the render thread or waits in recording/task workers. No global fatal hook, recovery, lost-device idle wait or generic wrapper around every API error.
+- Implement the Application sink with one prepared SparkleTasks BlockingIo dispatch: bounded byte/count queue and bounded work per invocation, no task per callback or permanent worker. Reject requested mode when that asynchronous lane is unavailable. Contain exceptions/allocation failures at SDK C callbacks; never wait, decode, log recursively or perform synchronous disk I/O there.
+- Implement the design's fresh session identity, state transitions, reserved-slot cleanup and manifest-last publication. SDK Finished, sink-borrow settlement and durable writes are separate obligations. Keep the RHI callback anchor, tokens, callback code and DLL until process exit: Disable is not a documented callback-join barrier. Seal sink admission and settle admitted borrows before destroying Application storage. Bound cooperative polling; do not promise to preempt a blocked SDK/OS call.
 
-**Validate now:** source-review initialization/failure/teardown order, callback ownership, lock ordering, count/byte accounting, cancellation and publication paths; run static boundary checks and the Stage Review Gate. Prepare `CHK-GCD-01/04/05/06/07` fixtures, including repeated loss, delayed callbacks, 10,000 repeated recording cycles, overflow, ID collisions and failed writes. Run them in `GCD-4`.
+**Validate now:** source-review initialization/failure/teardown order, callback ownership, lock ordering, count/byte accounting, cancellation and publication paths; run static boundary checks and the Stage Review Gate. Prepare `CHK-GCD-01/04/05/06/07` fixtures, including preparation rollback, foreign-thread/worker-origin Notify, close/cancel/shutdown versus enqueue/finish, capacity reuse, serial/threaded host finalization versus owner-affine joins, repeated loss, delayed callbacks, 10,000 repeated recording cycles, overflow, ID collisions and failed writes. Run them in `GCD-4`.
 
 **Phase exit criteria:** both backend source routes fit the design, no second worker/execution authority exists, and every failure has a truthful state and safe lifetime. Builds, asynchronous behavior, ordinary-build erasure and native collection remain unqualified.
 
 ```text
 Execute only GCD-2 from Docs/Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md after GCD-1's source gate.
-Implement the private session, existing scope/resource hooks and native loss handling before abort. Use the Application task runtime for bounded asynchronous publication. Audit callback exception containment, session identity, terminal failure and shutdown against the design; remove replaced paths.
+Implement the private session, existing scope/resource hooks and native loss handling before abort. Use the GCD-0-qualified Tasks submission contract for bounded asynchronous publication; current callback-side Launch is forbidden. Audit callback exception containment, session identity, terminal failure and shutdown against the design; remove replaced paths.
 Non-negotiable exit: pass the Stage Review Gate and static boundary checks. No intermediate build or fault run. Stop on unsafe callback/context/task/DLL lifetime, an unbounded queue or a second collector. Native and executable fixture checks remain deferred to GCD-4.
 ```
 
@@ -103,6 +70,7 @@ Non-negotiable exit: pass the Stage Review Gate and static boundary checks. No i
 
 **Work:**
 
+- Consume the returned `shader-export.json` path directly. Bind its hashes to source revision/dirty patch, product/profile/API and executable/CPU symbols in the final session bundle; reject stale or incomplete joins. No directory scan for a plausible export.
 - Extend existing direct startup options and Launcher typed requests with Off/Aftermath intent. Reuse product-root discovery for diagnostic Editor/Game binaries; do not move the canonical Launcher into the variant or add a second Launcher.
 - Validate selected profile/API, admitted SDK, symbol receipts, capture conflict and reserved output slot before device creation. Bind the shared manifest to a fresh session ID, the launched child and exact product/cook identity. Old, partial or other-child files cannot confirm readiness. Ready requires the child's successful native initialization, not a Launcher PID or requested setting.
 - Present final collection state separately from source-mapping qualification. Reuse Open folder and an explicitly configured inspector handoff, with quoted/Unicode paths and no required file association or undocumented tool CLI. Verify bundle receipts and provide manual search-path setup where needed. Missing inspector preserves the incident. Direct launch writes the same manifest and preserves the terminal failure exit.
@@ -127,7 +95,7 @@ Non-negotiable exit: pass the Stage Review Gate with one launch/state authority 
 | Required route | Success / failure oracle |
 | --- | --- |
 | Integrated build and shader exports | Configure/build only named affected products/helpers after GCD-0–3. Inspect optimized raster/compute/ray-tracing outputs on both compiler backends; exported and loaded code hashes agree, full source-debug data exists. Missing Slang mapping blocks acceptance; no compiler swap. |
-| Executable controlled negatives | Run all deferred `CHK-GCD-01/03/04/05/06/07` fixtures: missing/wrong SDK, absent BlockingIo lane, capture conflict, stale/cross-child manifests, scopes/reset/concurrency, byte/count/dictionary exhaustion, duplicate-ID mismatch, denied/locked/full/partial writes, cancellation and privacy. Run non-fault checks first; symbol-mismatch tests use the first valid dump with isolated inspector search paths/caches. Injected callbacks are not native proof. |
+| Executable controlled negatives | Run all deferred `CHK-GCD-01/03/04/05/06/07` fixtures: missing/wrong SDK, revalidation after receipt/listed-input changes, absent BlockingIo lane, capture conflict, stale/cross-child manifests, scopes/reset/concurrency, byte/count/dictionary exhaustion, duplicate-ID mismatch, denied/locked/full/partial writes, cancellation and privacy. Run non-fault checks first; symbol-mismatch tests use the first valid dump with isolated inspector search paths/caches. Injected callbacks are not native proof. |
 | SDK-absent ordinary builds | All four profiles configure/build without SDK headers/libraries/runtime. Check optional source exclusion and imports/dependency closure. Verify canonical Launcher and ordinary stage membership exclude the SDK/private artifacts; use the existing package verifier if a local stage is produced. No new public archive prerequisite. |
 | Normal journeys | Three launch/quit cycles for each of the eight profile/API combinations, including direct and Launcher entry. Verify baseline breadcrumbs with unrelated tooling/validation off, Unicode paths, orderly drain and unused-slot cleanup. Record matched Off/Aftermath CPU/GPU/memory/storage costs separately from release performance. |
 | Native faults | Compute and ray-tracing fixtures for each of those eight combinations: **16 required fault cells**. Real SDK callbacks produce hashed dumps; the inspector opens them and resolves exact shader/source plus known scope observations. Freeze expected shader/function and acceptable source-line range before each run; optimized code need not map to one unique instruction/line. |

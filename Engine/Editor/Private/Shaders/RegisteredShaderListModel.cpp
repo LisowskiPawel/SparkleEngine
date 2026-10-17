@@ -33,9 +33,21 @@ void RegisteredShaderListModel::Refresh()
 		row.ParameterCount = parameters.Fields.size();
 		row.RuntimeGeneration = generation;
 		row.ArtifactDirectory = FindDebugArtifactDirectoryFor(row.ShaderId);
-		row.ArtifactAvailable = !row.ArtifactDirectory.empty();
 		m_rows.push_back(std::move(row));
 	}
+}
+
+bool RegisteredShaderListModel::HasDebugArtifacts(const std::filesystem::path& directory)
+{
+	if (directory.empty())
+	{
+		return false;
+	}
+
+	std::error_code errorCode;
+
+	return std::filesystem::is_regular_file(directory / "compile-request.json", errorCode) && !errorCode && std::filesystem::is_regular_file(directory.parent_path() / "shader-export.json", errorCode)
+	    && !errorCode;
 }
 
 std::filesystem::path RegisteredShaderListModel::FindDebugArtifactDirectoryFor(std::string_view shaderId)
@@ -56,7 +68,7 @@ std::filesystem::path RegisteredShaderListModel::FindDebugArtifactDirectoryFor(s
 		}
 
 		const std::string directoryName = it->path().filename().generic_string();
-		if (Strings::ContainsIgnoreCase(directoryName, shaderId) && std::filesystem::exists(it->path() / "compile-request.json", errorCode) && !errorCode)
+		if (Strings::ContainsIgnoreCase(directoryName, shaderId) && HasDebugArtifacts(it->path()))
 		{
 			return it->path();
 		}

@@ -131,6 +131,39 @@ CPU task concurrency, producer/render pipelining, command recording, GPU queue o
 
 The reference execution uses the final graph and data contract serially. Parallel execution must preserve its output and terminal-state semantics.
 
+### Prepared Task Dispatch
+
+**Target contract, not implemented.** This is the Tasks prerequisite for the [GPU crash writer](PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#architecture-and-lifetimes). GCD-2 implements it with its consumer; GCD-4 qualifies execution. Ordinary `Launch` retains owner-thread scope admission and worker self-submission rejection.
+
+A move-only `TaskDispatch` is one reusable, scope-owned invocation slot on the existing executor. Application prepares it before SDK callbacks. Notification makes work ready; an idle dispatch occupies no worker. No dispatch storage or worker is reserved until PrepareDispatch is called. This adds no thread, executor, callback bus or general asynchronous graph API.
+
+```cpp
+// Target API shape; not a declaration of delivered source.
+TaskDispatch TaskExecutor::PrepareDispatch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context = {});
+bool TaskDispatch::Notify() noexcept;
+void TaskDispatch::Close() noexcept;
+const TaskExecution& TaskDispatch::GetExecution() const noexcept;
+```
+
+| Boundary | Required behavior |
+| --- | --- |
+| Prepare | Scope owner only, outside executor workers. Validate open scope, callable, Normal completion policy, owned context and a configured asynchronous lane; reject serial/zero-worker selection. Allocate the complete dispatch, ready node, cancellation hook and terminal-result storage before returning. Reserve one existing `MaximumActiveExecutions` slot until settlement, including idle time. Rejection/allocation failure leaves neither owner partly admitted and rejects Application preflight before SDK enable. No new capacity option. |
+| Notify | Any thread, including a worker of that executor. Publish the caller's payload first. Under the dispatch gate, reject closed/cancelled/failed state or coalesce a wake. Return true only if that notification is covered by a future invocation; it is not file-write completion. No allocation, graph construction, scope registration, ordinary Launch/Submit, task wait, user callback, logging or Fatal. Brief mutex acquisition is allowed; no hard real-time latency claim. |
+| Execute | Existing workers on the selected lane; never concurrent bodies for one dispatch. A notification received while running requests one further invocation. Bound work per invocation and merge fairly with ordinary ready work; dispatch must not wait for ordinary queues to empty. The worker releases scheduler locks before calling the function. Idle has no task body or wait loop. |
+| Close | Idempotent; does not wait for task/body completion. Destruction closes admission. Reject subsequent Notify calls, retain accepted pending work, then settle once after its last invocation. Close while idle settles immediately. The scope owner closes explicitly and uses existing bounded join before destroying captures; a worker cannot join. No reopening, rebinding or same-handle reuse. Close is safe from another thread; existing TaskExecution status/IsSettled reads are thread-safe, while WaitFor and scope join retain their owner affinity. |
+| Failure / cancel | Body failure or exception closes admission and preserves the first failure through the existing TaskExecution result. Use prepared failure storage if allocation fails; do not enter the ordinary post-admission Fatal path. The scope owner closes dispatch admission before joining; scope-close rules for new execution registration stay unchanged. Scope/executor cancellation closes idle dispatches too, wakes pending cancellation and cooperatively settles running work. A cancelled queued node must be dequeued/unlinked before settlement releases its storage. It may discard pending normal work and returns Cancelled, never successful drain. |
+| Executor shutdown | Drain closes every admitted dispatch and completes accepted work before stopping workers. Cancel also requests cancellation. Settled handles can outlive the executor: Notify returns false without touching its former owner. No new preparation during shutdown. |
+
+The protocol states are **Idle / Queued / Running / Settled**, with admission open/closed and one pending-rerun bit. Settled denotes the existing TaskExecution completion, not a second writable terminal flag. TaskExecution owns cancellation/result and TaskScope owns settlement; do not copy those authorities into a second completion record. One prepared ready node may be queued at most once. While running, Notify sets the rerun bit rather than queueing the node again. On body return, atomically consume that bit and requeue, become idle, or settle when closed. Close preserves a rerun accepted before closure; cancellation/failure is an explicit exception with an unsuccessful result. One dispatch has one execution identity, not a new execution or retained scope entry per notification.
+
+Keep the ready node in dispatch-owned storage; use an intrusive ready list inside the existing lane, not allocating `std::deque::push_back` from Notify. Executor ownership retains the node through dequeue, cancellation and settlement. Prepare rolls back any scope/runtime admission if a later preparation step fails; no throwing publication occurs after ownership commits. Reclaim the slot once and release body/context captures outside locks before scope join reports completion. Never return or throw a partially registered dispatch. Reserve scope registration/cancellation capacity before incrementing active counts; the scope admission ordering repair is delivered in GCD-0, with executable allocation-fault proof deferred to GCD-4.
+
+**Lock order:** dispatch gate -> lane ready-list mutex -> lane wake mutex. Workers release the lane mutex before taking a dispatch gate. Hold the gate through owner access/enqueue/wakeup so shutdown cannot detach the owner mid-notification. Never hold the executor lifecycle mutex while closing a dispatch or publishing completion. Publish scope/runtime settlement after releasing dispatch/queue locks. No lock is held during the user body, file I/O or arbitrary callbacks. Cancellation uses a prepared stop hook and the same close/settlement path; idle cancellation cannot leave a scope waiting forever.
+
+Implement this mechanism under Tasks `Private/Scheduling`, extending existing `TaskExecutor`, `TaskScope` admission/settlement and lane worker selection. Keep callback payloads, byte limits, SDK types and artifact policy outside Tasks. The GCD hook ledger names this extension; it is not permission for an Application scheduler or private worker.
+
+Required final checks: foreign-thread and same-worker Notify; concurrent/coalesced wake; notification during body completion; prepare failure at each admission step; scope close/cancel and executor Drain/Cancel while idle/queued/running; stale handle after executor shutdown; capacity reuse; bounded storage after 10,000 notifications; no concurrent body; ordinary Launch guards unchanged. Inject delayed barriers and allocation failures in GCD-4. State/lock review in GCD-0 cannot qualify the future implementation.
+
 ## Owner-Thread Commit and Publication
 
 ### GameFramework Work

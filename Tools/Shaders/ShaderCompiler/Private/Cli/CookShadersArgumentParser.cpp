@@ -29,10 +29,10 @@ void CookShadersArgumentParser::PrintHelp(std::ostream& output)
 	       << "  --target <name>             Add a codegen target such as DxilSm66 or SpirV16. "
 	          "Defaults to DxilSm66 and SpirV16.\n"
 	       << "  --backend <name>            Select a compiler backend, or auto.\n"
-	       << "  --debug-artifacts <dir>     Write optional compiler diagnostics outside runtime artifacts.\n"
+	       << "  --debug-artifacts <dir>     Export exact code, full debug data and private source to a fresh cook directory.\n"
 	       << "  --analysis <pass[,pass]>    Run optional analysis report passes such as cooked-shader-stats.\n"
 	       << "  --parallel-compiles <1-8>   Bound concurrent compiler sessions. Defaults to 4; use 1 as the serial oracle.\n"
-	       << "  --debug-info                Request backend debug information and symbol emission where supported.\n"
+	       << "  --debug-info                Export full debug data under the workspace shader symbols root. Optimization is unchanged.\n"
 	       << "  --disable-optimizations     Build shaders without backend optimization passes.\n"
 	       << "  --warnings-as-errors <on|off>  Treat shader warnings as hard errors. Defaults to on.\n"
 	       << "  --strip-debug <on|off>      Strip embedded debug info from final runtime binaries when supported.\n";

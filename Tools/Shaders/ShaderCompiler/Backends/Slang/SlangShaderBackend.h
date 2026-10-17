@@ -7,6 +7,7 @@
 #include <slang-com-ptr.h>
 #include <slang.h>
 
+#include <span>
 #include <string>
 #include <vector>
 
@@ -32,11 +33,18 @@ public:
 	CompiledShader Compile(const ShaderCompileRequest& request) override;
 
 private:
+	struct SymbolSelection;
+
+	Slang::ComPtr<slang::ISession> CreateSession(const ShaderCompileRequest& request) const;
+	static Slang::ComPtr<slang::IComponentType> LinkProgram(slang::ISession& session, const ShaderCompileRequest& request, std::string& diagnostics);
+	static std::vector<std::uint8_t> ExtractBytecode(slang::IComponentType& program, std::string& diagnostics);
+	static ShaderReflection ExtractReflection(const ShaderCompileRequest& request, slang::IComponentType& program, std::span<const std::uint8_t> bytecode, std::string& diagnostics);
 	static SlangStage MapStage(ShaderStage stage);
 	static SlangCompileTarget MapTarget(ShaderTarget target);
 	static std::string BlobToString(slang::IBlob* blob);
 	static std::vector<std::string> BuildDebugArgumentStrings(const ShaderCompileRequest& request);
-	static ShaderDebugArtifactSet CaptureDebugArtifacts(const ShaderCompileRequest& request, std::string_view sourceText, std::string_view diagnostics);
+	static ShaderDebugArtifactSet CaptureDebugArtifacts(const ShaderCompileRequest& request, slang::IComponentType& program, std::span<const std::uint8_t> bytecode, std::string_view diagnostics);
+	static void ExtractSymbols(slang::IComponentType& program, ShaderDebugArtifactSet& artifacts);
 	static std::uint64_t QueryBackendVersion(slang::IGlobalSession& globalSession);
 
 	Slang::ComPtr<slang::IGlobalSession> m_globalSession;

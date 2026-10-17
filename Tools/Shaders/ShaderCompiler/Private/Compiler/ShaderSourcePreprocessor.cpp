@@ -8,6 +8,7 @@
 #include "Core/Public/Files/FileUtils.h"
 
 #include <format>
+#include <algorithm>
 #include <regex>
 #include <sstream>
 #include <unordered_set>
@@ -16,6 +17,7 @@ struct ShaderSourcePreprocessor::PreprocessContext final
 {
 	std::unordered_set<std::string> OncePathKeys;
 	std::unordered_set<std::string> ActivePathKeys;
+	std::vector<ShaderSourceFile>* SourceFiles = nullptr;
 };
 
 void ShaderSourcePreprocessor::VisitFile(std::string_view filePath, const ShaderCompileRequest& request, PreprocessContext& context, std::string& outSource)
@@ -33,6 +35,7 @@ void ShaderSourcePreprocessor::VisitFile(std::string_view filePath, const Shader
 	{
 		throw Diagnostics::Error(std::format("Detected recursive shader include while preprocessing '{}'", pathKey));
 	}
+	CaptureSourceFile(pathKey, sourceText, context.SourceFiles);
 
 	const std::string linePath = MakeLinePath(pathKey);
 	AppendLineDirective(outSource, 1u, linePath);
@@ -68,6 +71,22 @@ void ShaderSourcePreprocessor::VisitFile(std::string_view filePath, const Shader
 	}
 
 	context.ActivePathKeys.erase(pathKey);
+}
+
+void ShaderSourcePreprocessor::CaptureSourceFile(const std::string& pathKey, const std::string& sourceText, std::vector<ShaderSourceFile>* sourceFiles)
+{
+	if (sourceFiles != nullptr)
+	{
+		const auto existing = std::ranges::find(*sourceFiles, pathKey, &ShaderSourceFile::VirtualPath);
+		if (existing == sourceFiles->end())
+		{
+			sourceFiles->push_back({.VirtualPath = pathKey, .Contents = sourceText});
+		}
+		else if (existing->Contents != sourceText)
+		{
+			throw Diagnostics::Error(std::format("Shader source '{}' changed while preprocessing.", pathKey));
+		}
+	}
 }
 
 std::string ShaderSourcePreprocessor::ReadSourceText(std::string_view virtualPath, const ShaderCompileRequest& request)
@@ -137,7 +156,7 @@ void ShaderSourcePreprocessor::AppendExpandedInclude(
 	VisitFile(*includePath, request, context, outSource);
 }
 
-std::string ShaderSourcePreprocessor::Load(std::string_view sourcePath, const ShaderCompileRequest& request)
+std::string ShaderSourcePreprocessor::Load(std::string_view sourcePath, const ShaderCompileRequest& request, std::vector<ShaderSourceFile>* sourceFiles)
 {
 	std::string sourceText;
 	if (request.ParameterStruct && !request.ParameterStruct->Values.empty())
@@ -150,7 +169,7 @@ std::string ShaderSourcePreprocessor::Load(std::string_view sourcePath, const Sh
 		}
 		sourceText += "};\n";
 	}
-	PreprocessContext context;
+	PreprocessContext context{.SourceFiles = sourceFiles};
 	VisitFile(sourcePath, request, context, sourceText);
 	return sourceText;
 }

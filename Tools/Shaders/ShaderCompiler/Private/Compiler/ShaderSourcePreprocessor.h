@@ -9,10 +9,12 @@
 class ShaderSourcePreprocessor final
 {
 public:
-	static std::string Load(std::string_view sourcePath, const ShaderCompileRequest& request);
+	static std::string Load(std::string_view sourcePath, const ShaderCompileRequest& request, std::vector<ShaderSourceFile>* sourceFiles = nullptr);
 
 private:
 	struct PreprocessContext;
+
+	static void CaptureSourceFile(const std::string& pathKey, const std::string& sourceText, std::vector<ShaderSourceFile>* sourceFiles);
 
 	static void VisitFile(std::string_view filePath, const ShaderCompileRequest& request, PreprocessContext& context, std::string& outSource);
 	static std::string ReadSourceText(std::string_view virtualPath, const ShaderCompileRequest& request);

@@ -70,6 +70,11 @@ static void PrintSummary(const ShaderCookResult& result, const ShaderCookSetting
 	        ToolConsole::Field("mapEntries", std::to_string(result.output.entries.size())),
 	        ToolConsole::Field("uniqueCodeRecords", std::to_string(result.output.uniqueCodeCount)),
 	        ToolConsole::QuotedField("targets", FormatTargets(settings.targets))});
+
+	if (!result.output.debugManifestPath.empty())
+	{
+		ToolConsole::Message(std::cout, ToolConsoleSeverity::Info, "Shader debug export", {ToolConsole::QuotedField("manifest", result.output.debugManifestPath.generic_string())});
+	}
 }
 
 static int RunAnalysisPasses(const ShaderCookResult& result, const ShaderCookSettings& settings)

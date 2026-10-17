@@ -30,12 +30,7 @@ private:
 	    const ProducerMap& producerMap,
 	    std::size_t totalWork,
 	    const ToolWorkProgressCallback& progress);
-	static std::vector<ShaderCompileResult> FanOutResults(std::span<const ShaderCompileJob> jobs, std::span<const ShaderCompileResult> producerResults, std::span<const std::size_t> producerForJob);
-	static void FinalizeResults(
-	    const ShaderCookSettings& settings,
-	    std::span<const ShaderCompileJob> jobs,
-	    std::span<ShaderCompileResult> results,
-	    std::size_t totalWork,
-	    const ToolWorkProgressCallback& progress);
+	static std::vector<ShaderCompileResult> FanOutResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> producerResults, std::span<const std::size_t> producerForJob);
+	static void FinalizeResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> results, std::size_t totalWork, const ToolWorkProgressCallback& progress);
 	static bool HasSameCompilerInput(const ShaderCompileJob& lhs, const ShaderCompileJob& rhs) noexcept;
 };

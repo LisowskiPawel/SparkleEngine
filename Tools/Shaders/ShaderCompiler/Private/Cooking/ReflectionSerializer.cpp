@@ -2,6 +2,15 @@
 
 #include "Cooking/ReflectionSerializer.h"
 
+#include "RHI/Public/Shaders/GlobalShaderMap.h"
+
+#include <utility>
+
+std::string ReflectionSerializer::ResolveString(const GlobalShaderMap& map, std::uint32_t offset, std::uint32_t size)
+{
+	return std::string(map.ResolveString(ShaderMapStringRef{offset, size}));
+}
+
 void ReflectionSerializer::Build(std::span<const ShaderReflection> reflections, Strings::StringTableBuilder& stringTable, Output& outOutput)
 {
 	outOutput.reflectionRecords.clear();
@@ -126,4 +135,92 @@ void ReflectionSerializer::Build(std::span<const ShaderReflection> reflections, 
 		record.WaveSize = reflection.WaveSize;
 		outOutput.reflectionRecords.push_back(record);
 	}
+}
+
+ShaderReflection ReflectionSerializer::Decode(const GlobalShaderMap& map, const GlobalShaderMapEntry& entry)
+{
+	ShaderReflection result;
+	const CookedShaderReflectionRecord& record = map.GetReflection(entry);
+	const auto allConstantBuffers = map.GetConstantBuffers();
+	const auto allMembers = map.GetConstantBufferMembers();
+	for (std::uint32_t index = 0; index < record.ConstantBufferCount; ++index)
+	{
+		const CookedShaderConstantBufferRecord& buffer = allConstantBuffers[record.ConstantBufferOffset + index];
+		ShaderReflectionConstantBuffer decoded;
+		decoded.Name = ResolveString(map, buffer.NameOffsetInBytes, buffer.NameSizeInBytes);
+		decoded.SizeInBytes = buffer.SizeInBytes;
+		for (std::uint32_t memberIndex = 0; memberIndex < buffer.MemberCount; ++memberIndex)
+		{
+			const CookedShaderConstantBufferMemberRecord& member = allMembers[buffer.MemberOffset + memberIndex];
+
+			decoded.Members.push_back(
+			    ShaderReflectionConstantBufferMember{
+			        .Name = ResolveString(map, member.NameOffsetInBytes, member.NameSizeInBytes),
+			        .OffsetInBytes = member.OffsetInBytes,
+			        .SizeInBytes = member.SizeInBytes,
+			        .ArrayCount = member.ArrayCount,
+			        .ArrayStrideInBytes = member.ArrayStrideInBytes,
+			        .ScalarType = member.ScalarType,
+			        .RowCount = member.RowCount,
+			        .ColumnCount = member.ColumnCount});
+		}
+		result.ConstantBuffers.push_back(std::move(decoded));
+	}
+	const auto allBindings = map.GetResourceBindings();
+	for (std::uint32_t index = 0; index < record.ResourceBindingCount; ++index)
+	{
+		const CookedShaderResourceBindingRecord& binding = allBindings[record.ResourceBindingOffset + index];
+		std::uint32_t constantBufferIndex = kCookedShaderReflectionInvalidIndex;
+		if (binding.ConstantBufferIndex >= record.ConstantBufferOffset && binding.ConstantBufferIndex < record.ConstantBufferOffset + record.ConstantBufferCount)
+		{
+			constantBufferIndex = binding.ConstantBufferIndex - record.ConstantBufferOffset;
+		}
+
+		result.Bindings.push_back(
+		    ShaderReflectionResourceBinding{
+		        .Name = ResolveString(map, binding.NameOffsetInBytes, binding.NameSizeInBytes),
+		        .Kind = binding.Kind,
+		        .Dimension = binding.Dimension,
+		        .IsReadOnly = binding.IsReadOnly != 0,
+		        .Set = binding.Set,
+		        .Slot = binding.Slot,
+		        .ArrayCount = binding.ArrayCount,
+		        .SizeInBytes = binding.SizeInBytes,
+		        .ConstantBufferIndex = constantBufferIndex});
+	}
+	const auto allInputs = map.GetInputElements();
+	for (std::uint32_t index = 0; index < record.InputElementCount; ++index)
+	{
+		const CookedShaderInputElementRecord& input = allInputs[record.InputElementOffset + index];
+
+		result.InputElements.push_back(
+		    ShaderReflectionInputElement{
+		        .Semantic = ResolveString(map, input.SemanticOffsetInBytes, input.SemanticSizeInBytes),
+		        .SemanticIndex = input.SemanticIndex,
+		        .Location = input.Location,
+		        .ScalarType = input.ScalarType,
+		        .ComponentCount = input.ComponentCount});
+	}
+	const auto allPushConstants = map.GetPushConstantRanges();
+	for (std::uint32_t index = 0; index < record.PushConstantRangeCount; ++index)
+	{
+		const CookedShaderPushConstantRangeRecord& range = allPushConstants[record.PushConstantRangeOffset + index];
+		result.PushConstants.push_back(ShaderReflectionPushConstantRange{.OffsetInBytes = range.OffsetInBytes, .SizeInBytes = range.SizeInBytes, .VisibilityMask = range.VisibilityMask});
+	}
+	const auto allSpecializations = map.GetSpecializationConstants();
+	for (std::uint32_t index = 0; index < record.SpecializationConstantCount; ++index)
+	{
+		const CookedShaderSpecializationConstantRecord& value = allSpecializations[record.SpecializationConstantOffset + index];
+
+		result.SpecializationConstants.push_back(
+		    ShaderReflectionSpecializationConstant{
+		        .Name = ResolveString(map, value.NameOffsetInBytes, value.NameSizeInBytes),
+		        .ConstantId = value.ConstantId,
+		        .DefaultValueBits = value.DefaultValueBits,
+		        .ScalarType = value.ScalarType});
+	}
+	result.ThreadGroupSize = {record.ThreadGroupSize[0], record.ThreadGroupSize[1], record.ThreadGroupSize[2]};
+	result.EntryFlags = record.EntryFlags;
+	result.WaveSize = record.WaveSize;
+	return result;
 }

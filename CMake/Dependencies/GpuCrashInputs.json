@@ -1,0 +1,93 @@
+{
+  "Aftermath": {
+    "version": "2026.3.26197.2318",
+    "directories": ["include", "lib/x64"],
+    "files": [
+      {"path": "LICENSE", "sha256": "606b69fb994b63e2122711694cde23a656bf861a8a27c2bab42acf5897230d4b", "bytes": 35954},
+      {"path": "Readme.md", "sha256": "7ac1eadebc81278cd68bcc84c7f0dfbe655fcd6dde6a0d935b5d6c255c89e6d0", "bytes": 59830},
+      {"path": "include/GFSDK_Aftermath.h", "sha256": "4b7f7e663530035766d469333134294482d6c2bf19ed495097024f89c2b80144", "bytes": 29299},
+      {"path": "include/GFSDK_Aftermath_Defines.h", "sha256": "92856303e2869fa2d68f3f7725bf95053868311e005eae1df902fdf5fc493c15", "bytes": 12375},
+      {"path": "include/GFSDK_Aftermath_GpuCrashDump.h", "sha256": "16737033694d6ea60e2f6bbbec243a79e21b21c66accabf87b8e38b4bb6e1140", "bytes": 25243},
+      {"path": "include/GFSDK_Aftermath_GpuCrashDumpDecoding.h", "sha256": "871cba8c9fb92e1f58a4eb77e9edf873581d91768686470e50b4bb05514d8dcf", "bytes": 57938},
+      {"path": "include/GFSDK_Aftermath_GpuCrashDumpEditing.h", "sha256": "56639e1db6a5fc0135a5660eac8890f59620009ea7e9538a39de775ac81a2aeb", "bytes": 10721},
+      {"path": "lib/x64/GFSDK_Aftermath_Lib.x64.dll", "sha256": "e119d214ecbc8abbbe9f3dc4990a77b999e4fd268071e0a1145c25e487cc0dd7", "bytes": 9240728},
+      {"path": "lib/x64/GFSDK_Aftermath_Lib.x64.lib", "sha256": "19f1fbcccb541be65af54a26e518780819db7836734e58a1ad12da395091f0f8", "bytes": 18938},
+      {"path": "nsight-aftermath-usage-guidelines.txt", "sha256": "5c29ffda156eb7e25cb15183254822d4a3b2de8ac73470082c45647be47fd792", "bytes": 1072}
+    ]
+  },
+  "Dxc": {
+    "version": "LunarG Vulkan SDK 1.4.350.0",
+    "directories": ["Include/dxc"],
+    "files": [
+      {"path": "Bin/dxcompiler.dll", "sha256": "6e990d20e53390cde413ce9a8016a8f43582e325a04cf72ecc706b4bea504f0c", "bytes": 21565880},
+      {"path": "Include/dxc/WinAdapter.h", "sha256": "1f56a3848e65937eaf7eeddc02fb5418d28513bd518014e2c9b58eb59764491a", "bytes": 30945},
+      {"path": "Include/dxc/dxcapi.h", "sha256": "ff3ca20c5ff948d7b1050c4b96d1ee42a9ecc054724dc4dafbef50cc04fd1cde", "bytes": 54624},
+      {"path": "Lib/dxcompiler.lib", "sha256": "dd837c4f45a401652e66df30fb944999b4e150c046ca41701e06429f7e2f7083", "bytes": 2002},
+      {"path": "Licenses/LICENSE.txt", "sha256": "03b9dd9957f288bc26ef39d188672d5a761f2f35c972d959b65c0f32cd4d576f", "bytes": 944}
+    ]
+  },
+  "Slang": {
+    "version": "2026.8 / LunarG Vulkan SDK 1.4.350.0",
+    "directories": ["Include/slang", "Bin/slang-standard-module-2026.8"],
+    "files": [
+      {"path": "Bin/slang-compiler.dll", "sha256": "cfdc9c0067942608757cbb343b53302bd7da1c6b945e9dd343c9474941f9830b", "bytes": 31122360},
+      {"path": "Bin/slang-glsl-module.dll", "sha256": "0b71a1f5a0795e5a94080eb452b378ddde6a75222dda448c5558fb5516acda99", "bytes": 1291192},
+      {"path": "Bin/slang-glslang.dll", "sha256": "b9dcd6cf4e1c6f55d88f3ddfd928d0fdb2c2afd22b13d9a08f9694f676b01f51", "bytes": 10159032},
+      {"path": "Bin/slang-rt.dll", "sha256": "1af4d49f19f39baa3e767624688020c7223af381b3dbd8fbce463e5fd96b9ebf", "bytes": 748472},
+      {"path": "Bin/slang-standard-module-2026.8/slang/WaveMatrix.slang", "sha256": "7c54344d6f5a0570d6417888296753e6b341e041ca4a6a39335e14af87ffd27e", "bytes": 36043},
+      {"path": "Bin/slang-standard-module-2026.8/slang/accelerate-vector-coopmat.slang", "sha256": "6559975ee2d147d44afb07346320d02e6ac77ae4180528b1f8fa7f82e843b63b", "bytes": 10621},
+      {"path": "Bin/slang-standard-module-2026.8/slang/activations.slang", "sha256": "f61dcab4de8bc77887a448ed9c73bb74542a64e42a27c3f6e457353aca7b9447", "bytes": 5298},
+      {"path": "Bin/slang-standard-module-2026.8/slang/bindless-storage.slang", "sha256": "d55135354347cd2333caa2346ef79527a9bc8dfd0db9313463e44c53246a3337", "bytes": 16896},
+      {"path": "Bin/slang-standard-module-2026.8/slang/hash-function.slang", "sha256": "f730f5bb868d8f8805ae9ce6420599b4c43cec17decfedda001705cab3107bc1", "bytes": 3610},
+      {"path": "Bin/slang-standard-module-2026.8/slang/iactivation.slang", "sha256": "e2d839ed915ba28bd554187cb0868b7c9e165d3f48614783724403b271990058", "bytes": 994},
+      {"path": "Bin/slang-standard-module-2026.8/slang/iencoder.slang", "sha256": "2177cea7d3da4e4577ee840989fa2a7502939ef14bd57ceed4e6dc870ce3d005", "bytes": 902},
+      {"path": "Bin/slang-standard-module-2026.8/slang/ilayer.slang", "sha256": "3e47ef65ea31f6cff857d8c3158755e679d206058433cd635ec55de87fdbc3fa", "bytes": 966},
+      {"path": "Bin/slang-standard-module-2026.8/slang/inline-vector.slang", "sha256": "50c9d0726c6e8ea93b2d43c46628b8ca30e3ab02b79942d132040859af214600", "bytes": 6794},
+      {"path": "Bin/slang-standard-module-2026.8/slang/istorages.slang", "sha256": "d1818c0eef09cce3e677d591b7a2e1b09b8770bcf960f97b78f6a29b7c19d2cb", "bytes": 4048},
+      {"path": "Bin/slang-standard-module-2026.8/slang/ivector.slang", "sha256": "48b64841b60c3138d0ce949f9f49c86ee07b0187798e1e206f1e839c0d42515a", "bytes": 4258},
+      {"path": "Bin/slang-standard-module-2026.8/slang/layers.slang", "sha256": "ea2a47da72d97e729b6ca82730592fe548203677ea061ebeb1f9b73ab2996758", "bytes": 3253},
+      {"path": "Bin/slang-standard-module-2026.8/slang/mma-linear-layout-help.slang", "sha256": "7223942c03e4b9fbac2fae8e2e213be95bc0bfc99b286f7f6b9b845e6d844a87", "bytes": 57264},
+      {"path": "Bin/slang-standard-module-2026.8/slang/mma-tiled-cuda.slang", "sha256": "0d8de6257095a8bc498b48e2ed2a6be7ddae1b692dd40a347ace2610a8a50cb4", "bytes": 21835},
+      {"path": "Bin/slang-standard-module-2026.8/slang/mma-tiled-layout-helper.slang", "sha256": "b57f26f943691b7abc2dae98a859b324c08942ed62243335adacd563f87bc8ba", "bytes": 4736},
+      {"path": "Bin/slang-standard-module-2026.8/slang/mma-tiled-vulkan.slang", "sha256": "d32b57ad87df104a67cb46f74633e9c66c225831c1078612da3d8821e0a43127", "bytes": 17384},
+      {"path": "Bin/slang-standard-module-2026.8/slang/neural.slang", "sha256": "233c7e0d0c3352a0cf5c0690400a75e5f1284d7bc012752472fc861f3cb220a4", "bytes": 1784},
+      {"path": "Bin/slang-standard-module-2026.8/slang/neural.slang-module", "sha256": "a5ae4ab66204492890e1d491c91b8522a54f8abc7c2d1e6167e4bc57c09f4ee0", "bytes": 6491164},
+      {"path": "Bin/slang-standard-module-2026.8/slang/permuto-encoder.slang", "sha256": "e26ce720e984d906b8475dc32eb3dac45ee377ea39591a40044ab311d77302b1", "bytes": 14699},
+      {"path": "Bin/slang-standard-module-2026.8/slang/shared-memory-pool.slang", "sha256": "8d82639b0be46bf319e20470574a9ca93751bd2df13a126f0f5a0ea187c6614b", "bytes": 28234},
+      {"path": "Bin/slang-standard-module-2026.8/slang/vectorized-reader.slang", "sha256": "ed75edc8f84a593dee13c1c54fbff023382b7f102dde3046b9917e08ae630daa", "bytes": 9850},
+      {"path": "Bin/slang.dll", "sha256": "3b36ede98c2c58bab5efda3914caae0698c2e0f815c3e1a896ca1dba8439da00", "bytes": 71608},
+      {"path": "Bin/slang.slang", "sha256": "8480e5f4ff36484f25ba9c3eae83e964c8e576c8bde3f9834266855b737c6e5f", "bytes": 13700},
+      {"path": "Include/slang/slang-com-helper.h", "sha256": "8c4936e5bad6e61222cde9ae266dc5931cdcd5989d01495cef6dff2aef9b9276", "bytes": 7945},
+      {"path": "Include/slang/slang-com-ptr.h", "sha256": "0bb72f8f4135ab01ab5c6c27f8da478bfbcf1a6132cf33d153b2357303664905", "bytes": 5566},
+      {"path": "Include/slang/slang-cpp-host-prelude.h", "sha256": "ec6f0de0dd114753dc70e22472ba24db0eee9d78524a47ebf016bdd570011a60", "bytes": 1524},
+      {"path": "Include/slang/slang-cpp-prelude.h", "sha256": "9425a850626175dc3c818bfc7e74deca573de3be85a2c4c3660287505807d0c9", "bytes": 8529},
+      {"path": "Include/slang/slang-cpp-scalar-intrinsics.h", "sha256": "642ae202cd3d9ccca332dd63053a70b7d9d03dcfc0cfaf2348dc30ec3bc246dd", "bytes": 29841},
+      {"path": "Include/slang/slang-cpp-types-core.h", "sha256": "d1f587e81028726c7849c01b7bc52dba373e35bb082e2522ea5b776f15a52dbf", "bytes": 23649},
+      {"path": "Include/slang/slang-cpp-types.h", "sha256": "f684488b215faedf6b4f07ebc0455b0e6e1874915a6a6f0a68c6fa7ef797dc74", "bytes": 37859},
+      {"path": "Include/slang/slang-cuda-prelude.h", "sha256": "43daf3fb60cb6cf347fb90997068d4241af4644aa1ba31f2bf15620b033245df", "bytes": 285620},
+      {"path": "Include/slang/slang-deprecated.h", "sha256": "a764d633fea9ff3dbcc30da1e9551e671b2d684bbb1caffc3903853b78580c60", "bytes": 73113},
+      {"path": "Include/slang/slang-gfx.h", "sha256": "a99263f011a5963daf3775b18ea8f98403dc733f755a18fcba3233751139145c", "bytes": 94409},
+      {"path": "Include/slang/slang-hlsl-prelude.h", "sha256": "6a02a2fe1ebfd6fbf1a66740078ac5a321be6884b0e9bec527a8c69d7211d674", "bytes": 206},
+      {"path": "Include/slang/slang-image-format-defs.h", "sha256": "35ad9b68cfa889157b2bf4a4ef39263b4ad5f0f760ffee66aca03438e8363bcd", "bytes": 2421},
+      {"path": "Include/slang/slang-llvm.h", "sha256": "8f799317742485deb13353e9260764c58248175a75c9af96942ee49744067505", "bytes": 12053},
+      {"path": "Include/slang/slang-tag-version.h", "sha256": "d8e351dd9d2ba2011027edb87a9408877bbe267b76c694584cc95c44393b54e8", "bytes": 76},
+      {"path": "Include/slang/slang-torch-prelude.h", "sha256": "60bc416b2ff5bb86299ff994a84f3e88245328f2010ad5d165973d39dd28f3b7", "bytes": 5370},
+      {"path": "Include/slang/slang.h", "sha256": "80ca5b8dbfc6061aaf9d28d376fd4625fefe3b36272597ba97ff1384ec84c94d", "bytes": 200920},
+      {"path": "Lib/slang.lib", "sha256": "675d3cdb83072e3e795cc6fac6e5af682ed5bcb2847b0e0f5cf5947cfc937a2a", "bytes": 154238},
+      {"path": "Licenses/LICENSE.txt", "sha256": "03b9dd9957f288bc26ef39d188672d5a761f2f35c972d959b65c0f32cd4d576f", "bytes": 944}
+    ]
+  },
+  "SpirvTools": {
+    "version": "LunarG Vulkan SDK 1.4.350.0",
+    "directories": ["Include/spirv-tools"],
+    "files": [
+      {"path": "Bin/SPIRV-Tools-shared.dll", "sha256": "06c7cae210d28d1de2a6eb0f9357b4337429dd8f7f49b32f60194b51983241db", "bytes": 1689528},
+      {"path": "Include/spirv-tools/libspirv.h", "sha256": "f4b0a2300806acf1efc9cfb79708b892891352f4d719de1f76848cc89b95acac", "bytes": 48870},
+      {"path": "Include/spirv-tools/libspirv.hpp", "sha256": "6b6bcb9f5ab28642c51013433e75e5f9a4138577fcbce1e6204bcda47bbd1710", "bytes": 16430},
+      {"path": "Include/spirv-tools/linker.hpp", "sha256": "cd3fc7d085f29437b4dc304a8d2496784e20703d7c9ca057a26f8226f038d8b0", "bytes": 4818},
+      {"path": "Include/spirv-tools/optimizer.hpp", "sha256": "85f5247437234e42c2fee6ddda387f097cd1de454f0ddb3a6d827bb8d53b95db", "bytes": 52249},
+      {"path": "Lib/SPIRV-Tools-shared.lib", "sha256": "494143ec027327298aab27ede26368cd165efcdc075386bfe6f4d5b19f5b4abc", "bytes": 45224},
+      {"path": "Licenses/LICENSE.txt", "sha256": "03b9dd9957f288bc26ef39d188672d5a761f2f35c972d959b65c0f32cd4d576f", "bytes": 944}
+    ]
+  }
+}

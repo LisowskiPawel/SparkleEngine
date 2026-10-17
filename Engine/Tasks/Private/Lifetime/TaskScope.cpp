@@ -3,6 +3,7 @@
 #include "TaskScopeState.h"
 
 #include <cassert>
+#include <functional>
 #include <stdexcept>
 #include <utility>
 
@@ -22,17 +23,19 @@ bool TaskScope::State::RegisterExecution(const std::shared_ptr<TaskExecution::St
 	{
 		return false;
 	}
-	++ActiveExecutions;
-	Executions.emplace_back(execution);
-	execution->JoinThread = OwnerThread;
 
-	execution->OnSettled = [scope = weak_from_this()]
+	std::function<void()> onSettled = [scope = weak_from_this()]
 	{
 		if (auto state = scope.lock())
 		{
 			state->ExecutionSettled();
 		}
 	};
+
+	Executions.emplace_back(execution);
+	execution->JoinThread = OwnerThread;
+	execution->OnSettled = std::move(onSettled);
+	++ActiveExecutions;
 
 	return true;
 }
@@ -44,9 +47,9 @@ bool TaskScope::State::RegisterChild(const std::shared_ptr<State>& child)
 	{
 		return false;
 	}
-	++OpenChildren;
 	Children.emplace_back(child);
 	child->Parent = shared_from_this();
+	++OpenChildren;
 	return true;
 }
 

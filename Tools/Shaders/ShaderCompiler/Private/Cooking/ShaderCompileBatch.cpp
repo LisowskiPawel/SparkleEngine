@@ -6,7 +6,6 @@
 #include "Cooking/ShaderCompileJobExecutor.h"
 #include "Cooking/ShaderCookCancellation.h"
 #include "Cooking/ShaderCookSettings.h"
-#include "Cooking/ShaderDebugArtifactWriter.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/FileSystemUtils.h"
 #include "TaskExecutor.h"
@@ -31,9 +30,9 @@ std::vector<ShaderCompileResult> ShaderCompileBatch::Execute(
 	ShaderCookCancellation::ThrowIfRequested(settings.cancellationSignalPath);
 
 	const ProducerMap producerMap = SelectProducers(jobs);
-	const std::vector<ShaderCompileResult> producerResults = CompileProducers(settings, jobs, producerMap, totalWork, progress);
+	std::vector<ShaderCompileResult> producerResults = CompileProducers(settings, jobs, producerMap, totalWork, progress);
 	std::vector<ShaderCompileResult> results = FanOutResults(jobs, producerResults, producerMap.ProducerForJob);
-	FinalizeResults(settings, jobs, results, totalWork, progress);
+	FinalizeResults(jobs, results, totalWork, progress);
 	return results;
 }
 
@@ -148,28 +147,33 @@ std::vector<ShaderCompileResult> ShaderCompileBatch::CompileProducers(
 	throw Diagnostics::Error(std::string(result.GetMessage()));
 }
 
-std::vector<ShaderCompileResult> ShaderCompileBatch::FanOutResults(
-    std::span<const ShaderCompileJob> jobs,
-    std::span<const ShaderCompileResult> producerResults,
-    std::span<const std::size_t> producerForJob)
+std::vector<ShaderCompileResult> ShaderCompileBatch::FanOutResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> producerResults, std::span<const std::size_t> producerForJob)
 {
 	std::vector<ShaderCompileResult> results;
 	results.reserve(jobs.size());
+	std::vector<std::size_t> remainingConsumers(producerResults.size());
+	for (const std::size_t producer : producerForJob)
+	{
+		++remainingConsumers[producer];
+	}
 	for (std::size_t jobIndex = 0; jobIndex < jobs.size(); ++jobIndex)
 	{
-		results.push_back(producerResults[producerForJob[jobIndex]]);
+		const std::size_t producer = producerForJob[jobIndex];
+		if (--remainingConsumers[producer] == 0)
+		{
+			results.push_back(std::move(producerResults[producer]));
+		}
+		else
+		{
+			results.push_back(producerResults[producer]);
+		}
 		results.back().ShaderType = jobs[jobIndex].Request.ShaderType;
 		results.back().Target = jobs[jobIndex].Request.Target;
 	}
 	return results;
 }
 
-void ShaderCompileBatch::FinalizeResults(
-    const ShaderCookSettings& settings,
-    std::span<const ShaderCompileJob> jobs,
-    std::span<ShaderCompileResult> results,
-    std::size_t totalWork,
-    const ToolWorkProgressCallback& progress)
+void ShaderCompileBatch::FinalizeResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> results, std::size_t totalWork, const ToolWorkProgressCallback& progress)
 {
 	for (std::size_t jobIndex = 0; jobIndex < jobs.size(); ++jobIndex)
 	{
@@ -183,10 +187,6 @@ void ShaderCompileBatch::FinalizeResults(
 		{
 			ShaderCompileFailureReplay::Write(Filesystem::GetCookedShaderRootPath(), job, error.what());
 			throw;
-		}
-		if (job.Request.CaptureDebugArtifacts)
-		{
-			ShaderDebugArtifactWriter::Write(settings.debugArtifactDirectory, job.Request, result.Output, result.DebugArtifacts);
 		}
 		if (progress)
 		{

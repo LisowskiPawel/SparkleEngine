@@ -17,7 +17,6 @@ struct RegisteredShaderRow final
 	std::string Stage;
 	std::size_t ParameterCount = 0;
 	std::uint64_t RuntimeGeneration = 0;
-	bool ArtifactAvailable = false;
 	std::filesystem::path ArtifactDirectory;
 };
 
@@ -28,6 +27,7 @@ public:
 
 	void SetGenerationProvider(GenerationProvider provider);
 	void Refresh();
+	static bool HasDebugArtifacts(const std::filesystem::path& directory);
 
 	const std::vector<RegisteredShaderRow>& GetRows() const noexcept { return m_rows; }
 
