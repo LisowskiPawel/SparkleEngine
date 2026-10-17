@@ -8,7 +8,7 @@ namespace SparkleLauncher
 {
 	static std::vector<std::string> GetDefaultBuildToolArguments()
 	{
-		return {"/nologo", "/v:minimal", "/m:1", "/p:UseMultiToolTask=false", "/p:TrackFileAccess=false", "/nodeReuse:false"};
+		return {"/nologo", "/v:minimal", "/m:1", "/p:UseMultiToolTask=false", "/nodeReuse:false"};
 	}
 
 	static std::string ToCMakeBool(bool value)

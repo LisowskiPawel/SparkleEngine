@@ -8,7 +8,12 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_cookedTextureLoadTaskLogger, "Renderer.CookedTextureLoadTask");
 
-TaskExecution CookedTextureLoadTask::Launch(TaskExecutor& taskExecutor, TaskScope& taskScope, const std::filesystem::path& path, const std::shared_ptr<Payload>& payload)
+TaskExecution CookedTextureLoadTask::Launch(
+    TaskExecutor& taskExecutor,
+    TaskScope& taskScope,
+    const std::filesystem::path& path,
+    const std::shared_ptr<Payload>& payload,
+    std::uint64_t maximumDecodedBytes)
 {
 	if (payload == nullptr)
 	{
@@ -32,14 +37,14 @@ TaskExecution CookedTextureLoadTask::Launch(TaskExecutor& taskExecutor, TaskScop
 	graph.ContinueWith(
 	    read,
 	    TaskDesc{.Name = TaskName("Decode cooked texture generation"), .Lane = TaskLane::Background},
-	    [payload](TaskExecutionContext& context)
+	    [payload, maximumDecodedBytes](TaskExecutionContext& context)
 	    {
 		    if (context.IsCancellationRequested())
 		    {
 			    payload->File = {};
 			    return TaskResult::Cancelled("Texture decode cancelled.");
 		    }
-		    payload->Texture = CookedTextureLoader::Decode(payload->File);
+		    payload->Texture = CookedTextureLoader::Decode(payload->File, maximumDecodedBytes);
 		    payload->File = {};
 		    return TaskResult::Success();
 	    });

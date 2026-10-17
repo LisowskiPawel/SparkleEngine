@@ -51,25 +51,32 @@ std::optional<AssetGenerationHandle> AssetResidency::BeginGeneration(std::uint64
 	return handle;
 }
 
-bool AssetResidency::BeginDecoding(AssetGenerationHandle handle) noexcept
+bool AssetResidency::BeginDecoding(AssetGenerationHandle handle, std::uint64_t reservedDecodedBytes) noexcept
 {
 	AssetGenerationStatus* generation = FindMutable(handle);
-	if (generation == nullptr || generation->State != AssetResidencyState::Reading)
+	if (generation == nullptr || generation->State != AssetResidencyState::Reading || reservedDecodedBytes > m_budget.MaximumDecodedBytes - m_counters.DecodedBytes)
 	{
 		return false;
 	}
 	generation->State = AssetResidencyState::Decoding;
+	generation->DecodedBytes = reservedDecodedBytes;
+	m_counters.DecodedBytes += reservedDecodedBytes;
 	return true;
 }
 
 bool AssetResidency::PublishReadyForUpload(AssetGenerationHandle handle, std::uint64_t decodedBytes, std::uint64_t uploadBytes) noexcept
 {
 	AssetGenerationStatus* generation = FindMutable(handle);
-	if (generation == nullptr || (generation->State != AssetResidencyState::Reading && generation->State != AssetResidencyState::Decoding) || !CanPublishDecoded(decodedBytes, uploadBytes))
+	if (generation == nullptr || (generation->State != AssetResidencyState::Reading && generation->State != AssetResidencyState::Decoding))
+	{
+		return false;
+	}
+	if (decodedBytes > m_budget.MaximumDecodedBytes - (m_counters.DecodedBytes - generation->DecodedBytes) || uploadBytes > m_budget.MaximumPendingUploadBytes)
 	{
 		return false;
 	}
 
+	m_counters.DecodedBytes -= generation->DecodedBytes;
 	generation->State = AssetResidencyState::ReadyForUpload;
 	generation->DecodedBytes = decodedBytes;
 	generation->UploadBytes = uploadBytes;
@@ -184,11 +191,6 @@ AssetResidencyState AssetResidency::GetState(AssetGenerationHandle handle) const
 AssetGenerationStatus* AssetResidency::FindMutable(AssetGenerationHandle handle) noexcept
 {
 	return const_cast<AssetGenerationStatus*>(std::as_const(*this).Find(handle));
-}
-
-bool AssetResidency::CanPublishDecoded(std::uint64_t decodedBytes, std::uint64_t uploadBytes) const noexcept
-{
-	return decodedBytes <= m_budget.MaximumDecodedBytes - m_counters.DecodedBytes && uploadBytes <= m_budget.MaximumPendingUploadBytes;
 }
 
 bool AssetResidency::IsComplete(const RhiSubmissionState& completion, RhiCommandSubmissionService& submissions) const noexcept

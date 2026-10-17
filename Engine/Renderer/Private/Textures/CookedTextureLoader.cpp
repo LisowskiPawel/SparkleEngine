@@ -82,7 +82,7 @@ CookedTextureFilePayload CookedTextureLoader::Read(const std::filesystem::path& 
 	return payload;
 }
 
-LoadedTextureData CookedTextureLoader::Decode(const CookedTextureFilePayload& payload)
+LoadedTextureData CookedTextureLoader::Decode(const CookedTextureFilePayload& payload, std::uint64_t maximumDecodedBytes)
 {
 	if (payload.ResolvedPath.empty() || payload.Bytes.empty())
 	{
@@ -101,14 +101,21 @@ LoadedTextureData CookedTextureLoader::Decode(const CookedTextureFilePayload& pa
 	const TextureFormatIntent formatIntent = CookedTextureDecoder::ResolveFormatIntent(header.formatIntent);
 
 	std::vector<CookedTextureMipHeader> mipHeaders;
-	if (!reader.ReadArray(header.mipCount * header.GetArraySize(), mipHeaders, errorMessage))
+	const std::size_t subresourceCount = static_cast<std::size_t>(header.mipCount) * header.GetArraySize();
+	if (!reader.ReadArray(subresourceCount, mipHeaders, errorMessage))
 	{
 		throw Diagnostics::Error(errorMessage);
 	}
 
+	std::uint64_t decodedBytes = 0;
 	for (std::uint32_t mipIndex = 0; mipIndex < static_cast<std::uint32_t>(mipHeaders.size()); ++mipIndex)
 	{
 		CookedTextureDecoder::ValidateMipHeader(mipHeaders[mipIndex], mipIndex, payload.ResolvedPath);
+		if (mipHeaders[mipIndex].dataSize > maximumDecodedBytes - decodedBytes)
+		{
+			throw Diagnostics::Error(std::format("Cooked texture asset '{}' exceeds its decoded-byte reservation.", payload.ResolvedPath.string()));
+		}
+		decodedBytes += mipHeaders[mipIndex].dataSize;
 	}
 
 	RhiTextureUploadDesc textureUpload;

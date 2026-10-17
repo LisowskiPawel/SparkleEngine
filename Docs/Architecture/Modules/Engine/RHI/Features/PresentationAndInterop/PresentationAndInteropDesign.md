@@ -250,6 +250,7 @@ For a valid native window and supported configuration, RHI owns one swapchain li
 
 - Presentation defaults and runtime request determine back-buffer count, frames in flight, VSync, and related neutral configuration within documented bounds.
 - Backend swapchains own native buffers, views, acquisition state, present mode/flags, and pacing primitives.
+- Vulkan acquisition records the acquired image's transition to the graph's `Present` import state before graph or direct UI recording uses it, including after resize.
 - Resize/minimize must settle or preserve in-flight ownership before replacing buffers; a zero-sized window is not a renderable surface.
 - Renderer owns what color it writes and when UI composition occurs. RHI owns swapchain format/state and present mechanics, not tone mapping or output encoding policy.
 

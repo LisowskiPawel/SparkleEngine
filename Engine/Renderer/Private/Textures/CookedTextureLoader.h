@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <limits>
 #include <vector>
 
 struct LoadedTextureData final
@@ -22,7 +23,7 @@ class CookedTextureLoader final
 {
 public:
 	static CookedTextureFilePayload Read(const std::filesystem::path& texturePath);
-	static LoadedTextureData Decode(const CookedTextureFilePayload& payload);
+	static LoadedTextureData Decode(const CookedTextureFilePayload& payload, std::uint64_t maximumDecodedBytes = std::numeric_limits<std::uint64_t>::max());
 
 	CookedTextureLoader() = delete;
 	~CookedTextureLoader() = delete;

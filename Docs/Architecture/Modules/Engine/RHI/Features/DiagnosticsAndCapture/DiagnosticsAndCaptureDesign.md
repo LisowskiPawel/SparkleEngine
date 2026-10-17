@@ -18,6 +18,7 @@ This family explains what the RHI can reveal about native work and how a selecte
 | --- | --- | --- |
 | understand what native work occurred or failed | [Diagnostics](#diagnostics) | an attributable event/message/timestamp is an observation, not correctness proof |
 | capture a native GPU host interval in an external tool | [External Capture](../../../../../CrossModule/PerformanceDiagnostics/ExternalCapture/ExternalCaptureDesign.md) | one selected provider, verified native finalization, honest target scope; installation and markers do not prove readiness |
+| plan GPU crash dump and shader-source inspection | [GPU Crash Debugging](../../../../../CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md) / [stages](../../../../../CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md) | planned Aftermath collector and breadcrumbs; separate from active frame capture, not yet implemented |
 | inspect the bytes of a selected render product | [Texture Capture](#texture-capture) | copy completion and conversion prove delivery, not semantic product correctness |
 
 ```mermaid

@@ -123,8 +123,8 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 
 	for (TextureRequest& request : m_requests)
 	{
-		request.Wanted = m_wantedPathTextureKeys.contains(request.Source.CacheKey);
-		if (!request.Wanted)
+		request.Wanted = request.Generation.Generation == generation && m_wantedPathTextureKeys.contains(request.Source.CacheKey);
+		if (!request.Wanted && !request.Execution.IsValid())
 		{
 			(void) m_residency.Cancel(request.Generation);
 		}
@@ -158,6 +158,9 @@ void TextureCache::LaunchPendingRequests()
 	    std::count_if(m_requests.begin(), m_requests.end(), [](const TextureRequest& request) noexcept { return request.LoadStarted && request.Execution.IsValid(); }));
 
 	std::size_t availableSlots = activeLoadCount < kMaximumConcurrentLoads ? kMaximumConcurrentLoads - activeLoadCount : 0;
+	const AssetResidencyBudget& budget = m_residency.GetBudget();
+	// Reserve a full single-upload allowance before a worker can allocate decoded pixels.
+	const std::uint64_t maximumDecodedBytes = std::min(budget.MaximumDecodedBytes, budget.MaximumPendingUploadBytes);
 	for (TextureRequest& request : m_requests)
 	{
 		if (availableSlots == 0)
@@ -169,15 +172,14 @@ void TextureCache::LaunchPendingRequests()
 			continue;
 		}
 
-		LaunchRequest(request);
+		if (!m_residency.BeginDecoding(request.Generation, maximumDecodedBytes))
+		{
+			return;
+		}
+		request.Execution = CookedTextureLoadTask::Launch(m_taskExecutor, *m_taskScope, request.Source.Path, request.Payload, maximumDecodedBytes);
+		request.LoadStarted = true;
 		--availableSlots;
 	}
-}
-
-void TextureCache::LaunchRequest(TextureRequest& request)
-{
-	request.Execution = CookedTextureLoadTask::Launch(m_taskExecutor, *m_taskScope, request.Source.Path, request.Payload);
-	request.LoadStarted = true;
 }
 
 void TextureCache::ConsumeCompletedRequests() noexcept
@@ -211,14 +213,10 @@ void TextureCache::ConsumeCompletedRequests() noexcept
 			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture task graph produced no decoded payload.");
 		}
 
-		if (!m_residency.BeginDecoding(request.Generation))
-		{
-			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture generation could not enter decoding.");
-		}
 		const std::uint64_t decodedBytes = RendererTextureFactory::CalculatePayloadBytes(request.Payload->Texture.Upload);
 		if (!m_residency.PublishReadyForUpload(request.Generation, decodedBytes, decodedBytes))
 		{
-			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture generation exceeded residency capacity.");
+			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture generation exceeded reserved residency capacity.");
 		}
 
 		request.Decoded.emplace(std::move(request.Payload->Texture));

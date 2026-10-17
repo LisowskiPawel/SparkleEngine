@@ -14,6 +14,8 @@ Make the existing renderer observable with trustworthy external captures before 
 
 ## Work This Plan
 
+**Current priority:** [GPU Crash Debugging GCD-0 through GCD-4](GpuCrashDebugging/ImplementationPlan.md) precedes renewed GPU hang investigation. It is a separate bounded crash workflow, not delivery of this plan's internal diagnostics product. The [roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) owns the global order.
+
 | What to do | Working route |
 | --- | --- |
 | First action | [External Capture](ExternalCapture/ImplementationPlan.md#work-this-plan) owns the remaining provider work. Use [P0-GATE](#phase-0--reconcile-and-choose) only for unresolved selection/authority decisions. |

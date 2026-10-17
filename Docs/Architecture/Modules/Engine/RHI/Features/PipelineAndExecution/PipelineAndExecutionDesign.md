@@ -258,6 +258,7 @@ RHI exposes separable capabilities for triangle acceleration structures, inline 
 
 - BLAS/TLAS descriptions own geometry, instance identity/mask/flags/transform, build/update intent, addresses, and sizing. Current public geometry is indexed triangles; procedural intersection is not a Renderer path.
 - Inline queries and native pipelines are distinct capabilities. Native pipelines own exports/hit groups and raygen/miss/hit/callable SBT regions.
+- Vulkan buffer allocation honors the device's scratch, acceleration-structure and shader-table address alignment; rounding buffer size alone does not align its native allocation.
 - Classic TLAS and partitioned TLAS are independent services. PTLAS remains vendor/API/capability gated and its public vocabulary exceeds the current Renderer-selected subset.
 - RHI owns native object, layout, and command validity. Renderer owns scene mapping, SBT record semantics, effect selection, and fallback/rejection policy.
 

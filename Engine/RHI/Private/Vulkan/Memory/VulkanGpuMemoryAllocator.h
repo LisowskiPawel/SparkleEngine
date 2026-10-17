@@ -40,7 +40,8 @@ public:
 	    const VkBufferCreateInfo& bufferCreateInfo,
 	    RhiMemoryCategory category,
 	    RhiMemoryResidencyClass residencyClass,
-	    std::wstring_view debugName) noexcept;
+	    std::wstring_view debugName,
+	    VkDeviceSize minimumAlignment = 1) noexcept;
 	std::unique_ptr<VulkanGpuAllocationRecord> CreateImage(
 	    const VkImageCreateInfo& imageCreateInfo,
 	    RhiMemoryCategory category,

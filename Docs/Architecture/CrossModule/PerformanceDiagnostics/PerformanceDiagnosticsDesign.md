@@ -47,6 +47,7 @@ The internal layer is a compass: it identifies the likely limiting domain and th
 | dated current-source capability and gaps | [Capability](Capability.md) |
 | feature-local evidence, failures, checks, and completion | [Acceptance](Acceptance.md) |
 | delivery order and phase exits | [Performance Diagnostics Delivery Plan](ImplementationPlan.md) |
+| GPU crash dumps, breadcrumbs and exact shader/source correlation | [GPU Crash Debugging Design](GpuCrashDebugging/GpuCrashDebuggingDesign.md), [NVIDIA/AMD/Epic research](GpuCrashDebugging/Research.md) and [staged plan](GpuCrashDebugging/ImplementationPlan.md); planning only, separate from frame capture |
 | external product precedent and rejected UX options | [Diagnostics Product And UX Research](ProductAndUxResearch.md) |
 | target layouts, interaction, and failure-state mockups | [Visual Design And Tool Wireframes](VisualDesign.md) |
 | promotion gate for historical automation or a separate tool | [Performance Dashboard Idea](DashboardIdea.md) |

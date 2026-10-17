@@ -199,7 +199,12 @@ void VulkanRenderDeviceServices::AcquireFrameBackBuffer()
 	{
 		m_commandRecordingContext->CancelFrame(m_currentFrameIndex);
 		m_renderHardwareInterface->RebuildSwapChainBackBufferViews();
+		return;
 	}
+
+	// Graph imports and direct presentation share a present-ready acquired image.
+	auto& commandList = static_cast<VulkanRenderCommandList&>(GetCurrentGraphicsCommandList());
+	m_renderHardwareInterface->TransitionCurrentBackBuffer(commandList.GetVulkanCommandBuffer(), ResourceState::Present);
 }
 
 RenderCommandList& VulkanRenderDeviceServices::GetCurrentGraphicsCommandList() noexcept

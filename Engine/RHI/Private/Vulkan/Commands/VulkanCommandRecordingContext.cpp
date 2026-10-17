@@ -83,7 +83,6 @@ RhiCommandRecordingLease VulkanCommandRecordingContext::Acquire(ERhiQueueType qu
 	    .FrameSlot = slot.FrameSlot,
 	    .ContextId = RhiCommandRecordingContextId{.Value = slot.ContextIndex},
 	    .Owner = owner,
-	    .DescriptorPage = RhiCommandRecordingDescriptorPage{.Capacity = slot.DescriptorPool->GetCapacity()},
 	    .RetirementToken = reusableAfter,
 	    .Begin = &BeginLease,
 	    .Close = &CloseLease,

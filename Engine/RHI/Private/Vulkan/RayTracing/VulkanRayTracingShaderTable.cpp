@@ -99,7 +99,7 @@ VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanG
 	    packingRules,
 	    bytes);
 
-	VkBufferCreateInfo bufferInfo{
+	const VkBufferCreateInfo bufferInfo{
 	    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 	    .pNext = nullptr,
 	    .flags = 0,
@@ -109,13 +109,12 @@ VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanG
 	    .queueFamilyIndexCount = 0,
 	    .pQueueFamilyIndices = nullptr};
 
-	rhi.ConfigureResourceQueueSharing(bufferInfo);
-
 	m_allocation = memoryAllocator.CreateBuffer(
 	    bufferInfo,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::HostUpload,
-	    desc.DebugName != nullptr ? std::wstring_view(desc.DebugName) : std::wstring_view(L"RHI_RayTracingShaderTable"));
+	    desc.DebugName != nullptr ? std::wstring_view(desc.DebugName) : std::wstring_view(L"RHI_RayTracingShaderTable"),
+	    capabilities.ShaderTableAlignmentInBytes);
 
 	if (m_allocation == nullptr || m_allocation->Buffer == VK_NULL_HANDLE || m_allocation->BufferDeviceAddress == 0 || !memoryAllocator.WriteAllocation(*m_allocation, bytes.data(), bytes.size()))
 	{

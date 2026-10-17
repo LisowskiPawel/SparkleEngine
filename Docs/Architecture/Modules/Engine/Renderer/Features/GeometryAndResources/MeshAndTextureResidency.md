@@ -4,7 +4,7 @@
 
 **Status:** current feature dossier; source-backed, not streaming-throughput, memory-pressure, or release evidence
 
-**Verified:** 2026-09-06 through committed `master` revision `c28b33bd`; current mesh, texture, residency, diagnostic, and submission owners inspected; executable source is unchanged from the earlier `8414b5dc` audit
+**Verified:** owner audit 2026-09-06 at `c28b33bd`; texture decode reservation and stale-generation cancellation updated 2026-10-17. Native pressure/lifetime qualification remains open.
 
 **Scope:** `REN-SCENE-08`, `REN-SCENE-09`, and the residency mechanics observed by `REN-DIAG-02` through `REN-DIAG-04`; owns asynchronous mesh/texture admission, CPU preparation/decode, upload, activation, generation replacement, cancellation, and completion-safe eviction
 
@@ -45,13 +45,15 @@ The benefit is bounded background work with generation-safe publication: frame p
 | Contract | Current default | Meaning and limit |
 | --- | --- | --- |
 | request backlog | 256 generations | admission count across non-retired work for that cache-owned `AssetResidency` instance |
-| decoded CPU bytes | 512 MiB | bytes held after preparation/decode and before upload completion releases CPU accounting |
+| decoded CPU bytes | 512 MiB | texture decode reservations plus published decoded bytes until upload completion; mesh accounting begins at prepared-payload publication |
 | pending upload bytes | 256 MiB | upload bytes admitted concurrently |
 | resident bytes | 2 GiB | accounted GPU-resident bytes for the cache-owned state machine |
 | mesh preparation concurrency | 16 tasks | maximum simultaneous immutable-mesh preparation tasks |
 | texture load concurrency | 16 tasks | maximum simultaneous cooked-texture read/decode tasks |
 
 These defaults are instantiated separately by the mesh and texture caches; they are not one global Renderer memory budget. The 16-task limits bound concurrency, not total queued assets or decoded memory. Default textures follow their synchronous bootstrap path and therefore must not be assumed to be covered by the asynchronous scene-texture state machine without evidence.
+
+Texture admission reserves the smaller decoded/upload limit before launching read/decode work. With current defaults this initially admits two 256 MiB reservations; publication replaces each reservation with its actual decoded size. Pressure leaves work unstarted. The decoder rejects excess mip bytes before allocating pixels, and cancellation retains the reservation until the task settles. Serialized input buffers and synchronous defaults are outside this decoded-byte counter; it is not a total-process memory limit.
 
 ## Mesh And Texture Routes
 
@@ -66,7 +68,7 @@ These defaults are instantiated separately by the mesh and texture caches; they 
 
 ## Failure Policy And Current Risks
 
-- Mesh backlog exhaustion returns an invalid/empty handle, while several mesh preparation/state/capacity failures are fatal. Texture admission, decode, upload, or invalid scene-generation failures are fatal in the inspected path. This asymmetry needs an intentional product policy before heavy-content release.
+- Mesh backlog exhaustion returns an invalid/empty handle, while several mesh preparation/state/capacity failures are fatal. Texture backlog, decode, upload, invalid scene-generation and individually oversized payload failures remain fatal. Temporary decoded-budget pressure defers task launch; completed tasks are consumed once. Only the selected scene generation remains wanted, even when old/new generations share a path. This adds no eviction, quality reduction or global budget.
 - Missing/not-yet-resident material textures resolve through semantic defaults where the consuming path requests them; the dossier does not claim that every absent mesh/texture has a visually acceptable placeholder.
 - Cooked textures reject bad magic, zero dimensions/mips/array size, unknown format/intent, unsupported dimension, wrong cubemap face count, invalid mip pitches/sizes, truncated data, trailing bytes, and invalid upload layout.
 - Resident accounting depends on valid upload tokens. A completion stall delays activation/eviction and can retain requests/resources; no timeout, priority, LRU, or pressure-driven eviction policy was found.

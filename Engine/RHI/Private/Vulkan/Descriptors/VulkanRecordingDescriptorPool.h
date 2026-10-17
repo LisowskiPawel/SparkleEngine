@@ -11,8 +11,6 @@ class VulkanRhi;
 class VulkanRecordingDescriptorPool final
 {
 public:
-	static constexpr std::uint32_t DescriptorSetCapacity = 256;
-
 	explicit VulkanRecordingDescriptorPool(VulkanRhi& rhi) noexcept;
 	~VulkanRecordingDescriptorPool() noexcept;
 
@@ -24,11 +22,11 @@ public:
 	void Reset() noexcept;
 	VkDescriptorSet AllocateSet(VkDescriptorSetLayout layout, std::span<const VkDescriptorPoolSize> requirements) noexcept;
 
-	std::uint32_t GetCapacity() const noexcept { return DescriptorSetCapacity; }
-
 	VkDescriptorPool GetNativePool() const noexcept { return m_pages.front().Pool; }
 
 private:
+	static constexpr std::uint32_t DescriptorSetsPerPage = 256;
+
 	struct PoolPage final
 	{
 		VkDescriptorPool Pool = VK_NULL_HANDLE;
@@ -43,5 +41,4 @@ private:
 
 	VulkanRhi* m_rhi = nullptr;
 	std::vector<PoolPage> m_pages;
-	std::uint32_t m_allocatedSetCount = 0;
 };

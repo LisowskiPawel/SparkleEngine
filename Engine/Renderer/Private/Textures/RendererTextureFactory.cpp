@@ -32,7 +32,8 @@ RendererTexture RendererTextureFactory::Create(const std::filesystem::path& text
 	    .ArraySize = textureUpload.GetArraySize(),
 	    .Dimension = textureUpload.Dimension};
 
-	RhiOwnedResourceHandle resource = m_resourceService.CreateTextureResource(resourceDesc, ResourceState::CopyDest, RhiMemoryCategory::Texture, RhiMemoryResidencyClass::DeviceLocal, debugName);
+	const ResourceState initialState = commandList.GetQueueType() == ERhiQueueType::Copy ? ResourceState::Common : ResourceState::CopyDest;
+	RhiOwnedResourceHandle resource = m_resourceService.CreateTextureResource(resourceDesc, initialState, RhiMemoryCategory::Texture, RhiMemoryResidencyClass::DeviceLocal, debugName);
 	if (!resource)
 	{
 		Diagnostics::Fatal(g_rendererTextureFactoryLogger, __FILE__, __LINE__, std::format("Texture resource creation failed for '{}'.", texturePath.string()));

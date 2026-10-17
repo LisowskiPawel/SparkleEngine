@@ -85,5 +85,5 @@ Thumbs.db
 # User-selected classic Sponza publisher acquisition (recipe stays tracked).
 /Projects/Showcase/Assets/Meshes/Sponza/Publisher/
 
-# Generated compiler databases; existing tracked files are unaffected.
+# Generated compiler databases.
 *.pdb

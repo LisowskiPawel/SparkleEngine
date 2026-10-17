@@ -239,7 +239,8 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateBuffe
     const VkBufferCreateInfo& bufferCreateInfo,
     RhiMemoryCategory category,
     RhiMemoryResidencyClass residencyClass,
-    std::wstring_view debugName) noexcept
+    std::wstring_view debugName,
+    VkDeviceSize minimumAlignment) noexcept
 {
 	if (m_impl == nullptr || m_impl->Allocator == nullptr)
 	{
@@ -254,7 +255,7 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateBuffe
 	m_rhi.ConfigureResourceQueueSharing(nativeCreateInfo);
 	VkBuffer buffer = VK_NULL_HANDLE;
 	VmaAllocation allocation = nullptr;
-	const VkResult result = vmaCreateBuffer(m_impl->Allocator, &nativeCreateInfo, &allocationCreateInfo, &buffer, &allocation, nullptr);
+	const VkResult result = vmaCreateBufferWithAlignment(m_impl->Allocator, &nativeCreateInfo, &allocationCreateInfo, minimumAlignment, &buffer, &allocation, nullptr);
 	if (!VulkanResult::Succeeded(result) || buffer == VK_NULL_HANDLE || allocation == nullptr)
 	{
 		return {};

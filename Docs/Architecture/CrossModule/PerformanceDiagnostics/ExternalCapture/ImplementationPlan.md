@@ -12,6 +12,8 @@ Finish the missing capture routes and prove the integrations already present in 
 
 ## Work This Plan
 
+For the current GPU hang blocker, follow [GPU Crash Debugging](../GpuCrashDebugging/ImplementationPlan.md) first. This frame-capture plan retains its provider scope; PIX assistance uses a separate session from Aftermath.
+
 | What to do | Working route |
 | --- | --- |
 | First action | [remaining provider discovery](#stage-0--close-remaining-provider-discovery): close only unresolved native completion, target/generation, interposer and configuration cells. |

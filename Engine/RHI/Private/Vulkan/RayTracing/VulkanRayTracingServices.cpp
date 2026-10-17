@@ -148,7 +148,8 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreateScratchBuffer(std::uint64
 	    bufferCreateInfo,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::DeviceLocal,
-	    debugName.empty() ? L"RayTracingScratch" : debugName);
+	    debugName.empty() ? L"RayTracingScratch" : debugName,
+	    scratchAlignment);
 
 	return record != nullptr ? MakeVulkanOwnedResourceHandle(std::move(record)) : RhiOwnedResourceHandle{};
 }
@@ -178,7 +179,8 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreateAccelerationStructureBuff
 	    bufferCreateInfo,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::DeviceLocal,
-	    debugName.empty() ? L"RayTracingAccelerationStructure" : debugName);
+	    debugName.empty() ? L"RayTracingAccelerationStructure" : debugName,
+	    asAlignment);
 
 	if (record == nullptr || record->Buffer == VK_NULL_HANDLE)
 	{

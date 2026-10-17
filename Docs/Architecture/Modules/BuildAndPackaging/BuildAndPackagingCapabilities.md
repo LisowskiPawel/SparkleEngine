@@ -206,9 +206,10 @@ declares that effect and shell invocation releases the calling artifact after
 starting the per-user shadow; progress and completion are read from the
 operation log rather than a parent process that would keep the target locked.
 
-`dist/` is reserved for future immutable staged packages and archives. Its name
-does not imply that release assembly exists: package manifests, signing,
-relocation, clean-machine verification, and the release workflow remain absent.
+Launcher keeps MSBuild file tracking enabled so unchanged inputs retain their
+compiled outputs. `CMake/Packaging/Package.ps1` owns release assembly; see
+[Packaging And Installation](PackagingAndInstallation.md) for its manifest,
+archive and qualification boundaries. Signing belongs to final publication.
 
 | ID | Capability | State | Exact current coverage and limit | Evidence |
 | --- | --- | --- | --- | --- |

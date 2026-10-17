@@ -152,7 +152,10 @@ void TextureCache::UnloadSceneTextures() noexcept
 	for (TextureRequest& request : m_requests)
 	{
 		request.Wanted = false;
-		(void) m_residency.Cancel(request.Generation);
+		if (!request.Execution.IsValid())
+		{
+			(void) m_residency.Cancel(request.Generation);
+		}
 	}
 
 	for (auto texture = m_pathTextures.begin(); texture != m_pathTextures.end();)

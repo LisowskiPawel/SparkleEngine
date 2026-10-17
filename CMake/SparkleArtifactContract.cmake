@@ -52,6 +52,7 @@ set(_sparkle_legacy_generated_paths
     "${SPARKLE_REPOSITORY_ROOT}/Scratch")
 file(GLOB _sparkle_legacy_build_roots LIST_DIRECTORIES TRUE "${SPARKLE_REPOSITORY_ROOT}/build-*")
 file(GLOB _sparkle_legacy_root_build_files LIST_DIRECTORIES FALSE
+    "${SPARKLE_REPOSITORY_ROOT}/*.pdb"
     "${SPARKLE_REPOSITORY_ROOT}/*.sln"
     "${SPARKLE_REPOSITORY_ROOT}/*.slnx"
     "${SPARKLE_REPOSITORY_ROOT}/*.vcxproj"

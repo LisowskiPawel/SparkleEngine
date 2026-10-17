@@ -37,7 +37,6 @@ void VulkanRecordingDescriptorPool::Reset() noexcept
 		page.Remaining = page.Capacity;
 		page.AllocatedSets = 0;
 	}
-	m_allocatedSetCount = 0;
 }
 
 bool VulkanRecordingDescriptorPool::CanAllocate(const PoolPage& page, std::span<const VkDescriptorPoolSize> requirements) noexcept
@@ -55,15 +54,14 @@ bool VulkanRecordingDescriptorPool::CanAllocate(const PoolPage& page, std::span<
 
 VkDescriptorSet VulkanRecordingDescriptorPool::AllocateSet(VkDescriptorSetLayout layout, std::span<const VkDescriptorPoolSize> requirements) noexcept
 {
-	// The global set cap bounds every page; per-page counts identify unused pages for reclamation.
-	if (layout == VK_NULL_HANDLE || m_allocatedSetCount >= DescriptorSetCapacity)
+	if (layout == VK_NULL_HANDLE)
 	{
 		return VK_NULL_HANDLE;
 	}
 
 	for (PoolPage& page : m_pages)
 	{
-		if (CanAllocate(page, requirements))
+		if (page.AllocatedSets < DescriptorSetsPerPage && CanAllocate(page, requirements))
 		{
 			return AllocateSet(page, layout, requirements);
 		}
@@ -102,7 +100,6 @@ VkDescriptorSet VulkanRecordingDescriptorPool::AllocateSet(PoolPage& page, VkDes
 		available->descriptorCount -= requirement.descriptorCount;
 	}
 	++page.AllocatedSets;
-	++m_allocatedSetCount;
 	return descriptorSet;
 }
 
@@ -143,7 +140,7 @@ void VulkanRecordingDescriptorPool::CreatePool(std::span<const VkDescriptorPoolS
 	    .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 	    .pNext = nullptr,
 	    .flags = 0,
-	    .maxSets = DescriptorSetCapacity,
+	    .maxSets = DescriptorSetsPerPage,
 	    .poolSizeCount = static_cast<std::uint32_t>(page.Capacity.size()),
 	    .pPoolSizes = page.Capacity.data()};
 

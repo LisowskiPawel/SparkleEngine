@@ -68,7 +68,7 @@ public:
 	explicit AssetResidency(AssetResidencyBudget budget = {}) noexcept;
 
 	std::optional<AssetGenerationHandle> BeginGeneration(std::uint64_t assetKey, std::uint32_t generation) noexcept;
-	bool BeginDecoding(AssetGenerationHandle handle) noexcept;
+	bool BeginDecoding(AssetGenerationHandle handle, std::uint64_t reservedDecodedBytes = 0) noexcept;
 	bool PublishReadyForUpload(AssetGenerationHandle handle, std::uint64_t decodedBytes, std::uint64_t uploadBytes) noexcept;
 	bool BeginUpload(AssetGenerationHandle handle) noexcept;
 	bool RecordUploadSubmission(AssetGenerationHandle handle, RhiSubmissionToken completionToken, std::uint64_t residentBytes) noexcept;
@@ -87,7 +87,6 @@ public:
 
 private:
 	AssetGenerationStatus* FindMutable(AssetGenerationHandle handle) noexcept;
-	bool CanPublishDecoded(std::uint64_t decodedBytes, std::uint64_t uploadBytes) const noexcept;
 	bool IsComplete(const RhiSubmissionState& completion, RhiCommandSubmissionService& submissions) const noexcept;
 	void ReleaseCpuBudget(AssetGenerationStatus& generation) noexcept;
 	void ReleaseBacklog(AssetGenerationStatus& generation) noexcept;

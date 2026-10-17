@@ -6,7 +6,7 @@
 
 **Scope:** the order to follow from the current release work through advanced graphics and portfolio delivery
 
-**Updated:** 2026-10-11; progress summarizes recorded source work, not release approval
+**Updated:** 2026-10-17; progress summarizes recorded work, not release approval
 
 Choose one task below, open its **implementation stage**, and copy that stage's prompt. The linked **design** explains the behavior and checks to preserve. This roadmap owns priority and brief progress; implementation plans own the steps.
 
@@ -20,15 +20,16 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 
 ## Where We Are And What Is Next
 
-**Next: verify the regenerated PD-3 archive, run PD-4's package checks, then the user's clean-machine rehearsal.** Open [reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), then [PD-3](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation). [Current package results and archive identity](../../artifacts/validation/releases/0.1.0/43219fc6-product-closure-20261012/candidate.json) distinguish completed checks from remaining acceptance.
+**Next: build GPU crash debugging tooling, starting at [GCD-0](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md#gcd-0--qualify-inputs-and-freeze-hooks).** Pause Modern Sponza hang investigation until native dumps, breadcrumbs and exact shader/source correlation pass GCD-4. Then resume PD-1, verify quit times and regenerate the archive. The product plan remains open; tooling is its next GPU-dependent prerequisite. The approved fresh-repository rehearsal on this laptop does not establish clean-OS or independent-adopter acceptance.
 
 | Current work | Design / acceptance reference | Implementation stages |
 | --- | --- | --- |
-| Qualify inputs, then finish the three-product archive | [Package design and reviewed inputs](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs) | [PD-3: package and installation](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation) |
-| Close missing product and source journeys | [Approved product scope](../Acceptance/FirstRelease.md#approved-release-scope) | [PD-1: Game/Editor](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells), [PD-2: source/Launcher](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-2--source-build-cook-and-launcher) |
-| After the archive: local diagnostics and closure | [Self-service and diagnostic contract](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md) | [PD-4: local diagnostics](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-4--support-incident-response-and-product-closure) |
+| Deliver GPU crash debugging before resuming hang investigation | [Aftermath, breadcrumbs and symbol design](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md) | [GCD-0 through GCD-4](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md) |
+| Fix and verify the remaining product/source journeys | [Approved product scope](../Acceptance/FirstRelease.md#approved-release-scope) | [PD-1: Game/Editor](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells), [PD-2: source/Launcher](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-2--source-build-cook-and-launcher) |
+| Freeze source and regenerate the three-product archive | [Package design](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs) | [PD-3](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation) |
+| Verify diagnostics and close the product reports | [Self-service contract](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md) | [PD-4](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-4--support-incident-response-and-product-closure) |
 
-**Renderer work:** continue [Lit/Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#required-execution-order). Recheck dated failures against current source before fixing their owner.
+**Renderer work:** [Lit/Reference recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#required-execution-order) retains its scope. GPU hang reproduction waits for GCD-4; independent work may continue. Recheck dated failures against current source before fixing their owner.
 
 **Final step before publication:** [FR-07](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-07--publish-and-verify) owns the deferred Windows certificate, signing/timestamping, signed-byte verification and public redistribution closure. These are outside PD-1 through PD-4.
 
@@ -36,15 +37,16 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 
 | Work | Implemented / recorded | Remaining |
 | --- | --- | --- |
-| Scope / FR-00 | Six product choices approved. | Technical scope and rights closure. |
-| Identity / FR-01 | Identity, dependency pins, notices; earlier Shipping/Empty baseline passed locally. | Historical asset rights, exact redistribution/helper/symbol admission and current-candidate qualification. |
-| PD-1: Game / Editor | Product shells, shared settings path, dedicated lens-effect passes; bounded build/startup checks. | Input/DPI, settings/failure routes, Editor edit/save, unsupported providers and visual proof. New effect toggles remain deferred. |
-| PD-2: source / Launcher | Typed sync/configure/build/cook/run/clean and owner-check routes exist. | Cold/warm and controlled failures; independent source-adopter rehearsal. |
-| PD-3 / FR-02: package | Six Shipping products pass the input audit. Original asset authorship recorded; compiled/SDK/Microsoft notices consolidated. ShaderCompiler no longer embeds SDK locations. [Current checks](../../artifacts/validation/releases/0.1.0/43219fc6-product-closure-20261012/candidate.json). | Regenerate after catalog/planner changes; qualify installed seven-map/offline/failure, LGPL replacement and user minimum-machine routes. Signing and public rights belong to FR-07. |
-| PD-4: diagnostics | Local export, retention, symbols and replacement/review tools; fixture checks. | Waiting for the PD-3 archive, then native crash/hang/GPU/privacy, self-service and replacement checks. Automatic crash/hang collection is unavailable. |
+| Scope / FR-00 | Six product choices approved. | Remaining technical qualification; public rights close at FR-07. |
+| Identity / FR-01 | Identity, dependency pins and notices implemented; earlier baseline recorded. | Qualify the final source candidate. |
+| GPU crash tooling / GCD | Design, [NVIDIA/AMD/Epic implementation study](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/Research.md) and staged plan prepared; investigation paused. | Qualify SDK/compiler inputs, implement collection and prove dump-to-source inspection on D3D12/Vulkan. |
+| PD-1: Game / Editor | Product shells/shared settings implemented; seven-map archive cook passed. | Native crash/quit regression, controls/settings/failure and Editor edit/save checks. |
+| PD-2: source / Launcher | Cold clone configured, synced and built the products/tools; Empty cook passed. Restored MSBuild tracking; unchanged full Launcher build took 7.62 s. Earlier owner/runner checks retain their recorded identities. | Current cook/failure/GUI-equivalence checks and independent adoption. |
+| PD-3 / FR-02: package | Unsigned archive `de0cf4bc…` verified; selected seven-map cook passed on this laptop. | Regenerate after fixes; final archive/offline/precompiled/Qt replacement and minimum-machine checks. |
+| PD-4: diagnostics | Twenty consent/privacy/symbol/review fixture checks passed against `de0cf4bc…`. | Real incident/self-service and valid replacement rehearsal; repeat affected checks on final bytes. Automatic crash/hang collection remains unavailable. |
 | FR-03 to FR-08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
 
-All six product reports remain blocked; implemented source is not release acceptance. The earlier local baseline at `fec29052c6f6195547f2062da9def86e520dc0df` does not qualify later changes. Reuse valid work, rerun checks affected by changed inputs, and keep future results bound to their exact candidate/archive. [Release gates](../Acceptance/FirstRelease.md#release-gates) decide shipment; [approved scope](../Acceptance/FirstRelease.md#approved-release-scope) fixes the promises.
+All six product reports remain blocked. Exact candidate records stay under local `artifacts/validation/releases/`; the [report contract](../Acceptance/FeatureCompletionReports.md) defines their required identity and evidence. Earlier results do not qualify changed binaries. Remove completed task instructions; delete the product plan when its remaining checks close. [Release gates](../Acceptance/FirstRelease.md#release-gates) still decide shipment.
 
 ## Ordered Delivery
 

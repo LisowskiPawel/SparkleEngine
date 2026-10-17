@@ -67,7 +67,6 @@ public:
 	void CommitBindingRevision(std::uint64_t bindingRevision) noexcept;
 
 	void UnloadSceneTextures() noexcept;
-	void UnloadAll() noexcept;
 
 	const RendererTexture* GetTexture(TextureId id) const noexcept;
 	const RendererTexture* ResolveDefaultSkyTexture() const noexcept;
@@ -117,12 +116,12 @@ private:
 	static constexpr std::size_t kMaximumConcurrentLoads = 16;
 
 	void LoadDefaultTextures(RenderCommandList& commandList, std::vector<RhiResourceHandle>& uploadedResources);
+	void UnloadAll() noexcept;
 	std::vector<RhiResourceHandle> LoadSceneTextures(const RenderTextureTable& textures, RenderCommandList& commandList);
 	bool HasPendingSceneTextureUploads() const noexcept;
 	void RequestTexture(const ResolvedTexturePath& source, std::uint32_t generation);
 	void SynchronizeSceneTextures(const RenderTextureTable& textures);
 	void LaunchPendingRequests();
-	void LaunchRequest(TextureRequest& request);
 	void ConsumeCompletedRequests() noexcept;
 	void UploadReadyTextures(RenderCommandList& commandList, std::vector<RhiResourceHandle>& uploadedResources);
 	TextureRequest* FindRequest(const TextureKey& cacheKey, std::uint32_t generation) noexcept;

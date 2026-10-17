@@ -34,7 +34,7 @@ Outputs stay under `artifacts/releases/<version>/`. Assembly starts under `.part
 
 Core owns manifest-relative paths and product size/hash verification. Launcher prefers its installed location over the current directory and rejects checkout overrides. First launch verifies and transactionally seeds `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`: project recipes into `Source/Showcase/`, the immutable `Engine/Cooked/` baseline into `Cooked/`. Initial shader readiness verifies the copied baseline against the package manifest without a recook signal; later recooks require their completion signal. Repeat launches preserve selections; a changed or incomplete package identity requires an explicit store reset. Sync/cook/run use the existing typed owners and packaged helpers; source build/cleanup actions are unavailable in installed mode. Missing or malformed package metadata cannot select a checkout.
 
-The installed route is implemented but not accepted. Exact payload rights, CRT/helper closure, symbols, selected-map cooking, private-path inspection and LGPL replacement remain unqualified. The maintainer will run CHK-PKG-02 after a verified archive is ready.
+The installed route is implemented but not accepted. The [roadmap](../../../Strategy/Roadmap.md#release-progress) summarizes qualified archive checks and remaining product, replacement and adoption work. Run CHK-PKG-02 against the archive regenerated after those fixes; public redistribution and publisher signing remain FR-07 work.
 
 ## At A Glance
 
