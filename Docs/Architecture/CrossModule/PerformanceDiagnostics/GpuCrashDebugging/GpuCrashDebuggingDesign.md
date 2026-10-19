@@ -187,6 +187,8 @@ These local criteria refine `FCR-RHI-05`, `FCR-RHI-06`, `FCR-SHDR-01` and `FCR-P
 
 Use non-sensitive, disposable fault fixtures. Retain recipes/patches and module/shader hashes privately; remove injection source, shaders and executables before handoff. Recheck final production module identity after removal and repeat affected checks if it changes. No permanent crash menu, fault switch or source-controlled dump archive.
 
+**Offline diagnosis, 2026-10-19 (`ITER-GCD-04-03`):** the pinned SDK and formatter both load the matched shader and NVIDIA debug data but retain `comp.10000.spv:0` for PC `0x2f0`. Explicit missing-input controls return no mapping; the earlier dump with the same shader resolves PC `0x2e0` to source line 23. A missing file/search path is ruled out; the exact compiler/driver attribution defect remains unresolved. Results and a private reproducer are retained under `artifacts/validation/gpu-crash-debugging/20261019-gcd-4/`; candidate verdicts are under `artifacts/validation/releases/0.1.0/ITER-GCD-04-03/features/`. No new fault was run and no source line was inferred. The unchanged source-line gate remains blocked.
+
 **Tool limits:** NVIDIA formatter 2026.3.1 rejected Unicode working/output paths; use ASCII inspector working/output paths. Sparkle's Unicode manifest launch was qualified through the actual GUI. Windows PowerShell 5.1 exports need a short local destination; excessive path length can leave a `.partial` export, while the original incident remains intact. PIX was exercised separately with Aftermath off. Unknown frame/page-fault facts stay unknown.
 
 ## Change Budget And Stop Rules
