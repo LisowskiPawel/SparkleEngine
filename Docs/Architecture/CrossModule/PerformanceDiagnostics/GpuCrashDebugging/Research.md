@@ -1,6 +1,6 @@
 # GPU Crash Debugging Research
 
-[Docs](../../../../README.md) / [Design decisions](GpuCrashDebuggingDesign.md) / [Implementation stages](ImplementationPlan.md)
+[Docs](../../../../README.md) / [Design decisions](GpuCrashDebuggingDesign.md) / [Delivery status](../../../../Strategy/Roadmap.md#release-progress)
 
 **Status:** primary-source research and comparison, inspected 2026-10-17. Not an implementation or native acceptance result.
 
@@ -14,7 +14,7 @@
 4. Preserve full shader debug information and exact active bytes. NVIDIA and AMD do not accept identical symbol formats; a CPU PDB does not supply GPU shader mapping.
 5. Separate GPU-observed progress, CPU recording history and shader fault attribution. Missing page-fault data does not prove an infinite loop; the last breadcrumb does not prove the faulty command.
 
-The [design](GpuCrashDebuggingDesign.md#architecture-and-lifetimes) owns Sparkle's selected behavior. This page records the evidence, alternatives and limitations behind it. The [decision crosswalk](#decision-crosswalk) links findings to delivery and checks.
+The [design](GpuCrashDebuggingDesign.md#architecture-and-lifetimes) owns Sparkle's selected behavior. This page records the evidence, alternatives and limitations behind it. The [decision crosswalk](#decision-crosswalk) links findings to design checks.
 
 Read by subject: [NVIDIA](#nvidia-sdk-sample-versus-production-rhi), [AMD](#amd-analysis-breadcrumbs-and-resource-history), [Epic](#epic-engine-level-responsibilities), [presentations](#technical-presentations-and-their-limits), [comparison](#mechanism-comparison), [fault matrix](#fault-and-evidence-matrix).
 
@@ -32,7 +32,7 @@ Repository observations use immutable commits, not their current default branche
 | AMD FidelityFX SDK 1.1.4, Breadcrumbs 1.0.1 | [c6efa6bf7f2027b3ec94f28578bb5965eabb9e55](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/tree/c6efa6bf7f2027b3ec94f28578bb5965eabb9e55) | Read component, public/private headers and DX12/Vulkan lowering. This version contains the studied library; current HEAD is not substituted for it. |
 | Epic Unreal Engine | Public UE 5.5 RHI API; UE 5.6 crash guide; current shader/reporting documentation | Documentation/API inspection only. No authenticated Epic source checkout was available; private backend implementation and teardown details were not inspected. Do not describe them as audited source. |
 
-Local Sparkle source was rechecked at `343d9e4fe112f10e5b05a46c45532b8a8a061d62` plus the worktree. Existing owners are listed in the [design's source audit](GpuCrashDebuggingDesign.md#current-route-and-gaps). This iteration changes documentation only and leaves GPU hang reproduction paused.
+Local Sparkle source was rechecked at `343d9e4fe112f10e5b05a46c45532b8a8a061d62` plus the worktree. Current owners are listed in the [design](GpuCrashDebuggingDesign.md#implementation-owners). This research iteration changed documentation only and ran no GPU faults.
 
 Local integration constraints: `FrameExecutionDiagnostics` checks RHI event capability; pass/chunk admission also checks existing marker verbosity. D3D12 scope calls currently compile under the PIX-event guard; Vulkan uses debug-utils scopes. Therefore native Aftermath code alone would not establish baseline breadcrumbs. The design adds one neutral scope-admission requirement at those existing owners, independent of timing/capture/validation, and keeps vendor conditions out of frame orchestration.
 
@@ -52,13 +52,13 @@ That SDK release also documents richer resource timelines on R615 and known attr
 
 The [D3D12 tracker](https://github.com/NVIDIA/nsight-aftermath-samples/blob/d3585be2c58b1c23ff29a77713b0d04c2de8b70a/D3D12HelloNsightAftermath/NsightAftermathGpuCrashTracker.cpp) demonstrates callback registration, synchronized shader-debug storage, marker resolution, raw dump writing and JSON decoding. It opts into deferred debug callbacks and writes/decodes during callbacks. It also includes command-line context. These are useful demonstrations, but increase failure-path work and privacy exposure if copied wholesale.
 
-**Transfer:** register the necessary callbacks; retain NVIDIA shader-debug identifiers; preserve the raw dump and its candidate identity. **Reject:** callback-time JSON generation, arbitrary command-line capture, unbounded shader-debug maps and current-directory publication. Sparkle's task executor owns asynchronous file work, but inspection found that current TaskScope registration requires its owner thread, workers cannot submit to their executor, and scheduler allocation failure can call Fatal. Direct callback-side Launch is therefore unsuitable. A parked writer or private subsystem worker also violates its [Tasks standard](../../../../Engineering/Modules/Tasks.md). The design therefore selects the Tasks-owned [prepared dispatch contract](../../MultithreadedEngine.md#prepared-task-dispatch): pre-admit on the scope owner, then notify without allocation or a parked worker. GCD-2 implements it; this decision is not execution proof. SDK completion, sink-borrow settlement and durable writes remain separate obligations.
+**Transfer:** register the necessary callbacks; retain NVIDIA shader-debug identifiers; preserve the raw dump and its candidate identity. **Reject:** callback-time JSON generation, arbitrary command-line capture, unbounded shader-debug maps and current-directory publication. Sparkle's task executor owns asynchronous file work, but inspection found that current TaskScope registration requires its owner thread, workers cannot submit to their executor, and scheduler allocation failure can call Fatal. Direct callback-side Launch is therefore unsuitable. A parked writer or private subsystem worker also violates its [Tasks standard](../../../../Engineering/Modules/Tasks.md). The design therefore selects the Tasks-owned [prepared dispatch contract](../../MultithreadedEngine.md#prepared-task-dispatch): pre-admit on the scope owner, then notify without allocation or a parked worker. Asynchronous behavior needs local executable evidence. SDK completion, sink-borrow settlement and durable writes remain separate obligations.
 
 The [sample application](https://github.com/NVIDIA/nsight-aftermath-samples/blob/d3585be2c58b1c23ff29a77713b0d04c2de8b70a/D3D12HelloNsightAftermath/D3D12HelloNsightAftermath.cpp) polls dump status for a three-second window after loss and keeps four frames of application-managed marker history. This illustrates asynchronous finalization and bounded history; neither number proves safety for Sparkle's parallel queues. Use its controlled-fault idea only in disposable validation fixtures. Sparkle's collection budget bounds cooperative waits, not an unreturning SDK/driver/OS call. External test termination is containment, not proof of successful finalization.
 
 The [Vulkan tracker](https://github.com/NVIDIA/nsight-aftermath-samples/blob/d3585be2c58b1c23ff29a77713b0d04c2de8b70a/VkHelloNsightAftermath/NsightAftermathGpuCrashTracker.cpp) repeats the same collector responsibilities for Vulkan. The [Vulkan application](https://github.com/NVIDIA/nsight-aftermath-samples/blob/d3585be2c58b1c23ff29a77713b0d04c2de8b70a/VkHelloNsightAftermath/VkHelloNsightAftermath.cpp) supplies checkpoints and device diagnostics configuration. Transfer the native extension/configuration order; do not copy automatic checkpoint/call-stack settings, sample startup plumbing or feature-reducing crash controls into normal application code.
 
-The official [SDK sample index](https://docs.nvidia.com/nsight-aftermath/SDK/samples.html) also points to Nvpro's `crash_aftermath`. Its [pinned scenarios](https://github.com/nvpro-samples/vk_mini_samples/blob/1ca74a9c2b459848fded141dc14392dcc9e88029/samples/crash_aftermath/README.md), [integration](https://github.com/nvpro-samples/vk_mini_samples/blob/1ca74a9c2b459848fded141dc14392dcc9e88029/samples/crash_aftermath/crash_aftermath.cpp) and [Slang shader](https://github.com/nvpro-samples/vk_mini_samples/blob/1ca74a9c2b459848fded141dc14392dcc9e88029/samples/crash_aftermath/shaders/crash_aftermath.slang) distinguish timeout loops from buffer-device-address faults and direct/indirect stale pointers. Side effects keep a test loop from disappearing under optimization. Use that distinction when selecting disposable GCD-4 fixtures; do not copy the permanent crash UI, randomized address writes or registry instructions. Sample reproducibility claims still need qualification on Sparkle's exact compiler/driver.
+The official [SDK sample index](https://docs.nvidia.com/nsight-aftermath/SDK/samples.html) also points to Nvpro's `crash_aftermath`. Its [pinned scenarios](https://github.com/nvpro-samples/vk_mini_samples/blob/1ca74a9c2b459848fded141dc14392dcc9e88029/samples/crash_aftermath/README.md), [integration](https://github.com/nvpro-samples/vk_mini_samples/blob/1ca74a9c2b459848fded141dc14392dcc9e88029/samples/crash_aftermath/crash_aftermath.cpp) and [Slang shader](https://github.com/nvpro-samples/vk_mini_samples/blob/1ca74a9c2b459848fded141dc14392dcc9e88029/samples/crash_aftermath/shaders/crash_aftermath.slang) distinguish timeout loops from buffer-device-address faults and direct/indirect stale pointers. Side effects keep a test loop from disappearing under optimization. Use that distinction when selecting disposable fault fixtures; do not copy the permanent crash UI, randomized address writes or registry instructions. Sample reproducibility claims still need qualification on Sparkle's exact compiler/driver.
 
 ### NVRHI Ownership And Marker Retention
 
@@ -137,7 +137,7 @@ The official [Unreal Fest 2023 session](https://www.youtube.com/watch?v=CyrGLMmV
 
 The inspected Sparkle Slang backend separates diagnostic argument strings from actual compiler API options. Logging `-g2` cannot establish that it was applied. Source review must trace the actual option and exported blob; only emitted-artifact inspection and the native inspector probe can qualify source mapping. The plan defers those executable checks to its final validation stage rather than making them a circular prerequisite to building the collector.
 
-Keep source-path remapping, transitive includes, entry points, specialization/permutation and optimization in the bundle identity. An inspector displaying the correct source file is insufficient if it belongs to another shader binary. Source mapping in optimized code can be many-to-one; GCD-4 uses an identifiable fault expression without requiring a fictitious unique line for every possible production crash.
+Keep source-path remapping, transitive includes, entry points, specialization/permutation and optimization in the bundle identity. An inspector displaying the correct source file is insufficient if it belongs to another shader binary. Source mapping in optimized code can be many-to-one; controlled validation uses an identifiable fault expression without requiring a fictitious unique line for every possible production crash.
 
 ## Technical Presentations And Their Limits
 
@@ -172,20 +172,20 @@ Supporting contracts: [DRED and its caveats](https://learn.microsoft.com/en-us/w
 
 Candidate transfer decisions below are enacted only by the [design](GpuCrashDebuggingDesign.md), not by importing reference code. Existing `AC/FM/CHK-GCD` identities remain the acceptance authority.
 
-| Decision | Evidence / tradeoff | Design consequence | Stage / check |
+| Decision | Evidence / tradeoff | Design consequence | Check |
 | --- | --- | --- | --- |
-| `D-GCD-01` One startup and collection owner | SDK order; NVRHI device boundary | One pre-device RHI session, existing Application/Renderer composition; no pass-level vendor branches | GCD-0/2; CHK-01/07 |
-| `D-GCD-02` Minimal failure callback | NVIDIA tracker shows decoding/file work in the callback; Sparkle Tasks owns execution | Contain callback failures; bound bytes/count; prepare one scoped Tasks dispatch before callbacks, then coalesce BlockingIo writes; no new thread; external analysis | GCD-2; CHK-05/06 |
-| `D-GCD-03` Stable semantic tokens | NVIDIA histories and Epic/FFX lifetime concerns | Immutable session dictionary, collision-safe identity, no frame-age eviction; no per-frame token growth | GCD-2; CHK-04/05 |
-| `D-GCD-04` Begin/end observation truth | Epic/FFX markers, Vulkan stage queries and local verbosity gates | Admit baseline scopes independently of timing/capture; instrument both boundaries; CPU End is not GPU completion; no fabricated total order or unique Vulkan frame | GCD-2/4; CHK-04/07 |
-| `D-GCD-05` Full exact symbol bundle | NVIDIA lookup; AMD format differences; Epic generation/export split | Actual compiler API options, exact exported/loaded code, native debug IDs separate from SHA-256 and CPU identity; native mapping qualified only in GCD-4 | GCD-1/4; CHK-03 |
-| `D-GCD-06` Preserve named resource clues | RGD resource history; Aftermath resource metadata; existing Sparkle names | Reuse backend naming/driver tracking; retain VA/type/lifetime facts without another allocation journal | GCD-2/4; CHK-02/04 |
-| `D-GCD-07` Collect debug data without a hidden SDK cache | Installed SDK's deferred-callback memory tradeoff | Immediate `.nvdbg` callbacks, bounded queued writes; measure SDK/driver overhead separately | GCD-0/2/4; CHK-05/06/07 |
-| `D-GCD-08` Bounded terminal failure | NVIDIA asynchronous finalization; Epic report separation | Collect before immediate fatal abort; cooperative budget, quiescence and settled writes; blocked native calls need external test containment, no recovery/UAF | GCD-2/4; CHK-05/06 |
-| `D-GCD-09` Explicit diagnostic policy | Aftermath limitations, error-reporting contract and observer effects | No active PIX/capturer combination; shader-error reporting enabled, automatic call stacks off; fault-policy changes recorded | GCD-0/3/4; CHK-01/07 |
-| `D-GCD-10` Keep ordinary development thin | NVRHI optional dependency; existing Sparkle feature enclosure/artifact contract | SDK absent from ordinary builds; canonical Launcher stays outside diagnostic variants; no new registry, shader database, runtime or settings family | GCD-0/2/4; CHK-07 |
-| `D-GCD-11` Local artifacts with explicit consent | Epic producer/client/server split; raw vendor data | Prebuilt safe context, private raw files, sanitized default export; no uploader/support service | GCD-2/3; CHK-06 |
-| `D-GCD-12` Test limitations as well as successes | All sources distinguish clues from causes | Wrong symbols, lagging queues, missing names/page faults and external-reset cases remain inconclusive when appropriate | GCD-4; CHK-02/03/04/05 |
+| `D-GCD-01` One startup and collection owner | SDK order; NVRHI device boundary | One pre-device RHI session, existing Application/Renderer composition; no pass-level vendor branches | CHK-01/07 |
+| `D-GCD-02` Minimal failure callback | NVIDIA tracker shows decoding/file work in the callback; Sparkle Tasks owns execution | Contain callback failures; bound bytes/count; prepare one scoped Tasks dispatch before callbacks, then coalesce BlockingIo writes; no new thread; external analysis | CHK-05/06 |
+| `D-GCD-03` Stable semantic tokens | NVIDIA histories and Epic/FFX lifetime concerns | Immutable session dictionary, collision-safe identity, no frame-age eviction; no per-frame token growth | CHK-04/05 |
+| `D-GCD-04` Begin/end observation truth | Epic/FFX markers, Vulkan stage queries and local verbosity gates | Admit baseline scopes independently of timing/capture; instrument both boundaries; CPU End is not GPU completion; no fabricated total order or unique Vulkan frame | CHK-04/07 |
+| `D-GCD-05` Full exact symbol bundle | NVIDIA lookup; AMD format differences; Epic generation/export split | Actual compiler API options, exact exported/loaded code, native debug IDs separate from SHA-256 and CPU identity; source mapping needs native qualification | CHK-03 |
+| `D-GCD-06` Preserve named resource clues | RGD resource history; Aftermath resource metadata; existing Sparkle names | Reuse backend naming/driver tracking; retain VA/type/lifetime facts without another allocation journal | CHK-02/04 |
+| `D-GCD-07` Collect debug data without a hidden SDK cache | Installed SDK's deferred-callback memory tradeoff | Immediate `.nvdbg` callbacks, bounded queued writes; measure SDK/driver overhead separately | CHK-05/06/07 |
+| `D-GCD-08` Bounded terminal failure | NVIDIA asynchronous finalization; Epic report separation | Collect before immediate fatal abort; cooperative budget, quiescence and settled writes; blocked native calls need external test containment, no recovery/UAF | CHK-05/06 |
+| `D-GCD-09` Explicit diagnostic policy | Aftermath limitations, error-reporting contract and observer effects | No active PIX/capturer combination; shader-error reporting enabled, automatic call stacks off; fault-policy changes recorded | CHK-01/07 |
+| `D-GCD-10` Keep ordinary development thin | NVRHI optional dependency; existing Sparkle feature enclosure/artifact contract | SDK absent from ordinary builds; canonical Launcher stays outside diagnostic variants; no new registry, shader database, runtime or settings family | CHK-07 |
+| `D-GCD-11` Local artifacts with explicit consent | Epic producer/client/server split; raw vendor data | Prebuilt safe context, private raw files, sanitized default export; no uploader/support service | CHK-06 |
+| `D-GCD-12` Test limitations as well as successes | All sources distinguish clues from causes | Wrong symbols, lagging queues, missing names/page faults and external-reset cases remain inconclusive when appropriate | CHK-02/03/04/05 |
 
 `CHK-01` through `CHK-07` above abbreviate the design's `CHK-GCD-01` through `CHK-GCD-07` only; they are not new check identities.
 
@@ -208,7 +208,7 @@ Candidate transfer decisions below are enacted only by the [design](GpuCrashDebu
 
 ## Cost And Qualification Questions
 
-The initial limits in the design are **proposed Sparkle budgets**, not values validated by these sources. Keep them distinct from SDK/driver-owned memory, which the application cannot cap with its own queue limit. GCD-0 verifies API/input compatibility; GCD-4 measures the actual workloads. A measured overflow or incompatible lifetime reopens the owning design decision before increasing complexity.
+The design's application-owned budgets are not values validated by these sources. Keep them distinct from SDK/driver-owned memory, which the application cannot cap with its queue limit. Input compatibility and workload costs need local evidence. A measured overflow or incompatible lifetime reopens the owning design decision before increasing complexity.
 
 Measure these separately: cold and warm shader preparation; CPU recording time; GPU frame time; application/driver memory; `.nvdbg`/symbol/incident sizes; writer throughput; fault-to-callback latency; callback-to-durable-publication latency; normal and faulted shutdown. Use matched feature settings and optimization. No percentage taken from a vendor sample, paper or AAA-engine measurement becomes a Sparkle budget.
 
@@ -216,4 +216,4 @@ Required implementation checks must include immediate concurrent shader-debug ca
 
 ## What This Study Does Not Establish
 
-No SDK collector was enabled, driver setting changed, GPU fault injected or paused hang reproduced. No AMD hardware route, Epic private source or inaccessible video/PDF content was qualified. Current SDK/runtime redistribution remains a separate input-admission task. The production stages and all native dump-to-source criteria remain open.
+This research did not enable an SDK collector, change driver settings or inject a GPU fault. It does not qualify AMD hardware, Epic private source, inaccessible sources or SDK redistribution. Current implementation and native qualification are recorded in the [design and candidate reports](GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures).

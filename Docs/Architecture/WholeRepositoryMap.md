@@ -25,7 +25,7 @@ Target capability belongs to [Principal Graphics Requirements](../Strategy/Requi
 - [World Coordinate, Units, and Transform Contract](Decisions/WorldCoordinateAndUnits.md) owns spatial semantics.
 - [Editor Viewport Camera Architecture](Decisions/EditorViewportCamera.md) owns the editor-view and scene-camera split.
 - [Shader System Architecture](CrossModule/ShaderSystem/ShaderSystemDesign.md) owns the enduring authoring, compilation, cooked-artifact, runtime-materialization, and graph-use design. The [capability inventory](Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md) owns the dated current-source view, and the [delivery plan](CrossModule/ShaderSystem/ImplementationPlan.md) owns phase order.
-- [GPU Crash Debugging Design](CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md) owns Aftermath collection, breadcrumbs, shader/source correlation and remaining qualification; candidate scope and evidence stay with that owner.
+- [GPU Crash Debugging Design](CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md) owns Aftermath collection, breadcrumbs and shader/source correlation; it links the qualified candidate and its limits.
 - [Bistro and San Miguel Acceptance Workloads](../Acceptance/GraphicsWorkloads.md) owns workload gates and evidence meaning.
 
 Dated assessments retain the source state they observed. They are not silently rewritten into current architecture claims.

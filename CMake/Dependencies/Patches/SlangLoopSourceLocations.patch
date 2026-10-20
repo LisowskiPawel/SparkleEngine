@@ -1,0 +1,113 @@
+Slang 2026.8 loop source locations
+Base: d88cc8fff35baf96cf30d242b2572564cf8043b6
+License: Apache-2.0 WITH LLVM-exception (upstream LICENSE)
+
+Preserve authored loop locations on synthesized SPIR-V control-flow blocks.
+No source-line inference in Sparkle, no optimization or compiler substitution.
+
+diff --git a/source/slang/slang-emit-spirv.cpp b/source/slang/slang-emit-spirv.cpp
+index 1e141e6..d1e5a5e 100644
+--- a/source/slang/slang-emit-spirv.cpp
++++ b/source/slang/slang-emit-spirv.cpp
+@@ -7441,8 +7441,45 @@ struct SPIRVEmitContext : public SourceEmitterBase, public SPIRVEmitSharedContex
+         }
+     }
+ 
++    void emitLoopSourceLocation(IRLoop* loopInst, SpvInstParent* parent)
++    {
++        auto debugLevel = m_targetProgram->getOptionSet().getDebugInfoLevel();
++        auto location = loopInst->findDecoration<IRDebugLocationDecoration>();
++        if (debugLevel == DebugInfoLevel::None || !location)
++            return;
++
++        if (debugLevel == DebugInfoLevel::Minimal)
++        {
++            auto source = as<IRDebugSource>(location->getSource());
++            auto line = as<IRIntLit>(location->getLine())->getValue();
++            auto col = as<IRIntLit>(location->getCol())->getValue();
++            emitInst(
++                parent,
++                nullptr,
++                SpvOpLine,
++                source->getFileName(),
++                SpvLiteralInteger::from32((uint32_t)line),
++                SpvLiteralInteger::from32((uint32_t)col));
++            return;
++        }
++
++        emitOpDebugLine(
++            parent,
++            nullptr,
++            m_voidType,
++            getNonSemanticDebugInfoExtInst(),
++            location->getSource(),
++            location->getLine(),
++            location->getLine(),
++            location->getCol(),
++            location->getCol());
++    }
++
+     void emitLoopHeaderBlock(IRLoop* loopInst, SpvInst* loopHeaderBlock)
+     {
++        // Phi nodes are already emitted; line metadata must follow them.
++        emitLoopSourceLocation(loopInst, loopHeaderBlock);
++
+         bool hasBackJump = false;
+         for (auto use = loopInst->getTargetBlock()->firstUse; use; use = use->nextUse)
+         {
+diff --git a/source/slang/slang-ir-spirv-legalize.cpp b/source/slang/slang-ir-spirv-legalize.cpp
+index e0e5553..db84ee8 100644
+--- a/source/slang/slang-ir-spirv-legalize.cpp
++++ b/source/slang/slang-ir-spirv-legalize.cpp
+@@ -1396,6 +1396,14 @@ struct SPIRVLegalizationContext : public SourceEmitterBase
+                 // Restore the target block
+                 loop->block.set(t);
+ 
++                // Keep the authored loop location on the generated back edge.
++                if (auto location = loop->findDecoration<IRDebugLocationDecoration>())
++                {
++                    auto line = as<IRIntLit>(location->getLine())->getValue();
++                    auto col = as<IRIntLit>(location->getCol())->getValue();
++                    builder.emitDebugLine(location->getSource(), line, line, col, col);
++                }
++
+                 // Branch to the target in our new continue block
+                 auto branch = builder.emitBranch(t, ps.getCount(), ps.getBuffer());
+                 addToWorkList(branch);
+diff --git a/source/slang/slang-lower-to-ir.cpp b/source/slang/slang-lower-to-ir.cpp
+index d1b9009..071151d 100644
+--- a/source/slang/slang-lower-to-ir.cpp
++++ b/source/slang/slang-lower-to-ir.cpp
+@@ -3799,6 +3799,8 @@ Type* getThisParamTypeForCallable(IRGenContext* context, DeclRef<Decl> callableD
+ 
+ struct StmtLoweringVisitor;
+ 
++void maybeAddDebugLocationDecoration(IRGenContext* context, IRInst* inst);
++
+ void maybeEmitDebugLine(
+     IRGenContext* context,
+     StmtLoweringVisitor* visitor,
+@@ -7822,6 +7824,7 @@ struct StmtLoweringVisitor : StmtVisitor<StmtLoweringVisitor>
+         // and then insert the block for the head.
+ 
+         auto loopInst = builder->emitLoop(loopHead, breakLabel, continueLabel);
++        maybeAddDebugLocationDecoration(context, loopInst);
+ 
+         insertBlock(loopHead);
+ 
+@@ -7929,6 +7932,7 @@ struct StmtLoweringVisitor : StmtVisitor<StmtLoweringVisitor>
+         // and then insert the block for the head.
+ 
+         auto loopInst = builder->emitLoop(loopHead, breakLabel, continueLabel);
++        maybeAddDebugLocationDecoration(context, loopInst);
+ 
+         addLoopDecorations(loopInst, stmt);
+ 
+@@ -7988,6 +7992,7 @@ struct StmtLoweringVisitor : StmtVisitor<StmtLoweringVisitor>
+         // and then insert the block for the head.
+ 
+         auto loopInst = builder->emitLoop(loopHead, breakLabel, continueLabel);
++        maybeAddDebugLocationDecoration(context, loopInst);
+ 
+         addLoopDecorations(loopInst, stmt);
+ 

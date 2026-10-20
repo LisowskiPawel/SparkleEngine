@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "Core/Public/Files/FileUtils.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <format>
 #include <fstream>
@@ -13,19 +14,22 @@ namespace Files
 		std::ifstream input(path, std::ios::binary | std::ios::ate);
 		if (!input)
 		{
-			outErrorMessage = std::format("Failed to open '{}'", path.string());
+			const std::string displayPath = Strings::ToNarrow(path.wstring());
+			outErrorMessage = std::format("Failed to open '{}'", displayPath);
 			return false;
 		}
 
 		const std::ifstream::pos_type fileSize = input.tellg();
 		if (fileSize <= 0)
 		{
-			outErrorMessage = std::format("'{}' is empty", path.string());
+			const std::string displayPath = Strings::ToNarrow(path.wstring());
+			outErrorMessage = std::format("'{}' is empty", displayPath);
 			return false;
 		}
 		if (static_cast<std::uint64_t>(fileSize) > (std::numeric_limits<std::size_t>::max)())
 		{
-			outErrorMessage = std::format("'{}' is too large to load", path.string());
+			const std::string displayPath = Strings::ToNarrow(path.wstring());
+			outErrorMessage = std::format("'{}' is too large to load", displayPath);
 			return false;
 		}
 
@@ -33,7 +37,8 @@ namespace Files
 		input.seekg(0, std::ios::beg);
 		if (!input.read(reinterpret_cast<char*>(outBytes.data()), fileSize))
 		{
-			outErrorMessage = std::format("Failed to read '{}'", path.string());
+			const std::string displayPath = Strings::ToNarrow(path.wstring());
+			outErrorMessage = std::format("Failed to read '{}'", displayPath);
 			outBytes.clear();
 			return false;
 		}
@@ -47,14 +52,16 @@ namespace Files
 		std::ifstream input(path, std::ios::binary | std::ios::ate);
 		if (!input)
 		{
-			outErrorMessage = std::format("Failed to open '{}'", path.string());
+			const std::string displayPath = Strings::ToNarrow(path.wstring());
+			outErrorMessage = std::format("Failed to open '{}'", displayPath);
 			return false;
 		}
 
 		const std::ifstream::pos_type fileSize = input.tellg();
 		if (fileSize == std::ifstream::pos_type(-1) || static_cast<std::uint64_t>(fileSize) > maximumBytes)
 		{
-			outErrorMessage = std::format("Failed to determine a supported size for '{}'", path.string());
+			const std::string displayPath = Strings::ToNarrow(path.wstring());
+			outErrorMessage = std::format("Failed to determine a supported size for '{}'", displayPath);
 			return false;
 		}
 
@@ -63,7 +70,8 @@ namespace Files
 		if (!outText.empty() && !input.read(outText.data(), static_cast<std::streamsize>(outText.size())))
 		{
 			outText.clear();
-			outErrorMessage = std::format("Failed to read '{}'", path.string());
+			const std::string displayPath = Strings::ToNarrow(path.wstring());
+			outErrorMessage = std::format("Failed to read '{}'", displayPath);
 			return false;
 		}
 		outErrorMessage.clear();

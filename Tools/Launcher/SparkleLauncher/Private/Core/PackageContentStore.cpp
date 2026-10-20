@@ -14,6 +14,91 @@
 
 namespace SparkleLauncher
 {
+	struct SeedFile final
+	{
+		std::filesystem::path Source;
+		std::filesystem::path Relative;
+		std::string_view Entry;
+	};
+
+	static std::error_code CopyContentStoreSeed(const SeedFile& seed, const std::filesystem::path& transaction)
+	{
+		std::error_code errorCode;
+		const auto destination = transaction / seed.Relative;
+		std::filesystem::create_directories(destination.parent_path(), errorCode);
+		if (errorCode)
+		{
+			return errorCode;
+		}
+
+		std::filesystem::copy_file(seed.Source, destination, std::filesystem::copy_options::none, errorCode);
+		if (errorCode)
+		{
+			return errorCode;
+		}
+
+		std::filesystem::permissions(destination, std::filesystem::perms::owner_write, std::filesystem::perm_options::add, errorCode);
+		if (errorCode)
+		{
+			return errorCode;
+		}
+
+		Hash::Sha256Digest hash;
+		std::string expectedHash;
+		std::string error;
+		if (!Json::TryReadStringProperty(seed.Entry, "Sha256", expectedHash) || !Hash::TrySha256File(destination, hash, error) || Hash::Sha256ToHex(hash) != expectedHash)
+		{
+			return std::make_error_code(std::errc::io_error);
+		}
+		return {};
+	}
+
+	static bool PublishContentStore(const std::filesystem::path& contentRoot, const std::string& identity, const std::vector<SeedFile>& seeds, std::string& outErrorMessage)
+	{
+		std::error_code errorCode;
+		const auto transaction = std::filesystem::path(contentRoot.wstring() + L".partial-" + std::to_wstring(std::chrono::steady_clock::now().time_since_epoch().count()));
+		if (!std::filesystem::create_directories(transaction, errorCode) || errorCode)
+		{
+			outErrorMessage = "Cannot create content-store transaction: " + errorCode.message();
+			return false;
+		}
+
+		for (const auto& directory : {"Meshes", "Textures", "Materials", "Skeletons", "Animations", "SceneManifests"})
+		{
+			std::filesystem::create_directories(transaction / "Cooked" / directory, errorCode);
+			if (errorCode)
+			{
+				break;
+			}
+		}
+
+		for (const auto& seed : seeds)
+		{
+			if (errorCode)
+			{
+				break;
+			}
+			errorCode = CopyContentStoreSeed(seed, transaction);
+		}
+
+		if (!errorCode && Files::TryWriteAllText(transaction / ".sparkle-package", identity, outErrorMessage))
+		{
+			std::filesystem::rename(transaction, contentRoot, errorCode);
+			if (!errorCode)
+			{
+				return true;
+			}
+		}
+		if (errorCode)
+		{
+			outErrorMessage = "Content-store initialization failed: " + errorCode.message();
+		}
+
+		std::error_code cleanupError;
+		std::filesystem::remove_all(transaction, cleanupError);
+		return false;
+	}
+
 	bool InitializePackageContentStore(const std::filesystem::path& packageRoot, std::string& outErrorMessage)
 	{
 		const auto content = Filesystem::ResolvePackageContentRoot(packageRoot);
@@ -49,14 +134,8 @@ namespace SparkleLauncher
 			return false;
 		}
 
-		struct SeedFile final
-		{
-			std::filesystem::path Source;
-			std::filesystem::path Relative;
-			std::string_view Entry;
-		};
-
 		std::vector<SeedFile> seeds;
+		const auto sourceRelative = source->lexically_relative(*content);
 		const std::string projectPrefix = project->lexically_relative(packageRoot).generic_string() + "/";
 		const std::string cookedPrefix = engine->lexically_relative(packageRoot).generic_string() + "/Cooked/";
 		for (const auto file : files)
@@ -75,7 +154,7 @@ namespace SparkleLauncher
 				{
 					continue;
 				}
-				destination = source->lexically_relative(*content) / Strings::ToWide(relative);
+				destination = sourceRelative / Strings::ToWide(relative);
 			}
 			else if (path.starts_with(cookedPrefix))
 			{
@@ -93,7 +172,6 @@ namespace SparkleLauncher
 			}
 			seeds.push_back({*verified, std::move(destination), file});
 		}
-		const auto sourceRelative = source->lexically_relative(*content);
 
 		const std::array required = {
 		    sourceRelative / ".sparkle-project",
@@ -111,64 +189,6 @@ namespace SparkleLauncher
 			}
 		}
 
-		const auto transaction = std::filesystem::path(content->wstring() + L".partial-" + std::to_wstring(std::chrono::steady_clock::now().time_since_epoch().count()));
-		if (!std::filesystem::create_directories(transaction, errorCode) || errorCode)
-		{
-			outErrorMessage = "Cannot create content-store transaction: " + errorCode.message();
-			return false;
-		}
-		for (const auto& directory : {"Meshes", "Textures", "Materials", "Skeletons", "Animations", "SceneManifests"})
-		{
-			std::filesystem::create_directories(transaction / "Cooked" / directory, errorCode);
-			if (errorCode)
-			{
-				break;
-			}
-		}
-		for (const auto& seed : seeds)
-		{
-			if (errorCode)
-			{
-				break;
-			}
-			const auto destination = transaction / seed.Relative;
-			std::filesystem::create_directories(destination.parent_path(), errorCode);
-			if (errorCode)
-			{
-				break;
-			}
-			std::filesystem::copy_file(seed.Source, destination, std::filesystem::copy_options::none, errorCode);
-			if (errorCode)
-			{
-				break;
-			}
-			std::filesystem::permissions(destination, std::filesystem::perms::owner_write, std::filesystem::perm_options::add, errorCode);
-			if (errorCode)
-			{
-				break;
-			}
-			Hash::Sha256Digest hash;
-			std::string expectedHash;
-			if (!Json::TryReadStringProperty(seed.Entry, "Sha256", expectedHash) || !Hash::TrySha256File(destination, hash, outErrorMessage) || Hash::Sha256ToHex(hash) != expectedHash)
-			{
-				errorCode = std::make_error_code(std::errc::io_error);
-				break;
-			}
-		}
-		if (!errorCode && Files::TryWriteAllText(transaction / ".sparkle-package", identity, outErrorMessage))
-		{
-			std::filesystem::rename(transaction, *content, errorCode);
-			if (!errorCode)
-			{
-				return true;
-			}
-		}
-		if (errorCode)
-		{
-			outErrorMessage = "Content-store initialization failed: " + errorCode.message();
-		}
-		std::error_code cleanupError;
-		std::filesystem::remove_all(transaction, cleanupError);
-		return false;
+		return PublishContentStore(*content, identity, seeds, outErrorMessage);
 	}
 }

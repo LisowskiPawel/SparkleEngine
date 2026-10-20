@@ -12,7 +12,7 @@ Finish the missing capture routes and prove the integrations already present in 
 
 ## Work This Plan
 
-GPU failure tooling and its remaining qualification use [GPU Crash Debugging](../GpuCrashDebugging/GpuCrashDebuggingDesign.md) route. This frame-capture plan retains its provider scope; PIX assistance uses a separate session from Aftermath.
+GPU failure tooling is qualified within the [GPU Crash Debugging candidate scope](../GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures). This frame-capture plan remains open; PIX uses a separate session from Aftermath.
 
 | What to do | Working route |
 | --- | --- |

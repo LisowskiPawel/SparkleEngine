@@ -2,11 +2,11 @@
 
 [Docs](../../../README.md) / [Up](ImplementationPlan.md)
 
-**Status:** remaining work for PD-1–4. Implemented paths are summarized in the [roadmap](../../../Strategy/Roadmap.md#release-progress); exact results stay in candidate reports.
+**Status:** open; PD-1–4 still need product and archive checks. Completed source work is summarized in the [roadmap](../../../Strategy/Roadmap.md#release-progress); exact results stay in candidate reports.
 
 Deliver Launcher, Editor and Game in one unsigned internal archive, with selected content and self-service recovery. Public-release prerequisites belong to [FR-07](ImplementationPlan.md#fr-07--publish-and-verify).
 
-**Prerequisite:** close the [remaining GPU crash check](../PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md#gcd-4--prove-native-crash-debugging). Then resume PD-1 with matched tooling. Collect Modern Sponza evidence, fix the owning defect and rerun affected journeys. This product plan remains open; keep the existing owners and reuse completed systems.
+**Next:** [PD-1](#pd-1--game-and-editor-product-shells). Collect Modern Sponza with the [qualified GPU crash tooling](../PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures) and matched product/shader/symbol receipts; fix its owner and rerun affected journeys.
 
 Each stage follows [Change Lifecycle and its source-style gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate). Reuse evidence only when its candidate/configuration still matches; record changed-input invalidation and unavailable required checks before advancing.
 
@@ -68,7 +68,7 @@ Freeze source after the product fixes. Use the existing packaging owner to regen
 Remaining:
 
 - Against the final archive, exercise onboarding, known-issue review and recovery for all three products. Recheck local diagnostic consent, privacy, retention and native symbol identity.
-- Retain the distinction between synthetic crash/hang/GPU projections and real native incidents. Record automatic crash/hang collection and shader-symbol export as unavailable where unsupported.
+- Reuse qualified GPU checks only when product/shader/symbol identities match. Distinguish real incidents from synthetic fixtures; record unsupported automatic CPU crash/hang collection honestly.
 - Complete critical-defect review and a valid immutable replacement/withdrawal rehearsal, including applicability, rollback and evidence invalidation. Preserve the no-support policy and no response deadlines.
 - Reconcile `FCR-PROD-01` through `06` against the same source/configuration/archive; name every failed or unavailable required check.
 

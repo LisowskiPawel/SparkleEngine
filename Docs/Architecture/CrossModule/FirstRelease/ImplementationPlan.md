@@ -4,7 +4,7 @@
 
 Stages: [FR-00](#fr-00--scope-and-discovery) / [FR-01](#fr-01--identity-rights-and-baseline) / [FR-02](#fr-02--package-spine) / [FR-03](#fr-03--feature-closure) / [FR-04](#fr-04--release-maps) / [FR-05](#fr-05--performance-stability-and-native-proof) / [FR-06](#fr-06--candidate-freeze-and-independent-adoption) / [FR-07](#fr-07--publish-and-verify) / [FR-08](#fr-08--stabilize-and-close).
 
-**Status:** release implementation orchestrator; ordered work, not implementation evidence or release approval
+**Status:** open release plan; remaining work is tracked in the roadmap and linked stage plans
 
 Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for delivered work and missing checks. [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) selects the next task; this page supplies its phase brief.
 

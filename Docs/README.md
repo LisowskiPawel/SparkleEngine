@@ -8,7 +8,7 @@ Use these pages to understand the engine, choose your next task and find the des
 
 | I want to... | Open |
 | --- | --- |
-| Continue the first release | [Roadmap](Strategy/Roadmap.md#where-we-are-and-what-is-next) -> [work plan](Architecture/CrossModule/FirstRelease/ImplementationPlan.md) -> [shipping checks](Acceptance/FirstRelease.md) |
+| Continue the first release | [Next task](Strategy/Roadmap.md#where-we-are-and-what-is-next) -> [PD-1: Game/Editor journeys](Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells) -> [shipping checks](Acceptance/FirstRelease.md) |
 | Understand the engine | [Engine at a glance](Architecture/EngineAtAGlance.md) -> [repository map](Architecture/WholeRepositoryMap.md) |
 | Find a module or feature | [Architecture](Architecture/README.md) -> [modules](Architecture/Modules/ModuleInventory.md) |
 | Work on rendering | [Renderer](Architecture/Modules/Engine/Renderer/RendererDesign.md) or [RHI](Architecture/Modules/Engine/RHI/RHIDesign.md) |

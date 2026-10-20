@@ -14,7 +14,7 @@ Make the existing renderer observable with trustworthy external captures before 
 
 ## Work This Plan
 
-**Current priority:** [GPU crash debugging](GpuCrashDebugging/GpuCrashDebuggingDesign.md) has a remaining serial Vulkan source-mapping check. After it closes, resume the remaining product journeys through the [roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next); this internal diagnostics product remains unfinished.
+**Current priority:** the [roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) resumes product journeys using [qualified GPU crash debugging](GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures). This broader diagnostics plan remains open; GCD delivery does not close its capture or internal-tool stages.
 
 | What to do | Working route |
 | --- | --- |

@@ -11,7 +11,8 @@
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <Windows.h>
-#include <set>
+#include <algorithm>
+#include <array>
 #include <system_error>
 
 namespace SparkleLauncher
@@ -75,20 +76,18 @@ namespace SparkleLauncher
 				break;
 			}
 		}
-		std::error_code fileError;
-		const auto size = std::filesystem::file_size(manifestPath, fileError);
 		std::string json;
 		std::string error;
 		std::string identity;
 		std::string state;
 		std::uint32_t pid = 0;
-		if (fileError || size > 32u * 1024u * 1024u || !Files::TryReadAllText(manifestPath, json, error, 32u * 1024u * 1024u) || !Json::TryReadStringProperty(json, "incidentId", identity)
-		    || identity != sessionId || !Json::TryReadUnsignedIntegerProperty(json, "childPid", pid) || pid != childPid || !Json::TryReadStringProperty(json, "state", state))
+		if (!Files::TryReadAllText(manifestPath, json, error, 32u * 1024u * 1024u) || !Json::TryReadStringProperty(json, "incidentId", identity) || identity != sessionId
+		    || !Json::TryReadUnsignedIntegerProperty(json, "childPid", pid) || pid != childPid || !Json::TryReadStringProperty(json, "state", state))
 		{
 			return {};
 		}
-		static const std::set<std::string> states{"Preparing", "Ready", "Collecting", "Collected", "Partial", "Timed out", "Unavailable"};
-		if (!states.contains(state))
+		static constexpr std::array<std::string_view, 7> states{"Preparing", "Ready", "Collecting", "Collected", "Partial", "Timed out", "Unavailable"};
+		if (std::find(states.begin(), states.end(), state) == states.end())
 		{
 			return {};
 		}

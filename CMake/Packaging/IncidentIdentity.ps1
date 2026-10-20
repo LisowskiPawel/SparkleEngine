@@ -4,6 +4,14 @@ Set-StrictMode -Version Latest
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 Add-Type -AssemblyName System.IO.Compression
 
+function Get-IncidentPreviewSha256
+{
+    param([string] $Json)
+    $hash = [Security.Cryptography.SHA256]::Create()
+    try { return [BitConverter]::ToString($hash.ComputeHash([Text.Encoding]::UTF8.GetBytes($Json))).Replace('-','').ToLowerInvariant() }
+    finally { $hash.Dispose() }
+}
+
 function Get-IncidentFile
 {
     param([string] $Path, [long] $MaximumBytes)

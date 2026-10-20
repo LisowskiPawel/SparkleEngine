@@ -3,6 +3,7 @@
 #include "Cooking/ShaderCompileBatch.h"
 
 #include "Cooking/ShaderCompileFailureReplay.h"
+#include "Cooking/ShaderCompileJob.h"
 #include "Cooking/ShaderCompileJobExecutor.h"
 #include "Cooking/ShaderCookCancellation.h"
 #include "Cooking/ShaderCookSettings.h"
@@ -12,210 +13,223 @@
 #include "Verification/ShaderParameterStructCookVerifier.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <exception>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <unordered_map>
+#include <utility>
 
-std::vector<ShaderCompileResult> ShaderCompileBatch::Execute(
-    const ShaderCookSettings& settings,
-    std::span<const ShaderCompileJob> jobs,
-    std::size_t totalWork,
-    const ToolWorkProgressCallback& progress)
+namespace ShaderCompileBatch
 {
-	if (jobs.empty())
+	struct ProducerMap final
 	{
-		return {};
-	}
-	ShaderCookCancellation::ThrowIfRequested(settings.cancellationSignalPath);
+		std::vector<std::size_t> ProducerJobIndices;
+		std::vector<std::size_t> ProducerForJob;
+	};
 
-	const ProducerMap producerMap = SelectProducers(jobs);
-	std::vector<ShaderCompileResult> producerResults = CompileProducers(settings, jobs, producerMap, totalWork, progress);
-	std::vector<ShaderCompileResult> results = FanOutResults(jobs, producerResults, producerMap.ProducerForJob);
-	FinalizeResults(jobs, results, totalWork, progress);
-	return results;
-}
-
-ShaderCompileBatch::ProducerMap ShaderCompileBatch::SelectProducers(std::span<const ShaderCompileJob> jobs)
-{
-	ProducerMap result;
-	result.ProducerForJob.resize(jobs.size());
-	std::unordered_map<ShaderCompileInputHash, std::vector<std::size_t>> producersByHash;
-	for (std::size_t jobIndex = 0; jobIndex < jobs.size(); ++jobIndex)
+	static bool HasSameCompilerInput(const ShaderCompileJob& lhs, const ShaderCompileJob& rhs) noexcept
 	{
-		const ShaderCompileJob& job = jobs[jobIndex];
-		std::size_t producerIndex = result.ProducerJobIndices.size();
-		if (const auto matchingHash = producersByHash.find(job.InputHash); matchingHash != producersByHash.end())
-		{
-			for (const std::size_t candidateProducer : matchingHash->second)
-			{
-				if (HasSameCompilerInput(jobs[result.ProducerJobIndices[candidateProducer]], job))
-				{
-					producerIndex = candidateProducer;
-					break;
-				}
-			}
-		}
-		if (producerIndex == result.ProducerJobIndices.size())
-		{
-			result.ProducerJobIndices.push_back(jobIndex);
-			producersByHash[job.InputHash].push_back(producerIndex);
-		}
-		result.ProducerForJob[jobIndex] = producerIndex;
-	}
-	return result;
-}
-
-std::vector<ShaderCompileResult> ShaderCompileBatch::CompileProducers(
-    const ShaderCookSettings& settings,
-    std::span<const ShaderCompileJob> jobs,
-    const ProducerMap& producerMap,
-    std::size_t totalWork,
-    const ToolWorkProgressCallback& progress)
-{
-	const std::span<const std::size_t> producerJobIndices = producerMap.ProducerJobIndices;
-	std::vector<std::size_t> consumerCountByProducer(producerJobIndices.size());
-	for (const std::size_t producerIndex : producerMap.ProducerForJob)
-	{
-		++consumerCountByProducer[producerIndex];
-	}
-	std::mutex progressMutex;
-	std::size_t completedWork = 0;
-	const std::uint32_t hardwareThreads = std::max(1u, std::thread::hardware_concurrency());
-	const std::uint32_t compileWorkers = std::clamp(settings.maximumParallelCompiles, 1u, std::min(hardwareThreads, 8u));
-	TaskExecutor executor(
-	    TaskExecutorConfig{
-	        .FrameCriticalWorkerCount = 1,
-	        .BackgroundWorkerCount = compileWorkers,
-	        .MaximumTasksPerExecution = static_cast<std::uint32_t>(producerJobIndices.size()),
-	        .MaximumEdgesPerExecution = 1,
-	        .MaximumActiveExecutions = 1});
-	std::vector<ShaderCompileResult> results(producerJobIndices.size());
-	std::vector<std::string> failureDiagnostics(producerJobIndices.size());
-	TaskGraphBuilder graph(TaskGraphLimits{.MaximumTasks = static_cast<std::uint32_t>(producerJobIndices.size()), .MaximumEdges = 1});
-	for (std::uint32_t producerIndex = 0; producerIndex < producerJobIndices.size(); ++producerIndex)
-	{
-		graph.Add(
-		    TaskDesc{TaskName("Compile shader"), TaskLane::Background},
-		    [&, producerIndex](TaskExecutionContext& context)
-		    {
-			    if (context.IsCancellationRequested() || ShaderCookCancellation::IsRequested(settings.cancellationSignalPath))
-			    {
-				    return TaskResult::Cancelled("Shader cook was cancelled.");
-			    }
-			    const std::size_t jobIndex = producerJobIndices[producerIndex];
-			    try
-			    {
-				    results[producerIndex] = ShaderCompileJobExecutor::Execute(jobs[jobIndex]);
-				    if (progress)
-				    {
-					    std::lock_guard lock(progressMutex);
-					    completedWork += consumerCountByProducer[producerIndex];
-					    progress({.Action = "Compiled shader", .Item = jobs[jobIndex].Request.ShaderTypeName, .Completed = completedWork, .Total = totalWork});
-				    }
-				    return TaskResult::Success();
-			    }
-			    catch (const std::exception& error)
-			    {
-				    failureDiagnostics[producerIndex] = error.what();
-				    return TaskResult::Failure(error.what());
-			    }
-		    });
-	}
-
-	TaskExecutionContext context;
-	const TaskExecution execution = executor.Submit(graph.Compile(), context);
-	if (execution.GetStatus() == TaskExecutionStatus::Succeeded)
-	{
-		ShaderCookCancellation::ThrowIfRequested(settings.cancellationSignalPath);
-		return results;
-	}
-	for (std::size_t producerIndex = 0; producerIndex < failureDiagnostics.size(); ++producerIndex)
-	{
-		if (!failureDiagnostics[producerIndex].empty())
-		{
-			ShaderCompileFailureReplay::Write(Filesystem::GetCookedShaderRootPath(), jobs[producerJobIndices[producerIndex]], failureDiagnostics[producerIndex]);
-			break;
-		}
-	}
-
-	const TaskResult result = execution.GetResult();
-	if (result.GetMessage().empty())
-	{
-		throw Diagnostics::Error("Shader compile task failed without a diagnostic.");
-	}
-	throw Diagnostics::Error(std::string(result.GetMessage()));
-}
-
-std::vector<ShaderCompileResult> ShaderCompileBatch::FanOutResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> producerResults, std::span<const std::size_t> producerForJob)
-{
-	std::vector<ShaderCompileResult> results;
-	results.reserve(jobs.size());
-	std::vector<std::size_t> remainingConsumers(producerResults.size());
-	for (const std::size_t producer : producerForJob)
-	{
-		++remainingConsumers[producer];
-	}
-	for (std::size_t jobIndex = 0; jobIndex < jobs.size(); ++jobIndex)
-	{
-		const std::size_t producer = producerForJob[jobIndex];
-		if (--remainingConsumers[producer] == 0)
-		{
-			results.push_back(std::move(producerResults[producer]));
-		}
-		else
-		{
-			results.push_back(producerResults[producer]);
-		}
-		results.back().ShaderType = jobs[jobIndex].Request.ShaderType;
-		results.back().Target = jobs[jobIndex].Request.Target;
-	}
-	return results;
-}
-
-void ShaderCompileBatch::FinalizeResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> results, std::size_t totalWork, const ToolWorkProgressCallback& progress)
-{
-	for (std::size_t jobIndex = 0; jobIndex < jobs.size(); ++jobIndex)
-	{
-		const ShaderCompileJob& job = jobs[jobIndex];
-		ShaderCompileResult& result = results[jobIndex];
-		try
-		{
-			ShaderParameterStructCookVerifier::Verify(job, result.Output, &result.DebugArtifacts);
-		}
-		catch (const std::exception& error)
-		{
-			ShaderCompileFailureReplay::Write(Filesystem::GetCookedShaderRootPath(), job, error.what());
-			throw;
-		}
-		if (progress)
-		{
-			progress({.Action = "Verified shader", .Item = job.Request.ShaderTypeName, .Completed = jobs.size() + jobIndex + 1, .Total = totalWork});
-		}
-	}
-}
-
-bool ShaderCompileBatch::HasSameCompilerInput(const ShaderCompileJob& lhs, const ShaderCompileJob& rhs) noexcept
-{
-	if (lhs.SourceContentHash != rhs.SourceContentHash || lhs.DependencyClosureHash != rhs.DependencyClosureHash || lhs.RequestHash != rhs.RequestHash
-	    || lhs.VirtualDependencies != rhs.VirtualDependencies || lhs.BackendName != rhs.BackendName || lhs.BackendVersion != rhs.BackendVersion || lhs.TargetProfile != rhs.TargetProfile
-	    || lhs.Request.VirtualSourcePath != rhs.Request.VirtualSourcePath || lhs.Request.SourceCode != rhs.Request.SourceCode || lhs.Request.EntryPoint != rhs.Request.EntryPoint
-	    || lhs.Request.Stage != rhs.Request.Stage || lhs.Request.Target != rhs.Request.Target || lhs.Request.UnitKind != rhs.Request.UnitKind
-	    || lhs.Request.RequiredFeatures != rhs.Request.RequiredFeatures || lhs.Request.EnableDebugInfo != rhs.Request.EnableDebugInfo
-	    || lhs.Request.EnableOptimizations != rhs.Request.EnableOptimizations || lhs.Request.TreatWarningsAsErrors != rhs.Request.TreatWarningsAsErrors
-	    || lhs.Request.StripDebugInfo != rhs.Request.StripDebugInfo || lhs.Request.Defines != rhs.Request.Defines
-	    || lhs.Request.DescriptorBindingRemaps.size() != rhs.Request.DescriptorBindingRemaps.size())
-	{
-		return false;
-	}
-	for (std::size_t index = 0; index < lhs.Request.DescriptorBindingRemaps.size(); ++index)
-	{
-		const ShaderDescriptorBindingRemap& left = lhs.Request.DescriptorBindingRemaps[index];
-		const ShaderDescriptorBindingRemap& right = rhs.Request.DescriptorBindingRemaps[index];
-		if (left.Name != right.Name || left.Set != right.Set || left.Binding != right.Binding)
+		if (lhs.SourceContentHash != rhs.SourceContentHash || lhs.DependencyClosureHash != rhs.DependencyClosureHash || lhs.RequestHash != rhs.RequestHash
+		    || lhs.VirtualDependencies != rhs.VirtualDependencies || lhs.BackendName != rhs.BackendName || lhs.BackendVersion != rhs.BackendVersion || lhs.TargetProfile != rhs.TargetProfile
+		    || lhs.Request.VirtualSourcePath != rhs.Request.VirtualSourcePath || lhs.Request.SourceCode != rhs.Request.SourceCode || lhs.Request.EntryPoint != rhs.Request.EntryPoint
+		    || lhs.Request.Stage != rhs.Request.Stage || lhs.Request.Target != rhs.Request.Target || lhs.Request.UnitKind != rhs.Request.UnitKind
+		    || lhs.Request.RequiredFeatures != rhs.Request.RequiredFeatures || lhs.Request.EnableDebugInfo != rhs.Request.EnableDebugInfo
+		    || lhs.Request.EnableOptimizations != rhs.Request.EnableOptimizations || lhs.Request.TreatWarningsAsErrors != rhs.Request.TreatWarningsAsErrors
+		    || lhs.Request.StripDebugInfo != rhs.Request.StripDebugInfo || lhs.Request.Defines != rhs.Request.Defines
+		    || lhs.Request.DescriptorBindingRemaps.size() != rhs.Request.DescriptorBindingRemaps.size())
 		{
 			return false;
 		}
+		for (std::size_t index = 0; index < lhs.Request.DescriptorBindingRemaps.size(); ++index)
+		{
+			const ShaderDescriptorBindingRemap& left = lhs.Request.DescriptorBindingRemaps[index];
+			const ShaderDescriptorBindingRemap& right = rhs.Request.DescriptorBindingRemaps[index];
+			if (left.Name != right.Name || left.Set != right.Set || left.Binding != right.Binding)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
-	return true;
+
+	static ProducerMap SelectProducers(std::span<const ShaderCompileJob> jobs)
+	{
+		ProducerMap result;
+		result.ProducerForJob.resize(jobs.size());
+		std::unordered_map<ShaderCompileInputHash, std::vector<std::size_t>> producersByHash;
+
+		for (std::size_t jobIndex = 0; jobIndex < jobs.size(); ++jobIndex)
+		{
+			const ShaderCompileJob& job = jobs[jobIndex];
+			std::size_t producerIndex = result.ProducerJobIndices.size();
+			if (const auto matchingHash = producersByHash.find(job.InputHash); matchingHash != producersByHash.end())
+			{
+				for (const std::size_t candidateProducer : matchingHash->second)
+				{
+					if (HasSameCompilerInput(jobs[result.ProducerJobIndices[candidateProducer]], job))
+					{
+						producerIndex = candidateProducer;
+						break;
+					}
+				}
+			}
+			if (producerIndex == result.ProducerJobIndices.size())
+			{
+				result.ProducerJobIndices.push_back(jobIndex);
+				producersByHash[job.InputHash].push_back(producerIndex);
+			}
+			result.ProducerForJob[jobIndex] = producerIndex;
+		}
+		return result;
+	}
+
+	static std::vector<ShaderCompileResult> CompileProducers(
+	    const ShaderCookSettings& settings,
+	    std::span<const ShaderCompileJob> jobs,
+	    const ProducerMap& producerMap,
+	    std::size_t totalWork,
+	    const ToolWorkProgressCallback& progress)
+	{
+		const std::span<const std::size_t> producerJobIndices = producerMap.ProducerJobIndices;
+		std::vector<std::size_t> consumerCountByProducer(producerJobIndices.size());
+		for (const std::size_t producerIndex : producerMap.ProducerForJob)
+		{
+			++consumerCountByProducer[producerIndex];
+		}
+
+		std::mutex progressMutex;
+		std::size_t completedWork = 0;
+		const std::uint32_t hardwareThreads = std::max(1u, std::thread::hardware_concurrency());
+		const std::uint32_t compileWorkers = std::clamp(settings.maximumParallelCompiles, 1u, std::min(hardwareThreads, 8u));
+		TaskExecutor executor(
+		    TaskExecutorConfig{
+		        .FrameCriticalWorkerCount = 1,
+		        .BackgroundWorkerCount = compileWorkers,
+		        .MaximumTasksPerExecution = static_cast<std::uint32_t>(producerJobIndices.size()),
+		        .MaximumEdgesPerExecution = 1,
+		        .MaximumActiveExecutions = 1});
+		std::vector<ShaderCompileResult> results(producerJobIndices.size());
+		std::vector<std::string> failureDiagnostics(producerJobIndices.size());
+		TaskGraphBuilder graph(TaskGraphLimits{.MaximumTasks = static_cast<std::uint32_t>(producerJobIndices.size()), .MaximumEdges = 1});
+		for (std::uint32_t producerIndex = 0; producerIndex < producerJobIndices.size(); ++producerIndex)
+		{
+			graph.Add(
+			    TaskDesc{TaskName("Compile shader"), TaskLane::Background},
+			    [&, producerIndex](TaskExecutionContext& context)
+			    {
+				    if (context.IsCancellationRequested() || ShaderCookCancellation::IsRequested(settings.cancellationSignalPath))
+				    {
+					    return TaskResult::Cancelled("Shader cook was cancelled.");
+				    }
+				    const std::size_t jobIndex = producerJobIndices[producerIndex];
+				    try
+				    {
+					    results[producerIndex] = ShaderCompileJobExecutor::Execute(jobs[jobIndex]);
+					    if (progress)
+					    {
+						    std::lock_guard lock(progressMutex);
+						    completedWork += consumerCountByProducer[producerIndex];
+						    progress({.Action = "Compiled shader", .Item = jobs[jobIndex].Request.ShaderTypeName, .Completed = completedWork, .Total = totalWork});
+					    }
+					    return TaskResult::Success();
+				    }
+				    catch (const std::exception& error)
+				    {
+					    failureDiagnostics[producerIndex] = error.what();
+					    return TaskResult::Failure(error.what());
+				    }
+			    });
+		}
+
+		TaskExecutionContext context;
+		const TaskExecution execution = executor.Submit(graph.Compile(), context);
+		if (execution.GetStatus() == TaskExecutionStatus::Succeeded)
+		{
+			ShaderCookCancellation::ThrowIfRequested(settings.cancellationSignalPath);
+			return results;
+		}
+
+		for (std::size_t producerIndex = 0; producerIndex < failureDiagnostics.size(); ++producerIndex)
+		{
+			if (!failureDiagnostics[producerIndex].empty())
+			{
+				ShaderCompileFailureReplay::Write(Filesystem::GetCookedShaderRootPath(), jobs[producerJobIndices[producerIndex]], failureDiagnostics[producerIndex]);
+				break;
+			}
+		}
+
+		const TaskResult result = execution.GetResult();
+		if (result.GetMessage().empty())
+		{
+			throw Diagnostics::Error("Shader compile task failed without a diagnostic.");
+		}
+		throw Diagnostics::Error(std::string(result.GetMessage()));
+	}
+
+	static std::vector<ShaderCompileResult> FanOutResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> producerResults, std::span<const std::size_t> producerForJob)
+	{
+		std::vector<ShaderCompileResult> results;
+		results.reserve(jobs.size());
+		std::vector<std::size_t> remainingConsumers(producerResults.size());
+		for (const std::size_t producer : producerForJob)
+		{
+			++remainingConsumers[producer];
+		}
+
+		for (std::size_t jobIndex = 0; jobIndex < jobs.size(); ++jobIndex)
+		{
+			const std::size_t producer = producerForJob[jobIndex];
+			if (--remainingConsumers[producer] == 0)
+			{
+				results.push_back(std::move(producerResults[producer]));
+			}
+			else
+			{
+				results.push_back(producerResults[producer]);
+			}
+			results.back().ShaderType = jobs[jobIndex].Request.ShaderType;
+			results.back().Target = jobs[jobIndex].Request.Target;
+		}
+		return results;
+	}
+
+	static void FinalizeResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> results, std::size_t totalWork, const ToolWorkProgressCallback& progress)
+	{
+		for (std::size_t jobIndex = 0; jobIndex < jobs.size(); ++jobIndex)
+		{
+			const ShaderCompileJob& job = jobs[jobIndex];
+			ShaderCompileResult& result = results[jobIndex];
+			try
+			{
+				ShaderParameterStructCookVerifier::Verify(job, result.Output, &result.DebugArtifacts);
+			}
+			catch (const std::exception& error)
+			{
+				ShaderCompileFailureReplay::Write(Filesystem::GetCookedShaderRootPath(), job, error.what());
+				throw;
+			}
+
+			if (progress)
+			{
+				progress({.Action = "Verified shader", .Item = job.Request.ShaderTypeName, .Completed = jobs.size() + jobIndex + 1, .Total = totalWork});
+			}
+		}
+	}
+
+	std::vector<ShaderCompileResult> Execute(const ShaderCookSettings& settings, std::span<const ShaderCompileJob> jobs, std::size_t totalWork, const ToolWorkProgressCallback& progress)
+	{
+		if (jobs.empty())
+		{
+			return {};
+		}
+		ShaderCookCancellation::ThrowIfRequested(settings.cancellationSignalPath);
+
+		const ProducerMap producerMap = SelectProducers(jobs);
+		std::vector<ShaderCompileResult> producerResults = CompileProducers(settings, jobs, producerMap, totalWork, progress);
+		std::vector<ShaderCompileResult> results = FanOutResults(jobs, producerResults, producerMap.ProducerForJob);
+		FinalizeResults(jobs, results, totalWork, progress);
+		return results;
+	}
 }

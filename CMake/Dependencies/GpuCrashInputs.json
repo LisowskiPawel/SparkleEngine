@@ -27,10 +27,10 @@
     ]
   },
   "Slang": {
-    "version": "2026.8 / LunarG Vulkan SDK 1.4.350.0",
+    "version": "2026.8-gcd4-loop-locations / source d88cc8fff35baf96cf30d242b2572564cf8043b6 + SlangLoopSourceLocations.patch",
     "directories": ["Include/slang", "Bin/slang-standard-module-2026.8"],
     "files": [
-      {"path": "Bin/slang-compiler.dll", "sha256": "cfdc9c0067942608757cbb343b53302bd7da1c6b945e9dd343c9474941f9830b", "bytes": 31122360},
+      {"path": "Bin/slang-compiler.dll", "sha256": "17018b56015e482583da2cc1e3dc16c137857b6ba9ed245af2876eed1f4b62b2", "bytes": 31383552},
       {"path": "Bin/slang-glsl-module.dll", "sha256": "0b71a1f5a0795e5a94080eb452b378ddde6a75222dda448c5558fb5516acda99", "bytes": 1291192},
       {"path": "Bin/slang-glslang.dll", "sha256": "b9dcd6cf4e1c6f55d88f3ddfd928d0fdb2c2afd22b13d9a08f9694f676b01f51", "bytes": 10159032},
       {"path": "Bin/slang-rt.dll", "sha256": "1af4d49f19f39baa3e767624688020c7223af381b3dbd8fbce463e5fd96b9ebf", "bytes": 748472},
@@ -70,11 +70,13 @@
       {"path": "Include/slang/slang-hlsl-prelude.h", "sha256": "6a02a2fe1ebfd6fbf1a66740078ac5a321be6884b0e9bec527a8c69d7211d674", "bytes": 206},
       {"path": "Include/slang/slang-image-format-defs.h", "sha256": "35ad9b68cfa889157b2bf4a4ef39263b4ad5f0f760ffee66aca03438e8363bcd", "bytes": 2421},
       {"path": "Include/slang/slang-llvm.h", "sha256": "8f799317742485deb13353e9260764c58248175a75c9af96942ee49744067505", "bytes": 12053},
-      {"path": "Include/slang/slang-tag-version.h", "sha256": "d8e351dd9d2ba2011027edb87a9408877bbe267b76c694584cc95c44393b54e8", "bytes": 76},
+      {"path": "Include/slang/slang-tag-version.h", "sha256": "e98bb7d3c5e4942d8ec683c6370f3bdbcb764f82787190a15fd4ed9187ea86e5", "bytes": 98},
       {"path": "Include/slang/slang-torch-prelude.h", "sha256": "60bc416b2ff5bb86299ff994a84f3e88245328f2010ad5d165973d39dd28f3b7", "bytes": 5370},
       {"path": "Include/slang/slang.h", "sha256": "80ca5b8dbfc6061aaf9d28d376fd4625fefe3b36272597ba97ff1384ec84c94d", "bytes": 200920},
       {"path": "Lib/slang.lib", "sha256": "675d3cdb83072e3e795cc6fac6e5af682ed5bcb2847b0e0f5cf5947cfc937a2a", "bytes": 154238},
-      {"path": "Licenses/LICENSE.txt", "sha256": "03b9dd9957f288bc26ef39d188672d5a761f2f35c972d959b65c0f32cd4d576f", "bytes": 944}
+      {"path": "Licenses/LICENSE.txt", "sha256": "03b9dd9957f288bc26ef39d188672d5a761f2f35c972d959b65c0f32cd4d576f", "bytes": 944},
+      {"path": "Patches/SlangLoopSourceLocations.patch", "sha256": "26c7578d8372834bf63d19c440a64fb7f84b8f564f8eea6bb8a75223cc7c3c93", "bytes": 4692},
+      {"path": "Licenses/Slang-LICENSE.txt", "sha256": "61f6d4d529404f6f8270c30bbe15d755157424cc83a1af563b4840adfd8b5466", "bytes": 1519}
     ]
   },
   "SpirvTools": {

@@ -6,7 +6,7 @@
 
 **Scope:** the order to follow from the current release work through advanced graphics and portfolio delivery
 
-**Updated:** 2026-10-17; progress summarizes recorded work, not release approval
+**Updated:** 2026-10-20; progress summarizes recorded work, not release approval
 
 Choose one task below, open its **implementation stage**, and copy that stage's prompt. The linked **design** explains the behavior and checks to preserve. This roadmap owns priority and brief progress; implementation plans own the steps.
 
@@ -20,7 +20,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 
 ## Where We Are And What Is Next
 
-**Next: [finish serial-host crash qualification](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/ImplementationPlan.md#gcd-4--prove-native-crash-debugging), then [PD-1: finish Game/Editor journeys](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells).** The earlier native matrix passes; exact SDK/formatter lookups now rule out missing symbols, but the serial Vulkan dump still needs a verified source-mapping repair. A normal-quit ownership fix is built and checked; changed binaries need native revalidation. Collect the Modern Sponza failure with its matched shaders/symbols, fix the owning defect, verify quit times, then regenerate the archive and continue PD-2/3/4. The approved fresh-repository rehearsal does not establish clean-OS or independent-adopter acceptance.
+**Next: [PD-1: finish Game/Editor journeys](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells).** GPU crash tooling is qualified. Collect Modern Sponza with matched product/shader/symbol receipts, fix its owner and verify quit. Then regenerate the archive and continue PD-2/3/4. The fresh-repository rehearsal does not establish clean-OS or independent-adopter acceptance.
 
 | Current work | Design / acceptance reference | Implementation stages |
 | --- | --- | --- |
@@ -38,14 +38,14 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 | --- | --- | --- |
 | Scope / FR-00 | Six product choices approved. | Remaining technical qualification; public rights close at FR-07. |
 | Identity / FR-01 | Identity, dependency pins and notices implemented; earlier baseline recorded. | Qualify the final source candidate. |
-| GPU crash tooling / GCD | 32 normal launches and 16 native compute/ray-tracing cells with exact source mapping; four profiles, both APIs. [Scope and evidence](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures). | Qualify a compiler/driver/decoder source-mapping repair, then revalidate affected products and resume PD-1. |
+| GPU crash tooling / GCD | Delivered: 18 native checks, 32 normal journeys, four SDK-free builds; `ITER-GCD-04-06`. [Scope and evidence](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures). | None for the qualified tooling candidate; use in PD-1. |
 | PD-1: Game / Editor | Product shells/shared settings implemented; seven-map archive cook passed. | Native crash/quit regression, controls/settings/failure and Editor edit/save checks. |
-| PD-2: source / Launcher | Cold clone configured, synced and built the products/tools; Empty cook passed. Restored MSBuild tracking; unchanged full Launcher build took 7.62 s. Earlier owner/runner checks retain their recorded identities. | Current cook/failure/GUI-equivalence checks and independent adoption. |
+| PD-2: source / Launcher | Cold clone configured, synced and built products/tools; Empty cook passed. | Current cook/failure/GUI-equivalence checks and independent adoption. |
 | PD-3 / FR-02: package | Unsigned archive `de0cf4bc…` verified; selected seven-map cook passed on this laptop. | Regenerate after fixes; final archive/offline/precompiled/Qt replacement and minimum-machine checks. |
-| PD-4: diagnostics | Twenty consent/privacy/symbol/review fixture checks passed against `de0cf4bc…`. | Real incident/self-service and valid replacement rehearsal; repeat affected checks on final bytes. Automatic crash/hang collection remains unavailable. |
+| PD-4: diagnostics | Local GPU tooling qualified; earlier consent/privacy/review fixtures passed on `de0cf4bc…`. | Final-archive self-service, incident and replacement rehearsals. Automatic CPU crash/hang collection remains unavailable. |
 | FR-03 to FR-08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
 
-All six product reports remain blocked. Exact candidate records stay under local `artifacts/validation/releases/`; the [report contract](../Acceptance/FeatureCompletionReports.md) defines their required identity and evidence. Earlier results do not qualify changed binaries. Remove completed task instructions; delete the product plan when its remaining checks close. [Release gates](../Acceptance/FirstRelease.md#release-gates) still decide shipment.
+Full product acceptance remains open; GCD's scoped pass does not close PD-1–4. Exact results stay under local `artifacts/validation/releases/`; the [report contract](../Acceptance/FeatureCompletionReports.md) binds them to candidate identities. [Release gates](../Acceptance/FirstRelease.md#release-gates) decide shipment.
 
 ## Ordered Delivery
 

@@ -28,9 +28,7 @@ try
         . (Join-Path $PSScriptRoot '../Diagnostics/GpuCrashIncident.ps1')
         $proposal = Get-GpuCrashExport $GpuCrashManifestPath $IncludeGpuDump.IsPresent $IncludeNvdbg.IsPresent $IncludeSource.IsPresent $IncludeSymbols.IsPresent
         $json = $proposal.Record | ConvertTo-Json -Depth 12
-        $hash = [Security.Cryptography.SHA256]::Create()
-        try { $digest = [BitConverter]::ToString($hash.ComputeHash([Text.Encoding]::UTF8.GetBytes($json))).Replace('-','').ToLowerInvariant() }
-        finally { $hash.Dispose() }
+        $digest = Get-IncidentPreviewSha256 $json
         if (!$Consent)
         {
             [ordered]@{ PreviewSha256 = $digest; Warning = 'Raw dumps, NVIDIA debug data and full source/symbols may contain private content and paths. Binary redaction is not provided.'
@@ -89,9 +87,7 @@ try
         CrashCollection = 'UNAVAILABLE'; HangCollection = 'UNAVAILABLE'; AutomaticUpload = $false
     }
     $json = $record | ConvertTo-Json -Depth 8
-    $hash = [Security.Cryptography.SHA256]::Create()
-    try { $digest = [BitConverter]::ToString($hash.ComputeHash([Text.Encoding]::UTF8.GetBytes($json))).Replace('-','').ToLowerInvariant() }
-    finally { $hash.Dispose() }
+    $digest = Get-IncidentPreviewSha256 $json
     if (!$Consent)
     {
         [ordered]@{ PreviewSha256 = $digest; Record = $record } | ConvertTo-Json -Depth 10
