@@ -52,16 +52,6 @@ void Transform::Translate(const DirectX::XMFLOAT3& delta) noexcept
 	m_translation.z += delta.z;
 }
 
-void Transform::TranslateScaled(const DirectX::XMFLOAT3& direction, float distance) noexcept
-{
-	DirectX::XMFLOAT3 position = m_translation;
-	DirectX::XMVECTOR pos = DirectX::XMLoadFloat3(&position);
-	DirectX::XMVECTOR dir = DirectX::XMLoadFloat3(&direction);
-	pos = DirectX::XMVectorAdd(pos, DirectX::XMVectorScale(dir, distance));
-	DirectX::XMStoreFloat3(&position, pos);
-	SetTranslation(position);
-}
-
 void Transform::SetRotationEuler(const DirectX::XMFLOAT3& rotationEuler) noexcept
 {
 	m_rotationEuler = rotationEuler;
@@ -70,21 +60,6 @@ void Transform::SetRotationEuler(const DirectX::XMFLOAT3& rotationEuler) noexcep
 DirectX::XMFLOAT3 Transform::GetRotationEuler() const noexcept
 {
 	return m_rotationEuler;
-}
-
-void Transform::RotateEuler(const DirectX::XMFLOAT3& deltaEuler) noexcept
-{
-	m_rotationEuler.x += deltaEuler.x;
-	m_rotationEuler.y += deltaEuler.y;
-	m_rotationEuler.z += deltaEuler.z;
-}
-
-void Transform::RotateYawPitch(float yawDelta, float pitchDelta, float minPitch, float maxPitch) noexcept
-{
-	DirectX::XMFLOAT3 rotationEuler = m_rotationEuler;
-	rotationEuler.y += yawDelta;
-	rotationEuler.x += pitchDelta;
-	SetYawPitch(rotationEuler.y, rotationEuler.x, minPitch, maxPitch);
 }
 
 void Transform::SetYawPitch(float yaw, float pitch, float minPitch, float maxPitch) noexcept
@@ -116,20 +91,4 @@ DirectX::XMMATRIX Transform::GetWorldMatrix() const noexcept
 	const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationRollPitchYaw(m_rotationEuler.x, m_rotationEuler.y, m_rotationEuler.z);
 	const DirectX::XMMATRIX translation = DirectX::XMMatrixTranslation(m_translation.x, m_translation.y, m_translation.z);
 	return scale * rotation * translation;
-}
-
-DirectX::XMMATRIX Transform::GetWorldInverseTransposeMatrix() const noexcept
-{
-	const DirectX::XMMATRIX world = GetWorldMatrix();
-	return DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, world));
-}
-
-DirectX::XMFLOAT3X3 Transform::GetRotationMatrix3x3() const noexcept
-{
-	const DirectX::XMFLOAT3 rotationEuler = m_rotationEuler;
-	const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationRollPitchYaw(rotationEuler.x, rotationEuler.y, rotationEuler.z);
-
-	DirectX::XMFLOAT3X3 rotation3x3;
-	DirectX::XMStoreFloat3x3(&rotation3x3, rotation);
-	return rotation3x3;
 }

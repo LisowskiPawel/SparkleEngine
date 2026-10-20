@@ -15,21 +15,16 @@ public:
 	DirectX::XMFLOAT3 GetTranslation() const noexcept;
 
 	void Translate(const DirectX::XMFLOAT3& delta) noexcept;
-	void TranslateScaled(const DirectX::XMFLOAT3& direction, float distance) noexcept;
 
 	void SetRotationEuler(const DirectX::XMFLOAT3& rotationEuler) noexcept;
 	DirectX::XMFLOAT3 GetRotationEuler() const noexcept;
 
-	void RotateEuler(const DirectX::XMFLOAT3& deltaEuler) noexcept;
-	void RotateYawPitch(float yawDelta, float pitchDelta, float minPitch, float maxPitch) noexcept;
 	void SetYawPitch(float yaw, float pitch, float minPitch, float maxPitch) noexcept;
 
 	void SetScale(const DirectX::XMFLOAT3& scale) noexcept;
 	DirectX::XMFLOAT3 GetScale() const noexcept;
 
 	DirectX::XMMATRIX GetWorldMatrix() const noexcept;
-	DirectX::XMMATRIX GetWorldInverseTransposeMatrix() const noexcept;
-	DirectX::XMFLOAT3X3 GetRotationMatrix3x3() const noexcept;
 
 private:
 	DirectX::XMFLOAT3 m_translation{0.0f, 0.0f, 0.0f};

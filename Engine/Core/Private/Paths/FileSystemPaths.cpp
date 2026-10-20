@@ -27,19 +27,9 @@ namespace Filesystem
 		return Private::GetAssetPathState().projectPath;
 	}
 
-	const std::filesystem::path& GetProjectAssetsPath()
-	{
-		return Private::GetAssetPathState().projectAssetsPath;
-	}
-
 	const std::filesystem::path& GetEnginePath()
 	{
 		return Private::GetAssetPathState().enginePath;
-	}
-
-	const std::filesystem::path& GetEngineAssetsPath()
-	{
-		return Private::GetAssetPathState().engineAssetsPath;
 	}
 
 	void ConfigureProjectRoot(const std::filesystem::path& projectRoot)

@@ -19,13 +19,6 @@ float4 PositionViewToClip(float4 viewPosition)
 	return mul(viewPosition, ProjectionMTX);
 }
 
-float4 PositionLocalToClip(float4 localPosition)
-{
-	const float4 worldPosition = PositionLocalToWorld(localPosition);
-	const float4 viewPosition = PositionWorldToView(worldPosition);
-	return PositionViewToClip(viewPosition);
-}
-
 float4 PositionWorldToClip(float4 worldPosition)
 {
 	return mul(worldPosition, ViewProjMTX);
@@ -35,36 +28,4 @@ float4 ApplyTemporalJitterClipOffset(float4 clipPosition, float2 jitterNdc)
 {
 	clipPosition.xy += jitterNdc * clipPosition.w;
 	return clipPosition;
-}
-
-float3 NormalLocalToWorld(float3 normalLocal)
-{
-	return normalize(mul(normalLocal, WorldInverseTranspose));
-}
-
-float4 TangentLocalToWorld(float4 tangentLocal)
-{
-	const float3 worldTangent = mul(tangentLocal.xyz, (float3x3)WorldMatrix);
-	return float4(worldTangent, tangentLocal.w);
-}
-
-float3 Rotate(float3 v, float3 axis, float angle)
-{
-	const float c = cos(angle);
-	const float s = sin(angle);
-	const float oneMinusC = 1.0f - c;
-
-	const float3 a = normalize(axis);
-
-	const float3x3 rotMtx = float3x3(c + a.x * a.x * oneMinusC,
-	                                 a.x * a.y * oneMinusC - a.z * s,
-	                                 a.x * a.z * oneMinusC + a.y * s,
-	                                 a.y * a.x * oneMinusC + a.z * s,
-	                                 c + a.y * a.y * oneMinusC,
-	                                 a.y * a.z * oneMinusC - a.x * s,
-	                                 a.z * a.x * oneMinusC - a.y * s,
-	                                 a.z * a.y * oneMinusC + a.x * s,
-	                                 c + a.z * a.z * oneMinusC);
-
-	return mul(v, rotMtx);
 }

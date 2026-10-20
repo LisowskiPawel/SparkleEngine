@@ -20,13 +20,10 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <tuple>
 
 class InputEventDispatcher;
 class Window;
 struct WindowMessageEvent;
-
-using InputEventTypes = std::tuple<KeyboardEvent, MouseButtonEvent, MouseMoveEvent, MouseWheelEvent>;
 
 template <typename TEvent> using InputCallback = std::function<void(const TEvent&)>;
 

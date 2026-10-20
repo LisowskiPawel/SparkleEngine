@@ -8,6 +8,7 @@
 #include "Editor/Public/UI.h"
 #include "Editor/Viewport/EditorViewportOutputCoordinator.h"
 #include "EditorOperations/EditorOperationRuntime.h"
+#include "RenderingSettings/EngineRenderingSettingsPersistence.h"
 #include "Input/InputSystem.h"
 #include "Renderer.h"
 #include "GameApplication.h"
@@ -116,7 +117,7 @@ void EditorApplication::InitializeUi()
 	    .SubmitRenderingSettings =
 	        [&renderer](EngineRenderingSettingsState settings)
 	    {
-		    SaveRenderingSettings(settings);
+		    EngineRenderingSettingsPersistence::Write(settings);
 		    renderer.SubmitRenderingSettings(std::move(settings));
 	    },
 	    .CaptureRenderingSettings = [&renderer]() { return renderer.CaptureRenderingSettings(); },

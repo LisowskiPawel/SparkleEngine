@@ -34,8 +34,6 @@ public:
 
 	template <typename T> const T* TryGet() const noexcept { return m_userType != nullptr && *m_userType == typeid(T) ? static_cast<const T*>(m_userData) : nullptr; }
 
-	std::uint64_t GetExecutionGeneration() const noexcept { return m_executionGeneration; }
-
 	TaskLane GetLane() const noexcept { return m_lane; }
 
 	bool IsCancellationRequested() const noexcept { return m_cancellation.stop_requested(); }

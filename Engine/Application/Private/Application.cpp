@@ -26,11 +26,6 @@ void Application::ConfigureProcessFromCommandLine()
 #endif
 }
 
-void Application::SaveRenderingSettings(const EngineRenderingSettingsState& settings)
-{
-	EngineRenderingSettingsPersistence::Write(settings);
-}
-
 void Application::Run()
 {
 	try

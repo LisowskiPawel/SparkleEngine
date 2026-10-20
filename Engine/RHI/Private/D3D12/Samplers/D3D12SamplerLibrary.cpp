@@ -57,8 +57,6 @@ D3D12SamplerLibrary::D3D12SamplerLibrary(D3D12Rhi& rhi, RhiDescriptorService& de
 		return;
 	}
 
-	m_descriptorSize = m_rhi->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
-
 	const auto createSampler = [this](Slot slot, RhiSamplerMinMagFilter minMagFilter, RhiSamplerMipFilter mipFilter, RhiSamplerAddressMode addressMode, RhiSamplerAnisotropy maxAnisotropy)
 	{
 		CreateSampler(slot, MakeSamplerDesc(minMagFilter, mipFilter, addressMode, maxAnisotropy));

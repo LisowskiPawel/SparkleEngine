@@ -28,9 +28,7 @@ namespace Filesystem
 	// Cached repository roots
 	const std::filesystem::path& GetWorkspaceRootPath();
 	const std::filesystem::path& GetProjectPath();
-	const std::filesystem::path& GetProjectAssetsPath();
 	const std::filesystem::path& GetEnginePath();
-	const std::filesystem::path& GetEngineAssetsPath();
 	void ConfigureProjectRoot(const std::filesystem::path& projectRoot);
 
 	// Generated cooked/cache/output roots

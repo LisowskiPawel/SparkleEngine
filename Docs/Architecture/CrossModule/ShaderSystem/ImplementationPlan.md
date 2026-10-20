@@ -18,6 +18,8 @@ Prove the shader and pipeline path already delivered in source; repair demonstra
 | Result to reach | Candidate-bound compiler/cook/runtime/failure evidence and clean ownership; use existing checkpoint proof while its inputs remain valid. |
 | Start / stop | Reconcile source drift and the clean Phase 11 floor before regeneration. Missing producers or duplicate authoring/map/pipeline authorities stop the affected check. |
 
+Delivered source checkpoints are retained in [Delivery Evidence](DeliveryEvidence.md). Revalidate them only when changed inputs invalidate their proof; repair demonstrated discrepancies in the current owner. Execute unresolved native/compiler/lifetime/parity/failure/observer/package checks through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without repeating delivered migrations.
+
 ## Delivery At A Glance
 
 ```mermaid
@@ -272,8 +274,6 @@ Suggested title: `Shaders: unify source identity and acceleration-structure bind
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-2-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
-**Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
-
 <details>
 <summary>Copy implementation prompt</summary>
 
@@ -288,8 +288,6 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 ### Phase 3 - Establish reproducible compile jobs and changed dependencies
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-3-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
-
-**Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -306,8 +304,6 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-4-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
-**Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
-
 <details>
 <summary>Copy implementation prompt</summary>
 
@@ -322,8 +318,6 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 ### Phase 5 - Split raster intent, attachment compatibility, and graphics pipeline materialization
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-5-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
-
-**Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -340,8 +334,6 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-6-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
-**Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
-
 <details>
 <summary>Copy implementation prompt</summary>
 
@@ -357,8 +349,6 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-7-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
-**Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
-
 <details>
 <summary>Copy implementation prompt</summary>
 
@@ -373,8 +363,6 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 ### Phase 8 - Add production hit semantics, shadow rays, and scene-to-SBT indexing
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-8-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
-
-**Remaining delta:** revalidate this checkpoint only when source/candidate drift affects it; repair a demonstrated discrepancy in its existing owner. Execute its unresolved native/compiler/lifetime/parity/failure/observer/package oracles through [Phase 12](#phase-12---regenerate-validate-and-hand-off-the-complete-shader-graphics-pipeline-and-ray-tracing-candidate), without recreating the delivered frontend, map, pipeline or RT machinery.
 
 <details>
 <summary>Copy implementation prompt</summary>

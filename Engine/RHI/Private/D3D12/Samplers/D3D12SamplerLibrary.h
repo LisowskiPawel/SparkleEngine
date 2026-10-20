@@ -83,5 +83,4 @@ private:
 	D3D12Rhi* m_rhi = nullptr;
 	RhiDescriptorService* m_descriptorService = nullptr;
 	RhiDescriptorTableHandle m_tableHandle = {};
-	uint32_t m_descriptorSize = 0;
 };

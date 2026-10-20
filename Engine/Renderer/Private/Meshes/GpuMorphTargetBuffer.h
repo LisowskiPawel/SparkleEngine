@@ -35,8 +35,6 @@ public:
 
 	std::uint32_t GetTargetCount() const noexcept { return m_targetCount; }
 
-	bool HasTargets() const noexcept { return m_targetCount > 0u; }
-
 private:
 	RenderHardwareInterface* m_renderHardwareInterface = nullptr;
 

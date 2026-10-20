@@ -10,38 +10,13 @@
 
 **Release classification authority:** [First Release Acceptance Contract](../../Acceptance/FirstRelease.md)
 
-**Current Stage 0 proposal:** [Release Scope](../../Acceptance/FirstRelease.md#approved-release-scope) and [512 Capability Dispositions](../../Acceptance/ReleaseScope/CapabilityDispositions.md) reconcile every existing detailed-inventory ID with one module owner/classification, plus the live map/view/settings surfaces at `93e86b8113c3fcd0c4921729c3513538b95bc794`. These are proposed decisions; the historical source/evidence states below are not refreshed or promoted to acceptance.
+**Release scope:** [Approved scope](../../Acceptance/FirstRelease.md#approved-release-scope) and [capability dispositions](../../Acceptance/ReleaseScope/CapabilityDispositions.md). These decisions do not promote the source evidence below.
 
 **Per-feature candidate report authority:** [First Release Feature Completion Reports](../../Acceptance/FeatureCompletionReports.md)
 
 **Current readiness authority:** [Current Feature Readiness](../../Acceptance/CurrentReadiness.md)
 
 **Sequencing authority:** [Release-First Principal Graphics Roadmap](../../Strategy/Roadmap.md)
-
-## At A Glance
-
-Use the module pages to understand one owner. Use CrossModule only when the result genuinely crosses owners. The detailed tables later on this page are a dated source ledger, not a release scorecard.
-
-```mermaid
-flowchart LR
-    Tools[Tools<br/>import, cook, compile, launch] --> Products[Cooked products]
-    Products --> Engine[Engine<br/>world, application, renderer, RHI]
-    Engine --> Projects[Projects<br/>Showcase products and workloads]
-    Build[Build and packaging] -. composes .-> Tools
-    Build -. composes .-> Engine
-    Build -. composes .-> Projects
-    Cross[CrossModule] -. traces shared journeys .-> Tools
-    Cross -. traces shared journeys .-> Engine
-    Cross -. traces shared journeys .-> Projects
-```
-
-| If you need to know... | Read |
-| --- | --- |
-| what SparkleEngine contains and what is missing | [Engine At A Glance](../EngineAtAGlance.md) |
-| who owns a source capability | the Engine, Tools, Projects, or Build page below |
-| how a capability travels across owners | [Cross-Module Architecture](../CrossModule/README.md) |
-| whether a candidate actually passed | [Acceptance](../../Acceptance/README.md) |
-| how far implementation, integration, verification, and delivery have progressed | [Current Feature Readiness](../../Acceptance/CurrentReadiness.md) |
 
 ## Browse By Repository Boundary
 
@@ -54,17 +29,6 @@ flowchart LR
 | [CrossModule](../CrossModule/README.md) | systems that genuinely span multiple durable owners without one primary module |
 
 Physical placement follows ownership: Renderer details stay under `Engine/Renderer`, RHI details under `Engine/RHI`, and relationships are expressed through links. A feature's plan and research stay beside its dossier; broader module plans stay at the module root, and ownerless joins use `CrossModule`. The inventory below provides the repository-wide evidence ledger without replacing those routes.
-
-## Purpose
-
-This inventory answers four different questions without collapsing them into one:
-
-1. What contract or implementation path exists in the current tree?
-2. Which backends, modes, resources, materials, passes, or tools does that path actually cover?
-3. What is incomplete, capability-gated, vocabulary-only, or absent from that path?
-4. What evidence is still needed before the capability can be included in a release?
-
-Code and executable build configuration remain the authority for implementation. These files are a dated reviewer map. Reconcile a row with current producers, consumers, build membership, and public selection surfaces whenever any of those change.
 
 ## Use The Inventory By Question
 
@@ -114,37 +78,38 @@ The initial detailed inventories carry `S` only. No `B`, `R`, `N`, `P`, or `A` e
 
 ## Detailed Inventories
 
-| Module | Depth in this snapshot | Document | Current evidence boundary |
-| --- | --- | --- | --- |
-| Application | Detailed | [Application Capability Inventory](Engine/Application/ApplicationCapabilities.md) | Game/editor hosts, configuration, loop composition, console, recook, capture coordination, startup/shutdown, and build split reconciled; source-only. |
-| Build and packaging | Detailed | [Build And Packaging Capability Inventory](BuildAndPackaging/BuildAndPackagingCapabilities.md) | CMake profiles, toolchains, dependencies, targets, artifacts, staging, discovery, checks, automation, tests, installation, and packaging reconciled; source-only. |
-| Core | Detailed | [Core Capability Inventory](Engine/Core/CoreCapabilities.md) | Public/private source, CMake membership, diagnostics, configuration, files, processes, serialization, input, math, time, and thread vocabulary reconciled; source-only. |
-| Editor | Detailed | [Editor Capability Inventory](Engine/Editor/EditorCapabilities.md) | Workspace, viewport, level/editing actions, settings, tools, console, capture, restart, runtime separation, and build surfaces reconciled; source-only. |
-| Engine asset corpus | Detailed | [Engine Assets Capability Inventory](Engine/Assets/AssetsCapabilities.md) | Tracked shaders, default textures, sky environments, fixtures, and known transformation/consumption paths reconciled; source-only. |
-| GameFramework | Detailed | [GameFramework Capability Inventory](Engine/GameFramework/GameFrameworkCapabilities.md) | Levels, cooked loading, world/ECS, editing, publication, and render extraction reconciled; source-only. |
-| Launcher | Detailed | [Launcher Capability Inventory](Tools/Launcher/LauncherCapabilities.md) | Discovery, readiness, configure/build/cook/acquire/run/clean workflows, history, cancellation, GUI/shell access, and build membership reconciled; source-only. |
-| Asset cooking | Detailed | [Asset Cooking Capability Inventory](Tools/Cooking/CookingCapabilities.md) | Asset/texture/mesh/material/scene cooking, validation, concurrency, publication, runtime handoff, and build membership reconciled; source-only. |
-| Platform | Detailed | [Platform Capability Inventory](Engine/Platform/PlatformCapabilities.md) | Window, DPI, message, input, routing, capture, cursor, and build surfaces reconciled; source-only. |
-| RHI | Detailed | [RHI Capability Inventory](Engine/RHI/CapabilityInventory.md), reached through the [RHI module route](Engine/RHI/RHIDesign.md) | Public contracts, both backend implementations, build switches, and Renderer consumers reconciled; source-only. |
-| Renderer | Detailed | [Renderer Capability Inventory](Engine/Renderer/CapabilityInventory.md), reached through the [Renderer module route](Engine/Renderer/RendererDesign.md) | Whole-frame ownership plus feature families for surface production, Direct/Indirect/Volumetric Lighting, Ray Tracing, and Post Processing with distinct exposure, reconstruction/upscaling, tone mapping, color grading, chromatic aberration, frame generation, and output boundaries; source-only. |
-| Shader compilation and delivery | Detailed | [Shader Compilation Capability Inventory](Tools/ShaderCompiler/ShaderCompilerCapabilities.md) | Tool build, CLI, typed registrations, compiler backends, validation, publication, editor recook, and runtime loading reconciled; source-only. |
-| Showcase products | Detailed | [Showcase Product Capability Inventory](Projects/Showcase/ShowcaseCapabilities.md) | Editor/game targets, startup/selection, all 16 catalog levels, asset-pack readiness, and workload coverage reconciled; source-only. |
-| Source importers | Detailed | [Source Importers Capability Inventory](Tools/SourceImporters/SourceImportersCapabilities.md) | Formats, geometry, transforms, materials, textures, cameras, lights, deformation, animation, validation, dependencies, and known losses reconciled; source-only. |
-| Tasks | Detailed | [Tasks Capability Inventory](Engine/Tasks/TasksCapabilities.md) | Task graphs, lanes, parallel ranges, cancellation, handles, events, shutdown, failure propagation, and tracing reconciled; source-only. |
-| Shared tool support | Detailed | [Shared Tool Support Capability Inventory](Tools/ToolSupport/ToolSupportCapabilities.md) | Common cooker/compiler console messages, fields, progress, summaries, consumers, and game-profile isolation reconciled; source-only. |
-| Python automation and analysis | Negative/target dossier | [Python Automation And Analysis](Tools/PythonAutomationAndAnalysis.md) | Two narrow Showcase conversion scripts are distinguished from an absent reusable Python tooling, analysis, bindings, or embedded-runtime capability. |
-| Persona/roadmap/gap coverage | Strategy crosswalk | [Capability Coverage Against Persona, Roadmap, And Gap Assessment](../CrossModule/StrategyCoverage.md) | All current module inventories mapped to `NS-*`, `PGE-*`, release subsystems, and refreshed volatile gap observations; source-only. |
-| Neural graphics | Negative/target dossier | [Neural Graphics](../CrossModule/NeuralGraphics/NeuralGraphicsDesign.md) | Vendor reconstruction inference is separated from absent owned data/training, model-to-kernel lowering, kernels, and runtime inference. |
-| Performance diagnostics | Focused dated snapshot | [Performance Diagnostics Capability Inventory](../CrossModule/PerformanceDiagnostics/Capability.md) | Existing timing, marker, memory, editor, and external-capture surfaces reconciled at the document's stated snapshot; source-only and due for refresh before implementation. |
-| Geometry-cache animation | Focused dated snapshot | [Geometry Cache Animation Capability Snapshot](../CrossModule/GeometryCacheAnimation/GeometryCacheAnimationDesign.md#geometry-cache-animation-capability-snapshot) | Existing import, cook, animation, scene-publication, deformation, residency, and workload-source seams reconciled; source-only. |
-| Deferred GBuffer decals | Current feature-gap dossier | [Deferred Decals](Engine/Renderer/Features/DeferredDecals/DeferredDecalsDesign.md) | No current decal feature; existing extension seams and separately labeled target architecture are reconciled without implying implementation. |
-| Debug-view presentation | Current feature dossier | [Debug Views](Engine/Renderer/Features/DebugViews/DebugViewsDesign.md) | Existing modes, visualization products, exposure/tone/encoding limitation, viewport ownership, and target-presentation boundary reconciled; source-only. |
-| Cross-system graphics coverage | Deep horizontal | [Graphics Feature Coverage Matrix](../CrossModule/GraphicsCoverageMatrix.md) | Feature-by-feature selectors, passes, shaders, RHI gates, backend asymmetries, fallbacks, resources, and negative coverage reconciled; source-only. |
-| Feature execution | Deep vertical | [Graphics Feature Execution Traces](../CrossModule/FeatureExecutionTraces.md) | Frame, raster, ray GBuffer, ReSTIR, reference, provider, shader-delivery, and capture paths traced producer-to-consumer; source-only. |
-| Product/developer workflow coverage | Deep horizontal | [Product And Developer Workflow Coverage](../CrossModule/ProductWorkflowCoverage.md) | Discovery, build, content, cook, launch, editor, game, diagnostics, cancellation, package, release, and support journeys compared actor-by-actor; source-only. |
-| Product/developer execution | Deep vertical | [Product And Developer Execution Traces](../CrossModule/ProductExecutionTraces.md) | Quick Start, asset-to-frame, editor transaction, settings, shader reload, capture, and settlement paths traced across owners; source-only. |
-| Registered Renderer programs | Exact catalog | [Renderer Shader Program Catalog](Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md) | All 35 registrations mapped to source, entry, stage, consumer, and binding/traversal boundary; source-only. |
-| Evidence closure | Plan | [Capability Evidence Plan](CapabilityEvidencePlan.md) | Missing source audits and the smallest proof needed to promote individual claims. It does not replace release gates or roadmap order. |
+| Module | Depth in this snapshot | Document |
+| --- | --- | --- |
+| Application | Detailed | [Application Capability Inventory](Engine/Application/ApplicationCapabilities.md) |
+| Build and packaging | Detailed | [Build And Packaging Capability Inventory](BuildAndPackaging/BuildAndPackagingCapabilities.md) |
+| Core | Detailed | [Core Capability Inventory](Engine/Core/CoreCapabilities.md) |
+| Editor | Detailed | [Editor Capability Inventory](Engine/Editor/EditorCapabilities.md) |
+| Engine asset corpus | Detailed | [Engine Assets Capability Inventory](Engine/Assets/AssetsCapabilities.md) |
+| GameFramework | Detailed | [GameFramework Capability Inventory](Engine/GameFramework/GameFrameworkCapabilities.md) |
+| Launcher | Detailed | [Launcher Capability Inventory](Tools/Launcher/LauncherCapabilities.md) |
+| Asset cooking | Detailed | [Asset Cooking Capability Inventory](Tools/Cooking/CookingCapabilities.md) |
+| Platform | Detailed | [Platform Capability Inventory](Engine/Platform/PlatformCapabilities.md) |
+| RHI | Detailed | [RHI Capability Inventory](Engine/RHI/CapabilityInventory.md), reached through the [RHI module route](Engine/RHI/RHIDesign.md) |
+| Renderer | Detailed | [Renderer Capability Inventory](Engine/Renderer/CapabilityInventory.md), reached through the [Renderer module route](Engine/Renderer/RendererDesign.md) |
+| Shader compilation and delivery | Detailed | [Shader Compilation Capability Inventory](Tools/ShaderCompiler/ShaderCompilerCapabilities.md) |
+| Showcase products | Detailed | [Showcase Product Capability Inventory](Projects/Showcase/ShowcaseCapabilities.md) |
+| Source importers | Detailed | [Source Importers Capability Inventory](Tools/SourceImporters/SourceImportersCapabilities.md) |
+| Tasks | Detailed | [Tasks Capability Inventory](Engine/Tasks/TasksCapabilities.md) |
+| Shared tool support | Detailed | [Shared Tool Support Capability Inventory](Tools/ToolSupport/ToolSupportCapabilities.md) |
+| Python automation and analysis | Negative/target dossier | [Python Automation And Analysis](Tools/PythonAutomationAndAnalysis.md) |
+| Persona/roadmap/gap coverage | Strategy crosswalk | [Capability Coverage Against Persona, Roadmap, And Gap Assessment](../CrossModule/StrategyCoverage.md) |
+| Neural graphics | Negative/target dossier | [Neural Graphics](../CrossModule/NeuralGraphics/NeuralGraphicsDesign.md) |
+| Performance diagnostics | Focused dated snapshot | [Performance Diagnostics Capability Inventory](../CrossModule/PerformanceDiagnostics/Capability.md) |
+| Geometry-cache animation | Focused dated snapshot | [Geometry Cache Animation Capability Snapshot](../CrossModule/GeometryCacheAnimation/GeometryCacheAnimationDesign.md#geometry-cache-animation-capability-snapshot) |
+| Deferred GBuffer decals | Current feature-gap dossier | [Deferred Decals](Engine/Renderer/Features/DeferredDecals/DeferredDecalsDesign.md) |
+| Debug-view presentation | Current feature dossier | [Debug Views](Engine/Renderer/Features/DebugViews/DebugViewsDesign.md) |
+| Cross-system graphics coverage | Deep horizontal | [Graphics Feature Coverage Matrix](../CrossModule/GraphicsCoverageMatrix.md) |
+| Feature execution | Deep vertical | [Graphics Feature Execution Traces](../CrossModule/FeatureExecutionTraces.md) |
+| Product/developer workflow coverage | Deep horizontal | [Product And Developer Workflow Coverage](../CrossModule/ProductWorkflowCoverage.md) |
+| Product/developer execution | Deep vertical | [Product And Developer Execution Traces](../CrossModule/ProductExecutionTraces.md) |
+| Registered Renderer programs | Exact catalog | [Renderer Shader Program Catalog](Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md) |
+| Evidence closure | Plan | [Capability Evidence Plan](CapabilityEvidencePlan.md) |
+
 
 ## Current Coverage Boundary
 

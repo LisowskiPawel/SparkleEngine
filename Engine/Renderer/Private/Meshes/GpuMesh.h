@@ -85,8 +85,6 @@ public:
 
 	std::span<const VertexSkinInfluence> GetSkinInfluences() const noexcept { return m_cpuSkinInfluences; }
 
-	bool HasMorphTargets() const noexcept { return m_morphTargets.HasTargets(); }
-
 	std::uint32_t GetMorphTargetCount() const noexcept { return m_morphTargets.GetTargetCount(); }
 
 	std::span<const MorphTargetDeltaData> GetMorphTargetDeltas() const noexcept { return m_morphTargets.GetDeltas(); }
