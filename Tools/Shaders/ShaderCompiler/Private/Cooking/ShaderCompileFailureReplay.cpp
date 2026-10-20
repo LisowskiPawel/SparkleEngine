@@ -45,6 +45,7 @@ namespace ShaderCompileFailureReplay
 		const std::size_t retainedCount = std::min(values.size(), kMaximumFailureListEntries);
 		std::vector<std::string> bounded;
 		bounded.reserve(retainedCount + static_cast<std::size_t>(values.size() > retainedCount));
+
 		for (std::size_t index = 0; index < retainedCount; ++index)
 		{
 			const auto& text = project(values[index]);
@@ -63,6 +64,7 @@ namespace ShaderCompileFailureReplay
 		{
 			const std::vector<std::string> replayDependencies = BoundStrings(std::span(job.VirtualDependencies));
 			const std::vector<std::string> replayDefines = BoundStrings(std::span(job.Request.Defines));
+
 			const std::vector<std::string> replayRemaps = BoundStrings(
 			    std::span(job.Request.DescriptorBindingRemaps),
 			    [](const ShaderDescriptorBindingRemap& remap) { return std::format("{}:{}:{}", remap.Name, remap.Set, remap.Binding); });

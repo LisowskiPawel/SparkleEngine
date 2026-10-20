@@ -1,11 +1,9 @@
 #pragma once
 
-#include "Cooking/ShaderCompileJob.h"
+struct ShaderCompileJob;
+struct ShaderCompileResult;
 
-class ShaderCompileJobExecutor final
+namespace ShaderCompileJobExecutor
 {
-public:
-	ShaderCompileJobExecutor() = delete;
-
-	static ShaderCompileResult Execute(const ShaderCompileJob& job);
-};
+	ShaderCompileResult Execute(const ShaderCompileJob& job);
+}
