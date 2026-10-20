@@ -4,6 +4,7 @@
 #include "Core/Public/FileSystemUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Json/JsonReader.h"
+#include "Core/Public/Formatting/HexFormat.h"
 #include "Core/Public/Paths/PackagePaths.h"
 #include "Core/Public/Paths/WorkspaceOutputPaths.h"
 #include "Core/Public/Paths/ProductPaths.h"
@@ -68,7 +69,7 @@ namespace SparkleLauncher
 
 		std::uint64_t expectedMapHash = 0;
 		std::uint64_t expectedLibraryHash = 0;
-		if (!Json::TryParseHexUInt64(expectedMapHashText, expectedMapHash) || !Json::TryParseHexUInt64(expectedLibraryHashText, expectedLibraryHash))
+		if (!Formatting::TryParseHexUInt64(expectedMapHashText, expectedMapHash) || !Formatting::TryParseHexUInt64(expectedLibraryHashText, expectedLibraryHash))
 		{
 			return false;
 		}

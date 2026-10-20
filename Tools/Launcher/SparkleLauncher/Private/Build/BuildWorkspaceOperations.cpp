@@ -1,6 +1,9 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
 #include "HostGraphicsCapabilities.h"
+#include "SparkleLauncher/BuildProfileCatalog.h"
+
+#include <algorithm>
 
 namespace SparkleLauncher
 {
@@ -67,6 +70,48 @@ namespace SparkleLauncher
 		settings.NvidiaStreamlineEnabled = hostGraphics.HasNvidiaAdapter;
 #endif
 		return settings;
+	}
+
+	std::vector<std::string> ResolveWorkspaceBuildTargets(const BuildWorkspaceOperationPlan& plan, BuildWorkspaceScope scope)
+	{
+		switch (scope)
+		{
+			case BuildWorkspaceScope::Launcher:
+				return {"SparkleLauncher"};
+			case BuildWorkspaceScope::CookTools:
+			{
+				std::vector<std::string> targets;
+#if SPARKLE_ENABLE_CONTENT_PIPELINE
+				targets.push_back("AssetCooker");
+				targets.push_back("TextureCooker");
+#endif
+#if SPARKLE_ENABLE_SHADER_COMPILER
+				targets.push_back("ShaderCompiler");
+#endif
+				return targets;
+			}
+			case BuildWorkspaceScope::Editor:
+			case BuildWorkspaceScope::Game:
+			{
+				if (plan.Kind != BuildWorkspaceOperationKind::BuildWorkspace && !plan.Request.SelectedTargets.empty())
+				{
+					return plan.Request.SelectedTargets;
+				}
+				const std::string& profileName = scope == BuildWorkspaceScope::Editor ? plan.Request.EditorProfile : plan.Request.GameProfile;
+				const std::optional<BuildProfile> profile = FindBuildProfile(profileName);
+				if (!profile.has_value())
+				{
+					return {};
+				}
+				return {BuildProjectTargetName(plan.Request.ContentId, *profile)};
+			}
+		}
+		return {};
+	}
+
+	bool HasSelectedBuildScope(const BuildWorkspaceOperationRequest& request, BuildWorkspaceScope scope)
+	{
+		return std::find(request.SelectedScopes.begin(), request.SelectedScopes.end(), scope) != request.SelectedScopes.end();
 	}
 
 	std::string ToString(BuildWorkspaceOperationKind kind)

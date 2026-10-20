@@ -2,6 +2,8 @@
 
 #include "Vulkan/Commands/VulkanRenderCommandList.h"
 
+#include "Vulkan/VulkanTypeConversions.h"
+
 #include "Vulkan/Descriptors/VulkanDescriptorAllocator.h"
 #include "Vulkan/Descriptors/VulkanRecordingDescriptorPool.h"
 #include "Vulkan/Device/VulkanRhi.h"
@@ -162,48 +164,6 @@ const CompiledBinding* VulkanRenderCommandList::FindBindingByIndex(const VulkanB
 		}
 	}
 	return nullptr;
-}
-
-VkShaderStageFlags VulkanRenderCommandList::ToVkShaderStages(ShaderStageMask visibilityMask) noexcept
-{
-	VkShaderStageFlags result = 0;
-	if (HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Vertex))
-	{
-		result |= VK_SHADER_STAGE_VERTEX_BIT;
-	}
-	if (HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Pixel))
-	{
-		result |= VK_SHADER_STAGE_FRAGMENT_BIT;
-	}
-	if (HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Compute))
-	{
-		result |= VK_SHADER_STAGE_COMPUTE_BIT;
-	}
-	if (HasAnyShaderStageMask(visibilityMask, ShaderStageMask::RayGeneration))
-	{
-		result |= VK_SHADER_STAGE_RAYGEN_BIT_KHR;
-	}
-	if (HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Miss))
-	{
-		result |= VK_SHADER_STAGE_MISS_BIT_KHR;
-	}
-	if (HasAnyShaderStageMask(visibilityMask, ShaderStageMask::ClosestHit))
-	{
-		result |= VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-	}
-	if (HasAnyShaderStageMask(visibilityMask, ShaderStageMask::AnyHit))
-	{
-		result |= VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
-	}
-	if (HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Intersection))
-	{
-		result |= VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
-	}
-	if (HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Callable))
-	{
-		result |= VK_SHADER_STAGE_CALLABLE_BIT_KHR;
-	}
-	return result != 0 ? result : VK_SHADER_STAGE_ALL;
 }
 
 void VulkanRenderCommandList::WriteAccelerationStructureBinding(VkDescriptorSet descriptorSet, const CompiledBinding& binding, RhiResourceHandle resourceHandle) noexcept
@@ -412,7 +372,14 @@ void VulkanRenderCommandList::SetShaderPushConstants(
 	{
 		return;
 	}
-	vkCmdPushConstants(m_commandBuffer, state.PipelineLayout, ToVkShaderStages(binding->VisibilityMask), destOffsetIn32BitValues * sizeof(std::uint32_t), num32BitValues * sizeof(std::uint32_t), data);
+
+	vkCmdPushConstants(
+	    m_commandBuffer,
+	    state.PipelineLayout,
+	    VulkanTypeConversions::ToVkShaderStages(binding->VisibilityMask),
+	    destOffsetIn32BitValues * sizeof(std::uint32_t),
+	    num32BitValues * sizeof(std::uint32_t),
+	    data);
 }
 
 void VulkanRenderCommandList::FlushShaderDescriptorSets(VkPipelineBindPoint bindPoint, ShaderBindingState& state) noexcept

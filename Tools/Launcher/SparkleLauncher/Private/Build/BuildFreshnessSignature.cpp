@@ -33,7 +33,7 @@ namespace SparkleLauncher
 		return normalized.find("/third_party/") != std::string::npos || normalized.find("\\third_party\\") != std::string::npos;
 	}
 
-	static std::string MakeFreshnessSignaturePath(const std::filesystem::path& repositoryRoot, const std::filesystem::path& path)
+	std::string MakeFreshnessSignaturePath(const std::filesystem::path& repositoryRoot, const std::filesystem::path& path)
 	{
 		const std::optional<std::filesystem::path> relativePath = Paths::TryMakeRelativeUnderRoot(path, repositoryRoot);
 		std::string value = relativePath.has_value() ? relativePath->generic_string() : path.filename().generic_string();

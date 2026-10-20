@@ -174,6 +174,7 @@ A complete validated neutral descriptor—shader programs, reflected bindings, p
 - `ShaderBytecode`, target/stage identity, reflection, and `PassParameterLayout` define the ABI consumed by pipeline validation.
 - Graphics and compute pipeline descriptors own all exposed fixed-function and binding state. Cache identity must include every semantic field and the owning shader generation.
 - D3D12 root signatures/PSOs and Vulkan layouts/modules/pipelines are lowerings, not separate feature contracts.
+- `VulkanTypeConversions` owns shader-stage lowering for modules, binding layouts and push constants; consumers do not keep local conversion tables.
 - The current graphics contract binds vertex and pixel programs. Geometry/hull/domain and mesh/task vocabulary is not an active pipeline route.
 - Shader authoring macros/types are compile-time contract vocabulary; the ShaderCompiler owns offline compilation/publication and Renderer owns program selection/reload.
 

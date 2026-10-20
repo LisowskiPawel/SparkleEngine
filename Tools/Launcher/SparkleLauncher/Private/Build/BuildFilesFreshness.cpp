@@ -3,25 +3,15 @@
 #include "BuildFreshnessSignature.h"
 #include "CMakeGeneratorModel.h"
 #include "BuildWorkspaceStateFiles.h"
-#include "Core/Public/Paths/PathUtils.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Paths/WorkspaceOutputPaths.h"
 
-#include <algorithm>
 #include <fstream>
 #include <optional>
 #include <system_error>
 
 namespace SparkleLauncher
 {
-	static std::string MakeFreshnessRelativePath(const std::filesystem::path& repositoryRoot, const std::filesystem::path& path)
-	{
-		const std::optional<std::filesystem::path> relativePath = Paths::TryMakeRelativeUnderRoot(path, repositoryRoot);
-		std::string value = relativePath.has_value() ? relativePath->generic_string() : path.filename().generic_string();
-		std::replace(value.begin(), value.end(), '/', '\\');
-		return Strings::ToLowerCopy(value);
-	}
-
 	static std::string ToCMakeBool(bool value)
 	{
 		return value ? "ON" : "OFF";
@@ -138,7 +128,7 @@ namespace SparkleLauncher
 			if (!errorCode && inputTime > stampTime)
 			{
 				status.State = BuildFilesFreshnessState::BuildInputChanged;
-				status.Summary = "Build input changed: " + MakeFreshnessRelativePath(repositoryRoot, path);
+				status.Summary = "Build input changed: " + MakeFreshnessSignaturePath(repositoryRoot, path);
 				return status;
 			}
 			errorCode.clear();

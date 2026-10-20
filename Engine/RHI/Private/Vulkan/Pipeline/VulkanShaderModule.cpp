@@ -1,6 +1,8 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Pipeline/VulkanShaderModule.h"
+
+#include "Vulkan/VulkanTypeConversions.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
 #endif
@@ -106,44 +108,10 @@ VkPipelineShaderStageCreateInfo VulkanShaderModule::BuildStageCreateInfo() const
 	    .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 	    .pNext = nullptr,
 	    .flags = 0,
-	    .stage = ToVkShaderStage(m_stage),
+	    .stage = VulkanTypeConversions::ToVkShaderStage(m_stage),
 	    .module = m_module,
 	    .pName = m_entryPoint.c_str(),
 	    .pSpecializationInfo = nullptr};
-}
-
-VkShaderStageFlagBits VulkanShaderModule::ToVkShaderStage(ShaderStage stage) noexcept
-{
-	switch (stage)
-	{
-		case ShaderStage::Vertex:
-			return VK_SHADER_STAGE_VERTEX_BIT;
-		case ShaderStage::Pixel:
-			return VK_SHADER_STAGE_FRAGMENT_BIT;
-		case ShaderStage::Compute:
-			return VK_SHADER_STAGE_COMPUTE_BIT;
-		case ShaderStage::Geometry:
-			return VK_SHADER_STAGE_GEOMETRY_BIT;
-		case ShaderStage::Hull:
-			return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-		case ShaderStage::Domain:
-			return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-		case ShaderStage::RayGeneration:
-			return VK_SHADER_STAGE_RAYGEN_BIT_KHR;
-		case ShaderStage::Miss:
-			return VK_SHADER_STAGE_MISS_BIT_KHR;
-		case ShaderStage::ClosestHit:
-			return VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-		case ShaderStage::AnyHit:
-			return VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
-		case ShaderStage::Intersection:
-			return VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
-		case ShaderStage::Callable:
-			return VK_SHADER_STAGE_CALLABLE_BIT_KHR;
-		case ShaderStage::Count:
-		default:
-			return VK_SHADER_STAGE_ALL;
-	}
 }
 
 void VulkanShaderModule::Reset() noexcept

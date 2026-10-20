@@ -47,5 +47,4 @@ namespace Json
 	}
 
 	SPARKLE_CORE_API bool TryReadUInt64Property(std::string_view objectText, std::string_view key, std::uint64_t& outValue);
-	SPARKLE_CORE_API bool TryParseHexUInt64(std::string_view text, std::uint64_t& outValue) noexcept;
 }

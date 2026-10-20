@@ -3,10 +3,7 @@
 #include "CMakeWorkflowProcessRequests.h"
 #include "HostToolInstaller.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "SparkleLauncher/BuildProfileCatalog.h"
 
-#include <algorithm>
-#include <optional>
 #include <string_view>
 #include <utility>
 
@@ -32,43 +29,6 @@ namespace SparkleLauncher
 			return MakeCMakeLauncherBuildRequest(plan.RepositoryRoot, plan.Toolchain, plan.Operation.Id, profileName, "Build.txt");
 		}
 		return MakeCMakeBuildRequest(plan.RepositoryRoot, plan.Toolchain, plan.Operation.Id, profileName, targets, "Build.txt");
-	}
-
-	static std::vector<std::string> ResolveProjectTargets(std::string_view projectId, std::string_view profileName)
-	{
-		const std::optional<BuildProfile> profile = FindBuildProfile(profileName);
-		if (!profile.has_value())
-		{
-			return {};
-		}
-		return {BuildProjectTargetName(projectId, *profile)};
-	}
-
-	static std::vector<std::string> ResolveBuildTargets(const BuildWorkspaceOperationPlan& plan, std::string_view profileName)
-	{
-		if (!plan.Request.SelectedTargets.empty())
-		{
-			return plan.Request.SelectedTargets;
-		}
-		return ResolveProjectTargets(plan.Request.ContentId, profileName);
-	}
-
-	static std::vector<std::string> GetEnabledCookToolTargets()
-	{
-		std::vector<std::string> targets;
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-		targets.push_back("AssetCooker");
-		targets.push_back("TextureCooker");
-#endif
-#if SPARKLE_ENABLE_SHADER_COMPILER
-		targets.push_back("ShaderCompiler");
-#endif
-		return targets;
-	}
-
-	static bool HasSelectedScope(const BuildWorkspaceOperationRequest& request, BuildWorkspaceScope scope)
-	{
-		return std::find(request.SelectedScopes.begin(), request.SelectedScopes.end(), scope) != request.SelectedScopes.end();
 	}
 
 	static void AppendTargets(std::vector<std::string>& destination, const std::vector<std::string>& targets)
@@ -143,41 +103,41 @@ namespace SparkleLauncher
 				}
 
 				std::vector<std::string> editorProfileTargets;
-				if (HasSelectedScope(plan.Request, BuildWorkspaceScope::Launcher))
+				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Launcher))
 				{
-					editorProfileTargets.push_back("SparkleLauncher");
+					AppendTargets(editorProfileTargets, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher));
 				}
-				if (HasSelectedScope(plan.Request, BuildWorkspaceScope::Editor))
+				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Editor))
 				{
-					AppendTargets(editorProfileTargets, ResolveProjectTargets(plan.Request.ContentId, plan.Request.EditorProfile));
+					AppendTargets(editorProfileTargets, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor));
 				}
-				if (HasSelectedScope(plan.Request, BuildWorkspaceScope::CookTools))
+				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::CookTools))
 				{
-					AppendTargets(editorProfileTargets, GetEnabledCookToolTargets());
+					AppendTargets(editorProfileTargets, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools));
 				}
 				if (!editorProfileTargets.empty())
 				{
 					AddBuildStep(steps, plan, plan.Request.EditorProfile, editorProfileTargets);
 				}
-				if (HasSelectedScope(plan.Request, BuildWorkspaceScope::Game))
+				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Game))
 				{
-					AddBuildStep(steps, plan, plan.Request.GameProfile, ResolveProjectTargets(plan.Request.ContentId, plan.Request.GameProfile));
+					AddBuildStep(steps, plan, plan.Request.GameProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game));
 				}
 				return steps;
 			}
 			case BuildWorkspaceOperationKind::CompileLauncher:
 				AddConfigureStep(steps, plan);
-				AddBuildStep(steps, plan, plan.Request.EditorProfile, {"SparkleLauncher"});
+				AddBuildStep(steps, plan, plan.Request.EditorProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher));
 				return steps;
 			case BuildWorkspaceOperationKind::CompileEditor:
-				AddBuildStep(steps, plan, plan.Request.EditorProfile, ResolveBuildTargets(plan, plan.Request.EditorProfile));
+				AddBuildStep(steps, plan, plan.Request.EditorProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor));
 				return steps;
 			case BuildWorkspaceOperationKind::CompileGame:
-				AddBuildStep(steps, plan, plan.Request.GameProfile, ResolveBuildTargets(plan, plan.Request.GameProfile));
+				AddBuildStep(steps, plan, plan.Request.GameProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game));
 				return steps;
 			case BuildWorkspaceOperationKind::BuildCookTools:
 			{
-				const std::vector<std::string> cookToolTargets = GetEnabledCookToolTargets();
+				const std::vector<std::string> cookToolTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools);
 				if (!cookToolTargets.empty())
 				{
 					AddBuildStep(steps, plan, plan.Request.EditorProfile, cookToolTargets);

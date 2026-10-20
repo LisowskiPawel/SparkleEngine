@@ -178,6 +178,8 @@ namespace SparkleLauncher
 	std::string ToString(BuildFilesFreshnessState state);
 	std::string ToString(BuildWorkspaceOperationKind kind);
 	std::string BuildWorkspaceScopeId(BuildWorkspaceScope scope);
+	bool HasSelectedBuildScope(const BuildWorkspaceOperationRequest& request, BuildWorkspaceScope scope);
+	std::vector<std::string> ResolveWorkspaceBuildTargets(const BuildWorkspaceOperationPlan& plan, BuildWorkspaceScope scope);
 	bool TryParseBuildWorkspaceScope(std::string_view text, BuildWorkspaceScope& outScope);
 	std::string ToString(WorkspaceIde ide);
 	std::string DisplayName(WorkspaceIde ide);

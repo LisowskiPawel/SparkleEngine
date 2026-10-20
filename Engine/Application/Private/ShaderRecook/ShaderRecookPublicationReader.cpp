@@ -6,6 +6,7 @@
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Json/JsonReader.h"
+#include "Core/Public/Formatting/HexFormat.h"
 
 #include <cstdint>
 #include <string>
@@ -73,8 +74,8 @@ ShaderRecookPublicationReadResult ShaderRecookPublicationReader::Parse(std::stri
 	std::uint64_t cookedShaderLibraryHash = 0;
 	if (!Json::TryReadStringProperty(text, "schema", schema) || !Json::TryReadStringProperty(text, "status", status) || !Json::TryReadUInt64Property(text, "publicationId", publicationId)
 	    || !Json::TryReadUInt64Property(text, "publishedAtUnixMs", publishedAtUnixMs) || !Json::TryReadStringProperty(text, "globalShaderMapHash", globalShaderMapHashText)
-	    || !Json::TryReadStringProperty(text, "cookedShaderLibraryHash", cookedShaderLibraryHashText) || !Json::TryParseHexUInt64(globalShaderMapHashText, globalShaderMapHash)
-	    || !Json::TryParseHexUInt64(cookedShaderLibraryHashText, cookedShaderLibraryHash))
+	    || !Json::TryReadStringProperty(text, "cookedShaderLibraryHash", cookedShaderLibraryHashText) || !Formatting::TryParseHexUInt64(globalShaderMapHashText, globalShaderMapHash)
+	    || !Formatting::TryParseHexUInt64(cookedShaderLibraryHashText, cookedShaderLibraryHash))
 	{
 		result.Diagnostic = "Shader recook publication is invalid or partially written; reload rejected before touching active shaders.";
 		return result;

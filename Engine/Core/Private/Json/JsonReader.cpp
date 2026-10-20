@@ -2,7 +2,6 @@
 
 #include "Core/Public/Json/JsonReader.h"
 
-#include "Core/Public/Formatting/HexFormat.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <cctype>
@@ -392,8 +391,4 @@ namespace Json
 		return true;
 	}
 
-	bool TryParseHexUInt64(std::string_view text, std::uint64_t& outValue) noexcept
-	{
-		return Formatting::TryParseHexUInt64(text, outValue);
-	}
 }

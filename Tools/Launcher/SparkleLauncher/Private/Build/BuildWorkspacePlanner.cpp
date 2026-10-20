@@ -7,7 +7,6 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "SparkleLauncher/ArtifactNaming.h"
-#include "SparkleLauncher/BuildProfileCatalog.h"
 #include "LauncherStatePaths.h"
 #include "Core/Public/Paths/WorkspaceOutputPaths.h"
 
@@ -66,34 +65,6 @@ namespace SparkleLauncher
 
 		AddReadiness(plan, "Enabled repository dependencies are incomplete. Run Sync Code before local build workflows.");
 		return false;
-	}
-
-	static std::vector<std::string> ResolveProjectTargets(std::string_view projectId, std::string_view profileName)
-	{
-		const std::optional<BuildProfile> profile = FindBuildProfile(profileName);
-		if (!profile.has_value())
-		{
-			return {};
-		}
-		return {BuildProjectTargetName(projectId, *profile)};
-	}
-
-	static std::vector<std::string> GetEnabledCookToolTargets()
-	{
-		std::vector<std::string> targets;
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-		targets.push_back("AssetCooker");
-		targets.push_back("TextureCooker");
-#endif
-#if SPARKLE_ENABLE_SHADER_COMPILER
-		targets.push_back("ShaderCompiler");
-#endif
-		return targets;
-	}
-
-	static bool HasSelectedScope(const BuildWorkspaceOperationRequest& request, BuildWorkspaceScope scope)
-	{
-		return std::find(request.SelectedScopes.begin(), request.SelectedScopes.end(), scope) != request.SelectedScopes.end();
 	}
 
 	static void AppendTargets(std::vector<std::string>& destination, const std::vector<std::string>& targets)
@@ -221,13 +192,13 @@ namespace SparkleLauncher
 				}
 
 				std::vector<std::string> editorProfileTargets;
-				if (HasSelectedScope(request, BuildWorkspaceScope::Launcher))
+				if (HasSelectedBuildScope(request, BuildWorkspaceScope::Launcher))
 				{
-					editorProfileTargets.push_back("SparkleLauncher");
+					AppendTargets(editorProfileTargets, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher));
 				}
-				if (HasSelectedScope(request, BuildWorkspaceScope::Editor))
+				if (HasSelectedBuildScope(request, BuildWorkspaceScope::Editor))
 				{
-					const std::vector<std::string> editorTargets = ResolveProjectTargets(request.ContentId, request.EditorProfile);
+					const std::vector<std::string> editorTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor);
 					if (editorTargets.empty())
 					{
 						AddReadiness(plan, "No editor build target could be resolved.");
@@ -235,9 +206,9 @@ namespace SparkleLauncher
 					}
 					AppendTargets(editorProfileTargets, editorTargets);
 				}
-				if (HasSelectedScope(request, BuildWorkspaceScope::CookTools))
+				if (HasSelectedBuildScope(request, BuildWorkspaceScope::CookTools))
 				{
-					const std::vector<std::string> cookToolTargets = GetEnabledCookToolTargets();
+					const std::vector<std::string> cookToolTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools);
 					if (cookToolTargets.empty())
 					{
 						AddReadiness(plan, "No cook-tool targets are enabled in this workspace configuration.");
@@ -250,9 +221,9 @@ namespace SparkleLauncher
 					AddBuildStep(plan, request.EditorProfile, editorProfileTargets);
 				}
 
-				if (HasSelectedScope(request, BuildWorkspaceScope::Game))
+				if (HasSelectedBuildScope(request, BuildWorkspaceScope::Game))
 				{
-					const std::vector<std::string> gameTargets = ResolveProjectTargets(request.ContentId, request.GameProfile);
+					const std::vector<std::string> gameTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game);
 					if (gameTargets.empty())
 					{
 						AddReadiness(plan, "No game build target could be resolved.");
@@ -266,7 +237,7 @@ namespace SparkleLauncher
 			}
 			case BuildWorkspaceOperationKind::CompileLauncher:
 				AddConfigureStep(plan);
-				AddBuildStep(plan, request.EditorProfile, {"SparkleLauncher"});
+				AddBuildStep(plan, request.EditorProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher));
 				AddPlannedEffect(plan, "Configure the Launcher-owned product graph, then rebuild its executable and deployed support files.");
 				plan.CanRun = true;
 				return;
@@ -284,7 +255,7 @@ namespace SparkleLauncher
 				{
 					return;
 				}
-				std::vector<std::string> targets = request.SelectedTargets.empty() ? ResolveProjectTargets(request.ContentId, request.EditorProfile) : request.SelectedTargets;
+				std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor);
 				if (targets.empty())
 				{
 					AddReadiness(plan, "No editor build target could be resolved.");
@@ -308,7 +279,7 @@ namespace SparkleLauncher
 				{
 					return;
 				}
-				std::vector<std::string> targets = request.SelectedTargets.empty() ? ResolveProjectTargets(request.ContentId, request.GameProfile) : request.SelectedTargets;
+				std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game);
 				if (targets.empty())
 				{
 					AddReadiness(plan, "No game build target could be resolved.");
@@ -332,7 +303,7 @@ namespace SparkleLauncher
 					return;
 				}
 				{
-					const std::vector<std::string> cookToolTargets = GetEnabledCookToolTargets();
+					const std::vector<std::string> cookToolTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools);
 					if (cookToolTargets.empty())
 					{
 						AddReadiness(plan, "No optional cook-tool targets are enabled in this workspace configuration.");

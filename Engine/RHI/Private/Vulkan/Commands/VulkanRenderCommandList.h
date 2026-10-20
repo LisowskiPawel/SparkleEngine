@@ -160,7 +160,6 @@ private:
 	void OnResourceTrackingFinished(RhiResourceHandle resource, RhiSubmissionToken submissionToken) noexcept override;
 
 	static const CompiledBinding* FindBindingByIndex(const VulkanBindingLayout* layout, std::uint32_t bindingIndex) noexcept;
-	static VkShaderStageFlags ToVkShaderStages(ShaderStageMask visibilityMask) noexcept;
 	VulkanResourceStateMapping ResolveResourceState(ResourceState state) const noexcept;
 	VkBuffer ResolveBuffer(RhiGpuVirtualAddress gpuAddress) const noexcept;
 	BufferBinding ResolveBufferBinding(RhiGpuVirtualAddress gpuAddress) const noexcept;

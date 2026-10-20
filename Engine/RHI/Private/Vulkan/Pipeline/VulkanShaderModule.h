@@ -28,7 +28,6 @@ public:
 	VkPipelineShaderStageCreateInfo BuildStageCreateInfo() const noexcept;
 
 private:
-	static VkShaderStageFlagBits ToVkShaderStage(ShaderStage stage) noexcept;
 	void Reset() noexcept;
 
 	VkDevice m_device = VK_NULL_HANDLE;

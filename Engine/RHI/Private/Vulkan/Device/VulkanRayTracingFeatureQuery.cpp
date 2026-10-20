@@ -1,34 +1,7 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Device/VulkanRayTracingFeatureQuery.h"
-#include "Vulkan/Core/VulkanResult.h"
-
-#include <algorithm>
-#include <string_view>
-#include <vector>
-
-namespace VulkanExtensionQuery
-{
-	bool IsDeviceExtensionAvailable(VkPhysicalDevice device, const char* extensionName) noexcept
-	{
-		std::uint32_t extensionCount = 0;
-		if (!VulkanResult::Succeeded(vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr)))
-		{
-			return false;
-		}
-
-		std::vector<VkExtensionProperties> extensions(extensionCount);
-		if (!VulkanResult::Succeeded(vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, extensions.data())))
-		{
-			return false;
-		}
-
-		return std::any_of(
-		    extensions.begin(),
-		    extensions.end(),
-		    [extensionName](const VkExtensionProperties& extension) noexcept { return std::string_view(extension.extensionName) == extensionName; });
-	}
-}
+#include "Vulkan/Device/VulkanDeviceExtensions.h"
 
 VulkanRayTracingFeatureStatus VulkanRayTracingFeatureQuery::Query(VkPhysicalDevice physicalDevice) noexcept
 {
@@ -38,12 +11,12 @@ VulkanRayTracingFeatureStatus VulkanRayTracingFeatureQuery::Query(VkPhysicalDevi
 		return status;
 	}
 
-	status.SupportsAccelerationStructureExtension = VulkanExtensionQuery::IsDeviceExtensionAvailable(physicalDevice, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-	status.SupportsRayTracingPipelineExtension = VulkanExtensionQuery::IsDeviceExtensionAvailable(physicalDevice, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
-	status.SupportsRayQueryExtension = VulkanExtensionQuery::IsDeviceExtensionAvailable(physicalDevice, VK_KHR_RAY_QUERY_EXTENSION_NAME);
-	status.SupportsDeferredHostOperationsExtension = VulkanExtensionQuery::IsDeviceExtensionAvailable(physicalDevice, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
-	status.SupportsBufferDeviceAddressExtension = VulkanExtensionQuery::IsDeviceExtensionAvailable(physicalDevice, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
-	status.SupportsPartitionedAccelerationStructureExtension = VulkanExtensionQuery::IsDeviceExtensionAvailable(physicalDevice, VK_NV_PARTITIONED_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+	status.SupportsAccelerationStructureExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+	status.SupportsRayTracingPipelineExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+	status.SupportsRayQueryExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_RAY_QUERY_EXTENSION_NAME);
+	status.SupportsDeferredHostOperationsExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+	status.SupportsBufferDeviceAddressExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
+	status.SupportsPartitionedAccelerationStructureExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_NV_PARTITIONED_ACCELERATION_STRUCTURE_EXTENSION_NAME);
 
 	VkPhysicalDeviceFeatures2 features{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
 	VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES};

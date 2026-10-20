@@ -6,6 +6,7 @@
 #include "Core/Public/FileSystemUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Json/JsonReader.h"
+#include "Core/Public/Formatting/HexFormat.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "RHI/Public/Shaders/GlobalShaderMap.h"
 
@@ -87,7 +88,7 @@ namespace GpuCrashInputVerification
 				VerifyShaderDebugData(format, requestPath, request, bundleRoot, files);
 				std::uint64_t type = 0;
 				std::uint64_t input = 0;
-				if (!Json::TryParseHexUInt64(ReadRequiredString(request, "shaderTypeId"), type) || !Json::TryParseHexUInt64(ReadRequiredString(request, "compileInputHash"), input)
+				if (!Formatting::TryParseHexUInt64(ReadRequiredString(request, "shaderTypeId"), type) || !Formatting::TryParseHexUInt64(ReadRequiredString(request, "compileInputHash"), input)
 				    || !exportedJobs.emplace(type, ReadRequiredString(request, "target"), input, ReadRequiredString(request, "codeSha256")).second)
 				{
 					throw Diagnostics::Error("Shader export has invalid or duplicate permutation identity.");

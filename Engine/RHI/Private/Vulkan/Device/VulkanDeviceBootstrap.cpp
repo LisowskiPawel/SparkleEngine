@@ -1,6 +1,8 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Device/VulkanRhi.h"
+
+#include "Vulkan/Device/VulkanDeviceExtensions.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
 #endif
@@ -241,11 +243,11 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 	}
 
 	std::vector<const char*> deviceExtensions;
-	if (IsDeviceExtensionAvailable(m_physicalDevice, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
+	if (VulkanDeviceExtensions::IsAvailable(m_physicalDevice, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
 	{
 		deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
-	if (IsDeviceExtensionAvailable(m_physicalDevice, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME))
+	if (VulkanDeviceExtensions::IsAvailable(m_physicalDevice, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME))
 	{
 		deviceExtensions.push_back(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME);
 	}
@@ -558,23 +560,6 @@ bool VulkanRhi::IsInstanceExtensionAvailable(const char* extensionName) noexcept
 
 	std::vector<VkExtensionProperties> extensions(extensionCount);
 	if (!VulkanResult::Succeeded(vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data())))
-	{
-		return false;
-	}
-
-	return std::any_of(extensions.begin(), extensions.end(), [extensionName](const VkExtensionProperties& extension) noexcept { return std::string_view(extension.extensionName) == extensionName; });
-}
-
-bool VulkanRhi::IsDeviceExtensionAvailable(VkPhysicalDevice device, const char* extensionName) noexcept
-{
-	std::uint32_t extensionCount = 0;
-	if (!VulkanResult::Succeeded(vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr)))
-	{
-		return false;
-	}
-
-	std::vector<VkExtensionProperties> extensions(extensionCount);
-	if (!VulkanResult::Succeeded(vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, extensions.data())))
 	{
 		return false;
 	}

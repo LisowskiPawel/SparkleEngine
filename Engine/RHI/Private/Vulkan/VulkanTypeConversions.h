@@ -5,6 +5,7 @@
 #include "Pipeline/RhiPipelineDesc.h"
 #include "RayTracing/RhiRayTracingDesc.h"
 #include "Resources/RhiResourceDesc.h"
+#include "Shaders/ShaderStage.h"
 #include "Vulkan/VulkanIncludes.h"
 
 struct VulkanResourceStateMapping final
@@ -26,6 +27,8 @@ public:
 	static VkStencilOp ToVkStencilOp(RhiStencilOp op) noexcept;
 	static VkCullModeFlags ToVkCullModeFlags(ERhiCullMode cullMode) noexcept;
 	static VkPrimitiveTopology ToVkPrimitiveTopology(RhiPrimitiveTopology topology) noexcept;
+	static VkShaderStageFlagBits ToVkShaderStage(ShaderStage stage) noexcept;
+	static VkShaderStageFlags ToVkShaderStages(ShaderStageMask visibilityMask) noexcept;
 	static bool IsBufferResourceStateSupported(ResourceState state) noexcept;
 	static bool IsImageResourceStateSupported(ResourceState state) noexcept;
 	static VulkanResourceStateMapping ToResourceStateMapping(ResourceState state) noexcept;
