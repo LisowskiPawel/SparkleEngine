@@ -274,106 +274,29 @@ Suggested title: `Shaders: unify source identity and acceleration-structure bind
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-2-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
-<details>
-<summary>Copy implementation prompt</summary>
-
-```text
-Execute only Phase 2 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-2---make-the-shader-class-the-complete-lean-frontend.
-Task: Make the shader class the complete lean frontend. Complete only its remaining work using the stage requirements and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
-```
-
-</details>
-
 ### Phase 3 - Establish reproducible compile jobs and changed dependencies
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-3-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
-
-<details>
-<summary>Copy implementation prompt</summary>
-
-```text
-Execute only Phase 3 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-3---establish-reproducible-compile-jobs-and-changed-dependencies.
-Task: Establish reproducible compile jobs and changed dependencies. Complete only its remaining work using the stage requirements and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
-```
-
-</details>
 
 ### Phase 4 - Replace cooked packages with the global shader map
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-4-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
-<details>
-<summary>Copy implementation prompt</summary>
-
-```text
-Execute only Phase 4 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-4---replace-cooked-packages-with-the-global-shader-map.
-Task: Replace cooked packages with the global shader map. Complete only its remaining work using the stage requirements and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
-```
-
-</details>
-
 ### Phase 5 - Split raster intent, attachment compatibility, and graphics pipeline materialization
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-5-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
-
-<details>
-<summary>Copy implementation prompt</summary>
-
-```text
-Execute only Phase 5 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-5---split-raster-intent-attachment-compatibility-and-graphics-pipeline-materialization.
-Task: Split raster intent, attachment compatibility, and graphics pipeline materialization. Complete only its remaining work using the stage requirements and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
-```
-
-</details>
 
 ### Phase 6 - Deliver the complete paired ray-tracing runtime foundation
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-6-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
-<details>
-<summary>Copy implementation prompt</summary>
-
-```text
-Execute only Phase 6 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-6---deliver-the-complete-paired-ray-tracing-runtime-foundation.
-Task: Deliver the complete paired ray-tracing runtime foundation. Complete only its remaining work using the stage requirements and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
-```
-
-</details>
-
 ### Phase 7 - Deliver dual-execution ray-traced GBuffer parity
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-7-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
 
-<details>
-<summary>Copy implementation prompt</summary>
-
-```text
-Execute only Phase 7 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-7---deliver-dual-execution-ray-traced-gbuffer-parity.
-Task: Deliver dual-execution ray-traced GBuffer parity. Complete only its remaining work using the stage requirements and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
-```
-
-</details>
-
 ### Phase 8 - Add production hit semantics, shadow rays, and scene-to-SBT indexing
 
 The implementation instructions for this recorded source slice are retired. Its [historical checkpoint and deferred proof contract](DeliveryEvidence.md#phase-8-source-checkpoint) remain available. Source delivery does not close Phase 12 or feature acceptance.
-
-<details>
-<summary>Copy implementation prompt</summary>
-
-```text
-Execute only Phase 8 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md#phase-8---add-production-hit-semantics-shadow-rays-and-scene-to-sbt-indexing.
-Task: Add production hit semantics, shadow rays, and scene-to-SBT indexing. Complete only its remaining work using the stage requirements and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
-```
-
-</details>
 
 ### Phase 9 - Migrate eligible effects and deliver one whole-frame execution plan
 

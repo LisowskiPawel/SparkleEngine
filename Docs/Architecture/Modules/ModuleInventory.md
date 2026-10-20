@@ -110,7 +110,6 @@ The initial detailed inventories carry `S` only. No `B`, `R`, `N`, `P`, or `A` e
 | Registered Renderer programs | Exact catalog | [Renderer Shader Program Catalog](Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md) |
 | Evidence closure | Plan | [Capability Evidence Plan](CapabilityEvidencePlan.md) |
 
-
 ## Current Coverage Boundary
 
 Every top-level implementation owner is routed above and has a source-depth capability inventory. That closes the first navigation skeleton, not the release or the dossier audit. Horizontal graphics and product-workflow matrices, vertical execution traces, and the evidence plan own the remaining cross-module questions. [Inventory hardening items `INV-009` through `INV-012`](CapabilityEvidencePlan.md#inventory-expansion) deliberately remain Open until every capability has all dossier dimensions, journeys, proof destinations, and reverse mappings reconciled. Any new public selector, executable, catalog entry, backend/mode, generated product, or module must enter those routes before it can be treated as inventoried.
