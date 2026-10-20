@@ -373,13 +373,8 @@ void VulkanRenderCommandList::SetShaderPushConstants(
 		return;
 	}
 
-	vkCmdPushConstants(
-	    m_commandBuffer,
-	    state.PipelineLayout,
-	    VulkanTypeConversions::ToVkShaderStages(binding->VisibilityMask),
-	    destOffsetIn32BitValues * sizeof(std::uint32_t),
-	    num32BitValues * sizeof(std::uint32_t),
-	    data);
+	const VkShaderStageFlags stageFlags = VulkanTypeConversions::ToVkShaderStages(binding->VisibilityMask);
+	vkCmdPushConstants(m_commandBuffer, state.PipelineLayout, stageFlags, destOffsetIn32BitValues * sizeof(std::uint32_t), num32BitValues * sizeof(std::uint32_t), data);
 }
 
 void VulkanRenderCommandList::FlushShaderDescriptorSets(VkPipelineBindPoint bindPoint, ShaderBindingState& state) noexcept

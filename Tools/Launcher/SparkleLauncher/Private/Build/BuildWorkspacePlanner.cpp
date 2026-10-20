@@ -194,7 +194,8 @@ namespace SparkleLauncher
 				std::vector<std::string> editorProfileTargets;
 				if (HasSelectedBuildScope(request, BuildWorkspaceScope::Launcher))
 				{
-					AppendTargets(editorProfileTargets, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher));
+					const std::vector<std::string> launcherTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher);
+					AppendTargets(editorProfileTargets, launcherTargets);
 				}
 				if (HasSelectedBuildScope(request, BuildWorkspaceScope::Editor))
 				{
@@ -236,11 +237,14 @@ namespace SparkleLauncher
 				return;
 			}
 			case BuildWorkspaceOperationKind::CompileLauncher:
+			{
 				AddConfigureStep(plan);
-				AddBuildStep(plan, request.EditorProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher));
+				const std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher);
+				AddBuildStep(plan, request.EditorProfile, targets);
 				AddPlannedEffect(plan, "Configure the Launcher-owned product graph, then rebuild its executable and deployed support files.");
 				plan.CanRun = true;
 				return;
+			}
 			case BuildWorkspaceOperationKind::CompileEditor:
 			{
 				if (!RequireSyncedSourceDependencies(plan))

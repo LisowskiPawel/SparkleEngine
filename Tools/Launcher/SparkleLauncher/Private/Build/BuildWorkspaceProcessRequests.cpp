@@ -105,15 +105,18 @@ namespace SparkleLauncher
 				std::vector<std::string> editorProfileTargets;
 				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Launcher))
 				{
-					AppendTargets(editorProfileTargets, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher));
+					const std::vector<std::string> launcherTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher);
+					AppendTargets(editorProfileTargets, launcherTargets);
 				}
 				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Editor))
 				{
-					AppendTargets(editorProfileTargets, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor));
+					const std::vector<std::string> editorTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor);
+					AppendTargets(editorProfileTargets, editorTargets);
 				}
 				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::CookTools))
 				{
-					AppendTargets(editorProfileTargets, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools));
+					const std::vector<std::string> cookToolTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools);
+					AppendTargets(editorProfileTargets, cookToolTargets);
 				}
 				if (!editorProfileTargets.empty())
 				{
@@ -121,20 +124,30 @@ namespace SparkleLauncher
 				}
 				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Game))
 				{
-					AddBuildStep(steps, plan, plan.Request.GameProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game));
+					const std::vector<std::string> gameTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game);
+					AddBuildStep(steps, plan, plan.Request.GameProfile, gameTargets);
 				}
 				return steps;
 			}
 			case BuildWorkspaceOperationKind::CompileLauncher:
+			{
 				AddConfigureStep(steps, plan);
-				AddBuildStep(steps, plan, plan.Request.EditorProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher));
+				const std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher);
+				AddBuildStep(steps, plan, plan.Request.EditorProfile, targets);
 				return steps;
+			}
 			case BuildWorkspaceOperationKind::CompileEditor:
-				AddBuildStep(steps, plan, plan.Request.EditorProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor));
+			{
+				const std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor);
+				AddBuildStep(steps, plan, plan.Request.EditorProfile, targets);
 				return steps;
+			}
 			case BuildWorkspaceOperationKind::CompileGame:
-				AddBuildStep(steps, plan, plan.Request.GameProfile, ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game));
+			{
+				const std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game);
+				AddBuildStep(steps, plan, plan.Request.GameProfile, targets);
 				return steps;
+			}
 			case BuildWorkspaceOperationKind::BuildCookTools:
 			{
 				const std::vector<std::string> cookToolTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools);
