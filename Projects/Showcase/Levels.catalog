@@ -4,7 +4,7 @@ DisplayName = Empty
 Description = Start with a clean scene for experiments, tools, and new content.
 Source = Levels/Empty.level
 ReleaseSupported = true
-Selected = false
+Selected = true
 
 [Level]
 Id = ModernSponza
@@ -17,7 +17,7 @@ AssetPack = ModernSponzaCurtains
 Family = Modern Sponza
 VariantKind = Base
 ReleaseSupported = true
-Selected = false
+Selected = true
 
 [Level]
 Id = ModernSponzaCandles
@@ -116,7 +116,7 @@ Source = Levels/Sponza.level
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/Sponza
 AssetPack = Sponza
 ReleaseSupported = true
-Selected = false
+Selected = true
 
 [Level]
 Id = ABeautifulGame
@@ -126,7 +126,7 @@ Source = Levels/ABeautifulGame.level
 Thumbnail = Launcher/Thumbnails/ABeautifulGame.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ABeautifulGame
 ReleaseSupported = true
-Selected = false
+Selected = true
 
 [Level]
 Id = DamagedHelmet
@@ -147,7 +147,7 @@ Thumbnail = Launcher/Thumbnails/LPSHead.jpg
 SourcePage = https://casual-effects.com/g3d/data10/index.html
 AssetPack = LPSHead
 ReleaseSupported = true
-Selected = false
+Selected = true
 
 [Level]
 Id = CornellBox
@@ -157,7 +157,7 @@ Source = Levels/CornellBox.level
 Thumbnail = Launcher/Thumbnails/CornellBox.png
 SourcePage = https://casual-effects.com/g3d/data10/index.html
 ReleaseSupported = true
-Selected = false
+Selected = true
 
 [Level]
 Id = DiffuseTransmissionPlant
@@ -167,7 +167,7 @@ Source = Levels/DiffuseTransmissionPlant.level
 Thumbnail = Launcher/Thumbnails/DiffuseTransmissionPlant.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DiffuseTransmissionPlant
 ReleaseSupported = true
-Selected = false
+Selected = true
 
 [Level]
 Id = CesiumMan
@@ -177,7 +177,7 @@ Source = Levels/CesiumMan.level
 Thumbnail = Launcher/Thumbnails/CesiumMan.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CesiumMan
 ReleaseSupported = true
-Selected = false
+Selected = true
 
 [Level]
 Id = StanfordBunnySubsurface
