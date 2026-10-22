@@ -54,11 +54,11 @@ void UI::Implementation::HandleTransactionShortcuts()
 		return;
 	}
 
-	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Z))
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Z, ImGuiInputFlags_RouteGlobal))
 	{
 		(void) m_transactionHistory->Undo(m_sceneModel->GetWorldGeneration());
 	}
-	else if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Y))
+	else if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Y, ImGuiInputFlags_RouteGlobal))
 	{
 		(void) m_transactionHistory->Redo(m_sceneModel->GetWorldGeneration());
 	}
