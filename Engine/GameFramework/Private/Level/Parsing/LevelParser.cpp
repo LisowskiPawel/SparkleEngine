@@ -6,11 +6,13 @@
 #include "Level/Parsing/LightingSectionParser.h"
 #include "Level/Parsing/SkySectionParser.h"
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Level/Level.h"
 
 #include <fstream>
 #include <format>
+#include <sstream>
 
 class LevelDocumentCodec final
 {
@@ -87,13 +89,13 @@ public:
 		}
 	}
 
-	static void WriteLevelSection(std::ofstream& output, const LevelAsset& level)
+	static void WriteLevelSection(std::ostream& output, const LevelAsset& level)
 	{
 		output << "[Level]\n";
 		output << "Name = " << level.GetName() << "\n\n";
 	}
 
-	static void WriteSceneAssetsSection(std::ofstream& output, const LevelDesc& levelDesc)
+	static void WriteSceneAssetsSection(std::ostream& output, const LevelDesc& levelDesc)
 	{
 		output << "[SceneAssets]\n";
 		for (const SceneAssetId& sceneAssetId : levelDesc.sceneAssetIds)
@@ -169,19 +171,7 @@ void LevelParser::SaveToFile(const LevelAsset& level)
 		throw Diagnostics::Error("Level has no source path.");
 	}
 
-	std::error_code errorCode;
-	std::filesystem::create_directories(sourcePath.parent_path(), errorCode);
-	if (errorCode)
-	{
-		throw Diagnostics::Error(std::format("Failed to create level directory '{}'.", sourcePath.parent_path().string()));
-	}
-
-	std::ofstream output(sourcePath, std::ios::trunc);
-	if (!output.is_open())
-	{
-		throw Diagnostics::Error(std::format("Failed to open level file '{}' for writing.", sourcePath.string()));
-	}
-
+	std::ostringstream output;
 	const LevelDesc levelDesc = level.BuildDescription();
 	LevelDocumentCodec::WriteLevelSection(output, level);
 	LevelParsing::WriteCameraSection(output, levelDesc);
@@ -191,6 +181,11 @@ void LevelParser::SaveToFile(const LevelAsset& level)
 
 	if (!output.good())
 	{
-		throw Diagnostics::Error(std::format("Failed while writing level file '{}'.", sourcePath.string()));
+		throw Diagnostics::Error(std::format("Failed to serialize level '{}'.", level.GetName()));
+	}
+	std::string errorMessage;
+	if (!Files::TryWriteAllTextAtomic(sourcePath, std::move(output).str(), errorMessage))
+	{
+		throw Diagnostics::Error(errorMessage);
 	}
 }

@@ -220,6 +220,7 @@ bool LevelSession::SaveActiveLevel() noexcept
 	try
 	{
 		m_levelRegistry->SaveLevel(*m_activeLevel);
+		m_lastLoadDiagnostic.clear();
 		return true;
 	}
 	catch (const Diagnostics::Error& error)

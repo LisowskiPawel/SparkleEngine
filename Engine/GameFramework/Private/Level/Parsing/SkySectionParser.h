@@ -8,5 +8,5 @@
 namespace LevelParsing
 {
 	void ParseSkySectionField(const ParsedLevelLine& parsedLine, LevelDesc& levelDesc);
-	void WriteSkySection(std::ofstream& output, const LevelDesc& levelDesc);
+	void WriteSkySection(std::ostream& output, const LevelDesc& levelDesc);
 }

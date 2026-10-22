@@ -4,7 +4,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 
-#include <fstream>
+#include <ostream>
 #include <iomanip>
 
 namespace LevelParsing
@@ -64,7 +64,7 @@ namespace LevelParsing
 		}
 	}
 
-	void WriteCameraSection(std::ofstream& output, const LevelDesc& levelDesc)
+	void WriteCameraSection(std::ostream& output, const LevelDesc& levelDesc)
 	{
 		output << std::setprecision(9);
 		output << "[Camera]\n";

@@ -2,9 +2,9 @@
 
 #include "GameFramework/Public/Level/LevelDesc.h"
 
-#include <fstream>
+#include <iosfwd>
 
 namespace LevelParsing
 {
-	void WriteLightingSectionValues(std::ofstream& output, const LevelDesc& levelDesc);
+	void WriteLightingSectionValues(std::ostream& output, const LevelDesc& levelDesc);
 }

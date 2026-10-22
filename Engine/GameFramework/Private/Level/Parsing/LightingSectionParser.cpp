@@ -8,6 +8,7 @@
 #include "Level/Parsing/Lighting/LightingSectionWriter.h"
 
 #include <format>
+#include <ostream>
 
 namespace LevelParsing
 {
@@ -46,7 +47,7 @@ namespace LevelParsing
 		}
 	}
 
-	void WriteLightingSection(std::ofstream& output, const LevelDesc& levelDesc)
+	void WriteLightingSection(std::ostream& output, const LevelDesc& levelDesc)
 	{
 		WriteLightingSectionValues(output, levelDesc);
 	}

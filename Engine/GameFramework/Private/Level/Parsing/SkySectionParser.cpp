@@ -5,7 +5,7 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
 
-#include <fstream>
+#include <ostream>
 #include <iomanip>
 
 namespace LevelParsing
@@ -41,7 +41,7 @@ namespace LevelParsing
 		}
 	}
 
-	void WriteSkySection(std::ofstream& output, const LevelDesc& levelDesc)
+	void WriteSkySection(std::ostream& output, const LevelDesc& levelDesc)
 	{
 		if (!levelDesc.sky)
 		{

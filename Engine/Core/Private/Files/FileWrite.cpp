@@ -134,21 +134,7 @@ namespace Files
 
 	bool TryWriteAllTextAtomic(const std::filesystem::path& path, std::string_view text, std::string& outErrorMessage)
 	{
-		const std::filesystem::path temporaryPath = BuildTemporaryPath(path);
-		CleanupTemporaryFile(temporaryPath);
-
-		if (!TryWriteAllText(temporaryPath, text, outErrorMessage))
-		{
-			return false;
-		}
-		if (!TryFinalizeTemporaryFile(temporaryPath, path, outErrorMessage))
-		{
-			CleanupTemporaryFile(temporaryPath);
-			return false;
-		}
-
-		outErrorMessage.clear();
-		return true;
+		return TryWriteAllBytesAtomic(path, std::as_bytes(std::span(text)), outErrorMessage);
 	}
 
 	bool TryOpenBinaryOutput(const std::filesystem::path& path, std::ofstream& output, std::string& outErrorMessage)

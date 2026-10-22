@@ -5,6 +5,7 @@
 #include "Core/Public/Diagnostics/Verify.h"
 
 #include <iomanip>
+#include <ostream>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_lightingSectionWriterLogger, "GameFramework.LevelParsing");
 
@@ -13,16 +14,16 @@ namespace LevelParsing
 	class LightingSectionSerialization final
 	{
 	public:
-		static void WriteDirectional(std::ofstream& output, std::string_view prefix, const SceneLightDesc& light, const SceneDirectionalLightDesc& value);
-		static void WritePoint(std::ofstream& output, std::string_view prefix, const SceneLightDesc& light, const PointLightDesc& value);
-		static void WriteSpot(std::ofstream& output, std::string_view prefix, const SceneLightDesc& light, const SpotLightDesc& value);
-		static void WriteRect(std::ofstream& output, std::string_view prefix, const SceneLightDesc& light, const RectLightDesc& value);
+		static void WriteDirectional(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SceneDirectionalLightDesc& value);
+		static void WritePoint(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const PointLightDesc& value);
+		static void WriteSpot(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SpotLightDesc& value);
+		static void WriteRect(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const RectLightDesc& value);
 
 	private:
-		static void WriteCommonFields(std::ofstream& output, std::string_view prefix, const SceneLightCommonDesc& common);
+		static void WriteCommonFields(std::ostream& output, std::string_view prefix, const SceneLightCommonDesc& common);
 	};
 
-	void LightingSectionSerialization::WriteCommonFields(std::ofstream& output, std::string_view prefix, const SceneLightCommonDesc& common)
+	void LightingSectionSerialization::WriteCommonFields(std::ostream& output, std::string_view prefix, const SceneLightCommonDesc& common)
 	{
 		if (!common.name.empty())
 		{
@@ -33,7 +34,7 @@ namespace LevelParsing
 		output << prefix << "Visible = " << (common.visible ? "true" : "false") << "\n";
 	}
 
-	void LightingSectionSerialization::WriteDirectional(std::ofstream& output, std::string_view prefix, const SceneLightDesc& light, const SceneDirectionalLightDesc& value)
+	void LightingSectionSerialization::WriteDirectional(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SceneDirectionalLightDesc& value)
 	{
 		WriteCommonFields(output, prefix, light.common);
 		output << prefix << "IlluminanceLux = " << value.illuminance << "\n";
@@ -42,7 +43,7 @@ namespace LevelParsing
 		output << prefix << "CastShadow = " << (value.castShadow ? "true" : "false") << "\n";
 	}
 
-	void LightingSectionSerialization::WritePoint(std::ofstream& output, std::string_view prefix, const SceneLightDesc& light, const PointLightDesc& value)
+	void LightingSectionSerialization::WritePoint(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const PointLightDesc& value)
 	{
 		WriteCommonFields(output, prefix, light.common);
 		output << prefix << "LuminousIntensityCandela = " << value.luminousIntensity << "\n";
@@ -53,7 +54,7 @@ namespace LevelParsing
 		output << prefix << "CastShadow = " << (value.castShadow ? "true" : "false") << "\n";
 	}
 
-	void LightingSectionSerialization::WriteSpot(std::ofstream& output, std::string_view prefix, const SceneLightDesc& light, const SpotLightDesc& value)
+	void LightingSectionSerialization::WriteSpot(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SpotLightDesc& value)
 	{
 		WriteCommonFields(output, prefix, light.common);
 		output << prefix << "LuminousIntensityCandela = " << value.luminousIntensity << "\n";
@@ -67,7 +68,7 @@ namespace LevelParsing
 		output << prefix << "CastShadow = " << (value.castShadow ? "true" : "false") << "\n";
 	}
 
-	void LightingSectionSerialization::WriteRect(std::ofstream& output, std::string_view prefix, const SceneLightDesc& light, const RectLightDesc& value)
+	void LightingSectionSerialization::WriteRect(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const RectLightDesc& value)
 	{
 		WriteCommonFields(output, prefix, light.common);
 		output << prefix << "LuminanceCdPerM2 = " << value.luminance << "\n";
@@ -78,7 +79,7 @@ namespace LevelParsing
 		output << prefix << "CastShadow = " << (value.castShadow ? "true" : "false") << "\n";
 	}
 
-	void WriteLightingSectionValues(std::ofstream& output, const LevelDesc& levelDesc)
+	void WriteLightingSectionValues(std::ostream& output, const LevelDesc& levelDesc)
 	{
 		output << std::setprecision(9);
 		output << "[Lighting]\n";
