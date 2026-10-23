@@ -256,6 +256,8 @@ For a valid native window and supported configuration, RHI owns one swapchain li
 
 ### Presentation: Design Decisions And Tradeoffs
 
+Back-buffer viewport/scissor dimensions describe the allocated image, not the live window. Renderer resolves direct presentation extent after backend frame acquisition, which may recreate the swapchain. Editor viewport extent remains an independent render request.
+
 | Decision | Benefit | Cost or risk |
 | --- | --- | --- |
 | Separate Renderer encoding from RHI presentation | Color policy does not become API-specific | End-to-end SDR/HDR evidence must join two owners |

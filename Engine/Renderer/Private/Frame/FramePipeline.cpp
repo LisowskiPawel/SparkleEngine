@@ -160,8 +160,8 @@ bool FramePipeline::BeginFrame(RenderFrameSubmission& submission) noexcept
 	}
 
 	ApplyPendingResize();
-	RefreshFrameResources();
 	BeginBackendFrame();
+	RefreshFrameResources();
 
 	return true;
 }

@@ -188,12 +188,14 @@ UINT D3D12SwapChain::ComputeSwapChainFlags() const
 
 RhiViewport D3D12SwapChain::GetDefaultViewport() const
 {
-	return RhiViewport{.X = 0.0f, .Y = 0.0f, .Width = static_cast<float>(GetWindowWidth()), .Height = static_cast<float>(GetWindowHeight()), .MinDepth = 0.0f, .MaxDepth = 1.0f};
+	const D3D12_RESOURCE_DESC backBuffer = GetCurrentResource()->GetDesc();
+	return RhiViewport{.X = 0.0f, .Y = 0.0f, .Width = static_cast<float>(backBuffer.Width), .Height = static_cast<float>(backBuffer.Height), .MinDepth = 0.0f, .MaxDepth = 1.0f};
 }
 
 RhiRect D3D12SwapChain::GetDefaultScissorRect() const
 {
-	return RhiRect{.Left = 0, .Top = 0, .Right = static_cast<std::int32_t>(GetWindowWidth()), .Bottom = static_cast<std::int32_t>(GetWindowHeight())};
+	const D3D12_RESOURCE_DESC backBuffer = GetCurrentResource()->GetDesc();
+	return RhiRect{.Left = 0, .Top = 0, .Right = static_cast<std::int32_t>(backBuffer.Width), .Bottom = static_cast<std::int32_t>(backBuffer.Height)};
 }
 
 void D3D12SwapChain::Present()

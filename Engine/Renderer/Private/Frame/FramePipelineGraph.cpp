@@ -19,12 +19,13 @@
 
 RenderViewportExtent FramePipeline::ResolveOutputExtent() const noexcept
 {
-	if (m_viewportRenderRequest.Extent.IsValid())
+	if (!ShouldOutputToBackBuffer() && m_viewportRenderRequest.Extent.IsValid())
 	{
 		return m_viewportRenderRequest.Extent;
 	}
 
-	return m_windowExtent;
+	const RhiViewport backBufferViewport = m_deviceServices.GetRenderHardwareInterface().GetPresentationService().GetBackBufferViewport();
+	return {static_cast<std::uint32_t>(backBufferViewport.Width), static_cast<std::uint32_t>(backBufferViewport.Height)};
 }
 
 RenderFrameGraphSettings FramePipeline::ResolveFrameGraphSettings() const noexcept
