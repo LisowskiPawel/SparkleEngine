@@ -6,7 +6,7 @@
 
 **Scope:** the order to follow from the current release work through advanced graphics and portfolio delivery
 
-**Updated:** 2026-10-20; progress summarizes recorded work, not release approval
+**Updated:** 2026-10-23; progress summarizes recorded work, not release approval
 
 Choose one task below, open its **implementation stage**, and copy that stage's prompt. The linked **design** explains the behavior and checks to preserve. This roadmap owns priority and brief progress; implementation plans own the steps.
 
@@ -20,7 +20,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 
 ## Where We Are And What Is Next
 
-**Next: [PD-1: finish Game/Editor journeys](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells).** GPU crash tooling is qualified. Collect Modern Sponza with matched product/shader/symbol receipts, fix its owner and verify quit. Then regenerate the archive and continue PD-2/3/4. The fresh-repository rehearsal does not establish clean-OS or independent-adopter acceptance.
+**Next: [PD-1: finish Game/Editor journeys](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells).** Fix D3D12 Game shutdown for Cornell Box and Diffuse Transmission Plant, then finish rendered-frame and interaction checks. Regenerate the archive after product closure and continue PD-2/3/4. This laptop's source-workspace runs do not establish clean-OS or independent-adopter acceptance.
 
 | Current work | Design / acceptance reference | Implementation stages |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 | Scope / FR-00 | Six product choices approved. | Remaining technical qualification; public rights close at FR-07. |
 | Identity / FR-01 | Identity, dependency pins and notices implemented; earlier baseline recorded. | Qualify the final source candidate. |
 | GPU crash tooling / GCD | Delivered: 18 native checks, 32 normal journeys, four SDK-free builds; `ITER-GCD-04-06`. [Scope and evidence](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures). | None for the qualified tooling candidate; use in PD-1. |
-| PD-1: Game / Editor | Product shells/shared settings implemented; seven-map archive cook passed. | Native crash/quit regression, controls/settings/failure and Editor edit/save checks. |
+| PD-1: Game / Editor | Resize/input repaired; 32 native map/API runs recorded. Editor edit/save/reload, settings/reset and malformed-settings rejection verified. | Two D3D12 Game quit-budget failures; rendered-frame, interaction and remaining failure checks. |
 | PD-2: source / Launcher | Cold clone configured, synced and built products/tools; Empty cook passed. | Current cook/failure/GUI-equivalence checks and independent adoption. |
 | PD-3 / FR-02: package | Unsigned archive `de0cf4bc…` verified; selected seven-map cook passed on this laptop. | Regenerate after fixes; final archive/offline/precompiled/Qt replacement and minimum-machine checks. |
 | PD-4: diagnostics | Local GPU tooling qualified; earlier consent/privacy/review fixtures passed on `de0cf4bc…`. | Final-archive self-service, incident and replacement rehearsals. Automatic CPU crash/hang collection remains unavailable. |

@@ -6,7 +6,7 @@
 
 Deliver Launcher, Editor and Game in one unsigned internal archive, with selected content and self-service recovery. Public-release prerequisites belong to [FR-07](ImplementationPlan.md#fr-07--publish-and-verify).
 
-**Next:** recheck Modern Sponza in [PD-1](#pd-1--game-and-editor-product-shells). If the failure persists, collect it with [qualified GPU crash tooling](../PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures) and matching product/shader/symbol receipts, then fix its owner.
+**Next:** finish [PD-1](#pd-1--game-and-editor-product-shells): fix D3D12 Game shutdown for Cornell Box and Diffuse Transmission Plant, then qualify rendered output and the remaining interaction/failure routes. Use [qualified GPU crash tooling](../PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures) with matching receipts if a native GPU failure recurs.
 
 Reuse existing implementations and valid results; repeat only checks invalidated by changed inputs. Follow [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate). Record exact source/configuration/artifact identities in the [candidate reports](../../../Acceptance/FeatureCompletionReports.md). A stage stays open while a required check is failed or unavailable; historical passes do not qualify changed binaries.
 
@@ -14,15 +14,16 @@ Reuse existing implementations and valid results; repeat only checks invalidated
 
 **Owners/checks:** [Game](../../Modules/Projects/Showcase/ShowcaseCapabilities.md), [Editor](../../Modules/Engine/Editor/EditorCapabilities.md); `FCR-PROD-01/04`.
 
-- After the Modern Sponza check, close Launcher → Game/Editor coverage for Empty and seven maps on D3D12/Vulkan. Verify Game quit ≤5 s and Editor quit ≤10 s.
-- Finish help, input/focus, resize/DPI, shared settings/reset, unsupported-provider and missing/corrupt-content checks. Loading failure must remain visible.
-- Verify Editor edit/undo/redo/save/reload and Game's isolation from Editor dependencies.
+- Fix D3D12 Game quit: Cornell Box took 5.35 s (repeat 6.29 s), Diffuse Transmission Plant 8.88 s; the limit stays 5 s. Revalidate affected journeys against the repaired products.
+- Qualify first correct frames, starting with Modern Sponza's noisy/saturated output. Requested-map readiness and exit code do not prove image correctness.
+- Finish input/focus, display/DPI, unsupported-provider, missing/corrupt-content recovery and quit-during-load checks. Rendering settings stay in Editor and are shared with Game.
+- Finish Editor rejected/stale-edit, cancelled recook/capture and restart-required journeys. Exact archive/component proof belongs to PD-3.
 
 **Exit:** `FCR-PROD-01/04` pass the admitted journeys, preserving display-selected resolution and approved shared defaults.
 
 ```text
 Execute only PD-1 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md.
-Start with Modern Sponza; finish the remaining journeys above using existing owners and matched crash tooling. Record native child exits, quit timings and exact candidate results.
+Start with the two D3D12 Game shutdown failures; preserve their recorded timings and the 5 s limit. Finish the remaining journeys above using existing owners and matched crash tooling when needed. Record exact candidate results; do not repeat unaffected work or treat map readiness as visual proof.
 ```
 
 ## `PD-2` — Source Build, Cook, And Launcher

@@ -90,7 +90,7 @@ Launcher loads `Levels.catalog` -> selected level/pack readiness is evaluated ->
 
 ## Game Menu
 
-In the PD-1 working candidate, Game opens its menu on first run. Esc or F1 returns to it; the menu exposes level selection, load failures, camera reload, help and quit. Rendering settings are configured in Editor through the shared settings owner; a Game settings frontend is deferred. Resolution follows the window. The developer console is excluded from Shipping builds. These source changes do not pass the packaged/clean-machine criteria below.
+In the PD-1 working candidate, Game opens its menu on first run. Esc or F1 returns to it; the menu exposes level selection, load failures, camera reload, help and quit. Resume returns keyboard input to Game; opening the menu or losing focus releases mouse look. Rendering settings are configured in Editor through the shared settings owner; a Game settings frontend is deferred. Resolution follows the window. The developer console is excluded from Shipping builds. These source changes do not pass the packaged/clean-machine criteria below.
 
 ## `FCR-PROD-01` Game Consumer Contract
 

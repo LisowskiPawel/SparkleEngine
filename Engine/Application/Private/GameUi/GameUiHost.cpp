@@ -213,8 +213,7 @@ bool GameUiHost::WantsInputCapture() const noexcept
 		return true;
 	}
 #endif
-	const ImGuiIO& io = ImGui::GetIO();
-	return io.WantCaptureKeyboard || io.WantCaptureMouse;
+	return ImGui::GetIO().WantCaptureMouse;
 }
 
 void GameUiHost::DrawLevelSelection()
