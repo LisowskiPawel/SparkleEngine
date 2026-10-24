@@ -16,7 +16,7 @@ namespace SparkleLauncher
 			return steps;
 		}
 
-		ProcessRequest request;
+		Process::ChildProcessRequest request;
 		request.ExecutablePath = plan.ExecutablePath;
 		request.WorkingDirectory = plan.WorkingDirectory;
 		request.Environment = plan.Environment;

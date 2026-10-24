@@ -83,6 +83,8 @@ A plan, decision record or acceptance entry point MUST make the next useful acti
 
 Keep current goals, decisions, remaining work, supported behavior and required checks. Summarize completed work briefly in the roadmap; retire superseded audits and duplicate execution prompts. Put generated logs, source snapshots and candidate receipts in ignored output, not maintained Markdown. Preserve legal notices and reproducibility inputs; when retiring a page, update incoming links to the current owner. Do not turn a missing check into completion while shortening text.
 
+A plan must distinguish admitted delivery, preservation/proof of an existing path, and unselected possibilities. Its scope boundary applies to every copied stage prompt. Tie each implementation stage to a selected output and consumer, state what it will not deliver, and name local replacement/deletion work or explain why none is justified. Reuse [scope and retirement decisions](ChangeLifecycle.md#scope-and-retirement-decision); do not reproduce that procedure in every dossier. A blocked or target-only feature is not an instruction to create a full documentation package or finish the feature. Keep necessary negative capability boundaries in the existing family owner when separate files have no independent lifecycle.
+
 ## Visual Elements
 
 Use visuals when they reduce the work required to understand relationships:

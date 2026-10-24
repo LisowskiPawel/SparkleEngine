@@ -39,7 +39,7 @@ namespace SparkleLauncher
 		return !toolchain.VisualStudioPath.empty() && !toolchain.VisualStudioInstallerPath.empty();
 	}
 
-	static std::optional<ProcessRequest> BuildClangClInstallRequest(
+	static std::optional<Process::ChildProcessRequest> BuildClangClInstallRequest(
 	    const BuildToolchainStatus& toolchain,
 	    const std::filesystem::path& repositoryRoot,
 	    std::string_view operationId,
@@ -64,7 +64,7 @@ namespace SparkleLauncher
 		      "if ($process.ExitCode -ne 0) { throw ('Visual Studio Installer exited with code ' + $process.ExitCode) }; "
 		      "Write-Output 'Visual Studio clang-cl components installation completed.'";
 
-		ProcessRequest request;
+		Process::ChildProcessRequest request;
 		request.ExecutablePath = ResolvePowerShellPath();
 		request.Arguments = {"-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script};
 		request.WorkingDirectory = repositoryRoot;
@@ -105,7 +105,7 @@ namespace SparkleLauncher
 		return installer != nullptr && installer->IsAvailable != nullptr && installer->IsAvailable(toolchain);
 	}
 
-	std::optional<ProcessRequest> BuildHostToolInstallRequest(
+	std::optional<Process::ChildProcessRequest> BuildHostToolInstallRequest(
 	    std::string_view toolId,
 	    const BuildToolchainStatus& toolchain,
 	    const std::filesystem::path& repositoryRoot,

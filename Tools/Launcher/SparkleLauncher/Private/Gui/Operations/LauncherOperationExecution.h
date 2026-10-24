@@ -27,5 +27,5 @@ namespace SparkleLauncher
 	    const LauncherOperationRequest& request,
 	    IProcessRunner& processRunner,
 	    TaskExecutionContext& context,
-	    const ProcessOutputCallback& outputCallback);
+	    const Process::ChildProcessOutputCallback& outputCallback);
 }

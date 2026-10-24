@@ -16,7 +16,7 @@ public:
 	EditorViewportOutputCoordinator(const EditorViewportOutputCoordinator&) = delete;
 	EditorViewportOutputCoordinator& operator=(const EditorViewportOutputCoordinator&) = delete;
 
-	void Update(Renderer& renderer);
+	void Update(UI& ui, Renderer& renderer);
 	void HandleAction(UI& ui, Renderer& renderer, std::uint64_t frameId);
 
 private:

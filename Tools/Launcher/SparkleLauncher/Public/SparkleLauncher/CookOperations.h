@@ -92,5 +92,5 @@ namespace SparkleLauncher
 	const std::vector<CookOperationDefinition>& GetCookOperationDefinitions();
 	std::optional<CookOperationDefinition> FindCookOperationDefinition(std::string_view operationId);
 	CookOperationPlan PlanCookOperation(std::string_view operationId, const CookOperationRequest& request);
-	OperationRecord RunCookOperationPlan(CookOperationPlan plan, IProcessRunner& processRunner, const ProcessOutputCallback& outputCallback = {});
+	OperationRecord RunCookOperationPlan(CookOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback = {});
 }

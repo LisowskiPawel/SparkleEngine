@@ -3,6 +3,7 @@
 #include "CMakeGeneratorModel.h"
 #include "LauncherStatePaths.h"
 #include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 namespace SparkleLauncher
 {
@@ -16,10 +17,14 @@ namespace SparkleLauncher
 		return value ? "ON" : "OFF";
 	}
 
-	ProcessRequest MakeCMakeConfigureRequest(const std::filesystem::path& repositoryRoot, const BuildToolchainStatus& toolchain, std::string_view operationId, std::string_view logFileName)
+	Process::ChildProcessRequest MakeCMakeConfigureRequest(
+	    const std::filesystem::path& repositoryRoot,
+	    const BuildToolchainStatus& toolchain,
+	    std::string_view operationId,
+	    std::string_view logFileName)
 	{
 		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		ProcessRequest process;
+		Process::ChildProcessRequest process;
 		process.ExecutablePath = toolchain.CMakePath;
 		process.WorkingDirectory = outputs.BuildRoot;
 		process.LogPath = ResolveLauncherOperationLogPath(repositoryRoot, operationId, logFileName);
@@ -36,23 +41,23 @@ namespace SparkleLauncher
 		}
 		if (!toolchain.NinjaPath.empty() && CMakeGeneratorUsesNinjaMakeProgram(toolchain.Generator))
 		{
-			process.Arguments.push_back("-DCMAKE_MAKE_PROGRAM=" + toolchain.NinjaPath.generic_string());
+			process.Arguments.push_back("-DCMAKE_MAKE_PROGRAM=" + Strings::ToNarrow(toolchain.NinjaPath.generic_wstring()));
 		}
 		if (!toolchain.QtRootPath.empty())
 		{
-			process.Arguments.push_back("-DCMAKE_PREFIX_PATH=" + toolchain.QtRootPath.generic_string());
+			process.Arguments.push_back("-DCMAKE_PREFIX_PATH=" + Strings::ToNarrow(toolchain.QtRootPath.generic_wstring()));
 		}
 		if (!toolchain.GitPath.empty())
 		{
-			process.Arguments.push_back("-DGIT_EXECUTABLE=" + toolchain.GitPath.generic_string());
-			process.Arguments.push_back("-DSPARKLE_GIT_EXE=" + toolchain.GitPath.generic_string());
+			process.Arguments.push_back("-DGIT_EXECUTABLE=" + Strings::ToNarrow(toolchain.GitPath.generic_wstring()));
+			process.Arguments.push_back("-DSPARKLE_GIT_EXE=" + Strings::ToNarrow(toolchain.GitPath.generic_wstring()));
 		}
 		if (!toolchain.VulkanSdkRoot.empty())
 		{
-			process.Arguments.push_back("-DVulkan_INCLUDE_DIR=" + (toolchain.VulkanSdkRoot / "Include").generic_string());
-			process.Arguments.push_back("-DVulkan_LIBRARY=" + (toolchain.VulkanSdkRoot / "Lib" / "vulkan-1.lib").generic_string());
-			process.Environment.push_back({"VULKAN_SDK", toolchain.VulkanSdkRoot.generic_string()});
-			process.Environment.push_back({"VK_SDK_PATH", toolchain.VulkanSdkRoot.generic_string()});
+			process.Arguments.push_back("-DVulkan_INCLUDE_DIR=" + Strings::ToNarrow((toolchain.VulkanSdkRoot / "Include").generic_wstring()));
+			process.Arguments.push_back("-DVulkan_LIBRARY=" + Strings::ToNarrow((toolchain.VulkanSdkRoot / "Lib" / "vulkan-1.lib").generic_wstring()));
+			process.Environment.push_back({"VULKAN_SDK", Strings::ToNarrow(toolchain.VulkanSdkRoot.generic_wstring())});
+			process.Environment.push_back({"VK_SDK_PATH", Strings::ToNarrow(toolchain.VulkanSdkRoot.generic_wstring())});
 		}
 		const WorkspaceFeatureSettings featureSettings = GetLauncherWorkspaceFeatureSettings();
 		process.Arguments.push_back("-DSPARKLE_ENABLE_CONTENT_PIPELINE=" + ToCMakeBool(featureSettings.ContentPipelineEnabled));
@@ -60,11 +65,11 @@ namespace SparkleLauncher
 		process.Arguments.push_back("-DSPARKLE_ENABLE_KTX_SUPPORT=" + ToCMakeBool(featureSettings.KtxSupportEnabled));
 		process.Arguments.push_back("-DSPARKLE_ENABLE_NVIDIA_STREAMLINE=" + ToCMakeBool(featureSettings.NvidiaStreamlineEnabled));
 		process.Arguments.push_back("-Wno-dev");
-		process.Arguments.push_back(repositoryRoot.string());
+		process.Arguments.push_back(Strings::ToNarrow(repositoryRoot.wstring()));
 		return process;
 	}
 
-	ProcessRequest MakeCMakeBuildRequest(
+	Process::ChildProcessRequest MakeCMakeBuildRequest(
 	    const std::filesystem::path& repositoryRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
@@ -73,11 +78,11 @@ namespace SparkleLauncher
 	    std::string_view logFileName)
 	{
 		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		ProcessRequest process;
+		Process::ChildProcessRequest process;
 		process.ExecutablePath = toolchain.CMakePath;
 		process.WorkingDirectory = repositoryRoot;
 		process.LogPath = ResolveLauncherOperationLogPath(repositoryRoot, operationId, logFileName);
-		process.Arguments = {"--build", outputs.BuildRoot.string(), "--config", std::string(profileName), "--target"};
+		process.Arguments = {"--build", Strings::ToNarrow(outputs.BuildRoot.wstring()), "--config", std::string(profileName), "--target"};
 		process.Arguments.insert(process.Arguments.end(), targets.begin(), targets.end());
 		if (CMakeGeneratorUsesMsBuildArguments(toolchain.Generator))
 		{
@@ -88,23 +93,27 @@ namespace SparkleLauncher
 		return process;
 	}
 
-	ProcessRequest MakeCMakeLauncherConfigureRequest(const std::filesystem::path& repositoryRoot, const BuildToolchainStatus& toolchain, std::string_view operationId, std::string_view logFileName)
+	Process::ChildProcessRequest MakeCMakeLauncherConfigureRequest(
+	    const std::filesystem::path& repositoryRoot,
+	    const BuildToolchainStatus& toolchain,
+	    std::string_view operationId,
+	    std::string_view logFileName)
 	{
 		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		ProcessRequest process = MakeCMakeConfigureRequest(repositoryRoot, toolchain, operationId, logFileName);
+		Process::ChildProcessRequest process = MakeCMakeConfigureRequest(repositoryRoot, toolchain, operationId, logFileName);
 		if (!process.Arguments.empty())
 		{
 			process.Arguments.pop_back();
 		}
 		process.WorkingDirectory = repositoryRoot;
 		process.Arguments.push_back("-S");
-		process.Arguments.push_back((repositoryRoot / "Tools" / "Launcher").string());
+		process.Arguments.push_back(Strings::ToNarrow((repositoryRoot / "Tools" / "Launcher").wstring()));
 		process.Arguments.push_back("-B");
-		process.Arguments.push_back(outputs.LauncherBuildDirectory().string());
+		process.Arguments.push_back(Strings::ToNarrow(outputs.LauncherBuildDirectory().wstring()));
 		return process;
 	}
 
-	ProcessRequest MakeCMakeLauncherBuildRequest(
+	Process::ChildProcessRequest MakeCMakeLauncherBuildRequest(
 	    const std::filesystem::path& repositoryRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
@@ -112,11 +121,11 @@ namespace SparkleLauncher
 	    std::string_view logFileName)
 	{
 		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		ProcessRequest process;
+		Process::ChildProcessRequest process;
 		process.ExecutablePath = toolchain.CMakePath;
 		process.WorkingDirectory = repositoryRoot;
 		process.LogPath = ResolveLauncherOperationLogPath(repositoryRoot, operationId, logFileName);
-		process.Arguments = {"--build", outputs.LauncherBuildDirectory().string(), "--config", std::string(profileName), "--target", "SparkleLauncher"};
+		process.Arguments = {"--build", Strings::ToNarrow(outputs.LauncherBuildDirectory().wstring()), "--config", std::string(profileName), "--target", "SparkleLauncher"};
 		if (CMakeGeneratorUsesMsBuildArguments(toolchain.Generator))
 		{
 			process.Arguments.push_back("--");
@@ -126,7 +135,7 @@ namespace SparkleLauncher
 		return process;
 	}
 
-	ProcessRequest MakeCMakeDependencySyncRequest(
+	Process::ChildProcessRequest MakeCMakeDependencySyncRequest(
 	    const std::filesystem::path& repositoryRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
@@ -134,7 +143,7 @@ namespace SparkleLauncher
 	    std::string_view logFileName)
 	{
 		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		ProcessRequest process = MakeCMakeConfigureRequest(repositoryRoot, toolchain, operationId, logFileName);
+		Process::ChildProcessRequest process = MakeCMakeConfigureRequest(repositoryRoot, toolchain, operationId, logFileName);
 		if (!process.Arguments.empty())
 		{
 			process.Arguments.pop_back();
@@ -143,11 +152,11 @@ namespace SparkleLauncher
 		const std::filesystem::path dependencySyncDirectory = outputs.SourceDependencySyncDirectory(sourceDependencyId);
 		process.WorkingDirectory = repositoryRoot;
 		process.Arguments.push_back("-DSPARKLE_SYNC_SOURCE_DEPENDENCY=" + std::string(sourceDependencyId));
-		process.Arguments.push_back("-DFETCHCONTENT_BASE_DIR=" + outputs.DependencyCacheRoot.generic_string());
+		process.Arguments.push_back("-DFETCHCONTENT_BASE_DIR=" + Strings::ToNarrow(outputs.DependencyCacheRoot.generic_wstring()));
 		process.Arguments.push_back("-S");
-		process.Arguments.push_back(repositoryRoot.string());
+		process.Arguments.push_back(Strings::ToNarrow(repositoryRoot.wstring()));
 		process.Arguments.push_back("-B");
-		process.Arguments.push_back(dependencySyncDirectory.string());
+		process.Arguments.push_back(Strings::ToNarrow(dependencySyncDirectory.wstring()));
 		return process;
 	}
 }

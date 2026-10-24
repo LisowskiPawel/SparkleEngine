@@ -9,6 +9,7 @@
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifactWriter.h"
 #include "Renderer.h"
 
+#include <optional>
 #include <utility>
 
 ReferencePathTracerArtifactCoordinator::ReferencePathTracerArtifactCoordinator(EditorOperationRuntime& operations) noexcept :
@@ -151,11 +152,7 @@ void ReferencePathTracerArtifactCoordinator::PublishIfReady()
 			        return TaskResult::Cancelled("Reference Path Tracer artifact publication was cancelled.");
 		        }
 		        result = ReferencePathTracerArtifactWriter::Write(std::move(request), context.GetCancellationToken());
-		        if (context.IsCancellationRequested())
-		        {
-			        return TaskResult::Cancelled("Reference Path Tracer artifact publication was cancelled.");
-		        }
-		        return result.Succeeded ? TaskResult::Success() : TaskResult::Failure(result.ErrorMessage);
+		        return result.Succeeded ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.ErrorMessage) : TaskResult::Failure(result.ErrorMessage));
 	        },
 	        errorMessage))
 	{
@@ -192,8 +189,16 @@ void ReferencePathTracerArtifactCoordinator::Update(Renderer& renderer, const Vi
 		}
 	}
 	ReferencePathTracerArtifactWriteResult result;
-	if (m_writeOperation.TryConsume(result))
+	if (const std::optional<TaskResult> taskResult = m_writeOperation.TryConsume(result))
 	{
+		if (!taskResult->Succeeded())
+		{
+			result.Succeeded = false;
+			if (result.ErrorMessage.empty())
+			{
+				result.ErrorMessage = taskResult->GetMessage();
+			}
+		}
 		m_lastResult = std::move(result);
 	}
 }

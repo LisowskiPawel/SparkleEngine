@@ -53,6 +53,8 @@ Every integration MUST:
 - distinguish product, preview, research, unsupported, and deleted states honestly;
 - improve the complete touched ownership path, including the directly exposed debt needed for one coherent result, without expanding into unrelated cleanup.
 
+Preservation applies to the selected contract, not every historical feature or private representation. [Scope And Retirement Decision](ChangeLifecycle.md#scope-and-retirement-decision) permits deliberate narrowing/removal with scope reconciliation and preservation evidence. An architecture dossier or inventory entry does not require its implementation or indefinite retention.
+
 The desired change is usually additive in capability and reductive in structure. Speculative frameworks, scene-specific architecture, duplicate schedulers/graphs/caches, and names whose claims exceed their evidence do not satisfy this contract.
 
 ## Required Work and Alternate Implementations

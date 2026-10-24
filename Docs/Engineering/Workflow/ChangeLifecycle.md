@@ -64,6 +64,14 @@ Before adding a persistent concept, state:
 
 This is a reasoning ledger, not a target for negative line count. A change may add substantial implementation while remaining structurally reductive. If permanent complexity has no current consumer, owner, invariant, or evidence-backed need, do not add it.
 
+### Scope And Retirement Decision
+
+Before spending implementation effort, apply [Roadmap scope protection](../../Strategy/Roadmap.md#scope-protection). Record the admitted output, current consumer, smallest necessary delta, explicit non-delivery, and cleanup in the existing iteration record. If no selected promise depends on a capability, evaluate **reuse**, **narrow**, **defer**, or **retire** before choosing to complete it. This decision applies to existing engine code as well as proposed additions.
+
+For retirement, trace the current producers, consumers, serialized/cooked contracts, public selectors, build/package membership, external dependencies and evidence users. Name what remains and prove that it still produces the selected result. An unneeded private helper or replaced path is removed within the authorized slice. Removing an advertised or required capability first changes its owning scope/classification and dependent acceptance claims; a `Removed` result requires the implementation and reachable residue to be gone. A documentation decision alone is not removal evidence.
+
+Land the corresponding source, shader, settings/UI, registration, build/dependency, generated-output and documentation cleanup together. Reuse the smallest positive preservation check and a negative reachability/stale-reference check. Preserve unique notices, provenance and valid evidence. Do not retain a disabled framework, compatibility path, placeholder menu or unused API for possible future work. If no deletion is justified, say why; do not invent churn to satisfy a subtraction quota.
+
 ### Reconcile Current State
 
 Before relying on an earlier prompt, completion record, test, or criterion:

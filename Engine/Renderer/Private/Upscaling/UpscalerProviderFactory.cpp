@@ -4,6 +4,7 @@
 #include "Upscaling/NvidiaDlss/NvidiaDlssUpscalerProvider.h"
 #include "Upscaling/UpscalerProvider.h"
 #include "Upscaling/UpscalerSettings.h"
+#include "Core/Public/Diagnostics/Error.h"
 
 std::unique_ptr<IUpscalerProvider> CreateConfiguredUpscalerProvider()
 {
@@ -13,7 +14,9 @@ std::unique_ptr<IUpscalerProvider> CreateConfiguredUpscalerProvider()
 			return std::make_unique<NvidiaDlssUpscalerProvider>();
 
 		case EUpscalerProviderKind::Linear:
-		default:
 			return {};
+
+		default:
+			throw Diagnostics::Error("Invalid r.Upscaler.Provider. Use 0 (Linear) or 1 (NVIDIA DLSS) in the shared rendering settings.");
 	}
 }

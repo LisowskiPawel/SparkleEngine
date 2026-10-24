@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ShaderRecook/ShaderRecookRequest.h"
+#include "Core/Public/Process/ChildProcess.h"
 
 #include <filesystem>
 #include <stop_token>
@@ -12,16 +13,16 @@ inline constexpr int kShaderCompilerNoWorkExitCode = 2;
 
 struct ShaderCompilerProcessResult final
 {
-	int ExitCode = -1;
-	std::filesystem::path ExecutablePath;
+	Process::ChildProcessResult Execution;
 	std::string CommandLine;
-	std::string Output;
 
-	bool Succeeded() const noexcept { return ExitCode == 0; }
+	bool Succeeded() const noexcept { return Execution.Succeeded(); }
 
-	bool NoWork() const noexcept { return ExitCode == kShaderCompilerNoWorkExitCode; }
+	bool NoWork() const noexcept { return Execution.Launched && !Execution.Cancelled && Execution.ExitCode == kShaderCompilerNoWorkExitCode && Execution.FailureReason.empty(); }
 
 	bool SettledSuccessfully() const noexcept { return Succeeded() || NoWork(); }
+
+	std::string TakeOutput();
 };
 
 class ShaderCompilerProcess final

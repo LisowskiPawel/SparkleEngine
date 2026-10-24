@@ -6,7 +6,7 @@
 
 **Scope:** the order to follow from the current release work through advanced graphics and portfolio delivery
 
-**Updated:** 2026-10-23; progress summarizes recorded work, not release approval
+**Updated:** 2026-10-24; progress summarizes recorded work, not release approval
 
 Choose one task below, open its **implementation stage**, and copy that stage's prompt. The linked **design** explains the behavior and checks to preserve. This roadmap owns priority and brief progress; implementation plans own the steps.
 
@@ -20,7 +20,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 
 ## Where We Are And What Is Next
 
-**Next: [PD-1: finish Game/Editor journeys](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells).** Fix D3D12 Game shutdown for Cornell Box and Diffuse Transmission Plant, then finish rendered-frame and interaction checks. Regenerate the archive after product closure and continue PD-2/3/4. This laptop's source-workspace runs do not establish clean-OS or independent-adopter acceptance.
+**Next: [PD-1: finish Game/Editor journeys](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells).** Resolve Modern Sponza's rendered output, then close the retained shutdown failures and remaining interaction checks. Regenerate the archive after product closure and continue PD-2/3/4. This laptop's source-workspace runs do not establish clean-OS or independent-adopter acceptance.
 
 | Current work | Design / acceptance reference | Implementation stages |
 | --- | --- | --- |
@@ -39,8 +39,8 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 | Scope / FR-00 | Six product choices approved. | Remaining technical qualification; public rights close at FR-07. |
 | Identity / FR-01 | Identity, dependency pins and notices implemented; earlier baseline recorded. | Qualify the final source candidate. |
 | GPU crash tooling / GCD | Delivered: 18 native checks, 32 normal journeys, four SDK-free builds; `ITER-GCD-04-06`. [Scope and evidence](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures). | None for the qualified tooling candidate; use in PD-1. |
-| PD-1: Game / Editor | Resize/input repaired; 32 native map/API runs recorded. Editor edit/save/reload, settings/reset and malformed-settings rejection verified. | Two D3D12 Game quit-budget failures; rendered-frame, interaction and remaining failure checks. |
-| PD-2: source / Launcher | Cold clone configured, synced and built products/tools; Empty cook passed. | Current cook/failure/GUI-equivalence checks and independent adoption. |
+| PD-1: Game / Editor | Startup/edit rejection and Settings fixes checked. Recook quit, capture failure/retry and camera edit/undo/redo/save/restart pass locally. Game menu resize fixed. | Frame correctness, native startup/shutdown and remaining interaction/failure checks. |
+| PD-2: source / Launcher | Fresh-checkout build/Empty cold/warm cook and eight native Empty routes recorded. Empty-only selection fixed; configure preserves caches. Process quoting/Unicode, log failure, cancellation and readiness checks passed locally. | Network-blocked replay, seven-map/subset, remaining build/cook/GUI-equivalence checks and independent adoption. |
 | PD-3 / FR-02: package | Unsigned archive `de0cf4bc…` verified; selected seven-map cook passed on this laptop. | Regenerate after fixes; final archive/offline/precompiled/Qt replacement and minimum-machine checks. |
 | PD-4: diagnostics | Local GPU tooling qualified; earlier consent/privacy/review fixtures passed on `de0cf4bc…`. | Final-archive self-service, incident and replacement rehearsals. Automatic CPU crash/hang collection remains unavailable. |
 | FR-03 to FR-08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
@@ -152,7 +152,7 @@ Update the result in its owner, then update this page's current/next pointer. Lo
 
 ## Planning Coverage And Fillable Files
 
-All 49 feature families retain their [existing phase assignments](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#feature-work-package-registry). Reuse these plans. The remaining small scaffolds are [Vignette](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#basic-vignette-remaining-delivery-plan), [Graphics Portfolio](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#graphics-portfolio-delivery-plan) and the contribution/transfer cards above.
+All 49 feature families retain their [existing phase assignments](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#feature-work-package-registry). These are routing coverage, not 49 new implementation projects or permission to complete every target in a dossier. Reuse existing behavior and valid proof; implement only the missing delta for an admitted promise. The remaining small scaffolds are [Vignette](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#basic-vignette-remaining-delivery-plan), [Graphics Portfolio](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#graphics-portfolio-delivery-plan) and the contribution/transfer cards above.
 
 To fill a missing plan, use the [remaining-work template](../Engineering/Workflow/Templates/RemainingWorkPlan.md). Resolve its decision owners and check cards before calling it implementation-ready. Retire completed instructions after preserving useful design and evidence.
 
@@ -217,6 +217,18 @@ A risk stays **Open** until its retirement evidence is linked from the current i
 
 ## Scope Protection
 
-Correctness, lifetime safety, paired APIs and required rendering are release work. Extra presentation polish, second hardware and generalized tooling can wait. Preserve qualified reference truth, held-out evaluation, the classical fallback and honest limitations.
+Every proposed stage must name the selected output or release promise it advances, its actual consumer, the smallest missing production delta, its exclusions, and the existing path it will simplify or remove. An inventory gap, a detailed target architecture, a professional role keyword or completion of `REL-11` is insufficient admission. If existing code and external tools can produce the required evidence, use them. Prefer a demonstrated defect repair or deletion over another framework.
+
+| Scope | Delivery boundary |
+| --- | --- |
+| Current release | Approved Launcher/Editor/Game journeys, seven selected maps plus Empty, required rendering, paired APIs, finite package/publication and independent reproduction. Preserve the [six approved decisions](../Acceptance/FirstRelease.md#approval-and-next-work), exact budgets and required failure checks. |
+| Rendering depth | Trustworthy surface transport/reference, frame graph and native lifetime, existing SR/RR and the specifically admitted display/decal features. No additional light/material/AA/provider variants merely to fill a capability table. |
+| Diagnostics | Use qualified crash tooling and selected external capture routes. Internal stat catalogs, workspace, GPU visualizer, history service and dashboard are unselected; a specific missing measurement may justify only its smallest producer/export path. |
+| Later evidence | Bistro/San Miguel, causal studies, one owned diffuse-indirect model-to-shader slice and three cases reuse release mechanisms and accepted artifacts. They do not expand the release map or material domain. |
+| Unselected breadth | Geometry cache, volumetrics/clouds, frame generation, GPU-driven geometry, extra platforms/hardware, general authoring tools and ML frameworks remain unselected after release until a separate consumer and value decision admits a bounded slice. |
+
+Deletion and scope reduction are valid delivery outcomes. Apply [scope and retirement decisions](../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision) when an existing feature lacks a selected consumer; reconcile its classifications, selectors, dependencies and checks before removing it. Do not replace the old blanket feature-preservation rule with arbitrary deletion or a line-count target. Supported required behavior and evidence remain binding until their scope owner changes the promise.
+
+Correctness, lifetime safety, paired APIs and required rendering are release work. Extra presentation polish, second hardware and generalized tooling can wait. Preserve qualified reference truth, held-out evaluation, the classical fallback and honest limitations. End each implementation stage with its local cleanup and deletion evidence; cleanup is not a final optional phase.
 
 When a candidate fails, repair its owner or explicitly revise scope and rerun affected proof. Publish only approved bytes; begin the advanced program only after `REL-11`.

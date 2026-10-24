@@ -169,7 +169,18 @@ void GameUiHost::DrawMenu()
 	const float scale = m_window.GetDpiScale();
 	ImGui::SetNextWindowPos(viewport->WorkPos, ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2((std::min) (620.0f * scale, viewport->WorkSize.x), (std::min) (720.0f * scale, viewport->WorkSize.y)), ImGuiCond_Always);
-	if (!ImGui::Begin("Sparkle Game"))
+	const bool showContents = ImGui::Begin("Sparkle Game");
+	const ImVec2 windowSize = ImGui::GetWindowSize();
+	const ImVec2 windowPosition = ImGui::GetWindowPos();
+	const ImVec2 constrainedPosition(
+	    std::clamp(windowPosition.x, viewport->WorkPos.x, (std::max) (viewport->WorkPos.x, viewport->WorkPos.x + viewport->WorkSize.x - windowSize.x)),
+	    std::clamp(windowPosition.y, viewport->WorkPos.y, (std::max) (viewport->WorkPos.y, viewport->WorkPos.y + viewport->WorkSize.y - windowSize.y)));
+	if (constrainedPosition.x != windowPosition.x || constrainedPosition.y != windowPosition.y)
+	{
+		ImGui::SetWindowPos(constrainedPosition);
+	}
+
+	if (!showContents)
 	{
 		ImGui::End();
 		return;

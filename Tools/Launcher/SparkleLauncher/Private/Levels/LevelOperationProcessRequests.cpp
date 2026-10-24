@@ -13,7 +13,7 @@
 
 namespace SparkleLauncher
 {
-	static ProcessRequest MakeAssetPackSyncRequest(const LevelOperationPlan& plan, const ProjectAssetPack& pack)
+	static Process::ChildProcessRequest MakeAssetPackSyncRequest(const LevelOperationPlan& plan, const ProjectAssetPack& pack)
 	{
 		const std::filesystem::path projectRoot = Filesystem::ResolveProductProjectRoot(plan.RepositoryRoot, plan.Request.ContentId);
 		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(plan.RepositoryRoot);
@@ -38,7 +38,7 @@ namespace SparkleLauncher
 			syncScript = *verified;
 		}
 
-		ProcessRequest process;
+		Process::ChildProcessRequest process;
 		process.WorkingDirectory = plan.RepositoryRoot;
 		process.LogPath = ResolveLauncherOperationLogPath(plan.RepositoryRoot, plan.Operation.Id, "AssetPack-" + pack.id + ".txt");
 		process.ExecutablePath = plan.CMakePath;

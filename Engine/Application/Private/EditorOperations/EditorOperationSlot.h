@@ -3,9 +3,11 @@
 #include "EditorOperations/EditorOperationRuntime.h"
 #include "Tasks/Public/TaskExecutor.h"
 #include "Tasks/Public/TaskGraph.h"
+#include "Tasks/Public/TaskTypes.h"
 
 #include <exception>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -51,16 +53,18 @@ public:
 
 	bool IsOccupied() const noexcept { return m_execution.IsValid(); }
 
-	bool TryConsume(TResult& result) noexcept
+	std::optional<TaskResult> TryConsume(TResult& result)
 	{
 		if (!m_execution.IsValid() || !m_execution.IsSettled())
 		{
-			return false;
+			return std::nullopt;
 		}
-		result = m_result ? std::move(*m_result) : TResult{};
+
+		TaskResult taskResult = m_execution.GetResult();
+		result = std::move(*m_result);
 		m_result.reset();
 		m_execution = {};
-		return true;
+		return taskResult;
 	}
 
 private:

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
-#include "SparkleLauncher/ProcessRunner.h"
+#include "Core/Public/Process/ChildProcess.h"
 
 #include <filesystem>
 #include <string>
@@ -10,18 +10,26 @@
 
 namespace SparkleLauncher
 {
-	ProcessRequest MakeCMakeConfigureRequest(const std::filesystem::path& repositoryRoot, const BuildToolchainStatus& toolchain, std::string_view operationId, std::string_view logFileName);
+	Process::ChildProcessRequest MakeCMakeConfigureRequest(
+	    const std::filesystem::path& repositoryRoot,
+	    const BuildToolchainStatus& toolchain,
+	    std::string_view operationId,
+	    std::string_view logFileName);
 
-	ProcessRequest MakeCMakeDependencySyncRequest(
+	Process::ChildProcessRequest MakeCMakeDependencySyncRequest(
 	    const std::filesystem::path& repositoryRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view sourceDependencyId,
 	    std::string_view logFileName);
 
-	ProcessRequest MakeCMakeLauncherConfigureRequest(const std::filesystem::path& repositoryRoot, const BuildToolchainStatus& toolchain, std::string_view operationId, std::string_view logFileName);
+	Process::ChildProcessRequest MakeCMakeLauncherConfigureRequest(
+	    const std::filesystem::path& repositoryRoot,
+	    const BuildToolchainStatus& toolchain,
+	    std::string_view operationId,
+	    std::string_view logFileName);
 
-	ProcessRequest MakeCMakeBuildRequest(
+	Process::ChildProcessRequest MakeCMakeBuildRequest(
 	    const std::filesystem::path& repositoryRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
@@ -29,7 +37,7 @@ namespace SparkleLauncher
 	    const std::vector<std::string>& targets,
 	    std::string_view logFileName);
 
-	ProcessRequest MakeCMakeLauncherBuildRequest(
+	Process::ChildProcessRequest MakeCMakeLauncherBuildRequest(
 	    const std::filesystem::path& repositoryRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,

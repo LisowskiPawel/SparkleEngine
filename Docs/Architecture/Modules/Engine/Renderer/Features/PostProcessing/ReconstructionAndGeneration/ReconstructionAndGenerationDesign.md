@@ -104,9 +104,9 @@ Invalid output or provider extents must not produce divided-by-zero jitter or a 
 | Requested route | Render extent | Sampling/AA meaning | Active/fallback boundary |
 | --- | --- | --- | --- |
 | Linear | output extent | single-sample raster plus active Halton camera jitter; Linear resolves/copies the current scene result | internal baseline; no separate resolution-scale selector found |
-| NVIDIA DLSS SR `NativeAA` | provider-selected extent, expected native/output-sized when provider accepts it | vendor reconstruction quality mode using shared temporal inputs | D3D12/SDK/adapter/interposer gated; initialization failure resolves to Linear |
+| NVIDIA DLSS SR `NativeAA` | provider-selected extent, expected native/output-sized when provider accepts it | vendor reconstruction quality mode using shared temporal inputs | SDK/adapter/interposer gated; selected-provider initialization failure is fatal and does not select Linear |
 | NVIDIA DLSS SR Quality/Balanced/Performance/UltraPerformance | provider optimal internal extent | vendor temporal upscaling/reconstruction | requested mode is not active evidence; actual extent/provider must be reported |
-| NVIDIA DLSS RR | equal render-extent input/output using the provider's NativeAA mode | vendor lighting denoising produces a render-resolution intermediate | unavailable/unsupported resolves Off; selected Linear/DLSS SR quality independently owns render-to-output resolution conversion |
+| NVIDIA DLSS RR | equal render-extent input/output using the provider's NativeAA mode | vendor lighting denoising produces a render-resolution intermediate | selected-provider initialization failure is fatal and does not select Off; selected Linear/DLSS SR quality independently owns render-to-output resolution conversion |
 | RHI sample counts 2/4/8 | vocabulary supported by neutral texture/pipeline validation | potential multisample resource/pipeline contract only | no current Renderer pass/selector/end-to-end resolve route found |
 | MSAA jitter helper | source-only 8-sample offset table | temporal sample vocabulary only | active `RenderViewState` hard-codes Halton; helper is not selected |
 
@@ -197,6 +197,8 @@ Use the official pinned Streamline `v2.11.1` [SR guide](https://github.com/NVIDI
 | DLSS Ray Reconstruction | D3D12 provider readiness plus ReSTIR-specific guides | optional render-resolution `DenoisedSceneColor` consumed by the selected presentation upscaler | mode/guide restrictions and quality/history proof open |
 
 Only the selected presentation upscaler may own `ResolvedSceneColor` for a frame. Ray Reconstruction owns a separate render-resolution `DenoisedSceneColor`; it composes before Linear or DLSS Super Resolution instead of replacing either. Selected vendor initialization or evaluation failure is fatal and preserves the requested selection. Linear and RR Off are explicit user choices; they are not automatic recovery paths.
+
+Provider-input reconciliation (2026-10-24): the Renderer-owned provider enums define their accepted numeric CVar domain. Core's shared string parser applies that pure validation before console, command-line or persisted assignment; invalid text leaves the previous value unchanged, and a rejected control batch commits none of its entries. This input rejection is distinct from a valid provider that cannot initialize on the selected device. Factories retain a defensive error for invalid typed caller input; these source contracts do not establish native provider or image-quality acceptance.
 
 **Parent family:** [Post Processing](../PostProcessingDesign.md)
 

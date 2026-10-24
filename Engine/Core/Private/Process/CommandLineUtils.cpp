@@ -75,20 +75,26 @@ namespace CommandLine
 		std::string quoted;
 		quoted.reserve(text.size() + 2);
 		quoted.push_back('"');
+		std::size_t backslashes = 0;
 		for (const char character : text)
 		{
-			if (character == '"')
+			if (character == '\\')
 			{
-				quoted.push_back('\\');
+				++backslashes;
+				continue;
 			}
+
+			quoted.append(character == '"' ? backslashes * 2 + 1 : backslashes, '\\');
+			backslashes = 0;
 			quoted.push_back(character);
 		}
+		quoted.append(backslashes * 2, '\\');
 		quoted.push_back('"');
 		return quoted;
 	}
 
 	std::string QuotePath(const std::filesystem::path& path)
 	{
-		return QuoteArgument(path.string());
+		return QuoteArgument(Strings::ToNarrow(path.wstring()));
 	}
 }

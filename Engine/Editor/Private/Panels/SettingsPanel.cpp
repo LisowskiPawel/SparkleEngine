@@ -57,12 +57,24 @@ void SettingsPanel::BuildUI(bool disableInteraction)
 		m_refreshFromRuntimeOnNextOpen = false;
 	}
 
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowSize(ImVec2(1120.0f, 780.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), viewport->WorkSize);
 	const std::string windowTitle = UiUtil::MakeIconLabel(UiUtil::EditorIcon::Settings, "Settings") + "##EditorSettings";
 	if (!ImGui::Begin(windowTitle.c_str(), &m_isOpen))
 	{
 		ImGui::End();
 		return;
+	}
+
+	const ImVec2 windowSize = ImGui::GetWindowSize();
+	const ImVec2 windowPosition = ImGui::GetWindowPos();
+	const ImVec2 constrainedPosition(
+	    std::clamp(windowPosition.x, viewport->WorkPos.x, (std::max) (viewport->WorkPos.x, viewport->WorkPos.x + viewport->WorkSize.x - windowSize.x)),
+	    std::clamp(windowPosition.y, viewport->WorkPos.y, (std::max) (viewport->WorkPos.y, viewport->WorkPos.y + viewport->WorkSize.y - windowSize.y)));
+	if (constrainedPosition.x != windowPosition.x || constrainedPosition.y != windowPosition.y)
+	{
+		ImGui::SetWindowPos(constrainedPosition);
 	}
 
 	const bool showRestartBar = HasPendingRestart();

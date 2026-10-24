@@ -8,7 +8,7 @@
 
 namespace SparkleLauncher
 {
-	OperationRecord RunLevelRunOperationPlan(LevelRunOperationPlan plan, IProcessRunner& processRunner, const ProcessOutputCallback& outputCallback)
+	OperationRecord RunLevelRunOperationPlan(LevelRunOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
@@ -29,10 +29,10 @@ namespace SparkleLauncher
 		{
 			LevelRunOperationProcessStep& step = processSteps[stepIndex];
 			ReportOperationProgress(outputCallback, step.DisplayName);
-			ProcessRequest request = step.Request;
+			Process::ChildProcessRequest request = step.Request;
 			AppendProcessOutputCallback(request, outputCallback);
 
-			const ProcessResult result = processRunner.Run(request);
+			const Process::ChildProcessResult result = processRunner.Run(request);
 			if (plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath)
 			{
 				const auto path = ReadGpuCrashAnnouncement(result.CapturedOutput);
@@ -41,9 +41,9 @@ namespace SparkleLauncher
 					operation.GpuCrash = GpuCrashIncident{path, plan.SessionId, result.ProcessId};
 				}
 			}
-			if (!result.Launched || result.Canceled || !result.Ready)
+			if (!result.Ready || !result.Succeeded())
 			{
-				if (result.Canceled)
+				if (result.Cancelled)
 				{
 					SetOperationFailure(operation, OperationProblemKind::Cancellation, step.DisplayName + " was canceled.", "Open the level again when ready.");
 				}
@@ -55,7 +55,7 @@ namespace SparkleLauncher
 					    result.FailureReason.empty() ? step.DisplayName + " failed." : result.FailureReason,
 					    "Review the application startup log, correct the first startup or readiness failure, then retry this level.");
 				}
-				MarkOperationFinished(operation, result.Canceled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
+				MarkOperationFinished(operation, result.Cancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 				return operation;
 			}
 		}

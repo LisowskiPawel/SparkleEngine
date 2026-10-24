@@ -1,4 +1,5 @@
 #include "Process/ChildProcess.h"
+#include "Process/CommandLineUtils.h"
 #include "Process/ChildProcessWindows.h"
 #include "Process/ProcessReadinessEnvironment.h"
 
@@ -6,7 +7,6 @@
 #include <array>
 #include <atomic>
 #include <cwchar>
-#include <cwctype>
 #include <fstream>
 #include <string>
 #include <string_view>
@@ -106,52 +106,15 @@ public:
 		return result;
 	}
 
-	static std::wstring QuoteArgument(const std::wstring& argument)
-	{
-		if (argument.empty())
-		{
-			return L"\"\"";
-		}
-		const bool needsQuotes = std::any_of(argument.begin(), argument.end(), [](wchar_t value) { return std::iswspace(value) || value == L'\"'; });
-		if (!needsQuotes)
-		{
-			return argument;
-		}
-
-		std::wstring quoted(1, L'\"');
-		std::size_t backslashes = 0;
-		for (const wchar_t value : argument)
-		{
-			if (value == L'\\')
-			{
-				++backslashes;
-				continue;
-			}
-			if (value == L'\"')
-			{
-				quoted.append(backslashes * 2 + 1, L'\\');
-				quoted.push_back(value);
-				backslashes = 0;
-				continue;
-			}
-			quoted.append(backslashes, L'\\');
-			backslashes = 0;
-			quoted.push_back(value);
-		}
-		quoted.append(backslashes * 2, L'\\');
-		quoted.push_back(L'\"');
-		return quoted;
-	}
-
 	static std::wstring BuildCommandLine(const Process::ChildProcessRequest& request)
 	{
-		std::wstring commandLine = QuoteArgument(request.ExecutablePath.wstring());
+		std::string commandLine = CommandLine::QuotePath(request.ExecutablePath);
 		for (const std::string& argument : request.Arguments)
 		{
-			commandLine.push_back(L' ');
-			commandLine += QuoteArgument(Utf8ToWide(argument));
+			commandLine.push_back(' ');
+			commandLine += CommandLine::QuoteArgument(argument);
 		}
-		return commandLine;
+		return Utf8ToWide(commandLine);
 	}
 
 	static std::vector<wchar_t> BuildEnvironment(const std::vector<Process::EnvironmentOverride>& overrides)
@@ -359,7 +322,10 @@ static Process::ChildProcessResult RunWindowsChildProcessUntilReady(const Proces
 	}
 
 	std::error_code directoryError;
-	std::filesystem::create_directories(request.LogPath.parent_path(), directoryError);
+	if (!request.LogPath.parent_path().empty())
+	{
+		std::filesystem::create_directories(request.LogPath.parent_path(), directoryError);
+	}
 	if (directoryError)
 	{
 		result.FailureReason = "Failed to create the child process log directory: " + directoryError.message();
@@ -534,8 +500,22 @@ Process::ChildProcessResult Process::Detail::RunWindowsChildProcess(const ChildP
 	if (!request.LogPath.empty())
 	{
 		std::error_code error;
-		std::filesystem::create_directories(request.LogPath.parent_path(), error);
+		if (!request.LogPath.parent_path().empty())
+		{
+			std::filesystem::create_directories(request.LogPath.parent_path(), error);
+		}
+		if (error)
+		{
+			result.FailureReason = "Failed to create the child process log directory: " + error.message();
+			return result;
+		}
+
 		log.open(request.LogPath, std::ios::binary | std::ios::trunc);
+		if (!log)
+		{
+			result.FailureReason = "Failed to open the child process log.";
+			return result;
+		}
 	}
 
 	ChildProcessWindowsImplementation::OwnedProcess child;
@@ -664,6 +644,14 @@ Process::ChildProcessResult Process::Detail::RunWindowsChildProcess(const ChildP
 	DWORD exitCode = 1;
 	GetExitCodeProcess(child.Process.Get(), &exitCode);
 	result.ExitCode = static_cast<int>(exitCode);
+	if (log.is_open())
+	{
+		log.flush();
+		if (!log && result.FailureReason.empty())
+		{
+			result.FailureReason = "Failed to write the child process log.";
+		}
+	}
 #endif
 	return result;
 }

@@ -32,6 +32,8 @@ public:
 
 	const std::optional<WorldEditResult>& GetLastResult() const noexcept { return m_lastResult; }
 
+	void DismissLastResult() noexcept { m_lastResult.reset(); }
+
 private:
 	struct Transaction final
 	{

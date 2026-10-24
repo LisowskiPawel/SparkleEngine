@@ -28,6 +28,7 @@ private:
 	void BuildSelectionHeader() noexcept;
 	void BuildDetailsToolbar() noexcept;
 	void BuildSelectionInspector() noexcept;
+	void BuildEditStatus() noexcept;
 
 	std::shared_ptr<const EditorSceneModel> m_model;
 	EditorTransactionHistory* m_transactionHistory = nullptr;

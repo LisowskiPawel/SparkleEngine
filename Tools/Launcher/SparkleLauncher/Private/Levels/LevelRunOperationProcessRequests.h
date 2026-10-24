@@ -11,7 +11,7 @@ namespace SparkleLauncher
 	{
 		std::string Id;
 		std::string DisplayName;
-		ProcessRequest Request;
+		Process::ChildProcessRequest Request;
 	};
 
 	std::vector<LevelRunOperationProcessStep> BuildLevelRunProcessStepsForPlan(const LevelRunOperationPlan& plan);

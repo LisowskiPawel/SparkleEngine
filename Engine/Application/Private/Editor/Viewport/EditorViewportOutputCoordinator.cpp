@@ -27,9 +27,9 @@ EditorViewportOutputCoordinator::EditorViewportOutputCoordinator(EditorOperation
 
 EditorViewportOutputCoordinator::~EditorViewportOutputCoordinator() noexcept = default;
 
-void EditorViewportOutputCoordinator::Update(Renderer& renderer)
+void EditorViewportOutputCoordinator::Update(UI& ui, Renderer& renderer)
 {
-	m_state->PresentationCapture.Update(renderer);
+	m_state->PresentationCapture.Update(ui.GetEditorConsoleSystem(), renderer);
 	m_state->ReferenceArtifacts.Update(renderer, renderer.GetViewportPresentation().Products);
 }
 
@@ -38,7 +38,7 @@ void EditorViewportOutputCoordinator::HandleAction(UI& ui, Renderer& renderer, s
 	const ViewportOutputAction action = ui.ConsumeViewportOutputAction();
 	if (action == ViewportOutputAction::CapturePresentation)
 	{
-		m_state->PresentationCapture.Request(renderer, frameId);
+		m_state->PresentationCapture.Request(ui.GetEditorConsoleSystem(), renderer, frameId);
 		return;
 	}
 	ApplyReferencePathTracerArtifactAction(action, m_state->ReferenceArtifacts, renderer, renderer.GetViewportPresentation().Products);

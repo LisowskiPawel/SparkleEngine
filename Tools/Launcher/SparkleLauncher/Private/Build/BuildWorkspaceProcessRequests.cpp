@@ -9,7 +9,7 @@
 
 namespace SparkleLauncher
 {
-	static ProcessRequest MakeConfigureRequest(const BuildWorkspaceOperationPlan& plan)
+	static Process::ChildProcessRequest MakeConfigureRequest(const BuildWorkspaceOperationPlan& plan)
 	{
 		if (plan.Kind == BuildWorkspaceOperationKind::CompileLauncher)
 		{
@@ -22,7 +22,7 @@ namespace SparkleLauncher
 		return MakeCMakeConfigureRequest(plan.RepositoryRoot, plan.Toolchain, plan.Operation.Id, "Configure.txt");
 	}
 
-	static ProcessRequest MakeBuildRequest(const BuildWorkspaceOperationPlan& plan, std::string_view profileName, const std::vector<std::string>& targets)
+	static Process::ChildProcessRequest MakeBuildRequest(const BuildWorkspaceOperationPlan& plan, std::string_view profileName, const std::vector<std::string>& targets)
 	{
 		if (plan.Kind == BuildWorkspaceOperationKind::CompileLauncher)
 		{
@@ -58,7 +58,7 @@ namespace SparkleLauncher
 	static void AddHostToolInstallStep(std::vector<BuildWorkspaceProcessStep>& steps, const BuildWorkspaceOperationPlan& plan)
 	{
 		std::string errorMessage;
-		std::optional<ProcessRequest> request = BuildHostToolInstallRequest(plan.Request.HostToolId, plan.Toolchain, plan.RepositoryRoot, plan.Operation.Id, errorMessage);
+		std::optional<Process::ChildProcessRequest> request = BuildHostToolInstallRequest(plan.Request.HostToolId, plan.Toolchain, plan.RepositoryRoot, plan.Operation.Id, errorMessage);
 		if (!request.has_value())
 		{
 			throw Diagnostics::Error(errorMessage);

@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <format>
+#include <optional>
 #include <utility>
 
 ShaderRecookCoordinator::ShaderRecookCoordinator(EditorOperationRuntime& operations) :
@@ -83,12 +84,13 @@ void ShaderRecookCoordinator::Update(Renderer& renderer, bool reloadRequested) n
 	}
 
 	ExecutionResult result;
-	if (!m_operation.TryConsume(result))
+	const std::optional<TaskResult> taskResult = m_operation.TryConsume(result);
+	if (!taskResult)
 	{
 		return;
 	}
 
-	CompleteRecook(renderer, std::move(result));
+	CompleteRecook(renderer, std::move(result), *taskResult);
 
 	StartQueuedRecook();
 
@@ -156,9 +158,21 @@ void ShaderRecookCoordinator::StartRecook(ShaderRecookRequest request) noexcept
 	PublishStatus(std::format("Shader recook #{} started for {} through the shader compiler process (baselinePublicationId={}).", requestId, requestDescription, baselinePublicationId));
 }
 
-void ShaderRecookCoordinator::CompleteRecook(Renderer& renderer, ExecutionResult result) noexcept
+void ShaderRecookCoordinator::CompleteRecook(Renderer& renderer, ExecutionResult result, const TaskResult& taskResult) noexcept
 {
-	// Cancellation can settle the slot before the compiler body assigns its request identity.
+	if (!taskResult.Succeeded())
+	{
+		PublishStatus(
+		    std::format(
+		        "Shader recook {}: {}. The previous shader map remains active.\nCompiler exit code: {}\nCommand: {}\n\n{}",
+		        taskResult.WasCancelled() ? "cancelled" : "failed",
+		        taskResult.GetMessage(),
+		        result.Process.Execution.ExitCode,
+		        result.Process.CommandLine,
+		        result.Process.TakeOutput()));
+
+		return;
+	}
 	if (result.RequestId == 0u)
 	{
 		return;
@@ -169,72 +183,57 @@ void ShaderRecookCoordinator::CompleteRecook(Renderer& renderer, ExecutionResult
 		return;
 	}
 
-	if (result.Process.Succeeded())
+	const ShaderRecookPublicationReadResult readResult = ReadRecookPublication();
+	std::string publicationDiagnostic;
+	const ShaderRecookPublication* publication = FindFreshPublication(readResult, result.BaselinePublicationId, publicationDiagnostic);
+	if (publication == nullptr)
 	{
-		const ShaderRecookPublicationReadResult readResult = ReadRecookPublication();
-		std::string publicationDiagnostic;
-		const ShaderRecookPublication* publication = FindFreshPublication(readResult, result.BaselinePublicationId, publicationDiagnostic);
-		if (publication == nullptr)
-		{
-			PublishStatus(
-			    std::format(
-			        "Shader recook #{} ({}) finished with process success, but runtime reload was rejected before touching active "
-			        "shader artifacts: {}\nCommand: {}\n\n{}",
-			        result.RequestId,
-			        DescribeRequest(result.Request),
-			        publicationDiagnostic,
-			        result.Process.CommandLine,
-			        result.Process.Output));
-
-			return;
-		}
-
-		try
-		{
-			ReloadShaders(renderer);
-		}
-		catch (const Diagnostics::Error& error)
-		{
-			m_lastObservedPublicationId = publication->PublicationId;
-
-			PublishStatus(
-			    std::format(
-			        "Shader recook #{} ({}) published fresh result {} but runtime validation rejected the replacement set; previous cooked "
-			        "shader map remains active. {}\nCommand: {}\n\n{}",
-			        result.RequestId,
-			        DescribeRequest(result.Request),
-			        publication->PublicationId,
-			        error.what(),
-			        result.Process.CommandLine,
-			        result.Process.Output));
-
-			return;
-		}
-
-		m_lastObservedPublicationId = publication->PublicationId;
-
 		PublishStatus(
 		    std::format(
-		        "Shader recook #{} ({}) succeeded. Accepted publication {} and activated a validated shader runtime generation.\nCommand: "
-		        "{}\n\n{}",
+		        "Shader recook #{} ({}) finished with process success, but runtime reload was rejected before touching active "
+		        "shader artifacts: {}\nCommand: {}\n\n{}",
 		        result.RequestId,
 		        DescribeRequest(result.Request),
-		        publication->PublicationId,
+		        publicationDiagnostic,
 		        result.Process.CommandLine,
-		        result.Process.Output));
+		        result.Process.TakeOutput()));
 
 		return;
 	}
 
+	try
+	{
+		ReloadShaders(renderer);
+	}
+	catch (const Diagnostics::Error& error)
+	{
+		m_lastObservedPublicationId = publication->PublicationId;
+
+		PublishStatus(
+		    std::format(
+		        "Shader recook #{} ({}) published fresh result {} but runtime validation rejected the replacement set; previous cooked "
+		        "shader map remains active. {}\nCommand: {}\n\n{}",
+		        result.RequestId,
+		        DescribeRequest(result.Request),
+		        publication->PublicationId,
+		        error.what(),
+		        result.Process.CommandLine,
+		        result.Process.TakeOutput()));
+
+		return;
+	}
+
+	m_lastObservedPublicationId = publication->PublicationId;
+
 	PublishStatus(
 	    std::format(
-	        "Shader recook #{} ({}) failed with exit code {}. The previous shader map remains active; no recook publication was "
-	        "accepted and old artifacts remain loaded.\nCommand: {}\n\n{}",
+	        "Shader recook #{} ({}) succeeded. Accepted publication {} and activated a validated shader runtime generation.\nCommand: "
+	        "{}\n\n{}",
 	        result.RequestId,
 	        DescribeRequest(result.Request),
-	        result.Process.ExitCode,
+	        publication->PublicationId,
 	        result.Process.CommandLine,
-	        result.Process.Output));
+	        result.Process.TakeOutput()));
 }
 
 void ShaderRecookCoordinator::ReloadShaders(Renderer& renderer)

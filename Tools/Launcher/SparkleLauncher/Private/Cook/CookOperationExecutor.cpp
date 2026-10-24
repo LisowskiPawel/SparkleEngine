@@ -10,7 +10,7 @@ namespace SparkleLauncher
 {
 	constexpr unsigned int kMissingRuntimeDependencyExitCode = 0xC0000135u;
 
-	static std::string MakeCookFailureSummary(const CookOperationProcessStep& step, const ProcessResult& result)
+	static std::string MakeCookFailureSummary(const CookOperationProcessStep& step, const Process::ChildProcessResult& result)
 	{
 		if (!result.FailureReason.empty())
 		{
@@ -79,7 +79,7 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	OperationRecord RunCookOperationPlan(CookOperationPlan plan, IProcessRunner& processRunner, const ProcessOutputCallback& outputCallback)
+	OperationRecord RunCookOperationPlan(CookOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
@@ -119,7 +119,7 @@ namespace SparkleLauncher
 				continue;
 			}
 
-			ProcessRequest request = step.Request;
+			Process::ChildProcessRequest request = step.Request;
 			if (step.Id == "configure")
 			{
 				std::error_code errorCode;
@@ -128,10 +128,10 @@ namespace SparkleLauncher
 
 			AppendProcessOutputCallback(request, outputCallback);
 
-			const ProcessResult result = processRunner.Run(request);
-			if (!result.Launched || result.Canceled || result.ExitCode != 0)
+			const Process::ChildProcessResult result = processRunner.Run(request);
+			if (!result.Succeeded())
 			{
-				if (result.Canceled)
+				if (result.Cancelled)
 				{
 					SetOperationFailure(operation, OperationProblemKind::Cancellation, step.DisplayName + " was canceled.", "Run the cook operation again when ready.");
 				}
@@ -139,7 +139,7 @@ namespace SparkleLauncher
 				{
 					SetProcessOperationFailure(operation, result.StartFailure, MakeCookFailureSummary(step, result), CookRecoveryAction(step));
 				}
-				MarkOperationFinished(operation, result.Canceled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
+				MarkOperationFinished(operation, result.Cancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 				return operation;
 			}
 			if (step.Id == "cook-shaders")

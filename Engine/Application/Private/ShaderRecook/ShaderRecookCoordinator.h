@@ -43,7 +43,7 @@ private:
 	void HandleReloadRequests(Renderer& renderer, bool reloadRequested) noexcept;
 	void StartQueuedRecook() noexcept;
 	void StartRecook(ShaderRecookRequest request) noexcept;
-	void CompleteRecook(Renderer& renderer, ExecutionResult result) noexcept;
+	void CompleteRecook(Renderer& renderer, ExecutionResult result, const TaskResult& taskResult) noexcept;
 	void ReloadShaders(Renderer& renderer);
 	void HandleManualReload(Renderer& renderer) noexcept;
 	void HandleExternalRecookPublication(Renderer& renderer) noexcept;

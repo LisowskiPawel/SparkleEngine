@@ -28,7 +28,10 @@ void EditorTransactionHistory::InvalidateForWorldGeneration(std::uint64_t worldG
 	m_worldGeneration = worldGeneration;
 	m_undo.clear();
 	m_redo.clear();
-	m_lastResult.reset();
+	if (m_lastResult && m_lastResult->IsAccepted())
+	{
+		m_lastResult.reset();
+	}
 }
 
 WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, WorldEditCommand inverse, std::uint64_t worldGeneration, std::string coalescingKey)
@@ -62,7 +65,8 @@ WorldEditResult EditorTransactionHistory::Undo(std::uint64_t worldGeneration)
 	InvalidateForWorldGeneration(worldGeneration);
 	if (m_undo.empty())
 	{
-		return {0, WorldEditResultStatus::Rejected, "There is no editor transaction to undo."};
+		m_lastResult = WorldEditResult{0, WorldEditResultStatus::Rejected, "There is no editor transaction to undo."};
+		return *m_lastResult;
 	}
 	Transaction transaction = m_undo.back();
 	WorldEditResult result = Submit(transaction.Inverse, worldGeneration);
@@ -80,7 +84,8 @@ WorldEditResult EditorTransactionHistory::Redo(std::uint64_t worldGeneration)
 	InvalidateForWorldGeneration(worldGeneration);
 	if (m_redo.empty())
 	{
-		return {0, WorldEditResultStatus::Rejected, "There is no editor transaction to redo."};
+		m_lastResult = WorldEditResult{0, WorldEditResultStatus::Rejected, "There is no editor transaction to redo."};
+		return *m_lastResult;
 	}
 	Transaction transaction = m_redo.back();
 	WorldEditResult result = Submit(transaction.Forward, worldGeneration);

@@ -8,6 +8,11 @@ enum class EUpscalerProviderKind : std::uint8_t
 	NvidiaDlss = 1
 };
 
+constexpr bool IsValidConsoleVariableValue(EUpscalerProviderKind value) noexcept
+{
+	return value == EUpscalerProviderKind::Linear || value == EUpscalerProviderKind::NvidiaDlss;
+}
+
 enum class EUpscalerQualityMode : std::uint8_t
 {
 	NativeAA = 0,

@@ -23,7 +23,8 @@ const char* RayReconstructionModeToString(EngineRayReconstructionMode mode) noex
 		case EngineRayReconstructionMode::NvidiaDlssRayReconstruction:
 			return "NVIDIA DLSS Ray Reconstruction";
 		case EngineRayReconstructionMode::Off:
-		default:
 			return "Off";
+		default:
+			return "Unknown";
 	}
 }

@@ -36,9 +36,9 @@ namespace SparkleLauncher
 		arguments.push_back(plan.Request.ShaderStripDebugInfo ? "on" : "off");
 	}
 
-	static ProcessRequest MakeAssetCookerRequest(const CookOperationPlan& plan, std::string_view command, std::string_view logFileName)
+	static Process::ChildProcessRequest MakeAssetCookerRequest(const CookOperationPlan& plan, std::string_view command, std::string_view logFileName)
 	{
-		ProcessRequest process;
+		Process::ChildProcessRequest process;
 		process.ExecutablePath = Filesystem::ResolveProductToolPath(plan.RepositoryRoot, "AssetCooker", plan.ToolProfile);
 		process.WorkingDirectory = plan.RepositoryRoot;
 		process.LogPath = ResolveLauncherOperationLogPath(plan.RepositoryRoot, plan.Operation.Id, logFileName);
@@ -46,9 +46,9 @@ namespace SparkleLauncher
 		return process;
 	}
 
-	static ProcessRequest MakeShaderCompilerCookAllRequest(const CookOperationPlan& plan)
+	static Process::ChildProcessRequest MakeShaderCompilerCookAllRequest(const CookOperationPlan& plan)
 	{
-		ProcessRequest process;
+		Process::ChildProcessRequest process;
 		process.ExecutablePath = Filesystem::ResolveProductToolPath(plan.RepositoryRoot, "ShaderCompiler", plan.ToolProfile);
 		process.WorkingDirectory = Filesystem::ResolveProductProjectRoot(plan.RepositoryRoot, plan.Request.ContentId);
 		process.LogPath = ResolveLauncherOperationLogPath(plan.RepositoryRoot, plan.Operation.Id, "CookShaders.txt");
@@ -57,7 +57,7 @@ namespace SparkleLauncher
 		return process;
 	}
 
-	static void AddStep(std::vector<CookOperationProcessStep>& steps, std::string id, std::string displayName, ProcessRequest request)
+	static void AddStep(std::vector<CookOperationProcessStep>& steps, std::string id, std::string displayName, Process::ChildProcessRequest request)
 	{
 		CookOperationProcessStep step;
 		step.Id = std::move(id);

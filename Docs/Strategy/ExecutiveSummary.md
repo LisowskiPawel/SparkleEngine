@@ -44,9 +44,15 @@ The intended result is smaller and more explicit, not broader:
 - existing debugger/capture capability used instead of new reporting frameworks;
 - obsolete paths deleted when a replacement lands.
 
+Product completeness is bounded by the selected rendering demonstration and its reproduction path. Editor, Launcher, content tools and packaging exist to serve that result; conventional engine feature coverage is not a goal. A missing conventional capability is often an intentional boundary.
+
+Existing code is not automatically worth retaining. When a capability has no selected consumer or evidence role, evaluate narrowing or deleting it before investing in its completion. Preserve required behavior and unique evidence; change advertised scope explicitly rather than carrying unused implementations, selectors and dependencies indefinitely. [Roadmap scope control](Roadmap.md#scope-protection) owns admission; [Change Lifecycle](../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision) owns the removal procedure.
+
 ## Workload Ladder
 
 The planning horizon uses one fixed ladder:
+
+This is the **later advanced-evidence ladder**, after release closeout. The first release uses its separately approved [seven-map set](../Acceptance/FirstRelease.md#releasemapset), plus Empty. Bistro and San Miguel do not become first-release dependencies through this summary.
 
 - **Sponza** — Tier 0 startup and rapid regression.
 - **Bistro exterior/interior** — primary Tier 1 flagship and narrative spine.

@@ -152,21 +152,23 @@ ConsoleCommandResult ShaderConsoleCommands::ExecuteListShaders()
 ConsoleCommandResult ShaderConsoleCommands::ExecuteListShaderBackends()
 {
 	ShaderCompilerProcessResult result = ShaderCompilerProcess::RunToolCommand("list-backends");
+	std::string output = result.TakeOutput();
 	if (!result.Succeeded())
 	{
-		return ConsoleCommandResult::Error(result.Output.empty() ? "failed to query shader compiler backends" : std::move(result.Output));
+		return ConsoleCommandResult::Error(output.empty() ? "failed to query shader compiler backends" : std::move(output));
 	}
-	return ConsoleCommandResult::Success(std::move(result.Output));
+	return ConsoleCommandResult::Success(std::move(output));
 }
 
 ConsoleCommandResult ShaderConsoleCommands::ExecuteListShaderTargets()
 {
 	ShaderCompilerProcessResult result = ShaderCompilerProcess::RunToolCommand("list-targets");
+	std::string output = result.TakeOutput();
 	if (!result.Succeeded())
 	{
-		return ConsoleCommandResult::Error(result.Output.empty() ? "failed to query shader compiler targets" : std::move(result.Output));
+		return ConsoleCommandResult::Error(output.empty() ? "failed to query shader compiler targets" : std::move(output));
 	}
-	return ConsoleCommandResult::Success(std::move(result.Output));
+	return ConsoleCommandResult::Success(std::move(output));
 }
 
 std::vector<std::string> ShaderConsoleCommands::CompleteRecompileShaders(const ConsoleAutocompleteRequest& request)

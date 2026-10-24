@@ -172,7 +172,7 @@ bool EditorApplication::Tick()
 
 void EditorApplication::UpdateEditorOperations(Renderer& renderer)
 {
-	m_state->ViewportOutput->Update(renderer);
+	m_state->ViewportOutput->Update(*m_state->Ui, renderer);
 
 	if (m_state->Ui->ConsumeShaderRecookRequest())
 	{

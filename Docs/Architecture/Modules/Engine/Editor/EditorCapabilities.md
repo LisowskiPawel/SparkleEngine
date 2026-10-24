@@ -49,7 +49,7 @@ The Console starts collapsed. Its footer button, `~` outside text input, or `Win
 
 The settings UI separates window orchestration, category presentation, and edit state:
 
-- `SettingsPanel` owns the settings window, search, and restart action. `RenderingSettingsPanel` orders rendering categories and presents the rendering-wide interaction/restart state; it does not draw setting rows.
+- `SettingsPanel` owns the settings window, search, and restart action. It constrains the window to the current viewport so saved placement and resize cannot hide its controls. `RenderingSettingsPanel` orders rendering categories and presents the rendering-wide interaction/restart state; it does not draw setting rows.
 - `Rendering*SettingsSection` files implement their named categories. Geometry owns the GBuffer and mesh-batching controls. Ray Tracing Scene owns general TLAS controls and composes the independently implemented PTLAS subgroup; PTLAS owns its enable-dependent controls.
 - `RenderingSettingsUi` owns shared category/table/row widgets. `ExposureSettingsEditor` shares exposure controls between engine defaults and viewport overrides; category implementations do not duplicate those rows.
 - `EngineRenderingSettingsController` owns the mutable interaction state, semantic setters, commit/refresh callbacks, and restart comparison. Application persistence and Renderer-owned value/active-state policy remain outside these UI implementations.
@@ -76,7 +76,7 @@ This source separation was reconciled on 2026-10-04; it does not establish runti
 | `ED-009` | Sky inspector | Implemented path | Enables/disables and edits the current sky environment through world commands. It does not import/cook a new texture. | `S` |
 | `ED-010` | Material variant selector | Implemented path | Lists cooked/imported named variants and changes the active variant. There is no variant authoring interface. | `S` |
 | `ED-011` | Undo/redo | Implemented path | Ctrl+Z/Ctrl+Y execute inverse/forward world commands; history supports coalescing and is invalidated on world-generation change. Coverage is limited to the current seven world-edit payloads. | `S` |
-| `ED-012` | Stale edit protection | Implemented path | Every edit submits with expected world generation and reports Accepted/Stale/Rejected; transaction history retains the last result. UI presentation of every rejection path needs evidence. | `S` |
+| `ED-012` | Stale edit protection | Implemented path | Every edit submits with expected world generation and reports Accepted/Stale/Rejected. Inspector displays failures until dismissal or a successful edit; generation changes clear history without hiding a failure. Undo/redo shortcuts are disabled during level load. Packaged rejection journeys remain unqualified. | `S` |
 
 ## Viewport And Rendering Controls
 
@@ -87,7 +87,7 @@ This source separation was reconciled on 2026-10-04; it does not establish runti
 | `ED-015` | Exposure overrides | Implemented path | Per-viewport manual/automatic exposure controls override view presentation without changing scene state. | `S` |
 | `ED-016` | Rendering settings | Implemented path | Separate searchable Display, Exposure, and Tone Mapping categories expose presentation/device controls, exposure/metering/adaptation, and the tone mapper respectively. Upscaling and Ray Reconstruction remain separate. Ray Tracing Scene keeps TLAS refit outside a PTLAS subgroup; the subgroup retains its enable toggle and hides partition tuning when disabled. PTLAS defaults off; saved choices are preserved. Vignette and chromatic aberration use dedicated passes with approved defaults; their widgets are deferred. Color grading and frame generation remain absent. Apply/restart behavior follows each setting owner. | `S` |
 | `ED-017` | Restart service | Implemented path | Settings can request an editor restart when a process-level setting requires it. Recovery/session restoration is not a current documented capability. | `S` |
-| `ED-018` | Viewport capture | Implemented path | File menu queues a viewport capture through Application/Renderer coordination and reports completion. Format/path/content correctness remains open evidence. | `S` |
+| `ED-018` | Viewport capture | Implemented path | File menu queues a viewport capture through Application/Renderer coordination. The console shows admission/readback/write failure, cancellation or the saved path. Format/path/content correctness remains candidate evidence. | `S` |
 
 ## Developer Tools
 

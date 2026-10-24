@@ -7,6 +7,7 @@
 #include "Scene/Model/EditorSceneModel.h"
 #include "Scene/Model/EditorSceneModelBuilder.h"
 #include "Scene/Transactions/EditorTransactionHistory.h"
+#include "Level/LevelSession.h"
 
 #include <imgui.h>
 
@@ -49,7 +50,7 @@ void UI::Implementation::UpdateSceneModel()
 
 void UI::Implementation::HandleTransactionShortcuts()
 {
-	if (!m_sceneModel || !m_transactionHistory || ImGui::GetIO().WantTextInput)
+	if (!m_sceneModel || !m_transactionHistory || ImGui::GetIO().WantTextInput || (m_levelSession != nullptr && m_levelSession->IsLevelChangeInProgress()))
 	{
 		return;
 	}

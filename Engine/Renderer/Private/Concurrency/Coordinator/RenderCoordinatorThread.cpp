@@ -4,6 +4,7 @@
 #include "Concurrency/Coordinator/RendererExecutionContext.h"
 
 #include <algorithm>
+#include <exception>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderCoordinatorLogger, "Renderer.Coordinator");
 
@@ -59,6 +60,10 @@ void RenderCoordinator::HandleRenderThreadStartFailure()
 	{
 		m_renderThread.join();
 	}
+	if (m_startFailure)
+	{
+		std::rethrow_exception(m_startFailure);
+	}
 
 	Diagnostics::Fatal(g_renderCoordinatorLogger, __FILE__, __LINE__, "RenderThread failed to create its renderer execution context.");
 }
@@ -66,6 +71,7 @@ void RenderCoordinator::HandleRenderThreadStartFailure()
 void RenderCoordinator::RenderThreadMain()
 {
 	Threading::SetCurrentThreadRole("Sparkle.RenderThread");
+	std::exception_ptr failure;
 	try
 	{
 		m_context = std::make_unique<RendererExecutionContext>(*m_window, m_deviceLaunch, m_config);
@@ -84,15 +90,21 @@ void RenderCoordinator::RenderThreadMain()
 	}
 	catch (const std::exception& exception)
 	{
+		failure = std::current_exception();
 		SPDLOG_ERROR("RenderThread terminated after an exception: {}", exception.what());
 	}
 	catch (...)
 	{
+		failure = std::current_exception();
 		SPDLOG_ERROR("RenderThread terminated after an unknown exception.");
 	}
 
 	{
 		std::lock_guard lock(m_startMutex);
+		if (!m_startSucceeded)
+		{
+			m_startFailure = std::move(failure);
+		}
 		m_started = true;
 	}
 	m_startedCondition.notify_one();

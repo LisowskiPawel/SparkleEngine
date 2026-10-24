@@ -4,6 +4,7 @@
 #include "RayReconstruction/NvidiaDlssRayReconstruction/NvidiaDlssRayReconstructionProvider.h"
 #include "RayReconstruction/RayReconstructionProvider.h"
 #include "RayReconstruction/RayReconstructionSettings.h"
+#include "Core/Public/Diagnostics/Error.h"
 
 std::unique_ptr<IRayReconstructionProvider> CreateConfiguredRayReconstructionProvider()
 {
@@ -13,7 +14,9 @@ std::unique_ptr<IRayReconstructionProvider> CreateConfiguredRayReconstructionPro
 			return std::make_unique<NvidiaDlssRayReconstructionProvider>();
 
 		case EngineRayReconstructionMode::Off:
-		default:
 			return {};
+
+		default:
+			throw Diagnostics::Error("Invalid r.RayReconstruction.Mode. Use 0 (Off) or 1 (NVIDIA DLSS Ray Reconstruction) in the shared rendering settings.");
 	}
 }

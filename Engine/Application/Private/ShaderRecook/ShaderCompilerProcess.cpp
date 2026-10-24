@@ -7,43 +7,38 @@
 #include "Core/Public/Paths/WorkspaceOutputPaths.h"
 #include "Core/Public/Process/ChildProcess.h"
 #include "Core/Public/Process/CommandLineUtils.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <format>
-#include <functional>
 #include <sstream>
 #include <system_error>
 #include <utility>
 
-class ShaderCompilerCommandPresentation final
+static std::string BuildDisplayCommand(const std::filesystem::path& executablePath, const std::vector<std::string>& arguments)
 {
-public:
-	static std::string BuildDisplayCommand(const std::filesystem::path& executablePath, const std::vector<std::string>& arguments)
+	std::ostringstream command;
+	command << CommandLine::QuotePath(executablePath);
+	for (std::size_t argumentIndex = 0; argumentIndex < arguments.size(); ++argumentIndex)
 	{
-		std::ostringstream command;
-		command << CommandLine::QuotePath(executablePath);
-		for (std::size_t argumentIndex = 0; argumentIndex < arguments.size(); ++argumentIndex)
+		if (arguments[argumentIndex] == "--cancellation-signal")
 		{
-			if (arguments[argumentIndex] == "--cancellation-signal")
-			{
-				++argumentIndex;
-				continue;
-			}
-			command << ' ' << CommandLine::QuoteArgument(arguments[argumentIndex]);
+			++argumentIndex;
+			continue;
 		}
-		return command.str();
+		command << ' ' << CommandLine::QuoteArgument(arguments[argumentIndex]);
 	}
-};
+	return command.str();
+}
 
 class ShaderCompilerCancellationSignal final
 {
 public:
-	explicit ShaderCompilerCancellationSignal(std::stop_token cancellation) :
-	    m_path(BuildPath()),
-	    m_callback(std::move(cancellation), [this] { Signal(); })
+	ShaderCompilerCancellationSignal() :
+	    m_path(BuildPath())
 	{
 	}
 
@@ -56,7 +51,6 @@ public:
 
 	const std::filesystem::path& GetPath() const noexcept { return m_path; }
 
-private:
 	void Signal() const noexcept
 	{
 		if (m_path.empty())
@@ -67,6 +61,7 @@ private:
 		(void) Files::TryWriteAllTextAtomic(m_path, "cancelled\n", fileError);
 	}
 
+private:
 	static std::filesystem::path BuildPath()
 	{
 		std::error_code errorCode;
@@ -95,25 +90,27 @@ private:
 	}
 
 	std::filesystem::path m_path;
-	std::stop_callback<std::function<void()>> m_callback;
 };
 
 ShaderCompilerProcessResult ShaderCompilerProcess::RunCook(const ShaderRecookRequest& request, std::stop_token cancellation) noexcept
 {
-	ShaderCompilerCancellationSignal cancellationSignal(std::move(cancellation));
+	ShaderCompilerCancellationSignal cancellationSignal;
 	if (cancellationSignal.GetPath().empty())
 	{
-		return ShaderCompilerProcessResult{.Output = "Failed to create the shader cooker cancellation signal path."};
+		return ShaderCompilerProcessResult{.Execution = {.FailureReason = "Failed to create the shader cooker cancellation signal path."}};
 	}
+
+	// Unregister and settle the callback before the signal's destructor removes its files.
+	std::stop_callback cancellationCallback(cancellation, [&cancellationSignal] { cancellationSignal.Signal(); });
 
 	std::vector<std::string> arguments{"cook"};
 	arguments.emplace_back("--cancellation-signal");
-	arguments.push_back(cancellationSignal.GetPath().string());
+	arguments.push_back(Strings::ToNarrow(cancellationSignal.GetPath().wstring()));
 	if (request.Type == ShaderRecookRequestType::ShaderId)
 	{
 		if (request.Target.empty())
 		{
-			return ShaderCompilerProcessResult{.Output = "Targeted shader recook requires a shader id."};
+			return ShaderCompilerProcessResult{.Execution = {.FailureReason = "Targeted shader recook requires a shader id."}};
 		}
 		arguments.push_back("--shader-id");
 		arguments.push_back(request.Target);
@@ -122,7 +119,7 @@ ShaderCompilerProcessResult ShaderCompilerProcess::RunCook(const ShaderRecookReq
 	{
 		if (request.ChangedVirtualPaths.empty())
 		{
-			return ShaderCompilerProcessResult{.Output = "Changed shader recook requires at least one virtual source path."};
+			return ShaderCompilerProcessResult{.Execution = {.FailureReason = "Changed shader recook requires at least one virtual source path."}};
 		}
 		for (const std::string& virtualPath : request.ChangedVirtualPaths)
 		{
@@ -160,30 +157,32 @@ ShaderCompilerProcessResult ShaderCompilerProcess::RunCommand(const std::filesys
 	ShaderCompilerProcessResult result;
 	if (executablePath.empty())
 	{
-		result.Output = "ShaderCompiler.exe was not found in the build output.";
+		result.Execution.FailureReason = "ShaderCompiler.exe was not found in the build output.";
 		return result;
 	}
 	if (workingDirectory.empty())
 	{
-		result.Output = "Configured project root was not found from the current build output.";
+		result.Execution.FailureReason = "Configured project root was not found from the current build output.";
 		return result;
 	}
 
-	result.ExecutablePath = executablePath;
-	result.CommandLine = ShaderCompilerCommandPresentation::BuildDisplayCommand(executablePath, arguments);
+	result.CommandLine = BuildDisplayCommand(executablePath, arguments);
 
-	Process::ChildProcessResult process = Process::ChildProcess::Run(
-	    Process::ChildProcessRequest{.ExecutablePath = executablePath, .Arguments = std::move(arguments), .WorkingDirectory = workingDirectory});
+	result.Execution = Process::ChildProcess::Run(Process::ChildProcessRequest{.ExecutablePath = executablePath, .Arguments = std::move(arguments), .WorkingDirectory = workingDirectory});
 
-	result.ExitCode = process.ExitCode;
-	result.Output = std::move(process.CapturedOutput);
-	if (!process.FailureReason.empty())
-	{
-		if (!result.Output.empty())
-		{
-			result.Output.push_back('\n');
-		}
-		result.Output += process.FailureReason;
-	}
 	return result;
+}
+
+std::string ShaderCompilerProcessResult::TakeOutput()
+{
+	std::string output = std::move(Execution.CapturedOutput);
+	if (!Execution.FailureReason.empty())
+	{
+		if (!output.empty())
+		{
+			output.push_back('\n');
+		}
+		output += Execution.FailureReason;
+	}
+	return output;
 }

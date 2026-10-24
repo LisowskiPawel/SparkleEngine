@@ -5,6 +5,7 @@
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <format>
+#include <system_error>
 
 bool ShaderCookCancellation::IsRequested(const std::filesystem::path& signalPath)
 {
@@ -15,7 +16,7 @@ bool ShaderCookCancellation::IsRequested(const std::filesystem::path& signalPath
 
 	std::error_code errorCode;
 	const bool requested = std::filesystem::is_regular_file(signalPath, errorCode);
-	if (errorCode)
+	if (errorCode && errorCode != std::errc::no_such_file_or_directory)
 	{
 		throw Diagnostics::Error(std::format("Failed to inspect shader cook cancellation signal '{}': {}", signalPath.string(), errorCode.message()));
 	}

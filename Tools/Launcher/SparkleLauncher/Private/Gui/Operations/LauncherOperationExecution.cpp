@@ -18,9 +18,9 @@ namespace SparkleLauncher
 		{
 		}
 
-		ProcessResult Run(const ProcessRequest& request) override
+		Process::ChildProcessResult Run(const Process::ChildProcessRequest& request) override
 		{
-			ProcessRequest scopedRequest = request;
+			Process::ChildProcessRequest scopedRequest = request;
 			scopedRequest.Cancellation = m_context.GetCancellationToken();
 			return m_runner.Run(scopedRequest);
 		}
@@ -55,7 +55,7 @@ namespace SparkleLauncher
 	    const LauncherOperationRequest& request,
 	    IProcessRunner& processRunner,
 	    TaskExecutionContext& context,
-	    const ProcessOutputCallback& outputCallback)
+	    const Process::ChildProcessOutputCallback& outputCallback)
 	{
 		TaskContextProcessRunner taskProcessRunner(processRunner, context);
 		LauncherOperationPlan plan = PlanLauncherOperation(category, operationId, request);

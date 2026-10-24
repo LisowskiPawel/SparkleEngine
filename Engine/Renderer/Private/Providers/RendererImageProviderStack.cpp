@@ -38,6 +38,7 @@ void RendererImageProviderStack::Initialize()
 	RhiInteropService& interop = m_renderHardwareInterface.GetInteropService();
 
 	m_upscaler = CreateConfiguredUpscalerProvider();
+	m_rayReconstruction = CreateConfiguredRayReconstructionProvider();
 	if (m_upscaler != nullptr
 	    && !m_upscaler->Initialize(
 	        capabilities,
@@ -51,7 +52,6 @@ void RendererImageProviderStack::Initialize()
 		    "supported provider or repair its prerequisites.");
 	}
 
-	m_rayReconstruction = CreateConfiguredRayReconstructionProvider();
 	if (m_rayReconstruction != nullptr
 	    && !m_rayReconstruction->Initialize(
 	        capabilities,

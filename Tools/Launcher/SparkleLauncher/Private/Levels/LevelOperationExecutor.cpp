@@ -15,7 +15,7 @@ namespace SparkleLauncher
 		    && planned.DisplayCommandLine == BuildDisplayCommandLine(executable.Request.ExecutablePath, executable.Request.Arguments) && planned.LogPath == executable.Request.LogPath;
 	}
 
-	static std::string MakeLevelOperationFailureSummary(const LevelOperationProcessStep& step, const ProcessResult& result)
+	static std::string MakeLevelOperationFailureSummary(const LevelOperationProcessStep& step, const Process::ChildProcessResult& result)
 	{
 		if (!result.FailureReason.empty())
 		{
@@ -34,7 +34,7 @@ namespace SparkleLauncher
 		        [](const LevelOperationStep& planned, const LevelOperationProcessStep& executable) { return MatchesPlannedStep(planned, executable); });
 	}
 
-	OperationRecord RunLevelOperationPlan(LevelOperationPlan plan, IProcessRunner& processRunner, const ProcessOutputCallback& outputCallback)
+	OperationRecord RunLevelOperationPlan(LevelOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
@@ -78,13 +78,13 @@ namespace SparkleLauncher
 		{
 			LevelOperationProcessStep& step = processSteps[stepIndex];
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, processSteps.size());
-			ProcessRequest request = step.Request;
+			Process::ChildProcessRequest request = step.Request;
 			AppendProcessOutputCallback(request, outputCallback);
 
-			const ProcessResult result = processRunner.Run(request);
-			if (!result.Launched || result.Canceled || result.ExitCode != 0)
+			const Process::ChildProcessResult result = processRunner.Run(request);
+			if (!result.Succeeded())
 			{
-				if (result.Canceled)
+				if (result.Cancelled)
 				{
 					SetOperationFailure(operation, OperationProblemKind::Cancellation, step.DisplayName + " was canceled.", "Run Sync again when ready.");
 				}
@@ -96,7 +96,7 @@ namespace SparkleLauncher
 					    MakeLevelOperationFailureSummary(step, result),
 					    "Correct the first asset acquisition error in the named log, then retry Sync.");
 				}
-				MarkOperationFinished(operation, result.Canceled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
+				MarkOperationFinished(operation, result.Cancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 				return operation;
 			}
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, processSteps.size());

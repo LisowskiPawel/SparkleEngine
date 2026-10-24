@@ -160,6 +160,15 @@ private:
 			}
 
 			parsedValue = static_cast<T>(underlyingValue);
+			// Enum owners may supply an ADL validator; validation and commit use this same parser.
+			if constexpr (requires { IsValidConsoleVariableValue(parsedValue); })
+			{
+				if (!IsValidConsoleVariableValue(parsedValue))
+				{
+					errorMessage = "numeric enum value is outside the supported domain";
+					return false;
+				}
+			}
 			return true;
 		}
 		else if constexpr (std::is_integral_v<T>)

@@ -12,7 +12,7 @@ namespace SparkleLauncher
 	{
 		std::string Id;
 		std::string DisplayName;
-		ProcessRequest Request;
+		Process::ChildProcessRequest Request;
 		std::filesystem::path DestructivePath;
 		bool HasProcessRequest = true;
 		bool DeletesCookedOutputs = false;

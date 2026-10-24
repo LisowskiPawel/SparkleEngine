@@ -192,6 +192,22 @@ void SceneInspectorPanel::BuildSelectionInspector() noexcept
 	}
 }
 
+void SceneInspectorPanel::BuildEditStatus() noexcept
+{
+	const std::optional<WorldEditResult>& result = m_transactionHistory->GetLastResult();
+	if (!result || result->IsAccepted())
+	{
+		return;
+	}
+
+	ImGui::TextWrapped("Edit not applied: %s", result->Message.c_str());
+	if (ImGui::SmallButton("Dismiss edit failure"))
+	{
+		m_transactionHistory->DismissLastResult();
+	}
+	ImGui::Separator();
+}
+
 void SceneInspectorPanel::BuildUI(bool disableInteraction)
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -222,6 +238,7 @@ void SceneInspectorPanel::BuildUI(bool disableInteraction)
 
 	constexpr float kContentPad = 8.0f;
 	ImGui::Indent(kContentPad);
+	BuildEditStatus();
 
 	constexpr ImGuiTabBarFlags kTabBarFlags = ImGuiTabBarFlags_NoCloseWithMiddleMouseButton | ImGuiTabBarFlags_FittingPolicyResizeDown;
 	if (ImGui::BeginTabBar("##InspectorTabs", kTabBarFlags))

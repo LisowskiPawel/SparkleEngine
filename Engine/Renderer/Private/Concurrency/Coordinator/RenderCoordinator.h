@@ -17,6 +17,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -105,6 +106,7 @@ private:
 	std::condition_variable m_startedCondition;
 	bool m_started = false;
 	bool m_startSucceeded = false;
+	std::exception_ptr m_startFailure;
 	mutable std::mutex m_readStateMutex;
 	ViewportPresentationSnapshot m_publishedViewportPresentation;
 	std::atomic<std::uint64_t> m_shaderGeneration{0};
