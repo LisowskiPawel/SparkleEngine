@@ -6,13 +6,13 @@
 
 **Deliverable:** one unsigned internal Launcher/Editor/Game archive, selected content and self-service recovery. Public rights, publisher certificates, signing and publication remain [FR-07](ImplementationPlan.md#fr-07--publish-and-verify).
 
-**Next:** PD-1 **Frames**: finish Launcher -> Game/Editor coverage for Empty and seven maps. Lighting quality, including Modern Sponza noise/clipping, remains in the renderer/release gates under the [approved product boundary](../../../Acceptance/FirstRelease.md#approval-and-next-work). Crashes, wrong/missing content, blank frames and retained startup/close failures still block this plan. Use [matched crash tooling](../PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures) for native failures.
+**Next:** PD-1 **Frames**: finish Launcher -> Game/Editor coverage for Empty and seven maps. Lighting quality, including Modern Sponza noise/clipping, remains in the renderer/release gates under the [approved product boundary](../../../Acceptance/FirstRelease.md#product-plan-and-public-release). Crashes, wrong/missing content, blank frames and retained startup/close failures still block this plan. Use [matched crash tooling](../PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures) for native failures.
 
 ## How To Close This Plan
 
 | Stage | Current position | What permits exit |
 | --- | --- | --- |
-| [PD-1](#pd-1--game-and-editor-product-shells) | Read-only asset inspector repaired; rendering, lifecycle and remaining journeys stay open. | Its four source-workspace checks below pass. |
+| [PD-1](#pd-1--game-and-editor-product-shells) | Read-only asset inspector repaired; map presentation, lifecycle and remaining journeys stay open. | Its four source-workspace checks below pass. |
 | [PD-2](#pd-2--source-build-cook-and-launcher) | Documented source reproduction and operations pass for their recorded inputs. | Reuse those checks; revalidate affected owners when the final source changes. |
 | [PD-3](#pd-3--package-and-installation) | Current assembly/integrity checks pass for `0db84502…`; installed Empty/Cornell and explicit-default failure checks pass locally. | Regenerate after PD-1 repairs; finish seven-map, budget, removal and clean/minimum-machine proof. |
 | [PD-4](#pd-4--support-incident-response-and-product-closure) | Retained-archive export, symbols and review negatives pass; final self-service/replacement proof remains open. | Self-service, replacement and all six reports pass. |
@@ -40,7 +40,7 @@ Name the failing owner, necessary change, deletion or justified zero-deletion re
 - [ ] **Interaction/failure:** help, input/focus, resize, 100/150/200% DPI, Editor settings Save/Reset and Game consumption work; corrupt/denied settings preserve accepted state. Unsupported providers and missing/corrupt content fail visibly; explicit recovery works without false Empty activation. (`AC-PROD01-02/03`, `AC-PROD04-03`.)
 - [ ] **Editing/isolation:** edit -> undo -> redo -> Save -> reload preserves the expected result; stale/rejected edits, failed saves and cancelled recook/capture preserve accepted state. Preserve supported transform/visibility/variant edits and read-only asset identity. Game has no Editor/authoring dependency. (`AC-PROD01-04`, `AC-PROD04-02/03/04`.)
 
-**Phase exit:** all four checks pass for their recorded source configuration. Archive/independent portions remain assigned below; a shell repair does not require completing an unrelated rendering research plan.
+**Phase exit:** all four checks pass for their recorded source configuration. Archive and clean-environment portions remain assigned below; a shell repair does not require completing an unrelated rendering research plan.
 
 ```text
 Execute only PD-1 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md. Apply the owning execution contract and its Stage Source-Style Gate.

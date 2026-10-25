@@ -116,7 +116,7 @@ Source = Levels/Sponza.level
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/Sponza
 AssetPack = Sponza
 ReleaseSupported = true
-Selected = false
+Selected = true
 
 [Level]
 Id = ABeautifulGame
@@ -229,7 +229,7 @@ AssetPack = SheenCloth
 Family = Material Reference
 VariantKind = Base
 ReleaseSupported = false
-Selected = false
+Selected = true
 
 [AssetPack]
 Id = Bistro
