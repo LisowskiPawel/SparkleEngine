@@ -92,6 +92,30 @@ namespace PathLightSampling
 		return LightSampling::PhotometricRgbToRadiometric(light.Color, light.Luminance);
 	}
 
+	LightSampling::DirectLightSample SampleSpotLight(uint lightIndex, float3 positionWorld)
+	{
+		const SpotLightGpuData light = SpotLights[lightIndex];
+		LightSampling::DirectLightSample result = LightSampling::RadiometricPointLightSample(positionWorld, light.Position, SpotIntensity(lightIndex));
+		const float coneCosine = dot(normalize(light.Direction), -result.DirectionWorld);
+
+		const float angular = light.InnerAngleCosine == light.OuterAngleCosine ? (coneCosine >= light.OuterAngleCosine ? 1.0f : 0.0f)
+		                                                                       : smoothstep(light.OuterAngleCosine, light.InnerAngleCosine, coneCosine);
+
+		result.IncidentRadiance *= angular;
+		return result;
+	}
+
+	LightSampling::DirectLightSample SampleRectLight(uint lightIndex, float3 positionWorld, float2 sample)
+	{
+		const RectLightGpuData light = RectLights[lightIndex];
+		const float3 normal = normalize(light.Direction);
+		const float3 tangent = normalize(light.Tangent - normal * dot(light.Tangent, normal));
+		const float3 bitangent = cross(normal, tangent);
+		const float3 samplePosition = light.Position + tangent * ((sample.x - 0.5f) * light.Width) + bitangent * ((sample.y - 0.5f) * light.Height);
+		LightSampling::DirectLightSample result = LightSampling::RadiometricAreaLightSample(positionWorld, samplePosition, normal, RectRadiance(lightIndex), rcp(light.Width * light.Height), false);
+		return result;
+	}
+
 	LightSampling::DirectLightSample SampleAnalyticLight(uint lightType, uint lightIndex, float3 positionWorld, float2 sample)
 	{
 		if (lightType == LightSampling::LightTypeDirectional)
@@ -104,24 +128,10 @@ namespace PathLightSampling
 		}
 		if (lightType == LightSampling::LightTypeSpot)
 		{
-			const SpotLightGpuData light = SpotLights[lightIndex];
-			LightSampling::DirectLightSample result = LightSampling::RadiometricPointLightSample(positionWorld, light.Position, SpotIntensity(lightIndex));
-			const float coneCosine = dot(normalize(light.Direction), -result.DirectionWorld);
-
-			const float angular = light.InnerAngleCosine == light.OuterAngleCosine ? (coneCosine >= light.OuterAngleCosine ? 1.0f : 0.0f)
-			                                                                       : smoothstep(light.OuterAngleCosine, light.InnerAngleCosine, coneCosine);
-
-			result.IncidentRadiance *= angular;
-			return result;
+			return SampleSpotLight(lightIndex, positionWorld);
 		}
 
-		const RectLightGpuData light = RectLights[lightIndex];
-		const float3 normal = normalize(light.Direction);
-		const float3 tangent = normalize(light.Tangent - normal * dot(light.Tangent, normal));
-		const float3 bitangent = cross(normal, tangent);
-		const float3 samplePosition = light.Position + tangent * ((sample.x - 0.5f) * light.Width) + bitangent * ((sample.y - 0.5f) * light.Height);
-		LightSampling::DirectLightSample result = LightSampling::RadiometricAreaLightSample(positionWorld, samplePosition, normal, RectRadiance(lightIndex), rcp(light.Width * light.Height), false);
-		return result;
+		return SampleRectLight(lightIndex, positionWorld, sample);
 	}
 
 	EmissiveTriangle LoadEmissiveTriangle(uint instanceId, uint primitiveIndex)

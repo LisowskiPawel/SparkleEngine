@@ -13,8 +13,6 @@ namespace IndirectReservoir
 {
 	static const float MinTarget = 1.0e-6f;
 
-	typedef GBufferPathSurface Surface;
-
 	struct Candidate
 	{
 		uint2 RandomPixel;
@@ -31,17 +29,12 @@ namespace IndirectReservoir
 		float Valid;
 	};
 
-	Surface LoadSurface(uint2 pixelCoord)
-	{
-		return LoadGBufferPathSurface(pixelCoord);
-	}
-
-	float4 PackSurface(Surface surface)
+	float4 PackSurface(GBufferPathSurface surface)
 	{
 		return RestirReservoirCommon::PackSurface(surface.Valid, surface.GBuffer.NormalWorld, surface.ViewDistance);
 	}
 
-	bool AreSurfacesCompatible(Surface surface, float4 packedSurface)
+	bool AreSurfacesCompatible(GBufferPathSurface surface, float4 packedSurface)
 	{
 		return RestirReservoirCommon::AreSurfacesCompatible(surface.Valid, surface.GBuffer.NormalWorld, surface.ViewDistance, packedSurface);
 	}
@@ -92,7 +85,7 @@ namespace IndirectReservoir
 		return reservoir;
 	}
 
-	PathLighting::Result EvaluateCandidate(Surface surface, Candidate candidate, Texture2D skyTexture, SamplerState skySampler)
+	PathLighting::Result EvaluateCandidate(GBufferPathSurface surface, Candidate candidate, Texture2D skyTexture, SamplerState skySampler)
 	{
 		return PathLighting::TraceSurfacePath(skyTexture,
 		                                      skySampler,
@@ -132,7 +125,7 @@ namespace IndirectReservoir
 		return selected;
 	}
 
-	bool CombineReservoir(inout Reservoir reservoir, Reservoir candidateReservoir, Surface surface, Texture2D skyTexture, SamplerState skySampler, float maxM, float random)
+	bool CombineReservoir(inout Reservoir reservoir, Reservoir candidateReservoir, GBufferPathSurface surface, Texture2D skyTexture, SamplerState skySampler, float maxM, float random)
 	{
 		if (!surface.Valid || candidateReservoir.M <= 0.0f)
 		{
@@ -167,7 +160,7 @@ namespace IndirectReservoir
 		return selected;
 	}
 
-	Reservoir BuildInitialReservoir(Surface surface, uint2 pixelCoord, Texture2D skyTexture, SamplerState skySampler)
+	Reservoir BuildInitialReservoir(GBufferPathSurface surface, uint2 pixelCoord, Texture2D skyTexture, SamplerState skySampler)
 	{
 		Reservoir reservoir = EmptyReservoir();
 		if (!surface.Valid)

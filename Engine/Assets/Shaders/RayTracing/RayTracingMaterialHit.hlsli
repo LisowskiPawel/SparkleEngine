@@ -80,6 +80,36 @@ RayTracingMaterialSample EvaluateRayTracingHitMaterial(RayTracingHitMaterial mat
 	return result;
 }
 
+void BuildRayTracingShadingFrame(RayTracingEvaluatedTriangle evaluatedTriangle,
+                                 MeshInstanceData mesh,
+                                 float3 outwardGeometricNormal,
+                                 out float3 vertexNormal,
+                                 out float3 tangentWorld,
+                                 out float3 bitangentWorld)
+{
+	const float3 localNormal = evaluatedTriangle.V0.Normal * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Normal * evaluatedTriangle.BarycentricWeights.y
+	    + evaluatedTriangle.V2.Normal * evaluatedTriangle.BarycentricWeights.z;
+
+	const float3 localTangent = evaluatedTriangle.V0.Tangent * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Tangent * evaluatedTriangle.BarycentricWeights.y
+	    + evaluatedTriangle.V2.Tangent * evaluatedTriangle.BarycentricWeights.z;
+
+	const float interpolatedTangentSign = evaluatedTriangle.V0.TangentSign * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.TangentSign * evaluatedTriangle.BarycentricWeights.y
+	    + evaluatedTriangle.V2.TangentSign * evaluatedTriangle.BarycentricWeights.z;
+
+	const float tangentSign = interpolatedTangentSign >= 0.0f ? 1.0f : -1.0f;
+
+	vertexNormal = normalize(mul(localNormal, (float3x3)mesh.WorldInverseTranspose));
+	tangentWorld = normalize(mul(localTangent, (float3x3)mesh.WorldMatrix));
+
+	if (dot(vertexNormal, outwardGeometricNormal) < 0.0f)
+	{
+		vertexNormal = -vertexNormal;
+	}
+
+	tangentWorld = OrthonormalizeTangent(tangentWorld, vertexNormal);
+	bitangentWorld = ComputeBitangentFromSign(vertexNormal, tangentWorld, tangentSign);
+}
+
 RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult trace)
 {
 	const RayTracingEvaluatedTriangle evaluatedTriangle = EvaluateRayTracingTriangle(trace.InstanceId, trace.PrimitiveIndex, trace.Barycentrics);
@@ -100,27 +130,10 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	const float faceSign = trace.FrontFace ? 1.0f : -1.0f;
 	const float3 geometricNormal = outwardGeometricNormal * faceSign;
 
-	const float3 localNormal = evaluatedTriangle.V0.Normal * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Normal * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.Normal * evaluatedTriangle.BarycentricWeights.z;
-
-	const float3 localTangent = evaluatedTriangle.V0.Tangent * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Tangent * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.Tangent * evaluatedTriangle.BarycentricWeights.z;
-
-	const float interpolatedTangentSign = evaluatedTriangle.V0.TangentSign * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.TangentSign * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.TangentSign * evaluatedTriangle.BarycentricWeights.z;
-
-	const float tangentSign = interpolatedTangentSign >= 0.0f ? 1.0f : -1.0f;
-
-	float3 vertexNormal = normalize(mul(localNormal, (float3x3)mesh.WorldInverseTranspose));
-	float3 tangentWorld = normalize(mul(localTangent, (float3x3)mesh.WorldMatrix));
-
-	if (dot(vertexNormal, outwardGeometricNormal) < 0.0f)
-	{
-		vertexNormal = -vertexNormal;
-	}
-
-	tangentWorld = OrthonormalizeTangent(tangentWorld, vertexNormal);
-	const float3 bitangentWorld = ComputeBitangentFromSign(vertexNormal, tangentWorld, tangentSign);
+	float3 vertexNormal;
+	float3 tangentWorld;
+	float3 bitangentWorld;
+	BuildRayTracingShadingFrame(evaluatedTriangle, mesh, outwardGeometricNormal, vertexNormal, tangentWorld, bitangentWorld);
 
 	const float2 texCoord0 = InterpolateRayTracingTexCoord0(evaluatedTriangle);
 	const RayTracingMaterialSample material = EvaluateRayTracingHitMaterial(evaluatedTriangle.Material, texCoord0, InterpolateRayTracingColor(evaluatedTriangle));

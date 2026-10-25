@@ -25,7 +25,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const IndirectReservoir::Surface surface = IndirectReservoir::LoadSurface(pixelCoord);
+	const GBufferPathSurface surface = LoadGBufferPathSurface(pixelCoord);
 	IndirectReservoir::Reservoir reservoir = IndirectReservoir::BuildInitialReservoir(surface, pixelCoord, SkyTexture, SamplerLinearClamp);
 
 	if (surface.Valid && RestirIndirectTemporalReuse != 0u && HistoryValid != 0u)

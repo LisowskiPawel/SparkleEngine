@@ -27,11 +27,16 @@ struct RayTracingEvaluatedTriangle
 	RayTracingEvaluatedVertex V2;
 };
 
-RayTracingEvaluatedVertex EvaluateRayTracingVertex(RayTracingHitVertex vertex, MeshInstanceData mesh, RayTracingHitInstance instance, uint vertexIndex)
+RayTracingEvaluatedVertex EvaluateRayTracingVertex(RayTracingHitVertex vertex,
+                                                   MeshInstanceData mesh,
+                                                   RayTracingHitInstance instance,
+                                                   uint vertexIndex,
+                                                   StructuredBuffer<float> weights,
+                                                   StructuredBuffer<JointMatrixData> joints)
 {
 	const uint localVertexIndex = vertexIndex - instance.FirstVertex;
-	const MorphedVertexAttributes morphed = ApplyMorphing(mesh, instance.MorphTargetDeltaOffset, localVertexIndex, vertex.Position, vertex.Normal, vertex.Tangent.xyz);
-	const SkinnedVertexAttributes skinned = ApplySkinning(mesh, vertexIndex, morphed.Position, morphed.Normal, morphed.Tangent);
+	const MorphedVertexAttributes morphed = ApplyMorphing(mesh, instance.MorphTargetDeltaOffset, localVertexIndex, vertex.Position, vertex.Normal, vertex.Tangent.xyz, weights);
+	const SkinnedVertexAttributes skinned = ApplySkinning(mesh, vertexIndex, morphed.Position, morphed.Normal, morphed.Tangent, joints);
 
 	RayTracingEvaluatedVertex result;
 	result.Position = skinned.Position;
@@ -51,9 +56,9 @@ RayTracingEvaluatedTriangle EvaluateRayTracingTriangle(uint instanceId, uint pri
 	result.Instance = source.Instance;
 	result.Material = source.Material;
 	result.BarycentricWeights = source.BarycentricWeights;
-	result.V0 = EvaluateRayTracingVertex(source.V0, mesh, source.Instance, source.VertexIndices.x);
-	result.V1 = EvaluateRayTracingVertex(source.V1, mesh, source.Instance, source.VertexIndices.y);
-	result.V2 = EvaluateRayTracingVertex(source.V2, mesh, source.Instance, source.VertexIndices.z);
+	result.V0 = EvaluateRayTracingVertex(source.V0, mesh, source.Instance, source.VertexIndices.x, MorphWeights, JointMatrices);
+	result.V1 = EvaluateRayTracingVertex(source.V1, mesh, source.Instance, source.VertexIndices.y, MorphWeights, JointMatrices);
+	result.V2 = EvaluateRayTracingVertex(source.V2, mesh, source.Instance, source.VertexIndices.z, MorphWeights, JointMatrices);
 	return result;
 }
 
@@ -67,34 +72,9 @@ float3 InterpolateRayTracingPosition(RayTracingEvaluatedTriangle evaluatedTriang
 
 float3 EvaluatePreviousRayTracingPosition(RayTracingHitTriangle hitTriangle, MeshInstanceData mesh)
 {
-	const uint localVertex0 = hitTriangle.VertexIndices.x - hitTriangle.Instance.FirstVertex;
-	const uint localVertex1 = hitTriangle.VertexIndices.y - hitTriangle.Instance.FirstVertex;
-	const uint localVertex2 = hitTriangle.VertexIndices.z - hitTriangle.Instance.FirstVertex;
-
-	const MorphedVertexAttributes morphed0 = ApplyPreviousMorphing(mesh,
-	                                                               hitTriangle.Instance.MorphTargetDeltaOffset,
-	                                                               localVertex0,
-	                                                               hitTriangle.V0.Position,
-	                                                               hitTriangle.V0.Normal,
-	                                                               hitTriangle.V0.Tangent.xyz);
-
-	const MorphedVertexAttributes morphed1 = ApplyPreviousMorphing(mesh,
-	                                                               hitTriangle.Instance.MorphTargetDeltaOffset,
-	                                                               localVertex1,
-	                                                               hitTriangle.V1.Position,
-	                                                               hitTriangle.V1.Normal,
-	                                                               hitTriangle.V1.Tangent.xyz);
-
-	const MorphedVertexAttributes morphed2 = ApplyPreviousMorphing(mesh,
-	                                                               hitTriangle.Instance.MorphTargetDeltaOffset,
-	                                                               localVertex2,
-	                                                               hitTriangle.V2.Position,
-	                                                               hitTriangle.V2.Normal,
-	                                                               hitTriangle.V2.Tangent.xyz);
-
-	const float3 p0 = ApplyPreviousSkinning(mesh, hitTriangle.VertexIndices.x, morphed0.Position, morphed0.Normal, morphed0.Tangent).Position;
-	const float3 p1 = ApplyPreviousSkinning(mesh, hitTriangle.VertexIndices.y, morphed1.Position, morphed1.Normal, morphed1.Tangent).Position;
-	const float3 p2 = ApplyPreviousSkinning(mesh, hitTriangle.VertexIndices.z, morphed2.Position, morphed2.Normal, morphed2.Tangent).Position;
+	const float3 p0 = EvaluateRayTracingVertex(hitTriangle.V0, mesh, hitTriangle.Instance, hitTriangle.VertexIndices.x, PreviousMorphWeights, PreviousJointMatrices).Position;
+	const float3 p1 = EvaluateRayTracingVertex(hitTriangle.V1, mesh, hitTriangle.Instance, hitTriangle.VertexIndices.y, PreviousMorphWeights, PreviousJointMatrices).Position;
+	const float3 p2 = EvaluateRayTracingVertex(hitTriangle.V2, mesh, hitTriangle.Instance, hitTriangle.VertexIndices.z, PreviousMorphWeights, PreviousJointMatrices).Position;
 	precise float3 edge1 = p1 - p0;
 	precise float3 edge2 = p2 - p0;
 	precise float3 position = p0 + mad(hitTriangle.BarycentricWeights.y, edge1, hitTriangle.BarycentricWeights.z * edge2);

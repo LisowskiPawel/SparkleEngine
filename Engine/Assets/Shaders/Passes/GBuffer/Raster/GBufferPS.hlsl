@@ -1,6 +1,7 @@
 #include "/Engine/Resources/ViewUniformData.hlsli"
 
-#include "/Engine/CommonPS.hlsli"
+#include "/Engine/Geometry/PixelInput.hlsli"
+#include "/Engine/Material/Material.hlsli"
 #include "/Engine/Passes/GBuffer/GBufferPacking.hlsli"
 #include "/Engine/Passes/GBuffer/MotionVector.hlsli"
 

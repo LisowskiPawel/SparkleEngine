@@ -8,7 +8,7 @@ namespace IndirectReservoir
 {
 	void ReuseTemporal(uint2 pixelCoord,
 	                   uint2 extent,
-	                   Surface surface,
+	                   GBufferPathSurface surface,
 	                   Texture2D motionVectors,
 	                   Texture2D<float4> previousSamples,
 	                   Texture2D<float4> previousWeights,
@@ -32,7 +32,7 @@ namespace IndirectReservoir
 
 	void ReuseSpatial(uint2 pixelCoord,
 	                  uint2 extent,
-	                  Surface surface,
+	                  GBufferPathSurface surface,
 	                  Texture2D<float4> temporalSamples,
 	                  Texture2D<float4> temporalWeights,
 	                  Texture2D skyTexture,
@@ -50,7 +50,7 @@ namespace IndirectReservoir
 				continue;
 			}
 
-			const Surface neighborSurface = LoadSurface(uint2(neighborCoord));
+			const GBufferPathSurface neighborSurface = LoadGBufferPathSurface(uint2(neighborCoord));
 			if (!AreSurfacesCompatible(surface, PackSurface(neighborSurface)))
 			{
 				continue;

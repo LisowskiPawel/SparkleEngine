@@ -10,7 +10,7 @@ RWTexture2D<float4> IndirectSpecular;
 
 #include "/Engine/Lighting/RayReconstructionGuides.hlsli"
 
-void StoreIndirectLighting(uint2 pixelCoord, IndirectReservoir::Surface surface, PathLighting::Result path, float reservoirWeight)
+void StoreIndirectLighting(uint2 pixelCoord, GBufferPathSurface surface, PathLighting::Result path, float reservoirWeight)
 {
 	if (RestirIndirectEvaluateDiffuse != 0u)
 	{
@@ -44,7 +44,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const IndirectReservoir::Surface surface = IndirectReservoir::LoadSurface(pixelCoord);
+	const GBufferPathSurface surface = LoadGBufferPathSurface(pixelCoord);
 
 	const IndirectReservoir::Reservoir reservoir = IndirectReservoir::UnpackReservoir(CurrentReservoirSampleTexture.Load(int3(pixelCoord, 0)), CurrentReservoirWeightTexture.Load(int3(pixelCoord, 0)));
 

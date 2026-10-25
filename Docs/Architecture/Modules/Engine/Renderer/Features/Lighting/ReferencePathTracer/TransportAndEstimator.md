@@ -516,6 +516,8 @@ This binding supersedes the Stage-3/4 material and endpoint limits for the curre
 
 </details>
 
+Source responsibility reconciliation, 2026-10-25: `PathLightSampling::SampleAnalyticLight` selects the light family; focused spot and rectangle samplers own attenuation and emitter geometry. The existing radiometry, PDFs and Reference estimator ordering remain unchanged. This source separation does not close the deferred estimator or GPU acceptance gates above.
+
 ### NVIDIA And Epic Correspondence Audit — Estimator And Surface Slices
 
 This audit covers committed estimator slice `5e6badf03df44133eb75db54875417821a9909c8`, committed surface slice `78a2598a54b9ab70f0e9bbb91aaa15aeb3a11c99`, committed correction slice `3b41476f04968e5affc1f5300efaa39252d6ee4a`, and the current scoped alignment follow-up. NVIDIA implementation sources and Epic product documentation are precedent and challenge inputs, not a vendor-conformance label or local correctness oracle. The full capability-to-stage disposition is retained in the [NVIDIA and Epic mid-delivery alignment](Research.md#nvidia-and-epic-mid-delivery-alignment--2026-09-13).

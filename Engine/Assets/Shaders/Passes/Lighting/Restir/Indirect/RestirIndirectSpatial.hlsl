@@ -20,7 +20,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const IndirectReservoir::Surface surface = IndirectReservoir::LoadSurface(pixelCoord);
+	const GBufferPathSurface surface = LoadGBufferPathSurface(pixelCoord);
 
 	IndirectReservoir::Reservoir reservoir = IndirectReservoir::UnpackReservoir(TemporalReservoirSampleTexture.Load(int3(pixelCoord, 0)), TemporalReservoirWeightTexture.Load(int3(pixelCoord, 0)));
 
