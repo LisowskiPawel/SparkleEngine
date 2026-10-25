@@ -90,9 +90,6 @@ void RenderRayTracingScene::Build(
 
 	m_performanceMetrics.Providers.TopLevelProvider = topLevelBuild.ActiveProvider;
 	m_performanceMetrics.Providers.TopLevelProviderReason = topLevelBuild.ActiveProviderReason;
-	m_performanceMetrics.Providers.PartitionedTlasProvider = m_capabilityReport.PartitionedTlas.Provider;
-	m_performanceMetrics.Providers.SupportsPartitionedTlas = m_capabilityReport.PartitionedTlas.Supported;
-	m_performanceMetrics.Providers.PartitionedTlasCapabilityReason = m_capabilityReport.PartitionedTlas.CapabilityStatusReason;
 	m_performanceMetrics.Blas.ReferencedMeshCount = blasStats.referencedMeshCount;
 	m_performanceMetrics.Blas.BuiltCount = blasStats.builtBlasCount;
 	m_performanceMetrics.Blas.ReusedCount = blasStats.reusedBlasCount;

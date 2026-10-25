@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include "Scene/Meshes/Mesh.h"
 #include "World/ECS/Components/EditorComponents.h"
 #include "World/ECS/Components/RenderingComponents.h"
 #include "World/ECS/Components/TransformComponents.h"

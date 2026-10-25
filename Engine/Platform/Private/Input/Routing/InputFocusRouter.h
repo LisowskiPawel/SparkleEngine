@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Input/Dispatch/InputLayer.h"
-#include "Input/InputBackendResult.h"
 #include "Input/Mouse/MousePosition.h"
 
 #include <vector>
+
+struct InputBackendResult;
 
 class InputFocusRouter final
 {

@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <bit>
 #include <limits>
-#include <span>
+#include <utility>
 
 RenderViewPreparation::RenderViewPreparation(TaskExecutor& taskExecutor) noexcept :
     m_taskExecutor(&taskExecutor)

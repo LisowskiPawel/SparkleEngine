@@ -139,81 +139,81 @@ static constexpr Key s_VirtualKeyToKey[] = {
 
 static constexpr size_t s_VirtualKeyTableSize = sizeof(s_VirtualKeyToKey) / sizeof(s_VirtualKeyToKey[0]);
 
-static Key TranslateVirtualKey(WPARAM VirtualKey) noexcept
+static Key TranslateVirtualKey(WPARAM virtualKey) noexcept
 {
-	if (VirtualKey == VK_SHIFT)
+	if (virtualKey == VK_SHIFT)
 	{
-		if (GetKeyState(VK_LSHIFT) & 0x8000)
+		if ((GetKeyState(VK_LSHIFT) & 0x8000) != 0)
 		{
 			return Key::LeftShift;
 		}
-		if (GetKeyState(VK_RSHIFT) & 0x8000)
+		if ((GetKeyState(VK_RSHIFT) & 0x8000) != 0)
 		{
 			return Key::RightShift;
 		}
 		return Key::LeftShift;
 	}
-	if (VirtualKey == VK_CONTROL)
+	if (virtualKey == VK_CONTROL)
 	{
-		if (GetKeyState(VK_LCONTROL) & 0x8000)
+		if ((GetKeyState(VK_LCONTROL) & 0x8000) != 0)
 		{
 			return Key::LeftCtrl;
 		}
-		if (GetKeyState(VK_RCONTROL) & 0x8000)
+		if ((GetKeyState(VK_RCONTROL) & 0x8000) != 0)
 		{
 			return Key::RightCtrl;
 		}
 		return Key::LeftCtrl;
 	}
-	if (VirtualKey == VK_MENU)
+	if (virtualKey == VK_MENU)
 	{
-		if (GetKeyState(VK_LMENU) & 0x8000)
+		if ((GetKeyState(VK_LMENU) & 0x8000) != 0)
 		{
 			return Key::LeftAlt;
 		}
-		if (GetKeyState(VK_RMENU) & 0x8000)
+		if ((GetKeyState(VK_RMENU) & 0x8000) != 0)
 		{
 			return Key::RightAlt;
 		}
 		return Key::LeftAlt;
 	}
 
-	if (VirtualKey == VK_LSHIFT)
+	if (virtualKey == VK_LSHIFT)
 	{
 		return Key::LeftShift;
 	}
-	if (VirtualKey == VK_RSHIFT)
+	if (virtualKey == VK_RSHIFT)
 	{
 		return Key::RightShift;
 	}
-	if (VirtualKey == VK_LCONTROL)
+	if (virtualKey == VK_LCONTROL)
 	{
 		return Key::LeftCtrl;
 	}
-	if (VirtualKey == VK_RCONTROL)
+	if (virtualKey == VK_RCONTROL)
 	{
 		return Key::RightCtrl;
 	}
-	if (VirtualKey == VK_LMENU)
+	if (virtualKey == VK_LMENU)
 	{
 		return Key::LeftAlt;
 	}
-	if (VirtualKey == VK_RMENU)
+	if (virtualKey == VK_RMENU)
 	{
 		return Key::RightAlt;
 	}
 
-	if (VirtualKey == VK_RETURN)
+	if (virtualKey == VK_RETURN)
 	{
 		return Key::Enter;
 	}
 
-	if (VirtualKey < s_VirtualKeyTableSize)
+	if (virtualKey < s_VirtualKeyTableSize)
 	{
-		return s_VirtualKeyToKey[VirtualKey];
+		return s_VirtualKeyToKey[virtualKey];
 	}
 
-	switch (VirtualKey)
+	switch (virtualKey)
 	{
 		case VK_OEM_1:
 			return Key::Semicolon;
@@ -248,49 +248,49 @@ static Key TranslateVirtualKey(WPARAM VirtualKey) noexcept
 
 static ModifierFlags GetCurrentModifiers() noexcept
 {
-	ModifierFlags Flags = ModifierFlags::None;
+	ModifierFlags flags = ModifierFlags::None;
 
-	if (GetKeyState(VK_LSHIFT) & 0x8000)
+	if ((GetKeyState(VK_LSHIFT) & 0x8000) != 0)
 	{
-		Flags = Flags | ModifierFlags::LeftShift;
+		flags = flags | ModifierFlags::LeftShift;
 	}
-	if (GetKeyState(VK_RSHIFT) & 0x8000)
+	if ((GetKeyState(VK_RSHIFT) & 0x8000) != 0)
 	{
-		Flags = Flags | ModifierFlags::RightShift;
+		flags = flags | ModifierFlags::RightShift;
 	}
-	if (GetKeyState(VK_LCONTROL) & 0x8000)
+	if ((GetKeyState(VK_LCONTROL) & 0x8000) != 0)
 	{
-		Flags = Flags | ModifierFlags::LeftCtrl;
+		flags = flags | ModifierFlags::LeftCtrl;
 	}
-	if (GetKeyState(VK_RCONTROL) & 0x8000)
+	if ((GetKeyState(VK_RCONTROL) & 0x8000) != 0)
 	{
-		Flags = Flags | ModifierFlags::RightCtrl;
+		flags = flags | ModifierFlags::RightCtrl;
 	}
-	if (GetKeyState(VK_LMENU) & 0x8000)
+	if ((GetKeyState(VK_LMENU) & 0x8000) != 0)
 	{
-		Flags = Flags | ModifierFlags::LeftAlt;
+		flags = flags | ModifierFlags::LeftAlt;
 	}
-	if (GetKeyState(VK_RMENU) & 0x8000)
+	if ((GetKeyState(VK_RMENU) & 0x8000) != 0)
 	{
-		Flags = Flags | ModifierFlags::RightAlt;
+		flags = flags | ModifierFlags::RightAlt;
 	}
-	if (GetKeyState(VK_CAPITAL) & 0x0001)
+	if ((GetKeyState(VK_CAPITAL) & 0x0001) != 0)
 	{
-		Flags = Flags | ModifierFlags::CapsLock;
+		flags = flags | ModifierFlags::CapsLock;
 	}
-	if (GetKeyState(VK_NUMLOCK) & 0x0001)
+	if ((GetKeyState(VK_NUMLOCK) & 0x0001) != 0)
 	{
-		Flags = Flags | ModifierFlags::NumLock;
+		flags = flags | ModifierFlags::NumLock;
 	}
 
-	return Flags;
+	return flags;
 }
 
 InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_t parameter1, std::intptr_t parameter2)
 {
 	InputBackendResult result{};
-	WPARAM WParam = static_cast<WPARAM>(parameter1);
-	LPARAM LParam = static_cast<LPARAM>(parameter2);
+	WPARAM wParam = static_cast<WPARAM>(parameter1);
+	LPARAM lParam = static_cast<LPARAM>(parameter2);
 
 	switch (message)
 	{
@@ -298,9 +298,9 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 		case WM_SYSKEYDOWN:
 		{
 			result.Type = InputEventType::Keyboard;
-			result.Keyboard.KeyCode = TranslateVirtualKey(WParam);
+			result.Keyboard.KeyCode = TranslateVirtualKey(wParam);
 			result.Keyboard.bPressed = true;
-			result.Keyboard.bRepeat = (LParam & 0x40000000) != 0;
+			result.Keyboard.bRepeat = (lParam & 0x40000000) != 0;
 			result.Keyboard.Modifiers = GetCurrentModifiers();
 			break;
 		}
@@ -309,7 +309,7 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 		case WM_SYSKEYUP:
 		{
 			result.Type = InputEventType::Keyboard;
-			result.Keyboard.KeyCode = TranslateVirtualKey(WParam);
+			result.Keyboard.KeyCode = TranslateVirtualKey(wParam);
 			result.Keyboard.bPressed = false;
 			result.Keyboard.bRepeat = false;
 			result.Keyboard.Modifiers = GetCurrentModifiers();
@@ -321,8 +321,8 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 			result.Type = InputEventType::MouseButton;
 			result.MouseButton.Button = MouseButton::Left;
 			result.MouseButton.bPressed = true;
-			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
 			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
@@ -332,8 +332,8 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 			result.Type = InputEventType::MouseButton;
 			result.MouseButton.Button = MouseButton::Left;
 			result.MouseButton.bPressed = false;
-			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
 			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
@@ -343,8 +343,8 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 			result.Type = InputEventType::MouseButton;
 			result.MouseButton.Button = MouseButton::Right;
 			result.MouseButton.bPressed = true;
-			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
 			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
@@ -354,8 +354,8 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 			result.Type = InputEventType::MouseButton;
 			result.MouseButton.Button = MouseButton::Right;
 			result.MouseButton.bPressed = false;
-			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
 			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
@@ -365,8 +365,8 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 			result.Type = InputEventType::MouseButton;
 			result.MouseButton.Button = MouseButton::Middle;
 			result.MouseButton.bPressed = true;
-			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
 			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
@@ -376,8 +376,8 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 			result.Type = InputEventType::MouseButton;
 			result.MouseButton.Button = MouseButton::Middle;
 			result.MouseButton.bPressed = false;
-			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
 			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
@@ -385,8 +385,8 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 		case WM_MOUSEMOVE:
 		{
 			result.Type = InputEventType::MouseMove;
-			result.MouseMove.Position.X = GET_X_LPARAM(LParam);
-			result.MouseMove.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseMove.Position.X = GET_X_LPARAM(lParam);
+			result.MouseMove.Position.Y = GET_Y_LPARAM(lParam);
 
 			result.MouseMove.Delta.X = 0;
 			result.MouseMove.Delta.Y = 0;
@@ -396,20 +396,20 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 		case WM_MOUSEWHEEL:
 		{
 			result.Type = InputEventType::MouseWheel;
-			result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(WParam)) / WHEEL_DELTA;
+			result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA;
 			result.MouseWheel.bHorizontal = false;
-			result.MouseWheel.Position.X = GET_X_LPARAM(LParam);
-			result.MouseWheel.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseWheel.Position.X = GET_X_LPARAM(lParam);
+			result.MouseWheel.Position.Y = GET_Y_LPARAM(lParam);
 			break;
 		}
 
 		case WM_MOUSEHWHEEL:
 		{
 			result.Type = InputEventType::MouseWheel;
-			result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(WParam)) / WHEEL_DELTA;
+			result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA;
 			result.MouseWheel.bHorizontal = true;
-			result.MouseWheel.Position.X = GET_X_LPARAM(LParam);
-			result.MouseWheel.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseWheel.Position.X = GET_X_LPARAM(lParam);
+			result.MouseWheel.Position.Y = GET_Y_LPARAM(lParam);
 			break;
 		}
 

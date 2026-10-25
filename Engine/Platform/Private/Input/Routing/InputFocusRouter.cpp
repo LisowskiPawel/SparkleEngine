@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Input/Routing/InputFocusRouter.h"
+#include "Input/InputBackendResult.h"
 
 void InputFocusRouter::BeginFrame(bool interactionDisabled, bool textInputActive)
 {

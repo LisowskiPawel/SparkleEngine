@@ -17,7 +17,7 @@ AssetPack = ModernSponzaCurtains
 Family = Modern Sponza
 VariantKind = Base
 ReleaseSupported = true
-Selected = true
+Selected = false
 
 [Level]
 Id = ModernSponzaCandles
