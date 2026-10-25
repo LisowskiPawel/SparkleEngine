@@ -15,7 +15,7 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARA
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_editorLogger, "Editor");
 
 EditorImGuiContext::EditorImGuiContext(Window& window) noexcept :
-	m_window(window)
+    m_window(window)
 {
 }
 
@@ -44,14 +44,13 @@ void EditorImGuiContext::Initialize()
 	const Filesystem::ProductUserStatePaths& userState = Filesystem::GetProductUserStatePaths();
 	m_iniPath = (userState.SettingsRoot / "EditorLayout.ini").string();
 	io.IniFilename = m_iniPath.c_str();
-
 }
 
 bool EditorImGuiContext::InitializePlatformBackend()
 {
 	if (!m_window.GetHWND())
 	{
-		Diagnostics::Fatal(g_editorLogger, __FILE__, __LINE__, "UI::Implementation::InitializeWin32Backend: invalid window handle");
+		Diagnostics::Fatal(g_editorLogger, __FILE__, __LINE__, "EditorImGuiContext::InitializePlatformBackend: invalid window handle");
 		return false;
 	}
 
@@ -78,10 +77,18 @@ bool EditorImGuiContext::IsReady() const noexcept
 void EditorImGuiContext::SubscribeToWindowEvents(ShortcutHandler shortcutHandler)
 {
 	m_shortcutHandler = std::move(shortcutHandler);
-	auto handle = m_window.OnWindowMessage.Add([this](WindowMessageEvent& event) { HandleWindowMessage(event); });
-	m_windowMessageHandle = ScopedEventHandle(m_window.OnWindowMessage, handle);
-	auto dpiScaleHandle = m_window.OnDpiScaleChanged.Add([this](float dpiScale) { ApplyDpiScale(dpiScale); });
-	m_windowDpiScaleHandle = ScopedEventHandle(m_window.OnDpiScaleChanged, dpiScaleHandle);
+	try
+	{
+		auto handle = m_window.OnWindowMessage.Add([this](WindowMessageEvent& event) { HandleWindowMessage(event); });
+		m_windowMessageHandle = ScopedEventHandle(m_window.OnWindowMessage, handle);
+		auto dpiScaleHandle = m_window.OnDpiScaleChanged.Add([this](float dpiScale) { ApplyDpiScale(dpiScale); });
+		m_windowDpiScaleHandle = ScopedEventHandle(m_window.OnDpiScaleChanged, dpiScaleHandle);
+	}
+	catch (...)
+	{
+		UnsubscribeFromWindowEvents();
+		throw;
+	}
 }
 
 void EditorImGuiContext::UnsubscribeFromWindowEvents() noexcept
@@ -99,7 +106,7 @@ void EditorImGuiContext::HandleWindowMessage(WindowMessageEvent& event)
 	}
 
 	if (m_shortcutHandler && ImGui::GetCurrentContext() != nullptr && (event.lParam & (LPARAM{1} << 30)) == 0
-		&& m_shortcutHandler(static_cast<std::uint32_t>(event.msg), static_cast<std::uintptr_t>(event.wParam), ImGui::GetIO().WantTextInput))
+	    && m_shortcutHandler(static_cast<std::uint32_t>(event.msg), static_cast<std::uintptr_t>(event.wParam), ImGui::GetIO().WantTextInput))
 	{
 		event.handled = true;
 		return;

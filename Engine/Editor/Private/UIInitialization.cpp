@@ -160,7 +160,6 @@ void UI::Implementation::ConfigureMainMenuBarWindowActions()
 	    });
 }
 
-
 void UI::Implementation::InitializeImGuiContext()
 {
 	m_imguiContext = std::make_unique<EditorImGuiContext>(*m_window);
@@ -173,8 +172,5 @@ void UI::Implementation::InitializeImGuiContext()
 void UI::Implementation::SubscribeToWindowEvents()
 {
 	m_imguiContext->SubscribeToWindowEvents(
-		[this](std::uint32_t message, std::uintptr_t key, bool wantsTextInput)
-		{
-			return m_editorConsoleSystem != nullptr && m_editorConsoleSystem->HandleShortcut(message, key, wantsTextInput);
-		});
+	    [this](std::uint32_t message, std::uintptr_t key, bool wantsTextInput) { return m_editorConsoleSystem != nullptr && m_editorConsoleSystem->HandleShortcut(message, key, wantsTextInput); });
 }

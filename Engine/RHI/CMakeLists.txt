@@ -150,6 +150,7 @@ target_link_libraries(SparkleRHICommon
         SparkleCore
     PRIVATE
         SparklePlatform
+        imgui
 )
 
 sparkle_target_precompile_headers(SparkleRHICommon
@@ -411,6 +412,7 @@ target_link_libraries(SparkleRHI
         SparkleCore
     PRIVATE
         SparklePlatform
+        imgui
         ${SPARKLE_RHI_BACKEND_TARGETS}
 )
 

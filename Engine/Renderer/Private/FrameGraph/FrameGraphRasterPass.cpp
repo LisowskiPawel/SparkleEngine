@@ -7,8 +7,8 @@
 static bool StencilWrites(const RhiStencilState& stencil) noexcept
 {
 	return stencil.StencilEnable && stencil.StencilWriteMask != 0
-		&& (stencil.FrontFaceStencilFailOp != RhiStencilOp::Keep || stencil.FrontFaceStencilDepthFailOp != RhiStencilOp::Keep || stencil.FrontFaceStencilPassOp != RhiStencilOp::Keep
-			|| stencil.BackFaceStencilFailOp != RhiStencilOp::Keep || stencil.BackFaceStencilDepthFailOp != RhiStencilOp::Keep || stencil.BackFaceStencilPassOp != RhiStencilOp::Keep);
+	    && (stencil.FrontFaceStencilFailOp != RhiStencilOp::Keep || stencil.FrontFaceStencilDepthFailOp != RhiStencilOp::Keep || stencil.FrontFaceStencilPassOp != RhiStencilOp::Keep
+	        || stencil.BackFaceStencilFailOp != RhiStencilOp::Keep || stencil.BackFaceStencilDepthFailOp != RhiStencilOp::Keep || stencil.BackFaceStencilPassOp != RhiStencilOp::Keep);
 }
 
 static const PassParameterTextureBindingData& ResolveRasterAttachmentBinding(const PassParameterSet& parameters, std::uint32_t parameterIndex)
@@ -105,14 +105,12 @@ static void ResolveColorSampleCount(FrameGraphRasterPass& result, const FrameGra
 
 static void ResolveDepthStencilCompatibility(FrameGraphRasterPass& result, const RasterPassRenderState& renderState, const FrameGraphResourceRegistry& resources)
 {
-
 	if (result.HasDepthStencil)
 	{
 		const FrameGraphTextureDesc& depthDesc = resources.GetMetadata(result.DepthStencil.Handle.GetResourceHandle()).textureDesc;
 		if ((result.ColorCount != 0 && depthDesc.sampleCount != result.Compatibility.SampleCount)
 		    || (result.DepthStencil.DepthStencilAccess == FrameGraphDepthStencilAccess::ReadOnly
-		        && (result.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear || renderState.GetDepth().DepthWriteEnable
-		            || StencilWrites(renderState.GetStencil()))))
+		        && (result.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear || renderState.GetDepth().DepthWriteEnable || StencilWrites(renderState.GetStencil()))))
 		{
 			throw Diagnostics::Error("Raster depth attachment is incompatible with pass depth, stencil, access, load, or sample state.");
 		}
@@ -126,7 +124,6 @@ static void ResolveDepthStencilCompatibility(FrameGraphRasterPass& result, const
 
 static void ValidateRasterPassState(const FrameGraphRasterPass& result, const RasterPassRenderState& renderState)
 {
-
 	if (!renderState.GetDepth().DepthEnable && renderState.GetDepth().DepthWriteEnable)
 	{
 		throw Diagnostics::Error("Raster depth writes require depth testing to be enabled.");

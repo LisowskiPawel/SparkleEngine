@@ -63,7 +63,6 @@ private:
 
 	void InitializeImGuiContext();
 
-
 	void InitializeWorkspace();
 	void InitializeCorePanels();
 	void InitializeViewport();
@@ -75,7 +74,7 @@ private:
 
 	void SubscribeToWindowEvents();
 
-
+	std::unique_ptr<EditorImGuiContext> m_imguiContext;
 	CVarControlExecutor m_consoleVariables;
 	std::unique_ptr<EditorIconService> m_icons;
 	std::unique_ptr<MainMenuBarPanel> m_mainMenuBar;
@@ -109,5 +108,4 @@ private:
 	std::uint64_t m_viewportGeneration = 0;
 	bool m_shaderReloadRequested = false;
 	bool m_shaderRecookRequested = false;
-	std::unique_ptr<EditorImGuiContext> m_imguiContext;
 };
