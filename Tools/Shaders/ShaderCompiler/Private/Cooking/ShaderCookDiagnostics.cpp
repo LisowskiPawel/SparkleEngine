@@ -4,7 +4,7 @@
 
 #include <format>
 
-std::string ShaderCookDiagnostics::FormatJobContext(const ShaderCompileJob& job, std::string_view backendName, ShaderTarget target)
+std::string FormatShaderCompileJob(const ShaderCompileJob& job, std::string_view backendName, ShaderTarget target)
 {
 	return std::format(
 	    "shader type '{}' source '{}' entry '{}' stage '{}' backend '{}' target '{}' profile '{}' compileInputHash {:016X}",

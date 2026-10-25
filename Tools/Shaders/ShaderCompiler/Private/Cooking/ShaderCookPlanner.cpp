@@ -11,7 +11,7 @@
 #include <format>
 #include <unordered_set>
 
-std::vector<ShaderCookDesc> ShaderCookPlanner::BuildShaders(const ShaderCookSettings& settings, const ShaderDependencyManifest& dependencyManifest, const ShaderContractCatalog& catalog)
+std::vector<ShaderCookDesc> SelectShadersForCook(const ShaderCookSettings& settings, const ShaderDependencyManifest& dependencyManifest, const ShaderContractCatalog& catalog)
 {
 	const std::uint32_t selectionCount = static_cast<std::uint32_t>(!settings.shaderId.empty()) + static_cast<std::uint32_t>(!settings.changedVirtualPaths.empty());
 	if (selectionCount > 1)

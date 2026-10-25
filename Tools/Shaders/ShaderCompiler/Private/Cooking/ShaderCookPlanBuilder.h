@@ -6,7 +6,4 @@
 class ShaderBackendPool;
 struct ShaderCookSettings;
 
-namespace ShaderCookPlanBuilder
-{
-	ShaderCookPipelinePlan Build(const ShaderCookSettings& settings, ShaderBackendPool& backendPool, const ToolWorkProgressCallback& progress);
-}
+ShaderCookPipelinePlan BuildShaderCookPlan(const ShaderCookSettings& settings, ShaderBackendPool& backendPool, const ToolWorkProgressCallback& progress);

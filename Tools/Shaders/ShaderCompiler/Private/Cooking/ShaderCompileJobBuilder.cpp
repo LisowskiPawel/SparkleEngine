@@ -69,10 +69,10 @@ ShaderCompileJob ShaderCompileJobBuilder::Build(const ShaderCookSettings& settin
 	IShaderBackend& backend = backendPool.ResolveAndAcquire(request.VirtualSourcePath, request.Target, settings.backendName);
 	IncludeClosureHash closure = PreprocessSource(request);
 	const std::uint64_t sourceHash = Hash::Fnv1a64(request.SourceCode);
-	const std::uint64_t requestHash = ShaderCompileRequestHasher::Compute(request);
+	const std::uint64_t requestHash = HashShaderCompileRequest(request);
 	std::string backendName(backend.GetBackendName());
 	const std::uint64_t backendVersion = backend.GetBackendVersion();
-	std::string targetProfile = ShaderCompileProfile::BuildTargetProfile(request);
+	std::string targetProfile = BuildShaderTargetProfile(request);
 	const ShaderCompileInputHash inputHash = BuildInputHash(sourceHash, closure.includeClosureHash, requestHash, backendName, backendVersion);
 
 	return ShaderCompileJob{
@@ -89,9 +89,9 @@ ShaderCompileJob ShaderCompileJobBuilder::Build(const ShaderCookSettings& settin
 
 IncludeClosureHash ShaderCompileJobBuilder::PreprocessSource(ShaderCompileRequest& request)
 {
-	const IncludeClosureHash before = IncludeClosureHasher::Compute(request);
-	request.SourceCode = ShaderSourcePreprocessor::Load(request.VirtualSourcePath, request, request.CaptureDebugArtifacts ? &request.SourceFiles : nullptr);
-	IncludeClosureHash closure = IncludeClosureHasher::Compute(request);
+	const IncludeClosureHash before = HashShaderIncludeClosure(request);
+	request.SourceCode = PreprocessShaderSource(request.VirtualSourcePath, request, request.CaptureDebugArtifacts ? &request.SourceFiles : nullptr);
+	IncludeClosureHash closure = HashShaderIncludeClosure(request);
 	if (before.sourceHash != closure.sourceHash || before.includeClosureHash != closure.includeClosureHash || before.virtualDependencies != closure.virtualDependencies)
 	{
 		throw Diagnostics::Error(std::format("Shader source closure changed while constructing compile job for '{}'.", request.ShaderTypeName));

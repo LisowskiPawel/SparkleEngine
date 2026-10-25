@@ -6,12 +6,14 @@
 
 #include <utility>
 
-std::string ReflectionSerializer::ResolveString(const GlobalShaderMap& map, std::uint32_t offset, std::uint32_t size)
+static std::string ResolveString(const GlobalShaderMap& map, std::uint32_t offset, std::uint32_t size);
+
+static std::string ResolveString(const GlobalShaderMap& map, std::uint32_t offset, std::uint32_t size)
 {
 	return std::string(map.ResolveString(ShaderMapStringRef{offset, size}));
 }
 
-void ReflectionSerializer::Build(std::span<const ShaderReflection> reflections, Strings::StringTableBuilder& stringTable, Output& outOutput)
+void BuildShaderReflectionTables(std::span<const ShaderReflection> reflections, Strings::StringTableBuilder& stringTable, ShaderReflectionTables& outOutput)
 {
 	outOutput.reflectionRecords.clear();
 	outOutput.resourceBindings.clear();
@@ -137,7 +139,7 @@ void ReflectionSerializer::Build(std::span<const ShaderReflection> reflections, 
 	}
 }
 
-ShaderReflection ReflectionSerializer::Decode(const GlobalShaderMap& map, const GlobalShaderMapEntry& entry)
+ShaderReflection DecodeShaderReflection(const GlobalShaderMap& map, const GlobalShaderMapEntry& entry)
 {
 	ShaderReflection result;
 	const CookedShaderReflectionRecord& record = map.GetReflection(entry);

@@ -129,7 +129,7 @@ std::string ShaderParameterStructVerificationResult::BuildJsonReport() const
 	return stream.str();
 }
 
-ShaderParameterStructVerificationResult ShaderParameterStructVerifier::Verify(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool allowUnreflectedDeclarations)
+ShaderParameterStructVerificationResult VerifyShaderParameterStruct(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool allowUnreflectedDeclarations)
 {
 	ShaderParameterStructVerificationResult result;
 

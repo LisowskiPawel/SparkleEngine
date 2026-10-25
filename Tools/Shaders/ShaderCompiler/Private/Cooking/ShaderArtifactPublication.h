@@ -8,15 +8,10 @@
 
 struct ShaderCookSettings;
 
-class ShaderArtifactPublication final
-{
-public:
-	ShaderArtifactPublication() = delete;
+void PrepareShaderProducts(ShaderCookPipelinePlan& plan, std::span<ShaderCompileResult> compileResults);
 
-	static ShaderCookOutput Publish(
-	    const ShaderCookPipelinePlan& plan,
-	    std::span<const ShaderCompileResult> compileResults,
-	    const ShaderCookSettings& settings,
-	    const std::filesystem::path& outputDirectory,
-	    bool replaceCompleteCatalog);
-};
+ShaderCookOutput PublishShaderArtifacts(
+    const ShaderCookPipelinePlan& plan,
+    std::span<const ShaderCompileResult> compileResults,
+    const ShaderCookSettings& settings,
+    const std::filesystem::path& outputDirectory);

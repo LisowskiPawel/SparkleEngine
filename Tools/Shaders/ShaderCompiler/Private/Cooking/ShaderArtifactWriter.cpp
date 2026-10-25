@@ -173,7 +173,7 @@ namespace ShaderArtifactWriter
 			        .ArrayCount = binding.ArrayCount,
 			        .ValueSizeInBytes = binding.ValueSizeInBytes});
 		}
-		entry.Reflection = ReflectionSerializer::Decode(map, source);
+		entry.Reflection = DecodeShaderReflection(map, source);
 		const CookedShaderCodeRecord* const code = library.Find(source.CodeHash);
 		if (code == nullptr)
 		{
@@ -288,7 +288,7 @@ namespace ShaderArtifactWriter
 
 	static std::uint64_t ComputePublicationHash(
 	    const ArtifactTables& tables,
-	    const ReflectionSerializer::Output& reflectionOutput,
+	    const ShaderReflectionTables& reflectionOutput,
 	    const std::vector<CookedShaderCodeRecord>& codeRecords,
 	    const std::vector<std::uint8_t>& codeBlob)
 	{
@@ -308,7 +308,7 @@ namespace ShaderArtifactWriter
 		return Hash::FinalizeFnv1a64(publicationHash);
 	}
 
-	static void WriteMap(const std::filesystem::path& path, std::uint64_t publicationHash, const ArtifactTables& tables, const ReflectionSerializer::Output& reflection)
+	static void WriteMap(const std::filesystem::path& path, std::uint64_t publicationHash, const ArtifactTables& tables, const ShaderReflectionTables& reflection)
 	{
 		GlobalShaderMapHeader mapHeader{};
 		mapHeader.EntryCount = static_cast<std::uint32_t>(tables.Entries.size());
@@ -356,8 +356,8 @@ namespace ShaderArtifactWriter
 	{
 		ShaderCookOutput result{.mapPath = mapPath, .libraryPath = libraryPath};
 		ArtifactTables tables = BuildTables(entries, result);
-		ReflectionSerializer::Output reflectionOutput;
-		ReflectionSerializer::Build(tables.Reflections, tables.Strings, reflectionOutput);
+		ShaderReflectionTables reflectionOutput;
+		BuildShaderReflectionTables(tables.Reflections, tables.Strings, reflectionOutput);
 
 		std::vector<std::uint8_t> codeBlob;
 		const std::vector<CookedShaderCodeRecord> codeRecords = BuildCodeRecords(tables.UniqueCode, codeBlob);

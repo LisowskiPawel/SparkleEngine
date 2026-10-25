@@ -13,7 +13,7 @@ namespace ShaderContractValidation
 	}
 }
 
-std::vector<ShaderContractVerificationFailure> ShaderContractValidator::Validate(const ShaderContractCatalog& catalog)
+std::vector<ShaderContractVerificationFailure> ValidateShaderContracts(const ShaderContractCatalog& catalog)
 {
 	std::vector<ShaderContractVerificationFailure> failures;
 	std::unordered_set<std::string> names;
@@ -74,7 +74,7 @@ std::vector<ShaderContractVerificationFailure> ShaderContractValidator::Validate
 	return failures;
 }
 
-std::string ShaderContractValidator::FormatFailure(const ShaderContractVerificationFailure& failure)
+std::string FormatShaderContractFailure(const ShaderContractVerificationFailure& failure)
 {
 	return std::format(
 	    "shader={} source={} entry={} stage={} reason={}",

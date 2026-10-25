@@ -9,7 +9,7 @@
 
 #include <sstream>
 
-CookedShaderStatsReport CookedShaderStatsPass::WriteCsv(const ShaderCookOutput& output, const std::filesystem::path& analysisDirectory)
+CookedShaderStatsReport WriteCookedShaderStats(const ShaderCookOutput& output, const std::filesystem::path& analysisDirectory)
 {
 	CookedShaderStatsReport report{.outputPath = analysisDirectory / "CookedShaderStats.csv"};
 	std::ostringstream csv;

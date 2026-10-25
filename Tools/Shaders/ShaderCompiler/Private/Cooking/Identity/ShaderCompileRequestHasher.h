@@ -4,10 +4,4 @@
 
 #include <cstdint>
 
-class ShaderCompileRequestHasher final
-{
-public:
-	ShaderCompileRequestHasher() = delete;
-
-	static std::uint64_t Compute(const ShaderCompileRequest& request);
-};
+std::uint64_t HashShaderCompileRequest(const ShaderCompileRequest& request);

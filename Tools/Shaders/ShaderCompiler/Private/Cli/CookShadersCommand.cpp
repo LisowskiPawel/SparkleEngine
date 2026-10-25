@@ -40,13 +40,11 @@ int CookShaders(std::span<const std::string_view> args)
 		ToolConsole::Message(std::cerr, ToolConsoleSeverity::Error, "Invalid shader cook arguments", {ToolConsole::QuotedField("reason", error.what())});
 		return kExitCodeUsage;
 	}
-
-	GlobalShaderCooker cooker;
 	ShaderCookResult cookResult;
 	ToolWorkProgressWriter progressOutput(std::cout);
 	try
 	{
-		cookResult = cooker.CookAll(settings, [&progressOutput](const ToolWorkProgressEvent& progress) { progressOutput.Report(progress); });
+		cookResult = CookGlobalShaders(settings, [&progressOutput](const ToolWorkProgressEvent& progress) { progressOutput.Report(progress); });
 	}
 	catch (const Diagnostics::Error& error)
 	{
@@ -129,7 +127,7 @@ static std::string FormatTargets(std::span<const ShaderTarget> targets)
 
 static void RunCookedShaderStats(const ShaderCookResult& result)
 {
-	const CookedShaderStatsReport report = CookedShaderStatsPass::WriteCsv(result.output, result.outputDirectory / "Analysis");
+	const CookedShaderStatsReport report = WriteCookedShaderStats(result.output, result.outputDirectory / "Analysis");
 
 	ToolConsole::Message(
 	    std::cout,

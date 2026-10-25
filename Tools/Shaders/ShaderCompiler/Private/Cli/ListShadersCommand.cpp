@@ -22,17 +22,17 @@ int ListShaders(std::span<const std::string_view> args)
 	ShaderContractCatalog catalog;
 	try
 	{
-		catalog = ShaderContractCatalogBuilder::Build(ShaderContractSelectionKind::All, {});
+		catalog = BuildShaderContractCatalog(ShaderContractSelectionKind::All, {});
 	}
 	catch (const Diagnostics::Error& error)
 	{
 		std::cerr << "ShaderCompiler: failed to build shader catalog - " << error.what() << "\n";
 		return kExitCodeCookFailure;
 	}
-	const std::vector<ShaderContractVerificationFailure> failures = ShaderContractValidator::Validate(catalog);
+	const std::vector<ShaderContractVerificationFailure> failures = ValidateShaderContracts(catalog);
 	for (const ShaderContractVerificationFailure& failure : failures)
 	{
-		std::cerr << "ShaderCompiler: shader contract invalid " << ShaderContractValidator::FormatFailure(failure) << "\n";
+		std::cerr << "ShaderCompiler: shader contract invalid " << FormatShaderContractFailure(failure) << "\n";
 	}
 	if (!failures.empty())
 	{

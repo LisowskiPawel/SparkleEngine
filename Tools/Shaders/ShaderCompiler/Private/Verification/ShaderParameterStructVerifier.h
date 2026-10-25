@@ -14,10 +14,4 @@ struct ShaderParameterStructVerificationResult final
 	std::string BuildJsonReport() const;
 };
 
-class ShaderParameterStructVerifier final
-{
-public:
-	ShaderParameterStructVerifier() = delete;
-
-	static ShaderParameterStructVerificationResult Verify(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool allowUnreflectedDeclarations = false);
-};
+ShaderParameterStructVerificationResult VerifyShaderParameterStruct(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool allowUnreflectedDeclarations = false);

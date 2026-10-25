@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-std::string SpirVDisassembler::Disassemble(std::span<const std::uint8_t> bytecode)
+std::string DisassembleSpirV(std::span<const std::uint8_t> bytecode)
 {
 	if (bytecode.empty() || bytecode.size() % sizeof(std::uint32_t) != 0u)
 	{

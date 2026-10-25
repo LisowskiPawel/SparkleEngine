@@ -11,10 +11,4 @@ struct CookedShaderStatsReport final
 	std::uint32_t rowCount = 0;
 };
 
-class CookedShaderStatsPass final
-{
-public:
-	CookedShaderStatsPass() = delete;
-
-	static CookedShaderStatsReport WriteCsv(const ShaderCookOutput& output, const std::filesystem::path& analysisDirectory);
-};
+CookedShaderStatsReport WriteCookedShaderStats(const ShaderCookOutput& output, const std::filesystem::path& analysisDirectory);

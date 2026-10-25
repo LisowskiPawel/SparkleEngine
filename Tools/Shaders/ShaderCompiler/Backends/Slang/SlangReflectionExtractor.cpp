@@ -4,7 +4,23 @@
 
 #include <algorithm>
 
-ShaderReflection SlangReflectionExtractor::Extract(slang::ProgramLayout& programLayout, ShaderStage stage)
+static void VisitScope(slang::VariableLayoutReflection* scopeLayout, ShaderStage stage, ShaderReflection& outReflection);
+static void VisitVariable(slang::VariableLayoutReflection* variableLayout, ShaderStage stage, ShaderReflection& outReflection);
+static void VisitTypeFields(slang::TypeLayoutReflection* typeLayout, ShaderStage stage, ShaderReflection& outReflection);
+
+static void AddResourceBinding(slang::VariableLayoutReflection& variableLayout, slang::ParameterCategory category, ShaderReflection& outReflection);
+static void AddConstantBuffer(slang::VariableLayoutReflection& variableLayout, ShaderReflectionResourceBinding& binding, ShaderReflection& outReflection);
+static void AddPushConstantBlock(slang::VariableLayoutReflection& variableLayout, ShaderStage stage, ShaderReflection& outReflection);
+static void AddVaryingInput(slang::VariableLayoutReflection& variableLayout, ShaderReflection& outReflection);
+
+static void FlattenMembers(slang::TypeLayoutReflection* typeLayout, std::uint32_t parentOffset, std::vector<ShaderReflectionConstantBufferMember>& outMembers);
+static CookedShaderResourceKind MapResourceKind(slang::TypeLayoutReflection* typeLayout, slang::ParameterCategory category);
+static CookedShaderResourceDimension MapResourceDimension(slang::TypeLayoutReflection* typeLayout);
+static CookedShaderScalarType MapScalarType(slang::TypeReflection::ScalarType type);
+static slang::TypeLayoutReflection* UnwrapSingleElementContainer(slang::TypeLayoutReflection* typeLayout);
+static std::uint32_t NormalizeArrayCount(std::size_t elementCount);
+
+ShaderReflection ExtractSlangReflection(slang::ProgramLayout& programLayout, ShaderStage stage)
 {
 	ShaderReflection outReflection;
 
@@ -32,7 +48,7 @@ ShaderReflection SlangReflectionExtractor::Extract(slang::ProgramLayout& program
 	return outReflection;
 }
 
-void SlangReflectionExtractor::VisitScope(slang::VariableLayoutReflection* scopeLayout, ShaderStage stage, ShaderReflection& outReflection)
+static void VisitScope(slang::VariableLayoutReflection* scopeLayout, ShaderStage stage, ShaderReflection& outReflection)
 {
 	if (scopeLayout == nullptr)
 	{
@@ -42,7 +58,7 @@ void SlangReflectionExtractor::VisitScope(slang::VariableLayoutReflection* scope
 	VisitVariable(scopeLayout, stage, outReflection);
 }
 
-void SlangReflectionExtractor::VisitVariable(slang::VariableLayoutReflection* variableLayout, ShaderStage stage, ShaderReflection& outReflection)
+static void VisitVariable(slang::VariableLayoutReflection* variableLayout, ShaderStage stage, ShaderReflection& outReflection)
 {
 	if (variableLayout == nullptr || variableLayout->getTypeLayout() == nullptr)
 	{
@@ -78,7 +94,7 @@ void SlangReflectionExtractor::VisitVariable(slang::VariableLayoutReflection* va
 	VisitTypeFields(variableLayout->getTypeLayout(), stage, outReflection);
 }
 
-void SlangReflectionExtractor::VisitTypeFields(slang::TypeLayoutReflection* typeLayout, ShaderStage stage, ShaderReflection& outReflection)
+static void VisitTypeFields(slang::TypeLayoutReflection* typeLayout, ShaderStage stage, ShaderReflection& outReflection)
 {
 	if (typeLayout == nullptr)
 	{
@@ -104,7 +120,7 @@ void SlangReflectionExtractor::VisitTypeFields(slang::TypeLayoutReflection* type
 	}
 }
 
-void SlangReflectionExtractor::AddResourceBinding(slang::VariableLayoutReflection& variableLayout, slang::ParameterCategory category, ShaderReflection& outReflection)
+static void AddResourceBinding(slang::VariableLayoutReflection& variableLayout, slang::ParameterCategory category, ShaderReflection& outReflection)
 {
 	ShaderReflectionResourceBinding binding;
 	const char* bindingName = variableLayout.getName();
@@ -152,7 +168,7 @@ void SlangReflectionExtractor::AddResourceBinding(slang::VariableLayoutReflectio
 	}
 }
 
-void SlangReflectionExtractor::AddConstantBuffer(slang::VariableLayoutReflection& variableLayout, ShaderReflectionResourceBinding& binding, ShaderReflection& outReflection)
+static void AddConstantBuffer(slang::VariableLayoutReflection& variableLayout, ShaderReflectionResourceBinding& binding, ShaderReflection& outReflection)
 {
 	ShaderReflectionConstantBuffer cb;
 	cb.Name = binding.Name;
@@ -169,7 +185,7 @@ void SlangReflectionExtractor::AddConstantBuffer(slang::VariableLayoutReflection
 	outReflection.ConstantBuffers.push_back(std::move(cb));
 }
 
-void SlangReflectionExtractor::AddPushConstantBlock(slang::VariableLayoutReflection& variableLayout, ShaderStage stage, ShaderReflection& outReflection)
+static void AddPushConstantBlock(slang::VariableLayoutReflection& variableLayout, ShaderStage stage, ShaderReflection& outReflection)
 {
 	ShaderReflectionPushConstantRange range;
 	range.OffsetInBytes = static_cast<std::uint32_t>(variableLayout.getOffset(slang::ParameterCategory::PushConstantBuffer));
@@ -178,7 +194,7 @@ void SlangReflectionExtractor::AddPushConstantBlock(slang::VariableLayoutReflect
 	outReflection.PushConstants.push_back(range);
 }
 
-void SlangReflectionExtractor::AddVaryingInput(slang::VariableLayoutReflection& variableLayout, ShaderReflection& outReflection)
+static void AddVaryingInput(slang::VariableLayoutReflection& variableLayout, ShaderReflection& outReflection)
 {
 	ShaderReflectionInputElement element;
 	element.Semantic = variableLayout.getSemanticName() ? variableLayout.getSemanticName() : variableLayout.getName();
@@ -189,7 +205,7 @@ void SlangReflectionExtractor::AddVaryingInput(slang::VariableLayoutReflection& 
 	outReflection.InputElements.push_back(std::move(element));
 }
 
-void SlangReflectionExtractor::FlattenMembers(slang::TypeLayoutReflection* typeLayout, std::uint32_t parentOffset, std::vector<ShaderReflectionConstantBufferMember>& outMembers)
+static void FlattenMembers(slang::TypeLayoutReflection* typeLayout, std::uint32_t parentOffset, std::vector<ShaderReflectionConstantBufferMember>& outMembers)
 {
 	if (typeLayout == nullptr || typeLayout->getKind() != slang::TypeReflection::Kind::Struct)
 	{
@@ -219,7 +235,7 @@ void SlangReflectionExtractor::FlattenMembers(slang::TypeLayoutReflection* typeL
 	}
 }
 
-CookedShaderResourceKind SlangReflectionExtractor::MapResourceKind(slang::TypeLayoutReflection* typeLayout, slang::ParameterCategory category)
+static CookedShaderResourceKind MapResourceKind(slang::TypeLayoutReflection* typeLayout, slang::ParameterCategory category)
 {
 	if (category == slang::ParameterCategory::ConstantBuffer)
 	{
@@ -255,7 +271,7 @@ CookedShaderResourceKind SlangReflectionExtractor::MapResourceKind(slang::TypeLa
 	return writable ? CookedShaderResourceKind::RWTexture : CookedShaderResourceKind::Texture;
 }
 
-CookedShaderResourceDimension SlangReflectionExtractor::MapResourceDimension(slang::TypeLayoutReflection* typeLayout)
+static CookedShaderResourceDimension MapResourceDimension(slang::TypeLayoutReflection* typeLayout)
 {
 	const SlangResourceShape shape = typeLayout != nullptr ? typeLayout->getResourceShape() : SLANG_RESOURCE_NONE;
 	const SlangResourceShape baseShape = static_cast<SlangResourceShape>(shape & SLANG_RESOURCE_BASE_SHAPE_MASK);
@@ -285,7 +301,7 @@ CookedShaderResourceDimension SlangReflectionExtractor::MapResourceDimension(sla
 	}
 }
 
-CookedShaderScalarType SlangReflectionExtractor::MapScalarType(slang::TypeReflection::ScalarType type)
+static CookedShaderScalarType MapScalarType(slang::TypeReflection::ScalarType type)
 {
 	switch (type)
 	{
@@ -314,7 +330,7 @@ CookedShaderScalarType SlangReflectionExtractor::MapScalarType(slang::TypeReflec
 	}
 }
 
-slang::TypeLayoutReflection* SlangReflectionExtractor::UnwrapSingleElementContainer(slang::TypeLayoutReflection* typeLayout)
+static slang::TypeLayoutReflection* UnwrapSingleElementContainer(slang::TypeLayoutReflection* typeLayout)
 {
 	if (typeLayout == nullptr)
 	{
@@ -337,7 +353,7 @@ slang::TypeLayoutReflection* SlangReflectionExtractor::UnwrapSingleElementContai
 	}
 }
 
-std::uint32_t SlangReflectionExtractor::NormalizeArrayCount(std::size_t elementCount)
+static std::uint32_t NormalizeArrayCount(std::size_t elementCount)
 {
 	if (elementCount == 0 || elementCount == SLANG_UNKNOWN_SIZE)
 	{

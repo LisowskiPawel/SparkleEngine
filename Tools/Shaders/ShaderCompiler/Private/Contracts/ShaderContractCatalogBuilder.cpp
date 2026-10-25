@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <utility>
 
-ShaderContractCatalog ShaderContractCatalogBuilder::Build(ShaderContractSelectionKind selectionKind, std::string_view requestedId)
+ShaderContractCatalog BuildShaderContractCatalog(ShaderContractSelectionKind selectionKind, std::string_view requestedId)
 {
 	ShaderContractCatalog catalog;
 	std::unordered_map<ShaderTypeId, std::string> shaderTypeNames;

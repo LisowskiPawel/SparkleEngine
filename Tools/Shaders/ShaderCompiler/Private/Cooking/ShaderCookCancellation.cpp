@@ -7,7 +7,7 @@
 #include <format>
 #include <system_error>
 
-bool ShaderCookCancellation::IsRequested(const std::filesystem::path& signalPath)
+bool IsShaderCookCancelled(const std::filesystem::path& signalPath)
 {
 	if (signalPath.empty())
 	{
@@ -23,9 +23,9 @@ bool ShaderCookCancellation::IsRequested(const std::filesystem::path& signalPath
 	return requested;
 }
 
-void ShaderCookCancellation::ThrowIfRequested(const std::filesystem::path& signalPath)
+void ThrowIfShaderCookCancelled(const std::filesystem::path& signalPath)
 {
-	if (IsRequested(signalPath))
+	if (IsShaderCookCancelled(signalPath))
 	{
 		throw Diagnostics::Error("Shader cook was cancelled before publication.");
 	}

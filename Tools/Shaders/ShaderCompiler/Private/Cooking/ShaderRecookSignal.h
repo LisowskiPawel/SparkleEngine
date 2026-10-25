@@ -2,10 +2,4 @@
 
 #include <filesystem>
 
-class ShaderRecookSignal final
-{
-public:
-	ShaderRecookSignal() = delete;
-
-	static void Write(const std::filesystem::path& mapReadPath, const std::filesystem::path& libraryReadPath, const std::filesystem::path& signalStoragePath);
-};
+void WriteShaderRecookSignal(const std::filesystem::path& mapReadPath, const std::filesystem::path& libraryReadPath, const std::filesystem::path& signalStoragePath);

@@ -12,10 +12,4 @@ enum class ShaderContractSelectionKind : std::uint8_t
 	ShaderId,
 };
 
-class ShaderContractCatalogBuilder final
-{
-public:
-	ShaderContractCatalogBuilder() = delete;
-
-	static ShaderContractCatalog Build(ShaderContractSelectionKind selectionKind, std::string_view requestedId);
-};
+ShaderContractCatalog BuildShaderContractCatalog(ShaderContractSelectionKind selectionKind, std::string_view requestedId);

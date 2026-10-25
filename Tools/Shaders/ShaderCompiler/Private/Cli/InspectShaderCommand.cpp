@@ -21,7 +21,7 @@ int InspectShader(std::span<const std::string_view> args)
 
 	try
 	{
-		const ShaderContractCatalog catalog = ShaderContractCatalogBuilder::Build(ShaderContractSelectionKind::ShaderId, args[0]);
+		const ShaderContractCatalog catalog = BuildShaderContractCatalog(ShaderContractSelectionKind::ShaderId, args[0]);
 		const ShaderContract& shader = catalog.front();
 		const CookedShaderLibrary library = CookedShaderLibrary::Open(Filesystem::GetCookedShaderLibraryPath());
 		const GlobalShaderMap map = GlobalShaderMap::Open(Filesystem::GetGlobalShaderMapPath(), library);

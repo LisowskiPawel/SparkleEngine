@@ -1,4 +1,4 @@
-﻿#include "PCH.h"
+#include "PCH.h"
 
 #include "Cooking/Identity/IncludeClosureHasher.h"
 
@@ -14,9 +14,15 @@
 #include <regex>
 #include <sstream>
 
+using HashPair = std::pair<std::string, std::uint64_t>;
+
+static void VisitFile(std::string_view filePath, const ShaderCompileRequest& request, std::unordered_set<std::string>& visitedPathKeys, std::vector<HashPair>& outFileHashes);
+static std::uint64_t ComputeClosureHash(std::vector<HashPair>& fileHashes);
+static std::uint64_t FindSourceHash(std::string_view sourcePath, const std::vector<HashPair>& fileHashes);
+
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_includeClosureHasherLogger, "ShaderCompiler.IncludeClosureHasher");
 
-void IncludeClosureHasher::VisitFile(std::string_view filePath, const ShaderCompileRequest& request, std::unordered_set<std::string>& visitedPathKeys, std::vector<HashPair>& outFileHashes)
+static void VisitFile(std::string_view filePath, const ShaderCompileRequest& request, std::unordered_set<std::string>& visitedPathKeys, std::vector<HashPair>& outFileHashes)
 {
 	const std::string pathKey = request.SourceMounts.get().CanonicalizeVirtualPath(filePath);
 	if (!visitedPathKeys.insert(pathKey).second)
@@ -58,7 +64,7 @@ void IncludeClosureHasher::VisitFile(std::string_view filePath, const ShaderComp
 	}
 }
 
-IncludeClosureHash IncludeClosureHasher::Compute(const ShaderCompileRequest& request)
+IncludeClosureHash HashShaderIncludeClosure(const ShaderCompileRequest& request)
 {
 	std::unordered_set<std::string> visited;
 	std::vector<HashPair> fileHashes;
@@ -83,7 +89,7 @@ IncludeClosureHash IncludeClosureHasher::Compute(const ShaderCompileRequest& req
 	    .virtualDependencies = std::move(virtualDependencies)};
 }
 
-std::uint64_t IncludeClosureHasher::ComputeClosureHash(std::vector<HashPair>& fileHashes)
+static std::uint64_t ComputeClosureHash(std::vector<HashPair>& fileHashes)
 {
 	std::sort(fileHashes.begin(), fileHashes.end(), [](const HashPair& lhs, const HashPair& rhs) { return lhs.first < rhs.first; });
 
@@ -103,7 +109,7 @@ std::uint64_t IncludeClosureHasher::ComputeClosureHash(std::vector<HashPair>& fi
 	return closureHash == 0 ? Hash::kFnv64OffsetBasis : closureHash;
 }
 
-std::uint64_t IncludeClosureHasher::FindSourceHash(std::string_view sourcePath, const std::vector<HashPair>& fileHashes)
+static std::uint64_t FindSourceHash(std::string_view sourcePath, const std::vector<HashPair>& fileHashes)
 {
 	const std::string sourcePathKey(sourcePath);
 	for (const auto& [path, hash] : fileHashes)

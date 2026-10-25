@@ -16,13 +16,36 @@
 
 #include <utility>
 
-ShaderCookOutput ShaderArtifactPublication::Publish(
+void PrepareShaderProducts(ShaderCookPipelinePlan& plan, std::span<ShaderCompileResult> compileResults)
+{
+	for (std::size_t jobIndex = 0; jobIndex < plan.jobs.size(); ++jobIndex)
+	{
+		const ShaderCompileJob& job = plan.jobs[jobIndex];
+		const ShaderCookDesc& shader = plan.shaders[job.ShaderIndex];
+		ShaderCompileResult& compiled = compileResults[jobIndex];
+		if (compiled.ShaderType != job.Request.ShaderType || compiled.Target != job.Request.Target || compiled.InputHash != job.InputHash)
+		{
+			throw Diagnostics::Error("Shader compile result does not match its immutable job identity.");
+		}
+		plan.shaderOutputs[job.ShaderIndex].push_back(
+		    ShaderCookProduct{
+		        .shaderTypeId = shader.shaderTypeId,
+		        .target = compiled.Target,
+		        .features = shader.features,
+		        .rayTracing = shader.rayTracing,
+		        .parameterLayout = shader.parameterLayout,
+		        .bindingRemaps = job.Request.DescriptorBindingRemaps,
+		        .compiled = std::move(compiled.Output)});
+	}
+}
+
+ShaderCookOutput PublishShaderArtifacts(
     const ShaderCookPipelinePlan& plan,
     std::span<const ShaderCompileResult> compileResults,
     const ShaderCookSettings& settings,
-    const std::filesystem::path& outputDirectory,
-    bool replaceCompleteCatalog)
+    const std::filesystem::path& outputDirectory)
 {
+	const bool replaceCompleteCatalog = settings.shaderId.empty() && settings.changedVirtualPaths.empty();
 	const std::filesystem::path& mapPath = Filesystem::GetGlobalShaderMapPath();
 	const std::filesystem::path& libraryPath = Filesystem::GetCookedShaderLibraryPath();
 	const std::filesystem::path stagedMapPath = Files::BuildTemporaryPath(mapPath, ".cook-generation");
@@ -50,7 +73,7 @@ ShaderCookOutput ShaderArtifactPublication::Publish(
 		const CookedShaderLibrary stagedLibrary = CookedShaderLibrary::Open(stagedLibraryPath);
 		const GlobalShaderMap stagedMap = GlobalShaderMap::Open(stagedMapPath, stagedLibrary);
 		ShaderDependencyManifest::Write(plan.dependencyManifest, stagedDependencyPath);
-		ShaderRecookSignal::Write(stagedMapPath, stagedLibraryPath, stagedSignalPath);
+		WriteShaderRecookSignal(stagedMapPath, stagedLibraryPath, stagedSignalPath);
 		std::vector<Files::FilePublication> files = {{stagedMapPath, mapPath}, {stagedLibraryPath, libraryPath}, {stagedDependencyPath, dependencyPath}, {stagedSignalPath, signalPath}};
 		if (settings.enableDebugInfo || !settings.debugArtifactDirectory.empty())
 		{
@@ -59,7 +82,7 @@ ShaderCookOutput ShaderArtifactPublication::Publish(
 			files.push_back(std::move(debugPublication));
 			result.debugManifestPath = files.back().PublishedPath;
 		}
-		ShaderCookCancellation::ThrowIfRequested(settings.cancellationSignalPath);
+		ThrowIfShaderCookCancelled(settings.cancellationSignalPath);
 		std::string error;
 		if (!Files::TryPublishFileSet(files, error))
 		{

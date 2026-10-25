@@ -9,11 +9,4 @@
 struct ShaderCompileResult;
 struct ShaderCookPipelinePlan;
 
-class GlobalShaderCooker final
-{
-public:
-	ShaderCookResult CookAll(const ShaderCookSettings& settings = {}, const ToolWorkProgressCallback& progress = {}) const;
-
-private:
-	static void PrepareShaderProducts(ShaderCookPipelinePlan& plan, std::span<ShaderCompileResult> compileResults);
-};
+ShaderCookResult CookGlobalShaders(const ShaderCookSettings& settings = {}, const ToolWorkProgressCallback& progress = {});

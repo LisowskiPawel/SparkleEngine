@@ -121,7 +121,7 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 
 	std::wstring wSourcePath = Strings::ToWide(std::string_view{request.VirtualSourcePath});
 	std::wstring wEntryPoint = Strings::ToWide(std::string_view{request.EntryPoint});
-	std::wstring wTargetProfile = Strings::ToWide(std::string_view{ShaderCompileProfile::BuildTargetProfile(request)});
+	std::wstring wTargetProfile = Strings::ToWide(std::string_view{BuildShaderTargetProfile(request)});
 	std::vector<std::wstring> wDefines;
 	std::vector<LPCWSTR> args;
 
@@ -137,7 +137,7 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 	}
 	if (IsSpirVTarget(request.Target))
 	{
-		SpirVBindingNormalizer::Normalize(bytecode, request.DescriptorBindingRemaps);
+		NormalizeSpirVBindings(bytecode, request.DescriptorBindingRemaps);
 	}
 
 	ShaderReflection reflection = IsSpirVTarget(request.Target) ? ExtractSpirVReflection(bytecode, request.Stage)
@@ -289,11 +289,11 @@ void DxcShaderBackend::BuildCompileArguments(
 	if (IsSpirVTarget(request.Target))
 	{
 		outArgs.push_back(L"-spirv");
-		if constexpr (ShaderCompileProfile::SpirVUseDirectXBufferLayout)
+		if constexpr (SpirVUseDirectXBufferLayout)
 		{
 			outArgs.push_back(L"-fvk-use-dx-layout");
 		}
-		if constexpr (ShaderCompileProfile::SpirVUseUnknownStorageImageFormat)
+		if constexpr (SpirVUseUnknownStorageImageFormat)
 		{
 			outArgs.push_back(L"-fspv-use-unknown-image-format");
 		}
@@ -444,7 +444,7 @@ ShaderDebugArtifactSet DxcShaderBackend::CaptureDebugArtifacts(
 	ShaderDebugArtifactSet debugArtifacts;
 	debugArtifacts.CompileArguments = BuildDebugArgumentStrings(compileArgs);
 	debugArtifacts.CompilerOutput.assign(compilerOutput);
-	debugArtifacts.Disassembly = IsSpirVTarget(request.Target) ? SpirVDisassembler::Disassemble(bytecode) : ExtractDisassembly(*m_utils.Get(), *m_compiler.Get(), bytecode);
+	debugArtifacts.Disassembly = IsSpirVTarget(request.Target) ? DisassembleSpirV(bytecode) : ExtractDisassembly(*m_utils.Get(), *m_compiler.Get(), bytecode);
 	if (debugArtifacts.Disassembly.empty())
 	{
 		throw Diagnostics::Error("DXC failed to capture disassembly for shader source '" + request.VirtualSourcePath + "'.");

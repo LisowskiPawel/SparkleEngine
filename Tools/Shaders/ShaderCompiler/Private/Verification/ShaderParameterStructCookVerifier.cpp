@@ -10,7 +10,9 @@
 
 #include <format>
 
-void ShaderParameterStructCookVerifier::Verify(const ShaderCompileJob& job, const CookedStageBuild& compiledStage, ShaderDebugArtifactSet* debugArtifacts)
+static void WriteSkippedReport(ShaderDebugArtifactSet* debugArtifacts, std::string_view reason);
+
+void VerifyCookedShaderParameters(const ShaderCompileJob& job, const CookedStageBuild& compiledStage, ShaderDebugArtifactSet* debugArtifacts)
 {
 	if (!job.Request.ParameterStruct.has_value())
 	{
@@ -18,7 +20,7 @@ void ShaderParameterStructCookVerifier::Verify(const ShaderCompileJob& job, cons
 		return;
 	}
 
-	const ShaderParameterStructVerificationResult verificationResult = ShaderParameterStructVerifier::Verify(
+	const ShaderParameterStructVerificationResult verificationResult = VerifyShaderParameterStruct(
 	    *job.Request.ParameterStruct,
 	    compiledStage.reflection,
 	    job.Request.UnitKind == ShaderCompileUnitKind::Library);
@@ -33,13 +35,13 @@ void ShaderParameterStructCookVerifier::Verify(const ShaderCompileJob& job, cons
 		throw Diagnostics::Error(
 		    std::format(
 		        "SC2001 {} parameter-struct '{}' verification failed: {}",
-		        ShaderCookDiagnostics::FormatJobContext(job, compiledStage.backendName, job.Request.Target),
+		        FormatShaderCompileJob(job, compiledStage.backendName, job.Request.Target),
 		        job.Request.ParameterStruct->Name,
 		        verificationResult.mismatches.front()));
 	}
 }
 
-void ShaderParameterStructCookVerifier::WriteSkippedReport(ShaderDebugArtifactSet* debugArtifacts, std::string_view reason)
+static void WriteSkippedReport(ShaderDebugArtifactSet* debugArtifacts, std::string_view reason)
 {
 	if (debugArtifacts == nullptr)
 	{

@@ -73,7 +73,7 @@ namespace ShaderCompileJobExecutor
 		}
 		catch (const Diagnostics::Error& error)
 		{
-			const std::string jobContext = ShaderCookDiagnostics::FormatJobContext(job, backend->GetBackendName(), job.Request.Target);
+			const std::string jobContext = FormatShaderCompileJob(job, backend->GetBackendName(), job.Request.Target);
 			throw Diagnostics::Error(std::format("Failed to compile {} - {}", jobContext, error.what()));
 		}
 

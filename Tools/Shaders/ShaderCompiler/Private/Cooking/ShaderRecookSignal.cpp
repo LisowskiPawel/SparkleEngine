@@ -1,4 +1,4 @@
-﻿#include "PCH.h"
+#include "PCH.h"
 
 #include "Cooking/ShaderRecookSignal.h"
 
@@ -9,7 +9,7 @@
 
 #include <chrono>
 
-void ShaderRecookSignal::Write(const std::filesystem::path& mapReadPath, const std::filesystem::path& libraryReadPath, const std::filesystem::path& signalStoragePath)
+void WriteShaderRecookSignal(const std::filesystem::path& mapReadPath, const std::filesystem::path& libraryReadPath, const std::filesystem::path& signalStoragePath)
 {
 	std::vector<std::uint8_t> mapBytes;
 	std::vector<std::uint8_t> libraryBytes;

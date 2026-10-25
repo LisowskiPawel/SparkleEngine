@@ -87,7 +87,7 @@ CompiledShader SlangShaderBackend::Compile(const ShaderCompileRequest& request)
 	std::vector<std::uint8_t> bytecode = ExtractBytecode(*program.get(), diagnostics);
 	if (IsSpirVTarget(request.Target))
 	{
-		SpirVBindingNormalizer::Normalize(bytecode, request.DescriptorBindingRemaps);
+		NormalizeSpirVBindings(bytecode, request.DescriptorBindingRemaps);
 	}
 
 	ShaderReflection reflection = ExtractReflection(request, *program.get(), bytecode, diagnostics);
@@ -121,7 +121,7 @@ Slang::ComPtr<slang::ISession> SlangShaderBackend::CreateSession(const ShaderCom
 
 	slang::TargetDesc targetDesc{};
 	targetDesc.format = MapTarget(request.Target);
-	targetDesc.profile = m_globalSession->findProfile(ShaderCompileProfile::GetSlangTargetProfileName(request.Target));
+	targetDesc.profile = m_globalSession->findProfile(GetSlangTargetProfileName(request.Target));
 	if (targetDesc.format == SLANG_TARGET_UNKNOWN || targetDesc.profile == SLANG_PROFILE_UNKNOWN)
 	{
 		throw Diagnostics::Error("Slang backend does not support requested shader target");
@@ -137,11 +137,9 @@ Slang::ComPtr<slang::ISession> SlangShaderBackend::CreateSession(const ShaderCom
 	{
 		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::EmitSpirvDirectly, {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}};
 		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanUseEntryPointName, {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}};
-		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::ForceDXLayout, {slang::CompilerOptionValueKind::Int, ShaderCompileProfile::SpirVUseDirectXBufferLayout, 0, nullptr, nullptr}};
+		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::ForceDXLayout, {slang::CompilerOptionValueKind::Int, SpirVUseDirectXBufferLayout, 0, nullptr, nullptr}};
 
-		targetOptions[targetOptionCount++] = {
-		    slang::CompilerOptionName::DefaultImageFormatUnknown,
-		    {slang::CompilerOptionValueKind::Int, ShaderCompileProfile::SpirVUseUnknownStorageImageFormat, 0, nullptr, nullptr}};
+		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::DefaultImageFormatUnknown, {slang::CompilerOptionValueKind::Int, SpirVUseUnknownStorageImageFormat, 0, nullptr, nullptr}};
 	}
 	else if (request.EnableDebugInfo)
 	{
@@ -262,7 +260,7 @@ ShaderReflection SlangShaderBackend::ExtractReflection(const ShaderCompileReques
 			    "Slang failed to produce reflection layout for target '" + std::string{GetShaderTargetName(request.Target)} + "' source '" + request.VirtualSourcePath + "' entry '"
 			    + request.EntryPoint + "' - " + diagnostics);
 		}
-		reflection = SlangReflectionExtractor::Extract(*layout, request.Stage);
+		reflection = ExtractSlangReflection(*layout, request.Stage);
 	}
 
 	return reflection;
@@ -333,7 +331,7 @@ std::vector<std::string> SlangShaderBackend::BuildDebugArgumentStrings(const Sha
 	args.push_back("-target");
 	args.push_back(IsSpirVTarget(request.Target) ? "spirv" : "dxil");
 	args.push_back("-profile");
-	args.push_back(ShaderCompileProfile::GetSlangTargetProfileName(request.Target));
+	args.push_back(GetSlangTargetProfileName(request.Target));
 	args.push_back(request.EnableOptimizations ? "-O3" : "-O0");
 	args.push_back(request.EnableDebugInfo ? "-g2" : "-g0");
 	if (!IsSpirVTarget(request.Target) && request.EnableDebugInfo)
@@ -344,11 +342,11 @@ std::vector<std::string> SlangShaderBackend::BuildDebugArgumentStrings(const Sha
 	{
 		args.push_back("-emit-spirv-directly");
 		args.push_back("-fvk-use-entrypoint-name");
-		if constexpr (ShaderCompileProfile::SpirVUseDirectXBufferLayout)
+		if constexpr (SpirVUseDirectXBufferLayout)
 		{
 			args.push_back("-fvk-use-dx-layout");
 		}
-		if constexpr (ShaderCompileProfile::SpirVUseUnknownStorageImageFormat)
+		if constexpr (SpirVUseUnknownStorageImageFormat)
 		{
 			args.push_back("-default-image-format-unknown");
 		}
@@ -368,7 +366,7 @@ ShaderDebugArtifactSet SlangShaderBackend::CaptureDebugArtifacts(
 	artifacts.PreprocessedSource = request.SourceCode;
 	if (IsSpirVTarget(request.Target))
 	{
-		artifacts.Disassembly = SpirVDisassembler::Disassemble(bytecode);
+		artifacts.Disassembly = DisassembleSpirV(bytecode);
 	}
 	else
 	{

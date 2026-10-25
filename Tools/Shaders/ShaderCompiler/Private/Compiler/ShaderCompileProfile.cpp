@@ -32,7 +32,7 @@ static std::uint32_t GetProfileShaderModelMinor(ShaderTarget target) noexcept
 	}
 }
 
-const char* ShaderCompileProfile::GetShaderModelProfileName(ShaderTarget target)
+const char* GetShaderModelProfileName(ShaderTarget target)
 {
 	switch (target)
 	{
@@ -57,7 +57,7 @@ const char* ShaderCompileProfile::GetShaderModelProfileName(ShaderTarget target)
 	}
 }
 
-const char* ShaderCompileProfile::GetSpirVProfileName(ShaderTarget target)
+const char* GetSpirVProfileName(ShaderTarget target)
 {
 	switch (target)
 	{
@@ -72,12 +72,12 @@ const char* ShaderCompileProfile::GetSpirVProfileName(ShaderTarget target)
 	}
 }
 
-const char* ShaderCompileProfile::GetSlangTargetProfileName(ShaderTarget target)
+const char* GetSlangTargetProfileName(ShaderTarget target)
 {
 	return IsSpirVTarget(target) ? GetSpirVProfileName(target) : GetShaderModelProfileName(target);
 }
 
-std::string ShaderCompileProfile::BuildTargetProfile(const ShaderCompileRequest& request)
+std::string BuildShaderTargetProfile(const ShaderCompileRequest& request)
 {
 	std::string profile;
 	profile.reserve(8);

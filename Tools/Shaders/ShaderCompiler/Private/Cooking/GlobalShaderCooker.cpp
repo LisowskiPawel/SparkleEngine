@@ -12,30 +12,10 @@
 
 #include <span>
 
-void GlobalShaderCooker::PrepareShaderProducts(ShaderCookPipelinePlan& plan, std::span<ShaderCompileResult> compileResults)
-{
-	for (std::size_t jobIndex = 0; jobIndex < plan.jobs.size(); ++jobIndex)
-	{
-		const ShaderCompileJob& job = plan.jobs[jobIndex];
-		const ShaderCookDesc& shader = plan.shaders[job.ShaderIndex];
-		ShaderCompileResult& compiled = compileResults[jobIndex];
-		if (compiled.ShaderType != job.Request.ShaderType || compiled.Target != job.Request.Target || compiled.InputHash != job.InputHash)
-		{
-			throw Diagnostics::Error("Shader compile result does not match its immutable job identity.");
-		}
-		plan.shaderOutputs[job.ShaderIndex].push_back(
-		    ShaderCookProduct{
-		        .shaderTypeId = shader.shaderTypeId,
-		        .target = compiled.Target,
-		        .features = shader.features,
-		        .rayTracing = shader.rayTracing,
-		        .parameterLayout = shader.parameterLayout,
-		        .bindingRemaps = job.Request.DescriptorBindingRemaps,
-		        .compiled = std::move(compiled.Output)});
-	}
-}
 
-ShaderCookResult GlobalShaderCooker::CookAll(const ShaderCookSettings& settings, const ToolWorkProgressCallback& progress) const
+
+
+ShaderCookResult CookGlobalShaders(const ShaderCookSettings& settings, const ToolWorkProgressCallback& progress)
 {
 	ShaderCookResult result;
 	result.outputDirectory = Filesystem::GetCookedShaderRootPath();
@@ -44,7 +24,7 @@ ShaderCookResult GlobalShaderCooker::CookAll(const ShaderCookSettings& settings,
 		progress({.Action = "Planning shader cook"});
 	}
 	ShaderBackendPool backendPool;
-	ShaderCookPipelinePlan plan = ShaderCookPlanBuilder::Build(settings, backendPool, progress);
+	ShaderCookPipelinePlan plan = BuildShaderCookPlan(settings, backendPool, progress);
 	result.compileJobCount = plan.jobs.size();
 	result.selectedShaderCount = plan.shaders.size();
 	if (plan.jobs.empty() && plan.removedShaderTypeCount == 0)
@@ -64,7 +44,7 @@ ShaderCookResult GlobalShaderCooker::CookAll(const ShaderCookSettings& settings,
 	std::vector<ShaderCompileResult> compileResults;
 	if (!plan.jobs.empty())
 	{
-		compileResults = ShaderCompileBatch::Execute(settings, plan.jobs, totalWork, progress);
+		compileResults = CompileShaderBatch(settings, plan.jobs, totalWork, progress);
 	}
 	if (progress)
 	{
@@ -72,13 +52,12 @@ ShaderCookResult GlobalShaderCooker::CookAll(const ShaderCookSettings& settings,
 	}
 	PrepareShaderProducts(plan, compileResults);
 
-	ShaderCookCancellation::ThrowIfRequested(settings.cancellationSignalPath);
+	ThrowIfShaderCookCancelled(settings.cancellationSignalPath);
 	if (progress)
 	{
 		progress({.Action = "Publishing cooked shaders", .Completed = totalWork - 1, .Total = totalWork});
 	}
-	const bool replaceCompleteCatalog = settings.shaderId.empty() && settings.changedVirtualPaths.empty();
-	result.output = ShaderArtifactPublication::Publish(plan, compileResults, settings, result.outputDirectory, replaceCompleteCatalog);
+	result.output = PublishShaderArtifacts(plan, compileResults, settings, result.outputDirectory);
 	if (progress)
 	{
 		progress({.Action = "Cooked shaders published", .Completed = totalWork, .Total = totalWork});
