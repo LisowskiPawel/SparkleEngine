@@ -19,7 +19,7 @@
 #include <vector>
 #include <wrl/client.h>
 
-// DXC backend used privately by GlobalShaderCooker.
+// DXC backend used privately by CookGlobalShaders.
 // Produces both DXIL and SPIR-V via DXC's `-spirv` mode.
 class DxcShaderBackend final : public IShaderBackend
 {

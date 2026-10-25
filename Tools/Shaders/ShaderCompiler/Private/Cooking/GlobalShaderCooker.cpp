@@ -12,9 +12,6 @@
 
 #include <span>
 
-
-
-
 ShaderCookResult CookGlobalShaders(const ShaderCookSettings& settings, const ToolWorkProgressCallback& progress)
 {
 	ShaderCookResult result;
