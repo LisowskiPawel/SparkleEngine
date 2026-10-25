@@ -192,11 +192,13 @@ A complete neutral binding layout plus type-correct writes becomes backend descr
 | Make indexed binding capability-gated | Unsupported devices never enter a path they cannot execute | Feature availability varies by adapter and needs requested-versus-active reporting |
 | Retain descriptors by GPU completion | Prevents stale native references | Delayed work can retain heap/pool capacity and must remain bounded |
 
+Descriptor operation ownership was reconciled on 2026-10-25. Frame admission names descriptor allocation/table/view reclamation in the existing order. D3D12 view dispatch selects focused render-target, depth, texture SRV/UAV and buffer SRV/UAV writers; each owns its native descriptor fields and validation. Vulkan descriptor snapshots, table identity, pool capacity and retirement state remain under their existing owners.
+
 ### Descriptor Binding: Acceptance Criteria
 
 #### Vulkan Recording-Pool Capacity
 
-`VulkanBindingLayoutCompiler` derives each set's per-descriptor-type demand from the final deduplicated native layout bindings, including immutable samplers. `VulkanBindingLayout` retains that immutable allocation metadata; the recording binding owner passes a borrowed span to `VulkanRecordingDescriptorPool`. Renderer shader names, material limits and scene policy do not enter the pool.
+`CompileVulkanBindingLayout` derives each set's per-descriptor-type demand from the final deduplicated native layout bindings, including immutable samplers. `VulkanBindingLayout` retains that immutable allocation metadata; the recording binding owner passes a borrowed span to `VulkanRecordingDescriptorPool`. Renderer shader names, material limits and scene policy do not enter the pool.
 
 A recording pool checks each page's remaining descriptors and 256-set capacity before native allocation, then grows by another page when needed. The page limit is not a recording-wide draw limit. Pages are sized for actual set demand and reset only after submission retirement. Unused pages may be replaced for larger layouts; used pages remain live. Vulkan leases do not expose a fixed contiguous descriptor-page capacity: their native pools can grow during recording. Unexpected native creation/allocation/reset failures are fatal.
 

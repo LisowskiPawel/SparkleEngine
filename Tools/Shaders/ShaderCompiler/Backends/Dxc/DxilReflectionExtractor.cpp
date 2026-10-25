@@ -301,11 +301,9 @@ static void ReflectVertexInputs(ID3D12ShaderReflection& shader, UINT count, Shad
 	}
 }
 
-ShaderReflection ExtractDxilReflection(IDxcUtils& utils, IDxcResult* result, std::span<const std::uint8_t> bytecode, ShaderStage stage)
+ShaderReflection ExtractDxilReflection(IDxcUtils& utils, IDxcResult* result, ShaderStage stage)
 {
 	ShaderReflection reflection;
-
-	(void) bytecode;
 
 	Microsoft::WRL::ComPtr<IDxcBlob> reflectionBlob;
 	auto shaderReflection = OpenShaderReflection(utils, result, reflectionBlob);

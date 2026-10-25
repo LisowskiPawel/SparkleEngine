@@ -2,10 +2,8 @@
 
 #include "ShaderReflection.h"
 
-#include <vector>
 #include <cstdint>
 #include <span>
-#include <string>
 
 // SPIR-V -> ShaderReflection extractor backed by SPIRV-Reflect.
 // SPIRV-Reflect symbols stay confined to the compiler's SPIR-V implementation.

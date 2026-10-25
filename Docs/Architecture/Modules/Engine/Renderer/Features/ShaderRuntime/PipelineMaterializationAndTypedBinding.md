@@ -54,7 +54,7 @@ The [Shader Program Catalog](ShaderProgramCatalog.md) owns exact program members
 
 Typed pass structures declare direct scalar/vector/matrix values, shared global uniform buffers, the existing per-object material data, texture/buffer SRV/UAVs, samplers, acceleration structures, push constants, and raster attachments. Direct values use automatic HLSL packing and instance-owned byte storage; reflected offsets and sizes are checked during cooking, and their layout hash participates in typed signatures. Per-pass and per-feature authored uniform payloads are excluded. Each execution authors fresh pass parameters after scene/view preparation: allocate, assign resources and current values through `parameters->`, then dispatch/draw. There is no separately registered default/view/history refresh phase. The graph owns each instance at a stable address through setup, compilation, and joined CPU recording; the next execution clears CPU pass declarations and parameters while graph-generation resources and histories remain alive. Copying and moving parameter instances are forbidden because bindings reference their fields and packed storage. Native ray-tracing shader tables are reused for the exact materialized pipeline and scene-plan generation and retire with the graph after all used GPU queues complete. The cooked parameter signature and runtime `PassParameterLayout` must match the registration and active map entry.
 
-`PassBinder` has graphics, compute, and ray domains. It can bind a full compiled layout or named subsets and resolves:
+Binding ownership was reconciled on 2026-10-25 against `c02956f3` plus the scoped working tree. `PassBinder.cpp` exposes `BindGraphicsPassParameters`, `BindComputePassParameters` and `BindRayTracingPassParameters`; `PassBindingOperations.cpp` implements layout validation, subset matching, compiled-kind selection and command binding. The former static facade is removed. The same full-layout and named-subset paths resolve:
 
 - uniform data through frame upload allocation;
 - graph textures/buffers through current SRV/UAV descriptor resolution;
@@ -62,9 +62,11 @@ Typed pass structures declare direct scalar/vector/matrix values, shared global 
 - shared/unique sampler tables through the descriptor service;
 - explicit address/table/push-constant overrides where the contract requires native or externally supplied bindings.
 
-High-level scene and presentation composition read the prepared frame by reference; the frame-graph builder carries no frame/view state, view mode, or viewport request. Visualization composition selects one product family, scene composition encloses Lit reconstruction, and presentation composition chooses the signal domain. Lower pass authoring receives the selected operation's actual inputs; ordinary parameter assignments read the prepared `RenderView`. The scene graph rebuild key includes the mode and real-time lighting pass availability, so changes rebuild the applicable graph. Feature eligibility is resolved at its consuming owner; CVar-derived reconstruction booleans are not transported through frame settings or pass signatures.
+High-level scene and presentation composition read the prepared frame by reference; the frame-graph builder carries no frame/view state, view mode, or viewport request. Visualization composition selects one product family, scene composition encloses Lit reconstruction, and presentation composition chooses the signal domain. Lower pass authoring receives the selected operation's actual inputs; ordinary parameter assignments read the prepared `RenderView`. Declarations, setup and compilation run for each executed frame; retained resource generations and view-history identity follow the [frame-graph owner](../FrameExecution/FrameGraphAndScheduling.md#rebuild-and-invalidation). Feature eligibility is resolved at its consuming owner; CVar-derived reconstruction booleans are not transported through frame settings or pass signatures.
 
 Missing bindings, incompatible value kinds, attachment-as-SRV misuse, wrong array cardinality, unresolved resources/descriptors, absent required overrides, unknown named bindings, layout mismatch, or unsupported compiled binding type are fatal contract violations. There is no silent null binding policy.
+
+`BuildShaderPipelineParameterLayout` is the canonical multi-program layout operation; the single-program helper uses it. Field validation and merging stay in the layout implementation, while `GetDefaultShaderVisibility` owns default stage visibility. There is no second namespaced build entry point. Layout ordering, visibility unions, packed-value metadata and signatures retain their existing contract.
 
 ## Runtime Materialization Matrix
 
@@ -137,6 +139,6 @@ Primary evidence destination: `REN-E31` in the [Capability Evidence Plan](../../
 - [`PipelineRuntimeLibrary.cpp`](../../../../../../../Engine/Renderer/Private/PipelineRuntime/PipelineRuntimeLibrary.cpp)
 - [`GraphicsPipelineMaterialization.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/GraphicsPipelineMaterialization.cpp)
 - [`RayTracingPipelineRuntime.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/RayTracingPipelineRuntime.cpp)
-- [`PassBinder.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/PassBinder.cpp) and [`PassBinderCommands.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/PassBinderCommands.cpp)
+- [`PassBinder.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/PassBinder.cpp) and [`PassBindingOperations.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/PassBindingOperations.cpp)
 - [`PassParameterSet.cpp`](../../../../../../../Engine/Renderer/Private/ShaderParameters/PassParameterSet.cpp)
 - [`CMakeLists.txt`](../../../../../../../Engine/Renderer/CMakeLists.txt)

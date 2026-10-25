@@ -27,6 +27,8 @@
 
 Source ownership reconciled on 2026-10-06: the five fixed CLI verbs are functions referenced by one immutable descriptor table, which also owns usage text. Dispatch no longer allocates command objects or a polymorphic registry; argument parsing, cook execution, diagnostics, and exit-code policy remain in their existing owners.
 
+Reflection ownership was reconciled on 2026-10-25 against `c02956f3` plus the scoped working tree. DXIL, DXIL-library and SPIR-V extraction use direct functions that coordinate native acquisition and focused metadata-family operations. DXIL reflection bytes remain owned by the extraction entry point; SPIR-V module lifetime encloses all extraction. Conversion, member layout, resource identity, stage metadata and diagnostics retain their existing semantics. Backend-registration storage and profile mapping use local functions without static-only class shells. These source changes do not establish full compiler/backend or publication acceptance.
+
 ## Read This Page
 
 - **Use the tool:** [Command-line surface](#command-line-surface) and [supported compiler targets](#authored-languages-compiler-backends-and-targets).

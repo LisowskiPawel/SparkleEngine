@@ -20,7 +20,7 @@
 
 // DXIL -> ShaderReflection extractor for compiled DXC binaries.
 // DXC and D3D12 reflection symbols stay confined to Backends/Dxc/.
-ShaderReflection ExtractDxilReflection(IDxcUtils& utils, IDxcResult* result, std::span<const std::uint8_t> bytecode, ShaderStage stage);
+ShaderReflection ExtractDxilReflection(IDxcUtils& utils, IDxcResult* result, ShaderStage stage);
 ShaderReflection ExtractDxilLibraryReflection(IDxcUtils& utils, IDxcResult* result, std::string_view entryPoint);
 
 CookedShaderResourceKind MapDxilResourceKind(D3D_SHADER_INPUT_TYPE type, D3D_SRV_DIMENSION dim);

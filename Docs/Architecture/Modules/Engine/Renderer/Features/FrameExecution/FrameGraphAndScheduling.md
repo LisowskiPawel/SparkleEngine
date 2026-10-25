@@ -84,6 +84,8 @@ Queue existence does not prove useful overlap. When any non-graphics queue is us
 
 [`FrameGraphResourceCommands`](../../../../../../../Engine/Renderer/Private/FrameGraph/Execution/FrameGraphResourceCommands.cpp) implements raster attachment binding, copies, clears, unordered-access lookup, and native texture-view selection over graph-owned resource metadata/accesses. `FrameGraph` owns declarations, resource lifetime, and the texture lookup used by UI/capture; it exposes no duplicate recording-command surface. Descriptor validation, copy compatibility, clear values, queue/barrier planning, and recording/submission lifetimes retain their existing rules. Scoped CPU plan comparisons and compilation do not close native GPU, output-equivalence, or lifetime acceptance, and do not change readiness.
 
+Resource preparation ownership was reconciled on 2026-10-25 against `c02956f3` plus the scoped working tree. Import synchronization selects color, depth or buffer view operations; each operation owns required descriptors and view ownership flags. Texture-history preparation separates usage discovery, resource reset, allocation and previous/current binding. Generation changes, frame-slot selection and commit timing retain their existing order. Compilation frontiers, queue/barrier planning and recording algorithms remain in their current owners. The resource-command hardware-interface lookup remains private to the one compiled-binding operation that needs it.
+
 | Resource class | Meaning | Lifetime rule |
 | --- | --- | --- |
 | Transient | Graph-created intermediate texture/buffer | Compiler derives first/last use and may assign an aliased physical block; alias barriers separate occupants. |

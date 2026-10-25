@@ -142,7 +142,7 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 
 	ShaderReflection reflection = IsSpirVTarget(request.Target) ? ExtractSpirVReflection(bytecode, request.Stage)
 	    : request.UnitKind == ShaderCompileUnitKind::Library    ? ExtractDxilLibraryReflection(*m_utils.Get(), result.Get(), request.EntryPoint)
-	                                                            : ExtractDxilReflection(*m_utils.Get(), result.Get(), bytecode, request.Stage);
+	                                                            : ExtractDxilReflection(*m_utils.Get(), result.Get(), request.Stage);
 
 	ShaderDebugArtifactSet debugArtifacts;
 	if (request.CaptureDebugArtifacts)

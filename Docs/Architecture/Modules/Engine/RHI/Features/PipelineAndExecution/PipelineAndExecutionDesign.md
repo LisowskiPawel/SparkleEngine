@@ -178,6 +178,8 @@ A complete validated neutral descriptor—shader programs, reflected bindings, p
 - The current graphics contract binds vertex and pixel programs. Geometry/hull/domain and mesh/task vocabulary is not an active pipeline route.
 - Shader authoring macros/types are compile-time contract vocabulary; the ShaderCompiler owns offline compilation/publication and Renderer owns program selection/reload.
 
+Native construction ownership was reconciled on 2026-10-25 against `c02956f3` plus the scoped working tree. Pipeline creation coordinates validation, shader/layout preparation and native materialization; focused functions lower vertex input, raster, blend, depth/stencil and sample state. Referenced arrays and shader modules stay alive through the synchronous native creation call. Backend binding-layout compilation directly coordinates parameter collection and descriptor-set/root-signature creation; the pipeline service selects its concrete compile function at compile time. Stateless implementation classes are removed; resource-owning pipeline/layout classes remain. This source separation adds no native GPU or performance acceptance.
+
 ### Pipeline and Shader Contracts: Design Decisions And Tradeoffs
 
 | Decision | Benefit | Cost or risk |
