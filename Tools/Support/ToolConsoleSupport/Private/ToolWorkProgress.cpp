@@ -1,4 +1,5 @@
 #include "ToolWorkProgress.h"
+#include "ToolWorkProgressEvent.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -24,8 +25,8 @@ static std::string FormatProgressItem(std::string_view action, std::string_view 
 		phase += ": ";
 		phase += item;
 	}
-	std::replace(phase.begin(), phase.end(), '\r', ' ');
-	std::replace(phase.begin(), phase.end(), '\n', ' ');
+	std::ranges::replace(phase, '\r', ' ');
+	std::ranges::replace(phase, '\n', ' ');
 	return phase;
 }
 

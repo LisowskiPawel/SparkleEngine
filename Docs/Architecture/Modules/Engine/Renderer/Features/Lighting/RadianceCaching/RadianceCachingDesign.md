@@ -1,6 +1,6 @@
 # Radiance Caching
 
-[Docs](../../../../../../../../README.md) / [Up](../LightingDesign.md)
+[Docs](../../../../../../../README.md) / [Up](../LightingDesign.md)
 
 **Status:** selected post-release target; no SHaRC or NRC integration is claimed.
 
@@ -17,4 +17,4 @@ The first SHaRC profile queries diffuse continuation only; misses continue norma
 
 Use one selected cache per frame. Cache Off, SHaRC and later NRC are mutually exclusive intent in the existing indirect settings owner, with requested/active state visible. An unsupported or broken explicitly selected cache must be reported before successful publication; never label an uncached frame as cache output. Cache misses are normal transport events, distinct from provider failure.
 
-Evidence lives under the existing graphics-workload artifact root in `radiance-cache/sharc/` and `radiance-cache/nrc/`, with original candidate/configuration/resource/shader/SDK joins. Local reports own the new `AC-SHARC-*` and `AC-NRC-*` verdicts; these are later portfolio targets, not new first-release FCR families or readiness points. Existing [workload protocols](../../../../../../../../Acceptance/GraphicsWorkloads.md) govern scene rights, raw comparisons, repeats, observer effects and uncertainty.
+Evidence lives under the existing graphics-workload artifact root in `radiance-cache/sharc/` and `radiance-cache/nrc/`, with original candidate/configuration/resource/shader/SDK joins. Local reports own the new `AC-SHARC-*` and `AC-NRC-*` verdicts; these are later portfolio targets, not new first-release FCR families or readiness points. Existing [workload protocols](../../../../../../../Acceptance/GraphicsWorkloads.md) govern scene rights, raw comparisons, repeats, observer effects and uncertainty.

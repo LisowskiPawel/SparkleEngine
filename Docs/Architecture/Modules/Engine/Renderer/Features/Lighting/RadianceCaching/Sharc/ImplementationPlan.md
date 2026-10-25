@@ -1,9 +1,9 @@
 # SHaRC Staged Delivery
 
-[Docs](../../../../../../../../../README.md) / [Up](SharcDesign.md)
+[Docs](../../../../../../../../README.md) / [Up](SharcDesign.md)
 
 **Status:** selected target sequence; discovery and prerequisite gates remain open. No stage is executed by this plan.
-**Contract:** [design, semantics, measurement and local acceptance](SharcDesign.md); [Roadmap](../../../../../../../../../Strategy/Roadmap.md) owns global order.
+**Contract:** [design, semantics, measurement and local acceptance](SharcDesign.md); [Roadmap](../../../../../../../../Strategy/Roadmap.md) owns global order.
 
 ## Work This Plan
 
@@ -11,7 +11,7 @@ Production starts after REL-11 and qualified indirect continuation/reference inp
 
 ## Stage Contract
 
-Every stage inspects HEAD/status, applicable AGENTS.md, live producers/consumers/lifetime/build membership and concurrent edits. Apply [Change Integration](../../../../../../../../../Engineering/Workflow/ChangeIntegration.md), [Change Lifecycle](../../../../../../../../../Engineering/Workflow/ChangeLifecycle.md), relevant Renderer/RHI/Tools standards and the [Stage Source-Style Gate](../../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), including authored readability/spacing review after formatting. Discovery/no-source work records justified source-style N/A.
+Every stage inspects HEAD/status, applicable AGENTS.md, live producers/consumers/lifetime/build membership and concurrent edits. Apply [Change Integration](../../../../../../../../Engineering/Workflow/ChangeIntegration.md), [Change Lifecycle](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md), relevant Renderer/RHI/Tools standards and the [Stage Source-Style Gate](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), including authored readability/spacing review after formatting. Discovery/no-source work records justified source-style N/A.
 
 Ledger every external feature hook and material copy; default to existing semantic inputs, one feature-local owner, zero new public types and no framework. Each stage removes replaced state/paths/selectors/dependencies in the same slice and checks retained consumers. A zero-deletion stage names why no replaced path exists. Temporary probes stay local and are removed before handoff; keep valuable source/commands/results as ignored evidence.
 

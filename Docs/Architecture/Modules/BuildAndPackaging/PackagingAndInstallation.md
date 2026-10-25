@@ -296,11 +296,11 @@ BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,Revi
 | Export | Local fixed projection of verified package identity and counts; preview digest binds consent. Originals stay local. [User command and privacy limits](../../../../SUPPORT.md#preview-and-export-local-diagnostics). |
 | Symbols | Shipping MSVC emits `/Zi`/full PDBs into the separate symbol root. DbgHelp checks PE/PDB GUID-age; embedded paths are excluded. Archive-to-companion hashes and native source attribution are separate checks. |
 | Crash/hang | User-reported categories; automatic collection unavailable. Native incident rehearsal remains required. |
-| Review | Pawel Lisowski reviews each proposed release/replacement and closeout. Unresolved S0/S1 blocks approval. Results are local review records; publication and aggregate acceptance are separate. |
+| Review | Pawel Lisowski owns release review; the author or agent may execute it and must name the actual reviewer. Unresolved S0/S1 blocks approval. Local review, publication and aggregate acceptance are separate. |
 
 Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply; interrupted replacement and public withdrawal remain unproved.
 
-Invoke `ReviewRelease.ps1` with `-PackageRoot`, `-ArchivePath`, `-ArchiveSha256`, `-LedgerPath`, `-Decision Approve|Replace|Withdraw` and an existing local `-OutputDirectory`. Replacement also needs `-ReplacementRoot`, `-ReplacementArchive`, `-ReplacementSha256`, `-ReplacementLedgerPath` and a state policy.
+Invoke `ReviewRelease.ps1` with `-PackageRoot`, `-ArchivePath`, `-ArchiveSha256`, `-LedgerPath`, `-Reviewer` (the actual author/agent), `-Decision Approve|Replace|Withdraw` and an existing local `-OutputDirectory`. Replacement also needs `-ReplacementRoot`, `-ReplacementArchive`, `-ReplacementSha256`, `-ReplacementLedgerPath` and a state policy.
 
 Ledger: `ArchiveSha256` and `Defects` with `Id: ISSUE-<number>`, `Severity: S0..S3`, `Disposition: Unresolved|Resolved`. Resolved entries require `EvidencePath` to a bounded receipt with matching `ArchiveSha256`, `DefectId` and `Status: PASS`. Only its hash is exported.
 

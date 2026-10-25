@@ -133,6 +133,8 @@ Start this program after release stabilization (`REL-11`). Follow the technical 
 | **M3 — Causal classical studies** | Technical handoff: one analyzer, three complementary studies, causal incident/replay packet and local failure/quality/native proof. Documented reproduction remains open for M6. | [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#remaining-stages) — `WS-S0–3`; [four subject plans](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/StudyProtocols.md#owned-evidence-folders). This handoff admits M4 without requiring the later neural case. |
 | **M4 — Owned data and model** | Qualify the necessary diffuse-indirect component measurement, then one scene-separated dataset and fixed residual CNN/training recipe. Beauty is not a training label. | [Neural plan](../Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#remaining-stages) — `NG-S0–2`; ratify [semantics](../Architecture/CrossModule/NeuralGraphics/Semantics.md) and actual environment/rights/numeric gates before production |
 | **M5 — Model to shader** | Correct exported operators and FP32 shaders, one runtime, then measured optimization. | [Neural plan](../Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#remaining-stages) — `NG-S3–5`; conformance precedes optimization |
+| **M5R - Required renderer depth** | Complete the selected lighting/material/reconstruction/media/cache/texture/AS extensions; SHaRC fully done before NRC implementation. Existing source does not close this milestone. | [Ordered renderer-depth wave](#required-renderer-depth-wave) and detailed subject plans; no automatic first-release expansion |
+
 | **M6 — Evaluation and transfer** | Qualify the neural technical/package candidate, assemble the three cases, execute one documented rehearsal covering the required study and neural results, then close their adoption cells. | Neural `NG-S6a` -> portfolio stages `2/3` -> `NG-S6b` and [study WS-S4](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s4---close-documented-study-reproduction); [portfolio plan](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md) owns the actual exercise. |
 | **M7 — Direction and observed influence** | Technical challenge/decision record, a second usage context, author/agent before/after explanation task and justified revision/retest. Required for the stronger principal-oriented portfolio packet; no new engine subsystem. | [Technology Transfer KT-0..3](../Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md), [review criteria](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md#binary-review-criteria), `PGD-09`; external participation is optional; no external result is inferred |
 
@@ -148,7 +150,8 @@ flowchart LR
     Content --> Classical[M3 studies and incident packet]
     Classical --> Data[M4 owned data and model]
     Data --> Kernels[M5 checked runtime]
-    Kernels --> Evaluation[NG-S6a local evaluation/package]
+    Kernels --> Depth[M5R required renderer depth]
+    Depth --> Evaluation[NG-S6a local evaluation/package]
     Evaluation --> Cases[Assemble three cases]
     Cases --> Reproduce[M6 documented rehearsal]
     Reproduce --> StudyClose[WS-S4 adoption closure]
@@ -159,6 +162,27 @@ flowchart LR
 
 M3 requires `AC-WS-01..03` and the local input/failure/cleanup portion of `AC-WS-04`; its rehearsal portion stays open. `NG-S6a` requires all local neural criteria, quality metrics and package/failure checks; the rehearsal part of `AC-NG-08` stays open. Portfolio assembly accepts these qualified technical packets with their pending adoption cells. Stage 3 performs the real exercise, after which WS-S4/NG-S6b reuse only the applicable original observations. Full study/neural acceptance still requires every cell; this ordering changes no criterion or threshold.
 
+## Required Renderer Depth Wave
+
+M5R is selected by the 2026-10-25 rendering-depth decision. Execute after M5's checked owned runtime and the existing correct classical handoff; feasibility/source research can prepare independently. Keep one production slice active. Later material profiles do not invalidate or silently relabel the frozen base-domain dataset/reference; evaluate expanded-domain behavior separately.
+
+| Order | Required delivery and actual plan | Exit that unlocks the next item |
+| --- | --- | --- |
+| 1 | [Direct lighting](../Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md) DIR-1..8: accepted estimator/reuse plus mixed analytic, emissive-triangle and environment lighting. [Indirect](../Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md) IND-1..6/8: explicit paths, GRIS shifts and admitted multi-bounce diffuse/rough-specular transport. Reuse valid release proof. | Independent raw/PDF/energy/reuse/failure checks and qualified domain; no reconstruction hiding incorrect transport. ReGIR and advanced guiding remain conditional. |
+| 2 | [Materials/shading](../Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/ImplementationPlan.md) MAT-S0..5: base lineage and model proof, anisotropic GGX and one dielectric coat. | Evaluation/sample/PDF/energy and raster/ray/API proof; independently qualified extended reference domain. |
+| 3 | [Denoising/upscaling](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md) REC-S0..5: reuse complete release SR/RR qualification, deliver one RELAX diffuse/specular temporal path. | Actual guide/hit-distance/motion/extent semantics, raw and temporal quality, native/lifetime/value/package proof. The owned CNN remains distinct. |
+| 4 | [PTLAS](../Architecture/Modules/Engine/Renderer/Features/RayTracing/PartitionedTlas/ImplementationPlan.md) PTLAS-S0..5. | Supported sparse writes, migration, BLAS/SBT replacement and partition translation; classic parity, useful total cost and advertised native/provider support. |
+| 5 | [Volumetrics](../Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md) VOL-S0..5, Q0/Q1/Q2 only. | Physical coefficients/phase, analytic/reference transmittance/in-scatter, bounded local froxels, temporal/native/value/product proof. |
+| 6 | [SHaRC](../Architecture/Modules/Engine/Renderer/Features/Lighting/RadianceCaching/Sharc/ImplementationPlan.md) SHARC-S0..5. | All AC-SHARC-01..05, including dynamics, whole-product value, package and documented reproduction. This is the first required radiance cache. |
+| 7 | [NRC](../Architecture/Modules/Engine/Renderer/Features/Lighting/RadianceCaching/Nrc/ImplementationPlan.md) NRC-S0..5; production is blocked until SHaRC is fully done. | Real online learning/coupling, common-domain comparison against SHaRC/uncached transport, adaptation/bias/native/value/package/reproduction proof. |
+| 8 | [NTC](../Architecture/CrossModule/NeuralGraphics/TextureCompression/ImplementationPlan.md) NTC-S0..5. | Real cooked latent material and on-sample decode, filtering/LOD/material quality, memory-versus-compute frontier and delivery proof. |
+
+This order is a finite renderer specialization, not a new general engine. The [depth-to-evidence map](FeatureDeliveryCatalog.md#selected-rendering-depth) gives the technical questions and proof owners. Every stage has deletion/narrowing work and an addition budget. Cache Off, raw outputs, BCn materials and classic TLAS are necessary positive controls, not stale paths to delete.
+
+M5R closes each subject's local technical/product/rehearsal criteria before M6 assembly. Use the existing documented author/agent rehearsal policy; external participation is optional and must be credited honestly. SHaRC's required reproduction occurs before NRC production and does not wait for final case assembly. Reuse those original observations in M6 where applicable, avoiding a prerequisite cycle or a separate adoption platform.
+
+Extend the same three headline cases with short depth sections and original artifact links. Do not create a new case/project for every SDK. Qualify individual features first, then the selected combined hero configuration; do not build the full cartesian product of every lobe/cache/denoiser/AS mode. A required unsupported tuple or failed value gate stays open/blocked rather than disappearing from the target.
+
 ## Conditional And Excluded Work
 
 Beyond the required M0–M7 evidence, select additional work only for a demonstrated need:
@@ -168,7 +192,7 @@ Beyond the required M0–M7 evidence, select additional work only for a demonstr
 
 **Not selected:** native Linux support; AMD hardware acquisition or AMD specialist profiling; new physics/networking/audio/scripting systems; installer/updater; stable plugin SDK; broad Editor or ML frameworks. Additional hardware needs its own admitted question; [profiling guidance](../Engineering/Verification/ExternalProfiling.md) records available routes.
 
-Geometry-cache animation, volumetrics, frame generation and meshlets/DGC/SER remain outside the selected release. Their [geometry-cache](../Architecture/CrossModule/GeometryCacheAnimation/ImplementationPlan.md), [volumetric](../Architecture/Modules/Engine/Renderer/Features/Lighting/VolumetricLighting/ImplementationPlan.md) and [research](Research/RenderingReferenceExamples.md) documents preserve future context.
+Geometry-cache animation, frame generation and meshlets/DGC/SER remain outside the selected program. Volumetric Q0/Q1/Q2, SHaRC then NRC, NTC and PTLAS are selected later portfolio work in M5R. Physical atmosphere, clouds, imported volume formats, arbitrary ML frameworks and further cache/denoiser families remain unselected. These choices change no current release/default or readiness verdict.
 
 ## Dependency And Work-In-Progress Rule
 
@@ -218,6 +242,8 @@ Use this section when opening or closing an iteration. The everyday task order i
 | M3 | `WL-04`, `PGD-03/04/05` |
 | M4 | `WL-05`, `PGD-06` |
 | M5 | `WL-06`, `PGD-07` |
+| M5R | Selected renderer depth; existing PGD-02/03/06..08 and subject-local AC-SHARC/NRC/NTC/PTLAS/MAT/REC/VOL proof |
+
 | M6 | `WL-07/08`, `CASE-*`, `PGD-08` |
 | M7 | `PGD-09`, existing `CASE-05` / `WL-08` transfer records; no new workload identity |
 
@@ -275,8 +301,8 @@ A bounded simplification/retirement may instead name the selected path it preser
 | Minimal supporting engine | Current camera/world/animation/publication, Core/Tasks, selected edits and source/content/package paths only as needed by the approved demonstrations and professional proof. Narrow or retire unused/private placeholder surface instead of completing it. |
 | Launcher exception | Keep a polished, useful presentation/reproduction front door: selected scenes/previews, readiness, build/cook/run, progress/cancel and recovery. Reuse current operation/settings authority; no general workflow or installer/updater product. |
 | Diagnostics | Use qualified crash tooling and selected external capture routes. Internal stat catalogs, workspace, GPU visualizer, history service and dashboard are unselected; a specific missing measurement may justify only its smallest producer/export path. |
-| Later evidence | Bistro/San Miguel, complementary causal studies, one qualified diffuse-indirect component/model-to-shader slice and three cases reuse release mechanisms and accepted artifacts. M7 reuses those results for direction/transfer evidence. No release-map/material-domain expansion or new integration platform follows. |
-| Unselected breadth | Geometry cache, volumetrics/clouds, frame generation, GPU-driven geometry, extra platforms/hardware, general authoring tools and ML frameworks remain unselected after release until a separate consumer and value decision admits a bounded slice. |
+| Later evidence | Bistro/San Miguel, causal studies, the owned diffuse-indirect model and the selected M5R renderer-depth wave feed the same three cases. New material profiles receive qualified reference domains; existing release maps, labels and thresholds keep their identities. M7 reuses the results for direction/transfer. |
+| Unselected breadth | Geometry cache, atmosphere/clouds/imported volumes, frame generation, GPU-driven geometry, extra platforms/hardware, general authoring tools and ML frameworks remain unselected until a separate consumer/value decision admits a bounded slice. |
 
 Deletion and scope reduction are valid delivery outcomes. Apply [scope and retirement decisions](../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision) when an existing feature lacks a selected consumer; reconcile its classifications, selectors, dependencies and checks before removing it. Do not replace the old blanket feature-preservation rule with arbitrary deletion or a line-count target. Supported required behavior and evidence remain binding until their scope owner changes the promise.
 

@@ -4,6 +4,7 @@ param(
     [Parameter(Mandatory)][string] $ArchivePath,
     [Parameter(Mandatory)][string] $ArchiveSha256,
     [Parameter(Mandatory)][string] $LedgerPath,
+    [Parameter(Mandatory)][ValidatePattern('^[\p{L}\p{Nd}][\p{L}\p{Nd} ._-]{0,127}$')][string] $Reviewer,
     [Parameter(Mandatory)][ValidateSet('Approve','Replace','Withdraw')][string] $Decision,
     [Parameter(Mandatory)][string] $OutputDirectory,
     [string] $ReplacementRoot = '',
@@ -85,7 +86,7 @@ try
     $blocking = @(if ($Decision -eq 'Replace') { $nextReview.Blocking } else { $review.Blocking })
     $status = if ($blocking.Count -gt 0 -and $Decision -ne 'Withdraw') { 'BLOCKED' } else { 'PASS' }
     $record = [ordered]@{
-        Reviewer = 'Pawel Lisowski'; Version = $manifest.Version; Revision = $manifest.Revision
+        Reviewer = $Reviewer; Version = $manifest.Version; Revision = $manifest.Revision
         SourceInputsSha256 = $manifest.SourceInputsSha256; ArchiveSha256 = $ArchiveSha256
         LedgerSha256 = $review.LedgerSha256
         ReviewedUtc = [DateTime]::UtcNow.ToString('o'); Decision = $Decision; Status = $status

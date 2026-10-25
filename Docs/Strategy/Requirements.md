@@ -111,6 +111,12 @@ The source archive assigns each individual source bullet to one or more IDs. At 
 
 No supplied responsibility or qualification is outside the matrix.
 
+## Selected Rendering Specialization
+
+The [depth-to-evidence map](FeatureDeliveryCatalog.md#selected-rendering-depth) binds PGE-02..13 to path-tracing/reference depth, direct/indirect estimator proof, base plus anisotropic/layered materials, complete SR/RR and one RELAX denoiser, bounded volumetric lighting, SHaRC fully delivered before NRC, NTC on-sample material decode and supported PTLAS. These are explicit local targets; existing code or named SDK presence is insufficient. Keep the owned denoiser's data/model/kernel work separate from vendor integration.
+
+[M5R](Roadmap.md#required-renderer-depth-wave) stages these later features after release and the checked owned-runtime chain. Every target needs mathematical/semantic, native/lifetime, dynamic/failure, quality/time/memory and documented reproduction evidence under its own plan. The local feature criteria add no first-release FCR families, automatic readiness or guarantee of a principal job title.
+
 ## Non-Repository Requirements
 
 SparkleEngine cannot prove these alone:

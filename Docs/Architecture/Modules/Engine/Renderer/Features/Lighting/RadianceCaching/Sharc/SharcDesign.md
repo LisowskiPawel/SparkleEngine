@@ -1,6 +1,6 @@
 # NVIDIA SHaRC Delivery Contract
 
-[Docs](../../../../../../../../../README.md) / [Up](../RadianceCachingDesign.md) / [Implementation](ImplementationPlan.md)
+[Docs](../../../../../../../../README.md) / [Up](../RadianceCachingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** selected target and open `SHARC-D0`; not implemented or measured.
 **Inspected:** 2026-10-25, local source baseline `154c6e883e51689f12feab95646795cc7cbfcdd1`; current PTLAS and lighting code do not establish SHaRC support.

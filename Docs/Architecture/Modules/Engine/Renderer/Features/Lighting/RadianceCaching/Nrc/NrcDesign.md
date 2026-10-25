@@ -1,13 +1,13 @@
 # NVIDIA NRC Delivery Contract
 
-[Docs](../../../../../../../../../README.md) / [Up](../RadianceCachingDesign.md) / [Implementation](ImplementationPlan.md)
+[Docs](../../../../../../../../README.md) / [Up](../RadianceCachingDesign.md) / [Implementation](ImplementationPlan.md)
 
 **Status:** selected later target; `NRC-D0` open; implementation blocked until SHaRC is fully accepted.
 **Reason:** `PGE-02/03/05/08..13`; compare neural radiance caching against an understood, delivered classical cache and uncached transport.
 
 ## Product And Attribution
 
-An engineer selects NRC in the existing indirect-lighting path, obtains actual online-trained cache-assisted indirect output, and can explain when its quality, response and total cost justify it over SHaRC. NVIDIA owns the SDK network/training/inference internals. Sparkle owns the transport coupling, data semantics, scheduling, native integration, failure behavior and comparative evidence. The [owned neural denoiser](../../../../../../../../CrossModule/NeuralGraphics/NeuralGraphicsDesign.md) remains required evidence for personally implemented model/training/kernel work.
+An engineer selects NRC in the existing indirect-lighting path, obtains actual online-trained cache-assisted indirect output, and can explain when its quality, response and total cost justify it over SHaRC. NVIDIA owns the SDK network/training/inference internals. Sparkle owns the transport coupling, data semantics, scheduling, native integration, failure behavior and comparative evidence. The [owned neural denoiser](../../../../../../../CrossModule/NeuralGraphics/NeuralGraphicsDesign.md) remains required evidence for personally implemented model/training/kernel work.
 
 Initial scope: the same diffuse continuation as SHaRC, followed by one rough-specular profile after the shared-domain proof. Exclude arbitrary model loading, online model persistence, distributed training, custom training infrastructure and changes to the raw Reference estimator. NRC is a biased acceleration mode, not ground truth.
 
@@ -29,7 +29,7 @@ Freeze these as a reviewed rule-to-shader/API ledger before implementation:
 
 ## Owners And Budget
 
-Existing indirect lighting owns the feature and typed lobe results; FrameGraph owns ordering/lifetimes. API-specific SDK interop stays inside dedicated existing-style external-provider adapters; native handles do not enter Renderer feature headers or general RHI policy. Use the accepted [Renderer/RHI boundary](../../../../../../../../Decisions/RendererRhiBoundary.md).
+Existing indirect lighting owns the feature and typed lobe results; FrameGraph owns ordering/lifetimes. API-specific SDK interop stays inside dedicated existing-style external-provider adapters; native handles do not enter Renderer feature headers or general RHI policy. Use the accepted [Renderer/RHI boundary](../../../../../../../Decisions/RendererRhiBoundary.md).
 
 Budget: reuse the SHaRC-era selection/composition/status seams, existing transport/material/light data and frame completion. One feature-local context per admitted View/device; byte-account context/workspace/model state and replacement overlap. Zero new generic tensor graphs, cache registry, scheduler, shadow Scene or configuration framework. Native callback/interop additions need a consumer, lifetime, failure and defect-detecting check.
 

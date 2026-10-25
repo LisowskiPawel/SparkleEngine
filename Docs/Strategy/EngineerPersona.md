@@ -38,7 +38,7 @@ Be able to explain the complete path from renderer intent through frame-graph sc
 
 Own features across CPU preparation, scene/resource data, pass scheduling, shader execution, temporal state, backends, configuration, fallback, debugging, and quality/performance validation.
 
-Depth matters more than feature count. One path-traced or neural feature that survives realistic workloads, both supported APIs, failure cases, and a skeptical review is stronger than many incomplete toggles.
+The selected depth covers path tracing, direct and indirect estimators, materials/shading, upscaling/denoising, bounded volumetrics, SHaRC before NRC, NTC and PTLAS. Each needs mathematical reasoning, independent raw controls, native lifetime/failure proof and quality/time/memory evidence on its advertised tuples. Existing code does not satisfy this target by presence. Follow the [depth-to-evidence map](FeatureDeliveryCatalog.md#selected-rendering-depth) and ordered M5R wave; do not inflate adjacent engine systems.
 
 ### Shader and Kernel Craft
 
@@ -56,7 +56,7 @@ Use captures, counters, traces, disassembly, controlled experiments, and serial/
 
 Understand data, training/evaluation boundaries, model graphs, operators, precision, export, deployment, inference scheduling, quality metrics, generalization, and failure cases well enough to translate a bounded model into efficient GPU work.
 
-Keep offline experimentation separate from runtime ownership. A real neural feature has a deterministic artifact, validated operator path, classical baseline/fallback, measured quality/latency/memory, and an honest capability boundary. Empty tensor frameworks, mock models, provider enums, and disconnected microbenchmarks are not completion.
+Keep offline experimentation separate from runtime ownership. Offline neural features have immutable identified artifacts; online NRC has identified SDK/configuration and evolving state with measured adaptation/reset behavior. Both need a validated execution path, classical comparison, measured quality/latency/memory and an honest capability boundary. Keep personally owned data/model/kernel evidence distinct from vendor integration. Empty tensor frameworks, mock models, provider enums, and disconnected microbenchmarks are not completion.
 
 ### Debugging and Developer Technology
 

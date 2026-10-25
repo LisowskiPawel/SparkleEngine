@@ -14,7 +14,7 @@
 
 Develop SparkleEngine as a compact renderer-first engine and evidence platform for principal-level graphics engineering. Prioritize a few complete, reproducible vertical slices over feature count, framework breadth, or documentation volume.
 
-The [public engineering study](Research/README.md#public-engineering-study) grounds that direction in actual role descriptions, affiliation-qualified engineers and exact public source examples. The selected professional focus is rendering/developer technology with GPU-system depth: trustworthy transport, causal native analysis, owned neural shader work and documented reproduction. Compiler/driver research, GPU-driven geometry and further platforms remain separate conditional specialties.
+The [public engineering study](Research/README.md#public-engineering-study) grounds that direction in actual role descriptions, affiliation-qualified engineers and exact public source examples. The selected professional focus is rendering/developer technology with GPU-system depth: trustworthy transport, causal native analysis, owned neural shader work and documented reproduction. The selected [renderer-depth wave](Roadmap.md#required-renderer-depth-wave) adds qualified materials, temporal denoising/upscaling, bounded volumetrics, SHaRC then NRC, NTC and supported PTLAS. Compiler/driver research, GPU-driven geometry and further platforms remain separate conditional specialties.
 
 The engine should make it easy for a reviewer to answer:
 
