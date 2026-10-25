@@ -25,5 +25,4 @@ void RenderView::InitializeFromRequest(const RenderViewBuildRequest& request) no
 	outputExtent = request.OutputExtent;
 	displaySettings = ResolvedViewportDisplaySettings::Resolve(request.ViewportRequest.Exposure);
 	camera = request.Input.Camera;
-
 }

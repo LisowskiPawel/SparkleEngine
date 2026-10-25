@@ -86,10 +86,6 @@ private:
 	D3D12RecordingResourceUseToken BeginResourceTracking(RhiResourceHandle resource, bool coordinatorRecording) noexcept;
 	void EndResourceTracking(D3D12RecordingResourceUseToken use, RhiSubmissionToken submissionToken) noexcept;
 	bool BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept;
-	RhiCapabilities BuildCapabilities() const noexcept;
-	RhiBackendDiagnosticsSupport BuildBackendDiagnosticsSupport() const noexcept;
-	RhiBackendMemorySupport BuildBackendMemorySupport() const noexcept;
-	RhiFormatSupport QueryFormatSupport(PixelFormat format) const noexcept;
 
 	std::unique_ptr<D3D12InteropService> m_interopService;
 	std::unique_ptr<D3D12CaptureService> m_captureService;

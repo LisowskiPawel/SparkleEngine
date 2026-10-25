@@ -20,7 +20,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 
 ## Where We Are And What Is Next
 
-**Next: [PD-1, remaining journeys](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells).** Startup-close is repaired. Qualify the final Editor error overlay and affected concurrent Renderer/RHI changes, then finish loading-close, input/DPI and remaining editing/failure checks. [Recorded source checks](../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain their candidate identity. Final PD-3 archive and PD-4 recovery/replacement follow product qualification; lighting quality remains in renderer/release gates.
+**Next: [PD-1, remaining journeys](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells).** Startup-close is repaired. Editor error visibility is repaired. Freeze/rebuild the changing Renderer/RHI inputs, then finish the remaining loading-close, input/DPI and editing/failure checks. [Recorded source checks](../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain their candidate identity. Final PD-3 archive and PD-4 recovery/replacement follow product qualification; lighting quality remains in renderer/release gates.
 
 | Current work | Design / acceptance reference | Implementation stages |
 | --- | --- | --- |

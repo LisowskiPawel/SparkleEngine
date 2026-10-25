@@ -54,7 +54,7 @@ Source ownership reconciled on 2026-10-06: Core's `Assets/DefaultTexture.h` owns
 
 ### Texture Cooker Implementation Ownership
 
-Source ownership reconciled on 2026-10-25: `TextureAssetCooker::Cook` composes request validation, source loading, memory reservation, transformation, and output publication. `TextureCookMemoryLimiter` derives the reservation from the loaded pixel payload and retains its existing lease lifetime. Private `Cooking/CookedTextureAssetWriter` owns mip/header encoding, byte writes, temporary-file cleanup, and final publication. The output schema, slice/mip order, transform policies, and transaction boundary are unchanged; build or bounded byte comparisons do not close the broader deterministic-cook or package gates.
+Source ownership reconciled on 2026-10-25: `CookTextureAsset` composes request validation, source loading, memory reservation, transformation, and output publication. `TextureCookMemoryLimiter` derives the reservation from the loaded pixel payload and retains its existing lease lifetime. Private `Cooking/CookedTextureAssetWriter` owns mip/header encoding, byte writes, temporary-file cleanup, and final publication. The output schema, slice/mip order, transform policies, and transaction boundary are unchanged; build or bounded byte comparisons do not close the broader deterministic-cook or package gates.
 
 ## Texture Cooking
 

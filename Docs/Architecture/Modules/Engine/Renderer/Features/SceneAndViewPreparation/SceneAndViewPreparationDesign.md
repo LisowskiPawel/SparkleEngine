@@ -6,7 +6,7 @@ Sections: [Scene Preparation](#scene-preparation) / [View Preparation](#view-pre
 
 **Status:** current feature-family dossier; source-backed, not runtime, concurrency, visibility, memory, or release evidence
 
-**Verified:** 2026-09-06 against committed `master` revision `d236da11`; `Engine/Renderer` is unchanged from the earlier `8414b5dc` source audit
+**Verified:** feature-family baseline 2026-09-06 at revision `d236da11`; preparation implementation ownership rechecked 2026-10-25 against revision `984ac1c59` plus the working tree. Feature-local runtime claims retain their evidence boundaries below.
 
 **Scope:** `REN-SCENE-01` through `REN-SCENE-10` plus scene/view portions of `REN-OWN-02` through `REN-OWN-04`; routes the three distinct owners that turn immutable world data into prepared scene, prepared view, and published GPU-scene state
 

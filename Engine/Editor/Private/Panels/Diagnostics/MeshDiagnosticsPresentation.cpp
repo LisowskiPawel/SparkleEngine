@@ -2,24 +2,15 @@
 
 #include "Panels/Diagnostics/MeshDiagnosticsPresentation.h"
 
-#include "Core/Public/Json/JsonReader.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
-#include "Core/Public/Strings/StringUtils.h"
 #include "Panels/Diagnostics/PanelDiagnosticsFormatting.h"
 #include "Panels/Diagnostics/MeshDiagnosticMetadataCatalog.h"
 
-#include <filesystem>
 #include <format>
-#include <fstream>
 #include <optional>
 #include <string>
-#include <string_view>
-#include <unordered_map>
-#include <utility>
 
 namespace MeshDiagnosticsPresentation
 {
-
 	std::string FormatRuntimeId(std::uintptr_t id)
 	{
 		return std::format("0x{:016X}", static_cast<std::uint64_t>(id));

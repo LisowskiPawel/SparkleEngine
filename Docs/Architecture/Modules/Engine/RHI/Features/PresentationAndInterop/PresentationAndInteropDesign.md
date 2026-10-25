@@ -43,6 +43,8 @@ Presentation owns swapchain images, ImGui owns UI command lowering, and interop 
 
 Source ownership reconciled on 2026-10-25: the hardware-interface aggregates compose focused services. `D3D12BackBufferPresentation` and `VulkanBackBufferPresentation`, under each backend's private `SwapChain` directory, own target setup, native rendering, and presentation transitions; the Vulkan owner also retains per-image layout tracking. `RhiPresentationServiceAdapter` contains the one begin/end pairing invariant and owns its narrow native implementation by value. It no longer borrows the whole hardware-interface aggregate. Recording context and frame-slot lifetime remain explicit borrows from the device lifecycle; no second frame index is stored.
 
+Native format/feature queries live in `Device/D3D12Capabilities.cpp` and `Device/VulkanCapabilities.cpp`; common RHI `Device/RhiCapabilitySupport.cpp` owns their shared diagnostics and memory-support projection. The aggregates publish those results without encoding native query mechanics.
+
 `VulkanDeviceBootstrap.cpp` creates the native device, `VulkanRhiQueues.cpp` creates queue wrappers, and `VulkanRhiDiagnostics.cpp` owns bootstrap naming and diagnostic formatting. This placement and target-build evidence do not establish native presentation, resize, validation, or backend parity acceptance.
 
 ## Shared Risks

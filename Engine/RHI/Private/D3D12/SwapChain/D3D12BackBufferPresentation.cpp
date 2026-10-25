@@ -8,8 +8,6 @@
 #include "D3D12/Commands/D3D12CommandRecordingContext.h"
 #include "D3D12/Commands/D3D12RenderCommandList.h"
 
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_backBufferPresentationLogger, "RHI.D3D12.Presentation");
-
 D3D12BackBufferPresentation::D3D12BackBufferPresentation(D3D12Rhi& rhi, D3D12SwapChain& swapChain, D3D12DescriptorService& descriptors, D3D12ResourceService& resources) noexcept :
     m_rhi(&rhi),
     m_swapChain(&swapChain),
@@ -49,28 +47,29 @@ RhiResourceHandle D3D12BackBufferPresentation::GetBackBufferResource() const noe
 	return RhiResourceHandle{m_swapChain->GetCurrentResource()};
 }
 
-RenderCommandList& D3D12BackBufferPresentation::BeginBackBufferRendering() noexcept
+RhiCpuDescriptorHandle D3D12BackBufferPresentation::BindBackBuffer(RenderCommandList& commandList) noexcept
 {
 	RhiResourceHandle presentTexture{m_swapChain->GetCurrentResource()};
-	RenderCommandList& commandList = GetGraphicsCommandList();
 	commandList.TransitionResource(presentTexture, ResourceState::Present, ResourceState::RenderTarget);
 	m_descriptorService->BindGlobalDescriptorState(commandList);
 
 	const RhiCpuDescriptorHandle renderTargetView = GetBackBufferRenderTargetView();
 	commandList.SetRenderTarget(renderTargetView);
 
-	return commandList;
+	return renderTargetView;
 }
 
 void D3D12BackBufferPresentation::BeginPresentRenderPass(RhiClearColorView clearColor) noexcept
 {
-	RenderCommandList& commandList = BeginBackBufferRendering();
-	commandList.ClearRenderTarget(GetBackBufferRenderTargetView(), clearColor);
+	RenderCommandList& commandList = GetGraphicsCommandList();
+	const RhiCpuDescriptorHandle renderTargetView = BindBackBuffer(commandList);
+	commandList.ClearRenderTarget(renderTargetView, clearColor);
 }
 
 void D3D12BackBufferPresentation::BeginPresentOverlayPass() noexcept
 {
-	(void) BeginBackBufferRendering();
+	RenderCommandList& commandList = GetGraphicsCommandList();
+	(void) BindBackBuffer(commandList);
 }
 
 void D3D12BackBufferPresentation::EndPresentRenderPass() noexcept

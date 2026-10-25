@@ -5,10 +5,9 @@
 #include "Commands/RenderCommandList.h"
 #include "D3D12/Commands/D3D12CommandRecordingContext.h"
 #include "D3D12/Capture/D3D12CaptureService.h"
-#include "D3D12/Device/D3D12ExternalFeatureInteropCapabilities.h"
+#include "D3D12/Device/D3D12Capabilities.h"
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/SwapChain/D3D12SwapChain.h"
-#include "D3D12/D3D12TypeConversions.h"
 #include "D3D12/Diagnostics/D3D12RenderDiagnostics.h"
 #include "D3D12/Descriptors/D3D12DescriptorHeap.h"
 #include "D3D12/Descriptors/D3D12DescriptorHeapManager.h"
@@ -26,7 +25,6 @@
 #include "Presentation/RhiPresentationServiceAdapter.h"
 #include "D3D12/SwapChain/D3D12BackBufferPresentation.h"
 #include "Pipeline/RhiPipelineServiceAdapter.h"
-#include "Shaders/ShaderTarget.h"
 
 #include <d3d12.h>
 
@@ -51,7 +49,7 @@ D3D12RenderHardwareInterface::D3D12RenderHardwareInterface(
 	m_rayTracingServices = std::make_unique<D3D12RayTracingServices>(rhi, memoryAllocator, *m_resourceService, rhi.GetNvapiRayTracingProvider());
 
 	m_diagnostics = CreateD3D12RenderDiagnostics(rhi, swapChain.GetMaximumFramesInFlight());
-	m_capabilities = BuildCapabilities();
+	m_capabilities = BuildD3D12Capabilities(*m_rhi, *m_swapChain, *m_diagnostics);
 	m_imguiBackend = std::make_unique<D3D12ImGuiBackend>(*this);
 }
 
@@ -65,117 +63,6 @@ D3D12RecordingResourceUseToken D3D12RenderHardwareInterface::BeginResourceTracki
 void D3D12RenderHardwareInterface::EndResourceTracking(D3D12RecordingResourceUseToken use, RhiSubmissionToken submissionToken) noexcept
 {
 	m_resourceService->EndResourceTracking(use, submissionToken);
-}
-
-RhiCapabilities D3D12RenderHardwareInterface::BuildCapabilities() const noexcept
-{
-	RhiCapabilities capabilities{};
-	const D3D_FEATURE_LEVEL featureLevel = m_rhi->GetDeviceFeatureLevel();
-	const std::uint32_t featureLevelMajor = featureLevel >= D3D_FEATURE_LEVEL_12_0 ? 12u : featureLevel >= D3D_FEATURE_LEVEL_11_0 ? 11u : 0u;
-
-	const std::uint32_t featureLevelMinor = featureLevel == D3D_FEATURE_LEVEL_12_2 ? 2u
-	    : featureLevel == D3D_FEATURE_LEVEL_12_1                                   ? 1u
-	    : featureLevel == D3D_FEATURE_LEVEL_12_0                                   ? 0u
-	    : featureLevel == D3D_FEATURE_LEVEL_11_1                                   ? 1u
-	    : featureLevel == D3D_FEATURE_LEVEL_11_0                                   ? 0u
-	                                                                               : 0u;
-
-	capabilities.BackendApi = ERhiBackendApi::D3D12;
-	capabilities.RuntimeShaderBinaryFormat = ShaderBinaryFormat::Dxil;
-
-	capabilities.BackendVersion = RhiBackendVersionInfo{
-	    .Semantic = ERhiBackendVersionSemantic::FeatureLevel,
-	    .Major = featureLevelMajor,
-	    .Minor = featureLevelMinor,
-	    .Patch = 0,
-	    .PackedValue = static_cast<std::uint32_t>(featureLevel)};
-
-	capabilities.DescriptorModel = ERhiDescriptorModel::DescriptorTables;
-
-	capabilities.BindingLimits = RhiBindingLimits{
-	    .MaxDescriptorSets = 1,
-	    .MaxShaderResourceDescriptors = D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_2,
-	    .MaxSamplerDescriptors = D3D12_MAX_SHADER_VISIBLE_SAMPLER_HEAP_SIZE,
-	    .MaxDescriptorTableEntries = D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_2,
-	    .MaxPushConstantBytes = 256};
-
-	capabilities.DescriptorIndexing = RhiDescriptorIndexingCapabilities{.SupportsSampledImageArrayNonUniformIndexing = true, .SupportsPartiallyBoundDescriptorArrays = true};
-	capabilities.UploadReadback = RhiUploadReadbackCapabilities{.SupportsBufferUpload = true, .SupportsTextureUpload = true, .SupportsReadback = true};
-
-	capabilities.Presentation = RhiPresentationCapabilities{
-	    .BackBufferCount = m_swapChain->GetBackBufferCount(),
-	    .MaximumFramesInFlight = m_swapChain->GetMaximumFramesInFlight(),
-	    .Throttle = ERhiPresentationThrottle::FrameLatencyWaitableObject};
-
-	for (std::size_t index = 0; index < capabilities.FormatSupport.size(); ++index)
-	{
-		capabilities.FormatSupport[index] = QueryFormatSupport(kRhiCapabilityPixelFormats[index]);
-	}
-	capabilities.Diagnostics = BuildBackendDiagnosticsSupport();
-	capabilities.RayTracing = m_rhi->GetRayTracingCapabilities();
-	D3D12_FEATURE_DATA_D3D12_OPTIONS options{};
-	capabilities.SupportsShaderFloat64 = SUCCEEDED(m_rhi->GetDevice()->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(options))) && options.DoublePrecisionFloatShaderOps != FALSE;
-	capabilities.SupportsMeshShaders = false;
-	capabilities.SupportsTaskShaders = false;
-	capabilities.Queues.Set(ERhiQueueType::Graphics, true, true);
-	capabilities.Queues.Set(ERhiQueueType::Compute, true, true);
-	capabilities.Queues.Set(ERhiQueueType::Copy, true, true);
-	capabilities.SupportsPresent = m_swapChain->GetBackBufferFormat() != PixelFormat::Unknown;
-	capabilities.MemoryAllocator = ERhiMemoryAllocatorBackend::D3D12Managed;
-	capabilities.MemorySupport = BuildBackendMemorySupport();
-	capabilities.ExternalFeatureInterop = BuildD3D12ExternalFeatureInteropCapabilities(m_rhi, m_rhi->GetDevice() != nullptr);
-	return capabilities;
-}
-
-RhiBackendDiagnosticsSupport D3D12RenderHardwareInterface::BuildBackendDiagnosticsSupport() const noexcept
-{
-	const bool validationEnabled = m_rhi->IsValidationEnabled();
-	const RhiDiagnosticsCapabilities diagnosticsCapabilities = m_diagnostics->GetCapabilities();
-
-	return RhiBackendDiagnosticsSupport{
-	    .ValidationEnabled = validationEnabled,
-	    .SupportsDebugLayer = validationEnabled,
-	    .SupportsObjectNames = diagnosticsCapabilities.SupportsObjectNames,
-	    .SupportsGpuEvents = diagnosticsCapabilities.SupportsGpuEvents,
-	    .SupportsTimestampQueries = diagnosticsCapabilities.SupportsTimestampQueries,
-	    .SupportsDebugMessages = diagnosticsCapabilities.SupportsDebugMessages,
-	    .SupportsLiveObjectReports = diagnosticsCapabilities.SupportsLiveObjectReports,
-	    .SupportsCrashDiagnostics = diagnosticsCapabilities.SupportsCrashDiagnostics};
-}
-
-RhiBackendMemorySupport D3D12RenderHardwareInterface::BuildBackendMemorySupport() const noexcept
-{
-	const RenderMemoryDiagnostics* const memoryDiagnostics = m_diagnostics->GetMemoryDiagnostics();
-
-	return RhiBackendMemorySupport{
-	    .SupportsMemoryDiagnostics = memoryDiagnostics != nullptr,
-	    .SupportsBudgetQueries = memoryDiagnostics != nullptr && memoryDiagnostics->SupportsBudgetQueries(),
-	    .SupportsDelayedDestructionTracking = memoryDiagnostics != nullptr && memoryDiagnostics->SupportsDelayedDestructionTracking(),
-	    .SupportsResidencyPressure = memoryDiagnostics != nullptr && memoryDiagnostics->SupportsBudgetQueries()};
-}
-
-RhiFormatSupport D3D12RenderHardwareInterface::QueryFormatSupport(PixelFormat format) const noexcept
-{
-	RhiFormatSupport support{.Format = format};
-	if (format == PixelFormat::Unknown)
-	{
-		return support;
-	}
-
-	D3D12_FEATURE_DATA_FORMAT_SUPPORT data{};
-	data.Format = D3D12TypeConversions::ToDxgiFormat(format);
-	const HRESULT supportResult = m_rhi->GetDevice()->CheckFeatureSupport(D3D12_FEATURE_FORMAT_SUPPORT, &data, sizeof(data));
-	if (data.Format == DXGI_FORMAT_UNKNOWN || FAILED(supportResult))
-	{
-		return support;
-	}
-
-	support.SupportsTexture = (data.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE2D) != 0;
-	support.SupportsShaderResource = (data.Support1 & (D3D12_FORMAT_SUPPORT1_SHADER_LOAD | D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE)) != 0;
-	support.SupportsUnorderedAccess = (data.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE) != 0;
-	support.SupportsRenderTarget = (data.Support1 & D3D12_FORMAT_SUPPORT1_RENDER_TARGET) != 0;
-	support.SupportsDepthStencil = (data.Support1 & D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL) != 0;
-	return support;
 }
 
 std::uint32_t D3D12RenderHardwareInterface::GetCurrentFrameIndex() const noexcept

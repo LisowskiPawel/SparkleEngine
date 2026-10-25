@@ -31,7 +31,7 @@ public:
 	PixelFormat GetPresentColorFormat() const noexcept;
 
 private:
-	RenderCommandList& BeginBackBufferRendering() noexcept;
+	RhiCpuDescriptorHandle BindBackBuffer(RenderCommandList& commandList) noexcept;
 	RenderCommandList& GetGraphicsCommandList() noexcept;
 
 	D3D12Rhi* m_rhi;

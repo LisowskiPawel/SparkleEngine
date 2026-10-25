@@ -4,8 +4,4 @@
 
 class TextureCookMemoryLimiter;
 
-class TextureAssetCooker final
-{
-public:
-	void Cook(const TextureCookRequest& request, TextureCookMemoryLimiter& memoryLimiter) const;
-};
+void CookTextureAsset(const TextureCookRequest& request, TextureCookMemoryLimiter& memoryLimiter);

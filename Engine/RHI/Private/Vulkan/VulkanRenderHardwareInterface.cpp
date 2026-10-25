@@ -2,14 +2,13 @@
 
 #include "Vulkan/VulkanRenderHardwareInterface.h"
 
-#include "Shaders/ShaderTarget.h"
 #include "Vulkan/Capture/VulkanCaptureService.h"
 #include "Vulkan/Commands/VulkanCommandRecordingContext.h"
 #include "Vulkan/Commands/VulkanRenderCommandList.h"
 #include "Vulkan/Descriptors/VulkanDescriptorAllocator.h"
 #include "Vulkan/Descriptors/VulkanDescriptorService.h"
 #include "Vulkan/Device/VulkanRhi.h"
-#include "Vulkan/Device/VulkanExternalFeatureInteropCapabilities.h"
+#include "Vulkan/Device/VulkanCapabilities.h"
 #include "Vulkan/Diagnostics/VulkanRenderDiagnostics.h"
 #include "Vulkan/Interop/VulkanInteropService.h"
 #include "Vulkan/Memory/VulkanGpuMemoryAllocator.h"
@@ -25,11 +24,6 @@
 #include "Vulkan/Samplers/VulkanSamplerLibrary.h"
 #include "Vulkan/SwapChain/VulkanSwapChain.h"
 #include "Vulkan/UI/VulkanImGuiBackend.h"
-#include "Vulkan/VulkanTypeConversions.h"
-
-#include <array>
-
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanRenderHardwareInterfaceLogger, "RHI.Vulkan.Interface");
 
 VulkanRenderHardwareInterface::VulkanRenderHardwareInterface(VulkanRhi& rhi, VulkanSwapChain& swapChain, VulkanGpuMemoryAllocator& memoryAllocator) noexcept :
     m_rhi(&rhi),
@@ -49,7 +43,7 @@ VulkanRenderHardwareInterface::VulkanRenderHardwareInterface(VulkanRhi& rhi, Vul
 	m_imguiBackend = std::make_unique<VulkanImGuiBackend>(*this, *m_descriptorService);
 	m_diagnostics = CreateVulkanRenderDiagnostics(rhi, memoryAllocator);
 	RebuildSwapChainBackBufferViews();
-	m_capabilities = BuildCapabilities();
+	m_capabilities = BuildVulkanCapabilities(*m_rhi, *m_swapChain, *m_diagnostics, m_commandRecordingContext != nullptr);
 }
 
 VulkanRenderHardwareInterface::~VulkanRenderHardwareInterface() noexcept
@@ -167,120 +161,6 @@ RhiRayTracingCapabilities VulkanRenderHardwareInterface::GetRayTracingCapabiliti
 	return m_rayTracingServices->GetCapabilities();
 }
 
-RhiCapabilities VulkanRenderHardwareInterface::BuildCapabilities() const noexcept
-{
-	VkPhysicalDeviceProperties properties{};
-	vkGetPhysicalDeviceProperties(m_rhi->GetPhysicalDevice(), &properties);
-
-	RhiCapabilities capabilities{};
-	capabilities.BackendApi = ERhiBackendApi::Vulkan;
-	capabilities.RuntimeShaderBinaryFormat = ShaderBinaryFormat::SpirV;
-	const std::uint32_t apiVersion = m_rhi->GetAdapterInfo().ApiVersion;
-
-	capabilities.BackendVersion = RhiBackendVersionInfo{
-	    .Semantic = ERhiBackendVersionSemantic::ApiVersion,
-	    .Major = VK_VERSION_MAJOR(apiVersion),
-	    .Minor = VK_VERSION_MINOR(apiVersion),
-	    .Patch = VK_VERSION_PATCH(apiVersion),
-	    .PackedValue = apiVersion};
-
-	capabilities.DescriptorModel = ERhiDescriptorModel::DescriptorSets;
-
-	capabilities.BindingLimits = RhiBindingLimits{
-	    .MaxDescriptorSets = properties.limits.maxBoundDescriptorSets,
-	    .MaxShaderResourceDescriptors = properties.limits.maxDescriptorSetSampledImages + properties.limits.maxDescriptorSetStorageImages + properties.limits.maxDescriptorSetUniformBuffers
-	        + properties.limits.maxDescriptorSetStorageBuffers,
-	    .MaxSamplerDescriptors = properties.limits.maxDescriptorSetSamplers,
-	    .MaxDescriptorTableEntries = properties.limits.maxDescriptorSetSampledImages + properties.limits.maxDescriptorSetStorageImages,
-	    .MaxPushConstantBytes = properties.limits.maxPushConstantsSize};
-
-	capabilities.DescriptorIndexing = RhiDescriptorIndexingCapabilities{
-	    .SupportsSampledImageArrayNonUniformIndexing = m_rhi->GetFeatureStatus().EnabledSampledImageArrayNonUniformIndexing,
-	    .SupportsPartiallyBoundDescriptorArrays = m_rhi->GetFeatureStatus().EnabledPartiallyBoundDescriptorArrays};
-
-	capabilities.UploadReadback = RhiUploadReadbackCapabilities{.SupportsBufferUpload = true, .SupportsTextureUpload = true, .SupportsReadback = true};
-
-	capabilities.Presentation = RhiPresentationCapabilities{
-	    .BackBufferCount = m_swapChain->GetBackBufferCount(),
-	    .MaximumFramesInFlight = m_swapChain->GetMaximumFramesInFlight(),
-	    .Throttle = ERhiPresentationThrottle::SwapChainImageAcquisition};
-
-	for (std::size_t index = 0; index < capabilities.FormatSupport.size(); ++index)
-	{
-		capabilities.FormatSupport[index] = QueryFormatSupport(kRhiCapabilityPixelFormats[index]);
-	}
-	capabilities.Diagnostics = BuildBackendDiagnosticsSupport();
-	capabilities.RayTracing = m_rhi->GetRayTracingCapabilities();
-	capabilities.SupportsShaderFloat64 = m_rhi->GetFeatureStatus().EnabledShaderFloat64;
-	capabilities.SupportsMeshShaders = false;
-	capabilities.SupportsTaskShaders = false;
-	const bool hasComputeQueue = m_rhi->GetQueue(ERhiQueueType::Compute) != VK_NULL_HANDLE;
-	const bool hasCopyQueue = m_rhi->GetQueue(ERhiQueueType::Copy) != VK_NULL_HANDLE;
-	capabilities.Queues.Set(ERhiQueueType::Graphics, true, true);
-	capabilities.Queues.Set(ERhiQueueType::Compute, hasComputeQueue, hasComputeQueue && m_rhi->HasIndependentQueue(ERhiQueueType::Compute));
-	capabilities.Queues.Set(ERhiQueueType::Copy, hasCopyQueue, hasCopyQueue && m_rhi->HasIndependentQueue(ERhiQueueType::Copy));
-	capabilities.SupportsPresent = m_swapChain->GetBackBufferFormat() != PixelFormat::Unknown;
-	capabilities.MemoryAllocator = ERhiMemoryAllocatorBackend::VulkanManaged;
-	capabilities.MemorySupport = BuildBackendMemorySupport();
-	capabilities.ExternalFeatureInterop = BuildVulkanExternalFeatureInteropCapabilities(m_rhi, m_commandRecordingContext != nullptr);
-	return capabilities;
-}
-
-RhiBackendDiagnosticsSupport VulkanRenderHardwareInterface::BuildBackendDiagnosticsSupport() const noexcept
-{
-	const bool validationEnabled = m_rhi->IsValidationEnabled();
-	const RhiDiagnosticsCapabilities diagnostics = m_diagnostics->GetCapabilities();
-
-	return RhiBackendDiagnosticsSupport{
-	    .ValidationEnabled = validationEnabled,
-	    .SupportsDebugLayer = validationEnabled,
-	    .SupportsObjectNames = diagnostics.SupportsObjectNames,
-	    .SupportsGpuEvents = diagnostics.SupportsGpuEvents,
-	    .SupportsTimestampQueries = diagnostics.SupportsTimestampQueries,
-	    .SupportsDebugMessages = diagnostics.SupportsDebugMessages,
-	    .SupportsLiveObjectReports = diagnostics.SupportsLiveObjectReports,
-	    .SupportsCrashDiagnostics = diagnostics.SupportsCrashDiagnostics};
-}
-
-RhiBackendMemorySupport VulkanRenderHardwareInterface::BuildBackendMemorySupport() const noexcept
-{
-	const RenderMemoryDiagnostics* const diagnostics = m_diagnostics->GetMemoryDiagnostics();
-
-	return RhiBackendMemorySupport{
-	    .SupportsMemoryDiagnostics = diagnostics != nullptr,
-	    .SupportsBudgetQueries = diagnostics != nullptr && diagnostics->SupportsBudgetQueries(),
-	    .SupportsDelayedDestructionTracking = diagnostics != nullptr && diagnostics->SupportsDelayedDestructionTracking(),
-	    .SupportsResidencyPressure = diagnostics != nullptr && diagnostics->SupportsBudgetQueries()};
-}
-
-RhiFormatSupport VulkanRenderHardwareInterface::QueryFormatSupport(PixelFormat format) const noexcept
-{
-	RhiFormatSupport support{.Format = format};
-	if (format == PixelFormat::Unknown)
-	{
-		return support;
-	}
-
-	const VkFormat nativeFormat = VulkanTypeConversions::ToVkFormat(format);
-	if (nativeFormat == VK_FORMAT_UNDEFINED)
-	{
-		return support;
-	}
-
-	VkFormatProperties properties{};
-	vkGetPhysicalDeviceFormatProperties(m_rhi->GetPhysicalDevice(), nativeFormat, &properties);
-	const VkFormatFeatureFlags optimal = properties.optimalTilingFeatures;
-
-	support.SupportsTexture = (optimal & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0 || (optimal & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT) != 0
-	    || (optimal & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0;
-
-	support.SupportsShaderResource = (optimal & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0;
-	support.SupportsUnorderedAccess = (optimal & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT) != 0;
-	support.SupportsRenderTarget = (optimal & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT) != 0;
-	support.SupportsDepthStencil = (optimal & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0;
-	return support;
-}
-
 RenderDiagnostics& VulkanRenderHardwareInterface::GetDiagnostics() noexcept
 {
 	return *m_diagnostics;
@@ -370,7 +250,7 @@ void VulkanRenderHardwareInterface::SetCommandRecordingContext(VulkanCommandReco
 {
 	m_commandRecordingContext = &commandRecordingContext;
 	m_presentationService->GetImplementation().SetCommandRecordingContext(commandRecordingContext);
-	m_capabilities = BuildCapabilities();
+	m_capabilities = BuildVulkanCapabilities(*m_rhi, *m_swapChain, *m_diagnostics, m_commandRecordingContext != nullptr);
 }
 
 void VulkanRenderHardwareInterface::ResetTransientFrameResources() noexcept

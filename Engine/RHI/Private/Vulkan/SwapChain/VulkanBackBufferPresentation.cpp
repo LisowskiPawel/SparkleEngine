@@ -11,7 +11,7 @@
 
 #include <algorithm>
 
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_backBufferPresentationLogger, "RHI.Vulkan.Presentation");
+SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_backBufferPresentationLogger, "RHI.Vulkan.Interface");
 
 VulkanBackBufferPresentation::VulkanBackBufferPresentation(VulkanSwapChain& swapChain, VulkanDescriptorService& descriptors, VulkanResourceService& resources, const std::uint32_t& frameIndex) noexcept
     :

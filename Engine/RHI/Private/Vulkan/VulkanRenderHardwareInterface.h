@@ -82,10 +82,6 @@ private:
 	friend class VulkanInteropService;
 	friend class VulkanRenderDeviceServices;
 
-	RhiCapabilities BuildCapabilities() const noexcept;
-	RhiBackendDiagnosticsSupport BuildBackendDiagnosticsSupport() const noexcept;
-	RhiBackendMemorySupport BuildBackendMemorySupport() const noexcept;
-	RhiFormatSupport QueryFormatSupport(PixelFormat format) const noexcept;
 	void PrepareCurrentBackBufferForPresentation(VulkanRenderCommandList& commandList) noexcept;
 	void TransitionCurrentBackBuffer(VkCommandBuffer commandBuffer, ResourceState newState) noexcept;
 	void SetCommandRecordingContext(VulkanCommandRecordingContext& commandRecordingContext) noexcept;

@@ -155,8 +155,7 @@ TaskResult TextureCookBatchRun::CookRequest(std::uint32_t index)
 	TextureSourceComApartment comApartment;
 	comApartment.Initialize();
 
-	TextureAssetCooker cooker;
-	cooker.Cook(stagedRequest, m_memoryLimiter);
+	CookTextureAsset(stagedRequest, m_memoryLimiter);
 	if (m_progress)
 	{
 		const std::size_t completed = ++m_completedRequests;

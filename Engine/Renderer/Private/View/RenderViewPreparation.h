@@ -2,14 +2,11 @@
 
 #include "View/RenderViewVisibility.h"
 #include "Tasks/Public/TaskGraph.h"
-#include "Tasks/Public/TaskTypes.h"
 #include "View/MeshInstanceBatchBuilder.h"
 
 #include <cstddef>
 #include <cstdint>
-#include <vector>
 
-class TaskExecutionContext;
 class TaskExecutor;
 struct PreparedRenderScene;
 class RenderViewState;

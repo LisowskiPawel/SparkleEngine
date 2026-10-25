@@ -2,10 +2,8 @@
 
 #include "View/RenderViewBuilder.h"
 
-#include "Renderer/Public/Viewport/ViewportContracts.h"
 #include "View/RenderView.h"
 #include "View/RenderViewState.h"
-
 #include "View/RenderViewProjection.h"
 
 void BuildRenderView(RenderView& output, RenderViewState& state, const RenderViewBuildRequest& request) noexcept
