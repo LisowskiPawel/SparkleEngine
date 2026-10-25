@@ -6,15 +6,15 @@
 
 **Deliverable:** one unsigned internal Launcher/Editor/Game archive, selected content and self-service recovery. Public rights, publisher certificates, signing and publication remain [FR-07](ImplementationPlan.md#fr-07--publish-and-verify).
 
-**Next:** finish PD-1's loading-close and remaining interaction/editing checks. Startup-close is repaired; eight recorded cells pass. The Editor error-overlay repair is qualified for its recorded binary. Rebuild a stable final source candidate before completing affected Renderer/RHI checks and freezing the next archive. [Recorded checks](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) keep their original identities. Lighting quality remains in renderer/release gates under the [approved boundary](../../../Acceptance/FirstRelease.md#product-plan-and-public-release).
+**Next:** [PD-3: final archive and installed rehearsal](#pd-3--package-and-installation). PD-1 source journeys and PD-2 source operations pass for their recorded inputs. Revalidate only owners changed after those candidates; retain the [approved product/lighting boundary](../../../Acceptance/FirstRelease.md#product-plan-and-public-release).
 
 ## How To Close This Plan
 
 | Stage | Current position | What permits exit |
 | --- | --- | --- |
-| [PD-1](#pd-1--game-and-editor-product-shells) | Recorded frame, startup-close, camera-save and settings/content-failure checks pass; final-source and remaining journeys stay open. | Its four source-workspace checks below pass. |
+| [PD-1](#pd-1--game-and-editor-product-shells) | Source-workspace complete; [candidate reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). | Revalidate affected checks if source, products or content change. Installed portions remain PD-3. |
 | [PD-2](#pd-2--source-build-cook-and-launcher) | Documented source reproduction and operations pass for their recorded inputs. | Reuse those checks; revalidate affected owners when the final source changes. |
-| [PD-3](#pd-3--package-and-installation) | Current assembly/integrity checks pass for `0db84502…`; installed Empty/Cornell and explicit-default failure checks pass locally. | Regenerate after PD-1 repairs; finish seven-map, budget, removal and clean/minimum-machine proof. |
+| [PD-3](#pd-3--package-and-installation) | `d641947e…` assembly passes for PD-1's frozen source. Earlier installed checks retain their own archive identities. | Finish exact-archive seven-map, budget, Qt, removal and clean/minimum-machine proof. |
 | [PD-4](#pd-4--support-incident-response-and-product-closure) | Retained-archive export, symbols and review negatives pass; final self-service/replacement proof remains open. | Self-service, replacement and all six reports pass. |
 
 **Rehearsal:** author/agent runs satisfy the [accepted actor scope](../../../Acceptance/FeatureCompletionReports.md#report-closure-and-review). Clean/minimum-machine checks still apply; record the actual environment.
@@ -33,19 +33,9 @@ Name the failing owner, necessary change, deletion or justified zero-deletion re
 
 **Owners:** [Game](../../Modules/Projects/Showcase/ShowcaseCapabilities.md#fcr-prod-01-game-consumer-contract), [Editor](../../Modules/Engine/Editor/EditorCapabilities.md#fcr-prod-04-editor-contract); `FCR-PROD-01/04`.
 
-**Prerequisite:** matching source, product, cooked content and shader/symbol receipts. No archive is needed for these source-workspace checks.
+**Source-workspace complete:** frames, lifecycle, interaction/failure and editing/isolation pass in the [PD-1 report](../../../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/pd1-source-completion.json). Final replay uses `241ef037` plus the retained patch, source fingerprint `9a1f7d03…`; reused checks retain their original identities. Newer main-branch rendering changes are outside this verdict.
 
-- [x] **Frames:** Launcher activates Empty and each of the seven maps in Game/Editor on D3D12/Vulkan, with the requested identity, expected scene/camera and geometry/material bindings, and a presented frame. Crashes, wrong/missing content, blank frames and false Empty activation fail; lighting quality is qualified in the renderer/release gates. (`AC-PROD01-02`, `AC-PROD04-01`.)
-- [ ] **Lifecycle:** finish observed quit-during-load and final-source startup/idle checks within **5 s Game / 10 s Editor** and the frozen startup budget, with native exits and no orphan/partial writes. Eight startup-close cells and observed delayed-load closes for Game/D3D12 and Editor/both APIs pass for their recorded binaries; Game/Vulkan loading-close remains unqualified. A clean exit without an observed pending load cannot pass loading-close. (`AC-PROD01-01/05`, `AC-PROD04-01`.)
-- [ ] **Interaction/failure:** finish input/focus, 100/200% DPI, unsupported-provider and remaining content/recovery cells. Recorded help/150% resize, settings commit/reset/denial/corruption, Game shared-setting launches and Game content failure/recovery checks pass; Editor startup failure is visible above the workspace. (`AC-PROD01-02/03`, `AC-PROD04-03`.)
-- [ ] **Editing/isolation:** finish stale/rejected edits and cancelled recook/capture; revalidate affected final-source checks. Camera edit -> undo -> redo -> Save -> reload, denied-save/retry and source Game isolation pass for their recorded inputs. Preserve supported transform/visibility/variant edits and read-only asset identity. (`AC-PROD01-04`, `AC-PROD04-02/03/04`.)
-
-**Phase exit:** all four checks pass for their recorded source configuration. Archive and clean-environment portions remain assigned below; a shell repair does not require completing an unrelated rendering research plan.
-
-```text
-Execute only PD-1 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md. Apply the owning execution contract and its Stage Source-Style Gate.
-Apply Delivery Boundary For Every Stage. Complete the next unchecked item, starting with Lifecycle. Record candidate-bound cells, failures, recovery and native exits; update the item/FCR and name the next item. Reuse unchanged proof.
-```
+Installed counterparts remain in PD-3. Lighting quality, release performance and public qualification remain in their release gates.
 
 ## `PD-2` — Source Build, Cook, And Launcher
 
@@ -73,9 +63,9 @@ Apply Delivery Boundary For Every Stage. Revalidate only affected source/operati
 
 **Prerequisite:** PD-1/2 technical results and reviewed final inputs. Earlier archives can test packaging mechanics; final acceptance waits for repaired products.
 
-- [x] **Assembly mechanics:** `Package.ps1` produced unsigned `0db84502…21d957` with three products, admitted helpers, shared defaults, engine baseline, recipes, manifests, notices/SBOM, provenance and a separate matched symbol companion. Generated products freeze after build/cook; external inputs remain pinned. [Candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). (`AC-PKG-01/02/03/06`, assembly scope.)
+- [x] **Assembly mechanics:** `Package.ps1` produced unsigned `d641947e…054ce9` for PD-1's frozen source, with three products, admitted helpers, shared defaults, engine baseline, recipes, manifests, notices/SBOM, provenance and a separate matched symbol companion. Generated products freeze after build/cook; external inputs remain pinned. [Assembly report](../../../../artifacts/releases/0.1.0/d641947e73aa1258d2ec9dd046b925575b131700b2ec9fb2167ad3b819054ce9/report.json). (`AC-PKG-01/02/03/06`, assembly scope.)
 - [x] **Failure integrity:** owner stage/archive and full-command negatives reject stale, extra, missing, corrupt, escaping and forbidden inputs without publication. Six-product precompiled import and local Game compilation use the same owned binary paths. (`CHK-PKG-01`.)
-- [ ] **Final archive/rehearsal:** regenerate after PD-1 repairs. Exact-archive Launcher -> Editor/Game must cover Empty, all seven maps and a subset, selective sync/offline run, relocation/read-only extraction, Qt replacement and removal as a standard user. Local Empty/Cornell checks passed on both APIs; removal was blocked by automatic approval review. Finish the clean/minimum-machine, no source/SDK/admin/override/author-cache, user-state and budget checks. (`AC-PKG-04/05`, installed portions of `FCR-PROD-01/03/04`, `CHK-PKG-02`.)
+- [ ] **Final archive/rehearsal:** select the verified archive above or regenerate if accepted inputs change. Exact-archive Launcher -> Editor/Game must cover Empty, all seven maps and a subset, selective sync/offline run, relocation/read-only extraction, Qt replacement and removal as a standard user. Earlier local Empty/Cornell checks passed on both APIs; removal was blocked by automatic approval review. Finish the clean/minimum-machine, no source/SDK/admin/override/author-cache, user-state and budget checks. (`AC-PKG-04/05`, installed portions of `FCR-PROD-01/03/04`, `CHK-PKG-02`.)
 
 **Phase exit:** `FCR-PROD-05` and `REL-03` pass the unsigned internal scope for that archive. This is not permission to publish.
 
