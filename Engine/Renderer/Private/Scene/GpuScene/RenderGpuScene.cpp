@@ -148,8 +148,8 @@ struct RenderGpuScene::Impl final
 	void UpdateRayTracing(const PreparedRenderScene& preparedScene, RenderGpuDynamicFrameStorage& storage)
 	{
 		const std::uint64_t textureGeneration = preparedScene.materialTextureTable.Generation;
-		std::uint64_t topologyHash = Hash::ContinueFnv1a64Value(Hash::kFnv64OffsetBasis, preparedScene.rayTracingWork.BlasInputs.size());
-		for (const RenderRayTracingBlasInput& input : preparedScene.rayTracingWork.BlasInputs)
+		std::uint64_t topologyHash = Hash::ContinueFnv1a64Value(Hash::kFnv64OffsetBasis, preparedScene.rayTracingInstances.size());
+		for (const RenderRayTracingInstance& input : preparedScene.rayTracingInstances)
 		{
 			topologyHash = Hash::ContinueFnv1a64Value(topologyHash, input.GpuSceneSlot);
 		}

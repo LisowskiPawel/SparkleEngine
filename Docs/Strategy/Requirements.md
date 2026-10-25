@@ -57,7 +57,7 @@ The persona's [`NS-*` North Star outcomes](EngineerPersona.md#north-star) and th
 | `NS-MATH-DATA` | `PGE-02`, `PGE-03`, `PGE-04`, `PGE-08`, `PGE-09`, `PGE-10`, `PGE-11`, `PGE-12` | Are semantics, math, numerical behavior, data transformations, layouts, and cost understood and tested? |
 | `NS-EVIDENCE` | `PGE-02` through `PGE-12`, `PGE-14` | Do the declared correctness, quality, performance, API/compiler/driver, neural, and failure claims have reproducible evidence? |
 | `NS-OWNERSHIP` | `PGE-01`, `PGE-05`, `PGE-07`, `PGE-09`, `PGE-10`, `PGE-12`, `PGE-15` | Are authority, lifetime, synchronization, capability selection, fallback, failure, and retirement explicit? |
-| `NS-ADOPTION` | `PGE-01`, `PGE-06`, `PGE-07`, `PGE-13`, `PGE-14`, `PGE-15` | Can a non-author discover, integrate, reproduce, diagnose, support, and communicate the result? |
+| `NS-ADOPTION` | `PGE-01`, `PGE-06`, `PGE-07`, `PGE-13`, `PGE-14`, `PGE-15` | Can the author or agent discover, integrate, reproduce, diagnose, support, and communicate the result? |
 | `NS-SIMPLIFY` | `PGE-07`, `PGE-10`, `PGE-13`, `PGE-15` | Did the work remove superseded authority, narrow unnecessary scope or retire an unneeded capability while preserving the selected result and its evidence? |
 
 The crosswalk is a routing aid, not evidence. An iteration records each selected `PGE-*` as `advance`, `preserve`, `not applicable`, or `blocked`; a grouped range never hides an individual target's result. [Change Lifecycle](../Engineering/Workflow/ChangeLifecycle.md#create-the-iteration-control-record) owns the iteration record format.
@@ -139,7 +139,7 @@ The whole engine is not the portfolio. It is the evidence substrate. The public 
 
 Scene-specific assets, routes, `CASE-01` through `CASE-05`, and presentation gates belong to [I. Acceptance Workloads](../Acceptance/GraphicsWorkloads.md). This document owns only the reviewer/evidence meaning above.
 
-[Review And Transfer](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md) turns that meaning into the selected three-case package and binary review checks. M6 needs the technical package and first independent reproduction/review; M7 adds an observed expert challenge/direction record, second consumer context, teaching outcome and feedback-driven revision/retest. These local portfolio goals do not certify employment duration, degrees or an NVIDIA hiring level.
+[Review And Transfer](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md) turns that meaning into the selected three-case package and binary review checks. M6 needs the technical package and documented author/agent reproduction/review; M7 adds a technical challenge/direction record, second usage context, explanation rehearsal and justified revision/retest. External influence is optional and requires actual evidence. These local portfolio goals do not certify employment duration, degrees or an NVIDIA hiring level.
 
 ### Case-Study Structure
 
@@ -186,7 +186,7 @@ Use the [PGE implementation lookup](../Architecture/CrossModule/FeatureDocumenta
 
 | Requirement | Observable evidence target | Selected output |
 | --- | --- | --- |
-| `PGE-01` | M6: at least one non-author reproduces a headline result. M7: a second actual consumer context and feedback-driven revision/retest. Record constraints, interventions and personal ownership; state collaboration breadth honestly. | `PGD-01/08/09` |
+| `PGE-01` | M6: the author or agent reproduces a headline result. M7: a second actual consumer context and feedback-driven revision/retest. Record constraints, interventions and personal ownership; state collaboration breadth honestly. | `PGD-01/08/09` |
 | `PGE-02` | One complete rendering case with bounded transport/material domain, analytic/independent checks and representative scene evidence. | `PGD-02/03` |
 | `PGE-03` | One owned neural feature joins dataset, model, runtime and held-out quality/cost/failure evidence; vendor integration alone does not qualify. | `PGD-06..08` |
 | `PGE-04` | Every fixed operator and the full exported model match the reference within frozen tolerance on actual GPUs; optimization ablations preserve conformance. | `PGD-07` |

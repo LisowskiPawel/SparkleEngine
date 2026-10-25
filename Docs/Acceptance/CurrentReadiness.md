@@ -52,7 +52,7 @@ The score is the sum of four independently visible components:
 | `I` — implementation | 40 | owned production code and build membership for the declared feature, from absent through partial to a complete source route |
 | `R` — integration and reachability | 20 | a real producer/selector/caller, consumer-visible result, active-state truth, and the declared mode/backend/content route |
 | `V` — verification | 25 | retained candidate-bound build, focused correctness, runtime, failure, native-validation, quality, performance, and parity evidence as applicable |
-| `D` — delivery and adoption | 15 | staged/package result, clean-machine operation, documentation/support, non-author adoption, publication, and continuing ownership |
+| `D` — delivery and adoption | 15 | staged/package result, clean-machine operation, documentation/support, documented reproduction, publication, and continuing ownership |
 
 `Score = I + R + V + D`. Each component is awarded in five-point increments because finer precision would imply evidence the snapshot does not contain.
 
@@ -74,8 +74,8 @@ When implementation, scope, or evidence changes, update this snapshot, the ownin
 
 | ID | Feature | Baseline score | Baseline `I/R/V/D` | Current state | Largest missing layer |
 | --- | --- | ---: | ---: | --- | --- |
-| `FCR-PROD-01` | Showcase game product | **50** | `35/15/0/0` | Shell/settings and scoped native checks exist; rendering/lifecycle failures remain | PD-1 remaining cells, then exact-archive/independent proof |
-| `FCR-PROD-02` | source build and cook route | **40** | `30/10/0/0` | Local fresh source and Empty cold/warm results exist | Network-blocked replay, complete scope/fault coverage and non-author rehearsal |
+| `FCR-PROD-01` | Showcase game product | **50** | `35/15/0/0` | Shell/settings and scoped native checks exist; rendering/lifecycle failures remain | PD-1 remaining cells, then exact-archive/reproduction proof |
+| `FCR-PROD-02` | source build and cook route | **40** | `30/10/0/0` | Local fresh source and Empty cold/warm results exist | Network-blocked replay, complete scope/fault coverage and documented rehearsal |
 | `FCR-PROD-03` | Launcher workflow | **50** | `35/15/0/0` | Typed source/installed routes and bounded process checks exist | Current-candidate CLI/GUI, failure/cleanup and installed selection/sync proof |
 | `FCR-PROD-04` | Editor product | **45** | `30/15/0/0` | Edit/save/restart and capture/recook checks exist on recorded candidates | Remaining native faults/profile/map cells and final installed proof |
 | `FCR-PROD-05` | portable release package | **0** | `0/0/0/0` | Current internal assembly/integrity and bounded installed checks verified; [results](FeatureCompletionReports.md#product-delivery-progress) (score predates them) | Repaired final archive, full seven-map/removal/budget and clean-environment qualification; publisher signing at FR-07 |

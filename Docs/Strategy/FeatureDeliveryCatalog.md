@@ -46,7 +46,7 @@ Matched Windows D3D12/Vulkan quality/cost cases on named hardware; one actual st
 
 **Evidence boundary:** D3D12/Vulkan and rendering paths exist; complete workload evidence is unclaimed.
 
-**Delivery route:** After release and correct references: technical `M3`, `WL-04`; final independent closure at `M6/WS-S4`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md).
+**Delivery route:** After release and correct references: technical `M3`, `WL-04`; final reproduction closure at `M6/WS-S4`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md).
 
 **Requirements:** `PGE-02`, `05`, `08..10`
 
@@ -92,7 +92,7 @@ The [fixed operators/layout and existing-owner runtime](../Architecture/CrossMod
 
 ### `PGD-08` Held-out evaluation and transferable explanation
 
-The [three selected narratives and small package](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md#the-three-headline-cases), quality/latency/memory frontier, failures, exact manifests, paper and talk/demo. At least one non-author reproduces a headline result without private repair; a specialist challenges a meaningful assumption and the disposition records feedback and resulting changes.
+The [three selected narratives and small package](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md#the-three-headline-cases), quality/latency/memory frontier, failures, exact manifests, paper and talk/demo. The author or agent reproduces a headline result without private repair; a specialist challenges a meaningful assumption and the disposition records feedback and resulting changes.
 
 **Evidence boundary:** No owned neural evaluation/adoption result is claimed.
 
@@ -125,7 +125,7 @@ These are concrete examples within the nine outputs above, not additional featur
 | `PGD-03/04`: Is shader live state, traffic or code size the actual limiter? | One exact source/bytecode/native join; hypothesis and alternative; counter/ISA evidence where available; quality-equivalent whole-frame result. A failure or inconclusive outcome is useful. | `NVR-18/19`; [Shader System plan](../Architecture/CrossModule/ShaderSystem/ImplementationPlan.md), [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md). SER is optional. |
 | `PGD-05`: Can another engineer compare the evidence correctly? | One bounded offline CLI, stable original-input hashes, run-level tables/plots, raw/display-domain distinction and mismatch/partial-input controls. | `NVR-12/14`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md), existing Python owner. No embedded viewer or general analyzer platform. |
 | `PGD-06/07`: Does a small owned model become correct, useful shader work? | Dataset/model/operator cards, held-out split, FP32 shader conformance, one layout/fusion/precision ablation, resource-retirement/fallback and quality/latency/memory frontier. | `NVR-03/10/11/13`; [Neural discovery](../Architecture/CrossModule/NeuralGraphics/Discovery.md) and [plan](../Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md). Do not add NeRF or OptiX. |
-| `PGD-08/09`: Can knowledge and maintenance transfer? | M6: real non-author reproduction and meaningful specialist challenge. M7: second actual consumer context, before/after teaching task and feedback-driven revision/retest, with a finite follow-up/retirement boundary. | `NVR-17/20`; [Review And Transfer](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md), existing CASE/WL owners. No support service or invented external result. |
+| `PGD-08/09`: Can knowledge and maintenance transfer? | M6: documented author/agent reproduction and separate technical challenge. M7: second usage context, before/after explanation task and justified revision/retest, with a finite follow-up/retirement boundary. | `NVR-17/20`; [Review And Transfer](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md), existing CASE/WL owners. No support service or invented external result. |
 | Conditional `PGD-03/09`: Would a GPU-driven geometry or memory change solve a measured problem? | First produce a visibility/draw-granularity or residency-pressure diagnosis. Admit a bounded feature only if the current path cannot meet a frozen consumer need. | `NVR-08/09/16`; [Visibility](../Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/VisibilityAndDrawPreparation.md), [Residency](../Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/MeshAndTextureResidency.md). Meshlets/DGC/new vendor SDKs remain study-only until separately admitted. |
 
 Every selected exercise records the source card, exact assumption, local differences, rights route, falsifier and result owner using the [reference-use record](Research/RenderingReferenceExamples.md#delivery-reference-use-record). An algorithm replacement requires its existing feature gate; a documentation precedent cannot reopen or silently change an accepted scope.

@@ -8,7 +8,7 @@
 
 **Authority boundary:** runtime truth belongs to [Semantics](Semantics.md) and [Execution Architecture](ExecutionArchitecture.md); this page owns interaction. The parent [Visual Design](../VisualDesign.md) supplies layout precedent, not provider capability proof.
 
-**Current implementation:** DebugEditor/DevelopmentEditor have single-provider startup selection, native bootstrap, request control and a viewport overlay. Scoped native results are recorded in [Discovery](Discovery.md#direct-launch-implementation-handoff---2026-10-10); lifecycle, full matrix, Game, Shipping product and independent adoption acceptance remain open. This source refresh does not increase readiness.
+**Current implementation:** DebugEditor/DevelopmentEditor have single-provider startup selection, native bootstrap, request control and a viewport overlay. Scoped native results are recorded in [Discovery](Discovery.md#direct-launch-implementation-handoff---2026-10-10); lifecycle, full matrix, Game, Shipping product and documented reproduction acceptance remain open. This source refresh does not increase readiness.
 
 ## Implemented Launch And Viewport Action
 
@@ -80,4 +80,4 @@ Errors follow `Problem`, `Expected`, `Observed`, `Why it matters`, `Next action`
 
 Every action has provider/activity accessible name, keyboard focus, readable state/reason and non-color status. Use existing UI style/DPI policy; small glyphs have the usual hit target. At narrow widths collapse into a labeled `Capture` menu with the same entries/state rather than hide failures. Exercise supported scaling/high-contrast/keyboard routes and paths containing spaces/Unicode. Units and native target scope remain readable; serialized support identity is locale-independent.
 
-`CHK-EC-UX` and `CHK-EC-ADOPT` retain clean first-use, failed setup, Busy, stale target, timeout/drain, open failure, automation and non-author recovery transcripts. Screenshots verify layout/state presentation only. Runtime capture, symbols, native validation, observer cost and Shipping proof require the separate dossier checks.
+`CHK-EC-UX` and `CHK-EC-ADOPT` retain clean first-use, failed setup, Busy, stale target, timeout/drain, open failure, automation and documented recovery transcripts. Screenshots verify layout/state presentation only. Runtime capture, symbols, native validation, observer cost and Shipping proof require the separate dossier checks.

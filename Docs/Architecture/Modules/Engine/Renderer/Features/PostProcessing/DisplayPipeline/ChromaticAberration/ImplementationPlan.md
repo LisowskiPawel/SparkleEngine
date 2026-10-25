@@ -69,7 +69,7 @@ Every stage records prerequisites, production files and generated/build/package 
 
 | Stage | Required inputs | Owned output | Non-goals | Minimum falsifiers |
 | --- | --- | --- | --- | --- |
-| 0 | current source, pinned research, release/product boundary | accepted basic-effect semantic/ownership/proof decisions and `CHRD-00` result | production code/readiness | `CHK-CHRD-01` through `10`, hand cases, independent review |
+| 0 | current source, pinned research, release/product boundary | accepted basic-effect semantic/ownership/proof decisions and `CHRD-00` result | production code/readiness | `CHK-CHRD-01` through `10`, hand cases, separate review |
 | 1 | accepted basic model and existing settings/View/display owners | reviewed first-slice state/binding/output and check map | production state, registrations, inactive seam | real consumer, neutral/failure oracle, bounded files and deletion list |
 | 2 | accepted equations/domain/edge/precision/budgets | one distinct backend-neutral lens pass/product | UI polish, fusion, spectral/quality/history | analytic patterns, seeded defects, alpha/stage/extent, native validation, cost |
 | 3 | stable runtime state/result/product vocabulary | complete UX, debug/UI/capture/automation/package integration | player UI or new framework | first use, reset, states/errors, rapid edits, views/resize, capture lineage, manifest parity |

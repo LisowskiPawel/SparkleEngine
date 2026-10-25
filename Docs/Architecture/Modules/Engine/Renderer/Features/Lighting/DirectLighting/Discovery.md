@@ -118,7 +118,7 @@ Every row is independently reviewed. `Proposed` means the documents contain a ca
 | `DIR-D0-01` | first-release repair, later release, or excluded profiles; D3D12/Vulkan and traversal matrix | product/release admission and feature/profile table | Renderer owner / release owner | Open | no production replacement scope |
 | `DIR-D0-02` | explicit photometric-to-working conversion and shape models | dimensional derivation, analytic light matrix, importer/authoring trace | lighting semantics / independent math reviewer | Open | no unit or reference comparison claim |
 | `DIR-D0-03` | current versus corrected lobe energy, GGX sampling/energy variants | BRDF evaluation/PDF/furnace sweeps and per-lobe allocation | material-lighting semantics / RPT reviewer | Open | no reservoir target or lobe acceptance |
-| `DIR-D0-04` | CPU analytic, exhaustive GPU, accepted RPT, external artifacts | oracle manifest, shared-code analysis, tolerances before results | verification owner / independent reviewer | Open | no visual-correctness root-cause verdict |
+| `DIR-D0-04` | CPU analytic, exhaustive GPU, accepted RPT, external artifacts | oracle manifest, shared-code analysis, tolerances before results | verification owner / separate reviewer | Open | no visual-correctness root-cause verdict |
 | `DIR-D0-05` | stable logical ID plus translation or full reset | add/remove/reorder/mutation captures and packing/round-trip tests | prepared-light owner / lifetime reviewer | Open | no temporal reuse across light changes |
 | `DIR-D0-06` | uniform, power mixture, cluster/BVH, ReGIR, environment/emissive proposals | normalization/support/variance/time/memory study | Direct sampler owner / estimator reviewer | Open | initial proposal remains unratified |
 | `DIR-D0-07` | reuse off, canonical correction modes, visibility-reuse choices, advanced pairwise/MCMC | equation-to-code table and enumerated/statistical reservoir tests | reservoir owner / independent estimator reviewer | Open | no ReSTIR conformance claim |
@@ -169,7 +169,7 @@ Budget: new private `Passes/Lighting/Direct/DirectLightingControls.h/.cpp`, `Dir
 
 **Stage-4 bounded primary-shadow result, 2026-10-05:** the separately queued Debug Views slice now owns `r.Lighting.Shadows.Direct` at Shadows. Optional signal allocation/production is separated from Direct-owned reservoirs. Exactly two final Direct schemas evaluate real signal visibility or fully visible primary response with no signal binding; the shadowed consumer fails missing or unproduced input. The unoccluded selection target, source/proposal PDFs and reservoir normalization remain unchanged. [Bounded Show evidence](../../../../../../../Acceptance/Renderer/DebugViews.md#earlier-execution-evidence) owns selected D3D12/Vulkan occluder/off/re-enable/retained-intent numeric, omission and history evidence and separate Reference findings. This is not Direct Lighting replacement, Indirect Shadows, full provider/backend coverage or GPU timing.
 
-For each row: freeze hypotheses and thresholds; capture the committed baseline and dirty boundary; run the smallest differentiating experiment; retain raw inputs/results/configuration; record why each alternative was accepted, rejected, deferred or excluded; obtain the named independent review; then update the semantic/architecture/UX owner before marking `Accepted`. A surprising result reopens the row and every dependent row. Missing hardware, provider, content, rights or oracle marks `Blocked`, never `Accepted by assumption`.
+For each row: freeze hypotheses and thresholds; capture the committed baseline and dirty boundary; run the smallest differentiating experiment; retain raw inputs/results/configuration; record why each alternative was accepted, rejected, deferred or excluded; obtain the named separate review; then update the semantic/architecture/UX owner before marking `Accepted`. A surprising result reopens the row and every dependent row. Missing hardware, provider, content, rights or oracle marks `Blocked`, never `Accepted by assumption`.
 
 ## Risk Register
 
@@ -228,7 +228,7 @@ The gate review receives:
 7. reconstruction input/output and disocclusion study;
 8. workload quality/time/memory baseline with uncertainty;
 9. accepted decision table, revised stage estimates, hook/deletion ledger, and named owners;
-10. independent review stating whether Stage 1 may begin.
+10. separate review stating whether Stage 1 may begin.
 
 ## Discovery Failure Modes
 

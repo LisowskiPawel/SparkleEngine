@@ -17,7 +17,7 @@ namespace SparkleLauncher
 		for (std::size_t newline = m_pendingLine.find('\n'); newline != std::string::npos; newline = m_pendingLine.find('\n'))
 		{
 			const std::string_view line(m_pendingLine.data(), newline);
-			const std::optional<ToolWorkProgress> progress = ToolWorkProgressProtocol::Parse(line);
+			const std::optional<ToolWorkProgress> progress = ParseToolWorkProgress(line);
 			if (progress && Accept(*progress) && progressCallback)
 			{
 				progressCallback(*progress);

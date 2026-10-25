@@ -59,7 +59,7 @@ Excluded:
 
 ## Decision Recording Contract
 
-Every `CGRD-*` row must retain: `Proposed`, `Accepted`, `Rejected`, or `Blocked`; accountable owner and independent reviewer; exact evidence/artifact; rationale and rejected alternatives; affected `CGR-FS-*`, `CGR-MATH-*`, `AC/FM/CHK`; implementation and package consequence; and an invalidation trigger. A default value, source precedent, prototype result, or convenient API shape is not a disposition.
+Every `CGRD-*` row must retain: `Proposed`, `Accepted`, `Rejected`, or `Blocked`; accountable owner and separate reviewer; exact evidence/artifact; rationale and rejected alternatives; affected `CGR-FS-*`, `CGR-MATH-*`, `AC/FM/CHK`; implementation and package consequence; and an invalidation trigger. A default value, source precedent, prototype result, or convenient API shape is not a disposition.
 
 ## Current Source Truth
 
@@ -125,7 +125,7 @@ Every row must have an explicit disposition, reviewer, rationale, and invalidati
 | `AC-CGRD-07` | the full included/excluded feature, profile, backend, asset, selector, and output matrix has one disposition and no reachable undeclared cell. | reconciled `CGR-FS-*` ledger, support matrix, selector/package audit, and explicit exclusions |
 | `AC-CGRD-08` | hostile-input and capacity policy is sufficient to bound parser work, multiplication/allocation, path resolution, decoded payload, GPU upload, retirement backlog, and diagnostic volume. | adversarial corpus, checked-limit table, timeout/memory bounds, cleanup observation, and security review |
 | `AC-CGRD-09` | each stage is a reviewable vertical result with prerequisites, estimates, deletions, non-goals, stop conditions, and a prompt whose non-negotiables are falsifiable. | accepted `ImplementationPlan.md`, capacity/estimate assumptions, and stage-to-acceptance map |
-| `AC-CGRD-10` | an independent reviewer can reconstruct the claim, reproduce at least one hand case, and identify a seeded defect caught by each evidence class. | exact-revision color/math, asset/security, architecture, UX, and evidence review record |
+| `AC-CGRD-10` | an separate reviewer can reconstruct the claim, reproduce at least one hand case, and identify a seeded defect caught by each evidence class. | exact-revision color/math, asset/security, architecture, UX, and evidence review record |
 
 `FM-CGRD-01` occurs when a decision is silently deferred to code. `FM-CGRD-02` occurs when a selected oracle shares the implementation defect it claims to catch. `FM-CGRD-03` occurs when the package admits a control, asset form, domain, or workflow not mapped to acceptance and delivery. Any of these failures keeps the gate `Blocked`.
 
@@ -168,7 +168,7 @@ The gate report is complete only when it retains:
 5. `.cube` grammar plus hostile-input corpus, security review, checked capacity limits, expected categories, and package/provenance policy;
 6. owner/producer/consumer/identity/lifetime/publication/retirement/deletion ledger and end-to-end author-to-pixel sequence;
 7. first-use, invalid asset, live edit, two-view, reset, capture, package, accessibility, and automation dry runs;
-8. stage estimates and assumptions, no-orphan traceability, exact stop/escalation rules, and independent review record;
+8. stage estimates and assumptions, no-orphan traceability, exact stop/escalation rules, and separate review record;
 9. exact checks actually run, artifacts, limitations, unavailable executable checks, and final `PASS` or `BLOCKED` decision.
 
 ## Gate Decision

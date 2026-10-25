@@ -77,7 +77,7 @@ The important boundary is that GameFramework publishes immutable scene/view inpu
 | GameFramework | **48/100** | Implemented path; unproved | levels, cooked loading, ECS/world updates, editing, render extraction | Cancellation/reload, malformed content, numerical and cross-worker determinism evidence |
 | Renderer | **36/100** | Broad established path plus four absent mandatory targets | raster/ray GBuffer, direct/indirect lighting, frame graph, post processing, diagnostics | Deferred decals, grading, chromatic aberration, HDR10, feature correctness, visual/temporal quality, backend parity, and performance |
 | RHI | **45/100** | Broad implemented path; capability-gated | D3D12/Vulkan resources, descriptors, pipelines, commands, ray tracing, presentation, diagnostics | Native validation, device/queue/lifetime faults, parity, performance, device-recovery scope |
-| Tools and products | **45/100** | Partial | Launcher, cookers, ShaderCompiler, editor, Showcase game/editor | polished first use, public support route, independent adoption, packaged operation |
+| Tools and products | **45/100** | Partial | Launcher, cookers, ShaderCompiler, editor, Showcase game/editor | polished first use, public support route, documented reproduction, packaged operation |
 
 `Implemented path` means source and build membership contain the route. `Unproved` means its required executable evidence has not been retained and accepted.
 
@@ -136,7 +136,7 @@ See [Renderer Features](Modules/Engine/Renderer/Features/RendererFeatureGuide.md
 3. Implement and verify one manifest-owned package/install path.
 4. Close each included feature’s correctness, failure, lifetime, backend, and requested-versus-active contract.
 5. Run map-quality, native-validation, performance, memory, stability, and clean-machine gates.
-6. Complete independent adoption, publication, support, and stabilization.
+6. Complete documented reproduction, publication, support, and stabilization.
 
 Current gate state lives in [First Release Acceptance](../Acceptance/FirstRelease.md), not on this overview page.
 

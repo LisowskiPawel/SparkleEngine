@@ -2,108 +2,68 @@
 
 [Docs](../../../../README.md) / [Up](TransferDesign.md)
 
-Turn accepted technical work into observed expert influence, second-context use and a feedback-driven revision without adding engine breadth.
+Review accepted technical work, rehearse a second usage context and improve the explanation without adding engine breadth.
 
-**Status:** remaining evidence delivery; this plan records no executed study or acceptance result
+**Status:** remaining technical/evidence delivery; no exercise or acceptance result is claimed
 
-**Admission:** Required M7 / PGD-09 after accepted M6 technical/reproduction evidence; actual exercises require their real participants, rights and separate external-action authorization.
-
-## Work This Plan
-
-| What to do | Working route |
-| --- | --- |
-| First action | [KT-0](#kt-0-freeze-the-participant-context-and-exercise): prepare the concrete question/task/rubric and bind actual participant inputs in KT-0. |
-| Result to reach | AC-PORT-04..08 / CHK-PORT-03/04 observations and truthful CASE-05 transfer records; these do not certify hiring level or years of organizational leadership. |
-| Start / stop | Planning can prepare decisions earlier; execution needs the exact candidate, valid prerequisites and frozen check cards. Missing rights, tools, or external participants keep the affected result open. |
+**Admission:** M7 / PGD-09 follows M6 technical/reproduction inputs. The author or agent may run every stage; external participants and professional-impact claims are optional.
 
 ## Execution Contract
 
-Read [the design/check owner](TransferDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Production state/API/dependencies default to zero. A justified feedback repair uses its existing feature plan; useful documentation simplification is valid when it solves the observed consumer problem. Contact/publication retain actual authorization.
+Read [the design](TransferDesign.md) and [AC-PORT/CHK-PORT owner](../ReviewAndTransfer.md#binary-review-criteria). Execute the first unfinished stage and reuse valid proof. Follow [Change Lifecycle](../../../../Engineering/Workflow/ChangeLifecycle.md), its Stage Source-Style Gate and [accepted actor scope](../../../../Acceptance/FeatureCompletionReports.md#report-closure-and-review). Record exact candidate, tasks/oracles, commands, results, limits and cleanup. No-source work records justified N/A.
 
-Apply [Change Lifecycle's stage budget](../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and [Stage Source-Style Gate](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), including exact formatter coverage and authored layout/responsibility review after the final edit. No-source work records justified N/A and artifact/docs checks. Freeze input/candidate/API/tools, units, numeric/uncertainty/failure rules and capacity before results. Keep original evidence, delete replaced/rejected paths and probes in their producing stage, and verify the retained result. Handoff exact commands, artifacts, cleanup, limits and next action; quote required clauses with proof or BLOCKED. No result/grade is awarded by this plan.
+Production state/API/dependencies default to zero. A demonstrated repair uses its existing feature owner. Remove replaced instructions and disposable probes in the same stage. Add no support, participant or review platform. Contact/publication still requires separate authorization; invent no external participation or professional fact.
 
 ## Remaining Stages
 
 ### KT-0: Freeze The Participant Context And Exercise
 
-**Start:** M6 case/package inputs are known; planning may prepare the concrete exercise before a participant is available.
+**Start:** M6 case/package inputs are known.
 
-**Work:** Bind the real participant/context, prior involvement, permissions, original candidate/rights, meaningful technical question and comparable before/after task/rubric. Identify which valid M6 specialist review can be reused. Separate actual external inputs from technical preparation.
+**Work:** Bind the author/agent actor, candidate/rights, second usage context, meaningful technical question and comparable before/after task/rubric. Identify reusable M6 review evidence.
 
-**Cleanup / non-delivery:** Documentation only. Remove competing exercise outlines and duplicate instructions; no contact, publishing, invented identity or new platform.
-
-**Exit:** A reviewable cleared exercise and exact remaining participant/authorization inputs; no result is marked passed.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** Task, oracle, input hashes and actor are fixed; no executed result is claimed. An external participant is not a prerequisite.
 
 ```text
-Execute only KT-0 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-0-freeze-the-participant-context-and-exercise. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
-Freeze one real second-context exercise from accepted cases, the technical question, original artifacts/rights and before/after rubric. Reuse M6 review where valid; list missing actual participants/authorization. Prepare only, contact nobody and invent no outcome.
-NON-NEGOTIABLE: use actual authorized people and frozen tasks; record all assistance and real feedback/retest; invent no external or professional fact. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Execute only KT-0 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-0-freeze-the-participant-context-and-exercise. Apply its Execution Contract.
+Freeze one second-context exercise, author/agent actor, technical question, original candidate and before/after rubric. Reuse valid proof. Contact nobody and invent no result.
 ```
-
-</details>
 
 ### KT-1: Record The Meaningful Technical Challenge
 
-**Start:** The accepted M6 packet or its exact reused review, real reviewer and exercise authorization are available.
+**Start:** The M6 packet and KT-0 review question are available.
 
-**Work:** Retain the original proposal/constraints, specialist challenge, alternative, discriminating evidence and resulting revision or reasoned rejection. Make personal/team contribution explicit. If M6 already supplies this exact proof, verify its identity and do not rerun it.
+**Work:** In a separate author/agent review pass, challenge the assumption, compare an alternative and retain the discriminating evidence and disposition. Reuse an existing matching review rather than duplicate it.
 
-**Cleanup / non-delivery:** Remove redundant summaries while preserving original review/provenance. No new engine work merely to agree with a reviewer.
-
-**Exit:** AC-PORT-04 has actual challenge/decision evidence or a blocked missing reviewer/result.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** AC-PORT-04 has an executed challenge/decision record with actual attribution. Remove redundant summaries; no engine change is required merely to satisfy a review.
 
 ```text
-Execute only KT-1 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-1-record-the-meaningful-technical-challenge. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
-Execute or validly reuse the real expert review. Record proposal, challenge, alternatives, evidence, disposition and personal credit. Do not self-certify, substitute AI review, expand scope or act externally without authorization.
-NON-NEGOTIABLE: use actual authorized people and frozen tasks; record all assistance and real feedback/retest; invent no external or professional fact. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Execute only KT-1 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-1-record-the-meaningful-technical-challenge. Apply its Execution Contract.
+Perform or reuse the author/agent review. Record proposal, challenge, alternative, evidence and disposition. A revision needs an observed reason; a justified rejection is valid. Claim no outside reviewer.
 ```
-
-</details>
 
 ### KT-2: Observe Second-Context Use And Learning
 
-**Start:** KT-0 task/rubric, real participant, cleared artifacts and actual authorization are fixed.
+**Start:** KT-0 tasks, rubric and cleared candidate are fixed.
 
-**Work:** Observe the before task, bounded explanation and comparable held-back after task in the second actual context. Record environment, failures, correct steps/rationale, assistance and participant feedback. An assisted exercise cannot replace M6 unaided reproduction.
+**Work:** Execute the before task, bounded explanation and comparable held-back after task in the second context. Record environment, correct/failed steps, reasoning, assistance and limitations. Self-run observations remain explicitly author/agent rehearsal.
 
-**Cleanup / non-delivery:** Use existing code/runbooks/manifests. Remove one-off exercise/probe code before handoff; no integration SDK, support service or telemetry product.
-
-**Exit:** AC-PORT-05 and the learning part of 06 have actual observations and limits; attendance or changed task difficulty cannot pass.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** AC-PORT-05/06 have actual task observations. Remove one-off exercise/probe code; no new integration SDK, service or telemetry.
 
 ```text
-Execute only KT-2 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-2-observe-second-context-use-and-learning. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
-Run only the authorized second-context exercise with frozen before/after rubric. Retain environment, assistance, failures, reasoning and feedback. Keep assisted teaching distinct from unaided adoption. Stop on uncleared material or a missing real consumer; build no new system.
-NON-NEGOTIABLE: use actual authorized people and frozen tasks; record all assistance and real feedback/retest; invent no external or professional fact. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Execute only KT-2 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-2-observe-second-context-use-and-learning. Apply its Execution Contract.
+Run the frozen author/agent exercise and record actual before/after output, reasoning, failures and assistance. Do not label it third-party learning. Use existing code/runbooks/manifests and remove disposable probes.
 ```
-
-</details>
 
 ### KT-3: Revise Retest And Reconcile Claims
 
-**Start:** KT-1/2 have genuine feedback and a justified current-owner change.
+**Start:** KT-1/2 findings identify a useful change or support a no-change decision.
 
-**Work:** Apply one useful feedback-driven clarification/simplification or demonstrated repair through its existing owner. Retest affected numerical/runtime/reproduction or instruction claims, reconcile source/candidate/rights and CV/team attribution, and record finite follow-up/end condition. Prepare only the cleared final packet; upstream submission remains conditional on a real issue.
+**Work:** Apply a justified clarification/simplification or repair through its current owner; retest affected claims. Reconcile candidate/rights, personal/team attribution and finite follow-up. Preserve valid earlier proof and remove replaced material.
 
-**Cleanup / non-delivery:** Delete replaced instructions/state and all disposable exercise code now; verify earlier cleanup. No fabricated mentoring/recommendation, permanent support promise or automatic publication.
-
-**Exit:** AC-PORT-04..08 / CHK-PORT-03/04 close only for actual observed evidence; M7 stays open on missing follow-through or professional facts.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** AC-PORT-04..08 / CHK-PORT-03/04 have explicit technical verdicts and actual evidence. No external mentoring/employment/adoption result is required or inferred.
 
 ```text
-Execute only KT-3 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-3-revise-retest-and-reconcile-claims. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
-Implement only the justified existing-owner feedback change, retest affected claims and link original before/after records. Reconcile personal/team/professional truth and finite follow-up, remove replaced material/probes and report real M7 outcomes or blocked cells. No contact/submission/publication without authorization.
-NON-NEGOTIABLE: use actual authorized people and frozen tasks; record all assistance and real feedback/retest; invent no external or professional fact. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Execute only KT-3 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-3-revise-retest-and-reconcile-claims. Apply its Execution Contract.
+Implement only a justified existing-owner change, retest affected claims and link original before/after records, or retain an evidence-backed no-change decision. Reconcile truthful scope/attribution, remove replaced material/probes and report remaining technical checks. No contact or publication without authorization.
 ```
-
-</details>

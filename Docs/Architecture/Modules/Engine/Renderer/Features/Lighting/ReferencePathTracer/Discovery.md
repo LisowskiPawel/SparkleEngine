@@ -14,7 +14,7 @@
 
 **Naming reconciliation:** the 2026-09-09 working-tree clean break makes `ReferencePathTracer` the sole feature name; it changes no behavior, authorization, or evidence claim.
 
-**Current readiness:** `PTD-01-R2 PASS` and `PTD-02-R0 PASS` remain valid because the precision amendment changes neither selector nor frame ownership. Stage 3 is **IMPLEMENTED / VALIDATION DEFERRED**; real raw GPU/fault evidence and independent review of binary32 error at the frozen SPP/radiance bounds remain unrun and receive no readiness credit. No estimator-authority, image, oracle, package, or release evidence is inferred. See [Current Feature Readiness](../../../../../../../Acceptance/CurrentReadiness.md#renderer).
+**Current readiness:** `PTD-01-R2 PASS` and `PTD-02-R0 PASS` remain valid because the precision amendment changes neither selector nor frame ownership. Stage 3 is **IMPLEMENTED / VALIDATION DEFERRED**; real raw GPU/fault evidence and separate review of binary32 error at the frozen SPP/radiance bounds remain unrun and receive no readiness credit. No estimator-authority, image, oracle, package, or release evidence is inferred. See [Current Feature Readiness](../../../../../../../Acceptance/CurrentReadiness.md#renderer).
 
 ## Gate At A Glance
 
@@ -65,7 +65,7 @@ Every row must be `PASS`. “Documented,” “reviewed,” and “accepted” m
 | ID | Pass criterion | Required retained evidence | Blocks exit when |
 | --- | --- | --- | --- |
 | `AC-PTD-01` | Terms and claimant are frozen: Reference Path Tracer, unbiased, consistent, converged, feature complete, ground truth, raw, preview, and candidate comparison each have a non-overlapping meaning. | terminology/claim table approved by feature and evidence owners | A result can change labels without changing evidence. |
-| `AC-PTD-02` | The target transport equation, measures, radiometric units, path domain, camera model, supported scene snapshot, and full-versus-finite path-length claim are explicit. | accepted revision of [Transport And Estimator](TransportAndEstimator.md), completed decision slots, hand cases, and independent review | “Unbiased” has no exact integral, a symbol/choice remains implicit, or a deterministic cutoff is hidden. |
+| `AC-PTD-02` | The target transport equation, measures, radiometric units, path domain, camera model, supported scene snapshot, and full-versus-finite path-length claim are explicit. | accepted revision of [Transport And Estimator](TransportAndEstimator.md), completed decision slots, hand cases, and separate review | “Unbiased” has no exact integral, a symbol/choice remains implicit, or a deterministic cutoff is hidden. |
 | `AC-PTD-03` | Every camera, geometry/deformation, material/texture, alpha/sidedness, light, environment, emission, and dynamic-scene behavior is included or excluded for the development `v0.1` contract. | feature-domain matrix reconciled with the frozen `RPTConformanceSet` and every development selector; release-map adoption explicitly deferred to Stage 10/`PTD-03` | A development-reachable or conformance-required semantic has no verdict, or an unreconciled release map is treated as supported. |
 | `AC-PTD-04` | Current implementation and build membership are traced from selection through scene/view data, primary hit, sampling, lighting, traversal, accumulation, output, and failure on D3D12/Vulkan. | line-linked current-route trace with owner, producer, consumer, lifetime, format, configuration, fallback, and invalidation | Any contribution, clamp/cutoff, state transition, or backend route is untraced. |
 | `AC-PTD-05` | The complete estimator is derived: strategy/lobe/light selection, BSDF/emission/environment terms, PDFs/Jacobians, MIS if used, delta events, NEE, Russian roulette, termination, and zero/invalid cases. | completed `MATH-*` equation-to-code ledger, independently reviewed derivation, and hand-computable examples | A term or probability appears in code without its estimator role, or vice versa. |
@@ -99,7 +99,7 @@ Risk status is recorded in `PTD-00-R0` below. Discovery activity alone does not 
 | `RISK-PTD-09` | Raw truth is contaminated by clamp/filter/denoiser/exposure/tone/encode/screenshot operations. | Give raw linear HDR a separate named resource/export and immutable metadata; label previews. | `CHK-PTD-03`, `CHK-PTD-09` with each biasing switch toggled or rejected. | Reject contaminated artifacts and regenerate from raw; evidence owner. | Raw path trace proves no display/biasing operation before comparison and identity mutation is detected. |
 | `RISK-PTD-10` | Reference accumulation hangs, TDRs, exhausts VRAM/disk, cannot cancel, or leaves a plausible partial result. | Freeze time/resource budgets, progress, watchdog, cancellation, atomic publish, cleanup, and recovery; treat hardware-specific achievement as Stage-6/9 evidence, not a Stage-0 fact. | `CHK-PTD-07`, `CHK-PTD-10` controlled timeout/OOM/disk/cancel cases. | Refuse or terminate safely, preserve diagnostic/partial state as non-candidate, and keep an unproved hardware row unavailable; runtime owner. | Every claimed support row's controlled failures end within budget with no complete marker, leaked state, or corrupted prior evidence. |
 | `RISK-PTD-11` | External feature breadth grows a second scene/material framework or multiple competing reference paths. | Select the smallest target from current release needs and enforce one owner/representation/copy budget. | `CHK-PTD-02`, `CHK-PTD-12`; dependency and code-shape estimates. | Defer nonessential features and reject generalized infrastructure; Renderer/release owners. | Accepted decision records each excluded external feature and plan has one target path with bounded size. |
-| `RISK-PTD-12` | Production implementation begins, or a conditional plan choice is treated as frozen, while discovery can still change architecture, scope, estimator, or evidence. | Hard `PTD-00` Stage-1 gate bound to one immutable accepted report; release-package gates remain hard only for Stage 10 and release claims. | `CHK-PTD-11`, `CHK-PTD-12`; inspect code/worktree changes, plan status, prerequisites, and unresolved questions. | Stop premature implementation and return to the unresolved discovery slice; do not use missing release packaging to alter the technical target. | All `AC-PTD-*` pass, zero plan-shaping unknowns remain, independent review and repository owner approve the exact revision, and Stage 1 records it. |
+| `RISK-PTD-12` | Production implementation begins, or a conditional plan choice is treated as frozen, while discovery can still change architecture, scope, estimator, or evidence. | Hard `PTD-00` Stage-1 gate bound to one immutable accepted report; release-package gates remain hard only for Stage 10 and release claims. | `CHK-PTD-11`, `CHK-PTD-12`; inspect code/worktree changes, plan status, prerequisites, and unresolved questions. | Stop premature implementation and return to the unresolved discovery slice; do not use missing release packaging to alter the technical target. | All `AC-PTD-*` pass, zero plan-shaping unknowns remain, separate review and repository owner approve the exact revision, and Stage 1 records it. |
 
 ## Discovery Failure Modes
 
@@ -141,7 +141,7 @@ Each check specification produced during discovery must include initial state, a
 | `CHK-PTD-09` raw-output/provenance review | `AC-PTD-09`, `AC-PTD-12`; `FM-PTD-06`, `FM-PTD-12`; `RISK-PTD-05`, `RISK-PTD-09` | Trace raw radiance to file and comparison before every display operation; mutate each identity field and require mismatch/invalidation. | artifact schema, sample manifest, hash/invalidation table | Missing provenance or mixed raw/preview path blocks evidence use. |
 | `CHK-PTD-10` backend/failure protocol | `AC-PTD-13`; `FM-PTD-11`, `FM-PTD-13`; `RISK-PTD-08`, `RISK-PTD-10` | Specify D3D12/Vulkan automatic capability checks, native validation, compiler/settings identity, device removal/TDR/OOM/disk-full/timeout/cancel behavior, cleanup, and numeric parity. | matrix and expected diagnostic/artifact states | Incomplete automatic selection or unexplained validation output blocks the backend. |
 | `CHK-PTD-11` traceability audit | `AC-PTD-14`, `AC-PTD-16`; `FM-PTD-15`, `FM-PTD-16`; `RISK-PTD-12` | Mechanically and manually verify every AC/risk/FM has an owner and detecting check, every work package has one key check, and no plan-shaping unknown is deferred. | coverage table and unmatched-ID output | Any orphan ID or non-detecting check blocks exit. |
-| `CHK-PTD-12` independent plan-readiness review | `AC-PTD-15`, `AC-PTD-16`, `AC-PTD-17`; `FM-PTD-14`, `FM-PTD-16`; `RISK-PTD-11`, `RISK-PTD-12` | A non-author reconstructs the target, rejects alternatives from evidence, challenges one failure per evidence class, and decides whether planning requires reopening discovery. | signed review record and `PASS`/`BLOCKED` decision | Private explanation or reopened core decision keeps `PTD-00` blocked. |
+| `CHK-PTD-12` independent plan-readiness review | `AC-PTD-15`, `AC-PTD-16`, `AC-PTD-17`; `FM-PTD-14`, `FM-PTD-16`; `RISK-PTD-11`, `RISK-PTD-12` | The author or agent reconstructs the target, rejects alternatives from evidence, challenges one failure per evidence class, and decides whether planning requires reopening discovery. | signed review record and `PASS`/`BLOCKED` decision | Private explanation or reopened core decision keeps `PTD-00` blocked. |
 
 ## Required `PTD-00` Evidence Package
 
@@ -172,9 +172,9 @@ Generated experiment output belongs under the normal ignored evidence/artifact r
 | Authority used | live code/build configuration, current acceptance/roadmap authorities, this dossier, and pinned primary-source ledger |
 | Cheapest falsifiers | targeted `rg`/file inspection, selector/build/source trace, identifier reconciliation, and independent read-only reviews; no build or render was needed to prove the blocking release/scope facts |
 | Production changes | none permitted and none made |
-| Decision | **BLOCKED**. `AC-PTD-03`, `AC-PTD-13`, and `AC-PTD-17` cannot pass without a frozen `ReleaseMapSet` plus accepted hardware/package reachability and a subsequent independent review of that exact reconciliation. Stage 1 is not authorized; `REL-03` is independently blocked. |
+| Decision | **BLOCKED**. `AC-PTD-03`, `AC-PTD-13`, and `AC-PTD-17` cannot pass without a frozen `ReleaseMapSet` plus accepted hardware/package reachability and a subsequent separate review of that exact reconciliation. Stage 1 is not authorized; `REL-03` is independently blocked. |
 
-This is a real Stage-0 result, not a claim that document completeness proves the feature. The mathematical and product choices below are frozen candidates so the missing release inputs cannot be disguised as implementation discretion. When the external blockers close, `PTD-00-R1` must rebase to the then-current commit, reconcile only the affected matrices, repeat all independent reviews, and either accept the exact dossier revision or record new blockers.
+This is a real Stage-0 result, not a claim that document completeness proves the feature. The mathematical and product choices below are frozen candidates so the missing release inputs cannot be disguised as implementation discretion. When the external blockers close, `PTD-00-R1` must rebase to the then-current commit, reconcile only the affected matrices, repeat all separate reviews, and either accept the exact dossier revision or record new blockers.
 
 ### `PTD-D0` terminology, claimant, and scope decision
 
@@ -214,7 +214,7 @@ The target shape is accepted as one Renderer-owned per-view session, independent
 
 | Rows | Owner / primary phase | Defect-detecting checks | Budget | Independent/shared-dependency oracle |
 | --- | --- | --- | --- | --- |
-| `RPT-FS-01`, `10`, `12`, `15` | Renderer View/session, Editor/Application adapters; Stages 1, 6, 7 | `CHK-RPT-02`, `07`, `09`, `15`, `16` | 255-455 h combined stages; per UX runtime bounds | canonical camera fixtures, state-model traces, non-author first use |
+| `RPT-FS-01`, `10`, `12`, `15` | Renderer View/session, Editor/Application adapters; Stages 1, 6, 7 | `CHK-RPT-02`, `07`, `09`, `15`, `16` | 255-455 h combined stages; per UX runtime bounds | canonical camera fixtures, state-model traces, documented first use |
 | `RPT-FS-02`, `03`, `11` | Renderer View/geometry plus RHI traversal; Stages 2, 5 | `CHK-RPT-03`, `04`, `08` | 130-220 h | hand-derived ray/triangle expectations executed through production GPU transport, NVIDIA/PBRT error-bound challenge, paired backends |
 | `RPT-FS-04`, `05`, `06` | Scene/material/texture producers and Renderer BSDF; Stages 2, 4, 5 | `CHK-RPT-03`, `04`, `05` | 220-370 h overlapping | glTF fixtures, hand-derived decode/eval expectations executed on the GPU, furnace, Mitsuba-equivalent scenes |
 | `RPT-FS-07`, `08`, `09` | Renderer light/integrator; Stages 3, 4 | `CHK-RPT-05`, `11` | 160-270 h | analytic energy/PDF cases, minimal tracer, Falcor/Capsaicin/Mitsuba |
@@ -334,11 +334,11 @@ Revised ranges after the live audit are: Stage 0 `70-110 h` including external o
 | `CHK-PTD-09` | evidence/Application owners | 8 h schema review | remove staging; missing hash/identity blocks |
 | `CHK-PTD-10` | RHI/runtime owners | 8 h protocol | cleanup tickets/staging; fallback/leak blocks |
 | `CHK-PTD-11` | documentation owner | 2 h mechanical/manual | no artifacts; orphan ID blocks |
-| `CHK-PTD-12` | independent reviewers | 8 h | retain signed result; reopened decision blocks |
+| `CHK-PTD-12` | separate reviewers | 8 h | retain signed result; reopened decision blocks |
 
 Coverage is conjunctive: `CHK-PTD-01` covers `AC-03/04`; `02` covers `AC-01/10/15`; `03` covers `AC-02/05`; `04` covers `AC-06`; `05` covers `AC-03/10`; `06` covers `AC-07/11`; `07` covers `AC-08/09/13`; `08` covers `AC-08/10`; `09` covers `AC-09/12`; `10` covers `AC-13`; `11` covers `AC-14/16`; `12` covers `AC-15/16/17`. `FM-PTD-01..16` and `RISK-PTD-01..12` each appear in their detecting check rows above; mechanical `rg` must return every ID before R1 acceptance. `RISK-PTD-03`, `08`, `10`, and `12` remain Open because their release/support/review evidence is unavailable; all other risk treatments are accepted designs but retire only through later executable evidence.
 
-### Acceptance and independent review record
+### Acceptance and separate review record
 
 | Criterion | R0 result | Evidence / blocker |
 | --- | --- | --- |
@@ -357,7 +357,7 @@ Coverage is conjunctive: `CHK-PTD-01` covers `AC-03/04`; `02` covers `AC-01/10/1
 | `AC-PTD-13` | **BLOCKED** | numeric budgets are frozen, but accepted hardware, maps, package roots, and Shipping reachability are not available to prove the contract is finite/reachable |
 | `AC-PTD-14` | PASS (design) | AC/FM/RISK/CHK ownership and coverage record |
 | `AC-PTD-15` | PASS (design) | selected/rejected target-shape record and revised complexity range |
-| `AC-PTD-16` | **BLOCKED** | path-level ledger and stage ownership are now reconciled, but the exact report revision cannot be signed while release-owned prerequisites and independent reviews remain open |
+| `AC-PTD-16` | **BLOCKED** | path-level ledger and stage ownership are now reconciled, but the exact report revision cannot be signed while release-owned prerequisites and separate reviews remain open |
 | `AC-PTD-17` | **BLOCKED** | independent design re-reviews pass the candidate math, architecture, and UX contracts, but the exact immutable R1 dossier still lacks content/release, support/package, accountable human, and final cross-discipline signatures after release reconciliation |
 
 Three independent read-only agent review tracks were conducted against R0 inputs: mathematical/numerical, architecture/current-route, and evidence/first-use. Initial passes returned **BLOCKED** and exposed the nonexistent `RenderViewKind::Editor`, incorrect environment Jacobian, discretely biased roulette, underspecified MIS/material/sampler/robustness/statistics/artifacts, incomplete lifecycle/CLI/Shipping behavior, current Inline/GBuffer/history route, LDR BMP capture, package reachability, and missing report/clean-break matrices. After reconciliation, the math/numeric and UX/evidence reviewers returned **PASS for the Stage-0 design candidate** with no plan-shaping invention point; the architecture reviewer found the architecture/plan internally coherent and **BLOCKED only by the declared external/evidentiary prerequisites**. These are AI-assisted internal reviews, not a substitute for named accountable human approval or executable evidence. R1 requires fresh independent math, numeric, architecture, evidence, content/release, support/package, and clean first-use signatures against one immutable candidate revision after the release-owned inputs exist.
@@ -368,9 +368,9 @@ No engine build, shader compile/cook, Game launch, GPU validation, representativ
 
 ## Gate Decision
 
-`PTD-00` passes only when `AC-PTD-01` through `AC-PTD-17` pass, every applicable `FM-PTD-*` has a detecting `CHK-PTD-*`, all release/technical risks have accepted treatments, and independent review signs the exact report revision.
+`PTD-00` passes only when `AC-PTD-01` through `AC-PTD-17` pass, every applicable `FM-PTD-*` has a detecting `CHK-PTD-*`, all release/technical risks have accepted treatments, and separate review signs the exact report revision.
 
-Historical R0 decision: **`PTD-00-R0 BLOCKED` at `669637cf23b9748f8b94635409e74159d31d0bc2`**. R0 required the affected release-map/support/package reconciliation and all independent reviews after `REL-01` supplied the exact inputs, and did not authorize Stage 1. The R1 section below supersedes only that gate placement; it does not rewrite or erase the evidence and blocker record that produced R0.
+Historical R0 decision: **`PTD-00-R0 BLOCKED` at `669637cf23b9748f8b94635409e74159d31d0bc2`**. R0 required the affected release-map/support/package reconciliation and all separate reviews after `REL-01` supplied the exact inputs, and did not authorize Stage 1. The R1 section below supersedes only that gate placement; it does not rewrite or erase the evidence and blocker record that produced R0.
 
 ## `PTD-00-R1` Gate-Separation Reconciliation
 
@@ -405,7 +405,7 @@ This is an implementation/evidence input, not distributable Showcase content. Fi
 
 Pinned Falcor, Capsaicin, and Mitsuba interchange recipes remain external challenges after semantic equivalence is established. They are not members of `RPTConformanceSet`, copied assets, release maps, or sole expected-value authorities.
 
-### R1 independent review record
+### R1 separate review record
 
 Three fresh read-only review tracks inspected the live R1 documentation reconciliation against committed source input `30597d7d0bb70af9f2836ab01d81d47c3e20bcde`. They made no file changes and ran no build, shader, GPU, runtime, statistical-execution, package, or clean-machine check.
 

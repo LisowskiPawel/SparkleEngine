@@ -14,7 +14,7 @@
 
 Develop SparkleEngine as a compact renderer-first engine and evidence platform for principal-level graphics engineering. Prioritize a few complete, reproducible vertical slices over feature count, framework breadth, or documentation volume.
 
-The [public engineering study](Research/README.md#public-engineering-study) grounds that direction in actual role descriptions, affiliation-qualified engineers and exact public source examples. The selected professional focus is rendering/developer technology with GPU-system depth: trustworthy transport, causal native analysis, owned neural shader work and independent adoption. Compiler/driver research, GPU-driven geometry and further platforms remain separate conditional specialties.
+The [public engineering study](Research/README.md#public-engineering-study) grounds that direction in actual role descriptions, affiliation-qualified engineers and exact public source examples. The selected professional focus is rendering/developer technology with GPU-system depth: trustworthy transport, causal native analysis, owned neural shader work and documented reproduction. Compiler/driver research, GPU-driven geometry and further platforms remain separate conditional specialties.
 
 The engine should make it easy for a reviewer to answer:
 
@@ -72,7 +72,7 @@ Tier 1 claims require Tier 1 evidence. The renderer and content pipeline must re
 | P0 | Whole-system performance evidence | p50/p95/p99, pacing, memory high-water, CPU/GPU timelines, controlled before/after results |
 | P1 | Path-traced flagship | reference math/images, RT resource lifetime, quality/latency/memory evidence on both Tier 1 scenes |
 | P1 | Real neural graphics feature | bounded trained model/operator, deterministic artifact, optimized runtime inference, classical fallback, quality/performance frontier |
-| P1 | Technology transfer and direction | M6 independent reproduction/review; M7 expert challenge, second actual consumer context, observed teaching task and feedback-driven revision/retest using the same three cases |
+| P1 | Technology transfer and direction | M6 documented reproduction/review; M7 technical challenge, second usage context, author/agent explanation rehearsal and justified revision/retest using the same three cases |
 
 The [roadmap](Roadmap.md) owns global order and current/next work, without delivery dates or hour budgets. This table states the durable outcome hierarchy.
 

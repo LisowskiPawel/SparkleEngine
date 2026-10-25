@@ -110,7 +110,7 @@ The current gap permits one clean output-resolution insertion. It does not estab
 | `AC-CHRD-07` | cost/resource budgets cover active/neutral paths, 1080p/4K, resize, captures, pipeline variants, and optional future fusion | measured/modelled budget sheet with escalation triggers |
 | `AC-CHRD-08` | evidence detects swapped channels, wrong scale/aspect/stage, wrap, alpha mutation, stale state, silent disable, and incidental-fringe misclassification | `CHR-EXP-06` seeded-defect trial |
 | `AC-CHRD-09` | every plan stage has prerequisites, estimates, non-goals, owned output, deletion list, stop conditions, and falsifiable exit | accepted Plan and stage dry-run record |
-| `AC-CHRD-10` | independent reviewers can reproduce a hand case and determine active versus incidental fringing without private explanation | exact-revision math, architecture, UX, and evidence review record |
+| `AC-CHRD-10` | separate reviewers can reproduce a hand case and determine active versus incidental fringing without private explanation | exact-revision math, architecture, UX, and evidence review record |
 
 ## Discovery Failure Modes
 
@@ -151,7 +151,7 @@ The gate report retains:
 5. owner/producer/consumer/state/lifetime/extent/failure/deletion ledger and end-to-end sequence;
 6. first-use, reset, invalid, two-view, resize/minimize, debug/UI/capture, package, accessibility, and automation dry runs;
 7. numeric cost/memory/artifact budgets, tolerances, fixtures, seeded defects, and oracle independence record;
-8. stage estimates, no-orphan mapping, exact stop/escalation rules, rights/provenance disposition, and independent review;
+8. stage estimates, no-orphan mapping, exact stop/escalation rules, rights/provenance disposition, and separate review;
 9. exact checks run, outputs, limitations/unavailable checks, and final `PASS` or `Blocked` verdict.
 
 ## Gate Decision

@@ -10,10 +10,6 @@ class RayTracingClassicTlasStrategy final : public RayTracingTopLevelAcceleratio
 public:
 	explicit RayTracingClassicTlasStrategy(RenderHardwareInterface& renderHardwareInterface) noexcept;
 	~RayTracingClassicTlasStrategy() noexcept override;
-
-	const char* GetStrategyName() const noexcept override;
-	ERhiRayTracingTopLevelProvider GetActiveProvider() const noexcept override;
-	const char* GetActiveProviderReason() const noexcept override;
 	RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept override;
 	RayTracingTopLevelAccelerationStructureBuildResult Build(
 	    RenderCommandContext& commandContext,

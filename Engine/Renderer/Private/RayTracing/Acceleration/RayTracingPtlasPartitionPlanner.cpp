@@ -136,13 +136,9 @@ DirectX::XMFLOAT3 RayTracingPtlasPartitionPlanner::ComputeInstancePartitionPosit
 RayTracingPtlasPartitionPlanner::SceneBounds RayTracingPtlasPartitionPlanner::ComputeSceneBounds(const PreparedRenderScene& preparedScene) noexcept
 {
 	SceneBounds bounds{};
-	for (const std::uint32_t blasInputIndex : preparedScene.rayTracingWork.PartitionedTlasBlasInputIndices)
+	for (const RenderRayTracingInstance& input : preparedScene.rayTracingInstances)
 	{
-		if (blasInputIndex >= preparedScene.rayTracingWork.BlasInputs.size())
-		{
-			Diagnostics::Fatal(g_rayTracingPtlasPartitionPlannerLogger, __FILE__, __LINE__, "Partition planning references a BLAS input outside the prepared work plan.");
-		}
-		const std::uint32_t primitiveIndex = preparedScene.rayTracingWork.BlasInputs[blasInputIndex].PrimitiveIndex;
+		const std::uint32_t primitiveIndex = input.PrimitiveIndex;
 		const InstanceBounds instanceBounds = ComputeInstanceWorldBounds(preparedScene, primitiveIndex);
 		if (instanceBounds.Valid)
 		{
@@ -251,20 +247,15 @@ void RayTracingPtlasPartitionPlanner::CollectObservedInstances(
     RayTracingPtlasPartitionPlan& plan,
     BuildState& state)
 {
-	const RenderRayTracingWorkPlan& work = preparedScene.rayTracingWork;
+	const auto& instances = preparedScene.rayTracingInstances;
 	const bool hasGlobalPartition = plan.Counts.GlobalPartitionIndex != kRayTracingPtlasInvalidEntryIndex;
 	std::unordered_set<std::uint32_t> seenStableIndices;
-	seenStableIndices.reserve(work.PartitionedTlasBlasInputIndices.size());
-	state.ObservedInstances.reserve(work.PartitionedTlasBlasInputIndices.size());
+	seenStableIndices.reserve(instances.size());
+	state.ObservedInstances.reserve(instances.size());
 	std::uint32_t maximumStableIndex = 0;
 
-	for (const std::uint32_t blasInputIndex : work.PartitionedTlasBlasInputIndices)
+	for (const RenderRayTracingInstance& input : instances)
 	{
-		if (blasInputIndex >= work.BlasInputs.size())
-		{
-			Diagnostics::Fatal(g_rayTracingPtlasPartitionPlannerLogger, __FILE__, __LINE__, "Partition planning references a BLAS input outside the prepared work plan.");
-		}
-		const RenderRayTracingBlasInput& input = work.BlasInputs[blasInputIndex];
 		if (input.PrimitiveIndex >= preparedScene.primitives.size())
 		{
 			Diagnostics::Fatal(g_rayTracingPtlasPartitionPlannerLogger, __FILE__, __LINE__, "Partition planning references a mesh instance outside the render scene.");
@@ -368,8 +359,8 @@ RayTracingPtlasPartitionPlan RayTracingPtlasPartitionPlanner::Build(const Prepar
 	ValidateConfig(inputConfig);
 	const RayTracingPtlasPartitionPlannerConfig& config = inputConfig;
 	RayTracingPtlasPartitionPlan plan = InitializePlan(preparedScene, config);
-	const RenderRayTracingWorkPlan& work = preparedScene.rayTracingWork;
-	if (work.PartitionedTlasBlasInputIndices.empty())
+	const auto& instances = preparedScene.rayTracingInstances;
+	if (instances.empty())
 	{
 		m_previousInstances.clear();
 		m_partitionStates.clear();

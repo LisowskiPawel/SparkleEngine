@@ -98,7 +98,7 @@ In the PD-1 working candidate, Game opens its menu on first run. Esc or F1 retur
 
 This is the Architecture acceptance owner for the Showcase consumer journey. [Application](../../Engine/Application/ApplicationCapabilities.md#product-contract-boundary) owns host construction and settlement; the [frozen product contract](../../../../Acceptance/FirstRelease.md#frozen-product-and-output-classification) owns release values; [release gates](../../../../Acceptance/FirstRelease.md#release-gates) are linked, not repeated.
 
-**Proof allocation:** [PD-1](../../../CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells) closes source-workspace portions; PD-3 closes installed portions and PD-4 reconciles the same archive/non-author evidence. These are portions of the criteria below, not separate acceptance definitions. Results stay in [Product delivery progress](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
+**Proof allocation:** [PD-1](../../../CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells) closes source-workspace portions; PD-3 closes installed portions and PD-4 reconciles the same archive/rehearsal evidence. These are portions of the criteria below, not separate acceptance definitions. Results stay in [Product delivery progress](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
 
 | ID | Binary acceptance criterion | Proof phase |
 | --- | --- | --- |

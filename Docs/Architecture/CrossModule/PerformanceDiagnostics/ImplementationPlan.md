@@ -39,7 +39,7 @@ Execute only unresolved P0-GATE decisions needed by the Roadmap-selected slice f
 
 ## Phase 1 — Prove External Capture End To End
 
-**Delivery owner:** [External Capture staged plan](ExternalCapture/ImplementationPlan.md). It retains the exact `EXT-00` through `EXT-05` cells and provider-specific discovery, failure, native finalization, artifact, observer, Shipping-erasure and independent-review requirements.
+**Delivery owner:** [External Capture staged plan](ExternalCapture/ImplementationPlan.md). It retains the exact `EXT-00` through `EXT-05` cells and provider-specific discovery, failure, native finalization, artifact, observer, Shipping-erasure and separate-review requirements.
 
 **Exit (`P1-GATE`):** every selected external cell has its candidate-bound result; aggregate closure covers the child's frozen matrix. Missing tools, hardware or checks remain blockers for those cells. A qualified PIX cell stays useful while later cells remain open. No internal collection, history, query or UI product is needed to pass external capture.
 
@@ -101,7 +101,7 @@ Do not execute Phase 5 without explicit package admission and a failed simpler a
 
 ## Phase 6 — Harden And Close The Selected Product
 
-Close only the selected scope. Preserve candidate-bound positive/negative, backend/profile, observer, shutdown, package and independent-adoption checks applicable to that scope. Unselected packages remain deferred; do not implement or exercise them to complete a ledger.
+Close only the selected scope. Preserve candidate-bound positive/negative, backend/profile, observer, shutdown, package and documented-reproduction checks applicable to that scope. Unselected packages remain deferred; do not implement or exercise them to complete a ledger.
 
 **Exit:** `FIN-01` through `FIN-04` close the admitted matrix, failures/lifetimes, observer/capacity and deletion/documentation respectively. No unresolved required cell becomes a pass. A narrow result does not claim every development map's performance is understood.
 

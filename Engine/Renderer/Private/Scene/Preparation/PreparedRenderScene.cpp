@@ -22,9 +22,7 @@ void PreparedRenderScene::ResetForReuse() noexcept
 	previousJointMatrices.clear();
 	morphWeights.clear();
 	previousMorphWeights.clear();
-	rayTracingWork.BlasInputs.clear();
-	rayTracingWork.ClassicTlasBlasInputIndices.clear();
-	rayTracingWork.PartitionedTlasBlasInputIndices.clear();
+	rayTracingInstances.clear();
 	materialGeneration.reset();
 	materials = {};
 	materialTextureTable = {};

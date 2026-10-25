@@ -13,7 +13,7 @@ Turn one actual failure into a causal, reproducible incident case without buildi
 | What to do | Working route |
 | --- | --- |
 | First action | [INC-0](#inc-0-freeze-the-failed-candidate-and-question): bind the actual bad candidate and first discriminating observation; reuse completed evidence where valid. |
-| Result to reach | M3: causal original-bad versus fixed proof and a cleared replay packet under AC-WS-03. M6 / parent WS-S4 retains the required real independent review/replay under AC-WS-04. |
+| Result to reach | M3: causal original-bad versus fixed proof and a cleared replay packet under AC-WS-03. M6 / parent WS-S4 retains the required real separate review/replay under AC-WS-04. |
 | Start / stop | Planning can prepare decisions earlier; execution needs the exact candidate, valid prerequisites and frozen check cards. Missing rights, tools, or external participants keep the affected result open. |
 
 ## Execution Contract

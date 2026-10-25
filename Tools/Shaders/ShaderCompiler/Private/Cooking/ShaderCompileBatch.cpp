@@ -13,9 +13,9 @@
 #include "Verification/ShaderParameterStructCookVerifier.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cstdint>
 #include <exception>
-#include <mutex>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -99,8 +99,7 @@ namespace ShaderCompileBatch
 			++consumerCountByProducer[producerIndex];
 		}
 
-		std::mutex progressMutex;
-		std::size_t completedWork = 0;
+		std::atomic<std::size_t> completedWork{0};
 		const std::uint32_t hardwareThreads = std::max(1u, std::thread::hardware_concurrency());
 		const std::uint32_t compileWorkers = std::clamp(settings.maximumParallelCompiles, 1u, std::min(hardwareThreads, 8u));
 		TaskExecutor executor(
@@ -129,9 +128,9 @@ namespace ShaderCompileBatch
 					    results[producerIndex] = ShaderCompileJobExecutor::Execute(jobs[jobIndex]);
 					    if (progress)
 					    {
-						    std::lock_guard lock(progressMutex);
-						    completedWork += consumerCountByProducer[producerIndex];
-						    progress({.Action = "Compiled shader", .Item = jobs[jobIndex].Request.ShaderTypeName, .Completed = completedWork, .Total = totalWork});
+						    const std::size_t work = consumerCountByProducer[producerIndex];
+						    const std::size_t completed = completedWork.fetch_add(work) + work;
+						    progress({.Action = "Compiled shader", .Item = jobs[jobIndex].Request.ShaderTypeName, .Completed = completed, .Total = totalWork});
 					    }
 					    return TaskResult::Success();
 				    }

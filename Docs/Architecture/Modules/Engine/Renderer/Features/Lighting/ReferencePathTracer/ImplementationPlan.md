@@ -360,6 +360,6 @@ An implemented tracer with incomplete evidence is **not complete**. A fully evid
 
 Start with the recovery route below. The ordinary per-view mode, alternate frame middle, session/accumulation, shared transport, automatic traversal, UI and manual publication route are source-delivered; do not restart their implementation. Close identified invalid-result/preflight defects and execute the deferred analytic, lifecycle, backend, UX and publication checks against one real candidate. Source delivery remains distinct from executable acceptance.
 
-Reuse valid prior proof and re-run invalidated cells. `REL-03`, release maps, support identities, all included GPU validation and independent adoption remain mandatory before release/package/oracle claims. The [readiness dashboard](../../../../../../../Acceptance/CurrentReadiness.md#renderer) remains the score owner.
+Reuse valid prior proof and re-run invalidated cells. `REL-03`, release maps, support identities, all included GPU validation and documented reproduction remain mandatory before release/package/oracle claims. The [readiness dashboard](../../../../../../../Acceptance/CurrentReadiness.md#renderer) remains the score owner.
 
 </details>

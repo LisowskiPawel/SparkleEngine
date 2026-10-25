@@ -192,7 +192,7 @@ Automation also freezes target window/display selection policy, timeout, allowed
 
 ## Stage-0 First-Use And Transition Dry Run
 
-Independent reviewers walk: SDR baseline; HDR request with OS HDR off; eligible activation; metadata omitted/failure; UI-white change; resize/fullscreen/minimize; window straddle/move between HDR and SDR displays; OS toggle; hotplug; suspend/resume; interposer/interface loss; device/backend recovery; fallback success/failure; package first use; raw/native/compositor/external capture interpretation; and Use SDR. They inject stale and mixed generations in the paper/state model.
+Separate reviewers walk: SDR baseline; HDR request with OS HDR off; eligible activation; metadata omitted/failure; UI-white change; resize/fullscreen/minimize; window straddle/move between HDR and SDR displays; OS toggle; hotplug; suspend/resume; interposer/interface loss; device/backend recovery; fallback success/failure; package first use; raw/native/compositor/external capture interpretation; and Use SDR. They inject stale and mixed generations in the paper/state model.
 
 The dry run passes only when reviewers can identify current pixels/profile, current output and validity, why requested/active differ, next legal action, maximum wait/black period, and what each artifact proves without private explanation.
 

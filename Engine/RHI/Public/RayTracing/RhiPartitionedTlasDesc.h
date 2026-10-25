@@ -6,6 +6,9 @@
 
 #include <array>
 #include <cstdint>
+#include <limits>
+
+inline constexpr std::uint32_t RhiPartitionedTlasGlobalPartitionIndex = (std::numeric_limits<std::uint32_t>::max)();
 
 enum class ERhiPartitionedTlasProvider : std::uint8_t
 {

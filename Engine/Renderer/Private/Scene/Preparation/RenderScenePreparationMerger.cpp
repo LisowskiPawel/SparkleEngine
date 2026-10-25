@@ -28,11 +28,9 @@ void RenderScenePreparationMerger::PublishSceneOutputs(RenderScenePreparationRun
 TaskResult RenderScenePreparationMerger::BuildRayTracingPlan(TaskExecutionContext& context)
 {
 	RenderScenePreparationRun& run = *context.TryGet<RenderScenePreparationRun>();
-	RenderRayTracingWorkPlan& plan = run.PreparedScene.rayTracingWork;
+	auto& rayTracingInstances = run.PreparedScene.rayTracingInstances;
 
-	plan.BlasInputs.reserve(run.PreparedScene.primitives.size());
-	plan.ClassicTlasBlasInputIndices.reserve(run.PreparedScene.primitives.size());
-	plan.PartitionedTlasBlasInputIndices.reserve(run.PreparedScene.primitives.size());
+	rayTracingInstances.reserve(run.PreparedScene.primitives.size());
 
 	for (std::uint32_t primitiveIndex = 0u; primitiveIndex < run.PreparedScene.primitives.size(); ++primitiveIndex)
 	{
@@ -42,10 +40,7 @@ TaskResult RenderScenePreparationMerger::BuildRayTracingPlan(TaskExecutionContex
 			continue;
 		}
 
-		const std::uint32_t blasInputIndex = static_cast<std::uint32_t>(plan.BlasInputs.size());
-		plan.BlasInputs.push_back(RenderRayTracingBlasInput{.PrimitiveIndex = primitiveIndex, .GpuSceneSlot = draw.Source.GpuSceneSlot});
-		plan.ClassicTlasBlasInputIndices.push_back(blasInputIndex);
-		plan.PartitionedTlasBlasInputIndices.push_back(blasInputIndex);
+		rayTracingInstances.push_back(RenderRayTracingInstance{.PrimitiveIndex = primitiveIndex, .GpuSceneSlot = draw.Source.GpuSceneSlot});
 	}
 
 	return TaskResult::Success();

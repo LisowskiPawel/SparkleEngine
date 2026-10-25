@@ -6,7 +6,7 @@
 #include "TaskExecutor.h"
 
 #include <algorithm>
-#include <mutex>
+#include <atomic>
 #include <thread>
 
 struct AssetCookerSceneBatch::Item final
@@ -108,15 +108,14 @@ TaskResult AssetCookerSceneBatch::BuildProduct(const std::vector<AssetCookerScen
 bool AssetCookerSceneBatch::BuildProducts(const std::vector<AssetCookerSceneEntry>& sceneEntries, std::vector<Item>& items, const ToolWorkProgressCallback& progress, std::size_t totalWork)
 {
 	const std::uint32_t taskCapacity = static_cast<std::uint32_t>(std::max<std::size_t>(sceneEntries.size(), 1u));
-	std::mutex progressMutex;
-	std::size_t completed = 0;
+	std::atomic<std::size_t> completed{0};
 
-	const auto itemCompleted = [&sceneEntries, &progress, &progressMutex, &completed, totalWork](std::uint32_t index)
+	const auto itemCompleted = [&sceneEntries, &progress, &completed, totalWork](std::uint32_t index)
 	{
 		if (progress)
 		{
-			std::lock_guard lock(progressMutex);
-			progress({.Action = "Cooked scene", .Item = sceneEntries[index].relativePath, .Completed = ++completed, .Total = totalWork});
+			const std::size_t completedWork = ++completed;
+			progress({.Action = "Cooked scene", .Item = sceneEntries[index].relativePath, .Completed = completedWork, .Total = totalWork});
 		}
 	};
 

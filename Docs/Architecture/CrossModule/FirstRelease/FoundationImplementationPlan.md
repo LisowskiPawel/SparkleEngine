@@ -126,7 +126,7 @@ NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/set
 
 **Cleanup:** Remove stale current-state instructions, duplicate reports and obsolete generated membership. Check that preceding repairs already removed their replaced paths.
 
-**Exit:** Every admitted foundation claim has its candidate decision and required negatives; exclusions have reasons. This stage does not recreate source-present layers or turn local rehearsal into independent adoption.
+**Exit:** Every admitted foundation claim has its candidate decision and required negatives; exclusions have reasons. This stage does not recreate source-present layers or turn local rehearsal into documented reproduction.
 
 ```text
 Execute only FWC-6 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-6--foundation-candidate-closure. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.

@@ -19,17 +19,8 @@ struct ToolWorkProgress final
 	bool IsDeterminate() const noexcept { return total != 0; }
 };
 
-class ToolWorkProgressProtocol final
-{
-public:
-	ToolWorkProgressProtocol() = delete;
-
-	static std::string Format(std::string_view phase, std::size_t completed = 0, std::size_t total = 0);
-	static std::optional<ToolWorkProgress> Parse(std::string_view line);
-
-private:
-	static std::optional<std::size_t> ParseCount(std::string_view text);
-};
+std::string FormatToolWorkProgress(std::string_view phase, std::size_t completed = 0, std::size_t total = 0);
+std::optional<ToolWorkProgress> ParseToolWorkProgress(std::string_view line);
 
 class ToolWorkProgressWriter final
 {
@@ -42,6 +33,7 @@ public:
 private:
 	std::ostream& m_output;
 	std::mutex m_mutex;
-	std::string m_lastPhase;
+	std::string m_lastAction;
+	std::size_t m_lastTotal = 0;
 	std::size_t m_lastPercentage = std::numeric_limits<std::size_t>::max();
 };

@@ -22,7 +22,7 @@ Certificate enrollment is deferred until before public release. It does not prev
 
 ## Product Plan And Public Release
 
-[PD-1 through PD-4](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#how-to-close-this-plan) qualify the approved product journeys and one **unsigned internal** archive. Source-only checks run before an archive exists; installed checks consume the archive. Independent-adopter and clean/minimum-machine requirements remain required where assigned, even when local checks pass.
+[PD-1 through PD-4](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#how-to-close-this-plan) qualify the approved product journeys and one **unsigned internal** archive. Source-only checks run before an archive exists; installed checks consume the archive. Author/agent rehearsal is accepted under the [actor scope](FeatureCompletionReports.md#report-closure-and-review); clean/minimum-machine requirements remain required where assigned.
 
 The product plan may retire after all six reports explicitly pass the unsigned-internal-product scope; public-release qualification remains open. Certificate issuance, signing and public redistribution stay listed as pending FR-07 obligations, not failed product-stage prerequisites or exclusions. Signing changes byte identities; final integrity/trust and affected consumer checks must run again before public release. Package input identity, internal integrity and truthful failure behavior are not deferred.
 
@@ -90,7 +90,7 @@ Excluded from release example selection: `DamagedHelmet` (rights unresolved), `M
 | Vulkan | Explicitly selectable; Vulkan 1.3 plus the [required feature set](#frozen-platform-and-toolchain-prerequisites). Separate native/provider/performance proof required. |
 | Source build | Exact [toolchain](#frozen-platform-and-toolchain-prerequisites): VS Community 2026 18.7.0/MSVC 14.51.36231, Windows SDK 10.0.26100.0, CMake 4.3.3, Git for Windows 2.54.0, Qt 6.11.1 `msvc2022_64`, Vulkan SDK 1.4.350.0/Slang 2026.8, DXC 1.9.0.5347 |
 
-This is an initial named-machine claim. Generic 8 GiB GPU/16 GiB PC floors and other hardware/drivers require qualification before advertisement. Two measurement roles on one machine do not count as independent adoption. HDR additionally requires a qualified HDR10 display/OS configuration; none is recorded. No hardware purchase is authorized. Debug/Development builds remain source products; all three public products need qualified release configurations. Alternate toolchains remain unqualified.
+This is an initial named-machine claim. Generic 8 GiB GPU/16 GiB PC floors and other hardware/drivers require qualification before advertisement. Two measurement roles on one machine do not count as documented reproduction. HDR additionally requires a qualified HDR10 display/OS configuration; none is recorded. No hardware purchase is authorized. Debug/Development builds remain source products; all three public products need qualified release configurations. Alternate toolchains remain unqualified.
 
 </details>
 
@@ -157,7 +157,7 @@ Gates are strictly ordered. A later gate may be prepared, but it cannot be accep
 | `REL-06 Performance and stability` | Every release map meets the 30 FPS floor; load/soak/repeat/resize/switch/shutdown and memory gates pass on the supported matrix. | Raw timings, captures, memory records, and stability log. |
 | `REL-07 Native backend diagnostics` | D3D12 and Vulkan validation passes are clean or every finding is resolved/classified; crash/device-loss diagnostics are actionable. | API validation logs, captures, driver matrix, and incident records. |
 | `REL-08 Clean-machine candidate` | The frozen internal bundle starts all three products as a standard user, performs user-selected sync and completes Editor/Game journeys offline afterward on minimum/reference machines, with read-only install, per-user state, integrity, compatibility, and failure checks. | Candidate hashes and explicit unsigned-internal status, clean-machine record, filesystem/network inventory, screenshots, and logs. |
-| `REL-09 Independent release approval` | A non-author completes both consumer and source-adopter journeys from public instructions; all failure-mode checks pass; zero open `S0`/`S1`; waivers and known issues are approved. | Signed go/no-go checklist, consumer report, source-adopter report, and negative-test ledger. |
+| `REL-09 Candidate release review` | The author or agent completes both consumer and source-adopter journeys from public instructions; all failure-mode checks pass; zero open `S0`/`S1`; waivers and known issues are approved. | Signed go/no-go checklist, consumer report, source-adopter report, and negative-test ledger. |
 | `REL-10 Publish and verify` | The installed-consumer compatibility policy is effective; tag/artifact bytes are immutable; uploaded hashes/signatures/attestation match; fresh downloads pass all three product journeys and shortest source checks; notes/notices and the no-support statement are accurate. | Published URL/tag, checksums/signatures/attestation, retrieval logs and final policy. |
 | `REL-11 Stabilize and close` | A bounded maintainer release review is completed, known candidate defects are dispositioned, any replacement/withdrawal has exact provenance, and no unresolved `S0`/`S1` remains. No ongoing user support or response window is required. | Release-review ledger, any patch/withdraw records, retrospective and approval to unlock new feature work. |
 
@@ -174,7 +174,7 @@ Gates are strictly ordered. A later gate may be prepared, but it cannot be accep
 | `REL-06` | Presented/CPU/GPU p95 over 33.33 ms; hitch cluster; load/startup budget miss; memory growth/thrash; thermal/dynamic-quality contamination. | Mark failed, capture bottleneck evidence, optimize the owner or reduce the preapproved scope/preset honestly, then rerun all three runs and stability loops. |
 | `REL-07` | D3D12/Vulkan validation message; device removal; descriptor/resource lifetime error; crash record lacks context; validation path changes behavior. | Fix the API/lifetime owner, preserve reduced evidence, rerun focused validation then affected maps; do not waive an uncategorized native error. |
 | `REL-08` | Smart App Control/antivirus block; no-admin/read-only/offline failure; settings write into install; corrupt-cache crash; unexpected network/file mutation; removal damages user data. | Reject candidate bytes, correct package/runtime ownership or supported scope, produce a new candidate ID, and rerun every invalidated gate. |
-| `REL-09` | Non-author needs private help; source build cannot reproduce; instructions omit a prerequisite; negative check misses its injected defect; open `S0`/`S1`. | No-go. Fix product/docs/evidence, generate a new candidate if bytes changed, and repeat independent acceptance with a clean state. |
+| `REL-09` | The documented route needs hidden repair; source build cannot reproduce; instructions omit a prerequisite; negative check misses its injected defect; open `S0`/`S1`. | No-go. Fix product/docs/evidence, generate a new candidate if bytes changed, and repeat affected acceptance with a clean state. |
 | `REL-10` | Uploaded bytes/hash/signature/tag differ; compatibility policy still assumes no consumers; broken release/onboarding link or false support promise; fresh download fails. | Stop announcement or withdraw affected assets, preserve incident evidence, publish corrected bytes only under a new version/candidate, then verify again. |
 | `REL-11` | Known `S0`/`S1`, security/rights defect, repeat crash or public-byte mismatch at closeout. | Block closure, preserve exact evidence, then fix/revalidate or withdraw affected bytes. No public response deadline is promised. |
 
@@ -228,7 +228,7 @@ These are contract targets, not evidence that the current source enforces or pas
 | Source validation tools | clang-format and clang-tidy `22.1.3`, discoverable on PATH or through the [style owner](../Engineering/Foundations/CodeStyle.md#repository-commands) | Required by the approved `code_style_check` baseline gate; not required to launch packaged products. |
 | Cold source acquisition | Git and HTTPS network access for pinned source/dependency inputs; no credentials or private caches | Git dependencies use full commit hashes. Configure rejects dirty or mismatched Git caches without resetting or deleting them. SDK/archive receipts and cold/warm reproduction remain candidate checks; warm replay must run without network after the declared cache is populated. |
 
-The release owner selected this existing laptop as both `MIN-01` and `REF-01` on 2026-10-10: Windows 11 Home 25H2 build `26200.9457`, AMD Ryzen 9 8940HX (16 cores/32 logical processors), 63.17 GiB OS-reported RAM, NVIDIA GeForce RTX 5070 Ti Laptop GPU with 12,227 MiB reported dedicated memory on driver `610.47`, and Patriot P400L 2000GB NVMe SSD/NTFS. The generic CPU/RAM/VRAM floors above are necessary prerequisite targets, **not a supported lower-end machine claim**: initial performance acceptance is on this named laptop. Expanding to another hardware class requires scope approval and its own proof. The [scope record](#product-and-supported-matrix) owns the selected machine/exposure boundary. Hardware inspection and owner selection do not prove graphics support, 30 FPS, an HDR-capable display or independent adoption.
+The release owner selected this existing laptop as both `MIN-01` and `REF-01` on 2026-10-10: Windows 11 Home 25H2 build `26200.9457`, AMD Ryzen 9 8940HX (16 cores/32 logical processors), 63.17 GiB OS-reported RAM, NVIDIA GeForce RTX 5070 Ti Laptop GPU with 12,227 MiB reported dedicated memory on driver `610.47`, and Patriot P400L 2000GB NVMe SSD/NTFS. The generic CPU/RAM/VRAM floors above are necessary prerequisite targets, **not a supported lower-end machine claim**: initial performance acceptance is on this named laptop. Expanding to another hardware class requires scope approval and its own proof. The [scope record](#product-and-supported-matrix) owns the selected machine/exposure boundary. Hardware inspection and owner selection do not prove graphics support, 30 FPS, an HDR-capable display or documented reproduction.
 
 ### Frozen Paths, Mutation Boundary, And Budgets
 
@@ -346,7 +346,7 @@ Deferred decals, Color Grading and HDR10 remain their existing mandatory obligat
 
 ### Principal Frame Review
 
-The requested quality standard is a frame that can withstand detailed review by a principal rendering engineer at NVIDIA. Freeze the packet and review criteria below, then retain the independent qualified reviewer identity, relevant experience, reviewed candidate/artifact hashes, findings and disposition through the existing release-review gate. Reviewer competence and completed scrutiny establish that evidence; employer affiliation is not an additional release prerequisite. A claim that an NVIDIA engineer reviewed the frame requires that person's confirmed identity and actual review. Author self-review or an AI-generated checklist cannot claim independent review occurred. No outreach is authorized by this documentation work.
+The requested quality standard is a frame that can withstand detailed principal-rendering review. Freeze the packet and criteria below, then retain the actual author/agent reviewer, candidate/artifact hashes, findings and disposition. An external reviewer is optional. A claim that an NVIDIA engineer reviewed the frame still requires that person's confirmed identity and actual review; an author/agent pass cannot claim it. No outreach is authorized by this documentation work.
 
 The packet contains:
 
@@ -362,7 +362,7 @@ Acceptance requires no unresolved release-critical correctness, lifetime, synchr
 
 ## Release Roles
 
-One person may hold several roles, but the independent acceptance run MUST be performed by someone who did not prepare the candidate on that machine.
+One person may hold several roles, but the recorded acceptance run MUST be performed by someone who did not prepare the candidate on that machine.
 
 | Role | Decision owned |
 | --- | --- |
@@ -404,7 +404,7 @@ The engine-adopter journey is accepted separately from the binary package:
 - one minimal command path builds the Game; optional editor, launcher, import/cook, ray-tracing, and vendor-provider paths are separately selectable and fail at configure time when prerequisites are absent;
 - `Showcase` is the supported sample project. The instructions identify where to add a project, where generated/cooked data lives, how to clean it, and which interfaces are stable or deliberately unstable;
 - warnings, failed downloads, missing tools, unsupported CPUs/GPUs, bad cached dependencies, and cook errors stop with actionable ownership and recovery instructions;
-- a non-author completes the journey and reports elapsed time, download/build/disk cost, commands, failures, and one technical criticism.
+- the author or agent completes the journey and reports elapsed time, download/build/disk cost, commands, failures, and one technical criticism.
 
 No binary SDK, plugin ABI, installed headers/libraries, or compatibility promise may be inferred from source-export macros. If those are excluded, the release page says so plainly.
 
@@ -553,7 +553,7 @@ Every negative check records its `FM-*` and `CHK-*`, expected failure, observed 
 | Launcher | Required shipped product: source/toolchain discovery; configure/build/cook/run; asset-pack sync; progress/cancel/failure; selectable scope matches support; no repository-only path assumptions; child-process handoff and shutdown. |
 | Third-party providers | Exact feature/provider need; immutable SDK/runtime identity; license and redistribution; release-only DLL allowlist; signature/publisher; unsupported-hardware and missing-provider behavior; no debug/provider payload leakage. |
 | Runtime package | Dependency closure; package-relative immutable content; per-user writable state; offline start; clean-machine consumer journey; trusted PE signatures; manifest, hashes, provenance, SBOM, and allowlist; no authoring/training/source/debug assets; extraction/removal behavior. |
-| Source release/adopter | Immutable source tag/archive; public prerequisite and dependency sync; clean build/cook/run; supported sample project; source API/ABI statement; no private path/tool/credential; independent reproduction. |
+| Source release/adopter | Immutable source tag/archive; public prerequisite and dependency sync; clean build/cook/run; supported sample project; source API/ABI statement; no private path/tool/credential; documented reproduction. |
 | Crash/security/support | Local process/hang/device-loss diagnostics, candidate symbol correlation, consent/privacy, known issues and explicit no-support statement. Release-side vulnerability disposition and immutable replacement/withdrawal remain required; no intake service or response clock. |
 | Documentation/support | Runtime and source-adopter quick starts; requirements; controls; map/mode/provider matrix; API/compatibility policy; notices/SBOM; release notes; known issues; troubleshooting; integrity verification; crash/security/reporting instructions; privacy; explicit absence of ongoing support. |
 
@@ -632,7 +632,7 @@ artifacts/validation/releases/<version>/<candidate-id>/
 - Direct public Windows distribution is blocked by an unsigned, self-signed, untrusted, expired, mismatched, or unexpectedly signed PE. Any accepted channel-specific alternative must be frozen at `REL-00` and proven end to end.
 - The installed-consumer compatibility, persisted-data, update, rollback, no-support, and local-diagnostic/privacy rules MUST be effective before `REL-10`; publication cannot rely on the repository's pre-consumer clean-break premise.
 - Scope may shrink to reach a trustworthy release. Acceptance thresholds may not be weakened after observing a failure without recording a reviewed contract change and rationale.
-- The release owner gives the final go/no-go only after an independent reviewer completes `REL-09`.
+- The release owner gives the final go/no-go only after an separate reviewer completes `REL-09`.
 - `REL-10` proves publication; it does not unlock new features. Only the approved `REL-11` stabilization closeout does.
 
 ## Reference And Ownership

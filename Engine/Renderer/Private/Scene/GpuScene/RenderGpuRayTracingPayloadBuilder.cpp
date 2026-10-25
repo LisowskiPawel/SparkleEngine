@@ -169,7 +169,7 @@ static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpu
 {
 	std::uint32_t instanceCapacity = 1;
 	std::unordered_set<std::uint32_t> occupiedGpuSceneSlots;
-	for (const RenderRayTracingBlasInput& input : preparedScene.rayTracingWork.BlasInputs)
+	for (const RenderRayTracingInstance& input : preparedScene.rayTracingInstances)
 	{
 		if (input.GpuSceneSlot == (std::numeric_limits<std::uint32_t>::max)() || !occupiedGpuSceneSlots.insert(input.GpuSceneSlot).second)
 		{
@@ -179,11 +179,11 @@ static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpu
 	}
 
 	payloads.Instances.resize(instanceCapacity);
-	meshOffsets.reserve(preparedScene.rayTracingWork.BlasInputs.size());
+	meshOffsets.reserve(preparedScene.rayTracingInstances.size());
 }
 
 static void AppendInstance(
-    const RenderRayTracingBlasInput& input,
+    const RenderRayTracingInstance& input,
     const PreparedRenderScene& preparedScene,
     const GpuMeshCache& meshes,
     RenderGpuRayTracingPayloads& payloads,
@@ -233,8 +233,8 @@ void BuildRenderGpuRayTracingPayloads(const PreparedRenderScene& preparedScene, 
 {
 	Clear(payloads);
 
-	const RenderRayTracingWorkPlan& work = preparedScene.rayTracingWork;
-	if (work.BlasInputs.empty())
+	const auto& instances = preparedScene.rayTracingInstances;
+	if (instances.empty())
 	{
 		return;
 	}
@@ -247,7 +247,7 @@ void BuildRenderGpuRayTracingPayloads(const PreparedRenderScene& preparedScene, 
 
 	MeshHitDataOffsets meshOffsets;
 	PrepareInstances(preparedScene, payloads, meshOffsets);
-	for (const RenderRayTracingBlasInput& input : work.BlasInputs)
+	for (const RenderRayTracingInstance& input : instances)
 	{
 		AppendInstance(input, preparedScene, meshes, payloads, meshOffsets);
 	}

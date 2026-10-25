@@ -338,7 +338,7 @@ Include scope/claims, semantics, ownership, identity/lifetime, user workflow, pl
 | --- | --- | --- | --- |
 | `AC-{{DISCOVERY_GATE}}-01` | {{BINARY_DECISION_COMPLETENESS}} | {{SIGNED_OR_REVIEWED_ARTIFACT}} | {{WHAT_A_REVIEWER_WOULD_STILL_HAVE_TO_INFER}} |
 
-Require exact terms, current-route audit, feature disposition, semantic derivation, architecture/lifetime, oracle independence, check design, thresholds, budgets, experience, security/rights, clean break, estimates, and independent review as applicable.
+Require exact terms, current-route audit, feature disposition, semantic derivation, architecture/lifetime, oracle independence, check design, thresholds, budgets, experience, security/rights, clean break, estimates, and separate review as applicable.
 
 ## Risk Register
 
@@ -354,7 +354,7 @@ Require exact terms, current-route audit, feature disposition, semantic derivati
 
 ## Evidence Package
 
-List the exact linked artifacts required for the decision: terminology, current trace, research ledger, feature matrix, semantic contract and hand cases, ownership/lifetime graph, UX dry run, risk/failure/check coverage, budgets, rights/security, estimates, clean-break ledger, and independent review.
+List the exact linked artifacts required for the decision: terminology, current trace, research ledger, feature matrix, semantic contract and hand cases, ownership/lifetime graph, UX dry run, risk/failure/check coverage, budgets, rights/security, estimates, clean-break ledger, and separate review.
 
 ## Exit Rule
 
@@ -430,7 +430,7 @@ List only unknowns with an owner, consequence, smallest next probe, and destinat
 
 ## Scaffold: `Semantics.md` — Algorithm, Protocol, Or Correctness Contract
 
-Create this file when correctness depends on formulas, units, coordinate conventions, data formats, protocol transitions, deterministic ordering, or another normative algorithm deserving independent review. Otherwise keep the small semantic contract in `ExecutionArchitecture.md`.
+Create this file when correctness depends on formulas, units, coordinate conventions, data formats, protocol transitions, deterministic ordering, or another normative algorithm deserving separate review. Otherwise keep the small semantic contract in `ExecutionArchitecture.md`.
 
 ````markdown
 # {{FEATURE_NAME}} Semantic Contract
@@ -795,7 +795,7 @@ Use only stage families required by this feature and split them when reviewabili
 
 | Family | Outcome | Typical prerequisite | Key proof |
 | --- | --- | --- | --- |
-| 0. Discovery/freeze | Close decisions, risks, semantic slots, architecture, UX, evidence design, budgets, estimates, and independent review. | None | {{DISCOVERY_GATE}} report |
+| 0. Discovery/freeze | Close decisions, risks, semantic slots, architecture, UX, evidence design, budgets, estimates, and separate review. | None | {{DISCOVERY_GATE}} report |
 | 1. Contracts/authority | Freeze the smallest consumed boundary and retirement decision. Production contracts land with their real consumer; otherwise this is documentation only. | Discovery and release prerequisite | Reviewed first-slice/check budget; no dormant API/state |
 | 2. Minimal vertical slice | One real input reaches one real observable result through the intended production path. | Contracts | Known-value end-to-end case |
 | 3. Semantic completeness | Complete included algorithms, formats, events, modes, or data rules. | Minimal slice | Rule-to-code and fault-injection evidence |
@@ -939,7 +939,7 @@ The gate fails when:
 | Current state and target design share present tense | Readers infer implementation from architecture prose. | Revision-pin current facts and label every target/proposal and non-claim. |
 | Research becomes local authority | A respected vendor or paper makes an unverified transfer look settled. | Record permitted use/non-inference and close the choice in Discovery/Semantics. |
 | The dossier repeats every companion table | Navigation exists but several documents own the same fact. | Keep one owner and use direct links with only local context. |
-| Discovery passes because documentation is lengthy | Open constants, units, budgets, or ownership decisions survive into coding. | Require binary decision rows, artifacts, independent review, and no inferred slot. |
+| Discovery passes because documentation is lengthy | Open constants, units, budgets, or ownership decisions survive into coding. | Require binary decision rows, artifacts, separate review, and no inferred slot. |
 | The plan chooses architecture | Later stages silently rewrite the durable design. | Resolve design in its owner before freezing the stage prompt. |
 | A stage is horizontal plumbing only | Many abstractions exist without a real end-to-end result. | Deliver the smallest real vertical slice and expand from proven semantics. |
 | A feature diffuses through generic owners | Each individual edit looks small, but understanding or removing the feature requires tracing the entire engine. | Freeze one feature home and hook budget; run `CHK-{{PREFIX}}-ARCH` at every stage and block every unledgered outside edit. |

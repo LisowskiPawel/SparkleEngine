@@ -55,4 +55,4 @@ Existing ImGuiRenderPacketBuilder remains the only cross-thread texture upload/p
 
 ## Validation Limits
 
-The [shared-service handoff](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/Discovery.md#shared-editor-icon-service-handoff) records exact build, serial/threaded UI, shared-client/deduplication, atlas growth, manifest failures, configuration membership and cleanup results. Those checks do not establish native GPU capture, Debug/Vulkan execution, full Shipping product/import/package erasure, accessibility/scaling matrix or independent adoption.
+The [shared-service handoff](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/Discovery.md#shared-editor-icon-service-handoff) records exact build, serial/threaded UI, shared-client/deduplication, atlas growth, manifest failures, configuration membership and cleanup results. Those checks do not establish native GPU capture, Debug/Vulkan execution, full Shipping product/import/package erasure, accessibility/scaling matrix or documented reproduction.

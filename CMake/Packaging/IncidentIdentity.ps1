@@ -48,6 +48,7 @@ function Get-IncidentPackage
     }
     Assert-PackageLayout $manifest
     Test-PackageStage $PackageRoot $manifest
+    Test-PackageMetadata $PackageRoot $manifest
     Test-PackageArchive $ArchivePath $PackageRoot $manifest
     return $manifest
 }

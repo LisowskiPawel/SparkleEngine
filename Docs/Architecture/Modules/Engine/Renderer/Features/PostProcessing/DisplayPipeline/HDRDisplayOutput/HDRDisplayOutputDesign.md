@@ -100,7 +100,7 @@ Completion claims signal construction and native activation on the frozen machin
 | optional editor FP16/scRGB cell | may fit Advanced Color composition/UI better | is a different encoding/tuple and doubles some semantic/native/evidence cells | `HDRD-01/03/11/12` |
 | system SDR white with bounded fallback | respects user/system UI brightness policy | dynamic query/update/failure ownership and validation required | `HDRD-05` |
 | fixed or bounded-adaptive peak | reproducible creative intent or improved display use | detected capability is not mastering policy; adaptation can change authored result | `HDRD-04` |
-| metadata non-authority | prevents false activation/color claims | diagnostics must separate requested/submitted/accepted/unknown effect | `HDRD-09` |
+| metadatthe author or agentity | prevents false activation/color claims | diagnostics must separate requested/submitted/accepted/unknown effect | `HDRD-09` |
 | generation-joined Renderer/RHI state | prevents PQ-on-SDR and SDR-on-HDR mixed frames | transition protocol and handoff latency become explicit | `HDRD-10` |
 | atomic SDR fallback | preserves usability on failure | requires recreatable known-good tuple and bounded recovery/black-frame behavior | `HDRD-07/08/10` |
 

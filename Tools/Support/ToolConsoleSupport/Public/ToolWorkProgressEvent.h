@@ -12,4 +12,6 @@ struct ToolWorkProgressEvent final
 	std::size_t Total = 0;
 };
 
+// Batch workers may report concurrently or out of completion order; sinks serialize/coalesce their own state.
+// Action and Item are borrowed only for the duration of the callback. Progress never publishes work results.
 using ToolWorkProgressCallback = std::function<void(const ToolWorkProgressEvent&)>;

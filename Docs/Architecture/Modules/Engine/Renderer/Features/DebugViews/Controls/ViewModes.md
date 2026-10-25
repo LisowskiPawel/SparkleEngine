@@ -88,7 +88,7 @@ Unreal exposes both a high-level runtime `EViewModeIndex` and lower-level `FEngi
 
 A per-view visibility or presentation control may be added only when all of these are true:
 
-1. it has a real independent user or runtime use case;
+1. it has a real rehearsal actor or runtime use case;
 2. it has a named production consumer and deterministic disabled behavior;
 3. it is orthogonal to `RenderViewMode` rather than another encoding of a mode;
 4. it is resolved below the mode-selection boundary and does not replace or compete with `ViewMode`;

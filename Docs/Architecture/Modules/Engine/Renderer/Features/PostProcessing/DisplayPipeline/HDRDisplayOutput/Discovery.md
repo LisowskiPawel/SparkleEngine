@@ -119,7 +119,7 @@ This is a verified source-backed absence. It does not establish which Advanced C
 | `AC-HDRD-07` | full feature/profile/backend/window/display/UI/package/exclusion matrix has one disposition and no reachable undeclared cell | reconciled `HDR-FS-*` ledger, support/reachability matrices, selector/source/package audit |
 | `AC-HDRD-08` | resource/performance/transition budgets bound query rate, swapchain memory, transform/UI work, recreation, black frames, retries, diagnostics, captures, and evidence workload | numeric budget sheet and boundary/fault observations |
 | `AC-HDRD-09` | every plan stage has prerequisites, estimates, owned result, non-goals, deletions, stop rules, and a prompt that cannot choose policy | accepted Plan and stage dry-run record |
-| `AC-HDRD-10` | independent reviewers can reproduce semantic/native/state/fallback/artifact cases and distinguish signal/native/display claims | exact-revision color, D3D12, Vulkan, architecture, UX, and evidence reviews |
+| `AC-HDRD-10` | separate reviewers can reproduce semantic/native/state/fallback/artifact cases and distinguish signal/native/display claims | exact-revision color, D3D12, Vulkan, architecture, UX, and evidence reviews |
 
 ## Discovery Failure Modes
 
@@ -164,7 +164,7 @@ The gate report retains:
 7. owner/type/state/generation/lifetime/transition/rollback/failure/deletion ledger with mixed-generation and fallback fault results;
 8. first-use, monitor/OS/window/device transition, recovery, UI, debug/capture, accessibility, automation, package dry runs;
 9. performance/memory/query/recreation/black-frame/retry/capture/evidence budgets and boundary observations;
-10. no-orphan mapping, rights/provenance, exact checks run/unavailable, limitations, independent review, and `PASS` or `Blocked` verdict.
+10. no-orphan mapping, rights/provenance, exact checks run/unavailable, limitations, separate review, and `PASS` or `Blocked` verdict.
 
 ## Gate Decision
 

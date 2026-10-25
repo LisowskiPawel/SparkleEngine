@@ -118,7 +118,7 @@ Freeze product/path domain and prove what the current seed-replay route does bef
 
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-0--close-ind-d0 and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
-Execute Indirect Lighting Stage 0 from `IndirectLighting/ImplementationPlan.md`. Treat this as discovery, not an estimator rewrite. Decode and trace the current seed-replay paths, targets, weights, technique accounting, history, and raw outputs; run only the IND-X experiments needed by the admitted slice and defer unselected optimizations; freeze each consumed `IND-D0-*` decision and threshold before candidate observation; name the exact replacement/deletion ledger; reconcile release and Reference Path Tracer gates; and obtain independent review. Report unknowns and unrun checks explicitly.
+Execute Indirect Lighting Stage 0 from `IndirectLighting/ImplementationPlan.md`. Treat this as discovery, not an estimator rewrite. Decode and trace the current seed-replay paths, targets, weights, technique accounting, history, and raw outputs; run only the IND-X experiments needed by the admitted slice and defer unselected optimizations; freeze each consumed `IND-D0-*` decision and threshold before candidate observation; name the exact replacement/deletion ledger; reconcile release and Reference Path Tracer gates; and obtain separate review. Report unknowns and unrun checks explicitly.
 ```
 
 </details>

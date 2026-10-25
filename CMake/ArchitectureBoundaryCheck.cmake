@@ -228,7 +228,7 @@ function(sparkle_boundary_scan_file absolute_path)
 				"${_line}")
 		endif()
 
-		if(_line MATCHES "ToolWorkProgressProtocol" AND
+		if(_line MATCHES "FormatToolWorkProgress|ParseToolWorkProgress" AND
 		   NOT _relative_path MATCHES "^Tools/Support/ToolConsoleSupport/(Private|Public)/ToolWorkProgress[.](cpp|h)$" AND
 		   NOT _relative_path MATCHES "^Tools/Launcher/SparkleLauncher/Private/(Core/LauncherOperationProgress|Gui/Operations/LauncherProgressStreamDecoder)[.]cpp$")
 			sparkle_boundary_append_failure(

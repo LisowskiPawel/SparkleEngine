@@ -97,7 +97,7 @@ Generic `Radiance` readback with the Reference producer's exact sample-prefix me
 | Need | Open |
 | --- | --- |
 | external NVIDIA/AMD implementations, Epic viewport UX, neutral math/format foundations, and current Sparkle gaps | [Research](Research.md) |
-| the blocking terminology, estimator, scope, fixture, risk, and independent-review gate | [`PTD-00` Discovery](Discovery.md) |
+| the blocking terminology, estimator, scope, fixture, risk, and separate-review gate | [`PTD-00` Discovery](Discovery.md) |
 | exact notation, formulas, PDF measures, core algorithm, PBR material decisions, equation-to-code ledger, and mathematical failure points | [Transport And Estimator](TransportAndEstimator.md) |
 | target ownership, per-view session/invalidation state, dataflow, sampler, integrator, traversal, artifact, workflow, and clean-break decisions | [Execution Architecture](ExecutionArchitecture.md) |
 | viewport-first interaction, Lit comparison, Editor/Game camera reset rules, defaults, progress, state actions, manual export, accessibility, errors, and first-use proof | [User Experience](UserExperience.md) |

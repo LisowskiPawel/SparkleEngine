@@ -33,7 +33,7 @@ The user's selected local scope uses installed software/current hardware, skips 
 | 3–4 | Nsight D3D12 acceptance, missing Vulkan lowering and specialist handoffs | EC-G3/EC-G4 |
 | 5–6 | RenderDoc D3D12/Vulkan candidate acceptance | EC-G5/EC-G6 |
 | 7 | Remaining available specialist handoffs | EC-G7 disposition |
-| 8 | Matrix, Shipping products, observer and independent adoption | EC-G8 and parent P1-GATE |
+| 8 | Matrix, Shipping products, observer and documented reproduction | EC-G8 and parent P1-GATE |
 
 Stage IDs remain stable for acceptance traceability. Close only the remaining delta at each gate; source delivery is not native acceptance. Earlier engine repair gates require revalidation only when drift invalidates their bounded evidence. Native target/finalization, failure and hook authorization remain mandatory before a production delta.
 
@@ -87,9 +87,9 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 ## Stage 2 — Close PIX Lifecycle, Game And Delivery
 
-**Remaining work:** Complete cancellation/drain/deadline, native-hotkey Busy, target/device loss, late result and shutdown controls. Add the smallest approved DevelopmentGame control over the same authority; the current source excludes Game capture and does not claim that route. Finish CPU/shader provenance, optimized observer comparisons and actual Shipping product/import/package/tool-free checks. Reuse valid separate PIX Timing evidence, refreshing invalidated cells. Independent adoption remains an explicit aggregate task.
+**Remaining work:** Complete cancellation/drain/deadline, native-hotkey Busy, target/device loss, late result and shutdown controls. Add the smallest approved DevelopmentGame control over the same authority; the current source excludes Game capture and does not claim that route. Finish CPU/shader provenance, optimized observer comparisons and actual Shipping product/import/package/tool-free checks. Reuse valid separate PIX Timing evidence, refreshing invalidated cells. Documented reproduction remains an explicit aggregate task.
 
-**Exit `EC-G2`:** relevant `AC-EC-01`–`AC-EC-10` and `AC-EC-12` pass for PIX Editor/Game D3D12, mapped negative failures settle safely, package/observer controls pass and individual PIX acceptance is recorded in candidate report. Non-author adoption may be performed now or remain explicit aggregate Stage 8 evidence. The separate PIX Timing lane has a transcript/artifact or explicit blocked prerequisite and cannot revoke an accepted GPU Capture cell. No whole-map capture is needed for each repair; retain Empty/Sponza and defer the roster gate to Stage 8.
+**Exit `EC-G2`:** relevant `AC-EC-01`–`AC-EC-10` and `AC-EC-12` pass for PIX Editor/Game D3D12, mapped negative failures settle safely, package/observer controls pass and individual PIX acceptance is recorded in candidate report. Documented reproduction may be performed now or remain explicit aggregate Stage 8 evidence. The separate PIX Timing lane has a transcript/artifact or explicit blocked prerequisite and cannot revoke an accepted GPU Capture cell. No whole-map capture is needed for each repair; retain Empty/Sponza and defer the roster gate to Stage 8.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -183,9 +183,9 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 ## Stage 8 — Close Remaining Matrix, Adoption And Parent Evidence
 
-**Remaining work:** Reuse valid narrow proof, then finish the frozen admitted release-map/representative-feature and API/profile/native-feature/interposer/validation/provider matrix from CHK-EC-MATRIX; catalog membership alone does not require every deferred scene per provider. Close actual ShippingEditor/Game import/package/optimized-callsite erasure, cold no-provider launch, user-state cleanliness, symbol mismatches, observer protocol, recovery and independent adoption/review. Review EVOLUTION/LOCALITY/ARCH against the delivered owners and verify earlier stage cleanup; any surviving production residue returns to its owner as a bounded repair with affected proof invalidated. Missing or unrun cells remain open; independent adoption cannot be author self-certification. P1-GATE closes only under the parent contract.
+**Remaining work:** Reuse valid narrow proof, then finish the frozen admitted release-map/representative-feature and API/profile/native-feature/interposer/validation/provider matrix from CHK-EC-MATRIX; catalog membership alone does not require every deferred scene per provider. Close actual ShippingEditor/Game import/package/optimized-callsite erasure, cold no-provider launch, user-state cleanliness, symbol mismatches, observer protocol, recovery and documented reproduction/review. Review EVOLUTION/LOCALITY/ARCH against the delivered owners and verify earlier stage cleanup; any surviving production residue returns to its owner as a bounded repair with affected proof invalidated. Missing or unrun cells remain open; documented author/agent reproduction is accepted, with actual commands and artifacts. P1-GATE closes only under the parent contract.
 
-**Exit `EC-G8`:** all relevant dossier criteria/failures/checks have retained results, no accepted cell lacks native artifact/identity/failure/Shipping/observer evidence, independent review/adoption complete. Record candidate disposition in existing completion report. Parent `P1-GATE` closes only with all selected `EXT-*` accepted or genuinely unsupported dispositions plus parent workload/erasure gates. Internal diagnostics packages remain unselected; Stage 8 admits or implements none of them.
+**Exit `EC-G8`:** all relevant dossier criteria/failures/checks have retained results, no accepted cell lacks native artifact/identity/failure/Shipping/observer evidence, separate review/adoption complete. Record candidate disposition in existing completion report. Parent `P1-GATE` closes only with all selected `EXT-*` accepted or genuinely unsupported dispositions plus parent workload/erasure gates. Internal diagnostics packages remain unselected; Stage 8 admits or implements none of them.
 
 <details>
 <summary>Copy implementation prompt</summary>

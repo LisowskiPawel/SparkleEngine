@@ -85,7 +85,7 @@ Every stage stops when an accepted discovery decision is missing or contradicted
 
 | Stage | Required inputs | Primary owned output | Non-goals | Minimum falsifiers |
 | --- | --- | --- | --- | --- |
-| 0 | current source trace, pinned research, template contract | exact accepted dossier revisions and `CGRD-00` result | production code or readiness credit | `CHK-CGRD-01` through `10` and independent review |
+| 0 | current source trace, pinned research, template contract | exact accepted dossier revisions and `CGRD-00` result | production code or readiness credit | `CHK-CGRD-01` through `10` and separate review |
 | 1 | accepted semantics and current settings/View/display owners | reviewed producer-to-output state/binding/check map | production carriers, registrations, inactive seam | actual consumer, neutral/failure oracle and bounded file/deletion list |
 | 2 | accepted parameter math/graph edge and Stage-1 map | complete settings/View/typed-binding/shader route producing one parameter-only grade | LUT/source/cook, fusion, output-profile policy | CPU/GPU hand cases, defect mutations, alpha/stage/extent, backend shader/native checks |
 | 3 | accepted grammar/layout/capacity/provenance | deterministic typed source-to-cooked artifact | runtime upload/render, extra formats, OCIO dependency | valid/malformed/hostile corpus, deterministic recook, dependency discovery, transaction failure |

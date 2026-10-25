@@ -11,29 +11,14 @@ RayTracingClassicTlasStrategy::RayTracingClassicTlasStrategy(RenderHardwareInter
 
 RayTracingClassicTlasStrategy::~RayTracingClassicTlasStrategy() noexcept = default;
 
-const char* RayTracingClassicTlasStrategy::GetStrategyName() const noexcept
-{
-	return "ClassicTlasStrategy";
-}
-
-ERhiRayTracingTopLevelProvider RayTracingClassicTlasStrategy::GetActiveProvider() const noexcept
-{
-	return ERhiRayTracingTopLevelProvider::ClassicTlas;
-}
-
-const char* RayTracingClassicTlasStrategy::GetActiveProviderReason() const noexcept
-{
-	return "classic-tlas-strategy-selected";
-}
-
 RenderRayTracingFrameBindings RayTracingClassicTlasStrategy::Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept
 {
 	(void) viewPlan;
 	RenderRayTracingFrameBindings frameBindings{};
-	const std::uint32_t estimatedInstanceCount = static_cast<std::uint32_t>(preparedScene.rayTracingWork.ClassicTlasBlasInputIndices.size());
+	const std::uint32_t estimatedInstanceCount = static_cast<std::uint32_t>(preparedScene.rayTracingInstances.size());
 	m_classicTlasBuilder.Prepare(estimatedInstanceCount);
 
-	frameBindings.TlasResource = m_classicTlasBuilder.GetTlas().resource;
+	frameBindings.TlasResource = m_classicTlasBuilder.GetResource();
 	frameBindings.EstimatedInstanceCount = estimatedInstanceCount;
 	return frameBindings;
 }
@@ -48,8 +33,8 @@ RayTracingTopLevelAccelerationStructureBuildResult RayTracingClassicTlasStrategy
 {
 	(void) viewPlan;
 	RayTracingTopLevelAccelerationStructureBuildResult result{};
-	result.ActiveProvider = GetActiveProvider();
-	result.ActiveProviderReason = GetActiveProviderReason();
+	result.ActiveProvider = ERhiRayTracingTopLevelProvider::ClassicTlas;
+	result.ActiveProviderReason = "classic-tlas-strategy-selected";
 	result.InstanceCount = m_classicTlasBuilder.Build(commandContext, preparedScene, blasCache, shaderTablePlan, diagnostics);
 	return result;
 }

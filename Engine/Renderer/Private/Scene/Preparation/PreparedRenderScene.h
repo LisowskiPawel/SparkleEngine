@@ -8,7 +8,7 @@
 #include "Scene/Preparation/RenderLightCollection.h"
 #include "Scene/Preparation/RenderMeshWorldBounds.h"
 #include "Scene/Preparation/RenderPrimitivePreparation.h"
-#include "Scene/Preparation/RenderRayTracingWorkPlan.h"
+#include "Scene/Preparation/RenderRayTracingInstance.h"
 #include "Scene/Preparation/RenderSkyData.h"
 #include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
 
@@ -46,7 +46,7 @@ struct PreparedRenderScene final
 	std::vector<DirectX::XMFLOAT4X4> previousJointMatrices;
 	std::vector<float> morphWeights;
 	std::vector<float> previousMorphWeights;
-	RenderRayTracingWorkPlan rayTracingWork;
+	std::vector<RenderRayTracingInstance> rayTracingInstances;
 	std::shared_ptr<const RenderMaterialGeneration> materialGeneration;
 	std::span<const MaterialData> materials;
 	ResolvedMaterialTextureTable materialTextureTable = {};

@@ -9,11 +9,7 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_rayTracingPtlasPartitionPlannerStateLogger, "Renderer.RayTracing.PtlasPartitionPlannerState");
 
-class RayTracingPtlasPartitionPlannerStateConstants final
-{
-public:
-	static constexpr std::uint32_t kMaxPlannerPartitionsPerAxis = 64;
-};
+static constexpr std::uint32_t MaxPlannerPartitionsPerAxis = 64;
 
 void RayTracingPtlasPartitionPlanner::Clear() noexcept
 {
@@ -23,8 +19,7 @@ void RayTracingPtlasPartitionPlanner::Clear() noexcept
 
 void RayTracingPtlasPartitionPlanner::ValidateConfig(const RayTracingPtlasPartitionPlannerConfig& config) noexcept
 {
-	if (config.PartitionsPerAxis == 0u || config.PartitionsPerAxis > RayTracingPtlasPartitionPlannerStateConstants::kMaxPlannerPartitionsPerAxis || config.ModeChangeDistance < 0.0f
-	    || config.TransformDirtyEpsilon < 0.0f)
+	if (config.PartitionsPerAxis == 0u || config.PartitionsPerAxis > MaxPlannerPartitionsPerAxis || config.ModeChangeDistance < 0.0f || config.TransformDirtyEpsilon < 0.0f)
 	{
 		Diagnostics::Fatal(g_rayTracingPtlasPartitionPlannerStateLogger, __FILE__, __LINE__, "Partitioned TLAS planner configuration is outside its structural bounds.");
 	}

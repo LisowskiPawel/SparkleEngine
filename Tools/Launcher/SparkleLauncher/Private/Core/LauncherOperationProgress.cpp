@@ -3,6 +3,7 @@
 #include "ToolWorkProgress.h"
 
 #include <cstddef>
+#include <string>
 #include <string_view>
 
 namespace SparkleLauncher
@@ -11,7 +12,8 @@ namespace SparkleLauncher
 	{
 		if (outputCallback)
 		{
-			outputCallback(ToolWorkProgressProtocol::Format(phase, completed, total));
+			const std::string record = FormatToolWorkProgress(phase, completed, total);
+			outputCallback(record);
 		}
 	}
 }

@@ -31,10 +31,6 @@ public:
 	RayTracingTopLevelAccelerationStructureStrategy& operator=(const RayTracingTopLevelAccelerationStructureStrategy&) = delete;
 	RayTracingTopLevelAccelerationStructureStrategy(RayTracingTopLevelAccelerationStructureStrategy&&) = delete;
 	RayTracingTopLevelAccelerationStructureStrategy& operator=(RayTracingTopLevelAccelerationStructureStrategy&&) = delete;
-
-	virtual const char* GetStrategyName() const noexcept = 0;
-	virtual ERhiRayTracingTopLevelProvider GetActiveProvider() const noexcept = 0;
-	virtual const char* GetActiveProviderReason() const noexcept = 0;
 	virtual RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept = 0;
 
 	virtual RayTracingTopLevelAccelerationStructureBuildResult Build(

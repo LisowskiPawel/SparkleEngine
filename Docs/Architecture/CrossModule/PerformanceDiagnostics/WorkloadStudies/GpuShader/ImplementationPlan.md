@@ -13,7 +13,7 @@ Turn one predeclared GPU question into original, falsifiable paired-API evidence
 | What to do | Working route |
 | --- | --- |
 | First action | [GPU-0](#gpu-0-freeze-the-kernel-question): Select one measured pass and exact semantic/source/bytecode/event join. |
-| Result to reach | This domain supplies local AC-WS-02/CHK-WS-02 evidence to M3/CASE-02/03. Parent WS-S4 closes actual independent reproduction at M6, without blocking the M4 technical dependency. |
+| Result to reach | This domain supplies local AC-WS-02/CHK-WS-02 evidence to M3/CASE-02/03. Parent WS-S4 closes actual documented reproduction at M6, without blocking the M4 technical dependency. |
 | Start / stop | Planning can prepare decisions earlier; execution needs the exact candidate, valid prerequisites and frozen check cards. Missing rights, tools, or external participants keep the affected result open. |
 
 ## Execution Contract

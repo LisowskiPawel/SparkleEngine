@@ -6,7 +6,7 @@ Implementation stages: [ImplementationPlan](ImplementationPlan.md).
 
 Sections: [Graphics Portfolio Delivery Plan](ImplementationPlan.md#graphics-portfolio-delivery-plan) / [Graphics Knowledge Transfer](#graphics-knowledge-transfer) / [Upstream Graphics Contribution](#upstream-graphics-contribution).
 
-**Status:** target dossier; case delivery and independent adoption remain unproved
+**Status:** target dossier; case delivery and documented reproduction remain unproved
 
 **Scope:** three reproducible technical cases at M6, then observed direction, second-context transfer, teaching and feedback revision at M7; reuse the same rendering work
 
@@ -48,7 +48,7 @@ Before sharing, verify candidate identity, artifact validity, rights and privacy
 
 **Scope:** help another person understand and reproduce one evidence-backed graphics case, then use their feedback
 
-M6 requires first independent reproduction/review. M7 requires a meaningful expert challenge/direction record, second actual consumer context, observed before/after teaching task and one feedback-driven post-adoption revision/retest. [Review And Transfer](ReviewAndTransfer.md) defines the binary checks; [portfolio stage 4](ImplementationPlan.md#4-demonstrate-direction-and-transfer) owns execution. Continuing maintenance or additional adopters beyond that finite exercise remains conditional; no support service is selected.
+M6 requires documented author/agent reproduction/review. M7 requires a meaningful technical challenge/direction record, second usage context, author/agent before/after explanation task and justified revision/retest. [Review And Transfer](ReviewAndTransfer.md) defines the binary checks; [portfolio stage 4](ImplementationPlan.md#4-demonstrate-direction-and-transfer) owns execution. Continuing maintenance or additional adopters beyond that finite exercise remains conditional; no support service is selected.
 
 The [Technology Transfer subject folder](TechnologyTransfer/TransferDesign.md) owns the actual participant/context, technical question, before/after task/rubric and revision/retest contract. Its [KT-0..3 implementation plan](TechnologyTransfer/ImplementationPlan.md) supplies prerequisites, bounded work, falsifiers, cleanup and copied prompts. Prepare the concrete exercise in KT-0; missing people, permission and outcomes remain actual evidence dependencies.
 

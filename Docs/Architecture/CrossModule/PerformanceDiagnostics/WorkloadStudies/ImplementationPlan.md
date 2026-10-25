@@ -2,7 +2,7 @@
 
 [Docs](../../../../README.md) / [Up](WorkloadStudiesDesign.md)
 
-Stages: [WS-S0](#ws-s0---freeze-discovery) / [WS-S1](#ws-s1---one-analysis-consumer) / [WS-S2](#ws-s2---causal-paired-api-studies) / [WS-S3](#ws-s3---incident-and-technical-handoff) / [WS-S4](#ws-s4---close-independent-study-reproduction).
+Stages: [WS-S0](#ws-s0---freeze-discovery) / [WS-S1](#ws-s1---one-analysis-consumer) / [WS-S2](#ws-s2---causal-paired-api-studies) / [WS-S3](#ws-s3---incident-and-technical-handoff) / [WS-S4](#ws-s4---close-documented-study-reproduction).
 
 Produce the classical technical handoff at M3, then close independent study/incident reproduction at M6 using the same original evidence.
 
@@ -15,7 +15,7 @@ Produce the classical technical handoff at M3, then close independent study/inci
 | What to do | Working route |
 | --- | --- |
 | First action | [WS-S0 freeze](#remaining-stages): select actual producer records; if a necessary fact is missing, freeze and route its smallest producer prerequisite, then close WS-D0 before building an analyzer. |
-| Result to reach | M3: analyzer, three causal studies and the cleared incident/replay packet with local checks. M6: actual independent reproduction closes AC-WS-04; it does not block the neural work needed by that final exercise. |
+| Result to reach | M3: analyzer, three causal studies and the cleared incident/replay packet with local checks. M6: actual documented reproduction closes AC-WS-04; it does not block the neural work needed by that final exercise. |
 | Start / stop | New production tooling waits for REL-11, WS-D0 and workload/reference inputs. This route cannot bypass parent capture gates or invent a collector. |
 
 ## Stage Contract
@@ -40,8 +40,8 @@ This parent owns WS-D0, the one analysis consumer and aggregate CASE/WL joins. T
 | [`WS-S0`](#ws-s0---freeze-discovery) Freeze discovery | Close five `WS-D0` cells, actual producer sample, statistics/observer/size cards, API/hardware matrix and current-script retain/narrow/delete decisions. If a necessary field is absent, freeze its producer/check card, route the admitted prerequisite through parent Phase 4, qualify the original record and return here. | WS-S0 stays documentation/local probe only; the producer uses its own bounded stage, not the still-blocked analyzer gate. Remove probes; no guessed data/schema, duplicate collector or full internal spine. Missing unowned inputs/thresholds still block WS-D0. |
 | [`WS-S1`](#ws-s1---one-analysis-consumer) One analysis consumer | Implement only the selected offline CLI over frozen workload records; publish per-run tables/plots and source joins. Pass `AC-WS-01`, input/failure/cleanup parts of `AC-WS-04`, `AC-PY-01..04`. | No collector/export/history or Python framework. Delete the replaced ad hoc supported analysis route; original evidence stays intact. |
 | [`WS-S2`](#ws-s2---causal-paired-api-studies) Causal paired-API studies | Execute only the first unfinished admitted stage in the [CPU](CpuPreparation/ImplementationPlan.md), [GPU](GpuShader/ImplementationPlan.md) or [lifetime](ResourceLifetime/ImplementationPlan.md) owner. Parent WS-D05 selects all three questions before results; each child supplies model/baseline/experiment/paired verdict. | Join all three domain results under AC-WS-02/WL-04/07. Do not duplicate child steps or demand three wins; preserve their rejected/inconclusive evidence, actual tool limits and same-stage cleanup. |
-| [`WS-S3`](#ws-s3---incident-and-technical-handoff) Incident and technical handoff | Use the [incident plan](IncidentAnalysis/ImplementationPlan.md) for missing causal/local replay proof, then join the analyzer and all three study packets. | M3 admits M4 with AC-WS-01..03 and local input/failure/cleanup controls from 04; independent-user 04 remains open for WS-S4 at M6. No adoption verdict is inferred. |
-| [`WS-S4`](#ws-s4---close-independent-study-reproduction) Independent reproduction closure | At M6, consume the actual [portfolio stage 3](../../GraphicsPortfolio/ImplementationPlan.md#3-reproduce-review-and-revise) observations for the frozen study/analysis and incident packet. | Close AC-WS-04/CHK-WS-04 only for actual supported results; keep unavailable cells open. Reuse one exercise instead of another adopter per child. |
+| [`WS-S3`](#ws-s3---incident-and-technical-handoff) Incident and technical handoff | Use the [incident plan](IncidentAnalysis/ImplementationPlan.md) for missing causal/local replay proof, then join the analyzer and all three study packets. | M3 admits M4 with AC-WS-01..03 and local input/failure/cleanup controls from 04; rehearsal 04 remains open for WS-S4 at M6. No adoption verdict is inferred. |
+| [`WS-S4`](#ws-s4---close-documented-study-reproduction) Documented reproduction closure | At M6, consume the actual [portfolio stage 3](../../GraphicsPortfolio/ImplementationPlan.md#3-reproduce-review-and-revise) observations for the frozen study/analysis and incident packet. | Close AC-WS-04/CHK-WS-04 only for actual supported results; keep unavailable cells open. Reuse one exercise instead of another adopter per child. |
 
 ## Reference-Guided Study Selection
 
@@ -96,25 +96,25 @@ Execute only the first unfinished admitted stage in this plan's CpuPreparation, 
 
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s3---incident-and-technical-handoff and apply its Stage Contract, including the Stage Source-Style Gate.
-Use IncidentAnalysis/ImplementationPlan.md for the first missing causal/local replay stage; reuse valid original release evidence. Join the analyzer, all three study domains and incident/replay packet with AC-WS-01..03 and the local failure/cleanup portion of 04. This is the M3 technical handoff for M4; independent reproduction is not its prerequisite. Keep AC-WS-04's non-author result open for M6 / WS-S4. Verify cleanup and retain original identities/negative conclusions; no new runner, adopter or report portal.
+Use IncidentAnalysis/ImplementationPlan.md for the first missing causal/local replay stage; reuse valid original release evidence. Join the analyzer, all three study domains and incident/replay packet with AC-WS-01..03 and the local failure/cleanup portion of 04. This is the M3 technical handoff for M4; documented reproduction is not its prerequisite. Keep AC-WS-04's rehearsal result open for M6 / WS-S4. Verify cleanup and retain original identities/negative conclusions; no new runner, adopter or report portal.
 ```
 
 </details>
 
-### WS-S4 - Close Independent Study Reproduction
+### WS-S4 - Close Documented Study Reproduction
 
 **Start:** M3 technical packets and the relevant M6 neural technical/package inputs are qualified; portfolio stage 2 has assembled the cleared package. Final study/neural adoption is not an entry prerequisite.
 
 **Work:** Use the actual portfolio stage 3 exercise to reproduce the selected study/analysis headline and trace original incident/CASE evidence. Record environment, prior involvement, every intervention, failures and actual outputs. Reuse only observations that exercise AC-WS-04/CHK-WS-04; a content-only launch cannot close this cell. A repair returns to its existing owner and invalidates affected proof.
 
-**Cleanup / exit:** Close remaining AC-WS-04 and aggregate study acceptance only after the actual independent result; retain earlier valid local checks when this is blocked. Verify prior deletions, remove disposable exercise code and keep original artifacts. No second exercise/participant per study, new support service or separate readiness store.
+**Cleanup / exit:** Close remaining AC-WS-04 and aggregate study acceptance only after the actual documented result; retain earlier valid local checks when this is blocked. Verify prior deletions, remove disposable exercise code and keep original artifacts. No second exercise/participant per study, new support service or separate readiness store.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s4---close-independent-study-reproduction and apply its Stage Contract, including the Stage Source-Style Gate.
-Execute WS-S4 only after the technical packets and cleared M6 assembly exist. Obtain the relevant actual portfolio stage 3 observations for AC-WS-04/CHK-WS-04; record original input/candidate identity, independent user/environment, interventions, failed steps and output. Final adoption is an output, not a prerequisite. Reuse one exercise, route defects to existing owners, requalify changed claims and remove probes. No self-certification, extra adopter per folder or unauthorized external action; absent reproduction stays BLOCKED.
+Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s4---close-documented-study-reproduction and apply its Stage Contract, including the Stage Source-Style Gate.
+Execute WS-S4 only after the technical packets and cleared M6 assembly exist. Obtain the relevant actual portfolio stage 3 observations for AC-WS-04/CHK-WS-04; record original input/candidate identity, rehearsal actor/environment, interventions, failed steps and output. Final adoption is an output, not a prerequisite. Reuse one exercise, route defects to existing owners, requalify changed claims and remove probes. No unexecuted result claims or extra rehearsal per folder or unauthorized external action; absent reproduction stays BLOCKED.
 ```
 
 </details>

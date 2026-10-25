@@ -1,33 +1,21 @@
 #pragma once
 
-#include "RayTracing/Acceleration/RayTracingBlasCache.h"
 #include "RHI/Public/RayTracing/RhiRayTracingDesc.h"
 
-#include <DirectXMath.h>
-
-#include <array>
 #include <cstdint>
-#include <vector>
+#include <optional>
 
 class RenderCommandContext;
 class RenderHardwareInterface;
 class RayTracingPerformanceDiagnostics;
 class RayTracingShaderTablePlan;
+class RayTracingBlasCache;
 struct MeshDraw;
 struct PreparedRenderScene;
 
 class RayTracingClassicTlasBuilder final
 {
 public:
-	struct TlasHandle final
-	{
-		RhiOwnedResourceHandle resource = {};
-		RhiGpuVirtualAddress gpuAddress = 0;
-		std::uint32_t instanceCount = 0;
-
-		bool IsValid() const noexcept;
-	};
-
 	explicit RayTracingClassicTlasBuilder(RenderHardwareInterface& renderHardwareInterface) noexcept;
 	~RayTracingClassicTlasBuilder() noexcept;
 
@@ -44,7 +32,7 @@ public:
 	    const RayTracingShaderTablePlan& shaderTablePlan,
 	    RayTracingPerformanceDiagnostics* diagnostics = nullptr) noexcept;
 
-	const TlasHandle& GetTlas() const noexcept { return m_tlas; }
+	RhiOwnedResourceHandle GetResource() const noexcept { return m_accelerationStructureBuffer; }
 
 	void Clear() noexcept;
 
@@ -67,14 +55,14 @@ private:
 	void RecordBuild(RenderCommandContext& commandContext, const BuildState& state, RayTracingPerformanceDiagnostics* diagnostics) const noexcept;
 	void TrackBuildResources(RenderCommandContext& commandContext) const noexcept;
 	void ReleaseResources() noexcept;
-	void EnsureResources(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo) noexcept;
+	void EnsureResources(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, ERhiClassicTlasBuildFlags buildFlags) noexcept;
 
-	RenderHardwareInterface* m_renderHardwareInterface = nullptr;
+	RenderHardwareInterface& m_renderHardwareInterface;
 	RhiOwnedResourceHandle m_instanceBuffer = {};
 	RhiOwnedResourceHandle m_scratchBuffer = {};
 	RhiOwnedResourceHandle m_accelerationStructureBuffer = {};
 	std::uint64_t m_scratchBufferSizeInBytes = 0;
 	std::uint64_t m_accelerationStructureSizeInBytes = 0;
 	bool m_resourcesAllowUpdate = false;
-	TlasHandle m_tlas = {};
+	std::optional<std::uint32_t> m_builtInstanceCount;
 };

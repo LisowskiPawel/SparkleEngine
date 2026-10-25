@@ -14,6 +14,8 @@ static constexpr std::string_view kWorkProgressPrefix = "[PROGRESS] ";
 static constexpr std::string_view kIndeterminateProgressPrefix = "? ";
 static constexpr std::size_t kDecimalRadix = 10;
 
+static std::optional<std::size_t> ParseProgressCount(std::string_view text);
+
 static std::string FormatProgressItem(std::string_view action, std::string_view item)
 {
 	std::string phase(action);
@@ -27,7 +29,7 @@ static std::string FormatProgressItem(std::string_view action, std::string_view 
 	return phase;
 }
 
-std::string ToolWorkProgressProtocol::Format(std::string_view phase, std::size_t completed, std::size_t total)
+std::string FormatToolWorkProgress(std::string_view phase, std::size_t completed, std::size_t total)
 {
 	std::ostringstream output;
 	output << kWorkProgressPrefix;
@@ -43,7 +45,7 @@ std::string ToolWorkProgressProtocol::Format(std::string_view phase, std::size_t
 	return output.str();
 }
 
-std::optional<ToolWorkProgress> ToolWorkProgressProtocol::Parse(std::string_view line)
+std::optional<ToolWorkProgress> ParseToolWorkProgress(std::string_view line)
 {
 	if (line.ends_with('\r'))
 	{
@@ -70,8 +72,8 @@ std::optional<ToolWorkProgress> ToolWorkProgressProtocol::Parse(std::string_view
 
 	const std::string_view completedText = line.substr(0, slash);
 	const std::string_view totalText = line.substr(slash + 1, space - slash - 1);
-	const std::optional<std::size_t> completed = ParseCount(completedText);
-	const std::optional<std::size_t> total = ParseCount(totalText);
+	const std::optional<std::size_t> completed = ParseProgressCount(completedText);
+	const std::optional<std::size_t> total = ParseProgressCount(totalText);
 	if (!completed || !total || *total == 0 || *completed > *total)
 	{
 		return std::nullopt;
@@ -80,7 +82,7 @@ std::optional<ToolWorkProgress> ToolWorkProgressProtocol::Parse(std::string_view
 	return ToolWorkProgress{.completed = *completed, .total = *total, .phase = std::string(line.substr(space + 1))};
 }
 
-std::optional<std::size_t> ToolWorkProgressProtocol::ParseCount(std::string_view text)
+static std::optional<std::size_t> ParseProgressCount(std::string_view text)
 {
 	if (text.empty())
 	{
@@ -111,26 +113,7 @@ ToolWorkProgressWriter::ToolWorkProgressWriter(std::ostream& output) noexcept :
 
 void ToolWorkProgressWriter::Report(std::string_view phase, std::size_t completed, std::size_t total)
 {
-	std::scoped_lock lock(m_mutex);
-	if (total == 0)
-	{
-		if (m_lastPhase != phase)
-		{
-			m_output << ToolWorkProgressProtocol::Format(phase) << std::flush;
-			m_lastPhase = phase;
-		}
-		return;
-	}
-
-	const std::size_t percentage = static_cast<std::size_t>(static_cast<double>(completed) * 100.0 / static_cast<double>(total));
-	if (m_lastPhase == phase && m_lastPercentage == percentage)
-	{
-		return;
-	}
-
-	m_output << ToolWorkProgressProtocol::Format(phase, completed, total) << std::flush;
-	m_lastPhase = phase;
-	m_lastPercentage = percentage;
+	Report(phase, {}, completed, total);
 }
 
 void ToolWorkProgressWriter::Report(const ToolWorkProgressEvent& progress)
@@ -140,5 +123,18 @@ void ToolWorkProgressWriter::Report(const ToolWorkProgressEvent& progress)
 
 void ToolWorkProgressWriter::Report(std::string_view action, std::string_view item, std::size_t completed, std::size_t total)
 {
-	Report(FormatProgressItem(action, item), completed, total);
+	std::scoped_lock lock(m_mutex);
+	const std::size_t percentage = total != 0 ? static_cast<std::size_t>(static_cast<double>(completed) * 100.0 / static_cast<double>(total)) : std::numeric_limits<std::size_t>::max();
+	const bool samePhase = m_lastAction == action && m_lastTotal == total;
+	if (samePhase && (total == 0 || percentage <= m_lastPercentage))
+	{
+		return;
+	}
+
+	const std::string phase = FormatProgressItem(action, item);
+	const std::string record = FormatToolWorkProgress(phase, completed, total);
+	m_output << record << std::flush;
+	m_lastAction = action;
+	m_lastTotal = total;
+	m_lastPercentage = percentage;
 }

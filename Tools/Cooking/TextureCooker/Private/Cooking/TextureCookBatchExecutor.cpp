@@ -16,11 +16,11 @@
 #include "TextureCookRequestList.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <functional>
-#include <mutex>
 #include <objbase.h>
 #include <optional>
 #include <thread>
@@ -65,8 +65,7 @@ private:
 	const std::vector<TextureCookRequest>& m_requests;
 	TextureCookMemoryLimiter m_memoryLimiter;
 	std::function<void(std::size_t, std::size_t)> m_progress;
-	std::mutex m_progressMutex;
-	std::size_t m_completedRequests = 0;
+	std::atomic<std::size_t> m_completedRequests{0};
 	std::vector<TextureCookBatchItemResult> m_items;
 };
 
@@ -160,8 +159,8 @@ TaskResult TextureCookBatchRun::CookRequest(std::uint32_t index)
 	cooker.Cook(stagedRequest, m_memoryLimiter);
 	if (m_progress)
 	{
-		std::lock_guard lock(m_progressMutex);
-		m_progress(index, ++m_completedRequests);
+		const std::size_t completed = ++m_completedRequests;
+		m_progress(index, completed);
 	}
 	return TaskResult::Success();
 }

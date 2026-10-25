@@ -178,13 +178,15 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 
 	PopulateStandardRayTracingCapabilityGroups(m_rayTracingCapabilities);
 
+	const bool partitionedTlasReady = m_featureStatus.RayTracing.EnabledPartitionedAccelerationStructure && m_getPartitionedAccelerationStructureBuildSizes != nullptr
+	    && m_cmdBuildPartitionedAccelerationStructures != nullptr;
+
 	m_rayTracingCapabilities.Groups.PartitionedTlas = RhiPartitionedTlasCapabilities{
-	    .Supported = m_featureStatus.RayTracing.EnabledPartitionedAccelerationStructure && m_getPartitionedAccelerationStructureBuildSizes != nullptr
-	        && m_cmdBuildPartitionedAccelerationStructures != nullptr,
+	    .Supported = partitionedTlasReady,
 	    .Provider = ERhiPartitionedTlasProvider::VulkanNvPartitionedAccelerationStructure,
 	    .NvidiaDeviceOnly = true,
 	    .CurrentDeviceIsNvidia = m_adapterInfo.VendorId == NvidiaVendorId,
-	    .SupportsDescriptorAccess = false,
+	    .SupportsDescriptorAccess = partitionedTlasReady,
 	    .SupportsCpuPackedOperations = m_featureStatus.RayTracing.EnabledPartitionedAccelerationStructure,
 	    .SupportsGpuDrivenOperations = m_featureStatus.RayTracing.EnabledPartitionedAccelerationStructure,
 	    .SupportsGpuOperationCount = m_featureStatus.RayTracing.EnabledPartitionedAccelerationStructure,

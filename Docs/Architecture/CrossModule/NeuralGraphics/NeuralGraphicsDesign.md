@@ -226,7 +226,7 @@ This contract answers one decision: can Sparkle claim an **owned**, reproducible
 | ownership and reproducibility | licensed dataset, frozen splits, model/operator, training recipe, evaluation, and immutable artifact identity |
 | compiler/runtime integrity | inspectable lowering/kernel decisions, numerical equivalence, typed Renderer/RHI execution, fallback, and lifetime |
 | product quality and cost | frozen workload quality/temporal/robustness plus CPU/GPU/memory/artifact/package results |
-| failure and delivery | corrupt/unsupported/non-finite/reload/shutdown cases plus manifested licenses/hashes and non-author reproduction |
+| failure and delivery | corrupt/unsupported/non-finite/reload/shutdown cases plus manifested licenses/hashes and documented reproduction |
 
 Every gate is conjunctive. High image quality cannot compensate for unlicensed data, fast kernels cannot compensate for numerical mismatch, and a clean fallback does not prove the requested neural path.
 
@@ -243,7 +243,7 @@ Every gate is conjunctive. High image quality cannot compensate for unlicensed d
 | `AC-NG-05` | Renderer/RHI execution declares every resource, dependency, synchronization, capability, generation, history, fallback, and retirement boundary. |
 | `AC-NG-06` | Frozen Bistro/San Miguel or approved replacement workloads meet every required raw/log/FLIP/temporal rule and report CPU/GPU tails, workspace/artifact size and classical comparison; separate bounded batch/precision/layout observations retain their actual scope. Missing metrics cannot be replaced by a favorable aggregate. |
 | `AC-NG-07` | Missing/corrupt/incompatible artifact, unsupported hardware/backend/operator, allocation/compile/dispatch failure, non-finite output, reload, and shutdown remain honest and bounded. |
-| `AC-NG-08` | Package manifests account for model/kernel/runtime bytes, licenses, hashes, compatibility, and source/debug erasure; a non-author can reproduce the supported result. |
+| `AC-NG-08` | Package manifests account for model/kernel/runtime bytes, licenses, hashes, compatibility, and source/debug erasure; the author or agent can reproduce the supported result. |
 | `AC-NG-09` | The necessary diffuse-indirect target producer is derived and qualified independently: exact path/lobe/domain, camera/pixel population, committed prefix and uncertainty; isolated controls detect direct/specular leakage, wrong density/weight and stale component identity. Beauty or subtraction of unrelated noisy products cannot pass. |
 
 ### Controlled Failures

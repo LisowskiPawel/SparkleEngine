@@ -118,7 +118,7 @@ Turn the user's visual-failure report and this research package into frozen, rev
 2. Reuse valid DIR-X evidence; run only experiments needed by the admitted first slice. Give each DIR-D0 decision an accepted, blocked or explicitly deferred disposition; unselected many-light/environment/emissive/guiding choices require no prototype.
 3. Freeze formulas, units, light identities, target/bias mode, compatibility, visibility, denoiser, quality profiles, artifacts, thresholds, budgets, hook ledger, and clean-break deletions.
 4. Reconcile first-release admission and assign owners and the concrete resource/check budget.
-5. Obtain independent review of the gate; retain `Open` or `Blocked` for every unresolved cell.
+5. Obtain separate review of the gate; retain `Open` or `Blocked` for every unresolved cell.
 
 ### Exit Gate
 

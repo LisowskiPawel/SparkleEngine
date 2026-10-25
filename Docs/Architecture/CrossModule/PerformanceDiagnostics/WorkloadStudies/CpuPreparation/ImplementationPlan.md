@@ -13,7 +13,7 @@ Turn one predeclared CPU question into original, falsifiable paired-API evidence
 | What to do | Working route |
 | --- | --- |
 | First action | [CPU-0](#cpu-0-freeze-the-causal-question): Select the measured edge and exact source owner. |
-| Result to reach | This domain supplies local AC-WS-02/CHK-WS-02 evidence to M3/CASE-02/03. Parent WS-S4 closes actual independent reproduction at M6, without blocking the M4 technical dependency. |
+| Result to reach | This domain supplies local AC-WS-02/CHK-WS-02 evidence to M3/CASE-02/03. Parent WS-S4 closes actual documented reproduction at M6, without blocking the M4 technical dependency. |
 | Start / stop | Planning can prepare decisions earlier; execution needs the exact candidate, valid prerequisites and frozen check cards. Missing rights, tools, or external participants keep the affected result open. |
 
 ## Execution Contract
@@ -91,7 +91,7 @@ NON-NEGOTIABLE: preserve serial/worker output and publication; measure critical 
 
 **Start:** CPU-2 candidate/negative result and original artifacts are fixed.
 
-**Work:** Complete required D3D12/Vulkan cells under the common sample/uncertainty policy. Report per-run p50/p95/p99, whole-frame/pacing/memory effect, model discrepancies and scope limits. Route the finished packet to CASE-02 and the parent independent reproduction.
+**Work:** Complete required D3D12/Vulkan cells under the common sample/uncertainty policy. Report per-run p50/p95/p99, whole-frame/pacing/memory effect, model discrepancies and scope limits. Route the finished packet to CASE-02 and the parent documented reproduction.
 
 **Cleanup / non-delivery:** Verify earlier cleanup; remove disposable probes and superseded instructions. Reuse the one portfolio reproduction rather than scheduling a new adopter per study.
 

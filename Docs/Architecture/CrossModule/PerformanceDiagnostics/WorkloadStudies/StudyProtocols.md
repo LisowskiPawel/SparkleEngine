@@ -43,6 +43,6 @@ At least one rejected/inconclusive alternative remains required across the three
 
 ## Inputs, Tool And Delivery Boundaries
 
-WS-S0 freezes producer samples and study cards; a necessary missing record follows the bounded parent Phase-4 prerequisite before returning to WS-D0. WS-S1 supplies the offline consumer, WS-S2 the three studies and WS-S3 the local incident/replay handoff for M3. WS-S4 closes required independent reproduction at M6 after portfolio assembly. No internal profiler/data spine or adoption-before-neural prerequisite is selected.
+WS-S0 freezes producer samples and study cards; a necessary missing record follows the bounded parent Phase-4 prerequisite before returning to WS-D0. WS-S1 supplies the offline consumer, WS-S2 the three studies and WS-S3 the local incident/replay handoff for M3. WS-S4 closes required documented reproduction at M6 after portfolio assembly. No internal profiler/data spine or adoption-before-neural prerequisite is selected.
 
 `AC-WS-02/03`, `CHK-WS-02/03` and relevant `WL-04/07` own the verdicts. Remove disposable probes, experiment switches and rejected product mechanisms at each handoff. Keep original artifacts, unsuccessful findings and useful minimal reproduction instructions. This page defines proof obligations, not candidate results.

@@ -2,7 +2,7 @@
 
 [Docs](../../../README.md) / [Up](../README.md)
 
-Stages: [FR-00](#fr-00--scope-and-discovery) / [FR-01](#fr-01--identity-rights-and-baseline) / [FR-02](#fr-02--package-spine) / [FR-03](#fr-03--feature-closure) / [FR-04](#fr-04--release-maps) / [FR-05](#fr-05--performance-stability-and-native-proof) / [FR-06](#fr-06--candidate-freeze-and-independent-adoption) / [FR-07](#fr-07--publish-and-verify) / [FR-08](#fr-08--stabilize-and-close).
+Stages: [FR-00](#fr-00--scope-and-discovery) / [FR-01](#fr-01--identity-rights-and-baseline) / [FR-02](#fr-02--package-spine) / [FR-03](#fr-03--feature-closure) / [FR-04](#fr-04--release-maps) / [FR-05](#fr-05--performance-stability-and-native-proof) / [FR-06](#fr-06--candidate-freeze-and-reproduction) / [FR-07](#fr-07--publish-and-verify) / [FR-08](#fr-08--stabilize-and-close).
 
 **Status:** open release plan; remaining work is tracked in the roadmap and linked stage plans
 
@@ -44,7 +44,7 @@ Execute only remaining FR-01 work from Docs/Architecture/CrossModule/FirstReleas
 
 **Cleanup:** delete stale staged membership and replaced staging/path policy in that repair; no installer, updater, SDK or another packager.
 
-**Exit:** FCR-PROD-05/REL-03 meet their internal archive contract. Clean-machine and independent-adopter portions are linked once through PD-3/FR-06, not recreated as a second acceptance journey here. Public release still waits for FR-07 and all required gates.
+**Exit:** FCR-PROD-05/REL-03 meet their internal archive contract. Clean-machine and source-adopter portions are linked once through PD-3/FR-06, not recreated as a second acceptance journey here. Public release still waits for FR-07 and all required gates.
 
 ```text
 Execute only remaining FR-02 package work through PD-3 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Regenerate and verify the current unsigned archive with existing tooling, close its exact missing checks and remove stale membership. Reuse shared installed/adopter proof; do not implement another package spine. Apply the owning execution contract and its Stage Source-Style Gate.
@@ -97,24 +97,24 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 
 </details>
 
-### `FR-06` — Candidate Freeze And Independent Adoption
+### `FR-06` — Candidate Freeze And Reproduction
 
-**Goal:** freeze one byte-identical candidate and prove both runtime-consumer and source-adopter journeys by non-authors.
+**Goal:** freeze one byte-identical candidate and prove both runtime-consumer and source-adopter journeys by the author or agent.
 
-**Non-goals:** fixing the candidate in place, giving undocumented assistance, or counting the author as independent adoption.
+**Non-goals:** fixing the candidate in place, giving undocumented assistance, or hiding repairs or machine-specific prerequisites.
 
 **Failure modes:** hash drift; cached prerequisite; admin/environment dependency; private path; support instructions fail; issue causes an untracked rebuild.
 
 **Phase exit criteria:** `REL-08` and `REL-09` pass; any fix creates a new candidate and invalidates affected evidence.
 
-**Candidate:** independent adoption may use the unsigned internal archive. Windows signing is deferred to FR-07; changed bytes require renewed identity and affected checks before publication.
+**Candidate:** documented reproduction may use the unsigned internal archive. Windows signing is deferred to FR-07; changed bytes require renewed identity and affected checks before publication.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only FR-06 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-06--candidate-freeze-and-independent-adoption. Apply the owning execution contract and its Stage Source-Style Gate.
-Freeze one package identity after prerequisite gates pass. Run the documented independent consumer and source-adopter journeys for REL-08/09 without private repair or author caches. Reuse existing manifests and operation reports; add no adoption runner or reporting authority. A required repair returns to its owner with same-slice cleanup and invalidates dependent proof if bytes or configuration change.
+Execute only FR-06 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-06--candidate-freeze-and-reproduction. Apply the owning execution contract and its Stage Source-Style Gate.
+Freeze one package identity after prerequisite gates pass. Run the documented documented consumer and source-adopter journeys for REL-08/09 without private repair or author caches. Reuse existing manifests and operation reports; add no adoption runner or reporting authority. A required repair returns to its owner with same-slice cleanup and invalidates dependent proof if bytes or configuration change.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
 ```
 

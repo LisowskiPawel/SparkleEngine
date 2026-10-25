@@ -78,7 +78,7 @@ Every stage report records exact revision/dirty boundary; prerequisites; touched
 
 | Stage | Required inputs | Owned output | Non-goals | Minimum falsifiers |
 | --- | --- | --- | --- | --- |
-| 0 | current source, pinned research, named probe hardware/software, product/release boundary | accepted native/color/ownership/proof decisions and `HDRD-00` result | production code/readiness claim | `CHK-HDRD-01` through `10`, semantic/native/transition/evidence dry runs, independent reviews |
+| 0 | current source, pinned research, named probe hardware/software, product/release boundary | accepted native/color/ownership/proof decisions and `HDRD-00` result | production code/readiness claim | `CHK-HDRD-01` through `10`, semantic/native/transition/evidence dry runs, separate reviews |
 | 1 | accepted neutral types/owners/events/reasons/budgets | SDR-preserving request/capabilities/result/facts generations on both backends | HDR format/color space, Renderer HDR pixels | source/boundary check, SDR raw/native preservation, query faults, stale generations, two windows if admitted |
 | 2 | accepted D3D12 profile/tuple/interface/metadata/rollback | complete D3D12 eligible activation/fallback transaction | Renderer tone/PQ, Vulkan, new UI | support/set/recreate/output/interposer/metadata/present/device faults and SDR restore |
 | 3 | accepted Vulkan extensions/surface/profile/metadata/rollback | complete Vulkan eligible activation/fallback transaction | Renderer tone/PQ, D3D12 redesign | missing extension/tuple/function, recreate/present/output/device faults, validation, SDR restore |

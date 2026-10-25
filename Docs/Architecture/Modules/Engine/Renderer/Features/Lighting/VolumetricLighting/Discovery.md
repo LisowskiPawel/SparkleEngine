@@ -122,7 +122,7 @@ Freeze one feature home, authored/cooked/scene/GPU/frame/RHI integration hooks, 
 
 ## Gate Resolution Protocol
 
-The release owner first closes admission. Each admitted row then fixes options, fixtures, metrics and thresholds before a bounded prototype or reference run; retains exact source/content/build/backend/dirty identity and raw artifacts; records explicit accepted/rejected/deferred/excluded reasons; completes rights/provenance review where assets/code are involved; obtains the named independent review; and updates the single semantic/architecture/UX owner. Missing admission, reference, content rights, capability or target hardware yields `Blocked`. A paper or another engine cannot close a local row.
+The release owner first closes admission. Each admitted row then fixes options, fixtures, metrics and thresholds before a bounded prototype or reference run; retains exact source/content/build/backend/dirty identity and raw artifacts; records explicit accepted/rejected/deferred/excluded reasons; completes rights/provenance review where assets/code are involved; obtains the named separate review; and updates the single semantic/architecture/UX owner. Missing admission, reference, content rights, capability or target hardware yields `Blocked`. A paper or another engine cannot close a local row.
 
 ## Risk Register
 
@@ -181,7 +181,7 @@ The release owner first closes admission. Each admitted row then fixes options, 
 8. atmosphere/LUT/environment comparison and bridge design;
 9. heterogeneous asset/tracking/majorant study;
 10. Volumetric ReSTIR path/estimator experiment and explicit admission/rejection;
-11. exact integration-hook and clean-break ledger, revised estimates, thresholds, backend cells, and independent review.
+11. exact integration-hook and clean-break ledger, revised estimates, thresholds, backend cells, and separate review.
 
 ## Discovery Failure Modes
 
