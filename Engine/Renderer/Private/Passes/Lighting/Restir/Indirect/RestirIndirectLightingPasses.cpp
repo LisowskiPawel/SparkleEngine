@@ -8,14 +8,17 @@
 #include "Passes/Lighting/Restir/Indirect/RestirIndirectTemporal.h"
 #include "Passes/Lighting/Restir/Indirect/RestirIndirectReservoirResources.h"
 #include "Passes/Lighting/Restir/Indirect/IndirectLightingControls.h"
-#include "Passes/Lighting/Restir/Indirect/IndirectLightingResources.h"
+#include "Passes/Lighting/LightingRenderTargets.h"
+#include "Passes/Lighting/LightingTargetClear.h"
 #include "Passes/Lighting/Restir/Reconstruction/RayReconstructionSurfaceGuides.h"
 #include "Passes/Lighting/Restir/Reconstruction/RestirRayReconstructionResources.h"
 
 void AddRestirIndirectLightingPasses(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, RenderFrameGraphResources& resources)
 {
-	CreateIndirectLightingResources(builder, sceneExtent, resources);
+	CreateIndirectLightingRenderTargets(builder, sceneExtent, resources);
+	AddIndirectLightingClearPass(builder, sceneExtent, resources);
 	CreateRayReconstructionGuideRenderTargets(builder, sceneExtent, resources);
+	AddRayReconstructionGuideClearPass(builder, sceneExtent, resources);
 	AddRayReconstructionSurfaceGuidesPass(builder, frame, sceneExtent, resources);
 
 	if (!IsIndirectLightingAdmitted())

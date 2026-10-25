@@ -5,6 +5,4 @@
 class FrameGraphBuilder;
 struct RenderFrameGraphResources;
 
-void CreateDirectLightingResources(FrameGraphBuilder& builder, RenderViewportExtent extent, RenderFrameGraphResources& resources);
-
 void CreateDirectLightReservoirResources(FrameGraphBuilder& builder, RenderViewportExtent extent, RenderFrameGraphResources& resources);

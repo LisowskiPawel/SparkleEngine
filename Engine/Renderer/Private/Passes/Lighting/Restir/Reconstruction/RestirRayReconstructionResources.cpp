@@ -2,9 +2,6 @@
 #include "Passes/Lighting/Restir/Reconstruction/RestirRayReconstructionResources.h"
 
 #include "Frame/Graph/RenderFrameGraphFormats.h"
-#include "Passes/Lighting/LightingTargetClear.h"
-
-#include <array>
 
 #include "Frame/Graph/RenderFrameGraphResources.h"
 #include "FrameGraph/Builder/FrameGraphBuilder.h"
@@ -24,9 +21,6 @@ void CreateRayReconstructionGuideRenderTargets(FrameGraphBuilder& builder, Rende
 	guides.SpecularAlbedo = createGuide("RayReconstructionSpecularAlbedo", PixelFormat::R16G16B16A16_Float);
 	guides.Roughness = createGuide("RayReconstructionRoughness", PixelFormat::R32_Float);
 	guides.SpecularHitDistance = createGuide("RayReconstructionSpecularHitDistance", PixelFormat::R32_Float);
-
-	const std::array targets{guides.DiffuseAlbedo, guides.SpecularAlbedo, guides.Roughness, guides.SpecularHitDistance};
-	AddLightingTargetClearPass(builder, "RayReconstructionGuideClear", renderExtent, targets);
 }
 
 RayReconstructionPassResources CreateRestirRayReconstructionResources(FrameGraphBuilder& builder, RenderViewportExtent renderExtent, const RenderFrameGraphResources& resources)

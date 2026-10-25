@@ -242,8 +242,7 @@ void FramePipeline::PrepareRenderingState(RenderFrame& frame)
 
 void FramePipeline::PublishFrameProducts()
 {
-	ViewportFrameProducts products = m_frameResources.ViewportProducts;
-	PublishViewportRenderProducts(m_viewportRenderProducts, m_viewportRenderRequest, products, m_frameGraphSettings.RenderExtent, m_frameGraphSettings.OutputExtent);
+	PublishViewportRenderProducts(m_viewportRenderProducts, m_viewportRenderRequest, m_frameResources.ViewportProducts, m_frameGraphSettings.RenderExtent, m_frameGraphSettings.OutputExtent);
 }
 
 RenderFrame& FramePipeline::PrepareRenderFrame(const RenderViewInput& viewInput, const RenderFrameTime& time)

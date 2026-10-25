@@ -5,12 +5,15 @@
 #include "Passes/Lighting/Direct/DirectLightReservoirPasses.h"
 #include "Passes/Lighting/Direct/DirectLighting.h"
 #include "Passes/Lighting/Direct/DirectLightingControls.h"
-#include "Passes/Lighting/Direct/DirectLightingResources.h"
+#include "Passes/Lighting/Direct/DirectLightReservoirResources.h"
 #include "Passes/Lighting/Shadows/DirectShadowSignal.h"
+#include "Passes/Lighting/LightingRenderTargets.h"
+#include "Passes/Lighting/LightingTargetClear.h"
 
 void AddRestirDirectLightingPasses(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, RenderRayTracingScene& rayTracingScene, RenderFrameGraphResources& resources)
 {
-	CreateDirectLightingResources(builder, sceneExtent, resources);
+	CreateDirectLightingRenderTargets(builder, sceneExtent, resources);
+	AddDirectLightingClearPass(builder, sceneExtent, resources);
 	if (!IsDirectLightingAdmitted())
 	{
 		return;
