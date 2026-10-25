@@ -140,7 +140,7 @@ void UiFrameRenderer::RenderHostOverlay(const UiRenderPacket& packet) noexcept
 
 void UiFrameRenderer::Play(const UiRenderPacket& packet) noexcept
 {
-	m_packetPlayer->Render(packet, *m_textureRegistry, m_deviceServices.GetImGuiRenderer());
+	m_packetPlayer->Render(packet, *m_textureRegistry, m_deviceServices.GetImGuiRenderer(), m_deviceServices.GetCurrentGraphicsCommandList());
 }
 
 void UiFrameRenderer::TransitionViewportProduct(FrameGraph& frameGraph, const ViewportRenderProducts& viewportProducts, ResourceState after) noexcept

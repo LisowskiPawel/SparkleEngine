@@ -66,14 +66,6 @@ public:
 	RhiOwnedResourceHandle CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName);
 	RhiOwnedResourceHandle CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName);
 	RhiOwnedResourceHandle CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName);
-	VkInstance GetVulkanInstance() const noexcept;
-	VkPhysicalDevice GetVulkanPhysicalDevice() const noexcept;
-	VkDevice GetVulkanDevice() const noexcept;
-	VkQueue GetVulkanGraphicsQueue() const noexcept;
-	std::uint32_t GetVulkanGraphicsQueueFamilyIndex() const noexcept;
-	std::uint32_t GetVulkanApiVersion() const noexcept;
-	std::uint32_t GetSwapChainBackBufferCount() const noexcept;
-	VkFormat GetNativeBackBufferFormat() const noexcept;
 	void SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept;
 	void ResetTransientFrameResources() noexcept;
 	void RebuildSwapChainBackBufferViews() noexcept;

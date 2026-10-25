@@ -5,6 +5,7 @@
 
 #include <cstdint>
 
+class RenderCommandList;
 struct ImDrawData;
 struct ImTextureData;
 
@@ -22,7 +23,7 @@ public:
 	virtual void BeginFrame() noexcept = 0;
 	virtual std::uint64_t ResolveTextureId(RhiGpuDescriptorHandle shaderResourceView) noexcept = 0;
 	virtual void UpdateTexture(ImTextureData& texture) noexcept = 0;
-	virtual void RenderDrawData(ImDrawData* drawData) noexcept = 0;
+	virtual void RenderDrawData(RenderCommandList& commandList, ImDrawData* drawData) noexcept = 0;
 	virtual void Shutdown() noexcept = 0;
 
 protected:

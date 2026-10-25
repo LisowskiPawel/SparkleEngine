@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <memory>
 
+class RenderCommandList;
 class RhiImGuiRenderer;
 class UiTextureRegistry;
 struct ImTextureData;
@@ -19,7 +20,7 @@ public:
 	UiRenderPacketPlayer& operator=(const UiRenderPacketPlayer&) = delete;
 
 	void SynchronizeTextures(const UiRenderPacket& packet, RhiImGuiRenderer& renderer);
-	void Render(const UiRenderPacket& packet, const UiTextureRegistry& textures, RhiImGuiRenderer& renderer);
+	void Render(const UiRenderPacket& packet, const UiTextureRegistry& textures, RhiImGuiRenderer& renderer, RenderCommandList& commandList);
 	void Shutdown(RhiImGuiRenderer& renderer) noexcept;
 
 private:

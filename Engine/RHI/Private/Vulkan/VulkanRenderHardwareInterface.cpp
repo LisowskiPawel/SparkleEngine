@@ -40,7 +40,7 @@ VulkanRenderHardwareInterface::VulkanRenderHardwareInterface(VulkanRhi& rhi, Vul
 	m_uploadService = std::make_unique<VulkanUploadService>(memoryAllocator);
 	m_samplerLibrary = std::make_unique<VulkanSamplerLibrary>(rhi, *m_descriptorService);
 	m_descriptorService->SetSamplerLibrary(*m_samplerLibrary);
-	m_imguiBackend = std::make_unique<VulkanImGuiBackend>(*this, *m_descriptorService);
+	m_imguiBackend = std::make_unique<VulkanImGuiBackend>(rhi, swapChain, *m_descriptorService);
 	m_diagnostics = CreateVulkanRenderDiagnostics(rhi, memoryAllocator);
 	RebuildSwapChainBackBufferViews();
 	m_capabilities = BuildVulkanCapabilities(*m_rhi, *m_swapChain, *m_diagnostics, m_commandRecordingContext != nullptr);
@@ -199,46 +199,6 @@ RhiOwnedResourceHandle VulkanRenderHardwareInterface::CreateRayTracingAccelerati
 RhiOwnedResourceHandle VulkanRenderHardwareInterface::CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
 	return m_rayTracingServices->CreateInstanceBuffer(instances, instanceCount, debugName);
-}
-
-VkInstance VulkanRenderHardwareInterface::GetVulkanInstance() const noexcept
-{
-	return m_rhi->GetInstance();
-}
-
-VkPhysicalDevice VulkanRenderHardwareInterface::GetVulkanPhysicalDevice() const noexcept
-{
-	return m_rhi->GetPhysicalDevice();
-}
-
-VkDevice VulkanRenderHardwareInterface::GetVulkanDevice() const noexcept
-{
-	return m_rhi->GetDevice();
-}
-
-VkQueue VulkanRenderHardwareInterface::GetVulkanGraphicsQueue() const noexcept
-{
-	return m_rhi->GetGraphicsQueue();
-}
-
-std::uint32_t VulkanRenderHardwareInterface::GetVulkanGraphicsQueueFamilyIndex() const noexcept
-{
-	return m_rhi->GetGraphicsQueueFamilyIndex();
-}
-
-std::uint32_t VulkanRenderHardwareInterface::GetVulkanApiVersion() const noexcept
-{
-	return m_rhi->GetAdapterInfo().ApiVersion;
-}
-
-std::uint32_t VulkanRenderHardwareInterface::GetSwapChainBackBufferCount() const noexcept
-{
-	return m_swapChain->GetBackBufferCount();
-}
-
-VkFormat VulkanRenderHardwareInterface::GetNativeBackBufferFormat() const noexcept
-{
-	return m_swapChain->GetNativeBackBufferFormat();
 }
 
 void VulkanRenderHardwareInterface::SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept

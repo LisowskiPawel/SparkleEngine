@@ -9,21 +9,25 @@
 struct ImDrawData;
 struct ImGuiContext;
 class VulkanDescriptorService;
-class VulkanRenderHardwareInterface;
+class VulkanRhi;
+class VulkanSwapChain;
 
 class VulkanImGuiBackend final : public RhiImGuiRenderer
 {
 public:
-	VulkanImGuiBackend(VulkanRenderHardwareInterface& renderHardwareInterface, VulkanDescriptorService& descriptorService) noexcept;
+	VulkanImGuiBackend(VulkanRhi& rhi, VulkanSwapChain& swapChain, VulkanDescriptorService& descriptors) noexcept;
 
 	void Initialize() override;
 	void BeginFrame() noexcept override;
 	std::uint64_t ResolveTextureId(RhiGpuDescriptorHandle shaderResourceView) noexcept override;
 	void UpdateTexture(ImTextureData& texture) noexcept override;
-	void RenderDrawData(ImDrawData* drawData) noexcept override;
+	void RenderDrawData(RenderCommandList& commandList, ImDrawData* drawData) noexcept override;
 	void Shutdown() noexcept override;
 
 private:
+	void InitializeRendererBackend(ImGuiContext* previousContext);
+	void CreateTextureSampler(ImGuiContext* previousContext);
+
 	struct TextureBinding final
 	{
 		VkImageView ImageView = VK_NULL_HANDLE;
@@ -31,10 +35,9 @@ private:
 	};
 
 	std::uint64_t GetTextureId(VkImageView imageView) noexcept;
-	ImGuiContext* ActivateContext() const noexcept;
-	static void RestoreContext(ImGuiContext* context) noexcept;
 
-	VulkanRenderHardwareInterface& m_renderHardwareInterface;
+	VulkanRhi& m_rhi;
+	VulkanSwapChain& m_swapChain;
 	VulkanDescriptorService& m_descriptorService;
 	VkSampler m_imguiSampler = VK_NULL_HANDLE;
 	std::vector<TextureBinding> m_textureBindings;

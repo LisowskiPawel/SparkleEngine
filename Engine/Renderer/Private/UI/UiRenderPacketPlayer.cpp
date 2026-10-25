@@ -51,7 +51,7 @@ void UiRenderPacketPlayer::SynchronizeTextures(const UiRenderPacket& packet, Rhi
 	RetireReleasedTextures();
 }
 
-void UiRenderPacketPlayer::Render(const UiRenderPacket& packet, const UiTextureRegistry& textures, RhiImGuiRenderer& renderer)
+void UiRenderPacketPlayer::Render(const UiRenderPacket& packet, const UiTextureRegistry& textures, RhiImGuiRenderer& renderer, RenderCommandList& commandList)
 {
 	if (!packet.HasDrawData())
 	{
@@ -65,7 +65,7 @@ void UiRenderPacketPlayer::Render(const UiRenderPacket& packet, const UiTextureR
 	}
 
 	PrepareDrawData(packet);
-	renderer.RenderDrawData(&m_storage->DrawData);
+	renderer.RenderDrawData(commandList, &m_storage->DrawData);
 }
 
 void UiRenderPacketPlayer::Shutdown(RhiImGuiRenderer& renderer) noexcept

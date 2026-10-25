@@ -50,7 +50,7 @@ D3D12RenderHardwareInterface::D3D12RenderHardwareInterface(
 
 	m_diagnostics = CreateD3D12RenderDiagnostics(rhi, swapChain.GetMaximumFramesInFlight());
 	m_capabilities = BuildD3D12Capabilities(*m_rhi, *m_swapChain, *m_diagnostics);
-	m_imguiBackend = std::make_unique<D3D12ImGuiBackend>(*this);
+	m_imguiBackend = std::make_unique<D3D12ImGuiBackend>(rhi, swapChain, *m_descriptorService);
 }
 
 D3D12RenderHardwareInterface::~D3D12RenderHardwareInterface() noexcept = default;
@@ -191,11 +191,6 @@ const RenderDiagnostics& D3D12RenderHardwareInterface::GetDiagnostics() const no
 RhiImGuiRenderer& D3D12RenderHardwareInterface::GetImGuiRenderer() noexcept
 {
 	return *m_imguiBackend;
-}
-
-ID3D12DescriptorHeap* D3D12RenderHardwareInterface::GetD3D12ShaderResourceDescriptorHeap() const noexcept
-{
-	return m_descriptorService->GetShaderResourceDescriptorHeap();
 }
 
 RhiRayTracingAccelerationStructurePrebuildInfo D3D12RenderHardwareInterface::GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept

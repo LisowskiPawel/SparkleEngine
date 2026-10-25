@@ -1,12 +1,11 @@
 #include "PCH.h"
 
 #include "UIImplementation.h"
+#include "ImGui/EditorImGuiContext.h"
 #include "Editor/Public/Icons/EditorIconService.h"
 
 #include "EditorWorkspaceLayout.h"
 #include "Console/EditorConsoleSystem.h"
-#include "Core/Public/FileSystemUtils.h"
-#include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Input/InputSystem.h"
 #include "Panels/MainMenuBarPanel.h"
 #include "Panels/SceneInspectorPanel.h"
@@ -26,45 +25,10 @@
 #include "Viewport/EditorViewportSession.h"
 #include "Window/Window.h"
 
-#include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
 #include <memory>
 #include <string>
-
-IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_editorLogger, "Editor");
-
-void UI::Implementation::InitializeImGuiContext()
-{
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	m_isImGuiContextInitialized = true;
-
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	const Filesystem::ProductUserStatePaths& userState = Filesystem::GetProductUserStatePaths();
-	m_imguiIniPath = (userState.SettingsRoot / "EditorLayout.ini").string();
-	io.IniFilename = m_imguiIniPath.c_str();
-	ImGuiRenderPacketBuilder::ConfigureProducerContext();
-
-	SparkleUiTheme::ConfigureTypography();
-	m_icons = std::make_unique<EditorIconService>();
-}
-
-bool UI::Implementation::InitializeWin32Backend()
-{
-	if (!m_window->GetHWND())
-	{
-		Diagnostics::Fatal(g_editorLogger, __FILE__, __LINE__, "UI::Implementation::InitializeWin32Backend: invalid window handle");
-		return false;
-	}
-
-	ImGui_ImplWin32_Init(m_window->GetHWND());
-	m_isWin32BackendInitialized = true;
-	return true;
-}
 
 void UI::Implementation::InitializeWorkspace()
 {
@@ -196,41 +160,21 @@ void UI::Implementation::ConfigureMainMenuBarWindowActions()
 	    });
 }
 
-void UI::Implementation::SubscribeToWindowEvents(Window& window)
+
+void UI::Implementation::InitializeImGuiContext()
 {
-	auto handle = window.OnWindowMessage.Add(
-	    [this](WindowMessageEvent& event)
-	    {
-		    if (!m_isWin32BackendInitialized)
-		    {
-			    return;
-		    }
-
-		    if (m_editorConsoleSystem != nullptr && ImGui::GetCurrentContext() != nullptr && (event.lParam & (LPARAM{1} << 30)) == 0
-		        && m_editorConsoleSystem->HandleShortcut(static_cast<std::uint32_t>(event.msg), static_cast<std::uintptr_t>(event.wParam), ImGui::GetIO().WantTextInput))
-		    {
-			    event.handled = true;
-			    return;
-		    }
-
-		    if (ImGui_ImplWin32_WndProcHandler(event.hWnd, event.msg, event.wParam, event.lParam) != 0)
-		    {
-			    event.handled = true;
-		    }
-	    });
-
-	m_windowMessageHandle = ScopedEventHandle(window.OnWindowMessage, handle);
-
-	auto dpiScaleHandle = window.OnDpiScaleChanged.Add([this](float dpiScale) { ApplyDpiScale(dpiScale); });
-	m_windowDpiScaleHandle = ScopedEventHandle(window.OnDpiScaleChanged, dpiScaleHandle);
+	m_imguiContext = std::make_unique<EditorImGuiContext>(*m_window);
+	m_imguiContext->Initialize();
+	ImGuiRenderPacketBuilder::ConfigureProducerContext();
+	SparkleUiTheme::ConfigureTypography();
+	m_icons = std::make_unique<EditorIconService>();
 }
 
-void UI::Implementation::ApplyDpiScale(float dpiScale) noexcept
+void UI::Implementation::SubscribeToWindowEvents()
 {
-	ImGuiStyle& style = ImGui::GetStyle();
-	style = ImGuiStyle{};
-	ImGui::StyleColorsDark(&style);
-	SparkleUiTheme::ApplyEditorialDarkTheme();
-	style.FontScaleDpi = dpiScale;
-	style.ScaleAllSizes(dpiScale);
+	m_imguiContext->SubscribeToWindowEvents(
+		[this](std::uint32_t message, std::uintptr_t key, bool wantsTextInput)
+		{
+			return m_editorConsoleSystem != nullptr && m_editorConsoleSystem->HandleShortcut(message, key, wantsTextInput);
+		});
 }

@@ -5,15 +5,18 @@
 #include "Vulkan/Core/VulkanResult.h"
 #include "Vulkan/Commands/VulkanRenderCommandList.h"
 #include "Vulkan/Descriptors/VulkanDescriptorService.h"
-#include "Vulkan/VulkanRenderHardwareInterface.h"
+#include "Vulkan/Device/VulkanRhi.h"
+#include "Vulkan/SwapChain/VulkanSwapChain.h"
+#include "UI/RhiImGuiContext.h"
 
 #include <backends/imgui_impl_vulkan.h>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanImGuiBackendLogger, "RHI.Vulkan.ImGui");
 
-VulkanImGuiBackend::VulkanImGuiBackend(VulkanRenderHardwareInterface& renderHardwareInterface, VulkanDescriptorService& descriptorService) noexcept :
-    m_renderHardwareInterface(renderHardwareInterface),
-    m_descriptorService(descriptorService)
+VulkanImGuiBackend::VulkanImGuiBackend(VulkanRhi& rhi, VulkanSwapChain& swapChain, VulkanDescriptorService& descriptors) noexcept :
+    m_rhi(rhi),
+    m_swapChain(swapChain),
+    m_descriptorService(descriptors)
 {
 }
 
@@ -24,20 +27,20 @@ void VulkanImGuiBackend::Initialize()
 		return;
 	}
 
-	ImGuiContext* previousContext = ImGui::GetCurrentContext();
-	m_imguiContext = previousContext;
-	if (m_imguiContext == nullptr)
-	{
-		m_imguiContext = ImGui::CreateContext();
-		m_ownsContext = true;
-	}
-	ImGui::SetCurrentContext(m_imguiContext);
+	ImGuiContext* previousContext = AcquireImGuiContext(m_imguiContext, m_ownsContext);
 
-	const std::uint32_t backBufferCount = m_renderHardwareInterface.GetSwapChainBackBufferCount();
-	const VkFormat colorFormat = m_renderHardwareInterface.GetNativeBackBufferFormat();
+	InitializeRendererBackend(previousContext);
+	CreateTextureSampler(previousContext);
+	RestoreImGuiContext(previousContext);
+}
+
+void VulkanImGuiBackend::InitializeRendererBackend(ImGuiContext* previousContext)
+{
+	const std::uint32_t backBufferCount = m_swapChain.GetBackBufferCount();
+	const VkFormat colorFormat = m_swapChain.GetNativeBackBufferFormat();
 	if (backBufferCount < 2 || colorFormat == VK_FORMAT_UNDEFINED)
 	{
-		RestoreContext(previousContext);
+		RestoreImGuiContext(previousContext);
 		Diagnostics::Fatal(g_vulkanImGuiBackendLogger, __FILE__, __LINE__, "Cannot initialize ImGui without a valid Vulkan swap chain.");
 	}
 
@@ -51,12 +54,12 @@ void VulkanImGuiBackend::Initialize()
 	    .stencilAttachmentFormat = VK_FORMAT_UNDEFINED};
 
 	ImGui_ImplVulkan_InitInfo initInfo = {};
-	initInfo.ApiVersion = m_renderHardwareInterface.GetVulkanApiVersion();
-	initInfo.Instance = m_renderHardwareInterface.GetVulkanInstance();
-	initInfo.PhysicalDevice = m_renderHardwareInterface.GetVulkanPhysicalDevice();
-	initInfo.Device = m_renderHardwareInterface.GetVulkanDevice();
-	initInfo.QueueFamily = m_renderHardwareInterface.GetVulkanGraphicsQueueFamilyIndex();
-	initInfo.Queue = m_renderHardwareInterface.GetVulkanGraphicsQueue();
+	initInfo.ApiVersion = m_rhi.GetAdapterInfo().ApiVersion;
+	initInfo.Instance = m_rhi.GetInstance();
+	initInfo.PhysicalDevice = m_rhi.GetPhysicalDevice();
+	initInfo.Device = m_rhi.GetDevice();
+	initInfo.QueueFamily = m_rhi.GetGraphicsQueueFamilyIndex();
+	initInfo.Queue = m_rhi.GetGraphicsQueue();
 	initInfo.DescriptorPoolSize = 1024;
 	initInfo.MinImageCount = backBufferCount;
 	initInfo.ImageCount = backBufferCount;
@@ -74,16 +77,19 @@ void VulkanImGuiBackend::Initialize()
 
 	if (initInfo.Instance == VK_NULL_HANDLE || initInfo.PhysicalDevice == VK_NULL_HANDLE || initInfo.Device == VK_NULL_HANDLE || initInfo.Queue == VK_NULL_HANDLE || initInfo.QueueFamily == UINT32_MAX)
 	{
-		RestoreContext(previousContext);
+		RestoreImGuiContext(previousContext);
 		Diagnostics::Fatal(g_vulkanImGuiBackendLogger, __FILE__, __LINE__, "Cannot initialize ImGui with incomplete Vulkan device state.");
 	}
 
 	if (!ImGui_ImplVulkan_Init(&initInfo))
 	{
-		RestoreContext(previousContext);
+		RestoreImGuiContext(previousContext);
 		Diagnostics::Fatal(g_vulkanImGuiBackendLogger, __FILE__, __LINE__, "ImGui Vulkan renderer initialization failed.");
 	}
+}
 
+void VulkanImGuiBackend::CreateTextureSampler(ImGuiContext* previousContext)
+{
 	const VkSamplerCreateInfo samplerInfo{
 	    .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
 	    .pNext = nullptr,
@@ -104,61 +110,58 @@ void VulkanImGuiBackend::Initialize()
 	    .borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK,
 	    .unnormalizedCoordinates = VK_FALSE};
 
-	const VkResult samplerResult = vkCreateSampler(m_renderHardwareInterface.GetVulkanDevice(), &samplerInfo, nullptr, &m_imguiSampler);
+	const VkResult samplerResult = vkCreateSampler(m_rhi.GetDevice(), &samplerInfo, nullptr, &m_imguiSampler);
 	if (!VulkanResult::Succeeded(samplerResult) || m_imguiSampler == VK_NULL_HANDLE)
 	{
 		SPDLOG_LOGGER_ERROR(g_vulkanImGuiBackendLogger, "{}", VulkanResult::FormatFailure("vkCreateSampler", samplerResult));
 		ImGui_ImplVulkan_Shutdown();
-		RestoreContext(previousContext);
+		RestoreImGuiContext(previousContext);
 		Diagnostics::Fatal(g_vulkanImGuiBackendLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateSampler", samplerResult));
 	}
-
-	RestoreContext(previousContext);
 }
 
 void VulkanImGuiBackend::BeginFrame() noexcept
 {
-	ImGuiContext* previousContext = ActivateContext();
+	ImGuiContext* previousContext = ActivateImGuiContext(m_imguiContext);
 	ImGui_ImplVulkan_NewFrame();
-	RestoreContext(previousContext);
+	RestoreImGuiContext(previousContext);
 }
 
 std::uint64_t VulkanImGuiBackend::ResolveTextureId(RhiGpuDescriptorHandle shaderResourceView) noexcept
 {
-	ImGuiContext* previousContext = ActivateContext();
+	ImGuiContext* previousContext = ActivateImGuiContext(m_imguiContext);
 	const std::uint64_t textureId = GetTextureId(m_descriptorService.GetRegisteredImageView(shaderResourceView));
-	RestoreContext(previousContext);
+	RestoreImGuiContext(previousContext);
 	return textureId;
 }
 
 void VulkanImGuiBackend::UpdateTexture(ImTextureData& texture) noexcept
 {
-	ImGuiContext* previousContext = ActivateContext();
+	ImGuiContext* previousContext = ActivateImGuiContext(m_imguiContext);
 	ImGui_ImplVulkan_UpdateTexture(&texture);
-	RestoreContext(previousContext);
+	RestoreImGuiContext(previousContext);
 }
 
-void VulkanImGuiBackend::RenderDrawData(ImDrawData* drawData) noexcept
+void VulkanImGuiBackend::RenderDrawData(RenderCommandList& commandList, ImDrawData* drawData) noexcept
 {
 	if (drawData == nullptr)
 	{
 		return;
 	}
 
-	ImGuiContext* previousContext = ActivateContext();
-	RenderCommandList& commandList = m_renderHardwareInterface.GetGraphicsCommandList(m_renderHardwareInterface.GetCurrentFrameIndex());
+	ImGuiContext* previousContext = ActivateImGuiContext(m_imguiContext);
 
 	VkCommandBuffer commandBuffer = static_cast<VkCommandBuffer>(
 	    commandList.GetNativeHandle(RhiNativeInteropRequest{.Consumer = ERhiNativeInteropConsumer::Presentation, .Reason = "Render ImGui draw data through Vulkan backend"}).Value);
 
 	if (commandBuffer == VK_NULL_HANDLE)
 	{
-		RestoreContext(previousContext);
+		RestoreImGuiContext(previousContext);
 		return;
 	}
 
 	ImGui_ImplVulkan_RenderDrawData(drawData, commandBuffer);
-	RestoreContext(previousContext);
+	RestoreImGuiContext(previousContext);
 }
 
 std::uint64_t VulkanImGuiBackend::GetTextureId(VkImageView imageView) noexcept
@@ -192,7 +195,7 @@ void VulkanImGuiBackend::Shutdown() noexcept
 	{
 		return;
 	}
-	ImGuiContext* previousContext = ActivateContext();
+	ImGuiContext* previousContext = ActivateImGuiContext(m_imguiContext);
 	for (const TextureBinding& binding : m_textureBindings)
 	{
 		if (binding.DescriptorSet != VK_NULL_HANDLE)
@@ -204,28 +207,11 @@ void VulkanImGuiBackend::Shutdown() noexcept
 
 	if (m_imguiSampler != VK_NULL_HANDLE)
 	{
-		vkDestroySampler(m_renderHardwareInterface.GetVulkanDevice(), m_imguiSampler, nullptr);
+		vkDestroySampler(m_rhi.GetDevice(), m_imguiSampler, nullptr);
 		m_imguiSampler = VK_NULL_HANDLE;
 	}
 
 	ImGui_ImplVulkan_Shutdown();
-	RestoreContext(previousContext);
-	if (m_ownsContext)
-	{
-		ImGui::DestroyContext(m_imguiContext);
-	}
-	m_imguiContext = nullptr;
-	m_ownsContext = false;
-}
-
-ImGuiContext* VulkanImGuiBackend::ActivateContext() const noexcept
-{
-	ImGuiContext* previousContext = ImGui::GetCurrentContext();
-	ImGui::SetCurrentContext(m_imguiContext);
-	return previousContext;
-}
-
-void VulkanImGuiBackend::RestoreContext(ImGuiContext* context) noexcept
-{
-	ImGui::SetCurrentContext(context);
+	RestoreImGuiContext(previousContext);
+	ReleaseImGuiContext(m_imguiContext, m_ownsContext);
 }

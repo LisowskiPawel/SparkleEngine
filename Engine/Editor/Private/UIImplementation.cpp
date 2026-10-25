@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "UIImplementation.h"
+#include "ImGui/EditorImGuiContext.h"
 #include "Editor/Public/Icons/EditorIconService.h"
 
 #include "Console/EditorConsoleSystem.h" // IWYU pragma: keep
@@ -29,7 +30,6 @@
 #include "Viewport/EditorViewportSession.h"
 #include "Window/Window.h"
 
-#include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
 #include <memory>
@@ -168,8 +168,8 @@ UI::Implementation::Implementation(EditorHostServices hostServices) :
 	m_editorConsoleSystem = std::make_unique<EditorConsoleSystem>(m_consoleVariables);
 
 	InitializeImGuiContext();
-	ApplyDpiScale(m_window->GetDpiScale());
-	if (!InitializeWin32Backend())
+	m_imguiContext->ApplyDpiScale(m_window->GetDpiScale());
+	if (!m_imguiContext->InitializePlatformBackend())
 	{
 		return;
 	}
@@ -179,27 +179,16 @@ UI::Implementation::Implementation(EditorHostServices hostServices) :
 	{
 		m_viewportSession->SetViewModeChangedHandler([this](RenderViewMode viewMode) { m_viewportPanel->SetViewMode(viewMode); });
 	}
-	SubscribeToWindowEvents(hostServices.HostWindow);
+	SubscribeToWindowEvents();
 }
 
 UI::Implementation::~Implementation() noexcept
 {
-	m_windowDpiScaleHandle.Reset();
-	m_windowMessageHandle.Reset();
+	m_imguiContext->UnsubscribeFromWindowEvents();
 	m_viewportPanel.reset();
 	m_viewportToolbar.reset();
 	m_icons.reset();
-
-	if (m_isWin32BackendInitialized)
-	{
-		ImGui_ImplWin32_Shutdown();
-		m_isWin32BackendInitialized = false;
-	}
-	if (m_isImGuiContextInitialized)
-	{
-		ImGui::DestroyContext();
-		m_isImGuiContextInitialized = false;
-	}
+	m_imguiContext.reset();
 }
 
 void UI::Implementation::Update()
@@ -216,5 +205,5 @@ void UI::Implementation::Update()
 
 bool UI::Implementation::IsReady() const noexcept
 {
-	return m_isImGuiContextInitialized && m_isWin32BackendInitialized;
+	return m_imguiContext != nullptr && m_imguiContext->IsReady();
 }

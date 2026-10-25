@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "UIImplementation.h"
+#include "ImGui/EditorImGuiContext.h"
 
 #include "EditorWorkspaceLayout.h"
 #include "Console/EditorConsoleSystem.h"
@@ -18,23 +19,14 @@
 #include "Viewport/ViewportToolbar.h"
 #include "Timer.h"
 
-#include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
 #include <algorithm>
 
 void UI::Implementation::NewFrame()
 {
-	if (!IsReady())
-	{
-		return;
-	}
-
-	ImGuiIO& io = ImGui::GetIO();
-	io.DeltaTime = static_cast<float>(m_timer->GetDelta(TimeDomain::Unscaled, TimeUnit::Seconds));
-
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+	const float deltaSeconds = static_cast<float>(m_timer->GetDelta(TimeDomain::Unscaled, TimeUnit::Seconds));
+	m_imguiContext->BeginFrame(deltaSeconds);
 }
 
 void UI::Implementation::Build()

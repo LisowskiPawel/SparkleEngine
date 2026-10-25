@@ -1,12 +1,12 @@
 #pragma once
 
 #include "UI.h"
-#include "Core/Public/Events/ScopedEventHandle.h"
 #include "Scene/SceneObjectSelection.h"
 
 #include <string>
 
 class EditorIconService;
+class EditorImGuiContext;
 class Timer;
 class MainMenuBarPanel;
 class EditorConsoleSystem;
@@ -63,7 +63,6 @@ private:
 
 	void InitializeImGuiContext();
 
-	bool InitializeWin32Backend();
 
 	void InitializeWorkspace();
 	void InitializeCorePanels();
@@ -74,9 +73,8 @@ private:
 	void HandleTransactionShortcuts();
 	void ConfigureMainMenuBarWindowActions();
 
-	void SubscribeToWindowEvents(Window& window);
+	void SubscribeToWindowEvents();
 
-	void ApplyDpiScale(float dpiScale) noexcept;
 
 	CVarControlExecutor m_consoleVariables;
 	std::unique_ptr<EditorIconService> m_icons;
@@ -111,10 +109,5 @@ private:
 	std::uint64_t m_viewportGeneration = 0;
 	bool m_shaderReloadRequested = false;
 	bool m_shaderRecookRequested = false;
-	bool m_isImGuiContextInitialized = false;
-	bool m_isWin32BackendInitialized = false;
-	std::string m_imguiIniPath;
-
-	ScopedEventHandle m_windowMessageHandle;
-	ScopedEventHandle m_windowDpiScaleHandle;
+	std::unique_ptr<EditorImGuiContext> m_imguiContext;
 };
