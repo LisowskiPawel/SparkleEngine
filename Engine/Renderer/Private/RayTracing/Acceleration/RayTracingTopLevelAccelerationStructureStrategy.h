@@ -45,7 +45,6 @@ public:
 	    const RayTracingPtlasPartitionPlan& viewPlan,
 	    RayTracingPerformanceDiagnostics* diagnostics) noexcept = 0;
 
-	virtual bool HasValidSceneTlas() const noexcept = 0;
 	virtual void Clear() noexcept = 0;
 
 protected:

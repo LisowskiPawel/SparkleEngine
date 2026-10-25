@@ -13,10 +13,10 @@
 
 namespace Files
 {
-	class SPARKLE_CORE_API BinarySpanReader final
+	class BinarySpanReader final
 	{
 	public:
-		explicit BinarySpanReader(std::span<const std::uint8_t> bytes) noexcept;
+		explicit SPARKLE_CORE_API BinarySpanReader(std::span<const std::uint8_t> bytes) noexcept;
 
 		template <typename T> bool ReadValue(T& outValue, std::string& outErrorMessage)
 		{
@@ -67,9 +67,9 @@ namespace Files
 			return true;
 		}
 
-		bool ReadBytes(std::size_t byteCount, std::span<const std::uint8_t>& outBytes, std::string& outErrorMessage);
-		bool ReadStringWithUInt32Length(std::string& outValue, std::string& outErrorMessage);
-		bool ReadString(std::size_t byteCount, std::string& outValue, std::string& outErrorMessage);
+		SPARKLE_CORE_API bool ReadBytes(std::size_t byteCount, std::span<const std::uint8_t>& outBytes, std::string& outErrorMessage);
+		SPARKLE_CORE_API bool ReadStringWithUInt32Length(std::string& outValue, std::string& outErrorMessage);
+		SPARKLE_CORE_API bool ReadString(std::size_t byteCount, std::string& outValue, std::string& outErrorMessage);
 
 		std::size_t GetOffset() const noexcept { return m_offset; }
 
@@ -86,7 +86,7 @@ namespace Files
 			return true;
 		}
 
-		bool CanRead(std::size_t byteCount) const noexcept;
+		SPARKLE_CORE_API bool CanRead(std::size_t byteCount) const noexcept;
 
 		std::span<const std::uint8_t> m_bytes;
 		std::size_t m_offset = 0;

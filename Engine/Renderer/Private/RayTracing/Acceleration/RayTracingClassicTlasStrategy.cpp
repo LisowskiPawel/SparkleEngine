@@ -54,11 +54,6 @@ RayTracingTopLevelAccelerationStructureBuildResult RayTracingClassicTlasStrategy
 	return result;
 }
 
-bool RayTracingClassicTlasStrategy::HasValidSceneTlas() const noexcept
-{
-	return m_classicTlasBuilder.GetTlas().IsValid();
-}
-
 void RayTracingClassicTlasStrategy::Clear() noexcept
 {
 	m_classicTlasBuilder.Clear();

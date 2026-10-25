@@ -8,6 +8,7 @@
 #include "RayTracing/Diagnostics/RayTracingPerformanceDiagnostics.h"
 #include "RayTracing/Acceleration/RayTracingTopLevelAccelerationStructureStrategy.h"
 #include "RayTracing/Acceleration/RayTracingPtlasPartitionPlanner.h"
+#include "RayTracing/RayTracingCapabilityReport.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderRayTracingSceneLogger, "Renderer.RenderRayTracingScene");
@@ -27,24 +28,36 @@ static RayTracingExecutionFrontend SelectExecutionFrontend(const RayTracingCapab
 }
 
 RenderRayTracingScene::RenderRayTracingScene(RenderHardwareInterface& renderHardwareInterface, const GpuMeshCache& meshes, const RayTracingCapabilityReport& capabilityReport) noexcept :
-    m_capabilityReport(capabilityReport),
     m_executionFrontend(SelectExecutionFrontend(capabilityReport))
 {
-	m_performanceMetrics.Providers.TopLevelProvider = m_capabilityReport.TopLevelProvider.SelectedProvider;
-	m_performanceMetrics.Providers.TopLevelProviderReason = m_capabilityReport.TopLevelProvider.SelectionReason;
-	m_performanceMetrics.Providers.PartitionedTlasProvider = m_capabilityReport.PartitionedTlas.Provider;
-	m_performanceMetrics.Providers.SupportsPartitionedTlas = m_capabilityReport.PartitionedTlas.Supported;
-	m_performanceMetrics.Providers.PartitionedTlasCapabilityReason = m_capabilityReport.PartitionedTlas.CapabilityStatusReason;
-	if (!m_capabilityReport.SupportsAccelerationStructure)
+	m_performanceMetrics.Providers.TopLevelProvider = capabilityReport.TopLevelProvider.SelectedProvider;
+	m_performanceMetrics.Providers.TopLevelProviderReason = capabilityReport.TopLevelProvider.SelectionReason;
+	m_performanceMetrics.Providers.PartitionedTlasProvider = capabilityReport.PartitionedTlas.Provider;
+	m_performanceMetrics.Providers.SupportsPartitionedTlas = capabilityReport.PartitionedTlas.Supported;
+	m_performanceMetrics.Providers.PartitionedTlasCapabilityReason = capabilityReport.PartitionedTlas.CapabilityStatusReason;
+	if (!capabilityReport.SupportsAccelerationStructure)
 	{
 		return;
 	}
 
 	m_blasCache = std::make_unique<RayTracingBlasCache>(renderHardwareInterface, meshes);
-	m_topLevelAccelerationStructureStrategy = CreateRayTracingTopLevelAccelerationStructureStrategy(renderHardwareInterface, m_capabilityReport);
+	m_topLevelAccelerationStructureStrategy = CreateRayTracingTopLevelAccelerationStructureStrategy(renderHardwareInterface, capabilityReport);
 }
 
 RenderRayTracingScene::~RenderRayTracingScene() noexcept = default;
+
+void RenderRayTracingScene::BeginGraphBuild() noexcept
+{
+	if (m_executionFrontend == RayTracingExecutionFrontend::Pipeline)
+	{
+		m_shaderTablePlan.BeginMaterializationSet();
+	}
+}
+
+std::uint64_t RenderRayTracingScene::GetGraphGeneration() const noexcept
+{
+	return m_executionFrontend == RayTracingExecutionFrontend::Pipeline ? m_shaderTablePlan.GetGeneration() : 0u;
+}
 
 RenderRayTracingFrameBindings RenderRayTracingScene::Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept
 {

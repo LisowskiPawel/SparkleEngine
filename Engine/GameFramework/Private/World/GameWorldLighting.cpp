@@ -121,16 +121,6 @@ namespace ECS
 		return entity;
 	}
 
-	std::size_t GameWorldState::GetLightCount() const noexcept
-	{
-		return Count<Light>();
-	}
-
-	EntityId GameWorldState::GetLightEntity(std::size_t index) const noexcept
-	{
-		return EntityAt<Light>(index);
-	}
-
 	std::optional<SceneLightDesc> GameWorldState::ReadLight(EntityId entity) const
 	{
 		const Light* light = m_registry.Get<Light>(entity);

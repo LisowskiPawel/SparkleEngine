@@ -126,11 +126,6 @@ RayTracingTopLevelAccelerationStructureBuildResult RayTracingPartitionedTlasStra
 	return BuildPartitionedTlas(commandContext, preparedScene, blasCache, shaderTablePlan, viewPlan, diagnostics);
 }
 
-bool RayTracingPartitionedTlasStrategy::HasValidSceneTlas() const noexcept
-{
-	return m_partitionedResources.HasSceneTlas();
-}
-
 void RayTracingPartitionedTlasStrategy::Clear() noexcept
 {
 	ReleasePartitionedTlasResources();

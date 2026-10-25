@@ -3,7 +3,6 @@
 #include "RayTracing/Diagnostics/RayTracingPerformanceMetrics.h"
 #include "RayTracing/RayTracingExecutionFrontend.h"
 #include "Scene/RayTracing/RenderRayTracingFrameBindings.h"
-#include "RayTracing/RayTracingCapabilityReport.h"
 #include "Scene/RayTracing/RayTracingShaderTablePlan.h"
 
 #include <cstdint>
@@ -20,6 +19,7 @@ struct PreparedRenderScene;
 struct RenderMaterialTable;
 struct RenderPrimitive;
 struct RayTracingPtlasPartitionPlan;
+struct RayTracingCapabilityReport;
 
 class RenderRayTracingScene final
 {
@@ -37,19 +37,10 @@ public:
 	void Clear() noexcept;
 	void SynchronizeShaderTablePlan(std::span<const RenderPrimitive> primitives, const RenderMaterialTable& materials) noexcept;
 
-	bool IsAvailable() const noexcept { return m_capabilityReport.SupportsAccelerationStructure; }
-
 	RayTracingExecutionFrontend GetExecutionFrontend() const noexcept { return m_executionFrontend; }
 
-	void BeginGraphBuild() noexcept
-	{
-		if (m_executionFrontend == RayTracingExecutionFrontend::Pipeline)
-		{
-			m_shaderTablePlan.BeginMaterializationSet();
-		}
-	}
-
-	std::uint64_t GetGraphGeneration() const noexcept { return m_executionFrontend == RayTracingExecutionFrontend::Pipeline ? m_shaderTablePlan.GetGeneration() : 0u; }
+	void BeginGraphBuild() noexcept;
+	std::uint64_t GetGraphGeneration() const noexcept;
 
 	const RayTracingPerformanceMetrics& GetPerformanceMetrics() const noexcept { return m_performanceMetrics; }
 
@@ -58,8 +49,6 @@ public:
 	RayTracingShaderTablePlan& GetShaderTablePlan() noexcept { return m_shaderTablePlan; }
 
 private:
-	RayTracingCapabilityReport m_capabilityReport = {};
-
 	RayTracingExecutionFrontend m_executionFrontend = RayTracingExecutionFrontend::None;
 	RayTracingPerformanceMetrics m_performanceMetrics = {};
 	RayTracingShaderTablePlan m_shaderTablePlan;

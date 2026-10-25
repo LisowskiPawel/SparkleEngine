@@ -79,8 +79,6 @@ namespace ECS
 		std::span<const SceneMeshInstanceGroupData> GetExtractedMeshGroups() const noexcept { return m_extraction.GetMeshGroups(); }
 
 		EntityId AddLight(SceneLightDesc&& desc);
-		std::size_t GetLightCount() const noexcept;
-		EntityId GetLightEntity(std::size_t index) const noexcept;
 		std::optional<SceneLightDesc> ReadLight(EntityId entity) const;
 		bool WriteLight(EntityId entity, SceneLightDesc&& desc);
 
