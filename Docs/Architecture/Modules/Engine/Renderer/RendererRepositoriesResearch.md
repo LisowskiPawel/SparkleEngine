@@ -301,7 +301,7 @@ Donut explicitly avoids ray tracing acceleration structure ownership because AS 
 
 This is acceptable for an engine, but it raises the bar:
 
-- selectable classic TLAS and PTLAS policies
+- selectable TLAS and PTLAS policies
 - minimal PTLAS implementation on supported D3D12/Vulkan backends
 - no future GPU-pack placeholders in the default renderer
 - measured perf/memory evidence

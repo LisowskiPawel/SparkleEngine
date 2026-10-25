@@ -89,7 +89,7 @@ private:
 	void CreateDevice();
 	void CreateMemoryAllocator();
 	void CheckRayTracingSupport() noexcept;
-	void SelectRayTracingTopLevelProvider() noexcept;
+	void SelectRayTracingTlasProvider() noexcept;
 	void CreateCommandQueues();
 	void DisableInterposer() noexcept;
 	void ShutdownInterposer() noexcept;

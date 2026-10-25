@@ -37,8 +37,8 @@ EngineRenderingSettingsState EngineRenderingSettingsControls::Capture() noexcept
 	state.RayReconstructionMode = CVarRayReconstructionMode.Get();
 	state.SelectedGBufferAlgorithm = CVarGBufferAlgorithm.Get();
 	state.MeshAutoBatching = CVarRendererMeshAutoBatching.Get();
-	state.RefitTlas = CVarRayTracingClassicTlasRefit.Get();
-	state.PtlasActive = CVarRayTracingPreferPartitionedTlas.Get();
+	state.RefitTlas = CVarRayTracingTlasRefit.Get();
+	state.PtlasActive = CVarRayTracingPreferPtlas.Get();
 	state.PtlasPartitionsPerAxis = CVarRayTracingPartitionsPerAxis.Get();
 	state.PtlasPartitionUpdateMode = CVarRayTracingPtlasPartitionUpdateMode.Get();
 	state.PtlasMarkAllDynamicInPartition = CVarRayTracingPtlasMarkAllDynamicInPartition.Get();
@@ -81,8 +81,8 @@ void EngineRenderingSettingsControls::Apply(const EngineRenderingSettingsState& 
 	setCVarIfChanged(CVarRayReconstructionMode, state.RayReconstructionMode);
 	setCVarIfChanged(CVarGBufferAlgorithm, state.SelectedGBufferAlgorithm);
 	setCVarIfChanged(CVarRendererMeshAutoBatching, state.MeshAutoBatching);
-	setCVarIfChanged(CVarRayTracingClassicTlasRefit, state.RefitTlas);
-	setCVarIfChanged(CVarRayTracingPreferPartitionedTlas, state.PtlasActive);
+	setCVarIfChanged(CVarRayTracingTlasRefit, state.RefitTlas);
+	setCVarIfChanged(CVarRayTracingPreferPtlas, state.PtlasActive);
 	setCVarIfChanged(CVarRayTracingPartitionsPerAxis, state.PtlasPartitionsPerAxis);
 	setCVarIfChanged(CVarRayTracingPtlasPartitionUpdateMode, state.PtlasPartitionUpdateMode);
 	setCVarIfChanged(CVarRayTracingPtlasMarkAllDynamicInPartition, state.PtlasMarkAllDynamicInPartition);

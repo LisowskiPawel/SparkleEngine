@@ -267,11 +267,10 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 		{
 			deviceExtensions.push_back(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
 		}
-		if (m_adapterInfo.VendorId == NvidiaVendorId && m_featureStatus.RayTracing.SupportsPartitionedAccelerationStructureExtension
-		    && m_featureStatus.RayTracing.SupportsPartitionedAccelerationStructureFeature)
+		if (m_adapterInfo.VendorId == NvidiaVendorId && m_featureStatus.RayTracing.SupportsPtlasExtension && m_featureStatus.RayTracing.SupportsPtlasFeature)
 		{
 			deviceExtensions.push_back(VK_NV_PARTITIONED_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-			m_featureStatus.RayTracing.EnabledPartitionedAccelerationStructure = true;
+			m_featureStatus.RayTracing.EnabledPtlas = true;
 		}
 	}
 	AppendAvailableDeviceExtension(m_physicalDevice, deviceExtensions, NvidiaBinaryImportExtensionName);
@@ -332,8 +331,7 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 	VkPhysicalDeviceRayTracingPipelineFeaturesKHR enabledRayTracingPipelineFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
 	VkPhysicalDeviceRayQueryFeaturesKHR enabledRayQueryFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
 
-	VkPhysicalDevicePartitionedAccelerationStructureFeaturesNV enabledPartitionedAccelerationStructureFeatures{
-	    .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PARTITIONED_ACCELERATION_STRUCTURE_FEATURES_NV};
+	VkPhysicalDevicePartitionedAccelerationStructureFeaturesNV enabledPtlasFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PARTITIONED_ACCELERATION_STRUCTURE_FEATURES_NV};
 
 	if (m_featureStatus.RayTracing.EnabledAccelerationStructure)
 	{
@@ -362,11 +360,11 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 			*enabledNext = &enabledRayQueryFeatures;
 			enabledNext = &enabledRayQueryFeatures.pNext;
 		}
-		if (m_featureStatus.RayTracing.EnabledPartitionedAccelerationStructure)
+		if (m_featureStatus.RayTracing.EnabledPtlas)
 		{
-			enabledPartitionedAccelerationStructureFeatures.partitionedAccelerationStructure = VK_TRUE;
-			*enabledNext = &enabledPartitionedAccelerationStructureFeatures;
-			enabledNext = &enabledPartitionedAccelerationStructureFeatures.pNext;
+			enabledPtlasFeatures.partitionedAccelerationStructure = VK_TRUE;
+			*enabledNext = &enabledPtlasFeatures;
+			enabledNext = &enabledPtlasFeatures.pNext;
 		}
 	}
 
@@ -451,9 +449,9 @@ void VulkanRhi::LogBootstrapSummary() noexcept
 	    "Vulkan features: validation={}, synchronization2 supported/enabled={}/{}, timelineSemaphore supported/enabled={}/{}, "
 	    "dynamicRendering supported/enabled={}/{}, scalarBlockLayout supported/enabled={}/{}, "
 	    "samplerAnisotropy supported/enabled={}/{}, fillModeNonSolid supported/enabled={}/{}, "
-	    "rtExtensions(as={}, pipeline={}, rayQuery={}, deferredHostOps={}, bda={}, partitionedTlasNv={}), "
-	    "rtFeatures(as={}, pipeline={}, rayQuery={}, bda={}, partitionedTlasNv={}), "
-	    "rtEnabled(as={}, pipeline={}, rayQuery={}, partitionedTlasNv={})",
+	    "rtExtensions(as={}, pipeline={}, rayQuery={}, deferredHostOps={}, bda={}, ptlasNv={}), "
+	    "rtFeatures(as={}, pipeline={}, rayQuery={}, bda={}, ptlasNv={}), "
+	    "rtEnabled(as={}, pipeline={}, rayQuery={}, ptlasNv={})",
 	    m_validationEnabled,
 	    m_featureStatus.SupportsSynchronization2,
 	    m_featureStatus.EnabledSynchronization2,
@@ -472,16 +470,16 @@ void VulkanRhi::LogBootstrapSummary() noexcept
 	    m_featureStatus.RayTracing.SupportsRayQueryExtension,
 	    m_featureStatus.RayTracing.SupportsDeferredHostOperationsExtension,
 	    m_featureStatus.RayTracing.SupportsBufferDeviceAddressExtension,
-	    m_featureStatus.RayTracing.SupportsPartitionedAccelerationStructureExtension,
+	    m_featureStatus.RayTracing.SupportsPtlasExtension,
 	    m_featureStatus.RayTracing.SupportsAccelerationStructureFeature,
 	    m_featureStatus.RayTracing.SupportsRayTracingPipelineFeature,
 	    m_featureStatus.RayTracing.SupportsRayQueryFeature,
 	    m_featureStatus.RayTracing.SupportsBufferDeviceAddressFeature,
-	    m_featureStatus.RayTracing.SupportsPartitionedAccelerationStructureFeature,
+	    m_featureStatus.RayTracing.SupportsPtlasFeature,
 	    m_featureStatus.RayTracing.EnabledAccelerationStructure,
 	    m_featureStatus.RayTracing.EnabledRayTracingPipeline,
 	    m_featureStatus.RayTracing.EnabledInlineRayQuery,
-	    m_featureStatus.RayTracing.EnabledPartitionedAccelerationStructure);
+	    m_featureStatus.RayTracing.EnabledPtlas);
 
 	const std::string adapterSummary = std::format(
 	    "Vulkan adapter: name='{}', api={}, driver={}, queues(graphics={}:{}, compute={}:{}, copy={}:{}), independent(compute={}, copy={})",
@@ -498,12 +496,12 @@ void VulkanRhi::LogBootstrapSummary() noexcept
 	    HasIndependentQueue(ERhiQueueType::Copy));
 
 	const std::string providerSummary = std::format(
-	    "Vulkan ray tracing provider: topLevel={}({}), partitionedTlasProvider={} supported={} reason={}",
-	    RhiRayTracingTopLevelProviderToString(m_rayTracingCapabilities.Groups.Provider.SelectedTopLevelProvider),
-	    m_rayTracingCapabilities.Groups.Provider.SelectedTopLevelProviderReason,
-	    RhiPartitionedTlasProviderToString(m_rayTracingCapabilities.Groups.PartitionedTlas.Provider),
-	    m_rayTracingCapabilities.Groups.PartitionedTlas.Supported,
-	    m_rayTracingCapabilities.Groups.PartitionedTlas.CapabilityStatusReason);
+	    "Vulkan ray tracing provider: topLevel={}({}), ptlasProvider={} supported={} reason={}",
+	    RhiRayTracingTlasProviderToString(m_rayTracingCapabilities.Groups.Provider.SelectedTlasProvider),
+	    m_rayTracingCapabilities.Groups.Provider.SelectedTlasProviderReason,
+	    RhiPtlasProviderToString(m_rayTracingCapabilities.Groups.Ptlas.Provider),
+	    m_rayTracingCapabilities.Groups.Ptlas.Supported,
+	    m_rayTracingCapabilities.Groups.Ptlas.CapabilityStatusReason);
 
 	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Driver, adapterSummary);
 	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Validation, featureSummary);

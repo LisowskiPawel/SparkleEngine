@@ -334,11 +334,9 @@ RhiRayTracingAccelerationStructurePrebuildInfo D3D12RenderHardwareInterface::Get
 	return m_rayTracingServices->GetBottomLevelAccelerationStructurePrebuildInfo(geometry);
 }
 
-RhiRayTracingAccelerationStructurePrebuildInfo D3D12RenderHardwareInterface::GetTopLevelAccelerationStructurePrebuildInfo(
-    std::uint32_t instanceCount,
-    ERhiClassicTlasBuildFlags buildFlags) const noexcept
+RhiRayTracingAccelerationStructurePrebuildInfo D3D12RenderHardwareInterface::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
 {
-	return m_rayTracingServices->GetTopLevelAccelerationStructurePrebuildInfo(instanceCount, buildFlags);
+	return m_rayTracingServices->GetTlasPrebuildInfo(instanceCount, buildFlags);
 }
 
 RhiOwnedResourceHandle D3D12RenderHardwareInterface::CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
@@ -414,7 +412,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE D3D12RenderHardwareInterface::ResolveDescriptorTable
 	return D3D12_GPU_DESCRIPTOR_HANDLE{handle.Value};
 }
 
-bool D3D12RenderHardwareInterface::BuildPartitionedTopLevelAccelerationStructure(ID3D12GraphicsCommandList7* commandList, const RhiPartitionedTlasBuildCommandDesc& desc) const noexcept
+bool D3D12RenderHardwareInterface::BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept
 {
-	return m_rayTracingServices->BuildPartitionedTopLevelAccelerationStructure(commandList, desc);
+	return m_rayTracingServices->BuildPtlas(commandList, desc);
 }

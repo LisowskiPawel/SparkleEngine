@@ -10,7 +10,7 @@
 
 **Current readiness:** **36/100** across 26 tracked Renderer families — source implementation/integration is substantial, four admitted release features are absent, and candidate verification/delivery/adoption are `0`. See [Current Feature Readiness](../../../../../Acceptance/CurrentReadiness.md#renderer).
 
-[Required rendering depth](../../../../../Strategy/FeatureDeliveryCatalog.md#selected-rendering-depth) routes existing transport proof and the selected [materials](GeometryAndResources/ImplementationPlan.md), [reconstruction](PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md), [volumes](Lighting/VolumetricLighting/ImplementationPlan.md), [SHaRC then NRC](Lighting/RadianceCaching/RadianceCachingDesign.md), [NTC](../../../../CrossModule/NeuralGraphics/TextureCompression/ImplementationPlan.md) and [PTLAS](RayTracing/PartitionedTlas/ImplementationPlan.md). Selection adds no implementation or readiness proof.
+[Required rendering depth](../../../../../Strategy/FeatureDeliveryCatalog.md#selected-rendering-depth) routes existing transport proof and the selected [materials](GeometryAndResources/ImplementationPlan.md), [reconstruction](PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md), [volumes](Lighting/VolumetricLighting/ImplementationPlan.md), [SHaRC then NRC](Lighting/RadianceCaching/RadianceCachingDesign.md), [NTC](../../../../CrossModule/NeuralGraphics/TextureCompression/ImplementationPlan.md) and [PTLAS](RayTracing/Ptlas/ImplementationPlan.md). Selection adds no implementation or readiness proof.
 
 ## At A Glance
 
@@ -91,7 +91,7 @@ A Renderer feature dossier must answer—or explicitly mark unanswered—what re
 | `FCR-REN-08`, `PTD-*`, eventual `RPT-*` | [Reference Path Tracer](Lighting/ReferencePathTracer/ReferencePathTracerDesign.md) | feature definition, discovery gate, and eventual proof contract for an independent reference oracle |
 | `REN-VOL-*` | [Volumetric Lighting](Lighting/VolumetricLighting/VolumetricLightingDesign.md) | explicit negative capability plus blocked post-release target for media, fog, Volumetric ReSTIR, physical atmosphere/sky, and aerial perspective |
 | `REN-DECAL-*` | [Deferred Decals](DeferredDecals/DeferredDecalsDesign.md) | explicit current absence plus a separately labeled [composition architecture](DeferredDecals/CompositionArchitecture.md) |
-| `REN-RT-*` | [Ray Tracing](RayTracing/RayTracingDesign.md) | prepared scene identity becomes classic/PTLAS acceleration and inline/native effect traversal; target invariants are separate |
+| `REN-RT-*` | [Ray Tracing](RayTracing/RayTracingDesign.md) | prepared scene identity becomes TLAS/PTLAS acceleration and inline/native effect traversal; target invariants are separate |
 | `REN-POST-*` | [Post Processing](PostProcessing/PostProcessingDesign.md) | one ordered image-space family transforms scene-linear lighting into a resolved, encoded output while naming absent expected stages |
 | `REN-POST-01` through `REN-POST-03` | [Exposure](PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#exposure) | scene luminance and per-view settings become one bounded history-aware exposure value |
 | `REN-POST-04` through `REN-POST-06` | [Image Reconstruction and Upscaling](PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#image-reconstruction-and-upscaling) | render-extent color and guides become one output-extent resolved color |

@@ -4,15 +4,15 @@
 
 struct RhiCapabilities;
 
-struct RayTracingTopLevelProviderCapabilityReport final
+struct RayTracingTlasProviderCapabilityReport final
 {
-	ERhiRayTracingTopLevelProvider SelectedProvider = ERhiRayTracingTopLevelProvider::None;
+	ERhiRayTracingTlasProvider SelectedProvider = ERhiRayTracingTlasProvider::None;
 	const char* SelectionReason = "not-queried";
 };
 
-struct RayTracingPartitionedTlasCapabilityReport final
+struct RayTracingPtlasCapabilityReport final
 {
-	ERhiPartitionedTlasProvider Provider = ERhiPartitionedTlasProvider::None;
+	ERhiPtlasProvider Provider = ERhiPtlasProvider::None;
 	bool Supported = false;
 	bool SupportsDescriptor = false;
 	const char* CapabilityStatusReason = "not-queried";
@@ -24,8 +24,8 @@ struct RayTracingCapabilityReport final
 	bool SupportsInlineRayQuery = false;
 	bool SupportsRayTracingPipeline = false;
 	bool SupportsDescriptorIndexing = false;
-	RayTracingTopLevelProviderCapabilityReport TopLevelProvider;
-	RayTracingPartitionedTlasCapabilityReport PartitionedTlas;
+	RayTracingTlasProviderCapabilityReport TlasProvider;
+	RayTracingPtlasCapabilityReport Ptlas;
 };
 
 RayTracingCapabilityReport BuildRayTracingCapabilityReport(const RhiCapabilities& capabilities) noexcept;

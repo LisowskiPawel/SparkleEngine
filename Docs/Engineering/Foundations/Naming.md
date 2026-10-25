@@ -71,6 +71,7 @@ Shared graphics contracts use the same vocabulary at every boundary:
 - Pass-specific parameter structs carry semantic frame, scene, view, ray-tracing, provider, history, and display inputs. Broad semantic context bags are prohibited; do not introduce a service bag under a different `*Context`, `*Services`, or `*Resources` name.
 - `SourceImportOutput` contains imported content plus `SourceImportProvenance`; import failure is `Diagnostics::Error`. Prefer `output` or `importOutput`, not `result`.
 - Use `GpuMesh`, `GpuMeshCache`, and `commandContext`; do not use `GPU*` casing or `cmd` in owned neutral code.
+- Use `TLAS` and `PTLAS` in rendering prose, UI, diagnostics and labels, with `Tlas` and `Ptlas` in owned C++ names and filenames. Use the same short terms in configuration keys. Keep exact SDK identifiers only at external API boundaries and in source URLs.
 - Neutral render-target APIs use `renderTarget`, `renderTargets`, `renderTargetCount`, and `depthStencil`; `rtv`/`dsv` remain native D3D boundary terms.
 - Neutral pipelines are `RenderPipeline` described by `GraphicsPipelineDesc` or `ComputePipelineDesc`, created with `Create*Pipeline`, and bound with `SetPipeline`. `PipelineState`, `PSO`, native pipeline types, and `SetPipelineState` do not leak into neutral contracts.
 - `LevelSession` owns registered/active/pending/loading level lifetime. `SceneLoadExecutor` owns work that produces `SceneLoadPackage`; shared payload is `SceneLoadWorkState`.

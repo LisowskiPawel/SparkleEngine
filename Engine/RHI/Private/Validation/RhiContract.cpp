@@ -99,7 +99,7 @@ bool RhiContract::IsRayTracingInstanceListUsable(const RhiRayTracingInstanceDesc
 	return true;
 }
 
-bool RhiContract::IsPartitionedTlasOperationPackUsable(const RhiPartitionedTlasOperationPackDesc& operationPack) noexcept
+bool RhiContract::IsPtlasOperationPackUsable(const RhiPtlasOperationPackDesc& operationPack) noexcept
 {
 	if (operationPack.OperationCount == 0 || operationPack.Operations == nullptr || (operationPack.InstanceWriteCount != 0 && operationPack.InstanceWrites == nullptr)
 	    || (operationPack.InstanceUpdateCount != 0 && operationPack.InstanceUpdates == nullptr) || (operationPack.PartitionTranslationCount != 0 && operationPack.PartitionTranslations == nullptr))
@@ -109,7 +109,7 @@ bool RhiContract::IsPartitionedTlasOperationPackUsable(const RhiPartitionedTlasO
 
 	for (std::uint32_t index = 0; index < operationPack.InstanceWriteCount; ++index)
 	{
-		const RhiPartitionedTlasInstanceWriteDesc& instance = operationPack.InstanceWrites[index];
+		const RhiPtlasInstanceWriteDesc& instance = operationPack.InstanceWrites[index];
 		if (instance.AccelerationStructure == 0 || instance.InstanceID > kRhiRayTracingMaxInstanceId || instance.InstanceMask == 0 || instance.InstanceMask > kRhiRayTracingMaxInstanceMask
 		    || instance.InstanceContributionToHitGroupIndex > kRhiRayTracingMaxInstanceContributionToHitGroupIndex)
 		{
@@ -119,7 +119,7 @@ bool RhiContract::IsPartitionedTlasOperationPackUsable(const RhiPartitionedTlasO
 
 	for (std::uint32_t index = 0; index < operationPack.InstanceUpdateCount; ++index)
 	{
-		const RhiPartitionedTlasInstanceUpdateDesc& instance = operationPack.InstanceUpdates[index];
+		const RhiPtlasInstanceUpdateDesc& instance = operationPack.InstanceUpdates[index];
 		if (instance.AccelerationStructure == 0 || instance.InstanceContributionToHitGroupIndex > kRhiRayTracingMaxInstanceContributionToHitGroupIndex)
 		{
 			return false;

@@ -21,7 +21,7 @@ void RayTracingPtlasPartitionPlanner::ValidateConfig(const RayTracingPtlasPartit
 {
 	if (config.PartitionsPerAxis == 0u || config.PartitionsPerAxis > MaxPlannerPartitionsPerAxis || config.ModeChangeDistance < 0.0f || config.TransformDirtyEpsilon < 0.0f)
 	{
-		Diagnostics::Fatal(g_rayTracingPtlasPartitionPlannerStateLogger, __FILE__, __LINE__, "Partitioned TLAS planner configuration is outside its structural bounds.");
+		Diagnostics::Fatal(g_rayTracingPtlasPartitionPlannerStateLogger, __FILE__, __LINE__, "PTLAS planner configuration is outside its structural bounds.");
 	}
 }
 

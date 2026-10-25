@@ -28,7 +28,7 @@ void AddRayTracingScenePass(FrameGraphBuilder& builder, const RenderFrame& frame
 			    Diagnostics::Fatal(g_rayTracingSceneFrameGraphLogger, __FILE__, __LINE__, "Ray-tracing scene build received an invalid persistent SceneTlas handle.");
 		    }
 
-		    resourceBuilder.Use(sceneTlas, ResourceUsage::AccelerationStructureBuild, "SceneTopLevelAccelerationStructure");
+		    resourceBuilder.Use(sceneTlas, ResourceUsage::AccelerationStructureBuild, "SceneTlas");
 	    },
 	    [&rayTracingScene, &frame](PassCommandContext& context) { rayTracingScene.Build(context.Commands, frame.PreparedScene, frame.View.rayTracingPlan, &context.Diagnostics); });
 }

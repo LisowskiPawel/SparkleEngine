@@ -2,32 +2,32 @@
 
 #include "RayTracing/RhiRayTracingService.h"
 
-RhiRayTracingAccelerationStructurePrebuildInfo RhiRayTracingService::GetTopLevelAccelerationStructurePrebuildInfo(std::uint32_t instanceCount, ERhiClassicTlasBuildFlags buildFlags) const noexcept
+RhiRayTracingAccelerationStructurePrebuildInfo RhiRayTracingService::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
 {
-	return GetClassicTlasService().GetClassicTopLevelAccelerationStructurePrebuildInfo(instanceCount, buildFlags);
+	return GetTlasService().GetTlasPrebuildInfo(instanceCount, buildFlags);
 }
 
-RhiPartitionedTlasBuildSizes RhiRayTracingService::GetPartitionedTopLevelAccelerationStructureBuildSizes(const RhiPartitionedTlasDesc& desc) const noexcept
+RhiPtlasBuildSizes RhiRayTracingService::GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept
 {
-	return GetPartitionedTlasService().GetPartitionedTopLevelAccelerationStructureBuildSizes(desc);
+	return GetPtlasService().GetPtlasBuildSizes(desc);
 }
 
-RhiOwnedResourceHandle RhiRayTracingService::CreatePartitionedTopLevelAccelerationStructureBuffer(const RhiPartitionedTlasBuildSizes& sizes, std::wstring_view debugName)
+RhiOwnedResourceHandle RhiRayTracingService::CreatePtlasBuffer(const RhiPtlasBuildSizes& sizes, std::wstring_view debugName)
 {
-	return GetPartitionedTlasService().CreatePartitionedTopLevelAccelerationStructureBuffer(sizes, debugName);
+	return GetPtlasService().CreatePtlasBuffer(sizes, debugName);
 }
 
-RhiOwnedResourceHandle RhiRayTracingService::CreatePartitionedTopLevelAccelerationStructureOperationBuffer(const RhiPartitionedTlasOperationPackDesc& operationPack, std::wstring_view debugName)
+RhiOwnedResourceHandle RhiRayTracingService::CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName)
 {
-	return GetPartitionedTlasService().CreatePartitionedTopLevelAccelerationStructureOperationBuffer(operationPack, debugName);
+	return GetPtlasService().CreatePtlasOperationBuffer(operationPack, debugName);
 }
 
-RhiPartitionedTlasOperationBufferLayout RhiRayTracingService::GetPartitionedTopLevelAccelerationStructureOperationBufferLayout(const RhiPartitionedTlasDesc& desc) const noexcept
+RhiPtlasOperationBufferLayout RhiRayTracingService::GetPtlasOperationBufferLayout(const RhiPtlasDesc& desc) const noexcept
 {
-	return GetPartitionedTlasService().GetPartitionedTopLevelAccelerationStructureOperationBufferLayout(desc);
+	return GetPtlasService().GetPtlasOperationBufferLayout(desc);
 }
 
 RhiOwnedResourceHandle RhiRayTracingService::CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
-	return GetClassicTlasService().CreateClassicTopLevelAccelerationStructureInstanceBuffer(instances, instanceCount, debugName);
+	return GetTlasService().CreateTlasInstanceBuffer(instances, instanceCount, debugName);
 }

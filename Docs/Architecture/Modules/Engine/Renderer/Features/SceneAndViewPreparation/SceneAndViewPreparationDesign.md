@@ -200,7 +200,7 @@ Feature-family proof is owned by [Acceptance](#scene-and-view-preparation-accept
 | current/previous joint and morph data | deformed raster/ray geometry and motion | continuity and frame-slot identity cannot mix |
 | ray vertices/indices/influences/hit instances/materials | BLAS/TLAS, ray GBuffer, shadows, and indirect paths | scene-to-hit/SBT mapping must use the matching generation |
 | material texture table and binding revision | eligible ray material evaluation | fixed capacity and completion-safe texture-generation replacement |
-| per-view instance/partition payload | selected classic/PTLAS strategy | view identity joins shared scene identity without becoming scene authority |
+| per-view instance/partition payload | selected TLAS/PTLAS strategy | view identity joins shared scene identity without becoming scene authority |
 
 ```mermaid
 flowchart LR

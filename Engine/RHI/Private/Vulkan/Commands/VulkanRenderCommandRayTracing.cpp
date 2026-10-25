@@ -102,17 +102,17 @@ void VulkanRenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRay
 	vkCmdPipelineBarrier2(m_commandBuffer, &dependencyInfo);
 }
 
-void VulkanRenderCommandList::BuildTopLevelAccelerationStructure(
+void VulkanRenderCommandList::BuildTlas(
     RhiGpuVirtualAddress instanceDescsGpuAddress,
     std::uint32_t instanceCount,
     RhiGpuVirtualAddress scratchGpuAddress,
     RhiGpuVirtualAddress resultGpuAddress,
-    ERhiClassicTlasBuildMode buildMode) noexcept
+    ERhiTlasBuildMode buildMode) noexcept
 {
 	if (m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr || m_memoryAllocator == nullptr || m_rhi->GetCmdBuildAccelerationStructures() == nullptr || instanceDescsGpuAddress == 0
 	    || scratchGpuAddress == 0 || resultGpuAddress == 0)
 	{
-		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan classic TLAS build received no device, command buffer, build entry point, or GPU address.");
+		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan TLAS build received no device, command buffer, build entry point, or GPU address.");
 	}
 	EndDynamicRenderingIfNeeded();
 
@@ -120,7 +120,7 @@ void VulkanRenderCommandList::BuildTopLevelAccelerationStructure(
 	if (!ResolveAddress(resultGpuAddress, resultResource) || resultResource.AccelerationStructure == VK_NULL_HANDLE
 	    || resultResource.AccelerationStructureType != VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR)
 	{
-		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan classic TLAS destination does not resolve to a top-level acceleration structure.");
+		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan TLAS destination does not resolve to a TLAS.");
 	}
 
 	const VkAccelerationStructureGeometryInstancesDataKHR instances{
@@ -137,15 +137,15 @@ void VulkanRenderCommandList::BuildTopLevelAccelerationStructure(
 	    .flags = VK_GEOMETRY_OPAQUE_BIT_KHR};
 
 	const VkBuildAccelerationStructureFlagsKHR nativeBuildFlags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR
-	    | (buildMode != ERhiClassicTlasBuildMode::Build ? VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR : static_cast<VkBuildAccelerationStructureFlagsKHR>(0));
+	    | (buildMode != ERhiTlasBuildMode::Build ? VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR : static_cast<VkBuildAccelerationStructureFlagsKHR>(0));
 
 	const VkAccelerationStructureBuildGeometryInfoKHR buildInfo{
 	    .sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR,
 	    .pNext = nullptr,
 	    .type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR,
 	    .flags = nativeBuildFlags,
-	    .mode = buildMode == ERhiClassicTlasBuildMode::Update ? VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR : VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR,
-	    .srcAccelerationStructure = buildMode == ERhiClassicTlasBuildMode::Update ? resultResource.AccelerationStructure : VK_NULL_HANDLE,
+	    .mode = buildMode == ERhiTlasBuildMode::Update ? VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR : VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR,
+	    .srcAccelerationStructure = buildMode == ERhiTlasBuildMode::Update ? resultResource.AccelerationStructure : VK_NULL_HANDLE,
 	    .dstAccelerationStructure = resultResource.AccelerationStructure,
 	    .geometryCount = 1,
 	    .pGeometries = &geometry,
@@ -179,13 +179,12 @@ void VulkanRenderCommandList::BuildTopLevelAccelerationStructure(
 	vkCmdPipelineBarrier2(m_commandBuffer, &dependencyInfo);
 }
 
-void VulkanRenderCommandList::BuildPartitionedTopLevelAccelerationStructure(const RhiPartitionedTlasBuildCommandDesc& desc) noexcept
+void VulkanRenderCommandList::BuildPtlas(const RhiPtlasBuildCommandDesc& desc) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr || m_rhi->GetCmdBuildPartitionedAccelerationStructures() == nullptr || !desc.DestinationResource
-	    || desc.DestinationAccelerationStructure == 0 || desc.Scratch == 0 || desc.OperationHeaders == 0 || desc.OperationCount == 0 || desc.Layout.InstanceCapacity == 0
-	    || desc.Layout.PartitionCount == 0)
+	if (m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr || m_rhi->GetCmdBuildPtlas() == nullptr || !desc.DestinationResource || desc.DestinationAccelerationStructure == 0 || desc.Scratch == 0
+	    || desc.OperationHeaders == 0 || desc.OperationCount == 0 || desc.Layout.InstanceCapacity == 0 || desc.Layout.PartitionCount == 0)
 	{
-		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan partitioned TLAS build received incomplete device, command-buffer, layout, or GPU-address inputs.");
+		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan PTLAS build received incomplete device, command-buffer, layout, or GPU-address inputs.");
 	}
 	EndDynamicRenderingIfNeeded();
 
@@ -210,9 +209,9 @@ void VulkanRenderCommandList::BuildPartitionedTopLevelAccelerationStructure(cons
 
 	vkCmdPipelineBarrier2(m_commandBuffer, &operationDataDependency);
 
-	VkPartitionedAccelerationStructureFlagsNV partitionedTlasFlags{};
+	VkPartitionedAccelerationStructureFlagsNV ptlasFlags{};
 	VkPartitionedAccelerationStructureInstancesInputNV input{};
-	VulkanTypeConversions::ConfigurePartitionedTlasInput(desc.Layout, input, partitionedTlasFlags);
+	VulkanTypeConversions::ConfigurePtlasInput(desc.Layout, input, ptlasFlags);
 
 	const VkBuildPartitionedAccelerationStructureInfoNV buildInfo{
 	    .sType = VK_STRUCTURE_TYPE_BUILD_PARTITIONED_ACCELERATION_STRUCTURE_INFO_NV,
@@ -224,7 +223,7 @@ void VulkanRenderCommandList::BuildPartitionedTopLevelAccelerationStructure(cons
 	    .srcInfos = desc.OperationHeaders,
 	    .srcInfosCount = desc.OperationCount};
 
-	m_rhi->GetCmdBuildPartitionedAccelerationStructures()(m_commandBuffer, &buildInfo);
+	m_rhi->GetCmdBuildPtlas()(m_commandBuffer, &buildInfo);
 
 	const VkMemoryBarrier2 buildBarrier{
 	    .sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER_2,

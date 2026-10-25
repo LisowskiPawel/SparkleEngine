@@ -1,6 +1,6 @@
 #include "PCH.h"
 
-#include "D3D12/RayTracing/D3D12ClassicTlasServices.h"
+#include "D3D12/RayTracing/D3D12TlasServices.h"
 
 #include "D3D12/D3D12TypeConversions.h"
 #include "D3D12/Device/D3D12Rhi.h"
@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-class D3D12ClassicTlasTranslation final
+class D3D12TlasTranslation final
 {
 public:
 	static std::wstring MakeDebugName(std::wstring_view debugName, std::wstring_view defaultDebugName) { return debugName.empty() ? std::wstring(defaultDebugName) : std::wstring(debugName); }
@@ -38,15 +38,13 @@ public:
 	}
 };
 
-D3D12ClassicTlasServices::D3D12ClassicTlasServices(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& memoryAllocator) noexcept :
+D3D12TlasServices::D3D12TlasServices(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& memoryAllocator) noexcept :
     m_rhi(&rhi),
     m_memoryAllocator(&memoryAllocator)
 {
 }
 
-RhiRayTracingAccelerationStructurePrebuildInfo D3D12ClassicTlasServices::GetClassicTopLevelAccelerationStructurePrebuildInfo(
-    std::uint32_t instanceCount,
-    ERhiClassicTlasBuildFlags buildFlags) const noexcept
+RhiRayTracingAccelerationStructurePrebuildInfo D3D12TlasServices::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
 {
 	if (m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure)
 	{
@@ -57,7 +55,7 @@ RhiRayTracingAccelerationStructurePrebuildInfo D3D12ClassicTlasServices::GetClas
 	inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
 	inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
 	inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_TRACE;
-	if (HasFlag(buildFlags, ERhiClassicTlasBuildFlags::AllowUpdate))
+	if (HasFlag(buildFlags, ERhiTlasBuildFlags::AllowUpdate))
 	{
 		inputs.Flags |= D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_UPDATE;
 	}
@@ -74,10 +72,7 @@ RhiRayTracingAccelerationStructurePrebuildInfo D3D12ClassicTlasServices::GetClas
 	return prebuildInfo;
 }
 
-RhiOwnedResourceHandle D3D12ClassicTlasServices::CreateClassicTopLevelAccelerationStructureInstanceBuffer(
-    const RhiRayTracingInstanceDesc* instances,
-    std::uint32_t instanceCount,
-    std::wstring_view debugName)
+RhiOwnedResourceHandle D3D12TlasServices::CreateTlasInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
 	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !RhiContract::IsRayTracingInstanceListUsable(instances, instanceCount))
 	{
@@ -96,7 +91,7 @@ RhiOwnedResourceHandle D3D12ClassicTlasServices::CreateClassicTopLevelAccelerati
 		nativeInstance.InstanceID = source.InstanceID;
 		nativeInstance.InstanceMask = source.InstanceMask;
 		nativeInstance.InstanceContributionToHitGroupIndex = source.InstanceContributionToHitGroupIndex;
-		nativeInstance.Flags = D3D12ClassicTlasTranslation::ToNativeInstanceFlags(source.Flags);
+		nativeInstance.Flags = D3D12TlasTranslation::ToNativeInstanceFlags(source.Flags);
 		nativeInstance.AccelerationStructure = source.AccelerationStructure;
 	}
 
@@ -108,7 +103,7 @@ RhiOwnedResourceHandle D3D12ClassicTlasServices::CreateClassicTopLevelAccelerati
 	    D3D12_RESOURCE_STATE_GENERIC_READ,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::HostUpload,
-	    D3D12ClassicTlasTranslation::MakeDebugName(debugName, L"RayTracingClassicTlasInstanceBuffer"));
+	    D3D12TlasTranslation::MakeDebugName(debugName, L"RayTracingTlasInstanceBuffer"));
 
 	if (ownedRecord == nullptr || ownedRecord->Resource == nullptr)
 	{

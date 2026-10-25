@@ -238,9 +238,9 @@ Current absence, extension seams, and the separately labeled target architecture
 
 | Capability ID | Capability | State | Exact current coverage and limit | Evidence | Release disposition |
 | --- | --- | --- | --- | --- | --- |
-| `REN-RT-01` | Classic TLAS | Capability-gated | Per-view classic TLAS build with an optional refit/update setting; instances carry stable scene identity and shader-table contribution. | `S` | Pending |
-| `REN-RT-02` | Partitioned TLAS | Capability-gated | Selected through RHI provider capability/preferences with a per-view 3D partition planner. Current build strategy disables instance updates and partition translation and caps operation count at one. | `S` | Pending |
-| `REN-RT-03` | Shared scene identity | Implemented path | Classic and partitioned acceleration paths derive from the same prepared scene/GPU-scene identity rather than independent material/effect representations. | `S` | Pending |
+| `REN-RT-01` | TLAS | Capability-gated | Per-view TLAS build with an optional refit/update setting; instances carry stable scene identity and shader-table contribution. | `S` | Pending |
+| `REN-RT-02` | PTLAS | Capability-gated | Selected through RHI provider capability/preferences with a per-view XZ grid and separate global partition. Preparation owns the bound storage; the current full-build strategy writes admitted instances with one operation and disables instance updates and partition translation. Scoped source reconciliation: 2026-10-25; see [Ray Tracing](Features/RayTracing/RayTracingDesign.md#acceleration-features). | `S` | Pending |
+| `REN-RT-03` | Shared scene identity | Implemented path | TLAS and PTLAS acceleration paths derive from the same prepared scene/GPU-scene identity rather than independent material/effect representations. | `S` | Pending |
 | `REN-RT-04` | Shader-table plan | Implemented path | Logical geometry/material/hit-group classification maps to checked SBT record indices for one shared Surface ray type. | `S` | Pending |
 | `REN-RT-05` | Hit-group coverage | Partial | Opaque and alpha-tested triangle hit groups are authored. Procedural/intersection and callable program coverage was not found in current Renderer effects. | `S` | Pending |
 | `REN-RT-06` | Plan invalidation | Implemented path | Generation changes follow geometry/hit-group/SBT semantic changes rather than ordinary material-value edits; retired tables/pipelines wait on queue submissions. | `S` | Pending |
@@ -350,7 +350,7 @@ Each selectable mode needs a representative screenshot/capture, expected-value d
 
 ## Public And Developer Selection Surface
 
-The inspected public settings cover VSync, back-buffer format, adapter preference, tone mapper, exposure, output encoding, upscaler and quality, ray reconstruction, GBuffer algorithm, automatic mesh batching, classic TLAS refit, and partitioned TLAS activation/planning controls. Ray-tracing frontend selection is one automatic Renderer policy with no public or per-effect setting. View mode is non-persisted per-viewport state carried as one `RenderViewMode` on `ViewportRenderRequest`; it is not an engine rendering setting or a second lighting-route type. `r.BackBufferCount` and `r.MaximumFramesInFlight` are RHI console controls outside the Renderer settings state/persistence. Material texture-table support is derived from RHI capabilities; there is no registered material binding-mode control.
+The inspected public settings cover VSync, back-buffer format, adapter preference, tone mapper, exposure, output encoding, upscaler and quality, ray reconstruction, GBuffer algorithm, automatic mesh batching, TLAS refit, and PTLAS activation/planning controls. Ray-tracing frontend selection is one automatic Renderer policy with no public or per-effect setting. View mode is non-persisted per-viewport state carried as one `RenderViewMode` on `ViewportRenderRequest`; it is not an engine rendering setting or a second lighting-route type. `r.BackBufferCount` and `r.MaximumFramesInFlight` are RHI console controls outside the Renderer settings state/persistence. Material texture-table support is derived from RHI capabilities; there is no registered material binding-mode control.
 
 The settings section persists 26 named Renderer CVars in `/Script/SparkleRenderer.EngineRenderingSettings`. Immutable `Config/DefaultEngine.ini` supplies defaults; per-user `Settings/EngineRendering.ini` overlays them and is the only write target, retaining its other sections. View mode is session state and is not in that persisted set. Adapter preference and back-buffer format are written immediately but reported as pending restart; the other section values are applied to Renderer CVars on commit. The full lifecycle and known in-place-write/diagnostic gaps are owned by [Settings State and Persistence](Features/RuntimeConfiguration/RuntimeConfigurationDesign.md#settings-state-and-persistence).
 
@@ -366,7 +366,7 @@ No current selector exists for Volumetric Lighting, deferred decals, color gradi
 - Ray use currently has no fully non-ray lighting fallback. Minimum hardware/support claims must account for that fact.
 - Native RT pipeline execution covers ray GBuffer and direct-shadow visibility, not the Reference Path Tracer or ReSTIR indirect.
 - Dynamic ray-traced deformation performs CPU position work and full BLAS rebuild; it is not refit/update support and may be expensive.
-- Partitioned TLAS has a richer low-level RHI contract than the Renderer currently exercises.
+- PTLAS has a richer low-level RHI contract than the Renderer currently exercises.
 - Optional NVIDIA providers require exact binary, adapter, driver, interposer, feature, and fallback evidence before advertisement.
 - Async compute and parallel recording are implemented scheduling paths, not proven speedups.
 - Typed parameter validation and pipeline caches are implemented mechanisms, not native pipeline correctness or hot-reload stress evidence.

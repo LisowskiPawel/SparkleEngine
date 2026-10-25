@@ -3,7 +3,7 @@
 #include "RHI/Public/Bindings/RenderBindingSet.h"
 #include "RHI/Public/Core/RhiCapabilities.h"
 #include "RHI/Public/Pipeline/RhiPipelineDesc.h"
-#include "RHI/Public/RayTracing/RhiPartitionedTlasDesc.h"
+#include "RHI/Public/RayTracing/RhiPtlasDesc.h"
 #include "RHI/Public/RayTracing/RhiRayTracingDesc.h"
 #include "RHI/Public/RayTracing/RhiRayTracingPipelineDesc.h"
 #include "RHI/Public/Resources/RhiResourceDesc.h"
@@ -19,7 +19,7 @@ namespace RhiContract
 	bool IsResourceViewDescUsable(const RhiResourceViewDesc& desc) noexcept;
 	bool IsRayTracingGeometryDescUsable(const RhiRayTracingGeometryDesc& geometry) noexcept;
 	bool IsRayTracingInstanceListUsable(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount) noexcept;
-	bool IsPartitionedTlasOperationPackUsable(const RhiPartitionedTlasOperationPackDesc& operationPack) noexcept;
+	bool IsPtlasOperationPackUsable(const RhiPtlasOperationPackDesc& operationPack) noexcept;
 	bool IsRayTracingGpuAddressPresent(RhiGpuVirtualAddress gpuAddress) noexcept;
 	bool IsRayTracingBufferSizeUsable(std::uint64_t sizeInBytes, std::uint64_t alignmentInBytes) noexcept;
 	void ValidateGraphicsPipelineDesc(const GraphicsPipelineDesc& desc);

@@ -219,21 +219,23 @@ Definition of done: descriptor mutation, ABI, cache identity, reload lifetime, n
 
 **Verified:** 2026-09-06 at committed `master` revision `8414b5dc`
 
-**Scope:** `RHI-RT-*` and RHI-side `RHI-RTC-*`; acceleration structures, inline queries, native pipelines, shader tables, classic TLAS, partitioned TLAS, transforms, capability gates, and native lowering
+**Scope:** `RHI-RT-*` and RHI-side `RHI-RTC-*`; acceleration structures, inline queries, native pipelines, shader tables, TLAS, PTLAS, transforms, capability gates, and native lowering
 
-**Current readiness:** **40/100** — AS, inline, native-pipeline, shader-table, and partitioned vocabulary/routes exist but remain capability-gated and unproved across devices/backends/effects. See [Current Feature Readiness](../../../../../../Acceptance/CurrentReadiness.md#rhi-and-gpu-execution).
+**Current readiness:** **40/100** — AS, inline, native-pipeline, shader-table, and PTLAS vocabulary/routes exist but remain capability-gated and unproved across devices/backends/effects. See [Current Feature Readiness](../../../../../../Acceptance/CurrentReadiness.md#rhi-and-gpu-execution).
 
-Source ownership reconciled on 2026-10-06: Vulkan PTLAS sizing and build recording both call `VulkanTypeConversions::ConfigurePartitionedTlasInput`. One conversion owns the instance capacities, partition counts, fast-trace flag, and partition-translation flag chain; backend capability and native execution contracts are unchanged.
+Source ownership reconciled on 2026-10-06: Vulkan PTLAS sizing and build recording both call `VulkanTypeConversions::ConfigurePtlasInput`. One conversion owns the instance capacities, partition counts, fast-trace flag, and partition-translation flag chain; backend capability and native execution contracts are unchanged.
+
+Scoped source reconciliation on 2026-10-25: Vulkan advertises PTLAS descriptor access when the PTLAS feature is enabled and native size/build functions are loaded. Binding layouts, descriptor pools, address-based descriptor writes, and command binding use the selected provider. `RhiPtlasGlobalPartitionIndex` names the native reserved global index; regular partition count and global occupancy capacity remain separate. Native descriptor semantics follow the [Vulkan descriptor contract](https://docs.vulkan.org/spec/latest/chapters/descriptors.html#descriptors-partitioned-acceleration-structure) and [partitioned instance definition](https://docs.vulkan.org/refpages/latest/refpages/source/VkPartitionedAccelerationStructureWriteInstanceDataNV.html). This source correction does not qualify backend parity or unrestricted PTLAS operations.
 
 ### Ray Tracing: At A Glance
 
 | Capability | Current RHI contract | Does not imply |
 | --- | --- | --- |
-| triangle BLAS and classic TLAS | neutral geometry/instance descriptions, sizing, build, address, and completion lifetime | procedural geometry, every update/refit mode, or valid Renderer scene mapping |
+| triangle BLAS and TLAS | neutral geometry/instance descriptions, sizing, build, address, and completion lifetime | procedural geometry, every update/refit mode, or valid Renderer scene mapping |
 | inline ray queries | capability-gated traversal from compute/pixel shader contracts | native ray-pipeline support or parity for every effect |
 | native ray pipelines | exports, hit groups, pipeline creation, `TraceRays`, and shader-table regions | correct logical record mapping or inline-path equivalence |
 | shader binding table (SBT) | alignment, stride, regions, and record bytes | correct Renderer material/instance semantics without the higher-level plan |
-| partitioned TLAS | vendor/API/capability-gated provider vocabulary and operations | general PTLAS availability, unrestricted updates, or backend symmetry |
+| PTLAS | vendor/API/capability-gated provider vocabulary and operations | general PTLAS availability, unrestricted updates, or backend symmetry |
 
 ### Ray Work Lifecycle
 
@@ -253,14 +255,14 @@ RHI guarantees native mechanism validity; Renderer owns why a ray is traced and 
 
 ### Ray Tracing: Feature Promise
 
-RHI exposes separable capabilities for triangle acceleration structures, inline traversal, native ray pipelines, shader tables, classic TLAS update, and optional partitioned TLAS. Each request succeeds only when its exact contract is complete; one supported ray mechanism never implies support for every Renderer effect.
+RHI exposes separable capabilities for triangle acceleration structures, inline traversal, native ray pipelines, shader tables, TLAS update, and optional PTLAS. Each request succeeds only when its exact contract is complete; one supported ray mechanism never implies support for every Renderer effect.
 
 ### Contract Boundaries
 
 - BLAS/TLAS descriptions own geometry, instance identity/mask/flags/transform, build/update intent, addresses, and sizing. Current public geometry is indexed triangles; procedural intersection is not a Renderer path.
 - Inline queries and native pipelines are distinct capabilities. Native pipelines own exports/hit groups and raygen/miss/hit/callable SBT regions.
 - Vulkan buffer allocation honors the device's scratch, acceleration-structure and shader-table address alignment; rounding buffer size alone does not align its native allocation.
-- Classic TLAS and partitioned TLAS are independent services. PTLAS remains vendor/API/capability gated and its public vocabulary exceeds the current Renderer-selected subset.
+- TLAS and PTLAS are independent services. PTLAS remains vendor/API/capability gated and its public vocabulary exceeds the current Renderer-selected subset.
 - RHI owns native object, layout, and command validity. Renderer owns scene mapping, SBT record semantics, effect selection, and fallback/rejection policy.
 
 ### Ray Tracing: Design Decisions And Tradeoffs
@@ -277,7 +279,7 @@ RHI exposes separable capabilities for triangle acceleration structures, inline 
 - `AC-RHI-RT-01` — BLAS/TLAS build inputs, transforms, addresses, instance IDs/masks/flags, sizing, update rules, and completion lifetime match on both backends.
 - `AC-RHI-RT-02` — inline and native-pipeline capability reports match native features; strict unsupported requests reject before recording.
 - `AC-RHI-RT-03` — pipeline exports/hit groups and SBT region alignment/stride/record bytes map every Renderer logical record to the intended native shader record.
-- `AC-RHI-RT-04` — classic TLAS update/refit and PTLAS operations activate only for their documented support and never alias unsupported BLAS-refit/procedural/callable feature claims.
+- `AC-RHI-RT-04` — TLAS update/refit and PTLAS operations activate only for their documented support and never alias unsupported BLAS-refit/procedural/callable feature claims.
 - `AC-RHI-RT-05` — shared supported effect fixtures produce equivalent hit/miss/material/visibility semantics for D3D12/Vulkan and inline/native paths within declared tolerances.
 
 ### Ray Tracing: Controlled Failures And Checks
@@ -286,7 +288,7 @@ RHI exposes separable capabilities for triangle acceleration structures, inline 
 | --- | --- | --- |
 | `FM-RHI-RT-01` missing feature/extension/export/hit group or malformed SBT | reject before build/dispatch and identify requirement | `CHK-RHI-RT-01` capability/pipeline/SBT mutation matrix |
 | `FM-RHI-RT-02` stale BLAS/TLAS/SBT identity during scene change | old state remains alive only to completion; new dispatch cannot consume mismatched records | `CHK-RHI-RT-02` scene churn and retirement stress |
-| `FM-RHI-RT-03` PTLAS provider unavailable or operation unsupported | feature reports unavailable; classic/neutral state is not corrupted | `CHK-RHI-RT-03` provider/capability matrix |
+| `FM-RHI-RT-03` PTLAS provider unavailable or operation unsupported | feature reports unavailable; TLAS/neutral state is not corrupted | `CHK-RHI-RT-03` provider/capability matrix |
 
 Check coverage: `CHK-RHI-RT-01` covers `AC-RHI-RT-02`, `AC-RHI-RT-03`, and `FM-RHI-RT-01`; `CHK-RHI-RT-02` covers `AC-RHI-RT-01`, `AC-RHI-RT-03`, `AC-RHI-RT-05`, and `FM-RHI-RT-02`; `CHK-RHI-RT-03` covers `AC-RHI-RT-04` and `FM-RHI-RT-03`.
 

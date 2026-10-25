@@ -14,7 +14,7 @@ class RenderHardwareInterface;
 class GpuMeshCache;
 class PassExecutionDiagnostics;
 class RayTracingBlasCache;
-class RayTracingTopLevelAccelerationStructureStrategy;
+class RayTracingAccelerationStrategy;
 struct PreparedRenderScene;
 struct RenderMaterialTable;
 struct RenderPrimitive;
@@ -53,5 +53,5 @@ private:
 	RayTracingPerformanceMetrics m_performanceMetrics = {};
 	RayTracingShaderTablePlan m_shaderTablePlan;
 	std::unique_ptr<RayTracingBlasCache> m_blasCache;
-	std::unique_ptr<RayTracingTopLevelAccelerationStructureStrategy> m_topLevelAccelerationStructureStrategy;
+	std::unique_ptr<RayTracingAccelerationStrategy> m_accelerationStrategy;
 };

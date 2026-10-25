@@ -7,7 +7,7 @@
 
 ## Work This Plan
 
-Production follows REL-11 and correct prepared-scene/BLAS/classic-TLAS/SBT proof. Existing experimental code must earn the supported subset; PTLAS is now a selected portfolio feature, not an optional undocumented toggle. Execute the first unfinished stage only. The discovery card freezes numerical tolerances, practical-effect bands, exact eligibility, rights, hook/copy/resource limits and failure checks before production; a source-present mechanism is not a satisfied gate.
+Production follows REL-11 and correct prepared-scene/BLAS/TLAS/SBT proof. Existing experimental code must earn the supported subset; PTLAS is now a selected portfolio feature, not an optional undocumented toggle. Execute the first unfinished stage only. The discovery card freezes numerical tolerances, practical-effect bands, exact eligibility, rights, hook/copy/resource limits and failure checks before production; a source-present mechanism is not a satisfied gate.
 
 ## Stage Contract
 
@@ -28,21 +28,21 @@ Each exit records exact candidate/dirty state, API/device/tool/content/shader/SD
 **Exit:** Exact supported operation/device matrix, failure checks and hook/copy/byte ledger accepted; architecture boundary remains intact.
 
 ```text
-Execute only PTLAS-S0 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/PartitionedTlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Execute only PTLAS-S0 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/Ptlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
 ```
 
 ## PTLAS-S1 Qualify current full-build identity
 
-**Start:** PTLAS-D0 and classic reference outputs.
+**Start:** PTLAS-D0 and TLAS reference outputs.
 
-**Work:** Use existing strategy/services to establish initial, empty and full-write correctness. Compare classic/PTLAS hit IDs/depth/material/alpha/double-sided/masks and SBT mapping, including reordered prepared primitives and both traversal frontends where admitted.
+**Work:** Use existing strategy/services to establish initial, empty and full-write correctness. Compare TLAS/PTLAS hit IDs/depth/material/alpha/double-sided/masks and SBT mapping, including reordered prepared primitives and both traversal frontends where admitted.
 
 **Cleanup:** Remove duplicate scene/hit/material snapshots and stale planner outputs; reuse one semantic AS binding.
 
 **Exit:** AC-PTLAS-01 full-build cells and native size-query/recording agreement pass; experimental status remains until later stages.
 
 ```text
-Execute only PTLAS-S1 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/PartitionedTlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Execute only PTLAS-S1 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/Ptlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
 ```
 
 ## PTLAS-S2 Deliver sparse updates and migration
@@ -56,7 +56,7 @@ Execute only PTLAS-S1 from Docs/Architecture/Modules/Engine/Renderer/Features/Ra
 **Exit:** AC-PTLAS-02 incremental/migration/replacement cells pass; captured operation records prove partial work.
 
 ```text
-Execute only PTLAS-S2 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/PartitionedTlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Execute only PTLAS-S2 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/Ptlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
 ```
 
 ## PTLAS-S3 Deliver partition translation and safe replacement
@@ -70,21 +70,21 @@ Execute only PTLAS-S2 from Docs/Architecture/Modules/Engine/Renderer/Features/Ra
 **Exit:** All AC-PTLAS-02/03 operation/lifetime/failure cells pass independently on required native tuples.
 
 ```text
-Execute only PTLAS-S3 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/PartitionedTlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Execute only PTLAS-S3 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/Ptlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
 ```
 
 ## PTLAS-S4 Prove build plus trace value
 
 **Start:** Parity/safety pass and frozen workload/decision bands.
 
-**Work:** Measure classic rebuild/refit versus PTLAS on deterministic instanced geometry with sparse, migrating and near-all-dynamic regimes. Include CPU planning/upload, AS build, trace, synchronization, frame distributions and complete memory.
+**Work:** Measure TLAS rebuild/refit versus PTLAS on deterministic instanced geometry with sparse, migrating and near-all-dynamic regimes. Include CPU planning/upload, AS build, trace, synchronization, frame distributions and complete memory.
 
 **Cleanup:** Delete losing production policies and sample simulation/debug systems; retain original source/patch/captures for rejected experiments as ignored evidence.
 
 **Exit:** AC-PTLAS-04 has a useful admitted case and honest losing regime on the actual supported tuple; no isolated build timer substitutes for full cost.
 
 ```text
-Execute only PTLAS-S4 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/PartitionedTlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Execute only PTLAS-S4 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/Ptlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
 ```
 
 ## PTLAS-S5 Promote the actual supported subset
@@ -93,10 +93,10 @@ Execute only PTLAS-S4 from Docs/Architecture/Modules/Engine/Renderer/Features/Ra
 
 **Work:** Complete selector/status/refusal and package proof; the author or agent reproduces parity, sparse-update benefit and one failure. Update source inventories, capability/evidence maps and experimental/support classifications only to the observed subset.
 
-**Cleanup:** Remove obsolete experimental restrictions only when replaced and proved; delete completed prompts, stale knobs and unused dependencies while preserving classic TLAS.
+**Cleanup:** Remove obsolete experimental restrictions only when replaced and proved; delete completed prompts, stale knobs and unused dependencies while preserving TLAS.
 
 **Exit:** AC-PTLAS-01..05 all pass; source presence alone never promotes support.
 
 ```text
-Execute only PTLAS-S5 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/PartitionedTlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Execute only PTLAS-S5 from Docs/Architecture/Modules/Engine/Renderer/Features/RayTracing/Ptlas/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
 ```

@@ -49,13 +49,15 @@
 
 ## Ray-Tracing Frontend And Top-Level-AS Matrix
 
-| Concern | Classic TLAS | Partitioned TLAS on D3D12 | Partitioned AS operations on Vulkan |
+Source reconciliation: 2026-10-25 for the top-level-AS rows below. These describe current eligibility and the existing full-build PTLAS subset; the [incremental support target](../Modules/Engine/Renderer/Features/RayTracing/Ptlas/PtlasDesign.md) and release qualification remain separate.
+
+| Concern | TLAS | PTLAS on D3D12 | PTLAS on Vulkan |
 | --- | --- | --- | --- |
 | Capability source | Standard RHI AS support populates build, update, GPU-readable instance-buffer support | NVAPI provider query on an NVIDIA device, after DXR availability | `VK_NV_partitioned_acceleration_structure` extension, feature, and loaded functions on NVIDIA |
-| Runtime selection | Selected whenever AS exists and a usable PTLAS descriptor path is not selected | Selected only when `r.RayTracing.PreferPartitionedTlas` requests it and the provider reports both support and descriptor access | Never selected by the current code: capability records `SupportsDescriptorAccess=false`, so selection falls back to classic with reason `vulkan-ptlas-descriptor-path-unavailable` |
-| Renderer update path | Initial build; optional refit/update for later rigid changes via `r.RayTracing.Tlas.Refit` | Renderer builds its partition operation strategy and routes the RHI build through NVAPI | Low-level create/size/build operation surface exists, but it is not the Renderer’s active TLAS binding provider |
-| Shader binding | Standard acceleration-structure descriptor | Provider-selected partitioned-AS descriptor when supported | Vulkan binding-layout code can name the partitioned descriptor type, but current provider selection cannot reach it |
-| Honest claim | Implemented, capability-gated, unexecuted | Vendor/API-gated partial path, unexecuted | Low-level vocabulary and operations exist; selectable Renderer PTLAS is not currently supported |
+| Runtime selection | Selected whenever AS exists and a usable PTLAS descriptor path is not selected | Selected only when `r.RayTracing.PreferPtlas` requests it and the provider reports both support and descriptor access | Selectable on request when the extension/feature is enabled and native size/build functions are loaded; otherwise TLAS is selected with the capability reason |
+| Renderer update path | Initial build; optional refit/update via `r.RayTracing.Tlas.Refit` after a recorded nonempty build with unchanged count and update-capable storage | Full build with one instance-write operation through NVAPI; no instance-update or partition-translation operations | Same Renderer full-build subset through Vulkan NV operations; no instance-update or partition-translation operations |
+| Shader binding | Standard acceleration-structure descriptor | Provider-selected PTLAS descriptor when supported | `VK_DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV` and its device-address descriptor write; shared traversal shaders |
+| Honest claim | Implemented and capability-gated; complete scene/effect/lifetime qualification remains pending | Vendor/API-gated experimental full-build subset; incremental support and release qualification remain pending | Vendor/API-gated experimental full-build subset; independent native-validation, incremental support and release qualification remain pending |
 
 Native RT pipelines currently adapt two effects only: ray GBuffer and direct-shadow visibility. Reference direct/indirect lighting and ReSTIR indirect remain inline-query compute paths.
 

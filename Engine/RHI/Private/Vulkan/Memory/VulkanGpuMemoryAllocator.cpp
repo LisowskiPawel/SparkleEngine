@@ -681,7 +681,7 @@ void VulkanGpuMemoryAllocator::DestroyAllocation(VulkanGpuAllocationRecord& reco
 		record.DeviceAddress = 0;
 		record.BufferDeviceAddress = 0;
 		record.AccelerationStructureType = VK_ACCELERATION_STRUCTURE_TYPE_MAX_ENUM_KHR;
-		record.IsPartitionedAccelerationStructure = false;
+		record.IsPtlas = false;
 		record.Allocation = nullptr;
 		record.ResourceKind = VulkanGpuAllocationResourceKind::Unknown;
 		return;
@@ -723,7 +723,7 @@ void VulkanGpuMemoryAllocator::DestroyAllocation(VulkanGpuAllocationRecord& reco
 	record.DeviceAddress = 0;
 	record.BufferDeviceAddress = 0;
 	record.AccelerationStructureType = VK_ACCELERATION_STRUCTURE_TYPE_MAX_ENUM_KHR;
-	record.IsPartitionedAccelerationStructure = false;
+	record.IsPtlas = false;
 	record.Allocation = nullptr;
 	record.ResourceKind = VulkanGpuAllocationResourceKind::Unknown;
 }

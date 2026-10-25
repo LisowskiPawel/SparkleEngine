@@ -288,9 +288,8 @@ private:
 			case ShaderParameterSemanticKind::SamplerSet:
 				return VK_DESCRIPTOR_TYPE_SAMPLER;
 			case ShaderParameterSemanticKind::AccelerationStructure:
-				return rhi.GetRayTracingCapabilities().Groups.Provider.SelectedTopLevelProvider == ERhiRayTracingTopLevelProvider::PartitionedTlas
-				    ? VK_DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV
-				    : VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+				return rhi.GetRayTracingCapabilities().Groups.Provider.SelectedTlasProvider == ERhiRayTracingTlasProvider::Ptlas ? VK_DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV
+				                                                                                                                 : VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
 
 			default:
 				return VK_DESCRIPTOR_TYPE_MAX_ENUM;

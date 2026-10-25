@@ -194,16 +194,14 @@ void D3D12Rhi::CheckRayTracingSupport() noexcept
 {
 	m_rayTracingCapabilities = {};
 
-	m_rayTracingCapabilities.Groups.PartitionedTlas = RhiPartitionedTlasCapabilities{
+	m_rayTracingCapabilities.Groups.Ptlas = RhiPtlasCapabilities{
 	    .Supported = false,
-	    .Provider = ERhiPartitionedTlasProvider::D3D12NvapiPartitionedTlas,
+	    .Provider = ERhiPtlasProvider::D3D12NvapiPtlas,
 	    .NvidiaDeviceOnly = true,
 	    .CurrentDeviceIsNvidia = IsNvidiaAdapter(),
 	    .CapabilityStatusReason = "d3d12-options5-not-queried"};
 
-	m_rayTracingCapabilities.Groups.Provider = RhiRayTracingProviderCapabilities{
-	    .SelectedTopLevelProvider = ERhiRayTracingTopLevelProvider::None,
-	    .SelectedTopLevelProviderReason = "ray-tracing-not-queried"};
+	m_rayTracingCapabilities.Groups.Provider = RhiRayTracingProviderCapabilities{.SelectedTlasProvider = ERhiRayTracingTlasProvider::None, .SelectedTlasProviderReason = "ray-tracing-not-queried"};
 
 	if (!m_device)
 	{
@@ -234,44 +232,41 @@ void D3D12Rhi::CheckRayTracingSupport() noexcept
 
 		PopulateStandardRayTracingCapabilityGroups(m_rayTracingCapabilities);
 
-		m_rayTracingCapabilities.Groups.PartitionedTlas = RhiPartitionedTlasCapabilities{
+		m_rayTracingCapabilities.Groups.Ptlas = RhiPtlasCapabilities{
 		    .Supported = false,
-		    .Provider = ERhiPartitionedTlasProvider::D3D12NvapiPartitionedTlas,
+		    .Provider = ERhiPtlasProvider::D3D12NvapiPtlas,
 		    .NvidiaDeviceOnly = true,
 		    .CurrentDeviceIsNvidia = IsNvidiaAdapter(),
 		    .CapabilityStatusReason = "d3d12-nvapi-ptlas-provider-not-queried"};
 
-		m_rayTracingCapabilities.Groups.PartitionedTlas = m_nvapiRayTracingProvider.QueryPartitionedTlasCapabilities(
-		    m_device.Get(),
-		    IsNvidiaAdapter(),
-		    m_rayTracingCapabilities.SupportsAccelerationStructure);
+		m_rayTracingCapabilities.Groups.Ptlas = m_nvapiRayTracingProvider.QueryPtlasCapabilities(m_device.Get(), IsNvidiaAdapter(), m_rayTracingCapabilities.SupportsAccelerationStructure);
 
-		SelectRayTracingTopLevelProvider();
+		SelectRayTracingTlasProvider();
 	}
 	else
 	{
-		m_rayTracingCapabilities.Groups.PartitionedTlas.CapabilityStatusReason = "d3d12-options5-query-failed";
-		m_rayTracingCapabilities.Groups.Provider.SelectedTopLevelProvider = ERhiRayTracingTopLevelProvider::None;
-		m_rayTracingCapabilities.Groups.Provider.SelectedTopLevelProviderReason = "d3d12-options5-query-failed";
+		m_rayTracingCapabilities.Groups.Ptlas.CapabilityStatusReason = "d3d12-options5-query-failed";
+		m_rayTracingCapabilities.Groups.Provider.SelectedTlasProvider = ERhiRayTracingTlasProvider::None;
+		m_rayTracingCapabilities.Groups.Provider.SelectedTlasProviderReason = "d3d12-options5-query-failed";
 		SPDLOG_LOGGER_WARN(g_d3d12RhiLogger, "CheckFeatureSupport(OPTIONS5) failed hr={:#010x}; ray tracing assumed unsupported.", static_cast<uint32_t>(hr));
 	}
 }
 
-void D3D12Rhi::SelectRayTracingTopLevelProvider() noexcept
+void D3D12Rhi::SelectRayTracingTlasProvider() noexcept
 {
 	RhiRayTracingProviderCapabilities& provider = m_rayTracingCapabilities.Groups.Provider;
 	if (!m_rayTracingCapabilities.SupportsAccelerationStructure)
 	{
-		provider = RhiRayTracingProviderCapabilities{.SelectedTopLevelProvider = ERhiRayTracingTopLevelProvider::None, .SelectedTopLevelProviderReason = "ray-tracing-unavailable"};
+		provider = RhiRayTracingProviderCapabilities{.SelectedTlasProvider = ERhiRayTracingTlasProvider::None, .SelectedTlasProviderReason = "ray-tracing-unavailable"};
 		return;
 	}
 
-	const RhiPartitionedTlasCapabilities& partitionedTlas = m_rayTracingCapabilities.Groups.PartitionedTlas;
-	const bool partitionedTlasSelected = CVarRayTracingPreferPartitionedTlas.Get() && partitionedTlas.Supported && partitionedTlas.SupportsDescriptorAccess;
+	const RhiPtlasCapabilities& ptlas = m_rayTracingCapabilities.Groups.Ptlas;
+	const bool ptlasSelected = CVarRayTracingPreferPtlas.Get() && ptlas.Supported && ptlas.SupportsDescriptorAccess;
 
 	provider = RhiRayTracingProviderCapabilities{
-	    .SelectedTopLevelProvider = partitionedTlasSelected ? ERhiRayTracingTopLevelProvider::PartitionedTlas : ERhiRayTracingTopLevelProvider::ClassicTlas,
-	    .SelectedTopLevelProviderReason = partitionedTlasSelected ? "d3d12-nvapi-ptlas-selected" : "classic-tlas-selected"};
+	    .SelectedTlasProvider = ptlasSelected ? ERhiRayTracingTlasProvider::Ptlas : ERhiRayTracingTlasProvider::Tlas,
+	    .SelectedTlasProviderReason = ptlasSelected ? "d3d12-nvapi-ptlas-selected" : "TLAS-selected"};
 }
 
 void D3D12Rhi::CreateCommandQueues()

@@ -29,29 +29,29 @@ D3D12RayTracingServices::D3D12RayTracingServices(D3D12Rhi& rhi, D3D12GpuMemoryAl
     m_memoryAllocator(&memoryAllocator),
     m_resourceService(&resourceService),
     m_nvapiProvider(&nvapiProvider),
-    m_classicTlasServices(rhi, memoryAllocator),
-    m_partitionedTlasServices(rhi, memoryAllocator, nvapiProvider)
+    m_tlasServices(rhi, memoryAllocator),
+    m_ptlasServices(rhi, memoryAllocator, nvapiProvider)
 {
 }
 
-RhiClassicTlasService& D3D12RayTracingServices::GetClassicTlasService() noexcept
+RhiTlasService& D3D12RayTracingServices::GetTlasService() noexcept
 {
-	return m_classicTlasServices;
+	return m_tlasServices;
 }
 
-const RhiClassicTlasService& D3D12RayTracingServices::GetClassicTlasService() const noexcept
+const RhiTlasService& D3D12RayTracingServices::GetTlasService() const noexcept
 {
-	return m_classicTlasServices;
+	return m_tlasServices;
 }
 
-RhiPartitionedTlasService& D3D12RayTracingServices::GetPartitionedTlasService() noexcept
+RhiPtlasService& D3D12RayTracingServices::GetPtlasService() noexcept
 {
-	return m_partitionedTlasServices;
+	return m_ptlasServices;
 }
 
-const RhiPartitionedTlasService& D3D12RayTracingServices::GetPartitionedTlasService() const noexcept
+const RhiPtlasService& D3D12RayTracingServices::GetPtlasService() const noexcept
 {
-	return m_partitionedTlasServices;
+	return m_ptlasServices;
 }
 
 RhiRayTracingCapabilities D3D12RayTracingServices::GetCapabilities() const noexcept
@@ -96,24 +96,24 @@ RhiRayTracingAccelerationStructurePrebuildInfo D3D12RayTracingServices::GetBotto
 	return prebuildInfo;
 }
 
-RhiRayTracingAccelerationStructurePrebuildInfo D3D12RayTracingServices::GetTopLevelAccelerationStructurePrebuildInfo(std::uint32_t instanceCount, ERhiClassicTlasBuildFlags buildFlags) const noexcept
+RhiRayTracingAccelerationStructurePrebuildInfo D3D12RayTracingServices::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
 {
-	return m_classicTlasServices.GetClassicTopLevelAccelerationStructurePrebuildInfo(instanceCount, buildFlags);
+	return m_tlasServices.GetTlasPrebuildInfo(instanceCount, buildFlags);
 }
 
-RhiPartitionedTlasBuildSizes D3D12RayTracingServices::GetPartitionedTopLevelAccelerationStructureBuildSizes(const RhiPartitionedTlasDesc& desc) const noexcept
+RhiPtlasBuildSizes D3D12RayTracingServices::GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept
 {
-	return m_partitionedTlasServices.GetPartitionedTopLevelAccelerationStructureBuildSizes(desc);
+	return m_ptlasServices.GetPtlasBuildSizes(desc);
 }
 
-RhiOwnedResourceHandle D3D12RayTracingServices::CreatePartitionedTopLevelAccelerationStructureBuffer(const RhiPartitionedTlasBuildSizes& sizes, std::wstring_view debugName)
+RhiOwnedResourceHandle D3D12RayTracingServices::CreatePtlasBuffer(const RhiPtlasBuildSizes& sizes, std::wstring_view debugName)
 {
-	return m_partitionedTlasServices.CreatePartitionedTopLevelAccelerationStructureBuffer(sizes, debugName);
+	return m_ptlasServices.CreatePtlasBuffer(sizes, debugName);
 }
 
-RhiOwnedResourceHandle D3D12RayTracingServices::CreatePartitionedTopLevelAccelerationStructureOperationBuffer(const RhiPartitionedTlasOperationPackDesc& operationPack, std::wstring_view debugName)
+RhiOwnedResourceHandle D3D12RayTracingServices::CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName)
 {
-	return m_partitionedTlasServices.CreatePartitionedTopLevelAccelerationStructureOperationBuffer(operationPack, debugName);
+	return m_ptlasServices.CreatePtlasOperationBuffer(operationPack, debugName);
 }
 
 RhiOwnedResourceHandle D3D12RayTracingServices::CreateScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
@@ -168,7 +168,7 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingAccelerationStru
 
 RhiOwnedResourceHandle D3D12RayTracingServices::CreateInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
-	return m_classicTlasServices.CreateClassicTopLevelAccelerationStructureInstanceBuffer(instances, instanceCount, debugName);
+	return m_tlasServices.CreateTlasInstanceBuffer(instances, instanceCount, debugName);
 }
 
 RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
@@ -176,14 +176,14 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingInstanceBuffer(c
 	return CreateInstanceBuffer(instances, instanceCount, debugName);
 }
 
-bool D3D12RayTracingServices::BuildPartitionedTopLevelAccelerationStructure(ID3D12GraphicsCommandList7* commandList, const RhiPartitionedTlasBuildCommandDesc& desc) const noexcept
+bool D3D12RayTracingServices::BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept
 {
 	const RhiRayTracingCapabilities capabilities = GetCapabilities();
-	if (!capabilities.Groups.PartitionedTlas.Supported)
+	if (!capabilities.Groups.Ptlas.Supported)
 	{
 		return false;
 	}
-	return m_nvapiProvider != nullptr && m_nvapiProvider->BuildPartitionedTlas(commandList, desc);
+	return m_nvapiProvider != nullptr && m_nvapiProvider->BuildPtlas(commandList, desc);
 }
 
 std::unique_ptr<RayTracingShaderTable> D3D12RayTracingServices::CreateRayTracingShaderTable(const RayTracingShaderTableDesc& desc)

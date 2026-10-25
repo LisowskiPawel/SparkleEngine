@@ -28,7 +28,7 @@ The Render Hardware Interface (RHI) translates backend-neutral GPU work into one
 | One neutral service surface with separate D3D12 and Vulkan lowerings | Accepted D3D12/Vulkan feature parity or minimum-hardware matrix |
 | Resource/view/sampler creation, upload/readback, allocation, aliasing, and retirement contracts | Proved allocation-pressure, aliasing, delayed-completion, and leak behavior |
 | Descriptor layouts/writes, graphics/compute/ray pipelines, commands, queues, barriers, waits, and tokens | Complete boundary/capacity/invalid-use and native-validation results |
-| BLAS/TLAS, inline ray queries, native ray pipelines and shader tables, plus partitioned-TLAS vocabulary/path | Accepted support matrix across devices, backends, traversal modes, and dynamic geometry |
+| BLAS/TLAS, inline ray queries, native ray pipelines and shader tables, plus PTLAS vocabulary/path | Accepted support matrix across devices, backends, traversal modes, and dynamic geometry |
 | Swapchain acquire/resize/present, ImGui rendering, external interop, diagnostics, and texture capture | Implemented HDR presentation, broad external-native access, or whole-device recreation after device loss; HDR10 is an admitted target only |
 
 ## Where RHI Sits
@@ -84,7 +84,7 @@ The [RHI Feature Guide](Features/RHIFeatureGuide.md) maps every public service a
 | Graphics and compute pipelines/commands | Implemented source path | Implemented source path | Shader/reflection ABI and native validation remain open |
 | Inline ray queries | Capability-gated path | Capability-gated path | Requires reported ray-query and descriptor capabilities |
 | Native ray pipelines and shader tables | Capability-gated path | Capability-gated path | Native object/table layout and cross-backend semantic parity remain open |
-| Partitioned TLAS | Narrow capability/provider path | Narrow capability/provider path | Renderer exercises a restricted subset; do not infer general update/refit support |
+| PTLAS | Narrow capability/provider path | Narrow capability/provider path | Renderer exercises a restricted subset; do not infer general update/refit support |
 | Swapchain and SDR presentation | Implemented source path | Implemented source path | resize and pacing evidence open |
 | HDR10 format/color-space/metadata activation | First-release target; not found | First-release target; not found | owned by Renderer `FCR-REN-26` with RHI backend mechanics |
 | External provider interop | Narrow capability-gated path | No general equivalent claim | Native access is provider-specific and deliberately not a general escape hatch |
@@ -129,7 +129,7 @@ Public contracts live under `Engine/RHI/Public`. Common validation and neutral i
 - HDR presentation is absent but its Windows HDR10 backend mechanics are mandatory first-release work under Renderer-owned `FCR-REN-26`.
 - Optional provider interop is not a general native API surface and does not imply Vulkan/provider parity.
 - Public vocabulary can be broader than current Renderer consumers; unused or partial modes must remain unreachable or explicitly classified.
-- Ray tracing and partitioned acceleration remain capability-gated and narrower than the neutral vocabulary may suggest.
+- Ray tracing and PTLAS remain capability-gated and narrower than the neutral vocabulary may suggest.
 - Allocation, descriptor, queue, readback, resize, shutdown, and delayed-completion failure behavior still needs focused evidence.
 
 ## Evidence And Reference

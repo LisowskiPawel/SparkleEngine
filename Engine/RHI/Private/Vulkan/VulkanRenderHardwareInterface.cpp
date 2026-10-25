@@ -320,11 +320,9 @@ RhiRayTracingAccelerationStructurePrebuildInfo VulkanRenderHardwareInterface::Ge
 	return m_rayTracingServices->GetBottomLevelAccelerationStructurePrebuildInfo(geometry);
 }
 
-RhiRayTracingAccelerationStructurePrebuildInfo VulkanRenderHardwareInterface::GetTopLevelAccelerationStructurePrebuildInfo(
-    std::uint32_t instanceCount,
-    ERhiClassicTlasBuildFlags buildFlags) const noexcept
+RhiRayTracingAccelerationStructurePrebuildInfo VulkanRenderHardwareInterface::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
 {
-	return m_rayTracingServices->GetTopLevelAccelerationStructurePrebuildInfo(instanceCount, buildFlags);
+	return m_rayTracingServices->GetTlasPrebuildInfo(instanceCount, buildFlags);
 }
 
 RhiOwnedResourceHandle VulkanRenderHardwareInterface::CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)

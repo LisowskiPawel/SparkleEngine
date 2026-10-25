@@ -622,7 +622,7 @@ M5R is later portfolio scope. The [depth map](../Strategy/FeatureDeliveryCatalog
 | First cache, SHaRC | radiance-cache/sharc/; AC-SHARC-01..05, full closure before NRC production |
 | Subsequent neural cache, NRC | radiance-cache/nrc/; AC-NRC-01..05 and original SHaRC/uncached inputs |
 | On-sample NTC | neural-textures/ntc/; AC-NTC-01..05 |
-| Supported PTLAS | ray-tracing/ptlas/; AC-PTLAS-01..05 and classic/native joins |
+| Supported PTLAS | ray-tracing/ptlas/; AC-PTLAS-01..05 and TLAS/native joins |
 
 Each report binds derivation, source/cooked/native identity, independent raw oracle, dynamics/failures, complete quality/time/memory and documented reproduction to the candidate. Current author/agent rehearsal policy applies; outside participation is optional and never fabricated. M6 reuses applicable original results in three cases. SHaRC reproduction occurs before NRC production, without waiting for M6 assembly.
 

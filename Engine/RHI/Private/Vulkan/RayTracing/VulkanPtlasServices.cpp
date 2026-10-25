@@ -1,9 +1,9 @@
 #include "Vulkan/VulkanPCH.h"
 
-#include "Vulkan/RayTracing/VulkanPartitionedTlasServices.h"
+#include "Vulkan/RayTracing/VulkanPtlasServices.h"
 
 #include "Memory/RhiMemoryTypes.h"
-#include "RayTracing/RhiPartitionedTlasOperationLayout.h"
+#include "RayTracing/RhiPtlasOperationLayout.h"
 #include "RayTracing/RhiRayTracingDesc.h"
 #include "Resources/RhiResourceDesc.h"
 #include "Validation/RhiContract.h"
@@ -16,49 +16,49 @@
 #include <memory>
 #include <vector>
 
-VkPartitionedAccelerationStructureInstanceFlagsNV VulkanPartitionedTlasServices::ToVkPartitionedInstanceFlags(RhiPartitionedTlasInstanceFlags flags) noexcept
+VkPartitionedAccelerationStructureInstanceFlagsNV VulkanPtlasServices::ToVkPtlasInstanceFlags(RhiPtlasInstanceFlags flags) noexcept
 {
 	VkPartitionedAccelerationStructureInstanceFlagsNV nativeFlags = 0;
-	if (HasFlag(flags, RhiPartitionedTlasInstanceFlags::TriangleFacingCullDisable))
+	if (HasFlag(flags, RhiPtlasInstanceFlags::TriangleFacingCullDisable))
 	{
 		nativeFlags |= VK_PARTITIONED_ACCELERATION_STRUCTURE_INSTANCE_FLAG_TRIANGLE_FACING_CULL_DISABLE_BIT_NV;
 	}
-	if (HasFlag(flags, RhiPartitionedTlasInstanceFlags::TriangleFlipFacing))
+	if (HasFlag(flags, RhiPtlasInstanceFlags::TriangleFlipFacing))
 	{
 		nativeFlags |= VK_PARTITIONED_ACCELERATION_STRUCTURE_INSTANCE_FLAG_TRIANGLE_FLIP_FACING_BIT_NV;
 	}
-	if (HasFlag(flags, RhiPartitionedTlasInstanceFlags::ForceOpaque))
+	if (HasFlag(flags, RhiPtlasInstanceFlags::ForceOpaque))
 	{
 		nativeFlags |= VK_PARTITIONED_ACCELERATION_STRUCTURE_INSTANCE_FLAG_FORCE_OPAQUE_BIT_NV;
 	}
-	if (HasFlag(flags, RhiPartitionedTlasInstanceFlags::ForceNoOpaque))
+	if (HasFlag(flags, RhiPtlasInstanceFlags::ForceNoOpaque))
 	{
 		nativeFlags |= VK_PARTITIONED_ACCELERATION_STRUCTURE_INSTANCE_FLAG_FORCE_NO_OPAQUE_BIT_NV;
 	}
-	if (HasFlag(flags, RhiPartitionedTlasInstanceFlags::EnableExplicitBoundingBox))
+	if (HasFlag(flags, RhiPtlasInstanceFlags::EnableExplicitBoundingBox))
 	{
 		nativeFlags |= VK_PARTITIONED_ACCELERATION_STRUCTURE_INSTANCE_FLAG_ENABLE_EXPLICIT_BOUNDING_BOX_NV;
 	}
 	return nativeFlags;
 }
 
-VkPartitionedAccelerationStructureOpTypeNV VulkanPartitionedTlasServices::ToVkPartitionedOperationType(ERhiPartitionedTlasOperationType type) noexcept
+VkPartitionedAccelerationStructureOpTypeNV VulkanPtlasServices::ToVkPtlasOperationType(ERhiPtlasOperationType type) noexcept
 {
 	switch (type)
 	{
-		case ERhiPartitionedTlasOperationType::UpdateInstance:
+		case ERhiPtlasOperationType::UpdateInstance:
 			return VK_PARTITIONED_ACCELERATION_STRUCTURE_OP_TYPE_UPDATE_INSTANCE_NV;
-		case ERhiPartitionedTlasOperationType::WritePartitionTranslation:
+		case ERhiPtlasOperationType::WritePartitionTranslation:
 			return VK_PARTITIONED_ACCELERATION_STRUCTURE_OP_TYPE_WRITE_PARTITION_TRANSLATION_NV;
-		case ERhiPartitionedTlasOperationType::WriteInstance:
+		case ERhiPtlasOperationType::WriteInstance:
 		default:
 			return VK_PARTITIONED_ACCELERATION_STRUCTURE_OP_TYPE_WRITE_INSTANCE_NV;
 	}
 }
 
-RhiPartitionedTlasNativeOperationLayout VulkanPartitionedTlasServices::GetNativeOperationLayout() noexcept
+RhiPtlasNativeOperationLayout VulkanPtlasServices::GetNativeOperationLayout() noexcept
 {
-	return RhiPartitionedTlasNativeOperationLayout{
+	return RhiPtlasNativeOperationLayout{
 	    .OperationCountSizeInBytes = sizeof(std::uint32_t),
 	    .OperationHeaderStrideInBytes = sizeof(VkBuildPartitionedAccelerationStructureIndirectCommandNV),
 	    .OperationHeaderAlignmentInBytes = alignof(VkBuildPartitionedAccelerationStructureIndirectCommandNV),
@@ -71,7 +71,7 @@ RhiPartitionedTlasNativeOperationLayout VulkanPartitionedTlasServices::GetNative
 	    .BufferAlignmentInBytes = 16};
 }
 
-RhiGpuVirtualAddress VulkanPartitionedTlasServices::ResolvePartitionedInstanceAccelerationStructureAddress(RhiGpuVirtualAddress accelerationStructure) const noexcept
+RhiGpuVirtualAddress VulkanPtlasServices::ResolvePtlasInstanceAccelerationStructureAddress(RhiGpuVirtualAddress accelerationStructure) const noexcept
 {
 	if (m_memoryAllocator == nullptr || accelerationStructure == 0)
 	{
@@ -87,28 +87,27 @@ RhiGpuVirtualAddress VulkanPartitionedTlasServices::ResolvePartitionedInstanceAc
 	return record->BufferDeviceAddress;
 }
 
-VulkanPartitionedTlasServices::VulkanPartitionedTlasServices(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept :
+VulkanPtlasServices::VulkanPtlasServices(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept :
     m_rhi(&rhi),
     m_memoryAllocator(&memoryAllocator)
 {
 }
 
-RhiPartitionedTlasBuildSizes VulkanPartitionedTlasServices::GetPartitionedTopLevelAccelerationStructureBuildSizes(const RhiPartitionedTlasDesc& desc) const noexcept
+RhiPtlasBuildSizes VulkanPtlasServices::GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || !capabilities.Groups.PartitionedTlas.Supported || m_rhi->GetPartitionedAccelerationStructureBuildSizes() == nullptr || desc.InstanceCapacity == 0
-	    || desc.PartitionCount == 0)
+	if (m_rhi == nullptr || !capabilities.Groups.Ptlas.Supported || m_rhi->GetPtlasBuildSizes() == nullptr || desc.InstanceCapacity == 0 || desc.PartitionCount == 0)
 	{
 		return {};
 	}
 
-	VkPartitionedAccelerationStructureFlagsNV partitionedTlasFlags{};
+	VkPartitionedAccelerationStructureFlagsNV ptlasFlags{};
 	VkPartitionedAccelerationStructureInstancesInputNV input{};
-	VulkanTypeConversions::ConfigurePartitionedTlasInput(desc, input, partitionedTlasFlags);
+	VulkanTypeConversions::ConfigurePtlasInput(desc, input, ptlasFlags);
 	VkAccelerationStructureBuildSizesInfoKHR nativeInfo{.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR, .pNext = nullptr};
-	m_rhi->GetPartitionedAccelerationStructureBuildSizes()(m_rhi->GetDevice(), &input, &nativeInfo);
+	m_rhi->GetPtlasBuildSizes()(m_rhi->GetDevice(), &input, &nativeInfo);
 
-	return RhiPartitionedTlasBuildSizes{
+	return RhiPtlasBuildSizes{
 	    .AccelerationStructureSizeInBytes = nativeInfo.accelerationStructureSize,
 	    .BuildScratchSizeInBytes = nativeInfo.buildScratchSize,
 	    .UpdateScratchSizeInBytes = nativeInfo.updateScratchSize,
@@ -121,16 +120,16 @@ RhiPartitionedTlasBuildSizes VulkanPartitionedTlasServices::GetPartitionedTopLev
 	        : 0u};
 }
 
-RhiOwnedResourceHandle VulkanPartitionedTlasServices::CreatePartitionedTopLevelAccelerationStructureBuffer(const RhiPartitionedTlasBuildSizes& sizes, std::wstring_view debugName)
+RhiOwnedResourceHandle VulkanPtlasServices::CreatePtlasBuffer(const RhiPtlasBuildSizes& sizes, std::wstring_view debugName)
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !capabilities.Groups.PartitionedTlas.Supported || sizes.AccelerationStructureSizeInBytes == 0)
+	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !capabilities.Groups.Ptlas.Supported || sizes.AccelerationStructureSizeInBytes == 0)
 	{
 		return {};
 	}
 
 	const RhiBufferResourceDesc desc{
-	    .SizeInBytes = RhiPartitionedTlasOperationLayout::AlignUp(sizes.AccelerationStructureSizeInBytes, capabilities.AccelerationStructureByteAlignment),
+	    .SizeInBytes = RhiPtlasOperationLayout::AlignUp(sizes.AccelerationStructureSizeInBytes, capabilities.AccelerationStructureByteAlignment),
 	    .AllowUnorderedAccess = true};
 
 	const VkBufferCreateInfo bufferCreateInfo = VulkanTypeConversions::BuildBufferCreateInfo(
@@ -141,7 +140,7 @@ RhiOwnedResourceHandle VulkanPartitionedTlasServices::CreatePartitionedTopLevelA
 	    bufferCreateInfo,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::DeviceLocal,
-	    debugName.empty() ? L"RayTracingPartitionedTlasStorage" : debugName);
+	    debugName.empty() ? L"RayTracingPtlasStorage" : debugName);
 
 	if (record == nullptr || record->DeviceAddress == 0)
 	{
@@ -149,24 +148,22 @@ RhiOwnedResourceHandle VulkanPartitionedTlasServices::CreatePartitionedTopLevelA
 	}
 
 	record->AccelerationStructureType = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
-	record->IsPartitionedAccelerationStructure = true;
-	SetVulkanAllocationRecordDebugName(*record, debugName.empty() ? L"RayTracingPartitionedTlasStorage" : debugName);
+	record->IsPtlas = true;
+	SetVulkanAllocationRecordDebugName(*record, debugName.empty() ? L"RayTracingPtlasStorage" : debugName);
 	return MakeVulkanOwnedResourceHandle(std::move(record));
 }
 
-RhiOwnedResourceHandle VulkanPartitionedTlasServices::CreatePartitionedTopLevelAccelerationStructureOperationBuffer(
-    const RhiPartitionedTlasOperationPackDesc& operationPack,
-    std::wstring_view debugName)
+RhiOwnedResourceHandle VulkanPtlasServices::CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName)
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !capabilities.Groups.PartitionedTlas.Supported || !RhiContract::IsPartitionedTlasOperationPackUsable(operationPack))
+	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !capabilities.Groups.Ptlas.Supported || !RhiContract::IsPtlasOperationPackUsable(operationPack))
 	{
 		return {};
 	}
 
-	const RhiPartitionedTlasNativeOperationLayout nativeLayout = GetNativeOperationLayout();
+	const RhiPtlasNativeOperationLayout nativeLayout = GetNativeOperationLayout();
 
-	const RhiPartitionedTlasOperationBufferLayout layout = RhiPartitionedTlasOperationLayout::Build(
+	const RhiPtlasOperationBufferLayout layout = RhiPtlasOperationLayout::Build(
 	    operationPack.OperationCount,
 	    operationPack.InstanceWriteCount,
 	    operationPack.InstanceUpdateCount,
@@ -188,7 +185,7 @@ RhiOwnedResourceHandle VulkanPartitionedTlasServices::CreatePartitionedTopLevelA
 	    bufferCreateInfo,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::HostUpload,
-	    debugName.empty() ? L"RayTracingPartitionedTlasOperations" : debugName);
+	    debugName.empty() ? L"RayTracingPtlasOperations" : debugName);
 
 	if (record == nullptr || record->Buffer == VK_NULL_HANDLE || record->DeviceAddress == 0)
 	{
@@ -210,19 +207,19 @@ RhiOwnedResourceHandle VulkanPartitionedTlasServices::CreatePartitionedTopLevelA
 	const RhiGpuVirtualAddress partitionTranslationAddress = record->DeviceAddress + layout.PartitionTranslationRecordsOffsetInBytes;
 	for (std::uint32_t operationIndex = 0; operationIndex < operationPack.OperationCount; ++operationIndex)
 	{
-		const RhiPartitionedTlasOperationHeader& operation = operationPack.Operations[operationIndex];
+		const RhiPtlasOperationHeader& operation = operationPack.Operations[operationIndex];
 
 		nativeOperations[operationIndex] = VkBuildPartitionedAccelerationStructureIndirectCommandNV{
-		    .opType = ToVkPartitionedOperationType(operation.Type),
+		    .opType = ToVkPtlasOperationType(operation.Type),
 		    .argCount = operation.ArgumentCount,
 		    .argData = VkStridedDeviceAddressNV{
-		        .startAddress = RhiPartitionedTlasOperationLayout::ResolveArgumentAddress(operation, instanceWriteAddress, instanceUpdateAddress, partitionTranslationAddress),
-		        .strideInBytes = RhiPartitionedTlasOperationLayout::ResolveArgumentStride(operation, nativeLayout)}};
+		        .startAddress = RhiPtlasOperationLayout::ResolveArgumentAddress(operation, instanceWriteAddress, instanceUpdateAddress, partitionTranslationAddress),
+		        .strideInBytes = RhiPtlasOperationLayout::ResolveArgumentStride(operation, nativeLayout)}};
 	}
 
 	for (std::uint32_t instanceIndex = 0; instanceIndex < operationPack.InstanceWriteCount; ++instanceIndex)
 	{
-		const RhiPartitionedTlasInstanceWriteDesc& source = operationPack.InstanceWrites[instanceIndex];
+		const RhiPtlasInstanceWriteDesc& source = operationPack.InstanceWrites[instanceIndex];
 		VkPartitionedAccelerationStructureWriteInstanceDataNV& target = nativeInstanceWrites[instanceIndex];
 		for (std::uint32_t transformIndex = 0; transformIndex < source.Transform.size(); ++transformIndex)
 		{
@@ -232,25 +229,25 @@ RhiOwnedResourceHandle VulkanPartitionedTlasServices::CreatePartitionedTopLevelA
 		target.instanceID = source.InstanceID;
 		target.instanceMask = source.InstanceMask;
 		target.instanceContributionToHitGroupIndex = source.InstanceContributionToHitGroupIndex;
-		target.instanceFlags = ToVkPartitionedInstanceFlags(source.Flags);
+		target.instanceFlags = ToVkPtlasInstanceFlags(source.Flags);
 		target.instanceIndex = source.InstanceIndex;
 		target.partitionIndex = source.PartitionIndex;
-		target.accelerationStructure = ResolvePartitionedInstanceAccelerationStructureAddress(source.AccelerationStructure);
+		target.accelerationStructure = ResolvePtlasInstanceAccelerationStructureAddress(source.AccelerationStructure);
 	}
 
 	for (std::uint32_t instanceIndex = 0; instanceIndex < operationPack.InstanceUpdateCount; ++instanceIndex)
 	{
-		const RhiPartitionedTlasInstanceUpdateDesc& source = operationPack.InstanceUpdates[instanceIndex];
+		const RhiPtlasInstanceUpdateDesc& source = operationPack.InstanceUpdates[instanceIndex];
 
 		nativeInstanceUpdates[instanceIndex] = VkPartitionedAccelerationStructureUpdateInstanceDataNV{
 		    .instanceIndex = source.InstanceIndex,
 		    .instanceContributionToHitGroupIndex = source.InstanceContributionToHitGroupIndex,
-		    .accelerationStructure = ResolvePartitionedInstanceAccelerationStructureAddress(source.AccelerationStructure)};
+		    .accelerationStructure = ResolvePtlasInstanceAccelerationStructureAddress(source.AccelerationStructure)};
 	}
 
 	for (std::uint32_t partitionIndex = 0; partitionIndex < operationPack.PartitionTranslationCount; ++partitionIndex)
 	{
-		const RhiPartitionedTlasPartitionTranslationDesc& source = operationPack.PartitionTranslations[partitionIndex];
+		const RhiPtlasPartitionTranslationDesc& source = operationPack.PartitionTranslations[partitionIndex];
 		VkPartitionedAccelerationStructureWritePartitionTranslationDataNV& target = nativePartitionTranslations[partitionIndex];
 		target.partitionIndex = source.PartitionIndex;
 		target.partitionTranslation[0] = source.Translation[0];
@@ -265,15 +262,15 @@ RhiOwnedResourceHandle VulkanPartitionedTlasServices::CreatePartitionedTopLevelA
 	return MakeVulkanOwnedResourceHandle(std::move(record));
 }
 
-RhiPartitionedTlasOperationBufferLayout VulkanPartitionedTlasServices::GetPartitionedTopLevelAccelerationStructureOperationBufferLayout(const RhiPartitionedTlasDesc& desc) const noexcept
+RhiPtlasOperationBufferLayout VulkanPtlasServices::GetPtlasOperationBufferLayout(const RhiPtlasDesc& desc) const noexcept
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || !capabilities.Groups.PartitionedTlas.Supported || desc.MaxOperations == 0)
+	if (m_rhi == nullptr || !capabilities.Groups.Ptlas.Supported || desc.MaxOperations == 0)
 	{
 		return {};
 	}
 
-	return RhiPartitionedTlasOperationLayout::Build(
+	return RhiPtlasOperationLayout::Build(
 	    desc.MaxOperations,
 	    desc.InstanceCapacity,
 	    desc.AllowInstanceUpdates ? desc.InstanceCapacity : 0u,

@@ -168,7 +168,7 @@ The `FrameGraph` object is rebuilt when output/topology, provider selection, lig
 | Presentation/output | `Passes/Visualization` owns focused visualization families; `Passes/Presentation/Upscaling` resolves output extent; `Passes/Presentation/Display` owns tone mapping and encoding; the Presentation root composes and publishes the result. [Feature dossier](Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#presentation-and-output). |
 | UI/viewport composition | `Private/UI` and `Private/Editor`; immutable packets, host overlay, editor viewport texture binding, and generation checks. [Feature dossier](Modules/Engine/Renderer/Features/ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md#ui-and-viewport-composition). |
 | Persistent GPU scene | `Scene/GpuScene`; geometry, material, lighting, and ray-tracing bindings derived from `RenderScene` |
-| Ray-tracing scene | `Scene/RayTracing` plus `RayTracing/Acceleration`; classic and capability-gated partitioned TLAS share scene identity |
+| Ray-tracing scene | `Scene/RayTracing` plus `RayTracing/Acceleration`; TLAS and capability-gated PTLAS share scene identity |
 | Dual RT execution | GBuffer and direct-shadow effects have typed inline-query and native-pipeline source frontends selected before graph construction. [Feature dossier](Modules/Engine/Renderer/Features/RayTracing/RayTracingDesign.md). |
 | Shader-table mapping | `RayTracingShaderTablePlan` owns the shared Surface record order, checked instance/geometry indexing, invalidation, and bounded metrics |
 | Image providers | Renderer-owned provider stack with NVIDIA Streamline/DLSS adapters and non-provider presentation paths |
@@ -183,7 +183,7 @@ The native D3D12/Vulkan ray-tracing pipeline, shader-table, and trace-command so
 
 Common RHI code owns backend-neutral contracts and validation, including shader map/library records, shader parameters, graphics/ray-tracing descriptors, and checked shader-table packing. Native object creation and command emission remain inside `Private/D3D12` or `Private/Vulkan`.
 
-Current ray-tracing vocabulary distinguishes acceleration-structure, inline-query, and native-pipeline capabilities. Public contracts include classic and partitioned TLAS, ray-tracing pipeline composition descriptors, shader tables, and `TraceRays`; backend-private implementations lower them to D3D12 state objects/dispatch tables or Vulkan ray-tracing pipelines/group handles/SBT regions.
+Current ray-tracing vocabulary distinguishes acceleration-structure, inline-query, and native-pipeline capabilities. Public contracts include TLAS and PTLAS, ray-tracing pipeline composition descriptors, shader tables, and `TraceRays`; backend-private implementations lower them to D3D12 state objects/dispatch tables or Vulkan ray-tracing pipelines/group handles/SBT regions.
 
 ## Shader Source, Cook, And Runtime Flow
 

@@ -8,20 +8,20 @@
 #include <cstdint>
 #include <limits>
 
-inline constexpr std::uint32_t RhiPartitionedTlasGlobalPartitionIndex = (std::numeric_limits<std::uint32_t>::max)();
+inline constexpr std::uint32_t RhiPtlasGlobalPartitionIndex = (std::numeric_limits<std::uint32_t>::max)();
 
-enum class ERhiPartitionedTlasProvider : std::uint8_t
+enum class ERhiPtlasProvider : std::uint8_t
 {
 	None,
-	VulkanNvPartitionedAccelerationStructure,
-	D3D12NvapiPartitionedTlas,
+	VulkanNvPtlas,
+	D3D12NvapiPtlas,
 	D3D12PublicDxrRtasOperations,
 };
 
-struct RhiPartitionedTlasCapabilities
+struct RhiPtlasCapabilities
 {
 	bool Supported = false;
-	ERhiPartitionedTlasProvider Provider = ERhiPartitionedTlasProvider::None;
+	ERhiPtlasProvider Provider = ERhiPtlasProvider::None;
 	bool NvidiaDeviceOnly = false;
 	bool CurrentDeviceIsNvidia = false;
 	bool SupportsDescriptorAccess = false;
@@ -42,7 +42,7 @@ struct RhiPartitionedTlasCapabilities
 	const char* CapabilityStatusReason = "not-queried";
 };
 
-struct RhiPartitionedTlasDesc
+struct RhiPtlasDesc
 {
 	std::uint32_t InstanceCapacity = 0;
 	std::uint32_t PartitionCount = 0;
@@ -53,7 +53,7 @@ struct RhiPartitionedTlasDesc
 	bool AllowPartitionTranslation = false;
 };
 
-struct RhiPartitionedTlasBuildSizes
+struct RhiPtlasBuildSizes
 {
 	std::uint64_t AccelerationStructureSizeInBytes = 0;
 	std::uint64_t BuildScratchSizeInBytes = 0;
@@ -65,14 +65,14 @@ struct RhiPartitionedTlasBuildSizes
 	std::uint64_t PartitionWriteInfoSizeInBytes = 0;
 };
 
-enum class ERhiPartitionedTlasOperationType : std::uint8_t
+enum class ERhiPtlasOperationType : std::uint8_t
 {
 	WriteInstance,
 	UpdateInstance,
 	WritePartitionTranslation,
 };
 
-enum class RhiPartitionedTlasInstanceFlags : std::uint32_t
+enum class RhiPtlasInstanceFlags : std::uint32_t
 {
 	None = 0,
 	TriangleFacingCullDisable = 1u << 0u,
@@ -82,44 +82,44 @@ enum class RhiPartitionedTlasInstanceFlags : std::uint32_t
 	EnableExplicitBoundingBox = 1u << 4u,
 };
 
-SPARKLE_RHI_API RhiPartitionedTlasInstanceFlags operator|(RhiPartitionedTlasInstanceFlags lhs, RhiPartitionedTlasInstanceFlags rhs) noexcept;
-SPARKLE_RHI_API bool HasFlag(RhiPartitionedTlasInstanceFlags flags, RhiPartitionedTlasInstanceFlags flag) noexcept;
+SPARKLE_RHI_API RhiPtlasInstanceFlags operator|(RhiPtlasInstanceFlags lhs, RhiPtlasInstanceFlags rhs) noexcept;
+SPARKLE_RHI_API bool HasFlag(RhiPtlasInstanceFlags flags, RhiPtlasInstanceFlags flag) noexcept;
 
-struct RhiPartitionedTlasOperationHeader
+struct RhiPtlasOperationHeader
 {
-	ERhiPartitionedTlasOperationType Type = ERhiPartitionedTlasOperationType::WriteInstance;
+	ERhiPtlasOperationType Type = ERhiPtlasOperationType::WriteInstance;
 	std::uint32_t ArgumentCount = 0;
 	RhiGpuVirtualAddress ArgumentData = 0;
 	std::uint64_t ArgumentStrideInBytes = 0;
 };
 
-struct RhiPartitionedTlasInstanceWriteDesc
+struct RhiPtlasInstanceWriteDesc
 {
 	std::array<float, 12> Transform = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f};
 	std::array<float, 6> ExplicitBoundingBox = {};
 	std::uint32_t InstanceID = 0;
 	std::uint32_t InstanceMask = 0xFF;
 	std::uint32_t InstanceContributionToHitGroupIndex = 0;
-	RhiPartitionedTlasInstanceFlags Flags = RhiPartitionedTlasInstanceFlags::TriangleFacingCullDisable;
+	RhiPtlasInstanceFlags Flags = RhiPtlasInstanceFlags::TriangleFacingCullDisable;
 	std::uint32_t InstanceIndex = 0;
 	std::uint32_t PartitionIndex = 0;
 	RhiGpuVirtualAddress AccelerationStructure = 0;
 };
 
-struct RhiPartitionedTlasInstanceUpdateDesc
+struct RhiPtlasInstanceUpdateDesc
 {
 	std::uint32_t InstanceIndex = 0;
 	std::uint32_t InstanceContributionToHitGroupIndex = 0;
 	RhiGpuVirtualAddress AccelerationStructure = 0;
 };
 
-struct RhiPartitionedTlasPartitionTranslationDesc
+struct RhiPtlasPartitionTranslationDesc
 {
 	std::uint32_t PartitionIndex = 0;
 	std::array<float, 3> Translation = {};
 };
 
-struct RhiPartitionedTlasOperationBufferLayout
+struct RhiPtlasOperationBufferLayout
 {
 	std::uint64_t OperationCountOffsetInBytes = 0;
 	std::uint64_t OperationHeadersOffsetInBytes = 0;
@@ -133,21 +133,21 @@ struct RhiPartitionedTlasOperationBufferLayout
 	std::uint64_t PartitionTranslationStrideInBytes = 0;
 };
 
-struct RhiPartitionedTlasOperationPackDesc
+struct RhiPtlasOperationPackDesc
 {
-	const RhiPartitionedTlasOperationHeader* Operations = nullptr;
+	const RhiPtlasOperationHeader* Operations = nullptr;
 	std::uint32_t OperationCount = 0;
-	const RhiPartitionedTlasInstanceWriteDesc* InstanceWrites = nullptr;
+	const RhiPtlasInstanceWriteDesc* InstanceWrites = nullptr;
 	std::uint32_t InstanceWriteCount = 0;
-	const RhiPartitionedTlasInstanceUpdateDesc* InstanceUpdates = nullptr;
+	const RhiPtlasInstanceUpdateDesc* InstanceUpdates = nullptr;
 	std::uint32_t InstanceUpdateCount = 0;
-	const RhiPartitionedTlasPartitionTranslationDesc* PartitionTranslations = nullptr;
+	const RhiPtlasPartitionTranslationDesc* PartitionTranslations = nullptr;
 	std::uint32_t PartitionTranslationCount = 0;
 };
 
-struct RhiPartitionedTlasBuildCommandDesc
+struct RhiPtlasBuildCommandDesc
 {
-	RhiPartitionedTlasDesc Layout;
+	RhiPtlasDesc Layout;
 	RhiResourceHandle DestinationResource;
 	RhiGpuVirtualAddress SourceAccelerationStructure = 0;
 	RhiGpuVirtualAddress DestinationAccelerationStructure = 0;
@@ -156,4 +156,4 @@ struct RhiPartitionedTlasBuildCommandDesc
 	RhiGpuVirtualAddress OperationCount = 0;
 };
 
-SPARKLE_RHI_API const char* RhiPartitionedTlasProviderToString(ERhiPartitionedTlasProvider provider) noexcept;
+SPARKLE_RHI_API const char* RhiPtlasProviderToString(ERhiPtlasProvider provider) noexcept;

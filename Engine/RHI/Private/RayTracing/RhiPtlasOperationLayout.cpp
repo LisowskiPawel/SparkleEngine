@@ -1,15 +1,15 @@
 #include "PCH.h"
 
-#include "RayTracing/RhiPartitionedTlasOperationLayout.h"
+#include "RayTracing/RhiPtlasOperationLayout.h"
 
-RhiPartitionedTlasOperationBufferLayout RhiPartitionedTlasOperationLayout::Build(
+RhiPtlasOperationBufferLayout RhiPtlasOperationLayout::Build(
     std::uint32_t operationCount,
     std::uint32_t instanceWriteCount,
     std::uint32_t instanceUpdateCount,
     std::uint32_t partitionTranslationCount,
-    const RhiPartitionedTlasNativeOperationLayout& nativeLayout) noexcept
+    const RhiPtlasNativeOperationLayout& nativeLayout) noexcept
 {
-	RhiPartitionedTlasOperationBufferLayout layout{
+	RhiPtlasOperationBufferLayout layout{
 	    .OperationCountOffsetInBytes = 0,
 	    .OperationHeaderStrideInBytes = nativeLayout.OperationHeaderStrideInBytes,
 	    .InstanceWriteStrideInBytes = nativeLayout.InstanceWriteStrideInBytes,
@@ -28,8 +28,8 @@ RhiPartitionedTlasOperationBufferLayout RhiPartitionedTlasOperationLayout::Build
 	return layout;
 }
 
-RhiGpuVirtualAddress RhiPartitionedTlasOperationLayout::ResolveArgumentAddress(
-    const RhiPartitionedTlasOperationHeader& operation,
+RhiGpuVirtualAddress RhiPtlasOperationLayout::ResolveArgumentAddress(
+    const RhiPtlasOperationHeader& operation,
     RhiGpuVirtualAddress instanceWriteAddress,
     RhiGpuVirtualAddress instanceUpdateAddress,
     RhiGpuVirtualAddress partitionTranslationAddress) noexcept
@@ -41,17 +41,17 @@ RhiGpuVirtualAddress RhiPartitionedTlasOperationLayout::ResolveArgumentAddress(
 
 	switch (operation.Type)
 	{
-		case ERhiPartitionedTlasOperationType::UpdateInstance:
+		case ERhiPtlasOperationType::UpdateInstance:
 			return instanceUpdateAddress;
-		case ERhiPartitionedTlasOperationType::WritePartitionTranslation:
+		case ERhiPtlasOperationType::WritePartitionTranslation:
 			return partitionTranslationAddress;
-		case ERhiPartitionedTlasOperationType::WriteInstance:
+		case ERhiPtlasOperationType::WriteInstance:
 		default:
 			return instanceWriteAddress;
 	}
 }
 
-std::uint64_t RhiPartitionedTlasOperationLayout::ResolveArgumentStride(const RhiPartitionedTlasOperationHeader& operation, const RhiPartitionedTlasNativeOperationLayout& nativeLayout) noexcept
+std::uint64_t RhiPtlasOperationLayout::ResolveArgumentStride(const RhiPtlasOperationHeader& operation, const RhiPtlasNativeOperationLayout& nativeLayout) noexcept
 {
 	if (operation.ArgumentStrideInBytes != 0)
 	{
@@ -60,17 +60,17 @@ std::uint64_t RhiPartitionedTlasOperationLayout::ResolveArgumentStride(const Rhi
 
 	switch (operation.Type)
 	{
-		case ERhiPartitionedTlasOperationType::UpdateInstance:
+		case ERhiPtlasOperationType::UpdateInstance:
 			return nativeLayout.InstanceUpdateStrideInBytes;
-		case ERhiPartitionedTlasOperationType::WritePartitionTranslation:
+		case ERhiPtlasOperationType::WritePartitionTranslation:
 			return nativeLayout.PartitionTranslationStrideInBytes;
-		case ERhiPartitionedTlasOperationType::WriteInstance:
+		case ERhiPtlasOperationType::WriteInstance:
 		default:
 			return nativeLayout.InstanceWriteStrideInBytes;
 	}
 }
 
-std::uint64_t RhiPartitionedTlasOperationLayout::AlignUp(std::uint64_t value, std::uint64_t alignment) noexcept
+std::uint64_t RhiPtlasOperationLayout::AlignUp(std::uint64_t value, std::uint64_t alignment) noexcept
 {
 	return alignment == 0 ? value : ((value + alignment - 1u) / alignment) * alignment;
 }

@@ -109,8 +109,8 @@ public:
 	PFN_vkGetAccelerationStructureBuildSizesKHR GetAccelerationStructureBuildSizes() const noexcept;
 	PFN_vkCmdBuildAccelerationStructuresKHR GetCmdBuildAccelerationStructures() const noexcept;
 	PFN_vkGetAccelerationStructureDeviceAddressKHR GetAccelerationStructureDeviceAddress() const noexcept;
-	PFN_vkGetPartitionedAccelerationStructuresBuildSizesNV GetPartitionedAccelerationStructureBuildSizes() const noexcept;
-	PFN_vkCmdBuildPartitionedAccelerationStructuresNV GetCmdBuildPartitionedAccelerationStructures() const noexcept;
+	PFN_vkGetPartitionedAccelerationStructuresBuildSizesNV GetPtlasBuildSizes() const noexcept;
+	PFN_vkCmdBuildPartitionedAccelerationStructuresNV GetCmdBuildPtlas() const noexcept;
 	PFN_vkCreateRayTracingPipelinesKHR GetCreateRayTracingPipelines() const noexcept;
 	PFN_vkGetRayTracingShaderGroupHandlesKHR GetRayTracingShaderGroupHandles() const noexcept;
 	PFN_vkCmdTraceRaysKHR GetCmdTraceRays() const noexcept;
@@ -134,7 +134,7 @@ private:
 	void LoadDeviceDebugFunctions() noexcept;
 	void LoadRayTracingFunctions() noexcept;
 	void BuildRayTracingCapabilities() noexcept;
-	void SelectRayTracingTopLevelProvider() noexcept;
+	void SelectRayTracingTlasProvider() noexcept;
 	void NameBootstrapObjects() noexcept;
 	void LogBootstrapSummary() noexcept;
 	void PushDiagnosticMessage(ERhiDiagnosticMessageSeverity severity, ERhiDiagnosticMessageCategory category, std::string text) noexcept;
@@ -176,8 +176,8 @@ private:
 	PFN_vkGetAccelerationStructureBuildSizesKHR m_getAccelerationStructureBuildSizes = nullptr;
 	PFN_vkCmdBuildAccelerationStructuresKHR m_cmdBuildAccelerationStructures = nullptr;
 	PFN_vkGetAccelerationStructureDeviceAddressKHR m_getAccelerationStructureDeviceAddress = nullptr;
-	PFN_vkGetPartitionedAccelerationStructuresBuildSizesNV m_getPartitionedAccelerationStructureBuildSizes = nullptr;
-	PFN_vkCmdBuildPartitionedAccelerationStructuresNV m_cmdBuildPartitionedAccelerationStructures = nullptr;
+	PFN_vkGetPartitionedAccelerationStructuresBuildSizesNV m_getPtlasBuildSizes = nullptr;
+	PFN_vkCmdBuildPartitionedAccelerationStructuresNV m_cmdBuildPtlas = nullptr;
 	PFN_vkCreateRayTracingPipelinesKHR m_createRayTracingPipelines = nullptr;
 	PFN_vkGetRayTracingShaderGroupHandlesKHR m_getRayTracingShaderGroupHandles = nullptr;
 	PFN_vkCmdTraceRaysKHR m_cmdTraceRays = nullptr;

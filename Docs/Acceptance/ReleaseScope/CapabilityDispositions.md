@@ -339,12 +339,12 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `RHI-CMD-07` | Diagnostic scopes | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-RT-01` | Bottom-level AS | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-RT-02` | BLAS update/refit | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `RHI-RT-03` | Classic TLAS | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `RHI-RT-03` | TLAS | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-RT-04` | Inline ray query | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-RT-05` | Native RT pipeline | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-RT-06` | Shader table | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-RT-07` | Triangle hit groups | Included | Game/source | Triangle geometry only; procedural/intersection/callable generality is excluded. |
-| `RHI-RT-08` | Partitioned TLAS | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
+| `RHI-RT-08` | PTLAS | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `RHI-RTC-01` | Ray-traced GBuffer | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-RTC-02` | Direct-shadow visibility | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `RHI-RTC-03` | Reference path-traced direct/indirect | Included | Game/source | Required native lowering for full admitted reference transport; no finite-depth diagnostic substituted as oracle. |
@@ -468,8 +468,8 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `REN-DECAL-01` | Authored and scene decal data | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
 | `REN-DECAL-02` | Primary deferred GBuffer composition | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
 | `REN-DECAL-03` | Secondary-ray decal evaluation | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
-| `REN-RT-01` | Classic TLAS | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-RT-02` | Partitioned TLAS | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
+| `REN-RT-01` | TLAS | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `REN-RT-02` | PTLAS | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `REN-RT-03` | Shared scene identity | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-RT-04` | Shader-table plan | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-RT-05` | Hit-group coverage | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
@@ -686,7 +686,7 @@ This table takes precedence over a compound inventory title. It does not replace
 | Linear provider / native extent | Included / runtime, default | Reconstruction owner; this is not TAA or a new native AA implementation |
 | DLSS / NativeAA, Quality, Balanced, Performance, UltraPerformance | Included / runtime | Vendor-compatible tuples only; all enum quality choices require supported-provider/extent proof. Missing provider is visible unavailable, not a hidden baseline switch. |
 | DLSS Ray Reconstruction | Included / runtime | Required complete compatible lighting/guide/provider cells on D3D12 and Vulkan; Off native control, On realtime preset; current Vulkan initialization gap cannot be marked accepted |
-| Classic TLAS / refit | Included / runtime | Shared AS identity/lifetime; no new consumer acceleration-structure editor |
+| TLAS / refit | Included / runtime | Shared AS identity/lifetime; no new consumer acceleration-structure editor |
 | PTLAS and partition controls | Experimental / source only | Narrow installed capability and build/update semantics; Off consumer baseline; no performance savings claim |
 | Mesh batching / single-sample raster / fixed Halton jitter | Included / runtime | Existing mechanics; advanced occlusion/mesh shaders, MSAA, standalone TAA/FXAA and dynamic resolution excluded |
 | Color Grading / Chromatic Aberration / Vignette | Included / game targets | FCR-REN-24/25; neutral grading, chromatic aberration On and vignette On defaults; each feature needs independent bounded controls, formula/order/failure and both-backend proof |
@@ -750,7 +750,7 @@ The [owner-directed rendering closure](../FirstRelease.md#required-rendering-clo
 | `r.RayReconstruction.Mode` | `1` | Included / runtime | Linear/native and RR-Off are native controls; Included DLSS quality/RR cells must pass on both APIs. Unsupported requests are visible failures, not accepted substitutes. |
 | `r.GBuffer.Algorithm` | `0` | Included / runtime | Included Rasterized default; RayTracing Included; realtime preset requires complete traced primary/secondary transport; shared automatic ray lowering. |
 | `r.RayTracing.Tlas.Refit` | `1` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
-| `r.RayTracing.PreferPartitionedTlas` | `1` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |
+| `r.RayTracing.PreferPtlas` | `1` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |
 | `r.RayTracing.Ptlas.PartitionsPerAxis` | `8` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |
 | `r.RayTracing.Ptlas.PartitionUpdateMode` | `0` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |
 | `r.RayTracing.Ptlas.MarkAllDynamicInPartition` | `0` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |

@@ -256,7 +256,7 @@ VulkanRecordingResource VulkanRecordingResourceTable::BuildResource(const Vulkan
 	    .Usage = record.Usage,
 	    .AccelerationStructureType = record.AccelerationStructureType,
 	    .ResourceKind = record.ResourceKind,
-	    .IsPartitionedAccelerationStructure = record.IsPartitionedAccelerationStructure};
+	    .IsPtlas = record.IsPtlas};
 }
 
 void VulkanRecordingResourceTable::RetainReference(VulkanGpuAllocationRecord& record) noexcept

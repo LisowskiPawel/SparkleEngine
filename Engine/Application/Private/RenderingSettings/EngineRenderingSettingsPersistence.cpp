@@ -71,7 +71,7 @@ std::span<const std::string_view> EngineRenderingSettingsPersistence::GetPersist
 	    "r.RayReconstruction.Mode",
 	    "r.GBuffer.Algorithm",
 	    "r.RayTracing.Tlas.Refit",
-	    "r.RayTracing.PreferPartitionedTlas",
+	    "r.RayTracing.PreferPtlas",
 	    "r.RayTracing.Ptlas.PartitionsPerAxis",
 	    "r.RayTracing.Ptlas.PartitionUpdateMode",
 	    "r.RayTracing.Ptlas.MarkAllDynamicInPartition",
@@ -214,7 +214,7 @@ void EngineRenderingSettingsPersistence::Write(const EngineRenderingSettingsStat
 	appendConfigValue("r.RayReconstruction.Mode", state.RayReconstructionMode);
 	appendConfigValue("r.GBuffer.Algorithm", state.SelectedGBufferAlgorithm);
 	appendConfigValue("r.RayTracing.Tlas.Refit", state.RefitTlas);
-	appendConfigValue("r.RayTracing.PreferPartitionedTlas", state.PtlasActive);
+	appendConfigValue("r.RayTracing.PreferPtlas", state.PtlasActive);
 	appendConfigValue("r.RayTracing.Ptlas.PartitionsPerAxis", state.PtlasPartitionsPerAxis);
 	appendConfigValue("r.RayTracing.Ptlas.PartitionUpdateMode", state.PtlasPartitionUpdateMode);
 	appendConfigValue("r.RayTracing.Ptlas.MarkAllDynamicInPartition", state.PtlasMarkAllDynamicInPartition);

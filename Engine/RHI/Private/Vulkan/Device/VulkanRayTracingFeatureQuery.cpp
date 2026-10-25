@@ -16,14 +16,14 @@ VulkanRayTracingFeatureStatus VulkanRayTracingFeatureQuery::Query(VkPhysicalDevi
 	status.SupportsRayQueryExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_RAY_QUERY_EXTENSION_NAME);
 	status.SupportsDeferredHostOperationsExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
 	status.SupportsBufferDeviceAddressExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
-	status.SupportsPartitionedAccelerationStructureExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_NV_PARTITIONED_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+	status.SupportsPtlasExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_NV_PARTITIONED_ACCELERATION_STRUCTURE_EXTENSION_NAME);
 
 	VkPhysicalDeviceFeatures2 features{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
 	VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES};
 	VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
 	VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
 	VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
-	VkPhysicalDevicePartitionedAccelerationStructureFeaturesNV partitionedAccelerationStructureFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PARTITIONED_ACCELERATION_STRUCTURE_FEATURES_NV};
+	VkPhysicalDevicePartitionedAccelerationStructureFeaturesNV ptlasFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PARTITIONED_ACCELERATION_STRUCTURE_FEATURES_NV};
 
 	void** next = &features.pNext;
 	*next = &bufferDeviceAddressFeatures;
@@ -43,9 +43,9 @@ VulkanRayTracingFeatureStatus VulkanRayTracingFeatureQuery::Query(VkPhysicalDevi
 		*next = &rayQueryFeatures;
 		next = &rayQueryFeatures.pNext;
 	}
-	if (status.SupportsPartitionedAccelerationStructureExtension)
+	if (status.SupportsPtlasExtension)
 	{
-		*next = &partitionedAccelerationStructureFeatures;
+		*next = &ptlasFeatures;
 	}
 
 	vkGetPhysicalDeviceFeatures2(physicalDevice, &features);
@@ -53,7 +53,7 @@ VulkanRayTracingFeatureStatus VulkanRayTracingFeatureQuery::Query(VkPhysicalDevi
 	status.SupportsAccelerationStructureFeature = accelerationStructureFeatures.accelerationStructure == VK_TRUE;
 	status.SupportsRayTracingPipelineFeature = rayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE;
 	status.SupportsRayQueryFeature = rayQueryFeatures.rayQuery == VK_TRUE;
-	status.SupportsPartitionedAccelerationStructureFeature = partitionedAccelerationStructureFeatures.partitionedAccelerationStructure == VK_TRUE;
+	status.SupportsPtlasFeature = ptlasFeatures.partitionedAccelerationStructure == VK_TRUE;
 
 	status.EnabledAccelerationStructure = status.SupportsAccelerationStructureExtension && status.SupportsDeferredHostOperationsExtension && status.SupportsBufferDeviceAddressFeature
 	    && status.SupportsAccelerationStructureFeature;

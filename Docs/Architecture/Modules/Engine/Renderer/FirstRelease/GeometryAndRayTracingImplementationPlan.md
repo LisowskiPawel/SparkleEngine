@@ -71,15 +71,15 @@ NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/set
 
 **Start:** Scene/resource generations are valid; AS update, mapping, selection or lifetime is the failing edge.
 
-**Work:** Repair current classic build/refit and instance/contribution identity, topology-change detection, scratch/result/operation bounds, queue completion, publication and retirement. Check move/delete/reload and required allocation failure. PTLAS keeps its separately experimental disposition; it cannot become the release baseline.
+**Work:** Repair current TLAS build/refit and instance/contribution identity, topology-change detection, scratch/result/operation bounds, queue completion, publication and retirement. Check move/delete/reload and required allocation failure. PTLAS keeps its separately experimental disposition; it cannot become the release baseline.
 
 **Cleanup:** Remove duplicate AS plans, contribution mappings and stale update/publication records; scene policy remains Renderer-owned and native execution RHI-owned.
 
-**Exit:** FCR-REN-12 admitted classic/refit cells pass native lifetime and cost checks; experimental PTLAS has a separate result, not an all-hardware promise.
+**Exit:** FCR-REN-12 admitted TLAS/refit cells pass native lifetime and cost checks; experimental PTLAS has a separate result, not an all-hardware promise.
 
 ```text
 Execute only GR-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-3--renderer-tlas-policy-and-publication. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
-Selected work: Repair current classic build/refit and instance/contribution identity, topology-change detection, scratch/result/operation bounds, queue completion, publication and retirement.
+Selected work: Repair current TLAS build/refit and instance/contribution identity, topology-change detection, scratch/result/operation bounds, queue completion, publication and retirement.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-12; no neighboring stage or new mechanism merely to fill a report.
 ```

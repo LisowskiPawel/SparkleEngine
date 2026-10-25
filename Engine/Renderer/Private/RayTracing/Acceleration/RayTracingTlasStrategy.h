@@ -1,17 +1,17 @@
 #pragma once
 
-#include "RayTracing/Acceleration/RayTracingClassicTlasBuilder.h"
-#include "RayTracing/Acceleration/RayTracingTopLevelAccelerationStructureStrategy.h"
+#include "RayTracing/Acceleration/RayTracingTlasBuilder.h"
+#include "RayTracing/Acceleration/RayTracingAccelerationStrategy.h"
 
 class RenderHardwareInterface;
 
-class RayTracingClassicTlasStrategy final : public RayTracingTopLevelAccelerationStructureStrategy
+class RayTracingTlasStrategy final : public RayTracingAccelerationStrategy
 {
 public:
-	explicit RayTracingClassicTlasStrategy(RenderHardwareInterface& renderHardwareInterface) noexcept;
-	~RayTracingClassicTlasStrategy() noexcept override;
+	explicit RayTracingTlasStrategy(RenderHardwareInterface& renderHardwareInterface) noexcept;
+	~RayTracingTlasStrategy() noexcept override;
 	RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept override;
-	RayTracingTopLevelAccelerationStructureBuildResult Build(
+	RayTracingTlasBuildResult Build(
 	    RenderCommandContext& commandContext,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
@@ -21,5 +21,5 @@ public:
 	void Clear() noexcept override;
 
 private:
-	RayTracingClassicTlasBuilder m_classicTlasBuilder;
+	RayTracingTlasBuilder m_tlasBuilder;
 };

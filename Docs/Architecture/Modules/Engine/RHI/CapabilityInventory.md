@@ -153,18 +153,18 @@ The honest product statement at this snapshot is: **fixed-capacity bindless mate
 
 ## Ray-Tracing Coverage
 
-Ray tracing is not one boolean. The current contract separates acceleration structures, inline traversal, native pipeline dispatch, shader-table layout, classic TLAS, and partitioned TLAS.
+Ray tracing is not one boolean. The current contract separates acceleration structures, inline traversal, native pipeline dispatch, shader-table layout, TLAS, and PTLAS.
 
 | Capability ID | Capability | D3D12 path | Vulkan path | Current semantic limit | Evidence |
 | --- | --- | --- | --- | --- | --- |
 | `RHI-RT-01` | Bottom-level AS | DXR triangle geometry build | KHR acceleration-structure triangle geometry build | Public geometry description is one indexed triangle geometry with opaque control. Renderer static BLASes cache; deforming BLASes are rebuilt. | `S` |
 | `RHI-RT-02` | BLAS update/refit | Prebuild vocabulary includes update sizing | Prebuild vocabulary includes update sizing | No public BLAS update/refit command or Renderer producer was found; do not advertise deforming-mesh refit. | `S` |
-| `RHI-RT-03` | Classic TLAS | Build, allow-update, update/refit | Build, allow-update, update/refit | Instance ID, mask, shader-table contribution, flags, transform, and BLAS address are represented. | `S` |
+| `RHI-RT-03` | TLAS | Build, allow-update, update/refit | Build, allow-update, update/refit | Instance ID, mask, shader-table contribution, flags, transform, and BLAS address are represented. | `S` |
 | `RHI-RT-04` | Inline ray query | Requires DXR tier 1.1 capability | Requires Vulkan ray-query feature/extension | Renderer uses inline traversal for more effects than native pipeline traversal. | `S` |
 | `RHI-RT-05` | Native RT pipeline | Requires DXR tier 1.0 | Requires KHR ray-tracing pipeline | Pipeline export/hit-group contracts, SBT creation, and `TraceRays` exist in both backends. No runtime proof was produced here. | `S` |
 | `RHI-RT-06` | Shader table | Ray-generation, miss, hit, callable regions; local record bytes/signatures | Same backend-neutral regions mapped to Vulkan SBT | Renderer currently authors raygen/miss/hit records for one shared Surface ray type; callable is contract capacity, not current effect coverage. | `S` |
 | `RHI-RT-07` | Triangle hit groups | Closest-hit and any-hit exports | Closest-hit and any-hit exports | Procedural/intersection fields exist in the RHI contract, but no current Renderer procedural-geometry effect was found. | `S` |
-| `RHI-RT-08` | Partitioned TLAS | NVIDIA NVAPI and public DXR RTAS-operation provider contracts | NVIDIA Vulkan extension provider | Vendor/API/capability gated. Current Renderer strategy disables instance updates and partition translation and emits at most one operation. | `S` |
+| `RHI-RT-08` | PTLAS | NVIDIA NVAPI and public DXR RTAS-operation provider contracts | NVIDIA Vulkan extension provider | Vendor/API/capability gated. Current Renderer strategy disables instance updates and partition translation and emits at most one operation. | `S` |
 
 ### Current Renderer Traversal Consumers
 
@@ -210,7 +210,7 @@ Ray tracing is not one boolean. The current contract separates acceleration stru
 - The RHI has procedural/callable/advanced stage vocabulary beyond current Renderer production paths. Such vocabulary is not a shippable feature.
 - No current HDR presentation implementation was found; the admitted HDR10 contract is owned by Renderer and requires both RHI backends.
 - Swapchain resize/recreation is implemented; whole-device recreation after D3D12 removal or Vulkan device loss is not. DRED/result diagnostics are not recovery.
-- Rich partitioned-TLAS operation vocabulary exceeds the current Renderer strategy. Advertise only the actually selected and exercised subset.
+- Rich PTLAS operation vocabulary exceeds the current Renderer strategy. Advertise only the actually selected and exercised subset.
 
 ## Primary Source Routes
 

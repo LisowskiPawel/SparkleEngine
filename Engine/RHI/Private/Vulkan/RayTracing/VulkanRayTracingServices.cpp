@@ -49,29 +49,29 @@ VkAccelerationStructureGeometryKHR VulkanRayTracingServices::BuildBottomLevelGeo
 VulkanRayTracingServices::VulkanRayTracingServices(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept :
     m_rhi(&rhi),
     m_memoryAllocator(&memoryAllocator),
-    m_classicTlasServices(rhi, memoryAllocator),
-    m_partitionedTlasServices(rhi, memoryAllocator)
+    m_tlasServices(rhi, memoryAllocator),
+    m_ptlasServices(rhi, memoryAllocator)
 {
 }
 
-RhiClassicTlasService& VulkanRayTracingServices::GetClassicTlasService() noexcept
+RhiTlasService& VulkanRayTracingServices::GetTlasService() noexcept
 {
-	return m_classicTlasServices;
+	return m_tlasServices;
 }
 
-const RhiClassicTlasService& VulkanRayTracingServices::GetClassicTlasService() const noexcept
+const RhiTlasService& VulkanRayTracingServices::GetTlasService() const noexcept
 {
-	return m_classicTlasServices;
+	return m_tlasServices;
 }
 
-RhiPartitionedTlasService& VulkanRayTracingServices::GetPartitionedTlasService() noexcept
+RhiPtlasService& VulkanRayTracingServices::GetPtlasService() noexcept
 {
-	return m_partitionedTlasServices;
+	return m_ptlasServices;
 }
 
-const RhiPartitionedTlasService& VulkanRayTracingServices::GetPartitionedTlasService() const noexcept
+const RhiPtlasService& VulkanRayTracingServices::GetPtlasService() const noexcept
 {
-	return m_partitionedTlasServices;
+	return m_ptlasServices;
 }
 
 RhiRayTracingCapabilities VulkanRayTracingServices::GetCapabilities() const noexcept
@@ -112,24 +112,24 @@ RhiRayTracingAccelerationStructurePrebuildInfo VulkanRayTracingServices::GetBott
 	    .UpdateScratchDataSizeInBytes = nativeInfo.updateScratchSize};
 }
 
-RhiRayTracingAccelerationStructurePrebuildInfo VulkanRayTracingServices::GetTopLevelAccelerationStructurePrebuildInfo(std::uint32_t instanceCount, ERhiClassicTlasBuildFlags buildFlags) const noexcept
+RhiRayTracingAccelerationStructurePrebuildInfo VulkanRayTracingServices::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
 {
-	return m_classicTlasServices.GetClassicTopLevelAccelerationStructurePrebuildInfo(instanceCount, buildFlags);
+	return m_tlasServices.GetTlasPrebuildInfo(instanceCount, buildFlags);
 }
 
-RhiPartitionedTlasBuildSizes VulkanRayTracingServices::GetPartitionedTopLevelAccelerationStructureBuildSizes(const RhiPartitionedTlasDesc& desc) const noexcept
+RhiPtlasBuildSizes VulkanRayTracingServices::GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept
 {
-	return m_partitionedTlasServices.GetPartitionedTopLevelAccelerationStructureBuildSizes(desc);
+	return m_ptlasServices.GetPtlasBuildSizes(desc);
 }
 
-RhiOwnedResourceHandle VulkanRayTracingServices::CreatePartitionedTopLevelAccelerationStructureBuffer(const RhiPartitionedTlasBuildSizes& sizes, std::wstring_view debugName)
+RhiOwnedResourceHandle VulkanRayTracingServices::CreatePtlasBuffer(const RhiPtlasBuildSizes& sizes, std::wstring_view debugName)
 {
-	return m_partitionedTlasServices.CreatePartitionedTopLevelAccelerationStructureBuffer(sizes, debugName);
+	return m_ptlasServices.CreatePtlasBuffer(sizes, debugName);
 }
 
-RhiOwnedResourceHandle VulkanRayTracingServices::CreatePartitionedTopLevelAccelerationStructureOperationBuffer(const RhiPartitionedTlasOperationPackDesc& operationPack, std::wstring_view debugName)
+RhiOwnedResourceHandle VulkanRayTracingServices::CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName)
 {
-	return m_partitionedTlasServices.CreatePartitionedTopLevelAccelerationStructureOperationBuffer(operationPack, debugName);
+	return m_ptlasServices.CreatePtlasOperationBuffer(operationPack, debugName);
 }
 
 RhiOwnedResourceHandle VulkanRayTracingServices::CreateScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
@@ -224,7 +224,7 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreateRayTracingAccelerationStr
 
 RhiOwnedResourceHandle VulkanRayTracingServices::CreateInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
-	return m_classicTlasServices.CreateClassicTopLevelAccelerationStructureInstanceBuffer(instances, instanceCount, debugName);
+	return m_tlasServices.CreateTlasInstanceBuffer(instances, instanceCount, debugName);
 }
 
 RhiOwnedResourceHandle VulkanRayTracingServices::CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)

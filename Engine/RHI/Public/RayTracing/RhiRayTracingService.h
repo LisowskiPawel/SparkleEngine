@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Memory/RhiMemoryTypes.h"
-#include "../RayTracing/RhiClassicTlasService.h"
-#include "../RayTracing/RhiPartitionedTlasService.h"
+#include "../RayTracing/RhiTlasService.h"
+#include "../RayTracing/RhiPtlasService.h"
 #include "../RayTracing/RhiRayTracingDesc.h"
 #include "../RayTracing/RhiRayTracingPipelineDesc.h"
 #include "../Resources/RhiResourceDesc.h"
@@ -25,18 +25,16 @@ public:
 	RhiRayTracingService(RhiRayTracingService&&) = delete;
 	RhiRayTracingService& operator=(RhiRayTracingService&&) = delete;
 
-	virtual RhiClassicTlasService& GetClassicTlasService() noexcept = 0;
-	virtual const RhiClassicTlasService& GetClassicTlasService() const noexcept = 0;
-	virtual RhiPartitionedTlasService& GetPartitionedTlasService() noexcept = 0;
-	virtual const RhiPartitionedTlasService& GetPartitionedTlasService() const noexcept = 0;
+	virtual RhiTlasService& GetTlasService() noexcept = 0;
+	virtual const RhiTlasService& GetTlasService() const noexcept = 0;
+	virtual RhiPtlasService& GetPtlasService() noexcept = 0;
+	virtual const RhiPtlasService& GetPtlasService() const noexcept = 0;
 	virtual RhiRayTracingAccelerationStructurePrebuildInfo GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept = 0;
-	virtual RhiRayTracingAccelerationStructurePrebuildInfo GetTopLevelAccelerationStructurePrebuildInfo(
-	    std::uint32_t instanceCount,
-	    ERhiClassicTlasBuildFlags buildFlags = ERhiClassicTlasBuildFlags::None) const noexcept;
-	virtual RhiPartitionedTlasBuildSizes GetPartitionedTopLevelAccelerationStructureBuildSizes(const RhiPartitionedTlasDesc& desc) const noexcept;
-	virtual RhiOwnedResourceHandle CreatePartitionedTopLevelAccelerationStructureBuffer(const RhiPartitionedTlasBuildSizes& sizes, std::wstring_view debugName);
-	virtual RhiOwnedResourceHandle CreatePartitionedTopLevelAccelerationStructureOperationBuffer(const RhiPartitionedTlasOperationPackDesc& operationPack, std::wstring_view debugName);
-	virtual RhiPartitionedTlasOperationBufferLayout GetPartitionedTopLevelAccelerationStructureOperationBufferLayout(const RhiPartitionedTlasDesc& desc) const noexcept;
+	virtual RhiRayTracingAccelerationStructurePrebuildInfo GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags = ERhiTlasBuildFlags::None) const noexcept;
+	virtual RhiPtlasBuildSizes GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept;
+	virtual RhiOwnedResourceHandle CreatePtlasBuffer(const RhiPtlasBuildSizes& sizes, std::wstring_view debugName);
+	virtual RhiOwnedResourceHandle CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName);
+	virtual RhiPtlasOperationBufferLayout GetPtlasOperationBufferLayout(const RhiPtlasDesc& desc) const noexcept;
 	virtual RhiOwnedResourceHandle CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName) = 0;
 	virtual RhiOwnedResourceHandle CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName) = 0;
 	virtual RhiOwnedResourceHandle CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName);

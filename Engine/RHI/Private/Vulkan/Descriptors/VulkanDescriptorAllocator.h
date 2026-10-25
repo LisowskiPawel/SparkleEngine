@@ -47,7 +47,7 @@ public:
 	void WriteDescriptorHandle(VkDescriptorSet descriptorSet, const CompiledBinding& binding, RhiGpuDescriptorHandle handle) noexcept;
 	void WriteBufferDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkBuffer buffer, VkDeviceSize offset, VkDeviceSize range) noexcept;
 	void WriteAccelerationStructureDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkAccelerationStructureKHR accelerationStructure) noexcept;
-	void WritePartitionedAccelerationStructureDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkDeviceAddress accelerationStructureAddress) noexcept;
+	void WritePtlasDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkDeviceAddress accelerationStructureAddress) noexcept;
 
 private:
 	friend class VulkanDescriptorService;
@@ -61,7 +61,7 @@ private:
 		StorageBuffer,
 		Sampler,
 		AccelerationStructure,
-		PartitionedAccelerationStructure,
+		Ptlas,
 	};
 
 	struct DescriptorEntry final
@@ -70,7 +70,7 @@ private:
 		VkDescriptorImageInfo Image = {};
 		VkDescriptorBufferInfo Buffer = {};
 		VkAccelerationStructureKHR AccelerationStructure = VK_NULL_HANDLE;
-		VkDeviceAddress PartitionedAccelerationStructureAddress = 0;
+		VkDeviceAddress PtlasAddress = 0;
 	};
 
 	static constexpr std::size_t DescriptorWriteChunkCapacity = 64;
@@ -80,7 +80,7 @@ private:
 		std::array<VkDescriptorImageInfo, DescriptorWriteChunkCapacity> ImageInfos;
 		std::array<VkDescriptorBufferInfo, DescriptorWriteChunkCapacity> BufferInfos;
 		std::array<VkAccelerationStructureKHR, DescriptorWriteChunkCapacity> AccelerationStructures;
-		std::array<VkDeviceAddress, DescriptorWriteChunkCapacity> PartitionedAccelerationStructureAddresses;
+		std::array<VkDeviceAddress, DescriptorWriteChunkCapacity> PtlasAddresses;
 		std::uint32_t Count = 0;
 	};
 

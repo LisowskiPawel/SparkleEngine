@@ -118,7 +118,7 @@ void VulkanRecordingDescriptorPool::CreatePool(std::span<const VkDescriptorPoolS
 	{
 		page.Capacity.push_back({.type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, .descriptorCount = 128});
 	}
-	if (m_rhi->GetFeatureStatus().RayTracing.EnabledPartitionedAccelerationStructure)
+	if (m_rhi->GetFeatureStatus().RayTracing.EnabledPtlas)
 	{
 		page.Capacity.push_back({.type = VK_DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV, .descriptorCount = 128});
 	}

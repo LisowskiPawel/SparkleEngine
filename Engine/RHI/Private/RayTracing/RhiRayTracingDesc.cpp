@@ -4,22 +4,22 @@
 
 void PopulateStandardRayTracingCapabilityGroups(RhiRayTracingCapabilities& capabilities) noexcept
 {
-	capabilities.Groups.ClassicTlas = RhiClassicTlasCapabilities{
-	    .SupportsClassicTlasBuild = capabilities.SupportsAccelerationStructure,
-	    .SupportsClassicTlasUpdate = capabilities.SupportsAccelerationStructure,
+	capabilities.Groups.Tlas = RhiTlasCapabilities{
+	    .SupportsTlasBuild = capabilities.SupportsAccelerationStructure,
+	    .SupportsTlasUpdate = capabilities.SupportsAccelerationStructure,
 	    .SupportsGpuReadableInstanceBuffer = capabilities.SupportsAccelerationStructure,
 	    .InstanceDescSizeInBytes = capabilities.InstanceDescSizeInBytes};
 }
 
-const char* RhiRayTracingTopLevelProviderToString(ERhiRayTracingTopLevelProvider provider) noexcept
+const char* RhiRayTracingTlasProviderToString(ERhiRayTracingTlasProvider provider) noexcept
 {
 	switch (provider)
 	{
-		case ERhiRayTracingTopLevelProvider::ClassicTlas:
-			return "ClassicTlas";
-		case ERhiRayTracingTopLevelProvider::PartitionedTlas:
-			return "PartitionedTlas";
-		case ERhiRayTracingTopLevelProvider::None:
+		case ERhiRayTracingTlasProvider::Tlas:
+			return "TLAS";
+		case ERhiRayTracingTlasProvider::Ptlas:
+			return "PTLAS";
+		case ERhiRayTracingTlasProvider::None:
 		default:
 			return "None";
 	}

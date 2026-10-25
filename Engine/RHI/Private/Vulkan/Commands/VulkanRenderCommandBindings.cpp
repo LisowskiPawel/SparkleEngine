@@ -169,14 +169,14 @@ const CompiledBinding* VulkanRenderCommandList::FindBindingByIndex(const VulkanB
 void VulkanRenderCommandList::WriteAccelerationStructureBinding(VkDescriptorSet descriptorSet, const CompiledBinding& binding, RhiResourceHandle resourceHandle) noexcept
 {
 	VulkanGpuAllocationRecord* const allocation = m_memoryAllocator != nullptr ? m_memoryAllocator->FindAllocationRecord(resourceHandle) : nullptr;
-	if (allocation == nullptr || (allocation->AccelerationStructure == VK_NULL_HANDLE && !allocation->IsPartitionedAccelerationStructure))
+	if (allocation == nullptr || (allocation->AccelerationStructure == VK_NULL_HANDLE && !allocation->IsPtlas))
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan acceleration-structure binding references an unresolved resource.");
 	}
 
-	if (allocation->IsPartitionedAccelerationStructure)
+	if (allocation->IsPtlas)
 	{
-		m_descriptorAllocator->WritePartitionedAccelerationStructureDescriptor(descriptorSet, binding, allocation->DeviceAddress);
+		m_descriptorAllocator->WritePtlasDescriptor(descriptorSet, binding, allocation->DeviceAddress);
 		return;
 	}
 

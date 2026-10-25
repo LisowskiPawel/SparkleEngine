@@ -87,13 +87,13 @@ public:
 	void Dispatch(std::uint32_t groupCountX, std::uint32_t groupCountY, std::uint32_t groupCountZ) noexcept override;
 	void TraceRays(const TraceRaysDesc& desc) noexcept override;
 	void BuildBottomLevelAccelerationStructure(const RhiRayTracingGeometryDesc& geometry, RhiGpuVirtualAddress scratchGpuAddress, RhiGpuVirtualAddress resultGpuAddress) noexcept override;
-	void BuildTopLevelAccelerationStructure(
+	void BuildTlas(
 	    RhiGpuVirtualAddress instanceDescsGpuAddress,
 	    std::uint32_t instanceCount,
 	    RhiGpuVirtualAddress scratchGpuAddress,
 	    RhiGpuVirtualAddress resultGpuAddress,
-	    ERhiClassicTlasBuildMode buildMode = ERhiClassicTlasBuildMode::Build) noexcept override;
-	void BuildPartitionedTopLevelAccelerationStructure(const RhiPartitionedTlasBuildCommandDesc& desc) noexcept override;
+	    ERhiTlasBuildMode buildMode = ERhiTlasBuildMode::Build) noexcept override;
+	void BuildPtlas(const RhiPtlasBuildCommandDesc& desc) noexcept override;
 	void CopyResource(RhiResourceHandle destinationResource, RhiResourceHandle sourceResource) noexcept override;
 	void AliasResource(RhiResourceHandle beforeResource, RhiResourceHandle afterResource) noexcept override;
 	void TransitionResource(RhiResourceHandle resource, ResourceState before, ResourceState after) noexcept override;

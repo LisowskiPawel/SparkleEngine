@@ -17,7 +17,7 @@ extern ConsoleVariable<bool> CVarRendererMeshAutoBatching;
 extern ConsoleVariable<RendererDiagnosticMarkerVerbosity> CVarRendererDiagnosticMarkerVerbosity;
 extern ConsoleVariable<bool> CVarRendererDiagnosticGpuTiming;
 extern ConsoleVariable<bool> CVarRendererParallelFrameGraphRecording;
-extern ConsoleVariable<bool> CVarRayTracingClassicTlasRefit;
+extern ConsoleVariable<bool> CVarRayTracingTlasRefit;
 extern ConsoleVariable<std::uint32_t> CVarRayTracingPartitionsPerAxis;
 extern ConsoleVariable<RayTracingPtlasPartitionUpdateMode> CVarRayTracingPtlasPartitionUpdateMode;
 extern ConsoleVariable<bool> CVarRayTracingPtlasMarkAllDynamicInPartition;

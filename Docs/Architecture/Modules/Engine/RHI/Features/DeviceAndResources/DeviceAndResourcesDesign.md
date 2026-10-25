@@ -170,7 +170,7 @@ flowchart LR
     Submit --> Complete[Queue completion authorizes reuse]
 ```
 
-The shader ABI, resource generation, descriptor allocation, and recording lifetime meet here. Treating any one of them as sufficient creates the classic failure where a syntactically valid slot points at the wrong object or is recycled before the GPU finishes.
+The shader ABI, resource generation, descriptor allocation, and recording lifetime meet here. Treating any one of them as sufficient creates the TLAS failure where a syntactically valid slot points at the wrong object or is recycled before the GPU finishes.
 
 ### Descriptor Binding: Feature Promise
 

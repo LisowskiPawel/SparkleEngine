@@ -39,7 +39,7 @@ This promise currently covers opaque and alpha-tested static, instanced, skinned
 | Skeletal meshes | Up to eight imported/cooked influences flow as current/previous joint matrices to raster and ray hit/deformation data | Visual and motion-vector parity unproved; ray geometry rebuild cost open |
 | Morph targets | Sparse morph deltas and current/previous weights feed raster/ray deformation and motion | Combined skin+morph edge cases and bounds need evidence |
 | Frustum visibility | Per-view bounds test produces raster-visible indices | Invalid bounds conservatively remain visible; occlusion culling is not claimed |
-| Ray geometry | Triangle BLASes, shared hit vertices/indices/material/instance records, classic or partitioned TLAS | Deforming BLAS refit is not exposed; procedural intersection is absent |
+| Ray geometry | Triangle BLASes, shared hit vertices/indices/material/instance records, TLAS or PTLAS | Deforming BLAS refit is not exposed; procedural intersection is absent |
 
 `r.Meshes.Static` and `r.Meshes.Skinned` independently admit static and skeletal primitives before scene preparation. Disabled primitives retain their authored objects and stable GPU scene slots but produce no deformation, raster batches, ray instances, or emissive-light sampling records. Ray hit-payload caching observes the prepared ray-work membership as well as authored structural revisions, allowing re-enable to restore the payload even when the scene itself has not changed. The [Scene Rendering Controls](../DebugViews/Controls/ShowFlags.md#scene-rendering-controls) contract owns their Show-menu and sequenced mutation behavior. This is implemented routing, not raster/ray parity evidence.
 

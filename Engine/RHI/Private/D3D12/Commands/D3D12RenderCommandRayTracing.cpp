@@ -68,28 +68,28 @@ D3D12_GPU_VIRTUAL_ADDRESS D3D12RenderCommandList::ResolveRayTracingBufferAddress
 	return resource != nullptr ? resource->GetGPUVirtualAddress() + binding.OffsetInBytes : 0;
 }
 
-void D3D12RenderCommandList::BuildTopLevelAccelerationStructure(
+void D3D12RenderCommandList::BuildTlas(
     RhiGpuVirtualAddress instanceDescsGpuAddress,
     std::uint32_t instanceCount,
     RhiGpuVirtualAddress scratchGpuAddress,
     RhiGpuVirtualAddress resultGpuAddress,
-    ERhiClassicTlasBuildMode buildMode) noexcept
+    ERhiTlasBuildMode buildMode) noexcept
 {
 	if (m_commandList == nullptr || !RhiContract::IsRayTracingGpuAddressPresent(instanceDescsGpuAddress) || !RhiContract::IsRayTracingGpuAddressPresent(scratchGpuAddress)
 	    || !RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress))
 	{
-		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 classic TLAS build received no command list or an empty GPU address.");
+		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 TLAS build received no command list or an empty GPU address.");
 	}
 
 	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs{};
 	inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
 	inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
 	inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_TRACE;
-	if (buildMode != ERhiClassicTlasBuildMode::Build)
+	if (buildMode != ERhiTlasBuildMode::Build)
 	{
 		inputs.Flags |= D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_UPDATE;
 	}
-	if (buildMode == ERhiClassicTlasBuildMode::Update)
+	if (buildMode == ERhiTlasBuildMode::Update)
 	{
 		inputs.Flags |= D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PERFORM_UPDATE;
 	}
@@ -100,23 +100,23 @@ void D3D12RenderCommandList::BuildTopLevelAccelerationStructure(
 	buildDesc.Inputs = inputs;
 	buildDesc.ScratchAccelerationStructureData = scratchGpuAddress;
 	buildDesc.DestAccelerationStructureData = resultGpuAddress;
-	buildDesc.SourceAccelerationStructureData = buildMode == ERhiClassicTlasBuildMode::Update ? resultGpuAddress : 0;
+	buildDesc.SourceAccelerationStructureData = buildMode == ERhiTlasBuildMode::Update ? resultGpuAddress : 0;
 	m_commandList->BuildRaytracingAccelerationStructure(&buildDesc, 0, nullptr);
 }
 
-void D3D12RenderCommandList::BuildPartitionedTopLevelAccelerationStructure(const RhiPartitionedTlasBuildCommandDesc& desc) noexcept
+void D3D12RenderCommandList::BuildPtlas(const RhiPtlasBuildCommandDesc& desc) noexcept
 {
 	if (m_commandList == nullptr || m_owner == nullptr || !desc.DestinationResource)
 	{
-		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 partitioned TLAS build has no command list, device owner, or destination resource.");
+		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 PTLAS build has no command list, device owner, or destination resource.");
 	}
 
 	BeginDiagnosticScope("RayTracing.PTLAS.Build", RhiDiagnosticLabelColor{92, 148, 255, 255});
-	const bool submitted = m_owner->BuildPartitionedTopLevelAccelerationStructure(m_commandList, desc);
+	const bool submitted = m_owner->BuildPtlas(m_commandList, desc);
 	EndDiagnosticScope();
 	if (!submitted)
 	{
-		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 partitioned TLAS provider rejected the build command.");
+		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 PTLAS provider rejected the build command.");
 	}
 	UnorderedAccessBarrier(desc.DestinationResource);
 }

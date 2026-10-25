@@ -10,6 +10,8 @@
 
 **Selected ExternalCapture delivery, 2026-10-09:** WPR/WPA, PresentMon, PIX Timing, Nsight GPU Trace/Systems and separate NVIDIA Aftermath guidance. The user explicitly excludes AMD RGP/RMV/RRA/RGA/uProf/RGD and associated hardware/tool investment. AMD references below remain background research, not setup, implementation or acceptance obligations for this delivery. CPU investigations use WPR/WPA. The [specialist preflight](../../Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/Discovery.md#stage-7-specialist-preflight---2026-10-09) records installed inputs and missing native evidence; it does not close EC-G7.
 
+**Naming reconciliation (2026-10-25):** Command/source examples use current TLAS/PTLAS identifiers and configuration keys. Retained capture/transcript artifacts preserve the actual spelling executed for their original candidate; this rename does not rerun or promote their evidence. Recheck the current command on a new candidate before claiming current behavior.
+
 ## Quick Route
 
 ```mermaid
@@ -254,7 +256,7 @@ For direct IDE/shortcut launches, **Window > Settings > GPU Capture > Capture to
 
 `--capture-provider pix|nsight-graphics|renderdoc|none` is the canonical equivalent. Duplicate/multiple/unknown intent rejects before graphics. Nsight Graphics Capture remains experimental and currently D3D12 only. RenderDoc uses its standard installed location and negotiated 1.6 application API. PIX uses the installed capturer's matching CLI to confirm native opening: retail 2603.25 works, Preview is unnecessary. Missing headers/tools leave a disabled action with a reason. Shipping/Game has no enabled capture route in this iteration.
 
-The validated Sponza experiment explicitly used `--cvar=r.Upscaler.Provider=0 --cvar=r.RayReconstruction.Mode=0 --cvar=r.RayTracing.PreferPartitionedTlas=false`. These are choices for the tested feature cell, never automatic provider fallbacks; default/vendor-feature combinations remain separate unverified cells. An arm deadline before native scheduling permits retry once current scene output exists. A native finalization deadline or target change quarantines the activity: restart the Editor, because timeout does not cancel hooks or permit overlap. An ordinary running Editor without early hooks needs a fresh instrumented launch.
+The validated Sponza experiment explicitly used `--cvar=r.Upscaler.Provider=0 --cvar=r.RayReconstruction.Mode=0 --cvar=r.RayTracing.PreferPtlas=false`. These are choices for the tested feature cell, never automatic provider fallbacks; default/vendor-feature combinations remain separate unverified cells. An arm deadline before native scheduling permits retry once current scene output exists. A native finalization deadline or target change quarantines the activity: restart the Editor, because timeout does not cancel hooks or permit overlap. An ordinary running Editor without early hooks needs a fresh instrumented launch.
 
 Nsight viewer handoff uses the desktop shell, outside inherited capture injection. The deleted child-launch route injected ngfx-capture-interception.dll into ngfx-ui.exe and produced a D3D9 Device Creation incompatibility. Do not suppress that warning or disable renderer features as recovery. If desktop-shell handoff fails, open the confirmed artifact from an independently launched Nsight Graphics instance.
 
@@ -268,7 +270,7 @@ See [implementation results](../../Architecture/CrossModule/PerformanceDiagnosti
 | --- | --- | --- |
 | Retail PIX GPU Capture | Correct native CLI quoting plus F11 after warm-up saved/opened a full Sponza GPU capture and screenshot. | Explicit tested D3D12 tuple; immediate startup capture lacked viewport output and was superseded. No engine request/controller acceptance. |
 | Retail PIX Timing | Native capture saved; retail WinPix opened it for ShowcaseEditor. | Separate timing activity; no PIX events in this build. Source correlation and observer acceptance remain unproved. |
-| Nsight Graphics D3D12 | F11 workflow saved a capture; matched replay succeeded and embedded screenshot shows Sponza. | Explicit linear/RR-off/classic-TLAS tuple only. Timed routes did not produce artifacts. |
+| Nsight Graphics D3D12 | F11 workflow saved a capture; matched replay succeeded and embedded screenshot shows Sponza. | Explicit linear/RR-off/TLAS tuple only. Timed routes did not produce artifacts. |
 | Nsight Graphics Vulkan | Timed, hotkey and standalone frame-index attempts did not finalize a capture. | Skip current workflow; this is not a hardware/API-unsupported disposition. RenderDoc Vulkan remains usable independently. |
 | RenderDoc D3D12 / Vulkan | Finalized native captures replayed; full 5120x1392 Sponza Editor outputs exported. Vulkan includes named frame-graph passes. | Tool-selected containing present, not engine viewport/generation/FrameId authority. No Game or combination acceptance. |
 | WPR/WPA | CPU start failed with profiling-policy error `0xc5585011`; no ETL. | Skip current collection; does not invalidate PIX Timing. |
@@ -283,7 +285,7 @@ Use these inputs from the repository root. Set child environment `SPARKLE_STARTU
 $profilingRepo = (Get-Location).Path
 $profilingEditor = Join-Path $profilingRepo 'artifacts/dev/Projects/Showcase/Binaries/DevelopmentEditor/ShowcaseEditor.exe'
 $profilingWorkingDirectory = Join-Path $profilingRepo 'Projects/Showcase'
-$profilingArguments = '--graphics-api d3d12 --cvar=r.Upscaler.Provider=0 --cvar=r.RayReconstruction.Mode=0 --cvar=r.RayTracing.PreferPartitionedTlas=false'
+$profilingArguments = '--graphics-api d3d12 --cvar=r.Upscaler.Provider=0 --cvar=r.RayReconstruction.Mode=0 --cvar=r.RayTracing.PreferPtlas=false'
 $profilingCaptureRoot = Join-Path $env:LOCALAPPDATA 'SparkleEngine/Development/SparkleEngine-736b042528ba48b3/Showcase/Captures/ExternalCaptureReady-20261009'
 ```
 
@@ -346,7 +348,7 @@ Replay succeeded with nonfatal NvAPI profile-registration/application-driver-sta
 **RenderDoc:** use qrenderdoc **File -> Launch Application** with the same executable, working directory, arguments and temporary Sponza environment. For Vulkan replace only `--graphics-api d3d12` with `--graphics-api vulkan`. Request capture from the tool's connected-process controls while leaving the maximized viewport visible. The tested CLI launch equivalent is:
 
 ```powershell
-& 'C:/Program Files/RenderDoc/renderdoccmd.exe' capture --working-dir $profilingWorkingDirectory --capture-file (Join-Path $profilingCaptureRoot 'renderdoc-d3d12') $profilingEditor --graphics-api d3d12 --cvar=r.Upscaler.Provider=0 --cvar=r.RayReconstruction.Mode=0 --cvar=r.RayTracing.PreferPartitionedTlas=false
+& 'C:/Program Files/RenderDoc/renderdoccmd.exe' capture --working-dir $profilingWorkingDirectory --capture-file (Join-Path $profilingCaptureRoot 'renderdoc-d3d12') $profilingEditor --graphics-api d3d12 --cvar=r.Upscaler.Provider=0 --cvar=r.RayReconstruction.Mode=0 --cvar=r.RayTracing.PreferPtlas=false
 ```
 
 Set the Sponza environment before this CLI call too. `renderdoccmd capture` returned positive connection identifier **38920**, not conventional exit-zero success. Connect to the exact launched process in RenderDoc. The retained native control experiment checked PID before `TriggerCapture`, waited for `NewCapture`, then opened/replayed each artifact and exported its final Present resource. A request alone is not completion. [RenderDoc's quick start](https://github.com/baldurk/renderdoc/blob/v1.46/docs/getting_started/quick_start.rst) describes its separate launch/capture/inspection workflow. Open finalized `.rdc` files in qrenderdoc; `renderdoccmd replay --loops 1 <file.rdc>` is the verified D3D12 CLI replay alternative. Native tool frame numbers are not Sparkle FrameIds.

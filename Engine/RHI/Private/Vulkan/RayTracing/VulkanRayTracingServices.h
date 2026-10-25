@@ -1,8 +1,8 @@
 #pragma once
 
 #include "RayTracing/RhiRayTracingService.h"
-#include "Vulkan/RayTracing/VulkanClassicTlasServices.h"
-#include "Vulkan/RayTracing/VulkanPartitionedTlasServices.h"
+#include "Vulkan/RayTracing/VulkanTlasServices.h"
+#include "Vulkan/RayTracing/VulkanPtlasServices.h"
 #include "Vulkan/VulkanIncludes.h"
 
 #include <memory>
@@ -17,18 +17,16 @@ class VulkanRayTracingServices final : public RhiRayTracingService
 public:
 	VulkanRayTracingServices(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept;
 
-	RhiClassicTlasService& GetClassicTlasService() noexcept override;
-	const RhiClassicTlasService& GetClassicTlasService() const noexcept override;
-	RhiPartitionedTlasService& GetPartitionedTlasService() noexcept override;
-	const RhiPartitionedTlasService& GetPartitionedTlasService() const noexcept override;
+	RhiTlasService& GetTlasService() noexcept override;
+	const RhiTlasService& GetTlasService() const noexcept override;
+	RhiPtlasService& GetPtlasService() noexcept override;
+	const RhiPtlasService& GetPtlasService() const noexcept override;
 	RhiRayTracingCapabilities GetCapabilities() const noexcept;
 	RhiRayTracingAccelerationStructurePrebuildInfo GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept override;
-	RhiRayTracingAccelerationStructurePrebuildInfo GetTopLevelAccelerationStructurePrebuildInfo(
-	    std::uint32_t instanceCount,
-	    ERhiClassicTlasBuildFlags buildFlags = ERhiClassicTlasBuildFlags::None) const noexcept override;
-	RhiPartitionedTlasBuildSizes GetPartitionedTopLevelAccelerationStructureBuildSizes(const RhiPartitionedTlasDesc& desc) const noexcept override;
-	RhiOwnedResourceHandle CreatePartitionedTopLevelAccelerationStructureBuffer(const RhiPartitionedTlasBuildSizes& sizes, std::wstring_view debugName) override;
-	RhiOwnedResourceHandle CreatePartitionedTopLevelAccelerationStructureOperationBuffer(const RhiPartitionedTlasOperationPackDesc& operationPack, std::wstring_view debugName) override;
+	RhiRayTracingAccelerationStructurePrebuildInfo GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags = ERhiTlasBuildFlags::None) const noexcept override;
+	RhiPtlasBuildSizes GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept override;
+	RhiOwnedResourceHandle CreatePtlasBuffer(const RhiPtlasBuildSizes& sizes, std::wstring_view debugName) override;
+	RhiOwnedResourceHandle CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName) override;
 	RhiOwnedResourceHandle CreateScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName);
 	RhiOwnedResourceHandle CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName) override;
 	RhiOwnedResourceHandle CreateAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName);
@@ -43,6 +41,6 @@ private:
 
 	VulkanRhi* m_rhi = nullptr;
 	VulkanGpuMemoryAllocator* m_memoryAllocator = nullptr;
-	VulkanClassicTlasServices m_classicTlasServices;
-	VulkanPartitionedTlasServices m_partitionedTlasServices;
+	VulkanTlasServices m_tlasServices;
+	VulkanPtlasServices m_ptlasServices;
 };

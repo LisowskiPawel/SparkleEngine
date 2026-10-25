@@ -5,21 +5,21 @@
 #include <array>
 #include <cstdint>
 
-struct RhiClassicTlasCapabilities
+struct RhiTlasCapabilities
 {
-	bool SupportsClassicTlasBuild = false;
-	bool SupportsClassicTlasUpdate = false;
+	bool SupportsTlasBuild = false;
+	bool SupportsTlasUpdate = false;
 	bool SupportsGpuReadableInstanceBuffer = false;
 	std::uint32_t InstanceDescSizeInBytes = 0;
 };
 
-enum class ERhiClassicTlasBuildFlags : std::uint8_t
+enum class ERhiTlasBuildFlags : std::uint8_t
 {
 	None = 0,
 	AllowUpdate = 1 << 0,
 };
 
-enum class ERhiClassicTlasBuildMode : std::uint8_t
+enum class ERhiTlasBuildMode : std::uint8_t
 {
 	Build,
 	BuildAllowUpdate,
@@ -34,12 +34,12 @@ enum class RhiRayTracingInstanceFlags : std::uint8_t
 	ForceNonOpaque = 1 << 2,
 };
 
-constexpr ERhiClassicTlasBuildFlags operator|(ERhiClassicTlasBuildFlags lhs, ERhiClassicTlasBuildFlags rhs) noexcept
+constexpr ERhiTlasBuildFlags operator|(ERhiTlasBuildFlags lhs, ERhiTlasBuildFlags rhs) noexcept
 {
-	return static_cast<ERhiClassicTlasBuildFlags>(static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs));
+	return static_cast<ERhiTlasBuildFlags>(static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs));
 }
 
-constexpr bool HasFlag(ERhiClassicTlasBuildFlags flags, ERhiClassicTlasBuildFlags flag) noexcept
+constexpr bool HasFlag(ERhiTlasBuildFlags flags, ERhiTlasBuildFlags flag) noexcept
 {
 	return (static_cast<std::uint8_t>(flags) & static_cast<std::uint8_t>(flag)) != 0;
 }

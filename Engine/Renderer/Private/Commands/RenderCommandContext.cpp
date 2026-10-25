@@ -270,29 +270,29 @@ void RenderCommandContext::BuildBottomLevelAccelerationStructure(const RhiRayTra
 	Diagnostics::Fatal(g_renderCommandContextLogger, __FILE__, __LINE__, "BLAS build has no active render command list.");
 }
 
-void RenderCommandContext::BuildTopLevelAccelerationStructure(
+void RenderCommandContext::BuildTlas(
     RhiGpuVirtualAddress instanceDescsGpuAddress,
     std::uint32_t instanceCount,
     RhiGpuVirtualAddress scratchGpuAddress,
     RhiGpuVirtualAddress resultGpuAddress,
-    ERhiClassicTlasBuildMode buildMode) noexcept
+    ERhiTlasBuildMode buildMode) noexcept
 {
 	if (m_commandList != nullptr)
 	{
-		m_commandList->BuildTopLevelAccelerationStructure(instanceDescsGpuAddress, instanceCount, scratchGpuAddress, resultGpuAddress, buildMode);
+		m_commandList->BuildTlas(instanceDescsGpuAddress, instanceCount, scratchGpuAddress, resultGpuAddress, buildMode);
 		return;
 	}
-	Diagnostics::Fatal(g_renderCommandContextLogger, __FILE__, __LINE__, "Classic TLAS build has no active render command list.");
+	Diagnostics::Fatal(g_renderCommandContextLogger, __FILE__, __LINE__, "TLAS build has no active render command list.");
 }
 
-void RenderCommandContext::BuildPartitionedTopLevelAccelerationStructure(const RhiPartitionedTlasBuildCommandDesc& desc) noexcept
+void RenderCommandContext::BuildPtlas(const RhiPtlasBuildCommandDesc& desc) noexcept
 {
 	if (m_commandList != nullptr)
 	{
-		m_commandList->BuildPartitionedTopLevelAccelerationStructure(desc);
+		m_commandList->BuildPtlas(desc);
 		return;
 	}
-	Diagnostics::Fatal(g_renderCommandContextLogger, __FILE__, __LINE__, "Partitioned TLAS build has no active render command list.");
+	Diagnostics::Fatal(g_renderCommandContextLogger, __FILE__, __LINE__, "PTLAS build has no active render command list.");
 }
 
 void RenderCommandContext::TrackResource(RhiResourceHandle resource) noexcept

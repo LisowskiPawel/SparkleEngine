@@ -428,10 +428,7 @@ VkImageAspectFlags VulkanTypeConversions::ResolveAspectMask(PixelFormat format) 
 	Diagnostics::Fatal(g_vulkanTypeConversionsLogger, __FILE__, __LINE__, "Cannot resolve an aspect mask for an unknown Vulkan format.");
 }
 
-void VulkanTypeConversions::ConfigurePartitionedTlasInput(
-    const RhiPartitionedTlasDesc& desc,
-    VkPartitionedAccelerationStructureInstancesInputNV& input,
-    VkPartitionedAccelerationStructureFlagsNV& flags) noexcept
+void VulkanTypeConversions::ConfigurePtlasInput(const RhiPtlasDesc& desc, VkPartitionedAccelerationStructureInstancesInputNV& input, VkPartitionedAccelerationStructureFlagsNV& flags) noexcept
 {
 	flags = VkPartitionedAccelerationStructureFlagsNV{
 	    .sType = VK_STRUCTURE_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_FLAGS_NV,

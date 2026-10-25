@@ -6,6 +6,8 @@
 
 **Verified:** 2026-09-06 against committed `master` revision `d236da11`; `Engine/Renderer` and `Engine/RHI` are unchanged from the earlier `8414b5dc` source audit
 
+**Scoped source reconciliation:** 2026-10-25 for TLAS/PTLAS management and shared scene inputs. The acceleration contract below reflects the current owners; this does not update the wider evidence or readiness verdict.
+
 **Scope:** `REN-RT-01` through `REN-RT-06`, the ray portions of `REN-FRONT-02` through `REN-FRONT-04`, and `REN-LGT-02` through `REN-LGT-04`; defines current acceleration-scene, traversal-frontend, shader-table, and effect coverage
 
 **Current readiness:** **40/100** — acceleration, inline, native-pipeline, and selection source routes exist but are capability-gated; effect/backend/content parity, failure, lifetime, memory, quality, and cost proof is absent. See [Current Feature Readiness](../../../../../../Acceptance/CurrentReadiness.md#renderer).
@@ -14,7 +16,7 @@
 
 | Layer | Current route | Critical limit |
 | --- | --- | --- |
-| geometry acceleration | triangle BLAS cache; classic TLAS plus restricted capability-gated PTLAS strategy | deforming BLAS rebuild rather than a proved update/refit strategy |
+| geometry acceleration | triangle BLAS cache; TLAS plus restricted capability-gated PTLAS strategy | deforming BLAS rebuild rather than a proved update/refit strategy |
 | traversal frontends | inline ray query and native ray pipeline where exact capabilities/programs exist | effects do not all implement both frontends |
 | shader-table mapping | checked Renderer plan maps logical scene/hit/material identity to native records | mapping and retirement remain unproved under churn |
 | primary visibility | raster or ray GBuffer share one deferred material-result contract | raster/ray semantic parity is unproved |
@@ -49,15 +51,19 @@ Ray tracing is capability-gated. Source contains D3D12 and Vulkan acceleration s
 | --- | --- | --- |
 | Static BLAS | cached triangle BLAS derived from resident GPU meshes | one indexed triangle-geometry contract per public description; cache correctness/retirement unproved |
 | Deforming BLAS | current skinned/morphed geometry rebuilt for ray use | public Renderer refit/update producer not found; do not claim deforming BLAS refit |
-| Classic TLAS | per-view instance build; optional `r.RayTracing.Tlas.Refit` after initial build | transform/identity/update parity needs evidence |
-| Partitioned TLAS | provider/capability-gated 3D partition plan | current strategy disables instance updates and partition translation and emits at most one operation |
-| Shared identity | classic/PTLAS instances derive from prepared scene and GPU-scene hit records | no independent effect-specific scene/material copy is intended |
+| TLAS | per-view instance build; optional `r.RayTracing.Tlas.Refit` after a recorded nonempty build with the same instance count and update-capable storage | first build, count change, storage replacement, or update-policy change requires a build; broader transform/identity/update parity needs evidence |
+| PTLAS | provider/capability-gated XZ grid with a separate global partition | full build with one instance-write operation; instance-update and partition-translation operations remain disabled |
+| Shared identity | one prepared `rayTracingInstances` list feeds both strategies, partition planning, and GPU-scene hit records | `RayTracingShaderTablePlan` remains the shared contribution authority; no strategy-specific admission list |
 
 The frame graph reserves a persistent `SceneTlas`, declares `RayTracingSceneBuild`, and binds the current native TLAS before graph execution. Traceable instances without matching hit-instance/material records are a fatal contract violation.
 
+TLAS preparation preserves proof of the last recorded build while its storage and update policy remain valid. PTLAS preparation allocates storage and scratch before graph binding; recording consumes those same resources. Sufficient allocated instance and local/global occupancy capacities are retained across smaller plans. The native partition count covers the regular grid only; global writes use `RhiPtlasGlobalPartitionIndex`, independently of the planner's logical bucket index. Empty and all-global plans retain a legal nonzero regular-partition capacity.
+
+The current PTLAS path can be selected on D3D12 through NVAPI or on Vulkan through `VK_NV_partitioned_acceleration_structure` when the native provider, descriptor access, and required operations are available. Vulkan descriptor eligibility requires the enabled feature and loaded size/build functions. This is the existing full-build subset, not qualification of the incremental support target below.
+
 ## Selected PTLAS Support Delivery
 
-[PTLAS target](PartitionedTlas/PtlasDesign.md) and [PTLAS-S0..5](PartitionedTlas/ImplementationPlan.md) own required later sparse writes, migration, legal BLAS/SBT replacement and partition translation. Current narrow AC-RT/source limits and first-release experimental disposition remain unchanged until observed proof supports promotion. A target selection is not support evidence.
+[PTLAS target](Ptlas/PtlasDesign.md) and [PTLAS-S0..5](Ptlas/ImplementationPlan.md) own required later sparse writes, migration, legal BLAS/SBT replacement and partition translation. Current narrow AC-RT/source limits and first-release experimental disposition remain unchanged until observed proof supports promotion. A target selection is not support evidence.
 
 ## Traversal Coverage
 
@@ -94,7 +100,7 @@ PTLAS selection likewise depends on the provider and advertised operation suppor
 ## Intent And Tradeoffs
 
 - One semantic effect above thin traversal adapters avoids duplicated GBuffer/shadow meaning. It requires parity evidence at raw outputs, alpha decisions, miss behavior, and motion/deformation edges.
-- One shared prepared/GPU scene keeps raster, inline, pipeline, classic, and PTLAS identity coherent. It concentrates lifetime and SBT-index correctness in a few critical owners.
+- One shared prepared/GPU scene keeps raster, inline, pipeline, TLAS, and PTLAS identity coherent. It concentrates lifetime and SBT-index correctness in a few critical owners.
 - Stable checked SBT planning prevents material-value churn from rebuilding logical record layout. It introduces an explicit generation dependency when geometry/hit-group meaning changes.
 - Rebuilding deforming BLAS is a clear current policy but can be expensive; performance must be measured before introducing update/refit complexity.
 - Vendor PTLAS is isolated behind RHI provider capabilities while Renderer owns partition policy. This preserves the boundary but creates an intentionally asymmetric optional path.
@@ -108,9 +114,9 @@ PTLAS selection likewise depends on the provider and advertised operation suppor
 
 ## Acceptance Criteria
 
-- `AC-RT-01` — static, instanced, alpha-tested, double-sided, skinned, morphed, moved, removed, and reloaded triangle instances preserve one scene/hit/material identity through BLAS, classic/PTLAS, inline, pipeline, and retirement where each cell is supported.
+- `AC-RT-01` — static, instanced, alpha-tested, double-sided, skinned, morphed, moved, removed, and reloaded triangle instances preserve one scene/hit/material identity through BLAS, TLAS/PTLAS, inline, pipeline, and retirement where each cell is supported.
 - `AC-RT-02` — static BLAS reuse occurs only while geometry identity is unchanged; deforming geometry rebuild is reported as rebuild and produces current positions without being mislabeled refit/update.
-- `AC-RT-03` — classic TLAS initial build and enabled refit/update preserve transforms, instance IDs, masks, and shader-table contribution; unsupported update conditions rebuild or reject explicitly.
+- `AC-RT-03` — TLAS initial build and enabled refit/update preserve transforms, instance IDs, masks, and shader-table contribution; unsupported update conditions rebuild or reject explicitly.
 - `AC-RT-04` — PTLAS activates only when the provider supports the exact requested operations; the current one-operation/no-instance-update/no-translation limit is enforced and visible.
 - `AC-RT-05` — SBT indices for the shared Surface ray type and every opaque/alpha-tested geometry fall within the planned record count, point to the intended hit group/local data, and invalidate only on layout-semantic changes.
 - `AC-RT-06` — every dual-frontend effect uses the one automatic resolver; Pipeline is selected when complete, Inline is selected otherwise when complete, and neither route schedules when shared requirements are unavailable.
@@ -126,7 +132,7 @@ PTLAS selection likewise depends on the provider and advertised operation suppor
 | `FM-RT-01` | selected automatic frontend is missing one required program/SBT dependency | graph construction rejects before trace dispatch; it does not add an effect-local fallback or setting | `AC-RT-06`, `AC-RT-08` |
 | `FM-RT-02` | SBT contribution/index/count mismatch or stale plan generation | validation rejects before table publication/dispatch; prior valid generation remains isolated | `AC-RT-05`, `AC-RT-08`, `AC-RT-09` |
 | `FM-RT-03` | traceable instance lacks matching hit/material/texture record | GPU-scene/graph binding fails; no plausible hit shading is published | `AC-RT-01`, `AC-RT-08` |
-| `FM-RT-04` | request unsupported PTLAS update/translation or overflow operation plan | PTLAS remains inactive/rejected with exact operation reason; no silent classic/PTLAS claim swap | `AC-RT-04`, `AC-RT-06` |
+| `FM-RT-04` | request unsupported PTLAS update/translation or overflow operation plan | PTLAS remains inactive/rejected with exact operation reason; no silent TLAS/PTLAS claim swap | `AC-RT-04`, `AC-RT-06` |
 | `FM-RT-05` | geometry/material/scene changes while old work is in flight | new generation binds only new state; old resources retire after every queue token | `AC-RT-01`, `AC-RT-09` |
 | `FM-RT-06` | frontend/backend differs at alpha, miss, bias, or deformation edge | parity oracle fails and holds only the affected cell with artifacts retained | `AC-RT-07`, `AC-RT-10` |
 
@@ -134,7 +140,7 @@ PTLAS selection likewise depends on the provider and advertised operation suppor
 
 | Check | Exercise and oracle | Covers |
 | --- | --- | --- |
-| `CHK-RT-01` | deterministic scene-identity/BLAS/TLAS matrix over static/deforming/add/move/remove/reload, classic refit on/off, and PTLAS capability/operation limits | `AC-RT-01`–`AC-RT-04`; `FM-RT-03`, `FM-RT-04` |
+| `CHK-RT-01` | deterministic scene-identity/BLAS/TLAS matrix over static/deforming/add/move/remove/reload, TLAS refit on/off, and PTLAS capability/operation limits | `AC-RT-01`–`AC-RT-04`; `FM-RT-03`, `FM-RT-04` |
 | `CHK-RT-02` | enumerate planned SBT records and recompute every logical index; corrupt contribution/count/generation and require pre-dispatch rejection | `AC-RT-05`, `AC-RT-08`; `FM-RT-02` |
 | `CHK-RT-03` | capability matrix for the shared automatic resolver plus dual-frontend GBuffer, shadow, and Reference consumers and explicit Inline-only ReSTIR-indirect cells; compare raw outputs | `AC-RT-06`–`AC-RT-08`; `FM-RT-01`, `FM-RT-06` |
 | `CHK-RT-04` | churn geometry, shader/SBT, graph, resize, reload, and shutdown while frames are in flight; inspect bindings, queue tokens, retained generations, and reclamation | `AC-RT-09`; `FM-RT-05` |
@@ -146,7 +152,7 @@ This current contract is **defined but unproved**. The target [Execution Archite
 
 - [`RenderRayTracingScene.cpp`](../../../../../../../Engine/Renderer/Private/Scene/RayTracing/RenderRayTracingScene.cpp)
 - [`RayTracingScenePass.cpp`](../../../../../../../Engine/Renderer/Private/Passes/Scene/RayTracingScenePass.cpp)
-- [`RayTracingBlasCache.cpp`](../../../../../../../Engine/Renderer/Private/RayTracing/Acceleration/RayTracingBlasCache.cpp), [`RayTracingClassicTlasStrategy.cpp`](../../../../../../../Engine/Renderer/Private/RayTracing/Acceleration/RayTracingClassicTlasStrategy.cpp), and the adjacent PTLAS strategy owners
+- [`RayTracingBlasCache.cpp`](../../../../../../../Engine/Renderer/Private/RayTracing/Acceleration/RayTracingBlasCache.cpp), [`RayTracingTlasStrategy.cpp`](../../../../../../../Engine/Renderer/Private/RayTracing/Acceleration/RayTracingTlasStrategy.cpp), and the adjacent PTLAS strategy owners
 - [`RayTracingShaderTablePlan.cpp`](../../../../../../../Engine/Renderer/Private/Scene/RayTracing/RayTracingShaderTablePlan.cpp)
 - [`RayTracingGBufferMesh.cpp`](../../../../../../../Engine/Renderer/Private/Passes/GBuffer/RayTracing/RayTracingGBufferMesh.cpp)
 - [`DirectShadowSignal.cpp`](../../../../../../../Engine/Renderer/Private/Passes/Lighting/Shadows/DirectShadowSignal.cpp)

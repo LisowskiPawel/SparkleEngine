@@ -1,6 +1,6 @@
 #include "Vulkan/VulkanPCH.h"
 
-#include "Vulkan/RayTracing/VulkanClassicTlasServices.h"
+#include "Vulkan/RayTracing/VulkanTlasServices.h"
 
 #include "Memory/RhiMemoryTypes.h"
 #include "Resources/RhiResourceDesc.h"
@@ -36,15 +36,13 @@ public:
 	}
 };
 
-VulkanClassicTlasServices::VulkanClassicTlasServices(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept :
+VulkanTlasServices::VulkanTlasServices(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept :
     m_rhi(&rhi),
     m_memoryAllocator(&memoryAllocator)
 {
 }
 
-RhiRayTracingAccelerationStructurePrebuildInfo VulkanClassicTlasServices::GetClassicTopLevelAccelerationStructurePrebuildInfo(
-    std::uint32_t instanceCount,
-    ERhiClassicTlasBuildFlags buildFlags) const noexcept
+RhiRayTracingAccelerationStructurePrebuildInfo VulkanTlasServices::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
 {
 	if (m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure || m_rhi->GetAccelerationStructureBuildSizes() == nullptr)
 	{
@@ -66,7 +64,7 @@ RhiRayTracingAccelerationStructurePrebuildInfo VulkanClassicTlasServices::GetCla
 	    .flags = VK_GEOMETRY_OPAQUE_BIT_KHR};
 
 	const VkBuildAccelerationStructureFlagsKHR nativeBuildFlags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR
-	    | (HasFlag(buildFlags, ERhiClassicTlasBuildFlags::AllowUpdate) ? VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR : static_cast<VkBuildAccelerationStructureFlagsKHR>(0));
+	    | (HasFlag(buildFlags, ERhiTlasBuildFlags::AllowUpdate) ? VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR : static_cast<VkBuildAccelerationStructureFlagsKHR>(0));
 
 	const VkAccelerationStructureBuildGeometryInfoKHR buildInfo{
 	    .sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR,
@@ -90,10 +88,7 @@ RhiRayTracingAccelerationStructurePrebuildInfo VulkanClassicTlasServices::GetCla
 	    .UpdateScratchDataSizeInBytes = nativeInfo.updateScratchSize};
 }
 
-RhiOwnedResourceHandle VulkanClassicTlasServices::CreateClassicTopLevelAccelerationStructureInstanceBuffer(
-    const RhiRayTracingInstanceDesc* instances,
-    std::uint32_t instanceCount,
-    std::wstring_view debugName)
+RhiOwnedResourceHandle VulkanTlasServices::CreateTlasInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
 	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure || !RhiContract::IsRayTracingInstanceListUsable(instances, instanceCount))
 	{
@@ -127,7 +122,7 @@ RhiOwnedResourceHandle VulkanClassicTlasServices::CreateClassicTopLevelAccelerat
 	    bufferCreateInfo,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::HostUpload,
-	    debugName.empty() ? L"RayTracingClassicTlasInstanceBuffer" : debugName);
+	    debugName.empty() ? L"RayTracingTlasInstanceBuffer" : debugName);
 
 	if (record == nullptr || record->Buffer == VK_NULL_HANDLE || !m_memoryAllocator->WriteAllocation(*record, nativeInstances.data(), static_cast<std::size_t>(sizeInBytes)))
 	{

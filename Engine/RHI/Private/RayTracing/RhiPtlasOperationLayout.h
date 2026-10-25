@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RayTracing/RhiPartitionedTlasDesc.h"
+#include "RayTracing/RhiPtlasDesc.h"
 
 #include <cstdint>
 
-struct RhiPartitionedTlasNativeOperationLayout final
+struct RhiPtlasNativeOperationLayout final
 {
 	std::uint64_t OperationCountSizeInBytes = 0;
 	std::uint64_t OperationHeaderStrideInBytes = 0;
@@ -18,22 +18,22 @@ struct RhiPartitionedTlasNativeOperationLayout final
 	std::uint64_t BufferAlignmentInBytes = 0;
 };
 
-class RhiPartitionedTlasOperationLayout final
+class RhiPtlasOperationLayout final
 {
 public:
-	static RhiPartitionedTlasOperationBufferLayout Build(
+	static RhiPtlasOperationBufferLayout Build(
 	    std::uint32_t operationCount,
 	    std::uint32_t instanceWriteCount,
 	    std::uint32_t instanceUpdateCount,
 	    std::uint32_t partitionTranslationCount,
-	    const RhiPartitionedTlasNativeOperationLayout& nativeLayout) noexcept;
+	    const RhiPtlasNativeOperationLayout& nativeLayout) noexcept;
 
 	static RhiGpuVirtualAddress ResolveArgumentAddress(
-	    const RhiPartitionedTlasOperationHeader& operation,
+	    const RhiPtlasOperationHeader& operation,
 	    RhiGpuVirtualAddress instanceWriteAddress,
 	    RhiGpuVirtualAddress instanceUpdateAddress,
 	    RhiGpuVirtualAddress partitionTranslationAddress) noexcept;
-	static std::uint64_t ResolveArgumentStride(const RhiPartitionedTlasOperationHeader& operation, const RhiPartitionedTlasNativeOperationLayout& nativeLayout) noexcept;
+	static std::uint64_t ResolveArgumentStride(const RhiPtlasOperationHeader& operation, const RhiPtlasNativeOperationLayout& nativeLayout) noexcept;
 
 	static std::uint64_t AlignUp(std::uint64_t value, std::uint64_t alignment) noexcept;
 };

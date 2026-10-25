@@ -7,11 +7,11 @@
 
 struct RayTracingProviderMetrics final
 {
-	ERhiRayTracingTopLevelProvider TopLevelProvider = ERhiRayTracingTopLevelProvider::None;
-	const char* TopLevelProviderReason = "not-queried";
-	ERhiPartitionedTlasProvider PartitionedTlasProvider = ERhiPartitionedTlasProvider::None;
-	bool SupportsPartitionedTlas = false;
-	const char* PartitionedTlasCapabilityReason = "not-queried";
+	ERhiRayTracingTlasProvider TlasProvider = ERhiRayTracingTlasProvider::None;
+	const char* TlasProviderReason = "not-queried";
+	ERhiPtlasProvider PtlasProvider = ERhiPtlasProvider::None;
+	bool SupportsPtlas = false;
+	const char* PtlasCapabilityReason = "not-queried";
 };
 
 struct RayTracingPerformanceMetrics final

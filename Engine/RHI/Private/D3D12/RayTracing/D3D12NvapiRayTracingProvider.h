@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RayTracing/RhiPartitionedTlasDesc.h"
+#include "RayTracing/RhiPtlasDesc.h"
 
 #include <cstdint>
 #include <string_view>
@@ -19,9 +19,9 @@ public:
 	D3D12NvapiRayTracingProvider(D3D12NvapiRayTracingProvider&&) = delete;
 	D3D12NvapiRayTracingProvider& operator=(D3D12NvapiRayTracingProvider&&) = delete;
 
-	RhiPartitionedTlasCapabilities QueryPartitionedTlasCapabilities(ID3D12Device10* device, bool runsOnNvidiaDevice, bool supportsAccelerationStructure) const noexcept;
-	RhiPartitionedTlasBuildSizes GetPartitionedTlasBuildSizes(ID3D12Device10* device, const RhiPartitionedTlasDesc& desc) const noexcept;
-	bool BuildPartitionedTlas(ID3D12GraphicsCommandList7* commandList, const RhiPartitionedTlasBuildCommandDesc& desc) const noexcept;
+	RhiPtlasCapabilities QueryPtlasCapabilities(ID3D12Device10* device, bool runsOnNvidiaDevice, bool supportsAccelerationStructure) const noexcept;
+	RhiPtlasBuildSizes GetPtlasBuildSizes(ID3D12Device10* device, const RhiPtlasDesc& desc) const noexcept;
+	bool BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept;
 
 	bool IsRuntimeInitialized() const noexcept;
 	const char* GetRuntimeStatusReason() const noexcept;

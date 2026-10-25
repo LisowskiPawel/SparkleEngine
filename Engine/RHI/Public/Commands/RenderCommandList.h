@@ -90,14 +90,14 @@ public:
 	virtual void TraceRays(const TraceRaysDesc& desc) noexcept = 0;
 	virtual void BuildBottomLevelAccelerationStructure(const RhiRayTracingGeometryDesc& geometry, RhiGpuVirtualAddress scratchGpuAddress, RhiGpuVirtualAddress resultGpuAddress) noexcept = 0;
 
-	virtual void BuildTopLevelAccelerationStructure(
+	virtual void BuildTlas(
 	    RhiGpuVirtualAddress instanceDescsGpuAddress,
 	    std::uint32_t instanceCount,
 	    RhiGpuVirtualAddress scratchGpuAddress,
 	    RhiGpuVirtualAddress resultGpuAddress,
-	    ERhiClassicTlasBuildMode buildMode = ERhiClassicTlasBuildMode::Build) noexcept = 0;
+	    ERhiTlasBuildMode buildMode = ERhiTlasBuildMode::Build) noexcept = 0;
 
-	virtual void BuildPartitionedTopLevelAccelerationStructure(const RhiPartitionedTlasBuildCommandDesc& desc) noexcept = 0;
+	virtual void BuildPtlas(const RhiPtlasBuildCommandDesc& desc) noexcept = 0;
 	virtual void CopyResource(RhiResourceHandle destinationResource, RhiResourceHandle sourceResource) noexcept = 0;
 	virtual void AliasResource(RhiResourceHandle beforeResource, RhiResourceHandle afterResource) noexcept = 0;
 	virtual void TransitionResource(RhiResourceHandle resource, ResourceState before, ResourceState after) noexcept = 0;

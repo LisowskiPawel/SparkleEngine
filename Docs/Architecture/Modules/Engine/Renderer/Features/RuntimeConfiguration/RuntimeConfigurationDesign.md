@@ -75,8 +75,8 @@ Application-private `EngineRenderingSettingsPersistence` owns 26 names under `/S
 | Ray reconstruction | `r.RayReconstruction.Mode` | Off | [reconstruction/upscaling](../PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#image-reconstruction-and-upscaling) provider stack; ReSTIR only; unavailable path resolves Off |
 | GBuffer | `r.GBuffer.Algorithm` | Rasterized | graph topology; the shared ray-tracing owner resolves the traversal frontend automatically when RayTracing is selected |
 | Mesh work | `r.MeshAutoBatching` | on | per-view raster batch construction |
-| Classic TLAS | `r.RayTracing.Tlas.Refit` | on | classic TLAS strategy after initial build |
-| PTLAS | `r.RayTracing.PreferPartitionedTlas`, `r.RayTracing.Ptlas.PartitionsPerAxis`, `r.RayTracing.Ptlas.PartitionUpdateMode`, `r.RayTracing.Ptlas.MarkAllDynamicInPartition`, `r.RayTracing.Ptlas.ModeChangeDistance` | off, 8, AlwaysUpdatePartition, false, 100 | RHI capability preference plus per-view partition planner; actual current execution remains the narrow one-operation/no-update/no-translation strategy |
+| TLAS | `r.RayTracing.Tlas.Refit` | on | TLAS strategy after initial build |
+| PTLAS | `r.RayTracing.PreferPtlas`, `r.RayTracing.Ptlas.PartitionsPerAxis`, `r.RayTracing.Ptlas.PartitionUpdateMode`, `r.RayTracing.Ptlas.MarkAllDynamicInPartition`, `r.RayTracing.Ptlas.ModeChangeDistance` | off, 8, AlwaysUpdatePartition, false, 100 | RHI capability preference plus per-view partition planner; actual current execution remains the narrow one-operation/no-update/no-translation strategy |
 
 The settings writer replaces only its owned INI section. Loading silently ignores names outside its allowlist and currently discards `TrySetValueFromString` error text; malformed persisted-value diagnostics remain a gap.
 

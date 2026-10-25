@@ -1,31 +1,31 @@
 #pragma once
 
 #include "RhiAccelerationStructureDesc.h"
-#include "RhiClassicTlasDesc.h"
-#include "RhiPartitionedTlasDesc.h"
+#include "RhiTlasDesc.h"
+#include "RhiPtlasDesc.h"
 #include "../RHIAPI.h"
 
 #include <cstdint>
 
 inline constexpr std::uint32_t kRhiRayTracingMaxPayloadSizeInBytes = 128;
 
-enum class ERhiRayTracingTopLevelProvider : std::uint8_t
+enum class ERhiRayTracingTlasProvider : std::uint8_t
 {
 	None,
-	ClassicTlas,
-	PartitionedTlas,
+	Tlas,
+	Ptlas,
 };
 
 struct RhiRayTracingProviderCapabilities
 {
-	ERhiRayTracingTopLevelProvider SelectedTopLevelProvider = ERhiRayTracingTopLevelProvider::None;
-	const char* SelectedTopLevelProviderReason = "not-queried";
+	ERhiRayTracingTlasProvider SelectedTlasProvider = ERhiRayTracingTlasProvider::None;
+	const char* SelectedTlasProviderReason = "not-queried";
 };
 
 struct RhiRayTracingCapabilityGroups
 {
-	RhiClassicTlasCapabilities ClassicTlas;
-	RhiPartitionedTlasCapabilities PartitionedTlas;
+	RhiTlasCapabilities Tlas;
+	RhiPtlasCapabilities Ptlas;
 	RhiRayTracingProviderCapabilities Provider;
 };
 
@@ -47,5 +47,5 @@ struct RhiRayTracingCapabilities
 	RhiRayTracingCapabilityGroups Groups;
 };
 
-SPARKLE_RHI_API const char* RhiRayTracingTopLevelProviderToString(ERhiRayTracingTopLevelProvider provider) noexcept;
+SPARKLE_RHI_API const char* RhiRayTracingTlasProviderToString(ERhiRayTracingTlasProvider provider) noexcept;
 SPARKLE_RHI_API void PopulateStandardRayTracingCapabilityGroups(RhiRayTracingCapabilities& capabilities) noexcept;

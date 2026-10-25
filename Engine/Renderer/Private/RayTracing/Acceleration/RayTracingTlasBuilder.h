@@ -13,16 +13,16 @@ class RayTracingBlasCache;
 struct MeshDraw;
 struct PreparedRenderScene;
 
-class RayTracingClassicTlasBuilder final
+class RayTracingTlasBuilder final
 {
 public:
-	explicit RayTracingClassicTlasBuilder(RenderHardwareInterface& renderHardwareInterface) noexcept;
-	~RayTracingClassicTlasBuilder() noexcept;
+	explicit RayTracingTlasBuilder(RenderHardwareInterface& renderHardwareInterface) noexcept;
+	~RayTracingTlasBuilder() noexcept;
 
-	RayTracingClassicTlasBuilder(const RayTracingClassicTlasBuilder&) = delete;
-	RayTracingClassicTlasBuilder& operator=(const RayTracingClassicTlasBuilder&) = delete;
-	RayTracingClassicTlasBuilder(RayTracingClassicTlasBuilder&&) = delete;
-	RayTracingClassicTlasBuilder& operator=(RayTracingClassicTlasBuilder&&) = delete;
+	RayTracingTlasBuilder(const RayTracingTlasBuilder&) = delete;
+	RayTracingTlasBuilder& operator=(const RayTracingTlasBuilder&) = delete;
+	RayTracingTlasBuilder(RayTracingTlasBuilder&&) = delete;
+	RayTracingTlasBuilder& operator=(RayTracingTlasBuilder&&) = delete;
 
 	void Prepare(std::uint32_t instanceCapacity) noexcept;
 	std::uint32_t Build(
@@ -40,9 +40,9 @@ private:
 	struct BuildState;
 
 	static std::uint64_t AlignRayTracingBufferSize(std::uint64_t sizeInBytes, std::uint64_t alignment) noexcept;
-	static bool SupportsClassicTlasRefit(RenderHardwareInterface& renderHardwareInterface) noexcept;
-	static ERhiClassicTlasBuildFlags ResolveClassicTlasBuildFlags(RenderHardwareInterface& renderHardwareInterface) noexcept;
-	static std::uint64_t ResolveScratchSize(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, ERhiClassicTlasBuildFlags buildFlags) noexcept;
+	static bool SupportsTlasRefit(RenderHardwareInterface& renderHardwareInterface) noexcept;
+	static ERhiTlasBuildFlags ResolveTlasBuildFlags(RenderHardwareInterface& renderHardwareInterface) noexcept;
+	static std::uint64_t ResolveScratchSize(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, ERhiTlasBuildFlags buildFlags) noexcept;
 	static RhiRayTracingInstanceFlags ResolveInstanceFlags(const PreparedRenderScene& preparedScene, const MeshDraw& draw) noexcept;
 	static void CollectInstances(
 	    RenderCommandContext& commandContext,
@@ -55,7 +55,7 @@ private:
 	void RecordBuild(RenderCommandContext& commandContext, const BuildState& state, RayTracingPerformanceDiagnostics* diagnostics) const noexcept;
 	void TrackBuildResources(RenderCommandContext& commandContext) const noexcept;
 	void ReleaseResources() noexcept;
-	void EnsureResources(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, ERhiClassicTlasBuildFlags buildFlags) noexcept;
+	void EnsureResources(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, ERhiTlasBuildFlags buildFlags) noexcept;
 
 	RenderHardwareInterface& m_renderHardwareInterface;
 	RhiOwnedResourceHandle m_instanceBuffer = {};

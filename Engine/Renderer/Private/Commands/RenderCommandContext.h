@@ -82,13 +82,13 @@ public:
 	void Dispatch(std::uint32_t groupCountX, std::uint32_t groupCountY, std::uint32_t groupCountZ) noexcept;
 	void TraceRays(const TraceRaysDesc& desc) noexcept;
 	void BuildBottomLevelAccelerationStructure(const RhiRayTracingGeometryDesc& geometry, RhiGpuVirtualAddress scratchGpuAddress, RhiGpuVirtualAddress resultGpuAddress) noexcept;
-	void BuildTopLevelAccelerationStructure(
+	void BuildTlas(
 	    RhiGpuVirtualAddress instanceDescsGpuAddress,
 	    std::uint32_t instanceCount,
 	    RhiGpuVirtualAddress scratchGpuAddress,
 	    RhiGpuVirtualAddress resultGpuAddress,
-	    ERhiClassicTlasBuildMode buildMode = ERhiClassicTlasBuildMode::Build) noexcept;
-	void BuildPartitionedTopLevelAccelerationStructure(const RhiPartitionedTlasBuildCommandDesc& desc) noexcept;
+	    ERhiTlasBuildMode buildMode = ERhiTlasBuildMode::Build) noexcept;
+	void BuildPtlas(const RhiPtlasBuildCommandDesc& desc) noexcept;
 	void TrackResource(RhiResourceHandle resource) noexcept;
 	bool SupportsDiagnosticScopes() const noexcept;
 	void BeginDiagnosticScope(std::string_view label, RhiDiagnosticLabelColor color = {}) noexcept;

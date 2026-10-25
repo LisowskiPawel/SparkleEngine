@@ -89,7 +89,7 @@ The paired contract covers:
 - descriptors, resource views, samplers, binding layouts, graphics/compute pipelines;
 - graphics, compute, and copy recording/submission;
 - explicit transitions, UAV barriers, draw, dispatch, and copy;
-- classic BLAS/TLAS, capability-gated partitioned TLAS, inline ray queries, and capability-gated native ray-tracing pipelines, shader tables, and trace dispatch;
+- TLAS BLAS/TLAS, capability-gated PTLAS, inline ray queries, and capability-gated native ray-tracing pipelines, shader tables, and trace dispatch;
 - presentation, capture, timestamps, debug markers/messages, and memory diagnostics;
 - native device, queue, command-list, and resource interop through neutral handles.
 

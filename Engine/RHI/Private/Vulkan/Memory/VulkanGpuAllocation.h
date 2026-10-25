@@ -31,7 +31,7 @@ struct VulkanGpuAllocationRecord final
 	VkDeviceAddress DeviceAddress = 0;
 	VkDeviceAddress BufferDeviceAddress = 0;
 	VkAccelerationStructureTypeKHR AccelerationStructureType = VK_ACCELERATION_STRUCTURE_TYPE_MAX_ENUM_KHR;
-	bool IsPartitionedAccelerationStructure = false;
+	bool IsPtlas = false;
 	VmaAllocation_T* Allocation = nullptr;
 	VulkanGpuMemoryBlockRecord* ParentMemoryBlock = nullptr;
 	VulkanGpuAllocationResourceKind ResourceKind = VulkanGpuAllocationResourceKind::Unknown;

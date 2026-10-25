@@ -14,7 +14,7 @@ ConsoleVariable<bool> CVarRendererDiagnosticGpuTiming(
     "Collect internal GPU timestamp timings from renderer diagnostic scopes. Profiler markers remain controlled by "
     "r.Diagnostics.MarkerVerbosity.");
 ConsoleVariable<bool> CVarRendererParallelFrameGraphRecording("r.FrameGraph.ParallelRecording", true, "Record compiled typed-shader frame-graph chunks through SparkleTasks.");
-ConsoleVariable<bool> CVarRayTracingClassicTlasRefit("r.RayTracing.Tlas.Refit", true, "Use classic TLAS refit/update after the initial full build when PTLAS is disabled.");
+ConsoleVariable<bool> CVarRayTracingTlasRefit("r.RayTracing.Tlas.Refit", true, "Use TLAS refit/update after the initial full build when PTLAS is disabled.");
 ConsoleVariable<std::uint32_t> CVarRayTracingPartitionsPerAxis("r.RayTracing.Ptlas.PartitionsPerAxis", 8u, "Logical ray tracing partition grid resolution per axis.");
 ConsoleVariable<RayTracingPtlasPartitionUpdateMode> CVarRayTracingPtlasPartitionUpdateMode(
     "r.RayTracing.Ptlas.PartitionUpdateMode",

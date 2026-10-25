@@ -342,16 +342,16 @@ void VulkanDescriptorAllocator::WriteAccelerationStructureDescriptor(VkDescripto
 	WriteEntries(descriptorSet, binding, std::span<const DescriptorEntry>(&entry, 1));
 }
 
-void VulkanDescriptorAllocator::WritePartitionedAccelerationStructureDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkDeviceAddress accelerationStructureAddress) noexcept
+void VulkanDescriptorAllocator::WritePtlasDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkDeviceAddress accelerationStructureAddress) noexcept
 {
 	if (descriptorSet == VK_NULL_HANDLE || accelerationStructureAddress == 0)
 	{
-		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan partitioned acceleration-structure binding requires a descriptor set and GPU address.");
+		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan PTLAS binding requires a descriptor set and GPU address.");
 	}
 
 	DescriptorEntry entry{};
-	entry.Kind = EntryKind::PartitionedAccelerationStructure;
-	entry.PartitionedAccelerationStructureAddress = accelerationStructureAddress;
+	entry.Kind = EntryKind::Ptlas;
+	entry.PtlasAddress = accelerationStructureAddress;
 	WriteEntries(descriptorSet, binding, std::span<const DescriptorEntry>(&entry, 1));
 }
 
@@ -371,7 +371,7 @@ VkDescriptorType VulkanDescriptorAllocator::ToDescriptorType(EntryKind kind) noe
 			return VK_DESCRIPTOR_TYPE_SAMPLER;
 		case EntryKind::AccelerationStructure:
 			return VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-		case EntryKind::PartitionedAccelerationStructure:
+		case EntryKind::Ptlas:
 			return VK_DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV;
 		case EntryKind::Empty:
 		default:
@@ -532,7 +532,7 @@ bool VulkanDescriptorAllocator::EntryKindMatchesBinding(const CompiledBinding& b
 		case ShaderParameterSemanticKind::SamplerSet:
 			return entryKind == EntryKind::Sampler;
 		case ShaderParameterSemanticKind::AccelerationStructure:
-			return entryKind == EntryKind::AccelerationStructure || entryKind == EntryKind::PartitionedAccelerationStructure;
+			return entryKind == EntryKind::AccelerationStructure || entryKind == EntryKind::Ptlas;
 		default:
 			return false;
 	}
@@ -566,8 +566,8 @@ bool VulkanDescriptorAllocator::BuildWriteChunk(std::span<const DescriptorEntry>
 				outChunk.AccelerationStructures[index] = entry.AccelerationStructure;
 				break;
 
-			case EntryKind::PartitionedAccelerationStructure:
-				outChunk.PartitionedAccelerationStructureAddresses[index] = entry.PartitionedAccelerationStructureAddress;
+			case EntryKind::Ptlas:
+				outChunk.PtlasAddresses[index] = entry.PtlasAddress;
 				break;
 
 			case EntryKind::UniformBuffer:
@@ -597,20 +597,19 @@ void VulkanDescriptorAllocator::CommitWriteChunk(
 	    .accelerationStructureCount = chunk.Count,
 	    .pAccelerationStructures = chunk.AccelerationStructures.data()};
 
-	const VkWriteDescriptorSetPartitionedAccelerationStructureNV partitionedAccelerationStructureWrite{
+	const VkWriteDescriptorSetPartitionedAccelerationStructureNV ptlasWrite{
 	    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_PARTITIONED_ACCELERATION_STRUCTURE_NV,
 	    .pNext = nullptr,
 	    .accelerationStructureCount = chunk.Count,
-	    .pAccelerationStructures = chunk.PartitionedAccelerationStructureAddresses.data()};
+	    .pAccelerationStructures = chunk.PtlasAddresses.data()};
 
 	const bool writesImages = entryKind == EntryKind::SampledImage || entryKind == EntryKind::StorageImage || entryKind == EntryKind::Sampler;
 	const bool writesBuffers = entryKind == EntryKind::UniformBuffer || entryKind == EntryKind::StorageBuffer;
 
 	const VkWriteDescriptorSet write{
 	    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-	    .pNext = entryKind == EntryKind::AccelerationStructure
-	        ? static_cast<const void*>(&accelerationStructureWrite)
-	        : (entryKind == EntryKind::PartitionedAccelerationStructure ? static_cast<const void*>(&partitionedAccelerationStructureWrite) : nullptr),
+	    .pNext = entryKind == EntryKind::AccelerationStructure ? static_cast<const void*>(&accelerationStructureWrite)
+	                                                           : (entryKind == EntryKind::Ptlas ? static_cast<const void*>(&ptlasWrite) : nullptr),
 	    .dstSet = descriptorSet,
 	    .dstBinding = binding.BindingPoint.Binding,
 	    .dstArrayElement = firstDescriptor,

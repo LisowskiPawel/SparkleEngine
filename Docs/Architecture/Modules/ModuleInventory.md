@@ -119,7 +119,7 @@ Every top-level implementation owner is routed above and has a source-depth capa
 | Claim or reviewer concern | Owning detail |
 | --- | --- |
 | D3D12/Vulkan coverage or parity | [RHI capability inventory](Engine/RHI/CapabilityInventory.md), [RHI feature dossiers](Engine/RHI/Features/RHIFeatureGuide.md), [graphics matrix](../CrossModule/GraphicsCoverageMatrix.md), and candidate evidence |
-| Ray tracing, inline/native pipelines, shader tables, classic/PTLAS | [Renderer ray-tracing dossier](Engine/Renderer/Features/RayTracing/RayTracingDesign.md), [RHI ray-tracing dossier](Engine/RHI/Features/PipelineAndExecution/PipelineAndExecutionDesign.md#ray-tracing), and [graphics traces](../CrossModule/FeatureExecutionTraces.md) |
+| Ray tracing, inline/native pipelines, shader tables, TLAS/PTLAS | [Renderer ray-tracing dossier](Engine/Renderer/Features/RayTracing/RayTracingDesign.md), [RHI ray-tracing dossier](Engine/RHI/Features/PipelineAndExecution/PipelineAndExecutionDesign.md#ray-tracing), and [graphics traces](../CrossModule/FeatureExecutionTraces.md) |
 | Bindless/material binding coverage | [graphics matrix](../CrossModule/GraphicsCoverageMatrix.md#binding-and-material-coverage) |
 | PBR/material/direct-light coverage | [Geometry, Materials, and GBuffer](Engine/Renderer/Features/GeometryAndResources/GeometryMaterialsAndGBuffer.md), [Direct Lighting](Engine/Renderer/Features/Lighting/DirectLighting/DirectLightingDesign.md), and the [exact inventory](Engine/Renderer/CapabilityInventory.md) |
 | Indirect-light/history/environment coverage | [Indirect Lighting and ReSTIR GI](Engine/Renderer/Features/Lighting/IndirectLighting/IndirectLightingDesign.md) and the [whole-frame route](Engine/Renderer/RenderingASparkleFrame.md) |
