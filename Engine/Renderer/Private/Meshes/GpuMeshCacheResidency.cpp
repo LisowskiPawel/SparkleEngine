@@ -26,11 +26,6 @@ const GpuMesh* GpuMeshCache::Resolve(GpuMeshHandle handle) const noexcept
 	return mesh != m_handles.end() ? mesh->second : nullptr;
 }
 
-std::size_t GpuMeshCache::GetCachedCount() const noexcept
-{
-	return m_cache.size();
-}
-
 bool GpuMeshCache::Contains(const Mesh& cpuMesh) const noexcept
 {
 	return m_sourceHandles.contains(&cpuMesh);

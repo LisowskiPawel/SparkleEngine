@@ -60,7 +60,7 @@ This promise currently covers opaque and alpha-tested static, instanced, skinned
 
 Raster GBuffer uses a bindful per-material layout for eight texture roles: base color, normal, roughness, metallic, ambient occlusion, emissive, subsurface color, and subsurface strength. Ray consumers use a fixed-capacity material texture descriptor array only when non-uniform indexing and partially-bound array capabilities are available and the capacity reaches 4096. This is bounded descriptor-array indexing, not engine-wide runtime-sized bindless.
 
-`r.Material.BindingMode` currently registers `RayTracingOnly` and `Everything` with `RayTracingOnly` as default, but the inspected CVar has no game consumer and the material-table capability report supports only `RayTracingOnly`. Treat `Everything` as unreachable vocabulary until the selector is either removed or connected to a defined producer/consumer/failure path.
+Material texture-table support is derived from RHI descriptor capabilities by `SupportsMaterialTextureTable`; there is no user binding-mode selector. The 2026-10-25 source cleanup removes the unused selector and report-only mode/path fields without changing the 4096-descriptor threshold or the indexing requirements. This is source evidence, not native rendering or backend-parity acceptance.
 
 ## GBuffer Products
 

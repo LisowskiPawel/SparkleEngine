@@ -171,18 +171,4 @@ namespace ECS
 		return written;
 	}
 
-	std::vector<SceneLightDesc> GameWorldState::CaptureLightsToDesc() const
-	{
-		std::vector<SceneLightDesc> lights;
-		lights.reserve(GetLightCount());
-		for (std::size_t index = 0; index < GetLightCount(); ++index)
-		{
-			if (std::optional<SceneLightDesc> light = ReadLight(GetLightEntity(index)))
-			{
-				lights.push_back(std::move(*light));
-			}
-		}
-		return lights;
-	}
-
 }

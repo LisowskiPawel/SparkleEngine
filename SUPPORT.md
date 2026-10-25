@@ -1,6 +1,6 @@
 # Using Sparkle
 
-[README](README.md)
+[SparkleEngine](https://github.com/stoleckipawel/SparkleEngine#readme)
 
 No user support service, response deadline or guaranteed fix is offered. Check [known issues](KNOWN_ISSUES.md) and [security](SECURITY.md).
 
@@ -42,7 +42,7 @@ The JSON contains product/build identity, incident category, error counts and di
 
 Optional `-NativePdbPath` checks matching native symbols; mismatches reject export. Ordinary packages have no automatic crash/hang collection or qualified shader-symbol correlation. Review any files you voluntarily share; raw dumps/captures may contain private data.
 
-For the opt-in source-only GPU crash variant, use the [launch and inspection route](Docs/Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#launch-and-inspection-route). It remains unqualified until GCD-4. The source export helper accepts `-GpuCrashManifestPath <incident.json>`; preview is sanitized metadata. Raw dump, NVIDIA debug data, source and symbols require their explicit category switches plus matching preview consent. Full symbols also require Source consent because they can embed source. Nothing is uploaded.
+The opt-in source-only GPU crash variant has its own [qualified candidate and launch/inspection route](https://github.com/stoleckipawel/SparkleEngine/blob/master/Docs/Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#launch-and-inspection-route). Ordinary packages do not include that variant. Its source export helper accepts `-GpuCrashManifestPath <incident.json>`; preview contains sanitized metadata. Raw dump, NVIDIA debug data, source and symbols each require category consent and the matching preview digest. Full symbols also require Source consent because they can embed source. Nothing is uploaded.
 
 ## Retention and replacement
 

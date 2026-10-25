@@ -84,10 +84,8 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 		mapped.PreferredIde = workspaceIde;
 		mapped.Compiler = workspaceCompiler;
 		mapped.SelectedScopes = ParseBuildScopes(request.BuildScopes);
-		mapped.SelectedTargets = SplitList(request.SelectedTargets);
 		mapped.SourceDependencyId = request.SourceDependencyId.toStdString();
 		mapped.HostToolId = request.HostToolId.toStdString();
-		mapped.ForceConfigure = request.ForceConfigure;
 		return mapped;
 	}
 
@@ -125,14 +123,8 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 		mapped.RepositoryRoot = request.RepositoryRoot;
 		mapped.ContentId = request.ContentId.toStdString();
 		mapped.GameProfile = request.GameProfile.toStdString();
-		mapped.Mode = request.ForceRecook ? CookMode::Force : CookMode::Incremental;
-		mapped.ForceRecookConfirmed = request.ConfirmForceRecook;
 		mapped.SelectedScopes = ParseCookScopes(request.CookScopes);
 		mapped.ShaderBackend = request.ShaderBackend.toStdString();
-		mapped.ShaderEnableDebugInfo = request.ShaderEnableDebugInfo;
-		mapped.ShaderEnableOptimizations = request.ShaderEnableOptimizations;
-		mapped.ShaderWarningsAsErrors = request.ShaderWarningsAsErrors;
-		mapped.ShaderStripDebugInfo = request.ShaderStripDebugInfo;
 		return mapped;
 	}
 

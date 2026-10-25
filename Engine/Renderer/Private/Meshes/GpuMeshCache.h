@@ -41,7 +41,6 @@ public:
 
 	const GpuMesh* Resolve(GpuMeshHandle handle) const noexcept;
 
-	std::size_t GetCachedCount() const noexcept;
 	bool Contains(const Mesh& cpuMesh) const noexcept;
 	const GpuMesh* Find(const Mesh& cpuMesh) const noexcept;
 

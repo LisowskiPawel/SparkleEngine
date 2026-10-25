@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FrameGraph/FrameGraphResourceRegistry.h"
+#include "FrameGraph/FrameGraphResourceTypes.h"
 
 #include <vector>
 
@@ -18,7 +18,6 @@ public:
 
 	void Clear() noexcept;
 	void RegisterResource(FrameGraphResourceHandle handle, ResourceState initialState) noexcept;
-	void ResetCurrentStates(const FrameGraphResourceRegistry& registry) noexcept;
 	void UpdateCurrentState(FrameGraphResourceHandle handle, ResourceState currentState) noexcept;
 
 	ResourceState GetRuntimeState(FrameGraphResourceHandle handle) const noexcept;

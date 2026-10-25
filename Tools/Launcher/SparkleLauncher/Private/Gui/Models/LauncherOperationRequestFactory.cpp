@@ -54,7 +54,6 @@ namespace SparkleLauncher
 		request.PreferredIde = ResolveSelectedWorkspaceIde(settings);
 		request.Compiler = ResolveSelectedWorkspaceCompiler(settings);
 		request.SelectedScopes = ResolveSelectedBuildScopes(settings);
-		request.ForceConfigure = settings.ForceConfigure();
 		return request;
 	}
 
@@ -63,16 +62,12 @@ namespace SparkleLauncher
 		LauncherOperationRequest request = goalRequest;
 		request.RunId.clear();
 		request.OperationId = operationId;
-		request.SelectedTargets.clear();
 		if (!requestedLevelIds.isEmpty())
 		{
 			request.RequestedLevelIds = requestedLevelIds.join(',');
 		}
 		request.SourceDependencyId.clear();
 		request.HostToolId.clear();
-		request.ForceConfigure = false;
-		request.ForceRecook = false;
-		request.ConfirmForceRecook = false;
 		request.ConfirmClean = false;
 		return request;
 	}
@@ -94,21 +89,12 @@ namespace SparkleLauncher
 		request.WorkspaceCompiler = settings.WorkspaceCompiler();
 		request.BuildScopes = settings.BuildScopes();
 		request.CookScopes = settings.CookScopes();
-		request.SelectedTargets = settings.SelectedTargets();
 		request.ShaderBackend = settings.ShaderBackend();
 		request.GraphicsApi = settings.GraphicsApi();
 		request.CaptureProvider = settings.CaptureProvider();
 		request.GpuCrashMode = settings.GpuCrashMode();
 		request.ShaderExportPath = request.GpuCrashMode == RhiGpuCrashMode::Off ? QString{} : settings.ShaderExportPath();
-		request.ShaderEnableDebugInfo = settings.ShaderEnableDebugInfo();
-		request.ShaderEnableOptimizations = settings.ShaderEnableOptimizations();
-		request.ShaderWarningsAsErrors = settings.ShaderWarningsAsErrors();
-		request.ShaderStripDebugInfo = settings.ShaderStripDebugInfo();
 		request.CleanScope = settings.CleanScope();
-		request.ForceConfigure = settings.ForceConfigure();
-		request.ForceRecook = settings.ForceRecook();
-		request.ConfirmForceRecook = settings.ConfirmForceRecook();
-		request.ConfirmClean = settings.ConfirmClean();
 
 		return request;
 	}
@@ -128,8 +114,7 @@ namespace SparkleLauncher
 		    settings.EditorProfile(),
 		    settings.GameProfile(),
 		    settings.BuildScopes(),
-		    settings.CookScopes(),
-		    settings.SelectedTargets()};
+		    settings.CookScopes()};
 	}
 
 	LauncherOperationRequest BuildActionCleanOperationRequest(

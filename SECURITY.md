@@ -1,6 +1,6 @@
 # Security
 
-[README](README.md)
+[SparkleEngine](https://github.com/stoleckipawel/SparkleEngine#readme)
 
 Sparkle has no security response service, private intake channel, response deadline, supported-version period or guaranteed fix.
 

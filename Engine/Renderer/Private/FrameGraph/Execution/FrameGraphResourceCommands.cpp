@@ -46,13 +46,6 @@ void FrameGraphResourceCommands::EndRasterPass(RenderCommandContext& commandCont
 	commandContext.EndRasterPass();
 }
 
-void FrameGraphResourceCommands::BindRenderTarget(RenderCommandContext& commandContext, FrameGraphTextureHandle renderTargetHandle, FrameGraphTextureHandle depthStencilHandle) const noexcept
-{
-	const RhiCpuDescriptorHandle renderTargetView = ResolveRenderTargetView(renderTargetHandle.GetResourceHandle());
-	const RhiCpuDescriptorHandle depthStencilView = depthStencilHandle.IsValid() ? ResolveDepthStencilView(depthStencilHandle.GetResourceHandle()) : RhiCpuDescriptorHandle{};
-	commandContext.SetRenderTarget(renderTargetView, depthStencilView ? &depthStencilView : nullptr);
-}
-
 void FrameGraphResourceCommands::BindRenderTargets(
     RenderCommandContext& commandContext,
     std::span<const FrameGraphTextureHandle> renderTargetHandles,

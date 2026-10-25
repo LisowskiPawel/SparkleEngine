@@ -23,7 +23,6 @@ namespace SparkleLauncher
 		const QString& WorkspaceCompiler() const;
 		const QString& BuildScopes() const;
 		const QString& CookScopes() const;
-		const QString& SelectedTargets() const;
 		const QString& ShaderBackend() const;
 		const QString& GraphicsApi() const;
 		ExternalCaptureProvider CaptureProvider() const;
@@ -31,40 +30,21 @@ namespace SparkleLauncher
 		const QString& ShaderExportPath() const;
 		const QString& GpuCrashInspectorPath() const;
 		const QString& CleanScope() const;
-		bool ShaderEnableDebugInfo() const;
-		bool ShaderEnableOptimizations() const;
-		bool ShaderWarningsAsErrors() const;
-		bool ShaderStripDebugInfo() const;
-		bool ForceConfigure() const;
-		bool ForceRecook() const;
-		bool ConfirmForceRecook() const;
-		bool ConfirmClean() const;
 
 	public slots:
 		void SetRunMode(const QString& runMode);
 		void SetBuildConfiguration(const QString& configuration);
-		void SetEditorProfile(const QString& profileName);
-		void SetGameProfile(const QString& profileName);
 		void SetWorkspaceIde(const QString& ide);
 		void SetWorkspaceCompiler(const QString& compiler);
 		void SetBuildScopes(const QString& scopes);
 		void SetCookScopes(const QString& scopes);
-		void SetSelectedTargets(const QString& targets);
 		void SetShaderBackend(const QString& backend);
 		void SetGraphicsApi(const QString& graphicsApi);
 		void SetCaptureProvider(const QString& provider);
 		void SetGpuCrashMode(const QString& mode);
 		void SetShaderExportPath(const QString& path);
 		void SetGpuCrashInspectorPath(const QString& path);
-		void SetShaderEnableDebugInfo(bool enabled);
-		void SetShaderEnableOptimizations(bool enabled);
-		void SetShaderWarningsAsErrors(bool enabled);
-		void SetShaderStripDebugInfo(bool enabled);
 		void SetCleanScope(const QString& scope);
-		void SetForceConfigure(bool enabled);
-		void SetForceRecook(bool enabled);
-		void SetConfirmForceRecook(bool enabled);
-		void SetConfirmClean(bool enabled);
 
 	signals:
 		void SettingsChanged();
@@ -77,7 +57,6 @@ namespace SparkleLauncher
 		QString m_workspaceCompiler = "msvc";
 		QString m_buildScopes;
 		QString m_cookScopes;
-		QString m_selectedTargets;
 		QString m_shaderBackend = "dxc";
 		QString m_graphicsApi = "d3d12";
 		ExternalCaptureProvider m_captureProvider = ExternalCaptureProvider::None;
@@ -85,13 +64,5 @@ namespace SparkleLauncher
 		QString m_shaderExportPath;
 		QString m_gpuCrashInspectorPath;
 		QString m_cleanScope = "cooked";
-		bool m_shaderEnableDebugInfo = false;
-		bool m_shaderEnableOptimizations = true;
-		bool m_shaderWarningsAsErrors = true;
-		bool m_shaderStripDebugInfo = true;
-		bool m_forceConfigure = false;
-		bool m_forceRecook = false;
-		bool m_confirmForceRecook = false;
-		bool m_confirmClean = false;
 	};
 }

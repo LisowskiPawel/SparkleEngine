@@ -20,13 +20,3 @@ bool RenderSceneGpuGeometryBindings::HasSkinningBuffers() const noexcept
 {
 	return JointMatrices.IsValid() && PreviousJointMatrices.IsValid();
 }
-
-bool RenderSceneGpuGeometryBindings::HasMorphingBuffers() const noexcept
-{
-	return MorphWeights.IsValid() && PreviousMorphWeights.IsValid();
-}
-
-bool RenderSceneGpuRayTracingBindings::HasCompleteBuffers() const noexcept
-{
-	return Vertices && SkinInfluences && MorphTargetDeltas && Indices && Instances && Materials;
-}

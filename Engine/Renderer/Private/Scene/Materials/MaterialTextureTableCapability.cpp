@@ -3,51 +3,26 @@
 
 #include <algorithm>
 
-class MaterialTextureTableCapacity final
-{
-public:
-	static std::uint32_t ResolveShaderResourceDescriptorCapacity(const RhiBindingLimits& limits) noexcept
-	{
-		std::uint32_t capacity = limits.MaxShaderResourceDescriptors;
-		if (limits.MaxDescriptorTableEntries != 0)
-		{
-			capacity = capacity == 0 ? limits.MaxDescriptorTableEntries : std::min(capacity, limits.MaxDescriptorTableEntries);
-		}
-		return capacity;
-	}
-};
-
-MaterialTextureTableCapabilityReport BuildMaterialTextureTableCapabilityReport(const RhiCapabilities& capabilities) noexcept
+bool SupportsMaterialTextureTable(const RhiCapabilities& capabilities) noexcept
 {
 	if (capabilities.BackendApi == ERhiBackendApi::Unknown || capabilities.DescriptorModel == ERhiDescriptorModel::Unknown)
 	{
-		return MaterialTextureTableCapabilityReport{.StatusReason = "backend-descriptor-model-unknown"};
+		return false;
 	}
 	if (!capabilities.DescriptorIndexing.SupportsSampledImageArrayNonUniformIndexing)
 	{
-		return MaterialTextureTableCapabilityReport{.StatusReason = "sampled-image-array-non-uniform-indexing-unavailable"};
+		return false;
 	}
 	if (!capabilities.DescriptorIndexing.SupportsPartiallyBoundDescriptorArrays)
 	{
-		return MaterialTextureTableCapabilityReport{.StatusReason = "partially-bound-descriptor-arrays-unavailable"};
+		return false;
 	}
 
-	const std::uint32_t shaderResourceCapacity = MaterialTextureTableCapacity::ResolveShaderResourceDescriptorCapacity(capabilities.BindingLimits);
-	if (shaderResourceCapacity == 0)
+	const RhiBindingLimits& limits = capabilities.BindingLimits;
+	std::uint32_t capacity = limits.MaxShaderResourceDescriptors;
+	if (limits.MaxDescriptorTableEntries != 0)
 	{
-		return MaterialTextureTableCapabilityReport{.StatusReason = "shader-resource-descriptor-limit-unavailable"};
+		capacity = capacity == 0 ? limits.MaxDescriptorTableEntries : std::min(capacity, limits.MaxDescriptorTableEntries);
 	}
-
-	if (shaderResourceCapacity < MaterialTextureTableFixedCapacity)
-	{
-		return MaterialTextureTableCapabilityReport{.MaxTextureDescriptors = shaderResourceCapacity, .StatusReason = "shader-resource-descriptor-limit-below-material-texture-table-capacity"};
-	}
-
-	return MaterialTextureTableCapabilityReport{
-	    .Supported = true,
-	    .SelectedPath = MaterialTextureTablePath::FixedCapacityDescriptorArray,
-	    .SupportsRuntimeSizedBindless = false,
-	    .SupportedMaterialBindingModeMask = MaterialBindingModeMask(MaterialBindingMode::RayTracingOnly),
-	    .MaxTextureDescriptors = MaterialTextureTableFixedCapacity,
-	    .StatusReason = "fixed-capacity-descriptor-array-selected"};
+	return capacity >= MaterialTextureTableFixedCapacity;
 }

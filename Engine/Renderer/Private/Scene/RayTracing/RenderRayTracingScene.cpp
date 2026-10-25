@@ -104,8 +104,3 @@ void RenderRayTracingScene::SynchronizeShaderTablePlan(std::span<const RenderPri
 {
 	m_shaderTablePlan.Synchronize(primitives, materials);
 }
-
-bool RenderRayTracingScene::HasValidTlas() const noexcept
-{
-	return m_topLevelAccelerationStructureStrategy != nullptr && m_topLevelAccelerationStructureStrategy->HasValidSceneTlas();
-}

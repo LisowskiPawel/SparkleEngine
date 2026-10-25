@@ -46,7 +46,7 @@ Matched Windows D3D12/Vulkan quality/cost cases on named hardware; one actual st
 
 **Evidence boundary:** D3D12/Vulkan and rendering paths exist; complete workload evidence is unclaimed.
 
-**Delivery route:** After release and correct references: `M3`, `WL-04`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md).
+**Delivery route:** After release and correct references: technical `M3`, `WL-04`; final independent closure at `M6/WS-S4`; [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md).
 
 **Requirements:** `PGE-02`, `05`, `08..10`
 

@@ -53,7 +53,7 @@ TaskDispatch::State::State(std::shared_ptr<TaskExecution::State> execution, Task
 {
 	Completion.Generation = Execution->Data.Generation;
 	Completion.FirstFailureTaskName = Desc.Name.Get();
-	TaskExecutionContextBinding::Bind(Context, Completion.Generation, Desc.Lane, Execution->Cancellation.get_token());
+	Context.Bind(Desc.Lane, Execution->Cancellation.get_token());
 	PreparedSettlement = [this]
 	{
 		ReleaseAdmission();

@@ -36,7 +36,6 @@ struct RenderSceneGpuGeometryBindings final
 
 	bool HasMeshInstanceBuffers() const noexcept;
 	bool HasSkinningBuffers() const noexcept;
-	bool HasMorphingBuffers() const noexcept;
 };
 
 struct RenderSceneGpuRayTracingBindings final
@@ -49,8 +48,6 @@ struct RenderSceneGpuRayTracingBindings final
 	RenderSceneGpuBufferBinding Materials;
 	std::uint32_t InstanceCount = 0u;
 	std::uint32_t MaterialCount = 0u;
-
-	bool HasCompleteBuffers() const noexcept;
 };
 
 struct RenderSceneGpuBindings final

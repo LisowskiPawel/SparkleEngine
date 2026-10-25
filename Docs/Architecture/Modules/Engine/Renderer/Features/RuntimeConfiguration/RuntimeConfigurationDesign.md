@@ -102,7 +102,6 @@ The seven lighting leaves are also reachable through [Editor Show](../DebugViews
 | `r.Diagnostics.MarkerVerbosity` | FramePass; Off/FramePass/Detailed | frame/pass/detailed GPU marker emission | developer console; package exposure must be classified | [Diagnostics](../ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md#diagnostics-products-and-capture) |
 | `r.Diagnostics.GpuTiming` | off | timestamp collection/resolution | developer console; observer cost unmeasured | [Diagnostics](../ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md#diagnostics-products-and-capture) |
 | `r.FrameGraph.ParallelRecording` | on | Tasks-backed recording chunks | developer console; equivalence/scaling unproved | [Frame Graph](../FrameExecution/FrameGraphAndScheduling.md) |
-| `r.Material.BindingMode` | RayTracingOnly; also registers Everything | no game consumer found; capability report supports RayTracingOnly only | ineffective registered selector; `Everything` is not a feature | [Geometry/Materials](../GeometryAndResources/GeometryMaterialsAndGBuffer.md#material-contract) |
 
 ### RHI Console Controls Outside The Renderer Settings State
 
@@ -153,7 +152,7 @@ When adding or changing a selector:
 - `AC-SEL-04` — the 26-name owned INI section round-trips valid settings without modifying other sections; non-persisted/session/RHI-only controls remain absent by design.
 - `AC-SEL-05` — live changes apply on the next permitted frame, topology/history changes rebuild/reset their owners, and restart-required changes do not claim live activation.
 - `AC-SEL-06` — Editor, Game, Debug/Development/Shipping, workspace/package, D3D12/Vulkan reachability is independently classified; hidden console reachability still counts unless erased/locked.
-- `AC-SEL-07` — absent feature selectors remain absent and ineffective `r.Material.BindingMode` vocabulary is removed or visibly nonfunctional, never advertised as an active feature.
+- `AC-SEL-07` — absent feature selectors remain absent; material texture-table support derives from RHI capabilities without an ineffective binding-mode control.
 
 ### Controlled Failure Modes And Checks
 
@@ -180,7 +179,7 @@ This selector contract is **defined but unproved**. A registered or persisted na
 - [`ViewportDisplayCVars.cpp`](../../../../../../../Engine/Renderer/Private/View/ViewportDisplayCVars.cpp)
 - [`UpscalerSettings.cpp`](../../../../../../../Engine/Renderer/Private/Upscaling/UpscalerSettings.cpp) and [`RayReconstructionSettings.cpp`](../../../../../../../Engine/Renderer/Private/RayReconstruction/RayReconstructionSettings.cpp)
 - [`RayTracedShadowCVars.cpp`](../../../../../../../Engine/Renderer/Private/RayTracing/Effects/Shadows/RayTracedShadowCVars.cpp) and [`RestirIndirectLightingCVars.cpp`](../../../../../../../Engine/Renderer/Private/RayTracing/Effects/RestirLighting/RestirIndirectLightingCVars.cpp)
-- [`MaterialCVars.cpp`](../../../../../../../Engine/Renderer/Private/Scene/Materials/MaterialCVars.cpp)
+- [`MaterialTextureTableCapability.cpp`](../../../../../../../Engine/Renderer/Private/Scene/Materials/MaterialTextureTableCapability.cpp)
 - [`RHICVars.cpp`](../../../../../../../Engine/RHI/Private/CVars/RHICVars.cpp)
 
 ## Settings State and Persistence

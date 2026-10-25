@@ -29,7 +29,6 @@ namespace SparkleLauncher
 		QString GameProfile;
 		QString BuildScopes;
 		QString CookScopes;
-		QString SelectedTargets;
 	};
 
 	std::filesystem::path ResolveCleanScopePreviewPath(const std::filesystem::path& repositoryRoot, const QString& projectId, const QString& scope);

@@ -104,28 +104,4 @@ namespace SparkleLauncher
 		return statusLabel;
 	}
 
-	QPushButton* LauncherMainWindow::CreateCommandActionButton(const QString& operationId, const QString& label, bool primary, bool runImmediately)
-	{
-		QPushButton* button = new QPushButton(label, this);
-		button->setObjectName(primary ? "CommandPrimaryButton" : "CommandSecondaryButton");
-		button->setMinimumHeight(primary ? LauncherUi::Button::PrimaryMinHeight : LauncherUi::Button::SecondaryMinHeight);
-		button->setAccessibleName(label);
-		button->setToolTip(runImmediately ? "Run this workflow now." : "Open this workflow.");
-		RegisterFocusable(button);
-
-		connect(
-		    button,
-		    &QPushButton::clicked,
-		    this,
-		    [this, operationId, runImmediately]()
-		    {
-			    SetSelectedOperation(operationId);
-			    if (runImmediately)
-			    {
-				    RunSelectedOperation();
-			    }
-		    });
-
-		return button;
-	}
 }

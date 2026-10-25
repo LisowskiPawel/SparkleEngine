@@ -91,22 +91,3 @@ void FrameGraph::BindPersistentAccelerationStructure(FrameGraphAccelerationStruc
 
 	BindPersistentAccelerationStructure(handle, m_renderHardwareInterface->GetResourceService().GetResourceHandle(resource), currentState);
 }
-
-void FrameGraph::ClearPersistentAccelerationStructureBinding(FrameGraphAccelerationStructureHandle handle) noexcept
-{
-	if (!handle.IsValid())
-	{
-		return;
-	}
-
-	const FrameGraphResourceHandle resourceHandle = handle.GetResourceHandle();
-	if (!m_resourceRegistry.IsRegistered(resourceHandle))
-	{
-		return;
-	}
-
-	m_resourceResolver.ClearResolvedAccess(resourceHandle);
-	m_resourceRegistry.SetExternalContentsProduced(resourceHandle, false);
-	const FrameGraphResourceMetadata& metadata = m_resourceRegistry.GetMetadata(resourceHandle);
-	m_resourceStateTracker.UpdateCurrentState(resourceHandle, metadata.initialState);
-}

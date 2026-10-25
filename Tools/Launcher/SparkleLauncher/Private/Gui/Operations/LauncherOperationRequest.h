@@ -30,7 +30,6 @@ namespace SparkleLauncher
 		QString WorkspaceCompiler;
 		QString BuildScopes;
 		QString CookScopes;
-		QString SelectedTargets;
 		QString RequestedLevelIds;
 		QString SourceDependencyId;
 		QString HostToolId;
@@ -42,13 +41,6 @@ namespace SparkleLauncher
 		QString CleanScope = "cooked";
 		QVector<LauncherCleanTarget> CleanTargets;
 		QVector<QString> PreservedPaths;
-		bool ShaderEnableDebugInfo = false;
-		bool ShaderEnableOptimizations = true;
-		bool ShaderWarningsAsErrors = true;
-		bool ShaderStripDebugInfo = true;
-		bool ForceConfigure = false;
-		bool ForceRecook = false;
-		bool ConfirmForceRecook = false;
 		bool ConfirmClean = false;
 	};
 }

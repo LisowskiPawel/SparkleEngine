@@ -30,11 +30,6 @@ namespace ECS
 		return m_data != nullptr ? m_data->Error : invalid;
 	}
 
-	std::span<const GameSystemDesc> CompiledGameSystemGraph::GetSystems() const noexcept
-	{
-		return m_data != nullptr ? std::span<const GameSystemDesc>(m_data->Systems) : std::span<const GameSystemDesc>{};
-	}
-
 	std::uint32_t GameSystemGraph::Add(GameSystemDesc descriptor)
 	{
 		const auto index = static_cast<std::uint32_t>(m_systems.size());

@@ -41,7 +41,6 @@ private:
 
 	TaskExecutor* m_taskExecutor = nullptr;
 	Run m_run;
-	std::vector<MeshRenderItem> m_visibleItems;
 	MeshInstanceBatchBuilder m_batchBuilder;
 	MeshInstanceBatchBuildResult m_batchResult;
 	CompiledTaskGraph m_graph;

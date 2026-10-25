@@ -347,14 +347,6 @@ template <typename TValue = void> struct RWStructuredBuffer final
 	using ValueType = TValue;
 };
 
-struct ShaderRenderTargetParameter final
-{
-};
-
-struct ShaderDepthTargetParameter final
-{
-};
-
 template <typename TResource> struct ShaderParameterResourceTraits;
 
 template <> struct ShaderParameterResourceTraits<Texture2D>

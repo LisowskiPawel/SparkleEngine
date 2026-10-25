@@ -4,8 +4,6 @@
 
 #include <cstdint>
 #include <span>
-#include <string>
-#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -36,7 +34,6 @@ namespace Files
 		}
 
 		void WriteBytes(std::span<const std::uint8_t> values);
-		bool WriteStringWithUInt32Length(std::string_view value, std::string& outErrorMessage);
 
 	private:
 		std::vector<std::uint8_t>& m_bytes;

@@ -25,7 +25,6 @@
 #include <memory>
 #include <optional>
 
-class Mesh;
 class SkeletonResourceStore;
 class GameWorldResourceStores;
 class TaskExecutor;
@@ -62,8 +61,6 @@ namespace ECS
 		EntityId GetActiveCamera() const noexcept { return m_activeCamera; }
 
 		bool WriteCameraDesc(EntityId entity, const CameraDesc& desc) noexcept;
-		float ReadCameraAspectRatio(EntityId entity) const noexcept;
-		bool WriteCameraAspectRatio(EntityId entity, float aspectRatio) noexcept;
 		bool WriteTransform(EntityId entity, const Transform& transform) noexcept;
 		Transform ReadTransform(EntityId entity) const noexcept;
 		bool WriteVisibility(EntityId entity, bool visible) noexcept;
@@ -72,13 +69,7 @@ namespace ECS
 		EntityId AddMesh(SceneMeshInstanceData&& instance);
 		std::size_t GetMeshCount() const noexcept;
 		EntityId GetMeshEntity(std::size_t index) const noexcept;
-		const Mesh* ResolveMesh(EntityId entity) const noexcept;
-		bool IsSkeletalMesh(EntityId entity) const noexcept;
-		MaterialHandle ReadMeshMaterial(EntityId entity) const noexcept;
 		bool WriteMeshMaterial(EntityId entity, MaterialHandle material) noexcept;
-		Assets::CookedAssetId ReadMeshAssetId(EntityId entity) const noexcept;
-		Assets::CookedAssetId ReadSkeletonAssetId(EntityId entity) const noexcept;
-		std::uint32_t ReadMeshSourceNodeIndex(EntityId entity) const noexcept;
 		void AppendMeshInstanceGroups(std::vector<SceneMeshInstanceGroupData> groups);
 
 		std::size_t GetMeshInstanceGroupCount() const noexcept { return m_meshInstanceGroups.size(); }
@@ -92,7 +83,6 @@ namespace ECS
 		EntityId GetLightEntity(std::size_t index) const noexcept;
 		std::optional<SceneLightDesc> ReadLight(EntityId entity) const;
 		bool WriteLight(EntityId entity, SceneLightDesc&& desc);
-		std::vector<SceneLightDesc> CaptureLightsToDesc() const;
 
 		void AppendAnimationClips(std::vector<AnimationClipResource> clips, AnimationClipResourceStore& resources, std::uint64_t sourceInstanceId);
 		bool PrepareSystemResources(GameWorldResourceStores& resources);

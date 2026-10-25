@@ -49,7 +49,6 @@ public:
 	void BuildMaterials(PreparedRenderScene& preparedScene);
 	const RenderSceneGpuBindings& UpdateGpuScene(const PreparedRenderScene& preparedScene, const RenderView& view, std::uint32_t frameIndex);
 	RenderRayTracingFrameBindings PrepareRayTracingFrame(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept;
-	bool IsRayTracingAvailable() const noexcept;
 
 	RenderRayTracingScene& GetRayTracingScene() noexcept { return *m_renderRayTracingScene; }
 

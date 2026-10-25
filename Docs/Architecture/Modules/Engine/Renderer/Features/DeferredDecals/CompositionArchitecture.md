@@ -325,7 +325,7 @@ Engine/Assets/Shaders
 
 Do not create separate `RasterDecal`, `RayDecal`, `DecalMaterial`, or `DecalTextureCache` directories/classes. The later ray lookup belongs beside existing ray scene preparation and adds no second copy of the shared files above.
 
-The currently unconsumed `r.Material.BindingMode`/`MaterialBindingMode` path must be rechecked before implementation. If it remains unconsumed, delete it while renaming the capability around the scene material texture table needed by both ray materials and decals. Do not add a new decal binding-mode switch on top.
+Scene material texture-table support is derived from RHI capabilities by the existing `SupportsMaterialTextureTable` owner. Reuse it for ray materials and decals; do not add a decal binding-mode switch or restore the unused material selector removed by the 2026-10-25 source cleanup.
 
 ## Rejected Alternatives
 

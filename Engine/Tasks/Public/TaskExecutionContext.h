@@ -3,14 +3,13 @@
 #include "TaskTypes.h"
 
 #include <utility>
-#include <cstdint>
 #include <memory>
 #include <stop_token>
 #include <typeinfo>
 
 class TaskExecutor;
-class TaskEvent;
-struct TaskExecutionContextBinding;
+class TaskDispatch;
+class SerialTaskExecution;
 
 class SPARKLE_TASKS_API TaskExecutionContext final
 {
@@ -46,18 +45,14 @@ public:
 
 private:
 	friend class TaskExecutor;
-	friend class TaskEvent;
-	friend struct TaskExecutionContextBinding;
+	friend class TaskDispatch;
+	friend class SerialTaskExecution;
+
+	void Bind(TaskLane lane, std::stop_token cancellation) noexcept;
 
 	void* m_userData = nullptr;
 	const std::type_info* m_userType = nullptr;
 	std::shared_ptr<void> m_userOwner;
 	std::stop_token m_cancellation;
-	std::uint64_t m_executionGeneration = 0;
 	TaskLane m_lane = TaskLane::FrameCritical;
-};
-
-struct TaskExecutionContextBinding final
-{
-	static void Bind(TaskExecutionContext& context, std::uint64_t generation, TaskLane lane, std::stop_token cancellation) noexcept;
 };

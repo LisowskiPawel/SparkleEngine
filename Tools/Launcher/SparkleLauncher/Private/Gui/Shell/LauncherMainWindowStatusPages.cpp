@@ -325,7 +325,7 @@ namespace SparkleLauncher
 			    CreateStatusActionButton("cook.tools.prepare", "Build", "Build Cooking Tools"));
 		}
 
-		if (!cookPlan.CanRun && issueLayout == nullptr && !cookPlan.Request.SelectedScopes.empty() && !(cookPlan.Request.Mode == CookMode::Force && !cookPlan.Request.ForceRecookConfirmed))
+		if (!cookPlan.CanRun && issueLayout == nullptr && !cookPlan.Request.SelectedScopes.empty())
 		{
 			const QString detail = cookPlan.ReadinessMessages.empty() ? QStringLiteral("The selected cooking stages cannot run with the current workspace configuration.")
 			                                                          : QString::fromStdString(cookPlan.ReadinessMessages.back());
@@ -335,24 +335,4 @@ namespace SparkleLauncher
 		}
 	}
 
-	void LauncherMainWindow::AddMaintenanceEnvironmentStatus(QVBoxLayout& layout, const QString& operationId)
-	{
-		MaintenanceOperationRequest request;
-		request.RepositoryRoot = m_repositoryRoot;
-		request.ContentId = m_contentModel.ContentId().toStdString();
-		request.EditorProfile = m_settings.EditorProfile().toStdString();
-		request.DestructiveActionConfirmed = m_settings.ConfirmClean();
-
-		if (operationId == "workspace.clean")
-		{
-			QVBoxLayout* maintenanceLayout = AddOptionGroup(layout, "Readiness", QString());
-
-			AddStatusRow(
-			    *maintenanceLayout,
-			    "Confirmation",
-			    m_settings.ConfirmClean() ? "Enabled" : "Required on run",
-			    m_settings.ConfirmClean() ? "Clean confirmation is enabled in settings." : "The launcher will ask for confirmation before destructive clean actions run.",
-			    m_settings.ConfirmClean() ? "ok" : "warning");
-		}
-	}
 }

@@ -26,6 +26,6 @@ Use the [workload-owned artifact home](../../../../../Acceptance/GraphicsWorkloa
 
 ## Checks, Risks And Stop Conditions
 
-`CHK-WS-03` rejects an unproved root cause, mixed symbols/candidate, missing bad sample, inability to distinguish two explanations or a fix that cannot be falsified. `CHK-WS-04` obtains the relevant independent replay/review through the parent portfolio exercise; one participant can cover the case without a new adopter per study. Keep assistance and unavailable cells explicit.
+`CHK-WS-03` rejects an unproved root cause, mixed symbols/candidate, missing bad sample, inability to distinguish two explanations or a fix that cannot be falsified. `CHK-WS-04` obtains independent replay/review at M6 / parent WS-S4 through the portfolio exercise; one participant can cover the case without an adopter per study. The local causal/replay packet hands off at M3 without pretending that later adoption already passed. Keep assistance and unavailable cells explicit.
 
 Main risk (incident/evidence owners): an easy-looking symptom becomes a speculative driver diagnosis or broad rewrite. Freeze the discriminating check first; preserve the original failure, shrink to the first wrong boundary, and return an unproved claim to investigation. If rights/tool access prevent sharing, prepare a cleared reduced reproduction and mark the stronger claim blocked. Existing release repairs may proceed under their own gate; new production tooling still waits for REL-11.

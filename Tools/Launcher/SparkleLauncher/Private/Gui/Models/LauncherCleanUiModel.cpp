@@ -191,18 +191,7 @@ namespace SparkleLauncher
 			return targets;
 		}
 
-		const auto addNamedTargets = [&context, &targets](const QString& profileName, const QStringList& targetNames, const QString& detail)
-		{
-			for (const QString& targetName : targetNames)
-			{
-				if (!targetName.isEmpty())
-				{
-					AddTargetArtifactOutputs(targets, context.RepositoryRoot, profileName, targetName, detail);
-				}
-			}
-		};
-
-		const auto addProjectArtifacts = [&context, &addNamedTargets, &targets](const QString& profileName, const QString& projectName, const QString& detail)
+		const auto addProjectArtifacts = [&context, &targets](const QString& profileName, const QString& projectName, const QString& detail)
 		{
 			const std::optional<BuildProfile> profile = FindBuildProfile(profileName.toStdString());
 			if (!profile.has_value())
@@ -247,26 +236,12 @@ namespace SparkleLauncher
 
 		if (context.OperationId == "workspace.build.editor" || (workspaceBuild && buildScopes.contains("editor")))
 		{
-			if (context.OperationId == "workspace.build.editor" && !context.SelectedTargets.trimmed().isEmpty())
-			{
-				addNamedTargets(context.EditorProfile, context.SelectedTargets.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts), "Selected editor build target outputs.");
-			}
-			else
-			{
-				addProjectArtifacts(context.EditorProfile, context.ContentId, "Editor target outputs.");
-			}
+			addProjectArtifacts(context.EditorProfile, context.ContentId, "Editor target outputs.");
 		}
 
 		if (context.OperationId == "workspace.build.game" || (workspaceBuild && buildScopes.contains("game")))
 		{
-			if (context.OperationId == "workspace.build.game" && !context.SelectedTargets.trimmed().isEmpty())
-			{
-				addNamedTargets(context.GameProfile, context.SelectedTargets.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts), "Selected game build target outputs.");
-			}
-			else
-			{
-				addProjectArtifacts(context.GameProfile, context.ContentId, "Game target outputs.");
-			}
+			addProjectArtifacts(context.GameProfile, context.ContentId, "Game target outputs.");
 		}
 
 		if (context.OperationId == "cook.tools.prepare" || (workspaceBuild && buildScopes.contains("cook-tools")))

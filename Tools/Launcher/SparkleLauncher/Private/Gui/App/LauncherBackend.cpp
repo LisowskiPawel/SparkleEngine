@@ -1,73 +1,16 @@
 #include "LauncherBackend.h"
 
-#include "SparkleLauncher/BuildWorkspaceOperations.h"
-#include "SparkleLauncher/CookOperations.h"
-#include "SparkleLauncher/LevelOperations.h"
-#include "SparkleLauncher/LevelRunOperations.h"
-#include "SparkleLauncher/MaintenanceOperations.h"
-#include "Operations/LauncherOperationExecution.h"
 #include "Operations/LauncherOperationService.h"
 
 #include <QtCore/QMetaObject>
 
 #include <memory>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
-#include <variant>
-#include <vector>
 
 namespace SparkleLauncher
 {
-	static void AppendLine(std::ostringstream& output, std::string_view text)
-	{
-		output << text << '\n';
-	}
-
-	static void AppendPlanDetails(
-	    std::ostringstream& output,
-	    const OperationRecord& operation,
-	    bool canRun,
-	    const std::vector<std::string>& readinessMessages,
-	    const std::vector<std::string>& plannedEffects)
-	{
-		AppendLine(output, operation.DisplayName + std::string(canRun ? " [Ready]" : " [Blocked]"));
-		AppendLine(output, "Operation: " + operation.Id);
-		if (!operation.LogPath.empty())
-		{
-			AppendLine(output, "Log: " + operation.LogPath.string());
-		}
-		if (operation.RequiresConfirmation)
-		{
-			if (operation.DestructiveScope == OperationDestructiveScope::None)
-			{
-				AppendLine(output, "Confirmation required: selected clean scopes");
-			}
-			else
-			{
-				AppendLine(output, "Confirmation required: " + ToString(operation.DestructiveScope));
-			}
-		}
-		for (const std::string& message : readinessMessages)
-		{
-			AppendLine(output, "Readiness: " + message);
-		}
-		for (const std::string& effect : plannedEffects)
-		{
-			AppendLine(output, "Effect: " + effect);
-		}
-		if (!operation.DryRunText.empty())
-		{
-			AppendLine(output, "");
-			AppendLine(output, operation.DryRunText);
-		}
-	}
-
-	static QString ToQtString(const std::ostringstream& output)
-	{
-		return QString::fromStdString(output.str());
-	}
 
 	static LauncherOperationResult BuildOperationResult(const OperationRecord& operation)
 	{
@@ -123,40 +66,19 @@ namespace SparkleLauncher
 		return m_operations;
 	}
 
-	void LauncherBackend::RequestOperationPreview(const LauncherOperationRequest& request)
-	{
-		const LauncherOperationDescriptor* operation = FindOperation(request.OperationId);
-		if (operation == nullptr)
-		{
-			emit OperationPreviewFailed(request.OperationId, "Unknown launcher operation.");
-			return;
-		}
-
-		std::ostringstream output;
-		const std::string operationId = request.OperationId.toStdString();
-		const LauncherOperationPlan plan = PlanLauncherOperation(operation->Category, operationId, request);
-
-		const bool canRun = std::visit(
-		    [&output](const auto& typedPlan)
-		    {
-			    AppendPlanDetails(output, typedPlan.Operation, typedPlan.CanRun, typedPlan.ReadinessMessages, typedPlan.PlannedEffects);
-			    return typedPlan.CanRun;
-		    },
-		    plan);
-
-		emit OperationPreviewReady(operation->Id, operation->DisplayName, ToQtString(output), canRun);
-	}
-
 	void LauncherBackend::RunOperation(LauncherOperationRequest request)
 	{
+		const QString runId = request.RunId.isEmpty() ? request.OperationId : request.RunId;
 		const LauncherOperationDescriptor* operation = FindOperation(request.OperationId);
 		if (operation == nullptr)
 		{
-			emit OperationPreviewFailed(request.OperationId, "Unknown launcher operation.");
+			OperationRecord rejected = MakeOperationRecord(request.OperationId.toStdString(), request.OperationId.toStdString());
+			SetOperationFailure(rejected, OperationProblemKind::Planning, "Unknown launcher operation.", "Select an available workflow, refresh the launcher, then retry.");
+			MarkOperationFinished(rejected, OperationStatus::Failed);
+			emit OperationFinished(runId, request.OperationId, request.OperationId, BuildOperationResult(rejected));
 			return;
 		}
 
-		const QString runId = request.RunId.isEmpty() ? operation->Id : request.RunId;
 		emit OperationStarted(runId, operation->Id, operation->DisplayName);
 		const LauncherOperationCategory category = operation->Category;
 		const QString title = operation->DisplayName;

@@ -198,7 +198,7 @@ std::shared_ptr<TaskExecution::State> TaskExecutor::Implementation::Runtime::Lau
 	const std::uint64_t generation = m_nextExecutionGeneration.fetch_add(1, std::memory_order_relaxed);
 	auto execution = CreateExecution(generation, scope);
 
-	TaskExecutionContextBinding::Bind(context, generation, TaskLane::FrameCritical, execution->Cancellation.get_token());
+	context.Bind(TaskLane::FrameCritical, execution->Cancellation.get_token());
 
 	if (!ValidateLaunchRequest(graph, context, scope, execution, generation))
 	{

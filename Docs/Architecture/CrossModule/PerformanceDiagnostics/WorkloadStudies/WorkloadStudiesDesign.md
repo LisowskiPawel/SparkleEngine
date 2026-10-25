@@ -38,6 +38,10 @@ WS-S1 must prove Unicode/relative paths, schema/unit/mixed-settings rejection, n
 
 `WS-D0` passes only with a reviewed source/dossier revision, a valid producer sample, numeric decision cards and the exact narrow consumer. If a selected claim lacks an input, WS-S0 first freezes that producer's narrow contract/check card; the admitted [parent Phase 4](../ImplementationPlan.md#phase-4--deliver-reproducible-evidence) can deliver it without waiting for the analyzer's completed WS-D0. Qualify the actual record, then return to WS-S0 and freeze the consumer. This breaks a sample-before-producer cycle without inventing data or admitting the internal diagnostics ladder. Existing parent gates and REL-11 still govern new production work; native records remain preferred where sufficient.
 
+## Technical Handoff And Final Reproduction
+
+M3's technical handoff uses WS-S0..3: AC-WS-01..03, the three complementary original study records, cleared incident replay and local input/failure/cleanup checks from 04. This admits the dependent neural work. AC-WS-04's real independent-user result remains required at M6 / WS-S4 after portfolio assembly; it cannot be an M3 prerequisite because that assembly also needs the neural result. Full study acceptance still requires all four criteria.
+
 ## Local Acceptance And Failures
 
 | ID | Observable criterion and check |

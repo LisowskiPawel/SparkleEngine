@@ -24,10 +24,6 @@ public:
 	void BeginRasterPass(RenderCommandContext& commandContext, const FrameGraphRasterPass& rasterPass) const noexcept;
 	void EndRasterPass(RenderCommandContext& commandContext) const noexcept;
 
-	void BindRenderTarget(
-	    RenderCommandContext& commandContext,
-	    FrameGraphTextureHandle renderTargetHandle,
-	    FrameGraphTextureHandle depthStencilHandle = FrameGraphTextureHandle::Invalid()) const noexcept;
 	void BindRenderTargets(
 	    RenderCommandContext& commandContext,
 	    std::span<const FrameGraphTextureHandle> renderTargetHandles,

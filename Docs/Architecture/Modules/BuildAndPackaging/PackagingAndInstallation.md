@@ -285,7 +285,7 @@ Package and native-incident acceptance remain open.
 
 ### Current Local Route
 
-**Source slice:** `ITER-PD4-01`, 2026-10-11; [Release progress](../../../Strategy/Roadmap.md#release-progress). Public instructions: [recovery/privacy](../../../../SUPPORT.md), [known issues](../../../../KNOWN_ISSUES.md), [security](../../../../SECURITY.md).
+**Evidence:** [Product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain archive-bound export/symbol/review checks and outstanding adoption/native/replacement proof. Public instructions: [recovery/privacy](../../../../SUPPORT.md), [known issues](../../../../KNOWN_ISSUES.md), [security](../../../../SECURITY.md).
 
 BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,ReviewRelease}.ps1`. [Release Inputs](#release-inputs) defines shipped helper/policy membership; review remains a maintainer source-side task.
 
@@ -294,7 +294,7 @@ BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,Revi
 | Logs/retention | Core Logger rotates logs; Launcher owns operation logs. [Public retention/removal rules](../../../../SUPPORT.md#retention-and-replacement) apply. Keep private symbols with candidate evidence through release review. |
 | GPU faults | D3D12 resource service drains supported bounded DRED records into logs; Vulkan records device loss. No automatic recovery. |
 | Export | Local fixed projection of verified package identity and counts; preview digest binds consent. Originals stay local. [User command and privacy limits](../../../../SUPPORT.md#preview-and-export-local-diagnostics). |
-| Symbols | Shipping MSVC emits `/Zi`/full PDBs into the separate symbol root. DbgHelp checks PE/PDB GUID-age; embedded paths are excluded. Full candidate/shader correlation remains unqualified. |
+| Symbols | Shipping MSVC emits `/Zi`/full PDBs into the separate symbol root. DbgHelp checks PE/PDB GUID-age; embedded paths are excluded. Archive-to-companion hashes and native source attribution are separate checks. |
 | Crash/hang | User-reported categories; automatic collection unavailable. Native incident rehearsal remains required. |
 | Review | Pawel Lisowski reviews each proposed release/replacement and closeout. Unresolved S0/S1 blocks approval. Results are local review records; publication and aggregate acceptance are separate. |
 
@@ -353,4 +353,4 @@ This stable family ID now covers adoption, local diagnostics and release review.
 | `CHK-ADOPT-03` | `AC-ADOPT-04`; `FM-ADOPT-04` | Review exact candidate known-defect ledger and public policy, then inject an unresolved critical defect and a false support promise. Both must block closeout; no live inbox submission is required. |
 | `CHK-ADOPT-04` | `AC-ADOPT-05`; `FM-ADOPT-05` | Apply/interrupt a versioned replacement on copies with representative user state; verify applicability, atomicity, state policy, rollback/withdrawal and unchanged public bytes. |
 
-Candidate results remain in `FCR-PROD-06`. No onboarding, local diagnostic, replacement or closeout check ran in this documentation amendment. Missing intake channels alone are no longer a blocker.
+Candidate results remain in `FCR-PROD-06`; fixtures cannot close an unavailable required native or adoption check. Missing intake channels alone are not a blocker.

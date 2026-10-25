@@ -186,7 +186,6 @@ public:
 	    FrameGraphAccelerationStructureHandle handle,
 	    RhiOwnedResourceHandle resource,
 	    ResourceState currentState = ResourceState::RayTracingAccelerationStructure) noexcept;
-	void ClearPersistentAccelerationStructureBinding(FrameGraphAccelerationStructureHandle handle) noexcept;
 	void BindPersistentTexture(FrameGraphTextureHandle handle, RhiResourceHandle resource, ResourceState currentState = ResourceState::Common) noexcept;
 	void BindPersistentTexture(FrameGraphTextureHandle handle, RhiOwnedResourceHandle resource, ResourceState currentState = ResourceState::Common) noexcept;
 	void BindPersistentTexture(
@@ -195,11 +194,9 @@ public:
 	    RhiResourceViewHandle shaderResourceView,
 	    const FrameGraphTextureDesc& desc,
 	    ResourceState currentState = ResourceState::Common) noexcept;
-	void ClearPersistentTextureBinding(FrameGraphTextureHandle handle) noexcept;
 	void BindPersistentBuffer(FrameGraphBufferHandle handle, RhiResourceHandle resource, ResourceState currentState = ResourceState::Common) noexcept;
 	void BindPersistentBuffer(FrameGraphBufferHandle handle, RhiOwnedResourceHandle resource, ResourceState currentState = ResourceState::Common) noexcept;
 	void BindPersistentBuffer(FrameGraphBufferHandle handle, RhiOwnedResourceHandle resource, const FrameGraphBufferDesc& desc, ResourceState currentState = ResourceState::Common) noexcept;
-	void ClearPersistentBufferBinding(FrameGraphBufferHandle handle) noexcept;
 	void ExportTexture(FrameGraphTextureHandle handle, std::string_view name) noexcept;
 	PixelFormat GetTextureFormat(FrameGraphTextureHandle handle) const noexcept;
 	ResourceState GetTrackedResourceState(FrameGraphResourceHandle handle) const noexcept;

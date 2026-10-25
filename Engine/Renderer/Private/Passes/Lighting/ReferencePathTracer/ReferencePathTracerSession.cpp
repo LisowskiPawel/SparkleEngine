@@ -41,14 +41,13 @@ ViewportRenderProgressReason ReferencePathTracerSession::ResolveAvailability(con
 {
 	const RhiCapabilities& capabilities = m_deviceServices.GetCapabilities();
 	const RhiFormatSupport* format = capabilities.FindFormatSupport(PixelFormat::R32G32B32A32_Float);
-	const MaterialTextureTableCapabilityReport materialTextures = BuildMaterialTextureTableCapabilityReport(capabilities);
 	const bool supportsView = view.camera.ProjectionKind == CameraProjectionKind::Perspective && view.renderExtent.IsValid();
 	if (!supportsView)
 	{
 		return ViewportRenderProgressReason::UnsupportedView;
 	}
 	const bool supportsAccumulation = format != nullptr && format->SupportsShaderResource && format->SupportsUnorderedAccess;
-	if (!supportsAccumulation || executionFrontend == RayTracingExecutionFrontend::None || !materialTextures.Supported)
+	if (!supportsAccumulation || executionFrontend == RayTracingExecutionFrontend::None || !SupportsMaterialTextureTable(capabilities))
 	{
 		return ViewportRenderProgressReason::UnsupportedCapability;
 	}

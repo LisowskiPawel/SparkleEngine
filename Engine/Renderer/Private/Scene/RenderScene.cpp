@@ -36,11 +36,6 @@ RenderRayTracingFrameBindings RenderScene::PrepareRayTracingFrame(const Prepared
 	return m_renderRayTracingScene->Prepare(preparedScene, viewPlan);
 }
 
-bool RenderScene::IsRayTracingAvailable() const noexcept
-{
-	return m_renderRayTracingScene->IsAvailable();
-}
-
 bool RenderScene::Apply(const RenderSceneDelta& delta, RenderSceneDynamicData dynamic)
 {
 	if (!ValidateDelta(delta))

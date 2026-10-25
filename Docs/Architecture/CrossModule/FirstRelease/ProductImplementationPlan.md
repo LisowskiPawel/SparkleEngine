@@ -15,7 +15,7 @@
 | [PD-1](#pd-1--game-and-editor-product-shells) | Read-only asset inspector repaired; rendering, lifecycle and remaining journeys stay open. | Its four source-workspace checks below pass. |
 | [PD-2](#pd-2--source-build-cook-and-launcher) | Source reproduction and operations pass; independent adoption remains open. | Source, operation and independent-adopter checks pass. |
 | [PD-3](#pd-3--package-and-installation) | Current assembly/integrity checks pass for `0db84502…`; installed Empty/Cornell and explicit-default failure checks pass locally. | Regenerate after PD-1 repairs; finish seven-map, budget, removal and clean/minimum-machine proof. |
-| [PD-4](#pd-4--support-incident-response-and-product-closure) | Local diagnostics/review paths exist; final-archive proof is missing. | Self-service, replacement and report reconciliation pass. |
+| [PD-4](#pd-4--support-incident-response-and-product-closure) | Retained-archive export, symbols and review negatives pass; final self-service/replacement proof remains open. | Self-service, replacement and all six reports pass. |
 
 **External proof:** a non-author source/product rehearsal and the required clean/minimum-machine run remain necessary. Another author-run checkout cannot close them.
 
@@ -89,10 +89,10 @@ Apply Delivery Boundary For Every Stage. Complete the next unchecked archive/int
 
 **Owner:** [self-service/diagnostics](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#fcr-prod-06-support-and-incident-contract); `FCR-PROD-06`.
 
-**Prerequisite:** PD-3's exact verified archive and symbol companion. Earlier diagnostic fixtures qualify only their original inputs.
+**Prerequisite:** PD-3's exact verified archive and symbol companion. [Retained-archive checks](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) are supporting proof; final acceptance waits for PD-3.
 
-- [ ] **Self-service/diagnostics:** a non-author completes all three product journeys; supported startup/crash/timeout/GPU routes retain consent, privacy, bounds and exact symbol identity. Verify unavailable categories/manual recovery truthfully; automatic CPU crash/hang collection is not required. (`AC-ADOPT-01/02/03`.)
-- [ ] **Review/replacement:** critical-defect review blocks approval; immutable replacement/withdrawal rejects wrong identities, preserves state and supports the declared rollback. No support service or deadline is advertised. (`AC-ADOPT-04/05`.)
+- [ ] **Self-service/diagnostics:** finish non-author three-product journeys and supported native/manual incident recovery on the final archive. Reuse unchanged export/privacy/bounds/symbol checks; unavailable categories stay explicit. Automatic CPU crash/hang collection is not required. (`AC-ADOPT-01/02/03`.)
+- [ ] **Replacement:** exercise a distinct verified version, interrupted replacement and declared rollback on isolated copies, preserving user state. Reuse critical-defect review, withdrawal and wrong-identity rejection checks. No support service or deadline is advertised. (`AC-ADOPT-04/05`.)
 - [ ] **Closure:** reconcile `FCR-PROD-01` through `06` against one final source/configuration/archive, with every applicable AC/FM/CHK passed or explicitly excluded by its scope owner. Failed, not-run and unavailable required checks keep this item open. No unresolved defect blocking that product scope may be waived by prose.
 
 **Phase exit:** all six reports pass their admitted internal-product scope. Retire this plan, repair incoming links and leave one roadmap completion row. Retain useful evidence in ignored artifacts. Broader rendering/performance, public signing/rights and publication gates remain in the mother plan.

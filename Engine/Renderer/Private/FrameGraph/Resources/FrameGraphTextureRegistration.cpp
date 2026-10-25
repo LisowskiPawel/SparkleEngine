@@ -285,26 +285,6 @@ void FrameGraph::BindPersistentTexture(
 	}
 }
 
-void FrameGraph::ClearPersistentTextureBinding(FrameGraphTextureHandle handle) noexcept
-{
-	if (!handle.IsValid())
-	{
-		return;
-	}
-
-	const FrameGraphResourceHandle resourceHandle = handle.GetResourceHandle();
-	if (!m_resourceRegistry.IsRegistered(resourceHandle))
-	{
-		return;
-	}
-
-	ReleaseExternalResourceViews(resourceHandle);
-	m_resourceResolver.ClearResolvedAccess(resourceHandle);
-	m_resourceRegistry.SetExternalContentsProduced(resourceHandle, false);
-	const FrameGraphResourceMetadata& metadata = m_resourceRegistry.GetMetadata(resourceHandle);
-	m_resourceStateTracker.UpdateCurrentState(resourceHandle, metadata.initialState);
-}
-
 void FrameGraph::BindPersistentBuffer(FrameGraphBufferHandle handle, RhiOwnedResourceHandle resource, ResourceState currentState) noexcept
 {
 	if (m_renderHardwareInterface == nullptr || !resource)
@@ -331,26 +311,6 @@ void FrameGraph::BindPersistentBuffer(FrameGraphBufferHandle handle, RhiOwnedRes
 	}
 	metadata.bufferDesc = resolvedDesc;
 	BindPersistentBuffer(handle, resource, currentState);
-}
-
-void FrameGraph::ClearPersistentBufferBinding(FrameGraphBufferHandle handle) noexcept
-{
-	if (!handle.IsValid())
-	{
-		return;
-	}
-
-	const FrameGraphResourceHandle resourceHandle = handle.GetResourceHandle();
-	if (!m_resourceRegistry.IsRegistered(resourceHandle))
-	{
-		return;
-	}
-
-	ReleaseExternalResourceViews(resourceHandle);
-	m_resourceResolver.ClearResolvedAccess(resourceHandle);
-	m_resourceRegistry.SetExternalContentsProduced(resourceHandle, false);
-	const FrameGraphResourceMetadata& metadata = m_resourceRegistry.GetMetadata(resourceHandle);
-	m_resourceStateTracker.UpdateCurrentState(resourceHandle, metadata.initialState);
 }
 
 FrameGraphResourceHandle FrameGraph::AllocateDynamicResourceHandle() noexcept

@@ -63,7 +63,7 @@ On visibility-task failure, view preparation clears raster indices, batches, and
 
 ## Candidate Validation And Batch Identity
 
-A candidate is raster-submittable only when its draw index names a prepared primitive, its prepared draw has a GPU mesh, any instance-group index is in range, its material binding exists when required, and its material classification is not rejected.
+The batch builder consumes the visibility task's item buffer directly and skips rejected classifications before inspecting draw, group, or material state. View preparation does not retain or copy a second compacted item buffer. A remaining candidate is raster-submittable only when its draw index names a prepared primitive, its prepared draw has a GPU mesh, any instance-group index is in range, and its material binding exists when required.
 
 Two non-transparent candidates may share a batch only when all current batch-key fields agree:
 

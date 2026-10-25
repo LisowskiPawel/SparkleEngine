@@ -107,7 +107,7 @@ NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/set
 
 **Work:** Execute the next [decal stage](../Features/DeferredDecals/ImplementationPlan.md) and [AC-DECAL-01 through 08](../Features/DeferredDecals/Acceptance.md). The leaf owns projection, tile/lookup strategy and composition; this parent adds no inside/outside volume rasterization or second blend path. Preserve authored/cooked identity, zero-decal behavior, order/channels, raw/temporal and secondary-ray proof.
 
-**Cleanup:** Recheck CVarRendererMaterialBindingMode, SupportedMaterialBindingModeMask and its query: the 2026-10-24 source search found registration/declaration and initialization but no runtime reader/caller in Engine/Tools/Projects/CMake. If unchanged, remove the ineffective selector/mode/mask with help/inventory/build consumers; preserve the real fixed-capacity texture table and descriptor checks.
+**Cleanup:** Reuse the existing material texture-table capability owner and preserve the real fixed-capacity table and descriptor checks. Do not reintroduce a binding-mode selector or report-only mode/mask state; keep decal-specific policy inside its feature home.
 
 **Exit:** FCR-REN-23 passes admitted authoring/material/overlap/overflow/lifecycle/backend/package/cost checks; replaced PBR/composition data and temporary producers are gone. Static projected decals do not admit dynamic/mesh/transparent decal systems.
 

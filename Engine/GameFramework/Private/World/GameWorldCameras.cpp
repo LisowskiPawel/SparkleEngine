@@ -141,29 +141,6 @@ namespace ECS
 		return written;
 	}
 
-	float GameWorldState::ReadCameraAspectRatio(EntityId entity) const noexcept
-	{
-		const Camera* camera = m_registry.Get<Camera>(entity);
-		return camera != nullptr ? camera->AspectRatio : 1.0f;
-	}
-
-	bool GameWorldState::WriteCameraAspectRatio(EntityId entity, float aspectRatio) noexcept
-	{
-		const Camera* camera = m_registry.Get<Camera>(entity);
-		if (camera == nullptr)
-		{
-			return false;
-		}
-		Camera updated = *camera;
-		updated.AspectRatio = aspectRatio;
-		const bool written = m_registry.Replace(entity, updated);
-		if (written)
-		{
-			RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::Camera);
-		}
-		return written;
-	}
-
 	bool GameWorldState::WriteTransform(EntityId entity, const Transform& transform) noexcept
 	{
 		const bool written = m_registry.Replace(entity, WorldTransformConversion::ToLocal(transform));

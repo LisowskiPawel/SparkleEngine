@@ -76,7 +76,7 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::Execute(std:
 
 	const bool blocked = task.BlockedByPrerequisite.load(std::memory_order_acquire) || task.BlockedByParent.load(std::memory_order_acquire) || cancellation.stop_requested();
 	TaskExecutionContext taskContext = m_context;
-	TaskExecutionContextBinding::Bind(taskContext, m_generation, node.Desc.Lane, cancellation);
+	taskContext.Bind(node.Desc.Lane, cancellation);
 
 	const TaskResult result = blocked && node.Desc.CompletionPolicy == TaskCompletionPolicy::Normal ? TaskResult::Cancelled("Task execution was cancelled or a prerequisite did not succeed.")
 	                                                                                                : TaskFunctionInvoker::Invoke(node, taskContext);

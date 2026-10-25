@@ -219,6 +219,11 @@ bool MeshInstanceBatchBuilder::IsValidCandidate(
     const MeshInstanceBatchBuildOptions& options,
     MeshGeometryInstancingDiagnostics& diagnostics) noexcept
 {
+	if (item.Classification == RenderMaterialClassification::Rejected)
+	{
+		return false;
+	}
+
 	if (item.DrawIndex >= primitives.size() || !primitives[item.DrawIndex].Draw.Geometry.Mesh)
 	{
 		if (options.CollectDiagnostics)
@@ -246,7 +251,7 @@ bool MeshInstanceBatchBuilder::IsValidCandidate(
 		}
 		return false;
 	}
-	return item.Classification != RenderMaterialClassification::Rejected;
+	return true;
 }
 
 MeshInstanceBatchBuilder::BatchKey MeshInstanceBatchBuilder::MakeBatchKey(const MeshRenderItem& item, std::span<const PreparedRenderPrimitive> primitives) noexcept

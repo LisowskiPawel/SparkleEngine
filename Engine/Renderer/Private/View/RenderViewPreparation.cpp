@@ -40,21 +40,11 @@ void RenderViewPreparation::Prepare(const PreparedRenderScene& preparedScene, Re
 		return;
 	}
 
-	m_visibleItems.clear();
-	m_visibleItems.reserve(m_run.Items.size());
-	for (const MeshRenderItem& item : m_run.Items)
-	{
-		if (item.Classification != RenderMaterialClassification::Rejected)
-		{
-			m_visibleItems.push_back(item);
-		}
-	}
-
 	m_batchResult.RasterInstanceIndices = std::move(view.rasterPrimitiveIndices);
 	m_batchResult.Batches = std::move(view.meshInstanceBatches);
 
 	m_batchBuilder.Build(
-	    m_visibleItems,
+	    m_run.Items,
 	    preparedScene.primitives,
 	    preparedScene.instanceGroups,
 	    MeshInstanceBatchBuildOptions{.EnableAutoBatching = CVarRendererMeshAutoBatching.Get(), .RequireMaterialBindingSet = true, .CollectDiagnostics = false},

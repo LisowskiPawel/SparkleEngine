@@ -39,8 +39,6 @@ public:
 
 	bool IsAvailable() const noexcept { return m_capabilityReport.SupportsAccelerationStructure; }
 
-	bool HasValidTlas() const noexcept;
-
 	RayTracingExecutionFrontend GetExecutionFrontend() const noexcept { return m_executionFrontend; }
 
 	void BeginGraphBuild() noexcept

@@ -42,14 +42,11 @@ namespace SparkleLauncher
 
 		const QVector<LauncherOperationDescriptor>& Operations() const;
 
-		void RequestOperationPreview(const LauncherOperationRequest& request);
 		void RunOperation(LauncherOperationRequest request);
 		bool CancelOperation(const QString& runId);
 		bool ObserveGpuCrash(GpuCrashIncident incident, std::function<void(const QString&)> completion);
 
 	signals:
-		void OperationPreviewReady(const QString& operationId, const QString& title, const QString& previewText, bool canRun);
-		void OperationPreviewFailed(const QString& operationId, const QString& message);
 		void OperationStarted(const QString& runId, const QString& operationId, const QString& title);
 		void OperationOutputReceived(const QString& runId, const QString& operationId, const QString& outputText);
 		void OperationProgressReceived(const QString& runId, const QString& operationId, const QString& phase, quint64 completed, quint64 total);

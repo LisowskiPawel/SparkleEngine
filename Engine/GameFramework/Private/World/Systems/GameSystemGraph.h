@@ -5,7 +5,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -120,7 +119,6 @@ namespace ECS
 		explicit operator bool() const noexcept { return IsValid(); }
 
 		const GameSystemGraphError& GetError() const noexcept;
-		std::span<const GameSystemDesc> GetSystems() const noexcept;
 		bool Execute(TaskExecutor& executor, GameWorldSystemExecution& systems, GameSystemGraphError& error);
 
 	private:

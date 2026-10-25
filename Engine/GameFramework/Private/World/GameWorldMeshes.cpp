@@ -79,24 +79,6 @@ namespace ECS
 		return EntityAt<MeshInstance>(index);
 	}
 
-	const Mesh* GameWorldState::ResolveMesh(EntityId entity) const noexcept
-	{
-		const MeshInstance* mesh = m_registry.Get<MeshInstance>(entity);
-		return mesh == nullptr ? nullptr : m_meshResources.Resolve(mesh->Resource);
-	}
-
-	bool GameWorldState::IsSkeletalMesh(EntityId entity) const noexcept
-	{
-		const MeshInstance* mesh = m_registry.Get<MeshInstance>(entity);
-		return mesh != nullptr && mesh->Kind == SceneMeshKind::Skeletal;
-	}
-
-	MaterialHandle GameWorldState::ReadMeshMaterial(EntityId entity) const noexcept
-	{
-		const MeshInstance* mesh = m_registry.Get<MeshInstance>(entity);
-		return mesh == nullptr ? MaterialHandle::Invalid() : mesh->Material;
-	}
-
 	bool GameWorldState::WriteMeshMaterial(EntityId entity, MaterialHandle material) noexcept
 	{
 		const MeshInstance* mesh = m_registry.Get<MeshInstance>(entity);
@@ -112,24 +94,6 @@ namespace ECS
 			RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::MeshInstance);
 		}
 		return written;
-	}
-
-	Assets::CookedAssetId GameWorldState::ReadMeshAssetId(EntityId entity) const noexcept
-	{
-		const MeshInstance* mesh = m_registry.Get<MeshInstance>(entity);
-		return mesh == nullptr ? Assets::InvalidCookedAssetId : mesh->MeshAssetId;
-	}
-
-	Assets::CookedAssetId GameWorldState::ReadSkeletonAssetId(EntityId entity) const noexcept
-	{
-		const MeshInstance* mesh = m_registry.Get<MeshInstance>(entity);
-		return mesh == nullptr ? Assets::InvalidCookedAssetId : mesh->SkeletonAssetId;
-	}
-
-	std::uint32_t GameWorldState::ReadMeshSourceNodeIndex(EntityId entity) const noexcept
-	{
-		const MeshInstance* mesh = m_registry.Get<MeshInstance>(entity);
-		return mesh == nullptr ? Assets::kInvalidCookedSceneSourceNodeIndex : mesh->SourceNodeIndex;
 	}
 
 	void GameWorldState::AppendMeshInstanceGroups(std::vector<SceneMeshInstanceGroupData> groups)

@@ -493,17 +493,6 @@ namespace SparkleLauncher
 		return groupLayout;
 	}
 
-	QVBoxLayout* LauncherMainWindow::AddInlineOptionsSection(QVBoxLayout& layout)
-	{
-		QFrame* section = new QFrame(this);
-		section->setObjectName("InlineOptionsSection");
-		QVBoxLayout* sectionLayout = new QVBoxLayout(section);
-		sectionLayout->setContentsMargins(0, 0, 0, 0);
-		sectionLayout->setSpacing(LauncherUi::Section::Spacing);
-		layout.addWidget(section);
-		return sectionLayout;
-	}
-
 	void LauncherMainWindow::AddNoOptionsMessage(QVBoxLayout& layout, const QString& text)
 	{
 		QLabel* label = new QLabel(text, this);

@@ -81,10 +81,7 @@ namespace SparkleLauncher
 		QWidget* CreateFooterContextPanel(QWidget* parent);
 		QLabel* CreateSectionLabel(const QString& title) const;
 		QLabel* CreateFieldLabel(const QString& title) const;
-		QCheckBox* CreateBoundCheckBox(const QString& label, const QString& tooltip, bool checked, void (LauncherSettings::*setter)(bool));
 		QLineEdit* CreateBoundLineEdit(const QString& text, const QString& placeholder, const QString& tooltip, void (LauncherSettings::*setter)(const QString&));
-		QTextEdit* CreateBoundTextEdit(const QString& text, const QString& placeholder, const QString& tooltip, void (LauncherSettings::*setter)(const QString&));
-		QComboBox* CreateProfileCombo(const QStringList& profiles, const QString& currentProfile, void (LauncherSettings::*setter)(const QString&));
 		QComboBox* CreateValueCombo(const QVector<QPair<QString, QString>>& options, const QString& currentValue, void (LauncherSettings::*setter)(const QString&));
 		QComboBox* CreateContextCombo(void (LauncherSettings::*setter)(const QString&));
 		void RefreshContextSelectors();
@@ -131,7 +128,6 @@ namespace SparkleLauncher
 		QVector<LauncherCleanTarget> BuildLevelCleanTargets(const LauncherContentSummary& content, const QString& levelId = QString()) const;
 		bool SetLevelsSelected(const std::filesystem::path& contentRoot, const std::vector<std::string>& levelIds, bool selected, const QString& actionName);
 		LauncherLevelUiModel BuildLevelUiModel() const;
-		QPushButton* CreateCommandActionButton(const QString& operationId, const QString& label, bool primary, bool runImmediately = false);
 		void AddHomeQuickStart(QVBoxLayout& layout);
 		void StartQuickStartLevel(const LauncherContentSummary& content, const LauncherLevelUiEntry& level);
 		void ContinueQuickStart();
@@ -143,8 +139,6 @@ namespace SparkleLauncher
 		QPushButton* CreateHostToolActionButton(const ToolchainItemStatus& item);
 		void SelectWorkspaceCompiler(WorkspaceCompiler compiler);
 		void InstallHostTool(const ToolchainItemStatus& item);
-		void AddMaintenanceEnvironmentStatus(QVBoxLayout& layout, const QString& operationId);
-		QVBoxLayout* AddInlineOptionsSection(QVBoxLayout& layout);
 		void AddNoOptionsMessage(QVBoxLayout& layout, const QString& text);
 		void SetControlsEnabled(bool enabled);
 		void EnsureOptionsPage(const QString& operationId);

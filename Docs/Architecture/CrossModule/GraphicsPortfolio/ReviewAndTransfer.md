@@ -39,6 +39,8 @@ Each case answers: problem/consumer, constraints, your personal contribution, de
 
 M6 closes the technical package and first reproduction (`01..03` plus its independent review). M7 closes the direction/second-context/teaching/revision record (`04..08`) for the stronger principal-oriented portfolio claim. These are local program choices inferred from the role study, not an NVIDIA hiring guarantee or official checklist.
 
+Assembly consumes M3's locally qualified study/incident packet and NG-S6a's local evaluation/package result, with final non-author cells visibly open. The actual M6 exercise covers the study/analysis and neural results required by AC-WS-04/AC-NG-08; WS-S4/NG-S6b then reuse those observations to close their criteria. Requiring those adoption verdicts before assembly would create a prerequisite cycle. One frozen package/participant may cover the distinct results; a successful unrelated headline cannot substitute for either.
+
 ## Failure Controls And Check Route
 
 Before review, deliberately identify one wrong/missing candidate link or hash, a hidden prerequisite, a mixed-settings comparison and an uncleared artifact; the preparation check must reject them. Restore the valid package before an actual participant uses it. Use existing manifests/commands and disposable probes, not a portfolio test framework.

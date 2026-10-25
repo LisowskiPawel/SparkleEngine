@@ -13,7 +13,7 @@ Turn one actual failure into a causal, reproducible incident case without buildi
 | What to do | Working route |
 | --- | --- |
 | First action | [INC-0](#inc-0-freeze-the-failed-candidate-and-question): bind the actual bad candidate and first discriminating observation; reuse completed evidence where valid. |
-| Result to reach | A causal original-bad versus fixed result, reduced replay, scoped report and real independent review under AC-WS-03/04. |
+| Result to reach | M3: causal original-bad versus fixed proof and a cleared replay packet under AC-WS-03. M6 / parent WS-S4 retains the required real independent review/replay under AC-WS-04. |
 | Start / stop | Planning can prepare decisions earlier; execution needs the exact candidate, valid prerequisites and frozen check cards. Missing rights, tools, or external participants keep the affected result open. |
 
 ## Execution Contract
@@ -93,18 +93,18 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Start:** INC-2 proof or valid historical accepted equivalent is available.
 
-**Work:** Assemble the concise symptom/hypotheses/mechanism/fix/deletion narrative and cleared reduced replay. Link the original CASE-02/FCR artifacts, obtain the parent independent exercise/review and retain interventions and findings.
+**Work:** Assemble the concise symptom/hypotheses/mechanism/fix/deletion narrative and cleared reduced replay. Link the original CASE-02/FCR artifacts, qualify the local replay instructions and hand the cleared packet to the parent. Independent exercise/review follows at M6 / WS-S4, after the neural case exists.
 
 **Cleanup / non-delivery:** Remove one-off assembly/replay code from submitted source. Verify earlier cleanup and retain unique failure evidence; no issue portal or continuing support commitment.
 
-**Exit:** The incident meets AC-WS-03 and its relevant AC-WS-04 replay; absent external evidence stays open without erasing valid local results. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** The incident meets AC-WS-03 and its local replay checks for M3. AC-WS-04 independent evidence stays open at the parent WS-S4/M6 gate; it cannot block the technical handoff needed by neural work. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
 Execute only INC-3 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/IncidentAnalysis/ImplementationPlan.md#inc-3-publish-the-scoped-incident-and-replay. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
-Deliver the original incident/causal repair packet and cleared replay to the existing CASE-02 and parent reproduction route. Retain actual review/interventions, limitations and deletion proof. Do not invent a reviewer or submit/contact without authorization.
+Deliver the original causal repair and locally qualified replay packet to CASE-02 and parent WS-S3 for M3. Preserve limitations and deletion proof. Route required actual independent observations to WS-S4 at M6; do not require them before neural production or invent a reviewer. No unauthorized submission/contact.
 NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
 ```
 

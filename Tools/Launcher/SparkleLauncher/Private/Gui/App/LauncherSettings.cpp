@@ -83,11 +83,6 @@ namespace SparkleLauncher
 		return m_cookScopes;
 	}
 
-	const QString& LauncherSettings::SelectedTargets() const
-	{
-		return m_selectedTargets;
-	}
-
 	const QString& LauncherSettings::ShaderBackend() const
 	{
 		return m_shaderBackend;
@@ -167,46 +162,6 @@ namespace SparkleLauncher
 		return m_cleanScope;
 	}
 
-	bool LauncherSettings::ShaderEnableDebugInfo() const
-	{
-		return m_shaderEnableDebugInfo;
-	}
-
-	bool LauncherSettings::ShaderEnableOptimizations() const
-	{
-		return m_shaderEnableOptimizations;
-	}
-
-	bool LauncherSettings::ShaderWarningsAsErrors() const
-	{
-		return m_shaderWarningsAsErrors;
-	}
-
-	bool LauncherSettings::ShaderStripDebugInfo() const
-	{
-		return m_shaderStripDebugInfo;
-	}
-
-	bool LauncherSettings::ForceConfigure() const
-	{
-		return m_forceConfigure;
-	}
-
-	bool LauncherSettings::ForceRecook() const
-	{
-		return m_forceRecook;
-	}
-
-	bool LauncherSettings::ConfirmForceRecook() const
-	{
-		return m_confirmForceRecook;
-	}
-
-	bool LauncherSettings::ConfirmClean() const
-	{
-		return m_confirmClean;
-	}
-
 	void LauncherSettings::SetRunMode(const QString& runMode)
 	{
 		const QString normalized = runMode.trimmed().toLower() == "game" ? QStringLiteral("game") : QStringLiteral("editor");
@@ -229,16 +184,6 @@ namespace SparkleLauncher
 
 		m_buildConfiguration = normalized;
 		emit SettingsChanged();
-	}
-
-	void LauncherSettings::SetEditorProfile(const QString& profileName)
-	{
-		SetBuildConfiguration(profileName);
-	}
-
-	void LauncherSettings::SetGameProfile(const QString& profileName)
-	{
-		SetBuildConfiguration(profileName);
 	}
 
 	void LauncherSettings::SetWorkspaceIde(const QString& ide)
@@ -285,16 +230,6 @@ namespace SparkleLauncher
 		emit SettingsChanged();
 	}
 
-	void LauncherSettings::SetSelectedTargets(const QString& targets)
-	{
-		if (m_selectedTargets == targets)
-		{
-			return;
-		}
-		m_selectedTargets = targets;
-		emit SettingsChanged();
-	}
-
 	void LauncherSettings::SetShaderBackend(const QString& backend)
 	{
 		const QString normalized = backend.trimmed().toLower() == "slang" ? QStringLiteral("slang") : QStringLiteral("dxc");
@@ -324,86 +259,6 @@ namespace SparkleLauncher
 			return;
 		}
 		m_cleanScope = scope;
-		emit SettingsChanged();
-	}
-
-	void LauncherSettings::SetShaderEnableDebugInfo(bool enabled)
-	{
-		if (m_shaderEnableDebugInfo == enabled)
-		{
-			return;
-		}
-		m_shaderEnableDebugInfo = enabled;
-		emit SettingsChanged();
-	}
-
-	void LauncherSettings::SetShaderEnableOptimizations(bool enabled)
-	{
-		if (m_shaderEnableOptimizations == enabled)
-		{
-			return;
-		}
-		m_shaderEnableOptimizations = enabled;
-		emit SettingsChanged();
-	}
-
-	void LauncherSettings::SetShaderWarningsAsErrors(bool enabled)
-	{
-		if (m_shaderWarningsAsErrors == enabled)
-		{
-			return;
-		}
-		m_shaderWarningsAsErrors = enabled;
-		emit SettingsChanged();
-	}
-
-	void LauncherSettings::SetShaderStripDebugInfo(bool enabled)
-	{
-		if (m_shaderStripDebugInfo == enabled)
-		{
-			return;
-		}
-		m_shaderStripDebugInfo = enabled;
-		emit SettingsChanged();
-	}
-
-	void LauncherSettings::SetForceConfigure(bool enabled)
-	{
-		if (m_forceConfigure == enabled)
-		{
-			return;
-		}
-		m_forceConfigure = enabled;
-		emit SettingsChanged();
-	}
-
-	void LauncherSettings::SetForceRecook(bool enabled)
-	{
-		if (m_forceRecook == enabled)
-		{
-			return;
-		}
-		m_forceRecook = enabled;
-		emit SettingsChanged();
-	}
-
-	void LauncherSettings::SetConfirmForceRecook(bool enabled)
-	{
-		if (m_confirmForceRecook == enabled)
-		{
-			return;
-		}
-		m_confirmForceRecook = enabled;
-		emit SettingsChanged();
-	}
-
-	void LauncherSettings::SetConfirmClean(bool enabled)
-	{
-		if (m_confirmClean == enabled)
-		{
-			return;
-		}
-		m_confirmClean = enabled;
 		emit SettingsChanged();
 	}
 

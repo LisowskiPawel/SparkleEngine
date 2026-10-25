@@ -56,7 +56,7 @@ Use ReviewAndTransfer.md's selected three cases/package and AC-PORT/CHK-PORT con
 
 ### 2. Assemble The Three Cases
 
-**Start when:** selected case evidence and sharing rights are accepted.
+**Start when:** selected technical evidence and sharing rights are accepted: M3's study/incident packet and NG-S6a's local evaluation/package proof. Their final non-author adoption cells may still be open; this stage prepares the inputs needed to close them.
 
 Build the small package in Review And Transfer: landing/readme, three narratives, original-artifact index, reproduction instructions and technical paper/talk outline. Each narrative shows personal contribution, derivation, source/native/model lineage, analytical prediction, measured result, rejected/inconclusive alternative, failure, limitation and simplification. Include the three complementary study domains inside the measured-frame case; they are not extra engine projects. Explain classical versus owned neural results without inheriting vendor/paper claims.
 
@@ -69,7 +69,7 @@ Link original artifacts and package only the cleared reproduction subset. Replac
 
 ```text
 Execute only stage 2 from Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#2-assemble-the-three-cases; apply its Stage Contract, including the Stage Source-Style Gate.
-Assemble ReviewAndTransfer.md's three cases and minimal package from accepted, cleared original evidence. Include personal contribution, derivation/source/native joins, cost predictions, controlled results, negative alternatives, limitations and deletions. Run CHK-PORT-01/04, hash/rights and timed reader checks. Replace duplicate narratives and remove probes; preserve originals. Handoff coverage and pending cells without claiming external acceptance. No new site, viewer, collector or copied capture depot.
+Assemble ReviewAndTransfer.md's three cases from M3 technical/incident and NG-S6a local evaluation/package proof, with sharing rights accepted. Final study/neural adoption may remain open; this package is its input. Include personal contribution, derivation/source/native joins, controlled results, negative alternatives and limitations. Run CHK-PORT-01/04, hash/rights and reader checks. Replace duplicate narratives and remove probes; preserve originals. No invented acceptance, site, viewer or capture depot.
 ```
 
 </details>
@@ -80,6 +80,8 @@ Assemble ReviewAndTransfer.md's three cases and minimal package from accepted, c
 
 Execute WL-07/08 and CHK-PORT-02 with the exact supported tuple. Record prior involvement, every intervention, failed step and actual outputs; an assisted exercise cannot pass unaided reproduction. Obtain a real specialist challenge to a material design/performance assumption and retain its evidence, alternatives and disposition under AC-PORT-04. Repair justified documentation/instruction issues; production defects return to their existing owner with same-stage cleanup and affected proof invalidated.
 
+Freeze the exercise's coverage before the run: it must reproduce the selected study/analysis headline and supported neural result required by `AC-WS-04` and `AC-NG-08`, with original input/model/native identity. One participant/package can cover both without an adopter per folder. Do not demand these final adoption verdicts as entry prerequisites. Return the actual observations to WS-S4 and NG-S6b; a generic content-only first run cannot close either missing result.
+
 **Exit:** M6 has the three technical cases, real first non-author reproduction and independent review, with AC-PORT-01..03 and the review record. Missing participation/result keeps the corresponding criterion open. Remove probes and stale claims; do not add a review portal or support service.
 
 <details>
@@ -87,7 +89,7 @@ Execute WL-07/08 and CHK-PORT-02 with the exact supported tuple. Record prior in
 
 ```text
 Execute only stage 3 from Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#3-reproduce-review-and-revise; apply its Stage Contract, including the Stage Source-Style Gate.
-After actual participant authorization, execute WL-07/08 and CHK-PORT-02 on the frozen candidate, recording involvement/interventions/failures and output. Obtain the meaningful independent technical challenge in AC-PORT-04 and dispose of each finding. Route production defects to existing owners; requalify changed claims and remove probes. Handoff original reports and real M6 results or explicit blocked cells. Do not self-certify adoption, silently repair the participant's environment or contact/publish without authorization.
+After actual participant authorization, execute WL-07/08 and CHK-PORT-02 on the frozen technical packet. Cover the selected study/analysis and supported neural result for AC-WS-04/AC-NG-08; final adoption verdicts are outputs, not prerequisites. Record involvement/interventions/failures and actual output, then return applicable observations to WS-S4/NG-S6b. Obtain the AC-PORT-04 specialist challenge and dispose of findings; route defects to existing owners and requalify affected proof. No self-certification, private repair or unauthorized external action.
 ```
 
 </details>

@@ -274,18 +274,6 @@ namespace SparkleLauncher
 		return label;
 	}
 
-	QCheckBox* LauncherMainWindow::CreateBoundCheckBox(const QString& label, const QString& tooltip, bool checked, void (LauncherSettings::*setter)(bool))
-	{
-		QCheckBox* box = new QCheckBox(label, this);
-		box->setToolTip(tooltip);
-		box->setAccessibleName(label);
-		box->setAccessibleDescription(tooltip);
-		box->setChecked(checked);
-		RegisterFocusable(box);
-		connect(box, &QCheckBox::toggled, &m_settings, setter);
-		return box;
-	}
-
 	QLineEdit* LauncherMainWindow::CreateBoundLineEdit(const QString& text, const QString& placeholder, const QString& tooltip, void (LauncherSettings::*setter)(const QString&))
 	{
 		QLineEdit* edit = new QLineEdit(this);
@@ -296,32 +284,6 @@ namespace SparkleLauncher
 		RegisterFocusable(edit);
 		connect(edit, &QLineEdit::textChanged, &m_settings, setter);
 		return edit;
-	}
-
-	QTextEdit* LauncherMainWindow::CreateBoundTextEdit(const QString& text, const QString& placeholder, const QString& tooltip, void (LauncherSettings::*setter)(const QString&))
-	{
-		QTextEdit* edit = new QTextEdit(this);
-		edit->setPlainText(text);
-		edit->setPlaceholderText(placeholder);
-		edit->setToolTip(tooltip);
-		edit->setAccessibleDescription(tooltip);
-		edit->setMinimumHeight(LauncherUi::TextEdit::MinHeight);
-		edit->setMaximumHeight(LauncherUi::TextEdit::MaxHeight);
-		RegisterFocusable(edit);
-		connect(edit, &QTextEdit::textChanged, this, [edit, setter, this]() { (m_settings.*setter)(edit->toPlainText()); });
-		return edit;
-	}
-
-	QComboBox* LauncherMainWindow::CreateProfileCombo(const QStringList& profiles, const QString& currentProfile, void (LauncherSettings::*setter)(const QString&))
-	{
-		QComboBox* combo = new QComboBox(this);
-		combo->addItems(profiles);
-		combo->setAccessibleName("Profile");
-		combo->setAccessibleDescription("Build profile used by this workflow.");
-		combo->setCurrentText(currentProfile);
-		RegisterFocusable(combo);
-		connect(combo, &QComboBox::currentTextChanged, &m_settings, setter);
-		return combo;
 	}
 
 	QComboBox* LauncherMainWindow::CreateValueCombo(const QVector<QPair<QString, QString>>& options, const QString& currentValue, void (LauncherSettings::*setter)(const QString&))

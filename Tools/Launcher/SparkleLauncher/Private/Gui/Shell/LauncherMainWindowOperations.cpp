@@ -176,65 +176,45 @@ namespace SparkleLauncher
 
 	bool LauncherMainWindow::ConfirmRunRequest(LauncherOperationRequest& request) const
 	{
-		const bool cleanRequested = request.OperationId == "workspace.clean";
-		const bool customCleanRequested = cleanRequested && !request.CleanTargets.isEmpty();
-		const bool destructiveRequested = request.ForceRecook || cleanRequested;
-		if (!destructiveRequested)
+		if (request.OperationId != "workspace.clean" || request.ConfirmClean)
 		{
 			return true;
 		}
-		if (request.ForceRecook && !request.ConfirmForceRecook)
+
+		const bool customCleanRequested = !request.CleanTargets.isEmpty();
+		QStringList scopeNames;
+		if (customCleanRequested)
 		{
-			QMessageBox::warning(const_cast<LauncherMainWindow*>(this), "Confirmation Required", "Enable Confirm clean cook before removing cooked outputs.");
-			return false;
+			for (const LauncherCleanTarget& target : request.CleanTargets)
+			{
+				scopeNames.push_back(target.DisplayName + "\n" + target.Path);
+			}
 		}
-		if (cleanRequested && !request.ConfirmClean)
+		else
 		{
-			QStringList scopeNames;
-			if (customCleanRequested)
+			for (const QString& scopeValue : request.CleanScope.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts))
 			{
-				for (const LauncherCleanTarget& target : request.CleanTargets)
-				{
-					scopeNames.push_back(target.DisplayName + "\n" + target.Path);
-				}
+				scopeNames.push_back(CleanScopeDisplayName(scopeValue));
 			}
-			else
-			{
-				for (const QString& scopeValue : request.CleanScope.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts))
-				{
-					scopeNames.push_back(CleanScopeDisplayName(scopeValue));
-				}
-			}
-
-			QString message = customCleanRequested ? "Generated outputs to clean:\n\n" + scopeNames.join("\n\n") : "Clean scopes:\n" + scopeNames.join('\n');
-
-			message += customCleanRequested ? "\n\nThis removes only the generated outputs mapped to the selected action. Continue?"
-			                                : "\n\nThis removes generated files for the selected scope. Continue?";
-
-			const QMessageBox::StandardButton result = QMessageBox::question(
-			    const_cast<LauncherMainWindow*>(this),
-			    customCleanRequested ? "Confirm Action Clean" : "Confirm Clean Workspace",
-			    message,
-			    QMessageBox::Ok | QMessageBox::Cancel,
-			    QMessageBox::Cancel);
-
-			if (result != QMessageBox::Ok)
-			{
-				return false;
-			}
-
-			request.ConfirmClean = true;
-			return true;
 		}
+
+		QString message = customCleanRequested ? "Generated outputs to clean:\n\n" + scopeNames.join("\n\n") : "Clean scopes:\n" + scopeNames.join('\n');
+		message += customCleanRequested ? "\n\nThis removes only the generated outputs mapped to the selected action. Continue?" : "\n\nThis removes generated files for the selected scope. Continue?";
 
 		const QMessageBox::StandardButton result = QMessageBox::question(
 		    const_cast<LauncherMainWindow*>(this),
-		    "Confirm Clean Cook",
-		    "This workflow will remove cooked outputs before cooking. Continue?",
-		    QMessageBox::Yes | QMessageBox::No,
-		    QMessageBox::No);
+		    customCleanRequested ? "Confirm Action Clean" : "Confirm Clean Workspace",
+		    message,
+		    QMessageBox::Ok | QMessageBox::Cancel,
+		    QMessageBox::Cancel);
 
-		return result == QMessageBox::Yes;
+		if (result != QMessageBox::Ok)
+		{
+			return false;
+		}
+
+		request.ConfirmClean = true;
+		return true;
 	}
 
 	void LauncherMainWindow::PromptForLauncherRestart()

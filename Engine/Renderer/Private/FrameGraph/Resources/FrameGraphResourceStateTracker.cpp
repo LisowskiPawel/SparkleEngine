@@ -19,14 +19,6 @@ void FrameGraphResourceStateTracker::RegisterResource(FrameGraphResourceHandle h
 	}
 }
 
-void FrameGraphResourceStateTracker::ResetCurrentStates(const FrameGraphResourceRegistry& registry) noexcept
-{
-	for (const FrameGraphResourceHandle handle : registry.GetRegisteredHandles())
-	{
-		UpdateCurrentState(handle, registry.GetMetadata(handle).initialState);
-	}
-}
-
 void FrameGraphResourceStateTracker::UpdateCurrentState(FrameGraphResourceHandle handle, ResourceState currentState) noexcept
 {
 	assert(handle.IsValid());
