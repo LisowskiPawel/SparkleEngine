@@ -21,7 +21,7 @@ Sections: [Neural Graphics Training And Evaluation](#neural-graphics-training-an
 | problem and dataset | Not found | one bounded graphics problem, licensed/provenanced data, immutable splits, and a classical/reference target |
 | model and training | Not found | owned operator/model, reproducible recipe, checkpoints, metrics, and accepted artifact |
 | evaluation | Not found | independent quality, temporal, robustness, cost, and distribution-shift comparison |
-| export/lowering/kernel | Not found | inspectable legalization, fusion, layout/precision decisions, kernel identity, and numerical equivalence |
+| fixed export/kernel | Not found | fixed tensor/operator/layout contract, checked artifact and kernel identity, bounded precision/layout profiles and GPU numerical equivalence |
 | Renderer/RHI runtime | Not found | typed inputs/output/history, capability selection, classical fallback, dispatch, synchronization, and retirement |
 | product delivery | Not found | manifested model/kernel/runtime bytes, licenses, compatibility, clean-machine result, and support boundary |
 
@@ -44,7 +44,7 @@ Existing NVIDIA reconstruction providers enter at an external runtime-inference 
 | --- | --- | --- |
 | `NG-TRAIN-*` | dataset/provenance, owned model/operator, and reproducible training | Not found |
 | `NG-EVAL-*` | independent quality, temporal, robustness, and cost evaluation | Not found |
-| `NG-LOWER-*` | model export, intermediate representation, legalization, fusion, layout, and precision | Not found |
+| `NG-LOWER-*` | fixed tensor export/operator validation and measured layout/precision choices; no arbitrary graph IR | Not found |
 | `NG-KERNEL-*` | backend kernel generation or selection and numerical validation | Not found |
 | `NG-RUNTIME-*` | owned Renderer/RHI inference, fallback, lifetime, and packaged product route | Not found |
 
@@ -108,7 +108,7 @@ The selected diffuse-indirect slice now has proposed [signal, fixed CNN, trainin
 | --- | --- | --- |
 | problem | exact user-visible signal, inputs, output/color domain, valid range, scenes/hardware, and non-goals | model metrics cannot be tied to a product outcome |
 | data | source/license/provenance, scene/camera/frame identity, generator revision, hashes, and immutable splits | leakage or unlicensed output invalidates evaluation |
-| training | model/operator, preprocessing, augmentation, seeds, precision, losses, optimizer, schedule, and checkpoints | results cannot be reproduced or attributed |
+| training | fixed model/operator, preprocessing, seeds, precision, loss/optimizer, checkpoints and bounded profile controls | results cannot be reproduced or attributed |
 | evaluation | frozen numerical/image/sequence, temporal, robustness, and cost comparisons against classical/reference routes | a faster or prettier cherry-picked output can pass without an oracle |
 | publication | immutable artifact schema, normalization, weights, metrics, provenance, compatibility, and generation | partial/corrupt work can replace the last accepted model |
 
@@ -202,7 +202,7 @@ Ratified fixed model -> checked weight/bias artifact -> three typed FP32 operato
 
 ### Model To Kernel And Runtime Inference: Current Classification
 
-`NG-LOWER-01` model export/IR, `NG-LOWER-02` operator legalization/fusion, `NG-KERNEL-01` backend kernel generation/selection, `NG-RUNTIME-01` owned inference runtime, and `NG-RUNTIME-02` packaged product consumer are **Not found**. Existing HLSL/Slang compilation demonstrates graphics shader delivery, not ML model productization.
+`NG-LOWER-01` fixed model export, `NG-LOWER-02` fixed operator checking/measured optimization, `NG-KERNEL-01` kernel production, `NG-RUNTIME-01` owned inference and `NG-RUNTIME-02` packaged consumer are **Not found** in the recorded snapshot. These IDs require the selected fixed path; they do not request an arbitrary graph IR, legalization framework or second compiler. Existing shader delivery alone does not prove model productization.
 
 The `CASE-04` Model-to-Shader and `WL-06` runtime-inference workloads in [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md) are acceptance gates for this future route, not evidence it exists. See [Neural Graphics Acceptance](#neural-graphics-acceptance).
 
@@ -241,7 +241,7 @@ Every gate is conjunctive. High image quality cannot compensate for unlicensed d
 | `AC-NG-03` | Owned model/operator, training recipe, seeds/configuration, checkpoints, metrics, and independent reference comparisons reproduce within declared tolerance. |
 | `AC-NG-04` | Model export/lowering, operator/kernel decisions, precision/layout, binding ABI, artifact identity, and validation are inspectable and deterministic. |
 | `AC-NG-05` | Renderer/RHI execution declares every resource, dependency, synchronization, capability, generation, history, fallback, and retirement boundary. |
-| `AC-NG-06` | Frozen Bistro/San Miguel or approved replacement workloads report quality, temporal behavior, CPU/GPU p50/p95/p99, memory/workspace, artifact size, and classical comparison. |
+| `AC-NG-06` | Frozen Bistro/San Miguel or approved replacement workloads meet every required raw/log/FLIP/temporal rule and report CPU/GPU tails, workspace/artifact size and classical comparison; separate bounded batch/precision/layout observations retain their actual scope. Missing metrics cannot be replaced by a favorable aggregate. |
 | `AC-NG-07` | Missing/corrupt/incompatible artifact, unsupported hardware/backend/operator, allocation/compile/dispatch failure, non-finite output, reload, and shutdown remain honest and bounded. |
 | `AC-NG-08` | Package manifests account for model/kernel/runtime bytes, licenses, hashes, compatibility, and source/debug erasure; a non-author can reproduce the supported result. |
 | `AC-NG-09` | The necessary diffuse-indirect target producer is derived and qualified independently: exact path/lobe/domain, camera/pixel population, committed prefix and uncertainty; isolated controls detect direct/specular leakage, wrong density/weight and stale component identity. Beauty or subtraction of unrelated noisy products cannot pass. |

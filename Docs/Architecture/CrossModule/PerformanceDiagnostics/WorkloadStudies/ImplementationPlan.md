@@ -2,7 +2,7 @@
 
 [Docs](../../../../README.md) / [Up](WorkloadStudiesDesign.md)
 
-Stages: [WS-S0](#ws-s0---freeze-discovery) / [WS-S1](#ws-s1---one-analysis-consumer) / [WS-S2](#ws-s2---causal-paired-api-studies) / [WS-S3](#ws-s3---incident-adoption-and-publication) / [WS-S4](#ws-s4---close-independent-study-reproduction).
+Stages: [WS-S0](#ws-s0---freeze-discovery) / [WS-S1](#ws-s1---one-analysis-consumer) / [WS-S2](#ws-s2---causal-paired-api-studies) / [WS-S3](#ws-s3---incident-and-technical-handoff) / [WS-S4](#ws-s4---close-independent-study-reproduction).
 
 Produce the classical technical handoff at M3, then close independent study/incident reproduction at M6 using the same original evidence.
 
@@ -40,21 +40,14 @@ This parent owns WS-D0, the one analysis consumer and aggregate CASE/WL joins. T
 | [`WS-S0`](#ws-s0---freeze-discovery) Freeze discovery | Close five `WS-D0` cells, actual producer sample, statistics/observer/size cards, API/hardware matrix and current-script retain/narrow/delete decisions. If a necessary field is absent, freeze its producer/check card, route the admitted prerequisite through parent Phase 4, qualify the original record and return here. | WS-S0 stays documentation/local probe only; the producer uses its own bounded stage, not the still-blocked analyzer gate. Remove probes; no guessed data/schema, duplicate collector or full internal spine. Missing unowned inputs/thresholds still block WS-D0. |
 | [`WS-S1`](#ws-s1---one-analysis-consumer) One analysis consumer | Implement only the selected offline CLI over frozen workload records; publish per-run tables/plots and source joins. Pass `AC-WS-01`, input/failure/cleanup parts of `AC-WS-04`, `AC-PY-01..04`. | No collector/export/history or Python framework. Delete the replaced ad hoc supported analysis route; original evidence stays intact. |
 | [`WS-S2`](#ws-s2---causal-paired-api-studies) Causal paired-API studies | Execute only the first unfinished admitted stage in the [CPU](CpuPreparation/ImplementationPlan.md), [GPU](GpuShader/ImplementationPlan.md) or [lifetime](ResourceLifetime/ImplementationPlan.md) owner. Parent WS-D05 selects all three questions before results; each child supplies model/baseline/experiment/paired verdict. | Join all three domain results under AC-WS-02/WL-04/07. Do not duplicate child steps or demand three wins; preserve their rejected/inconclusive evidence, actual tool limits and same-stage cleanup. |
-| [`WS-S3`](#ws-s3---incident-adoption-and-publication) Incident and technical handoff | Use the [incident plan](IncidentAnalysis/ImplementationPlan.md) for missing causal/local replay proof, then join the analyzer and all three study packets. | M3 admits M4 with AC-WS-01..03 and local input/failure/cleanup controls from 04; independent-user 04 remains open for WS-S4 at M6. No adoption verdict is inferred. |
+| [`WS-S3`](#ws-s3---incident-and-technical-handoff) Incident and technical handoff | Use the [incident plan](IncidentAnalysis/ImplementationPlan.md) for missing causal/local replay proof, then join the analyzer and all three study packets. | M3 admits M4 with AC-WS-01..03 and local input/failure/cleanup controls from 04; independent-user 04 remains open for WS-S4 at M6. No adoption verdict is inferred. |
 | [`WS-S4`](#ws-s4---close-independent-study-reproduction) Independent reproduction closure | At M6, consume the actual [portfolio stage 3](../../GraphicsPortfolio/ImplementationPlan.md#3-reproduce-review-and-revise) observations for the frozen study/analysis and incident packet. | Close AC-WS-04/CHK-WS-04 only for actual supported results; keep unavailable cells open. Reuse one exercise instead of another adopter per child. |
 
 ## Reference-Guided Study Selection
 
-Consult the [what/where/why cards](../../../../Strategy/Research/RenderingReferenceExamples.md) during `WS-S0`, not while interpreting favorable candidate results. They supply hypotheses, not performance thresholds or completed studies.
+Use the [catalog's exercises](../../../../Strategy/FeatureDeliveryCatalog.md#research-informed-delivery-exercises) and [pinned source cards](../../../../Strategy/Research/RenderingReferenceExamples.md) to choose hypotheses in WS-S0. The domain designs own the actual CPU, shader and lifetime protocols; source examples neither select another feature nor supply local thresholds.
 
-| Question family | Reference | Measurable output and boundary |
-| --- | --- | --- |
-| CPU recording/binding/submission | `NVR-01/07/16`: state/lifetime and historical/current CAD comparisons. | One existing consumer, exact thread/queue order, CPU and whole-frame distributions, resource retirement and equivalent output. The deprecated sample is historical; preserve current parallel topology, no DGC requirement. |
-| Shader code size/live state/traffic | `NVR-18/19`: source correlation and shipped ray-tracing investigation. | Exact optimized source/bytecode/native identity, observed limiter, one change and quality/memory/cost controls. Missing counter/source support is explicit; SER is optional, GPU Trace is distinct from frame capture. |
-| Sampling/reconstruction/residency | `NVR-02/03/09/17`: guide/history, estimator and budget obligations. | One equivalent raw/filtered product and uncertainty/cost comparison, or one residency-pressure question. No algorithm replacement without its owning gate; heap budget is not allocated high-water. |
-| Analyzer and transfer | `NVR-12/14/20`: a focused image utility and teaching route. | One immutable-record consumer and non-author exercise with feedback. No embedded viewer, Adobe integration or general profiling framework. |
-
-Choose one actual question in each [Study Protocol](StudyProtocols.md): CPU preparation/recording, GPU kernel behavior and resource/queue lifetime. The reference table supplies precedents within those domains, not substitute coverage or three mandated wins. Record the selected source, local differences, rights and falsifier through the [reference-use record](../../../../Strategy/Research/RenderingReferenceExamples.md#delivery-reference-use-record). References do not change `WS-D0`, workload prerequisites, sample or observer authority.
+Before results, record the exact source/assumption, local differences, rights and falsifier through the existing [reference-use record](../../../../Strategy/Research/RenderingReferenceExamples.md#delivery-reference-use-record). Keep rejected/inconclusive evidence and actual native-tool limits. No copied sample architecture, mandatory vendor feature or three-success requirement follows from the examples.
 
 ## Ready-To-Use Prompts
 
@@ -96,13 +89,13 @@ Execute only the first unfinished admitted stage in this plan's CpuPreparation, 
 
 </details>
 
-### WS-S3 - Incident, Adoption And Publication
+### WS-S3 - Incident And Technical Handoff
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s3---incident-adoption-and-publication and apply its Stage Contract, including the Stage Source-Style Gate.
+Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s3---incident-and-technical-handoff and apply its Stage Contract, including the Stage Source-Style Gate.
 Use IncidentAnalysis/ImplementationPlan.md for the first missing causal/local replay stage; reuse valid original release evidence. Join the analyzer, all three study domains and incident/replay packet with AC-WS-01..03 and the local failure/cleanup portion of 04. This is the M3 technical handoff for M4; independent reproduction is not its prerequisite. Keep AC-WS-04's non-author result open for M6 / WS-S4. Verify cleanup and retain original identities/negative conclusions; no new runner, adopter or report portal.
 ```
 

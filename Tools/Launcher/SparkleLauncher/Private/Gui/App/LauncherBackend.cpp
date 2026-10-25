@@ -1,5 +1,10 @@
 #include "LauncherBackend.h"
 
+#include "SparkleLauncher/BuildWorkspaceOperations.h"
+#include "SparkleLauncher/CookOperations.h"
+#include "SparkleLauncher/LevelOperations.h"
+#include "SparkleLauncher/LevelRunOperations.h"
+#include "SparkleLauncher/MaintenanceOperations.h"
 #include "Operations/LauncherOperationService.h"
 
 #include <QtCore/QMetaObject>
@@ -11,7 +16,6 @@
 
 namespace SparkleLauncher
 {
-
 	static LauncherOperationResult BuildOperationResult(const OperationRecord& operation)
 	{
 		LauncherOperationResult result;

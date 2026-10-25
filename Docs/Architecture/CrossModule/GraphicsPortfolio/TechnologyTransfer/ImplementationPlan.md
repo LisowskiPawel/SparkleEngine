@@ -18,11 +18,9 @@ Turn accepted technical work into observed expert influence, second-context use 
 
 ## Execution Contract
 
-Use the [owning design](TransferDesign.md) and execute only the first unfinished stage below. Inspect current status, source/build owners, producers, consumers, lifetime and valid original artifacts; do not replay accepted work because it appears in a new plan. Production repairs return to their existing feature owner and admission. This evidence plan cannot add a feature, new platform or permanent validation service.
+Read [the design/check owner](TransferDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Production state/API/dependencies default to zero. A justified feedback repair uses its existing feature plan; useful documentation simplification is valid when it solves the observed consumer problem. Contact/publication retain actual authorization.
 
-Apply [Change Integration](../../../../Engineering/Workflow/ChangeIntegration.md), the [stage complexity budget](../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and the [Stage Source-Style Gate](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit: exact formatter file coverage, authored spacing/responsibility review and git diff --check. A no-source stage records source-style N/A with its reason and runs the relevant documentation/artifact checks. Check IDs do not authorize permanent fixtures. Default new production state/API/dependency is zero. A justified feedback repair uses its existing implementation plan; documentation simplification is a valid useful revision when it solves the observed consumer problem.
-
-Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, falsifier, output limits and cleanup before candidate observations. Preserve original evidence and remove experiment toggles/probes and replaced supported paths in their producing stage. Record exact commands, tools, results, limits and next permitted action in the existing result owner; no result or grade is awarded here.
+Apply [Change Lifecycle's stage budget](../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and [Stage Source-Style Gate](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), including exact formatter coverage and authored layout/responsibility review after the final edit. No-source work records justified N/A and artifact/docs checks. Freeze input/candidate/API/tools, units, numeric/uncertainty/failure rules and capacity before results. Keep original evidence, delete replaced/rejected paths and probes in their producing stage, and verify the retained result. Handoff exact commands, artifacts, cleanup, limits and next action; quote required clauses with proof or BLOCKED. No result/grade is awarded by this plan.
 
 ## Remaining Stages
 
@@ -34,7 +32,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 
 **Cleanup / non-delivery:** Documentation only. Remove competing exercise outlines and duplicate instructions; no contact, publishing, invented identity or new platform.
 
-**Exit:** A reviewable cleared exercise and exact remaining participant/authorization inputs; no result is marked passed. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** A reviewable cleared exercise and exact remaining participant/authorization inputs; no result is marked passed.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -42,7 +40,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 ```text
 Execute only KT-0 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-0-freeze-the-participant-context-and-exercise. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze one real second-context exercise from accepted cases, the technical question, original artifacts/rights and before/after rubric. Reuse M6 review where valid; list missing actual participants/authorization. Prepare only, contact nobody and invent no outcome.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: use actual authorized people and frozen tasks; record all assistance and real feedback/retest; invent no external or professional fact. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -55,7 +53,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Remove redundant summaries while preserving original review/provenance. No new engine work merely to agree with a reviewer.
 
-**Exit:** AC-PORT-04 has actual challenge/decision evidence or a blocked missing reviewer/result. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** AC-PORT-04 has actual challenge/decision evidence or a blocked missing reviewer/result.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -63,7 +61,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only KT-1 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-1-record-the-meaningful-technical-challenge. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Execute or validly reuse the real expert review. Record proposal, challenge, alternatives, evidence, disposition and personal credit. Do not self-certify, substitute AI review, expand scope or act externally without authorization.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: use actual authorized people and frozen tasks; record all assistance and real feedback/retest; invent no external or professional fact. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -76,7 +74,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Use existing code/runbooks/manifests. Remove one-off exercise/probe code before handoff; no integration SDK, support service or telemetry product.
 
-**Exit:** AC-PORT-05 and the learning part of 06 have actual observations and limits; attendance or changed task difficulty cannot pass. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** AC-PORT-05 and the learning part of 06 have actual observations and limits; attendance or changed task difficulty cannot pass.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -84,7 +82,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only KT-2 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-2-observe-second-context-use-and-learning. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Run only the authorized second-context exercise with frozen before/after rubric. Retain environment, assistance, failures, reasoning and feedback. Keep assisted teaching distinct from unaided adoption. Stop on uncleared material or a missing real consumer; build no new system.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: use actual authorized people and frozen tasks; record all assistance and real feedback/retest; invent no external or professional fact. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -97,7 +95,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Delete replaced instructions/state and all disposable exercise code now; verify earlier cleanup. No fabricated mentoring/recommendation, permanent support promise or automatic publication.
 
-**Exit:** AC-PORT-04..08 / CHK-PORT-03/04 close only for actual observed evidence; M7 stays open on missing follow-through or professional facts. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** AC-PORT-04..08 / CHK-PORT-03/04 close only for actual observed evidence; M7 stays open on missing follow-through or professional facts.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -105,7 +103,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only KT-3 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-3-revise-retest-and-reconcile-claims. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Implement only the justified existing-owner feedback change, retest affected claims and link original before/after records. Reconcile personal/team/professional truth and finite follow-up, remove replaced material/probes and report real M7 outcomes or blocked cells. No contact/submission/publication without authorization.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: use actual authorized people and frozen tasks; record all assistance and real feedback/retest; invent no external or professional fact. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>

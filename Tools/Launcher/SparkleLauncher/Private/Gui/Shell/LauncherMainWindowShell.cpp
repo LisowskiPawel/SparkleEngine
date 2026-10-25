@@ -24,7 +24,6 @@
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSizePolicy>
 #include <QtWidgets/QStackedWidget>
-#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 
 namespace SparkleLauncher

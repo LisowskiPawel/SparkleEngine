@@ -85,12 +85,8 @@ namespace SparkleLauncher
 		{
 			return RunLauncherShellOperation(model, arguments, output, error);
 		}
-		if (!arguments.DryRunOperationId.empty())
-		{
-			ApplyLauncherShellDryRun(model, arguments);
-		}
-
+		const bool previewSucceeded = arguments.DryRunOperationId.empty() || ApplyLauncherShellDryRun(model, arguments);
 		RenderLauncherShell(model, output);
-		return 0;
+		return previewSucceeded ? 0 : 1;
 	}
 }

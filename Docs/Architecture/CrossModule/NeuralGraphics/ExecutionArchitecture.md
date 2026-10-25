@@ -43,6 +43,6 @@ Exercise missing/corrupt/wrong-shape weights, wrong semantic/component, stale up
 
 ## Implementation And Exit Route
 
-NG-S0 ratifies semantics, component attribution, reference qualification, numerical/value/temporal budgets and exact source/build/hooks. NG-S1 qualifies the necessary raw component and deterministic data. NG-S2 proves training; NG-S3 proves exported operators/FP32; NG-S4 joins one real runtime consumer; NG-S5 tests a measured kernel hypothesis; NG-S6 closes quality/package/adoption. No earlier proof is manufactured by a later integration.
+NG-S0 ratifies semantics/metrics and exact hooks; NG-S1 qualifies component, baseline and data. NG-S2 proves training/batch behavior; NG-S3 proves fixed export/FP32 and scoped storage quantization. NG-S4 joins the runtime; NG-S5 measures the bounded layout control and any justified production optimization. NG-S6a supplies local quality/package proof to case assembly; the actual portfolio exercise then supplies NG-S6b adoption closure. Final adoption cannot be required before its technical input exists. No earlier proof is manufactured by later integration.
 
 Every stage follows the existing complexity/hook/copy budget and removes its replaced component/export/upload/filter route in that slice. A negative experiment leaves original evidence and no dormant product variant. `AC-NG-01..09`, existing `FM-NG-*` and `CHK-NG-*` remain the acceptance route; this architecture creates no result authority.

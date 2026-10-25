@@ -62,13 +62,29 @@ Initial recipe proposal: PyTorch FP32, Adam (`lr=1e-3`, betas `0.9/0.999`, epsil
 
 Proposed repeat rule: rerun one seed on the same frozen environment/data order and require validation log-RMSE within 1% relative difference, with all product gates still passing. Report all three seeds and their spread separately; different seeds need not produce identical weights. Re-exporting the same accepted checkpoint must produce identical artifact bytes. A different software/hardware environment is a new qualification cell, not an implied reproducibility pass. Ratify this policy in NG-D04 before training; never raise the tolerance to excuse a measured failure.
 
-Before full training: overfit one tiny batch, check loss reduction against a zero-residual network, inspect input/target alignment, and verify a finite-difference gradient on a small operator. Ablate guide channels and the residual connection using validation only. Profile training throughput/peak memory separately from inference; use a bounded batch/precision comparison under the same loss/update policy, with FP32 still the conformance authority. Preserve failed runs and justify a bounded recipe/topology revision before new candidate training; do not search against held-out San Miguel.
+Before full training: overfit one tiny batch, check loss reduction against a zero-residual network, inspect input/target alignment, and verify a finite-difference gradient on a small operator away from activation discontinuities. Ablate guide channels and the residual connection using validation only. Run the bounded profile controls below; preserve failed runs and justify a recipe/topology revision before new training. Do not search against held-out San Miguel.
+
+## Required Bounded Profile Controls
+
+PGE-12 requires actual batch/precision/layout evidence. These are small predeclared diagnostic comparisons, not three optimizations that must ship or a combinatorial tuning program. NG-D04/05/07 freeze inputs, repetitions, numerical/cost rules and the exact probe before execution.
+
+| Axis and stage | Minimal comparison and required observation |
+| --- | --- |
+| Training batch, NG-S2 | Profile batches 8 and 16 on the same bounded training/validation population and loss normalization. Record examples/s, ms/update and actual peak memory, separate from inference. This diagnoses throughput/memory; it does not require two full training runs or claim equal convergence. The accepted recipe remains explicit. |
+| Precision, NG-S3/5 | Compare FP32 weights to one FP16 storage round trip through the same fixed operator/FP32 evaluator; retain bytes, operator/full-model drift and image-error impact. This is quantization/storage evidence, not native FP16 arithmetic or Tensor Core speed proof. A native precision speed claim additionally needs actual kernel and whole-frame measurements. |
+| Runtime layout, NG-S5 | Measure the accepted NHWC16 baseline against one predeclared alternate layout/packing prototype on a representative fixed operator. Record indexing/traffic prediction, actual GPU time/peak workspace and numerical parity. State operator versus full-model/API scope; an adopted production change still needs the whole-product/both-API checks. |
+
+Use existing Tools/ShaderSystem/Renderer owners and disposable local probes. Keep only the accepted production representation; remove rejected prototype code, formats, switches and registrations at that stage's exit while retaining original measurements. No autotuner, benchmark platform, additional model topology or mandatory vendor SDK is selected. A negative result is useful; an unrun axis cannot be reported as measured.
+
+Retain the exact probe source/patch, frozen inputs, compiler/build/run recipe, source/cooked/native hashes and raw observations in the existing ignored evidence home. Removing a probe from submitted production must not erase the information needed to reproduce its measured claim. Share only the cleared subset; this is an artifact, not a second supported implementation.
 
 ## Numerical And Product Gates
 
 NG-D05/07 must accept or explicitly revise these **local proposed targets before candidate results**. They are not NVIDIA hiring thresholds or published performance claims.
 
 Evaluate valid RGB scalars over each declared scene/sequence/mask. `log-RMSE = sqrt(mean((T(pred)-T(target))^2))`; `linear NRMSE = sqrt(sum((pred-target)^2) / max(sum(target^2), 1e-12*N*s^2))`, with `N` the valid scalar count. Empty populations reject. Report both errors and their populations separately; reference uncertainty must decide the difference. No pooled average may hide a failing required scene.
+
+The [workload contract](../../../Acceptance/GraphicsWorkloads.md#neural-rendering-contract-across-bistro-and-san-miguel) also requires FLIP and temporal assessment. NG-D07 must freeze the actual FLIP implementation/variant, parameters, image domain/range and comparison transform/exposure, reference population and numeric decision rule before training. Compare the controlled scene result with only the reconstructed diffuse product changed; direct/specular and presentation settings stay matched. Raw/log metrics remain separate. Neither log-RMSE nor a favorable display comparison waives another required metric; a missing qualified FLIP rule keeps the gate open.
 
 | Claim | Proposed falsifying rule |
 | --- | --- |

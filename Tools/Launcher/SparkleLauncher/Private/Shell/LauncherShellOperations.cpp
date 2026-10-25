@@ -184,51 +184,49 @@ namespace SparkleLauncher
 		RecordLauncherShellActivity(model, plan.Operation.DisplayName + " dry-run planned");
 	}
 
-	void ApplyLauncherShellDryRun(LauncherShellModel& model, const LauncherShellArguments& arguments)
+	bool ApplyLauncherShellDryRun(LauncherShellModel& model, const LauncherShellArguments& arguments)
 	{
 		const LauncherShellOperationRow* operation = FindLauncherShellOperation(model, arguments.DryRunOperationId);
 		if (operation == nullptr)
 		{
 			model.JobOutput.push_back("Unknown dry-run operation: " + arguments.DryRunOperationId);
 			RecordLauncherShellActivity(model, "Dry-run failed: unknown operation " + arguments.DryRunOperationId);
-			return;
+			return false;
 		}
 
 		if (FindBuildWorkspaceOperationDefinition(operation->Id).has_value())
 		{
 			AppendBuildPlanDryRun(model, PlanBuildWorkspaceOperation(operation->Id, BuildWorkspaceShellRequest(model)));
-			return;
+			return true;
 		}
 
 		if (FindCookOperationDefinition(operation->Id).has_value())
 		{
 			AppendCookPlanDryRun(model, PlanCookOperation(operation->Id, BuildCookShellRequest(model, arguments)));
-			return;
+			return true;
 		}
 
 		if (FindLevelOperationDefinition(operation->Id).has_value())
 		{
 			AppendLevelPlanDryRun(model, PlanLevelOperation(operation->Id, BuildLevelShellRequest(model, arguments)));
-			return;
+			return true;
 		}
 
 		if (FindLevelRunOperationDefinition(operation->Id).has_value())
 		{
 			AppendLevelRunPlanDryRun(model, PlanLevelRunOperation(operation->Id, BuildLevelRunShellRequest(model, arguments)));
-			return;
+			return true;
 		}
 
 		if (FindMaintenanceOperationDefinition(operation->Id).has_value())
 		{
 			AppendMaintenancePlanDryRun(model, PlanMaintenanceOperation(operation->Id, BuildMaintenanceShellRequest(model, arguments)));
-			return;
+			return true;
 		}
 
-		OperationRecord record = MakeOperationRecord(operation->Id, operation->DisplayName);
-		record.DryRunText = "Dry-run only: " + operation->NextEffect;
-		model.JobOutput.push_back(record.DisplayName + " [Preview]");
-		model.JobOutput.push_back(record.DryRunText);
-		RecordLauncherShellActivity(model, record.DisplayName + " dry-run");
+		model.JobOutput.push_back("No dry-run planner for operation: " + operation->Id);
+		RecordLauncherShellActivity(model, "Dry-run failed: no planner for " + operation->Id);
+		return false;
 	}
 
 	int ReportLauncherShellOperationResult(const OperationRecord& operation, std::ostream& output, std::ostream& error)

@@ -18,11 +18,9 @@ Deliver the missing advanced scene/content proof from original bytes through ind
 
 ## Execution Contract
 
-Use the [owning design](ContentToPixelDesign.md) and execute only the first unfinished stage below. Inspect current status, source/build owners, producers, consumers, lifetime and valid original artifacts; do not replay accepted work because it appears in a new plan. Production repairs return to their existing feature owner and admission. This evidence plan cannot add a feature, new platform or permanent validation service.
+Read [the design/check owner](ContentToPixelDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Use existing conversion/import/cook/world/render owners. A missing San Miguel conversion does not admit a generic importer, new renderer or scene-specific shader. Preserve source semantics, rights and accepted transport.
 
-Apply [Change Integration](../../../../../Engineering/Workflow/ChangeIntegration.md), the [stage complexity budget](../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit: exact formatter file coverage, authored spacing/responsibility review and git diff --check. A no-source stage records source-style N/A with its reason and runs the relevant documentation/artifact checks. Check IDs do not authorize permanent fixtures. New permanent state/API/dependency is zero unless a demonstrated conversion/import/render defect needs a bounded existing-owner repair. Preserve selected content/math and delete the replaced route in that repair.
-
-Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, falsifier, output limits and cleanup before candidate observations. Preserve original evidence and remove experiment toggles/probes and replaced supported paths in their producing stage. Record exact commands, tools, results, limits and next permitted action in the existing result owner; no result or grade is awarded here.
+Apply [Change Lifecycle's stage budget](../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), including exact formatter coverage and authored layout/responsibility review after the final edit. No-source work records justified N/A and artifact/docs checks. Freeze input/candidate/API/tools, units, numeric/uncertainty/failure rules and capacity before results. Keep original evidence, delete replaced/rejected paths and probes in their producing stage, and verify the retained result. Handoff exact commands, artifacts, cleanup, limits and next action; quote required clauses with proof or BLOCKED. No result/grade is awarded by this plan.
 
 ## Remaining Stages
 
@@ -34,7 +32,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 
 **Cleanup / non-delivery:** Documentation/local probes only. No new renderer, importer, MAP runner or scope expansion merely because a field is missing. Retire duplicated scene plans.
 
-**Exit:** A source-to-pixel card assigns every missing fact to an owner and next stage; actual rights/oracle/tool unknowns remain explicit. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** A source-to-pixel card assigns every missing fact to an owner and next stage; actual rights/oracle/tool unknowns remain explicit.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -42,7 +40,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 ```text
 Execute only CPIX-0 from Docs/Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md#cpix-0-freeze-workload-inputs-and-oracles. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze the exact advanced scene/source/rights/cook/camera/domain and check cards under GraphicsWorkloads. Inspect current MAP-00 and Reference proof; route only necessary producer prerequisites. No production work or release-scope change.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: preserve required source/material semantics and active-level identity; qualify raw independent truth and rights; keep held-out boundaries. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -55,7 +53,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Delete replaced local conversion/serializer/generated authority and restore temporary selection/settings. No direct OBJ importer without its existing workload decision, second asset database or new source scene.
 
-**Exit:** WL-01/02 and applicable MAP-A..D cells have deterministic source-to-cook semantics, rights and failure-safe actual activation; visual/material fidelity is still pending. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** WL-01/02 and applicable MAP-A..D cells have deterministic source-to-cook semantics, rights and failure-safe actual activation; visual/material fidelity is still pending.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -63,7 +61,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only CPIX-1 from Docs/Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md#cpix-1-qualify-deterministic-content-delivery. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Execute only the missing content slice: reuse Bistro proof, qualify San Miguel conversion through current supported formats and semantic inventory, then deterministic cook/load/failure controls. Remove replaced routes and restore temporary state. Stop on lost required semantics or guessed rights; no generic importer expansion.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: preserve required source/material semantics and active-level identity; qualify raw independent truth and rights; keep held-out boundaries. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -76,7 +74,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Remove probes, duplicate fixtures and scene-specific corrections; keep the genuine independent oracle and useful minimal inputs outside submitted source. Do not replace raw truth with screenshots.
 
-**Exit:** WL-03 and applicable material/Reference cells pass for the stated domain or remain explicitly blocked; support/loss classification is reviewed without silently weakening it. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** WL-03 and applicable material/Reference cells pass for the stated domain or remain explicitly blocked; support/loss classification is reviewed without silently weakening it.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -84,7 +82,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only CPIX-2 from Docs/Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md#cpix-2-prove-materials-lighting-and-raw-pixels. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Prove the fixed material/light/pixel lineage against accepted raw independent oracles on D3D12/Vulkan. Preserve transport math and uncertainty, detect wrong camera/color/normal/identity controls and route defects to existing feature owners. No beauty-only approval or hidden material reduction.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: preserve required source/material semantics and active-level identity; qualify raw independent truth and rights; keep held-out boundaries. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -97,7 +95,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Verify producing-stage cleanup, remove disposable assembly code and superseded instructions; no copied multi-GB scene/capture depot or new presentation engine.
 
-**Exit:** M1/M2 proof is usable by WS-D0 and neural discovery; the three headline cases still need their own later evaluation/reproduction. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** M1/M2 proof is usable by WS-D0 and neural discovery; the three headline cases still need their own later evaluation/reproduction.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -105,7 +103,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only CPIX-3 from Docs/Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md#cpix-3-close-the-tier-one-case-and-handoff. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Close only missing Tier-1 MAP/WL cells and CASE-01/03 artifact joins. Preserve raw source/cook/native identity, rights, scene limits and held-out boundaries. Reuse valid runs, remove probes and hand off the exact M3 inputs; no automatic neural or release acceptance.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: preserve required source/material semantics and active-level identity; qualify raw independent truth and rights; keep held-out boundaries. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>

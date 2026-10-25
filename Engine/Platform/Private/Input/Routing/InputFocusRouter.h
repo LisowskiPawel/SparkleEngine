@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Platform/Public/PlatformAPI.h"
-
 #include "Input/Dispatch/InputLayer.h"
-#include "Input/IInputBackend.h"
+#include "Input/InputBackendResult.h"
 #include "Input/Mouse/MousePosition.h"
 
 #include <vector>
 
-class SPARKLE_PLATFORM_API InputFocusRouter final
+class InputFocusRouter final
 {
 public:
 	InputFocusRouter() noexcept = default;

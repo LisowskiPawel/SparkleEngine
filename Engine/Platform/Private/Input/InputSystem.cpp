@@ -2,6 +2,8 @@
 #include "Input/InputSystem.h"
 #include "Input/Backends/Win32InputBackend.h"
 #include "Input/Dispatch/InputEventDispatcher.h"
+#include "Input/InputBackendResult.h"
+#include "Input/Routing/InputFocusRouter.h"
 #include "Window/Window.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -9,22 +11,16 @@
 #endif
 #include <Windows.h>
 
-#include <cstdio>
 #include <utility>
 
-std::unique_ptr<InputSystem> InputSystem::Create()
+struct InputSystem::DispatchState final
 {
-#if defined(_WIN32) || defined(_WIN64)
-	auto backend = std::make_unique<Win32InputBackend>();
-	return std::make_unique<InputSystem>(std::move(backend));
-#else
-  #error "No input backend available for this platform"
-#endif
-}
+	InputEventDispatcher EventDispatcher;
+	InputFocusRouter FocusRouter;
+};
 
-InputSystem::InputSystem(std::unique_ptr<IInputBackend> Backend) :
-    m_Backend(std::move(Backend)),
-    m_eventDispatcher(std::make_unique<InputEventDispatcher>())
+InputSystem::InputSystem() :
+    m_dispatch(std::make_unique<DispatchState>())
 {
 }
 
@@ -49,14 +45,14 @@ void InputSystem::BeginFrame()
 	{
 		layerState.BeginFrame();
 	}
-	m_eventDispatcher->ClearDeferredEvents();
+	m_dispatch->EventDispatcher.ClearDeferredEvents();
 }
 
 void InputSystem::ProcessDeferredEvents()
 {
 	m_OwnerThread.AssertAccess();
 
-	m_eventDispatcher->ProcessDeferredEvents(
+	m_dispatch->EventDispatcher.ProcessDeferredEvents(
 	    m_LayerEnabled,
 	    [this]
 	    {
@@ -86,12 +82,7 @@ void InputSystem::HandleWindowMessage(WindowMessageEvent& event)
 bool InputSystem::OnWindowMessage(uint32_t Msg, uintptr_t Param1, intptr_t Param2)
 {
 	m_OwnerThread.AssertAccess();
-	if (!m_Backend)
-	{
-		return false;
-	}
-
-	InputBackendResult result = m_Backend->ProcessMessage(Msg, Param1, Param2);
+	InputBackendResult result = ProcessWin32InputMessage(Msg, Param1, Param2);
 
 	if (!result.IsValid())
 	{
@@ -144,12 +135,12 @@ bool InputSystem::OnWindowMessage(uint32_t Msg, uintptr_t Param1, intptr_t Param
 
 void InputSystem::BeginInputRoutingFrame(bool interactionDisabled, bool textInputActive)
 {
-	m_FocusRouter.BeginFrame(interactionDisabled, textInputActive);
+	m_dispatch->FocusRouter.BeginFrame(interactionDisabled, textInputActive);
 }
 
 void InputSystem::RegisterInputTargetRegion(float left, float top, float right, float bottom, InputLayer targetLayer)
 {
-	m_FocusRouter.RegisterTargetRegion(left, top, right, bottom, targetLayer);
+	m_dispatch->FocusRouter.RegisterTargetRegion(left, top, right, bottom, targetLayer);
 }
 
 void InputSystem::SetActiveLayer(InputLayer Layer) noexcept
@@ -217,7 +208,7 @@ InputLayer InputSystem::ResolveTargetLayer(const InputBackendResult& Result)
 		return m_MouseCaptureLayer;
 	}
 
-	InputLayer targetLayer = m_FocusRouter.ResolveTargetLayer(Result, GetActiveLayer());
+	InputLayer targetLayer = m_dispatch->FocusRouter.ResolveTargetLayer(Result, GetActiveLayer());
 
 	return IsLayerEnabled(targetLayer) ? targetLayer : InputLayer::System;
 }
@@ -225,31 +216,31 @@ InputLayer InputSystem::ResolveTargetLayer(const InputBackendResult& Result)
 EventHandle InputSystem::SubscribeKeyboard(KeyboardCallback Callback, InputLayer Layer, DispatchMode Mode)
 {
 	m_OwnerThread.AssertAccess();
-	return m_eventDispatcher->Subscribe<KeyboardEvent>(std::move(Callback), Layer, Mode);
+	return m_dispatch->EventDispatcher.Subscribe<KeyboardEvent>(std::move(Callback), Layer, Mode);
 }
 
 EventHandle InputSystem::SubscribeMouseButton(MouseButtonCallback Callback, InputLayer Layer, DispatchMode Mode)
 {
 	m_OwnerThread.AssertAccess();
-	return m_eventDispatcher->Subscribe<MouseButtonEvent>(std::move(Callback), Layer, Mode);
+	return m_dispatch->EventDispatcher.Subscribe<MouseButtonEvent>(std::move(Callback), Layer, Mode);
 }
 
 EventHandle InputSystem::SubscribeMouseMove(MouseMoveCallback Callback, InputLayer Layer, DispatchMode Mode)
 {
 	m_OwnerThread.AssertAccess();
-	return m_eventDispatcher->Subscribe<MouseMoveEvent>(std::move(Callback), Layer, Mode);
+	return m_dispatch->EventDispatcher.Subscribe<MouseMoveEvent>(std::move(Callback), Layer, Mode);
 }
 
 EventHandle InputSystem::SubscribeMouseWheel(MouseWheelCallback Callback, InputLayer Layer, DispatchMode Mode)
 {
 	m_OwnerThread.AssertAccess();
-	return m_eventDispatcher->Subscribe<MouseWheelEvent>(std::move(Callback), Layer, Mode);
+	return m_dispatch->EventDispatcher.Subscribe<MouseWheelEvent>(std::move(Callback), Layer, Mode);
 }
 
 void InputSystem::Unsubscribe(EventHandle Handle)
 {
 	m_OwnerThread.AssertAccess();
-	m_eventDispatcher->Unsubscribe(Handle);
+	m_dispatch->EventDispatcher.Unsubscribe(Handle);
 }
 
 void InputSystem::CaptureMouse()
@@ -370,7 +361,7 @@ void InputSystem::CancelLayer(InputLayer Layer)
 		releaseEvent.Modifiers = state.GetModifiers();
 		releaseEvent.bPressed = false;
 		state.SetKeyState(releaseEvent.KeyCode, ButtonState::Released);
-		m_eventDispatcher->DispatchImmediate(releaseEvent, Layer, m_LayerEnabled);
+		m_dispatch->EventDispatcher.DispatchImmediate(releaseEvent, Layer, m_LayerEnabled);
 	}
 
 	const MousePosition mousePosition = state.GetMousePosition();
@@ -388,7 +379,7 @@ void InputSystem::CancelLayer(InputLayer Layer)
 		releaseEvent.Modifiers = state.GetModifiers();
 		releaseEvent.bPressed = false;
 		state.SetMouseButtonState(releaseEvent.Button, ButtonState::Released);
-		m_eventDispatcher->DispatchImmediate(releaseEvent, Layer, m_LayerEnabled);
+		m_dispatch->EventDispatcher.DispatchImmediate(releaseEvent, Layer, m_LayerEnabled);
 	}
 
 	state = InputState{};
@@ -401,8 +392,8 @@ template <typename TEvent> void InputSystem::ProcessEvent(const TEvent& Event, I
 	{
 		UpdateStateFromEvent(m_LayerStates[static_cast<std::size_t>(TargetLayer)], Event);
 	}
-	m_eventDispatcher->DispatchImmediate(Event, TargetLayer, m_LayerEnabled);
-	m_eventDispatcher->QueueDeferred(Event, TargetLayer, m_LayerEnabled);
+	m_dispatch->EventDispatcher.DispatchImmediate(Event, TargetLayer, m_LayerEnabled);
+	m_dispatch->EventDispatcher.QueueDeferred(Event, TargetLayer, m_LayerEnabled);
 }
 
 void InputSystem::UpdateStateFromEvent(InputState& State, const KeyboardEvent& Event)

@@ -91,4 +91,5 @@ Executable/current directory and markers -> workspace/project discovery -> `Conf
 - `Windows.h`, DirectXMath, Win32 process code, and private `bcrypt` make the current Core surface Windows-oriented despite otherwise portable helpers.
 - CVar assignment is mutable global state and not synchronized or persisted by Core.
 - `Files::BinarySpanReader` owns cursor advancement, bounds, multiplication overflow, and borrowed raw array bytes. GameFramework's cooked reader translates failures into domain exceptions around that same cursor; it does not implement another byte decoder. The owning cooked schema still validates magic, counts, cross-references, and semantic invariants. This source boundary was rechecked on 2026-10-06.
+- Reader surface rechecked on 2026-10-25: non-template decoding lives in Core's matching source file. The unused typed-array reinterpretation and skip APIs are removed; consumers borrow raw bytes or copy decoded values without requiring aligned file storage. Cooked representations are unchanged.
 - Source presence does not establish crash-safe publication, Unicode/path edge behavior, privilege behavior, or packaged path correctness.

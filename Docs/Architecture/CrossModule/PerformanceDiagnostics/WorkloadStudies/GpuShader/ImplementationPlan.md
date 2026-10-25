@@ -13,16 +13,14 @@ Turn one predeclared GPU question into original, falsifiable paired-API evidence
 | What to do | Working route |
 | --- | --- |
 | First action | [GPU-0](#gpu-0-freeze-the-kernel-question): Select one measured pass and exact semantic/source/bytecode/event join. |
-| Result to reach | The domain packet closes its part of AC-WS-02/CHK-WS-02 and routes to CASE-02/03; the parent still requires all three domains, incident and actual reproduction. |
+| Result to reach | This domain supplies local AC-WS-02/CHK-WS-02 evidence to M3/CASE-02/03. Parent WS-S4 closes actual independent reproduction at M6, without blocking the M4 technical dependency. |
 | Start / stop | Planning can prepare decisions earlier; execution needs the exact candidate, valid prerequisites and frozen check cards. Missing rights, tools, or external participants keep the affected result open. |
 
 ## Execution Contract
 
-Use the [owning design](StudyDesign.md) and execute only the first unfinished stage below. Inspect current status, source/build owners, producers, consumers, lifetime and valid original artifacts; do not replay accepted work because it appears in a new plan. Production repairs return to their existing feature owner and admission. This evidence plan cannot add a feature, new platform or permanent validation service.
+Read [the design/check owner](StudyDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Keep shader/registration/binding/cook work in current Renderer/ShaderSystem owners. A prototype adds no retained variant, profiler, compiler backend or mandatory vendor dependency.
 
-Apply [Change Integration](../../../../../Engineering/Workflow/ChangeIntegration.md), the [stage complexity budget](../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit: exact formatter file coverage, authored spacing/responsibility review and git diff --check. A no-source stage records source-style N/A with its reason and runs the relevant documentation/artifact checks. Check IDs do not authorize permanent fixtures. Default new persistent state/API/dependency budget is zero. A justified repair uses its existing owner and smallest selected consumer.
-
-Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, falsifier, output limits and cleanup before candidate observations. Preserve original evidence and remove experiment toggles/probes and replaced supported paths in their producing stage. Record exact commands, tools, results, limits and next permitted action in the existing result owner; no result or grade is awarded here.
+Apply [Change Lifecycle's stage budget](../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), including exact formatter coverage and authored layout/responsibility review after the final edit. No-source work records justified N/A and artifact/docs checks. Freeze input/candidate/API/tools, units, numeric/uncertainty/failure rules and capacity before results. Keep original evidence, delete replaced/rejected paths and probes in their producing stage, and verify the retained result. Handoff exact commands, artifacts, cleanup, limits and next action; quote required clauses with proof or BLOCKED. No result/grade is awarded by this plan.
 
 ## Remaining Stages
 
@@ -34,7 +32,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 
 **Cleanup / non-delivery:** Documentation/probes only. No compiler backend, replacement tracer, SER requirement or profiler infrastructure.
 
-**Exit:** The question and exact tools/identities/control cards are reviewable; absent source correlation or required data is a named blocker. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** The question and exact tools/identities/control cards are reviewable; absent source correlation or required data is a named blocker.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -42,7 +40,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 ```text
 Execute only GPU-0 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/GpuShader/ImplementationPlan.md#gpu-0-freeze-the-kernel-question. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze one executed shader question, source/options/artifact/native joins, analytical cost model, actual tool access and numerical/observer falsifiers. No production edit or invented disassembly.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and quality; state real instruction/counter access. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -55,7 +53,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Use existing tools and shader owner. Remove correlation probes; no permanent debug switch or collector.
 
-**Exit:** Executed source joins and baseline quality/noise controls pass, and observed facts discriminate the selected hypothesis at the declared access level. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** Executed source joins and baseline quality/noise controls pass, and observed facts discriminate the selected hypothesis at the declared access level.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -63,7 +61,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only GPU-1 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/GpuShader/ImplementationPlan.md#gpu-1-qualify-executed-baseline-and-oracle. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Qualify the executed baseline, source/IR/native join, independent output oracle and noise controls. Explain producer-versus-consumer stalls and what the tools do not expose. No counter screenshot as a causal verdict.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and quality; state real instruction/counter access. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -76,7 +74,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Delete replaced implementation and rejected variants/registrations/settings/dependencies in this slice. Keep the correct baseline evidence; no dormant tuning framework.
 
-**Exit:** The candidate preserves semantics or is rejected; actual native/local and whole-frame effects are attributable with a retained alternative. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** The candidate preserves semantics or is rejected; actual native/local and whole-frame effects are attributable with a retained alternative.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -84,7 +82,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only GPU-2 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/GpuShader/ImplementationPlan.md#gpu-2-test-one-semantics-preserving-change. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Test only the frozen shader mechanism under its owning feature contract. Verify numerical/raw parity and source/native identity, compare cost predictions and observations, and remove replaced/rejected variants. Stop on changed estimator, hidden quality drift or guessed ISA.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and quality; state real instruction/counter access. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -97,7 +95,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Remove experiment probes and verify no unsupported variant survives. No new vendor dependency to decorate the conclusion.
 
-**Exit:** GPU part of AC-WS-02/CHK-WS-02 has original evidence and a scoped positive/negative/inconclusive verdict; no broader hardware or compiler-authorship claim. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** GPU part of AC-WS-02/CHK-WS-02 has original evidence and a scoped positive/negative/inconclusive verdict; no broader hardware or compiler-authorship claim.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -105,7 +103,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only GPU-3 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/GpuShader/ImplementationPlan.md#gpu-3-decide-whole-frame-value-on-both-apis. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Close paired-API shader and whole-frame evidence using frozen sample/quality/effect policy. Retain exact inspection level, negative alternatives and limitations; link original artifacts to CASE-02/03. Do not promote local dispatch speed to whole-frame benefit.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and quality; state real instruction/counter access. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>

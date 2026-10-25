@@ -13,16 +13,14 @@ Turn one predeclared LIFE question into original, falsifiable paired-API evidenc
 | What to do | Working route |
 | --- | --- |
 | First action | [LIFE-0](#life-0-freeze-the-resource-and-completion-claim): Select the resource/condition, mutable owner, generations and every consuming queue/token. |
-| Result to reach | The domain packet closes its part of AC-WS-02/CHK-WS-02 and routes to CASE-02/03; the parent still requires all three domains, incident and actual reproduction. |
+| Result to reach | This domain supplies local AC-WS-02/CHK-WS-02 evidence to M3/CASE-02/03. Parent WS-S4 closes actual independent reproduction at M6, without blocking the M4 technical dependency. |
 | Start / stop | Planning can prepare decisions earlier; execution needs the exact candidate, valid prerequisites and frozen check cards. Missing rights, tools, or external participants keep the affected result open. |
 
 ## Execution Contract
 
-Use the [owning design](StudyDesign.md) and execute only the first unfinished stage below. Inspect current status, source/build owners, producers, consumers, lifetime and valid original artifacts; do not replay accepted work because it appears in a new plan. Production repairs return to their existing feature owner and admission. This evidence plan cannot add a feature, new platform or permanent validation service.
+Read [the design/check owner](StudyDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Keep the current Renderer/RHI generation/submission/retirement owner. No second manager, global-idle lifetime policy, content reduction or forced topology change can manufacture a win.
 
-Apply [Change Integration](../../../../../Engineering/Workflow/ChangeIntegration.md), the [stage complexity budget](../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit: exact formatter file coverage, authored spacing/responsibility review and git diff --check. A no-source stage records source-style N/A with its reason and runs the relevant documentation/artifact checks. Check IDs do not authorize permanent fixtures. Default new persistent state/API/dependency budget is zero. A justified repair uses its existing owner and smallest selected consumer.
-
-Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, falsifier, output limits and cleanup before candidate observations. Preserve original evidence and remove experiment toggles/probes and replaced supported paths in their producing stage. Record exact commands, tools, results, limits and next permitted action in the existing result owner; no result or grade is awarded here.
+Apply [Change Lifecycle's stage budget](../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), including exact formatter coverage and authored layout/responsibility review after the final edit. No-source work records justified N/A and artifact/docs checks. Freeze input/candidate/API/tools, units, numeric/uncertainty/failure rules and capacity before results. Keep original evidence, delete replaced/rejected paths and probes in their producing stage, and verify the retained result. Handoff exact commands, artifacts, cleanup, limits and next action; quote required clauses with proof or BLOCKED. No result/grade is awarded by this plan.
 
 ## Remaining Stages
 
@@ -34,7 +32,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 
 **Cleanup / non-delivery:** No new memory manager, allocator dashboard, async topology or global device-idle policy.
 
-**Exit:** One resource-to-last-consumer model, actual input sample and numeric decision/check cards are frozen; unowned native completion blocks execution. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** One resource-to-last-consumer model, actual input sample and numeric decision/check cards are frozen; unowned native completion blocks execution.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -42,7 +40,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 ```text
 Execute only LIFE-0 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ResourceLifetime/ImplementationPlan.md#life-0-freeze-the-resource-and-completion-claim. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze one real resource/queue condition and exact owners/tokens, expected live bytes/dependencies, budget meanings and controlled lifetime falsifiers. Documentation only; no guessed completion or new manager.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: preserve every consuming queue/token and required content; distinguish budget from live bytes; reject premature reuse. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -55,7 +53,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Keep shared state and native lifetime in current owners. Remove temporary tracing and injection code; no permanent public fault API.
 
-**Exit:** Original baseline and negative detect stale/premature use and distinguish budget/usage/high-water; the current symptom has a discriminating observation. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** Original baseline and negative detect stale/premature use and distinguish budget/usage/high-water; the current symptom has a discriminating observation.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -63,7 +61,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only LIFE-1 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ResourceLifetime/ImplementationPlan.md#life-1-qualify-the-lifetime-baseline. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Qualify original generation/token/timeline and memory facts with delayed/serial/pressure controls. Keep budget, usage and allocations distinct. Retain exact native findings; remove probes and make no optimization claim.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: preserve every consuming queue/token and required content; distinguish budget from live bytes; reject premature reuse. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -76,7 +74,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Delete replaced lifetime flags/wait/manager path now. No premature reclamation, forced serialization, content reduction or second scheduler to create a win.
 
-**Exit:** Current output and delayed/failure controls pass; actual additions and removal match the budget and the result is causally attributable. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** Current output and delayed/failure controls pass; actual additions and removal match the budget and the result is causally attributable.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -84,7 +82,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only LIFE-2 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ResourceLifetime/ImplementationPlan.md#life-2-test-the-owning-repair-or-simplification. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Test only the frozen lifetime/residency hypothesis in its owner. Preserve all-queue completion and quality, compare byte/dependency predictions with measurements, and delete the replaced path. Stop on stale use, hidden budget changes or global-idle workaround.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: preserve every consuming queue/token and required content; distinguish budget from live bytes; reject premature reuse. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -97,7 +95,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Verify prior removals, remove probes and retain useful failure artifacts. No allocator/telemetry service or new hardware program.
 
-**Exit:** Lifetime part of AC-WS-02/CHK-WS-02 is reviewable; no source-only/native-validation-only speed claim or unsupported driver diagnosis. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** Lifetime part of AC-WS-02/CHK-WS-02 is reviewable; no source-only/native-validation-only speed claim or unsupported driver diagnosis.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -105,7 +103,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only LIFE-3 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ResourceLifetime/ImplementationPlan.md#life-3-close-paired-lifetime-and-tail-evidence. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Close matched API lifetime, native failure and whole-frame/memory evidence. Retain exact tokens/generations, rejected alternatives and limits. Link original CASE-02/03 records and keep unproved tool/hardware cells blocked.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: preserve every consuming queue/token and required content; distinguish budget from live bytes; reject premature reuse. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>

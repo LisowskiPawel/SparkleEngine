@@ -51,7 +51,9 @@ The present implementation is Windows-only: public `Window` exposes `HWND` and W
 
 ## Vertical Input Trace
 
-Win32 sends a window message -> `Window::WindowProc` exposes it through `OnWindowMessage` -> `InputSystem` asks `Win32InputBackend` to translate it -> global state is updated -> focus router selects System/UI/Gameplay using capture state and registered rectangles -> immediate subscribers run or an event is queued -> Application calls `ProcessDeferredEvents` -> camera/editor/console consumers receive only their enabled layer.
+Win32 sends a window message -> `Window::WindowProc` exposes it through `OnWindowMessage` -> `InputSystem` calls the private `ProcessWin32InputMessage` decoder -> global state is updated -> focus router selects System/UI/Gameplay using capture state and registered rectangles -> immediate subscribers run or an event is queued -> Application calls `ProcessDeferredEvents` -> camera/editor/console consumers receive only their enabled layer.
+
+Input ownership rechecked on 2026-10-25: hosts construct `InputSystem` directly and consume its state, registration and routing operations. Dispatcher and focus-router lifetime share one private state allocation; native decoding is stateless. Backend results and the router remain Platform-private. No injected backend interface or forwarding factory remains. The window subscription is released before input state is destroyed. This source boundary does not qualify focus-loss, DPI or interactive behavior.
 
 ## Explicit Non-Capabilities And Risks
 

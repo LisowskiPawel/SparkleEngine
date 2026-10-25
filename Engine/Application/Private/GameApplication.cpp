@@ -116,7 +116,7 @@ void GameApplication::InitializeHost()
 
 void GameApplication::InitializeInput()
 {
-	m_inputSystem = InputSystem::Create();
+	m_inputSystem = std::make_unique<InputSystem>();
 	m_inputSystem->SetInputCaptureQuery(WantsImGuiInputCapture);
 	m_inputSystem->SubscribeToWindow(*m_window);
 }

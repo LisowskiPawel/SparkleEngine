@@ -2,7 +2,6 @@
 
 #include "Platform/Public/PlatformAPI.h"
 
-#include "IInputBackend.h"
 #include "Events/EventHandle.h"
 #include "Events/ScopedEventHandle.h"
 #include "Input/InputState.h"
@@ -12,7 +11,6 @@
 #include "Input/Events/MouseButtonEvent.h"
 #include "Input/Events/MouseMoveEvent.h"
 #include "Input/Events/MouseWheelEvent.h"
-#include "Input/Routing/InputFocusRouter.h"
 #include "Core/Public/Threading/ThreadOwnership.h"
 
 #include <cstddef>
@@ -21,9 +19,9 @@
 #include <functional>
 #include <memory>
 
-class InputEventDispatcher;
 class Window;
 struct WindowMessageEvent;
+struct InputBackendResult;
 
 template <typename TEvent> using InputCallback = std::function<void(const TEvent&)>;
 
@@ -36,9 +34,7 @@ using InputCaptureQuery = std::function<bool()>;
 class SPARKLE_PLATFORM_API InputSystem
 {
 public:
-	static std::unique_ptr<InputSystem> Create();
-
-	explicit InputSystem(std::unique_ptr<IInputBackend> Backend);
+	InputSystem();
 
 	~InputSystem();
 
@@ -101,6 +97,8 @@ public:
 	void CenterCursor(void* windowHandle);
 
 private:
+	struct DispatchState;
+
 	static constexpr std::size_t LayerCount = static_cast<std::size_t>(InputLayer::Count);
 
 	InputLayer ResolveTargetLayer(const InputBackendResult& Result);
@@ -113,8 +111,7 @@ private:
 	void UpdateStateFromEvent(InputState& State, const MouseMoveEvent& Event);
 	void UpdateStateFromEvent(InputState& State, const MouseWheelEvent& Event);
 
-	std::unique_ptr<IInputBackend> m_Backend;
-	std::unique_ptr<InputEventDispatcher> m_eventDispatcher;
+	std::unique_ptr<DispatchState> m_dispatch;
 
 	InputState m_State;
 	std::array<InputState, LayerCount> m_LayerStates{};
@@ -124,7 +121,6 @@ private:
 	std::array<bool, LayerCount> m_LayerEnabled = {true, true, true};
 	InputLayer m_ActiveLayer = InputLayer::Gameplay;
 	InputLayer m_MouseCaptureLayer = InputLayer::System;
-	InputFocusRouter m_FocusRouter;
 	InputCaptureQuery m_captureQuery;
 
 	int32_t m_LastMouseX = 0;

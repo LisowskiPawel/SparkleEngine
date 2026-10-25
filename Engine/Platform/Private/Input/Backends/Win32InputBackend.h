@@ -1,19 +1,7 @@
 #pragma once
 
-#include "Input/IInputBackend.h"
-#include "Input/Keyboard/Key.h"
+#include <cstdint>
 
-#ifndef WIN32_LEAN_AND_MEAN
-  #define WIN32_LEAN_AND_MEAN
-#endif
-#include <Windows.h>
+struct InputBackendResult;
 
-class Win32InputBackend final : public IInputBackend
-{
-public:
-	InputBackendResult ProcessMessage(uint32_t Msg, uintptr_t Param1, intptr_t Param2) override;
-
-	static Key TranslateVirtualKey(WPARAM VirtualKey) noexcept;
-
-	static ModifierFlags GetCurrentModifiers() noexcept;
-};
+InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_t parameter1, std::intptr_t parameter2);

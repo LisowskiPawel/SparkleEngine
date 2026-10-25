@@ -18,11 +18,9 @@ Turn one actual failure into a causal, reproducible incident case without buildi
 
 ## Execution Contract
 
-Use the [owning design](IncidentDesign.md) and execute only the first unfinished stage below. Inspect current status, source/build owners, producers, consumers, lifetime and valid original artifacts; do not replay accepted work because it appears in a new plan. Production repairs return to their existing feature owner and admission. This evidence plan cannot add a feature, new platform or permanent validation service.
+Read [the design/check owner](IncidentDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Only a demonstrated causal repair spends a production budget, through its existing feature plan. Keep original bad/good evidence; no permanent fault API, collector or guessed driver diagnosis.
 
-Apply [Change Integration](../../../../../Engineering/Workflow/ChangeIntegration.md), the [stage complexity budget](../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit: exact formatter file coverage, authored spacing/responsibility review and git diff --check. A no-source stage records source-style N/A with its reason and runs the relevant documentation/artifact checks. Check IDs do not authorize permanent fixtures. Evidence work adds no persistent runtime state. Only a demonstrated causal repair can spend a feature-owned addition/deletion budget.
-
-Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, falsifier, output limits and cleanup before candidate observations. Preserve original evidence and remove experiment toggles/probes and replaced supported paths in their producing stage. Record exact commands, tools, results, limits and next permitted action in the existing result owner; no result or grade is awarded here.
+Apply [Change Lifecycle's stage budget](../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) and [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), including exact formatter coverage and authored layout/responsibility review after the final edit. No-source work records justified N/A and artifact/docs checks. Freeze input/candidate/API/tools, units, numeric/uncertainty/failure rules and capacity before results. Keep original evidence, delete replaced/rejected paths and probes in their producing stage, and verify the retained result. Handoff exact commands, artifacts, cleanup, limits and next action; quote required clauses with proof or BLOCKED. No result/grade is awarded by this plan.
 
 ## Remaining Stages
 
@@ -34,7 +32,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 
 **Cleanup / non-delivery:** Planning only unless the current release gate already authorizes the needed reproduction. No guessed diagnosis, production fault toggle or new tool.
 
-**Exit:** One symptom, bad/good boundary, actual reproduction route, rights and first falsifier are explicit. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** One symptom, bad/good boundary, actual reproduction route, rights and first falsifier are explicit.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -42,7 +40,7 @@ Freeze the candidate, workload/API/profile, units, numeric rule, uncertainty, fa
 ```text
 Execute only INC-0 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/IncidentAnalysis/ImplementationPlan.md#inc-0-freeze-the-failed-candidate-and-question. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze one real failed candidate and symptom, original artifacts, expected oracle, current source/native identity and minimal reproduction. Reuse accepted release work; stop on missing bad evidence or invented root cause.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual; preserve source/symbol identity; label unproved causes. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -55,7 +53,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Delete diagnostic probes at the owner boundary; keep original logs/captures. No global logging, second capture service or speculative API/driver fix.
 
-**Exit:** The causal conclusion separates alternatives at its stated scope, or remains honestly unproved with a next discriminating action. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** The causal conclusion separates alternatives at its stated scope, or remains honestly unproved with a next discriminating action.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -63,7 +61,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only INC-1 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/IncidentAnalysis/ImplementationPlan.md#inc-1-discriminate-competing-causes. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Investigate the first wrong product using at least two hypotheses and separating controls. Preserve candidate/symbol/frame joins and negative observations. Stop before a repair if the cause is still correlation.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual; preserve source/symbol identity; label unproved causes. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -76,7 +74,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Delete replaced state/path and disposable regression/injection code in this stage. No compatibility workaround, broad rewrite or permanent test framework.
 
-**Exit:** AC-WS-03/CHK-WS-03 have causal bad-versus-good proof and preserved selected behavior; source/build alone cannot close it. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** AC-WS-03/CHK-WS-03 have causal bad-versus-good proof and preserved selected behavior; source/build alone cannot close it.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -84,7 +82,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only INC-2 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/IncidentAnalysis/ImplementationPlan.md#inc-2-prove-the-minimal-owning-repair. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Prove only the admitted minimal repair in its owner, including original bad/controlled-negative and fixed oracle, native/lifetime preservation and exact artifacts. Remove replaced paths/probes; stop on an unfalsifiable fix or broadened scope.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual; preserve source/symbol identity; label unproved causes. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>
@@ -97,7 +95,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 
 **Cleanup / non-delivery:** Remove one-off assembly/replay code from submitted source. Verify earlier cleanup and retain unique failure evidence; no issue portal or continuing support commitment.
 
-**Exit:** The incident meets AC-WS-03 and its local replay checks for M3. AC-WS-04 independent evidence stays open at the parent WS-S4/M6 gate; it cannot block the technical handoff needed by neural work. The Execution Contract's responsibility, cleanup and source-style checks apply before handoff; an unavailable required falsifier leaves this exit open.
+**Exit:** The incident meets AC-WS-03 and its local replay checks for M3. AC-WS-04 independent evidence stays open at the parent WS-S4/M6 gate; it cannot block the technical handoff needed by neural work.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -105,7 +103,7 @@ NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity;
 ```text
 Execute only INC-3 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/IncidentAnalysis/ImplementationPlan.md#inc-3-publish-the-scoped-incident-and-replay. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Deliver the original causal repair and locally qualified replay packet to CASE-02 and parent WS-S3 for M3. Preserve limitations and deletion proof. Route required actual independent observations to WS-S4 at M6; do not require them before neural production or invent a reviewer. No unauthorized submission/contact.
-NON-NEGOTIABLE: bind observations to original candidate/input/artifact identity; freeze rules before results; preserve the selected output and one production owner; report missing/failed/inconclusive evidence honestly. Quote each applicable clause with proof or BLOCKED. Handoff exact commands, controls, artifacts, deletions, limitations and next permitted stage. Do not execute neighboring stages or expand the engine to populate a report.
+NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual; preserve source/symbol identity; label unproved causes. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 ```
 
 </details>

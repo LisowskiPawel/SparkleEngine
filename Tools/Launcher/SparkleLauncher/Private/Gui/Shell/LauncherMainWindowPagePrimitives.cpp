@@ -1,48 +1,16 @@
 #include "LauncherMainWindow.h"
 
 #include "LauncherActionWidgets.h"
-#include "LauncherArtworkWidgets.h"
-#include "LauncherCleanUiModel.h"
-#include "LauncherDependencyUiModel.h"
-#include "LauncherHomeWidgets.h"
-#include "LauncherLayoutWidgets.h"
-#include "LauncherOperationRequestFactory.h"
-#include "LauncherPageUtilities.h"
-#include "LauncherContentModel.h"
-#include "LauncherSettings.h"
-#include "LauncherToolchainUiModel.h"
 #include "LauncherUiDesign.h"
-#include "LauncherUiModel.h"
-#include "LauncherWorkflowCatalog.h"
 
-#include "SparkleLauncher/BuildWorkspaceOperations.h"
-#include "SparkleLauncher/CookOperations.h"
-#include "SparkleLauncher/MaintenanceOperations.h"
-
-#include <QtCore/QCoreApplication>
-#include <QtCore/QProcess>
-#include <QtCore/QRegularExpression>
-#include <QtCore/QStringList>
-#include <QtGui/QGuiApplication>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QComboBox>
+#include <QtCore/QString>
 #include <QtWidgets/QFrame>
-#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QScrollArea>
-#include <QtWidgets/QSizePolicy>
-#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 #include <algorithm>
-#include <cstdint>
-#include <filesystem>
-#include <system_error>
-#include <vector>
 
 namespace SparkleLauncher
 {

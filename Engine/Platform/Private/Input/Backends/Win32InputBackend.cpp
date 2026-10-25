@@ -1,5 +1,12 @@
 #include "PCH.h"
 #include "Input/Backends/Win32InputBackend.h"
+#include "Input/InputBackendResult.h"
+#include "Input/Keyboard/Key.h"
+
+#ifndef WIN32_LEAN_AND_MEAN
+  #define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
 
 #include <windowsx.h>
 
@@ -132,7 +139,7 @@ static constexpr Key s_VirtualKeyToKey[] = {
 
 static constexpr size_t s_VirtualKeyTableSize = sizeof(s_VirtualKeyToKey) / sizeof(s_VirtualKeyToKey[0]);
 
-Key Win32InputBackend::TranslateVirtualKey(WPARAM VirtualKey) noexcept
+static Key TranslateVirtualKey(WPARAM VirtualKey) noexcept
 {
 	if (VirtualKey == VK_SHIFT)
 	{
@@ -239,7 +246,7 @@ Key Win32InputBackend::TranslateVirtualKey(WPARAM VirtualKey) noexcept
 	}
 }
 
-ModifierFlags Win32InputBackend::GetCurrentModifiers() noexcept
+static ModifierFlags GetCurrentModifiers() noexcept
 {
 	ModifierFlags Flags = ModifierFlags::None;
 
@@ -279,130 +286,130 @@ ModifierFlags Win32InputBackend::GetCurrentModifiers() noexcept
 	return Flags;
 }
 
-InputBackendResult Win32InputBackend::ProcessMessage(uint32_t Msg, uintptr_t Param1, intptr_t Param2)
+InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_t parameter1, std::intptr_t parameter2)
 {
-	InputBackendResult Result;
-	WPARAM WParam = static_cast<WPARAM>(Param1);
-	LPARAM LParam = static_cast<LPARAM>(Param2);
+	InputBackendResult result{};
+	WPARAM WParam = static_cast<WPARAM>(parameter1);
+	LPARAM LParam = static_cast<LPARAM>(parameter2);
 
-	switch (Msg)
+	switch (message)
 	{
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 		{
-			Result.Type = InputEventType::Keyboard;
-			Result.Keyboard.KeyCode = TranslateVirtualKey(WParam);
-			Result.Keyboard.bPressed = true;
-			Result.Keyboard.bRepeat = (LParam & 0x40000000) != 0;
-			Result.Keyboard.Modifiers = GetCurrentModifiers();
+			result.Type = InputEventType::Keyboard;
+			result.Keyboard.KeyCode = TranslateVirtualKey(WParam);
+			result.Keyboard.bPressed = true;
+			result.Keyboard.bRepeat = (LParam & 0x40000000) != 0;
+			result.Keyboard.Modifiers = GetCurrentModifiers();
 			break;
 		}
 
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		{
-			Result.Type = InputEventType::Keyboard;
-			Result.Keyboard.KeyCode = TranslateVirtualKey(WParam);
-			Result.Keyboard.bPressed = false;
-			Result.Keyboard.bRepeat = false;
-			Result.Keyboard.Modifiers = GetCurrentModifiers();
+			result.Type = InputEventType::Keyboard;
+			result.Keyboard.KeyCode = TranslateVirtualKey(WParam);
+			result.Keyboard.bPressed = false;
+			result.Keyboard.bRepeat = false;
+			result.Keyboard.Modifiers = GetCurrentModifiers();
 			break;
 		}
 
 		case WM_LBUTTONDOWN:
 		{
-			Result.Type = InputEventType::MouseButton;
-			Result.MouseButton.Button = MouseButton::Left;
-			Result.MouseButton.bPressed = true;
-			Result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			Result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
-			Result.MouseButton.Modifiers = GetCurrentModifiers();
+			result.Type = InputEventType::MouseButton;
+			result.MouseButton.Button = MouseButton::Left;
+			result.MouseButton.bPressed = true;
+			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
 
 		case WM_LBUTTONUP:
 		{
-			Result.Type = InputEventType::MouseButton;
-			Result.MouseButton.Button = MouseButton::Left;
-			Result.MouseButton.bPressed = false;
-			Result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			Result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
-			Result.MouseButton.Modifiers = GetCurrentModifiers();
+			result.Type = InputEventType::MouseButton;
+			result.MouseButton.Button = MouseButton::Left;
+			result.MouseButton.bPressed = false;
+			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
 
 		case WM_RBUTTONDOWN:
 		{
-			Result.Type = InputEventType::MouseButton;
-			Result.MouseButton.Button = MouseButton::Right;
-			Result.MouseButton.bPressed = true;
-			Result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			Result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
-			Result.MouseButton.Modifiers = GetCurrentModifiers();
+			result.Type = InputEventType::MouseButton;
+			result.MouseButton.Button = MouseButton::Right;
+			result.MouseButton.bPressed = true;
+			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
 
 		case WM_RBUTTONUP:
 		{
-			Result.Type = InputEventType::MouseButton;
-			Result.MouseButton.Button = MouseButton::Right;
-			Result.MouseButton.bPressed = false;
-			Result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			Result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
-			Result.MouseButton.Modifiers = GetCurrentModifiers();
+			result.Type = InputEventType::MouseButton;
+			result.MouseButton.Button = MouseButton::Right;
+			result.MouseButton.bPressed = false;
+			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
 
 		case WM_MBUTTONDOWN:
 		{
-			Result.Type = InputEventType::MouseButton;
-			Result.MouseButton.Button = MouseButton::Middle;
-			Result.MouseButton.bPressed = true;
-			Result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			Result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
-			Result.MouseButton.Modifiers = GetCurrentModifiers();
+			result.Type = InputEventType::MouseButton;
+			result.MouseButton.Button = MouseButton::Middle;
+			result.MouseButton.bPressed = true;
+			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
 
 		case WM_MBUTTONUP:
 		{
-			Result.Type = InputEventType::MouseButton;
-			Result.MouseButton.Button = MouseButton::Middle;
-			Result.MouseButton.bPressed = false;
-			Result.MouseButton.Position.X = GET_X_LPARAM(LParam);
-			Result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
-			Result.MouseButton.Modifiers = GetCurrentModifiers();
+			result.Type = InputEventType::MouseButton;
+			result.MouseButton.Button = MouseButton::Middle;
+			result.MouseButton.bPressed = false;
+			result.MouseButton.Position.X = GET_X_LPARAM(LParam);
+			result.MouseButton.Position.Y = GET_Y_LPARAM(LParam);
+			result.MouseButton.Modifiers = GetCurrentModifiers();
 			break;
 		}
 
 		case WM_MOUSEMOVE:
 		{
-			Result.Type = InputEventType::MouseMove;
-			Result.MouseMove.Position.X = GET_X_LPARAM(LParam);
-			Result.MouseMove.Position.Y = GET_Y_LPARAM(LParam);
+			result.Type = InputEventType::MouseMove;
+			result.MouseMove.Position.X = GET_X_LPARAM(LParam);
+			result.MouseMove.Position.Y = GET_Y_LPARAM(LParam);
 
-			Result.MouseMove.Delta.X = 0;
-			Result.MouseMove.Delta.Y = 0;
+			result.MouseMove.Delta.X = 0;
+			result.MouseMove.Delta.Y = 0;
 			break;
 		}
 
 		case WM_MOUSEWHEEL:
 		{
-			Result.Type = InputEventType::MouseWheel;
-			Result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(WParam)) / WHEEL_DELTA;
-			Result.MouseWheel.bHorizontal = false;
-			Result.MouseWheel.Position.X = GET_X_LPARAM(LParam);
-			Result.MouseWheel.Position.Y = GET_Y_LPARAM(LParam);
+			result.Type = InputEventType::MouseWheel;
+			result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(WParam)) / WHEEL_DELTA;
+			result.MouseWheel.bHorizontal = false;
+			result.MouseWheel.Position.X = GET_X_LPARAM(LParam);
+			result.MouseWheel.Position.Y = GET_Y_LPARAM(LParam);
 			break;
 		}
 
 		case WM_MOUSEHWHEEL:
 		{
-			Result.Type = InputEventType::MouseWheel;
-			Result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(WParam)) / WHEEL_DELTA;
-			Result.MouseWheel.bHorizontal = true;
-			Result.MouseWheel.Position.X = GET_X_LPARAM(LParam);
-			Result.MouseWheel.Position.Y = GET_Y_LPARAM(LParam);
+			result.Type = InputEventType::MouseWheel;
+			result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(WParam)) / WHEEL_DELTA;
+			result.MouseWheel.bHorizontal = true;
+			result.MouseWheel.Position.X = GET_X_LPARAM(LParam);
+			result.MouseWheel.Position.Y = GET_Y_LPARAM(LParam);
 			break;
 		}
 
@@ -411,5 +418,5 @@ InputBackendResult Win32InputBackend::ProcessMessage(uint32_t Msg, uintptr_t Par
 			break;
 	}
 
-	return Result;
+	return result;
 }

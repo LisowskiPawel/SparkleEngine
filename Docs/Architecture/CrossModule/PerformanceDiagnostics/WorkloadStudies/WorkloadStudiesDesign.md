@@ -26,6 +26,8 @@ Use actual available runtime or native-tool records. Application owns the existi
 
 WS-S1 must prove Unicode/relative paths, schema/unit/mixed-settings rejection, null/partial/oversize inputs, deterministic frozen-input output, cancellation and interrupted publication. Freeze a real null/noise comparison and changed-setting negative before a candidate win. Exact schema/metric/bootstrap and installed versions remain technical qualification inputs to WS-D0, not permission to invent a new exporter.
 
+The selected consumer is the study engineer, not a new native ingestion API. AC-PY-03 is satisfied by actual original-input/schema checks and independent reanalysis; it does not authorize a C++ report loader, runtime analysis panel or second results store.
+
 ## Discovery Gate `WS-D0`
 
 | Cell | Owner and closure evidence |

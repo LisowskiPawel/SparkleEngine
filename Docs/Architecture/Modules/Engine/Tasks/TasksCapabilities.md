@@ -69,7 +69,9 @@ Tasks supplies execution mechanics, not subsystem state ownership. Parallel work
 
 ## Vertical Execution Trace
 
-Builder records nodes/edges -> `Compile` validates the complete graph -> `Submit` takes a settled host-boundary path or `Launch` attaches execution to a scope -> ready nodes enter their declared lane -> a worker pops local/injection/steal work -> task body runs with generation/lane/cancellation context -> result releases nested tasks and dependents -> execution aggregates the first failure and final status -> scope and shutdown join before owner destruction.
+Builder records nodes/edges -> `Compile` validates the complete graph -> `Submit` takes a settled host-boundary path or `Launch` attaches execution to a scope -> ready nodes enter their declared lane -> a worker pops local/injection/steal work -> task body runs with lane/cancellation context -> result releases nested tasks and dependents -> execution aggregates the first failure and final status -> scope and shutdown join before owner destruction.
+
+Context ownership rechecked on 2026-10-25: lane and cancellation binding is private to execution/dispatch. Contexts do not duplicate execution generation; generation identity remains on execution handles, scheduler state and profiling records that consume it. Hosts cannot rebind runtime state through a public helper.
 
 ## Explicit Non-Capabilities And Risks
 
