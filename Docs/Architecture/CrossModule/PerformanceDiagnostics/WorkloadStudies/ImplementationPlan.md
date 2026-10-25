@@ -14,22 +14,33 @@ Turn real workload records into three causal graphics studies and one independen
 
 | What to do | Working route |
 | --- | --- |
-| First action | [WS-S0 freeze](#remaining-stages): select actual producer records and close the five WS-D0 decisions before building an analyzer. |
-| Result to reach | A fixed schema, statistics/observer rules and three selected causal questions; keep rejected or inconclusive findings. |
+| First action | [WS-S0 freeze](#remaining-stages): select actual producer records; if a necessary fact is missing, freeze and route its smallest producer prerequisite, then close WS-D0 before building an analyzer. |
+| Result to reach | A fixed schema and statistics/observer rules, plus one actual causal question in each [CPU, GPU and lifetime protocol](StudyProtocols.md); keep rejected or inconclusive findings. |
 | Start / stop | New production tooling waits for REL-11, WS-D0 and workload/reference inputs. This route cannot bypass parent capture gates or invent a collector. |
 
 ## Stage Contract
 
-Apply [Change Lifecycle](../../../../Engineering/Workflow/ChangeLifecycle.md), [Change Integration](../../../../Engineering/Workflow/ChangeIntegration.md) and the [Feature Delivery Package](../../../../Engineering/Workflow/Templates/FeatureDeliveryPackage.md). Freeze prerequisite revisions, file allowlist, consumer/deletion/hook/copy budget, AC/FM/CHK and numeric rules before results. Before every implementation handoff enforce [Code Style](../../../../Engineering/Foundations/CodeStyle.md), applicable formatting/logical-spacing checks, narrow owner validation and `git diff --check`; boundary checks only for an actual Renderer/RHI boundary change. Remove disposable probes.
+Apply [Change Lifecycle](../../../../Engineering/Workflow/ChangeLifecycle.md), [Change Integration](../../../../Engineering/Workflow/ChangeIntegration.md) and the [Feature Delivery Package](../../../../Engineering/Workflow/Templates/FeatureDeliveryPackage.md). Freeze prerequisite revisions, file allowlist, consumer/deletion/hook/copy budget, AC/FM/CHK and numeric rules before results. Before every implementation handoff enforce [Stage Source-Style Gate](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), applicable formatting/logical-spacing checks, narrow owner validation and `git diff --check`; boundary checks only for an actual Renderer/RHI boundary change. Remove disposable probes.
+
+## Subject Delivery Owners
+
+This parent owns WS-D0, the one analysis consumer and aggregate CASE/WL joins. The child plans own their actual studies; WS-S2/3 below delegate rather than repeat their implementation work.
+
+| Selected evidence | Implementation owner |
+| --- | --- |
+| Python analysis consumer / PGD-05 | [WS-S1](#ws-s1---one-analysis-consumer), [fixed command/input/output proposal](WorkloadStudiesDesign.md#bounded-offline-analysis-consumer) |
+| CPU / GPU / lifetime / PGD-03 | [CPU plan](CpuPreparation/ImplementationPlan.md), [GPU plan](GpuShader/ImplementationPlan.md), [lifetime plan](ResourceLifetime/ImplementationPlan.md) |
+| Causal incident / PGD-04 | [Incident plan](IncidentAnalysis/ImplementationPlan.md) |
+| Original artifacts and final reproduction | [Workload evidence homes](../../../../Acceptance/GraphicsWorkloads.md#evidence-folders-and-delivery-owners); [portfolio stage 3](../../GraphicsPortfolio/ImplementationPlan.md#3-reproduce-review-and-revise) owns the real exercise |
 
 ## Remaining Stages
 
 | Stage | Work and exit | Deliberate scope and stop |
 | --- | --- | --- |
-| [`WS-S0`](#ws-s0---freeze-discovery) Freeze discovery | Close five `WS-D0` cells, actual producer sample, statistics/observer/size cards and API/hardware matrix. | Documentation/local probe only; stop on missing producer, unowned schema or unfrozen thresholds. |
+| [`WS-S0`](#ws-s0---freeze-discovery) Freeze discovery | Close five `WS-D0` cells, actual producer sample, statistics/observer/size cards, API/hardware matrix and current-script retain/narrow/delete decisions. If a necessary field is absent, freeze its producer/check card, route the admitted prerequisite through parent Phase 4, qualify the original record and return here. | WS-S0 stays documentation/local probe only; the producer uses its own bounded stage, not the still-blocked analyzer gate. Remove probes; no guessed data/schema, duplicate collector or full internal spine. Missing unowned inputs/thresholds still block WS-D0. |
 | [`WS-S1`](#ws-s1---one-analysis-consumer) One analysis consumer | Implement only the selected offline CLI over frozen workload records; publish per-run tables/plots and source joins. Pass `AC-WS-01`, input/failure/cleanup parts of `AC-WS-04`, `AC-PY-01..04`. | No collector/export/history or Python framework. Delete the replaced ad hoc supported analysis route; original evidence stays intact. |
-| [`WS-S2`](#ws-s2---causal-paired-api-studies) Causal paired-API studies | Complete three questions on matched D3D12/Vulkan tuples, including rejected/inconclusive evidence. Pass `AC-WS-02` and relevant `WL-04/07`; explain actual queue/barrier/shader/CPU constraints. | No forced async/serial topology change to manufacture a win, no broad feature additions. Stop on quality mismatch, candidate drift or observer contamination. |
-| [`WS-S3`](#ws-s3---incident-adoption-and-publication) Incident, adoption and publication | Deliver one difficult incident record, regression route and independent study reproduction; pass `AC-WS-03/04`, route into canonical case studies. | No invented influence/adoption evidence or unsupported hardware pass. Delete probes/replaced mechanisms; retain useful captures and negative conclusions. |
+| [`WS-S2`](#ws-s2---causal-paired-api-studies) Causal paired-API studies | Execute only the first unfinished admitted stage in the [CPU](CpuPreparation/ImplementationPlan.md), [GPU](GpuShader/ImplementationPlan.md) or [lifetime](ResourceLifetime/ImplementationPlan.md) owner. Parent WS-D05 selects all three questions before results; each child supplies model/baseline/experiment/paired verdict. | Join all three domain results under AC-WS-02/WL-04/07. Do not duplicate child steps or demand three wins; preserve their rejected/inconclusive evidence, actual tool limits and same-stage cleanup. |
+| [`WS-S3`](#ws-s3---incident-adoption-and-publication) Incident, adoption and publication | Use the [incident plan](IncidentAnalysis/ImplementationPlan.md) for missing causal proof. Join accepted original study/incident records, then use portfolio stage 3 for the one independent reproduction/review. | AC-WS-03/04 and CASE/WL joins close only with actual evidence. No extra adopter per child, new incident portal, results store or deferred cleanup. |
 
 ## Reference-Guided Study Selection
 
@@ -42,7 +53,7 @@ Consult the [what/where/why cards](../../../../Strategy/Research/RenderingRefere
 | Sampling/reconstruction/residency | `NVR-02/03/09/17`: guide/history, estimator and budget obligations. | One equivalent raw/filtered product and uncertainty/cost comparison, or one residency-pressure question. No algorithm replacement without its owning gate; heap budget is not allocated high-water. |
 | Analyzer and transfer | `NVR-12/14/20`: a focused image utility and teaching route. | One immutable-record consumer and non-author exercise with feedback. No embedded viewer, Adobe integration or general profiling framework. |
 
-Choose exactly three distinct causal questions for `WS-S2`, retaining the existing rejected/inconclusive-result obligation; they need not use three different families. Record the selected source, local differences, rights and falsifier through the [reference-use record](../../../../Strategy/Research/RenderingReferenceExamples.md#delivery-reference-use-record). References do not change `WS-D0`, workload prerequisite, sample or observer authority.
+Choose one actual question in each [Study Protocol](StudyProtocols.md): CPU preparation/recording, GPU kernel behavior and resource/queue lifetime. The reference table supplies precedents within those domains, not substitute coverage or three mandated wins. Record the selected source, local differences, rights and falsifier through the [reference-use record](../../../../Strategy/Research/RenderingReferenceExamples.md#delivery-reference-use-record). References do not change `WS-D0`, workload prerequisites, sample or observer authority.
 
 ## Ready-To-Use Prompts
 
@@ -52,10 +63,10 @@ Choose exactly three distinct causal questions for `WS-S2`, retaining the existi
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s0---freeze-discovery and apply its Stage Contract.
-Execute WS-S0 only in Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md. Research/planning only. Inspect GraphicsWorkloads, diagnostics comparison/data-spine status, external capture/runbook, Python dossier, real product launch and current installed tool/hardware environment. Close WS-D01..05 against an exact source revision and real producer sample; freeze units/identity/schema, missing-data policy, numeric comparison/observer rules, bounds and consumer/hook/copy/deletion ledger. Keep REL-11 and existing parent gates authoritative. No production code or guessed exporter. Validate docs/style/traceability and hand off WS-D0 or exact unresolved owners.
+Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s0---freeze-discovery and apply its Stage Contract, including the Stage Source-Style Gate.
+Execute WS-S0 only in Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md. Research/planning only. Inspect actual runtime/native records, GraphicsWorkloads, diagnostics comparison rules, Python dossier and current tools. Prefer existing records. If a required field is absent, freeze its minimal producer/check/observer/capacity card and hand off the prerequisite to parent Phase 4 under its own admission, without waiting for completed analyzer WS-D0; resume this freeze after that real record is qualified. Close WS-D01..05 with exact source/sample, units/identity/schema, missing-data rules, numeric/observer bounds and hook/copy/deletion ledger. Preserve REL-11 and parent gates. No production code, guessed exporter or internal diagnostics ladder in WS-S0; report the exact next owner/action while blocked.
 
-Select three distinct causal questions using this plan's reference-guided table. For each selected NVR card record exact source, local assumption/differences, rights, measurable output and falsifier before candidate results. Do not mandate a vendor feature or copy a sample architecture.
+Select one actual question in each StudyProtocols.md domain: WS-CPU, WS-GPU and WS-LIFE. Freeze each cost model, native observation, source/IR/instruction or timeline/retirement joins, falsifiers and available tool-access limits. For each selected NVR card record exact source, local differences, rights and measurable output before results. Do not mandate a vendor feature or manufacture a defect.
 ```
 
 </details>
@@ -66,8 +77,8 @@ Select three distinct causal questions using this plan's reference-guided table.
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s1---one-analysis-consumer and apply its Stage Contract.
-Execute WS-S1 only after accepted WS-D0 and production admission. Extend the existing Tools owner with one selected offline analysis CLI and real consumer. Reuse workload schemas; preserve run-level distributions and candidate/frame/settings/native-artifact joins. Reject partial/mismatched/missing/oversized inputs, preserve originals and clean interrupted publication. Run frozen AC-WS-01/04 and AC-PY controls, code style and narrow owner checks. Delete replaced supported analysis paths and remove probes. Stop on unowned schema, lost identity or duplicate collector/export. No runtime Python or public framework. Handoff exact commands/results/limitations.
+Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s1---one-analysis-consumer and apply its Stage Contract, including the Stage Source-Style Gate.
+Execute WS-S1 only after accepted WS-D0 and production admission. Ratify and implement the bounded command/input/output/failure contract in WorkloadStudiesDesign.md, using actual frozen producer samples and exact versions/capacity rules; the planned command is not current source. Extend the existing Tools owner with one selected offline analysis CLI and real consumer. Reuse workload schemas; preserve run-level distributions and candidate/frame/settings/native-artifact joins. Reject partial/mismatched/missing/oversized inputs, preserve originals and clean interrupted publication. Run frozen AC-WS-01/04 and AC-PY controls, code style and narrow owner checks. Delete replaced supported analysis paths and remove probes. Stop on unowned schema, lost identity or duplicate collector/export. No runtime Python or public framework. Handoff exact commands/results/limitations.
 ```
 
 </details>
@@ -78,8 +89,8 @@ Execute WS-S1 only after accepted WS-D0 and production admission. Extend the exi
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s2---causal-paired-api-studies and apply its Stage Contract.
-Execute WS-S2 only after the accepted input/analyzer and workload/reference prerequisites. Run the three predeclared causal studies on matched Windows D3D12/Vulkan configurations using frozen quality/sample/uncertainty/practical-effect and observer controls. Keep one change per hypothesis, preserve production parallel topology, retain native before/after identity and one rejected/inconclusive alternative. Repair only a demonstrated bounded defect under the existing owner, with code style and affected narrow checks. Stop on quality/settings drift, invalid reference or unfrozen threshold. Handoff AC-WS-02 and relevant workload cells, no invented performance win.
+Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s2---causal-paired-api-studies and apply its Stage Contract, including the Stage Source-Style Gate.
+Execute only the first unfinished admitted stage in this plan's CpuPreparation, GpuShader or ResourceLifetime ImplementationPlan.md. Apply that child's exact prerequisites, design/check card, model, baseline, controlled experiment, paired verdict and cleanup. This parent joins the three original results under AC-WS-02 and relevant WL cells; it does not redefine their protocols. Preserve rejected/inconclusive results and actual tool/quality/observer limits. No forced topology change, duplicated study runner or feature expansion.
 ```
 
 </details>
@@ -90,8 +101,8 @@ Execute WS-S2 only after the accepted input/analyzer and workload/reference prer
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s3---incident-adoption-and-publication and apply its Stage Contract.
-Execute WS-S3 only against accepted study artifacts. Close the one difficult incident from earliest wrong product through competing hypotheses, minimal fix/deletion and controlled regression; preserve exact source/shader/native identity. Obtain independent reproduction/review, record feedback and changes, and route report/plots/captures into the existing CASE/WL/completion owners. Run AC-WS-03/04 and applicable style/docs checks; remove probes. Stop on unproved root cause or absent adopter; keep valid individual results. No author self-certification or unrelated feature expansion.
+Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s3---incident-adoption-and-publication and apply its Stage Contract, including the Stage Source-Style Gate.
+Use IncidentAnalysis/ImplementationPlan.md for the first missing causal incident stage; reuse valid original release incidents. Once study/incident proof exists, join AC-WS-02..04 and hand the cleared packet to GraphicsPortfolio stage 3 for its one actual independent reproduction/review. Retain original identity, feedback, intervention and limitation records. Verify preceding cleanup and remove probes. Missing root cause or participant stays blocked; do not run a new adopter per folder or build an incident/report portal.
 ```
 
 </details>

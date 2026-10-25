@@ -130,18 +130,8 @@ namespace SparkleLauncher
 				{
 					return;
 				}
-				if (sourceDependenciesMissing)
-				{
-					AddPlannedEffect(plan, "Repair incomplete enabled source dependency caches before the next local rebuild or cook workflow.");
-				}
-				if (needsConfigure)
-				{
-					AddConfigureStep(plan);
-				}
-				else
-				{
-					AddPlannedEffect(plan, "Repository dependency configure is current; no configure step is required.");
-				}
+				AddPlannedEffect(plan, "Validate pinned source dependencies and acquire missing caches.");
+				AddConfigureStep(plan);
 				plan.CanRun = true;
 				return;
 			case BuildWorkspaceOperationKind::GenerateBuildFiles:

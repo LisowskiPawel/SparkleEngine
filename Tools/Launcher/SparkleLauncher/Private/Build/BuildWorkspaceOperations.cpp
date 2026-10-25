@@ -299,7 +299,6 @@ namespace SparkleLauncher
 		switch (plan.Kind)
 		{
 			case BuildWorkspaceOperationKind::SyncCode:
-				return !plan.Request.SourceDependencyId.empty() || plan.Request.ForceConfigure || !plan.Freshness.Current || HasIncompleteEnabledSourceDependencies(plan);
 			case BuildWorkspaceOperationKind::GenerateBuildFiles:
 				return true;
 			case BuildWorkspaceOperationKind::BuildWorkspace:

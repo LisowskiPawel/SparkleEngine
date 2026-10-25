@@ -80,7 +80,7 @@ It does not claim that the target is implemented, set performance targets for a 
 - [Performance Diagnostics Capability Inventory](Capability.md) owns the dated current-source snapshot and reconciliation gaps.
 - The adjacent [Performance Diagnostics — Acceptance](Acceptance.md) contract owns feature-local workload evidence requirements, baseline experiments, reviewer artifacts, and verification gates.
 
-Application owns the presentation-neutral live diagnostics product, cross-domain session orchestration, active stat-view selection, and the bounded runtime serialization mechanism used by an explicit benchmark. The acceptance workload owns the benchmark schema, route, destination/name, sample policy, analysis, and claim. Editor owns its viewport menu/window presentation. DevelopmentGame owns a compact presenter through its existing game console/UI packet path. Each engine domain remains the authority for its own measurements. These concrete product consumers justify compact stat views; they do not justify a general task browser, allocation explorer, or trace-viewer product.
+Application composes the selected cross-domain request/result and actual runtime serialization boundary. A live session/join/stat-selection owner is conditional on an admitted consumer; it is not required to use existing native tools or original workload records. The acceptance workload owns the benchmark schema, route, destination/name, sample policy, analysis, and claim. Editor owns its viewport menu/window presentation. DevelopmentGame owns a compact presenter through its existing game console/UI packet path. Each engine domain remains the authority for its own measurements. These concrete product consumers justify compact stat views; they do not justify a general task browser, allocation explorer, or trace-viewer product.
 
 ## Adversarial Review Standard
 
@@ -99,7 +99,9 @@ The goals survive this review: a bounded first-party orientation layer, one focu
 
 ## Executive Decision
 
-Sparkle will provide four complementary diagnostic layers:
+The four layers below describe conditional diagnostic depth. The [delivery plan](ImplementationPlan.md#delivery-at-a-glance) selects existing external capture and needed workload evidence; internal overlays, the workspace, live history and GPU visualizer are unselected. Do not construct these layers in sequence merely because the design describes them. A separately admitted consumer must justify each additional producer and presenter after existing tools prove insufficient.
+
+The conditional layers are:
 
 | Layer | Answers | Product shape |
 | --- | --- | --- |
@@ -110,47 +112,23 @@ Sparkle will provide four complementary diagnostic layers:
 
 The live layer is a compass, not a verdict. It must expose validity, frame identity, configuration, and likely limiting domain without pretending that utilization, FPS, summed scope time, or a single captured frame proves cause.
 
-The table describes the final diagnostic ladder, not implementation order. Delivery is deliberately external-first: after the source-backed baseline, Sparkle proves the complete PIX, Nsight Graphics, then RenderDoc launch-to-artifact paths using the [external-capture staged plan](ExternalCapture/ImplementationPlan.md) before adding its internal session, stats, histories, timestamp queries, workspace, or `ProfileGpu`. This establishes trustworthy native captures and marker correlation against the current renderer before internal instrumentation can disturb or obscure it.
+The table is not a requirement to deliver the whole ladder. Selected external-capture work remains PIX, Nsight Graphics, then RenderDoc through the [child plan](ExternalCapture/ImplementationPlan.md). Completing capture does not select an internal session, stats, histories, queries, workspace or `ProfileGpu`. If later admitted, those packages preserve the semantics, bounds, zero authoring tax and Shipping erasure below.
 
 ## Unreal Stat-System Precedent And Sparkle Adaptation
 
-Status of this section: external research used to shape the target; it is not local implementation authority.
+The earlier study explored compact stats, a fixed group catalog and a GPU visualizer. Sparkle retains only the transferable questions: units and validity, physical versus logical ownership, shared pass/marker identity, bounded observer cost and a useful next native-tool action. It does not adopt a stat catalog, workspace or query product by precedent.
 
-Unreal's strongest lesson is the diagnostic ladder, not any particular macro or subsystem name. Its official documentation presents stat commands as the quickest in-application view, `stat unit` as a frame/game/draw/GPU orientation surface, opt-in groups such as GPU, Memory, RHI, and SceneRendering, and deeper tools for causal analysis. Unreal's render graph also provides render-graph-owned scopes for both in-engine GPU stats and external-profiler events.
-
-Sparkle adopts the following product behaviors:
-
-| Unreal precedent | Sparkle adaptation | Deliberately not copied |
-| --- | --- | --- |
-| A short console command toggles an on-screen stat group. | One case-insensitive, autocomplete-capable `Stat` command uses Sparkle's existing Editor and game console registries. The Editor viewport leads with typed task presets; `Customize Stats...` reaches the same fixed group requests. | A second console, hidden command parser, presenter-specific command implementation, or twelve raw groups presented as equal first-level choices. |
-| `stat unit` rapidly compares frame, game, draw/render, RHI-thread, and GPU time. | `Stat Unit` compares frame interval, host/game phase wall, render wall, queue waits, presentation, and GPU queue span using honest Sparkle ownership labels. | Pretending Editor gameplay has its own OS thread, or treating the numerically largest pipelined column as proof by itself. |
-| Named groups expose GPU, RHI, scene rendering, memory, gameplay, and hitch information. | A small fixed internal catalog names Fps, Unit, UnitGraph, Threads, Tasks, Gpu, GpuPasses, Render, Scene, Rhi, Memory, and Hitches. Each group is admitted only when it has a real producer, bounded consumer, and tier evidence; normal users select an investigation intent rather than assembling this catalog. | An open-ended global stat registry, arbitrary module macros, hundreds of groups without an active product question, or making internal composition the primary navigation. |
-| Stat types distinguish cycle counters, per-frame counters, persistent accumulators, and memory values. | Every Sparkle row declares duration, count, bytes, ratio, state, high-water, sampling interval, and validity semantics. | Combining unlike kinds into a typeless number or assuming every value resets per frame. |
-| Render-graph scopes feed both in-engine GPU stats and external markers. | Stable Sparkle frame-graph/pass tokens are shared by detailed GPU rows and PIX/RenderDoc/Nsight/RGP markers. | Separate UI-only pass names or per-frame formatted marker strings. |
-| A focused GPU profile can expose a hierarchical event tree while realtime GPU stats stay quick and cumulative. | `Stat Gpu`/`Stat GpuPasses` remain live orientation; `ProfileGpu` takes one bounded frozen hierarchical capture with inclusive/exclusive views. | Running a full hierarchical query capture continuously or confusing the visualizer with hardware-counter attribution. |
-| PIX or RenderDoc attachment adds a compact provider capture button to the upper-right Level Viewport. | Every requested or detected capable PIX, RenderDoc, or Nsight Graphics provider adds its own small `Capture next frame` icon to a compact group at the right side of the Sparkle viewport header. | Permanent icons for providers that were neither requested nor detected, treating icon presence as proof of capture readiness, or copying Unreal's plugin architecture. |
-| Captures complement live stats because the overlay is quick but not a complete profiler. | Live stats answer where to look and support simple controlled comparisons; external tools remain the authority for call stacks, scheduling causality, shader/hardware limits, and API-state investigation. | Claiming that a rich overlay eliminates the need to know profiler workflows. |
-
-Primary precedent sources are Epic's [Stat Commands](https://dev.epicgames.com/documentation/unreal-engine/stat-commands-in-unreal-engine), [performance profiling introduction](https://dev.epicgames.com/documentation/unreal-engine/introduction-to-performance-profiling-and-configuration-in-unreal-engine), [Stats System overview](https://dev.epicgames.com/documentation/unreal-engine/unreal-engine-stats-system-overview), [graphics programming overview](https://dev.epicgames.com/documentation/unreal-engine/graphics-programming-overview-for-unreal-engine), [Render Dependency Graph profiling guidance](https://dev.epicgames.com/documentation/unreal-engine/render-dependency-graph-in-unreal-engine#performanceprofiling), [PIX integration](https://dev.epicgames.com/documentation/en-us/unreal-engine/using-pix-on-windows-with-unreal-engine), and [RenderDoc integration](https://dev.epicgames.com/documentation/en-us/unreal-engine/using-renderdoc-with-unreal-engine).
+Current external capture keeps one startup selection and targeted viewport request; its [experience owner](ExternalCapture/UserExperience.md) defines the delivered controls. Future internal presentation requires its own consumer/value decision rather than the earlier Tier-A/B/C rollout.
 
 ## Goals And Non-Goals
 
 ### Goals
 
-- Separate application frame interval, editor work, gameplay/world work, render-thread CPU work, task-worker work, GPU work, presentation waits, process RAM, and GPU memory.
-- Preserve the difference between a physical OS thread and a logical phase running on that thread.
-- Correlate delayed and pipelined CPU/GPU samples with the existing `FrameId`.
-- Show current values, stable distributions, high-water marks, and data age with explicit units.
-- Keep all queues, buffers, label sets, and exports bounded.
-- Keep gameplay, content, render-pass, and ordinary engine code intent-first: derive diagnostics automatically from existing orchestration, task, frame-graph, queue, allocator, and publication owners; allow only sparse static semantic markers where intent cannot be derived.
-- Reuse the existing thread names, `SparkleTasks` ETW events, frame-graph GPU scopes, RHI timestamps, and allocator diagnostics.
-- Make D3D12 and Vulkan measurements semantically comparable while exposing backend limitations.
-- Provide fast, composable `Stat` views in both DevelopmentEditor and DevelopmentGame without requiring an attached profiler.
-- Provide an on-demand GPU captured-frame view with per-queue marker hierarchy, inclusive/exclusive cost, flat/coalesced views, and exact capture configuration.
-- Expose the single startup-selected external provider as an icon overlay at the viewport surface's upper right. Its action requests the next eligible containing host interval for that scene; native APIs and lease policy remain in RHI private owners. Reject multiple provider intent and unaccepted injected combinations.
-- Make the next profiler action obvious and produce evidence a portfolio reviewer can audit.
-- Measure the observer cost of the diagnostics themselves.
-- Compile optional performance-diagnostics collection, histories, presentation, export, marker fanout, timestamp planning, and external-provider integration out of Shipping so runtime `Off` is not mistaken for zero shipped cost.
+- Produce trustworthy native capture and candidate-bound release/workload measurements through existing owners.
+- Keep units, frame/range/configuration identity, validity, provenance, timing and memory meanings exact across APIs.
+- Add only a demonstrated missing fact and its actual consumer, with bounded cost and failure behavior.
+- Preserve normal rendering topology, zero feature-author registration tax and applicable Shipping erasure.
+- Reuse qualified tools and original evidence; delete duplicate collectors, state or presentation with a replacement.
 
 ### Non-Goals
 
@@ -354,76 +332,32 @@ One private backend adapter fans each semantic scope out to Sparkle timing and s
 
 ## System Ownership And Data Flow
 
-```text
-Core monotonic clock + minimal CPU trace sink
-        |                         SparkleTasks ETW events
-        v                                  |
-Application diagnostics session <---------+
-  host phase sample + process RAM
-        |          ^
-        |          | immutable results keyed by FrameId
-        |          |
-        |     Renderer diagnostics producer
-        |       render CPU stages
-        |       frame-queue waits
-        |       resolved GPU scopes
-        |       RHI GPU memory
-        |          ^
-        |          |
-        |     RHI timestamps/allocator truth
-        |
-        +----> bounded joined frame history
-                    |
-                    +----> immutable live performance model
-                    |       |-- Editor Performance menu/overlays/window
-                    |       `-- DevelopmentGame stat overlay
-                    |
-                    `----> explicit benchmark exporter
+```mermaid
+flowchart LR
+    Facts[Current Application/Tasks/Renderer/RHI facts] --> Result[Existing request/export result]
+    Native[Qualified native tool and capture] --> Records[Original workload records and artifacts]
+    Result --> Records
+    Records --> Analysis[Bounded offline comparison]
+    Result --> UI[Existing selected capture/result UI]
 ```
+
+The selected path joins original identity and meaning; it does not require a runtime joined history or Performance workspace. A missing fact first belongs to the producer that performs the real work. Introduce cross-domain stored state only when a separately admitted consumer cannot use existing results or views.
 
 ### Owners
 
-| Responsibility | Owner | Contract |
+| Owner | Current/selected responsibility | Additional state is not implied |
 | --- | --- | --- |
-| Monotonic CPU timestamp and minimal platform trace emission | Core diagnostics bootstrap | No domain policy, sample history, UI, or file output. |
-| Task dependency/begin/end trace events | Tasks | Existing bounded task identity and lane semantics; provider work is skipped when disabled. |
-| Host frame identity, diagnostics mode, process RAM polling, cross-domain join, rolling windows, explicit export | Application | One session owner; immutable model/result publication. |
-| Gameplay/update/extraction wall scopes | Application around GameFramework owner calls | Initial top-level measurement needs no public ECS diagnostic snapshot. Detailed systems stay in task traces. |
-| Renderer CPU stages, frame queue, GPU timing resolution | Renderer | Immutable `FrameId`-keyed performance result; no ECS or Editor types. |
-| GPU timestamp, queue type, allocator, and budget facts | RHI | Backend-neutral values with backend capability and scope declared. No bottleneck policy. |
-| External frame-capture bootstrap and native trigger | Existing process composition plus selected RHI private adapter | Normalize one provider before graphics creation, reject incompatible injected activities, bind the real target and publish one neutral observation. SDK loading and APIs remain private. |
-| Active stat groups and presentation-neutral row models | Application | Fixed catalog maps immutable diagnostic fields to bounded rows and required collection mode. No domain measurement authority. |
-| Editor live presentation and user intent | Editor | Reads one immutable model and submits semantic group/reset/export/external-capture requests from the viewport menu, capture overlay, console, or Performance window. No renderer/RHI pointers. |
-| DevelopmentGame live presentation | Application game console/UI packet owner | Reads the same immutable model and submits the same semantic group requests. It does not gain Editor dependencies. |
-| Benchmark artifacts | Application evidence session | Written only for an explicit bounded request under the acceptance-workload artifact root. |
-
-External-first delivery does not require the full Application diagnostics session. The first capture slice extends `RendererExternalRuntime`, the existing Renderer bounded control/read-state route, backend-private RHI adapters, and one narrow immutable Application-to-Editor projection. It uses the product's existing `FrameId` and viewport/present-target identity but owns no internal timing or history. When the Application session arrives later, it composes that projection as a stable submodel; it does not copy provider state, move native lifetime, or create a second request/arbitration path.
+| Core | Existing clock/process/path primitives and truthful boundary errors. | No new trace service or generic diagnostic registry. |
+| Application | Product launch/capture intent, lifetime and actual request/export orchestration. | A live join/session/stat demand owner only if its consumer is admitted. |
+| Tasks | Existing task/worker identity and ETW execution facts. | No task browser, second runtime or diagnostic task graph. |
+| Renderer | Current frame/view/pass, product and measurement facts; semantic marker identity. | No UI polling or diagnostics-only scene scan. |
+| RHI/backends | Native timing/memory/capture/diagnostic facts and completion-safe native lowering. | No workload/schema/UI policy or universal hardware-counter platform. |
+| Editor | Existing controls emit typed intent and display immutable request/results. | No separate timing/capture authority or automatic Performance workspace. |
+| Workload/Tools | Experiment input/schema/destination and bounded offline analysis of original records. | No second sampler, runtime exporter, database, runner service or dashboard. |
 
 ### Target Responsibility Placement
 
-The implementation extends existing modules and private production paths; these are responsibility boundaries, not permission to add a new top-level framework:
-
-```text
-Core
-  monotonic clock + minimal platform trace emission only
-Tasks
-  existing SparkleTasks ETW/task identity
-Application/Private/Diagnostics
-  session/demand owner, typed domain mailboxes, FrameId join/generations,
-  fixed rings/descriptors, immutable live model, explicit exporter
-Renderer/Private/Diagnostics
-  render CPU builder/waits, bounded GPU scope plan, delayed resolver,
-  immutable FrameId-keyed renderer results
-RHI/<backend>/Private/Diagnostics
-  timestamp capability/calibration, memory facts, native marker/object-name fanout,
-  zero or more external frame-capture adapters selected before device creation
-Editor/Private
-  Performance/Stat presenters, conditional provider icon group, and typed requests only
-DevelopmentGame Application presenter
-  compact rows through the existing game console/UI packet route
-```
-
-Core does not own a profiler service. Editor does not own engine measurements. RHI public contracts expose only the backend-neutral facts required by the Renderer/Application consumers; vendor SDK types and tool-specific state remain backend-private. A new file or public type requires a present consumer and cannot exist only to anticipate a future profiler.
+For a newly admitted fact or consumer, extend its existing owner and name the real publication/lifetime boundary before adding a holder. Reuse the concrete homes in [External Capture execution architecture](ExternalCapture/ExecutionArchitecture.md) for current provider work. Do not precreate Application session/history classes, view-model families or module-wide source partitions from the former target file map. The data/access and cost examples below constrain only structures the selected consumer actually needs.
 
 ### Publication Rules
 
@@ -649,130 +583,18 @@ CPU utilization alone is never sufficient for a CPU-limited hint. GPU utilizatio
 
 ## Diagnostics Product Information Architecture
 
-The accepted product shape is a progressive diagnostic ladder, not a collection of profiler windows. Every Sparkle-owned presentation reads the same immutable joined diagnostics product and preserves the same `FrameId`, range, semantic token, units, configuration, and validity.
+The current consumer is a rendering investigation, release check or capture request. Existing native tools and current timing/memory producers supply its facts. Add a missing field at its actual owner and use one existing capture/export/presentation route; no shared history or workspace is a prerequisite merely because domains differ.
 
 ### Product Surfaces And Depth Boundary
 
-| Surface | Depth | Product role | Boundary |
-| --- | --- | --- | --- |
-| Viewport/runtime Stats | Glance and live orientation | Answer whether the frame is healthy and which top-level domain deserves attention. | No arbitrary tracks, history browser, or causal claim. |
-| Editor Performance workspace | Trend, ranking, selected frame/range, and bounded capture | Correlate frame distribution, physical CPU owners/logical phases, task lanes, GPU queues/passes, process RAM, and precise GPU memory fields. | One fixed workspace; no generic trace store, symbol engine, or allocation explorer. |
-| External-profiler handoff | API/state, scheduling, memory allocation/residency, shader/hardware, and crash cause | Carry exact configuration and stable selected identities into PIX, RenderDoc, Nsight, RGP/RMV/RGA, WPA, or equivalent tools. | Sparkle does not reproduce vendor/source-level analysis. |
-
-The viewport and DevelopmentGame overlay own no independent data model. The Performance workspace is available once from `Windows > Performance`, the viewport summary, the existing console commands, and a selected hitch. A new diagnostic question does not automatically justify a new panel.
-
-The GPU Visualizer is the `GPU / Captured frame` mode of the Performance workspace, not another permanent Editor window. Hitches are selections in the shared frame navigator, not a Hitch Browser. A future memory A/B snapshot is a Memory view mode only if an accepted workload justifies it. Existing Used Shaders, Used Meshes, and Used Textures remain resource/asset inspectors until a separately accepted migration can consolidate and remove an old path; they do not own whole-system performance truth.
-
-### Intent-First Entry And Progressive Disclosure
-
-The first choice is the user's question, not a stat-group or collector name:
-
-| User intent | Primary entry/result | Backend automation | Details intentionally deferred |
-| --- | --- | --- | --- |
-| Is this frame healthy? | `Quick Check` opens the compact Unit summary or Overview. | Select the minimum basic collection, correlate valid fields, keep the live window, and propose one honest next action. | Individual groups, scope capacity, timestamps, provenance records, queue submissions. |
-| Why is CPU work or waiting high? | `Investigate CPU` opens CPU with the same frame/range. | Preserve selection; expose real physical owners, logical phases, waits and task-lane aggregates already available. | OS scheduling/call stacks remain an `Open WPA/PIX guidance` action. |
-| Why is GPU work high? | `Investigate GPU` opens GPU Live and selects the strongest valid expensive top-level marker. | Preserve frame/configuration, choose the minimum timing demand, maintain separate queues, and expose `Show Passes` or `Capture GPU` only when valid. | Query slots, native event APIs, pipeline/shader hashes, hardware counters and ISA. |
-| Capture the next frame in an attached tool | A compact group contains one small PIX, RenderDoc, and/or Nsight Graphics icon for every provider requested/detected in this process. | Select the clicked icon's provider, bind the clicked viewport's stable present target, validate provider/backend/readiness, and arm one next-valid-frame capture. | Provider injection, native handles, capture-layer options, compatibility, and output transport remain private/operational detail. |
-| Is memory pressure or growth involved? | `Investigate Memory` opens definitions, trend, budget, and A/B/C guidance. | Select current/high-water/sample-age facts and maintain precise local/non-local semantics. | Allocation maps, call stacks and residency events remain external-tool work. |
-| Produce reproducible evidence | `Capture Evidence...` opens a review step prefilled from the selected workload/range/configuration. | Validate readiness, sample population, observer mode, required identities, destination and manifest before enabling export. | Raw schema and hashes remain expandable/copyable; no normal-run files. |
-| Customize an expert overlay | `Customize Stats...` or the console exposes the fixed catalog with cost/search. | Reject unsupported combinations before commit and derive the minimum shared collection mode. | This is not the default viewport menu and never creates another collector. |
-
-Progressive disclosure is fixed:
-
-1. **Glance:** health, frame budget, likely domain, validity, and one next action.
-2. **Investigate:** one Overview/CPU/GPU/Memory view with preserved frame/range and a contextual Inspector.
-3. **Evidence:** explicit captured frame or benchmark review with complete configuration and observer state.
-4. **Expert:** raw stat groups, exact definitions/provenance, hashes/tokens, and external-profiler guidance.
-
-The frontend automatically chooses `Off`, `LiveBasic`, or `LiveDetailed` from visible intent; those mode names are status/cost disclosure, not a normal configuration task. It also fills configuration, stable identities, supported external-tool route, and export manifest from authoritative state. It never automatically writes a file, starts an external capture, enables validation/hardware counters, changes renderer topology, or promotes a causal claim.
-
-The default ribbon shows only live/frozen state, selected frame/range, build/backend, resolution, data quality, and any non-default/observer warning. Adapter/driver, pipeline depth, full render settings, commit/configuration hashes, provenance, and capacity move into `Configuration Details` and always enter exported evidence. This keeps screenshots auditable without turning every live screen into a manifest dump.
-
-Every state has one dominant next action. Unsupported or temporarily invalid actions are hidden or disabled with the prerequisite next to them; the UI does not accept a capture/export/setup combination that its owner can already prove invalid. Suggestions remain evidence-scoped navigation, never silent setting changes or optimization commands.
-
-### Shared Selection Model
-
-Exactly one workspace selection is active:
-
-| Selection | Meaning | Cross-view behavior |
+| Selected question | Current/default route | Requires separate admission |
 | --- | --- | --- |
-| `Live` | Follow the newest completed joined sample. | All views advance together; memory retains its independently displayed sample age. |
-| `FrameId` | Freeze one completed application/renderer frame identity. | CPU/GPU values from another frame never substitute silently; delayed GPU data remains Pending. |
-| Bounded frame range | Aggregate valid joined samples in the visible range. | Every percentile/table declares included, excluded, invalid, and discontinuity counts. |
-| Typed object token | One physical thread, logical phase, task lane/family, GPU queue/scope, or memory category within the selected frame/range. | Main view highlights it and the Inspector shows producer, owner, identity, metrics, validity, and next action. |
+| Inspect a native frame, shader or resource | Existing external-capture action and provider-native artifact. | Additional provider, native feature tuple or integration depth. |
+| Qualify frame rate, memory or an optimization | Frozen workload inputs, existing measurements/native tools and the bounded offline consumer. | A new metric producer only when existing facts cannot answer the question. |
+| Investigate a crash/device failure | Qualified GCD/native diagnostics with matching symbols and receipts. | Automatic recovery, upload service or crash/hang collection not already available. |
+| Repeatedly inspect a missing live fact | First test the question with existing logs/captures. | One bounded stat/presenter after value, owner and observer-cost admission. |
 
-Switching Overview/CPU/GPU/Memory preserves the frame/range. A typed object token follows only when the destination has an explicit semantic correlation; otherwise the object selection clears while the frame/range remains. Search/filter hides rows but does not alter captured totals, denominators, percentages, or the selection identity.
-
-### Performance Workspace Layout
-
-```text
-+ Performance ----------------------------------------------------------------+
-| LIVE | Frame 18422 | D3D12 | 5120x1392 | DevEditor | Basic | valid 120/120  |
-| [Overview] [CPU] [GPU] [Memory]      [Freeze] [Investigate GPU] [More...]     |
-+ Frame navigator -------------------------------------------------------------+
-| budget 16.7 ms ........... ^ hitch #18391 ........ selected #18422 ......... |
-+ Main view ------------------------------------------------+ Inspector --------+
-| summary / lanes / timeline / marker tree / memory trend   | selected identity |
-|                                                           | owner + definition |
-|                                                           | metrics + validity |
-|                                                           | correlation/action |
-+ Status ----------------------------------------------------------------------+
-| likely GPU-limited | lost 0 | memory age 0.4 s | GPU resolved 2 frames late  |
-+------------------------------------------------------------------------------+
-```
-
-The composition is fixed:
-
-- The compact context ribbon shows live/frozen state, selected frame/range, build/backend, render extent, data quality, and non-default observer warning; `Configuration Details` owns adapter/driver, topology, exact mode/provenance, and complete evidence identity.
-- The fixed view tabs are Overview, CPU, GPU, and Memory.
-- The frame navigator stays visible in every view. Click selects a frame, drag selects a range, and Previous/Next Hitch moves the same selection.
-- The main view changes representation without changing truth: summary, physical thread lanes, queue/marker timeline and hierarchy, or memory trend/categories.
-- The Inspector is selection-driven and never polls engine state independently.
-- The status footer keeps validity/loss and the single most honest next action visible; secondary actions remain contextual or under `More`.
-
-Arbitrary dashboard tiles, plugin tracks, detachable subpanes, stored custom layouts, and a view-registration API are rejected for the initial product.
-
-### Fixed View Contracts
-
-| View | Primary composition | Selection detail | Explicit escalation boundary |
-| --- | --- | --- | --- |
-| Overview | Frame budget/distribution, top-level CPU work and waits, GPU queue span, present policy, process RAM/GPU memory current/high-water, likely-domain explanation, configuration. | Selected frame/range identity, supporting observations, missing data, next action. | No call stacks, API events, resource contents, or hardware cause. |
-| CPU | Physical Sparkle thread lanes first; logical phase blocks within their real owner; task lanes separate; bounded aggregate phase/task table. | Thread name/ID, phase/task token, wall/wait/ready/count statistics, source and validity. | OS running/ready/preempted state, arbitrary threads, stack sampling, callers/callees, and flame graphs require WPA/PIX/Nsight Systems. |
-| GPU Live | Per-queue spans/timelines and bounded recent pass ranking. | Queue/pass token, frame identity, inclusive/exclusive when valid, work counts, resolution delay. | API state, resources, pipelines, barriers, shader counters, wave/cache/bandwidth cause require PIX/RenderDoc/Nsight/RGP. |
-| GPU Captured frame | Frozen per-queue timeline synchronized with Hierarchy, Flat Inclusive, Flat Exclusive, or Coalesced marker table. | Full marker path, explicit parent, queue/batch/chunk, ticks, duration, draws/dispatches, validity, copy path. | Marker timing cannot prove unmarked idle, cross-queue critical path, or hardware limitation. |
-| Memory | Process RAM and GPU tracked/block/local/non-local definition rows, time trend, fixed categories, budget/pressure, retirement, current/high-water/age. | Category/heap token, current/high-water/delta when supported, definition, ownership, data age. | Allocation call stacks, arbitrary heap query, fragmentation/page map, residency events, and leak verdict require external tools. |
-
-Overview uses aligned rows and a compact trend rather than a wall of decorative cards. The largest displayed number does not become the limiting-domain verdict automatically because pipelined domains overlap and waits may be downstream consequences.
-
-CPU lanes always distinguish physical execution from logical work. For example, gameplay in DevelopmentEditor is shown as a `Gameplay` phase on `Sparkle.EditorThread` when that is the actual topology; it is not relabeled as a physical `Game Thread` to resemble another engine. `Sparkle.RenderThread` is shown because Sparkle currently owns it, not because a renderer is required to have one. Render work could legally execute on the caller, a render thread, tasks, or a hybrid topology; diagnostics names must follow the implemented owner.
-
-GPU queue timelines are not summed. Hierarchy nesting and inclusive/`exclusive (uncovered)` columns remain adjacent. Flat-inclusive and coalesced sums carry a visible double-counting warning. `Unaccounted` means the union outside known child scopes within a valid queue root; it does not mean idle or wasted work.
-
-Memory keeps these definitions separate:
-
-- process working set versus process private commit;
-- engine-tracked used bytes versus allocator block/committed bytes;
-- engine-tracked GPU resources versus API/OS local and non-local usage/budget;
-- current value versus run high-water versus pending-retirement value.
-
-Categories need not sum to an OS/driver total. Differences remain visible and are never assigned to a fabricated category merely to make a chart close.
-
-### Workspace Interaction Contract
-
-| Action | Required behavior |
-| --- | --- |
-| Click viewport summary | Open Performance Overview following the newest valid joined frame. |
-| Click/step a frame | Freeze that `FrameId` and update every view from the same joined identity. |
-| Drag a frame range | Aggregate only valid samples and expose inclusion/exclusion counts. |
-| Click a CPU phase, GPU marker, or memory category | Set one typed selection and populate the shared Inspector. |
-| Double-click a GPU marker | Expand its hierarchy path and zoom the selected queue timeline to its interval. |
-| Freeze / Live | Change follow state only; collection demand changes only through a visible collection control. |
-| Capture GPU | Arm the bounded next-frame capture and show Armed/Recorded/Resolving/Ready/Invalid in the existing GPU view. |
-| Click attached-tool icon | Arm one provider-native capture at the next valid present of the clicked viewport; retain the current Sparkle selection and expose request state without blocking EditorThread. |
-| Copy marker path | Copy the same stable semantic path emitted to external GPU markers. |
-| Export | Start an explicit bounded evidence action; never enable continuous file output. |
-
-The console and UI issue the same typed requests. UI does not construct command strings; command handlers do not reach into ImGui panels. Exact keyboard bindings remain a presentation implementation detail, but frame stepping, hitch stepping, search focus, timeline fit, and selection clear must be possible without precision mouse work.
+A current asset inspector remains an asset inspector. It does not need to merge into a Performance workspace. New consumers do not create duplicate capture, timing, memory, selection or serialization authorities.
 
 ### Attached External Frame Capture
 
@@ -784,7 +606,7 @@ Use the [launch/capability semantics](ExternalCapture/Semantics.md#launch-and-ca
 
 #### Viewport Icon And Interaction
 
-The [External Capture UX](ExternalCapture/UserExperience.md) owns first use and the context action; [Visual Design](VisualDesign.md#attached-profiler-capture-icons) illustrates placement. A scene viewport resolves to its containing native present surface; it is not assumed to own a swapchain. Native captures can contain other work, and actual frame/interval certainty is explicit. Editor layout/presentation emits typed intent over the existing control route and owns no capture state.
+The [External Capture UX](ExternalCapture/UserExperience.md) owns first use and the context action; [Visual Design](VisualDesign.md#current-capture-experience) illustrates placement. A scene viewport resolves to its containing native present surface; it is not assumed to own a swapchain. Native captures can contain other work, and actual frame/interval certainty is explicit. Editor layout/presentation emits typed intent over the existing control route and owns no capture state.
 
 #### State And Publication
 
@@ -792,201 +614,23 @@ The [capture protocol](ExternalCapture/Semantics.md#state-cancellation-and-exclu
 
 ### Visual, Validity, And Accessibility Rules
 
-- Milliseconds lead; derived FPS is secondary. Binary byte units and percent denominators are explicit.
-- Stable domain/queue/phase colors are shared across overlay, Overview, lanes, and capture. Color conveys category or budget state, never validity/cause alone.
-- Gray text plus hatching/icon/text distinguishes Invalid, Pending, Stale, Unsupported, Dropped, Filtered, and no submitted work.
-- Budget coloring applies only to a value with a declared budget: neutral below, warning above, critical above twice budget. A high utilization percentage is not automatically red.
-- Configuration, observer mode, sample count, loss, and selected identity remain visible in screenshots and while scrolling.
-- Stable row order is used for Overview. Rankings show the active sort key. Search does not cause rows or totals to jump semantically.
-- Narrow overlays may abbreviate, but the workspace uses full names and tooltips state producer, owner, interval, unit, inclusion rule, validity, and collection cost.
+Use units, actual frame/range identity, validity/age/loss and requested/active configuration. Milliseconds lead for durations; counts, ratios and bytes keep their own units and denominators. Invalid or missing data is not zero. Labels and errors remain understandable without color; a presenter observes immutable results and issues typed intent without synchronous native polling.
 
-Required non-numeric states are first-class UX:
-
-| State | Presentation requirement |
-| --- | --- |
-| Warming up | `N / required valid samples`; percentile and likely-domain fields remain unavailable. |
-| GPU resolving | Selected `FrameId`, delayed nonblocking state, and age/frame delay. |
-| No submitted queue work | Named text distinct from unsupported and measured zero. |
-| Stale memory | Last sample age and cadence; it is not displayed as frame-correlated. |
-| Cap/loss | Retained/lost counts and reason; incomplete views remain visibly incomplete. |
-| Discontinuity | Resize/reload/device/route reason and distribution exclusion rule. |
-| External capture | Tool/mode and observer warning; any internal timestamp suppression is explicit. |
-| Device loss/shutdown | One settled invalid capture result; no hidden block or silent disappearance. |
-
-### Low-Clutter Functional Gate
-
-A proposed row, group, or mode is admitted only when it has all of the following:
-
-1. a named user question tied to an acceptance workload or a core orientation need;
-2. one authoritative producer and definition;
-3. a bounded immutable presentation model and explicit cost class;
-4. an existing surface slot in Stats or one of the four Performance views;
-5. a validity/failure presentation and observer-cost check;
-6. a clear point where an external profiler becomes the better tool;
-7. proof that the value changes a user decision and cannot remain a tooltip, Inspector field, exported fact, or external-tool detail;
-8. placement under an existing user intent without adding another top-level tab, toolbar action, preset, or dialog.
-
-This gate rejects instrumentation because it is merely interesting. Stable owner boundaries, RDG passes, RHI queues, allocator authorities, and the task scheduler should provide most measurements automatically. Feature code adds a child scope only when the parent cannot answer an accepted diagnostic question. No diagnostics-only scan of scene entities, resources, passes, descriptors, or tasks is permitted.
+No fixed Overview/CPU/GPU/Memory layout, Inspector, hitch navigator or universal selection model is selected. [Visual research](VisualDesign.md) retains illustrative alternatives, not screen requirements. [Workload Studies](WorkloadStudies/ImplementationPlan.md) owns the selected offline comparison consumer.
 
 ## Sparkle Stat Views And Commands
 
-The Unreal-inspired surface is a set of fixed views over the existing joined diagnostics product. It is not a second collector. A stat group declares which already-owned fields it presents and the minimum collection mode it demands. Multiple visible groups share one sample.
+No Stat group catalog, overlay set or Stat command implementation is selected. The prior Tier-A minimum and Tier-B/C workspace/visualizer ladder are retired; MAP-00, WL-04 and case evidence do not require those UIs.
 
-### Stat Interaction Contract
+If a separately admitted live question needs a presenter, use the existing console/UI route and the smallest typed request. Select its actual fact/producer, unit, validity, immutable result, bounded lifetime and observer budget. Do not implement all Fps/Unit/Threads/Gpu/Memory groups, reserve enum values or create registries first. Add state only with its real consumer and delete a replaced presenter in the same slice.
 
-The existing console grammar supports expert and automation access through one root command in both Editor and DevelopmentGame. The normal viewport menu leads with task presets; it does not mirror every raw group as an equal first-level choice.
-
-| Command | Behavior |
-| --- | --- |
-| `Stat` | Prints active groups, collection mode, sample count, and compact usage. |
-| `Stat List [filter]` | Expert route that lists the fixed available groups and collection cost. Autocomplete uses the existing console registry. |
-| `Stat <group> [On\|Off\|Toggle]` | Expert route that changes one group's visibility. Omitting the action toggles it. |
-| `Stat Preset <Quick\|Cpu\|Gpu\|Memory>` | Replaces the active group set with one task-oriented preset used by the normal menu. |
-| `Stat None` | Hides all stat overlays and releases their demand at the next owner commit. Benchmark, external-capture, or open Performance-view demand remains independent. |
-| `Stat Reset` | Starts a new live sample-window generation and clears live high-water/worst-frame presentation. It does not reset allocator or engine authority. |
-| `Stat Dump [group]` | Prints one bounded immutable compact snapshot to the existing console output, capped at 64 rows across active groups. It does not create a file or begin a capture. |
-
-Command names are displayed in canonical Sparkle casing but remain case-insensitive because the existing registry is case-insensitive. The Editor viewport menu sends the same typed preset requests as the command handler and exposes `Customize Stats...` for raw groups; it does not construct command strings. Unknown groups, unavailable build capabilities, and invalid actions return one actionable console result.
-
-External capture and workload benchmark start/stop remain separate explicit workflows. `Stat Dump` must never become an accidental unbounded `StartFile` equivalent.
-
-### Fixed Group Catalog
-
-| Group | Primary diagnostic question | Rows | Minimum collection |
-| --- | --- | --- | --- |
-| `Fps` | What is the derived display rate? | Derived FPS, latest frame interval, frame budget. | Existing host clock; orientation only. |
-| `Unit` | Which top-level domain is consuming or stalling the frame budget? | Frame p50/p95, host/game phase wall, render work, producer/render waits, graphics GPU span, present policy, likely-domain hint. | `LiveBasic`. |
-| `UnitGraph` | Is the limiting domain stable or spiking over time? | Fixed 120-frame graph for Frame, host non-wait work, render non-wait work, GPU graphics span, and budget line; invalid/pending samples have gaps. | Same `LiveBasic` data as Unit. |
-| `Threads` | What did Sparkle's named physical threads do in the selected completed interval? | Editor/Game, Render, and fixed task-worker lanes; phase wall, classified wait, occupied ratio, ready delay, longest stable task label, and data age. | `LiveBasic`; OS running/ready/wait still requires a system trace. |
-| `Tasks` | Is task scheduling, imbalance, or a named task family material? | Per-lane task count, occupied wall, ready-delay p95, caller-join wall, longest stable task label, failures/cancellations. | `LiveBasic` fixed aggregates; no task history table. |
-| `Gpu` | Which GPU queue controls the current frame budget? | Graphics/compute/copy top-level span, validity, resolution delay, queue overlap notice, and presentation context. | `LiveBasic`. |
-| `GpuPasses` | Which stable render passes consume the selected queue span? | Bounded live ranking from recent resolved frames with top-level inclusive/`exclusive (uncovered)` cost, shallow hierarchy, percent of queue span, owned draw/dispatch counts, and unaccounted span. Nested percentages are non-additive. It is not the frozen tree navigator. | `LiveDetailed`; initial latest-eight-frame and 256-scope candidates. Always show valid `N`; this tiny recent set is orientation, not a stable benchmark distribution. |
-| `Render` | Is renderer CPU orchestration or submitted workload unexpectedly large? | Setup/prepare/extract/cull/graph setup/compile/record/submit/present wall; recording groups, passes, submissions, draws, dispatches, pipeline/shader-package/RT-build counts, barriers/transitions, upload bytes, and rejected work where already produced. | `LiveBasic`; counters are admitted only at their production owner without a diagnostic rescan. |
-| `Scene` | What scene cardinality reached each stage of the render path? | Extracted, accepted, visible, submitted, and rejected instances; meshes/materials/lights; triangle/index counts where meaningful; RT instances and BLAS/TLAS counts; dirty/upload counts. | `LiveBasic` after immutable owner counters exist. Never query live ECS or renderer caches from UI. |
-| `Rhi` | What backend work and allocator pressure did Sparkle submit? | Backend/adapter, queue submissions, command-recording groups/lists, pipeline creations/cache state, descriptor and barrier counts where owned, upload/readback bytes, timestamp capacity/loss, tracked/block/local/non-local memory. | `LiveBasic`; neutral facts only, no native handle/type leakage. |
-| `Memory` | Is RAM or GPU memory growing, near budget, fragmented, or awaiting retirement? | Working set/private commit, tracked used/allocator blocks, local/non-local usage/budget, categories, transient/RT scratch and result bytes, upload/eviction/residency/missing-event counters, retirement backlog, current/high-water/age. | Default 1 Hz memory sampling plus owned event deltas; allocation/residency detail remains external. |
-| `Hitches` | Which recent frames exceeded a declared budget and which domain was implicated? | Last 16 qualifying `FrameId` values, interval, likely domain, worst phase/pass or compile/load/pipeline token, discontinuity, and validity. | `LiveBasic`; annotations only when an owner emitted them; no automatic file output. |
-
-The catalog is intentionally much smaller than Unreal's because Sparkle does not yet own animation, audio, networking, streaming, or other production diagnostic products at comparable maturity. It is an internal composition/expert customization catalog, not the primary information architecture. A group is added only with a present user question, authoritative producer, bounded row model, cost classification, and removal/review owner.
-
-Presets are aliases for these exact sets:
-
-| Preset | Groups | Intended question |
-| --- | --- | --- |
-| `Quick` | Unit | What should I inspect next? |
-| `Cpu` | Unit, Threads, Tasks | Is host/render/task CPU work or waiting controlling the frame? |
-| `Gpu` | Unit, Gpu, Render | Is GPU work dominant, and did renderer workload or CPU preparation change? |
-| `Memory` | Unit, Memory, Rhi | Is process or GPU memory under pressure, growing, fragmented, or awaiting retirement? |
-
-No preset enables `GpuPasses` implicitly because detailed timestamp overhead must be a visible user choice.
-
-Portfolio/reviewer output belongs to `Capture Evidence...`, which validates and renders the required configuration rather than adding a permanent everyday viewport preset.
-
-### Delivery Tiers
-
-The fixed catalog is a bounded option set, not a commitment to implement every group. Delivery is gated by the first accepted consumer; Tier A is the selected minimum, while Tier B/C entries remain candidates that are deleted or left external when their current consumer and measured diagnostic value do not justify them:
-
-| Tier | Required product subset | Acceptance consumer | Deferred until evidence exists |
-| --- | --- | --- | --- |
-| A: Evidence spine | `Fps`, `Unit`, `UnitGraph`, minimal `Threads`, `Gpu`, `Memory`, Overview, configuration/validity, explicit benchmark export. | `MAP-00` on Sponza calibration. | Detailed pass tree, optional scene counters, RT structure detail, hardware counters. |
-| B: Measured frame | Full CPU/GPU/Memory views; `GpuPasses`, `Render`, `Rhi`, `Hitches`; `ProfileGpu`; benchmark evidence families and native capture handoff. | `WL-04`, `CASE-02`, first bottleneck study. | A general trace store, arbitrary allocation explorer, embedded source/ISA, vendor SDK. |
-| C: Workload-driven additions | `Scene`, task-family detail, RT and compilation/residency rows already justified by an accepted study; adoption guidance. | `CASE-03`, `CASE-04`, `CASE-05`, remaining studies. | Any row without an owner, falsifiable question, and measured usefulness. |
-
-`Tasks` remains available in the fixed design but is not a Tier A blocker; the minimal CPU view can expose worker-lane aggregates needed for `MAP-00`. A group moves earlier only when the current measured bottleneck needs it. A late feature is deleted or left external when its implementation and observer cost exceed its diagnostic value.
-
-### Row And Presentation Semantics
-
-- Duration rows show latest, p50, p95, and maximum in milliseconds over the declared valid window.
-- Per-frame count rows show latest, p50/p95 where useful, and maximum; they never carry an `ms` suffix.
-- Byte rows show current, run high-water, budget/limit when defined, sample age, and binary units.
-- Ratio rows name the denominator, such as occupied wall / sample-window wall or pass duration / same-queue outer span.
-- State rows show stable enum text rather than encoding state as zero or color alone.
-- Every row tooltip identifies producer, physical/logical owner, interval, unit, inclusion/exclusion rule, validity, and minimum collection mode.
-- Parent duration and child contribution are distinct columns. Nested or overlapping CPU/GPU rows are never presented as an additive total.
-- GPU unattributed span is the outer queue span minus the interval union covered by valid top-level scopes, never the outer span minus a sum of nested durations.
-- A count is shown only when its production owner can increment it as part of normal work. The diagnostics path does not scan scene resources, passes, descriptors, or tasks merely to populate a stat.
-
-### Demand, Cost, And Composition
-
-- The active group set is bounded to four simultaneous compact overlays. The Editor Performance window can inspect every fixed view without placing all rows over the scene.
-- Expert customization that exceeds the calibrated compact-group candidate fails with the active set and `Stat None`/preset guidance; it never evicts a group implicitly. Task presets replace the active set atomically.
-- A compact group shows at most 16 rows. A bounded `+N hidden; open Performance` row replaces overflow. Stable priority precedes duration sorting so important validity/configuration rows do not jump.
-- The union of overlay groups, the open Performance view, and benchmark requests determines the minimum collection mode. `GpuPasses` visibly promotes the session to `LiveDetailed`; releasing the last detailed request returns to `LiveBasic` after the generation boundary. `ExternalCapture` is an explicit override and may suppress overlapping internal timestamps as declared in the banner.
-- `ProfileGpu` is an explicit one-shot demand outside the four-overlay limit. It pins one resolved detailed slot as the frozen product while armed/resolving and releases or replaces it only through the capture-state contract; it never makes continuous full-tree collection implicit.
-- `UnitGraph` reuses the joined ring and cannot allocate another time-series history. Presets are fixed group sets, not stored user-authored layouts.
-- Presenters may refresh every UI frame, but process/GPU memory retains its slower source cadence and visible age. Presentation never increases source polling silently.
-- Overlay closed/open measurements are part of the observer-cost test. The banner always shows `Basic` or `Detailed`, sample count, invalid/lost count, and resolution.
-- Shipping builds default to no live stat presentation. Exact build eligibility remains an implementation decision and must not make unavailable values look valid.
-
-### Visual Design Handoff
-
-The canonical `Unit` and `GpuPasses` presentations live in [Performance Diagnostics Visual Design And Tool Wireframes](VisualDesign.md#compact-stat-tools). Their values are illustrative. The pass hierarchy, counts, and timings must come from one correlated frame; the display must not combine rolling CPU values with an unrelated latest GPU frame without labeling both identities.
-
-### What Built-In Stats Can Settle
-
-| Question | Built-in stats can be sufficient when | Escalate when |
-| --- | --- | --- |
-| CPU-side, GPU-side, presentation, or memory pressure? | Unit/Threads/Gpu/Memory remain correlated and one controlled configuration change moves the expected domain. | Signals disagree, data is pending, or a wait/overlap controls the critical path. |
-| Which render pass family dominates? | One stable top-level pass repeatedly consumes the valid queue span and disabling its feature removes comparable time without changing the workload unfairly. | The reason inside the pass requires shader, wave, cache, bandwidth, barrier, or API-state evidence. |
-| Editor overhead or engine workload? | Matched DevelopmentEditor and DevelopmentGame runs isolate Editor/UI work at identical render extent and settings. | OS scheduling, DWM/compositor, driver, or third-party work remains plausible. |
-| Too much submitted work? | Render/Scene/Rhi counts reveal a reproducible cardinality jump tied to a route or feature. | The generating call path, visibility error, command redundancy, or backend behavior is unclear. |
-| Process/GPU memory growth or pressure? | Memory categories, tracked/block distinction, local/non-local budget, and retirement return-to-baseline behavior answer the lifecycle question. | Allocation call stacks, untracked driver memory, residency/eviction, or fragmentation cause is required. |
-
-This is the intended reduction in profiler dependence: common orientation and controlled before/after questions stay in Sparkle. Specialized tools remain necessary when the question changes from "which domain or workload changed?" to "which call stack, scheduling edge, shader/hardware unit, allocation site, or API dependency caused it?"
+The earlier bounded-history and Basic-mode cost values remain conditional measurement hypotheses for a consumer that selects that mode; they are not reasons to allocate a session or history. Current FPS text is not silently relabeled as qualified engine timing.
 
 ## On-Demand GPU Visualizer
 
-### Product Decision
+ProfileGpu and an internal marker-query visualizer are unselected. Native captures are the default. A future proposal must first show a recurring question that existing tools cannot answer economically, compare the simpler option, and freeze the actual scope, query capacity, observer cost and native lifetime.
 
-Sparkle will provide a focused GPU Visualizer mode for one captured frame inside the Performance workspace. It reuses the same frame-graph scope vocabulary as `Stat GpuPasses` and external GPU markers, but freezes a richer immutable result so the user can navigate hierarchy, timeline, inclusive cost, exclusive cost, and repeated marker instances without an attached tool. `GPU Visualizer` is a recognizable capability name, not a separate panel or data owner.
-
-This follows two useful Unreal patterns without copying its implementation wholesale:
-
-- Epic documents realtime `stat gpu` as cumulative and non-hierarchical for quick monitoring.
-- Epic's profile visualization surfaces support hierarchical, flat, coalesced, inclusive, and exclusive views.
-- RDG owns scopes for both in-engine GPU statistics and external-profiler events.
-
-The adopted behavior is a quick live view plus a deliberate detailed frame capture. The rejected behavior is an always-running full tree or a claim that timestamps provide resource state, shader counters, wave occupancy, cache/bandwidth attribution, or draw debugging. See Epic's [realtime GPU profiler guidance](https://dev.epicgames.com/documentation/unreal-engine/vr-performance-testing-in-unreal-engine#real-time-gpu-profiler), [ProfileVisualizer API](https://dev.epicgames.com/documentation/unreal-engine/API/Developer/ProfileVisualizer), and [RDG profiling scopes](https://dev.epicgames.com/documentation/unreal-engine/render-dependency-graph-in-unreal-engine#performanceprofiling).
-
-### GPU Capture Interaction Contract
-
-`ProfileGpu` is a separate command because a frozen query capture has different cost and lifetime from a live stat group:
-
-| Command | Behavior |
-| --- | --- |
-| `ProfileGpu` or `ProfileGpu Capture` | Arms the next valid rendered frame, returns a `GpuProfileCaptureId`, and opens Performance/GPU in captured-frame mode when delayed results resolve. DevelopmentGame retains the result and prints a compact readiness summary. |
-| `ProfileGpu Open` | Opens Performance/GPU on the latest retained frozen capture in Editor or shows its compact summary in DevelopmentGame. |
-| `ProfileGpu Frame <FrameId>` | Freezes an already-resolved frame from the eight-slot detailed ring when available; it does not pretend an uncollected past frame can be recovered. |
-| `ProfileGpu Cancel` | Cancels an armed request. If GPU work was submitted, resolution still retires safely but its product is discarded. |
-| `ProfileGpu Clear` | Releases the retained frozen result after presenter publication and returns Performance/GPU captured-frame mode to its empty state. |
-
-Only one request may be armed or resolving. A second request returns `Busy` with the active capture ID; it does not replace an explicit capture silently. A request fails immediately with a typed reason when timestamp queries are unavailable, the renderer has no valid output extent, an external capture owns the instrumentation mode, or the fixed scope plan cannot be created.
-
-The Performance/GPU view may expose `Capture GPU`; it submits the same typed request as the command. This Sparkle capture stays inside the workspace and is visually distinct from the provider-branded viewport icons that write external tool artifacts. UI code does not construct command strings. No `ProfileGpu` command writes a file by default.
-
-### Capture State And Publication
-
-```text
-Idle
-  | ProfileGpu -> CaptureId
-  v
-Armed --cancel------------------------------> Cancelled -> Idle
-  | next valid rendered frame selects FrameId
-  v
-Recorded/Submitted --shutdown/device loss--> Invalid result -> Idle
-  | frame slot and GPU completion retire
-  v
-Resolving --validation/query failure--------> Invalid result -> Idle
-  | immutable result published
-  v
-Ready/Frozen --Clear or next accepted capture--------------> Idle
-```
-
-- Application owns user request identity and presentation state; Renderer owns frame selection, scope recording, delayed resolution, hierarchy validation, and derived timing values.
-- `GpuProfileCaptureId`, `FrameId`, sample generation, backend, and renderer configuration all cross publication. A frame-in-flight slot is never capture identity.
-- The producer never blocks EditorThread/GameThread for GPU completion. The result appears as `Armed`, `Resolving`, `Ready`, `Invalid`, or `Cancelled` with age and reason.
-- The request captures the next frame with a valid render extent. Loading, resize, shader reload, validation, and other discontinuities remain visible tags; the visualizer never quietly substitutes a later "better" frame.
-- Shutdown and device loss settle the request exactly once. Late resolution cannot republish after clear, replacement, or product destruction.
+The reusable correctness constraints below remain a target contract if that proposal is admitted. They do not require implementing a hierarchy, query plan, record format or presenter now. A future accepted slice supplies its own request/state/finalization and consumer decisions; no production placeholder is retained.
 
 ### Scope Identity And Fixed Record
 
@@ -1083,91 +727,11 @@ For a valid leaf, exclusive equals inclusive. For a parent, a large inclusive va
 
 Graphics, compute, and copy produce independent trees. Sparkle does not subtract a compute child from a graphics parent, sum queue roots, or align queue-relative timelines on one axis without validated cross-queue clock calibration. Submission dependencies may be listed as metadata without inventing calibrated overlap.
 
-### Views And Coalescing
-
-The frozen capture supports four bounded views over the same records:
-
-| View | Meaning |
-| --- | --- |
-| Hierarchy | Every scope instance under its explicit parent for the selected queue. Default sort is execution order. |
-| Flat Inclusive | Individual instances sorted by inclusive duration. Nested rows can double count and carry a visible warning. |
-| Flat Exclusive | Individual instances sorted by exclusive duration, useful for finding uninstrumented/self contribution. |
-| Coalesced | Instances sharing `ScopeToken` are grouped with call count, sum/average/max inclusive, and sum/average/max exclusive. Coalesced sums are not a frame total. |
-
-`Expand hot path` follows the largest valid child contribution from the selected node. Search filters display names without changing totals. Structural queue/batch/chunk rows can be hidden, but their timing remains part of the parent chain. Marker-only barrier/draw annotations may appear in details and counts but never receive fabricated milliseconds.
-
-### GPU Visualizer Presentation
-
-The captured-frame layout, columns, inspector, and navigation controls live in the [GPU Captured Frame wireframe](VisualDesign.md#gpu-captured-frame). The visual example does not establish Sponza's actual pass cost; the architecture in this section remains authoritative for record and calculation semantics.
-
-### Relationship To Live Stats And External Tools
-
-- `Stat Gpu` answers which queue is expensive over time.
-- `Stat GpuPasses` shows a bounded live ranking from recent resolved detailed frames.
-- `ProfileGpu` answers which marked region owns inclusive/exclusive time in one selected frame.
-- PIX/RenderDoc answer which API events, resources, descriptors, pipelines, barriers, draws, and outputs produced the region.
-- Nsight Graphics/RGP answer which shaders, hardware units, waves, occupancy, bandwidth, caches, or synchronization mechanisms explain the region on captured hardware.
-
-Selecting a captured-frame node exposes `Copy marker path` so the same stable label can be located in PIX, RenderDoc, Nsight, or RGP. A Sparkle capture is sufficient for marker-level attribution and rapid feature controls; it is not causal proof below the marker boundary.
-
 ## Editor Presentation
 
-### Viewport Summary
+Existing Editor capture controls use the [external-capture experience](ExternalCapture/UserExperience.md). Keep startup selection, viewport target and request/result state with their current owners; do not add a Performance menu or workspace as a prerequisite.
 
-The existing top-right FPS text becomes the compact `Stat Unit` summary when that group is active. Milliseconds lead; FPS remains a derived convenience. A nearby Performance menu leads with `Quick Check` and `Investigate CPU/GPU/Memory`; it shows the active task preset and automatically derived collection cost. `Customize Stats...` is the searchable expert route to the fixed group catalog used by the console command. Requested or detected external frame-capture providers contribute their compact icons to one far-right viewport-header group without entering the Performance menu or workspace toolbar. The canonical [viewport controls and compact `Unit` layouts](VisualDesign.md#shared-controls) live in the visual-design document.
-
-Rules:
-
-- A value without enough valid samples shows `warming up (N/120)`.
-- GPU timing, process RAM, and GPU memory fields show `N/A`, `Disabled`, `Pending`, or age when appropriate.
-- The resolution shown is render resolution, not inferred desktop/window size; output and client extent are in the details view.
-- Color indicates budget state, not generic "good/bad": neutral below the configured budget, warning above it, critical above twice it, gray when invalid.
-- Clicking the summary opens the Performance window at the correlated latest valid frame.
-- Clicking any provider icon arms that named provider for the next valid frame of the viewport and changes only the relevant icon/status notification; it does not replace the current workspace selection or masquerade as `ProfileGpu`.
-- FPS is `1000 / p50 frame interval ms` and is labeled as derived; it is not averaged from instantaneous FPS samples.
-
-### Performance Window
-
-One window serves the Editor presenter and expands the same immutable model used by compact stat groups. DevelopmentGame uses compact overlays only. The window is not a dockable general diagnostics platform and does not own a second group catalog. The visual-design document owns the [workspace shell and fixed view layouts](VisualDesign.md#performance-workspace-tools). All values in those layouts are illustrative only; they are not measurements of the supplied Sponza screenshot or evidence of a Sparkle bottleneck.
-
-### Interpretation Examples
-
-These patterns are also illustrative. They demonstrate the reasoning the system must support, not expected Sponza results.
-
-| Observed correlated pattern | Honest orientation | Required confirmation |
-| --- | --- | --- |
-| Frame p95 `181 ms`; host non-wait phases `8 ms`; render non-wait phases `19 ms`; graphics span `172 ms`; producer backpressure `153 ms`; present throttle off. | Likely GPU-limited. Gameplay and editor UI are not large enough to explain the interval. | PIX Timing plus one PIX/Nsight/RGP GPU trace; rank pass and verify queue occupancy/synchronization. |
-| Frame p95 `129 ms`; renderer frame-graph compile `94 ms`; graphics span `9 ms`; producer backpressure `0 ms`. | Likely render-CPU-limited in graph compilation. | WPA/PIX CPU samples and a compile-scope call tree; compare a serial/reference topology control. |
-| Frame p95 `43 ms`; gameplay systems `35 ms`; render CPU `7 ms`; graphics span `10 ms`; FrameCritical ready delay `8 ms`. | Likely gameplay/task critical path with scheduling delay. | WPA precise scheduling plus `SparkleTasks` dependencies; test 1/2/N and serial controls. |
-| Frame timing is stable; private commit rises every load/unload; GPU tracked used returns to baseline but allocator blocks remain high. | Possible CPU leak plus expected/uncertain GPU pool retention; do not call both leaks. | CPU allocation call-stack capture and a repeated post-retirement route; inspect allocator reuse/fragmentation separately. |
-| Warm p50 is healthy but p99/worst coincide with new shader-package tokens and pipeline creations; the next traversal is stable. | Likely compilation/pipeline-cache hitch, not a steady GPU pass regression. | CPU/API timing trace with cold/warm cache states; repeat after cache invalidation and after a fully warm control. |
-| RT build time and scratch/result high-water rise with instance count, while the selected ray dispatch also shows a traversal-pressure change. | RT structure/build policy and traversal are competing causes. | Record BLAS/TLAS build/update/compaction facts; inspect structure/traversal in RRA/PIX/Nsight/RGP and change one geometry/instance/build policy. |
-
-The window has four fixed views:
-
-| View | Shows | Does not show |
-| --- | --- | --- |
-| Overview | Budget, frame distribution, likely domain, current configuration, next profiler action. | Per-function or per-draw detail. |
-| CPU | Physical Sparkle thread lanes, fixed logical phase wall time, known owner waits, and task-lane occupied/ready-delay aggregates. | OS run/ready/wait scheduling, a flame graph, every task, or arbitrary external thread attribution. |
-| GPU | Per-queue top-level spans, latest bounded pass ranking, and Live/Captured-frame modes with one `Capture frame` action. | Hardware counters, shader ISA, resource contents, or uncalibrated cross-queue total. |
-| Memory | RAM definitions/trend/high-water plus local/non-local GPU memory and fixed categories. | Allocation call stacks or a permanent largest-resource browser. |
-
-### Required Configuration Banner
-
-Every screenshot or exported summary includes:
-
-- commit/build identity and `DevelopmentGame`/`DevelopmentEditor` configuration;
-- D3D12/Vulkan, adapter, device ID where available, driver, and validation state;
-- scene/level, camera route, readiness state, render path/provider/fallback;
-- render/output/client resolution, VSync/presentation mode, dynamic-resolution state;
-- threaded/serial renderer, pipeline depth, task serial/worker counts;
-- diagnostics mode, warm-up frames, measured frames, run count, and collection overhead result.
-- engine/content/configuration hashes and the reference/comparison-system role when the artifact is benchmark evidence.
-- measurement provenance, valid/original/excluded population counts, elapsed span, and sample generation for every headline comparison;
-- external capture tool/version and capture/replay/system-derived mode when an imported field or screenshot comes from a native tool;
-- profiling-build identity, symbol/shader-debug package hashes, exact marker/token provenance, and object-name eligibility for an external capture.
-
-Without this banner, a number is orientation only and cannot be promoted into portfolio evidence.
+For any separately selected live fact, prefer one existing presentation location. Preserve immutable result/frame identity, explicit unavailability, keyboard/scale/error basics and no collection from UI. The [mockups](VisualDesign.md) are alternatives to reevaluate only if a real consumer warrants them.
 
 ## External Profiler Handoff Contract
 

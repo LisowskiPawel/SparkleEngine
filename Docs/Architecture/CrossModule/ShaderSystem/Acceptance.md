@@ -46,12 +46,12 @@ Implementation is not accepted merely when the new API compiles. The completed s
 6. paired PIX and RenderDoc captures for the same representative scene and settings, plus Nsight or RGA shader analysis where the finding requires source/IL/ISA counters;
 7. exact engine commit, global-shader-map/library hash, compiler backend and version, target, optimization/debug policy, GPU, driver, API, scene, camera, resolution, warm-up, capture frame, and run count;
 8. editor adoption evidence: edit, changed-dependency selection, successful reload, failed replacement rollback, direct error navigation, one-job replay, and GPU-safe old-generation retirement;
-9. a clean build/cook/run from documented commands and a recorded issue or minimal reproducer created by a second adopter;
-10. before/after authored-string, registration, parameter-declaration, forwarding-pass, compile-job, unique-code, cooked-code/library-byte, cook-time, map/library-open, and first-materialization counts so the simplification claim is measurable;
-11. a generated support matrix proving backend/target/stage/shader-type/feature/policy status and a consumer report distinguishing registered, cooked, runtime-valid, selected, and captured shaders, supported alternates, and mandatory failures;
+9. a clean build/cook/run from documented commands and a recorded issue or minimal reproducer created by a second adopter; reuse the release source-adopter exercise when it actually covers this shader route, rather than require another independent journey per report;
+10. the available historical baseline and current authored-string, registration, parameter, forwarding-pass, job/code/byte and cost observations needed for a specific simplification claim; do not recreate deleted architecture or add a reporting system to recover missing historical numbers;
+11. an inspectable support matrix proving backend/target/stage/shader-type/feature/policy status and a consumer report distinguishing registered, cooked, runtime-valid, selected, and captured shaders, supported alternates, and mandatory failures;
 12. runtime-generation and lazy-materialization lifetime evidence, including state-object/pipeline, SBT layout/index/update/memory, trace dispatch, alternate selection, mandatory-product failure, reload, and paired capture evidence, plus only compression/eviction metrics that actually exist.
 
-The [performance diagnostics architecture](../PerformanceDiagnostics/PerformanceDiagnosticsDesign.md) owns the shared measurement and capture infrastructure. This document owns the shader-specific identities and joins that make those captures traceable. Evidence records belong under the repository's evidence path selected by the acceptance workload; they must not be embedded here as claims that age with hardware, drivers, or compiler versions.
+Existing native tools and current measurement producers supply captures. The [performance diagnostics architecture](../PerformanceDiagnostics/PerformanceDiagnosticsDesign.md) owns shared metric semantics; its unselected internal session, workspace and visualizer are not shader acceptance prerequisites. This document owns the shader-specific identities and joins that make those captures traceable. Evidence records belong under the repository's evidence path selected by the acceptance workload; they must not be embedded here as claims that age with hardware, drivers, or compiler versions.
 
 ## Controlled Failures And Key Checks
 
@@ -72,6 +72,52 @@ The [performance diagnostics architecture](../PerformanceDiagnostics/Performance
 | `CHK-SHS-04` | exercise repeated cook, 1/2/N work, cancellation, Apply Changed, failed replacement, delayed completion, reload, and device recreation | publication, concurrency, and lifetime |
 | `CHK-SHS-05` | force supported and unsupported raster, compute, inline-query, native RT, AS-provider, pipeline, and SBT paths on both APIs | capability truth and backend lowering |
 | `CHK-SHS-06` | retain paired captures, disassembly/provenance joins, output comparisons, cold/warm timing, memory high-water, and observer configuration | executable parity, traceability, and performance |
+
+## Native Conformance And Comparison Oracles
+
+These are enduring checks for the retained shader/RHI contract. They do not authorize a production conformance mode, committed test fixtures, additional rendering features, or an automatic device-recovery product. Use existing routes or disposable probes and preserve the actual supported matrix. Independent source/backend oracles remain necessary even when two paths share code.
+
+### Same-Frame GBuffer Comparison
+
+The oracle is fixed before images are collected. It runs on D3D12 and Vulkan with identical source revision, cooked generation, scene, camera matrices/jitter/history, render extent, TLAS, instance/geometry/material buffers, texture table, and output formats. It includes sky-only miss pixels, front-facing and back-facing opaque triangles, near-plane/TMin boundary cases on either side of `0.001`, non-square and non-multiple-of-eight extents, indexed geometry, rigid motion, skinned deformation, and morph deformation. The shared Surface extension adds alpha/cutout and shadow consumers of the shared Surface hit contract without weakening these comparisons.
+
+| Compared field | Frozen comparison |
+| --- | --- |
+| hit/miss, instance id, primitive id, face/cull result, resolution bounds and untouched guard texels | exact integer/identity equality; any out-of-bounds write fails |
+| miss BaseColor, Normal, Material, Emissive, Subsurface, DeviceZ, MotionVector | exact stored-value equality to the shared `GBufferPacking::PackSky*` values and zero motion |
+| BaseColor, Material, Subsurface (`R8G8B8A8_UNorm`) | each stored channel differs by at most one 8-bit code value (`1/255`) |
+| Normal (`R16G16B16A16_Float`) | decoded unit-vector angular error at most `0.1` degree; alpha is exactly zero |
+| Emissive (`R16G16B16A16_Float`) | per-channel absolute error at most `0.002 * max(1, abs(reference))`; alpha is exactly zero |
+| DeviceZ (`R32_Float`) | absolute error at most `1e-5`; sky is exactly zero |
+| MotionVector (`R16G16_Float`) | per-component absolute error at most `0.02` viewport pixel; invalid-history and miss cases are exactly zero |
+
+A fault-sensitive check temporarily perturbs one shared hit-store result and proves both frontends fail the oracle in the same field; it then restores the source and reruns. Independent temporary perturbations bypass the shared store from each frontend and must be detected, proving the oracle does not pass merely because both paths miss or compare an untouched target. The validation slice removes every perturbation and temporary comparison resource before handoff.
+
+### Ray Stage And Graphics-Key Controls
+
+The all-six-stage RT conformance route must use one registered ray-generation class with global parameters, at least one miss and callable record, one triangle group with closest-hit and any-hit, and one procedural group with closest-hit, any-hit, and intersection. The same logical composition, record indices, bounded local POD, dispatch dimensions, and exact sentinels run on D3D12 and Vulkan. Independent invalid cases must reject duplicate/missing/wrong-stage exports, illegal triangle/procedural groups, root-layout mismatch, local size/signature mismatch, malformed record bytes, payload/attribute/recursion excess, unsupported compiler/backend target, overflow/misalignment/out-of-range table regions, illegal queue, stale pipeline/table generation, and a dispatch whose exact pipeline was not bound. Each oracle must demonstrably reach its intended owner rather than failing earlier for an unrelated reason.
+
+Run graphics-key perturbation and corruption checks that independently vary generation, each shader code hash, binding-layout signature, every blend/color-write, raster, depth/stencil, topology, vertex-input, color/depth format, attachment count, and sample fact; prove each pipeline-affecting mutation changes equality/hash and exact materialization, while labels, viewport/scissor, attachment actions/access, streams, and draw arguments do not. Force a hash collision, missing pre-materialized key, stale generation, incompatible attachment access/sample, unsupported backend mapping, solid/two-sided/wireframe request set, repeated compatible draws, and reload with delayed queue completion.
+
+### Current Contract And Deletion Floor
+
+Check the current replacement/deletion floor: zero definitions/uses of every phase-owned package/program/pass-wrapper/duplicate-parameter/old-prefix/old-path/compatibility symbol; caller-authored complete graphics-state bag, repeated attachment signature, eager variant bundle, incomplete graphics key, and recording-time pipeline creation; compiler-only RT package/rejection path; ambiguous RT capability/mode; device-address/descriptor/no-query shadow duplication; shader-visible TLAS address/access mode; graph/native bypass; duplicate map/pipeline/table/scene/effect-plan authority; and permutation/precache/preload scaffold.
+
+### Verification Coverage
+
+| Layer | Required verification |
+| --- | --- |
+| authoring and parameters | one typed class/schema authority; explicit SRV/UAV/AS/attachment vocabulary; direct compute/graphics use; typed RT exports/groups; duplicate/missing/illegal relationships; no forwarding schema |
+| source and compilation | virtual source identity; dependency closure; portable input hash; compile-every-selected-input; in-operation fan-out; cancellation; DXIL/SPIR-V stage capability truth |
+| map and code library | deterministic catalog/map/library; code/hash/layout/export/group integrity; transactional publication; zero package reader/writer/identity compatibility |
+| neutral RHI | independent AS/inline/pipeline capabilities; one semantic AS binding; immutable descriptors; checked SBT arithmetic; queue/resource/state legality; opaque generations; no native leakage |
+| backend GPU | exact classic/partitioned AS descriptor layout/write; D3D12 state objects/identifiers/tables/dispatch; Vulkan RT pipelines/group handles/device-address tables/dispatch; all stage sentinels; clean native validation |
+| frame graph/runtime | typed compute/draw/trace; declared resources/transitions/dependencies/culling; pre-execute materialization; exact generation capture; stale rejection; submission-token retirement |
+| renderer scene/SBT | one classic/partitioned logical contribution plan; instance/geometry/ray-type formula; bounds; dirty generation; table bytes/update; no material duplication |
+| effect selection/parity | one automatic engine-wide resolver; exactly one frontend per dual effect; same-frame GBuffer/shadow/migrated-effect parity; algorithm/API separation; supported alternates/history; mandatory-product failure |
+| tooling/provenance | one `Apply Changed` operation; source-located failure; shader/effect-to-code/map/pipeline/table/graph/capture trace; bounded semantic frontend; no artifact scan or backend control |
+| lifetime/failure | invalid replacement rollback; several frames in flight; reload/device recreation; table/pipeline generation match; no device-idle shortcut; previous accepted generation preserved |
+| performance/evidence | fixed provenance; p50/p95/p99 CPU/GPU; compiler/map/pipeline/table/TLAS/BLAS/memory/bytes; cold/warm separation; paired captures; both wins and regressions |
 
 ## Completion Criteria
 
@@ -105,7 +151,7 @@ The unified shader, graphics-pipeline, and ray-tracing migration is accepted onl
 - `AC-SHS-26` — every ray-query effect is classified, every migrated effect schedules exactly one frontend from one immutable whole-frame plan, strict requests preflight atomically, automatic choices are inspectable, and temporal/history ownership is not duplicated;
 - `AC-SHS-27` — D3D12/Vulkan runtime/capture evidence covers raster, compute/inline query, RT conformance, migrated effects, presentation/debug, explicit supported alternates, mandatory-product failures, reload/device recreation, and resolves a captured shader/code/pipeline/table identity to the exact class, source closure, compile request, map entry, code record, logical table record, and symbols;
 - `AC-SHS-28` — delayed GPU completion proves old map/library/layout/pipeline/table generations retire only after all queue submissions complete;
-- `AC-SHS-29` — the rejected-name and semantic-equivalent floor recorded by the delivery plan is clean across runtime, tools, build membership, generated/cooked artifacts, frontend models, diagnostics, and current documentation; no alias, adapter, compatibility overload/reader, dual writer, fallback to the replaced contract, copied schema, parallel registry/cache/generation, or renamed legacy owner remains;
+- `AC-SHS-29` — the [current deletion floor](#current-contract-and-deletion-floor) is clean across runtime, tools, build membership, generated/cooked artifacts, frontend models, diagnostics, and current documentation; no alias, adapter, compatibility overload/reader, dual writer, fallback to the replaced contract, copied schema, parallel registry/cache/generation, or renamed legacy owner remains;
 - `AC-SHS-30` — no migration logging, report generator, cache browser, submitted test scaffold, god owner/folder/function, one-method forwarding wrapper, duplicated policy, or excessive diagnostics remains;
 - `AC-SHS-31` — the [required evidence pack](#required-evidence-pack) is complete or each unavailable claim is explicitly blocked with provenance.
 

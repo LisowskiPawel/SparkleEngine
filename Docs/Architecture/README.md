@@ -20,6 +20,7 @@ This tree explains what each system does, how data and responsibility move throu
 | Feature understanding | One result, its selection, design, limits, and proof contract — [Renderer Features](Modules/Engine/Renderer/Features/RendererFeatureGuide.md), [RHI Features](Modules/Engine/RHI/Features/RHIFeatureGuide.md), or the owning module |
 | Cross-system trace | A workflow or GPU feature spanning several owners — [Cross-Module Architecture](CrossModule/README.md) |
 | Documentation coverage | Whether every strategy, plan, acceptance, and research feature has an Architecture owner — [Feature Documentation Coverage](CrossModule/FeatureDocumentation/README.md) |
+| Persona evidence delivery | Exact stage/design/result route for every PGE target — [implementation lookup](CrossModule/FeatureDocumentation/StableIdentifierCoverage.md#principal-graphics-engineer-requirements), [artifact homes](../Acceptance/GraphicsWorkloads.md#evidence-folders-and-delivery-owners) |
 | First-release implementation | Release order plus module-owned work packages — [First Release Implementation Plan](CrossModule/FirstRelease/ImplementationPlan.md) |
 | Product journey | Build, content, editor, game, and delivery handoffs — [Product Workflow Coverage](CrossModule/ProductWorkflowCoverage.md) and [Product Execution Traces](CrossModule/ProductExecutionTraces.md) |
 | Accepted invariant | Why a boundary must remain true — [Architecture Decisions](Decisions/README.md) |
@@ -61,6 +62,8 @@ The directory answers “who owns this subject?” The filename and status heade
 Feature architecture owns the feature-local completion contract—criteria, controlled failures, checks, and definition of done. [Acceptance](../Acceptance/README.md) tracks cross-feature workloads and candidate/release progress without creating a duplicate feature hierarchy.
 
 ## Evidence Boundary
+
+Architecture coverage is not a delivery backlog. Current maps describe what exists; target contracts constrain a capability only if the [Roadmap admits it](../Strategy/Roadmap.md#scope-protection). A missing capability may stay deliberately absent. Before extending an owner, evaluate reuse, a smaller scope, or [retirement](../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision); proof obligations do not authorize a new framework, tool or public surface.
 
 A document in this tree may prove that a source/build route exists or define what must be tested. It does not prove that the route built, ran, produced a correct image, met performance targets, or may ship. Plans and research add no readiness credit. Read the projected percentage in [Current Feature Readiness](../Acceptance/CurrentReadiness.md), the current evidence state in [Acceptance](../Acceptance/README.md), and the missing checks in the [Capability Evidence Plan](Modules/CapabilityEvidencePlan.md).
 

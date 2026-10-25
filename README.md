@@ -23,7 +23,21 @@ cmake --build build/private/tools/SparkleLauncher --config DevelopmentEditor --t
 & ./artifacts/dev/Tools/SparkleLauncher/Binaries/DevelopmentEditor/SparkleLauncher.exe
 ```
 
-This builds Launcher; use it to configure/build the engine, select content, cook and start Editor or Game. Start with Empty. Only selected assets download; offline use requires completed sync/cook. See [Launcher workflows](Docs/Architecture/Modules/Tools/Launcher/LauncherCapabilities.md).
+This builds Launcher. Open it to select content and build/cook/start Editor or Game, or use the same operations directly for the initial Empty Game:
+
+```powershell
+$launcher = './artifacts/dev/Tools/SparkleLauncher/Binaries/DevelopmentEditor/SparkleLauncher.exe'
+$profiles = '--editor-profile', 'ShippingEditor', '--game-profile', 'ShippingGame'
+& $launcher @profiles --run workspace.sync-code
+& $launcher @profiles --run workspace.build.game
+& $launcher @profiles --run cook.tools.prepare
+& $launcher @profiles --run cook.all
+& $launcher @profiles --level Empty --product game --graphics-api d3d12 --run levels.run
+```
+
+Stop at the first nonzero exit. Build/dependency state stays in `build/`; binaries and cooked content go to `artifacts/dev/`. Select maps in Launcher before cooking them; `--level` selects sync/run, not cook scope. Only selected assets download; offline use requires completed sync/cook. See [Launcher workflows](Docs/Architecture/Modules/Tools/Launcher/LauncherCapabilities.md) and [source budgets/cleanup](Docs/Acceptance/FirstRelease.md#frozen-paths-mutation-boundary-and-budgets). The `0.y.z` source API is unstable; no binary SDK or ABI compatibility is offered.
+
+Check the configured workspace with `powershell -NoProfile -ExecutionPolicy Bypass -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor`. Results stay under `artifacts/validation/baseline/`.
 
 With an archive for your source revision, use the [precompiled-binary route](Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#work-with-precompiled-binaries). It writes the same binary locations as local compilation. No qualified downloadable archive is available yet.
 

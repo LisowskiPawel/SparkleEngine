@@ -24,7 +24,7 @@ namespace SparkleLauncher
 	class LauncherActivityPanel final : public QFrame
 	{
 	public:
-		LauncherActivityPanel(const LauncherIconLibrary& icons, const std::function<void(QWidget*)>& registerFocusable, QWidget* parent = nullptr);
+		LauncherActivityPanel(const LauncherIconLibrary& icons, const std::function<void(QWidget*)>& registerFocusable, std::function<void(const QString&)> cancelRun, QWidget* parent = nullptr);
 
 		void ShowMessage(const QString& message);
 		void RegisterRun(const QString& runId, const QString& title);
@@ -35,6 +35,7 @@ namespace SparkleLauncher
 		void DisplayBlockedOperation(const QString& runId, const QString& title, const QString& message);
 		void AppendRunOutput(const QString& runId, const QString& text);
 		void ShowRunOutput(const QString& runId);
+		bool HasActiveRun() const;
 
 	private:
 		enum class RunState : std::uint8_t
@@ -85,6 +86,7 @@ namespace SparkleLauncher
 		QTextEdit* m_operationOutput = nullptr;
 		QPushButton* m_toggleOutputButton = nullptr;
 		QPushButton* m_copyOutputButton = nullptr;
+		QPushButton* m_cancelRunButton = nullptr;
 		QHash<QString, RunRecord> m_runs;
 		QIcon m_queuedIcon;
 		QIcon m_runningIcon;

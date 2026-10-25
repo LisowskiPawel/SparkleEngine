@@ -179,17 +179,7 @@ set(SPARKLE_RHI_BACKEND_TARGETS "")
 
 if(SPARKLE_RHI_WITH_D3D12)
     if(SPARKLE_RHI_WITH_D3D12_NVAPI)
-        set(_sparkle_nvapi_header_path "${SPARKLE_RHI_D3D12_NVAPI_INCLUDE_DIR}/nvapi.h")
-        set(_sparkle_nvapi_library_exists FALSE)
-        if(EXISTS "${SPARKLE_RHI_D3D12_NVAPI_LIBRARY}")
-            set(_sparkle_nvapi_library_exists TRUE)
-        endif()
-
-        if(SPARKLE_RHI_D3D12_NVAPI_FETCH_FROM_GITHUB AND
-           (NOT SPARKLE_RHI_D3D12_NVAPI_INCLUDE_DIR OR
-            NOT SPARKLE_RHI_D3D12_NVAPI_LIBRARY OR
-            NOT EXISTS "${_sparkle_nvapi_header_path}" OR
-            NOT _sparkle_nvapi_library_exists))
+        if(SPARKLE_RHI_D3D12_NVAPI_FETCH_FROM_GITHUB)
             sparkle_populate_nvidia_nvapi()
 
             set(SPARKLE_RHI_D3D12_NVAPI_INCLUDE_DIR "${sparkle_nvapi_SOURCE_DIR}" CACHE PATH "Directory containing NVIDIA NVAPI headers, used only by SparkleRHI_D3D12" FORCE)
@@ -210,12 +200,9 @@ if(SPARKLE_RHI_WITH_D3D12)
         endif()
     endif()
 
-    FetchContent_Declare(sparkle_d3d12ma
-        GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git
-        GIT_TAG        0fa62ed3a0a69b73230a8ec1faa752d4061c8dc8 # v3.1.0
-        GIT_SHALLOW    TRUE
-        GIT_PROGRESS   ${SPARKLE_GIT_PROGRESS}
-    )
+    sparkle_declare_git_dependency(sparkle_d3d12ma
+        https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git
+        0fa62ed3a0a69b73230a8ec1faa752d4061c8dc8)
 
     FetchContent_GetProperties(sparkle_d3d12ma)
     if(NOT sparkle_d3d12ma_POPULATED)
@@ -332,12 +319,9 @@ if(SPARKLE_RHI_WITH_D3D12)
 endif()
 
 if(SPARKLE_RHI_WITH_VULKAN)
-    FetchContent_Declare(sparkle_vma
-        GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
-        GIT_TAG        v3.1.0
-        GIT_SHALLOW    TRUE
-        GIT_PROGRESS   ${SPARKLE_GIT_PROGRESS}
-    )
+    sparkle_declare_git_dependency(sparkle_vma
+        https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+        009ecd192c1289c7529bff248a16cfe896254816)
 
     FetchContent_GetProperties(sparkle_vma)
     if(NOT sparkle_vma_POPULATED)

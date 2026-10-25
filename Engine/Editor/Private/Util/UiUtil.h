@@ -123,7 +123,6 @@ namespace UiUtil
 	void EndDetailsCategory();
 	void DrawDetailsEmptyState(const char* text = "Select an object from the scene outliner to inspect its properties.");
 	void DrawDetailsValueRow(const char* label, const char* value);
-	void DrawDetailsAssetRow(const char* label, EditorIcon thumbnailIcon, const char* value, const char* typeText = nullptr);
 	bool EditDetailsFloat(const char* label, float& value, float speed, float minValue, float maxValue, const char* format, const float* resetValue = nullptr);
 	bool EditDetailsFloat3(const char* label, float values[3], float speed, float minValue, float maxValue, const char* format, const float* resetValues = nullptr);
 	bool EditDetailsColor3(const char* label, float values[3], const float* resetValues = nullptr);

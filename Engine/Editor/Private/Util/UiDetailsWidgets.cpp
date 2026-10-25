@@ -2,13 +2,9 @@
 #include "Util/UiUtil.h"
 
 #include "Style/SparkleUiPalette.h"
-#include "Style/SparkleUiTheme.h"
-
-#include "Core/Public/Strings/StringUtils.h"
 
 #include <algorithm>
 #include <cfloat>
-#include <cmath>
 #include <vector>
 
 #include <imgui.h>
@@ -54,66 +50,9 @@ namespace UiUtil
 
 		ImGui::TableSetColumnIndex(1);
 		ImGui::AlignTextToFramePadding();
-		ImGui::TextUnformatted(value);
+		ImGui::TextWrapped("%s", value);
 		DrawDetailsEmptyUtility(2);
 
-		EndDetailsRow();
-	}
-
-	void DrawDetailsAssetRow(const char* label, EditorIcon thumbnailIcon, const char* value, const char* typeText)
-	{
-		if (!BeginDetailsRow(label, 1))
-		{
-			return;
-		}
-
-		ImGui::TableSetColumnIndex(1);
-		const ImVec2 thumbnailSize(32.0f, 32.0f);
-		const ImVec2 start = ImGui::GetCursorScreenPos();
-		ImDrawList* drawList = ImGui::GetWindowDrawList();
-		drawList->AddRectFilled(start, ImVec2(start.x + thumbnailSize.x, start.y + thumbnailSize.y), SparkleUiPalette::SceneOutlinerBadgeBackground(), 4.0f);
-		drawList->AddRect(start, ImVec2(start.x + thumbnailSize.x, start.y + thumbnailSize.y), SparkleUiPalette::PanelHeaderBorder(), 4.0f);
-		const char* thumbnailLabel = GetEditorIconGlyph(thumbnailIcon);
-		const ImVec2 thumbnailTextSize = ImGui::CalcTextSize(thumbnailLabel);
-
-		drawList->AddText(
-		    ImVec2(start.x + ((thumbnailSize.x - thumbnailTextSize.x) * 0.5f), start.y + ((thumbnailSize.y - thumbnailTextSize.y) * 0.5f)),
-		    SparkleUiPalette::SceneOutlinerBadgeText(),
-		    thumbnailLabel);
-
-		ImGui::Dummy(thumbnailSize);
-
-		ImGui::SameLine(0.0f, 6.0f);
-		ImGui::BeginGroup();
-		const float buttonWidth = (std::max) (80.0f, ImGui::GetContentRegionAvail().x - 72.0f);
-		ImGui::SetNextItemWidth(buttonWidth);
-		ImGui::Button(value != nullptr ? value : "None", ImVec2(buttonWidth, 0.0f));
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::SetTooltip("Asset selector placeholder");
-		}
-		if (typeText != nullptr && typeText[0] != '\0')
-		{
-			ImGui::TextDisabled("%s", typeText);
-		}
-		ImGui::EndGroup();
-
-		ImGui::SameLine(0.0f, 4.0f);
-		ImGui::BeginGroup();
-		ImGui::SmallButton("Use");
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::SetTooltip("Use selected asset placeholder");
-		}
-		ImGui::SameLine(0.0f, 3.0f);
-		ImGui::SmallButton("Find");
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::SetTooltip("Browse asset placeholder");
-		}
-		ImGui::EndGroup();
-
-		DrawDetailsEmptyUtility(2);
 		EndDetailsRow();
 	}
 

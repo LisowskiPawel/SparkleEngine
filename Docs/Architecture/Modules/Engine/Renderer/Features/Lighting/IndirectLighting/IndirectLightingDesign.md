@@ -90,7 +90,7 @@ Atmospheric sky and fog live in [Volumetric Lighting](../VolumetricLighting/Volu
 | `IND-Q2` initial estimator | one-bounce path samples agree statistically without reuse/reconstruction |
 | `IND-Q3` reservoir correctness | shift/GRIS normalization and reuse pass static/mutation tests |
 | `IND-Q4` reconstructed product | motion/disocclusion/lighting/material sequences retain detail without stale energy |
-| `IND-Q5` workload product | Cornell/Sponza/Bistro/San Miguel quality-time-memory cells on supported backends |
+| `IND-Q5` workload product | analytic/Cornell and applicable approved release-map quality/time/memory cells on both APIs; later Bistro/San Miguel cells only in the admitted advanced program |
 
 ## Acceptance Criteria
 

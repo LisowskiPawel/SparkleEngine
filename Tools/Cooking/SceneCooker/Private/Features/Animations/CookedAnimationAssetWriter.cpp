@@ -15,8 +15,7 @@ class CookedAnimationAssetStager final
 {
 public:
 	static void StageAnimationAsset(const CookedAnimationAssetBuild& animationAsset, std::vector<Files::FilePublication>& outPublication);
-	static Assets::CookedAnimationAssetHeader BuildHeader(const CookedAnimationAssetBuild& animationAsset) noexcept;
-	static void CopyName(std::string_view sourceName, char (&destination)[64]) noexcept;
+	static void BuildHeader(const CookedAnimationAssetBuild& animationAsset, Assets::CookedAnimationAssetHeader& header) noexcept;
 };
 
 void CookedAnimationAssetWriter::StageAnimationAssets(const std::vector<CookedAnimationAssetBuild>& animationAssets, std::vector<Files::FilePublication>& outPublication)
@@ -35,7 +34,8 @@ void CookedAnimationAssetStager::StageAnimationAsset(const CookedAnimationAssetB
 	Files::CleanupTemporaryFile(stagedOutputPath);
 	outPublication.push_back({stagedOutputPath, outputPath});
 
-	const Assets::CookedAnimationAssetHeader header = BuildHeader(animationAsset);
+	Assets::CookedAnimationAssetHeader header;
+	BuildHeader(animationAsset, header);
 	std::string errorMessage;
 	std::ofstream output;
 	if (!Files::TryOpenBinaryOutput(stagedOutputPath, output, errorMessage) || !Files::BinaryStreamWriter::WriteValue(output, header, errorMessage)
@@ -50,25 +50,17 @@ void CookedAnimationAssetStager::StageAnimationAsset(const CookedAnimationAssetB
 	}
 }
 
-Assets::CookedAnimationAssetHeader CookedAnimationAssetStager::BuildHeader(const CookedAnimationAssetBuild& animationAsset) noexcept
+void CookedAnimationAssetStager::BuildHeader(const CookedAnimationAssetBuild& animationAsset, Assets::CookedAnimationAssetHeader& header) noexcept
 {
-	Assets::CookedAnimationAssetHeader header{
-	    .fileHeader = {Assets::kCookedAnimationAssetMagic},
-	    .targetSkeletonAssetId = animationAsset.targetSkeletonAssetId,
-	    .sourceAnimationIndex = animationAsset.sourceAnimationIndex,
-	    .durationSeconds = animationAsset.durationSeconds,
-	    .channelCount = static_cast<std::uint32_t>(animationAsset.channels.size()),
-	    .keyframeCount = static_cast<std::uint32_t>(animationAsset.keyframes.size()),
-	    .channelStride = sizeof(Assets::CookedAnimationChannelRecord),
-	    .keyframeStride = sizeof(Assets::CookedAnimationKeyframeRecord),
-	    .flags = 0};
-
-	CopyName(animationAsset.name, header.name);
-	return header;
-}
-
-void CookedAnimationAssetStager::CopyName(std::string_view sourceName, char (&destination)[64]) noexcept
-{
-	std::memset(destination, 0, sizeof(destination));
-	std::memcpy(destination, sourceName.data(), sourceName.size());
+	// The binary header includes alignment bytes that must be deterministic too.
+	std::memset(&header, 0, sizeof(header));
+	header.fileHeader.magic = Assets::kCookedAnimationAssetMagic;
+	header.targetSkeletonAssetId = animationAsset.targetSkeletonAssetId;
+	header.sourceAnimationIndex = animationAsset.sourceAnimationIndex;
+	header.durationSeconds = animationAsset.durationSeconds;
+	header.channelCount = static_cast<std::uint32_t>(animationAsset.channels.size());
+	header.keyframeCount = static_cast<std::uint32_t>(animationAsset.keyframes.size());
+	header.channelStride = sizeof(Assets::CookedAnimationChannelRecord);
+	header.keyframeStride = sizeof(Assets::CookedAnimationKeyframeRecord);
+	std::memcpy(header.name, animationAsset.name.data(), animationAsset.name.size());
 }

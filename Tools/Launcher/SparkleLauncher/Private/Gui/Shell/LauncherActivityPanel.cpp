@@ -21,6 +21,7 @@
 #include <QtWidgets/QWidget>
 
 #include <algorithm>
+#include <utility>
 
 namespace SparkleLauncher
 {
@@ -36,7 +37,11 @@ namespace SparkleLauncher
 		return static_cast<int>(static_cast<long double>(boundedCompleted) * 100.0L / static_cast<long double>(total));
 	}
 
-	LauncherActivityPanel::LauncherActivityPanel(const LauncherIconLibrary& icons, const std::function<void(QWidget*)>& registerFocusable, QWidget* parent) :
+	LauncherActivityPanel::LauncherActivityPanel(
+	    const LauncherIconLibrary& icons,
+	    const std::function<void(QWidget*)>& registerFocusable,
+	    std::function<void(const QString&)> cancelRun,
+	    QWidget* parent) :
 	    QFrame(parent),
 	    m_queuedIcon(icons.Icon(LauncherIcon::Queued, QColor(LauncherUi::Color::StateQueued))),
 	    m_runningIcon(icons.Icon(LauncherIcon::Running, QColor(LauncherUi::Color::StateRunning))),
@@ -115,6 +120,14 @@ namespace SparkleLauncher
 		outputHeader->setObjectName("OutputPaneLabel");
 		outputHeaderLayout->addWidget(outputHeader, 0);
 		outputHeaderLayout->addStretch(1);
+
+		m_cancelRunButton = new QPushButton("Cancel run", outputPane);
+		m_cancelRunButton->setObjectName("SecondaryButton");
+		m_cancelRunButton->setAccessibleName("Cancel selected run");
+		m_cancelRunButton->setVisible(false);
+		registerFocusable(m_cancelRunButton);
+		connect(m_cancelRunButton, &QPushButton::clicked, this, [this, cancelRun = std::move(cancelRun)]() { cancelRun(m_activeRunId); });
+		outputHeaderLayout->addWidget(m_cancelRunButton);
 
 		m_copyOutputButton = new QPushButton("Copy output", outputPane);
 		m_copyOutputButton->setObjectName("SecondaryButton");
@@ -321,6 +334,7 @@ namespace SparkleLauncher
 		m_activeRunId = runId;
 		UpdateRunSelectionVisuals();
 		const RunState state = run->State;
+		m_cancelRunButton->setVisible(state == RunState::Queued || state == RunState::Running);
 		const QString& title = run->Title;
 		QString stateName;
 		switch (state)
@@ -408,6 +422,11 @@ namespace SparkleLauncher
 		m_copyOutputButton->setVisible(!runId.isEmpty());
 		m_copyOutputButton->setEnabled(canCopyOutput);
 		m_copyOutputButton->setToolTip(canCopyOutput ? "Copy output for the selected run. Shortcut: Ctrl+Shift+C." : "Select a run to copy its output. Shortcut: Ctrl+Shift+C.");
+	}
+
+	bool LauncherActivityPanel::HasActiveRun() const
+	{
+		return std::any_of(m_runs.cbegin(), m_runs.cend(), [](const RunRecord& run) { return run.State == RunState::Queued || run.State == RunState::Running; });
 	}
 
 	LauncherActivityPanel::RunWidgets LauncherActivityPanel::CreateRunWidgets(const QString& title)

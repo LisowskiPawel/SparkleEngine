@@ -37,7 +37,7 @@
 
 ### `VOL-D0-01` Roadmap, Product, And Platform Admission
 
-After `REL-11`, freeze release/milestone, mandatory D3D12/Vulkan/device profile, game/editor reachability, and `Required/Deferred/Excluded` table for baseline fog, local media, atmosphere, heterogeneous volumes, Volumetric ReSTIR, and clouds. Assign an FCR/evidence owner before a production claim.
+After a separate consumer/tier admission, freeze only that slice's milestone, API/device, reachability and Required/Deferred/Excluded decisions. No tier is admitted by REL-11 itself. Assign an FCR/evidence owner before production; unrelated local-media, atmosphere, heterogeneous, reuse or cloud cells stay Deferred without experiments.
 
 ### `VOL-D0-02` World, Units, And Medium Semantics
 
@@ -141,17 +141,17 @@ The release owner first closes admission. Each admitted row then fixes options, 
 | Capability | Proposed disposition | Dependency |
 | --- | --- | --- |
 | medium math + analytic/reference tests | Required first | post-`REL-11` approval |
-| homogeneous/exponential height fog | Required first product | medium contract |
+| homogeneous/exponential height fog | Unselected candidate | a future consumer must select the actual first product |
 | one directional light single scattering | Required first vertical slice | Direct light semantic bridge |
 | correct surface/sky composition | Required first vertical slice | frame recipe/scene-linear boundary |
-| local box/sphere media | Required unified-froxel slice | authoring/scene/GPU schema |
-| all admitted analytic lights + shadows | Required unified-froxel slice | light lists/distribution and visibility decision |
-| portable temporal reconstruction | Required unified-froxel slice | raw static correctness |
-| physical atmosphere/aerial perspective | Required major tier | LUT/reference/environment bridge |
-| dense heterogeneous texture | Planned | content/cook/tracking gate |
+| local box/sphere media | Unselected | separate local-medium consumer and authored-to-frame decision |
+| all analytic lights + shadows | Unselected beyond the chosen first light | named scattering/light domain and value decision |
+| portable temporal reconstruction | Unselected | demonstrated temporal-quality need after raw correctness |
+| physical atmosphere/aerial perspective | Unselected | distinct physical-sky consumer and LUT/reference/environment contract |
+| dense heterogeneous texture | Unselected | distinct content/cook/tracking admission |
 | OpenVDB/NanoVDB | Deferred | accepted Volume workload and content pipeline |
 | per-froxel reservoir light selection | Conditional | measured many-light problem |
-| path-space Volumetric ReSTIR | Planned research/high-quality tier | reference integrator + heterogeneous media |
+| path-space Volumetric ReSTIR | Unselected | separate measured transport/reuse benefit and valid reference/support |
 | clouds | Deferred separate admission | atmosphere + heterogeneous + authoring UX |
 | transparent-surface medium nesting | Excluded initially | transmission/material/order-independent rendering contract |
 
@@ -198,6 +198,6 @@ The release owner first closes admission. Each admitted row then fixes options, 
 
 ## Exit Criteria And Decision
 
-`VOL-D0` passes only after `REL-11` explicitly unlocks new features, a roadmap owner admits the exact scope and assigns an FCR, all sixteen decisions and relevant experiments close, first-stage hooks/checks/budgets are reviewed, and negative-capability claims are updated in the same admitted change.
+`VOL-D0` passes only after `REL-11` explicitly unlocks new features, a roadmap owner admits the exact scope and assigns an FCR, decisions and experiments consumed by the selected tier close while unselected cells remain explicitly Deferred, first-stage hooks/checks/budgets are reviewed, and negative-capability claims are updated in the same admitted change.
 
 **Current decision: Blocked by roadmap; discovery open.** No production code is authorized by this package, and Volumetric Lighting remains 0/100.

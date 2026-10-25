@@ -2,255 +2,139 @@
 
 [Docs](../../../../README.md) / [Up](RHIDesign.md)
 
-Stages: [RHI-0](#rhi-0--freeze-the-service-and-backend-matrix) / [RHI-1](#rhi-1--device-resources-descriptors-and-lifetime) / [RHI-2](#rhi-2--command-recording-synchronization-resize-and-present) / [RHI-3](#rhi-3--paired-backend-lowering) / [RHI-4](#rhi-4--ray-tracing-and-acceleration-structure-execution) / [RHI-5](#rhi-5--diagnostics-capture-device-loss-and-recovery) / [RHI-6](#rhi-6--candidate-closure).
+Prove that the selected frame and product transitions lower correctly to D3D12/Vulkan, with bounded native lifetime and truthful failure.
 
-Make D3D12 and Vulkan execute the same admitted GPU contracts and fail safely when requirements are missing.
-
-**Status:** implementation plan; ordered backend closure, not native-validation or release evidence
-
-**Snapshot:** 2026-09-08; portfolio projection **45/100**; all six `FCR-RHI-*` families are `Blocked`
+**Status:** remaining release integration and proof; stage names do not imply missing implementation or passed evidence.
 
 ## Work This Plan
 
-| What to do | Working route |
-| --- | --- |
-| First action | [RHI-0 backend matrix](#rhi-0--freeze-the-service-and-backend-matrix): match each Renderer request to a real service and supported native tuple. |
-| Result to reach | An explicit capability/service matrix and narrow native checks; later phases close resources, submission, ray tracing and device failure. |
-| Start / stop | Do not infer parity from shared names. Missing native support or a required unavailable check blocks that cell; Renderer policy stays in Renderer. |
+Assign the demonstrated failure or open native claim to its service. RHI-0 closes only missing consumer/capability decisions; existing services and qualified GCD/native evidence are reused. Inventory coverage does not require every extension or service to be reimplemented before repairing a frame.
+
+Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).
+
+## Dependencies
+
+Resource ownership precedes use; completion precedes reuse or retirement. Ray/HDR work uses current native owners through its feature discovery. Paired checks follow each affected shared contract, rather than a separate late port. RHI-6 joins final candidate results.
 
 ## `RHI-0` — Freeze The Service And Backend Matrix
 
-**Goal:** reconcile every public RHI service and every Renderer consumer into an admitted D3D12/Vulkan/capability matrix before changing implementation.
+**Start:** A selected Renderer request lacks a current native tuple, consumer or decidable support/failure contract.
 
-**Non-goals:** making both backends textually identical, exposing native vocabulary to Renderer, or filling matrix cells with assumed support.
+**Work:** Trace that request through its service/native owner, build/SDK/device prerequisites and lifetime. Reconcile affected D3D12/Vulkan capability/failure cells in existing dossiers; consider narrowing unused public surface rather than implementing it.
 
-**Required work:**
+**Cleanup:** Remove stale capability claims and duplicate service definitions; no native Renderer policy or convenience RHI.
 
-- inventory public services, resource and handle types, descriptors, pipelines, command operations, queues, present, interop, capture, timing, ray tracing, and diagnostics;
-- trace owner, lifetime, creation/destruction, producer/consumer, CMake membership, selector, requested/active state, unsupported route, and native lowering;
-- map each service to feature-local `AC-RHI*`, `FM-RHI*`, and `CHK-RHI*`; repair the Architecture contract first if any admitted cell lacks one;
-- freeze hardware/driver/toolchain/provider and feature-level prerequisites for the release candidate;
-- classify divergence as shared invariant, intentionally backend-specific mechanism, unsupported, or defect.
-
-**Failure modes to control:** public service has one backend only but reports support; implementation method has no consumer; Renderer branches on native API; invalid handle behavior is undefined; capability query differs from actual creation.
-
-**Phase exit criteria:** every admitted service has a current source route, both-backend disposition, capability/failure behavior, and mapped check; unknown cells block later phases.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** Each affected admitted cell has a real lowering or named blocker, consumer and AC/FM/check; unselected extensions stay outside this stage.
 
 ```text
-Execute only RHI-0 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-0--freeze-the-service-and-backend-matrix.
-Goal: reconcile every public RHI service and every Renderer consumer into an admitted D3D12/Vulkan/capability matrix before changing implementation. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RHI-0 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-0--freeze-the-service-and-backend-matrix. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Trace that request through its service/native owner, build/SDK/device prerequisites and lifetime.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RHI-1` — Device, Resources, Descriptors, And Lifetime
 
-**Goal:** close `FCR-RHI-01` and the resource/lifecycle base of `FCR-RHI-06` with one published backend aggregate and completion-safe ownership.
+**Start:** A selected device/resource/descriptor creation, partial failure or retirement edge needs closure.
 
-**Non-goals:** Renderer resource policy in RHI, a generic lifetime framework without consumers, or relying on process exit for cleanup.
+**Work:** Preserve owner-thread aggregate publication and reverse teardown. Check affected buffer/texture/view/sampler/descriptor/upload/readback/pipeline inputs, generation/bounds/mapping/state and allocation failures; prove all-queue completion before recycling. Record changed descriptor/memory high-water.
 
-**Required work:**
+**Cleanup:** Delete duplicate wrappers, copied ownership/state and replaced descriptor/resource-lifetime machinery; retain one published device aggregate.
 
-- preserve owner-thread aggregate creation/publication and reverse-order teardown; make partial-create cleanup explicit;
-- close buffer/texture/view/sampler/descriptor/upload/readback/pipeline resource creation and invalid-input/allocation behavior for admitted uses;
-- define handle/generation, native ownership, mapped memory, descriptor range, state initialization, debug naming, and queue-use retirement;
-- make capability queries and creation failure agree; keep unsupported behavior explicit and safe;
-- measure retained/high-water memory and descriptor usage for release workloads.
-
-**Failure modes to control:** partial device publishes; descriptor out of bounds; freed resource remains in flight; mapped range misuse; allocation failure corrupts prior state; dependent outlives device; native object leaks.
-
-**Phase exit criteria:** all admitted resource/descriptor/lifetime criteria pass on both backends; partial creation and allocation/invalid-handle failures settle cleanly; memory and live-object records are retained.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-RHI-01 and applicable FCR-RHI-06 lifecycle cells pass both-API valid/invalid/partial-create/allocation and native live-object checks.
 
 ```text
-Execute only RHI-1 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-1--device-resources-descriptors-and-lifetime.
-Goal: close FCR-RHI-01 and the resource/lifecycle base of FCR-RHI-06 with one published backend aggregate and completion-safe ownership. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RHI-1 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-1--device-resources-descriptors-and-lifetime. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Preserve owner-thread aggregate publication and reverse teardown.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-01, FCR-RHI-06; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RHI-2` — Command Recording, Synchronization, Resize, And Present
 
-**Goal:** close `FCR-RHI-02` from frame begin through recording leases, submission tokens, completion, resize, present, and retirement.
+**Start:** Valid resources exist; recording/submission/completion or product presentation is the affected edge.
 
-**Non-goals:** Renderer pass scheduling in RHI, unconditional queue waits, or treating a responsive process as a correct frame loop.
+**Work:** Check lease/frame/token identity, batches/order/waits/barriers, recycling and frames-in-flight; exercise affected minimize/zero-size/resize/out-of-date/acquire/present/cancel/shutdown. HDR native work runs through its admitted leaf stage, not a duplicate sequence here. Measure changed submit/present/wait/pacing cost.
 
-**Required work:**
+**Cleanup:** Remove redundant token/state/wait/swapchain paths; lower graph intent without pass policy or unconditional waits.
 
-- define frame/submission/completion identities, legal owner/thread states, command-list lease lifetime, batch ordering, queue dependencies, and serial control;
-- close resource state/barrier lowering, signal/wait error propagation, completion-driven recycling, frames-in-flight bounds, and cancellation/shutdown settlement;
-- handle zero-size/minimized window, swapchain out-of-date/suboptimal, resize generation, acquire/present failure, and device-loss separation;
-- expose the native capability, compatible format/color-space activation, static metadata, recreation, and fallback mechanics consumed by Renderer `DSP-7`; `FCR-REN-26` retains HDR feature ownership;
-- ensure Renderer graph order lowers without hidden RHI policy and native markers preserve causality;
-- measure CPU submit/present, waits, pacing, and resource high-water without changing the production route.
-
-**Failure modes to control:** token reused across generation; wait cycle; allocator/list reset before completion; resize destroys in-flight back buffer; present failure loops; incompatible HDR format/color-space or failed metadata leaves false active state; cancellation partially submits; shutdown hangs.
-
-**Phase exit criteria:** serial and normal frame paths, resize/minimize/restore, queue ordering, failure, shutdown, and pacing checks pass on both backends with clean native validation.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-RHI-02 affected normal/serial, transition/failure and lifetime cells pass both APIs with clean or properly dispositioned native diagnostics.
 
 ```text
-Execute only RHI-2 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-2--command-recording-synchronization-resize-and-present.
-Goal: close FCR-RHI-02 from frame begin through recording leases, submission tokens, completion, resize, present, and retirement. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RHI-2 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-2--command-recording-synchronization-resize-and-present. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Check lease/frame/token identity, batches/order/waits/barriers, recycling and frames-in-flight; exercise affected minimize/zero-size/resize/out-of-date/acquire/present/cancel/shutdown.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-02; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RHI-3` — Paired Backend Lowering
 
-**Goal:** close `FCR-RHI-03` by proving that common contracts produce equivalent declared results while backend-specific mechanics remain contained.
+**Start:** A retained common contract changed or lacks required paired-native proof.
 
-**Non-goals:** identical native command streams, hiding a real backend limitation, or branching feature semantics in backend code.
+**Work:** Compare affected descriptor/format/pipeline/command/state/queue/interop/present/error cells with identical logical inputs. Repair missing lowering at its backend owner; retain intentional native differences behind the shared invariant. Reuse representative frame and focused invalid-input controls.
 
-**Required work:**
+**Cleanup:** Delete duplicate mapping/capability truth and native bypass replaced by the fix. Do not demand identical command streams or implement unselected extensions.
 
-- compare every admitted resource, descriptor, pipeline, command, state/barrier, presentation, interop, and diagnostic operation cell-by-cell;
-- close missing lowering and normalize error/capability truth at the shared boundary without lowest-common-denominator leakage;
-- validate descriptor lifetime, format/state mapping, queue family/ownership, swapchain differences, compiler failures, and debug naming;
-- retain backend-specific algorithms only behind the common invariant and document why they differ;
-- execute matching deterministic micro-oracles plus representative Renderer paths with D3D12 debug layer/DRED and Vulkan validation.
-
-**Failure modes to control:** one backend silently no-ops; format/state maps differently; validation suppression hides defect; capability advertised before dependency; fallback changes feature result; backend fix changes shared semantics.
-
-**Phase exit criteria:** every included matrix cell is `PASS` or explicitly excluded before scope freeze; deterministic outputs and failures agree within owned tolerances; native validation is clean or has an accepted, scoped disposition.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-RHI-03 admitted cells meet owned result/failure tolerances on both APIs. Missing Included support stays blocked; scope changes go through the release owner.
 
 ```text
-Execute only RHI-3 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-3--paired-backend-lowering.
-Goal: close FCR-RHI-03 by proving that common contracts produce equivalent declared results while backend-specific mechanics remain contained. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RHI-3 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-3--paired-backend-lowering. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Compare affected descriptor/format/pipeline/command/state/queue/interop/present/error cells with identical logical inputs.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-03; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RHI-4` — Ray-Tracing And Acceleration-Structure Execution
 
-**Goal:** close `FCR-RHI-04` for admitted BLAS/TLAS, update/refit/partitioned policy, inline query, native pipeline, shader table, and trace commands.
+**Start:** Selected scene/TLAS policy and required shader/RT composition are valid.
 
-**Non-goals:** moving scene/TLAS selection policy out of Renderer, duplicating effect semantics for inline and RGS, or claiming unsupported hardware paths.
+**Work:** Check admitted BLAS/TLAS build/update/refit, scratch/result/operation bounds, contribution/SBT/hit identity, queues/state/retirement and allocation failures. Use current inline/native controls and shader composition/record/dispatch checks. PTLAS retains its experimental disposition; scene policy remains Renderer-owned.
 
-**Required work:**
+**Cleanup:** Remove duplicate native tables/mappings/handle state and unsupported fallback producers replaced by the repair.
 
-- freeze geometry/instance/generation/SBT contribution identity and ownership across build, update, replacement, and completion;
-- close scratch/result/operation-buffer sizing, bounds, state/synchronization, compaction/retirement as applicable, and allocation failure;
-- keep one semantic Renderer effect contract with thin inline/native-pipeline traversal adapters;
-- make requested/active capability and classic/refit/partitioned choices observable, including safe unsupported behavior;
-- compare deterministic hit/miss/instance/material results and native validation across backends/routes; measure build/update/traversal and memory.
-
-**Failure modes to control:** stale BLAS address; SBT index aliases instance; update used after topology change; operation buffer overrun; scratch freed early; unsupported path silently falls back; inline/RGS result diverges.
-
-**Phase exit criteria:** all admitted ray criteria/failures pass for both APIs and traversal routes; identity and lifetime ledgers reconcile; costs and capability boundaries are recorded.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-RHI-04 required native RT/AS cells pass both APIs with identity, bounds, failure and cost evidence. No new extension, compaction tier or traversal architecture is implied.
 
 ```text
-Execute only RHI-4 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-4--ray-tracing-and-acceleration-structure-execution.
-Goal: close FCR-RHI-04 for admitted BLAS/TLAS, update/refit/partitioned policy, inline query, native pipeline, shader table, and trace commands. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RHI-4 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-4--ray-tracing-and-acceleration-structure-execution. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Check admitted BLAS/TLAS build/update/refit, scratch/result/operation bounds, contribution/SBT/hit identity, queues/state/retirement and allocation failures.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-04; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RHI-5` — Diagnostics, Capture, Device Loss, And Recovery
 
-**Goal:** close `FCR-RHI-05` and `FCR-RHI-06` with bounded observation, truthful recoverable swapchain events, and terminal device-loss handling.
+**Start:** An admitted readback/native diagnostic/failure cell is missing or fails; qualified crash tooling is reused where applicable.
 
-**Non-goals:** an internal performance-dashboard product, automatic device resurrection, unbounded logging, or collecting private content without intent.
+**Work:** Exercise affected timestamp validity, names/messages/loss, memory/live objects, destination-free readback and external correlation. Distinguish recoverable swapchain events from terminal device loss; prove settlement/no post-loss use, candidate/frame/object provenance and local privacy. Missing automatic CPU crash/hang collection stays unavailable.
 
-**Required work:**
+**Cleanup:** Remove duplicate capture/diagnostic state, stale callbacks/provider leases and temporary fault probes; no internal profiler, device resurrection or support service.
 
-- close timing validity, message/drop state, memory/live objects, object naming, texture capture/readback/encoding, privacy, and external-tool correlation;
-- ensure observers are bounded and selectable, report unavailable/invalid data, and are erased or disabled as the Shipping contract requires;
-- distinguish resize/out-of-date recovery from terminal device loss; settle queues/dependents and prevent post-loss use;
-- collect DRED or Vulkan fault/context data with candidate/frame/object identity and safe user-facing export;
-- exercise partial create, queue wait failure, capture failure, device removal/loss, teardown, and repeated recoverable swapchain events.
-
-**Failure modes to control:** invalid timestamp presented as zero; diagnostic ring silently overwrites; capture reads wrong generation; observer stalls frame; device loss retried forever; post-loss native call; diagnostics leak private path/data.
-
-**Phase exit criteria:** feature checks pass on both APIs; recoverable versus terminal paths are unmistakable; native objects settle; diagnostic artifacts identify candidate/frame without privacy breach; external profiler handoff is demonstrated where applicable.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-RHI-05/06 affected capture, loss/failure/shutdown and observer/privacy cells pass. Artifacts identify the actual candidate; terminal loss is never called recovery.
 
 ```text
-Execute only RHI-5 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-5--diagnostics-capture-device-loss-and-recovery.
-Goal: close FCR-RHI-05 and FCR-RHI-06 with bounded observation, truthful recoverable swapchain events, and terminal device-loss handling. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RHI-5 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-5--diagnostics-capture-device-loss-and-recovery. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Exercise affected timestamp validity, names/messages/loss, memory/live objects, destination-free readback and external correlation.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-05; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RHI-6` — Candidate Closure
 
-**Goal:** bind all RHI claims to one package candidate, hardware/driver matrix, and paired-backend evidence index.
+**Start:** Final package/shader/provider identities and admitted native results exist.
 
-**Non-goals:** rerunning broad work without a missing claim or accepting one backend on behalf of the other.
+**Work:** Join six reports and the paired backend/driver/configuration matrix. Run only missing package-relative or cross-boundary checks; reuse unchanged GCD/native artifacts. Invalidate claims affected by device/provider/driver/code changes.
 
-**Required work:** audit all six FCR reports, run only missing cross-boundary and package-relative checks, verify native validation artifacts, confirm capability/selectors and exclusions, and check invalidation after any code/provider/driver/config change.
+**Cleanup:** Verify prior wrapper/state/registration/dependency deletions and remove stale current instructions; unique artifacts remain linked.
 
-**Failure modes to control:** evidence uses different binary or shader/content; driver/tool version missing; backend failure hidden by auto-selection; unavailable hardware marked pass; debug-only route differs from Shipping package.
-
-**Phase exit criteria:** each RHI FCR has a complete candidate-bound decision, paired matrices and limitations are explicit, and all Renderer dependencies have a stable accepted contract.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** Each admitted FCR-RHI-01 through 06 claim has an exact decision and required negatives. Unrun hardware cells cannot pass; unselected services create no implementation task.
 
 ```text
-Execute only RHI-6 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-6--candidate-closure.
-Goal: bind all RHI claims to one package candidate, hardware/driver matrix, and paired-backend evidence index. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RHI-6 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-6--candidate-closure. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Join six reports and the paired backend/driver/configuration matrix.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-01; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## Reference And Ownership
 
-<details>
-<summary>Exact owners, source snapshots and related contracts</summary>
-
-**Responsibility:** sequence the neutral RHI contract, both native lowerings, GPU execution, diagnostics, and device-failure closure
-
-**Orchestrator:** [First Release Implementation Plan](../../../CrossModule/FirstRelease/ImplementationPlan.md)
-
-**Architecture owner:** [Render Hardware Interface](RHIDesign.md) and its [feature dossiers](Features/RHIFeatureGuide.md)
-
-</details>
-
-## Outcome And Sequence
-
-Deliver one narrow Renderer-facing RHI whose D3D12 and Vulkan implementations truthfully lower the admitted resource, execution, presentation, ray-tracing, diagnostics, and failure contracts.
-
-```mermaid
-flowchart LR
-    R0[RHI-0<br/>matrix and baseline] --> R1[RHI-1<br/>device and resources]
-    R1 --> R2[RHI-2<br/>submission and present]
-    R2 --> R3[RHI-3<br/>paired lowering]
-    R3 --> R4[RHI-4<br/>ray execution]
-    R4 --> R5[RHI-5<br/>diagnostics and loss]
-    R5 --> R6[RHI-6<br/>candidate closure]
-```
-
-| Phase | Primary families | Required Architecture route |
-| --- | --- | --- |
-| `RHI-0` | all six | [Capability Inventory](CapabilityInventory.md), feature acceptance sections, Renderer consumers |
-| `RHI-1` | `FCR-RHI-01`, resource portion of `06` | [Device And Resources](Features/DeviceAndResources/DeviceAndResourcesDesign.md) |
-| `RHI-2` | `FCR-RHI-02` | [Command Submission](Features/PipelineAndExecution/PipelineAndExecutionDesign.md#command-submission-and-synchronization), [Presentation](Features/PresentationAndInterop/PresentationAndInteropDesign.md#presentation) |
-| `RHI-3` | `FCR-RHI-03` | [Backend Selection And Capabilities](Features/DeviceAndResources/DeviceAndResourcesDesign.md#backend-selection-and-device-capabilities) plus all admitted contracts |
-| `RHI-4` | `FCR-RHI-04` | [Ray Tracing](Features/PipelineAndExecution/PipelineAndExecutionDesign.md#ray-tracing) |
-| `RHI-5` | `FCR-RHI-05`, `FCR-RHI-06` | [Diagnostics And Capture](Features/DiagnosticsAndCapture/DiagnosticsAndCaptureDesign.md), [Device Lifecycle](Features/DeviceAndResources/DeviceAndResourcesDesign.md#device-lifecycle-and-failure-recovery) |
-| `RHI-6` | all six | candidate reports and package matrix |
-
-Use the [common phase contract](../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract). The [NVRHI Programming Guide](https://github.com/NVIDIA-RTX/NVRHI/blob/8e8c36e37558acec333204619b95d9d2fcdc4a79/doc/ProgrammingGuide.md), [DirectX Graphics Samples](https://github.com/microsoft/DirectX-Graphics-Samples), and [Khronos Vulkan Samples](https://github.com/KhronosGroup/Vulkan-Samples) provide reference questions and native oracles. They do not authorize a wrapper migration, API imitation, or claim of local parity.
+[RHI design](RHIDesign.md) and [feature dossiers](Features/RHIFeatureGuide.md) own semantics and AC/FM/checks. [Device/resources](Features/DeviceAndResources/DeviceAndResourcesDesign.md), [execution](Features/PipelineAndExecution/PipelineAndExecutionDesign.md), [presentation](Features/PresentationAndInterop/PresentationAndInteropDesign.md) and [capture](Features/DiagnosticsAndCapture/DiagnosticsAndCaptureDesign.md) remain owners; this plan assigns release work.

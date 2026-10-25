@@ -49,7 +49,7 @@ Freeze pixel measurement, path-length/domain notation, throughput, emitted radia
 
 ### `IND-D0-03` Independent Oracles And Fixtures
 
-Freeze CPU/analytic/metamorphic cases and external/reference-tracer artifacts. Name shared material/light/texture/ray code and the independent cross-check for each. Use Cornell Box as a controlled reference, Sponza as Tier 0 reachability, Bistro as flagship, and San Miguel as held-out content.
+Freeze CPU/analytic/metamorphic cases and external/reference-tracer artifacts. Name shared material/light/texture/ray code and the independent cross-check for each. Use Cornell/analytic controls and the applicable approved release maps for the first-release candidate. Bistro flagship and San Miguel held-out content belong to separately admitted later workload proof, not this release prerequisite.
 
 ### `IND-D0-04` Initial Candidate Generator
 
@@ -189,7 +189,7 @@ Each row closes only after hypotheses and thresholds are fixed, the exact candid
 | `IND-X-04` reservoir statistics | enumerated/discrete path proposals, duplication/correlation, temporal/spatial chains | `IND-D0-07/08` |
 | `IND-X-05` motion/animation | camera, disocclusion, rigid/deformed surface, light/sky/material mutation | `IND-D0-08/09/10` |
 | `IND-X-06` reconstruction | raw/reconstructed static/motion cells with identical guides and exposure | `IND-D0-11` |
-| `IND-X-07` workload baseline | Cornell/Sponza/Bistro/San Miguel at exact profile/backend | `IND-D0-12/14` |
+| `IND-X-07` workload baseline | applicable analytic/Cornell/approved release maps at the exact profile/backend; later Tier 1 scenes only for advanced-program admission | `IND-D0-12/14` |
 
 ## Discovery Evidence Package
 
@@ -218,6 +218,6 @@ Each row closes only after hypotheses and thresholds are fixed, the exact candid
 
 ## Exit Criteria And Decision
 
-`IND-D0` passes only when all fourteen decisions are explicit, every selected equation has an owner and falsifying test, path/shift/reservoir representations round-trip, the oracle independence is reviewed, budgets and failure states are frozen, seed-replay deletions are named, and the release owner admits the next stage.
+`IND-D0` passes only when consumed decisions are accepted and unselected expansion cells are explicitly Deferred, every selected equation has an owner and falsifying test, path/shift/reservoir representations round-trip, the oracle independence is reviewed, budgets and failure states are frozen, seed-replay deletions are named, and the release owner admits the next stage.
 
 **Current decision: Open / Blocked for production replacement.** The existing implementation remains source-present and unproved; this documentation does not change its capability score.

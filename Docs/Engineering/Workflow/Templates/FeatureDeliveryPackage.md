@@ -45,13 +45,15 @@ Notice the direction of authority: research informs decisions, discovery freezes
 
 ## Select The Smallest Honest Package
 
+First apply [scope protection](../../../Strategy/Roadmap.md#scope-protection): name the selected output and real consumer, then decide whether reuse, a smaller contract, or retirement avoids new work. Instantiate only knowledge roles needed for a current decision. High assurance requires precise semantics and falsifying evidence; it does not itself require seven maintained files.
+
 | Feature shape | Recommended documents | Do not do |
 | --- | --- | --- |
 | Small, one-owner behavior with no independent research or rollout | One dossier using the [page template](Page.md), with compact design and acceptance sections. | Create empty companion documents for appearance. |
 | Moderate feature with a known algorithm and one user route | `FeatureDesign.md`, `ExecutionArchitecture.md`, `ImplementationPlan.md`; add `Research.md` or `UserExperience.md` only when independently maintained. | Mix current state, future stages, and executed results into one diary. |
 | Algorithmically sensitive feature | Add `Semantics.md` for equations, protocol, state-machine, data-format, or deterministic-behavior authority. | Leave correctness-defining choices to implementation prompts. |
 | Product/tool workflow | Add `UserExperience.md` for discovery, setup, progress, interruption, results, accessibility, and automation equivalence. | Treat a debug panel, CVar, or happy-path screenshot as product completion. |
-| High-assurance reference, infrastructure, release, security, or evidence feature | Use all seven feature-local roles below unless a documented combination preserves one owner and one lifecycle. | Reduce rigor because the feature is internal or technically impressive. |
+| High-assurance reference, infrastructure, release, security, or evidence feature | Maintain each necessary semantic, decision and proof responsibility; split only roles with an independent lifecycle or reader need. | Treat seven files as an assurance gate or reduce the actual proof rigor. |
 
 The full package has seven direct Markdown files, matching the active-folder sibling budget in [Documentation Organization](../DocumentationOrganization.md#granularity). If an eighth independently maintained role is necessary, form a durable subfolder with its own index instead of flattening or merging authority.
 
@@ -83,6 +85,7 @@ Use this card before writing stages, including for a target feature whose implem
 | Reviewable artifact | Example manifest/table/capture/fixture/output and its identity join; final evidence owner. An example is not an observed result. |
 | Failure and stop | Fault, detection boundary, safe state/cleanup, counterexample and smallest defect-detecting check. Missing inputs are not unsupported-design evidence. |
 | Architecture budget | Existing producer/consumer/state/lifetime, integration hooks, public/copy delta and replaced paths to delete; reject a framework without a consumer. |
+| Non-delivery and retirement | Specific neighboring capabilities not selected; current code/state/selectors/dependencies to narrow or delete in each slice, preservation/reachability checks, or a justified zero-deletion result. Use the existing scope/retirement procedure. |
 | Stage exit | Binary prerequisite and result, preserved/excluded scope, style/build/validation controls and exact handoff. |
 
 For an absent feature, populate discovery questions and bounded next actions rather than an empty directory or speculative API. Start with the smallest meaningful package. After delivery, remove completed implementation prompts/tasks, retain durable design and valuable source/native/negative evidence, and leave the plan with only unfinished obligations.
@@ -793,14 +796,14 @@ Use only stage families required by this feature and split them when reviewabili
 | Family | Outcome | Typical prerequisite | Key proof |
 | --- | --- | --- | --- |
 | 0. Discovery/freeze | Close decisions, risks, semantic slots, architecture, UX, evidence design, budgets, estimates, and independent review. | None | {{DISCOVERY_GATE}} report |
-| 1. Contracts/authority | Introduce the smallest request/result/identity boundary and remove or relabel false authority. | Discovery and release prerequisite | Invalid/ownership/clean-break checks |
+| 1. Contracts/authority | Freeze the smallest consumed boundary and retirement decision. Production contracts land with their real consumer; otherwise this is documentation only. | Discovery and release prerequisite | Reviewed first-slice/check budget; no dormant API/state |
 | 2. Minimal vertical slice | One real input reaches one real observable result through the intended production path. | Contracts | Known-value end-to-end case |
 | 3. Semantic completeness | Complete included algorithms, formats, events, modes, or data rules. | Minimal slice | Rule-to-code and fault-injection evidence |
 | 4. Lifecycle/robustness | Close state, cancellation, reset, capacity, invalid data, recovery, publication, and numeric/concurrency hazards. | Semantic core | Adversarial and controlled-failure matrix |
 | 5. Platform/content parity | Close every accepted backend, platform, mode, profile, and content cell without semantic forks or silent fallback. | Stable core | Paired/independent matrix evidence |
 | 6. UX/automation | Deliver discoverable recommended and expert routes over the same authoritative operation. | Stable service | First-use, failure, accessibility, automation parity |
 | 7. Evidence/nonfunctional | Execute predeclared correctness, performance, security, package, provenance, and resilience protocols. | Product-complete candidate | Retained candidate-bound evidence |
-| 8. Adoption/cleanup | Adopt consumers, delete superseded paths and temporary probes, verify package/release reachability, and file {{FCR_ID}}. | Accepted evidence | Conjunctive feature-completion report |
+| 8. Adoption/closure | Adopt consumers, verify prior stage deletions and package/release reachability, remove proof-only probes, and file {{FCR_ID}}. | Accepted evidence | Conjunctive feature-completion report |
 
 Do not force these exact numbers. Preserve dependency direction and make each stage a coherent owner/invariant-sized vertical slice.
 
@@ -821,7 +824,7 @@ Every stage executor must:
 1. read repository guidance, this feature's owning documents, applicable Engineering standards, and exact prerequisite artifacts;
 2. inspect current status, owners, producers, consumers, lifetime, selectors, build membership, generated products, and unrelated dirty work before editing;
 3. stop on absent, stale, or contradicted prerequisites rather than inventing a decision;
-4. implement only the selected stage and directly required defects;
+4. apply [the stage complexity budget]({{CHANGE_LIFECYCLE_PATH}}#define-the-outcome-and-complexity-budget): choose proof, repair, bounded simplification/retirement or admitted addition; classify touched existing code and implement only the selected slice. A cut may preserve the required result with no replacement feature;
 5. maintain one semantic product and one mutable authority, with thin lower-level/backend/UI adapters;
 6. apply the clean-break policy: update all owned producers/consumers and delete replaced paths without compatibility aliases or dual representations;
 7. preserve explicit requested-versus-active state, strict unsupported behavior, safe failure, bounded cancellation, and transactional publication;
@@ -842,7 +845,7 @@ Every prompt's `NON-NEGOTIABLE` paragraph is an exit gate. The handoff quotes ea
 - Backend/mode/platform adapters cannot fork semantic behavior without a separately accepted product identity.
 - Preview/diagnostic/partial output cannot become authoritative result.
 - Thresholds, seeds, matrices, budgets, and stop rules are frozen before candidate results are observed.
-- Temporary probes remain local-only and are removed before final adoption unless accepted as durable product checks.
+- Replacement cleanup closes in its producing stage; final adoption verifies it. Temporary probes remain local-only and are removed before each handoff; check IDs do not authorize permanent test infrastructure.
 - Every stage passes `CHK-{{PREFIX}}-ARCH`; implementation remains predominantly inside the frozen feature home and each outside edit is an accepted composition, consumer, build/generated, documentation/evidence, or clean-break hook.
 
 ## Stage {{N}} — {{OUTCOME_NAME}}
@@ -859,8 +862,8 @@ State one observable vertical-slice outcome, not a list of files or mechanisms.
 
 ### Work
 
-1. Inspect/reconcile {{CURRENT_OWNER_AND_ROUTE}}.
-2. Implement {{ONE_AUTHORITATIVE_PRODUCT_SLICE}}.
+1. Inspect/reconcile {{CURRENT_OWNER_AND_ROUTE}}; decide {{RETAIN_NARROW_REPLACE_OR_RETIRE_EXISTING_PATH_AND_REASON}}.
+2. Implement {{ONE_AUTHORITATIVE_PRODUCT_SLICE}} within {{JUSTIFIED_STATE_API_HOOK_COPY_DEPENDENCY_DELTA}}; reuse {{EXISTING_REPRESENTATION_OR_MECHANISM}}.
 3. Update every producer, consumer, build/generated entry, diagnostic, and document in scope.
 4. Delete {{SUPERSEDED_PATH_OR_STATE}}.
 5. Retain {{EVIDENCE_ARTIFACTS}}.
@@ -873,7 +876,8 @@ State one observable vertical-slice outcome, not a list of files or mechanisms.
 
 - Binary observable outcomes tied to accepted criteria/failures/checks.
 - Exact matrix and thresholds.
-- Required deletion and no-stale-reference proof.
+- Actual additions match the justified budget; no unused state, speculative extension point or unnecessary dependency survives.
+- Required same-stage deletion and no-stale-reference proof, plus a positive retained-result check; justify zero deletion when appropriate.
 - Required review and evidence artifacts.
 - The [Stage Source-Style Gate]({{CHANGE_LIFECYCLE_PATH}}#stage-source-style-gate) passes for the final stage-owned source, including added files; no-source stages record justified `N/A`.
 - Explicit `BLOCKED` triggers.
@@ -888,7 +892,7 @@ Outcome: {{ONE_OBSERVABLE_VERTICAL_SLICE}}.
 
 Inspect first: {{OWNERS_PRODUCERS_CONSUMERS_LIFETIME_SELECTORS_BUILD_AND_CURRENT_EVIDENCE}}.
 
-Change: {{EXACT_SEMANTIC_ARCHITECTURE_UX_AND_PRODUCTION_BOUNDARY}}. Update every owned producer/consumer/build/generated/document surface and delete {{REPLACED_AUTHORITY}} as one clean break.
+Change: {{EXACT_SEMANTIC_ARCHITECTURE_UX_AND_PRODUCTION_BOUNDARY}} within {{JUSTIFIED_ADDITION_BUDGET}}. Retain or narrow {{EXISTING_SELECTED_PATH_AND_REASON}}. Update every owned producer/consumer/build/generated/document surface and delete {{REPLACED_AUTHORITY}} as one clean break before this stage exits.
 
 NON-NEGOTIABLE: {{THE_FEW_CORRECTNESS_OWNERSHIP_LIFETIME_FAILURE_OR_UX_FACTS_WHOSE_VIOLATION_COULD_PRODUCE_PLAUSIBLE_BUT_WRONG_SUCCESS}}. Keep the implementation inside {{FEATURE_HOME}} behind the frozen integration hooks. Generic orchestrators select, invoke, and publish only; they do not acquire feature state, algorithms, validation, resource policy, shader bindings, or feature-specific failure logic. Quote each item at handoff with its retained proof or report BLOCKED.
 

@@ -93,7 +93,7 @@ function Assert-PackageLayout
     {
         throw 'Package layout differs from the frozen three-product content-store contract.'
     }
-    foreach ($path in @('Projects/Showcase/.sparkle-project', 'Projects/Showcase/Levels.catalog'))
+    foreach ($path in @('Projects/Showcase/.sparkle-project', 'Projects/Showcase/Levels.catalog', 'Config/DefaultEngine.ini'))
     {
         if (@($Manifest.Files | Where-Object Path -ceq $path).Count -ne 1) { throw "Missing package recipe input: '$path'." }
     }

@@ -244,7 +244,7 @@ The gate review receives:
 
 ## Exit Criteria
 
-`DIR-D0` passes only when all fourteen decisions have owners, immutable reviewed artifacts, and explicit dispositions; every `AC-DIR-*`, `FM-DIR-*`, and `CHK-DIR-*` maps to a stage; the first production slice has a bounded hook/deletion ledger; and the applicable release owner authorizes execution. Unanswered questions stay `Open`; unavailable evidence is `Blocked`, never assumed.
+`DIR-D0` passes only when every decision consumed by the admitted slice has an owner, immutable reviewed evidence and an accepted disposition; unselected expansion decisions are explicitly Deferred without implementation/probe obligations; every `AC-DIR-*`, `FM-DIR-*`, and `CHK-DIR-*` maps to a stage; the first production slice has a bounded hook/deletion ledger; and the applicable release owner authorizes execution. Unanswered questions stay `Open`; unavailable evidence is `Blocked`, never assumed.
 
 ## Gate Decision
 

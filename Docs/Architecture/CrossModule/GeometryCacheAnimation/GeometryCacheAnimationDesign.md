@@ -44,7 +44,9 @@ flowchart LR
 
 ## Decision
 
-Sparkle should support baked vertex animation as a first-class geometry-cache capability:
+Geometry-cache animation is unselected in the release and current advanced program. The Knight source variant does not justify this pipeline. A future consumer and [scope admission](../../../Strategy/Roadmap.md#scope-protection) must precede production work; `REL-11` alone does not admit it.
+
+If admitted, the bounded target is:
 
 1. Alembic is a source format used by host tools only. The runtime never loads Alembic or USD.
 2. The source importer normalizes axes, handedness, units, transforms, time samples, topology, attributes, face sets, and bounds into one `ImportedGeometryCache` contract.
@@ -372,7 +374,7 @@ Do not add `KnightImporter`, `ModernSponzaAnimation`, a geometry-cache renderer,
 
 **Scope:** current import, cook, animation, render-scene, deformation, residency, and Modern Sponza source surfaces relevant to geometry-cache delivery
 
-**Architecture authority:** [Geometry Cache Animation Pipeline]()
+**Architecture authority:** [Geometry Cache Animation Pipeline](#geometry-cache-animation-pipeline)
 
 **Delivery authority:** [Geometry Cache Animation Delivery Plan](ImplementationPlan.md)
 

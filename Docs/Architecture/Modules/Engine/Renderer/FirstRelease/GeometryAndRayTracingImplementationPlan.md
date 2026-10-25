@@ -2,216 +2,139 @@
 
 [Docs](../../../../../README.md) / [Up](README.md) / [Design](../RendererDesign.md)
 
-Stages: [GR-0](#gr-0--freeze-geometry-material-and-traversal-semantics) / [GR-1](#gr-1--mesh-and-texture-residency) / [GR-2](#gr-2--visibility-draw-preparation-and-raster-gbuffer) / [GR-3](#gr-3--renderer-tlas-policy-and-publication) / [GR-4](#gr-4--ray-traced-gbuffer) / [GR-5](#gr-5--deferred-gbuffer-decals) / [GR-6](#gr-6--geometry-ray-and-decal-candidate-closure).
+Make admitted raster and ray paths consume the same resident geometry, material and instance identities, then integrate the bounded required decal feature.
 
-Make raster and ray rendering consume the same correct geometry and materials, then add the required decals.
-
-**Status:** implementation plan; not visual, native-validation, performance, or release evidence
-
-**Current readiness:** section projection **38/100**; substantial raster/residency source and partial ray routes, while deferred decals are absent; all six families are `Blocked`
+**Status:** remaining release integration and proof; stage names do not imply missing implementation or passed evidence.
 
 ## Work This Plan
 
-| What to do | Working route |
-| --- | --- |
-| First action | [GR-0 semantic review](#gr-0--freeze-geometry-material-and-traversal-semantics): freeze geometry, material and traversal correspondence before repairing residency or GBuffer production. |
-| Result to reach | Shared comparison inputs and exact contracts for raster, inline rays and native ray pipelines; later phases close residency, traversal and decals. |
-| Start / stop | Use the selected release phase and its prerequisites. Raster output alone cannot establish ray correctness; missing material/identity decisions stop implementation. |
+Enter the stage owning the earliest wrong geometry/material product. GR-0 resolves a missing shared decision; valid residency, raster, TLAS and ray implementations are reused. The required decal feature delegates implementation to its leaf plan rather than prescribing another composition algorithm here.
 
-## Plan At A Glance
+Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).
 
-```mermaid
-flowchart LR
-    G0[GR-0<br/>semantic matrix] --> G1[GR-1<br/>residency]
-    G1 --> G2[GR-2<br/>visibility and raster]
-    G2 --> G3[GR-3<br/>TLAS]
-    G3 --> G4[GR-4<br/>ray GBuffer]
-    G4 --> G5[GR-5<br/>deferred decals]
-    G5 --> G6[GR-6<br/>closure]
-```
+## Dependencies
 
-| Phase | Primary family | Product result |
-| --- | --- | --- |
-| `GR-0` | all six | one geometry/material/identity and oracle matrix |
-| `GR-1` | `FCR-REN-17` | bounded generation-safe mesh/texture residency |
-| `GR-2` | `FCR-REN-21`, `FCR-REN-04` | deterministic visible raster GBuffer |
-| `GR-3` | `FCR-REN-12` | correct classic/refit/partitioned TLAS policy and identity |
-| `GR-4` | `FCR-REN-05` | shared-semantic inline/RGS ray GBuffer |
-| `GR-5` | `FCR-REN-23` | authored decals through raster and secondary-ray composition |
-| `GR-6` | all six | candidate-bound raster/ray/decal parity and failure closure |
-
-NVIDIA's [RTXDI integration guide](https://github.com/NVIDIA-RTX/RTXDI/blob/main/Doc/Integration.md) is useful because it makes host-owned scene/material/GBuffer responsibilities explicit; the [DirectX raytracing samples](https://github.com/microsoft/DirectX-Graphics-Samples/tree/master/Samples/Desktop/D3D12Raytracing) and [Khronos ray-tracing guide](https://docs.vulkan.org/guide/latest/extensions/ray_tracing.html) are native oracles. None defines Sparkle's scene/material semantics.
+Residency supplies valid resources to raster and ray paths. TLAS/SBT publication precedes ray consumers; raster and ray controls qualify their own results. GR-5 integrates those current consumers after local discovery, without a new geometry database, GPU-driven renderer, LOD/occlusion system or geometry-cache pipeline.
 
 ## `GR-0` — Freeze Geometry, Material, And Traversal Semantics
 
-**Goal:** establish one authored-to-GPU semantic contract and deterministic fixtures shared by raster, inline ray query, and native ray pipeline.
+**Start:** The selected geometry/material/traversal failure lacks a shared meaning or oracle.
 
-**Non-goals:** implementing missing features, adding LOD/occlusion/GPU-driven rendering, or treating raster output as an unquestioned ray oracle.
+**Work:** Resolve affected identity/generation, coordinate/tangent/UV/color/alpha/two-sided, skin/morph/motion or ray-hit/SBT cells in current owners. Choose deterministic inputs and independent/raw checks for admitted raster, inline and native-pipeline routes.
 
-**Required work:** map geometry/submesh/material/texture/instance identities and generations; coordinate/tangent/normal/UV/material channel/color-space/alpha/two-sided/skin/morph/motion semantics; visibility/group/sort rules; residency/TLAS/SBT lifetimes; requested/active traversal states; backend/content matrices; and all feature-local criteria/checks.
+**Cleanup:** Remove duplicate semantic definitions and obsolete traversal/material claims rather than create a general scene framework.
 
-**Failure modes:** raster and ray decode material differently; instance contribution aliases; alpha/two-sided policy is implicit; motion history uses different identity; unsupported route silently falls back; absent features enter release claims.
-
-**Phase exit criteria:** fixtures and analytic/reference oracles cover admitted static/skinned/morph, material, alpha, two-sided, transform, visibility, and traversal cells; every family contract is binary and current.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** The cell has one definition, lifetime, capability disposition and falsifying check; raster appearance alone is not its ray oracle.
 
 ```text
-Execute only GR-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-0--freeze-geometry-material-and-traversal-semantics.
-Goal: establish one authored-to-GPU semantic contract and deterministic fixtures shared by raster, inline ray query, and native ray pipeline. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only GR-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-0--freeze-geometry-material-and-traversal-semantics. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Resolve affected identity/generation, coordinate/tangent/UV/color/alpha/two-sided, skin/morph/motion or ray-hit/SBT cells in current owners.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `GR-1` — Mesh And Texture Residency
 
-**Goal:** close `FCR-REN-17` with bounded CPU work, upload, activation, replacement, cancellation, and completion-safe eviction.
+**Start:** Required content exists; activation/upload/replacement/retirement or residency proof is the missing edge.
 
-**Non-goals:** a general virtual-texturing system, speculative streaming tiers, or placeholder behavior that disguises required content failure.
+**Work:** Exercise immutable generations, decode/staging/upload tokens, transactional activation, cancellation, reload/eviction and all-queue retirement. Preserve owned exact/over-budget, 16-job and 256-backlog boundary checks and changed CPU/GPU memory high-water.
 
-**Required work:** preserve immutable asset generations; reconcile job/backlog limits, decode/staging/upload/token ownership, activation boundary, stale work, replacement, cancellation, all-queue completion, eviction, refusal/placeholder policy, and diagnostics; exercise exact/over-budget plus the documented 16-job and 256-backlog boundaries; measure CPU/GPU memory and streaming stability.
+**Cleanup:** Remove redundant residency-ready state, copied asset truth and replaced staging/activation records. Required missing content fails visibly; a placeholder cannot claim that content loaded.
 
-**Failure modes:** stale generation activates; cancellation leaks staging; upload token failure publishes; resource evicted while another queue uses it; backlog exceeds bound; placeholder changes silently; memory never returns after reload.
-
-**Phase exit criteria:** all residency criteria and negative checks pass at/below/above limits; activation is transactional; memory and queue high-water are bounded; reload/eviction leaves no stale binding.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-17 applicable limit, stale-work/failure/cancellation and memory/retirement checks pass; no speculative streaming or virtual-texturing tier is added.
 
 ```text
-Execute only GR-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-1--mesh-and-texture-residency.
-Goal: close FCR-REN-17 with bounded CPU work, upload, activation, replacement, cancellation, and completion-safe eviction. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only GR-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-1--mesh-and-texture-residency. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Exercise immutable generations, decode/staging/upload tokens, transactional activation, cancellation, reload/eviction and all-queue retirement.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-17; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `GR-2` — Visibility, Draw Preparation, And Raster GBuffer
 
-**Goal:** close `FCR-REN-21` and `FCR-REN-04` with deterministic visible work and a semantically correct PBR GBuffer.
+**Start:** Resident admitted inputs are valid and a visibility/draw/GBuffer cell needs proof or repair.
 
-**Non-goals:** occlusion culling, LOD, mesh shaders, indirect GPU-driven submission, stereo, or broad material-system redesign.
+**Work:** Check frustum/bounds/identity, deterministic opaque grouping/sorting/batching, retained transparent ordering, task failure/cancellation, depth/material/normal/motion channels, alpha/two-sided and deformation. Compare serial/parallel prepared work and native output; source transparency metadata does not itself prove a supported transparency renderer.
 
-**Required work:** close analytic frustum classification, invalid identity rejection, authored/fallback grouping, deterministic opaque sorting/batching, transparent single-item order, task cancellation/failure, and diagnostic reconciliation; then prove depth, normal/tangent, material channels, precision/spaces, skin/morph, alpha/two-sided, motion data, draw bounds, and map coverage.
+**Cleanup:** Delete duplicate prepared-draw/batching carriers, repeated material decode and invalid draw-producing fallbacks replaced by the repair.
 
-**Failure modes:** invalid bounds pass culling; transparent order batches incorrectly; task failure emits partial draw list; stale resident handle draws; normal/tangent space differs; alpha route writes inconsistent depth/material; motion missing after deformation.
-
-**Phase exit criteria:** analytic visibility cases, serial/parallel draw equivalence, batching correctness/benefit, controlled failures, deterministic GBuffer fixtures, and native validation pass for admitted content on both backends.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-21/FCR-REN-04 pass admitted visibility, draw and raw GBuffer cases on both APIs; no absent LOD/occlusion/mesh-shader capability is inferred.
 
 ```text
-Execute only GR-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-2--visibility-draw-preparation-and-raster-gbuffer.
-Goal: close FCR-REN-21 and FCR-REN-04 with deterministic visible work and a semantically correct PBR GBuffer. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only GR-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-2--visibility-draw-preparation-and-raster-gbuffer. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Check frustum/bounds/identity, deterministic opaque grouping/sorting/batching, retained transparent ordering, task failure/cancellation, depth/material/normal/motion channels, alpha/two-sided and deformation.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-21, FCR-REN-04; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `GR-3` — Renderer TLAS Policy And Publication
 
-**Goal:** close `FCR-REN-12` by converting current scene generations into the correct acceleration structure and operation plan consumed by every ray effect.
+**Start:** Scene/resource generations are valid; AS update, mapping, selection or lifetime is the failing edge.
 
-**Non-goals:** putting scene update policy in RHI, rebuilding unconditionally, or making partitioned TLAS the only route without capability and benefit evidence.
+**Work:** Repair current classic build/refit and instance/contribution identity, topology-change detection, scratch/result/operation bounds, queue completion, publication and retirement. Check move/delete/reload and required allocation failure. PTLAS keeps its separately experimental disposition; it cannot become the release baseline.
 
-**Required work:** reconcile classic build/refit/update and partitioned choices, capability and requested/active truth, geometry/instance/contribution identity, static/dynamic/topology-change policy, transform/move/delete/reload, operation-buffer bounds, scratch/result ownership, queue synchronization, publication, and retirement; measure build/update/traversal/memory frontiers.
+**Cleanup:** Remove duplicate AS plans, contribution mappings and stale update/publication records; scene policy remains Renderer-owned and native execution RHI-owned.
 
-**Failure modes:** refit after topology change; deleted instance persists; contribution maps wrong hit group; operation buffer overflows; new TLAS publishes before completion; old TLAS retires early; unsupported partitioned path lies about active state.
-
-**Phase exit criteria:** selection, identity, update policy, bounds, failure, synchronization, native validation, and cost criteria pass across both backends and admitted TLAS routes.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-12 admitted classic/refit cells pass native lifetime and cost checks; experimental PTLAS has a separate result, not an all-hardware promise.
 
 ```text
-Execute only GR-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-3--renderer-tlas-policy-and-publication.
-Goal: close FCR-REN-12 by converting current scene generations into the correct acceleration structure and operation plan consumed by every ray effect. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only GR-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-3--renderer-tlas-policy-and-publication. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Repair current classic build/refit and instance/contribution identity, topology-change detection, scratch/result/operation bounds, queue completion, publication and retirement.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-12; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `GR-4` — Ray-Traced GBuffer
 
-**Goal:** close `FCR-REN-05` with automatic/inline/native-pipeline traversal adapters producing one shared semantic GBuffer result.
+**Start:** Valid TLAS/SBT/material inputs and current shader/native contracts are available.
 
-**Non-goals:** duplicated effect shaders, route-specific materials, or accepting visual similarity without hit/material identity checks.
+**Work:** Prove hit/miss/instance/primitive/material and GBuffer correspondence for admitted automatic/inline/native routes, with alpha/two-sided, skin/morph and motion cases. Use the shader acceptance owner's frozen [GBuffer comparison](../../../../CrossModule/ShaderSystem/Acceptance.md#same-frame-gbuffer-comparison) and native lifetime checks.
 
-**Required work:** reconcile route selection, capability/fallback truth, common inputs/outputs, miss/hit/instance/primitive/material/SBT mapping, alpha/two-sided/skinned/morph behavior, motion/history inputs, barriers and failure; use identical deterministic rays/fixtures and compare intermediate identities plus final channels; measure quality/time/memory crossover.
+**Cleanup:** Delete route-specific material/hit decoding, duplicate effect implementations and obsolete bindings replaced by the fix; keep one selected producer per frame.
 
-**Failure modes:** automatic selects unavailable route; inline/RGS miss differs; SBT contribution selects wrong material; alpha/two-sided behavior diverges; provider failure leaves stale output; one route lacks motion; backend compiler/validation failure hidden.
-
-**Phase exit criteria:** shared semantic criteria and controlled failures pass for every admitted route/backend/content cell; route state is observable; differences are within owned numerical tolerances and cost evidence supports defaults.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-05 meets owned raw tolerances, selection/rejection and native/cost matrices. No dual-output production mode or second material authority.
 
 ```text
-Execute only GR-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-4--ray-traced-gbuffer.
-Goal: close FCR-REN-05 with automatic/inline/native-pipeline traversal adapters producing one shared semantic GBuffer result. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only GR-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-4--ray-traced-gbuffer. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Prove hit/miss/instance/primitive/material and GBuffer correspondence for admitted automatic/inline/native routes, with alpha/two-sided, skin/morph and motion cases.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-05; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `GR-5` — Deferred GBuffer Decals
 
-**Goal:** close `FCR-REN-23` by implementing the authored decal path, bounded scene/GPU representation, deterministic post-GBuffer composition, and equivalent secondary-ray material resolution defined by the [deferred-decals contract](../Features/DeferredDecals/Acceptance.md).
+**Start:** Local decal semantics/discovery and current raster/ray material consumers are qualified.
 
-**Non-goals:** forward decals, arbitrary material graphs, mesh decals, lighting-buffer decals, order-independent blending, or using screen-space composition as false proof of ray-hit behavior.
+**Work:** Execute the next [decal stage](../Features/DeferredDecals/ImplementationPlan.md) and [AC-DECAL-01 through 08](../Features/DeferredDecals/Acceptance.md). The leaf owns projection, tile/lookup strategy and composition; this parent adds no inside/outside volume rasterization or second blend path. Preserve authored/cooked identity, zero-decal behavior, order/channels, raw/temporal and secondary-ray proof.
 
-**Required work:** execute the staged [Deferred GBuffer Decals plan](../Features/DeferredDecals/ImplementationPlan.md); establish asset/cook/runtime identity, transform and bounds, scene publication, visibility/sorting/layering, bindless material resources, inside/outside volume rasterization, channel masks and blend semantics, normal-space handling, frame-graph placement before all GBuffer consumers, and a shared decal-material query for admitted secondary rays. Preserve explicit requested/active/unsupported state and define capacity, replacement, retirement, and failure behavior.
+**Cleanup:** Recheck CVarRendererMaterialBindingMode, SupportedMaterialBindingModeMask and its query: the 2026-10-24 source search found registration/declaration and initialization but no runtime reader/caller in Engine/Tools/Projects/CMake. If unchanged, remove the ineffective selector/mode/mask with help/inventory/build consumers; preserve the real fixed-capacity texture table and descriptor checks.
 
-**Failure modes:** authored decal never reaches cooked/runtime state; stale generation remains visible; volume culling or inside/outside winding drops valid pixels; overlapping order differs across runs/backends; unmasked channels change; normals use the wrong space; a downstream consumer reads pre-decal GBuffer; raster and secondary-ray material results diverge; overflow or missing resources silently omit decals.
-
-**Phase exit criteria:** `AC-DECAL-01` through `AC-DECAL-08` and their failure/check matrix pass for deterministic overlap, channel-mask, normal, edge, motion, lifetime, overflow, secondary-ray, backend, performance, and package cases; `FCR-REN-23` records candidate-bound evidence and limitations.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-23 passes admitted authoring/material/overlap/overflow/lifecycle/backend/package/cost checks; replaced PBR/composition data and temporary producers are gone. Static projected decals do not admit dynamic/mesh/transparent decal systems.
 
 ```text
-Execute only GR-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-5--deferred-gbuffer-decals.
-Goal: close FCR-REN-23 by implementing the authored decal path, bounded scene/GPU representation, deterministic post-GBuffer composition, and equivalent secondary-ray material resolution defined by the deferred-decals contract (../Features/DeferredDecals/Acceptance.md). Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only GR-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-5--deferred-gbuffer-decals. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Execute the next [decal stage](../Features/DeferredDecals/ImplementationPlan.md) and [AC-DECAL-01 through 08](../Features/DeferredDecals/Acceptance.md).
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-23; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `GR-6` — Geometry, Ray, And Decal Candidate Closure
 
-**Goal:** prove that residency, visibility, raster, TLAS, ray GBuffer, and deferred decals agree for one candidate and release content set.
+**Start:** Admitted geometry, residency, traversal and decal results use compatible candidate inputs.
 
-**Non-goals:** using the release maps to skip analytic fixtures or claiming absent LOD/occlusion.
+**Work:** Join the six reports and fill only missing raster/ray/material, reload/soak, lifetime or package checks on the release maps. Keep raw identity/channel comparisons distinct from post-processed images.
 
-**Failure modes:** route uses different cooked generation; residency report predates GBuffer fix; raster/ray comparison is post-tonemapped; one route/backend unavailable; memory evidence omits reload/soak.
+**Cleanup:** Verify previous deletions and stale source/shader/registration/build references; retire completed instructions after preserving proof.
 
-**Phase exit criteria:** all six FCR reports have exact criteria/failure/check matrices, raw comparison artifacts, native diagnostics, performance/memory records, limitations, and candidate-bound decisions.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-04/05/12/17/21/23 have exact candidate decisions and required negatives. Unavailable Included cells stay blocked; unselected capability creates no implementation task.
 
 ```text
-Execute only GR-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-6--geometry-ray-and-decal-candidate-closure.
-Goal: prove that residency, visibility, raster, TLAS, ray GBuffer, and deferred decals agree for one candidate and release content set. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only GR-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md#gr-6--geometry-ray-and-decal-candidate-closure. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Join the six reports and fill only missing raster/ray/material, reload/soak, lifetime or package checks on the release maps.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-04; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## Reference And Ownership
 
-<details>
-<summary>Exact owners, source snapshots and related contracts</summary>
-
-**Families:** `FCR-REN-04`, `FCR-REN-05`, `FCR-REN-12`, `FCR-REN-17`, `FCR-REN-21`, `FCR-REN-23`
-
-**Responsibility:** sequence resident visible geometry through raster and ray GBuffer production with one identity and material contract
-
-**Parent:** [First Release Renderer Plans](README.md)
-
-**Architecture:** [Geometry And Resources](../Features/GeometryAndResources/GeometryAndResourcesDesign.md), [Renderer Ray Tracing](../Features/RayTracing/RayTracingDesign.md), and [RHI Ray Tracing](../../RHI/Features/PipelineAndExecution/PipelineAndExecutionDesign.md#ray-tracing)
-
-</details>
+[Geometry/resources](../Features/GeometryAndResources/GeometryAndResourcesDesign.md), [ray tracing](../Features/RayTracing/RayTracingDesign.md), [native RT](../../RHI/Features/PipelineAndExecution/PipelineAndExecutionDesign.md#ray-tracing) and [decals](../Features/DeferredDecals/DeferredDecalsDesign.md) own contracts. This plan owns the six release-family assignments only.

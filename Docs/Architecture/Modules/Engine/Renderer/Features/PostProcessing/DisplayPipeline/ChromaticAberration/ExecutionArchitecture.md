@@ -197,7 +197,7 @@ An intentional-fringe artifact is valid only when the active result digest match
 
 Validation and scheduling are transactional per frame. A bad request never overwrites a prior settings record invisibly; it produces the accepted `Rejected` or sanitized result. A missing program/pipeline/device generation produces `Unavailable` and omits only the effect. Recovery is a later request/frame generation after values or dependencies become valid.
 
-Reset/disable immediately publishes a neutral request whose older non-neutral prepared values cannot become eligible for later frames. Resize/minimize drops incoherent frames through existing admission rules. A graph failure is not recovered by reusing stale output; the frame follows the existing renderer failure boundary and the effect result remains truthful.
+Product Reset restores the approved On defaults and frozen values. An explicit neutral validation request publishes zero-work state whose older non-neutral prepared values cannot become eligible; that control requires no public effect toggle. Resize/minimize drops incoherent frames through existing admission rules. A graph failure is not recovered by reusing stale output; the frame follows the existing renderer failure boundary and the effect result remains truthful.
 
 ## Support And Exclusions
 

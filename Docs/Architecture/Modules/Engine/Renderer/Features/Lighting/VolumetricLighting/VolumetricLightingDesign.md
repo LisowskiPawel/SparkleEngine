@@ -16,11 +16,11 @@
 
 ## Outcome
 
-Sparkle needs one coherent participating-media system rather than separate cosmetic fog, light-shaft, and sky hacks. It must start from physically meaningful extinction/scattering/emission and the radiative transfer equation, deliver a practical froxel-based fog/atmosphere product, then evaluate reservoir-resampled heterogeneous/multiple-scattering paths where they materially improve quality.
+Volumetric lighting is unselected in the release and current advanced program. The contracts below preserve possible future media semantics; they do not establish a product need. If a future Roadmap decision admits a tier, keep one coherent participating-media owner, start from physically meaningful extinction/scattering/emission, and deliver only the selected tier. Fog does not automatically admit atmosphere, heterogeneous media, reservoir reuse or clouds.
 
 Volumetric ReSTIR is an advanced estimator track inside this feature—not the prerequisite for basic fog. The first usable slice is deterministic homogeneous/height fog plus single-scattered light and exact composition. A ReSTIR volume implementation begins only after a reference transport baseline, medium representation, transmittance estimator, and workload budget exist.
 
-The current roadmap excludes volumetric lighting from the first-release scope and blocks new feature production before the release gate. This package records the mandatory post-release target without changing that policy. See [Roadmap](../../../../../../../Strategy/Roadmap.md).
+The current roadmap excludes volumetric lighting from the selected delivery. This package is a conditional target; release closeout is necessary but insufficient admission. See [Roadmap scope protection](../../../../../../../Strategy/Roadmap.md#scope-protection).
 
 ## Start Here
 

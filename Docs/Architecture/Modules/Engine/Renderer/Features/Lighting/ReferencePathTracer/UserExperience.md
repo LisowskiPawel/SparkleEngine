@@ -2,9 +2,9 @@
 
 [Docs](../../../../../../../README.md) / [Up](ReferencePathTracerDesign.md) / [Implementation](ImplementationPlan.md)
 
-**Status:** Stage-0-frozen development-product experience accepted by `PTD-00-R1 PASS`; Stage-7 menu/progress/action and Stage-9 manual evidence/output source remain **IMPLEMENTED / VALIDATION DEFERRED**, while the current candidate is **BLOCKED FOR FIRST-USE SUCCESS** because Lit and Reference do not yet present usable scene lighting
+**Status:** experience contract retaining the accepted `PTD-00-R1` development baseline and the approved consumer release scope. Development menu/progress/manual-output source remains **IMPLEMENTED / VALIDATION DEFERRED**; Shipping host/output integration and usable first-use proof remain open.
 
-**Responsibility:** define how a developer, lighting engineer, or technical artist discovers, enters, navigates, observes, compares, resets, pauses, diagnoses, and secondarily exports the Reference Path Tracer
+**Responsibility:** define how a user, lighting engineer, or technical artist discovers, enters, navigates, observes, compares, resets, pauses, diagnoses, and secondarily exports the Reference Path Tracer
 
 **Authority boundary:** the [feature dossier](ReferencePathTracerDesign.md) owns binary acceptance and failure verdicts, [Transport And Estimator](TransportAndEstimator.md) owns mathematical meaning, [Execution Architecture](ExecutionArchitecture.md) owns per-view session/state/data ownership, [Discovery](Discovery.md) owns ratification, and the [staged plan](ImplementationPlan.md) owns implementation order and prompts
 
@@ -49,7 +49,7 @@ These are Stage-0 design inputs, not claims about the current implementation. A 
 | Duration | Interactive sessions default to an `8 h` wall-time limit; reaching it enters `TimedOut` and never publishes completion. If retention is available, it preserves the prefix and `Extend And Resume` continues it; otherwise it releases the prefix after settlement, labels `No resumable prefix`, and both `Extend And Resume` and `Restart` revalidate and begin ordinal zero. |
 | Disk | Preflight requires predicted staging plus final output plus `10%`, and refuses a single invocation predicted above `64 GiB`. No partial result is promoted on exhaustion. |
 | Evidence actions | `Pause` is memory-only. `Checkpoint And Pause`, `Save Current Prefix`, and `Save Complete` are P3 Expert actions initiated explicitly from the current viewport. An identity change cancels a pending capture intent; it never retargets it automatically. `Cancel After Checkpoint` means finish and verify the current checkpoint transaction, then stop; ordinary `Cancel` abandons staging. |
-| Shipping | `ShippingEditor` and `ShippingGame` compile out the Reference mode producer/control and every session factory, overlay, ApplicationEditor operation, writer, optional codec dependency, package entry, and public documentation route. RHI contains no Reference enumerator or mode field. Source presence elsewhere is not consumer reachability. |
+| Shipping | `ShippingEditor` and `ShippingGame` include the approved Reference mode, bounded session/progress/actions and explicit raw export. Startup remains Lit. Use the same Renderer semantics and a small host adapter over the shared private Application output operation; include only its reviewed codec/package dependencies. Developer console, generic debug panels and external capture tools stay excluded. RHI contains no Reference enumerator or mode field. Source presence is not consumer reachability proof. |
 
 The numerical bounds are implementation contracts immediately. A development machine either meets the capability/resource predicates and reports measured behavior or returns the frozen unavailable/capacity result; it does not invent different limits. Naming minimum/reference release machines and claiming those bounds as supported-product performance remains a Stage-10 release gate.
 
@@ -66,7 +66,7 @@ Four distinctions remain impossible to miss:
 - **complete current-view result versus partial prefix, checkpoint, export staging, failure, or accepted oracle evidence**;
 - **viewport comparison session versus a durable exported artifact**.
 
-The Renderer semantic is host-agnostic and supports both Editor `Scene` views and Game `Game` views. `RenderViewKind` identifies the ordinary camera producer; it never chooses a different path tracer. `RenderViewMode::ReferencePathTracer` selects the same frame composition, session semantics, and estimator for either kind. DevelopmentEditor exposes the mode through its viewport UI, while DebugGame/DevelopmentGame may submit the same value through their approved control. Shipping reachability remains a separate release-policy gate, not an architecture fork.
+The Renderer semantic is host-agnostic and supports both Editor `Scene` views and Game `Game` views. `RenderViewKind` identifies the ordinary camera producer; it never chooses a different path tracer. `RenderViewMode::ReferencePathTracer` selects the same frame composition, session semantics, and estimator for either kind. Development hosts retain their current route. The approved Shipping products expose that same mode through their existing viewport/menu owner, with progress/actions and manual raw output; no separate settings frontend, hidden CLI renderer or host-specific estimator is introduced. Build/package reachability still needs executable proof.
 
 ## Intended People And Jobs
 
@@ -307,9 +307,9 @@ The frozen dry-run matrix is keyboard-only selection/actions/focus order; non-co
 | --- | --- |
 | `DebugEditor`, `DevelopmentEditor` | View-mode selector, overlay/details, semantic Renderer API, manual ApplicationEditor artifact operation, raw writer, and support details included. |
 | `DebugGame`, `DevelopmentGame` | The same Renderer `ReferencePathTracer` mode and session are included and selectable through an approved ordinary viewport control; no Editor dependency or Game-specific estimator exists. |
-| `ShippingEditor`, `ShippingGame` | The Reference mode producer/control and every session factory, writer/operation, support promise, optional artifact dependency, package entry, and public documentation route are compiled out. RHI exposes no Reference value; no session can start. |
+| `ShippingEditor`, `ShippingGame` | Included mode/session, progress/pause/reset and explicit raw export using the same consumer contract. Lit remains default; no Editor dependency in Game, generic developer capture surface or support-service promise. RHI exposes no Reference value. |
 
-The current repository does not yet prove this matrix: the transitional global Reference composition CVar is removed and development-host source uses one ordinary request, but Renderer still links into shipping profiles and no package/Shipping exclusion proof has run. Source presence is not Shipping reachability evidence.
+The current repository does not yet prove this matrix: the transitional global Reference composition CVar is removed and development-host source uses one ordinary request, but the raw artifact operation is currently under private Application Editor ownership. Stage 7 must close the Shipping host controls and Stage 9 must share the necessary Application output mechanism with Game, deleting the replaced Editor-only path. Stage 10 qualifies the actual archive; source linkage alone is not consumer first-use or export proof.
 
 ## Stage-0 First-Use Dry Run
 
@@ -400,7 +400,7 @@ This correspondence originally guided Stages 6/7. The current source contains ac
 | Display changes contaminate raw output | The oracle becomes presentation-dependent. | One-way raw-to-preview transform and raw-first save/compare actions. |
 | A second viewport silently takes capacity | Work and memory disappear without an owner transition. | Explicit active-view capacity and transfer action. |
 | Export launches another renderer | View and saved output can disagree. | Typed readback from the same exact session/prefix. |
-| Shipping first run exposes the tool accidentally | Developer dependencies and unsupported workflow leak into the consumer product. | Explicit build/package/reachability gate; Renderer semantics do not imply product exposure. |
+| Reference starts without selection, the Included mode/raw export is absent, or unrelated developer tools ship | Default behavior, the consumer promise or dependency boundary is violated. | Exact-archive first-use, explicit selection/export and negative developer-surface checks; Renderer source linkage alone cannot pass. |
 
 ## UX Review And Acceptance Handoff
 

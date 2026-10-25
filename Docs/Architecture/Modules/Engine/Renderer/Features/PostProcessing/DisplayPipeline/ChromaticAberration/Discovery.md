@@ -19,7 +19,7 @@ Chromatic aberration is visually simple but semantically easy to fake. A feature
 | Area | Candidate | Decision still required |
 | --- | --- | --- |
 | product | one optional per-view radial channel-separation effect | confirm simple RGB model rather than spectral/multi-sample simulation |
-| controls | strength, normalized center, start offset | freeze ranges, defaults, units, live-edit and invalid-value behavior |
+| parameter/default policy | strength, normalized center, start offset | freeze finite ranges/units and approved On values; neutral is a test control, new public toggles are deferred |
 | geometry | output-resolution, aspect-aware radial displacement | freeze radius normalization, direction/sign, channel offsets, and resolution scaling |
 | order | after selected tone/gamut mapping; before encoding and UI | reconcile SDR and HDR target-linear domains plus debug/capture policy |
 | edge/alpha | bilinear clamp-to-edge; alpha preserved | freeze coordinate and texel-center rules and high-strength bound |
@@ -42,7 +42,7 @@ The table is a candidate boundary, not permission to implement it. `CHRD-00` rem
 
 ## Discovery Scope
 
-Included discovery surfaces are the one radial model; public/default/per-view state; active output extent/subrect geometry; SDR/HDR target-linear placement; channel sample positions; bilinear/texel/edge/alpha policy; neutral omission; graph/shader/capture/debug/UI joins; editor/automation workflow; D3D12/Vulkan mechanism; package reachability; performance/memory; failure/recovery; and negative classification of incidental fringing.
+Included discovery surfaces are the one radial model; public/default/per-view state; active output extent/subrect geometry; SDR/HDR target-linear placement; channel sample positions; bilinear/texel/edge/alpha policy; neutral omission; graph/shader/capture/debug/UI joins; existing settings/capture/validation workflow without new public lens toggles; D3D12/Vulkan mechanism; package reachability; performance/memory; failure/recovery; and negative classification of incidental fringing.
 
 Excluded from both discovery and first release are physical calibration, lens profiles, wavelength/spectral sensor integration, authored spectral LUTs, anamorphic models, per-channel curves, guard-band generation, local volumes/masks, history/temporal sampling, quality tiers, player-facing controls, and a generic lens-effects framework. Research may compare an excluded shape only to justify the selected boundary; comparison does not admit it.
 
@@ -66,7 +66,7 @@ The current gap permits one clean output-resolution insertion. It does not estab
 | `CHRD-04` | displacement units | freeze strength in pixels at a 1080-line reference, scaling rule, sign/direction, maximum displacement, and behavior at zero/minimized extent |
 | `CHRD-05` | channel model | freeze red/green/blue sample positions and weights; decide whether green remains at the source coordinate and whether channel order follows RGB storage rather than display primaries |
 | `CHRD-06` | filtering and edge | freeze bilinear texel-center convention, clamp-to-edge behavior, alpha copy, finite policy, and bounds proof |
-| `CHRD-07` | selection/state | freeze global default, per-view override, requested/resolved/active/unavailable state, persistence, live edit, and capture fields |
+| `CHRD-07` | selection/state | freeze approved On default, view-isolated actual state, existing selected persistence/reset and capture fields; do not require new public lens controls |
 | `CHRD-08` | debug/UI/capture | classify every debug mode, ensure UI is never distorted, and name raw pre/post/encoded products |
 | `CHRD-09` | cost and implementation shape | select compute/graphics placement, pass omission, resource reuse, GPU budget, memory ceiling, and whether later fusion may be considered |
 | `CHRD-10` | evidence | freeze analytic patterns, resolutions/aspects, temporal cases, backend/package matrix, tolerances, seeded defects, and escalation triggers |

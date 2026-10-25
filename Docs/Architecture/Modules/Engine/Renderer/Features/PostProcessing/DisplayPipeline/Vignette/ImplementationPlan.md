@@ -21,7 +21,7 @@ Add one basic vignette through the existing display and settings owners, with no
 | Card | Existing proposal | Exact decision / owner still required |
 | --- | --- | --- |
 | Pixel domain/formula | Dossier's aspect-correct linear-domain mask and neutral identity | TODO Renderer owner: formats, SDR/HDR stage/product and extent/subrect handling |
-| Controls/workflow | Intensity/inner radius and neutral defaults | TODO settings/Application owner: names, validation, persistence/reset and actual consumer UI |
+| Parameter/default policy | Required On effect; zero intensity is the neutral control | TODO Renderer/settings owner: exact approved nonzero values, validation and existing shared-default reset/persistence; no new public lens toggle or Game settings frontend |
 | Graph/lifetime | Existing typed feature pass and output-product route | TODO Renderer owner: pass inclusion, resource/alpha/raw/debug/UI bypass and one producer/consumer authority |
 | Numeric/cost checks | AC-VIG-01..06 and existing CHK mappings | TODO validation owner: independent formula inputs, tolerance, extent matrix, native order, observer/cost bounds and artifacts before candidate results |
 | Change budget | Existing owners, no new framework/history | TODO implementation owner: concrete source/build allowlist, hooks, deleted path/copy delta and smallest both-backend checks |
@@ -32,13 +32,13 @@ Add one basic vignette through the existing display and settings owners, with no
 
 **Prerequisite:** Inspect current display/settings/graph owners
 
-**Work and exit:** Resolve five cards and review exact formula/stage/bounds. Documentation-only; chromatic discovery remains independent.
+**Work and exit:** Resolve five cards and review exact formula/stage/bounds, current consumers and the existing mask/settings/intermediate paths to retain, narrow or delete. Freeze the smallest consumed state/hook/copy delta; land no inactive pass, public control, carrier or registration. Remove superseded decision instructions and disposable probes. Documentation-only; chromatic discovery remains independent.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 1 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-1---freeze. Inspect current display-product, settings/persistence/presenter and typed-graph owners. Resolve its five cards against the dossier, with numerical/cost rules frozen before results and one authority at each edge. Link AC-VIG/FM-VIG/CHK-VIG to real both-backend check cards. Keep the independent CHRD-00 contract and 49-family registry. Do not implement code/assets or claim acceptance. Handoff the reviewed local plan, file/hook/deletion/copy budget and exact unresolved owners.
+Execute only Stage 1 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-1---freeze. Inspect current display-product, settings/persistence/presenter and typed-graph owners. Resolve its five cards against the dossier, with numerical/cost rules frozen before results and one authority at each edge. Link AC-VIG/FM-VIG/CHK-VIG to real both-backend check cards. Keep the independent CHRD-00 contract and 49-family registry. Do not implement code/assets or claim acceptance. Handoff the reviewed local plan, file/hook/deletion/copy budget and exact unresolved owners. Apply the owning execution contract and its Stage Source-Style Gate.
 ```
 
 </details>
@@ -47,14 +47,14 @@ Execute only Stage 1 from Docs/Architecture/Modules/Engine/Renderer/Features/Pos
 
 **Prerequisite:** Accepted vignette freeze and contributing display/graph contracts
 
-**Work and exit:** Add only the typed pass/parameters and existing control/persistence/presenter membership. Disabled state schedules no work. Apply style/readability, narrow build and frozen formula/order/failure controls on both APIs.
+**Work and exit:** Land the typed pass/parameters and existing shared-default integration with the actual effect output. Reuse resolved View values and typed graph mechanisms; delete replaced mask/parameter/intermediate authority in this slice. Add no public lens toggle, Game settings frontend, lens manager, history or duplicate settings snapshot. Disabled state schedules no work. Apply style/readability, narrow build and frozen formula/order/failure controls on both APIs. Exit requires retained display behavior, stale-path checks and actual additions within the freeze budget; remove local oracle/probe code before handoff.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 2 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-2---one-effect-slice.
-After the reviewed vignette freeze, complete only the existing typed pass/parameters and approved settings integration. Preserve current defaults and deferred public toggles. Prove disabled-no-work, formula/order/failure and both-backend behavior. Reuse the dedicated pass; do not put this effect into tone mapping.
+Execute only Stage 2 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-2---one-effect-slice. Apply the owning execution contract and its Stage Source-Style Gate.
+After the reviewed vignette freeze, complete only the existing typed pass/parameters and approved settings integration. Preserve current defaults and deferred public toggles. Prove disabled-no-work, formula/order/failure and both-backend behavior. Reuse the dedicated pass; do not put this effect into tone mapping. Complete its deletion/retention and addition-budget exit now; add no lens framework or copied settings truth.
 Stop on unresolved prerequisites or unavailable required checks.
 ```
 
@@ -64,20 +64,20 @@ Stop on unresolved prerequisites or unavailable required checks.
 
 **Prerequisite:** Exact supported native candidate
 
-**Work and exit:** Close AC-VIG-01..06, including resize/views/raw/debug/UI, Shipping/per-user behavior and observer/cost evidence. Record vignette separately inside FCR-REN-25; remove probes and delivered instructions.
+**Work and exit:** Close AC-VIG-01..06 through existing tooling, including resize/views/raw/debug/UI, Shipping/per-user behavior and observer/cost evidence. Record vignette separately inside FCR-REN-25; verify Stage-2 deletion/addition results and remove probes and delivered instructions. No new runner, report generator or public fault API is admitted. A required production repair returns to its owner and creates a new candidate.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 3 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-3---delivery-proof.
+Execute only Stage 3 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-3---delivery-proof. Apply the owning execution contract and its Stage Source-Style Gate.
 Against the exact supported native candidate, run AC-VIG-01 through 06 for views/resize, raw/debug/UI bypass, Shipping/per-user state and observer/cost bounds. Record vignette separately inside FCR-REN-25. Remove temporary probes; retain exact commands, configuration, results and limitations.
 Stop on unresolved prerequisites or unavailable required checks.
 ```
 
 </details>
 
-Each future implementation exit follows [Change Lifecycle](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md), [Change Integration](../../../../../../../../Engineering/Workflow/ChangeIntegration.md) and [Code Style](../../../../../../../../Engineering/Foundations/CodeStyle.md), including formatting/logical spacing, the scoped responsibility review, frozen checks and `git diff --check`.
+Each future implementation exit follows [Change Lifecycle](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md), including its [stage complexity budget](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget), [Change Integration](../../../../../../../../Engineering/Workflow/ChangeIntegration.md) and [Stage Source-Style Gate](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate). Every copied prompt inherits its stage's work and cleanup exit. Required checks include formatting/logical spacing, scoped responsibility review, frozen checks and `git diff --check`; unjustified additions or postponed cleanup leave that stage open.
 
 ## First Permitted Prompt
 

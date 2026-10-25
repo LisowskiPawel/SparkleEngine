@@ -1,5 +1,6 @@
 #include "AssetCookerService.h"
 #include "Core/Public/Paths/PackagePaths.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include "AssetCookerTypes.h"
 #include "../Diagnostics/AssetCookerDiagnostics.h"
@@ -18,7 +19,7 @@ AssetCookerService::AssetCookerService(const char* repositoryRoot, const char* p
 {
 	if (HasText(repositoryRoot))
 	{
-		m_configuredRepositoryRoot = std::filesystem::path(repositoryRoot);
+		m_configuredRepositoryRoot = Strings::ToWide(std::string_view(repositoryRoot));
 	}
 	if (HasText(projectName))
 	{

@@ -154,7 +154,8 @@ namespace SparkleLauncher
 
 		connect(m_workflowPanel, &LauncherWorkflowPanel::OperationSelected, this, &LauncherMainWindow::SetSelectedOperation);
 		rootLayout->addWidget(m_workflowPanel, 1);
-		m_activityPanel = new LauncherActivityPanel(m_icons, [this](QWidget* widget) { RegisterFocusable(widget); }, centralWidget);
+		m_activityPanel = new LauncherActivityPanel(m_icons, [this](QWidget* widget) { RegisterFocusable(widget); }, [this](const QString& runId) { m_backend.CancelOperation(runId); }, centralWidget);
+
 		rootLayout->addWidget(m_activityPanel, 0);
 		rootLayout->addWidget(CreateFooterContextPanel(centralWidget), 0);
 		RefreshContextSelectors();

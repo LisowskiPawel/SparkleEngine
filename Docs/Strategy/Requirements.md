@@ -10,7 +10,7 @@
 
 **Scope:** principal-level real-time graphics, developer technology, GPU systems, rendering research productization, workload tooling, and neural graphics
 
-**Research refinement:** 2026-10-10; [role depth](Research/GraphicsEngineerProfiles.md#graphics-role-depth-and-evidence), [affiliation-checked public work](Research/GraphicsEngineerProfiles.md) and [pinned rendering examples](Research/RenderingReferenceExamples.md) strengthen the evidence targets below without upgrading any personal or feature result.
+**Research refinement:** 2026-10-25; [targeted principal-role refresh](Research/GraphicsEngineerProfiles.md#2026-10-25-principal-target-refresh), earlier [role depth](Research/GraphicsEngineerProfiles.md#graphics-role-depth-and-evidence) and [pinned examples](Research/RenderingReferenceExamples.md) strengthen evidence targets without upgrading personal or feature results. Public-engineer affiliations retain their original inspection date.
 
 ## Read This Page
 
@@ -35,7 +35,7 @@ SparkleEngine's priority order is:
 
 1. evidence for this persona;
 2. a focused research and learning platform that produces that evidence;
-3. a usable independent game engine, where product work reinforces rather than competes with the first two priorities.
+3. a compact rendering demonstration and reproduction host, including the useful Launcher presentation path; general engine breadth is outside the selected target.
 
 The product workload decision is fixed for this planning horizon:
 
@@ -139,6 +139,8 @@ The whole engine is not the portfolio. It is the evidence substrate. The public 
 
 Scene-specific assets, routes, `CASE-01` through `CASE-05`, and presentation gates belong to [I. Acceptance Workloads](../Acceptance/GraphicsWorkloads.md). This document owns only the reviewer/evidence meaning above.
 
+[Review And Transfer](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md) turns that meaning into the selected three-case package and binary review checks. M6 needs the technical package and first independent reproduction/review; M7 adds an observed expert challenge/direction record, second consumer context, teaching outcome and feedback-driven revision/retest. These local portfolio goals do not certify employment duration, degrees or an NVIDIA hiring level.
+
 ### Case-Study Structure
 
 Every public case uses the same order:
@@ -167,7 +169,7 @@ The target is rendering/developer technology with GPU-system depth. Senior roles
 
 | Existing requirements | Added review obligation | Reference and selected delivery |
 | --- | --- | --- |
-| `PGE-01/13/15` | Credit personal/team/external contributions; show one consequential decision changed by independent review/adopter feedback, plus ownership and maintenance/deletion rationale. | Public integration/teaching `NVR-17/20`; `PGD-01/08`. Later `PGD-09` adds a second distinct consumer context and one feedback-driven post-adoption revision. |
+| `PGE-01/13/15` | Credit personal/team/external contributions; show a consequential decision challenged by real expert review, a second actual consumer context, observed learning and a justified feedback-driven revision/retest, plus finite ownership/deletion rationale. | Public integration/teaching `NVR-17/20`; `PGD-01/08/09`, required M7 [review/transfer criteria](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md#binary-review-criteria). No upstream contribution is mandatory without a real issue. |
 | `PGE-02/08` | Derive the actual estimator, proposal/target PDF, reuse/shift and normalization assumptions; show a numerical/independent control and an invalid-history or invalid-sample counterexample. | `NVR-02/04/05/15/17`; `PGD-02/03`, existing Direct/Indirect/Reference owners. |
 | `PGE-05/06/10` | Identify a measured limiting mechanism; isolate one recording/binding, shader or memory hypothesis; retain whole-frame quality/cost and a rejected/inconclusive alternative. | `NVR-01/07/09/16/18/19`; `PGD-03/04`. Do not mandate an optimization before measuring its premise. |
 | `PGE-07/09` | Join source, compiler inputs/options, cooked bytecode, ABI and actual native execution; prove one bounded negative/failure case without another tracker or tool authority. | `NVR-01/06/13/18`; `PGD-04/05/07`. A cooker does not prove compiler-backend authorship. |
@@ -180,13 +182,15 @@ Every cited example has what/where/why, license route, existing local consumer a
 
 The [delivery catalog](FeatureDeliveryCatalog.md) supplies concrete examples and owning plans. These targets specify what the reviewer inspects; they do not award `E3/E4`, supersede workload thresholds or assert employment qualifications. Every metric has units, baseline, matrix and a decision rule frozen by its owner before results.
 
+Use the [PGE implementation lookup](../Architecture/CrossModule/FeatureDocumentation/StableIdentifierCoverage.md#principal-graphics-engineer-requirements) to reach each exact stage, contract and result owner. [Evidence folders](../Acceptance/GraphicsWorkloads.md#evidence-folders-and-delivery-owners) give original artifact homes. Shared cases advance several requirements without a new subsystem, folder or report per skill.
+
 | Requirement | Observable evidence target | Selected output |
 | --- | --- | --- |
-| `PGE-01` | At least one non-author reproduces a headline result; feedback, ownership and resulting change are recorded. Collaboration breadth is stated honestly. | `PGD-01/08/09` |
+| `PGE-01` | M6: at least one non-author reproduces a headline result. M7: a second actual consumer context and feedback-driven revision/retest. Record constraints, interventions and personal ownership; state collaboration breadth honestly. | `PGD-01/08/09` |
 | `PGE-02` | One complete rendering case with bounded transport/material domain, analytic/independent checks and representative scene evidence. | `PGD-02/03` |
 | `PGE-03` | One owned neural feature joins dataset, model, runtime and held-out quality/cost/failure evidence; vendor integration alone does not qualify. | `PGD-06..08` |
 | `PGE-04` | Every fixed operator and the full exported model match the reference within frozen tolerance on actual GPUs; optimization ablations preserve conformance. | `PGD-07` |
-| `PGE-05` | Three causal studies join CPU/GPU/presentation/memory and native artifacts; whole-frame effect and one rejected/inconclusive result are explained. | `PGD-03/05/08` |
+| `PGE-05` | Complementary CPU preparation, GPU shader and resource-lifetime studies join analytical predictions to native artifacts, quality and whole-frame effects; retain a rejected/inconclusive alternative. | `PGD-03/05/08` |
 | `PGE-06` | One difficult incident has a reproduction, earliest bad product, refuted hypothesis, bounded fix and defect-detecting regression/failure route. | `PGD-04` |
 | `PGE-07` | Reviewed production C++ ownership and one useful Python consumer show bounded input/failure/cleanup, reproducible output and appropriate narrow checks. | `PGD-01/05/06` |
 | `PGE-08` | A report derives the estimator/model/units and uncertainty/decision rule, explains reference equivalence and includes falsifying controls. | `PGD-02/03/06/08` |
@@ -196,7 +200,7 @@ The [delivery catalog](FeatureDeliveryCatalog.md) supplies concrete examples and
 | `PGE-12` | Training and runtime have separate profiles; model export, cold startup, precision/layout, inference tails and peak workspace are attributed. | `PGD-06..08` |
 | `PGE-13` | Three headline cases and a report/demo link actual code/native artifacts and reproduction; one useful tool or deleted negative result has a productization decision. | `PGD-02..08` |
 | `PGE-14` | Windows paired-API/toolchain evidence is reproducible. Linux is excluded from the selected delivery program. Written explanations are independently reviewed. | `PGD-01/03/08/09` |
-| `PGE-15` | Decisions show constraints, tradeoffs and removed complexity; independent review/adoption plus genuine teaching/mentoring records support influence. No count of features certifies principal level. | `PGD-01/08/09` |
+| `PGE-15` | Repeated delivered slices and removed complexity, a challenged direction/alternative/decision record, real transfer/learning and post-adoption revision support influence at M7. Employment-scale leadership, recommendations and tenure need truthful professional evidence; no feature count certifies principal level. | `PGD-01/08/09` |
 
 Gate progress is evidence-based, without calendar targets. Counts set portfolio coverage; they do not replace statistical sample counts, exact numeric tolerances or sustained professional-history proof.
 

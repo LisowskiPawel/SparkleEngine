@@ -30,38 +30,26 @@ IND-D0 + release admission
   -> IND-4 temporal/spatial reuse and mutation safety
   -> IND-5 admitted multi-bounce/glossy domain
   -> IND-6 reconstruction
-  -> IND-7 measured advanced optimization
   -> IND-8 candidate evidence and FCR-REN-07
+
+IND-6 -> IND-7 -> IND-8 only for a separately admitted optimization.
 ```
 
 The accepted Reference Path Tracer is required before scene-level reference claims in Stages 5/8, but analytic/metamorphic and external manifest-pinned references allow Stages 1–4 to progress independently.
 
 ## Planning Envelope
 
-<details>
-<summary>Expand planning envelope</summary>
-
-| Work | Estimate after discovery | Key uncertainty |
-| --- | ---: | --- |
-| Stage 0 | 5–10 engineering days | current technique accounting and oracle state |
-| Stages 1–2 | 12–22 days | path/material/light correctness and record cost |
-| Stages 3–4 | 18–35 days | shift/GRIS implementation, animation, correlation |
-| Stage 5 | 10–25 days | glossy/domain complexity and ray budget |
-| Stage 6 | 8–18 days | portable reconstruction quality |
-| Stage 7 | 0–25 days per admitted optimization | value of enhanced reuse/guiding/cache |
-| Stage 8 | 8–18 days | accepted reference, backend/hardware/workload availability |
-
-Ranges are hypotheses until Stage 0 measures the route. Each stage remains a coherent change; split work when its production hook/deletion ledger or claim needs independent review.
-
-</details>
+Resolve only the admitted technique accounting, path-record/shift/GRIS, glossy-domain and reconstruction decisions in IND-D0. Freeze path/history memory, ray/dispatch cost and quality/convergence thresholds before the corresponding slice. Guiding, caches and extra optimization tracks remain conditional; no effort estimate schedules them.
 
 ## Universal Execution Contract
+
+Each stage passes the [Stage Source-Style Gate](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
 Every stage:
 
 - rechecks revision/status/guidance and inspects exact producers, consumers, lifetime, shader/build/package membership, and concurrent edits;
 - follows Change Integration, Change Lifecycle, Renderer, Module Ownership, Data And Memory, and Validation And Evidence;
-- uses one private feature capsule, existing scene/material/light/sky/ray/frame-graph owners, typed bindings, and direct calls;
+- applies the [stage complexity budget](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) to one private feature capsule and existing scene/material/light/sky/ray/frame-graph owners; uses typed bindings/direct calls, narrows unnecessary existing representations and justifies every persistent addition;
 - creates no duplicate path tracer, scene representation, GI framework, compatibility schema, forwarding wrapper, or permanent diagnostics subsystem;
 - updates code, shaders, registrations/cooking, generated surfaces, checks, and affected docs together;
 - preserves unrelated dirty work, especially the existing user-owned Reference Path Tracer edit;
@@ -80,12 +68,12 @@ This matrix is normative for the stage. Stage 0 replaces responsibility names wi
 | Stage | Prerequisites | Required production delta and deletion | Explicit non-goals | Retained deliverables | Smallest stage falsifier |
 | --- | --- | --- | --- | --- | --- |
 | 0 | current revision/status/source trace; release/reference owners reachable; bounded probe route | discovery artifacts/probes only; no estimator behavior change; remove temporary probes | renaming seed replay, increasing bounces/candidates, implementing a cache | accepted decision/technique/domain registers, seed-replay equation trace, oracle/metric/profile table, exact hook/deletion map, revised estimates and review | any `IND-D0-*` choice, equation, threshold, owner, rights or first-slice file remains unresolved |
-| 1 | accepted `IND-D0-01/02/03/04/09/10/12/14`; admitted work and independent fixtures | add CPU/analytic/metamorphic reference plus bounded no-reuse one-bounce GPU estimator/raw lobes; correct only ledgered shared semantic defects | reservoir/path-record replacement, cross-pixel/frame reuse, reconstruction, broader depth | executable technique ledger, raw per-terminal/lobe artifacts, reference/independence manifest, ray/path/finite counters | NEE/emission/environment/depth toggles violate predictions or initial mean misses threshold |
+| 1 | accepted `IND-D0-01/02/03/04/09/10/12/14`; admitted work and independent fixtures | qualify CPU/analytic/metamorphic cases and bounded no-reuse GPU output at the current initial-sampling/raw-lobe boundary or through a disposable probe; correct only ledgered shared semantic defects | separate integrator/resolve/registration/toggle, reservoir/path-record replacement, cross-pixel/frame reuse, reconstruction, broader depth | executable technique ledger, raw per-terminal/lobe artifacts, reference/independence manifest, ray/path/finite counters | NEE/emission/environment/depth controls violate predictions, initial mean misses threshold, or proof leaves a second production estimator |
 | 2 | Stage 1 pass; frozen logical path record/packing/identity and seed-replay deletion list | establish private feature owner and explicit path/initial-reservoir state; update bindings/shaders/captures/build together; delete float seed payload and replay readers/writers | shifts, temporal/spatial reuse, record compaction beyond proof, compatibility schema | logical/packed record spec, max/round-trip/long-run tests, fresh-only equivalence and stale-symbol/deletion audit | any required probability/generation fact is absent, integer identity loses precision, or old path survives |
-| 3 | Stage 2 pass; exact admitted shift domains/inverses/support/Jacobians/GRIS weights and static fixtures | implement mapping and reservoir owners plus deterministic same-frame/CPU paths; no persistent history publication | temporal reuse, broader lobes/depth, reconstruction, guiding/cache | hand round trips, rejection taxonomy, enumerated/statistical distributions, destination mean comparison, finite/extreme tests | mapping cannot be derived in one measure, rejected sample adds mass, or statistics exclude reference |
-| 4 | Stage 3 pass; frozen reprojection/splat, ordering/neighbors/correlation and mutation policies | add per-View previous/current path/receiver state, temporal/spatial proposals, confidence, transactional publication/retirement | reconstruction, path-depth/lobe expansion, pass fusion/advanced splatting | mutation/dual-view/cancel/long-run artifacts, duplication/autocorrelation/diversity/error curves, replacement memory | stale/cross-view path publishes, current scene mutation maps without proof, or reuse exceeds error/correlation bounds |
-| 5 | Stage 4 pass; next path depth/lobe/terminal class separately admitted; accepted RPT/external reference | extend technique ledger, logical/packed record, initial generator, mapping/GRIS and resolve together for one increment | multiple increments, unapproved delta/transmission/caustics, reconstruction tuning | roughness-depth-terminal matrix, raw reference/convergence, ray/path/state budgets, explicit exclusions/status | new domain lacks alternate-technique/MIS/mapping support or regresses previously accepted cells |
-| 6 | included Stage 5 domain passes; portable reconstruction and optional-provider contract accepted | add portable lobe reconstruction through existing provider owner, guides/confidence/history/status and optional RR adapter | filter feedback into estimator, using denoising to admit unsupported transport, sole vendor path | raw/reconstructed motion/disocclusion/glossy/emissive/sky sequences, guide/fault manifests, lag/detail/time/memory, UX route | raw failure is hidden, guides/history mismatch, or mandatory portable profile cannot recover safely |
+| 3 | Stage 2 pass; exact admitted shift domains/inverses/support/Jacobians/GRIS weights and static fixtures | implement only admitted mapping/reservoir functions, deleting superseded mapping/weight formulas; check deterministic same-frame GPU output against a local independent CPU oracle; no CPU runtime transport or persistent history publication | temporal reuse, broader lobes/depth, reconstruction, guiding/cache | hand round trips, rejection taxonomy, enumerated/statistical distributions, destination mean comparison, finite/extreme tests | mapping cannot be derived in one measure, rejected sample adds mass, duplicate semantic authority remains, or statistics exclude reference |
+| 4 | Stage 3 pass; frozen reprojection/splat, ordering/neighbors/correlation and mutation policies | add only consumed per-View previous/current path/receiver state, temporal/spatial proposals, confidence and transactional publication/retirement; delete replaced history validity and copied receiver/confidence truth | reconstruction, path-depth/lobe expansion, pass fusion/advanced splatting | mutation/dual-view/cancel/long-run artifacts, duplication/autocorrelation/diversity/error curves, replacement memory | stale/cross-view path publishes, redundant history authority remains, current scene mutation maps without proof, or reuse exceeds error/correlation bounds |
+| 5 | Stage 4 pass; next path depth/lobe/terminal class separately admitted; accepted RPT/external reference | extend technique ledger, logical/packed record, initial generator, mapping/GRIS and resolve together for one increment; replace narrower special cases and delete rejected domain/packing variants | multiple increments, unapproved delta/transmission/caustics, reconstruction tuning | roughness-depth-terminal matrix, raw reference/convergence, ray/path/state budgets, explicit exclusions/status | new domain lacks alternate-technique/MIS/mapping support, adds unconsumed record fields, or regresses previously accepted cells |
+| 6 | included Stage 5 domain passes; portable reconstruction and optional-provider contract accepted | add portable lobe reconstruction through existing provider owner, consumed guides/confidence/history/status and optional RR adapter; delete replaced filter experiments and duplicate guide/history state | filter feedback into estimator, using denoising to admit unsupported transport, sole vendor path | raw/reconstructed motion/disocclusion/glossy/emissive/sky sequences, guide/fault manifests, lag/detail/time/memory, UX route | raw failure is hidden, duplicate or stale guides/history remain, or mandatory portable profile cannot recover safely |
 | 7 | Stage 6 pass; one named failing workload and one optimization admission with frozen A/B | integrate only selected enhanced reuse/splatting/guiding/cache mechanism; update semantics/history/hooks/tests; remove entirely on failure | another GI architecture, bundled optimizations, permanent experiment switch | reproduced baseline failure, equal-time A/B, correlation/lag/time/memory/backend regressions, provenance/hook/removal record | no measured benefit, semantic core changes, duplicate scene/GI state, or any required regression fails |
 | 8 | all included stages pass; exact candidate/hardware/content/reference/provider matrix; `FCR-REN-07` owner ready | evidence and stale-state closure only; production fix requires new candidate/re-admission; remove final prototype names/docs | redesign/tuning during evidence, borrowed proof across domains/backends, unrelated repair | full FCR bundle, path/domain/status UX, backend/native validation, workload/raw/reference, convergence/time/memory/package/enclosure results | any included AC/FM/CHK or exclusion lacks candidate-bound disposition, or seed-replay residue remains |
 
@@ -93,7 +81,7 @@ This matrix is normative for the stage. Stage 0 replaces responsibility names wi
 
 ## Required Stage Handoff
 
-Every stage reports start/end revision and dirty boundary; accepted prerequisites; changed/deleted files by responsibility including build/generated/package; external hook and bounded-removal ledgers; semantic/technique mapping; exact commands/configurations/artifacts/results; cleanup; all unrun checks; remaining domain/quality/backend limits; and a binary next-stage authorization. Raw estimator, mapping, reservoir and reconstruction verdicts remain separate.
+Every stage reports start/end revision and dirty boundary; accepted prerequisites; changed/deleted files by responsibility including build/generated/package; external hook and bounded-removal ledgers; semantic/technique mapping; exact commands/configurations/artifacts/results; cleanup; all unrun checks; remaining domain/quality/backend limits; and a binary next-stage authorization. Compare actual state/API/hooks/copies/variants/dependencies with the frozen stage budget; unjustified additions or deferred replacement cleanup block that stage, even when images pass. Include a positive check of retained selected behavior. Raw estimator, mapping, reservoir and reconstruction verdicts remain separate.
 
 ## Copy-Ready Prompt Contract
 
@@ -111,7 +99,7 @@ Freeze product/path domain and prove what the current seed-replay route does bef
 
 ### Work
 
-1. Execute `IND-X-01` through `IND-X-07` with exact candidate identity.
+1. Reuse valid IND-X proof and run only experiments consumed by the admitted transport/reuse slice, with exact candidate identity. Explicitly defer unselected guiding/cache/advanced-reuse families rather than prototype them for gate completeness.
 2. Trace current per-bounce NEE/emission/environment accounting and seed replay from equations to shader output.
 3. Freeze oracles, path/technique domain, initial proposal, record, shift, GRIS weight, correlation/bias mode, histories, reconstruction, budgets, profiles, hooks/deletions, and FCR fields.
 4. Reconcile release admission and Reference Path Tracer dependency.
@@ -121,7 +109,7 @@ Freeze product/path domain and prove what the current seed-replay route does bef
 
 - all `IND-D0-01` through `14` decisions have explicit reviewed dispositions;
 - current seed replay is either formally proved for a narrow domain or named for deletion; absence of proof cannot preserve it;
-- Stage 1 has frozen tests, thresholds, files/hooks, owner, and revised estimate.
+- Stage 1 has frozen tests, thresholds, files/hooks, owner and resource/check bounds.
 
 ### Ready-To-Use Prompt
 
@@ -129,8 +117,8 @@ Freeze product/path domain and prove what the current seed-replay route does bef
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-0--close-ind-d0 and apply this plan's shared execution contract.
-Execute Indirect Lighting Stage 0 from `IndirectLighting/ImplementationPlan.md`. Treat this as discovery, not an estimator rewrite. Decode and trace the current seed-replay paths, targets, weights, technique accounting, history, and raw outputs; run `IND-X-01` through `IND-X-07`; freeze every `IND-D0-*` decision and threshold before candidate observation; name the exact replacement/deletion ledger; reconcile release and Reference Path Tracer gates; and obtain independent review. Report unknowns and unrun checks explicitly.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-0--close-ind-d0 and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
+Execute Indirect Lighting Stage 0 from `IndirectLighting/ImplementationPlan.md`. Treat this as discovery, not an estimator rewrite. Decode and trace the current seed-replay paths, targets, weights, technique accounting, history, and raw outputs; run only the IND-X experiments needed by the admitted slice and defer unselected optimizations; freeze each consumed `IND-D0-*` decision and threshold before candidate observation; name the exact replacement/deletion ledger; reconcile release and Reference Path Tracer gates; and obtain independent review. Report unknowns and unrun checks explicitly.
 ```
 
 </details>
@@ -144,7 +132,7 @@ Build independent one-bounce truth before reservoirs.
 ### Work
 
 1. Add CPU/analytic/metamorphic tests for furnace/energy, diffuse and rough-glossy secondary surfaces, isolated NEE, emissive hit, environment miss, occluder insertion, light/environment scaling, path-depth and roulette boundaries.
-2. Add a bounded no-reuse GPU initial estimator using frozen BSDF/light proposals and raw lobe outputs.
+2. Exercise bounded no-reuse GPU initial sampling using frozen BSDF/light proposals at the current raw-lobe boundary or through a disposable probe. Keep necessary semantic repairs in the existing initial generator for Stage 2 to consume; do not add a standalone estimator, runtime mode or registration for this oracle.
 3. Record selection/conditional PDFs, throughput, lobe, terminal technique, MIS, path depth, and finite counters through existing test/capture routes.
 4. Compare to independent external or accepted reference artifacts with shared-code analysis where available.
 5. Correct shared transport semantic defects only within the accepted Stage-1 hook ledger.
@@ -153,7 +141,8 @@ Build independent one-bounce truth before reservoirs.
 
 - `AC-IND-01/02/07` foundations and `CHK-IND-01` pass;
 - adding/removing NEE, emitter, environment, or path depth changes energy exactly as predicted;
-- no reservoir reuse or reconstruction contributes to the result.
+- no reservoir reuse or reconstruction contributes to the result;
+- any production repair has its real Stage-2 consumer and retained-result check; local oracle/probe code is removed and no parallel estimator remains.
 
 ### Ready-To-Use Prompt
 
@@ -161,8 +150,8 @@ Build independent one-bounce truth before reservoirs.
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-1--prove-initial-transport-and-technique-accounting and apply this plan's shared execution contract.
-Implement Indirect Lighting Stage 1 only. Establish the accepted CPU/analytic/metamorphic cases and a bounded GPU one-bounce initial estimator with explicit BSDF, NEE, emissive/environment, MIS, lobe, throughput, depth, and roulette accounting. Produce raw `IndirectDiffuse`/`IndirectSpecular` artifacts without reservoir reuse or reconstruction. Fix only proved semantic defects in the frozen hook ledger. Do not introduce the new reservoir yet or increase path scope.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-1--prove-initial-transport-and-technique-accounting and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
+Implement Indirect Lighting Stage 1 only. Establish accepted local CPU/analytic/metamorphic cases and qualify bounded GPU one-bounce initial sampling through the current raw-lobe boundary or a disposable probe, with explicit BSDF, NEE, emissive/environment, MIS, lobe, throughput, depth, and roulette accounting. Produce raw `IndirectDiffuse`/`IndirectSpecular` artifacts without reservoir reuse or reconstruction. Fix only proved semantic defects in the existing initial generator and frozen hook ledger; remove local oracle/probe additions before handoff. Add no standalone estimator, permanent mode or registration. Do not introduce the new reservoir yet or increase path scope.
 ```
 
 </details>
@@ -193,7 +182,7 @@ Replace the float-packed random identity with one auditable initial path sample 
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-2--introduce-the-explicit-path-record-and-delete-seed-replay and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-2--introduce-the-explicit-path-record-and-delete-seed-replay and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Indirect Lighting Stage 2. Create the accepted private feature owner and explicit path-sample/initial-reservoir record with integer logical identities and the exact factors needed by future shifts. Add packing and long-run round-trip tests. Feed the proved Stage-1 initial estimator through it, then delete the old float-packed seed identity and all seed-replay code in the same change. Keep temporal/spatial reuse disabled; no compatibility schema or legacy selector.
 ```
 
@@ -225,7 +214,7 @@ Prove reconnection/replay mapping and generalized reservoir math before temporal
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-3--implement-shift-mappings-and-gris-in-isolation and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-3--implement-shift-mappings-and-gris-in-isolation and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Indirect Lighting Stage 3 on the explicit Stage-2 path record. Add only the ratified reconnection and any required hybrid/replay mapping, including inverse, support, Jacobian, visibility, and deterministic rejection. Implement the exact GRIS target/contribution/resampling weight and bounded reservoir update. Validate in CPU/deterministic same-frame fixtures and statistical tests without temporal history. Stop if the pinned equation cannot be mapped unambiguously to code.
 ```
 
@@ -257,7 +246,7 @@ Publish generation-safe per-View reuse that handles motion, disocclusion, animat
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-4--add-temporal-and-spatial-product-reuse and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-4--add-temporal-and-spatial-product-reuse and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Indirect Lighting Stage 4 after static shift/GRIS proof. Add the accepted per-View temporal proposal, current-scene shift, spatial neighbors, disocclusion policy, confidence, full generation identity, transactional history publication, and retirement. Run the entire `CHK-IND-03/04` mutation and long-run matrix and measure diversity/correlation as well as raw error. Do not add reconstruction or expand path depth in this stage.
 ```
 
@@ -289,7 +278,7 @@ Deliver the exact path depth and rough-specular support promised by the product,
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-5--expand-to-the-admitted-multi-bounce-and-glossy-domain and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-5--expand-to-the-admitted-multi-bounce-and-glossy-domain and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement only the next Indirect Lighting Stage-5 path-depth/lobe increment admitted by `IND-D0`. Extend the path record, technique accounting, shift, and GRIS equations together; add hybrid replay only with inverse/support/PDF tests. Compare raw diffuse/specular against accepted independent reference artifacts over roughness, environment/emissive, occlusion, animation, and depth cells. Preserve explicit exclusions for delta, transmission, and caustics.
 ```
 
@@ -321,7 +310,7 @@ Make the proved raw indirect estimator product-usable under motion while retaini
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-6--deliver-portable-reconstruction and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-6--deliver-portable-reconstruction and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Indirect Lighting Stage 6 using the frozen portable reconstruction contract, then connect optional DLSS Ray Reconstruction through the existing provider boundary. Preserve raw lobe/path/reservoir evidence and separate histories. Exercise invalid guide/provider faults plus static, camera motion, disocclusion, environment/emissive change, glossy detail, and thin geometry. Report raw versus reconstructed error, lag, time, and memory.
 ```
 
@@ -331,7 +320,7 @@ Implement Indirect Lighting Stage 6 using the frozen portable reconstruction con
 
 ### Objective
 
-Admit at most one measured optimization that solves a documented failing workload without replacing the feature's semantic core.
+This stage is optional and initially Deferred. Proceed from the accepted Stage-6 result directly to Stage 8 unless a separately admitted failing workload justifies one optimization. A cache/guiding study is not required to finish the realtime release path.
 
 ### Candidate Increments
 
@@ -350,7 +339,7 @@ Run an A/B experiment against Stage 6 with frozen error/lag/time/memory metrics.
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-7--evaluate-advanced-reuse-guiding-or-caching and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-7--evaluate-advanced-reuse-guiding-or-caching and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Evaluate the single Indirect Lighting Stage-7 optimization named by the accepted admission record. First reproduce the failing workload and freeze A/B metrics/budgets. Implement the smallest integration into existing path/reservoir/history owners, update equations and failure tests, and report quality/correlation/lag/time/memory across all required regressions. Remove the experiment if it does not pass; do not bundle another GI system.
 ```
 
@@ -365,7 +354,7 @@ Publish evidence for the exact product claim and close or block `FCR-REN-07` hon
 ### Work
 
 1. Freeze candidate/build/shader/backend/device/driver/content/reference/settings identities and thresholds.
-2. Run analytic/Cornell controls, Sponza, Bistro interior/exterior, San Miguel held-out, static/motion/disocclusion/animation/environment/emissive/glossy/failure cells.
+2. For release closure, use analytic/Cornell controls and the approved release-map cells for admitted static/motion/disocclusion/animation/environment/emissive/glossy and failure behavior. Bistro/San Miguel and held-out studies join only after advanced-program admission.
 3. Exercise supported D3D12/Vulkan traversal/reconstruction profiles with native validation.
 4. Retain raw lobes/path/reservoir/confidence, reconstructed products, reference AOVs, convergence/error statistics, timing distributions, and peak/history memory.
 5. Validate requested/active/excluded/degraded UX, build/cook/package, generated surfaces, enclosure/hooks, stale paths, scoped diff, and `git diff --check`.
@@ -373,7 +362,7 @@ Publish evidence for the exact product claim and close or block `FCR-REN-07` hon
 
 ### Exit Gate
 
-- `AC-IND-01` through `AC-IND-13` have explicit evidence dispositions;
+- `AC-IND-01` through `AC-IND-13` have dispositions for the admitted candidate domain; unselected Stage-7 optimization families stay deferred;
 - required cells pass or the report remains blocked with exact dependencies;
 - the seed-replay prototype and stale documentation are absent.
 
@@ -383,8 +372,8 @@ Publish evidence for the exact product claim and close or block `FCR-REN-07` hon
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-8--backend-workload-adoption-and-fcr-closure and apply this plan's shared execution contract.
-Execute Indirect Lighting Stage 8 as candidate validation. Freeze exact candidate/configuration/reference identity and metrics before runs. Exercise analytic/Cornell, Sponza, Bistro, San Miguel, motion/disocclusion/animation/environment/emissive/glossy/failure and supported D3D12/Vulkan cells with native validation. Retain raw and reconstructed artifacts and separate estimator, convergence, temporal, visual, performance, memory, backend, and release verdicts. Update `FCR-REN-07` only from observed evidence.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-8--backend-workload-adoption-and-fcr-closure and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
+Execute Indirect Lighting Stage 8 as candidate validation. Freeze exact candidate/configuration/reference identity and metrics before runs. Exercise analytic/Cornell, selected release-map, admitted motion/disocclusion/animation/environment/emissive/glossy/failure and D3D12/Vulkan cells. Do not require later Bistro/San Miguel studies for first-release closure. Retain raw and reconstructed artifacts and separate estimator, convergence, temporal, visual, performance, memory, backend, and release verdicts. Update `FCR-REN-07` only from observed evidence.
 ```
 
 </details>

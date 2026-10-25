@@ -2,254 +2,139 @@
 
 [Docs](../../../README.md) / [Up](ImplementationPlan.md)
 
-Stages: [FWC-0](#fwc-0--reconcile-feature-contracts-and-boundaries) / [FWC-1](#fwc-1--core-and-windows-platform) / [FWC-2](#fwc-2--task-runtime-and-cancellation) / [FWC-3](#fwc-3--level-world-and-render-publication) / [FWC-4](#fwc-4--import-cook-and-engine-assets) / [FWC-5](#fwc-5--shader-route-and-shared-tool-output) / [FWC-6](#fwc-6--foundation-candidate-closure).
+Deliver only the foundation, world and content repairs needed to make the approved rendering and product journeys reproducible.
 
-**Status:** implementation stages; candidate results remain in Acceptance.
+**Status:** remaining release integration and proof; stage names do not imply missing implementation or passed evidence.
 
-**Design and checks:** [module contracts](../../Modules/ModuleInventory.md), [shader system](../ShaderSystem/ShaderSystemDesign.md). Open the owner named by the selected FWC stage.
+## Work This Plan
 
-Make paths, tasks, worlds, content and shaders dependable enough for the selected release.
+Choose the failing edge from the current product/frame journey. Use FWC-0 only if that edge lacks a current owner or decidable check; otherwise enter its owning stage directly. Existing cold/warm cook, process and product evidence is reused by candidate identity, rather than dismissed by an old "no evidence" snapshot.
 
-## Foundation Work
+Run the stage that owns the demonstrated missing contract, failing check or named bounded simplification from [Roadmap](../../../Strategy/Roadmap.md#portfolio-focus-and-existing-code-simplification). Keep supporting world/Core/tool code to the selected rendering and reproduction role; retain real Tasks, data/lifetime, animation and deterministic-content requirements. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](ImplementationPlan.md#phase-card-contract).
 
-| What to do | Working route |
-| --- | --- |
-| First action | [FWC-0 contract review](#fwc-0--reconcile-feature-contracts-and-boundaries): identify which producer/consumer promise lacks a decidable check before changing its code. |
-| Result to reach | Each of the 11 families has one owner, a supported matrix and exact failure/check routes; then repair only the selected dependency. |
-| Start / stop | Follow release admission and the local dependency chain. A proven blocker may be repaired through its own authorized route; do not start a broad foundation rewrite. |
+## Dependencies
+
+Content must be acquired and cooked before world activation; world publication must be valid before Renderer consumes it. Core/process and Tasks repairs are prerequisites only for consumers that demonstrate their failure. FWC-5 delegates shader proof to the existing shader plan; FWC-6 joins the resulting reports, rather than rerunning eleven implementations.
 
 ## `FWC-0` — Reconcile Feature Contracts And Boundaries
 
-**Goal:** make the 11 foundation families independently decidable and trace their real production edges before edits.
+**Start:** A selected journey exposes an ambiguous contract, unmatched selector or missing check.
 
-**Non-goals:** a new foundation framework, copying Renderer criteria into GameFramework, or inferring completeness from file presence.
+**Work:** Trace that input through its producer, publication, consumer and shutdown. Reuse the eleven-family owner map; resolve only the changed scope, path, import, worker or shader cells. Keep Linux, uncooked loading and unselected import semantics excluded.
 
-**Required work:**
+**Cleanup:** Remove superseded criteria or duplicate owner descriptions; do not create a dossier or control system for each inventory row.
 
-- trace every family from public producer through mutable owner, publication boundary, consumer, shutdown, and package membership;
-- add/refine feature-local `AC/FM/CHK` in the owning Architecture pages where the release promise is not already binary;
-- define supported path/Unicode/platform, task worker counts, level/content set, import formats, shader backends, CLI output, and package matrices;
-- name copy/lifetime budgets for world-to-render and cook publication, plus which derived outputs are disposable;
-- record absent/excluded behavior, especially native Linux, uncooked runtime loading, undeclared import extensions, and internal shader redesign not required by a failing criterion.
-
-**Failure modes to control:** broad module criterion cannot be tested; producer and consumer use different identity; derived cache becomes source truth; shutdown ownership is absent; Windows-only promise is hidden.
-
-**Phase exit criteria:** each family has an owner, end-to-end trace, matrix, binary criteria, controlled failures, mapped checks, current-state verdict, and stop decisions.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** The selected edge has one owner, scope, failure/AC/check mapping and next repair or evidence action; accepted decisions are not reopened.
 
 ```text
-Execute only FWC-0 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-0--reconcile-feature-contracts-and-boundaries.
-Goal: make the 11 foundation families independently decidable and trace their real production edges before edits. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FWC-0 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-0--reconcile-feature-contracts-and-boundaries. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Trace that input through its producer, publication, consumer and shutdown.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FWC-1` — Core And Windows Platform
 
-**Goal:** close `FCR-CORE-01` and `FCR-PLAT-01` for standard-user Windows x64 operation and safe platform failure.
+**Start:** An admitted Windows path, child process, configuration, window or input transition fails or lacks required final-candidate proof.
 
-**Non-goals:** native Linux implementation, broad utility rewrites, or platform policy leaking into higher modules.
+**Work:** Repair that current Core/Platform owner. Cover its affected Unicode/path bounds, immutable package/per-user paths, atomic last-good config, focus/capture/DPI, zero-size/resize and handle/error/shutdown cells. Reuse process quoting, cancellation and log-failure results while their inputs remain valid.
 
-**Required work:**
+**Cleanup:** Delete the path reconstruction, encoding conversion, duplicated process policy or forwarding error state the repair replaces; preserve caller-specific workflow policy.
 
-- reconcile path roots, filesystem operations, logging/diagnostics, configuration, strings/Unicode, errors, and package/per-user locations;
-- reconcile Win32 window/input/focus/capture, DPI/monitor changes, resize/minimize/restore, timing, handles, and shutdown;
-- use typed error identity at the lowest owner and keep bounded diagnostics useful to product support;
-- reject path escape, overlength/invalid input, read-only package mutation, unsupported environment, and invalid window/input transitions safely;
-- preserve the explicit native-Linux negative boundary and avoid portable-looking APIs that are not supported.
-
-**Failure modes to control:** current-directory dependence; user path truncation; config corruption destroys last good state; input remains captured after focus loss; zero-size resize reaches Renderer; handle leak; log growth is unbounded.
-
-**Phase exit criteria:** the defined path/Unicode/config/window/input/DPI/focus/resize/shutdown matrices pass; package stays immutable; native Linux remains truthfully unavailable; candidate reports carry exact environment/results.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** Affected CORE/PLAT criteria and negative controls pass for standard-user Windows; package bytes stay immutable and unavailable cells stay open in FCR-CORE-01/FCR-PLAT-01.
 
 ```text
-Execute only FWC-1 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-1--core-and-windows-platform.
-Goal: close FCR-CORE-01 and FCR-PLAT-01 for standard-user Windows x64 operation and safe platform failure. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FWC-1 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-1--core-and-windows-platform. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Repair that current Core/Platform owner.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-CORE-01, FCR-PLAT-01; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FWC-2` — Task Runtime And Cancellation
 
-**Goal:** close `FCR-TASK-01` with one deterministic-enough task contract across serial and `1/2/N` worker modes.
+**Start:** A selected loading, world, rendering or tool operation needs a scheduler repair or missing task-lifetime evidence.
 
-**Non-goals:** replacing domain schedulers with one generic graph, forcing parallelism where serial wins, or adding unmeasured lock-free machinery.
+**Work:** Use the one task runtime. Prove the affected DAG/result, exclusive writes, serial reference, queue/worker bounds, nested waits, failure, cancellation and shutdown. Use serial/1/2/N where the task contract requires it; a throughput claim additionally needs scheduling/crossover measurements.
 
-**Required work:**
+**Cleanup:** Remove duplicate task ownership, local executor/queue state or orphaned cancellation machinery exposed by this repair. Do not create a scheduler or generic workflow graph.
 
-- identify executor, scope/event, queue, nested work, waiting, cancellation, exception/failure, destruction, and shutdown owners;
-- define input/output identity, serial reference behavior, deterministic ordering requirements, exclusive writable ranges, and publication policy per consumer;
-- bound queues/workers, prevent oversubscription/deadlock, and make work-in-flight shutdown settle or fail explicitly;
-- preserve consumer-specific orchestration while reusing the shared execution mechanism;
-- measure scheduling overhead, queue pressure, throughput, latency, and serial crossover causally.
-
-**Failure modes to control:** nested wait deadlock; task escapes owner lifetime; canceled work publishes partially; exception disappears; queue grows unbounded; shutdown hangs; more workers regress without visibility.
-
-**Phase exit criteria:** all owned task criteria pass for serial/1/2/N and pressure/failure/shutdown matrices; consumer parity is demonstrated; performance conclusions include raw measurements and crossover.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-TASK-01 records applicable parity, pressure, failure and settlement checks. Functional closure does not claim unmeasured speedup.
 
 ```text
-Execute only FWC-2 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-2--task-runtime-and-cancellation.
-Goal: close FCR-TASK-01 with one deterministic-enough task contract across serial and 1/2/N worker modes. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FWC-2 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-2--task-runtime-and-cancellation. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Use the one task runtime.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-TASK-01; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FWC-3` — Level, World, And Render Publication
 
-**Goal:** close `FCR-WORLD-01`, `02`, and `03` from catalog selection through deterministic activation and immutable render submission.
+**Start:** Selected cooked content is available and the failing activation/publication edge is identified, or Roadmap selects a bounded world-surface simplification with a concrete retained-path check.
 
-**Non-goals:** Renderer querying ECS state, a second scene database, or accepting `Empty` as silent recovery from a requested level failure.
+**Work:** Repair transactional request/load/cancel/switch/reload and the immutable world-to-render publication, or remove only the selected unnecessary surface. Retain the current fixed eleven-stage pipeline and one Tasks runtime, including access/hazard checks, structure epochs and deterministic commits; do not reopen its delivered scheduling refactor or generalize it into a gameplay/plugin framework. Preserve entity/resource generations, transforms, camera/light/material and existing skin/morph semantics used by the release. Check delete/reuse, old-world retirement and in-flight readers; quantify changed copies and extraction cost.
 
-**Required work:**
+**Cleanup:** Recheck `CompiledGameSystemGraph::GetSystems`: the 2026-10-25 repository search found only its declaration/definition. If unchanged, delete that private inspection accessor and immediately unused exposure/includes; keep descriptor/query/resource facts actually consumed by the compiler/executor. Delete parallel activation flags, copied world truth or replaced publication records when that is the owned repair. Renderer never queries ECS; a failed requested map cannot report successful Empty activation.
 
-- make level identity, load graph, cancellation, transactional activation, switch/reload, old-world retirement, and failure UI explicit;
-- keep world state GameFramework-owned and publish structural deltas, dynamic data, resource tables, and view input through one immutable boundary;
-- reconcile stable/generation identity for entity, geometry, material, light, camera, animation, and sky data across deletion/reuse/reload;
-- prove coordinate/units, transforms, camera controls, static/skinned/morph animation, material variants, four light kinds, bounds/history, and invalid-data policy;
-- measure extraction copies/cost, memory high-water, ordering, and in-flight safety.
-
-**Failure modes to control:** stale entity generation; new level partially visible; canceled load activates; delete/reuse aliases old GPU data; malformed asset becomes valid default silently; animation bounds/history lag; extraction races consumer.
-
-**Phase exit criteria:** lifecycle, semantic, identity, cancellation, reload, concurrency, and cost checks pass for the admitted map/content set; Renderer consumes only published frame data; reports for all three families agree on candidate identity.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-WORLD-01/02/03 agree on candidate and active-level/submission identity; affected lifecycle, semantic, cancellation and cost checks pass. A simplification shows the unused surface is gone and preserves camera/animation/skin/morph/transform/extraction semantics. For an accessor-only cut, check absence and unchanged compiler/executor consumers with the narrow owning-target check; expand serial/worker runtime proof only if execution/data changes. Source proof does not pass the family's unrun runtime cells or claim speedup.
 
 ```text
-Execute only FWC-3 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication.
-Goal: close FCR-WORLD-01, 02, and 03 from catalog selection through deterministic activation and immutable render submission. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FWC-3 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Repair transactional request/load/cancel/switch/reload and the immutable world-to-render publication, or remove only the selected unnecessary surface.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-WORLD-01; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FWC-4` — Import, Cook, And Engine Assets
 
-**Goal:** close `FCR-CONT-01`, `02`, and `03` with deterministic, provenance-preserving, transactional source-to-package products.
+**Start:** The selected map/dependency closure or an advertised retained input fails provenance, import, cook or loading proof.
 
-**Non-goals:** runtime source import, retaining arbitrary author files in the runtime package, or treating cooked output as irreplaceable source truth.
+**Work:** Use existing import/normalization/cook/publication/load for the retained glTF/GLB/FBX subset. Verify coordinate/material/alpha/animation losses, dependency paths, default/sky meanings and notices. Exercise malformed/oversized/missing input, bounded jobs/memory and interrupted publication; regenerate disposable output under the current contract.
 
-**Required work:**
+**Cleanup:** Remove duplicate source/cooked authority, stale reachable products and superseded serializers or asset scans in the changed path. Do not implement an unsupported format to fill an inventory cell.
 
-- inventory accepted glTF/GLB/FBX inputs, external/embedded dependencies, provenance, coordinate/tangent/material/alpha/animation semantics, and rejection limits;
-- keep import normalization, cook planning, product serialization, manifest publication, and runtime loading as explicit owned stages;
-- make cook publication atomic and reject stale/incompatible/incomplete dependencies; bound parallel jobs, memory, path traversal, and oversized/malformed input;
-- establish release allowlists and per-file license/provenance for engine assets, semantic defaults, fixtures, shaders/includes, and sky assets;
-- prove deterministic semantic identity and clean regeneration without requiring byte identity where tools legitimately differ.
-
-**Failure modes to control:** path escape; missing external texture; malformed/oversized asset consumes unbounded resources; partial cook replaces good generation; stale schema accepted; default texture has wrong meaning; undeclared fixture/package dependency.
-
-**Phase exit criteria:** supported inputs produce complete package-relative products; negative inputs fail without partial publication; manifests and rights are complete; clean regeneration and runtime consumption pass for the frozen content set.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-CONT-01/02/03 bind selected assets to complete package-relative products, deterministic identities, rights and failure-safe publication. Unsupported visible effects remain blockers or require a scope decision.
 
 ```text
-Execute only FWC-4 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-4--import-cook-and-engine-assets.
-Goal: close FCR-CONT-01, 02, and 03 with deterministic, provenance-preserving, transactional source-to-package products. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FWC-4 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-4--import-cook-and-engine-assets. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Use existing import/normalization/cook/publication/load for the retained glTF/GLB/FBX subset.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-CONT-01; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FWC-5` — Shader Route And Shared Tool Output
 
-**Goal:** close `FCR-SHDR-01` and `FCR-TOOL-01` from registration through cooked code/reflection to runtime pipeline consumers, with truthful script-readable tool behavior.
+**Start:** A selected program, typed binding, publication/reload or tool-output claim needs proof or repair.
 
-**Non-goals:** executing the entire [Shader System target plan](../ShaderSystem/ImplementationPlan.md) merely because it exists, preserving legacy shader layouts, or adding a second diagnostic schema.
+**Work:** Use the [remaining shader validation plan](../ShaderSystem/ImplementationPlan.md) for compiler/ABI/native/lifetime checks. Repair the current owner only where it fails. For shared tool output, check the changed consumer's severity/streams/exit/progress/path-quoting/cancellation result; do not repeat unaffected journeys.
 
-**Required work:**
+**Cleanup:** Delete replaced registrations, shader/binding/generation authority, duplicate output formatting and temporary validation additions. Add no diagnostic schema or compiler service.
 
-- reconcile registrations, build membership, job planning, include/dependency identity, DXIL/SPIR-V compile/reflection, code-library publication, runtime consumption, replacement, and retirement;
-- require every selected job/parameter/domain to be represented and reject ABI/reflection mismatch before use;
-- make compiler/cook replacement transactional; keep last good generation only where Architecture explicitly owns that safe state, never as a silent compatibility route;
-- unify message severity, stdout/stderr, process result, progress, summary, fields, path quoting/redaction, and cancellation across every ToolConsoleSupport consumer;
-- invoke a phase of the existing Shader System plan only when a failing release criterion requires that architecture; otherwise close the current route with minimal change.
-
-**Failure modes to control:** registered shader not built; stale include identity; DXIL/SPIR-V divergence; corrupt library accepted; in-flight generation freed; tool exits zero on failure; progress floods output; private path leaks.
-
-**Phase exit criteria:** admitted shader matrix compiles, reflects, publishes, materializes, replaces/fails safely, and packages on both backends; every tool consumer obeys the shared output/exit contract; exact reports are candidate-bound.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-SHDR-01/FCR-TOOL-01 link actual producer-to-consumer results, both required shader targets and affected CLI failures; compile alone is not runtime/package acceptance.
 
 ```text
-Execute only FWC-5 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-5--shader-route-and-shared-tool-output.
-Goal: close FCR-SHDR-01 and FCR-TOOL-01 from registration through cooked code/reflection to runtime pipeline consumers, with truthful script-readable tool behavior. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FWC-5 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-5--shader-route-and-shared-tool-output. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Use the [remaining shader validation plan](../ShaderSystem/ImplementationPlan.md) for compiler/ABI/native/lifetime checks.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-SHDR-01, FCR-TOOL-01; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FWC-6` — Foundation Candidate Closure
 
-**Goal:** reconcile all 11 families on the same package candidate and prove their cross-boundary invariants.
+**Start:** Admitted reports and the exact source/package candidate exist.
 
-**Non-goals:** using an integration smoke to replace feature checks or changing code while preserving old evidence.
+**Work:** Join the eleven family dispositions and original artifacts to the current package-relative content-to-frame journey. Run only missing cross-boundary checks; invalidate affected results after code/input changes.
 
-**Required work:** run the package-relative source/content/world/render journey, verify candidate hashes and evidence coverage, close all missing negative checks, and inspect for duplicate owners, stale paths, unbounded work, undeclared package inputs, or invalidated results.
+**Cleanup:** Remove stale current-state instructions, duplicate reports and obsolete generated membership. Check that preceding repairs already removed their replaced paths.
 
-**Failure modes to control:** individually passing components disagree on identity; author cache masks dependency; candidate changed after a report; unavailable check marked pass; one backend consumes a different cooked/shader generation.
-
-**Phase exit criteria:** every foundation FCR has a complete candidate report with criteria/failures/checks, limitations, invalidation triggers, and a `PASS`, `BLOCKED`, `EXCLUDED`, or `SUPERSEDED` decision.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** Every admitted foundation claim has its candidate decision and required negatives; exclusions have reasons. This stage does not recreate source-present layers or turn local rehearsal into independent adoption.
 
 ```text
-Execute only FWC-6 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-6--foundation-candidate-closure.
-Goal: reconcile all 11 families on the same package candidate and prove their cross-boundary invariants. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FWC-6 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-6--foundation-candidate-closure. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Join the eleven family dispositions and original artifacts to the current package-relative content-to-frame journey.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
 ```
 
-</details>
+## Reference And Ownership
 
-## Foundation: Reference And Ownership
-
-<details>
-<summary>Exact owners, source snapshots and related contracts</summary>
-
-**Responsibility:** sequence closure of the CPU/platform substrate and the world, content, shader, and tool paths consumed by the release
-
-**Orchestrator:** [First Release Implementation Plan](ImplementationPlan.md)
-
-**Primary Architecture route:** [Engine modules](../../Modules/Engine/README.md), [Tools](../../Modules/Tools/README.md), [Shader System](../ShaderSystem/ShaderSystemDesign.md), and [Multithreaded Engine](../MultithreadedEngine.md)
-
-</details>
-
-## Outcome And Dependency Chain
-
-Close the CPU/platform substrate, task execution, world lifecycle/publication, source-to-cooked content path, shader path, and shared tool contract that the package and Renderer consume.
-
-```mermaid
-flowchart LR
-    F0[FWC-0<br/>contracts] --> F1[FWC-1<br/>Core and Platform]
-    F1 --> F2[FWC-2<br/>Tasks]
-    F2 --> F3[FWC-3<br/>World publication]
-    F3 --> F4[FWC-4<br/>Import, cook, assets]
-    F4 --> F5[FWC-5<br/>Shaders and tools]
-    F5 --> F6[FWC-6<br/>candidate closure]
-```
-
-| Phase | Primary families | Current state |
-| --- | --- | --- |
-| `FWC-0` | all 11 | source routes are described; several module-level release contracts require criterion-level reconciliation |
-| `FWC-1` | `FCR-CORE-01`, `FCR-PLAT-01` | broad integrated source, no candidate matrix |
-| `FWC-2` | `FCR-TASK-01` | shared executor is integrated, pressure/failure/performance proof absent |
-| `FWC-3` | `FCR-WORLD-01`–`03` | cooked world and render publication exist, lifecycle/semantic proof absent |
-| `FWC-4` | `FCR-CONT-01`–`03` | import/cook/assets exist, deterministic/package/failure proof absent |
-| `FWC-5` | `FCR-SHDR-01`, `FCR-TOOL-01` | shader/tool routes exist, parity/ABI/transactional and CLI-contract proof absent |
-| `FWC-6` | all 11 | candidate reports absent |
-
-The phases follow the [common phase contract](ImplementationPlan.md#phase-card-contract). Reference systems supply questions, not goals: Unreal's [Tasks](https://dev.epicgames.com/documentation/unreal-engine/tasks-systems-in-unreal-engine?lang=en-US), [Asset Management](https://dev.epicgames.com/documentation/unreal-engine/asset-management-in-unreal-engine), [asynchronous loading](https://dev.epicgames.com/documentation/unreal-engine/asynchronous-asset-loading-in-unreal-engine?lang=en-US), and [Derived Data Cache](https://dev.epicgames.com/documentation/en-us/unreal-engine/using-derived-data-cache-in-unreal-engine) clarify dependency, identity, async-lifetime, and disposable-derived-data concerns. Sparkle keeps its existing owners and contracts.
+[Module contracts](../../Modules/ModuleInventory.md), [Tasks/world topology](../MultithreadedEngine.md), [shader design](../ShaderSystem/ShaderSystemDesign.md) and [product remaining work](ProductImplementationPlan.md) own the boundaries. This plan routes FCR-CORE-01, FCR-PLAT-01, FCR-TASK-01, FCR-WORLD-01 through 03, FCR-CONT-01 through 03, FCR-SHDR-01 and FCR-TOOL-01; it stores no candidate results.

@@ -2,216 +2,139 @@
 
 [Docs](../../../../../README.md) / [Up](README.md) / [Design](../RendererDesign.md)
 
-Stages: [RD-0](#rd-0--freeze-runtime-state-and-observation-contracts) / [RD-1](#rd-1--pipeline-materialization-and-typed-binding) / [RD-2](#rd-2--settings-state-and-persistence) / [RD-3](#rd-3--debug-views-diagnostics-products-and-capture) / [RD-4](#rd-4--ui-and-viewport-composition) / [RD-5](#rd-5--latency-coordination) / [RD-6](#rd-6--runtime-and-diagnostics-candidate-closure).
+Make existing bindings, settings, debug/capture and viewport/latency observations describe the same active frame without building a diagnostics product.
 
-Make shader binding, settings, debug views, capture and viewport controls agree about the frame the user sees.
-
-**Status:** implementation plan; not shader, UX, capture, latency, performance, or release evidence
-
-**Current readiness:** section projection **40/100**; substantial pipeline/settings/debug/UI source exists, latency is partial, and all five families are `Blocked`
+**Status:** remaining release integration and proof; stage names do not imply missing implementation or passed evidence.
 
 ## Work This Plan
 
-| What to do | Working route |
-| --- | --- |
-| First action | [RD-0 state review](#rd-0--freeze-runtime-state-and-observation-contracts): trace a user request into active pipeline/feature state and the displayed or captured frame. |
-| Result to reach | One state authority and observable frame identity, then the selected binding/settings/diagnostic/UI/latency slice. |
-| Start / stop | Keep development diagnostics outside Shipping and follow the selected phase prerequisites. A second settings truth or missing capture identity stops the slice. |
+Use RD-0 only for a missing identity/authority decision. A binding defect enters RD-1 immediately as a prerequisite to its rendering consumer; settings/UI repairs do not wait for a pipeline rewrite. Preserve delivered Show controls, process/capture fixes and qualified native tooling.
 
-## Plan At A Glance
+Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).
 
-```mermaid
-flowchart LR
-    R0[RD-0<br/>runtime truth] --> R1[RD-1<br/>pipeline binding]
-    R1 --> R2[RD-2<br/>settings]
-    R2 --> R3[RD-3<br/>debug and capture]
-    R3 --> R4[RD-4<br/>UI and viewport]
-    R4 --> R5[RD-5<br/>latency]
-    R5 --> R6[RD-6<br/>closure]
-```
+## Dependencies
 
-`RD-1` is an early Renderer dependency and should execute before geometry/lighting pipeline consumers. The other phases close product-facing control and observation after the underlying frame paths are stable.
-
-| Phase | Primary family | Result |
-| --- | --- | --- |
-| `RD-0` | all five | one selector/settings/pipeline/frame/capture/latency identity map |
-| `RD-1` | `FCR-REN-16` | complete registered/cooked ABI and typed pipeline binding |
-| `RD-2` | `FCR-REN-19` | durable requested/resolved/active settings truth |
-| `RD-3` | `FCR-REN-11` | interpretable bounded debug views and capture products |
-| `RD-4` | `FCR-REN-13` | immutable generation-safe UI/viewport composition |
-| `RD-5` | `FCR-REN-20` | correctly scoped and measured latency coordination |
-| `RD-6` | all five | candidate-bound runtime/diagnostic closure |
+RD-1 supplies valid bound programs to frame features. RD-2 applies requested state; RD-3/RD-4 observe and present the frame. RD-5 closes only admitted latency/provider behavior. These are dependency edges, not a serial rewrite from bindings to UI; RD-6 joins compatible results.
 
 ## `RD-0` — Freeze Runtime State And Observation Contracts
 
-**Goal:** reconcile how a user request becomes active shader/pipeline/feature state and how that exact frame is identified in UI, debug, capture, and latency artifacts.
+**Start:** A selected journey cannot correlate request, active state or visible/captured frame.
 
-**Non-goals:** a new global settings registry, an internal performance-dashboard product, or making diagnostics mutable authorities.
+**Work:** Trace only that request through current settings/CVar precedence, pipeline/feature generation, view product, capture or latency token. Resolve missing domain/encoding and requested/active/restart/unavailable meanings in their owner.
 
-**Required work:** trace registration/cooked shader identity, pipeline/layout/cache generation, typed bindings, settings file/CVar/command/UI precedence, requested/resolved/active/restart/fallback state, debug semantics/display mapping, capture sidecar, UI packet/product generations, frame/latency tokens, provider/backend/package matrices, and all feature criteria/checks.
+**Cleanup:** Delete obsolete control/status descriptions and duplicate authority in the changed contract; no global registry, read-model framework or report browser.
 
-**Failure modes:** state shown differs from bound pipeline; stale pipeline/cache survives ABI change; settings save lies; debug label lacks domain; capture and latency use different frame identity; UI packet holds invalid resource; unavailable provider appears enabled.
-
-**Phase exit criteria:** one identity/state diagram and matrix covers all five families; each mutable owner and immutable observer is named; missing or conflicting acceptance blocks implementation.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** One state/identity trace and smallest missing check identify the repair; other families are not reopened by default.
 
 ```text
-Execute only RD-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-0--freeze-runtime-state-and-observation-contracts.
-Goal: reconcile how a user request becomes active shader/pipeline/feature state and how that exact frame is identified in UI, debug, capture, and latency artifacts. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RD-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-0--freeze-runtime-state-and-observation-contracts. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Trace only that request through current settings/CVar precedence, pipeline/feature generation, view product, capture or latency token.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RD-1` — Pipeline Materialization And Typed Binding
 
-**Goal:** close `FCR-REN-16` so every admitted graphics/compute/ray pipeline validates cooked ABI, materializes correctly, binds complete current resources, and replaces generations safely.
+**Start:** A selected program/parameter/domain, cache-key, reload or pipeline-lifetime claim fails or needs proof.
 
-**Non-goals:** untyped descriptor plumbing, preserving obsolete layouts, a second pipeline cache, or executing the whole Shader System plan without a failing release criterion.
+**Work:** Use current registration/cook/reflection/materialization/binding and the [shader validation plan](../../../../CrossModule/ShaderSystem/ImplementationPlan.md). Exercise affected key/ABI/capability/corruption/reload and all-queue retirement cells, retaining required API coverage.
 
-**Required work:** reconcile registration/build/cook membership, code/reflection identity, every parameter/domain, graphics key completeness, capability rejection, layout/pipeline creation, typed binding, cache identity, whole-generation replacement, failed reload safe state, in-flight retirement, and retained/high-water bounds on both backends.
+**Cleanup:** Remove obsolete shader lookups, duplicate binding/cache/generation state and rejected layouts with their consumers; no replayed migration or second cache.
 
-**Failure modes:** registered program missing; reflection/ABI mismatch accepted; cache key omits state; wrong resource domain binds; unsupported ray pipeline materializes; reload partially replaces; old generation retires while in flight; cache grows forever.
-
-**Phase exit criteria:** complete program/parameter/domain matrix, invalid/missing/corrupt/capability/reload failures, cache key/retirement, native backend validation, and performance/memory checks pass.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-16 links actual program/binding/native and failure/cost evidence; registration or compilation is not runtime proof.
 
 ```text
-Execute only RD-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-1--pipeline-materialization-and-typed-binding.
-Goal: close FCR-REN-16 so every admitted graphics/compute/ray pipeline validates cooked ABI, materializes correctly, binds complete current resources, and replaces generations safely. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RD-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-1--pipeline-materialization-and-typed-binding. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Use current registration/cook/reflection/materialization/binding and the [shader validation plan](../../../../CrossModule/ShaderSystem/ImplementationPlan.md).
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-16; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RD-2` — Settings State And Persistence
 
-**Goal:** close `FCR-REN-19` with one aggregate requested state, deterministic precedence, durable atomic persistence, and truthful resolution/activation.
+**Start:** An approved control needs request-to-active or persistence closure.
 
-**Non-goals:** each feature parsing its own config, hiding restart requirements, writing into the package, or preserving obsolete setting aliases.
+**Work:** Repair current defaults/ranges/precedence, atomic per-user save/load/reset, render-thread delivery and resolved/active/restart truth. Exercise malformed values, save failure, affected edit/queue/shutdown and package paths; retain approved shared Game/Editor settings.
 
-**Required work:** reconcile field/name/default/range, file location/schema, command-line/CVar/UI precedence, load/edit/save/transfer, serial/render-thread delivery, requested/CVar/resolved/active/restart state, malformed/unknown value policy, atomic save and last-good behavior, concurrent edit, queue pressure, and shutdown.
+**Cleanup:** Delete stale aliases, duplicate UI/CVar/file truth and replaced transfer state. Do not add another Game settings frontend or compatibility schema.
 
-**Failure modes:** package config modified; partial save corrupts state; malformed value silently activates; unknown legacy name persists; UI/CVar/file disagree; concurrent change is lost; queue overflow applies stale state; restart-only field claims active.
-
-**Phase exit criteria:** field/consumer coverage, valid and malformed round trip, precedence, atomic failure, concurrent/pressure/shutdown, package path, and requested-to-active state checks pass.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-19 affected round-trip/precedence/atomic-failure/active-state cells pass without modifying immutable package defaults.
 
 ```text
-Execute only RD-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-2--settings-state-and-persistence.
-Goal: close FCR-REN-19 with one aggregate requested state, deterministic precedence, durable atomic persistence, and truthful resolution/activation. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RD-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-2--settings-state-and-persistence. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Repair current defaults/ranges/precedence, atomic per-user save/load/reset, render-thread delivery and resolved/active/restart truth.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-19; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RD-3` — Debug Views, Diagnostics Products, And Capture
 
-**Goal:** close `FCR-REN-11` with exact mode semantics, correct display treatment, explicit unavailable state, and reproducible capture metadata.
+**Start:** An existing required mode, Show control or capture output needs proof or repair.
 
-**Non-goals:** building the separate Performance Diagnostics product, exposing private development data in Shipping, or making debug output an unqualified colorimetric oracle.
+**Work:** Use [Debug Views acceptance](../Features/DebugViews/Acceptance.md) and retained [Show results](../../../../../Acceptance/Renderer/DebugViews.md). Close remaining availability, per-view mode, signal/display, readback/sidecar/identity, privacy or observer cells. Use qualified crash/external tools through current owners.
 
-**Required work:** inventory Lit/wireframe/GBuffer/lighting/GPU-scene modes and required resources; close the one per-view mode route, labels, unavailable reasons, exposure/tone/encoding mapping, stable visualization ranges/legends, capture readback/format/sidecar/provenance, bounded observer cost, privacy and Shipping erasure; reconcile remaining work against [current Debug Views acceptance](../Features/DebugViews/Acceptance.md). Completed Show implementation records are [Bounded Show evidence](../../../../../Acceptance/Renderer/DebugViews.md).
+**Cleanup:** Remove stale modes without producers through their scope owner, duplicate capture/status state and temporary probes. Do not recreate delivered controls or implement Stat groups, histories, workspace or ProfileGpu.
 
-**Failure modes:** process-global mode leaks across viewports; unavailable resource displays stale data; mode goes through wrong tone/encoding; legend/range changes without metadata; capture generation mismatches frame; private path/content leaks; observer changes timing materially.
-
-**Phase exit criteria:** every admitted mode/resource/view/display/capture/unavailable/privacy/cost cell passes; sidecars identify candidate/frame/view/settings/domain/encoding; Shipping behavior matches scope.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-11 records admitted mode/frame/view/domain/encoding and failure/cost proof; missing required output cannot display stale data as valid.
 
 ```text
-Execute only RD-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-3--debug-views-diagnostics-products-and-capture.
-Goal: close FCR-REN-11 with exact mode semantics, correct display treatment, explicit unavailable state, and reproducible capture metadata. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RD-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-3--debug-views-diagnostics-products-and-capture. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Use [Debug Views acceptance](../Features/DebugViews/Acceptance.md) and retained [Show results](../../../../../Acceptance/Renderer/DebugViews.md).
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-11; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RD-4` — UI And Viewport Composition
 
-**Goal:** close `FCR-REN-13` with immutable host/editor packets, generation-safe viewport products and texture handles, and correct blend/color/DPI composition.
+**Start:** A current viewport/packet, resize/DPI transition or texture handle is the failing edge.
 
-**Non-goals:** moving UI ownership into Renderer, retaining mutable UI objects across threads, or requiring Editor UI in the Shipping runtime.
+**Work:** Check immutable packet ownership/copies, product/texture generations and retirement, blend/color/alpha, extent/DPI, level switch, missing/stale input and shutdown. Preserve the shipped product split: Game excludes Editor authoring; admitted Editor retains its UI route.
 
-**Required work:** reconcile packet creation/copy budget/lifetime, viewport identity and generation, texture-handle validation, product publication/retirement, blend and color domain, DPI/extent, graph execution ordering, submission, resize/level switch, missing/stale products, bounds, and package behavior.
+**Cleanup:** Remove redundant packet/product publication and mutable cross-thread UI state exposed by the repair; UI policy stays with its host.
 
-**Failure modes:** packet references mutable/freed memory; stale product sampled after resize; invalid handle indexes descriptor; UI uses wrong color/alpha convention; level switch shows old viewport; missing product crashes; Shipping includes excluded editor path.
-
-**Phase exit criteria:** packet lifetime/copy, handle/generation/bounds, blend/color/DPI, missing/stale/failure, resize/switch/shutdown, and Shipping classification checks pass.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-13 affected lifetime/bounds/color/resize/switch/failure/package cells pass without a viewport or UI framework.
 
 ```text
-Execute only RD-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-4--ui-and-viewport-composition.
-Goal: close FCR-REN-13 with immutable host/editor packets, generation-safe viewport products and texture handles, and correct blend/color/DPI composition. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RD-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-4--ui-and-viewport-composition. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Check immutable packet ownership/copies, product/texture generations and retirement, blend/color/alpha, extent/DPI, level switch, missing/stale input and shutdown.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-13; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RD-5` — Latency Coordination
 
-**Goal:** close `FCR-REN-20` for the explicitly supported Streamline PCL/Reflex boundary, with correct six-marker frame identity and independently measured benefit.
+**Start:** An admitted PCL/Reflex marker/provider cell needs functional closure or a latency claim is actually made.
 
-**Non-goals:** claiming latency reduction from marker presence, supporting Vulkan Reflex when the contract excludes it, or making provider availability a runtime requirement.
+**Work:** Check existing six-marker order, simulation/submit/present identity, 64-to-32-bit limits, capability/availability, failure/shutdown and exact DLL/package boundary. Keep unsupported Vulkan Reflex explicit. Measure independently for a claimed benefit; markers alone prove no latency reduction.
 
-**Required work:** reconcile host simulation and render submit/present frame tokens, six marker order/ownership, 64-to-32-bit conversion limits, Streamline on/off/readiness, PCL versus Reflex capability, D3D12/Vulkan boundary, sleep/marker failure, shutdown, package DLL/signature/redistribution, and measurement method separate from functional checks.
+**Cleanup:** Remove duplicate frame/provider state and obsolete marker calls; add no input-to-display platform or mandatory optional latency SDK.
 
-**Failure modes:** duplicate/out-of-order marker; token truncation aliases frame; marker from wrong thread/phase; provider fault stalls frame; Reflex called unsupported; missing DLL silently changes active state; shutdown uses provider after release; latency claim lacks controlled comparison.
-
-**Phase exit criteria:** marker order/identity, misuse/provider/failure/shutdown, backend/package, requested-active state, and controlled latency measurements pass for admitted cells; unsupported cells remain explicit.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-20 closes declared functional/safe-unavailability behavior and any claimed controlled measurement. Missing measurement stays unproved; it does not authorize a diagnostics subsystem.
 
 ```text
-Execute only RD-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-5--latency-coordination.
-Goal: close FCR-REN-20 for the explicitly supported Streamline PCL/Reflex boundary, with correct six-marker frame identity and independently measured benefit. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RD-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-5--latency-coordination. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Check existing six-marker order, simulation/submit/present identity, 64-to-32-bit limits, capability/availability, failure/shutdown and exact DLL/package boundary.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-20; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `RD-6` — Runtime And Diagnostics Candidate Closure
 
-**Goal:** prove that bound pipelines, settings, debug/capture, UI composition, and latency artifacts all describe the same active frame and candidate.
+**Start:** Five admitted family results and final package configuration exist.
 
-**Non-goals:** one UI smoke standing in for shader/native checks or admitting the separate diagnostics product.
+**Work:** Join active bindings/settings, visible/captured product and applicable latency identity on one candidate. Fill missing integrated/package checks; distinguish noninstrumented/excluded cells from failed Included claims.
 
-**Failure modes:** requested state differs from active but capture omits it; pipeline/provider DLL differs from manifest; UI/debug observe stale generation; latency token cannot join capture; evidence predates settings/shader change.
+**Cleanup:** Verify prior deletions; remove stale control/pipeline/provider instructions and duplicate result summaries.
 
-**Phase exit criteria:** all five FCR reports carry complete candidate-bound criteria/failure/check coverage, package/native/provider matrices, identity joins, performance/observer data, limitations, and explicit decisions.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-11/13/16/19/20 carry compatible candidate/results, required negatives, honest provider limits and observer/cost evidence. A broader diagnostics product is not required.
 
 ```text
-Execute only RD-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-6--runtime-and-diagnostics-candidate-closure.
-Goal: prove that bound pipelines, settings, debug/capture, UI composition, and latency artifacts all describe the same active frame and candidate. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only RD-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md#rd-6--runtime-and-diagnostics-candidate-closure. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Join active bindings/settings, visible/captured product and applicable latency identity on one candidate.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-11; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## Reference And Ownership
 
-<details>
-<summary>Exact owners, source snapshots and related contracts</summary>
-
-**Families:** `FCR-REN-11`, `FCR-REN-13`, `FCR-REN-16`, `FCR-REN-19`, `FCR-REN-20`
-
-**Responsibility:** sequence pipeline binding, runtime state, diagnostic presentation, viewport composition, and latency coordination closure
-
-**Parent:** [First Release Renderer Plans](README.md)
-
-**Architecture:** [Shader Runtime](../Features/ShaderRuntime/ShaderRuntimeDesign.md), [Runtime Configuration](../Features/RuntimeConfiguration/RuntimeConfigurationDesign.md), [Debug Views](../Features/DebugViews/DebugViewsDesign.md), [Viewport And Diagnostics](../Features/ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md), and [Latency Coordination](../Features/FrameExecution/LatencyCoordination.md)
-
-</details>
+[Shader runtime](../Features/ShaderRuntime/ShaderRuntimeDesign.md), [settings](../Features/RuntimeConfiguration/RuntimeConfigurationDesign.md), [Debug Views](../Features/DebugViews/DebugViewsDesign.md), [viewport](../Features/ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md) and [latency](../Features/FrameExecution/LatencyCoordination.md) own behavior. PD-1 consumes these repairs without duplicating their implementation sequence.

@@ -230,46 +230,6 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	static void PruneEmptyDirectories(const std::filesystem::path& root)
-	{
-		std::error_code errorCode;
-		if (!std::filesystem::is_directory(root, errorCode))
-		{
-			return;
-		}
-
-		std::vector<std::filesystem::path> directories;
-		for (std::filesystem::recursive_directory_iterator iterator(root, std::filesystem::directory_options::skip_permission_denied, errorCode), end; iterator != end; iterator.increment(errorCode))
-		{
-			if (errorCode)
-			{
-				errorCode.clear();
-				continue;
-			}
-			if (iterator->is_directory(errorCode))
-			{
-				directories.push_back(iterator->path());
-			}
-			errorCode.clear();
-		}
-
-		std::sort(directories.begin(), directories.end(), [](const std::filesystem::path& left, const std::filesystem::path& right) { return left.native().size() > right.native().size(); });
-
-		for (const std::filesystem::path& directory : directories)
-		{
-			errorCode.clear();
-			if (!std::filesystem::is_directory(directory, errorCode))
-			{
-				continue;
-			}
-			const bool empty = std::filesystem::directory_iterator(directory, errorCode) == std::filesystem::directory_iterator();
-			if (!errorCode && empty)
-			{
-				std::filesystem::remove(directory, errorCode);
-			}
-		}
-	}
-
 	static bool RunCleanStep(const MaintenanceOperationProcessStep& step, const std::vector<std::filesystem::path>& preservedPaths, std::string& outErrorMessage)
 	{
 		switch (step.CleanBehavior)
@@ -336,9 +296,6 @@ namespace SparkleLauncher
 				return operation;
 			}
 		}
-
-		PruneEmptyDirectories(plan.RepositoryRoot / "Projects");
-		PruneEmptyDirectories(plan.RepositoryRoot);
 
 		MarkOperationFinished(operation, OperationStatus::Succeeded, 0);
 		return operation;

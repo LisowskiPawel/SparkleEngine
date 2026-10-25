@@ -2,7 +2,7 @@
 
 [Docs](../../../../../../../README.md) / [Up](ReferencePathTracerDesign.md) / [Implementation](ImplementationPlan.md)
 
-**Status:** Stage-0-frozen target architecture accepted by `PTD-00-R1 PASS`; source delivery through Stage 9 remains **IMPLEMENTED / VALIDATION DEFERRED** and structurally aligned, while usable rendering and Reference authority are blocked by the current black-lighting result and the retained executable evidence backlog
+**Status:** target architecture retaining the `PTD-00-R1 PASS` transport/development baseline and the approved consumer release scope. Development source through Stage 9 remains **IMPLEMENTED / VALIDATION DEFERRED**; Shipping host/output integration, usable rendering and Reference authority remain open.
 
 **Scope:** define the owner, contracts, lifetime, execution, sampling, accumulation, viewport interaction, manual artifact, and clean-break boundaries for SparkleEngine's eventual Reference Path Tracer
 
@@ -474,7 +474,7 @@ The completed directory contains at minimum:
 | `manifest.json` | Canonical identity, scope, settings, hashes, backend/frontend, counts, accepted statistical summary, budgets, timing, lineage, and completed status; written last. |
 | `preview.*` | Optional derivative for humans, with exposure/tone/encoding settings and the raw artifact hash. It is never a comparison source. |
 
-OpenEXR is the required high-dynamic-range interchange container unless `PTD-00` records a stronger alternative. Existing readback, image-buffer encoding, operation, and bundle-publication mechanics are extended once rather than copied per feature. The private ApplicationEditor encoder may use the repository's existing TinyEXR dependency only after ownership, write support, security, rights, build, and package review; TextureCooker ownership does not automatically authorize a Renderer dependency.
+OpenEXR is the required high-dynamic-range interchange container unless `PTD-00` records a stronger alternative. Existing readback, image-buffer encoding, operation, and bundle-publication mechanics are extended once rather than copied per feature. Current Reference encoding/publication lives under private Application Editor ownership. The approved Game/raw-export consumer requires moving the necessary host-independent mechanism to private Application ownership, with thin Editor/Game action adapters and deletion of the replaced Editor-only implementation in the same slice. Game acquires no Editor dependency; Renderer and RHI acquire no filesystem/codec/UI policy. Use the existing TinyEXR dependency only after write support, security, rights, build and package review; TextureCooker ownership does not automatically authorize a Renderer dependency.
 
 Raw publication defaults to the exact current session render extent and numeric precision. It never reads a UI-scaled backbuffer, screenshot surface, downsampled progress preview, or thumbnail. An explicitly requested different crop or extent creates a separate identity and result; it is not a convenient lower-resolution copy mislabeled as the viewport session.
 
@@ -508,7 +508,7 @@ The overlay displays exact committed/target prefix, target ratio, last reset rea
 
 Raw export is optional and secondary. `Save Complete`, `Save Current Prefix`, and `Save Checkpoint` read the current session prefix only after the user presses the corresponding viewport button; `Save Current Prefix` is explicitly partial. Export failure does not destroy the live prefix or a prior result. There is no deferred save intent or second render launched merely because the user saves.
 
-The feature is excluded from `ShippingEditor`, `ShippingGame`, and consumer first run by default. Shipping profiles compile out every Reference producer/session factory and Reference mode producer/control, UI row, writer, codec/package, and documentation route; no Reference value enters RHI contracts. If release scope later exposes it, dependencies, writable roots, support contract, selector reachability, and performance expectations must be admitted explicitly. Development Editor and Game hosts submit the same per-view mode; no composition-selector CVar remains.
+The [approved release scope](../../../../../../../Acceptance/FirstRelease.md#required-rendering-closure) includes the consumer Reference mode and raw-linear export. `ShippingEditor` and `ShippingGame` therefore retain the same Renderer session/selector and the smallest host controls, progress, pause/reset and explicit raw-output operation needed by that promise. Ordinary startup stays Lit; Reference starts only after explicit selection and successful preflight. Export uses the existing per-user writable output boundary, never the install tree. No Reference value enters RHI contracts. Developer console, generic debug panels, external capture SDKs and unrelated artifact tooling remain excluded from Shipping; this product feature does not admit them. The earlier development-only Shipping exclusion is superseded for this consumer slice, not for its mathematical domain or evidence gates. Stages 7/9 own the missing host/output integration; Stage 10 proves the exact shipped products. No support service or separate Game rendering-settings frontend is added.
 
 ## Failure And Recovery Contract
 
@@ -543,6 +543,14 @@ The implementation retires duplicate or misleading authority in the same change 
 
 Exact source deletions are frozen by the plan stage that inspects the live tree. The goal is one Reference Path Tracer authority, not preserving filenames from this snapshot.
 
+## Conditional Neural Component Measurement
+
+The post-release owned denoiser needs an independently qualified diffuse-indirect target. Current Reference output publishes beauty mean/M2; that output cannot be relabeled as a component. [Neural Semantics](../../../../../../CrossModule/NeuralGraphics/Semantics.md#selected-product-and-reference-dependency) owns the proposed target, channel/domain and pairing rules. NG-D0 must ratify the exact estimator partition and check card; NG-S1 then delivers and qualifies the bounded producer before data publication, after REL-11/M3. Existing beauty recovery and release acceptance remain prior work.
+
+Keep the component calculation in the existing transport/product owners and extend the current typed raw transaction only as necessary. Preserve camera-ray visibility, sample/prefix identity, joint sampling density, MIS and roulette compensation. A sampled lobe tag alone does not prove a correct component estimator. Do not subtract unrelated noisy images or introduce another tracer, arbitrary AOV registry or output framework. Component mean/uncertainty and identity must be independently inspectable; beauty sampling/output must remain unchanged.
+
+The slice reopens only affected derivation, shader/resource/output and package checks under existing AC-RPT/CHK-RPT owners, plus `AC-NG-09/CHK-NG-01`: isolated direct/specular leakage, component/PDF controls, prefix/reset/corruption and uncertainty. Record results in the existing Reference and neural reports. Accepted beauty evidence cannot auto-pass the new measurement, and this conditional target does not invalidate unchanged historical results or add a release gate.
+
 ## Design Decisions And Rejected Shapes
 
 | Decision | Why | Rejected default |
@@ -557,7 +565,7 @@ Exact source deletions are frozen by the plan stage that inspects the live tree.
 | Megakernel first, wavefront only from evidence | Minimizes coordination before correctness is known. | Importing a split-kernel framework because AMD/NVIDIA examples use one. |
 | Fixed sample prefix for production evidence | Makes accumulation, restart, and comparison exact and reviewable. | Adaptive stopping before its bias/statistics contract exists. |
 | Raw EXR plus manifest, preview derivative | Prevents presentation from contaminating the oracle. | BMP/screenshot/tone-mapped golden images as truth. |
-| Shared private Application encoder/publisher with a thin Reference schema composer | Keeps codec/filesystem/UI dependencies out of core Renderer and Shipping runtime while making later capture consumers incremental. | Turning the shared mechanism into a feature-policy registry or linking a development export stack into every runtime Renderer. |
+| Shared private Application encoder/publisher with a thin Reference schema composer | Serves admitted Editor/Game export without copying the writer or putting codec/filesystem/UI policy in Renderer/RHI; package only the actual output dependencies. | Turning the mechanism into a policy registry, importing Editor into Game, or shipping the unrelated development export stack. |
 
 ## Support And Evidence Matrix
 
@@ -569,7 +577,7 @@ Exact source deletions are frozen by the plan stage that inspects the live tree.
 | Vulkan + Pipeline | Required strict route | Reference Pipeline adapter and shared-kernel route are source-present; unproved on GPU. |
 | Editor viewport view mode and progress overlay | Required primary development-product route | Menu row, automatic start, progress/actions, and feature-local overlay are source-present; build and interaction evidence is deferred. |
 | Game-kind view semantic | Required shared camera/session behavior; product exposure gated separately | `GameApplication` accepts the same ordinary request/mode and reaches the same frame/session; a concrete host workflow has not been exercised. |
-| `ShippingEditor`, `ShippingGame` | Public source-header enum value remains; all producers/session factories and user/export/package routes are excluded | Must remain unreachable and free of optional artifact dependencies. |
+| `ShippingEditor`, `ShippingGame` | Included consumer mode, bounded progress/control and explicit raw export through the same session | Host/output/build/package integration and exact-archive first-use/failure proof remain open; unrelated development tools stay excluded. |
 | Reference-produced `Radiance` EXR/manifest/checkpoint | Required for final evidence; secondary product surface after the live viewport milestone | Source-present through generic product readback and the private ApplicationEditor transaction; decoder round trip, corruption/failure injection, and publication evidence are deferred. |
 | Numerical/statistical/runtime/package proof | Required by `FCR-REN-08` | Not produced by this architecture work. |
 
@@ -595,7 +603,7 @@ An implementation review fails if any invariant is false:
 
 ## Evidence And Current Status
 
-This document selects a target shape, not an implementation or verdict. Its source observations have not been build-, shader-, runtime-, GPU-, visual-, convergence-, performance-, package-, or release-verified in this change. `PTD-00` must still accept exact estimator mathematics, feature dispositions, concrete algorithms, numeric tolerances, fixture manifests, resource budgets, and independent review before Stage 1.
+This document retains the accepted `PTD-00-R1` target and separately labels the later NG-D0 component proposal. It supplies no new implementation or executable verdict. Existing development source and historical results remain bound to their recorded candidates; recovery, consumer integration and deferred numerical/GPU/output/package checks follow the remaining plan. Reopen only changed discovery decisions and affected evidence. The conditional component needs its own derivation/qualification rather than replaying Stage 1 or inheriting beauty acceptance.
 
 Use:
 

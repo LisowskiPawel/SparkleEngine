@@ -58,7 +58,7 @@ The active direct BRDF is Cook–Torrance/GGX/Smith/Schlick plus Burley diffuse 
 | `DIR-FS-05` | reservoir reuse | canonical ReSTIR DI reservoir, explicit target, `M`, normalization, light identity, and bias mode | fused passes, pairwise/advanced reuse only after evidence | partial, conformance unknown |
 | `DIR-FS-06` | visibility and shadows | finite segment semantics, alpha/two-sided agreement, robust ray offsets, strict provider status | opacity micromaps or non-ray provider only after independent admission | partial, ray-only |
 | `DIR-FS-07` | stochastic reconstruction | raw noisy signal, confidence/history contract, and classical vendor-neutral baseline | optional DLSS Ray Reconstruction behind the same semantic inputs | absent/optional only |
-| `DIR-FS-08` | many-light product | bounded work with explicit degradation under overlap and reported active quality | ReGIR only if distributed-scene evidence beats simpler PDFs | absent |
+| `DIR-FS-08` | bounded light-count behavior | retained analytic-light counts and over-budget refusal/degradation remain finite and explicit | many-light expansion/ReGIR only after separate workload/value admission | current capacity behavior unproved; expansion unselected |
 | `DIR-FS-09` | diagnostics and adoption | raw lobe/sample/visibility/reservoir captures through existing generic routes | focused editor controls after developer workflow is proved | partial |
 
 ## Target Quality Tiers
@@ -69,7 +69,7 @@ The active direct BRDF is Cook–Torrance/GGX/Smith/Schlick plus Burley diffuse 
 | `DIR-Q1` reference | establish unbiased/high-sample scene-linear comparison | accepted Reference Path Tracer direct AOV or an independently generated reference with complete manifest |
 | `DIR-Q2` interactive correctness | establish ReSTIR normalization, temporal safety, frontend parity, and finite output | raw-lobe statistical/metamorphic checks before denoising |
 | `DIR-Q3` reconstructed quality | make the sparse signal temporally useful without hiding invalid history | motion/disocclusion/animated-light sequences with raw and reconstructed evidence |
-| `DIR-Q4` product scale | demonstrate many-light usefulness inside frozen quality, memory, and time budgets | Sponza, Bistro, San Miguel, and a synthetic overlap stress scene on both supported backends |
+| `DIR-Q4` product scale | meet selected light-count, quality, time and memory budgets | first release: applicable approved maps and bounded overlap controls on both APIs; later admitted advanced program: Bistro/San Miguel studies |
 
 ## Acceptance Criteria
 
@@ -109,7 +109,7 @@ The active direct BRDF is Cook–Torrance/GGX/Smith/Schlick plus Burley diffuse 
 | `CHK-DIR-04` | paired Inline/Pipeline visibility fixture and injected capability faults | `AC-DIR-06`; `FM-DIR-03/05` |
 | `CHK-DIR-05` | long finite/stability sequence with counters and reservoir decode | `AC-DIR-04/05`; `FM-DIR-04` |
 | `CHK-DIR-06` | raw-versus-reconstructed motion, disocclusion, light-toggle, and cut sequences | `AC-DIR-07`; `FM-DIR-06` |
-| `CHK-DIR-07` | fixed-camera overlap sweep from one to thousands of important lights at frozen budgets | `AC-DIR-08/09`; `FM-DIR-07` |
+| `CHK-DIR-07` | fixed-camera retained-count/boundary/over-budget overlap controls; a thousands-of-lights sweep only if that scale tier is separately admitted | `AC-DIR-08/09`; `FM-DIR-07` |
 | `CHK-DIR-08` | D3D12/Vulkan candidate matrix with native validation and raw artifacts | `AC-DIR-10/12`; `FM-DIR-08` |
 | `CHK-DIR-09` | enclosure/build/link/stale-path audit | `AC-DIR-11` |
 

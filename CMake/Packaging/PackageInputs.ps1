@@ -79,6 +79,12 @@ function New-PackageManifest
             }
         }
     }
+    $defaults = @($Inputs.Files | Where-Object Path -ceq 'Config/DefaultEngine.ini')
+    if ($defaults.Count -ne 1 -or $defaults[0].Source -cne 'Config/DefaultEngine.ini' -or
+        $defaults[0].Component -cne 'Shared' -or $defaults[0].Role -cne 'Defaults')
+    {
+        throw 'Rendering defaults differ from their configuration owner.'
+    }
     foreach ($binding in @(
         @('Tools/Diagnostics/ExportDiagnostics.ps1','CMake/Packaging/ExportDiagnostics.ps1'),
         @('Tools/Diagnostics/IncidentIdentity.ps1','CMake/Packaging/IncidentIdentity.ps1'),

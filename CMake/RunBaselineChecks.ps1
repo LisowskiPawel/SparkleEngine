@@ -50,24 +50,26 @@ try
         }
         $process = $null
         $timer = [Diagnostics.Stopwatch]::StartNew()
-        $check.Status = 'CANCELLED'; $check.Reason = 'Invocation interrupted'
+        $check.Status = 'FAILED'; $check.Reason = 'Owner invocation did not complete'
         try
         {
             Write-Host "Baseline owner check: $($check.Target) ($Configuration)"
             $process = Start-Process -FilePath $cmake.Source -ArgumentList "--build `"$build`" --config $Configuration --target $($check.Target)" -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $OutputDirectory "$($check.Target).log") -RedirectStandardError (Join-Path $OutputDirectory "$($check.Target).error.log")
             [void] $process.Handle
-            while (!$process.WaitForExit(100))
+            while ($true)
             {
+                $completed = $process.WaitForExit(100)
+                if ($completed) { break }
                 if ($CancellationSignal -ne '' -and (Test-Path -LiteralPath $CancellationSignal))
                 {
-                    $check.Reason = 'Cancellation requested'; $cancelled = $true; break
+                    $check.Status = 'CANCELLED'; $check.Reason = 'Cancellation requested'; $cancelled = $true; break
                 }
                 if ($timer.Elapsed.TotalSeconds -ge $TimeoutSeconds)
                 {
                     $check.Status = 'TIMED_OUT'; $check.Reason = 'Per-check time limit reached'; break
                 }
             }
-            if ($process.HasExited)
+            if ($completed)
             {
                 $check.ExitCode = $process.ExitCode
                 $check.Status = if ($process.ExitCode -eq 0) { 'PASS' } else { 'FAILED' }

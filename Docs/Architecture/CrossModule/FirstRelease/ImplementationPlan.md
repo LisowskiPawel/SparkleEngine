@@ -10,118 +10,73 @@ Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for
 
 [First Release Acceptance](../../../Acceptance/FirstRelease.md#release-gates) owns release verdicts. Feature-local Architecture checks and [candidate reports](../../../Acceptance/FeatureCompletionReports.md) own feature proof.
 
+For product work, follow the [PD-1 through PD-4 exit checklist](ProductImplementationPlan.md#how-to-close-this-plan) and [recorded progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). Its closure qualifies the admitted internal product scope, not all release gates. [First Release](../../../Acceptance/FirstRelease.md#product-plan-and-public-release) retains the independent/machine requirements and FR-07 signing/public-rights boundary.
+
 Choose the section for your current task: [release phases](#release-tasks), [Game/Editor/Launcher/package](ProductImplementationPlan.md#first-release-product-implementation-plan), [paths/tasks/world/cook/shaders](FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan), or [feature owners](#complete-feature-routing).
 
 ## Release Tasks
 
 ### `FR-00` — Scope And Discovery
 
-**Goal:** approve one reviewable release scope of included, experimental, excluded, and removed behavior. Preserve the already accepted `PTD-00` development discovery; do not restart it or treat it as accepted release-map oracle evidence.
+**Remaining work:** reconcile changed selectors and exact component/helper/content-store membership against the six already approved product choices. Keep seven examples plus Empty, shared approved defaults, display-selected resolution, required rendering and no-support policy. Preserve accepted PTD-00; scope discovery does not restart it.
 
-**Current handoff:** the owner approved all [six scope decisions](../../../Acceptance/FirstRelease.md#approval-and-next-work): three shipped products, seven selected maps, Launcher entry, user/display-selected resolution, approved defaults with chromatic aberration/vignette On, and no user support service. The laptop retains a fixed recorded 30 FPS acceptance benchmark. No product-choice answer remains pending; exact rights receipts and package/helper/configuration/content-store closure still block FR-00. Accepted PTD-00 development discovery is preserved.
-
-**Non-goals:** implementation, optimistic scoring, adding target-only features, or treating the present reference path as an unbiased oracle.
-
-**Failure modes:** unclassified selector; Architecture target mistaken for release scope; missing redistribution decision; `PTD-00` output incomplete; later work starts despite a blocked discovery gate.
-
-**Phase exit criteria:** `REL-00` criteria are mapped to checks; every reachable option has a product classification; the release package contents are named; `PTD-00` records `PASS` or a blocking/re-scope decision.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** REL-00 has finite Included/Experimental/Excluded/Removed dispositions and named owners/checks. A current inventory gap receives a disposition, not automatic implementation. Exact rights evidence stays with FR-01/final FR-07 review, and technical unknowns are not new user-choice requests.
 
 ```text
-Execute only FR-00 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-00--scope-and-discovery.
-Reconcile the six approved choices, selected maps, reachable-option classifications and exact package/helper/rights decisions. Preserve accepted PTD-00 discovery. Map REL-00 checks; stop on unresolved admission.
-Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+Execute only remaining FR-00 scope reconciliation from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Preserve approved decisions and accepted PTD-00. Close changed membership/selector dispositions and their check routes; do not reapprove settled scope or implement target-only features. Apply the owning execution contract and its Stage Source-Style Gate.
 ```
-
-</details>
 
 ### `FR-01` — Identity, Rights, And Baseline
 
-**Goal:** make source, dependencies, assets, licenses, version identity, the initial build/cook/Game baseline, and approved fresh-checkout gate automation reproducible enough to start package work.
+**Remaining work:** reuse existing identity, pins, notices and local baseline; qualify only changed inputs and missing exact-candidate cold/warm/offline source checks through PD-2. Bind source/dependency/content identity, redistribution decisions and provenance to actual payloads. Final public certificate/signature and unresolved public-rights closure remain FR-07 obligations.
 
-**Non-goals:** broad feature fixes, performance tuning, or publication.
+**Cleanup:** remove obsolete input/discovery/pin authority in a replacing repair and regenerate disposable output. No second dependency manager, baseline runner or broad automation program is selected.
 
-**Failure modes:** mutable dependency; unidentified asset; dirty/generated state hidden; author-machine-only prerequisite; runtime result recorded without exact revision/configuration.
-
-**Phase exit criteria:** `REL-01` and `REL-02` candidate records pass or name blockers; one baseline path has exact commands, versions, hashes, outputs, and cleanup.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** REL-01/02 reports distinguish validated internal source/baseline work from any outstanding public-rights/trust blocker. Dependency-ready unsigned development can collect evidence; it does not bypass ordered formal release approval.
 
 ```text
-Execute only FR-01 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-01--identity-rights-and-baseline.
-After FR-00 exits, audit pinned inputs, identity, provenance, redistributable payloads, prerequisites and generated state. Invoke existing owner checks; qualify the exact clean build/cook/Game baseline. Record REL-01/02 blockers; stop on unresolved rights or mutable inputs.
-Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+Execute only remaining FR-01 work from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Reuse identity/pin/notice and compatible baseline evidence; qualify changed inputs and missing PD-2 source checks. Retain exact rights/provenance blockers for final release review. Add no baseline framework or unrelated feature repairs. Apply the owning execution contract and its Stage Source-Style Gate.
 ```
-
-</details>
 
 ### `FR-02` — Package Spine
 
-**Goal:** complete `FCR-PROD-05` as one build → cook → stage → verify → package authority.
+**Remaining work:** use PD-3 and the existing CMake/Packaging manifest-owned route to regenerate the unsigned Launcher/Editor/Game archive after product repairs. Earlier archives may check packaging mechanics; only final bytes qualify product behavior. Verify complete admitted payload, per-user mutation boundary, failure-safe publication and exact manifests/hashes.
 
-**Non-goals:** an installer, binary SDK, silent best-effort staging, or distributing authoring tools by accident.
+**Cleanup:** delete stale staged membership and replaced staging/path policy in that repair; no installer, updater, SDK or another packager.
 
-**Failure modes:** source-tree mutation; stale stage contents; undeclared dependency; absolute/user path; manifest/archive mismatch; partial archive after failure; package works only with repository state.
-
-**Phase exit criteria:** [Product phase `PD-3`](ProductImplementationPlan.md#pd-3--package-and-installation) passes and `REL-03` has clean-machine runtime evidence for the exact archive.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-PROD-05/REL-03 meet their internal archive contract. Clean-machine and independent-adopter portions are linked once through PD-3/FR-06, not recreated as a second acceptance journey here. Public release still waits for FR-07 and all required gates.
 
 ```text
-Execute only FR-02 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-02--package-spine.
-Execute the existing ProductImplementationPlan PD-3 route after package inputs are admitted. Complete the current single packaging owner and exact-archive REL-03 evidence; do not add another packaging authority.
-Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+Execute only remaining FR-02 package work through PD-3 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Regenerate and verify the current unsigned archive with existing tooling, close its exact missing checks and remove stale membership. Reuse shared installed/adopter proof; do not implement another package spine. Apply the owning execution contract and its Stage Source-Style Gate.
 ```
-
-</details>
 
 ### `FR-03` — Feature Closure
 
-**Goal:** close every included FCR family against its Architecture-owned contract in dependency order.
+**Selection:** use Roadmap's required-feature priority to choose one missing consumer result, failed check or [bounded simplification](../../../Strategy/Roadmap.md#portfolio-focus-and-existing-code-simplification). First decide whether the route needs proof, a local repair, narrowing/retirement of unnecessary existing surface, or a specifically admitted missing feature. The 49-family registry routes that decision; it does not authorize 49 audits or redesigns. Simplification preserves a named rendering/product/evidence path and may remove private dead code without inventing a new feature or waiting for REL-11.
 
-**Non-goals:** averaging readiness, accepting source presence, restoring superseded designs, or adding excluded capabilities.
+**Work:** enter the responsible child/leaf stage with actual prerequisites. Reference recovery precedes dependent quality claims; shared binding/native/content defects precede their affected consumer. Implement only the necessary delta. Each repair deletes its replaced code/state/selector/build/dependency path and proves retained behavior in the same slice. Narrowing a required promise needs its scope-owner decision first.
 
-**Failure modes:** orphan FCR; missing feature-local criterion; backend/mode/content gap; silent fallback; stale evidence reused after a change; feature passes but packaged route fails.
-
-**Phase exit criteria:** all 49 primary owners in [Complete Feature Routing](#complete-feature-routing) have a candidate-bound result and `REL-04` passes.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** all family dispositions are reconciled, and every Included/Experimental claim has the exact evidence required for REL-04. Reuse shared artifacts by identity; unselected future tiers need no implementation. Missing numerical/native/failure evidence remains blocked; a successful package or average readiness cannot replace it.
 
 ```text
-Execute only FR-03 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-03--feature-closure.
-Select the next admitted incomplete family from Complete Feature Routing. Execute its primary implementation stage and owning AC/FM/CHK in dependency order. Reuse valid proof, invalidate changed claims and reconcile all 49 candidate results for REL-04.
-Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+Execute only the next Roadmap-selected FR-03 delta from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Name the selected path and consumer, then choose proof, repair, bounded simplification/retirement or admitted feature and run its owning child/leaf stage. For a cut, name the unnecessary existing surface and prove the retained path; no replacement feature is required. Complete local deletion and preservation checks. Reuse valid reports; do not execute the whole family registry or optional tiers. Apply the owning execution contract and its Stage Source-Style Gate.
 ```
-
-</details>
 
 ### `FR-04` — Release Maps
 
-**Goal:** turn the frozen `ReleaseMapSet` into representative correctness, artifact, and product-journey evidence.
+**Work:** qualify the approved seven-map set plus built-in Empty through source/cook/runtime/product identity, material losses, raw reference domain/uncertainty and temporal/artifact review. Use the applicable MAP-A through MAP-H method and per-map release contract on required APIs. The later Bistro/San Miguel, neural WL and portfolio CASE completion gates are not additional release maps or prerequisites.
 
-**Non-goals:** choosing flattering viewpoints, using one screenshot as correctness proof, or adding map-specific renderer hacks.
+**Cleanup:** repair the actual content/transport/output owner and remove the replaced faulty path; do not add map-specific renderer branches, substitute content silently or expand the reflection oracle domain to excuse unsupported effects.
 
-**Failure modes:** missing workload coverage; reference/candidate mismatch; debug/exposure state omitted; warmed-only capture; cherry-picked output; map fix bypasses asset/renderer owner.
-
-**Phase exit criteria:** every applicable `MAP-*` and specialist case has exact candidate identity, settings, references, artifacts, verdict, and invalidation triggers; `REL-05` passes.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** REL-05 has exact candidate/settings/pose/camera/reference identities, original artifacts, defects and invalidation triggers for each selected map. A map's load/readiness or attractive final screenshot cannot pass its material/raw/temporal checks.
 
 ```text
-Execute only FR-04 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-04--release-maps.
-Freeze the selected map/settings/reference identities, then exercise the applicable MAP and specialist cases. Repair each failing content or renderer owner. Retain exact candidate comparisons and invalidation triggers for REL-05.
-Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+Execute only the selected FR-04 map proof from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Use the approved release maps and their applicable checks, not the later Tier-1/portfolio ladder. Freeze raw/reference/settings identity, repair the first wrong owner with local cleanup and record exact results for REL-05. Apply the owning execution contract and its Stage Source-Style Gate.
 ```
 
-</details>
-
 ### `FR-05` — Performance, Stability, And Native Proof
+
+Use original frame/native/memory evidence and existing tools. This stage closes the fixed release protocol after scoped per-feature cost checks; it does not implement an internal profiler or repeat unchanged feature proofs. Remove disposable probes before handoff. A measured defect returns to its production owner for a bounded repair and same-slice deletion, then invalidates only affected candidate proof; no permanent benchmark service or fault API is added here.
 
 **Goal:** prove declared budgets, failure/recovery behavior, soaks, and native D3D12/Vulkan correctness for the same candidate.
 
@@ -129,13 +84,13 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 
 **Failure modes:** observer changes result; no cold/steady distinction; validation warning dismissed; device loss called recovered; memory high-water omitted; backend divergence hidden.
 
-**Phase exit criteria:** `REL-06`/`REL-07` pass with causal measurements, native diagnostics, controlled failure evidence, and exact candidate identity.
+**Phase exit criteria:** `REL-06`/`REL-07` pass with causal measurements, native diagnostics, controlled failure evidence, and exact candidate identity. Actual production additions and deletions satisfy the Phase Card Contract; temporary validation code and registrations are gone.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only FR-05 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-05--performance-stability-and-native-proof.
+Execute only FR-05 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-05--performance-stability-and-native-proof. Apply the owning execution contract and its Stage Source-Style Gate.
 Run the REL-06/07 budget, stability, recovery and paired-native checks for one candidate and declared laptop benchmark. Separate cold and steady results, observer effects and unsupported rows. Retain raw timings, memory and validation findings.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
 ```
@@ -158,8 +113,8 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only FR-06 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-06--candidate-freeze-and-independent-adoption.
-Freeze one package identity after prerequisite gates pass. Run the documented independent consumer and source-adopter journeys for REL-08/09 without private repair or author caches. Invalidate dependent proof if bytes or configuration change.
+Execute only FR-06 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-06--candidate-freeze-and-independent-adoption. Apply the owning execution contract and its Stage Source-Style Gate.
+Freeze one package identity after prerequisite gates pass. Run the documented independent consumer and source-adopter journeys for REL-08/09 without private repair or author caches. Reuse existing manifests and operation reports; add no adoption runner or reporting authority. A required repair returns to its owner with same-slice cleanup and invalidates dependent proof if bytes or configuration change.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
 ```
 
@@ -169,7 +124,7 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 
 **Goal:** publish exactly the approved candidate and verify its public identity, downloads, documentation, and truthful no-support/self-service entry points.
 
-**Non-goals:** last-minute feature work or replacing an approved artifact after publication.
+**Non-goals:** last-minute feature work, an installer/updater/publication service, or replacing an approved artifact after publication. Reuse current signing/manifest/package operations; remove obsolete staging inputs and temporary publication probes while retaining final bytes and provenance.
 
 **Failure modes:** tag/archive mismatch; wrong hashes; missing notices; unavailable download; public docs describe excluded behavior; public instructions invent a support service or omit self-service recovery.
 
@@ -181,7 +136,7 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only FR-07 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-07--publish-and-verify.
+Execute only FR-07 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-07--publish-and-verify. Apply the owning execution contract and its Stage Source-Style Gate.
 Prepare the already approved candidate for publication under REL-10. Verify signatures, immutable downloads, public identity and truthful self-service policy. Perform authorized publication only, then verify the downloaded bytes against the frozen archive.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
 ```
@@ -196,13 +151,13 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 
 **Failure modes:** known critical blocker omitted; replacement lacks provenance; defect cannot be reproduced; public bytes differ without a new version; false support promise.
 
-**Phase exit criteria:** `REL-11` passes with a bounded release-review ledger, any required replacement/withdrawal records, no unresolved release blocker and a final accepted release report.
+**Phase exit criteria:** `REL-11` passes with a bounded release-review ledger, any required replacement/withdrawal records, no unresolved release blocker and a final accepted release report. Earlier stage cleanup is verified; no dormant next-program code, support service or completed implementation instructions remain in the active delivery route.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only FR-08 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-08--stabilize-and-close.
+Execute only FR-08 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-08--stabilize-and-close. Apply the owning execution contract and its Stage Source-Style Gate.
 Perform the finite maintainer review under REL-11: disposition known defects, rehearse required replacement/withdrawal decisions and reconcile invalidated evidence. Record the closeout decision before admitting the next program; promise no support service.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
 ```
@@ -218,7 +173,7 @@ Stop the current iteration when any of these is true:
 - an implementation would create a second mutable owner, semantic path, selector truth, or evidence truth;
 - a required check is unavailable, inconclusive, or bound to a different candidate;
 - the only route to passing is a silent fallback, map-specific workaround, compatibility layer, broad mutex, retry loop, or suppressed native diagnostic;
-- the Reference Path Tracer work would cross from `PTD-00` discovery into implementation before the gate passes;
+- a required changed reference-domain decision is unresolved; accepted PTD-00 and delivered source work are preserved rather than reopened by default;
 - the active candidate, package manifest, release map set, provider version, backend, or configuration changes without evidence invalidation.
 
 ## Explicitly Unscheduled Capabilities
@@ -226,7 +181,11 @@ Stop the current iteration when any of these is true:
 The first release does not automatically schedule geometry-cache animation, neural graphics, volumetric lighting, frame generation, native Linux, a binary SDK, an installer, a full CI/regression product beyond the approved deterministic release gates, or an internal performance-dashboard product. Linux is excluded from the roadmap. The other Architecture dossiers retain their negative/target contracts. Deferred decals, color grading, chromatic aberration, and HDR10 output are explicitly scheduled release blockers through `FCR-REN-23` through `FCR-REN-26`; their acceptance remains open until the required implementation and evidence pass. Admit any other capability only by changing scope, adding/updating its FCR and feature-local acceptance, re-evaluating dependencies and risks, and invalidating affected release evidence.
 ## Phase Card Contract
 
-Follow [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md) and the owning feature checks. Inspect current source, preserve supported behavior, extend existing owners, delete replaced paths and record exact results. An unavailable check remains blocked. Phase briefs do not authorize scope expansion or broad builds unrelated to the affected claim.
+Every child stage and copied prompt uses the same delivery rule: identify the selected promise and actual consumer, reuse compatible code/evidence, then close only its missing production/proof delta or a bounded simplification preserving that path. A deletion slice can be complete with no replacement capability. Global priority comes from Roadmap; local prerequisites come from the owning contract, not a phase-number chain. [Portfolio focus](../../../Strategy/Roadmap.md#portfolio-focus-and-existing-code-simplification) protects rendering depth and necessary support while minimizing general-engine scope; Launcher retains its explicit presentation/reproduction role.
+
+Follow [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md), including its [stage complexity budget](../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget), [scope/retirement](../../../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision), responsibility refinement and the [source-style gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate). Each stage names the touched existing path to retain, narrow, replace or retire; proposed state/API/hooks/copies/dependencies require a current consumer and a reason existing representations cannot serve it. Its work and exit compare that budget to the actual diff, delete replaced code/state/selectors/build/dependencies, and include a positive retained-path check and a stale-reachability check; justify zero deletion instead of inventing churn. Unjustified additions or postponed cleanup leave that stage open. A final cleanup stage verifies these results and cannot defer them.
+
+Use owning AC/FM/checks, exact candidate/API/profile/content identities and the cheapest falsifying control. Check IDs do not authorize a permanent fixture, runner, report generator or fault-injection API. Preserve useful unique evidence; reuse shared package/adoption artifacts rather than run a new journey per family. Required unavailable proof stays blocked. No broad build/cook/map sweep occurs merely to gain confidence.
 
 ## Complete Feature Routing
 

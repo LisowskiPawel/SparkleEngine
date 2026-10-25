@@ -45,6 +45,8 @@ This is a cross-feature workload contract. Individual Renderer and RHI criteria 
 
 ## Decision
 
+**Program boundary:** this document's Bistro/San Miguel, bottleneck-study, neural and portfolio completion gates belong to the later advanced program. The [first release](FirstRelease.md#releasemapset) uses seven selected examples plus Empty. Reuse the applicable map-check method and evidence semantics there; do not import this entire workload ladder into `REL-04/05`. Release work takes priority until closeout, and later workload admission still follows [Roadmap scope protection](../Strategy/Roadmap.md#scope-protection).
+
 The ORCA Bistro scene is SparkleEngine's primary product acceptance workload for the next six to twelve months. San Miguel 2.0 is the supported secondary acceptance workload.
 
 This is not a decision to add another sample. It is a decision to use one production-shaped scene to force the renderer, content pipeline, tools, measurement practice, and public evidence to converge on a credible result.
@@ -566,7 +568,7 @@ For the fixed neural GI denoising/reconstruction feature:
 - the held-out scene determines whether a result is a general feature or a Bistro-specific fit;
 - training/offline dependencies do not become runtime dependencies.
 
-San Miguel is the required first held-out light-transport scene because it is available in simple OBJ/PNG research formats and presents different interior visibility. It remains a fully supported user scene while its frozen final-test cameras remain excluded from neural training and model-selection decisions.
+San Miguel is the required first held-out light-transport scene for the admitted advanced program because it presents different interior visibility. Its supported-scene claim waits for that program's acquisition/material/runtime proof; its frozen final-test cameras remain excluded from neural training and model selection.
 
 ## Evidence Packages
 
@@ -579,6 +581,21 @@ One workload should produce several narrow stories rather than one enormous "eng
 | `CASE-03 Reference Path Tracer Under Budget` | Reference convergence, real-time sample allocation, BLAS/TLAS and lighting cost, quality/performance frontier, failure cases. | `PGE-02`, `PGE-05`, `PGE-08`, `PGE-10`, `PGE-13` |
 | `CASE-04 Model to Shader` | Dataset split, model/operator derivation, immutable export, numerical checks, optimized GPU kernels, classical fallback, Bistro presentation and held-out San Miguel results. | `PGE-03`, `PGE-04`, `PGE-08`, `PGE-11`, `PGE-12`, `PGE-13` |
 | `CASE-05 Adoption Package` | Clean acquisition/build/cook/run, capability and fallback matrix, tuning guide, peer reproduction, issue template. | `PGE-01`, `PGE-07`, `PGE-13`, `PGE-14`, `PGE-15` |
+
+### Evidence Folders And Delivery Owners
+
+Keep one subject home per coherent evidence stream. A PGE capability can reuse several original streams; it does not need a duplicate folder, runner or report. These are output locations populated when real work runs, not empty directories or passed results created by planning.
+
+| Evidence stream | Maintained contract and plan | Candidate artifact home |
+| --- | --- | --- |
+| Approved release/source/package/native proof | Existing [First Release plans](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md); feature plans retain implementation | Existing `artifacts/validation/releases/<version>/<candidate-id>/` and its original feature/completion references; preserve accepted older paths/hashes. |
+| Content to correct pixel / WL-01..03 | [Content To Pixel](../Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md) | Existing `artifacts/validation/showcase-levels/<run-id>/<level-id>/`; CASE-01/03 link source/cook/pixel/reference proof. |
+| Analysis consumer and complementary native studies / WL-04 | [Workload Studies](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md), [domain folders](../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/StudyProtocols.md#owned-evidence-folders) | Existing `artifacts/validation/performance-diagnostics/<package-id>/<run-id>/<level-id>/`; use package IDs `WS-ANALYSIS`, `WS-CPU`, `WS-GPU`, `WS-LIFE`, `WS-INCIDENT`, with subject `analysis/`, model/decision notes and references to original captures. |
+| Owned data/model/shader/runtime / WL-05..06 | [Neural Graphics](../Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md) | `artifacts/validation/neural-graphics/<candidate-id>/` with `component/`, `baseline/`, `dataset/`, `training/`, `conformance/`, `runtime/`, `evaluation/`; existing immutable data/model/cook manifests remain original authority. No bulk dataset/checkpoint copy into source. |
+| Three cases and first independent reproduction / WL-07..08 | [Graphics Portfolio stages 1..3](../Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md) | `artifacts/validation/portfolio/<candidate-id>/` with selected CASE narratives/original-artifact index and `CASE-05/reproduction/`. Link original technical records instead of duplicating them. |
+| Direction, second-context learning and revision / M7 | [Technology Transfer](../Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md) | The same portfolio candidate's `CASE-05/transfer/`: task/rubric, authorized observations/feedback, decision and revision/retest references. Actual participant privacy/permission controls sharing. |
+
+Every packet binds exact source/dirty scope, cooked content/model/shader and native identity, API/profile/hardware/driver/tools/settings, units/population/observer and oracle, commands, raw observations, failure controls, verdict/limits and invalidation triggers. Schema, numerical and acceptance meanings remain with their existing owners; these directories are storage, not a new evidence service or runtime manifest format. Preserve original immutable evidence when the candidate changes; new results get a new run identity. Source-only, unavailable and external/non-repository facts cannot become PASS by having a folder.
 
 The public front page shows only:
 
@@ -598,7 +615,7 @@ The engine should not accumulate flagship scenes.
 | Workload | Distinct value | Decision for the next year |
 | --- | --- | --- |
 | Current Sponza | Small, fast, already integrated; catches startup, basic material, raster, and RT regressions. | **Keep as Tier 0.** Run frequently. Never use alone for flagship claims. |
-| Modern Sponza base/add-ons | High-resolution PBR, 4K textures, curtains, animation, alpha-card trees, emissive-light, Alembic water, VDB volumes, and multiple interchange formats. | **Support as an opt-in compatibility family without flagship status.** The exposed Modern Sponza base always combines the publisher base with Colorful Curtains; Emissive Candles and Animated Knight layer on that composition. Ivy, Trees, Flood, and Volumetric Explosion remain visible disabled add-ons and are never downloaded until their named technology gates close. Official sample library: [GPU Research Samples](https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html). |
+| Modern Sponza base/add-ons | Base plus curtains exercises the selected release content. Animation, foliage, water and volumes represent separate technology choices. | **Qualify the selected base plus Colorful Curtains first.** Candles, Knight, Ivy, Trees, Flood and Volumetric Explosion are not selected release examples or implicit later implementation tasks. Do not acquire or build their missing technology without separate Roadmap admission. Official source context: [GPU Research Samples](https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html). |
 | San Miguel 2.0 | Iconic PBRT scene; different interior/courtyard visibility, dense detail, and indirect-light transport in a 523 MB corrected high/low OBJ/PNG package. | **Support as Tier 1 secondary.** It receives import, material, reference-quality, benchmark, deterministic-route, high/low scaling, gallery, and neural held-out gates, but Bistro remains the flagship story. Source: [McGuire Computer Graphics Archive](https://casual-effects.com/g3d/data10/index.html). |
 | Sun Temple | Recognizable detailed PBR environment with about 1.64 million published vertices in FBX/Falcor form. | **Do not add now.** It overlaps the current material/architecture scene set and has non-commercial share-alike terms. Source: [ORCA scene page](https://developer.nvidia.com/ue4-sun-temple). |
 | Emerald Square | Approximately 10.0 million triangles and city-scale geometry; useful for AS memory, culling, and streaming beyond Bistro. | **External post-Bistro benchmark only.** Its CC BY-NC-SA 3.0 terms conflict with uncomplicated future commercial bundling. Do not ship it as product content. Source: [ORCA scene page](https://developer.nvidia.com/orca/nvidia-emerald-square). |
@@ -610,7 +627,7 @@ Scene-adoption rule:
 
 > Add another workload only when it exposes a measured failure mode that Bistro and the fast regression set cannot expose, and when fixing that failure advances a named `PGE-*` requirement more than it delays the flagship package.
 
-Cataloging an optional source package or disabled future add-on is not a claim that it is an adopted runtime workload. Modern Sponza compatibility work and Jungle Ruins source acquisition must not displace the Bistro/San Miguel acceptance gates.
+Cataloging an optional source package or disabled future add-on is not a claim that it is an adopted runtime workload. Within the admitted advanced program, optional add-ons and Jungle Ruins acquisition must not displace the Bistro/San Miguel gates. Required Modern Sponza first-release qualification retains its earlier Roadmap priority.
 
 ## Workload Gate Sequence
 
@@ -626,6 +643,8 @@ The [Roadmap](../Strategy/Roadmap.md) owns global delivery priority without cale
 | `WL-06 Runtime Inference` | Real shader inference, numerical checks, latency/memory profile, Bistro quality frontier, and classical fallback. |
 | `WL-07 Reproduction` | Three completed bottleneck studies, regression thresholds, clean acquisition/build/cook/run, and an external reproduction attempt. |
 | `WL-08 Publication` | Hero stills, traversal video, three specialist case studies, model-to-shader result, limitations, and reviewer-ready routing. |
+
+The post-release portfolio joins these existing results through [Review And Transfer](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md). M6 requires the actual technical package and first independent reproduction/review, beyond an attempted run. The stronger M7 packet adds expert challenge/direction, a second consumer context, observed teaching and feedback-driven revision/retest under AC-PORT-04..08, recorded with existing CASE-05/WL adoption evidence. This extends portfolio evidence depth, not first-release scope, workload IDs or numerical thresholds. No external outcome is awarded by this contract.
 
 ## Completion Gate
 

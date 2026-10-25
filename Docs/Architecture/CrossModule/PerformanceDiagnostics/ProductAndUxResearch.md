@@ -326,33 +326,18 @@ This is consistent with the reviewed production frontends. Epic exposes a saved-
 
 ## Selected Direction And Canonical Handoff
 
-The hybrid diagnostics ladder is the selected result of this research: cheap compact orientation, one joined Performance workspace, a bounded captured-frame GPU view, explicit evidence export, and stable handoff to specialized external tools. The detailed specification now lives with its durable owners instead of being repeated in this research record.
+The earlier research preferred a hybrid internal diagnostics ladder. Current strategy selects the external-capture route and necessary measurement evidence, not its joined workspace, stat catalog or captured-frame UI. Those are design alternatives to reevaluate only for a demonstrated consumer; product precedent does not authorize their implementation.
 
-| Selected concern | Adopted boundary | Canonical owner |
-| --- | --- | --- |
-| Product depth and surfaces | Task-first Quick/CPU/GPU/Memory entry, an initially bounded compact-overlay set, one fixed Overview/CPU/GPU/Memory workspace, and external tools for causal depth. Raw stat groups remain expert customization, not the first menu. | [Product information architecture](PerformanceDiagnosticsDesign.md#diagnostics-product-information-architecture) |
-| Physical/logical ownership and metric meaning | Physical CPU thread rows, logical phases inside their real owners, independent GPU queues, distinct memory definitions, explicit validity. | [Measurement and view contracts](PerformanceDiagnosticsDesign.md#measurement-vocabulary) |
-| Selection and interaction | One shared frame/range/object selection; hitches are frame selections; Sparkle GPU capture stays inside the GPU view; an attached external provider may add one targeted viewport action; filtering never changes totals. | [Workspace interaction contract](PerformanceDiagnosticsDesign.md#workspace-interaction-contract) |
-| Visual and failure behavior | Milliseconds lead, color is never the only signal, configuration remains visible, and pending/stale/unsupported/lost states never masquerade as zero. | [Visual and accessibility rules](PerformanceDiagnosticsDesign.md#visual-validity-and-accessibility-rules) |
-| Concrete product presentation | Integrated graphical mockups, every compact group, fixed workspace views, evidence actions, keyboard baseline, and failure states. | [Performance Diagnostics Visual Design And Tool Wireframes](VisualDesign.md) |
-| Resource inspector boundary | Existing shader, mesh, and texture tools remain asset inspectors unless an accepted migration removes the old route; they do not own system performance truth. | [Product surfaces and depth boundary](PerformanceDiagnosticsDesign.md#product-surfaces-and-depth-boundary) |
-
-This handoff preserves the adopted decisions while keeping research focused on precedents, options, tradeoffs, and why the hybrid direction won. The following low-clutter principles remain here because they summarize the implementation consequences drawn from the research.
+| Question carried forward | Current owner |
+| --- | --- |
+| What does the physical/logical owner, interval, unit and validity mean? | [Measurement semantics](PerformanceDiagnosticsDesign.md#measurement-vocabulary). |
+| How does a real capture request reach native completion and safe lifetime? | [External Capture](ExternalCapture/ExternalCaptureDesign.md). |
+| Which original artifacts and comparisons prove the selected claim? | [Workload Studies](WorkloadStudies/WorkloadStudiesDesign.md), shared [Acceptance](Acceptance.md). |
+| Would an internal presenter add value over current tools? | [Conditional architecture](PerformanceDiagnosticsDesign.md#diagnostics-product-information-architecture) and [visual alternatives](VisualDesign.md); a new scope decision is required. |
 
 ## Low-Clutter Integration Principles
 
-The UX alone cannot prevent instrumentation clutter. The selected functionality imposes these implementation-facing constraints without designing the collector here:
-
-- One presentation-neutral diagnostics product feeds overlays, Performance, benchmark summaries, and export.
-- Normal entry points are user questions/presets; the fixed group catalog is available through contextual customization and the console, not displayed as twelve equal choices.
-- UI panels consume immutable snapshots and issue typed semantic requests. They do not include renderer snapshots directly, synchronously query live engine state, or define measurement semantics.
-- Instrument stable owner boundaries: application frame, named physical threads, scheduler lanes, renderer phases, frame-graph passes, RHI queue/timestamps, allocator/memory authority.
-- RDG pass declaration/execution supplies semantic GPU scopes automatically. Feature code adds a child marker only when it answers an accepted workload question.
-- Counts are incremented where normal work already occurs; no diagnostics-only scene/resource rescan.
-- Hot records use fixed IDs/tokens and bounded storage. Strings are resolved outside capture paths.
-- Deep modes are explicit and temporary. Closing the last consumer releases demand; no hidden always-on trace.
-- Adding a view requires an authoritative producer, declared cost, bounded model, UX slot, validation plan, and an external escalation boundary.
-- When a new route supersedes one of the current Editor diagnostic provider callbacks or standalone panels, remove the replaced path in the same accepted migration. Do not create a second compatibility system.
+Keep measurements with their production owner, derived results immutable and costs/validity explicit. Native tools retain causal depth. A new consumer reuses the same fact/capture route; it does not create another collector, history, schema or synchronization policy. Stable pass/owner markers arise from existing execution and must not become an authoring-registration burden. Delete the presentation or callback path a selected replacement actually supersedes; there is no standing migration to a common workspace.
 
 ## Current Sparkle UX Reconciliation
 
@@ -367,28 +352,15 @@ The 2026-09-29 local source reconciliation at `d1d26dbb` shows useful foundation
 - Used Meshes and Used Textures refresh a captured snapshot when opened; Used Shaders has explicit refresh and artifact tabs. These are useful interaction precedents for snapshot/status/detail, not a whole-system diagnostics architecture.
 - Renderer/RHI already have scoped GPU events/timers, frame-graph pass/chunk scopes, D3D12 PIX events, Vulkan debug labels, timestamp allocation/resolution, memory diagnostics, and task ETW profiling. The UX can reuse their semantic vocabulary after the ownership/publication design is accepted.
 
-This reconciliation is not a request to refactor the current panels now. It establishes the integration pressure the later implementation plan must resolve.
+These are dated source observations, not current repair tasks. The later capture implementation supersedes the missing-selection/icon observations; use its live owner before any change. Refactor a panel only when the selected journey demonstrates the defect.
 
 ## Portfolio And Reviewer Presentation
 
-One implementation slice should intentionally produce four readable artifacts:
-
-1. Hero: Sponza viewport plus compact `Stat Unit`/memory summary and exact configuration.
-2. Triage: Performance Overview showing frame distribution, physical CPU owners, GPU queue/pass ranking, process RAM plus local/non-local GPU memory, likely domain, and next action.
-3. Focused GPU: captured marker timeline/tree with inclusive/`exclusive (uncovered)` columns and a selected pass path found in PIX/Nsight/RGP.
-4. Experiment: aligned baseline/change table with p50/p95/p99 or required percentiles, high-water values, capture links, and causal caveat.
-
-The portfolio narrative should be `symptom -> reliable baseline -> Sparkle orientation -> external capture -> hypothesis -> one controlled change -> distribution/result -> limitations`. A beautiful profiler screen without a reproducible route and causal experiment is decoration, not engineering evidence.
+Reuse one understandable rendered result, original native capture, exact configuration and baseline/candidate table or plot from the selected study. A raw/CLI result can supply the evidence; no Stat Unit overlay, Performance Overview or internal GPU screen is required to make a credible case. Explain symptom, controls, competing hypotheses, one discriminating change, measured result, deletion/negative result and limitations.
 
 ## Adoption Order
 
-This research recommends design validation in this order; it is not an implementation schedule:
-
-1. Validate terminology, units, frame selection, configuration ribbon, and Overview wireframe against `MAP-00`.
-2. Validate physical CPU thread/phase lanes and GPU queue/marker hierarchy against actual Sparkle topology.
-3. Validate Memory definitions and category ownership before drawing any graph.
-4. Prototype Performance interactions using fake immutable data: live/frozen, frame/range selection, pending/invalid, filters, inspector, GPU capture state.
-5. Only after the product questions survive review, design producer/publication slices in the canonical architecture.
+Select the investigation question, verify existing producer/tool input, and run its cheapest falsifying check. If those routes answer it, stop adding tooling. Only an unresolved recurring consumer need justifies a new bounded observation or presentation slice; its design and proof are selected together. Do not prototype an entire workspace with fake data before establishing that need.
 
 ## Source Quality, Adoption, And Revalidation
 

@@ -6,7 +6,7 @@ Stages: [Stage 3](#stage-3---validate-the-semantic-integrator) / [Stage 4](#stag
 
 Recover useful Lit and Reference images, then prove the existing tracer before using its output as a reference.
 
-**Status:** source stages delivered; recovery, deferred GPU validation, artifact integrity and final adoption remain open
+**Status:** development source stages delivered; recovery, approved Shipping host/output integration in Stages 7/9, deferred GPU validation, artifact integrity and final adoption remain open
 
 **Reconciled:** 2026-10-10 against source `34b6d8a7a34283fb4bf568be13307c741ca1bedd`. This cleanup reuses the existing source-delivery records and deferred-evidence disposition; it does not claim a fresh cook, launch, pixel, estimator or reference-authority result. The black-lighting observation remains dated 2026-09-26 until a new candidate disproves it.
 
@@ -17,6 +17,8 @@ Recover useful Lit and Reference images, then prove the existing tracer before u
 | First action | [recovery execution order](#required-execution-order): verify the dated black-lighting symptom and find the first incorrect radiance or display product. |
 | Result to reach | Correct nontrivial radiance for one exact candidate, followed by backend, estimator, lifecycle and artifact-integrity evidence. |
 | Start / stop | Recheck cooker/Editor launch before rebuilding/cooking. Preserve delivered stages; Stage 10 still waits for its evidence candidate, release inputs and package prerequisites. |
+
+The later [neural component measurement](ExecutionArchitecture.md#conditional-neural-component-measurement), `RPT-FS-21`, is deliberately outside this recovery/release sequence. After NG-D0/REL-11/M3, [NG-S1](../../../../../../CrossModule/NeuralGraphics/ImplementationPlan.md#ng-s1---deterministic-dataset) owns its admitted producer-to-dataset order and affected Reference requalification. Do not add that output to Stage 9 merely because both use raw publication, or treat beauty acceptance as component proof.
 
 ## Current Recovery And Completion Route - 2026-09-26
 
@@ -60,13 +62,15 @@ The [mathematical audit](TransportAndEstimator.md#current-invalid-sample-and-cla
 4. **Clear the Vulkan and frontend gate.** Repeat the same semantic inputs under Vulkan and every automatically selected complete Inline/Pipeline route with native validation. Then execute the raw paired comparison required by `CHK-RPT-12`; a successful launch alone is insufficient.
 5. **Prove raw-product and artifact integrity.** Exercise exact committed-prefix capture, FLOAT EXR decode/round trip, checkpoint mean/M2/count restoration, hashes, provenance mutation, cancellation, access/disk failure, interruption, and completion-file-last publication under `CHK-RPT-09`, `10`, and `13`.
 6. **Close the source-contract discrepancies and execute the estimator evidence ladder.** Prove unsupported reachable content is rejected before sample zero and invalid samples cannot advance a valid/completed prefix; then run `CHK-RPT-03` through `11` with the frozen analytic/metamorphic scenes, hand cases, injected PDF/MIS/emission/roulette/sample/endpoint/accumulation defects, independent replicates, and semantically matched external renderers. Do not tune thresholds or scope after observing output.
-7. **Finish product and release proof.** Complete Editor and Game first use, accessibility, response/resource budgets, unsupported routes, Shipping exclusion, clean package operation, release maps, and every remaining `CHK-RPT-14` through `20` cell. Only then may Stage 10 submit `FCR-REN-08`.
+7. **Finish product and release proof.** Close the approved Shipping host/output delta in Stages 7/9, then prove Editor/Game first use, accessibility, response/resource budgets, unsupported routes, Included consumer reachability, unrelated developer-tool exclusion, clean package operation, release maps and every remaining `CHK-RPT-14` through `20` cell. Only then may Stage 10 submit `FCR-REN-08`.
 
 ### Recovery gate
 
 Stage 9 remains source-delivered, but it cannot produce an evidence candidate until steps 1-6 pass for one immutable candidate. Stage 10 remains unauthorized until that evidence candidate also satisfies the exact release inputs named by Stage 10. Manual work may be deferred without erasing source progress, but an observed black frame is an active failed product criterion rather than merely an unrun check.
 
 ## Universal Execution Contract
+
+Each stage passes the [Stage Source-Style Gate](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
 Every implementation prompt below inherits these rules. The executing agent must:
 
@@ -76,7 +80,7 @@ Every implementation prompt below inherits these rules. The executing agent must
 4. implement only the selected stage and defects required for its exit criteria. Do not begin later UI, general framework, performance, denoising, neural, material-system, or compatibility work;
 5. preserve Scene-owned scene data, View-owned view identity/camera data, one private Reference Path Tracer product/policy capsule, the existing small shared path-tracing/RayTracing/Lighting/Common shader owners, thin RHI traversal adapters, and the single-truth/copy budget. After preparation, pass the canonical `RenderFrame` through execution boundaries instead of unpacking parallel identity/time/Scene/View/ray-binding arguments or carrying the complete mutable viewport request beside its accepted View; pass only a focused one-shot control edge when the feature consumes one. Preserve the original Sparkle frame shell: `FramePipeline::BuildRenderFrameGraph` calls ordinary nested `Add...Passes` functions, while `AddSceneRenderingPasses` selects the accepted request's `RenderViewMode::ReferencePathTracer` and invokes either the Lit or Reference pass function directly before declaring shared exposure, optional scene denoising, and presentation-upscaling passes once. Never add a class-shaped graph stage, recipe/base interface, graph factory, dependency bag, global feature manager, Editor mirror enum, target/show-flag translation, graph-settings copy, process-global selector, RHI mode, second renderer/frame loop/submission path, or both estimator middles together;
 6. apply the [GPU-Only Transport Boundary](#remaining-work-at-a-glance) and [Shared Path-Tracing Family Boundary](#remaining-work-at-a-glance) before adding or naming any type, function, resource, or file. Keep only Reference target/claim, selected strategy set and admissibility, sample-stream identity/dimensions, finite/reference termination, per-view session/invalidation/progress, raw-result authority, evidence, and failure policy in the feature capsule. Extend the established `Common`, `Lighting`, `RayTracingHit*`, `PathSurface`, `RayTracingPathSample`, `PathSampling`, `PathLighting`, and `PathTracer` shader owners for camera/RNG mechanics, trace/hit/material/surface conversion, environment, path state/events, BSDF/light sample-evaluate-PDF, visibility, MIS/roulette arithmetic, robust rays, and accumulation arithmetic whose semantics are reusable by unbiased, optimized/biased, cache-backed, or denoised GPU path tracers. Search current Reference, `Path*`, ReSTIR, and cache-facing shader code before adding code. No generic mechanism may retain a `ReferencePathTracer` name; no Reference-only or biased/cache/denoiser policy may enter a shared owner; no second shared vocabulary may compete with an established one; and only the production GPU shader route may produce transport results;
-7. perform clean breaks for Sparkle-owned contracts: update all producers/consumers/build/docs together and delete the replaced path. Do not add legacy readers, aliases, version bridges, fallback selectors, or dual representations;
+7. apply the [stage complexity budget](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) to each recovery/validation repair: retain or narrow the consumed current route, justify every persistent addition, update all producers/consumers/build/docs together and delete the replaced path before this stage exits. Reject unused state, wrappers, legacy readers, aliases, version bridges, fallback selectors or dual representations; no deletion is required when evidence-only work leaves the production path unchanged;
 8. keep current code/behavior labels honest. Never use “unbiased,” “ground truth,” “converged,” or “accepted reference” beyond the exact passed scope;
 9. design each check with initial state, action/injection, oracle, matrix, artifact, maximum duration/resources, cleanup, and escalation. Use the cheapest claim-falsifying check first;
 10. do not add submitted test-only classes, fixtures, executables, files, CMake targets, feature-specific diagnostic passes/readbacks, debug panels, dashboards, or parallel inspection APIs. Use the real production route and existing generic capture/validation surfaces. A temporary focused probe is allowed only when a named criterion cannot be falsified more cheaply, and every probe must be removed before handoff;
@@ -109,7 +113,7 @@ If source reality proves a plan instruction wrong, correct the owning architectu
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 3 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-3---validate-the-semantic-integrator.
+Execute only Stage 3 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-3---validate-the-semantic-integrator. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Validate The Semantic Integrator. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
 ```
@@ -131,7 +135,7 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 4 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-4---validate-surface-transport.
+Execute only Stage 4 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-4---validate-surface-transport. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Validate Surface Transport. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
 ```
@@ -153,7 +157,7 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 5 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-5---validate-content-and-numeric-robustness.
+Execute only Stage 5 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-5---validate-content-and-numeric-robustness. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Validate Content And Numeric Robustness. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
 ```
@@ -180,7 +184,7 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 6 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-6---validate-per-view-accumulation-and-mode-authority.
+Execute only Stage 6 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-6---validate-per-view-accumulation-and-mode-authority. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Validate Per-View Accumulation And Mode Authority. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
 ```
@@ -189,9 +193,9 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 
 ## Stage 7 - Validate Live Viewport And Lit Comparison
 
-**Remaining work:** exercise the existing production route against the following retained exit requirements; repair only demonstrated failures. This is deferred validation, not another implementation of the delivered feature.
+**Remaining work:** reuse the delivered development viewport/session route and close only the approved ShippingEditor/ShippingGame host-selection, progress and control gap. Use the existing viewport/menu and same Renderer request; no Game settings frontend or host-specific estimator. Delete replaced host selectors/progress copies in this slice, then validate the following exits. This does not reopen the integrator.
 
-- A first-time Editor user finds Reference Path Tracer immediately after Lit, while an approved Game host can select the same mode through its ordinary development view selector. Either route sees the latest composition accumulate, moves/rotates its canonical camera with responsive feedback and exact reset, stops and sees automatic refinement, completes, switches Lit/back with correct resume/reset, and pauses/restarts without private Renderer knowledge, saving, or a wizard.
+- A first-time Editor user finds Reference Path Tracer immediately after Lit, while an approved Game host can select the same mode through its ordinary viewport/menu owner in the approved development and Shipping products. Lit remains the startup default; selection is explicit and unrelated console/debug/external-capture surfaces stay excluded. Either route sees the latest composition accumulate, moves/rotates its canonical camera with responsive feedback and exact reset, stops and sees automatic refinement, completes, switches Lit/back with correct resume/reset, and pauses/restarts without private Renderer knowledge, saving, or a wizard.
 - Every hard invalidation resets before mixing; every presentation/scheduling-only change preserves the prefix; continuous animation never produces accepted streaked history.
 - The overlay remains truthful through validation, rapid camera motion, reset, accumulation, completion, pause, Lit suspension, eviction, unavailable, and failure states; target progress is never labeled convergence.
 - Closing details/viewport/application, invalid inputs, second-view capacity, eviction, time/resource limits, accessibility, and user-facing error/support behavior match the frozen contract.
@@ -203,8 +207,8 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 7 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-7---validate-live-viewport-and-lit-comparison.
-Task: Validate Live Viewport And Lit Comparison. Complete only its remaining work using the stage requirements and owning checks.
+Execute only Stage 7 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-7---validate-live-viewport-and-lit-comparison. Apply the owning execution contract and its Stage Source-Style Gate.
+Task: Close only the approved Shipping host selection/progress/control delta, then validate the common live viewport/Lit loop. Apply the stage budget and same-slice host cleanup; do not reimplement transport or add a settings frontend.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
 ```
 
@@ -224,7 +228,7 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 8 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-8---prove-traversal-and-backend-parity.
+Execute only Stage 8 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-8---prove-traversal-and-backend-parity. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Prove Traversal And Backend Parity. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
 ```
@@ -233,7 +237,9 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 
 ## Stage 9 - Prove Manual Publication And Evidence-Candidate Integrity
 
-**Remaining work:** exercise the existing production route against the following retained exit requirements; repair only demonstrated failures. This is deferred validation, not another implementation of the delivered feature.
+**Remaining work:** qualify the current raw-prefix path and close the admitted consumer export gap. Move only necessary encoder/publication mechanics from private Application Editor ownership to private Application ownership, using existing typed output actions and small host adapters. Update Game/Editor producers, operation lifetime, CMake/dependencies and package membership together; delete the replaced Editor-only implementation. Preserve the existing schema, atomic publication and exact prefix, with no Editor dependency in Game or second writer/collector. Then prove the retained exits below.
+
+Recheck the retained [default long-destination failure](../../../../../../CrossModule/PerformanceDiagnostics/ExternalCapture/Discovery.md#stage-0b-implementation-handoff---2026-10-08): the historical checkpoint failed at a 261-character staging path, while a shorter explicit-root control passed. Those results do not qualify the canonical default. Fix any still-present composition/creation defect at the Application artifact/Core filesystem owner, preserving source identity, collision safety, canonical user-state containment and transactional publication. An output-root escape override, truncation or machine-wide path setting cannot serve as the product fix. Run normal and long Unicode/default-root, interrupted-publication and threaded controls against the new candidate; do not infer a cause for the historical access violation without evidence.
 
 - `CHK-RPT-03` through `13` all pass for every included matrix cell before Stage 9 may claim an evidence candidate. If owner-operated execution is deferred, Stage-9 implementation may close as **IMPLEMENTED / VALIDATION DEFERRED**, the exact matrix remains in the backlog, and no oracle/readiness credit is granted.
 - The protocol detects seeded bias, correlation, shared-dependency, local-image, invalid-value, truncation, accumulation, backend, and artifact-publication defects.
@@ -249,8 +255,8 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 9 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-9---prove-manual-publication-and-evidence-candidate-integrity.
-Task: Prove Manual Publication And Evidence-Candidate Integrity. Complete only its remaining work using the stage requirements and owning checks.
+Execute only Stage 9 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-9---prove-manual-publication-and-evidence-candidate-integrity. Apply the owning execution contract and its Stage Source-Style Gate.
+Task: Close the approved shared Application output/Shipping raw-export delta without a second writer or Editor dependency in Game. Complete the stage work, deletion and candidate-integrity exits; revalidate canonical long-path/interrupted-publication failures and preserve exact raw prefixes.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
 ```
 
@@ -260,15 +266,15 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 
 ### Objective
 
-Finish the product boundary, produce release-map references inside the accepted domain, delete old authority, and submit the candidate `FCR-REN-08` report.
+Finish the product boundary, produce release-map references inside the accepted domain, verify prior stage cleanup, and submit the candidate `FCR-REN-08` report.
 
 ### Work
 
 1. Freeze each applicable release-map scene/camera/configuration and verify it lies wholly inside the accepted transport domain.
 2. Produce raw high-sample references, independent replicates, uncertainty/convergence, full frames/crops, artifact checklist, input/output hashes, and shared-dependency oracle statements for `PTD-03`/`MAP-A` through `MAP-H`.
 3. Compare real-time PBR and lighting subjects only against applicable raw reference quantities. Keep display/preview comparisons separately labeled.
-4. Validate the exact DevelopmentEditor/package workflow on clean supported machines, read-only install, writable output root, spaces/non-ASCII, both backends, first use, support output, resource bounds, and controlled failures. Both `ShippingEditor` and `ShippingGame` remain free of every producer/session factory and user/export/package route unless admitted.
-5. Complete the deletion ledger: old reference producer/history/settings/shaders/selectors/docs/artifacts are removed or retained under an unambiguous non-authoritative role. Remove temporary probes and generated local evidence not permitted for submission.
+4. Validate the exact ShippingEditor/ShippingGame archive workflows on clean supported machines, reusing compatible development controls, read-only install, writable output root, spaces/non-ASCII, both backends, first use, support output, resource bounds, and controlled failures. Both Shipping products expose the approved Reference mode/raw export; unrelated development tools/SDKs remain absent. Verify the Stage-7/9 host/output integration rather than adding a separate development archive.
+5. Verify the deletion ledger already closed in each producing/repair stage: no old reference producer/history/settings/shader/selector competes with current authority. Preserve useful original artifacts under their exact candidate identity; remove disposable probes/output. Any surviving production residue returns to its owner as a bounded repair with affected evidence invalidated, rather than using Stage 10 as a postponed cleanup bucket.
 6. Verify source/header/shader/generated/CMake/package/SBOM/license/docs membership and dependency direction. Re-run `CHK-RPT-20` against the then-current pinned NVIDIA revisions and official Epic Path Tracer documentation; any newly relevant capability is explicitly adopted, assigned, deliberately different, or excluded before the completion report.
 7. Run the required focused final checks, architecture boundary check, `git diff --check`, and dirty-work audit. Escalate breadth only for claims actually affected.
 8. File `FCR-REN-08` with exact results, exclusions, failures, limits, evidence links, and invalidation triggers. The acceptance owner, not the implementer or this plan, decides `PASS`, `BLOCKED`, or `EXCLUDED`.
@@ -287,13 +293,13 @@ Finish the product boundary, produce release-map references inside the accepted 
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Stage 10 of Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md after Stage 9 evidence is complete and the exact `ReleaseMapSet`, support-machine identities, and `REL-03 PASS` package revision are accepted. Apply the Universal Execution Contract.
+Execute only Stage 10 of Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md after Stage 9 evidence is complete and the exact `ReleaseMapSet`, support-machine identities, and `REL-03 PASS` package revision are accepted. Apply the Universal Execution Contract, including the Stage Source-Style Gate.
 
-Freeze every applicable release-map camera/configuration within the accepted transport domain and produce PTD-03 raw references with independent replicates, convergence/uncertainty, complete provenance, hashes, full frames/crops, artifact review, and shared-dependency oracle statements. Exercise the exact clean-machine DevelopmentEditor/package workflow, writable-root/read-only-install and spaces/non-ASCII paths, both backends, first use, user-facing error/support output, budgets, and controlled failures. Keep `ShippingEditor` and `ShippingGame` free of every producer/session factory and user/export/package route unless release scope explicitly admits them.
+Freeze every applicable release-map camera/configuration within the accepted transport domain and produce PTD-03 raw references with independent replicates, convergence/uncertainty, complete provenance, hashes, full frames/crops, artifact review, and shared-dependency oracle statements. Exercise the exact clean-machine ShippingEditor/ShippingGame archive workflows, writable-root/read-only-install and spaces/non-ASCII paths, both backends, first use, user-facing error/support output, budgets, and controlled failures. Prove the already approved consumer mode and explicit raw export in both Shipping products, with Lit default, canonical writable roots and no unrelated console/debug/external-capture dependencies. Reuse Stage-7/9 implementation and development controls; add no separate development archive.
 
 NON-NEGOTIABLE: ship only the scope proved by the accepted TransportAndEstimator.md revision and only the workflow proved by UserExperience.md. Every view-mode label/order, preset, overlay, reset reason, Editor/Game result, manifest, artifact action, map comparison, and support message must preserve the bounded claim, host-agnostic Renderer semantic, and raw/preview distinction. A host/View-kind estimator fork, map outside the domain, unexplained invalid-result state, unresolved MATH-* defect, inaccessible first-use step, stale/mixed prefix, silent capability substitution, plausible partial artifact, or surviving competing selector/estimator authority blocks FCR-REN-08.
 
-Complete the clean break: remove or unambiguously relabel all old GBuffer-seeded reference producer/history/settings/shaders/selectors/docs and remove temporary probes; audit source/header/shader/generated/CMake/package/SBOM/license/docs membership and unrelated dirty work. Retain `FRAME-RPT-10` and `CORE-RPT-10`; run CHK-RPT-01, 14, 15, 16, 17, 18, 19, 20 plus every invalidated prior check, architecture_boundary_check, focused builds/runs required by the claims, and git diff --check. File FCR-REN-08 with exact PASS/BLOCKED/EXCLUDED evidence and limitations. Do not call the feature accepted unless every applicable AC-RPT-01 through 23 passes conjunctively and the acceptance owner approves the report.
+Verify the stage-local clean breaks: no old GBuffer-seeded reference producer/history/settings/shader/selector competes with current authority. Return remaining production residue to its owner as an explicit repair and invalidate affected proof. Remove temporary probes; audit source/header/shader/generated/CMake/package/SBOM/license/docs membership and unrelated dirty work. Retain `FRAME-RPT-10` and `CORE-RPT-10`; run CHK-RPT-01, 14, 15, 16, 17, 18, 19, 20 plus every invalidated prior check, architecture_boundary_check, focused builds/runs required by the claims, and git diff --check. File FCR-REN-08 with exact PASS/BLOCKED/EXCLUDED evidence and limitations. Do not call the feature accepted unless every applicable AC-RPT-01 through 23 passes conjunctively and the acceptance owner approves the report.
 ```
 
 </details>

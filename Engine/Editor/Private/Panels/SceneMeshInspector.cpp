@@ -11,7 +11,7 @@
 void SceneMeshInspector::Build(const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation, const std::string& filter) noexcept
 {
 	BuildTransformCategory(filter, mesh, transactionHistory, generation);
-	BuildStaticMeshCategory(filter, mesh);
+	BuildMeshCategory(filter, mesh);
 	BuildAdvancedParametersCategory(filter, mesh, transactionHistory, generation);
 	BuildMaterialsCategory(filter, mesh);
 }
@@ -55,14 +55,13 @@ void SceneMeshInspector::BuildTransformCategory(const std::string& filter, const
 	UiUtil::EndDetailsCategory();
 }
 
-void SceneMeshInspector::BuildStaticMeshCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept
+void SceneMeshInspector::BuildMeshCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept
 {
 	if (!UiUtil::MatchesDetailsFilter(filter, "Mesh", "type asset rendering skeletal static") || !UiUtil::BeginDetailsCategory("Mesh"))
 	{
 		return;
 	}
 	const bool skeletal = mesh.Kind == SceneMeshKind::Skeletal;
-	UiUtil::DrawDetailsAssetRow("Mesh", UiUtil::EditorIcon::StaticMesh, skeletal ? "Cooked Skeletal Mesh" : "Cooked Static Mesh", "Generation-pinned asset reference");
 	UiUtil::DrawDetailsValueRow("Type", skeletal ? "Skeletal" : "Static");
 	char value[64] = {};
 	std::snprintf(value, sizeof(value), "%llu", static_cast<unsigned long long>(mesh.MeshAssetId));
@@ -91,8 +90,11 @@ void SceneMeshInspector::BuildMaterialsCategory(const std::string& filter, const
 	{
 		return;
 	}
-	char buffer[64] = {};
-	std::snprintf(buffer, sizeof(buffer), "Material %u", mesh.Material.IsValid() ? mesh.Material.GetIndex() : 0u);
-	UiUtil::DrawDetailsAssetRow("Element 0", UiUtil::EditorIcon::Material, buffer, "Material slot");
+	char buffer[64] = "None";
+	if (mesh.Material.IsValid())
+	{
+		std::snprintf(buffer, sizeof(buffer), "Material %u (generation %u)", mesh.Material.GetIndex(), mesh.Material.GetGeneration());
+	}
+	UiUtil::DrawDetailsValueRow("Element 0", buffer);
 	UiUtil::EndDetailsCategory();
 }

@@ -46,7 +46,7 @@ The claim excludes physical lens calibration, wavelength transport, spectral sen
 | `CHR-FS-05` | target-linear pass after tone/gamut and before encoding/UI | candidate; domain cells blocked by `CHRD-02` | graph/product evidence and `AC-CHR-04` |
 | `CHR-FS-06` | bilinear clamp-to-edge and alpha copy | included after texel-center/bounds proof | semantics and `AC-CHR-02/04/06` |
 | `CHR-FS-07` | exact neutral pass/resource omission | included | graph/resource trace and `AC-CHR-01` |
-| `CHR-FS-08` | editor controls, reset, truthful requested/active state | included for DevelopmentEditor | UX and `AC-CHR-05/06` |
+| `CHR-FS-08` | approved default and existing settings/reset/capture truth | existing Editor authority; new public lens toggles deferred | UX and `AC-CHR-05/06` |
 | `CHR-FS-09` | raw pre/post plus encoded/UI capture lineage | included for evidence/support | capture owner and `AC-CHR-04/07` |
 | `CHR-FS-10` | D3D12/Vulkan and admitted packaged product | included only where release matrix admits the product | `AC-CHR-07` |
 | `CHR-FS-11` | spectral LUT/multisample, physical profiles, anamorphic, guard band | excluded | selector/source/package absence audit |
@@ -54,9 +54,9 @@ The claim excludes physical lens calibration, wavelength transport, spectral sen
 
 ## Product And Support Matrix
 
-| Product / mode | Authored controls | Runtime effect | Required result |
+| Product / mode | Parameter source | Runtime effect | Required result |
 | --- | --- | --- | --- |
-| DevelopmentEditor D3D12 | global/default and per-view | target when active | full semantic, workflow, capture, failure, and cost evidence |
+| DevelopmentEditor D3D12 | shared default/internal view values; no required public toggle | target when active | full semantic, workflow, capture, failure, and cost evidence |
 | DevelopmentEditor Vulkan | same contract | target when active | same plus raw backend comparison and native validation |
 | packaged Game D3D12 | cooked/configured values only if product scope admits them | target | dependency/configuration reachability and clean-machine result |
 | packaged Game Vulkan | same if release backend is admitted | target | package plus backend evidence |
@@ -92,7 +92,7 @@ The admitted scope must define and implement:
 
 - the fixed post-tone/pre-encode position, with raw input/output capture identity and UI excluded from distortion;
 - the radial RGB channel-offset model, reference-height units, viewport center/aspect behavior, bilinear sampling, bounded edge clamp, alpha preservation, and one quality mode;
-- per-camera/per-viewport settings, defaults, serialization, editor controls, requested/active diagnostics, and disable/identity behavior;
+- view-isolated values, approved On defaults, existing settings/reset and capture truth; neutral validation is required, new public lens controls are not;
 - extent/resize/history behavior, compute or graphics pass ownership, backend requirements, cost, and controlled failure;
 - reference patterns for zero-strength identity, center stability, radial symmetry, edge behavior, temporal stability, and resolution independence.
 
@@ -118,7 +118,7 @@ These are discovery candidates. A changed choice must update semantics, architec
 - `AC-CHR-02` — the radial channel-offset equation matches a CPU reference for center, axes, diagonals, aspect ratios, start offsets, strengths, and edge coordinates within declared filtering tolerance.
 - `AC-CHR-03` — strength scales from the 1080-line reference to output height, so matched normalized patterns have the same authored displacement within tolerance at every admitted resolution.
 - `AC-CHR-04` — the pass consumes tone-mapped display-linear color after grading and before encoding/UI exactly once; alpha and viewport/product identity are preserved.
-- `AC-CHR-05` — per-view requested/resolved/active state, persistence, live edit, two-viewport isolation, resize/DPI, capture metadata, and invalid values behave deterministically.
+- `AC-CHR-05` — actual default/configuration-to-frame state, approved-default reset, any selected persistence, view isolation, resize/DPI, capture identity and invalid values behave deterministically. Neutral validation does not require a new public toggle or Game settings frontend.
 - `AC-CHR-06` — non-finite, negative/out-of-range, zero-extent, missing-input, stale-generation, and resource/pipeline failures reject or produce the documented identity safe state without stale or partial output.
 - `AC-CHR-07` — D3D12/Vulkan raw results, temporal stability, package operation, pass cost, and memory satisfy declared release tolerances and budgets.
 - `AC-CHR-08` — ordinary reconstruction/filtering fringes remain defects; excluded physical/spectral/local-volume/guard-band/history variants are not claimed.

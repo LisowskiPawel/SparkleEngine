@@ -12,6 +12,7 @@ Add-Type -AssemblyName System.IO.Compression
 . (Join-Path $PSScriptRoot 'PackageVerification.ps1')
 . (Join-Path $PSScriptRoot 'PackageDependencies.ps1')
 . (Join-Path $PSScriptRoot 'PackageInputs.ps1')
+. (Join-Path $PSScriptRoot 'PackageOutputs.ps1')
 
 $repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 if ($BuildDirectory -eq '') { $BuildDirectory = Join-Path $repositoryRoot 'build' }
@@ -26,6 +27,7 @@ $report = [ordered]@{
     Version = $version; Revision = ''; SourceInputsSha256 = ''; Signing = 'UnsignedInternal'; Status = 'BLOCKED'; Steps = @(); Archive = $null
     Environment = @{ OperatingSystem = [Environment]::OSVersion.VersionString; PowerShell = $PSVersionTable.PSVersion.ToString() }
     Configurations = @('ShippingEditor', 'ShippingGame'); ReleaseInputs = $null; PayloadSha256 = $null; BuildCache = $null
+    ReviewedPayloadSha256 = $null; Outputs = $null
 }
 $phase = 'Admission'
 $lock = $null
@@ -178,6 +180,7 @@ try
             $receipt.PayloadSha256 -cne $report.PayloadSha256) { throw "Unresolved or stale $name admission." }
     }
     $report.Steps += @{ Name = 'Admission'; Status = 'PASS' }
+    $report.ReviewedPayloadSha256 = $report.PayloadSha256
 
     $phase = 'Build'
     $cmake = (Get-Command cmake -ErrorAction Stop).Source
@@ -194,8 +197,14 @@ try
     {
         Invoke-ReleaseCommand $cooker @('cook-project','Showcase',$configuration,'--tool-profile','ShippingEditor','--root',$repositoryRoot) "cook-$configuration.log"
     }
-    $phase = 'Stage'
+    $phase = 'Freeze'
     Assert-ReleaseCandidateUnchanged
+    $report.Outputs = Update-PackageOutputs $repositoryRoot $BuildDirectory $version $transactionRoot $products $inputs
+    $manifest = New-PackageManifest $repositoryRoot $version $report.Revision $report.SourceInputsSha256 $products $inputs
+    $report.PayloadSha256 = Get-ReleaseSourceHash ($manifest | ConvertTo-Json -Depth 20 -Compress)
+    $inputs | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $transactionRoot 'frozen-inputs.json') -Encoding UTF8
+    $report.Steps += @{ Name = 'Freeze'; Status = 'PASS' }
+    $phase = 'Stage'
     $stage = Join-Path $transactionRoot 'stage'
     New-PackageStage $repositoryRoot $stage $inputs.Files $manifest
     $report.Steps += @{ Name = 'Stage'; Status = 'PASS' }
@@ -222,14 +231,13 @@ catch
     $report.Archive = $null
     $report.Steps = @($report.Steps | Where-Object { $_.Name -ne $phase -or $_.Status -ne 'PASS' })
     $report.Steps += @{ Name = $phase; Status = 'BLOCKED'; Reason = $_.Exception.Message }
-    foreach ($skipped in @('Build','Cook','Stage','Verify','Package'))
+    foreach ($skipped in @('Build','Cook','Freeze','Stage','Verify','Package'))
     {
         if ($skipped -ne $phase -and !@($report.Steps | Where-Object Name -eq $skipped).Count)
         {
             $report.Steps += @{ Name = $skipped; Status = 'SKIPPED'; Reason = "Predecessor $phase did not pass." }
         }
     }
-    [Console]::Error.WriteLine($_.Exception.Message)
 }
 finally
 {
@@ -244,4 +252,8 @@ finally
     finally { if ($null -ne $lock) { $lock.Dispose() } }
 }
 Write-Output "Release report: $reportPath"
-if ($report.Status -ne 'PASS') { exit 1 }
+if ($report.Status -ne 'PASS')
+{
+    [Console]::Error.WriteLine(($report.Steps | Where-Object Status -eq 'BLOCKED' | Select-Object -Last 1).Reason)
+    exit 1
+}

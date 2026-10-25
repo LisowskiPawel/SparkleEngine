@@ -34,41 +34,28 @@ Deliver a correct, diagnosable, portable direct-lighting path that scales from e
 ## Gate And Dependency Graph
 
 ```text
-release/admission gate ----+
-DIR-D0 --------------------+--> DIR-1 --> DIR-2 --> DIR-3 --> DIR-4
-RPT accepted direct AOV ---+       |         |                  |
-analytic CPU oracle -------+-------+---------+------------------+
-                                                             DIR-5 --> DIR-6 --> DIR-7 --> DIR-8
+release/admission + DIR-D0 + analytic oracle
+  -> DIR-1 -> DIR-2 -> DIR-3 -> DIR-4 -> DIR-5 -> DIR-6 -> DIR-8
+
+DIR-6 -> DIR-7 -> DIR-8 only for a separately admitted expansion.
+Accepted RPT direct AOV -> scene-level comparisons, not the DIR-1/2 start gate.
 ```
 
 The Reference Path Tracer is helpful for scene-level comparison only after its own evidence gate. `DIR-1/2` do not wait for it because analytic and exhaustive tests are deliberately independent.
 
 ## Planning Envelope
 
-<details>
-<summary>Expand planning envelope</summary>
-
-| Item | Estimate after gate | Principal uncertainty |
-| --- | ---: | --- |
-| Stage 0 discovery | 4–8 engineering days | reproduction, oracle readiness, product admission |
-| Stages 1–2 correctness foundation | 8–15 days | current BRDF/light semantic defects and test infrastructure |
-| Stages 3–4 reservoir/reuse replacement | 12–25 days | correction math, packing, motion/light translation |
-| Stage 5 visibility parity | 5–12 days | Pipeline readiness, alpha/two-sided backend differences |
-| Stage 6 reconstruction | 8–18 days | chosen baseline and existing RR integration state |
-| Stage 7 scale expansion | 0–25 days per admitted increment | emissive inventory/ReGIR/product scope |
-| Stage 8 evidence/adoption | 6–15 days | backend/hardware/workload availability |
-
-These are planning ranges, not commitments. `DIR-D0` replaces them with owner-reviewed estimates after experiments. Every stage is one reviewable production slice; split a stage if its hook ledger or validation cannot be reviewed coherently.
-
-</details>
+Resolve only the admitted estimator, light/PDF, reservoir/history, visibility and reconstruction uncertainties in DIR-D0. Freeze record/resource bytes, ray/dispatch cost, quality/error and observer thresholds before implementation. Stage 7 expansions require their own demonstrated need; no calendar or effort estimate schedules them.
 
 ## Universal Execution Contract
+
+Each stage passes the [Stage Source-Style Gate](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
 Every stage prompt inherits these rules:
 
 - inspect revision/status, applicable `AGENTS.md`, owner docs, source consumers/producers/lifetime/build membership, and concurrent changes before editing;
 - follow Change Integration, Change Lifecycle, Renderer, Module Ownership, Data And Memory, and claim-driven validation rules;
-- keep mechanism/state in the feature capsule and ledger every external feature-named hook;
+- apply the [stage complexity budget](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget): keep mechanism/state in the feature capsule, justify actual additions and ledger every external feature-named hook; narrow or delete the touched existing representation when its current consumers do not need its breadth;
 - extend current owners directly; no legacy path, alias, migration reader, duplicate scene/material/light record, generic framework, forwarding wrapper, or diagnostic subsystem;
 - update code, headers, shaders, typed bindings, registrations/cooking, build/package membership, checks, and directly affected docs together;
 - preserve unrelated dirty work and do not modify Reference Path Tracer files unless the stage explicitly owns a reviewed cross-feature contract change;
@@ -85,7 +72,7 @@ This matrix is part of each stage, not optional guidance. “Production delta”
 | Stage | Prerequisites | Required production delta and deletion | Explicit non-goals | Retained deliverables | Smallest stage falsifier |
 | --- | --- | --- | --- | --- | --- |
 | 0 | current revision/status/source trace; release owner available; raw capture route or bounded probe | documentation/fixtures/probes only; no estimator behavior change; delete temporary probes before handoff | tuning constants, rewriting shaders, enabling an SDK | accepted decision register, raw-failure manifest, oracle/threshold/profile table, exact hook/deletion/build map, revised estimate, review record | any `DIR-D0-*` choice, threshold, owner, rights action, or first-slice file remains unresolved |
-| 1 | accepted `DIR-D0-01/02/03/04/11/14`; admitted work; fixture/reference rights | add independent CPU/closed-form oracle and bounded exhaustive GPU product through existing light/material/ray/frame routes; remove only proved obsolete temporary diagnostic code | reservoir change, temporal reuse, denoising, new lobes/providers | analytic vectors, exhaustive raw lobes, per-light breakdown, invalid/capacity results, shared-code analysis, commands/configuration | analytic or exhaustive result misses a frozen threshold, or oracle depends entirely on questioned production code |
+| 1 | accepted `DIR-D0-01/02/03/04/11/14`; admitted work; fixture/reference rights | qualify independent CPU/closed-form cases and bounded exhaustive GPU output using current product boundaries or local probes; remove disposable oracle/diagnostic code before handoff | permanent exhaustive resolve/registration/toggle, reservoir change, temporal reuse, denoising, new lobes/providers | analytic vectors, exhaustive raw lobes, per-light breakdown, invalid/capacity results, shared-code analysis, commands/configuration | analytic or exhaustive result misses a frozen threshold, oracle depends entirely on questioned production code, or proof adds an unused product path |
 | 2 | Stage 1 pass; frozen equations/units/lobes/shapes; exact semantic call sites | establish one shared focused evaluation/sampling/PDF semantic owner and update all production/reference consumers; delete duplicated/replaced light/BRDF/PDF rules | reservoir/reuse, emissive inventory, ReGIR, reconstruction, new material model | equation-to-code review, CPU/shader parity, furnace/shape/PDF artifacts, source/build/deletion map | any consumer retains a competing formula or sampling PDF disagrees with evaluation/support |
 | 3 | Stage 2 pass; accepted target/proposals/record/precision; frozen old-state deletion list | replace initial reservoir/sample representation, pass bindings, shaders and registrations atomically; retain exhaustive oracle; delete old representation/readers/writers | temporal/spatial reuse, visibility caching, reconstruction, advanced proposals not admitted | logical/packed layouts, round-trip/max/finite tests, discrete/statistical results, fresh-only raw/reference captures, stale-symbol search | old and new representations coexist, a contributing light has zero support, or mean/selection statistics fail |
 | 4 | Stage 3 pass; accepted correction mode, light translation, history/compatibility/random layout and budgets | add immutable previous/current per-View reservoirs/surface metadata, temporal/spatial passes, transactional publication/retirement; delete obsolete coarse history path | reconstruction, new light classes/providers, pass fusion or large-kernel research | mutation matrix, decoded histories/rejections, diversity/autocorrelation/convergence curves, long-run/dual-view/resize artifacts, memory overlap | wrong-light/stale/cross-view reuse, non-finite publication, or reuse increases error beyond frozen bound |
@@ -109,7 +96,7 @@ Every stage retains:
 7. failed/unavailable/unrun build, runtime, GPU, backend, visual, performance, package, accessibility and clean-machine checks;
 8. remaining risks/limitations and a binary statement that the next stage is `Authorized` or `Blocked`.
 
-No stage hands off a partial history, compatibility mode, dormant experiment, unowned diagnostic, or result detached from candidate identity.
+Compare each stage's actual persistent state, public controls, hooks, copies, variants and dependencies with its frozen budget. The listed deletion and a positive retained-result check close in that stage; an unjustified addition or postponed cleanup blocks exit. No stage hands off a partial history, compatibility mode, dormant experiment, unowned diagnostic, or result detached from candidate identity.
 
 ## Copy-Ready Prompt Contract
 
@@ -128,9 +115,9 @@ Turn the user's visual-failure report and this research package into frozen, rev
 ### Work
 
 1. Capture the current failure in raw direct lobes, selected light/sample, reservoir state, visibility, and final preview with exact candidate identity.
-2. Execute `DIR-X-01` through `DIR-X-09`, resolve `DIR-D0-01` through `DIR-D0-14`, and fill the evidence package.
+2. Reuse valid DIR-X evidence; run only experiments needed by the admitted first slice. Give each DIR-D0 decision an accepted, blocked or explicitly deferred disposition; unselected many-light/environment/emissive/guiding choices require no prototype.
 3. Freeze formulas, units, light identities, target/bias mode, compatibility, visibility, denoiser, quality profiles, artifacts, thresholds, budgets, hook ledger, and clean-break deletions.
-4. Reconcile first-release admission and assign owners/revised estimates.
+4. Reconcile first-release admission and assign owners and the concrete resource/check budget.
 5. Obtain independent review of the gate; retain `Open` or `Blocked` for every unresolved cell.
 
 ### Exit Gate
@@ -145,8 +132,8 @@ Turn the user's visual-failure report and this research package into frozen, rev
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-0--close-discovery-and-authorize-the-first-slice and apply this plan's shared execution contract.
-Execute Direct Lighting Stage 0 from `DirectLighting/ImplementationPlan.md`. Treat the task as discovery and evidence, not a renderer rewrite. Run `DIR-X-01` through `DIR-X-09`, reproduce the reported visual failure with raw direct lobe, reservoir, selected-light/PDF, and visibility artifacts; close every `DIR-D0-*` decision; freeze thresholds and budgets before candidate observation; produce the exact hook/deletion ledger and revised estimates; and request independent gate review. Do not change production estimator behavior. Preserve unrelated work and report every unrun check.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-0--close-discovery-and-authorize-the-first-slice and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
+Execute Direct Lighting Stage 0 from `DirectLighting/ImplementationPlan.md`. Treat the task as discovery and evidence, not a renderer rewrite. Run only the DIR-X experiments consumed by the admitted first slice, reuse valid results, explicitly defer unselected expansions, and reproduce the reported visual failure with raw direct lobe, reservoir, selected-light/PDF, and visibility artifacts; close every `DIR-D0-*` decision; freeze thresholds and budgets before candidate observation; produce the exact hook/deletion ledger and resource/check bounds; and request independent gate review. Do not change production estimator behavior. Preserve unrelated work and report every unrun check.
 ```
 
 </details>
@@ -160,7 +147,7 @@ Create the smallest independent foundation that can identify whether light units
 ### Work
 
 1. Add CPU/closed-form light and BRDF hand-case checks using frozen `DIR-D0-02/03` semantics.
-2. Add a bounded exhaustive GPU direct resolve for test/developer fixtures using the production GBuffer/light/material boundary and the same raw lobe outputs.
+2. Qualify exhaustive small-light GPU output using the existing production input/lobe boundary or a disposable local probe. This oracle is not a new permanent resolve feature, shader registration or developer toggle; retain only the actual product path and original proof.
 3. Cover one/exact-capacity/overflow, inverse-square, cone edges, rectangle Jacobian/sidedness, roughness/metallic/F0, diffuse/subsurface allocation, black/zero/degenerate/non-finite inputs.
 4. Add raw artifact decode with existing capture/test infrastructure; temporary probes must be removed before submission.
 5. Record which current defects are proved and which remain hypotheses.
@@ -170,7 +157,7 @@ Create the smallest independent foundation that can identify whether light units
 - `CHK-DIR-01` passes for the frozen matrix.
 - Exhaustive GPU output agrees with the independent oracle at predeclared tolerances.
 - No reservoir, temporal reuse, or denoising participates in the claim.
-- Exact new production/test file and integration-hook ledger is reviewed.
+- Any actual production delta has a real consumer and reviewed hook/deletion ledger; temporary oracle/test additions are removed before handoff.
 
 ### Ready-To-Use Prompt
 
@@ -178,7 +165,7 @@ Create the smallest independent foundation that can identify whether light units
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-1--establish-analytic-and-exhaustive-truth and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-1--establish-analytic-and-exhaustive-truth and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 1 only. Build the accepted analytic CPU/closed-form cases and one bounded exhaustive GPU direct-lighting baseline over the production surface/light boundary. Produce raw `DirectDiffuse`, `DirectSpecular`, and `DirectSubsurface` evidence without reservoir reuse, reconstruction, exposure, or tone mapping. Cover units, light geometry/PDFs, BRDF energy allocation, capacities, and invalid inputs. Do not tune or replace ReSTIR yet. Keep tests local-only if they require new test-only files, and do not submit temporary probes.
 ```
 
@@ -210,7 +197,7 @@ Make production direct evaluation and candidate evaluation consume one proved se
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-2--freeze-one-shared-light-and-surface-semantic-kernel and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-2--freeze-one-shared-light-and-surface-semantic-kernel and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 2 from the accepted `DIR-D0` equations. Establish one shared, focused light/BRDF semantic kernel for exhaustive resolve and reservoir candidate evaluation; update descriptors/preparation/shaders/callers together; and delete the replaced internal semantics. Prove evaluation/PDF support, lobe energy allocation, shape Jacobians, and finite handling with Stage 1 tests. Do not add new material lobes, emissive meshes, ReGIR, denoising, or a shadow-map framework.
 ```
 
@@ -242,7 +229,7 @@ Land a canonical, testable initial-candidate reservoir with stable integer ident
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-3--replace-initial-reservoir-state-and-sampling and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-3--replace-initial-reservoir-state-and-sampling and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 3 only. Replace the old direct reservoir and initial sampling in one clean break using the frozen target, source PMF/PDF, integer sample identity, stream update, bounded `M`, and normalization. Keep temporal/spatial reuse off. Support only the candidate families admitted by `DIR-D0`. Compare raw output statistically to the exhaustive baseline and run finite/invariant tests. Delete the superseded representation, callers, shaders, bindings, and registrations; do not add a compatibility mode.
 ```
 
@@ -274,7 +261,7 @@ Add stable-light temporal reuse, disocclusion handling, spatial reuse, and the s
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-4--add-correct-temporal-and-spatial-reuse and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-4--add-correct-temporal-and-spatial-reuse and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 4 on the accepted Stage-3 reservoir. Add previous/current light translation, complete surface/history identity, temporal and spatial reuse, disocclusion policy, and the frozen bias-correction modes. Keep reservoir and reconstruction history separate. Exercise every `CHK-DIR-03/05` mutation, including light reorder/removal, material/alpha change, occluder motion, cuts, resize, dual views, shader reload, and long frame indices. Stop if any correction equation or history field remains unresolved.
 ```
 
@@ -306,7 +293,7 @@ Make selected-sample visibility reliable across Inline/Pipeline providers and D3
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-5--prove-visibility-semantics-and-provider-parity and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-5--prove-visibility-semantics-and-provider-parity and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 5. Reconcile Inline and Pipeline selected-light visibility to the frozen segment, offset, face, alpha, and material semantics while retaining their real execution differences. Exercise strict/automatic resolution and inject missing capability/program/SBT/TLAS/material faults. Run the required Renderer/RHI architecture boundary check and paired-provider fixtures. Do not add screen traces, VSM, opacity micromaps, or a generic shadow-provider framework.
 ```
 
@@ -338,7 +325,7 @@ Turn the proved raw sparse signal into a stable product image without hiding est
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-6--deliver-portable-reconstruction and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-6--deliver-portable-reconstruction and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 6 after raw estimator and visibility gates pass. Add the accepted portable reconstruction path using the frozen guide/confidence/history contract, then connect optional DLSS Ray Reconstruction through the existing provider boundary. Preserve raw lobe capture and separate reservoir from denoiser history. Run the motion/disocclusion/light-toggle matrix and report raw versus reconstructed quality, memory, and time. Stop if the denoiser is required to make an invalid estimator look correct.
 ```
 
@@ -352,7 +339,7 @@ Add only those candidate classes or spatial guiding structures whose measured va
 
 ### Work
 
-For each separately reviewed increment:
+This stage is optional. If no separate failing workload and DIR-D0 expansion are admitted, record it Deferred and proceed from Stage 6 to Stage 8; do not conduct expansion experiments merely to close the plan. For an admitted increment:
 
 1. close its admission experiment and update `DIR-D0`, architecture, hook ledger, budgets, and checks;
 2. add environment mapping/PDF, emissive-triangle inventory/update, or ReGIR world-space structures through existing scene/GPU-scene owners;
@@ -372,7 +359,7 @@ For each separately reviewed increment:
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-7--admit-and-deliver-many-light-expansions and apply this plan's shared execution contract.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-7--admit-and-deliver-many-light-expansions and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement only the Direct Lighting Stage-7 increment explicitly admitted by `DIR-D0` (environment candidates, emissive triangles, or ReGIR). Start from its measured baseline and frozen update/identity/PDF/budget contract. Integrate through existing scene, GPU-scene, material, asset, and frame-graph owners; prevent emission double counting; add mutation and retirement checks; and report the quality/time/memory delta. Do not bundle the other increments or advertise unlimited lights.
 ```
 
@@ -387,7 +374,7 @@ Prove the complete candidate in representative content and publish an honest `FC
 ### Work
 
 1. Freeze candidate revision, build/configuration, shaders, backend/device/driver, content/reference hashes, settings, warmup/capture windows, and thresholds.
-2. Run Cornell Box/analytic controls, Sponza Tier 0, Bistro interior/exterior, San Miguel held-out, synthetic overlap, motion/disocclusion, and controlled failure cells.
+2. For release closure, run analytic/Cornell controls and the approved ReleaseMapSet cells that exercise retained lights/materials, plus bounded overlap, motion/disocclusion and failures. After separate advanced-program admission, add Bistro/San Miguel workload proof; those scenes are not first-release prerequisites.
 3. Run D3D12/Vulkan native validation for supported profiles and record unsupported cells explicitly.
 4. Capture raw lobes, selected sample/visibility/confidence where required, reconstructed result, final preview, memory, and GPU timing distributions.
 5. Complete adoption/settings/default/error-message checks, stale-path/build/package validation, scoped diff review, and `git diff --check`.
@@ -395,7 +382,7 @@ Prove the complete candidate in representative content and publish an honest `FC
 
 ### Exit Gate
 
-- `AC-DIR-01` through `AC-DIR-12` have owned results.
+- `AC-DIR-01` through `AC-DIR-12` have results for the admitted candidate domain; unselected Stage-7 classes are explicitly outside it. Stage 8 consumes the completed first six stages directly when Stage 7 is deferred.
 - Required workload/backend/failure cells pass or the feature remains blocked with exact reasons.
 - No superseded source path, stale documentation link, hidden fallback, or unsubmitted required artifact remains.
 
@@ -405,8 +392,8 @@ Prove the complete candidate in representative content and publish an honest `FC
 <summary>Copy implementation prompt</summary>
 
 ```text
-Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-8--product-adoption-backend-evidence-and-closure and apply this plan's shared execution contract.
-Execute Direct Lighting Stage 8 as candidate validation and adoption. Freeze exact candidate/configuration/reference identity and thresholds before runs. Exercise analytic/Cornell, Sponza, Bistro, San Miguel, overlap, motion, disocclusion, alpha, failure, and D3D12/Vulkan native-validation cells. Retain raw and reconstructed artifacts and separate numerical, temporal, visual, performance, memory, backend, and release verdicts. Update `FCR-REN-06` only with observed evidence; do not repair unrelated defects during the evidence run.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-8--product-adoption-backend-evidence-and-closure and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
+Execute Direct Lighting Stage 8 as candidate validation and adoption. Freeze exact candidate/configuration/reference identity and thresholds before runs. Exercise analytic/Cornell, selected release-map, bounded overlap, motion/disocclusion, alpha/failure and required D3D12/Vulkan cells. Do not pull later Bistro/San Miguel gates into first-release closure. Retain raw and reconstructed artifacts and separate numerical, temporal, visual, performance, memory, backend, and release verdicts. Update `FCR-REN-06` only with observed evidence; do not repair unrelated defects during the evidence run.
 ```
 
 </details>

@@ -9,6 +9,7 @@
 | Next task and implementation order | [Roadmap](Roadmap.md#where-we-are-and-what-is-next) |
 | Product direction: what and why | [Executive Summary](ExecutiveSummary.md) |
 | Capabilities and required evidence | [Requirements](Requirements.md) |
+| Exact implementation and artifact route per target | [PGE-01..15 delivery lookup](../Architecture/CrossModule/FeatureDocumentation/StableIdentifierCoverage.md#principal-graphics-engineer-requirements), [evidence folders](../Acceptance/GraphicsWorkloads.md#evidence-folders-and-delivery-owners) |
 | Engineering judgment and working habits | [Engineer Persona](EngineerPersona.md) |
 | Concrete delivery examples | [Feature Delivery Catalog](FeatureDeliveryCatalog.md) |
 | Professional expectations and references | [Role research](Research/README.md), [rendering examples](Research/RenderingReferenceExamples.md) |

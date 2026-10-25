@@ -4,6 +4,7 @@
 #include "Cooking/AssetCookerSceneBatch.h"
 #include "Cooking/TextureRequestPlanBuilder.h"
 #include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Strings/StringUtils.h"
 #include "ToolConsole.h"
 #include "ToolWorkProgress.h"
 
@@ -83,7 +84,7 @@ void AssetCookerStageExecutor::AppendOutput(std::vector<AssetCookerOutputRecord>
 	AssetCookerOutputRecord output;
 	output.category = category;
 	output.assetId = std::move(assetId);
-	output.path = path.string();
+	output.path = Strings::ToNarrow(path.wstring());
 	outputs.push_back(std::move(output));
 }
 
@@ -142,7 +143,7 @@ bool AssetCookerStageExecutor::RunTextures(const AssetCookerProjectCookPlan& pla
 		return false;
 	}
 
-	const int exitCode = AssetCookerToolProcess::Run(plan.textureCookerPath, {"cook-request-file", requestFile.GetPath().string()}, plan.projectRoot);
+	const int exitCode = AssetCookerToolProcess::Run(plan.textureCookerPath, {"cook-request-file", Strings::ToNarrow(requestFile.GetPath().wstring())}, plan.projectRoot);
 	if (exitCode != 0)
 	{
 		diagnostics.AddError(AssetCookerCategory::Textures, "Texture asset cooking failed.");

@@ -20,7 +20,9 @@
 
 Become the graphics systems engineer who can take a rendering or GPU-compute problem from research-shaped ambiguity to a lean, measured, product-quality implementation that another engineer can adopt.
 
-The target is not a generalist who knows engine vocabulary. It is an engineer who reasons from first principles across C++, shaders, explicit graphics APIs, CPU/GPU architecture, data and concurrency, debugging tools, research translation, and product constraints.
+The specialty is rendering/developer technology with GPU-system depth: reason from first principles across C++, shaders, explicit graphics APIs, CPU/GPU architecture, data and concurrency, debugging tools, research translation, and product constraints. Repository scope should make that specialty immediately visible. Deepen the selected renderer and its evidence; keep gameplay, authoring and other supporting systems to their demonstrated role. A partially built general-engine system with no planned rendering consumer is a narrowing/retirement candidate, not a portfolio obligation.
+
+Launcher is the deliberate exception for portfolio presentation and reproduction. A clear first run, useful scene previews/selection and honest readiness/progress/recovery help another engineer evaluate the rendering. Preserve this polish while keeping one operation authority. C++ ownership, Tasks, shader/content tools and package reliability remain necessary evidence for the target; minimizing support code must not remove those foundations or their failure checks.
 
 > I build advanced real-time graphics systems that are technically deep, causally measured, honest about limits, and clean enough for another team to own.
 
@@ -81,7 +83,7 @@ Design integration surfaces, fallback behavior, diagnostic entry points, and doc
 - Keep public contracts smaller than private implementation.
 - Establish correctness and a serial/reference contract before parallel optimization.
 - Stabilize the product path before a profiling campaign.
-- Preserve real capabilities while deleting scaffolding and duplicated authority.
+- Preserve selected capabilities and their evidence while deleting scaffolding and duplicated authority; explicitly narrow or retire capabilities with no selected consumer instead of maintaining breadth for its own sake.
 - Integrate research only when it answers a current product problem and has a deletion/fallback decision.
 
 ### Review
@@ -109,7 +111,7 @@ The selected focus is rendering/developer technology with GPU-system depth, supp
 
 Develop depth through the existing three headline cases. For each, explain the problem selection, exact personal contribution, mathematical/API assumptions, executed source identity, quality/cost tradeoff and external feedback. A principal-shaped result includes the decision that limited scope, removed authority or rejected an attractive optimization. Do not turn every neighboring specialty into a new mandatory engine subsystem.
 
-The minimum program needs one independent reproduction and review. Later influence work should add a second distinct consumer context and a post-adoption revision driven by actual feedback through `PGD-09`. Two self-authored demos do not satisfy this progression, and one successful adoption does not establish years of organizational leadership.
+M6 needs one independent reproduction and meaningful specialist review. The stronger principal-oriented packet also requires M7 / `PGD-09`: a second actual consumer context, an observed teaching task, a consequential direction/review record and a feedback-driven post-adoption revision/retest. [Review And Transfer](../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md) defines these checks without adding engine breadth. Two self-authored demos do not satisfy this progression, and these records do not establish years of organizational leadership or guarantee a hiring level.
 
 ### Observable Behaviors
 

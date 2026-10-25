@@ -4,7 +4,7 @@
 
 **Status:** primary-source research index; precedent for strategy, not hiring eligibility or implementation evidence
 
-The original supplied role and CV material remains in [Role Sources](../RoleSources.md). [Principal Graphics Roles](GraphicsEngineerProfiles.md#principal-graphics-roles-and-portfolio-implications) refreshes that archive with employer roles and technical sources, records retrieval limits, and explains which expectations transfer to Sparkle's portfolio.
+The original supplied role and CV material remains in [Role Sources](../RoleSources.md). The [2026-10-25 principal-target refresh](GraphicsEngineerProfiles.md#2026-10-25-principal-target-refresh) rechecks the two primary NVIDIA role descriptions and technical precedent, records retrieval limits, and routes the missing neural component/design, complementary native studies and observed direction/transfer evidence. The earlier [broader role study](GraphicsEngineerProfiles.md#principal-graphics-roles-and-portfolio-implications) retains its original inspection date and affiliation limits.
 
 [Requirements](../Requirements.md) owns the stable `PGE-*` target. [Feature Delivery Catalog](../FeatureDeliveryCatalog.md) translates those targets into inspectable outputs. [Roadmap](../Roadmap.md) owns priority and admission; research does not authorize implementation.
 

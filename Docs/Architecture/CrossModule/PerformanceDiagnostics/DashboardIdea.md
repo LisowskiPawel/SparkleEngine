@@ -27,7 +27,7 @@ Code, CMake, tests, generated artifacts, and observed captures remain the author
 
 ## Current Recommendation
 
-Do not build a separate graphical application yet. Mature one evidence contract through cheaper forms first:
+No dashboard, history service or controlled-runner service is selected. The ladder below is a study of possible later boundaries, not an ordered backlog. Use the one admitted offline consumer in [Workload Studies](WorkloadStudies/ImplementationPlan.md); a separate graphical application needs a new Roadmap decision even after the study's promotion gates pass.
 
 ```text
 Sparkle runtime measurements and explicit exports
@@ -45,7 +45,7 @@ scheduled runs on a controlled machine
 thin separate dashboard, only after promotion gates pass
 ```
 
-The engine should own authoritative measurements and bounded live orientation. The external workflow should own repeatable execution, comparison, and report generation. A future dashboard may submit jobs and read immutable evidence; it must not become another collector, metric authority, benchmark protocol, capture implementation, or result schema.
+The engine owns authoritative facts and current request/results. A bounded live presenter is optional and requires its own admitted consumer. The external workflow should own repeatable execution, comparison, and report generation. A future dashboard may submit jobs and read immutable evidence; it must not become another collector, metric authority, benchmark protocol, capture implementation, or result schema.
 
 This keeps the first useful product small: a reproducible run and an honest comparison are more valuable than an application shell.
 
@@ -57,7 +57,7 @@ This keeps the first useful product small: a reproducible run and an honest comp
 | External runner and analyzer | Launch matrix, workload invocation, artifact validation, cohort matching, comparison, thresholds, generated reports, CI exit status. | Alternate metric semantics, hidden collection, UI-specific schema, implicit acceptance. |
 | Future dashboard | Browse accepted runs, filter exact cohorts, display trends, link evidence, submit approved jobs. | Mutable copies of engine truth, its own capture path, arbitrary remote execution, automatic root-cause claims. |
 
-The versioned evidence artifact is the only handoff. Runtime views, command-line reports, and any future dashboard are immutable readers of the same meanings.
+The immutable, identified evidence artifact is the only handoff. Runtime views, command-line reports, and any future dashboard are readers of the same meanings; do not add an internal schema version or migration system for disposable local output.
 
 ## Maturity Stages
 
@@ -83,7 +83,7 @@ Create a dashboard project only when all of the following are true:
 6. A prototype proves the app can remain a thin reader over the existing artifact and job contracts.
 7. The expected review value justifies the added build, dependency, deployment, and support surface.
 
-If any gate fails, improve the runner, analyzer, or generated report instead.
+If the recurring consumer need is absent, stop. A failed dashboard promotion gate does not select a runner, history report or earlier service stage; improve an existing analyzer only for an actual unresolved comparison.
 
 ## Comparison Contract
 

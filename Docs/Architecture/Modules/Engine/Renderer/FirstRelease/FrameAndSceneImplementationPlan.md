@@ -2,168 +2,105 @@
 
 [Docs](../../../../../README.md) / [Up](README.md) / [Design](../RendererDesign.md)
 
-Stages: [FS-0](#fs-0--contract-identity-and-serial-oracle) / [FS-1](#fs-1--frame-admission-and-coordination) / [FS-2](#fs-2--scene-view-and-gpu-scene-preparation) / [FS-3](#fs-3--frame-graph-compile-and-execution) / [FS-4](#fs-4--frame-and-scene-candidate-closure).
+Keep the selected frame tied to one immutable world submission, view/settings identity and completion-safe graph execution.
 
-Keep each frame tied to the right world, camera and settings, and execute only valid graph work.
-
-**Status:** implementation plan; not frame, threading, graph, or release evidence
-
-**Current readiness:** section projection **50/100**; substantial source routes, but all three families are `Blocked` with no candidate verification or delivery evidence
+**Status:** remaining release integration and proof; stage names do not imply missing implementation or passed evidence.
 
 ## Work This Plan
 
-| What to do | Working route |
-| --- | --- |
-| First action | [FS-0 identity review](#fs-0--contract-identity-and-serial-oracle): trace one world submission through scene/view preparation and the graph; define the serial comparison. |
-| Result to reach | A fixed frame identity, supported serial/threaded matrix and checks for queues, barriers and retirement. |
-| Start / stop | Reconcile current source and release admission before implementation. Crossed identities, hidden dependencies or missing lifetime proof stop the affected slice. |
+Use FS-0 for a missing identity/oracle decision. Otherwise repair or prove FS-1, FS-2 or FS-3 at the earliest incorrect product. Existing coordinator, Scene/View and frame-graph implementations are the starting path.
 
-## Plan At A Glance
+Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).
 
-```mermaid
-flowchart LR
-    F0[FS-0<br/>contract and serial oracle] --> F1[FS-1<br/>frame admission]
-    F1 --> F2[FS-2<br/>scene and view]
-    F2 --> F3[FS-3<br/>frame graph]
-    F3 --> F4[FS-4<br/>closure]
-```
+## Dependencies
 
-| Phase | Goal | Principal failures |
-| --- | --- | --- |
-| `FS-0` | reconcile identity, ownership, matrices, and feature checks | stale assumption, missing criterion, conflicting owners |
-| `FS-1` | monotonic bounded serial/threaded admission | stale frame, partial control, deadlock, unbounded queue |
-| `FS-2` | deterministic Scene/View/GPU-scene preparation | generation alias, copy explosion, premature retirement |
-| `FS-3` | explicit graph dependencies and safe lowering | hidden dependency, wrong barrier/lifetime, swallowed failure |
-| `FS-4` | candidate-bound end-to-end closure | mismatched candidate, one mode/backend unproved |
-
-Unreal's [parallel-rendering overview](https://dev.epicgames.com/documentation/en-us/unreal-engine/parallel-rendering-overview) and [Render Dependency Graph](https://dev.epicgames.com/documentation/unreal-engine/render-dependency-graph-in-unreal-engine?lang=en-US) are precedent for ownership/thread and declarative-graph questions. They do not define Sparkle classes or prove local behavior.
+Admission supplies one immutable input. Scene/View preparation consumes it; the graph consumes those prepared products. A valid predecessor needs no reimplementation. Serial/threaded controls compare the same input; both native APIs remain required for final closure.
 
 ## `FS-0` — Contract, Identity, And Serial Oracle
 
-**Goal:** freeze the world-submission → coordinator → host → Scene/View → graph identity and the serial reference result.
+**Start:** The selected failure cannot yet be assigned to admission, preparation or graph execution.
 
-**Non-goals:** changing concurrency, adding graph features, or restoring historical packet/scene designs.
+**Work:** Trace actual world/control/settings epochs, persistent Scene, per-View state, GPU mirror and output consumer. Identify the existing serial comparison and only missing AC/FM/check cells.
 
-**Required work:** trace frame/control/settings identity, queue/lifetime ownership, Scene versus View state, GPU mirrors, graph/pass/resource ownership, RHI lowering, and all direct consumers. Reconcile feature `AC/FM/CHK`, supported serial/threaded/backend/view/content matrix, invalidation reasons, copy budget, performance budgets, and candidate artifacts.
+**Cleanup:** Retire obsolete packet/scene assumptions and duplicated contract descriptions; do not restore historical topology or create a scheduler.
 
-**Failure modes:** a criterion names an obsolete design; frame and settings epochs can cross; Scene/View state is duplicated; serial result is undefined; graph output has no consumer/lifetime.
-
-**Phase exit criteria:** all three families have current owner/producer/consumer/lifetime and checks; serial oracle and matrices are explicit; contradictions block implementation.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** One candidate/input/oracle and affected ownership/lifetime/copy boundary identify the next check or repair for FCR-REN-01/02/03.
 
 ```text
-Execute only FS-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-0--contract-identity-and-serial-oracle.
-Goal: freeze the world-submission → coordinator → host → Scene/View → graph identity and the serial reference result. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FS-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-0--contract-identity-and-serial-oracle. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Trace actual world/control/settings epochs, persistent Scene, per-View state, GPU mirror and output consumer.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-01; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FS-1` — Frame Admission And Coordination
 
-**Goal:** close `FCR-REN-01` with monotonic, bounded, failure-aware admission and equivalent serial/threaded results.
+**Start:** Admission, backpressure, control order or shutdown is the affected edge.
 
-**Non-goals:** a generic message bus, multiple pending-frame semantics, or retries that hide a failed producer/consumer edge.
+**Work:** Exercise monotonic submissions/settings epochs, bounded frame/control queues, wakes/waits, failure propagation, cancellation and shutdown in existing serial/threaded modes. Measure changed coordinator work, latency and queue high-water.
 
-**Required work:** preserve one immutable world input; define admission/drop/backpressure policy, control/settings epoch ordering, requested/active publication, wake/sleep, shutdown/cancel, in-flight invalidation, and error propagation; bound frame/control queues; keep serial mode an actual control path; measure admission/coordinator CPU, waits, queue high-water, and latency.
+**Cleanup:** Remove redundant pending-frame/control state and forwarding coordination the repair replaces. Keep one immutable world input; retries or another queue cannot hide a broken producer edge.
 
-**Failure modes:** older frame overwrites newer; settings apply to wrong frame; queue grows; blocked producer deadlocks shutdown; thread fails silently; canceled frame publishes; serial/threaded visible output differs.
-
-**Phase exit criteria:** monotonic and bounded behavior, serial/threaded parity, queue pressure, failure, cancellation, invalidation, and shutdown checks pass; CPU/latency evidence meets the dossier budgets or blocks.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** Affected FCR-REN-01 pressure/order/failure/shutdown checks pass with equivalent serial/threaded results and owned time/queue limits.
 
 ```text
-Execute only FS-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-1--frame-admission-and-coordination.
-Goal: close FCR-REN-01 with monotonic, bounded, failure-aware admission and equivalent serial/threaded results. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FS-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-1--frame-admission-and-coordination. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Exercise monotonic submissions/settings epochs, bounded frame/control queues, wakes/waits, failure propagation, cancellation and shutdown in existing serial/threaded modes.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-01; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FS-2` — Scene, View, And GPU-Scene Preparation
 
-**Goal:** close `FCR-REN-02` with Scene-owned persistent truth, View-owned view/temporal truth, and generation-safe GPU mirrors.
+**Start:** Published input is valid, but scene/view identity, upload or lifetime proof is missing or wrong.
 
-**Non-goals:** Renderer ECS access, per-view copies of scene truth, or a second material/geometry/light registry.
+**Work:** Repair structural/dynamic publication, resource tables, allocation/reuse, bindings and completion-driven retirement. Check create/update/delete/reuse/reload, skin/morph updates and per-view/history isolation on admitted view routes. Resolve required snapshots once per epoch; account for changed copies/uploads/high-water.
 
-**Required work:** reconcile structural deltas, dynamic data, resource tables, camera/display/temporal inputs, mesh/material/light/ray bindings, allocation/reuse, upload, replacement, deletion/reload, and completion-safe retirement; resolve input snapshot once per epoch; prove two-view isolation and deterministic identity; measure copies/uploads/memory high-water.
+**Cleanup:** Delete duplicated scene truth, replaced GPU mirror/publication records and redundant view products; preserve snapshots required by a real lifetime or ABI boundary.
 
-**Failure modes:** deleted handle aliases reused slot; View mutates Scene; stale dynamic deformation; reload retains old binding; resource freed on one queue while used on another; two views share history; unbounded mirror growth.
-
-**Phase exit criteria:** every scene/view acceptance criterion and controlled failure passes across create/update/delete/reuse/reload/dynamic/two-view cases; identity/copy/upload/memory ledgers reconcile.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-02 affected semantic/generation/isolation and all-queue retirement checks pass; no stale binding or unbounded mirror growth remains.
 
 ```text
-Execute only FS-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-2--scene-view-and-gpu-scene-preparation.
-Goal: close FCR-REN-02 with Scene-owned persistent truth, View-owned view/temporal truth, and generation-safe GPU mirrors. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FS-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-2--scene-view-and-gpu-scene-preparation. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Repair structural/dynamic publication, resource tables, allocation/reuse, bindings and completion-driven retirement.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-02; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FS-3` — Frame Graph Compile And Execution
 
-**Goal:** close `FCR-REN-03` with declared pass/resource dependencies, valid scheduling/lifetimes, observable execution, and faithful RHI lowering.
+**Start:** Required frame inputs exist; a graph dependency, resource/state, recording or retirement claim fails or remains unproved.
 
-**Non-goals:** moving native state policy into Renderer, adding async queues without measured benefit, or using graph order as an undocumented dependency.
+**Work:** Validate selected production passes' reads/writes/imports/export roots, queues, culling, transient alias/initialization, histories and typed bindings. Exercise missing/conflicting production, invalidation/rebuild, recording/submission failure and serial/parallel equivalence; inspect native barriers/waits and changed compile/record/copy cost.
 
-**Required work:** inventory every release pass and resource; declare reads/writes, lifetime, history/external/transient classification, queue, culling/side effect, markers, and failure result; close dependency/barrier/alias/invalidation/rebuild logic; preserve serial schedule oracle; make missing/failed pass inputs block or choose an explicit safe result; measure build/compile/record/submit costs.
+**Cleanup:** Remove superseded version/frontier records, dead unexported work, duplicate command state and replaced helpers in the owning repair. Missing required production fails; a clear/copy placeholder cannot satisfy it.
 
-**Failure modes:** undeclared read; write/write ambiguity; transient alias overlaps lifetime; history culled; pass failure ignored; marker lacks frame/view; rebuild misses selector/extent/format; backend produces different dependency result.
-
-**Phase exit criteria:** graph structural checks, resource lifetime/barrier/native validation, pass failure/invalidation, serial/parallel recording, culling/aliasing where admitted, markers, and backend-equivalent results pass.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** Applicable AC-FGS-01 through 08 pass on admitted frame topologies/APIs with truthful failures and completion-safe reuse. No new async queue or graph facility is selected without a measured frame need.
 
 ```text
-Execute only FS-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-3--frame-graph-compile-and-execution.
-Goal: close FCR-REN-03 with declared pass/resource dependencies, valid scheduling/lifetimes, observable execution, and faithful RHI lowering. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FS-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-3--frame-graph-compile-and-execution. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Validate selected production passes' reads/writes/imports/export roots, queues, culling, transient alias/initialization, histories and typed bindings.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `FS-4` — Frame And Scene Candidate Closure
 
-The [required whole-frame review](../../../../../Acceptance/FirstRelease.md#principal-frame-review) must retain source-to-present lineage, both native captures, graph hazards/aliasing/queue ownership, serial/parallel equivalence, provider transitions and bounded rebuild/retirement costs. Close FrameGraph AC-FGS-01–08 against all Included frame topologies before declaring the graph complete. Source compiler-plan comparisons or a passing empty graph cannot substitute for production frame/lifetime proof.
+**Start:** Admitted admission/preparation/graph results and exact candidate are available.
 
-**Goal:** bind admission, preparation, and graph execution to one candidate and prove their joint failure and lifetime behavior.
+**Work:** Join FCR-REN-01/02/03 to the [principal frame review](../../../../../Acceptance/FirstRelease.md#principal-frame-review): source-to-present lineage, both native captures, hazards/aliasing/queues, serial/parallel equivalence, provider transitions and bounded rebuild/retirement. Fill only missing integration cells.
 
-**Non-goals:** replacing focused checks with a smoke or accepting one view/backend/mode for the full matrix.
+**Cleanup:** Verify stage-local deletions and stale includes/registrations/current docs against the final frame; remove completed instructions after retaining original proof.
 
-**Failure modes:** evidence from different code/content/settings; serial oracle not captured; debug observer changes ordering; shutdown leak appears only after level switch; one backend validation absent.
-
-**Phase exit criteria:** `FCR-REN-01`–`03` reports contain full criteria/failure/check coverage, exact candidate identity, matrices, performance data, limitations, invalidation triggers, and decisions.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** The three reports agree on source/content/settings identity and required failure/native/cost/lifetime results. An empty graph or compiler-plan comparison is not production-frame proof.
 
 ```text
-Execute only FS-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-4--frame-and-scene-candidate-closure.
-Goal: bind admission, preparation, and graph execution to one candidate and prove their joint failure and lifetime behavior. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only FS-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-4--frame-and-scene-candidate-closure. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Join FCR-REN-01/02/03 to the [principal frame review](../../../../../Acceptance/FirstRelease.md#principal-frame-review): source-to-present lineage, both native captures, hazards/aliasing/queues, serial/parallel equivalence, provider transitions and bounded rebuild/retirement.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-01; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## Reference And Ownership
 
-<details>
-<summary>Exact owners, source snapshots and related contracts</summary>
-
-**Families:** `FCR-REN-01`, `FCR-REN-02`, `FCR-REN-03`
-
-**Responsibility:** sequence immutable frame admission, Scene/View/GPU-scene preparation, and frame-graph closure
-
-**Parent:** [First Release Renderer Plans](README.md)
-
-**Architecture:** [Frame Execution](../Features/FrameExecution/FrameExecutionDesign.md), [Scene And View Preparation](../Features/SceneAndViewPreparation/SceneAndViewPreparationDesign.md), [feature acceptance](../Features/SceneAndViewPreparation/SceneAndViewPreparationDesign.md#scene-and-view-preparation-acceptance), and [Frame Graph And Scheduling](../Features/FrameExecution/FrameGraphAndScheduling.md)
-
-</details>
+[Frame execution](../Features/FrameExecution/FrameExecutionDesign.md), [Scene/View preparation](../Features/SceneAndViewPreparation/SceneAndViewPreparationDesign.md) and [frame graph acceptance](../Features/FrameExecution/FrameGraphAndScheduling.md) own behavior and proof. This plan routes FCR-REN-01 through 03; [Roadmap](../../../../../Strategy/Roadmap.md) owns global order.

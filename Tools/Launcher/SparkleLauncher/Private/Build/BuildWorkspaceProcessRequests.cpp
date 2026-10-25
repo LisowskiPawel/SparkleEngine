@@ -87,11 +87,6 @@ namespace SparkleLauncher
 		switch (plan.Kind)
 		{
 			case BuildWorkspaceOperationKind::SyncCode:
-				if (BuildWorkspaceOperationRequiresConfigureStep(plan))
-				{
-					AddConfigureStep(steps, plan);
-				}
-				return steps;
 			case BuildWorkspaceOperationKind::GenerateBuildFiles:
 				AddConfigureStep(steps, plan);
 				return steps;

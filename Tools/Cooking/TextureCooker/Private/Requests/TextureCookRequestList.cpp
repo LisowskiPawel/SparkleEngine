@@ -13,8 +13,7 @@ static void SortForSerialization(std::vector<TextureCookRequest>& requests)
 {
 	std::ranges::sort(
 	    requests,
-	    [](const TextureCookRequest& lhs, const TextureCookRequest& rhs)
-	    { return lhs.assetId != rhs.assetId ? lhs.assetId < rhs.assetId : lhs.outputPath.generic_string() < rhs.outputPath.generic_string(); });
+	    [](const TextureCookRequest& lhs, const TextureCookRequest& rhs) { return lhs.assetId != rhs.assetId ? lhs.assetId < rhs.assetId : lhs.outputPath.native() < rhs.outputPath.native(); });
 }
 
 void WriteTextureCookRequestList(const std::filesystem::path& outputPath, const std::vector<TextureCookRequest>& requests)
@@ -46,7 +45,7 @@ std::vector<TextureCookRequest> LoadTextureCookRequestList(const std::filesystem
 	std::ifstream input(inputPath);
 	if (!input.is_open())
 	{
-		throw Diagnostics::Error("Failed to open texture cook request file '" + inputPath.string() + "'.");
+		throw Diagnostics::Error("Failed to open texture cook request file '" + Strings::ToNarrow(inputPath.wstring()) + "'.");
 	}
 
 	TextureCookRequestSet requestSet;
@@ -64,7 +63,7 @@ std::vector<TextureCookRequest> LoadTextureCookRequestList(const std::filesystem
 		{
 			if (!TextureCookRequestCodec::IsHeader(trimmedLine))
 			{
-				throw Diagnostics::Error("Texture cook request file '" + inputPath.string() + "' has an invalid header.");
+				throw Diagnostics::Error("Texture cook request file '" + Strings::ToNarrow(inputPath.wstring()) + "' has an invalid header.");
 			}
 			foundHeader = true;
 			continue;
@@ -76,13 +75,13 @@ std::vector<TextureCookRequest> LoadTextureCookRequestList(const std::filesystem
 		}
 		catch (const Diagnostics::Error& error)
 		{
-			throw Diagnostics::Error(std::string(error.what()) + " File: '" + inputPath.string() + "', line " + std::to_string(lineNumber) + ".");
+			throw Diagnostics::Error(std::string(error.what()) + " File: '" + Strings::ToNarrow(inputPath.wstring()) + "', line " + std::to_string(lineNumber) + ".");
 		}
 	}
 
 	if (!foundHeader)
 	{
-		throw Diagnostics::Error("Texture cook request file '" + inputPath.string() + "' is empty.");
+		throw Diagnostics::Error("Texture cook request file '" + Strings::ToNarrow(inputPath.wstring()) + "' is empty.");
 	}
 	std::vector<TextureCookRequest> requests = requestSet.ReleaseRequests();
 	std::ranges::sort(requests, {}, &TextureCookRequest::assetId);

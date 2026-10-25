@@ -10,6 +10,10 @@
 
 ## Interpretation
 
+This ledger classifies release exposure; it is not an implementation backlog. An Included source mechanism is preserved and checked through its admitted consumer, rather than redesigned as an independent product. Architecture targets and unsupported cells do not become work through proximity to an Included row. Apply [scope protection](../../Strategy/Roadmap.md#scope-protection) before selecting any delta.
+
+When a current capability has no selected consumer, use the [scope/retirement procedure](../../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision) to choose narrowing, exclusion or deletion and reconcile the owning promise first. Source-only reachability, package exclusion and actual removal are distinct: `Removed` needs source/build/selector residue checks, not a documentation label. The rows below remain the approved classifications until such a concrete change lands.
+
 Included is an obligation to deliver and accept the exact bounded path, not a statement that it works. Experimental still needs correctness within its declared limits and safe failure. Excluded has no first-release promise. No row is Removed. The Exposure column restricts distribution: Source only does not enter a shipped component; Game/source covers Game and shared product mechanics; Editor/Launcher/source covers admitted shipped-tool workflows. The release-owner amendment includes Launcher and Editor, seven selectable examples plus built-in Empty, and only the features required by those release paths. Other choices are development or unavailable. Internal mechanisms do not become standalone public features or a stable SDK.
 
 The capability name and source link retain the existing inventory owner instead of copying its implementation narrative. A section names exactly one module owner; cross-module feature/report ownership remains in the existing FCR registry. Compound rows are split in the public-surface tables below. Old inventory evidence remains dated; a classification does not refresh all of its source assertions.

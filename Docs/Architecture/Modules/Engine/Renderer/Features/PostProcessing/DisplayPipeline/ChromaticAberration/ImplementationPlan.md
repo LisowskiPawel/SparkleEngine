@@ -2,7 +2,7 @@
 
 [Docs](../../../../../../../../README.md) / [Up](ChromaticAberrationDesign.md)
 
-Stages: [Stage 0](#stage-0--close-chrd-00) / [Stage 1](#stage-1--add-state-and-a-neutral-seam) / [Stage 2](#stage-2--implement-and-prove-the-lens-pass) / [Stage 3](#stage-3--complete-experience-and-integration) / [Stage 4](#stage-4--candidate-evidence-and-closure).
+Stages: [Stage 0](#stage-0--close-chrd-00) / [Stage 1](#stage-1--freeze-the-first-lens-slice) / [Stage 2](#stage-2--implement-and-prove-the-lens-pass) / [Stage 3](#stage-3--complete-experience-and-integration) / [Stage 4](#stage-4--candidate-evidence-and-closure).
 
 Add a small lens effect with defined channel offsets, clamp behavior and a zero-cost neutral state.
 
@@ -26,7 +26,7 @@ Deliver one small, stateless, per-view chromatic-aberration effect with a Stage-
 
 ```mermaid
 flowchart LR
-    D0[CHRD-00 discovery] --> S1[Stage 1 inactive state]
+    D0[CHRD-00 discovery] --> S1[Stage 1 first-slice freeze]
     DSP0[DSP domain vocabulary] --> S1
     HDR[HDR target-domain decision if admitted] --> S2[Stage 2 lens pass]
     S1 --> S2
@@ -39,27 +39,13 @@ An available display-pipeline seam does not bypass `CHRD-00`. HDR output may rem
 
 ## Planning Envelope
 
-<details>
-<summary>Expand planning envelope</summary>
-
-The ranges are initial engineering hours for one experienced owner/reviewer stream, including stage-local review/check work but excluding queue time for unavailable machines. Stage 0 must replace them after current owner and model scope are frozen.
-
-| Stage | Initial effort range | Main uncertainty | Budget/capacity record |
-| --- | ---: | --- | --- |
-| 0 | 25-40 h | fixed model choice, geometry/domain, evidence classifier | experiment time/artifacts, model quality/cost thresholds |
-| 1 | 15-25 h | fitting state/digest/result into existing settings/View vocabulary | public/state bytes, serialization, graph zero-work impact |
-| 2 | 30-50 h | coordinate/filter parity, exact stage, backend sampler behavior | transient bytes, reads/writes/dispatch, 1080p/4K time, variants |
-| 3 | 25-45 h | state truth across views/resize/debug/UI/package | convergence, capture/support size/time, accessibility review |
-| 4 | 40-70 h | complete profile/backend/package/fault/performance matrix | candidate runtime and artifact storage; machine/adapter availability |
-| **Total** | **135-230 h** | complete first-release closure | all admitted criteria, failures, backends, package, and evidence |
-
-Stage 0 replaces initial estimates with current owner/file touchpoints, expected review slices, numeric budgets, check duration/artifact size, and escalation triggers. Cutting analytic/raw/backend/package/artifact-classification evidence is a scope decision, not an estimate reduction. Needing a spectral asset, quality framework, persistent history, or guard-band system exceeds the envelope and returns to product discovery.
-
-</details>
+CHRD-00 freezes the exact model/domain, current owner/file map, public/settings state, graph placement, sample/variant/transient cost and numeric thresholds. Retain raw/backend/package/artifact-classification proof and actual check/artifact bounds. Spectral assets, persistent history, a quality framework or guard-band system exceed the selected basic effect; return to scope discovery instead of enlarging a time estimate.
 
 ## Execution Contract
 
-Each stage maps the touched `AC-CHR-*`, `FM-CHR-*`, `RISK-CHR-*`, and `CHK-CHR-*`; starts from current status/revision/dirty state; uses the smallest defect-detecting check; extends current settings/View/graph/shader/editor/capture/package owners; removes replaced names; and stops on an unresolved domain, unit, channel, edge, debug, or budget decision. No compatibility path, spectral-LUT framework, history, quality tiers, permanent test code, or silent fallback is allowed.
+Each stage passes the [Stage Source-Style Gate](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
+
+Each stage maps the touched `AC-CHR-*`, `FM-CHR-*`, `RISK-CHR-*`, and `CHK-CHR-*`; starts from current status/revision/dirty state; uses the smallest defect-detecting check; and applies the [stage complexity budget](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) to current settings/View/graph/shader/editor/capture/package owners. Retain/narrow/delete touched existing paths, justify actual additions and finish their cleanup before exit. Stop on an unresolved domain, unit, channel, edge, debug, or budget decision. No compatibility path, spectral-LUT framework, history, quality tiers, permanent test code, or silent fallback is allowed.
 
 Every stage records prerequisites, production files and generated/build/package membership, owned output, non-goals, deletions, checks/results, unrun checks, downstream evidence invalidated, revision, and dirty boundary. Temporary test-only classes/files/executables remain local and are removed before submission unless the user separately authorizes them.
 
@@ -83,8 +69,8 @@ Every stage records prerequisites, production files and generated/build/package 
 
 | Stage | Required inputs | Owned output | Non-goals | Minimum falsifiers |
 | --- | --- | --- | --- | --- |
-| 0 | current source, pinned research, release/product boundary | accepted seven-document package and `CHRD-00` result | production code/readiness | `CHK-CHRD-01` through `10`, hand cases, independent review |
-| 1 | accepted types/state/defaults/ranges and current settings/View owners | serializable request/digest/result plus neutral graph/program seam | sampling, non-neutral pixels, new manager/UI framework | round trip, two Views, invalid/off/minimized truth, graph omission, build/package surface |
+| 0 | current source, pinned research, release/product boundary | accepted basic-effect semantic/ownership/proof decisions and `CHRD-00` result | production code/readiness | `CHK-CHRD-01` through `10`, hand cases, independent review |
+| 1 | accepted basic model and existing settings/View/display owners | reviewed first-slice state/binding/output and check map | production state, registrations, inactive seam | real consumer, neutral/failure oracle, bounded files and deletion list |
 | 2 | accepted equations/domain/edge/precision/budgets | one distinct backend-neutral lens pass/product | UI polish, fusion, spectral/quality/history | analytic patterns, seeded defects, alpha/stage/extent, native validation, cost |
 | 3 | stable runtime state/result/product vocabulary | complete UX, debug/UI/capture/automation/package integration | player UI or new framework | first use, reset, states/errors, rapid edits, views/resize, capture lineage, manifest parity |
 | 4 | frozen candidate/manifests/thresholds | acceptance artifacts and clean closure | tuning thresholds/model after output | all `CHK-CHR-*`, fault controls, paired backend, package, cost, exclusions/classification |
@@ -97,44 +83,41 @@ Every stage records prerequisites, production files and generated/build/package 
 
 Run `CHR-EXP-01` through `06`, disposition `CHRD-01` through `10`, freeze model/controls/domains/units/bounds/state/debug/budgets/evidence, and accept exact document revisions. No production code changes.
 
-**Exit:** the semantics can be independently implemented without choosing a constant or coordinate rule, and every risk/criterion/failure has a defect-detecting check.
+**Exit:** the semantics can be independently implemented without choosing a constant or coordinate rule, every risk/criterion/failure has a defect-detecting check, and the first slice has a bounded addition/deletion map. Remove disposable experiments and superseded model/control instructions; no production model variants or settings vocabulary land here.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Chromatic Aberration Stage 0. Inspect current post/display/settings/View/shader/debug/capture/UI/package paths, compare simple RGB and spectral precedent, and freeze every CHRD decision, model constant, control range, domain, unit, edge rule, matrix, budget, fixture, tolerance, and invalidation trigger. Update only the owning documents. Stop instead of choosing from visual preference alone.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-0--close-chrd-00; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
+Execute only Chromatic Aberration Stage 0. Inspect current post/display/settings/View/shader/debug/capture/UI/package paths, reuse the existing three-channel precedent and close only unaccepted CHRD model/constant/control/domain/unit/edge/matrix/budget/oracle decisions; retain accepted values and explicit invalidation triggers. Update only the owning documents. Stop instead of choosing from visual preference alone.
 NON-NEGOTIABLE: no production changes, model choice is justified by predeclared quality/cost evidence, and every accepted document revision is named or the gate remains `Blocked`.
 ```
 
 </details>
 
-### Stage 1 — Add State And A Neutral Seam
+### Stage 1 — Freeze The First Lens Slice
 
-Extend public display settings, persistence, per-view overrides, immutable View resolution, graph vocabulary, shader registration, and requested/resolved/active diagnostics. Keep strength neutral and omit all GPU work.
+Freeze the accepted channel displacement, coordinates/filtering/alpha, settings/View identity, graph edge, independent numeric oracle and concrete file/build map. This is documentation and check design; do not register inactive state, shaders or graph vocabulary without a consumer.
 
-**Exit:** neutral and invalid states are truthful; two views isolate; settings round-trip; output extent is the only geometry input; no second state owner or persistent resource appears.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** the first effect slice has a reviewed producer-to-output change, neutral/failure checks and deletion list. No dormant production types or framework were added.
 
 ```text
-Execute only Chromatic Aberration Stage 1 from accepted CHRD-00 revisions. Add the smallest typed settings/View/graph/shader-catalog state and requested/resolved/active result. Keep output unchanged and omit the pass. Exercise neutral, invalid/non-finite/range values, persistence, per-view override, two views, resize/minimize, missing program membership, and package surface. Do not implement sampling yet.
-NON-NEGOTIABLE: zero/invalid/minimized state schedules no effect work, View truth does not alias, no second state owner appears, and pixels remain the existing output.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-1--freeze-the-first-lens-slice; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
+Execute only Chromatic Aberration Stage 1 from its ImplementationPlan.md. Freeze the concrete first-slice contract and checks without production changes. Carry required state, shader and build edits into Stage 2 with the real output consumer; add no inactive seam.
 ```
-
-</details>
 
 ### Stage 2 — Implement And Prove The Lens Pass
 
-Implement `CHR-MATH-*` in one shader with an independent CPU coordinate/filter oracle. Insert the distinct target-linear pass, preserve alpha/product identity, clamp all reads, omit zero, and use no history.
+Land required settings/View/typed binding, shader and build membership together with their real first output. Reuse resolved View/settings values and the current typed pass; remove replaced offsets, state, model branches and intermediates in that slice. Implement `CHR-MATH-*` in one shader checked by a local independent CPU coordinate/filter oracle. Insert the distinct target-linear pass, preserve alpha/product identity, clamp all reads, omit zero, and use no history. No lens manager, extra public selector or parallel parameter snapshot is needed.
 
-**Exit:** `AC-CHR-01` through `04` semantic portions pass; swapped channel, wrong scale/aspect/stage, wrap, alpha, and zero-work defects are detected; D3D12/Vulkan shaders compile through owned routes and cost meets the frozen budget.
+**Exit:** `AC-CHR-01` through `04` semantic portions pass; swapped channel, wrong scale/aspect/stage, wrap, alpha, and zero-work defects are detected; D3D12/Vulkan shaders compile through owned routes and cost meets the frozen budget. One consumed model/pass remains; replaced offsets/branches/intermediates and proof-only code are gone, with retained display behavior checked.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-2--implement-and-prove-the-lens-pass; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Chromatic Aberration Stage 2. Implement the accepted three-channel model at the accepted target-linear boundary with output-extent pixel units, bilinear clamp, alpha preservation, and exact zero omission. Compare an independent double-precision CPU evaluator over impulse/grid/edge/alpha patterns, all admitted aspects/resolutions/centers/offsets/strengths, and seeded semantic defects. Inspect typed bindings, native validation, raw pre/post products, and pass cost on both backends. Stop on any unexplained mismatch.
 NON-NEGOTIABLE: one model/domain/filter contract serves both backends, every seeded channel/scale/aspect/stage/edge/alpha defect fails, no history/asset/quality tier exists, and zero remains no-work.
 ```
@@ -143,15 +126,16 @@ NON-NEGOTIABLE: one model/domain/filter contract serves both backends, every see
 
 ### Stage 3 — Complete Experience And Integration
 
-Add the narrow DevelopmentEditor controls to the existing rendering settings surface, neutral reset, per-view override, active/error state, capture metadata, exact-debug bypass, UI exclusion, and automation fields. Exercise rapid edits, resize, view switch, invalid state, missing pipeline, capture, and package operation.
+Join the approved On default and existing Editor/shared settings/reset path to actual view/frame and capture truth. Add no new public lens toggles or Game settings frontend. Exercise neutral/invalid values through existing typed or disposable validation routes, then resize/view isolation, missing pipeline, debug/UI bypass, capture and package behavior. Reset restores the approved default, not the neutral test setting.
 
-**Exit:** `AC-CHR-05/06/08` and all controlled failure paths pass; a developer can identify whether the intentional effect is active; ordinary artifacts cannot be mislabeled.
+**Exit:** `AC-CHR-05/06/08` and all controlled failure paths pass; a developer can identify whether the intentional effect is active; ordinary artifacts cannot be mislabeled. Any replaced UI/config/status authority is deleted; no new toggle, settings frontend, status cache or permanent fault control survives the actual hook/copy budget review.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only Chromatic Aberration Stage 3. Wire accepted controls and status through the existing settings/editor/View owners, classify every debug mode, keep UI downstream, and publish bounded capture/automation metadata. Exercise first use, reset, invalid values, two views, rapid edits, resize/DPI/minimize, mode/debug changes, missing pipeline, capture lineage, and packaged settings. Do not add a player-facing menu or generic post-process framework.
+Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-3--complete-experience-and-integration; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
+Execute only Chromatic Aberration Stage 3. Use the existing Editor/shared settings and capture route to prove approved On/default-reset and actual View state; add no public lens toggle or Game settings frontend. Use a typed/local neutral control, classify debug bypass and keep UI downstream. Exercise first use, reset, invalid values, two views, rapid edits, resize/DPI/minimize, mode/debug changes, missing pipeline, capture lineage, and packaged settings. Do not add a player-facing menu or generic post-process framework.
 NON-NEGOTIABLE: requested/active/artifact truth comes from runtime state, reset is exact, incidental fringes cannot be labeled intentional, and excluded workflow surfaces remain absent.
 ```
 
@@ -159,7 +143,7 @@ NON-NEGOTIABLE: requested/active/artifact truth comes from runtime state, reset 
 
 ### Stage 4 — Candidate Evidence And Closure
 
-Run `CHK-CHR-01` through `05` for one immutable candidate, including analytic defect controls, matched resolutions, temporal camera motion, SDR/HDR cells, D3D12/Vulkan raw comparison, native validation, package, cost/memory, excluded-surface audit, and artifact classification. Remove temporary probes and submit `FCR-REN-25`.
+Run `CHK-CHR-01` through `05` for one immutable candidate, including analytic defect controls, matched resolutions, temporal camera motion, SDR/HDR cells, D3D12/Vulkan raw comparison, native validation, package, cost/memory, excluded-surface audit, and artifact classification through existing tools. Remove temporary probes, verify preceding model/state/dependency cleanup and submit `FCR-REN-25`; no permanent capture/comparison/report framework is selected. A production repair returns to its owner with affected evidence invalidated.
 
 **Exit:** all `AC-CHR-01` through `08` pass conjunctively, each failure/risk has detecting evidence, and the acceptance owner records the verdict.
 
@@ -167,6 +151,7 @@ Run `CHK-CHR-01` through `05` for one immutable candidate, including analytic de
 <summary>Copy implementation prompt</summary>
 
 ```text
+Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-4--candidate-evidence-and-closure; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Chromatic Aberration Stage 4 for one frozen candidate. Run the complete predeclared CHK-CHR matrix and seeded defects across domains, resolutions, aspects, views, debug/UI/capture, backends, package, and cost. Remove temporary test-only code; reconcile source/header/shader/generated/CMake/settings/package/docs membership; and file FCR-REN-25 with exact evidence and limitations. Do not retune the model or thresholds after seeing candidate output.
 NON-NEGOTIABLE: candidate/model/thresholds are frozen before output, all criteria and controlled failures close conjunctively, temporary probes are removed, and any ambiguous artifact or missing cell yields `Blocked`.
 ```
@@ -180,12 +165,12 @@ NON-NEGOTIABLE: candidate/model/thresholds are frozen before output, all criteri
 
 | Claim | Establishing stage | Closing evidence | Invalidated by |
 | --- | --- | --- | --- |
-| `AC-CHR-01` exact neutral/no resources | 1; re-proved after pass in 2 | Stage 4 `CHK-CHR-01/04` plus graph/resource trace | neutral predicate, graph/fusion, state/result change |
+| `AC-CHR-01` exact neutral/no resources | 2; contract freeze in 1 | Stage 4 `CHK-CHR-01/04` plus graph/resource trace | neutral predicate, graph/fusion, state/result change |
 | `AC-CHR-02` model/coordinate/filter agreement | 2 | `CHK-CHR-01` with retained hand cases/defects | model/constant/range/coordinate/filter/precision/compiler change |
 | `AC-CHR-03` resolution-independent authored units | 2 | `CHK-CHR-03` across frozen extents/aspects/subrects | strength units/extent source/scaling/viewport policy change |
 | `AC-CHR-04` stage/alpha/product identity | 2; UX join in 3 | `CHK-CHR-02` raw topology/captures | display/HDR/debug/UI/capture/fusion ordering change |
-| `AC-CHR-05` per-view state/workflow | 1 state; 3 complete experience | `CHK-CHR-04` | settings precedence, digest, reset, View/extent/result vocabulary change |
-| `AC-CHR-06` controlled invalid/failure behavior | 1 validation; 2 graph; 3 recovery | `CHK-CHR-03/04` | validation/fallback/program/device/graph behavior change |
+| `AC-CHR-05` per-view state/workflow | 2 state; 3 complete experience | `CHK-CHR-04` | settings precedence, digest, reset, View/extent/result vocabulary change |
+| `AC-CHR-06` controlled invalid/failure behavior | 2 validation/graph; 3 recovery | `CHK-CHR-03/04` | validation/fallback/program/device/graph behavior change |
 | `AC-CHR-07` backend/package/cost | incremental 2-3 | Stage 4 `CHK-CHR-03/05` | shader/RHI/package/budget/candidate change |
 | `AC-CHR-08` artifact classification/exclusions | 0 contract; 3 labels/reachability | Stage 4 `CHK-CHR-05/NEG-01` | selector/source/shader/package/docs claim change |
 
@@ -200,7 +185,7 @@ NON-NEGOTIABLE: candidate/model/thresholds are frozen before output, all criteri
 | graph/resources | current dependency/transient lifetime mechanisms | hidden in-place route, persistent history/profile/LUT workarounds |
 | shader/program/RHI | typed registration and mechanism ownership | ad hoc bindings, backend-specific semantic forks, experimental model variants |
 | editor/automation/package | current display workflow/config/reachability route | console-only enable, player menu, duplicate manifest schema |
-| evidence | final accepted candidate artifacts/reports | local probes, temporary fixtures/classes/executables, stale screenshots |
+| evidence | useful original candidate artifacts/reports, including negative results | local probes, temporary fixtures/classes/executables and disposable screenshots with no retained evidence consumer |
 | repository | unrelated user-owned dirty work | only superseded paths introduced or explicitly replaced by this feature |
 
 ## Stop And Escalation Rules
@@ -230,7 +215,7 @@ A working shader is not completion. The plan closes only when the authored units
 <details>
 <summary>Exact owners, source snapshots and related contracts</summary>
 
-**Responsibility:** order discovery, inactive state, semantic pass, editor/debug/capture integration, and candidate evidence for `FCR-REN-25`
+**Responsibility:** order discovery, first-slice freeze, complete semantic output, editor/debug/capture integration, and candidate evidence for `FCR-REN-25`
 
 **Authority boundary:** [Discovery](Discovery.md) freezes decisions; [Semantics](Semantics.md), [Execution Architecture](ExecutionArchitecture.md), and [User Experience](UserExperience.md) own accepted target contracts; [README](ChromaticAberrationDesign.md) owns acceptance; [Display And Reconstruction](../../../../FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-6--chromatic-aberration-and-vignette) owns release sequence
 

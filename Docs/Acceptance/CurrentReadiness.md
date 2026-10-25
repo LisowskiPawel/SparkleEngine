@@ -6,7 +6,7 @@ Use this dated dashboard to find what exists and which proof is missing. For the
 
 **Status:** high-level readiness snapshot; orientation only, not feature acceptance or release approval
 
-**Snapshot:** base repository assessment from 2026-09-13 at `9689e6ba870a01ef703da723648d3837e6b20863`; the Reference Path Tracer row alone was reconciled 2026-09-26 against `abe538470fe4e3a3cc5b454f1c5aa54bbd888b60`; no release-approved candidate report was found
+**Snapshot:** numerical baseline from 2026-09-13 at `9689e6ba870a01ef703da723648d3837e6b20863`; Reference Path Tracer text reconciled 2026-09-26 at `abe538470fe4e3a3cc5b454f1c5aa54bbd888b60`; product-state text reconciled 2026-10-24 against retained reports at `9bf95541` plus documentation changes. Product scores are not rescored; final release approval remains open
 
 **Responsibility:** provide one evidence-weighted 0–100 view of what exists now, what is only partial, what is missing, and which proof or delivery layer blocks each tracked feature
 
@@ -25,11 +25,11 @@ Use this dated dashboard to find what exists and which proof is missing. For the
 
 | Portfolio | Tracked families | Readiness | What the number means now |
 | --- | ---: | ---: | --- |
-| Product, build, and delivery | 6 | **33/100** | Development products exist, but installation/package and public support operation are missing. |
+| Product, build, and delivery | 6 | **33/100** | Historical score; product/package routes and partial evidence now exist. Final archive/adoption remains open; a public support service is excluded. |
 | Foundation, world, and content | 11 | **49/100** | Broad source-integrated foundations exist; candidate correctness, stress, package, and adoption proof is absent. |
 | RHI and GPU execution | 6 | **45/100** | D3D12/Vulkan mechanisms are substantial in source; paired native execution, failure, and release evidence is absent. |
 | Renderer | 26 | **36/100** | Most established frame paths exist in source, while four admitted first-release features are absent and no candidate proof exists. |
-| **All tracked `FCR-*` families** | **49** | **40/100** | **49 Blocked; 0 candidate reports; 0 release-approved features.** |
+| **All tracked `FCR-*` families** | **49** | **40/100** | Historical baseline: **49 Blocked; 0 release-approved features.** Later partial reports exist; they do not close a whole family. |
 
 ```mermaid
 flowchart LR
@@ -70,14 +70,17 @@ When implementation, scope, or evidence changes, update this snapshot, the ownin
 
 ## Product, Build, And Delivery
 
-| ID | Feature | Score | `I/R/V/D` | Current state | Largest missing layer |
+**Product update (2026-10-24):** current-state text below follows [Product delivery progress](FeatureCompletionReports.md#product-delivery-progress). Numeric scores/components remain the dated baseline, not completion percentages or a fresh rescore.
+
+| ID | Feature | Baseline score | Baseline `I/R/V/D` | Current state | Largest missing layer |
 | --- | --- | ---: | ---: | --- | --- |
-| `FCR-PROD-01` | Showcase game product | **50** | `35/15/0/0` | Integrated source path | intentional first-use, runtime, budget, failure, and release evidence |
-| `FCR-PROD-02` | source build and cook route | **40** | `30/10/0/0` | Partial development route | immutable prerequisites, clean adoption, reproducibility, and package-relative proof |
-| `FCR-PROD-03` | Launcher workflow | **50** | `35/15/0/0` | Integrated developer path | clean-machine workflow, failure/cancellation truth, and distribution classification |
-| `FCR-PROD-04` | Editor product | **45** | `30/15/0/0` | Integrated development path | usability, viewport/edit correctness, package classification, performance, and adoption |
-| `FCR-PROD-05` | installation and release package | **0** | `0/0/0/0` | Not found | one stage/sign/verify/package/install owner and clean-machine result |
-| `FCR-PROD-06` | self-service diagnostics and finite release review; no support service | **15** | `10/5/0/0` | Local export/review source and fixture checks; native package routes blocked | exact-archive onboarding, crash/hang/GPU/privacy, full symbol correlation and replacement/withdrawal rehearsal; score not reassessed by the source slice ([Release progress](../Strategy/Roadmap.md#release-progress)) |
+| `FCR-PROD-01` | Showcase game product | **50** | `35/15/0/0` | Shell/settings and scoped native checks exist; rendering/lifecycle failures remain | PD-1 remaining cells, then exact-archive/independent proof |
+| `FCR-PROD-02` | source build and cook route | **40** | `30/10/0/0` | Local fresh source and Empty cold/warm results exist | Network-blocked replay, complete scope/fault coverage and non-author rehearsal |
+| `FCR-PROD-03` | Launcher workflow | **50** | `35/15/0/0` | Typed source/installed routes and bounded process checks exist | Current-candidate CLI/GUI, failure/cleanup and installed selection/sync proof |
+| `FCR-PROD-04` | Editor product | **45** | `30/15/0/0` | Edit/save/restart and capture/recook checks exist on recorded candidates | Remaining native faults/profile/map cells and final installed proof |
+| `FCR-PROD-05` | portable release package | **0** | `0/0/0/0` | Current internal assembly/integrity and bounded installed checks verified; [results](FeatureCompletionReports.md#product-delivery-progress) (score predates them) | Repaired final archive, full seven-map/removal/budget and clean-environment qualification; publisher signing at FR-07 |
+| `FCR-PROD-06` | self-service diagnostics and finite review | **15** | `10/5/0/0` | Local export/review/replacement routes and fixtures exist; no support service | Final-archive self-service/native-manual diagnostics/privacy/symbol/replacement proof |
+
 
 ## Foundation, World, Content, Shaders, And Tools
 
@@ -117,7 +120,7 @@ When implementation, scope, or evidence changes, update this snapshot, the ownin
 | `FCR-REN-05` | ray-traced GBuffer execution | **40** | `30/10/0/0` | Capability-gated partial route | strict/automatic selection, inline/native parity, content matrix, failure, and crossover evidence |
 | `FCR-REN-06` | direct lighting | **45** | `30/15/0/0` | Source-present and ray-dependent; ReSTIR DI conformance unproved | analytic baseline, BRDF/light units, PDFs, bias/light translation, visibility/reconstruction, many-light degradation, failure, quality, memory, and cost evidence |
 | `FCR-REN-07` | indirect lighting | **45** | `30/15/0/0` | Source-present seed-replay prototype; ReSTIR GI/GRIS conformance unproved | path/technique accounting, record/shift/GRIS math, history, motion/disocclusion, correlation/bias/noise, reconstruction, sky, quality, memory, and cost evidence |
-| `FCR-REN-08` | Reference Path Tracer | **50** | `45/5/0/0` | Stages 3-9 are source-delivered with one ordinary view mode, one original-frame alternate middle, a feature-owned GPU session, shared transport core, automatic traversal frontend, and manual raw-publication route. D3D12 reaches selection/progress after repairing presentation-policy and mixed-address-sampler crashes, but Lit and Reference currently show effectively black scene lighting while GBuffer diffuse remains populated. This failed visual result adds no verification/delivery credit. | root-cause and repair the first incorrect shared lighting/presentation product; rebuild/cook the exact candidate; then execute D3D12/Vulkan viewport, lifecycle, camera, raw artifact, analytic/statistical/fault, robustness, parity, accessibility, Shipping/package, release-map, and full oracle evidence from the [current recovery route](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#current-recovery-and-completion-route---2026-09-26) |
+| `FCR-REN-08` | Reference Path Tracer | **50** | `45/5/0/0` | Development Stages 3-9 are source-delivered with one ordinary view mode, one original-frame alternate middle, a feature-owned GPU session, shared transport core, automatic traversal frontend, and manual raw-publication route. D3D12 reaches selection/progress after repairing presentation-policy and mixed-address-sampler crashes, but Lit and Reference currently show effectively black scene lighting while GBuffer diffuse remains populated. This failed visual result adds no verification/delivery credit. | root-cause and repair the first incorrect shared lighting/presentation product; rebuild/cook the exact candidate; close the approved Shipping host controls/shared Application raw-export delta, then execute D3D12/Vulkan viewport, lifecycle, camera, raw artifact, analytic/statistical/fault, robustness, parity, accessibility, consumer/package, release-map, and full oracle evidence from the [current recovery route](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#current-recovery-and-completion-route---2026-09-26) |
 | `FCR-REN-09` | exposure | **45** | `30/15/0/0` | Integrated manual/automatic source path | numeric, adaptation/reset, per-view, scheduling, backend, and color-domain evidence |
 | `FCR-REN-10` | reconstruction and upscaling | **40** | `30/10/0/0` | Linear plus capability-gated NVIDIA routes | requested/active/provider truth, inputs, failure, package, temporal quality, latency, and memory |
 | `FCR-REN-11` | debug views and capture | **40** | `25/15/0/0` | Reachable but presentation-partial | exact signal/display semantics, unavailable state, isolation, sidecars, interpretation, and observer cost |
@@ -139,12 +142,14 @@ When implementation, scope, or evidence changes, update this snapshot, the ownin
 
 ## Explicit Missing Or Not-Yet-Admitted Capabilities
 
+Missing capability is not scheduled work. Use [Roadmap scope protection](../Strategy/Roadmap.md#scope-protection) to decide whether to reuse, narrow, defer or retire a surface. A zero score does not justify another subsystem, and deleting an unneeded capability does not award acceptance points to the retained one.
+
 These rows prevent adjacent infrastructure or a detailed target design from looking like an implemented feature. They are not included in the 49-family average unless an existing `FCR-*` row already owns them. Deferred decals, color grading, chromatic aberration, and HDR output moved into the tracked table above when admitted to the first release; their score remains zero.
 
 | Capability | Readiness | Current state | Current owner or boundary |
 | --- | ---: | --- | --- |
-| release installation/package | **0/100** | Not found | [Build and Packaging](../Architecture/Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md) and `FCR-PROD-05` |
-| continuous integration and regression service | **0/100** | Not found | [CI and Regression](../Architecture/Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md#automation) |
+| release installation/package | **0/100** (baseline) | Implemented since baseline; final archive/adoption open | [Build and Packaging](../Architecture/Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md) and `FCR-PROD-05` |
+| broader CI and regression service | **0/100** | Unselected; minimal repository-check workflow source exists, hosted proof unverified here | [CI and Regression](../Architecture/Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md#automation) |
 | geometry-cache animation | **0/100** | Target only; not implemented or roadmap-admitted | [Geometry Cache Animation](../Architecture/CrossModule/GeometryCacheAnimation/GeometryCacheAnimationDesign.md) |
 | neural training/dataset pipeline | **0/100** | Target only; no production data/model workflow | [Neural Graphics](../Architecture/CrossModule/NeuralGraphics/NeuralGraphicsDesign.md) |
 | neural runtime model/kernel path | **0/100** | Target only; no production inference feature | [Neural Graphics](../Architecture/CrossModule/NeuralGraphics/NeuralGraphicsDesign.md) |

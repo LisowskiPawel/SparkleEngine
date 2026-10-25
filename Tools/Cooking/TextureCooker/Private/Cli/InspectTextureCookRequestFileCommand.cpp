@@ -7,6 +7,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Formatting/HexFormat.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <iostream>
 #include <vector>
@@ -16,8 +17,8 @@ static void PrintRequest(const TextureCookRequest& request)
 	std::cout << "  Texture '" << Formatting::FormatHexUInt64(request.assetId) << "' colorSpace='" << GetTextureColorSpaceName(request.policy.colorSpace) << "' mipPolicy='"
 	          << GetTextureMipPolicyName(request.policy.mipPolicy) << "' mipFilter='" << GetTextureMipFilterName(request.policy.mipFilter) << "' colorProcessing='"
 	          << GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) << "' textureGroup='" << GetTextureGroupName(request.policy.textureGroup) << "' dimension='"
-	          << GetTextureDimensionName(request.policy.dimension) << "' channelMask='" << GetTextureChannelMaskName(request.policy.channelMask) << "' output='" << request.outputPath.string()
-	          << "' source='" << request.sourcePath.string() << "'\n";
+	          << GetTextureDimensionName(request.policy.dimension) << "' channelMask='" << GetTextureChannelMaskName(request.policy.channelMask) << "' output='"
+	          << Strings::ToNarrow(request.outputPath.wstring()) << "' source='" << Strings::ToNarrow(request.sourcePath.wstring()) << "'\n";
 }
 
 int InspectTextureCookRequestFile(const std::filesystem::path& requestFilePath)
@@ -33,7 +34,7 @@ int InspectTextureCookRequestFile(const std::filesystem::path& requestFilePath)
 		return TextureCookerConstants::ExitInspectRequestFileFailed;
 	}
 
-	std::cout << TextureCookerConstants::ToolName << ": request file='" << requestFilePath.string() << "' contains " << requests.size() << " texture request(s)\n";
+	std::cout << TextureCookerConstants::ToolName << ": request file='" << Strings::ToNarrow(requestFilePath.wstring()) << "' contains " << requests.size() << " texture request(s)\n";
 	for (const TextureCookRequest& request : requests)
 	{
 		PrintRequest(request);

@@ -131,7 +131,7 @@ endfunction()
 set(ENV{GIT_LFS_SKIP_SMUDGE} 1)
 set(ENV{GIT_CONFIG_PARAMETERS} "'filter.lfs.process=' 'filter.lfs.smudge=' 'filter.lfs.clean=' 'filter.lfs.required=false' 'core.longpaths=true'")
 
-# Locate Git once - used by FetchContent, recovery loops, and sparse checkout.
+# Locate Git once - used by FetchContent, cache verification, and sparse checkout.
 # Fresh Windows machines often have Git installed in the standard Program Files
 # location without the current shell inheriting an updated PATH, so honor both
 # CMake/launcher-provided overrides and common install roots before failing.
@@ -218,115 +218,88 @@ function(sparkle_collect_missing_relative_paths root_path out_missing_paths)
 endfunction()
 
 function(sparkle_prepare_git_fetchcontent_source dependency_name)
-    set(options)
-    set(oneValueArgs DISPLAY_NAME SOURCE_DIR BINARY_DIR SUBBUILD_DIR EXPECTED_REVISION)
+    set(oneValueArgs DISPLAY_NAME SOURCE_DIR EXPECTED_REVISION)
     set(multiValueArgs REQUIRED_PATHS)
-    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+    string(LENGTH "${ARG_EXPECTED_REVISION}" revision_length)
+    if(NOT revision_length EQUAL 40 OR NOT ARG_EXPECTED_REVISION MATCHES "^[0-9a-f]+$")
+        message(FATAL_ERROR "${dependency_name} requires a full Git commit hash.")
+    endif()
     if("${ARG_DISPLAY_NAME}" STREQUAL "")
         set(ARG_DISPLAY_NAME "${dependency_name}")
     endif()
     if("${ARG_SOURCE_DIR}" STREQUAL "")
         set(ARG_SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/${dependency_name}-src")
     endif()
-    if("${ARG_SUBBUILD_DIR}" STREQUAL "")
-        set(ARG_SUBBUILD_DIR "${FETCHCONTENT_BASE_DIR}/${dependency_name}-subbuild")
-    endif()
 
     string(TOUPPER "${dependency_name}" dependency_upper)
-    set(fetchcontent_source_cache_key "FETCHCONTENT_SOURCE_DIR_${dependency_upper}")
-    set(fetchcontent_source_cache_value "${${fetchcontent_source_cache_key}}")
-
-    if(NOT EXISTS "${ARG_SOURCE_DIR}" AND NOT "${fetchcontent_source_cache_value}" STREQUAL "")
-        if(SPARKLE_VERBOSE_DEPENDENCIES)
-            message(STATUS "  Clearing stale FetchContent source override: ${dependency_name}")
-        endif()
-        set(${fetchcontent_source_cache_key} "" CACHE PATH "" FORCE)
-        set(fetchcontent_source_cache_value "")
+    set(source_cache_key "FETCHCONTENT_SOURCE_DIR_${dependency_upper}")
+    if(NOT "${${source_cache_key}}" STREQUAL "" AND NOT "${${source_cache_key}}" STREQUAL "${ARG_SOURCE_DIR}")
+        message(FATAL_ERROR "${ARG_DISPLAY_NAME} source override escapes its owned cache: '${${source_cache_key}}'. Expected '${ARG_SOURCE_DIR}'.")
     endif()
-
     if(NOT EXISTS "${ARG_SOURCE_DIR}")
+        set(${source_cache_key} "" CACHE PATH "" FORCE)
         return()
     endif()
 
-    set(needs_recovery FALSE)
-    set(recovery_reason "")
+    execute_process(
+        COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD
+        WORKING_DIRECTORY "${ARG_SOURCE_DIR}"
+        RESULT_VARIABLE revision_result
+        OUTPUT_VARIABLE current_revision
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET)
+    execute_process(
+        COMMAND "${GIT_EXECUTABLE}" status --porcelain --untracked-files=all
+        WORKING_DIRECTORY "${ARG_SOURCE_DIR}"
+        RESULT_VARIABLE status_result
+        OUTPUT_VARIABLE source_status
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET)
 
-    if(NOT EXISTS "${ARG_SOURCE_DIR}/.git")
-        set(needs_recovery TRUE)
-        set(recovery_reason "no .git directory")
-    else()
+    # zlib 1.3.1 moves its tracked header aside during out-of-source configure.
+    # Admit only that exact rename, with the original Git blob still intact.
+    if(dependency_name STREQUAL "zlib" AND source_status STREQUAL " D zconf.h" AND EXISTS "${ARG_SOURCE_DIR}/zconf.h.included")
         execute_process(
-            COMMAND "${GIT_EXECUTABLE}" rev-parse --is-inside-work-tree
+            COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD:zconf.h
             WORKING_DIRECTORY "${ARG_SOURCE_DIR}"
-            RESULT_VARIABLE git_rc
-            OUTPUT_QUIET ERROR_QUIET
-        )
-        if(NOT git_rc EQUAL 0)
-            set(needs_recovery TRUE)
-            set(recovery_reason "git metadata is invalid")
-        else()
-            execute_process(
-                COMMAND "${GIT_EXECUTABLE}" reset --hard HEAD
-                WORKING_DIRECTORY "${ARG_SOURCE_DIR}"
-                RESULT_VARIABLE git_reset_rc
-                OUTPUT_QUIET ERROR_QUIET
-            )
-            if(NOT git_reset_rc EQUAL 0)
-                set(needs_recovery TRUE)
-                set(recovery_reason "git reset failed")
-            endif()
-        endif()
-    endif()
-
-    if(NOT needs_recovery AND NOT "${ARG_EXPECTED_REVISION}" STREQUAL "")
-        execute_process(
-            COMMAND "${GIT_EXECUTABLE}" rev-parse --verify "${ARG_EXPECTED_REVISION}^{commit}"
-            WORKING_DIRECTORY "${ARG_SOURCE_DIR}"
-            RESULT_VARIABLE expected_revision_rc
-            OUTPUT_VARIABLE expected_revision
+            RESULT_VARIABLE original_result
+            OUTPUT_VARIABLE original_header
             OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_QUIET
-        )
+            ERROR_QUIET)
         execute_process(
-            COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD
+            COMMAND "${GIT_EXECUTABLE}" hash-object --path=zconf.h zconf.h.included
             WORKING_DIRECTORY "${ARG_SOURCE_DIR}"
-            RESULT_VARIABLE current_revision_rc
-            OUTPUT_VARIABLE current_revision
+            RESULT_VARIABLE moved_result
+            OUTPUT_VARIABLE moved_header
             OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_QUIET
-        )
-        if(NOT expected_revision_rc EQUAL 0 OR NOT current_revision_rc EQUAL 0 OR
-           NOT current_revision STREQUAL expected_revision)
-            set(needs_recovery TRUE)
-            set(recovery_reason "revision does not match ${ARG_EXPECTED_REVISION}")
+            ERROR_QUIET)
+        if(original_result EQUAL 0 AND moved_result EQUAL 0 AND original_header STREQUAL moved_header)
+            set(source_status "")
         endif()
     endif()
 
-    if(NOT needs_recovery AND ARG_REQUIRED_PATHS)
-        sparkle_collect_missing_relative_paths("${ARG_SOURCE_DIR}" missing_required_paths ${ARG_REQUIRED_PATHS})
-        if(missing_required_paths)
-            list(JOIN missing_required_paths ", " missing_required_paths_text)
-            set(needs_recovery TRUE)
-            set(recovery_reason "missing required paths: ${missing_required_paths_text}")
-        endif()
+    if(NOT EXISTS "${ARG_SOURCE_DIR}/.git" OR NOT revision_result EQUAL 0 OR NOT status_result EQUAL 0 OR
+       NOT current_revision STREQUAL ARG_EXPECTED_REVISION OR NOT source_status STREQUAL "")
+        message(FATAL_ERROR
+            "${ARG_DISPLAY_NAME} cache is dirty, incomplete or not at ${ARG_EXPECTED_REVISION}: '${ARG_SOURCE_DIR}'. "
+            "Cache preserved. Inspect it, then explicitly clean the dependency cache and retry Sync Code.")
     endif()
+    sparkle_collect_missing_relative_paths("${ARG_SOURCE_DIR}" missing_paths ${ARG_REQUIRED_PATHS})
+    if(missing_paths)
+        message(FATAL_ERROR "${ARG_DISPLAY_NAME} cache is incomplete: ${missing_paths}. Cache preserved at '${ARG_SOURCE_DIR}'.")
+    endif()
+    set(${source_cache_key} "${ARG_SOURCE_DIR}" CACHE PATH "" FORCE)
+endfunction()
 
-    if(needs_recovery)
-        message(WARNING "Corrupt or incomplete ${ARG_DISPLAY_NAME} source cache detected (${recovery_reason}). Removing for re-download...")
-        set(paths_to_remove "${ARG_SOURCE_DIR}" "${ARG_SUBBUILD_DIR}")
-        if(NOT "${ARG_BINARY_DIR}" STREQUAL "")
-            list(APPEND paths_to_remove "${ARG_BINARY_DIR}")
-        endif()
-        file(REMOVE_RECURSE ${paths_to_remove})
-        set(${fetchcontent_source_cache_key} "" CACHE PATH "" FORCE)
-        return()
-    endif()
-
-    if(SPARKLE_VERBOSE_DEPENDENCIES)
-        message(STATUS "  Reusing existing clone: ${dependency_name}")
-    endif()
-    set(${fetchcontent_source_cache_key} "${ARG_SOURCE_DIR}" CACHE PATH "" FORCE)
+function(sparkle_declare_git_dependency dependency_name repository revision)
+    FetchContent_Declare(${dependency_name}
+        GIT_REPOSITORY "${repository}"
+        GIT_TAG "${revision}"
+        GIT_SHALLOW FALSE
+        GIT_PROGRESS ${_sparkle_git_progress})
+    sparkle_prepare_git_fetchcontent_source("${dependency_name}" EXPECTED_REVISION "${revision}")
 endfunction()
 
 function(sparkle_ensure_archive_dependency)
@@ -370,14 +343,10 @@ set(SPARKLE_NVIDIA_NVAPI_GIT_TAG "9b181ea572f680327fe01a14a0f1f41c78034104" CACH
 
 function(sparkle_populate_nvidia_nvapi)
     set(_nvapi_source_dir "${FETCHCONTENT_BASE_DIR}/sparkle_nvapi-src")
-    set(_nvapi_binary_dir "${FETCHCONTENT_BASE_DIR}/sparkle_nvapi-build")
-    set(_nvapi_subbuild_dir "${FETCHCONTENT_BASE_DIR}/sparkle_nvapi-subbuild")
     sparkle_prepare_git_fetchcontent_source(
         "sparkle_nvapi"
         DISPLAY_NAME "NVIDIA NVAPI"
         SOURCE_DIR "${_nvapi_source_dir}"
-        BINARY_DIR "${_nvapi_binary_dir}"
-        SUBBUILD_DIR "${_nvapi_subbuild_dir}"
         EXPECTED_REVISION "${SPARKLE_NVIDIA_NVAPI_GIT_TAG}"
         REQUIRED_PATHS
             "nvapi.h"
@@ -392,31 +361,6 @@ function(sparkle_populate_nvidia_nvapi)
     FetchContent_Populate(sparkle_nvapi)
     set(sparkle_nvapi_SOURCE_DIR "${sparkle_nvapi_SOURCE_DIR}" PARENT_SCOPE)
 endfunction()
-
-# ---------------------------------------------------------------------------
-# Recovery: Remove partial/corrupt clones from interrupted downloads.
-# If someone kills the process mid-clone, the src dir may exist but not be a
-# valid git repo. FetchContent won't re-clone in that state - it tries an
-# update step on a broken repo and fails with a confusing error.
-# We detect this and nuke the broken directory + stamp files so the clone
-# starts fresh.
-#
-# If the src dir IS a valid git repo (i.e., the clone completed successfully),
-# we tell FetchContent to reuse it via FETCHCONTENT_SOURCE_DIR_<NAME>.
-# This prevents FetchContent from trying to re-clone into an existing
-# directory, which fails on Windows with "Error removing directory".
-# ---------------------------------------------------------------------------
-# Note: compressonator is handled separately below via sparse checkout.
-foreach(_dep imgui cgltf mikktspace stb tinyexr spdlog zlib assimp ktx spirv_reflect)
-    set(_sparkle_dependency_id "${_dep}")
-    if(_dep STREQUAL "spirv_reflect")
-        set(_sparkle_dependency_id "spirv-reflect")
-    endif()
-    sparkle_source_dependency_selected("${_sparkle_dependency_id}" _sparkle_prepare_dependency)
-    if(_sparkle_prepare_dependency)
-        sparkle_prepare_git_fetchcontent_source("${_dep}" DISPLAY_NAME "${_dep}")
-    endif()
-endforeach()
 
 if(SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "nvidia-nvapi")
     sparkle_log_dependency_step(1 1 "NVIDIA NVAPI SDK" "git 9b181ea" "source SDK" "D3D12 NVAPI headers and import library" "https://github.com/NVIDIA/nvapi.git")
@@ -434,12 +378,9 @@ endif()
 # ============================================================================
 sparkle_source_dependency_selected("imgui" _sparkle_fetch_imgui)
 if(_sparkle_fetch_imgui)
-FetchContent_Declare(imgui
-    GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG        6d910d5487d11ca567b61c7824b0c78c569d62f0 # v1.92.5
-    GIT_SHALLOW    FALSE
-    GIT_PROGRESS   ${_sparkle_git_progress}
-)
+sparkle_declare_git_dependency(imgui
+    https://github.com/ocornut/imgui.git
+    6d910d5487d11ca567b61c7824b0c78c569d62f0)
 sparkle_log_dependency_step(1 12 "Dear ImGui" "v1.92.5" "~7 MB" "Immediate-mode UI core and Win32 platform backend" "https://github.com/ocornut/imgui.git")
 FetchContent_Populate(imgui)
 
@@ -498,12 +439,9 @@ if(_sparkle_fetch_cgltf AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYNC
     # Target:  cgltf (INTERFACE)
     # Usage:   target_link_libraries(YourTarget PRIVATE cgltf)
     # ============================================================================
-    FetchContent_Declare(cgltf
-        GIT_REPOSITORY https://github.com/jkuhlmann/cgltf.git
-        GIT_TAG        360db1a95480fe102ae9c69b27c5d101167ff5ba # v1.15
-        GIT_SHALLOW    FALSE
-        GIT_PROGRESS   ${_sparkle_git_progress}
-    )
+    sparkle_declare_git_dependency(cgltf
+        https://github.com/jkuhlmann/cgltf.git
+        360db1a95480fe102ae9c69b27c5d101167ff5ba)
     sparkle_log_dependency_step(2 12 "cgltf" "v1.15" "~1 MB" "Single-header glTF 2.0 parser for source scene imports" "https://github.com/jkuhlmann/cgltf.git")
     FetchContent_Populate(cgltf)
 
@@ -533,11 +471,9 @@ if(_sparkle_fetch_mikktspace AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE
     # Target:  mikktspace (STATIC)
     # Usage:   target_link_libraries(YourTarget PRIVATE mikktspace)
     # ============================================================================
-    FetchContent_Declare(mikktspace
-        GIT_REPOSITORY https://github.com/mmikk/MikkTSpace.git
-        GIT_TAG        3e895b49d05ea07e4c2133156cfa94369e19e409
-        GIT_PROGRESS   ${_sparkle_git_progress}
-    )
+    sparkle_declare_git_dependency(mikktspace
+        https://github.com/mmikk/MikkTSpace.git
+        3e895b49d05ea07e4c2133156cfa94369e19e409)
     sparkle_log_dependency_step(3 12 "MikkTSpace" "3e895b49" "<1 MB" "Canonical tangent generation for normal-mapped glTF imports" "https://github.com/mmikk/MikkTSpace.git")
     FetchContent_Populate(mikktspace)
 
@@ -574,12 +510,9 @@ if(_sparkle_fetch_stb AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYNC_S
     # Usage:   target_link_libraries(YourTarget PRIVATE stb)
     #          #define STB_IMAGE_IMPLEMENTATION  (in exactly one .cpp)
     # ============================================================================
-    FetchContent_Declare(stb
-        GIT_REPOSITORY https://github.com/nothings/stb.git
-        GIT_TAG        2c980bb59875b0d32144a71867fbdebb2f77cd20
-        GIT_SHALLOW    FALSE
-        GIT_PROGRESS   ${_sparkle_git_progress}
-    )
+    sparkle_declare_git_dependency(stb
+        https://github.com/nothings/stb.git
+        2c980bb59875b0d32144a71867fbdebb2f77cd20)
     sparkle_log_dependency_step(4 12 "stb" "2c980bb59875b0d32144a71867fbdebb2f77cd20" "~5 MB" "Header-only image loading and mip resize helpers" "https://github.com/nothings/stb.git")
     FetchContent_Populate(stb)
 
@@ -603,12 +536,9 @@ if(_sparkle_fetch_tinyexr)
     # Usage:   target_link_libraries(YourTarget PRIVATE tinyexr)
     #          #define TINYEXR_IMPLEMENTATION (in exactly one .cpp)
     # ============================================================================
-    FetchContent_Declare(tinyexr
-        GIT_REPOSITORY https://github.com/syoyo/tinyexr.git
-        # v1.0.7 release commit; pinned by identity rather than a mutable tag.
-        GIT_TAG        6e8cac308cdf4d717078f3f37c4aa39bf3b356b4
-        GIT_PROGRESS   ${_sparkle_git_progress}
-    )
+    sparkle_declare_git_dependency(tinyexr
+        https://github.com/syoyo/tinyexr.git
+        6e8cac308cdf4d717078f3f37c4aa39bf3b356b4)
     sparkle_log_dependency_step(5 12 "tinyexr" "v1.0.7" "~1 MB" "Header-only OpenEXR image loading/writing support" "https://github.com/syoyo/tinyexr.git")
     FetchContent_Populate(tinyexr)
 
@@ -641,12 +571,9 @@ endif()
 # ============================================================================
 sparkle_source_dependency_selected("spdlog" _sparkle_fetch_spdlog)
 if(_sparkle_fetch_spdlog)
-FetchContent_Declare(spdlog
-    GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG        27cb4c76708608465c413f6d0e6b8d99a4d84302 # v1.14.1
-    GIT_SHALLOW    FALSE
-    GIT_PROGRESS   ${_sparkle_git_progress}
-)
+sparkle_declare_git_dependency(spdlog
+    https://github.com/gabime/spdlog.git
+    27cb4c76708608465c413f6d0e6b8d99a4d84302)
 sparkle_log_dependency_step(6 12 "spdlog" "v1.14.1" "~3 MB" "Repo-wide logging backend" "https://github.com/gabime/spdlog.git")
 FetchContent_Populate(spdlog)
 
@@ -702,12 +629,9 @@ if(_sparkle_fetch_zlib)
     # Target:  zlibstatic
     # Usage:   target_link_libraries(YourTarget PRIVATE zlibstatic)
     # ============================================================================
-    FetchContent_Declare(zlib
-        GIT_REPOSITORY https://github.com/madler/zlib.git
-        GIT_TAG        51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf # v1.3.1
-        GIT_SHALLOW    FALSE
-        GIT_PROGRESS   ${_sparkle_git_progress}
-    )
+    sparkle_declare_git_dependency(zlib
+        https://github.com/madler/zlib.git
+        51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf)
     sparkle_log_dependency_step(7 12 "zlib" "v1.3.1" "~1 MB" "Compression backend used by TinyEXR and Assimp" "https://github.com/madler/zlib.git")
     FetchContent_Populate(zlib)
 
@@ -750,12 +674,9 @@ if(_sparkle_fetch_assimp AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYN
     # Target:  assimp::assimp
     # Usage:   target_link_libraries(YourTarget PRIVATE assimp::assimp)
     # ============================================================================
-    FetchContent_Declare(assimp
-        GIT_REPOSITORY https://github.com/assimp/assimp.git
-        GIT_TAG        c35200e38ea8f058812b83de2ef32c6093b0ece2 # v5.4.3
-        GIT_SHALLOW    FALSE
-        GIT_PROGRESS   ${_sparkle_git_progress}
-    )
+    sparkle_declare_git_dependency(assimp
+        https://github.com/assimp/assimp.git
+        c35200e38ea8f058812b83de2ef32c6093b0ece2)
     sparkle_log_dependency_step(8 12 "Assimp" "v5.4.3" "~15 MB" "FBX and DCC scene import support" "https://github.com/assimp/assimp.git")
     FetchContent_Populate(assimp)
 
@@ -968,13 +889,14 @@ if(_sparkle_fetch_ktx AND (SPARKLE_ENABLE_KTX_SUPPORT OR NOT SPARKLE_SYNC_SOURCE
     # Usage:   target_link_libraries(YourTarget PRIVATE ktx)
     #          #include <ktx.h>
     # ============================================================================
+    set(_sparkle_ktx_revision 91ace88675ac59a97e55d0378a6602a9ae6b98bd)
+    sparkle_prepare_git_fetchcontent_source(ktx EXPECTED_REVISION "${_sparkle_ktx_revision}")
     FetchContent_Declare(ktx
-    GIT_REPOSITORY https://github.com/KhronosGroup/KTX-Software.git
-    GIT_TAG        91ace88675ac59a97e55d0378a6602a9ae6b98bd # v4.3.2
-    GIT_SHALLOW    FALSE
-    GIT_PROGRESS   ${_sparkle_git_progress}
-    GIT_SUBMODULES ""
-)
+        GIT_REPOSITORY https://github.com/KhronosGroup/KTX-Software.git
+        GIT_TAG ${_sparkle_ktx_revision}
+        GIT_SHALLOW FALSE
+        GIT_PROGRESS ${_sparkle_git_progress}
+        GIT_SUBMODULES "")
 sparkle_log_dependency_step(10 12 "KTX-Software" "v4.3.2" "~46 MB (largest dependency)" "KTX2 texture container read/write, with tests/tools/docs/JNI/Python disabled" "https://github.com/KhronosGroup/KTX-Software.git")
 FetchContent_Populate(ktx)
 
@@ -1028,12 +950,9 @@ if(_sparkle_fetch_spirv_reflect AND (SPARKLE_ENABLE_SHADER_COMPILER OR NOT SPARK
     # Usage:   target_link_libraries(YourTarget PRIVATE spirv_reflect)
     #          #include <spirv_reflect.h>
     # ============================================================================
-    FetchContent_Declare(spirv_reflect
-    GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Reflect.git
-    GIT_TAG        b4dc70d8e6ac30c719a2d05b8ad05e1d277c92b4 # vulkan-sdk-1.3.290.0
-    GIT_SHALLOW    FALSE
-    GIT_PROGRESS   ${_sparkle_git_progress}
-)
+    sparkle_declare_git_dependency(spirv_reflect
+        https://github.com/KhronosGroup/SPIRV-Reflect.git
+        b4dc70d8e6ac30c719a2d05b8ad05e1d277c92b4)
 sparkle_log_dependency_step(11 12 "SPIRV-Reflect" "vulkan-sdk-1.3.290.0" "~2 MB" "SPIR-V reflection for offline shader compiler backends" "https://github.com/KhronosGroup/SPIRV-Reflect.git")
 FetchContent_Populate(spirv_reflect)
 

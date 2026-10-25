@@ -200,7 +200,7 @@ Every read still has one real scheduled producer or an explicitly declared inten
 
 ## Graph Lifetime And Histories
 
-The [Show execution contract]() describes graph-generation/retirement changes and runtime-uniform early shader branches. Its historical unavailable-guide and disabled-diagnostic decisions are superseded by the 2026-10-06 correction: every flag combination remains valid, disabled diagnostic outputs are zero, and Ray Reconstruction retains genuine surface guides when indirect lighting is off. Frame execution and resource retirement remain owned by the existing frame pipeline; no flag-specific scheduler or publication veto is introduced.
+The [execution contract](#execution-and-product-contract) keeps every flag combination valid: disabled diagnostic outputs are zero, and Ray Reconstruction retains genuine surface guides when indirect lighting is off. This is the accepted 2026-10-06 behavior. Frame execution and resource retirement remain owned by the existing frame pipeline; no flag-specific scheduler or publication veto is introduced.
 
 Retain accepted CVar-derived values only when required by graph topology identity, a frame/pass ABI, or temporal invalidation. Such a value is a feature-owned lifecycle fact, not another editable authority. Do not add a global resolved show mask or route feature values through viewport requests/settings to trigger rebuilding. Rebuilding finishes before execution of the affected frame; old in-flight GPU resources/graphs retire through their existing fence-based lifetime.
 

@@ -12,7 +12,7 @@
 
 **Evidence and disposition:** [Capability Evidence Plan](../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../Acceptance/FirstRelease.md)
 
-**Current readiness:** **25/100** across build-to-release delivery — development build/staging foundations exist, but CI, package/install, verification, and operated delivery are absent. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
+**Current readiness:** **25/100** across build-to-release delivery — historical score; build/package and bounded CI routes now exist, while final package/adoption proof is open. This documentation pass does not rescore the module. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
 
 **Identity amendment (2026-10-10):** [SparkleProductIdentity.cmake](../../../../CMake/SparkleProductIdentity.cmake) owns version `0.1.0`, publisher and copyright; root and standalone Launcher CMake entry points share it. Existing project-product and Launcher owners attach Windows version resources with public names Sparkle Editor, Sparkle Game and Sparkle Launcher. This adds executable identity, not a package/signing owner. [Current FR-01 report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) records validation and remaining blockers.
 
@@ -22,7 +22,7 @@
 
 **Public development setup (2026-10-11):** the [root README](../../../../README.md) uses the standalone Launcher entry; [Contributing](../../../../CONTRIBUTING.md) routes public review. A [bounded source workflow](#automation) is prepared; historical absence-of-CI rows below predate it. Hosted/build/GPU acceptance remains unproved.
 
-**Baseline owner checks:** after Launcher generates the canonical workspace, run `powershell -NoProfile -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor`. [RunBaselineChecks.ps1](../../../../CMake/RunBaselineChecks.ps1) prints the revision/dirty state and sequentially invokes `architecture_boundary_check`, `code_style_check` and `ShaderCompilerCliValidation`, stopping at the first owner failure. It adds no check semantics and does not certify fresh checkout, asset rights, full cook or runtime. Candidate/environment/artifact binding remains with the [acceptance report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers).
+**Baseline owner checks:** after Launcher generates the canonical workspace, run `powershell -NoProfile -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor`. [RunBaselineChecks.ps1](../../../../CMake/RunBaselineChecks.ps1) records revision/dirty state and sequential results for `architecture_boundary_check`, `code_style_check` and `ShaderCompilerCliValidation`. Failed, timed-out, cancelled, skipped, unavailable or missing-artifact results prevent a pass. It adds no check semantics and does not certify fresh checkout, asset rights, full cook or runtime. Candidate/environment/artifact binding remains with the [acceptance report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers).
 
 Use [build/profile rules](#build-contract), [generated-output layout](#canonical-generated-output-layout), [automation](#automation), or [packaging and diagnostics](PackagingAndInstallation.md).
 
@@ -34,7 +34,7 @@ Use [build/profile rules](#build-contract), [generated-output layout](#canonical
 | prepare runnable development products | declared runtime support is copied beside Launcher/Showcase targets | development staging still depends on workspace conventions |
 | inspect architecture/style | custom boundary and code-style targets exist | no general automated regression runner or CI gate |
 | stage and distribute a release | CMake/Packaging source route; exact bytes unqualified | reviewed payloads, Launcher installed journey, symbols/signing and clean-machine proof |
-| operate a released product | partial developer onboarding only | public first-use, support/security intake, incident, patch, and withdrawal operation |
+| self-service and finite release review | local export/review/replacement routes exist; no user support service | exact-archive onboarding, consent/privacy, review and replacement evidence |
 
 ```mermaid
 flowchart LR
@@ -230,20 +230,22 @@ archive and qualification boundaries. Signing belongs to final publication.
 
 This section owns the build-side source-adopter verdict. [Adoption](PackagingAndInstallation.md#local-diagnostics-and-release-review) owns public recovery/support after a failure; [First Release](../../../Acceptance/FirstRelease.md#frozen-platform-and-toolchain-prerequisites) owns the frozen prerequisite values.
 
-| ID | Binary acceptance criterion |
-| --- | --- |
-| `AC-PROD02-01` | From the immutable public tag/archive and root `README.md`, a non-author can identify the exact supported toolchain, network/cache/disk effects, unstable source API/no-binary-SDK boundary, and one minimal `ShippingGame` runtime route before running commands. |
-| `AC-PROD02-02` | On the supported source machine with empty dependency/build/cook caches, the documented commands sync immutable inputs, configure, build `ShowcaseGame` and required cook tools, cook the included products, and launch the requested example within the frozen source budget. Every step has an attributable exit and artifact identity. |
-| `AC-PROD02-03` | The same source/revision/toolchain replays from the declared warm cache without network, produces logically identical manifests/products, and does not depend on an author path, private cache, environment-only selection, or repository dirt. |
-| `AC-PROD02-04` | Launcher, Editor and Game are required release products; exact helper/provider membership is separately classified. Source-build prerequisites are public and pinned; packaged selection/sync/launch needs no undeclared toolchain. Omitting an optional development surface removes its prerequisite or rejects it before work with one actionable reason. |
-| `AC-PROD02-05` | Clean/reset operations enumerate and require confirmation for owned generated roots, preserve tracked/untracked source and user-declared preserved paths, and report missing/locked/partial deletion as failure. |
+**Proof allocation:** PD-2 qualifies the immutable source candidate and source-operation failures; PD-3 qualifies packaged dependency closure. A non-author rehearsal is required and cannot be inferred from this laptop's author-run clone. [Product delivery progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) records the retained partial results.
+
+| ID | Binary acceptance criterion | Proof phase |
+| --- | --- | --- |
+| `AC-PROD02-01` | From the reviewed immutable source candidate and root `README.md` (public tag/archive retrieval is verified in FR-07), a non-author can identify the exact supported toolchain, network/cache/disk effects, unstable source API/no-binary-SDK boundary, and one minimal `ShippingGame` runtime route before running commands. | PD-2 immutable source rehearsal; FR-07 public retrieval |
+| `AC-PROD02-02` | On the supported source machine with empty dependency/build/cook caches, the documented commands sync immutable inputs, configure, build `ShowcaseGame` and required cook tools, cook the included products, and launch the requested example within the frozen source budget. Every step has an attributable exit and artifact identity. | PD-2 cold source route and adopter |
+| `AC-PROD02-03` | The same source/revision/toolchain replays from the declared warm cache without network, produces logically identical manifests/products, and does not depend on an author path, private cache, environment-only selection, or repository dirt. | PD-2 warm offline replay |
+| `AC-PROD02-04` | Launcher, Editor and Game are required release products; exact helper/provider membership is separately classified. Source-build prerequisites are public and pinned; packaged selection/sync/launch needs no undeclared toolchain. Omitting an optional development surface removes its prerequisite or rejects it before work with one actionable reason. | PD-2 source prerequisites; PD-3 installed closure |
+| `AC-PROD02-05` | Clean/reset operations enumerate and require confirmation for owned generated roots, preserve tracked/untracked source and user-declared preserved paths, and report missing/locked/partial deletion as failure. | PD-2 owned cleanup/faults |
 
 | ID | Cause/injection, safe result, and affected criterion |
 | --- | --- |
 | `FM-PROD02-01` | Remove or downgrade CMake, Git, MSVC/Windows SDK, Qt, Vulkan SDK/DXC/Slang, or a selected optional tool. Configure/preflight must identify the exact missing/unsupported prerequisite and exit nonzero; a skipped action or missing artifact cannot be summarized as success (`AC-PROD02-01`, `AC-PROD02-02`, `AC-PROD02-04`). |
 | `FM-PROD02-02` | Block network with an empty cache, corrupt a dependency checkout/archive, or replace a locked revision. Cold acquisition fails without partial acceptance; warm replay either uses verified cache or says network is required (`AC-PROD02-02`, `AC-PROD02-03`). |
 | `FM-PROD02-03` | Run from a Unicode/spaced clone and remove all `SPARKLE_*` path overrides. Any private path, author cache, or environment-only requirement fails the source route (`AC-PROD02-02`, `AC-PROD02-03`). |
-| `FM-PROD02-04` | At this revision `Tools/CMakeLists.txt` adds Launcher unconditionally and Launcher requires Qt 6.8, so even a Game-focused configure requires Qt. Launcher is now a required release product; its source configure prerequisite is explicit and packaged Qt runtime closure still requires qualification. A Game-only configure cannot call Qt optional until target membership makes that route independent. |
+| `FM-PROD02-04` | The full three-product source route requires Qt 6.11.1, enforced by Launcher CMake. Omit it: configure must name the missing prerequisite. Packaged products need their declared Qt runtime closure, not the Qt SDK; qualify that separate route in PD-3. |
 | `FM-PROD02-05` | Place sentinels and preserved paths beside every clean target, inject a locked file, and cancel. Any source/sentinel removal or false-success aggregate fails `AC-PROD02-05`. |
 | `FM-PROD02-06` | Inspect public wording and delivered files for SDK/install/ABI claims. Any binary SDK implication without installed headers/libraries/samples/version policy fails `AC-PROD02-01` and must be removed, not softened. |
 
@@ -257,11 +259,11 @@ Every source-adopter criterion/failure maps to a check. No configure, build, coo
 
 ## Vertical Build-To-Product Trace
 
-CMake selects profile/options -> dependency owner resolves/fetches host and source requirements -> engine/tool/project targets are added -> profile target builds into private build tree while declared artifacts publish to `artifacts/dev` -> runtime DLL/vendor/Qt support is copied to target-owned directories -> Launcher checks freshness/readiness and launches from the project workspace. The trace currently stops before a formal Stage/Package/Install product.
+CMake selects profile/options -> dependency owner resolves/fetches host and source requirements -> engine/tool/project targets are added -> profile target builds into private build tree while declared artifacts publish to `artifacts/dev` -> runtime DLL/vendor/Qt support is copied to target-owned directories -> Launcher checks freshness/readiness and launches from the project workspace. The existing [package owner](PackagingAndInstallation.md#current-package-entry) continues into fresh staging, verification and an unsigned internal archive; final installed/adoption proof remains open.
 
 ## Explicit Non-Capabilities And Risks
 
-- There is no current release package, installer, signed manifest, binary provenance/SBOM, CI gate, or automated test runner.
+- The manifest-owned unsigned package and minimal repository-check workflow exist. Final public signing/rights, exact-archive and hosted-check evidence remain separate open results; no installer or general automated test service is selected.
 - As of `ITER-REL-01-03` (2026-10-10), declared Git refs use full commit hashes; Compressonator also validates cached revision, cleanliness and required paths. Cache overrides, archives, host SDKs and clean acquisition still require qualification. [Current FR-01 report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) owns the results.
 - Sanitizer options exist but the current Windows/MSVC product route does not make all sanitizer modes usable.
 - Development artifact staging can still rely on repository/project roots and does not prove redistributable clean-machine execution.
@@ -269,47 +271,46 @@ CMake selects profile/options -> dependency owner resolves/fetches host and sour
 
 ## Automation
 
-**Scope:** define reproducible check selection, isolated matrix execution, cancellation, aggregation, artifact retention, and regression-reporting boundaries
+**Scope:** the current minimal repository-check workflow and the boundary for any separately admitted automation extension
 
 **Owner:** repository build/verification automation, with checks implemented by their owning modules
 
-**Current readiness:** **0/100** — target only; no tracked CI workflow or registered CMake test service was found. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
+**Current readiness:** **0/100** for the broader, unselected automation target. Minimal workflow source exists; no hosted result or release-grade automation proof is claimed. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
 
-**Open-source setup amendment (2026-10-11):** [repository-checks.yml](../../../../.github/workflows/repository-checks.yml) invokes the existing architecture script and Git whitespace checks on ordinary pull requests, main-branch pushes and manual dispatch. It uses a commit-pinned checkout action, read-only token, no persisted credentials, hosted Windows runner, timeout and cancellation. It does not acquire assets, require signing secrets, run GPU work or redefine owner assertions. Tool versions and candidate identity are logged; the hosted runner image is mutable and no deterministic build claim follows. Workflow source is prepared locally; no hosted run or branch-protection requirement is claimed. The readiness/snapshot below remains historical. [GitHub's workflow security guidance](https://docs.github.com/en/actions/reference/security/secure-use) informs these permission and pinning choices.
+**Source verified:** 2026-10-24 at `9bf955414bfe98fbb9062f3563a9654f42e64e1e` against [repository-checks.yml](../../../../.github/workflows/repository-checks.yml). This is a source observation, not a hosted execution result.
 
 ### Automation: At A Glance
 
 | Capability | Current state | Target behavior |
 | --- | --- | --- |
-| automation entry point | Not found | clean, reproducible invocation from frozen revision/toolchain/dependencies |
-| check selection | documented manual principle only | change and claim select the cheapest falsifying checks plus required escalation |
-| execution matrix | Not found | isolated profile/backend/module jobs with bounded concurrency and cancellation |
-| aggregation | Not found | pass, fail, unavailable, skipped, flaky, timeout, and inconclusive remain distinct |
-| retained evidence | Not found | machine-readable result plus attributable logs/artifacts and expiry policy |
+| automation entry point | PR, master/main push and manual workflow | qualify this existing route before extending it |
+| check selection | two existing owner checks: whitespace and architecture boundaries | add only a missing admitted claim; no full build/cook/test ladder by default |
+| execution matrix | one hosted Windows job with timeout and superseded-run cancellation | extra profile/backend jobs require their own consumer and cost decision |
+| aggregation | native job/step exits; hosted behavior unproved here | preserve failures; no separate aggregation service is selected |
+| retained evidence | source requests revision/status/tool logs; no hosted artifacts inspected | qualify attributable native logs; add an artifact only for a selected proof consumer |
 
 ```mermaid
 flowchart LR
-    Change[Revision, dirty policy, and changed claims] --> Select[Select required checks and matrix]
-    Select --> Isolate[Create isolated build/artifact/user roots]
-    Isolate --> Run[Run bounded jobs with timeout and cancellation]
-    Run --> Aggregate[Aggregate without evidence inflation]
-    Aggregate --> Retain[Retain logs, manifests, captures, and terminal result]
+    Change[Pull request, push or manual dispatch] --> Job[One bounded Windows job]
+    Job --> Git[Existing Git whitespace check]
+    Git --> Boundary[Existing architecture script]
+    Boundary --> Result[Native job result and candidate/tool logs]
 ```
 
-CI is not a new test authority: each module owns what its check means, while automation owns reproducible selection, isolation, scheduling, failure propagation, and retention.
+Each module owns its assertion. The workflow invokes it and preserves its exit; it does not create another check registry, runner or proof authority.
 
 ### Capability Identity
 
 | ID | Capability | Current state |
 | --- | --- | --- |
-| `CI-01` | Clean reproducible automation entry point | Not found |
-| `CI-02` | Change- and release-claim-driven check selection | Not found |
-| `CI-03` | Isolated matrix execution, cancellation, and honest aggregation | Not found |
-| `CI-04` | Attributable machine-readable results and retained artifacts | Not found |
+| `CI-01` | Clean reproducible automation entry point | Partial: workflow source; hosted/toolchain result unproved |
+| `CI-02` | Change- and release-claim-driven check selection | Partial: two fixed source checks; no release-matrix selector |
+| `CI-03` | Isolated matrix execution, cancellation, and honest aggregation | Partial: bounded job/cancellation source; no wider matrix result |
+| `CI-04` | Attributable machine-readable results and retained artifacts | Partial: requested candidate/tool logs; no hosted evidence qualified |
 
 ### Capability Boundary
 
-Current custom checks, manual workloads, and documented evidence plans are useful inputs but do not form an automated regression product. The target is a reproducible automation layer that selects the cheapest claim-falsifying checks, reports unavailable gates honestly, retains attributable artifacts, and escalates only when a changed claim requires broader build/runtime/native/performance/package evidence.
+The selected work is qualification of the existing small workflow. An additional automated check must name its release consumer, current owner assertion, bounded cost and defect-detecting result before admission. Reuse direct commands and native CI job/log behavior. No general scheduler, fixture service, report platform, full GPU farm or automatic all-map cook is selected. If a workflow replacement is admitted, delete the old invocation/policy in the same slice rather than retaining parallel runners.
 
 ### Contract
 
@@ -320,7 +321,7 @@ Current custom checks, manual workloads, and documented evidence plans are usefu
 
 ### Current State And Missing Surface
 
-The inspected tree has no `.github` workflow and no CMake `enable_testing()`/`add_test()` registration. Therefore there is no current active CI matrix, automated regression baseline, flaky-test policy, protected-gate result, or retained automated release artifact. Manual source checks remain source evidence only.
+[repository-checks.yml](../../../../.github/workflows/repository-checks.yml) invokes the existing architecture script and Git whitespace checks. It uses a commit-pinned checkout action, read-only token, no persisted credentials, a hosted Windows runner, a 15-minute timeout and superseded-run cancellation. It acquires no content/signing prerequisites and schedules no engine build or GPU work. The runner image is mutable, so this source does not establish a deterministic build. No hosted run, branch-protection result or automated release baseline was verified in this documentation pass. Broader targets below apply only when their corresponding automation is admitted; they do not authorize its implementation.
 
 ### Acceptance Handoff
 

@@ -20,6 +20,8 @@ This file is part of the Performance Diagnostics architecture set and owns the d
 
 ## Acceptance At A Glance
 
+Apply this contract to the exact [selected delivery scope](ImplementationPlan.md#delivery-at-a-glance). Metric validity, provenance, comparison, observer and failure rules remain mandatory for any claimed result. Live groups, histories, internal GPU capture and their UI checks apply only when that capability is admitted; absent unselected views are not defects and do not require implementation. Record inapplicability with the scope reason, distinct from missing evidence for a required cell. Release measurement can use qualified external tools and existing producers without completing this broader product.
+
 | A trustworthy result must answer | Required evidence shape |
 | --- | --- |
 | what interval and work were measured? | stable frame/range identity, mode, queue/thread/phase, validity, counts, and raw samples |
@@ -33,12 +35,12 @@ The live dashboard is orientation, not benchmark proof. A benchmark summary with
 
 ## Acceptance-Workload Diagnostic Contract
 
-The Performance workspace is a live diagnostic product. The acceptance-workload package is a stricter evidence product. They share metric definitions and immutable identities, but they are not the same schema and must not be forced into the same screen.
+The selected workload evidence is an explicit immutable result. A future live presenter or focused internal capture would be a different optional product; it does not have to exist to accept native captures or benchmark records. Apply the relevant depth below only when that consumer is selected, with the same exact metric/identity/validity semantics.
 
 | Depth | Product | Required statistics | Retention/output | Claim strength |
 | --- | --- | --- | --- | --- |
-| Live orientation | Stats and Performance workspace | Latest, rolling p50/p95/max, sample count/span, current/high-water memory, validity and observer state. | Bounded in-memory rings; no file by default. | Chooses the next question; never proves causality. |
-| Focused frame/range | Frozen frame/range and `ProfileGpu` | Selected-frame/range timing, inclusive/exclusive marker hierarchy, counts, validity, configuration. | One retained capture plus bounded recent detail. | Attributes marked time; does not prove hardware cause. |
+| Optional live orientation | Only an independently admitted presenter | Latest, rolling p50/p95/max, sample count/span, current/high-water memory, validity and observer state. | Bounded in-memory rings; no file by default. | Chooses the next question; never proves causality. |
+| Optional internal frame/range | Only an independently admitted frozen capture | Selected-frame/range timing, inclusive/exclusive marker hierarchy, counts, validity, configuration. | One retained capture plus bounded recent detail. | Attributes marked time; does not prove hardware cause. |
 | Benchmark evidence | `MAP-00` and accepted workload route | Per-run and combined p50/p95/p99/worst, run-to-run variance/uncertainty, high-water identity, event/count totals, comparisons and threshold verdict. | Explicit raw samples, summary, manifest, capture links under the workload owner. | Supports a reproducible performance claim after controls and quality checks. |
 | Specialist capture | Native external tool | Scheduler/API/resource/counter/source/ISA/allocation/residency/crash facts. | Tool-native artifact linked from the same manifest. | Supports a scoped cause on the captured platform/configuration. |
 
@@ -116,7 +118,7 @@ The screenshot's visible approximately 6 FPS is enough to justify measurement, b
 
 ## Benchmark And Portfolio Evidence
 
-The live Editor screenshot is one portfolio artifact, not the result. Conceptually, a reviewer-ready performance case includes the following files under the workload-owned run directory; [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md) remains authoritative for exact names and placement:
+A live Editor screenshot, when used, is an illustration rather than the result. Conceptually, a reviewer-ready performance case includes the following files under the workload-owned run directory; [Graphics Workloads](../../../Acceptance/GraphicsWorkloads.md) remains authoritative for exact names and placement:
 
 ```text
 artifacts/validation/showcase-levels/<run-id>/<level-id>/
@@ -125,8 +127,6 @@ artifacts/validation/showcase-levels/<run-id>/<level-id>/
 |-- timings.csv
 |-- summary.md
 |-- launch.log
-|-- <level>-<route>-diagnostics.png
-|-- <level>-<route>-gpu-profile.png
 |-- <level>-<route>-frame.png
 `-- captures/
     |-- cpu-system-trace.<native-format>
@@ -165,7 +165,7 @@ A specialist-facing case should be readable in this order:
 2. Configuration: commit, product, backend, hardware/driver, resolution, route, settings, validation, workers, and diagnostics mode.
 3. Baseline: distributions and memory high-water, not one frame or one FPS number.
 4. Competing hypotheses: for example editor UI, game systems, frame-graph compile, command recording, GPU lighting, presentation, or memory pressure.
-5. Discriminating evidence: one joined diagnostics view, one readable `ProfileGpu` tree when the question is marker attribution, and the appropriate external CPU/GPU capture when causality requires it.
+5. Discriminating evidence: the original correlated measurements and appropriate native CPU/GPU artifact that distinguishes the hypotheses. A joined workspace or ProfileGpu tree is not required; it may be used only if independently admitted and qualified.
 6. Root cause: critical path with relevant call stack, pass, queue, resource, counter, or state.
 7. Experiment/fix: one scoped change and the control that could falsify it.
 8. Outcome: before/after distributions, image/validation result, memory, pacing, and limitations.
@@ -177,7 +177,7 @@ A specialist-facing case should be readable in this order:
 | Reviewer | Diagnostic evidence they should see |
 | --- | --- |
 | Recruiter, 60-90 seconds | One clean frame/diagnostics image and one sentence naming the measured bottleneck and outcome. No profiler wall of text. |
-| Hiring manager, 10 minutes | Problem, configuration, baseline, likely-domain view, readable GPU Visualizer hot path, one controlled experiment, before/after table, and limitation. |
+| Hiring manager, 10 minutes | Problem, configuration, baseline, relevant native marker/timeline excerpt, one controlled experiment, before/after table and limitation; no internal visualizer required. |
 | Graphics specialist, 45-60 minutes | Raw schema, CPU/GPU timing semantics, inclusive/exclusive marker tree and invalidation rules, PIX/RenderDoc/Nsight/RGP/WPA capture, API/backend difference, counters or disassembly where causal, and reproduction steps. |
 | Adopter | Exact build/run/route, diagnostic mode, expected summary, capture trigger, fallback, raw files, and issue/reproducer template. |
 
@@ -193,38 +193,20 @@ Every vertical slice passes the [authoring-isolation and Shipping-erasure](#auth
 
 ### Frontend Workflow And Clutter
 
-- Scenario tests drive the immutable presentation model through `Quick Check`, `Investigate CPU`, `Investigate GPU`, `Investigate Memory`, `Capture Evidence`, attached-provider ready/armed/finalizing/completed/unavailable states, cancellation, and failure without constructing console strings or mutating collectors/provider APIs from UI code.
-- The normal route from viewport orientation to one selected domain requires no knowledge of stat-group names, collection modes, timestamp queries, counters, backend targets, hashes, manifests, or external-tool configuration. A test or structured UI audit rejects any normal path that makes one of those fields mandatory.
-- The first-level viewport menu contains the task intents, current state/cost, `Customize Stats...`, and open/hide controls; raw group names remain behind customization. Workspace snapshots verify that contextual capture/export/recovery commands do not become a permanent wall of equal toolbar actions.
-- Viewport snapshots verify None and each single selected-provider overlay state at the upper-right scene surface, including disabled reasons and pending/quarantined behavior. Launcher/settings expose the same ordered enum. Multiple selection and incompatible injected-hook controls must reject before graphics work; no simultaneous provider-icon group is required.
-- Every unavailable or unsafe action is disabled with one visible prerequisite. The frontend cannot express contradictory collection requests, start a second exclusive capture, export invalid evidence, or silently enable a more perturbing mode.
-- Switching views and launching a contextual investigation preserves the selected frame/range and follows a typed object only where correlation is valid. Failures preserve that context and show one root cause, one next action, and a details route to raw evidence.
-- Advanced overrides are typed, validated, resettable, scoped to the current operation or saved preset, and rendered as a difference from the recommended configuration. Closing and reopening the workspace cannot silently promote them to defaults.
-- Keyboard-only navigation reaches every task intent, view, selected row, Inspector action, configuration detail, and recovery action with visible focus. Accessible names and status text communicate validity/cost without relying on color.
-- Representative engine users perform the orientation-to-investigation, failed-capture recovery, and evidence-export tasks from a clean UI state. Record completion, time, wrong turns, backtracking, and expert-setting exposure; unresolved repeated misconfiguration or terminology confusion blocks frontend acceptance.
+Accept the actual selected action, not the former workspace design. Current external capture uses the startup enum and single selected-provider viewport action: None/ready/armed/finalizing/completed/unavailable/busy, disabled reasons, wrong/stale target, cancellation/failure and safe recovery are observable through existing controls. Multiple intent rejects before graphics work; UI owns no duplicate provider state or native calls.
+
+Keyboard/scale labels, visible focus, status and errors must work for those delivered controls. A clean first-use/recovery exercise records confusion or required private intervention. Quick Check, Investigate CPU/GPU/Memory, Customize Stats, Inspector, hitch navigator and Performance tabs are not required routes. If an internal presenter is later admitted, freeze its exact action/state/validity/cost and accessibility checks with the producer; do not inherit every screen in the old mockup.
 
 ### Semantics And Correlation
 
-- Synthetic nested scopes with known ticks prove inclusive/exclusive calculation for leaves, nested children, sibling gaps, repeated tokens, and interval-union coverage without double count.
-- Property/fuzz tests generate bounded valid and malformed hierarchies, timestamp-wrap cases, interval overlaps, generation changes, and state-machine action sequences; they assert deterministic merge, nonnegative derived values, bounded loss, and exactly-once settlement.
-- Malformed parent cycles, child escape, sibling overlap, cross-queue parenting, and unprovable timestamp wrap invalidate the affected tree instead of producing negative or misleading exclusive time.
-- Randomized recording-task completion produces the same merged hierarchy and order from preassigned `(queue, batch, chunk, local sequence)` records.
-- `ProfileGpu` arm/capture/resolve/open/clear, busy, cancel, shutdown, failure, and late-publication transitions settle each capture ID once and preserve `FrameId` identity.
-- Threaded depth 0/1/2 frames join CPU and delayed GPU data by `FrameId` under randomized resolution delay.
-- Serial renderer/task modes publish honest physical-thread ownership and no phantom lanes.
-- Missing/disabled/stale/invalid values never enter percentiles and never render as zero.
-- Field-valid and common-correlated populations pass known-value tests with different missing fields, generations, provenance, discontinuities, and selection intervals; aggregates expose original/valid/excluded counts and reasons.
-- Timestamp wrap, queue separation, sample-window reset, lost result, shutdown, and late publication are tested.
-- D3D12 queue frequency/support and bottom-of-pipe semantics, Vulkan stage/period/valid-bit semantics, calibration age/deviation rejection, and dependency-only uncalibrated queue display pass backend-focused tests.
-- Nearest-rank percentiles and high-water frame identity pass known-value tests.
-- `Stat` parsing, case-insensitive group lookup, autocomplete, toggle/idempotent On/Off behavior, `None`, `Reset`, `Dump`, and every preset pass focused command tests.
-- Editor menu and console requests produce the same active group set without one presentation path invoking the other.
-- Group demand changes advance sample generation; late detailed results cannot populate a group after it is disabled and re-enabled.
-- Unit/UnitGraph use the same joined samples, and correlated example data proves that invalid GPU frames render as gaps rather than zeros.
-- GpuPasses live ranking, unaccounted span, queue separation, row overflow, and count/duration units pass known-value tests.
-- GPU Visualizer hierarchy, flat inclusive, flat exclusive, coalesced call-count/sum/average/max, hot-path expansion, and marker-only rows pass known-value tests.
-- The generated/static scope registry rejects token/path collisions and transient identity components, preserves the single current marker vocabulary and exact candidate provenance without internal schema-version dispatch, emits balanced command-recording-local duration scopes under randomized task completion, and keeps point markers/resource names out of duration aggregation.
-- OS process-lifetime peaks, Sparkle session sampled high-water, and benchmark-run sampled high-water remain distinct; reset changes only the session generation and sampled values expose cadence.
+| Actual product being accepted | Required controls |
+| --- | --- |
+| Any measurement/comparison | Exact owner/unit/interval/frame/configuration, timestamp/provenance/wrap semantics, valid/excluded/lost populations, discontinuities and reset; known-value controls reject missing/stale/invalid fields and fabricated zeros. Preserve physical threads versus logical phases and sampled versus OS-lifetime memory peaks. |
+| Current native capture | Exactly-once request outcome, target/frame certainty, native completion/quiescence, symbols/candidate identity, loss/shutdown and marker/source correlation under the External Capture contract. Use actual serial/threaded topology and expose unsupported cells. |
+| Future admitted cross-domain join/history | Only if consumed: delayed/out-of-order CPU/GPU results, generation/reset and common-correlated cohorts; use serial and exposed threaded depths 0/1/2 with randomized resolution delays. Prove fixed capacity/loss, no stale-frame substitution and no synchronous collection from UI. |
+| Future admitted internal hierarchical capture | Only if consumed: known nested ticks, parent cycles/child escape/sibling overlap/cross-queue/wrap invalidation, deterministic chunk merge under randomized task completion, bounded state-machine settlement and parallel topology. Inclusive/exclusive uses interval unions and exposes unattributed time; marker-only nodes have no fabricated duration. |
+
+These controls use existing commands or disposable local probes. They do not require a committed fuzz/property-test framework, scope registry, session, hierarchy or query product for a native capture or workload record. If those structures are actually selected, token/path collision, recording-local balanced scopes, population/union arithmetic and observer bounds remain required; transient identity or per-frame strings cannot become aggregation keys.
 
 ### Backend And Product Matrix
 
@@ -232,7 +214,7 @@ External native-capture criteria/failures/checks are owned by the [External Capt
 
 - DevelopmentGame and DevelopmentEditor on D3D12 and Vulkan.
 - DevelopmentEditor external capture: PIX on D3D12; RenderDoc on D3D12 and Vulkan; Nsight Graphics Capture on its supported NVIDIA D3D12/Vulkan matrix while explicitly `Experimental`.
-- For each provider, test no flag/no injection, requested but missing, passively attached, ready, next-frame capture of the clicked viewport, multi-window target selection, busy/conflict, resize/minimize, device loss, finalization, shutdown, artifact-open/path-unavailable, and clean relaunch without the provider. Test supported and rejected provider combinations separately, including independent icon state and global request arbitration.
+- For each provider, test no flag/no injection, requested but missing, passively attached, ready, next-frame capture of the clicked viewport, multi-window target selection, busy/conflict, resize/minimize, device loss, finalization, shutdown, artifact-open/path-unavailable, and clean relaunch without the provider. Test the admitted single-provider route and rejection of invalid multiple-provider intent; native combinations need separate acceptance and remain rejected when unqualified. Reuse the current selected-provider icon and request authority.
 - Threaded and serial renderer controls.
 - Normal and serial task controls.
 - Validation on/off state recorded; native validation passes on supported routes.
@@ -268,11 +250,11 @@ External native-capture criteria/failures/checks are owned by the [External Capt
 ### Cost And Bounds
 
 - Ring capacities, queue capacities, string/label storage, and export sizes are asserted/tested.
-- Candidate four-overlay, 16-compact-row, hitch-row, and detailed-scope limits plus fixed presets and hidden-row behavior are asserted/tested before the calibrated values are frozen.
+- Any separately selected presenter/history/query layout proves its actual calibrated capacity, overflow and retained cost. The earlier four-overlay/16-row workspace design is not a minimum product or acceptance prerequisite.
 - `LiveBasic` performs no post-initialization per-frame heap allocation.
-- `Off`, `LiveBasic`, `LiveDetailed`, `GpuProfileCapture`, and external-capture overhead are measured, not assumed.
-- Fps-only, Unit, four simultaneous basic groups, GpuPasses, ProfileGpu, and UI open/closed observer costs are measured independently.
-- A representative ProfileGpu capture leaves parallel frame-graph recording enabled and preserves submission batches, queue dependencies, worker policy, command order, and output. CPU recording disturbance and GPU timing disturbance are reported.
+- Measure only existing/selected observer modes against Off and disclose each actual collection configuration. No mode is implemented merely to complete an overhead table.
+- If a live/internal presenter is separately admitted, measure its selected open/closed and collection compositions independently; unselected stat groups and views require no implementation or experiment.
+- Any separately admitted internal GPU capture leaves parallel frame-graph recording enabled and preserves submission batches, queue dependencies, worker policy, command order, and output. CPU recording disturbance and GPU timing disturbance are reported.
 - Scope planning and recording use fixed storage with no per-scope string allocation, shared-vector growth, or mutex contention between recording tasks; per-queue query capacity is checked before arming.
 - Enabling groups with the same minimum mode does not duplicate collection, memory polling, GPU timestamp pairs, or history storage.
 - Export failure preserves the previous accepted evidence and reports one actionable error.
@@ -285,8 +267,8 @@ The detailed contracts above remain the authority for fields, statistics, worklo
 | Criterion | Pass condition | Checks |
 | --- | --- | --- |
 | `AC-PERF-01` | Every displayed/exported metric names its physical or logical owner, unit, interval, validity, age, and unavailable state; no neighboring metric is used as a substitute. | `CHK-PERF-01`, `CHK-PERF-04` |
-| `AC-PERF-02` | Off, live, detailed, profile, benchmark, and external-capture modes collect only their declared bounded products and Shipping erases development-only collection. | `CHK-PERF-02`, `CHK-PERF-06` |
-| `AC-PERF-03` | The live product, focused capture, benchmark record, and specialist artifact remain separate evidence depths joined by immutable frame/run/configuration identity. | `CHK-PERF-01`, `CHK-PERF-03` |
+| `AC-PERF-02` | Existing/selected observation modes collect only their declared bounded products and Shipping erases applicable development-only collection; unselected modes are not implemented for this criterion. | `CHK-PERF-02`, `CHK-PERF-06` |
+| `AC-PERF-03` | The evidence depths actually selected remain distinct and join immutable frame/run/configuration identity; an absent unselected UI/capture depth is not required infrastructure. | `CHK-PERF-01`, `CHK-PERF-03` |
 | `AC-PERF-04` | Accepted comparisons retain raw samples, run counts, uncertainty/variation, thresholds, comparability controls, and `Pass`/`Regression`/`Inconclusive` disposition. | `CHK-PERF-03` |
 | `AC-PERF-05` | CPU, GPU, memory, loading/compilation, concurrency, ray tracing, and workload-cardinality families are recorded or explicitly classified unavailable. | `CHK-PERF-01`, `CHK-PERF-05` |
 | `AC-PERF-06` | Input-to-display remains `NotInstrumented` until a bounded input/simulation/present/display identity chain exists and is correlated independently. | `CHK-PERF-04` |
@@ -311,8 +293,8 @@ The detailed contracts above remain the authority for fields, statistics, worklo
 | `CHK-PERF-03` | run `MAP-00`, repeated warm samples, mismatch controls, synthetic uncertainty data, and clean-environment replay | comparison and reproducibility |
 | `CHK-PERF-04` | exercise supported/unavailable capture providers, viewport identity, input-to-display classification, and external marker correlation | capture and latency truth |
 | `CHK-PERF-05` | correlate representative CPU, GPU, memory, ray-tracing, and hard-incident evidence with WPA/PIX/RenderDoc/vendor tools as applicable | attribution and causality |
-| `CHK-PERF-06` | measure Off/live/detail/profile/export overhead, fixed storage, duplicate-group collection, query capacity, and parallel-recording disturbance | observer cost and noninterference |
+| `CHK-PERF-06` | measure actual selected-mode/storage/export overhead and parallel-recording disturbance; duplicate groups/query capacity apply only when those consumers are admitted | observer cost and noninterference |
 
 ## Completion Definition
 
-Performance Diagnostics is complete only when `AC-PERF-01` through `AC-PERF-10` pass, every applicable `FM-PERF-*` is deliberately exercised through its named `CHK-PERF-*`, candidate evidence is recorded in the release-level completion report, and unavailable tools or hardware remain explicit blockers rather than inferred passes.
+An admitted diagnostics slice is complete only when every applicable `AC-PERF-01` through `AC-PERF-10` passes, inapplicable capabilities have explicit scope reasons, every applicable `FM-PERF-*` is exercised through its named `CHK-PERF-*`, and exact evidence is recorded in the owning report. Missing tools or hardware for a required cell remain blockers. A narrow capture or measurement pass does not claim the full target diagnostics product is delivered.

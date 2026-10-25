@@ -2,11 +2,24 @@
 
 [Docs](../../README.md) / [Up](README.md)
 
-Sections: [Graphics Role Depth And Evidence](#graphics-role-depth-and-evidence) / [Principal Graphics Roles And Portfolio Implications](#principal-graphics-roles-and-portfolio-implications).
+Sections: [2026-10-25 principal refresh](#2026-10-25-principal-target-refresh) / [Graphics Role Depth And Evidence](#graphics-role-depth-and-evidence) / [Principal Graphics Roles And Portfolio Implications](#principal-graphics-roles-and-portfolio-implications).
 
 **Status:** public-source research; affiliation and attribution findings, not employment verification or personal evidence grading
 
-**Inspected:** 2026-10-10. This records source provenance, not a delivery target. Employer biographies can remain online after a move; recheck before claiming current employment. [Requirements](../Requirements.md) owns capability targets; [source cards](RenderingReferenceExamples.md) own the exact study locations.
+**Inspected:** public profiles and eight-role study on 2026-10-10; targeted principal-role/technical refresh on 2026-10-25 below. The refresh does not reverify every affiliation or vacancy. Employer biographies can remain online after a move; recheck before claiming current employment. [Requirements](../Requirements.md) owns targets; [source cards](RenderingReferenceExamples.md) own exact study locations.
+
+## 2026-10-25 Principal Target Refresh
+
+**Retrieval boundary:** official indexed employer descriptions were retrieved for the two primary roles below. Direct Workday pages exposed JavaScript shells; separate direct CXS retrieval attempts timed out. No raw employer JSON or present vacancy status was verified. Earlier role/profile records retain their original inspection date. These paraphrases support local planning, not a hiring checklist or an internal promotion ladder.
+
+| Refreshed primary role | Requirements relevant to the selected persona | Decision and exact delivery owner |
+| --- | --- | --- |
+| [Principal Graphics Developer Tools Engineer, JR2019836](https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/Principal-Graphics-Developer-Tools-Engineer_JR2019836) | Technical strategy under ambiguity, hands-on prototype-to-product work, developer needs, cross-team influence, mentoring and communication, backed by graphics API/C++ depth. The indexed qualification includes 15+ years and a relevant degree or equivalent experience. | A useful analyzer/incident alone is insufficient principal evidence. Require observed expert challenge/direction, second-context transfer, learning and feedback-driven revision at [M7](../Roadmap.md#retained-advanced-graphics-roadmap), using [AC-PORT-04..08](../../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md#binary-review-criteria). No new tools platform. |
+| [Principal Developer Technology Engineer, JR2013547](https://nvidia.wd5.myworkdayjobs.com/nvidiaexternalcareersite/job/Principal-Developer-Technology-Engineer_JR2013547) | Advanced path-traced/neural rendering, system and model optimization, architecture/driver collaboration, mathematical and CPU/GPU depth, demos/papers and communication. It also asks for 15+ years of relevant work/research and a master's degree or equivalent experience. | Preserve transport/reference, paired-API and owned neural depth. Add the missing component-label dependency and concrete [neural math/runtime](../../Architecture/CrossModule/NeuralGraphics/NeuralGraphicsDesign.md#intended-vertical-slice), complementary [CPU/GPU/lifetime protocols](../../Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/StudyProtocols.md), and actual reproduction. No general AI-agent/gameplay system or driver implementation claim. |
+
+**Technical cross-checks:** the [NVIDIA neural-shading course](https://research.nvidia.com/labs/rtr/publication/duca2025neural/) supports small trainable shader-integrated models as a relevant specialty; it does not validate the local CNN. [PyTorch Conv2d](https://docs.pytorch.org/docs/main/generated/torch.nn.Conv2d.html) makes cross-correlation, padding and channel layout explicit. [Nsight Shader Profiler](https://docs.nvidia.com/nsight-graphics/UserGuide/shader-profiler.html) supports shader/instruction correlation but distinguishes full disassembly access from non-Pro instruction ranges; sampled stall locations alone do not establish cause. [Neural Research](../../Architecture/CrossModule/NeuralGraphics/Research.md) records primary precedent and the proposed model's limits. Use installed tool/version/capability evidence at execution, not an assumed SDK or paid entitlement.
+
+The resulting plan deepens the same three cases. It does not add a subsystem for each role bullet, waive release gates or promise a title. Employment duration, qualifications, organizational scope, recommendations and confidential shipped work need truthful [professional evidence](../Requirements.md#non-repository-requirements). This documentation pass supplies no E3/E4, external review or adoption result.
 
 ## Method And Confidence
 
@@ -143,7 +156,7 @@ No inspected source establishes `Expert` as a universal NVIDIA rank. Here it mea
 | Transfer | Another developer can use the documented result. | Explain difficult internals and diagnose an adopter's failure. | Repeated external adoption/review, decision influence, stewardship and teaching with genuine feedback. |
 | Scope honesty | Identify tested APIs, hardware and failures. | Separate algorithm, compiler, driver and architecture effects. | Make reviewable support and investment decisions without inflating breadth or concealing missing evidence. |
 
-The [public engineer study]() supplies examples of these behaviors. Titles, degrees, years, repository stars and paper counts are not repository acceptance thresholds. No feature count can turn self-authored work into evidence of managing organizational risk or developing other engineers.
+The [public engineer study](#employer-described-rendering-and-developer-technology-work) supplies examples of these behaviors. Titles, degrees, years, repository stars and paper counts are not repository acceptance thresholds. No feature count can turn self-authored work into evidence of managing organizational risk or developing other engineers.
 
 ### Portfolio Review Questions
 
@@ -156,9 +169,9 @@ Use these questions alongside the canonical [E0–E4 evidence scale](../Requirem
 5. Does the neural case contain an owned model, fixed operator math, FP32 shader conformance and a measured product comparison?
 6. Can a non-author reproduce a result, and did their feedback change implementation or guidance?
 7. Is there an explicit decision record explaining rejected scope, interface/copy/hook costs and deleted authority?
-8. Beyond the minimum advanced program, is there evidence from a second independent consumer context and one post-adoption repair or improvement prompted by real feedback?
+8. For M7, is there a second actual consumer context, observed teaching/learning and a justified post-adoption revision/retest prompted by real feedback?
 
-Questions 1–7 refine the selected `PGD-*` outputs. Question 8 is the conditional `PGD-09` influence progression; it does not silently double the minimum adopter gate or certify sustained professional leadership. Professional and confidential evidence can supplement the public project with appropriate permission.
+Questions 1–7 refine M6's selected `PGD-*` outputs. The 2026-10-25 decision makes question 8 a required M7 / `PGD-09` evidence progression for the stronger principal-oriented packet; [Review And Transfer](../../Architecture/CrossModule/GraphicsPortfolio/ReviewAndTransfer.md) defines its observed outcomes. It changes no release adopter gate and cannot certify employment-scale leadership. Truthful professional/confidential evidence can supplement the project with permission.
 
 ### What Changes In Delivery
 
@@ -174,7 +187,7 @@ For a compiler-specialist claim, new GPU-driven pipeline or research publication
 
 **Owner:** Strategy research. The [supplied source archive](../RoleSources.md) remains unchanged in meaning; [Requirements](../Requirements.md) owns capability targets.
 
-**Expanded engineering study:** [role-family and level depth](#graphics-role-depth-and-evidence), [verified public engineer examples]() and [twenty actionable source cards](RenderingReferenceExamples.md). The study distinguishes current publisher descriptions, historical affiliations, explicit former employees and uncertain identities. The original cross-employer study below remains useful; the expansion gives precise code/publication locations and existing delivery consumers.
+**Expanded engineering study:** [role-family and level depth](#graphics-role-depth-and-evidence), [verified public engineer examples](#employer-described-rendering-and-developer-technology-work) and [twenty actionable source cards](RenderingReferenceExamples.md). The study distinguishes current publisher descriptions, historical affiliations, explicit former employees and uncertain identities. The original cross-employer study below remains useful; the expansion gives precise code/publication locations and existing delivery consumers.
 
 ### Employer Evidence
 

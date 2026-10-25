@@ -3,12 +3,14 @@
 #include "LauncherActivityPanel.h"
 #include "Models/LauncherOperationResult.h"
 #include "LauncherSettings.h"
+#include "LauncherWorkflowPanel.h"
 
 namespace SparkleLauncher
 {
 	void LauncherMainWindow::DisplayOperationStarted(const QString& runId, const QString&, const QString& title)
 	{
 		m_activityPanel->DisplayOperationStarted(runId, title);
+		m_workflowPanel->setEnabled(false);
 	}
 
 	void LauncherMainWindow::AppendOperationOutput(const QString& runId, const QString&, const QString& outputText)
@@ -34,6 +36,7 @@ namespace SparkleLauncher
 			m_settings.SetShaderExportPath(result.ShaderExportPath);
 		}
 		const QString effectiveTitle = m_activityPanel->DisplayOperationFinished(runId, title, result);
+		m_workflowPanel->setEnabled(!m_activityPanel->HasActiveRun());
 
 		bool refreshesSourceDependencyState = false;
 		for (auto dependencyRun = m_sourceDependencyRunIds.begin(); dependencyRun != m_sourceDependencyRunIds.end();)

@@ -2,272 +2,187 @@
 
 [Docs](../../../../../README.md) / [Up](README.md) / [Design](../RendererDesign.md)
 
-Stages: [DSP-0](#dsp-0--freeze-domains-extents-and-active-state-truth) / [DSP-1](#dsp-1--temporal-sampling-history-resolution-and-aa-truth) / [DSP-2](#dsp-2--exposure) / [DSP-3](#dsp-3--image-reconstruction-and-provider-integration) / [DSP-4](#dsp-4--tone-mapping-encoding-and-presentation) / [DSP-5](#dsp-5--color-grading) / [DSP-6](#dsp-6--chromatic-aberration-and-vignette) / [DSP-7](#dsp-7--hdr10-display-output) / [DSP-8](#dsp-8--display-candidate-closure).
+Qualify existing temporal/exposure/reconstruction/SDR behavior, then integrate approved grading, basic lens and HDR features through their bounded contracts.
 
-Turn correct scene radiance into a stable, reconstructed SDR or HDR image with honest controls.
-
-**Status:** implementation plan; not colorimetric, provider, visual-quality, performance, or release evidence
-
-**Current readiness:** section projection **29/100**; six source routes are present or provider-gated while grading, chromatic aberration, and HDR10 output are absent; all nine families are `Blocked`
+**Status:** remaining release integration and proof; stage names do not imply missing implementation or passed evidence.
 
 ## Work This Plan
 
-| What to do | Working route |
-| --- | --- |
-| First action | [DSP-0 domain review](#dsp-0--freeze-domains-extents-and-active-state-truth): trace scene/display domains, render/output extents, history and requested versus active settings. |
-| Result to reach | One agreed transform/order and reset contract before exposure, DLSS/Ray Reconstruction, tone mapping, grading and lens work. |
-| Start / stop | The local discoveries must close before their feature slices. Both APIs remain required; HDR display proof additionally needs a qualified display/OS tuple. |
+Use DSP-0 only for a changed domain/order decision. Select the earliest wrong display product after raw lighting is valid. Existing exposure/provider/tone code is repaired or proved, not rebuilt by default. Grading, chromatic aberration, vignette and HDR retain their release obligations and local discovery gates.
 
-## Plan At A Glance
+Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).
+
+## Dependencies
 
 ```mermaid
 flowchart LR
-    D0[DSP-0<br/>domain contract] --> D1[DSP-1<br/>extent and history]
-    D1 --> D2[DSP-2<br/>exposure]
-    D2 --> D3[DSP-3<br/>reconstruction]
-    D3 --> D4[DSP-4<br/>tone and output]
-    D4 --> D5[DSP-5<br/>color grading]
-    D5 --> D6[DSP-6<br/>chromatic aberration]
-    D6 --> D7[DSP-7<br/>HDR10 output]
-    D7 --> D8[DSP-8<br/>closure]
+    Domain[DSP-0 domains and active state] --> History[DSP-1 extents and history]
+    History --> Exposure[DSP-2 exposure]
+    Exposure --> Reconstruct[DSP-3 SR and RR]
+    Reconstruct --> Output[DSP-4 SDR tone and output]
+    Output --> Grade[DSP-5 grading]
+    Output --> Lens[DSP-6 basic lens effects]
+    Output --> HDR[DSP-7 HDR native tuple and transform]
+    Grade --> Join[DSP-8 integrated display proof]
+    Lens --> Join
+    HDR --> Join
 ```
 
-| Phase | Primary families | Result |
-| --- | --- | --- |
-| `DSP-0` | all nine | one scene/display domain, extent, jitter, history, selector, and output matrix |
-| `DSP-1` | `FCR-REN-18`, `FCR-REN-22` | view-owned temporal identity and truthful render/output resolution |
-| `DSP-2` | `FCR-REN-09` | finite, correctly reset manual/automatic exposure |
-| `DSP-3` | `FCR-REN-10` | linear/DLSS SR/Ray Reconstruction requested-active-fallback closure |
-| `DSP-4` | `FCR-REN-14`, `FCR-REN-15` | one tone operator and one encoded output without double transforms |
-| `DSP-5` | `FCR-REN-24` | scene-referred grading controls and LUT look |
-| `DSP-6` | `FCR-REN-25` | basic chromatic aberration and vignette, with independent neutral/formula/order proofs |
-| `DSP-7` | `FCR-REN-26` | truthful paired-backend HDR10 presentation and SDR fallback |
-| `DSP-8` | all nine | candidate-bound temporal/display/provider closure |
+The diagram expresses inputs, not instructions to execute every stage. Qualified predecessors are reused. A missing HDR display blocks native HDR proof, not independent SDR/grading/lens work. Raw-reference, exact-debug and UI products retain their bypass/composition rules.
 
 ## `DSP-0` — Freeze Domains, Extents, And Active-State Truth
 
-**Goal:** define the exact order and meaning of HDR scene color, exposure, temporal inputs, reconstruction, tone mapping, debug replacement, encoding, UI, back buffer, viewport product, and capture.
+**Start:** The selected transform/provider/output cell lacks a ratified domain or ordering decision.
 
-**Non-goals:** frame generation, new AA methods, scRGB/HLG/dynamic-HDR profiles, or assuming provider documentation proves local integration.
+**Work:** Trace its scene-linear signal, exposure, guides/motion/jitter, reconstruction, tone/grade/lens edge, encoding, alpha/UI and capture product. Freeze actual render/output/client extents, requested/active/fallback and generation in existing owners. HDR discovery chooses the native tuple needed for the HDR10 signal; this phase does not independently select an extra output profile.
 
-**Required work:** trace input/output color domains, formats/alpha, render/output/viewport extents, jitter sign/sequence, motion/depth/exposure/guides, history identity/reset, requested/resolved/active/fallback/provider state, grading and LUT placement, tone operators, chromatic placement, SDR/HDR output transforms, UI/capture boundaries, backend/package matrices, and all feature `AC/FM/CHK`.
+**Cleanup:** Remove duplicate order/domain definitions and obsolete selector assumptions; no general color or AA framework.
 
-**Failure modes:** double exposure/grading/tone/encoding; provider receives wrong jitter/motion; viewport and dispatch extents differ; fallback is silent; history crosses view/generation; debug output is transformed unexpectedly; HDR active state or an absent AA/frame-generation feature is implied.
-
-**Phase exit criteria:** a stage/resource/domain diagram and binary matrices exist; every selector and negative capability has an observable disposition; analytic ramps/motion/resize/provider fixtures and checks are selected.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** A current diagram and affected AC/FM/check cells decide the next slice; every retained feature has one transform/output owner.
 
 ```text
-Execute only DSP-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-0--freeze-domains-extents-and-active-state-truth.
-Goal: define the exact order and meaning of HDR scene color, exposure, temporal inputs, reconstruction, tone mapping, debug replacement, encoding, UI, back buffer, viewport product, and capture. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only DSP-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-0--freeze-domains-extents-and-active-state-truth. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Trace its scene-linear signal, exposure, guides/motion/jitter, reconstruction, tone/grade/lens edge, encoding, alpha/UI and capture product.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `DSP-1` — Temporal Sampling, History, Resolution, And AA Truth
 
-**Goal:** close `FCR-REN-18` and `FCR-REN-22` with one View-owned jitter/history contract and exact render-to-output geometry.
+**Start:** An admitted view/history/provider input or extent cell needs closure.
 
-**Non-goals:** implementing TAA/FXAA/SMAA/MSAA/dynamic resolution, provider-owned hidden jitter, or sharing history between views.
+**Work:** Check Halton index/sign/matrices, rigid/skin/morph/sky motion, cuts/resize/provider/scene reset and view isolation. Match attachment/dispatch/scissor/product and SDK-derived extents; preserve actual sample count and explicit absence of standalone TAA/FXAA/SMAA/MSAA/dynamic resolution.
 
-**Required work:** close Halton sequence/sign/index and camera matrices; common validity and every invalidation reason; static/camera/rigid/skin/morph/sky motion; two-view isolation; output/render extents, viewport/scissor/dispatch/product agreement; provider quality/ratio and actual attachment sample count; resize/mode/provider/scene generation reset; explicit single-sample and absent-AA truth.
+**Cleanup:** Remove duplicate extent/jitter/reset authority and superseded history validity; no new AA technique or hidden provider jitter.
 
-**Failure modes:** one-frame jitter mismatch; history survives cut/resize/provider switch; motion uses current transform twice; two views alias; dispatch writes wrong extent; requested ratio differs from active; implicit resolve is assumed.
-
-**Phase exit criteria:** analytic sequence/motion/extent cases, reset matrix, two-view isolation, serial/threaded and backend parity, provider handoff inputs, and explicit negative AA checks pass.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-18/FCR-REN-22 affected numerical/reset/isolation/native controls pass both APIs with requested/actual extents recorded.
 
 ```text
-Execute only DSP-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-1--temporal-sampling-history-resolution-and-aa-truth.
-Goal: close FCR-REN-18 and FCR-REN-22 with one View-owned jitter/history contract and exact render-to-output geometry. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only DSP-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-1--temporal-sampling-history-resolution-and-aa-truth. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Check Halton index/sign/matrices, rigid/skin/morph/sky motion, cuts/resize/provider/scene reset and view isolation.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-18, FCR-REN-22; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `DSP-2` — Exposure
 
-**Goal:** close `FCR-REN-09` with finite manual and metered exposure, bounded View-owned adaptation history, correct scheduling, and explicit reset.
+**Start:** Valid raw lighting and the existing exposure semantic contract are available.
 
-**Non-goals:** a cinematography system, hiding lighting-unit errors with exposure, or accepting visually plausible adaptation without a step-response oracle.
+**Work:** Check retained manual/metering modes, luminance/reduction, finite min/max, adaptation direction/speed/time and step response, reset/isolation, async producer dependencies and provider multiplier. Repair demonstrated failures; reuse valid numeric results by identity.
 
-**Required work:** reconcile luminance input/domain, manual value, metering/reduction, min/max, adaptation direction/speeds/delta time, history identity, async dependency/overlap, downstream multiplier, and UI/settings state; exercise uniform ramps, dark/bright extremes, step up/down, cuts/resizes/mode/view changes, non-finite/empty input, and serial/backend comparisons.
+**Cleanup:** Delete replaced metering/adaptation state and duplicate multiplier application; exposure cannot repair transport units or conceal nonfinite raw input.
 
-**Failure modes:** non-finite luminance poisons history; adaptation reverses; clamp masks wrong domain; reset uses stale value; async read races producer; two views share exposure; manual/auto state lies.
-
-**Phase exit criteria:** metering and step-response numerical checks, finite bounds, reset/isolation, scheduling/native validation, downstream interaction, and cost criteria pass.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-09 meets owned ramp/extreme/step/finite/reset/scheduling tolerances and changed cost bounds.
 
 ```text
-Execute only DSP-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-2--exposure.
-Goal: close FCR-REN-09 with finite manual and metered exposure, bounded View-owned adaptation history, correct scheduling, and explicit reset. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only DSP-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-2--exposure. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Check retained manual/metering modes, luminance/reduction, finite min/max, adaptation direction/speed/time and step response, reset/isolation, async producer dependencies and provider multiplier.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-09; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `DSP-3` — Image Reconstruction And Provider Integration
 
-**Goal:** close `FCR-REN-10` for the Linear baseline and every admitted NVIDIA DLSS Super Resolution or Ray Reconstruction route.
+**Start:** Required raw signals, temporal/exposure conventions and exact pinned SDK/runtime tuple are known.
 
-The amended Included matrix requires both APIs on the named machine, every exposed SR quality mode, RR Off/On and supported SR/RR composition. Inspect exact Streamline `v2.11.1` headers/manuals and current D3D12-only initialization before adding private Vulkan mechanics; existing Vulkan texture-tag helpers are not initialization/evaluation evidence. Freeze one supported topology/output owner and the realtime preset's fixed SDK-derived extent. Perform guide/motion/exposure/reset, temporal quality, native lifetime/state-restoration and package checks per API; no fallback may pass the requested provider.
+**Work:** Close Linear control and every exposed SDK-supported DLSS SR/RR combination required on the named NVIDIA machine for D3D12/Vulkan. Inspect current initialization/evaluation rather than infer it from texture helpers; freeze realtime internal/output extent and one composition owner. Prove guides, motion/depth/jitter/exposure/reset, temporal quality, state restoration, retirement, DLL/rights/package and failures.
 
-**Non-goals:** frame generation, claiming unsupported backend/hardware, vendor-specific semantics leaking into unrelated passes, or requiring a provider for the package baseline unless scope says so.
+**Cleanup:** Remove duplicate provider/extent/history/status paths and obsolete bindings. Preserve truthful Linear/Off recovery without accepting it as requested SR/RR proof; no frame generation or provider catalog.
 
-**Required work:** preserve one requested/resolved/active/fallback model; validate provider version/signature/redistribution and build/package membership; reconcile color/depth/motion/jitter/exposure/reactive/guide semantics, render/output extents, reset and feature lifetime; keep Linear as deterministic baseline; handle unsupported API/GPU, missing/corrupt DLL, initialization/evaluation/shutdown failure visibly; measure quality, latency, CPU/GPU time, and memory.
-
-**Failure modes:** provider selected but baseline active silently; wrong motion/jitter sign; missing input tolerated as stale data; provider feature outlives device/view; fallback changes output extent; DLL absent only in package; token/latency identity crosses frame.
-
-**Phase exit criteria:** baseline and every included provider cell pass requested/active/failure/reset/input/package checks; quality/time/memory comparisons and redistribution evidence are candidate-bound; excluded cells are not selectable/advertised.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-10 required cells pass independently on both APIs; fallback, missing hardware or Experimental cannot close an Included provider result.
 
 ```text
-Execute only DSP-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-3--image-reconstruction-and-provider-integration.
-Goal: close FCR-REN-10 for the Linear baseline and every admitted NVIDIA DLSS Super Resolution or Ray Reconstruction route. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only DSP-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-3--image-reconstruction-and-provider-integration. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Close Linear control and every exposed SDK-supported DLSS SR/RR combination required on the named NVIDIA machine for D3D12/Vulkan.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-10; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `DSP-4` — Tone Mapping, Encoding, And Presentation
 
-**Goal:** close `FCR-REN-14` and `FCR-REN-15` with exactly one selected tone operator, exactly one output encoding, and generation-safe back-buffer/viewport publication.
+**Start:** Valid radiance and provider/exposure domains exist; current SDR output is selected.
 
-**Non-goals:** HDR output, full color management, color grading, exact debug bypass beyond the current contract, or using UI to repair scene/display transforms.
+**Work:** Check retained Reinhard/ACES approximation/fitted choices against owned ramps/extremes, finite/alpha behavior, one exposure/tone/encoding sequence, format/domain pairing, viewport/backbuffer generations, debug/capture labels, UI and resize/DPI/present. This is the SDR control for later output changes.
 
-**Required work:** close Reinhard/ACES approximation/ACES fitted selection, known ramps/extremes, finite/alpha behavior, exposure interaction, scene/display-linear boundary, encoding/format pairs, clipping/banding disposition, debug replacement limitation, output/viewport identity, resize/DPI, capture interpretation, backend present, and UI composition boundary.
+**Cleanup:** Delete double transforms, redundant output products and replaced tone/encoding state. No color-management suite or UI repair of scene/display math.
 
-**Failure modes:** double tone/encode; NaN/Inf reaches output; wrong alpha; unsupported operator value selects arbitrary code; viewport product generation is stale; capture mislabeled; resize format/state mismatch; UI is encoded twice.
-
-**Phase exit criteria:** numerical ramp/extreme/operator, encoding/format, finite/alpha, debug/capture, back-buffer/viewport, resize/DPI, UI boundary, and both-backend present checks pass within owned tolerances.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-14/FCR-REN-15 affected numerical/domain/publication/native output cells pass both APIs.
 
 ```text
-Execute only DSP-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-4--tone-mapping-encoding-and-presentation.
-Goal: close FCR-REN-14 and FCR-REN-15 with exactly one selected tone operator, exactly one output encoding, and generation-safe back-buffer/viewport publication. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only DSP-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-4--tone-mapping-encoding-and-presentation. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Check retained Reinhard/ACES approximation/fitted choices against owned ramps/extremes, finite/alpha behavior, one exposure/tone/encoding sequence, format/domain pairing, viewport/backbuffer generations, debug/capture labels, UI and resize/DPI/present.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-14, FCR-REN-15; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `DSP-5` — Color Grading
 
-**Goal:** close `FCR-REN-24` with the bounded, independently reviewable color-grading result accepted by `CGRD-00`.
+**Start:** CGRD-00 and contributing scene/display domains are accepted for the retained parameter/LUT subset.
 
-**Non-goals:** production work before `CGRD-00` passes, or silently expanding beyond the exclusions ratified there.
+**Work:** Execute the next [grading stage](../Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md). Retain independent numeric oracle, neutral identity, typed current asset/cook/residency, view/reset, raw/debug/UI bypass and package/cost proof.
 
-**Required work:** first close [Color Grading Discovery](../Features/PostProcessing/DisplayPipeline/ColorGrading/Discovery.md). Only after `CGRD-00` is `PASS`, execute the conditional [feature-local plan](../Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md) against the frozen semantics, asset, ownership, experience, budget, and evidence decisions. External precedent is not local proof.
+**Cleanup:** Delete replaced grade/settings/source-cooked authority in the leaf stage; no grading graph/editor or arbitrary LUT format.
 
-**Failure modes:** implementation starts from an unresolved decision; neutral state alters pixels; parameter/LUT order or domain differs from the accepted semantics; invalid data creates non-finite output or silently substitutes a look; grading is applied twice; views share mutable state; cooked/package identity diverges.
-
-**Phase exit criteria:** `AC-CGR-01` through `AC-CGR-08`, controlled failures, analytic ramps/patches, LUT identity/interpolation, two-view/reset, SDR/HDR-domain, backend, package, cost, and candidate checks pass; `FCR-REN-24` records the evidence.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-24 satisfies AC-CGR-01 through 08 and mapped failures for the admitted candidate. SDR proof does not claim native HDR cells.
 
 ```text
-Execute only DSP-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-5--color-grading.
-Goal: close FCR-REN-24 with the bounded, independently reviewable color-grading result accepted by CGRD-00. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only DSP-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-5--color-grading. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Execute the next [grading stage](../Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md).
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-24; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `DSP-6` — Chromatic Aberration And Vignette
 
-**Goal:** close `FCR-REN-25` with independently accepted chromatic-aberration and basic-vignette results. `CHRD-00` owns the chromatic stage/domain/units; the Vignette dossier owns its separate freeze.
+**Start:** CHRD-00 is accepted for chromatic work, or the independent vignette freeze is accepted for vignette work.
 
-Also deliver [Basic Vignette](../Features/PostProcessing/DisplayPipeline/Vignette/VignetteDesign.md) through its small local freeze/formula/settings/order checks. CHRD-00 authorizes chromatic work only; it cannot accept or implicitly choose vignette semantics. The family exits only when both independent feature results pass on D3D12/Vulkan with neutral-work erasure and raw/debug/UI isolation. Keep each feature's state/parameters local and compose through the existing display/typed-graph seam.
+**Work:** Execute one selected [chromatic](../Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md) or [vignette](../Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md) stage. Neither waits for the other's discovery. Keep independent formula/units/edges/alpha/aspect checks, selected settings and actual On defaults; neutral controls omit all effect work.
 
-**Non-goals:** production work before `CHRD-00` passes, or silently expanding beyond the exclusions ratified there.
+**Cleanup:** Remove replaced offsets/masks/fields/intermediates in that leaf; reuse settings/display/graph owners without a lens stack or artistic suite.
 
-**Required work:** first close [Chromatic Aberration Discovery](../Features/PostProcessing/DisplayPipeline/ChromaticAberration/Discovery.md). Only after `CHRD-00` is `PASS`, execute the conditional [feature-local plan](../Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md) against the frozen coordinate, displacement, channel, filtering, ownership, workflow, budget, and evidence decisions.
-
-**Failure modes:** implementation starts from an unresolved decision; zero state changes pixels; authored behavior varies outside the accepted resolution/aspect rule; sampling leaves the accepted boundary policy; alpha changes; stage/debug/UI policy is violated; invalid controls produce non-finite output; views share state.
-
-**Phase exit criteria:** `AC-CHR-01` through `AC-CHR-08` and `AC-VIG-01` through `AC-VIG-06`, zero/known-pattern/edge/alpha/resolution/view/debug/backend/package/cost and controlled-negative checks pass; `FCR-REN-25` records the two candidate-bound sub-results.
-
-The separate vignette freeze/stage cards and prompt live in the [feature-local plan](../Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#basic-vignette-remaining-delivery-plan). DSP-6 composes the two independently proved results; it does not maintain a second vignette delivery sequence.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-25 closes only when AC-CHR-01 through 08 and AC-VIG-01 through 06 each pass raw/debug/UI, view/backend/package/cost and controlled failures. One effect cannot inherit the other's verdict.
 
 ```text
-Execute only DSP-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-6--chromatic-aberration-and-vignette.
-Goal: close FCR-REN-25 with independently accepted chromatic-aberration and basic-vignette results. CHRD-00 owns the chromatic stage/domain/units; the Vignette dossier owns its separate freeze. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only DSP-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-6--chromatic-aberration-and-vignette. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Execute one selected [chromatic](../Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md) or [vignette](../Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md) stage.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-25; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `DSP-7` — HDR10 Display Output
 
-**Goal:** close `FCR-REN-26` with a truthful Windows HDR route on D3D12 and Vulkan plus mandatory automatic SDR fallback, using the output approach accepted by `HDRD-00`.
+**Start:** HDRD-00 accepts signal/UI/native tuple and contributing contracts; native proof also requires a qualified HDR display/OS tuple.
 
-**Non-goals:** production work before `HDRD-00` passes; HLG, Dolby Vision, dynamic metadata, or claiming that a 10-bit/float surface or metadata alone is active HDR. Whether FP16/scRGB is required for an admitted profile is a discovery decision, not a pre-declared exclusion.
+**Work:** Execute the next [HDR stage](../Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/ImplementationPlan.md). Renderer owns scene/UI/gamut/tone/transfer; RHI owns capability/activation/metadata/recreation/present. Qualify native state, PQ/gamut/luminance/UI, transitions/faults, SDR recovery and package/cost on each required API.
 
-**Required work:** first close [HDR Display Output Discovery](../Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/Discovery.md), including the UINT10/PQ versus FP16/scRGB route, target-luminance policy, system SDR-white policy, metadata role, and backend eligibility. Only after `HDRD-00` is `PASS`, execute the conditional [feature-local plan](../Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/ImplementationPlan.md). Renderer owns scene/display semantics; RHI owns native capability, activation, recreation, and present mechanics.
+**Cleanup:** Remove duplicate native/Renderer active-state and tone/encoding paths in the replacement stage. No second display/settings framework, extra HDR profile or hardware purchase by implication.
 
-**Failure modes:** implementation starts from an unresolved platform/color decision; format, color space, transfer, alpha/composition, or Renderer domain disagree; metadata is mistaken for pixel interpretation or active-state proof; UI is dim or double transformed; monitor/OS state leaves stale active state; backends diverge; activation failure does not recover to SDR.
-
-**Phase exit criteria:** `AC-HDR-01` through `AC-HDR-08`, native state inspection, PQ/gamut/luminance/UI fixtures, transition/failure matrix, paired-backend comparison, SDR fallback, package, performance, and candidate checks pass on admitted HDR hardware; `FCR-REN-26` records limitations.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-26 meets AC-HDR-01 through 08 on admitted hardware. Math can pass without a display; actual HDR activation/output stays unrun until observed.
 
 ```text
-Execute only DSP-7 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-7--hdr10-display-output.
-Goal: close FCR-REN-26 with a truthful Windows HDR route on D3D12 and Vulkan plus mandatory automatic SDR fallback, using the output approach accepted by HDRD-00. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only DSP-7 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-7--hdr10-display-output. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Execute the next [HDR stage](../Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/ImplementationPlan.md).
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-26; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## `DSP-8` — Display Candidate Closure
 
-**Goal:** prove the complete temporal-to-display chain for one candidate without one stage hiding another's defect.
+**Start:** Compatible temporal, exposure/provider, SDR and required feature results exist for final configuration.
 
-**Non-goals:** accepting screenshots alone, merging provider and baseline verdicts, or promoting excluded display features.
+**Work:** Join nine reports and raw/intermediate/presented domains on one candidate. Fill missing interactions/reset/failure/native/package and quality/time/memory cells; keep provider and baseline verdicts separate.
 
-**Failure modes:** result compared after an unknown transform; histories/settings differ between runs; provider package differs; capture metadata lacks domain/encoding; one backend or viewport route omitted; evidence predates a shader change.
+**Cleanup:** Verify neutral-work omission and stage-local removal of obsolete transforms/state/build/shader membership; retire completed prompts after retaining proof.
 
-**Phase exit criteria:** all nine FCR reports link exact raw/intermediate/final artifacts, analytical and visual oracles, reset/failure matrices, provider/package/native evidence, performance/latency/memory, limitations, and candidate decisions.
-
-<details>
-<summary>Copy implementation prompt</summary>
+**Exit:** FCR-REN-09/10/14/15/18/22/24/25/26 close admitted criteria and negatives. Required missing HDR/SR/RR proof stays blocked without creating unrelated display work.
 
 ```text
-Execute only DSP-8 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-8--display-candidate-closure.
-Goal: prove the complete temporal-to-display chain for one candidate without one stage hiding another's defect. Follow this stage's work, non-goals and owning checks.
-Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Execute only DSP-8 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-8--display-candidate-closure. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
+Selected work: Join nine reports and raw/intermediate/presented domains on one candidate.
+Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
+NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-09; no neighboring stage or new mechanism merely to fill a report.
 ```
-
-</details>
 
 ## Reference And Ownership
 
-<details>
-<summary>Exact owners, source snapshots and related contracts</summary>
-
-**Families:** `FCR-REN-09`, `FCR-REN-10`, `FCR-REN-14`, `FCR-REN-15`, `FCR-REN-18`, `FCR-REN-22`, `FCR-REN-24`, `FCR-REN-25`, `FCR-REN-26`
-
-**Responsibility:** sequence view-owned temporal/display state from sampling and exposure through reconstruction, tone mapping, and output
-
-**Owner-directed release amendment:** [Required rendering closure](../../../../../Acceptance/FirstRelease.md#required-rendering-closure) makes complete DLSS SR/RR on D3D12 and Vulkan mandatory; fallback/Experimental cannot close those cells. Basic vignette joins chromatic aberration under FCR-REN-25 with separate feature proofs. Existing domain/provider discovery still freezes actual SDK-supported topology before implementation or performance claims.
-
-**Parent:** [First Release Renderer Plans](README.md)
-
-**Architecture:** [Post Processing](../Features/PostProcessing/PostProcessingDesign.md), [Display Pipeline](../Features/PostProcessing/DisplayPipeline/DisplayPipelineDesign.md), [Reconstruction And Generation](../Features/PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md), and [Temporal Sampling And History](../Features/FrameExecution/TemporalSamplingAndHistory.md)
-
-</details>
+[Display contract](../Features/PostProcessing/DisplayPipeline/DisplayPipelineDesign.md), [reconstruction](../Features/PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md), [temporal history](../Features/FrameExecution/TemporalSamplingAndHistory.md) and linked leaf dossiers own semantics. [Required rendering closure](../../../../../Acceptance/FirstRelease.md#required-rendering-closure), approved defaults and budgets remain unchanged.

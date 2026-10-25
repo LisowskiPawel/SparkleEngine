@@ -22,7 +22,7 @@ Coverage is necessary but not sufficient. A routed feature still fails the docum
 | Audit | Question answered |
 | --- | --- |
 | [Source Document Coverage](SourceDocumentCoverage.md) | For every source document named in the refinement request, which feature topics occur and where are they documented? |
-| [Stable Identifier Coverage](StableIdentifierCoverage.md) | Where does every `NS-*`, `PGE-*`, current `FCR-*`, `REL-*`, `RISK-REL-*`, `FM-REL-*`, `MAP-*`, `CASE-*`, and `WL-*` identifier route? |
+| [Stable Identifier Coverage](StableIdentifierCoverage.md) | Where does every identifier route? Its [PGE delivery lookup](StableIdentifierCoverage.md#principal-graphics-engineer-requirements) connects all fifteen persona targets to exact implementation stages, contracts and original evidence/result owners. |
 | [Strategic Deliverable Outputs](StableIdentifierCoverage.md#strategic-deliverable-outputs) | Where do the catalog's concrete `PGD-01..09` outputs route, including absent neural and analysis work? |
 | [Research Reference Routing](StableIdentifierCoverage.md#research-reference-routing) | Which existing owners consume the twenty NVIDIA `NVR-*` study cards, and which examples remain conditional research? |
 | [Documentation Presentation Research](PresentationResearch.md) | Which external information-architecture and presentation precedents informed the reader-first documentation structure? |

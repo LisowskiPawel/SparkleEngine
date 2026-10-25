@@ -52,7 +52,10 @@ Existing NVIDIA reconstruction providers enter at an external runtime-inference 
 
 | Dossier | Owns | Current state |
 | --- | --- | --- |
-| [Discovery](Discovery.md) | selected denoising problem, blocking decisions, numeric/ownership/build freeze | Open decision gate |
+| [Discovery](Discovery.md) | ratify the concrete denoising proposal, close source/reference/environment/rights and numeric qualifications | Open decision gate |
+| [Semantics](Semantics.md) | component target, eleven input channels, fixed CNN, tensor/training math and proposed numerical/value budgets | Target proposal; not a result |
+| [Execution Architecture](ExecutionArchitecture.md) | necessary component producer, fixed export, typed three-pass runtime, lifecycle/fallback and ownership | Target proposal; not implemented |
+| [Research](Research.md) | primary-source neural/numerical/profiling precedent and the local topology choice's limits | Inspected research |
 | [Plan](ImplementationPlan.md) | remaining gate-based stages and ready-to-use prompts | Conditional target work |
 | [Training And Evaluation](#neural-graphics-training-and-evaluation) | problem definition, dataset/provenance, reference target, model/operator, training, evaluation, reproducible artifact | Not found |
 | [Model To Kernel And Runtime Inference](#model-to-kernel-and-runtime-inference) | export/lowering, kernel selection/optimization, runtime ABI, scheduling, fallback, profiling, delivery | Not found |
@@ -62,15 +65,15 @@ The current NVIDIA DLSS Super Resolution and Ray Reconstruction providers are do
 
 ## Intended Vertical Slice
 
-The selected strategic slice is one diffuse-indirect denoiser: [Discovery](Discovery.md) holds nine unresolved decision cells and [Plan](ImplementationPlan.md) supplies bounded remaining stages and executable prompts. Its production admission waits for `REL-11` and `M3`; publishing the plan does not change the absence or readiness above. [Feature Delivery Catalog](../../../Strategy/FeatureDeliveryCatalog.md) routes `PGD-06..08` and the exact reviewer outputs.
+The selected strategic slice is one diffuse-indirect denoiser. [Semantics](Semantics.md) proposes the concrete eleven-channel, three-layer residual CNN and training/numerical/value rules; [Execution Architecture](ExecutionArchitecture.md) defines the necessary qualified component producer and one runtime. [Discovery](Discovery.md) ratifies nine explicit cells rather than choosing an unspecified model while coding. [Plan](ImplementationPlan.md) supplies bounded remaining stages and prompts. Production still waits for `REL-11` and `M3`; the proposal changes no absence/readiness claim. [Feature Delivery Catalog](../../../Strategy/FeatureDeliveryCatalog.md) routes `PGD-06..08` and reviewer outputs.
 
-Frozen representative scene data and references -> deterministic dataset builder -> owned model/operator and training recipe -> evaluated versioned artifact -> explicit export/lowering and GPU-kernel plan -> Renderer feature contract and classical fallback -> RHI resources/dispatch/synchronization -> packaged artifact -> Bistro/San Miguel quality, latency, memory, and failure evidence.
+Frozen representative scene data and independently qualified diffuse-indirect reference component -> deterministic dataset builder -> owned model/operator and training recipe -> immutable current artifact -> fixed export and GPU-kernel plan -> Renderer feature contract and classical fallback -> RHI resources/dispatch/synchronization -> packaged artifact -> Bistro/San Miguel quality, latency, memory, and failure evidence. Beauty radiance or an external vendor denoiser cannot substitute for the component target or owned model.
 
 No arrow in this route is implemented merely because this target dossier exists. The feature remains absent until source/build membership and a reachable product consumer prove otherwise.
 
 ## Ownership Rules
 
-- Training data and evaluation artifacts have one provenance/version owner; runtime code does not silently generate or mutate them.
+- Training data and evaluation artifacts have one immutable identity/provenance owner; runtime code does not silently generate or mutate them.
 - Model/operator semantics are independent of backend kernels. Backend lowering may specialize execution without forking the feature definition or oracle.
 - Renderer owns requested/active feature selection, inputs, output/history identity, fallback, and user-facing diagnostics. RHI owns neutral GPU mechanisms and backend lowering.
 - Build/Packaging owns immutable model/kernel delivery and redistribution. Showcase owns only representative workload selection, not feature truth.
@@ -83,17 +86,17 @@ No arrow in this route is implemented merely because this target dossier exists.
 | Start from one bounded user-visible problem | Success and non-goals can be measured | Does not create a generic ML platform |
 | Keep model semantics separate from backend kernels | One oracle can validate several optimized implementations | Export/lowering ABI and numerical drift become explicit contracts |
 | Require a classical fallback with one output contract | Quality, latency, memory, and failure comparisons are meaningful | Both paths must remain maintained and semantically aligned |
-| Publish immutable model/kernel generations | Reproduction, rollback, and completion-safe runtime use remain possible | Artifacts, compatibility, retention, and packaging add product complexity |
+| Publish one current immutable model/kernel generation | Reproduction and completion-safe replacement remain possible | Account for actual old/new in-flight overlap; no internal format migration or compatibility reader |
 
 ## Neural Graphics Training And Evaluation
 
 **Status:** target capability dossier; no owned training or evaluation implementation was found
 
-The selected diffuse-indirect slice is being defined by [NG-D0 discovery](Discovery.md); [Plan](ImplementationPlan.md) Stages 1–2 deliver this contract only after its admission/decision gates. No training result or numeric tolerance is inferred from this page.
+The selected diffuse-indirect slice now has proposed [signal, fixed CNN, training recipe and numerical/value gates](Semantics.md). [NG-D0](Discovery.md) must ratify them against actual environment, rights and oracle inputs. [Plan](ImplementationPlan.md) NG-S1 first qualifies the necessary component producer, then data; NG-S2 trains only after that proof. Proposed tolerances are not accepted results.
 
 **Scope:** define the absent data, training, evaluation, reproducibility, quality, failure, and model-publication capability boundary
 
-**Owner:** future training/evaluation tool and asset-publication path; Renderer is a consumer, not the training owner
+**Owner:** one offline Tools-owned builder/training/export route and existing asset publication; Renderer consumes the accepted artifact
 
 **Snapshot:** 2026-09-07; the live non-documentation source/build tree was searched for owned training/data/model paths; source evidence `S` only
 
@@ -111,27 +114,25 @@ The selected diffuse-indirect slice is being defined by [NG-D0 discovery](Discov
 
 ```mermaid
 flowchart LR
-    Sources[Licensed source and reference generation] --> Dataset[Deterministic dataset and frozen splits]
+    Sources[Licensed source and qualified component measurement] --> Dataset[Deterministic dataset and frozen splits]
     Dataset --> Training[Reproducible training run]
-    Training --> Candidate[Versioned candidate checkpoint]
+    Training --> Candidate[Identified candidate checkpoint]
     Candidate --> Evaluation[Independent frozen evaluation]
     Evaluation -->|passes| Publish[Atomically publish accepted model artifact]
     Evaluation -->|fails| Reject[Retain diagnostics; do not publish]
 ```
 
-The cost of this strict boundary is additional data/provenance infrastructure and slower iteration. The benefit is that a runtime result can be traced back to data, training, evaluation, and artifact identity instead of an opaque weight file.
+Use original capture/model manifests and a single bounded offline consumer. The runtime result must trace to data, training and artifact identity; that obligation does not require a dataset service, experiment platform or second provenance schema.
 
 ### Problem And Output Contract
 
-The first owned neural feature must solve one bounded graphics problem with an explicit classical/reference target. Candidate examples are reconstruction, denoising, sampling guidance, compression, or material/light approximation; choosing one is a roadmap decision, not made by this document.
-
-The feature definition must freeze input tensors/attributes, output semantics and color domain, valid extents/ranges, temporal state, quality oracle, classical fallback, supported scenes/hardware, and non-goals before model selection. A training win without an integrated user-visible outcome does not satisfy the feature.
+The selected product is spatial reconstruction of albedo-modulated scene-linear diffuse-indirect RGB before composition. Eleven inputs feed the fixed `11→16→16→3` residual CNN; direct/specular, exposure, recurrent history, sampling guidance and compression are outside this slice. [Semantics](Semantics.md) owns the transforms, padding, loss/splits, conformance and product gates. [Execution Architecture](ExecutionArchitecture.md) owns the producer/runtime joins. Ratify these exact proposals rather than selecting a different problem while coding. A training win without a useful integrated result cannot pass.
 
 ### Data, State, Lifetime, And Reproducibility
 
 - Every training/evaluation sample records source/license, scene/camera/frame identity, generator/reference revision, parameters, split membership, and content hash.
 - Train/validation/test splits prevent scene/camera/frame leakage and keep the final test set immutable.
-- Preprocessing, augmentation, seeds, precision, loss terms, optimizer/schedule, checkpoints, and evaluation commands are versioned inputs.
+- Preprocessing, seeds, precision, loss, optimizer/schedule, checkpoints and evaluation commands are immutable identified inputs. Do not add augmentation or search infrastructure outside the ratified recipe.
 - The published artifact contains model/operator schema, weights, input/output normalization, compatibility identity, metrics, and provenance. Partial or failed publication cannot replace the last accepted generation.
 - Dataset volume, preprocessing/training wall time, CPU/GPU memory high-water, checkpoint size, and evaluation cost are bounded and reported.
 
@@ -153,9 +154,9 @@ Acceptance is owned by [Neural Graphics Acceptance](#neural-graphics-acceptance)
 
 [NG-D0 discovery](Discovery.md) must freeze the selected tensor/operator/ABI/lifetime and capability cells. [Plan](ImplementationPlan.md) Stages 3–6 deliver fixed FP32 conformance, runtime, optional measured optimization and adoption; the plan does not create an implemented path.
 
-**Scope:** define the absent model-export, legalization, kernel-generation, runtime-execution, packaging, and completion-safe lifetime boundary
+**Scope:** fixed weight/bias export, three FP32 operators, existing ShaderSystem cook, one Renderer-private runtime and completion-safe delivery; no arbitrary graph compiler
 
-**Owner:** future model compiler/export tool plus Assets, Renderer, RHI, and Build/Packaging delivery owners
+**Owner:** one offline fixed exporter plus existing Assets, ShaderSystem, Renderer, RHI and Build/Packaging owners
 
 **Snapshot:** 2026-09-07; the live non-documentation source/build tree was searched for owned model export/lowering/kernel/inference-runtime paths; source evidence `S` only
 
@@ -165,9 +166,9 @@ Acceptance is owned by [Neural Graphics Acceptance](#neural-graphics-acceptance)
 
 | Stage | Owned decision | Required observable |
 | --- | --- | --- |
-| export/IR | accepted model/operator becomes a validated immutable schema | source/artifact hashes, shapes, operators, normalization, and compatibility |
-| legalization/optimization | unsupported operators reject; fusion, layout, and precision choices remain inspectable | exact decisions plus numerical comparison to the accepted model |
-| kernel production | generate or select backend/capability-specific kernels | code/kernel hash, target, workgroup/layout, resource/workspace contract |
+| fixed export | accepted tensors/biases become one checked immutable artifact | exact OIHW order/count, normalization, model/semantic hashes and current contract |
+| measured optimization | unsupported topology rejects; only a demonstrated precision/layout/fusion hypothesis is tested | explicit decision, float64/PyTorch/GPU conformance and full-product controls |
+| kernel production | three typed FP32 compute operators through the existing shader cook | code/hash, workgroup/layout, two-buffer workspace and actual source/native join |
 | runtime activation | Renderer resolves requested/active neural or classical path | reason, inputs/output/history identity, and one complete generation |
 | GPU execution | RHI materializes resources/pipeline/dispatch/barriers | attributable timing, memory, queue, and completion tokens |
 | delivery | Build/Packaging manifests model/kernel/runtime bytes and licenses | clean product readiness or explicit unavailable state |
@@ -180,11 +181,11 @@ This dossier owns the boundary from one accepted model/operator artifact to exec
 
 ### Intended Route
 
-Accepted model/operator -> validated intermediate/export schema -> operator/legalization/fusion/layout/precision plan -> generated or selected kernels -> ShaderCompiler/build publication -> immutable game artifact -> Renderer typed inputs/outputs/history -> RHI dispatch/resources/barriers -> result validation -> completion-safe retirement.
+Ratified fixed model -> checked weight/bias artifact -> three typed FP32 operators -> existing ShaderSystem/Assets publication -> immutable runtime generation -> Renderer raw diffuse and RR-independent guides -> RHI dispatch/barriers -> bounded validity/publication and classical fallback -> all-queue retirement. Profile a justified optimization only after that baseline is correct.
 
 ### Contracts
 
-- The artifact identity includes source model hash, schema/lowering version, target/backend/capability, precision/layout, kernel/code hash, binding ABI, and required runtime version.
+- The artifact identity includes source model and semantic hash, current fixed tensor contract, target/backend/capability, precision/layout, kernel/code hash and binding ABI. Replace all producers/consumers together; no internal version negotiation or legacy reader.
 - Unsupported operators, dynamic shapes, precision loss, capability mismatch, compilation failure, and validation mismatch fail before activation. Automatic fallback is allowed only when the requested/active distinction and reason are visible.
 - Renderer owns semantic inputs/output and classical fallback. The lowering owner chooses legal kernels. RHI exposes mechanisms and capability truth without neural-policy vocabulary.
 - Runtime scheduling declares resources, dependencies, queues, history, scratch/workspace, synchronization, and in-flight generation lifetime. Replacement retires only after every consuming queue completes.
@@ -194,7 +195,7 @@ Accepted model/operator -> validated intermediate/export schema -> operator/lega
 
 | Decision | Benefit | Cost or risk |
 | --- | --- | --- |
-| One explicit intermediate/export schema | Lowering decisions and compatibility become reviewable | Schema ownership and invalidation must be maintained |
+| One fixed tensor/export contract | Shapes/order/normalization and drift are reviewable | Exact count/hash checks; unsupported topology rejects instead of growing an operator IR |
 | Specialize kernels below stable model semantics | Hardware performance can improve without forking the feature oracle | Precision/layout/fusion can introduce numerical drift |
 | Use typed Renderer inputs and output | Neural and classical paths remain comparable | Dynamic shapes and ad hoc tensors are deliberately constrained |
 | Retire model/kernel generations by GPU completion | Reload cannot use freed artifacts or workspace | In-flight generations retain model/kernel/scratch memory |
@@ -243,12 +244,13 @@ Every gate is conjunctive. High image quality cannot compensate for unlicensed d
 | `AC-NG-06` | Frozen Bistro/San Miguel or approved replacement workloads report quality, temporal behavior, CPU/GPU p50/p95/p99, memory/workspace, artifact size, and classical comparison. |
 | `AC-NG-07` | Missing/corrupt/incompatible artifact, unsupported hardware/backend/operator, allocation/compile/dispatch failure, non-finite output, reload, and shutdown remain honest and bounded. |
 | `AC-NG-08` | Package manifests account for model/kernel/runtime bytes, licenses, hashes, compatibility, and source/debug erasure; a non-author can reproduce the supported result. |
+| `AC-NG-09` | The necessary diffuse-indirect target producer is derived and qualified independently: exact path/lobe/domain, camera/pixel population, committed prefix and uncertainty; isolated controls detect direct/specular leakage, wrong density/weight and stale component identity. Beauty or subtraction of unrelated noisy products cannot pass. |
 
 ### Controlled Failures
 
 | ID | Fault and required outcome |
 | --- | --- |
-| `FM-NG-01` | Dataset provenance/license/split integrity fails -> training/evaluation publication is blocked. |
+| `FM-NG-01` | Component estimator/domain/uncertainty or dataset provenance/license/split integrity fails -> dataset/training/evaluation publication is blocked; beauty cannot substitute for the target. |
 | `FM-NG-02` | Model schema/operator/shape/precision is unsupported -> lowering fails with exact identity and no stale replacement. |
 | `FM-NG-03` | Kernel compilation, validation, capability, allocation, or dispatch fails -> requested/active state reports failure or declared classical fallback. |
 | `FM-NG-04` | Output is non-finite, outside semantic bounds, temporally unstable, or below the frozen quality threshold -> candidate fails regardless of speed. |
@@ -259,7 +261,7 @@ Every gate is conjunctive. High image quality cannot compensate for unlicensed d
 
 | ID | Covers | Smallest required check |
 | --- | --- | --- |
-| `CHK-NG-01` | `AC-NG-01..03`, `FM-NG-01` | Rebuild a bounded dataset/model twice from frozen inputs; compare splits, artifacts, metrics, provenance, and reference outputs. |
+| `CHK-NG-01` | `AC-NG-01..03/09`, `FM-NG-01` | Qualify the component producer with isolated/negative controls before dataset publication; rebuild bounded data/model twice, then compare splits, artifacts, metrics, provenance and reference uncertainty. |
 | `CHK-NG-02` | `AC-NG-04..05`, `FM-NG-02..03`, `FM-NG-05` | Reverse-trace one model to kernels and GPU commands, validate numerical equivalence, then inject schema/capability/compile/allocation/generation failures. |
 | `CHK-NG-03` | `AC-NG-06..07`, `FM-NG-04` | Run the frozen quality/temporal/performance/memory matrix against the classical fallback and perturb fault-sensitive inputs. |
 | `CHK-NG-04` | `AC-NG-08`, `FM-NG-06` | Verify package manifest/licenses/hashes and repeat the supported and missing-artifact journeys from clean bytes. |

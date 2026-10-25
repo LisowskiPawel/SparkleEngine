@@ -21,6 +21,8 @@ Use this compact form for an admitted subject whose detailed stages have not yet
 
 **Contract/result owners:** {{links to feature design and local AC/FM/CHK}}, {{existing candidate report}}
 
+**Evidence home:** {{original candidate/run artifact folder and manifest; derivative outputs link original records rather than copy them}}
+
 ## Work This Plan
 
 | What to do | Working route |
@@ -50,7 +52,7 @@ approve rights, hashes or runtime results that the technical owner must verify.
 
 **Start when:** live owners and global admission are known.
 
-Fill the decision/check cards. This stage changes documentation only.
+Fill the decision/check cards. Choose reuse, repair, bounded simplification/retirement or an admitted missing slice. Name existing code to retain, narrow or retire and the smallest justified additions for the next stage. A removal-only result names the selected path it preserves; it requires no replacement capability. This stage changes documentation only; no placeholder API, registration, inactive state or new planning subsystem is delivered.
 
 **Exit:** {{reviewed discovery decision, exact remaining owner and check cards}}.
 
@@ -58,19 +60,19 @@ Fill the decision/check cards. This stage changes documentation only.
 
 **Start when:** the freeze and previous necessary proof are accepted.
 
-{{Small actual producer-to-consumer change, exclusions and deleted path.}}
+{{Small actual producer-to-consumer change, current consumer, bounded state/API/hook/copy/dependency additions and why existing representations cannot serve them. State exclusions and the existing path to narrow/delete, or justify retention.}}
 
-**Exit:** {{linked AC/FM/CHK, narrow build/native controls and deletion evidence}}.
+**Exit:** {{linked AC/FM/CHK, narrow build/native controls, actual additions versus budget, retained-path check and same-slice deletion/stale-reachability evidence}}. Unused state or postponed replacement cleanup leaves this stage open.
 
 ### 3. Prove Delivery
 
 **Start when:** the exact supported candidate is available.
 
-{{Package, reproduction, failure and review work still needed.}}
+{{Package, reproduction, failure and review work still needed, using existing tools and original artifacts. No new collector, runner, report framework or public fault API is implied by a check ID.}}
 
-**Exit:** {{existing report and retained artifacts}}.
+**Exit:** {{existing report and retained artifacts}}, with disposable code/registrations removed and earlier stage cleanup verified. Repairs return to their owner and create a new candidate; final proof is not a feature-expansion or deferred-cleanup stage.
 
-Split step 2 only for a real independent prerequisite or reviewable slice. Every implementation handoff follows Change Lifecycle/Integration, applicable Code Style and logical-spacing checks, narrow owner validation and git diff --check. Record candidate results only in their owning report; remove disposable probes and delivered instructions.
+Split step 2 only for a real independent prerequisite or reviewable slice. Every implementation handoff follows Change Lifecycle/Integration and its Stage Source-Style Gate after the final edit, including exact formatter coverage and authored spacing/responsibility review, narrow owner validation and git diff --check. No-source work records source-style N/A with its reason and applicable artifact/docs checks. Record candidate results only in their owning report; remove disposable probes and delivered instructions.
 
 ## First Permitted Prompt
 
@@ -80,11 +82,16 @@ Split step 2 only for a real independent prerequisite or reviewable slice. Every
 Freeze only this subject's missing decisions. Inspect the existing owners and
 linked prerequisite revisions. Populate the cards above and the local stages
 using actual producers/consumers and defect-detecting checks. Reuse existing
-contracts, IDs and artifacts; do not create another global order or results
-ledger. Do not implement while a required contract is unresolved. Handoff the
-reviewable local plan and exact remaining decisions to the named owner.
+contracts, IDs and artifacts; apply Change Lifecycle's stage complexity budget
+to existing code and proposed additions. Do not create another global order or
+results ledger. Do not implement while a required contract is unresolved. Apply
+the plan's Stage Source-Style Gate after the final edit; no-source work records
+justified N/A and artifact/docs checks. Handoff the reviewable local plan and
+exact remaining decisions to the named owner.
 
 </details>
 ```
 
 When populating the scaffold, mark each unresolved value explicitly. Replace instructional placeholders before calling the plan implementation-ready. Delete completed stage instructions after preserving enduring design and valuable evidence under [Documentation Lifecycle](../DocumentationOrganization.md#lifecycle).
+
+The instantiated plan and every copied stage prompt link the owning [Stage Source-Style Gate](../ChangeLifecycle.md#stage-source-style-gate); do not copy formatter settings or present a style pass as semantic, numerical or native evidence.

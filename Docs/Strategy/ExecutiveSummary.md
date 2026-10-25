@@ -31,7 +31,7 @@ Sparkle is one coherent product with three reinforcing purposes:
 
 1. prove deep real-time rendering, GPU systems, and developer-technology capability;
 2. provide a focused platform for path-tracing and neural-graphics work;
-3. remain a usable independent engine where product work strengthens the first two goals.
+3. let a reviewer discover, run and reproduce those results through a polished Launcher and a bounded demo/editor host.
 
 The intended result is smaller and more explicit, not broader:
 
@@ -44,7 +44,9 @@ The intended result is smaller and more explicit, not broader:
 - existing debugger/capture capability used instead of new reporting frameworks;
 - obsolete paths deleted when a replacement lands.
 
-Product completeness is bounded by the selected rendering demonstration and its reproduction path. Editor, Launcher, content tools and packaging exist to serve that result; conventional engine feature coverage is not a goal. A missing conventional capability is often an intentional boundary.
+Product completeness is bounded by the selected rendering demonstration and its reproduction path. Maximize the depth, correctness, measured cost and clarity of the selected rendering work; minimize the general gameplay, authoring and platform machinery needed to host it. Core, Tasks, content/shader cooking, native lifetime and reliable packaging remain necessary graphics foundations. Their presence does not authorize general engine products. A missing conventional capability is often an intentional boundary.
+
+Launcher is an explicit portfolio-presentation exception: clear scene selection/previews, readiness, build/cook/run, progress/cancel, recovery and an understandable first run earn work even when they add no rendering algorithm. Preserve that useful product and its polish. Keep workflow truth in its existing Launcher Core owner (`SparkleLauncherCore`) and Qt as presentation; the exception does not select an installer, updater, general workflow platform or second content database. Editor remains the smaller inspection, rendering-control and selected-edit surface needed by the examples.
 
 Existing code is not automatically worth retaining. When a capability has no selected consumer or evidence role, evaluate narrowing or deleting it before investing in its completion. Preserve required behavior and unique evidence; change advertised scope explicitly rather than carrying unused implementations, selectors and dependencies indefinitely. [Roadmap scope control](Roadmap.md#scope-protection) owns admission; [Change Lifecycle](../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision) owns the removal procedure.
 
@@ -70,7 +72,7 @@ Tier 1 claims require Tier 1 evidence. The renderer and content pipeline must re
 | P0 | Whole-system performance evidence | p50/p95/p99, pacing, memory high-water, CPU/GPU timelines, controlled before/after results |
 | P1 | Path-traced flagship | reference math/images, RT resource lifetime, quality/latency/memory evidence on both Tier 1 scenes |
 | P1 | Real neural graphics feature | bounded trained model/operator, deterministic artifact, optimized runtime inference, classical fallback, quality/performance frontier |
-| P1 | Technology transfer | narrow adoption surface, failure/fallback guide, reproducible demo, technical note, external or peer review |
+| P1 | Technology transfer and direction | M6 independent reproduction/review; M7 expert challenge, second actual consumer context, observed teaching task and feedback-driven revision/retest using the same three cases |
 
 The [roadmap](Roadmap.md) owns global order and current/next work, without delivery dates or hour budgets. This table states the durable outcome hierarchy.
 
@@ -83,7 +85,7 @@ Do not optimize the portfolio or engine for:
 - a second renderer, scheduler, scene authority, content database, or diagnostics product;
 - speculative future-hardware APIs;
 - large embedded source-scene depots;
-- editor/launcher breadth unrelated to flagship evidence;
+- general Editor/gameplay breadth; Launcher additions unrelated to presentation, reproduction or the approved source/product journeys;
 - claims based on names, scaffolding, one FPS number, one backend, or unverified generated output;
 - documents that repeat requirements, architecture, standards, or validation contracts.
 

@@ -14,6 +14,8 @@
 
 **Current readiness:** **50/100** for the tracked game product route — project/catalog/source integration exists; content readiness, executable workloads, package, first-use, and release evidence remain open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
 
+**Advanced evidence delivery:** [Content To Pixel design](ContentToPixel/ContentToPixelDesign.md) and its [CPIX-0..3 plan](ContentToPixel/ImplementationPlan.md) own the missing M1/M2 source/conversion/material/raw-reference proof for Bistro and San Miguel. This future route does not change the dated inventory, first-release map set or current readiness.
+
 ## At A Glance
 
 | Product concern | Current state | Evidence boundary |
@@ -96,13 +98,15 @@ In the PD-1 working candidate, Game opens its menu on first run. Esc or F1 retur
 
 This is the Architecture acceptance owner for the Showcase consumer journey. [Application](../../Engine/Application/ApplicationCapabilities.md#product-contract-boundary) owns host construction and settlement; the [frozen product contract](../../../../Acceptance/FirstRelease.md#frozen-product-and-output-classification) owns release values; [release gates](../../../../Acceptance/FirstRelease.md#release-gates) are linked, not repeated.
 
-| ID | Binary acceptance criterion |
-| --- | --- |
-| `AC-PROD01-01` | From the included archive as a standard user, with no repository, environment override, administrator right, network, or developer tool, Sparkle Game (current source target `ShowcaseGame`, exact packaged path in the manifest) reaches intentional built-in Empty or the explicitly selected/synced map within the frozen startup budget and reports the exact product/package identity. |
-| `AC-PROD01-02` | Selecting each included example publishes the requested catalog identity and first correct frame within its load budget; missing, corrupt, unsupported, or unregistered content produces a distinct failure and never claims successful requested-map activation through built-in `Empty`; intentional Empty selection is valid. |
-| `AC-PROD01-03` | Game exposes controls/help, camera reload, return to its menu and quit without a console command. Help directs rendering-settings inspection and reset to Editor; Editor shows requested versus active state and persists documented defaults to the shared per-user settings consumed by both products. No Game rendering-settings screen is required. |
-| `AC-PROD01-04` | `ShippingGame` contains and exposes no game/editor console, CVar authoring route, shader recook, editor panel, source importer/cooker, repository marker dependency, or developer-only command. |
-| `AC-PROD01-05` | Close/quit during idle and level load settles level/task/Renderer/RHI work within the shutdown budget, returns one success/failure exit status, and leaves immutable package/source bytes unchanged. |
+**Proof allocation:** [PD-1](../../../CrossModule/FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells) closes source-workspace portions; PD-3 closes installed portions and PD-4 reconciles the same archive/non-author evidence. These are portions of the criteria below, not separate acceptance definitions. Results stay in [Product delivery progress](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
+
+| ID | Binary acceptance criterion | Proof phase |
+| --- | --- | --- |
+| `AC-PROD01-01` | From the included archive as a standard user, with no repository, environment override, administrator right, network, or developer tool, Sparkle Game (current source target `ShowcaseGame`, exact packaged path in the manifest) reaches intentional built-in Empty or the explicitly selected/synced map within the frozen startup budget and reports the exact product/package identity. | PD-1 source startup; PD-3 installed startup |
+| `AC-PROD01-02` | Selecting each included example publishes the requested catalog identity and first correct frame within its load budget; missing, corrupt, unsupported, or unregistered content produces a distinct failure and never claims successful requested-map activation through built-in `Empty`; intentional Empty selection is valid. | PD-1 source maps/failures; PD-3 archive equivalents |
+| `AC-PROD01-03` | Game exposes controls/help, camera reload, return to its menu and quit without a console command. Help directs rendering-settings inspection and reset to Editor; Editor shows requested versus active state and persists documented defaults to the shared per-user settings consumed by both products. No Game rendering-settings screen is required. Menu/help/quit remain reachable after move/resize at the approved DPI scales. | PD-1 shared controls/settings; PD-3/4 packaged use |
+| `AC-PROD01-04` | `ShippingGame` contains and exposes no game/editor console, CVar authoring route, shader recook, editor panel, source importer/cooker, repository marker dependency, or developer-only command. | PD-1 source/link checks; PD-3 package membership |
+| `AC-PROD01-05` | Close/quit during idle and level load settles level/task/Renderer/RHI work within the shutdown budget, returns one success/failure exit status, and leaves immutable package/source bytes unchanged. | PD-1 source lifecycle; PD-3 archive lifecycle |
 
 | ID | Cause/injection, detection boundary, safe result, and recovery |
 | --- | --- |
@@ -115,8 +119,10 @@ This is the Architecture acceptance owner for the Showcase consumer journey. [Ap
 | Check | Claims falsified | Smallest route and fixed oracle |
 | --- | --- | --- |
 | `CHK-PROD01-01` | `AC-PROD01-04`; `FM-PROD01-03` | Build the exact `ShippingGame` product when authorized, inspect link/import/file/string membership, then launch and exercise the console shortcut. Zero developer surface is the oracle; any match or overlay is failure. |
-| `CHK-PROD01-02` | `AC-PROD01-01`, `AC-PROD01-03`, `AC-PROD01-05`; `FM-PROD01-01`, `FM-PROD01-04`, `FM-PROD01-05` | On a clean standard-user minimum machine, verify/extract the candidate, launch from an unrelated working directory with overrides absent and network blocked, complete help/settings/reset/quit, and diff created/modified paths and process tree against the frozen path/budget contract. |
-| `CHK-PROD01-03` | `AC-PROD01-02`; `FM-PROD01-02` | For every included map, capture requested/active identity and first frame; on isolated archive copies inject missing and corrupt products. Success requires the requested map; each fault must produce the predeclared non-`Empty` failure/recovery. |
+| `CHK-PROD01-02` | `AC-PROD01-01`, `AC-PROD01-03`, `AC-PROD01-05`; `FM-PROD01-01`, `FM-PROD01-04`, `FM-PROD01-05` | On a clean standard-user minimum machine, verify/extract the candidate, launch from an unrelated working directory with overrides absent and network blocked, complete Game help/quit and Editor settings/reset with shared Game consumption, and diff created/modified paths and process tree against the frozen path/budget contract. |
+| `CHK-PROD01-03` | `AC-PROD01-02`; `FM-PROD01-02` | For every included map, predeclare its expected scene/camera, geometry/material bindings and displayed output, then capture requested/active identity and first correct frame. On isolated copies inject missing/corrupt products. Identity alone cannot pass a known incorrect image; each fault must produce the predeclared non-`Empty` failure/recovery. Source portions run in PD-1, archive counterparts in PD-3. |
+
+Before a map check, freeze the source/cook/shader, camera and settings identities and its expected image from the owning map/Renderer contract. Record activation and first displayed frame separately: identity/readiness alone cannot pass image correctness. Full reference/convergence, lighting-quality and 30 FPS proof stays with the corresponding feature/release gates; a known blocking render defect still prevents accepting that map.
 
 Every criterion and failure above maps to at least one check. Candidate results belong in `FCR-PROD-01`; this source/documentation inspection does not pass any row.
 

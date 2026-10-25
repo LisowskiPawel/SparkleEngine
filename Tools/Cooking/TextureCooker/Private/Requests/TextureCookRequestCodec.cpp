@@ -6,6 +6,7 @@
 #include "TextureCookPolicyCodec.h"
 
 #include <sstream>
+#include <stdexcept>
 #include <vector>
 
 class TextureCookRequestParsing final
@@ -25,7 +26,17 @@ public:
 		return static_cast<TextureAssetId>(parsedAssetId);
 	}
 
-	static std::filesystem::path NormalizePath(std::string_view value) { return std::filesystem::path(std::string(value)).lexically_normal(); }
+	static std::filesystem::path NormalizePath(std::string_view value)
+	{
+		try
+		{
+			return std::filesystem::path(Strings::ToWide(value)).lexically_normal();
+		}
+		catch (const std::invalid_argument&)
+		{
+			throw Diagnostics::Error("Texture cook request path is not valid UTF-8.");
+		}
+	}
 };
 
 std::string_view TextureCookRequestCodec::GetHeader() noexcept
@@ -75,6 +86,6 @@ std::string TextureCookRequestCodec::FormatLine(const TextureCookRequest& reques
 	output << Formatting::FormatHexUInt64(request.assetId) << '|' << GetTextureColorSpaceName(request.policy.colorSpace) << '|' << GetTextureMipPolicyName(request.policy.mipPolicy) << '|'
 	       << GetTextureMipFilterName(request.policy.mipFilter) << '|' << GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) << '|'
 	       << GetTextureGroupName(request.policy.textureGroup) << '|' << GetTextureDimensionName(request.policy.dimension) << '|' << GetTextureChannelMaskName(request.policy.channelMask) << '|'
-	       << request.outputPath.generic_string() << '|' << request.sourcePath.generic_string();
+	       << Strings::ToNarrow(request.outputPath.generic_wstring()) << '|' << Strings::ToNarrow(request.sourcePath.generic_wstring());
 	return output.str();
 }

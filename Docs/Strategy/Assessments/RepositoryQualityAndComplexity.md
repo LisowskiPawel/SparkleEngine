@@ -2,13 +2,15 @@
 
 [Docs](../../README.md) / [Up](README.md)
 
-**Status:** dated assessment; strategy and refactoring decision brief
+**Status:** historical assessment; source findings and preservation-only premise from the stated snapshot, not current work selection
 
 **Current feature readiness:** **Not graded by this assessment.** Repository quality is not interchangeable with feature completion; use the current **40/100** portfolio projection in [Current Feature Readiness](../../Acceptance/CurrentReadiness.md) for implementation/evidence state.
 
-**Responsibility:** assess how to preserve current capabilities while reducing structural complexity and improving repository credibility
+**Responsibility:** retain the dated structural findings and their original preservation-only assumptions; current scope and retirement decisions belong to Roadmap and Change Lifecycle
 
 **Snapshot date:** 2026-08-23
+
+**Current use:** historical feature-preserving refactoring assessment. Its blanket preservation boundary does not override the 2026-10-24 [scope protection](../Roadmap.md#scope-protection) decision: existing capabilities may be narrowed or retired through [Change Lifecycle](../../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision). Revalidate the dated source findings before selecting any repair; this assessment does not authorize a parallel cleanup program.
 
 **Source revision:** `1a70a64c` (`shader & rt doc merge`); engine and tool source remains the `44c2f192` code snapshot assessed below.
 

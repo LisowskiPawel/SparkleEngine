@@ -51,18 +51,20 @@ Classify each conditional gate as **advance**, **preserve**, **not applicable**,
 
 ### Define the Outcome and Complexity Budget
 
-Before adding a persistent concept, state:
+At the start of each implementation stage, choose evidence-only work, a repair in the existing owner, a bounded simplification/retirement, or an admitted missing capability. A simplification names the selected path it preserves and the unused concepts, misleading surface or ownership hops it removes; it need not invent a functional defect or a replacement feature. Reuse working code and valid proof before choosing a production addition. Apply the [complexity budget](../Foundations/ModuleOwnership.md#complexity-budget), [integration-hook budget](../Foundations/ModuleOwnership.md#feature-enclosure-and-integration-hook-budget) and [copy budget](../Foundations/DataAndMemory.md#single-truth-and-copy-budget) to the actual stage, including changes to existing code. In its existing control record, state:
 
 - the user or engine outcome and authoritative production path;
 - the current owner that will absorb the change;
-- the essential state, branch, type, dependency, configuration, or public API being added;
+- the essential state, branch, type, dependency, configuration, or public API being added, its current consumer and why the existing representation or direct code is insufficient;
 - each material copy or new value holder and the boundary reason that prevents using a reference, view, handle, or move;
-- the old path, repeated policy, dead surface, or unnecessary work being removed or simplified;
+- the disposition of the touched existing path: retain for a named selected result, narrow to that result, replace and delete, or retire through the scope owner; include repeated policy, unused selectors, dead surface and unnecessary work;
 - the owned artifacts that will be regenerated and the internal versions, migrations, adapters, aliases, fallbacks, or dual paths that will be deleted rather than preserved;
 - the performance classification and budgets that may move;
 - explicit non-goals that bound cleanup and prevent a second architecture.
 
 This is a reasoning ledger, not a target for negative line count. A change may add substantial implementation while remaining structurally reductive. If permanent complexity has no current consumer, owner, invariant, or evidence-backed need, do not add it.
+
+The stage exit compares that budget with the actual diff: every persistent addition has its accepted consumer and owner, every replaced path and its reachable residue is gone, and retained selected behavior has a positive check. Unjustified state, hooks, variants or dependencies and deferred same-slice cleanup keep the stage open even if the output works. Record only material deltas; a short reason suffices when no addition or deletion is justified. A later hardening/closure stage verifies earlier cleanup rather than collecting it as unfinished work. Documentation-only stages freeze decisions without landing dormant production vocabulary; evidence-only stages reuse current tooling and remove disposable validation code before handoff.
 
 ### Scope And Retirement Decision
 

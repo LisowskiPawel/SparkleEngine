@@ -12,6 +12,8 @@
 
 ## Product Identity Constraint
 
+**2026-10-24 scope reconciliation:** the dated source findings below are coverage, not a list of features to implement. Apply [Roadmap scope protection](../../Strategy/Roadmap.md#scope-protection) to every plan and evidence item: preserve the selected rendering result, bound its supporting product work, and evaluate narrowing/deletion of unneeded existing capability. The release uses its approved maps; Bistro/San Miguel and owned neural work remain later evidence. No source finding or evidence grade was refreshed by this documentation pass.
+
 The [Feature Delivery Catalog](../../Strategy/FeatureDeliveryCatalog.md) now routes concrete professional outputs and measurable exits to these owners. [Current role research](../../Strategy/Research/README.md) informs that selection; [Neural discovery/plan](NeuralGraphics/Discovery.md) and [Workload Studies](PerformanceDiagnostics/WorkloadStudies/WorkloadStudiesDesign.md) expose remaining target work. This is a planning update, not a reinspection of every dated source observation or an evidence-level upgrade.
 
 Sparkle's target is a compact renderer-first engine and evidence platform. Coverage therefore does not mean adding every conventional engine feature. A capability belongs in this inventory when it is one of:

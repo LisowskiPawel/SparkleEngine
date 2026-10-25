@@ -6,6 +6,8 @@
 #include "Core/Public/FileSystemUtils.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Paths/PackagePaths.h"
+#include "Core/Public/Paths/ProductPaths.h"
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
@@ -22,7 +24,17 @@
 
 std::filesystem::path EngineRenderingSettingsPersistence::GetDefaultConfigPath()
 {
-	return Filesystem::GetWorkspaceRootPath() / "Config" / "DefaultEngine.ini";
+	const std::filesystem::path& root = Filesystem::GetWorkspaceRootPath();
+	if (!Filesystem::IsSourceWorkspace(root))
+	{
+		const auto defaults = Filesystem::ResolvePackageFilePath(root, "Config/DefaultEngine.ini");
+		if (!defaults)
+		{
+			throw Diagnostics::Error("The packaged rendering defaults are missing or corrupt. Extract a verified package before retrying.");
+		}
+		return *defaults;
+	}
+	return root / "Config" / "DefaultEngine.ini";
 }
 
 std::filesystem::path EngineRenderingSettingsPersistence::GetUserConfigPath()

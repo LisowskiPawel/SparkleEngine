@@ -1,9 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <cstddef>
 #include <string>
-#include "World/EntityId.h"
 
 class EditorTransactionHistory;
 struct WorldMeshReadData;
@@ -15,7 +13,7 @@ public:
 
 private:
 	static void BuildTransformCategory(const std::string&, const WorldMeshReadData&, EditorTransactionHistory&, std::uint64_t) noexcept;
-	static void BuildStaticMeshCategory(const std::string&, const WorldMeshReadData&) noexcept;
+	static void BuildMeshCategory(const std::string&, const WorldMeshReadData&) noexcept;
 	static void BuildAdvancedParametersCategory(const std::string&, const WorldMeshReadData&, EditorTransactionHistory&, std::uint64_t) noexcept;
 	static void BuildMaterialsCategory(const std::string&, const WorldMeshReadData&) noexcept;
 

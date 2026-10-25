@@ -8,24 +8,24 @@ Sections: [Graphics Portfolio Delivery Plan](ImplementationPlan.md#graphics-port
 
 **Status:** target dossier; case delivery and independent adoption remain unproved
 
-**Scope:** turn existing product, rendering and neural evidence into three understandable, reproducible case studies
+**Scope:** three reproducible technical cases at M6, then observed direction, second-context transfer, teaching and feedback revision at M7; reuse the same rendering work
 
 A reviewer should be able to see what you built, why it works, where it fails and how to reproduce it. This folder joins evidence already owned by the engine's feature and workload reports.
 
 ## The Three Cases
 
 1. **Content to correct pixel:** follow an asset/material through cooking, shading and raw reference output.
-2. **A measured rendering improvement:** explain the actual limiter, the experiment and its whole-frame result, including a rejected or inconclusive alternative.
+2. **One measured frame, two APIs:** join complementary CPU preparation, GPU shader and resource-lifetime studies, the difficult incident and whole-frame results, including a rejected or inconclusive alternative.
 3. **Owned model to shader:** connect dataset/training choices to correct GPU operators, runtime behavior and held-out evaluation.
 
-The [delivery catalog](../../../Strategy/FeatureDeliveryCatalog.md#three-headline-cases) gives output examples. The [Roadmap](../../../Strategy/Roadmap.md#retained-advanced-graphics-roadmap) decides when to prepare and deliver them.
+The [review contract](ReviewAndTransfer.md) selects exact CASE joins, minimal package, mathematical/native proof and AC-PORT/CHK-PORT criteria. The [Roadmap](../../../Strategy/Roadmap.md#retained-advanced-graphics-roadmap) decides when to deliver them. Cases are selected; actual candidate/rights/participants and results remain execution inputs.
 
 ## Where To Start
 
 | Your task | Open |
 | --- | --- |
 | Choose artifacts and assemble the cases | [Delivery plan](ImplementationPlan.md#graphics-portfolio-delivery-plan) |
-| Prepare an exercise, first-use review or later teaching activity | [Knowledge transfer](#graphics-knowledge-transfer) |
+| Prepare M6 reproduction and M7 direction/teaching/transfer | [Review criteria](ReviewAndTransfer.md#binary-review-criteria), [actual participant card](#graphics-knowledge-transfer) |
 | Plan a justified upstream patch or technical submission after M6 | [Upstream contribution](#upstream-graphics-contribution) |
 
 ## Evidence To Reuse
@@ -44,32 +44,15 @@ Before sharing, verify candidate identity, artifact validity, rights and privacy
 
 ## Graphics Knowledge Transfer
 
-**Status:** fillable planning card; teaching, mentoring and adopter evidence remain unproved
+**Status:** selected M6/M7 evidence contract; actual participant and outcome fields remain unproved
 
 **Scope:** help another person understand and reproduce one evidence-backed graphics case, then use their feedback
 
-At M6, the first independent reproduction/review is required. Deeper teaching, a second adopter and sustained maintenance are later conditional work. The [Roadmap](../../../Strategy/Roadmap.md#conditional-and-excluded-work) owns that priority; the [portfolio plan](ImplementationPlan.md#graphics-portfolio-delivery-plan) owns assembly.
+M6 requires first independent reproduction/review. M7 requires a meaningful expert challenge/direction record, second actual consumer context, observed before/after teaching task and one feedback-driven post-adoption revision/retest. [Review And Transfer](ReviewAndTransfer.md) defines the binary checks; [portfolio stage 4](ImplementationPlan.md#4-demonstrate-direction-and-transfer) owns execution. Continuing maintenance or additional adopters beyond that finite exercise remains conditional; no support service is selected.
 
-### Decisions To Fill
+The [Technology Transfer subject folder](TechnologyTransfer/TransferDesign.md) owns the actual participant/context, technical question, before/after task/rubric and revision/retest contract. Its [KT-0..3 implementation plan](TechnologyTransfer/ImplementationPlan.md) supplies prerequisites, bounded work, falsifiers, cleanup and copied prompts. Prepare the concrete exercise in KT-0; missing people, permission and outcomes remain actual evidence dependencies.
 
-| Choose… | Record… |
-| --- | --- |
-| **Audience and question** | Author: actual consenting participant/audience and one selected case question. |
-| **Evidence** | Evidence owner: original case/workload report, exact candidate/artifact and shareable subset. |
-| **Exercise** | Author: entry point, commands/input, expected inspectable result and a bounded completion check. |
-| **Learning and feedback** | Reviewer: an observable task/decision before and after the explanation, actual feedback and the resulting revision. |
-| **Independent adoption** | Adopter: prior involvement, environment and every intervention. Distinguish an assisted exercise from an unaided acceptance run. |
-| **Maintenance** | Support owner: one feedback-driven follow-up, supported scope, contact and retirement route. |
-
-These decisions are still open. Fill them from one accepted case before arranging the exercise.
-
-### Remaining Delivery
-
-1. **Prepare:** choose the audience, question and cleared evidence; build only the minimal exercise.
-2. **Deliver:** after consent/authorization, retain questions, interventions, failures and feedback.
-3. **Improve:** record the resulting changes and reproduction/maintenance outcomes in the existing case/workload/support report, with clear attribution and limitations.
-
-Planning does not authorize contacting people or publishing material. Actual participant feedback establishes transfer evidence.
+M6 reproduction remains in [portfolio stage 3](ImplementationPlan.md#3-reproduce-review-and-revise). Reuse valid specialist review and original CASE/WL evidence; no extra adopter per study or ongoing support service is selected. [Evidence folders](../../../Acceptance/GraphicsWorkloads.md#evidence-folders-and-delivery-owners) separate original proof and the minimal reproduction/transfer package. Writing these plans sends no message or publication.
 
 ## Upstream Graphics Contribution
 
