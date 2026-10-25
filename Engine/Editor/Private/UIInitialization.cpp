@@ -23,7 +23,6 @@
 #include "Style/SparkleUiTheme.h"
 #include "Viewport/EditorViewportSession.h"
 
-
 #include <memory>
 #include <string>
 

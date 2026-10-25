@@ -4,7 +4,7 @@
 
 No user support service, response deadline or guaranteed fix is offered. Check [known issues](KNOWN_ISSUES.md) and [security](SECURITY.md).
 
-The portable release is not ready. For now, follow the source-build instructions in the [repository README](https://github.com/stoleckipawel/SparkleEngine#build-and-launch). Package instructions below apply once a verified archive is available.
+For source builds, follow the [repository README](https://github.com/stoleckipawel/SparkleEngine#build-and-launch). The instructions below cover a verified portable archive; public release qualification remains open.
 
 ## Start, recover and exit
 
@@ -48,4 +48,8 @@ The opt-in source-only GPU crash variant has its own [qualified candidate and la
 
 Core logs rotate at 5 MiB with two backups per name, with up to one message of overshoot. Launcher logs, captures and exports remain until manually removed. Close products before clearing files.
 
-Replacements use a new version and archive hash. Extract separately; keep the previous verified ZIP and back up settings. Side-by-side versions share `v0.1` settings. To roll back, re-extract the old ZIP and restore the settings backup if needed. No automatic updater or compatibility guarantee is provided. Stop using an archive identified as withdrawn.
+Replacements use a new version and archive hash. Extract separately; keep the previous verified ZIP and back up settings. Side-by-side versions share `v0.1` settings.
+
+Selected content lives separately at `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/` and belongs to one exact archive. Before switching archives, close all products and move that directory to a backup. The new Launcher initializes its own store; select, sync and cook the maps again. Keep authored levels in the backup; do not copy the `.sparkle-package` marker between candidates. To roll back, close all products, move the new store aside, restore the old store and settings backup, then re-extract the old ZIP.
+
+No automatic updater or compatibility guarantee is provided. Stop using an archive identified as withdrawn.

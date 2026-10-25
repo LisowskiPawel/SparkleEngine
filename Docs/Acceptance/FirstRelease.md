@@ -22,7 +22,9 @@ Certificate enrollment is deferred until before public release. It does not prev
 
 ## Product Plan And Public Release
 
-[PD-1 through PD-4](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#how-to-close-this-plan) qualify the approved product journeys and one **unsigned internal** archive. Source-only checks run before an archive exists; installed checks consume the archive. Author/agent rehearsal is accepted under the [actor scope](FeatureCompletionReports.md#report-closure-and-review); clean/minimum-machine requirements remain required where assigned.
+[PD-1 through PD-4](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#how-to-close-this-plan) qualify the approved product journeys and one **unsigned internal** archive. Source-only checks run before an archive exists; installed checks consume the archive. Author/agent rehearsal is accepted under the [actor scope](FeatureCompletionReports.md#report-closure-and-review).
+
+**Accepted internal rehearsal:** use the existing `MIN-01`/`REF-01` laptop with an isolated source checkout, fresh owned extraction/content state and a standard-user process. This applies the owner's existing-laptop decision to the product contracts' clean/minimum-machine checks. Record the installed toolchain, remove discovery overrides and verify dependency independence, offline operation, writable paths and budgets. A fresh Windows installation is outside this internal rehearsal; broader public-host qualification remains in the release gates.
 
 **Product boundary, approved 2026-10-25:** PD-1..4 prove requested map/content identity, expected scene/camera and geometry/material bindings, presented output, controls, failure and lifecycle. Lighting quality, including Modern Sponza noise/clipping, is deferred to renderer/map/release gates. Crashes, wrong/missing content, blank frames and false Empty activation still block the product plan. Defaults remain unchanged; this deferral does not qualify lighting or approve publication.
 

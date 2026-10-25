@@ -157,7 +157,7 @@ Source = Levels/CornellBox.level
 Thumbnail = Launcher/Thumbnails/CornellBox.png
 SourcePage = https://casual-effects.com/g3d/data10/index.html
 ReleaseSupported = true
-Selected = true
+Selected = false
 
 [Level]
 Id = DiffuseTransmissionPlant
@@ -229,7 +229,7 @@ AssetPack = SheenCloth
 Family = Material Reference
 VariantKind = Base
 ReleaseSupported = false
-Selected = true
+Selected = false
 
 [AssetPack]
 Id = Bistro
