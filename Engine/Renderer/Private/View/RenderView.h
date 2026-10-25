@@ -15,6 +15,8 @@
 #include <cstdint>
 #include <vector>
 
+struct RenderViewBuildRequest;
+
 struct RenderView final
 {
 	std::uint64_t viewportId = 0u;
@@ -36,5 +38,6 @@ struct RenderView final
 	RayTracingPtlasPartitionPlan rayTracingPlan = {};
 	RenderViewWorkloadSummary workload = {};
 
+	void InitializeFromRequest(const RenderViewBuildRequest& request) noexcept;
 	void ResetForReuse() noexcept;
 };

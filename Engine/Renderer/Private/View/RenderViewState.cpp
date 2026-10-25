@@ -1,6 +1,8 @@
 #include "PCH.h"
 
 #include "View/RenderViewState.h"
+#include "View/RenderView.h"
+#include "View/RenderViewBuilder.h"
 
 #include "Core/Public/Math/WorldCoordinateSystem.h"
 #include "Math/MathUtils.h"
@@ -161,4 +163,25 @@ ViewTemporalUniformData RenderViewState::BuildTemporal(const RenderViewStateBuil
 	m_lastInvalidationReasons = m_pendingInvalidationReasons;
 	m_pendingInvalidationReasons = RenderViewInvalidationReason::None;
 	return temporal;
+}
+
+void RenderViewState::UpdateTemporal(RenderView& view, const RenderViewBuildRequest& request) noexcept
+{
+	view.temporalUniform = BuildTemporal(
+	    RenderViewStateBuildInput{
+	        .ViewInput = request.Input,
+	        .Identity =
+	            {
+	                .ViewportId = view.viewportId,
+	                .Selection = view.selection.Value,
+	                .Kind = view.kind,
+	                .Mode = view.viewMode,
+	            },
+	        .Camera = view.cameraUniform,
+	        .RenderExtent = request.RenderExtent,
+	        .FrameId = request.FrameId,
+	        .SceneGeneration = request.SceneGeneration,
+	        .ShaderGeneration = request.ShaderGeneration,
+	        .ImageProviderGeneration = request.ImageProviderGeneration,
+	        .GraphTopologyGeneration = request.GraphTopologyGeneration});
 }

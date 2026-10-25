@@ -39,6 +39,12 @@ flowchart LR
 
 Presentation owns swapchain images, ImGui owns UI command lowering, and interop owns exceptional external access. The parent [RHI Feature Dossiers](../RHIFeatureGuide.md) index owns capability routing.
 
+### Backend Implementation Owners
+
+Source ownership reconciled on 2026-10-25: the hardware-interface aggregates compose focused services. `D3D12BackBufferPresentation` and `VulkanBackBufferPresentation`, under each backend's private `SwapChain` directory, own target setup, native rendering, and presentation transitions; the Vulkan owner also retains per-image layout tracking. `RhiPresentationServiceAdapter` contains the one begin/end pairing invariant and owns its narrow native implementation by value. It no longer borrows the whole hardware-interface aggregate. Recording context and frame-slot lifetime remain explicit borrows from the device lifecycle; no second frame index is stored.
+
+`VulkanDeviceBootstrap.cpp` creates the native device, `VulkanRhiQueues.cpp` creates queue wrappers, and `VulkanRhiDiagnostics.cpp` owns bootstrap naming and diagnostic formatting. This placement and target-build evidence do not establish native presentation, resize, validation, or backend parity acceptance.
+
 ## Shared Risks
 
 - Resize and minimize replace presentation identity while older frames may remain in flight.

@@ -45,6 +45,14 @@ RenderFrameSubmission
 
 These pages are separate because their state owners, lifetimes, outputs, and invalidation reasons differ. They remain one family because the publication invariant allows no mixed scene/view/GPU generation to escape.
 
+### Preparation Implementation Owners
+
+Source ownership reconciled on 2026-10-25; these routes describe implementation placement, not GPU or runtime acceptance:
+
+- `Scene/Preparation/RenderScenePreparation.cpp` owns preparation order, run storage reuse, settlement, and publication. `RenderScenePreparationGraph.cpp` owns graph capacities and partition policy; `RenderScenePreparationTasks.cpp` adapts task ranges to the primitive, deformation, and light implementors.
+- `View/RenderViewBuilder.cpp` composes view intent, projection, and temporal identity. `RenderViewProjection.cpp` derives camera matrices and raster state. `RenderViewPreparation.cpp` owns the visibility execution lifetime and batch reuse; `RenderViewPreparationGraph.cpp` owns its cached graph, while `RenderViewVisibility.cpp` owns culling, material classification, distance calculation, and workload counts.
+- `Scene/GpuScene/RenderGpuScene.cpp` composes geometry preparation and lighting, geometry-buffer, and ray-tracing updates. `RenderGpuLighting`, `RenderGpuGeometryBuffers`, and `RenderGpuRayTracing` own their existing payload/buffer state and update/reset rules by value. Each family returns bindings directly into the scene's one frame-slot publication; no family retains a second binding snapshot. Frame-slot reuse remains governed by GPU submission completion.
+
 ## Shared Invariants
 
 - Scene data and view data remain separate: geometry/material/light/resource identity is scene-owned; camera, frustum, extents, display intent, temporal identity, and partition planning are view-owned.

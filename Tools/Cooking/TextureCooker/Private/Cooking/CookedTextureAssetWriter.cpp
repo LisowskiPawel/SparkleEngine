@@ -49,7 +49,7 @@ static CookedTextureAssetHeader BuildHeader(const TextureLoadResult& cookedTextu
 	return header;
 }
 
-static void WriteMipPayloads(std::ostream& output, const TextureLoadResult& cookedTexture, std::string& fileError)
+static void WriteMipPayloads(std::ofstream& output, const TextureLoadResult& cookedTexture, std::string& fileError)
 {
 	for (const TextureArraySliceData& arraySlice : cookedTexture.arraySlices)
 	{

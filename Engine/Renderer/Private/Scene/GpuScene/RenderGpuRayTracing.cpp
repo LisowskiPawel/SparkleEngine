@@ -15,7 +15,7 @@ RenderSceneGpuRayTracingBindings RenderGpuRayTracing::Update(const PreparedRende
 	FrameStorage& storage = m_frames[frameIndex % m_frames.size()];
 	RefreshPayloads(preparedScene);
 	UploadFrame(storage);
-	return PublishBindings(storage);
+	return BuildBindings(storage);
 }
 
 void RenderGpuRayTracing::RefreshPayloads(const PreparedRenderScene& preparedScene)
@@ -55,7 +55,7 @@ void RenderGpuRayTracing::UploadFrame(FrameStorage& storage)
 	}
 }
 
-RenderSceneGpuRayTracingBindings RenderGpuRayTracing::PublishBindings(FrameStorage& storage)
+RenderSceneGpuRayTracingBindings RenderGpuRayTracing::BuildBindings(const FrameStorage& storage) const noexcept
 {
 	return RenderSceneGpuRayTracingBindings{
 	    .Vertices = m_topology.Vertices.GetBinding(),

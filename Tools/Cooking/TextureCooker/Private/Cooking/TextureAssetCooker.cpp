@@ -6,9 +6,6 @@
 #include "Pipeline/TexturePipeline.h"
 #include "SourceLoading/TextureSourceLoader.h"
 
-
-
-
 void TextureAssetCooker::Cook(const TextureCookRequest& request, TextureCookMemoryLimiter& memoryLimiter) const
 {
 	ValidateTextureCookRequest(request);

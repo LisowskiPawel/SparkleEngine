@@ -45,6 +45,8 @@ The Editor should expose owner commands and read models, not mutate Renderer/RHI
 
 The Console starts collapsed. Its footer button, `~` outside text input, or `Window > Console` opens and focuses it; focused `Esc` closes it without discarding scrollback/history. These are source contracts, not interactive, DPI or shutdown acceptance.
 
+Shader inspection and mesh preview source ownership was reconciled on 2026-10-25. Private `Shaders/ShaderArtifactInspection` owns selected-artifact loading, text cache invalidation, and missing-file messages; `UsedShadersPanel` retains shader selection, actions, and tabs. Private `Panels/Diagnostics/MeshPreview` owns bounds, projection, triangle traversal, and preview drawing; `UsedMeshesPanel` retains selection, preview controls, and the borrowed diagnostic-provider boundary. These are source and build boundaries, not interactive or visual acceptance.
+
 ### Rendering Settings Ownership
 
 The settings UI separates window orchestration, category presentation, and edit state:

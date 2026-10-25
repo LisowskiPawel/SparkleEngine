@@ -37,7 +37,7 @@ private:
 	void RefreshPayloads(const PreparedRenderScene& preparedScene);
 	void UpdateTopology();
 	void UploadFrame(FrameStorage& storage);
-	RenderSceneGpuRayTracingBindings PublishBindings(FrameStorage& storage);
+	RenderSceneGpuRayTracingBindings BuildBindings(const FrameStorage& storage) const noexcept;
 	TopologyStorage m_topology;
 	RhiResourceService& m_resourceService;
 	const GpuMeshCache& m_meshes;

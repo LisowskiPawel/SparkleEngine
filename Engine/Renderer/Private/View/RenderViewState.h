@@ -53,6 +53,9 @@ struct RenderViewStateBuildInput final
 	std::uint64_t GraphTopologyGeneration = 0u;
 };
 
+struct RenderView;
+struct RenderViewBuildRequest;
+
 class RenderViewState final
 {
 public:
@@ -63,7 +66,7 @@ public:
 	RenderViewState& operator=(const RenderViewState&) = delete;
 
 	void Invalidate(RenderViewInvalidationReason reason) noexcept;
-	ViewTemporalUniformData BuildTemporal(const RenderViewStateBuildInput& input) noexcept;
+	void UpdateTemporal(RenderView& view, const RenderViewBuildRequest& request) noexcept;
 	RayTracingPtlasPartitionPlan BuildRayTracingPlan(const PreparedRenderScene& preparedScene, const DirectX::XMFLOAT3& cameraPosition) noexcept;
 
 	RenderViewInvalidationReason GetLastInvalidationReasons() const noexcept { return m_lastInvalidationReasons; }
@@ -83,6 +86,7 @@ private:
 		float OrthographicHeightMeters = 0.0f;
 	};
 
+	ViewTemporalUniformData BuildTemporal(const RenderViewStateBuildInput& input) noexcept;
 	void ObserveIdentityAndGenerations(const RenderViewStateBuildInput& input) noexcept;
 	static RenderViewInvalidationReason CombineInvalidationReasons(RenderViewInvalidationReason left, RenderViewInvalidationReason right) noexcept;
 	static CameraPose CapturePose(const RenderViewStateBuildInput& input) noexcept;

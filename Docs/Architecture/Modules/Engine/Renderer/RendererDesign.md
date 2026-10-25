@@ -46,6 +46,8 @@ Once preparation has frozen a frame, downstream execution and feature owners con
 
 The executable architecture check rejects external includes of `Renderer/Private`, Public-to-Private dependency leaks, reintroduction of known implementation-only header families under `Renderer/Public`, FramePipeline construction outside `RendererHost`, execution-context reach-through into subsystem implementations, coordinator mailbox commands entering the execution context, Scene/View/cache/provider ownership drifting back into the host, host service-locator getters, and decomposition of `RenderFrame` at the frame-execution boundary.
 
+Transient resource materialization follows the same private ownership split: `FrameGraphTransientAllocator` owns block/resource lifetime and dispatch, while `FrameGraphTransientResourceAllocation.cpp` implements depth, color, and buffer allocation/view rules. Shared texture creation and view-requirement predicates each have one definition.
+
 ## How A Frame Moves Through The Renderer
 
 The solid path is the normal frame. Dashed paths replace or specialize part of it.
