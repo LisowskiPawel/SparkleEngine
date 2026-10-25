@@ -36,6 +36,8 @@ The former process-global visualization selection, Editor mirror enum/preset res
 
 The debug resolve is partitioned into GBuffer, lighting, and GPU-scene families. Each family privately owns its activation predicate, early return, pass parameters, and shader; scene-level composition simply invokes the family entry points in order. Adding or reordering an enum value cannot activate a family by ordinal accident.
 
+The GBuffer and lighting shader roots retain invocation bounds and pass the selected mode plus output texture to `StoreGBufferVisualization` and `StoreLightingVisualization`. Their respective `Passes/Visualization/*Visualization.hlsli` owners contain channel selection, decoding and publication. Existing alpha handling, GBuffer unsupported-mode no-write behavior, and lighting unsupported-mode black output remain unchanged; no diagnostic result carrier or extra shader variant is introduced.
+
 ## Current Modes
 
 | Capability | Modes | Current producer |

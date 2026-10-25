@@ -14,7 +14,7 @@ namespace AreaLights
 	LightSampling::DirectLightSample SampleDirectionalLight(uint lightIndex, float2 sample)
 	{
 		const DirectionalLightGpuData light = DirectionalLights[lightIndex];
-		const float3 centerDirectionWorld = PunctualLights::GetDirectionalLightDirection(lightIndex);
+		const float3 centerDirectionWorld = normalize(-light.Direction);
 		const float3 illuminance = light.Color * light.Illuminance;
 		const float coneHalfAngle = light.AngularSizeRadians * 0.5f;
 		if (coneHalfAngle <= 1.0e-5f)
@@ -43,7 +43,7 @@ namespace AreaLights
 	{
 		const PointLightGpuData light = PointLights[lightIndex];
 		float distanceToLight = 0.0f;
-		const float3 centerDirectionWorld = PunctualLights::GetPointLightDirection(positionWorld, lightIndex, distanceToLight);
+		const float3 centerDirectionWorld = PunctualLights::DirectionToLight(positionWorld, light.Position, distanceToLight);
 		const float radius = light.Radius;
 		if (radius <= 1.0e-4f)
 		{
@@ -70,7 +70,7 @@ namespace AreaLights
 	{
 		const SpotLightGpuData light = SpotLights[lightIndex];
 		float distanceToLight = 0.0f;
-		const float3 centerDirectionWorld = PunctualLights::GetSpotLightDirection(positionWorld, lightIndex, distanceToLight);
+		const float3 centerDirectionWorld = PunctualLights::DirectionToLight(positionWorld, light.Position, distanceToLight);
 		const float3 lightDirectionWorld = normalize(light.Direction);
 		const float radius = light.Radius;
 		if (radius <= 1.0e-4f)

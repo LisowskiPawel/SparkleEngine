@@ -119,6 +119,8 @@ Direct Lighting is done only when `DIR-D0` is accepted, every included `DIR-FS-*
 
 Shader source ownership was reconciled on 2026-10-25. The existing reservoir scope is `DirectReservoir`; shadow signal packing/construction and direct-sample visibility use descriptive free functions, while `ShadowRays` retains common trace semantics and constants. Temporal/spatial kernels retain dispatch admission, reuse selection and output publication; `Lighting/DirectLightReservoirReuse.hlsli` implements reprojection, compatibility and neighbor sampling through explicit input textures and the existing reservoir state. `DirectLightReservoir.hlsli` owns selected-sample lobe evaluation; its target and selected-light evaluations share `BuildLightingSurface` for the GBuffer-to-BRDF field projection; `DirectLighting.hlsl` owns resource loads and conditional lobe writes. The live proposal remains uniform over analytic lights. The uncalled weighted-proposal implementation and its estimation helpers were removed after a complete consumer trace; this does not implement or retire the target power-weighted feature. No shader record, parameter binding or dispatch was added by this separation. This is responsibility placement, not direct-lighting numerical, temporal or native GPU acceptance.
 
+`AreaLights.hlsli` acquires the selected GPU light value and passes its position to `PunctualLights::DirectionToLight`. The punctual math owner has no GPU light-buffer dependency; optimized distance/attenuation rules and the distinct reference radiometric path retain their existing equations.
+
 ## Primary Source Routes
 
 - [`RestirDirectLightingPasses.cpp`](../../../../../../../../Engine/Renderer/Private/Passes/Lighting/Direct/RestirDirectLightingPasses.cpp)

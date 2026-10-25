@@ -50,6 +50,17 @@ namespace PathLightSampling
 		return count;
 	}
 
+	uint GetEmissiveOrdinal(uint instanceId, uint primitiveIndex)
+	{
+		uint ordinal = primitiveIndex;
+		[loop]
+		for (uint candidateInstance = 0u; candidateInstance < instanceId; ++candidateInstance)
+		{
+			ordinal += CountEmissiveTriangles(candidateInstance);
+		}
+		return ordinal;
+	}
+
 	void FindEmissiveTriangle(uint ordinal, out uint instanceId, out uint primitiveIndex)
 	{
 		instanceId = 0u;

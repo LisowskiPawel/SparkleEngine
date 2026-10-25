@@ -93,12 +93,7 @@ namespace ReferencePathTracer
 
 	float EmissiveTrianglePdfW(LightCounts counts, float3 previousPositionWorld, RayTracingPathSurface surface)
 	{
-		uint ordinal = surface.PrimitiveIndex;
-		[loop]
-		for (uint instanceId = 0u; instanceId < surface.InstanceId; ++instanceId)
-		{
-			ordinal += PathLightSampling::CountEmissiveTriangles(instanceId);
-		}
+		const uint ordinal = PathLightSampling::GetEmissiveOrdinal(surface.InstanceId, surface.PrimitiveIndex);
 
 		return CommonRandom::CategoricalProbabilityMass(counts.Analytic + ordinal, counts.Total)
 		    * PathLightSampling::EmissiveTrianglePdfW(previousPositionWorld, surface.PositionWorld, surface.InstanceId, surface.PrimitiveIndex);

@@ -1,25 +1,12 @@
 #ifndef SPARKLE_PUNCTUAL_LIGHTS_HLSLI
 #define SPARKLE_PUNCTUAL_LIGHTS_HLSLI
 
-#include "/Engine/Resources/LightGpuData.hlsli"
-
 namespace PunctualLights
 {
-	float3 GetDirectionalLightDirection(uint lightIndex)
-	{
-		return normalize(-DirectionalLights[lightIndex].Direction);
-	}
 
-	float3 GetPointLightDirection(float3 positionWorld, uint lightIndex, out float distanceToLight)
+	float3 DirectionToLight(float3 positionWorld, float3 lightPositionWorld, out float distanceToLight)
 	{
-		const float3 surfaceToLight = PointLights[lightIndex].Position - positionWorld;
-		distanceToLight = length(surfaceToLight);
-		return surfaceToLight / max(distanceToLight, 0.0001f);
-	}
-
-	float3 GetSpotLightDirection(float3 positionWorld, uint lightIndex, out float distanceToLight)
-	{
-		const float3 surfaceToLight = SpotLights[lightIndex].Position - positionWorld;
+		const float3 surfaceToLight = lightPositionWorld - positionWorld;
 		distanceToLight = length(surfaceToLight);
 		return surfaceToLight / max(distanceToLight, 0.0001f);
 	}

@@ -41,7 +41,7 @@ There are exactly 37 registrations: 29 Compute, one Vertex, one Pixel, three Ray
 | `RayTracingMaterialAnyHit` | `/Engine/RayTracing/RayTracingMaterialPipeline.hlsl` | `RayTracingMaterialAnyHit` | AnyHit | Shared alpha-mask rejection over the same material policy as inline traversal. |
 | `SceneDepthCS` | `/Engine/Passes/GBuffer/SceneDepth.hlsl` | `main` | Compute | Converts frontend-specific device depth into common linear R32F scene depth. |
 | `SkyMotionVectorCS` | `/Engine/Passes/GBuffer/SkyMotionVector.hlsl` | `main` | Compute | Completes background motion vectors from current/previous view transforms. |
-| `GBufferVisualizationCS` | `/Engine/Passes/Visualization/GBufferVisualization.hlsl` | `main` | Compute | Reads only GBuffer products for the eight GBuffer visualization modes; output still enters presentation. |
+| `GBufferVisualizationCS` | `/Engine/Passes/Visualization/GBufferVisualization.hlsl` | `main` | Compute | Reads only GBuffer products for the nine GBuffer visualization modes; output still enters presentation. |
 | `LightingVisualizationCS` | `/Engine/Passes/Visualization/LightingVisualization.hlsl` | `main` | Compute | Fixed five lighting inputs and GBuffer alpha; existing View uniform selects the lobe. Disabled diagnostics decline execution/publication. |
 | `GpuSceneVisualizationCS` | `/Engine/Passes/Visualization/GpuSceneVisualization.hlsl` | `main` | Compute | Publishes the instance palette already authored into GBuffer base color for the GPU-scene visualization mode. |
 

@@ -103,6 +103,8 @@ Default exposure is Automatic with Histogram. Default multiplier bounds are `0.0
 - Current/prior 1x1 textures own adaptation history. Scene/view/topology discontinuities invalidate affected history.
 - Exposure is an input to image providers and tone mapping; it does not own either feature.
 
+`Exposure.hlsl` acquires moments and prior history, invokes exposure resolution, and publishes the existing current/history payload. `ExposureResolve.hlsli` owns history-mode admission, target resolution (including empty-metering fallback) and adaptation. Reusable luminance, exposure and adaptation equations remain in `Display/Exposure.hlsli`; the split adds no settings or history representation.
+
 ### Failure, Tradeoffs, And Evidence
 
 - Non-finite settings use engine defaults; finite settings and final adaptation are bounded by the semantic contract. Invalid HDR samples cannot poison metering/history. Camera cuts, resize, and mode/viewport changes still require candidate-bound reset evidence.

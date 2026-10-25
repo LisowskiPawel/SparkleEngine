@@ -1,8 +1,6 @@
 #ifndef SPARKLE_LIGHT_SAMPLING_HLSLI
 #define SPARKLE_LIGHT_SAMPLING_HLSLI
 
-#include "/Engine/Resources/FrameUniformData.hlsli"
-
 #include "/Engine/Common/Math.hlsli"
 #include "/Engine/Common/Random.hlsli"
 
@@ -57,22 +55,15 @@ namespace LightSampling
 
 	DirectLightSample PunctualDirectLightSample(float3 directionWorld, float3 incidentRadiance, float distanceToLight, bool isDirectional)
 	{
-		DirectLightSample result;
+		DirectLightSample result = InvalidDirectLightSample();
 		result.Valid = any(incidentRadiance > 0.0f.xxx);
 		result.DirectionWorld = SafeNormalize(directionWorld);
 		result.Distance = distanceToLight;
 		result.IncidentRadiance = max(incidentRadiance, 0.0f.xxx);
 		result.PdfW = 1.0f;
-		result.LightSelectionPdf = 1.0f;
-		result.EmitterNormalWorld = 0.0f.xxx;
-		result.SamplePositionWorld = 0.0f.xxx;
-		result.EmitterEndpointBaseOffset = 0.0f;
-		result.EmitterEndpointTraversalSensitivity = 0.0f.xxxx;
 		result.VisibilityDistance = distanceToLight;
 		result.IsDirectional = isDirectional;
 		result.Delta = true;
-		result.TargetInstanceId = 0xFFFFFFFFu;
-		result.TargetPrimitiveIndex = 0xFFFFFFFFu;
 		return result;
 	}
 
@@ -104,22 +95,15 @@ namespace LightSampling
 			return InvalidDirectLightSample();
 		}
 
-		DirectLightSample result;
+		DirectLightSample result = InvalidDirectLightSample();
 		result.Valid = any(emittedRadiance > 0.0f.xxx);
 		result.DirectionWorld = directionWorld;
 		result.Distance = distanceToLight;
 		result.IncidentRadiance = max(emittedRadiance, 0.0f.xxx) * rangeCutoff;
 		result.PdfW = pdfW;
-		result.LightSelectionPdf = 1.0f;
 		result.EmitterNormalWorld = normalWorld;
 		result.SamplePositionWorld = samplePositionWorld;
-		result.EmitterEndpointBaseOffset = 0.0f;
-		result.EmitterEndpointTraversalSensitivity = 0.0f.xxxx;
 		result.VisibilityDistance = distanceToLight;
-		result.IsDirectional = false;
-		result.Delta = false;
-		result.TargetInstanceId = 0xFFFFFFFFu;
-		result.TargetPrimitiveIndex = 0xFFFFFFFFu;
 		return result;
 	}
 
