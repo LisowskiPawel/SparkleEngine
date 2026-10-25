@@ -223,6 +223,8 @@ Composition occurs after the scene graph and before final submit. This gives hos
 - Renderer UI's private `UiTextureRegistry` gives the viewport a generation-derived `UiTextureHandle` and maps other texture IDs for UI/diagnostic consumers. The binding is published separately from `RenderProduct`; viewport products remain rendering-only metadata.
 - The inspected non-viewport registration list appends unique bindings and has only the `uint32` slot-space bound; no explicit unregister/reclamation owner was found. Long-session growth and stale-handle behavior are therefore Partial capability, not an unlimited-lifetime guarantee.
 
+The replay command list is explicit: `UiFrameRenderer` borrows its current graphics list from `RenderDeviceServices`, and `UiRenderPacketPlayer` passes that same list with reconstructed draw data to `RhiImGuiRenderer::RenderDrawData`. The list belongs to the same device as the renderer and is borrowed only for the call. Packet preparation neither selects a queue nor retains the list or a live Editor pointer. Source ownership reconciled on 2026-10-25; backend/device execution remains a separate proof gate.
+
 ### Failure, Tradeoffs, And Evidence
 
 - Missing products, generation mismatch, stale handles, empty packets, resize, level switch, and repeated texture registration need controlled behavior.

@@ -6,7 +6,6 @@
 
 #include "EditorWorkspaceLayout.h"
 #include "Console/EditorConsoleSystem.h"
-#include "Input/InputSystem.h"
 #include "Panels/MainMenuBarPanel.h"
 #include "Panels/SceneInspectorPanel.h"
 #include "Panels/SceneOutlinerPanel.h"
@@ -23,9 +22,7 @@
 #include "Settings/EditorRestartService.h"
 #include "Style/SparkleUiTheme.h"
 #include "Viewport/EditorViewportSession.h"
-#include "Window/Window.h"
 
-#include <imgui.h>
 
 #include <memory>
 #include <string>

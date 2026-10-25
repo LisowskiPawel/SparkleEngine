@@ -47,6 +47,8 @@ Native format/feature queries live in `Device/D3D12Capabilities.cpp` and `Device
 
 `VulkanDeviceBootstrap.cpp` creates the native device, `VulkanRhiQueues.cpp` creates queue wrappers, and `VulkanRhiDiagnostics.cpp` owns bootstrap naming and diagnostic formatting. This placement and target-build evidence do not establish native presentation, resize, validation, or backend parity acceptance.
 
+Native ImGui backends borrow the native device, swapchain and descriptor service directly. D3D12 descriptor callbacks retain only the descriptor service. `UiFrameRenderer` selects the current graphics command list from the same `RenderDeviceServices` that supplies the ImGui renderer and passes a call-scoped borrow through packet replay to `RhiImGuiRenderer::RenderDrawData`; native UI lowering does not select a command list or submit work. Common private `UI/RhiImGuiContext` owns context acquisition, activation, restoration and release mechanics while each backend instance retains its one context/ownership state. ImGui is an explicit private dependency of the common and final RHI targets. This source ownership was rechecked on 2026-10-25; it is not native UI or presentation acceptance.
+
 ## Shared Risks
 
 - Resize and minimize replace presentation identity while older frames may remain in flight.

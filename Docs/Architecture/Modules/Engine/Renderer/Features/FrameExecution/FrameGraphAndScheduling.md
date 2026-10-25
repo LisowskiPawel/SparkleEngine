@@ -4,7 +4,7 @@
 
 **Status:** current feature dossier; source-backed, not native-validation, overlap, performance, or release evidence
 
-**Verified:** 2026-09-06 against committed `master` revision `d236da11`; `Engine/Renderer` is unchanged from the earlier `8414b5dc` source audit
+**Verified:** feature baseline 2026-09-06 at revision `d236da11`; the dated source reconciliations below refine specific ownership paths and do not establish native execution.
 
 **Recipe-composition amendment:** refreshed 2026-09-13 against source input `9689e6ba870a01ef703da723648d3837e6b20863` plus the current scoped working tree; no build, runtime, GPU, native-validation, performance, or release proof is implied
 
@@ -13,6 +13,8 @@
 **Per-frame compilation amendment, 2026-10-11:** declaration, setup and compilation run for each rendered execution; compiled plans are not reused between frames. Pass-admission keys for scene rendering, lighting and post processing are removed. Resource configuration and provider/shader/SBT generations still govern retained GPU resource replacement; view mode belongs to temporal view identity, not graph reuse. This source reconciliation adds no native or performance proof.
 
 Graph parameter allocations own their metadata for the current shader stage. A shared parameter schema used by compute and ray generation does not retain the first stage's visibility. `FrameGraph::Compile` orders history preparation, imported-access synchronization, transient planning and frame-plan compilation through semantic operations. Its private compilation helper wires the compiler phases; transient planning owns allocation preparation and state resets. Compilation first derives resource lifetimes and physical placement, then prepares allocation reuse before planning barriers and recording. Replaced transient backing resources restart at their declared native initial states; retained allocations keep their tracked states. Both compiler phases run each executable frame. These ownership rules do not establish full scheduling or performance acceptance.
+
+Raster admission source ownership was rechecked on 2026-10-25. `FrameGraph::BuildRasterPass` sequences attachment collection, color sample resolution, depth/stencil compatibility and final state validation. Its private functions borrow registered-resource metadata read-only; color and depth attachment rules have separate implementors. Binding/registration checks still precede compatibility checks and preserve the existing failure order. The owning FrameGraph entry point retains encapsulation of its resource registry; no registry getter or separate lifecycle object is required.
 
 **Scope:** `REN-FG-01` through `REN-FG-08` and the frame-graph portion of `REN-OWN-04`/`REN-OWN-06`; defines how Renderer feature declarations become resources, dependencies, barriers, queue submissions, and retirement
 
