@@ -2,18 +2,12 @@
 #include "Passes/Lighting/LightingComposite.h"
 
 #include "Passes/Lighting/LightingCompositeShader.h"
-#include "Passes/Lighting/LightingTargetClear.h"
 #include "Core/Public/Math/MathUtils.h"
 #include "Frame/Graph/RenderFrameGraphResources.h"
 #include "FrameGraph/Builder/FrameGraphBuilder.h"
 
-#include <array>
-
-void AddLightingCompositePasses(FrameGraphBuilder& builder, RenderViewportExtent sceneExtent, const RenderFrameGraphResources& resources)
+void AddLightingCompositePass(FrameGraphBuilder& builder, RenderViewportExtent sceneExtent, const RenderFrameGraphResources& resources)
 {
-	const std::array sceneColorTarget{resources.Transient.Scene.SceneColor};
-	AddLightingTargetClearPass(builder, "SceneColor.Clear", sceneExtent, sceneColorTarget);
-
 	const auto& lighting = resources.Transient.Lighting;
 	auto& parameters = builder.AllocParameters<LightingCompositeCS>();
 	parameters->SceneColor = builder.CreateUAV(resources.Transient.Scene.SceneColor);

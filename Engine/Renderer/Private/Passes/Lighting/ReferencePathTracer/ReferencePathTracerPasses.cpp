@@ -24,8 +24,8 @@ void AddReferencePathTracerPasses(
 	const ReferencePathTracerGraphResources& graphResources = session.GetGraphResources();
 	const ReferencePathTracerWork& work = session.GetWork();
 
-	AddReferencePathTracerTransportPass(builder, frame, settings.RenderExtent, resources, graphResources, work, session.m_rayTracingScene);
-	AddReferencePathTracerDisplayPass(builder, settings.RenderExtent, resources, graphResources, work);
+	AddReferencePathTracerTransportPass(builder, frame, settings.RenderExtent, graphResources, work, session.m_rayTracingScene, resources);
+	AddReferencePathTracerDisplayPass(builder, settings.RenderExtent, graphResources, work, resources);
 
 	PublishReferencePathTracerProducts(graphResources, resources);
 }

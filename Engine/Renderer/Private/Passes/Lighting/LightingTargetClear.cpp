@@ -36,6 +36,12 @@ void AddLightingTargetClearPass(FrameGraphBuilder& builder, std::string_view nam
 	    });
 }
 
+void AddSceneColorClearPass(FrameGraphBuilder& builder, RenderViewportExtent extent, const RenderFrameGraphResources& resources)
+{
+	const std::array targets{resources.Transient.Scene.SceneColor};
+	AddLightingTargetClearPass(builder, "SceneColor.Clear", extent, targets);
+}
+
 void AddDirectLightingClearPass(FrameGraphBuilder& builder, RenderViewportExtent extent, const RenderFrameGraphResources& resources)
 {
 	const auto& lighting = resources.Transient.Lighting;

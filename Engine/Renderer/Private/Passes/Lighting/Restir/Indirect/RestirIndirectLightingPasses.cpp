@@ -4,9 +4,6 @@
 #include "Frame/RenderFrame.h"
 #include "Passes/Lighting/Restir/Indirect/RestirIndirectReservoirPasses.h"
 #include "Passes/Lighting/Restir/Indirect/RestirIndirectResolve.h"
-#include "Passes/Lighting/Restir/Indirect/RestirIndirectSpatial.h"
-#include "Passes/Lighting/Restir/Indirect/RestirIndirectTemporal.h"
-#include "Passes/Lighting/Restir/Indirect/RestirIndirectReservoirResources.h"
 #include "Passes/Lighting/Restir/Indirect/IndirectLightingControls.h"
 #include "Passes/Lighting/LightingRenderTargets.h"
 #include "Passes/Lighting/LightingTargetClear.h"
@@ -26,10 +23,6 @@ void AddRestirIndirectLightingPasses(FrameGraphBuilder& builder, const RenderFra
 		return;
 	}
 
-	CreateRestirIndirectHistoryResources(builder, sceneExtent, resources);
-	const RestirIndirectWorkingReservoirs workingReservoirs = AddRestirIndirectReservoirPasses(builder, sceneExtent, resources);
-
-	AddRestirIndirectTemporalPass(builder, frame, sceneExtent, workingReservoirs, resources);
-	AddRestirIndirectSpatialPass(builder, frame, sceneExtent, workingReservoirs, resources);
+	AddRestirIndirectReservoirPasses(builder, frame, sceneExtent, resources);
 	AddRestirIndirectResolvePass(builder, frame, sceneExtent, resources);
 }

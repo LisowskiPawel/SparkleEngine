@@ -30,7 +30,7 @@ template <typename TShader> static auto& BuildDirectShadowSignalParameters(Frame
 	return parameters;
 }
 
-void AddDirectShadowSignalPass(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, RenderFrameGraphResources& resources, RenderRayTracingScene& rayTracingScene)
+void AddDirectShadowSignalPass(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, RenderRayTracingScene& rayTracingScene, RenderFrameGraphResources& resources)
 {
 	CreateDirectShadowSignalResources(builder, sceneExtent, resources);
 	if (!IsDirectShadowsActive())

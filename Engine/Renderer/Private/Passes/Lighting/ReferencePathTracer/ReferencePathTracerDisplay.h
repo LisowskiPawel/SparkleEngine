@@ -10,6 +10,6 @@ struct RenderFrameGraphResources;
 void AddReferencePathTracerDisplayPass(
     FrameGraphBuilder& builder,
     RenderViewportExtent extent,
-    const RenderFrameGraphResources& resources,
     const ReferencePathTracerGraphResources& graphResources,
-    const ReferencePathTracerWork& work);
+    const ReferencePathTracerWork& work,
+    const RenderFrameGraphResources& resources);

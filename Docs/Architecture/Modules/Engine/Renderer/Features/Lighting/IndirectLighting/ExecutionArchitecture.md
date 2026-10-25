@@ -26,7 +26,9 @@ One Lit View produces finite scene-linear `IndirectDiffuse` and `IndirectSpecula
 | reconstruction | optional adjacent RR guides, no mandatory baseline | portable raw-first diffuse/specular baseline plus optional RR |
 | evidence | source inventory | analytic/statistical/convergence/temporal/backend/workload evidence |
 
-Current implementation ownership reconciled on 2026-10-06: temporal, spatial, and resolve passes share `BindRestirIndirectParameters` in the existing ReSTIR indirect owner. It registers the same six pass-parameter values and captured resource handles at execution setup time; CVar sampling is not moved into graph construction. Resolve-only reconstruction-guide policy stays in resolve. This removes repeated setup without changing the estimator or claiming `IND-D0` conformance.
+Current C++ composition, reconciled 2026-10-25: `AddRestirIndirectLightingPasses` declares and explicitly clears indirect lobe and reconstruction-guide targets, schedules surface guides when needed, then admits reservoir reuse and resolve. `AddRestirIndirectReservoirPasses` owns history/working-resource preparation, initialization and temporal/spatial passes; its temporary reservoirs stay inside that stage. Resource factories declare resources without scheduling GPU work. Existing off-state lobe/guide initialization and execution order remain.
+
+Temporal, spatial and resolve definitions share `BindRestirIndirectParameters` in the existing indirect owner. Each uses the typed `AllocParameters` authoring path for the current frame; resolve-only reconstruction policy stays in resolve. This responsibility split does not change the estimator or claim `IND-D0` conformance.
 
 ## Feature Enclosure
 

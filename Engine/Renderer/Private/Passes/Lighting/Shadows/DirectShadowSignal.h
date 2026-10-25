@@ -8,4 +8,4 @@ class FrameGraphBuilder;
 class RenderRayTracingScene;
 struct RenderFrameGraphResources;
 
-void AddDirectShadowSignalPass(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, RenderFrameGraphResources& resources, RenderRayTracingScene& rayTracingScene);
+void AddDirectShadowSignalPass(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, RenderRayTracingScene& rayTracingScene, RenderFrameGraphResources& resources);

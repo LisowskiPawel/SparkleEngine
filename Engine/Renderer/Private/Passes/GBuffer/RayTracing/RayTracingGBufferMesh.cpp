@@ -39,8 +39,8 @@ void AddRayTracingGBufferMeshPass(
     FrameGraphBuilder& builder,
     const RenderFrame& frame,
     RenderViewportExtent sceneExtent,
-    const RenderFrameGraphResources& resources,
-    RenderRayTracingScene& rayTracingScene)
+    RenderRayTracingScene& rayTracingScene,
+    const RenderFrameGraphResources& resources)
 {
 	AddRayTracingMaterialPass<RayTracingGBufferInlineCS, RayTracingGBufferRGS>(
 	    builder,

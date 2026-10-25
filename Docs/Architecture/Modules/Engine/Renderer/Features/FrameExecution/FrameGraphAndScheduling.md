@@ -52,6 +52,14 @@ This is infrastructure used by features, not a visual feature by itself. Its obs
 
 Declaration order in [`BuildRenderFrameGraph`](../../../../../../../Engine/Renderer/Private/Frame/Graph/BuildRenderFrameGraph.cpp) expresses the intended pipeline, but the compiler's resource graph is the execution authority. A pass must not depend on incidental insertion order.
 
+## Frame Composition
+
+The C++ authoring boundary was reconciled on 2026-10-25 against `ede5b573` plus the scoped working tree. `BuildRenderFrameGraph` orders shared declarations, ray-scene publication, scene rendering, presentation and exports. Scene rendering selects Lit or Reference, then orders exposure, visualization, denoising and upscaling. Closed-set choices remain in their feature composers; leaf operations own bindings, dispatch and optional admission.
+
+Lighting composers explicitly schedule target clears. Resource factories declare targets and histories without scheduling GPU work. Direct and indirect reservoir composers own their resource preparation and temporal/spatial sequence; temporary indirect reservoirs do not escape into lighting composition. Real-time scene composition separately names scene-color initialization and the single lighting composite pass. Existing off-state initialization, pass order, descriptors and queues are preserved.
+
+This separation follows the focused pass functions and deferred parameter lifetime described in Epic's [Render Dependency Graph guide](https://dev.epicgames.com/documentation/unreal-engine/render-dependency-graph-in-unreal-engine). This is a local use of that pattern, without an additional orchestration framework. Source comparisons and focused compilation do not establish GPU output or temporal equivalence.
+
 ## Pass Kinds And Queues
 
 | Pass kind | Current use | Scheduling boundary |

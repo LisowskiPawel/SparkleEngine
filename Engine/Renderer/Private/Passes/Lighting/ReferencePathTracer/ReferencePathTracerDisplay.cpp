@@ -11,9 +11,9 @@
 void AddReferencePathTracerDisplayPass(
     FrameGraphBuilder& builder,
     RenderViewportExtent extent,
-    const RenderFrameGraphResources& resources,
     const ReferencePathTracerGraphResources& graphResources,
-    const ReferencePathTracerWork& work)
+    const ReferencePathTracerWork& work,
+    const RenderFrameGraphResources& resources)
 {
 	auto& parameters = builder.AllocParameters<ReferencePathTracerDisplayCS>();
 	parameters->WorkingMean = builder.CreateSRV(graphResources.WorkingMean);

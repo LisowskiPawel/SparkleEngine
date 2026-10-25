@@ -29,7 +29,7 @@ void AddGBufferPasses(
 			AddRasterizedGBufferMeshPass(builder, frame, gpuMeshCache, resources);
 			break;
 		case GBufferAlgorithm::RayTracing:
-			AddRayTracingGBufferMeshPass(builder, frame, sceneExtent, resources, rayTracingScene);
+			AddRayTracingGBufferMeshPass(builder, frame, sceneExtent, rayTracingScene, resources);
 			break;
 		default:
 			throw Diagnostics::Error("GBuffer graph construction received an invalid algorithm.");

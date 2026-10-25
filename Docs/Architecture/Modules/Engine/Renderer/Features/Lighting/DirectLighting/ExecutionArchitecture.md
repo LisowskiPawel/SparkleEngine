@@ -25,6 +25,8 @@ One Lit view resolves a declared Direct Lighting profile into finite scene-linea
 | reconstruction | no dedicated portable direct path; optional adjacent RR route | raw-first classical baseline plus optional RR using identical declared guides |
 | validation | source inspection only | analytic, statistical, temporal, paired-provider/backend, workload, memory, and time evidence |
 
+Current C++ composition, reconciled 2026-10-25: `AddRestirDirectLightingPasses` declares direct lobe targets, explicitly clears them, admits the enabled lighting family, then adds reservoir reuse, selected-light visibility and lobe shading. `AddDirectLightReservoirPasses` owns reservoir resource preparation followed by temporal and spatial passes. `DirectLightReservoirResources` declares only the reservoir textures/history; `LightingTargetClear` owns clear-pass definitions. Disabled lobes retain their initialized outputs. This responsibility split preserves the current algorithm and does not close the target contract.
+
 ## Ownership Boundary
 
 The steady-state implementation home is proposed as:

@@ -3,11 +3,14 @@
 
 #include "Frame/Graph/RenderFrameGraphResources.h"
 #include "Passes/Lighting/Restir/Indirect/RestirIndirectReservoirResources.h"
+#include "Passes/Lighting/Restir/Indirect/RestirIndirectTemporal.h"
+#include "Passes/Lighting/Restir/Indirect/RestirIndirectSpatial.h"
 #include "Passes/Core/ComputeClear.h"
 #include "Resources/History/FrameHistory.h"
 
-RestirIndirectWorkingReservoirs AddRestirIndirectReservoirPasses(FrameGraphBuilder& builder, RenderViewportExtent sceneExtent, const RenderFrameGraphResources& resources)
+void AddRestirIndirectReservoirPasses(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, RenderFrameGraphResources& resources)
 {
+	CreateRestirIndirectHistoryResources(builder, sceneExtent, resources);
 	const RestirIndirectWorkingReservoirs workingReservoirs = CreateRestirIndirectWorkingReservoirs(builder, sceneExtent);
 	const FrameGraphReservoirHistoryHandles& history = resources.History.RestirIndirectReservoir;
 
@@ -17,5 +20,6 @@ RestirIndirectWorkingReservoirs AddRestirIndirectReservoirPasses(FrameGraphBuild
 	AddComputeClearPass(builder, "ClearRestirIndirectCurrentWeight", history.Weight.Current, sceneExtent);
 	AddComputeClearPass(builder, "ClearRestirIndirectCurrentSurface", history.Surface.Current, sceneExtent);
 
-	return workingReservoirs;
+	AddRestirIndirectTemporalPass(builder, frame, sceneExtent, workingReservoirs, resources);
+	AddRestirIndirectSpatialPass(builder, frame, sceneExtent, workingReservoirs, resources);
 }

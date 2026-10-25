@@ -14,7 +14,7 @@ void AddReferencePathTracerTransportPass(
     FrameGraphBuilder& builder,
     const RenderFrame& frame,
     RenderViewportExtent extent,
-    const RenderFrameGraphResources& resources,
     const ReferencePathTracerGraphResources& graphResources,
     const ReferencePathTracerWork& work,
-    RenderRayTracingScene& rayTracingScene);
+    RenderRayTracingScene& rayTracingScene,
+    const RenderFrameGraphResources& resources);

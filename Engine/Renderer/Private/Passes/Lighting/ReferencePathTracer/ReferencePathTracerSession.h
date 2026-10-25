@@ -41,10 +41,10 @@ private:
 	    FrameGraphBuilder& builder,
 	    const RenderFrame& frame,
 	    RenderViewportExtent extent,
-	    const RenderFrameGraphResources& resources,
 	    const ReferencePathTracerGraphResources& graphResources,
 	    const ReferencePathTracerWork& work,
-	    RenderRayTracingScene& rayTracingScene);
+	    RenderRayTracingScene& rayTracingScene,
+	    const RenderFrameGraphResources& resources);
 
 	static constexpr std::uint32_t WorkRowsPerDispatch = 32u;
 

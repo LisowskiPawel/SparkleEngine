@@ -5,6 +5,7 @@
 #include "Frame/Graph/RenderFrameGraphSettings.h"
 #include "Passes/GBuffer/GBufferPasses.h"
 #include "Passes/Lighting/LightingComposite.h"
+#include "Passes/Lighting/LightingTargetClear.h"
 #include "Passes/Lighting/RealTimePathTracerProducts.h"
 #include "Passes/Lighting/Restir/RestirLightingPasses.h"
 #include "Passes/Lighting/Sky/Sky.h"
@@ -21,7 +22,8 @@ void AddRealTimePathTracerPasses(
 	AddGBufferPasses(builder, frame, settings.RenderExtent, gpuMeshCache, rayTracingScene, resources);
 
 	AddRestirLightingPasses(builder, frame, settings.RenderExtent, rayTracingScene, resources);
-	AddLightingCompositePasses(builder, settings.RenderExtent, resources);
+	AddSceneColorClearPass(builder, settings.RenderExtent, resources);
+	AddLightingCompositePass(builder, settings.RenderExtent, resources);
 	AddSkyPass(builder, frame, settings.RenderExtent, resources);
 
 	PublishRealTimePathTracerProducts(resources);

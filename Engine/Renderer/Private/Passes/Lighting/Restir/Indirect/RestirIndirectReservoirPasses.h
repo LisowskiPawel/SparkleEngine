@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Passes/Lighting/Restir/Indirect/RestirIndirectReservoirResources.h"
 #include "Renderer/Public/Viewport/ViewportContracts.h"
 
 class FrameGraphBuilder;
+struct RenderFrame;
 struct RenderFrameGraphResources;
 
-RestirIndirectWorkingReservoirs AddRestirIndirectReservoirPasses(FrameGraphBuilder& builder, RenderViewportExtent sceneExtent, const RenderFrameGraphResources& resources);
+void AddRestirIndirectReservoirPasses(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, RenderFrameGraphResources& resources);
