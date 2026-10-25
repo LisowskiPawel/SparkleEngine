@@ -9,9 +9,13 @@
 #include "RHI/Public/Resources/RhiResourceHandles.h"
 
 #include <span>
+#include <cstdint>
 
 class FrameGraph;
-class PassBinder;
+class PassBindingOverrides;
+struct CompiledBinding;
+struct PassParameterBinding;
+enum class BindingDomain : std::uint8_t;
 class RenderCommandContext;
 class RenderHardwareInterface;
 struct NativeTextureViewInfo;
@@ -42,7 +46,13 @@ public:
 	void BindGlobalDescriptorState(RenderCommandContext& commandContext) const noexcept;
 
 private:
-	friend class PassBinder;
+	friend void BindCompiledPassParameter(
+	    RenderCommandContext& commandContext,
+	    const FrameGraphResourceCommands& resources,
+	    const CompiledBinding& compiledBinding,
+	    const PassParameterBinding* parameterBinding,
+	    const PassBindingOverrides* overrides,
+	    BindingDomain domain);
 	RenderHardwareInterface& GetRenderHardwareInterface() const noexcept;
 	RhiCpuDescriptorHandle ResolveRenderTargetView(FrameGraphResourceHandle handle) const noexcept;
 	RhiCpuDescriptorHandle ResolveDepthStencilView(FrameGraphResourceHandle handle) const noexcept;

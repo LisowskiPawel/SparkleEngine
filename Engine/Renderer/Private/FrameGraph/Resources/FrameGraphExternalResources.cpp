@@ -97,8 +97,7 @@ void FrameGraph::SyncImportedColorViews(FrameGraphResourceHandle handle, const F
 
 	if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::ShaderRead) && !access.shaderResourceView)
 	{
-		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
-		    RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
+		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
 
 		access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
 	}
@@ -127,8 +126,7 @@ void FrameGraph::SyncImportedDepthViews(FrameGraphResourceHandle handle, const F
 
 	if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::ShaderRead) && !access.shaderResourceView)
 	{
-		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
-		    RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
+		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
 
 		access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
 	}

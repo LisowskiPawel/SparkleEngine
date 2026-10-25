@@ -45,27 +45,6 @@ static CompiledBindingType ToCompiledBindingType(ShaderParameterSemanticKind sem
 	}
 }
 
-static void UpsertDescriptorBinding(VulkanRhi& rhi, std::vector<PendingDescriptorBinding>& descriptorBindings, VkDescriptorSetLayoutBinding binding, VkDescriptorBindingFlags bindingFlags) noexcept
-{
-	for (PendingDescriptorBinding& existingBinding : descriptorBindings)
-	{
-		if (existingBinding.Binding.binding == binding.binding && existingBinding.Binding.descriptorType == binding.descriptorType)
-		{
-			existingBinding.Binding.descriptorCount = std::max(existingBinding.Binding.descriptorCount, binding.descriptorCount);
-			existingBinding.Binding.stageFlags |= binding.stageFlags;
-			existingBinding.BindingFlags |= bindingFlags;
-			return;
-		}
-	}
-
-	PendingDescriptorBinding pendingBinding{.Binding = binding, .BindingFlags = bindingFlags};
-	if (binding.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLER)
-	{
-		pendingBinding.ImmutableSampler = CreateImmutableSampler(rhi);
-	}
-	descriptorBindings.push_back(pendingBinding);
-}
-
 static VkSampler CreateImmutableSampler(VulkanRhi& rhi) noexcept
 {
 	const VkSamplerCreateInfo createInfo{
@@ -95,6 +74,27 @@ static VkSampler CreateImmutableSampler(VulkanRhi& rhi) noexcept
 		Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateSampler", result));
 	}
 	return sampler;
+}
+
+static void UpsertDescriptorBinding(VulkanRhi& rhi, std::vector<PendingDescriptorBinding>& descriptorBindings, VkDescriptorSetLayoutBinding binding, VkDescriptorBindingFlags bindingFlags) noexcept
+{
+	for (PendingDescriptorBinding& existingBinding : descriptorBindings)
+	{
+		if (existingBinding.Binding.binding == binding.binding && existingBinding.Binding.descriptorType == binding.descriptorType)
+		{
+			existingBinding.Binding.descriptorCount = std::max(existingBinding.Binding.descriptorCount, binding.descriptorCount);
+			existingBinding.Binding.stageFlags |= binding.stageFlags;
+			existingBinding.BindingFlags |= bindingFlags;
+			return;
+		}
+	}
+
+	PendingDescriptorBinding pendingBinding{.Binding = binding, .BindingFlags = bindingFlags};
+	if (binding.descriptorType == VK_DESCRIPTOR_TYPE_SAMPLER)
+	{
+		pendingBinding.ImmutableSampler = CreateImmutableSampler(rhi);
+	}
+	descriptorBindings.push_back(pendingBinding);
 }
 
 static VkDescriptorType ToVkDescriptorType(ShaderParameterSemanticKind semanticKind, const VulkanRhi& rhi) noexcept
@@ -169,7 +169,13 @@ VulkanBindingLayout::~VulkanBindingLayout() noexcept
 	}
 }
 
-static void CompileParameterBindings(VulkanRhi& rhi, const RenderBindingLayoutCompileDesc& desc, std::vector<CompiledBinding>& bindings, std::vector<std::string>& bindingNames, std::vector<VkPushConstantRange>& pushConstantRanges, std::map<std::uint32_t, std::vector<PendingDescriptorBinding>>& descriptorBindingsBySet)
+static void CompileParameterBindings(
+    VulkanRhi& rhi,
+    const RenderBindingLayoutCompileDesc& desc,
+    std::vector<CompiledBinding>& bindings,
+    std::vector<std::string>& bindingNames,
+    std::vector<VkPushConstantRange>& pushConstantRanges,
+    std::map<std::uint32_t, std::vector<PendingDescriptorBinding>>& descriptorBindingsBySet)
 {
 	const auto& parameters = desc.ParameterLayout->GetParameters();
 	for (std::size_t parameterIndex = 0; parameterIndex < parameters.size(); ++parameterIndex)
@@ -237,7 +243,12 @@ static void CompileParameterBindings(VulkanRhi& rhi, const RenderBindingLayoutCo
 	}
 }
 
-static void CreateDescriptorSetLayouts(VulkanRhi& rhi, std::map<std::uint32_t, std::vector<PendingDescriptorBinding>>& descriptorBindingsBySet, std::vector<VkDescriptorSetLayout>& descriptorSetLayouts, std::vector<std::vector<VkDescriptorPoolSize>>& descriptorSetRequirements, std::vector<VkSampler>& immutableSamplers)
+static void CreateDescriptorSetLayouts(
+    VulkanRhi& rhi,
+    std::map<std::uint32_t, std::vector<PendingDescriptorBinding>>& descriptorBindingsBySet,
+    std::vector<VkDescriptorSetLayout>& descriptorSetLayouts,
+    std::vector<std::vector<VkDescriptorPoolSize>>& descriptorSetRequirements,
+    std::vector<VkSampler>& immutableSamplers)
 {
 	for (auto& [setIndex, descriptorBindings] : descriptorBindingsBySet)
 	{

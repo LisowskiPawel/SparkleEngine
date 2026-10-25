@@ -19,7 +19,10 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanPipelineLogger, "RHI.Vulkan.Pipeline");
 
-static std::string ToDebugName(const wchar_t* debugName) { return debugName != nullptr ? Strings::ToNarrow(debugName) : std::string{"VulkanPipeline"}; }
+static std::string ToDebugName(const wchar_t* debugName)
+{
+	return debugName != nullptr ? Strings::ToNarrow(debugName) : std::string{"VulkanPipeline"};
+}
 
 static VkStencilOpState BuildStencilFaceState(CompareOp compareOp, RhiStencilOp failOp, RhiStencilOp depthFailOp, RhiStencilOp passOp, const RhiStencilState& desc) noexcept
 {
@@ -102,7 +105,10 @@ static VkBlendOp ToVkBlendOperation(RhiBlendOperation operation) noexcept
 	Diagnostics::Fatal(g_vulkanPipelineLogger, __FILE__, __LINE__, "Vulkan received an unsupported blend operation.");
 }
 
-static VkPipelineVertexInputStateCreateInfo BuildVertexInputState(const RhiVertexInputDeclaration& input, std::array<VkVertexInputBindingDescription, 4>& vertexBindings, std::array<VkVertexInputAttributeDescription, 16>& vertexAttributes)
+static VkPipelineVertexInputStateCreateInfo BuildVertexInputState(
+    const RhiVertexInputDeclaration& input,
+    std::array<VkVertexInputBindingDescription, 4>& vertexBindings,
+    std::array<VkVertexInputAttributeDescription, 16>& vertexAttributes)
 {
 	for (std::uint32_t index = 0; index < input.BindingCount; ++index)
 	{
@@ -132,6 +138,7 @@ static VkPipelineVertexInputStateCreateInfo BuildVertexInputState(const RhiVerte
 	    .pVertexBindingDescriptions = input.BindingCount != 0 ? vertexBindings.data() : nullptr,
 	    .vertexAttributeDescriptionCount = input.ElementCount,
 	    .pVertexAttributeDescriptions = input.ElementCount != 0 ? vertexAttributes.data() : nullptr};
+
 	return vertexInputState;
 }
 
@@ -151,6 +158,7 @@ static VkPipelineRasterizationStateCreateInfo BuildRasterizationState(const RhiR
 	    .depthBiasClamp = 0.0f,
 	    .depthBiasSlopeFactor = 0.0f,
 	    .lineWidth = 1.0f};
+
 	return rasterizationState;
 }
 
@@ -166,6 +174,7 @@ static VkPipelineMultisampleStateCreateInfo BuildMultisampleState(std::uint32_t 
 	    .pSampleMask = nullptr,
 	    .alphaToCoverageEnable = alphaToCoverage ? VK_TRUE : VK_FALSE,
 	    .alphaToOneEnable = VK_FALSE};
+
 	return multisampleState;
 }
 
@@ -206,14 +215,10 @@ static VkPipelineDepthStencilStateCreateInfo BuildDepthStencilState(const Graphi
 	        desc.Stencil.FrontFaceStencilDepthFailOp,
 	        desc.Stencil.FrontFaceStencilPassOp,
 	        desc.Stencil),
-	    .back = BuildStencilFaceState(
-	        desc.Stencil.BackFaceStencilFunc,
-	        desc.Stencil.BackFaceStencilFailOp,
-	        desc.Stencil.BackFaceStencilDepthFailOp,
-	        desc.Stencil.BackFaceStencilPassOp,
-	        desc.Stencil),
+	    .back = BuildStencilFaceState(desc.Stencil.BackFaceStencilFunc, desc.Stencil.BackFaceStencilFailOp, desc.Stencil.BackFaceStencilDepthFailOp, desc.Stencil.BackFaceStencilPassOp, desc.Stencil),
 	    .minDepthBounds = 0.0f,
 	    .maxDepthBounds = 1.0f};
+
 	return depthStencilState;
 }
 
@@ -232,7 +237,6 @@ VulkanPipeline::VulkanPipeline(VulkanRhi& rhi, const GraphicsPipelineDesc& desc)
     m_bindPoint(VK_PIPELINE_BIND_POINT_GRAPHICS)
 {
 	RhiContract::ValidateGraphicsPipelineDesc(desc);
-
 
 	const std::string debugName = ToDebugName(desc.DebugName);
 	VulkanPipelineLayoutBuilder layoutBuilder;
@@ -336,7 +340,6 @@ void VulkanPipeline::CreateGraphicsPipeline(VulkanRhi& rhi, const GraphicsPipeli
 	}
 
 	VulkanDebugNames::SetObjectName(rhi.GetSetDebugUtilsObjectName(), m_device, VK_OBJECT_TYPE_PIPELINE, reinterpret_cast<std::uint64_t>(m_pipeline), debugName);
-
 }
 
 VulkanPipeline::VulkanPipeline(VulkanRhi& rhi, const ComputePipelineDesc& desc) :

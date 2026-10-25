@@ -41,7 +41,7 @@ D3D12RenderHardwareInterface::D3D12RenderHardwareInterface(
 {
 	m_interopService = std::make_unique<D3D12InteropService>(*this);
 	m_captureService = std::make_unique<D3D12CaptureService>(rhi);
-	m_pipelineService = std::make_unique<RhiPipelineServiceAdapter<D3D12Rhi, D3D12Pipeline, D3D12RayTracingPipeline, D3D12BindingLayoutCompiler>>(rhi);
+	m_pipelineService = std::make_unique<RhiPipelineServiceAdapter<D3D12Rhi, D3D12Pipeline, D3D12RayTracingPipeline, CompileD3D12BindingLayout>>(rhi);
 	m_descriptorService = std::make_unique<D3D12DescriptorService>(rhi, descriptorHeapManager, m_capabilities);
 	m_resourceService = std::make_unique<D3D12ResourceService>(rhi, memoryAllocator, m_capabilities);
 	m_presentationService = std::make_unique<RhiPresentationServiceAdapter<D3D12BackBufferPresentation>>(rhi, swapChain, *m_descriptorService, *m_resourceService);

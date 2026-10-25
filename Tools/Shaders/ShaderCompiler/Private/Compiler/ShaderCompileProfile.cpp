@@ -7,34 +7,30 @@
 #include <cstdint>
 #include <string>
 
-class ShaderModelProfile final
+static std::uint32_t GetProfileShaderModelMinor(ShaderTarget target) noexcept
 {
-public:
-	static std::uint32_t GetProfileShaderModelMinor(ShaderTarget target) noexcept
+	switch (target)
 	{
-		switch (target)
-		{
-			case ShaderTarget::DxilSm60:
-				return 0;
-			case ShaderTarget::DxilSm61:
-				return 1;
-			case ShaderTarget::DxilSm62:
-				return 2;
-			case ShaderTarget::DxilSm63:
-				return 3;
-			case ShaderTarget::DxilSm64:
-				return 4;
-			case ShaderTarget::DxilSm65:
-				return 5;
-			case ShaderTarget::DxilSm66:
-				return 6;
-			case ShaderTarget::DxilSm67:
-				return 7;
-			default:
-				return 6;
-		}
+		case ShaderTarget::DxilSm60:
+			return 0;
+		case ShaderTarget::DxilSm61:
+			return 1;
+		case ShaderTarget::DxilSm62:
+			return 2;
+		case ShaderTarget::DxilSm63:
+			return 3;
+		case ShaderTarget::DxilSm64:
+			return 4;
+		case ShaderTarget::DxilSm65:
+			return 5;
+		case ShaderTarget::DxilSm66:
+			return 6;
+		case ShaderTarget::DxilSm67:
+			return 7;
+		default:
+			return 6;
 	}
-};
+}
 
 const char* ShaderCompileProfile::GetShaderModelProfileName(ShaderTarget target)
 {
@@ -89,6 +85,6 @@ std::string ShaderCompileProfile::BuildTargetProfile(const ShaderCompileRequest&
 	profile += '_';
 	profile += '6';
 	profile += '_';
-	profile += std::to_string(ShaderModelProfile::GetProfileShaderModelMinor(request.Target));
+	profile += std::to_string(GetProfileShaderModelMinor(request.Target));
 	return profile;
 }

@@ -618,17 +618,17 @@ bool D3D12DescriptorService::WriteResourceViewDescriptor(const RhiResourceViewDe
 	switch (desc.Kind)
 	{
 		case ERhiResourceViewKind::RenderTarget:
-		return WriteRenderTargetDescriptor(device, desc, nativeDestination);
+			return WriteRenderTargetDescriptor(device, desc, nativeDestination);
 		case ERhiResourceViewKind::DepthStencil:
-		return WriteDepthStencilDescriptor(device, desc, nativeDestination);
+			return WriteDepthStencilDescriptor(device, desc, nativeDestination);
 		case ERhiResourceViewKind::TextureShaderResource:
-		return WriteTextureSrv(device, desc, nativeDestination);
+			return WriteTextureSrv(device, desc, nativeDestination);
 		case ERhiResourceViewKind::TextureUnorderedAccess:
-		return WriteTextureUav(device, desc, nativeDestination);
+			return WriteTextureUav(device, desc, nativeDestination);
 		case ERhiResourceViewKind::BufferShaderResource:
-		return WriteBufferSrv(device, desc, nativeDestination);
+			return WriteBufferSrv(device, desc, nativeDestination);
 		case ERhiResourceViewKind::BufferUnorderedAccess:
-		return WriteBufferUav(device, desc, nativeDestination);
+			return WriteBufferUav(device, desc, nativeDestination);
 		default:
 			return false;
 	}

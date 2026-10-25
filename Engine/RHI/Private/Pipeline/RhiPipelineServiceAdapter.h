@@ -7,7 +7,7 @@
 
 #include <memory>
 
-template <typename BackendRhi, typename BackendPipeline, typename BackendRayTracingPipeline, typename BindingLayoutCompiler> class RhiPipelineServiceAdapter final : public RhiPipelineService
+template <typename BackendRhi, typename BackendPipeline, typename BackendRayTracingPipeline, auto CompileBindingLayout> class RhiPipelineServiceAdapter final : public RhiPipelineService
 {
 public:
 	explicit RhiPipelineServiceAdapter(BackendRhi& rhi) noexcept :
@@ -21,7 +21,7 @@ public:
 		{
 			Fail("Binding-layout creation received an incomplete compile description.");
 		}
-		return BindingLayoutCompiler::Compile(m_rhi, desc);
+		return CompileBindingLayout(m_rhi, desc);
 	}
 
 	std::unique_ptr<RenderPipeline> CreateGraphicsPipeline(const GraphicsPipelineDesc& desc) override

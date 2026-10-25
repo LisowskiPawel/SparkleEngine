@@ -33,7 +33,10 @@ static bool ResourceKindMatches(CookedShaderResourceKind kind, ShaderParameterSe
 	}
 }
 
-[[noreturn]] static void Fail(std::string_view message) { Diagnostics::Fatal(g_rhiShaderBindingReflectionLogger, __FILE__, __LINE__, message); }
+[[noreturn]] static void Fail(std::string_view message)
+{
+	Diagnostics::Fatal(g_rhiShaderBindingReflectionLogger, __FILE__, __LINE__, message);
+}
 
 static void CollectBindingLocations(const ResolvedShader& shader, std::string_view bindingName, ShaderParameterSemanticKind semanticKind, std::vector<RhiReflectedBindingLocation>& locations)
 {
@@ -42,8 +45,7 @@ static void CollectBindingLocations(const ResolvedShader& shader, std::string_vi
 	for (std::uint32_t index = 0; index < reflection.ResourceBindingCount; ++index)
 	{
 		const CookedShaderResourceBindingRecord& resource = resources[reflection.ResourceBindingOffset + index];
-		if (!ResourceKindMatches(resource.Kind, semanticKind)
-		    || shader.Map->ResolveString(ShaderMapStringRef{resource.NameOffsetInBytes, resource.NameSizeInBytes}) != bindingName)
+		if (!ResourceKindMatches(resource.Kind, semanticKind) || shader.Map->ResolveString(ShaderMapStringRef{resource.NameOffsetInBytes, resource.NameSizeInBytes}) != bindingName)
 		{
 			continue;
 		}

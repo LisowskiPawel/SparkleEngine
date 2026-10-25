@@ -112,14 +112,8 @@ static void ReflectLibraryBindings(ID3D12FunctionReflection& function, UINT coun
 	}
 }
 
-ShaderReflection ExtractDxilLibraryReflection(IDxcUtils& utils, IDxcResult* result, std::string_view entryPoint)
+static Microsoft::WRL::ComPtr<ID3D12LibraryReflection> OpenLibraryReflection(IDxcUtils& utils, IDxcResult* result, Microsoft::WRL::ComPtr<IDxcBlob>& reflectionBlob)
 {
-	if (result == nullptr || entryPoint.empty())
-	{
-		throw Diagnostics::Error("DXIL library reflection requires a compile result and export name.");
-	}
-
-	Microsoft::WRL::ComPtr<IDxcBlob> reflectionBlob;
 	if (FAILED(result->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(reflectionBlob.ReleaseAndGetAddressOf()), nullptr)) || !reflectionBlob || reflectionBlob->GetBufferSize() == 0)
 	{
 		throw Diagnostics::Error("DXIL library reflection: DXC produced no reflection part.");
@@ -130,18 +124,22 @@ ShaderReflection ExtractDxilLibraryReflection(IDxcUtils& utils, IDxcResult* resu
 	{
 		throw Diagnostics::Error("DXIL library reflection: CreateReflection failed.");
 	}
+	return library;
+}
+
+static ID3D12FunctionReflection* FindLibraryExport(ID3D12LibraryReflection& library, std::string_view entryPoint, D3D12_FUNCTION_DESC& functionDesc)
+{
 	D3D12_LIBRARY_DESC libraryDesc{};
-	if (FAILED(library->GetDesc(&libraryDesc)))
+	if (FAILED(library.GetDesc(&libraryDesc)))
 	{
 		throw Diagnostics::Error("DXIL library reflection: GetDesc failed.");
 	}
 
 	ID3D12FunctionReflection* function = nullptr;
-	D3D12_FUNCTION_DESC functionDesc{};
 	std::string reflectedFunctionNames;
 	for (UINT functionIndex = 0; functionIndex < libraryDesc.FunctionCount; ++functionIndex)
 	{
-		ID3D12FunctionReflection* candidate = library->GetFunctionByIndex(functionIndex);
+		ID3D12FunctionReflection* candidate = library.GetFunctionByIndex(functionIndex);
 		D3D12_FUNCTION_DESC candidateDesc{};
 		if (candidate == nullptr || FAILED(candidate->GetDesc(&candidateDesc)) || candidateDesc.Name == nullptr)
 		{
@@ -164,6 +162,20 @@ ShaderReflection ExtractDxilLibraryReflection(IDxcUtils& utils, IDxcResult* resu
 		throw Diagnostics::Error(
 		    std::format("DXIL library reflection did not contain requested export '{}'; reflected functions: {}.", entryPoint, reflectedFunctionNames.empty() ? "<none>" : reflectedFunctionNames));
 	}
+	return function;
+}
+
+ShaderReflection ExtractDxilLibraryReflection(IDxcUtils& utils, IDxcResult* result, std::string_view entryPoint)
+{
+	if (result == nullptr || entryPoint.empty())
+	{
+		throw Diagnostics::Error("DXIL library reflection requires a compile result and export name.");
+	}
+
+	Microsoft::WRL::ComPtr<IDxcBlob> reflectionBlob;
+	auto library = OpenLibraryReflection(utils, result, reflectionBlob);
+	D3D12_FUNCTION_DESC functionDesc{};
+	ID3D12FunctionReflection* function = FindLibraryExport(*library.Get(), entryPoint, functionDesc);
 
 	ShaderReflection reflection;
 	ReflectLibraryConstantBuffers(*function, functionDesc.ConstantBuffers, reflection);

@@ -166,7 +166,7 @@ public:
 	template <typename TShader> TypedPassParameterInstance<typename TShader::Parameters>& AllocParameters()
 	{
 		const ShaderRegistrationDesc& shader = GlobalShader<TShader>::GetRegistration();
-		const ShaderStageVisibility visibility = ShaderParameterLayoutBuilder::GetDefaultVisibility(shader.Stage);
+		const ShaderStageVisibility visibility = GetDefaultShaderVisibility(shader.Stage);
 		assert(visibility != ShaderStageVisibility::None && "Graph parameters require a concrete shader stage.");
 		return m_frameGraph.AllocParameters<typename TShader::Parameters>(shader.ShaderName.data(), visibility);
 	}

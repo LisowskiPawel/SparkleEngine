@@ -5,36 +5,30 @@
 #include <algorithm>
 #include <vector>
 
-class ShaderBackendRegistrationStore final
+static std::vector<ShaderBackendRegistration>& MutableRegistrations()
 {
-public:
-	ShaderBackendRegistrationStore() = delete;
+	static std::vector<ShaderBackendRegistration> registrations;
+	return registrations;
+}
 
-	static std::vector<ShaderBackendRegistration>& MutableRegistrations()
+static const std::vector<ShaderBackendRegistration>& RegistrationSnapshot()
+{
+	static const std::vector<ShaderBackendRegistration> registrations = []
 	{
-		static std::vector<ShaderBackendRegistration> registrations;
-		return registrations;
-	}
+		std::vector<ShaderBackendRegistration> snapshot = MutableRegistrations();
+		std::ranges::sort(snapshot, [](const ShaderBackendRegistration& left, const ShaderBackendRegistration& right) { return left.Descriptor.Name < right.Descriptor.Name; });
+		return snapshot;
+	}();
 
-	static const std::vector<ShaderBackendRegistration>& RegistrationSnapshot()
-	{
-		static const std::vector<ShaderBackendRegistration> registrations = []
-		{
-			std::vector<ShaderBackendRegistration> snapshot = MutableRegistrations();
-			std::ranges::sort(snapshot, [](const ShaderBackendRegistration& left, const ShaderBackendRegistration& right) { return left.Descriptor.Name < right.Descriptor.Name; });
-			return snapshot;
-		}();
-
-		return registrations;
-	}
-};
+	return registrations;
+}
 
 void RegisterBuiltinShaderBackend(ShaderBackendRegistration registration)
 {
-	ShaderBackendRegistrationStore::MutableRegistrations().push_back(registration);
+	MutableRegistrations().push_back(registration);
 }
 
 std::span<const ShaderBackendRegistration> GetBuiltinShaderBackendRegistrations() noexcept
 {
-	return ShaderBackendRegistrationStore::RegistrationSnapshot();
+	return RegistrationSnapshot();
 }

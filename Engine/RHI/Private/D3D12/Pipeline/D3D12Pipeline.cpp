@@ -190,11 +190,7 @@ static D3D12_SHADER_BYTECODE ResolveD3D12ShaderStage(const RhiShaderStageDesc& s
 	const ResolvedShader& shader = *shaderDesc.Shader;
 	if (shader.Entry->BinaryFormat != ShaderBinaryFormat::Dxil)
 	{
-		Diagnostics::Fatal(
-		    g_pipelineLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format("Pipeline '{}' received non-DXIL code for shader stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));
+		Diagnostics::Fatal(g_pipelineLogger, __FILE__, __LINE__, std::format("Pipeline '{}' received non-DXIL code for shader stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));
 	}
 
 	const ShaderBytecode bytecode = shader.GetBytecode();
@@ -290,7 +286,11 @@ D3D12Pipeline::D3D12Pipeline(D3D12Rhi& rhi, const ComputePipelineDesc& desc) :
 	Create(desc);
 }
 
-D3D12_GRAPHICS_PIPELINE_STATE_DESC D3D12Pipeline::BuildGraphicsState(const GraphicsPipelineDesc& desc, std::span<const D3D12_INPUT_ELEMENT_DESC> vertexLayout, D3D12_SHADER_BYTECODE vertexShader, D3D12_SHADER_BYTECODE pixelShader)
+D3D12_GRAPHICS_PIPELINE_STATE_DESC D3D12Pipeline::BuildGraphicsState(
+    const GraphicsPipelineDesc& desc,
+    std::span<const D3D12_INPUT_ELEMENT_DESC> vertexLayout,
+    D3D12_SHADER_BYTECODE vertexShader,
+    D3D12_SHADER_BYTECODE pixelShader)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.InputLayout.NumElements = static_cast<UINT>(vertexLayout.size());

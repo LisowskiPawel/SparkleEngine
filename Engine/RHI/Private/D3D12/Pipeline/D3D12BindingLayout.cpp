@@ -32,8 +32,6 @@ static D3D12_SHADER_VISIBILITY ToD3D12Visibility(ShaderStageMask visibilityMask)
 	return D3D12_SHADER_VISIBILITY_ALL;
 }
 
-
-
 static void CompileUniformBinding(
     D3D12RootSignatureBuilder& builder,
     std::vector<CompiledBinding>& bindings,
@@ -56,8 +54,7 @@ static void CompileUniformBinding(
 		{
 			assert((bindingRecord.ValueSizeInBytes % sizeof(std::uint32_t)) == 0);
 
-			const std::uint32_t bindingIndex = builder
-			                                       .AddRootConstants(bindingRecord.ValueSizeInBytes / static_cast<std::uint32_t>(sizeof(std::uint32_t)), shaderRegister, registerSpace, visibility);
+			const std::uint32_t bindingIndex = builder.AddRootConstants(bindingRecord.ValueSizeInBytes / static_cast<std::uint32_t>(sizeof(std::uint32_t)), shaderRegister, registerSpace, visibility);
 
 			bindings.push_back(
 			    CompiledBinding{

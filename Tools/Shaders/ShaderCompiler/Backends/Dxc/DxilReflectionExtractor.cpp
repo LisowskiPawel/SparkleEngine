@@ -137,7 +137,7 @@ static std::uint8_t PopMaskBits(std::uint8_t mask)
 	return count;
 }
 
-static Microsoft::WRL::ComPtr<ID3D12ShaderReflection> OpenShaderReflection(IDxcUtils& utils, IDxcResult* result)
+static Microsoft::WRL::ComPtr<ID3D12ShaderReflection> OpenShaderReflection(IDxcUtils& utils, IDxcResult* result, Microsoft::WRL::ComPtr<IDxcBlob>& reflectionBlob)
 {
 	if (result == nullptr)
 	{
@@ -146,7 +146,6 @@ static Microsoft::WRL::ComPtr<ID3D12ShaderReflection> OpenShaderReflection(IDxcU
 
 	// DXC exposes reflection as a separate output blob.
 	// Query DXC_OUT_REFLECTION directly instead of walking the container.
-	Microsoft::WRL::ComPtr<IDxcBlob> reflectionBlob;
 	HRESULT hr = result->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(reflectionBlob.ReleaseAndGetAddressOf()), nullptr);
 	if (FAILED(hr) || !reflectionBlob || reflectionBlob->GetBufferSize() == 0)
 	{
@@ -305,10 +304,11 @@ static void ReflectVertexInputs(ID3D12ShaderReflection& shader, UINT count, Shad
 ShaderReflection ExtractDxilReflection(IDxcUtils& utils, IDxcResult* result, std::span<const std::uint8_t> bytecode, ShaderStage stage)
 {
 	ShaderReflection reflection;
-	
+
 	(void) bytecode;
 
-	auto shaderReflection = OpenShaderReflection(utils, result);
+	Microsoft::WRL::ComPtr<IDxcBlob> reflectionBlob;
+	auto shaderReflection = OpenShaderReflection(utils, result, reflectionBlob);
 
 	D3D12_SHADER_DESC desc{};
 	if (FAILED(shaderReflection->GetDesc(&desc)))
@@ -316,13 +316,13 @@ ShaderReflection ExtractDxilReflection(IDxcUtils& utils, IDxcResult* result, std
 		throw Diagnostics::Error("DXIL reflection: GetDesc failed");
 	}
 
-	ReflectConstantBuffers(*shaderReflection, desc.ConstantBuffers, reflection);
+	ReflectConstantBuffers(*shaderReflection.Get(), desc.ConstantBuffers, reflection);
 
-	ReflectResourceBindings(*shaderReflection, desc.BoundResources, reflection);
+	ReflectResourceBindings(*shaderReflection.Get(), desc.BoundResources, reflection);
 
 	if (stage == ShaderStage::Vertex)
 	{
-		ReflectVertexInputs(*shaderReflection, desc.InputParameters, reflection);
+		ReflectVertexInputs(*shaderReflection.Get(), desc.InputParameters, reflection);
 	}
 
 	// Compute thread-group size.
