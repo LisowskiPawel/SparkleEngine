@@ -104,6 +104,11 @@ void GameApplication::Initialize()
 	InitializeInput();
 	InitializeGameWorld();
 	InitializeRenderer();
+	if (!m_renderer)
+	{
+		return;
+	}
+
 	InitializeGameUi();
 	m_isInitialized = true;
 }
@@ -167,7 +172,7 @@ void GameApplication::InitializeRenderer()
 
 	try
 	{
-		m_renderer = std::make_unique<Renderer>(*m_timer, *m_window, graphicsLaunch, rendererConfig);
+		m_renderer = Renderer::Create(*m_timer, *m_window, graphicsLaunch, rendererConfig);
 	}
 	catch (...)
 	{

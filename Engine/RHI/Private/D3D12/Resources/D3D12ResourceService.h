@@ -61,6 +61,7 @@ public:
 
 private:
 	friend class D3D12RenderHardwareInterface;
+	friend class D3D12BackBufferPresentation;
 	void DrainCompletedResourceReleases() noexcept;
 	void FlushDeferredResourceReleases() noexcept;
 	D3D12RecordingResourceUseToken BeginResourceTracking(RhiResourceHandle resource, bool coordinatorRecording) noexcept;

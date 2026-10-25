@@ -2,28 +2,11 @@
 
 #include "View/RenderViewBuilder.h"
 
-#include "Config/DepthConvention.h"
-#include "Core/Public/Math/WorldCoordinateSystem.h"
-#include "GameFramework/Public/Scene/Camera/CameraDesc.h"
 #include "Renderer/Public/Viewport/ViewportContracts.h"
-#include "RHI/Public/Resources/RhiResourceDesc.h"
 #include "View/RenderView.h"
 #include "View/RenderViewState.h"
 
-#include <DirectXMath.h>
-
-#include <algorithm>
-#include <cstdint>
-
-static RhiViewport BuildViewport(RenderViewportExtent extent) noexcept
-{
-	return RhiViewport{.X = 0.0f, .Y = 0.0f, .Width = static_cast<float>(extent.Width), .Height = static_cast<float>(extent.Height), .MinDepth = 0.0f, .MaxDepth = 1.0f};
-}
-
-static RhiRect BuildScissorRect(RenderViewportExtent extent) noexcept
-{
-	return RhiRect{.Left = 0, .Top = 0, .Right = static_cast<std::int32_t>(extent.Width), .Bottom = static_cast<std::int32_t>(extent.Height)};
-}
+#include "View/RenderViewProjection.h"
 
 void BuildRenderView(RenderView& output, RenderViewState& state, const RenderViewBuildRequest& request) noexcept
 {
@@ -37,50 +20,8 @@ void BuildRenderView(RenderView& output, RenderViewState& state, const RenderVie
 	output.displaySettings = ResolvedViewportDisplaySettings::Resolve(request.ViewportRequest.Exposure);
 	output.camera = request.Input.Camera;
 
-	const RenderViewportExtent projectionExtent = request.ViewportRequest.Extent.IsValid() ? request.ViewportRequest.Extent : request.OutputExtent;
-	const float projectionWidth = static_cast<float>((std::max) (projectionExtent.Width, 1u));
-	const float projectionHeight = static_cast<float>((std::max) (projectionExtent.Height, 1u));
-	output.camera.AspectRatio = projectionWidth / projectionHeight;
-
-	const DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&output.camera.Position);
-	const DirectX::XMVECTOR direction = DirectX::XMLoadFloat3(&output.camera.Direction);
-	const DirectX::XMVECTOR target = DirectX::XMVectorAdd(position, direction);
-	const DirectX::XMVECTOR worldUp = DirectX::XMVectorSet(WorldCoordinates::kUpX, WorldCoordinates::kUpY, WorldCoordinates::kUpZ, 0.0f);
-	const DirectX::XMMATRIX worldToView = DirectX::XMMatrixLookAtLH(position, target, worldUp);
-
-	const float nearZ = output.camera.NearZ;
-	const float farZ = output.camera.FarZ;
-	DirectX::XMMATRIX viewToClip;
-	if (output.camera.ProjectionKind == CameraProjectionKind::Orthographic)
-	{
-		const float height = (std::max) (output.camera.OrthographicHeightMeters, 0.001f);
-		const float width = height * (std::max) (output.camera.AspectRatio, 0.001f);
-		viewToClip = DepthConvention::CreateOrthographicOffCenterLH(-width * 0.5f, width * 0.5f, -height * 0.5f, height * 0.5f, nearZ, farZ);
-	}
-	else
-	{
-		viewToClip = DepthConvention::CreatePerspectiveFovLH(DirectX::XMConvertToRadians(output.camera.FovYDegrees), output.camera.AspectRatio, nearZ, farZ);
-	}
-
-	const DirectX::XMMATRIX worldToClip = DirectX::XMMatrixMultiply(worldToView, viewToClip);
-	DirectX::XMStoreFloat4x4(&output.cameraUniform.ViewMTX, worldToView);
-	DirectX::XMStoreFloat4x4(&output.cameraUniform.ProjectionMTX, viewToClip);
-	DirectX::XMStoreFloat4x4(&output.cameraUniform.ViewProjMTX, worldToClip);
-	DirectX::XMStoreFloat4x4(&output.cameraUniform.InvViewMTX, DirectX::XMMatrixInverse(nullptr, worldToView));
-	DirectX::XMStoreFloat4x4(&output.cameraUniform.InvProjectionMTX, DirectX::XMMatrixInverse(nullptr, viewToClip));
-	output.cameraUniform.Position = output.camera.Position;
-	output.cameraUniform.NearZ = nearZ;
-	output.cameraUniform.FarZ = farZ;
-	output.cameraUniform.Direction = output.camera.Direction;
-	output.frustum.ExtractFromViewProjection(output.cameraUniform.ViewProjMTX);
-
-	output.viewport = BuildViewport(request.RenderExtent);
-	output.scissorRect = BuildScissorRect(request.RenderExtent);
-	const float renderWidth = static_cast<float>((std::max) (request.RenderExtent.Width, 1u));
-	const float renderHeight = static_cast<float>((std::max) (request.RenderExtent.Height, 1u));
-	output.uniform.ViewportSize = {renderWidth, renderHeight};
-	output.uniform.ViewportSizeInv = {1.0f / renderWidth, 1.0f / renderHeight};
-	output.uniform.RenderViewModeIndex = static_cast<std::uint32_t>(output.viewMode);
+	BuildRenderViewCamera(output, request.ViewportRequest.Extent.IsValid() ? request.ViewportRequest.Extent : request.OutputExtent);
+	BuildRenderViewRasterState(output, request.RenderExtent);
 
 	output.temporalUniform = state.BuildTemporal(
 	    RenderViewStateBuildInput{

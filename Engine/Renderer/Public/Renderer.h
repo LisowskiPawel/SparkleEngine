@@ -27,7 +27,8 @@ struct RenderFrameSubmission;
 class SPARKLE_RENDERER_API Renderer final
 {
 public:
-	Renderer(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config = {});
+	// Returns no renderer when the host closes during graphics preparation.
+	static std::unique_ptr<Renderer> Create(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config = {});
 	~Renderer() noexcept;
 
 	Renderer(const Renderer&) = delete;
@@ -60,5 +61,7 @@ public:
 	ExternalCaptureAdmission RequestExternalCapture(std::uint64_t viewportGeneration) noexcept;
 
 private:
+	explicit Renderer(std::unique_ptr<RendererFacadeState> state) noexcept;
+
 	std::unique_ptr<RendererFacadeState> m_state;
 };

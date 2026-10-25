@@ -12,6 +12,8 @@ class D3D12DescriptorHeapManager;
 class D3D12DescriptorService;
 class D3D12UploadService;
 class D3D12CaptureService;
+class D3D12BackBufferPresentation;
+template <typename Implementation> class RhiPresentationServiceAdapter;
 class D3D12CommandRecordingContext;
 class D3D12ImGuiBackend;
 class D3D12InteropService;
@@ -68,20 +70,11 @@ public:
 	RhiRayTracingCapabilities GetRayTracingCapabilities() const noexcept;
 	RhiImGuiRenderer& GetImGuiRenderer() noexcept;
 	ID3D12DescriptorHeap* GetD3D12ShaderResourceDescriptorHeap() const noexcept;
-	RhiViewport GetBackBufferViewport() const noexcept;
-	RhiRect GetBackBufferScissorRect() const noexcept;
-	RhiCpuDescriptorHandle GetBackBufferRenderTargetView() const noexcept;
-	RhiResourceHandle GetBackBufferResource() const noexcept;
 	RhiRayTracingAccelerationStructurePrebuildInfo GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept;
 	RhiRayTracingAccelerationStructurePrebuildInfo GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags = ERhiTlasBuildFlags::None) const noexcept;
 	RhiOwnedResourceHandle CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName);
 	RhiOwnedResourceHandle CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName);
 	RhiOwnedResourceHandle CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName);
-	void BeginPresentRenderPass(RhiClearColorView clearColor) noexcept;
-	void BeginPresentOverlayPass() noexcept;
-	void EndPresentRenderPass() noexcept;
-	PixelFormat GetPresentColorFormat() const noexcept;
-	PixelFormat GetPresentDepthStencilFormat() const noexcept;
 	void SetSamplerTableHandle(RhiDescriptorTableHandle samplerTableHandle) noexcept;
 
 private:
@@ -100,7 +93,7 @@ private:
 
 	std::unique_ptr<D3D12InteropService> m_interopService;
 	std::unique_ptr<D3D12CaptureService> m_captureService;
-	std::unique_ptr<RhiPresentationService> m_presentationService;
+	std::unique_ptr<RhiPresentationServiceAdapter<D3D12BackBufferPresentation>> m_presentationService;
 	std::unique_ptr<RhiPipelineService> m_pipelineService;
 	std::unique_ptr<D3D12ResourceService> m_resourceService;
 	std::unique_ptr<D3D12RayTracingServices> m_rayTracingServices;

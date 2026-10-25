@@ -8,6 +8,7 @@
 #include "Window/Window.h"
 
 #include <imgui.h>
+#include <algorithm>
 #include <utility>
 
 MainMenuBarPanel::MainMenuBarPanel(LevelSession* levelSession, Window* window) noexcept
@@ -308,6 +309,10 @@ void MainMenuBarPanel::BuildUI() noexcept
 	BuildWindowControls();
 
 	ImGui::EndMainMenuBar();
+}
+
+void MainMenuBarPanel::BuildOverlays() noexcept
+{
 	BuildHelpWindow();
 	BuildLevelStatus();
 }
@@ -333,10 +338,24 @@ void MainMenuBarPanel::BuildHelpWindow() noexcept
 
 void MainMenuBarPanel::BuildLevelStatus() noexcept
 {
-	if (m_levelSession && (m_levelSession->IsLevelChangeInProgress() || !m_levelSession->GetLastLoadDiagnostic().empty()))
+	const bool failed = m_levelSession && !m_levelSession->GetLastLoadDiagnostic().empty();
+	const bool focusFailure = failed && !m_levelFailureVisible;
+	m_levelFailureVisible = failed;
+	if (m_levelSession && (m_levelSession->IsLevelChangeInProgress() || failed))
 	{
-		if (ImGui::Begin("Level operation"))
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+		const ImVec2 center(viewport->WorkPos.x + viewport->WorkSize.x * 0.5f, viewport->WorkPos.y + viewport->WorkSize.y * 0.5f);
+		ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+		ImGui::SetNextWindowSize(ImVec2((std::min) (560.0f * ImGui::GetStyle().FontScaleDpi, viewport->WorkSize.x), 0.0f), ImGuiCond_Always);
+		ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), viewport->WorkSize);
+		if (focusFailure)
 		{
+			ImGui::SetNextWindowFocus();
+		}
+
+		if (ImGui::Begin("Level operation", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse))
+		{
+			ImGui::PushTextWrapPos(0.0f);
 			if (m_levelSession->IsLevelChangeInProgress())
 			{
 				ImGui::TextUnformatted("Loading selected level. The previous level remains active until loading succeeds.");
@@ -347,6 +366,7 @@ void MainMenuBarPanel::BuildLevelStatus() noexcept
 			{
 				m_window->RequestClose();
 			}
+			ImGui::PopTextWrapPos();
 		}
 		ImGui::End();
 	}

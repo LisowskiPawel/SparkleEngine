@@ -10,7 +10,7 @@ Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for
 
 [First Release Acceptance](../../../Acceptance/FirstRelease.md#release-gates) owns release verdicts. Feature-local Architecture checks and [candidate reports](../../../Acceptance/FeatureCompletionReports.md) own feature proof.
 
-For product work, follow the [PD-1 through PD-4 exit checklist](ProductImplementationPlan.md#how-to-close-this-plan) and [recorded progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). Its closure qualifies the admitted internal product scope, not all release gates. [First Release](../../../Acceptance/FirstRelease.md#product-plan-and-public-release) retains the independent/machine requirements and FR-07 signing/public-rights boundary.
+For product work, follow the [PD-1 through PD-4 exit checklist](ProductImplementationPlan.md#how-to-close-this-plan) and [recorded progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). Its closure qualifies the admitted internal product scope, not all release gates. [First Release](../../../Acceptance/FirstRelease.md#product-plan-and-public-release) retains clean-environment/minimum-machine requirements and the FR-07 signing/public-rights boundary.
 
 Choose the section for your current task: [release phases](#release-tasks), [Game/Editor/Launcher/package](ProductImplementationPlan.md#first-release-product-implementation-plan), [paths/tasks/world/cook/shaders](FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan), or [feature owners](#complete-feature-routing).
 

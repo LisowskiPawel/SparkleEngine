@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Shaders/RegisteredShaderListModel.h"
+#include "Shaders/ShaderArtifactInspection.h"
 
 #include <array>
-#include <filesystem>
 #include <functional>
 #include <string>
 
@@ -25,23 +25,12 @@ public:
 	void BuildUI(bool disableInteraction);
 
 private:
-	struct ArtifactTexts final
-	{
-		std::string Source;
-		std::string Reflection;
-		std::string Disassembly;
-		std::string ParameterMatch;
-		std::string CompileRequest;
-	};
-
-	static std::string ReadTextFileOrMessage(const std::filesystem::path& path);
 	static void DrawTextArtifact(const char* childId, const std::string& text) noexcept;
 
 	void EnsureRows();
 	void DrawToolbar(bool disableInteraction);
 	void DrawTable(bool disableInteraction);
 	void DrawSelectedShaderArtifacts();
-	void RefreshSelectedShaderArtifacts();
 	const RegisteredShaderRow* GetSelectedRow() const noexcept;
 	bool MatchesFilter(const RegisteredShaderRow& row) const noexcept;
 
@@ -49,11 +38,9 @@ private:
 	CommandHandler m_reloadHandler;
 	CommandHandler m_recookAllHandler;
 	RecookHandler m_recookHandler;
-	ArtifactTexts m_artifactTexts;
-	std::filesystem::path m_selectedArtifactDirectory;
+	ShaderArtifactInspection m_artifactInspection;
 	std::array<char, 160> m_filterBuffer{};
 	std::string m_selectedShaderId;
-	std::string m_loadedArtifactShaderId;
 	bool m_hasRows = false;
 	bool m_isOpen = false;
 };

@@ -8,27 +8,17 @@
 #include "Panels/Diagnostics/PanelDiagnosticsFormatting.h"
 #include "Panels/Diagnostics/MeshDiagnosticMetadataCatalog.h"
 
-#include <algorithm>
-#include <array>
-#include <cmath>
 #include <filesystem>
 #include <format>
 #include <fstream>
-#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <utility>
 
-#include <imgui.h>
-
 namespace MeshDiagnosticsPresentation
 {
-
-	const std::array<const char*, 3> PreviewModes = {"Wireframe", "Solid", "Wire + Solid"};
-	const std::size_t MaxPreviewTriangles = 20000;
-	const float Pi = 3.1415926535f;
 
 	std::string FormatRuntimeId(std::uintptr_t id)
 	{
@@ -129,42 +119,4 @@ namespace MeshDiagnosticsPresentation
 		return totalBytes;
 	}
 
-	PreviewBounds ComputePreviewBounds(const MeshPreviewGeometry& geometry) noexcept
-	{
-		PreviewBounds bounds;
-		if (geometry.Vertices.empty())
-		{
-			return bounds;
-		}
-
-		bounds.Min.X = bounds.Min.Y = bounds.Min.Z = (std::numeric_limits<float>::max)();
-		bounds.Max.X = bounds.Max.Y = bounds.Max.Z = (std::numeric_limits<float>::lowest)();
-		for (const MeshPreviewVertex& vertex : geometry.Vertices)
-		{
-			bounds.Min.X = (std::min) (bounds.Min.X, vertex.X);
-			bounds.Min.Y = (std::min) (bounds.Min.Y, vertex.Y);
-			bounds.Min.Z = (std::min) (bounds.Min.Z, vertex.Z);
-			bounds.Max.X = (std::max) (bounds.Max.X, vertex.X);
-			bounds.Max.Y = (std::max) (bounds.Max.Y, vertex.Y);
-			bounds.Max.Z = (std::max) (bounds.Max.Z, vertex.Z);
-		}
-		bounds.IsValid = true;
-		return bounds;
-	}
-
-	MeshPreviewVertex RotatePreviewVertex(const MeshPreviewVertex& vertex, const MeshPreviewVertex& center, float yaw, float pitch) noexcept
-	{
-		const float x = vertex.X - center.X;
-		const float y = vertex.Y - center.Y;
-		const float z = vertex.Z - center.Z;
-
-		const float cosYaw = std::cos(yaw);
-		const float sinYaw = std::sin(yaw);
-		const float yawX = (x * cosYaw) + (z * sinYaw);
-		const float yawZ = (-x * sinYaw) + (z * cosYaw);
-
-		const float cosPitch = std::cos(pitch);
-		const float sinPitch = std::sin(pitch);
-		return MeshPreviewVertex{yawX, (y * cosPitch) - (yawZ * sinPitch), (y * sinPitch) + (yawZ * cosPitch)};
-	}
 }

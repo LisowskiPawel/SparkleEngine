@@ -6,13 +6,13 @@
 
 **Deliverable:** one unsigned internal Launcher/Editor/Game archive, selected content and self-service recovery. Public rights, publisher certificates, signing and publication remain [FR-07](ImplementationPlan.md#fr-07--publish-and-verify).
 
-**Next:** PD-1 **Frames**: finish Launcher -> Game/Editor coverage for Empty and seven maps. Lighting quality, including Modern Sponza noise/clipping, remains in the renderer/release gates under the [approved product boundary](../../../Acceptance/FirstRelease.md#product-plan-and-public-release). Crashes, wrong/missing content, blank frames and retained startup/close failures still block this plan. Use [matched crash tooling](../PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures) for native failures.
+**Next:** finish PD-1's loading-close and remaining interaction/editing checks. Startup-close is repaired; eight recorded cells pass. Qualify the final Editor error-overlay repair and affected concurrent Renderer/RHI changes before freezing the next archive. [Recorded checks](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) keep their original identities. Lighting quality remains in renderer/release gates under the [approved boundary](../../../Acceptance/FirstRelease.md#product-plan-and-public-release).
 
 ## How To Close This Plan
 
 | Stage | Current position | What permits exit |
 | --- | --- | --- |
-| [PD-1](#pd-1--game-and-editor-product-shells) | Read-only asset inspector repaired; map presentation, lifecycle and remaining journeys stay open. | Its four source-workspace checks below pass. |
+| [PD-1](#pd-1--game-and-editor-product-shells) | Recorded frame, startup-close, camera-save and settings/content-failure checks pass; final-source and remaining journeys stay open. | Its four source-workspace checks below pass. |
 | [PD-2](#pd-2--source-build-cook-and-launcher) | Documented source reproduction and operations pass for their recorded inputs. | Reuse those checks; revalidate affected owners when the final source changes. |
 | [PD-3](#pd-3--package-and-installation) | Current assembly/integrity checks pass for `0db84502…`; installed Empty/Cornell and explicit-default failure checks pass locally. | Regenerate after PD-1 repairs; finish seven-map, budget, removal and clean/minimum-machine proof. |
 | [PD-4](#pd-4--support-incident-response-and-product-closure) | Retained-archive export, symbols and review negatives pass; final self-service/replacement proof remains open. | Self-service, replacement and all six reports pass. |
@@ -35,16 +35,16 @@ Name the failing owner, necessary change, deletion or justified zero-deletion re
 
 **Prerequisite:** matching source, product, cooked content and shader/symbol receipts. No archive is needed for these source-workspace checks.
 
-- [ ] **Frames:** Launcher activates Empty and each of the seven maps in Game/Editor on D3D12/Vulkan, with the requested identity, expected scene/camera and geometry/material bindings, and a presented frame. Crashes, wrong/missing content, blank frames and false Empty activation fail; lighting quality is qualified in the renderer/release gates. (`AC-PROD01-02`, `AC-PROD04-01`.)
-- [ ] **Lifecycle:** startup meets the frozen budget; idle, startup-close and quit-during-load settle within **5 s Game / 10 s Editor**, with native child exits and no orphan/partial writes. Retained failures must be repaired. (`AC-PROD01-01/05`, `AC-PROD04-01`.)
-- [ ] **Interaction/failure:** help, input/focus, resize, 100/150/200% DPI, Editor settings Save/Reset and Game consumption work; corrupt/denied settings preserve accepted state. Unsupported providers and missing/corrupt content fail visibly; explicit recovery works without false Empty activation. (`AC-PROD01-02/03`, `AC-PROD04-03`.)
-- [ ] **Editing/isolation:** edit -> undo -> redo -> Save -> reload preserves the expected result; stale/rejected edits, failed saves and cancelled recook/capture preserve accepted state. Preserve supported transform/visibility/variant edits and read-only asset identity. Game has no Editor/authoring dependency. (`AC-PROD01-04`, `AC-PROD04-02/03/04`.)
+- [x] **Frames:** Launcher activates Empty and each of the seven maps in Game/Editor on D3D12/Vulkan, with the requested identity, expected scene/camera and geometry/material bindings, and a presented frame. Crashes, wrong/missing content, blank frames and false Empty activation fail; lighting quality is qualified in the renderer/release gates. (`AC-PROD01-02`, `AC-PROD04-01`.)
+- [ ] **Lifecycle:** finish observed quit-during-load and final-source startup/idle checks within **5 s Game / 10 s Editor** and the frozen startup budget, with native exits and no orphan/partial writes. Eight startup-close cells pass for the recorded repair; a clean exit without an observed pending load cannot pass loading-close. (`AC-PROD01-01/05`, `AC-PROD04-01`.)
+- [ ] **Interaction/failure:** finish input/focus, 100/200% DPI, unsupported-provider and remaining content/recovery cells; qualify the final error-overlay repair. Recorded help/150% resize, settings commit/reset/denial/corruption, Game shared-setting launches and Game content failure/recovery checks pass. (`AC-PROD01-02/03`, `AC-PROD04-03`.)
+- [ ] **Editing/isolation:** finish stale/rejected edits and cancelled recook/capture; revalidate affected final-source checks. Camera edit -> undo -> redo -> Save -> reload, denied-save/retry and source Game isolation pass for their recorded inputs. Preserve supported transform/visibility/variant edits and read-only asset identity. (`AC-PROD01-04`, `AC-PROD04-02/03/04`.)
 
 **Phase exit:** all four checks pass for their recorded source configuration. Archive and clean-environment portions remain assigned below; a shell repair does not require completing an unrelated rendering research plan.
 
 ```text
 Execute only PD-1 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md. Apply the owning execution contract and its Stage Source-Style Gate.
-Apply Delivery Boundary For Every Stage. Complete the next unchecked item, starting with Frames. Record candidate-bound cells, failures, recovery and native exits; update the item/FCR and name the next item. Reuse unchanged proof.
+Apply Delivery Boundary For Every Stage. Complete the next unchecked item, starting with Lifecycle. Record candidate-bound cells, failures, recovery and native exits; update the item/FCR and name the next item. Reuse unchanged proof.
 ```
 
 ## `PD-2` — Source Build, Cook, And Launcher

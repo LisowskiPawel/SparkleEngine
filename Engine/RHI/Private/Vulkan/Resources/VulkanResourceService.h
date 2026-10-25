@@ -61,6 +61,7 @@ public:
 
 private:
 	friend class VulkanRenderHardwareInterface;
+	friend class VulkanBackBufferPresentation;
 	void DrainCompletedResourceReleases() noexcept;
 	void FlushDeferredResourceReleases() noexcept;
 

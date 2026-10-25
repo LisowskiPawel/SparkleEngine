@@ -106,7 +106,7 @@ World publishes immutable read view/change sequence -> `EditorSceneModelBuilder`
 
 ## Product Journey Changes
 
-The PD-1 working candidate adds Help > Controls, File > Quit, a visible level-operation failure surface and Reset rendering defaults in the Settings toolbar. Dedicated vignette and chromatic aberration passes retain their approved defaults; effect widgets are deferred. Failed settings writes retain the previous settings and show the error; reopening Settings preserves restart-required state. Rendering settings retain the existing shared capture/apply owner; no additional viewport settings snapshot is published. These changes still require the candidate journey checks below.
+The PD-1 route includes Help > Controls, File > Quit, level-operation status and Reset rendering defaults. Transient status is viewport-bounded and drawn after the workspace; a new failure receives focus without taking it every frame. Dedicated vignette/chromatic aberration passes retain approved defaults; effect widgets are deferred. Failed settings writes retain accepted state and show the error; reopening Settings preserves restart-required state. The existing shared settings capture/apply owner remains authoritative. [Candidate checks](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) record which journeys passed.
 
 ## `FCR-PROD-04` Editor Contract
 

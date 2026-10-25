@@ -16,6 +16,7 @@
 #include "ShaderRecook/ShaderRecookCoordinator.h"
 #include "Time/Timer.h"
 #include "World/GameWorld.h"
+#include "Window/Window.h"
 
 #include <utility>
 
@@ -52,6 +53,11 @@ void EditorApplication::Initialize()
 	}
 
 	InitializeGameApplication();
+	if (m_state->Game->GetWindow().ShouldClose())
+	{
+		return;
+	}
+
 	InitializeEditorOperations();
 	InitializeUi();
 #if SPARKLE_APPLICATION_WITH_EXTERNAL_CAPTURE_UI

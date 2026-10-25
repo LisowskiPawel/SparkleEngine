@@ -5,8 +5,9 @@
 
 #include <cstdint>
 #include <memory>
-#include <vector>
 
+class VulkanBackBufferPresentation;
+template <typename Implementation> class RhiPresentationServiceAdapter;
 class VulkanCommandRecordingContext;
 class VulkanUploadService;
 class VulkanCaptureService;
@@ -60,19 +61,11 @@ public:
 	RenderCommandList& GetCommandList(ERhiQueueType queueType, std::uint32_t frameIndex) noexcept;
 	RhiRayTracingCapabilities GetRayTracingCapabilities() const noexcept;
 	RhiImGuiRenderer& GetImGuiRenderer() noexcept;
-	RhiViewport GetBackBufferViewport() const noexcept;
-	RhiRect GetBackBufferScissorRect() const noexcept;
-	RhiCpuDescriptorHandle GetBackBufferRenderTargetView() const noexcept;
-	RhiResourceHandle GetBackBufferResource() const noexcept;
 	RhiRayTracingAccelerationStructurePrebuildInfo GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept;
 	RhiRayTracingAccelerationStructurePrebuildInfo GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags = ERhiTlasBuildFlags::None) const noexcept;
 	RhiOwnedResourceHandle CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName);
 	RhiOwnedResourceHandle CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName);
 	RhiOwnedResourceHandle CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName);
-	void BeginPresentRenderPass(RhiClearColorView clearColor) noexcept;
-	void BeginPresentOverlayPass() noexcept;
-	void EndPresentRenderPass() noexcept;
-	PixelFormat GetPresentColorFormat() const noexcept;
 	VkInstance GetVulkanInstance() const noexcept;
 	VkPhysicalDevice GetVulkanPhysicalDevice() const noexcept;
 	VkDevice GetVulkanDevice() const noexcept;
@@ -93,16 +86,13 @@ private:
 	RhiBackendDiagnosticsSupport BuildBackendDiagnosticsSupport() const noexcept;
 	RhiBackendMemorySupport BuildBackendMemorySupport() const noexcept;
 	RhiFormatSupport QueryFormatSupport(PixelFormat format) const noexcept;
-	RhiResourceViewHandle GetCurrentBackBufferViewHandle() const noexcept;
-	void BeginCurrentBackBufferRendering(const float* clearColor, bool clear) noexcept;
-	void EndCurrentBackBufferRendering() noexcept;
 	void PrepareCurrentBackBufferForPresentation(VulkanRenderCommandList& commandList) noexcept;
 	void TransitionCurrentBackBuffer(VkCommandBuffer commandBuffer, ResourceState newState) noexcept;
 	void SetCommandRecordingContext(VulkanCommandRecordingContext& commandRecordingContext) noexcept;
 
 	std::unique_ptr<VulkanInteropService> m_interopService;
 	std::unique_ptr<VulkanCaptureService> m_captureService;
-	std::unique_ptr<RhiPresentationService> m_presentationService;
+	std::unique_ptr<RhiPresentationServiceAdapter<VulkanBackBufferPresentation>> m_presentationService;
 	std::unique_ptr<RhiPipelineService> m_pipelineService;
 	std::unique_ptr<VulkanResourceService> m_resourceService;
 	std::unique_ptr<VulkanRayTracingServices> m_rayTracingServices;
@@ -117,5 +107,4 @@ private:
 	std::unique_ptr<RenderDiagnostics> m_diagnostics;
 	RhiCapabilities m_capabilities;
 	std::uint32_t m_currentFrameIndex = 0;
-	std::vector<VkImageLayout> m_swapChainBackBufferLayouts;
 };

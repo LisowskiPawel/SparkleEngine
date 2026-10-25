@@ -31,7 +31,6 @@ private:
 	void DrawMeshTable(bool disableInteraction);
 	void DrawSelectedMeshInspector(bool disableInteraction);
 	void DrawPreviewControls(bool disableInteraction);
-	void DrawPreview(const MeshDiagnosticsRow& row) const;
 	void DrawSelectedMeshDetails(const MeshDiagnosticsRow& row) const;
 	const MeshDiagnosticsRow* GetSelectedRow() const noexcept;
 	bool MatchesFilter(const MeshDiagnosticsRow& row) const;

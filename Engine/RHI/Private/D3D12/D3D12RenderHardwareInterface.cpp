@@ -24,6 +24,7 @@
 #include "D3D12/Samplers/D3D12SamplerLibrary.h"
 #include "D3D12/UI/D3D12ImGuiBackend.h"
 #include "Presentation/RhiPresentationServiceAdapter.h"
+#include "D3D12/SwapChain/D3D12BackBufferPresentation.h"
 #include "Pipeline/RhiPipelineServiceAdapter.h"
 #include "Shaders/ShaderTarget.h"
 
@@ -42,10 +43,10 @@ D3D12RenderHardwareInterface::D3D12RenderHardwareInterface(
 {
 	m_interopService = std::make_unique<D3D12InteropService>(*this);
 	m_captureService = std::make_unique<D3D12CaptureService>(rhi);
-	m_presentationService = std::make_unique<RhiPresentationServiceAdapter<D3D12RenderHardwareInterface>>(*this);
 	m_pipelineService = std::make_unique<RhiPipelineServiceAdapter<D3D12Rhi, D3D12Pipeline, D3D12RayTracingPipeline, D3D12BindingLayoutCompiler>>(rhi);
 	m_descriptorService = std::make_unique<D3D12DescriptorService>(rhi, descriptorHeapManager, m_capabilities);
 	m_resourceService = std::make_unique<D3D12ResourceService>(rhi, memoryAllocator, m_capabilities);
+	m_presentationService = std::make_unique<RhiPresentationServiceAdapter<D3D12BackBufferPresentation>>(rhi, swapChain, *m_descriptorService, *m_resourceService);
 
 	m_rayTracingServices = std::make_unique<D3D12RayTracingServices>(rhi, memoryAllocator, *m_resourceService, rhi.GetNvapiRayTracingProvider());
 
@@ -282,6 +283,7 @@ RenderCommandList& D3D12RenderHardwareInterface::GetCommandList(ERhiQueueType qu
 void D3D12RenderHardwareInterface::SetCommandRecordingContext(D3D12CommandRecordingContext& commandContext) noexcept
 {
 	m_commandRecordingContext = &commandContext;
+	m_presentationService->GetImplementation().SetCommandRecordingContext(commandContext);
 }
 
 RhiRayTracingCapabilities D3D12RenderHardwareInterface::GetRayTracingCapabilities() const noexcept
@@ -309,26 +311,6 @@ ID3D12DescriptorHeap* D3D12RenderHardwareInterface::GetD3D12ShaderResourceDescri
 	return m_descriptorService->GetShaderResourceDescriptorHeap();
 }
 
-RhiViewport D3D12RenderHardwareInterface::GetBackBufferViewport() const noexcept
-{
-	return m_swapChain->GetDefaultViewport();
-}
-
-RhiRect D3D12RenderHardwareInterface::GetBackBufferScissorRect() const noexcept
-{
-	return m_swapChain->GetDefaultScissorRect();
-}
-
-RhiCpuDescriptorHandle D3D12RenderHardwareInterface::GetBackBufferRenderTargetView() const noexcept
-{
-	return RhiCpuDescriptorHandle{m_swapChain->GetCPUHandle().ptr};
-}
-
-RhiResourceHandle D3D12RenderHardwareInterface::GetBackBufferResource() const noexcept
-{
-	return RhiResourceHandle{m_swapChain->GetCurrentResource()};
-}
-
 RhiRayTracingAccelerationStructurePrebuildInfo D3D12RenderHardwareInterface::GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept
 {
 	return m_rayTracingServices->GetBottomLevelAccelerationStructurePrebuildInfo(geometry);
@@ -352,47 +334,6 @@ RhiOwnedResourceHandle D3D12RenderHardwareInterface::CreateRayTracingAcceleratio
 RhiOwnedResourceHandle D3D12RenderHardwareInterface::CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
 	return m_rayTracingServices->CreateInstanceBuffer(instances, instanceCount, debugName);
-}
-
-void D3D12RenderHardwareInterface::BeginPresentRenderPass(RhiClearColorView clearColor) noexcept
-{
-	RhiResourceHandle presentTexture{m_swapChain->GetCurrentResource()};
-	RenderCommandList& commandList = GetGraphicsCommandList(GetCurrentFrameIndex());
-	commandList.TransitionResource(presentTexture, ResourceState::Present, ResourceState::RenderTarget);
-	m_descriptorService->BindGlobalDescriptorState(commandList);
-
-	const RhiCpuDescriptorHandle renderTargetView = GetBackBufferRenderTargetView();
-	commandList.SetRenderTarget(renderTargetView);
-
-	commandList.ClearRenderTarget(renderTargetView, clearColor);
-}
-
-void D3D12RenderHardwareInterface::BeginPresentOverlayPass() noexcept
-{
-	RhiResourceHandle presentTexture{m_swapChain->GetCurrentResource()};
-	RenderCommandList& commandList = GetGraphicsCommandList(GetCurrentFrameIndex());
-	commandList.TransitionResource(presentTexture, ResourceState::Present, ResourceState::RenderTarget);
-	m_descriptorService->BindGlobalDescriptorState(commandList);
-
-	const RhiCpuDescriptorHandle renderTargetView = GetBackBufferRenderTargetView();
-	commandList.SetRenderTarget(renderTargetView);
-}
-
-void D3D12RenderHardwareInterface::EndPresentRenderPass() noexcept
-{
-	RhiResourceHandle presentTexture{m_swapChain->GetCurrentResource()};
-	RenderCommandList& commandList = GetGraphicsCommandList(GetCurrentFrameIndex());
-	commandList.TransitionResource(presentTexture, ResourceState::RenderTarget, ResourceState::Present);
-}
-
-PixelFormat D3D12RenderHardwareInterface::GetPresentColorFormat() const noexcept
-{
-	return m_swapChain->GetBackBufferFormat();
-}
-
-PixelFormat D3D12RenderHardwareInterface::GetPresentDepthStencilFormat() const noexcept
-{
-	return PixelFormat::Unknown;
 }
 
 void D3D12RenderHardwareInterface::SetSamplerTableHandle(RhiDescriptorTableHandle samplerTableHandle) noexcept

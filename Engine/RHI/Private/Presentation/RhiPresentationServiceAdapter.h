@@ -5,32 +5,36 @@
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
 
-template <typename Owner> class RhiPresentationServiceAdapter final : public RhiPresentationService
+#include <utility>
+
+template <typename Implementation> class RhiPresentationServiceAdapter final : public RhiPresentationService
 {
 public:
-	explicit RhiPresentationServiceAdapter(Owner& owner) noexcept :
-	    m_owner(owner)
+	template <typename... Args> explicit RhiPresentationServiceAdapter(Args&&... args) noexcept :
+	    m_implementation(std::forward<Args>(args)...)
 	{
 	}
 
-	RhiViewport GetBackBufferViewport() const noexcept override { return m_owner.GetBackBufferViewport(); }
+	Implementation& GetImplementation() noexcept { return m_implementation; }
 
-	RhiRect GetBackBufferScissorRect() const noexcept override { return m_owner.GetBackBufferScissorRect(); }
+	RhiViewport GetBackBufferViewport() const noexcept override { return m_implementation.GetBackBufferViewport(); }
 
-	RhiCpuDescriptorHandle GetBackBufferRenderTargetView() const noexcept override { return m_owner.GetBackBufferRenderTargetView(); }
+	RhiRect GetBackBufferScissorRect() const noexcept override { return m_implementation.GetBackBufferScissorRect(); }
 
-	RhiResourceHandle GetBackBufferResource() const noexcept override { return m_owner.GetBackBufferResource(); }
+	RhiCpuDescriptorHandle GetBackBufferRenderTargetView() const noexcept override { return m_implementation.GetBackBufferRenderTargetView(); }
+
+	RhiResourceHandle GetBackBufferResource() const noexcept override { return m_implementation.GetBackBufferResource(); }
 
 	void BeginPresentRenderPass(RhiClearColorView clearColor) noexcept override
 	{
 		Begin();
-		m_owner.BeginPresentRenderPass(clearColor);
+		m_implementation.BeginPresentRenderPass(clearColor);
 	}
 
 	void BeginPresentOverlayPass() noexcept override
 	{
 		Begin();
-		m_owner.BeginPresentOverlayPass();
+		m_implementation.BeginPresentOverlayPass();
 	}
 
 	void EndPresentRenderPass() noexcept override
@@ -39,11 +43,11 @@ public:
 		{
 			Fail("Present rendering ended without a matching begin.");
 		}
-		m_owner.EndPresentRenderPass();
+		m_implementation.EndPresentRenderPass();
 		m_rendering = false;
 	}
 
-	PixelFormat GetPresentColorFormat() const noexcept override { return m_owner.GetPresentColorFormat(); }
+	PixelFormat GetPresentColorFormat() const noexcept override { return m_implementation.GetPresentColorFormat(); }
 
 private:
 	void Begin() noexcept
@@ -61,6 +65,6 @@ private:
 		Diagnostics::Fatal(logger, __FILE__, __LINE__, message);
 	}
 
-	Owner& m_owner;
+	Implementation m_implementation;
 	bool m_rendering = false;
 };

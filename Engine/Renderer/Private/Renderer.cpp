@@ -4,22 +4,37 @@
 #include "Concurrency/Coordinator/RenderCoordinator.h"
 #include "GameFramework/Public/Rendering/RenderFrameSubmission.h"
 #include "Integrations/RendererExternalRuntime.h"
+#include "Window/Window.h"
+
+#include <optional>
 
 class RendererFacadeState final
 {
 public:
-	RendererFacadeState(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config) :
-	    ExternalRuntime(graphicsLaunch),
-	    Coordinator(timer, window, config, ExternalRuntime.GetDeviceLaunch())
+	explicit RendererFacadeState(RendererGraphicsLaunch graphicsLaunch) :
+	    ExternalRuntime(graphicsLaunch)
 	{
 	}
 
 	RendererExternalRuntime ExternalRuntime;
-	RenderCoordinator Coordinator;
+	std::optional<RenderCoordinator> Coordinator;
 };
 
-Renderer::Renderer(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config) :
-    m_state(std::make_unique<RendererFacadeState>(timer, window, graphicsLaunch, config))
+std::unique_ptr<Renderer> Renderer::Create(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config)
+{
+	auto state = std::make_unique<RendererFacadeState>(graphicsLaunch);
+	window.PollEvents();
+	if (window.ShouldClose())
+	{
+		return {};
+	}
+
+	state->Coordinator.emplace(timer, window, config, state->ExternalRuntime.GetDeviceLaunch());
+	return std::unique_ptr<Renderer>(new Renderer(std::move(state)));
+}
+
+Renderer::Renderer(std::unique_ptr<RendererFacadeState> state) noexcept :
+    m_state(std::move(state))
 {
 }
 
@@ -27,67 +42,67 @@ Renderer::~Renderer() noexcept = default;
 
 void Renderer::SubmitViewportRenderRequest(ViewportRenderRequest request) noexcept
 {
-	m_state->Coordinator.SubmitViewportRequest(request);
+	m_state->Coordinator->SubmitViewportRequest(request);
 }
 
 ViewportPresentationSnapshot Renderer::GetViewportPresentation() const
 {
-	return m_state->Coordinator.GetViewportPresentation();
+	return m_state->Coordinator->GetViewportPresentation();
 }
 
 EngineRenderingSettingsState Renderer::CaptureRenderingSettings() const
 {
-	return m_state->Coordinator.CaptureRenderingSettings();
+	return m_state->Coordinator->CaptureRenderingSettings();
 }
 
 CVarControlResult Renderer::ExecuteConsoleVariables(CVarControlRequest request)
 {
-	return m_state->Coordinator.ExecuteConsoleVariables(std::move(request));
+	return m_state->Coordinator->ExecuteConsoleVariables(std::move(request));
 }
 
 void Renderer::ReloadShaders()
 {
-	m_state->Coordinator.ReloadShaders();
+	m_state->Coordinator->ReloadShaders();
 }
 
 std::uint64_t Renderer::GetShaderGeneration() const noexcept
 {
-	return m_state->Coordinator.GetShaderGeneration();
+	return m_state->Coordinator->GetShaderGeneration();
 }
 
 MeshDiagnosticsSnapshot Renderer::CaptureMeshDiagnostics() const
 {
-	return m_state->Coordinator.CaptureMeshDiagnostics();
+	return m_state->Coordinator->CaptureMeshDiagnostics();
 }
 
 TextureDiagnosticsSnapshot Renderer::CaptureTextureDiagnostics() const
 {
-	return m_state->Coordinator.CaptureTextureDiagnostics();
+	return m_state->Coordinator->CaptureTextureDiagnostics();
 }
 
 RendererMemoryDiagnosticsSnapshot Renderer::CaptureMemoryDiagnostics() const
 {
-	return m_state->Coordinator.CaptureMemoryDiagnostics();
+	return m_state->Coordinator->CaptureMemoryDiagnostics();
 }
 
 MeshPreviewGeometry Renderer::CaptureMeshPreview(std::uintptr_t meshRuntimeId) const
 {
-	return m_state->Coordinator.CaptureMeshPreview(meshRuntimeId);
+	return m_state->Coordinator->CaptureMeshPreview(meshRuntimeId);
 }
 
 void Renderer::SubmitRenderFrame(RenderFrameSubmission submission) noexcept
 {
-	m_state->Coordinator.StageFrameSubmission(std::move(submission));
+	m_state->Coordinator->StageFrameSubmission(std::move(submission));
 }
 
 void Renderer::SubmitUiRenderPacket(UiRenderPacket packet) noexcept
 {
-	m_state->Coordinator.StageUiRenderPacket(std::move(packet));
+	m_state->Coordinator->StageUiRenderPacket(std::move(packet));
 }
 
 void Renderer::SubmitRenderingSettings(EngineRenderingSettingsState settings) noexcept
 {
-	m_state->Coordinator.SubmitRenderingSettings(settings);
+	m_state->Coordinator->SubmitRenderingSettings(settings);
 }
 
 void Renderer::BeginSimulationFrame(std::uint64_t frameId) noexcept
@@ -102,17 +117,17 @@ void Renderer::EndSimulationFrame(std::uint64_t frameId) noexcept
 
 ViewportCaptureAdmission Renderer::RequestViewportCapture(ViewportCaptureRequest request) noexcept
 {
-	return m_state->Coordinator.RequestViewportCapture(std::move(request));
+	return m_state->Coordinator->RequestViewportCapture(std::move(request));
 }
 
 bool Renderer::TryTakeViewportCapture(ViewportCaptureId id, ViewportCaptureReadback& readback) noexcept
 {
-	return m_state->Coordinator.TryTakeViewportCapture(id, readback);
+	return m_state->Coordinator->TryTakeViewportCapture(id, readback);
 }
 
 void Renderer::OnRender() noexcept
 {
-	m_state->Coordinator.RenderFrame();
+	m_state->Coordinator->RenderFrame();
 }
 
 ExternalCaptureSnapshot Renderer::ObserveExternalCapture() const
@@ -127,5 +142,5 @@ ExternalCaptureSnapshot Renderer::ObserveExternalCapture() const
 
 ExternalCaptureAdmission Renderer::RequestExternalCapture(std::uint64_t viewportGeneration) noexcept
 {
-	return m_state->Coordinator.RequestExternalCapture(viewportGeneration);
+	return m_state->Coordinator->RequestExternalCapture(viewportGeneration);
 }

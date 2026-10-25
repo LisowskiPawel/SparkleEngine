@@ -28,6 +28,7 @@ public:
 	void SetConsoleOpenHandler(std::function<void()> handler);
 	void SetViewportCaptureHandler(std::function<void()> handler);
 	void BuildUI() noexcept;
+	void BuildOverlays() noexcept;
 
 	float GetHeight() const noexcept { return m_heightPixels; }
 
@@ -52,5 +53,6 @@ private:
 	std::function<void()> m_consoleOpenHandler;
 	std::function<void()> m_viewportCaptureHandler;
 	bool m_helpOpen = false;
+	bool m_levelFailureVisible = false;
 	float m_heightPixels = 0.0f;
 };

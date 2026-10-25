@@ -36,8 +36,8 @@ void D3D12ImGuiBackend::Initialize()
 	initInfo.Device = ToD3D12Device(m_renderHardwareInterface.GetDeviceHandle());
 	initInfo.CommandQueue = ToD3D12CommandQueue(m_renderHardwareInterface.GetGraphicsQueueHandle());
 	initInfo.NumFramesInFlight = static_cast<int>(m_renderHardwareInterface.GetCapabilities().Presentation.MaximumFramesInFlight);
-	initInfo.RTVFormat = D3D12TypeConversions::ToDxgiFormat(m_renderHardwareInterface.GetPresentColorFormat());
-	initInfo.DSVFormat = D3D12TypeConversions::ToDxgiFormat(m_renderHardwareInterface.GetPresentDepthStencilFormat());
+	initInfo.RTVFormat = D3D12TypeConversions::ToDxgiFormat(m_renderHardwareInterface.GetPresentationService().GetPresentColorFormat());
+	initInfo.DSVFormat = D3D12TypeConversions::ToDxgiFormat(PixelFormat::Unknown);
 	initInfo.SrvDescriptorHeap = m_renderHardwareInterface.GetD3D12ShaderResourceDescriptorHeap();
 	initInfo.SrvDescriptorAllocFn = &D3D12ImGuiBackend::AllocateDescriptor;
 	initInfo.SrvDescriptorFreeFn = &D3D12ImGuiBackend::ReleaseDescriptor;

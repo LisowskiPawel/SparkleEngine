@@ -54,6 +54,11 @@ void UI::Implementation::Build()
 	ImGui::ShowDemoWindow(&showDemoWindow);
 #endif
 
+	if (m_mainMenuBar)
+	{
+		m_mainMenuBar->BuildOverlays();
+	}
+
 	ImGui::Render();
 }
 

@@ -3,12 +3,12 @@
 #include "Panels/UsedMeshesPanel.h"
 
 #include "Panels/Diagnostics/MeshDiagnosticsPresentation.h"
+#include "Panels/Diagnostics/MeshPreview.h"
 #include "Panels/Diagnostics/PanelDiagnosticsFormatting.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Util/UiUtil.h"
 
 #include <algorithm>
-#include <array>
 #include <string>
 #include <utility>
 
@@ -199,7 +199,7 @@ void UsedMeshesPanel::DrawSelectedMeshInspector(bool disableInteraction)
 	PanelDiagnosticsFormatting::DrawWrappedDisabledText(sourcePath);
 	ImGui::Separator();
 	DrawPreviewControls(disableInteraction);
-	DrawPreview(*selectedRow);
+	MeshPreview::Draw(m_previewGeometry, selectedRow->GpuResident, m_previewYaw, m_previewPitch, m_previewModeIndex);
 	ImGui::SeparatorText("Runtime Properties");
 	ImGui::BeginChild("##MeshDetailsPane", ImVec2(0.0f, 0.0f), ImGuiChildFlags_None);
 	DrawSelectedMeshDetails(*selectedRow);
@@ -210,10 +210,10 @@ void UsedMeshesPanel::DrawPreviewControls(bool disableInteraction)
 {
 	ImGui::BeginDisabled(disableInteraction);
 	ImGui::SetNextItemWidth(150.0f);
-	ImGui::Combo("Mode", &m_previewModeIndex, MeshDiagnosticsPresentation::PreviewModes.data(), static_cast<int>(MeshDiagnosticsPresentation::PreviewModes.size()));
+	ImGui::Combo("Mode", &m_previewModeIndex, MeshPreview::Modes.data(), static_cast<int>(MeshPreview::Modes.size()));
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(120.0f);
-	ImGui::SliderFloat("Yaw", &m_previewYaw, -MeshDiagnosticsPresentation::Pi, MeshDiagnosticsPresentation::Pi, "%.2f");
+	ImGui::SliderFloat("Yaw", &m_previewYaw, -MeshPreview::Pi, MeshPreview::Pi, "%.2f");
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(120.0f);
 	ImGui::SliderFloat("Pitch", &m_previewPitch, -1.45f, 1.45f, "%.2f");
@@ -224,115 +224,6 @@ void UsedMeshesPanel::DrawPreviewControls(bool disableInteraction)
 		m_previewPitch = -0.35f;
 	}
 	ImGui::EndDisabled();
-}
-
-void UsedMeshesPanel::DrawPreview(const MeshDiagnosticsRow& row) const
-{
-	const float detailsReserveHeight = 214.0f;
-	ImVec2 availableRegion = ImGui::GetContentRegionAvail();
-	availableRegion.y = (std::max) (128.0f, availableRegion.y - detailsReserveHeight);
-
-	ImGui::BeginChild("##MeshPreview", ImVec2(0.0f, availableRegion.y), ImGuiChildFlags_Borders);
-	const ImVec2 canvasMin = ImGui::GetCursorScreenPos();
-	const ImVec2 canvasSize = ImGui::GetContentRegionAvail();
-	ImGui::InvisibleButton("##MeshPreviewCanvas", canvasSize);
-	ImDrawList* drawList = ImGui::GetWindowDrawList();
-	const ImVec2 canvasMax(canvasMin.x + canvasSize.x, canvasMin.y + canvasSize.y);
-	drawList->AddRectFilled(canvasMin, canvasMax, IM_COL32(18, 20, 24, 255));
-	drawList->AddRect(canvasMin, canvasMax, IM_COL32(68, 74, 84, 255));
-
-	if (!m_previewGeometry.IsValid())
-	{
-		drawList->AddText(ImVec2(canvasMin.x + 12.0f, canvasMin.y + 12.0f), IM_COL32(160, 166, 176, 255), "Preview geometry is unavailable.");
-		ImGui::EndChild();
-		return;
-	}
-
-	const MeshDiagnosticsPresentation::PreviewBounds bounds = MeshDiagnosticsPresentation::ComputePreviewBounds(m_previewGeometry);
-	if (!bounds.IsValid || canvasSize.x <= 1.0f || canvasSize.y <= 1.0f)
-	{
-		ImGui::EndChild();
-		return;
-	}
-
-	const MeshPreviewVertex center{(bounds.Min.X + bounds.Max.X) * 0.5f, (bounds.Min.Y + bounds.Max.Y) * 0.5f, (bounds.Min.Z + bounds.Max.Z) * 0.5f};
-	float projectedMinX = (std::numeric_limits<float>::max)();
-	float projectedMinY = (std::numeric_limits<float>::max)();
-	float projectedMaxX = (std::numeric_limits<float>::lowest)();
-	float projectedMaxY = (std::numeric_limits<float>::lowest)();
-	for (const MeshPreviewVertex& vertex : m_previewGeometry.Vertices)
-	{
-		const MeshPreviewVertex rotated = MeshDiagnosticsPresentation::RotatePreviewVertex(vertex, center, m_previewYaw, m_previewPitch);
-		projectedMinX = (std::min) (projectedMinX, rotated.X);
-		projectedMinY = (std::min) (projectedMinY, rotated.Y);
-		projectedMaxX = (std::max) (projectedMaxX, rotated.X);
-		projectedMaxY = (std::max) (projectedMaxY, rotated.Y);
-	}
-
-	const float projectedWidth = (std::max) (projectedMaxX - projectedMinX, 0.001f);
-	const float projectedHeight = (std::max) (projectedMaxY - projectedMinY, 0.001f);
-	const float scale = 0.86f * (std::min) (canvasSize.x / projectedWidth, canvasSize.y / projectedHeight);
-	const ImVec2 canvasCenter(canvasMin.x + (canvasSize.x * 0.5f), canvasMin.y + (canvasSize.y * 0.5f));
-
-	const auto projectVertex = [&](const MeshPreviewVertex& vertex) noexcept
-	{
-		const MeshPreviewVertex rotated = MeshDiagnosticsPresentation::RotatePreviewVertex(vertex, center, m_previewYaw, m_previewPitch);
-		return ImVec2(canvasCenter.x + (rotated.X * scale), canvasCenter.y - (rotated.Y * scale));
-	};
-
-	const bool drawSolid = m_previewModeIndex == 1 || m_previewModeIndex == 2;
-	const bool drawWire = m_previewModeIndex == 0 || m_previewModeIndex == 2;
-	const std::size_t triangleCount = m_previewGeometry.Indices.size() / 3;
-	const std::size_t previewTriangleCount = (std::min) (triangleCount, MeshDiagnosticsPresentation::MaxPreviewTriangles);
-
-	const auto forEachProjectedTriangle = [&](const auto& callback)
-	{
-		for (std::size_t triangleIndex = 0; triangleIndex < previewTriangleCount; ++triangleIndex)
-		{
-			const std::uint32_t index0 = m_previewGeometry.Indices[(triangleIndex * 3) + 0];
-			const std::uint32_t index1 = m_previewGeometry.Indices[(triangleIndex * 3) + 1];
-			const std::uint32_t index2 = m_previewGeometry.Indices[(triangleIndex * 3) + 2];
-			if (index0 >= m_previewGeometry.Vertices.size() || index1 >= m_previewGeometry.Vertices.size() || index2 >= m_previewGeometry.Vertices.size())
-			{
-				continue;
-			}
-
-			callback(std::array{projectVertex(m_previewGeometry.Vertices[index0]), projectVertex(m_previewGeometry.Vertices[index1]), projectVertex(m_previewGeometry.Vertices[index2])});
-		}
-	};
-
-	if (drawSolid)
-	{
-		const ImDrawListFlags previousDrawListFlags = drawList->Flags;
-		if (!drawWire)
-		{
-			drawList->Flags &= ~ImDrawListFlags_AntiAliasedFill;
-		}
-
-		const ImU32 solidColor = row.GpuResident ? (drawWire ? IM_COL32(89, 142, 199, 84) : IM_COL32(89, 142, 199, 230)) : (drawWire ? IM_COL32(128, 128, 128, 72) : IM_COL32(128, 128, 128, 220));
-		forEachProjectedTriangle([&](const std::array<ImVec2, 3>& triangle) { drawList->AddTriangleFilled(triangle[0], triangle[1], triangle[2], solidColor); });
-		drawList->Flags = previousDrawListFlags;
-	}
-
-	if (drawWire)
-	{
-		const ImU32 wireColor = row.GpuResident ? IM_COL32(176, 212, 255, 220) : IM_COL32(184, 184, 184, 210);
-
-		forEachProjectedTriangle(
-		    [&](const std::array<ImVec2, 3>& triangle)
-		    {
-			    drawList->AddLine(triangle[0], triangle[1], wireColor, 1.0f);
-			    drawList->AddLine(triangle[1], triangle[2], wireColor, 1.0f);
-			    drawList->AddLine(triangle[2], triangle[0], wireColor, 1.0f);
-		    });
-	}
-
-	if (triangleCount > previewTriangleCount)
-	{
-		drawList->AddText(ImVec2(canvasMin.x + 12.0f, canvasMin.y + 12.0f), IM_COL32(192, 196, 204, 255), "Preview truncated for large mesh.");
-	}
-
-	ImGui::EndChild();
 }
 
 void UsedMeshesPanel::DrawSelectedMeshDetails(const MeshDiagnosticsRow& row) const

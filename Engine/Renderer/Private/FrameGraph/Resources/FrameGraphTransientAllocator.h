@@ -57,6 +57,13 @@ private:
 		RhiOwnedMemoryBlockHandle memoryBlock = {};
 	};
 
+	static bool RequiresShaderResourceView(const FrameGraphTransientResourcePlan& transientPlan) noexcept;
+	static bool RequiresUnorderedAccessView(const FrameGraphTransientResourcePlan& transientPlan) noexcept;
+	void CreateTextureAllocation(AllocationRecord& allocation, const FrameGraphTransientResourcePlan& transientPlan, RhiOwnedMemoryBlockHandle memoryBlock, const wchar_t* defaultDebugName);
+	void CreateDepthStencilAllocation(AllocationRecord& allocation, const FrameGraphTransientResourcePlan& transientPlan, RhiOwnedMemoryBlockHandle memoryBlock);
+	void CreateColorAllocation(AllocationRecord& allocation, const FrameGraphTransientResourcePlan& transientPlan, RhiOwnedMemoryBlockHandle memoryBlock);
+	void CreateBufferAllocation(AllocationRecord& allocation, const FrameGraphTransientResourcePlan& transientPlan, RhiOwnedMemoryBlockHandle memoryBlock);
+
 	void ReleaseAllocations() noexcept;
 	AllocationRecord CreateAllocationRecord(const FrameGraphTransientResourcePlan& transientPlan);
 	RhiOwnedMemoryBlockHandle GetOrCreateMemoryBlock(const FrameGraphTransientResourcePlan& transientPlan);
