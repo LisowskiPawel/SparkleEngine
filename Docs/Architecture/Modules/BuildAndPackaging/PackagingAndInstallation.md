@@ -10,7 +10,7 @@
 
 **Strategy and acceptance sources:** [`PGE-01`, `PGE-13`, `PGE-14`, `PGE-15`](../../../Strategy/Requirements.md), [First Release](../../../Acceptance/FirstRelease.md), and `FCR-PROD-02`/`FCR-PROD-05` in [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md)
 
-**Acceptance:** blocked until the exact archive and clean-machine journey pass. See [Release progress](../../../Strategy/Roadmap.md#release-progress) for the current archive identity and checks.
+**Acceptance:** `e771a244…` passes assembly and installed positive journeys on the accepted existing laptop. Installed failure coverage and removal keep `FCR-PROD-05`/`REL-03` blocked; see [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
 
 
 Use [reviewed inputs](#reviewed-package-inputs) to prepare the package, [package command](#current-package-entry) to assemble it, [package checks](#fcr-prod-05-package-contract) to qualify it, and [local diagnostics](#local-diagnostics-and-release-review) for incident/export/replacement behavior.
@@ -36,7 +36,7 @@ Outputs stay under `artifacts/releases/<version>/`. Assembly starts under `.part
 
 Core owns manifest-relative paths and product size/hash verification. Launcher prefers its installed location over the current directory and rejects checkout overrides. First launch verifies and transactionally seeds `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`: project recipes into `Source/Showcase/`, the immutable `Engine/Cooked/` baseline into `Cooked/`. Initial shader readiness verifies the copied baseline against the package manifest without a recook signal; later recooks require their completion signal. Repeat launches preserve selections; a changed or incomplete package identity requires an explicit store reset. Sync/cook/run use the existing typed owners and packaged helpers; source build/cleanup actions are unavailable in installed mode. Missing or malformed package metadata cannot select a checkout.
 
-The installed route is implemented but not accepted. The [roadmap](../../../Strategy/Roadmap.md#release-progress) summarizes qualified archive checks and remaining product, replacement and adoption work. Run CHK-PKG-02 against the archive regenerated after those fixes; public redistribution and publisher signing remain FR-07 work.
+The installed route has exact-archive positive proof, including all seven maps, a fresh selected subset and relocated read-only execution. Finish `FM-PKG-04/05` and removal under `CHK-PKG-02`; regenerate only when accepted inputs change. Public redistribution and publisher signing remain FR-07 work.
 
 ## At A Glance
 
@@ -45,8 +45,8 @@ The installed route is implemented but not accepted. The [roadmap](../../../Stra
 | development artifacts | implemented workspace-oriented output/copy routes | remain inputs only; never advertised as a release package |
 | immutable staging | source route and structural rejection checks exist | qualify exact three-product bytes through the complete route |
 | trust/publication | integrity, import and metadata verification exist | complete notices/SBOM/source obligations, symbols and pre-release signing |
-| installation and writable state | manifest discovery, transactional store seeding and existing sync/cook/run paths | qualify seven-map selection, offline use, failure/reset and removal |
-| relocation and clean-machine use | unqualified | retained standard-user rehearsal of the exact archive |
+| installation and writable state | seven-map/subset/offline and Editor writes checked; original user state restored | finish installed failure coverage and removal |
+| relocation and clean-machine use | `e771a244…` standard-user Unicode/read-only relocation checked on accepted MIN-01 laptop | no fresh-OS or broader hardware claim |
 
 The internal route is one directional transaction: Build -> Cook -> Stage -> Verify -> Package -> Extract/Run. FR-07 adds publisher signing and verifies the resulting final bytes. Each step consumes a declared predecessor product and must never scan unrelated development directories to infer missing membership.
 
@@ -56,8 +56,8 @@ The internal route is one directional transaction: Build -> Cook -> Stage -> Ver
 | --- | --- | --- |
 | `PKG-01` | Deterministic immutable staging tree and manifest | current internal assembly/integrity verified; final product proof open |
 | `PKG-02` | License/SBOM, signature, integrity, and publication verification | internal integrity and symbol identities checked; public obligations/signing open |
-| `PKG-03` | Standard-user extract/run/remove with separate writable state | local Empty/Cornell journeys checked; removal and full consumer proof open |
-| `PKG-04` | Relocated, read-only, offline, clean-machine product operation | local offline/read-only/relocation checks recorded; clean environment remains open |
+| `PKG-03` | Standard-user extract/run/remove with separate writable state | all-map/subset operation checked; installed failures and removal remain open |
+| `PKG-04` | Relocated, read-only, offline, clean-machine product operation | qualified positive journeys for `e771a244…` under the accepted existing-laptop scope |
 
 ## Capability Boundary
 
@@ -74,7 +74,7 @@ The capability uses the same route for internal qualification and final publicat
 
 ## Requested And Active State
 
-The source packaging route is implemented but unqualified. A development artifact directory is not a package. The manifest and completion report must name the exact products/profiles, backend/provider support, content set, candidate and signature status before acceptance.
+Assembly and positive installed checks are qualified for `e771a244…`; missing required failure/removal results keep package acceptance open. A development artifact directory is not a package. The manifest and report bind products/profiles, backend/provider support, content, candidate and unsigned-internal status.
 
 ## Failure, Capacity, And Observability
 

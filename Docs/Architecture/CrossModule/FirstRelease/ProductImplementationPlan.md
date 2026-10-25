@@ -6,7 +6,7 @@
 
 **Deliverable:** one unsigned internal Launcher/Editor/Game archive, selected content and self-service recovery. Public rights, publisher certificates, signing and publication remain [FR-07](ImplementationPlan.md#fr-07--publish-and-verify).
 
-**Next:** [PD-3: final archive and installed rehearsal](#pd-3--package-and-installation). PD-1 source journeys and PD-2 source operations pass for their recorded inputs. Revalidate only owners changed after those candidates; retain the [approved product/lighting boundary](../../../Acceptance/FirstRelease.md#product-plan-and-public-release).
+**Next:** [PD-3: installed failures and removal](#pd-3--package-and-installation). Archive `e771a244…` passes assembly and installed positive journeys; two checks remain open. Reuse the recorded PD-1/2 source proof and retain the [approved product/lighting boundary](../../../Acceptance/FirstRelease.md#product-plan-and-public-release).
 
 ## How To Close This Plan
 
@@ -14,7 +14,7 @@
 | --- | --- | --- |
 | [PD-1](#pd-1--game-and-editor-product-shells) | Source-workspace complete; [candidate reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). | Revalidate affected checks if source, products or content change. Installed portions remain PD-3. |
 | [PD-2](#pd-2--source-build-cook-and-launcher) | Source-workspace complete; [candidate reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). | Revalidate affected checks if source inputs change. Installed Launcher portions remain PD-3. |
-| [PD-3](#pd-3--package-and-installation) | `d641947e…` assembly passes for PD-1's frozen source. Earlier installed checks retain their own archive identities. | Finish exact-archive seven-map, budget, Qt, removal and clean/minimum-machine proof. |
+| [PD-3](#pd-3--package-and-installation) | `e771a244…`: assembly, 32 installed map/API cells, fresh subset, budgets, Qt and relocation pass. | Complete installed failure coverage and extraction removal; see the two unchecked items below. |
 | [PD-4](#pd-4--support-incident-response-and-product-closure) | Retained-archive export, symbols and review negatives pass; final self-service/replacement proof remains open. | Self-service, replacement and all six reports pass. |
 
 **Rehearsal:** author/agent runs satisfy the [accepted actor scope](../../../Acceptance/FeatureCompletionReports.md#report-closure-and-review). Clean/minimum-machine checks still apply; record the actual environment.
@@ -51,9 +51,11 @@ Preserve the [Launcher presentation and operation boundary](../../Modules/Tools/
 
 **Prerequisite:** PD-1/2 technical results and reviewed final inputs. Earlier archives can test packaging mechanics; final acceptance waits for repaired products.
 
-- [x] **Assembly mechanics:** `Package.ps1` produced unsigned `d641947e…054ce9` for PD-1's frozen source, with three products, admitted helpers, shared defaults, engine baseline, recipes, manifests, notices/SBOM, provenance and a separate matched symbol companion. Generated products freeze after build/cook; external inputs remain pinned. [Assembly report](../../../../artifacts/releases/0.1.0/d641947e73aa1258d2ec9dd046b925575b131700b2ec9fb2167ad3b819054ce9/report.json). (`AC-PKG-01/02/03/06`, assembly scope.)
+- [x] **Assembly mechanics:** unsigned `e771a244…f6b9bd`, frozen `241ef037` plus retained patch, source fingerprint `5ab719d7…`. Three products, admitted helpers, defaults/content recipes, manifests/notices/SBOM/provenance and matched private symbols are verified. [Assembly report](../../../../artifacts/releases/0.1.0/e771a244095431d06663927b7b181ab12710478d630f01919dc9ff37a9f6b9bd/report.json). (`AC-PKG-01/02/03/06`, assembly scope.)
 - [x] **Failure integrity:** owner stage/archive and full-command negatives reject stale, extra, missing, corrupt, escaping and forbidden inputs without publication. Six-product precompiled import and local Game compilation use the same owned binary paths. (`CHK-PKG-01`.)
-- [ ] **Final archive/rehearsal:** select the verified archive above or regenerate if accepted inputs change. Exact-archive Launcher -> Editor/Game must cover Empty, all seven maps and a subset, selective sync/offline run, relocation/read-only extraction, Qt replacement and removal as a standard user. Earlier local Empty/Cornell checks passed on both APIs; removal was blocked by automatic approval review. Finish the clean/minimum-machine, no source/SDK/admin/override/author-cache, user-state and budget checks. (`AC-PKG-04/05`, installed portions of `FCR-PROD-01/03/04`, `CHK-PKG-02`.)
+- [x] **Installed positive journeys:** 32 Empty/seven-map Game/Editor/API cells; fresh Cornell-only GUI selection/cook/handoff and four subset cells; offline operation, Unicode/read-only relocation, modified app-local Qt, installed Editor edit/undo/redo/save/reload and sampled memory/quit budgets. [Candidate report](../../../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/pd3-installed-final/completion.json) records the accepted existing-laptop environment and input reuse. Original user state is restored exactly. (`AC-PKG-04`, positive portions of `AC-PKG-05`.)
+- [ ] **Installed failures:** finish denied/full-store recovery and per-allowlisted-DLL/content startup-removal coverage. Bad store identity, missing cooked meshes and corrupt shaders already fail correctly. Stage/archive negatives do not replace these installed checks. (`FM-PKG-04/05`, `CHK-PKG-02`.)
+- [ ] **Removal:** automatic approval review rejected deletion of this turn's verified extraction before execution. It remains retained; no alternative deletion was attempted. Record authorized removal and unchanged user-state hashes against this archive. (`AC-PKG-05`, `CHK-PKG-02`.)
 
 **Phase exit:** `FCR-PROD-05` and `REL-03` pass the unsigned internal scope for that archive. This is not permission to publish.
 
