@@ -13,7 +13,7 @@
 | Stage | Current position | What permits exit |
 | --- | --- | --- |
 | [PD-1](#pd-1--game-and-editor-product-shells) | Source-workspace complete; [candidate reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). | Revalidate affected checks if source, products or content change. Installed portions remain PD-3. |
-| [PD-2](#pd-2--source-build-cook-and-launcher) | Documented source reproduction and operations pass for their recorded inputs. | Reuse those checks; revalidate affected owners when the final source changes. |
+| [PD-2](#pd-2--source-build-cook-and-launcher) | Source-workspace complete; [candidate reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). | Revalidate affected checks if source inputs change. Installed Launcher portions remain PD-3. |
 | [PD-3](#pd-3--package-and-installation) | `d641947e…` assembly passes for PD-1's frozen source. Earlier installed checks retain their own archive identities. | Finish exact-archive seven-map, budget, Qt, removal and clean/minimum-machine proof. |
 | [PD-4](#pd-4--support-incident-response-and-product-closure) | Retained-archive export, symbols and review negatives pass; final self-service/replacement proof remains open. | Self-service, replacement and all six reports pass. |
 
@@ -41,21 +41,9 @@ Installed counterparts remain in PD-3. Lighting quality, release performance and
 
 **Owners:** [source build](../../Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md#fcr-prod-02-source-adopter-contract), [Launcher](../../Modules/Tools/Launcher/LauncherCapabilities.md#fcr-prod-03-launcher-contract); `FCR-PROD-02/03`.
 
-**Prerequisite:** pinned inputs/public prerequisites and a recorded source candidate. Source validation may proceed independently of a rendering repair; successful launch cannot pass a failed image cell.
+**Source-workspace complete:** reproduction and operations pass in the [PD-2 report](../../../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/pd2-source-final/completion.json). Cold/offline proof retains `9bf95541` plus its source snapshot; affected owner checks, shell results and actual Launcher GUI child were revalidated on frozen `241ef037` plus patch. The rejected non-author requirement is superseded explicitly; no historical binary is relabelled.
 
-Keep Launcher a polished portfolio front door over its existing workflows: a reviewer can recognize/select the examples, understand readiness and dependency work, build/cook/run the requested product/API, follow progress/cancel and recover from a real failure. Improve those existing surfaces when needed, preserving previews and useful operation history; no new dashboard/workflow framework is implied. Fold duplicate Qt/Launcher Core settings, status or operation policy back into the current authority in the same slice. Presentation work is bounded by that first-use/reproduction result rather than a separate cosmetic backlog.
-
-- [x] **Reproduction:** documented cold build/cook/run, approved owner gates and network-blocked warm replay cover Empty, seven maps and a subset; manifests/products agree logically and no author path/cache is required. (`AC-PROD02-01/02/03/04`.)
-- [x] **Operations:** direct and GUI requests agree on effects, artifacts and result. Missing tools, bad/Unicode paths, failed children, cancellation, locked/stale outputs and clean containment have observed outcomes; no false success, source deletion or orphan child. Preserve distinct failure/cancel/timeout/skipped/unavailable/missing-artifact results. (`AC-PROD02-05`, `AC-PROD03-01` through `05`.)
-
-**Recorded:** [PD-2 reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain fresh source clones, a spaced Unicode checkout, all-map/subset offline cooks and native launches, GUI/CLI parity, owner gates and failure/cancel/clean checks. Cold route: **20 min 29 s**; offline replay: **2 min 41 s**, plus **2 min 5 s** for eight native map checks. OS system-commit high-water: **26.24 GiB**; observed owned storage: **25.48 GiB**. A second person is not required. Final source changes need only their affected checks.
-
-**Phase exit:** these source/operation checks pass in the owning reports. Installed Launcher checks remain PD-3; public tag/download verification remains FR-07.
-
-```text
-Execute only PD-2 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md. Apply the owning execution contract and its Stage Source-Style Gate.
-Apply Delivery Boundary For Every Stage. Revalidate only affected source/operation checks or the Roadmap-selected bounded Launcher slice. Preserve useful scene/previews/readiness/progress/recovery and one Core operation authority; build no general workflow platform. Reuse valid evidence; record candidate, commands, artifacts, cleanup and next item. Author/agent rehearsal is accepted.
-```
+Preserve the [Launcher presentation and operation boundary](../../Modules/Tools/Launcher/LauncherCapabilities.md#at-a-glance). Installed Launcher checks remain PD-3; public tag/download verification remains FR-07.
 
 ## `PD-3` — Package And Installation
 
