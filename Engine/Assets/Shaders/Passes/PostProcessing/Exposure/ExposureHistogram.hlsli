@@ -32,6 +32,39 @@ namespace ExposureHistogram
 		const float normalized = (float(bin - 1u) + 0.5f) / float(BinCount - 1u);
 		return exp2(lerp(MinimumLogLuminance, MaximumLogLuminance, normalized));
 	}
+
+	uint CountSamples(StructuredBuffer<uint> histogramCounts)
+	{
+		uint sampleCount = 0u;
+		[loop]
+		for (uint bin = 0u; bin < BinCount; ++bin)
+		{
+			sampleCount += histogramCounts[bin];
+		}
+
+		return sampleCount;
+	}
+
+	float ResolveAverageLuminance(StructuredBuffer<uint> histogramCounts, uint sampleCount)
+	{
+		const float lowCount = float(sampleCount) * LowPercentile;
+		const float highCount = float(sampleCount) * HighPercentile;
+		float cumulativeCount = 0.0f;
+		float weightedLuminance = 0.0f;
+		float retainedCount = 0.0f;
+		[loop]
+		for (uint bin = 0u; bin < BinCount; ++bin)
+		{
+			const float nextCount = cumulativeCount + float(histogramCounts[bin]);
+			const float weight = max(min(nextCount, highCount) - max(cumulativeCount, lowCount), 0.0f);
+			weightedLuminance += BinLuminance(bin) * weight;
+			retainedCount += weight;
+			cumulativeCount = nextCount;
+		}
+
+		const float averageLuminance = retainedCount > 0.0f ? max(weightedLuminance / retainedCount, Exposure::MinimumMeteredLuminance) : Exposure::MinimumMeteredLuminance;
+		return averageLuminance;
+	}
 }
 
 #endif

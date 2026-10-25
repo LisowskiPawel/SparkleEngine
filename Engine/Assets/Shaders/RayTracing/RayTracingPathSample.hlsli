@@ -1,6 +1,6 @@
 #pragma once
 
-namespace RayTracingPathSample
+namespace PathSample
 {
 	static const uint LobeDiffuse = 1u;
 	static const uint LobeSpecular = 2u;

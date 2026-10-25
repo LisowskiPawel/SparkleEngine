@@ -117,10 +117,13 @@ The active direct BRDF is Cook–Torrance/GGX/Smith/Schlick plus Burley diffuse 
 
 Direct Lighting is done only when `DIR-D0` is accepted, every included `DIR-FS-*` maps to passing `AC-DIR-*`/`CHK-DIR-*`, controlled failures reach their safe states, the clean-break/enclosure and adoption contracts pass, supported D3D12/Vulkan quality-time-memory cells pass, and `FCR-REN-06` records the exact candidate verdict. RTXDI, MegaLights, NRD, FidelityFX, the current source path, and a future Reference Path Tracer are dependencies or precedents—not inherited evidence. First-release work remains subject to the repository release gate; unadmitted expansions such as photometric profiles, a shadow-map fallback, or emissive animation do not enter production merely because they are researched here.
 
+Shader source ownership was reconciled on 2026-10-25. The existing reservoir scope is `DirectReservoir`; shadow signal packing/construction and direct-sample visibility use descriptive free functions, while `ShadowRays` retains common trace semantics and constants. Temporal/spatial kernels retain dispatch admission, reuse selection and output publication; `Lighting/DirectLightReservoirReuse.hlsli` implements reprojection, compatibility and neighbor sampling through explicit input textures and the existing reservoir state. `DirectLightReservoir.hlsli` owns selected-sample lobe evaluation; `DirectLighting.hlsl` owns resource loads and conditional lobe writes. No shader record, parameter binding or dispatch was added by this separation. This is responsibility placement, not direct-lighting numerical, temporal or native GPU acceptance.
+
 ## Primary Source Routes
 
 - [`RestirDirectLightingPasses.cpp`](../../../../../../../../Engine/Renderer/Private/Passes/Lighting/Direct/RestirDirectLightingPasses.cpp)
 - [`DirectLightReservoir.hlsli`](../../../../../../../../Engine/Assets/Shaders/Lighting/DirectLightReservoir.hlsli)
+- [`DirectLightReservoirReuse.hlsli`](../../../../../../../../Engine/Assets/Shaders/Lighting/DirectLightReservoirReuse.hlsli)
 - [`DirectLightSampling.hlsli`](../../../../../../../../Engine/Assets/Shaders/Lighting/DirectLightSampling.hlsli)
 - [`DirectShadowSignal.cpp`](../../../../../../../../Engine/Renderer/Private/Passes/Lighting/Shadows/DirectShadowSignal.cpp)
 - [`SurfaceLighting.hlsli`](../../../../../../../../Engine/Assets/Shaders/Lighting/SurfaceLighting.hlsli) and [`BRDF.hlsli`](../../../../../../../../Engine/Assets/Shaders/BRDF/BRDF.hlsli)

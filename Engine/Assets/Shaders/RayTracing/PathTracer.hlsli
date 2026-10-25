@@ -46,7 +46,7 @@ namespace PathTracer
 		throughput /= survivalProbability;
 	}
 
-	void ApplyDirectionSample(inout PathState path, RayTracingPathSample::DirectionSample sample)
+	void ApplyDirectionSample(inout PathState path, PathSample::DirectionSample sample)
 	{
 		path.Throughput *= sample.DiffuseThroughput + sample.SpecularThroughput;
 		path.DirectionWorld = sample.DirectionWorld;

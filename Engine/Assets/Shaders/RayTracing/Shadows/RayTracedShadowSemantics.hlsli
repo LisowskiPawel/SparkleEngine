@@ -11,7 +11,7 @@ struct RayTracedShadowRequest
 	float MaxDistance;
 };
 
-namespace RayTracedShadows
+namespace ShadowRays
 {
 	static const uint ShadowInstanceMask = 0xFFu;
 	static const uint ShadowRayFlags = RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES;
@@ -25,7 +25,7 @@ namespace RayTracedShadows
 	                              out ShadowVisibilitySample immediateSignal)
 	{
 		request = (RayTracedShadowRequest)0;
-		immediateSignal = RayTracedShadowSignals::BuildUnshadowedSignal(0.0f);
+		immediateSignal = BuildUnshadowedSignal(0.0f);
 		if (!lightSample.Valid)
 		{
 			return false;
@@ -33,7 +33,7 @@ namespace RayTracedShadows
 
 		const bool supported = lightSample.IsDirectional ? RayTracedDirectionalShadowsEnabled != 0u : RayTracedLocalLightShadowsEnabled != 0u;
 		const float maxDistance = lightSample.IsDirectional ? RayTracedShadowMaxDistance : lightSample.VisibilityDistance;
-		immediateSignal = RayTracedShadowSignals::BuildUnshadowedSignal(maxDistance);
+		immediateSignal = BuildUnshadowedSignal(maxDistance);
 		if (!castsShadow || !supported || (!lightSample.IsDirectional && lightSample.VisibilityDistance <= MinimumShadowTMin))
 		{
 			return false;
@@ -49,10 +49,10 @@ namespace RayTracedShadows
 	{
 		if (occluded)
 		{
-			return RayTracedShadowSignals::BuildOccludedSignal(hitDistance, maxDistance);
+			return BuildOccludedSignal(hitDistance, maxDistance);
 		}
 
-		return RayTracedShadowSignals::BuildUnshadowedSignal(maxDistance);
+		return BuildUnshadowedSignal(maxDistance);
 	}
 }
 

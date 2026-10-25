@@ -6,36 +6,7 @@ RWTexture2D<float4> CurrentReservoirSurfaceTexture;
 Texture2D SkyTexture;
 SamplerState SamplerLinearClamp;
 
-#include "/Engine/Lighting/RestirIndirectReservoir.hlsli"
-
-void ReuseSpatialReservoir(uint2 pixelCoord, uint2 extent, RestirIndirectReservoir::Surface surface, inout RestirIndirectReservoir::Reservoir reservoir)
-{
-	if (surface.Valid && RestirIndirectSpatialReuse != 0u)
-	{
-		uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x5A71A1u);
-		const uint offsetStart = uint(CommonRandom::Random01(rng) * 8.0f) & 7u;
-		[unroll]
-		for (uint sampleIndex = 0u; sampleIndex < RestirReservoirCommon::SpatialNeighborCount; ++sampleIndex)
-		{
-			const int2 neighborCoord = int2(pixelCoord) + RestirReservoirCommon::SpatialOffsets[(offsetStart + sampleIndex * 2u) & 7u];
-			if (neighborCoord.x < 0 || neighborCoord.y < 0 || neighborCoord.x >= int(extent.x) || neighborCoord.y >= int(extent.y))
-			{
-				continue;
-			}
-
-			const RestirIndirectReservoir::Surface neighborSurface = RestirIndirectReservoir::LoadSurface(uint2(neighborCoord));
-			if (!RestirIndirectReservoir::AreSurfacesCompatible(surface, RestirIndirectReservoir::PackSurface(neighborSurface)))
-			{
-				continue;
-			}
-
-			const RestirIndirectReservoir::Reservoir neighbor = RestirIndirectReservoir::UnpackReservoir(TemporalReservoirSampleTexture.Load(int3(neighborCoord, 0)),
-			                                                                                             TemporalReservoirWeightTexture.Load(int3(neighborCoord, 0)));
-
-			RestirIndirectReservoir::CombineReservoir(reservoir, neighbor, surface, SkyTexture, SamplerLinearClamp, RestirReservoirCommon::MaxSpatialM, CommonRandom::Random01(rng));
-		}
-	}
-}
+#include "/Engine/Lighting/RestirIndirectReservoirReuse.hlsli"
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -49,14 +20,16 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const RestirIndirectReservoir::Surface surface = RestirIndirectReservoir::LoadSurface(pixelCoord);
+	const IndirectReservoir::Surface surface = IndirectReservoir::LoadSurface(pixelCoord);
 
-	RestirIndirectReservoir::Reservoir reservoir = RestirIndirectReservoir::UnpackReservoir(TemporalReservoirSampleTexture.Load(int3(pixelCoord, 0)),
-	                                                                                        TemporalReservoirWeightTexture.Load(int3(pixelCoord, 0)));
+	IndirectReservoir::Reservoir reservoir = IndirectReservoir::UnpackReservoir(TemporalReservoirSampleTexture.Load(int3(pixelCoord, 0)), TemporalReservoirWeightTexture.Load(int3(pixelCoord, 0)));
 
-	ReuseSpatialReservoir(pixelCoord, uint2(width, height), surface, reservoir);
+	if (surface.Valid && RestirIndirectSpatialReuse != 0u)
+	{
+		IndirectReservoir::ReuseSpatial(pixelCoord, uint2(width, height), surface, TemporalReservoirSampleTexture, TemporalReservoirWeightTexture, SkyTexture, SamplerLinearClamp, reservoir);
+	}
 
-	CurrentReservoirSampleTexture[pixelCoord] = RestirIndirectReservoir::PackSample(reservoir);
-	CurrentReservoirWeightTexture[pixelCoord] = RestirIndirectReservoir::PackWeight(reservoir);
-	CurrentReservoirSurfaceTexture[pixelCoord] = RestirIndirectReservoir::PackSurface(surface);
+	CurrentReservoirSampleTexture[pixelCoord] = IndirectReservoir::PackSample(reservoir);
+	CurrentReservoirWeightTexture[pixelCoord] = IndirectReservoir::PackWeight(reservoir);
+	CurrentReservoirSurfaceTexture[pixelCoord] = IndirectReservoir::PackSurface(surface);
 }

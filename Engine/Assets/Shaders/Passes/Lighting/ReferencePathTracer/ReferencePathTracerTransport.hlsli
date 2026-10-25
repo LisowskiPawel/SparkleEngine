@@ -12,14 +12,14 @@
 
 namespace ReferencePathTracer
 {
-	RayTracingPathSample::DirectionSample SamplePathDirection(RayTracingPathSurface surface, PathBsdf::LobeMasses lobeMasses, SampleIdentity sampleIdentity, uint surfaceDepth)
+	PathSample::DirectionSample SamplePathDirection(RayTracingPathSurface surface, PathBsdf::LobeMasses lobeMasses, SampleIdentity sampleIdentity, uint surfaceDepth)
 	{
 		const CommonRandom::CategoricalSample lobeChoice = CommonRandom::SampleCategorical(RandomWord(sampleIdentity, SurfaceDimension(surfaceDepth, LobeChoiceOffset)), lobeMasses.Count);
 
-		uint selectedLobe = RayTracingPathSample::LobeSpecular;
+		uint selectedLobe = PathSample::LobeSpecular;
 		if (lobeMasses.Diffuse > 0.0f && lobeChoice.Index == 0u)
 		{
-			selectedLobe = RayTracingPathSample::LobeDiffuse;
+			selectedLobe = PathSample::LobeDiffuse;
 		}
 
 		const float2 bsdfSample = float2(CommonRandom::OpenUnitInterval(RandomWord(sampleIdentity, SurfaceDimension(surfaceDepth, BsdfDirectionXOffset))),
@@ -98,7 +98,7 @@ namespace ReferencePathTracer
 				break;
 			}
 
-			const RayTracingPathSample::DirectionSample bsdf = SamplePathDirection(surface, lobeMasses, sampleIdentity, path.SurfaceDepth);
+			const PathSample::DirectionSample bsdf = SamplePathDirection(surface, lobeMasses, sampleIdentity, path.SurfaceDepth);
 			if (!bsdf.HasSupport)
 			{
 				break;

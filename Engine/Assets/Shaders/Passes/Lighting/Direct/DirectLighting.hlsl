@@ -1,8 +1,4 @@
-#include "/Engine/Resources/ViewCameraUniformData.hlsli"
-
 #include "/Engine/Lighting/DirectLightReservoir.hlsli"
-#include "/Engine/Lighting/SurfaceLighting.hlsli"
-#include "/Engine/Passes/GBuffer/GBufferUtils.hlsli"
 #include "/Engine/RayTracing/Shadows/RayTracedShadowSignalPacking.hlsli"
 
 RWTexture2D<float4> DirectDiffuse;
@@ -11,54 +7,6 @@ RWTexture2D<float4> DirectSubsurface;
 Texture2D<float4> ShadowVisibilitySignal;
 Texture2D<float4> CurrentReservoirSample;
 Texture2D<float4> CurrentReservoirWeight;
-
-SurfaceLighting::Contribution EvaluateDirectLighting(uint2 pixelCoord, GBufferData gBuffer)
-{
-	const float3 positionWorld = ReconstructGBufferWorldPosition(pixelCoord, gBuffer.SceneDepth, InvViewMTX, InvProjectionMTX);
-	const float3 viewDirWorld = normalize(Position - positionWorld);
-
-	SurfaceLighting::Contribution directLighting = (SurfaceLighting::Contribution)0;
-
-	const DirectLightReservoir::Reservoir reservoir = DirectLightReservoir::UnpackReservoir(CurrentReservoirSample.Load(int3(pixelCoord, 0)), CurrentReservoirWeight.Load(int3(pixelCoord, 0)));
-
-	float visibility = 1.0f;
-	if (DirectLightingEvaluateShadows != 0u)
-	{
-		visibility = RayTracedShadowSignalPacking::UnpackShadowSignal(ShadowVisibilitySignal.Load(int3(pixelCoord, 0))).Visibility;
-	}
-
-	const bool evaluateSubsurface = DirectLightingEvaluateSubsurface != 0u && HasSubsurface(gBuffer);
-	if (!DirectLightReservoir::IsValid(reservoir))
-	{
-		return directLighting;
-	}
-
-	const LightSampling::DirectLightSample lightSample = DirectLightReservoir::ReplayLightSample(reservoir, positionWorld);
-	const float reservoirWeight = DirectLightReservoir::GetFinalWeight(reservoir);
-	if (!lightSample.Valid || reservoirWeight <= 0.0f)
-	{
-		return directLighting;
-	}
-
-	SurfaceLighting::Surface lightingSurface = {viewDirWorld,
-	                                            gBuffer.NormalWorld,
-	                                            gBuffer.BaseColor,
-	                                            gBuffer.Roughness,
-	                                            gBuffer.Metallic,
-	                                            gBuffer.DielectricF0,
-	                                            gBuffer.SubsurfaceColor,
-	                                            gBuffer.SubsurfaceStrength,
-	                                            DirectLightingEvaluateDiffuse != 0u,
-	                                            DirectLightingEvaluateSpecular != 0u,
-	                                            evaluateSubsurface};
-
-	const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, visibility);
-
-	directLighting.Diffuse += contribution.Diffuse * reservoirWeight;
-	directLighting.Specular += contribution.Specular * reservoirWeight;
-	directLighting.Subsurface += contribution.Subsurface * reservoirWeight;
-	return directLighting;
-}
 
 void StoreDirectLighting(uint2 pixelCoord, SurfaceLighting::Contribution directLighting, float alpha)
 {
@@ -95,6 +43,14 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const SurfaceLighting::Contribution directLighting = EvaluateDirectLighting(pixelCoord, gBuffer);
+	const DirectReservoir::Reservoir reservoir = DirectReservoir::UnpackReservoir(CurrentReservoirSample.Load(int3(pixelCoord, 0)), CurrentReservoirWeight.Load(int3(pixelCoord, 0)));
+
+	float visibility = 1.0f;
+	if (DirectLightingEvaluateShadows != 0u)
+	{
+		visibility = UnpackShadowSignal(ShadowVisibilitySignal.Load(int3(pixelCoord, 0))).Visibility;
+	}
+
+	const SurfaceLighting::Contribution directLighting = DirectReservoir::EvaluateSelectedLighting(pixelCoord, gBuffer, reservoir, visibility);
 	StoreDirectLighting(pixelCoord, directLighting, gBuffer.Alpha);
 }

@@ -3,7 +3,7 @@
 
 #include "/Engine/Lighting/DirectLightSampling.hlsli"
 
-namespace DirectLightReservoir
+namespace DirectReservoir
 {
 	static const float MinPdf = 1.0e-6f;
 

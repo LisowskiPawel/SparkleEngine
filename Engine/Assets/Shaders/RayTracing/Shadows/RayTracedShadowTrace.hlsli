@@ -4,7 +4,7 @@
 #include "/Engine/RayTracing/Shadows/RayTracedShadowSemantics.hlsli"
 #include "/Engine/RayTracing/RayTracingSceneTrace.hlsli"
 
-namespace RayTracedShadows
+namespace ShadowRays
 {
 	ShadowVisibilitySample TraceShadowRay(RayTracedShadowRequest request)
 	{

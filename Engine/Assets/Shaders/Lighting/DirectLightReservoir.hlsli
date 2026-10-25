@@ -10,7 +10,7 @@
 #include "/Engine/Lighting/SurfaceLighting.hlsli"
 #include "/Engine/Passes/GBuffer/GBufferUtils.hlsli"
 
-namespace DirectLightReservoir
+namespace DirectReservoir
 {
 
 	struct Surface
@@ -81,6 +81,46 @@ namespace DirectLightReservoir
 		const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, 1.0f);
 
 		return max(contribution.Diffuse + contribution.Specular + contribution.Subsurface, 0.0f.xxx);
+	}
+
+	SurfaceLighting::Contribution EvaluateSelectedLighting(uint2 pixelCoord, GBufferData gBuffer, Reservoir reservoir, float visibility)
+	{
+		const float3 positionWorld = ReconstructGBufferWorldPosition(pixelCoord, gBuffer.SceneDepth, InvViewMTX, InvProjectionMTX);
+		const float3 viewDirWorld = normalize(Position - positionWorld);
+
+		SurfaceLighting::Contribution directLighting = (SurfaceLighting::Contribution)0;
+
+		const bool evaluateSubsurface = DirectLightingEvaluateSubsurface != 0u && HasSubsurface(gBuffer);
+		if (!IsValid(reservoir))
+		{
+			return directLighting;
+		}
+
+		const LightSampling::DirectLightSample lightSample = ReplayLightSample(reservoir, positionWorld);
+		const float reservoirWeight = GetFinalWeight(reservoir);
+		if (!lightSample.Valid || reservoirWeight <= 0.0f)
+		{
+			return directLighting;
+		}
+
+		SurfaceLighting::Surface lightingSurface = {viewDirWorld,
+		                                            gBuffer.NormalWorld,
+		                                            gBuffer.BaseColor,
+		                                            gBuffer.Roughness,
+		                                            gBuffer.Metallic,
+		                                            gBuffer.DielectricF0,
+		                                            gBuffer.SubsurfaceColor,
+		                                            gBuffer.SubsurfaceStrength,
+		                                            DirectLightingEvaluateDiffuse != 0u,
+		                                            DirectLightingEvaluateSpecular != 0u,
+		                                            evaluateSubsurface};
+
+		const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, visibility);
+
+		directLighting.Diffuse += contribution.Diffuse * reservoirWeight;
+		directLighting.Specular += contribution.Specular * reservoirWeight;
+		directLighting.Subsurface += contribution.Subsurface * reservoirWeight;
+		return directLighting;
 	}
 
 	float EvaluateTargetPdf(Surface surface, Reservoir reservoir)

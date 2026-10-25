@@ -182,6 +182,8 @@ Resolve retains the middle 10th through 90th percentiles of valid sample counts.
 
 An entirely invalid automatic frame retains a valid, bounded prior multiplier. Without valid prior history it uses bounded neutral exposure `1`. A valid all-black image still meters at the luminance floor and resolves the bounded automatic target. This protects exposure state; it does not repair an invalid lighting producer.
 
+Histogram source ownership was reconciled on 2026-10-25. `ExposureHistogram.hlsli` owns sample counting and percentile-weighted average luminance; `ExposureHistogramResolve.hlsl` invokes those operations and publishes the existing log-luminance/valid-count moments. The build kernel retains its group-shared initialization, barriers and atomic publication as one GPU operation. This separation adds no shader records, resources or dispatches and preserves the reduction order and empty-histogram result; it is not metering-quality, native GPU or performance acceptance.
+
 ### Temporal Response And History
 
 Manual mode, missing/invalid history, a mode-tag mismatch, or a non-positive/non-finite prior multiplier resolves directly to target. Automatic mode with valid positive history adapts in log2 multiplier space:
@@ -220,7 +222,7 @@ The current pipeline does not pre-expose the lighting buffers. If that domain ch
 ### Source Routes
 
 - [Exposure passes](../../../../../../../../Engine/Renderer/Private/Passes/PostProcessing/Exposure/ExposurePasses.cpp), [histogram declaration](../../../../../../../../Engine/Renderer/Private/Passes/PostProcessing/Exposure/ExposureMeteringPasses.cpp), and [adaptation parameters](../../../../../../../../Engine/Renderer/Private/Passes/PostProcessing/Exposure/ExposureAdaptation.cpp)
-- [Histogram resolve](../../../../../../../../Engine/Assets/Shaders/Passes/PostProcessing/Exposure/ExposureHistogramResolve.hlsl), [shared exposure math](../../../../../../../../Engine/Assets/Shaders/Display/Exposure.hlsli), and [history resolve](../../../../../../../../Engine/Assets/Shaders/Passes/PostProcessing/Exposure/Exposure.hlsl)
+- [Histogram math](../../../../../../../../Engine/Assets/Shaders/Passes/PostProcessing/Exposure/ExposureHistogram.hlsli), [histogram resolve](../../../../../../../../Engine/Assets/Shaders/Passes/PostProcessing/Exposure/ExposureHistogramResolve.hlsl), [shared exposure math](../../../../../../../../Engine/Assets/Shaders/Display/Exposure.hlsli), and [history resolve](../../../../../../../../Engine/Assets/Shaders/Passes/PostProcessing/Exposure/Exposure.hlsl)
 - [View settings resolution](../../../../../../../../Engine/Renderer/Private/View/ViewportDisplaySettings.cpp) and [frame placement](../../../../../../../../Engine/Renderer/Private/Passes/Scene/SceneRenderingPasses.cpp)
 - [Tone mapping](../../../../../../../../Engine/Assets/Shaders/Passes/Presentation/Display/ToneMapping.hlsl) and [output encoding](../../../../../../../../Engine/Renderer/Private/Passes/Presentation/Display/OutputEncoding.cpp)
 

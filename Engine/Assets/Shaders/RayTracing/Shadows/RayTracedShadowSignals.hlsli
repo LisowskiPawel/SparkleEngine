@@ -9,27 +9,24 @@ struct ShadowVisibilitySample
 	float MaxDistance;
 };
 
-namespace RayTracedShadowSignals
+ShadowVisibilitySample BuildUnshadowedSignal(float maxDistance)
 {
-	ShadowVisibilitySample BuildUnshadowedSignal(float maxDistance)
-	{
-		ShadowVisibilitySample signal;
-		signal.Visibility = 1.0f;
-		signal.HitDistance = maxDistance;
-		signal.Confidence = 1.0f;
-		signal.MaxDistance = maxDistance;
-		return signal;
-	}
+	ShadowVisibilitySample signal;
+	signal.Visibility = 1.0f;
+	signal.HitDistance = maxDistance;
+	signal.Confidence = 1.0f;
+	signal.MaxDistance = maxDistance;
+	return signal;
+}
 
-	ShadowVisibilitySample BuildOccludedSignal(float hitDistance, float maxDistance)
-	{
-		ShadowVisibilitySample signal;
-		signal.Visibility = 0.0f;
-		signal.HitDistance = hitDistance;
-		signal.Confidence = 1.0f;
-		signal.MaxDistance = maxDistance;
-		return signal;
-	}
+ShadowVisibilitySample BuildOccludedSignal(float hitDistance, float maxDistance)
+{
+	ShadowVisibilitySample signal;
+	signal.Visibility = 0.0f;
+	signal.HitDistance = hitDistance;
+	signal.Confidence = 1.0f;
+	signal.MaxDistance = maxDistance;
+	return signal;
 }
 
 #endif

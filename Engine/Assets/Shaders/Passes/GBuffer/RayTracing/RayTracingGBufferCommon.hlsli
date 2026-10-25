@@ -68,7 +68,7 @@ namespace RayTracingGBuffer
 
 	void StoreHit(uint2 pixelCoord, RayTracingHitSurfaceData surface)
 	{
-		GBufferBaseColor[pixelCoord] = GBufferPacking::PackBaseColor(surface.BaseColor, surface.Alpha, surface.AlphaMode, RayTracingHitSurface::AlphaModeBlended);
+		GBufferBaseColor[pixelCoord] = GBufferPacking::PackBaseColor(surface.BaseColor, surface.Alpha, surface.AlphaMode, HitSurface::AlphaModeBlended);
 		GBufferWorldNormal[pixelCoord] = GBufferPacking::PackWorldNormal(surface.NormalWorld);
 		GBufferWorldTangent[pixelCoord] = GBufferPacking::PackWorldTangent(surface.TangentWorld);
 		GBufferMaterial[pixelCoord] = GBufferPacking::PackMaterial(surface.Metallic, surface.Roughness, surface.AmbientOcclusion, surface.DielectricF0);

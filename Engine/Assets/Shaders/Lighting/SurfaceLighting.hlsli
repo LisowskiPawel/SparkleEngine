@@ -54,16 +54,16 @@ namespace SurfaceLighting
 			return result;
 		}
 
-		const BRDF::Direct::Response response = BRDF::Direct::Evaluate(shadingData,
-		                                                               surface.BaseColor,
-		                                                               surface.Roughness,
-		                                                               surface.Metallic,
-		                                                               f0,
-		                                                               surface.SubsurfaceColor,
-		                                                               surface.SubsurfaceStrength,
-		                                                               surface.EvaluateDiffuse,
-		                                                               surface.EvaluateSpecular,
-		                                                               surface.EvaluateSubsurface);
+		const BRDF::DirectResponse response = BRDF::EvaluateDirect(shadingData,
+		                                                           surface.BaseColor,
+		                                                           surface.Roughness,
+		                                                           surface.Metallic,
+		                                                           f0,
+		                                                           surface.SubsurfaceColor,
+		                                                           surface.SubsurfaceStrength,
+		                                                           surface.EvaluateDiffuse,
+		                                                           surface.EvaluateSpecular,
+		                                                           surface.EvaluateSubsurface);
 
 		const float3 radiance = lightSample.IncidentRadiance * shadowVisibility / samplePdf;
 		const float3 incidentRadiance = radiance * shadingData.NoL;

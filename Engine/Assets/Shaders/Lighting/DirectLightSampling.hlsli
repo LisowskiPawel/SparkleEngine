@@ -4,7 +4,6 @@
 #include "/Engine/Resources/LightGpuData.hlsli"
 #include "/Engine/Resources/SceneLightingUniformData.hlsli"
 
-#include "/Engine/Common/Color.hlsli"
 #include "/Engine/Lighting/AreaLights.hlsli"
 
 namespace DirectLightSampling
@@ -143,127 +142,6 @@ namespace DirectLightSampling
 		}
 
 		return false;
-	}
-
-	float EstimateDirectionalLightWeight(uint lightIndex, float3 normalWorld)
-	{
-		const float3 directionWorld = PunctualLights::GetDirectionalLightDirection(lightIndex);
-		const float noL = max(dot(normalWorld, directionWorld), 0.0f);
-		return CommonColor::LuminanceRec709(max(DirectionalLights[lightIndex].Color * DirectionalLights[lightIndex].Illuminance, 0.0f.xxx)) * noL;
-	}
-
-	float EstimatePointLightWeight(uint lightIndex, float3 positionWorld, float3 normalWorld)
-	{
-		float distanceToLight = 0.0f;
-		const float3 directionWorld = PunctualLights::GetPointLightDirection(positionWorld, lightIndex, distanceToLight);
-		const float noL = max(dot(normalWorld, directionWorld), 0.0f);
-		const PointLightGpuData light = PointLights[lightIndex];
-		const float distanceAttenuation = PunctualLights::ComputePunctualDistanceAttenuation(distanceToLight, light.Range, light.DistanceAttenuationCoefficients);
-		return CommonColor::LuminanceRec709(max(light.Color * light.LuminousIntensity * distanceAttenuation, 0.0f.xxx)) * noL;
-	}
-
-	float EstimateSpotLightWeight(uint lightIndex, float3 positionWorld, float3 normalWorld)
-	{
-		float distanceToLight = 0.0f;
-		const float3 directionWorld = PunctualLights::GetSpotLightDirection(positionWorld, lightIndex, distanceToLight);
-		const float noL = max(dot(normalWorld, directionWorld), 0.0f);
-		const SpotLightGpuData light = SpotLights[lightIndex];
-		const float distanceAttenuation = PunctualLights::ComputePunctualDistanceAttenuation(distanceToLight, light.Range, light.DistanceAttenuationCoefficients);
-		const float angularAttenuation = PunctualLights::ComputeSpotAngularAttenuation(-directionWorld, light.Direction, light.InnerAngleCosine, light.OuterAngleCosine);
-		return CommonColor::LuminanceRec709(max(light.Color * light.LuminousIntensity * distanceAttenuation * angularAttenuation, 0.0f.xxx)) * noL;
-	}
-
-	float EstimateRectLightWeight(uint lightIndex, float3 positionWorld, float3 normalWorld)
-	{
-		const RectLightGpuData light = RectLights[lightIndex];
-		const float width = max(light.Width, 0.0f);
-		const float height = max(light.Height, 0.0f);
-		const float area = width * height;
-		if (area <= 1.0e-4f)
-		{
-			return 0.0f;
-		}
-
-		const float3 surfaceToLight = light.Position - positionWorld;
-		const float distanceSquared = max(dot(surfaceToLight, surfaceToLight), 1.0e-4f);
-		const float3 directionWorld = surfaceToLight * rsqrt(distanceSquared);
-		const float noL = max(dot(normalWorld, directionWorld), 0.0f);
-		const float cosLight = max(dot(SafeNormalize(light.Direction, float3(0.0f, -1.0f, 0.0f)), -directionWorld), 0.0f);
-		return CommonColor::LuminanceRec709(max(light.Color * light.Luminance, 0.0f.xxx)) * area * noL * cosLight / distanceSquared;
-	}
-
-	float EstimateLightWeight(LightId light, float3 positionWorld, float3 normalWorld)
-	{
-		if (light.Type == LightSampling::LightTypeDirectional)
-		{
-			return EstimateDirectionalLightWeight(light.Index, normalWorld);
-		}
-
-		if (light.Type == LightSampling::LightTypePoint)
-		{
-			return EstimatePointLightWeight(light.Index, positionWorld, normalWorld);
-		}
-
-		if (light.Type == LightSampling::LightTypeSpot)
-		{
-			return EstimateSpotLightWeight(light.Index, positionWorld, normalWorld);
-		}
-
-		if (light.Type == LightSampling::LightTypeRect)
-		{
-			return EstimateRectLightWeight(light.Index, positionWorld, normalWorld);
-		}
-
-		return 0.0f;
-	}
-
-	LightCandidate SampleLightCandidate(float3 positionWorld, float3 normalWorld, float random)
-	{
-		const uint lightCount = GetDirectLightCount();
-		if (lightCount == 0u)
-		{
-			return InvalidLightCandidate();
-		}
-
-		float totalWeight = 0.0f;
-		[loop]
-		for (uint linearIndex = 0u; linearIndex < lightCount; ++linearIndex)
-		{
-			totalWeight += EstimateLightWeight(GetDirectLightId(linearIndex), positionWorld, normalWorld);
-		}
-
-		if (totalWeight <= 1.0e-6f)
-		{
-			return InvalidLightCandidate();
-		}
-
-		const float target = min(saturate(random), 0.999999f) * totalWeight;
-		float accumulatedWeight = 0.0f;
-		LightCandidate lastCandidate = InvalidLightCandidate();
-		[loop]
-		for (uint linearIndex = 0u; linearIndex < lightCount; ++linearIndex)
-		{
-			const LightId light = GetDirectLightId(linearIndex);
-			const float weight = EstimateLightWeight(light, positionWorld, normalWorld);
-			if (weight <= 0.0f)
-			{
-				continue;
-			}
-
-			LightCandidate candidate;
-			candidate.Light = light;
-			candidate.SelectionPdf = weight / totalWeight;
-			candidate.Valid = 1.0f;
-			lastCandidate = candidate;
-
-			accumulatedWeight += weight;
-			if (target <= accumulatedWeight)
-			{
-				return candidate;
-			}
-		}
-
-		return lastCandidate;
 	}
 
 	LightCandidate SampleUniformLightCandidate(float random)

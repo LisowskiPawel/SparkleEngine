@@ -11,26 +11,7 @@ Texture2D GBufferMotionVector;
 Texture2D SkyTexture;
 SamplerState SamplerLinearClamp;
 
-#include "/Engine/Lighting/RestirIndirectReservoir.hlsli"
-
-void ReuseTemporalReservoir(uint2 pixelCoord, uint2 extent, RestirIndirectReservoir::Surface surface, inout RestirIndirectReservoir::Reservoir reservoir)
-{
-	if (surface.Valid && RestirIndirectTemporalReuse != 0u && HistoryValid != 0u)
-	{
-		const float2 motionPixels = GBufferMotionVector.Load(int3(pixelCoord, 0)).xy;
-		const float2 previousPixel = MotionVectors::ReprojectToPreviousPixelCenter(pixelCoord, motionPixels, float2(extent.x, extent.y));
-		const int2 previousPixelCoord = int2(floor(previousPixel));
-		if (previousPixelCoord.x >= 0 && previousPixelCoord.y >= 0 && previousPixelCoord.x < int(extent.x) && previousPixelCoord.y < int(extent.y)
-		    && RestirIndirectReservoir::AreSurfacesCompatible(surface, PreviousReservoirSurfaceTexture.Load(int3(previousPixelCoord, 0))))
-		{
-			const RestirIndirectReservoir::Reservoir previous = RestirIndirectReservoir::UnpackReservoir(PreviousReservoirSampleTexture.Load(int3(previousPixelCoord, 0)),
-			                                                                                             PreviousReservoirWeightTexture.Load(int3(previousPixelCoord, 0)));
-
-			uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x7E4F0A1u);
-			RestirIndirectReservoir::CombineReservoir(reservoir, previous, surface, SkyTexture, SamplerLinearClamp, RestirReservoirCommon::MaxTemporalM, CommonRandom::Random01(rng));
-		}
-	}
-}
+#include "/Engine/Lighting/RestirIndirectReservoirReuse.hlsli"
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -44,11 +25,23 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const RestirIndirectReservoir::Surface surface = RestirIndirectReservoir::LoadSurface(pixelCoord);
-	RestirIndirectReservoir::Reservoir reservoir = RestirIndirectReservoir::BuildInitialReservoir(surface, pixelCoord, SkyTexture, SamplerLinearClamp);
+	const IndirectReservoir::Surface surface = IndirectReservoir::LoadSurface(pixelCoord);
+	IndirectReservoir::Reservoir reservoir = IndirectReservoir::BuildInitialReservoir(surface, pixelCoord, SkyTexture, SamplerLinearClamp);
 
-	ReuseTemporalReservoir(pixelCoord, uint2(width, height), surface, reservoir);
+	if (surface.Valid && RestirIndirectTemporalReuse != 0u && HistoryValid != 0u)
+	{
+		IndirectReservoir::ReuseTemporal(pixelCoord,
+		                                 uint2(width, height),
+		                                 surface,
+		                                 GBufferMotionVector,
+		                                 PreviousReservoirSampleTexture,
+		                                 PreviousReservoirWeightTexture,
+		                                 PreviousReservoirSurfaceTexture,
+		                                 SkyTexture,
+		                                 SamplerLinearClamp,
+		                                 reservoir);
+	}
 
-	TemporalReservoirSampleTexture[pixelCoord] = RestirIndirectReservoir::PackSample(reservoir);
-	TemporalReservoirWeightTexture[pixelCoord] = RestirIndirectReservoir::PackWeight(reservoir);
+	TemporalReservoirSampleTexture[pixelCoord] = IndirectReservoir::PackSample(reservoir);
+	TemporalReservoirWeightTexture[pixelCoord] = IndirectReservoir::PackWeight(reservoir);
 }

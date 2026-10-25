@@ -11,71 +11,65 @@
 
 namespace BRDF
 {
-	namespace Direct
+	struct DirectResponse
 	{
-		struct Response
+		float3 Diffuse;
+		float3 Specular;
+		float3 Subsurface;
+	};
+
+	DirectResponse EvaluateDirect(ShadingData sd,
+	                              float3 albedo,
+	                              float roughness,
+	                              float metallic,
+	                              float3 F0,
+	                              float3 subsurfaceColor,
+	                              float subsurfaceStrength,
+	                              bool evaluateDiffuse,
+	                              bool evaluateSpecular,
+	                              bool evaluateSubsurface)
+	{
+		DirectResponse response = (DirectResponse)0;
+		const float3 F = Fresnel::EvaluateDirect(sd.VoH, F0);
+
+		if (evaluateSpecular)
 		{
-			float3 Diffuse;
-			float3 Specular;
-			float3 Subsurface;
-		};
-
-		Response Evaluate(ShadingData sd,
-		                  float3 albedo,
-		                  float roughness,
-		                  float metallic,
-		                  float3 F0,
-		                  float3 subsurfaceColor,
-		                  float subsurfaceStrength,
-		                  bool evaluateDiffuse,
-		                  bool evaluateSpecular,
-		                  bool evaluateSubsurface)
-		{
-			Response response = (Response)0;
-			const float3 F = Fresnel::EvaluateDirect(sd.VoH, F0);
-
-			if (evaluateSpecular)
-			{
-				response.Specular = Specular::EvaluateDirect(sd, roughness, F);
-			}
-
-			const float3 kD = (1.0f - F) * (1.0f - metallic);
-			const float subsurfaceWeight = saturate(subsurfaceStrength);
-			if (evaluateDiffuse)
-			{
-				response.Diffuse = Diffuse::EvaluateDirect(albedo, roughness, sd) * kD * (1.0f - subsurfaceWeight);
-			}
-
-			if (evaluateSubsurface && subsurfaceWeight > 0.0f)
-			{
-				response.Subsurface = Subsurface::EvaluateDirect(albedo, subsurfaceColor, roughness, subsurfaceWeight, sd) * kD * subsurfaceWeight;
-			}
-			return response;
+			response.Specular = Specular::EvaluateDirect(sd, roughness, F);
 		}
+
+		const float3 kD = (1.0f - F) * (1.0f - metallic);
+		const float subsurfaceWeight = saturate(subsurfaceStrength);
+		if (evaluateDiffuse)
+		{
+			response.Diffuse = Diffuse::EvaluateDirect(albedo, roughness, sd) * kD * (1.0f - subsurfaceWeight);
+		}
+
+		if (evaluateSubsurface && subsurfaceWeight > 0.0f)
+		{
+			response.Subsurface = Subsurface::EvaluateDirect(albedo, subsurfaceColor, roughness, subsurfaceWeight, sd) * kD * subsurfaceWeight;
+		}
+		return response;
 	}
 
-	namespace Indirect
+	void EvaluateIndirect(float NoV,
+	                      float3 albedo,
+	                      float roughness,
+	                      float metallic,
+	                      float3 F0,
+	                      float3 irradiance,
+	                      float3 prefilteredEnv,
+	                      float ambientOcclusion,
+	                      out float3 outDiffuse,
+	                      out float3 outSpecular)
 	{
-		void Evaluate(float NoV,
-		              float3 albedo,
-		              float roughness,
-		              float metallic,
-		              float3 F0,
-		              float3 irradiance,
-		              float3 prefilteredEnv,
-		              float ambientOcclusion,
-		              out float3 outDiffuse,
-		              out float3 outSpecular)
-		{
-			const float3 F = Fresnel::EvaluateIndirect(NoV, F0, roughness);
+		const float3 F = Fresnel::EvaluateIndirect(NoV, F0, roughness);
 
-			outSpecular = Specular::EvaluateIndirect(NoV, F0, roughness, prefilteredEnv);
+		outSpecular = Specular::EvaluateIndirect(NoV, F0, roughness, prefilteredEnv);
 
-			const float3 kD = (1.0f - F) * (1.0f - metallic);
-			outDiffuse = Diffuse::EvaluateIndirect(albedo) * irradiance * kD;
+		const float3 kD = (1.0f - F) * (1.0f - metallic);
+		outDiffuse = Diffuse::EvaluateIndirect(albedo) * irradiance * kD;
 
-			outDiffuse *= Occlusion::MultibounceAO(ambientOcclusion, albedo);
-			outSpecular *= Occlusion::SpecularOcclusion(NoV, ambientOcclusion, roughness);
-		}
+		outDiffuse *= Occlusion::MultibounceAO(ambientOcclusion, albedo);
+		outSpecular *= Occlusion::SpecularOcclusion(NoV, ambientOcclusion, roughness);
 	}
 }

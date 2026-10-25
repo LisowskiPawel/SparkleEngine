@@ -31,49 +31,49 @@ RayTracingMaterialSample EvaluateRayTracingHitMaterial(RayTracingHitMaterial mat
 	result.AmbientOcclusion = 1.0f;
 	result.SubsurfaceStrength = material.SubsurfaceStrength;
 
-	if (MaterialTextureTableSampling::HasTexture(material.TextureFlags, MaterialTextureTableSampling::TextureSlotNormal))
+	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotNormal))
 	{
-		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextureTableSampling::TextureSlotNormal];
+		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextures::TextureSlotNormal];
 
-		result.NormalTangent = DecodeBc5TangentNormal(SampleRayTracingMaterialTexture(material, MaterialTextureTableSampling::TextureSlotNormal, uv).rg, mapping.Strength);
+		result.NormalTangent = DecodeBc5TangentNormal(SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotNormal, uv).rg, mapping.Strength);
 	}
 
-	if (MaterialTextureTableSampling::HasTexture(material.TextureFlags, MaterialTextureTableSampling::TextureSlotBaseColor))
+	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotBaseColor))
 	{
-		result.BaseColor = SampleRayTracingMaterialTexture(material, MaterialTextureTableSampling::TextureSlotBaseColor, uv) * material.BaseColor;
+		result.BaseColor = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotBaseColor, uv) * material.BaseColor;
 	}
 
-	if (MaterialTextureTableSampling::HasTexture(material.TextureFlags, MaterialTextureTableSampling::TextureSlotRoughness))
+	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotRoughness))
 	{
-		result.Roughness = SampleRayTracingMaterialTexture(material, MaterialTextureTableSampling::TextureSlotRoughness, uv).r * material.Roughness;
+		result.Roughness = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotRoughness, uv).r * material.Roughness;
 	}
 
-	if (MaterialTextureTableSampling::HasTexture(material.TextureFlags, MaterialTextureTableSampling::TextureSlotMetallic))
+	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotMetallic))
 	{
-		result.Metallic = SampleRayTracingMaterialTexture(material, MaterialTextureTableSampling::TextureSlotMetallic, uv).r * material.Metallic;
+		result.Metallic = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotMetallic, uv).r * material.Metallic;
 	}
 
-	if (EmissiveEnabled != 0u && MaterialTextureTableSampling::HasTexture(material.TextureFlags, MaterialTextureTableSampling::TextureSlotEmissive))
+	if (EmissiveEnabled != 0u && MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotEmissive))
 	{
-		result.Emissive = SampleRayTracingMaterialTexture(material, MaterialTextureTableSampling::TextureSlotEmissive, uv).rgb * material.EmissiveColor;
+		result.Emissive = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotEmissive, uv).rgb * material.EmissiveColor;
 	}
 
-	if (MaterialTextureTableSampling::HasTexture(material.TextureFlags, MaterialTextureTableSampling::TextureSlotOcclusion))
+	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotOcclusion))
 	{
-		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextureTableSampling::TextureSlotOcclusion];
-		const float sampledOcclusion = SampleRayTracingMaterialTexture(material, MaterialTextureTableSampling::TextureSlotOcclusion, uv).r;
+		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextures::TextureSlotOcclusion];
+		const float sampledOcclusion = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotOcclusion, uv).r;
 
 		result.AmbientOcclusion = lerp(1.0f, sampledOcclusion, mapping.Strength);
 	}
 
-	if (MaterialTextureTableSampling::HasTexture(material.TextureFlags, MaterialTextureTableSampling::TextureSlotSubsurfaceColor))
+	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotSubsurfaceColor))
 	{
-		result.SubsurfaceColor = SampleRayTracingMaterialTexture(material, MaterialTextureTableSampling::TextureSlotSubsurfaceColor, uv).rgb * material.SubsurfaceColor;
+		result.SubsurfaceColor = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceColor, uv).rgb * material.SubsurfaceColor;
 	}
 
-	if (MaterialTextureTableSampling::HasTexture(material.TextureFlags, MaterialTextureTableSampling::TextureSlotSubsurfaceStrength))
+	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotSubsurfaceStrength))
 	{
-		result.SubsurfaceStrength = SampleRayTracingMaterialTexture(material, MaterialTextureTableSampling::TextureSlotSubsurfaceStrength, uv).r * material.SubsurfaceStrength;
+		result.SubsurfaceStrength = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceStrength, uv).r * material.SubsurfaceStrength;
 	}
 
 	result.BaseColor *= vertexColor;
@@ -89,7 +89,7 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	const float3 normalObject = cross(evaluatedTriangle.V1.Position - evaluatedTriangle.V0.Position, evaluatedTriangle.V2.Position - evaluatedTriangle.V0.Position);
 	const float3 outwardGeometricNormal = RayEndpoints::TransformGeometricNormal(normalObject, mesh);
 
-	const bool twoSided = (evaluatedTriangle.Instance.Flags & RayTracingHitSurface::InstanceFlagTwoSided) != 0u;
+	const bool twoSided = (evaluatedTriangle.Instance.Flags & HitSurface::InstanceFlagTwoSided) != 0u;
 
 	RayTracingHitSurfaceData surface = (RayTracingHitSurfaceData)0;
 	if (!trace.FrontFace && !twoSided)

@@ -25,7 +25,7 @@ struct RayTracingHitSurfaceData
 	bool EmissionTwoSided;
 };
 
-namespace RayTracingHitSurface
+namespace HitSurface
 {
 	static const uint AlphaModeOpaque = 0u;
 	static const uint AlphaModeTested = 1u;

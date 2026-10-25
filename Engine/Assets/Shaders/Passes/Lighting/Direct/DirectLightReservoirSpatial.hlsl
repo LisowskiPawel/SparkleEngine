@@ -1,36 +1,10 @@
-#include "/Engine/Lighting/DirectLightReservoir.hlsli"
+#include "/Engine/Lighting/DirectLightReservoirReuse.hlsli"
 
 Texture2D<float4> TemporalReservoirSample;
 Texture2D<float4> TemporalReservoirWeight;
 RWTexture2D<float4> CurrentReservoirSample;
 RWTexture2D<float4> CurrentReservoirWeight;
 RWTexture2D<float4> CurrentReservoirSurface;
-
-void ReuseSpatialReservoir(uint2 pixelCoord, uint2 extent, DirectLightReservoir::Surface surface, inout DirectLightReservoir::Reservoir reservoir)
-{
-	uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x5A71A1u);
-	const uint offsetStart = (uint)(CommonRandom::Random01(rng) * 8.0f) & 7u;
-	[unroll]
-	for (uint sampleIndex = 0u; sampleIndex < RestirReservoirCommon::SpatialNeighborCount; ++sampleIndex)
-	{
-		const int2 neighborCoord = int2(pixelCoord) + RestirReservoirCommon::SpatialOffsets[(offsetStart + sampleIndex * 2u) & 7u];
-		if (neighborCoord.x < 0 || neighborCoord.y < 0 || neighborCoord.x >= (int)extent.x || neighborCoord.y >= (int)extent.y)
-		{
-			continue;
-		}
-
-		const DirectLightReservoir::Surface neighborSurface = DirectLightReservoir::LoadSurface((uint2)neighborCoord);
-		if (!DirectLightReservoir::AreSurfacesCompatible(surface, DirectLightReservoir::PackSurface(neighborSurface)))
-		{
-			continue;
-		}
-
-		const DirectLightReservoir::Reservoir neighborReservoir = DirectLightReservoir::UnpackReservoir(TemporalReservoirSample.Load(int3(neighborCoord, 0)),
-		                                                                                                TemporalReservoirWeight.Load(int3(neighborCoord, 0)));
-
-		DirectLightReservoir::CombineReservoir(reservoir, neighborReservoir, surface, RestirReservoirCommon::MaxSpatialM, CommonRandom::Random01(rng));
-	}
-}
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -45,21 +19,21 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const DirectLightReservoir::Surface surface = DirectLightReservoir::LoadSurface(pixelCoord);
+	const DirectReservoir::Surface surface = DirectReservoir::LoadSurface(pixelCoord);
 	if (!surface.Valid)
 	{
-		const DirectLightReservoir::Reservoir emptyReservoir = DirectLightReservoir::EmptyReservoir();
-		CurrentReservoirSample[pixelCoord] = DirectLightReservoir::PackReservoirSample(emptyReservoir);
-		CurrentReservoirWeight[pixelCoord] = DirectLightReservoir::PackReservoirWeight(emptyReservoir);
+		const DirectReservoir::Reservoir emptyReservoir = DirectReservoir::EmptyReservoir();
+		CurrentReservoirSample[pixelCoord] = DirectReservoir::PackReservoirSample(emptyReservoir);
+		CurrentReservoirWeight[pixelCoord] = DirectReservoir::PackReservoirWeight(emptyReservoir);
 		CurrentReservoirSurface[pixelCoord] = 0.0f.xxxx;
 		return;
 	}
 
-	DirectLightReservoir::Reservoir reservoir = DirectLightReservoir::UnpackReservoir(TemporalReservoirSample.Load(int3(pixelCoord, 0)), TemporalReservoirWeight.Load(int3(pixelCoord, 0)));
+	DirectReservoir::Reservoir reservoir = DirectReservoir::UnpackReservoir(TemporalReservoirSample.Load(int3(pixelCoord, 0)), TemporalReservoirWeight.Load(int3(pixelCoord, 0)));
 
-	ReuseSpatialReservoir(pixelCoord, uint2(width, height), surface, reservoir);
+	DirectReservoir::ReuseSpatial(pixelCoord, uint2(width, height), surface, TemporalReservoirSample, TemporalReservoirWeight, reservoir);
 
-	CurrentReservoirSample[pixelCoord] = DirectLightReservoir::PackReservoirSample(reservoir);
-	CurrentReservoirWeight[pixelCoord] = DirectLightReservoir::PackReservoirWeight(reservoir);
-	CurrentReservoirSurface[pixelCoord] = DirectLightReservoir::PackSurface(surface);
+	CurrentReservoirSample[pixelCoord] = DirectReservoir::PackReservoirSample(reservoir);
+	CurrentReservoirWeight[pixelCoord] = DirectReservoir::PackReservoirWeight(reservoir);
+	CurrentReservoirSurface[pixelCoord] = DirectReservoir::PackSurface(surface);
 }

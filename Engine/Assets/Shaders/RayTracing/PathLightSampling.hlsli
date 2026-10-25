@@ -29,9 +29,7 @@ namespace PathLightSampling
 
 		const RayTracingHitInstance instance = RayTracingHitInstances[instanceId];
 
-		return (instance.Flags & RayTracingHitSurface::InstanceFlagValid) != 0u && (RayTracingHitMaterials[instance.MaterialSlot].Flags & RayTracingHitSurface::MaterialFlagEmissive) != 0u
-		    ? instance.IndexCount / 3u
-		    : 0u;
+		return (instance.Flags & HitSurface::InstanceFlagValid) != 0u && (RayTracingHitMaterials[instance.MaterialSlot].Flags & HitSurface::MaterialFlagEmissive) != 0u ? instance.IndexCount / 3u : 0u;
 	}
 
 	uint CountEmissiveTriangles()
@@ -141,7 +139,7 @@ namespace PathLightSampling
 		const float twiceArea = length(normalUnnormalized);
 		emissiveTriangle.Normal = RayEndpoints::TransformGeometricNormal(normalObject, emissiveTriangle.Mesh);
 		emissiveTriangle.Area = 0.5f * twiceArea;
-		emissiveTriangle.TwoSided = (evaluated.Instance.Flags & RayTracingHitSurface::InstanceFlagTwoSided) != 0u;
+		emissiveTriangle.TwoSided = (evaluated.Instance.Flags & HitSurface::InstanceFlagTwoSided) != 0u;
 		return emissiveTriangle;
 	}
 
@@ -165,9 +163,9 @@ namespace PathLightSampling
 		}
 
 		float3 emittedRadiance = emissiveTriangle.Material.EmissiveColor;
-		if (MaterialTextureTableSampling::HasTexture(emissiveTriangle.Material.TextureFlags, MaterialTextureTableSampling::TextureSlotEmissive))
+		if (MaterialTextures::HasTexture(emissiveTriangle.Material.TextureFlags, MaterialTextures::TextureSlotEmissive))
 		{
-			emittedRadiance *= SampleRayTracingMaterialTexture(emissiveTriangle.Material, MaterialTextureTableSampling::TextureSlotEmissive, InterpolateRayTracingTexCoord0(sampledTriangle)).rgb;
+			emittedRadiance *= SampleRayTracingMaterialTexture(emissiveTriangle.Material, MaterialTextures::TextureSlotEmissive, InterpolateRayTracingTexCoord0(sampledTriangle)).rgb;
 		}
 
 		LightSampling::DirectLightSample result = LightSampling::RadiometricAreaLightSample(positionWorld,

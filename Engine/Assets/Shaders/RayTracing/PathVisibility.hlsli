@@ -6,29 +6,26 @@
 #include "/Engine/RayTracing/RayEndpoints.hlsli"
 #include "/Engine/RayTracing/RayTracingSceneTrace.hlsli"
 
-namespace PathVisibility
+bool IsPathUnoccluded(RaytracingAccelerationStructure sceneTlas, RayTracingPathSurface surface, LightSampling::DirectLightSample lightSample)
 {
-	bool IsUnoccluded(RaytracingAccelerationStructure sceneTlas, RayTracingPathSurface surface, LightSampling::DirectLightSample lightSample)
+	RayDesc ray;
+	if (lightSample.IsDirectional)
 	{
-		RayDesc ray;
-		if (lightSample.IsDirectional)
-		{
-			ray = RayEndpoints::Continuation(surface.PositionWorld, surface.GeometricNormalWorld, surface.PositionError, lightSample.DirectionWorld);
-		}
-		else
-		{
-			ray = RayEndpoints::Connection(surface.PositionWorld,
-			                               surface.GeometricNormalWorld,
-			                               surface.PositionError,
-			                               lightSample.SamplePositionWorld,
-			                               lightSample.EmitterNormalWorld,
-			                               lightSample.EmitterEndpointBaseOffset,
-			                               lightSample.EmitterEndpointTraversalSensitivity);
-		}
-
-		const RayTracingTraceResult trace = TraceSceneRay(sceneTlas, ray.Origin, ray.Direction, ray.TMin, ray.TMax, RAY_FLAG_CULL_BACK_FACING_TRIANGLES, 0xFFu);
-		return !trace.Hit || (trace.InstanceId == lightSample.TargetInstanceId && trace.PrimitiveIndex == lightSample.TargetPrimitiveIndex);
+		ray = RayEndpoints::Continuation(surface.PositionWorld, surface.GeometricNormalWorld, surface.PositionError, lightSample.DirectionWorld);
 	}
+	else
+	{
+		ray = RayEndpoints::Connection(surface.PositionWorld,
+		                               surface.GeometricNormalWorld,
+		                               surface.PositionError,
+		                               lightSample.SamplePositionWorld,
+		                               lightSample.EmitterNormalWorld,
+		                               lightSample.EmitterEndpointBaseOffset,
+		                               lightSample.EmitterEndpointTraversalSensitivity);
+	}
+
+	const RayTracingTraceResult trace = TraceSceneRay(sceneTlas, ray.Origin, ray.Direction, ray.TMin, ray.TMax, RAY_FLAG_CULL_BACK_FACING_TRIANGLES, 0xFFu);
+	return !trace.Hit || (trace.InstanceId == lightSample.TargetInstanceId && trace.PrimitiveIndex == lightSample.TargetPrimitiveIndex);
 }
 
 #endif

@@ -4,7 +4,7 @@
 #include "ShaderRecook/ShaderCompilerProcess.h"
 
 #include "Core/Public/Files/FileUtils.h"
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "Core/Public/Paths/ProductPaths.h"
 #include "Core/Public/Process/ChildProcess.h"
 #include "Core/Public/Process/CommandLineUtils.h"
 #include "Core/Public/Strings/StringUtils.h"
@@ -139,8 +139,7 @@ std::filesystem::path ShaderCompilerProcess::ResolveExecutable() noexcept
 {
 	const std::filesystem::path executableDirectory = Filesystem::GetExecutableDirectory();
 	const std::string profileName = executableDirectory.filename().string();
-	const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(Filesystem::GetWorkspaceRootPath());
-	const std::filesystem::path executablePath = outputs.ToolTargetOutputs("ShaderCompiler", profileName).BinaryDirectory / "ShaderCompiler.exe";
+	const std::filesystem::path executablePath = Filesystem::ResolveProductToolPath(Filesystem::GetWorkspaceRootPath(), "ShaderCompiler", profileName);
 	std::error_code error;
 	return std::filesystem::is_regular_file(executablePath, error) && !error ? executablePath : std::filesystem::path{};
 }
@@ -157,7 +156,7 @@ ShaderCompilerProcessResult ShaderCompilerProcess::RunCommand(const std::filesys
 	ShaderCompilerProcessResult result;
 	if (executablePath.empty())
 	{
-		result.Execution.FailureReason = "ShaderCompiler.exe was not found in the build output.";
+		result.Execution.FailureReason = "ShaderCompiler.exe was not found for this product. Prepare cooking tools in Launcher, then retry.";
 		return result;
 	}
 	if (workingDirectory.empty())

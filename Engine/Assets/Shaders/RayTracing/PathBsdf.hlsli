@@ -139,7 +139,7 @@ namespace PathBsdf
 		return result;
 	}
 
-	float3 SampleVisibleGGXHalfVector(RayTracingPathSurface surface, float2 sample)
+	float3 SampleGGXReflection(RayTracingPathSurface surface, float2 sample)
 	{
 		const CommonSampling::OrthonormalBasis basis = CommonSampling::BuildOrthonormalBasis(surface.NormalWorld);
 
@@ -162,38 +162,31 @@ namespace PathBsdf
 		const float3 localHalfVector = normalize(float3(alpha * visibleNormal.xy, max(visibleNormal.z, 0.0f)));
 		const float3 halfVectorWorld = basis.Tangent * localHalfVector.x + basis.Bitangent * localHalfVector.y + surface.NormalWorld * localHalfVector.z;
 
-		return normalize(halfVectorWorld);
+		const float3 halfVector = normalize(halfVectorWorld);
+		return normalize(reflect(-surface.ViewDirWorld, halfVector));
 	}
 
-	RayTracingPathSample::DirectionSample Sample(RayTracingPathSurface surface, LobeMasses masses, uint selectedLobe, float2 sample, bool evaluateDiffuse, bool evaluateSpecular)
+	PathSample::DirectionSample SampleMirror(RayTracingPathSurface surface, float specularMass, bool evaluateSpecular)
 	{
-		RayTracingPathSample::DirectionSample result = (RayTracingPathSample::DirectionSample)0;
+		PathSample::DirectionSample result = (PathSample::DirectionSample)0;
+		result.DirectionWorld = normalize(reflect(-surface.ViewDirWorld, surface.NormalWorld));
 
-		if (selectedLobe == RayTracingPathSample::LobeDiffuse)
+		if (evaluateSpecular)
 		{
-			result.DirectionWorld = CommonSampling::SampleCosineHemisphereDirection(surface.NormalWorld, sample);
+			const float3 f0 = lerp(surface.DielectricF0.xxx, surface.BaseColor, surface.Metallic);
+			const float cosine = abs(dot(surface.ViewDirWorld, surface.NormalWorld));
+			const float correction = ShadingNormalCorrection(surface, result.DirectionWorld);
+			result.SpecularThroughput = BRDF::Fresnel::Schlick(cosine, f0) * correction / specularMass;
 		}
-		else
-		{
-			if (masses.SpecularDelta)
-			{
-				result.DirectionWorld = normalize(reflect(-surface.ViewDirWorld, surface.NormalWorld));
+		result.Delta = true;
+		result.HasSupport = any(result.SpecularThroughput > 0.0f);
+		return result;
+	}
 
-				if (evaluateSpecular)
-				{
-					const float3 f0 = lerp(surface.DielectricF0.xxx, surface.BaseColor, surface.Metallic);
-					const float cosine = abs(dot(surface.ViewDirWorld, surface.NormalWorld));
-					const float correction = ShadingNormalCorrection(surface, result.DirectionWorld);
-					result.SpecularThroughput = BRDF::Fresnel::Schlick(cosine, f0) * correction / masses.Specular;
-				}
-				result.Delta = true;
-				result.HasSupport = any(result.SpecularThroughput > 0.0f);
-				return result;
-			}
-
-			const float3 halfVector = SampleVisibleGGXHalfVector(surface, sample);
-			result.DirectionWorld = normalize(reflect(-surface.ViewDirWorld, halfVector));
-		}
+	PathSample::DirectionSample BuildContinuousSample(RayTracingPathSurface surface, float3 directionWorld, LobeMasses masses, bool evaluateDiffuse, bool evaluateSpecular)
+	{
+		PathSample::DirectionSample result = (PathSample::DirectionSample)0;
+		result.DirectionWorld = directionWorld;
 
 		const Evaluation evaluation = EvaluateContinuous(surface, result.DirectionWorld, masses, evaluateDiffuse, evaluateSpecular);
 		result.PdfW = evaluation.PdfW;
@@ -213,6 +206,27 @@ namespace PathBsdf
 		result.HasSupport = evaluation.HasSupport;
 		return result;
 	}
+
+	PathSample::DirectionSample Sample(RayTracingPathSurface surface, LobeMasses masses, uint selectedLobe, float2 sample, bool evaluateDiffuse, bool evaluateSpecular)
+	{
+		if (selectedLobe != PathSample::LobeDiffuse && masses.SpecularDelta)
+		{
+			return SampleMirror(surface, masses.Specular, evaluateSpecular);
+		}
+
+		float3 directionWorld;
+		if (selectedLobe == PathSample::LobeDiffuse)
+		{
+			directionWorld = CommonSampling::SampleCosineHemisphereDirection(surface.NormalWorld, sample);
+		}
+		else
+		{
+			directionWorld = SampleGGXReflection(surface, sample);
+		}
+
+		return BuildContinuousSample(surface, directionWorld, masses, evaluateDiffuse, evaluateSpecular);
+	}
+
 }
 
 #endif

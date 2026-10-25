@@ -1,15 +1,13 @@
 #ifndef SPARKLE_RAY_TRACING_PATH_SAMPLING_HLSLI
 #define SPARKLE_RAY_TRACING_PATH_SAMPLING_HLSLI
 
-#include "/Engine/Resources/FrameUniformData.hlsli"
-
 #include "/Engine/Common/Random.hlsli"
 #include "/Engine/Lighting/SurfaceLighting.hlsli"
 #include "/Engine/RayTracing/PathBsdf.hlsli"
 #include "/Engine/RayTracing/PathSurface.hlsli"
 #include "/Engine/RayTracing/RayTracingPathSample.hlsli"
 
-namespace RayTracingPathSampling
+namespace PathSampling
 {
 	static const uint SpecularSampleModeStochasticGGX = 1u;
 
@@ -31,11 +29,6 @@ namespace RayTracingPathSampling
 		return result;
 	}
 
-	RandomSamples GenerateRandomSamples(uint2 pixelCoord, uint bounceIndex, uint sampleIndex)
-	{
-		return GenerateRandomSamples(pixelCoord, bounceIndex, sampleIndex, FrameIndex);
-	}
-
 	float DiffuseLobeProbability(RayTracingPathSurface surface, float3 f0)
 	{
 		const float3 luminanceWeights = float3(0.2126f, 0.7152f, 0.0722f);
@@ -45,13 +38,13 @@ namespace RayTracingPathSampling
 		return totalWeight > 0.0f ? saturate(diffuseWeight / totalWeight) : 0.5f;
 	}
 
-	RayTracingPathSample::DirectionSample InvalidSample()
+	PathSample::DirectionSample InvalidSample()
 	{
-		RayTracingPathSample::DirectionSample result = (RayTracingPathSample::DirectionSample)0;
+		PathSample::DirectionSample result = (PathSample::DirectionSample)0;
 		return result;
 	}
 
-	RayTracingPathSample::DirectionSample SampleBSDF(RayTracingPathSurface surface, uint specularSampleMode, RandomSamples randomSamples, bool evaluateDiffuse, bool evaluateSpecular)
+	PathSample::DirectionSample SampleBSDF(RayTracingPathSurface surface, uint specularSampleMode, RandomSamples randomSamples, bool evaluateDiffuse, bool evaluateSpecular)
 	{
 		if (!surface.Valid)
 		{
@@ -70,10 +63,10 @@ namespace RayTracingPathSampling
 			return InvalidSample();
 		}
 
-		uint selectedLobe = RayTracingPathSample::LobeSpecular;
+		uint selectedLobe = PathSample::LobeSpecular;
 		if (randomSamples.Lobe < diffuseMass)
 		{
-			selectedLobe = RayTracingPathSample::LobeDiffuse;
+			selectedLobe = PathSample::LobeDiffuse;
 		}
 
 		return PathBsdf::Sample(surface, masses, selectedLobe, randomSamples.Direction, evaluateDiffuse, evaluateSpecular);

@@ -4,7 +4,7 @@
 
 **Status:** current feature dossier; source-backed, not visual fidelity, raster/ray parity, performance, or release evidence
 
-**Verified:** 2026-09-06 against committed `master` revision `d236da11`; `Engine/Renderer` is unchanged from the earlier `8414b5dc` source audit
+**Verified:** feature baseline 2026-09-06 at revision `d236da11`; dated source reconciliations below update specific ownership paths without establishing native execution.
 
 **Scope:** `REN-SCENE-03` through `REN-SCENE-10`, `REN-MAT-01` through `REN-MAT-10`, `REN-GBUF-01` through `REN-GBUF-08`, and `REN-FRONT-01` through `REN-FRONT-07`
 
@@ -61,6 +61,8 @@ This promise currently covers opaque and alpha-tested static, instanced, skinned
 Raster GBuffer uses a bindful per-material layout for eight texture roles: base color, normal, roughness, metallic, ambient occlusion, emissive, subsurface color, and subsurface strength. Ray consumers use a fixed-capacity material texture descriptor array only when non-uniform indexing and partially-bound array capabilities are available and the capacity reaches 4096. This is bounded descriptor-array indexing, not engine-wide runtime-sized bindless.
 
 Material texture-table support is derived from RHI descriptor capabilities by `SupportsMaterialTextureTable`; there is no user binding-mode selector. The 2026-10-25 source cleanup removes the unused selector and report-only mode/path fields without changing the 4096-descriptor threshold or the indexing requirements. This is source evidence, not native rendering or backend-parity acceptance.
+
+Shader scope ownership was reconciled on 2026-10-25. `MaterialTextures` names the existing texture-table slot/address/sampling owner; `BRDF::EvaluateDirect`, `BRDF::EvaluateIndirect` and the existing `BRDF::DirectResponse` value sit directly in the BRDF domain rather than nested Direct/Indirect scopes. Real diffuse/specular/Fresnel model scopes remain. These names preserve the equations, texture bindings and record fields; they do not establish physical-model correctness or raster/ray parity.
 
 The [selected shading contract](ShadingModelsDesign.md) and [MAT plan](ImplementationPlan.md) own base qualification and later anisotropic GGX/clearcoat. Existing helpers are not physical-model, sampling or cross-path verdicts; new profiles require independently qualified reference domains.
 

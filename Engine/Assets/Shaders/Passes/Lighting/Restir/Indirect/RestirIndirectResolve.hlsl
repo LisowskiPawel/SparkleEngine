@@ -10,7 +10,7 @@ RWTexture2D<float4> IndirectSpecular;
 
 #include "/Engine/Lighting/RayReconstructionGuides.hlsli"
 
-void StoreIndirectLighting(uint2 pixelCoord, RestirIndirectReservoir::Surface surface, RayTracingPathLighting::Result path, float reservoirWeight)
+void StoreIndirectLighting(uint2 pixelCoord, IndirectReservoir::Surface surface, PathLighting::Result path, float reservoirWeight)
 {
 	if (RestirIndirectEvaluateDiffuse != 0u)
 	{
@@ -44,10 +44,9 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const RestirIndirectReservoir::Surface surface = RestirIndirectReservoir::LoadSurface(pixelCoord);
+	const IndirectReservoir::Surface surface = IndirectReservoir::LoadSurface(pixelCoord);
 
-	const RestirIndirectReservoir::Reservoir reservoir = RestirIndirectReservoir::UnpackReservoir(CurrentReservoirSampleTexture.Load(int3(pixelCoord, 0)),
-	                                                                                              CurrentReservoirWeightTexture.Load(int3(pixelCoord, 0)));
+	const IndirectReservoir::Reservoir reservoir = IndirectReservoir::UnpackReservoir(CurrentReservoirSampleTexture.Load(int3(pixelCoord, 0)), CurrentReservoirWeightTexture.Load(int3(pixelCoord, 0)));
 
 	if (!surface.Valid)
 	{
@@ -63,7 +62,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		RayReconstructionGuides::WriteSurface(pixelCoord, surface.GBuffer, surface.PathSurface.ViewDirWorld);
 	}
 
-	if (!RestirIndirectReservoir::IsValid(reservoir))
+	if (!IndirectReservoir::IsValid(reservoir))
 	{
 		if (WriteRayReconstructionGuides != 0u)
 		{
@@ -72,8 +71,8 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const RayTracingPathLighting::Result path = RestirIndirectReservoir::EvaluateCandidate(surface, reservoir.Selected, SkyTexture, SamplerLinearClamp);
-	const float reservoirWeight = RestirIndirectReservoir::GetFinalWeight(reservoir);
+	const PathLighting::Result path = IndirectReservoir::EvaluateCandidate(surface, reservoir.Selected, SkyTexture, SamplerLinearClamp);
+	const float reservoirWeight = IndirectReservoir::GetFinalWeight(reservoir);
 
 	StoreIndirectLighting(pixelCoord, surface, path, reservoirWeight);
 }

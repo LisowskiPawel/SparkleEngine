@@ -15,14 +15,7 @@ RayTracingTraceResult TraceSceneRay(RaytracingAccelerationStructure sceneTlas, f
 	RayTracingMaterialPayload payload = (RayTracingMaterialPayload)0;
 	payload.RayT = tMax;
 
-	TraceRay(sceneTlas,
-	         rayFlags,
-	         instanceMask,
-	         RayTracingShaderTableLayout::SurfaceRayContribution,
-	         RayTracingShaderTableLayout::GeometryMultiplier,
-	         RayTracingShaderTableLayout::SurfaceMissIndex,
-	         ray,
-	         payload);
+	TraceRay(sceneTlas, rayFlags, instanceMask, RayShaderTable::SurfaceRayContribution, RayShaderTable::GeometryMultiplier, RayShaderTable::SurfaceMissIndex, ray, payload);
 
 	return ResolveRayTracingMaterialPayload(payload);
 }

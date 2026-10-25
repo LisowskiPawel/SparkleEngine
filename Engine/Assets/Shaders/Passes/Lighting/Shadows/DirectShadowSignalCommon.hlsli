@@ -19,7 +19,7 @@ Texture2D<float4> CurrentReservoirWeight;
 bool PrepareDirectShadowSignal(uint2 pixelCoord, out RayTracedShadowRequest request, out ShadowVisibilitySample immediateSignal)
 {
 	request = (RayTracedShadowRequest)0;
-	immediateSignal = RayTracedShadowSignals::BuildUnshadowedSignal(0.0f);
+	immediateSignal = BuildUnshadowedSignal(0.0f);
 
 	const float sceneDepth = LoadSceneDepth(pixelCoord);
 	if (IsSkyPixel(sceneDepth))
@@ -29,14 +29,14 @@ bool PrepareDirectShadowSignal(uint2 pixelCoord, out RayTracedShadowRequest requ
 
 	const float3 positionWorld = ReconstructGBufferWorldPosition(pixelCoord, sceneDepth, InvViewMTX, InvProjectionMTX);
 	const float3 normalWorld = GBufferPacking::DecodeWorldNormal(GBufferWorldNormal.Load(int3(pixelCoord, 0)).xyz);
-	const DirectLightReservoir::Reservoir reservoir = DirectLightReservoir::UnpackReservoir(CurrentReservoirSample.Load(int3(pixelCoord, 0)), CurrentReservoirWeight.Load(int3(pixelCoord, 0)));
-	if (!DirectLightReservoir::IsValid(reservoir))
+	const DirectReservoir::Reservoir reservoir = DirectReservoir::UnpackReservoir(CurrentReservoirSample.Load(int3(pixelCoord, 0)), CurrentReservoirWeight.Load(int3(pixelCoord, 0)));
+	if (!DirectReservoir::IsValid(reservoir))
 	{
 		return false;
 	}
 
-	const LightSampling::DirectLightSample lightSample = DirectLightReservoir::ReplayLightSample(reservoir, positionWorld);
-	return RayTracedShadows::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, DirectLightSampling::CastsShadow(reservoir.Candidate.Light), request, immediateSignal);
+	const LightSampling::DirectLightSample lightSample = DirectReservoir::ReplayLightSample(reservoir, positionWorld);
+	return ShadowRays::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, DirectLightSampling::CastsShadow(reservoir.Candidate.Light), request, immediateSignal);
 }
 
 void TraceAndStoreDirectShadowSignal(uint2 pixelCoord)
@@ -53,10 +53,10 @@ void TraceAndStoreDirectShadowSignal(uint2 pixelCoord)
 	ShadowVisibilitySample signal;
 	if (PrepareDirectShadowSignal(pixelCoord, request, signal))
 	{
-		signal = RayTracedShadows::TraceShadowRay(request);
+		signal = ShadowRays::TraceShadowRay(request);
 	}
 
-	ShadowVisibilitySignal[pixelCoord] = RayTracedShadowSignalPacking::PackShadowSignal(signal);
+	ShadowVisibilitySignal[pixelCoord] = PackShadowSignal(signal);
 }
 
 #endif

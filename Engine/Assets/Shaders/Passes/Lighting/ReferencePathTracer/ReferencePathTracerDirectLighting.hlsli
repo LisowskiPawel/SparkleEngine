@@ -56,7 +56,7 @@ namespace ReferencePathTracer
 
 		const LightSampling::DirectLightSample light = SampleLight(selection, surface.PositionWorld, lightShapeSample, skyTexture, skySampler);
 		const PathBsdf::Evaluation bsdf = PathBsdf::EvaluateContinuous(surface, light.DirectionWorld, lobeMasses, true, true);
-		if (!bsdf.HasSupport || !PathVisibility::IsUnoccluded(sceneTlas, surface, light))
+		if (!bsdf.HasSupport || !IsPathUnoccluded(sceneTlas, surface, light))
 		{
 			return 0.0f.xxx;
 		}

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace MaterialTextureTableSampling
+namespace MaterialTextures
 {
 	static const uint TextureSlotBaseColor = 0u;
 	static const uint TextureSlotNormal = 1u;

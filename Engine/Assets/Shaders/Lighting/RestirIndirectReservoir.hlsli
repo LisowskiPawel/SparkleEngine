@@ -9,11 +9,11 @@
 #include "/Engine/RayTracing/GBufferPathSurface.hlsli"
 #include "/Engine/RayTracing/PathLighting.hlsli"
 
-namespace RestirIndirectReservoir
+namespace IndirectReservoir
 {
 	static const float MinTarget = 1.0e-6f;
 
-	typedef RayTracingGBufferPathSurface::Surface Surface;
+	typedef GBufferPathSurface Surface;
 
 	struct Candidate
 	{
@@ -33,7 +33,7 @@ namespace RestirIndirectReservoir
 
 	Surface LoadSurface(uint2 pixelCoord)
 	{
-		return RayTracingGBufferPathSurface::Load(pixelCoord);
+		return LoadGBufferPathSurface(pixelCoord);
 	}
 
 	float4 PackSurface(Surface surface)
@@ -92,22 +92,22 @@ namespace RestirIndirectReservoir
 		return reservoir;
 	}
 
-	RayTracingPathLighting::Result EvaluateCandidate(Surface surface, Candidate candidate, Texture2D skyTexture, SamplerState skySampler)
+	PathLighting::Result EvaluateCandidate(Surface surface, Candidate candidate, Texture2D skyTexture, SamplerState skySampler)
 	{
-		return RayTracingPathLighting::TraceSurfacePathWithRandomFrame(skyTexture,
-		                                                               skySampler,
-		                                                               surface.PathSurface,
-		                                                               candidate.RandomPixel,
-		                                                               candidate.SampleIndex,
-		                                                               RayTracingPathSampling::SpecularSampleModeStochasticGGX,
-		                                                               RestirIndirectBounceCount,
-		                                                               candidate.RandomFrameIndex,
-		                                                               RestirIndirectEvaluateDiffuse != 0u,
-		                                                               RestirIndirectEvaluateSpecular != 0u,
-		                                                               RestirIndirectTraceSecondaryShadows != 0u);
+		return PathLighting::TraceSurfacePath(skyTexture,
+		                                      skySampler,
+		                                      surface.PathSurface,
+		                                      candidate.RandomPixel,
+		                                      candidate.SampleIndex,
+		                                      PathSampling::SpecularSampleModeStochasticGGX,
+		                                      RestirIndirectBounceCount,
+		                                      candidate.RandomFrameIndex,
+		                                      RestirIndirectEvaluateDiffuse != 0u,
+		                                      RestirIndirectEvaluateSpecular != 0u,
+		                                      RestirIndirectTraceSecondaryShadows != 0u);
 	}
 
-	float EvaluateTarget(RayTracingPathLighting::Result path)
+	float EvaluateTarget(PathLighting::Result path)
 	{
 		return max(CommonColor::LuminanceRec709(max(path.DiffuseContribution + path.SpecularContribution, 0.0f.xxx)), 0.0f);
 	}
@@ -147,7 +147,7 @@ namespace RestirIndirectReservoir
 			return false;
 		}
 
-		const RayTracingPathLighting::Result replay = EvaluateCandidate(surface, candidateReservoir.Selected, skyTexture, skySampler);
+		const PathLighting::Result replay = EvaluateCandidate(surface, candidateReservoir.Selected, skyTexture, skySampler);
 		const float target = EvaluateTarget(replay);
 		if (target <= MinTarget)
 		{
