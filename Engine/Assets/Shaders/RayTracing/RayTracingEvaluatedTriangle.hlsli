@@ -3,6 +3,7 @@
 
 #include "/Engine/Resources/MeshInstanceShaderData.hlsli"
 
+#include "/Engine/Geometry/Basis.hlsli"
 #include "/Engine/Geometry/Morphing.hlsli"
 #include "/Engine/Geometry/Skinning.hlsli"
 #include "/Engine/RayTracing/RayTracingHitData.hlsli"
@@ -91,6 +92,36 @@ float4 InterpolateRayTracingColor(RayTracingEvaluatedTriangle evaluatedTriangle)
 {
 	return evaluatedTriangle.V0.Color * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Color * evaluatedTriangle.BarycentricWeights.y
 	    + evaluatedTriangle.V2.Color * evaluatedTriangle.BarycentricWeights.z;
+}
+
+void BuildRayTracingShadingFrame(RayTracingEvaluatedTriangle evaluatedTriangle,
+                                 MeshInstanceData mesh,
+                                 float3 outwardGeometricNormal,
+                                 out float3 vertexNormal,
+                                 out float3 tangentWorld,
+                                 out float3 bitangentWorld)
+{
+	const float3 localNormal = evaluatedTriangle.V0.Normal * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Normal * evaluatedTriangle.BarycentricWeights.y
+	    + evaluatedTriangle.V2.Normal * evaluatedTriangle.BarycentricWeights.z;
+
+	const float3 localTangent = evaluatedTriangle.V0.Tangent * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Tangent * evaluatedTriangle.BarycentricWeights.y
+	    + evaluatedTriangle.V2.Tangent * evaluatedTriangle.BarycentricWeights.z;
+
+	const float interpolatedTangentSign = evaluatedTriangle.V0.TangentSign * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.TangentSign * evaluatedTriangle.BarycentricWeights.y
+	    + evaluatedTriangle.V2.TangentSign * evaluatedTriangle.BarycentricWeights.z;
+
+	const float tangentSign = interpolatedTangentSign >= 0.0f ? 1.0f : -1.0f;
+
+	vertexNormal = normalize(mul(localNormal, (float3x3)mesh.WorldInverseTranspose));
+	tangentWorld = normalize(mul(localTangent, (float3x3)mesh.WorldMatrix));
+
+	if (dot(vertexNormal, outwardGeometricNormal) < 0.0f)
+	{
+		vertexNormal = -vertexNormal;
+	}
+
+	tangentWorld = OrthonormalizeTangent(tangentWorld, vertexNormal);
+	bitangentWorld = ComputeBitangentFromSign(vertexNormal, tangentWorld, tangentSign);
 }
 
 #endif

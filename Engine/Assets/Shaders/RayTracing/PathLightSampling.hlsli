@@ -7,7 +7,8 @@
 
 #include "/Engine/Lighting/LightSampling.hlsli"
 #include "/Engine/RayTracing/RayTracingHitUniformData.hlsli"
-#include "/Engine/RayTracing/RayTracingMaterialHit.hlsli"
+#include "/Engine/RayTracing/RayEndpoints.hlsli"
+#include "/Engine/RayTracing/RayTracingMaterialSampling.hlsli"
 
 namespace PathLightSampling
 {

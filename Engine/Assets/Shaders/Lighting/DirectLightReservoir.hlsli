@@ -57,6 +57,23 @@ namespace DirectReservoir
 		return RestirReservoirCommon::AreSurfacesCompatible(surface.Valid, surface.GBuffer.NormalWorld, surface.ViewDistance, packedSurface);
 	}
 
+	SurfaceLighting::Surface BuildLightingSurface(GBufferData gBuffer, float3 viewDirWorld, bool evaluateSubsurface)
+	{
+		SurfaceLighting::Surface lightingSurface = {viewDirWorld,
+		                                            gBuffer.NormalWorld,
+		                                            gBuffer.BaseColor,
+		                                            gBuffer.Roughness,
+		                                            gBuffer.Metallic,
+		                                            gBuffer.DielectricF0,
+		                                            gBuffer.SubsurfaceColor,
+		                                            gBuffer.SubsurfaceStrength,
+		                                            DirectLightingEvaluateDiffuse != 0u,
+		                                            DirectLightingEvaluateSpecular != 0u,
+		                                            evaluateSubsurface};
+
+		return lightingSurface;
+	}
+
 	float3 EvaluateRawContribution(Surface surface, Reservoir reservoir)
 	{
 		if (!surface.Valid || !IsValid(reservoir))
@@ -66,17 +83,7 @@ namespace DirectReservoir
 
 		const LightSampling::DirectLightSample lightSample = ReplayLightSample(reservoir, surface.PositionWorld);
 
-		SurfaceLighting::Surface lightingSurface = {surface.ViewDirWorld,
-		                                            surface.GBuffer.NormalWorld,
-		                                            surface.GBuffer.BaseColor,
-		                                            surface.GBuffer.Roughness,
-		                                            surface.GBuffer.Metallic,
-		                                            surface.GBuffer.DielectricF0,
-		                                            surface.GBuffer.SubsurfaceColor,
-		                                            surface.GBuffer.SubsurfaceStrength,
-		                                            DirectLightingEvaluateDiffuse != 0u,
-		                                            DirectLightingEvaluateSpecular != 0u,
-		                                            surface.EvaluateSubsurface};
+		const SurfaceLighting::Surface lightingSurface = BuildLightingSurface(surface.GBuffer, surface.ViewDirWorld, surface.EvaluateSubsurface);
 
 		const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, 1.0f);
 
@@ -103,17 +110,7 @@ namespace DirectReservoir
 			return directLighting;
 		}
 
-		SurfaceLighting::Surface lightingSurface = {viewDirWorld,
-		                                            gBuffer.NormalWorld,
-		                                            gBuffer.BaseColor,
-		                                            gBuffer.Roughness,
-		                                            gBuffer.Metallic,
-		                                            gBuffer.DielectricF0,
-		                                            gBuffer.SubsurfaceColor,
-		                                            gBuffer.SubsurfaceStrength,
-		                                            DirectLightingEvaluateDiffuse != 0u,
-		                                            DirectLightingEvaluateSpecular != 0u,
-		                                            evaluateSubsurface};
+		const SurfaceLighting::Surface lightingSurface = BuildLightingSurface(gBuffer, viewDirWorld, evaluateSubsurface);
 
 		const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, visibility);
 

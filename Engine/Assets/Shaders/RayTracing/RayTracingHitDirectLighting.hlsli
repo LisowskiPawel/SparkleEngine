@@ -5,7 +5,7 @@
 
 #include "/Engine/Lighting/AreaLights.hlsli"
 #include "/Engine/Lighting/SurfaceLighting.hlsli"
-#include "/Engine/RayTracing/RayTracingMaterialHit.hlsli"
+#include "/Engine/RayTracing/RayTracingHitSurface.hlsli"
 #include "/Engine/RayTracing/Shadows/RayTracedShadowVisibility.hlsli"
 
 void AccumulateRayTracingHitDirectLightSample(RayTracingHitSurfaceData surface,

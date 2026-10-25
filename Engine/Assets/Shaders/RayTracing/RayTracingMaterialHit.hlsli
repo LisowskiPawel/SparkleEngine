@@ -1,114 +1,10 @@
 #pragma once
 
 #include "/Engine/Geometry/Basis.hlsli"
-#include "/Engine/Material/MaterialNormal.hlsli"
 #include "/Engine/RayTracing/RayEndpoints.hlsli"
 #include "/Engine/RayTracing/RayTracingHitSurface.hlsli"
-#include "/Engine/RayTracing/RayTracingMaterialAlpha.hlsli"
+#include "/Engine/RayTracing/RayTracingMaterialSampling.hlsli"
 #include "/Engine/RayTracing/RayTracingTraceResult.hlsli"
-
-struct RayTracingMaterialSample
-{
-	float4 BaseColor;
-	float3 Emissive;
-	float3 NormalTangent;
-	float3 SubsurfaceColor;
-	float Roughness;
-	float Metallic;
-	float AmbientOcclusion;
-	float SubsurfaceStrength;
-};
-
-RayTracingMaterialSample EvaluateRayTracingHitMaterial(RayTracingHitMaterial material, float2 uv, float4 vertexColor)
-{
-	RayTracingMaterialSample result;
-	result.BaseColor = material.BaseColor;
-	result.Emissive = EmissiveEnabled != 0u ? material.EmissiveColor : 0.0f.xxx;
-	result.NormalTangent = float3(0.0f, 0.0f, 1.0f);
-	result.SubsurfaceColor = material.SubsurfaceColor;
-	result.Roughness = material.Roughness;
-	result.Metallic = material.Metallic;
-	result.AmbientOcclusion = 1.0f;
-	result.SubsurfaceStrength = material.SubsurfaceStrength;
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotNormal))
-	{
-		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextures::TextureSlotNormal];
-
-		result.NormalTangent = DecodeBc5TangentNormal(SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotNormal, uv).rg, mapping.Strength);
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotBaseColor))
-	{
-		result.BaseColor = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotBaseColor, uv) * material.BaseColor;
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotRoughness))
-	{
-		result.Roughness = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotRoughness, uv).r * material.Roughness;
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotMetallic))
-	{
-		result.Metallic = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotMetallic, uv).r * material.Metallic;
-	}
-
-	if (EmissiveEnabled != 0u && MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotEmissive))
-	{
-		result.Emissive = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotEmissive, uv).rgb * material.EmissiveColor;
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotOcclusion))
-	{
-		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextures::TextureSlotOcclusion];
-		const float sampledOcclusion = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotOcclusion, uv).r;
-
-		result.AmbientOcclusion = lerp(1.0f, sampledOcclusion, mapping.Strength);
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotSubsurfaceColor))
-	{
-		result.SubsurfaceColor = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceColor, uv).rgb * material.SubsurfaceColor;
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotSubsurfaceStrength))
-	{
-		result.SubsurfaceStrength = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceStrength, uv).r * material.SubsurfaceStrength;
-	}
-
-	result.BaseColor *= vertexColor;
-	return result;
-}
-
-void BuildRayTracingShadingFrame(RayTracingEvaluatedTriangle evaluatedTriangle,
-                                 MeshInstanceData mesh,
-                                 float3 outwardGeometricNormal,
-                                 out float3 vertexNormal,
-                                 out float3 tangentWorld,
-                                 out float3 bitangentWorld)
-{
-	const float3 localNormal = evaluatedTriangle.V0.Normal * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Normal * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.Normal * evaluatedTriangle.BarycentricWeights.z;
-
-	const float3 localTangent = evaluatedTriangle.V0.Tangent * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Tangent * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.Tangent * evaluatedTriangle.BarycentricWeights.z;
-
-	const float interpolatedTangentSign = evaluatedTriangle.V0.TangentSign * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.TangentSign * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.TangentSign * evaluatedTriangle.BarycentricWeights.z;
-
-	const float tangentSign = interpolatedTangentSign >= 0.0f ? 1.0f : -1.0f;
-
-	vertexNormal = normalize(mul(localNormal, (float3x3)mesh.WorldInverseTranspose));
-	tangentWorld = normalize(mul(localTangent, (float3x3)mesh.WorldMatrix));
-
-	if (dot(vertexNormal, outwardGeometricNormal) < 0.0f)
-	{
-		vertexNormal = -vertexNormal;
-	}
-
-	tangentWorld = OrthonormalizeTangent(tangentWorld, vertexNormal);
-	bitangentWorld = ComputeBitangentFromSign(vertexNormal, tangentWorld, tangentSign);
-}
 
 RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult trace)
 {
@@ -136,7 +32,7 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	BuildRayTracingShadingFrame(evaluatedTriangle, mesh, outwardGeometricNormal, vertexNormal, tangentWorld, bitangentWorld);
 
 	const float2 texCoord0 = InterpolateRayTracingTexCoord0(evaluatedTriangle);
-	const RayTracingMaterialSample material = EvaluateRayTracingHitMaterial(evaluatedTriangle.Material, texCoord0, InterpolateRayTracingColor(evaluatedTriangle));
+	const RayTracingMaterialSample material = SampleRayTracingMaterial(evaluatedTriangle.Material, texCoord0, InterpolateRayTracingColor(evaluatedTriangle), EmissiveEnabled != 0u);
 
 	float3 shadingNormal = TransformTangentNormalToWorld(material.NormalTangent, vertexNormal, tangentWorld, bitangentWorld);
 	shadingNormal *= faceSign;

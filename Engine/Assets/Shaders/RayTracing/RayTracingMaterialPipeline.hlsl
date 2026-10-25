@@ -1,4 +1,4 @@
-#include "/Engine/RayTracing/RayTracingMaterialAlpha.hlsli"
+#include "/Engine/RayTracing/RayTracingMaterialSampling.hlsli"
 #include "/Engine/RayTracing/RayTracingMaterialPayload.hlsli"
 
 [shader("miss")]

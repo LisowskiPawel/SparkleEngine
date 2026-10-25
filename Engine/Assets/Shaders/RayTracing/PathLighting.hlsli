@@ -7,6 +7,7 @@
 #include "/Engine/RayTracing/PathTracer.hlsli"
 #include "/Engine/RayTracing/PathSampling.hlsli"
 #include "/Engine/RayTracing/PathTrace.hlsli"
+#include "/Engine/RayTracing/RayTracingMaterialHit.hlsli"
 #include "/Engine/RayTracing/RayTracingHitLighting.hlsli"
 
 namespace PathLighting

@@ -1,7 +1,7 @@
 #ifndef SPARKLE_RAY_TRACING_SCENE_TRACE_INLINE_HLSLI
 #define SPARKLE_RAY_TRACING_SCENE_TRACE_INLINE_HLSLI
 
-#include "/Engine/RayTracing/RayTracingMaterialAlpha.hlsli"
+#include "/Engine/RayTracing/RayTracingMaterialSampling.hlsli"
 #include "/Engine/RayTracing/RayTracingSceneTrace.hlsli"
 
 RayTracingTraceResult TraceSceneRay(RaytracingAccelerationStructure sceneTlas, float3 originWorld, float3 directionWorld, float tMin, float tMax, uint rayFlags, uint instanceMask)
