@@ -11,7 +11,46 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_passBinderLogger, "Renderer.PassBinder");
 
-struct PassBinder::BindingRequest final
+enum class BindingDomain : std::uint8_t
+{
+	Graphics,
+	Compute,
+	RayTracing,
+};
+
+struct BindingRequest;
+
+static void BindPassParameters(
+    RenderCommandContext& commandContext,
+    const FrameGraphResourceCommands& resources,
+    const RenderBindingLayout& layout,
+    const PassParameterSet& parameterSet,
+    std::span<const char* const> bindingNames,
+    const PassBindingOverrides* overrides,
+    bool bindLayout,
+    BindingDomain domain);
+static void BindCompiledBinding(
+    RenderCommandContext& commandContext,
+    const FrameGraphResourceCommands& resources,
+    const CompiledBinding& compiledBinding,
+    const PassParameterBinding* parameterBinding,
+    const PassBindingOverrides* overrides,
+    BindingDomain domain);
+static void BindConstantBuffer(const BindingRequest& request);
+static void BindReadOnlyAddress(const BindingRequest& request);
+static void BindReadWriteAddress(const BindingRequest& request);
+static void BindAccelerationStructure(const BindingRequest& request);
+static void BindResourceTable(const BindingRequest& request, bool readWrite);
+static void BindSamplerTable(const BindingRequest& request);
+static void BindPushConstantData(const BindingRequest& request);
+static void BindGpuAddress(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuVirtualAddress gpuAddress, BindingDomain domain);
+static void BindDescriptorTableOverride(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, const PassBindingOverride& bindingOverride, BindingDomain domain);
+static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuDescriptorHandle descriptorTable, BindingDomain domain);
+static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiDescriptorTableBinding descriptorTable, BindingDomain domain);
+static void BindPushConstants(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, const void* data, std::uint32_t constantCount, BindingDomain domain);
+static void Require(bool condition, std::string_view message);
+
+struct BindingRequest final
 {
 	RenderCommandContext& CommandContext;
 	const FrameGraphResourceCommands& Resources;
@@ -22,7 +61,7 @@ struct PassBinder::BindingRequest final
 	BindingDomain Domain = BindingDomain::Graphics;
 };
 
-void PassBinder::BindGraphics(
+void BindGraphicsPassParameters(
     RenderCommandContext& commandContext,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& layout,
@@ -31,10 +70,10 @@ void PassBinder::BindGraphics(
     const PassBindingOverrides* overrides,
     bool bindLayout)
 {
-	BindImpl(commandContext, resources, layout, parameterSet, bindingNames, overrides, bindLayout, BindingDomain::Graphics);
+	BindPassParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, bindLayout, BindingDomain::Graphics);
 }
 
-void PassBinder::BindCompute(
+void BindComputePassParameters(
     RenderCommandContext& commandContext,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& layout,
@@ -43,10 +82,10 @@ void PassBinder::BindCompute(
     const PassBindingOverrides* overrides,
     bool bindLayout)
 {
-	BindImpl(commandContext, resources, layout, parameterSet, bindingNames, overrides, bindLayout, BindingDomain::Compute);
+	BindPassParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, bindLayout, BindingDomain::Compute);
 }
 
-void PassBinder::BindRayTracing(
+void BindRayTracingPassParameters(
     RenderCommandContext& commandContext,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& layout,
@@ -55,18 +94,10 @@ void PassBinder::BindRayTracing(
     const PassBindingOverrides* overrides,
     bool bindLayout)
 {
-	BindImpl(commandContext, resources, layout, parameterSet, bindingNames, overrides, bindLayout, BindingDomain::RayTracing);
+	BindPassParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, bindLayout, BindingDomain::RayTracing);
 }
 
-void PassBinder::BindImpl(
-    RenderCommandContext& commandContext,
-    const FrameGraphResourceCommands& resources,
-    const RenderBindingLayout& layout,
-    const PassParameterSet& parameterSet,
-    std::span<const char* const> bindingNames,
-    const PassBindingOverrides* overrides,
-    bool bindLayout,
-    BindingDomain domain)
+static void ValidateParameterLayout(const RenderBindingLayout& layout, const PassParameterSet& parameterSet, std::span<const char* const> bindingNames)
 {
 	Require(parameterSet.HasLayout(), "Pass binding requires a parameter set with a compiled layout.");
 	if (bindingNames.empty())
@@ -76,30 +107,26 @@ void PassBinder::BindImpl(
 		Require(parameterLayout != nullptr, "Pass parameter layout is unavailable.");
 		Require(parameterLayout->Matches(compiledLayout), "Pass parameter layout does not match the compiled binding layout.");
 	}
+}
 
-	if (bindLayout && domain == BindingDomain::Compute)
+static void BindDomainLayout(RenderCommandContext& commandContext, const RenderBindingLayout& layout, BindingDomain domain)
+{
+	if (domain == BindingDomain::Compute)
 	{
 		commandContext.SetComputeBindingLayout(layout);
 	}
-	else if (bindLayout && domain == BindingDomain::RayTracing)
+	else if (domain == BindingDomain::RayTracing)
 	{
 		commandContext.SetRayTracingBindingLayout(layout);
 	}
-	else if (bindLayout)
+	else
 	{
 		commandContext.SetGraphicsBindingLayout(layout);
 	}
+}
 
-	if (bindingNames.empty())
-	{
-		for (std::size_t bindingIndex = 0; bindingIndex < layout.GetBindingCount(); ++bindingIndex)
-		{
-			const CompiledBinding& compiledBinding = layout.GetBindings()[bindingIndex];
-			BindCompiledBinding(commandContext, resources, compiledBinding, parameterSet.FindBinding(compiledBinding.Name), overrides, domain);
-		}
-		return;
-	}
-
+static void BindNamedParameters(RenderCommandContext& commandContext, const FrameGraphResourceCommands& resources, const RenderBindingLayout& layout, const PassParameterSet& parameterSet, std::span<const char* const> bindingNames, const PassBindingOverrides* overrides, BindingDomain domain)
+{
 	for (const char* bindingName : bindingNames)
 	{
 		bool boundAny = false;
@@ -119,7 +146,36 @@ void PassBinder::BindImpl(
 	}
 }
 
-void PassBinder::BindCompiledBinding(
+static void BindPassParameters(
+    RenderCommandContext& commandContext,
+    const FrameGraphResourceCommands& resources,
+    const RenderBindingLayout& layout,
+    const PassParameterSet& parameterSet,
+    std::span<const char* const> bindingNames,
+    const PassBindingOverrides* overrides,
+    bool bindLayout,
+    BindingDomain domain)
+{
+	ValidateParameterLayout(layout, parameterSet, bindingNames);
+	if (bindLayout)
+	{
+		BindDomainLayout(commandContext, layout, domain);
+	}
+
+	if (bindingNames.empty())
+	{
+		for (std::size_t bindingIndex = 0; bindingIndex < layout.GetBindingCount(); ++bindingIndex)
+		{
+			const CompiledBinding& compiledBinding = layout.GetBindings()[bindingIndex];
+			BindCompiledBinding(commandContext, resources, compiledBinding, parameterSet.FindBinding(compiledBinding.Name), overrides, domain);
+		}
+		return;
+	}
+
+	BindNamedParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, domain);
+}
+
+static void BindCompiledBinding(
     RenderCommandContext& commandContext,
     const FrameGraphResourceCommands& resources,
     const CompiledBinding& compiledBinding,
@@ -167,7 +223,7 @@ void PassBinder::BindCompiledBinding(
 	}
 }
 
-void PassBinder::BindConstantBuffer(const BindingRequest& request)
+static void BindConstantBuffer(const BindingRequest& request)
 {
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::ConstantBufferView) : nullptr;
 	if (bindingOverride != nullptr)
@@ -188,7 +244,7 @@ void PassBinder::BindConstantBuffer(const BindingRequest& request)
 	BindGpuAddress(request.CommandContext, request.Binding, gpuAddress, request.Domain);
 }
 
-void PassBinder::BindReadOnlyAddress(const BindingRequest& request)
+static void BindReadOnlyAddress(const BindingRequest& request)
 {
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::ShaderResourceView) : nullptr;
 	if (bindingOverride != nullptr)
@@ -200,7 +256,7 @@ void PassBinder::BindReadOnlyAddress(const BindingRequest& request)
 	Require(false, "Read-only address binding requires an explicit pass override.");
 }
 
-void PassBinder::BindReadWriteAddress(const BindingRequest& request)
+static void BindReadWriteAddress(const BindingRequest& request)
 {
 	Require(request.Overrides != nullptr, "Read-write address binding requires an explicit pass override.");
 	const PassBindingOverride* bindingOverride = request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::UnorderedAccessView);
@@ -208,7 +264,7 @@ void PassBinder::BindReadWriteAddress(const BindingRequest& request)
 	BindGpuAddress(request.CommandContext, request.Binding, bindingOverride->GpuAddress, request.Domain);
 }
 
-void PassBinder::BindAccelerationStructure(const BindingRequest& request)
+static void BindAccelerationStructure(const BindingRequest& request)
 {
 	Require(request.Parameters != nullptr, "Acceleration-structure binding is absent from the pass parameter set.");
 	const FrameGraphAccelerationStructureHandle* accelerationStructure = request.Parameters->AsAccelerationStructureHandle();
@@ -228,7 +284,7 @@ void PassBinder::BindAccelerationStructure(const BindingRequest& request)
 	request.CommandContext.BindAccelerationStructure(request.Binding.BindingIndex, resource);
 }
 
-void PassBinder::BindResourceTable(const BindingRequest& request, bool readWrite)
+static void BindResourceTable(const BindingRequest& request, bool readWrite)
 {
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::DescriptorTable) : nullptr;
 	if (bindingOverride != nullptr)
@@ -267,7 +323,7 @@ void PassBinder::BindResourceTable(const BindingRequest& request, bool readWrite
 	BindDescriptorTable(request.CommandContext, request.Binding, view, request.Domain);
 }
 
-void PassBinder::BindSamplerTable(const BindingRequest& request)
+static void BindSamplerTable(const BindingRequest& request)
 {
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::DescriptorTable) : nullptr;
 	if (bindingOverride != nullptr)
@@ -284,7 +340,7 @@ void PassBinder::BindSamplerTable(const BindingRequest& request)
 	BindDescriptorTable(request.CommandContext, request.Binding, samplerBinding, request.Domain);
 }
 
-void PassBinder::BindPushConstantData(const BindingRequest& request)
+static void BindPushConstantData(const BindingRequest& request)
 {
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::PushConstants) : nullptr;
 	if (bindingOverride != nullptr)
@@ -299,10 +355,128 @@ void PassBinder::BindPushConstantData(const BindingRequest& request)
 	BindPushConstants(request.CommandContext, request.Binding, uniformData->Data, uniformData->SizeInBytes / static_cast<std::uint32_t>(sizeof(std::uint32_t)), request.Domain);
 }
 
-void PassBinder::Require(bool condition, std::string_view message)
+static void Require(bool condition, std::string_view message)
 {
 	if (!condition)
 	{
 		Diagnostics::Fatal(g_passBinderLogger, __FILE__, __LINE__, std::string(message));
 	}
+}
+
+static void BindDescriptorTableOverride(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, const PassBindingOverride& bindingOverride, BindingDomain domain)
+{
+	if (bindingOverride.DescriptorTableKind == DescriptorTableOverrideKind::LogicalTable)
+	{
+		BindDescriptorTable(commandContext, compiledBinding, bindingOverride.LogicalDescriptorTable, domain);
+	}
+	else
+	{
+		BindDescriptorTable(commandContext, compiledBinding, bindingOverride.DescriptorTable, domain);
+	}
+}
+
+static void BindGpuAddress(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuVirtualAddress gpuAddress, BindingDomain domain)
+{
+	Require(gpuAddress != 0, "Pass address binding resolved to a null GPU address.");
+	switch (compiledBinding.Type)
+	{
+		case CompiledBindingType::ConstantBuffer:
+			if (domain == BindingDomain::Compute)
+			{
+				commandContext.BindComputeConstantBuffer(compiledBinding.BindingIndex, gpuAddress);
+			}
+			else if (domain == BindingDomain::RayTracing)
+			{
+				commandContext.BindRayTracingConstantBuffer(compiledBinding.BindingIndex, gpuAddress);
+			}
+			else
+			{
+				commandContext.BindConstantBuffer(compiledBinding.BindingIndex, gpuAddress);
+			}
+			return;
+		case CompiledBindingType::ReadOnlyAddress:
+			if (domain == BindingDomain::Compute)
+			{
+				commandContext.BindComputeShaderResourceAddress(compiledBinding.BindingIndex, gpuAddress);
+			}
+			else if (domain == BindingDomain::RayTracing)
+			{
+				commandContext.BindRayTracingShaderResourceAddress(compiledBinding.BindingIndex, gpuAddress);
+			}
+			else
+			{
+				commandContext.BindShaderResourceAddress(compiledBinding.BindingIndex, gpuAddress);
+			}
+			return;
+		case CompiledBindingType::ReadWriteAddress:
+			if (domain == BindingDomain::Compute)
+			{
+				commandContext.BindComputeUnorderedAccessAddress(compiledBinding.BindingIndex, gpuAddress);
+			}
+			else if (domain == BindingDomain::RayTracing)
+			{
+				commandContext.BindRayTracingUnorderedAccessAddress(compiledBinding.BindingIndex, gpuAddress);
+			}
+			else
+			{
+				commandContext.BindUnorderedAccessAddress(compiledBinding.BindingIndex, gpuAddress);
+			}
+			return;
+		default:
+			Require(false, "Pass address binding has an unsupported type.");
+			return;
+	}
+}
+
+static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuDescriptorHandle descriptorTable, BindingDomain domain)
+{
+	Require(static_cast<bool>(descriptorTable), "Pass resource binding resolved to a null GPU descriptor handle.");
+	if (domain == BindingDomain::Compute)
+	{
+		commandContext.BindComputeDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+		return;
+	}
+	if (domain == BindingDomain::RayTracing)
+	{
+		commandContext.BindRayTracingDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+		return;
+	}
+
+	commandContext.BindDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+}
+
+static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiDescriptorTableBinding descriptorTable, BindingDomain domain)
+{
+	Require(static_cast<bool>(descriptorTable), "Pass resource binding resolved to an invalid logical descriptor table.");
+	if (domain == BindingDomain::Compute)
+	{
+		commandContext.BindComputeDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+		return;
+	}
+	if (domain == BindingDomain::RayTracing)
+	{
+		commandContext.BindRayTracingDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+		return;
+	}
+
+	commandContext.BindDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+}
+
+static void BindPushConstants(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, const void* data, std::uint32_t constantCount, BindingDomain domain)
+{
+	Require(data != nullptr, "Push-constant binding has no data.");
+	Require(constantCount > 0, "Push-constant binding has no values.");
+
+	if (domain == BindingDomain::Compute)
+	{
+		commandContext.SetComputePushConstants(compiledBinding.BindingIndex, constantCount, data, 0);
+		return;
+	}
+	if (domain == BindingDomain::RayTracing)
+	{
+		commandContext.SetRayTracingPushConstants(compiledBinding.BindingIndex, constantCount, data, 0);
+		return;
+	}
+
+	commandContext.SetPushConstants(compiledBinding.BindingIndex, constantCount, data, 0);
 }

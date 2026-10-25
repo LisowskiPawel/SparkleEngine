@@ -4,6 +4,7 @@
 #include "D3D12RootSignature.h"
 
 #include <cstdint>
+#include <span>
 #include <d3d12.h>
 #include <wrl/client.h>
 
@@ -32,6 +33,7 @@ private:
 	void SetRenderTargetBlendState(D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDesc, const RhiBlendState& blend, std::uint32_t colorAttachmentCount) noexcept;
 	void SetDepthTestState(D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDesc, const RhiDepthState& depthDesc) noexcept;
 	void SetStencilTestState(D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDesc, const RhiStencilState& stencilDesc) noexcept;
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC BuildGraphicsState(const GraphicsPipelineDesc& desc, std::span<const D3D12_INPUT_ELEMENT_DESC> vertexLayout, D3D12_SHADER_BYTECODE vertexShader, D3D12_SHADER_BYTECODE pixelShader);
 	void Create(const GraphicsPipelineDesc& desc);
 	void Create(const ComputePipelineDesc& desc);
 

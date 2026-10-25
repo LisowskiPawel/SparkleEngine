@@ -43,6 +43,7 @@ class FrameGraphBuilder;
 class TaskExecutor;
 class Window;
 class RenderHardwareInterface;
+class RhiResourceService;
 class RasterPassRenderState;
 
 class FrameGraph
@@ -288,6 +289,9 @@ private:
 	    const FrameGraphResourceMetadata& resourceMetadata,
 	    const FrameGraphPlan& plan) const noexcept;
 	void EnsureTransientResourcesMaterialized(const FrameGraphPlan& plan) const noexcept;
+	void SyncImportedColorViews(FrameGraphResourceHandle handle, const FrameGraphResourceMetadata& metadata, FrameGraphResourceAccess& access) const noexcept;
+	void SyncImportedDepthViews(FrameGraphResourceHandle handle, const FrameGraphResourceMetadata& metadata, FrameGraphResourceAccess& access) const noexcept;
+	void SyncImportedBufferViews(FrameGraphResourceHandle handle, const FrameGraphResourceMetadata& metadata, FrameGraphResourceAccess& access) const noexcept;
 	void ReleaseExternalResourceViews() noexcept;
 	void ReleaseExternalResourceViews(FrameGraphResourceHandle handle) noexcept;
 	void EmitTransientAliasingBarriers(RenderCommandContext& commandContext, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept;
@@ -318,6 +322,11 @@ private:
 		bool allowDepthStencil = false;
 		bool allowUnorderedAccess = false;
 	};
+
+	void PrepareTextureHistory(const FrameGraphPlan& plan, TextureHistoryRecord& history, std::uint32_t historyResourceCount, RhiResourceService& resourceService);
+	void ResetTextureHistoryResources(TextureHistoryRecord& history, RhiResourceService& resourceService);
+	void AllocateTextureHistoryResources(TextureHistoryRecord& history, std::uint32_t historyResourceCount, RhiResourceService& resourceService);
+	void BindTextureHistory(TextureHistoryRecord& history, std::uint32_t historyResourceCount);
 
 	mutable std::uint64_t m_historyFrameIndex = 0;
 

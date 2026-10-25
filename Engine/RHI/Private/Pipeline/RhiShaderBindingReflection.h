@@ -14,12 +14,8 @@ struct RhiReflectedBindingLocation final
 	ShaderStageMask VisibilityMask = ShaderStageMask::None;
 };
 
-class RhiShaderBindingReflection final
-{
-public:
-	static std::vector<RhiReflectedBindingLocation> ResolveLocations(
-	    std::span<const ResolvedShader> shaders,
-	    const PassParameterLayout& parameterLayout,
-	    std::string_view bindingName,
-	    ShaderParameterSemanticKind semanticKind);
-};
+std::vector<RhiReflectedBindingLocation> ResolveShaderBindingLocations(
+    std::span<const ResolvedShader> shaders,
+    const PassParameterLayout& parameterLayout,
+    std::string_view bindingName,
+    ShaderParameterSemanticKind semanticKind);

@@ -140,9 +140,9 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 		SpirVBindingNormalizer::Normalize(bytecode, request.DescriptorBindingRemaps);
 	}
 
-	ShaderReflection reflection = IsSpirVTarget(request.Target) ? SpirVReflectionExtractor::Extract(bytecode, request.Stage)
-	    : request.UnitKind == ShaderCompileUnitKind::Library    ? DxilReflectionExtractor::ExtractLibrary(*m_utils.Get(), result.Get(), request.EntryPoint)
-	                                                            : DxilReflectionExtractor::Extract(*m_utils.Get(), result.Get(), bytecode, request.Stage);
+	ShaderReflection reflection = IsSpirVTarget(request.Target) ? ExtractSpirVReflection(bytecode, request.Stage)
+	    : request.UnitKind == ShaderCompileUnitKind::Library    ? ExtractDxilLibraryReflection(*m_utils.Get(), result.Get(), request.EntryPoint)
+	                                                            : ExtractDxilReflection(*m_utils.Get(), result.Get(), bytecode, request.Stage);
 
 	ShaderDebugArtifactSet debugArtifacts;
 	if (request.CaptureDebugArtifacts)

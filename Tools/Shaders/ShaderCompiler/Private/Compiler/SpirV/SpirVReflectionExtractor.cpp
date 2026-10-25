@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "Compiler/SpirV/SpirVReflectionExtractor.h"
+#include <spirv_reflect.h>
 
 #include "Core/Public/Diagnostics/Error.h"
 
@@ -9,7 +10,7 @@
 #include <vector>
 #include <utility>
 
-CookedShaderResourceKind SpirVReflectionExtractor::MapDescriptorType(SpvReflectDescriptorType type, SpvDim dim, SpvReflectDecorationFlags decorationFlags)
+static CookedShaderResourceKind MapDescriptorType(SpvReflectDescriptorType type, SpvDim dim, SpvReflectDecorationFlags decorationFlags)
 {
 	switch (type)
 	{
@@ -37,7 +38,7 @@ CookedShaderResourceKind SpirVReflectionExtractor::MapDescriptorType(SpvReflectD
 	}
 }
 
-CookedShaderResourceDimension SpirVReflectionExtractor::MapImageDim(SpvDim dim, std::uint32_t arrayed, std::uint32_t ms)
+static CookedShaderResourceDimension MapImageDim(SpvDim dim, std::uint32_t arrayed, std::uint32_t ms)
 {
 	switch (dim)
 	{
@@ -60,7 +61,7 @@ CookedShaderResourceDimension SpirVReflectionExtractor::MapImageDim(SpvDim dim, 
 	}
 }
 
-CookedShaderScalarType SpirVReflectionExtractor::MapInputFormat(SpvReflectFormat format, std::uint8_t& outComponentCount)
+static CookedShaderScalarType MapInputFormat(SpvReflectFormat format, std::uint8_t& outComponentCount)
 {
 	switch (format)
 	{
@@ -178,7 +179,7 @@ CookedShaderScalarType SpirVReflectionExtractor::MapInputFormat(SpvReflectFormat
 	}
 }
 
-CookedShaderScalarType SpirVReflectionExtractor::MapNumericScalar(const SpvReflectNumericTraits& traits, bool isSigned)
+static CookedShaderScalarType MapNumericScalar(const SpvReflectNumericTraits& traits, bool isSigned)
 {
 	const std::uint32_t width = traits.scalar.width;
 	if (width == 32u)
@@ -196,7 +197,7 @@ CookedShaderScalarType SpirVReflectionExtractor::MapNumericScalar(const SpvRefle
 	return CookedShaderScalarType::Unknown;
 }
 
-void SpirVReflectionExtractor::FlattenBlockMembers(const SpvReflectBlockVariable& block, std::uint32_t parentAbsoluteOffset, std::vector<ShaderReflectionConstantBufferMember>& outMembers)
+static void FlattenBlockMembers(const SpvReflectBlockVariable& block, std::uint32_t parentAbsoluteOffset, std::vector<ShaderReflectionConstantBufferMember>& outMembers)
 {
 	for (std::uint32_t i = 0; i < block.member_count; ++i)
 	{
@@ -264,26 +265,12 @@ void SpirVReflectionExtractor::FlattenBlockMembers(const SpvReflectBlockVariable
 	}
 }
 
-ShaderReflection SpirVReflectionExtractor::Extract(std::span<const std::uint8_t> bytecode, ShaderStage stage)
+static void ReflectDescriptorBindings(SpvReflectShaderModule& module, ShaderReflection& reflection)
 {
-	ShaderReflection reflection;
-
-	if (bytecode.empty())
-	{
-		throw Diagnostics::Error("SPIR-V reflection: empty bytecode");
-	}
-
-	SpvReflectShaderModule module{};
-	SpvReflectResult res = spvReflectCreateShaderModule(bytecode.size(), bytecode.data(), &module);
-	if (res != SPV_REFLECT_RESULT_SUCCESS)
-	{
-		throw Diagnostics::Error("SPIR-V reflection: spvReflectCreateShaderModule failed");
-	}
-
 	// Emit CB records for uniform buffers plus resource bindings for all descriptors.
 	// Binding entries point at the CB record when applicable.
 	std::uint32_t bindingCount = 0;
-	res = spvReflectEnumerateDescriptorBindings(&module, &bindingCount, nullptr);
+	SpvReflectResult res = spvReflectEnumerateDescriptorBindings(&module, &bindingCount, nullptr);
 	std::vector<SpvReflectDescriptorBinding*> bindings(bindingCount, nullptr);
 	if (res == SPV_REFLECT_RESULT_SUCCESS && bindingCount > 0)
 	{
@@ -338,43 +325,45 @@ ShaderReflection SpirVReflectionExtractor::Extract(std::span<const std::uint8_t>
 
 		reflection.Bindings.push_back(std::move(binding));
 	}
+}
 
-	// Vertex input variables.
-	if (stage == ShaderStage::Vertex)
+static void ReflectVertexInputs(SpvReflectShaderModule& module, ShaderReflection& reflection)
+{
+	std::uint32_t inputCount = 0;
+	spvReflectEnumerateInputVariables(&module, &inputCount, nullptr);
+	std::vector<SpvReflectInterfaceVariable*> inputs(inputCount, nullptr);
+	if (inputCount > 0)
 	{
-		std::uint32_t inputCount = 0;
-		spvReflectEnumerateInputVariables(&module, &inputCount, nullptr);
-		std::vector<SpvReflectInterfaceVariable*> inputs(inputCount, nullptr);
-		if (inputCount > 0)
-		{
-			spvReflectEnumerateInputVariables(&module, &inputCount, inputs.data());
-		}
-
-		reflection.InputElements.reserve(inputCount);
-		for (SpvReflectInterfaceVariable* v : inputs)
-		{
-			if (v == nullptr)
-			{
-				continue;
-			}
-			// Skip built-ins (SV_VertexID etc.); they're not in the input
-			// layout the renderer needs to bind.
-			if ((v->decoration_flags & SPV_REFLECT_DECORATION_BUILT_IN) != 0u)
-			{
-				continue;
-			}
-
-			ShaderReflectionInputElement element;
-			element.Semantic = (v->semantic && v->semantic[0] != '\0') ? v->semantic : (v->name ? v->name : "");
-			element.SemanticIndex = 0;
-			element.Location = v->location;
-			std::uint8_t componentCount = 0;
-			element.ScalarType = MapInputFormat(v->format, componentCount);
-			element.ComponentCount = componentCount;
-			reflection.InputElements.push_back(std::move(element));
-		}
+		spvReflectEnumerateInputVariables(&module, &inputCount, inputs.data());
 	}
 
+	reflection.InputElements.reserve(inputCount);
+	for (SpvReflectInterfaceVariable* v : inputs)
+	{
+		if (v == nullptr)
+		{
+			continue;
+		}
+		// Skip built-ins (SV_VertexID etc.); they're not in the input
+		// layout the renderer needs to bind.
+		if ((v->decoration_flags & SPV_REFLECT_DECORATION_BUILT_IN) != 0u)
+		{
+			continue;
+		}
+
+		ShaderReflectionInputElement element;
+		element.Semantic = (v->semantic && v->semantic[0] != '\0') ? v->semantic : (v->name ? v->name : "");
+		element.SemanticIndex = 0;
+		element.Location = v->location;
+		std::uint8_t componentCount = 0;
+		element.ScalarType = MapInputFormat(v->format, componentCount);
+		element.ComponentCount = componentCount;
+		reflection.InputElements.push_back(std::move(element));
+	}
+}
+
+static void ReflectPushConstants(SpvReflectShaderModule& module, ShaderStage stage, ShaderReflection& reflection)
+{
 	// Push-constant blocks.
 	{
 		std::uint32_t pcCount = 0;
@@ -420,7 +409,10 @@ ShaderReflection SpirVReflectionExtractor::Extract(std::span<const std::uint8_t>
 			reflection.Bindings.push_back(std::move(binding));
 		}
 	}
+}
 
+static void ReflectSpecializationConstants(SpvReflectShaderModule& module, ShaderReflection& reflection)
+{
 	// Specialization constants.
 	{
 		std::uint32_t specCount = 0;
@@ -448,6 +440,34 @@ ShaderReflection SpirVReflectionExtractor::Extract(std::span<const std::uint8_t>
 			reflection.SpecializationConstants.push_back(std::move(sc));
 		}
 	}
+}
+
+ShaderReflection ExtractSpirVReflection(std::span<const std::uint8_t> bytecode, ShaderStage stage)
+{
+	ShaderReflection reflection;
+
+	if (bytecode.empty())
+	{
+		throw Diagnostics::Error("SPIR-V reflection: empty bytecode");
+	}
+
+	SpvReflectShaderModule module{};
+	SpvReflectResult res = spvReflectCreateShaderModule(bytecode.size(), bytecode.data(), &module);
+	if (res != SPV_REFLECT_RESULT_SUCCESS)
+	{
+		throw Diagnostics::Error("SPIR-V reflection: spvReflectCreateShaderModule failed");
+	}
+
+	ReflectDescriptorBindings(module, reflection);
+
+	if (stage == ShaderStage::Vertex)
+	{
+		ReflectVertexInputs(module, reflection);
+	}
+
+	ReflectPushConstants(module, stage, reflection);
+
+	ReflectSpecializationConstants(module, reflection);
 
 	// Entry-point compilation emits one entry point in both supported SPIR-V backends.
 	if (stage == ShaderStage::Compute && module.entry_point_count > 0)

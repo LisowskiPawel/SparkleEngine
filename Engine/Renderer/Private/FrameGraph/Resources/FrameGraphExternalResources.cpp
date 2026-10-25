@@ -75,71 +75,86 @@ void FrameGraph::SyncImportedResourceAccesses() const noexcept
 
 		if (metadata.kind == FrameGraphResourceKind::ColorRenderTarget)
 		{
-			if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::RenderTarget) && !access.renderTargetView)
-			{
-				access.renderTargetView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(RhiResourceViewDesc::RenderTarget(access.resource, metadata.textureDesc.format));
-			}
-
-			if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::ShaderRead) && !access.shaderResourceView)
-			{
-				access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
-				    RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
-
-				access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
-			}
-
-			if (RequiresUnorderedAccessView(m_compiledPlan, handle))
-			{
-				if (!m_renderHardwareInterface->GetResourceService().SupportsUnorderedAccess(access.resource))
-				{
-					FailMissingUnorderedAccessSupport(metadata);
-				}
-
-				if (!access.unorderedAccessView)
-				{
-					access.unorderedAccessView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
-					    RhiResourceViewDesc::TextureUnorderedAccess(access.resource, metadata.textureDesc.format));
-				}
-			}
+			SyncImportedColorViews(handle, metadata, access);
 		}
 		else if (metadata.kind == FrameGraphResourceKind::DepthStencil)
 		{
-			if (!access.depthStencilView)
-			{
-				access.depthStencilView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(RhiResourceViewDesc::DepthStencil(access.resource, metadata.textureDesc.format));
-			}
-
-			if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::ShaderRead) && !access.shaderResourceView)
-			{
-				access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
-				    RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
-
-				access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
-			}
+			SyncImportedDepthViews(handle, metadata, access);
 		}
 		else if (metadata.kind == FrameGraphResourceKind::Buffer)
 		{
-			if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::ShaderRead) && !access.shaderResourceView)
-			{
-				access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
-				    RhiResourceViewDesc::BufferShaderResource(access.resource, metadata.bufferDesc.sizeInBytes, metadata.bufferDesc.strideInBytes));
+			SyncImportedBufferViews(handle, metadata, access);
+		}
+	}
+}
 
-				access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
-			}
+void FrameGraph::SyncImportedColorViews(FrameGraphResourceHandle handle, const FrameGraphResourceMetadata& metadata, FrameGraphResourceAccess& access) const noexcept
+{
+	if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::RenderTarget) && !access.renderTargetView)
+	{
+		access.renderTargetView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(RhiResourceViewDesc::RenderTarget(access.resource, metadata.textureDesc.format));
+	}
 
-			if (RequiresUnorderedAccessView(m_compiledPlan, handle))
-			{
-				if (!m_renderHardwareInterface->GetResourceService().SupportsUnorderedAccess(access.resource))
-				{
-					FailMissingUnorderedAccessSupport(metadata);
-				}
+	if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::ShaderRead) && !access.shaderResourceView)
+	{
+		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
+		    RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
 
-				if (!access.unorderedAccessView)
-				{
-					access.unorderedAccessView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
-					    RhiResourceViewDesc::BufferUnorderedAccess(access.resource, metadata.bufferDesc.sizeInBytes, metadata.bufferDesc.strideInBytes));
-				}
-			}
+		access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
+	}
+
+	if (RequiresUnorderedAccessView(m_compiledPlan, handle))
+	{
+		if (!m_renderHardwareInterface->GetResourceService().SupportsUnorderedAccess(access.resource))
+		{
+			FailMissingUnorderedAccessSupport(metadata);
+		}
+
+		if (!access.unorderedAccessView)
+		{
+			access.unorderedAccessView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
+			    RhiResourceViewDesc::TextureUnorderedAccess(access.resource, metadata.textureDesc.format));
+		}
+	}
+}
+
+void FrameGraph::SyncImportedDepthViews(FrameGraphResourceHandle handle, const FrameGraphResourceMetadata& metadata, FrameGraphResourceAccess& access) const noexcept
+{
+	if (!access.depthStencilView)
+	{
+		access.depthStencilView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(RhiResourceViewDesc::DepthStencil(access.resource, metadata.textureDesc.format));
+	}
+
+	if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::ShaderRead) && !access.shaderResourceView)
+	{
+		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
+		    RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
+
+		access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
+	}
+}
+
+void FrameGraph::SyncImportedBufferViews(FrameGraphResourceHandle handle, const FrameGraphResourceMetadata& metadata, FrameGraphResourceAccess& access) const noexcept
+{
+	if (RequiresUsage(m_compiledPlan, handle, ResourceUsage::ShaderRead) && !access.shaderResourceView)
+	{
+		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
+		    RhiResourceViewDesc::BufferShaderResource(access.resource, metadata.bufferDesc.sizeInBytes, metadata.bufferDesc.strideInBytes));
+
+		access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
+	}
+
+	if (RequiresUnorderedAccessView(m_compiledPlan, handle))
+	{
+		if (!m_renderHardwareInterface->GetResourceService().SupportsUnorderedAccess(access.resource))
+		{
+			FailMissingUnorderedAccessSupport(metadata);
+		}
+
+		if (!access.unorderedAccessView)
+		{
+			access.unorderedAccessView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
+			    RhiResourceViewDesc::BufferUnorderedAccess(access.resource, metadata.bufferDesc.sizeInBytes, metadata.bufferDesc.strideInBytes));
 		}
 	}
 }

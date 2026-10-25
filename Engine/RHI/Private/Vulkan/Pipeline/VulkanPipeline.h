@@ -1,5 +1,8 @@
 #pragma once
 
+#include <span>
+#include <string>
+
 #include "Pipeline/RhiPipelineDesc.h"
 #include "Vulkan/VulkanIncludes.h"
 
@@ -28,6 +31,8 @@ public:
 	VkPipelineBindPoint GetBindPoint() const noexcept { return m_bindPoint; }
 
 private:
+	void CreateGraphicsPipeline(VulkanRhi& rhi, const GraphicsPipelineDesc& desc, std::span<const VkPipelineShaderStageCreateInfo> shaderStages, const std::string& debugName);
+
 	void Reset() noexcept;
 
 	VkDevice m_device = VK_NULL_HANDLE;

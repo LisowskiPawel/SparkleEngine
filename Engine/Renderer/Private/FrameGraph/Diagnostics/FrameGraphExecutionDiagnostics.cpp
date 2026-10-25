@@ -7,11 +7,7 @@
 
 #include <string>
 
-class FrameGraphExecutionDiagnosticsConstants final
-{
-public:
-	static constexpr RhiDiagnosticLabelColor kFrameGraphDetailMarkerColor{.Red = 120, .Green = 160, .Blue = 220, .Alpha = 255};
-};
+static constexpr RhiDiagnosticLabelColor kFrameGraphDetailMarkerColor{.Red = 120, .Green = 160, .Blue = 220, .Alpha = 255};
 
 FrameGraphExecutionDiagnostics::FrameGraphExecutionDiagnostics(FrameExecutionDiagnostics& frameDiagnostics, RenderCommandContext& commands) noexcept :
     m_frameDiagnostics(&frameDiagnostics),
@@ -83,5 +79,5 @@ void FrameGraphExecutionDiagnostics::InsertDetailedMarker(std::string_view label
 		return;
 	}
 
-	m_frameDiagnostics->InsertGpuMarker(*m_commands, label, FrameGraphExecutionDiagnosticsConstants::kFrameGraphDetailMarkerColor);
+	m_frameDiagnostics->InsertGpuMarker(*m_commands, label, kFrameGraphDetailMarkerColor);
 }

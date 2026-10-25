@@ -29,26 +29,41 @@ void D3D12DescriptorService::BeginFrame(std::uint32_t frameIndex) noexcept
 		return;
 	}
 
+	ReclaimDescriptorAllocations(frameIndex);
+
+	ReclaimDescriptorTables(frameIndex);
+
+	ReclaimResourceViews(frameIndex);
+	m_currentFrameIndex = frameIndex;
+}
+
+void D3D12DescriptorService::ReclaimDescriptorAllocations(std::uint32_t frameIndex) noexcept
+{
 	for (const RetiredDescriptorAllocation& retired : m_retiredDescriptorAllocations[frameIndex])
 	{
 		DestroyDescriptorAllocation(retired.descriptorType, retired.allocation);
 	}
 	m_retiredDescriptorAllocations[frameIndex].clear();
+}
 
+void D3D12DescriptorService::ReclaimDescriptorTables(std::uint32_t frameIndex) noexcept
+{
 	for (const RetiredDescriptorTable& retired : m_retiredDescriptorTables[frameIndex])
 	{
 		DestroyDescriptorTable(retired.descriptorType, retired.nativeHandle, retired.descriptorCount);
 		RecycleDescriptorTableRecord(retired.recordIndex);
 	}
 	m_retiredDescriptorTables[frameIndex].clear();
+}
 
+void D3D12DescriptorService::ReclaimResourceViews(std::uint32_t frameIndex) noexcept
+{
 	for (RetiredResourceView& retired : m_retiredResourceViews[frameIndex])
 	{
 		DestroyResourceView(retired.record);
 		RecycleResourceViewRecord(retired.recordIndex);
 	}
 	m_retiredResourceViews[frameIndex].clear();
-	m_currentFrameIndex = frameIndex;
 }
 
 ID3D12DescriptorHeap* D3D12DescriptorService::GetShaderResourceDescriptorHeap() const noexcept
@@ -454,6 +469,138 @@ ERhiDescriptorAllocatorType D3D12DescriptorService::ResolveResourceViewDescripto
 	}
 }
 
+static bool WriteRenderTargetDescriptor(ID3D12Device* device, const RhiResourceViewDesc& desc, D3D12_CPU_DESCRIPTOR_HANDLE nativeDestination) noexcept
+{
+	if (!desc.Resource)
+	{
+		return false;
+	}
+
+	D3D12_RENDER_TARGET_VIEW_DESC viewDesc{};
+	viewDesc.Format = D3D12TypeConversions::ToDxgiFormat(desc.Format);
+	viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	device->CreateRenderTargetView(D3D12TypeConversions::ToResource(desc.Resource), &viewDesc, nativeDestination);
+	return true;
+}
+
+static bool WriteDepthStencilDescriptor(ID3D12Device* device, const RhiResourceViewDesc& desc, D3D12_CPU_DESCRIPTOR_HANDLE nativeDestination) noexcept
+{
+	if (!desc.Resource)
+	{
+		return false;
+	}
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC viewDesc{};
+	viewDesc.Format = D3D12TypeConversions::ToDxgiFormat(desc.Format);
+	viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	viewDesc.Flags = D3D12_DSV_FLAG_NONE;
+	device->CreateDepthStencilView(D3D12TypeConversions::ToResource(desc.Resource), &viewDesc, nativeDestination);
+	return true;
+}
+
+static bool WriteTextureSrv(ID3D12Device* device, const RhiResourceViewDesc& desc, D3D12_CPU_DESCRIPTOR_HANDLE nativeDestination) noexcept
+{
+	if (!desc.Resource)
+	{
+		return false;
+	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC viewDesc{};
+	viewDesc.Format = D3D12TypeConversions::ToDxgiShaderResourceViewFormat(desc.Format);
+	viewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	if (desc.TextureDimension == TextureResourceDimension::TextureCube)
+	{
+		viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+		viewDesc.TextureCube.MostDetailedMip = desc.Texture.MostDetailedMip;
+		viewDesc.TextureCube.MipLevels = desc.Texture.MipCount;
+		viewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+	}
+	else
+	{
+		viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		viewDesc.Texture2D.MostDetailedMip = desc.Texture.MostDetailedMip;
+		viewDesc.Texture2D.MipLevels = desc.Texture.MipCount;
+		viewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+	}
+	device->CreateShaderResourceView(D3D12TypeConversions::ToResource(desc.Resource), &viewDesc, nativeDestination);
+	return true;
+}
+
+static bool WriteTextureUav(ID3D12Device* device, const RhiResourceViewDesc& desc, D3D12_CPU_DESCRIPTOR_HANDLE nativeDestination) noexcept
+{
+	if (!desc.Resource)
+	{
+		return false;
+	}
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC viewDesc{};
+	viewDesc.Format = D3D12TypeConversions::ToDxgiFormat(desc.Format);
+	viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+	viewDesc.Texture2D.MipSlice = desc.Texture.MostDetailedMip;
+	viewDesc.Texture2D.PlaneSlice = 0;
+	device->CreateUnorderedAccessView(D3D12TypeConversions::ToResource(desc.Resource), nullptr, &viewDesc, nativeDestination);
+	return true;
+}
+
+static bool WriteBufferSrv(ID3D12Device* device, const RhiResourceViewDesc& desc, D3D12_CPU_DESCRIPTOR_HANDLE nativeDestination) noexcept
+{
+	if (!desc.Resource || desc.Buffer.SizeInBytes == 0)
+	{
+		return false;
+	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC viewDesc{};
+	viewDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	viewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	if (desc.Buffer.StrideInBytes > 0)
+	{
+		viewDesc.Format = DXGI_FORMAT_UNKNOWN;
+		viewDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		viewDesc.Buffer.FirstElement = desc.Buffer.OffsetInBytes / desc.Buffer.StrideInBytes;
+		viewDesc.Buffer.StructureByteStride = desc.Buffer.StrideInBytes;
+		viewDesc.Buffer.NumElements = static_cast<UINT>(desc.Buffer.SizeInBytes / desc.Buffer.StrideInBytes);
+	}
+	else
+	{
+		viewDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+		viewDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
+		viewDesc.Buffer.FirstElement = desc.Buffer.OffsetInBytes / sizeof(std::uint32_t);
+		viewDesc.Buffer.StructureByteStride = 0;
+		viewDesc.Buffer.NumElements = static_cast<UINT>(desc.Buffer.SizeInBytes / sizeof(std::uint32_t));
+	}
+	device->CreateShaderResourceView(D3D12TypeConversions::ToResource(desc.Resource), &viewDesc, nativeDestination);
+	return true;
+}
+
+static bool WriteBufferUav(ID3D12Device* device, const RhiResourceViewDesc& desc, D3D12_CPU_DESCRIPTOR_HANDLE nativeDestination) noexcept
+{
+	if (!desc.Resource || desc.Buffer.SizeInBytes == 0)
+	{
+		return false;
+	}
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC viewDesc{};
+	viewDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+	if (desc.Buffer.StrideInBytes > 0)
+	{
+		viewDesc.Format = DXGI_FORMAT_UNKNOWN;
+		viewDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+		viewDesc.Buffer.FirstElement = desc.Buffer.OffsetInBytes / desc.Buffer.StrideInBytes;
+		viewDesc.Buffer.StructureByteStride = desc.Buffer.StrideInBytes;
+		viewDesc.Buffer.NumElements = static_cast<UINT>(desc.Buffer.SizeInBytes / desc.Buffer.StrideInBytes);
+	}
+	else
+	{
+		viewDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+		viewDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
+		viewDesc.Buffer.FirstElement = desc.Buffer.OffsetInBytes / sizeof(std::uint32_t);
+		viewDesc.Buffer.StructureByteStride = 0;
+		viewDesc.Buffer.NumElements = static_cast<UINT>(desc.Buffer.SizeInBytes / sizeof(std::uint32_t));
+	}
+	device->CreateUnorderedAccessView(D3D12TypeConversions::ToResource(desc.Resource), nullptr, &viewDesc, nativeDestination);
+	return true;
+}
+
 bool D3D12DescriptorService::WriteResourceViewDescriptor(const RhiResourceViewDesc& desc, RhiCpuDescriptorHandle destination) noexcept
 {
 	if (m_rhi == nullptr || !destination)
@@ -471,131 +618,17 @@ bool D3D12DescriptorService::WriteResourceViewDescriptor(const RhiResourceViewDe
 	switch (desc.Kind)
 	{
 		case ERhiResourceViewKind::RenderTarget:
-		{
-			if (!desc.Resource)
-			{
-				return false;
-			}
-
-			D3D12_RENDER_TARGET_VIEW_DESC viewDesc{};
-			viewDesc.Format = D3D12TypeConversions::ToDxgiFormat(desc.Format);
-			viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-			device->CreateRenderTargetView(D3D12TypeConversions::ToResource(desc.Resource), &viewDesc, nativeDestination);
-			return true;
-		}
+		return WriteRenderTargetDescriptor(device, desc, nativeDestination);
 		case ERhiResourceViewKind::DepthStencil:
-		{
-			if (!desc.Resource)
-			{
-				return false;
-			}
-
-			D3D12_DEPTH_STENCIL_VIEW_DESC viewDesc{};
-			viewDesc.Format = D3D12TypeConversions::ToDxgiFormat(desc.Format);
-			viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-			viewDesc.Flags = D3D12_DSV_FLAG_NONE;
-			device->CreateDepthStencilView(D3D12TypeConversions::ToResource(desc.Resource), &viewDesc, nativeDestination);
-			return true;
-		}
+		return WriteDepthStencilDescriptor(device, desc, nativeDestination);
 		case ERhiResourceViewKind::TextureShaderResource:
-		{
-			if (!desc.Resource)
-			{
-				return false;
-			}
-
-			D3D12_SHADER_RESOURCE_VIEW_DESC viewDesc{};
-			viewDesc.Format = D3D12TypeConversions::ToDxgiShaderResourceViewFormat(desc.Format);
-			viewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			if (desc.TextureDimension == TextureResourceDimension::TextureCube)
-			{
-				viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-				viewDesc.TextureCube.MostDetailedMip = desc.Texture.MostDetailedMip;
-				viewDesc.TextureCube.MipLevels = desc.Texture.MipCount;
-				viewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
-			}
-			else
-			{
-				viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-				viewDesc.Texture2D.MostDetailedMip = desc.Texture.MostDetailedMip;
-				viewDesc.Texture2D.MipLevels = desc.Texture.MipCount;
-				viewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-			}
-			device->CreateShaderResourceView(D3D12TypeConversions::ToResource(desc.Resource), &viewDesc, nativeDestination);
-			return true;
-		}
+		return WriteTextureSrv(device, desc, nativeDestination);
 		case ERhiResourceViewKind::TextureUnorderedAccess:
-		{
-			if (!desc.Resource)
-			{
-				return false;
-			}
-
-			D3D12_UNORDERED_ACCESS_VIEW_DESC viewDesc{};
-			viewDesc.Format = D3D12TypeConversions::ToDxgiFormat(desc.Format);
-			viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-			viewDesc.Texture2D.MipSlice = desc.Texture.MostDetailedMip;
-			viewDesc.Texture2D.PlaneSlice = 0;
-			device->CreateUnorderedAccessView(D3D12TypeConversions::ToResource(desc.Resource), nullptr, &viewDesc, nativeDestination);
-			return true;
-		}
+		return WriteTextureUav(device, desc, nativeDestination);
 		case ERhiResourceViewKind::BufferShaderResource:
-		{
-			if (!desc.Resource || desc.Buffer.SizeInBytes == 0)
-			{
-				return false;
-			}
-
-			D3D12_SHADER_RESOURCE_VIEW_DESC viewDesc{};
-			viewDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-			viewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			if (desc.Buffer.StrideInBytes > 0)
-			{
-				viewDesc.Format = DXGI_FORMAT_UNKNOWN;
-				viewDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-				viewDesc.Buffer.FirstElement = desc.Buffer.OffsetInBytes / desc.Buffer.StrideInBytes;
-				viewDesc.Buffer.StructureByteStride = desc.Buffer.StrideInBytes;
-				viewDesc.Buffer.NumElements = static_cast<UINT>(desc.Buffer.SizeInBytes / desc.Buffer.StrideInBytes);
-			}
-			else
-			{
-				viewDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-				viewDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
-				viewDesc.Buffer.FirstElement = desc.Buffer.OffsetInBytes / sizeof(std::uint32_t);
-				viewDesc.Buffer.StructureByteStride = 0;
-				viewDesc.Buffer.NumElements = static_cast<UINT>(desc.Buffer.SizeInBytes / sizeof(std::uint32_t));
-			}
-			device->CreateShaderResourceView(D3D12TypeConversions::ToResource(desc.Resource), &viewDesc, nativeDestination);
-			return true;
-		}
+		return WriteBufferSrv(device, desc, nativeDestination);
 		case ERhiResourceViewKind::BufferUnorderedAccess:
-		{
-			if (!desc.Resource || desc.Buffer.SizeInBytes == 0)
-			{
-				return false;
-			}
-
-			D3D12_UNORDERED_ACCESS_VIEW_DESC viewDesc{};
-			viewDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-			if (desc.Buffer.StrideInBytes > 0)
-			{
-				viewDesc.Format = DXGI_FORMAT_UNKNOWN;
-				viewDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-				viewDesc.Buffer.FirstElement = desc.Buffer.OffsetInBytes / desc.Buffer.StrideInBytes;
-				viewDesc.Buffer.StructureByteStride = desc.Buffer.StrideInBytes;
-				viewDesc.Buffer.NumElements = static_cast<UINT>(desc.Buffer.SizeInBytes / desc.Buffer.StrideInBytes);
-			}
-			else
-			{
-				viewDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-				viewDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
-				viewDesc.Buffer.FirstElement = desc.Buffer.OffsetInBytes / sizeof(std::uint32_t);
-				viewDesc.Buffer.StructureByteStride = 0;
-				viewDesc.Buffer.NumElements = static_cast<UINT>(desc.Buffer.SizeInBytes / sizeof(std::uint32_t));
-			}
-			device->CreateUnorderedAccessView(D3D12TypeConversions::ToResource(desc.Resource), nullptr, &viewDesc, nativeDestination);
-			return true;
-		}
+		return WriteBufferUav(device, desc, nativeDestination);
 		default:
 			return false;
 	}

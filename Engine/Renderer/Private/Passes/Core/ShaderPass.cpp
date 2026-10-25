@@ -136,7 +136,7 @@ void BindComputeShaderPass(
 
 	commandContext.SetPipeline(pipeline);
 
-	PassBinder::BindCompute(
+	BindComputePassParameters(
 	    commandContext,
 	    resources,
 	    bindingLayout,
@@ -164,7 +164,7 @@ void BindRasterShaderPass(
 
 	commandContext.SetPipeline(pipeline);
 
-	PassBinder::BindGraphics(
+	BindGraphicsPassParameters(
 	    commandContext,
 	    resources,
 	    bindingLayout,
@@ -183,7 +183,7 @@ void BindRayTracingShaderPass(
 {
 	resources.BindGlobalDescriptorState(commandContext);
 	commandContext.SetRayTracingPipeline(pipeline);
-	PassBinder::BindRayTracing(commandContext, resources, bindingLayout, parameterSet);
+	BindRayTracingPassParameters(commandContext, resources, bindingLayout, parameterSet);
 }
 
 [[noreturn]] void ReportInvalidShaderPassParameterSet(const char* passName, const PassParameterSet& parameterSet, const char* requiredBinding) noexcept

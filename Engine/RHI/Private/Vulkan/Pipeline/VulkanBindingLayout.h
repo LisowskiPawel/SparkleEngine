@@ -44,8 +44,4 @@ private:
 	std::vector<VkPushConstantRange> m_pushConstantRanges;
 };
 
-class VulkanBindingLayoutCompiler final
-{
-public:
-	static std::unique_ptr<VulkanBindingLayout> Compile(VulkanRhi& rhi, const RenderBindingLayoutCompileDesc& desc);
-};
+std::unique_ptr<VulkanBindingLayout> CompileVulkanBindingLayout(VulkanRhi& rhi, const RenderBindingLayoutCompileDesc& desc);

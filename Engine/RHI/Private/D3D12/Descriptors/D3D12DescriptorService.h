@@ -41,6 +41,10 @@ public:
 	RhiGpuDescriptorHandle GetResourceViewGpuHandle(RhiResourceViewHandle view) const noexcept override;
 
 private:
+	void ReclaimDescriptorAllocations(std::uint32_t frameIndex) noexcept;
+	void ReclaimDescriptorTables(std::uint32_t frameIndex) noexcept;
+	void ReclaimResourceViews(std::uint32_t frameIndex) noexcept;
+
 	friend class D3D12InteropService;
 
 	NativeTextureViewInfo ResolveNativeTextureViewInfo(RhiResourceViewHandle view, RhiResourceHandle resource, ResourceState state) const noexcept;

@@ -28,7 +28,91 @@ static bool IsRequestedLibraryExport(std::string_view reflectedName, std::string
 	return reflectedName.starts_with(entryPoint) && reflectedName.substr(entryPoint.size()).starts_with("@@");
 }
 
-ShaderReflection DxilReflectionExtractor::ExtractLibrary(IDxcUtils& utils, IDxcResult* result, std::string_view entryPoint)
+static void ReflectLibraryConstantBuffers(ID3D12FunctionReflection& function, UINT count, ShaderReflection& reflection)
+{
+	reflection.ConstantBuffers.reserve(count);
+	for (UINT bufferIndex = 0; bufferIndex < count; ++bufferIndex)
+	{
+		ID3D12ShaderReflectionConstantBuffer* buffer = function.GetConstantBufferByIndex(bufferIndex);
+		D3D12_SHADER_BUFFER_DESC bufferDesc{};
+		if (buffer == nullptr || FAILED(buffer->GetDesc(&bufferDesc)))
+		{
+			throw Diagnostics::Error("DXIL library reflection could not read a constant-buffer declaration.");
+		}
+		ShaderReflectionConstantBuffer reflectedBuffer;
+		reflectedBuffer.Name = bufferDesc.Name != nullptr ? bufferDesc.Name : "";
+		reflectedBuffer.SizeInBytes = bufferDesc.Size;
+		reflectedBuffer.Members.reserve(bufferDesc.Variables);
+		for (UINT variableIndex = 0; variableIndex < bufferDesc.Variables; ++variableIndex)
+		{
+			ID3D12ShaderReflectionVariable* variable = buffer->GetVariableByIndex(variableIndex);
+			D3D12_SHADER_VARIABLE_DESC variableDesc{};
+			if (variable == nullptr || FAILED(variable->GetDesc(&variableDesc)))
+			{
+				throw Diagnostics::Error("DXIL library reflection could not read a constant-buffer member.");
+			}
+			D3D12_SHADER_TYPE_DESC typeDesc{};
+			ID3D12ShaderReflectionType* type = variable->GetType();
+			if (type == nullptr || FAILED(type->GetDesc(&typeDesc)))
+			{
+				throw Diagnostics::Error("DXIL library reflection could not read a constant-buffer member type.");
+			}
+			const std::uint32_t arrayCount = typeDesc.Elements > 0 ? typeDesc.Elements : 1u;
+
+			reflectedBuffer.Members.push_back(
+			    ShaderReflectionConstantBufferMember{
+			        .Name = variableDesc.Name != nullptr ? variableDesc.Name : "",
+			        .OffsetInBytes = variableDesc.StartOffset,
+			        .SizeInBytes = variableDesc.Size,
+			        .ArrayCount = arrayCount,
+			        .ArrayStrideInBytes = variableDesc.Size / arrayCount,
+			        .ScalarType = MapDxilScalarType(typeDesc.Type),
+			        .RowCount = static_cast<std::uint8_t>(typeDesc.Rows),
+			        .ColumnCount = static_cast<std::uint8_t>(typeDesc.Columns)});
+		}
+		reflection.ConstantBuffers.push_back(std::move(reflectedBuffer));
+	}
+}
+
+static void ReflectLibraryBindings(ID3D12FunctionReflection& function, UINT count, ShaderReflection& reflection)
+{
+	reflection.Bindings.reserve(count);
+	for (UINT bindingIndex = 0; bindingIndex < count; ++bindingIndex)
+	{
+		D3D12_SHADER_INPUT_BIND_DESC bindingDesc{};
+		if (FAILED(function.GetResourceBindingDesc(bindingIndex, &bindingDesc)))
+		{
+			throw Diagnostics::Error("DXIL library reflection could not read a resource binding.");
+		}
+		ShaderReflectionResourceBinding binding;
+		binding.Name = bindingDesc.Name != nullptr ? bindingDesc.Name : "";
+		binding.Kind = MapDxilResourceKind(bindingDesc.Type, bindingDesc.Dimension);
+		binding.Dimension = MapDxilDimension(bindingDesc.Dimension);
+		binding.IsReadOnly = IsDxilReadOnlyKind(binding.Kind);
+		binding.Set = bindingDesc.Space;
+		binding.Slot = bindingDesc.BindPoint;
+		binding.ArrayCount = bindingDesc.BindCount == 0 ? 0u : bindingDesc.BindCount;
+		if (binding.Kind == CookedShaderResourceKind::ConstantBuffer)
+		{
+			for (std::size_t bufferIndex = 0; bufferIndex < reflection.ConstantBuffers.size(); ++bufferIndex)
+			{
+				if (reflection.ConstantBuffers[bufferIndex].Name == binding.Name)
+				{
+					binding.ConstantBufferIndex = static_cast<std::uint32_t>(bufferIndex);
+					binding.SizeInBytes = reflection.ConstantBuffers[bufferIndex].SizeInBytes;
+					break;
+				}
+			}
+		}
+		else if (binding.Kind == CookedShaderResourceKind::StructuredBuffer || binding.Kind == CookedShaderResourceKind::RWStructuredBuffer)
+		{
+			binding.SizeInBytes = bindingDesc.NumSamples;
+		}
+		reflection.Bindings.push_back(std::move(binding));
+	}
+}
+
+ShaderReflection ExtractDxilLibraryReflection(IDxcUtils& utils, IDxcResult* result, std::string_view entryPoint)
 {
 	if (result == nullptr || entryPoint.empty())
 	{
@@ -82,82 +166,8 @@ ShaderReflection DxilReflectionExtractor::ExtractLibrary(IDxcUtils& utils, IDxcR
 	}
 
 	ShaderReflection reflection;
-	reflection.ConstantBuffers.reserve(functionDesc.ConstantBuffers);
-	for (UINT bufferIndex = 0; bufferIndex < functionDesc.ConstantBuffers; ++bufferIndex)
-	{
-		ID3D12ShaderReflectionConstantBuffer* buffer = function->GetConstantBufferByIndex(bufferIndex);
-		D3D12_SHADER_BUFFER_DESC bufferDesc{};
-		if (buffer == nullptr || FAILED(buffer->GetDesc(&bufferDesc)))
-		{
-			throw Diagnostics::Error("DXIL library reflection could not read a constant-buffer declaration.");
-		}
-		ShaderReflectionConstantBuffer reflectedBuffer;
-		reflectedBuffer.Name = bufferDesc.Name != nullptr ? bufferDesc.Name : "";
-		reflectedBuffer.SizeInBytes = bufferDesc.Size;
-		reflectedBuffer.Members.reserve(bufferDesc.Variables);
-		for (UINT variableIndex = 0; variableIndex < bufferDesc.Variables; ++variableIndex)
-		{
-			ID3D12ShaderReflectionVariable* variable = buffer->GetVariableByIndex(variableIndex);
-			D3D12_SHADER_VARIABLE_DESC variableDesc{};
-			if (variable == nullptr || FAILED(variable->GetDesc(&variableDesc)))
-			{
-				throw Diagnostics::Error("DXIL library reflection could not read a constant-buffer member.");
-			}
-			D3D12_SHADER_TYPE_DESC typeDesc{};
-			ID3D12ShaderReflectionType* type = variable->GetType();
-			if (type == nullptr || FAILED(type->GetDesc(&typeDesc)))
-			{
-				throw Diagnostics::Error("DXIL library reflection could not read a constant-buffer member type.");
-			}
-			const std::uint32_t arrayCount = typeDesc.Elements > 0 ? typeDesc.Elements : 1u;
+	ReflectLibraryConstantBuffers(*function, functionDesc.ConstantBuffers, reflection);
+	ReflectLibraryBindings(*function, functionDesc.BoundResources, reflection);
 
-			reflectedBuffer.Members.push_back(
-			    ShaderReflectionConstantBufferMember{
-			        .Name = variableDesc.Name != nullptr ? variableDesc.Name : "",
-			        .OffsetInBytes = variableDesc.StartOffset,
-			        .SizeInBytes = variableDesc.Size,
-			        .ArrayCount = arrayCount,
-			        .ArrayStrideInBytes = variableDesc.Size / arrayCount,
-			        .ScalarType = MapScalarType(typeDesc.Type),
-			        .RowCount = static_cast<std::uint8_t>(typeDesc.Rows),
-			        .ColumnCount = static_cast<std::uint8_t>(typeDesc.Columns)});
-		}
-		reflection.ConstantBuffers.push_back(std::move(reflectedBuffer));
-	}
-
-	reflection.Bindings.reserve(functionDesc.BoundResources);
-	for (UINT bindingIndex = 0; bindingIndex < functionDesc.BoundResources; ++bindingIndex)
-	{
-		D3D12_SHADER_INPUT_BIND_DESC bindingDesc{};
-		if (FAILED(function->GetResourceBindingDesc(bindingIndex, &bindingDesc)))
-		{
-			throw Diagnostics::Error("DXIL library reflection could not read a resource binding.");
-		}
-		ShaderReflectionResourceBinding binding;
-		binding.Name = bindingDesc.Name != nullptr ? bindingDesc.Name : "";
-		binding.Kind = MapResourceKind(bindingDesc.Type, bindingDesc.Dimension);
-		binding.Dimension = MapDimension(bindingDesc.Dimension);
-		binding.IsReadOnly = IsReadOnlyKind(binding.Kind);
-		binding.Set = bindingDesc.Space;
-		binding.Slot = bindingDesc.BindPoint;
-		binding.ArrayCount = bindingDesc.BindCount == 0 ? 0u : bindingDesc.BindCount;
-		if (binding.Kind == CookedShaderResourceKind::ConstantBuffer)
-		{
-			for (std::size_t bufferIndex = 0; bufferIndex < reflection.ConstantBuffers.size(); ++bufferIndex)
-			{
-				if (reflection.ConstantBuffers[bufferIndex].Name == binding.Name)
-				{
-					binding.ConstantBufferIndex = static_cast<std::uint32_t>(bufferIndex);
-					binding.SizeInBytes = reflection.ConstantBuffers[bufferIndex].SizeInBytes;
-					break;
-				}
-			}
-		}
-		else if (binding.Kind == CookedShaderResourceKind::StructuredBuffer || binding.Kind == CookedShaderResourceKind::RWStructuredBuffer)
-		{
-			binding.SizeInBytes = bindingDesc.NumSamples;
-		}
-		reflection.Bindings.push_back(std::move(binding));
-	}
 	return reflection;
 }

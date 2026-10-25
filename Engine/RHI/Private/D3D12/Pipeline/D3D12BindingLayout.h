@@ -31,8 +31,4 @@ private:
 	std::unique_ptr<D3D12RootSignature> m_rootSignature;
 };
 
-class D3D12BindingLayoutCompiler final
-{
-public:
-	static std::unique_ptr<D3D12BindingLayout> Compile(D3D12Rhi& rhi, const RenderBindingLayoutCompileDesc& desc);
-};
+std::unique_ptr<D3D12BindingLayout> CompileD3D12BindingLayout(D3D12Rhi& rhi, const RenderBindingLayoutCompileDesc& desc);

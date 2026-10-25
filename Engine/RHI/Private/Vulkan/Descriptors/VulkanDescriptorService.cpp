@@ -43,14 +43,19 @@ void VulkanDescriptorService::BeginFrame(std::uint32_t frameIndex) noexcept
 		Diagnostics::Fatal(g_vulkanDescriptorServiceLogger, __FILE__, __LINE__, "Vulkan descriptor frame index is out of range.");
 	}
 
+	ReclaimResourceViews(frameIndex);
+	m_currentFrameIndex = frameIndex;
+	m_allocator.BeginFrame(frameIndex);
+}
+
+void VulkanDescriptorService::ReclaimResourceViews(std::uint32_t frameIndex) noexcept
+{
 	for (RetiredResourceView& retired : m_retiredResourceViews[frameIndex])
 	{
 		DestroyResourceView(retired.Record);
 		RecycleResourceViewRecord(retired.RecordIndex);
 	}
 	m_retiredResourceViews[frameIndex].clear();
-	m_currentFrameIndex = frameIndex;
-	m_allocator.BeginFrame(frameIndex);
 }
 
 void VulkanDescriptorService::SetSamplerLibrary(VulkanSamplerLibrary& samplerLibrary) noexcept

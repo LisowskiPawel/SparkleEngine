@@ -58,6 +58,8 @@ public:
 	void ReleaseAllResourceViews() noexcept;
 
 private:
+	void ReclaimResourceViews(std::uint32_t frameIndex) noexcept;
+
 	friend class VulkanCommandRecordingContext;
 	friend class VulkanInteropService;
 	friend class VulkanRenderCommandList;

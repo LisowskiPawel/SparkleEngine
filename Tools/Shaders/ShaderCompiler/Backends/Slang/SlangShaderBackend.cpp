@@ -249,7 +249,7 @@ ShaderReflection SlangShaderBackend::ExtractReflection(const ShaderCompileReques
 	ShaderReflection reflection;
 	if (IsSpirVTarget(request.Target))
 	{
-		reflection = SpirVReflectionExtractor::Extract(bytecode, request.Stage);
+		reflection = ExtractSpirVReflection(bytecode, request.Stage);
 	}
 	else
 	{

@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <wrl/client.h>
 
-CookedShaderResourceKind DxilReflectionExtractor::MapResourceKind(D3D_SHADER_INPUT_TYPE type, D3D_SRV_DIMENSION dim)
+CookedShaderResourceKind MapDxilResourceKind(D3D_SHADER_INPUT_TYPE type, D3D_SRV_DIMENSION dim)
 {
 	switch (type)
 	{
@@ -39,7 +39,7 @@ CookedShaderResourceKind DxilReflectionExtractor::MapResourceKind(D3D_SHADER_INP
 	}
 }
 
-CookedShaderResourceDimension DxilReflectionExtractor::MapDimension(D3D_SRV_DIMENSION dim)
+CookedShaderResourceDimension MapDxilDimension(D3D_SRV_DIMENSION dim)
 {
 	switch (dim)
 	{
@@ -68,7 +68,7 @@ CookedShaderResourceDimension DxilReflectionExtractor::MapDimension(D3D_SRV_DIME
 	}
 }
 
-bool DxilReflectionExtractor::IsReadOnlyKind(CookedShaderResourceKind kind)
+bool IsDxilReadOnlyKind(CookedShaderResourceKind kind)
 {
 	switch (kind)
 	{
@@ -82,7 +82,7 @@ bool DxilReflectionExtractor::IsReadOnlyKind(CookedShaderResourceKind kind)
 	}
 }
 
-CookedShaderScalarType DxilReflectionExtractor::MapScalarType(D3D_SHADER_VARIABLE_TYPE type)
+CookedShaderScalarType MapDxilScalarType(D3D_SHADER_VARIABLE_TYPE type)
 {
 	switch (type)
 	{
@@ -111,7 +111,7 @@ CookedShaderScalarType DxilReflectionExtractor::MapScalarType(D3D_SHADER_VARIABL
 	}
 }
 
-CookedShaderScalarType DxilReflectionExtractor::MapInputComponent(D3D_REGISTER_COMPONENT_TYPE type)
+static CookedShaderScalarType MapInputComponent(D3D_REGISTER_COMPONENT_TYPE type)
 {
 	switch (type)
 	{
@@ -126,7 +126,7 @@ CookedShaderScalarType DxilReflectionExtractor::MapInputComponent(D3D_REGISTER_C
 	}
 }
 
-std::uint8_t DxilReflectionExtractor::PopMaskBits(std::uint8_t mask)
+static std::uint8_t PopMaskBits(std::uint8_t mask)
 {
 	std::uint8_t count = 0;
 	while (mask)
@@ -137,12 +137,8 @@ std::uint8_t DxilReflectionExtractor::PopMaskBits(std::uint8_t mask)
 	return count;
 }
 
-ShaderReflection DxilReflectionExtractor::Extract(IDxcUtils& utils, IDxcResult* result, std::span<const std::uint8_t> bytecode, ShaderStage stage)
+static Microsoft::WRL::ComPtr<ID3D12ShaderReflection> OpenShaderReflection(IDxcUtils& utils, IDxcResult* result)
 {
-	ShaderReflection reflection;
-	ShaderReflection& outReflection = reflection;
-	(void) bytecode;
-
 	if (result == nullptr)
 	{
 		throw Diagnostics::Error("DXIL reflection: null IDxcResult");
@@ -169,18 +165,17 @@ ShaderReflection DxilReflectionExtractor::Extract(IDxcUtils& utils, IDxcResult* 
 		throw Diagnostics::Error("DXIL reflection: CreateReflection failed");
 	}
 
-	D3D12_SHADER_DESC desc{};
-	if (FAILED(shaderReflection->GetDesc(&desc)))
-	{
-		throw Diagnostics::Error("DXIL reflection: GetDesc failed");
-	}
+	return shaderReflection;
+}
 
+static void ReflectConstantBuffers(ID3D12ShaderReflection& shader, UINT count, ShaderReflection& reflection)
+{
 	// Emit one record per reflected constant buffer.
 	// Bindings resolve CB indices by name in the next loop.
-	outReflection.ConstantBuffers.reserve(desc.ConstantBuffers);
-	for (UINT i = 0; i < desc.ConstantBuffers; ++i)
+	reflection.ConstantBuffers.reserve(count);
+	for (UINT i = 0; i < count; ++i)
 	{
-		ID3D12ShaderReflectionConstantBuffer* cb = shaderReflection->GetConstantBufferByIndex(i);
+		ID3D12ShaderReflectionConstantBuffer* cb = shader.GetConstantBufferByIndex(i);
 		if (cb == nullptr)
 		{
 			throw Diagnostics::Error("DXIL reflection could not read a constant-buffer declaration.");
@@ -226,30 +221,33 @@ ShaderReflection DxilReflectionExtractor::Extract(IDxcUtils& utils, IDxcResult* 
 			// D3D reflection does not expose array stride.
 			// Approximate it as SizeInBytes / ArrayCount.
 			member.ArrayStrideInBytes = (member.ArrayCount > 0) ? (member.SizeInBytes / member.ArrayCount) : member.SizeInBytes;
-			member.ScalarType = MapScalarType(tDesc.Type);
+			member.ScalarType = MapDxilScalarType(tDesc.Type);
 			member.RowCount = static_cast<std::uint8_t>(tDesc.Rows);
 			member.ColumnCount = static_cast<std::uint8_t>(tDesc.Columns);
 			outCb.Members.push_back(std::move(member));
 		}
 
-		outReflection.ConstantBuffers.push_back(std::move(outCb));
+		reflection.ConstantBuffers.push_back(std::move(outCb));
 	}
+}
 
+static void ReflectResourceBindings(ID3D12ShaderReflection& shader, UINT count, ShaderReflection& reflection)
+{
 	// Resource bindings.
-	outReflection.Bindings.reserve(desc.BoundResources);
-	for (UINT i = 0; i < desc.BoundResources; ++i)
+	reflection.Bindings.reserve(count);
+	for (UINT i = 0; i < count; ++i)
 	{
 		D3D12_SHADER_INPUT_BIND_DESC bindDesc{};
-		if (FAILED(shaderReflection->GetResourceBindingDesc(i, &bindDesc)))
+		if (FAILED(shader.GetResourceBindingDesc(i, &bindDesc)))
 		{
 			throw Diagnostics::Error("DXIL reflection could not read a resource binding.");
 		}
 
 		ShaderReflectionResourceBinding binding;
 		binding.Name = bindDesc.Name ? bindDesc.Name : "";
-		binding.Kind = MapResourceKind(bindDesc.Type, bindDesc.Dimension);
-		binding.Dimension = MapDimension(bindDesc.Dimension);
-		binding.IsReadOnly = IsReadOnlyKind(binding.Kind);
+		binding.Kind = MapDxilResourceKind(bindDesc.Type, bindDesc.Dimension);
+		binding.Dimension = MapDxilDimension(bindDesc.Dimension);
+		binding.IsReadOnly = IsDxilReadOnlyKind(binding.Kind);
 		binding.Set = bindDesc.Space;
 		binding.Slot = bindDesc.BindPoint;
 		binding.ArrayCount = (bindDesc.BindCount == 0) ? 0u /* unbounded */ : bindDesc.BindCount;
@@ -257,12 +255,12 @@ ShaderReflection DxilReflectionExtractor::Extract(IDxcUtils& utils, IDxcResult* 
 		if (binding.Kind == CookedShaderResourceKind::ConstantBuffer)
 		{
 			binding.SizeInBytes = 0;
-			for (std::size_t cbIndex = 0; cbIndex < outReflection.ConstantBuffers.size(); ++cbIndex)
+			for (std::size_t cbIndex = 0; cbIndex < reflection.ConstantBuffers.size(); ++cbIndex)
 			{
-				if (outReflection.ConstantBuffers[cbIndex].Name == binding.Name)
+				if (reflection.ConstantBuffers[cbIndex].Name == binding.Name)
 				{
 					binding.ConstantBufferIndex = static_cast<std::uint32_t>(cbIndex);
-					binding.SizeInBytes = outReflection.ConstantBuffers[cbIndex].SizeInBytes;
+					binding.SizeInBytes = reflection.ConstantBuffers[cbIndex].SizeInBytes;
 					break;
 				}
 			}
@@ -272,36 +270,59 @@ ShaderReflection DxilReflectionExtractor::Extract(IDxcUtils& utils, IDxcResult* 
 			binding.SizeInBytes = bindDesc.NumSamples; // element stride
 		}
 
-		outReflection.Bindings.push_back(std::move(binding));
+		reflection.Bindings.push_back(std::move(binding));
+	}
+}
+
+static void ReflectVertexInputs(ID3D12ShaderReflection& shader, UINT count, ShaderReflection& reflection)
+{
+	reflection.InputElements.reserve(count);
+	for (UINT i = 0; i < count; ++i)
+	{
+		D3D12_SIGNATURE_PARAMETER_DESC paramDesc{};
+		if (FAILED(shader.GetInputParameterDesc(i, &paramDesc)))
+		{
+			throw Diagnostics::Error("DXIL reflection could not read a shader input parameter.");
+		}
+
+		// Skip system-value semantics (SV_*) that are not consumed from
+		// the input layout.
+		if (paramDesc.SystemValueType != D3D_NAME_UNDEFINED)
+		{
+			continue;
+		}
+
+		ShaderReflectionInputElement element;
+		element.Semantic = paramDesc.SemanticName ? paramDesc.SemanticName : "";
+		element.SemanticIndex = paramDesc.SemanticIndex;
+		element.Location = paramDesc.Register;
+		element.ScalarType = MapInputComponent(paramDesc.ComponentType);
+		element.ComponentCount = PopMaskBits(paramDesc.Mask);
+		reflection.InputElements.push_back(std::move(element));
+	}
+}
+
+ShaderReflection ExtractDxilReflection(IDxcUtils& utils, IDxcResult* result, std::span<const std::uint8_t> bytecode, ShaderStage stage)
+{
+	ShaderReflection reflection;
+	
+	(void) bytecode;
+
+	auto shaderReflection = OpenShaderReflection(utils, result);
+
+	D3D12_SHADER_DESC desc{};
+	if (FAILED(shaderReflection->GetDesc(&desc)))
+	{
+		throw Diagnostics::Error("DXIL reflection: GetDesc failed");
 	}
 
-	// Vertex input signature: only meaningful for VS.
+	ReflectConstantBuffers(*shaderReflection, desc.ConstantBuffers, reflection);
+
+	ReflectResourceBindings(*shaderReflection, desc.BoundResources, reflection);
+
 	if (stage == ShaderStage::Vertex)
 	{
-		outReflection.InputElements.reserve(desc.InputParameters);
-		for (UINT i = 0; i < desc.InputParameters; ++i)
-		{
-			D3D12_SIGNATURE_PARAMETER_DESC paramDesc{};
-			if (FAILED(shaderReflection->GetInputParameterDesc(i, &paramDesc)))
-			{
-				throw Diagnostics::Error("DXIL reflection could not read a shader input parameter.");
-			}
-
-			// Skip system-value semantics (SV_*) that are not consumed from
-			// the input layout.
-			if (paramDesc.SystemValueType != D3D_NAME_UNDEFINED)
-			{
-				continue;
-			}
-
-			ShaderReflectionInputElement element;
-			element.Semantic = paramDesc.SemanticName ? paramDesc.SemanticName : "";
-			element.SemanticIndex = paramDesc.SemanticIndex;
-			element.Location = paramDesc.Register;
-			element.ScalarType = MapInputComponent(paramDesc.ComponentType);
-			element.ComponentCount = PopMaskBits(paramDesc.Mask);
-			outReflection.InputElements.push_back(std::move(element));
-		}
+		ReflectVertexInputs(*shaderReflection, desc.InputParameters, reflection);
 	}
 
 	// Compute thread-group size.
@@ -309,7 +330,7 @@ ShaderReflection DxilReflectionExtractor::Extract(IDxcUtils& utils, IDxcResult* 
 	{
 		UINT x = 0, y = 0, z = 0;
 		shaderReflection->GetThreadGroupSize(&x, &y, &z);
-		outReflection.ThreadGroupSize = {x, y, z};
+		reflection.ThreadGroupSize = {x, y, z};
 	}
 
 	// DXIL does not expose push constants or specialization constants here.
