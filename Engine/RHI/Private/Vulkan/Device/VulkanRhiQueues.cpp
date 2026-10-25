@@ -82,3 +82,33 @@ void VulkanRhi::ConfigureResourceQueueSharing(VkSwapchainCreateInfoKHR& createIn
 	createInfo.queueFamilyIndexCount = static_cast<std::uint32_t>(familyIndices.size());
 	createInfo.pQueueFamilyIndices = familyIndices.data();
 }
+
+void VulkanRhi::CreateCommandQueues() noexcept
+{
+	std::array<std::shared_ptr<VulkanNativeQueue>, RhiQueueTypeCount> nativeQueues{};
+	for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount; ++queueIndex)
+	{
+		const ERhiQueueType queueType = static_cast<ERhiQueueType>(queueIndex);
+		const VulkanQueueLocation& queueLocation = m_queueTopology.Get(queueType);
+		for (std::size_t previousQueueIndex = 0; previousQueueIndex < queueIndex; ++previousQueueIndex)
+		{
+			if (m_queueTopology.Get(static_cast<ERhiQueueType>(previousQueueIndex)) == queueLocation)
+			{
+				nativeQueues[queueIndex] = nativeQueues[previousQueueIndex];
+				break;
+			}
+		}
+		if (nativeQueues[queueIndex] == nullptr)
+		{
+			VkQueue nativeQueue = VK_NULL_HANDLE;
+			vkGetDeviceQueue(m_device, queueLocation.FamilyIndex, queueLocation.QueueIndex, &nativeQueue);
+			nativeQueues[queueIndex] = std::make_shared<VulkanNativeQueue>();
+			*nativeQueues[queueIndex] = nativeQueue;
+		}
+		m_queues[queueIndex] = std::make_unique<VulkanCommandQueue>(*this, queueType, nativeQueues[queueIndex]);
+	}
+	if (GetGraphicsQueue() == VK_NULL_HANDLE)
+	{
+		Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, "vkGetDeviceQueue returned a null graphics queue.");
+	}
+}

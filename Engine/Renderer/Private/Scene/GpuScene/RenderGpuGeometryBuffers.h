@@ -5,6 +5,7 @@
 #include "Scene/GpuScene/RenderSceneGpuBindings.h"
 
 #include <array>
+#include <vector>
 
 class RhiResourceService;
 class RenderGpuGeometryState;

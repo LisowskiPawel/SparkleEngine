@@ -8,15 +8,11 @@
 #endif
 
 #include "CVars/RHICVars.h"
-#include "Vulkan/Commands/VulkanCommandQueue.h"
 #include "Vulkan/Core/VulkanResult.h"
-#include "Vulkan/Diagnostics/VulkanDebugNames.h"
 #include "Core/Public/Diagnostics/Verify.h"
 
 #include <algorithm>
-#include <array>
 #include <cstring>
-#include <format>
 #include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanRhiLogger, "RHI.Vulkan");
@@ -389,146 +385,7 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 		Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateDevice", result));
 	}
 
-	std::array<std::shared_ptr<VulkanNativeQueue>, RhiQueueTypeCount> nativeQueues{};
-	for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount; ++queueIndex)
-	{
-		const ERhiQueueType queueType = static_cast<ERhiQueueType>(queueIndex);
-		const VulkanQueueLocation& queueLocation = m_queueTopology.Get(queueType);
-		for (std::size_t previousQueueIndex = 0; previousQueueIndex < queueIndex; ++previousQueueIndex)
-		{
-			if (m_queueTopology.Get(static_cast<ERhiQueueType>(previousQueueIndex)) == queueLocation)
-			{
-				nativeQueues[queueIndex] = nativeQueues[previousQueueIndex];
-				break;
-			}
-		}
-		if (nativeQueues[queueIndex] == nullptr)
-		{
-			VkQueue nativeQueue = VK_NULL_HANDLE;
-			vkGetDeviceQueue(m_device, queueLocation.FamilyIndex, queueLocation.QueueIndex, &nativeQueue);
-			nativeQueues[queueIndex] = std::make_shared<VulkanNativeQueue>();
-			*nativeQueues[queueIndex] = nativeQueue;
-		}
-		m_queues[queueIndex] = std::make_unique<VulkanCommandQueue>(*this, queueType, nativeQueues[queueIndex]);
-	}
-	if (GetGraphicsQueue() == VK_NULL_HANDLE)
-	{
-		Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, "vkGetDeviceQueue returned a null graphics queue.");
-	}
-}
-
-void VulkanRhi::NameBootstrapObjects() noexcept
-{
-	if (m_setDebugUtilsObjectName == nullptr || m_device == VK_NULL_HANDLE)
-	{
-		return;
-	}
-
-	(void) VulkanDebugNames::SetObjectName(m_setDebugUtilsObjectName, m_device, VK_OBJECT_TYPE_DEVICE, reinterpret_cast<std::uint64_t>(m_device), "Sparkle Vulkan Device");
-	for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount; ++queueIndex)
-	{
-		const ERhiQueueType queueType = static_cast<ERhiQueueType>(queueIndex);
-		const VulkanCommandQueue& queue = *m_queues[queueIndex];
-		if (queue.GetNativeQueue() == VK_NULL_HANDLE)
-		{
-			continue;
-		}
-		const std::string queueName = std::format("Sparkle Vulkan {} Queue", RhiQueueTypeToString(queueType));
-		(void) VulkanDebugNames::SetObjectName(m_setDebugUtilsObjectName, m_device, VK_OBJECT_TYPE_QUEUE, reinterpret_cast<std::uint64_t>(queue.GetNativeQueue()), queueName);
-		const std::string timelineName = std::format("Sparkle Vulkan {} Queue Timeline", RhiQueueTypeToString(queueType));
-		(void) VulkanDebugNames::SetObjectName(m_setDebugUtilsObjectName, m_device, VK_OBJECT_TYPE_SEMAPHORE, reinterpret_cast<std::uint64_t>(queue.GetTimelineSemaphore()), timelineName);
-	}
-}
-
-void VulkanRhi::LogBootstrapSummary() noexcept
-{
-	const std::string instanceExtensions = std::format("Enabled Vulkan instance extensions: {}", m_enabledInstanceExtensions.size());
-	const std::string deviceExtensions = std::format("Enabled Vulkan device extensions: {}", m_enabledDeviceExtensions.size());
-
-	const std::string featureSummary = std::format(
-	    "Vulkan features: validation={}, synchronization2 supported/enabled={}/{}, timelineSemaphore supported/enabled={}/{}, "
-	    "dynamicRendering supported/enabled={}/{}, scalarBlockLayout supported/enabled={}/{}, "
-	    "samplerAnisotropy supported/enabled={}/{}, fillModeNonSolid supported/enabled={}/{}, "
-	    "rtExtensions(as={}, pipeline={}, rayQuery={}, deferredHostOps={}, bda={}, ptlasNv={}), "
-	    "rtFeatures(as={}, pipeline={}, rayQuery={}, bda={}, ptlasNv={}), "
-	    "rtEnabled(as={}, pipeline={}, rayQuery={}, ptlasNv={})",
-	    m_validationEnabled,
-	    m_featureStatus.SupportsSynchronization2,
-	    m_featureStatus.EnabledSynchronization2,
-	    m_featureStatus.SupportsTimelineSemaphore,
-	    m_featureStatus.EnabledTimelineSemaphore,
-	    m_featureStatus.SupportsDynamicRendering,
-	    m_featureStatus.EnabledDynamicRendering,
-	    m_featureStatus.SupportsScalarBlockLayout,
-	    m_featureStatus.EnabledScalarBlockLayout,
-	    m_featureStatus.SupportsSamplerAnisotropy,
-	    m_featureStatus.EnabledSamplerAnisotropy,
-	    m_featureStatus.SupportsFillModeNonSolid,
-	    m_featureStatus.EnabledFillModeNonSolid,
-	    m_featureStatus.RayTracing.SupportsAccelerationStructureExtension,
-	    m_featureStatus.RayTracing.SupportsRayTracingPipelineExtension,
-	    m_featureStatus.RayTracing.SupportsRayQueryExtension,
-	    m_featureStatus.RayTracing.SupportsDeferredHostOperationsExtension,
-	    m_featureStatus.RayTracing.SupportsBufferDeviceAddressExtension,
-	    m_featureStatus.RayTracing.SupportsPtlasExtension,
-	    m_featureStatus.RayTracing.SupportsAccelerationStructureFeature,
-	    m_featureStatus.RayTracing.SupportsRayTracingPipelineFeature,
-	    m_featureStatus.RayTracing.SupportsRayQueryFeature,
-	    m_featureStatus.RayTracing.SupportsBufferDeviceAddressFeature,
-	    m_featureStatus.RayTracing.SupportsPtlasFeature,
-	    m_featureStatus.RayTracing.EnabledAccelerationStructure,
-	    m_featureStatus.RayTracing.EnabledRayTracingPipeline,
-	    m_featureStatus.RayTracing.EnabledInlineRayQuery,
-	    m_featureStatus.RayTracing.EnabledPtlas);
-
-	const std::string adapterSummary = std::format(
-	    "Vulkan adapter: name='{}', api={}, driver={}, queues(graphics={}:{}, compute={}:{}, copy={}:{}), independent(compute={}, copy={})",
-	    m_adapterInfo.Name,
-	    FormatApiVersion(m_adapterInfo.ApiVersion),
-	    m_adapterInfo.Driver,
-	    GetQueueFamilyIndex(ERhiQueueType::Graphics),
-	    GetQueueIndex(ERhiQueueType::Graphics),
-	    GetQueueFamilyIndex(ERhiQueueType::Compute),
-	    GetQueueIndex(ERhiQueueType::Compute),
-	    GetQueueFamilyIndex(ERhiQueueType::Copy),
-	    GetQueueIndex(ERhiQueueType::Copy),
-	    HasIndependentQueue(ERhiQueueType::Compute),
-	    HasIndependentQueue(ERhiQueueType::Copy));
-
-	const std::string providerSummary = std::format(
-	    "Vulkan ray tracing provider: topLevel={}({}), ptlasProvider={} supported={} reason={}",
-	    RhiRayTracingTlasProviderToString(m_rayTracingCapabilities.Groups.Provider.SelectedTlasProvider),
-	    m_rayTracingCapabilities.Groups.Provider.SelectedTlasProviderReason,
-	    RhiPtlasProviderToString(m_rayTracingCapabilities.Groups.Ptlas.Provider),
-	    m_rayTracingCapabilities.Groups.Ptlas.Supported,
-	    m_rayTracingCapabilities.Groups.Ptlas.CapabilityStatusReason);
-
-	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Driver, adapterSummary);
-	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Validation, featureSummary);
-	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Validation, providerSummary);
-	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Driver, instanceExtensions);
-	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Driver, deviceExtensions);
-
-	if (!m_featureStatus.RayTracing.EnabledAccelerationStructure)
-	{
-		const std::string rayTracingSummary = std::format(
-		    "Vulkan ray query backend disabled: hardwareExtensions(as={}, pipeline={}, rayQuery={}, deferredHostOps={}, bda={}) "
-		    "hardwareFeatures(as={}, pipeline={}, rayQuery={}, bda={}) functionsLoaded={}.",
-		    m_featureStatus.RayTracing.SupportsAccelerationStructureExtension,
-		    m_featureStatus.RayTracing.SupportsRayTracingPipelineExtension,
-		    m_featureStatus.RayTracing.SupportsRayQueryExtension,
-		    m_featureStatus.RayTracing.SupportsDeferredHostOperationsExtension,
-		    m_featureStatus.RayTracing.SupportsBufferDeviceAddressExtension,
-		    m_featureStatus.RayTracing.SupportsAccelerationStructureFeature,
-		    m_featureStatus.RayTracing.SupportsRayTracingPipelineFeature,
-		    m_featureStatus.RayTracing.SupportsRayQueryFeature,
-		    m_featureStatus.RayTracing.SupportsBufferDeviceAddressFeature,
-		    m_getBufferDeviceAddress != nullptr && m_createAccelerationStructure != nullptr && m_destroyAccelerationStructure != nullptr && m_getAccelerationStructureBuildSizes != nullptr
-		        && m_cmdBuildAccelerationStructures != nullptr && m_getAccelerationStructureDeviceAddress != nullptr);
-
-		SPDLOG_LOGGER_WARN(g_vulkanRhiLogger, "{}", rayTracingSummary);
-		PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Warning, ERhiDiagnosticMessageCategory::Validation, rayTracingSummary);
-	}
+	CreateCommandQueues();
 }
 
 bool VulkanRhi::IsLayerAvailable(const char* layerName) noexcept
@@ -584,45 +441,4 @@ std::uint32_t VulkanRhi::ScorePhysicalDevice(const VkPhysicalDeviceProperties& p
 	}
 
 	return properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU ? 10u : 100u;
-}
-
-VulkanAdapterInfo VulkanRhi::BuildAdapterInfo(const VkPhysicalDeviceProperties& properties)
-{
-	return VulkanAdapterInfo{
-	    .Name = properties.deviceName,
-	    .Driver = FormatDriverVersion(properties),
-	    .Vendor = std::format("{:#06x}", properties.vendorID),
-	    .VendorId = properties.vendorID,
-	    .DeviceId = properties.deviceID,
-	    .ApiVersion = properties.apiVersion,
-	    .DriverVersion = properties.driverVersion,
-	    .DeviceType = properties.deviceType};
-}
-
-std::string VulkanRhi::FormatApiVersion(std::uint32_t version)
-{
-	return std::format("{}.{}.{}", VK_API_VERSION_MAJOR(version), VK_API_VERSION_MINOR(version), VK_API_VERSION_PATCH(version));
-}
-
-std::string VulkanRhi::FormatDriverVersion(const VkPhysicalDeviceProperties& properties)
-{
-	return std::format("{} ({:#010x})", FormatApiVersion(properties.driverVersion), properties.driverVersion);
-}
-
-std::string VulkanRhi::PhysicalDeviceTypeToString(VkPhysicalDeviceType type)
-{
-	switch (type)
-	{
-		case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
-			return "IntegratedGpu";
-		case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-			return "DiscreteGpu";
-		case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
-			return "VirtualGpu";
-		case VK_PHYSICAL_DEVICE_TYPE_CPU:
-			return "Cpu";
-		case VK_PHYSICAL_DEVICE_TYPE_OTHER:
-		default:
-			return "Other";
-	}
 }

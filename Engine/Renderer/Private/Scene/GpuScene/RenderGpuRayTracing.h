@@ -3,13 +3,13 @@
 #include "RHI/Public/Frame/RhiFrameConstants.h"
 #include "Scene/GpuScene/PersistentStructuredBuffer.h"
 #include "Scene/GpuScene/RenderSceneGpuBindings.h"
+#include "Scene/GpuScene/RenderGpuRayTracingPayloadBuilder.h"
 
 #include <array>
 
-class RhiResourceService;
-#include "Scene/GpuScene/RenderGpuRayTracingPayloadBuilder.h"
-
 #include <limits>
+
+class RhiResourceService;
 
 class RenderGpuRayTracing final
 {

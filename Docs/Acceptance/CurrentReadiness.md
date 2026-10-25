@@ -74,10 +74,10 @@ When implementation, scope, or evidence changes, update this snapshot, the ownin
 
 | ID | Feature | Baseline score | Baseline `I/R/V/D` | Current state | Largest missing layer |
 | --- | --- | ---: | ---: | --- | --- |
-| `FCR-PROD-01` | Showcase game product | **50** | `35/15/0/0` | All 16 Game source map/API presentations and normal quits pass; source startup-close misses 5 s | Repair 5.26 s startup-close; finish interaction/failure/editing and exact-archive proof |
+| `FCR-PROD-01` | Showcase game product | **50** | `35/15/0/0` | Recorded Game map/API, ordinary-quit and repaired startup-close checks pass | Finish loading-close, remaining interaction/failure/editing and final-source/archive proof |
 | `FCR-PROD-02` | source build and cook route | **40** | `30/10/0/0` | Fresh Unicode source, cold/warm all-map/subset and offline/failure checks pass for recorded inputs | Revalidate affected final-source changes; the actor-only blocker is superseded |
 | `FCR-PROD-03` | Launcher workflow | **50** | `35/15/0/0` | Typed source/installed routes and bounded process checks exist | Current-candidate CLI/GUI, failure/cleanup and installed selection/sync proof |
-| `FCR-PROD-04` | Editor product | **45** | `30/15/0/0` | All 16 Editor source map/API presentations and normal quits pass; camera round-trip repaired | Revalidate affected editing; finish lifecycle/failure and final installed proof |
+| `FCR-PROD-04` | Editor product | **45** | `30/15/0/0` | Recorded Editor map/API, camera edit/save/reload and denied-save/settings checks pass | Qualify final error overlays/current source; finish remaining lifecycle/editing and installed proof |
 | `FCR-PROD-05` | portable release package | **0** | `0/0/0/0` | Current internal assembly/integrity and bounded installed checks verified; [results](FeatureCompletionReports.md#product-delivery-progress) (score predates them) | Repaired final archive, full seven-map/removal/budget and clean-environment qualification; publisher signing at FR-07 |
 | `FCR-PROD-06` | self-service diagnostics and finite review | **15** | `10/5/0/0` | Local export/review/replacement routes and fixtures exist; no support service | Final-archive self-service/native-manual diagnostics/privacy/symbol/replacement proof |
 

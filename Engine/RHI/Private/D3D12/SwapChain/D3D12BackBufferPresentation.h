@@ -14,6 +14,11 @@ class D3D12BackBufferPresentation final
 {
 public:
 	D3D12BackBufferPresentation(D3D12Rhi& rhi, D3D12SwapChain& swapChain, D3D12DescriptorService& descriptors, D3D12ResourceService& resources) noexcept;
+	D3D12BackBufferPresentation(const D3D12BackBufferPresentation&) = delete;
+	D3D12BackBufferPresentation& operator=(const D3D12BackBufferPresentation&) = delete;
+	D3D12BackBufferPresentation(D3D12BackBufferPresentation&&) = delete;
+	D3D12BackBufferPresentation& operator=(D3D12BackBufferPresentation&&) = delete;
+
 	void SetCommandRecordingContext(D3D12CommandRecordingContext& context) noexcept;
 
 	RhiViewport GetBackBufferViewport() const noexcept;

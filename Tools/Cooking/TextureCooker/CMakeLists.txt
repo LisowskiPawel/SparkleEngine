@@ -32,6 +32,7 @@ set(TEXTURE_COOKER_PRIVATE_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookBatchExecutor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookMemoryLimiter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureAssetCooker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookedTextureAssetWriter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/DdsTextureSourceLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/ExrTextureSourceLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/HdrTextureSourceLoader.cpp
@@ -60,6 +61,7 @@ set(TEXTURE_COOKER_PRIVATE_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookBatchExecutor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookMemoryLimiter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureAssetCooker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookedTextureAssetWriter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/TextureSourceLoader.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/TextureSourceLoadStages.h
 )

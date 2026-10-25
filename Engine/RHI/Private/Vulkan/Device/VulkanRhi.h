@@ -131,6 +131,7 @@ private:
 	void CreateDebugMessenger() noexcept;
 	void SelectPhysicalDevice() noexcept;
 	void CreateLogicalDevice() noexcept;
+	void CreateCommandQueues() noexcept;
 	void LoadDeviceDebugFunctions() noexcept;
 	void LoadRayTracingFunctions() noexcept;
 	void BuildRayTracingCapabilities() noexcept;

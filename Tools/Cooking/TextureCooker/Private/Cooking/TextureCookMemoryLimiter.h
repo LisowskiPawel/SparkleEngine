@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <mutex>
 
+struct TextureLoadResult;
+
 class TextureCookMemoryLimiter final
 {
 public:
@@ -26,7 +28,7 @@ public:
 	};
 
 	explicit TextureCookMemoryLimiter(std::size_t capacityBytes);
-	Lease Acquire(std::size_t bytes);
+	Lease Acquire(const TextureLoadResult& texture);
 
 private:
 	void Release(std::size_t bytes) noexcept;

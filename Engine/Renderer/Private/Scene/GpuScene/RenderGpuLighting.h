@@ -3,11 +3,11 @@
 #include "RHI/Public/Frame/RhiFrameConstants.h"
 #include "Scene/GpuScene/PersistentStructuredBuffer.h"
 #include "Scene/GpuScene/RenderSceneGpuBindings.h"
+#include "Scene/GpuScene/RenderGpuLightingPayloadBuilder.h"
 
 #include <array>
 
 class RhiResourceService;
-#include "Scene/GpuScene/RenderGpuLightingPayloadBuilder.h"
 
 class RenderGpuLighting final
 {

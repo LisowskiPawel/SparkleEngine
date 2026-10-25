@@ -19,6 +19,11 @@ class VulkanBackBufferPresentation final
 {
 public:
 	VulkanBackBufferPresentation(VulkanSwapChain& swapChain, VulkanDescriptorService& descriptors, VulkanResourceService& resources, const std::uint32_t& frameIndex) noexcept;
+	VulkanBackBufferPresentation(const VulkanBackBufferPresentation&) = delete;
+	VulkanBackBufferPresentation& operator=(const VulkanBackBufferPresentation&) = delete;
+	VulkanBackBufferPresentation(VulkanBackBufferPresentation&&) = delete;
+	VulkanBackBufferPresentation& operator=(VulkanBackBufferPresentation&&) = delete;
+
 	void SetCommandRecordingContext(VulkanCommandRecordingContext& context) noexcept;
 	void RebuildSwapChainBackBufferViews() noexcept;
 	void PrepareCurrentBackBufferForPresentation(VulkanRenderCommandList& commandList) noexcept;

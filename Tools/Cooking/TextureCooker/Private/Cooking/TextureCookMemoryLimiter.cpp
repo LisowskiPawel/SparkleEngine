@@ -1,4 +1,5 @@
 #include "Cooking/TextureCookMemoryLimiter.h"
+#include "Pipeline/TextureLoadResult.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 
@@ -52,8 +53,17 @@ TextureCookMemoryLimiter::TextureCookMemoryLimiter(std::size_t capacityBytes) :
 	}
 }
 
-TextureCookMemoryLimiter::Lease TextureCookMemoryLimiter::Acquire(std::size_t bytes)
+TextureCookMemoryLimiter::Lease TextureCookMemoryLimiter::Acquire(const TextureLoadResult& texture)
 {
+	std::size_t bytes = 0;
+	for (const TextureArraySliceData& slice : texture.arraySlices)
+	{
+		for (const TextureMipLevelData& mip : slice)
+		{
+			bytes += mip.data.size();
+		}
+	}
+
 	if (bytes == 0)
 	{
 		throw Diagnostics::Error("Texture cook pixel-data reservation is zero.");
