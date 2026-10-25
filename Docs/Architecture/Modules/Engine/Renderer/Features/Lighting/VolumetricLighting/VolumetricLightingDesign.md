@@ -2,11 +2,11 @@
 
 [Docs](../../../../../../../README.md) / [Up](../LightingDesign.md) / [Implementation](ImplementationPlan.md)
 
-**Status:** current negative capability plus target feature contract; research/discovery ready, production stages blocked by roadmap admission and `VOL-D0`
+**Status:** current negative capability plus selected Q0/Q1/Q2 target; production blocked by REL-11 and consumed VOL-D0 decisions
 
 **Responsibility:** own the bounded volume/fog/atmosphere/sky promise, negative state, feature tiers, acceptance, failures, checks, and definition of done
 
-**Authority boundary:** [Research](Research.md) owns precedent; [Discovery](Discovery.md) owns `VOL-D0`; [Transport And Composition](TransportAndComposition.md) owns math; [Execution Architecture](ExecutionArchitecture.md) owns system shape; [User Experience](UserExperience.md) owns human and automation behavior; [Plan](ImplementationPlan.md) owns order; code/build and a future assigned FCR own implementation/results
+**Authority boundary:** [Research](Research.md) owns precedent; [Discovery](Discovery.md) owns `VOL-D0`; [Transport And Composition](TransportAndComposition.md) owns math; [Execution Architecture](ExecutionArchitecture.md) owns system shape; [User Experience](UserExperience.md) owns human and automation behavior; [Plan](ImplementationPlan.md) owns order; code/build and local VOL-PF-01 report own implementation/results
 
 **Verified:** 2026-09-12 against revision `8b650c7450f8a59fb3bcc18edbb4d217a7b11ed5`; no participating-media implementation was found
 
@@ -16,11 +16,11 @@
 
 ## Outcome
 
-Volumetric lighting is unselected in the release and current advanced program. The contracts below preserve possible future media semantics; they do not establish a product need. If a future Roadmap decision admits a tier, keep one coherent participating-media owner, start from physically meaningful extinction/scattering/emission, and deliver only the selected tier. Fog does not automatically admit atmosphere, heterogeneous media, reservoir reuse or clouds.
+Selected 2026-10-25 for post-release M5R: Q0 semantic/reference, Q1 homogeneous/height fog and Q2 bounded local-media froxel lighting. Deliver physical coefficients/phase, independently checked transmittance/single scattering, all admitted analytic lights with geometry/medium attenuation, exact composition and mutation-safe temporal reconstruction. Existing image sky and surface subsurface approximations do not satisfy this target.
 
-Volumetric ReSTIR is an advanced estimator track inside this feature—not the prerequisite for basic fog. The first usable slice is deterministic homogeneous/height fog plus single-scattered light and exact composition. A ReSTIR volume implementation begins only after a reference transport baseline, medium representation, transmittance estimator, and workload budget exist.
+Use bounded analytic local density fields with deterministic overlap and an independent varying-density oracle. Imported dense/sparse volumes, physical atmosphere/sky, multiple scattering, volumetric ReSTIR and clouds remain unselected. Their conditional contracts below preserve boundaries without creating production stages.
 
-The current roadmap excludes volumetric lighting from the selected delivery. This package is a conditional target; release closeout is necessary but insufficient admission. See [Roadmap scope protection](../../../../../../../Strategy/Roadmap.md#scope-protection).
+The [six-stage plan](ImplementationPlan.md) owns selected delivery. Production waits for REL-11 and consumed VOL-D0 decisions, not a new discretionary decision about whether volumetrics is wanted. Absence/readiness remains unchanged until source and proof exist. Feature-local report VOL-PF-01 uses existing completion-report fields under the graphics-workload artifact root; it adds no first-release family.
 
 ## Start Here
 
@@ -50,7 +50,7 @@ No owned path was found for:
 
 The existing `SceneSkyDesc` is an enabled flag, RGB multiplier/brightness, and cooked HDR texture reference. `Sky.cpp` fills background/environment radiance. Wrap subsurface, alpha masking, bloom/exposure, and discarded glTF transmission/volume vocabulary are not volume transport.
 
-`REN-E24` remains the negative evidence owner until production admission. Creating this target package does not turn `REN-VOL-01` through `REN-VOL-03` into Planned-in-code, Partial, or Experimental.
+`REN-E24` remains the source-negative evidence owner until an implemented selected slice exists. Creating this target package does not turn `REN-VOL-01` through `REN-VOL-03` into Planned-in-code, Partial, or Experimental.
 
 ## Feature Decomposition
 
@@ -70,14 +70,14 @@ The existing `SceneSkyDesc` is an enabled flag, RGB multiplier/brightness, and c
 
 ## Product Tiers
 
-| Tier | Product promise | Explicit exclusions until later tier |
+| Tier / selection | Product promise | Explicit exclusions |
 | --- | --- | --- |
-| `VOL-Q0` semantic/reference | analytic homogeneous slabs, phase values, ratio/delta tracking references, composition | no visual product claim |
-| `VOL-Q1` baseline fog | global height fog, one direct light, single scattering, opaque-depth composition | local heterogeneous media, atmosphere, ReSTIR |
-| `VOL-Q2` unified froxel | local media, all analytic lights, shadows/transmittance, temporal reconstruction | multiple-scatter path truth and clouds |
-| `VOL-Q3` atmosphere/sky | physical sky, sun, aerial perspective, environment bridge, ground-to-space cells | clouds and arbitrary planet systems unless admitted |
-| `VOL-Q4` heterogeneous | dense/sparse volumes and local emission with content pipeline | production clouds until separate admission |
-| `VOL-Q5` reservoir volume | measured ReSTIR assistance for complex lighting/media and optional multiple scattering | no blanket real-time/unbiased claim |
+| Selected `VOL-Q0` semantic/reference | analytic homogeneous slabs, phase values, ratio/delta tracking references, composition | no visual product claim |
+| Selected `VOL-Q1` baseline fog | global height fog, one direct light, single scattering, opaque-depth composition | local heterogeneous media, atmosphere, ReSTIR |
+| Selected `VOL-Q2` unified froxel | local media, all analytic lights, shadows/transmittance, temporal reconstruction | multiple-scatter path truth and clouds |
+| Unselected `VOL-Q3` atmosphere/sky | physical sky, sun, aerial perspective, environment bridge, ground-to-space cells | clouds and arbitrary planet systems unless admitted |
+| Unselected `VOL-Q4` heterogeneous | dense/sparse volumes and local emission with content pipeline | production clouds until separate admission |
+| Unselected `VOL-Q5` reservoir volume | measured ReSTIR assistance for complex lighting/media and optional multiple scattering | no blanket real-time/unbiased claim |
 
 ## Acceptance Criteria
 
@@ -95,7 +95,7 @@ The existing `SceneSkyDesc` is an enabled flag, RGB multiplier/brightness, and c
 - `AC-VOL-12` — raw density/coefficient/transmittance/in-scatter and reconstructed/composed products remain separately inspectable with exact candidate identity.
 - `AC-VOL-13` — D3D12/Vulkan supported cells pass identical semantic/failure checks with native validation; quality, temporal behavior, GPU time, and peak/history memory are separately reported.
 - `AC-VOL-14` — one feature capsule owns volume mechanism/state; authored/cooked/scene/RHI hooks are ledgered and no fog/sky/cloud side system duplicates the transport.
-- `AC-VOL-15` — the roadmap assigns an FCR/evidence owner before production acceptance; until then all target criteria remain open and current negative criteria remain authoritative.
+- `AC-VOL-15` — the selected roadmap assigns VOL-PF-01 to the Renderer implementer/evidence owner before acceptance; target criteria remain open until observed proof and current negative criteria remain authoritative.
 
 ## Current Negative Acceptance
 
@@ -137,7 +137,7 @@ The existing `SceneSkyDesc` is an enabled flag, RGB multiplier/brightness, and c
 
 ## Definition Of Done
 
-An included volumetric tier is done only after `REL-11` admission, accepted `VOL-D0`, an assigned FCR, passing mapped `AC-VOL-*`/`CHK-VOL-*`, controlled failures, supported backend/content/adoption/quality-time-memory evidence, and removal of stale negative claims for exactly that tier. Other tiers may remain deferred or excluded. There is no volumetric FCR identity today. Papers and commercial-engine examples prove precedent only; the 2021 Volumetric ReSTIR results are not a ready-made Sparkle real-time solution.
+An included volumetric tier is done only after `REL-11` admission, accepted `VOL-D0`, assigned local report VOL-PF-01, passing mapped `AC-VOL-*`/`CHK-VOL-*`, controlled failures, supported backend/content/adoption/quality-time-memory evidence, and removal of stale negative claims for exactly that tier. Other tiers may remain deferred or excluded. VOL-PF-01 is a later local report, not a new first-release FCR family. Papers and commercial-engine examples prove precedent only; the 2021 Volumetric ReSTIR results are not a ready-made Sparkle real-time solution.
 
 ## Inspected Current Routes
 

@@ -10,9 +10,9 @@
 
 | Reader-facing case | Existing proof owners and required content |
 | --- | --- |
-| Content to correct pixel | `CASE-01` with relevant `CASE-03`: exact content/rights/cook/shader lineage, one explained pixel/transport derivation, independent reference uncertainty, material/domain limits and a raw failure control. |
-| One measured frame, two APIs | `CASE-02/03`: the complementary CPU/shader/lifetime studies, one difficult incident, prediction/measurement, before/after and rejected/inconclusive evidence. The case makes personal implementation/deletion visible. |
-| Owned model to shader | `CASE-04`: qualified component labels, split/recipe/model, operator/kernel conformance, cost model, optimization ablation, held-out San Miguel and declared quality/latency/memory frontier. Vendor inference is separate. |
+| Content to correct pixel | CASE-01/03 lineage/raw oracle plus MAT base/anisotropy/coat and bounded VOL transport; exact domain/uncertainty and failures. |
+| One measured frame, two APIs | CASE-02/03 studies/incident plus direct/indirect/reconstruction, SHaRC and PTLAS comparisons; full cost/native/failure proof and personal implementation/deletion. |
+| Owned model to shader | CASE-04 owned component/data/model/kernel/generalization proof, plus separately attributed NRC/NTC value sections and common-domain SHaRC/NRC and BCn/NTC frontiers. |
 
 `CASE-05` adoption evidence cuts across all three; it is not a fourth engine project. A case can reuse original candidate artifacts when each claimed result is actually decided by them. These are the exact assembly choices, replacing an open request to choose arbitrary cases.
 
@@ -39,7 +39,7 @@ Each case answers: problem/consumer, constraints, your personal contribution, de
 
 M6 closes the technical package and first reproduction (`01..03` plus its separate review). M7 closes the direction/second-context/teaching/revision record (`04..08`) for the stronger principal-oriented portfolio claim. These are local program choices inferred from the role study, not an NVIDIA hiring guarantee or official checklist.
 
-Assembly consumes M3's locally qualified study/incident packet and NG-S6a's local evaluation/package result, with final rehearsal cells visibly open. The actual M6 exercise covers the study/analysis and neural results required by AC-WS-04/AC-NG-08; WS-S4/NG-S6b then reuse those observations to close their criteria. Requiring those adoption verdicts before assembly would create a prerequisite cycle. One frozen package/participant may cover the distinct results; a successful unrelated headline cannot substitute for either.
+Assembly consumes M3's locally qualified study/incident packet, M5R's required subject-local results and NG-S6a's local evaluation/package result, with final rehearsal cells visibly open. The actual M6 exercise covers the study/analysis and neural results required by AC-WS-04/AC-NG-08; WS-S4/NG-S6b then reuse those observations to close their criteria. Requiring those adoption verdicts before assembly would create a prerequisite cycle. One frozen package/participant may cover the distinct results; a successful unrelated headline cannot substitute for either.
 
 ## Failure Controls And Check Route
 

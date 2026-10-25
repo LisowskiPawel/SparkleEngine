@@ -52,3 +52,13 @@ Compare uncached, SHaRC and NRC on a common diffuse domain before adding rough s
 `FM-NRC-01`: missing/wrong SDK or unsupported device -> preflight refusal without false active state. `FM-NRC-02`: invalid training/query records or non-finite prediction -> stop publication and diagnose the producer. `FM-NRC-03`: allocation/evaluation/device failure -> controlled operation failure; no automatic relabeling as SHaRC. `FM-NRC-04`: stale scene/context or shutdown while in flight -> invalidate and retire through real completion. Inject each at its owning boundary and retain the smallest counterexample.
 
 A cache miss/declined termination continues uncached tracing under the algorithm; it is distinct from SDK failure. If SDK eligibility or evidence cannot be obtained, the required target remains BLOCKED, not completed by a stub or an exclusion. Verdicts belong in the candidate's `radiance-cache/nrc/` report under the existing workload artifact root.
+
+## Check And Risk Ownership
+
+| Check | Defect-detecting obligation |
+| --- | --- |
+| CHK-NRC-01 | vertex/event/throughput coupling and full-path controls; retain the associated AC and FM row identities in the candidate report. |
+| CHK-NRC-02 | frozen updates, cold adaptation, invalid records and context/SDK faults; retain the associated AC and FM row identities in the candidate report. |
+| CHK-NRC-03 | common-domain SHaRC/uncached frontier, native/package and reproduction; retain the associated AC and FM row identities in the candidate report. |
+
+RISK-NRC-01: SDK eligibility, opaque internal cost and adaptation bias. The feature implementer and subject reviewer own mitigation: probe actual tuple and measure full online workload. A failed required falsifier/value band stops the stage; do not hide it by expanding scope or lowering a post-hoc threshold. The local acceptance table remains conjunctive, and the report records every supported API/domain cell separately.

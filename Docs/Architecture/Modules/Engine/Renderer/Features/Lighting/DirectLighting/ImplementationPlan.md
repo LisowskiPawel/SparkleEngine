@@ -28,7 +28,7 @@ Deliver a correct, diagnosable, portable direct-lighting path that scales from e
 4. add temporal/spatial reuse with stable identity and bias control;
 5. prove visibility frontends and failure behavior;
 6. add portable reconstruction and optional RR;
-7. admit emissive/environment/ReGIR only from measured need;
+7. deliver selected later emissive/environment classes; admit ReGIR only from measured need;
 8. close paired-backend/workload evidence and `FCR-REN-06`.
 
 ## Gate And Dependency Graph
@@ -37,7 +37,8 @@ Deliver a correct, diagnosable, portable direct-lighting path that scales from e
 release/admission + DIR-D0 + analytic oracle
   -> DIR-1 -> DIR-2 -> DIR-3 -> DIR-4 -> DIR-5 -> DIR-6 -> DIR-8
 
-DIR-6 -> DIR-7 -> DIR-8 only for a separately admitted expansion.
+DIR-6 -> DIR-7 emissive/environment -> DIR-8 is required for later M5R.
+ReGIR stays separately admitted; first-release base closure is unchanged.
 Accepted RPT direct AOV -> scene-level comparisons, not the DIR-1/2 start gate.
 ```
 
@@ -339,17 +340,17 @@ Add only those candidate classes or spatial guiding structures whose measured va
 
 ### Work
 
-This stage is optional. If no separate failing workload and DIR-D0 expansion are admitted, record it Deferred and proceed from Stage 6 to Stage 8; do not conduct expansion experiments merely to close the plan. For an admitted increment:
+First-release base closure may proceed from Stage 6 to Stage 8 under its existing scope. Later M5R requires emissive-triangle and environment candidates, delivered one class at a time after DIR-D0 freezes PDF/update/identity/budget and independent oracle. ReGIR remains conditional on a measured failing workload and separate admission. For each selected increment:
 
 1. close its admission experiment and update `DIR-D0`, architecture, hook ledger, budgets, and checks;
-2. add environment mapping/PDF, emissive-triangle inventory/update, or ReGIR world-space structures through existing scene/GPU-scene owners;
+2. deliver environment mapping/PDF and emissive-triangle inventory/update as separate selected slices through existing scene/GPU-scene owners; introduce ReGIR only after its conditional gate;
 3. prevent double counting between emissive surface hits, environment background, and direct candidates;
 4. stress dynamic updates, zero-power entries, distributed versus overlapping lights, and generation retirement;
 5. delete the superseded simpler path only if the accepted product no longer needs it; retain uniform/exhaustive oracle modes where bounded.
 
 ### Exit Gate
 
-- Each new class passes `AC-DIR-08/09` and its added failure matrix.
+- Each selected environment/emissive class passes AC-DIR-08/09, independent PDF/normalization and exhaustive/reference checks, dynamic zero-power/edit/retirement failures and a mixed-class double-count control. M5R cannot skip these classes as Deferred.
 - Quality/time/memory win is demonstrated on the workload that admitted it.
 - No duplicate light/material/asset pipeline or generic spatial-sampling framework appears.
 
@@ -360,7 +361,7 @@ This stage is optional. If no separate failing workload and DIR-D0 expansion are
 
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-7--admit-and-deliver-many-light-expansions and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
-Implement only the Direct Lighting Stage-7 increment explicitly admitted by `DIR-D0` (environment candidates, emissive triangles, or ReGIR). Start from its measured baseline and frozen update/identity/PDF/budget contract. Integrate through existing scene, GPU-scene, material, asset, and frame-graph owners; prevent emission double counting; add mutation and retirement checks; and report the quality/time/memory delta. Do not bundle the other increments or advertise unlimited lights.
+Implement one selected M5R Stage-7 class at a time (emissive triangles or environment candidates) after DIR-D0 closes its contract; ReGIR needs separate measured-need admission. Freeze update/identity/PDF/budgets, extend existing scene/GPU-scene/material owners, prevent double counting, qualify mutations/retirement and measure total quality/time/memory. Apply same-stage cleanup; do not bundle classes or claim unlimited lights.
 ```
 
 </details>

@@ -36,7 +36,7 @@ flowchart LR
     Package --> Workload[Bistro/San Miguel evidence]
 ```
 
-Existing NVIDIA reconstruction providers enter at an external runtime-inference boundary only. They are valuable integrations, but they do not satisfy any owned data, training, model, lowering, kernel, or evaluation row above.
+Existing NVIDIA reconstruction providers, and future NRC/NTC integrations, enter at external algorithm/runtime boundaries. They are valuable integrations, but they do not satisfy any owned data, training, model, lowering, kernel, or evaluation row above.
 
 ## Capability Identity
 
@@ -65,7 +65,7 @@ The current NVIDIA DLSS Super Resolution and Ray Reconstruction providers are do
 
 ## Intended Vertical Slice
 
-The selected strategic slice is one diffuse-indirect denoiser. [Semantics](Semantics.md) proposes the concrete eleven-channel, three-layer residual CNN and training/numerical/value rules; [Execution Architecture](ExecutionArchitecture.md) defines the necessary qualified component producer and one runtime. [Discovery](Discovery.md) ratifies nine explicit cells rather than choosing an unspecified model while coding. [Plan](ImplementationPlan.md) supplies bounded remaining stages and prompts. Production still waits for `REL-11` and `M3`; the proposal changes no absence/readiness claim. [Feature Delivery Catalog](../../../Strategy/FeatureDeliveryCatalog.md) routes `PGD-06..08` and reviewer outputs.
+The personally owned model/kernel slice remains one diffuse-indirect denoiser. Separately selected [NTC](TextureCompression/NtcDesign.md) and [NRC](../../Modules/Engine/Renderer/Features/Lighting/RadianceCaching/Nrc/NrcDesign.md) have their own SDK integration/value criteria; NRC production waits for completed SHaRC. Neither route satisfies personal model/kernel ownership. [Semantics](Semantics.md) proposes the concrete eleven-channel, three-layer residual CNN and training/numerical/value rules; [Execution Architecture](ExecutionArchitecture.md) defines the necessary qualified component producer and one runtime. [Discovery](Discovery.md) ratifies nine explicit cells rather than choosing an unspecified model while coding. [Plan](ImplementationPlan.md) supplies bounded remaining stages and prompts. Production still waits for `REL-11` and `M3`; the proposal changes no absence/readiness claim. [Feature Delivery Catalog](../../../Strategy/FeatureDeliveryCatalog.md) routes `PGD-06..08` and reviewer outputs.
 
 Frozen representative scene data and independently qualified diffuse-indirect reference component -> deterministic dataset builder -> owned model/operator and training recipe -> immutable current artifact -> fixed export and GPU-kernel plan -> Renderer feature contract and classical fallback -> RHI resources/dispatch/synchronization -> packaged artifact -> Bistro/San Miguel quality, latency, memory, and failure evidence. Beauty radiance or an external vendor denoiser cannot substitute for the component target or owned model.
 

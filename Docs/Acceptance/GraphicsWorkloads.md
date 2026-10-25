@@ -608,6 +608,24 @@ The public front page shows only:
 
 The specialist path contains the detail. Do not place a wall of subsystem names in the recruiter path.
 
+
+### Selected Renderer-Depth Artifact Homes
+
+M5R is later portfolio scope. The [depth map](../Strategy/FeatureDeliveryCatalog.md#selected-rendering-depth) names exact contracts/plans. Keep local results separate from first-release family scores. These are artifact destinations populated when real work runs, not maintained empty directories.
+
+| Subject-local result | Subfolder beneath the existing workload candidate root |
+| --- | --- |
+| Direct/indirect transport/reuse | lighting/direct/ and lighting/indirect/; original AC-DIR/IND and Reference joins |
+| Material base/anisotropy/coat | materials/shading-models/; AC-MAT-01..06 |
+| SR/RR/RELAX | reconstruction/denoising-upscaling/; original AC-IRU plus AC-REC-01..05 |
+| Q0/Q1/Q2 volumes | volumetrics/lighting/; VOL-PF-01 and applicable AC-VOL |
+| First cache, SHaRC | radiance-cache/sharc/; AC-SHARC-01..05, full closure before NRC production |
+| Subsequent neural cache, NRC | radiance-cache/nrc/; AC-NRC-01..05 and original SHaRC/uncached inputs |
+| On-sample NTC | neural-textures/ntc/; AC-NTC-01..05 |
+| Supported PTLAS | ray-tracing/ptlas/; AC-PTLAS-01..05 and classic/native joins |
+
+Each report binds derivation, source/cooked/native identity, independent raw oracle, dynamics/failures, complete quality/time/memory and documented reproduction to the candidate. Current author/agent rehearsal policy applies; outside participation is optional and never fabricated. M6 reuses applicable original results in three cases. SHaRC reproduction occurs before NRC production, without waiting for M6 assembly.
+
 ## Companion Scene Decision
 
 The engine should not accumulate flagship scenes.

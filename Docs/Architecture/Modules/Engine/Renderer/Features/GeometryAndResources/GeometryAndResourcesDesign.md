@@ -34,7 +34,7 @@ flowchart LR
 | --- | --- |
 | [Mesh And Texture Residency](MeshAndTextureResidency.md) | admission, preparation, upload, active generations, budgets, fallback, eviction, and completion-safe retirement |
 | [Visibility And Draw Preparation](VisibilityAndDrawPreparation.md) | visibility policy, culling and LOD boundaries, sorting, draw classification, batching, failure, and explicit unsupported cases |
-| [Geometry, Materials, And GBuffer](GeometryMaterialsAndGBuffer.md) | geometry/frontend coverage, material semantics, GBuffer products, limits, and raster/ray agreement |
+| [Geometry, Materials, And GBuffer](GeometryMaterialsAndGBuffer.md) | current surface contract; [shading depth](ShadingModelsDesign.md) and [MAT-S0..5](ImplementationPlan.md) qualify base and later anisotropic/coat profiles |
 
 Residency owns whether a resource generation is safely active. Visibility owns which prepared instances and batches proceed. Geometry/material documentation owns how an active visible generation becomes a surface result. None may borrow another's acceptance claim. The parent [Renderer Feature Dossiers](../RendererFeatureGuide.md) index owns capability routing.
 

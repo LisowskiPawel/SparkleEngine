@@ -177,7 +177,7 @@ Each row closes only after hypotheses and thresholds are fixed, the exact candid
 | emissive NEE inventory | dependent on Direct Lighting admission | avoid duplicate light extraction |
 | portable reconstruction | Required | sparse GI product cannot depend only on vendor path |
 | DLSS RR | Optional | acceleration behind common semantic inputs |
-| DDGI/surface/radiance/neural caches | Deferred alternatives | no current platform tier justifies parallel systems |
+| SHaRC then NRC | Required later M5R, separate cache plans | qualified uncached continuation; full SHaRC closure before NRC implementation |
 
 ## Required Experiments
 

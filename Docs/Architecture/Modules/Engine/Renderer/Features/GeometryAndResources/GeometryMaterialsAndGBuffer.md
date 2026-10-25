@@ -62,6 +62,8 @@ Raster GBuffer uses a bindful per-material layout for eight texture roles: base 
 
 Material texture-table support is derived from RHI descriptor capabilities by `SupportsMaterialTextureTable`; there is no user binding-mode selector. The 2026-10-25 source cleanup removes the unused selector and report-only mode/path fields without changing the 4096-descriptor threshold or the indexing requirements. This is source evidence, not native rendering or backend-parity acceptance.
 
+The [selected shading contract](ShadingModelsDesign.md) and [MAT plan](ImplementationPlan.md) own base qualification and later anisotropic GGX/clearcoat. Existing helpers are not physical-model, sampling or cross-path verdicts; new profiles require independently qualified reference domains.
+
 ## GBuffer Products
 
 The Emissive Show control supplies an ordinary `EmissiveEnabled` scalar shader parameter to raster and ray material evaluation. Disabled emission produces zero GBuffer emission and zero evaluated ray emission before an emissive texture sample; authored material factors, GPU payloads, MaterialCache generations, and the existing PerObjectPS path remain intact. [Scene Rendering Controls](../DebugViews/Controls/ShowFlags.md#scene-rendering-controls) owns that control contract.

@@ -99,7 +99,7 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 
 ### `FR-06` — Candidate Freeze And Reproduction
 
-**Goal:** freeze one byte-identical candidate and prove both runtime-consumer and source-adopter journeys by the author or agent.
+**Goal:** freeze one byte-identical candidate and prove the packaged-product and source-build journeys by the author or agent.
 
 **Non-goals:** fixing the candidate in place, giving undocumented assistance, or hiding repairs or machine-specific prerequisites.
 

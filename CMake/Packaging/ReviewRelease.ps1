@@ -4,7 +4,7 @@ param(
     [Parameter(Mandatory)][string] $ArchivePath,
     [Parameter(Mandatory)][string] $ArchiveSha256,
     [Parameter(Mandatory)][string] $LedgerPath,
-    [Parameter(Mandatory)][ValidatePattern('^[\p{L}\p{Nd}][\p{L}\p{Nd} ._-]{0,127}$')][string] $Reviewer,
+    [Parameter(Mandatory)][ValidatePattern('\A[\p{L}\p{Nd}][\p{L}\p{Nd} ._-]{0,127}\z')][string] $Reviewer,
     [Parameter(Mandatory)][ValidateSet('Approve','Replace','Withdraw')][string] $Decision,
     [Parameter(Mandatory)][string] $OutputDirectory,
     [string] $ReplacementRoot = '',

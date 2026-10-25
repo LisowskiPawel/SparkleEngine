@@ -42,6 +42,8 @@ Research-only `NVR-01..20` references are owned by [Rendering Reference Examples
 | `NS-ADOPTION` | [Adoption And Support](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#local-diagnostics-and-release-review), [Packaging](../../Modules/BuildAndPackaging/PackagingAndInstallation.md), [Launcher](../../Modules/Tools/Launcher/LauncherCapabilities.md) |
 | `NS-SIMPLIFY` | [Whole Repository Map](../../WholeRepositoryMap.md), [Strategy Coverage](../StrategyCoverage.md), and the explicit non-capability sections in each module/feature dossier |
 
+The [selected rendering-depth crosswalk](../../../Strategy/FeatureDeliveryCatalog.md#selected-rendering-depth) refines the PGE rows below with exact SHaRC -> NRC, NTC, PTLAS, material, denoising and volume plans. Existing PGE/first-release FCR identities stay unchanged; local criteria own later subject proof.
+
 ## Principal Graphics Engineer Requirements
 
 This is the implementation/evidence lookup for all fifteen canonical targets, not a second definition or score. Open the exact plan stage, then its linked design/check owner. [Evidence folders](../../../Acceptance/GraphicsWorkloads.md#evidence-folders-and-delivery-owners) supplies original artifact homes. Several targets deliberately share one completed slice; create no subsystem, folder or reproduction per skill keyword.

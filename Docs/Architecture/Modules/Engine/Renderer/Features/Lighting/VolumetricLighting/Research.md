@@ -10,6 +10,8 @@
 
 **Researched:** 2026-09-12; Sparkle source re-audit at `8b650c7450f8a59fb3bcc18edbb4d217a7b11ed5`; mutable reference repositories were checked against their listed HEAD revisions
 
+The 2026-10-25 selection consumes coefficient/phase/transmittance/single-scattering, bounded local-media/froxel and temporal precedent for Q0/Q1/Q2. The legacy NVIDIA Volumetric Lighting SDK is unsupported DX11 precedent, not a selected dependency. Atmosphere, volume assets, reservoirs and clouds remain research only.
+
 ## Research Decision
 
 Use one participating-media semantic core with two execution tiers:

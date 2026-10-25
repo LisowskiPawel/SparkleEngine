@@ -85,7 +85,7 @@ NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/set
 
 **Start:** Required raw signals, temporal/exposure conventions and exact pinned SDK/runtime tuple are known.
 
-**Work:** Close Linear control and every exposed SDK-supported DLSS SR/RR combination required on the named NVIDIA machine for D3D12/Vulkan. Inspect current initialization/evaluation rather than infer it from texture helpers; freeze realtime internal/output extent and one composition owner. Prove guides, motion/depth/jitter/exposure/reset, temporal quality, state restoration, retirement, DLL/rights/package and failures.
+**Work:** Close Linear control and every exposed SDK-supported DLSS SR/RR combination required on the named NVIDIA machine for D3D12/Vulkan. Inspect current initialization/evaluation rather than infer it from texture helpers; freeze realtime internal/output extent and one composition owner. Follow the selected REC-S1 topology: RR directly owns reconstructed output when active; remove the current RR-then-SR sequence and qualify requested/active compatibility without silent settings changes. Prove guides, motion/depth/jitter/exposure/reset, temporal quality, state restoration, retirement, DLL/rights/package and failures.
 
 **Cleanup:** Remove duplicate provider/extent/history/status paths and obsolete bindings. Preserve truthful Linear/Off recovery without accepting it as requested SR/RR proof; no frame generation or provider catalog.
 

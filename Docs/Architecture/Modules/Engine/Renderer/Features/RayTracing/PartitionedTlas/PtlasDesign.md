@@ -56,3 +56,13 @@ Use a deterministic existing instanced-geometry workload with fixed transforms, 
 `FM-PTLAS-01`: unsupported operation/provider -> reject before recording, preserve selected intent. `FM-PTLAS-02`: capacity/invalid duplicate or identity -> reject batch before partial publication; no silent drop. `FM-PTLAS-03`: stale BLAS/SBT/descriptor -> invalidate/rebuild through existing owner before traversal. `FM-PTLAS-04`: allocation/build/device failure -> diagnosed operation failure with completion-safe cleanup.
 
 Evidence belongs in `ray-tracing/ptlas/` beneath the existing workload artifact root. Existing `RHI-E11`/`REN-E12` and FCR ray families remain first-release owners; these local criteria extend later support proof without retroactively passing those reports. Experimental status changes only after all required cells and product controls pass.
+
+## Check And Risk Ownership
+
+| Check | Defect-detecting obligation |
+| --- | --- |
+| CHK-PTLAS-01 | classic hit/material/SBT parity and legal operation records; retain the associated AC and FM row identities in the candidate report. |
+| CHK-PTLAS-02 | sparse/migration/translation/capacity/identity and native lifetime faults; retain the associated AC and FM row identities in the candidate report. |
+| CHK-PTLAS-03 | build-plus-trace/full-frame memory/value and supported package replay; retain the associated AC and FM row identities in the candidate report. |
+
+RISK-PTLAS-01: provider legality, identity errors or traversal cost cancels build gain. The feature implementer and subject reviewer own mitigation: native legal-use checks and sparse/all-dynamic paired regimes. A failed required falsifier/value band stops the stage; do not hide it by expanding scope or lowering a post-hoc threshold. The local acceptance table remains conjunctive, and the report records every supported API/domain cell separately.

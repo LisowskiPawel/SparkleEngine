@@ -20,6 +20,8 @@
 
 **Release implementation phases:** [First Release Implementation Plan](../CrossModule/FirstRelease/ImplementationPlan.md) selects when an evidence item is needed and which feature phase consumes it
 
+[Selected renderer-depth contracts](../../Strategy/FeatureDeliveryCatalog.md#selected-rendering-depth) add later AC-SHARC/NRC/NTC/PTLAS/MAT/REC and selected VOL proof. Current RHI-E11/REN-E12, reconstruction and negative-volume evidence stay scoped to their actual source/candidate. New targets advance no evidence row; subject reports retain original results and workload artifact routing.
+
 ## At A Glance
 
 This is the queue of unanswered proof questions, not a checklist to run in bulk.

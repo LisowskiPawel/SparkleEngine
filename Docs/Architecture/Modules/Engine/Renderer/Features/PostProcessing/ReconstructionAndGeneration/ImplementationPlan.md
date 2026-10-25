@@ -7,7 +7,7 @@
 
 ## Work This Plan
 
-REC-S0/1 refine existing SR/RR obligations through DSP-1/2. RELAX production follows REL-11 and qualified raw direct/indirect products; it is not a newly imposed first-release dependency. Owned CNN work keeps its NG discovery and delivery chain. Execute the first unfinished stage only. The discovery card freezes numerical tolerances, practical-effect bands, exact eligibility, rights, hook/copy/resource limits and failure checks before production; a source-present mechanism is not a satisfied gate.
+REC-S0/1 refine existing SR/RR obligations through DSP-1 and DSP-3. RELAX production follows REL-11 and qualified raw direct/indirect products; it is not a newly imposed first-release dependency. Owned CNN work keeps its NG discovery and delivery chain. Execute the first unfinished stage only. The discovery card freezes numerical tolerances, practical-effect bands, exact eligibility, rights, hook/copy/resource limits and failure checks before production; a source-present mechanism is not a satisfied gate.
 
 ## Stage Contract
 
@@ -33,9 +33,9 @@ Execute only REC-S0 from Docs/Architecture/Modules/Engine/Renderer/Features/Post
 
 ## REC-S1 Qualify SR and RR
 
-**Start:** REC-D0 and DSP-1/2 prerequisites.
+**Start:** REC-D0 and DSP-1 and DSP-3 prerequisites.
 
-**Work:** Execute original release input/extent/native/lifetime/failure/package proof. Correct topology only through a reviewed current dossier/AC-IRU/selector/caller update in the same slice. Compare NativeAA and scaled cells independently.
+**Work:** Execute original release input/extent/native/lifetime/failure/package proof. Replace RR-then-SR with the selected single RR output owner through the current dossier/AC-IRU/settings/caller update in the same slice. Compare NativeAA and scaled cells independently.
 
 **Cleanup:** Delete duplicate output producers, unsupported double reconstruction and unnecessary guides while preserving retained consumers.
 
@@ -91,7 +91,7 @@ Execute only REC-S4 from Docs/Architecture/Modules/Engine/Renderer/Features/Post
 
 **Start:** Technical criteria and distributable dependencies available.
 
-**Work:** Manifest exact shader/profile/SDK/native bytes and requested/active/refusal UX. Non-author reproduces quality/cost plus a discontinuity/failure sequence; join only applicable original observations.
+**Work:** Manifest exact shader/profile/SDK/native bytes and requested/active/refusal UX. The author or agent reproduces quality/cost plus a discontinuity/failure sequence; join only applicable original observations.
 
 **Cleanup:** Remove probes, unused SDK families and completed instructions; preserve raw/native evidence.
 

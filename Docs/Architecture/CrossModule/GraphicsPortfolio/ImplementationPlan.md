@@ -56,9 +56,9 @@ Use ReviewAndTransfer.md's selected three cases/package and AC-PORT/CHK-PORT con
 
 ### 2. Assemble The Three Cases
 
-**Start when:** selected technical evidence and sharing rights are accepted: M3's study/incident packet and NG-S6a's local evaluation/package proof. Their final documented reproduction cells may still be open; this stage prepares the inputs needed to close them.
+**Start when:** selected technical evidence and sharing rights are accepted: M3's study/incident packet, M5R's required subject-local results and NG-S6a's local evaluation/package proof. Their final documented reproduction cells may still be open; this stage prepares the inputs needed to close them.
 
-Build the small package in Review And Transfer: landing/readme, three narratives, original-artifact index, reproduction instructions and technical paper/talk outline. Each narrative shows personal contribution, derivation, source/native/model lineage, analytical prediction, measured result, rejected/inconclusive alternative, failure, limitation and simplification. Include the three complementary study domains inside the measured-frame case; they are not extra engine projects. Explain classical versus owned neural results without inheriting vendor/paper claims.
+Build the small package in Review And Transfer: landing/readme, three narratives, original-artifact index, reproduction instructions and technical paper/talk outline. Each narrative shows personal contribution, derivation, source/native/model lineage, analytical prediction, measured result, rejected/inconclusive alternative, failure, limitation and simplification. Include the three complementary study domains inside the measured-frame case; they are not extra engine projects. Include the material/volume, lighting/reconstruction, SHaRC/PTLAS, NRC and NTC depth sections defined by Review And Transfer. Distinguish classical, personally owned neural and vendor-integration proof; no additional headline cases.
 
 Link original artifacts and package only the cleared reproduction subset. Replace duplicate narratives; do not copy large captures/content into source or build a website/viewer/framework. Execute CHK-PORT-01/04, verify hashes and reader paths, reject mixed candidates and remove assembly probes.
 
@@ -69,7 +69,7 @@ Link original artifacts and package only the cleared reproduction subset. Replac
 
 ```text
 Execute only stage 2 from Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#2-assemble-the-three-cases; apply its Stage Contract, including the Stage Source-Style Gate.
-Assemble ReviewAndTransfer.md's three cases from M3 technical/incident and NG-S6a local evaluation/package proof, with sharing rights accepted. Final study/neural adoption may remain open; this package is its input. Include personal contribution, derivation/source/native joins, controlled results, negative alternatives and limitations. Run CHK-PORT-01/04, hash/rights and reader checks. Replace duplicate narratives and remove probes; preserve originals. No invented acceptance, site, viewer or capture depot.
+Assemble ReviewAndTransfer.md's three cases from M3 technical/incident, all required M5R subject results and NG-S6a local evaluation/package proof, with sharing rights accepted. Final study/neural adoption may remain open; this package is its input. Include personal contribution, derivation/source/native joins, controlled results, negative alternatives and limitations. Run CHK-PORT-01/04, hash/rights and reader checks. Replace duplicate narratives and remove probes; preserve originals. No invented acceptance, site, viewer or capture depot.
 ```
 
 </details>

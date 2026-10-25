@@ -61,3 +61,13 @@ No inherited sample FPS, guessed entry budget or post-hoc threshold closes this 
 Leakage, slow lighting response, cache overhead and memory growth are primary risks. A technically integrated cache that fails the frozen value/quality gate remains unfinished; simplify or tune its owner, and retain a rejected experiment without leaving a permanent alternate runtime.
 
 Done means every criterion passes for the advertised subset, with source/build/native/raw/dynamic/cost/package/adoption evidence kept distinct. A build or screenshot alone cannot unblock NRC.
+
+## Check And Risk Ownership
+
+| Check | Defect-detecting obligation |
+| --- | --- |
+| CHK-SHARC-01 | transport accounting, constant radiance and forced-miss controls; retain the associated AC and FM row identities in the candidate report. |
+| CHK-SHARC-02 | hash/capacity/aging/reset/two-View and in-flight lifetime faults; retain the associated AC and FM row identities in the candidate report. |
+| CHK-SHARC-03 | held-out quality/response, native/full-cost and packaged reproduction; retain the associated AC and FM row identities in the candidate report. |
+
+RISK-SHARC-01: hash leakage and slow lighting response. The feature implementer and subject reviewer own mitigation: bound normal/age/confidence and retain failure sequences. A failed required falsifier/value band stops the stage; do not hide it by expanding scope or lowering a post-hoc threshold. The local acceptance table remains conjunctive, and the report records every supported API/domain cell separately.

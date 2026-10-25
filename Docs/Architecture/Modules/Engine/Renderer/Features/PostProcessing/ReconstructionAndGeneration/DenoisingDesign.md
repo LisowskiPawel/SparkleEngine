@@ -26,7 +26,7 @@ RR albedos/normals/roughness are material signals, not lighting or arbitrary GBu
 
 ## Output Ownership And Lifetime
 
-REC-D0 freezes the release-specific RR topology: supported combined RR reconstruction directly producing output extent, or a separately validated denoise-only composition. One producer owns the resolved output; no accidental double temporal reconstruction or filter pass masquerades as SDK support. Any required change updates the existing dossier's AC-IRU/output contract, selectors and every caller in one reviewed slice.
+The selected release-specific target is combined RR reconstruction directly producing output extent. REC-D0 freezes the actual mode/optimal extent, settings compatibility and tags; one producer owns the resolved output and no later SR evaluation follows RR. A denoise-only mode is not selected merely to preserve the current sequence. Any required change updates the existing dossier's AC-IRU/output contract, selectors and every caller in one reviewed slice.
 
 Renderer owns signal products/policy, feature-local adapters own NRD/Streamline dispatch setup, graph resources express actual guide/history/workspace access and all queues retire generations. RHI provides native execution/resources, not denoiser state or settings. Import only the selected NRD shader/runtime dependencies through existing ShaderSystem/build/package mechanisms; no parallel SDK renderer, light database or NRI layer.
 
@@ -34,7 +34,7 @@ Budget: existing requested/provider settings and composition hook, necessary typ
 
 ## REC-D0 And Measurement Card
 
-The rendering/native implementer and signal reviewer freeze actual SDK/profile/license/eligibility, transport guide derivations, topology, reset/failure policy, ABI/lifetime and numeric gates. Existing release SR/RR qualification may execute in DSP-1/2 now; RELAX production is later scope. The owned model retains its own discovery and REL-11/M3 dependencies.
+The rendering/native implementer and signal reviewer freeze actual SDK/profile/license/eligibility, transport guide derivations, topology, reset/failure policy, ABI/lifetime and numeric gates. Existing release SR/RR qualification may execute in DSP-1 and DSP-3 now; RELAX production is later scope. The owned model retains its own discovery and REL-11/M3 dependencies.
 
 Compare raw estimator, classical denoise, SR-only and RR in meaningful compatible cells; assess the owned denoiser only on its qualified diffuse-indirect component. Use identical raw inputs or matched sampler identity, fixed exposure/output and independent high-sample references. Freeze spatial error, temporal trail/flicker/response, disocclusion recovery, native correctness, practical whole-frame cost and peak memory before candidate results. Include motion, thin alpha geometry, specular detail, light/emissive changes and resize/cut/provider switching. Temporal smoothing cannot compensate for biased/wrong raw transport.
 
@@ -50,4 +50,14 @@ Compare raw estimator, classical denoise, SR-only and RR in meaningful compatibl
 
 `FM-REC-01`: wrong guide frame/unit/layout -> reject before evaluation, demonstrate a deliberately altered input. `FM-REC-02`: stale history/extent/provider -> invalidate before scheduling, test a cut/resize. `FM-REC-03`: selected SDK unavailable/evaluation failed -> existing explicit refusal/failure with selection intact; no silent Linear or copy output. `FM-REC-04`: in-flight resource replacement -> completion-safe retirement, checked with delayed work.
 
-Evidence lives in `reconstruction/denoising-upscaling/` under the existing workload artifact root. First-release FCR-REN-14..16 and local later criteria retain separate verdicts; no NRD/owned-model result can close SR/RR by association.
+Evidence lives in `reconstruction/denoising-upscaling/` under the existing workload artifact root. First-release FCR-REN-10 and local later criteria retain separate verdicts; no NRD/owned-model result can close SR/RR by association.
+
+## Check And Risk Ownership
+
+| Check | Defect-detecting obligation |
+| --- | --- |
+| CHK-REC-01 | guide/extent/topology conformance and deliberate wrong-input controls; retain the associated AC and FM row identities in the candidate report. |
+| CHK-REC-02 | motion/disocclusion/reset/two-View/SDK and completion faults; retain the associated AC and FM row identities in the candidate report. |
+| CHK-REC-03 | compatible held-out spatial/temporal full-cost/package replay; retain the associated AC and FM row identities in the candidate report. |
+
+RISK-REC-01: invalid guides hide transport errors or double reconstruction. The feature implementer and subject reviewer own mitigation: preserve raw outputs and freeze the installed SDK topology. A failed required falsifier/value band stops the stage; do not hide it by expanding scope or lowering a post-hoc threshold. The local acceptance table remains conjunctive, and the report records every supported API/domain cell separately.

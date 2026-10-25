@@ -50,3 +50,13 @@ The material/transport implementer and content/native reviewers freeze exact sel
 | `AC-MAT-06` | Held-out shaded quality, full-frame/peak-memory cost, failures, package identity and documented reproduction of the material comparison |
 
 Use `materials/shading-models/` under the existing workload artifact root. Completion requires all selected profiles, not only base helpers; references from an older material domain cannot qualify a new lobe. Reports retain results; no first-release score or accepted transport formula is changed by this target.
+
+## Check And Risk Ownership
+
+| Check | Defect-detecting obligation |
+| --- | --- |
+| CHK-MAT-01 | energy/reciprocity/PDF/sample and independent material-domain checks; retain the associated AC and FM row identities in the candidate report. |
+| CHK-MAT-02 | tangent/alpha/deformation/ABI/content and raster/ray counterexamples; retain the associated AC and FM row identities in the candidate report. |
+| CHK-MAT-03 | held-out native/raw/temporal cost and actual package reproduction; retain the associated AC and FM row identities in the candidate report. |
+
+RISK-MAT-01: new lobes invalidate oracle or guide assumptions. The feature implementer and subject reviewer own mitigation: qualify each reference profile and each affected guide before claims. A failed required falsifier/value band stops the stage; do not hide it by expanding scope or lowering a post-hoc threshold. The local acceptance table remains conjunctive, and the report records every supported API/domain cell separately.

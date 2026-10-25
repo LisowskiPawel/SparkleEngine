@@ -7,7 +7,7 @@
 
 ## Work This Plan
 
-MAT-S0/1 qualify the existing release material promise through GR-1/2. Anisotropy/clearcoat production follows REL-11 and qualified base/reference inputs. New lobes need an explicit reviewed reference-domain revision before raw-reference claims. Execute the first unfinished stage only. The discovery card freezes numerical tolerances, practical-effect bands, exact eligibility, rights, hook/copy/resource limits and failure checks before production; a source-present mechanism is not a satisfied gate.
+MAT-S0/1 qualify the existing release material promise through GR-0/2/4. Anisotropy/clearcoat production follows REL-11 and qualified base/reference inputs. New lobes need an explicit reviewed reference-domain revision before raw-reference claims. Execute the first unfinished stage only. The discovery card freezes numerical tolerances, practical-effect bands, exact eligibility, rights, hook/copy/resource limits and failure checks before production; a source-present mechanism is not a satisfied gate.
 
 ## Stage Contract
 
@@ -33,7 +33,7 @@ Execute only MAT-S0 from Docs/Architecture/Modules/Engine/Renderer/Features/Geom
 
 ## MAT-S1 Qualify lineage and base scattering
 
-**Start:** MAT-D0 and GR-1/2 inputs.
+**Start:** MAT-D0 and GR-0/2/4 inputs.
 
 **Work:** Trace authored/cooked/CPU-GPU values into raster/ray and direct/indirect/reference evaluation. Check color/F0/metallic/roughness, normal/tangent/alpha/transforms/deformation. Derive energy/PDF/sample behavior and honest existing subsurface limits.
 

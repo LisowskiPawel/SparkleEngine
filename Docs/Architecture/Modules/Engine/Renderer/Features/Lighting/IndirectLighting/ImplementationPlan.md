@@ -32,7 +32,8 @@ IND-D0 + release admission
   -> IND-6 reconstruction
   -> IND-8 candidate evidence and FCR-REN-07
 
-IND-6 -> IND-7 -> IND-8 only for a separately admitted optimization.
+IND-6 -> IND-7 -> IND-8 only for separately admitted advanced reuse/guiding.
+Required SHaRC -> NRC follows the cache plans after qualified continuation inputs.
 ```
 
 The accepted Reference Path Tracer is required before scene-level reference claims in Stages 5/8, but analytic/metamorphic and external manifest-pinned references allow Stages 1–4 to progress independently.
@@ -256,7 +257,7 @@ Implement Indirect Lighting Stage 4 after static shift/GRIS proof. Add the accep
 
 ### Objective
 
-Deliver the exact path depth and rough-specular support promised by the product, using ReSTIR GI or generalized ReSTIR PT mappings as frozen.
+Deliver the exact path depth and rough-specular support promised by the product, using ReSTIR GI or generalized ReSTIR PT mappings as frozen. M5R requires multi-bounce diffuse color bleeding and rough-specular continuation, emitter/environment terminals and independently qualified references; diffuse one-bounce alone is insufficient. Freeze depth convention/range and roughness bounds in IND-D0 before each increment.
 
 ### Work
 
@@ -320,14 +321,14 @@ Implement Indirect Lighting Stage 6 using the frozen portable reconstruction con
 
 ### Objective
 
-This stage is optional and initially Deferred. Proceed from the accepted Stage-6 result directly to Stage 8 unless a separately admitted failing workload justifies one optimization. A cache/guiding study is not required to finish the realtime release path.
+General advanced reuse/guiding remains optional and initially Deferred; first-release base closure may proceed from Stage 6 to Stage 8. Required later [SHaRC then NRC](../RadianceCaching/RadianceCachingDesign.md) now has separate contracts/plans. Those M5R deliveries cannot be skipped here or implemented as a second cache through this optional stage.
 
 ### Candidate Increments
 
 - ReSTIR PT Enhanced reciprocal neighbors, footprint reconnection, or duplication maps;
 - reservoir splatting/multilayer disocclusion reuse;
 - ReSTIR PG initial-candidate guiding;
-- SHaRC/DDGI/NRC only if a separately approved platform/product tier requires a cache.
+- DDGI or another unselected cache remains a future product decision. Required SHaRC -> NRC follows its linked owner and cannot be substituted by DDGI.
 
 ### Work And Exit
 

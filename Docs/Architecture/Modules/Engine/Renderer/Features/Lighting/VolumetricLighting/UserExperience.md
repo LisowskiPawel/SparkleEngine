@@ -8,6 +8,8 @@
 
 **Authority boundary:** the [dossier](VolumetricLightingDesign.md) owns acceptance; [Transport And Composition](TransportAndComposition.md) owns physical/result meaning; [Execution Architecture](ExecutionArchitecture.md) owns runtime/content truth; [Discovery](Discovery.md) ratifies product choices; [Plan](ImplementationPlan.md) owns delivery order
 
+Selected first-use flow uses existing scene settings for global homogeneous/height fog and bounded analytic local fields, truthful Q1/Q2 active status and raw transmittance/in-scatter controls. Unselected atmosphere/cloud/imported-volume/reuse choices are absent. UI/CLI/automation share accepted intent; no media editor is selected.
+
 ## Experience Principles
 
 1. One environment story covers sky background, aerial perspective, global fog, local media, sun/direct lights, and clouds when admitted. Separate panels cannot create competing physical state.

@@ -141,7 +141,7 @@ They use one environment mapping, rotation, radiance generation, and importance 
 | bidirectional/ReSTIR BDPT | eye/light subpaths and connection strategies | caustic/specular-diffuse-specular coverage | major technique/MIS/record expansion | separately admitted research domain[^8] |
 | DDGI/probe fields | spatial irradiance probes | stable diffuse, scalable amortization | leaks, update latency, weak glossy/high-frequency visibility | alternative platform tier, never silently combined with path-reservoir claims[^10] |
 | Lumen-like surface/radiance cache | scene parameterization plus traced/cached radiance | broad production GI/reflections on varied hardware | large scene/card/cache/tracing architecture | rejected as an incidental addition; needs its own product admission[^11][^20] |
-| SHaRC/NRC | hashed or learned radiance cache | amortizes later-bounce radiance | cache bias/training/generalization/memory and new lifetime | optional advanced tier only if a specific budget demands it[^12][^13] |
+| SHaRC/NRC | hashed or learned radiance cache | amortizes later-bounce radiance | cache bias/training/generalization/memory and new lifetime | selected later SHaRC-first/NRC-second delivery; exact transport/value/native gates remain mandatory[^12][^13] |
 
 The first target is deliberately narrower than “real-time path tracing”: one independently proved one-bounce estimator, explicit path record, one ratified shift family, GRIS reservoir mathematics, then temporal/spatial reuse. Every additional bounce, lobe, terminal technique, mapping, guide, or cache is a new domain cell with its own support and evidence.
 

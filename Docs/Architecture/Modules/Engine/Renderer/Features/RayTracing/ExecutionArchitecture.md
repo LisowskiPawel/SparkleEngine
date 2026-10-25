@@ -10,6 +10,8 @@
 
 **Current readiness:** **40/100** for the current ray feature baseline — this target contract adds no implementation or evidence credit by itself. See [Current Feature Readiness](../../../../../../Acceptance/CurrentReadiness.md#renderer).
 
+The [selected PTLAS plan](PartitionedTlas/ImplementationPlan.md) extends this current architecture after release. Its incremental/translation target changes no current source-backed subset; native packing stays inside RHI and scene/SBT identity stays shared.
+
 ## Purpose And Authority Boundary
 
 This document describes the intended ray-tracing system as one coherent target. It answers what inline ray query and native ray-tracing pipelines mean, what they share, what must remain distinct, who owns each decision, how shader tables map scene identity to native records, and what makes an effect genuinely dual-execution.

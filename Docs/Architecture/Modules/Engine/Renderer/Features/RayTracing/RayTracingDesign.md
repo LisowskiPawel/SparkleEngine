@@ -55,6 +55,10 @@ Ray tracing is capability-gated. Source contains D3D12 and Vulkan acceleration s
 
 The frame graph reserves a persistent `SceneTlas`, declares `RayTracingSceneBuild`, and binds the current native TLAS before graph execution. Traceable instances without matching hit-instance/material records are a fatal contract violation.
 
+## Selected PTLAS Support Delivery
+
+[PTLAS target](PartitionedTlas/PtlasDesign.md) and [PTLAS-S0..5](PartitionedTlas/ImplementationPlan.md) own required later sparse writes, migration, legal BLAS/SBT replacement and partition translation. Current narrow AC-RT/source limits and first-release experimental disposition remain unchanged until observed proof supports promotion. A target selection is not support evidence.
+
 ## Traversal Coverage
 
 | Effect | Inline ray query | Native pipeline | Active selection |

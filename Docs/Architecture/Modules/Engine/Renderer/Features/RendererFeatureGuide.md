@@ -10,6 +10,8 @@
 
 **Current readiness:** **36/100** across 26 tracked Renderer families — source implementation/integration is substantial, four admitted release features are absent, and candidate verification/delivery/adoption are `0`. See [Current Feature Readiness](../../../../../Acceptance/CurrentReadiness.md#renderer).
 
+[Required rendering depth](../../../../../Strategy/FeatureDeliveryCatalog.md#selected-rendering-depth) routes existing transport proof and the selected [materials](GeometryAndResources/ImplementationPlan.md), [reconstruction](PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md), [volumes](Lighting/VolumetricLighting/ImplementationPlan.md), [SHaRC then NRC](Lighting/RadianceCaching/RadianceCachingDesign.md), [NTC](../../../../CrossModule/NeuralGraphics/TextureCompression/ImplementationPlan.md) and [PTLAS](RayTracing/PartitionedTlas/ImplementationPlan.md). Selection adds no implementation or readiness proof.
+
 ## At A Glance
 
 This is the detailed feature map behind the [Renderer overview](../RendererDesign.md). Start with a family below, then open its child page for the algorithm, selector, limitations, tradeoffs, and local proof contract. The source-coverage tables later on this page are audit reference, not the recommended reading order.

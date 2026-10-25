@@ -52,3 +52,13 @@ Freeze quality/error bands on licensed train/validation material sets and a seal
 `FM-NTC-01`: corrupt/mismatched cooked set -> reject before GPU publication. `FM-NTC-02`: unsupported selected decoder -> explicit material admission failure with reason; never claim BCn output as NTC. `FM-NTC-03`: allocation/upload/compile failure -> retain a valid prior generation only under existing publication policy, report failure. `FM-NTC-04`: stale descriptors/weights -> prevent scheduling and retire safely. Inject these controls in the owning cook/runtime paths.
 
 Reports and assets live in `neural-textures/ntc/` beneath the existing workload artifact root; large source/training sets and codec build outputs stay out of repository source. All local acceptance cells are future portfolio requirements, not current readiness or a first-release feature-family expansion.
+
+## Check And Risk Ownership
+
+| Check | Defect-detecting obligation |
+| --- | --- |
+| CHK-NTC-01 | artifact/channel/decoder conformance; retain the associated AC and FM row identities in the candidate report. |
+| CHK-NTC-02 | LOD/filtering/motion and corrupt/unsupported/replacement controls; retain the associated AC and FM row identities in the candidate report. |
+| CHK-NTC-03 | held-out shaded quality and complete bytes-versus-frame-cost frontier; retain the associated AC and FM row identities in the candidate report. |
+
+RISK-NTC-01: filtering/normal distortion or decode cost outweighs memory saving. The feature implementer and subject reviewer own mitigation: freeze channel/filter contract and include shader-bound losing cases. A failed required falsifier/value band stops the stage; do not hide it by expanding scope or lowering a post-hoc threshold. The local acceptance table remains conjunctive, and the report records every supported API/domain cell separately.

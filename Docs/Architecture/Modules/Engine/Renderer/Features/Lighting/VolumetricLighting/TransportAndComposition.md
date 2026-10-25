@@ -10,6 +10,8 @@
 
 **Convention:** camera rays parameterize distance `s` in metres; radiance is scene-linear; volume results are premultiplied in-scattering plus scalar or RGB transmittance as frozen by discovery
 
+Selected executing math is Q0/Q1/Q2: homogeneous/height and bounded analytic local density, single scattering, froxel lighting and exact composition. Atmosphere, imported-volume, multiple-scattering and reservoir sections remain unselected reference. Varying-density oracle checks are required without an importer.
+
 ## Claim Boundary
 
 This page defines participating-media transport, atmosphere, volume resampling, and scene composition. It does not define surface BRDFs, screen-space Direct/Indirect reservoirs, transparent refractive nesting, or cloud authoring. Target formulas are normative after `VOL-D0` ratification; exact RGB/spectral approximations, precision, and discretization remain discovery outputs.

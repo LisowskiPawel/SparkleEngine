@@ -112,6 +112,8 @@ Invalid output or provider extents must not produce divided-by-zero jitter or a 
 
 ### Ownership, State, And Invalidation
 
+This table records the current source split. The selected Feature Promise below replaces RR-intermediate/SR composition with one output-resolution reconstruction owner in REC-S1/DSP-3; it does not claim that replacement already exists.
+
 | Concern | Owner | Required identity |
 | --- | --- | --- |
 | output extent | viewport request or window fallback in `FramePipeline` | viewport/window generation and exact width/height |
@@ -174,6 +176,8 @@ Primary evidence destination: `REN-E33` in the [Capability Evidence Plan](../../
 - [`RenderViewState.cpp`](../../../../../../../../Engine/Renderer/Private/View/RenderViewState.cpp) and [`TemporalJitterPatterns.cpp`](../../../../../../../../Engine/Renderer/Private/Temporal/TemporalJitterPatterns.cpp)
 - `Engine/Renderer/Private/FrameGraph`, `Engine/Renderer/Private/Passes`, and RHI resource/pipeline sample-count contracts
 
+The [denoising/upscaling contract](DenoisingDesign.md) and [REC-S0..5](ImplementationPlan.md) refine SR/RR qualification and select one later RELAX path. Qualify RR output topology against the installed pinned SDK; current composition below is source behavior, not proof that double reconstruction is supported. RELAX is post-release; owned CNN proof stays separate.
+
 ## Image Reconstruction And Upscaling
 
 **Status:** current feature dossier; source-backed, not provider validation, visual-quality, latency, performance, packaging, or release evidence
@@ -186,7 +190,7 @@ Primary evidence destination: `REN-E33` in the [Capability Evidence Plan](../../
 
 **Release amendment, 2026-10-10:** [Required rendering closure](../../../../../../../Acceptance/FirstRelease.md#required-rendering-closure) makes SR and RR Included on both APIs for the named machine. At source `93e86b81`, `StreamlineRuntimeSupport::Initialize`/interop eligibility still accept D3D12 only and set `eD3D12`; Vulkan texture-tagging helpers alone cannot satisfy this requirement. The historical source matrix below is not release disposition. Vulkan startup/evaluation and complete paired input/lifecycle/quality/package proof remain delivery work.
 
-Use the official pinned Streamline `v2.11.1` [SR guide](https://github.com/NVIDIA-RTX/Streamline/blob/v2.11.1/docs/ProgrammingGuideDLSS.md) and [RR guide](https://github.com/NVIDIA-RTX/Streamline/blob/v2.11.1/docs/ProgrammingGuideDLSS_RR.md), retrieved 2026-10-10, with installed headers: device registration, frame/viewport identity, optimal extent, input tags/constants, guide semantics, state restoration and resource release are implementation questions, not SDK-presence proof. RR documentation describes a denoised output at output resolution; freeze whether the local NativeAA-denoise-then-SR composition meets the pinned contract before treating it as complete. Do not copy guide snippets into native/public API policy or assume every optional SDK input applies to the admitted scene domain.
+Use the official pinned Streamline `v2.11.1` [SR guide](https://github.com/NVIDIA-RTX/Streamline/blob/v2.11.1/docs/ProgrammingGuideDLSS.md) and [RR guide](https://github.com/NVIDIA-RTX/Streamline/blob/v2.11.1/docs/ProgrammingGuideDLSS_RR.md), retrieved 2026-10-10, with installed headers: device registration, frame/viewport identity, optimal extent, input tags/constants, guide semantics, state restoration and resource release are implementation questions, not SDK-presence proof. The pinned RR guide describes RR replacing SR and producing denoised output at output resolution. REC-S1 must remove the local RR-then-SR sequence and qualify the supported single-output topology. Do not copy guide snippets into native/public API policy or assume every optional SDK input applies to the admitted scene domain.
 
 ### Image Reconstruction And Upscaling: At A Glance
 
@@ -196,7 +200,7 @@ Use the official pinned Streamline `v2.11.1` [SR guide](https://github.com/NVIDI
 | DLSS Super Resolution | D3D12 plus built/runtime/device/interposer/provider readiness | one reconstructed current-frame output from color, depth, motion, exposure, camera, and extent tags | vendor/hardware/package constraints and no Vulkan route |
 | DLSS Ray Reconstruction | D3D12 provider readiness plus ReSTIR-specific guides | optional render-resolution `DenoisedSceneColor` consumed by the selected presentation upscaler | mode/guide restrictions and quality/history proof open |
 
-Only the selected presentation upscaler may own `ResolvedSceneColor` for a frame. Ray Reconstruction owns a separate render-resolution `DenoisedSceneColor`; it composes before Linear or DLSS Super Resolution instead of replacing either. Selected vendor initialization or evaluation failure is fatal and preserves the requested selection. Linear and RR Off are explicit user choices; they are not automatic recovery paths.
+Current unqualified source topology: the presentation upscaler owns ResolvedSceneColor while RR first writes a separate render-resolution DenoisedSceneColor. The selected target below replaces this sequence with one reconstruction output producer. Selected vendor initialization or evaluation failure is fatal and preserves the requested selection. Linear and RR Off are explicit user choices; they are not automatic recovery paths.
 
 Provider-input reconciliation (2026-10-24): the Renderer-owned provider enums define their accepted numeric CVar domain. Core's shared string parser applies that pure validation before console, command-line or persisted assignment; invalid text leaves the previous value unchanged, and a rejected control batch commits none of its entries. This input rejection is distinct from a valid provider that cannot initialize on the selected device. Factories retain a defensive error for invalid typed caller input; these source contracts do not establish native provider or image-quality acceptance.
 
@@ -206,17 +210,19 @@ Cross-feature resolution/sample contract: [Resolution, Sampling, and Anti-Aliasi
 
 ### Feature Promise
 
-Sparkle may first denoise eligible ReSTIR lighting into `DenoisedSceneColor` at render extent, then always converts the selected raw or denoised scene color into one `ResolvedSceneColor` at output extent. Ray Reconstruction and DLSS Super Resolution are independent stages and may run sequentially: the former owns lighting denoising, while the latter owns presentation-resolution reconstruction.
+The selected target has one reconstruction output owner: Linear or DLSS SR when RR is Off; DLSS RR itself when RR is active and eligible. RR reconstructs to output extent at the admitted quality mode and does not feed a second DLSS SR evaluation. Existing requested settings resolve to one supported topology without silently changing intent; incompatible choices are explicitly refused. NativeAA and scaled RR need separate proof. The source currently uses a render-resolution RR intermediate before the presentation upscaler; that unqualified topology must be replaced in REC-S1/DSP-3 rather than preserved as a product requirement.
 
 | Feature | Requested choices | Active/failure rule | Inputs |
 | --- | --- | --- | --- |
 | Linear upscale | baseline provider | always-available internal path | scene color |
 | NVIDIA DLSS Super Resolution | NativeAA, Quality, Balanced, Performance, UltraPerformance | Streamline/capability/native-interop gated; initialization failure is fatal; selection is unchanged | color, device depth, motion, exposure, camera/temporal/extents |
-| NVIDIA DLSS Ray Reconstruction | Off or NVIDIA RR | ReSTIR-only render-resolution denoising; initialization failure is fatal; RR and upscaler selections are unchanged | color, depth, motion, diffuse/specular albedo, normal, roughness, specular hit distance, exposure |
+| NVIDIA DLSS Ray Reconstruction | Off or NVIDIA RR | selected target: eligible ReSTIR RR owns output-resolution reconstruction with no later SR; current intermediate remains unqualified; selected failure preserves intent | color, depth, motion, diffuse/specular albedo, normal, roughness, specular-hit or admitted specular-motion input, exposure |
 
 Vulkan currently refuses the external Streamline evaluation route instead of claiming parity with D3D12 native interop. Provider source presence does not prove supported hardware, driver behavior, input tagging, binary staging, quality, performance, or redistribution.
 
 ### Ownership And Lifetime
+
+The following records current source ownership. REC-S1 replaces the RR-intermediate/SR sequence under the target promise above; until then it is not a supported composition verdict.
 
 - Renderer settings/CVars express requested provider and quality; the provider stack owns readiness and resolved active state.
 - `AddSceneUpscalingPasses` visibly selects exactly one implemented presentation upscaler: Linear or NVIDIA DLSS. The selected provider and quality own the render extent, so DLSS NativeAA remains available at native resolution; the concrete NVIDIA operation maps and validates its color/depth/motion/exposure inputs before the generic provider evaluation bridge.
@@ -251,7 +257,7 @@ NativeAA and render-to-output scaling ratios need separate quality/cost cells. U
 - `AC-IRU-01` — one and only one producer writes `ResolvedSceneColor` at the requested output extent and documented scene-linear format for every supported combination.
 - `AC-IRU-02` — Linear produces finite in-bounds output for unity, down/upscale, odd dimensions, one-pixel edges, resize, and alpha fixtures with a predeclared filtering oracle.
 - `AC-IRU-03` — DLSS SR activates only with matching adapter/driver/SDK/interposer/backend readiness and complete color/depth/motion/exposure/camera/extent tags; requested quality and actual active provider are inspectable.
-- `AC-IRU-04` — DLSS RR activates only for ReSTIR with every required guide, writes only render-resolution `DenoisedSceneColor`, and leaves the independently selected Linear or DLSS SR stage responsible for output-resolution `ResolvedSceneColor`.
+- `AC-IRU-04` - DLSS RR activates only for admitted ReSTIR/guide/device cells and is the single output-resolution reconstruction producer. It uses the pinned SDK quality/optimal extent contract; no subsequent DLSS SR pass reprocesses its output. Current intermediate composition is replaced and independently qualified before acceptance.
 - `AC-IRU-05` — selected-provider initialization/evaluation failure reports the reason and terminates before successful output publication, preserving SR/RR selection without automatic fallback.
 - `AC-IRU-06` — camera cut, resize, scene/view/provider/shader/topology change resets temporal provider state and prevents mixed-generation inputs or outputs.
 - `AC-IRU-07` — old provider generations remain alive through last-use queue tokens and are reclaimed within a declared bound during repeated switches/failures/shutdown.
@@ -265,11 +271,11 @@ NativeAA and render-to-output scaling ratios need separate quality/cost cells. U
 | `FM-IRU-02` | missing/wrong-format/wrong-extent/stale guide or motion/depth/exposure input | graph construction or provider evaluation rejects before publication; no unrelated buffer, fabricated guide, silent provider substitution, or stale product is presented | `CHK-IRU-02`, `CHK-IRU-03` |
 | `FM-IRU-03` | resize/cut/provider or lighting-mode switch while work is in flight | temporal state resets, graph generation changes, and old provider retires by completion | `CHK-IRU-03` |
 | `FM-IRU-04` | external provider requested on Vulkan | selected-provider initialization/evaluation fails explicitly according to its owner, never claims parity | `CHK-IRU-02` |
-| `FM-IRU-05` | Ray Reconstruction claims `ResolvedSceneColor`, changes presentation extent/provider policy, or suppresses the selected upscaler | graph/resource contract detects the ownership or stage-composition violation | `CHK-IRU-01` |
+| `FM-IRU-05` | duplicate reconstruction/output producer, RR followed by SR, or inconsistent requested/active extent/quality | graph/resource and active-topology checks reject before publication; no silent settings rewrite | `CHK-IRU-01` |
 
 | Check | Exercise and oracle | Covers |
 | --- | --- | --- |
-| `CHK-IRU-01` | graph/resource audit plus Linear numeric pattern tests over extent/edge/alpha matrix | `AC-IRU-01`, `AC-IRU-02`; `FM-IRU-05` |
+| `CHK-IRU-01` | graph/resource audit, duplicate RR/SR producer counterexample, actual RR output extent and Linear numeric edge/alpha tests | AC-IRU-01/02/04; FM-IRU-05 |
 | `CHK-IRU-02` | provider readiness matrix varying backend, adapter capability, SDK/binary/interposer, quality, lighting mode, and each missing input | `AC-IRU-03`–`AC-IRU-05`, `AC-IRU-08`; `FM-IRU-01`, `FM-IRU-02`, `FM-IRU-04` |
 | `CHK-IRU-03` | temporal churn across motion, camera cut, resize, scene/view/provider/shader/topology changes and repeated failure/recovery; inspect tags, generations, queue tokens, and retention | `AC-IRU-06`, `AC-IRU-07`; `FM-IRU-02`, `FM-IRU-03` |
 | `CHK-IRU-04` | representative quality/performance/package run with predeclared metric and baseline at each supported extent/quality cell | `AC-IRU-02`, `AC-IRU-03`, `AC-IRU-04`, `AC-IRU-08` |

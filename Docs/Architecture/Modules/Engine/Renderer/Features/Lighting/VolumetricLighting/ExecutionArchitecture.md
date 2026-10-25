@@ -10,6 +10,8 @@
 
 **Priority:** semantic/reference core → first fog slice → unified froxel/local lights → temporal product → atmosphere/environment → heterogeneous media → Volumetric ReSTIR → clouds only if admitted
 
+For selected Q0/Q1/Q2, extend existing scene/preparation with bounded analytic medium fields; keep density/integration/history in one Renderer owner. Borrow existing lights and graph/RHI. Atmosphere LUTs, imported volumes, clouds and reservoir resources below are unselected branches and must not enter build/package by adjacency.
+
 ## Product Claim
 
 One View resolves authored media and sky mode into immutable prepared state; computes finite scene-linear in-scattering and transmittance; composes them once with opaque surface/background radiance; reconstructs without stale density/light; and reports exact active quality/capability. Advanced heterogeneous, reservoir, and cloud tiers extend the same medium/transport owner rather than creating parallel fog systems.

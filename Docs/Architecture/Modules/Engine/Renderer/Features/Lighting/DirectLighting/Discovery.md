@@ -109,6 +109,10 @@ Freeze one feature home and an integration-hook ledger. Decide exact old reservo
 
 Freeze every tolerance before candidate observation, exact D3D12/Vulkan configurations, driver/compiler/shader publication identities, fixture hashes, warmup/capture windows, raw artifact schema, performance statistics, and `FCR-REN-06` ownership. Separate numerical, temporal, visual, memory, time, failure, backend, and release verdicts.
 
+## Selected Later Lighting Scope
+
+M5R requires emissive-triangle and environment candidate classes after the correct analytic-light base, with their distinct proposal/target/PDF, inventory/generation/update and endpoint double-count checks. Stage 7 delivers separate slices; this is not a new first-release prerequisite. ReGIR remains conditional on demonstrated value. DIR-D0 closes consumed decisions before each increment; it cannot leave the two selected classes permanently Deferred.
+
 ## Decision Closure Register
 
 Every row is independently reviewed. `Proposed` means the documents contain a candidate, not that the decision is closed.
