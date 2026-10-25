@@ -66,7 +66,7 @@ namespace SparkleLauncher
 			    .Id = QString::fromStdString(level.id),
 			    .DisplayName = DisplayNameOrId(level.displayName, level.id),
 			    .Description = QString::fromStdString(level.description),
-			    .ThumbnailPath = QString::fromStdString(level.thumbnailPath.string()),
+			    .ThumbnailPath = QString::fromStdWString(level.thumbnailPath.wstring()),
 			    .Detail = BuildLevelDetail(level, assetPack),
 			    .SourcePageUrl = QString::fromStdString(level.sourcePageUrl.empty() && assetPack != nullptr ? assetPack->sourcePageUrl : level.sourcePageUrl),
 			    .UnsupportedReason = ResolveUnavailableReason(level, assetPack, levelSourceReady, packSourceReady, canSelect),

@@ -32,7 +32,7 @@ namespace SparkleLauncher
 		}
 
 		const std::string assetName = fileName.toStdString();
-		const std::filesystem::path applicationVisualPath = std::filesystem::path(QCoreApplication::applicationDirPath().toStdString()) / "Visuals" / assetName;
+		const std::filesystem::path applicationVisualPath = std::filesystem::path(QCoreApplication::applicationDirPath().toStdWString()) / "Visuals" / assetName;
 		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
 
 		const std::array<std::filesystem::path, 4> candidates = {
@@ -67,7 +67,7 @@ namespace SparkleLauncher
 			return nullptr;
 		}
 
-		QPixmap pixmap(QString::fromStdString(artworkPath.string()));
+		QPixmap pixmap(QString::fromStdWString(artworkPath.wstring()));
 		if (pixmap.isNull())
 		{
 			return nullptr;
@@ -109,7 +109,7 @@ namespace SparkleLauncher
 		const std::filesystem::path artworkPath = FindLauncherVisualAsset(repositoryRoot, artworkFileName);
 		if (!artworkPath.empty())
 		{
-			heroPixmap.load(QString::fromStdString(artworkPath.string()));
+			heroPixmap.load(QString::fromStdWString(artworkPath.wstring()));
 		}
 
 		HomeHeroCardWidget* card = new HomeHeroCardWidget(heroPixmap, parent);

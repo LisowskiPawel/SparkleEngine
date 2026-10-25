@@ -111,17 +111,25 @@ namespace SparkleLauncher
 		plan.Readiness.CookedTexturesReady = cookedContent.TexturesReady;
 		plan.Readiness.CookedShadersReady = cookedContent.Shaders == CookedShaderPublicationState::Ready;
 
-		plan.ReadinessMessages.push_back(plan.Readiness.ExecutableReady ? "Selected product executable is ready." : "Selected product executable is missing; compile " + plan.TargetName + " first.");
-
-		plan.ReadinessMessages.push_back(
-		    plan.Readiness.ContentDirectoryReady ? "Content working directory is valid." : "Content working directory is missing or invalid: " + Strings::ToNarrow(plan.WorkingDirectory.wstring()));
-
-		plan.ReadinessMessages.push_back(plan.Readiness.CookedMeshesReady ? "Cooked scenes and meshes are ready." : "Cooked scenes and meshes are missing.");
-		plan.ReadinessMessages.push_back(plan.Readiness.CookedTexturesReady ? "Cooked textures are ready." : "Cooked textures are missing.");
+		if (!plan.Readiness.ExecutableReady)
+		{
+			plan.ReadinessMessages.push_back("Selected product executable is missing; compile " + plan.TargetName + " first.");
+		}
+		if (!plan.Readiness.ContentDirectoryReady)
+		{
+			plan.ReadinessMessages.push_back("Content working directory is missing or invalid: " + Strings::ToNarrow(plan.WorkingDirectory.wstring()));
+		}
+		if (!plan.Readiness.CookedMeshesReady)
+		{
+			plan.ReadinessMessages.push_back("Cooked scenes and meshes are missing.");
+		}
+		if (!plan.Readiness.CookedTexturesReady)
+		{
+			plan.ReadinessMessages.push_back("Cooked textures are missing.");
+		}
 		switch (cookedContent.Shaders)
 		{
 			case CookedShaderPublicationState::Ready:
-				plan.ReadinessMessages.push_back("Cooked shaders are ready.");
 				break;
 			case CookedShaderPublicationState::Invalid:
 				plan.ReadinessMessages.push_back("Cooked shader publication is incomplete or internally inconsistent.");
