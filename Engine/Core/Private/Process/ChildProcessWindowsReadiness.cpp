@@ -37,7 +37,6 @@ namespace Process
 		}
 	}
 
-
 	static bool CreateChildReadinessEvent(WindowsProcessHandle& readinessEvent, std::wstring& eventName, ChildProcessResult& result)
 	{
 		static std::atomic_uint64_t nextReadinessIdentity{1};
@@ -54,8 +53,7 @@ namespace Process
 	static bool OpenChildReadinessLog(const std::filesystem::path& logPath, WindowsProcessHandle& outputFile, ChildProcessResult& result)
 	{
 		SECURITY_ATTRIBUTES security{sizeof(SECURITY_ATTRIBUTES), nullptr, TRUE};
-		outputFile.Reset(
-		    CreateFileW(logPath.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, &security, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
+		outputFile.Reset(CreateFileW(logPath.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, &security, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
 		if (!outputFile)
 		{
 			result.FailureReason = "Failed to open the child process log: " + FormatWindowsProcessError(GetLastError());
@@ -86,7 +84,6 @@ namespace Process
 			{
 				result.FailureReason = "Child readiness verification failed.";
 			}
-
 		}
 		return decision;
 	}

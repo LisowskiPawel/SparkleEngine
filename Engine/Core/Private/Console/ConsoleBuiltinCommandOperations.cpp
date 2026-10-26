@@ -35,7 +35,7 @@ ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandRegistry& commandReg
 		{
 			output += '\n';
 		}
-static 		output += FormatCommandHelp(command.Name, command.ArgumentSyntax, command.Help);
+		output += FormatCommandHelp(command.Name, command.ArgumentSyntax, command.Help);
 	}
 
 	if (output.empty())
@@ -55,7 +55,7 @@ ConsoleCommandResult ExecuteConsoleListCVars(const CVarControlExecutor& executor
 	{
 		return ConsoleCommandResult::Error("CVar control owner is unavailable.");
 	}
-static 	return FormatControlResult(executor({.Operation = CVarControlOperation::List, .Filter = arguments.empty() ? std::string{} : std::string(arguments.front())}));
+	return FormatControlResult(executor({.Operation = CVarControlOperation::List, .Filter = arguments.empty() ? std::string{} : std::string(arguments.front())}));
 }
 
 ConsoleCommandResult ExecuteConsoleGetCVar(const CVarControlExecutor& executor, std::span<const std::string_view> arguments)
@@ -69,7 +69,7 @@ ConsoleCommandResult ExecuteConsoleGetCVar(const CVarControlExecutor& executor, 
 	{
 		return ConsoleCommandResult::Error("CVar control owner is unavailable.");
 	}
-static 	return FormatControlResult(executor({.Operation = CVarControlOperation::Query, .Entries = {{std::string(arguments.front()), {}}}}));
+	return FormatControlResult(executor({.Operation = CVarControlOperation::Query, .Entries = {{std::string(arguments.front()), {}}}}));
 }
 
 ConsoleCommandResult ExecuteConsoleSetCVar(const CVarControlExecutor& executor, std::span<const std::string_view> arguments)
@@ -83,7 +83,7 @@ ConsoleCommandResult ExecuteConsoleSetCVar(const CVarControlExecutor& executor, 
 	{
 		return ConsoleCommandResult::Error("CVar control owner is unavailable.");
 	}
-static 	return FormatControlResult(executor({.Operation = CVarControlOperation::Set, .Entries = {{std::string(arguments.front()), Strings::Join(arguments, " ", 1)}}}));
+	return FormatControlResult(executor({.Operation = CVarControlOperation::Set, .Entries = {{std::string(arguments.front()), Strings::Join(arguments, " ", 1)}}}));
 }
 
 static ConsoleCommandResult FormatControlResult(CVarControlResult result)
@@ -99,7 +99,7 @@ static ConsoleCommandResult FormatControlResult(CVarControlResult result)
 		{
 			output += '\n';
 		}
-static 		output += FormatCVar(value);
+		output += FormatCVar(value);
 	}
 	return output.empty() ? ConsoleCommandResult::Warning("no CVars matched") : ConsoleCommandResult::Success(std::move(output));
 }

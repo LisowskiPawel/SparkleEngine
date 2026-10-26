@@ -51,4 +51,3 @@ void RegisterConsoleBuiltinCommands(ConsoleCommandRegistry& commandRegistry, CVa
 	        .Complete = [&cvarRegistry](ConsoleCommandScope, const ConsoleAutocompleteRequest& request) { return CompleteConsoleCVarName(cvarRegistry, request.CurrentToken); },
 	    });
 }
-

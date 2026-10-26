@@ -22,13 +22,11 @@ namespace Process
 		}
 	}
 
-
 	static bool CreateChildOutputPipe(WindowsProcessHandle& readPipe, WindowsProcessHandle& writePipe, ChildProcessResult& result)
 	{
 		static std::atomic_uint64_t nextPipeIdentity{1};
 		const std::wstring pipeName = L"\\\\.\\pipe\\Sparkle.ChildProcess." + std::to_wstring(GetCurrentProcessId()) + L"." + std::to_wstring(nextPipeIdentity.fetch_add(1, std::memory_order_relaxed));
-		readPipe.Reset(
-		    CreateNamedPipeW(pipeName.c_str(), PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, 64 * 1024, 64 * 1024, 0, nullptr));
+		readPipe.Reset(CreateNamedPipeW(pipeName.c_str(), PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 1, 64 * 1024, 64 * 1024, 0, nullptr));
 		if (!readPipe)
 		{
 			result.FailureReason = "Failed to create child output pipe: " + FormatWindowsProcessError(GetLastError());

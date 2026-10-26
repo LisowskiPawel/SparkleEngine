@@ -45,14 +45,14 @@ static bool ResolveNamedCVarBatch(ConsoleVariableRegistry& registry, const CVarC
 		if (variable == nullptr)
 		{
 			outError = "unknown CVar: " + entry.Name;
-		return false;
+			return false;
 		}
 		for (const ConsoleVariableBase* previous : variables)
 		{
 			if (previous == variable)
 			{
 				outError = "duplicate CVar: " + entry.Name;
-		return false;
+				return false;
 			}
 		}
 		if (request.Operation == CVarControlOperation::Set)
@@ -61,13 +61,13 @@ static bool ResolveNamedCVarBatch(ConsoleVariableRegistry& registry, const CVarC
 			if (!variable->ValidateValueFromString(entry.Value, error))
 			{
 				outError = "failed to set " + entry.Name + ": " + error;
-		return false;
+				return false;
 			}
 		}
 		else if (!entry.Value.empty())
 		{
 			outError = "Query does not accept values.";
-		return false;
+			return false;
 		}
 		variables.push_back(variable);
 	}

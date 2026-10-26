@@ -13,9 +13,21 @@ namespace Process
 {
 	static constexpr DWORD ProcessTerminationTimeoutMilliseconds = 5'000;
 
-	WindowsProcessHandle::WindowsProcessHandle(HANDLE handle) noexcept : m_handle(handle) {}
-	WindowsProcessHandle::~WindowsProcessHandle() { Reset(); }
-	WindowsProcessHandle::WindowsProcessHandle(WindowsProcessHandle&& other) noexcept : m_handle(std::exchange(other.m_handle, nullptr)) {}
+	WindowsProcessHandle::WindowsProcessHandle(HANDLE handle) noexcept :
+	    m_handle(handle)
+	{
+	}
+
+	WindowsProcessHandle::~WindowsProcessHandle()
+	{
+		Reset();
+	}
+
+	WindowsProcessHandle::WindowsProcessHandle(WindowsProcessHandle&& other) noexcept :
+	    m_handle(std::exchange(other.m_handle, nullptr))
+	{
+	}
+
 	WindowsProcessHandle& WindowsProcessHandle::operator=(WindowsProcessHandle&& other) noexcept
 	{
 		if (this != &other)
@@ -25,10 +37,18 @@ namespace Process
 		}
 		return *this;
 	}
-	WindowsProcessHandle::operator bool() const noexcept { return m_handle != nullptr && m_handle != INVALID_HANDLE_VALUE; }
+
+	WindowsProcessHandle::operator bool() const noexcept
+	{
+		return m_handle != nullptr && m_handle != INVALID_HANDLE_VALUE;
+	}
+
 	void WindowsProcessHandle::Reset(HANDLE handle) noexcept
 	{
-		if (*this) { CloseHandle(m_handle); }
+		if (*this)
+		{
+			CloseHandle(m_handle);
+		}
 		m_handle = handle;
 	}
 
@@ -48,7 +68,6 @@ namespace Process
 		return result;
 	}
 
-
 	std::string WideToUtf8(std::wstring_view text)
 	{
 		if (text.empty())
@@ -65,7 +84,6 @@ namespace Process
 		return result;
 	}
 
-
 	static std::wstring BuildCommandLine(const Process::ChildProcessRequest& request)
 	{
 		std::string commandLine = CommandLine::QuotePath(request.ExecutablePath);
@@ -76,7 +94,6 @@ namespace Process
 		}
 		return Utf8ToWide(commandLine);
 	}
-
 
 	static std::vector<wchar_t> BuildEnvironment(const std::vector<Process::EnvironmentOverride>& overrides)
 	{
@@ -118,7 +135,6 @@ namespace Process
 		return block;
 	}
 
-
 	std::string FormatWindowsProcessError(DWORD code)
 	{
 		LPWSTR raw = nullptr;
@@ -142,7 +158,6 @@ namespace Process
 		return message;
 	}
 
-
 	static Process::ChildProcessStartFailure ClassifyStartFailure(DWORD code) noexcept
 	{
 		switch (code)
@@ -160,13 +175,11 @@ namespace Process
 		}
 	}
 
-
 	void TerminateOwnedWindowsProcess(const WindowsOwnedProcess& process) noexcept
 	{
 		TerminateJobObject(process.Job.Get(), 1);
 		WaitForSingleObject(process.Process.Get(), ProcessTerminationTimeoutMilliseconds);
 	}
-
 
 	bool PrepareChildProcessLogDirectory(const std::filesystem::path& logPath, ChildProcessResult& result)
 	{

@@ -281,7 +281,7 @@ FR-02 implements transactional stage/verify/archive and package-relative discove
 
 Deliver self-service onboarding, diagnostics and recovery. **No user support service** is offered; [Release Scope](../../../Acceptance/FirstRelease.md#approval-and-next-work) owns that decision.
 
-Package and native-incident acceptance remain open.
+Package and aggregate product acceptance remain open; exact-archive native incident results are in the [product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
 
 ### Current Local Route
 
@@ -295,10 +295,10 @@ BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,Revi
 | GPU faults | D3D12 resource service drains supported bounded DRED records into logs; Vulkan records device loss. No automatic recovery. |
 | Export | Local fixed projection of verified package identity and counts; preview digest binds consent. Originals stay local. [User command and privacy limits](../../../../SUPPORT.md#preview-and-export-local-diagnostics). |
 | Symbols | Shipping MSVC emits `/Zi`/full PDBs into the separate symbol root. DbgHelp checks PE/PDB GUID-age; embedded paths are excluded. Archive-to-companion hashes and native source attribution are separate checks. |
-| Crash/hang | User-reported categories; automatic collection unavailable. Native incident rehearsal remains required. |
+| Crash/hang | User-reported categories; ordinary automatic collection unavailable. Archive-bound native D3D12 removal/manual recovery has supporting proof in the product reports. |
 | Review | Pawel Lisowski owns release review; the author or agent may execute it and must name the actual reviewer. Unresolved S0/S1 blocks approval. Local review, publication and aggregate acceptance are separate. |
 
-Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply. Exact-archive interrupted-extraction rejection and actual distinct-version startup/rollback now have [supporting proof](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); PD-3 and native incident acceptance remain open. No public replacement or withdrawal was performed.
+Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply. Exact-archive interrupted-extraction rejection, distinct-version startup/rollback and supported native/manual diagnostics have [supporting proof](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); final acceptance waits for PD-3. No public replacement or withdrawal was performed.
 
 Invoke `ReviewRelease.ps1` with `-PackageRoot`, `-ArchivePath`, `-ArchiveSha256`, `-LedgerPath`, `-Reviewer` (the actual author/agent), `-Decision Approve|Replace|Withdraw` and an existing local `-OutputDirectory`. Replacement also needs `-ReplacementRoot`, `-ReplacementArchive`, `-ReplacementSha256`, `-ReplacementLedgerPath` and a state policy.
 

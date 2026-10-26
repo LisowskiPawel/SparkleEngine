@@ -66,6 +66,26 @@ Producer builds temporary files -> `Files::FilePublication` groups temporary/fin
 
 Static `ConsoleVariable<T>` construction registers with the singleton registry -> command-line or console host resolves the name -> string parsing mutates the typed value -> Application/Renderer/RHI reads it at its chosen boundary. Core provides no persistence, range schema, restart policy, or UI ownership; those remain with the consumer.
 
+Console ownership reconciled on 2026-10-26: `CVarControl.cpp` sequences batch
+resolution/validation, assignment and result collection; private
+`CVarControlOperations.cpp` owns those mechanisms and preserves validation of
+the whole batch before mutation. `RegisterConsoleBuiltinCommands` declares the
+four built-ins in `ConsoleBuiltinCommands.cpp`; their execution, completion and
+output formatting live in private `ConsoleBuiltinCommandOperations.cpp`.
+
+### Child-process execution
+
+`Process::RunChildProcess` is the direct process contract used by tool and host
+clients. `ChildProcess.cpp` selects the platform route and
+`ChildProcessWindows.cpp` selects captured completion or readiness. Private
+`ChildProcessWindowsLaunch.cpp` owns Windows handle lifetime, command/environment
+lowering, suspended launch and job ownership; `ChildProcessWindowsOutput.cpp`
+owns pipe setup and output draining; `ChildProcessWindowsReadiness.cpp` owns the
+durable readiness channel, validation and ownership transfer. The wait loops
+remain cohesive state machines, with cancellation callbacks destroyed before
+their event handles. This 2026-10-26 source decomposition preserves the result
+contract and does not qualify package launch or clean-machine behavior.
+
 ### Logging category ownership
 
 A receiver declares a stable category with `SPARKLE_DEFINE_LOG_CATEGORY_STATIC`

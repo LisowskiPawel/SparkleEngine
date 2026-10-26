@@ -184,22 +184,24 @@ namespace Filesystem
 		return entry.empty() ? std::nullopt : std::make_optional(entry);
 	}
 
-	static bool MatchesPackageFileIdentity(const std::filesystem::path& path, std::string_view entry)
+	static std::optional<std::filesystem::path> ResolveVerifiedPackageFile(const std::filesystem::path& packageRoot, const std::filesystem::path& relative, std::string_view entry)
 	{
 		std::uint64_t size = 0u;
 		std::string expectedHash;
 		if (!Json::TryReadUInt64Property(entry, "Size", size) || !Json::TryReadStringProperty(entry, "Sha256", expectedHash))
 		{
-			return false;
+			return std::nullopt;
 		}
+		const auto path = Paths::Normalize(packageRoot / relative);
 		std::error_code errorCode;
 		Hash::Sha256Digest hash;
 		std::string failure;
-		if (std::filesystem::file_size(path, errorCode) != size || errorCode || !Hash::TrySha256File(path, hash, failure) || Hash::Sha256ToHex(hash) != expectedHash)
+		if (!Paths::IsUnderRoot(path, packageRoot) || std::filesystem::file_size(path, errorCode) != size || errorCode || !Hash::TrySha256File(path, hash, failure)
+		    || Hash::Sha256ToHex(hash) != expectedHash)
 		{
-			return false;
+			return std::nullopt;
 		}
-		return true;
+		return path;
 	}
 
 	std::optional<std::filesystem::path> ResolvePackageFilePath(const std::filesystem::path& packageRoot, std::string_view relativePath, std::string_view manifest)
@@ -223,8 +225,7 @@ namespace Filesystem
 		{
 			return std::nullopt;
 		}
-		const auto path = Paths::Normalize(packageRoot / *relative);
-		return Paths::IsUnderRoot(path, packageRoot) && MatchesPackageFileIdentity(path, *entry) ? std::make_optional(path) : std::nullopt;
+		return ResolveVerifiedPackageFile(packageRoot, *relative, *entry);
 	}
 
 	static std::optional<std::string> FindPackageProductPath(std::string_view manifest, std::string_view target, std::string_view configuration)
