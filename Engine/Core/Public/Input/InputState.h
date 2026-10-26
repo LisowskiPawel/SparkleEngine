@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <array>
 #include <cstdint>
+#include <span>
 
 class InputSystem;
 
@@ -91,6 +92,8 @@ private:
 	void SetCursorHidden(bool bHidden) noexcept;
 
 	void BeginFrame() noexcept;
+	static void AdvanceButtonStates(std::span<ButtonState> states) noexcept;
+	void ResetFrameDeltas() noexcept;
 
 	static constexpr std::size_t KeyCount = static_cast<std::size_t>(Key::Count);
 

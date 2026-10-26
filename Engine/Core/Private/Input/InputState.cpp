@@ -175,7 +175,14 @@ void InputState::SetCursorHidden(bool bHidden) noexcept
 
 void InputState::BeginFrame() noexcept
 {
-	for (auto& state : m_KeyStates)
+	AdvanceButtonStates(m_KeyStates);
+	AdvanceButtonStates(m_MouseButtonStates);
+	ResetFrameDeltas();
+}
+
+void InputState::AdvanceButtonStates(std::span<ButtonState> states) noexcept
+{
+	for (ButtonState& state : states)
 	{
 		if (state == ButtonState::Pressed)
 		{
@@ -186,19 +193,10 @@ void InputState::BeginFrame() noexcept
 			state = ButtonState::Up;
 		}
 	}
+}
 
-	for (auto& state : m_MouseButtonStates)
-	{
-		if (state == ButtonState::Pressed)
-		{
-			state = ButtonState::Held;
-		}
-		else if (state == ButtonState::Released)
-		{
-			state = ButtonState::Up;
-		}
-	}
-
+void InputState::ResetFrameDeltas() noexcept
+{
 	m_MouseDeltaX = 0;
 	m_MouseDeltaY = 0;
 	m_WheelDelta = 0.0f;

@@ -95,11 +95,27 @@ through that category and do not cache `shared_ptr<spdlog::logger>` instances or
 create registry entries. `SparkleCore` alone owns lazy category resolution,
 registry synchronization, sinks, levels, and logger lifetime. This keeps the
 frontend declarative while preserving one backend policy and one creation path.
-Logger bootstrap follows `Logger -> LogPathPolicy -> stateless user-state and
-filesystem discovery`. The policy must not call logging or aggregate path
+Logger initialization sequences private `LoggerBootstrap` operations for
+configured severity and sink construction before registering and publishing the
+core logger. Formatting, rotating-file creation and Windows debugger output
+remain with that bootstrap implementation, which writes the registry's active
+file path through a reference and retains no registry state.
+Bootstrap follows `Logger -> LoggerBootstrap -> LogPathPolicy -> stateless
+user-state and filesystem discovery`. The bootstrap and path policy must not
+call the logger registry or aggregate path
 getters; the public `Paths::LogFile` function delegates to the same policy. This
 allows aggregate path initialization to report diagnostics without re-entering
-itself. `architecture_boundary_check` rejects dependency reversals.
+itself. These private boundaries were reconciled on 2026-10-26;
+`architecture_boundary_check` rejects dependency reversals.
+
+### Input frame state
+
+Platform's `InputSystem` advances its system and layer states through
+`InputState::BeginFrame`. Core sequences keyboard advancement, mouse-button
+advancement and transient-delta reset; both device families use the same private
+button-transition operation over borrowed spans. Position, modifiers, capture
+and cursor state persist across this boundary. This 2026-10-26 decomposition
+adds no input policy or state ownership to Core.
 
 ### Workspace-derived paths
 

@@ -198,13 +198,23 @@ function(sparkle_boundary_scan_file absolute_path)
 				"${_line}")
 		endif()
 
-		if(_relative_path STREQUAL "Engine/Core/Private/Diagnostics/Logger.cpp" AND
+		if(_relative_path MATCHES "^Engine/Core/Private/Diagnostics/(Logger|LoggerBootstrap)[.](cpp|h)$" AND
 		   _line MATCHES "AssetPathState|Core/Public/(FileSystemUtils|Paths/DirectoryPaths)|GetProductUserStatePaths|Paths::LogFile")
 			sparkle_boundary_append_failure(
 				"LOGGING_BOOTSTRAP_USES_STATELESS_PATH_POLICY"
 				"${_relative_path}"
 				"${_line_number}"
 				"Logger bootstrap depends only on the private stateless log-path policy; aggregate path state can emit diagnostics while it initializes."
+				"${_line}")
+		endif()
+
+		if(_relative_path MATCHES "^Engine/Core/Private/Diagnostics/LoggerBootstrap[.](cpp|h)$" AND
+		   _line MATCHES "Diagnostics/Logger[.]h|Get(CoreLogger|Logger|ActiveLogFilePath)[(]|Logging::Initialize")
+			sparkle_boundary_append_failure(
+				"LOGGING_BOOTSTRAP_REMAINS_REGISTRY_INDEPENDENT"
+				"${_relative_path}"
+				"${_line_number}"
+				"Sink and initial-level setup must not re-enter the logger registry while initialization holds its lock."
 				"${_line}")
 		endif()
 
