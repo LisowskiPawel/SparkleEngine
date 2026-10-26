@@ -16,7 +16,7 @@ namespace SparkleLauncher
 {
 	Process::ChildProcessResult NativeProcessRunner::Run(const Process::ChildProcessRequest& request)
 	{
-		return Process::ChildProcess::Run(request);
+		return Process::RunChildProcess(request);
 	}
 
 	void AppendProcessOutputCallback(Process::ChildProcessRequest& request, Process::ChildProcessOutputCallback callback)

@@ -6,10 +6,10 @@
   #include "Process/ChildProcessWindows.h"
 #endif
 
-Process::ChildProcessResult Process::ChildProcess::Run(const ChildProcessRequest& request)
+Process::ChildProcessResult Process::RunChildProcess(const ChildProcessRequest& request)
 {
 #if defined(_WIN32)
-	return Detail::RunWindowsChildProcess(request);
+	return RunWindowsChildProcess(request);
 #else
 	ChildProcessResult result;
 	result.FailureReason = "Child process execution is not implemented for this platform.";

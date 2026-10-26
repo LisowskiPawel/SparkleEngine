@@ -13,12 +13,10 @@ namespace Filesystem
 		return Private::ResolveContainedPackageDirectory(packageRoot, "ProjectPath");
 	}
 
-
 	std::optional<std::filesystem::path> DiscoverPackageEngineRoot(const std::filesystem::path& packageRoot)
 	{
 		return Private::ResolveContainedPackageDirectory(packageRoot, "EnginePath");
 	}
-
 
 	std::optional<std::filesystem::path> ResolvePackageContentRoot(const std::filesystem::path& packageRoot)
 	{
@@ -37,7 +35,6 @@ namespace Filesystem
 		const std::filesystem::path result = Paths::Normalize(userStateRoot / *relative);
 		return Paths::IsUnderRoot(result, userStateRoot) ? std::optional(result) : std::nullopt;
 	}
-
 
 	std::optional<std::filesystem::path> ResolvePackageSourceRoot(const std::filesystem::path& packageRoot)
 	{

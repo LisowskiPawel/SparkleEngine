@@ -35,8 +35,7 @@ namespace Filesystem
 			return std::nullopt;
 		}
 		const auto productDirectory = executableDirectory.parent_path();
-		if (productDirectory.filename() == "Binaries"
-		    && (productDirectory.parent_path().parent_path().filename() == "Projects" || productDirectory.parent_path().parent_path().filename() == "Tools"))
+		if (productDirectory.filename() == "Binaries" && (productDirectory.parent_path().parent_path().filename() == "Projects" || productDirectory.parent_path().parent_path().filename() == "Tools"))
 		{
 			return Paths::Normalize(productDirectory.parent_path().parent_path().parent_path());
 		}

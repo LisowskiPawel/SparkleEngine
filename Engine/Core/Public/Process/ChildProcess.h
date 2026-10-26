@@ -64,11 +64,5 @@ namespace Process
 		bool Succeeded() const noexcept { return Launched && !Cancelled && (Ready || ExitCode == 0) && FailureReason.empty(); }
 	};
 
-	class SPARKLE_CORE_API ChildProcess final
-	{
-	public:
-		ChildProcess() = delete;
-
-		static ChildProcessResult Run(const ChildProcessRequest& request);
-	};
+	SPARKLE_CORE_API ChildProcessResult RunChildProcess(const ChildProcessRequest& request);
 }

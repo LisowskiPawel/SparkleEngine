@@ -167,7 +167,7 @@ ShaderCompilerProcessResult ShaderCompilerProcess::RunCommand(const std::filesys
 
 	result.CommandLine = BuildDisplayCommand(executablePath, arguments);
 
-	result.Execution = Process::ChildProcess::Run(Process::ChildProcessRequest{.ExecutablePath = executablePath, .Arguments = std::move(arguments), .WorkingDirectory = workingDirectory});
+	result.Execution = Process::RunChildProcess(Process::ChildProcessRequest{.ExecutablePath = executablePath, .Arguments = std::move(arguments), .WorkingDirectory = workingDirectory});
 
 	return result;
 }

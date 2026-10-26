@@ -16,7 +16,7 @@
 #include <vector>
 
 #if defined(_WIN32)
-#include <Windows.h>
+  #include <Windows.h>
 #endif
 
 namespace Filesystem::Private
@@ -45,7 +45,6 @@ namespace Filesystem::Private
 		return false;
 	}
 
-
 	static std::optional<std::filesystem::path> ParsePackageRelativePath(std::string_view relative)
 	{
 		if (relative.empty() || relative.find_first_of("\\:") != std::string_view::npos || relative.find("//") != std::string_view::npos || relative.front() == '/' || relative.back() == '/'
@@ -72,14 +71,12 @@ namespace Filesystem::Private
 		return path;
 	}
 
-
 	std::optional<std::filesystem::path> ReadPackageRelativePath(const std::filesystem::path& packageRoot, std::string_view property)
 	{
 		std::string document;
 		std::string relative;
 		return TryReadPackageManifest(packageRoot, document) && Json::TryReadStringProperty(document, property, relative) ? ParsePackageRelativePath(relative) : std::nullopt;
 	}
-
 
 	std::optional<std::filesystem::path> ResolveContainedPackageDirectory(const std::filesystem::path& packageRoot, std::string_view property)
 	{
@@ -115,7 +112,6 @@ namespace Filesystem
 		std::string failure;
 		return !errorCode && size <= 16u * 1024u * 1024u && Files::TryReadAllText(manifestPath, outDocument, failure);
 	}
-
 
 	static bool ValidatePackageFileEntry(const std::filesystem::path& packageRoot, std::string_view file, std::string& outErrorMessage)
 	{
@@ -161,7 +157,6 @@ namespace Filesystem
 		return true;
 	}
 
-
 	static std::optional<std::string_view> FindPackageFileEntry(std::string_view manifest, std::string_view relativePath)
 	{
 		std::vector<std::string_view> files;
@@ -200,8 +195,7 @@ namespace Filesystem
 		std::error_code errorCode;
 		Hash::Sha256Digest hash;
 		std::string failure;
-		if (std::filesystem::file_size(path, errorCode) != size || errorCode || !Hash::TrySha256File(path, hash, failure)
-		    || Hash::Sha256ToHex(hash) != expectedHash)
+		if (std::filesystem::file_size(path, errorCode) != size || errorCode || !Hash::TrySha256File(path, hash, failure) || Hash::Sha256ToHex(hash) != expectedHash)
 		{
 			return false;
 		}

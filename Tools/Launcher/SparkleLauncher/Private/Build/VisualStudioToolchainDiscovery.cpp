@@ -107,7 +107,7 @@ namespace SparkleLauncher
 			return std::nullopt;
 		}
 
-		const Process::ChildProcessResult result = Process::ChildProcess::Run(
+		const Process::ChildProcessResult result = Process::RunChildProcess(
 		    Process::ChildProcessRequest{
 		        .ExecutablePath = vswherePath,
 		        .Arguments = {"-latest", "-products", "*", "-requires", "Microsoft.VisualStudio.Component.VC.Tools.x86.x64", "-property", "installationPath"},

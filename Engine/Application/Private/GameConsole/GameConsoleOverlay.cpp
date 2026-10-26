@@ -13,7 +13,7 @@
 
 GameConsoleOverlay::GameConsoleOverlay(CVarControlExecutor executor)
 {
-	ConsoleBuiltinCommands::Register(m_commandRegistry, std::move(executor));
+	RegisterConsoleBuiltinCommands(m_commandRegistry, std::move(executor));
 	m_consoleSession = std::make_unique<ConsoleSession>(m_commandRegistry, ConsoleCommandScope::Game);
 	m_consoleSession->AddOutput(ConsoleCommandSeverity::Info, "Game console ready. Press tilde to close.");
 }

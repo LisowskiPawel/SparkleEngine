@@ -28,7 +28,7 @@ public:
 EditorConsoleSystem::EditorConsoleSystem(CVarControlExecutor executor)
 {
 	m_commandRegistry = std::make_unique<ConsoleCommandRegistry>();
-	ConsoleBuiltinCommands::Register(*m_commandRegistry, std::move(executor));
+	RegisterConsoleBuiltinCommands(*m_commandRegistry, std::move(executor));
 	m_session = std::make_unique<ConsoleSession>(*m_commandRegistry, ConsoleCommandScope::Editor);
 	m_consolePanel = std::make_unique<EditorConsolePanel>(*m_session);
 }

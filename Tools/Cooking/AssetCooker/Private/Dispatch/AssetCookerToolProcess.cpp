@@ -11,7 +11,7 @@ int AssetCookerToolProcess::Run(const std::filesystem::path& executablePath, con
 {
 	SPARKLE_DEFINE_LOG_CATEGORY_STATIC(toolProcessLogger, "Tools.AssetCooker.Process");
 
-	Process::ChildProcessResult result = Process::ChildProcess::Run(
+	Process::ChildProcessResult result = Process::RunChildProcess(
 	    Process::ChildProcessRequest{
 	        .ExecutablePath = executablePath,
 	        .Arguments = arguments,
