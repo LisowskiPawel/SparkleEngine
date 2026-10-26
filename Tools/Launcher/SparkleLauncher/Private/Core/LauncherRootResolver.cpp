@@ -17,6 +17,10 @@ namespace SparkleLauncher
 				outErrorMessage = "An installed Launcher cannot select another workspace with --root.";
 				return std::nullopt;
 			}
+			if (!Filesystem::ValidatePackageFiles(root, outErrorMessage))
+			{
+				return std::nullopt;
+			}
 			const auto project = Filesystem::DiscoverPackageProjectRoot(root);
 			const auto engine = Filesystem::DiscoverPackageEngineRoot(root);
 			if (!project || !engine || !Filesystem::ResolvePackageContentRoot(root))

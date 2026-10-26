@@ -11,6 +11,8 @@ namespace Filesystem
 {
 	SPARKLE_CORE_API std::optional<std::filesystem::path> DiscoverPackageRoot(const std::filesystem::path& startPath = {});
 	SPARKLE_CORE_API bool TryReadPackageManifest(const std::filesystem::path& packageRoot, std::string& outDocument);
+	// Presence and containment only; stage/archive verification owns payload identity.
+	SPARKLE_CORE_API bool ValidatePackageFiles(const std::filesystem::path& packageRoot, std::string& outErrorMessage);
 	SPARKLE_CORE_API std::optional<std::filesystem::path> DiscoverPackageProjectRoot(const std::filesystem::path& packageRoot);
 	SPARKLE_CORE_API std::optional<std::filesystem::path> DiscoverPackageEngineRoot(const std::filesystem::path& packageRoot);
 	SPARKLE_CORE_API std::optional<std::filesystem::path> ResolvePackageContentRoot(const std::filesystem::path& packageRoot);

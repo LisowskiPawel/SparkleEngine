@@ -85,6 +85,18 @@ itself. `architecture_boundary_check` rejects dependency reversals.
 
 Executable/current directory and markers -> workspace/project discovery -> `ConfigureProjectRoot` publishes the active project -> typed getters derive Engine/Project/cooked paths -> runtime/tools open those products. This is a vital package risk because a successful workspace path does not prove operation outside the repository.
 
+Path ownership reconciled on 2026-10-26: `Private/Paths/AssetPathState.cpp`
+owns the cached state's initialization and rebuild order. `AssetPathRoots.cpp`
+discovers its roots, `AssetPathLayout.cpp` builds typed/cooked layouts and
+materializes output directories, and `AssetPathValidation.cpp` checks the
+configured paths. `AssetPathResolution.cpp` owns asset search precedence and
+candidate lookup. Package discovery lives in `PackageDiscovery.cpp`, directory
+resolution in `PackagePaths.cpp`, and manifest parsing, path safety, file
+presence/identity checks and product lookup in `PackageManifest.cpp`. Bootstrap
+logging still uses stateless discovery and user-state paths without entering
+the aggregate state. These are private source boundaries; public path contracts
+and the package qualification limits above remain unchanged.
+
 ## Explicit Non-Capabilities And Risks
 
 - No networking, sockets, plugin loader, reflection/type system, general archive/container format, database, allocator framework, or cross-platform process implementation was found in this module.

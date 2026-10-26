@@ -42,4 +42,9 @@ namespace Filesystem::Private
 
 	AssetPathState& GetAssetPathState();
 	void RebuildProjectPaths(AssetPathState& state);
+	void DiscoverAssetPathRoots(AssetPathState& state);
+	void RebuildCookedPaths(AssetPathState& state);
+	void RebuildTypedPaths(AssetPathState& state);
+	void MaterializeOutputDirectories(const AssetPathState& state);
+	void ValidateConfiguredPaths(const AssetPathState& state);
 }

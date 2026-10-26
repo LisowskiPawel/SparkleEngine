@@ -12,7 +12,6 @@
 #include <string>
 #include <string_view>
 #include <system_error>
-#include <utility>
 
 namespace Paths::Private
 {
@@ -37,12 +36,9 @@ namespace Paths::Private
 		return logDirectory;
 	}
 
-	std::filesystem::path ResolveBootstrapLogFile(std::string_view configuredFile, LogParentDirectoryPolicy parentDirectoryPolicy)
+	static std::filesystem::path ResolveConfiguredLogFile(const std::filesystem::path& logsRoot, std::string_view configuredFile)
 	{
-		const Filesystem::ProductUserStatePaths userState = Filesystem::Private::ResolveCurrentProductUserStatePaths();
-		const std::filesystem::path& logsRoot = userState.LogsRoot;
 		std::filesystem::path configuredPath{std::string(configuredFile)};
-		std::filesystem::path logPath;
 		if (!configuredPath.empty())
 		{
 			if (!configuredPath.is_absolute())
@@ -51,20 +47,31 @@ namespace Paths::Private
 			}
 			if (Paths::IsUnderRoot(configuredPath, logsRoot))
 			{
-				logPath = std::move(configuredPath);
+				return configuredPath;
 			}
 		}
+		return {};
+	}
 
+	static void EnsureLogParentDirectory(const std::filesystem::path& logPath)
+	{
+		std::error_code errorCode;
+		std::filesystem::create_directories(logPath.parent_path(), errorCode);
+	}
+
+	std::filesystem::path ResolveBootstrapLogFile(std::string_view configuredFile, LogParentDirectoryPolicy parentDirectoryPolicy)
+	{
+		const Filesystem::ProductUserStatePaths userState = Filesystem::Private::ResolveCurrentProductUserStatePaths();
+		std::filesystem::path logPath = ResolveConfiguredLogFile(userState.LogsRoot, configuredFile);
 		if (logPath.empty())
 		{
 			const std::string executableStem = PathFormatting::SanitizePathSegment(Filesystem::Private::GetExecutableStem());
-			logPath = DefaultLogDirectory(logsRoot, executableStem) / PathFormatting::TimestampedFileName(executableStem, ".log");
+			logPath = DefaultLogDirectory(userState.LogsRoot, executableStem) / PathFormatting::TimestampedFileName(executableStem, ".log");
 		}
 
 		if (parentDirectoryPolicy == LogParentDirectoryPolicy::EnsureExists)
 		{
-			std::error_code errorCode;
-			std::filesystem::create_directories(logPath.parent_path(), errorCode);
+			EnsureLogParentDirectory(logPath);
 		}
 		return logPath;
 	}

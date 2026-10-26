@@ -3,11 +3,11 @@
 #include "Paths/FileSystemDiscovery.h"
 
 #include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/PackagePaths.h"
 #include "Core/Public/Paths/PathFormatting.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "Core/Public/Strings/StringUtils.h"
 
-#include <cctype>
 #include <string_view>
 #include <system_error>
 #include <utility>
@@ -44,7 +44,7 @@ namespace Filesystem::Private
 		return executableStem;
 	}
 
-	std::optional<std::filesystem::path> DiscoverWorkspaceProjectRoot()
+	static std::optional<std::filesystem::path> DiscoverWorkspaceProjectRoot()
 	{
 		const auto workspaceRoot = Filesystem::DiscoverWorkspaceRoot();
 		if (!workspaceRoot)
@@ -157,35 +157,33 @@ namespace Filesystem
 		return std::nullopt;
 	}
 
-	std::optional<std::filesystem::path> DiscoverWorkspaceRoot()
+	static std::optional<std::filesystem::path> FindProcessAncestorWithMarker(std::string_view marker)
 	{
-		if (const auto executableRoot = FindAncestorWithMarker(GetExecutableDirectory(), kWorkspaceMarker))
+		if (const auto executableRoot = FindAncestorWithMarker(GetExecutableDirectory(), marker))
 		{
 			return Paths::Normalize(*executableRoot);
 		}
 
 		std::error_code errorCode;
-		if (const auto workingRoot = FindAncestorWithMarker(std::filesystem::current_path(errorCode), kWorkspaceMarker); workingRoot && !errorCode)
+		if (const auto workingRoot = FindAncestorWithMarker(std::filesystem::current_path(errorCode), marker); workingRoot && !errorCode)
 		{
 			return Paths::Normalize(*workingRoot);
 		}
-
 		return std::nullopt;
+	}
+
+	std::optional<std::filesystem::path> DiscoverWorkspaceRoot()
+	{
+		return FindProcessAncestorWithMarker(kWorkspaceMarker);
 	}
 
 	std::optional<std::filesystem::path> DiscoverEngineRoot()
 	{
-		if (const auto executableRoot = FindAncestorWithMarker(GetExecutableDirectory(), kEngineMarker))
+		if (const auto processRoot = FindProcessAncestorWithMarker(kEngineMarker))
 		{
-			return Paths::Normalize(*executableRoot);
+			return processRoot;
 		}
-
 		std::error_code errorCode;
-		if (const auto workingRoot = FindAncestorWithMarker(std::filesystem::current_path(errorCode), kEngineMarker); workingRoot && !errorCode)
-		{
-			return Paths::Normalize(*workingRoot);
-		}
-
 		if (const auto workspaceRoot = DiscoverWorkspaceRoot())
 		{
 			const std::filesystem::path enginePath = *workspaceRoot / "engine";
@@ -203,17 +201,10 @@ namespace Filesystem
 		{
 			return ResolvePackageSourceRoot(*package);
 		}
-		if (const auto executableRoot = FindAncestorWithMarker(GetExecutableDirectory(), kProjectMarker))
+		if (const auto processRoot = FindProcessAncestorWithMarker(kProjectMarker))
 		{
-			return Paths::Normalize(*executableRoot);
+			return processRoot;
 		}
-
-		std::error_code errorCode;
-		if (const auto workingRoot = FindAncestorWithMarker(std::filesystem::current_path(errorCode), kProjectMarker); workingRoot && !errorCode)
-		{
-			return Paths::Normalize(*workingRoot);
-		}
-
 		if (const auto workspaceProjectRoot = Private::DiscoverWorkspaceProjectRoot())
 		{
 			return Paths::Normalize(*workspaceProjectRoot);

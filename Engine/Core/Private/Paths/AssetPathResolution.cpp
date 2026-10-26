@@ -11,10 +11,9 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogCoreFileSystem, "Core.FileSystem");
 
-class AssetPathSearch final
+namespace Filesystem
 {
-public:
-	static std::optional<std::filesystem::path> TryResolveIn(const std::filesystem::path& searchDirectory, const std::filesystem::path& relativePath, AssetType type)
+	static std::optional<std::filesystem::path> TryResolveAssetInDirectory(const std::filesystem::path& searchDirectory, const std::filesystem::path& relativePath, AssetType type)
 	{
 		if (searchDirectory.empty())
 		{
@@ -39,10 +38,7 @@ public:
 		}
 		return std::nullopt;
 	}
-};
 
-namespace Filesystem
-{
 	const std::filesystem::path& GetTypedPath(AssetType type, PathRoot root) noexcept
 	{
 		Private::AssetPathState& state = Private::GetAssetPathState();
@@ -106,16 +102,16 @@ namespace Filesystem
 		Private::AssetPathState& state = Private::GetAssetPathState();
 		if (type == AssetType::Texture && Strings::EqualsIgnoreCase(inputPath.extension().string(), ".stex"))
 		{
-			if (const auto cookedPath = AssetPathSearch::TryResolveIn(state.cookedAssetRootPath, inputPath, type))
+			if (const auto cookedPath = TryResolveAssetInDirectory(state.cookedAssetRootPath, inputPath, type))
 			{
 				return cookedPath;
 			}
 		}
-		if (const auto projectPath = AssetPathSearch::TryResolveIn(state.projectAssetsPath, inputPath, type))
+		if (const auto projectPath = TryResolveAssetInDirectory(state.projectAssetsPath, inputPath, type))
 		{
 			return projectPath;
 		}
-		return AssetPathSearch::TryResolveIn(state.engineAssetsPath, inputPath, type);
+		return TryResolveAssetInDirectory(state.engineAssetsPath, inputPath, type);
 	}
 
 	std::filesystem::path ResolveAssetPathValidated(const std::filesystem::path& inputPath, AssetType type)
