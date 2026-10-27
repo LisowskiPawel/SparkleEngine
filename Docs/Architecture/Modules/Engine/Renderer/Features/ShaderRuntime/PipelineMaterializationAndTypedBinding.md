@@ -6,7 +6,7 @@
 
 **Parameter-model source update:** 2026-10-06; this update does not establish native binding or output acceptance.
 
-**Verified:** 2026-09-06 through committed `master` revision `c28b33bd`; current parameter, pipeline, shader-generation, CMake, and RHI service routes inspected; executable source is unchanged from the earlier `8414b5dc` audit
+**Verified:** original source audit 2026-09-06 through committed `master` revision `c28b33bd`; ray-tracing materialization ownership reconciled 2026-10-27 against the working tree based on `186f7a16`. This bounded update does not requalify the full feature matrix.
 
 **Scope:** `REN-PIPE-01` through `REN-PIPE-05` and retained identity `REN-DIAG-08`; owns the bridge from registered typed pass contracts and cooked shader metadata to binding layouts, graphics/compute/ray pipelines, per-pass bindings, runtime caches, and completion-safe shader-generation replacement
 
@@ -69,6 +69,8 @@ Missing bindings, incompatible value kinds, attachment-as-SRV misuse, wrong arra
 `BuildShaderPipelineParameterLayout` is the canonical multi-program layout operation; the single-program helper uses it. Field validation and merging stay in the layout implementation, while `GetDefaultShaderVisibility` owns default stage visibility. There is no second namespaced build entry point. Layout ordering, visibility unions, packed-value metadata and signatures retain their existing contract.
 
 ## Runtime Materialization Matrix
+
+`RayTracingPipelineRuntime.cpp` sequences readiness, shader resolution, pipeline creation and generic/scene-plan table selection. `RayTracingPipelineMaterialization.cpp` owns first-occurrence shader selection, cooked-map resolution, capability validation, global bindings and pipeline descriptor construction. `RayTracingShaderTableMaterialization.cpp` owns opaque/alpha-tested record selection, local-data/signature mapping and table descriptor construction. The existing runtime retains resolved shader storage, binding layout, pipeline and generation; export pointers borrow its reserved shader storage. Record vectors remain temporary inputs to RHI creation. This separation does not establish native pipeline, shader-table, GPU output or reload acceptance.
 
 | Pipeline kind | Key/materialization input | Current cache/lifetime behavior |
 | --- | --- | --- |
@@ -139,6 +141,7 @@ Primary evidence destination: `REN-E31` in the [Capability Evidence Plan](../../
 - [`PipelineRuntimeLibrary.cpp`](../../../../../../../Engine/Renderer/Private/PipelineRuntime/PipelineRuntimeLibrary.cpp)
 - [`GraphicsPipelineMaterialization.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/GraphicsPipelineMaterialization.cpp)
 - [`RayTracingPipelineRuntime.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/RayTracingPipelineRuntime.cpp)
+- [`RayTracingPipelineMaterialization.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/RayTracingPipelineMaterialization.cpp) and [`RayTracingShaderTableMaterialization.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/RayTracingShaderTableMaterialization.cpp)
 - [`PassBinder.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/PassBinder.cpp) and [`PassBindingOperations.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/PassBindingOperations.cpp)
 - [`PassParameterSet.cpp`](../../../../../../../Engine/Renderer/Private/ShaderParameters/PassParameterSet.cpp)
 - [`CMakeLists.txt`](../../../../../../../Engine/Renderer/CMakeLists.txt)

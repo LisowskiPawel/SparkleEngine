@@ -131,8 +131,7 @@ void SceneOutlinerPanel::BuildSkySection() noexcept
 		return;
 	}
 
-	const std::vector<EditorSceneEntry> skyEntries{m_model->GetSkyEntry()};
-	DrawEntrySection("Sky", "Sky", "", skyEntries);
+	DrawEntrySection("Sky", "Sky", "", std::span(&m_model->GetSkyEntry(), 1));
 }
 
 void SceneOutlinerPanel::BuildMeshSection() noexcept
@@ -145,7 +144,7 @@ void SceneOutlinerPanel::BuildMeshSection() noexcept
 	DrawEntrySection("Meshes", "Meshes", "No meshes in scene", m_model->GetMeshEntries());
 }
 
-void SceneOutlinerPanel::DrawEntrySection(const char* id, const char* label, const char* emptyText, const std::vector<EditorSceneEntry>& entries) noexcept
+void SceneOutlinerPanel::DrawEntrySection(const char* id, const char* label, const char* emptyText, std::span<const EditorSceneEntry> entries) noexcept
 {
 	bool open = true;
 	DrawSectionRow(id, label, entries.size(), open);
@@ -160,7 +159,7 @@ void SceneOutlinerPanel::DrawEntrySection(const char* id, const char* label, con
 
 		for (const EditorSceneEntry& entry : entries)
 		{
-			if (PassesActiveFilter(entry.Selection) && MatchesSearch(entry.Label.c_str(), entry.TypeLabel.c_str()))
+			if (MatchesFilter(entry))
 			{
 				DrawSelectionEntry(entry.Label.c_str(), entry.TypeLabel.c_str(), entry.Selection);
 			}
@@ -184,21 +183,22 @@ bool SceneOutlinerPanel::PassesActiveFilter(const SceneObjectSelection& selectio
 	}
 }
 
-bool SceneOutlinerPanel::MatchesSearch(const char* label, const char* typeLabel) const noexcept
+bool SceneOutlinerPanel::MatchesFilter(const EditorSceneEntry& entry) const noexcept
 {
-	return m_filterText.empty() || Strings::ContainsIgnoreCase(label, m_filterText) || Strings::ContainsIgnoreCase(typeLabel, m_filterText);
+	return PassesActiveFilter(entry.Selection)
+	    && (m_filterText.empty() || Strings::ContainsIgnoreCase(entry.Label.c_str(), m_filterText) || Strings::ContainsIgnoreCase(entry.TypeLabel.c_str(), m_filterText));
 }
 
 std::size_t SceneOutlinerPanel::CountVisibleEntries() const noexcept
 {
 	std::size_t count = 0;
 
-	const auto countVisible = [this](const std::vector<EditorSceneEntry>& entries) noexcept
+	const auto countVisible = [this](std::span<const EditorSceneEntry> entries) noexcept
 	{
 		std::size_t visibleCount = 0;
 		for (const EditorSceneEntry& entry : entries)
 		{
-			if (PassesActiveFilter(entry.Selection) && MatchesSearch(entry.Label.c_str(), entry.TypeLabel.c_str()))
+			if (MatchesFilter(entry))
 			{
 				++visibleCount;
 			}
@@ -212,7 +212,7 @@ std::size_t SceneOutlinerPanel::CountVisibleEntries() const noexcept
 	}
 	count += countVisible(m_model->GetCameraEntries());
 	const EditorSceneEntry& sky = m_model->GetSkyEntry();
-	if (PassesActiveFilter(sky.Selection) && MatchesSearch(sky.Label.c_str(), sky.TypeLabel.c_str()))
+	if (MatchesFilter(sky))
 	{
 		++count;
 	}
@@ -352,7 +352,7 @@ void SceneOutlinerPanel::DrawSelectionEntry(const char* label, const char* typeL
 	ImGui::PopID();
 }
 
-void SceneOutlinerPanel::BuildUI(bool disableInteraction)
+void SceneOutlinerPanel::BeginWindow() noexcept
 {
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -370,17 +370,10 @@ void SceneOutlinerPanel::BuildUI(bool disableInteraction)
 	ImGui::PopStyleVar();
 
 	m_widthPixels = ImGui::GetWindowWidth();
-	UiUtil::DrawPanelHeader("Scene", "Outliner");
+}
 
-	if (!m_model || m_selection == nullptr)
-	{
-		ImGui::TextDisabled("Scene outliner unavailable");
-		ImGui::End();
-		return;
-	}
-	EnsureValidSelection();
-	ImGui::BeginDisabled(disableInteraction);
-	BuildToolbar();
+void SceneOutlinerPanel::BuildSceneTable() noexcept
+{
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
@@ -403,6 +396,24 @@ void SceneOutlinerPanel::BuildUI(bool disableInteraction)
 		ImGui::EndTable();
 	}
 	ImGui::PopStyleVar();
+}
+
+void SceneOutlinerPanel::BuildUI(bool disableInteraction)
+{
+	BeginWindow();
+	UiUtil::DrawPanelHeader("Scene", "Outliner");
+
+	if (!m_model || m_selection == nullptr)
+	{
+		ImGui::TextDisabled("Scene outliner unavailable");
+		ImGui::End();
+		return;
+	}
+
+	EnsureValidSelection();
+	ImGui::BeginDisabled(disableInteraction);
+	BuildToolbar();
+	BuildSceneTable();
 	BuildFooter();
 	ImGui::EndDisabled();
 

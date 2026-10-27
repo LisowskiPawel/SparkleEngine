@@ -4,8 +4,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <string>
-#include <vector>
 
 class EditorSceneModel;
 class EditorTransactionHistory;
@@ -35,7 +35,9 @@ public:
 	void BuildUI(bool disableInteraction = false);
 
 private:
+	void BeginWindow() noexcept;
 	void BuildToolbar() noexcept;
+	void BuildSceneTable() noexcept;
 	void BuildFooter() noexcept;
 	bool IsSelectionValid() const noexcept;
 	void EnsureValidSelection() noexcept;
@@ -43,9 +45,9 @@ private:
 	void BuildSkySection() noexcept;
 	void BuildLightSection() noexcept;
 	void BuildMeshSection() noexcept;
-	void DrawEntrySection(const char* id, const char* label, const char* emptyText, const std::vector<EditorSceneEntry>& entries) noexcept;
+	void DrawEntrySection(const char* id, const char* label, const char* emptyText, std::span<const EditorSceneEntry> entries) noexcept;
 	bool PassesActiveFilter(const SceneObjectSelection& selection) const noexcept;
-	bool MatchesSearch(const char* label, const char* typeLabel) const noexcept;
+	bool MatchesFilter(const EditorSceneEntry& entry) const noexcept;
 	std::size_t CountVisibleEntries() const noexcept;
 	bool IsEntryVisible(const SceneObjectSelection& selection) const noexcept;
 	void ToggleEntryVisibility(const SceneObjectSelection& selection) noexcept;

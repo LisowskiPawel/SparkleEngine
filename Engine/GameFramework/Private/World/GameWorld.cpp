@@ -1,19 +1,15 @@
 #include "PCH.h"
 #include "World/GameWorld.h"
 
-#include "Assets/SceneAssetPayload.h"
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
 #include "GameFramework/Public/Rendering/RenderFrameSubmission.h"
 #include "GameFramework/Public/Scene/Camera/CameraNavigation.h"
-#include "GameFramework/Public/Scene/Camera/SceneCameraEntry.h"
-#include "GameFramework/Public/Scene/Lighting/SceneLightDesc.h"
 #include "GameFramework/Public/Scene/Materials/MaterialVariant.h"
-#include "GameFramework/Public/World/SkyEnvironment.h"
 #include "GameFramework/Public/World/WorldChange.h"
 #include "GameFramework/Public/World/WorldEditCommand.h"
 #include "GameFramework/Public/World/WorldMaterialVariantView.h"
-#include "World/GameWorldSceneAssetCommitter.h"
+#include "World/SceneLoadWorldStaging.h"
 #include "Level/LevelDesc.h"
 #include "World/GameWorldState.h"
 #include "World/Extraction/RenderFrameSubmissionExtractor.h"
@@ -25,7 +21,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <optional>
 #include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_gameWorldLogger, "GameFramework.GameWorld");
@@ -45,38 +40,7 @@ void GameWorld::InitializeStagedLevel(const LevelDesc& desc)
 {
 	m_activeLevelName = desc.name;
 	m_activeLevelDesc = desc;
-	if (m_state->GetCameraCount() == 0)
-	{
-		SceneCameraEntry entry;
-		entry.name = "Scene Camera";
-		entry.desc = desc.cameraDesc;
-		if (!m_state->AddCamera(std::move(entry), true).IsValid())
-		{
-			Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "The staged world rejected its level camera.");
-		}
-	}
-	else
-	{
-		if (!m_state->WriteCameraDesc(m_state->GetActiveCamera(), desc.cameraDesc))
-		{
-			Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "The staged world could not update its active camera.");
-		}
-	}
-	if (desc.sky)
-	{
-		m_state->WriteSkyEnvironment(*desc.sky);
-	}
-	else
-	{
-		m_state->RemoveSkyEnvironment();
-	}
-	for (const SceneLightDesc& light : desc.lights)
-	{
-		if (!m_state->AddLight(SceneLightDesc(light)).IsValid())
-		{
-			Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "The staged world rejected a level light.");
-		}
-	}
+	InitializeSceneLoadLevel(*m_state, desc);
 }
 
 void GameWorld::Update(float deltaSeconds)
@@ -123,54 +87,12 @@ void GameWorld::PublishCameraInputIntent(const CameraInputIntent& intent) noexce
 
 void GameWorld::CommitSceneLoadPackage(Assets::SceneLoadPackage package)
 {
-	std::size_t expectedEntityCount = 1 + package.Level.lights.size();
-	for (const SceneAssetPayload& payload : package.AssetPayloads)
-	{
-		expectedEntityCount += payload.animations.size() + payload.staticMeshInstances.size() + payload.skeletalMeshInstances.size() + payload.cameras.size() + payload.lights.size();
-	}
-	if (package.Entities.size() != expectedEntityCount)
-	{
-		Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "Scene load blueprint count does not match the entity construction records.");
-	}
+	ValidateSceneLoadEntityCount(package);
 
 	GameWorld stagedWorld(m_taskExecutor);
 	stagedWorld.InitializeStagedLevel(package.Level);
 
-	GameWorldSceneAssetCommitter committer(*stagedWorld.m_state, *stagedWorld.m_resources);
-	for (SceneAssetPayload& payload : package.AssetPayloads)
-	{
-		committer.Commit(std::move(payload));
-	}
-	EntityId selectedCamera;
-	for (std::size_t index = 1; index < stagedWorld.m_state->GetCameraCount(); ++index)
-	{
-		const std::optional<SceneCameraEntry> camera = stagedWorld.m_state->ReadCamera(stagedWorld.m_state->GetCameraEntity(index));
-		if (!camera)
-		{
-			Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "The staged world could not read an enumerated camera.");
-		}
-		if (camera->IsPerspective())
-		{
-			selectedCamera = stagedWorld.m_state->GetCameraEntity(index);
-			break;
-		}
-	}
-	if (!selectedCamera.IsValid() && stagedWorld.m_state->GetCameraCount() != 0)
-	{
-		selectedCamera = stagedWorld.m_state->GetCameraEntity(0);
-	}
-	if (selectedCamera.IsValid() && !stagedWorld.m_state->SetActiveCamera(selectedCamera))
-	{
-		Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "The staged world could not activate its selected camera.");
-	}
-	if (!stagedWorld.m_state->PrepareSystemResources(*stagedWorld.m_resources))
-	{
-		Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "Staged world could not resolve animation targets and output slots.");
-	}
-	if (stagedWorld.m_state->GetEntityCount() != package.Entities.size())
-	{
-		Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "Staged world entity count does not match the validated blueprint package.");
-	}
+	PopulateStagedScene(*stagedWorld.m_state, *stagedWorld.m_resources, package);
 
 	m_state.swap(stagedWorld.m_state);
 	m_resources.swap(stagedWorld.m_resources);

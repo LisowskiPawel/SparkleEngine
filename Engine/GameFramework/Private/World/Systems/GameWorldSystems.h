@@ -6,12 +6,15 @@
 #include "World/Systems/Execution/SimulationSystemExecution.h"
 #include "World/Systems/Execution/TransformSystemExecution.h"
 
+#include <cstdint>
+
 class GameWorldResourceStores;
 class TaskExecutor;
 
 namespace ECS
 {
 	class CompiledGameSystemGraph;
+	struct GameSystemDesc;
 	CompiledGameSystemGraph BuildGameWorldSystemGraph();
 
 	class GameWorldState;
@@ -30,6 +33,18 @@ namespace ECS
 		static CompiledGameSystemGraph BuildGraph();
 
 	private:
+		static GameSystemDesc DescribeCameraMovement();
+		static GameSystemDesc DescribeAnimationPlayback();
+		static GameSystemDesc DescribeAnimationPoseEvaluation(std::uint32_t playbackIndex);
+		static GameSystemDesc DescribeMorphWeightEvaluation(std::uint32_t playbackIndex);
+		static GameSystemDesc DescribeSkinningEvaluation(std::uint32_t poseIndex);
+		static GameSystemDesc DescribeMorphOutputCommit(std::uint32_t morphIndex);
+		static GameSystemDesc DescribeSystemOutputCommit(std::uint32_t skinningIndex, std::uint32_t morphCommitIndex);
+		static GameSystemDesc DescribeTransformEvaluation();
+		static GameSystemDesc DescribeCameraDerivedState(std::uint32_t transformIndex);
+		static GameSystemDesc DescribeMeshExtraction();
+		static GameSystemDesc DescribeExtractionCommit(std::uint32_t extractionIndex);
+
 		SimulationSystemExecution m_simulation;
 		AnimationSystemExecution m_animation;
 		TransformSystemExecution m_transform;

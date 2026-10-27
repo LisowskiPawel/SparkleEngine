@@ -8,9 +8,11 @@
 
 struct SceneLightDesc;
 struct SceneObjectSelection;
+class EditorSceneModel;
 
 namespace SceneObjectPresentation
 {
+	void DrawSelectionHeader(const EditorSceneModel* model, const SceneObjectSelection* selection) noexcept;
 	UiUtil::EditorIcon GetLightIcon(SceneLightKind kind) noexcept;
 	const char* GetLightTypeLabel(SceneLightKind kind) noexcept;
 	std::string BuildLightLabel(const SceneLightDesc& light, std::size_t lightIndex);

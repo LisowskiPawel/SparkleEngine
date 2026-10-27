@@ -2,7 +2,6 @@
 
 #include "Core/Public/Console/CVarControl.h"
 
-#include <memory>
 #include <string>
 #include <string_view>
 
@@ -30,7 +29,10 @@ public:
 
 private:
 	void DrawLevelName(std::string_view levelName, bool compact) const noexcept;
-	void DrawViewModeSelector(bool disableInteraction, bool compact) noexcept;
+	bool BeginToolbarWindow() noexcept;
+	void DrawToolbarContents(std::string_view levelName, bool disableInteraction) noexcept;
+	void DrawToolbarBorder() const noexcept;
+	void EndToolbarWindow() const noexcept;
 	void DrawCameraControls(bool disableInteraction, bool compact) noexcept;
 	void DrawFrameStats() const noexcept;
 

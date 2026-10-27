@@ -14,43 +14,50 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_sceneAssetCommitterLogger, "GameFramework.SceneAssetCommitter");
 
-GameWorldSceneAssetCommitter::GameWorldSceneAssetCommitter(ECS::GameWorldState& world, GameWorldResourceStores& resources) noexcept :
-    m_state(world),
-    m_resources(resources)
-{
-}
-
-void GameWorldSceneAssetCommitter::Commit(SceneAssetPayload&& sceneAssetPayload)
+static void ValidatePayloadContents(const SceneAssetPayload& sceneAssetPayload)
 {
 	if (!sceneAssetPayload.HasMeshes() && sceneAssetPayload.cameras.empty() && sceneAssetPayload.lights.empty() && sceneAssetPayload.skeletons.empty() && sceneAssetPayload.animations.empty()
 	    && sceneAssetPayload.materials.empty() && sceneAssetPayload.materialVariants.empty())
 	{
 		Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "A validated scene asset payload contains no resources or entities.");
 	}
-	const bool hasSkeletons = !sceneAssetPayload.skeletons.empty();
-	const bool hasMaterials = !sceneAssetPayload.materials.empty();
+}
 
+static void AppendAnimationResources(ECS::GameWorldState& state, GameWorldResourceStores& resources, SceneAssetPayload& sceneAssetPayload)
+{
 	if (!sceneAssetPayload.skeletons.empty())
 	{
-		m_resources.Skeletons.Append(std::move(sceneAssetPayload.skeletons));
+		resources.Skeletons.Append(std::move(sceneAssetPayload.skeletons));
 	}
 	if (!sceneAssetPayload.animations.empty())
 	{
-		m_state.AppendAnimationClips(std::move(sceneAssetPayload.animations), m_resources.AnimationClips, sceneAssetPayload.authoredInstanceId);
+		state.AppendAnimationClips(std::move(sceneAssetPayload.animations), resources.AnimationClips, sceneAssetPayload.authoredInstanceId);
 	}
+}
+
+static MaterialHandle AppendMaterials(GameWorldResourceStores& resources, SceneAssetPayload& sceneAssetPayload)
+{
 	if (!sceneAssetPayload.materials.empty())
 	{
-		m_resources.Textures.AppendMaterialReferences(sceneAssetPayload.materials);
+		resources.Textures.AppendMaterialReferences(sceneAssetPayload.materials);
 	}
 
-	const MaterialHandle materialBaseHandle = sceneAssetPayload.materials.empty() ? MaterialHandle::Invalid() : m_resources.Materials.Append(std::move(sceneAssetPayload.materials));
-	const auto sceneMeshBaseIndex = static_cast<SceneMeshInstanceIndex>(m_state.GetMeshCount());
-	const auto sceneGroupBaseIndex = static_cast<SceneMeshInstanceGroupIndex>(m_state.GetMeshInstanceGroupCount());
+	return sceneAssetPayload.materials.empty() ? MaterialHandle::Invalid() : resources.Materials.Append(std::move(sceneAssetPayload.materials));
+}
 
-	std::vector<ECS::SceneMeshInstanceData> meshInstances = SceneAssetMeshInstanceBuilder::BuildInstances(sceneAssetPayload, m_resources.Materials, materialBaseHandle, sceneGroupBaseIndex);
+static void AppendMeshes(
+    ECS::GameWorldState& state,
+    MaterialResourceStore& materials,
+    SceneAssetPayload& sceneAssetPayload,
+    MaterialHandle materialBaseHandle,
+    SceneMeshInstanceIndex sceneMeshBaseIndex)
+{
+	const auto sceneGroupBaseIndex = static_cast<SceneMeshInstanceGroupIndex>(state.GetMeshInstanceGroupCount());
+
+	std::vector<ECS::SceneMeshInstanceData> meshInstances = SceneAssetMeshInstanceBuilder::BuildInstances(sceneAssetPayload, materials, materialBaseHandle, sceneGroupBaseIndex);
 	for (const ECS::SceneMeshInstanceData& meshInstance : meshInstances)
 	{
-		if (!m_resources.Materials.Contains(meshInstance.Material))
+		if (!materials.Contains(meshInstance.Material))
 		{
 			Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "A validated mesh instance resolved an absent material.");
 		}
@@ -58,43 +65,73 @@ void GameWorldSceneAssetCommitter::Commit(SceneAssetPayload&& sceneAssetPayload)
 
 	for (ECS::SceneMeshInstanceData& meshInstance : meshInstances)
 	{
-		if (!m_state.AddMesh(std::move(meshInstance)).IsValid())
+		if (!state.AddMesh(std::move(meshInstance)).IsValid())
 		{
 			Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "The staged world rejected a mesh instance.");
 		}
 	}
 
-	m_state.AppendMeshInstanceGroups(SceneAssetMeshInstanceBuilder::BuildGroups(sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex));
+	state.AppendMeshInstanceGroups(SceneAssetMeshInstanceBuilder::BuildGroups(sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex));
+}
 
-	m_resources.MaterialVariants.Append(
+static void AppendMaterialVariants(
+    const ECS::GameWorldState& state,
+    MaterialVariantResourceStore& variants,
+    const SceneAssetPayload& sceneAssetPayload,
+    MaterialHandle materialBaseHandle,
+    SceneMeshInstanceIndex sceneMeshBaseIndex)
+{
+	variants.Append(
 	    SceneMaterialVariantTranslator::BuildDescriptions(sceneAssetPayload),
-	    SceneMaterialVariantTranslator::BuildBindings(sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex, m_state));
+	    SceneMaterialVariantTranslator::BuildBindings(sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex, state));
+}
 
+static void AppendCameras(ECS::GameWorldState& state, SceneAssetPayload& sceneAssetPayload)
+{
 	for (SceneAssetPayload::Camera& camera : sceneAssetPayload.cameras)
 	{
 		SceneCameraEntry sceneCamera;
 		sceneCamera.name = std::move(camera.name);
 		sceneCamera.desc = camera.desc;
-		if (!m_state.AddCamera(std::move(sceneCamera)).IsValid())
+		if (!state.AddCamera(std::move(sceneCamera)).IsValid())
 		{
 			Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "The staged world rejected a scene camera.");
 		}
 	}
+}
+
+static void AppendLights(ECS::GameWorldState& state, SceneAssetPayload& sceneAssetPayload)
+{
 	for (SceneLightDesc& light : sceneAssetPayload.lights)
 	{
-		if (!m_state.AddLight(std::move(light)).IsValid())
+		if (!state.AddLight(std::move(light)).IsValid())
 		{
 			Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "The staged world rejected a scene light.");
 		}
 	}
+}
+
+void CommitSceneAssetPayload(ECS::GameWorldState& state, GameWorldResourceStores& resources, SceneAssetPayload&& sceneAssetPayload)
+{
+	ValidatePayloadContents(sceneAssetPayload);
+	const bool hasSkeletons = !sceneAssetPayload.skeletons.empty();
+	const bool hasMaterials = !sceneAssetPayload.materials.empty();
+
+	AppendAnimationResources(state, resources, sceneAssetPayload);
+	const MaterialHandle materialBaseHandle = AppendMaterials(resources, sceneAssetPayload);
+	const auto sceneMeshBaseIndex = static_cast<SceneMeshInstanceIndex>(state.GetMeshCount());
+	AppendMeshes(state, resources.Materials, sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex);
+	AppendMaterialVariants(state, resources.MaterialVariants, sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex);
+	AppendCameras(state, sceneAssetPayload);
+	AppendLights(state, sceneAssetPayload);
 
 	if (hasSkeletons)
 	{
-		m_state.NotifyResourceChanged(WorldDataKind::Skeleton);
+		state.NotifyResourceChanged(WorldDataKind::Skeleton);
 	}
 	if (hasMaterials)
 	{
-		m_state.NotifyResourceChanged(WorldDataKind::Material);
-		m_state.NotifyResourceChanged(WorldDataKind::Texture);
+		state.NotifyResourceChanged(WorldDataKind::Material);
+		state.NotifyResourceChanged(WorldDataKind::Texture);
 	}
 }

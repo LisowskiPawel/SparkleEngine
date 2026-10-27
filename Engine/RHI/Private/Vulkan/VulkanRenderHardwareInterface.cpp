@@ -223,12 +223,15 @@ void VulkanRenderHardwareInterface::RebuildSwapChainBackBufferViews() noexcept
 	m_presentationService->GetImplementation().RebuildSwapChainBackBufferViews();
 }
 
-void VulkanRenderHardwareInterface::PrepareCurrentBackBufferForPresentation(VulkanRenderCommandList& commandList) noexcept
+void VulkanRenderHardwareInterface::PrepareCurrentBackBufferForPresentation() noexcept
 {
+	auto& commandList = static_cast<VulkanRenderCommandList&>(GetGraphicsCommandList(m_currentFrameIndex));
 	m_presentationService->GetImplementation().PrepareCurrentBackBufferForPresentation(commandList);
 }
 
-void VulkanRenderHardwareInterface::TransitionCurrentBackBuffer(VkCommandBuffer commandBuffer, ResourceState newState) noexcept
+void VulkanRenderHardwareInterface::PrepareAcquiredBackBuffer() noexcept
 {
-	m_presentationService->GetImplementation().TransitionCurrentBackBuffer(commandBuffer, newState);
+	// Graph imports and direct presentation share a present-ready acquired image.
+	auto& commandList = static_cast<VulkanRenderCommandList&>(GetGraphicsCommandList(m_currentFrameIndex));
+	m_presentationService->GetImplementation().TransitionCurrentBackBuffer(commandList.GetVulkanCommandBuffer(), ResourceState::Present);
 }

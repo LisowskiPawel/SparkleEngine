@@ -83,6 +83,8 @@ public:
 	void NotifyFrameLatencyMarker(ERhiFrameLatencyMarker marker, std::uint64_t frameId) noexcept;
 
 private:
+	void InitializeDebugLayer() noexcept;
+	void InitializeDeviceDiagnostics() noexcept;
 	void SelectAdapter() noexcept;
 	bool IsNvidiaAdapter() const noexcept;
 	void CreateFactory();
@@ -91,6 +93,7 @@ private:
 	void CheckRayTracingSupport() noexcept;
 	void SelectRayTracingTlasProvider() noexcept;
 	void CreateCommandQueues();
+	ComPtr<ID3D12CommandQueue> CreateInterposerGraphicsQueue() noexcept;
 	void DisableInterposer() noexcept;
 	void ShutdownInterposer() noexcept;
 

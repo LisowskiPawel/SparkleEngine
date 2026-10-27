@@ -40,9 +40,43 @@ GameFramework depends on Core and Tasks but not Platform, Renderer, or RHI. It o
 
 ### World System Scheduling
 
-Source ownership reconciled on 2026-10-06 against base revision `026a3a56` with this cleanup applied; this is structural evidence, not runtime or performance acceptance. `GameWorldSystems.cpp` declares each stage's query/resource access, prerequisites, range policy, item count, and body together. Prerequisites use indices returned by the declaration builder; there is no separate hashed system identity or per-frame binding registry.
+Source ownership reconciled on 2026-10-27. `GameWorldSystems.cpp` composes the
+eleven-stage graph in execution order and owns the frozen-epoch execution flow.
+`GameWorldSystemDeclarations.cpp` constructs each stage through a focused private
+function, keeping query/resource access, phase, prerequisites, range policy, item
+count and body together. Prerequisites use indices returned by the same graph
+builder; there is no separate hashed system identity or per-frame binding
+registry. `GameWorldSystemPreparation.cpp` implements resource admission and
+scratch sizing on the existing `GameWorldState`; execution orchestration retains
+freeze, run and success-only dirty-state clearing. Helpers retain no new state,
+descriptor copies or epoch references. This is source/build preservation evidence,
+not runtime, determinism or performance acceptance.
 
 Compilation retains phase/resource validation, write-hazard rejection, and cycle rejection, then records dependency waves. The host submits each wave through `SparkleTasks`, resolving item counts after prerequisite commits. Empty stages add no tasks; serial workloads add one task; larger stages use the shared `ParallelFor` implementation. The frozen structure epoch spans all waves and deterministic output commits. Failure stops subsequent waves and prevents successful world publication. Each wave retains one compiled Tasks graph and its item-count key; count changes replace it after the previous submission settles. Cached callbacks obtain the current frame execution owner from the typed Tasks context, never from a retained frame reference. Graph construction occurs on count changes, while host settlement remains a scheduling cost; fewer scheduled nodes alone do not establish a frame-time improvement.
+
+### Scene Activation And Read Publication
+
+Source ownership reconciled on 2026-10-27. `GameWorld::CommitSceneLoadPackage`
+orders blueprint-count validation, isolated-world construction, level
+initialization, staged population and the accepted state/resource/document swap.
+Private `World/SceneLoadWorldStaging` owns entity-count validation, authored
+camera/sky/light initialization, payload traversal, camera selection and final
+resource/entity checks. `GameWorldSceneAssetCommitter` is a file owner for the
+direct `CommitSceneAssetPayload` function; it retains no committer object or
+borrowed-reference members. Focused private functions transfer animation and
+material resources, construct mesh groups and material bindings, and add cameras
+and lights. Existing mesh and material-variant translators remain authoritative.
+LevelSession still owns request/generation admission, events and activation
+completion; it never observes a partially staged world.
+
+`GameWorldState::PublishReadView` owns snapshot allocation, generation/sequence,
+baseline-versus-incremental selection, sky capture and release publication. Its
+private baseline, change-application and entity-refresh functions own row
+construction, changed-ID deduplication and sorted erase/upsert mechanics. The
+existing shared immutable snapshot remains the only read-view publication
+boundary; helpers borrow it for one call and retain no state. These are
+source/build preservation boundaries, not runtime, task-determinism, content,
+performance or release acceptance evidence.
 
 ### Animation Sampling Ownership
 

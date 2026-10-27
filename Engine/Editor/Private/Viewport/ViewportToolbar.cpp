@@ -1,59 +1,19 @@
 #include "PCH.h"
 #include "Viewport/ViewportToolbar.h"
 
-#include "Renderer/Public/Settings/EngineRenderingSettings.h"
-#include "Renderer/Public/Viewport/RenderViewMode.h"
 #include "Style/SparkleUiPalette.h"
 #include "Util/UiUtil.h"
 #include "Viewport/ViewportCameraProperties.h"
 #include "Viewport/EditorViewportSession.h"
 #include "Viewport/ViewportShowMenu.h"
+#include "Viewport/ViewportViewModeMenu.h"
 
 #include <imgui.h>
 
 #include <algorithm>
-#include <array>
-#include <cstddef>
 #include <cstdio>
 #include <string>
 #include <string_view>
-#include <utility>
-
-struct ViewModePresentation final
-{
-	RenderViewMode Mode;
-	UiUtil::EditorIcon Icon;
-	const char* Label;
-	const char* Category;
-};
-
-static constexpr auto viewModePresentations = std::to_array<ViewModePresentation>(
-    {{RenderViewMode::Lit, UiUtil::EditorIcon::ViewLit, "Lit", ""},
-        {RenderViewMode::ReferencePathTracer, UiUtil::EditorIcon::ViewLit, "Reference Path Tracer", ""},
-        {RenderViewMode::Wireframe, UiUtil::EditorIcon::ViewMode, "Wireframe", ""},
-        {RenderViewMode::GpuSceneInstances, UiUtil::EditorIcon::ViewMode, "GPU Scene Instances", ""},
-        {RenderViewMode::GBufferDiffuse, UiUtil::EditorIcon::ViewDiffuse, "GBuffer Diffuse", "GBuffer"},
-        {RenderViewMode::GBufferWorldNormal, UiUtil::EditorIcon::ViewNormal, "GBuffer World Normal", "GBuffer"},
-        {RenderViewMode::GBufferWorldTangent, UiUtil::EditorIcon::ViewNormal, "GBuffer World Tangent", "GBuffer"},
-        {RenderViewMode::GBufferRoughness, UiUtil::EditorIcon::ViewRoughness, "GBuffer Roughness", "GBuffer"},
-        {RenderViewMode::GBufferMetallic, UiUtil::EditorIcon::ViewMetallic, "GBuffer Metallic", "GBuffer"},
-        {RenderViewMode::GBufferEmissive, UiUtil::EditorIcon::ViewEmissive, "GBuffer Emissive", "GBuffer"},
-        {RenderViewMode::GBufferAmbientOcclusion, UiUtil::EditorIcon::ViewAmbientOcclusion, "GBuffer Ambient Occlusion", "GBuffer"},
-        {RenderViewMode::GBufferSubsurfaceColor, UiUtil::EditorIcon::ViewSubsurfaceColor, "GBuffer Subsurface Color", "GBuffer"},
-        {RenderViewMode::GBufferSubsurfaceStrength, UiUtil::EditorIcon::ViewSubsurfaceStrength, "GBuffer Subsurface Strength", "GBuffer"},
-        {RenderViewMode::DirectDiffuse, UiUtil::EditorIcon::ViewDirectDiffuse, "Direct Diffuse", "Lighting"},
-        {RenderViewMode::DirectSpecular, UiUtil::EditorIcon::ViewDirectSpecular, "Direct Specular", "Lighting"},
-        {RenderViewMode::DirectSubsurface, UiUtil::EditorIcon::ViewDirectSubsurface, "Direct Subsurface", "Lighting"},
-        {RenderViewMode::IndirectDiffuse, UiUtil::EditorIcon::ViewDirectDiffuse, "Indirect Diffuse", "Lighting"},
-        {RenderViewMode::IndirectSpecular, UiUtil::EditorIcon::ViewDirectSpecular, "Indirect Specular", "Lighting"}});
-
-static_assert(viewModePresentations.size() == static_cast<std::size_t>(RenderViewMode::Count));
-
-static const ViewModePresentation& DescribeViewMode(RenderViewMode viewMode) noexcept
-{
-	const auto found = std::ranges::find(viewModePresentations, viewMode, &ViewModePresentation::Mode);
-	return found != viewModePresentations.end() ? *found : viewModePresentations.front();
-}
 
 ViewportToolbar::ViewportToolbar(EditorViewportSession& viewportSession, const EngineRenderingSettingsState& renderingDefaults, const CVarControlExecutor& consoleVariables) noexcept :
     m_viewportSession(viewportSession),
@@ -69,21 +29,6 @@ void ViewportToolbar::SetGeometry(float leftPixels, float topPixels, float width
 	m_leftPixels = leftPixels;
 	m_topPixels = topPixels;
 	m_widthPixels = widthPixels;
-}
-
-static void DrawViewModeOption(EditorViewportSession& viewportSession, const ViewModePresentation& option, RenderViewMode currentViewMode) noexcept
-{
-	const bool selected = option.Mode == currentViewMode;
-	const UiUtil::MenuCheckState checkState = selected ? UiUtil::MenuCheckState::Checked : UiUtil::MenuCheckState::Unchecked;
-	if (UiUtil::DrawMenuItem(option.Label, option.Icon, checkState))
-	{
-		viewportSession.SetViewMode(option.Mode);
-	}
-
-	if (selected)
-	{
-		ImGui::SetItemDefaultFocus();
-	}
 }
 
 void ViewportToolbar::DrawLevelName(std::string_view levelName, bool compact) const noexcept
@@ -103,58 +48,6 @@ void ViewportToolbar::DrawLevelName(std::string_view levelName, bool compact) co
 	ImGui::SameLine();
 	ImGui::AlignTextToFramePadding();
 	ImGui::TextUnformatted(activeLevelName.c_str());
-}
-
-void ViewportToolbar::DrawViewModeSelector(bool disableInteraction, bool compact) noexcept
-{
-	RenderViewMode currentViewMode = m_viewportSession.GetViewMode();
-	if (currentViewMode >= RenderViewMode::Count)
-	{
-		currentViewMode = RenderViewMode::Lit;
-	}
-
-	ImGui::BeginDisabled(disableInteraction);
-	const ViewModePresentation& currentPresentation = DescribeViewMode(currentViewMode);
-	const std::string previewLabel = UiUtil::MakeIconLabel(currentPresentation.Icon, currentPresentation.Label);
-	const float previewWidth = ImGui::CalcTextSize(previewLabel.c_str()).x + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.x * 2.0f;
-	ImGui::SetNextItemWidth((std::clamp) (previewWidth, 100.0f, compact ? 145.0f : 260.0f));
-	const UiUtil::MenuStyleScope menuStyle;
-	if (ImGui::BeginCombo("##ViewportViewMode", previewLabel.c_str()))
-	{
-		for (const ViewModePresentation& option : viewModePresentations)
-		{
-			if (std::string_view(option.Category).empty())
-			{
-				DrawViewModeOption(m_viewportSession, option, currentViewMode);
-			}
-		}
-		UiUtil::DrawMenuSection("VISUALIZATIONS");
-		for (const char* category : {"GBuffer", "Lighting"})
-		{
-			float childWidth = 0.0f;
-			for (const ViewModePresentation& option : viewModePresentations)
-			{
-				if (std::string_view(option.Category) == category)
-				{
-					childWidth = (std::max) (childWidth, UiUtil::MeasureMenuRow(option.Label, UiUtil::MenuRowKind::Toggle));
-				}
-			}
-			if (UiUtil::BeginMenu(category, UiUtil::EditorIcon::ViewMode, childWidth))
-			{
-				for (const ViewModePresentation& option : viewModePresentations)
-				{
-					if (std::string_view(option.Category) == category)
-					{
-						DrawViewModeOption(m_viewportSession, option, currentViewMode);
-					}
-				}
-				ImGui::EndMenu();
-			}
-		}
-
-		ImGui::EndCombo();
-	}
-	ImGui::EndDisabled();
 }
 
 void ViewportToolbar::DrawCameraControls(bool disableInteraction, bool compact) noexcept
@@ -197,15 +90,25 @@ void ViewportToolbar::DrawFrameStats() const noexcept
 
 void ViewportToolbar::Draw(std::string_view levelName, bool disableInteraction) noexcept
 {
+	if (!BeginToolbarWindow())
+	{
+		return;
+	}
+	DrawToolbarContents(levelName, disableInteraction);
+	DrawToolbarBorder();
+	EndToolbarWindow();
+}
+
+bool ViewportToolbar::BeginToolbarWindow() noexcept
+{
 	if (m_widthPixels <= 0.0f)
 	{
 		m_heightPixels = 0.0f;
-		return;
+		return false;
 	}
 
 	const ImVec2 windowPadding(10.0f, 4.0f);
 	m_heightPixels = ImGui::GetFrameHeight() + (windowPadding.y * 2.0f);
-	const bool compactToolbar = m_widthPixels < 760.0f;
 
 	ImGui::SetNextWindowPos(ImVec2(m_leftPixels, m_topPixels), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(m_widthPixels, m_heightPixels), ImGuiCond_Always);
@@ -229,11 +132,16 @@ void ViewportToolbar::Draw(std::string_view levelName, bool disableInteraction) 
 
 	if (!ImGui::Begin("Viewport Toolbar", nullptr, windowFlags))
 	{
-		ImGui::End();
-		ImGui::PopStyleColor(7);
-		ImGui::PopStyleVar(2);
-		return;
+		EndToolbarWindow();
+		return false;
 	}
+
+	return true;
+}
+
+void ViewportToolbar::DrawToolbarContents(std::string_view levelName, bool disableInteraction) noexcept
+{
+	const bool compactToolbar = m_widthPixels < 760.0f;
 
 	const bool showLevel = m_widthPixels >= 480.0f;
 	if (showLevel)
@@ -246,19 +154,25 @@ void ViewportToolbar::Draw(std::string_view levelName, bool disableInteraction) 
 	}
 	DrawCameraControls(disableInteraction, compactToolbar);
 	ImGui::SameLine();
-	DrawViewModeSelector(disableInteraction, compactToolbar);
+	DrawViewportViewModeMenu(m_viewportSession, disableInteraction, compactToolbar);
 	ImGui::SameLine();
 	DrawViewportShowMenu(&m_consoleVariables, disableInteraction, m_showControlError);
 	if (!compactToolbar)
 	{
 		DrawFrameStats();
 	}
+}
 
+void ViewportToolbar::DrawToolbarBorder() const noexcept
+{
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 	const ImVec2 windowMin = ImGui::GetWindowPos();
 	const ImVec2 windowMax(windowMin.x + ImGui::GetWindowWidth(), windowMin.y + ImGui::GetWindowHeight());
 	drawList->AddLine(ImVec2(windowMin.x, windowMax.y - 1.0f), ImVec2(windowMax.x, windowMax.y - 1.0f), SparkleUiPalette::PanelHeaderBorder(), 1.0f);
+}
 
+void ViewportToolbar::EndToolbarWindow() const noexcept
+{
 	ImGui::End();
 	ImGui::PopStyleColor(7);
 	ImGui::PopStyleVar(2);

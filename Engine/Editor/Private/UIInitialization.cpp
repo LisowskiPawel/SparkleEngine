@@ -19,12 +19,40 @@
 #include "Renderer/Public/UI/ImGuiRenderPacketBuilder.h"
 #include "Scene/Model/EditorSceneModel.h"
 #include "Scene/Model/EditorSceneModelBuilder.h"
+#include "Scene/Transactions/EditorTransactionHistory.h"
 #include "Settings/EditorRestartService.h"
 #include "Style/SparkleUiTheme.h"
 #include "Viewport/EditorViewportSession.h"
 
 #include <memory>
 #include <string>
+#include <utility>
+
+void UI::Implementation::InitializeSceneEditing(EditorHostServices& hostServices)
+{
+	m_sceneModelBuilder = std::make_unique<EditorSceneModelBuilder>(EditorSceneSource{
+	    .AcquireReadView = std::move(hostServices.AcquireWorldReadView),
+	    .ReadChanges = std::move(hostServices.ReadWorldChanges),
+	    .AcknowledgeChanges = std::move(hostServices.AcknowledgeWorldChanges),
+	    .WorldGeneration = std::move(hostServices.WorldGeneration),
+	    .MaterialVariants = std::move(hostServices.MaterialVariants)});
+
+	m_transactionHistory = std::make_unique<EditorTransactionHistory>(std::move(hostServices.SubmitWorldEdit));
+}
+
+void UI::Implementation::InitializeRenderingSettings(EditorHostServices& hostServices)
+{
+	m_renderingSettings = std::make_unique<EngineRenderingSettingsController>(
+	    std::move(hostServices.RenderingSettings),
+	    std::move(hostServices.SubmitRenderingSettings),
+	    std::move(hostServices.CaptureRenderingSettings));
+}
+
+void UI::Implementation::InitializeConsole(CVarControlExecutor&& consoleVariables)
+{
+	m_consoleVariables = std::move(consoleVariables);
+	m_editorConsoleSystem = std::make_unique<EditorConsoleSystem>(m_consoleVariables);
+}
 
 void UI::Implementation::InitializeWorkspace()
 {

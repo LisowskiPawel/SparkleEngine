@@ -74,8 +74,8 @@ private:
 	friend class VulkanInteropService;
 	friend class VulkanRenderDeviceServices;
 
-	void PrepareCurrentBackBufferForPresentation(VulkanRenderCommandList& commandList) noexcept;
-	void TransitionCurrentBackBuffer(VkCommandBuffer commandBuffer, ResourceState newState) noexcept;
+	void PrepareCurrentBackBufferForPresentation() noexcept;
+	void PrepareAcquiredBackBuffer() noexcept;
 	void SetCommandRecordingContext(VulkanCommandRecordingContext& commandRecordingContext) noexcept;
 
 	std::unique_ptr<VulkanInteropService> m_interopService;

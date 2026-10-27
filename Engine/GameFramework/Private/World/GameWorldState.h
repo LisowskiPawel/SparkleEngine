@@ -121,9 +121,14 @@ namespace ECS
 		};
 
 		void MarkTransformDirty(EntityId entity) noexcept;
+		bool PrepareSystemExecution(GameWorldResourceStores& resources);
+		void PrepareSystemArena();
 		void RecordChange(EntityId entity, WorldChangeKind kind, WorldDataKind data) noexcept;
 		void PublishPendingChanges();
 		void PublishReadView(std::span<const WorldChange> changes, WorldSequence sequence, bool fullBaseline);
+		void BuildReadViewBaseline(WorldReadView::Storage& next) const;
+		void ApplyReadViewChanges(WorldReadView::Storage& next, std::span<const WorldChange> changes) const;
+		void RefreshReadViewEntity(WorldReadView::Storage& next, EntityId entity) const;
 		WorldCameraReadData BuildCameraReadData(EntityId entity) const;
 		WorldLightReadData BuildLightReadData(EntityId entity) const;
 		WorldMeshReadData BuildMeshReadData(EntityId entity) const;

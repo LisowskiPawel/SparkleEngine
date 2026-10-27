@@ -39,6 +39,19 @@ public:
 	    const RayTracingShaderTablePlan& plan) const;
 
 private:
+	static const ShaderRegistrationDesc& GetRegistration(ShaderTypeId shaderType);
+	std::vector<RhiRayTracingShaderExportDesc> ResolveShaders(
+	    RenderHardwareInterface& renderHardwareInterface,
+	    const GlobalShaderMap& map,
+	    const CookedShaderLibrary& library,
+	    ShaderTarget target,
+	    const RayTracingPipelineComposition& composition);
+	void MaterializePipeline(RenderHardwareInterface& renderHardwareInterface, const RayTracingPipelineComposition& composition, std::span<const RhiRayTracingShaderExportDesc> exports);
+	static std::vector<RhiRayTracingHitGroupDesc> BuildHitGroups(const RayTracingPipelineComposition& composition);
+	static std::vector<const RayTracingHitGroupComposition*> CollectRecordGroups(const RayTracingPipelineComposition& composition);
+	static std::vector<const RayTracingHitGroupComposition*> ResolveSceneRecordGroups(const RayTracingPipelineComposition& composition, const RayTracingShaderTablePlan& plan);
+	static std::vector<RhiRayTracingShaderRecord> BuildShaderRecords(std::span<const ShaderTypeId> shaderTypes);
+	static std::vector<RhiRayTracingShaderRecord> BuildHitGroupRecords(std::span<const RayTracingHitGroupComposition* const> recordGroups);
 	std::unique_ptr<RayTracingShaderTable> CreateShaderTable(
 	    RenderHardwareInterface& renderHardwareInterface,
 	    const RayTracingPipelineComposition& composition,

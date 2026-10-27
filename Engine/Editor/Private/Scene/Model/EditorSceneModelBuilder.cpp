@@ -3,30 +3,26 @@
 
 #include <algorithm>
 
-class EditorSceneModelPatching final
+template <typename T> static void PatchModelEntity(std::vector<T>& destination, std::span<const T> source, EntityId entity)
 {
-public:
-	template <typename T> static void PatchEntity(std::vector<T>& destination, std::span<const T> source, EntityId entity)
+	auto destinationIterator = std::lower_bound(destination.begin(), destination.end(), entity, [](const T& value, EntityId key) { return value.Entity < key; });
+	const auto sourceIterator = std::lower_bound(source.begin(), source.end(), entity, [](const T& value, EntityId key) { return value.Entity < key; });
+	if (sourceIterator != source.end() && sourceIterator->Entity == entity)
 	{
-		auto destinationIterator = std::lower_bound(destination.begin(), destination.end(), entity, [](const T& value, EntityId key) { return value.Entity < key; });
-		const auto sourceIterator = std::lower_bound(source.begin(), source.end(), entity, [](const T& value, EntityId key) { return value.Entity < key; });
-		if (sourceIterator != source.end() && sourceIterator->Entity == entity)
+		if (destinationIterator != destination.end() && destinationIterator->Entity == entity)
 		{
-			if (destinationIterator != destination.end() && destinationIterator->Entity == entity)
-			{
-				*destinationIterator = *sourceIterator;
-			}
-			else
-			{
-				destination.insert(destinationIterator, *sourceIterator);
-			}
+			*destinationIterator = *sourceIterator;
 		}
-		else if (destinationIterator != destination.end() && destinationIterator->Entity == entity)
+		else
 		{
-			destination.erase(destinationIterator);
+			destination.insert(destinationIterator, *sourceIterator);
 		}
 	}
-};
+	else if (destinationIterator != destination.end() && destinationIterator->Entity == entity)
+	{
+		destination.erase(destinationIterator);
+	}
+}
 
 std::shared_ptr<EditorSceneModel> EditorSceneModelBuilder::BuildFull(const WorldReadView& view, std::uint64_t worldGeneration)
 {
@@ -62,9 +58,9 @@ std::shared_ptr<EditorSceneModel> EditorSceneModelBuilder::BuildIncremental(cons
 		}
 		if (change.Entity.IsValid())
 		{
-			EditorSceneModelPatching::PatchEntity(model->m_cameras, view.GetCameras(), change.Entity);
-			EditorSceneModelPatching::PatchEntity(model->m_lights, view.GetLights(), change.Entity);
-			EditorSceneModelPatching::PatchEntity(model->m_meshes, view.GetMeshes(), change.Entity);
+			PatchModelEntity(model->m_cameras, view.GetCameras(), change.Entity);
+			PatchModelEntity(model->m_lights, view.GetLights(), change.Entity);
+			PatchModelEntity(model->m_meshes, view.GetMeshes(), change.Entity);
 		}
 		refreshSky |= change.Data == WorldDataKind::SkyEnvironment;
 		refreshVariants |= change.Data == WorldDataKind::Material;

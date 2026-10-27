@@ -23,10 +23,9 @@ public:
 	void BuildUI(bool disableInteraction = false);
 
 private:
-	std::string BuildSelectionTitle() const;
-	const char* BuildSelectionSubtitle() const noexcept;
-	void BuildSelectionHeader() noexcept;
+	void BeginWindow() noexcept;
 	void BuildDetailsToolbar() noexcept;
+	void BuildInspectorTabs() noexcept;
 	void BuildSelectionInspector() noexcept;
 	void BuildEditStatus() noexcept;
 

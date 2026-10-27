@@ -182,6 +182,10 @@ A request for a supported neutral texture/subresource becomes one asynchronous r
 - The requesting Application/tool workflow retains every output path and owns image encoding plus filesystem publication. RHI requests/results never carry a codec, encoded image, destination, staging path, manifest, or written-artifact identity.
 - A post-submission native map failure now returns one terminal Failed result and retires its staging owner on both backends. Current cancellation retires after queue completion without publishing a terminal payload; cancellation-result and shutdown fault evidence remain open acceptance work.
 
+**Readback ownership reconciliation, 2026-10-27:** the working tree based on `186f7a16` keeps ticket admission, polling, cancellation, publication and shutdown settlement in `D3D12CaptureService.cpp` and `VulkanCaptureService.cpp`. Each backend's private `CaptureReadback` files define the service-owned pending storage and focused admission/layout, buffer allocation, command preparation, transition/copy/restore, submission, mapping and completion operations. The asynchronous request is retained once; returned format comes from that request rather than a second stored format field.
+
+Vulkan pending storage owns its staging buffer, memory and command pool, and releases partially created resources through its destructor. The service retains submitted storage until completion, including deferred cancellation, and waits before shutdown destruction. Failed native stages therefore unwind through the same resource owner without repeated cleanup branches. This separation does not change the destination-free public contract, supported formats, source-lifetime requirements or cancellation-result behavior, and does not establish native GPU, pixel, performance or release acceptance.
+
 ### Texture Capture: Design Decisions And Tradeoffs
 
 #### Scalar Float Readback

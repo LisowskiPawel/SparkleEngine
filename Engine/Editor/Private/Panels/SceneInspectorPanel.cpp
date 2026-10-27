@@ -26,103 +26,6 @@ SceneInspectorPanel::SceneInspectorPanel(SceneObjectSelection& selection, Editor
 {
 }
 
-std::string SceneInspectorPanel::BuildSelectionTitle() const
-{
-	if (m_selection == nullptr)
-	{
-		return "No Selection";
-	}
-
-	switch (m_selection->type)
-	{
-		case SceneObjectType::Camera:
-			if (m_model)
-			{
-				const WorldCameraReadData* camera = m_model->FindCamera(m_selection->entity);
-				return camera && !camera->Name.empty() ? camera->Name : "Camera";
-			}
-			return "Scene Camera";
-		case SceneObjectType::Light:
-			if (m_model)
-			{
-				if (const WorldLightReadData* light = m_model->FindLight(m_selection->entity))
-				{
-					return SceneObjectPresentation::BuildLightLabel(light->Description, m_selection->entity.GetSlot());
-				}
-			}
-			return "Light";
-		case SceneObjectType::Sky:
-			return "Sky";
-		case SceneObjectType::Mesh:
-			return "Mesh " + std::to_string(m_selection->entity.GetSlot() + 1u);
-		case SceneObjectType::None:
-		default:
-			return "No Selection";
-	}
-}
-
-const char* SceneInspectorPanel::BuildSelectionSubtitle() const noexcept
-{
-	if (m_selection == nullptr)
-	{
-		return "Object";
-	}
-
-	switch (m_selection->type)
-	{
-		case SceneObjectType::Camera:
-			return "Camera";
-		case SceneObjectType::Light:
-			if (m_model)
-			{
-				if (const WorldLightReadData* light = m_model->FindLight(m_selection->entity))
-				{
-					return SceneObjectPresentation::GetLightTypeLabel(light->Description.GetKind());
-				}
-			}
-			return "Light";
-		case SceneObjectType::Sky:
-			return "Sky";
-		case SceneObjectType::Mesh:
-			return "Static Mesh";
-		case SceneObjectType::None:
-		default:
-			return "Object";
-	}
-}
-
-void SceneInspectorPanel::BuildSelectionHeader() noexcept
-{
-	const std::string title = BuildSelectionTitle();
-	const char* subtitle = BuildSelectionSubtitle();
-	const EditorSceneEntry* entry = m_model && m_selection ? m_model->FindEntry(*m_selection) : nullptr;
-	const UiUtil::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(m_selection, entry ? entry->LightKind : SceneLightKind::Unknown);
-
-	constexpr float kHeaderHeight = 30.0f;
-	constexpr float kHeaderPaddingX = 8.0f;
-	const float width = ImGui::GetContentRegionAvail().x;
-	const ImVec2 start = ImGui::GetCursorScreenPos();
-	const ImVec2 end(start.x + width, start.y + kHeaderHeight);
-	ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-	drawList->AddRectFilled(start, end, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::HeaderBackgroundActive()));
-	drawList->AddRectFilled(start, ImVec2(start.x + 3.0f, end.y), ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::Accent()));
-	drawList->AddLine(ImVec2(start.x, start.y), ImVec2(end.x, start.y), UiUtil::WithAlphaU32(SparkleUiPalette::Border(), 0.52f));
-	drawList->AddLine(ImVec2(start.x, end.y - 1.0f), ImVec2(end.x, end.y - 1.0f), UiUtil::WithAlphaU32(SparkleUiPalette::Border(), 0.58f));
-
-	ImGui::InvisibleButton("##DetailsSelectionHeader", ImVec2(width, kHeaderHeight));
-
-	ImGui::SetCursorScreenPos(ImVec2(start.x + kHeaderPaddingX + 10.0f, start.y + 7.0f));
-	ImGui::TextUnformatted(UiUtil::GetEditorIconGlyph(icon));
-	ImGui::SameLine(0.0f, 8.0f);
-	ImGui::TextUnformatted(title.c_str());
-	ImGui::SameLine();
-	ImGui::TextDisabled("%s", subtitle);
-
-	ImGui::SetCursorScreenPos(ImVec2(start.x, end.y));
-	BuildDetailsToolbar();
-}
-
 void SceneInspectorPanel::BuildDetailsToolbar() noexcept
 {
 	char filterBuffer[128] = {};
@@ -161,7 +64,8 @@ void SceneInspectorPanel::SetTopInset(float topInsetPixels) noexcept
 
 void SceneInspectorPanel::BuildSelectionInspector() noexcept
 {
-	BuildSelectionHeader();
+	SceneObjectPresentation::DrawSelectionHeader(m_model.get(), m_selection);
+	BuildDetailsToolbar();
 	switch (m_selection->type)
 	{
 		case SceneObjectType::Camera:
@@ -208,7 +112,7 @@ void SceneInspectorPanel::BuildEditStatus() noexcept
 	ImGui::Separator();
 }
 
-void SceneInspectorPanel::BuildUI(bool disableInteraction)
+void SceneInspectorPanel::BeginWindow() noexcept
 {
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -226,20 +130,10 @@ void SceneInspectorPanel::BuildUI(bool disableInteraction)
 	ImGui::PopStyleVar();
 
 	m_widthPixels = ImGui::GetWindowWidth();
+}
 
-	if (!m_model || !m_transactionHistory || m_selection == nullptr)
-	{
-		ImGui::TextDisabled("Scene inspector unavailable");
-		ImGui::End();
-		return;
-	}
-
-	ImGui::BeginDisabled(disableInteraction);
-
-	constexpr float kContentPad = 8.0f;
-	ImGui::Indent(kContentPad);
-	BuildEditStatus();
-
+void SceneInspectorPanel::BuildInspectorTabs() noexcept
+{
 	constexpr ImGuiTabBarFlags kTabBarFlags = ImGuiTabBarFlags_NoCloseWithMiddleMouseButton | ImGuiTabBarFlags_FittingPolicyResizeDown;
 	if (ImGui::BeginTabBar("##InspectorTabs", kTabBarFlags))
 	{
@@ -259,6 +153,25 @@ void SceneInspectorPanel::BuildUI(bool disableInteraction)
 
 		ImGui::EndTabBar();
 	}
+}
+
+void SceneInspectorPanel::BuildUI(bool disableInteraction)
+{
+	BeginWindow();
+
+	if (!m_model || !m_transactionHistory || m_selection == nullptr)
+	{
+		ImGui::TextDisabled("Scene inspector unavailable");
+		ImGui::End();
+		return;
+	}
+
+	ImGui::BeginDisabled(disableInteraction);
+
+	constexpr float kContentPad = 8.0f;
+	ImGui::Indent(kContentPad);
+	BuildEditStatus();
+	BuildInspectorTabs();
 
 	ImGui::Unindent(kContentPad);
 

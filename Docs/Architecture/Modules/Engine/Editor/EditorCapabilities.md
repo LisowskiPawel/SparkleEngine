@@ -43,6 +43,30 @@ The Editor should expose owner commands and read models, not mutate Renderer/RHI
 - [Menu widgets](../../../../../Engine/Editor/Private/Util/UiMenuWidgets.cpp) own shared palette, font-relative metrics and semantic drawing. ImGui owns input, navigation and popup lifetime; panels retain labels, control state and commands. `MenuStyleScope` restores style on every exit.
 - The [icon service](Icons.md) owns shared image resources and per-profile admission; clients borrow drawing and own layout. `UiIconWidgets.cpp` maps `EditorIcon` glyphs and owns badge/tooltip drawing with one `EditorIconSize`.
 
+Orchestration ownership was reconciled on 2026-10-27. The UI constructor orders
+scene editing, render-packet construction, rendering settings, console, ImGui,
+workspace and subscription setup; `UIInitialization.cpp` implements host-service
+binding without changing member or teardown lifetime. `MainMenuBarPanel` composes
+menus and delegates drag regions, window buttons and glyph geometry to private
+`Panels/TitleBarWindowControls`. `ViewportToolbar::Draw` sequences window
+admission, controls, decoration and closure; private `ViewportViewModeMenu` owns
+the mode catalog, grouped rows and selection routing through the existing
+viewport session. Both toolbar exit paths restore the same window/style stack.
+The floating console reuses its existing docked-content sequence, and scene-model
+entity patching remains a file-local operation on the builder's immutable-model
+publication path. These are source/build preservation boundaries, not new
+interactive or visual acceptance evidence.
+
+The scene-panel pass on the same date keeps window geometry, outliner table setup
+and inspector tabs in focused private functions, leaving `BuildUI` to sequence
+the panel workflow. `SceneObjectPresentation` owns selection-header labels, icons
+and drawing; the inspector composes it with the search toolbar and typed object
+inspectors. Outliner rows and footer counts share one filter predicate. Section
+drawing borrows model entries through `std::span`, including the single sky row,
+without a temporary vector or entry copy. Model ownership, selection, transaction
+generation checks and public Editor contracts remain unchanged. These boundaries
+have source/build evidence only.
+
 The Console starts collapsed. Its footer button, `~` outside text input, or `Window > Console` opens and focuses it; focused `Esc` closes it without discarding scrollback/history. These are source contracts, not interactive, DPI or shutdown acceptance.
 
 Shader inspection and mesh preview source ownership was reconciled on 2026-10-25. Private `Shaders/ShaderArtifactInspection` owns selected-artifact loading, text cache invalidation, and missing-file messages; `UsedShadersPanel` retains shader selection, actions, and tabs. Private `Panels/Diagnostics/MeshPreview` owns bounds, projection, triangle traversal, and preview drawing; `UsedMeshesPanel` retains selection, preview controls, and the diagnostic-provider binding. These are source and build boundaries, not interactive or visual acceptance.

@@ -62,6 +62,9 @@ private:
 	bool IsReady() const noexcept;
 
 	void InitializeImGuiContext();
+	void InitializeSceneEditing(EditorHostServices& hostServices);
+	void InitializeRenderingSettings(EditorHostServices& hostServices);
+	void InitializeConsole(CVarControlExecutor&& consoleVariables);
 
 	void InitializeWorkspace();
 	void InitializeCorePanels();

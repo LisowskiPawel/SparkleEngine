@@ -1,4 +1,4 @@
-﻿#include "PCH.h"
+#include "PCH.h"
 #include "Panels/EditorConsolePanel.h"
 
 #include "Core/Public/Console/ConsoleOutput.h"
@@ -54,12 +54,7 @@ void EditorConsolePanel::BuildUI(bool disableInteraction)
 		return;
 	}
 
-	DrawToolbar(disableInteraction);
-	ImGui::Separator();
-	DrawScrollback();
-	ImGui::Separator();
-	DrawInputLine(disableInteraction);
-	DrawAutocompletePreview();
+	BuildContent(disableInteraction);
 	ImGui::End();
 }
 

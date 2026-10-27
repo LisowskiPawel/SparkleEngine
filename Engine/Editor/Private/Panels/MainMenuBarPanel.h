@@ -1,8 +1,5 @@
 #pragma once
 
-struct ImVec2;
-struct ImVec4;
-
 #include <functional>
 
 class LevelSession;
@@ -38,11 +35,6 @@ private:
 	void BuildHelpWindow() noexcept;
 	void BuildLevelStatus() noexcept;
 	void BuildOpenLevelMenu() noexcept;
-	void BuildWindowControls() noexcept;
-	bool DrawTitleBarButton(const char* id, const ImVec2& size, const ImVec4& baseColor, const ImVec4& hoveredColor, const ImVec4& activeColor) noexcept;
-	void DrawMinimizeIcon() const noexcept;
-	void DrawMaximizeIcon() const noexcept;
-	void DrawCloseIcon() const noexcept;
 
 	LevelSession* m_levelSession = nullptr;
 	Window* m_window = nullptr;

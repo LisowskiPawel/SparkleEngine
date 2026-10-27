@@ -94,6 +94,7 @@ Validated recorded operations become explicit ordered submissions on capable que
 - Command lists expose neutral raster, compute, copy, resource-state, diagnostic, and capability-gated ray operations.
 - Submission batches carry explicit waits and produce completion tokens. Queue availability does not prove independent hardware execution or useful overlap.
 - D3D12 command queues/fences and Vulkan queues/timeline synchronization lower the same ordering contract.
+- `VulkanRenderDeviceServices` sequences frame recording, acquisition, presentation preparation, submission, and resize. Its private `VulkanFrameSubmission` owns pending queue waits, first-graphics consumption of the acquired image's binary semaphore, presentation wait/signal packing, and completion queries. It borrows the device, swapchain, recording context, and current frame index; device services destroy it before those dependencies. `VulkanCommandRecordingContext` retains lease/slot validation and retirement, and `VulkanCommandQueue` retains native queue synchronization. This ownership was reconciled on 2026-10-27 against the working tree based on `186f7a16`; it does not prove GPU ordering or backend parity.
 - Renderer frame-graph compilation owns intended dependencies and queue choice; RHI validates and executes that plan without reconstructing render policy.
 
 ### Design Decisions And Tradeoffs
