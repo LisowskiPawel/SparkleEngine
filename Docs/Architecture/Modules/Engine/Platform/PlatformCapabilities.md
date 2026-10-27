@@ -74,6 +74,17 @@ the original pointer/modifier sampling order. Native calls, state publication,
 callback lifetime and public operations are source-preserved. This adds no
 interactive fullscreen, focus-loss or input-cancellation acceptance evidence.
 
+Pointer-control ownership reconciled on 2026-10-27: private
+`Input/Backends/Win32PointerControl` owns foreground mouse capture/release, cursor
+display-counter loops and the cursor-centering coordinate round trip. It retains
+no input state or native owner. `InputSystem` publishes logical capture/layer and
+hidden state after the same native operations, and consumes the returned client
+position for its existing last-pointer cache. Capture admission means a foreground
+target existed and the request was issued; native success/error handling remains
+unchanged. Public APIs, routing, first-move baseline policy and callback lifetime
+are preserved. This boundary has source/build evidence only; desktop pointer,
+focus-loss and capture recovery remain runtime evidence items.
+
 Win32 sends a window message -> `Window::WindowProc` exposes it through `OnWindowMessage` -> `InputSystem` calls the private `ProcessWin32InputMessage` decoder -> global state is updated -> focus router selects System/UI/Gameplay using capture state and registered rectangles -> immediate subscribers run or an event is queued -> Application calls `ProcessDeferredEvents` -> camera/editor/console consumers receive only their enabled layer.
 
 Input ownership rechecked on 2026-10-25: hosts construct `InputSystem` directly and consume its state, registration and routing operations. Dispatcher and focus-router lifetime share one private state allocation; native decoding is stateless. Backend results and the router remain Platform-private. No injected backend interface or forwarding factory remains. The window subscription is released before input state is destroyed. This source boundary does not qualify focus-loss, DPI or interactive behavior.

@@ -1,15 +1,11 @@
 #include "PCH.h"
 #include "Input/InputSystem.h"
 #include "Input/Backends/Win32InputBackend.h"
+#include "Input/Backends/Win32PointerControl.h"
 #include "Input/Dispatch/InputEventDispatcher.h"
 #include "Input/InputBackendResult.h"
 #include "Input/Routing/InputFocusRouter.h"
 #include "Window/Window.h"
-
-#ifndef WIN32_LEAN_AND_MEAN
-  #define WIN32_LEAN_AND_MEAN
-#endif
-#include <Windows.h>
 
 #include <memory>
 #include <utility>
@@ -256,10 +252,8 @@ void InputSystem::Unsubscribe(EventHandle handle)
 
 void InputSystem::CaptureMouse()
 {
-	HWND hWnd = GetForegroundWindow();
-	if (hWnd)
+	if (CaptureWin32ForegroundMouse())
 	{
-		SetCapture(hWnd);
 		m_inputState.SetMouseCaptured(true);
 		m_mouseCaptureLayer = GetActiveLayer();
 	}
@@ -267,7 +261,7 @@ void InputSystem::CaptureMouse()
 
 void InputSystem::ReleaseMouse()
 {
-	ReleaseCapture();
+	ReleaseWin32MouseCapture();
 	m_inputState.SetMouseCaptured(false);
 	m_mouseCaptureLayer = InputLayer::System;
 }
@@ -279,19 +273,13 @@ bool InputSystem::IsMouseCaptured() const noexcept
 
 void InputSystem::HideCursor()
 {
-	while (::ShowCursor(FALSE) >= 0)
-	{
-		continue;
-	}
+	HideWin32Cursor();
 	m_inputState.SetCursorHidden(true);
 }
 
 void InputSystem::ShowCursor()
 {
-	while (::ShowCursor(TRUE) < 0)
-	{
-		continue;
-	}
+	ShowWin32Cursor();
 	m_inputState.SetCursorHidden(false);
 }
 
@@ -302,24 +290,10 @@ bool InputSystem::IsCursorHidden() const noexcept
 
 void InputSystem::CenterCursor(void* windowHandle)
 {
-	HWND hWnd = static_cast<HWND>(windowHandle);
-	if (!hWnd)
+	if (const std::optional<MousePosition> center = CenterWin32Cursor(windowHandle))
 	{
-		return;
-	}
-
-	RECT rect;
-	if (GetClientRect(hWnd, &rect))
-	{
-		POINT center;
-		center.x = (rect.right - rect.left) / 2;
-		center.y = (rect.bottom - rect.top) / 2;
-		ClientToScreen(hWnd, &center);
-		SetCursorPos(center.x, center.y);
-
-		ScreenToClient(hWnd, &center);
-		m_lastMouseX = center.x;
-		m_lastMouseY = center.y;
+		m_lastMouseX = center->X;
+		m_lastMouseY = center->Y;
 	}
 }
 
