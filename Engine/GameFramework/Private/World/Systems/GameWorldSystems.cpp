@@ -9,7 +9,6 @@
 namespace ECS
 {
 
-
 	GameWorldSystemExecution::GameWorldSystemExecution(GameWorldState& state, const GameWorldSystemExecutionContext& context, const StructureFrozenEpoch& epoch) :
 	    m_simulation(state, context.Camera, epoch),
 	    m_animation(state, context.Resources, context.Camera.DeltaSeconds, epoch),

@@ -49,6 +49,11 @@ private:
 	static constexpr std::uint32_t WorkRowsPerDispatch = 32u;
 
 	void Update(const RenderFrame& frame, ViewportRenderAction action, std::uint64_t actionSequence, RayTracingExecutionFrontend executionFrontend) noexcept;
+	bool SelectViewport(const RenderView& view, std::uint64_t actionSequence) noexcept;
+	void ApplyPendingTransfer(const RenderView& view) noexcept;
+	bool AdmitViewport(const RenderView& view) noexcept;
+	bool ActivateViewport(const RenderFrame& frame, RayTracingExecutionFrontend executionFrontend) noexcept;
+	void PrepareFrameWork(RenderViewportExtent extent) noexcept;
 	void ReserveGraphResources(FrameGraphBuilder& builder, RenderViewportExtent extent);
 
 	const ReferencePathTracerGraphResources& GetGraphResources() const noexcept { return m_resources.GetGraphResources(); }
@@ -76,6 +81,7 @@ private:
 	void ApplyAction(ViewportRenderAction action, std::uint64_t actionSequence, const RenderView& view) noexcept;
 	void Suspend() noexcept;
 	void FinalizeSuspension() noexcept;
+	void ReleaseRetainedIdentity() noexcept;
 	ViewportRenderProgress GetProgress() const noexcept;
 	RenderProductSamplePrefix GetRadianceSamplePrefix() const noexcept;
 

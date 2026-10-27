@@ -302,6 +302,8 @@ Persistent accumulators bind their actual frame-boundary state, not the interior
 
 ## State And Lifetime
 
+**Scoped source ownership update, 2026-10-27:** in the working tree based on `186f7a16`, `ReferencePathTracerSession.cpp` sequences completed work, viewport selection/actions, pending transfer, ownership admission, identity activation and frame-work preparation. `ReferencePathTracerSessionState.cpp` owns availability, identity/reset, action, transfer and suspension/retention transitions; its one retained-identity release operation serves both suspension paths. `ReferencePathTracerSessionWork.cpp` owns row-work construction, submission/completion bookkeeping, progress and sample-prefix projection. The existing session remains the sole state owner and retains `ReferencePathTracerResources`; no public API, state mirror or separate feature loop is added. This is a CPU ownership refactor, with no change to estimator validity, native resource policy or the unresolved invalid-sample and GPU evidence boundaries above.
+
 ```mermaid
 stateDiagram-v2
     [*] --> Inactive
