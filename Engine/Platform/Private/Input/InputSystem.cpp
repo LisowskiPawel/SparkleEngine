@@ -91,20 +91,7 @@ bool InputSystem::OnWindowMessage(uint32_t message, uintptr_t parameter1, intptr
 	}
 	if (result.Type == InputEventType::MouseMove)
 	{
-		int32_t deltaX = 0;
-		int32_t deltaY = 0;
-
-		if (m_hasLastMousePosition)
-		{
-			deltaX = result.MouseMove.Position.X - m_lastMouseX;
-			deltaY = result.MouseMove.Position.Y - m_lastMouseY;
-		}
-
-		m_lastMouseX = result.MouseMove.Position.X;
-		m_lastMouseY = result.MouseMove.Position.Y;
-		m_hasLastMousePosition = true;
-		result.MouseMove.Delta.X = deltaX;
-		result.MouseMove.Delta.Y = deltaY;
+		UpdateMouseMoveDelta(result.MouseMove);
 	}
 
 	const InputLayer targetLayer = ResolveTargetLayer(result);
@@ -113,6 +100,29 @@ bool InputSystem::OnWindowMessage(uint32_t message, uintptr_t parameter1, intptr
 		SetActiveLayer(targetLayer);
 	}
 
+	return DispatchInputEvent(result, targetLayer);
+}
+
+void InputSystem::UpdateMouseMoveDelta(MouseMoveEvent& event) noexcept
+{
+	int32_t deltaX = 0;
+	int32_t deltaY = 0;
+
+	if (m_hasLastMousePosition)
+	{
+		deltaX = event.Position.X - m_lastMouseX;
+		deltaY = event.Position.Y - m_lastMouseY;
+	}
+
+	m_lastMouseX = event.Position.X;
+	m_lastMouseY = event.Position.Y;
+	m_hasLastMousePosition = true;
+	event.Delta.X = deltaX;
+	event.Delta.Y = deltaY;
+}
+
+bool InputSystem::DispatchInputEvent(const InputBackendResult& result, InputLayer targetLayer)
+{
 	switch (result.Type)
 	{
 		case InputEventType::Keyboard:
@@ -349,6 +359,14 @@ void InputSystem::CancelLayer(InputLayer layer)
 	}
 
 	InputState& state = m_layerStates[layerIndex];
+	ReleaseLayerKeys(state, layer);
+	ReleaseLayerMouseButtons(state, layer);
+
+	state = InputState{};
+}
+
+void InputSystem::ReleaseLayerKeys(InputState& state, InputLayer layer)
+{
 	for (std::size_t keyIndex = 0; keyIndex < InputState::KeyCount; ++keyIndex)
 	{
 		const ButtonState keyState = state.m_KeyStates[keyIndex];
@@ -364,7 +382,10 @@ void InputSystem::CancelLayer(InputLayer layer)
 		state.SetKeyState(releaseEvent.KeyCode, ButtonState::Released);
 		m_dispatch->EventDispatcher.DispatchImmediate(releaseEvent, layer, m_layerEnabled);
 	}
+}
 
+void InputSystem::ReleaseLayerMouseButtons(InputState& state, InputLayer layer)
+{
 	const MousePosition mousePosition = state.GetMousePosition();
 	for (std::size_t buttonIndex = 0; buttonIndex < InputState::MouseButtonCount; ++buttonIndex)
 	{
@@ -382,8 +403,6 @@ void InputSystem::CancelLayer(InputLayer layer)
 		state.SetMouseButtonState(releaseEvent.Button, ButtonState::Released);
 		m_dispatch->EventDispatcher.DispatchImmediate(releaseEvent, layer, m_layerEnabled);
 	}
-
-	state = InputState{};
 }
 
 template <typename TEvent> void InputSystem::ProcessEvent(const TEvent& event, InputLayer TargetLayer)

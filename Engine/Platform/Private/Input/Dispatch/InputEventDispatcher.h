@@ -3,8 +3,6 @@
 #include "Input/InputSystem.h"
 
 #include <cstddef>
-#include <type_traits>
-#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <tuple>
@@ -25,20 +23,7 @@ public:
 		return handle;
 	}
 
-	void Unsubscribe(EventHandle handle)
-	{
-		if (!handle.IsValid())
-		{
-			return;
-		}
-
-		auto removeByHandle = [&handle](auto& callbacks)
-		{
-			callbacks.erase(std::remove_if(callbacks.begin(), callbacks.end(), [&handle](const auto& entry) { return entry.Handle == handle; }), callbacks.end());
-		};
-
-		std::apply([&removeByHandle](auto&... callbacks) { (removeByHandle(callbacks), ...); }, m_callbacks);
-	}
+	void Unsubscribe(EventHandle handle);
 
 	template <typename TEvent> void DispatchImmediate(const TEvent& event, InputLayer targetLayer, const LayerAvailability& layerAvailability)
 	{
@@ -81,13 +66,7 @@ public:
 		m_isProcessingDeferredEvents = false;
 	}
 
-	void ClearDeferredEvents()
-	{
-		GetDeferredQueue<KeyboardEvent>().clear();
-		GetDeferredQueue<MouseButtonEvent>().clear();
-		GetDeferredQueue<MouseMoveEvent>().clear();
-		GetDeferredQueue<MouseWheelEvent>().clear();
-	}
+	void ClearDeferredEvents();
 
 private:
 	template <typename TEvent> struct CallbackEntry final
@@ -113,20 +92,7 @@ private:
 	    std::vector<RoutedInputEvent<MouseMoveEvent>>,
 	    std::vector<RoutedInputEvent<MouseWheelEvent>>>;
 
-	static bool ShouldDispatchToLayer(InputLayer registeredLayer, InputLayer targetLayer, const LayerAvailability& layerAvailability) noexcept
-	{
-		if (registeredLayer == InputLayer::System)
-		{
-			return true;
-		}
-		if (registeredLayer != targetLayer)
-		{
-			return false;
-		}
-
-		const auto index = static_cast<std::size_t>(registeredLayer);
-		return index < layerAvailability.size() && layerAvailability[index];
-	}
+	static bool ShouldDispatchToLayer(InputLayer registeredLayer, InputLayer targetLayer, const LayerAvailability& layerAvailability) noexcept;
 
 	template <typename TEvent> std::vector<CallbackEntry<TEvent>>& GetCallbacks() { return std::get<std::vector<CallbackEntry<TEvent>>>(m_callbacks); }
 

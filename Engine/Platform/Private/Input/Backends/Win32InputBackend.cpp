@@ -286,6 +286,43 @@ static ModifierFlags GetCurrentModifiers() noexcept
 	return flags;
 }
 
+static void DecodeKeyboardEvent(InputBackendResult& result, WPARAM virtualKey, LPARAM keyFlags, bool pressed)
+{
+	result.Type = InputEventType::Keyboard;
+	result.Keyboard.KeyCode = TranslateVirtualKey(virtualKey);
+	result.Keyboard.bPressed = pressed;
+	result.Keyboard.bRepeat = pressed && (keyFlags & 0x40000000) != 0;
+	result.Keyboard.Modifiers = GetCurrentModifiers();
+}
+
+static void DecodeMouseButtonEvent(InputBackendResult& result, MouseButton button, bool pressed, LPARAM position)
+{
+	result.Type = InputEventType::MouseButton;
+	result.MouseButton.Button = button;
+	result.MouseButton.bPressed = pressed;
+	result.MouseButton.Position.X = GET_X_LPARAM(position);
+	result.MouseButton.Position.Y = GET_Y_LPARAM(position);
+	result.MouseButton.Modifiers = GetCurrentModifiers();
+}
+
+static void DecodeMouseMoveEvent(InputBackendResult& result, LPARAM position)
+{
+	result.Type = InputEventType::MouseMove;
+	result.MouseMove.Position.X = GET_X_LPARAM(position);
+	result.MouseMove.Position.Y = GET_Y_LPARAM(position);
+	result.MouseMove.Delta.X = 0;
+	result.MouseMove.Delta.Y = 0;
+}
+
+static void DecodeMouseWheelEvent(InputBackendResult& result, WPARAM wheelDelta, LPARAM position, bool horizontal)
+{
+	result.Type = InputEventType::MouseWheel;
+	result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wheelDelta)) / WHEEL_DELTA;
+	result.MouseWheel.bHorizontal = horizontal;
+	result.MouseWheel.Position.X = GET_X_LPARAM(position);
+	result.MouseWheel.Position.Y = GET_Y_LPARAM(position);
+}
+
 InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_t parameter1, std::intptr_t parameter2)
 {
 	InputBackendResult result{};
@@ -296,125 +333,51 @@ InputBackendResult ProcessWin32InputMessage(std::uint32_t message, std::uintptr_
 	{
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-		{
-			result.Type = InputEventType::Keyboard;
-			result.Keyboard.KeyCode = TranslateVirtualKey(wParam);
-			result.Keyboard.bPressed = true;
-			result.Keyboard.bRepeat = (lParam & 0x40000000) != 0;
-			result.Keyboard.Modifiers = GetCurrentModifiers();
+			DecodeKeyboardEvent(result, wParam, lParam, true);
 			break;
-		}
 
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-		{
-			result.Type = InputEventType::Keyboard;
-			result.Keyboard.KeyCode = TranslateVirtualKey(wParam);
-			result.Keyboard.bPressed = false;
-			result.Keyboard.bRepeat = false;
-			result.Keyboard.Modifiers = GetCurrentModifiers();
+			DecodeKeyboardEvent(result, wParam, lParam, false);
 			break;
-		}
 
 		case WM_LBUTTONDOWN:
-		{
-			result.Type = InputEventType::MouseButton;
-			result.MouseButton.Button = MouseButton::Left;
-			result.MouseButton.bPressed = true;
-			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
-			result.MouseButton.Modifiers = GetCurrentModifiers();
+			DecodeMouseButtonEvent(result, MouseButton::Left, true, lParam);
 			break;
-		}
 
 		case WM_LBUTTONUP:
-		{
-			result.Type = InputEventType::MouseButton;
-			result.MouseButton.Button = MouseButton::Left;
-			result.MouseButton.bPressed = false;
-			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
-			result.MouseButton.Modifiers = GetCurrentModifiers();
+			DecodeMouseButtonEvent(result, MouseButton::Left, false, lParam);
 			break;
-		}
 
 		case WM_RBUTTONDOWN:
-		{
-			result.Type = InputEventType::MouseButton;
-			result.MouseButton.Button = MouseButton::Right;
-			result.MouseButton.bPressed = true;
-			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
-			result.MouseButton.Modifiers = GetCurrentModifiers();
+			DecodeMouseButtonEvent(result, MouseButton::Right, true, lParam);
 			break;
-		}
 
 		case WM_RBUTTONUP:
-		{
-			result.Type = InputEventType::MouseButton;
-			result.MouseButton.Button = MouseButton::Right;
-			result.MouseButton.bPressed = false;
-			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
-			result.MouseButton.Modifiers = GetCurrentModifiers();
+			DecodeMouseButtonEvent(result, MouseButton::Right, false, lParam);
 			break;
-		}
 
 		case WM_MBUTTONDOWN:
-		{
-			result.Type = InputEventType::MouseButton;
-			result.MouseButton.Button = MouseButton::Middle;
-			result.MouseButton.bPressed = true;
-			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
-			result.MouseButton.Modifiers = GetCurrentModifiers();
+			DecodeMouseButtonEvent(result, MouseButton::Middle, true, lParam);
 			break;
-		}
 
 		case WM_MBUTTONUP:
-		{
-			result.Type = InputEventType::MouseButton;
-			result.MouseButton.Button = MouseButton::Middle;
-			result.MouseButton.bPressed = false;
-			result.MouseButton.Position.X = GET_X_LPARAM(lParam);
-			result.MouseButton.Position.Y = GET_Y_LPARAM(lParam);
-			result.MouseButton.Modifiers = GetCurrentModifiers();
+			DecodeMouseButtonEvent(result, MouseButton::Middle, false, lParam);
 			break;
-		}
 
 		case WM_MOUSEMOVE:
-		{
-			result.Type = InputEventType::MouseMove;
-			result.MouseMove.Position.X = GET_X_LPARAM(lParam);
-			result.MouseMove.Position.Y = GET_Y_LPARAM(lParam);
-
-			result.MouseMove.Delta.X = 0;
-			result.MouseMove.Delta.Y = 0;
+			DecodeMouseMoveEvent(result, lParam);
 			break;
-		}
 
 		case WM_MOUSEWHEEL:
-		{
-			result.Type = InputEventType::MouseWheel;
-			result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA;
-			result.MouseWheel.bHorizontal = false;
-			result.MouseWheel.Position.X = GET_X_LPARAM(lParam);
-			result.MouseWheel.Position.Y = GET_Y_LPARAM(lParam);
+			DecodeMouseWheelEvent(result, wParam, lParam, false);
 			break;
-		}
 
 		case WM_MOUSEHWHEEL:
-		{
-			result.Type = InputEventType::MouseWheel;
-			result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA;
-			result.MouseWheel.bHorizontal = true;
-			result.MouseWheel.Position.X = GET_X_LPARAM(lParam);
-			result.MouseWheel.Position.Y = GET_Y_LPARAM(lParam);
+			DecodeMouseWheelEvent(result, wParam, lParam, true);
 			break;
-		}
 
 		default:
-
 			break;
 	}
 

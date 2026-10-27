@@ -80,12 +80,16 @@ private:
 	void RegisterWindowClass();
 	void CreateWindowHandle(std::string_view title);
 	void ApplyInitialWindowState();
-	static bool ShouldStartFullscreen() noexcept;
+	void EnterFullScreen();
+	void RestoreWindowedMode();
 	UINT GetDpi() const noexcept;
 	int GetResizeBorderThickness() const noexcept;
 	MONITORINFO GetCurrentMonitorInfo() const noexcept;
 
 	LRESULT HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT HandleNonClientSize(WPARAM wParam, LPARAM lParam) const;
+	LRESULT HandleResizeHitTest(WPARAM wParam, LPARAM lParam) const;
+	void ApplyTrackSizeConstraints(MINMAXINFO& minMaxInfo) const;
 	void HandleDpiChanged(UINT dpi, const RECT& suggestedWindowRect);
 	void OnSizeChanged(WPARAM sizeType, uint32_t width, uint32_t height);
 	void ApplyPendingShowCommand() noexcept;

@@ -37,11 +37,6 @@ Window::~Window()
 	}
 }
 
-bool Window::ShouldStartFullscreen() noexcept
-{
-	return false;
-}
-
 void Window::RegisterWindowClass()
 {
 	WNDCLASSEXW wc{};
@@ -83,14 +78,7 @@ void Window::CreateWindowHandle(std::string_view title)
 void Window::ApplyInitialWindowState()
 {
 	GetWindowRect(m_hWnd, &m_windowedRect);
-	if (ShouldStartFullscreen())
-	{
-		SetFullScreen(true);
-	}
-	else
-	{
-		ShowWindow(m_hWnd, SW_SHOWMAXIMIZED);
-	}
+	ShowWindow(m_hWnd, SW_SHOWMAXIMIZED);
 }
 
 void Window::PollEvents() noexcept
@@ -115,12 +103,6 @@ void Window::WaitForEvent() noexcept
 	WaitMessage();
 }
 
-int Window::GetResizeBorderThickness() const noexcept
-{
-	const UINT dpi = GetDpi();
-	return GetSystemMetricsForDpi(SM_CXFRAME, dpi) + GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
-}
-
 MONITORINFO Window::GetCurrentMonitorInfo() const noexcept
 {
 	MONITORINFO monitorInfo{};
@@ -139,35 +121,45 @@ void Window::SetFullScreen(bool bFullScreen)
 
 	if (bFullScreen)
 	{
-		GetWindowRect(m_hWnd, &m_windowedRect);
-
-		SetWindowLongW(m_hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
-		SetWindowLongW(m_hWnd, GWL_EXSTYLE, WS_EX_APPWINDOW);
-
-		m_state = State::FullScreen;
-
-		const RECT rc = GetCurrentMonitorInfo().rcMonitor;
-		SetWindowPos(m_hWnd, HWND_TOP, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_FRAMECHANGED | SWP_NOACTIVATE);
-
-		ShowWindow(m_hWnd, SW_SHOW);
+		EnterFullScreen();
 	}
 	else
 	{
-		SetWindowLongW(m_hWnd, GWL_STYLE, kWindowedStyle | WS_VISIBLE);
-		SetWindowLongW(m_hWnd, GWL_EXSTYLE, kWindowedExStyle);
-
-		SetWindowPos(
-		    m_hWnd,
-		    HWND_NOTOPMOST,
-		    m_windowedRect.left,
-		    m_windowedRect.top,
-		    m_windowedRect.right - m_windowedRect.left,
-		    m_windowedRect.bottom - m_windowedRect.top,
-		    SWP_FRAMECHANGED | SWP_NOACTIVATE);
-
-		m_state = State::Normal;
-		ShowWindow(m_hWnd, SW_SHOWMAXIMIZED);
+		RestoreWindowedMode();
 	}
+}
+
+void Window::EnterFullScreen()
+{
+	GetWindowRect(m_hWnd, &m_windowedRect);
+
+	SetWindowLongW(m_hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+	SetWindowLongW(m_hWnd, GWL_EXSTYLE, WS_EX_APPWINDOW);
+
+	m_state = State::FullScreen;
+
+	const RECT rc = GetCurrentMonitorInfo().rcMonitor;
+	SetWindowPos(m_hWnd, HWND_TOP, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_FRAMECHANGED | SWP_NOACTIVATE);
+
+	ShowWindow(m_hWnd, SW_SHOW);
+}
+
+void Window::RestoreWindowedMode()
+{
+	SetWindowLongW(m_hWnd, GWL_STYLE, kWindowedStyle | WS_VISIBLE);
+	SetWindowLongW(m_hWnd, GWL_EXSTYLE, kWindowedExStyle);
+
+	SetWindowPos(
+	    m_hWnd,
+	    HWND_NOTOPMOST,
+	    m_windowedRect.left,
+	    m_windowedRect.top,
+	    m_windowedRect.right - m_windowedRect.left,
+	    m_windowedRect.bottom - m_windowedRect.top,
+	    SWP_FRAMECHANGED | SWP_NOACTIVATE);
+
+	m_state = State::Normal;
+	ShowWindow(m_hWnd, SW_SHOWMAXIMIZED);
 }
 
 bool Window::HasValidSize() const noexcept
@@ -275,82 +267,10 @@ LRESULT Window::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 		case WM_NCCALCSIZE:
-		{
-			if (wParam == TRUE)
-			{
-				if (IsZoomed(m_hWnd))
-				{
-					auto* params = reinterpret_cast<NCCALCSIZE_PARAMS*>(lParam);
-					params->rgrc[0] = GetCurrentMonitorInfo().rcWork;
-				}
-				return 0;
-			}
-
-			return 0;
-		}
+			return HandleNonClientSize(wParam, lParam);
 
 		case WM_NCHITTEST:
-		{
-			if (IsFullScreen() || IsZoomed(m_hWnd))
-			{
-				break;
-			}
-
-			POINT cursorPoint{static_cast<LONG>(static_cast<short>(LOWORD(lParam))), static_cast<LONG>(static_cast<short>(HIWORD(lParam)))};
-			RECT windowRect{};
-			if (!GetWindowRect(m_hWnd, &windowRect))
-			{
-				break;
-			}
-
-			const int border = GetResizeBorderThickness();
-			const bool onLeft = cursorPoint.x >= windowRect.left && cursorPoint.x < windowRect.left + border;
-			const bool onRight = cursorPoint.x <= windowRect.right && cursorPoint.x > windowRect.right - border;
-			const bool onTop = cursorPoint.y >= windowRect.top && cursorPoint.y < windowRect.top + border;
-			const bool onBottom = cursorPoint.y <= windowRect.bottom && cursorPoint.y > windowRect.bottom - border;
-
-			if (onTop && onLeft)
-			{
-				return HTTOPLEFT;
-			}
-
-			if (onTop && onRight)
-			{
-				return HTTOPRIGHT;
-			}
-
-			if (onBottom && onLeft)
-			{
-				return HTBOTTOMLEFT;
-			}
-
-			if (onBottom && onRight)
-			{
-				return HTBOTTOMRIGHT;
-			}
-
-			if (onLeft)
-			{
-				return HTLEFT;
-			}
-
-			if (onRight)
-			{
-				return HTRIGHT;
-			}
-
-			if (onTop)
-			{
-				return HTTOP;
-			}
-
-			if (onBottom)
-			{
-				return HTBOTTOM;
-			}
-
-			break;
-		}
+			return HandleResizeHitTest(wParam, lParam);
 
 		case WM_SIZE:
 			OnSizeChanged(wParam, LOWORD(lParam), HIWORD(lParam));
@@ -393,18 +313,8 @@ LRESULT Window::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case WM_GETMINMAXINFO:
-		{
-			auto* minMaxInfo = reinterpret_cast<MINMAXINFO*>(lParam);
-			const UINT dpi = GetDpi();
-			minMaxInfo->ptMinTrackSize.x = MulDiv(kMinWindowWidth, static_cast<int>(dpi), USER_DEFAULT_SCREEN_DPI);
-			minMaxInfo->ptMinTrackSize.y = MulDiv(kMinWindowHeight, static_cast<int>(dpi), USER_DEFAULT_SCREEN_DPI);
-			const MONITORINFO mi = GetCurrentMonitorInfo();
-			minMaxInfo->ptMaxPosition.x = mi.rcWork.left - mi.rcMonitor.left;
-			minMaxInfo->ptMaxPosition.y = mi.rcWork.top - mi.rcMonitor.top;
-			minMaxInfo->ptMaxSize.x = mi.rcWork.right - mi.rcWork.left;
-			minMaxInfo->ptMaxSize.y = mi.rcWork.bottom - mi.rcWork.top;
+			ApplyTrackSizeConstraints(*reinterpret_cast<MINMAXINFO*>(lParam));
 			return 0;
-		}
 
 		case WM_ERASEBKGND:
 			return 1;

@@ -102,7 +102,11 @@ private:
 	static constexpr std::size_t LayerCount = static_cast<std::size_t>(InputLayer::Count);
 
 	InputLayer ResolveTargetLayer(const InputBackendResult& result);
+	void UpdateMouseMoveDelta(MouseMoveEvent& event) noexcept;
+	bool DispatchInputEvent(const InputBackendResult& result, InputLayer targetLayer);
 	void CancelLayer(InputLayer layer);
+	void ReleaseLayerKeys(InputState& state, InputLayer layer);
+	void ReleaseLayerMouseButtons(InputState& state, InputLayer layer);
 
 	template <typename TEvent> void ProcessEvent(const TEvent& event, InputLayer TargetLayer);
 

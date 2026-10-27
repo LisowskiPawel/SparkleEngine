@@ -38,7 +38,7 @@ The present implementation is Windows-only: public `Window` exposes `HWND` and W
 | `PLAT-001` | Native Win32 window | Implemented path | Registers one Sparkle window class, creates one top-level popup/resizable application window, extends DWM frame into client area, exposes its `HWND`, and fatals on registration/creation failure. | `S` |
 | `PLAT-002` | Message pump | Implemented path | Non-blocking `PollEvents` drains the thread queue and synchronously broadcasts raw window messages; `WaitForEvent` blocks while minimized/idle until a message arrives. | `S` |
 | `PLAT-003` | Size/state | Implemented path | Atomically published client width/height, valid-size check, and Normal/Minimized/Maximized/FullScreen state. Minimum interactive size is 320x240. | `S` |
-| `PLAT-004` | Window controls | Implemented path | Request close, minimize, maximize, restore, maximize/restore toggle, borderless monitor fullscreen toggle, and native drag move. Initial show state is maximized; startup fullscreen currently always returns false. | `S` |
+| `PLAT-004` | Window controls | Implemented path | Request close, minimize, maximize, restore, maximize/restore toggle, borderless monitor fullscreen toggle, and native drag move. Startup is maximized; fullscreen remains an explicit runtime action. | `S` |
 | `PLAT-005` | DPI awareness/events | Implemented path | Manifest plus per-window DPI query, scale relative to 96 DPI, DPI-change event, suggested-rect handling, and DPI-aware resize-border metrics. Multi-monitor behavior remains unrun. | `S` |
 | `PLAT-006` | Window event contracts | Implemented path | Synchronous resized, DPI-scale-changed, and capacity-16 raw message events. Subscribers run on the polling thread and can mark raw messages handled. | `S` |
 | `PLAT-007` | Win32 keyboard/mouse backend | Implemented path | Translates Windows messages into typed keyboard, mouse-button, move, vertical/horizontal wheel events and modifier state. No gamepad, touch, pen, IME composition, or raw-input device catalog was found. | `S` |
@@ -50,6 +50,29 @@ The present implementation is Windows-only: public `Window` exposes `HWND` and W
 | `PLAT-013` | Owner-thread enforcement | Implemented path | Registration and dispatch are guarded by Core `OwnerThread`; the module is not generally thread-safe. | `S` |
 
 ## Vertical Input Trace
+
+Orchestration ownership reconciled on 2026-10-27: `Window::HandleMessage` retains
+raw-event admission and native message dispatch. Private `WindowNonClient.cpp`
+owns client-area adjustment, resize-border classification and tracking-size
+constraints, including the existing default-window-procedure fallthrough.
+`ProcessWin32InputMessage` selects focused keyboard, button, motion and wheel
+decoders over the same result object. `InputSystem` sequences admission, pointer
+delta, target selection and typed dispatch. `InputEventDispatcher.cpp` owns
+non-template subscription removal, queue clearing and layer eligibility;
+necessary typed dispatch templates remain in its private header. Window/input
+state, callback and deferred-queue lifetime, public operations and event values
+remain unchanged. This is source/build preservation evidence, not native window,
+input, focus, capture, DPI or multi-monitor acceptance.
+
+The same date's state-transition pass keeps fullscreen admission/selection in
+`SetFullScreen` and native style/placement work in private enter/restore functions.
+Startup directly retains the existing maximized show path; the constant-false
+startup predicate and unreachable fullscreen branch are removed. Layer
+cancellation sequences keyboard releases, mouse-button releases and final reset;
+private release functions retain state updates before immediate callbacks and
+the original pointer/modifier sampling order. Native calls, state publication,
+callback lifetime and public operations are source-preserved. This adds no
+interactive fullscreen, focus-loss or input-cancellation acceptance evidence.
 
 Win32 sends a window message -> `Window::WindowProc` exposes it through `OnWindowMessage` -> `InputSystem` calls the private `ProcessWin32InputMessage` decoder -> global state is updated -> focus router selects System/UI/Gameplay using capture state and registered rectangles -> immediate subscribers run or an event is queued -> Application calls `ProcessDeferredEvents` -> camera/editor/console consumers receive only their enabled layer.
 
