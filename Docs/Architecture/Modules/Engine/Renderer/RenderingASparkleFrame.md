@@ -109,21 +109,21 @@ The Reference Path Tracer is explicitly **one frame with an alternate middle rec
 
 | Product | Current format/shape | Produced by | Consumed by or exported as |
 | --- | --- | --- | --- |
-| Scene color | `R16G16B16A16_Float`, render extent | ReSTIR composite/sky or the selected Reference committed-display derivative | exposure, debug, optional denoising, and the presentation-upscaling input when denoising is inactive |
+| Scene color | `R32G32B32A32_Float`, render extent | ReSTIR composite/sky or the selected Reference committed-display derivative | exposure, debug, optional denoising, and the presentation-upscaling input when denoising is inactive |
 | Radiance | producer-declared scene-linear HDR, render extent | Lit publishes scene color; Reference publishes its committed first moment; future path tracers use the same semantic contract | generic viewport capture; progressive producers attach exact sample-prefix identity |
 | Radiance second moment | optional producer-declared Welford M2 accumulator (sum of squared radiance deviations), render extent | Reference accumulation when available; ordinary Lit currently leaves it absent | variance/evidence capture; never fabricated by a producer that does not compute it |
 | Scene depth | `R32_Float`, render extent | device-depth linearization | lighting, sky/background, viewport depth, provider inputs |
 | GBuffer base color | `R8G8B8A8_UNorm` | raster or ray GBuffer | lighting, debug |
 | GBuffer normal | `R16G16B16A16_Float` | raster or ray GBuffer | lighting, reconstruction, debug, viewport normal product |
 | GBuffer material | `R8G8B8A8_UNorm` | raster or ray GBuffer | metallic/roughness/AO/F0 lighting terms and debug |
-| Emissive | `R16G16B16A16_Float` | raster or ray GBuffer | lighting composite and debug |
+| Emissive | `R32G32B32A32_Float` | raster or ray GBuffer | lighting composite and debug |
 | Subsurface | `R8G8B8A8_UNorm` | raster or ray GBuffer | direct subsurface/composite and debug |
 | Motion vector | `R16G16_Float` | Lit GBuffer plus sky-motion handling | Lit temporal reuse,
     ray reconstruction, and DLSS Super Resolution |
-| Lighting lobes | ReSTIR uses `R16G16B16A16_Float`; reference uses `R32G32B32A32_Float` | selected lighting producer | composite, debug, reference sample, reconstruction |
+| Lighting lobes | `R32G32B32A32_Float` | selected lighting producer | composite, debug, reference sample, reconstruction |
 | Exposure | 1x1 `R32G32B32A32_Float` | manual/automatic exposure pass | reconstruction/upscaling and tone mapping |
-| Denoised scene color | `R16G16B16A16_Float`, render extent | optional DLSS Ray Reconstruction over eligible ReSTIR lighting | selected presentation upscaler |
-| Resolved scene color | `R16G16B16A16_Float`, output extent | point reconstruction for exact visualizations, Linear for any color input, or DLSS Super Resolution when temporal guides exist | tone mapping or exact-display handoff |
+| Denoised scene color | `R32G32B32A32_Float`, render extent | optional DLSS Ray Reconstruction over eligible ReSTIR lighting | selected presentation upscaler |
+| Resolved scene color | `R32G32B32A32_Float`, output extent | point reconstruction for exact visualizations, Linear for any color input, or DLSS Super Resolution when temporal guides exist | tone mapping or exact-display handoff |
 | Final LDR color | linear counterpart of output format, output extent | output-encoding compute pass | back-buffer copy and `FinalColorLdr` viewport product |
 
 The table states the current internal contract, not precision adequacy or backend format support. Those require `REN-E03`, `REN-E04`, `REN-E17`, and `RHI-E04` evidence.

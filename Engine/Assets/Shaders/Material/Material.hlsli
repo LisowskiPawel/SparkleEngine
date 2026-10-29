@@ -155,7 +155,9 @@ namespace Material
 		ApplyAlphaMode(props.Alpha);
 
 		const float3 normalTangent = SampleNormalTangent(Input.TexCoord);
-		props.NormalWorld = TransformTangentNormalToWorld(normalTangent, Input.NormalWorld, Input.TangentWorld.xyz, Input.BitangentWorld);
+		const float tangentSign = Input.TangentWorld.w >= 0.0f ? 1.0f : -1.0f;
+		const float3 bitangentWorld = ComputeBitangentFromSign(Input.NormalWorld, Input.TangentWorld.xyz, tangentSign);
+		props.NormalWorld = TransformTangentNormalToWorld(normalTangent, Input.NormalWorld, Input.TangentWorld.xyz, bitangentWorld);
 		if (!Input.IsFrontFace)
 		{
 			props.NormalWorld = -props.NormalWorld;

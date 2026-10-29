@@ -89,12 +89,12 @@ template <typename TParameterInstance> void BindSceneShaderParameters(FrameGraph
 	{
 		parameters->PreviousMorphWeights = builder.CreateSRV(scene.Geometry.PreviousMorphWeights);
 	}
-	if constexpr (requires { parameters->SamplerLinearClamp; })
+	if constexpr (requires { parameters->SamplerLinearNoMipWrapClampClamp; })
 	{
-		parameters->SamplerLinearClamp = RhiSamplerDesc{
+		parameters->SamplerLinearNoMipWrapClampClamp = RhiSamplerDesc{
 		    .MinMagFilter = RhiSamplerMinMagFilter::Linear,
-		    .MipFilter = RhiSamplerMipFilter::Linear,
-		    .Address = MakeRhiSamplerAddressModes(RhiSamplerAddressMode::Clamp)};
+		    .MipFilter = RhiSamplerMipFilter::None,
+		    .Address = RhiSamplerAddressModes{.U = RhiSamplerAddressMode::Wrap, .V = RhiSamplerAddressMode::Clamp, .W = RhiSamplerAddressMode::Clamp}};
 	}
 
 	if constexpr (requires { parameters->Frame; })

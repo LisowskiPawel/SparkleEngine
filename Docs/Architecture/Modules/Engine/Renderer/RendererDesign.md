@@ -32,6 +32,31 @@ The Renderer turns an immutable world submission into a lit, post-processed, pre
 | Exposure, optional DLSS RR lighting denoising, Linear/DLSS SR presentation upscaling, tone mapping, debug views, UI and SDR presentation | First-release targets still missing: deferred decals, color grading, chromatic aberration, HDR10 output; excluded: frame generation |
 | Requested settings, diagnostics, capture products, shader-generation replacement | Complete requested-versus-active, failure, stress, quality, and performance evidence |
 
+## PBR Correctness Follow-up
+
+The 2026-10-27 review found the following source defects and proof gaps. Source corrections do **not** establish GPU, visual, convergence, denoiser-quality or release acceptance. The linked subject plans own remaining work; this table is a routing index. The reference path remains a candidate, not a qualified raw oracle.
+
+| Finding | Current disposition | Owning next work |
+| --- | --- | --- |
+| F01: unavailable MIS competitor | Corrected technique/terminal weights; analytic rectangle camera/BSDF visibility remains open | [Reference repair order](Features/Lighting/ReferencePathTracer/ImplementationPlan.md#correctness-repair-follow-up) |
+| F02: GGX peak clipping/cancellation | Shared stable GGX source; extreme-domain and backend checks remain open | [Material base qualification](Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) |
+| F03: delta reflection below geometry | Delta support guard corrected; depends on N03 at the real-time primary surface | [Material/GBuffer work](Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) |
+| F04: inconsistent light units | Real-time and reference analytic conversion now share one owner | [Direct-light proof](Features/Lighting/DirectLighting/ImplementationPlan.md#correctness-repair-follow-up) |
+| F05: invalid sample reaches completed prefix | **Open:** GPU validity must gate commit, Complete and raw export | [Reference failure bridge](Features/Lighting/ReferencePathTracer/ImplementationPlan.md#correctness-repair-follow-up) |
+| F06: raster/ray material and coverage mismatch | **Open:** vertex RGBA, UV/address/strength and filtering contract | [Material lineage](Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) |
+| F07: unsupported reference light models admitted | Ideal-light and sampler-extent admission corrected; full exclusion matrix remains open | [Reference admission proof](Features/Lighting/ReferencePathTracer/ImplementationPlan.md#correctness-repair-follow-up) |
+| F08: lossy reservoir identity | Frame ID stored as exact 16-bit numeric fragments; one current payload | [Indirect identity proof](Features/Lighting/IndirectLighting/ImplementationPlan.md#correctness-repair-follow-up) |
+| F09: open-interval endpoint rounded to one | Exactly representable 23-bit midpoints replace the erroneous conversion | [Sampler contract/proof](Features/Lighting/ReferencePathTracer/ImplementationPlan.md#correctness-repair-follow-up) |
+| F10: sky longitude clamped | Usage-agnostic `SamplerLinearNoMipWrapClampClamp` shared by sky consumers | [Direct/environment proof](Features/Lighting/DirectLighting/ImplementationPlan.md#correctness-repair-follow-up) |
+| N01: reversed DLSS motion | External translation sign corrected; engine reservoir convention retained | [Reconstruction proof](Features/PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md#correctness-repair-follow-up) |
+| N02: area-light reuse density mismatch | Initial/reuse/final contributions use the light-parameter measure | [Direct reuse qualification](Features/Lighting/DirectLighting/ImplementationPlan.md#correctness-repair-follow-up) |
+| N03: primary geometric normal replaced by shading normal | **Open:** preserve geometric support and origin uncertainty through GBuffer | [MRT/producer-consumer work](Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) |
+| N04: direct diffuse energy gain | Roughness-one counterexample corrected using normalized Frostbite; complete model conservation/agreement remains open | [Material model matrix](Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) |
+| N05: finite radiance exceeds FP16 products | Emission and shared scene/lighting radiance use RGBA32F; SDK format and cost qualification remains open | [Range and SDK qualification](Features/PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md#correctness-repair-follow-up) |
+| N06: interpolated raster frame not orthonormal | Frame rebuilt before normal mapping; unused bitangent varying removed | [Frame/backend proof](Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) |
+
+Additional open obligations include support-aware ReSTIR normalization/convergence, real-time/reference model agreement, retained optional BRDF/subsurface branches and the selected RR/SR topology. They remain explicit in those owners; no denoiser may hide a wrong raw estimator. [Strategy](../../../../Strategy/Roadmap.md#pbr-correctness-follow-up) routes their delivery order.
+
 ## Module Surface And Encapsulation
 
 `Engine/Renderer/Public` is the stable host boundary, not a convenient include root for Renderer implementation. It contains only the facade, submission/settings/viewport/UI contracts, opaque handles, and bounded diagnostic read models required by Application, Editor, GameFramework, or Tools. Public result types expose observation; Renderer-only mutation remains private to their publication owners.

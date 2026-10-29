@@ -84,7 +84,6 @@ namespace DirectReservoir
 		candidate.SelectionPdf = 1.0f;
 		LightSampling::DirectLightSample sample = DirectLightSampling::SampleDirectLight(candidate, positionWorld, reservoir.ShapeSample);
 		sample.LightSelectionPdf = 1.0f;
-		sample.PdfW = 1.0f;
 		return sample;
 	}
 

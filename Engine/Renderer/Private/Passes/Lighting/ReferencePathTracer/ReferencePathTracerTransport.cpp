@@ -10,7 +10,6 @@
 #include "Passes/Lighting/ReferencePathTracer/ReferencePathTracerShader.h"
 #include "Passes/Lighting/ReferencePathTracer/ReferencePathTracerWork.h"
 #include "RayTracing/RayTracingMaterialPass.h"
-#include "RHI/Public/Samplers/RhiSamplerDesc.h"
 #include "Scene/RayTracing/RenderRayTracingScene.h"
 #include "ShaderData/SceneShaderParameters.h"
 
@@ -26,11 +25,6 @@ template <typename TShader> static auto& BuildReferencePathTracerParameters(
 	parameters->WorkingM2 = builder.CreateUAV(graphResources.WorkingM2);
 	parameters->CommittedMean = builder.CreateSRV(graphResources.CommittedMean);
 	parameters->CommittedM2 = builder.CreateSRV(graphResources.CommittedM2);
-
-	parameters->SamplerLinearWrapClamp = RhiSamplerDesc{
-	    .MinMagFilter = RhiSamplerMinMagFilter::Linear,
-	    .MipFilter = RhiSamplerMipFilter::None,
-	    .Address = RhiSamplerAddressModes{.U = RhiSamplerAddressMode::Wrap, .V = RhiSamplerAddressMode::Clamp, .W = RhiSamplerAddressMode::Clamp}};
 
 	BindSceneShaderParameters(builder, frame, parameters, resources);
 	parameters->SessionSeed = work.SessionSeed;

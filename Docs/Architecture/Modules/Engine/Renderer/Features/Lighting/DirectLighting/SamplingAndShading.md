@@ -88,11 +88,11 @@ The bounded material-budget prerequisite selects the following allocation, indep
 ```text
 s = saturate(authoredSubsurfaceStrength)
 baseBudget = (1 - Fresnel) * (1 - metallic)
-f_diffuse = BurleyDiffuse * baseBudget * (1 - s)
+f_diffuse = FrostbiteDiffuse * baseBudget * (1 - s)
 f_subsurface_approx = SubsurfaceApproximation * baseBudget * s
 ```
 
-For the current wrap approximation, `s` also supplies the authored wrap width; it is not an additional transport model. An explicit caller evaluation boolean skips subsurface math but never changes `s` or the diffuse allocation. Specular evaluation remains unchanged. This fixes base-budget allocation, not full Burley/GGX furnace conformance, BSSRDF support, or the remaining `DIR-D0-03` decisions. The shared evaluator returns one cohesive three-lobe response; no feature CVar or GBuffer dependency belongs in it.
+For the current wrap approximation, `s` also supplies the authored wrap width; it is not an additional transport model. An explicit caller evaluation boolean skips subsurface math but never changes `s` or the diffuse allocation. Specular evaluation remains unchanged. This fixes base-budget allocation, not full Frostbite/GGX furnace conformance, BSSRDF support, or the remaining `DIR-D0-03` decisions. The shared evaluator returns one cohesive three-lobe response; no feature CVar or GBuffer dependency belongs in it.
 
 ### Specular
 
@@ -107,7 +107,7 @@ f_specular = F(wo, h) * D(h) * G2(wi, wo) /
 
 ### Diffuse And Subsurface Approximation
 
-Burley diffuse, if retained, uses the same roughness and direction convention in CPU/reference/GPU code. The wrap-subsurface term is explicitly an empirical surface lobe, not BSSRDF or volume transport. Its energy comes from the base diffuse budget; it cannot simply be added on top of an unchanged diffuse response.
+The real-time direct branch now selects energy-normalized Frostbite diffuse under the [material repair contract](../../GeometryAndResources/ShadingModelsDesign.md#model-and-domain-contract). Its roughness/direction convention and energy behavior require the same independent CPU/GPU checks; the frozen Reference Lambert target remains distinct. The wrap-subsurface term is explicitly an empirical surface lobe, not BSSRDF or volume transport. Its energy comes from the base diffuse budget; it cannot simply be added on top of an unchanged diffuse response.
 
 ### Shading Normals
 

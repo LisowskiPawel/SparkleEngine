@@ -74,7 +74,7 @@ namespace DirectReservoir
 		return lightingSurface;
 	}
 
-	float3 EvaluateRawContribution(Surface surface, Reservoir reservoir)
+	float3 EvaluateCandidateContribution(Surface surface, Reservoir reservoir)
 	{
 		if (!surface.Valid || !IsValid(reservoir))
 		{
@@ -122,18 +122,7 @@ namespace DirectReservoir
 
 	float EvaluateTargetPdf(Surface surface, Reservoir reservoir)
 	{
-		return CommonColor::LuminanceRec709(EvaluateRawContribution(surface, reservoir));
-	}
-
-	float ComputeSourcePdf(DirectLightSampling::LightCandidate candidate, float3 positionWorld, float2 shapeSample)
-	{
-		if (!DirectLightSampling::IsValid(candidate))
-		{
-			return 0.0f;
-		}
-
-		const LightSampling::DirectLightSample sample = DirectLightSampling::SampleDirectLight(candidate, positionWorld, shapeSample);
-		return max(candidate.SelectionPdf * sample.PdfW, 0.0f);
+		return CommonColor::LuminanceRec709(EvaluateCandidateContribution(surface, reservoir));
 	}
 
 	bool StreamWeightedSample(inout Reservoir reservoir, DirectLightSampling::LightCandidate candidate, float2 shapeSample, float targetPdf, float sourcePdf, float random)
@@ -223,8 +212,7 @@ namespace DirectReservoir
 			candidateReservoir.Valid = DirectLightSampling::IsValid(candidate) ? 1.0f : 0.0f;
 
 			const float targetPdf = EvaluateTargetPdf(surface, candidateReservoir);
-			const float sourcePdf = ComputeSourcePdf(candidate, surface.PositionWorld, shapeSample);
-			StreamWeightedSample(reservoir, candidate, shapeSample, targetPdf, sourcePdf, CommonRandom::Random01(rng));
+			StreamWeightedSample(reservoir, candidate, shapeSample, targetPdf, candidate.SelectionPdf, CommonRandom::Random01(rng));
 		}
 
 		return reservoir;

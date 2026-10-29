@@ -4,6 +4,6 @@
 
 namespace RenderFrameGraphFormats
 {
-	inline constexpr PixelFormat SceneColor = PixelFormat::R16G16B16A16_Float;
+	inline constexpr PixelFormat SceneColor = PixelFormat::R32G32B32A32_Float;
 	inline constexpr PixelFormat SceneDepth = PixelFormat::R32_Float;
 }

@@ -15,7 +15,7 @@ namespace AreaLights
 	{
 		const DirectionalLightGpuData light = DirectionalLights[lightIndex];
 		const float3 centerDirectionWorld = normalize(-light.Direction);
-		const float3 illuminance = light.Color * light.Illuminance;
+		const float3 illuminance = LightSampling::PhotometricRgbToRadiometric(light.Color, light.Illuminance);
 		const float coneHalfAngle = light.AngularSizeRadians * 0.5f;
 		if (coneHalfAngle <= 1.0e-5f)
 		{
@@ -48,13 +48,17 @@ namespace AreaLights
 		if (radius <= 1.0e-4f)
 		{
 			const float distanceAttenuation = PunctualLights::ComputePunctualDistanceAttenuation(distanceToLight, light.Range, light.DistanceAttenuationCoefficients);
-			return LightSampling::PunctualDirectLightSample(centerDirectionWorld, light.Color * light.LuminousIntensity * distanceAttenuation, distanceToLight, false);
+
+			return LightSampling::PunctualDirectLightSample(centerDirectionWorld,
+			                                                LightSampling::PhotometricRgbToRadiometric(light.Color, light.LuminousIntensity) * distanceAttenuation,
+			                                                distanceToLight,
+			                                                false);
 		}
 
 		const float3 samplePositionWorld = CommonSampling::SampleSpherePoint(light.Position, radius, positionWorld - light.Position, sample);
 		const float3 normalWorld = SafeNormalize(samplePositionWorld - light.Position);
 		const float sphereArea = 4.0f * PI * radius * radius;
-		const float3 emittedRadiance = light.Color * light.LuminousIntensity / max(PI * radius * radius, 1.0e-4f);
+		const float3 emittedRadiance = LightSampling::PhotometricRgbToRadiometric(light.Color, light.LuminousIntensity) / max(PI * radius * radius, 1.0e-4f);
 		const float distanceToSample = length(samplePositionWorld - positionWorld);
 
 		return LightSampling::AreaDirectLightSample(
@@ -78,7 +82,11 @@ namespace AreaLights
 			const float3 lightToSurfaceDirection = -centerDirectionWorld;
 			const float distanceAttenuation = PunctualLights::ComputePunctualDistanceAttenuation(distanceToLight, light.Range, light.DistanceAttenuationCoefficients);
 			const float angularAttenuation = PunctualLights::ComputeSpotAngularAttenuation(lightToSurfaceDirection, lightDirectionWorld, light.InnerAngleCosine, light.OuterAngleCosine);
-			return LightSampling::PunctualDirectLightSample(centerDirectionWorld, light.Color * light.LuminousIntensity * distanceAttenuation * angularAttenuation, distanceToLight, false);
+
+			return LightSampling::PunctualDirectLightSample(centerDirectionWorld,
+			                                                LightSampling::PhotometricRgbToRadiometric(light.Color, light.LuminousIntensity) * distanceAttenuation * angularAttenuation,
+			                                                distanceToLight,
+			                                                false);
 		}
 
 		const float3 samplePositionWorld = CommonSampling::SampleDiskPoint(light.Position, lightDirectionWorld, radius, sample);
@@ -87,7 +95,7 @@ namespace AreaLights
 		const float3 sampledDirectionWorld = distanceToSample > 1.0e-4f ? surfaceToSample / distanceToSample : centerDirectionWorld;
 		const float angularAttenuation = PunctualLights::ComputeSpotAngularAttenuation(-sampledDirectionWorld, lightDirectionWorld, light.InnerAngleCosine, light.OuterAngleCosine);
 		const float diskArea = PI * radius * radius;
-		const float3 emittedRadiance = light.Color * light.LuminousIntensity * angularAttenuation / max(diskArea, 1.0e-4f);
+		const float3 emittedRadiance = LightSampling::PhotometricRgbToRadiometric(light.Color, light.LuminousIntensity) * angularAttenuation / max(diskArea, 1.0e-4f);
 
 		return LightSampling::AreaDirectLightSample(
 		    positionWorld,
@@ -110,7 +118,7 @@ namespace AreaLights
 		tangentWorld = normalize(tangentWorld);
 		const float3 bitangentWorld = normalize(cross(normalWorld, tangentWorld));
 		const float3 samplePositionWorld = light.Position + tangentWorld * ((sample.x - 0.5f) * width) + bitangentWorld * ((sample.y - 0.5f) * height);
-		return LightSampling::AreaDirectLightSample(positionWorld, samplePositionWorld, normalWorld, light.Color * light.Luminance, rcp(area), 1.0f);
+		return LightSampling::AreaDirectLightSample(positionWorld, samplePositionWorld, normalWorld, LightSampling::PhotometricRgbToRadiometric(light.Color, light.Luminance), rcp(area), 1.0f);
 	}
 }
 

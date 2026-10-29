@@ -207,6 +207,17 @@ Preserve accepted `PTD-00-R1` and delivered source stages. The [remaining plan](
 
 A finite-depth diagnostic, accumulation count or post-processed image does not qualify reference truth. Dependent quality checks need the accepted raw result and uncertainty.
 
+## PBR Correctness Follow-up
+
+The 2026-10-27 material/lighting/reconstruction audit has [one finding-to-owner index](../Architecture/Modules/Engine/Renderer/RendererDesign.md#pbr-correctness-follow-up). Source corrections do not change first-release readiness or the current installed-package priority. Before using displayed/denoised output as PBR or reference evidence, complete these existing subject stages:
+
+1. [Reference PTD-02 recovery](../Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#correctness-repair-follow-up): numerical failure must gate prefix/Complete/export; finish analytic-rectangle camera/BSDF/visibility semantics and execute raw estimator/admission/backend proof.
+2. [MAT-S0/1](../Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up): preserve primary geometric normals/origin bounds, restore raster/RT material and alpha lineage, and qualify complete base-model energy/PDF/frame/domain agreement. This precedes later anisotropy/coat work.
+3. [DIR](../Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#correctness-repair-follow-up) and [IND](../Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#correctness-repair-follow-up): close density/support-aware reuse and matched raw convergence, including zero-support and disocclusion controls. Seed replay, M caps and compatible normals are not proof.
+4. [REC-S0/1/3/4 and DSP-1/3](../Architecture/Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md#correctness-repair-follow-up): qualify corrected motion, RGBA32F SDK formats/range and full-frame cost, settle RR/SR output topology, then measure actual temporal quality. A denoiser cannot repair a wrong raw mean.
+
+Each owner records its exact source/shader/SDK/device/content candidate and remaining checks. No source fix, CPU arithmetic result or build alone closes the related `FCR-REN-*` or release gate.
+
 ## One Authority Per Question
 
 | To understand… | Open… |

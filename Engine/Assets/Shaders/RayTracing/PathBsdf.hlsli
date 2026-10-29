@@ -3,6 +3,7 @@
 
 #include "/Engine/Common/Constants.hlsli"
 #include "/Engine/BRDF/Fresnel.hlsli"
+#include "/Engine/BRDF/Distribution.hlsli"
 #include "/Engine/Common/Sampling.hlsli"
 #include "/Engine/RayTracing/PathSurface.hlsli"
 #include "/Engine/RayTracing/RayTracingPathSample.hlsli"
@@ -41,14 +42,6 @@ namespace PathBsdf
 		}
 		result.SpecularDelta = surface.Roughness == 0.0f;
 		return result;
-	}
-
-	float DistributionGGX(float noH, float alpha)
-	{
-		const float alpha2 = alpha * alpha;
-		const float denominatorBase = noH * noH * (alpha2 - 1.0f) + 1.0f;
-		const float denominator = PI * denominatorBase * denominatorBase;
-		return denominator > 0.0f ? alpha2 / denominator : 0.0f;
 	}
 
 	float SmithG1(float noX, float alpha)
@@ -113,7 +106,7 @@ namespace PathBsdf
 		if (!masses.SpecularDelta && masses.Specular > 0.0f)
 		{
 			const float alpha = surface.Roughness * surface.Roughness;
-			const float distribution = DistributionGGX(noH, alpha);
+			const float distribution = BRDF::Distribution::GGX(surface.NormalWorld, halfVector, alpha);
 			const float g1View = SmithG1(noV, alpha);
 			if (evaluateSpecular)
 			{
@@ -170,6 +163,11 @@ namespace PathBsdf
 	{
 		PathSample::DirectionSample result = (PathSample::DirectionSample)0;
 		result.DirectionWorld = normalize(reflect(-surface.ViewDirWorld, surface.NormalWorld));
+		if (specularMass <= 0.0f || dot(surface.ViewDirWorld, surface.NormalWorld) <= 0.0f || dot(surface.ViewDirWorld, surface.GeometricNormalWorld) <= 0.0f
+		    || dot(result.DirectionWorld, surface.GeometricNormalWorld) <= 0.0f)
+		{
+			return result;
+		}
 
 		if (evaluateSpecular)
 		{

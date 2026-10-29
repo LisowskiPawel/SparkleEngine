@@ -15,7 +15,7 @@ Texture2D<float4> CommittedMean;
 Texture2D<float4> CommittedM2;
 RaytracingAccelerationStructure SceneTlas;
 Texture2D SkyTexture;
-SamplerState SamplerLinearWrapClamp;
+SamplerState SamplerLinearNoMipWrapClampClamp;
 
 namespace ReferencePathTracer
 {
@@ -37,7 +37,7 @@ namespace ReferencePathTracer
 		sampleIdentity.ReplicateId = ReplicateId;
 		const float2 filmSample = float2(CommonRandom::OpenUnitInterval(RandomWord(sampleIdentity, FilmXDimension)), CommonRandom::OpenUnitInterval(RandomWord(sampleIdentity, FilmYDimension)));
 		const RayDesc primaryRay = BuildPerspectiveViewCameraRay(pixelCoord, uint2(width, height), filmSample);
-		const float3 contribution = TraceSurfaceTransport(SceneTlas, SkyTexture, SamplerLinearWrapClamp, primaryRay, sampleIdentity);
+		const float3 contribution = TraceSurfaceTransport(SceneTlas, SkyTexture, SamplerLinearNoMipWrapClampClamp, primaryRay, sampleIdentity);
 
 		float3 mean = PriorSampleCount == 0u ? 0.0f.xxx : CommittedMean[pixelCoord].rgb;
 		float3 m2 = PriorSampleCount == 0u ? 0.0f.xxx : CommittedM2[pixelCoord].rgb;

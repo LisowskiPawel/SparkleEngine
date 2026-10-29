@@ -4,7 +4,7 @@
 
 RWTexture2D<float4> SceneColor;
 Texture2D SkyTexture;
-SamplerState SamplerLinearClamp;
+SamplerState SamplerLinearNoMipWrapClampClamp;
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -25,6 +25,6 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	}
 
 	const float3 worldDirection = ComputeSkyViewDirectionWorld(dispatchThreadId.xy);
-	const float3 skyColor = SampleSkyRadiance(SkyTexture, SamplerLinearClamp, worldDirection);
+	const float3 skyColor = SampleSkyRadiance(SkyTexture, SamplerLinearNoMipWrapClampClamp, worldDirection);
 	SceneColor[dispatchThreadId.xy] = float4(skyColor, 1.0f);
 }

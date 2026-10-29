@@ -32,7 +32,6 @@ void main(in VS::Input Input, out VS::Output Output)
 	const float4 previousPositionWorld = mul(float4(previousLocalVertex.Position, 1.0f), previousWorldMatrix);
 	const float3 normalWorld = normalize(mul(localVertex.Normal, worldInverseTranspose));
 	const float3 tangentWorld = OrthonormalizeTangent(mul(localVertex.Tangent, (float3x3)worldMatrix), normalWorld);
-	const float3 bitangentWorld = ComputeBitangentFromSign(normalWorld, tangentWorld, Input.Tangent.w);
 
 	const float4 positionClip = PositionWorldToClip(positionWorld);
 	const float4 previousClipPosition = mul(previousPositionWorld, PreviousWorldToClipMatrix);
@@ -42,7 +41,6 @@ void main(in VS::Input Input, out VS::Output Output)
 	Output.Position = jitteredPositionClip;
 	Output.NormalWorld = normalWorld;
 	Output.TangentWorld = float4(tangentWorld, Input.Tangent.w);
-	Output.BitangentWorld = bitangentWorld;
 	Output.TexCoord = Input.TexCoord;
 	Output.PrevClipPosition = previousClipPosition;
 	Output.GpuSceneSlot = meshInstance.GpuSceneSlot;

@@ -1,7 +1,7 @@
 Texture2D<float4> CurrentReservoirSampleTexture;
 Texture2D<float4> CurrentReservoirWeightTexture;
 Texture2D SkyTexture;
-SamplerState SamplerLinearClamp;
+SamplerState SamplerLinearNoMipWrapClampClamp;
 
 #include "/Engine/Lighting/RestirIndirectReservoir.hlsli"
 
@@ -71,7 +71,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const PathLighting::Result path = IndirectReservoir::EvaluateCandidate(surface, reservoir.Selected, SkyTexture, SamplerLinearClamp);
+	const PathLighting::Result path = IndirectReservoir::EvaluateCandidate(surface, reservoir.Selected, SkyTexture, SamplerLinearNoMipWrapClampClamp);
 	const float reservoirWeight = IndirectReservoir::GetFinalWeight(reservoir);
 
 	StoreIndirectLighting(pixelCoord, surface, path, reservoirWeight);

@@ -9,7 +9,7 @@ Texture2D<float4> PreviousReservoirWeightTexture;
 Texture2D<float4> PreviousReservoirSurfaceTexture;
 Texture2D GBufferMotionVector;
 Texture2D SkyTexture;
-SamplerState SamplerLinearClamp;
+SamplerState SamplerLinearNoMipWrapClampClamp;
 
 #include "/Engine/Lighting/RestirIndirectReservoirReuse.hlsli"
 
@@ -26,7 +26,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	}
 
 	const GBufferPathSurface surface = LoadGBufferPathSurface(pixelCoord);
-	IndirectReservoir::Reservoir reservoir = IndirectReservoir::BuildInitialReservoir(surface, pixelCoord, SkyTexture, SamplerLinearClamp);
+	IndirectReservoir::Reservoir reservoir = IndirectReservoir::BuildInitialReservoir(surface, pixelCoord, SkyTexture, SamplerLinearNoMipWrapClampClamp);
 
 	if (surface.Valid && RestirIndirectTemporalReuse != 0u && HistoryValid != 0u)
 	{
@@ -38,7 +38,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		                                 PreviousReservoirWeightTexture,
 		                                 PreviousReservoirSurfaceTexture,
 		                                 SkyTexture,
-		                                 SamplerLinearClamp,
+		                                 SamplerLinearNoMipWrapClampClamp,
 		                                 reservoir);
 	}
 

@@ -55,6 +55,11 @@ namespace ReferencePathTracer
 		                                       CommonRandom::OpenUnitInterval(RandomWord(sampleIdentity, SurfaceDimension(surfaceDepth, LightShapeYOffset))));
 
 		const LightSampling::DirectLightSample light = SampleLight(selection, surface.PositionWorld, lightShapeSample, skyTexture, skySampler);
+		if (!light.Valid)
+		{
+			return 0.0f.xxx;
+		}
+
 		const PathBsdf::Evaluation bsdf = PathBsdf::EvaluateContinuous(surface, light.DirectionWorld, lobeMasses, true, true);
 		if (!bsdf.HasSupport || !IsPathUnoccluded(sceneTlas, surface, light))
 		{
@@ -62,7 +67,9 @@ namespace ReferencePathTracer
 		}
 
 		const float lightProbability = light.LightSelectionPdf * (light.Delta ? 1.0f : light.PdfW);
-		const float misWeight = light.Delta ? 1.0f : PathTracer::PowerHeuristic(lightProbability, bsdf.PdfW);
+		const bool continuesPath = FinitePathDiagnosticSurfaceVertices == 0u || surfaceDepth + 1u < FinitePathDiagnosticSurfaceVertices;
+		const float competingPdfW = continuesPath && selection.Kind != KindAnalytic ? bsdf.PdfW : 0.0f;
+		const float misWeight = light.Delta ? 1.0f : PathTracer::PowerHeuristic(lightProbability, competingPdfW);
 		return (bsdf.Diffuse + bsdf.Specular) * light.IncidentRadiance * bsdf.Cosine * misWeight / lightProbability;
 	}
 }

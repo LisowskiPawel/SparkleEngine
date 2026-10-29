@@ -15,11 +15,43 @@
 
 static_assert(static_cast<std::uint8_t>(ReferencePathTracerIdentityComponent::Backend) == static_cast<std::uint8_t>(ViewportRenderProgressReason::BackendChanged));
 
+static bool HasIdealPunctualLightModel(const auto& light) noexcept
+{
+	return light.radius == 0.0f && light.range == 0.0f && light.distanceAttenuationCoefficients.x == 0.0f && light.distanceAttenuationCoefficients.y == 0.0f
+	    && light.distanceAttenuationCoefficients.z == 1.0f;
+}
+
+static bool HasUnsupportedReferenceLightModel(const PreparedRenderScene& scene) noexcept
+{
+	for (std::size_t index = 0; index < scene.directionalLights.size(); ++index)
+	{
+		if (scene.directionalLights[index].angularSizeRadians != 0.0f)
+		{
+			return true;
+		}
+	}
+	for (std::size_t index = 0; index < scene.pointLights.size(); ++index)
+	{
+		if (!HasIdealPunctualLightModel(scene.pointLights[index]))
+		{
+			return true;
+		}
+	}
+	for (std::size_t index = 0; index < scene.spotLights.size(); ++index)
+	{
+		if (!HasIdealPunctualLightModel(scene.spotLights[index]))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 ViewportRenderProgressReason ReferencePathTracerSession::ResolveAvailability(const RenderView& view, const PreparedRenderScene& scene, RayTracingExecutionFrontend executionFrontend) const noexcept
 {
 	const RhiCapabilities& capabilities = m_deviceServices.GetCapabilities();
 	const RhiFormatSupport* format = capabilities.FindFormatSupport(PixelFormat::R32G32B32A32_Float);
-	const bool supportsView = view.camera.ProjectionKind == CameraProjectionKind::Perspective && view.renderExtent.IsValid();
+	const bool supportsView = view.camera.ProjectionKind == CameraProjectionKind::Perspective && view.renderExtent.IsValid() && view.renderExtent.Width <= 16384u && view.renderExtent.Height <= 16384u;
 	if (!supportsView)
 	{
 		return ViewportRenderProgressReason::UnsupportedView;
@@ -35,7 +67,7 @@ ViewportRenderProgressReason ReferencePathTracerSession::ResolveAvailability(con
 	    scene.materials.end(),
 	    [](const MaterialData& material) { return material.alphaMode == 2u || material.subsurfaceStrength != 0.0f; });
 
-	return unsupportedContent ? ViewportRenderProgressReason::UnsupportedContent : ViewportRenderProgressReason::None;
+	return unsupportedContent || HasUnsupportedReferenceLightModel(scene) ? ViewportRenderProgressReason::UnsupportedContent : ViewportRenderProgressReason::None;
 }
 
 void ReferencePathTracerSession::BeginIdentity(const ReferencePathTracerIdentity& identity, RenderViewportExtent extent, ViewportRenderProgressReason reason, std::uint32_t discardedSamples) noexcept

@@ -78,7 +78,7 @@ public:
 	static sl::float2 BuildMotionVectorScale(const StreamlineViewConstantsInput& input)
 	{
 		Require(input.RenderExtent.Width > 0 && input.RenderExtent.Height > 0, "Streamline motion-vector scale requires a non-empty render extent.");
-		const float directionScale = input.MotionVectorsCurrentMinusPrevious ? 1.0f : -1.0f;
+		const float directionScale = input.MotionVectorsCurrentMinusPrevious ? -1.0f : 1.0f;
 		return sl::float2{directionScale / static_cast<float>(input.RenderExtent.Width), directionScale / static_cast<float>(input.RenderExtent.Height)};
 	}
 };

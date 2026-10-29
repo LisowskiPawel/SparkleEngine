@@ -4,7 +4,7 @@ RWTexture2D<float4> CurrentReservoirSampleTexture;
 RWTexture2D<float4> CurrentReservoirWeightTexture;
 RWTexture2D<float4> CurrentReservoirSurfaceTexture;
 Texture2D SkyTexture;
-SamplerState SamplerLinearClamp;
+SamplerState SamplerLinearNoMipWrapClampClamp;
 
 #include "/Engine/Lighting/RestirIndirectReservoirReuse.hlsli"
 
@@ -26,7 +26,14 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 
 	if (surface.Valid && RestirIndirectSpatialReuse != 0u)
 	{
-		IndirectReservoir::ReuseSpatial(pixelCoord, uint2(width, height), surface, TemporalReservoirSampleTexture, TemporalReservoirWeightTexture, SkyTexture, SamplerLinearClamp, reservoir);
+		IndirectReservoir::ReuseSpatial(pixelCoord,
+		                                uint2(width, height),
+		                                surface,
+		                                TemporalReservoirSampleTexture,
+		                                TemporalReservoirWeightTexture,
+		                                SkyTexture,
+		                                SamplerLinearNoMipWrapClampClamp,
+		                                reservoir);
 	}
 
 	CurrentReservoirSampleTexture[pixelCoord] = IndirectReservoir::PackSample(reservoir);

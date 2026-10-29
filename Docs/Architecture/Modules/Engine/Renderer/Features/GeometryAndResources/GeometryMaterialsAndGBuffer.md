@@ -80,7 +80,7 @@ The Emissive Show control supplies an ordinary `EmissiveEnabled` scalar shader p
 | World normal | `R16G16B16A16_Float` | +Z default | signed normalized world-space shading normal in RGB (X, Y, Z); consumers normalize through the shared GBuffer decoder, and the debug view maps `[-1, 1]` to display-linear `[0, 1]` |
 | World tangent | `R16G16B16A16_Float` | zero means no surface tangent | signed world-space shading tangent in RGB (X, Y, Z) from the raster or ray-hit tangent frame; alpha distinguishes a surface from sky, and the debug view maps a surface tangent from `[-1, 1]` to display-linear `[0, 1]` |
 | Material | `R8G8B8A8_UNorm` | metallic 0, roughness 1, AO 1, F0 0.04 | PBR parameters and debug |
-| Emissive | `R16G16B16A16_Float` | zero | lighting composite |
+| Emissive | `R32G32B32A32_Float` | zero | scene-linear emission retained before lighting composite/exposure |
 | Subsurface | `R8G8B8A8_UNorm` | zero | direct subsurface term |
 | Motion vector | `R16G16_Float` | zero | temporal reuse, accumulation, providers; sky motion is written separately |
 | Device Z | raster `D32_Float`; ray `R32_Float` | far/background by frontend convention | visibility depth and provider input |

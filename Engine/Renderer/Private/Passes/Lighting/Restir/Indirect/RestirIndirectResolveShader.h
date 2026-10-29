@@ -44,7 +44,7 @@ public:
 	SHADER_PARAMETER_TEXTURE_SRV(Texture2D, GBufferMaterial)
 	SHADER_PARAMETER_TEXTURE_SRV(Texture2D, SceneDepth)
 	SHADER_PARAMETER_TEXTURE_SRV(Texture2D, SkyTexture)
-	SHADER_PARAMETER_SAMPLER(SamplerState, SamplerLinearClamp)
+	SHADER_PARAMETER_SAMPLER(SamplerState, SamplerLinearNoMipWrapClampClamp)
 	SHADER_PARAMETER_BUFFER_SRV(RayTracingHitVertex, RayTracingHitVertices)
 	SHADER_PARAMETER_BUFFER_SRV(MorphTargetDeltaData, MorphTargetDeltas)
 	SHADER_PARAMETER_BUFFER_SRV(uint32_t, RayTracingHitIndices)

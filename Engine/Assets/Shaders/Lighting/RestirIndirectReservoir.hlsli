@@ -52,9 +52,11 @@ namespace IndirectReservoir
 
 	float4 PackSample(Reservoir reservoir)
 	{
-		return IsValid(reservoir)
-		    ? float4(float(reservoir.Selected.RandomPixel.x), float(reservoir.Selected.RandomPixel.y), float(reservoir.Selected.SampleIndex), float(reservoir.Selected.RandomFrameIndex))
-		    : 0.0f.xxxx;
+		// Numeric float payloads keep frame identity exact as two 16-bit words.
+		const uint pixelAndSample = reservoir.Selected.RandomPixel.x * RestirReservoirCommon::InitialCandidateCount + reservoir.Selected.SampleIndex;
+		const uint frameLow = reservoir.Selected.RandomFrameIndex & 0xFFFFu;
+		const uint frameHigh = reservoir.Selected.RandomFrameIndex >> 16u;
+		return IsValid(reservoir) ? float4(float(pixelAndSample), float(reservoir.Selected.RandomPixel.y), float(frameLow), float(frameHigh)) : 0.0f.xxxx;
 	}
 
 	float4 PackWeight(Reservoir reservoir)
@@ -65,9 +67,10 @@ namespace IndirectReservoir
 	Reservoir UnpackReservoir(float4 samplePayload, float4 weightPayload)
 	{
 		Reservoir reservoir;
-		reservoir.Selected.RandomPixel = uint2(samplePayload.xy + 0.5f);
-		reservoir.Selected.SampleIndex = uint(samplePayload.z + 0.5f);
-		reservoir.Selected.RandomFrameIndex = uint(samplePayload.w + 0.5f);
+		const uint pixelAndSample = uint(samplePayload.x);
+		reservoir.Selected.RandomPixel = uint2(pixelAndSample / RestirReservoirCommon::InitialCandidateCount, uint(samplePayload.y));
+		reservoir.Selected.SampleIndex = pixelAndSample % RestirReservoirCommon::InitialCandidateCount;
+		reservoir.Selected.RandomFrameIndex = uint(samplePayload.z) | (uint(samplePayload.w) << 16u);
 		reservoir.WeightSum = weightPayload.x;
 		reservoir.Target = weightPayload.y;
 		reservoir.M = weightPayload.z;

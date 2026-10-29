@@ -26,7 +26,7 @@ namespace BRDF
 		{
 			const float alpha = roughness * roughness;
 
-			const float D = Distribution::Evaluate(sd.NoH, alpha);
+			const float D = Distribution::Evaluate(sd.N, sd.H, alpha);
 			const float G = Geometry::EvaluateDirect(sd.NoV, sd.NoL, sd.VoH, roughness, alpha);
 
 			return CookTorrance(D, F, G, sd.NoV, sd.NoL);

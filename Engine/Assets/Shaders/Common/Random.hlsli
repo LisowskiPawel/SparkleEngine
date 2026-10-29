@@ -60,7 +60,7 @@ namespace CommonRandom
 
 	float OpenUnitInterval(uint word)
 	{
-		return ((float)(word >> 8u) + 0.5f) * 0x1.0p-24f;
+		return ((float)(word >> 9u) + 0.5f) * 0x1.0p-23f;
 	}
 
 	struct CategoricalSample

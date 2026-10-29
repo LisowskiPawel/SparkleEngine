@@ -14,12 +14,13 @@ namespace BRDF
 			return albedo * INV_PI;
 		}
 
-		float3 Burley(float3 albedo, float roughness, float NoV, float NoL, float LoH)
+		float3 Frostbite(float3 albedo, float roughness, float NoV, float NoL, float LoH)
 		{
-			const float f90 = 0.5f + 2.0f * roughness * LoH * LoH;
+			const float f90 = 0.5f * roughness + 2.0f * roughness * LoH * LoH;
+			const float energyFactor = lerp(1.0f, 1.0f / 1.51f, roughness);
 			const float lightScatter = 1.0f + (f90 - 1.0f) * Pow5(1.0f - NoL);
 			const float viewScatter = 1.0f + (f90 - 1.0f) * Pow5(1.0f - NoV);
-			return albedo * INV_PI * lightScatter * viewScatter;
+			return albedo * INV_PI * lightScatter * viewScatter * energyFactor;
 		}
 
 		float3 OrenNayar(float3 albedo, float roughness, float NoV, float NoL, float3 N, float3 V, float3 L)
@@ -61,8 +62,8 @@ namespace BRDF
 		{
 #if BRDF_DIFFUSE_MODEL == BRDF_DIFFUSE_LAMBERT
 			return Lambert(albedo);
-#elif BRDF_DIFFUSE_MODEL == BRDF_DIFFUSE_BURLEY
-			return Burley(albedo, roughness, sd.NoV, sd.NoL, sd.LoH);
+#elif BRDF_DIFFUSE_MODEL == BRDF_DIFFUSE_FROSTBITE
+			return Frostbite(albedo, roughness, sd.NoV, sd.NoL, sd.LoH);
 #elif BRDF_DIFFUSE_MODEL == BRDF_DIFFUSE_OREN_NAYAR
 			return OrenNayar(albedo, roughness, sd.NoV, sd.NoL, sd.N, sd.V, sd.L);
 #elif BRDF_DIFFUSE_MODEL == BRDF_DIFFUSE_CHAN

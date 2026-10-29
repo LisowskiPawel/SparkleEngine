@@ -16,6 +16,10 @@
 
 **Current readiness:** `PTD-01-R2 PASS` and `PTD-02-R0 PASS` remain valid because the precision amendment changes neither selector nor frame ownership. Stage 3 is **IMPLEMENTED / VALIDATION DEFERRED**; real raw GPU/fault evidence and separate review of binary32 error at the frozen SPP/radiance bounds remain unrun and receive no readiness credit. No estimator-authority, image, oracle, package, or release evidence is inferred. See [Current Feature Readiness](../../../../../../../Acceptance/CurrentReadiness.md#renderer).
 
+## 2026-10-27 Open-Interval Correction
+
+The frozen conversion `((word>>8)+0.5)*2^-24` rounded the largest bucket to `1` in binary32, contradicting its required open interval. The corrected [sampler contract](TransportAndEstimator.md#stage-0-decision-freeze) uses `((word>>9)+0.5)*2^-23`: all 23-bit midpoints are exactly representable and strictly between zero and one. This amends only that defective conversion; Philox words, exact categorical masses and the separate 24-bit roulette threshold/compensation remain unchanged. Source/shader-generation identity invalidates prior sample sequences; no compatibility representation or internal protocol version is added. Independent distribution/prefix/backend review remains part of PTD-02 before oracle acceptance, and older artifacts retain their original candidate identity.
+
 ## Gate At A Glance
 
 | Discovery must freeze | Why planning cannot safely infer it later |

@@ -110,7 +110,7 @@ namespace ReferencePathTracer
 
 			PathTracer::ApplyDirectionSample(path, bsdf);
 
-			if (path.SurfaceDepth >= 3u && !SurvivesRussianRoulette(path.Throughput, sampleIdentity, surfaceVertexCount))
+			if (FinitePathDiagnosticSurfaceVertices == 0u && path.SurfaceDepth >= 3u && !SurvivesRussianRoulette(path.Throughput, sampleIdentity, surfaceVertexCount))
 			{
 				break;
 			}

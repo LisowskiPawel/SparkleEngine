@@ -16,6 +16,14 @@ Replace seed replay with an explicit indirect-transport estimator whose reuse an
 | Result to reach | A frozen transport/check contract, followed by explicit path records, isolated shifts and mutation-safe reuse. |
 | Start / stop | IND-D0 and applicable release admission block production. Analytic/external pinned checks can support early stages; scene-level claims in Stages 5/8 require accepted Reference output. |
 
+## Correctness Repair Follow-up
+
+The 2026-10-27 repair does not certify the current seed-replay prototype as GRIS, unbiased or converged. [Renderer's finding index](../../../RendererDesign.md#pbr-correctness-follow-up) routes the shared defects.
+
+1. **IND initial/reuse stages: qualify exact identity (F08).** The current float reservoir payload stores frame identity as two exact 16-bit numeric fragments. Pixel X and the bounded initial-candidate index share the remaining integer payload component; Y stays numeric. No float-to-uint rounding offset or old decoder remains. Prove round trips at `8388609`, `16777217`, `UINT32_MAX`, coordinate limits and every initial index, and deterministic replay across temporal/spatial and shader-history resets on both APIs.
+2. **IND path/shift/reuse stages: close estimator support (open).** The selected transform/Jacobian, complete proposal/target and support-aware normalization must be derived for actual retained paths. Seed replay, equal normal/depth and M caps are not that derivation. Use the source-target two-state support counterexample, disocclusion, changed lobes/materials, visibility and emission as negative controls; compare fresh-only and temporal/spatial means with independent replicates and a matched raw reference. Do not use a denoiser or radiance clamp as the oracle.
+3. **IND integration/qualification: consume geometric/material and raw-signal proof.** Complete [MAT-S1](../../GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) for N03/F06 and direct-versus-reference model agreement; the GBuffer primary still lacks true geometric support. Qualify shared radiometry/GGX and RGBA32F ranges, then the actual guide producer identities and motion under [REC](../../PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md#correctness-repair-follow-up). Preserve the explicit finite-bounce/real-time approximation domain until the selected full estimator proves otherwise.
+
 ## Outcome
 
 Replace the current seed-replay prototype with a mathematically explicit, testable ReSTIR GI/GRIS path that produces reliable raw indirect diffuse/specular, survives temporal change, reconstructs portably, and expands to broader glossy/multi-bounce transport only after proof.

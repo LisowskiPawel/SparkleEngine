@@ -78,7 +78,7 @@ The native shader-table plan has exactly two current ray types, `Surface` and `S
 | Indirect temporal | Reprojects and traces indirect candidate data | Prior indirect reservoir, GBuffer, TLAS, hit/material/light/sky data -> temporal reservoir | Inline ray query only |
 | Indirect spatial | Reuses neighboring indirect candidates | Temporal reservoir and current surface -> spatial reservoir | Inline ray query only |
 | Indirect resolve | Evaluates selected indirect sample | Reservoir + TLAS/material/sky -> indirect diffuse/specular and RR guides | Inline ray query only; guides are full extent only when RR is enabled |
-| Composite | Combines five lighting lobes; sky fills background | Lighting targets + GBuffer emissive/subsurface/depth -> RGBA16F scene color | RR is optional post-lighting reconstruction, not the lighting producer |
+| Composite | Combines five lighting lobes; sky fills background | Lighting targets + GBuffer emissive/subsurface/depth -> RGBA32F scene color | RR is optional post-lighting reconstruction, not the lighting producer |
 
 ReSTIR history invalidates when the prepared-scene invalidation hash changes, when temporal view validity is zero, or when the graph topology changes. The same invalidation also resets image-provider history.
 

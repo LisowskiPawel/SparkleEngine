@@ -13,9 +13,11 @@ Release retains its existing opaque/alpha-tested base material promise. Anisotro
 
 ## Model And Domain Contract
 
+The 2026-10-27 correctness repair selects NVIDIA RTXPT's energy-normalized Frostbite diffuse formula for the existing real-time direct branch, replacing unnormalized Burley. This is a bounded correction of the measured roughness-one energy gain, not acceptance of the complete material model: `MAT-S0/1` must still close the roughness/view/F0 furnace matrix, direct-versus-reference model differences, shading-normal support and every retained optional branch. The frozen Reference Lambert/GGX target is unchanged. The implementation precedent is [RTXPT BxDF](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Rtxpt/Shaders/PathTracer/BSDFs/BxDF.hlsli), with that revision's Frostbite default; no NVIDIA implementation is treated as an independent oracle by association.
+
 | Profile | Required reasoning and checks |
 | --- | --- |
-| `MAT-BASE` | Pin actual Lambert/Burley/Oren-Nayar and GGX/geometry/Fresnel branches used by supported shaders; derive parameter/range/roughness mapping, lobe weights and energy behavior rather than certify every dormant compile-time option |
+| `MAT-BASE` | Pin actual Lambert/Frostbite/Oren-Nayar and GGX/geometry/Fresnel branches used by supported shaders; derive parameter/range/roughness mapping, lobe weights and energy behavior rather than certify every dormant compile-time option |
 | `MAT-ANISO` | Two principal roughness values and tangent orientation; normalized anisotropic GGX, correlated masking, visible-normal sampling, directional PDF/Jacobian and isotropic-limit agreement |
 | `MAT-COAT` | One dielectric coat over the base, explicit coat weight/roughness/IOR range and attenuation of underlying scattering; matched evaluation/sampling/PDF and no additive energy creation |
 | Existing subsurface | State its direct-light approximation, controls and absent transport; check zero-strength identity, finite/grazing response and bounded energy, without claiming skin/path-volume accuracy |

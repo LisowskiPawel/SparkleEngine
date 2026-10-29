@@ -38,7 +38,7 @@ public:
 	SHADER_PARAMETER(std::uint32_t, WorkFlags)
 	SHADER_PARAMETER_CBUFFER(RayTracingHitUniformData, RayTracingHitConstants)
 	SHADER_PARAMETER_TEXTURE_SRV(Texture2D, SkyTexture)
-	SHADER_PARAMETER_SHARED_SAMPLER(SamplerLinearWrapClamp)
+	SHADER_PARAMETER_SHARED_SAMPLER(SamplerLinearNoMipWrapClampClamp)
 	SHADER_PARAMETER_BUFFER_SRV(DirectionalLightGpuData, DirectionalLights)
 	SHADER_PARAMETER_BUFFER_SRV(PointLightGpuData, PointLights)
 	SHADER_PARAMETER_BUFFER_SRV(SpotLightGpuData, SpotLights)
