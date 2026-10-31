@@ -12,7 +12,7 @@
 
 **Evidence and disposition:** [Capability Evidence Plan](../../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../../Acceptance/FirstRelease.md)
 
-**Current readiness:** **50/100** — the shared task runtime and consumers exist in source; stress, failure, shutdown, capacity, and causal-performance proof remain open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#foundation-world-content-shaders-and-tools).
+**Current readiness:** **50/100** — the shared task runtime and consumers exist in source; selected executor parity, pressure, failure and settlement proof is recorded below. Broader stress and causal-performance acceptance remain open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#foundation-world-content-shaders-and-tools).
 
 Source ownership reconciled on 2026-10-06: `ParallelFor` computes balanced partition boundaries with widened arithmetic (`count * index / partitions`). Each nonempty range stays within the item count, including counts just above the partition cap. GameFramework resolves live counts at settled host dependency waves and delegates populated ranges to this shared implementation.
 
@@ -24,7 +24,7 @@ Source ownership reconciled on 2026-10-06: `ParallelFor` computes balanced parti
 | work graph | compiled DAG, continuations, `WhenAll`, nested completion, and bounded parallel ranges | graph capacities and policies reject before launch |
 | serial reference | zero-worker configuration executes on the caller | mixed invalid worker configurations reject |
 | failure/cancellation | exceptions become failure; descendants suppress; cleanup settles; cancellation is cooperative | already-running tasks must observe stop and return |
-| structured lifetime | typed parent/child scopes cancel and join before owner destruction | worker-side waits/shutdown that could self-deadlock reject |
+| structured lifetime | hosts explicitly settle typed parent/child scopes before owner destruction | destructor cancellation is a fallback and asserts prior settlement; worker-side waits/shutdown that could self-deadlock reject |
 | observation | generation/status/result/per-node data and Windows ETW tracing | no portable trace provider or accepted stress/performance result |
 
 ```mermaid
@@ -73,10 +73,18 @@ Builder records nodes/edges -> `Compile` validates the complete graph -> `Submit
 
 Context ownership rechecked on 2026-10-25: lane and cancellation binding is private to execution/dispatch. Contexts do not duplicate execution generation; generation identity remains on execution handles, scheduler state and profiling records that consume it. Hosts cannot rebind runtime state through a public helper.
 
+### Worker Configuration And Source Proof
+
+`TaskExecutor::Implementation::Runtime::ValidateConfiguration` owns executor admission. It sums the three public 32-bit lane counts in 64 bits before checking the existing 256-worker aggregate limit, so overflow cannot bypass rejection before worker allocation. Zero workers retain the serial path; unsupported lane mixtures and graph capacities still reject through the existing exception. The constructor's later bounded reservation and all scheduling, queue, cancellation and publication policies are unchanged.
+
+Application resolves its task settings into this configuration and owns the application scope. The scene loader borrows that executor, owns a child Document scope and shared load state, and submits read/decode/fan-in/finalize dependencies with at most two scene assets in flight. Each asset slot has one writer per dependent stage; finalization consumes the settled slots. Cancellation and owner retirement use those existing scopes, not a second executor or loading-specific cancellation runtime.
+
+[FCR-TASK-01](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) records the selected FWC-2 repair and native production-API checks: serial and 1/2/4 workers per lane, exclusive ranges and nested completion, controlled failure, worker-wait rejection, bounded active-execution pressure, cooperative cancellation and Drain/Cancel settlement. The raw negative probe detects the superseded overflow guard. This is executor-boundary proof using a load-shaped DAG; it is not actual Sponza decoding/frame acceptance, exhaustive dispatch/stress qualification or measured throughput/crossover evidence.
+
 ## Explicit Non-Capabilities And Risks
 
 - No coroutines, fibers, GPU task scheduler, arbitrary task priorities, dynamic graph mutation after compile, cross-process queue, or distributed execution was found.
 - `TaskEvent::Wait` is deliberately blocking-I/O-only; it is not a general wait primitive for frame-critical work.
 - Cancellation is cooperative for running bodies; bounded cancellation latency depends on each task checking its token.
 - Work stealing is lane-local. The inventory does not prove load balance, fairness, determinism of parallel completion order, or absence of starvation.
-- No active repository test target currently proves graph cycles, cancellation races, repeated shutdown, or capacity edges; these belong in evidence closure.
+- No permanent repository test target owns these checks. The linked selected source proof retains temporary native-probe results; exhaustive races, remaining capacity/dispatch cells and causal performance still require their own admitted evidence.

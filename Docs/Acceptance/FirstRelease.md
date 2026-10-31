@@ -10,15 +10,34 @@ Use this contract to decide whether exact release bytes may ship. Make product c
 
 See [Roadmap progress and next work](../Strategy/Roadmap.md#release-progress). This page owns the checks required to ship; it does not repeat the work log.
 
-Read [approved scope](#approved-release-scope), [shipping gates](#release-gates), or [remaining blockers](#current-fr-01-blockers). Progress and next work stay in the Roadmap.
+Read [approved scope](#approved-release-scope), [shipping gates](#release-gates), or [public-rights blockers](#current-fr-01-blockers). Progress and next work stay in the Roadmap.
 
 ## Current FR-01 Blockers
 
 - Historical public asset rights remain unresolved; acquisition recipes do not qualify old repository bytes.
 - Exact Qt/NVIDIA/helper/CRT redistribution and symbol admission remain open. [Input contract](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#release-inputs).
-- The passing baseline at `fec29052c6f6195547f2062da9def86e520dc0df` is historical. Later source changes need their own applicable checks.
+- [FR-01 source requalification](#fr-01-source-requalification) is complete for the recorded internal source candidate: empty-cache acquisition/build/cook/Empty and exact-product warm/offline replay pass. The public obligations above remain final FR-07 work; historical PD-2 passes retain their original identities.
 
 Certificate enrollment is deferred until before public release. It does not prevent unsigned internal package development. [Roadmap](../Strategy/Roadmap.md#where-we-are-and-what-is-next).
+
+### FR-01 Source Requalification
+
+**`ITER-FR01-COLD-RECOVERY-20261031` — PASS, remaining internal source work closed.** [Result and control record](../../artifacts/validation/releases/0.1.0/fr01-cold-recovery-20261031/completion.json). The fresh isolated source has all 2,834 input hashes of `accba4ea654341270e218075db1874870436ed76`, fingerprint `41906b4d…`. [Candidate identity](../../artifacts/validation/releases/0.1.0/fr01-cold-recovery-20261031/candidate.json) retains the earlier base/patch and scope export. The private commit is not a public tag or product archive; concurrent shared-worktree changes retain their own identity.
+
+| Cell | Recorded result / remaining boundary |
+| --- | --- |
+| Identity, pins, notices and content inputs | Reuse the unchanged [input audit](../../artifacts/validation/releases/0.1.0/655f5fe8-fr01-20261031/static-validation.json). The [fresh cold cache](../../artifacts/validation/releases/0.1.0/fr01-cold-recovery-20261031/cold-inputs.json) passes all 13 Git pins and both archive hashes. [Actual payload provenance](../../artifacts/validation/releases/0.1.0/fr01-cold-recovery-20261031/current-payload-provenance.json) binds 82 new PEs and unchanged private notice inputs: 21 exact receipts and the separately hashed first-party license newline variant. Three historical URL receipts remain unrefreshed. Final notice-byte binding and public rights stay with FR-07. |
+| REL-00 scope export | The [reviewed `release-scope.md`](../../artifacts/validation/releases/0.1.0/655f5fe8-fr01-20261031/release-scope.md) is exported and hash-bound by [candidate identity](../../artifacts/validation/releases/0.1.0/655f5fe8-fr01-20261031/candidate.json). All six choices and accepted PTD-00 are preserved; final candidate freeze rechecks changed dispositions and identity. |
+| Architecture / source style / shader-compiler owners | Architecture passes. Two long RHI calls required formatting only; [unchanged-token/layout review](../../artifacts/validation/releases/0.1.0/655f5fe8-fr01-20261031/formatter-repair.json), focused check and full 2,315-file style recheck pass with clang-format/clang-tidy 22.1.3. [ShaderCompilerCliValidation](../../artifacts/validation/releases/0.1.0/655f5fe8-fr01-20261031/shader-cli-retry.json) passes paired DXIL/SPIR-V cooking, deterministic replay and cancellation/traversal/unknown-shader controls. The original interrupted baseline invocation remains inconclusive; its failed style observation is retained with the repair. |
+| Empty-cache source acquisition / build / cook / Empty | PASS: [cold route](../../artifacts/validation/releases/0.1.0/fr01-cold-recovery-20261031/cold-source-result.json) starts with empty dependency/build/cook caches and supplies none. Public sync/configure, ShippingGame, three helpers and `cook.all` return native exit 0; Empty is visually confirmed and closes normally. Sync takes 251.457 s; the route through reviewed launch takes 1,573.199 s. Earlier Assimp/Streamline/PIX transport failures remain in their [original report](../../artifacts/validation/releases/0.1.0/655f5fe8-fr01-20261031/completion.json); fresh success supersedes their blocking status without changing pins, adding retries or relabelling cached proof. |
+| Exact-product warm offline replay | PASS: [offline replay](../../artifacts/validation/releases/0.1.0/fr01-cold-recovery-20261031/offline-source-result.json) reuses only this cold cache and passes the same sync/build/cook/Empty route in 64.651 s. No adapter is active during the boundary probes, HTTPS fails before/after replay, then the original Wi-Fi/HTTPS connection is restored. All 99 checked product/cooked/symbol files retain their hashes; native Game/Launcher exit 0. Compatible [missing-Qt/dirty-input controls](../../artifacts/validation/releases/0.1.0/655f5fe8-fr01-20261031/source-negative-controls.json) are reused for unchanged owners. Seven-map, installed and feature-quality acceptance remain with their existing gates. |
+| Public rights and trust | BLOCKED for formal public release: historical source/content rights, exact Qt/NVIDIA/helper/CRT redistribution, corresponding-source/notice and applicable mark obligations, final payload provenance and trusted signing remain FR-01/final FR-07 review. This source iteration grants no public redistribution or publication approval. |
+
+**Budget and preservation:** recovery needs no production change or new dependency manager, baseline runner or test framework. The earlier two-call formatter repair retains its mechanical/authored Stage Source-Style PASS; this evidence/documentation continuation has no added or modified owned production source. All six choices, seven examples plus Empty, approved defaults, display-selected resolution and accepted PTD-00 remain intact. Original PD-2/package binaries are not relabelled.
+
+The [resource observation](../../artifacts/validation/releases/0.1.0/fr01-cold-recovery-20261031/source-resource-observations.json) records 27.761 GiB maximum sampled system commit across cold/warm work and 11.223 GiB owned storage at completion, within the source budgets. These are sampled/completion observations, not instantaneous peaks, first-interactive-frame latency or release-performance acceptance. [Cleanup](../../artifacts/validation/releases/0.1.0/fr01-cold-recovery-20261031/cleanup.json) removes temporary probe/observer source, stops the sampler and retains logs, products and symbols. Automatic approval review again rejected generated-checkout removal as “blocked by policy”; old/new validation roots and their isolated state are retained. This is recorded local artifact retention, not a passed removal check. Unrelated state/edits are preserved.
+
+**Remaining / next:** no internal FR-01 source item remains for this snapshot; requalify only inputs or cells invalidated by a changed candidate. The global next item is [PD-4's final archive reconciliation](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-4--support-incident-response-and-product-closure); PD-3 is accepted under its explicit removal exclusion. Final notice-byte binding, certificate/signature execution and exact public-rights/provenance closure remain FR-07. Retained local validation roots remain listed in the cleanup record.
 
 ## Product Plan And Public Release
 
@@ -31,6 +50,10 @@ Certificate enrollment is deferred until before public release. It does not prev
 The product plan may retire after all six reports explicitly pass the unsigned-internal-product scope; public-release qualification remains open. Certificate issuance, signing and public redistribution stay listed as pending FR-07 obligations, not failed product-stage prerequisites or exclusions. Signing changes byte identities; final integrity/trust and affected consumer checks must run again before public release. Package input identity, internal integrity and truthful failure behavior are not deferred.
 
 Broader feature/reference/performance/native acceptance remains under REL-04 through REL-07; recorded candidate review, publication and closeout remain REL-08 through REL-11. Reuse valid product evidence there without treating this implementation plan as whole-release approval. [Product delivery progress](FeatureCompletionReports.md#product-delivery-progress) records completed checks and remaining work.
+
+**Accepted PD-3 closure, 2026-10-31:** the scope owner's instruction, "consider this is done lets close this stage", accepts unsigned archive `a0f34c8b...` with only actual selected-extraction removal [EXCLUDED](../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/pd3-repaired-20261031/accepted-close-20261031/scope-decision.json). `FCR-PROD-05`/`REL-03` pass that admitted internal scope. The verified folder remains retained; no deletion or physical-removal pass is claimed. Existing technical proof and unchanged user-state/archive/symbol inventories are preserved. This candidate-specific exception does not alter the broader release contract.
+
+**FR-02 final recheck, 2026-10-31 — PASS:** [verification record](../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/fr02-final-20261031/completion.json) uses the unchanged package owner to verify all 434 archive members, retained extraction/layout/signatures, SBOM/provenance and exact native/shader companion identities. No invalidated admitted input, stale package member or internal FR-02 check remains. Existing build/cook/installed proof is reused; the archive is not regenerated or replaced. Current unrelated checkout edits retain their own identity. PD-4 reconciliation and final FR-07 public qualification remain separate.
 
 ## Approved Release Scope
 
@@ -313,7 +336,7 @@ The candidate traceability ledger MUST map each included/experimental `FCR-*` an
 
 `REL-00` produces one version-controlled release-scope record. It MUST name:
 
-The [approved scope](#approved-release-scope) supplies that record, with [512 inventory dispositions, current selector splits and component/helper/store membership](ReleaseScope/CapabilityDispositions.md). [FR-00 reconciliation](#fr-00-reconciliation-result) closes discovery for its recorded snapshot. Exporting the record into the exact candidate's `release-scope.md` remains a candidate-freeze obligation; rights and executable acceptance remain with their later gates.
+The [approved scope](#approved-release-scope) supplies that record, with [512 inventory dispositions, current selector splits and component/helper/store membership](ReleaseScope/CapabilityDispositions.md). [FR-00 reconciliation](#fr-00-reconciliation-result) closes discovery for its recorded snapshot. [FR-01](#fr-01-source-requalification) records the hash-bound source-candidate `release-scope.md` export. FR-06 rechecks final candidate identity and changed dispositions; rights and executable acceptance remain with their later gates.
 
 - public product name, version, platform, architecture, minimum Windows version, and supported GPU/API matrix;
 - minimum and reference CPU, memory, GPU, driver, and storage configurations;
@@ -333,7 +356,7 @@ Any later scope addition returns `REL-00` to `Blocked`. Defect fixes within froz
 
 ### FR-00 Reconciliation Result
 
-**`ITER-FR00-02` — PASS, scope discovery only (2026-10-31).** Owner: release scope; technical closure remains assigned to the existing module/stage owners in the [ledger](ReleaseScope/CapabilityDispositions.md#reconciled-membership-and-check-routes). Input: clean `e44692cce7eb33052b0a1ac763e66137a861639b` plus this documentation diff. [Frozen inputs](../../artifacts/validation/docs-focus/fr00-20261031/inputs-before.json) and [check results](../../artifacts/validation/docs-focus/fr00-20261031/validation.json) bind the observation. This is not a package, runtime, rights or public-release verdict, nor a pass for REL-00's still-unexported candidate artifact.
+**`ITER-FR00-02` — PASS, scope discovery only (2026-10-31).** Owner: release scope; technical closure remains assigned to the existing module/stage owners in the [ledger](ReleaseScope/CapabilityDispositions.md#reconciled-membership-and-check-routes). Input: clean `e44692cce7eb33052b0a1ac763e66137a861639b` plus this documentation diff. [Frozen inputs](../../artifacts/validation/docs-focus/fr00-20261031/inputs-before.json) and [check results](../../artifacts/validation/docs-focus/fr00-20261031/validation.json) bind the observation. This is not a package, runtime, rights or public-release verdict; the subsequent source-candidate export is recorded under [FR-01](#fr-01-source-requalification).
 
 **Outcome and budget:** preserve `NS-REAL`, `NS-EVIDENCE`, `NS-OWNERSHIP` and `NS-ADOPTION`; advance `NS-SIMPLIFY` through one reconciled scope authority. Preserve `PGE-01/13/15` obligations with no evidence-grade increase; other persona/workload gates are not applicable to documentation discovery. Retain the existing scope/ledger owners; replace stale helper, selector and default descriptions. Production state/API/hooks/copies/dependencies, generated builds and runtime exposure: zero. Source deletion is unjustified because this iteration classifies exposure without retiring implementation. No target-only feature or new validator is shipped.
 
@@ -345,7 +368,7 @@ Any later scope addition returns `REL-00` to `Blocked`. Defect fixes within froz
 
 Risk owners are release scope for `01/02` and documentation ownership for `03`. Likelihood is material because prior rows already drifted; impact is unintended scope or invalid proof. Prevention is the single ledger and unchanged approved rows; detection is the mapped static/negative check. A failure holds discovery, corrects the affected disposition/link and reruns that check. Retirement evidence is the passing scoped report. Changed selectors, membership, defaults or affected source inputs invalidate the corresponding cells; unrelated revisions do not.
 
-**Remaining / next:** no FR-00 discovery item remains for this snapshot. FR-01 qualifies changed rights/source-baseline inputs and exports the scope record when declaring the candidate identity; final public rights/signing remain FR-07. FR-06 rechecks that export against the frozen candidate. Global next work remains PD-3's repaired-archive installed member-failure check; this result neither executes it nor relabels its evidence. PTD-00 remains accepted; reference recovery and Stage 10 retain their current prerequisites.
+**Remaining / next:** no FR-00 discovery item remains for this snapshot. FR-01's source-candidate export and completed internal source cells are [recorded above](#fr-01-source-requalification); final public rights/signing remain FR-07. FR-06 rechecks that export against the frozen candidate. Global next work follows Roadmap's PD-4 pointer; this result neither executes it nor relabels its evidence. PTD-00 remains accepted; reference recovery and Stage 10 retain their current prerequisites.
 
 ## Required Rendering Closure
 
@@ -662,7 +685,7 @@ artifacts/validation/releases/<version>/<candidate-id>/
 
 **Responsibility:** define the complete evidence and approval boundary for the first public SparkleEngine release
 
-**Review the approved release:** start with the [six settled choices](#approval-and-next-work) and [FR-00 discovery result](#fr-00-reconciliation-result). The [capability ledger](ReleaseScope/CapabilityDispositions.md) owns dispositions. Candidate scope export, rights and executable release gates remain open; they do not reopen accepted discovery.
+**Review the approved release:** start with the [six settled choices](#approval-and-next-work) and [FR-00 discovery result](#fr-00-reconciliation-result). The [capability ledger](ReleaseScope/CapabilityDispositions.md) owns dispositions. [FR-01](#fr-01-source-requalification) records the source-candidate scope export; final candidate recheck, rights and executable release gates remain open without reopening accepted discovery.
 
 **Roadmap and sequence:** [F. Release-First Principal Graphics Roadmap](../Strategy/Roadmap.md)
 

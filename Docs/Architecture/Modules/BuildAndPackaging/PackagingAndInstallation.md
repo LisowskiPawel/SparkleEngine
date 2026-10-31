@@ -2,7 +2,7 @@
 
 [Docs](../../../README.md) / [Up](BuildAndPackagingCapabilities.md)
 
-**Status:** package contract and current implementation route; consumer package acceptance remains blocked
+**Status:** package contract and current implementation route; unsigned internal PD-3 scope accepted with explicit removal exclusion
 
 **Scope:** define release inputs, deterministic packaging, clean-machine operation and local diagnostics/replacement
 
@@ -10,7 +10,7 @@
 
 **Strategy and acceptance sources:** [`PGE-01`, `PGE-13`, `PGE-14`, `PGE-15`](../../../Strategy/Requirements.md), [First Release](../../../Acceptance/FirstRelease.md), and `FCR-PROD-02`/`FCR-PROD-05` in [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md)
 
-**Acceptance:** repaired `3743e72a…` has assembly/matched-symbol and installed-member failure proof; store recovery, affected positive reconciliation and removal keep `FCR-PROD-05`/`REL-03` blocked. Earlier `e771a244…` installed positives retain their accepted-laptop scope and identity. See [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) and [PD-3 remaining items](../../CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation).
+**Acceptance:** `FCR-PROD-05`/`REL-03` pass the admitted unsigned internal `a0f34c8b...` scope. Assembly/symbols, installed failures/recovery and positive reconciliation pass; the user accepts the selected extraction remaining retained, so actual removal is `EXCLUDED`. Earlier `e771a244...`/`3743e72a...` receipts keep their identities and accepted-laptop limits. See [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); [PD-4](../../CrossModule/FirstRelease/ProductImplementationPlan.md#pd-4--support-incident-response-and-product-closure) owns final archive reconciliation. The general package contract and public-release requirements are unchanged.
 
 
 Use [reviewed inputs](#reviewed-package-inputs) to prepare the package, [package command](#current-package-entry) to assemble it, [package checks](#fcr-prod-05-package-contract) to qualify it, and [local diagnostics](#local-diagnostics-and-release-review) for incident/export/replacement behavior.
@@ -32,20 +32,20 @@ The stage verifier checks paths, hashes, notices, components, read-only attribut
 
 ZIP creation uses sorted membership and fixed timestamps. Independent ZIP enumeration checks membership, size, hashes and attributes before publication. The manifest excludes its own digest; ZIP verification checks its exact staged bytes, and the external report binds the archive hash.
 
-Outputs stay under `artifacts/releases/<version>/`. Assembly starts under `.partial-<id>/`; the verified ZIP, report and retained evidence publish together into `<archive-sha256>/` by one directory move. A report-write failure publishes nothing; an existing destination is never overwritten. Only `SparkleEngine-v<version>-windows-x64-unsigned-internal.zip` is the product archive. Internal assembly does not pass REL-03; trusted signing and public redistribution obligations remain pre-release steps.
+Outputs stay under `artifacts/releases/<version>/`. Assembly starts under `.partial-<id>/`; the verified ZIP, report and retained evidence publish together into `<archive-sha256>/` by one directory move. A report-write failure publishes nothing; an existing destination is never overwritten. Only `SparkleEngine-v<version>-windows-x64-unsigned-internal.zip` is the product archive. REL-03 also requires the applicable installed acceptance; the admitted internal result is linked above. Trusted signing and public redistribution remain FR-07 obligations.
 
 Core owns manifest-relative paths and product size/hash verification. Launcher prefers its installed location over the current directory and rejects checkout overrides. First launch verifies and transactionally seeds `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`: project recipes into `Source/Showcase/`, the immutable `Engine/Cooked/` baseline into `Cooked/`. Initial shader readiness verifies the copied baseline against the package manifest without a recook signal; later recooks require their completion signal. Repeat launches preserve selections; a changed or incomplete package identity requires an explicit store reset. Sync/cook/run use the existing typed owners and packaged helpers; source build/cleanup actions are unavailable in installed mode. Missing or malformed package metadata cannot select a checkout.
 
-The installed route has exact-archive positive proof, including all seven maps, a fresh selected subset and relocated read-only execution. Finish `FM-PKG-04/05` and removal under `CHK-PKG-02`; regenerate only when accepted inputs change. Public redistribution and publisher signing remain FR-07 work.
+The admitted internal route has exact-candidate assembly, failure/recovery and positive reconciliation, including applicable seven-map/subset/offline/relocation proof with original identities retained. Actual selected-extraction removal is explicitly excluded by its scope owner. The [FR-02 recheck](../../../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/fr02-final-20261031/completion.json) confirms the accepted archive, membership and symbol identities remain unchanged. Regenerate only when admitted inputs change; PD-4 reconciliation and final FR-07 public qualification retain their own gates.
 
 ## At A Glance
 
 | Product boundary | Current state | Required result |
 | --- | --- | --- |
 | development artifacts | implemented workspace-oriented output/copy routes | remain inputs only; never advertised as a release package |
-| immutable staging | source route and structural rejection checks exist | qualify exact three-product bytes through the complete route |
+| immutable staging | exact `a0f34c8b...` assembly, membership/integrity and symbols verified | recheck affected inputs for a new candidate |
 | trust/publication | integrity, import and metadata verification exist | complete notices/SBOM/source obligations, symbols and pre-release signing |
-| installation and writable state | seven-map/subset/offline and Editor writes checked; original user state restored | finish installed failure coverage and removal |
+| installation and writable state | admitted internal failure/recovery and positive reconciliation pass; original user state restored | actual selected-extraction removal remains explicitly excluded for this candidate |
 | relocation and clean-machine use | `e771a244…` standard-user Unicode/read-only relocation checked on accepted MIN-01 laptop | no fresh-OS or broader hardware claim |
 
 The internal route is one directional transaction: Build -> Cook -> Stage -> Verify -> Package -> Extract/Run. FR-07 adds publisher signing and verifies the resulting final bytes. Each step consumes a declared predecessor product and must never scan unrelated development directories to infer missing membership.
@@ -54,9 +54,9 @@ The internal route is one directional transaction: Build -> Cook -> Stage -> Ver
 
 | ID | Capability | Current state |
 | --- | --- | --- |
-| `PKG-01` | Deterministic immutable staging tree and manifest | current internal assembly/integrity verified; final product proof open |
+| `PKG-01` | Deterministic immutable staging tree and manifest | admitted `a0f34c8b...` internal assembly/integrity and installed proof accepted |
 | `PKG-02` | License/SBOM, signature, integrity, and publication verification | internal integrity and symbol identities checked; public obligations/signing open |
-| `PKG-03` | Standard-user extract/run/remove with separate writable state | all-map/subset operation checked; installed failures and removal remain open |
+| `PKG-03` | Standard-user extract/run/remove with separate writable state | admitted installed failure/recovery and positive proof accepted; actual selected-extraction removal explicitly excluded |
 | `PKG-04` | Relocated, read-only, offline, clean-machine product operation | qualified positive journeys for `e771a244…` under the accepted existing-laptop scope |
 
 ## Capability Boundary
@@ -74,7 +74,7 @@ The capability uses the same route for internal qualification and final publicat
 
 ## Requested And Active State
 
-Assembly and positive installed checks are qualified for `e771a244…`; missing required failure/removal results keep package acceptance open. A development artifact directory is not a package. The manifest and report bind products/profiles, backend/provider support, content, candidate and unsigned-internal status.
+Package acceptance passes the admitted unsigned internal `a0f34c8b...` scope with its recorded removal exclusion. Earlier `e771a244...` and `3743e72a...` results remain bound to their own bytes and input-based applicability; PD-4 still reconciles all six product reports. The manifest and report bind products/profiles, backend/provider support, content, candidate and unsigned-internal status.
 
 ## Failure, Capacity, And Observability
 
@@ -104,7 +104,7 @@ Sparkle does **not** adopt UAT, BuildGraph XML, nodes/agents/triggers as public 
 
 ## `FCR-PROD-05` Package Contract
 
-**Proof allocation:** PD-3 qualifies an explicitly unsigned internal archive; PD-4 reuses that exact archive for adoption/replacement. Publisher signing and public redistribution close in FR-07, with affected checks repeated for the changed bytes. [Product delivery progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retains the earlier archive result without qualifying the current candidate.
+**Proof allocation:** PD-3 qualifies the admitted unsigned internal archive; PD-4 consumes that exact archive for adoption/replacement and six-report reconciliation. Publisher signing and public redistribution close in FR-07, with affected checks repeated for changed bytes. [Product delivery progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retains current acceptance, the explicit removal exclusion and earlier receipts with their original identities.
 
 | ID | Binary acceptance criterion | Proof phase |
 | --- | --- | --- |
@@ -189,7 +189,7 @@ Source use still requires Git for archive-to-checkout identity and CMake for con
 
 This follows Unreal's [precompiled-binary workflow](https://dev.epicgames.com/documentation/en-us/unreal-engine/using-precompiled-binaries-in-unreal-game-sync-for-unreal-engine) and [shared binary locations](https://dev.epicgames.com/documentation/en-us/unreal-engine/unreal-engine-directory-structure). Sparkle reuses CMake and its manifest verifier rather than adding Unreal Game Sync, Perforce or a second build system.
 
-Selected source and cooked content live under `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`, outside the extraction. Downloads are explicit Launcher selections, verified and transactionally published by the existing acquisition/cook owners. Keep source and cooked subtrees distinct; use the existing project/asset identities without introducing asset or shader versions. Existing settings/log owners remain per-user. The installed route implements this layout; PD-3 still must qualify offline use, read-only extraction, containment and helper discovery. Source workspaces keep their existing source/cooked paths.
+Selected source and cooked content live under `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`, outside the extraction. Downloads are explicit Launcher selections, verified and transactionally published by the existing acquisition/cook owners. Keep source and cooked subtrees distinct; use the existing project/asset identities without introducing asset or shader versions. Existing settings/log owners remain per-user. The installed route implements this layout; [PD-3 results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) record offline/read-only/containment/helper applicability and current recovery checks separately from the user-accepted removal exclusion. Source workspaces keep their existing source/cooked paths.
 
 
 ### Reviewed Package Inputs
@@ -243,7 +243,7 @@ The manifest owns `ProjectPath=Projects/Showcase`, `EnginePath=Engine`, `Content
 - Preserve the exact installed toolchain/SDK versions and prerequisites independently of redistributable components. Dependency license files and inline notices (including MikkTSpace, tinyexr and CMP_Core) must reach the notice bundle. NVIDIA SDK redistribution conditions and Qt LGPL/source/relink obligations must be satisfied for their admitted bytes.
 - Signing choice (owner delegated selection, 2026-10-11): **Certum Standard Code Signing in the Cloud, individual subscriber Pawel Lisowski**, through SimplySign Desktop and Windows SDK SignTool. This preserves the named publisher without assuming eligibility for an open-source-only certificate. [Certum's individual enrollment](https://support.certum.eu/en/code-signing-required-documents/) requires purchase and identity/address verification. Enrollment, payment and issuance have not occurred; no account or certificate was fabricated. The maintainer completes verification directly with Certum; identity documents and credentials never enter this repository.
 - Sign staged first-party PE files with the issued certificate's explicit thumbprint, SHA-256 file digest and RFC 3161 SHA-256 timestamp at `http://time.certum.pl/`, as in [Certum's cloud signing instructions](https://files.certum.eu/documents/manual_pl/Podpisywanie_narzedziem_signtool_i_jarsign_Code_Signing_w_chmurze.pdf). Keep valid third-party signatures. The package owner supplies the allowlisted file paths; signing is FR-07 work after issuance, before public publication. Verify every signature with Authenticode policy, timestamp and expected publisher. Unsigned local builds are development evidence.
-- No configured signing certificate exists on the audited host. The route is decided; execution remains unavailable until issuance and SimplySign activation. The [candidate report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) records this distinction. A self-signed certificate does not close it.
+- Certificate availability is not established by a source-baseline check. Enrollment/SimplySign activation, signing and signed-byte verification remain final FR-07 obligations under the decided route. The [candidate report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) distinguishes unsigned technical proof from public trust; a self-signed certificate does not close that boundary.
 
 #### Qt Source Companion And Component Terms
 
@@ -281,7 +281,7 @@ FR-02 implements transactional stage/verify/archive and package-relative discove
 
 Deliver self-service onboarding, diagnostics and recovery. **No user support service** is offered; [Release Scope](../../../Acceptance/FirstRelease.md#approval-and-next-work) owns that decision.
 
-Package and aggregate product acceptance remain open; exact-archive native incident results are in the [product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
+The admitted internal package scope is accepted; aggregate product acceptance remains open for PD-4. Exact-archive native incident results and unavailable categories stay in the [product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
 
 ### Current Local Route
 
@@ -298,7 +298,7 @@ BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,Revi
 | Crash/hang | User-reported categories; ordinary automatic collection unavailable. Archive-bound native D3D12 removal/manual recovery has supporting proof in the product reports. |
 | Review | Pawel Lisowski owns release review; the author or agent may execute it and must name the actual reviewer. Unresolved S0/S1 blocks approval. Local review, publication and aggregate acceptance are separate. |
 
-Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply. Exact-archive interrupted-extraction rejection, distinct-version startup/rollback and supported native/manual diagnostics have [supporting proof](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); final acceptance waits for PD-3. No public replacement or withdrawal was performed.
+Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply. Exact-archive interrupted-extraction rejection, distinct-version startup/rollback and supported native/manual diagnostics have [supporting proof](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); final adoption acceptance waits for current-archive PD-4 reconciliation. No public replacement or withdrawal was performed.
 
 Invoke `ReviewRelease.ps1` with `-PackageRoot`, `-ArchivePath`, `-ArchiveSha256`, `-LedgerPath`, `-Reviewer` (the actual author/agent), `-Decision Approve|Replace|Withdraw` and an existing local `-OutputDirectory`. Replacement also needs `-ReplacementRoot`, `-ReplacementArchive`, `-ReplacementSha256`, `-ReplacementLedgerPath` and a state policy.
 

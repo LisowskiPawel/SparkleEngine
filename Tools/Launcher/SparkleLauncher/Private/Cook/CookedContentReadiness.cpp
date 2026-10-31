@@ -46,6 +46,14 @@ namespace SparkleLauncher
 		return (!cooked.empty() && DirectoryHasRegularFiles(cooked / relativeDirectory)) || (!shared.empty() && DirectoryHasRegularFiles(shared / relativeDirectory));
 	}
 
+	static bool CookedSceneScopeIsReady(const std::filesystem::path& cooked)
+	{
+		std::error_code errorCode;
+
+		return !cooked.empty() && std::filesystem::is_regular_file(cooked / "SceneAssetRegistry.sreg", errorCode) && !errorCode && DirectoryHasRegularFiles(cooked / "SceneManifests")
+		    && DirectoryHasRegularFiles(cooked / "Meshes");
+	}
+
 	static bool ShaderPublicationMatchesSignal(const std::filesystem::path& cookedShaderDirectory)
 	{
 		const std::filesystem::path mapPath = Filesystem::BuildGlobalShaderMapPath(cookedShaderDirectory);
@@ -146,7 +154,7 @@ namespace SparkleLauncher
 		const auto shared = Filesystem::IsSourceWorkspace(repositoryRoot) ? outputs.SharedCookedProjectDirectory() : std::filesystem::path{};
 
 		return CookedContentReadiness{
-		    .MeshesReady = CookedAssetScopeHasFiles(cooked, shared, "Meshes"),
+		    .MeshesReady = CookedSceneScopeIsReady(cooked) || CookedSceneScopeIsReady(shared),
 		    .TexturesReady = CookedAssetScopeHasFiles(cooked, shared, "Textures"),
 		    .Shaders = cooked.empty() ? CookedShaderPublicationState::Missing : InspectCookedShaderPublication(repositoryRoot, cooked / "Shaders")};
 	}

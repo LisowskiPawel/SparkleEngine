@@ -26,64 +26,21 @@ Re-enter FWC-0 only when a new or changed selected edge lacks a current owner or
 
 ## `FWC-1` — Core And Windows Platform
 
-**Selected repair delivered; final-candidate proof remains open.** The [cursor-recentering owner](../../Modules/Engine/Platform/PlatformCapabilities.md#cursor-recentering-and-failure-publication) now rejects native failures and publishes the actual read-back position through its existing result. [CORE/PLAT records](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) retain the scoped checks and original proof identities. Do not repeat this repair without a new failing check.
+**Completed — selected cursor-recentering repair.** The [Platform owner](../../Modules/Engine/Platform/PlatformCapabilities.md#cursor-recentering-and-failure-publication) retains the delivered native-failure/readback contract. [CORE/PLAT results](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) retain the repair, negative controls, current Game observations, cleanup and source-style evidence. The scope owner explicitly accepted closure with the remaining desktop matrix excluded because the desktop is in use; excluded cells are unproved, not runtime passes.
 
-**Next open item:** once the existing package owner supplies an exact candidate containing the repaired Platform object, requalify the affected Game/Editor Sponza mouse-look/recenter, zero-size/restore and quit cells under `PLAT-E02` and the existing product checks. The current `3743e72a…` archive predates this repair. Candidate assembly/installed qualification stays in PD-3; no neighboring stage is authorized by this FWC-1 record. Unaffected Core paths/config/process cells retain their own required evidence and no source repair is implied.
-
-**Start:** An admitted Windows path, child process, configuration, window or input transition fails or lacks required final-candidate proof.
-
-**Work:** Reuse the delivered pointer repair and prove its affected current-candidate interaction cells before further source edits. For a new demonstrated failure, repair its current Core/Platform owner. Cover only the affected Unicode/path bounds, immutable package/per-user paths, atomic last-good config, focus/capture/DPI, zero-size/resize and handle/error/shutdown cells. Reuse process quoting, cancellation and log-failure results while their inputs remain valid.
-
-**Cleanup:** Delete the path reconstruction, encoding conversion, duplicated process policy or forwarding error state the repair replaces; preserve caller-specific workflow policy.
-
-**Exit:** Affected CORE/PLAT criteria and negative controls pass for standard-user Windows; package bytes stay immutable and unavailable cells stay open in FCR-CORE-01/FCR-PLAT-01.
-
-```text
-Execute only FWC-1 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-1--core-and-windows-platform. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
-Selected work: Requalify the repaired cursor-recentering path in an exact candidate containing it. Reuse passed local helper checks; repair again only if a current check fails.
-Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
-NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-CORE-01, FCR-PLAT-01; no neighboring stage or new mechanism merely to fill a report.
-Before handoff, update the stage result, remaining plan and next item.
-
-```
+No implementation or interactive-proof task remains in this selected FWC-1 scope. Reopen only for a new demonstrated defect or newly admitted proof. Installed/family acceptance retains its own candidate checks under [PD-3](ProductImplementationPlan.md#pd-3--package-and-installation); the [global next item](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) is unchanged. No neighboring stage was executed.
 
 ## `FWC-2` — Task Runtime And Cancellation
 
-**Start:** A selected loading, world, rendering or tool operation needs a scheduler repair or missing task-lifetime evidence.
+**Completed — selected shared-executor worker-bound repair and lifetime proof.** [Tasks owns the overflow-safe admission and retained loading boundary](../../Modules/Engine/Tasks/TasksCapabilities.md#worker-configuration-and-source-proof); [FCR-TASK-01 records the exact candidate, negative control and 176 passed native checks](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress). The existing validator replaces its wrapping sum in place; no state/API/hooks/dependencies or second runtime were added. Temporary probes are removed and the changed source passes the source-style gate.
 
-**Work:** Use the one task runtime. Prove the affected DAG/result, exclusive writes, serial reference, queue/worker bounds, nested waits, failure, cancellation and shutdown. Use serial/1/2/N where the task contract requires it; a throughput claim additionally needs scheduling/crossover measurements.
-
-**Cleanup:** Remove duplicate task ownership, local executor/queue state or orphaned cancellation machinery exposed by this repair. Do not create a scheduler or generic workflow graph.
-
-**Exit:** FCR-TASK-01 records applicable parity, pressure, failure and settlement checks. Functional closure does not claim unmeasured speedup.
-
-```text
-Execute only FWC-2 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-2--task-runtime-and-cancellation. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
-Selected work: Use the one task runtime.
-Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
-NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-TASK-01; no neighboring stage or new mechanism merely to fill a report.
-Before handoff, update the stage result, remaining plan and next item.
-
-```
+No work remains in this selected slice. Re-enter for a new demonstrated scheduler/lifetime defect or newly admitted evidence; full Sponza load/frame, broader stress/dispatch and measured performance retain their owning gates. The [global next item](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) is unchanged; no neighboring stage was executed.
 
 ## `FWC-3` — Level, World, And Render Publication
 
-**Start:** Selected cooked content is available and the failing activation/publication edge is identified, or Roadmap selects a bounded world-surface simplification with a concrete retained-path check.
+**Completed — selected compiled-world-graph accessor cleanup.** The unused `GetSystems` declaration/body and `<span>` include were already removed in `03f8da091…`; this stage reuses that cut and closes its source/build proof. [GameFramework owns the retained private boundary](../../Modules/Engine/GameFramework/GameFrameworkCapabilities.md#world-system-scheduling); [FCR-WORLD-01 records the exact candidate and WORLD-02/03 preservation projections](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress). Current/predecessor compiler controls, retained private consumers, eleven-stage order, symbol checks and the narrow GameFramework target pass. No production source changed, so source-style is justified `N/A`; temporary fixtures are removed.
 
-**Work:** Repair transactional request/load/cancel/switch/reload and the immutable world-to-render publication, or remove only the selected unnecessary surface. Retain the current fixed eleven-stage pipeline and one Tasks runtime, including access/hazard checks, structure epochs and deterministic commits; do not reopen its delivered scheduling refactor or generalize it into a gameplay/plugin framework. Preserve entity/resource generations, transforms, camera/light/material and existing skin/morph semantics used by the release. Check delete/reuse, old-world retirement and in-flight readers; quantify changed copies and extraction cost.
-
-**Cleanup:** Keep descriptor/query/resource facts consumed by the compiler/executor private; do not restore unused graph inspection surface. Delete parallel activation flags, copied world truth or replaced publication records when that is the owned repair. Renderer never queries ECS; a failed requested map cannot report successful Empty activation.
-
-**Exit:** FCR-WORLD-01/02/03 agree on candidate and active-level/submission identity; affected lifecycle, semantic, cancellation and cost checks pass. A simplification shows the unused surface is gone and preserves camera/animation/skin/morph/transform/extraction semantics. For an accessor-only cut, check absence and unchanged compiler/executor consumers with the narrow owning-target check; expand serial/worker runtime proof only if execution/data changes. Source proof does not pass the family's unrun runtime cells or claim speedup.
-
-```text
-Execute only FWC-3 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
-Selected work: Repair transactional request/load/cancel/switch/reload and the immutable world-to-render publication, or remove only the selected unnecessary surface.
-Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
-NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-WORLD-01; no neighboring stage or new mechanism merely to fill a report.
-Before handoff, update the stage result, remaining plan and next item.
-
-```
+No work remains in this selected accessor-only slice. New activation/publication defects or execution/data changes require their affected lifecycle, semantic, cancellation and cost proof; existing full-family runtime/frame/serial-worker checks remain unproved. This completion claims no speedup and does not reopen the delivered scheduling refactor. The [global next item](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) is unchanged; no neighboring stage was executed.
 
 ## `FWC-4` — Import, Cook, And Engine Assets
 

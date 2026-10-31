@@ -96,7 +96,7 @@ Source rechecked on 2026-10-31 at `655f5fe8…` plus the FWC-1 patch: `CenterWin
 
 `InputSystem::CenterCursor` remains the sole last-pointer-cache publisher and updates it only when that optional result exists. The helper owns native mechanics and no retained state; Application's camera collector retains its existing mouse-look policy. No public API, input layer, capture state, event lifetime or package path changes. Null results preserve the previous accepted cache instead of fabricating a new position.
 
-[FCR-PLAT-01's FWC-1 record](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) owns the controlled native-call failures, compiled InputSystem consumer checks, actual Windows client/screen/clipping observations, zero-size/restore and cleanup evidence. This is a focused native helper boundary; it does not qualify a final Game/Editor candidate, mixed-monitor DPI/focus/capture transitions or rendered Sponza.
+[FCR-PLAT-01's FWC-1 records](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) own the passed native-call failure controls, compiled InputSystem consumer checks, actual Windows client/screen/clipping observations and helper zero-size/restore evidence. Current dependency-built Game/Editor candidates contain the repair; the record also retains native Game D3D12 Sponza capture/recenter/release and focus-loss observations at 144 DPI. Selected-stage closure includes an explicit desktop-proof exclusion. It grants no complete product interaction matrix, mixed-monitor DPI, rendering-quality or installed acceptance.
 
 ## Explicit Non-Capabilities And Risks
 

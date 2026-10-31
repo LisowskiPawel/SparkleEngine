@@ -39,6 +39,8 @@ Launcher is an explicit exception to minimizing non-rendering product work. Its 
 
 **Map admission:** `ReleaseSupported` in [Levels.catalog](../../../../../Projects/Showcase/Levels.catalog) identifies Empty and the seven release maps. GUI cards label release/development maps; installed sync/run planners reject development maps, while source workflows retain them. Run requires the requested catalog map to be selected and source-ready before checking cooked products; Empty remains the built-in starting map.
 
+Non-empty scene readiness requires `SceneAssetRegistry.sreg`, non-empty `SceneManifests` and `Meshes` in the same cooked scope. Mesh files alone cannot admit a handoff after a publication member is removed. The existing GUI preparation path can recook missing scene publication; typed run remains blocked until it is ready. Installed recovery evidence belongs to [PD-3](../../../CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation).
+
 | User intent | Launcher responsibility | Success boundary |
 | --- | --- | --- |
 | prepare workspace | discover repository/project, inspect toolchain/dependencies, and propose the exact missing operation | readiness is revalidated immediately before execution |

@@ -20,35 +20,21 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 
 Discovery is reconciled for the [recorded snapshot](../../../Acceptance/FirstRelease.md#fr-00-reconciliation-result): six approved choices preserved, finite [membership/selector dispositions and check routes](../../../Acceptance/ReleaseScope/CapabilityDispositions.md#reconciled-membership-and-check-routes), accepted PTD-00 unchanged. No discovery task remains unless a changed surface invalidates its disposition.
 
-**Next local stage:** FR-01's changed-input rights/source-baseline qualification and candidate scope export; final public rights/signing remain FR-07. Follow Roadmap's existing PD-3 priority for implementation; identified product/rendering gaps stay with their named stages and do not restart discovery.
+**Handoff:** FR-01's [internal source qualification and scope export are complete](../../../Acceptance/FirstRelease.md#fr-01-source-requalification) for the recorded snapshot. Final public rights/signing remain FR-07. Follow Roadmap's existing PD-4 priority; identified product/rendering gaps stay with their named stages and do not restart discovery.
 
 ### `FR-01` — Identity, Rights, And Baseline
 
-**Remaining work:** reuse existing identity, pins, notices and local baseline; qualify only changed inputs and missing exact-candidate cold/warm/offline source checks through PD-2. Bind source/dependency/content identity, redistribution decisions and provenance to actual payloads. When declaring the candidate identity, export the [reviewed scope record](../../../Acceptance/FirstRelease.md#release-scope-freeze) into its `release-scope.md` for REL-00; recheck only changed dispositions. Final public certificate/signature and unresolved public-rights closure remain FR-07 obligations.
+**Complete for the recorded internal candidate:** [FR-01 source requalification](../../../Acceptance/FirstRelease.md#fr-01-source-requalification) retains identity/pins/notices, actual payload provenance, the hash-bound REL-00 scope export and compatible owner checks. Fresh empty-cache public sync/build/cook/Empty passes; the same products pass a 64.651-second network-blocked replay with unchanged hashes. Earlier transport failures remain historical. No new acquisition path, baseline framework or feature repair was needed.
 
-**Cleanup:** remove obsolete input/discovery/pin authority in a replacing repair and regenerate disposable output. No second dependency manager, baseline runner or broad automation program is selected.
-
-**Exit:** REL-01/02 reports distinguish validated internal source/baseline work from any outstanding public-rights/trust blocker. Dependency-ready unsigned development can collect evidence; it does not bypass ordered formal release approval.
-
-```text
-Execute only remaining FR-01 work from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Reuse identity/pin/notice and compatible baseline evidence; qualify changed inputs and missing PD-2 source checks. Retain exact rights/provenance blockers for final release review. Add no baseline framework or unrelated feature repairs. Apply the owning execution contract and its Stage Source-Style Gate.
-Before handoff, update the stage result, remaining plan and next item.
-
-```
+No internal source item remains for this snapshot. Reopen only invalidated inputs/cells when the candidate changes. Final notice-byte binding, exact public-rights/provenance and certificate/signature obligations remain FR-07; source qualification does not approve publication or bypass ordered release gates. Temporary probe/observer source is removed; generated validation roots remain after automatic cleanup rejection, as recorded in the linked result. Follow Roadmap's PD-4 priority.
 
 ### `FR-02` — Package Spine
 
-**Remaining work:** use PD-3 and the existing CMake/Packaging manifest-owned route to regenerate the unsigned Launcher/Editor/Game archive after product repairs. Earlier archives may check packaging mechanics; only final bytes qualify product behavior. Verify complete admitted payload, per-user mutation boundary, failure-safe publication and exact manifests/hashes.
+**Internal scope complete:** [PD-3](ProductImplementationPlan.md#pd-3--package-and-installation) accepts unsigned `a0f34c8b...` with passing assembly/symbols, installed failures, store recovery and positive reconciliation. The user explicitly excludes actual selected-extraction removal; the folder remains retained and no removal pass is claimed. `FCR-PROD-05`/`REL-03` pass that admitted internal scope. Reuse the recorded proof in PD-4; final signed/public bytes remain FR-07.
 
-**Cleanup:** delete stale staged membership and replaced staging/path policy in that repair; no installer, updater, SDK or another packager.
+**Final recheck:** [FR-02 result](../../../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/fr02-final-20261031/completion.json) verifies all 434 archive members, retained extraction/layout/signatures, SBOM/provenance and the unchanged native/shader symbol companion with existing owners. No stale membership or invalidated admitted input remains, so no regeneration or production repair is required. Completed execution instructions are removed; source-style is N/A for this evidence/documentation continuation.
 
-**Exit:** FCR-PROD-05/REL-03 meet their internal archive contract. Clean-machine and source-adopter portions are linked once through PD-3/FR-06, not recreated as a second acceptance journey here. Public release still waits for FR-07 and all required gates.
-
-```text
-Execute only remaining FR-02 package work through PD-3 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Regenerate and verify the current unsigned archive with existing tooling, close its exact missing checks and remove stale membership. Reuse shared installed/adopter proof; do not implement another package spine. Apply the owning execution contract and its Stage Source-Style Gate.
-Before handoff, update the stage result, remaining plan and next item.
-
-```
+**Remaining / next:** no FR-02 internal item remains for this candidate. Continue PD-4's final six-report reconciliation; regenerate only when admitted inputs change. Clean-machine/source-adopter proof stays linked through PD-3/FR-06. The removal exclusion and final FR-07 rights/signing obligations remain explicit.
 
 ### `FR-03` — Feature Closure
 
