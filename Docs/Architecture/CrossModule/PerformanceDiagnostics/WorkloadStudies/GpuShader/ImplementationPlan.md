@@ -18,7 +18,7 @@ Turn one predeclared GPU question into original, falsifiable paired-API evidence
 
 ## Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Read [the design/check owner](StudyDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Keep shader/registration/binding/cook work in current Renderer/ShaderSystem owners. A prototype adds no retained variant, profiler, compiler backend or mandatory vendor dependency.
 
@@ -43,6 +43,8 @@ Apply [Change Lifecycle's stage budget](../../../../../Engineering/Workflow/Chan
 Execute only GPU-0 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/GpuShader/ImplementationPlan.md#gpu-0-freeze-the-kernel-question. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze one executed shader question, source/options/artifact/native joins, analytical cost model, actual tool access and numerical/observer falsifiers. No production edit or invented disassembly.
 NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and quality; state real instruction/counter access. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -64,6 +66,8 @@ NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and 
 Execute only GPU-1 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/GpuShader/ImplementationPlan.md#gpu-1-qualify-executed-baseline-and-oracle. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Qualify the executed baseline, source/IR/native join, independent output oracle and noise controls. Explain producer-versus-consumer stalls and what the tools do not expose. No counter screenshot as a causal verdict.
 NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and quality; state real instruction/counter access. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -85,6 +89,8 @@ NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and 
 Execute only GPU-2 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/GpuShader/ImplementationPlan.md#gpu-2-test-one-semantics-preserving-change. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Test only the frozen shader mechanism under its owning feature contract. Verify numerical/raw parity and source/native identity, compare cost predictions and observations, and remove replaced/rejected variants. Stop on changed estimator, hidden quality drift or guessed ISA.
 NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and quality; state real instruction/counter access. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -106,6 +112,8 @@ NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and 
 Execute only GPU-3 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/GpuShader/ImplementationPlan.md#gpu-3-decide-whole-frame-value-on-both-apis. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Close paired-API shader and whole-frame evidence using frozen sample/quality/effect policy. Retain exact inspection level, negative alternatives and limitations; link original artifacts to CASE-02/03. Do not promote local dispatch speed to whole-frame benefit.
 NON-NEGOTIABLE: join actual source/cook/native identity; preserve estimator and quality; state real instruction/counter access. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

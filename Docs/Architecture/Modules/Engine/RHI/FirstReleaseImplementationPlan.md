@@ -8,7 +8,7 @@ Prove that the selected frame and product transitions lower correctly to D3D12/V
 
 ## Work This Plan
 
-Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Assign the demonstrated failure or open native claim to its service. RHI-0 closes only missing consumer/capability decisions; existing services and qualified GCD/native evidence are reused. Inventory coverage does not require every extension or service to be reimplemented before repairing a frame.
 
@@ -33,6 +33,8 @@ Execute only RHI-0 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImpleme
 Selected work: Trace that request through its service/native owner, build/SDK/device prerequisites and lifetime.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RHI-1` — Device, Resources, Descriptors, And Lifetime
@@ -50,6 +52,8 @@ Execute only RHI-1 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImpleme
 Selected work: Preserve owner-thread aggregate publication and reverse teardown.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-01, FCR-RHI-06; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RHI-2` — Command Recording, Synchronization, Resize, And Present
@@ -67,6 +71,8 @@ Execute only RHI-2 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImpleme
 Selected work: Check lease/frame/token identity, batches/order/waits/barriers, recycling and frames-in-flight; exercise affected minimize/zero-size/resize/out-of-date/acquire/present/cancel/shutdown.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-02; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RHI-3` — Paired Backend Lowering
@@ -84,6 +90,8 @@ Execute only RHI-3 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImpleme
 Selected work: Compare affected descriptor/format/pipeline/command/state/queue/interop/present/error cells with identical logical inputs.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-03; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RHI-4` — Ray-Tracing And Acceleration-Structure Execution
@@ -101,6 +109,8 @@ Execute only RHI-4 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImpleme
 Selected work: Check admitted BLAS/TLAS build/update/refit, scratch/result/operation bounds, contribution/SBT/hit identity, queues/state/retirement and allocation failures.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-04; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RHI-5` — Diagnostics, Capture, Device Loss, And Recovery
@@ -118,6 +128,8 @@ Execute only RHI-5 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImpleme
 Selected work: Exercise affected timestamp validity, names/messages/loss, memory/live objects, destination-free readback and external correlation.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-05; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RHI-6` — Candidate Closure
@@ -135,6 +147,8 @@ Execute only RHI-6 from Docs/Architecture/Modules/Engine/RHI/FirstReleaseImpleme
 Selected work: Join six reports and the paired backend/driver/configuration matrix.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-RHI-01; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Reference And Ownership

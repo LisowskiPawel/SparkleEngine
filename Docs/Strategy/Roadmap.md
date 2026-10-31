@@ -15,7 +15,7 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 1. Open the stage linked under **Where We Are And What Is Next**.
 2. Read its prerequisites and linked design. A blocked prerequisite stays blocked; completed source work is reused.
 3. Expand **Copy implementation prompt**, paste it, and work only that stage.
-4. Apply [stage completion and resume](../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume): reuse applicable passes and run the exact unmet checks. Record the result with its existing owner; close a passed local stage and remove delivered instructions in the same handoff.
+4. Apply [stage completion and resume](../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume): reuse applicable passes and run the exact unmet checks. Its [state update](../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is a required exit check: record the result, reconcile the remaining plan and update affected progress/next pointers before handoff.
 5. Name the exact next admitted item, or the failed/missing cell and change needed before retry. Update the short progress row here when its summarized state changes. Later aggregate acceptance does not reopen completed local work; source changes alone do not pass a release gate.
 
 ## Where We Are And What Is Next

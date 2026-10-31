@@ -41,7 +41,7 @@ Stage IDs remain stable for acceptance traceability. Close only the remaining de
 
 ## Universal Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Apply this to every prompt below; each prompt is standalone when pasted with its referenced owning plan.
 
@@ -67,6 +67,8 @@ Apply this to every prompt below; each prompt is standalone when pasted with its
 ```text
 Execute only the remaining Stage 0 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -83,6 +85,8 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 ```text
 Execute only the remaining Stage 1 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -99,6 +103,8 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 ```text
 Execute only the remaining Stage 2 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -115,6 +121,8 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 ```text
 Execute only the remaining Stage 3 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -131,6 +139,8 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 ```text
 Execute only the remaining Stage 4 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -147,6 +157,8 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 ```text
 Execute only the remaining Stage 5 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -163,6 +175,8 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 ```text
 Execute only the remaining Stage 6 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -179,6 +193,8 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 ```text
 Execute only the remaining Stage 7 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -195,6 +211,8 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 ```text
 Execute only the remaining Stage 8 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
 Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

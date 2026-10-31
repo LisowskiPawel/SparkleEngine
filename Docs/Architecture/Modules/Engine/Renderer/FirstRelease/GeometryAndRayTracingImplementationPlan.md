@@ -8,7 +8,7 @@ Make admitted raster and ray paths consume the same resident geometry, material 
 
 ## Work This Plan
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Enter the stage owning the earliest wrong geometry/material product. GR-0 resolves a missing shared decision; valid residency, raster, TLAS and ray implementations are reused. The required decal feature delegates implementation to its leaf plan rather than prescribing another composition algorithm here.
 
@@ -33,6 +33,8 @@ Execute only GR-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ge
 Selected work: Resolve affected identity/generation, coordinate/tangent/UV/color/alpha/two-sided, skin/morph/motion or ray-hit/SBT cells in current owners.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `GR-1` — Mesh And Texture Residency
@@ -50,6 +52,8 @@ Execute only GR-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ge
 Selected work: Exercise immutable generations, decode/staging/upload tokens, transactional activation, cancellation, reload/eviction and all-queue retirement.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-17; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `GR-2` — Visibility, Draw Preparation, And Raster GBuffer
@@ -67,6 +71,8 @@ Execute only GR-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ge
 Selected work: Check frustum/bounds/identity, deterministic opaque grouping/sorting/batching, retained transparent ordering, task failure/cancellation, depth/material/normal/motion channels, alpha/two-sided and deformation.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-21, FCR-REN-04; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `GR-3` — Renderer TLAS Policy And Publication
@@ -84,6 +90,8 @@ Execute only GR-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ge
 Selected work: Repair current TLAS build/refit and instance/contribution identity, topology-change detection, scratch/result/operation bounds, queue completion, publication and retirement.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-12; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `GR-4` — Ray-Traced GBuffer
@@ -101,6 +109,8 @@ Execute only GR-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ge
 Selected work: Prove hit/miss/instance/primitive/material and GBuffer correspondence for admitted automatic/inline/native routes, with alpha/two-sided, skin/morph and motion cases.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-05; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `GR-5` — Deferred GBuffer Decals
@@ -118,6 +128,8 @@ Execute only GR-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ge
 Selected work: Execute the next [decal stage](../Features/DeferredDecals/ImplementationPlan.md) and [AC-DECAL-01 through 08](../Features/DeferredDecals/Acceptance.md).
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-23; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `GR-6` — Geometry, Ray, And Decal Candidate Closure
@@ -135,6 +147,8 @@ Execute only GR-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ge
 Selected work: Join the six reports and fill only missing raster/ray/material, reload/soak, lifetime or package checks on the release maps.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-04; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Reference And Ownership

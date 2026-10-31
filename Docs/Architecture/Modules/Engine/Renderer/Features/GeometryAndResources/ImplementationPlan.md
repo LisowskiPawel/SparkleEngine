@@ -11,7 +11,7 @@ MAT-S0/1 qualify the existing release material promise through GR-0/2/4. Anisotr
 
 ## Stage Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Every stage inspects HEAD/status, applicable AGENTS.md, live producers/consumers/lifetime/build membership and concurrent edits. Apply [Change Integration](../../../../../../Engineering/Workflow/ChangeIntegration.md), [Change Lifecycle](../../../../../../Engineering/Workflow/ChangeLifecycle.md), relevant Renderer/RHI/Tools standards and the [Stage Source-Style Gate](../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), including authored readability/spacing review after formatting. Discovery/no-source work records justified source-style N/A.
 
@@ -42,6 +42,8 @@ The module's source corrections leave no claim that the current displayed materi
 
 ```text
 Execute only MAT-S0 from Docs/Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## MAT-S1 Qualify lineage and base scattering
@@ -56,6 +58,8 @@ Execute only MAT-S0 from Docs/Architecture/Modules/Engine/Renderer/Features/Geom
 
 ```text
 Execute only MAT-S1 from Docs/Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## MAT-S2 Deliver anisotropic GGX
@@ -70,6 +74,8 @@ Execute only MAT-S1 from Docs/Architecture/Modules/Engine/Renderer/Features/Geom
 
 ```text
 Execute only MAT-S2 from Docs/Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## MAT-S3 Deliver one dielectric coat
@@ -84,6 +90,8 @@ Execute only MAT-S2 from Docs/Architecture/Modules/Engine/Renderer/Features/Geom
 
 ```text
 Execute only MAT-S3 from Docs/Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## MAT-S4 Close cross-path consumers
@@ -98,6 +106,8 @@ Execute only MAT-S3 from Docs/Architecture/Modules/Engine/Renderer/Features/Geom
 
 ```text
 Execute only MAT-S4 from Docs/Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## MAT-S5 Measure package and reproduce
@@ -112,4 +122,6 @@ Execute only MAT-S4 from Docs/Architecture/Modules/Engine/Renderer/Features/Geom
 
 ```text
 Execute only MAT-S5 from Docs/Architecture/Modules/Engine/Renderer/Features/GeometryAndResources/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```

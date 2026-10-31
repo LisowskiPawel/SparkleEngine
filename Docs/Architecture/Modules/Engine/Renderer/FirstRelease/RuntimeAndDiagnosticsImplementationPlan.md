@@ -8,7 +8,7 @@ Make existing bindings, settings, debug/capture and viewport/latency observation
 
 ## Work This Plan
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Use RD-0 only for a missing identity/authority decision. A binding defect enters RD-1 immediately as a prerequisite to its rendering consumer; settings/UI repairs do not wait for a pipeline rewrite. Preserve delivered Show controls, process/capture fixes and qualified native tooling.
 
@@ -33,6 +33,8 @@ Execute only RD-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ru
 Selected work: Trace only that request through current settings/CVar precedence, pipeline/feature generation, view product, capture or latency token.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RD-1` — Pipeline Materialization And Typed Binding
@@ -50,6 +52,8 @@ Execute only RD-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ru
 Selected work: Use current registration/cook/reflection/materialization/binding and the [shader validation plan](../../../../CrossModule/ShaderSystem/ImplementationPlan.md).
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-16; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RD-2` — Settings State And Persistence
@@ -67,6 +71,8 @@ Execute only RD-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ru
 Selected work: Repair current defaults/ranges/precedence, atomic per-user save/load/reset, render-thread delivery and resolved/active/restart truth.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-19; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RD-3` — Debug Views, Diagnostics Products, And Capture
@@ -84,6 +90,8 @@ Execute only RD-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ru
 Selected work: Use [Debug Views acceptance](../Features/DebugViews/Acceptance.md) and retained [Show results](../../../../../Acceptance/Renderer/DebugViews.md).
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-11; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RD-4` — UI And Viewport Composition
@@ -101,6 +109,8 @@ Execute only RD-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ru
 Selected work: Check immutable packet ownership/copies, product/texture generations and retirement, blend/color/alpha, extent/DPI, level switch, missing/stale input and shutdown.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-13; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RD-5` — Latency Coordination
@@ -118,6 +128,8 @@ Execute only RD-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ru
 Selected work: Check existing six-marker order, simulation/submit/present identity, 64-to-32-bit limits, capability/availability, failure/shutdown and exact DLL/package boundary.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-20; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `RD-6` — Runtime And Diagnostics Candidate Closure
@@ -135,6 +147,8 @@ Execute only RD-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/Ru
 Selected work: Join active bindings/settings, visible/captured product and applicable latency identity on one candidate.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-11; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Reference And Ownership

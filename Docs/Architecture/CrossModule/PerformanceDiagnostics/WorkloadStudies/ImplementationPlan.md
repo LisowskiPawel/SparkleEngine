@@ -20,7 +20,7 @@ Produce the classical technical handoff at M3, then close independent study/inci
 
 ## Stage Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Apply [Change Lifecycle](../../../../Engineering/Workflow/ChangeLifecycle.md), [Change Integration](../../../../Engineering/Workflow/ChangeIntegration.md) and the [Feature Delivery Package](../../../../Engineering/Workflow/Templates/FeatureDeliveryPackage.md). Freeze prerequisite revisions, file allowlist, consumer/deletion/hook/copy budget, AC/FM/CHK and numeric rules before results. Before every implementation handoff enforce [Stage Source-Style Gate](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), applicable formatting/logical-spacing checks, narrow owner validation and `git diff --check`; boundary checks only for an actual Renderer/RHI boundary change. Remove disposable probes.
 
@@ -63,6 +63,8 @@ Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/Implem
 Execute WS-S0 only in Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md. Research/planning only. Inspect actual runtime/native records, GraphicsWorkloads, diagnostics comparison rules, Python dossier and current tools. Prefer existing records. If a required field is absent, freeze its minimal producer/check/observer/capacity card and hand off the prerequisite to parent Phase 4 under its own admission, without waiting for completed analyzer WS-D0; resume this freeze after that real record is qualified. Close WS-D01..05 with exact source/sample, units/identity/schema, missing-data rules, numeric/observer bounds and hook/copy/deletion ledger. Preserve REL-11 and parent gates. No production code, guessed exporter or internal diagnostics ladder in WS-S0; report the exact next owner/action while blocked.
 
 Select one actual question in each StudyProtocols.md domain: WS-CPU, WS-GPU and WS-LIFE. Freeze each cost model, native observation, source/IR/instruction or timeline/retirement joins, falsifiers and available tool-access limits. For each selected NVR card record exact source, local differences, rights and measurable output before results. Do not mandate a vendor feature or manufacture a defect.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -75,6 +77,8 @@ Select one actual question in each StudyProtocols.md domain: WS-CPU, WS-GPU and 
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s1---one-analysis-consumer and apply its Stage Contract, including the Stage Source-Style Gate.
 Execute WS-S1 only after accepted WS-D0 and production admission. Ratify and implement the bounded command/input/output/failure contract in WorkloadStudiesDesign.md, using actual frozen producer samples and exact versions/capacity rules; the planned command is not current source. Extend the existing Tools owner with one selected offline analysis CLI and real consumer. Reuse workload schemas; preserve run-level distributions and candidate/frame/settings/native-artifact joins. Reject partial/mismatched/missing/oversized inputs, preserve originals and clean interrupted publication. Run frozen AC-WS-01/04 and AC-PY controls, code style and narrow owner checks. Delete replaced supported analysis paths and remove probes. Stop on unowned schema, lost identity or duplicate collector/export. No runtime Python or public framework. Handoff exact commands/results/limitations.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -87,6 +91,8 @@ Execute WS-S1 only after accepted WS-D0 and production admission. Ratify and imp
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s2---causal-paired-api-studies and apply its Stage Contract, including the Stage Source-Style Gate.
 Execute only the first unfinished admitted stage in this plan's CpuPreparation, GpuShader or ResourceLifetime ImplementationPlan.md. Apply that child's exact prerequisites, design/check card, model, baseline, controlled experiment, paired verdict and cleanup. This parent joins the three original results under AC-WS-02 and relevant WL cells; it does not redefine their protocols. Preserve rejected/inconclusive results and actual tool/quality/observer limits. No forced topology change, duplicated study runner or feature expansion.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -99,6 +105,8 @@ Execute only the first unfinished admitted stage in this plan's CpuPreparation, 
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s3---incident-and-technical-handoff and apply its Stage Contract, including the Stage Source-Style Gate.
 Use IncidentAnalysis/ImplementationPlan.md for the first missing causal/local replay stage; reuse valid original release evidence. Join the analyzer, all three study domains and incident/replay packet with AC-WS-01..03 and the local failure/cleanup portion of 04. This is the M3 technical handoff for M4; documented reproduction is not its prerequisite. Keep AC-WS-04's rehearsal result open for M6 / WS-S4. Verify cleanup and retain original identities/negative conclusions; no new runner, adopter or report portal.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -117,6 +125,8 @@ Use IncidentAnalysis/ImplementationPlan.md for the first missing causal/local re
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s4---close-documented-study-reproduction and apply its Stage Contract, including the Stage Source-Style Gate.
 Execute WS-S4 only after the technical packets and cleared M6 assembly exist. Obtain the relevant actual portfolio stage 3 observations for AC-WS-04/CHK-WS-04; record original input/candidate identity, rehearsal actor/environment, interventions, failed steps and output. Final adoption is an output, not a prerequisite. Reuse one exercise, route defects to existing owners, requalify changed claims and remove probes. No unexecuted result claims or extra rehearsal per folder or unauthorized external action; absent reproduction stays BLOCKED.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

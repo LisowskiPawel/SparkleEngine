@@ -18,7 +18,7 @@ Turn one predeclared LIFE question into original, falsifiable paired-API evidenc
 
 ## Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Read [the design/check owner](StudyDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Keep the current Renderer/RHI generation/submission/retirement owner. No second manager, global-idle lifetime policy, content reduction or forced topology change can manufacture a win.
 
@@ -43,6 +43,8 @@ Apply [Change Lifecycle's stage budget](../../../../../Engineering/Workflow/Chan
 Execute only LIFE-0 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ResourceLifetime/ImplementationPlan.md#life-0-freeze-the-resource-and-completion-claim. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze one real resource/queue condition and exact owners/tokens, expected live bytes/dependencies, budget meanings and controlled lifetime falsifiers. Documentation only; no guessed completion or new manager.
 NON-NEGOTIABLE: preserve every consuming queue/token and required content; distinguish budget from live bytes; reject premature reuse. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -64,6 +66,8 @@ NON-NEGOTIABLE: preserve every consuming queue/token and required content; disti
 Execute only LIFE-1 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ResourceLifetime/ImplementationPlan.md#life-1-qualify-the-lifetime-baseline. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Qualify original generation/token/timeline and memory facts with delayed/serial/pressure controls. Keep budget, usage and allocations distinct. Retain exact native findings; remove probes and make no optimization claim.
 NON-NEGOTIABLE: preserve every consuming queue/token and required content; distinguish budget from live bytes; reject premature reuse. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -85,6 +89,8 @@ NON-NEGOTIABLE: preserve every consuming queue/token and required content; disti
 Execute only LIFE-2 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ResourceLifetime/ImplementationPlan.md#life-2-test-the-owning-repair-or-simplification. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Test only the frozen lifetime/residency hypothesis in its owner. Preserve all-queue completion and quality, compare byte/dependency predictions with measurements, and delete the replaced path. Stop on stale use, hidden budget changes or global-idle workaround.
 NON-NEGOTIABLE: preserve every consuming queue/token and required content; distinguish budget from live bytes; reject premature reuse. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -106,6 +112,8 @@ NON-NEGOTIABLE: preserve every consuming queue/token and required content; disti
 Execute only LIFE-3 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ResourceLifetime/ImplementationPlan.md#life-3-close-paired-lifetime-and-tail-evidence. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Close matched API lifetime, native failure and whole-frame/memory evidence. Retain exact tokens/generations, rejected alternatives and limits. Link original CASE-02/03 records and keep unproved tool/hardware cells blocked.
 NON-NEGOTIABLE: preserve every consuming queue/token and required content; distinguish budget from live bytes; reject premature reuse. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

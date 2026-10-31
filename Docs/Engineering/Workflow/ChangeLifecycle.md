@@ -138,18 +138,30 @@ Do not accumulate a large AI-generated diff and use a full engine, game, editor,
 
 This contract applies to every implementation plan and copied stage prompt, including older prompts. Keep the decision in the existing iteration record or owning candidate report; a separate tracker is unnecessary.
 
-Before work, freeze one finite stage exit: selected output/consumer, exact prerequisites and input identity, applicable AC/FM/CHK cells, observable oracles and thresholds, required cleanup/style checks, result owner and next permitted step. Link existing definitions instead of copying their matrices. An unresolved value is a named discovery decision, not an invitation to implement until the result seems sufficient. A discovery stage closes when its required decisions and check cards are accepted; downstream production or release proof belongs to its consuming stage.
+Before work, freeze one finite stage exit: selected output/consumer, exact prerequisites and input identity, applicable AC/FM/CHK cells, observable oracles and thresholds, required cleanup/style checks, result owner and next permitted step. Link existing definitions instead of copying their matrices. Resolve decisions consumed by this slice; explicitly defer unselected future choices without weakening required scope. An unresolved required value is a named discovery decision, not an invitation to implement until the result seems sufficient. A discovery stage closes when its required decisions and check cards are accepted; downstream production or release proof belongs to its consuming stage.
 
 On every resume:
 
 1. Read the last result and inspect current owners/inputs. Classify each required cell as already passed with applicable evidence, invalidated by a named change, or still missing/failed/unavailable. Reuse applicable passes. A new date, session or unrelated revision is not evidence of invalidation; changed binaries are not qualified by relabelling older results.
 2. Execute the next unmet check or its bounded owning repair. If a stage exceeds a reviewable slice, name its finite child items and exits before further implementation; close each satisfied item once. The parent waits for the union of its required results. A completed delegated stage does not reopen merely because its parent, another provider or final release acceptance is still blocked.
-3. After the final change, evaluate the frozen exit and applicable source-style/documentation checks. Record `PASS` immediately when every required cell passes or has an explicit scope-owner exclusion. Record `BLOCKED` when required proof failed, was not run or is unavailable; state the exact cell, observation, dependency/owner and next discriminating action. A partial pass is not a stage pass. `EXCLUDED` and `SUPERSEDED` retain their scope and reason in the owning report.
-4. Reconcile the plan in the same handoff: remove delivered instructions, retain only unfinished repairs/proof, and point to the exact next open item and its prerequisite. Report which item closed and where the evidence lives. Do not end with only "continue this stage." A blocked handoff identifies the input, repair or external change needed before retry; repeating the same broad run without such a change is not progress.
+3. After the final change, evaluate the frozen exit and applicable source-style/documentation checks. Record `PASS` when every required cell passes or has an explicit scope-owner exclusion and the mandatory state update is complete. Record `BLOCKED` when required proof failed, was not run or is unavailable; state the exact cell, observation, dependency/owner and next discriminating action. A partial pass is not a stage pass. `EXCLUDED` and `SUPERSEDED` retain their scope and reason in the owning report.
+4. Complete the mandatory [stage state update](#update-stage-state-before-handoff) before handoff. A blocked result identifies the input, repair or external change needed before retry; repeating the same broad run without such a change is not progress.
 
 Keep local stage completion distinct from feature/product/release acceptance. A source or provider slice can close its own gate while the aggregate remains open; an aggregate closes only after every applicable required result is present for its declared candidate and scope. Never weaken a required matrix, hide an unresolved defect in prose, or accept source presence in place of runtime proof to obtain closure.
 
 Once the frozen exit passes, stop that stage. Additional optimization, architecture cleanup or adjacent features need their existing later owner or a separately admitted slice; they do not extend the completed stage. Necessary same-slice cleanup and defect repairs remain part of the exit. Reopen only the affected cells when concrete new evidence contradicts their accepted claim.
+
+### Update Stage State Before Handoff
+
+State reconciliation is a required exit check for every stage, including documentation, evidence-only and blocked iterations. The work is not ready for a completed handoff until these records agree:
+
+- **Owning result:** record the exact item/candidate/scope, verdict, passed or still-missing required cells, commands/artifacts and invalidation triggers. A blocked result names its observation, dependency/owner and next discriminating action.
+- **Owning plan:** remove delivered instructions, preserve unfinished repairs/proof, and point to the exact next open item with its start condition. Keep only a short completion/evidence pointer where needed for navigation; the report retains the result. Do not end with only "continue this stage," repeat a completed child, or erase source progress because a later proof gate is blocked.
+- **Roadmap and consumers:** update an existing progress/next pointer when this result changes its summarized state or a dependent prerequisite. Preserve global admission/order; do not create a roadmap row per child check or a duplicate results ledger. Retiring a completed plan also repairs incoming links and leaves the existing roadmap completion row.
+
+The handoff names the item closed or blocked, the records updated, and the next permitted action. Missing state reconciliation keeps the stage exit open even when its production checks pass. A later session resumes from those records, not from the beginning of the copied prompt.
+
+Already-current plan/roadmap pointers need no cosmetic rewrite; verify them and say they remain current. Update the actual result for this iteration and change only records whose state or next action moved.
 
 ## During Implementation
 

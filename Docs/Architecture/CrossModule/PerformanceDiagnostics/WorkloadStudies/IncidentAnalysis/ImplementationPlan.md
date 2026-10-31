@@ -18,7 +18,7 @@ Turn one actual failure into a causal, reproducible incident case without buildi
 
 ## Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Read [the design/check owner](IncidentDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Only a demonstrated causal repair spends a production budget, through its existing feature plan. Keep original bad/good evidence; no permanent fault API, collector or guessed driver diagnosis.
 
@@ -43,6 +43,8 @@ Apply [Change Lifecycle's stage budget](../../../../../Engineering/Workflow/Chan
 Execute only INC-0 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/IncidentAnalysis/ImplementationPlan.md#inc-0-freeze-the-failed-candidate-and-question. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze one real failed candidate and symptom, original artifacts, expected oracle, current source/native identity and minimal reproduction. Reuse accepted release work; stop on missing bad evidence or invented root cause.
 NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual; preserve source/symbol identity; label unproved causes. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -64,6 +66,8 @@ NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual
 Execute only INC-1 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/IncidentAnalysis/ImplementationPlan.md#inc-1-discriminate-competing-causes. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Investigate the first wrong product using at least two hypotheses and separating controls. Preserve candidate/symbol/frame joins and negative observations. Stop before a repair if the cause is still correlation.
 NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual; preserve source/symbol identity; label unproved causes. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -85,6 +89,8 @@ NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual
 Execute only INC-2 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/IncidentAnalysis/ImplementationPlan.md#inc-2-prove-the-minimal-owning-repair. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Prove only the admitted minimal repair in its owner, including original bad/controlled-negative and fixed oracle, native/lifetime preservation and exact artifacts. Remove replaced paths/probes; stop on an unfalsifiable fix or broadened scope.
 NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual; preserve source/symbol identity; label unproved causes. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -106,6 +112,8 @@ NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual
 Execute only INC-3 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/IncidentAnalysis/ImplementationPlan.md#inc-3-publish-the-scoped-incident-and-replay. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Deliver the original causal repair and locally qualified replay packet to CASE-02 and parent WS-S3 for M3. Preserve limitations and deletion proof. Route required actual independent observations to WS-S4 at M6; do not require them before neural production or invent a reviewer. No unauthorized submission/contact.
 NON-NEGOTIABLE: prove the first wrong product and causal bad/good counterfactual; preserve source/symbol identity; label unproved causes. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

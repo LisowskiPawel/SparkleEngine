@@ -10,7 +10,7 @@ Review accepted technical work, rehearse a second usage context and improve the 
 
 ## Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Read [the design](TransferDesign.md) and [AC-PORT/CHK-PORT owner](../ReviewAndTransfer.md#binary-review-criteria). Execute the first unfinished stage and reuse valid proof. Follow [Change Lifecycle](../../../../Engineering/Workflow/ChangeLifecycle.md), its Stage Source-Style Gate and [accepted actor scope](../../../../Acceptance/FeatureCompletionReports.md#report-closure-and-review). Record exact candidate, tasks/oracles, commands, results, limits and cleanup. No-source work records justified N/A.
 
@@ -29,6 +29,8 @@ Production state/API/dependencies default to zero. A demonstrated repair uses it
 ```text
 Execute only KT-0 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-0-freeze-the-participant-context-and-exercise. Apply its Execution Contract.
 Freeze one second-context exercise, author/agent actor, technical question, original candidate and before/after rubric. Reuse valid proof. Contact nobody and invent no result.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ### KT-1: Record The Meaningful Technical Challenge
@@ -42,6 +44,8 @@ Freeze one second-context exercise, author/agent actor, technical question, orig
 ```text
 Execute only KT-1 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-1-record-the-meaningful-technical-challenge. Apply its Execution Contract.
 Perform or reuse the author/agent review. Record proposal, challenge, alternative, evidence and disposition. A revision needs an observed reason; a justified rejection is valid. Claim no outside reviewer.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ### KT-2: Observe Second-Context Use And Learning
@@ -55,6 +59,8 @@ Perform or reuse the author/agent review. Record proposal, challenge, alternativ
 ```text
 Execute only KT-2 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-2-observe-second-context-use-and-learning. Apply its Execution Contract.
 Run the frozen author/agent exercise and record actual before/after output, reasoning, failures and assistance. Do not label it third-party learning. Use existing code/runbooks/manifests and remove disposable probes.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ### KT-3: Revise Retest And Reconcile Claims
@@ -68,4 +74,6 @@ Run the frozen author/agent exercise and record actual before/after output, reas
 ```text
 Execute only KT-3 from Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md#kt-3-revise-retest-and-reconcile-claims. Apply its Execution Contract.
 Implement only a justified existing-owner change, retest affected claims and link original before/after records, or retain an evidence-backed no-change decision. Reconcile truthful scope/attribution, remove replaced material/probes and report remaining technical checks. No contact or publication without authorization.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```

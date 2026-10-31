@@ -23,7 +23,7 @@ These are proof dependencies, not four framework implementations. A valid preced
 
 ## Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Use [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md), its [source-style gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), [scope/retirement](../../../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision) and [claim-driven validation](../../../Engineering/Verification/ValidationAndEvidence.md#claim-driven-validation-selection). Each repair names the selected consumer, failed invariant, smallest change and same-stage deletion. Keep mechanism in existing tool/Renderer/RHI owners, one typed contract and all-queue retirement. Preserve unrelated changes and leave source-control actions to the user.
 
@@ -39,6 +39,8 @@ Trace definitions to their actual producers/consumers/build membership. Use the 
 
 ```text
 Reconcile only the selected current-contract discrepancy from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md. Use its actual failed AC/CHK and current owner. Preserve delivered code, delete only the replaced responsibility and run its smallest falsifying check. Do not replay historical phases 0-11. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Compiler And Publication Proof
@@ -51,6 +53,8 @@ Run CHK-SHS-02/03 and applicable CHK-SHS-04 on the selected contract: virtual so
 
 ```text
 Execute only the selected compiler/publication checks from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md. Freeze actual inputs, targets and oracle before results; reuse current tooling and repair the first failing owner. Retain current products and raw evidence, remove temporary additions and state which runtime claim remains unproved. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Runtime And Tooling Proof
@@ -65,6 +69,8 @@ Exercise current Apply Changed, changed-include closure, failed replacement, dir
 
 ```text
 Execute only the selected runtime/tooling proof from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md. Use current code and Acceptance's frozen oracle, exact candidate inputs and real native tools. Fix only demonstrated discrepancies, delete their replaced paths now and remove all temporary proof additions. Add no dual-output production mode or diagnostics platform. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Phase 12 - Regenerate, Validate, And Hand Off The Complete Shader, Graphics-Pipeline, And Ray-Tracing Candidate
@@ -77,6 +83,8 @@ Join [AC-SHS-01 through 31](Acceptance.md#completion-criteria) and FM/CHK result
 
 ```text
 Execute only Phase 12 from Docs/Architecture/CrossModule/ShaderSystem/ImplementationPlan.md. Reuse compatible focused proof, regenerate only invalidated current products and close missing integration/package/adoption checks for the exact candidate. Verify stage-local deletions and Acceptance coverage; report required unavailable evidence without manufacturing a pass or starting a new framework. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Reference And Ownership

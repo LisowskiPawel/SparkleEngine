@@ -8,7 +8,7 @@ Qualify existing temporal/exposure/reconstruction/SDR behavior, then integrate a
 
 ## Work This Plan
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Use DSP-0 only for a changed domain/order decision. Select the earliest wrong display product after raw lighting is valid. Existing exposure/provider/tone code is repaired or proved, not rebuilt by default. Grading, chromatic aberration, vignette and HDR retain their release obligations and local discovery gates.
 
@@ -47,6 +47,8 @@ Execute only DSP-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/D
 Selected work: Trace its scene-linear signal, exposure, guides/motion/jitter, reconstruction, tone/grade/lens edge, encoding, alpha/UI and capture product.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `DSP-1` — Temporal Sampling, History, Resolution, And AA Truth
@@ -64,6 +66,8 @@ Execute only DSP-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/D
 Selected work: Check Halton index/sign/matrices, rigid/skin/morph/sky motion, cuts/resize/provider/scene reset and view isolation.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-18, FCR-REN-22; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `DSP-2` — Exposure
@@ -81,6 +85,8 @@ Execute only DSP-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/D
 Selected work: Check retained manual/metering modes, luminance/reduction, finite min/max, adaptation direction/speed/time and step response, reset/isolation, async producer dependencies and provider multiplier.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-09; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `DSP-3` — Image Reconstruction And Provider Integration
@@ -98,6 +104,8 @@ Execute only DSP-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/D
 Selected work: Close Linear control and every exposed SDK-supported DLSS SR/RR combination required on the named NVIDIA machine for D3D12/Vulkan.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-10; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `DSP-4` — Tone Mapping, Encoding, And Presentation
@@ -115,6 +123,8 @@ Execute only DSP-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/D
 Selected work: Check retained Reinhard/ACES approximation/fitted choices against owned ramps/extremes, finite/alpha behavior, one exposure/tone/encoding sequence, format/domain pairing, viewport/backbuffer generations, debug/capture labels, UI and resize/DPI/present.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-14, FCR-REN-15; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `DSP-5` — Color Grading
@@ -132,6 +142,8 @@ Execute only DSP-5 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/D
 Selected work: Execute the next [grading stage](../Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md).
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-24; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `DSP-6` — Chromatic Aberration And Vignette
@@ -149,6 +161,8 @@ Execute only DSP-6 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/D
 Selected work: Execute one selected [chromatic](../Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md) or [vignette](../Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md) stage.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-25; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `DSP-7` — HDR10 Display Output
@@ -166,6 +180,8 @@ Execute only DSP-7 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/D
 Selected work: Execute the next [HDR stage](../Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/ImplementationPlan.md).
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-26; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `DSP-8` — Display Candidate Closure
@@ -183,6 +199,8 @@ Execute only DSP-8 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/D
 Selected work: Join nine reports and raw/intermediate/presented domains on one candidate.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-09; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Reference And Ownership

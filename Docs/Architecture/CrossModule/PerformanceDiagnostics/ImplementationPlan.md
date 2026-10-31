@@ -10,7 +10,7 @@ Make a selected rendering result observable through existing native tools. Add i
 
 ## Work This Plan
 
-Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Use [qualified GPU crash debugging](GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures) for current release failures. [External Capture](ExternalCapture/ImplementationPlan.md) owns the remaining PIX, Nsight and RenderDoc implementation and proof. Reuse delivered adapters and valid evidence.
 
@@ -37,6 +37,8 @@ Inspect live producers, consumers, build membership and retained evidence. Close
 
 ```text
 Execute only unresolved P0-GATE decisions needed by the Roadmap-selected slice from Docs/Architecture/CrossModule/PerformanceDiagnostics/ImplementationPlan.md. For capture, use child Stage 0. Freeze current owners, exact matrix and falsifying checks; add no production framework or internal diagnostics package. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Phase 1 — Prove External Capture End To End
@@ -47,6 +49,8 @@ Execute only unresolved P0-GATE decisions needed by the Roadmap-selected slice f
 
 ```text
 Execute only the earliest admitted remaining stage of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md. Preserve PIX, Nsight, RenderDoc priority and current qualified cells. Reuse delivered engine repairs; retain exact candidate and native artifacts. Do not start internal phases from this instruction. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Phase 2 — Build The Bounded Data Spine
@@ -60,6 +64,8 @@ Before selection, demonstrate the missing fact that an existing timing, memory o
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/ImplementationPlan.md#phase-2--build-the-bounded-data-spine; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Do not execute Phase 2 without a recorded consumer and scope admission. If admitted, deliver only its selected FND producer-to-consumer slice under this plan's Verification Comes First section; remove duplicate collectors and state in the same change.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Phase 3 — Ship The First Orientation Surface
@@ -73,6 +79,8 @@ A selected surface consumes accepted measurements; it creates no sampler or hist
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/ImplementationPlan.md#phase-3--ship-the-first-orientation-surface; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Do not execute Phase 3 without an admitted orientation consumer. If selected, extend one current presentation route with accepted measurements, prove its states and cost, and delete the presentation it replaces. Do not implement other ORI groups by adjacency.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Phase 4 — Deliver Reproducible Evidence
@@ -86,6 +94,8 @@ Reuse current capture/export products, workload identity and file publication. A
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/ImplementationPlan.md#phase-4--deliver-reproducible-evidence; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only an admitted Phase 4 evidence delta for the selected workload, including a necessary producer prerequisite frozen by WS-S0. Prefer existing artifacts; if insufficient, deliver the smallest owner-to-record change under its own frozen check/observer/capacity/deletion card, then return the qualified sample to WS-S0. Completed analyzer WS-D0 is not this producer's prerequisite. Preserve REL-11 and applicable parent gates, reject partial/mismatched records and retain raw identities/negative controls. Add no workspace, complete data spine or generalized runner.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Phase 5 — Add Selected Internal Investigation Depth
@@ -99,6 +109,8 @@ A workspace, CPU/GPU/memory view, pass-query hierarchy, task browser, hitch hist
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/ImplementationPlan.md#phase-5--add-selected-internal-investigation-depth; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Do not execute Phase 5 without explicit package admission and a failed simpler alternative. If admitted, deliver one bounded investigation slice, measure its value and observer cost, and delete rejected experiments or duplicate production paths. Native-tool detail stays in native artifacts.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Phase 6 — Harden And Close The Selected Product
@@ -110,6 +122,8 @@ Close only the selected scope. Preserve candidate-bound positive/negative, backe
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/ImplementationPlan.md#phase-6--harden-and-close-the-selected-product; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute Phase 6 only for the selected diagnostics candidate. Close its exact FIN matrix and failures, preserve original artifacts and limitations, remove stale code/selectors/build entries and completed instructions, and report the bounded verdict to the existing FCR/workload owner.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Ship-Control Ledger

@@ -819,7 +819,7 @@ State assumptions, available hardware/tooling/content, reviewer roles, contingen
 
 ## Universal Execution Contract
 
-Follow [stage completion and resume]({{CHANGE_LIFECYCLE_PATH}}#stage-completion-and-resume). Freeze the stage's finite check subset and result owner before work; resume from its recorded result, reuse applicable passes and close its own gate independently of later aggregate acceptance.
+Follow [stage completion and resume]({{CHANGE_LIFECYCLE_PATH}}#stage-completion-and-resume), including its mandatory [state update]({{CHANGE_LIFECYCLE_PATH}}#update-stage-state-before-handoff). Freeze the finite check subset and result owner before work; resume from its result, reuse applicable passes and close its own gate independently of later aggregate acceptance. Reconcile the owning result, remaining plan and affected roadmap/dependency pointers before handoff.
 
 Every stage executor must:
 
@@ -907,7 +907,7 @@ Stop if: {{MISSING_DECISION_DUPLICATE_AUTHORITY_SEMANTIC_DIVERGENCE_UNOWNED_LIFE
 
 Before submission or handoff: apply Docs/Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate after the final edit. Run the repository CodeStyle.bat Check on all stage-owned added/modified source files, review authored logical spacing and wrapping against CodeStyle.md, and run git diff --check. Record exact commands, tool version, file coverage, exclusions and both results; do not mark the stage complete with missing coverage or a failed required check. A no-source stage records justified N/A and applicable documentation/configuration checks.
 
-Handoff: apply stage completion and resume. Record PASS when this finite exit passes, or BLOCKED with the exact missing/failed cell and next discriminating action. Report changed/deleted files by responsibility, exact commands/configurations/results, artifact links, limitations and prerequisite validity. Remove delivered instructions and name the exact next open item, including whether Stage {{N_PLUS_1}} is authorized; do not reopen this local stage merely because aggregate acceptance remains open.
+Handoff: apply stage completion and resume, including the mandatory state update. Record PASS when this finite exit and state reconciliation pass, or BLOCKED with the exact missing/failed cell and next discriminating action. Report changed/deleted files by responsibility, exact commands/configurations/results, artifact links, limitations and prerequisite validity. Update the owning result, remove delivered instructions, reconcile affected roadmap/dependency pointers and name the exact next open item, including whether Stage {{N_PLUS_1}} is authorized. Later aggregate acceptance does not reopen a passed local stage.
 ```
 
 Repeat the stage section for each dependency-ready slice. Never make the final stage's prompt responsible for discovering missing work that earlier stages were meant to close.

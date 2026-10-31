@@ -81,7 +81,7 @@ Stage 9's original source work remains delivered, but its evidence exit stays op
 
 ## Universal Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Each stage passes the [Stage Source-Style Gate](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
@@ -129,6 +129,8 @@ If source reality proves a plan instruction wrong, correct the owning architectu
 Execute only Stage 3 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-3---validate-the-semantic-integrator. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Validate The Semantic Integrator. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -151,6 +153,8 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 Execute only Stage 4 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-4---validate-surface-transport. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Validate Surface Transport. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -173,6 +177,8 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 Execute only Stage 5 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-5---validate-content-and-numeric-robustness. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Validate Content And Numeric Robustness. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -200,6 +206,8 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 Execute only Stage 6 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-6---validate-per-view-accumulation-and-mode-authority. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Validate Per-View Accumulation And Mode Authority. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -223,6 +231,8 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 Execute only Stage 7 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-7---validate-live-viewport-and-lit-comparison. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Close only the approved Shipping host selection/progress/control delta, then validate the common live viewport/Lit loop. Apply the stage budget and same-slice host cleanup; do not reimplement transport or add a settings frontend.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -244,6 +254,8 @@ Check prerequisites; reuse completed work and follow repository conventions. Rec
 Execute only Stage 8 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-8---prove-traversal-and-backend-parity. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Prove Traversal And Backend Parity. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -271,6 +283,8 @@ Recheck the retained [default long-destination failure](../../../../../../CrossM
 Execute only Stage 9 from Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#stage-9---prove-manual-publication-and-evidence-candidate-integrity. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Close the approved shared Application output/Shipping raw-export delta without a second writer or Editor dependency in Game. Complete the stage work, deletion and candidate-integrity exits; revalidate canonical long-path/interrupted-publication failures and preserve exact raw prefixes.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -313,6 +327,8 @@ Freeze every applicable release-map camera/configuration within the accepted tra
 NON-NEGOTIABLE: ship only the scope proved by the accepted TransportAndEstimator.md revision and only the workflow proved by UserExperience.md. Every view-mode label/order, preset, overlay, reset reason, Editor/Game result, manifest, artifact action, map comparison, and support message must preserve the bounded claim, host-agnostic Renderer semantic, and raw/preview distinction. A host/View-kind estimator fork, map outside the domain, unexplained invalid-result state, unresolved MATH-* defect, inaccessible first-use step, stale/mixed prefix, silent capability substitution, plausible partial artifact, or surviving competing selector/estimator authority blocks FCR-REN-08.
 
 Verify the stage-local clean breaks: no old GBuffer-seeded reference producer/history/settings/shader/selector competes with current authority. Return remaining production residue to its owner as an explicit repair and invalidate affected proof. Remove temporary probes; audit source/header/shader/generated/CMake/package/SBOM/license/docs membership and unrelated dirty work. Retain `FRAME-RPT-10` and `CORE-RPT-10`; run CHK-RPT-01, 14, 15, 16, 17, 18, 19, 20 plus every invalidated prior check, architecture_boundary_check, focused builds/runs required by the claims, and git diff --check. File FCR-REN-08 with exact PASS/BLOCKED/EXCLUDED evidence and limitations. Do not call the feature accepted unless every applicable AC-RPT-01 through 23 passes conjunctively and the acceptance owner approves the report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -324,6 +340,8 @@ Verify the stage-local clean breaks: no old GBuffer-seeded reference producer/hi
 
 ```text
 Execute the earliest unfinished recovery/validation slice in Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md. Apply its Universal Execution Contract and current design owners. Do not repeat delivered Stage 0–9 implementation. Revalidate current code, cooked inputs and candidate evidence, locate the first incorrect product, and repair only the identified defect. Retain the existing frozen tolerances, capacities, matrix, source/bytecode identity and failure oracles; use the smallest required checks. Source presence or deferred execution is not PASS. Remove probes, pass the Stage Source-Style Gate for source changes, and remove completed tasks from this plan at handoff.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

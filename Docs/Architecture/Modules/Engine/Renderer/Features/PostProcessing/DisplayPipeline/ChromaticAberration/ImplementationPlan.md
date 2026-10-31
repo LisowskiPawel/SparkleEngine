@@ -45,7 +45,7 @@ CHRD-00 freezes the exact model/domain, current owner/file map, public/settings 
 
 ## Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Each stage passes the [Stage Source-Style Gate](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
@@ -96,6 +96,8 @@ Run `CHR-EXP-01` through `06`, disposition `CHRD-01` through `10`, freeze model/
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-0--close-chrd-00; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Chromatic Aberration Stage 0. Inspect current post/display/settings/View/shader/debug/capture/UI/package paths, reuse the existing three-channel precedent and close only unaccepted CHRD model/constant/control/domain/unit/edge/matrix/budget/oracle decisions; retain accepted values and explicit invalidation triggers. Update only the owning documents. Stop instead of choosing from visual preference alone.
 NON-NEGOTIABLE: no production changes, model choice is justified by predeclared quality/cost evidence, and every accepted document revision is named or the gate remains `Blocked`.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -109,6 +111,8 @@ Freeze the accepted channel displacement, coordinates/filtering/alpha, settings/
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-1--freeze-the-first-lens-slice; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Chromatic Aberration Stage 1 from its ImplementationPlan.md. Freeze the concrete first-slice contract and checks without production changes. Carry required state, shader and build edits into Stage 2 with the real output consumer; add no inactive seam.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ### Stage 2 — Implement And Prove The Lens Pass
@@ -124,6 +128,8 @@ Compare the existing connected pass/settings/shader with the accepted freeze and
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-2--implement-and-prove-the-lens-pass; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Chromatic Aberration Stage 2. Start with the connected ChromaticAberration pass/shader and shared settings bridge; implement only their missing accepted contract and delete replaced offsets/state. Prove the frozen three-channel model, target-linear order, pixel units, bilinear clamp, alpha and zero omission. Compare an independent double-precision CPU evaluator over the frozen pattern/aspect/resolution/parameter matrix and seeded semantic defects. Inspect bindings, native validation, raw pre/post products and cost on both backends. Reuse applicable passes and record the exact remaining cell for any unexplained mismatch.
 NON-NEGOTIABLE: one model/domain/filter contract serves both backends, every seeded channel/scale/aspect/stage/edge/alpha defect fails, no history/asset/quality tier exists, and zero remains no-work.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -141,6 +147,8 @@ Join the approved On default and existing Editor/shared settings/reset path to a
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-3--complete-experience-and-integration; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Chromatic Aberration Stage 3. Use the existing Editor/shared settings and capture route to prove approved On/default-reset and actual View state; add no public lens toggle or Game settings frontend. Use a typed/local neutral control, classify debug bypass and keep UI downstream. Exercise first use, reset, invalid values, two views, rapid edits, resize/DPI/minimize, mode/debug changes, missing pipeline, capture lineage, and packaged settings. Do not add a player-facing menu or generic post-process framework.
 NON-NEGOTIABLE: requested/active/artifact truth comes from runtime state, reset is exact, incidental fringes cannot be labeled intentional, and excluded workflow surfaces remain absent.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -158,6 +166,8 @@ Run `CHK-CHR-01` through `05` for one immutable candidate, including analytic de
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-4--candidate-evidence-and-closure; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Chromatic Aberration Stage 4 for one frozen candidate. Run the complete predeclared CHK-CHR matrix and seeded defects across domains, resolutions, aspects, views, debug/UI/capture, backends, package, and cost. Remove temporary test-only code; reconcile source/header/shader/generated/CMake/settings/package/docs membership; and file FCR-REN-25 with exact evidence and limitations. Do not retune the model or thresholds after seeing candidate output.
 NON-NEGOTIABLE: candidate/model/thresholds are frozen before output, all criteria and controlled failures close conjunctively, temporary probes are removed, and any ambiguous artifact or missing cell yields `Blocked`.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

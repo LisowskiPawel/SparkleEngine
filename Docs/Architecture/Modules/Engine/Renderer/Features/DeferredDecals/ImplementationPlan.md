@@ -12,7 +12,7 @@ Add authored decals that modify the right material surface consistently for rast
 
 ## Work This Plan
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 | What to do | Working route |
 | --- | --- |
@@ -57,6 +57,8 @@ Exit: contracts are reviewed, oracle inputs are deterministic, workload/cameras 
 Execute only Phase 0 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-0---freeze-contracts-and-evidence. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Freeze contracts and evidence. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -81,6 +83,8 @@ If a scene contains decals but the required scene material table is unsupported,
 Execute only Phase 1 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-1---authoring-and-scene-ownership. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Authoring and scene ownership. Complete the consumed source/cook/extraction route and same-slice deletions; defer GPU buffers/bindings to Phase 2.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -105,6 +109,8 @@ Exit: raster image tests pass for every channel group, overlap, near-plane/camer
 Execute only Phase 2 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-2---rasterized-deferred-decals. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Rasterized deferred decals. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -125,6 +131,8 @@ Exit: paired primary images agree within the recorded format/tolerance budget, p
 Execute only Phase 3 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-3---ray-traced-primary-gbuffer-parity. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Ray-traced primary GBuffer parity. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -148,6 +156,8 @@ Exit: the same authored decal appears on the visible receiver and in an off-scre
 Execute only Phase 4 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-4---reflections-and-gi-material-hits. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Reflections and GI material hits. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -169,6 +179,8 @@ Exit: the candidate is ready for judgment under [Deferred GBuffer Decals — Acc
 Execute only Phase 5 from Docs/Architecture/Modules/Engine/Renderer/Features/DeferredDecals/ImplementationPlan.md#phase-5---evidence-preparation-and-cleanup. Apply the owning execution contract and its Stage Source-Style Gate.
 Task: Evidence preparation and cleanup. Complete only its remaining work using the stage requirements and owning checks.
 Check prerequisites; reuse completed work and follow repository conventions. Record exact candidate/configuration, commands and exit results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

@@ -24,6 +24,8 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 
 ```text
 Execute only remaining FR-00 scope reconciliation from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Preserve approved decisions and accepted PTD-00. Close changed membership/selector dispositions and their check routes; do not reapprove settled scope or implement target-only features. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ### `FR-01` — Identity, Rights, And Baseline
@@ -36,6 +38,8 @@ Execute only remaining FR-00 scope reconciliation from Docs/Architecture/CrossMo
 
 ```text
 Execute only remaining FR-01 work from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Reuse identity/pin/notice and compatible baseline evidence; qualify changed inputs and missing PD-2 source checks. Retain exact rights/provenance blockers for final release review. Add no baseline framework or unrelated feature repairs. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ### `FR-02` — Package Spine
@@ -48,6 +52,8 @@ Execute only remaining FR-01 work from Docs/Architecture/CrossModule/FirstReleas
 
 ```text
 Execute only remaining FR-02 package work through PD-3 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Regenerate and verify the current unsigned archive with existing tooling, close its exact missing checks and remove stale membership. Reuse shared installed/adopter proof; do not implement another package spine. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ### `FR-03` — Feature Closure
@@ -60,6 +66,8 @@ Execute only remaining FR-02 package work through PD-3 from Docs/Architecture/Cr
 
 ```text
 Execute only the next Roadmap-selected FR-03 delta from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Name the selected path and consumer, then choose proof, repair, bounded simplification/retirement or admitted feature and run its owning child/leaf stage. For a cut, name the unnecessary existing surface and prove the retained path; no replacement feature is required. Complete local deletion and preservation checks. Reuse valid reports; do not execute the whole family registry or optional tiers. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ### `FR-04` — Release Maps
@@ -72,6 +80,8 @@ Execute only the next Roadmap-selected FR-03 delta from Docs/Architecture/CrossM
 
 ```text
 Execute only the selected FR-04 map proof from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Use the approved release maps and their applicable checks, not the later Tier-1/portfolio ladder. Freeze raw/reference/settings identity, repair the first wrong owner with local cleanup and record exact results for REL-05. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ### `FR-05` — Performance, Stability, And Native Proof
@@ -93,6 +103,8 @@ Use original frame/native/memory evidence and existing tools. This stage closes 
 Execute only FR-05 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-05--performance-stability-and-native-proof. Apply the owning execution contract and its Stage Source-Style Gate.
 Run the REL-06/07 budget, stability, recovery and paired-native checks for one candidate and declared laptop benchmark. Separate cold and steady results, observer effects and unsupported rows. Retain raw timings, memory and validation findings.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -116,6 +128,8 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 Execute only FR-06 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-06--candidate-freeze-and-reproduction. Apply the owning execution contract and its Stage Source-Style Gate.
 Freeze one package identity after prerequisite gates pass. Run the documented documented consumer and source-adopter journeys for REL-08/09 without private repair or author caches. Reuse existing manifests and operation reports; add no adoption runner or reporting authority. A required repair returns to its owner with same-slice cleanup and invalidates dependent proof if bytes or configuration change.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -139,6 +153,8 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 Execute only FR-07 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-07--publish-and-verify. Apply the owning execution contract and its Stage Source-Style Gate.
 Prepare the already approved candidate for publication under REL-10. Verify signatures, immutable downloads, public identity and truthful self-service policy. Perform authorized publication only, then verify the downloaded bytes against the frozen archive.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -160,6 +176,8 @@ Check named prerequisites before editing. Use the stage exit criteria; record ex
 Execute only FR-08 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-08--stabilize-and-close. Apply the owning execution contract and its Stage Source-Style Gate.
 Perform the finite maintainer review under REL-11: disposition known defects, rehearse required replacement/withdrawal decisions and reconcile invalidated evidence. Record the closeout decision before admitting the next program; promise no support service.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -181,7 +199,7 @@ Stop the current iteration when any of these is true:
 The first release does not automatically schedule geometry-cache animation, neural graphics, volumetric lighting, frame generation, native Linux, a binary SDK, an installer, a full CI/regression product beyond the approved deterministic release gates, or an internal performance-dashboard product. Linux is excluded from the roadmap. The other Architecture dossiers retain their negative/target contracts. Deferred decals, color grading, chromatic aberration, and HDR10 output are explicitly scheduled release blockers through `FCR-REN-23` through `FCR-REN-26`; their acceptance remains open until the required implementation and evidence pass. Admit any other capability only by changing scope, adding/updating its FCR and feature-local acceptance, re-evaluating dependencies and risks, and invalidating affected release evidence.
 ## Phase Card Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Every child stage and copied prompt uses the same delivery rule: identify the selected promise and actual consumer, reuse compatible code/evidence, then close only its missing production/proof delta or a bounded simplification preserving that path. A deletion slice can be complete with no replacement capability. Global priority comes from Roadmap; local prerequisites come from the owning contract, not a phase-number chain. [Portfolio focus](../../../Strategy/Roadmap.md#portfolio-focus-and-existing-code-simplification) protects rendering depth and necessary support while minimizing general-engine scope; Launcher retains its explicit presentation/reproduction role.
 

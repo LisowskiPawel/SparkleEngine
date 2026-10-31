@@ -8,7 +8,7 @@ Qualify raw surface radiance first, then close the admitted direct/indirect real
 
 ## Work This Plan
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Current entry is [Reference recovery](../Features/Lighting/ReferencePathTracer/ImplementationPlan.md#required-execution-order), represented here by LGT-3. Preserve accepted PTD-00 and delivered source stages. Use LGT-0 only for a changed shared semantic decision; reference recovery does not wait for completion of realtime estimators.
 
@@ -45,6 +45,8 @@ Execute only LGT-0 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/L
 Selected work: Reconcile that cell's units/spaces, ray/PDF/weight semantics, lobe/direct-indirect separation, raw output and independent oracle.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `LGT-1` — Direct Lighting
@@ -62,6 +64,8 @@ Execute only LGT-1 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/L
 Selected work: Execute only the next necessary [Direct Lighting stage](../Features/Lighting/DirectLighting/ImplementationPlan.md).
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-06; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `LGT-2` — Indirect Lighting
@@ -79,6 +83,8 @@ Execute only LGT-2 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/L
 Selected work: Execute only the next necessary [Indirect Lighting stage](../Features/Lighting/IndirectLighting/ImplementationPlan.md) for admitted secondary surface transport, sky/direct separation, reuse, disocclusion and reconstruction.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-07; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `LGT-3` — Preserve Discovery And Close The Required Reference
@@ -96,6 +102,8 @@ Execute only LGT-3 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/L
 Selected work: Follow existing recovery and remaining checks for admitted progressive surface reflection.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-08; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `LGT-4` — Lighting Candidate Closure
@@ -113,6 +121,8 @@ Execute only LGT-4 from Docs/Architecture/Modules/Engine/Renderer/FirstRelease/L
 Selected work: Join all three reports using raw lobe/transport evidence, analytic/independent controls and frozen motion/disocclusion cases.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-REN-06; no neighboring stage or new mechanism merely to fill a report.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Reference And Ownership

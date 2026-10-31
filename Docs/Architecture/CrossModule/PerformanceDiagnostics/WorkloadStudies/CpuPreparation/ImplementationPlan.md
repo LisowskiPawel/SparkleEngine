@@ -18,7 +18,7 @@ Turn one predeclared CPU question into original, falsifiable paired-API evidence
 
 ## Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Read [the design/check owner](StudyDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Keep the current world/Renderer preparation and Tasks owners. New persistent state/API/dependencies default to zero; an admitted copy/partition repair names the retained publication/exclusive-write boundary.
 
@@ -43,6 +43,8 @@ Apply [Change Lifecycle's stage budget](../../../../../Engineering/Workflow/Chan
 Execute only CPU-0 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/CpuPreparation/ImplementationPlan.md#cpu-0-freeze-the-causal-question. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze the actual CPU edge and source owner, item/byte/critical-path model, serial/worker oracle, raw producer sample and numeric/observer rules. No production edits. Stop on guessed data or unowned lifetime.
 NON-NEGOTIABLE: preserve serial/worker output and publication; measure critical path, not summed worker time; keep one Tasks owner. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -64,6 +66,8 @@ NON-NEGOTIABLE: preserve serial/worker output and publication; measure critical 
 Execute only CPU-1 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/CpuPreparation/ImplementationPlan.md#cpu-1-qualify-the-baseline. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Qualify optimized baseline and separate task/native traces. Join original frame/source identities, verify serial/worker equivalence and the frozen noise/observer controls. Retain actual missing counters; no speed claim.
 NON-NEGOTIABLE: preserve serial/worker output and publication; measure critical path, not summed worker time; keep one Tasks owner. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -85,6 +89,8 @@ NON-NEGOTIABLE: preserve serial/worker output and publication; measure critical 
 Execute only CPU-2 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/CpuPreparation/ImplementationPlan.md#cpu-2-test-one-bounded-change. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Test only the frozen CPU hypothesis in the existing owner. Compare predicted and measured work/critical path, preserve output/lifetime and run serial/worker falsifiers. Remove replaced/rejected paths in this slice. Stop on race, hidden settings drift or threshold changes.
 NON-NEGOTIABLE: preserve serial/worker output and publication; measure critical path, not summed worker time; keep one Tasks owner. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -106,6 +112,8 @@ NON-NEGOTIABLE: preserve serial/worker output and publication; measure critical 
 Execute only CPU-3 from Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/CpuPreparation/ImplementationPlan.md#cpu-3-close-paired-evidence-and-transfer. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Close matched API evidence, original source/frame joins, model-versus-observation and whole-frame verdict. Retain negative/inconclusive findings and link CASE-02. No unmeasured cache or architecture generalization.
 NON-NEGOTIABLE: preserve serial/worker output and publication; measure critical path, not summed worker time; keep one Tasks owner. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

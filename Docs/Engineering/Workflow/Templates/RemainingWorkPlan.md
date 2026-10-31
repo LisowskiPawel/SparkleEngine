@@ -33,6 +33,8 @@ Use this compact form for an admitted subject whose detailed stages have not yet
 
 Every stage and copied prompt follows [stage completion and resume]({{relative ChangeLifecycle path}}#stage-completion-and-resume). Before execution, freeze its finite AC/FM/CHK subset, matrix/oracles, input identity, result owner and next step. On resume, run only missing or concretely invalidated checks; close the local stage when its own exit passes, even if later aggregate proof remains open.
 
+The mandatory [state update]({{relative ChangeLifecycle path}}#update-stage-state-before-handoff) is part of each exit: owning result, remaining plan and affected roadmap/dependency pointers agree before handoff. An unrecorded outcome is unfinished work.
+
 ## Known Inputs And Decisions To Fill
 
 | Field | Known input / actual proposal | Unresolved decision / owner and consequence |
@@ -91,7 +93,8 @@ the plan's Stage Source-Style Gate after the final edit; no-source work records
 justified N/A and artifact/docs checks. Handoff the reviewable local plan and
 exact remaining decisions to the named owner.
 Apply stage completion and resume: record the local decision in its owning
-result, remove delivered instructions and name the exact next open item.
+result, remove delivered instructions, reconcile affected roadmap/dependency
+pointers and name the exact next open item. This state update is part of exit.
 
 </details>
 ```

@@ -25,7 +25,7 @@ Use the shipped profiles (`ShippingGame`, `ShippingEditor`) on both APIs for pro
 
 ## Delivery Boundary For Every Stage
 
-Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Follow [scope protection](../../../Strategy/Roadmap.md#scope-protection), [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the existing owner contracts. Deliver the approved journey or a [bounded simplification](../../../Strategy/Roadmap.md#portfolio-focus-and-existing-code-simplification) that preserves it. Keep hosts as composition, panels as presentation, Core as process authority, Launcher as workflow authority and `CMake/Packaging` as delivery authority. Launcher is the explicit portfolio-presentation exception: useful first-run/scene/readiness/progress/recovery polish belongs in PD-2/3; general Editor/gameplay breadth does not. Reuse shared settings, tasks, operations and manifests; add no support service or validation framework.
 
@@ -67,6 +67,8 @@ Preserve the [Launcher presentation and operation boundary](../../Modules/Tools/
 ```text
 Execute only PD-3 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md. Apply the owning execution contract and its Stage Source-Style Gate.
 Apply Delivery Boundary For Every Stage. Complete the next unchecked archive/integrity/rehearsal item through the existing owner. Bind results to one archive hash; unavailable required checks stay open.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## `PD-4` — Support, Incident Response, And Product Closure
@@ -86,4 +88,6 @@ The checked supporting items below are complete for their recorded archives. Onc
 ```text
 Execute only PD-4 from Docs/Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md. Apply the owning execution contract and its Stage Source-Style Gate.
 Apply Delivery Boundary For Every Stage. Complete the next unchecked archive-bound item using existing tools. Reconcile six reports; retire this plan only after its phase exit. Public approval remains separate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```

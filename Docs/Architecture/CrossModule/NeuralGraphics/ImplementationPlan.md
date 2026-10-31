@@ -20,7 +20,7 @@ Its [evidence home](../../../Acceptance/GraphicsWorkloads.md#evidence-folders-an
 
 ## Stage Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Apply [Change Integration](../../../Engineering/Workflow/ChangeIntegration.md), [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md) and the [delivery package](../../../Engineering/Workflow/Templates/FeatureDeliveryPackage.md). Before each stage freeze the candidate, prerequisite revisions, file allowlist, producer/consumer/deletion and hook/copy ledgers, AC/FM/CHK mappings and smallest checks. Use existing shader/frame-graph/Assets/runtime/package ownership. Its [stage complexity budget](../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) applies to both current scripts/runtime code and proposed additions: name what to retain, narrow or delete and compare actual state/API/hooks/copies/variants/dependencies at exit. An unused abstraction or postponed replacement deletion keeps that stage open.
 
@@ -52,6 +52,8 @@ Use the stage contract above with every prompt; these are bounded entries, not p
 ```text
 Execute NG-S0 only from Docs/Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#ng-s0---freeze-discovery. Apply the owning execution contract and its Stage Source-Style Gate.
 Ratify or explicitly revise Semantics.md and ExecutionArchitecture.md through NG-D0 against current owners and actual reference, rights, dataset, environment and lifetime inputs. Freeze the component derivation/check card, operator/layout recipe, conformance/value/cost limits and actual motion/edge thresholds; close all nine cells or name unresolved owners. Use Research.md as precedent, not results. Documentation/research only: preserve REL-11/M3 production admission; do not train, add runtime code or claim acceptance.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -72,6 +74,8 @@ Each row is a separate reviewable owner slice. Execute only the first unfinished
 ```text
 Read Docs/Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#ng-s1---deterministic-dataset and apply its Stage Contract, including the Stage Source-Style Gate.
 Execute only the first unfinished NG-S1 owner slice in this section, after NG-D0/REL-11/M3 and accepted base Reference prerequisites: 1a qualified component, then 1b fixed classical filter/RR-independent guides, then 1c dataset publication. Use ratified Semantics.md and ExecutionArchitecture.md; current beauty is not a label and vendor RR is not the spatial baseline. Apply that row's controls, affected owner checks and same-slice deletion. Preserve math/beauty, raw identity, rights and scene/sequence split. Handoff the row's exact proof and remaining NG-S1 obligations; stop on an unproved producer or unledgered hook. No second tracer, AOV/filter registry, model training or inference integration.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -84,6 +88,8 @@ Execute only the first unfinished NG-S1 owner slice in this section, after NG-D0
 ```text
 Read Docs/Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#ng-s2---owned-training-and-model and apply its Stage Contract, including the Stage Source-Style Gate.
 Execute NG-S2 only after accepted data. Follow ratified Semantics.md for fixed CNN/loss/halo, seeds/environment/repeat, tiny-batch/gradient, noisy/classical and validation-only ablations. Complete the short batch 8/16 profile on matched examples, reporting examples/s, ms/update and actual memory separately from inference; do not require two full training runs. Keep San Miguel sealed. Handoff AC-NG-03/CHK-NG-01, recipe identity, failures and cleanup. Stop on leakage, unfrozen rules or non-finite state; no inference integration.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -96,6 +102,8 @@ Execute NG-S2 only after accepted data. Follow ratified Semantics.md for fixed C
 ```text
 Read Docs/Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#ng-s3---export-and-fp32-conformance and apply its Stage Contract, including the Stage Source-Style Gate.
 Execute NG-S3 only after accepted semantics. Deliver the fixed OIHW/bias export and NHWC16 FP32 operators through existing ShaderSystem with exact padding/residual/decode. Prove float64/PyTorch/paired-GPU conformance and seeded layout/edge/channel/finite faults. Add only the frozen FP16 storage-round-trip diagnostic through the same operator; report bytes/drift, not native half-speed. Delete prototype formats and replaced conversions; keep one current artifact. Handoff AC-NG-04/CHK-NG-02. Stop on mismatch, guessed semantics or unowned lifetime; no vendor optimization.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -108,6 +116,8 @@ Execute NG-S3 only after accepted semantics. Deliver the fixed OIHW/bias export 
 ```text
 Read Docs/Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#ng-s4---runtime-vertical-slice and apply its Stage Contract, including the Stage Source-Style Gate.
 Execute NG-S4 only after NG-S3 conformance. Follow ExecutionArchitecture.md: three typed passes, two transient hidden buffers, one output, existing RR-independent guides and genuine surface validity. Prove black-surface/RR-off behavior, bounded invalid-output publication, input/model/output generations, declared dependencies, all-queue retirement and truthful fallback under failure/shutdown. Follow frozen hook/copy/deletion limits, remove replaced paths and run narrow owner/boundary checks. Handoff AC-NG-05/07. Stop on guessed guides, unowned lifetime or hidden fallback. No copied scene, second uploader or generic tensor runtime.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -120,6 +130,8 @@ Execute NG-S4 only after NG-S3 conformance. Follow ExecutionArchitecture.md: thr
 ```text
 Read Docs/Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#ng-s5---measured-kernel-optimization and apply its Stage Contract, including the Stage Source-Style Gate.
 Execute NG-S5 only after correct runtime. Complete Semantics.md's one-alternate-layout native control and join the S2 batch/S3 precision results; unrun axes remain unproved. Predict operations/traffic and retain actual operator/API scope, numerics, time and workspace. A production optimization additionally needs a measured limiter and whole-model/frame/quality/both-API proof. Keep the correct FP32 route and delete rejected prototypes/variants now. Handoff AC-NG-04/06 and original controls; no autotuner, mandatory SDK, claimed half-speed from storage-only evidence or post-result threshold change.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -139,6 +151,8 @@ The [portfolio plan](../GraphicsPortfolio/ImplementationPlan.md#3-reproduce-revi
 ```text
 Read Docs/Architecture/CrossModule/NeuralGraphics/ImplementationPlan.md#ng-s6---evaluation-delivery-and-adoption and apply its Stage Contract, including the Stage Source-Style Gate.
 Execute only the first unfinished NG-S6 slice. For S6a, qualify the supported candidate against every frozen raw/log/FLIP/temporal/value/cost and failure rule, San Miguel sealed-test identity, package/license/hash/native joins and local AC-NG-08 checks. Hand this technical packet to portfolio stage 2 with its rehearsal cell open. For S6b, consume the relevant actual portfolio stage 3 neural observations and close the remaining AC-NG-08/CHK-NG-04 cell; final adoption is not an entry prerequisite. Record exact proof, interventions, missing cells and cleanup in existing reports. Stop on failed value, uncertainty, model mismatch, unsafe failure or absent reproduction; no test-driven selection, invented result or extra platform.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

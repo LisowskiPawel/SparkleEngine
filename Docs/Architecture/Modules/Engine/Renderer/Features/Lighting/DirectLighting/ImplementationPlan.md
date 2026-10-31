@@ -59,7 +59,7 @@ Resolve only the admitted estimator, light/PDF, reservoir/history, visibility an
 
 ## Universal Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Each stage passes the [Stage Source-Style Gate](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
@@ -146,6 +146,8 @@ Turn the current source, retained findings and selected research into frozen, re
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-0--close-discovery-and-authorize-the-first-slice and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Execute Direct Lighting Stage 0 from `DirectLighting/ImplementationPlan.md`. Apply stage completion and resume. Run only the DIR-X experiments consumed by the selected first slice and reuse valid results. Retain current raw lobe/reservoir/light/PDF/visibility controls; diagnose historical visual symptoms only if reproduced. Accept the consumed DIR-D0 decisions and explicitly defer unselected expansions, with thresholds/budgets frozen before candidate observation. Retain the exact hook/deletion ledger, check bounds and separate gate review. Record the finite discovery verdict and next-stage admission separately; add no production estimator behavior, preserve unrelated work and report unrun required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -179,6 +181,8 @@ Create the smallest independent foundation that can identify whether light units
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-1--establish-analytic-and-exhaustive-truth and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 1 only. Build the accepted analytic CPU/closed-form cases and one bounded exhaustive GPU direct-lighting baseline over the production surface/light boundary. Produce raw `DirectDiffuse`, `DirectSpecular`, and `DirectSubsurface` evidence without reservoir reuse, reconstruction, exposure, or tone mapping. Cover units, light geometry/PDFs, BRDF energy allocation, capacities, and invalid inputs. Do not tune or replace ReSTIR yet. Keep tests local-only if they require new test-only files, and do not submit temporary probes.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -211,6 +215,8 @@ Make production direct evaluation and candidate evaluation consume one proved se
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-2--freeze-one-shared-light-and-surface-semantic-kernel and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 2 from the accepted `DIR-D0` equations. Establish one shared, focused light/BRDF semantic kernel for exhaustive resolve and reservoir candidate evaluation; update descriptors/preparation/shaders/callers together; and delete the replaced internal semantics. Prove evaluation/PDF support, lobe energy allocation, shape Jacobians, and finite handling with Stage 1 tests. Do not add new material lobes, emissive meshes, ReGIR, denoising, or a shadow-map framework.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -243,6 +249,8 @@ Land a canonical, testable initial-candidate reservoir with stable integer ident
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-3--replace-initial-reservoir-state-and-sampling and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 3 only. Replace the old direct reservoir and initial sampling in one clean break using the frozen target, source PMF/PDF, integer sample identity, stream update, bounded `M`, and normalization. Keep temporal/spatial reuse off. Support only the candidate families admitted by `DIR-D0`. Compare raw output statistically to the exhaustive baseline and run finite/invariant tests. Delete the superseded representation, callers, shaders, bindings, and registrations; do not add a compatibility mode.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -275,6 +283,8 @@ Add stable-light temporal reuse, disocclusion handling, spatial reuse, and the s
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-4--add-correct-temporal-and-spatial-reuse and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 4 on the accepted Stage-3 reservoir. Add previous/current light translation, complete surface/history identity, temporal and spatial reuse, disocclusion policy, and the frozen bias-correction modes. Keep reservoir and reconstruction history separate. Exercise every `CHK-DIR-03/05` mutation, including light reorder/removal, material/alpha change, occluder motion, cuts, resize, dual views, shader reload, and long frame indices. Stop if any correction equation or history field remains unresolved.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -307,6 +317,8 @@ Make selected-sample visibility reliable across Inline/Pipeline providers and D3
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-5--prove-visibility-semantics-and-provider-parity and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 5. Reconcile Inline and Pipeline selected-light visibility to the frozen segment, offset, face, alpha, and material semantics while retaining their real execution differences. Exercise strict/automatic resolution and inject missing capability/program/SBT/TLAS/material faults. Run the required Renderer/RHI architecture boundary check and paired-provider fixtures. Do not add screen traces, VSM, opacity micromaps, or a generic shadow-provider framework.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -339,6 +351,8 @@ Turn the proved raw sparse signal into a stable product image without hiding est
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-6--deliver-portable-reconstruction and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement Direct Lighting Stage 6 after raw estimator and visibility gates pass. Add the accepted portable reconstruction path using the frozen guide/confidence/history contract, then connect optional DLSS Ray Reconstruction through the existing provider boundary. Preserve raw lobe capture and separate reservoir from denoiser history. Run the motion/disocclusion/light-toggle matrix and report raw versus reconstructed quality, memory, and time. Stop if the denoiser is required to make an invalid estimator look correct.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -373,6 +387,8 @@ First-release base closure may proceed from Stage 6 to Stage 8 under its existin
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-7--admit-and-deliver-many-light-expansions and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Implement one selected M5R Stage-7 class at a time (emissive triangles or environment candidates) after DIR-D0 closes its contract; ReGIR needs separate measured-need admission. Freeze update/identity/PDF/budgets, extend existing scene/GPU-scene/material owners, prevent double counting, qualify mutations/retirement and measure total quality/time/memory. Apply same-stage cleanup; do not bundle classes or claim unlimited lights.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -406,6 +422,8 @@ Prove the complete candidate in representative content and publish an honest `FC
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-8--product-adoption-backend-evidence-and-closure and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
 Execute Direct Lighting Stage 8 as candidate validation and adoption. Freeze exact candidate/configuration/reference identity and thresholds before runs. Exercise analytic/Cornell, selected release-map, bounded overlap, motion/disocclusion, alpha/failure and required D3D12/Vulkan cells. Do not pull later Bistro/San Miguel gates into first-release closure. Retain raw and reconstructed artifacts and separate numerical, temporal, visual, performance, memory, backend, and release verdicts. Update `FCR-REN-06` only with observed evidence; do not repair unrelated defects during the evidence run.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

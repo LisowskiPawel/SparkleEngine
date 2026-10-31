@@ -18,7 +18,7 @@ Deliver the missing advanced scene/content proof from original bytes through ind
 
 ## Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Read [the design/check owner](ContentToPixelDesign.md), current source/build and original prerequisite artifacts; execute only the first unfinished admitted stage. Reuse valid proof. Use existing conversion/import/cook/world/render owners. A missing San Miguel conversion does not admit a generic importer, new renderer or scene-specific shader. Preserve source semantics, rights and accepted transport.
 
@@ -43,6 +43,8 @@ Apply [Change Lifecycle's stage budget](../../../../../Engineering/Workflow/Chan
 Execute only CPIX-0 from Docs/Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md#cpix-0-freeze-workload-inputs-and-oracles. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Freeze the exact advanced scene/source/rights/cook/camera/domain and check cards under GraphicsWorkloads. Inspect current MAP-00 and Reference proof; route only necessary producer prerequisites. No production work or release-scope change.
 NON-NEGOTIABLE: preserve required source/material semantics and active-level identity; qualify raw independent truth and rights; keep held-out boundaries. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -64,6 +66,8 @@ NON-NEGOTIABLE: preserve required source/material semantics and active-level ide
 Execute only CPIX-1 from Docs/Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md#cpix-1-qualify-deterministic-content-delivery. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Execute only the missing content slice: reuse Bistro proof, qualify San Miguel conversion through current supported formats and semantic inventory, then deterministic cook/load/failure controls. Remove replaced routes and restore temporary state. Stop on lost required semantics or guessed rights; no generic importer expansion.
 NON-NEGOTIABLE: preserve required source/material semantics and active-level identity; qualify raw independent truth and rights; keep held-out boundaries. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -85,6 +89,8 @@ NON-NEGOTIABLE: preserve required source/material semantics and active-level ide
 Execute only CPIX-2 from Docs/Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md#cpix-2-prove-materials-lighting-and-raw-pixels. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Prove the fixed material/light/pixel lineage against accepted raw independent oracles on D3D12/Vulkan. Preserve transport math and uncertainty, detect wrong camera/color/normal/identity controls and route defects to existing feature owners. No beauty-only approval or hidden material reduction.
 NON-NEGOTIABLE: preserve required source/material semantics and active-level identity; qualify raw independent truth and rights; keep held-out boundaries. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -106,6 +112,8 @@ NON-NEGOTIABLE: preserve required source/material semantics and active-level ide
 Execute only CPIX-3 from Docs/Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md#cpix-3-close-the-tier-one-case-and-handoff. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
 Close only missing Tier-1 MAP/WL cells and CASE-01/03 artifact joins. Preserve raw source/cook/native identity, rights, scene limits and held-out boundaries. Reuse valid runs, remove probes and hand off the exact M3 inputs; no automatic neural or release acceptance.
 NON-NEGOTIABLE: preserve required source/material semantics and active-level identity; qualify raw independent truth and rights; keep held-out boundaries. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

@@ -12,7 +12,7 @@ Finish and qualify the existing vignette through its display and settings owners
 
 ## Work This Plan
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 | What to do | Working route |
 | --- | --- |
@@ -45,6 +45,8 @@ Every stage and copied prompt follows [stage completion and resume](../../../../
 
 ```text
 Execute only Stage 1 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-1---freeze. Inspect current display-product, settings/persistence/presenter and typed-graph owners. Resolve its five cards against the dossier, with numerical/cost rules frozen before results and one authority at each edge. Link AC-VIG/FM-VIG/CHK-VIG to real both-backend check cards. Keep the independent CHRD-00 contract and 49-family registry. Do not implement code/assets or claim acceptance. Handoff the reviewed local plan, file/hook/deletion/copy budget and exact unresolved owners. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -62,6 +64,8 @@ Execute only Stage 1 from Docs/Architecture/Modules/Engine/Renderer/Features/Pos
 Execute only Stage 2 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-2---one-effect-slice. Apply the owning execution contract and its Stage Source-Style Gate.
 After the reviewed vignette freeze, compare the connected pass, fixed shader mask and shared settings bridge with its finite checks. Repair only missing formula/parameter/View/order behavior; preserve approved defaults and deferred public toggles. Prove neutral/disabled-no-work, formula/order/failure and both-backend behavior. Reuse the dedicated pass and applicable evidence. Complete its deletion/retention and addition-budget exit now; add no lens framework or copied settings truth.
 Stop on unresolved prerequisites or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -79,6 +83,8 @@ Stop on unresolved prerequisites or unavailable required checks.
 Execute only Stage 3 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-3---delivery-proof. Apply the owning execution contract and its Stage Source-Style Gate.
 Against the exact supported native candidate, run AC-VIG-01 through 06 for views/resize, raw/debug/UI bypass, Shipping/per-user state and observer/cost bounds. Record vignette separately inside FCR-REN-25. Remove temporary probes; retain exact commands, configuration, results and limitations.
 Stop on unresolved prerequisites or unavailable required checks.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

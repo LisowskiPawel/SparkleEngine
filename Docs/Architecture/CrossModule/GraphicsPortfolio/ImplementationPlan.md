@@ -30,7 +30,7 @@ Technical choices are established in [Review And Transfer](ReviewAndTransfer.md)
 
 ## Stage Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Apply the [stage complexity budget](../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget), [Change Integration](../../../Engineering/Workflow/ChangeIntegration.md) and [Stage Source-Style Gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) to any executable repair. Freeze the smallest assembly allowlist, original evidence identities, addition/deletion/copy/hook ledger and relevant AC-PORT/CHK-PORT checks. Each stage removes replaced narratives/probes and reports the actual supported surface; original immutable evidence remains intact. Missing people, permission, numerical proof or rights blocks the dependent result, not independent preparation.
 
@@ -52,6 +52,8 @@ Bind the three selected narratives to CASE-01..05 and original release/study/neu
 ```text
 Execute only stage 1 from Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#1-freeze-the-case-and-evidence-route; apply its Stage Contract, including the Stage Source-Style Gate.
 Use ReviewAndTransfer.md's selected three cases/package and AC-PORT/CHK-PORT contract. Bind actual candidate/contribution, original accepted artifacts, rights, reproduction tuple and participant inputs; map PGE facets and missing evidence to existing owners. Freeze the assembly allowlist and deletion/copy budget, then prepare CHK-PORT-01/04 failure controls. Remove competing outlines and stale claims. Handoff exact local inputs, gaps and checks. Do not invent outcomes, add runtime infrastructure, publish or contact anyone.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -72,6 +74,8 @@ Link original artifacts and package only the cleared reproduction subset. Replac
 ```text
 Execute only stage 2 from Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#2-assemble-the-three-cases; apply its Stage Contract, including the Stage Source-Style Gate.
 Assemble ReviewAndTransfer.md's three cases from M3 technical/incident, all required M5R subject results and NG-S6a local evaluation/package proof, with sharing rights accepted. Final study/neural adoption may remain open; this package is its input. Include personal contribution, derivation/source/native joins, controlled results, negative alternatives and limitations. Run CHK-PORT-01/04, hash/rights and reader checks. Replace duplicate narratives and remove probes; preserve originals. No invented acceptance, site, viewer or capture depot.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -92,6 +96,8 @@ Freeze the exercise's coverage before the run: it must reproduce the selected st
 ```text
 Execute only stage 3 from Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#3-reproduce-review-and-revise; apply its Stage Contract, including the Stage Source-Style Gate.
 Execute the author/agent rehearsal for WL-07/08 and CHK-PORT-02 on the frozen technical packet. Cover the selected study/analysis and supported neural result for AC-WS-04/AC-NG-08; final adoption verdicts are outputs, not prerequisites. Record involvement/interventions/failures and actual output, then return applicable observations to WS-S4/NG-S6b. Perform the AC-PORT-04 author/agent review and dispose of findings; route defects to existing owners and requalify affected proof. No unexecuted result claims, hidden repair or unauthorized external action.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -110,6 +116,8 @@ The [Technology Transfer design](TechnologyTransfer/TransferDesign.md) and [KT-0
 ```text
 Read Docs/Architecture/CrossModule/GraphicsPortfolio/ImplementationPlan.md#4-demonstrate-direction-and-transfer and apply its Stage Contract, including the Stage Source-Style Gate.
 Delegate only the first unfinished admitted stage to Docs/Architecture/CrossModule/GraphicsPortfolio/TechnologyTransfer/ImplementationPlan.md. Use its design, exact M6/participant/authorization prerequisites and KT-stage checks. Reuse valid expert review and original case artifacts; do not duplicate the workflow here. Join real AC-PORT-04..08 evidence and cleanup into the final CASE-05 packet. Missing external outcomes stay open. Contact/publication/submission require their actual authorization.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

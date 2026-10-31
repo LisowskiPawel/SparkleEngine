@@ -47,7 +47,7 @@ CGRD-00 freezes working domain, parameter and .cube subset, owner/files, parser 
 
 ## Universal Execution Contract
 
-Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). The [state update](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff) is part of its exit: record the result, reconcile remaining work and name the next item before handoff. Later aggregate proof remains separate.
 
 Each stage passes the [Stage Source-Style Gate](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
@@ -112,6 +112,8 @@ Every stage is independently reviewable. Its report must list production files c
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md#stage-0--close-discovery; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Color Grading Stage 0. Do not change production code. Inspect current Renderer/display/settings/shader/asset/cook/residency/editor/capture/package owners; run the seven discovery experiments; freeze every CGRD decision, risk, fixture, tolerance, budget, and invalidation trigger. Update only the owning feature documents. Stop rather than choosing working space, negative math, LUT grammar/layout/interpolation, ownership, UX, or evidence thresholds by convenience.
 NON-NEGOTIABLE: production remains untouched, every implementation-shaping unknown is closed/excluded/blocked explicitly, and the report names exact accepted revisions or records `Blocked`.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -124,6 +126,8 @@ NON-NEGOTIABLE: production remains untouched, every implementation-shaping unkno
 
 ```text
 Execute only ColorGrading Stage 1 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md. Freeze the concrete first-slice contract and checks without production changes. Carry required state, shader and build changes into Stage 2 with their real consumer; do not land an inactive framework. Apply the owning execution contract and its Stage Source-Style Gate.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 ## Stage 2 — Deliver The Parameter-Only Grade
@@ -141,6 +145,8 @@ Stage 2 lands the complete settings/View/typed-binding/shader/build route with i
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md#stage-2--deliver-the-parameter-only-grade; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Color Grading Stage 2. Implement the accepted CGR-MATH parameter transform once, after the accepted reconstruction/exposure boundary and before target tone mapping. Use typed binding and an independent double-precision oracle. Keep LUT absent. Exercise neutral omission, analytic colors/ramps/negative/HDR/non-finite values, alpha sentinel, wrong-order/weight/rule defects, debug classifications, output extents, D3D12/Vulkan shader paths, native validation, and pass cost. Stop on any semantic or stage ambiguity.
 NON-NEGOTIABLE: one accepted semantic transform, one exact stage, independent defect-detecting values, no LUT/fusion, and unchanged unrelated histories/SDR behavior.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -158,6 +164,8 @@ NON-NEGOTIABLE: one accepted semantic transform, one exact stage, independent de
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md#stage-3--add-the-typed-lut-source-and-cooked-contract; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Color Grading Stage 3. Add the accepted .cube source parser and canonical cooked grade-LUT format at the existing asset/cook owner. Enforce checked counts and byte/dimension limits, finite/domain/directive rules, deterministic bytes, provenance, transactional publication, and clear errors. Exercise identity/asymmetric known-cell plus malformed/truncated/extra/non-finite/overflow/unsupported fixtures. Do not upload, render, embed OCIO, or accept extra formats.
 NON-NEGOTIABLE: every token/count/allocation is bounded before publication, cooked identity is deterministic, runtime source loading is absent, and no unaccepted grammar/schema survives.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -175,6 +183,8 @@ NON-NEGOTIABLE: every token/count/allocation is bounded before publication, cook
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md#stage-4--join-residency-and-apply-the-lut; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Color Grading Stage 4. Reuse existing residency to publish a checked cooked LUT generation and bind it to the one grading pass. Implement the accepted LUT mapping/composition exactly. Exercise known asymmetric cells and interpolation points, boundary/out-of-domain values, missing/corrupt cooked data, upload/OOM/capacity/device loss, randomized replacement completion, two views, and delayed GPU retirement. Preserve the explicit last-good/default state and never claim the pending request active.
 NON-NEGOTIABLE: only complete current immutable generations activate, CPU/GPU axis/domain/filter/order agree, failures are transactional, and retirement follows real completion identity.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -192,6 +202,8 @@ NON-NEGOTIABLE: only complete current immutable generations activate, CPU/GPU ax
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md#stage-5--complete-the-development-experience; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Color Grading Stage 5. Add the accepted DevelopmentEditor controls and automation fields over the existing settings and active-state owners. Show semantic domain, neutral values, LUT metadata/identity, requested versus active/pending/unavailable reason, and reset. Exercise first use, invalid source, recook/upload failure, rapid edits/cancel, two views, capture metadata, package-missing state, accessibility, and manifest equivalence. Do not create a color-suite, volume system, runtime player UI, or alternate state cache.
 NON-NEGOTIABLE: visible/editor/automation truth derives from the same runtime owners, reset reaches exact omission, no silent substitute exists, and excluded controls/workflows remain unreachable.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>
@@ -209,6 +221,8 @@ NON-NEGOTIABLE: visible/editor/automation truth derives from the same runtime ow
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ColorGrading/ImplementationPlan.md#stage-6--evidence-package-and-close; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
 Execute only Color Grading Stage 6 for one frozen candidate. Run CHK-CGR-01 through 06 with seeded defect controls, raw pre/post-grade products, backend comparisons, two-view and replacement stress, package/clean-machine route, cost/memory, capture lineage, and excluded-feature audit. Remove temporary test-only code and reconcile source/header/shader/generated/CMake/asset/package/docs membership. File FCR-REN-24 with exact PASS/BLOCKED/EXCLUDED evidence and limitations; do not tune thresholds after candidate output.
 NON-NEGOTIABLE: one immutable candidate/manifest/threshold set, all applicable criteria conjunctive, all temporary probes removed, and any missing/mismatched evidence produces `Blocked` rather than a partial score.
+Before handoff, update the stage result, remaining plan and next item.
+
 ```
 
 </details>

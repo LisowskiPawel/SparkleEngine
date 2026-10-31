@@ -17,3 +17,5 @@
 | Source coverage and dated reviews | [Strategy coverage](../Architecture/CrossModule/StrategyCoverage.md), [assessments](Assessments/README.md), [role-source archive](RoleSources.md) |
 
 For a feature, open its **Design** document to understand what, why and how. Open its **ImplementationPlan** to work through stages and copy an execution prompt. [Architecture](../Architecture/README.md) locates both; [Engineering](../Engineering/README.md#choose-by-task) supplies the working rules.
+
+Every stage ends with the mandatory [state update](../Engineering/Workflow/ChangeLifecycle.md#update-stage-state-before-handoff): its result, remaining plan and affected roadmap pointers agree before handoff. Resume from that result and exact next item, reusing applicable passed checks.
