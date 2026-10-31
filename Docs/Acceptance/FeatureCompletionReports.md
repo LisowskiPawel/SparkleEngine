@@ -60,6 +60,12 @@ Evidence links above are local ignored artifacts, not a public evidence bundle. 
 
 **Execution:** the [product plan](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#how-to-close-this-plan) owns the remaining checklist. Its unchecked items map to the feature-local criteria; keep completion results here/in candidate reports, not in a second implementation diary. Public trust/rights/publication remain [FR-07](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-07--publish-and-verify).
 
+## Foundation Contract Progress
+
+**FWC-0 / Sponza — PASS, contract reconciliation only:** [FCR-WORLD-01 result](../../artifacts/validation/releases/0.1.0/e44692cc-fwc0-20261031/features/FCR-WORLD-01/completion.json) records the selected request through producer, publication, consumer and shutdown at `e44692cc…`. The [GameFramework owner](../Architecture/Modules/Engine/GameFramework/GameFrameworkCapabilities.md#explicit-level-selection-and-publication) links the existing acceptance/failure/check cells; the [eleven-family registry](#foundation-world-and-content) remains the routing authority. This is a documentation/source-trace result, with source-style `N/A` because no production source changed.
+
+Original `241ef037` Sponza frame/quit evidence and shared content-failure controls retain each original source, executable, API/profile, shader and settings identity. The corrupt-manifest controls use CornellBox; they are not Sponza-specific negatives or proof of current rendering/the repaired `3743e72a…` archive. Remaining installed member/store failures, affected positive reconciliation and removal stay with [PD-3](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation); no adjacent stage was executed or family/release acceptance advanced.
+
 ## Required Completion Report
 
 Store the candidate-bound report at:

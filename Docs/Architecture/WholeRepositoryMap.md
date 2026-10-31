@@ -233,7 +233,7 @@ LevelSession -> SceneLoadTaskGraph -> GameWorld
 - seven external-pack Game-supported levels: `ModernSponza`, `ModernSponzaCandles`, `ModernSponzaKnight`, `BistroExterior`, `BistroInteriorWine`, `LPSHead`, and `CornellBox`;
 - three source-readiness records that are not Game-supported: `JungleRuins`, `SanMiguelHigh`, and `SanMiguelLow`.
 
-The default game level is `Empty`; `SPARKLE_STARTUP_LEVEL` selects another catalog level. If catalog loading fails or `Empty` is absent, `LevelRegistry` creates the built-in empty fallback. External assets remain outside normal source history and are acquired through catalog metadata. Game support is distinct from download support and from the user's selected active set.
+The default game level is `Empty`; `SPARKLE_STARTUP_LEVEL` requests another catalog level. [GameFramework's selection contract](Modules/Engine/GameFramework/GameFrameworkCapabilities.md#explicit-level-selection-and-publication) distinguishes intentional Empty from unavailable explicit requests and owns the load/publication/shutdown trace. External assets remain outside normal source history and are acquired through catalog metadata. Game support is distinct from download support and from the user's selected active set.
 
 The catalog also records disabled future Modern Sponza add-ons for Ivy, Trees, Flood, and Volumetric Explosion with explicit implementation blockers. Their presence in metadata is not Game support.
 

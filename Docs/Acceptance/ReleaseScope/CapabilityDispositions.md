@@ -18,7 +18,46 @@ Included is an obligation to deliver and accept the exact bounded path, not a st
 
 The capability name and source link retain the existing inventory owner instead of copying its implementation narrative. A section names exactly one module owner; cross-module feature/report ownership remains in the existing FCR registry. Compound rows are split in the public-surface tables below. Old inventory evidence remains dated; a classification does not refresh all of its source assertions.
 
-No fixed function, data format or hidden low-level flag is a new public selector. Generic development CVar/CLI access is absent from Game; the Game settings allowlist below is exhaustive. Editor/Launcher use their classified typed workflows; this does not admit every development flag or debug-build feature. A new advertised/reachable consumer choice requires a row before scope approval.
+No fixed function, data format or hidden low-level flag is a new public selector. Generic development CVar/CLI access is absent from Game; the persisted settings below are shared inputs configured through Editor, not a Game settings frontend. Editor/Launcher use their classified typed workflows; this does not admit every development flag or debug-build feature. A new advertised/reachable consumer choice requires a disposition before release.
+
+## Reconciled Membership And Check Routes
+
+**Snapshot:** 2026-10-31 at `e44692cce7eb33052b0a1ac763e66137a861639b`; [FR-00 result](../FirstRelease.md#fr-00-reconciliation-result). The six approved choices are unchanged. These are distribution dispositions, not fresh executable passes. Exact per-file hashes, DLL/plugin/standard-module closure and terms stay in the existing [reviewed package input manifest](../../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs), rather than a second payload list here.
+
+| Membership | Disposition / exposure | Owner and required check route |
+| --- | --- | --- |
+| `SparkleLauncher`, `ShowcaseEditor`, `AssetCooker`, `TextureCooker`, `ShaderCompiler` / `ShippingEditor`; `ShowcaseGame` / `ShippingGame` | Included / six packaged executables | Build/package composition in [ReleaseProducts.cmake](../../../CMake/Packaging/ReleaseProducts.cmake); exact [paths and helper closure](../../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#product-and-helper-membership). PD-3 / `CHK-PKG-01` verifies generated products and complete allowlist; `CHK-PKG-02` proves helper discovery, startup rejection and offline use without host SDKs. No extra standalone importer, SDK or development executable. |
+| Portable CMake `4.3.3`: `Tools/CMake/bin/cmake.exe`, `Tools/CMake/share/cmake-4.3/Modules/CMake.cmake`, license | Included / acquisition helper | Launcher sync owner; PD-3 / `CHK-PKG-01/02` verifies these members and selected sync without host CMake. An arbitrary CMake/SDK directory is Excluded. |
+| `Tools/Content/{SyncAssetPack,SyncAssetPackFiles,SyncAssetPackArchive}.cmake` | Included / Shared Helper | Launcher source scripts bound by [PackageInputs.ps1](../../../CMake/Packaging/PackageInputs.ps1); PD-3 / `CHK-PKG-01/02` checks membership, hashes and selected dependency closure. |
+| `Tools/Diagnostics/{ExportDiagnostics,IncidentIdentity,PackageVerification}.ps1`; `docs/{SUPPORT,SECURITY,KNOWN_ISSUES}.md` | Included / Shared Helper and Metadata | Build/package binds source scripts and root policy files; PD-3 / `CHK-PKG-01`, then PD-4 / `FCR-PROD-06` consent/privacy/symbol and truthful no-support checks. `ReviewRelease.ps1` is Excluded from the product and retained for maintainers. |
+| `Config/DefaultEngine.ini`; `Projects/Showcase/{.sparkle-project,Levels.catalog}`, release level recipes and their admitted source dependencies; `Engine/Assets/` mandatory inputs; `Engine/Cooked/Shaders/{GlobalShaderMap.smap,CookedShaderLibrary.slib,ShaderDependencies.sdep}` and required engine textures | Included / immutable defaults, recipes and engine seed | Assets/content and Build/package; exact membership remains manifest-owned. PD-3 / `CHK-PKG-01` checks allowlist, source bindings and dependencies; `CHK-PKG-02` checks tampered/missing defaults, seed and content members before activation. |
+| Manifest `ProjectPath=Projects/Showcase`, `EnginePath=Engine`, `ContentStore=Content/Showcase` | Included / one installed store under `%LOCALAPPDATA%/SparkleEngine/` | Core path authority and Launcher store publication: `Source/Showcase/`, `Cooked/` and `Scratch/<tool>/` below the store; `.sparkle-package` binds its package identity. PD-3 / `CHK-PKG-02` covers fresh/subset/offline/read-only operation, wrong identity, denied/full-store failure, preserved state and released-fault retry. Source workspaces retain their own paths. |
+| Package symbol companion; caches, `recook.signal`, private intermediates, source headers/libraries, development outputs and selected-map cooked/download output inside the extraction | Symbols Included only in the separate companion; remaining product payload Excluded | Build/package / `CHK-PKG-01/02` and PD-4 exact-symbol checks. No automatic store migration, updater, installer or public SDK. No row is Removed without source/build/reachability evidence. |
+
+### Catalog Membership
+
+The [catalog](../../../Projects/Showcase/Levels.catalog) contains 20 levels and 18 pack definitions. `ReleaseSupported=true` names exactly the seven approved examples plus `Empty`; only `Empty` starts selected. Pack presence or `GameSupported=true` is not release admission.
+
+| Catalog/content membership | Disposition | Owner and check route |
+| --- | --- | --- |
+| `ModernSponza` -> `ModernSponzaCurtains` -> parent `ModernSponza`; `Sponza` -> `Sponza`; `LPSHead` -> `LPSHead` | Included / four acquisition packs, only on user selection | Launcher / PD-3 `CHK-PKG-02`: deduplicated parent-first closure, selected subset including none, cancel/failure/retry and offline reuse. Sponza source/textures/cooked derivatives/thumbnails remain acquisition-only, Excluded from bundled content until rights admission. |
+| `CornellBox`, `CesiumMan`, `DiffuseTransmissionPlant`, `ABeautifulGame` | Included / recipes and admitted local source closure, no catalog pack dependency | Content / PD-3 `CHK-PKG-01/02` verifies exact recipe/source/cooked membership; FR-04 / `REL-05` owns material, pose, reference-domain and image proof. Cornell's tracked GLB does not require the regeneration ZIP. |
+| `Empty` | Included / built-in, no downloaded pack | Application/Showcase / PD-1 and PD-3: intentional Empty startup and explicit requested-map failure stay distinct. |
+| `ModernSponzaCandles`, `ModernSponzaKnight`, `JungleRuins`, `BistroExterior`, `BistroInteriorWine`, `SanMiguelHigh`, `SanMiguelLow`, `DamagedHelmet`, `StanfordBunnySubsurface`, `StanfordDragonSubsurface`, `AnisotropyBarnLamp`, `SheenCloth` | Excluded / twelve release examples; retained development/source workloads | Launcher/Showcase / PD-3 `CHK-PKG-01/02`: development/unavailable labelling and installed sync/run rejection, with no excluded recipe/content activation. |
+| `Bistro`, `StanfordBunny`, `StanfordDragon`, `AnisotropyBarnLamp`, `SheenCloth`, `SanMiguel`, `ModernSponzaIvy`, `ModernSponzaTrees`, `ModernSponzaCandles`, `ModernSponzaKnight`, `ModernSponzaFlood`, `ModernSponzaExplosion`, `JungleRuins`; optional `CornellBox` regeneration pack | Excluded / fourteen product acquisition packs; source definitions retained | Launcher/content / PD-3 `CHK-PKG-01/02`: no selected release-map closure reaches these packs. No missing importer, geometry-cache, volume or regeneration path is scheduled by this inventory. Moana remains deferred with no catalog entry. |
+
+Exact rights receipts and historical source/export rights remain FR-01 / `REL-01` and final FR-07 review. Selection, a license filename or a verified download does not grant redistribution or expand accepted PTD-00 transport.
+
+### Selector Gaps And Dispositions
+
+| Current surface or gap | Disposition | Named owner / subsequent check |
+| --- | --- | --- |
+| PTLAS controls are drawn by Shipping Editor's current settings path, although the approved exposure is source only | Experimental / source only, consumer default Off; current exposure requires narrowing | Editor/Renderer, RD-2 / `CHK-SET-01/03`, then PD-3 `CHK-PKG-02`: prove source-only controls cannot select PTLAS in the shipped product. This discovery records the gap; it does not admit shipped experimental controls. |
+| `ReferencePathTracer` is an enum/Editor choice; Game has no view-mode selector | Included / required consumer result, host reachability still open | Application/Renderer, existing Reference Stages 7/9/10 and LGT-3 / `FCR-REN-08`; RD-3 / `CHK-DAC-02/04` checks real product identity and export. Preserve accepted PTD-00 and its raw/diagnostic distinction. |
+| `r.Vignette` and `r.ChromaticAberration` are persisted with On defaults; the settings panel has no separate lens controls | Included / shared approved defaults | Application/Renderer, RD-2 / `CHK-SET-01/02`; DSP-6 / `FCR-REN-25` and feature-local formula/order/failure checks. No additional Game settings screen or new lens toggle is required by scope reconciliation. |
+| Color Grading and HDR10 have target contracts; current display options are SDR formats/encoding | Included / required rendering, later delivery/proof | Renderer, DSP-5 / `FCR-REN-24`, DSP-7 / `FCR-REN-26`; qualify requested/active output, neutral grading and HDR-capable display separately. No target-only selector is implemented or counted as a current persisted key. Deferred decals remain GR-5 / `FCR-REN-23`. |
+| Normal output/display changes versus fixed 1080p acceptance presets | Included / display-selected resolution | Platform/Application and Renderer DSP-1/DSP-4; PD-1/3 display/DPI/resize checks plus feature output-extent checks. No fixed resolution menu or benchmark-driven product restriction. |
+| Existing opt-in Aftermath `gpu-crash` source variant; canonical package profiles omit it | Experimental / source variant only; SDK/runtime Excluded from product payload | Existing [qualified GCD owner](../../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md), RHI/ShaderCompiler/Application/Launcher. Preserve recorded GCD proof; PD-3 `CHK-PKG-01` checks SDK-free package membership; PD-4 records unavailable Shipping incident categories without inventing collection. No telemetry/support service. |
 
 ## Module Coverage
 
@@ -107,7 +146,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `CORE-007` | Lightweight JSON helpers | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `CORE-008` | Workspace/project path model | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `CORE-009` | Typed asset path resolution | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `CORE-010` | Child-process execution | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `CORE-010` | Child-process execution | Included | Editor/Launcher/source | Retain the admitted Editor/helper consumer; use its existing product/feature checks and CHK-PKG-01/02 for exact shipped closure. No Game console or standalone developer product. |
 | `CORE-011` | Environment and command-line utilities | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `CORE-012` | Project level catalog | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `CORE-013` | Input vocabulary/state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
@@ -186,7 +225,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `GF-018` | Static/instanced meshes | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `GF-019` | Skeletal animation | Included | Game/source | Cesium Man skeletal animation is an Included example; exact clip and pose require cook/runtime proof. |
 | `GF-020` | Morph animation | Included | Game/source | Existing source morph capability; no consumer morph demonstration or arbitrary animation-format promise. |
-| `GF-021` | World edits | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `GF-021` | World edits | Included | Editor/source | Retain admitted Editor authoring; PD-1/PD-3 own edit/save/reload proof. Game remains a consumer of the published scene. |
 | `GF-022` | Read snapshots/change journal | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `GF-023` | Structural publication | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `GF-024` | Dynamic publication | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
@@ -228,28 +267,28 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `COOK-001` | Project cook CLI | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-002` | Project discovery | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-003` | Capability preflight | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-004` | Shader stage delegation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-005` | Texture request planning | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-006` | Scene generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-007` | Tool/output reporting | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-008` | Source texture formats | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-009` | Texture dimensions | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-010` | Mip policy | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-011` | Channel extraction | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-012` | Semantic format policy | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-013` | Parallel batch | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-014` | Memory bound | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-015` | Generation publication | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-016` | Request inspection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-017` | Mesh | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-018` | Material | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-019` | Scene manifest | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-020` | Skeleton | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-021` | Animation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `COOK-022` | Registry | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `COOK-001` | Project cook CLI | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-002` | Project discovery | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-003` | Capability preflight | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-004` | Shader stage delegation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-005` | Texture request planning | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-006` | Scene generation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-007` | Tool/output reporting | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-008` | Source texture formats | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-009` | Texture dimensions | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-010` | Mip policy | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-011` | Channel extraction | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-012` | Semantic format policy | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-013` | Parallel batch | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-014` | Memory bound | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-015` | Generation publication | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-016` | Request inspection | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-017` | Mesh | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-018` | Material | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-019` | Scene manifest | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-020` | Skeleton | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-021` | Animation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `COOK-022` | Registry | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
 
 ## Platform
 
@@ -357,9 +396,9 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `RHI-DIAG-01` | Object naming and GPU events | Included | Game/source | Native names/markers retained as mechanics; capture SDK/event-runtime package inclusion is separately allowlisted. |
 | `RHI-DIAG-02` | Timestamp queries | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `RHI-DIAG-03` | Validation messages | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `RHI-DIAG-04` | D3D12 crash diagnostics | Included | Game/source | Local actionable device-loss diagnostics; no automatic upload or crash SDK. |
+| `RHI-DIAG-04` | D3D12 crash diagnostics | Included | Game/source | Local actionable device-loss diagnostics; no automatic upload. Ordinary Shipping omits the SDK; the qualified source diagnostic variant is classified separately above. |
 | `RHI-DIAG-05` | Live-object reporting | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `RHI-DIAG-06` | Texture capture | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `RHI-DIAG-06` | Texture capture | Included | Editor/source | Retain the admitted Editor/helper consumer; use its existing product/feature checks and CHK-PKG-01/02 for exact shipped closure. No Game console or standalone developer product. |
 | `RHI-DIAG-07` | External provider handles | Experimental | Game/source | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `RHI-DIAG-08` | ImGui backend | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 
@@ -387,8 +426,8 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `REN-PIPE-02` | Runtime shader and binding-layout validation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-PIPE-03` | Graphics and compute materialization | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-PIPE-04` | Native ray-pipeline and table materialization | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-PIPE-05` | Atomic shader-generation replacement | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-DIAG-08` | Shader hot reload | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `REN-PIPE-05` | Atomic shader-generation replacement | Included | Editor/source | Retain Editor shader recook/reload; RD-1 and PD-3 own generation/lifetime and installed-helper proof. No Game recook control. |
+| `REN-DIAG-08` | Shader hot reload | Included | Editor/source | Retain Editor shader recook/reload; RD-1 and PD-3 own generation/lifetime and installed-helper proof. No Game recook control. |
 | `REN-SCENE-01` | Persistent GPU scene | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-SCENE-02` | Parallel scene preparation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-SCENE-03` | Static meshes | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
@@ -406,7 +445,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `REN-VIS-05` | Opaque sorting and auto batching | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-VIS-06` | Transparent draw preparation | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-VIS-07` | Visibility task/failure bounds | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-VIS-08` | Visibility/batch workload facts | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `REN-VIS-08` | Visibility/batch workload facts | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
 | `REN-VIS-09` | Advanced visibility/draw generation | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `REN-TEMP-01` | Per-view previous-camera state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-TEMP-02` | Active temporal jitter | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
@@ -443,7 +482,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `REN-FRONT-03` | Ray GBuffer: native pipeline | Included | Game/source | Required traced surface frontend for realtime/native parity; complete owned hit/material/traversal contract. |
 | `REN-FRONT-04` | Automatic ray execution | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-FRONT-05` | Transparent blending | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `REN-FRONT-06` | Wireframe | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `REN-FRONT-06` | Wireframe | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
 | `REN-FRONT-07` | Material binding mode selector | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `REN-PBR-01` | Active direct specular BRDF | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-PBR-02` | Active direct diffuse BRDF | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
@@ -487,27 +526,27 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `REN-POST-13` | Frame generation | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `REN-POST-08` | Output encoding | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-POST-09` | HDR display output | Included | Game/source | Required delivery obligation; source absence/partial path cannot accept this row. |
-| `REN-POST-10` | Exact debug presentation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-DBG-01` | Final/material | Included | Source only | Lit is consumer Included; Wireframe source-only. This compound row is split in the view-mode table. |
-| `REN-DBG-02` | GBuffer | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-DBG-03` | Lighting | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-DBG-04` | Scene diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `REN-POST-10` | Exact debug presentation | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
+| `REN-DBG-01` | Final/material | Included | Editor/source | Lit is Game/Editor Included; Wireframe is Editor/source Included. The view-mode table owns the exact split. |
+| `REN-DBG-02` | GBuffer | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
+| `REN-DBG-03` | Lighting | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
+| `REN-DBG-04` | Scene diagnostics | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
 | `REN-UI-01` | UI render packets | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-UI-02` | Host overlay | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-UI-03` | Editor viewport presentation | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-UI-04` | Editor texture handles | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `REN-UI-03` | Editor viewport presentation | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
+| `REN-UI-04` | Editor texture handles | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
 | `REN-LAT-01` | Logical frame latency markers | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-LAT-02` | Streamline PCL marker route | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `REN-LAT-03` | Reflex simulation sleep | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `REN-LAT-04` | Provider call/shutdown lifetime | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `REN-LAT-05` | Frame-token identity | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
-| `REN-DIAG-01` | Frame/pass diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-DIAG-02` | Mesh diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-DIAG-03` | Texture diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-DIAG-04` | Memory diagnostics | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `REN-DIAG-01` | Frame/pass diagnostics | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
+| `REN-DIAG-02` | Mesh diagnostics | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
+| `REN-DIAG-03` | Texture diagnostics | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
+| `REN-DIAG-04` | Memory diagnostics | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
 | `REN-DIAG-05` | Viewport products | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `REN-DIAG-06` | Async captures | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
-| `REN-DIAG-07` | Mesh preview | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `REN-DIAG-06` | Async captures | Included | Editor/source | Retain the admitted Editor/helper consumer; use its existing product/feature checks and CHK-PKG-01/02 for exact shipped closure. No Game console or standalone developer product. |
+| `REN-DIAG-07` | Mesh preview | Included | Editor/source | Retain the admitted Editor workflow; RD-3/product checks and CHK-PKG-01/02 own feature and shipped-path proof. No Game developer control. |
 | `REN-SET-01` | Aggregate public settings state | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-SET-02` | Application-owned rendering-settings persistence | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `REN-SET-03` | Startup and editor commit | Included | Game/source | Game startup and Editor settings commit Included; keep Editor-only dependency isolation in the Game component. |
@@ -520,75 +559,75 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `SHD-BUILD-01` | Offline compiler executable | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-BUILD-02` | Shared shader contracts | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-BUILD-03` | Contract-only registrations | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-BUILD-01` | Offline compiler executable | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-BUILD-02` | Shared shader contracts | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-BUILD-03` | Contract-only registrations | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
 | `SHD-BUILD-04` | Runtime shader source dependency | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `SHD-BUILD-05` | Tool dependencies | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CLI-01` | `cook` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CLI-02` | `list-backends` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CLI-03` | `list-targets` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CLI-04` | `list-shaders` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CLI-05` | `inspect-shader` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-OPT-01` | Selection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-OPT-02` | Targets | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-OPT-03` | Backend | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-OPT-04` | Parallelism | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-OPT-05` | Diagnostics | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-OPT-06` | Compiler policy | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-OPT-07` | Cancellation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-TGT-01` | DXC | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-TGT-02` | Slang | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CAT-01` | Compute | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CAT-02` | Vertex | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CAT-03` | Pixel | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CAT-04` | Ray generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CAT-05` | Miss | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CAT-06` | Closest hit | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-CAT-07` | Any hit | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-BUILD-05` | Tool dependencies | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CLI-01` | `cook` | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CLI-02` | `list-backends` | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CLI-03` | `list-targets` | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CLI-04` | `list-shaders` | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CLI-05` | `inspect-shader` | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-OPT-01` | Selection | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-OPT-02` | Targets | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-OPT-03` | Backend | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-OPT-04` | Parallelism | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-OPT-05` | Diagnostics | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-OPT-06` | Compiler policy | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-OPT-07` | Cancellation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-TGT-01` | DXC | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-TGT-02` | Slang | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CAT-01` | Compute | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CAT-02` | Vertex | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CAT-03` | Pixel | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CAT-04` | Ray generation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CAT-05` | Miss | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CAT-06` | Closest hit | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-CAT-07` | Any hit | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
 | `SHD-CAT-08` | Geometry | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `SHD-CAT-09` | Hull | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `SHD-CAT-10` | Domain | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `SHD-CAT-11` | Intersection | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 | `SHD-CAT-12` | Callable | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `SHD-REG-01` | Typed global registration | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-REG-02` | Registry validation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-REG-03` | Parameter-structure contract | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-REG-04` | Ray contract | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-REG-05` | Runtime registration closure | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PLAN-01` | Virtual shader roots | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PLAN-02` | Include preprocessing | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PLAN-03` | Immutable jobs | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PLAN-04` | Changed-source planning | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PLAN-05` | In-operation deduplication | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-REG-01` | Typed global registration | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-REG-02` | Registry validation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-REG-03` | Parameter-structure contract | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-REG-04` | Ray contract | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-REG-05` | Runtime registration closure | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PLAN-01` | Virtual shader roots | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PLAN-02` | Include preprocessing | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PLAN-03` | Immutable jobs | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PLAN-04` | Changed-source planning | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PLAN-05` | In-operation deduplication | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
 | `SHD-PLAN-06` | Persistent result cache | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `SHD-PLAN-07` | Parallel compilation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-01` | DXIL generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-02` | SPIR-V generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-03` | DXIL reflection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-04` | SPIR-V reflection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-05` | Resource reflection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-06` | Constant data | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-07` | Stage inputs | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-08` | Specialization constants | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-09` | C++ parameter ABI validation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-ABI-10` | Vulkan descriptor normalization | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PUB-01` | `GlobalShaderMap.smap` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PUB-02` | `CookedShaderLibrary.slib` | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PUB-03` | Shared publication hash | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PUB-04` | Staged validation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PUB-05` | Atomic file-set publish | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PUB-06` | Deterministic identity | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-PUB-07` | Incremental preservation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-DIAG-01` | DXC debug artifacts | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-DIAG-02` | Slang debug artifacts | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-DIAG-03` | Cook analysis | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-DIAG-04` | Cooked inspection | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-DIAG-05` | Out-of-process editor recook | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-DIAG-06` | Used Shaders UI | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-DIAG-07` | Runtime reload | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `SHD-DIAG-08` | Shipping tool erasure | Included | Source/helper pending | Included source workflow obligation: prove all compiler/editor payload absent from Shipping. |
-| `SHD-DIAG-09` | Cook progress | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `SHD-PLAN-07` | Parallel compilation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-01` | DXIL generation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-02` | SPIR-V generation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-03` | DXIL reflection | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-04` | SPIR-V reflection | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-05` | Resource reflection | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-06` | Constant data | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-07` | Stage inputs | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-08` | Specialization constants | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-09` | C++ parameter ABI validation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-ABI-10` | Vulkan descriptor normalization | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PUB-01` | `GlobalShaderMap.smap` | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PUB-02` | `CookedShaderLibrary.slib` | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PUB-03` | Shared publication hash | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PUB-04` | Staged validation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PUB-05` | Atomic file-set publish | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PUB-06` | Deterministic identity | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-PUB-07` | Incremental preservation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-DIAG-01` | DXC debug artifacts | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-DIAG-02` | Slang debug artifacts | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-DIAG-03` | Cook analysis | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-DIAG-04` | Cooked inspection | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-DIAG-05` | Out-of-process editor recook | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-DIAG-06` | Used Shaders UI | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-DIAG-07` | Runtime reload | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `SHD-DIAG-08` | Shipping tool erasure | Included | Admitted helper/source | Compiler helpers remain in their declared ShippingEditor components; CHK-PKG-01/02 proves compiler/editor payload absent from the ShippingGame component. |
+| `SHD-DIAG-09` | Cook progress | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
 
 ## Showcase
 
@@ -602,7 +641,7 @@ No fixed function, data format or hidden low-level flag is a new public selector
 | `SHOW-004` | Six-profile build naming | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
 | `SHOW-005` | Startup level selection | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `SHOW-006` | Game level switching | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
-| `SHOW-007` | Authored level save | Included | Source only | Retain existing developer/source route; no packaged developer archive or consumer control. |
+| `SHOW-007` | Authored level save | Included | Editor/source | Retain the admitted Editor/helper consumer; use its existing product/feature checks and CHK-PKG-01/02 for exact shipped closure. No Game console or standalone developer product. |
 
 ## SourceImporters
 
@@ -610,24 +649,24 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `IMP-001` | glTF 2.0 JSON | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-002` | GLB | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-001` | glTF 2.0 JSON | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-002` | GLB | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
 | `IMP-003` | FBX | Experimental | Source only | Capability/limitation-gated; explicit requested/active truth and safe rejection; no unproved vendor/backend/estimator claim. |
 | `IMP-004` | OBJ/USD/Alembic/OpenVDB | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
-| `IMP-005` | Triangle geometry | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-006` | Tangent generation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-007` | Coordinate normalization | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-008` | Mesh instances | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-009` | GPU-authored instancing | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-010` | Metallic-roughness material | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-011` | Material textures | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-012` | Alpha | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-013` | Material variants | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-014` | Cameras | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-015` | Lights | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-016` | Skeleton/skin | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-017` | Morph targets | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `IMP-018` | Animation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `IMP-005` | Triangle geometry | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-006` | Tangent generation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-007` | Coordinate normalization | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-008` | Mesh instances | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-009` | GPU-authored instancing | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-010` | Metallic-roughness material | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-011` | Material textures | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-012` | Alpha | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-013` | Material variants | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-014` | Cameras | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-015` | Lights | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-016` | Skeleton/skin | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-017` | Morph targets | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `IMP-018` | Animation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
 | `IMP-019` | Embedded FBX textures | Excluded | No release promise | Outside first-release scope; do not expose or advertise this capability in the consumer product. |
 
 ## Tasks
@@ -657,13 +696,13 @@ No fixed function, data format or hidden low-level flag is a new public selector
 
 | ID | Capability | Classification | Exposure | Decision / required closure |
 | --- | --- | --- | --- | --- |
-| `TOOL-001` | Severity-prefixed messages | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `TOOL-002` | Named fields | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `TOOL-003` | Progress records | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `TOOL-004` | Summaries and lists | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `TOOL-005` | Path display helpers | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `TOOL-006` | Current consumers | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
-| `TOOL-007` | Game-profile isolation | Included | Source/helper pending | Source path retained; only helpers required by admitted Launcher/Editor workflows may ship after exact payload/toolchain closure is frozen. No standalone tool or SDK promise. |
+| `TOOL-001` | Severity-prefixed messages | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `TOOL-002` | Named fields | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `TOOL-003` | Progress records | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `TOOL-004` | Summaries and lists | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `TOOL-005` | Path display helpers | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `TOOL-006` | Current consumers | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
+| `TOOL-007` | Game-profile isolation | Included | Admitted helper/source | Retain only the admitted helper consumer described above; PD-3 / CHK-PKG-01/02 owns exact payload and runtime proof. No standalone tool or SDK promise. |
 
 ## Consumer And Development Surface Splits
 
@@ -689,68 +728,70 @@ This table takes precedence over a compound inventory title. It does not replace
 | TLAS / refit | Included / runtime | Shared AS identity/lifetime; no new consumer acceleration-structure editor |
 | PTLAS and partition controls | Experimental / source only | Narrow installed capability and build/update semantics; Off consumer baseline; no performance savings claim |
 | Mesh batching / single-sample raster / fixed Halton jitter | Included / runtime | Existing mechanics; advanced occlusion/mesh shaders, MSAA, standalone TAA/FXAA and dynamic resolution excluded |
-| Color Grading / Chromatic Aberration / Vignette | Included / game targets | FCR-REN-24/25; neutral grading, chromatic aberration On and vignette On defaults; each feature needs independent bounded controls, formula/order/failure and both-backend proof |
+| Color Grading / Chromatic Aberration / Vignette | Included / game targets | FCR-REN-24/25; neutral grading, chromatic aberration On and vignette On defaults; feature-local contracts own bounded semantics, formula/order/failure and both-backend proof; no new Game frontend or lens toggle is required here |
 | SDR / HDR10 | Included / runtime | SDR default; HDR10 only with qualified display/OS/swapchain tuple and mandatory SDR fallback; FCR-REN-26 remains open |
 | PIX / Nsight Graphics / RenderDoc | Experimental / Debug and Development source products only | Existing external-capture authority, one selected provider None -> Nsight -> PIX -> RenderDoc; exact supported native cells only. No optional Shipping capture payload. |
 | PIX Timing / Nsight GPU Trace and Systems / WPR-WPA / PresentMon | Experimental / source runbooks only | Distinct tool-managed activities/artifacts; not universal frame-provider APIs; native evidence remains in owning external-capture report |
-| AMD specialist profilers, embedded crash SDK/handler, internal profiler expansion | Excluded | User exclusion and separate discovery/privacy owners; no dormant adapter or new SDK in this scope |
+| AMD specialist profilers, shipped embedded crash SDK/handler, internal profiler expansion | Excluded | Product exclusion; the existing qualified source-only GPU-crash variant remains Experimental as bounded above |
 | Reflex/PCL and developer concurrency/diagnostic tuning | Experimental / source only | Existing latency/startup owners; no consumer latency savings or exposed topology control promise |
 
-The [owner-directed rendering closure](../FirstRelease.md#required-rendering-closure) additionally requires the realtime >=30 FPS preset, complete frame graph, full Included parity and independent principal-level frame review. These are release obligations, not source acceptance. See the scope record for native/realtime/reference presets. Vignette adds one target inventory row; no new enum or CVar was implemented.
+The [owner-directed rendering closure](../FirstRelease.md#required-rendering-closure) additionally requires the realtime >=30 FPS preset, complete frame graph, full Included parity and independent principal-level frame review. These are release obligations, not source acceptance. See the scope record for native/realtime/reference presets. REN-POST-14 retains the vignette inventory identity; its current persisted CVar is listed below. No feature implementation is delivered by this reconciliation.
 
 ## Every View Mode
 
-**Owner:** Renderer semantic, Application Game composition, Editor presentation. [Actual enum](../../../Engine/Renderer/Public/Viewport/RenderViewMode.h) has 18 values; Count is not a mode.
+**Owner:** Renderer semantic, Application Game composition, Editor presentation. [Actual enum](../../../Engine/Renderer/Public/Viewport/RenderViewMode.h) has 18 values; Count is not a mode. Editor presents all 18 through its existing menu; Game reachability for the Included reference mode is still a named gap above. RD-3 / FCR-REN-11 and CHK-DAC-02/04 own visualization/product/capture proof; LGT-3 / FCR-REN-08 owns reference truth.
 
 | Mode | Classification | Exposure |
 | --- | --- | --- |
-| `Lit = 0` | Included | Game/source |
-| `ReferencePathTracer = 1` | Included | Game/source |
-| `Wireframe = 2` | Included | Source only |
-| `GBufferDiffuse = 3` | Included | Source only |
-| `GBufferWorldNormal = 4` | Included | Source only |
-| `GBufferWorldTangent = 5` | Included | Source only |
-| `GBufferRoughness = 6` | Included | Source only |
-| `GBufferMetallic = 7` | Included | Source only |
-| `GBufferEmissive = 8` | Included | Source only |
-| `GBufferAmbientOcclusion = 9` | Included | Source only |
-| `GBufferSubsurfaceColor = 10` | Included | Source only |
-| `GBufferSubsurfaceStrength = 11` | Included | Source only |
-| `DirectDiffuse = 12` | Included | Source only |
-| `DirectSpecular = 13` | Included | Source only |
-| `DirectSubsurface = 14` | Included | Source only |
-| `IndirectDiffuse = 15` | Included | Source only |
-| `IndirectSpecular = 16` | Included | Source only |
-| `GpuSceneInstances = 17` | Included | Source only |
+| `Lit = 0` | Included | Game/Editor/source |
+| `ReferencePathTracer = 1` | Included | Game/Editor/source |
+| `Wireframe = 2` | Included | Editor/source |
+| `GBufferDiffuse = 3` | Included | Editor/source |
+| `GBufferWorldNormal = 4` | Included | Editor/source |
+| `GBufferWorldTangent = 5` | Included | Editor/source |
+| `GBufferRoughness = 6` | Included | Editor/source |
+| `GBufferMetallic = 7` | Included | Editor/source |
+| `GBufferEmissive = 8` | Included | Editor/source |
+| `GBufferAmbientOcclusion = 9` | Included | Editor/source |
+| `GBufferSubsurfaceColor = 10` | Included | Editor/source |
+| `GBufferSubsurfaceStrength = 11` | Included | Editor/source |
+| `DirectDiffuse = 12` | Included | Editor/source |
+| `DirectSpecular = 13` | Included | Editor/source |
+| `DirectSubsurface = 14` | Included | Editor/source |
+| `IndirectDiffuse = 15` | Included | Editor/source |
+| `IndirectSpecular = 16` | Included | Editor/source |
+| `GpuSceneInstances = 17` | Included | Editor/source |
 
 ## Every Persisted Setting
 
-**Single persistence owner:** Application. [Actual allowlist/writer](../../../Engine/Application/Private/RenderingSettings/EngineRenderingSettingsPersistence.cpp) contains 25 common names plus the conditional Editor startup-provider name. Renderer owns values/effects, not persistence or consumer UI. Current INI values below are observations, not the proposed release baseline. Public controls must use validated owning domains; no unrestricted numeric/CVar console in Shipping.
+**Single persistence owner:** Application. [Actual allowlist/writer](../../../Engine/Application/Private/RenderingSettings/EngineRenderingSettingsPersistence.cpp) contains 27 common names plus the conditional Editor startup-provider name. Renderer owns values/effects, not persistence or consumer UI. Values below match Config/DefaultEngine.ini at this snapshot, before per-user overrides; they do not prove active runtime values. Editor configures the admitted shared settings; Game consumes them. RD-2 / FCR-REN-19 and CHK-SET-01/02/03 own inventory, round-trip/failure and requested/active proof. No unrestricted numeric/CVar console in Shipping Game.
 
 | Setting | Current immutable INI | Classification / exposure | Release decision |
 | --- | --- | --- | --- |
 | `r.ExternalCapture.StartupProvider` | `absent; typed default None` | Experimental / source only | Editor Debug/Development only; None/Nsight/PIX/RenderDoc; one provider; no Shipping option. |
-| `r.VSync` | `0` | Included / runtime | Consumer default On; benchmark explicitly Off; current repository INI Off remains source observation. |
+| `r.VSync` | `1` | Included / runtime | Shared default On; benchmark explicitly Off. |
+| `r.Vignette` | `1` | Included / shared runtime | Approved default On; feature proof remains DSP-6 / FCR-REN-25; no extra Game toggle. |
+| `r.ChromaticAberration` | `1` | Included / shared runtime | Approved default On; feature proof remains DSP-6 / FCR-REN-25; no extra Game toggle. |
 | `r.BackBufferFormat` | `28` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
 | `r.PreferHighPerformanceAdapter` | `1` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
-| `r.ToneMapper` | `2` | Included / runtime | Change consumer baseline from AcesFilmic (2) to AcesApprox (1) in PD-1; all three modes Included. |
+| `r.ToneMapper` | `1` | Included / runtime | Shared default AcesApprox (1); all three modes remain Included. |
 | `r.Exposure.Mode` | `1` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
 | `r.Exposure.MeteringMethod` | `0` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
 | `r.OutputColorEncoding` | `0` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
-| `r.Exposure.Manual` | `0.800000` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
+| `r.Exposure.Manual` | `1.000000` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
 | `r.Exposure.Compensation` | `0.000000` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
 | `r.Exposure.TargetLuminance` | `0.180000` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
 | `r.Exposure.Min` | `0.000001` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
 | `r.Exposure.Max` | `65536.000000` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
-| `r.Exposure.AdaptationSpeedUp` | `2.000000` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
+| `r.Exposure.AdaptationSpeedUp` | `3.000000` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
 | `r.Exposure.AdaptationSpeedDown` | `1.000000` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
 | `r.MeshAutoBatching` | `1` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
-| `r.Upscaler.Provider` | `1` | Included / runtime | Linear/native and RR-Off are native controls; Included DLSS quality/RR cells must pass on both APIs. Unsupported requests are visible failures, not accepted substitutes. |
+| `r.Upscaler.Provider` | `0` | Included / runtime | Linear/native and RR-Off are native controls; Included DLSS quality/RR cells must pass on both APIs. Unsupported requests are visible failures, not accepted substitutes. |
 | `r.Upscaler.QualityMode` | `0` | Included / runtime | Linear/native and RR-Off are native controls; Included DLSS quality/RR cells must pass on both APIs. Unsupported requests are visible failures, not accepted substitutes. |
-| `r.RayReconstruction.Mode` | `1` | Included / runtime | Linear/native and RR-Off are native controls; Included DLSS quality/RR cells must pass on both APIs. Unsupported requests are visible failures, not accepted substitutes. |
+| `r.RayReconstruction.Mode` | `0` | Included / runtime | Linear/native and RR-Off are native controls; Included DLSS quality/RR cells must pass on both APIs. Unsupported requests are visible failures, not accepted substitutes. |
 | `r.GBuffer.Algorithm` | `0` | Included / runtime | Included Rasterized default; RayTracing Included; realtime preset requires complete traced primary/secondary transport; shared automatic ray lowering. |
 | `r.RayTracing.Tlas.Refit` | `1` | Included / runtime | Retain typed validated control; value/range/domain from owning settings contract. |
-| `r.RayTracing.PreferPtlas` | `1` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |
+| `r.RayTracing.PreferPtlas` | `0` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |
 | `r.RayTracing.Ptlas.PartitionsPerAxis` | `8` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |
 | `r.RayTracing.Ptlas.PartitionUpdateMode` | `0` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |
 | `r.RayTracing.Ptlas.MarkAllDynamicInPartition` | `0` | Experimental / source only | Off consumer baseline; no exposed consumer partition planner controls. |
@@ -758,8 +799,8 @@ The [owner-directed rendering closure](../FirstRelease.md#required-rendering-clo
 
 ## Coverage And Remaining Evidence
 
-This revised proposal assigns **512 capability IDs** across **16 owners**: 475 Included, 8 Experimental, 29 Excluded, 0 Removed. The original 511 IDs are retained; REN-POST-14 is the newly admitted vignette target. Every capability ID is present once. This is coverage of the existing detailed inventory, not a claim that every implementation fact in its historical snapshot was freshly audited.
+This ledger assigns **512 capability IDs** across **16 owners**: 475 Included, 8 Experimental, 29 Excluded, 0 Removed. The original 511 IDs are retained; REN-POST-14 is the newly admitted vignette target. Every capability ID is present once. This is coverage of the existing detailed inventory, not a claim that every implementation fact in its historical snapshot was freshly audited.
 
-Live supplemental closure covers the product CMake targets, graphics-launch parser, package/path contracts, 20 actual catalog levels, all 18 view modes, every persisted setting and the current external-capture path. All other registered developer CVar/CLI settings are development-only, unstable, and absent from the Game control promise. Shipping Editor/Launcher controls are bounded by their owning contracts; helper membership must be explicitly frozen, not inferred from this source inventory. Future source changes or an unmatched consumer option invalidate the scope check.
+Live supplemental closure covers the product CMake targets, graphics-launch parser, package/path contracts, 20 actual catalog levels, all 18 view modes, every persisted setting and the current external-capture path. All other registered developer CVar/CLI settings are development-only, unstable, and absent from the Game control promise. Shipping Editor/Launcher controls and helper membership are bounded by the dispositions/check routes above; remaining implementation or candidate evidence stays with those owners. Future source changes or an unmatched consumer option invalidate the scope check.
 
 Primary-source rights metadata does not prove the identity of locally acquired/cooked bytes. REL-01 must close that identity, credits, environment/texture/dependency closure, root license, publisher and redistribution receipts. Feature-local native proof, observer comparisons, failures and Shipping erasure remain in their existing acceptance owners. Approval adds A only for the disposition; never B/R/N/P.

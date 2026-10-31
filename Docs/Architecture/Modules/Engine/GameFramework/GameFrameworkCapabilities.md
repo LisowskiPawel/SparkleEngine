@@ -95,6 +95,30 @@ Source ownership reconciled on 2026-10-06: [AnimationSampler](../../../../../Eng
 | `GF-007` | File lifetime during load | Implemented path | `CookedAssetFileSet` owns opened/mapped asset files while decoder spans are consumed; decoded package ownership moves into world stores on commit. Repeat-load residency remains to be measured. | `S` |
 | `GF-008` | Manifest validation | Implemented path | Loader/validator checks file presence, indices, references, payload consistency, and reports explicit load failure rather than silently constructing partial scene data. Exact malformed corpus coverage is unproven. | `S` |
 
+### Explicit Level Selection And Publication
+
+**Source reconciliation:** 2026-10-31 at `e44692cce7eb33052b0a1ac763e66137a861639b`; `GF-002`/`GF-003` and their publication/shutdown edges only. This source trace adds no runtime or release verdict. [FWC-0 results](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) preserve the original candidate evidence.
+
+`LevelSession` owns requested-to-active level selection. Sponza is the selected reconciliation baseline: catalog ID `Sponza`, document `Projects/Showcase/Levels/Sponza.level`, authored name `Sponza`, scene asset ID `Sponza/Publisher/glTF/Sponza`. It does not change the default level, source content, settings or rendering quality. The checked-in catalog has Sponza unselected; a positive launch requires selecting/syncing its dependency closure and cooking it through the existing tool route.
+
+| Boundary | Current producer, publication and consumer |
+| --- | --- |
+| Request | Launcher's `LevelRunOperations` validates product/profile, API, catalog selection and readiness, then sends `SPARKLE_STARTUP_LEVEL=Sponza` and the same `ChildProcessRequest::ReadinessValue` to the selected Game/Editor child. `LevelRegistry` registers selected, ready documents and rejects a document name that differs from its catalog ID. |
+| Resolve and load | `LevelSession::InitializeStartupLevel` resolves the explicit name once. An unavailable Sponza leaves no active startup level and records a named diagnostic; an unavailable later request preserves the active level. The built-in `Empty` entry serves an absent/empty startup selector or an explicit Empty request; it never satisfies an explicit Sponza request. |
+| Publish | `SceneLoadExecutor` resolves the scene ID through its immutable cooked catalog, reads/decodes into an owned package and exposes only settled completion. `LevelSession` rejects failed/cancelled or stale world/document/catalog generations. On success `GameWorld` stages and swaps world/resource state; finalization precedes setting the active level and broadcasting `OnLevelChanged`. No partly loaded world is published. |
+| Consume | Application forwards the changed active name to Core's parent-readiness signal, which requires equality with the requested value. This proves activation identity, not presentation. GameWorld extraction publishes scene/view data in `RenderFrameSubmission`; Application moves it to Renderer without Renderer reading ECS. Game/Editor display LevelSession's diagnostic on failure; a responsive window or `Empty` image cannot pass a Sponza check. |
+| Shut down | Application releases Game UI and Renderer before LevelSession, world and the Tasks runtime. Renderer closes/joins its threaded queues or destroys its serial context and settles device work. SceneLoadExecutor cancels and joins its scope before package/catalog storage is released; only then can world and the application executor be destroyed. Cancellation settlement is a required executable check, not a bound proved by these destructor calls. |
+
+`LevelRegistry` owns document availability; `LevelSession` alone commits requested-to-active selection. Core readiness transports that result, and product acceptance requires the actual presented frame. Source import/cook and foundation dependencies retain their existing owners in the [eleven-family map](../../../../Acceptance/FeatureCompletionReports.md#foundation-world-and-content). Package admission and GPU retirement retain their Product/RHI owners.
+
+| Selected failure/acceptance edge | Existing check owner and required observation |
+| --- | --- |
+| Unselected/unavailable Sponza or missing/corrupt cooked dependency; `AC-PROD01-02` / `FM-PROD01-02` | [Showcase `CHK-PROD01-03`](../../Projects/Showcase/ShowcaseCapabilities.md#fcr-prod-01-game-consumer-contract): on an isolated candidate, positive Sponza has the expected scene/camera, bindings and presented output; a controlled missing/corrupt product names the failure and never activates false Empty. Intentional Empty remains valid. |
+| Wrong/failed child activation; `AC-PROD03-03` / `FM-PROD03-02` | [Launcher `CHK-PROD03-02`](../../Tools/Launcher/LauncherCapabilities.md#fcr-prod-03-launcher-contract): follow the final child, matching readiness identity and actionable failure; process creation or Launcher exit alone cannot pass. |
+| Quit with a load in flight; `AC-PROD01-05` / `FM-PROD01-05` | [Showcase `CHK-PROD01-02`](../../Projects/Showcase/ShowcaseCapabilities.md#fcr-prod-01-game-consumer-contract), with [Editor `CHK-PROD04-01`](../Editor/EditorCapabilities.md#fcr-prod-04-editor-contract) for the shared Editor route: establish the pending load, quit, observe native exit and no remaining owned work within the existing product budgets. |
+
+These checks retain their Windows x64 Game/Editor and D3D12/Vulkan product matrices and exact executable, content, shader and settings identities. Source-workspace results remain attached to their original candidates; installed equivalents belong to PD-3. Linux, uncooked runtime loading, unselected import semantics, worker-count equivalence and shader-contract changes are outside this reconciliation. Broader switching/generation proof remains `GF-E01`/`GF-E02` in the [evidence plan](../../CapabilityEvidencePlan.md#world-content-and-tool-evidence).
+
 ## World, ECS, And Simulation
 
 | ID | Capability | State | Exact current coverage and limit | Evidence |

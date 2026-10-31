@@ -86,7 +86,7 @@ Excluded from release example selection: `DamagedHelmet` (rights unresolved), `M
 
 | Field | Selected machine / approved boundary |
 | --- | --- |
-| Products / current source targets | Sparkle Launcher / `SparkleLauncher`; Sparkle Editor / `ShowcaseEditor`; Sparkle Game / `ShowcaseGame` (`ShippingGame`). Exact shipped filenames, Editor/Launcher configurations and component membership require a reviewed package manifest. |
+| Products / current source targets | Sparkle Launcher / `SparkleLauncher` and Sparkle Editor / `ShowcaseEditor` (`ShippingEditor`); Sparkle Game / `ShowcaseGame` (`ShippingGame`). The [membership dispositions](ReleaseScope/CapabilityDispositions.md#reconciled-membership-and-check-routes) freeze helpers and content-store boundaries; the reviewed package manifest owns exact shipped files/hashes. |
 | Observed OS | Windows 11 Home 25H2, build `26200.9457`; approved target starts at Windows 11 x64 24H2/build 26100 |
 | `MIN-01` / `REF-01` | Same AMD Ryzen 9 8940HX laptop, 16 cores/32 logical processors; 67,833,212,928 bytes OS-reported RAM; NVIDIA GeForce RTX 5070 Ti Laptop GPU, 12,227 MiB reported VRAM; driver `610.47` |
 | Storage | Patriot P400L 2000GB NVMe SSD, NTFS; at least 16 GiB free for extraction/staging/user data |
@@ -169,7 +169,7 @@ Gates are strictly ordered. A later gate may be prepared, but it cannot be accep
 
 | Gate | Representative failure modes | Required response before retry |
 | --- | --- | --- |
-| `REL-00` | Audience omitted; unlimited feature promise; no minimum hardware; runtime/source/SDK claims confused; package/update responsibility or no-support boundary unspecified. | Reduce and classify scope, declare non-goals and budgets, assign owners, then reapprove the whole contract. |
+| `REL-00` | Audience omitted; unlimited feature promise; no minimum hardware; runtime/source/SDK claims confused; package/update responsibility or no-support boundary unspecified. | Reconcile the changed surface, classify it and assign owners/checks under the six approved choices. Only a change to those promises needs a new scope-owner decision; do not reapprove settled scope for a technical inventory gap. |
 | `REL-01` | Placeholder identity; unclear map/dependency redistribution; moving dependency; no signing path; debug/vendor payload assumed redistributable. | Remove/replace/pin the input, obtain and record rights/signing route, regenerate inventory/notices, and reapprove. Unknown rights are a stop, not a waiver. |
 | `REL-02` | Dirty source; dependency resolves differently; empty-cache configure/build fails; warm cache hides missing input; warnings/check failures. | Fix the authoritative build/dependency path, recreate from clean state, retain the failed log, and rerun both cold and warm routes. |
 | `REL-03` | Missing DLL/content/manifest; extra debug/source/private file; writable install assumption; wrong signature; repository-relative lookup; nondeterministic membership. | Reject the stage, fix its single owner, regenerate/sign/verify/package from source, and never patch the archive manually. |
@@ -313,7 +313,7 @@ The candidate traceability ledger MUST map each included/experimental `FCR-*` an
 
 `REL-00` produces one version-controlled release-scope record. It MUST name:
 
-The current [scope proposal](#approved-release-scope) supplies that record, with [512 existing inventory dispositions and explicit live surface splits](ReleaseScope/CapabilityDispositions.md). Approval, exact selected-content rights and candidate validation remain separate requirements; this documentation pass does not pass the gate.
+The [approved scope](#approved-release-scope) supplies that record, with [512 inventory dispositions, current selector splits and component/helper/store membership](ReleaseScope/CapabilityDispositions.md). [FR-00 reconciliation](#fr-00-reconciliation-result) closes discovery for its recorded snapshot. Exporting the record into the exact candidate's `release-scope.md` remains a candidate-freeze obligation; rights and executable acceptance remain with their later gates.
 
 - public product name, version, platform, architecture, minimum Windows version, and supported GPU/API matrix;
 - minimum and reference CPU, memory, GPU, driver, and storage configurations;
@@ -331,6 +331,22 @@ The current [scope proposal](#approved-release-scope) supplies that record, with
 
 Any later scope addition returns `REL-00` to `Blocked`. Defect fixes within frozen scope do not. An approved reduction updates every affected selector, capability disposition, plan and dependent claim; it invalidates affected evidence without marking removed work as passed. Use [scope and retirement decisions](../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision). This documentation iteration makes no capability `Removed` and grants no executable acceptance.
 
+### FR-00 Reconciliation Result
+
+**`ITER-FR00-02` — PASS, scope discovery only (2026-10-31).** Owner: release scope; technical closure remains assigned to the existing module/stage owners in the [ledger](ReleaseScope/CapabilityDispositions.md#reconciled-membership-and-check-routes). Input: clean `e44692cce7eb33052b0a1ac763e66137a861639b` plus this documentation diff. [Frozen inputs](../../artifacts/validation/docs-focus/fr00-20261031/inputs-before.json) and [check results](../../artifacts/validation/docs-focus/fr00-20261031/validation.json) bind the observation. This is not a package, runtime, rights or public-release verdict, nor a pass for REL-00's still-unexported candidate artifact.
+
+**Outcome and budget:** preserve `NS-REAL`, `NS-EVIDENCE`, `NS-OWNERSHIP` and `NS-ADOPTION`; advance `NS-SIMPLIFY` through one reconciled scope authority. Preserve `PGE-01/13/15` obligations with no evidence-grade increase; other persona/workload gates are not applicable to documentation discovery. Retain the existing scope/ledger owners; replace stale helper, selector and default descriptions. Production state/API/hooks/copies/dependencies, generated builds and runtime exposure: zero. Source deletion is unjustified because this iteration classifies exposure without retiring implementation. No target-only feature or new validator is shipped.
+
+| Criterion / failure / risk | Check and fixed oracle | Result |
+| --- | --- | --- |
+| `AC-FR00-01`: current inventory, selected levels/packs, view enum, persisted defaults and package composition all have finite dispositions and named check routes. `FM-FR00-01` / `RISK-FR00-01`: a stale/missing selector or helper could escape scope. | `CHK-FR00-01`: compare all 16 inventory ID sets to the ledger, enum/persistence names and INI values to their rows, catalog release/pack closure and generated-product declarations to membership. Removing a classified key or changing release membership in memory must fail. | PASS; 512 unique capability IDs, 18 modes, 27 common settings plus one conditional setting, 20 levels / 18 packs, six executable/profile tuples. No unmatched audited surface. |
+| `AC-FR00-02`: all six approved choices, required rendering and accepted PTD-00 remain intact; every technical gap is assigned rather than implemented or submitted for renewed user choice. `FM-FR00-02` / `RISK-FR00-02`: documentation could silently enlarge/narrow scope or reopen discovery. | `CHK-FR00-02`: compare the six decision rows and frozen production/reference inputs, including PTD-00 discovery/transport/plan, to the starting hashes; reconcile any concurrent inventory documentation against its unchanged ID set; inspect every changed line and gap/check route. An altered approved decision must fail the control. | PASS; no production or reference-dossier change. Grading/HDR/decals, reference host reachability, PTLAS exposure and package failure proof retain their later owners. |
+| `AC-FR00-03`: stage result, remaining plan, roadmap and navigation agree. `FM-FR00-03` / `RISK-FR00-03`: stale links or completed prompts could restart discovery. | `CHK-FR00-03`: strict UTF-8, local links/anchors, stale-text scan, scoped diff review and `git diff --check`; a missing anchor must fail the link control. | PASS; source-style mechanical/authored checks N/A because only Markdown changed. Documentation layout/authority review applies. |
+
+Risk owners are release scope for `01/02` and documentation ownership for `03`. Likelihood is material because prior rows already drifted; impact is unintended scope or invalid proof. Prevention is the single ledger and unchanged approved rows; detection is the mapped static/negative check. A failure holds discovery, corrects the affected disposition/link and reruns that check. Retirement evidence is the passing scoped report. Changed selectors, membership, defaults or affected source inputs invalidate the corresponding cells; unrelated revisions do not.
+
+**Remaining / next:** no FR-00 discovery item remains for this snapshot. FR-01 qualifies changed rights/source-baseline inputs and exports the scope record when declaring the candidate identity; final public rights/signing remain FR-07. FR-06 rechecks that export against the frozen candidate. Global next work remains PD-3's repaired-archive installed member-failure check; this result neither executes it nor relabels its evidence. PTD-00 remains accepted; reference recovery and Stage 10 retain their current prerequisites.
+
 ## Required Rendering Closure
 
 The release owner's 2026-10-10 amendment makes the following **Included delivery obligations**, not experimental substitutes. “Feature complete” means complete against each owning feature's frozen, finite contract and all applicable failure, performance, package and adoption checks. It does not admit every possible rendering technique, API extension or material domain. No source, SDK-presence or single screenshot claim closes a row.
@@ -346,7 +362,7 @@ The release owner's 2026-10-10 amendment makes the following **Included delivery
 | Complete frame graph for the declared frame | `FCR-REN-03` and [AC-FGS-01–08](../Architecture/Modules/Engine/Renderer/Features/FrameExecution/FrameGraphAndScheduling.md#acceptance-criteria): dependencies/imports/export roots, culling, transient alias/initialization, state/UAV/queue waits, typed pass binding, serial/parallel recording equivalence, histories/rebuilds, external-provider work and token-safe retirement. Exercise negative compilation/recording/submission/lifetime cases. Native clean output alone cannot prove useful overlap or bounded resource/copy cost. |
 | Principal-level review of the entire frame | The [review package below](#principal-frame-review) is mandatory before `REL-04`/`REL-07` closure. Review the complete production frame and its failures, not just chosen shaders or a capability checklist. |
 
-Deferred decals, Color Grading and HDR10 remain their existing mandatory obligations; Frame Generation and Volumetric Lighting remain excluded. The amendment does not automatically expand PTD-00's physical transport domain or approve the proposed map set.
+Deferred decals, Color Grading and HDR10 remain their existing mandatory obligations; Frame Generation and Volumetric Lighting remain excluded. The amendment does not expand PTD-00's physical transport domain; the seven approved examples plus Empty retain their independent rights/material/reference checks.
 
 ### Principal Frame Review
 
@@ -646,7 +662,7 @@ artifacts/validation/releases/<version>/<candidate-id>/
 
 **Responsibility:** define the complete evidence and approval boundary for the first public SparkleEngine release
 
-**Review the approved release:** start with the [settled choices](#approval-and-next-work) and [six approved decisions](#approval-and-next-work). This contract defines the proof needed to ship; the [capability ledger](ReleaseScope/CapabilityDispositions.md) is reference detail. Product choices are approved; technical scope/rights closure (`REL-00`) remains blocked.
+**Review the approved release:** start with the [six settled choices](#approval-and-next-work) and [FR-00 discovery result](#fr-00-reconciliation-result). The [capability ledger](ReleaseScope/CapabilityDispositions.md) owns dispositions. Candidate scope export, rights and executable release gates remain open; they do not reopen accepted discovery.
 
 **Roadmap and sequence:** [F. Release-First Principal Graphics Roadmap](../Strategy/Roadmap.md)
 

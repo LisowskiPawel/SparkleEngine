@@ -18,19 +18,13 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 
 ### `FR-00` — Scope And Discovery
 
-**Remaining work:** reconcile changed selectors and exact component/helper/content-store membership against the six already approved product choices. Keep seven examples plus Empty, shared approved defaults, display-selected resolution, required rendering and no-support policy. Preserve accepted PTD-00; scope discovery does not restart it.
+Discovery is reconciled for the [recorded snapshot](../../../Acceptance/FirstRelease.md#fr-00-reconciliation-result): six approved choices preserved, finite [membership/selector dispositions and check routes](../../../Acceptance/ReleaseScope/CapabilityDispositions.md#reconciled-membership-and-check-routes), accepted PTD-00 unchanged. No discovery task remains unless a changed surface invalidates its disposition.
 
-**Exit:** REL-00 has finite Included/Experimental/Excluded/Removed dispositions and named owners/checks. A current inventory gap receives a disposition, not automatic implementation. Exact rights evidence stays with FR-01/final FR-07 review, and technical unknowns are not new user-choice requests.
-
-```text
-Execute only remaining FR-00 scope reconciliation from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Preserve approved decisions and accepted PTD-00. Close changed membership/selector dispositions and their check routes; do not reapprove settled scope or implement target-only features. Apply the owning execution contract and its Stage Source-Style Gate.
-Before handoff, update the stage result, remaining plan and next item.
-
-```
+**Next local stage:** FR-01's changed-input rights/source-baseline qualification and candidate scope export; final public rights/signing remain FR-07. Follow Roadmap's existing PD-3 priority for implementation; identified product/rendering gaps stay with their named stages and do not restart discovery.
 
 ### `FR-01` — Identity, Rights, And Baseline
 
-**Remaining work:** reuse existing identity, pins, notices and local baseline; qualify only changed inputs and missing exact-candidate cold/warm/offline source checks through PD-2. Bind source/dependency/content identity, redistribution decisions and provenance to actual payloads. Final public certificate/signature and unresolved public-rights closure remain FR-07 obligations.
+**Remaining work:** reuse existing identity, pins, notices and local baseline; qualify only changed inputs and missing exact-candidate cold/warm/offline source checks through PD-2. Bind source/dependency/content identity, redistribution decisions and provenance to actual payloads. When declaring the candidate identity, export the [reviewed scope record](../../../Acceptance/FirstRelease.md#release-scope-freeze) into its `release-scope.md` for REL-00; recheck only changed dispositions. Final public certificate/signature and unresolved public-rights closure remain FR-07 obligations.
 
 **Cleanup:** remove obsolete input/discovery/pin authority in a replacing repair and regenerate disposable output. No second dependency manager, baseline runner or broad automation program is selected.
 
@@ -119,7 +113,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Phase exit criteria:** `REL-08` and `REL-09` pass; any fix creates a new candidate and invalidates affected evidence.
 
-**Candidate:** documented reproduction may use the unsigned internal archive. Windows signing is deferred to FR-07; changed bytes require renewed identity and affected checks before publication.
+**Candidate:** recheck the FR-01 `release-scope.md` export against this candidate's membership/selectors, reopening only invalidated disposition cells. Documented reproduction may use the unsigned internal archive. Windows signing is deferred to FR-07; changed bytes require renewed identity and affected checks before publication.
 
 <details>
 <summary>Copy implementation prompt</summary>

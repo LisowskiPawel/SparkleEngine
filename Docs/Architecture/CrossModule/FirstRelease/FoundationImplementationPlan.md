@@ -20,6 +20,8 @@ Content must be acquired and cooked before world activation; world publication m
 
 ## `FWC-0` — Reconcile Feature Contracts And Boundaries
 
+The selected Sponza edge now routes through [one current contract](../../Modules/Engine/GameFramework/GameFrameworkCapabilities.md#explicit-level-selection-and-publication) and its [FCR-WORLD-01 result](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress). The next open item is [PD-3's installed member-failure matrix](ProductImplementationPlan.md#pd-3--package-and-installation), including `msvcp140_2.dll`, on repaired archive `3743e72a…`; the [global next pointer](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) remains current. Re-enter FWC-0 only for a new or changed ambiguous edge; do not repeat this reconciliation or reopen accepted scope.
+
 **Start:** A selected journey exposes an ambiguous contract, unmatched selector or missing check.
 
 **Work:** Trace that input through its producer, publication, consumer and shutdown. Reuse the eleven-family owner map; resolve only the changed scope, path, import, worker or shader cells. Keep Linux, uncooked loading and unselected import semantics excluded.
