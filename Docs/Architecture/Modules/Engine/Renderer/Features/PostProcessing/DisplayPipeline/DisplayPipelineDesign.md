@@ -19,8 +19,8 @@ This family owns the meaning of the pixel after lighting: how scene-linear value
 | exposure | implemented source path with manual/automatic state and history | accepted adaptation quality or temporal stability |
 | tone mapping | selectable Reinhard, ACES approximation, and ACES fitted source routes | exact standards compliance or calibrated display output |
 | color grading | first-release target; not found | tone mapping is not a grading or LUT system |
-| vignette | first-release target; not found | scene corner darkening is independent of chromatic displacement; no implementation inferred |
-| chromatic aberration | first-release target; not found | generic filtering/reconstruction is not lens simulation |
+| vignette | partial connected fixed-mask pass; proof open | existing source must meet the frozen numeric/neutral/order contract |
+| chromatic aberration | partial connected fixed-offset pass; proof open | existing source must meet accepted units/filter/per-view and native checks |
 | output/presentation handoff | implemented SDR-oriented encoding/copy route | accepted color accuracy or HDR support |
 | HDR10 display output | first-release target; not found | 10-bit or Linear output alone is not HDR activation |
 
@@ -56,7 +56,7 @@ flowchart LR
 
 The parent [Post Processing](../PostProcessingDesign.md) dossier owns shared stage order. Each transformation retains a separate input/output and proof contract.
 
-The order is semantic: exposure acts on scene-linear lighting, grading authors the reconstructed scene-referred look, the selected SDR or HDR tone/gamut mapping creates target-linear intent, vignette and then chromatic aberration act before target encoding and UI, and SDR/HDR output paths own their final encoding/publication contracts. Reordering stages requires an explicit color-domain decision, not only a graph edit.
+The target order is semantic: exposure acts on scene-linear lighting, grading authors the reconstructed scene-referred look, the selected SDR or HDR tone/gamut mapping creates target-linear intent, vignette and then chromatic aberration act before target encoding and UI, and SDR/HDR output paths own final encoding/publication. Current source has dedicated chromatic/vignette passes in the opposite lens order; the leaf freeze/repair must reconcile this discrepancy before acceptance. Reordering the target requires an explicit color-domain decision, not only a graph edit.
 
 ## Exposure
 

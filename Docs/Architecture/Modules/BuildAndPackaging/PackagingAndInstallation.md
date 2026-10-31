@@ -10,7 +10,7 @@
 
 **Strategy and acceptance sources:** [`PGE-01`, `PGE-13`, `PGE-14`, `PGE-15`](../../../Strategy/Requirements.md), [First Release](../../../Acceptance/FirstRelease.md), and `FCR-PROD-02`/`FCR-PROD-05` in [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md)
 
-**Acceptance:** `e771a244…` passes assembly and installed positive journeys on the accepted existing laptop. Installed failure coverage and removal keep `FCR-PROD-05`/`REL-03` blocked; see [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
+**Acceptance:** repaired `3743e72a…` has assembly/matched-symbol proof; installed member/store coverage, affected positive reconciliation and removal keep `FCR-PROD-05`/`REL-03` blocked. Earlier `e771a244…` installed positives retain their accepted-laptop scope and identity. See [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) and [PD-3 remaining items](../../CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation).
 
 
 Use [reviewed inputs](#reviewed-package-inputs) to prepare the package, [package command](#current-package-entry) to assemble it, [package checks](#fcr-prod-05-package-contract) to qualify it, and [local diagnostics](#local-diagnostics-and-release-review) for incident/export/replacement behavior.

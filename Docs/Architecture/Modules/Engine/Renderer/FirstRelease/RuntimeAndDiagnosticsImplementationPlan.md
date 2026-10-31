@@ -8,6 +8,8 @@ Make existing bindings, settings, debug/capture and viewport/latency observation
 
 ## Work This Plan
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Use RD-0 only for a missing identity/authority decision. A binding defect enters RD-1 immediately as a prerequisite to its rendering consumer; settings/UI repairs do not wait for a pipeline rewrite. Preserve delivered Show controls, process/capture fixes and qualified native tooling.
 
 Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).

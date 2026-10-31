@@ -8,6 +8,8 @@ Keep the selected frame tied to one immutable world submission, view/settings id
 
 ## Work This Plan
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Use FS-0 for a missing identity/oracle decision. Otherwise repair or prove FS-1, FS-2 or FS-3 at the earliest incorrect product. Existing coordinator, Scene/View and frame-graph implementations are the starting path.
 
 Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).

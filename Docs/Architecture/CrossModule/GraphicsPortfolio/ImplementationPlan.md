@@ -30,6 +30,8 @@ Technical choices are established in [Review And Transfer](ReviewAndTransfer.md)
 
 ## Stage Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Apply the [stage complexity budget](../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget), [Change Integration](../../../Engineering/Workflow/ChangeIntegration.md) and [Stage Source-Style Gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) to any executable repair. Freeze the smallest assembly allowlist, original evidence identities, addition/deletion/copy/hook ledger and relevant AC-PORT/CHK-PORT checks. Each stage removes replaced narratives/probes and reports the actual supported surface; original immutable evidence remains intact. Missing people, permission, numerical proof or rights blocks the dependent result, not independent preparation.
 
 For documentation assembly validate links/anchors, UTF-8, hashes/rights, stale paths, whitespace and git diff --check. Broader checks require an affected executable claim. Store actual candidate/numerical/adoption results in the existing CASE/WL/feature reports; this folder is the reader/transfer contract, not another runtime readiness ledger.

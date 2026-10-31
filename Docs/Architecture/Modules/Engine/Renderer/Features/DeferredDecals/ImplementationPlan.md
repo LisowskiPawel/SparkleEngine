@@ -12,6 +12,8 @@ Add authored decals that modify the right material surface consistently for rast
 
 ## Work This Plan
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 | What to do | Working route |
 | --- | --- |
 | First action | [Phase 0 contracts](#phase-0---freeze-contracts-and-evidence): freeze projection/composition meanings, fixture, budgets and actual material consumers. |

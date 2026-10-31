@@ -75,7 +75,7 @@ The important boundary is that GameFramework publishes immutable scene/view inpu
 | Platform and Application | **50/100** | Partial | Win32 window/input/DPI, game/editor hosts, serial/threaded frame loop | Non-Windows host, broad lifecycle tests, packaged standard-user behavior |
 | Assets, import, and cooking | **49/100** | Implemented path; unproved | glTF/GLB/FBX subsets, textures, meshes, materials, scenes, animation, shader products | Full fidelity, deterministic publication, malformed-input, license, and package completeness evidence |
 | GameFramework | **48/100** | Implemented path; unproved | levels, cooked loading, ECS/world updates, editing, render extraction | Cancellation/reload, malformed content, numerical and cross-worker determinism evidence |
-| Renderer | **36/100** | Broad established path plus four absent mandatory targets | raster/ray GBuffer, direct/indirect lighting, frame graph, post processing, diagnostics | Deferred decals, grading, chromatic aberration, HDR10, feature correctness, visual/temporal quality, backend parity, and performance |
+| Renderer | **36/100** | Dated score; broad path plus unqualified mandatory targets | raster/ray GBuffer, lighting, frame graph, post processing and connected basic lens passes | Decals, grading, HDR10 and complete lens contracts; correctness, quality, parity and performance proof |
 | RHI | **45/100** | Broad implemented path; capability-gated | D3D12/Vulkan resources, descriptors, pipelines, commands, ray tracing, presentation, diagnostics | Native validation, device/queue/lifetime faults, parity, performance, device-recovery scope |
 | Tools and products | **45/100** | Partial | Launcher, cookers, ShaderCompiler, editor, Showcase game/editor | polished first use, public support route, documented reproduction, packaged operation |
 
@@ -113,7 +113,7 @@ For the detailed lifecycle, read [Rendering A Sparkle Frame](Modules/Engine/Rend
 | Exposure, reconstruction, and upscaling | **40/100** | Partial/capability-gated | Manual/automatic exposure and Linear/DLSS routes exist; provider availability and temporal behavior need proof. |
 | Tone mapping and SDR output | **45/100** | Implemented path; unproved | Three tone-map choices feed display encoding; no public bypass or HDR display contract exists. |
 | Debug views and capture | **40/100** | Implemented path; unproved | Intermediate products are selectable/capturable; semantic display correctness and attribution remain open. |
-| Volumetrics, decals, grading, chromatic aberration, frame generation | **0/100** | Not found | Explicit negative dossiers prevent adjacent features or SDK presence from being mistaken for support. |
+| Volumetrics, decals, grading, chromatic aberration, vignette, frame generation | **0/100** (dated baseline) | Basic lens passes now source-present; other named paths remain targets/absence | Lens source presence does not establish the full formula/settings/native contract or rescore this snapshot; excluded scope remains explicit. |
 
 See [Renderer Features](Modules/Engine/Renderer/Features/RendererFeatureGuide.md) for the complete feature map and local proof contracts.
 

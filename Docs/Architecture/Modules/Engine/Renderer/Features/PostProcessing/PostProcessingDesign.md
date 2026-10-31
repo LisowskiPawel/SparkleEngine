@@ -17,7 +17,7 @@
 | How many final image paths exist? | One ordered path from scene-linear color to one resolved, tone-mapped, encoded current-frame output. |
 | Which image stages exist? | Optional capability-gated NVIDIA DLSS Ray Reconstruction lighting denoising, followed independently by Linear or capability-gated NVIDIA DLSS Super Resolution upscaling. |
 | Which presentation transforms exist? | Exposure, selectable tone mapping, and SDR-oriented output encoding/publication. |
-| Which first-release features are absent? | Color grading, chromatic aberration, vignette and HDR10 display output are admitted mandatory targets at 0/100; vignette is the 2026-10-10 scope addition, not implementation evidence. |
+| Which first-release contracts remain open? | Grading and HDR10 remain targets; chromatic aberration/vignette have partial connected source with unproved formula/settings/order/native contracts. Dated readiness scores are not rescored here. |
 | Which expected features remain excluded? | Frame generation, dynamic resolution, Renderer MSAA, and standalone TAA/FXAA/SMAA. |
 | What is the central risk? | Extent, history, provider, debug, color-domain, and output identity can disagree even when each stage exists in isolation. |
 
@@ -27,6 +27,8 @@ Read the family in execution order below. A neighboring stage never grants anoth
 
 Sparkle has one ordered post-processing path. Each stage owns one transformation and may not be inferred from a neighboring stage:
 
+The diagram retains the target order with source dispositions. Current code runs chromatic aberration before vignette; the leaf freezes must align that edge with the accepted target before order-sensitive acceptance.
+
 ```text
 SceneColor at render extent
   -> Exposure measurement/history
@@ -35,13 +37,13 @@ SceneColor at render extent
   -> selected Linear or DLSS Super Resolution upscaling to output extent
   -> Color Grading [first-release target; currently absent]
   -> target-specific Tone/Gamut Mapping [SDR current; HDR10 target absent]
-  -> Vignette [first-release target; currently absent]
-  -> Chromatic Aberration [first-release target; currently absent]
+  -> Vignette [partial connected source; target order/proof open]
+  -> Chromatic Aberration [partial connected source; target order/proof open]
   -> SDR Encoding or HDR10 PQ [HDR currently absent]
   -> back-buffer copy or viewport product
 ```
 
-Color grading, chromatic aberration, vignette, HDR10 output, and frame generation do not enter the current source path. The four admitted display targets are mandatory first-release work packages with full target/acceptance contracts; frame generation remains excluded. Their current negative boundaries prevent SDK presence, tone curves, 10-bit formats, temporal upscaling, or Reflex markers from being mistaken for implementation.
+Chromatic aberration and vignette enter the current source path as dedicated fixed-effect passes. Grading/HDR10 retain their target contracts and frame generation remains excluded. Source presence does not qualify the admitted lens model, settings, ordering or native/package behavior; negative checks continue to protect excluded scope and truthful artifact classification.
 
 ## Folder Map
 
@@ -61,7 +63,7 @@ Color grading, chromatic aberration, vignette, HDR10 output, and frame generatio
 | SDR output and presentation | `REN-POST-08`, `REN-POST-10` | SDR-oriented encoding/publication implemented; exact debug presentation partial | [Presentation and Output](DisplayPipeline/DisplayPipelineDesign.md#presentation-and-output) |
 | HDR display output | `REN-POST-09` | First-release target; implementation not found; discovery blocked | [HDR Display Output](DisplayPipeline/HDRDisplayOutput/HDRDisplayOutputDesign.md) |
 | Color grading | `REN-POST-11` | First-release target; implementation not found; discovery blocked | [Color Grading](DisplayPipeline/ColorGrading/ColorGradingDesign.md) |
-| Chromatic aberration | `REN-POST-12` | First-release target; implementation not found; discovery blocked | [Chromatic Aberration](DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md) |
+| Chromatic aberration | `REN-POST-12` | Partial connected source; accepted semantics and native proof open | [Chromatic Aberration](DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md) |
 | Frame generation | `REN-POST-13` | Not found; Reflex is not frame generation | [Frame Generation](ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#frame-generation) |
 
 ## Ordering And Ownership Invariants

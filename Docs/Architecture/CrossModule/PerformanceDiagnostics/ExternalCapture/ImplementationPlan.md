@@ -41,6 +41,8 @@ Stage IDs remain stable for acceptance traceability. Close only the remaining de
 
 ## Universal Execution Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Apply this to every prompt below; each prompt is standalone when pasted with its referenced owning plan.
 
 1. Read root/nested AGENTS, Docs entry point, this package, the parent plan, Change Integration/Lifecycle and applicable ModuleOwnership, DataAndMemory, Naming, Renderer/RHI/Editor/Tools/Tasks and ValidationAndEvidence routes. Inspect current revision/status, direct owners/producers/consumers/lifetime/build membership and exact prerequisite artifacts. Preserve unrelated and concurrent work.
@@ -57,7 +59,7 @@ Apply this to every prompt below; each prompt is standalone when pasted with its
 
 **Remaining work:** Close only unresolved native completion/quiescence, target/generation, interposer and configuration cells in [Discovery](Discovery.md). The engine repair decisions and 0A/0B/0C implementation are delivered. Revalidate installed headers and prior artifacts only when the candidate, tool or relevant source changed; do not repeat the repairs or use a scheduling success as completion.
 
-**Exit `EC-D0-PIX`:** All unresolved provider cells have exact decisions/artifacts or named unavailable prerequisites. Native completion, quiescence and target identity are proved before the affected adapter acceptance or implementation proceeds.
+**Exit `EC-D0-PIX`:** the remaining decisions and prerequisites required by the selected PIX slice are resolved with exact artifacts; native completion, quiescence and target identity are established before the affected adapter acceptance proceeds. Missing required prerequisites block that cell. Nsight/RenderDoc/specialist discovery keeps its own later provider items and does not reopen a passed PIX gate; record each provider's result separately.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -89,7 +91,7 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Remaining work:** Complete cancellation/drain/deadline, native-hotkey Busy, target/device loss, late result and shutdown controls. Add the smallest approved DevelopmentGame control over the same authority; the current source excludes Game capture and does not claim that route. Finish CPU/shader provenance, optimized observer comparisons and actual Shipping product/import/package/tool-free checks. Reuse valid separate PIX Timing evidence, refreshing invalidated cells. Documented reproduction remains an explicit aggregate task.
 
-**Exit `EC-G2`:** relevant `AC-EC-01`–`AC-EC-10` and `AC-EC-12` pass for PIX Editor/Game D3D12, mapped negative failures settle safely, package/observer controls pass and individual PIX acceptance is recorded in candidate report. Documented reproduction may be performed now or remain explicit aggregate Stage 8 evidence. The separate PIX Timing lane has a transcript/artifact or explicit blocked prerequisite and cannot revoke an accepted GPU Capture cell. No whole-map capture is needed for each repair; retain Empty/Sponza and defer the roster gate to Stage 8.
+**Exit `EC-G2`:** the PIX Editor/Game D3D12 cells assigned here from `AC-EC-01`–`AC-EC-10` and `AC-EC-12` pass, mapped negatives settle safely, and package/observer controls pass in the candidate report. Documented reproduction belongs to Stage 8 unless performed here; any criterion containing that unrun portion retains an open aggregate verdict. The separate PIX Timing lane has its own transcript/artifact or blocked prerequisite and cannot revoke an accepted GPU Capture cell. Retain Empty/Sponza controls here; the whole-map roster belongs to Stage 8.
 
 <details>
 <summary>Copy implementation prompt</summary>
@@ -153,7 +155,7 @@ Inspect existing production consumers and retained artifacts before editing. Do 
 
 **Remaining work:** Close EC-D0-RD-VK and candidate proof for the existing private Vulkan root/window binding and shared dynamic adapter. Verify instance-derived API root, selected scene/submit/Present contribution, wrong/stale root/window controls, lifecycle, compatible native validation and replay. Re-run the overlay request control that was previously obstructed by another foreground window. Do not reimplement the controller, pass VkDevice as the root, or infer success from bootstrap alone.
 
-**Exit `EC-G6`:** all relevant checks for Vulkan cell and artifact inspection, wrong/stale root/window negative control and compatible validation; all `EXT-00`–`EXT-05` have candidate dispositions or explicit remaining blockers. Aggregate parent P1 proof remains Stage 8.
+**Exit `EC-G6`:** the selected RenderDoc Vulkan checks, artifact inspection, wrong/stale root/window negatives and compatible native validation pass for the exact candidate. Record that provider cell and its limits; other `EXT-00`–`EXT-05` dispositions and aggregate parent P1 proof belong to Stage 8 and do not extend this local exit.
 
 <details>
 <summary>Copy implementation prompt</summary>

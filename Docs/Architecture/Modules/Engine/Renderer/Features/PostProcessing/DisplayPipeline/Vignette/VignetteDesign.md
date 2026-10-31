@@ -6,17 +6,19 @@ Implementation stages: [ImplementationPlan](ImplementationPlan.md).
 
 Sections: [Basic Vignette Remaining Delivery Plan](ImplementationPlan.md#basic-vignette-remaining-delivery-plan).
 
-**Status:** target feature dossier; release requirement authorized, implementation and numerical acceptance unclaimed
+**Status:** target feature dossier with partial connected source; numerical/native acceptance remains open
 
 **Scope:** the required basic, bounded scene-image darkening toward the viewport corners, separate from chromatic aberration
 
-**Verified:** source/name search at `93e86b8113c3fcd0c4921729c3513538b95bc794` on 2026-10-10 found no vignette feature
+**Source reconciled:** 2026-10-31 at `14b580f3`: dedicated pass/shader, registration, CVar and shared settings bridge exist; the older absence finding is superseded. No native/visual/performance acceptance is claimed.
 
-**Current readiness:** **0/100 — target only**; included in the lens post-processing scope of [FCR-REN-25](../../../../../../../../Acceptance/FeatureCompletionReports.md#initial-completion-report-registry), without changing the existing portfolio score
+**Dated readiness:** **0/100** in the lens scope of [FCR-REN-25](../../../../../../../../Acceptance/FeatureCompletionReports.md#initial-completion-report-registry); not rescored by source presence
 
 **Parent:** [Display Pipeline](../DisplayPipelineDesign.md). [Release requirements](../../../../../../../../Acceptance/FirstRelease.md#required-rendering-closure) require this small effect on both backends. This page owns its proposed semantics and local delivery checks; release results belong in the existing FCR report.
 
 ## Result And Bounds
+
+The existing [`Vignette.cpp`](../../../../../../../../../Engine/Renderer/Private/Passes/Presentation/PostProcessing/Vignette.cpp) and [shader](../../../../../../../../../Engine/Assets/Shaders/Passes/Presentation/PostProcessing/Vignette.hlsl) apply a fixed mask with at most 20% attenuation, selected through `r.Vignette` and shared boolean settings. The code currently runs after chromatic aberration. The target below places vignette first and requires frozen numeric/parameter/neutral behavior; the plan must align and qualify the existing route against that contract rather than add a second effect.
 
 The approved presented output includes a basic vignette On with values frozen before implementation, consistently on D3D12/Vulkan. Neutral is a formula/no-work control, not the shipped default. Existing Editor/shared settings remain authoritative; no new public lens toggle or Game settings frontend is required. It is an artistic post-process example, not a physical lens model. No texture asset, lens profile, animated authoring system, barrel distortion, film grain or new general effect registry is required.
 

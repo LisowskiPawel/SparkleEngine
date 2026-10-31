@@ -47,6 +47,8 @@ CGRD-00 freezes working domain, parameter and .cube subset, owner/files, parser 
 
 ## Universal Execution Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Each stage passes the [Stage Source-Style Gate](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
 Every stage starts from current status/revision/dirty state, maps its touched `AC-CGR-*`, `FM-CGR-*`, `RISK-CGR-*`, and `CHK-CGR-*`, and names the smallest claim-falsifying check. Apply the [stage complexity budget](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) to existing settings, View, frame-graph, shader, asset/cook, residency, editor, capture, and package owners: retain/narrow/delete their touched paths and justify each consumed addition. Use one scene-grade semantic contract on D3D12 and Vulkan. Delete replaced names/paths in the same stage; unjustified additions or postponed cleanup block exit. Add no compatibility reader, alternate settings authority, generic color framework, permanent test-only code, or silent fallback.

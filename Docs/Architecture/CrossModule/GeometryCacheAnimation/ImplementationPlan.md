@@ -18,4 +18,6 @@ Revalidate current ownership and source facts, then resolve only the first selec
 
 Write a new bounded stage sequence from that accepted decision before source work, including the [Stage Source-Style Gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) for each admitted slice; no-source work records justified N/A. Each slice must replace its temporary representation in the same change and preserve existing skin/morph consumers. Do not resurrect the former whole roadmap or acquire the Knight archive merely because this page exists.
 
+If re-admitted, use [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume): freeze the selected decision/check cards, finite exits and result owner before production. This page has no active stage to retry or mark implemented while deferral stands.
+
 The [Roadmap](../../../Strategy/Roadmap.md#conditional-and-excluded-work) is the admission/order owner. This deferred page grants no implementation, runtime or release evidence.

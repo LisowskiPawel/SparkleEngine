@@ -8,6 +8,8 @@ Qualify existing temporal/exposure/reconstruction/SDR behavior, then integrate a
 
 ## Work This Plan
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Use DSP-0 only for a changed domain/order decision. Select the earliest wrong display product after raw lighting is valid. Existing exposure/provider/tone code is repaired or proved, not rebuilt by default. Grading, chromatic aberration, vignette and HDR retain their release obligations and local discovery gates.
 
 Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).

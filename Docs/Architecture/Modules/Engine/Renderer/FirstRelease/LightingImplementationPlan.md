@@ -8,6 +8,8 @@ Qualify raw surface radiance first, then close the admitted direct/indirect real
 
 ## Work This Plan
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Current entry is [Reference recovery](../Features/Lighting/ReferencePathTracer/ImplementationPlan.md#required-execution-order), represented here by LGT-3. Preserve accepted PTD-00 and delivered source stages. Use LGT-0 only for a changed shared semantic decision; reference recovery does not wait for completion of realtime estimators.
 
 Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).

@@ -10,6 +10,8 @@ Make a selected rendering result observable through existing native tools. Add i
 
 ## Work This Plan
 
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Use [qualified GPU crash debugging](GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures) for current release failures. [External Capture](ExternalCapture/ImplementationPlan.md) owns the remaining PIX, Nsight and RenderDoc implementation and proof. Reuse delivered adapters and valid evidence.
 
 The larger stat/workspace/visualizer design remains a conditional reference. Neither release acceptance nor Workload Studies requires building it in full. A missing metric justifies its smallest existing-owner producer/export path, with explicit admission and cost evidence.

@@ -52,9 +52,9 @@ Each `CHRD-*` disposition records selected answer, alternatives rejected, source
 
 ## Current Source Truth
 
-At `ca55e7d8`, the then-current post-processing and presentation composition applied debug replacement before directly tone mapping, output encoding, and publishing the final product. The current owners are [`SceneRenderingPasses.cpp`](../../../../../../../../../Engine/Renderer/Private/Passes/Scene/SceneRenderingPasses.cpp), [`PresentationPasses.cpp`](../../../../../../../../../Engine/Renderer/Private/Passes/Presentation/PresentationPasses.cpp), [`ToneMapping.cpp`](../../../../../../../../../Engine/Renderer/Private/Passes/Presentation/Display/ToneMapping.cpp), and [`OutputEncoding.cpp`](../../../../../../../../../Engine/Renderer/Private/Passes/Presentation/Display/OutputEncoding.cpp). [`ViewportDisplaySettings.h`](../../../../../../../../../Engine/Renderer/Private/View/ViewportDisplaySettings.h) has no lens state. No chromatic shader, pass, selector, history, or editor control was found.
+The old `ca55e7d8` absence observation is historical. The 2026-10-31 source review at `14b580f3` finds a dedicated registered shader/pass, `r.ChromaticAberration` and shared settings capture/apply. [Current capability](ChromaticAberrationDesign.md#current-capability) names these owners and their limits: fixed integer offsets/clamped loads, with composition before vignette. Preserve this working insertion and isolate its missing accepted semantics; do not build another pass.
 
-The current gap permits one clean output-resolution insertion. It does not establish whether SDR and HDR target-linear values can share the same sampling pass, how exact debug products bypass it, or what authored strength means.
+Discovery must reconcile that code with reference-height units, bilinear sampling, per-view state, the accepted vignette order, debug/raw bypass, SDR/HDR domain cells and the frozen numeric/cost checks. Existing code does not decide those open contracts or pass native acceptance.
 
 ## Blocking Decisions
 

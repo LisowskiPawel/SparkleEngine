@@ -20,6 +20,8 @@ Its [evidence home](../../../Acceptance/GraphicsWorkloads.md#evidence-folders-an
 
 ## Stage Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Apply [Change Integration](../../../Engineering/Workflow/ChangeIntegration.md), [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md) and the [delivery package](../../../Engineering/Workflow/Templates/FeatureDeliveryPackage.md). Before each stage freeze the candidate, prerequisite revisions, file allowlist, producer/consumer/deletion and hook/copy ledgers, AC/FM/CHK mappings and smallest checks. Use existing shader/frame-graph/Assets/runtime/package ownership. Its [stage complexity budget](../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) applies to both current scripts/runtime code and proposed additions: name what to retain, narrow or delete and compare actual state/API/hooks/copies/variants/dependencies at exit. An unused abstraction or postponed replacement deletion keeps that stage open.
 
 Each exit includes applicable formatting and logical-spacing checks from [Stage Source-Style Gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), review of SRP/orchestration/naming, narrow builds/checks, directly affected docs and `git diff --check`. Run `architecture_boundary_check` when Renderer/RHI boundaries change. Disposable tests/probes are removed; retained artifacts go to the existing completion/workload report. No source/static check earns a numerical, GPU, performance, package or adoption verdict.

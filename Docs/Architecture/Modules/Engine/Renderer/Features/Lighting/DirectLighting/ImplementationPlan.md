@@ -6,13 +6,13 @@ Stages: [Stage 0](#stage-0--close-discovery-and-authorize-the-first-slice) / [St
 
 Replace unreliable raw direct lighting with an independently checked estimator, then add reuse and reconstruction.
 
-**Status:** implementation-ready sequence, conditionally blocked by `DIR-D0` and repository release admission; stages are not implementation evidence
+**Status:** conditional delivery plan; Stage 0 resolves `DIR-D0`, and production waits for that accepted gate and repository release admission. Stage descriptions are not implementation evidence.
 
 ## Work This Plan
 
 | What to do | Working route |
 | --- | --- |
-| First action | [Stage 0 discovery](#stage-0--close-discovery-and-authorize-the-first-slice): reproduce/localize the raw failure and close DIR-D0 light, surface, sampling and check decisions. |
+| First action | [Stage 0 discovery](#stage-0--close-discovery-and-authorize-the-first-slice): reconcile current raw controls and recorded repairs, then close the DIR-D0 decisions required by the first slice. Localize a visual failure only if reproduced on that candidate. |
 | Result to reach | Accepted discovery and analytic/exhaustive truth before replacing reservoirs or adding temporal/spatial reuse. |
 | Start / stop | DIR-D0 and release admission remain required. Reference direct-light output and provider-dependent comparisons need their own accepted oracle inputs. |
 
@@ -59,6 +59,8 @@ Resolve only the admitted estimator, light/PDF, reservoir/history, visibility an
 
 ## Universal Execution Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Each stage passes the [Stage Source-Style Gate](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
 Every stage prompt inherits these rules:
@@ -81,7 +83,7 @@ This matrix is part of each stage, not optional guidance. “Production delta”
 
 | Stage | Prerequisites | Required production delta and deletion | Explicit non-goals | Retained deliverables | Smallest stage falsifier |
 | --- | --- | --- | --- | --- | --- |
-| 0 | current revision/status/source trace; release owner available; raw capture route or bounded probe | documentation/fixtures/probes only; no estimator behavior change; delete temporary probes before handoff | tuning constants, rewriting shaders, enabling an SDK | accepted decision register, raw-failure manifest, oracle/threshold/profile table, exact hook/deletion/build map, revised estimate, review record | any `DIR-D0-*` choice, threshold, owner, rights action, or first-slice file remains unresolved |
+| 0 | current revision/status/source trace; scope owner and raw capture route or bounded probe available | documentation/fixtures/probes only; no estimator behavior change; delete temporary probes before handoff | tuning constants, rewriting shaders, enabling an SDK | reviewed decision dispositions, raw-control manifest, oracle/threshold/profile table, exact hook/deletion/build map and review record; next-stage admission stated separately | a decision, threshold, owner, input-rights action or file required by the first slice remains unresolved; unselected expansions need an explicit deferred disposition |
 | 1 | accepted `DIR-D0-01/02/03/04/11/14`; admitted work; fixture/reference rights | qualify independent CPU/closed-form cases and bounded exhaustive GPU output using current product boundaries or local probes; remove disposable oracle/diagnostic code before handoff | permanent exhaustive resolve/registration/toggle, reservoir change, temporal reuse, denoising, new lobes/providers | analytic vectors, exhaustive raw lobes, per-light breakdown, invalid/capacity results, shared-code analysis, commands/configuration | analytic or exhaustive result misses a frozen threshold, oracle depends entirely on questioned production code, or proof adds an unused product path |
 | 2 | Stage 1 pass; frozen equations/units/lobes/shapes; exact semantic call sites | establish one shared focused evaluation/sampling/PDF semantic owner and update all production/reference consumers; delete duplicated/replaced light/BRDF/PDF rules | reservoir/reuse, emissive inventory, ReGIR, reconstruction, new material model | equation-to-code review, CPU/shader parity, furnace/shape/PDF artifacts, source/build/deletion map | any consumer retains a competing formula or sampling PDF disagrees with evaluation/support |
 | 3 | Stage 2 pass; accepted target/proposals/record/precision; frozen old-state deletion list | replace initial reservoir/sample representation, pass bindings, shaders and registrations atomically; retain exhaustive oracle; delete old representation/readers/writers | temporal/spatial reuse, visibility caching, reconstruction, advanced proposals not admitted | logical/packed layouts, round-trip/max/finite tests, discrete/statistical results, fresh-only raw/reference captures, stale-symbol search | old and new representations coexist, a contributing light has zero support, or mean/selection statistics fail |
@@ -120,11 +122,11 @@ Each stage has one copyable prompt. It names the plan and inherits these shared 
 
 ### Objective
 
-Turn the user's visual-failure report and this research package into frozen, reviewable decisions and a bounded production change.
+Turn the current source, retained findings and selected research into frozen, reviewable decisions and a bounded next slice. Historical symptoms inform its controls; reproducing an old defect is not required when the current control passes.
 
 ### Work
 
-1. Capture the current failure in raw direct lobes, selected light/sample, reservoir state, visibility, and final preview with exact candidate identity.
+1. Retain current raw direct-lobe, selected-light/sample, reservoir, visibility and preview controls with exact candidate identity. Classify historical symptoms as reproduced or absent; localize only an observed failure and preserve already-delivered repairs.
 2. Reuse valid DIR-X evidence; run only experiments needed by the admitted first slice. Give each DIR-D0 decision an accepted, blocked or explicitly deferred disposition; unselected many-light/environment/emissive/guiding choices require no prototype.
 3. Freeze formulas, units, light identities, target/bias mode, compatibility, visibility, denoiser, quality profiles, artifacts, thresholds, budgets, hook ledger, and clean-break deletions.
 4. Reconcile first-release admission and assign owners and the concrete resource/check budget.
@@ -133,8 +135,8 @@ Turn the user's visual-failure report and this research package into frozen, rev
 ### Exit Gate
 
 - `DIR-D0` is explicitly accepted with immutable artifacts and no unresolved Stage-1 semantic.
-- The release owner authorizes Stage 1.
-- The reproduction distinguishes estimator, shading, visibility, reconstruction, or still-unknown failure; a screenshot alone does not pass.
+- Record Stage-1 release admission separately: its missing prerequisite blocks production, without reopening accepted discovery decisions.
+- The raw-control receipt distinguishes an estimator/shading/visibility/reconstruction failure, an explicitly unresolved observation, or a passing current control. Required first-slice semantics and oracles cannot remain unresolved; a screenshot alone does not pass.
 
 ### Ready-To-Use Prompt
 
@@ -143,7 +145,7 @@ Turn the user's visual-failure report and this research package into frozen, rev
 
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-0--close-discovery-and-authorize-the-first-slice and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
-Execute Direct Lighting Stage 0 from `DirectLighting/ImplementationPlan.md`. Treat the task as discovery and evidence, not a renderer rewrite. Run only the DIR-X experiments consumed by the admitted first slice, reuse valid results, explicitly defer unselected expansions, and reproduce the reported visual failure with raw direct lobe, reservoir, selected-light/PDF, and visibility artifacts; close every `DIR-D0-*` decision; freeze thresholds and budgets before candidate observation; produce the exact hook/deletion ledger and resource/check bounds; and request independent gate review. Do not change production estimator behavior. Preserve unrelated work and report every unrun check.
+Execute Direct Lighting Stage 0 from `DirectLighting/ImplementationPlan.md`. Apply stage completion and resume. Run only the DIR-X experiments consumed by the selected first slice and reuse valid results. Retain current raw lobe/reservoir/light/PDF/visibility controls; diagnose historical visual symptoms only if reproduced. Accept the consumed DIR-D0 decisions and explicitly defer unselected expansions, with thresholds/budgets frozen before candidate observation. Retain the exact hook/deletion ledger, check bounds and separate gate review. Record the finite discovery verdict and next-stage admission separately; add no production estimator behavior, preserve unrelated work and report unrun required checks.
 ```
 
 </details>

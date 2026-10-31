@@ -23,6 +23,8 @@ These are proof dependencies, not four framework implementations. A valid preced
 
 ## Execution Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Use [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md), its [source-style gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), [scope/retirement](../../../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision) and [claim-driven validation](../../../Engineering/Verification/ValidationAndEvidence.md#claim-driven-validation-selection). Each repair names the selected consumer, failed invariant, smallest change and same-stage deletion. Keep mechanism in existing tool/Renderer/RHI owners, one typed contract and all-queue retirement. Preserve unrelated changes and leave source-control actions to the user.
 
 No permutations, precache/preload, driver cache, compiler service, cache browser, duplicate schema/generation, compatibility reader, diagnostic product or permanent test-only machinery is selected. Check IDs authorize evidence, not a runner or production fault API. A missing mandatory render product fails before scheduling.

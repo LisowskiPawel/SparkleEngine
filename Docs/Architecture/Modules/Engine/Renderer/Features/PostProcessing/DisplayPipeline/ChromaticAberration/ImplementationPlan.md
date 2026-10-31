@@ -8,6 +8,8 @@ Add a small lens effect with defined channel offsets, clamp behavior and a zero-
 
 **Status:** conditional implementation plan; Stage 0 is permitted, Stages 1-4 are blocked until `CHRD-00 PASS` and `DSP-6` prerequisites
 
+**Current source, 2026-10-31:** the dedicated `ChromaticAberration.cpp`/`.hlsl`, shader registration, `r.ChromaticAberration` and shared settings bridge already exist. Presentation composes tone mapping -> chromatic aberration -> vignette -> encoding. The shader uses fixed rounded integer red/blue offsets and clamped loads; this is not the accepted reference-height/bilinear/per-view contract or native proof. Freeze the exact delta against these owners, then repair and qualify it; do not create another lens pass. [Current capability](ChromaticAberrationDesign.md#current-capability) retains the source routes and limits.
+
 **Current readiness:** **0/100** — target only.
 
 ## Work This Plan
@@ -15,7 +17,7 @@ Add a small lens effect with defined channel offsets, clamp behavior and a zero-
 | What to do | Working route |
 | --- | --- |
 | First action | [Stage 0 discovery](#stage-0--close-chrd-00): close CHRD-00 model, units, pixel domain and independent numerical checks. |
-| Result to reach | A fixed three-channel formula and accepted placement before adding state or the lens pass. |
+| Result to reach | A fixed three-channel formula and accepted placement against the connected pass and fixed offsets, before changing their contract. |
 | Start / stop | Stage 0 planning is permitted; production waits for CHRD-00 PASS and DSP-6. An unresolved HDR target cell must be separately dispositioned. |
 
 ## Outcome
@@ -42,6 +44,8 @@ An available display-pipeline seam does not bypass `CHRD-00`. HDR output may rem
 CHRD-00 freezes the exact model/domain, current owner/file map, public/settings state, graph placement, sample/variant/transient cost and numeric thresholds. Retain raw/backend/package/artifact-classification proof and actual check/artifact bounds. Spectral assets, persistent history, a quality framework or guard-band system exceed the selected basic effect; return to scope discovery instead of enlarging a time estimate.
 
 ## Execution Contract
+
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
 
 Each stage passes the [Stage Source-Style Gate](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
@@ -109,7 +113,7 @@ Execute only Chromatic Aberration Stage 1 from its ImplementationPlan.md. Freeze
 
 ### Stage 2 — Implement And Prove The Lens Pass
 
-Land required settings/View/typed binding, shader and build membership together with their real first output. Reuse resolved View/settings values and the current typed pass; remove replaced offsets, state, model branches and intermediates in that slice. Implement `CHR-MATH-*` in one shader checked by a local independent CPU coordinate/filter oracle. Insert the distinct target-linear pass, preserve alpha/product identity, clamp all reads, omit zero, and use no history. No lens manager, extra public selector or parallel parameter snapshot is needed.
+Compare the existing connected pass/settings/shader with the accepted freeze and change only the missing contract. Reconcile fixed integer offsets with the accepted units/bilinear oracle, resolved View/settings identity, typed binding and build membership. Resolve the recorded chromatic/vignette order against the owning target; preserve alpha/product identity, clamp reads and prove neutral omission. Delete replaced offsets/state/intermediates in the same slice. Retain one distinct target-linear pass and no history, lens manager, extra public selector or parameter snapshot. If an affected requirement already has applicable proof, reuse it.
 
 **Exit:** `AC-CHR-01` through `04` semantic portions pass; swapped channel, wrong scale/aspect/stage, wrap, alpha, and zero-work defects are detected; D3D12/Vulkan shaders compile through owned routes and cost meets the frozen budget. One consumed model/pass remains; replaced offsets/branches/intermediates and proof-only code are gone, with retained display behavior checked.
 
@@ -118,7 +122,7 @@ Land required settings/View/typed binding, shader and build membership together 
 
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ImplementationPlan.md#stage-2--implement-and-prove-the-lens-pass; apply its execution contract, named stage work/exit and Stage Source-Style Gate.
-Execute only Chromatic Aberration Stage 2. Implement the accepted three-channel model at the accepted target-linear boundary with output-extent pixel units, bilinear clamp, alpha preservation, and exact zero omission. Compare an independent double-precision CPU evaluator over impulse/grid/edge/alpha patterns, all admitted aspects/resolutions/centers/offsets/strengths, and seeded semantic defects. Inspect typed bindings, native validation, raw pre/post products, and pass cost on both backends. Stop on any unexplained mismatch.
+Execute only Chromatic Aberration Stage 2. Start with the connected ChromaticAberration pass/shader and shared settings bridge; implement only their missing accepted contract and delete replaced offsets/state. Prove the frozen three-channel model, target-linear order, pixel units, bilinear clamp, alpha and zero omission. Compare an independent double-precision CPU evaluator over the frozen pattern/aspect/resolution/parameter matrix and seeded semantic defects. Inspect bindings, native validation, raw pre/post products and cost on both backends. Reuse applicable passes and record the exact remaining cell for any unexplained mismatch.
 NON-NEGOTIABLE: one model/domain/filter contract serves both backends, every seeded channel/scale/aspect/stage/edge/alpha defect fails, no history/asset/quality tier exists, and zero remains no-work.
 ```
 

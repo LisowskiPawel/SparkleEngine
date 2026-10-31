@@ -4,11 +4,15 @@
 
 Stages: [1. Freeze](#stage-1---freeze) / [2. One effect slice](#stage-2---one-effect-slice) / [3. Delivery proof](#stage-3---delivery-proof).
 
-Add one basic vignette through the existing display and settings owners, with no pass at neutral settings.
+Finish and qualify the existing vignette through its display and settings owners, with no pass at neutral settings.
 
 **Status:** fillable target plan; numeric, settings, ownership and native check cards await freeze
 
+**Current source, 2026-10-31:** `Vignette.cpp`/`.hlsl`, registration, `r.Vignette` and the shared settings bridge are connected. The shader has a fixed 20% maximum attenuation; current composition places chromatic aberration before vignette, while its dossier target places vignette first. Freeze the required formula/parameters/order delta against that code, then repair and qualify it. Source presence does not pass the numeric/native gates; no second mask/pass is needed.
+
 ## Work This Plan
+
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
 
 | What to do | Working route |
 | --- | --- |
@@ -34,6 +38,8 @@ Add one basic vignette through the existing display and settings owners, with no
 
 **Work and exit:** Resolve five cards and review exact formula/stage/bounds, current consumers and the existing mask/settings/intermediate paths to retain, narrow or delete. Freeze the smallest consumed state/hook/copy delta; land no inactive pass, public control, carrier or registration. Remove superseded decision instructions and disposable probes. Documentation-only; chromatic discovery remains independent.
 
+**Completion decision:** record Stage 1 `PASS` when all five cards have accepted values/owners, the finite Stage-2 and Stage-3 check subsets have input/matrix/oracle/artifact definitions, and the local plan passes documentation review. The next item is Stage 2 after its contributing contracts pass. An unresolved card keeps Stage 1 blocked with that exact decision/owner; a later native result is not required to close this documentation stage.
+
 <details>
 <summary>Copy implementation prompt</summary>
 
@@ -47,14 +53,14 @@ Execute only Stage 1 from Docs/Architecture/Modules/Engine/Renderer/Features/Pos
 
 **Prerequisite:** Accepted vignette freeze and contributing display/graph contracts
 
-**Work and exit:** Land the typed pass/parameters and existing shared-default integration with the actual effect output. Reuse resolved View values and typed graph mechanisms; delete replaced mask/parameter/intermediate authority in this slice. Add no public lens toggle, Game settings frontend, lens manager, history or duplicate settings snapshot. Disabled state schedules no work. Apply style/readability, narrow build and frozen formula/order/failure controls on both APIs. Exit requires retained display behavior, stale-path checks and actual additions within the freeze budget; remove local oracle/probe code before handoff.
+**Work and exit:** Reconcile the connected typed pass, fixed mask and shared-default bridge with the accepted freeze; implement only missing formula/parameter/View/order behavior. Reuse typed graph mechanisms and delete replaced mask/parameter/intermediate authority in this slice. Add no public lens toggle, Game settings frontend, lens manager, history or duplicate settings snapshot. Neutral/disabled state schedules no work. Apply style/readability, narrow build and frozen formula/order/failure controls on both APIs. Exit requires retained display behavior, stale-path checks and actual additions within the freeze budget; remove local oracle/probe code before handoff.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
 Execute only Stage 2 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/Vignette/ImplementationPlan.md#stage-2---one-effect-slice. Apply the owning execution contract and its Stage Source-Style Gate.
-After the reviewed vignette freeze, complete only the existing typed pass/parameters and approved settings integration. Preserve current defaults and deferred public toggles. Prove disabled-no-work, formula/order/failure and both-backend behavior. Reuse the dedicated pass; do not put this effect into tone mapping. Complete its deletion/retention and addition-budget exit now; add no lens framework or copied settings truth.
+After the reviewed vignette freeze, compare the connected pass, fixed shader mask and shared settings bridge with its finite checks. Repair only missing formula/parameter/View/order behavior; preserve approved defaults and deferred public toggles. Prove neutral/disabled-no-work, formula/order/failure and both-backend behavior. Reuse the dedicated pass and applicable evidence. Complete its deletion/retention and addition-budget exit now; add no lens framework or copied settings truth.
 Stop on unresolved prerequisites or unavailable required checks.
 ```
 

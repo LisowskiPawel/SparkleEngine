@@ -277,13 +277,13 @@ Current absence, extension seams, and the separately labeled target architecture
 
 | Capability ID | Capability | State | Exact current coverage and limit | Evidence | Release disposition |
 | --- | --- | --- | --- | --- | --- |
-| `REN-POST-12` | Chromatic aberration | Not found | No lens/channel distortion model, strength/center/falloff setting, pass, shader, selector, history, diagnostic, or editor workflow was found. Reconstruction artifacts are not feature support. | `S` | First-release target; `FCR-REN-25` Blocked |
+| `REN-POST-12` | Chromatic aberration | Partial connected source | Dedicated fixed integer-offset pass/shader, CVar and shared settings bridge exist; accepted units/filter/per-view/order and native proof remain open. | `S` | First-release target; `FCR-REN-25` unaccepted |
 
 ## Frame Generation
 
 | Capability ID | Capability | State | Exact current coverage and limit | Evidence | Release disposition |
 | --- | --- | --- | --- | --- | --- |
-| `REN-POST-14` | Basic vignette | Target only; source implementation not found | Owner-directed first-release addition, 2026-10-10; [Vignette](Features/PostProcessing/DisplayPipeline/Vignette/VignetteDesign.md) owns the small mask/placement/neutral contract. | Source/name search only | Included obligation; FCR-REN-25 remains unaccepted |
+| `REN-POST-14` | Basic vignette | Partial connected source | Dedicated fixed mask pass/shader, CVar and shared settings bridge exist. [Vignette](Features/PostProcessing/DisplayPipeline/Vignette/VignetteDesign.md) retains numeric/neutral/order and native requirements. | Source review 2026-10-31; no runtime verdict | Included obligation; `FCR-REN-25` unaccepted |
 | `REN-POST-13` | Frame generation | Not found | No optical-flow/frame-synthesis provider, DLSS-G registration, generated-frame identity/resources, UI policy, pacing/present path, selector, or diagnostics were found. Streamline PCL/Reflex latency coordination is not frame generation. | `S` | Excluded unless later admitted |
 
 ## Presentation And Output
@@ -356,7 +356,7 @@ The settings section persists 26 named Renderer CVars in `/Script/SparkleRendere
 
 Release inventory must be generated from both UI/public settings and console/config surfaces. A hidden but reachable command or CVar is still a selectable capability unless Shipping erases or locks it.
 
-No current selector exists for Volumetric Lighting, deferred decals, color grading, chromatic aberration, frame generation, HDR display output, or a non-ray lighting fallback because those product paths are absent. Deferred decals, grading, chromatic aberration, and HDR10 are nevertheless first-release admitted; their implementation plans must add truthful selectors and active-state reporting before product claims. The exact current route, defaults, clamps, persistence, known unused selector, and deliberately absent selector set are in the [Feature Selector Catalog](Features/RuntimeConfiguration/RuntimeConfigurationDesign.md#feature-selector-catalog).
+Basic chromatic aberration and vignette now have connected passes, CVars and a shared settings bridge; their admitted semantic/native contracts remain open. Volumetrics, deferred decals, grading, frame generation, HDR output and a non-ray lighting fallback retain their declared target/absence boundaries. First-release admission does not itself qualify selectors or active-state reporting. The [Feature Selector Catalog](Features/RuntimeConfiguration/RuntimeConfigurationDesign.md#feature-selector-catalog) owns current routes/defaults and deliberate absences; the leaf plans repair and prove only missing contracts.
 
 ## Explicit Non-Claims And Shipping Risks
 
@@ -382,7 +382,7 @@ executable pixel, extent, backend, and capture evidence remains pending.
 - No current HDR-display implementation was found; the first-release target contract is now explicit.
 - No participating-media, fog-volume, volumetric-lighting, atmosphere, or aerial-perspective path was found; sky and wrap-subsurface lighting do not imply those capabilities.
 - Deferred decals are first-release admitted and have a target architecture, delivery plan, and acceptance contract, but no current authored data, scene/GPU representation, GBuffer pass, or secondary-ray composition path.
-- Color grading and chromatic aberration are first-release admitted but have no current implementation; frame generation remains absent and excluded. Tone mapping, reconstruction artifacts, Streamline PCL, and Reflex are not substitutes.
+- Color grading remains a first-release target; chromatic aberration/vignette have partial connected source and open semantic/native proof. Frame generation remains absent and excluded. Tone mapping, reconstruction artifacts, Streamline PCL and Reflex are not substitutes.
 
 ## Primary Source Routes
 

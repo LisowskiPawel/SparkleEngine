@@ -225,7 +225,7 @@ This contract is **defined but unproved**. Completion requires every `AC-FRM-*` 
 | Image reconstruction, upscaling, and provider lifetime | [Image Reconstruction and Upscaling](Features/PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#image-reconstruction-and-upscaling) |
 | Tone mapping | [Tone Mapping](Features/PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#tone-mapping) |
 | Color-grading target and current absence | [Color Grading](Features/PostProcessing/DisplayPipeline/ColorGrading/ColorGradingDesign.md) |
-| Chromatic-aberration target and current absence | [Chromatic Aberration](Features/PostProcessing/DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md) |
+| Chromatic-aberration partial source and target | [Chromatic Aberration](Features/PostProcessing/DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md) |
 | HDR-output target and current absence | [HDR Display Output](Features/PostProcessing/DisplayPipeline/HDRDisplayOutput/HDRDisplayOutputDesign.md) |
 | Explicit absence of frame generation | [Frame Generation](Features/PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#frame-generation) |
 | Debug handoff, encoding, and output targets | [Presentation and Output](Features/PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#presentation-and-output) and [Debug Views](Features/DebugViews/DebugViewsDesign.md) |

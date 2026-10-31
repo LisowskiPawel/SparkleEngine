@@ -12,6 +12,7 @@
 
 - **Prepare the change:** [Before editing](#before-editing): create the control record and inspect owners.
 - **Implement one slice:** [During implementation](#during-implementation), including the [source-style gate](#stage-source-style-gate).
+- **Close or resume a stage:** [Stage completion and resume](#stage-completion-and-resume); use the existing result rather than restarting its instructions.
 - **Review and hand off:** [Review and acceptance](#review-and-acceptance), [completion report](#completion-report) and [stop conditions](#stop-conditions).
 
 ## Before Editing
@@ -132,6 +133,23 @@ Implement or generate one coherent owner/invariant-sized batch at a time. Before
 6. escalate runtime or broad validation only under the [claim-driven validation rules](../Verification/ValidationAndEvidence.md#claim-driven-validation-selection).
 
 Do not accumulate a large AI-generated diff and use a full engine, game, editor, or workspace build as the first feedback signal. Broad builds, whole validation sets, all-content cooks, clean rebuilds, multi-backend runs, and acceptance workloads are final evidence only when the affected contract makes that breadth applicable. Uncertainty is resolved by inspecting the owner and choosing a more discriminating check, not by launching unrelated work.
+
+## Stage Completion And Resume
+
+This contract applies to every implementation plan and copied stage prompt, including older prompts. Keep the decision in the existing iteration record or owning candidate report; a separate tracker is unnecessary.
+
+Before work, freeze one finite stage exit: selected output/consumer, exact prerequisites and input identity, applicable AC/FM/CHK cells, observable oracles and thresholds, required cleanup/style checks, result owner and next permitted step. Link existing definitions instead of copying their matrices. An unresolved value is a named discovery decision, not an invitation to implement until the result seems sufficient. A discovery stage closes when its required decisions and check cards are accepted; downstream production or release proof belongs to its consuming stage.
+
+On every resume:
+
+1. Read the last result and inspect current owners/inputs. Classify each required cell as already passed with applicable evidence, invalidated by a named change, or still missing/failed/unavailable. Reuse applicable passes. A new date, session or unrelated revision is not evidence of invalidation; changed binaries are not qualified by relabelling older results.
+2. Execute the next unmet check or its bounded owning repair. If a stage exceeds a reviewable slice, name its finite child items and exits before further implementation; close each satisfied item once. The parent waits for the union of its required results. A completed delegated stage does not reopen merely because its parent, another provider or final release acceptance is still blocked.
+3. After the final change, evaluate the frozen exit and applicable source-style/documentation checks. Record `PASS` immediately when every required cell passes or has an explicit scope-owner exclusion. Record `BLOCKED` when required proof failed, was not run or is unavailable; state the exact cell, observation, dependency/owner and next discriminating action. A partial pass is not a stage pass. `EXCLUDED` and `SUPERSEDED` retain their scope and reason in the owning report.
+4. Reconcile the plan in the same handoff: remove delivered instructions, retain only unfinished repairs/proof, and point to the exact next open item and its prerequisite. Report which item closed and where the evidence lives. Do not end with only "continue this stage." A blocked handoff identifies the input, repair or external change needed before retry; repeating the same broad run without such a change is not progress.
+
+Keep local stage completion distinct from feature/product/release acceptance. A source or provider slice can close its own gate while the aggregate remains open; an aggregate closes only after every applicable required result is present for its declared candidate and scope. Never weaken a required matrix, hide an unresolved defect in prose, or accept source presence in place of runtime proof to obtain closure.
+
+Once the frozen exit passes, stop that stage. Additional optimization, architecture cleanup or adjacent features need their existing later owner or a separately admitted slice; they do not extend the completed stage. Necessary same-slice cleanup and defect repairs remain part of the exit. Reopen only the affected cells when concrete new evidence contradicts their accepted claim.
 
 ## During Implementation
 

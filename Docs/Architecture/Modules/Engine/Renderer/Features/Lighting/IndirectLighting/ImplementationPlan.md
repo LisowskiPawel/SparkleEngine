@@ -6,7 +6,7 @@ Stages: [Stage 0](#stage-0--close-ind-d0) / [Stage 1](#stage-1--prove-initial-tr
 
 Replace seed replay with an explicit indirect-transport estimator whose reuse and reconstruction can be checked.
 
-**Status:** implementation-ready sequence, blocked by `IND-D0`, applicable release admission, and stage-specific oracle/provider gates
+**Status:** conditional delivery plan; Stage 0 resolves `IND-D0`, and production waits for that accepted gate, applicable release admission and stage-specific oracle/provider prerequisites.
 
 ## Work This Plan
 
@@ -52,6 +52,8 @@ Resolve only the admitted technique accounting, path-record/shift/GRIS, glossy-d
 
 ## Universal Execution Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Each stage passes the [Stage Source-Style Gate](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
 Every stage:
@@ -61,7 +63,7 @@ Every stage:
 - applies the [stage complexity budget](../../../../../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget) to one private feature capsule and existing scene/material/light/sky/ray/frame-graph owners; uses typed bindings/direct calls, narrows unnecessary existing representations and justifies every persistent addition;
 - creates no duplicate path tracer, scene representation, GI framework, compatibility schema, forwarding wrapper, or permanent diagnostics subsystem;
 - updates code, shaders, registrations/cooking, generated surfaces, checks, and affected docs together;
-- preserves unrelated dirty work, especially the existing user-owned Reference Path Tracer edit;
+- preserves unrelated and concurrent work, inspecting the current status rather than assuming a historical dirty state;
 - chooses the smallest falsifying checks and states all unrun runtime/GPU/backend/performance work;
 - stops when an equation, mapping, oracle, admission, ownership boundary, or failure response is unresolved.
 

@@ -47,6 +47,8 @@ HDRD-00 freezes the exact native/display/UI tuple, owner/file map, snapshot/copy
 
 ## Universal Execution Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Each stage passes the [Stage Source-Style Gate](../../../../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) after the final edit, retaining exact formatter coverage and authored spacing/responsibility review. No-source work records justified N/A and its artifact/docs checks.
 
 Every stage records current revision/dirty state, owner path, touched `AC-HDR-*`, `FM-HDR-*`, `RISK-HDR-*`, and `CHK-HDR-*`, and the cheapest defect-detecting check. Preserve the working SDR route continuously. Renderer owns color/target/UI policy; RHI owns output/native presentation facts. Requested state never implies active state. Metadata never substitutes for color-space/pixel/measurement proof. Use no Renderer native API calls, backend-specific artistic transforms, compatibility paths, second HDR state store, permanent test-only code, or silent fallback.

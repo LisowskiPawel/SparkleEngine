@@ -8,7 +8,7 @@ Use these pages to understand the engine, choose your next task and find the des
 
 | I want to... | Open |
 | --- | --- |
-| Continue the first release | [Next task](Strategy/Roadmap.md#where-we-are-and-what-is-next) -> [PD-3: installed failures and removal](Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation) -> [shipping checks](Acceptance/FirstRelease.md) |
+| Continue the first release | [Next task](Strategy/Roadmap.md#where-we-are-and-what-is-next) -> [PD-3: qualify the repaired archive](Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation) -> [shipping checks](Acceptance/FirstRelease.md) |
 | Decide what to deepen, simplify or retire | [Product direction](Strategy/ExecutiveSummary.md#product-identity) -> [portfolio focus and existing-code cuts](Strategy/Roadmap.md#portfolio-focus-and-existing-code-simplification) -> [scope protection](Strategy/Roadmap.md#scope-protection) |
 | Understand the engine | [Engine at a glance](Architecture/EngineAtAGlance.md) -> [repository map](Architecture/WholeRepositoryMap.md) |
 | Find a module or feature | [Architecture](Architecture/README.md) -> [modules](Architecture/Modules/ModuleInventory.md) |

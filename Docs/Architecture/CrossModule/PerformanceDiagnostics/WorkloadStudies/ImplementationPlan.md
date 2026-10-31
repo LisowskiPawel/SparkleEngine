@@ -20,6 +20,8 @@ Produce the classical technical handoff at M3, then close independent study/inci
 
 ## Stage Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Apply [Change Lifecycle](../../../../Engineering/Workflow/ChangeLifecycle.md), [Change Integration](../../../../Engineering/Workflow/ChangeIntegration.md) and the [Feature Delivery Package](../../../../Engineering/Workflow/Templates/FeatureDeliveryPackage.md). Freeze prerequisite revisions, file allowlist, consumer/deletion/hook/copy budget, AC/FM/CHK and numeric rules before results. Before every implementation handoff enforce [Stage Source-Style Gate](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate), applicable formatting/logical-spacing checks, narrow owner validation and `git diff --check`; boundary checks only for an actual Renderer/RHI boundary change. Remove disposable probes.
 
 ## Subject Delivery Owners

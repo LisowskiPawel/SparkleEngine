@@ -8,6 +8,8 @@ Deliver only the foundation, world and content repairs needed to make the approv
 
 ## Work This Plan
 
+Every stage and copied prompt follows [stage completion and resume](../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Choose the failing edge from the current product/frame journey. Use FWC-0 only if that edge lacks a current owner or decidable check; otherwise enter its owning stage directly. Existing cold/warm cook, process and product evidence is reused by candidate identity, rather than dismissed by an old "no evidence" snapshot.
 
 Run the stage that owns the demonstrated missing contract, failing check or named bounded simplification from [Roadmap](../../../Strategy/Roadmap.md#portfolio-focus-and-existing-code-simplification). Keep supporting world/Core/tool code to the selected rendering and reproduction role; retain real Tasks, data/lifetime, animation and deterministic-content requirements. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](ImplementationPlan.md#phase-card-contract).

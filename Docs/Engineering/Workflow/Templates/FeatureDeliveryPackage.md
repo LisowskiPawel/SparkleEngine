@@ -819,6 +819,8 @@ State assumptions, available hardware/tooling/content, reviewer roles, contingen
 
 ## Universal Execution Contract
 
+Follow [stage completion and resume]({{CHANGE_LIFECYCLE_PATH}}#stage-completion-and-resume). Freeze the stage's finite check subset and result owner before work; resume from its recorded result, reuse applicable passes and close its own gate independently of later aggregate acceptance.
+
 Every stage executor must:
 
 1. read repository guidance, this feature's owning documents, applicable Engineering standards, and exact prerequisite artifacts;
@@ -876,11 +878,12 @@ State one observable vertical-slice outcome, not a list of files or mechanisms.
 
 - Binary observable outcomes tied to accepted criteria/failures/checks.
 - Exact matrix and thresholds.
+- Exact input identity, finite applicable AC/FM/CHK cells, owning result location and next permitted item. Discovery exits require accepted decisions/check cards; production and aggregate exits retain their own proof obligations.
 - Actual additions match the justified budget; no unused state, speculative extension point or unnecessary dependency survives.
 - Required same-stage deletion and no-stale-reference proof, plus a positive retained-result check; justify zero deletion when appropriate.
 - Required review and evidence artifacts.
 - The [Stage Source-Style Gate]({{CHANGE_LIFECYCLE_PATH}}#stage-source-style-gate) passes for the final stage-owned source, including added files; no-source stages record justified `N/A`.
-- Explicit `BLOCKED` triggers.
+- Explicit `BLOCKED` triggers and the next discriminating action for each missing prerequisite or check. A pass closes this stage in the same handoff; missing aggregate proof does not reopen a passed local stage.
 - `CHK-{{PREFIX}}-ARCH` passes for this stage with an exact outside-feature hook ledger, public-surface delta, dependency audit, feature-symbol/repeated-switch searches, and bounded-removal result.
 
 ### Ready-To-Use Implementation Prompt
@@ -904,7 +907,7 @@ Stop if: {{MISSING_DECISION_DUPLICATE_AUTHORITY_SEMANTIC_DIVERGENCE_UNOWNED_LIFE
 
 Before submission or handoff: apply Docs/Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate after the final edit. Run the repository CodeStyle.bat Check on all stage-owned added/modified source files, review authored logical spacing and wrapping against CodeStyle.md, and run git diff --check. Record exact commands, tool version, file coverage, exclusions and both results; do not mark the stage complete with missing coverage or a failed required check. A no-source stage records justified N/A and applicable documentation/configuration checks.
 
-Handoff: report changed/deleted files by responsibility, exact commands/configurations/results, artifact links, failed/unavailable checks, remaining risks and limitations, prerequisite validity, and whether Stage {{N_PLUS_1}} is authorized.
+Handoff: apply stage completion and resume. Record PASS when this finite exit passes, or BLOCKED with the exact missing/failed cell and next discriminating action. Report changed/deleted files by responsibility, exact commands/configurations/results, artifact links, limitations and prerequisite validity. Remove delivered instructions and name the exact next open item, including whether Stage {{N_PLUS_1}} is authorized; do not reopen this local stage merely because aggregate acceptance remains open.
 ```
 
 Repeat the stage section for each dependency-ready slice. Never make the final stage's prompt responsible for discovering missing work that earlier stages were meant to close.

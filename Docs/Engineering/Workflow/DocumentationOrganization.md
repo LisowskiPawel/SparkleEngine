@@ -201,6 +201,8 @@ An index routes. It SHOULD NOT reproduce large status tables, requirements, phas
 
 ## Lifecycle
 
+- Apply [stage completion and resume](ChangeLifecycle.md#stage-completion-and-resume) to each plan and copied prompt. Freeze finite exits, reuse applicable passed cells, close satisfied local stages independently of later aggregate gates, and name the exact remaining item at handoff. Keep results in their owning reports; do not create another progress registry.
+
 - Keep one global order and current/next planning pointer in [Roadmap](../../Strategy/Roadmap.md). The strategic catalog owns outputs/examples; colocated plans refine the selected work into local stages/prompts; feature and Acceptance owners retain contracts/results. Indexes route to these owners instead of maintaining independent priority queues, checklists or progress percentages. An explicitly fillable scaffold must name its known inputs, unresolved decision owners, admission and first permitted action; it is not implementation-ready until those decisions are closed. Use the [Remaining Work Plan template](Templates/RemainingWorkPlan.md) for a genuinely missing route, and reuse existing plans before adding files.
 
 - Implementation plans contain only unfinished work, including required validation, recovery, packaging, and adoption. Once a slice is delivered, remove its completed task lists, implementation prompts, execution diary, and obsolete estimates. For partially delivered slices, retain only the remaining delta; source delivery does not close unrun evidence gates.

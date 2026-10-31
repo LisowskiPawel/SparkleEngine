@@ -10,6 +10,8 @@ Review accepted technical work, rehearse a second usage context and improve the 
 
 ## Execution Contract
 
+Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Read [the design](TransferDesign.md) and [AC-PORT/CHK-PORT owner](../ReviewAndTransfer.md#binary-review-criteria). Execute the first unfinished stage and reuse valid proof. Follow [Change Lifecycle](../../../../Engineering/Workflow/ChangeLifecycle.md), its Stage Source-Style Gate and [accepted actor scope](../../../../Acceptance/FeatureCompletionReports.md#report-closure-and-review). Record exact candidate, tasks/oracles, commands, results, limits and cleanup. No-source work records justified N/A.
 
 Production state/API/dependencies default to zero. A demonstrated repair uses its existing feature owner. Remove replaced instructions and disposable probes in the same stage. Add no support, participant or review platform. Contact/publication still requires separate authorization; invent no external participation or professional fact.

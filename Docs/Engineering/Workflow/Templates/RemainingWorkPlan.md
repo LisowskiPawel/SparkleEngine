@@ -31,6 +31,8 @@ Use this compact form for an admitted subject whose detailed stages have not yet
 | Result to reach | {{Observable output and owning phase exit.}} |
 | Start / stop | {{What is permitted now, missing prerequisites and what blocks dependent work.}} |
 
+Every stage and copied prompt follows [stage completion and resume]({{relative ChangeLifecycle path}}#stage-completion-and-resume). Before execution, freeze its finite AC/FM/CHK subset, matrix/oracles, input identity, result owner and next step. On resume, run only missing or concretely invalidated checks; close the local stage when its own exit passes, even if later aggregate proof remains open.
+
 ## Known Inputs And Decisions To Fill
 
 | Field | Known input / actual proposal | Unresolved decision / owner and consequence |
@@ -54,7 +56,7 @@ approve rights, hashes or runtime results that the technical owner must verify.
 
 Fill the decision/check cards. Choose reuse, repair, bounded simplification/retirement or an admitted missing slice. Name existing code to retain, narrow or retire and the smallest justified additions for the next stage. A removal-only result names the selected path it preserves; it requires no replacement capability. This stage changes documentation only; no placeholder API, registration, inactive state or new planning subsystem is delivered.
 
-**Exit:** {{reviewed discovery decision, exact remaining owner and check cards}}.
+**Exit:** {{reviewed decisions and filled check cards, approving scope owner, owning result and exact next permitted stage}}. Later production/runtime evidence is not required to close this decision stage.
 
 ### 2. Deliver One Production Slice
 
@@ -62,7 +64,7 @@ Fill the decision/check cards. Choose reuse, repair, bounded simplification/reti
 
 {{Small actual producer-to-consumer change, current consumer, bounded state/API/hook/copy/dependency additions and why existing representations cannot serve them. State exclusions and the existing path to narrow/delete, or justify retention.}}
 
-**Exit:** {{linked AC/FM/CHK, narrow build/native controls, actual additions versus budget, retained-path check and same-slice deletion/stale-reachability evidence}}. Unused state or postponed replacement cleanup leaves this stage open.
+**Exit:** {{finite linked AC/FM/CHK cells, matrix/oracles, narrow build/native controls, actual additions versus budget, retained-path check, same-slice deletion/stale-reachability evidence and owning result}}. Unused state or postponed replacement cleanup leaves this stage open. Name the next permitted stage on pass, or the exact failed/missing cell and next discriminating action on block.
 
 ### 3. Prove Delivery
 
@@ -88,6 +90,8 @@ results ledger. Do not implement while a required contract is unresolved. Apply
 the plan's Stage Source-Style Gate after the final edit; no-source work records
 justified N/A and artifact/docs checks. Handoff the reviewable local plan and
 exact remaining decisions to the named owner.
+Apply stage completion and resume: record the local decision in its owning
+result, remove delivered instructions and name the exact next open item.
 
 </details>
 ```

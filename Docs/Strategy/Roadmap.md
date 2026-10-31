@@ -6,7 +6,7 @@
 
 **Scope:** the order to follow from the current release work through advanced graphics and portfolio delivery
 
-**Updated:** 2026-10-25; progress summarizes recorded work, not release approval
+**Updated:** 2026-10-31; progress summarizes recorded work, not release approval
 
 Choose one task below, open its **implementation stage**, and copy that stage's prompt. The linked **design** explains the behavior and checks to preserve. This roadmap owns priority and brief progress; implementation plans own the steps.
 
@@ -15,12 +15,12 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 1. Open the stage linked under **Where We Are And What Is Next**.
 2. Read its prerequisites and linked design. A blocked prerequisite stays blocked; completed source work is reused.
 3. Expand **Copy implementation prompt**, paste it, and work only that stage.
-4. Run its exit checks. Record the candidate result in Acceptance and update the short progress row here.
-5. Continue to the next admitted stage in the plan. Source changes alone do not pass a release gate.
+4. Apply [stage completion and resume](../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume): reuse applicable passes and run the exact unmet checks. Record the result with its existing owner; close a passed local stage and remove delivered instructions in the same handoff.
+5. Name the exact next admitted item, or the failed/missing cell and change needed before retry. Update the short progress row here when its summarized state changes. Later aggregate acceptance does not reopen completed local work; source changes alone do not pass a release gate.
 
 ## Where We Are And What Is Next
 
-**Next: [PD-3, installed failures and removal](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation).** Archive `e771a244…` passes assembly, all 32 installed map/API journeys, subset, Qt and relocation checks. Finish its two unchecked items; reuse the [recorded source and package proof](../Acceptance/FeatureCompletionReports.md#product-delivery-progress). PD-4 follows; lighting quality remains in renderer/release gates.
+**Next: [PD-3, qualify the repaired archive](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#pd-3--package-and-installation).** `3743e72a…` has repaired assembly and matched-symbol proof; resume its installed member/store checks, affected positive reconciliation and removal. Earlier `e771a244…` positives retain their identity. Reuse [applicable proof](../Acceptance/FeatureCompletionReports.md#product-delivery-progress), close each finite item once, then requalify affected PD-4 cells against the accepted archive. Lighting quality remains in renderer/release gates.
 
 | Current work | Design / acceptance reference | Implementation stages |
 | --- | --- | --- |
@@ -40,8 +40,8 @@ Choose one task below, open its **implementation stage**, and copy that stage's 
 | GPU crash tooling / GCD | Delivered: 18 native checks, 32 normal journeys, four SDK-free builds; `ITER-GCD-04-06`. [Scope and evidence](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures). | None for the qualified tooling candidate; reuse for native failures. |
 | PD-1: Game / Editor | Source-workspace complete: 32 final frame/quit cells, four observed loading closes, controls/DPI/settings/failures, editing and Game isolation. [Reports](../Acceptance/FeatureCompletionReports.md#product-delivery-progress) bind final replay to `241ef037` plus patch. | Installed counterparts in PD-3; revalidate affected later changes. |
 | PD-2: source / Launcher | Source-workspace complete: fresh/Unicode cold and offline replay, GUI/CLI parity, failure/cancel/clean, current owner gates and native GUI handoff. [Reports](../Acceptance/FeatureCompletionReports.md#product-delivery-progress) preserve each candidate and the approved actor scope. | Installed Launcher portions in PD-3; revalidate affected later changes. |
-| PD-3 / FR-02: package | Unsigned `e771a244…`: assembly/integrity/symbols, 32 installed frames/quits, fresh subset, modified Qt, Unicode/read-only relocation and sampled budgets pass on the accepted laptop. | Installed failure coverage; extraction removal rejected by automatic approval review. [Candidate report](../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/pd3-installed-final/completion.json). |
-| PD-4: diagnostics | Retained-archive export/symbol checks pass; source metadata-identity and reviewer-attribution repairs pass their controls. | Final-archive recovery, regenerated helpers/help and distinct-version replacement/rollback. Automatic CPU crash/hang collection remains unavailable. |
+| PD-3 / FR-02: package | Repaired `3743e72a…` assembly/symbols pass; earlier `e771a244…` installed positives retain their [candidate report](../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/pd3-installed-final/completion.json). | Repaired-candidate member/store failure coverage, affected positive reconciliation and authorized removal; exact items in PD-3. |
+| PD-4: diagnostics | `e771a244…` onboarding/manual and native D3D12 incident recovery, consented export/symbol checks and distinct-version replacement/rollback have supporting proof. | PD-3 acceptance, affected archive-bound requalification and same-final-archive six-report closure. Retain explicit unavailable incident categories; automatic CPU crash/hang collection is not required. |
 | FR-03 to FR-08 | Plans retained. | Feature/map/performance/backend/adoption checks, publication and finite release review. |
 
 Use the [four-stage exit checklist](../Architecture/CrossModule/FirstRelease/ProductImplementationPlan.md#how-to-close-this-plan) to close the product plan and the [acceptance progress ledger](../Acceptance/FeatureCompletionReports.md#product-delivery-progress) to reuse completed checks. Exact results stay under local `artifacts/validation/`. Product-plan closure is unsigned internal qualification; [release gates](../Acceptance/FirstRelease.md#release-gates) still decide shipment.

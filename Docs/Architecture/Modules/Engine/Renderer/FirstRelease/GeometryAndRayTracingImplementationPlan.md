@@ -8,6 +8,8 @@ Make admitted raster and ray paths consume the same resident geometry, material 
 
 ## Work This Plan
 
+Every stage and copied prompt follows [stage completion and resume](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Enter the stage owning the earliest wrong geometry/material product. GR-0 resolves a missing shared decision; valid residency, raster, TLAS and ray implementations are reused. The required decal feature delegates implementation to its leaf plan rather than prescribing another composition algorithm here.
 
 Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).

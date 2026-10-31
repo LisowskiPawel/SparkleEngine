@@ -8,11 +8,11 @@
 
 **Authority boundary:** [Semantics](Semantics.md) owns the model; [User Experience](UserExperience.md) owns observable workflow/state behavior; [README](ChromaticAberrationDesign.md) owns scope/acceptance; [Plan](ImplementationPlan.md) owns delivery order; RHI owns command/resource mechanics only
 
-**Current readiness:** **0/100 — target only**.
+**Dated readiness:** **0/100**; not rescored here. A connected basic pass exists; accepted semantic/state/native proof remains open.
 
 ## Delivery Priority And First Usable Slice
 
-The first usable slice is an inactive, serializable per-view state that proves exact neutral omission and truthful invalid-state reporting without changing pixels. The second slice is the distinct three-read pass with raw pre/post artifacts and an independent coordinate/filter oracle. Editor polish and packaging follow the stable state/result contract.
+The first work is the finite discovery/freeze against the connected fixed-offset pass and shared boolean controls. Its production slice changes required state, typed bindings and shader behavior together with their real output consumer, proving neutral/failure behavior and the independent coordinate/filter oracle. Do not deliver inactive serializable state or a second pass as an intermediate milestone. Integration and package proof follow the stable accepted state/result contract.
 
 Preserving the current display path has priority over showing an effect. Any invalid, unsupported, missing-program, or incoherent frame state omits the lens pass and reports why; it never distorts UI, mutates alpha, or silently turns unrelated color fringes into a claimed feature.
 
@@ -24,14 +24,14 @@ No lens manager, post-process volume system, spectral asset, temporal history, a
 
 ## Current Route Versus Target Route
 
-| Concern | Current source at `ca55e7d8` | Target delta | Preserved owner |
+| Concern | Current source at `14b580f3`, reviewed 2026-10-31 | Target delta | Preserved owner |
 | --- | --- | --- | --- |
-| settings/View | no aberration values/result | one narrow serializable request and immutable View result | existing display settings and View preparation |
-| graph | tone/encoding/presentation path; no lens product | optional target-linear lens product at accepted edge | Renderer frame graph/post path |
-| shader/program | no lens shader/program | one typed backend-neutral semantic program | shader catalog/generation/runtime |
-| resources | no effect-owned data/history | active transient output only; source read | frame graph and RHI resource mechanics |
-| debug/UI/capture | no intentional-effect identity | explicit bypass/composition/product lineage | existing Debug Views/UI/capture owners |
-| editor/automation/package | no control/field/claim | extend admitted display workflow and product config | current settings/editor/package owners |
+| settings/View | global CVar and shared boolean capture/apply | accepted numeric request and view-isolated immutable result; no copied settings authority | existing settings and View preparation |
+| graph | dedicated pass before vignette and encoding | align the existing edge with accepted lens order and neutral omission | Renderer frame graph/post path |
+| shader/program | registered fixed rounded-offset shader | accepted units/filter/model in the same typed program | shader catalog/generation/runtime |
+| resources | transient output on activation; no effect history | prove exact neutral omission and bounded lifetime/cost | frame graph and RHI resource mechanics |
+| debug/UI/capture | generic diagnostic bypass and downstream presentation | prove exact bypass/product lineage and actual state identity | existing Debug Views/UI/capture owners |
+| editor/automation/package | shared boolean bridge; effect widgets deferred | qualify approved defaults/reset and packaged output; no new control suite | current settings/editor/package owners |
 
 ## Target Flow
 

@@ -8,6 +8,8 @@ Prove that the selected frame and product transitions lower correctly to D3D12/V
 
 ## Work This Plan
 
+Every stage and copied prompt follows [stage completion and resume](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-completion-and-resume). Close its finite local exit once; keep later aggregate proof separate.
+
 Assign the demonstrated failure or open native claim to its service. RHI-0 closes only missing consumer/capability decisions; existing services and qualified GCD/native evidence are reused. Inventory coverage does not require every extension or service to be reimplemented before repairing a frame.
 
 Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).
