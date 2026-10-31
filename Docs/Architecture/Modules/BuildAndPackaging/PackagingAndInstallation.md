@@ -10,7 +10,7 @@
 
 **Strategy and acceptance sources:** [`PGE-01`, `PGE-13`, `PGE-14`, `PGE-15`](../../../Strategy/Requirements.md), [First Release](../../../Acceptance/FirstRelease.md), and `FCR-PROD-02`/`FCR-PROD-05` in [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md)
 
-**Acceptance:** `FCR-PROD-05`/`REL-03` pass the admitted unsigned internal `a0f34c8b...` scope. Assembly/symbols, installed failures/recovery and positive reconciliation pass; the user accepts the selected extraction remaining retained, so actual removal is `EXCLUDED`. Earlier `e771a244...`/`3743e72a...` receipts keep their identities and accepted-laptop limits. See [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); [PD-4](../../CrossModule/FirstRelease/ProductImplementationPlan.md#pd-4--support-incident-response-and-product-closure) owns final archive reconciliation. The general package contract and public-release requirements are unchanged.
+**Acceptance:** `FCR-PROD-05`/`REL-03` pass the admitted unsigned internal `a0f34c8b...` scope. Assembly/symbols, installed failures/recovery and positive reconciliation pass; the user accepts the selected extraction remaining retained, so actual removal is `EXCLUDED`. Earlier `e771a244...`/`3743e72a...` receipts keep their identities and accepted-laptop limits. See [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); [Product reconciliation](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retains technical passes but blocks closeout on source-applicable scene-publication coherence. The general package contract and public-release requirements are unchanged.
 
 
 Use [reviewed inputs](#reviewed-package-inputs) to prepare the package, [package command](#current-package-entry) to assemble it, [package checks](#fcr-prod-05-package-contract) to qualify it, and [local diagnostics](#local-diagnostics-and-release-review) for incident/export/replacement behavior.
@@ -36,7 +36,7 @@ Outputs stay under `artifacts/releases/<version>/`. Assembly starts under `.part
 
 Core owns manifest-relative paths and product size/hash verification. Launcher prefers its installed location over the current directory and rejects checkout overrides. First launch verifies and transactionally seeds `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`: project recipes into `Source/Showcase/`, the immutable `Engine/Cooked/` baseline into `Cooked/`. Initial shader readiness verifies the copied baseline against the package manifest without a recook signal; later recooks require their completion signal. Repeat launches preserve selections; a changed or incomplete package identity requires an explicit store reset. Sync/cook/run use the existing typed owners and packaged helpers; source build/cleanup actions are unavailable in installed mode. Missing or malformed package metadata cannot select a checkout.
 
-The admitted internal route has exact-candidate assembly, failure/recovery and positive reconciliation, including applicable seven-map/subset/offline/relocation proof with original identities retained. Actual selected-extraction removal is explicitly excluded by its scope owner. The [FR-02 recheck](../../../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/fr02-final-20261031/completion.json) confirms the accepted archive, membership and symbol identities remain unchanged. Regenerate only when admitted inputs change; PD-4 reconciliation and final FR-07 public qualification retain their own gates.
+The admitted internal route has exact-candidate assembly, failure/recovery and positive reconciliation, including applicable seven-map/subset/offline/relocation proof with original identities retained. Actual selected-extraction removal is explicitly excluded by its scope owner. The [FR-02 recheck](../../../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/fr02-final-20261031/completion.json) confirms the accepted archive, membership and symbol identities remain unchanged. Regenerate only when admitted inputs change; PD-4 technical replay is complete, but its known coherence defect blocks closeout; final FR-07 public qualification retains its own gates.
 
 ## At A Glance
 
@@ -74,7 +74,7 @@ The capability uses the same route for internal qualification and final publicat
 
 ## Requested And Active State
 
-Package acceptance passes the admitted unsigned internal `a0f34c8b...` scope with its recorded removal exclusion. Earlier `e771a244...` and `3743e72a...` results remain bound to their own bytes and input-based applicability; PD-4 still reconciles all six product reports. The manifest and report bind products/profiles, backend/provider support, content, candidate and unsigned-internal status.
+Package acceptance passes the admitted unsigned internal `a0f34c8b...` scope with its recorded removal exclusion. Earlier `e771a244...` and `3743e72a...` results remain bound to their own bytes and input-based applicability; Final support/product closeout is blocked by known source-applicable scene-publication coherence. The manifest and report bind products/profiles, backend/provider support, content, candidate and unsigned-internal status.
 
 ## Failure, Capacity, And Observability
 
@@ -281,7 +281,7 @@ FR-02 implements transactional stage/verify/archive and package-relative discove
 
 Deliver self-service onboarding, diagnostics and recovery. **No user support service** is offered; [Release Scope](../../../Acceptance/FirstRelease.md#approval-and-next-work) owns that decision.
 
-The admitted internal package scope is accepted; aggregate product acceptance remains open for PD-4. Exact-archive native incident results and unavailable categories stay in the [product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
+The admitted PD-3 package technical scope is accepted for `a0f34c8b...`; aggregate product closeout remains blocked by the source-applicable scene-publication defect. Exact-archive native incident results and unavailable categories stay in the [product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
 
 ### Current Local Route
 
@@ -298,7 +298,7 @@ BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,Revi
 | Crash/hang | User-reported categories; ordinary automatic collection unavailable. Archive-bound native D3D12 removal/manual recovery has supporting proof in the product reports. |
 | Review | Pawel Lisowski owns release review; the author or agent may execute it and must name the actual reviewer. Unresolved S0/S1 blocks approval. Local review, publication and aggregate acceptance are separate. |
 
-Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply. Exact-archive interrupted-extraction rejection, distinct-version startup/rollback and supported native/manual diagnostics have [supporting proof](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); final adoption acceptance waits for current-archive PD-4 reconciliation. No public replacement or withdrawal was performed.
+Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply. Exact-archive interrupted-extraction rejection, distinct-version startup/rollback and supported native/manual diagnostics have [current-archive technical proof](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). No public replacement or withdrawal was performed.
 
 Invoke `ReviewRelease.ps1` with `-PackageRoot`, `-ArchivePath`, `-ArchiveSha256`, `-LedgerPath`, `-Reviewer` (the actual author/agent), `-Decision Approve|Replace|Withdraw` and an existing local `-OutputDirectory`. Replacement also needs `-ReplacementRoot`, `-ReplacementArchive`, `-ReplacementSha256`, `-ReplacementLedgerPath` and a state policy.
 

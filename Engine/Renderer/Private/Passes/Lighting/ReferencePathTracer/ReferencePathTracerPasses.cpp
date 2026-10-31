@@ -27,5 +27,5 @@ void AddReferencePathTracerPasses(
 	AddReferencePathTracerTransportPass(builder, frame, settings.RenderExtent, graphResources, work, session.m_rayTracingScene, resources);
 	AddReferencePathTracerDisplayPass(builder, settings.RenderExtent, graphResources, work, resources);
 
-	PublishReferencePathTracerProducts(graphResources, resources);
+	PublishReferencePathTracerProducts(graphResources, session.CanPublishRadiance(), resources);
 }

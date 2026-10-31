@@ -77,6 +77,7 @@ private:
 	void BeginIdentity(const ReferencePathTracerIdentity& identity, RenderViewportExtent extent, ViewportRenderProgressReason reason, std::uint32_t discardedSamples) noexcept;
 	void UpdateIdentity(const RenderFrame& frame, RayTracingExecutionFrontend executionFrontend) noexcept;
 	void CompletePendingCommit() noexcept;
+	bool CanPublishRadiance() const noexcept;
 	void PrepareWork(RenderViewportExtent extent) noexcept;
 	void ApplyAction(ViewportRenderAction action, std::uint64_t actionSequence, const RenderView& view) noexcept;
 	void Suspend() noexcept;

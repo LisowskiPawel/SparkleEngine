@@ -56,7 +56,9 @@ ViewportRenderProgressReason ReferencePathTracerSession::ResolveAvailability(con
 	{
 		return ViewportRenderProgressReason::UnsupportedView;
 	}
+
 	const bool supportsAccumulation = format != nullptr && format->SupportsShaderResource && format->SupportsUnorderedAccess;
+
 	if (!supportsAccumulation || executionFrontend == RayTracingExecutionFrontend::None || !SupportsMaterialTextureTable(capabilities))
 	{
 		return ViewportRenderProgressReason::UnsupportedCapability;
@@ -72,6 +74,7 @@ ViewportRenderProgressReason ReferencePathTracerSession::ResolveAvailability(con
 
 void ReferencePathTracerSession::BeginIdentity(const ReferencePathTracerIdentity& identity, RenderViewportExtent extent, ViewportRenderProgressReason reason, std::uint32_t discardedSamples) noexcept
 {
+	m_pendingCommit = {};
 	m_identity = identity;
 	Hash::Sha256Digest identityHash{};
 	std::string hashError;
@@ -88,7 +91,6 @@ void ReferencePathTracerSession::BeginIdentity(const ReferencePathTracerIdentity
 	m_discardedSamples = discardedSamples;
 	m_pixelCount = static_cast<std::uint64_t>(extent.Width) * static_cast<std::uint64_t>(extent.Height);
 	m_nextRow = 0u;
-	m_pendingCommit = {};
 	m_workPrepared = false;
 	m_clearDisplay = true;
 	m_resetVisible = reason != ViewportRenderProgressReason::None;
@@ -297,6 +299,7 @@ bool ReferencePathTracerSession::ActivateViewport(const RenderFrame& frame, RayT
 
 void ReferencePathTracerSession::ReleaseRetainedIdentity() noexcept
 {
+	m_pendingCommit = {};
 	m_discardedSamples = m_committedSamples;
 	m_committedSamples = 0u;
 	m_lastReason = ViewportRenderProgressReason::RetentionReleased;

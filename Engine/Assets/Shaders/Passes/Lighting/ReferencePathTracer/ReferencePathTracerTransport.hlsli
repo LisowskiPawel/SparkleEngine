@@ -8,7 +8,6 @@
 #include "/Engine/RayTracing/RayTracingSceneTrace.hlsli"
 #include "/Engine/Passes/Lighting/ReferencePathTracer/ReferencePathTracerDirectLighting.hlsli"
 #include "/Engine/Passes/Lighting/ReferencePathTracer/ReferencePathTracerSampler.hlsli"
-#include "/Engine/Passes/Lighting/ReferencePathTracer/ReferencePathTracerWorkFlags.hlsli"
 
 namespace ReferencePathTracer
 {
@@ -77,14 +76,14 @@ namespace ReferencePathTracer
 			const RayTracingHitSurfaceData hitSurface = ReconstructRayTracingHitSurface(trace);
 			if (!hitSurface.Valid)
 			{
-				return PathTracer::InvalidRadiance().rgb;
+				return asfloat(0x7FC00000u).xxx;
 			}
 
 			const RayTracingPathSurface surface = BuildHitRayTracingPathSurface(hitSurface, path.DirectionWorld);
 			const uint surfaceVertexCount = path.SurfaceDepth + 1u;
 			if (FinitePathDiagnosticSurfaceVertices == 0u && surfaceVertexCount > 4096u)
 			{
-				return PathTracer::InvalidRadiance().rgb;
+				return asfloat(0x7FC00000u).xxx;
 			}
 
 			PathTracer::AddRadiance(contribution, path.Throughput, EvaluateSurfaceEmission(lightCounts, previousEvent, surface));

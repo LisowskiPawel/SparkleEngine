@@ -62,6 +62,8 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 
 Producer builds temporary files -> `Files::FilePublication` groups temporary/final paths -> `TryPublishFileSet` finalizes the set -> failures return an error and temporary cleanup helpers remove staging products. Shader and asset cookers consume this route; release proof must show that an interrupted generation never leaves a mixed readable generation.
 
+The current helper replaces files sequentially and retains rollback state only in process. [FWC-4's native counterexample](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) shows that returned-error rollback can pass while an abrupt publisher exit leaves mixed products readable by fresh cooked-material consumers. [Cooking owns the scene-generation contract and remaining repair](../../Tools/Cooking/CookingCapabilities.md#interrupted-scene-publication); this helper has no durable generation commit/recovery or reader-pinning contract. Do not infer crash atomicity from ordinary `TryPublishFileSet` success or rollback.
+
 ### Configuration entry
 
 Static `ConsoleVariable<T>` construction registers with the singleton registry -> command-line or console host resolves the name -> string parsing mutates the typed value -> Application/Renderer/RHI reads it at its chosen boundary. Core provides no persistence, range schema, restart policy, or UI ownership; those remain with the consumer.

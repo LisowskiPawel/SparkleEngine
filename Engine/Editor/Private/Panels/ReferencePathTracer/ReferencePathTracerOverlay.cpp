@@ -95,7 +95,7 @@ void DrawReferencePathTracerOverlay(const ViewportRenderProgress& progress, View
 		}
 		if (progress.Reason != ViewportRenderProgressReason::None)
 		{
-			ImGui::Text("Last event: %s", reasonLabel);
+			ImGui::TextWrapped("Last event: %s", reasonLabel);
 		}
 
 		if (paused)

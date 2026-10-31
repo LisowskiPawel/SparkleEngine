@@ -81,7 +81,6 @@ void ReferencePathTracerResources::Release() noexcept
 	{
 		resources.ReleaseOwnedResource(m_allocation.CommittedM2);
 	}
-
 	m_allocation = {};
 }
 

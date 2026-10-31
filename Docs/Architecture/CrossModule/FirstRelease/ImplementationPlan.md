@@ -2,39 +2,19 @@
 
 [Docs](../../../README.md) / [Up](../README.md)
 
-Stages: [FR-00](#fr-00--scope-and-discovery) / [FR-01](#fr-01--identity-rights-and-baseline) / [FR-02](#fr-02--package-spine) / [FR-03](#fr-03--feature-closure) / [FR-04](#fr-04--release-maps) / [FR-05](#fr-05--performance-stability-and-native-proof) / [FR-06](#fr-06--candidate-freeze-and-reproduction) / [FR-07](#fr-07--publish-and-verify) / [FR-08](#fr-08--stabilize-and-close).
+Remaining stages: [FR-03](#fr-03--feature-closure) / [FR-04](#fr-04--release-maps) / [FR-05](#fr-05--performance-stability-and-native-proof) / [FR-06](#fr-06--candidate-freeze-and-reproduction) / [FR-07](#fr-07--publish-and-verify) / [FR-08](#fr-08--stabilize-and-close).
 
 **Status:** open release plan; remaining work is tracked in the roadmap and linked stage plans
 
-Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for delivered work and missing checks. [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) selects the next task; this page supplies its phase brief.
+Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for completed FR-00–02 internal scope and missing checks. [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) selects the next task; this page supplies only unfinished phase work. Recheck completed cells only when their admitted inputs change; final public rights/signing remain FR-07.
 
 [First Release Acceptance](../../../Acceptance/FirstRelease.md#release-gates) owns release verdicts. Feature-local Architecture checks and [candidate reports](../../../Acceptance/FeatureCompletionReports.md) own feature proof.
 
-For product work, follow the [PD-1 through PD-4 exit checklist](ProductImplementationPlan.md#how-to-close-this-plan) and [recorded progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). Its closure qualifies the admitted internal product scope, not all release gates. [First Release](../../../Acceptance/FirstRelease.md#product-plan-and-public-release) retains clean-environment/minimum-machine requirements and the FR-07 signing/public-rights boundary.
+The [product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain five technical passes and current PD-4 controls for `a0f34c8b...` with its explicit removal exclusion. [Product closeout](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) stays blocked by the source-applicable FWC-4 scene-publication defect. The owner requested document retirement and paused FWC-4; this mother plan retains the unresolved acceptance obligation. [First Release](../../../Acceptance/FirstRelease.md#product-plan-and-public-release) retains the environment and FR-07 signing/public-rights boundaries.
 
-Choose the section for your current task: [release phases](#release-tasks), [Game/Editor/Launcher/package](ProductImplementationPlan.md#first-release-product-implementation-plan), [paths/tasks/world/cook/shaders](FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan), or [feature owners](#complete-feature-routing).
+Choose the section for your current task: [release phases](#release-tasks), [Game/Editor/Launcher/package](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress), [paths/tasks/world/cook/shaders](FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan), or [feature owners](#complete-feature-routing).
 
 ## Release Tasks
-
-### `FR-00` — Scope And Discovery
-
-Discovery is reconciled for the [recorded snapshot](../../../Acceptance/FirstRelease.md#fr-00-reconciliation-result): six approved choices preserved, finite [membership/selector dispositions and check routes](../../../Acceptance/ReleaseScope/CapabilityDispositions.md#reconciled-membership-and-check-routes), accepted PTD-00 unchanged. No discovery task remains unless a changed surface invalidates its disposition.
-
-**Handoff:** FR-01's [internal source qualification and scope export are complete](../../../Acceptance/FirstRelease.md#fr-01-source-requalification) for the recorded snapshot. Final public rights/signing remain FR-07. Follow Roadmap's existing PD-4 priority; identified product/rendering gaps stay with their named stages and do not restart discovery.
-
-### `FR-01` — Identity, Rights, And Baseline
-
-**Complete for the recorded internal candidate:** [FR-01 source requalification](../../../Acceptance/FirstRelease.md#fr-01-source-requalification) retains identity/pins/notices, actual payload provenance, the hash-bound REL-00 scope export and compatible owner checks. Fresh empty-cache public sync/build/cook/Empty passes; the same products pass a 64.651-second network-blocked replay with unchanged hashes. Earlier transport failures remain historical. No new acquisition path, baseline framework or feature repair was needed.
-
-No internal source item remains for this snapshot. Reopen only invalidated inputs/cells when the candidate changes. Final notice-byte binding, exact public-rights/provenance and certificate/signature obligations remain FR-07; source qualification does not approve publication or bypass ordered release gates. Temporary probe/observer source is removed; generated validation roots remain after automatic cleanup rejection, as recorded in the linked result. Follow Roadmap's PD-4 priority.
-
-### `FR-02` — Package Spine
-
-**Internal scope complete:** [PD-3](ProductImplementationPlan.md#pd-3--package-and-installation) accepts unsigned `a0f34c8b...` with passing assembly/symbols, installed failures, store recovery and positive reconciliation. The user explicitly excludes actual selected-extraction removal; the folder remains retained and no removal pass is claimed. `FCR-PROD-05`/`REL-03` pass that admitted internal scope. Reuse the recorded proof in PD-4; final signed/public bytes remain FR-07.
-
-**Final recheck:** [FR-02 result](../../../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/fr02-final-20261031/completion.json) verifies all 434 archive members, retained extraction/layout/signatures, SBOM/provenance and the unchanged native/shader symbol companion with existing owners. No stale membership or invalidated admitted input remains, so no regeneration or production repair is required. Completed execution instructions are removed; source-style is N/A for this evidence/documentation continuation.
-
-**Remaining / next:** no FR-02 internal item remains for this candidate. Continue PD-4's final six-report reconciliation; regenerate only when admitted inputs change. Clean-machine/source-adopter proof stays linked through PD-3/FR-06. The removal exclusion and final FR-07 rights/signing obligations remain explicit.
 
 ### `FR-03` — Feature Closure
 
@@ -43,6 +23,8 @@ No internal source item remains for this snapshot. Reopen only invalidated input
 **Work:** enter the responsible child/leaf stage with actual prerequisites. Reference recovery precedes dependent quality claims; shared binding/native/content defects precede their affected consumer. Implement only the necessary delta. Each repair deletes its replaced code/state/selector/build/dependency path and proves retained behavior in the same slice. Narrowing a required promise needs its scope-owner decision first.
 
 **Exit:** all family dispositions are reconciled, and every Included/Experimental claim has the exact evidence required for REL-04. Reuse shared artifacts by identity; unselected future tiers need no implementation. Missing numerical/native/failure evidence remains blocked; a successful package or average readiness cannot replace it.
+
+**Next FR-03 item:** reuse the completed [owner-selected Reference instrumentation retirement](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#work-this-plan) and its passing local contract/deletion/preservation checks, then [F05 engine qualification](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#f05-engine-qualification) and the separate F01 analytic-emitter repair. The [recorded controls and engine preflight](../../../Acceptance/FeatureCompletionReports.md#reference-correctness-progress) retain their exact candidates; no qualified engine prefix or raw image was obtained. `FCR-REN-08`/REL-04 remain open. Accepted PTD-00 is unchanged; the product closeout prerequisite remains blocked by scene-publication coherence.
 
 ```text
 Execute only the next Roadmap-selected FR-03 delta from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Name the selected path and consumer, then choose proof, repair, bounded simplification/retirement or admitted feature and run its owning child/leaf stage. For a cut, name the unnecessary existing surface and prove the retained path; no replacement feature is required. Complete local deletion and preservation checks. Reuse valid reports; do not execute the whole family registry or optional tiers. Apply the owning execution contract and its Stage Source-Style Gate.
@@ -57,6 +39,8 @@ Before handoff, update the stage result, remaining plan and next item.
 **Cleanup:** repair the actual content/transport/output owner and remove the replaced faulty path; do not add map-specific renderer branches, substitute content silently or expand the reflection oracle domain to excuse unsupported effects.
 
 **Exit:** REL-05 has exact candidate/settings/pose/camera/reference identities, original artifacts, defects and invalidation triggers for each selected map. A map's load/readiness or attractive final screenshot cannot pass its material/raw/temporal checks.
+
+**Remaining / next:** obtain the qualified current raw-reference candidate through FR-03 before dependent map comparisons. The F05 preflight supplies no REL-05 map pass. Keep the approved seven maps plus Empty; select one applicable map proof when its prerequisites are met, remove completed work from this plan and retain results in REL-05.
 
 ```text
 Execute only the selected FR-04 map proof from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Use the approved release maps and their applicable checks, not the later Tier-1/portfolio ladder. Freeze raw/reference/settings identity, repair the first wrong owner with local cleanup and record exact results for REL-05. Apply the owning execution contract and its Stage Source-Style Gate.
@@ -193,7 +177,7 @@ Every current `FCR-*` family has exactly one primary execution owner:
 
 | Plan | Primary families | Count |
 | --- | --- | ---: |
-| [Product And Delivery](ProductImplementationPlan.md#first-release-product-implementation-plan) | `FCR-PROD-01`–`06` | 6 |
+| [Product And Delivery](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) | `FCR-PROD-01`–`06` | 6 |
 | [Foundation, World, And Content](FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan) | `FCR-CORE-01`, `FCR-PLAT-01`, `FCR-TASK-01`, `FCR-WORLD-01`–`03`, `FCR-CONT-01`–`03`, `FCR-SHDR-01`, `FCR-TOOL-01` | 11 |
 | [RHI And GPU Execution](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md) | `FCR-RHI-01`–`06` | 6 |
 | [Renderer: Frame And Scene](../../Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md) | `FCR-REN-01`–`03` | 3 |
@@ -212,11 +196,13 @@ This is the exact one-to-one execution assignment. The phase owns implementation
 <details>
 <summary>Expand feature work-package registry</summary>
 
+Product delivery rows link to enduring contracts after owner-directed plan retirement. The known `FCR-PROD-06` closeout blocker remains here under FR-03 and the paused FWC-4 owner; it is not completed acceptance.
+
 | FCR | Primary phase | FCR | Primary phase |
 | --- | --- | --- | --- |
-| `FCR-PROD-01` | [`PD-1`](ProductImplementationPlan.md#pd-1--game-and-editor-product-shells) | `FCR-PROD-02` | [`PD-2`](ProductImplementationPlan.md#pd-2--source-build-cook-and-launcher) |
-| `FCR-PROD-03` | [`PD-2`](ProductImplementationPlan.md#pd-2--source-build-cook-and-launcher) | `FCR-PROD-04` | [`PD-1`](ProductImplementationPlan.md#pd-1--game-and-editor-product-shells) |
-| `FCR-PROD-05` | [`PD-3`](ProductImplementationPlan.md#pd-3--package-and-installation) | `FCR-PROD-06` | [`PD-4`](ProductImplementationPlan.md#pd-4--support-incident-response-and-product-closure) |
+| `FCR-PROD-01` | [Game contract](../../Modules/Projects/Showcase/ShowcaseCapabilities.md#fcr-prod-01-game-consumer-contract) | `FCR-PROD-02` | [Source contract](../../Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md#fcr-prod-02-source-adopter-contract) |
+| `FCR-PROD-03` | [Launcher contract](../../Modules/Tools/Launcher/LauncherCapabilities.md#fcr-prod-03-launcher-contract) | `FCR-PROD-04` | [Editor contract](../../Modules/Engine/Editor/EditorCapabilities.md#fcr-prod-04-editor-contract) |
+| `FCR-PROD-05` | [Package contract](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#fcr-prod-05-package-contract) | `FCR-PROD-06` | [Self-service contract](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#fcr-prod-06-support-and-incident-contract) |
 | `FCR-CORE-01` | [`FWC-1`](FoundationImplementationPlan.md#fwc-1--core-and-windows-platform) | `FCR-PLAT-01` | [`FWC-1`](FoundationImplementationPlan.md#fwc-1--core-and-windows-platform) |
 | `FCR-TASK-01` | [`FWC-2`](FoundationImplementationPlan.md#fwc-2--task-runtime-and-cancellation) | `FCR-WORLD-01` | [`FWC-3`](FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication) |
 | `FCR-WORLD-02` | [`FWC-3`](FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication) | `FCR-WORLD-03` | [`FWC-3`](FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication) |

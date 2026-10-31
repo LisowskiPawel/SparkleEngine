@@ -22,7 +22,7 @@
 | textures | source image plus semantic intent and format policy | validated mips/compressed cooked texture | KTX/format capability and fidelity vary; memory/concurrency need evidence |
 | scenes/assets | importer output plus project identities | meshes, materials, scene manifest, skeletons, animations, and dependencies | support is bounded by importer and runtime schemas |
 | shaders | registered programs and compilation configuration | shader map/library, reflection, symbols/provenance | owned by the separate ShaderCompiler route |
-| publication | complete temporary product set | atomically visible generation and manifest | interrupted or mixed generation must never remain readable |
+| publication | complete temporary product set | per-file replacement with in-process rollback | interrupted publication can leave a mixed readable generation; FWC-4 is blocked |
 
 ```mermaid
 flowchart LR
@@ -35,6 +35,14 @@ flowchart LR
 ```
 
 Cooking is a product boundary, not a collection of file converters. A successful child process is insufficient unless every declared output is present, mutually compatible, and published as one generation.
+
+### Interrupted Scene Publication
+
+The required boundary remains an atomically visible generation: failure or interruption must preserve the accepted products and must not expose a readable mixture. Current `CookedSceneGenerationWriter` stages typed products, manifests and the registry, then delegates their replacement to Core's `Files::TryPublishFileSet`. That helper preserves and replaces each file in sequence; its rollback state lives in the publishing process. Returned errors can roll back, but abrupt process exit cannot execute that rollback.
+
+[FCR-CONT-01's FWC-4 result](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) records a bounded counterexample using the real Core publisher and fresh GameFramework cooked-file/material readers: normal completion produces new/new, a locked destination returns an error and restores old/old, but interruption after the first replacement leaves a valid decoded new/old material pair. The fixtures are synthetic cooked materials, not a Sponza recook or format-fidelity test. No production assets were changed.
+
+FWC-4 stops at this prerequisite. The scene-generation owner needs a durable commit/recovery and reader-generation binding contract spanning the existing Core replacement helper and GameFramework loading boundary before the publication path can be replaced safely. Stable asset IDs, package-relative paths and shared helper consumers must remain explicit. In-process rollback and a successful cook are not crash-atomicity proof; the [remaining stage](../../../CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-4--import-cook-and-engine-assets) retains the repair and dependent checks.
 
 ### Shared Default Texture Products
 

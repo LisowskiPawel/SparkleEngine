@@ -22,13 +22,13 @@ Content must be acquired and cooked before world activation; world publication m
 
 **Completed — selected Sponza contract reconciliation.** [FCR-WORLD-01 records the passed exit](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress); [GameFramework owns the resulting contract](../../Modules/Engine/GameFramework/GameFrameworkCapabilities.md#explicit-level-selection-and-publication). The original artifacts and all traced source/input hashes were rechecked at `655f5fe8…` without reopening accepted scope. This completion covers contract reconciliation, not runtime or release acceptance.
 
-Re-enter FWC-0 only when a new or changed selected edge lacks a current owner or decidable check. The selected FWC-1 cursor-recentering repair is independent of [PD-3's remaining installed evidence](ProductImplementationPlan.md#pd-3--package-and-installation); the [global next pointer](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) remains with PD-3.
+Re-enter FWC-0 only when a new or changed selected edge lacks a current owner or decidable check. The selected FWC-1 cursor-recentering repair retains its own source scope; [accepted installed product evidence](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) keeps its archive identity. Follow the [global next pointer](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next).
 
 ## `FWC-1` — Core And Windows Platform
 
 **Completed — selected cursor-recentering repair.** The [Platform owner](../../Modules/Engine/Platform/PlatformCapabilities.md#cursor-recentering-and-failure-publication) retains the delivered native-failure/readback contract. [CORE/PLAT results](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) retain the repair, negative controls, current Game observations, cleanup and source-style evidence. The scope owner explicitly accepted closure with the remaining desktop matrix excluded because the desktop is in use; excluded cells are unproved, not runtime passes.
 
-No implementation or interactive-proof task remains in this selected FWC-1 scope. Reopen only for a new demonstrated defect or newly admitted proof. Installed/family acceptance retains its own candidate checks under [PD-3](ProductImplementationPlan.md#pd-3--package-and-installation); the [global next item](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) is unchanged. No neighboring stage was executed.
+No implementation or interactive-proof task remains in this selected FWC-1 scope. Reopen only for a new demonstrated defect or newly admitted proof. Installed/family acceptance retains its own candidate checks under [PD-3](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); the [global next item](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) is unchanged. No neighboring stage was executed.
 
 ## `FWC-2` — Task Runtime And Cancellation
 
@@ -44,22 +44,13 @@ No work remains in this selected accessor-only slice. New activation/publication
 
 ## `FWC-4` — Import, Cook, And Engine Assets
 
-**Start:** The selected map/dependency closure or an advertised retained input fails provenance, import, cook or loading proof.
+**Execution status:** paused by the scope owner. The recorded blocker and remaining repair are retained; documentation reconciliation does not resume this stage.
 
-**Work:** Use existing import/normalization/cook/publication/load for the retained glTF/GLB/FBX subset. Verify coordinate/material/alpha/animation losses, dependency paths, default/sky meanings and notices. Exercise malformed/oversized/missing input, bounded jobs/memory and interrupted publication; regenerate disposable output under the current contract.
+**BLOCKED — interrupted scene-generation publication.** [FCR-CONT-01](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) records the exact native publisher/reader counterexample and CONT-02/03 limits. Normal publication and returned-error rollback pass; terminating the publisher after its first replacement leaves a new/old cooked-material pair readable by a fresh production loader. The stage stops at this coherence/identity failure. No production repair or new generation mechanism was introduced; source-style is justified `N/A`, and temporary probes/fixtures are removed. Sponza source/cooked/default inputs and its accepted acquisition-only rights disposition remain unchanged.
 
-**Cleanup:** Remove duplicate source/cooked authority, stale reachable products and superseded serializers or asset scans in the changed path. Do not implement an unsupported format to fill an inventory cell.
+**Next repair:** resolve one durable commit/recovery and reader-generation binding contract at the [existing Cooking/Core/GameFramework publication boundary](../../Modules/Tools/Cooking/CookingCapabilities.md#interrupted-scene-publication), including stable asset identities, package-relative paths and shared Core-helper consumers. Then replace the unsafe path in the same stage, remove its superseded state/files, and rerun the recorded interruption falsifier plus normal completion, returned-error rollback and retry/retirement checks. The required oracle is one complete accepted generation, never a mixed readable set; do not weaken it or add a parallel publisher to fill the report.
 
-**Exit:** FCR-CONT-01/02/03 bind selected assets to complete package-relative products, deterministic identities, rights and failure-safe publication. Unsupported visible effects remain blockers or require a scope decision.
-
-```text
-Execute only FWC-4 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-4--import-cook-and-engine-assets. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
-Selected work: Use existing import/normalization/cook/publication/load for the retained glTF/GLB/FBX subset.
-Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
-NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-CONT-01; no neighboring stage or new mechanism merely to fill a report.
-Before handoff, update the stage result, remaining plan and next item.
-
-```
+**Remaining exit:** after that prerequisite is safe, finish the affected retained glTF/GLB/FBX provenance, coordinate/material/alpha/animation, dependency, defaults/sky/notices, malformed/oversized/missing-input and bounded-job/memory checks. Bind package-relative products, deterministic identities and existing rights exclusions in FCR-CONT-01/02/03. Preserve valid original cook evidence under its own candidate identity; unsupported visible effects still block or need a scope decision. No neighboring stage is authorized, and the [global next pointer](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) remains unchanged.
 
 ## `FWC-5` — Shader Route And Shared Tool Output
 
@@ -101,4 +92,4 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## Reference And Ownership
 
-[Module contracts](../../Modules/ModuleInventory.md), [Tasks/world topology](../MultithreadedEngine.md), [shader design](../ShaderSystem/ShaderSystemDesign.md) and [product remaining work](ProductImplementationPlan.md) own the boundaries. This plan routes FCR-CORE-01, FCR-PLAT-01, FCR-TASK-01, FCR-WORLD-01 through 03, FCR-CONT-01 through 03, FCR-SHDR-01 and FCR-TOOL-01; it stores no candidate results.
+[Module contracts](../../Modules/ModuleInventory.md), [Tasks/world topology](../MultithreadedEngine.md), [shader design](../ShaderSystem/ShaderSystemDesign.md) and [product acceptance](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) own the boundaries. This plan routes FCR-CORE-01, FCR-PLAT-01, FCR-TASK-01, FCR-WORLD-01 through 03, FCR-CONT-01 through 03, FCR-SHDR-01 and FCR-TOOL-01; it stores no candidate results.

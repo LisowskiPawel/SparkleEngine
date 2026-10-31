@@ -2,7 +2,7 @@
 
 [Docs](../../../../README.md) / [Up](../PerformanceDiagnosticsDesign.md) / [Research and comparisons](Research.md) / [Delivery status](../../../../Strategy/Roadmap.md#release-progress)
 
-**Status:** implemented and qualified for the recorded Windows x64 NVIDIA candidate. The completed GCD plan is retired; product work continues in [PD-1](../../FirstRelease/ProductImplementationPlan.md#pd-1--game-and-editor-product-shells).
+**Status:** implemented and qualified for the recorded Windows x64 NVIDIA candidate. The completed GCD plan is retired; [product reports](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain separate archive-bound acceptance.
 
 **Qualified:** 2026-10-20, `2bab6c366cf0d8e73ab1bd71d2059f43fc755763` plus the retained candidate patch; RTX 5070 Ti Laptop, driver 610.47. Exact inputs, commands, PE/PDB/shader identities and limits belong to `ITER-GCD-04-06` under `artifacts/validation/releases/0.1.0/`. Earlier records retain their original identities.
 
@@ -12,7 +12,7 @@ An opt-in GPU crash debugging launch mode for Editor and Game on Windows x64. Af
 
 Direct startup and the canonical Launcher select Off or Aftermath in source. The child owns input qualification, native readiness and incident publication. The retained candidate qualifies the resulting workflow.
 
-Use matched product, shader and symbol receipts for Modern Sponza investigation through the [product plan](../../FirstRelease/ProductImplementationPlan.md). Its GPU-dependent product checks remain open.
+Use matched product, shader and symbol receipts for Modern Sponza investigation through the [product reports](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). Broader native and rendering gates remain separate.
 
 Ordinary development remains unchanged: no SDK requirement, extra recording state or dump writer when compiled out. No telemetry, recovery system, embedded dump viewer, per-draw logging, TDR registry changes or new profiling framework. A CPU kill is not a GPU dump test. A breadcrumb identifies observed progress, not necessarily the faulty instruction.
 

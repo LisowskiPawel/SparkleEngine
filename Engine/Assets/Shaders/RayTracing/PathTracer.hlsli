@@ -14,12 +14,6 @@ namespace PathTracer
 		uint SurfaceDepth;
 	};
 
-	float4 InvalidRadiance()
-	{
-		const float quietNan = asfloat(0x7FC00000u);
-		return float4(quietNan, quietNan, quietNan, 0.0f);
-	}
-
 	void AddRadiance(inout float3 contribution, float3 throughput, float3 radiance)
 	{
 		contribution += throughput * radiance;

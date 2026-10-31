@@ -77,11 +77,23 @@ void ReferencePathTracerSession::OnFrameSubmitted(RhiSubmissionToken token) noex
 
 ViewportRenderProgress ReferencePathTracerSession::GetProgress() const noexcept
 {
-	const ViewportRenderProgressState state = m_unavailableReason != ViewportRenderProgressReason::None
-	    ? ViewportRenderProgressState::Unavailable
-	    : (m_paused ? ViewportRenderProgressState::Paused
-	                : (m_resetVisible ? ViewportRenderProgressState::Resetting
-	                                  : (m_committedSamples >= TargetSampleCount ? ViewportRenderProgressState::Complete : ViewportRenderProgressState::Accumulating)));
+	ViewportRenderProgressState state = ViewportRenderProgressState::Accumulating;
+	if (m_unavailableReason != ViewportRenderProgressReason::None)
+	{
+		state = ViewportRenderProgressState::Unavailable;
+	}
+	else if (m_paused)
+	{
+		state = ViewportRenderProgressState::Paused;
+	}
+	else if (m_resetVisible)
+	{
+		state = ViewportRenderProgressState::Resetting;
+	}
+	else if (m_committedSamples >= TargetSampleCount)
+	{
+		state = ViewportRenderProgressState::Complete;
+	}
 
 	const double remainingSamples = static_cast<double>(TargetSampleCount - (std::min) (m_committedSamples, TargetSampleCount));
 	const double estimatedSeconds = m_samplesPerSecond > 0.0 && m_pixelCount > 0u ? (remainingSamples * static_cast<double>(m_pixelCount)) / m_samplesPerSecond : 0.0;
@@ -100,7 +112,13 @@ ViewportRenderProgress ReferencePathTracerSession::GetProgress() const noexcept
 
 RenderProductSamplePrefix ReferencePathTracerSession::GetRadianceSamplePrefix() const noexcept
 {
-	return RenderProductSamplePrefix{.RenderIdentitySha256 = m_identitySha256, .SampleCount = m_committedSamples, .TargetSampleCount = TargetSampleCount};
+	return CanPublishRadiance() ? RenderProductSamplePrefix{.RenderIdentitySha256 = m_identitySha256, .SampleCount = m_committedSamples, .TargetSampleCount = TargetSampleCount}
+	                            : RenderProductSamplePrefix{};
+}
+
+bool ReferencePathTracerSession::CanPublishRadiance() const noexcept
+{
+	return m_committedSamples > 0u && !m_pendingCommit && (m_work.WorkFlags & ReferencePathTracerWork::WorkFlagCommitPrefix) == 0u;
 }
 
 void ReferencePathTracerSession::PrepareFrameWork(RenderViewportExtent extent) noexcept
