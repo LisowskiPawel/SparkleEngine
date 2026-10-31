@@ -79,15 +79,24 @@ Pointer-control ownership reconciled on 2026-10-27: private
 display-counter loops and the cursor-centering coordinate round trip. It retains
 no input state or native owner. `InputSystem` publishes logical capture/layer and
 hidden state after the same native operations, and consumes the returned client
-position for its existing last-pointer cache. Capture admission means a foreground
-target existed and the request was issued; native success/error handling remains
-unchanged. Public APIs, routing, first-move baseline policy and callback lifetime
-are preserved. This boundary has source/build evidence only; desktop pointer,
-focus-loss and capture recovery remain runtime evidence items.
+position for its existing last-pointer cache. Capture admission still means a
+foreground target existed and the request was issued; capture success/error
+handling is unchanged. Public APIs, routing, first-move baseline policy and
+callback lifetime are preserved. The recentering correction below supersedes
+only that operation's earlier native-result behavior; focus-loss and capture
+recovery retain their product evidence requirements.
 
 Win32 sends a window message -> `Window::WindowProc` exposes it through `OnWindowMessage` -> `InputSystem` calls the private `ProcessWin32InputMessage` decoder -> global state is updated -> focus router selects System/UI/Gameplay using capture state and registered rectangles -> immediate subscribers run or an event is queued -> Application calls `ProcessDeferredEvents` -> camera/editor/console consumers receive only their enabled layer.
 
 Input ownership rechecked on 2026-10-25: hosts construct `InputSystem` directly and consume its state, registration and routing operations. Dispatcher and focus-router lifetime share one private state allocation; native decoding is stateless. Backend results and the router remain Platform-private. No injected backend interface or forwarding factory remains. The window subscription is released before input state is destroyed. This source boundary does not qualify focus-loss, DPI or interactive behavior.
+
+### Cursor Recentering And Failure Publication
+
+Source rechecked on 2026-10-31 at `655f5fe8…` plus the FWC-1 patch: `CenterWin32Cursor` rejects a missing/invalid window, empty client area, or failed client/screen conversion, cursor move or position readback through its existing `std::optional<MousePosition>` result. After a successful move it reads the actual screen position and converts that observation to client coordinates. [Windows may clip a requested cursor position](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcursorpos); returning the requested center would give the next mouse event a false baseline.
+
+`InputSystem::CenterCursor` remains the sole last-pointer-cache publisher and updates it only when that optional result exists. The helper owns native mechanics and no retained state; Application's camera collector retains its existing mouse-look policy. No public API, input layer, capture state, event lifetime or package path changes. Null results preserve the previous accepted cache instead of fabricating a new position.
+
+[FCR-PLAT-01's FWC-1 record](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) owns the controlled native-call failures, compiled InputSystem consumer checks, actual Windows client/screen/clipping observations, zero-size/restore and cleanup evidence. This is a focused native helper boundary; it does not qualify a final Game/Editor candidate, mixed-monitor DPI/focus/capture transitions or rendered Sponza.
 
 ## Explicit Non-Capabilities And Risks
 

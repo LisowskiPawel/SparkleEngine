@@ -20,30 +20,19 @@ Content must be acquired and cooked before world activation; world publication m
 
 ## `FWC-0` — Reconcile Feature Contracts And Boundaries
 
-The selected Sponza edge now routes through [one current contract](../../Modules/Engine/GameFramework/GameFrameworkCapabilities.md#explicit-level-selection-and-publication) and its [FCR-WORLD-01 result](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress). The next open item is [PD-3's installed member-failure matrix](ProductImplementationPlan.md#pd-3--package-and-installation), including `msvcp140_2.dll`, on repaired archive `3743e72a…`; the [global next pointer](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) remains current. Re-enter FWC-0 only for a new or changed ambiguous edge; do not repeat this reconciliation or reopen accepted scope.
+**Completed — selected Sponza contract reconciliation.** [FCR-WORLD-01 records the passed exit](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress); [GameFramework owns the resulting contract](../../Modules/Engine/GameFramework/GameFrameworkCapabilities.md#explicit-level-selection-and-publication). The original artifacts and all traced source/input hashes were rechecked at `655f5fe8…` without reopening accepted scope. This completion covers contract reconciliation, not runtime or release acceptance.
 
-**Start:** A selected journey exposes an ambiguous contract, unmatched selector or missing check.
-
-**Work:** Trace that input through its producer, publication, consumer and shutdown. Reuse the eleven-family owner map; resolve only the changed scope, path, import, worker or shader cells. Keep Linux, uncooked loading and unselected import semantics excluded.
-
-**Cleanup:** Remove superseded criteria or duplicate owner descriptions; do not create a dossier or control system for each inventory row.
-
-**Exit:** The selected edge has one owner, scope, failure/AC/check mapping and next repair or evidence action; accepted decisions are not reopened.
-
-```text
-Execute only FWC-0 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-0--reconcile-feature-contracts-and-boundaries. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
-Selected work: Trace that input through its producer, publication, consumer and shutdown.
-Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
-NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to the stage's existing report owner; no neighboring stage or new mechanism merely to fill a report.
-Before handoff, update the stage result, remaining plan and next item.
-
-```
+Re-enter FWC-0 only when a new or changed selected edge lacks a current owner or decidable check. The selected FWC-1 cursor-recentering repair is independent of [PD-3's remaining installed evidence](ProductImplementationPlan.md#pd-3--package-and-installation); the [global next pointer](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) remains with PD-3.
 
 ## `FWC-1` — Core And Windows Platform
 
+**Selected repair delivered; final-candidate proof remains open.** The [cursor-recentering owner](../../Modules/Engine/Platform/PlatformCapabilities.md#cursor-recentering-and-failure-publication) now rejects native failures and publishes the actual read-back position through its existing result. [CORE/PLAT records](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) retain the scoped checks and original proof identities. Do not repeat this repair without a new failing check.
+
+**Next open item:** once the existing package owner supplies an exact candidate containing the repaired Platform object, requalify the affected Game/Editor Sponza mouse-look/recenter, zero-size/restore and quit cells under `PLAT-E02` and the existing product checks. The current `3743e72a…` archive predates this repair. Candidate assembly/installed qualification stays in PD-3; no neighboring stage is authorized by this FWC-1 record. Unaffected Core paths/config/process cells retain their own required evidence and no source repair is implied.
+
 **Start:** An admitted Windows path, child process, configuration, window or input transition fails or lacks required final-candidate proof.
 
-**Work:** Repair that current Core/Platform owner. Cover its affected Unicode/path bounds, immutable package/per-user paths, atomic last-good config, focus/capture/DPI, zero-size/resize and handle/error/shutdown cells. Reuse process quoting, cancellation and log-failure results while their inputs remain valid.
+**Work:** Reuse the delivered pointer repair and prove its affected current-candidate interaction cells before further source edits. For a new demonstrated failure, repair its current Core/Platform owner. Cover only the affected Unicode/path bounds, immutable package/per-user paths, atomic last-good config, focus/capture/DPI, zero-size/resize and handle/error/shutdown cells. Reuse process quoting, cancellation and log-failure results while their inputs remain valid.
 
 **Cleanup:** Delete the path reconstruction, encoding conversion, duplicated process policy or forwarding error state the repair replaces; preserve caller-specific workflow policy.
 
@@ -51,7 +40,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ```text
 Execute only FWC-1 from Docs/Architecture/CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-1--core-and-windows-platform. Apply the linked Phase Card Contract, including the Stage Source-Style Gate.
-Selected work: Repair that current Core/Platform owner.
+Selected work: Requalify the repaired cursor-recentering path in an exact candidate containing it. Reuse passed local helper checks; repair again only if a current check fails.
 Verify the stage's Start condition against current owners and exact prerequisite artifacts. Execute its full Work, Cleanup and Exit under the accepted scope; preserve the selected frame/product and reuse valid code/proof. Stop on a missing contract, unsafe lifetime, silent fallback, changed quality/identity or a required unavailable falsifier.
 NON-NEGOTIABLE: one producer/consumer authority; actual artifact/API/profile/settings identity; no unledgered state/API/hooks/copies/dependencies; same-stage replacement deletion and positive retained-path checks. A no-source stage records justified source-style N/A. Handoff exact checks/artifacts/limits to FCR-CORE-01, FCR-PLAT-01; no neighboring stage or new mechanism merely to fill a report.
 Before handoff, update the stage result, remaining plan and next item.

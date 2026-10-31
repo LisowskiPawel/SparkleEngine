@@ -45,7 +45,8 @@ RhiSubmissionToken VulkanFrameSubmission::Submit(RhiCommandRecordingLease&& leas
 	std::array<RhiSubmissionToken, RhiQueueTypeCount> resolvedWaitTokens{};
 	const std::size_t resolvedWaitCount = resolvedWaits.CopyTokens(resolvedWaitTokens);
 
-	return m_commandContext.Submit(std::move(lease), std::span<const RhiSubmissionToken>(resolvedWaitTokens.data(), resolvedWaitCount), ConsumeAcquireSemaphore(queueType), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+	return m_commandContext
+	    .Submit(std::move(lease), std::span<const RhiSubmissionToken>(resolvedWaitTokens.data(), resolvedWaitCount), ConsumeAcquireSemaphore(queueType), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
 }
 
 RhiSubmissionToken VulkanFrameSubmission::SubmitBatch(std::span<RhiCommandRecordingLease> leases, std::span<const RhiSubmissionToken> waitTokens) noexcept
@@ -60,7 +61,8 @@ RhiSubmissionToken VulkanFrameSubmission::SubmitBatch(std::span<RhiCommandRecord
 	std::array<RhiSubmissionToken, RhiQueueTypeCount> resolvedWaitTokens{};
 	const std::size_t resolvedWaitCount = resolvedWaits.CopyTokens(resolvedWaitTokens);
 
-	return m_commandContext.SubmitBatch(leases, std::span<const RhiSubmissionToken>(resolvedWaitTokens.data(), resolvedWaitCount), ConsumeAcquireSemaphore(queueType), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+	return m_commandContext
+	    .SubmitBatch(leases, std::span<const RhiSubmissionToken>(resolvedWaitTokens.data(), resolvedWaitCount), ConsumeAcquireSemaphore(queueType), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
 }
 
 RhiSubmissionState VulkanFrameSubmission::ConsumeQueueWaits(ERhiQueueType queueType, std::span<const RhiSubmissionToken> waitTokens) noexcept
