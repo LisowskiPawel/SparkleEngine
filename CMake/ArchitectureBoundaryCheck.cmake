@@ -60,6 +60,15 @@ endfunction()
 function(sparkle_boundary_scan_file absolute_path)
     sparkle_boundary_relative_path(_relative_path "${absolute_path}")
 
+    if(_relative_path MATCHES "^Engine/Editor/Public/(Console/EditorConsoleSystem|Shaders/RegisteredShaderListModel|Settings/EditorRestartService)[.]h$")
+        sparkle_boundary_append_failure(
+            "EDITOR_IMPLEMENTATIONS_REMAIN_PRIVATE"
+            "${_relative_path}"
+            "1"
+            "Console controllers, panel models and restart implementations are private; hosts consume bounded UI operations."
+            "${_relative_path}")
+    endif()
+
     if(_relative_path MATCHES "^Engine/Editor/Public/Panels/" AND
        NOT _relative_path STREQUAL "Engine/Editor/Public/Panels/ViewportOutputAction.h")
         sparkle_boundary_append_failure(
@@ -124,6 +133,25 @@ function(sparkle_boundary_scan_file absolute_path)
     foreach(_line IN LISTS _lines)
         math(EXPR _line_number "${_line_number} + 1")
         string(REPLACE "__SPARKLE_SEMICOLON__" ";" _line "${_line}")
+
+        if(_relative_path MATCHES "^Engine/" AND NOT _relative_path MATCHES "^Engine/Editor/" AND
+           _line MATCHES "EditorConsoleSystem|GetEditorConsoleSystem")
+            sparkle_boundary_append_failure(
+                "EDITOR_CONSOLE_OWNER_STAYS_PRIVATE"
+                "${_relative_path}"
+                "${_line_number}"
+                "Hosts publish console records through UI; they do not obtain the Editor console controller."
+                "${_line}")
+        endif()
+
+        if(_relative_path MATCHES "^Engine/Editor/" AND _line MATCHES "CreateProcessW|CommandLineToArgvW|GetCommandLineW")
+            sparkle_boundary_append_failure(
+                "EDITOR_NO_PROCESS_LAUNCH_MECHANICS"
+                "${_relative_path}"
+                "${_line_number}"
+                "Editor presents restart intent; Application owns close policy and Core owns process launch mechanics."
+                "${_line}")
+        endif()
 
         if(_relative_path MATCHES "^Engine/Renderer/Private/Passes/.+Passes[.]cpp$")
             if(_line MATCHES "builder[.](AddPass|Dispatch|DispatchAsync)")
@@ -199,7 +227,7 @@ function(sparkle_boundary_scan_file absolute_path)
 		endif()
 
 		if(_relative_path MATCHES "^Engine/Core/Private/Diagnostics/(Logger|LoggerBootstrap)[.](cpp|h)$" AND
-		   _line MATCHES "AssetPathState|Core/Public/(FileSystemUtils|Paths/DirectoryPaths)|GetProductUserStatePaths|Paths::LogFile")
+		   _line MATCHES "FileSystemPathState|Core/Public/Paths/(FileSystemPaths|ProductFilePaths)|GetProductUserStatePaths|Paths::LogFile")
 			sparkle_boundary_append_failure(
 				"LOGGING_BOOTSTRAP_USES_STATELESS_PATH_POLICY"
 				"${_relative_path}"
@@ -219,7 +247,7 @@ function(sparkle_boundary_scan_file absolute_path)
 		endif()
 
 		if(_relative_path MATCHES "^Engine/Core/Private/Paths/LogPathPolicy[.](cpp|h)$" AND
-		   _line MATCHES "Diagnostics/|Logger[.]h|AssetPathState|GetProductUserStatePaths|Core/Public/FileSystemUtils")
+		   _line MATCHES "Diagnostics/|Logger[.]h|FileSystemPathState|GetProductUserStatePaths|Core/Public/Paths/FileSystemPaths")
 			sparkle_boundary_append_failure(
 				"LOG_PATH_POLICY_REMAINS_BOOTSTRAP_SAFE"
 				"${_relative_path}"
@@ -229,7 +257,7 @@ function(sparkle_boundary_scan_file absolute_path)
 		endif()
 
 		if(_relative_path MATCHES "^Engine/Core/Private/Paths/(FileSystemDiscovery|UserStatePaths)[.](cpp|h)$" AND
-		   _line MATCHES "Diagnostics/|Logger[.]h|Get(AssetPathState|ProductUserStatePaths)|Paths::LogFile")
+		   _line MATCHES "Diagnostics/|Logger[.]h|Get(FileSystemPathState|ProductUserStatePaths)|Paths::LogFile")
 			sparkle_boundary_append_failure(
 				"BOOTSTRAP_PATH_DISCOVERY_REMAINS_STATELESS"
 				"${_relative_path}"
@@ -239,7 +267,7 @@ function(sparkle_boundary_scan_file absolute_path)
 		endif()
 
 		if(_line MATCHES "FormatToolWorkProgress|ParseToolWorkProgress" AND
-		   NOT _relative_path MATCHES "^Tools/Support/ToolConsoleSupport/(Private|Public)/ToolWorkProgress[.](cpp|h)$" AND
+		   NOT _relative_path MATCHES "^Tools/Support/ToolSupport/(Private|Public)/ToolWorkProgress[.](cpp|h)$" AND
 		   NOT _relative_path MATCHES "^Tools/Launcher/SparkleLauncher/Private/(Core/LauncherOperationProgress|Gui/Operations/LauncherProgressStreamDecoder)[.]cpp$")
 			sparkle_boundary_append_failure(
 				"TOOL_PROGRESS_TRANSPORT_REMAINS_AT_PROCESS_BOUNDARY"
@@ -249,7 +277,7 @@ function(sparkle_boundary_scan_file absolute_path)
 				"${_line}")
 		endif()
 
-		if(NOT _relative_path STREQUAL "Tools/Support/ToolConsoleSupport/Private/ToolWorkProgress.cpp" AND
+		if(NOT _relative_path STREQUAL "Tools/Support/ToolSupport/Private/ToolWorkProgress.cpp" AND
 		   _line MATCHES "\\[PROGRESS\\]")
 			sparkle_boundary_append_failure(
 				"TOOL_PROGRESS_MARKER_HAS_ONE_OWNER"
@@ -556,6 +584,28 @@ function(sparkle_boundary_scan_file absolute_path)
                 "${_relative_path}"
                 "${_line_number}"
                 "The frame orchestrator must call subsystem-level frame APIs rather than concrete pass implementations."
+                "${_line}")
+        endif()
+
+        if(_relative_path MATCHES "^Engine/" AND
+           _line MATCHES "ProjectLevelCatalog|ToolOutputPaths|LauncherProductPaths|SourceAssetPaths|SourceAssetType|SourceAssetRoot|ImportedTextureCacheRoot|ShaderDependencyManifestPath|ResolveAssetPath|GetTypedPath|GetShaderPath|texture-cooker-summary|texturecook-summary")
+            sparkle_boundary_append_failure(
+                "ENGINE_NO_PREPARATION_POLICY"
+                "${_relative_path}"
+                "${_line_number}"
+                "Build outputs, acquisition catalogs and Launcher product policy belong to tools; Engine consumes ordinary runtime inputs."
+                "${_line}")
+        endif()
+
+        if(_relative_path MATCHES "^Engine/" AND
+           (_line MATCHES "^[ \t]*#[ \t]*include[ \t]*[<\"].*(Tools/|SparkleLauncher/|ToolConsole[.]h|ToolWorkProgress|ShaderCompiler/)" OR
+            (_relative_path MATCHES "/CMakeLists[.]txt$" AND
+             _line MATCHES "(^|[ \t;(])(ToolSupport|SparkleLauncher(Core)?|ShaderCompiler|AssetCooker|TextureCooker|SceneCooker|MaterialCooker|MeshCooker|SourceImporters)([ \t;)]|$)")))
+            sparkle_boundary_append_failure(
+                "ENGINE_NO_HOST_TOOL_DEPENDENCY"
+                "${_relative_path}"
+                "${_line_number}"
+                "Host-tool includes and link dependencies belong to tool or executable composition, never Engine modules."
                 "${_line}")
         endif()
 
