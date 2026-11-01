@@ -6,12 +6,13 @@ namespace SparkleLauncher
 	static LauncherSelectionOption BuildExternalCaptureOption(ExternalCaptureProvider provider, const ExternalCaptureAvailability& availability)
 	{
 		QString name = QString::fromUtf8(ExternalCaptureProviderDisplayName(provider).data());
+		QString detail = QString::fromStdString(availability.Detail);
 		if (provider == ExternalCaptureProvider::NsightGraphics)
 		{
-			name += " (Experimental SDK)";
+			detail.prepend("Experimental SDK. ");
 		}
 
-		return {name, QString::fromUtf8(ExternalCaptureProviderToString(provider).data()), QString::fromStdString(availability.Detail), availability.Available(), availability.Supported};
+		return {name, QString::fromUtf8(ExternalCaptureProviderToString(provider).data()), detail, availability.Available(), availability.Supported};
 	}
 
 	QVector<LauncherSelectionOption> BuildExternalCaptureOptions(std::string_view api, std::string_view profile)

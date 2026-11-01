@@ -8,14 +8,14 @@ Produce the classical technical handoff at M3, then close independent study/inci
 
 **Status:** remaining discovery, analysis and study work; no calendar or capacity estimates
 
-**Prerequisites:** `REL-11` before new production tooling; correct workload/reference prerequisites for `M3/WL-04`; [WS-D0](WorkloadStudiesDesign.md#discovery-gate-ws-d0) before implementation. Existing release/capture repairs retain their own authorization; this plan cannot bypass the parent diagnostics `P1-GATE` to add internal collectors.
+**Prerequisites:** `REL-11` before new production tooling; correct workload/reference prerequisites for `M3/WL-04`; [WS-D0](WorkloadStudiesDesign.md#discovery-gate-ws-d0) before the analysis consumer. Existing release/capture repairs retain their authorization. A missing producer needs the bounded parent Phase-4 admission below and its actual native/tool prerequisites; the full provider-aggregate P1-GATE is not an entry condition. No internal collector program is selected.
 
 ## Work This Plan
 
 | What to do | Working route |
 | --- | --- |
-| First action | [WS-S0 freeze](#remaining-stages): select actual producer records; if a necessary fact is missing, freeze and route its smallest producer prerequisite, then close WS-D0 before building an analyzer. |
-| Result to reach | M3: analyzer, three causal studies and the cleared incident/replay packet with local checks. M6: actual documented reproduction closes AC-WS-04; it does not block the neural work needed by that final exercise. |
+| First action | [WS-S0 freeze](#remaining-stages): select actual producer records; if a necessary fact is missing, freeze and route its smallest producer prerequisite, then close WS-D0 before any new analysis code. |
+| Result to reach | M3: reproducible analysis, three causal studies and the cleared incident/replay packet with local checks. M6: actual documented reproduction closes AC-WS-04; it does not block the neural work needed by that final exercise. |
 | Start / stop | New production tooling waits for REL-11, WS-D0 and workload/reference inputs. This route cannot bypass parent capture gates or invent a collector. |
 
 ## Stage Contract
@@ -30,7 +30,7 @@ This parent owns WS-D0, the one analysis consumer and aggregate CASE/WL joins. T
 
 | Selected evidence | Implementation owner |
 | --- | --- |
-| Python analysis consumer / PGD-05 | [WS-S1](#ws-s1---one-analysis-consumer), [fixed command/input/output proposal](WorkloadStudiesDesign.md#bounded-offline-analysis-consumer) |
+| Python analysis consumer / PGD-05 | [WS-S1](#ws-s1---one-analysis-consumer), [bounded analysis input/output contract](WorkloadStudiesDesign.md#bounded-offline-analysis-consumer) |
 | CPU / GPU / lifetime / PGD-03 | [CPU plan](CpuPreparation/ImplementationPlan.md), [GPU plan](GpuShader/ImplementationPlan.md), [lifetime plan](ResourceLifetime/ImplementationPlan.md) |
 | Causal incident / PGD-04 | [Incident plan](IncidentAnalysis/ImplementationPlan.md) |
 | Original artifacts and final reproduction | [Workload evidence homes](../../../../Acceptance/GraphicsWorkloads.md#evidence-folders-and-delivery-owners); [portfolio stage 3](../../GraphicsPortfolio/ImplementationPlan.md#3-reproduce-review-and-revise) owns the real exercise |
@@ -40,9 +40,9 @@ This parent owns WS-D0, the one analysis consumer and aggregate CASE/WL joins. T
 | Stage | Work and exit | Deliberate scope and stop |
 | --- | --- | --- |
 | [`WS-S0`](#ws-s0---freeze-discovery) Freeze discovery | Close five `WS-D0` cells, actual producer sample, statistics/observer/size cards, API/hardware matrix and current-script retain/narrow/delete decisions. If a necessary field is absent, freeze its producer/check card, route the admitted prerequisite through parent Phase 4, qualify the original record and return here. | WS-S0 stays documentation/local probe only; the producer uses its own bounded stage, not the still-blocked analyzer gate. Remove probes; no guessed data/schema, duplicate collector or full internal spine. Missing unowned inputs/thresholds still block WS-D0. |
-| [`WS-S1`](#ws-s1---one-analysis-consumer) One analysis consumer | Implement only the selected offline CLI over frozen workload records; publish per-run tables/plots and source joins. Pass `AC-WS-01`, input/failure/cleanup parts of `AC-WS-04`, `AC-PY-01..04`. | No collector/export/history or Python framework. Delete the replaced ad hoc supported analysis route; original evidence stays intact. |
+| [`WS-S1`](#ws-s1---one-analysis-consumer) One analysis consumer | Use existing exports/tools and the smallest study-local calculation over frozen records; publish per-run tables/plots and source joins. No new maintained CLI is required. Pass `AC-WS-01`, input/failure/cleanup parts of `AC-WS-04`, `AC-PY-01..04`. | No collector/export/history, Python framework or mandatory Tools entry point. Retain the exact calculation/command with evidence; delete a supported route only when it is actually replaced. |
 | [`WS-S2`](#ws-s2---causal-paired-api-studies) Causal paired-API studies | Execute only the first unfinished admitted stage in the [CPU](CpuPreparation/ImplementationPlan.md), [GPU](GpuShader/ImplementationPlan.md) or [lifetime](ResourceLifetime/ImplementationPlan.md) owner. Parent WS-D05 selects all three questions before results; each child supplies model/baseline/experiment/paired verdict. | Join all three domain results under AC-WS-02/WL-04/07. Do not duplicate child steps or demand three wins; preserve their rejected/inconclusive evidence, actual tool limits and same-stage cleanup. |
-| [`WS-S3`](#ws-s3---incident-and-technical-handoff) Incident and technical handoff | Use the [incident plan](IncidentAnalysis/ImplementationPlan.md) for missing causal/local replay proof, then join the analyzer and all three study packets. | M3 admits M4 with AC-WS-01..03 and local input/failure/cleanup controls from 04; rehearsal 04 remains open for WS-S4 at M6. No adoption verdict is inferred. |
+| [`WS-S3`](#ws-s3---incident-and-technical-handoff) Incident and technical handoff | Use the [incident plan](IncidentAnalysis/ImplementationPlan.md) for missing causal/local replay proof, then join the analysis and all three study packets. | M3 admits M4 with AC-WS-01..03 and local input/failure/cleanup controls from 04; rehearsal 04 remains open for WS-S4 at M6. No adoption verdict is inferred. |
 | [`WS-S4`](#ws-s4---close-documented-study-reproduction) Documented reproduction closure | At M6, consume the actual [portfolio stage 3](../../GraphicsPortfolio/ImplementationPlan.md#3-reproduce-review-and-revise) observations for the frozen study/analysis and incident packet. | Close AC-WS-04/CHK-WS-04 only for actual supported results; keep unavailable cells open. Reuse one exercise instead of another adopter per child. |
 
 ## Reference-Guided Study Selection
@@ -76,7 +76,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ```text
 Read Docs/Architecture/CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md#ws-s1---one-analysis-consumer and apply its Stage Contract, including the Stage Source-Style Gate.
-Execute WS-S1 only after accepted WS-D0 and production admission. Ratify and implement the bounded command/input/output/failure contract in WorkloadStudiesDesign.md, using actual frozen producer samples and exact versions/capacity rules; the planned command is not current source. Extend the existing Tools owner with one selected offline analysis CLI and real consumer. Reuse workload schemas; preserve run-level distributions and candidate/frame/settings/native-artifact joins. Reject partial/mismatched/missing/oversized inputs, preserve originals and clean interrupted publication. Run frozen AC-WS-01/04 and AC-PY controls, code style and narrow owner checks. Delete replaced supported analysis paths and remove probes. Stop on unowned schema, lost identity or duplicate collector/export. No runtime Python or public framework. Handoff exact commands/results/limitations.
+Execute WS-S1 after accepted WS-D0 and its actual admission. Use existing native exports and analysis tools; add only a small study-local calculation when needed, recording its exact command/environment with ignored evidence. No new maintained CLI is required. Reuse workload schemas; preserve per-run distributions and candidate/frame/settings/native-artifact joins. Reject partial/mismatched/missing/over-bound inputs, preserve originals and write derivatives to a fresh output directory. Accept output only after completion and checks; no recovery/publication framework. Run frozen AC-WS-01/04 and AC-PY controls, code style and narrow owner checks. Delete replaced supported analysis paths and remove probes. Stop on unowned schema, lost identity or duplicate collector/export. No runtime Python or public framework. Handoff exact commands/results/limitations.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```

@@ -2,8 +2,7 @@
 
 #include "Paths/FileSystemDiscovery.h"
 
-#include "Core/Public/FileSystemUtils.h"
-#include "Core/Public/Paths/PackagePaths.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/PathFormatting.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "Core/Public/Strings/StringUtils.h"
@@ -197,10 +196,6 @@ namespace Filesystem
 
 	std::optional<std::filesystem::path> DiscoverProjectRoot()
 	{
-		if (const auto package = DiscoverPackageRoot())
-		{
-			return ResolvePackageSourceRoot(*package);
-		}
 		if (const auto processRoot = FindProcessAncestorWithMarker(kProjectMarker))
 		{
 			return processRoot;
@@ -211,6 +206,11 @@ namespace Filesystem
 		}
 
 		return std::nullopt;
+	}
+
+	std::filesystem::path ResolveArtifactRootPath(const std::filesystem::path& workspaceRoot)
+	{
+		return Paths::Normalize(workspaceRoot / "artifacts" / SPARKLE_ARTIFACT_VARIANT_NAME);
 	}
 
 	std::filesystem::path ResolveWorkspaceRootPath()

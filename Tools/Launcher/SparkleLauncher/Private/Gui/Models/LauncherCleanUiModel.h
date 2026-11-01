@@ -21,7 +21,7 @@ namespace SparkleLauncher
 
 	struct ActionCleanTargetContext
 	{
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		std::filesystem::path RunningLauncherPath;
 		QString OperationId;
 		QString ContentId;
@@ -31,7 +31,7 @@ namespace SparkleLauncher
 		QString CookScopes;
 	};
 
-	std::filesystem::path ResolveCleanScopePreviewPath(const std::filesystem::path& repositoryRoot, const QString& projectId, const QString& scope);
+	std::filesystem::path ResolveCleanScopePreviewPath(const std::filesystem::path& workspaceRoot, const QString& projectId, const QString& scope);
 
 	QString CleanScopeDisplayName(const QString& scopeValue);
 	QString CleanScopeSelectionError(const QString& scopeSelection);
@@ -45,7 +45,7 @@ namespace SparkleLauncher
 
 	void AddTargetArtifactOutputs(
 	    QVector<LauncherCleanTarget>& targets,
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const QString& profileName,
 	    const QString& targetName,
 	    const QString& detail,
@@ -53,7 +53,7 @@ namespace SparkleLauncher
 
 	void AddProjectTargetArtifactOutputs(
 	    QVector<LauncherCleanTarget>& targets,
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const QString& profileName,
 	    const QString& projectName,
 	    const QString& productRole,

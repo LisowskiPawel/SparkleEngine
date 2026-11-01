@@ -1,8 +1,8 @@
 #include "SparkleLauncher/MaintenanceOperations.h"
 
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 #include "MaintenanceOperationProcessRequests.h"
-#include "Core/Public/Projects/ProjectLevelCatalog.h"
+#include "ProjectLevelCatalog.h"
 
 #include <set>
 
@@ -364,7 +364,7 @@ namespace SparkleLauncher
 		}
 
 		plan.Kind = definition->Kind;
-		plan.RepositoryRoot = request.RepositoryRoot;
+		plan.WorkspaceRoot = request.WorkspaceRoot;
 		plan.Request = request;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Operation.Inputs.push_back({"content", request.ContentId});
@@ -377,14 +377,14 @@ namespace SparkleLauncher
 		{
 			plan.Operation.Inputs.push_back({"cleanScope", ToString(scope)});
 		}
-		if (!Filesystem::IsSourceWorkspace(request.RepositoryRoot))
+		if (!HasBuildSources(request.WorkspaceRoot))
 		{
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Source workspace operations are unavailable in a portable package.", "Use a source checkout for this operation.");
 			AddReadiness(plan, plan.Operation.Failure->Summary);
 			return plan;
 		}
-		plan.Toolchain = DetectBuildToolchain(request.RepositoryRoot, WorkspaceIde::VisualStudio);
-		plan.Freshness = CheckBuildFilesFreshness(request.RepositoryRoot, plan.Toolchain);
+		plan.Toolchain = DetectBuildToolchain(request.WorkspaceRoot, WorkspaceIde::VisualStudio);
+		plan.Freshness = CheckBuildFilesFreshness(request.WorkspaceRoot, plan.Toolchain);
 
 		switch (plan.Kind)
 		{

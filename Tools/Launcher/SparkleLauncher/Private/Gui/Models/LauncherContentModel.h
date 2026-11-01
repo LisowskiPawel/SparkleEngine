@@ -25,7 +25,7 @@ namespace SparkleLauncher
 		const LauncherContentSummary* Content() const;
 
 	public slots:
-		void Refresh(const std::filesystem::path& repositoryRoot);
+		void Refresh(const std::filesystem::path& workspaceRoot);
 
 	signals:
 		void ContentChanged();

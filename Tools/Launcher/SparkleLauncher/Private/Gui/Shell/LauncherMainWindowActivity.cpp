@@ -1,3 +1,4 @@
+#include "LauncherGpuCrashPanel.h"
 #include "LauncherMainWindow.h"
 
 #include "LauncherActivityPanel.h"
@@ -28,8 +29,7 @@ namespace SparkleLauncher
 		const bool succeeded = result.Succeeded;
 		if (result.GpuCrash)
 		{
-			m_gpuCrashIncident = result.GpuCrash;
-			RefreshGpuCrashIncident();
+			m_gpuCrashPanel->SetIncident(*result.GpuCrash);
 		}
 		if (succeeded && !result.ShaderExportPath.isEmpty())
 		{
@@ -83,6 +83,11 @@ namespace SparkleLauncher
 			PromptForLauncherRestart();
 		}
 
-		HandleQuickStartOperationFinished(runId, operationId, succeeded, succeeded ? result.Status : result.Problem);
+		if (runId == m_startingLevelRunId)
+		{
+			m_startingLevelRunId.clear();
+			m_startingLevelId.clear();
+			RefreshLevelActionButtons();
+		}
 	}
 }

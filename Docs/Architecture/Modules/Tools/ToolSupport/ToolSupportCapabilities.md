@@ -6,9 +6,9 @@
 
 **Snapshot:** 2026-09-28 at committed `master` revision `452c1f32`; `Tools/Support/ToolConsoleSupport`, its CMake membership, and current Launcher, AssetCooker, TextureCooker, and ShaderCompiler consumers inspected; evidence `S` only
 
-**Scope:** the shared host-tool console formatting boundary used by current command-line content and shader tools
+**Scope:** shared host-tool console formatting, output paths, source-asset lookup and project preparation metadata
 
-**Owner:** `Tools/Support/ToolConsoleSupport` / `ToolConsoleSupport`
+**Owner:** `Tools/Support/ToolSupport` / `ToolSupport`
 
 **Evidence and disposition:** [Capability Evidence Plan](../../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../../Acceptance/FirstRelease.md)
 
@@ -28,7 +28,11 @@ The library standardizes presentation and one deliberately narrow cross-process 
 
 ## Module Boundary
 
-`ToolConsoleSupport` is a C++20 static host-tool library. CMake includes it only when host tools are enabled and excludes it from default game-profile builds. AssetCooker, TextureCooker, ShaderCompiler, and Launcher host-tool code link it; Game and Editor logging remain separate Core/Application facilities.
+`ToolSupport` is a C++20 static host-tool library. CMake includes it only when host tools are enabled and excludes it from default game-profile builds. AssetCooker, TextureCooker, ShaderCompiler, and Launcher host-tool code link it; Engine does not link it. Game and Editor logging remain separate Core/Application facilities.
+
+**Preparation ownership, 2026-11-01:** the existing library also owns `ToolOutputPaths` and `ProjectLevelCatalog`, moved out of Core without aliases. `ProjectLevelSelectionWriter` owns only the catalog Selected-field updates. Launcher and Cooker use the catalog for source acquisition and cook selection; runtime loads ordinary level documents and cooked files without this model. The [Launcher contract](../Launcher/LauncherCapabilities.md#content-cook-run-and-maintenance-operations) owns preparation behavior. The original console snapshot and readiness above retain their evidence limits.
+
+**Source-path ownership, 2026-11-01:** at revision `81c6a4e4` plus the working-tree cleanup, `SourceAssetPaths` owns project-before-engine source lookup for shaders, textures and meshes, plus the imported-texture cache location. Source roots are derived on demand from Core's engine/project roots rather than retained in a second cache. `ToolOutputPaths` owns the compiler dependency-manifest location. Importers and cookers use private ToolSupport dependencies; runtime has no source-family vocabulary or ToolSupport dependency. This source/build boundary does not qualify cooked content, GPU output or a release candidate.
 
 ## Capability Surface
 
@@ -40,11 +44,11 @@ The library standardizes presentation and one deliberately narrow cross-process 
 | `TOOL-004` | Summaries and lists | Implemented path | Prints titled multi-line summaries plus indexed list headers/items. Layout is intended for readable CLI diagnostics; no schema/version guarantees parser compatibility. | `S` |
 | `TOOL-005` | Path display helpers | Implemented path | Produces a filename for compact display when present and falls back to the whole path. It does not normalize, validate, redact, relativize, or resolve paths. | `S` |
 | `TOOL-006` | Current consumers | Implemented path | AssetCooker reports stage and scene progress; TextureCooker reports request and publication progress; ShaderCompiler reports planning, compile, verification, and publication progress. Launcher-owned build, dependency, level, cook, and run executors report exact plan-step progress and preserve nested tool progress. | `S` |
-| `TOOL-007` | Game-profile isolation | Implemented path | Host-tool target configuration excludes the library from default game configurations, and no Engine/product target links it in the inspected build graph. Final binary/package absence remains unproven. | `S` |
+| `TOOL-007` | Game-profile isolation | Implemented path | Host-tool target configuration excludes the library from default game configurations. Engine modules and game executables do not link it; the Editor executable may bind optional tool operations at composition. Final binary/package absence remains unproven. | `S` |
 
 ## Vertical Tool-Diagnostic Trace
 
-Cooker/compiler or Launcher plan owns a phase and its real work count -> `ToolWorkProgressWriter` suppresses redundant percentage updates and emits a flushed progress record -> Launcher captures the stream, parses only that shared record, and updates the activity phase/bar -> ordinary output remains visible in the run log -> operation-specific code owns exit status and success/failure semantics. `ToolConsoleSupport` does not own process launch, log retention, cancellation, or result classification.
+Cooker/compiler or Launcher plan owns a phase and its real work count -> `ToolWorkProgressWriter` suppresses redundant percentage updates and emits a flushed progress record -> Launcher captures the stream, parses only that shared record, and updates the activity phase/bar -> ordinary output remains visible in the run log -> operation-specific code owns exit status and success/failure semantics. `ToolSupport` does not own process launch, log retention, cancellation, or result classification.
 
 ## Progress Contract
 

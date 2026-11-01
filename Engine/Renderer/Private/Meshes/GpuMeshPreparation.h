@@ -33,6 +33,7 @@ struct GpuMeshPreparedData final
 class GpuMeshPreparation final
 {
 public:
+	static std::uint64_t CalculateDecodedByteSize(const ImmutableRenderMeshHandle& source);
 	static GpuMeshPreparedData Build(const ImmutableRenderMeshHandle& source);
 	static VertexSkinInfluenceData ConvertSkinInfluence(const VertexSkinInfluence& influence) noexcept;
 

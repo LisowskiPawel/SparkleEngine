@@ -19,7 +19,7 @@ namespace SparkleLauncher
 
 	struct LauncherOperationRequest
 	{
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		QString RunId;
 		QString OperationId;
 		QString ContentId;
@@ -34,6 +34,7 @@ namespace SparkleLauncher
 		QString SourceDependencyId;
 		QString HostToolId;
 		QString ShaderBackend;
+		bool ShaderSymbols = false;
 		QString GraphicsApi;
 		ExternalCaptureProvider CaptureProvider = ExternalCaptureProvider::None;
 		RhiGpuCrashMode GpuCrashMode = RhiGpuCrashMode::Off;

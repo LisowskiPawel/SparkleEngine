@@ -12,7 +12,6 @@ struct EditorCommandPair final
 {
 	WorldEditCommand Forward;
 	WorldEditCommand Inverse;
-	std::string CoalescingKey;
 };
 
 // Pure translation from an immutable editor model and user intent to semantic world commands.

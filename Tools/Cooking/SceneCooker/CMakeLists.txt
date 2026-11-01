@@ -39,6 +39,8 @@ target_link_libraries(SceneCooker
         SourceImporters
         SparkleCore
         SparkleGameFramework
+    PRIVATE
+        ToolSupport
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SCENE_COOKER_PUBLIC_HEADERS})

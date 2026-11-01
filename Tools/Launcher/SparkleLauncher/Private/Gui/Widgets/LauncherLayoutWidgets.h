@@ -50,10 +50,10 @@ namespace SparkleLauncher
 		double m_aspectRatio = 16.0 / 9.0;
 	};
 
-	class HomeHeroCardWidget final : public QFrame
+	class SceneHeroCardWidget final : public QFrame
 	{
 	public:
-		explicit HomeHeroCardWidget(QPixmap source, QWidget* parent = nullptr);
+		explicit SceneHeroCardWidget(QPixmap source, QWidget* parent = nullptr);
 
 		void SetCopyPane(QWidget* copyPane);
 

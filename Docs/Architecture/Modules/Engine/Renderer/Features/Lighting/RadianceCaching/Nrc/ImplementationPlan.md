@@ -103,7 +103,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Start:** NRC-S4 and product preflight/failures qualified.
 
-**Work:** Package exact SDK/runtime/shader/license identities, supported matrix and classical choices. The author or agent reproduces the SHaRC/NRC comparison and one failure/recovery sequence from the delivered instructions.
+**Work:** Join exact SDK/runtime/shader/license identities, supported matrix and classical choices to the [shared candidate](../../../../../../../../Acceptance/FirstRelease.md#shared-delivery-evidence). Its documented rehearsal covers the SHaRC/NRC comparison and one failure/recovery sequence; no separate NRC package or adoption campaign.
 
 **Cleanup:** Remove temporary training/debug/sample systems and stale completed instructions; retain only required runtime dependencies.
 

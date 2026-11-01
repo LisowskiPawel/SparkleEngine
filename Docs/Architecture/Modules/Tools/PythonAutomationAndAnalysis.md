@@ -40,11 +40,11 @@ The current tree contains two Showcase-oriented source-conversion scripts. They 
 
 ## Target Contract
 
-The selected `PY-03` consumer is the [Graphics Workload Studies plan](../../CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md): one offline analysis CLI over the existing workload schema, with per-run comparisons/plots and identity/partial-input negatives. This is target work after its discovery/release admission, not an implemented Python layer or runtime binding promise.
+The selected `PY-03` consumer is the [Graphics Workload Studies plan](../../CrossModule/PerformanceDiagnostics/WorkloadStudies/ImplementationPlan.md): one useful offline comparison over existing workload/native exports, with per-run tables/plots and identity/partial-input negatives. Existing tools plus a small study-local script suffice; a maintained CLI is not required. This is target work after its discovery/release admission, not an implemented Python layer or runtime binding promise.
 
 A future tool names its actual consumer: an existing native asset/tool boundary or the engineer using the study output. Freeze interpreter/dependencies, current input/output contract and hashes, path policy, resource bounds, exits and cancellation/publication. Native ingestion validates bytes when it exists. For standalone analysis, frozen-input repeat, independent reanalysis and explicit schema/identity negatives validate the derivative output; do not add a native consumer solely to satisfy a template. Domain meaning remains with the workload/asset owner, with one current representation and no internal version dispatch.
 
-The selected delivery is the workload analyzer. Conversion/training preparation stays inside its existing feature owner and does not select a reusable build orchestrator, automation framework or additional Python product. Runtime embedding, editor scripting and public bindings remain unselected; documenting their absence does not schedule them.
+The selected output is reproducible workload analysis. A new supported analyzer command or Tools package needs demonstrated repeated use; study-local calculations can remain with ignored evidence. Conversion/training preparation stays inside its existing feature owner and does not select a reusable build orchestrator, automation framework or additional Python product. Runtime embedding, editor scripting and public bindings remain unselected; documenting their absence does not schedule them.
 
 ## Acceptance Handoff
 

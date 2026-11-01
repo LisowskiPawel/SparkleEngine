@@ -16,6 +16,8 @@
 
 **Current readiness:** **50/100** — the source-integrated shader route is substantial; candidate compiler/backend/ABI, failure, performance, package, and adoption evidence remains absent. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#foundation-world-content-shaders-and-tools).
 
+**Preparation ownership amendment, 2026-11-01:** Launcher owns compilation/cooking through the existing tool executable. Editor offers explicit Recompile Shaders and private symbol export, invoking that same `cook.shaders` operation through a tooling action bound by Showcase. Application runs the action in its existing cancellable Editor operation scope and reloads the ordinary map/library only after success. Engine owns no tool paths, compiler flags or source selection. The former compiler process owner, source watcher, recook queue and `recook.signal` receipt protocol stay deleted; the compiler emits no signal. This explicit full-catalog frontend does not complete the target Apply Changed UX below. Generic multi-file safety and runtime map/library validation remain; historical evidence below retains its original candidate. [Current source checks](../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json).
+
 ## Read This Page
 
 - **Understand the design:** [Decision summary](#decision-summary), [target shape](#target-shape) and [full lifecycle](#full-lifecycle).

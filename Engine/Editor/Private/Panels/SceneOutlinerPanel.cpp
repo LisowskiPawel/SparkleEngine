@@ -239,7 +239,7 @@ void SceneOutlinerPanel::ToggleEntryVisibility(const SceneObjectSelection& selec
 	{
 		return;
 	}
-	(void) m_transactionHistory->Execute(std::move(commands->Forward), std::move(commands->Inverse), m_model->GetWorldGeneration(), std::move(commands->CoalescingKey));
+	(void) m_transactionHistory->Execute(std::move(commands->Forward), std::move(commands->Inverse), m_model->GetWorldGeneration());
 }
 
 void SceneOutlinerPanel::SelectEntry(const SceneObjectSelection& selection) noexcept

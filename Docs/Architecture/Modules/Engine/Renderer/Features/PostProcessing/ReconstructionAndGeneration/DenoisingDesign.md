@@ -40,6 +40,8 @@ Compare raw estimator, classical denoise, SR-only and RR in meaningful compatibl
 
 ## Acceptance And Controlled Failures
 
+The raw/classical/SR/RR frontier closes this subject's local value gate without an owned-CNN prerequisite. NG-S6a consumes the qualified baseline and owns its component-matched neural comparison. Reuse applicable original records there; absence of a trained model does not block RELAX, and a local reconstruction pass grants no neural acceptance.
+
 | Criterion | Required falsifier/evidence |
 | --- | --- |
 | `AC-REC-01` signals | Named guide semantics with analytic motion/depth/normal/exposure and deliberate wrong-guide counterexamples; correct producer identity |

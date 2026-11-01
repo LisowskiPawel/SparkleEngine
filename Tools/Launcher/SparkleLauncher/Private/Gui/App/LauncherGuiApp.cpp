@@ -6,7 +6,7 @@
 #include "LauncherRootResolver.h"
 #include "LauncherSettings.h"
 #include "LauncherShadowExecution.h"
-#include "SparkleLauncher/RepositoryLocator.h"
+#include "SparkleLauncher/WorkspaceLocator.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <QtCore/QCoreApplication>
@@ -49,7 +49,7 @@ namespace SparkleLauncher
 #endif
 	}
 
-	static std::filesystem::path FindRequestedRepositoryRoot(int argc, char** argv)
+	static std::filesystem::path FindRequestedWorkspaceRoot(int argc, char** argv)
 	{
 		for (int index = 1; index + 1 < argc; ++index)
 		{
@@ -69,31 +69,31 @@ namespace SparkleLauncher
 
 		std::string repositoryError;
 
-		const std::optional<std::filesystem::path> repository = TryResolveLauncherRoot(
-		    FindRequestedRepositoryRoot(argc, argv),
+		const std::optional<std::filesystem::path> workspace = TryResolveLauncherRoot(
+		    FindRequestedWorkspaceRoot(argc, argv),
 		    std::filesystem::path(QCoreApplication::applicationDirPath().toStdWString()),
 		    repositoryError);
 
-		if (!repository)
+		if (!workspace)
 		{
 			QMessageBox::critical(nullptr, QStringLiteral("Sparkle Launcher"), QString::fromStdString("Launcher startup failed. " + repositoryError));
 			return 1;
 		}
 
-		const std::filesystem::path repositoryRoot = *repository;
+		const std::filesystem::path workspaceRoot = *workspace;
 		std::error_code errorCode;
-		std::filesystem::current_path(repositoryRoot, errorCode);
-		if (errorCode || !QDir::setCurrent(QString::fromStdWString(repositoryRoot.wstring())))
+		std::filesystem::current_path(workspaceRoot, errorCode);
+		if (errorCode || !QDir::setCurrent(QString::fromStdWString(workspaceRoot.wstring())))
 		{
 			QMessageBox::critical(
 			    nullptr,
 			    QStringLiteral("Sparkle Launcher"),
-			    QString::fromStdString("Launcher startup failed. Repository working directory could not be selected: " + repositoryRoot.string()));
+			    QString::fromStdString("Launcher startup failed. Repository working directory could not be selected: " + workspaceRoot.string()));
 
 			return 1;
 		}
 
-		const LauncherShadowStartResult shadow = StartLauncherShadow(repositoryRoot, {"--root", repositoryRoot.string()}, LauncherShadowCompletionPolicy::ReleaseCallingArtifact);
+		const LauncherShadowStartResult shadow = StartLauncherShadow(workspaceRoot, {"--root", workspaceRoot.string()}, LauncherShadowCompletionPolicy::ReleaseCallingArtifact);
 		if (shadow.State == LauncherShadowStartState::Started)
 		{
 			return shadow.ExitCode;
@@ -107,12 +107,12 @@ namespace SparkleLauncher
 		QTimer::singleShot(
 		    0,
 		    &application,
-		    [repositoryRoot]()
+		    [workspaceRoot]()
 		    {
 			    auto* settings = new LauncherSettings();
 			    auto* contentModel = new LauncherContentModel();
 			    auto* backend = new LauncherBackend();
-			    auto* mainWindow = new LauncherMainWindow(repositoryRoot, *contentModel, *settings, *backend);
+			    auto* mainWindow = new LauncherMainWindow(workspaceRoot, *contentModel, *settings, *backend);
 			    ForceShowWindow(*mainWindow);
 			    QTimer::singleShot(0, mainWindow, [mainWindow]() { ForceShowWindow(*mainWindow); });
 			    QTimer::singleShot(250, mainWindow, [mainWindow]() { ForceShowWindow(*mainWindow); });

@@ -4,8 +4,7 @@
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Paths/WorkspaceUserStatePaths.h"
 
-#include "Core/Public/FileSystemUtils.h"
-#include "Core/Public/Paths/PackagePaths.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "FileSystemDiscovery.h"
 #include "UserStatePaths.h"
@@ -28,8 +27,6 @@
 
 namespace Filesystem::Private
 {
-	constexpr std::string_view FirstReleaseStateVersion = "v0.1";
-
 	std::filesystem::path DiscoverPlatformLocalStateRoot()
 	{
 #if defined(_WIN32)
@@ -140,14 +137,6 @@ namespace Filesystem
 
 	ProductUserStatePaths Private::ResolveCurrentProductUserStatePaths()
 	{
-		if (const auto packageRoot = DiscoverPackageRoot())
-		{
-			const auto projectRoot = DiscoverPackageProjectRoot(*packageRoot);
-
-			return Private::BuildProductUserStatePaths(
-			    Private::ResolveSparkleUserStateRoot() / Private::ResolveProductName(projectRoot.value_or(std::filesystem::path{})) / Private::FirstReleaseStateVersion);
-		}
-
 		const std::filesystem::path workspaceRoot = ResolveWorkspaceRootPath();
 		const auto projectRoot = DiscoverProjectRoot();
 		return ResolveDevelopmentProductUserStatePaths(workspaceRoot, Private::ResolveProductName(projectRoot.value_or(std::filesystem::path{})));

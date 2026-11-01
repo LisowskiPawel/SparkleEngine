@@ -65,4 +65,7 @@ namespace Process
 	};
 
 	SPARKLE_CORE_API ChildProcessResult RunChildProcess(const ChildProcessRequest& request);
+	// Launches another instance with the current command line and working directory.
+	// A successful launch transfers the child's lifetime to the OS; the caller decides when to close itself.
+	SPARKLE_CORE_API bool RelaunchCurrentProcess();
 }

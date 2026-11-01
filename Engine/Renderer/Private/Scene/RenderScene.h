@@ -65,7 +65,6 @@ public:
 
 	const RenderMaterialTable& GetMaterials() const noexcept { return m_materials; }
 
-	const RenderTextureTable& GetTextures() const noexcept { return m_textures; }
 
 	const std::optional<SceneSkyDesc>& GetSky() const noexcept { return m_sky; }
 
@@ -122,9 +121,9 @@ private:
 	std::unique_ptr<RenderGpuScene> m_renderGpuScene;
 	std::unique_ptr<RenderRayTracingScene> m_renderRayTracingScene;
 	GpuMeshCache* m_gpuMeshCache = nullptr;
+	TextureCache* m_textureCache = nullptr;
 	std::unique_ptr<MaterialCache> m_materialCache;
 	RenderMaterialTable m_materials;
-	RenderTextureTable m_textures;
 	std::optional<SceneSkyDesc> m_sky;
 	std::vector<RenderMeshInstanceGroupData> m_instanceGroups;
 	std::vector<RenderLightData> m_lights;

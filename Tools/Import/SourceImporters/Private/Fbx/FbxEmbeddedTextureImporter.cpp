@@ -2,11 +2,12 @@
 
 #include "Fbx/FbxEmbeddedTextureImporter.h"
 
+#include "SourceAssetPaths.h"
+
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Formatting/HexFormat.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "Core/Public/Strings/StringUtils.h"
 
@@ -162,7 +163,7 @@ std::vector<std::filesystem::path> FbxEmbeddedTextureImporter::ExtractTextures(c
 		const FbxEmbeddedTextureEncoding::Payload payload = FbxEmbeddedTextureEncoding::BuildFilePayload(*texture);
 
 		const std::uint64_t contentHash = Hash::Fnv1a64(payload.Bytes.data(), payload.Bytes.size());
-		const std::filesystem::path cachePath = Paths::ImportedTextureCacheRoot() / (Formatting::FormatHexUInt64(contentHash) + payload.Extension);
+		const std::filesystem::path cachePath = SparkleTools::ImportedTextureCacheRoot() / (Formatting::FormatHexUInt64(contentHash) + payload.Extension);
 		std::error_code errorCode;
 		const bool cacheEntryExists = std::filesystem::exists(cachePath, errorCode);
 		if (errorCode)

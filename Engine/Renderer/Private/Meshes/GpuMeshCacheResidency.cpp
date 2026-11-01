@@ -77,6 +77,15 @@ void GpuMeshCache::LaunchPendingPreparations()
 		{
 			continue;
 		}
+		const std::uint64_t decodedBytes = GpuMeshPreparation::CalculateDecodedByteSize(request.Source);
+		if (decodedBytes > m_residency.GetBudget().MaximumDecodedBytes)
+		{
+			Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh preparation exceeds the decoded-byte budget.");
+		}
+		if (!m_residency.BeginDecoding(request.Generation, decodedBytes))
+		{
+			continue;
+		}
 
 		LaunchPreparation(request);
 		--availableSlots;
@@ -139,10 +148,6 @@ void GpuMeshCache::ConsumeCompletedPreparations() noexcept
 			Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh preparation produced no payload.");
 		}
 
-		if (!m_residency.BeginDecoding(request.Generation))
-		{
-			Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh generation could not enter decoding.");
-		}
 		const std::uint64_t decodedBytes = request.Prepared->GetDecodedByteSize();
 		if (!m_residency.PublishReadyForUpload(request.Generation, decodedBytes, request.Prepared->GetResidentByteSize()))
 		{

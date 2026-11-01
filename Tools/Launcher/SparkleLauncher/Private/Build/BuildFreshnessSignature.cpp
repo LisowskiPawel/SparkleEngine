@@ -1,6 +1,6 @@
 #include "BuildFreshnessSignature.h"
 
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "Core/Public/Strings/StringUtils.h"
@@ -33,18 +33,18 @@ namespace SparkleLauncher
 		return normalized.find("/third_party/") != std::string::npos || normalized.find("\\third_party\\") != std::string::npos;
 	}
 
-	std::string MakeFreshnessSignaturePath(const std::filesystem::path& repositoryRoot, const std::filesystem::path& path)
+	std::string MakeFreshnessSignaturePath(const std::filesystem::path& workspaceRoot, const std::filesystem::path& path)
 	{
-		const std::optional<std::filesystem::path> relativePath = Paths::TryMakeRelativeUnderRoot(path, repositoryRoot);
+		const std::optional<std::filesystem::path> relativePath = Paths::TryMakeRelativeUnderRoot(path, workspaceRoot);
 		std::string value = relativePath.has_value() ? relativePath->generic_string() : path.filename().generic_string();
 		std::replace(value.begin(), value.end(), '/', '\\');
 		return Strings::ToLowerCopy(value);
 	}
 
-	std::vector<std::filesystem::path> CollectBuildInputPaths(const std::filesystem::path& repositoryRoot)
+	std::vector<std::filesystem::path> CollectBuildInputPaths(const std::filesystem::path& workspaceRoot)
 	{
 		std::vector<std::filesystem::path> paths;
-		const std::filesystem::path rootCMake = repositoryRoot / "CMakeLists.txt";
+		const std::filesystem::path rootCMake = workspaceRoot / "CMakeLists.txt";
 		std::error_code errorCode;
 		if (std::filesystem::is_regular_file(rootCMake, errorCode))
 		{
@@ -54,7 +54,7 @@ namespace SparkleLauncher
 		static const std::array<std::string_view, 4> directories = {"CMake", "Engine", "Tools", "Projects"};
 		for (std::string_view directory : directories)
 		{
-			const std::filesystem::path root = repositoryRoot / std::string(directory);
+			const std::filesystem::path root = workspaceRoot / std::string(directory);
 			if (!std::filesystem::is_directory(root, errorCode))
 			{
 				continue;
@@ -77,13 +77,13 @@ namespace SparkleLauncher
 		return paths;
 	}
 
-	std::optional<std::string> ComputeSourceListHash(const std::filesystem::path& repositoryRoot)
+	std::optional<std::string> ComputeSourceListHash(const std::filesystem::path& workspaceRoot)
 	{
 		std::vector<std::string> relativePaths;
 		static const std::array<std::string_view, 3> directories = {"Engine", "Tools", "Projects"};
 		for (std::string_view directory : directories)
 		{
-			const std::filesystem::path root = repositoryRoot / std::string(directory);
+			const std::filesystem::path root = workspaceRoot / std::string(directory);
 			std::error_code errorCode;
 			if (!std::filesystem::is_directory(root, errorCode))
 			{
@@ -97,7 +97,7 @@ namespace SparkleLauncher
 				const std::filesystem::directory_entry entry = *iterator;
 				if (entry.is_regular_file(errorCode) && IsSourceFile(entry.path()) && !IsUnderThirdParty(entry.path()))
 				{
-					relativePaths.push_back(MakeFreshnessSignaturePath(repositoryRoot, entry.path()));
+					relativePaths.push_back(MakeFreshnessSignaturePath(workspaceRoot, entry.path()));
 				}
 				iterator.increment(errorCode);
 				errorCode.clear();

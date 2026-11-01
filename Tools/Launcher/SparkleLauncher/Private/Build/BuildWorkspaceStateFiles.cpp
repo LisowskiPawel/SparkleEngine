@@ -2,7 +2,7 @@
 
 #include "Core/Public/Json/JsonReader.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "ToolOutputPaths.h"
 
 #include <chrono>
 #include <cctype>
@@ -52,9 +52,9 @@ namespace SparkleLauncher
 		return Json::TryReadStringProperty(buffer.str(), key, value) ? std::optional<std::string>(value) : std::nullopt;
 	}
 
-	std::optional<std::string> ReadRootCMakeProjectName(const std::filesystem::path& repositoryRoot)
+	std::optional<std::string> ReadRootCMakeProjectName(const std::filesystem::path& workspaceRoot)
 	{
-		std::ifstream stream(repositoryRoot / "CMakeLists.txt");
+		std::ifstream stream(workspaceRoot / "CMakeLists.txt");
 		if (!stream.is_open())
 		{
 			return std::nullopt;
@@ -86,10 +86,10 @@ namespace SparkleLauncher
 		return std::nullopt;
 	}
 
-	std::filesystem::path GetBuildSolutionPath(const std::filesystem::path& repositoryRoot)
+	std::filesystem::path GetBuildSolutionPath(const std::filesystem::path& workspaceRoot)
 	{
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		const std::filesystem::path solutionBasePath = workspaceOutputs.BuildRoot / ReadRootCMakeProjectName(repositoryRoot).value_or("Sparkle");
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
+		const std::filesystem::path solutionBasePath = workspaceOutputs.BuildRoot / ReadRootCMakeProjectName(workspaceRoot).value_or("Sparkle");
 		std::filesystem::path candidate = solutionBasePath;
 		candidate += ".sln";
 		if (std::filesystem::exists(candidate))

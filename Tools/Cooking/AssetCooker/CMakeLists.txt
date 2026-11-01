@@ -8,7 +8,9 @@ set(ASSET_COOKER_CORE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/CatalogedLevelSceneReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Planning/ProjectCookPlanner.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerDispatcher.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerStageExecutor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookShaders.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookTextures.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookSceneAssets.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerToolProcess.cpp
 )
 
@@ -23,7 +25,7 @@ set(ASSET_COOKER_CORE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/CatalogedLevelSceneReader.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Planning/ProjectCookPlanner.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerDispatcher.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerStageExecutor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/AssetCookStages.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerToolProcess.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Planning/ProjectCookPlan.h
 )
@@ -58,7 +60,7 @@ set(ASSET_COOKER_COOKING_LINK_LIBRARIES
     MaterialCooker
     SceneCooker
     TextureCookShared
-    ToolConsoleSupport
+    ToolSupport
     SparkleCore
     SparkleGameFramework
     SparkleTasks

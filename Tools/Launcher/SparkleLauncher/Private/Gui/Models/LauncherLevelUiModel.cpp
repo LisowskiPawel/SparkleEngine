@@ -1,9 +1,11 @@
 #include "LauncherLevelUiModel.h"
 
 #include "LauncherContentModel.h"
+#include "../../Cook/CookedContentReadiness.h"
+#include "LauncherProductPaths.h"
 
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Projects/ProjectLevelCatalog.h"
+#include "ProjectLevelCatalog.h"
 
 #include <QtCore/QStringList>
 
@@ -39,16 +41,20 @@ namespace SparkleLauncher
 				return std::move(m_model);
 			}
 
+			const auto root = m_content.RootPath.parent_path().parent_path();
+			const auto cooked = InspectCookedContentReadiness(root, m_content.Id.toStdString());
+			std::error_code sourceError;
+			const bool hasSourceTools = std::filesystem::is_regular_file(root / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) && !sourceError;
 			m_model.Levels.reserve(static_cast<qsizetype>(m_catalog.levels.size()));
 			for (const ProjectLevelCatalogEntry& level : m_catalog.levels)
 			{
-				m_model.Levels.push_back(BuildLevel(level));
+				m_model.Levels.push_back(BuildLevel(level, cooked, hasSourceTools));
 			}
 			return std::move(m_model);
 		}
 
 	private:
-		LauncherLevelUiEntry BuildLevel(const ProjectLevelCatalogEntry& level) const
+		LauncherLevelUiEntry BuildLevel(const ProjectLevelCatalogEntry& level, const CookedContentReadiness& cooked, bool hasSourceTools) const
 		{
 			const auto pack = level.assetPackId.empty() ? m_catalog.assetPacks.end() : m_catalog.assetPacks.find(level.assetPackId);
 			const ProjectAssetPack* assetPack = pack == m_catalog.assetPacks.end() ? nullptr : &pack->second;
@@ -56,11 +62,12 @@ namespace SparkleLauncher
 			const bool levelSourceReady = std::filesystem::exists(level.sourcePath, sourceError) && !sourceError;
 			const bool packSourceReady = assetPack == nullptr || m_catalog.IsAssetPackSourceReady(assetPack->id);
 			const bool gameSupported = assetPack == nullptr || assetPack->gameSupported;
+			const bool ready = levelSourceReady && (level.id == "Empty" || cooked.MeshesReady) && cooked.TexturesReady && cooked.Shaders == CookedShaderPublicationState::Ready;
 			const bool acquisitionSupported = assetPack != nullptr && assetPack->downloadSupported;
 			const bool sourceReady = levelSourceReady && packSourceReady;
-			const bool canSelect = levelSourceReady && gameSupported && (assetPack == nullptr || packSourceReady || acquisitionSupported);
-			const bool canSync = levelSourceReady && assetPack != nullptr && acquisitionSupported && !packSourceReady;
-			const bool canClean = levelSourceReady && assetPack != nullptr && packSourceReady;
+			const bool canSelect = gameSupported && (ready || (hasSourceTools && levelSourceReady && (assetPack == nullptr || packSourceReady || acquisitionSupported)));
+			const bool canSync = hasSourceTools && levelSourceReady && assetPack != nullptr && acquisitionSupported && !packSourceReady;
+			const bool canClean = hasSourceTools && levelSourceReady && assetPack != nullptr && packSourceReady;
 
 			LauncherLevelUiEntry entry{
 			    .Id = QString::fromStdString(level.id),
@@ -73,7 +80,7 @@ namespace SparkleLauncher
 			    .Selected = level.selected,
 			    .SourceReady = sourceReady,
 			    .GameSupported = gameSupported,
-			    .Ready = m_catalog.IsLevelReady(level),
+			    .Ready = ready,
 			    .CanSelect = canSelect,
 			    .CanSync = canSync,
 			    .CanClean = canClean};
@@ -95,7 +102,7 @@ namespace SparkleLauncher
 			}
 			if (pack == nullptr)
 			{
-				return QStringLiteral("This repository map has no available source content.");
+				return QStringLiteral("This workspace map has no available source content.");
 			}
 			if (!packSourceReady && !pack->downloadSupported)
 			{
@@ -133,7 +140,7 @@ namespace SparkleLauncher
 				}
 			}
 
-			return traits.empty() ? QStringLiteral("Repository map") : traits.join("  ·  ");
+			return traits.empty() ? QStringLiteral("Workspace map") : traits.join("  ·  ");
 		}
 
 		std::uintmax_t ArchiveChainBytes(const ProjectAssetPack* pack) const
@@ -170,7 +177,7 @@ namespace SparkleLauncher
 			{
 				return "Unavailable";
 			}
-			if (level.Selected && level.Ready)
+			if (level.Ready)
 			{
 				return "Ready";
 			}
@@ -187,7 +194,7 @@ namespace SparkleLauncher
 			{
 				return "warning";
 			}
-			if (level.Selected && level.Ready)
+			if (level.Ready)
 			{
 				return "ok";
 			}

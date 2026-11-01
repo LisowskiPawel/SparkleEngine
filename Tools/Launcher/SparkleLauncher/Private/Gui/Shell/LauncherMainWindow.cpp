@@ -3,11 +3,9 @@
 #include "LauncherActivityPanel.h"
 #include "LauncherWorkflowPanel.h"
 #include "LauncherActionWidgets.h"
-#include "LauncherArtworkWidgets.h"
 #include "LauncherBackend.h"
 #include "LauncherCleanUiModel.h"
 #include "LauncherDependencyUiModel.h"
-#include "LauncherHomeWidgets.h"
 #include "LauncherIconLibrary.h"
 #include "LauncherLayoutWidgets.h"
 #include "LauncherLevelUiModel.h"
@@ -125,9 +123,9 @@ namespace SparkleLauncher
 		return "This workflow is currently blocked.";
 	}
 
-	LauncherMainWindow::LauncherMainWindow(std::filesystem::path repositoryRoot, LauncherContentModel& contentModel, LauncherSettings& settings, LauncherBackend& backend, QWidget* parent) :
+	LauncherMainWindow::LauncherMainWindow(std::filesystem::path workspaceRoot, LauncherContentModel& contentModel, LauncherSettings& settings, LauncherBackend& backend, QWidget* parent) :
 	    QMainWindow(parent),
-	    m_repositoryRoot(std::move(repositoryRoot)),
+	    m_workspaceRoot(std::move(workspaceRoot)),
 	    m_contentModel(contentModel),
 	    m_settings(settings),
 	    m_backend(backend)
@@ -238,7 +236,7 @@ namespace SparkleLauncher
 
 		if (refreshContent)
 		{
-			m_contentModel.Refresh(m_repositoryRoot);
+			m_contentModel.Refresh(m_workspaceRoot);
 			RefreshContextSelectors();
 		}
 
@@ -405,24 +403,24 @@ namespace SparkleLauncher
 		}
 
 		m_runButton->setVisible(true);
-		const bool isLevelCatalog = m_selectedOperationId == LauncherHomeOperationId();
+		const bool isLevelCatalog = m_selectedOperationId == LauncherScenesOperationId();
 		m_cleanButton->setVisible(isLevelCatalog || SupportsActionSpecificClean(m_selectedOperationId));
 
 		if (OperationNeedsContent(m_selectedOperationId) && m_contentModel.ContentId().isEmpty())
 		{
-			const QString reason = "Repository content is unavailable. Confirm this is a complete Sparkle workspace, then regenerate build files if needed.";
+			const QString reason = "Workspace content is unavailable. Confirm this is a complete Sparkle workspace, then regenerate build files if needed.";
 			m_runButton->setEnabled(false);
 			m_runButton->setToolTip(reason);
 			m_runButton->setAccessibleDescription(reason);
 			m_cleanButton->setEnabled(false);
-			m_cleanButton->setToolTip("Repository content is unavailable for this clean action.");
-			m_cleanButton->setAccessibleDescription("Repository content is unavailable for this clean action.");
+			m_cleanButton->setToolTip("Workspace content is unavailable for this clean action.");
+			m_cleanButton->setAccessibleDescription("Workspace content is unavailable for this clean action.");
 			return;
 		}
 
 		const QVector<LauncherCleanTarget> cleanTargets = SupportsActionSpecificClean(m_selectedOperationId)
 		    ? BuildActionSpecificCleanTargets(
-		          BuildActionCleanTargetContext(m_repositoryRoot, m_contentModel, m_settings, std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()), m_selectedOperationId))
+		          BuildActionCleanTargetContext(m_workspaceRoot, m_contentModel, m_settings, std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()), m_selectedOperationId))
 		    : QVector<LauncherCleanTarget>();
 
 		const bool cleanWorkspaceSelected = m_selectedOperationId == "workspace.clean";
@@ -482,7 +480,7 @@ namespace SparkleLauncher
 
 		if (FindBuildWorkspaceOperationDefinition(m_selectedOperationId.toStdString()).has_value())
 		{
-			const BuildWorkspaceOperationRequest request = BuildWorkspacePlanRequest(m_repositoryRoot, m_contentModel, m_settings);
+			const BuildWorkspaceOperationRequest request = BuildWorkspacePlanRequest(m_workspaceRoot, m_contentModel, m_settings);
 			const BuildWorkspaceOperationPlan plan = PlanBuildWorkspaceOperation(m_selectedOperationId.toStdString(), request);
 			const QString reason = plan.CanRun ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going." : FirstBlockingReadinessMessage(plan);
 			m_runButton->setEnabled(plan.CanRun);
@@ -493,7 +491,7 @@ namespace SparkleLauncher
 
 		if (FindCookOperationDefinition(m_selectedOperationId.toStdString()).has_value())
 		{
-			const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_repositoryRoot, m_contentModel, m_settings, m_selectedOperationId);
+			const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
 			const CookOperationPlan plan = PlanCookOperation(m_selectedOperationId.toStdString(), LauncherOperationRequestMapping::Cook(operationRequest));
 
 			const QString reason = plan.CanRun
@@ -525,7 +523,7 @@ namespace SparkleLauncher
 		{
 			const bool destructive = operationId == "workspace.clean";
 			LauncherIcon actionIcon = LauncherIcon::Run;
-			if (operationId == LauncherHomeOperationId() || operationId.startsWith("workspace.sync"))
+			if (operationId == LauncherScenesOperationId() || operationId.startsWith("workspace.sync"))
 			{
 				actionIcon = LauncherIcon::Sync;
 			}
@@ -543,22 +541,22 @@ namespace SparkleLauncher
 			}
 			m_runButton->setProperty("ActionTone", destructive ? "destructive" : "primary");
 			m_runButton->setIcon(m_icons.Icon(actionIcon, QColor(destructive ? "#ffffff" : "#071006")));
-			m_runButton->setText(operationId == LauncherHomeOperationId() ? "Sync All" : operationId == "workspace.clean" ? "Clean" : PrimaryActionLabelForOperationId(operationId));
+			m_runButton->setText(operationId == LauncherScenesOperationId() ? "Sync All" : operationId == "workspace.clean" ? "Clean" : PrimaryActionLabelForOperationId(operationId));
 
 			m_runButton->setAccessibleName(
-			    operationId == LauncherHomeOperationId() ? "Sync all available levels"
-			        : operationId == "workspace.clean"   ? "Clean generated repository state"
-			                                             : "Run selected workflow");
+			    operationId == LauncherScenesOperationId() ? "Sync all available levels"
+			        : operationId == "workspace.clean"     ? "Clean generated repository state"
+			                                               : "Run selected workflow");
 
 			m_runButton->style()->unpolish(m_runButton);
 			m_runButton->style()->polish(m_runButton);
 		}
 		if (m_cleanButton != nullptr)
 		{
-			const bool cleanAllLevels = operationId == LauncherHomeOperationId();
+			const bool cleanAllLevels = operationId == LauncherScenesOperationId();
 			m_cleanButton->setProperty("ActionTone", "destructive");
 			m_cleanButton->setText(cleanAllLevels ? "Clean All" : "Clean");
-			m_cleanButton->setAccessibleName(operationId == LauncherHomeOperationId() ? "Clean all selected levels" : "Clean selected workflow outputs");
+			m_cleanButton->setAccessibleName(operationId == LauncherScenesOperationId() ? "Clean all selected levels" : "Clean selected workflow outputs");
 			m_cleanButton->style()->unpolish(m_cleanButton);
 			m_cleanButton->style()->polish(m_cleanButton);
 		}

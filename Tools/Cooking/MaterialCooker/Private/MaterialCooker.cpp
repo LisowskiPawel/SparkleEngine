@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 
 #include "MaterialCooker.h"
 
@@ -16,8 +16,9 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/BinaryStreamWriter.h"
 #include "Core/Public/Files/FileUtils.h"
+#include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
+#include "Core/Public/Paths/ProductFilePaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 
 #include <cstddef>

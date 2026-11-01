@@ -1,59 +1,41 @@
 #include "SparkleLauncher/ProjectResolver.h"
 
-#include "Core/Public/FileSystemUtils.h"
-#include "Core/Public/Paths/PackagePaths.h"
-#include "Core/Public/Paths/ProductPaths.h"
-#include "PackageContentStore.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 
 #include <system_error>
 
 namespace SparkleLauncher
 {
-	std::optional<LauncherProject> ResolveLauncherProject(const std::filesystem::path& repositoryRoot, std::string& outErrorMessage)
+	std::optional<LauncherProject> ResolveLauncherProject(const std::filesystem::path& workspaceRoot, std::string& outErrorMessage)
 	{
 		outErrorMessage.clear();
 
-		if (!Filesystem::IsSourceWorkspace(repositoryRoot))
-		{
-			if (!InitializePackageContentStore(repositoryRoot, outErrorMessage))
-			{
-				return std::nullopt;
-			}
-			const auto project = Filesystem::ResolvePackageSourceRoot(repositoryRoot);
-			if (!project)
-			{
-				outErrorMessage = "Invalid package content-store path.";
-				return std::nullopt;
-			}
-			return LauncherProject{project->filename().string(), *project};
-		}
-
-		const std::filesystem::path projectsDirectory = repositoryRoot / "Projects";
+		const std::filesystem::path projectsDirectory = workspaceRoot / "Projects";
 		std::error_code errorCode;
 		const bool projectsDirectoryExists = std::filesystem::exists(projectsDirectory, errorCode);
 		if (errorCode)
 		{
-			outErrorMessage = "Failed to inspect repository content directory: " + errorCode.message();
+			outErrorMessage = "Failed to inspect workspace content directory: " + errorCode.message();
 			return std::nullopt;
 		}
 
 		const bool projectsDirectoryIsDirectory = projectsDirectoryExists && std::filesystem::is_directory(projectsDirectory, errorCode);
 		if (errorCode)
 		{
-			outErrorMessage = "Failed to inspect repository content directory: " + errorCode.message();
+			outErrorMessage = "Failed to inspect workspace content directory: " + errorCode.message();
 			return std::nullopt;
 		}
 
 		if (!projectsDirectoryIsDirectory)
 		{
-			outErrorMessage = "Repository content directory was not found: " + projectsDirectory.string();
+			outErrorMessage = "Workspace content directory was not found: " + projectsDirectory.string();
 			return std::nullopt;
 		}
 
 		std::filesystem::directory_iterator projectIterator(projectsDirectory, errorCode);
 		if (errorCode)
 		{
-			outErrorMessage = "Failed to enumerate repository content: " + errorCode.message();
+			outErrorMessage = "Failed to enumerate workspace content: " + errorCode.message();
 			return std::nullopt;
 		}
 
@@ -67,7 +49,7 @@ namespace SparkleLauncher
 			const bool isDirectory = entry.is_directory(errorCode);
 			if (errorCode)
 			{
-				outErrorMessage = "Failed to inspect repository content entry: " + errorCode.message();
+				outErrorMessage = "Failed to inspect workspace content entry: " + errorCode.message();
 				return std::nullopt;
 			}
 
@@ -78,7 +60,7 @@ namespace SparkleLauncher
 				const bool markerExists = std::filesystem::exists(markerPath, errorCode);
 				if (errorCode)
 				{
-					outErrorMessage = "Failed to inspect repository content marker: " + errorCode.message();
+					outErrorMessage = "Failed to inspect workspace content marker: " + errorCode.message();
 					return std::nullopt;
 				}
 
@@ -98,14 +80,14 @@ namespace SparkleLauncher
 			projectIterator.increment(errorCode);
 			if (errorCode)
 			{
-				outErrorMessage = "Failed to enumerate repository content: " + errorCode.message();
+				outErrorMessage = "Failed to enumerate workspace content: " + errorCode.message();
 				return std::nullopt;
 			}
 		}
 
 		if (contentCount != 1)
 		{
-			outErrorMessage = "SparkleLauncher requires exactly one repository content root; found " + std::to_string(contentCount) + ".";
+			outErrorMessage = "SparkleLauncher requires exactly one workspace content root; found " + std::to_string(contentCount) + ".";
 			return std::nullopt;
 		}
 

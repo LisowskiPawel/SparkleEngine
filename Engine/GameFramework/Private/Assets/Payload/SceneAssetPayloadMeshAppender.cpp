@@ -7,7 +7,7 @@
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Formatting/HexFormat.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
+#include "Core/Public/Paths/ProductFilePaths.h"
 #include "Scene/Transform.h"
 
 #include <DirectXMath.h>
@@ -55,7 +55,7 @@ namespace Assets
 		for (const CookedSceneMeshAssetRef& meshReference : sceneManifest.meshAssetReferences)
 		{
 			const std::filesystem::path meshAssetPath = Paths::CookedMeshAsset(meshReference.meshAssetId);
-			LoadedMeshAsset loadedMesh = meshAssetLoader.Decode(meshAssetPath, files.Get(meshAssetPath));
+			LoadedMeshAsset loadedMesh = meshAssetLoader.Decode(meshAssetPath, files.Get(meshAssetPath), files.GetAllocationBudget());
 
 			if (loadedMesh.GetAssetKind() != meshReference.meshAssetKind)
 			{

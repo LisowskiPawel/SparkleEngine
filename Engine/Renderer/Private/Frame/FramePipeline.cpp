@@ -224,7 +224,7 @@ void FramePipeline::UploadSceneAssets()
 {
 	RenderCommandList& graphicsCommandList = m_deviceServices.GetCurrentGraphicsCommandList();
 	m_gpuMeshCache->UploadReadyMeshes(graphicsCommandList);
-	m_textureCache->UpdateSceneTextures(m_renderScene->GetTextures(), m_deviceServices);
+	m_textureCache->UpdateSceneTextures(m_deviceServices);
 }
 
 void FramePipeline::PrepareRenderingState(RenderFrame& frame)
@@ -263,6 +263,7 @@ RenderFrame& FramePipeline::InitializeRenderFrame(const RenderFrameTime& time)
 	    .FrameId = m_frameId,
 	    .SceneGeneration = m_renderScene->GetSceneGeneration(),
 	    .ShaderGeneration = m_renderPassRuntimeCache.GetShaderGeneration(),
+	    .ShaderPublicationHash = m_renderPassRuntimeCache.GetShaderPublicationHash(),
 	    .ImageProviderGeneration = m_imageProviders->GetGeneration()};
 
 	frame.Time = time;

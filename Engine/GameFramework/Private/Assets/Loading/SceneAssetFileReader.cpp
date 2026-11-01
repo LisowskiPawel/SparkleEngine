@@ -6,7 +6,7 @@
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Assets/Loaders/SceneManifestLoader.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
+#include "Core/Public/Paths/ProductFilePaths.h"
 
 #include <format>
 
@@ -18,7 +18,7 @@ namespace Assets
 		try
 		{
 			files.Read(manifestPath);
-			manifest = SceneManifestLoader{}.Decode(manifestPath, files.Get(manifestPath));
+			manifest = SceneManifestLoader{}.Decode(manifestPath, files.Get(manifestPath), files.GetAllocationBudget());
 			files.Release(manifestPath);
 
 			for (const CookedSceneMeshAssetRef& reference : manifest.meshAssetReferences)

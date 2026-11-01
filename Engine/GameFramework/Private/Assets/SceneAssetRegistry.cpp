@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 
 #include "Assets/SceneAssetRegistry.h"
 

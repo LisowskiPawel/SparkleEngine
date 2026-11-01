@@ -4,9 +4,9 @@
 
 namespace SparkleLauncher
 {
-	LauncherStatePaths ResolveLauncherStatePaths(const std::filesystem::path& repositoryRoot)
+	LauncherStatePaths ResolveLauncherStatePaths(const std::filesystem::path& workspaceRoot)
 	{
-		const Filesystem::WorkspaceUserStatePaths workspaceState = Filesystem::ResolveWorkspaceUserStatePaths(repositoryRoot);
+		const Filesystem::WorkspaceUserStatePaths workspaceState = Filesystem::ResolveWorkspaceUserStatePaths(workspaceRoot);
 		const std::filesystem::path root = workspaceState.LauncherRoot;
 
 		return LauncherStatePaths{
@@ -18,9 +18,9 @@ namespace SparkleLauncher
 		    .SettingsFile = root / "Settings.json"};
 	}
 
-	std::filesystem::path ResolveLauncherOperationLogPath(const std::filesystem::path& repositoryRoot, std::string_view operationId, std::string_view logFileName)
+	std::filesystem::path ResolveLauncherOperationLogPath(const std::filesystem::path& workspaceRoot, std::string_view operationId, std::string_view logFileName)
 	{
-		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(repositoryRoot);
+		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(workspaceRoot);
 		return statePaths.LogsRoot / std::string(operationId) / std::string(logFileName);
 	}
 }

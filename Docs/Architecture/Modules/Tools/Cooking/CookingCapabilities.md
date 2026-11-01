@@ -14,6 +14,8 @@
 
 **Current readiness:** **50/100** — the cooked-only asset pipeline is source-integrated; deterministic, transactional, bounded, failure, package-relative, and clean-run proof remains open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#foundation-world-content-shaders-and-tools).
 
+**Preparation/runtime separation, 2026-11-01:** Launcher and AssetCooker share the source/acquisition catalog in ToolSupport. Selection and source readiness gate explicit cooking only. GameFramework discovers ordinary `Levels/<id>.level` documents and loads the same cooked files regardless of origin; it does not read the preparation catalog. Shader cancellation-file polling from the retired Editor compiler is deleted; Launcher owns process cancellation and the existing incomplete-write guard protects interrupted output. [Source controls](../../../../../artifacts/validation/runtime-inputs-slim-20261101/completion.json) retain their exact bounds.
+
 ## At A Glance
 
 | Route | Input | Published product | Important limit |
@@ -22,7 +24,7 @@
 | textures | source image plus semantic intent and format policy | validated mips/compressed cooked texture | KTX/format capability and fidelity vary; memory/concurrency need evidence |
 | scenes/assets | importer output plus project identities | meshes, materials, scene manifest, skeletons, animations, and dependencies | support is bounded by importer and runtime schemas |
 | shaders | registered programs and compilation configuration | shader map/library, reflection, symbols/provenance | owned by the separate ShaderCompiler route |
-| publication | complete temporary product set | per-file replacement with in-process rollback | interrupted publication can leave a mixed readable generation; FWC-4 is blocked |
+| publication | complete temporary product set and admitted roots | locked staging, journaled commit/recovery and scoped readers | recorded repair retains its identity; current deltas need affected checks, selected content proof FR-04 and candidate/product join FR-06 |
 
 ```mermaid
 flowchart LR
@@ -38,11 +40,11 @@ Cooking is a product boundary, not a collection of file converters. A successful
 
 ### Interrupted Scene Publication
 
-The required boundary remains an atomically visible generation: failure or interruption must preserve the accepted products and must not expose a readable mixture. Current `CookedSceneGenerationWriter` stages typed products, manifests and the registry, then delegates their replacement to Core's `Files::TryPublishFileSet`. That helper preserves and replaces each file in sequence; its rollback state lives in the publishing process. Returned errors can roll back, but abrupt process exit cannot execute that rollback.
+The required boundary is one coherent accepted scene set. The scope owner requested a simpler rendering-focused support path on 2026-10-31. Generated cook output is disposable: retain checked in-process rollback, and reject output interrupted during publication until the existing clean-and-recook operation rebuilds it. Automatic cross-process transaction recovery is retired. This keeps support code proportional to disposable rendering inputs.
 
-[FCR-CONT-01's FWC-4 result](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) records a bounded counterexample using the real Core publisher and fresh GameFramework cooked-file/material readers: normal completion produces new/new, a locked destination returns an error and restores old/old, but interruption after the first replacement leaves a valid decoded new/old material pair. The fixtures are synthetic cooked materials, not a Sponza recook or format-fidelity test. No production assets were changed.
+Core owns a fail-fast read/write lock and a small incomplete marker per admitted output directory. Writers acquire their scopes before staging. Validate the complete file list, mark it incomplete before replacing accepted files, and clear the marker only after complete publication or successful ordinary rollback. A killed publisher leaves the marker, so fresh readers and writers refuse the generated set and name the clean/regenerate action. Source assets, authored files and user settings are never recovery inputs or cleanup targets. No journal parser, checksum, file identity, undo-log replay or primary/secondary-root protocol is needed.
 
-FWC-4 stops at this prerequisite. The scene-generation owner needs a durable commit/recovery and reader-generation binding contract spanning the existing Core replacement helper and GameFramework loading boundary before the publication path can be replaced safely. Stable asset IDs, package-relative paths and shared helper consumers must remain explicit. In-process rollback and a successful cook are not crash-atomicity proof; the [remaining stage](../../../CrossModule/FirstRelease/FoundationImplementationPlan.md#fwc-4--import-cook-and-engine-assets) retains the repair and dependent checks.
+GameFramework owns one shared scope from fresh catalog lookup through mapped reads, decoding and worker settlement. Keep stable asset IDs and existing cooked relative paths. TextureCooker and ShaderCompiler use the same file-publication owner; separate shader debug output is just another admitted directory. The [selected-map stage](../../../CrossModule/FirstRelease/ImplementationPlan.md#fr-04--release-maps) owns applicable content checks; current publication deltas require affected source controls before the candidate join in FR-06. Earlier journal-recovery receipts retain their candidate identity and do not validate this simpler contract.
 
 ### Shared Default Texture Products
 

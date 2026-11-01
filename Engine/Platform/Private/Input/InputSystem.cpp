@@ -49,16 +49,7 @@ void InputSystem::ProcessDeferredEvents()
 {
 	m_ownerThread.AssertAccess();
 
-	m_dispatch->EventDispatcher.ProcessDeferredEvents(
-	    m_layerEnabled,
-	    [this]
-	    {
-		    if (m_captureQuery)
-		    {
-			    const bool wantsCaptureInput = m_captureQuery();
-			    SetActiveLayer(wantsCaptureInput ? InputLayer::UI : InputLayer::Gameplay);
-		    }
-	    });
+	m_dispatch->EventDispatcher.ProcessDeferredEvents(m_layerEnabled);
 }
 
 void InputSystem::SubscribeToWindow(Window& window)
@@ -181,16 +172,6 @@ void InputSystem::SetLayerEnabled(InputLayer layer, bool enabled)
 			SetActiveLayer(InputLayer::System);
 		}
 	}
-}
-
-void InputSystem::SetInputCaptureQuery(InputCaptureQuery query) noexcept
-{
-	m_captureQuery = std::move(query);
-}
-
-void InputSystem::ClearInputCaptureQuery() noexcept
-{
-	m_captureQuery = {};
 }
 
 bool InputSystem::IsLayerEnabled(InputLayer layer) const noexcept

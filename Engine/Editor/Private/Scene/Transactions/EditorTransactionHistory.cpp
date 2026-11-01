@@ -2,6 +2,24 @@
 #include "Scene/Transactions/EditorTransactionHistory.h"
 
 #include <utility>
+#include <type_traits>
+
+static bool AffectsSameTarget(const WorldEditPayload& left, const WorldEditPayload& right)
+{
+	if (left.index() != right.index())
+	{
+		return false;
+	}
+	return std::visit([&right](const auto& command)
+	{
+		using Command = std::remove_cvref_t<decltype(command)>;
+		if constexpr (requires { command.Entity; })
+		{
+			return command.Entity == std::get<Command>(right).Entity;
+		}
+		return true;
+	}, left);
+}
 
 class EditorTransactionHistoryLimits final
 {
@@ -26,6 +44,7 @@ void EditorTransactionHistory::InvalidateForWorldGeneration(std::uint64_t worldG
 		return;
 	}
 	m_worldGeneration = worldGeneration;
+	FinishInteraction();
 	m_undo.clear();
 	m_redo.clear();
 	if (m_lastResult && m_lastResult->IsAccepted())
@@ -44,7 +63,7 @@ WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, Worl
 		return result;
 	}
 
-	if (!coalescingKey.empty() && !m_undo.empty() && m_undo.back().CoalescingKey == coalescingKey)
+	if (m_coalescing && !coalescingKey.empty() && !m_undo.empty() && m_undo.back().CoalescingKey == coalescingKey && AffectsSameTarget(m_undo.back().Forward.Payload, forward.Payload))
 	{
 		m_undo.back().Forward = std::move(forward);
 	}
@@ -57,11 +76,13 @@ WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, Worl
 		m_undo.push_back({std::move(forward), std::move(inverse), std::move(coalescingKey)});
 	}
 	m_redo.clear();
+	m_coalescing = !m_undo.back().CoalescingKey.empty();
 	return result;
 }
 
 WorldEditResult EditorTransactionHistory::Undo(std::uint64_t worldGeneration)
 {
+	FinishInteraction();
 	InvalidateForWorldGeneration(worldGeneration);
 	if (m_undo.empty())
 	{
@@ -81,6 +102,7 @@ WorldEditResult EditorTransactionHistory::Undo(std::uint64_t worldGeneration)
 
 WorldEditResult EditorTransactionHistory::Redo(std::uint64_t worldGeneration)
 {
+	FinishInteraction();
 	InvalidateForWorldGeneration(worldGeneration);
 	if (m_redo.empty())
 	{

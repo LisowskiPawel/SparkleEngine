@@ -4,7 +4,7 @@
 #include "LauncherShellModel.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 
 #include <ostream>
 #include <string>
@@ -46,8 +46,8 @@ namespace SparkleLauncher
 	void RenderLauncherShell(const LauncherShellModel& model, std::ostream& output)
 	{
 		output << "Sparkle Launcher\n";
-		output << "Root: " << Strings::ToNarrow(model.RepositoryRoot.wstring()) << "\n\n";
-		const bool installed = !Filesystem::IsSourceWorkspace(model.RepositoryRoot);
+		output << "Root: " << Strings::ToNarrow(model.WorkspaceRoot.wstring()) << "\n\n";
+		const bool installed = !HasBuildSources(model.WorkspaceRoot);
 		output << "Profile selectors\n";
 		output << "  Editor: " << model.EditorProfile << " | options: " << (installed ? model.EditorProfile : BuildProfileOptionText(BuildProfileTarget::Editor)) << '\n';
 		output << "  Game/Cook: " << model.GameProfile << " | options: " << (installed ? model.GameProfile : BuildProfileOptionText(BuildProfileTarget::Game)) << '\n';

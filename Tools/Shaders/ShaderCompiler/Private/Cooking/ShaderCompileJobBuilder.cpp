@@ -2,6 +2,8 @@
 
 #include "Cooking/ShaderCompileJobBuilder.h"
 
+#include "SourceAssetPaths.h"
+
 #include "Backend/IShaderBackend.h"
 #include "Backend/ShaderBackendPool.h"
 #include "Compiler/ShaderCompileProfile.h"
@@ -11,7 +13,6 @@
 #include "Cooking/Identity/ShaderCompileRequestHasher.h"
 #include "Cooking/ShaderCookSettings.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
 
 #include <algorithm>
@@ -178,6 +179,8 @@ ShaderCompileFeatureFlags ShaderCompileJobBuilder::BuildRequiredFeatures(ShaderF
 
 const ShaderSourceMountTable& ShaderCompileJobBuilder::GetSourceMounts()
 {
-	static const ShaderSourceMountTable mounts(Filesystem::GetShaderPath(PathRoot::Engine), Filesystem::GetShaderPath(PathRoot::Project));
+	static const ShaderSourceMountTable mounts(
+	    SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Shader, SparkleTools::SourceAssetRoot::Engine),
+	    SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Shader, SparkleTools::SourceAssetRoot::Project));
 	return mounts;
 }

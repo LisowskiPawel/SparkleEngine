@@ -89,9 +89,9 @@ namespace SparkleLauncher
 		return std::none_of(items.begin(), items.end(), [](const ToolchainItemStatus& item) { return item.Required && item.State != ToolchainItemState::Found; });
 	}
 
-	BuildToolchainStatus DetectBuildToolchain(const std::filesystem::path& repositoryRoot, WorkspaceIde preferredIde, WorkspaceCompiler compiler)
+	BuildToolchainStatus DetectBuildToolchain(const std::filesystem::path& workspaceRoot, WorkspaceIde preferredIde, WorkspaceCompiler compiler)
 	{
-		(void) repositoryRoot;
+		(void) workspaceRoot;
 		BuildToolchainStatus status;
 		const WorkspaceFeatureSettings featureSettings = GetLauncherWorkspaceFeatureSettings();
 		status.Generator = ResolveGenerator();

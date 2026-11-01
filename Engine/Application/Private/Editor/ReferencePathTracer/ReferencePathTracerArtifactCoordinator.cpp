@@ -2,7 +2,7 @@
 
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifactCoordinator.h"
 
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Identifiers/Uuid.h"

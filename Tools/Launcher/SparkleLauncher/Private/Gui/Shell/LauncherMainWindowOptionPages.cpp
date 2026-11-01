@@ -49,15 +49,15 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::AddOptionsForOperation(QVBoxLayout& layout, const QString& operationId)
 	{
-		if (operationId == LauncherHomeOperationId())
+		if (operationId == LauncherScenesOperationId())
 		{
-			AddHomeQuickStart(layout);
+			AddSceneSelection(layout);
 			return;
 		}
 
 		if (operationId == "levels.run")
 		{
-			AddGpuCrashOptions(layout);
+			AddNoOptionsMessage(layout, "Choose a scene and use the launch settings in the footer.");
 			return;
 		}
 
@@ -263,6 +263,13 @@ namespace SparkleLauncher
 		    scopeBoxes);
 
 		cookLayout->addWidget(selectionPanel);
+		QCheckBox* shaderSymbols = new QCheckBox("Generate shader symbols", cookLayout->parentWidget());
+		shaderSymbols->setChecked(m_settings.ShaderSymbols());
+		shaderSymbols->setEnabled(features.ShaderCompilerEnabled);
+		shaderSymbols->setToolTip("Export private shader debug data. Runtime optimization is unchanged.");
+		RegisterFocusable(shaderSymbols);
+		cookLayout->addWidget(shaderSymbols);
+		connect(shaderSymbols, &QCheckBox::toggled, &m_settings, &LauncherSettings::SetShaderSymbols);
 
 		AddWorkflowAutomationNote(
 		    *cookLayout,
@@ -392,10 +399,10 @@ namespace SparkleLauncher
 		descriptionLayout->addWidget(scopeDescription);
 		scopeRowLayout->addLayout(descriptionLayout, 3);
 
-		const std::filesystem::path previewPath = ResolveCleanScopePreviewPath(m_repositoryRoot, contentId, scope.Value);
+		const std::filesystem::path previewPath = ResolveCleanScopePreviewPath(m_workspaceRoot, contentId, scope.Value);
 
 		const QString previewText = scope.Value == "cooked" ? QStringLiteral("Generated content - ") + FormatDirectoryInventory(previewPath)
-		                                                    : (scope.Preview.isEmpty() ? ToDisplayPath(m_repositoryRoot, previewPath) + " - " + FormatDirectoryInventory(previewPath) : scope.Preview);
+		                                                    : (scope.Preview.isEmpty() ? ToDisplayPath(m_workspaceRoot, previewPath) + " - " + FormatDirectoryInventory(previewPath) : scope.Preview);
 
 		ElidedLabel* scopeDetail = new ElidedLabel(previewText, scopeRow);
 		scopeDetail->setObjectName("CleanScopePreview");

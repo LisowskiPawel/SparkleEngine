@@ -48,6 +48,10 @@ Product completeness is bounded by the selected rendering demonstration and its 
 
 Launcher is an explicit portfolio-presentation exception: clear scene selection/previews, readiness, build/cook/run, progress/cancel, recovery and an understandable first run earn work even when they add no rendering algorithm. Preserve that useful product and its polish. Keep workflow truth in its existing Launcher Core owner (`SparkleLauncherCore`) and Qt as presentation; the exception does not select an installer, updater, general workflow platform or second content database. Editor remains the smaller inspection, rendering-control and selected-edit surface needed by the examples.
 
+The [consumer experience](../Acceptance/FirstRelease.md#consumer-effort-and-game-presentation) is extract one ready-to-run bundle, open Launcher, choose a supplied scene and Run. We prepare its complete admitted cooked content, runtime closure, authored cameras and defaults; build/recook and source setup are optional developer actions. Game presents rendering with camera input/native close and no ImGui menus, HUD or overlays. Keep Editor UI, inspection/editing and Reference controls/export; no Game export adapter or new delivery service is selected.
+
+The public release supplies a fresh [precompiled/cooked base with optional source rebuild](../Acceptance/FirstRelease.md#prebuilt-base-and-optional-rebuild). Users keep Launcher for both running the demo and rebuilding their own source changes. Publishing a new version never relies on older local content; this selects no content migration, version database, updater or release service.
+
 Existing code is not automatically worth retaining. When a capability has no selected consumer or evidence role, evaluate narrowing or deleting it before investing in its completion. Preserve required behavior and unique evidence; change advertised scope explicitly rather than carrying unused implementations, selectors and dependencies indefinitely. [Roadmap scope control](Roadmap.md#scope-protection) owns admission; [Change Lifecycle](../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision) owns the removal procedure.
 
 ## Workload Ladder
@@ -119,3 +123,5 @@ This summary does not restate detailed contracts:
 - [Engineering guidance](../Engineering/README.md#choose-by-task) owns implementation and review rules.
 
 If this summary conflicts with an owning document, the owning document controls.
+
+**2026-11-01 source simplification:** [one-path product cleanup](../../artifacts/validation/release-owner-slim-20261101/completion.json) removes release/store/origin scaffolding and Game UI while retaining Launcher/Editor. [Launcher-owned preparation](../../artifacts/validation/launcher-owned-delivery-20261101/completion.json) removes Engine package discovery and Editor compilation; archives keep the normal workspace-shaped tree. A new archive still needs affected proof; rendering recovery remains the next priority.

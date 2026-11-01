@@ -10,11 +10,11 @@
 
 namespace Assets
 {
-	LoadedSceneManifest SceneManifestLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes) const
+	LoadedSceneManifest SceneManifestLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const
 	{
 		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedSceneManifest");
 
-		CookedAssetByteReader reader(bytes);
+		CookedAssetByteReader reader(bytes, budget);
 		LoadedSceneManifest manifest;
 		manifest.header = reader.Read<CookedSceneManifestHeader>();
 		SceneManifestValidator::ValidateHeader(manifest);

@@ -6,7 +6,7 @@
 #include "SparkleLauncher/LevelOperations.h"
 #include "SparkleLauncher/LevelRunOperations.h"
 #include "LauncherStatePaths.h"
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
 
 #include <algorithm>
@@ -103,7 +103,7 @@ namespace SparkleLauncher
 
 	void AppendLocalLauncherShellActivity(LauncherShellModel& model)
 	{
-		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(model.RepositoryRoot);
+		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(model.WorkspaceRoot);
 		if (std::filesystem::exists(statePaths.ActivityFile))
 		{
 			model.Activity.push_back({"local", "Activity file: " + statePaths.ActivityFile.string()});
@@ -118,17 +118,17 @@ namespace SparkleLauncher
 		model.Activity.push_back({"local", latestLogPath.has_value() ? "Latest launcher log: " + latestLogPath->string() : "No launcher logs discovered yet."});
 	}
 
-	LauncherShellModel BuildLauncherShellModel(std::filesystem::path repository, LauncherProject content, const LauncherShellArguments& arguments)
+	LauncherShellModel BuildLauncherShellModel(std::filesystem::path workspace, LauncherProject content, const LauncherShellArguments& arguments)
 	{
 		LauncherShellModel model;
-		model.RepositoryRoot = std::move(repository);
+		model.WorkspaceRoot = std::move(workspace);
 		model.ContentId = std::move(content.Id);
-		model.EditorProfile = !Filesystem::IsSourceWorkspace(model.RepositoryRoot) ? "ShippingEditor" : arguments.EditorProfile;
-		model.GameProfile = !Filesystem::IsSourceWorkspace(model.RepositoryRoot) ? "ShippingGame" : arguments.GameProfile;
+		model.EditorProfile = !HasBuildSources(model.WorkspaceRoot) ? "ShippingEditor" : arguments.EditorProfile;
+		model.GameProfile = !HasBuildSources(model.WorkspaceRoot) ? "ShippingGame" : arguments.GameProfile;
 		model.WorkspaceIdePreference = arguments.WorkspaceIdePreference;
 		model.WorkspaceCompilerPreference = arguments.WorkspaceCompilerPreference;
 		model.Operations = BuildLauncherShellOperationRows();
-		if (!Filesystem::IsSourceWorkspace(model.RepositoryRoot))
+		if (!HasBuildSources(model.WorkspaceRoot))
 		{
 			for (auto& operation : model.Operations)
 			{

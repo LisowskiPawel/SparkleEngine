@@ -309,6 +309,8 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## Stage 6 — Deliver Portable Reconstruction
 
+First-release closure uses the approved portable baseline through its existing reconstruction owner; it does not depend on post-REL-11 RELAX production. In M5R, qualify expanded raw path/lobe inputs first, then use REC-S2..4's one RELAX path for affected Stage-6 and final Stage-8 checks. Reuse applicable release cells; do not build another filter to finish the earlier raw-transport row. An invalid required baseline remains a first-release blocker.
+
 ### Objective
 
 Make the proved raw indirect estimator product-usable under motion while retaining independent raw evidence.
@@ -334,7 +336,7 @@ Make the proved raw indirect estimator product-usable under motion while retaini
 
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/IndirectLighting/ImplementationPlan.md#stage-6--deliver-portable-reconstruction and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
-Implement Indirect Lighting Stage 6 using the frozen portable reconstruction contract, then connect optional DLSS Ray Reconstruction through the existing provider boundary. Preserve raw lobe/path/reservoir evidence and separate histories. Exercise invalid guide/provider faults plus static, camera motion, disocclusion, environment/emissive change, glossy detail, and thin geometry. Report raw versus reconstructed error, lag, time, and memory.
+Implement Indirect Lighting Stage 6 using the frozen portable reconstruction contract and existing provider owner. Reuse/repair the approved baseline for first release without waiting for later RELAX; M5R RELAX-dependent cells follow REC-S2..4 and reuse its single path. Then connect optional DLSS Ray Reconstruction. Preserve raw lobe/path/reservoir evidence and separate histories. Exercise invalid guide/provider faults plus static, camera motion, disocclusion, environment/emissive change, glossy detail, and thin geometry. Report raw versus reconstructed error, lag, time, and memory.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```

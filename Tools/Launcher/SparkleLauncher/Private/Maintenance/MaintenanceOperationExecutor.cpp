@@ -203,10 +203,10 @@ namespace SparkleLauncher
 		    || filename == "cmake_install.cmake" || filename == "Makefile" || isRiderSettingsFile;
 	}
 
-	static bool RemoveRootGeneratedFiles(const std::filesystem::path& repositoryRoot, std::string& outErrorMessage)
+	static bool RemoveRootGeneratedFiles(const std::filesystem::path& workspaceRoot, std::string& outErrorMessage)
 	{
 		std::error_code errorCode;
-		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(repositoryRoot, errorCode))
+		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(workspaceRoot, errorCode))
 		{
 			if (entry.is_directory(errorCode) && entry.path().filename() == "CMakeFiles")
 			{

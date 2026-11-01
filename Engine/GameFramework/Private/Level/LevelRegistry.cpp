@@ -1,10 +1,8 @@
 #include "PCH.h"
-#include "Core/Public/FileSystemUtils.h"
 #include "Level/LevelRegistry.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
-#include "Core/Public/Projects/ProjectLevelCatalog.h"
 #include "Level/Level.h"
 #include "Level/Parsing/LevelParser.h"
 
@@ -12,58 +10,52 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_levelRegistryLogger, "GameFramework.LevelRegistry");
 
-LevelRegistry::LevelRegistry()
+LevelRegistry::LevelRegistry(const std::filesystem::path& projectRoot)
 {
-	DiscoverLevels();
+	DiscoverLevels(projectRoot);
 }
 
 LevelRegistry::~LevelRegistry() noexcept = default;
 
-void LevelRegistry::DiscoverLevels()
+void LevelRegistry::DiscoverLevels(const std::filesystem::path& projectRoot)
 {
-	const std::filesystem::path& projectRoot = Filesystem::GetProjectPath();
-	try
+	std::error_code error;
+	std::filesystem::directory_iterator iterator(projectRoot / "Levels", error);
+	const std::filesystem::directory_iterator end;
+	while (!error && iterator != end)
 	{
-		const ProjectLevelCatalog catalog = ProjectLevelCatalogFile::Load(projectRoot);
-		for (const ProjectLevelCatalogEntry& entry : catalog.levels)
+		const auto& entry = *iterator;
+		if (entry.is_regular_file(error) && entry.path().extension() == ".level")
 		{
-			if (!entry.selected)
-			{
-				continue;
-			}
-
-			if (!catalog.IsLevelReady(entry))
-			{
-				SPDLOG_LOGGER_WARN(g_levelRegistryLogger, "LevelRegistry: selected level '{}' is not ready: '{}'.", entry.id, entry.sourcePath.string());
-				continue;
-			}
-
-			LoadCatalogLevel(entry);
+			LoadLevelFile(entry.path());
+		}
+		if (!error)
+		{
+			iterator.increment(error);
 		}
 	}
-	catch (const Diagnostics::Error& error)
+	if (error)
 	{
-		SPDLOG_LOGGER_WARN(g_levelRegistryLogger, "LevelRegistry: {}; using the built-in Empty level.", error.what());
+		SPDLOG_LOGGER_WARN(g_levelRegistryLogger, "LevelRegistry: could not discover level documents in '{}': {}.", projectRoot.string(), error.message());
 	}
-
 	EnsureDefaultLevel();
 }
 
-void LevelRegistry::LoadCatalogLevel(const ProjectLevelCatalogEntry& entry)
+void LevelRegistry::LoadLevelFile(const std::filesystem::path& path)
 {
 	try
 	{
-		auto loadedLevel = LevelParser::LoadFromFile(entry.sourcePath);
+		auto loadedLevel = LevelParser::LoadFromFile(path);
 		const std::string loadedLevelName(loadedLevel->GetName());
-		if (loadedLevelName != entry.id)
+		if (loadedLevelName != path.stem().string())
 		{
-			throw Diagnostics::Error(std::format("Catalog identity '{}' does not match authored level name '{}'.", entry.id, loadedLevelName));
+			throw Diagnostics::Error(std::format("Level filename identity '{}' does not match authored level name '{}'.", path.stem().string(), loadedLevelName));
 		}
 		Register(std::move(loadedLevel));
 	}
 	catch (const Diagnostics::Error& error)
 	{
-		const std::string failure = std::format("LevelRegistry: Failed to load catalog level '{}': {}", entry.sourcePath.string(), error.what());
+		const std::string failure = std::format("LevelRegistry: Failed to load level document '{}': {}", path.string(), error.what());
 		SPDLOG_LOGGER_WARN(g_levelRegistryLogger, "{}", failure);
 	}
 }

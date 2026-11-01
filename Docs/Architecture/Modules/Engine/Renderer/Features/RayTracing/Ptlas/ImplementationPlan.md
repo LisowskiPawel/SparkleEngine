@@ -103,7 +103,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Start:** Every technical cell qualified; native/runtime package dependencies available.
 
-**Work:** Complete selector/status/refusal and package proof; the author or agent reproduces parity, sparse-update benefit and one failure. Update source inventories, capability/evidence maps and experimental/support classifications only to the observed subset.
+**Work:** Complete selector/status/refusal and changed-dependency proof. The [shared delivery rehearsal](../../../../../../../Acceptance/FirstRelease.md#shared-delivery-evidence) covers parity, sparse-update benefit and one failure; no separate PTLAS archive or adopter campaign. Update source inventories, capability/evidence maps and experimental/support classifications only to the observed subset.
 
 **Cleanup:** Remove obsolete experimental restrictions only when replaced and proved; delete completed prompts, stale knobs and unused dependencies while preserving TLAS.
 

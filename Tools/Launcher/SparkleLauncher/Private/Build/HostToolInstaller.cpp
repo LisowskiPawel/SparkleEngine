@@ -41,7 +41,7 @@ namespace SparkleLauncher
 
 	static std::optional<Process::ChildProcessRequest> BuildClangClInstallRequest(
 	    const BuildToolchainStatus& toolchain,
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    std::string_view operationId,
 	    std::string& errorMessage)
 	{
@@ -67,8 +67,8 @@ namespace SparkleLauncher
 		Process::ChildProcessRequest request;
 		request.ExecutablePath = ResolvePowerShellPath();
 		request.Arguments = {"-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script};
-		request.WorkingDirectory = repositoryRoot;
-		request.LogPath = ResolveLauncherOperationLogPath(repositoryRoot, operationId, "InstallHostTool.txt");
+		request.WorkingDirectory = workspaceRoot;
+		request.LogPath = ResolveLauncherOperationLogPath(workspaceRoot, operationId, "InstallHostTool.txt");
 		errorMessage.clear();
 		return request;
 	}
@@ -108,7 +108,7 @@ namespace SparkleLauncher
 	std::optional<Process::ChildProcessRequest> BuildHostToolInstallRequest(
 	    std::string_view toolId,
 	    const BuildToolchainStatus& toolchain,
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    std::string_view operationId,
 	    std::string& errorMessage)
 	{
@@ -123,6 +123,6 @@ namespace SparkleLauncher
 			errorMessage = "The registered launcher installer for " + installer->DisplayName + " is not available on this machine.";
 			return std::nullopt;
 		}
-		return installer->BuildRequest(toolchain, repositoryRoot, operationId, errorMessage);
+		return installer->BuildRequest(toolchain, workspaceRoot, operationId, errorMessage);
 	}
 }

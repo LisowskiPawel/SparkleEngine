@@ -1,6 +1,6 @@
 #include "LauncherShadowExecution.h"
 
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 
 #include "LauncherStatePaths.h"
 
@@ -52,10 +52,10 @@ namespace SparkleLauncher
 		return result;
 	}
 
-	LauncherShadowStartResult StartLauncherShadow(const std::filesystem::path& repositoryRoot, const std::vector<std::string>& arguments, LauncherShadowCompletionPolicy completionPolicy)
+	LauncherShadowStartResult StartLauncherShadow(const std::filesystem::path& workspaceRoot, const std::vector<std::string>& arguments, LauncherShadowCompletionPolicy completionPolicy)
 	{
 		LauncherShadowStartResult result;
-		if (!Filesystem::IsSourceWorkspace(repositoryRoot))
+		if (!HasBuildSources(workspaceRoot))
 		{
 			result.State = LauncherShadowStartState::NotRequired;
 			result.ExitCode = 0;
@@ -69,7 +69,7 @@ namespace SparkleLauncher
 		}
 
 		const std::filesystem::path currentDirectory = currentExecutable.parent_path();
-		const std::filesystem::path shadowRoot = ResolveLauncherStatePaths(repositoryRoot).LiveInstancesRoot;
+		const std::filesystem::path shadowRoot = ResolveLauncherStatePaths(workspaceRoot).LiveInstancesRoot;
 		if (IsWithin(currentDirectory, shadowRoot))
 		{
 			result.State = LauncherShadowStartState::NotRequired;
@@ -106,7 +106,7 @@ namespace SparkleLauncher
 		}
 
 		const QString program = QString::fromStdWString(shadowExecutable.wstring());
-		const QString workingDirectory = QString::fromStdWString(repositoryRoot.wstring());
+		const QString workingDirectory = QString::fromStdWString(workspaceRoot.wstring());
 		const QStringList processArguments = ToQStringList(arguments);
 		if (completionPolicy == LauncherShadowCompletionPolicy::ReleaseCallingArtifact)
 		{

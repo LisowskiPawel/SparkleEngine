@@ -1,7 +1,7 @@
 #include "AssetPackSyncPlanner.h"
 
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Projects/ProjectLevelCatalog.h"
+#include "ProjectLevelCatalog.h"
 
 #include <algorithm>
 #include <set>
@@ -12,10 +12,9 @@ namespace SparkleLauncher
 	class AssetPackSyncPlanner final
 	{
 	public:
-		AssetPackSyncPlanner(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds, bool releaseOnly) noexcept :
+		AssetPackSyncPlanner(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds) noexcept :
 		    m_catalog(catalog),
-		    m_requestedLevelIds(requestedLevelIds),
-		    m_releaseOnly(releaseOnly)
+		    m_requestedLevelIds(requestedLevelIds)
 		{
 		}
 
@@ -54,10 +53,6 @@ namespace SparkleLauncher
 
 		void AppendLevelPack(const ProjectLevelCatalogEntry& level, bool selected)
 		{
-			if (m_releaseOnly && !level.releaseSupported)
-			{
-				throw Diagnostics::Error("Level '" + level.id + "' is development-only; use a source checkout for this map.");
-			}
 			if (level.assetPackId.empty())
 			{
 				return;
@@ -92,13 +87,12 @@ namespace SparkleLauncher
 
 		const ProjectLevelCatalog& m_catalog;
 		std::span<const std::string> m_requestedLevelIds;
-		bool m_releaseOnly;
 		std::set<std::string, std::less<>> m_appendedIds;
 		std::vector<std::string> m_packIds;
 	};
 
-	std::vector<std::string> BuildAssetPackSyncPlan(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds, bool releaseOnly)
+	std::vector<std::string> BuildAssetPackSyncPlan(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds)
 	{
-		return AssetPackSyncPlanner(catalog, requestedLevelIds, releaseOnly).Build();
+		return AssetPackSyncPlanner(catalog, requestedLevelIds).Build();
 	}
 }

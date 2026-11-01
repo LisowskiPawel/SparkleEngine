@@ -42,6 +42,7 @@ Use distinct verbs:
 - `Apply` consumes an accepted command or delta into owned state.
 - `Extract` transforms authority into a derived boundary representation.
 - `Retire` delays reuse/destruction until its completion condition.
+- `Find` searches for an existing match; `Resolve` determines or validates a canonical value/path. Neither implies opening a document, loading an asset or acquiring a resource.
 
 Avoid vague owners such as `Manager`, `System`, or `Services` unless the name states the domain and the type truly coordinates it. Prefer capability names such as evaluator, sampler, builder, compiler, planner, allocator, registry, publisher, committer, coordinator, encoder, decoder, or store.
 
@@ -76,6 +77,8 @@ Shared graphics contracts use the same vocabulary at every boundary:
 - Neutral pipelines are `RenderPipeline` described by `GraphicsPipelineDesc` or `ComputePipelineDesc`, created with `Create*Pipeline`, and bound with `SetPipeline`. `PipelineState`, `PSO`, native pipeline types, and `SetPipelineState` do not leak into neutral contracts.
 - `LevelSession` owns registered/active/pending/loading level lifetime. `SceneLoadExecutor` owns work that produces `SceneLoadPackage`; shared payload is `SceneLoadWorkState`.
 - `EditorTransactionHistory` owns undo/redo stacks and coalescing; panels borrow `transactionHistory`.
+- `WorkspaceRoot` / `workspaceRoot` identifies the ordinary marker-based tree shared by a source checkout and portable extraction. `RepositoryRoot` names the source repository in build/provenance operations; shared consumer discovery must not imply that Git or source files are required. Launcher discovery is `WorkspaceLocator`; explicit-root validation is `TryResolveWorkspaceRoot`, and ancestor search is `TryFindWorkspaceRoot`.
+- Application's `EditorShaderCompileOperation` owns background-operation lifetime, UI status and successful reload. The tooling compile action owns compiler invocation; an operation wrapper is not named as though it were the compiler.
 
 ## Quantities, Transforms, and ABI
 

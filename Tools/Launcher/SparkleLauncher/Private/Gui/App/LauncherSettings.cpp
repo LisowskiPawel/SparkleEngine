@@ -88,6 +88,15 @@ namespace SparkleLauncher
 		return m_shaderBackend;
 	}
 
+	void LauncherSettings::SetShaderSymbols(bool enabled)
+	{
+		if (m_shaderSymbols != enabled)
+		{
+			m_shaderSymbols = enabled;
+			emit SettingsChanged();
+		}
+	}
+
 	const QString& LauncherSettings::GraphicsApi() const
 	{
 		return m_graphicsApi;

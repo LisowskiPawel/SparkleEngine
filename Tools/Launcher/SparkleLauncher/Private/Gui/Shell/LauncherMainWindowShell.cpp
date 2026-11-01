@@ -1,3 +1,4 @@
+#include "LauncherGpuCrashPanel.h"
 #include "LauncherMainWindow.h"
 
 #include "LauncherLayoutWidgets.h"
@@ -11,7 +12,7 @@
 #include "LauncherWorkflowCatalog.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 
 #include <QtGui/QColor>
 #include <QtWidgets/QCheckBox>
@@ -141,24 +142,31 @@ namespace SparkleLauncher
 
 		m_runModeCombo = CreateContextCombo(&LauncherSettings::SetRunMode);
 		m_runModeCombo->setAccessibleName("Run Mode");
-		m_runModeCombo->setToolTip("Choose whether Quick Start opens the selected map in the editor or runs the standalone game.");
+		m_runModeCombo->setToolTip("Open the selected scene in Editor or run it in Game.");
 		addContextItem("Run Mode", *m_runModeCombo, LauncherUi::ContextSelector::RunModeComboMinWidth, LauncherUi::ContextSelector::RunModeComboMaxWidth);
 		addGroupDivider();
 
 		m_graphicsApiCombo = CreateContextCombo(&LauncherSettings::SetGraphicsApi);
 		m_graphicsApiCombo->setAccessibleName("Graphics API");
-		m_graphicsApiCombo->setToolTip("Graphics API passed to a Game launched from Quick Start.");
+		m_graphicsApiCombo->setToolTip("Graphics API used for the selected scene.");
 		addContextItem("Graphics API", *m_graphicsApiCombo, LauncherUi::ContextSelector::GraphicsApiComboMinWidth, LauncherUi::ContextSelector::GraphicsApiComboMaxWidth);
-
-		m_captureProviderCombo = CreateContextCombo(&LauncherSettings::SetCaptureProvider);
-		m_captureProviderCombo->setAccessibleName("GPU Capture");
-		m_captureProviderCombo->setToolTip("Attach a capture tool when the Editor starts.");
-		addContextItem("GPU Capture", *m_captureProviderCombo, LauncherUi::ContextSelector::CaptureComboMinWidth, LauncherUi::ContextSelector::CaptureComboMaxWidth);
 
 		m_shaderBackendCombo = CreateContextCombo(&LauncherSettings::SetShaderBackend);
 		m_shaderBackendCombo->setAccessibleName("Shader Compiler");
 		m_shaderBackendCombo->setToolTip("DXC or Slang backend passed to shader cook operations.");
 		addContextItem("Shader Compiler", *m_shaderBackendCombo, LauncherUi::ContextSelector::ShaderBackendComboMinWidth, LauncherUi::ContextSelector::ShaderBackendComboMaxWidth);
+
+		m_captureProviderCombo = CreateContextCombo(&LauncherSettings::SetCaptureProvider);
+		m_captureProviderCombo->setAccessibleName("GPU Capture");
+		m_captureProviderCombo->setToolTip("Attach a capture tool when the Editor starts.");
+		m_captureProviderCombo->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+		addContextItem("GPU Capture", *m_captureProviderCombo, LauncherUi::ContextSelector::CaptureComboWidth, LauncherUi::ContextSelector::CaptureComboWidth);
+		m_gpuCrashPanel = new LauncherGpuCrashPanel(m_workspaceRoot, m_settings, m_backend, panel);
+		for (QWidget* widget : m_gpuCrashPanel->GetFocusableWidgets())
+		{
+			RegisterFocusable(widget);
+		}
+		rowLayout->addWidget(m_gpuCrashPanel, 0, Qt::AlignVCenter);
 		addGroupDivider();
 
 		m_buildConfigurationCombo = CreateContextCombo(&LauncherSettings::SetBuildConfiguration);
@@ -204,16 +212,16 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::RefreshContextSelectors()
 	{
-		const bool installed = !Filesystem::IsSourceWorkspace(m_repositoryRoot);
+		const bool installed = !HasBuildSources(m_workspaceRoot);
 		if (installed)
 		{
 			m_settings.SetBuildConfiguration("shipping");
 		}
 
 		const BuildToolchainStatus toolchain = installed ? BuildToolchainStatus{}
-		                                                 : DetectBuildToolchain(m_repositoryRoot, ResolveSelectedWorkspaceIde(m_settings), ResolveSelectedWorkspaceCompiler(m_settings));
+		                                                 : DetectBuildToolchain(m_workspaceRoot, ResolveSelectedWorkspaceIde(m_settings), ResolveSelectedWorkspaceCompiler(m_settings));
 
-		const LauncherContextUiModel model = LauncherContextUiModel::Build(toolchain, m_repositoryRoot);
+		const LauncherContextUiModel model = LauncherContextUiModel::Build(toolchain, m_workspaceRoot);
 		PopulateBoundContextCombo(m_runModeCombo, model.RunModes, m_settings.RunMode(), m_settings, &LauncherSettings::SetRunMode);
 		PopulateBoundContextCombo(m_graphicsApiCombo, model.GraphicsApis, m_settings.GraphicsApi(), m_settings, &LauncherSettings::SetGraphicsApi);
 		const QString profile = m_settings.RunMode() == "editor" ? m_settings.EditorProfile() : m_settings.GameProfile();
@@ -241,16 +249,16 @@ namespace SparkleLauncher
 
 		QWidget* content = new QWidget(scrollArea);
 		content->setObjectName("OptionsContent");
-		const bool isQuickStart = operationId == LauncherHomeOperationId();
-		scrollArea->setAlignment(isQuickStart ? Qt::AlignTop : (Qt::AlignHCenter | Qt::AlignTop));
+		const bool isSceneSelection = operationId == LauncherScenesOperationId();
+		scrollArea->setAlignment(isSceneSelection ? Qt::AlignTop : (Qt::AlignHCenter | Qt::AlignTop));
 		content->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-		if (!isQuickStart)
+		if (!isSceneSelection)
 		{
 			content->setMaximumWidth(LauncherUi::Page::MaxContentWidth);
 		}
 		QVBoxLayout* layout = new QVBoxLayout(content);
-		layout->setContentsMargins(isQuickStart ? LauncherUi::Page::QuickStartMargins : LauncherUi::Page::ContentMargins);
-		layout->setSpacing(isQuickStart ? 0 : LauncherUi::Page::Spacing);
+		layout->setContentsMargins(isSceneSelection ? LauncherUi::Page::SceneSelectionMargins : LauncherUi::Page::ContentMargins);
+		layout->setSpacing(isSceneSelection ? 0 : LauncherUi::Page::Spacing);
 		AddOptionsForOperation(*layout, operationId);
 		layout->addStretch(1);
 		scrollArea->setWidget(content);

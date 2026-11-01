@@ -7,7 +7,7 @@
 
 namespace SparkleLauncher
 {
-	std::string MakeFreshnessSignaturePath(const std::filesystem::path& repositoryRoot, const std::filesystem::path& path);
-	std::vector<std::filesystem::path> CollectBuildInputPaths(const std::filesystem::path& repositoryRoot);
-	std::optional<std::string> ComputeSourceListHash(const std::filesystem::path& repositoryRoot);
+	std::string MakeFreshnessSignaturePath(const std::filesystem::path& workspaceRoot, const std::filesystem::path& path);
+	std::vector<std::filesystem::path> CollectBuildInputPaths(const std::filesystem::path& workspaceRoot);
+	std::optional<std::string> ComputeSourceListHash(const std::filesystem::path& workspaceRoot);
 }

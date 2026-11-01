@@ -74,7 +74,7 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::InstallHostTool(const ToolchainItemStatus& item)
 	{
-		LauncherOperationRequest request = BuildLauncherOperationRequest(m_repositoryRoot, m_contentModel, m_settings, "workspace.install-host-tool");
+		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, "workspace.install-host-tool");
 		request.HostToolId = QString::fromStdString(item.Id);
 		StartOperation(std::move(request), "Install " + QString::fromStdString(item.DisplayName));
 	}
@@ -128,7 +128,7 @@ namespace SparkleLauncher
 			return;
 		}
 
-		const BuildWorkspaceOperationRequest request = BuildWorkspacePlanRequest(m_repositoryRoot, m_contentModel, m_settings);
+		const BuildWorkspaceOperationRequest request = BuildWorkspacePlanRequest(m_workspaceRoot, m_contentModel, m_settings);
 
 		const BuildWorkspaceOperationPlan plan = PlanBuildWorkspaceOperation(operationId.toStdString(), request);
 		const QString workspaceIdeName = ResolveSelectedWorkspaceIdeName(m_settings);
@@ -291,7 +291,7 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::AddCookEnvironmentStatus(QVBoxLayout& layout, const QString& operationId)
 	{
-		const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_repositoryRoot, m_contentModel, m_settings, operationId);
+		const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, operationId);
 		const CookOperationPlan cookPlan = PlanCookOperation(operationId.toStdString(), LauncherOperationRequestMapping::Cook(operationRequest));
 		QVBoxLayout* issueLayout = nullptr;
 
@@ -320,7 +320,7 @@ namespace SparkleLauncher
 			    *ensureIssueLayout(),
 			    "Cooking tools",
 			    "Missing",
-			    "Import precompiled products or build the required tools: " + missingCookTools.join(", ") + ".",
+			    "Sync products or build the required tools: " + missingCookTools.join(", ") + ".",
 			    "bad",
 			    CreateStatusActionButton("cook.tools.prepare", "Build", "Build Cooking Tools"));
 		}

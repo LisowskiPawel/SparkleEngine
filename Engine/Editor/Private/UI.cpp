@@ -46,19 +46,24 @@ RendererMemoryDiagnosticsSnapshot UI::CaptureMemoryDiagnostics() const
 	return m_implementation->CaptureMemoryDiagnostics();
 }
 
-EditorConsoleSystem* UI::GetEditorConsoleSystem() noexcept
+void UI::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler)
 {
-	return m_implementation->GetEditorConsoleSystem();
+	m_implementation->SetShaderCompileHandler(std::move(handler));
+}
+
+void UI::SetShaderCompileStatus(bool busy, std::string_view message)
+{
+	m_implementation->SetShaderCompileStatus(busy, message);
+}
+
+void UI::AppendConsoleOutput(ConsoleOutputRecord record, bool showConsole)
+{
+	m_implementation->AppendConsoleOutput(std::move(record), showConsole);
 }
 
 bool UI::ConsumeShaderReloadRequest() noexcept
 {
 	return m_implementation->ConsumeShaderReloadRequest();
-}
-
-bool UI::ConsumeShaderRecookRequest() noexcept
-{
-	return m_implementation->ConsumeShaderRecookRequest();
 }
 
 ViewportOutputAction UI::ConsumeViewportOutputAction() noexcept

@@ -30,6 +30,8 @@ flowchart LR
 
 Reference usability/oracle qualification precedes dependent image-quality claims. Final reference package adoption waits for its own release inputs, so it does not create a cycle blocking direct/indirect source work. Indirect work waits for any direct/PDF dependency it actually consumes, not a replay of the direct plan.
 
+Final map/package observations are inputs to Reference and LGT-4 closure, not earlier formal REL verdicts. Use the [shared unsigned archive and rehearsal](../../../../../Acceptance/FirstRelease.md#shared-delivery-evidence); FR-06 later reconciles the same applicable evidence. REL-05/08/09 approval cannot be a prerequisite for producing REL-04's feature evidence.
+
 ## `LGT-0` — Freeze Units, Estimators, And Comparison Domain
 
 **Start:** An admitted light/material/sky or comparison cell changed or lacks a decidable contract.
@@ -91,7 +93,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Start:** Current recovery identifies the earliest wrong product; PTD-00 stays accepted unless a specific domain decision changes.
 
-**Work:** Follow existing recovery and remaining checks for admitted progressive surface reflection. Qualify independent analytic/minimal/external comparisons, invalid-sample rejection, convergence/uncertainty and raw-linear export before dependent oracle use. Close approved Shipping host controls/shared raw export in Stages 7/9, preserving one session and no Editor dependency in Game; finish reset/cancel and final Stage-10 map/package/adoption when their own prerequisites exist.
+**Work:** Follow existing recovery and remaining checks for admitted progressive surface reflection. Qualify independent analytic/minimal/external comparisons, invalid-sample rejection, convergence/uncertainty and raw-linear export before dependent oracle use. Close approved ShippingEditor controls/raw export in Stages 7/9 through the existing private Editor operation, preserving one Renderer session; Game remains render-only with no UI/export adapter or codec relocation; finish reset/cancel and final Stage-10 map/package/adoption when their own prerequisites exist.
 
 **Cleanup:** Remove competing mode/session/history/export truth and temporary probes in the owning repair. Do not restart delivered integrator stages, add a second offline renderer or expand into transmission/media/spectral/physical subsurface to accommodate a map.
 

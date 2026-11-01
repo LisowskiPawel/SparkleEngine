@@ -103,7 +103,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Start:** Technical cells pass; exact distributable bytes available.
 
-**Work:** Exercise bad payload/profile/hash, unsupported device, upload/allocation/compile failures and in-flight replacement. Package the actual runtime/cooked/shader/license tuple; the author or agent reproduces material and value results.
+**Work:** Exercise bad payload/profile/hash, unsupported device, upload/allocation/compile failures and in-flight replacement. Join the actual runtime/cooked/shader/license tuple to the [shared candidate](../../../../Acceptance/FirstRelease.md#shared-delivery-evidence); its documented rehearsal reproduces material and value results without another codec-specific package or release workflow.
 
 **Cleanup:** Remove source training sets, sample/test executables and codec build cache from package/source membership; retire replaced paths without deleting BCn baseline.
 

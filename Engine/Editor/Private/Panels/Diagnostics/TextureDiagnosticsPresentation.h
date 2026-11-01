@@ -3,7 +3,6 @@
 #include "Renderer/Public/Resources/Textures/TextureDiagnostics.h"
 
 #include <cstdint>
-#include <optional>
 #include <string>
 
 struct ImVec2;
@@ -11,8 +10,6 @@ struct ImVec2;
 namespace TextureDiagnosticsPresentation
 {
 	std::string FormatTextureDisplayName(const TextureDiagnosticsRow& row);
-	std::string FormatTexturePath(const TextureDiagnosticsRow& row);
-	std::optional<std::string> FindAuthoredSourcePath(const TextureDiagnosticsRow& row);
 	const char* FormatTextureKind(TextureDiagnosticsKind kind) noexcept;
 	const char* FormatTextureDimension(TextureResourceDimension dimension) noexcept;
 	const char* FormatTextureIntent(TextureFormatIntent intent) noexcept;

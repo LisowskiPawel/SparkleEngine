@@ -49,7 +49,7 @@ TextureCache::~TextureCache() noexcept
 	UnloadAll();
 }
 
-void TextureCache::UpdateSceneTextures(const RenderTextureTable& textures, RenderDeviceServices& deviceServices)
+void TextureCache::UpdateSceneTextures(RenderDeviceServices& deviceServices)
 {
 	RenderCommandList& graphicsCommandList = deviceServices.GetCurrentGraphicsCommandList();
 	const bool useCopyQueue = HasPendingSceneTextureUploads() && deviceServices.GetRenderHardwareInterface().GetCapabilities().Queues.SupportsIndependent(ERhiQueueType::Copy);
@@ -62,7 +62,7 @@ void TextureCache::UpdateSceneTextures(const RenderTextureTable& textures, Rende
 		uploadCommandList = &uploadLease.GetCommandList();
 	}
 
-	const std::vector<RhiResourceHandle> uploadedResources = LoadSceneTextures(textures, *uploadCommandList);
+	const std::vector<RhiResourceHandle> uploadedResources = LoadSceneTextures(*uploadCommandList);
 	if (!useCopyQueue)
 	{
 		return;
@@ -77,11 +77,10 @@ void TextureCache::UpdateSceneTextures(const RenderTextureTable& textures, Rende
 	}
 }
 
-std::vector<RhiResourceHandle> TextureCache::LoadSceneTextures(const RenderTextureTable& textures, RenderCommandList& commandList)
+std::vector<RhiResourceHandle> TextureCache::LoadSceneTextures(RenderCommandList& commandList)
 {
 	std::vector<RhiResourceHandle> uploadedResources;
 	LoadDefaultTextures(commandList, uploadedResources);
-	SynchronizeSceneTextures(textures);
 
 	ConsumeCompletedRequests();
 	LaunchPendingRequests();

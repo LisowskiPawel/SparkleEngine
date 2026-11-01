@@ -8,7 +8,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Tasks/Public/TaskExecutor.h"
 

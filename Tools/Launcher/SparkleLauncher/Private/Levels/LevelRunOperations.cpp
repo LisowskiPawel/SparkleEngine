@@ -1,14 +1,14 @@
 #include "SparkleLauncher/LevelRunOperations.h"
 
 #include "Core/Public/Strings/StringUtils.h"
-#include "Core/Public/Paths/ProductPaths.h"
-#include "Core/Public/Projects/ProjectLevelCatalog.h"
+#include "LauncherProductPaths.h"
+#include "ProjectLevelCatalog.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "CookedContentReadiness.h"
 #include "LevelRunOperationProcessRequests.h"
 #include "ExternalCaptureDiscovery.h"
 #include "GpuCrashLaunch.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "LauncherStatePaths.h"
 #include "SparkleLauncher/ToolResolver.h"
 
@@ -31,14 +31,10 @@ namespace SparkleLauncher
 				plan.ReadinessMessages.push_back("Requested level is not present in the catalog: " + plan.Request.LevelId);
 				return false;
 			}
-			if (!Filesystem::IsSourceWorkspace(plan.RepositoryRoot) && !level->releaseSupported)
+			std::error_code error;
+			if (!std::filesystem::is_regular_file(level->sourcePath, error) || error)
 			{
-				plan.ReadinessMessages.push_back("Requested level is development-only; use a source checkout: " + level->id);
-				return false;
-			}
-			if (level->id != "Empty" && (!level->selected || !catalog.IsLevelReady(*level)))
-			{
-				plan.ReadinessMessages.push_back("Requested level must be selected with its complete source content ready: " + level->id);
+				plan.ReadinessMessages.push_back("Requested level definition is missing: " + level->id);
 				return false;
 			}
 			return true;
@@ -83,14 +79,14 @@ namespace SparkleLauncher
 			plan.TargetName += "GpuCrashReceipt";
 		}
 
-		plan.ExecutablePath = Filesystem::ResolveProjectProductPath(
-		    plan.RepositoryRoot,
+		plan.ExecutablePath = ResolveProjectExecutable(
+		    plan.WorkspaceRoot,
 		    plan.Request.ContentId,
 		    plan.Request.RunMode == LevelRunMode::Editor ? "editor" : "game",
 		    plan.Request.ProductProfile,
 		    plan.Request.GpuCrashMode == RhiGpuCrashMode::Off ? "" : "gpu-crash");
 
-		plan.WorkingDirectory = Filesystem::ResolveProductProjectRoot(plan.Request.RepositoryRoot, plan.Request.ContentId);
+		plan.WorkingDirectory = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
 		return true;
 	}
 
@@ -102,7 +98,7 @@ namespace SparkleLauncher
 		plan.Readiness.ContentDirectoryReady = std::filesystem::exists(plan.WorkingDirectory / std::string(Filesystem::kProjectMarker), errorCode);
 
 		const CookedContentReadiness cookedContent = InspectCookedContentReadiness(
-		    plan.Request.RepositoryRoot,
+		    plan.Request.WorkspaceRoot,
 		    plan.Request.ContentId,
 		    plan.Request.GpuCrashMode == RhiGpuCrashMode::Off ? "" : "gpu-crash");
 
@@ -202,7 +198,7 @@ namespace SparkleLauncher
 			return plan;
 		}
 
-		plan.RepositoryRoot = request.RepositoryRoot;
+		plan.WorkspaceRoot = request.WorkspaceRoot;
 		plan.Request = request;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 
@@ -214,7 +210,7 @@ namespace SparkleLauncher
 		    {"graphicsApi", plan.Request.GraphicsApi},
 		    {"captureProvider", std::string(ExternalCaptureProviderToString(plan.Request.CaptureProvider))}};
 
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(plan.Request.RepositoryRoot, definition->Id, "Latest.txt");
+		plan.Operation.LogPath = ResolveLauncherOperationLogPath(plan.Request.WorkspaceRoot, definition->Id, "Latest.txt");
 		if (plan.Request.LevelId.empty())
 		{
 			plan.ReadinessMessages.push_back("A catalog level id is required.");

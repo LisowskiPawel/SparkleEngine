@@ -34,30 +34,6 @@ void EditorConsolePanel::Clear() noexcept
 	m_scrollToBottom = true;
 }
 
-void EditorConsolePanel::BuildUI(bool disableInteraction)
-{
-	if (!m_isOpen)
-	{
-		return;
-	}
-
-	const ImGuiViewport* viewport = ImGui::GetMainViewport();
-	if (viewport != nullptr)
-	{
-		ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + 12.0f, viewport->WorkPos.y + viewport->WorkSize.y - 320.0f), ImGuiCond_FirstUseEver);
-	}
-	ImGui::SetNextWindowSize(ImVec2(600.0f, 300.0f), ImGuiCond_FirstUseEver);
-	const std::string windowTitle = UiUtil::MakeIconLabel(UiUtil::EditorIcon::Console, "Console") + "##Editor Console";
-	if (!ImGui::Begin(windowTitle.c_str(), &m_isOpen))
-	{
-		ImGui::End();
-		return;
-	}
-
-	BuildContent(disableInteraction);
-	ImGui::End();
-}
-
 void EditorConsolePanel::BuildContent(bool disableInteraction)
 {
 	DrawToolbar(disableInteraction);

@@ -2,18 +2,22 @@
 
 [Docs](../../../../../README.md) / [Up](ContentToPixelDesign.md)
 
-Deliver the missing advanced scene/content proof from original bytes through independent raw pixels, then hand it to the native and neural studies.
+Deliver the missing advanced scene/content proof from original bytes through independent raw pixels, then hand qualified inputs to rendering work and the classical/neural studies.
 
 **Status:** remaining evidence delivery; this plan records no executed study or acceptance result
 
 **Admission:** M1/M2 / PGD-02 after REL-11 and M0; existing release source/reference repairs keep their own gates.
+
+M0 is the applicability check on the accepted release's obtain/build/run proof. Reuse that evidence when inputs match; a new acceptor campaign, portfolio case assembly or final study/neural adoption is not a prerequisite for CPIX-0/1. Changed content and renderer inputs retain their own checks below.
+
+Handoff is by qualified artifact: a consumer can use passed CPIX-1/2 scene/camera/content/raw cells without waiting for the final CPIX-3/CASE verdict. Every consumed input must have its actual proof. Remaining MAP, native/performance/failure and lineage cells still block M1/M2 completion and final case assembly; early input use is not a stage/family pass.
 
 ## Work This Plan
 
 | What to do | Working route |
 | --- | --- |
 | First action | [CPIX-0](#cpix-0-freeze-workload-inputs-and-oracles): bind current scene, producer and oracle facts in CPIX-0 rather than start a new import pipeline. |
-| Result to reach | Original per-map WL-01..03 / CASE-01/03 proof, explicit losses/domain and deterministic inputs usable by M3 and NG-D0. |
+| Result to reach | Original per-map WL-01..03 / CASE-01/03 proof, explicit losses/domain and deterministic inputs usable by the selected renderer leaf, M3 and NG-D0. |
 | Start / stop | Planning can prepare decisions earlier; execution needs the exact candidate, valid prerequisites and frozen check cards. Missing rights, tools, or external participants keep the affected result open. |
 
 ## Execution Contract
@@ -103,14 +107,14 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Cleanup / non-delivery:** Verify producing-stage cleanup, remove disposable assembly code and superseded instructions; no copied multi-GB scene/capture depot or new presentation engine.
 
-**Exit:** M1/M2 proof is usable by WS-D0 and neural discovery; the three headline cases still need their own later evaluation/reproduction.
+**Exit:** M1/M2 proof closes its remaining MAP/WL/lineage cells for final case assembly. Qualified inputs already supplied to renderer leaves, WS-D0 and neural discovery retain their own identities; the three headline cases still need later evaluation/reproduction.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
 Execute only CPIX-3 from Docs/Architecture/Modules/Projects/Showcase/ContentToPixel/ImplementationPlan.md#cpix-3-close-the-tier-one-case-and-handoff. Apply its Execution Contract, including the Stage Source-Style Gate and stage-local cleanup.
-Close only missing Tier-1 MAP/WL cells and CASE-01/03 artifact joins. Preserve raw source/cook/native identity, rights, scene limits and held-out boundaries. Reuse valid runs, remove probes and hand off the exact M3 inputs; no automatic neural or release acceptance.
+Close only missing Tier-1 MAP/WL cells and CASE-01/03 artifact joins. Preserve raw source/cook/native identity, rights, scene limits and held-out boundaries. Reuse valid runs and qualified input handoffs; renderer/study consumers do not wait for this final verdict when their own inputs already pass. Remove probes and hand off exact identities; no automatic renderer, neural or release acceptance.
 NON-NEGOTIABLE: preserve required source/material semantics and active-level identity; qualify raw independent truth and rights; keep held-out boundaries. Quote proof or BLOCKED at handoff; follow the Execution Contract, not neighboring stages.
 Before handoff, update the stage result, remaining plan and next item.
 

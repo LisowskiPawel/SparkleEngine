@@ -3,7 +3,6 @@
 #include "LauncherBackend.h"
 #include "LauncherCleanUiModel.h"
 #include "LauncherIconLibrary.h"
-#include "LauncherQuickStartExecution.h"
 
 #include <QtCore/QString>
 #include <QtCore/QVector>
@@ -40,6 +39,7 @@ namespace SparkleLauncher
 	class LauncherContentModel;
 	class LauncherSettings;
 	class LauncherActivityPanel;
+	class LauncherGpuCrashPanel;
 	class LauncherWorkflowPanel;
 	struct ThirdPartyDependencyUiEntry;
 	struct ThirdPartyDependencyUiStatus;
@@ -47,14 +47,13 @@ namespace SparkleLauncher
 	struct LauncherLevelUiModel;
 	class ResponsiveCardGridWidget;
 	struct LauncherContentSummary;
-	enum class LauncherArtworkPreset : std::uint8_t;
 
 	class LauncherMainWindow final : public QMainWindow
 	{
 		Q_OBJECT
 
 	public:
-		LauncherMainWindow(std::filesystem::path repositoryRoot, LauncherContentModel& contentModel, LauncherSettings& settings, LauncherBackend& backend, QWidget* parent = nullptr);
+		LauncherMainWindow(std::filesystem::path workspaceRoot, LauncherContentModel& contentModel, LauncherSettings& settings, LauncherBackend& backend, QWidget* parent = nullptr);
 
 		void SetStartupNotice(const QString& message);
 
@@ -85,10 +84,6 @@ namespace SparkleLauncher
 		QComboBox* CreateValueCombo(const QVector<QPair<QString, QString>>& options, const QString& currentValue, void (LauncherSettings::*setter)(const QString&));
 		QComboBox* CreateContextCombo(void (LauncherSettings::*setter)(const QString&));
 		void RefreshContextSelectors();
-		void AddGpuCrashOptions(QVBoxLayout& layout);
-		void OpenGpuCrashInspector(QPushButton& button);
-		void RefreshGpuCrashIncident();
-		void DisplayGpuCrashState(const QString& state);
 		static bool UsesBuildEnvironmentStatus(const QString& operationId);
 		void AddOptionsForOperation(QVBoxLayout& layout, const QString& operationId);
 		void AddBuildOptions(QVBoxLayout& layout);
@@ -118,7 +113,7 @@ namespace SparkleLauncher
 		void SyncSourceDependency(const ThirdPartyDependencyUiEntry& dependency);
 		void CleanSourceDependency(const ThirdPartyDependencyUiEntry& dependency);
 		void TrackSourceDependencyRun(const LauncherOperationRequest& request, const QString& runId);
-		void AddSyncLevelContentGroups(QVBoxLayout& layout);
+		void AddLevelContentGroups(QVBoxLayout& layout);
 		void AddSyncLevelRows(QVBoxLayout& layout, const LauncherContentSummary& content, const LauncherLevelUiModel& model);
 		void AddSyncLevelRow(ResponsiveCardGridWidget& grid, const LauncherContentSummary& content, const LauncherLevelUiEntry& level);
 		void ApplyLevelActionButtonState(QLabel& statusLabel, QPushButton& button, const LauncherLevelUiEntry& level);
@@ -128,12 +123,8 @@ namespace SparkleLauncher
 		QVector<LauncherCleanTarget> BuildLevelCleanTargets(const LauncherContentSummary& content, const QString& levelId = QString()) const;
 		bool SetLevelsSelected(const std::filesystem::path& contentRoot, const std::vector<std::string>& levelIds, bool selected, const QString& actionName);
 		LauncherLevelUiModel BuildLevelUiModel() const;
-		void AddHomeQuickStart(QVBoxLayout& layout);
-		void StartQuickStartLevel(const LauncherContentSummary& content, const LauncherLevelUiEntry& level);
-		void ContinueQuickStart();
-		void HandleQuickStartOperationFinished(const QString& runId, const QString& operationId, bool succeeded, const QString& statusText);
-		void ReportQuickStartBlocked(const QString& statusMessage);
-		void SetQuickStartButtonsEnabled(bool enabled);
+		void AddSceneSelection(QVBoxLayout& layout);
+		void StartLevel(const LauncherContentSummary& content, const LauncherLevelUiEntry& level);
 		void AddBuildEnvironmentStatus(QVBoxLayout& layout, const QString& operationId);
 		void AddCookEnvironmentStatus(QVBoxLayout& layout, const QString& operationId);
 		QPushButton* CreateHostToolActionButton(const ToolchainItemStatus& item);
@@ -160,7 +151,7 @@ namespace SparkleLauncher
 		void SetSelectedOperation(const QString& operationId);
 		void ApplyVisualStyle();
 
-		std::filesystem::path m_repositoryRoot;
+		std::filesystem::path m_workspaceRoot;
 		LauncherContentModel& m_contentModel;
 		LauncherSettings& m_settings;
 		LauncherBackend& m_backend;
@@ -180,7 +171,9 @@ namespace SparkleLauncher
 		QPushButton* m_runButton = nullptr;
 		QFrame* m_actionMetaPanel = nullptr;
 		LauncherActivityPanel* m_activityPanel = nullptr;
-		std::optional<LauncherQuickStartExecution> m_quickStartExecution;
+		LauncherGpuCrashPanel* m_gpuCrashPanel = nullptr;
+		QString m_startingLevelRunId;
+		QString m_startingLevelId;
 		QHash<QString, PendingLevelSelectionUpdate> m_pendingLevelSelectionUpdates;
 		QHash<QString, QPointer<QLabel>> m_levelStatusLabels;
 		QHash<QString, QPointer<QPushButton>> m_levelActionButtons;
@@ -188,9 +181,6 @@ namespace SparkleLauncher
 		QHash<QString, QPointer<QLabel>> m_sourceDependencyStatusLabels;
 		QHash<QString, QPointer<QPushButton>> m_sourceDependencyActionButtons;
 		QSet<QString> m_cleaningSourceDependencyRunIds;
-		std::optional<GpuCrashIncident> m_gpuCrashIncident;
-		QVector<QPointer<QLabel>> m_gpuCrashStatusLabels;
-		bool m_gpuCrashQueryPending = false;
 		QString m_selectedOperationId;
 		bool m_isRebuildingOptions = false;
 		bool m_isApplyingUiRefresh = false;

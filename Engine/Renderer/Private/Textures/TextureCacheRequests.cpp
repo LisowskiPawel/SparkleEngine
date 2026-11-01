@@ -103,11 +103,6 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 		Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Scene texture table has no generation identity.");
 	}
 	const std::uint32_t generation = textures.Generation;
-	if (m_sceneTextureGeneration == generation)
-	{
-		return;
-	}
-
 	m_wantedPathTextureKeys.clear();
 	for (const RenderTextureAsset& texture : textures.Assets)
 	{

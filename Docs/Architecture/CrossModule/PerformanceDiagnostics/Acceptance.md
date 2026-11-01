@@ -210,11 +210,11 @@ These controls use existing commands or disposable local probes. They do not req
 
 ### Backend And Product Matrix
 
-External native-capture criteria/failures/checks are owned by the [External Capture dossier](ExternalCapture/ExternalCaptureDesign.md#acceptance-and-check-contract); the rows below retain the parent cross-diagnostics matrix and require that delegated contract. Capture request failure and native quiescence are distinct; a scene viewport maps to a containing present interval rather than an exclusive native scene capture.
+External native-capture criteria/failures/checks are owned by the [External Capture dossier](ExternalCapture/ExternalCaptureDesign.md#acceptance-and-check-contract); the rows below apply only to selected diagnostics producers/routes under that delegated scope. Unselected internal packages, new Game controls and Nsight Vulkan integration create no release implementation obligation. Capture request failure and native quiescence are distinct; a scene viewport maps to a containing present interval rather than an exclusive native scene capture.
 
-- DevelopmentGame and DevelopmentEditor on D3D12 and Vulkan.
-- DevelopmentEditor external capture: PIX on D3D12; RenderDoc on D3D12 and Vulkan; Nsight Graphics Capture on its supported NVIDIA D3D12/Vulkan matrix while explicitly `Experimental`.
-- For each provider, test no flag/no injection, requested but missing, passively attached, ready, next-frame capture of the clicked viewport, multi-window target selection, busy/conflict, resize/minimize, device loss, finalization, shutdown, artifact-open/path-unavailable, and clean relaunch without the provider. Test the admitted single-provider route and rejection of invalid multiple-provider intent; native combinations need separate acceptance and remain rejected when unqualified. Reuse the current selected-provider icon and request authority.
+- Rendering/native proof retains its required D3D12/Vulkan product matrix. Capture uses the existing compatible Editor or tool-managed route needed by the measurement; no new Game integration is required.
+- Existing DevelopmentEditor candidates: PIX D3D12, RenderDoc D3D12/Vulkan and experimental Nsight D3D12. Qualify the route actually used; new Nsight Vulkan integration is deferred, with no support/pass claim.
+- For each selected provider cell, test no flag/no injection, requested but missing, passively attached, ready, next-frame capture of the clicked viewport, multi-window target selection, busy/conflict, resize/minimize, device loss, finalization, shutdown, artifact-open/path-unavailable, and clean relaunch without the provider. Test the admitted single-provider route and rejection of invalid multiple-provider intent; native combinations need separate acceptance and remain rejected when unqualified. Reuse the current selected-provider icon and request authority.
 - Threaded and serial renderer controls.
 - Normal and serial task controls.
 - Validation on/off state recorded; native validation passes on supported routes.

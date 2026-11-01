@@ -84,7 +84,7 @@ void UsedTexturesPanel::DrawTextureTable(bool disableInteraction)
 
 	ImGui::TableSetupScrollFreeze(0, 1);
 	ImGui::TableSetupColumn("Texture");
-	ImGui::TableSetupColumn("Source");
+	ImGui::TableSetupColumn("Cooked Path");
 	ImGui::TableSetupColumn("Kind");
 	ImGui::TableSetupColumn("Format");
 	ImGui::TableSetupColumn("Size");
@@ -109,8 +109,7 @@ void UsedTexturesPanel::DrawTextureTable(bool disableInteraction)
 			m_selectedKey = row.Key;
 		}
 		ImGui::TableNextColumn();
-		const std::string sourcePath = TextureDiagnosticsPresentation::FormatTexturePath(row);
-		ImGui::TextUnformatted(sourcePath.c_str());
+		ImGui::TextUnformatted(row.Key.c_str());
 		ImGui::TableNextColumn();
 		ImGui::TextUnformatted(TextureDiagnosticsPresentation::FormatTextureKind(row.Kind));
 		ImGui::TableNextColumn();
@@ -138,9 +137,8 @@ void UsedTexturesPanel::DrawSelectedTextureInspector(bool disableInteraction)
 	}
 
 	const std::string displayName = TextureDiagnosticsPresentation::FormatTextureDisplayName(*selectedRow);
-	const std::string sourcePath = TextureDiagnosticsPresentation::FormatTexturePath(*selectedRow);
 	ImGui::TextUnformatted(displayName.c_str());
-	PanelDiagnosticsFormatting::DrawWrappedDisabledText(sourcePath);
+	PanelDiagnosticsFormatting::DrawWrappedDisabledText(selectedRow->Key);
 	ImGui::Separator();
 	DrawPreview(*selectedRow);
 	ImGui::SeparatorText("Runtime Properties");
@@ -187,10 +185,6 @@ void UsedTexturesPanel::DrawSelectedTextureDetails(const TextureDiagnosticsRow& 
 	const std::string arraySize = std::to_string(row.ArraySize);
 	const char* textureFormat = TextureDiagnosticsPresentation::FormatTextureFormat(row.Format);
 
-	if (const std::optional<std::string> sourcePath = TextureDiagnosticsPresentation::FindAuthoredSourcePath(row))
-	{
-		UiUtil::DrawKeyValueRow("Source", sourcePath->c_str());
-	}
 	UiUtil::DrawKeyValueRow("Kind", TextureDiagnosticsPresentation::FormatTextureKind(row.Kind));
 	UiUtil::DrawKeyValueRow("Streamed", row.StreamManaged ? "yes" : "no");
 	UiUtil::DrawKeyValueRow("Default", row.Kind == TextureDiagnosticsKind::Scene ? "no" : "yes");
@@ -220,8 +214,7 @@ bool UsedTexturesPanel::MatchesFilter(const TextureDiagnosticsRow& row) const no
 {
 	const std::string_view filter(m_filterBuffer.data());
 
-	return filter.empty() || Strings::ContainsIgnoreCase(TextureDiagnosticsPresentation::FormatTextureDisplayName(row), filter)
-	    || Strings::ContainsIgnoreCase(TextureDiagnosticsPresentation::FormatTexturePath(row), filter) || Strings::ContainsIgnoreCase(row.Key, filter)
+	return filter.empty() || Strings::ContainsIgnoreCase(TextureDiagnosticsPresentation::FormatTextureDisplayName(row), filter) || Strings::ContainsIgnoreCase(row.Key, filter)
 	    || Strings::ContainsIgnoreCase(TextureDiagnosticsPresentation::FormatTextureFormat(row.Format), filter)
 	    || Strings::ContainsIgnoreCase(TextureDiagnosticsPresentation::FormatTextureKind(row.Kind), filter);
 }

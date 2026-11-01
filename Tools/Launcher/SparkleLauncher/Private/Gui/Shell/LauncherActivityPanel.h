@@ -32,7 +32,6 @@ namespace SparkleLauncher
 		void AppendOperationOutput(const QString& runId, const QString& outputText);
 		void UpdateOperationProgress(const QString& runId, const QString& phase, quint64 completed, quint64 total);
 		QString DisplayOperationFinished(const QString& runId, const QString& title, const LauncherOperationResult& result);
-		void DisplayBlockedOperation(const QString& runId, const QString& title, const QString& message);
 		void AppendRunOutput(const QString& runId, const QString& text);
 		void ShowRunOutput(const QString& runId);
 		bool HasActiveRun() const;

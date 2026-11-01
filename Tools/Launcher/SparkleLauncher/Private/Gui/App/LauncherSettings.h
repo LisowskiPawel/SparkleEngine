@@ -24,6 +24,9 @@ namespace SparkleLauncher
 		const QString& BuildScopes() const;
 		const QString& CookScopes() const;
 		const QString& ShaderBackend() const;
+
+		bool ShaderSymbols() const { return m_shaderSymbols; }
+
 		const QString& GraphicsApi() const;
 		ExternalCaptureProvider CaptureProvider() const;
 		RhiGpuCrashMode GpuCrashMode() const;
@@ -39,6 +42,7 @@ namespace SparkleLauncher
 		void SetBuildScopes(const QString& scopes);
 		void SetCookScopes(const QString& scopes);
 		void SetShaderBackend(const QString& backend);
+		void SetShaderSymbols(bool enabled);
 		void SetGraphicsApi(const QString& graphicsApi);
 		void SetCaptureProvider(const QString& provider);
 		void SetGpuCrashMode(const QString& mode);
@@ -58,6 +62,7 @@ namespace SparkleLauncher
 		QString m_buildScopes;
 		QString m_cookScopes;
 		QString m_shaderBackend = "dxc";
+		bool m_shaderSymbols = false;
 		QString m_graphicsApi = "d3d12";
 		ExternalCaptureProvider m_captureProvider = ExternalCaptureProvider::None;
 		RhiGpuCrashMode m_gpuCrashMode = RhiGpuCrashMode::Off;

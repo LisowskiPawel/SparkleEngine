@@ -11,7 +11,7 @@
 class AssetCookerService final
 {
 public:
-	AssetCookerService(const char* repositoryRoot, const char* projectName, const char* configuration, const char* toolProfile);
+	AssetCookerService(const char* workspaceRoot, const char* projectName, const char* configuration, const char* toolProfile);
 
 	AssetCookerServiceResult Cook(const char* projectName, const char* configuration, AssetCookerCategory category);
 
@@ -20,17 +20,17 @@ private:
 	static bool IsAllProjects(std::string_view projectName) noexcept;
 	static AssetCookerServiceResult Finish(bool succeeded, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord> outputs = {});
 
-	bool ResolveRepositoryRoot(AssetCookerDiagnostics& diagnostics, std::filesystem::path& outRepositoryRoot) const;
-	bool ResolveProjects(const std::filesystem::path& repositoryRoot, std::string_view projectName, AssetCookerDiagnostics& diagnostics, std::vector<std::string>& outProjects) const;
+	bool ResolveWorkspaceRoot(AssetCookerDiagnostics& diagnostics, std::filesystem::path& outWorkspaceRoot) const;
+	bool ResolveProjects(const std::filesystem::path& workspaceRoot, std::string_view projectName, AssetCookerDiagnostics& diagnostics, std::vector<std::string>& outProjects) const;
 	bool CookProjects(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    std::string_view toolProfile,
 	    AssetCookerCategory category,
 	    const std::vector<std::string>& projects,
 	    AssetCookerDiagnostics& diagnostics,
 	    std::vector<AssetCookerOutputRecord>& outOutputs) const;
 	bool CookProject(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    std::string_view projectName,
 	    std::string_view toolProfile,
 	    AssetCookerCategory category,
@@ -40,7 +40,7 @@ private:
 	std::string ResolveConfiguration(const char* requestConfiguration) const;
 	std::string ResolveToolProfile(std::string_view defaultToolProfile) const;
 
-	std::filesystem::path m_configuredRepositoryRoot;
+	std::filesystem::path m_configuredWorkspaceRoot;
 	std::string m_configuredProjectName;
 	std::string m_configuredConfiguration;
 	std::string m_configuredToolProfile;

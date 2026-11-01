@@ -2,23 +2,19 @@
 
 #include "World/Resources/TextureResourceStore.h"
 
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 
-class RenderTextureTableBuilder final
+static RenderTextureTable BuildRenderTextureTable(std::span<const std::filesystem::path> paths, std::uint32_t generation)
 {
-public:
-	static RenderTextureTable BuildRenderTextureTable(std::span<const std::filesystem::path> paths, std::uint32_t generation)
+	RenderTextureTable table;
+	table.Generation = generation;
+	table.Assets.reserve(paths.size());
+	for (std::uint32_t index = 0; index < paths.size(); ++index)
 	{
-		RenderTextureTable table;
-		table.Generation = generation;
-		table.Assets.reserve(paths.size());
-		for (std::uint32_t index = 0; index < paths.size(); ++index)
-		{
-			table.Assets.push_back({RenderTextureAssetHandle{index}, paths[index]});
-		}
-		return table;
+		table.Assets.push_back({RenderTextureAssetHandle{index}, paths[index]});
 	}
-};
+	return table;
+}
 
 void TextureResourceStore::AppendMaterialReferences(const std::vector<MaterialDesc>& materials)
 {
@@ -39,7 +35,7 @@ void TextureResourceStore::AppendMaterialReferences(const std::vector<MaterialDe
 void TextureResourceStore::AppendPaths(std::span<const std::filesystem::path> paths)
 {
 	const std::size_t previousCount = m_paths.size();
-	Filesystem::AppendNormalizedAssetPaths(paths, AssetType::Texture, m_paths);
+	Filesystem::AppendCookedTexturePaths(paths, m_paths);
 	if (m_paths.size() != previousCount)
 	{
 		++m_contentRevision;
@@ -48,13 +44,13 @@ void TextureResourceStore::AppendPaths(std::span<const std::filesystem::path> pa
 
 RenderTextureTable TextureResourceStore::CaptureRenderTable() const
 {
-	return RenderTextureTableBuilder::BuildRenderTextureTable(m_paths, m_generation);
+	return BuildRenderTextureTable(m_paths, m_generation);
 }
 
 RenderTextureTable TextureResourceStore::CaptureRenderTable(std::span<const std::filesystem::path> additionalPaths) const
 {
 	std::vector<std::filesystem::path> paths = m_paths;
 	paths.reserve(paths.size() + additionalPaths.size());
-	Filesystem::AppendNormalizedAssetPaths(additionalPaths, AssetType::Texture, paths);
-	return RenderTextureTableBuilder::BuildRenderTextureTable(paths, m_generation);
+	Filesystem::AppendCookedTexturePaths(additionalPaths, paths);
+	return BuildRenderTextureTable(paths, m_generation);
 }

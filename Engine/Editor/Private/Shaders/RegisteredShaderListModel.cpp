@@ -1,14 +1,11 @@
 #include "PCH.h"
-#include "Core/Public/FileSystemUtils.h"
 
 #include "Shaders/RegisteredShaderListModel.h"
+#include "Shaders/ShaderExportInspection.h"
 
-#include "Core/Public/Strings/StringUtils.h"
 #include "RHI/Public/Shaders/Authoring/GlobalShader.h"
 #include "RHI/Public/Shaders/ShaderStage.h"
 
-#include <filesystem>
-#include <system_error>
 #include <utility>
 
 void RegisteredShaderListModel::SetGenerationProvider(GenerationProvider provider)
@@ -25,54 +22,14 @@ void RegisteredShaderListModel::Refresh()
 		const ShaderParameterStructDescriptor parameters = shader.BuildParameterStructDescriptor != nullptr ? shader.BuildParameterStructDescriptor() : ShaderParameterStructDescriptor{};
 
 		RegisteredShaderRow row;
-		row.ShaderId = std::string(shader.ShaderName);
+		row.ShaderName = std::string(shader.ShaderName);
 		row.ShaderTypeId = shader.TypeId;
 		row.SourcePath = std::string(shader.SourcePath);
 		row.EntryPoint = std::string(shader.EntryPoint);
 		row.Stage = GetShaderStagePrefix(shader.Stage);
 		row.ParameterCount = parameters.Fields.size();
 		row.RuntimeGeneration = generation;
-		row.ArtifactDirectory = FindDebugArtifactDirectoryFor(row.ShaderId);
+		row.ExportDirectory = ShaderExportInspection::FindExportDirectory(row.ShaderName);
 		m_rows.push_back(std::move(row));
 	}
-}
-
-bool RegisteredShaderListModel::HasDebugArtifacts(const std::filesystem::path& directory)
-{
-	if (directory.empty())
-	{
-		return false;
-	}
-
-	std::error_code errorCode;
-
-	return std::filesystem::is_regular_file(directory / "compile-request.json", errorCode) && !errorCode && std::filesystem::is_regular_file(directory.parent_path() / "shader-export.json", errorCode)
-	    && !errorCode;
-}
-
-std::filesystem::path RegisteredShaderListModel::FindDebugArtifactDirectoryFor(std::string_view shaderId)
-{
-	const std::filesystem::path& root = Filesystem::GetShaderSymbolsOutputPath();
-	std::error_code errorCode;
-	if (!std::filesystem::exists(root, errorCode) || errorCode)
-	{
-		return {};
-	}
-
-	for (std::filesystem::recursive_directory_iterator it(root, errorCode), end; it != end && !errorCode; it.increment(errorCode))
-	{
-		if (!it->is_directory(errorCode) || errorCode)
-		{
-			errorCode.clear();
-			continue;
-		}
-
-		const std::string directoryName = it->path().filename().generic_string();
-		if (Strings::ContainsIgnoreCase(directoryName, shaderId) && HasDebugArtifacts(it->path()))
-		{
-			return it->path();
-		}
-		errorCode.clear();
-	}
-	return {};
 }

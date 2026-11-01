@@ -2,10 +2,11 @@
 
 #include "Cooking/ShaderCookPlanner.h"
 
+#include "SourceAssetPaths.h"
+
 #include "Compiler/ShaderSourceMountTable.h"
 #include "Cooking/Dependencies/ShaderDependencyManifest.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
 
 #include <algorithm>
 #include <format>
@@ -22,7 +23,9 @@ std::vector<ShaderCookDesc> SelectShadersForCook(const ShaderCookSettings& setti
 	std::unordered_set<ShaderTypeId> affectedShaderTypes;
 	if (!settings.changedVirtualPaths.empty())
 	{
-		const ShaderSourceMountTable sourceMounts(Filesystem::GetShaderPath(PathRoot::Engine), Filesystem::GetShaderPath(PathRoot::Project));
+		const ShaderSourceMountTable sourceMounts(
+		    SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Shader, SparkleTools::SourceAssetRoot::Engine),
+		    SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Shader, SparkleTools::SourceAssetRoot::Project));
 		std::vector<std::string> canonicalChangedPaths;
 		canonicalChangedPaths.reserve(settings.changedVirtualPaths.size());
 		for (const std::string& changedPath : settings.changedVirtualPaths)

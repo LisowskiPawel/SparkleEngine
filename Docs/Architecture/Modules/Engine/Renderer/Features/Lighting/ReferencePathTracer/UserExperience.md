@@ -2,9 +2,11 @@
 
 [Docs](../../../../../../../README.md) / [Up](ReferencePathTracerDesign.md) / [Implementation](ImplementationPlan.md)
 
-**Status:** experience contract retaining the accepted `PTD-00-R1` development baseline and the approved consumer release scope. Development menu/progress/manual-output source remains **IMPLEMENTED / VALIDATION DEFERRED**; Shipping host/output integration and usable first-use proof remain open.
+**Status:** experience contract retaining accepted `PTD-00-R1` transport and the amended Editor consumer scope. Development menu/progress/manual-output source remains **IMPLEMENTED / VALIDATION DEFERRED**; usable Editor first-use, ShippingEditor export and actual candidate proof remain open.
 
 **Responsibility:** define how a user, lighting engineer, or technical artist discovers, enters, navigates, observes, compares, resets, pauses, diagnoses, and secondarily exports the Reference Path Tracer
+
+**First-release boundary:** [file-session restore/resume is excluded](../../../../../../../Acceptance/FirstRelease.md#portfolio-demo-delivery-boundary). Pause/resume uses the retained in-memory prefix. Existing snapshot saving and exact raw/statistical export remain; no load-checkpoint button, restored-session promise or file-restore recovery path is selected. The accepted PTD-00 baseline is unchanged.
 
 **Authority boundary:** the [feature dossier](ReferencePathTracerDesign.md) owns binary acceptance and failure verdicts, [Transport And Estimator](TransportAndEstimator.md) owns mathematical meaning, [Execution Architecture](ExecutionArchitecture.md) owns per-view session/state/data ownership, [Discovery](Discovery.md) owns ratification, and the [staged plan](ImplementationPlan.md) owns implementation order and prompts
 
@@ -45,17 +47,17 @@ These are Stage-0 design inputs, not claims about the current implementation. A 
 | Work quantum | Reference batches are dynamically sized/partitioned so a submitted non-preemptible quantum targets `<= 100 ms` and must be `<= 500 ms` on the accepted support/map matrix. Failure to meet the hard bound blocks that matrix row rather than freezing navigation. |
 | Preview/progress | Present the newest completely committed current-identity prefix at least every `250 ms` while work completes; publish progress at `10 Hz` maximum and accessible announcements at `1 Hz` maximum. First current-identity prefix must appear within `2 s` on the accepted support/map matrix. |
 | Pause/cancel/close | Stop assigning work immediately. Late results are generation-rejected. Reach `Paused`, `Cancelled`, or a named device failure within `2 s` after the current quantum. Closing a viewport and normal application shutdown default to cancel-without-checkpoint; verified earlier results remain intact. |
-| Retention | Suspension retains the one prefix while its reference allocations remain within `min(2 GiB, 25% of reported local GPU budget)`. On UMA use reported local/available device memory. If budget is zero/unknown or the session exceeds it, `Pause` is disabled with `Retention unavailable`; switching to Lit settles and releases the prefix, so returning starts validation at ordinal zero. Stage 9 may add checkpoint-backed alternatives without changing this in-memory rule. Pressure eviction of an already suspended prefix announces the release and leaves no implied resume. |
+| Retention | Suspension retains the one prefix while its reference allocations remain within `min(2 GiB, 25% of reported local GPU budget)`. On UMA use reported local/available device memory. If budget is zero/unknown or the session exceeds it, `Pause` is disabled with `Retention unavailable`; switching to Lit settles and releases the prefix, so returning starts validation at ordinal zero. The first release has no checkpoint-backed retention alternative; loss of the retained prefix requires a new validated session. Pressure eviction of an already suspended prefix announces the release and leaves no implied resume. |
 | Duration | Interactive sessions default to an `8 h` wall-time limit; reaching it enters `TimedOut` and never publishes completion. If retention is available, it preserves the prefix and `Extend And Resume` continues it; otherwise it releases the prefix after settlement, labels `No resumable prefix`, and both `Extend And Resume` and `Restart` revalidate and begin ordinal zero. |
 | Disk | Preflight requires predicted staging plus final output plus `10%`, and refuses a single invocation predicted above `64 GiB`. No partial result is promoted on exhaustion. |
 | Evidence actions | `Pause` is memory-only. `Checkpoint And Pause`, `Save Current Prefix`, and `Save Complete` are P3 Expert actions initiated explicitly from the current viewport. An identity change cancels a pending capture intent; it never retargets it automatically. `Cancel After Checkpoint` means finish and verify the current checkpoint transaction, then stop; ordinary `Cancel` abandons staging. |
-| Shipping | `ShippingEditor` and `ShippingGame` include the approved Reference mode, bounded session/progress/actions and explicit raw export. Startup remains Lit. Use the same Renderer semantics and a small host adapter over the shared private Application output operation; include only its reviewed codec/package dependencies. Developer console, generic debug panels and external capture tools stay excluded. RHI contains no Reference enumerator or mode field. Source presence is not consumer reachability proof. |
+| Shipping | `ShippingEditor` retains the approved Reference selector, bounded progress/pause/reset and explicit raw export using the existing private ApplicationEditor operation. `ShippingGame` is a render-only experience without selector/progress/export UI. Both keep host-independent Renderer semantics; Lit remains default. No Game output adapter or encoder relocation is required. RHI has no Reference mode field. Source presence is not consumer reachability proof. |
 
 The numerical bounds are implementation contracts immediately. A development machine either meets the capability/resource predicates and reports measured behavior or returns the frozen unavailable/capacity result; it does not invent different limits. Naming minimum/reference release machines and claiming those bounds as supported-product performance remains a Stage-10 release gate.
 
 ## Product Pillar
 
-A user selects **Reference Path Tracer** through the current host's ordinary View Mode control—immediately after **Lit** in Editor, or through the approved development view selector in a Game host—and receives a progressively refined image with truthful sample progress. Any effective camera or radiance-affecting scene change invalidates the old prefix before it can mix with the new view. Switching back to Lit enables immediate comparison; returning resumes only a retained exact-identity prefix, while a disclosed no-retention exit restarts at ordinal zero.
+An Editor user selects **Reference Path Tracer** immediately after **Lit** in the ordinary View Mode control and receives progressive rendering with truthful sample progress. Effective camera or radiance-affecting changes invalidate the old prefix before mixing. Switching to Lit permits comparison; returning resumes only an exact-identity retained prefix, otherwise restarts at ordinal zero. Game follows the [render-only Game decision](../../../../../../../Acceptance/FirstRelease.md#consumer-effort-and-game-presentation) and has no feature menu, progress or export UI.
 
 The normal route requires no IDE, developer console, CVar sequence, mandatory setup workspace, or manual `Validate`/`Start` ceremony. Correct defaults, capability validation, accumulation, reset, and preview presentation are consequences of selecting the view mode. A details surface exists for current state, route/backend truth, raw-versus-display meaning, pause/restart, and actionable unavailability, but is not a prerequisite for first use. Export remains a later Evidence/Output capability.
 
@@ -66,7 +68,7 @@ Four distinctions remain impossible to miss:
 - **complete current-view result versus partial prefix, checkpoint, export staging, failure, or accepted oracle evidence**;
 - **viewport comparison session versus a durable exported artifact**.
 
-The Renderer semantic is host-agnostic and supports both Editor `Scene` views and Game `Game` views. `RenderViewKind` identifies the ordinary camera producer; it never chooses a different path tracer. `RenderViewMode::ReferencePathTracer` selects the same frame composition, session semantics, and estimator for either kind. Development hosts retain their current route. The approved Shipping products expose that same mode through their existing viewport/menu owner, with progress/actions and manual raw output; no separate settings frontend, hidden CLI renderer or host-specific estimator is introduced. Build/package reachability still needs executable proof.
+The Renderer semantic is host-agnostic for Editor `Scene` and runtime `Game` View producers; `RenderViewKind` never selects a different estimator. Editor supplies interactive mode selection, progress/actions and manual raw output through its existing owners. Game has no UI adapter or manual-export promise. Keep canonical camera, session, recipe and sample-stream equivalence checks at the Renderer/request boundary; do not create a Game frontend to exercise them.
 
 ## Intended People And Jobs
 
@@ -308,10 +310,11 @@ The frozen dry-run matrix is keyboard-only selection/actions/focus order; non-co
 | Profile | Frozen reachability |
 | --- | --- |
 | `DebugEditor`, `DevelopmentEditor` | View-mode selector, overlay/details, semantic Renderer API, manual ApplicationEditor artifact operation, raw writer, and support details included. |
-| `DebugGame`, `DevelopmentGame` | The same Renderer `ReferencePathTracer` mode and session are included and selectable through an approved ordinary viewport control; no Editor dependency or Game-specific estimator exists. |
-| `ShippingEditor`, `ShippingGame` | Included mode/session, progress/pause/reset and explicit raw export using the same consumer contract. Lit remains default; no Editor dependency in Game, generic developer capture surface or support-service promise. RHI exposes no Reference value. |
+| `DebugGame`, `DevelopmentGame` | Same Renderer request/session semantic; Game presentation is render-only, without an ImGui selector or export frontend. Core route/camera checks do not require a user-facing Game control. |
+| `ShippingEditor` | Included Reference selector/session, progress/pause/reset and explicit raw export through the existing Editor operation. Lit default; unrelated development tools remain excluded. |
+| `ShippingGame` | Rendering window, existing camera input and native close, with no ImGui/Reference controls or export UI. Renderer semantics stay shared; no separate estimator or output adapter. |
 
-The current repository does not yet prove this matrix: the transitional global Reference composition CVar is removed and development-host source uses one ordinary request, but the raw artifact operation is currently under private Application Editor ownership. Stage 7 must close the Shipping host controls and Stage 9 must share the necessary Application output mechanism with Game, deleting the replaced Editor-only path. Stage 10 qualifies the actual archive; source linkage alone is not consumer first-use or export proof.
+The current repository does not yet prove this matrix. Stage 7 closes only the Editor/ShippingEditor interaction delta and Stage 9 qualifies the existing private ApplicationEditor raw operation. Keep its encoder/publication there; the superseded Game-export requirement no longer justifies moving it or adding a shared output service. Stage 10 joins the actual archive rehearsal: Editor Reference use/export and render-only Game preservation. Existing source and historical receipts retain their identities.
 
 ## Stage-0 First-Use Dry Run
 
@@ -366,7 +369,7 @@ Epic's official Unreal Engine 5.8 Path Tracer documentation is the primary inter
 
 - ordinary viewport View Mode selection, automatic progressive accumulation, a visible target-SPP progress bar, and immediate noisy feedback;
 - invalidation on effective camera, view, object, material, light, environment, or admitted deformation change;
-- the same semantic being reachable from an approved Game viewport rather than existing only as an Editor batch tool;
+- the same Renderer semantic accepting Scene/Game camera producers without a host-specific estimator; the user-facing selector/progress/export remains Editor-only;
 - raw radiance remaining distinct from denoised radiance, albedo/normal/variance guides, display transforms, screenshots, and final file output;
 - bounce/sample/filter controls being mode semantics rather than mutations of the user's Lit configuration; and
 - bounded GPU work so camera interaction and the operating-system watchdog are not hostage to one uninterruptible render.
@@ -408,7 +411,7 @@ This correspondence originally guided Stages 6/7. The current source contains ac
 
 The implementation sequence has two non-interchangeable gates. The primary viewport usability gate passes before artifact polish can be used to claim product progress:
 
-1. `CHK-RPT-15` records a clean first-use transcript for finding the mode after Lit, automatic validation/start, live progressive display, responsive camera translation/rotation, named reset, automatic post-motion refinement, exact progress/completion, Lit comparison, exact resume/reset on return, pause/restart, failure, and recovery;
+1. `CHK-RPT-15` records an Editor first-use transcript for selection after Lit, automatic validation/start, current-view progress, responsive camera motion/reset/refinement, Lit comparison, exact resume/reset, pause/restart and failure/recovery; Game is checked for the separate render-only promise;
 2. both Editor and Game camera producers pass translation, rotation, camera selection, cut/teleport, projection/lens, resize, unchanged-frame, and continuous-motion matrices through one canonical View route;
 3. `CHK-RPT-09` proves no stale sample survives any hard invalidation, the displayed composition follows the newest camera within its frozen responsiveness budget, and no presentation/scheduling-only change loses a valid prefix;
 4. `CHK-RPT-16` proves one per-view Renderer session owns accumulation, no duplicate Lighting selector or estimator authority remains, and Shipping reachability matches accepted scope;

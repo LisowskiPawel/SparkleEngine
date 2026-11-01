@@ -10,11 +10,12 @@
 #include "Features/MaterialVariants/CookedSceneMaterialVariantBuilder.h"
 #include "Features/Metadata/CookedSceneMetadataBuilder.h"
 #include "Features/Skeletons/CookedSceneSkeletonBuilder.h"
-#include "Core/Public/Assets/AssetTypes.h"
+#include "SourceAssetPaths.h"
 #include "Core/Public/Files/BinaryStreamWriter.h"
 #include "Core/Public/Files/FileUtils.h"
-#include "Core/Public/FileSystemUtils.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
+#include "Core/Public/Files/FileSetPublication.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
+#include "Core/Public/Paths/ProductFilePaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "Assets/SceneAssetRegistry.h"
 #include "SourceImportOutput.h"
@@ -132,7 +133,7 @@ void SceneCookPipeline::StageManifest(const CookedSceneBuild& build, std::vector
 
 std::filesystem::path SceneCookPipeline::ResolveSourceScenePath(const std::filesystem::path& sourceScenePath)
 {
-	if (const auto resolvedPath = Filesystem::ResolveAssetPathNormalized(sourceScenePath, AssetType::Mesh))
+	if (const auto resolvedPath = SparkleTools::ResolveSourceAssetPath(sourceScenePath, SparkleTools::SourceAssetType::Mesh))
 	{
 		return *resolvedPath;
 	}
@@ -142,8 +143,8 @@ std::filesystem::path SceneCookPipeline::ResolveSourceScenePath(const std::files
 
 std::string SceneCookPipeline::BuildSceneAssetId(const std::filesystem::path& resolvedSourceScenePath)
 {
-	const std::filesystem::path projectMeshRoot = Filesystem::GetTypedPath(AssetType::Mesh, PathRoot::Project);
-	const std::filesystem::path engineMeshRoot = Filesystem::GetTypedPath(AssetType::Mesh, PathRoot::Engine);
+	const std::filesystem::path projectMeshRoot = SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Mesh, SparkleTools::SourceAssetRoot::Project);
+	const std::filesystem::path engineMeshRoot = SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Mesh, SparkleTools::SourceAssetRoot::Engine);
 
 	std::optional<std::filesystem::path> relativePath = Paths::TryMakeRelativeUnderRoot(resolvedSourceScenePath, projectMeshRoot);
 	if (!relativePath)

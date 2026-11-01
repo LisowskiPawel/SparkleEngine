@@ -6,7 +6,7 @@
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Identifiers/Uuid.h"
 #include "Core/Public/Json/JsonReader.h"
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 
@@ -28,7 +28,7 @@ namespace SparkleLauncher
 			}
 			return true;
 		}
-		if (plan.Request.GpuCrashMode != RhiGpuCrashMode::Aftermath || !Filesystem::IsSourceWorkspace(plan.RepositoryRoot) || plan.Request.CaptureProvider != ExternalCaptureProvider::None
+		if (plan.Request.GpuCrashMode != RhiGpuCrashMode::Aftermath || !HasBuildSources(plan.WorkspaceRoot) || plan.Request.CaptureProvider != ExternalCaptureProvider::None
 		    || plan.Request.ProductProfile.starts_with("Debug"))
 		{
 			plan.ReadinessMessages.emplace_back("Aftermath requires a Development/Shipping diagnostic product and a separate launch from frame capture.");
@@ -47,7 +47,7 @@ namespace SparkleLauncher
 		}
 		plan.SessionId = Identifiers::CreateUuidV4String();
 		plan.ReadinessMessages.emplace_back("Aftermath inputs will be qualified by the child before devices; native collection is not active yet.");
-		const auto state = Filesystem::ResolveDevelopmentProductUserStatePaths(plan.RepositoryRoot, plan.Request.ContentId);
+		const auto state = Filesystem::ResolveDevelopmentProductUserStatePaths(plan.WorkspaceRoot, plan.Request.ContentId);
 		const auto incidentRoot = state.CrashesRoot / "GpuCrash";
 		plan.PlannedEffects.emplace_back("Reserve one private incident slot beneath " + Strings::ToNarrow(incidentRoot.wstring()) + ".");
 		return true;

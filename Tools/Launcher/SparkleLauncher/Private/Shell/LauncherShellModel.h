@@ -2,7 +2,7 @@
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "SparkleLauncher/ProjectResolver.h"
-#include "SparkleLauncher/RepositoryLocator.h"
+#include "SparkleLauncher/WorkspaceLocator.h"
 
 #include <string>
 #include <string_view>
@@ -29,7 +29,7 @@ namespace SparkleLauncher
 
 	struct LauncherShellModel final
 	{
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		std::string ContentId;
 		std::string EditorProfile = "DevelopmentEditor";
 		std::string GameProfile = "DevelopmentGame";
@@ -40,7 +40,7 @@ namespace SparkleLauncher
 		std::vector<std::string> JobOutput;
 	};
 
-	LauncherShellModel BuildLauncherShellModel(std::filesystem::path repository, LauncherProject content, const LauncherShellArguments& arguments);
+	LauncherShellModel BuildLauncherShellModel(std::filesystem::path workspace, LauncherProject content, const LauncherShellArguments& arguments);
 	const LauncherShellOperationRow* FindLauncherShellOperation(const LauncherShellModel& model, std::string_view operationId) noexcept;
 	void RecordLauncherShellActivity(LauncherShellModel& model, std::string summary);
 }

@@ -1,17 +1,25 @@
 #pragma once
 
+#include "Assets/Loaders/CookedAssetAllocationBudget.h"
+
 #include <cstdint>
 #include <filesystem>
 #include <map>
 #include <memory>
 #include <span>
 
+namespace Files
+{
+	class FileSetReadScope;
+}
+
 namespace Assets
 {
 	class CookedAssetFileSet final
 	{
 	public:
-		CookedAssetFileSet();
+		CookedAssetAllocationBudget& GetAllocationBudget() const noexcept { return *m_budget; }
+		explicit CookedAssetFileSet(const Files::FileSetReadScope& publication, CookedAssetAllocationBudget& budget);
 		~CookedAssetFileSet();
 
 		CookedAssetFileSet(const CookedAssetFileSet&) = delete;
@@ -28,6 +36,8 @@ namespace Assets
 	private:
 		struct File;
 		static std::unique_ptr<File> Map(const std::filesystem::path& path);
+		CookedAssetAllocationBudget* m_budget = nullptr;
+		const Files::FileSetReadScope* m_publication = nullptr;
 		std::map<std::filesystem::path, std::unique_ptr<File>> m_files;
 	};
 }

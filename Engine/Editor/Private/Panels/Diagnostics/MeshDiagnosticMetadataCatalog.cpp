@@ -4,7 +4,7 @@
 
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Json/JsonReader.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
+#include "Core/Public/Paths/ProductFilePaths.h"
 
 #include <filesystem>
 #include <optional>

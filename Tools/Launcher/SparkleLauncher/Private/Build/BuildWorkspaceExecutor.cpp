@@ -5,7 +5,7 @@
 #include "BuildWorkspaceFailure.h"
 #include "LauncherOperationProgress.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "ToolOutputPaths.h"
 #include "SparkleLauncher/SourceDependencyState.h"
 
 #include <algorithm>
@@ -27,7 +27,7 @@ namespace SparkleLauncher
 			return std::nullopt;
 		}
 
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(plan.RepositoryRoot);
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(plan.WorkspaceRoot);
 		const SourceDependencyInventoryStatus status = InspectSourceDependencyCache(workspaceOutputs.DependencyCacheRoot);
 		if (status.AllEnabledDependenciesReady)
 		{
@@ -60,7 +60,7 @@ namespace SparkleLauncher
 			return "Unknown source dependency: " + plan.Request.SourceDependencyId + ".";
 		}
 
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(plan.RepositoryRoot);
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(plan.WorkspaceRoot);
 		const SourceDependencyValidation validation = ValidateSourceDependency(*dependency, workspaceOutputs.DependencyCacheRoot);
 		if (validation.Ready)
 		{
@@ -83,7 +83,7 @@ namespace SparkleLauncher
 			return std::nullopt;
 		}
 
-		const BuildToolchainStatus refreshedToolchain = DetectBuildToolchain(plan.RepositoryRoot, plan.Request.PreferredIde, plan.Request.Compiler);
+		const BuildToolchainStatus refreshedToolchain = DetectBuildToolchain(plan.WorkspaceRoot, plan.Request.PreferredIde, plan.Request.Compiler);
 
 		const auto installedTool = std::find_if(
 		    refreshedToolchain.Items.begin(),
@@ -181,7 +181,7 @@ namespace SparkleLauncher
 				}
 
 				std::string cleanupError;
-				if (!ResetNativeBuildOutputs(plan.RepositoryRoot, plan.Freshness.BuildDirectory, cleanupError))
+				if (!ResetNativeBuildOutputs(plan.WorkspaceRoot, plan.Freshness.BuildDirectory, cleanupError))
 				{
 					SetOperationFailure(operation, OperationProblemKind::Filesystem, std::move(cleanupError), "Close processes using generated build outputs, verify path permissions, then retry.");
 					MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
@@ -267,7 +267,7 @@ namespace SparkleLauncher
 			}
 
 			std::string errorMessage;
-			if (!UpdateBuildFilesFreshnessStamp(plan.RepositoryRoot, plan.Toolchain, errorMessage))
+			if (!UpdateBuildFilesFreshnessStamp(plan.WorkspaceRoot, plan.Toolchain, errorMessage))
 			{
 				SetOperationFailure(operation, OperationProblemKind::Filesystem, std::move(errorMessage), "Verify write permission for the launcher state directory, then retry Generate Build Files.");
 				MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);

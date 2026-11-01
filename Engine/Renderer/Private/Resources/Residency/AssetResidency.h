@@ -45,6 +45,7 @@ struct AssetResidencyCounters final
 {
 	std::uint64_t DecodedBytes = 0;
 	std::uint64_t PendingUploadBytes = 0;
+	// Includes upload reservations and allocations retained until retirement.
 	std::uint64_t ResidentBytes = 0;
 	std::uint32_t RequestBacklog = 0;
 };

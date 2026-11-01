@@ -1,12 +1,9 @@
 #include "PCH.h"
 #include "Panels/Diagnostics/TextureDiagnosticsPresentation.h"
 
-#include "Panels/Diagnostics/TextureDiagnosticMetadataCatalog.h"
-
 #include <algorithm>
 #include <filesystem>
 #include <format>
-#include <optional>
 #include <string>
 
 #include <imgui.h>
@@ -16,14 +13,6 @@ namespace TextureDiagnosticsPresentation
 
 	std::string FormatTextureDisplayName(const TextureDiagnosticsRow& row)
 	{
-		if (const std::optional<TextureDiagnosticMetadata> metadata = FindTextureDiagnosticMetadata(row))
-		{
-			if (!metadata->DisplayName.empty())
-			{
-				return metadata->DisplayName;
-			}
-		}
-
 		std::string filename = std::filesystem::path(row.Key).filename().generic_string();
 		if (!filename.empty())
 		{
@@ -31,25 +20,6 @@ namespace TextureDiagnosticsPresentation
 		}
 
 		return row.Key.empty() ? std::string("<unnamed texture>") : row.Key;
-	}
-
-	std::string FormatTexturePath(const TextureDiagnosticsRow& row)
-	{
-		if (const std::optional<TextureDiagnosticMetadata> metadata = FindTextureDiagnosticMetadata(row))
-		{
-			if (!metadata->SourcePath.empty())
-			{
-				return metadata->SourcePath;
-			}
-		}
-
-		return row.Key;
-	}
-
-	std::optional<std::string> FindAuthoredSourcePath(const TextureDiagnosticsRow& row)
-	{
-		const std::optional<TextureDiagnosticMetadata> metadata = FindTextureDiagnosticMetadata(row);
-		return metadata.has_value() && !metadata->SourcePath.empty() ? std::optional<std::string>(metadata->SourcePath) : std::nullopt;
 	}
 
 	const char* FormatTextureKind(TextureDiagnosticsKind kind) noexcept

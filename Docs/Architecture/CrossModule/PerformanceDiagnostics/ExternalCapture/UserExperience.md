@@ -8,7 +8,7 @@
 
 **Authority boundary:** runtime truth belongs to [Semantics](Semantics.md) and [Execution Architecture](ExecutionArchitecture.md); this page owns interaction. The parent [Visual Design](../VisualDesign.md) supplies layout precedent, not provider capability proof.
 
-**Current implementation:** DebugEditor/DevelopmentEditor have single-provider startup selection, native bootstrap, request control and a viewport overlay. Scoped native results are recorded in [Discovery](Discovery.md#direct-launch-implementation-handoff---2026-10-10); lifecycle, full matrix, Game, Shipping product and documented reproduction acceptance remain open. This source refresh does not increase readiness.
+**Current implementation:** DebugEditor/DevelopmentEditor have single-provider startup selection, native bootstrap, request control and a viewport overlay. Scoped native results are recorded in [Discovery](Discovery.md#direct-launch-implementation-handoff---2026-10-10); selected-route lifecycle, Shipping product and documented reproduction acceptance remain open; Game controls and Nsight Vulkan integration are deferred under the [current scope](ExternalCaptureDesign.md#product-and-support-disposition). This source refresh does not increase readiness.
 
 ## Implemented Launch And Viewport Action
 
@@ -16,17 +16,17 @@ DebugEditor and DevelopmentEditor accept one `--capture-provider none|nsight-gra
 
 The selected native activity bootstraps before intercepted graphics work. One recognizable application icon overlays the scene surface at its upper right with a two-font-height hit area. None contributes no overlay. The button submits the existing typed request; readiness and pending/quarantined state determine whether it is enabled. Marker availability alone cannot enable capture. The generic viewport owns overlay placement; the capture client owns presentation, and the shared icon service owns assets/resources. [Current composition](ExecutionArchitecture.md#implemented-editor-viewport-composition) and [native handoff](Discovery.md#direct-launch-implementation-handoff---2026-10-10) supersede the earlier disabled-artwork slice.
 
-PIX and Nsight Graphics have D3D12 adapters; RenderDoc has D3D12 and Vulkan lowering. Nsight Vulkan and DevelopmentGame remain delivery work. Shipping excludes the optional route in source/build membership; full product/package erasure still needs acceptance evidence.
+PIX and Nsight Graphics have D3D12 adapters; RenderDoc has D3D12 and Vulkan lowering. Nsight Vulkan and DevelopmentGame integration are deferred; tool-managed use remains a separately evidenced external workflow. Shipping excludes the optional route in source/build membership; full product/package erasure still needs acceptance evidence.
 
 ## Current Startup Selection
 
-Select **GPU Capture** beside **Graphics API** in the Sparkle Launcher footer: **None -> Nsight Graphics -> PIX -> RenderDoc**. Installed eligible tools are selectable; supported missing tools remain visible with setup details, and incompatible API/profile/hardware choices remain disabled with reasons. Default None launches without optional hooks. Installation detection performs no injection and does not imply native readiness. Nsight's experimental status stays visible.
+Select **GPU Capture** between **Shader Compiler** and **GPU Crash Debugging** in the Sparkle Launcher footer: **None -> Nsight Graphics -> PIX -> RenderDoc**. The selector has a fixed compact width; setup details and Nsight's experimental SDK status appear in option tooltips. Installed eligible tools are selectable; supported missing tools remain visible with setup details, and incompatible API/profile/hardware choices remain disabled with reasons. Default None launches without optional hooks. Installation detection performs no injection and does not imply native readiness.
 
 Direct IDE/shortcut launches may persist the same enum under **Window -> Settings -> GPU Capture -> Capture tool on startup** and restart. Explicit attachment flags or Launcher intent override that preference for one launch. One active provider owns capture; the larger icon overlays the viewport surface at its top right. Click it after the desired scene is ready. Capture applies to the containing host interval and includes Editor UI. Native finalization determines completion; pending/quarantined controls remain disabled. Rendering Settings, Launcher and UI never own a second native session.
 
 ## First Use: PIX
 
-1. Select DevelopmentEditor and D3D12 in Launcher, then PIX under GPU Capture. Runtime verifies the activity; installation detection alone does not prove readiness. DevelopmentGame is still pending Stage 2.
+1. Select DevelopmentEditor and D3D12 in Launcher, then PIX under GPU Capture. Runtime verifies the activity; installation detection alone does not prove readiness. No new DevelopmentGame control is selected.
 2. Launch the level-run operation. Unsafe partial injection rejects launch; unavailable capability reports a reason without substituting another tool or graphics API.
 3. Open the intended scene viewport and let it render. The PIX icon overlays the top-right scene surface; it captures the containing host interval, including Editor UI.
 4. Hover for `Capture a GPU frame with PIX` and any pending or failure reason. Click once when enabled. The same authority rejects a second active request; the viewport retains its camera, settings and selection.
@@ -35,7 +35,7 @@ Direct IDE/shortcut launches may persist the same enum under **Window -> Setting
 
 ### Remaining Presentation And Acceptance
 
-The following are target requirements, not controls already present in the overlay: a detailed result view with explicit identity certainty and observer/provenance data; separate `Open in tool` and `Show in folder` actions where an accessible artifact exists; accessible status/recovery and narrow-layout behavior. Keep native handoff separate from capture finalization, and never invent a precise tool frame ID from the host scheduling boundary. [Remaining delivery](ImplementationPlan.md) owns their implementation/acceptance disposition.
+Use the existing overlay for readiness/progress/error and the native-tool handoff for inspection. Existing local logs can carry artifact path, request/target identity and observer/provenance limits; a new result view, folder browser or setup/preferences surface is not required. Prove accessible status/recovery and supported layout behavior in this route. Keep native handoff separate from capture finalization, and never invent a precise tool frame ID from the host scheduling boundary. [Remaining delivery](ImplementationPlan.md) owns only its missing controls.
 
 Install/update the external tool through its normal vendor workflow. Sparkle does not silently download or elevate a tool, alter driver settings, scan arbitrary directories, or recreate a graphics device from a capture button. Optional trusted installation selection lives in setup/advanced preferences only when automatic supported discovery fails.
 
@@ -52,7 +52,7 @@ For specialist investigations, use `Open profiling guidance` with a selected que
 | Launcher optional tools | One typed process-start provider selection | Same normalization as direct CLI; startup capability/reason comes from launched process. |
 | Direct CLI | One `--capture-provider <id>` selection or attachment alias | Implemented Editor bootstrap and capture request route. Duplicate/unknown intent rejects before graphics; no tool-specific command string comes from Editor. |
 | Editor viewport icon | Named provider + current stable scene-view target + next eligible frame | Existing Renderer control route, one request ID, immutable result model. |
-| DevelopmentGame (remaining) | Same single-provider intent and existing development console/control operation | Stage 2 must add and validate the Game route; the current Editor-only implementation does not enable it. Provider-native capture is a distinct external workflow. |
+| DevelopmentGame | In-engine capture control deferred | The current Editor-only route remains unchanged. Use a native tool-managed launch/attachment if a selected Game measurement needs it; record actual artifact and settings. |
 | Automation | Same typed request and observed result; explicit readiness precondition and deadline | No script clicks a vendor icon or scrapes filename existence to infer completion. Nonzero rejection/failure result and retained native artifact identity. |
 
 Process-start selection cannot change on a running graphics context. UI offers `Relaunch with tool` guidance; unsaved Editor state follows existing save/relaunch workflow, with no automatic destructive restart.

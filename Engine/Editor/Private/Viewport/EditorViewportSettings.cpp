@@ -2,7 +2,7 @@
 
 #include "Viewport/EditorViewportSettings.h"
 
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 

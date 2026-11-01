@@ -1,12 +1,12 @@
 # Sparkle Launcher Visual Assets
 
-This folder owns curated imagery for the launcher Quick Start hero and contextual workflow surfaces.
+This folder owns curated imagery for the launcher scene selection hero and contextual workflow surfaces.
 
 Pawel Lisowski confirmed on 2026-10-11 that these PNGs are his original work for Sparkle. They use the repository's MIT license.
 
-Quick Start asset slots:
+scene selection asset slots:
 
-- `showcase-hero.png`: Home hero artwork.
+- `showcase-hero.png`: Scenes hero artwork.
 - `showcase-content.png`: Cooked content / scene asset tile.
 - `sparkle-architecture.png`: Architecture evidence tile.
 - `sparkle-source-tiers.png`: Source tier evidence tile.
@@ -15,7 +15,7 @@ Quick Start asset slots:
 
 Workflow banner asset slots:
 
-- `workflow-home-quickstart.png`: Quick Start contextual banner.
+- `workflow-scenes.png`: scene selection contextual banner.
 - `workflow-toolchain-check.png`: Host readiness workflow banner.
 - `workflow-source-sync.png`: Source tier sync workflow banner.
 - `workflow-generate-build-files.png`: Generate build files workflow banner.

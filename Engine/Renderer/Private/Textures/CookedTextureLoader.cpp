@@ -5,75 +5,76 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/BinarySpanReader.h"
 #include "Core/Public/Files/FileUtils.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "RHI/Public/Textures/CookedTextureAsset.h"
 
 #include <format>
 #include <span>
 
-class CookedTextureDecoder final
+static void ValidateHeader(const CookedTextureAssetHeader& header, const std::filesystem::path& resolvedPath)
 {
-public:
-	static void ValidateHeader(const CookedTextureAssetHeader& header, const std::filesystem::path& resolvedPath)
+	if (!header.HasExpectedMagic())
 	{
-		if (!header.HasExpectedMagic())
-		{
-			throw Diagnostics::Error("Invalid cooked texture asset header for '" + resolvedPath.string() + "'");
-		}
-
-		if (header.width == 0 || header.height == 0 || header.mipCount == 0 || PixelFormatFromSerializedTextureFormat(header.format) == PixelFormat::Unknown)
-		{
-			throw Diagnostics::Error("Cooked texture asset header has invalid dimensions, mip count, or format for '" + resolvedPath.string() + "'");
-		}
-
-		if (header.GetArraySize() == 0)
-		{
-			throw Diagnostics::Error("Cooked texture asset header has an invalid array size for '" + resolvedPath.string() + "'");
-		}
-
-		if (header.GetDimension() != TextureResourceDimension::Texture2D && header.GetDimension() != TextureResourceDimension::TextureCube)
-		{
-			throw Diagnostics::Error("Cooked texture asset header has an invalid texture dimension for '" + resolvedPath.string() + "'");
-		}
-
-		if (header.GetDimension() == TextureResourceDimension::TextureCube && header.GetArraySize() != 6)
-		{
-			throw Diagnostics::Error("Cooked texture asset header has an invalid cubemap face count for '" + resolvedPath.string() + "'");
-		}
+		throw Diagnostics::Error("Invalid cooked texture asset header for '" + resolvedPath.string() + "'");
 	}
 
-	static void ValidateMipHeader(const CookedTextureMipHeader& mipHeader, std::uint32_t mipIndex, const std::filesystem::path& resolvedPath)
+	if (header.width == 0 || header.height == 0 || header.mipCount == 0 || PixelFormatFromSerializedTextureFormat(header.format) == PixelFormat::Unknown)
 	{
-		if (mipHeader.width == 0 || mipHeader.height == 0 || mipHeader.rowPitch == 0 || mipHeader.slicePitch == 0 || mipHeader.dataSize == 0)
-		{
-			throw Diagnostics::Error(std::format("Cooked texture asset '{}' has an invalid mip header at index {}", resolvedPath.string(), mipIndex));
-		}
-
-		if (mipHeader.dataSize != mipHeader.slicePitch)
-		{
-			throw Diagnostics::Error(
-			    std::format("Cooked texture asset '{}' stores mip {} with {} payload bytes but {} slice pitch bytes", resolvedPath.string(), mipIndex, mipHeader.dataSize, mipHeader.slicePitch));
-		}
+		throw Diagnostics::Error("Cooked texture asset header has invalid dimensions, mip count, or format for '" + resolvedPath.string() + "'");
 	}
 
-	static TextureFormatIntent ResolveFormatIntent(std::uint32_t storedValue)
+	if (header.GetArraySize() == 0)
 	{
-		switch (static_cast<TextureFormatIntent>(storedValue))
-		{
-			case TextureFormatIntent::Unknown:
-			case TextureFormatIntent::ColorSrgb:
-			case TextureFormatIntent::DataLinear:
-				return static_cast<TextureFormatIntent>(storedValue);
-		}
-
-		throw Diagnostics::Error(std::format("Cooked texture stores unknown format intent {}.", storedValue));
+		throw Diagnostics::Error("Cooked texture asset header has an invalid array size for '" + resolvedPath.string() + "'");
 	}
-};
+
+	if (header.GetDimension() != TextureResourceDimension::Texture2D && header.GetDimension() != TextureResourceDimension::TextureCube)
+	{
+		throw Diagnostics::Error("Cooked texture asset header has an invalid texture dimension for '" + resolvedPath.string() + "'");
+	}
+
+	if (header.GetDimension() == TextureResourceDimension::TextureCube && header.GetArraySize() != 6)
+	{
+		throw Diagnostics::Error("Cooked texture asset header has an invalid cubemap face count for '" + resolvedPath.string() + "'");
+	}
+}
+
+static void ValidateMipHeader(const CookedTextureMipHeader& mipHeader, std::uint32_t mipIndex, const std::filesystem::path& resolvedPath)
+{
+	if (mipHeader.width == 0 || mipHeader.height == 0 || mipHeader.rowPitch == 0 || mipHeader.slicePitch == 0 || mipHeader.dataSize == 0)
+	{
+		throw Diagnostics::Error(std::format("Cooked texture asset '{}' has an invalid mip header at index {}", resolvedPath.string(), mipIndex));
+	}
+
+	if (mipHeader.dataSize != mipHeader.slicePitch)
+	{
+		throw Diagnostics::Error(
+		    std::format("Cooked texture asset '{}' stores mip {} with {} payload bytes but {} slice pitch bytes", resolvedPath.string(), mipIndex, mipHeader.dataSize, mipHeader.slicePitch));
+	}
+}
+
+static TextureFormatIntent ResolveFormatIntent(std::uint32_t storedValue)
+{
+	switch (static_cast<TextureFormatIntent>(storedValue))
+	{
+		case TextureFormatIntent::Unknown:
+		case TextureFormatIntent::ColorSrgb:
+		case TextureFormatIntent::DataLinear:
+			return static_cast<TextureFormatIntent>(storedValue);
+	}
+
+	throw Diagnostics::Error(std::format("Cooked texture stores unknown format intent {}.", storedValue));
+}
 
 CookedTextureFilePayload CookedTextureLoader::Read(const std::filesystem::path& texturePath)
 {
 	CookedTextureFilePayload payload;
-	payload.ResolvedPath = Filesystem::ResolveAssetPathValidated(texturePath, AssetType::Texture);
+	const auto resolvedPath = Filesystem::ResolveCookedTexturePath(texturePath);
+	if (!resolvedPath)
+	{
+		throw Diagnostics::Error("Cooked texture not found or not a .stex product: '" + texturePath.string() + "'.");
+	}
+	payload.ResolvedPath = *resolvedPath;
 	std::string errorMessage;
 	if (!Files::TryReadAllBytes(payload.ResolvedPath, payload.Bytes, errorMessage))
 	{
@@ -96,9 +97,9 @@ LoadedTextureData CookedTextureLoader::Decode(const CookedTextureFilePayload& pa
 	{
 		throw Diagnostics::Error(errorMessage);
 	}
-	CookedTextureDecoder::ValidateHeader(header, payload.ResolvedPath);
+	ValidateHeader(header, payload.ResolvedPath);
 
-	const TextureFormatIntent formatIntent = CookedTextureDecoder::ResolveFormatIntent(header.formatIntent);
+	const TextureFormatIntent formatIntent = ResolveFormatIntent(header.formatIntent);
 
 	std::vector<CookedTextureMipHeader> mipHeaders;
 	const std::size_t subresourceCount = static_cast<std::size_t>(header.mipCount) * header.GetArraySize();
@@ -110,7 +111,7 @@ LoadedTextureData CookedTextureLoader::Decode(const CookedTextureFilePayload& pa
 	std::uint64_t decodedBytes = 0;
 	for (std::uint32_t mipIndex = 0; mipIndex < static_cast<std::uint32_t>(mipHeaders.size()); ++mipIndex)
 	{
-		CookedTextureDecoder::ValidateMipHeader(mipHeaders[mipIndex], mipIndex, payload.ResolvedPath);
+		ValidateMipHeader(mipHeaders[mipIndex], mipIndex, payload.ResolvedPath);
 		if (mipHeaders[mipIndex].dataSize > maximumDecodedBytes - decodedBytes)
 		{
 			throw Diagnostics::Error(std::format("Cooked texture asset '{}' exceeds its decoded-byte reservation.", payload.ResolvedPath.string()));

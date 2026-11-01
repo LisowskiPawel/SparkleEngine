@@ -2,6 +2,7 @@
 #include "World/SceneLoadWorldStaging.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
+#include "Core/Public/Diagnostics/Error.h"
 #include "Level/Loading/SceneLoadPackage.h"
 #include "World/GameWorldSceneAssetCommitter.h"
 #include "World/GameWorldState.h"
@@ -9,6 +10,7 @@
 
 #include <cstddef>
 #include <optional>
+#include <limits>
 #include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_sceneLoadStagingLogger, "GameFramework.GameWorld");
@@ -83,19 +85,6 @@ static void SelectStagedCamera(ECS::GameWorldState& state)
 	}
 }
 
-void ValidateSceneLoadEntityCount(const Assets::SceneLoadPackage& package)
-{
-	std::size_t expectedEntityCount = 1 + package.Level.lights.size();
-	for (const SceneAssetPayload& payload : package.AssetPayloads)
-	{
-		expectedEntityCount += payload.animations.size() + payload.staticMeshInstances.size() + payload.skeletalMeshInstances.size() + payload.cameras.size() + payload.lights.size();
-	}
-	if (package.Entities.size() != expectedEntityCount)
-	{
-		Diagnostics::Fatal(g_sceneLoadStagingLogger, __FILE__, __LINE__, "Scene load blueprint count does not match the entity construction records.");
-	}
-}
-
 void InitializeSceneLoadLevel(ECS::GameWorldState& state, const LevelDesc& desc)
 {
 	InitializeLevelCamera(state, desc);
@@ -105,6 +94,25 @@ void InitializeSceneLoadLevel(ECS::GameWorldState& state, const LevelDesc& desc)
 
 void PopulateStagedScene(ECS::GameWorldState& state, GameWorldResourceStores& resources, Assets::SceneLoadPackage& package)
 {
+	std::size_t expectedEntityCount = 1;
+	const auto add = [&expectedEntityCount](std::size_t count)
+	{
+		if (count > (std::numeric_limits<std::size_t>::max)() - expectedEntityCount)
+		{
+			throw Diagnostics::Error("Scene entity count exceeds the host address range.");
+		}
+		expectedEntityCount += count;
+	};
+	add(package.Level.lights.size());
+	for (const SceneAssetPayload& payload : package.AssetPayloads)
+	{
+		add(payload.animations.size());
+		add(payload.staticMeshInstances.size());
+		add(payload.skeletalMeshInstances.size());
+		add(payload.cameras.size());
+		add(payload.lights.size());
+	}
+
 	for (SceneAssetPayload& payload : package.AssetPayloads)
 	{
 		CommitSceneAssetPayload(state, resources, std::move(payload));
@@ -114,8 +122,8 @@ void PopulateStagedScene(ECS::GameWorldState& state, GameWorldResourceStores& re
 	{
 		Diagnostics::Fatal(g_sceneLoadStagingLogger, __FILE__, __LINE__, "Staged world could not resolve animation targets and output slots.");
 	}
-	if (state.GetEntityCount() != package.Entities.size())
+	if (state.GetEntityCount() != expectedEntityCount)
 	{
-		Diagnostics::Fatal(g_sceneLoadStagingLogger, __FILE__, __LINE__, "Staged world entity count does not match the validated blueprint package.");
+		Diagnostics::Fatal(g_sceneLoadStagingLogger, __FILE__, __LINE__, "Staged world entity count does not match its scene payloads.");
 	}
 }

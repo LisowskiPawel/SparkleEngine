@@ -68,7 +68,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Cleanup:** Replace the previous classical filter when its supported consumers are covered; delete unused NRD families/wrappers.
 
-**Exit:** AC-REC-03 static cells pass on both APIs. DIR-6/IND-6 reuse this path/proof rather than build another filter.
+**Exit:** AC-REC-03 static cells pass on both APIs. Later M5R DIR-6/IND-6 reconstruction cells reuse this path/proof rather than build another filter; their first-release baseline remains independently required before REL-11. Raw lighting/model inputs precede this integration, while affected DIR/IND-8 and MAT-S4/5 final joins follow the completed reconstruction checks.
 
 ```text
 Execute only REC-S2 from Docs/Architecture/Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md. Apply the Stage Contract, including the Stage Source-Style Gate. Verify Start against current source and exact prerequisite artifacts; perform the full Work and Cleanup, then prove Exit. Retain positive controls for supported behavior and each required failure counterexample. Stop on a missing semantic, unsafe lifetime, unmet prerequisite or exceeded complexity budget. Report exact checks/artifacts and unrun evidence; do not advance another stage.
@@ -94,9 +94,9 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## REC-S4 Measure compatible choices
 
-**Start:** All semantic/native cells pass; references and rules frozen.
+**Start:** The selected raw/classical/SR/RR semantic/native cells pass; references and rules are frozen. An owned-CNN candidate is not an entry prerequisite.
 
-**Work:** Compare meaningful raw/classical/SR/RR cells with identical output and sampler identity. Include owned CNN only after its own conformance and for its actual component. Measure spatial/temporal/response quality, frame cost and complete guide/history/workspace memory.
+**Work:** Compare meaningful raw/classical/SR/RR cells with identical output and sampler identity. Measure spatial/temporal/response quality, frame cost and complete guide/history/workspace memory. NG-S6a owns the later CNN-versus-qualified-baseline comparison for its actual component; hand off these original records without waiting for model training or adding another comparison runner.
 
 **Cleanup:** Delete losing filters/settings and redundant classical paths; no benchmark platform or full cartesian test matrix.
 
@@ -112,7 +112,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Start:** Technical criteria and distributable dependencies available.
 
-**Work:** Manifest exact shader/profile/SDK/native bytes and requested/active/refusal UX. The author or agent reproduces quality/cost plus a discontinuity/failure sequence; join only applicable original observations.
+**Work:** Join exact shader/profile/SDK/native bytes and requested/active/refusal UX to the [shared candidate](../../../../../../../Acceptance/FirstRelease.md#shared-delivery-evidence). Its rehearsal covers quality/cost plus a discontinuity/failure sequence; reuse only applicable observations, without another provider-specific package or runner.
 
 **Cleanup:** Remove probes, unused SDK families and completed instructions; preserve raw/native evidence.
 

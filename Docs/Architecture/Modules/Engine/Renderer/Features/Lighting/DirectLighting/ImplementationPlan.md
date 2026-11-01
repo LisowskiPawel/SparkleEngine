@@ -325,6 +325,8 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## Stage 6 — Deliver Portable Reconstruction
 
+First-release closure uses the approved portable baseline through its existing reconstruction owner; it does not depend on post-REL-11 RELAX production. In M5R, deliver the new raw light-class inputs first, then use REC-S2..4's one RELAX path for affected Stage-6 and final Stage-8 checks. Reuse applicable release cells; do not implement another filter to complete the earlier raw-lighting row. An invalid required baseline remains a first-release blocker.
+
 ### Objective
 
 Turn the proved raw sparse signal into a stable product image without hiding estimator errors or making an optional vendor path mandatory.
@@ -350,7 +352,7 @@ Turn the proved raw sparse signal into a stable product image without hiding est
 
 ```text
 Read Docs/Architecture/Modules/Engine/Renderer/Features/Lighting/DirectLighting/ImplementationPlan.md#stage-6--deliver-portable-reconstruction and apply this plan's shared execution contract. Apply the owning execution contract and its Stage Source-Style Gate.
-Implement Direct Lighting Stage 6 after raw estimator and visibility gates pass. Add the accepted portable reconstruction path using the frozen guide/confidence/history contract, then connect optional DLSS Ray Reconstruction through the existing provider boundary. Preserve raw lobe capture and separate reservoir from denoiser history. Run the motion/disocclusion/light-toggle matrix and report raw versus reconstructed quality, memory, and time. Stop if the denoiser is required to make an invalid estimator look correct.
+Implement Direct Lighting Stage 6 after raw estimator and visibility gates pass. Reuse/repair the approved portable baseline through the existing provider boundary; first-release closure does not wait for later RELAX. M5R RELAX-dependent cells follow REC-S2..4 and reuse its single path. Use the frozen guide/confidence/history contract, then connect optional DLSS Ray Reconstruction. Preserve raw lobe capture and separate reservoir from denoiser history. Run the motion/disocclusion/light-toggle matrix and report raw versus reconstructed quality, memory, and time. Stop if the denoiser is required to make an invalid estimator look correct.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```

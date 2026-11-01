@@ -53,11 +53,11 @@ namespace AnimationAssetLoaderValidation
 
 namespace Assets
 {
-	LoadedAnimationAsset AnimationAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes) const
+	LoadedAnimationAsset AnimationAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const
 	{
 		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedAnimationAsset");
 
-		CookedAssetByteReader reader(bytes);
+		CookedAssetByteReader reader(bytes, budget);
 		LoadedAnimationAsset animationAsset;
 		animationAsset.header = reader.Read<CookedAnimationAssetHeader>();
 

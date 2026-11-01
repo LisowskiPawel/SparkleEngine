@@ -13,10 +13,11 @@
 #include "Panels/SceneOutlinerPanel.h"
 #include "Panels/SettingsPanel.h"
 #include "Panels/UsedMeshesPanel.h"
-#include "Panels/UsedShadersPanel.h"
+#include "Panels/ShaderToolsPanel.h"
 #include "Panels/UsedTexturesPanel.h"
 #include "Panels/ViewportPanel.h"
 #include "Viewport/ViewportToolbar.h"
+#include "Scene/Transactions/EditorTransactionHistory.h"
 #include "Timer.h"
 
 #include <imgui.h>
@@ -31,6 +32,10 @@ void UI::Implementation::NewFrame()
 
 void UI::Implementation::Build()
 {
+	if (m_transactionHistory && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+	{
+		m_transactionHistory->FinishInteraction();
+	}
 	UpdateSceneModel();
 	HandleTransactionShortcuts();
 	const bool disableInteraction = m_levelSession != nullptr && m_levelSession->IsLevelChangeInProgress();
@@ -51,6 +56,10 @@ void UI::Implementation::Build()
 		m_mainMenuBar->BuildOverlays();
 	}
 
+	if (m_transactionHistory && !ImGui::IsAnyItemActive())
+	{
+		m_transactionHistory->FinishInteraction();
+	}
 	ImGui::Render();
 }
 
@@ -160,9 +169,9 @@ void UI::Implementation::BuildSceneInspector(bool disableInteraction, float main
 
 void UI::Implementation::BuildUtilityPanels(bool disableInteraction)
 {
-	if (m_usedShadersPanel)
+	if (m_shaderToolsPanel)
 	{
-		m_usedShadersPanel->BuildUI(disableInteraction);
+		m_shaderToolsPanel->BuildUI(disableInteraction);
 	}
 	if (m_usedMeshesPanel)
 	{

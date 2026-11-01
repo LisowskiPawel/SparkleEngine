@@ -2,7 +2,7 @@
 
 [Docs](../../../README.md) / [Up](BuildAndPackagingCapabilities.md)
 
-**Status:** package contract and current implementation route; unsigned internal PD-3 scope accepted with explicit removal exclusion
+**Status:** current source contract; bounded source checks recorded, new-archive/public qualification open
 
 **Scope:** define release inputs, deterministic packaging, clean-machine operation and local diagnostics/replacement
 
@@ -10,23 +10,44 @@
 
 **Strategy and acceptance sources:** [`PGE-01`, `PGE-13`, `PGE-14`, `PGE-15`](../../../Strategy/Requirements.md), [First Release](../../../Acceptance/FirstRelease.md), and `FCR-PROD-02`/`FCR-PROD-05` in [Feature Completion Reports](../../../Acceptance/FeatureCompletionReports.md)
 
-**Acceptance:** `FCR-PROD-05`/`REL-03` pass the admitted unsigned internal `a0f34c8b...` scope. Assembly/symbols, installed failures/recovery and positive reconciliation pass; the user accepts the selected extraction remaining retained, so actual removal is `EXCLUDED`. Earlier `e771a244...`/`3743e72a...` receipts keep their identities and accepted-laptop limits. See [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); [Product reconciliation](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retains technical passes but blocks closeout on source-applicable scene-publication coherence. The general package contract and public-release requirements are unchanged.
+**Acceptance:** `FCR-PROD-05`/`REL-03` pass the admitted unsigned internal `a0f34c8b...` scope. Assembly/symbols, installed failures/recovery and positive reconciliation pass; the user accepts the selected extraction remaining retained, so actual removal is `EXCLUDED`. Earlier `e771a244...`/`3743e72a...` receipts keep their identities and accepted-laptop limits. See [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); [Product reconciliation](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retains technical passes but blocks closeout on source-applicable scene-publication coherence. Those results retain the earlier selected-content/store scope. The 2026-11-01 source cleanup below has its own checks; a new archive still needs affected product proof and rights/signing admission.
 
 
 Use [reviewed inputs](#reviewed-package-inputs) to prepare the package, [package command](#current-package-entry) to assemble it, [package checks](#fcr-prod-05-package-contract) to qualify it, and [local diagnostics](#local-diagnostics-and-release-review) for incident/export/replacement behavior.
 
+## Prebuilt Base And Source Rebuild
+
+**Approved target, 2026-11-01:** keep Launcher as the polished way to select, inspect and run the renderer, and as the existing frontend for users who choose to modify source and rebuild. Release engineering supplies a fresh, complete base for each published version.
+
+| Journey | Required result | Smallest implementation boundary |
+| --- | --- | --- |
+| Run the prebuilt release | Extract one ready-to-run consumer bundle, open Launcher, select a supplied scene and Run. Publisher has built/cooked/configured the complete admitted base. | No source, compiler, cook, old content, manual content assembly/hash matching or repair step for ordinary use. Read release-local products/content; keep writable settings/logs/authored saves in existing owners. |
+| Modify and rebuild | Obtain the matching source tag; optionally import that release's precompiled products and cooked content, then edit source/assets/shaders and use Launcher Build/Cook/Run. A source-only start also remains supported. | Use `SyncProducts.ps1`, canonical `artifacts/dev` outputs and existing Launcher operations. Rebuilt output replaces the imported base in those same locations; no second layout or ongoing source/binary freshness tracker. |
+| Publish the next version | Empty owned build/cooked/stage outputs -> configure/build -> full cook -> final inventory/verification -> archive, with required signing before publication. | Existing CMake/Packaging owner. No previous product, cook cache, stored admission receipt or previous user content is a prerequisite. |
+
+Supply one complete ready-to-run consumer bundle. Source, matched private symbols and optional rebuild tools may be companion downloads; users must not combine binary/content parts to start the rendering. Meet the existing combined size/startup budgets or leave the delivery blocker open. Publisher verification and initial matching source-tag/base import protect developer bootstrap; subsequent local edits use explicit Build/Cook in canonical outputs without a local-file version database or cross-release cache protocol.
+
+Keep the seven approved map choices plus Empty, defaults, APIs and rendering gates. Prebuilt content can contain only admitted redistributable bytes. Existing Sponza/Modern Sponza acquisition-only restrictions remain blockers for their bundled derivatives; source acquisition remains available through Launcher. Do not call a source-download/cook prerequisite a prebuilt run, silently remove a selected map, or treat this decision as a rights grant.
+
+Game follows the [render-only presentation contract](../../../Acceptance/FirstRelease.md#consumer-effort-and-game-presentation); Launcher and Editor retain their existing UI. Rebuild/recook is a deliberate developer choice, never an automatic first-run preparation chain. Publisher runtime closure/defaults/cooked content must make the ordinary launch work without special user setup.
+
+**Current source, 2026-11-01:** Launcher owns preparation; engine consumers use the normal workspace-shaped tree without release or artifact-origin state. `SyncProducts.ps1` verifies a matching archive at the import boundary and fills the same binary/cooked directories that local Build/Cook overwrite. Consumers resolve those files and validate the formats they actually use. There is no seed marker, shared installed store, runtime payload-hash scan or prerequisite graph. Run never acquires, builds or cooks automatically.
+
+Scene/shader publication retains the existing incomplete-write refusal and reader/writer exclusion. The cooked tree includes its passive `.publication-lock`; readers open it read-only without creating files. This is the same coherence contract for every product tree, independent of how its bytes arrived. Ordinary runtime state still uses the existing writable settings/log/save owners.
+
+The [current source result](../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json) covers owner builds and isolated helper/filesystem controls. [FR-06](../../CrossModule/FirstRelease/ImplementationPlan.md#prebuilt-delivery-simplification) retains one affected new-archive rehearsal; no old receipt is relabeled.
+
 ## Current Package Entry
 
-`CMake/Packaging` is the Build And Packaging owner. Root CMake generates product inputs from actual targets and registers `release_package`. It invokes existing CMake builds and AssetCooker commands, then copies only reviewed file entries into a new stage. No install rule exposes internal targets, and Launcher/Renderer/Application do not own packaging policy.
+Publisher preparation uses the existing Launcher/CMake build and cook operations in empty owned generated outputs. Packaging does not own another build/cook runner. Root CMake generates product paths from actual targets and registers `release_package`:
 
 ```powershell
 cmake -S . -B build -DSPARKLE_RELEASE_INPUTS=<reviewed-inputs.json>
+# Prepare the selected Shipping products and complete cook through existing operations.
 cmake --build build --config ShippingEditor --target release_package
 ```
 
-The input contract is in [Release Inputs](#reviewed-package-inputs). Dependency and symbol admission stops before internal build/cook/stage. Each retained owner receipt must pass and identify the exact source candidate. Public rights and Windows publisher signing are checked in FR-07 before publication. Discovery/content-store acceptance follows the produced archive; it is not a prerequisite that requires an archive before one can be made.
-
-After build/cook, `PackageOutputs.ps1` rechecks the six PE/PDB pairs and consumes the final cook's returned shader-export receipt. It freezes new hashes only for configured executables and admitted cooked outputs. Reviewed DLLs, helpers, recipes, notices and other external inputs must retain their admitted hashes. The transaction updates SBOM checksums for those generated outputs; its report distinguishes the reviewed payload from the final frozen payload. Compiler-generated identifier ordering need not be byte-identical across cooks.
+`Package.ps1` reads the reviewed input list, freezes prepared product/cooked hashes once, stages the declared files, verifies them and creates the archive. Missing or inconsistent prepared outputs stop publication. `PackageOutputs.ps1` checks the native PE/PDB pairs and the explicitly supplied `ShaderExport` directory against the cooked shader map/library and compiler identity. External DLLs, helpers, notices and other reviewed inputs retain their pinned hashes. One final manifest supplies the stage, SBOM checksums and archive checks; there are no pre-build admission receipts or build-cache snapshots.
 
 The stage verifier checks paths, hashes, notices, components, read-only attributes, x64 PE headers and vendor signatures. It reads ordinary/delay imports and requires app-local closure or explicit Windows/driver prerequisites; Game cannot import Editor/tool dependencies. SPDX file hashes/licenses and provenance product/source identities must match the final manifest. These checks do not replace legal review or complete SPDX schema validation.
 
@@ -34,9 +55,21 @@ ZIP creation uses sorted membership and fixed timestamps. Independent ZIP enumer
 
 Outputs stay under `artifacts/releases/<version>/`. Assembly starts under `.partial-<id>/`; the verified ZIP, report and retained evidence publish together into `<archive-sha256>/` by one directory move. A report-write failure publishes nothing; an existing destination is never overwritten. Only `SparkleEngine-v<version>-windows-x64-unsigned-internal.zip` is the product archive. REL-03 also requires the applicable installed acceptance; the admitted internal result is linked above. Trusted signing and public redistribution remain FR-07 obligations.
 
-Core owns manifest-relative paths and product size/hash verification. Launcher prefers its installed location over the current directory and rejects checkout overrides. First launch verifies and transactionally seeds `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`: project recipes into `Source/Showcase/`, the immutable `Engine/Cooked/` baseline into `Cooked/`. Initial shader readiness verifies the copied baseline against the package manifest without a recook signal; later recooks require their completion signal. Repeat launches preserve selections; a changed or incomplete package identity requires an explicit store reset. Sync/cook/run use the existing typed owners and packaged helpers; source build/cleanup actions are unavailable in installed mode. Missing or malformed package metadata cannot select a checkout.
+Runtime discovers `Levels/<id>.level` documents directly, without cook-selection or raw-source gates. The project/acquisition catalog and its mutable selection are tool-only; ordinary Launcher Run does not require source-acquisition manifests. Explicit acquisition still checks its manifest before download/publication. [Boundary regression controls](../../../../artifacts/validation/runtime-inputs-slim-20261101/completion.json) do not qualify a new archive.
+
+Runtime reads ordinary workspace/project/engine markers and uses `artifacts/dev/Projects/<project>/Cooked` everywhere. The archive retains the checkout-shaped tree, including `.sparkle`, `Engine/.sparkle-engine`, project definitions and `Config/DefaultEngine.ini`; there is no flattened installed layout, package manifest parsing or installed-mode flag in Engine. Package manifests remain transport/assembly evidence used only by package/sync tooling.
+
+Launcher chooses executables and invokes Build/Cook through existing tool processes. Shared host-tool `ToolOutputPaths` owns build/library/helper paths outside Engine. Editor inspects runtime products and may explicitly request the same Launcher shader cook, with optional private symbols, then reload on success. Showcase binds that tool action; Engine owns no preparation paths or compiler arguments. The former compiler process owner, source watcher, recook queue and completion-receipt reader stay deleted. Compilers/cookers remain the actual transformation tools, with no upward Engine dependency on Launcher.
+
+All products use the normal workspace-keyed per-user state. There is no release-version state branch, installed content store or migration. Earlier per-user data is untouched. Core provides generic filesystem/read/write safety; the shared interruption guard protects local cooks too and is not release policy.
 
 The admitted internal route has exact-candidate assembly, failure/recovery and positive reconciliation, including applicable seven-map/subset/offline/relocation proof with original identities retained. Actual selected-extraction removal is explicitly excluded by its scope owner. The [FR-02 recheck](../../../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/fr02-final-20261031/completion.json) confirms the accepted archive, membership and symbol identities remain unchanged. Regenerate only when admitted inputs change; PD-4 technical replay is complete, but its known coherence defect blocks closeout; final FR-07 public qualification retains its own gates.
+
+### Portfolio Release Boundary
+
+Follow [minimum supporting scope](../../../Acceptance/FirstRelease.md#minimum-supporting-scope) and the [minimum release workflow](../../../Acceptance/FirstRelease.md#minimum-release-workflow). Use this existing Build -> Cook -> Stage -> Verify -> ZIP route and the existing signing tools; package/report IDs do not require a release service, installer, updater or general recovery engine. Manual re-extraction, side-by-side replacement and clean/recook of generated data are sufficient. Preserve authored data, settings policy, contained paths, dependencies, candidate/symbol hashes and public notice/trust obligations.
+
+Join existing three-product onboarding, source-build, diagnostics and replacement observations into the applicable reports. Reuse unchanged cells by explicit applicability; run changed boundaries against the exact current archive. A replacement receives its real old/new identity and affected preservation/rollback checks when needed. Do not manufacture extra versions or new support tooling merely to refill an unchanged matrix. Unsupported diagnostic categories stay explicit instead of scheduling a collector.
 
 ## At A Glance
 
@@ -48,7 +81,7 @@ The admitted internal route has exact-candidate assembly, failure/recovery and p
 | installation and writable state | admitted internal failure/recovery and positive reconciliation pass; original user state restored | actual selected-extraction removal remains explicitly excluded for this candidate |
 | relocation and clean-machine use | `e771a244…` standard-user Unicode/read-only relocation checked on accepted MIN-01 laptop | no fresh-OS or broader hardware claim |
 
-The internal route is one directional transaction: Build -> Cook -> Stage -> Verify -> Package -> Extract/Run. FR-07 adds publisher signing and verifies the resulting final bytes. Each step consumes a declared predecessor product and must never scan unrelated development directories to infer missing membership.
+Publisher preparation is Build -> full Cook through existing tools. The package transaction is Freeze -> Stage -> Verify -> ZIP, followed by Extract/Run qualification. FR-07 adds publisher signing and verifies the resulting final bytes. Each step consumes a declared predecessor product and must never scan unrelated development directories to infer missing membership.
 
 ## Capability Identity
 
@@ -96,7 +129,7 @@ The external reference is **Unreal Engine 5.8 documentation**, retrieved 2026-09
 Only these invariants transfer into Sparkle's local contract:
 
 - Build, Cook, Stage, Verify/Sign, and Package are distinct owned products; Stage is a fresh declared tree outside development outputs, not a rename of `artifacts/dev`.
-- A requested terminal product executes only the dependency nodes it requires; every node has explicit inputs, required predecessors, produced outputs, result, and retained artifact identity.
+- Preparation uses the existing build/cook owners; packaging consumes their completed files without a second dependency scheduler.
 - Shipping membership deliberately differs from development membership, including removal of developer console/debug/authoring surfaces.
 - cancellation/failure remains visible at the owning operation, and a failed prerequisite or node prevents dependent publication.
 
@@ -104,15 +137,17 @@ Sparkle does **not** adopt UAT, BuildGraph XML, nodes/agents/triggers as public 
 
 ## `FCR-PROD-05` Package Contract
 
+**Target applicability:** the criteria below now qualify the prebuilt base and optional source-rebuild journey. Earlier PD-3 receipts retain their original store/helper scope; changed paths require affected requalification.
+
 **Proof allocation:** PD-3 qualifies the admitted unsigned internal archive; PD-4 consumes that exact archive for adoption/replacement and six-report reconciliation. Publisher signing and public redistribution close in FR-07, with affected checks repeated for changed bytes. [Product delivery progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retains current acceptance, the explicit removal exclusion and earlier receipts with their original identities.
 
 | ID | Binary acceptance criterion | Proof phase |
 | --- | --- | --- |
-| `AC-PKG-01` | One command consumes a frozen revision/configuration/content set and produces Build -> Cook -> fresh Stage -> Verify -> Package results (publisher Sign is added in FR-07) with explicit predecessor/output identities; failure at any node prevents archive publication. | PD-3 internal assembly; FR-07 publisher signing |
+| `AC-PKG-01` | For a frozen revision/configuration/content set, prepare fresh Build/full Cook through existing tools, then run the package command on those outputs. It freezes one inventory, stages/verifies/packages it and publishes nothing on failure; publisher Sign is added in FR-07. | PD-3 internal assembly; FR-07 publisher signing |
 | `AC-PKG-02` | `manifests/sparkle-package-manifest.json` accounts for every staged path, byte size, hash, permission/role, owner, origin, license, signature expectation, and component; independent verification rejects missing, extra, changed, absolute, escaping, or forbidden entries. | PD-3 stage/archive verification |
-| `AC-PKG-03` | The bundle contains all three manifest-owned Launcher, Editor and Game components with exact release configurations and declared helper closure. Game imports no Editor/authoring dependency. Selected content uses a verified writable store separate from immutable product bytes. Symbols are separate; installer/SDK/source/debug products and undeclared helpers are absent. | PD-3 product/helper/content membership |
-| `AC-PKG-04` | All three products start as a standard user with immutable extraction bytes read-only; Editor/Game run offline after selected content sync, from Unicode/spaced/relocated paths with no repository/build/SDK/environment/admin dependency; writes occur only in the frozen per-user root. | PD-3 clean standard-user rehearsal |
-| `AC-PKG-05` | Normal extract/first/repeat run, side-by-side replacement policy, archive removal, retained-user-data policy, and missing/corrupt dependency/content paths are documented and stay within frozen size/time/memory budgets. | PD-3 lifecycle/removal; PD-4 replacement |
+| `AC-PKG-03` | The bundle contains all three manifest-owned Launcher, Editor and Game components with exact release configurations and declared helper closure. Game has no Game ImGui host/menu/overlay or Editor/authoring dependency; Editor keeps its UI. The complete prebuilt cooked base comes from the current release; no older store or source cook is required to run it. Optional rebuild helpers are separately admitted for the source-workspace journey. Symbols are separate; installer/SDK/private-debug products and undeclared helpers are absent. | PD-3 product/helper/content membership |
+| `AC-PKG-04` | All three products start as a standard user with immutable extraction bytes read-only; Editor/Game run the advertised prebuilt content offline after extracting the one ready-to-run consumer bundle, from Unicode/spaced/relocated paths with no repository/build/SDK/environment/admin dependency; writes occur only in the frozen per-user root. | PD-3 clean standard-user rehearsal |
+| `AC-PKG-05` | Normal extract/first/repeat run, optional precompiled-plus-cooked source bootstrap followed by an actual source edit/rebuild, manual replacement/removal, retained-user-data policy and missing/corrupt required inputs are documented and stay within frozen size/time/memory budgets. | PD-3 lifecycle/removal; PD-4 replacement |
 | `AC-PKG-06` | SBOM/provenance, notices, explicit unsigned-internal status, vendor PE signatures, checksums, archive/source/candidate identity, and native/shader symbol correlation refer to the same immutable candidate. Public rights and trusted publisher signing are FR-07 publication checks. | PD-3 internal identity; FR-07 public trust/rights |
 
 | ID | Cause/injection, safe result, and affected criterion |
@@ -121,13 +156,13 @@ Sparkle does **not** adopt UAT, BuildGraph XML, nodes/agents/triggers as public 
 | `FM-PKG-02` | Alter a copied PE/archive/manifest/license/signature after staging. Verification quarantines the output and no candidate/archive success is emitted (`AC-PKG-02`, `AC-PKG-06`). |
 | `FM-PKG-03` | Make package bytes read-only, remove overrides, relocate, and block network. Any package/repository write or external-path/SDK dependency fails `AC-PKG-04`. |
 | `FM-PKG-04` | Deny/fill/corrupt the per-user root. The runtime names the path/space, preserves immutable bytes and last accepted state, and exits or disables only the optional operation (`AC-PKG-04`, `AC-PKG-05`). |
-| `FM-PKG-05` | Remove each allowlisted DLL/content file from isolated archive copies. Startup identifies the missing component and exits without partial success or fallback content (`AC-PKG-03`–`05`). |
+| `FM-PKG-05` | Remove each allowlisted member before package verification and reject the archive; separately remove the current product's required DLL/content inputs and reject at its startup/load boundary. Unused helper members do not become Game startup dependencies (`AC-PKG-03`–`05`). |
 | `FM-PKG-06` | Search output names/docs/files for installer or SDK semantics. Any bootstrapper/registry/install API/binary ABI implication without an admitted owner fails `AC-PKG-03` and blocks publication. |
 
 | Check | Claims falsified | Smallest route and fixed oracle |
 | --- | --- | --- |
 | `CHK-PKG-01` | `AC-PKG-01`–`03`, `AC-PKG-06`; `FM-PKG-01`, `FM-PKG-02`, `FM-PKG-06` | Generate from a clean destination, retain per-node results, independently enumerate/verify allowlist, denylist, hashes, signatures, SBOM/notices/symbol identity, then inject stale/extra/missing/tampered inputs. No archive may exist after a failed node. |
-| `CHK-PKG-02` | `AC-PKG-04`, `AC-PKG-05`; `FM-PKG-03`–`05` | On a clean standard-user minimum machine, extract to Unicode/spaced and read-only locations, test user-selected sync, then block network/remove overrides, inventory all file/network/process activity, run consumer first/repeat/fault cases, remove archive, and compare budgets/state hashes. |
+| `CHK-PKG-02` | `AC-PKG-04`, `AC-PKG-05`; `FM-PKG-03`–`05` | On a clean standard-user minimum machine, extract to Unicode/spaced and read-only locations, run the complete prebuilt base without source/build/old content state and with network/overrides absent, then import the matching base into a source workspace, modify one actual source input and use Launcher Build/Cook/Run; inventory all file/network/process activity, run consumer first/repeat/fault cases, remove archive, and compare budgets/state hashes. |
 
 No acceptance row is satisfied by this documentation pass. [`BUILD-E03`](../CapabilityEvidencePlan.md#product-workflow-and-delivery-evidence) is the smallest central proof destination; candidate-bound results belong in the release artifact path required by [First Release](../../../Acceptance/FirstRelease.md).
 
@@ -135,11 +170,11 @@ No acceptance row is satisfied by this documentation pass. [`BUILD-E03`](../Capa
 
 This page owns the input choices needed to implement the package spine. [Release Scope](../../../Acceptance/FirstRelease.md#approved-release-scope) owns product promises; [First Release](../../../Acceptance/FirstRelease.md) owns candidate verdicts. Keep the supported seven maps and Launcher entry; start Empty until the user selects content.
 
-**PD-4 package inputs:** `ExportDiagnostics.ps1`, `IncidentIdentity.ps1` and `PackageVerification.ps1` under `Tools/Diagnostics/` (Shared/Helper); root `SUPPORT.md`, `SECURITY.md` and `KNOWN_ISSUES.md` under `docs/` (Shared/Metadata). Require source hashes, notices and SBOM entries. `ReviewRelease.ps1` stays maintainer-only; PDBs stay in the separate symbol companion. Local prerequisites: PowerShell 5.1 and System32 DbgHelp; no symbol-server lookup. [Diagnostic owner](#current-local-route).
+**Delivery inputs:** three products, their real runtime closure, the complete admitted cooked base, source tag, notices and matching private symbols. Optional source-rebuild helpers follow the table below. Public policy files remain shipped metadata; diagnostic helper admission is justified by an actual local action, without a full package-verifier dependency. The custom release-review script/receipt schema is deleted. [Diagnostic owner](#current-local-route).
 
 **Open-source license boundary:** Sparkle-owned code remains MIT, including commercial use. Free educational delivery describes the maintainer's intent, not an added use restriction. Third-party content and SDK terms remain separate.
 
-**Free educational delivery (2026-10-11):** preserve all approved features, both backends and seven map choices. License compliance changes notices, source availability and how content is acquired; it must not disable DLSS/Ray Reconstruction, remove a map, substitute assets or silently lower quality. Selected publisher downloads stay inside Launcher, with progress, retry and offline reuse after acquisition. A free release still needs the applicable component terms. Certificate enrollment and public redistribution closure belong to FR-07 immediately before publication; they do not block unsigned internal product implementation.
+**Free educational delivery (2026-10-11):** preserve all approved features, both backends and seven map choices. License compliance changes notices, source availability and how content is acquired; it must not disable DLSS/Ray Reconstruction, remove a map, substitute assets or silently lower quality. Optional source acquisition stays inside Launcher with progress, retry and explicit failure. The prebuilt journey consumes this release's cooked base; unresolved cooked redistribution cannot be hidden behind a required end-user source cook. A free release still needs the applicable component terms. Certificate enrollment and public redistribution closure belong to FR-07 immediately before publication; they do not block unsigned internal product implementation.
 
 ### Product And Helper Membership
 
@@ -148,10 +183,10 @@ This page owns the input choices needed to implement the package spine. [Release
 | Sparkle Launcher | `SparkleLauncher`, `ShippingEditor` | Mandatory; package-relative discovery and selected sync must work without a source checkout. Include Qt's exact release DLL/plugin closure and its LGPL notices/source/relink obligations. |
 | Sparkle Editor | `ShowcaseEditor`, `ShippingEditor` | Mandatory; use the same identity/configuration owner as Game. Include its exact declared runtime closure; no undeclared developer SDK requirement. |
 | Sparkle Game | `ShowcaseGame`, `ShippingGame` | Mandatory; no Editor/tool-only payload. Include the nine pinned Streamline runtime DLLs, including `sl.dlss_d.dll` and the Vulkan Reflex dependency `NvLowLatencyVk.dll`; keep NVIDIA/NGX/Reflex terms and signatures. |
-| Selected-content cook helpers | `AssetCooker`, `TextureCooker`, `ShaderCompiler`, `ShippingEditor` | All three helpers and their exact runtime closure are mandatory. ShaderCompiler declares its Slang support DLLs, `slang.slang` and every standard-module file; the audit hashes them and the manifest requires them. Headers, compiler development tools, examples and arbitrary SDK directories are excluded. |
-| Acquisition helper | Portable CMake `4.3.3`, used by the existing sync owner; publisher archive SHA-256 `935ade9e5e8723583c07f44c5592cea2a1c8f65c56ca7e07b34c025c880e0bd6` | Include `Tools/CMake/bin/cmake.exe`, the publisher's `Tools/CMake/share/cmake-4.3/Modules/CMake.cmake` root-discovery module and its license. The three sync scripts use built-in commands; no general CMake development package is admitted. Qualify this helper layout through the sync owner, without a host installation. |
-| Acquisition scripts | Existing `SyncAssetPack.cmake`, `SyncAssetPackFiles.cmake`, `SyncAssetPackArchive.cmake` under `Tools/Content/` | Mandatory Shared/Helper entries bound to their Launcher source files; verify included scripts before execution. |
-| Initial content store | Allowlisted project recipes under `Projects/Showcase/`; qualified engine baseline under `Engine/Cooked/` | Mandatory marker/catalog, shader map, library and dependency manifest; include required engine textures. `recook.signal` is writable cook-completion state and is excluded. Seed only verified files. Never seed stale or unqualified selected-map output. |
+| Optional source-rebuild helpers | `AssetCooker`, `TextureCooker`, `ShaderCompiler`, `ShippingEditor` | Keep their actual runtime closure when supplied as a ready-to-rebuild source base, or build them through Launcher with the documented toolchain. They are not prerequisites for ordinary prebuilt Run. No arbitrary SDK directory enters the consumer bundle. |
+| Source acquisition/build | Existing Launcher CMake/source workflows and documented host prerequisites | Keep sync/build usable for optional source work. Portable CMake is not mandatory in the run bundle; admit a redistributable helper only for a selected source-workspace action. |
+| Acquisition scripts | Existing Launcher `SyncAssetPack*.cmake` source owners | Source-workspace acquisition uses these owners. Run from a complete prebuilt base does not execute acquisition scripts. |
+| Prebuilt cooked base | Admitted project/catalog/level metadata and complete cooked scene/material/texture/animation/shader dependencies | Ship the actual same-release base and qualify it without source assets or prior local content. No installed-store seed or persistent package-identity marker. Source-workspace import places the base in the existing canonical cooked output tree. |
 | Rendering defaults | `Config/DefaultEngine.ini`, Shared/Defaults | Bind the source-owned file into the manifest. Installed Game/Editor verify it before applying shared per-user settings; missing/corrupt defaults stop startup. |
 | Symbols / private intermediates | Separate archive / private build tree | AssetCooker requests shader debug information; DXIL PDBs stay outside cooked products. The existing ShaderCompiler `--debug-artifacts <private-dir>` route retains compile/source records for DXIL and SPIR-V correlation. No PDB, private source/path, cache, build tree or development executable belongs in the consumer archive. |
 
@@ -159,68 +194,47 @@ Release identity remains `0.1.0`, publisher Pawel Lisowski, copyright 2026. Use 
 
 ### Package And Writable Paths
 
-The archive preserves CMake's binary layout relative to `artifacts/dev`. `ReleaseProducts.cmake` derives paths from target output properties; it does not maintain a second package layout. Each product keeps its app-local DLL/plugin closure.
+The archive preserves the complete ordinary root layout, including the `artifacts/dev` prefix on binaries and cooked content. Open the root `LaunchSparkle.cmd`; its two-line command starts the existing Launcher executable without another installer or bootstrap service. `ReleaseProducts.cmake` derives paths from target output properties; it does not maintain a second package layout. Each product keeps its app-local DLL/plugin closure.
 
-| Product | Path under `artifacts/dev` or the extracted package |
+| Product | Path under either checkout or extraction root |
 | --- | --- |
-| Launcher | `Tools/SparkleLauncher/Binaries/ShippingEditor/SparkleLauncher.exe` |
-| Editor | `Projects/Showcase/Binaries/ShippingEditor/ShowcaseEditor.exe` |
-| Game | `Projects/Showcase/Binaries/ShippingGame/ShowcaseGame.exe` |
-| Cook helpers | `Tools/<tool>/Binaries/ShippingEditor/<tool>.exe` |
+| Launcher | `artifacts/dev/Tools/SparkleLauncher/Binaries/ShippingEditor/SparkleLauncher.exe` |
+| Editor | `artifacts/dev/Projects/Showcase/Binaries/ShippingEditor/ShowcaseEditor.exe` |
+| Game | `artifacts/dev/Projects/Showcase/Binaries/ShippingGame/ShowcaseGame.exe` |
+| Cook helpers | `artifacts/dev/Tools/<tool>/Binaries/ShippingEditor/<tool>.exe` |
 
 Shared engine targets emit to `Engine/Binaries/<module>/<profile>` when enabled; their required DLLs are staged beside each consuming executable. Static/import libraries remain separate development outputs and are excluded from the product archive.
 
-Portable CMake remains under `Tools/CMake/`. Core's `ProductPaths` selects the source or installed root once; Launcher run/cook operations and AssetCooker use those functions. A source checkout uses its normal content and generated outputs. An installed package verifies manifest membership and uses its separate writable content store.
+Core has no package path API. The existing marker-based roots and ordinary cooked-path getters work for both trees; `LauncherProductPaths` chooses launch/tool paths outside Engine. `LaunchSparkle.cmd` is pinned from `CMake/Packaging/LaunchSparkle.cmd` in reviewed inputs.
 
-### Work With Precompiled Binaries
+### Sync Product Bundles
 
-Import a verified archive for the checkout's exact Git revision, then use Launcher normally:
+Fill a source checkout's normal outputs from a verified archive for its exact Git revision:
 
 ```powershell
-& ./CMake/Packaging/UsePrecompiled.ps1 -Archive <archive.zip> -Sha256 <published-sha256>
+& ./CMake/Packaging/SyncProducts.ps1 -Archive <archive.zip> -Sha256 <published-sha256>
 artifacts/dev/Tools/SparkleLauncher/Binaries/ShippingEditor/SparkleLauncher.exe
 ```
 
-Select the Shipping profile for these precompiled products. To replace only selected products, add `-Products SparkleLauncher,ShowcaseEditor`. The import verifies archive membership, hashes, metadata and dependency closure before replacing complete product directories. Failed replacement restores previous directories; an unfinished rollback retains them in the named transaction directory. Close affected products and finish active builds before importing.
+The default sync replaces Launcher, Editor and Game binary directories plus `artifacts/dev/Projects/Showcase/Cooked` (and `artifacts/dev/Projects/Shared/Cooked` when present). Optional `-Products` selects binary targets, including cook helpers when supplied; the complete cooked base is always synced. Source files, settings and private symbols are untouched. Close affected products and finish builds/cooks before sync. Failed replacement restores accepted directories; an unfinished rollback retains them in the named private transaction directory.
 
-Local compilation writes the same executable/DLL locations. It does not switch to another binary directory or consult an installed manifest. Import leaves source, cooked content, user settings and symbols unchanged; use the existing sync/cook operations for content. Development and Debug profiles keep their own paths and require their own builds. The first precompiled route uses the six frozen Shipping products; no published archive or automatic download feed exists yet.
+Imported outputs are writable. Local compilation/cooking replaces exactly those files; no manifest lookup, imported/generated switch or origin marker participates in ordinary consumption. Shipping profiles use the supplied paths; Development/Debug need their own builds. Sync checks the initial archive/tag identity, not subsequent local source freshness. Build/Cook is the user's explicit refresh decision.
 
-Source use still requires Git for archive-to-checkout identity and CMake for content sync. Visual Studio, Qt and the Vulkan SDK are build prerequisites; running precompiled products uses their staged runtime dependencies and the graphics driver. Cook readiness checks the helpers beside their executables, independently of a configured build tree.
+Git is needed for initial checkout identity. Source acquisition/build/cook uses its normal action-specific prerequisites; ordinary Run needs only supplied runtime dependencies and a supported graphics driver. No downloadable qualified archive or automatic update feed is claimed yet.
 
-This follows Unreal's [precompiled-binary workflow](https://dev.epicgames.com/documentation/en-us/unreal-engine/using-precompiled-binaries-in-unreal-game-sync-for-unreal-engine) and [shared binary locations](https://dev.epicgames.com/documentation/en-us/unreal-engine/unreal-engine-directory-structure). Sparkle reuses CMake and its manifest verifier rather than adding Unreal Game Sync, Perforce or a second build system.
-
-Selected source and cooked content live under `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/`, outside the extraction. Downloads are explicit Launcher selections, verified and transactionally published by the existing acquisition/cook owners. Keep source and cooked subtrees distinct; use the existing project/asset identities without introducing asset or shader versions. Existing settings/log owners remain per-user. The installed route implements this layout; [PD-3 results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) record offline/read-only/containment/helper applicability and current recovery checks separately from the user-accepted removal exclusion. Source workspaces keep their existing source/cooked paths.
-
+The UGS-inspired part is shared output locations and explicit rebuild of what the developer changes. Sparkle keeps its current CMake/Launcher tools without adding Perforce, a sync service, version database or another build system. Historical internal archives keep their original store behavior and [candidate results](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress); this source change does not alter those archives.
 
 ### Reviewed Package Inputs
 
-The [package owner](#current-package-entry) consumes a reviewed JSON input file. Keep it outside the source snapshot, under ignored release evidence. CMake generates exact product paths under `build/private/release-products/<configuration>.json`; package membership is not inferred from development directories.
+**Current input contract:** review the frozen source/configuration/content selection, runtime dependencies and redistribution terms before work. CMake target outputs and existing content recipes supply membership; build/cook then creates the bytes in empty owned generated roots. Generate one final file inventory with path, size/hash, component, runtime/helper role, required notices and signature expectation. Validate dependencies, matching symbols, stage membership and archive bytes directly from that inventory. Generate SBOM/provenance from the same facts; do not maintain another payload graph.
 
-Prepare those inputs with the same owner:
+Published archive hashes and source-tag identity are delivery identities, not local-file schema versions. No `Admissions.DependencyClosure`/`SymbolCorrelation` JSON approval protocol, pre-existing executable digest, before/after payload rebind or old build cache is a prerequisite. Required legal/signing review remains real work; writing a PASS receipt cannot supply it.
 
-```powershell
-cmake -S . -B build
-powershell -NoProfile -File CMake/Packaging/Package.ps1 -AuditInputs
-```
-
-The audit retains `artifacts/releases/0.1.0/.partial-<id>/report.json`: binary/DLL hashes and imports, compiler-selected app-local CRT hashes/signatures and native PE/PDB identities for the six configured products. Missing or mismatched inputs remain blocked. It exits 1 without building, cooking or publishing an archive; discovery does not approve rights, complete dependency closure or shader symbols. Build the named targets in their declared configurations before repeating the audit. Shipping MSVC profiles trim the repository prefix from source names and retain only PDB filenames in every linked product, including compiled dependencies. Private PDBs stay separate; recheck source checksums and binary paths after rebuilding.
-
-| Input field | Required meaning |
-| --- | --- |
-| `Revision`, `SourceInputsSha256` | Exact Git revision and deterministic hash of repository-relative tracked/untracked nonignored file hashes, including deletions. The admission run retains `source-inputs.json` and the fingerprint in `report.json`; review that snapshot before admitting payloads. |
-| `Admissions` | `DependencyClosure`, `SymbolCorrelation`: each names repository-relative `Report`, `Size`, `Sha256`. The hashed JSON owner receipt carries `Gate`, `Status`, `Revision`, `SourceInputsSha256`, `PayloadSha256`; it must pass for the exact source and payload. `PayloadSha256` hashes the UTF-8 bytes of the generated manifest's compressed PowerShell JSON (`ConvertTo-Json -Depth 20 -Compress`), including membership, file hashes, products and system imports. Changing any of those inputs requires new receipts. A license filename or successful build is insufficient. |
-| `Files` | Explicit complete allowlist; each entry has repository-relative `Source`, package-relative `Path`, `Size`, lowercase `Sha256`, `Component`, `Role`, `Permission`, `Owner`, logical `Origin`, SPDX `License`, package-relative `Notice`, `Signature`. Admission verifies these reviewed bytes. After build/cook, only configured executable and admitted cooked-output hashes are refreshed through the output owner; external inputs remain pinned. Membership, terms and source identity cannot change. No absolute source path goes into the package manifest. |
-| `SystemImports` | Exact DLL names supplied by Windows or the supported graphics driver; each has `Name`, `Owner` (Windows/GraphicsDriver), `Requirement`. CRT, Qt, NVIDIA plugins and compiler-helper DLLs cannot use this exemption. Verify the declared import closure before assembly; qualify it on the minimum machine against the resulting archive. It never scans the host to supply missing files. |
-
-Components are Launcher, Editor, Game, the three admitted cook helpers, CMake, Engine and Shared. Roles are Runtime, Helper, EngineContent, Recipe, Defaults, Notice and Metadata. Permission is ReadOnly. Signature policy is UnsignedBuild, VendorSigned or NotApplicable (non-PE only); unsigned first-party archives are internal development products. VendorSigned bytes require valid Authenticode. Required entries include all six generated executables, `Tools/CMake/bin/cmake.exe`, `notices/ThirdPartyNotices.txt`, `manifests/sparkle-sbom.spdx.json` and `manifests/sparkle-provenance.json`. Notices must themselves be admitted members. The consolidated notice retains compiled libraries, DXC/Slang/SPIR-V components and Microsoft terms; it does not authorize public distribution. Windows 11 supplies `D3DCompiler_47.dll`; the package does not ship an extra copy.
-
-The SPDX 2.3 SBOM must identify its document/software components and enumerate every payload file with SHA-256 and the manifest license. Its own file and the provenance document are omitted from that list to avoid digest cycles; the package manifest binds both. Provenance names `Version`, `Revision`, `SourceInputsSha256` and the six exact `Products` (Component/Target/Configuration/Path). Static/embedded dependency completeness, redistribution terms and symbol correlation still require owner review. The verifier checks these bindings; it does not infer grants or replace a complete SPDX schema check.
-
-The manifest owns `ProjectPath=Projects/Showcase`, `EnginePath=Engine`, `ContentStore=Content/Showcase`. ContentStore is relative to the platform per-user SparkleEngine root. Core uses it for `Cooked/`; immutable recipes include `.sparkle-project` and `Levels.catalog`. Recipe/engine membership is checked before assembly. Launcher store population and package-relative helper/product discovery are implemented but remain unqualified against a release archive. Runtime acceptance follows that archive through CHK-PKG-02; no archive-bound runtime receipt is required before archive creation. Current input admissions remain unresolved.
+`Package.ps1` consumes these prepared outputs. `Get-PreparedProductInputs` reads real PE/PDB/runtime facts and fails when a required product is missing; `Freeze-PackageOutputs` updates only declared generated entries, then `New-PackageManifest` creates the single final inventory. `ShaderExport` names the final export directory relative to the source root. No cook-log parsing, build-cache identity, audit mode or admission-status schema is part of this route.
 
 ### Content And Source Distribution
 
-- Product archives carry engine-owned mandatory defaults and only legally admitted content. A requested map remains available through a verified user-selected acquisition recipe; no automatic first-launch download is required.
+- The same release supplies its legally admitted prebuilt content and the matching optional source-rebuild base. A prebuilt advertised map needs no source acquisition/cook. Source recipes remain available for users who deliberately acquire or change inputs and rebuild through Launcher.
 - Modern Sponza Base/Curtains and classic Sponza are acquisition-only until bundled redistribution is established. Exclude source, textures, cooked derivatives and their thumbnails from product archives. Publisher terms remain applicable to users; an acquisition recipe is not a new license grant.
 - Classic Sponza uses the pinned Khronos recipe under `Assets/Meshes/Sponza/SourceFiles.txt`; the level reads `Sponza/Publisher/glTF/Sponza`. The replaced bundled model/texture files are removed from the current source tree. The acquired tree is gitignored.
 - Cornell consumes the tracked self-contained GLB with `COPYRIGHT.txt` and conversion attribution. Its publisher OBJ ZIP is optional for regeneration. Do not turn the unavailable regeneration archive into a normal launch prerequisite.
@@ -287,22 +301,17 @@ The admitted PD-3 package technical scope is accepted for `a0f34c8b...`; aggrega
 
 **Evidence:** [Product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain archive-bound export/symbol/review checks and outstanding adoption/native/replacement proof. Public instructions: [recovery/privacy](../../../../SUPPORT.md), [known issues](../../../../KNOWN_ISSUES.md), [security](../../../../SECURITY.md).
 
-BuildAndPackaging owns `CMake/Packaging/{ExportDiagnostics,IncidentIdentity,ReviewRelease}.ps1`. [Release Inputs](#release-inputs) defines shipped helper/policy membership; review remains a maintainer source-side task.
+Ordinary self-service uses product/Launcher logs, documented requirements, known issues and manual re-extraction. It needs no retained ZIP, full package validation or diagnostic helper installation. Missing files/symbols remain unavailable, never verified by omission.
 
 | Responsibility | Current owner and boundary |
 | --- | --- |
-| Logs/retention | Core Logger rotates logs; Launcher owns operation logs. [Public retention/removal rules](../../../../SUPPORT.md#retention-and-replacement) apply. Keep private symbols with candidate evidence through release review. |
-| GPU faults | D3D12 resource service drains supported bounded DRED records into logs; Vulkan records device loss. No automatic recovery. |
-| Export | Local fixed projection of verified package identity and counts; preview digest binds consent. Originals stay local. [User command and privacy limits](../../../../SUPPORT.md#preview-and-export-local-diagnostics). |
-| Symbols | Shipping MSVC emits `/Zi`/full PDBs into the separate symbol root. DbgHelp checks PE/PDB GUID-age; embedded paths are excluded. Archive-to-companion hashes and native source attribution are separate checks. |
-| Crash/hang | User-reported categories; ordinary automatic collection unavailable. Archive-bound native D3D12 removal/manual recovery has supporting proof in the product reports. |
-| Review | Pawel Lisowski owns release review; the author or agent may execute it and must name the actual reviewer. Unresolved S0/S1 blocks approval. Local review, publication and aggregate acceptance are separate. |
+| Logs/retention | Core Logger and Launcher operation logs; [retention/removal rules](../../../../SUPPORT.md#retention-and-replacement) preserve user data. |
+| GPU faults | Existing native logging and the optional source GPU-crash tools. Automatic CPU crash/hang collection and unsupported native categories remain unavailable. |
+| GPU export | Source-only `ExportDiagnostics.ps1 -GpuCrashManifestPath ...` retains bounded preview, category consent, matched-symbol checks and unchanged originals. It has no ZIP/package prerequisite. [Privacy limits](../../../../SUPPORT.md#preview-and-export-local-diagnostics) apply. |
+| Symbols | Existing PE/PDB GUID-age checks and separate shader artifacts bind the exact inputs; source attribution needs its own actual proof. |
+| Review/replacement | Maintainer reviews the candidate, known issues and affected evidence once. Unresolved S0/S1 blocks publication. Manual side-by-side extraction/rollback preserves published identities and user state. |
 
-Replacement review requires verified old/new archives, different versions/hashes, unchanged three-product configuration scope and a replacement ledger retaining known IDs/severity. Critical defects must be resolved with matching candidate receipts. Review never mutates products or user state. Replacement/withdrawal invalidates all six product reports and affected release gates. [Manual rollback/settings rules](../../../../SUPPORT.md#retention-and-replacement) apply. Exact-archive interrupted-extraction rejection, distinct-version startup/rollback and supported native/manual diagnostics have [current-archive technical proof](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress). No public replacement or withdrawal was performed.
-
-Invoke `ReviewRelease.ps1` with `-PackageRoot`, `-ArchivePath`, `-ArchiveSha256`, `-LedgerPath`, `-Reviewer` (the actual author/agent), `-Decision Approve|Replace|Withdraw` and an existing local `-OutputDirectory`. Replacement also needs `-ReplacementRoot`, `-ReplacementArchive`, `-ReplacementSha256`, `-ReplacementLedgerPath` and a state policy.
-
-Ledger: `ArchiveSha256` and `Defects` with `Id: ISSUE-<number>`, `Severity: S0..S3`, `Disposition: Unresolved|Resolved`. Resolved entries require `EvidencePath` to a bounded receipt with matching `ArchiveSha256`, `DefectId` and `Status: PASS`. Only its hash is exported.
+The custom review/defect-receipt script and generic archive-projection exporter are removed. Do not replace them with another schema, collector or review service. Existing source GPU privacy/export mechanics have real rendering-diagnostics consumers and remain scoped to that job. Historical archive-bound controls keep their original identity.
 
 ### Diagnostics: Capability Identity
 
@@ -350,7 +359,7 @@ This stable family ID now covers adoption, local diagnostics and release review.
 | --- | --- | --- |
 | `CHK-ADOPT-01` | `AC-ADOPT-01`; `FM-ADOPT-01` | Documented packaged-product and source journeys through success and a missing prerequisite. Private repair, dead onboarding or misleading support claims fail. |
 | `CHK-ADOPT-02` | `AC-ADOPT-02`, `AC-ADOPT-03`; `FM-ADOPT-02`, `FM-ADOPT-03` | Isolated local startup/crash/hang/GPU diagnostics, with private/mismatched/oversized/unavailable fixtures. Inspect identity, symbols, redaction, bounds and absence of network uploads. |
-| `CHK-ADOPT-03` | `AC-ADOPT-04`; `FM-ADOPT-04` | Review exact candidate known-defect ledger and public policy, then inject an unresolved critical defect and a false support promise. Both must block closeout; no live inbox submission is required. |
+| `CHK-ADOPT-03` | `AC-ADOPT-04`; `FM-ADOPT-04` | Review the exact candidate's known issues, evidence and public policy, then challenge the decision with an unresolved critical defect and a false support promise. No machine-readable defect-ledger schema is required. Both must block closeout; no live inbox submission is required. |
 | `CHK-ADOPT-04` | `AC-ADOPT-05`; `FM-ADOPT-05` | Apply/interrupt a versioned replacement on copies with representative user state; verify applicability, atomicity, state policy, rollback/withdrawal and unchanged public bytes. |
 
 Candidate results remain in `FCR-PROD-06`; fixtures cannot close an unavailable required native or adoption check. Missing intake channels alone are not a blocker.

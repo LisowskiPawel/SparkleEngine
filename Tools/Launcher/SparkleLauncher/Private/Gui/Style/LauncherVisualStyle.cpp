@@ -94,6 +94,10 @@ namespace SparkleLauncher
 		addRule("#ActivityRail", "background: #1b1e1c; border: none; border-top: 1px solid " + divider + "; border-right: 1px solid " + border + ";");
 		addRule("#OutputPane", "background: #181b19; border: none; border-top: 1px solid " + divider + ";");
 		addRule("#FooterContextItem", "background: transparent; border: none;");
+		addRule("#FooterContextItem QCheckBox, #FooterContextItem QToolButton", "background: transparent;");
+		addRule("#FooterContextItem QToolButton", "padding: 0; border: 1px solid transparent; border-radius: 2px;");
+		addRule("#FooterContextItem QToolButton:hover", "background: " + panelHover + ";");
+		addRule("#FooterContextItem QToolButton:focus", "border-color: " + focus + ";");
 		addRule("#FooterContextDivider", "background: #363b37; border: none;");
 		addRule("#FooterFieldLabel", "color: " + textMuted + "; font-size: 8pt; font-weight: 650; padding: 0 4px;");
 

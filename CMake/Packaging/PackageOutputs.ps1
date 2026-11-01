@@ -2,12 +2,10 @@ Set-StrictMode -Version Latest
 
 function Get-PackageShaderExport
 {
-    param([string] $RepositoryRoot, [string] $CookLog)
-    $markers = @(Get-Content -LiteralPath $CookLog | Where-Object { $_.StartsWith('SPARKLE_SHADER_EXPORT ') })
-    if ($markers.Count -ne 1) { throw 'The final cook must return exactly one shader export receipt.' }
-    $path = $markers[0].Substring('SPARKLE_SHADER_EXPORT '.Length) | ConvertFrom-Json
+    param([string] $RepositoryRoot, [string] $ShaderExport)
+    Assert-PackagePath $ShaderExport
     $root = Join-Path $RepositoryRoot 'artifacts/symbols/shaders/Showcase'
-    $file = Get-IncidentFile $path 16777216
+    $file = Get-IncidentFile (Join-Path $RepositoryRoot $ShaderExport) 16777216
     if (!$file.FullName.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase))
     {
         throw 'Shader export escapes the configured symbol owner.'
@@ -66,17 +64,13 @@ function Update-PackageSbom
     $entry[0].Sha256 = (Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()
 }
 
-function Update-PackageOutputs
+function Freeze-PackageOutputs
 {
     param([string] $RepositoryRoot, [string] $BuildDirectory, [string] $Version, [string] $TransactionRoot, $Products, $Inputs)
     . (Join-Path $PSScriptRoot 'IncidentIdentity.ps1')
-    $audit = Get-PackageInputAudit $RepositoryRoot $BuildDirectory $Version
-    if (@($audit.Products | Where-Object { $_.Status -cne 'PASS' }).Count)
-    {
-        throw 'Final product, runtime or PE/PDB audit failed.'
-    }
-    $shader = Get-PackageShaderExport $RepositoryRoot (Join-Path $TransactionRoot 'cook-ShippingGame.log')
-    $compiler = @($audit.Products | Where-Object { $_.Component -ceq 'ShaderCompiler' })
+    $prepared = @(Get-PreparedProductInputs $RepositoryRoot $BuildDirectory $Version)
+    $shader = Get-PackageShaderExport $RepositoryRoot $Inputs.ShaderExport
+    $compiler = @($prepared | Where-Object { $_.Component -ceq 'ShaderCompiler' })
     if ($compiler.Count -ne 1 -or $compiler[0].Binary.Sha256 -cne $shader.CompilerSha256)
     {
         throw 'Shader export belongs to a different compiler executable.'
@@ -87,11 +81,11 @@ function Update-PackageOutputs
     foreach ($file in $Inputs.Files)
     {
         $path = [IO.Path]::GetFullPath((Join-Path $RepositoryRoot $file.Source))
-        $cooked = $file.Path.StartsWith('Engine/Cooked/', [StringComparison]::Ordinal) -and $file.Role -ceq 'EngineContent' -and
+        $cooked = $file.Path.StartsWith('artifacts/dev/Projects/Showcase/Cooked/', [StringComparison]::Ordinal) -and $file.Role -ceq 'EngineContent' -and
             $file.Source.StartsWith('artifacts/dev/Projects/Showcase/Cooked/', [StringComparison]::Ordinal)
         if ($generated.Contains($path) -or $cooked)
         {
-            # Only products of this build/cook may acquire new identities. External inputs stay pinned.
+            # Freeze prepared build/cook outputs once. External inputs stay pinned.
             $output = Get-IncidentFile $path ([long]::MaxValue)
             $file.Size = $output.Length
             $file.Sha256 = (Get-FileHash -LiteralPath $output.FullName).Hash.ToLowerInvariant()
@@ -100,5 +94,5 @@ function Update-PackageOutputs
     }
 
     Update-PackageSbom $RepositoryRoot $TransactionRoot $Inputs
-    return @{ Products = $audit.Products; ShaderExport = $shader }
+    return @{ Products = $prepared; ShaderExport = $shader }
 }

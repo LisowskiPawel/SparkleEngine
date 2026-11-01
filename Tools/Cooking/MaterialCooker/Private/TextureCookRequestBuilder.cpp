@@ -2,12 +2,11 @@
 
 #include "TextureCookRequestBuilder.h"
 
-#include "Core/Public/Assets/AssetTypes.h"
+#include "SourceAssetPaths.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Formatting/HexFormat.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 
 std::string TextureCookRequestBuilder::BuildTextureSourceKeyForRoot(std::string_view rootName, const TextureCookRequest& request, const std::filesystem::path& relativePath)
@@ -117,7 +116,7 @@ TextureDimension TextureCookRequestBuilder::ResolveTextureDimension(TextureGroup
 
 std::filesystem::path TextureCookRequestBuilder::NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath)
 {
-	if (const auto resolvedPath = Filesystem::ResolveAssetPathNormalized(sourceTexturePath, AssetType::Texture))
+	if (const auto resolvedPath = SparkleTools::ResolveSourceAssetPath(sourceTexturePath, SparkleTools::SourceAssetType::Texture))
 	{
 		return *resolvedPath;
 	}
@@ -139,7 +138,7 @@ std::string TextureCookRequestBuilder::BuildTextureSourceKey(const TextureCookRe
 		return BuildTextureSourceKeyForRoot("engine", request, *relativePath);
 	}
 
-	const std::filesystem::path importedTextureRoot = Paths::ImportedTextureCacheRoot();
+	const std::filesystem::path importedTextureRoot = SparkleTools::ImportedTextureCacheRoot();
 	if (const auto relativePath = Paths::TryMakeRelativeUnderRoot(request.sourcePath, importedTextureRoot))
 	{
 		return BuildTextureSourceKeyForRoot("imported", request, *relativePath);
@@ -166,7 +165,7 @@ std::filesystem::path TextureCookRequestBuilder::BuildTextureOutputPath(const Te
 		return *outputPath;
 	}
 
-	if (const auto outputPath = BuildTextureOutputPathForRoot(request.sourcePath, Paths::ImportedTextureCacheRoot(), "Imported", variantSuffix))
+	if (const auto outputPath = BuildTextureOutputPathForRoot(request.sourcePath, SparkleTools::ImportedTextureCacheRoot(), "Imported", variantSuffix))
 	{
 		return *outputPath;
 	}

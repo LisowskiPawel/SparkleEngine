@@ -51,7 +51,7 @@ namespace Assets
 				    }
 				    SceneAssetLoadWork& work = state->Assets[index];
 				    work.Payload = SceneAssetPayloadDecoder::Decode(work.Manifest, work.Files);
-				    SceneLoadPackageBuilder::BuildAssetBlueprints(work);
+				    PrepareSceneAssetForCommit(work);
 				    work.Files.Reset();
 				    work.Manifest = {};
 				    state->CompletedDecodes.fetch_add(1, std::memory_order_relaxed);
@@ -78,7 +78,7 @@ namespace Assets
 				    return TaskResult::Cancelled("Scene load cancelled before package finalization.");
 			    }
 			    state->Stage.store(LevelLoadOperationStage::Validating, std::memory_order_release);
-			    SceneLoadPackageBuilder::Finalize(*state);
+			    FinalizeSceneLoadPackage(*state);
 			    state->Stage.store(LevelLoadOperationStage::Ready, std::memory_order_release);
 			    return TaskResult::Success();
 		    });

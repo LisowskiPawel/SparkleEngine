@@ -4,7 +4,7 @@
 #include "ImGui/EditorImGuiContext.h"
 #include "Editor/Public/Icons/EditorIconService.h"
 
-#include "Console/EditorConsoleSystem.h" // IWYU pragma: keep
+#include "Console/EditorConsoleSystem.h"
 #include "GameFramework/Public/Rendering/RenderViewCameraData.h"
 #include "GameFramework/Public/Scene/Camera/CameraInputIntent.h"
 #include "Panels/MainMenuBarPanel.h"
@@ -13,7 +13,7 @@
 #include "Panels/SettingsPanel.h"
 #include "Settings/EngineRenderingSettingsController.h"
 #include "Panels/UsedMeshesPanel.h"
-#include "Panels/UsedShadersPanel.h"
+#include "Panels/ShaderToolsPanel.h"
 #include "Panels/UsedTexturesPanel.h"
 #include "Panels/ViewportPanel.h"
 #include "Viewport/ViewportToolbar.h"
@@ -26,7 +26,6 @@
 #include "Scene/Model/EditorSceneModel.h"
 #include "Scene/Model/EditorSceneModelBuilder.h"
 #include "Scene/Transactions/EditorTransactionHistory.h"
-#include "Settings/EditorRestartService.h"
 #include "Viewport/EditorViewportSession.h"
 #include "Window/Window.h"
 
@@ -34,6 +33,15 @@
 
 #include <memory>
 #include <utility>
+
+void UI::Implementation::AppendConsoleOutput(ConsoleOutputRecord record, bool showConsole)
+{
+	m_editorConsoleSystem->AppendOutput(std::move(record));
+	if (showConsole)
+	{
+		m_editorConsoleSystem->OpenConsole();
+	}
+}
 
 const ViewportRenderRequest& UI::Implementation::GetViewportRenderRequest() const noexcept
 {
@@ -97,9 +105,9 @@ void UI::Implementation::SetDiagnosticsProviders(EditorDiagnosticsProviders prov
 	m_memoryDiagnosticsProvider = std::move(providers.MemoryDiagnostics);
 	m_meshPreviewProvider = std::move(providers.MeshPreview);
 
-	if (m_usedShadersPanel)
+	if (m_shaderToolsPanel)
 	{
-		m_usedShadersPanel->SetGenerationProvider(m_shaderGenerationProvider);
+		m_shaderToolsPanel->SetGenerationProvider(m_shaderGenerationProvider);
 	}
 	if (m_usedMeshesPanel)
 	{
@@ -125,11 +133,14 @@ bool UI::Implementation::ConsumeShaderReloadRequest() noexcept
 	return requested;
 }
 
-bool UI::Implementation::ConsumeShaderRecookRequest() noexcept
+void UI::Implementation::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler)
 {
-	const bool requested = m_shaderRecookRequested;
-	m_shaderRecookRequested = false;
-	return requested;
+	m_shaderToolsPanel->SetCompileHandler(std::move(handler));
+}
+
+void UI::Implementation::SetShaderCompileStatus(bool busy, std::string_view message)
+{
+	m_shaderToolsPanel->SetCompileStatus(busy, message);
 }
 
 ViewportOutputAction UI::Implementation::ConsumeViewportOutputAction() noexcept
@@ -162,7 +173,7 @@ UI::Implementation::Implementation(EditorHostServices hostServices) :
 		return;
 	}
 
-	InitializeWorkspace();
+	InitializeWorkspace(std::move(hostServices.RequestRestart));
 	if (m_viewportSession && m_viewportPanel)
 	{
 		m_viewportSession->SetViewModeChangedHandler([this](RenderViewMode viewMode) { m_viewportPanel->SetViewMode(viewMode); });

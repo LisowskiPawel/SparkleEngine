@@ -16,7 +16,7 @@ struct AssetCookerCli::Arguments final
 	std::string ProjectName;
 	std::string Configuration = "DevelopmentGame";
 	std::string ToolProfile;
-	std::string RepositoryRoot;
+	std::string WorkspaceRoot;
 	AssetCookerCategory Category = AssetCookerCategory::All;
 };
 
@@ -45,7 +45,7 @@ bool AssetCookerCli::ParseCommonArguments(int argc, char** argv, int startIndex,
 				return false;
 			}
 
-			arguments.RepositoryRoot = argv[++index];
+			arguments.WorkspaceRoot = argv[++index];
 			continue;
 		}
 		if (argument == "--tool-profile")
@@ -118,10 +118,10 @@ void AssetCookerCli::PrintUsage(std::ostream& output)
 	constexpr std::string_view profile = "[DebugEditor|DebugGame|DevelopmentEditor|DevelopmentGame|ShippingEditor|ShippingGame]";
 
 	output << "Usage:\n"
-	       << "  AssetCooker cook-project [ProjectName|ALL] " << profile << " [--tool-profile <EditorProfile>] [--root <repo-root>]\n"
-	       << "  AssetCooker cook-shaders <ProjectName> " << profile << " [--tool-profile <EditorProfile>] [--root <repo-root>]\n"
-	       << "  AssetCooker cook-textures <ProjectName> " << profile << " [--tool-profile <EditorProfile>] [--root <repo-root>]\n"
-	       << "  AssetCooker cook-assets <ProjectName> " << profile << " [--tool-profile <EditorProfile>] [--root <repo-root>]\n";
+	       << "  AssetCooker cook-project [ProjectName|ALL] " << profile << " [--tool-profile <EditorProfile>] [--root <workspace-root>]\n"
+	       << "  AssetCooker cook-shaders <ProjectName> " << profile << " [--tool-profile <EditorProfile>] [--root <workspace-root>]\n"
+	       << "  AssetCooker cook-textures <ProjectName> " << profile << " [--tool-profile <EditorProfile>] [--root <workspace-root>]\n"
+	       << "  AssetCooker cook-assets <ProjectName> " << profile << " [--tool-profile <EditorProfile>] [--root <workspace-root>]\n";
 }
 
 void AssetCookerCli::PrintResult(const AssetCookerServiceResult& result)
@@ -153,7 +153,7 @@ int AssetCookerCli::Run(int argc, char** argv) const
 	}
 
 	AssetCookerService service(
-	    arguments.RepositoryRoot.empty() ? nullptr : arguments.RepositoryRoot.c_str(),
+	    arguments.WorkspaceRoot.empty() ? nullptr : arguments.WorkspaceRoot.c_str(),
 	    arguments.ProjectName.empty() ? nullptr : arguments.ProjectName.c_str(),
 	    arguments.Configuration.c_str(),
 	    arguments.ToolProfile.empty() ? nullptr : arguments.ToolProfile.c_str());

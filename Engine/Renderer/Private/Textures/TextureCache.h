@@ -61,7 +61,8 @@ public:
 	TextureCache(TextureCache&&) = delete;
 	TextureCache& operator=(TextureCache&&) = delete;
 
-	void UpdateSceneTextures(const RenderTextureTable& textures, RenderDeviceServices& deviceServices);
+	void SynchronizeSceneTextures(const RenderTextureTable& textures);
+	void UpdateSceneTextures(RenderDeviceServices& deviceServices);
 	void RecordUploadSubmission(RhiSubmissionToken token) noexcept;
 	void PollResidency() noexcept;
 	void CommitBindingRevision(std::uint64_t bindingRevision) noexcept;
@@ -117,10 +118,9 @@ private:
 
 	void LoadDefaultTextures(RenderCommandList& commandList, std::vector<RhiResourceHandle>& uploadedResources);
 	void UnloadAll() noexcept;
-	std::vector<RhiResourceHandle> LoadSceneTextures(const RenderTextureTable& textures, RenderCommandList& commandList);
+	std::vector<RhiResourceHandle> LoadSceneTextures(RenderCommandList& commandList);
 	bool HasPendingSceneTextureUploads() const noexcept;
 	void RequestTexture(const ResolvedTexturePath& source, std::uint32_t generation);
-	void SynchronizeSceneTextures(const RenderTextureTable& textures);
 	void LaunchPendingRequests();
 	void ConsumeCompletedRequests() noexcept;
 	void UploadReadyTextures(RenderCommandList& commandList, std::vector<RhiResourceHandle>& uploadedResources);

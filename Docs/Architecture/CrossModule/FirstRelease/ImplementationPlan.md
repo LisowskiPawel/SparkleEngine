@@ -6,15 +6,19 @@ Remaining stages: [FR-03](#fr-03--feature-closure) / [FR-04](#fr-04--release-map
 
 **Status:** open release plan; remaining work is tracked in the roadmap and linked stage plans
 
+**Purpose:** show the approved rendering well and make its results reproducible. Execute scene/pass/radiance, GPU correctness, quality and measured-cost work first. Supporting product/foundation changes are bounded repairs to a named rendering or reviewer-run blocker under [Roadmap scope protection](../../../Strategy/Roadmap.md#scope-protection); no subsystem-completeness program is selected. Keep the existing release gates and return to the rendered result after each supporting slice.
+
 Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for completed FR-00–02 internal scope and missing checks. [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) selects the next task; this page supplies only unfinished phase work. Recheck completed cells only when their admitted inputs change; final public rights/signing remain FR-07.
 
 [First Release Acceptance](../../../Acceptance/FirstRelease.md#release-gates) owns release verdicts. Feature-local Architecture checks and [candidate reports](../../../Acceptance/FeatureCompletionReports.md) own feature proof.
 
-The [product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain five technical passes and current PD-4 controls for `a0f34c8b...` with its explicit removal exclusion. [Product closeout](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) stays blocked by the source-applicable FWC-4 scene-publication defect. The owner requested document retirement and paused FWC-4; this mother plan retains the unresolved acceptance obligation. [First Release](../../../Acceptance/FirstRelease.md#product-plan-and-public-release) retains the environment and FR-07 signing/public-rights boundaries.
+The [product reports](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain five technical passes and current PD-4 controls for `a0f34c8b...` with its explicit removal exclusion. [Product closeout](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) stays blocked by the source-applicable FWC-4 scene-publication defect. The owner requested document retirement and later resumed FWC-4. Its recorded source publication repair passes for that candidate; the simplified lock/rollback/incomplete-marker implementation passes its affected source/native checks. Selected-map content proof follows FR-04, and a repaired archive with affected product reconciliation follows FR-06. This mother plan retains the unresolved acceptance obligation. [First Release](../../../Acceptance/FirstRelease.md#product-plan-and-public-release) retains the environment and FR-07 signing/public-rights boundaries.
 
-Choose the section for your current task: [release phases](#release-tasks), [Game/Editor/Launcher/package](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress), [paths/tasks/world/cook/shaders](FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan), or [feature owners](#complete-feature-routing).
+Choose the section for your current task: [release phases](#release-tasks), [Game/Editor/Launcher/package](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress), [completed foundation repairs](../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress), or [feature owners](#complete-feature-routing). The separate foundation plan is retired under the [portfolio demo boundary](../../../Acceptance/FirstRelease.md#portfolio-demo-delivery-boundary); selected content checks belong to FR-04, shader deltas to their existing owner, and candidate reconciliation to FR-06.
 
 ## Release Tasks
+
+Execute by [technical inputs before formal approval](../../../Acceptance/FirstRelease.md#shared-delivery-evidence). Selected content/map inputs and a named unsigned archive may be prepared while FR-03 is open; feature delivery observations join the same rehearsal later reconciled at FR-06. Do not require REL-08/09 approval before producing their feature prerequisites. Required public gates keep their strict order.
 
 ### `FR-03` — Feature Closure
 
@@ -22,9 +26,9 @@ Choose the section for your current task: [release phases](#release-tasks), [Gam
 
 **Work:** enter the responsible child/leaf stage with actual prerequisites. Reference recovery precedes dependent quality claims; shared binding/native/content defects precede their affected consumer. Implement only the necessary delta. Each repair deletes its replaced code/state/selector/build/dependency path and proves retained behavior in the same slice. Narrowing a required promise needs its scope-owner decision first.
 
-**Exit:** all family dispositions are reconciled, and every Included/Experimental claim has the exact evidence required for REL-04. Reuse shared artifacts by identity; unselected future tiers need no implementation. Missing numerical/native/failure evidence remains blocked; a successful package or average readiness cannot replace it.
+**Exit:** dispositions are reconciled for the approved release promises, and each admitted Included/Experimental claim has the exact evidence required for REL-04. A family inventory is not a module-completeness checklist; apply the [minimum supporting scope](../../../Acceptance/FirstRelease.md#minimum-supporting-scope). Reuse shared artifacts by identity; unselected future tiers need no implementation. Missing numerical/native/failure evidence remains blocked; a successful package or average readiness cannot replace it.
 
-**Next FR-03 item:** reuse the completed [owner-selected Reference instrumentation retirement](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#work-this-plan) and its passing local contract/deletion/preservation checks, then [F05 engine qualification](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#f05-engine-qualification) and the separate F01 analytic-emitter repair. The [recorded controls and engine preflight](../../../Acceptance/FeatureCompletionReports.md#reference-correctness-progress) retain their exact candidates; no qualified engine prefix or raw image was obtained. `FCR-REN-08`/REL-04 remain open. Accepted PTD-00 is unchanged; the product closeout prerequisite remains blocked by scene-publication coherence.
+**Next FR-03 item:** [current Sponza radiance recovery](../../Modules/Engine/Renderer/Features/Lighting/ReferencePathTracer/ImplementationPlan.md#required-execution-order): freeze one approved camera/settings/source candidate, observe Lit and admitted Reference raw/display products, then select only the first wrong rendering/input owner. [F05-C repairs the shader identity defect](../../../Acceptance/FeatureCompletionReports.md#reference-correctness-progress); completed instructions are retired. The separate F01 analytic-emitter repair and full identity/native/API/frontend/lifecycle/quality gates remain open before dependent FR-04 oracle claims. Accepted PTD-00 and product-closeout obligations are unchanged.
 
 ```text
 Execute only the next Roadmap-selected FR-03 delta from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Name the selected path and consumer, then choose proof, repair, bounded simplification/retirement or admitted feature and run its owning child/leaf stage. For a cut, name the unnecessary existing surface and prove the retained path; no replacement feature is required. Complete local deletion and preservation checks. Reuse valid reports; do not execute the whole family registry or optional tiers. Apply the owning execution contract and its Stage Source-Style Gate.
@@ -36,11 +40,15 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Work:** qualify the approved seven-map set plus built-in Empty through source/cook/runtime/product identity, material losses, raw reference domain/uncertainty and temporal/artifact review. Use the applicable MAP-A through MAP-H method and per-map release contract on required APIs. The later Bistro/San Miguel, neural WL and portfolio CASE completion gates are not additional release maps or prerequisites.
 
+Use the same map proof for source/cooked fidelity: reached geometry/tangents/axes/units, material/texture dependencies, camera/light and any selected skin/morph/animation semantics. Reuse compatible cook/loader controls; run missing decoder, failure, determinism, budget and serial/worker cells only for admitted inputs or changed shared producers. [Unused combinations are excluded from release proof](../../../Acceptance/ReleaseScope/CapabilityDispositions.md#portfolio-demo-applicability), without a general-importer or whole-family pass. Do not run a separate foundation format matrix before this stage. Package allowlist/source-debug erasure and exact notices remain FR-06/07.
+
 **Cleanup:** repair the actual content/transport/output owner and remove the replaced faulty path; do not add map-specific renderer branches, substitute content silently or expand the reflection oracle domain to excuse unsupported effects.
 
 **Exit:** REL-05 has exact candidate/settings/pose/camera/reference identities, original artifacts, defects and invalidation triggers for each selected map. A map's load/readiness or attractive final screenshot cannot pass its material/raw/temporal checks.
 
 **Remaining / next:** obtain the qualified current raw-reference candidate through FR-03 before dependent map comparisons. The F05 preflight supplies no REL-05 map pass. Keep the approved seven maps plus Empty; select one applicable map proof when its prerequisites are met, remove completed work from this plan and retain results in REL-05.
+
+Source/cooked input checks needed by the current rendering result can run before raw-oracle qualification. Reference comparisons wait for the qualified oracle; their exact map artifacts can then satisfy Reference Stage 10 before formal REL-05 acceptance. Reuse those artifacts rather than making feature closure and map closure wait for each other's verdict.
 
 ```text
 Execute only the selected FR-04 map proof from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md. Use the approved release maps and their applicable checks, not the later Tier-1/portfolio ladder. Freeze raw/reference/settings identity, repair the first wrong owner with local cleanup and record exact results for REL-05. Apply the owning execution contract and its Stage Source-Style Gate.
@@ -75,22 +83,39 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ### `FR-06` — Candidate Freeze And Reproduction
 
-**Goal:** freeze one byte-identical candidate and prove the packaged-product and source-build journeys by the author or agent.
+**Goal:** supply one freshly built precompiled/cooked release base, prove Launcher prebuilt Run, and prove optional source modification/rebuild starting from that matching base or from source alone.
 
 **Non-goals:** fixing the candidate in place, giving undocumented assistance, or hiding repairs or machine-specific prerequisites.
 
-**Failure modes:** hash drift; cached prerequisite; admin/environment dependency; private path; support instructions fail; issue causes an untracked rebuild.
+**Failure modes:** hash drift; cached prerequisite; admin/environment dependency; private path; documented run/recovery instructions fail; a fix changes the candidate without affected revalidation.
 
 **Phase exit criteria:** `REL-08` and `REL-09` pass; any fix creates a new candidate and invalidates affected evidence.
 
+The shared unsigned archive/rehearsal supplies package-bound feature inputs before this final gate. Prepare it when its actual content/build prerequisites exist, then freeze/reconcile its applicable results here after feature/map/native gates. This is one evidence journey, without an FR-03 -> FR-06 -> FR-03 approval dependency.
+
+#### Prebuilt Delivery Simplification
+
+**Approved target:** publisher prepares one ready-to-run bundle; ordinary use is extract -> Launcher -> scene -> Run, with no SDK/source/manual assembly/build/cook step. Game has [no ImGui UI](../../../Acceptance/FirstRelease.md#consumer-effort-and-game-presentation); Editor UI remains. Apply the [package/source-rebuild contract](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#prebuilt-base-and-source-rebuild). This is remaining work, not current acceptance. Preserve Launcher's selection/previews/controls, Build/Cook/Run, progress/cancel and failures. Use these existing owners; add no release manager, local-file version tracker or second content/build path.
+
+- [x] **Thin source implementation:** package prepared outputs through the existing owner with one final inventory; remove pre-build admissions/build-cache snapshots and the duplicate build/cook runner. `SyncProducts.ps1` fills the canonical binaries/cooked files local Build/Cook overwrite. Shared installed stores, seed/recook origin checks, runtime manifest-member scans and the Launcher prerequisite graph are deleted. Run is direct; explicit developer tools keep their existing UX.
+- [x] **Render-only Game source:** remove the Game-only ImGui host/console, flags and build hooks. Window title is independent of UI; Editor keeps its UI packets/context/input and editing/Reference path. This is source/build proof, not observed Game/Editor runtime acceptance.
+- [x] **Finite diagnostic source:** delete the custom release-review script and generic ZIP-dependent export path. Keep logs, manual recovery/known issues and existing source GPU-crash preview/consent/symbol tools.
+- [x] **Launcher-owned preparation:** remove Core package discovery/parsing/installed mode and release-version state, move build-output grammar to tool support, and retain the ordinary `artifacts/dev` tree in the archive. Editor no longer owns compiler execution, watches sources or parses recook receipts. Its optional Recompile Shaders action delegates to Launcher through a tooling binding, while Application retains operation lifetime and reloads only on success; existing runtime Reload remains. [ITER-RELEASE-SLIM-03](../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json) records the source/isolated checks; no rendering pipeline or generic publication guard changed.
+- [x] **Runtime admission reconciliation:** [ITER-RELEASE-SLIM-04](../../../../artifacts/validation/runtime-inputs-slim-20261101/completion.json) removes the remaining runtime selected/raw-source gate, moves acquisition/catalog policy from Core to ToolSupport, and removes the unused Editor shader cancellation-file protocol. Runtime discovers ordinary level documents; optional acquisition validates its own inputs. Native registry/session controls cover the previous preflight/runtime mismatch; archive/frame qualification stays below.
+- [ ] **One affected delivery rehearsal:** assemble a new exact archive/symbol companion after its named prerequisites. Exercise offline/relocated/read-only Run without source assets, SDKs or old content; Game frame/camera/focus/native close and Editor preservation; missing required CRT/content, interrupted cook, denied output/retry, and manual re-extraction. Import the matching base into a source checkout, edit a real code/asset/shader input, Build/Cook through Launcher and observe the replacement in the same paths. Retain fresh source-only proof or reuse unchanged cells with explicit applicability. Rights admission for bundled maps remains required; no blanket unrelated source/rendering replay.
+
+**Prior source result, 2026-11-01:** [ITER-RELEASE-SLIM-03](../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json) records Launcher-owned preparation, owner builds, source style and bounded native/sync controls. The [earlier cleanup](../../../../artifacts/validation/release-owner-slim-20261101/completion.json) retains its source identity; its flattened extraction layout is superseded. These are no new-archive or visible-frame passes. Temporary validation-folder cleanup is blocked by automatic approval review; ignored fixtures remain, with production scaffolding removed. **Next supporting item:** one affected delivery rehearsal after its named content/rendering prerequisites. Global rendering work remains FR-03 Sponza Lit/Reference recovery. Historical archive results, the removal exclusion and missing-`msvcp140_2.dll` regression oracle keep their identities.
+
 **Candidate:** recheck the FR-01 `release-scope.md` export against this candidate's membership/selectors, reopening only invalidated disposition cells. Documented reproduction may use the unsigned internal archive. Windows signing is deferred to FR-07; changed bytes require renewed identity and affected checks before publication.
+
+Join admitted foundation/content/shader results here through one shared package-relative content-to-frame journey and source-build rehearsal, following the [shared delivery evidence rule](../../../Acceptance/FirstRelease.md#shared-delivery-evidence). Feature closure contributes its affected controls to these runs; it does not commission another archive or adoption campaign per report. Replace the archive containing `ISSUE-3` and qualify its actual source, symbols and affected product checks; reuse unchanged cells by explicit applicability. This replaces the separate foundation aggregate stage, not the missing proof. A source edit after a recorded repair pass needs its own affected checks before archive qualification.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
 Execute only FR-06 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-06--candidate-freeze-and-reproduction. Apply the owning execution contract and its Stage Source-Style Gate.
-Freeze one package identity after prerequisite gates pass. Run the documented documented consumer and source-adopter journeys for REL-08/09 without private repair or author caches. Reuse existing manifests and operation reports; add no adoption runner or reporting authority. A required repair returns to its owner with same-slice cleanup and invalidates dependent proof if bytes or configuration change.
+The source simplification and Launcher-owned preparation are complete. Use the workspace-shaped archive and explicit Launcher Build/Cook, with Editor reload of existing outputs; do not restore Engine package discovery or compiler execution. Execute only the affected delivery rehearsal in Prebuilt Delivery Simplification through existing tools; preserve Launcher UX and record Stage Source-Style applicability. Do not restore a store, prerequisite scheduler, release runner or provenance-dependent consumer path. Final freeze waits for its named prerequisites. Then qualify one candidate for REL-08/09: prebuilt Run without source/old content and optional matching-base import -> real source edit -> Launcher Build/Cook/Run, plus source-only fresh build proof. Join applicable foundation/content/shader reports here; no separate foundation closure journey. Reuse existing manifests and operation reports; add no adoption runner or reporting authority. A required repair returns to its owner with same-slice cleanup and invalidates dependent proof if bytes or configuration change.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
 Before handoff, update the stage result, remaining plan and next item.
 
@@ -100,7 +125,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ### `FR-07` — Publish And Verify
 
-**Goal:** publish exactly the approved candidate and verify its public identity, downloads, documentation, and truthful no-support/self-service entry points.
+**Goal:** publish exactly the approved portable rendering demo and verify downloaded bytes, public identity, instructions and truthful self-service limits through the existing package/signing operations.
 
 **Non-goals:** last-minute feature work, an installer/updater/publication service, or replacing an approved artifact after publication. Reuse current signing/manifest/package operations; remove obsolete staging inputs and temporary publication probes while retaining final bytes and provenance.
 
@@ -138,7 +163,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ```text
 Execute only FR-08 from Docs/Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-08--stabilize-and-close. Apply the owning execution contract and its Stage Source-Style Gate.
-Perform the finite maintainer review under REL-11: disposition known defects, rehearse required replacement/withdrawal decisions and reconcile invalidated evidence. Record the closeout decision before admitting the next program; promise no support service.
+Perform one finite maintainer review under REL-11. Disposition known defects and reconcile invalidated evidence; reuse compatible replacement/withdrawal controls and execute affected checks if an actual replacement is required. Record the closeout decision before admitting the next program; promise no support service.
 Check named prerequisites before editing. Use the stage exit criteria; record exact candidate/configuration, commands and results. Stop on unresolved contracts or unavailable required checks.
 Before handoff, update the stage result, remaining plan and next item.
 
@@ -167,27 +192,15 @@ Every stage and copied prompt follows [stage completion and resume](../../../Eng
 
 Every child stage and copied prompt uses the same delivery rule: identify the selected promise and actual consumer, reuse compatible code/evidence, then close only its missing production/proof delta or a bounded simplification preserving that path. A deletion slice can be complete with no replacement capability. Global priority comes from Roadmap; local prerequisites come from the owning contract, not a phase-number chain. [Portfolio focus](../../../Strategy/Roadmap.md#portfolio-focus-and-existing-code-simplification) protects rendering depth and necessary support while minimizing general-engine scope; Launcher retains its explicit presentation/reproduction role.
 
+For supporting modules, apply the [minimum supporting scope and release workflow](../../../Acceptance/FirstRelease.md#minimum-supporting-scope) before selecting a task: name the exact demo/reviewer action, the broken invariant or unnecessary surface, and the smallest retained-path check. Default to the existing owner and zero new service/framework/persistent workflow state. A justified local guard or lifetime contract can remain necessary; a new recovery/validation platform or broader inventory closure is not a substitute. When that bounded path passes, hand control back to its rendering consumer.
+
 Follow [Change Lifecycle](../../../Engineering/Workflow/ChangeLifecycle.md), including its [stage complexity budget](../../../Engineering/Workflow/ChangeLifecycle.md#define-the-outcome-and-complexity-budget), [scope/retirement](../../../Engineering/Workflow/ChangeLifecycle.md#scope-and-retirement-decision), responsibility refinement and the [source-style gate](../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate). Each stage names the touched existing path to retain, narrow, replace or retire; proposed state/API/hooks/copies/dependencies require a current consumer and a reason existing representations cannot serve it. Its work and exit compare that budget to the actual diff, delete replaced code/state/selectors/build/dependencies, and include a positive retained-path check and a stale-reachability check; justify zero deletion instead of inventing churn. Unjustified additions or postponed cleanup leave that stage open. A final cleanup stage verifies these results and cannot defer them.
 
-Use owning AC/FM/checks, exact candidate/API/profile/content identities and the cheapest falsifying control. Check IDs do not authorize a permanent fixture, runner, report generator or fault-injection API. Preserve useful unique evidence; reuse shared package/adoption artifacts rather than run a new journey per family. Required unavailable proof stays blocked. No broad build/cook/map sweep occurs merely to gain confidence.
+Use owning AC/FM/checks, exact candidate/API/profile/content identities and the cheapest falsifying control. Check IDs do not authorize a permanent fixture, runner, report generator or fault-injection API. Apply [shared delivery evidence](../../../Acceptance/FirstRelease.md#shared-delivery-evidence): one candidate qualification serves its applicable feature reports; each leaf supplies only the missing feature-specific observation. Preserve useful unique evidence. Required unavailable proof stays blocked. No broad build/cook/map sweep occurs merely to gain confidence.
 
 ## Complete Feature Routing
 
-Every current `FCR-*` family has exactly one primary execution owner:
-
-| Plan | Primary families | Count |
-| --- | --- | ---: |
-| [Product And Delivery](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) | `FCR-PROD-01`–`06` | 6 |
-| [Foundation, World, And Content](FoundationImplementationPlan.md#first-release-foundation-and-content-implementation-plan) | `FCR-CORE-01`, `FCR-PLAT-01`, `FCR-TASK-01`, `FCR-WORLD-01`–`03`, `FCR-CONT-01`–`03`, `FCR-SHDR-01`, `FCR-TOOL-01` | 11 |
-| [RHI And GPU Execution](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md) | `FCR-RHI-01`–`06` | 6 |
-| [Renderer: Frame And Scene](../../Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md) | `FCR-REN-01`–`03` | 3 |
-| [Renderer: Geometry And Ray Tracing](../../Modules/Engine/Renderer/FirstRelease/GeometryAndRayTracingImplementationPlan.md) | `FCR-REN-04`, `05`, `12`, `17`, `21`, `23` | 6 |
-| [Renderer: Lighting](../../Modules/Engine/Renderer/FirstRelease/LightingImplementationPlan.md) | `FCR-REN-06`–`08` | 3 |
-| [Renderer: Display And Reconstruction](../../Modules/Engine/Renderer/FirstRelease/DisplayAndReconstructionImplementationPlan.md) | `FCR-REN-09`, `10`, `14`, `15`, `18`, `22`, `24`–`26` | 9 |
-| [Renderer: Runtime And Diagnostics](../../Modules/Engine/Renderer/FirstRelease/RuntimeAndDiagnosticsImplementationPlan.md) | `FCR-REN-11`, `13`, `16`, `19`, `20` | 5 |
-| **Total** | **all current families** | **49** |
-
-Cross-plan references are dependencies, not duplicate ownership. If the FCR registry changes, update this table and exactly one child owner in the same change.
+Use this lookup only after selecting a promised result from Roadmap. Each family has one owner; a row does not schedule a separate implementation, audit, onboarding run or report platform. Product/source/native/capture observations can serve multiple applicable reports when their inputs and oracles match. Unused combinations keep their explicit scope disposition rather than generating more engine work.
 
 ### Feature Work-Package Registry
 
@@ -196,19 +209,19 @@ This is the exact one-to-one execution assignment. The phase owns implementation
 <details>
 <summary>Expand feature work-package registry</summary>
 
-Product delivery rows link to enduring contracts after owner-directed plan retirement. The known `FCR-PROD-06` closeout blocker remains here under FR-03 and the paused FWC-4 owner; it is not completed acceptance.
+Product and foundation rows link to enduring owners after plan retirement. Enter a source owner only for a selected consumer's failed check or bounded simplification. The known `FCR-PROD-06` publication blocker needs affected current-source proof and repaired-archive reconciliation under FR-06; selected content proof follows FR-04. Neither is completed acceptance.
 
 | FCR | Primary phase | FCR | Primary phase |
 | --- | --- | --- | --- |
 | `FCR-PROD-01` | [Game contract](../../Modules/Projects/Showcase/ShowcaseCapabilities.md#fcr-prod-01-game-consumer-contract) | `FCR-PROD-02` | [Source contract](../../Modules/BuildAndPackaging/BuildAndPackagingCapabilities.md#fcr-prod-02-source-adopter-contract) |
 | `FCR-PROD-03` | [Launcher contract](../../Modules/Tools/Launcher/LauncherCapabilities.md#fcr-prod-03-launcher-contract) | `FCR-PROD-04` | [Editor contract](../../Modules/Engine/Editor/EditorCapabilities.md#fcr-prod-04-editor-contract) |
 | `FCR-PROD-05` | [Package contract](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#fcr-prod-05-package-contract) | `FCR-PROD-06` | [Self-service contract](../../Modules/BuildAndPackaging/PackagingAndInstallation.md#fcr-prod-06-support-and-incident-contract) |
-| `FCR-CORE-01` | [`FWC-1`](FoundationImplementationPlan.md#fwc-1--core-and-windows-platform) | `FCR-PLAT-01` | [`FWC-1`](FoundationImplementationPlan.md#fwc-1--core-and-windows-platform) |
-| `FCR-TASK-01` | [`FWC-2`](FoundationImplementationPlan.md#fwc-2--task-runtime-and-cancellation) | `FCR-WORLD-01` | [`FWC-3`](FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication) |
-| `FCR-WORLD-02` | [`FWC-3`](FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication) | `FCR-WORLD-03` | [`FWC-3`](FoundationImplementationPlan.md#fwc-3--level-world-and-render-publication) |
-| `FCR-CONT-01` | [`FWC-4`](FoundationImplementationPlan.md#fwc-4--import-cook-and-engine-assets) | `FCR-CONT-02` | [`FWC-4`](FoundationImplementationPlan.md#fwc-4--import-cook-and-engine-assets) |
-| `FCR-CONT-03` | [`FWC-4`](FoundationImplementationPlan.md#fwc-4--import-cook-and-engine-assets) | `FCR-SHDR-01` | [`FWC-5`](FoundationImplementationPlan.md#fwc-5--shader-route-and-shared-tool-output) |
-| `FCR-TOOL-01` | [`FWC-5`](FoundationImplementationPlan.md#fwc-5--shader-route-and-shared-tool-output) | `FCR-RHI-01` | [`RHI-1`](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-1--device-resources-descriptors-and-lifetime) |
+| `FCR-CORE-01` | [Core](../../Modules/Engine/Core/CoreCapabilities.md) | `FCR-PLAT-01` | [Platform](../../Modules/Engine/Platform/PlatformCapabilities.md) |
+| `FCR-TASK-01` | [Tasks](../../Modules/Engine/Tasks/TasksCapabilities.md) | `FCR-WORLD-01` | [GameFramework](../../Modules/Engine/GameFramework/GameFrameworkCapabilities.md) |
+| `FCR-WORLD-02` | [GameFramework](../../Modules/Engine/GameFramework/GameFrameworkCapabilities.md) | `FCR-WORLD-03` | [GameFramework](../../Modules/Engine/GameFramework/GameFrameworkCapabilities.md) |
+| `FCR-CONT-01` | [Selected-map proof](#fr-04--release-maps) | `FCR-CONT-02` | [Selected-map proof](#fr-04--release-maps) |
+| `FCR-CONT-03` | [Selected-map proof](#fr-04--release-maps) | `FCR-SHDR-01` | [Shader System](../ShaderSystem/ImplementationPlan.md) |
+| `FCR-TOOL-01` | [ToolSupport](../../Modules/Tools/ToolSupport/ToolSupportCapabilities.md) | `FCR-RHI-01` | [`RHI-1`](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-1--device-resources-descriptors-and-lifetime) |
 | `FCR-RHI-02` | [`RHI-2`](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-2--command-recording-synchronization-resize-and-present) | `FCR-RHI-03` | [`RHI-3`](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-3--paired-backend-lowering) |
 | `FCR-RHI-04` | [`RHI-4`](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-4--ray-tracing-and-acceleration-structure-execution) | `FCR-RHI-05` | [`RHI-5`](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-5--diagnostics-capture-device-loss-and-recovery) |
 | `FCR-RHI-06` | [`RHI-5`](../../Modules/Engine/RHI/FirstReleaseImplementationPlan.md#rhi-5--diagnostics-capture-device-loss-and-recovery) | `FCR-REN-01` | [`FS-1`](../../Modules/Engine/Renderer/FirstRelease/FrameAndSceneImplementationPlan.md#fs-1--frame-admission-and-coordination) |

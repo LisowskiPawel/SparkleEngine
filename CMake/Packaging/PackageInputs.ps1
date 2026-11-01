@@ -20,16 +20,21 @@ function Get-PackageProducts
 function New-PackageManifest
 {
     param([string] $RepositoryRoot, [string] $Version, [string] $Revision, [string] $SourceInputsSha256, $Products, $Inputs)
+    $packagedProducts = @($Products | Where-Object { $Inputs.Files.Path -ccontains $_.Path })
+    foreach ($component in @('Launcher','Editor','Game'))
+    {
+        if (@($packagedProducts | Where-Object Component -ceq $component).Count -ne 1) { throw "Missing/duplicate release product: '$component'." }
+    }
     $manifest = [ordered]@{
         Version = $Version; Revision = $Revision; SourceInputsSha256 = $SourceInputsSha256
-        Signing = 'UnsignedInternal'; ProjectPath = 'Projects/Showcase'; EnginePath = 'Engine'; ContentStore = 'Content/Showcase'
-        Products = @($Products | Select-Object Component, Target, Configuration, Path)
+        Signing = 'UnsignedInternal'
+        Products = @($packagedProducts | Select-Object Component, Target, Configuration, Path)
         SystemImports = @($Inputs.SystemImports)
         Files = @($Inputs.Files | Select-Object Path, Size, Sha256, Component, Role, Permission, Owner, Origin, License, Notice, Signature)
     }
     Assert-PackageManifest $manifest
     Assert-PackageLayout $manifest
-    foreach ($product in $Products)
+    foreach ($product in $packagedProducts)
     {
         $member = @($Inputs.Files | Where-Object Path -eq $product.Path)
         if ([string]::IsNullOrWhiteSpace($product.Source) -or $member.Count -ne 1 -or
@@ -49,10 +54,15 @@ function New-PackageManifest
             }
         }
     }
-    foreach ($path in @('notices/ThirdPartyNotices.txt','Tools/CMake/bin/cmake.exe','Tools/CMake/share/cmake-4.3/Modules/CMake.cmake',
+    foreach ($path in @('notices/ThirdPartyNotices.txt',
                         'manifests/sparkle-sbom.spdx.json','manifests/sparkle-provenance.json'))
     {
         if (@($Inputs.Files | Where-Object Path -eq $path).Count -ne 1) { throw "Missing required input: '$path'." }
+    }
+    $entry = @($Inputs.Files | Where-Object Path -ceq 'LaunchSparkle.cmd')
+    if ($entry.Count -ne 1 -or $entry[0].Source -cne 'CMake/Packaging/LaunchSparkle.cmd')
+    {
+        throw 'Missing canonical Launcher entry script.'
     }
     foreach ($file in $Inputs.Files)
     {
@@ -86,31 +96,19 @@ function New-PackageManifest
         throw 'Rendering defaults differ from their configuration owner.'
     }
     foreach ($binding in @(
-        @('Tools/Diagnostics/ExportDiagnostics.ps1','CMake/Packaging/ExportDiagnostics.ps1'),
-        @('Tools/Diagnostics/IncidentIdentity.ps1','CMake/Packaging/IncidentIdentity.ps1'),
-        @('Tools/Diagnostics/PackageVerification.ps1','CMake/Packaging/PackageVerification.ps1'),
         @('docs/SUPPORT.md','SUPPORT.md'), @('docs/SECURITY.md','SECURITY.md'), @('docs/KNOWN_ISSUES.md','KNOWN_ISSUES.md')))
     {
         $file = @($Inputs.Files | Where-Object Path -ceq $binding[0])
         if ($file.Count -ne 1 -or $file[0].Source -cne $binding[1] -or $file[0].Component -cne 'Shared' -or
-            $file[0].Role -cne $(if ($binding[0].EndsWith('.ps1')) { 'Helper' } else { 'Metadata' }))
+            $file[0].Role -cne 'Metadata')
         {
-            throw 'Diagnostic helper/public policy admission differs from its source owner.'
-        }
-    }
-    foreach ($name in @('SyncAssetPack.cmake','SyncAssetPackFiles.cmake','SyncAssetPackArchive.cmake'))
-    {
-        $file = @($Inputs.Files | Where-Object Path -ceq "Tools/Content/$name")
-        if ($file.Count -ne 1 -or $file[0].Source -cne "Tools/Launcher/SparkleLauncher/Scripts/$name" -or
-            $file[0].Component -cne 'Shared' -or $file[0].Role -cne 'Helper')
-        {
-            throw "Content acquisition helper differs from its source owner: '$name'."
+            throw 'Public policy admission differs from its source owner.'
         }
     }
     return $manifest
 }
 
-function Get-PackageInputAudit
+function Get-PreparedProductInputs
 {
     param([string] $RepositoryRoot, [string] $BuildDirectory, [string] $Version)
     . (Join-Path $PSScriptRoot 'IncidentIdentity.ps1')
@@ -121,8 +119,8 @@ function Get-PackageInputAudit
     {
         $fact = [ordered]@{
             Component = $product.Component; Target = $product.Target; Configuration = $product.Configuration
-            Path = $product.Path; Status = 'BLOCKED'; Binary = $null; NativeSymbols = $null
-            Imports = @(); RuntimeFiles = @(); SupportFiles = @(); CompilerRuntime = @(); MissingAppLocalImports = @(); Error = $null
+            Path = $product.Path; Binary = $null; NativeSymbols = $null
+            Imports = @(); RuntimeFiles = @(); SupportFiles = @(); CompilerRuntime = @(); MissingAppLocalImports = @()
         }
         try
         {
@@ -182,16 +180,9 @@ function Get-PackageInputAudit
             $fact.NativeSymbols = @{ Source = $symbols.FullName.Substring($RepositoryRoot.Length + 1).Replace('\','/')
                 Size = $symbols.Length; Sha256 = (Get-FileHash -LiteralPath $symbols.FullName).Hash.ToLowerInvariant()
                 Guid = $binaryId.Guid; Age = $binaryId.Age }
-            $fact.Status = 'PASS'
         }
-        catch { $fact.Error = $_.Exception.Message }
+        catch { throw "Prepared product '$($product.Component)' failed verification: $($_.Exception.Message)" }
         $fact
     })
-    return [ordered]@{
-        Status = 'BLOCKED'; Products = $facts
-        Limit = 'Discovery facts only: not a reviewed allowlist, legal admission, full dependency closure, shader-symbol or current-source build proof.'
-        Remaining = @('Rights owner receipt and component notices/terms/source obligations',
-            'Reviewed complete file allowlist and ordinary/delay/dynamic dependency closure',
-            'Native and shader symbol/source correlation receipt', 'Installed content-store journey and exact-archive standard-user rehearsal')
-    }
+    return $facts
 }

@@ -122,7 +122,7 @@ sparkle_target_precompile_headers(TextureCooker
 target_link_libraries(TextureCooker
     PRIVATE
         CMP_Core
-        ToolConsoleSupport
+        ToolSupport
         SparkleCore
         SparkleTasks
         TextureCookShared

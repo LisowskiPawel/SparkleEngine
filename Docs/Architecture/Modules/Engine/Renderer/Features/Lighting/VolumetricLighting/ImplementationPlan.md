@@ -103,7 +103,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Start:** Q0/Q1/Q2 technical cells qualified.
 
-**Work:** Manifest scene/shader/setting/rights identities; documented author/agent rehearsal reproduces raw transport, dynamic quality/cost and one failure. Publish coefficient/phase derivation and step/grid convergence study. Keep AC-VOL-08..11 exclusions scoped to unselected atmosphere/imported-volume/reservoir promises, preserving required Q2 varying-density proof.
+**Work:** Join scene/shader/setting/rights identities to the [shared candidate](../../../../../../../Acceptance/FirstRelease.md#shared-delivery-evidence) and reproduce raw transport, dynamic quality/cost and one failure within its documented rehearsal. Publish coefficient/phase derivation and step/grid convergence study. Keep AC-VOL-08..11 exclusions scoped to unselected atmosphere/imported-volume/reservoir promises, preserving required Q2 varying-density proof.
 
 **Cleanup:** Remove probes, unused selectors/dependencies and completed instructions; retain one medium capsule.
 

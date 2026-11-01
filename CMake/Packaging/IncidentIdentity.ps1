@@ -1,9 +1,5 @@
 Set-StrictMode -Version Latest
 
-. (Join-Path $PSScriptRoot 'PackageVerification.ps1')
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-Add-Type -AssemblyName System.IO.Compression
-
 function Get-IncidentPreviewSha256
 {
     param([string] $Json)
@@ -25,32 +21,6 @@ function Get-IncidentFile
         $current = if ($current -is [IO.DirectoryInfo]) { $current.Parent } else { $current.Directory }
     }
     return $item
-}
-
-function Get-IncidentPackage
-{
-    param([string] $PackageRoot, [string] $ArchivePath, [string] $ArchiveSha256)
-    if ($ArchiveSha256 -cnotmatch '^[a-f0-9]{64}$') { throw 'An exact lowercase archive SHA-256 is required.' }
-    [void] (Get-IncidentFile $ArchivePath ([long]::MaxValue))
-    if ((Get-FileHash -LiteralPath $ArchivePath).Hash.ToLowerInvariant() -cne $ArchiveSha256) { throw 'Archive identity mismatch.' }
-    if ([IO.Path]::GetFullPath($PackageRoot).StartsWith('\\')) { throw 'Choose a local package.' }
-    $PackageRoot = (Get-Item -LiteralPath $PackageRoot).FullName.TrimEnd('\','/')
-    $path = Join-Path $PackageRoot 'manifests/sparkle-package-manifest.json'
-    [void] (Get-IncidentFile $path 16777216)
-    $manifest = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
-    if ($manifest.Version -cnotmatch '^[0-9]+\.[0-9]+\.[0-9]+$' -or $manifest.Revision -cnotmatch '^[a-f0-9]{40}$' -or
-        $manifest.SourceInputsSha256 -cnotmatch '^[a-f0-9]{64}$') { throw 'Incomplete candidate identity.' }
-    foreach ($product in $manifest.Products)
-    {
-        Assert-PackagePath $product.Path
-        if ($product.Target -cnotmatch '^[A-Za-z][A-Za-z0-9]*$' -or
-            $product.Configuration -cnotmatch '^Shipping(Editor|Game)$') { throw 'Private or unsupported product identity.' }
-    }
-    Assert-PackageLayout $manifest
-    Test-PackageStage $PackageRoot $manifest
-    Test-PackageMetadata $PackageRoot $manifest
-    Test-PackageArchive $ArchivePath $PackageRoot $manifest
-    return $manifest
 }
 
 function Get-NativeSymbolIdentity

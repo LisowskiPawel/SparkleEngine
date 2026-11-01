@@ -16,7 +16,9 @@
 
 Source ownership reconciled on 2026-10-06: `CommandLine::ReadToken` owns the borrowed wide-token view and advancing offset used by Application CVar parsing and RHI backend selection. Core also owns the immutable default texture product catalog shared by Renderer and AssetCooker; cooking and runtime policy remain with those consumers.
 
-Package path amendment (2026-10-11): Core discovers the manifest from executable ancestors, reads declared project/engine paths and resolves cooked content under per-user state. It rejects malformed, escaping or reparse paths and does not pick another project or source checkout when package data is missing. Windows LocalAppData failure is explicit. JSON property lookup now reads immediate object members, rejects malformed input/duplicate requested keys and retains UTF-8 string handling. This is source behavior with compile checks; the Launcher/store and clean-machine journeys remain [unqualified](../../BuildAndPackaging/PackagingAndInstallation.md#current-package-entry).
+Path ownership amendment (2026-11-01): package/installed discovery, manifest parsing, source-vs-bundle product paths and the release-version state branch are deleted from Core. Source and extracted products use the same markers and `artifacts/dev` layout. Core resolves ordinary inputs and workspace-keyed user state; `ToolOutputPaths` is tool-only. Publication guards are generic local-cook/read safety, unchanged by delivery. [Current source checks](../../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json) do not qualify a new archive.
+
+**Preparation metadata boundary, 2026-11-01:** the remaining project/acquisition catalog model and its reader/validator/selection writer have moved to existing ToolSupport. Core contains no release/download/game-support or cook-selection policy. The existing architecture checker rejects reintroducing `ProjectLevelCatalog`, `ToolOutputPaths` or `LauncherProductPaths` into Engine. [Source result](../../../../../artifacts/validation/runtime-inputs-slim-20261101/completion.json) is separate from package/runtime-frame acceptance.
 
 ## At A Glance
 
@@ -28,6 +30,8 @@ Package path amendment (2026-10-11): Core discovers the manifest from executable
 | math, pixels, hashing/string tables | shared transforms, sampling helpers, linear/sRGB conversion, deterministic identifiers | consuming schemas own units, collision policy, formats, and numerical oracles |
 
 Core keeps dependencies pointed downward by owning only reusable mechanisms. That reduces duplication, but it also means a higher-level feature must own every semantic policy, lifetime, capacity, and user-visible failure built from those mechanisms.
+
+**Publication ownership amendment, 2026-11-01:** `Files/FileUtils.h` and `FilePublication.cpp` provide single-file finalization; `Files/FileSetPublication.h` and `FileSetPublication.cpp` own the publication record and coordinated reader/writer transaction. The file-set owner sequences validation, incomplete markers, replacement, backup retirement and rollback. Cookers supply staged files; runtime consumers hold read scopes. Splitting these responsibilities preserves the existing locking, commit and failure order and adds no artifact format or recovery path. This is an ownership description, not new runtime acceptance.
 
 ## Module Boundary
 
@@ -44,11 +48,11 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 | `CORE-005` | Whole-file I/O | Implemented path | Binary/text reads and writes, UTF-8 read-error paths, temporary paths, close/finalize helpers, atomic text write, and multi-file publication with cleanup. Atomicity/durability across crash or hostile filesystems is not runtime-proven. | `S` |
 | `CORE-006` | Bounded binary decode/encode | Implemented path | Span reader checks remaining bytes and multiplication overflow; buffer/stream writers cover trivially-copyable values/arrays, raw bytes, and UInt32-length strings. These helpers do not provide schema evolution by themselves. | `S` |
 | `CORE-007` | Lightweight JSON helpers | Partial | Escaped JSON writing and targeted property/string/unsigned/hex reads exist. This is not a general DOM, schema validator, or complete JSON parser. | `S` |
-| `CORE-008` | Workspace/project path model | Implemented path | Resolves executable, workspace, build output, logs, configured project, Engine/Project assets, cooked asset families, shader products/symbols, and recook signal paths. Discovery uses ancestor markers and environment/workspace state; packaged independence is not proven. | `S` |
-| `CORE-009` | Typed asset path resolution | Implemented path | Asset families and Engine/Project/Any roots drive normalized/validated lookup for meshes, textures, shaders, scene manifests, materials, skeletons, and animations. It is path resolution, not an asset database. | `S` |
+| `CORE-008` | Workspace/project path model | Implemented path | Executable/workspace/project/engine markers, cooked product paths and workspace-keyed user state. Core never reads a release manifest, switches installed mode, discovers a compiler or creates cooked directories during path discovery. Build/library/tool output grammar lives in tool support. | `S` |
+| `CORE-009` | Cooked product path resolution | Implemented path | Runtime texture lookup accepts existing `.stex` files at absolute paths or under the cooked texture/asset roots; it never searches raw source assets. Scene/material/mesh/skeleton/animation product paths remain shared with their cookers. Source-family lookup, import-cache paths and shader-dependency-manifest paths belong to ToolSupport. | `S` |
 | `CORE-010` | Child-process execution | Implemented path | Synchronous Win32 child launch with argv, working directory, environment overrides, output capture/callback, log path, cancellation token, exit code, and explicit launch/failure state. Native start failures classify missing executable/access denial/application-policy rejection without localized-text matching and expose Windows messages as UTF-8. Process-tree termination and package execution still need evidence. | `S` |
 | `CORE-011` | Environment and command-line utilities | Implemented path | String/bool/UInt environment access and UTF-8/wide conversion support tool and host boundaries. One Windows argument encoder serves child execution, Launcher previews and shader-command text, including embedded quotes and trailing backslashes. | `S` |
-| `CORE-012` | Project level catalog | Implemented path | Shared parser/model reads level and asset-pack metadata used by GameFramework, cooking, and Launcher: selection, family/variant, source/archive/hash/version/license, download/game support, and blockers. It does not download or activate content. | `S` |
+| `CORE-012` | Project level/acquisition catalog | Moved to ToolSupport | Preparation-only metadata/parser/editor are outside Core. Launcher and Cooker consume the same model; runtime discovers ordinary level documents and consumes cooked data. This retained ID describes the former ownership, not an Engine dependency. | `S` |
 | `CORE-013` | Input vocabulary/state | Implemented path | Key, mouse button, modifier, device, dispatch-layer/mode, typed events, and per-frame pressed/released/held, pointer delta, wheel, capture, and cursor state. OS acquisition/routing belongs to Platform. | `S` |
 | `CORE-014` | Math and coordinate helpers | Implemented path | DirectXMath-based transforms/normalization/frustum utilities, declared world-coordinate convention, and Bessel/sinc/Kaiser functions used by filtering. This is not a general numerics library. | `S` |
 | `CORE-015` | Pixel conversions | Implemented path | Float conversion plus linear/sRGB byte encode/decode helpers. RHI format support and texture cooking own storage-format decisions. | `S` |
@@ -60,9 +64,9 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 
 ### Transactional file publication
 
-Producer builds temporary files -> `Files::FilePublication` groups temporary/final paths -> `TryPublishFileSet` finalizes the set -> failures return an error and temporary cleanup helpers remove staging products. Shader and asset cookers consume this route; release proof must show that an interrupted generation never leaves a mixed readable generation.
+Cooking declares the output directories and complete staged file set. Core provides fail-fast read/write scopes, containment checks and checked in-process rollback. Writers mark output incomplete before replacement and clear the marker only after successful publication or ordinary rollback. A killed publisher or failed cleanup leaves generated output unusable: clean it and regenerate it from source. There is no persisted transaction log, checksum parser, file-identity recovery or cross-directory recovery protocol.
 
-The current helper replaces files sequentially and retains rollback state only in process. [FWC-4's native counterexample](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) shows that returned-error rollback can pass while an abrupt publisher exit leaves mixed products readable by fresh cooked-material consumers. [Cooking owns the scene-generation contract and remaining repair](../../Tools/Cooking/CookingCapabilities.md#interrupted-scene-publication); this helper has no durable generation commit/recovery or reader-pinning contract. Do not infer crash atomicity from ordinary `TryPublishFileSet` success or rollback.
+GameFramework holds one read scope from fresh catalog lookup through mapping/decoding and worker settlement. A reader refuses an incomplete marker; cooperative writers cannot change that domain during the load. OS handle lifetime releases the lock. Source assets and user settings are outside this disposable-output boundary. [Cooking owns the minimal recovery contract](../../Tools/Cooking/CookingCapabilities.md#interrupted-scene-publication); [FWC-4 results](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) distinguish the current marker controls from superseded journal-replay evidence. This is Windows process-interruption handling, not power-loss recovery or archive acceptance.
 
 ### Configuration entry
 
@@ -76,6 +80,8 @@ four built-ins in `ConsoleBuiltinCommands.cpp`; their execution, completion and
 output formatting live in private `ConsoleBuiltinCommandOperations.cpp`.
 
 ### Child-process execution
+
+Process relaunch ownership reconciled on 2026-11-01: `Process::RelaunchCurrentProcess` starts the current executable with the unchanged native command line and current working directory, then releases its process/thread handles. It does not wait for readiness or close the caller. Application owns that close decision after successful launch. Reusing the original command line removes Editor's duplicate argument parser/encoder; this is a launch contract, not session restoration or startup-health evidence.
 
 `Process::RunChildProcess` is the direct process contract used by tool and host
 clients. `ChildProcess.cpp` selects the platform route and
@@ -123,17 +129,7 @@ adds no input policy or state ownership to Core.
 
 Executable/current directory and markers -> workspace/project discovery -> `ConfigureProjectRoot` publishes the active project -> typed getters derive Engine/Project/cooked paths -> runtime/tools open those products. This is a vital package risk because a successful workspace path does not prove operation outside the repository.
 
-Path ownership reconciled on 2026-10-26: `Private/Paths/AssetPathState.cpp`
-owns the cached state's initialization and rebuild order. `AssetPathRoots.cpp`
-discovers its roots, `AssetPathLayout.cpp` builds typed/cooked layouts and
-materializes output directories, and `AssetPathValidation.cpp` checks the
-configured paths. `AssetPathResolution.cpp` owns asset search precedence and
-candidate lookup. Package discovery lives in `PackageDiscovery.cpp`, directory
-resolution in `PackagePaths.cpp`, and manifest parsing, path safety, file
-presence/identity checks and product lookup in `PackageManifest.cpp`. Bootstrap
-logging still uses stateless discovery and user-state paths without entering
-the aggregate state. These are private source boundaries; public path contracts
-and the package qualification limits above remain unchanged.
+Path ownership reconciled on 2026-11-01: public `Paths/FileSystemPaths.h` declares process/workspace/cooked path operations; `Paths/ProductFilePaths.h` builds product/log file paths. `FileSystemPathState.cpp` owns cached root/layout initialization. `FileSystemPathRoots.cpp` uses ordinary marker discovery, `CookedAssetPathLayout.cpp` composes the same cooked suffixes for every root, and loaders validate the products they consume. Discovery never materializes cooked output. `FileSystemDiscovery.cpp` and `UserStatePaths.cpp` remain stateless bootstrap owners. The package discovery/manifest/product-path files and compiler-specific symbol/signal getters are deleted. Host-tool `ToolOutputPaths` owns build/library/tool layout; Launcher owns source-action admission and executable selection. No Engine component depends on Launcher.
 
 ## Explicit Non-Capabilities And Risks
 

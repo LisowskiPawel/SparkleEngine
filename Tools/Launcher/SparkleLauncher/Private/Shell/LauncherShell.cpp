@@ -6,10 +6,10 @@
 #include "LauncherShellPresentation.h"
 #include "LauncherShadowExecution.h"
 #include "LauncherRootResolver.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 
 #include "SparkleLauncher/ProjectResolver.h"
-#include "SparkleLauncher/RepositoryLocator.h"
+#include "SparkleLauncher/WorkspaceLocator.h"
 
 #include <filesystem>
 #include <optional>
@@ -36,8 +36,8 @@ namespace SparkleLauncher
 		}
 
 		std::string errorMessage;
-		const std::optional<std::filesystem::path> repository = TryResolveLauncherRoot(arguments.StartPath, Filesystem::GetExecutableDirectory(), errorMessage);
-		if (!repository.has_value())
+		const std::optional<std::filesystem::path> workspace = TryResolveLauncherRoot(arguments.StartPath, Filesystem::GetExecutableDirectory(), errorMessage);
+		if (!workspace.has_value())
 		{
 			error << errorMessage << '\n';
 			return 1;
@@ -57,7 +57,7 @@ namespace SparkleLauncher
 			{
 				shadowArguments.emplace_back(argv[index]);
 			}
-			const LauncherShadowStartResult shadow = StartLauncherShadow(*repository, shadowArguments, completionPolicy);
+			const LauncherShadowStartResult shadow = StartLauncherShadow(*workspace, shadowArguments, completionPolicy);
 			if (shadow.State == LauncherShadowStartState::Started)
 			{
 				if (completionPolicy == LauncherShadowCompletionPolicy::ReleaseCallingArtifact)
@@ -73,14 +73,14 @@ namespace SparkleLauncher
 			}
 		}
 
-		std::optional<LauncherProject> content = ResolveLauncherProject(*repository, errorMessage);
+		std::optional<LauncherProject> content = ResolveLauncherProject(*workspace, errorMessage);
 		if (!content.has_value())
 		{
 			error << errorMessage << '\n';
 			return 1;
 		}
 
-		LauncherShellModel model = BuildLauncherShellModel(*repository, std::move(*content), arguments);
+		LauncherShellModel model = BuildLauncherShellModel(*workspace, std::move(*content), arguments);
 		if (!arguments.RunOperationId.empty())
 		{
 			return RunLauncherShellOperation(model, arguments, output, error);

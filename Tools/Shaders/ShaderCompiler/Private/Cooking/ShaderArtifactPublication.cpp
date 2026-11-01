@@ -4,14 +4,13 @@
 
 #include "Cooking/Dependencies/ShaderDependencyManifest.h"
 #include "Cooking/ShaderArtifactWriter.h"
-#include "Cooking/ShaderRecookSignal.h"
 #include "Cooking/ShaderDebugArtifactWriter.h"
 #include "Cooking/ShaderCookSettings.h"
-#include "Cooking/ShaderCookCancellation.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Files/FileUtils.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
+#include "Core/Public/Files/FileSetPublication.h"
+#include "Core/Public/Paths/ProductFilePaths.h"
 #include "RHI/Public/Shaders/GlobalShaderMap.h"
 
 #include <utility>
@@ -46,21 +45,29 @@ ShaderCookOutput PublishShaderArtifacts(
     const std::filesystem::path& outputDirectory)
 {
 	const bool replaceCompleteCatalog = settings.shaderId.empty() && settings.changedVirtualPaths.empty();
+
+	const std::filesystem::path debugDirectory = settings.debugArtifactDirectory.empty()
+	    ? (Filesystem::ResolveArtifactRootPath(Filesystem::GetWorkspaceRootPath()) / "symbols" / "shaders" / Filesystem::GetProjectPath().filename())
+	    : settings.debugArtifactDirectory;
+
+	std::vector<std::filesystem::path> publicationRoots{outputDirectory};
+	if (settings.enableDebugInfo || !settings.debugArtifactDirectory.empty())
+	{
+		publicationRoots.push_back(debugDirectory);
+	}
+	Files::FileSetPublisher publisher(publicationRoots);
 	const std::filesystem::path& mapPath = Filesystem::GetGlobalShaderMapPath();
 	const std::filesystem::path& libraryPath = Filesystem::GetCookedShaderLibraryPath();
 	const std::filesystem::path stagedMapPath = Files::BuildTemporaryPath(mapPath, ".cook-generation");
 	const std::filesystem::path stagedLibraryPath = Files::BuildTemporaryPath(libraryPath, ".cook-generation");
 	const std::filesystem::path dependencyPath = ShaderDependencyManifest::GetPath(outputDirectory);
 	const std::filesystem::path stagedDependencyPath = Files::BuildTemporaryPath(dependencyPath, ".cook-generation");
-	const std::filesystem::path signalPath = Paths::ShaderRecookSignal(outputDirectory);
-	const std::filesystem::path stagedSignalPath = Files::BuildTemporaryPath(signalPath, ".cook-generation");
 
 	const auto cleanupStagedFiles = [&]() noexcept
 	{
 		Files::CleanupTemporaryFile(stagedMapPath);
 		Files::CleanupTemporaryFile(stagedLibraryPath);
 		Files::CleanupTemporaryFile(stagedDependencyPath);
-		Files::CleanupTemporaryFile(stagedSignalPath);
 	};
 
 	cleanupStagedFiles();
@@ -73,18 +80,16 @@ ShaderCookOutput PublishShaderArtifacts(
 		const CookedShaderLibrary stagedLibrary = CookedShaderLibrary::Open(stagedLibraryPath);
 		const GlobalShaderMap stagedMap = GlobalShaderMap::Open(stagedMapPath, stagedLibrary);
 		ShaderDependencyManifest::Write(plan.dependencyManifest, stagedDependencyPath);
-		WriteShaderRecookSignal(stagedMapPath, stagedLibraryPath, stagedSignalPath);
-		std::vector<Files::FilePublication> files = {{stagedMapPath, mapPath}, {stagedLibraryPath, libraryPath}, {stagedDependencyPath, dependencyPath}, {stagedSignalPath, signalPath}};
+		std::vector<Files::FilePublication> files = {{stagedMapPath, mapPath}, {stagedLibraryPath, libraryPath}, {stagedDependencyPath, dependencyPath}};
 		if (settings.enableDebugInfo || !settings.debugArtifactDirectory.empty())
 		{
-			ShaderDebugArtifactWriter debugWriter(settings.debugArtifactDirectory.empty() ? Filesystem::GetShaderSymbolsOutputPath() : settings.debugArtifactDirectory);
+			ShaderDebugArtifactWriter debugWriter(debugDirectory);
 			Files::FilePublication debugPublication = debugWriter.StageManifest(plan, compileResults, stagedMap, stagedLibrary, stagedMapPath, stagedLibraryPath);
 			files.push_back(std::move(debugPublication));
 			result.debugManifestPath = files.back().PublishedPath;
 		}
-		ThrowIfShaderCookCancelled(settings.cancellationSignalPath);
 		std::string error;
-		if (!Files::TryPublishFileSet(files, error))
+		if (!publisher.Publish(files, error))
 		{
 			throw Diagnostics::Error(error);
 		}

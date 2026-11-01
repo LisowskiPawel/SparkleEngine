@@ -20,7 +20,7 @@ The Editor route has one startup provider selection, Launcher installation/compa
 
 Launcher **GPU Capture**, beside Graphics API, selects **None -> Nsight Graphics -> PIX -> RenderDoc**. Rendering Settings persists the same startup enum; explicit CLI/Launcher intent overrides it. Exactly one provider is allowed. Direct early attachment does not require opening the native tool GUI first. Installation and markers alone do not mean capture readiness; the native authority determines whether the icon can submit a request.
 
-Remaining production work includes Nsight Vulkan and the approved DevelopmentGame control route. Remaining evidence includes current-candidate target/finalization and failure coverage, observer measurements, actual Shipping-product/package erasure, the selected matrix and documented reproduction. See the [remaining plan](ImplementationPlan.md) for only these deltas. Local unavailable specialist lanes are skipped without investment; AMD remains excluded by user selection. Historical successful captures and the failed all-hook experiment remain candidate-bound records in Discovery. No provider-wide or parent gate closes from this documentation cleanup.
+The 2026-11-01 rendering-portfolio scope decision defers new Nsight Vulkan integration and DevelopmentGame capture controls. Use existing Editor routes or an external tool launch/attachment for the selected frame; no automatic integration is required for every tool/product/API. Retain current-candidate target/finalization and failure coverage, observer measurements, actual Shipping-product/package erasure and documented reproduction for each claimed route. The [remaining plan](ImplementationPlan.md) supplies those affected checks. Local unavailable specialist lanes are skipped without investment; AMD remains excluded by user selection. Historical successful captures and the failed all-hook experiment remain candidate-bound records in Discovery. No provider-wide or parent gate closes from this documentation cleanup.
 
 ## Reader Route
 
@@ -43,14 +43,16 @@ The user chooses a tool at launch, sees honest readiness beside the intended sce
 
 | Priority / identity | Activity and declared matrix | Disposition / delivery |
 | --- | --- | --- |
-| 1 / `EXT-01` | PIX GPU frame capture, Windows D3D12, Debug/Development Editor and Game | Selected target; minimal PIX vertical slice first, then lifecycle/adoption. Vulkan is excluded for this activity. |
-| 2 / `EXT-04`, `EXT-05` | Nsight Graphics Capture, supported NVIDIA Windows D3D12 and Vulkan, Debug/Development | Selected experimental target, SDK/driver/activity gates per backend. Accepted workflow does not remove SDK beta warning. |
-| 3 / `EXT-02`, `EXT-03` | RenderDoc frame debugging, supported Windows D3D12 and Vulkan, Debug/Development | Selected target after Nsight cells; negotiated API and current graphics-feature gates. Unsupported NVAPI/PTLAS/other vendor feature combinations reject explicitly; no silent renderer fallback. |
-| 4 / specialist route | PIX Timing; Nsight GPU Trace/Systems; WPR/WPA; PresentMon | Tool-managed handoff selected; bounded automatic integration only with a named consumer and a separate frozen activity contract. |
+| 1 / `EXT-01` | Existing PIX GPU capture in Windows D3D12 Debug/Development Editor | First route for required D3D12 evidence. New in-engine Game control is deferred; a tool-managed Game capture may be used when needed. PIX Vulkan remains excluded. |
+| 2 / `EXT-04`, `EXT-05` | Existing experimental Nsight D3D12 Editor route; prospective Vulkan integration | Keep the existing D3D12 route and qualify it when used. New Vulkan adapter is deferred, with no support claim. External tool-managed use needs its own actual artifact; keep the SDK beta warning. |
+| 3 / `EXT-02`, `EXT-03` | Existing RenderDoc D3D12/Vulkan Debug/Development Editor routes | Qualify the compatible route needed by the rendering check, including Vulkan evidence. Tool limitations cannot silently change renderer features. D3D12 tool alternatives need no duplicate campaign when the required claim is already proved. |
+| 4 / specialist route | PIX Timing; Nsight GPU Trace/Systems; WPR/WPA; PresentMon | Use an installed tool only for a named missing measurement. No additional automatic integration or all-tools qualification program is selected. |
 | Separate crash route | Nsight Aftermath | [GPU Crash Debugging](../GpuCrashDebugging/GpuCrashDebuggingDesign.md) provides dump collection, breadcrumbs, symbols and consent-bound export. Active capture and Aftermath use separate sessions. |
 | AMD RGP/RMV/RRA/RGA/uProf/RGD | AMD specialist tools | EXCLUDED by explicit user selection on 2026-10-09; no investment, implementation or acceptance evidence required. Research remains reference only. |
 | Every provider / ShippingEditor and ShippingGame | Optional diagnostics | Excluded at compile/link/package time; no capture parser or runtime enabling path. |
 | macOS/Linux/mobile/console; Intel-specific SDK integration; embedded counters/viewers | New platform/hardware or product authorities | Outside this package. Revisit with an explicit consumer and capability study; no implied portability. |
+
+Required D3D12/Vulkan rendering/native proof remains binding. Use the compatible existing capture route needed by that claim, retain its native artifact and limitations, and share qualification with the owning frame/package checks. Public release does not wait for every optional capturer to be qualified. Deferred cells are scope exclusions for this delivery, never passes or evidence of unsupported hardware. Existing unqualified provider claims remain unqualified.
 
 `EXT-00` is the bounded neutral spine delivered with real PIX, not a standalone framework. Stable package identities survive the priority change. Native artifact locations follow typed user-state roots; candidate reports link retained artifacts rather than committing large captures.
 
@@ -112,6 +114,6 @@ Check names in the failure table abbreviate the matching `CHK-EC-*` identity bel
 
 ## Completion And Result Ownership
 
-Each provider can be delivered when its own relevant criteria, failures and checks pass; PIX does not wait for unavailable NVIDIA hardware. Complete parent Phase 1 only when `EXT-00`–`EXT-05` have accepted or evidence-backed unsupported dispositions and the parent map/Shipping gates close. An unavailable installation, unrun probe, or temporarily missing hardware is **BLOCKED**, not permission to reject/delete an intended feature.
+Each provider can be qualified when its own relevant criteria, failures and checks pass. Parent Phase 1 closes only its frozen selected matrix under the scope above, with actual native artifacts and applicable observer/Shipping proof. It does not claim full `EXT-00` through `EXT-05` acceptance. Deferred Game/Vulkan integrations retain their scope exclusion; an unavailable tool or unrun required check for a selected route remains **BLOCKED**.
 
 Specialist Stage 7 closes its named tool-managed lanes separately and does not hold accepted PIX hostage. Full package closure additionally requires all applicable `AC-EC-*`, controlled `FM-EC-*`, separate review/adoption, clean-break cleanup and final report through [Acceptance](../../../../Acceptance/README.md). Candidate `PASS`, `BLOCKED`, `EXCLUDED`, or `SUPERSEDED` results belong in that report, not in these target pages.

@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <string_view>
 
 class Timer;
@@ -13,7 +14,6 @@ class InputSystem;
 class GameWorld;
 class Renderer;
 class LevelSession;
-class GameUiHost;
 class TaskExecutor;
 class TaskScope;
 class ApplicationTaskRuntime;
@@ -34,8 +34,7 @@ enum class GameApplicationFrameResult : std::uint8_t
 
 struct GameApplicationOptions final
 {
-	bool EnableGameUi = true;
-	bool EnableGameConsole = !SPARKLE_BUILD_SHIPPING;
+	std::string WindowTitle = "Sparkle Game";
 	bool AllowThreadedRenderer = true;
 	bool EnableUiRenderPackets = false;
 };
@@ -69,12 +68,10 @@ public:
 private:
 	friend class EditorApplication;
 
-	static bool WantsImGuiInputCapture() noexcept;
 	void InitializeHost();
 	void InitializeInput();
 	void InitializeGameWorld();
 	void InitializeRenderer();
-	void InitializeGameUi();
 	void SignalLevelReadiness(std::string_view level);
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	void ReportReadiness();
@@ -95,7 +92,6 @@ private:
 	std::unique_ptr<GpuCrashIncidentSink> m_gpuCrashSink;
 	std::string m_pendingReadiness;
 #endif
-	std::unique_ptr<GameUiHost> m_gameUiHost;
 	std::unique_ptr<ApplicationTaskRuntime> m_taskRuntime;
 	std::unique_ptr<CameraInputIntentCollector> m_cameraInputIntentCollector;
 	GameApplicationOptions m_options;

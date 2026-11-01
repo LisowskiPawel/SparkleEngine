@@ -12,5 +12,5 @@ namespace SparkleLauncher
 		std::filesystem::path RootPath;
 	};
 
-	std::optional<LauncherProject> ResolveLauncherProject(const std::filesystem::path& repositoryRoot, std::string& outErrorMessage);
+	std::optional<LauncherProject> ResolveLauncherProject(const std::filesystem::path& workspaceRoot, std::string& outErrorMessage);
 }

@@ -2,6 +2,7 @@
 #include "Scene/RenderScene.h"
 
 #include "Meshes/GpuMeshCache.h"
+#include "Textures/TextureCache.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "Scene/GpuScene/RenderGpuScene.h"
 #include "Scene/Materials/MaterialCache.h"
@@ -20,6 +21,7 @@ RenderScene::RenderScene(
     m_renderGpuScene(std::make_unique<RenderGpuScene>(renderHardwareInterface.GetResourceService(), gpuMeshCache)),
     m_renderRayTracingScene(std::make_unique<RenderRayTracingScene>(renderHardwareInterface, gpuMeshCache, rayTracingCapabilities)),
     m_gpuMeshCache(&gpuMeshCache),
+    m_textureCache(&textureCache),
     m_materialCache(std::make_unique<MaterialCache>(textureCache, renderHardwareInterface))
 {
 }

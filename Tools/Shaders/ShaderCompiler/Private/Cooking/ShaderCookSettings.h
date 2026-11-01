@@ -13,7 +13,6 @@ struct ShaderCookSettings final
 	std::string backendName = "auto";
 	std::string shaderId;
 	std::vector<std::string> changedVirtualPaths;
-	std::filesystem::path cancellationSignalPath;
 	std::filesystem::path debugArtifactDirectory;
 	std::vector<std::string> analysisPasses;
 	bool enableDebugInfo = false;

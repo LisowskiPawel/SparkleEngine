@@ -5,7 +5,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "SparkleLauncher/BuildProfileCatalog.h"
 #include "LauncherStatePaths.h"
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -361,7 +361,7 @@ namespace SparkleLauncher
 		}
 
 		plan.Kind = definition->Kind;
-		plan.RepositoryRoot = request.RepositoryRoot;
+		plan.WorkspaceRoot = request.WorkspaceRoot;
 		plan.Request = request;
 		if (plan.Kind == CookOperationKind::CookWorkspace)
 		{
@@ -375,7 +375,7 @@ namespace SparkleLauncher
 			}
 		}
 		plan.ToolProfile = ResolveCookToolProfile(request.GameProfile);
-		plan.CookedOutputDirectory = Filesystem::ResolveProductCookedRoot(request.RepositoryRoot, request.ContentId);
+		plan.CookedOutputDirectory = ResolveCookedRoot(request.WorkspaceRoot, request.ContentId);
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Operation.Inputs.push_back({"content", request.ContentId});
 		plan.Operation.Inputs.push_back({"gameProfile", request.GameProfile});
@@ -398,7 +398,7 @@ namespace SparkleLauncher
 			}
 			plan.Operation.Inputs.push_back({"cookScopes", Strings::Join(scopeNameViews, ", ")});
 		}
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.RepositoryRoot, definition->Id, "Latest.txt");
+		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
 		if (request.Mode == CookMode::Force)
 		{
 			plan.Operation.DestructiveScope = OperationDestructiveScope::CookedOutputs;
@@ -407,11 +407,11 @@ namespace SparkleLauncher
 
 		for (const std::string& toolName : GetRequiredCookToolNames(plan))
 		{
-			plan.RequiredToolPaths.push_back(Filesystem::ResolveProductToolPath(request.RepositoryRoot, toolName, plan.ToolProfile));
+			plan.RequiredToolPaths.push_back(ResolveToolExecutable(request.WorkspaceRoot, toolName, plan.ToolProfile));
 		}
 		if (request.ContentId.empty())
 		{
-			AddReadiness(plan, "Repository content is unavailable for cooking.");
+			AddReadiness(plan, "Workspace content is unavailable for cooking.");
 		}
 		const bool hasSelectedScopes = plan.Kind != CookOperationKind::CookWorkspace || !plan.Request.SelectedScopes.empty();
 		bool selectedScopesSupported = true;
@@ -471,7 +471,7 @@ namespace SparkleLauncher
 			if (!toolExists || errorCode)
 			{
 				requiredCookToolsAvailable = false;
-				AddReadiness(plan, "Cook tool is missing; import precompiled products or build cooking tools: " + toolPath.string());
+				AddReadiness(plan, "Cook tool is missing; sync products or build cooking tools: " + toolPath.string());
 				continue;
 			}
 
@@ -492,7 +492,7 @@ namespace SparkleLauncher
 			AddReadiness(
 			    plan,
 			    "Cook tool runtime support bundle is incomplete beside " + toolPath.filename().string()
-			        + "; import the complete precompiled bundle or rebuild cooking tools: " + Strings::Join(missingSupportEntryViews, ", "));
+			        + "; sync the complete product bundle or rebuild cooking tools: " + Strings::Join(missingSupportEntryViews, ", "));
 		}
 		if (request.Mode == CookMode::Force && !request.ForceRecookConfirmed)
 		{

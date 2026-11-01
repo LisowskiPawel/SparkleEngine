@@ -18,6 +18,29 @@ void InputEventDispatcher::Unsubscribe(EventHandle handle)
 	std::apply([&removeByHandle](auto&... callbacks) { (removeByHandle(callbacks), ...); }, m_callbacks);
 }
 
+void InputEventDispatcher::ProcessDeferredEvents(const LayerAvailability& layerAvailability)
+{
+	if (m_isProcessingDeferredEvents)
+	{
+		return;
+	}
+
+	m_isProcessingDeferredEvents = true;
+	try
+	{
+		ProcessDeferredEventsForType<KeyboardEvent>(layerAvailability);
+		ProcessDeferredEventsForType<MouseButtonEvent>(layerAvailability);
+		ProcessDeferredEventsForType<MouseMoveEvent>(layerAvailability);
+		ProcessDeferredEventsForType<MouseWheelEvent>(layerAvailability);
+	}
+	catch (...)
+	{
+		m_isProcessingDeferredEvents = false;
+		throw;
+	}
+	m_isProcessingDeferredEvents = false;
+}
+
 void InputEventDispatcher::ClearDeferredEvents()
 {
 	GetDeferredQueue<KeyboardEvent>().clear();

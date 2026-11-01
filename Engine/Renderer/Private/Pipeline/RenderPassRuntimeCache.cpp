@@ -3,7 +3,8 @@
 #include "RenderPassRuntimeCache.h"
 
 #include "Core/Public/Diagnostics/Logger.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Files/FileSetPublication.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "RHI/Public/Device/RenderDeviceServices.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "RHI/Public/Shaders/ShaderParameterLayoutBuilder.h"
@@ -27,6 +28,11 @@ RenderPassRuntimeCache::~RenderPassRuntimeCache() noexcept = default;
 std::uint64_t RenderPassRuntimeCache::GetShaderGeneration() const noexcept
 {
 	return m_activeGeneration != nullptr ? m_activeGeneration->Generation : 0;
+}
+
+std::uint64_t RenderPassRuntimeCache::GetShaderPublicationHash() const noexcept
+{
+	return m_activeGeneration != nullptr ? m_activeGeneration->Map.GetPublicationHash() : 0;
 }
 
 void RenderPassRuntimeCache::ReloadShaders()
@@ -66,6 +72,7 @@ void RenderPassRuntimeCache::ReloadShaders()
 
 std::unique_ptr<RenderPassRuntimeCache::ShaderRuntimeGeneration> RenderPassRuntimeCache::OpenGeneration(std::uint64_t generation) const
 {
+	const Files::FileSetReadScope publication(Filesystem::GetCookedShaderRootPath());
 	auto result = std::make_unique<ShaderRuntimeGeneration>();
 	result->Generation = generation;
 	result->Target = GetRuntimeShaderTarget(m_renderHardwareInterface->GetCapabilities().RuntimeShaderBinaryFormat);

@@ -44,6 +44,7 @@ public:
 	RenderPassRuntimeCache& operator=(RenderPassRuntimeCache&&) = delete;
 
 	std::uint64_t GetShaderGeneration() const noexcept;
+	std::uint64_t GetShaderPublicationHash() const noexcept;
 	void ReloadShaders();
 	void PollRetiredGenerations() noexcept;
 

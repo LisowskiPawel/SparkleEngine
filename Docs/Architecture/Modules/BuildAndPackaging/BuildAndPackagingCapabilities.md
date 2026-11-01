@@ -18,13 +18,15 @@
 
 **Release inputs:** [First Release Inputs](PackagingAndInstallation.md#release-inputs) names product profiles, helper admission, acquisition-only Sponza/source-export boundaries, notices/SBOM, signing inputs and threat controls. Candidate results remain in Acceptance.
 
-**Package owner (2026-10-11):** [CMake/Packaging](../../../../CMake/Packaging/Package.ps1) now owns the reviewed-input build/cook/stage/verify/archive route. [Packaging And Installation](PackagingAndInstallation.md#current-package-entry) describes current checks and remaining admission/runtime gaps. Historical Not found entries below retain their snapshot; source presence does not pass PD-3 or REL-03.
+**Package owner (2026-10-11):** [CMake/Packaging](../../../../CMake/Packaging/Package.ps1) now owns the prepared-output freeze/stage/verify/archive route. [Packaging And Installation](PackagingAndInstallation.md#current-package-entry) describes current checks and remaining admission/runtime gaps. Historical Not found entries below retain their snapshot; source presence does not pass PD-3 or REL-03.
 
 **Public development setup (2026-10-11):** the [root README](../../../../README.md) uses the standalone Launcher entry; [Contributing](../../../../CONTRIBUTING.md) routes public review. A [bounded source workflow](#automation) is prepared; historical absence-of-CI rows below predate it. Hosted/build/GPU acceptance remains unproved.
 
 **Baseline owner checks:** after Launcher generates the canonical workspace, run `powershell -NoProfile -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor`. [RunBaselineChecks.ps1](../../../../CMake/RunBaselineChecks.ps1) records revision/dirty state and sequential results for `architecture_boundary_check`, `code_style_check` and `ShaderCompilerCliValidation`. Failed, timed-out, cancelled, skipped, unavailable or missing-artifact results prevent a pass. It adds no check semantics and does not certify fresh checkout, asset rights, full cook or runtime. Candidate/environment/artifact binding remains with the [acceptance report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers).
 
 Use [build/profile rules](#build-contract), [generated-output layout](#canonical-generated-output-layout), [automation](#automation), or [packaging and diagnostics](PackagingAndInstallation.md).
+
+**Current delivery source, 2026-11-01:** existing Launcher/CMake tools prepare fresh products/full cook. Packaging freezes one inventory and verifies/stages/archives those files without another build/cook runner. `SyncProducts.ps1` fills the canonical binary/cooked outputs local generation replaces. Stores, runtime origin checks, admission receipts, Launcher prerequisite graph and Game-only UI are removed; [source checks](../../../../artifacts/validation/release-owner-slim-20261101/completion.json) are separate from future exact-archive/public qualification.
 
 ## At A Glance
 
@@ -105,10 +107,10 @@ The products intended for direct use are published by owner and profile under
 
 Launcher settings, activity, and operation logs are user-local state under
 `%LOCALAPPDATA%/SparkleEngine/LauncherState/<repository-id>/`; they are not
-build products. Editor and development-game mutable state is isolated per
-repository and product under
-`%LOCALAPPDATA%/SparkleEngine/Development/<repository-id>/<Product>/`; packaged
-`v0.1` runtime state uses `%LOCALAPPDATA%/SparkleEngine/<Product>/v0.1/`.
+build products. Editor and Game mutable state is isolated per root and product
+under `%LOCALAPPDATA%/SparkleEngine/Development/<repository-id>/<Product>/`,
+identically for source checkouts and extractions. Older archives retain their
+recorded state paths; current code has no release-version state lookup.
 `Settings/`, `Logs/`, `Captures/`, `Crashes/`, and `Cache/` are the only typed
 children of those product roots. Source defaults remain immutable.
 
@@ -116,10 +118,10 @@ The directory layout is an explicit code contract rather than a convention
 that callers reproduce. Engine and product code includes
 `Core/Public/Paths/ProductUserStatePaths.h` and requests the complete
 `ProductUserStatePaths` value; only its private implementation may choose the
-OS root, package version, development repository key, or typed child names.
-Workspace producers and consumers include
-`Core/Public/Paths/WorkspaceOutputPaths.h` for build, dependency, artifact,
-product, tool, cooked, diagnostic, library, and symbol locations.
+OS root, repository key, or typed child names. Preparation tools include
+`Tools/Support/ToolSupport/Public/ToolOutputPaths.h` for build, dependency,
+artifact, product, tool, cooked, diagnostic, library, and symbol locations.
+Engine consumes ordinary input paths through Core and never links ToolSupport.
 Launcher-owned settings, activity, and operation logs use the separate private
 `LauncherStatePaths` contract inside `SparkleLauncherCore`. Consumers select a
 named field or owner-specific method from those values. They must not append
@@ -130,7 +132,7 @@ Orchestrators resolve each contract once for the plan or operation stage and
 pass the resulting semantic path to the implementation that reads, writes, or
 removes it. A receiver may append only a leaf that it owns, such as a settings
 filename or one diagnostic record. When binary, library, and symbol locations
-describe one target, the receiver consumes one `WorkspaceTargetOutputPaths`
+describe one target, the receiver consumes one `ToolTargetOutputPaths`
 value; it does not independently rebuild those correlated trees. Mechanics
 that need only a destination receive that destination, not a repository root
 plus enough policy to rediscover it.
@@ -230,7 +232,7 @@ archive and qualification boundaries. Signing belongs to final publication.
 
 This section owns the build-side source-adopter verdict. [Adoption](PackagingAndInstallation.md#local-diagnostics-and-release-review) owns public recovery/support after a failure; [First Release](../../../Acceptance/FirstRelease.md#frozen-platform-and-toolchain-prerequisites) owns the frozen prerequisite values.
 
-**Proof allocation:** PD-2 qualifies the immutable source candidate and source-operation failures; PD-3 qualifies packaged dependency closure. Documented author/agent rehearsal is sufficient; cold/warm, exact-source and no hidden-cache checks remain required. [Product delivery progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) records the retained partial results.
+**Proof allocation:** PD-2 qualifies the immutable source candidate and source-operation failures; PD-3 qualifies packaged dependency closure. Documented author/agent rehearsal is sufficient; fresh-source and no hidden-cache checks remain required; warm/offline replay is historical or optional developer evidence, not permission to seed a new publisher release from old outputs. The optional matching precompiled/cooked base must also survive an actual user edit and Launcher rebuild. [Product delivery progress](../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) records the retained partial results.
 
 | ID | Binary acceptance criterion | Proof phase |
 | --- | --- | --- |

@@ -12,6 +12,12 @@
 
 Phase 12 still owns executable regeneration, compiler/backend/ABI, parity, corruption/failure, lifetime, capture, observer, package and adoption checks. Historical contract bullets below describe the original checkpoint and its deferred obligations; they are not instructions to recreate delivered code.
 
+**Current shared-owner reconciliation (2026-10-31):** historical `TryPublishFileSet` references below name the original checkpoint. FWC-4 replaces that free API with Core `FileSetPublisher`, acquires output/debug scopes before staging and verifies the changed shader caller with a seeded one-shader normal/denied/retry control. [Cooking owns the current interruption contract](../../Modules/Tools/Cooking/CookingCapabilities.md#interrupted-scene-publication); old phase results retain their original identity and do not pass the current incomplete-output contract or Phase 12.
+
+**Preparation ownership amendment, 2026-11-01:** Launcher invokes compilation/cooking through the existing tool executable. Editor consumes and explicitly reloads the ordinary runtime map/library; its compiler process, source watcher, recook queue and `recook.signal` receipt protocol are deleted. The compiler no longer emits that signal. Generic multi-file safety and runtime map/library validation remain; historical evidence below retains its original candidate. [Current source checks](../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json).
+
+**Cancellation reconciliation, 2026-11-01:** the orphan Editor cancellation-file option and polling helpers are removed. The CLI validation script no longer counts rejection of that retired option as successful cancellation proof. Historical cancellation/receipt rows below describe their original source checkpoint; current Launcher process cancellation and Tasks cancellation retain their own boundaries. [Current parser and ownership controls](../../../../artifacts/validation/runtime-inputs-slim-20261101/completion.json) do not claim executable cancellation/publication acceptance.
+
 ## Phase 2 Source Checkpoint
 
 This table records the Phase 2 source-consistency checkpoint present at the recorded checkpoint. It does not claim compilation, shader recording, backend execution, cook, runtime, capture, or performance evidence.

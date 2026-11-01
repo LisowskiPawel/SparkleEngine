@@ -9,11 +9,11 @@
 
 namespace Assets
 {
-	LoadedMaterialAsset MaterialAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes) const
+	LoadedMaterialAsset MaterialAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const
 	{
 		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedMaterialAsset");
 
-		CookedAssetByteReader reader(bytes);
+		CookedAssetByteReader reader(bytes, budget);
 		LoadedMaterialAsset materialAsset;
 		materialAsset.header = reader.Read<CookedMaterialAssetHeader>();
 

@@ -12,12 +12,6 @@
 
 namespace Files
 {
-	struct FilePublication final
-	{
-		std::filesystem::path StagedPath;
-		std::filesystem::path PublishedPath;
-	};
-
 	bool TryReadAllBytes(const std::filesystem::path& path, std::vector<std::uint8_t>& outBytes, std::string& outErrorMessage);
 	bool TryReadAllText(const std::filesystem::path& path, std::string& outText, std::string& outErrorMessage, std::size_t maximumBytes = (std::numeric_limits<std::size_t>::max)());
 	bool TryWriteAllBytes(const std::filesystem::path& path, std::span<const std::byte> bytes, std::string& outErrorMessage);
@@ -31,7 +25,6 @@ namespace Files
 	std::filesystem::path BuildTemporaryPath(const std::filesystem::path& path, std::string_view suffix = ".tmp");
 	bool TryFinalizeTemporaryFile(const std::filesystem::path& temporaryPath, const std::filesystem::path& finalPath, std::string& outErrorMessage);
 	bool TryFinalizeTemporaryFileIfMissing(const std::filesystem::path& temporaryPath, const std::filesystem::path& finalPath, std::string& outErrorMessage);
-	bool TryPublishFileSet(std::span<const FilePublication> files, std::string& outErrorMessage);
 	void CleanupTemporaryFile(const std::filesystem::path& temporaryPath, std::ofstream* output = nullptr) noexcept;
 	bool TryCloseOutput(std::ofstream& output, const std::filesystem::path& path, std::string& outErrorMessage);
 }

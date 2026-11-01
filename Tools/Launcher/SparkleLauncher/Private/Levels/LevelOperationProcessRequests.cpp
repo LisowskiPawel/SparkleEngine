@@ -1,12 +1,11 @@
 #include "LevelOperationProcessRequests.h"
 #include "Core/Public/Strings/StringUtils.h"
 
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 #include "AssetPackSyncPlanner.h"
 
-#include "Core/Public/Projects/ProjectLevelCatalog.h"
+#include "ProjectLevelCatalog.h"
 #include "LauncherStatePaths.h"
-#include "Core/Public/Paths/PackagePaths.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <utility>
@@ -15,32 +14,16 @@ namespace SparkleLauncher
 {
 	static Process::ChildProcessRequest MakeAssetPackSyncRequest(const LevelOperationPlan& plan, const ProjectAssetPack& pack)
 	{
-		const std::filesystem::path projectRoot = Filesystem::ResolveProductProjectRoot(plan.RepositoryRoot, plan.Request.ContentId);
-		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(plan.RepositoryRoot);
+		const std::filesystem::path projectRoot = ResolveProjectRoot(plan.WorkspaceRoot, plan.Request.ContentId);
+		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(plan.WorkspaceRoot);
 		const std::filesystem::path cacheRoot = statePaths.ContentArchivesRoot / plan.Request.ContentId;
 		const std::filesystem::path rootRelativeToExtraction = pack.rootPath.lexically_relative(pack.extractionPath);
 
-		std::filesystem::path syncScript = plan.RepositoryRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake";
-		if (!Filesystem::IsSourceWorkspace(plan.RepositoryRoot))
-		{
-			const auto verified = Filesystem::ResolvePackageFilePath(plan.RepositoryRoot, "Tools/Content/SyncAssetPack.cmake");
-			if (!verified)
-			{
-				throw Diagnostics::Error("The declared content acquisition script is missing or corrupt.");
-			}
-			for (const std::string_view dependency : {"Tools/Content/SyncAssetPackFiles.cmake", "Tools/Content/SyncAssetPackArchive.cmake"})
-			{
-				if (!Filesystem::ResolvePackageFilePath(plan.RepositoryRoot, dependency))
-				{
-					throw Diagnostics::Error("A declared acquisition script dependency is missing or corrupt.");
-				}
-			}
-			syncScript = *verified;
-		}
+		const std::filesystem::path syncScript = plan.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake";
 
 		Process::ChildProcessRequest process;
-		process.WorkingDirectory = plan.RepositoryRoot;
-		process.LogPath = ResolveLauncherOperationLogPath(plan.RepositoryRoot, plan.Operation.Id, "AssetPack-" + pack.id + ".txt");
+		process.WorkingDirectory = plan.WorkspaceRoot;
+		process.LogPath = ResolveLauncherOperationLogPath(plan.WorkspaceRoot, plan.Operation.Id, "AssetPack-" + pack.id + ".txt");
 		process.ExecutablePath = plan.CMakePath;
 
 		process.Arguments = {
@@ -71,9 +54,9 @@ namespace SparkleLauncher
 	std::vector<LevelOperationProcessStep> BuildLevelOperationProcessSteps(const LevelOperationPlan& plan)
 	{
 		std::vector<LevelOperationProcessStep> steps;
-		const std::filesystem::path projectRoot = Filesystem::ResolveProductProjectRoot(plan.RepositoryRoot, plan.Request.ContentId);
+		const std::filesystem::path projectRoot = ResolveProjectRoot(plan.WorkspaceRoot, plan.Request.ContentId);
 		const ProjectLevelCatalog catalog = ProjectLevelCatalogFile::Load(projectRoot);
-		for (const std::string& packId : BuildAssetPackSyncPlan(catalog, plan.Request.RequestedLevelIds, !Filesystem::IsSourceWorkspace(plan.RepositoryRoot)))
+		for (const std::string& packId : BuildAssetPackSyncPlan(catalog, plan.Request.RequestedLevelIds))
 		{
 			const ProjectAssetPack& pack = catalog.assetPacks.at(packId);
 			if (catalog.IsAssetPackPayloadPresent(pack))

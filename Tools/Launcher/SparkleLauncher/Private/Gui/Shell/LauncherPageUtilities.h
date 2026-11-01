@@ -10,7 +10,7 @@
 
 namespace SparkleLauncher
 {
-	QString ToDisplayPath(const std::filesystem::path& repositoryRoot, const std::filesystem::path& path);
+	QString ToDisplayPath(const std::filesystem::path& workspaceRoot, const std::filesystem::path& path);
 	QString FormatDirectoryInventory(const std::filesystem::path& path);
 	QString FormatStatusPath(const std::filesystem::path& path);
 	bool DirectoryHasEntries(const std::filesystem::path& path);

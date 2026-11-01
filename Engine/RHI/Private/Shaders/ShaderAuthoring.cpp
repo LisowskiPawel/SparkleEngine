@@ -6,7 +6,6 @@
 #include "ShaderParameters/PassParameterLayout.h"
 
 #include <algorithm>
-#include <string>
 #include <vector>
 
 ShaderTypeId BuildShaderTypeId(std::string_view shaderName) noexcept
@@ -81,14 +80,4 @@ const ShaderRegistrationDesc* GlobalShaderRegistry::FindByType(const std::type_i
 	const std::span<const ShaderRegistrationDesc> registrations = GetRegistrations();
 	const auto found = std::ranges::find_if(registrations, [&shaderType](const ShaderRegistrationDesc& candidate) { return candidate.ShaderType != nullptr && *candidate.ShaderType == shaderType; });
 	return found != registrations.end() ? &*found : nullptr;
-}
-
-std::string BuildShaderParameterStructReport(const ShaderParameterStructDescriptor& descriptor)
-{
-	std::string report = std::string(descriptor.Name) + " parameter(s)=" + std::to_string(descriptor.Fields.size());
-	for (const ShaderParameterStructFieldDescriptor& field : descriptor.Fields)
-	{
-		report += "\n  name=" + std::string(field.Name);
-	}
-	return report;
 }

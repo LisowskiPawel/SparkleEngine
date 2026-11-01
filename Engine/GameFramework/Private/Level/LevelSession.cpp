@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Level/LevelSession.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
@@ -15,7 +16,7 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_levelSessionLogger, "GameFramework.LevelSes
 
 LevelSession::LevelSession(GameWorld& world, TaskExecutor& taskExecutor, TaskScope& applicationScope) :
     m_gameWorld(&world),
-    m_levelRegistry(std::make_unique<LevelRegistry>()),
+    m_levelRegistry(std::make_unique<LevelRegistry>(Filesystem::GetProjectPath())),
     m_loadExecutor(std::make_unique<Assets::SceneLoadExecutor>(taskExecutor, applicationScope))
 {
 	InitializeStartupLevel();
@@ -31,7 +32,7 @@ void LevelSession::InitializeStartupLevel() noexcept
 	LevelAsset* startupLevel = m_levelRegistry->FindLevel(startupName);
 	if (!startupLevel && !requestedName.empty())
 	{
-		m_lastLoadDiagnostic = std::format("Requested level '{}' is unavailable. Select Empty or sync/cook this level through Sparkle Launcher.", requestedName);
+		m_lastLoadDiagnostic = std::format("Requested level '{}' has no valid level document. No level was activated.", requestedName);
 		SPDLOG_LOGGER_ERROR(g_levelSessionLogger, "Requested startup level '{}' is not registered; no level will be activated.", requestedName);
 		return;
 	}
@@ -56,7 +57,7 @@ void LevelSession::RequestLevelChange(std::string_view requestedLevelName) noexc
 	LevelAsset* requestedLevel = m_levelRegistry->FindLevel(requestedLevelName);
 	if (!requestedLevel)
 	{
-		m_lastLoadDiagnostic = std::format("Requested level '{}' is unavailable. The active level is unchanged. Sync/cook it through Sparkle Launcher.", requestedLevelName);
+		m_lastLoadDiagnostic = std::format("Requested level '{}' has no valid level document. The active level is unchanged.", requestedLevelName);
 		m_levelChangeEvents.OnLevelLoadFailed.Broadcast(requestedLevelName);
 		SPDLOG_LOGGER_WARN(g_levelSessionLogger, "Requested level '{}' is not registered.", std::string(requestedLevelName));
 		return;

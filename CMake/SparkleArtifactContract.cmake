@@ -167,11 +167,11 @@ else()
     set(_sparkle_active_artifact_root "${_sparkle_artifact_root}")
 endif()
 
-set(_sparkle_development_artifact_root "${_sparkle_active_artifact_root}/dev")
-set(_sparkle_tool_artifact_root "${_sparkle_development_artifact_root}/Tools")
-set(_sparkle_project_artifact_root "${_sparkle_development_artifact_root}/Projects")
-set(_sparkle_runtime_support_artifact_root "${_sparkle_development_artifact_root}/Engine/Binaries")
-set(_sparkle_library_artifact_root "${_sparkle_development_artifact_root}/libraries")
+set(_sparkle_product_root "${_sparkle_active_artifact_root}/dev")
+set(_sparkle_tool_artifact_root "${_sparkle_product_root}/Tools")
+set(_sparkle_project_artifact_root "${_sparkle_product_root}/Projects")
+set(_sparkle_runtime_support_artifact_root "${_sparkle_product_root}/Engine/Binaries")
+set(_sparkle_library_artifact_root "${_sparkle_product_root}/libraries")
 set(_sparkle_symbol_artifact_root "${_sparkle_active_artifact_root}/symbols")
 
 function(_sparkle_set_target_artifact_directories target_name runtime_root symbol_owner)
@@ -376,7 +376,7 @@ endfunction()
 
 message(STATUS
     "Sparkle roots: build=${_sparkle_configured_build_root}; artifacts=${_sparkle_active_artifact_root}; "
-    "dev=${_sparkle_development_artifact_root}")
+    "dev=${_sparkle_product_root}")
 message(STATUS "Sparkle artifact variant: ${SPARKLE_ARTIFACT_VARIANT}")
 
 function(sparkle_stage_external_capture_notices product_target)

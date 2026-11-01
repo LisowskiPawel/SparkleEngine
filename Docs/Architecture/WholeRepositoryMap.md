@@ -45,10 +45,11 @@ SparkleEngine
 `-- .sparkle               repository marker used by tooling
 ```
 
-Mutable editor/game state is not repository content. Development products
-use `%LOCALAPPDATA%/SparkleEngine/Development/<repository-id>/<Product>/` and
-packaged `v0.1` products use `%LOCALAPPDATA%/SparkleEngine/<Product>/v0.1/`,
-with typed `Settings`, `Logs`, `Captures`, `Crashes`, and `Cache` children.
+Mutable editor/game state is not repository content. Source and extracted products
+use the same root-keyed `%LOCALAPPDATA%/SparkleEngine/Development/<repository-id>/<Product>/`
+tree, with typed `Settings`, `Logs`, `Captures`, `Crashes`, and `Cache` children.
+There is no installed-mode or release-version lookup; older archive evidence keeps
+its original paths.
 
 The top-level CMake project requires C++20, loads the Sparkle build profiles and artifact/project contracts, adds `Engine` and `Tools`, then discovers runnable projects through `Projects/*/.sparkle-project`. Optional content-pipeline, shader-compiler, KTX, NVIDIA Streamline, sanitizer, and strict-warning features are explicit CMake options.
 
@@ -227,15 +228,9 @@ cooked-only GameFramework loaders
 LevelSession -> SceneLoadTaskGraph -> GameWorld
 ```
 
-`Projects/Showcase/Levels.catalog` is the single Showcase level/acquisition catalog. At the verified revision it contains 16 level records:
+`Projects/Showcase/Levels.catalog` is preparation metadata used by Launcher/AssetCooker through ToolSupport. It owns labels, source acquisition and the selected cook inputs, with the seven release maps plus Empty retained. Runtime never reads it. `LevelRegistry` receives the project path, discovers `Levels/<id>.level` documents, validates their identity and leaves cooked dependency validation to the existing loaders. An unselected or unavailable raw source pack cannot hide supplied runtime documents.
 
-- six asset-pack-free game levels: `Empty`, `Sponza`, `ABeautifulGame`, `DamagedHelmet`, `DiffuseTransmissionPlant`, and `CesiumMan`;
-- seven external-pack Game-supported levels: `ModernSponza`, `ModernSponzaCandles`, `ModernSponzaKnight`, `BistroExterior`, `BistroInteriorWine`, `LPSHead`, and `CornellBox`;
-- three source-readiness records that are not Game-supported: `JungleRuins`, `SanMiguelHigh`, and `SanMiguelLow`.
-
-The default game level is `Empty`; `SPARKLE_STARTUP_LEVEL` requests another catalog level. [GameFramework's selection contract](Modules/Engine/GameFramework/GameFrameworkCapabilities.md#explicit-level-selection-and-publication) distinguishes intentional Empty from unavailable explicit requests and owns the load/publication/shutdown trace. External assets remain outside normal source history and are acquired through catalog metadata. Game support is distinct from download support and from the user's selected active set.
-
-The catalog also records disabled future Modern Sponza add-ons for Ivy, Trees, Flood, and Volumetric Explosion with explicit implementation blockers. Their presence in metadata is not Game support.
+The default runtime level is `Empty`; `SPARKLE_STARTUP_LEVEL` requests another document identity. [GameFramework](Modules/Engine/GameFramework/GameFrameworkCapabilities.md#explicit-level-selection-and-publication) owns failure/publication/shutdown. Source support, download support and cook selection stay in tooling; package/map rights and actual rendering acceptance retain their own owners.
 
 ## Tools And Launcher Map
 
@@ -246,20 +241,24 @@ The catalog also records disabled future Modern Sponza add-ons for Ivy, Trees, F
 | `Tools/Shaders/ShaderContracts` | narrow shared shader-contract catalog surface used by the tool build |
 | `Tools/Import/SourceImporters` | canonical source-scene import and normalization |
 | `Tools/Cooking/*Cooker` | texture, mesh, material, scene, and project cook products |
-| `Tools/Support/ToolConsoleSupport` | shared host-tool console support |
+| `Tools/Support/ToolSupport` | shared host-tool console/progress, output paths, source lookup and project preparation metadata |
 
-The Launcher resolves its repository from an explicit `--root` request, the current directory, or executable ancestry; its deployable artifact does not carry a build-machine absolute-path marker. `LauncherMainWindow` remains the lifecycle and composition shell; `LauncherWorkflowPanel` owns workflow-catalog navigation and selection state, while `LauncherActivityPanel` owns the in-memory run list and output presentation. Quick Start projects the level catalog and resolves a requested level/run mode through existing typed sync, build, cook, and final-run capabilities. The Build, Cook, Sync, and Clean pages project those same backend operations; they do not own parallel implementations.
+The Launcher resolves its workspace from an explicit `--root` request, the current directory, or executable ancestry; its deployable artifact does not carry a build-machine absolute-path marker. `LauncherMainWindow` remains the lifecycle and composition shell; `LauncherWorkflowPanel` owns workflow-catalog navigation and selection state, while `LauncherActivityPanel` owns the in-memory run list and output presentation. Scenes projects the level catalog and submits a requested level/run mode directly to the existing typed run operation. Missing outputs report an error; optional source Sync, Build and Cook are explicit actions. There is no prerequisite graph or artifact-origin state. The Build, Cook, Sync, and Clean pages project those same backend operations; they do not own parallel implementations.
 
-Generated-location ownership is similarly explicit: Core's public
+Generated-location ownership is tool-only through `ToolOutputPaths`. Engine uses normal root/cooked getters, without package discovery or compile orchestration. Editor can request explicit shader compilation through a tooling action bound at the Showcase executable; Application owns its existing background-operation lifetime and reloads after success. Tool paths, Launcher cook policy and symbol export remain in Tools.
+
+`SourceAssetPaths` in ToolSupport resolves authoring inputs for importers and cookers. Core keeps cooked product lookup; Renderer and GameFramework use the cooked-texture-only resolver and never search project/engine source assets. Source-family enums, import-cache paths and compiler dependency-manifest locations do not enter Engine. The shared shader registry and parameter contracts stay in RHI because runtime pipeline materialization also consumes them; compiler execution and report publication stay in Tools.
+
+User-state ownership is similarly explicit: Core's public
 `ProductUserStatePaths` value is the engine/product boundary for per-user
-mutable state, and Core's `WorkspaceOutputPaths` is the shared boundary for
+mutable state, and Tool support's `ToolOutputPaths` is the shared boundary for
 repository-generated outputs. Launcher's private `LauncherStatePaths`
 collaboration owns launcher-specific leaf paths. Their concrete directory
 grammar and platform/repository identity mechanics remain private
 implementations; consumers do not reconstruct those paths from repository or
 user-state roots.
 
-`ShowcaseEditor` links the editor host and `ShowcaseGame` links the game host. Distribution packaging remains manual and outside Launcher ownership.
+`ShowcaseEditor` links the editor host and `ShowcaseGame` links the game host. Build/Cook and delivery remain Launcher/tooling concerns through existing CMake commands. Engine does not own release policy, compiler processes or package bootstrap.
 
 ## Validation And Evidence Boundaries
 

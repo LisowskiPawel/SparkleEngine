@@ -30,6 +30,7 @@ namespace SparkleLauncher
 		bool ForceRecookConfirmed = false;
 		bool CleanConfirmed = false;
 		bool ShowHelp = false;
+		bool ShaderSymbols = false;
 	};
 
 	bool ParseLauncherShellArguments(int argc, char** argv, LauncherShellArguments& outArguments, std::ostream& error);

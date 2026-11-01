@@ -22,11 +22,11 @@ namespace Assets
 		}
 	}
 
-	LoadedMeshAsset MeshAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes) const
+	LoadedMeshAsset MeshAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const
 	{
 		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedMeshAsset");
 
-		CookedAssetByteReader reader(bytes);
+		CookedAssetByteReader reader(bytes, budget);
 		const CookedMeshAssetHeader header = reader.Read<CookedMeshAssetHeader>();
 
 		if (!header.fileHeader.HasMagic(kCookedMeshAssetMagic) || header.vertexStride != sizeof(CookedMeshVertex) || header.indexStride != sizeof(std::uint32_t))
@@ -56,6 +56,7 @@ namespace Assets
 
 		const std::span<const std::uint8_t> cookedVertices = reader.ReadArrayBytes<CookedMeshVertex>(header.vertexCount);
 		MeshData geometry;
+		budget.ReserveArray<VertexData>(header.vertexCount);
 		geometry.vertices.resize(header.vertexCount);
 		for (std::size_t vertexIndex = 0; vertexIndex < geometry.vertices.size(); ++vertexIndex)
 		{
@@ -75,6 +76,7 @@ namespace Assets
 		}
 
 		MeshMorphData morphTargets;
+		budget.ReserveArray<MeshMorphTarget>(cookedMorphTargets.size());
 		morphTargets.reserve(cookedMorphTargets.size());
 		for (const CookedMeshMorphTargetRecord& cookedMorphTarget : cookedMorphTargets)
 		{
@@ -88,9 +90,11 @@ namespace Assets
 			}
 
 			MeshMorphTarget morphTarget;
+			budget.Reserve(sizeof(cookedMorphTarget.name));
 			morphTarget.name = cookedMorphTarget.name;
 			morphTarget.defaultWeight = cookedMorphTarget.defaultWeight;
-			morphTarget.deltas.resize(cookedMorphTarget.deltaCount);
+			budget.ReserveArray<MeshMorphTargetDelta>(cookedMorphTarget.deltaCount);
+		morphTarget.deltas.resize(cookedMorphTarget.deltaCount);
 			for (std::uint32_t deltaIndex = 0; deltaIndex < cookedMorphTarget.deltaCount; ++deltaIndex)
 			{
 				const CookedMeshMorphTargetDelta cookedDelta = MeshAssetLoaderDetail::ReadRecord<CookedMeshMorphTargetDelta>(cookedMorphTargetDeltas, cookedMorphTarget.firstDelta + deltaIndex);
@@ -103,7 +107,8 @@ namespace Assets
 			SkeletalMeshData loadedSkeletalMesh;
 			loadedSkeletalMesh.geometry = std::move(geometry);
 			loadedSkeletalMesh.morphTargets = std::move(morphTargets);
-			loadedSkeletalMesh.skinInfluences.resize(header.skinInfluenceCount);
+			budget.ReserveArray<VertexSkinInfluence>(header.skinInfluenceCount);
+		loadedSkeletalMesh.skinInfluences.resize(header.skinInfluenceCount);
 			for (std::size_t influenceIndex = 0; influenceIndex < loadedSkeletalMesh.skinInfluences.size(); ++influenceIndex)
 			{
 				const CookedMeshSkinInfluence cookedInfluence = MeshAssetLoaderDetail::ReadRecord<CookedMeshSkinInfluence>(cookedSkinInfluences, influenceIndex);

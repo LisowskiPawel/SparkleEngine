@@ -6,8 +6,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "LauncherStatePaths.h"
 #include "SparkleLauncher/ToolResolver.h"
-#include "Core/Public/Paths/PackagePaths.h"
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 
 #include <algorithm>
 #include <sstream>
@@ -73,7 +72,7 @@ namespace SparkleLauncher
 		}
 
 		plan.Kind = definition->Kind;
-		plan.RepositoryRoot = request.RepositoryRoot;
+		plan.WorkspaceRoot = request.WorkspaceRoot;
 		plan.Request = request;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Operation.Inputs.push_back({"content", request.ContentId});
@@ -87,20 +86,15 @@ namespace SparkleLauncher
 			}
 			plan.Operation.Inputs.push_back({"levels", Strings::Join(levelIds, ", ")});
 		}
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.RepositoryRoot, definition->Id, "Latest.txt");
+		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
 
-		ToolResolveResult cmake;
-		if (!Filesystem::IsSourceWorkspace(request.RepositoryRoot))
+		std::error_code sourceError;
+		if (!std::filesystem::is_regular_file(request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) || sourceError)
 		{
-			const auto path = Filesystem::ResolvePackageFilePath(request.RepositoryRoot, "Tools/CMake/bin/cmake.exe");
-			cmake.Found = path.has_value();
-			cmake.Path = path.value_or(std::filesystem::path{});
-			cmake.FailureReason = "The declared portable CMake payload is missing or corrupt.";
+			AddReadiness(plan, "Asset sync requires the source acquisition script. Open the matching source checkout to use this developer tool.");
+			return plan;
 		}
-		else
-		{
-			cmake = ResolveKnownTool(KnownTool::CMake);
-		}
+		const ToolResolveResult cmake = ResolveKnownTool(KnownTool::CMake);
 		if (cmake.Found)
 		{
 			plan.CMakePath = cmake.Path;
@@ -112,7 +106,7 @@ namespace SparkleLauncher
 		}
 		if (request.ContentId.empty())
 		{
-			AddReadiness(plan, "Repository content is unavailable for level synchronization.");
+			AddReadiness(plan, "Workspace content is unavailable for level synchronization.");
 		}
 
 		plan.PlannedEffects.push_back(

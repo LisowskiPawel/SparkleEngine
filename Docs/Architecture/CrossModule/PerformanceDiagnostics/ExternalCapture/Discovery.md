@@ -10,7 +10,7 @@
 
 **Authority boundary:** [Research](Research.md) supplies precedent; this gate validates decisions/environment; [Plan](ImplementationPlan.md) owns delivery order. Documentation alone does not pass this gate.
 
-**Current source:** existing Editor capture routes and the independent engine repairs are delivered; provider-wide candidate acceptance remains open. The [remaining plan](ImplementationPlan.md) selects only unresolved discovery, production deltas and evidence. Historical native SDK observations do not close aggregate acceptance.
+**Current source:** existing Editor capture routes and the independent engine repairs are delivered; provider-wide candidate acceptance remains open. The [2026-11-01 scope decision](ExternalCaptureDesign.md#product-and-support-disposition) defers new Game controls and Nsight Vulkan integration. The [remaining plan](ImplementationPlan.md) selects only evidence needed for an admitted existing route. Dated records below retain their original candidate, gates and failures; their former delivery scope is not a current instruction to build the deferred adapters.
 
 **Naming reconciliation (2026-10-25):** Command/source examples use current TLAS/PTLAS identifiers and configuration keys. Retained capture/transcript artifacts preserve the actual spelling executed for their original candidate; this rename does not rerun or promote their evidence. Recheck the current command on a new candidate before claiming current behavior.
 

@@ -4,8 +4,4 @@
 
 class TaskExecutionContext;
 
-class TaskFunctionInvoker final
-{
-public:
-	static TaskResult Invoke(const TaskGraphNode& node, TaskExecutionContext& context);
-};
+TaskResult InvokeTaskFunction(const TaskGraphNode& node, TaskExecutionContext& context);

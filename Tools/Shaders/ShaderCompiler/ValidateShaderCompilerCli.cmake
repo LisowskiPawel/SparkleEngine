@@ -122,15 +122,6 @@ run_shader_compiler_capture(
 require_output_match("${second_repeat_output}" "compileJobs=2" "the second explicit repeated operation")
 require_artifact_hashes("${full_map_hash}" "${full_library_hash}" "the second explicit repeated operation")
 
-set(cancellation_signal
-    "${COOKED_SHADER_DIRECTORY}/ShaderCompilerCliValidation.cancel")
-file(WRITE "${cancellation_signal}" "cancel")
-expect_shader_compiler_failure(
-    cook --shader-id "${REPRESENTATIVE_SHADER}" --target DxilSm66 --target SpirV16
-    --cancellation-signal "${cancellation_signal}")
-file(REMOVE "${cancellation_signal}")
-require_artifact_hashes("${full_map_hash}" "${full_library_hash}" "cancelled cooking")
-
 expect_shader_compiler_failure(cook --changed "/Engine/../Outside.hlsl" --target DxilSm66)
 require_artifact_hashes("${full_map_hash}" "${full_library_hash}" "traversal rejection")
 expect_shader_compiler_failure(cook --shader-id "__MissingShaderValidationSentinel" --target DxilSm66)

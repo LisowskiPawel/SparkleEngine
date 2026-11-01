@@ -26,10 +26,10 @@ namespace SparkleLauncher
 		return m_hasContent ? &m_content : nullptr;
 	}
 
-	void LauncherContentModel::Refresh(const std::filesystem::path& repositoryRoot)
+	void LauncherContentModel::Refresh(const std::filesystem::path& workspaceRoot)
 	{
 		std::string errorMessage;
-		const std::optional<LauncherProject> discoveredContent = ResolveLauncherProject(repositoryRoot, errorMessage);
+		const std::optional<LauncherProject> discoveredContent = ResolveLauncherProject(workspaceRoot, errorMessage);
 
 		LauncherContentSummary refreshedContent;
 		const bool hasRefreshedContent = discoveredContent.has_value();
@@ -51,7 +51,7 @@ namespace SparkleLauncher
 
 		if (!discoveredContent.has_value() && errorMessage.empty())
 		{
-			errorMessage = "The repository content root could not be discovered.";
+			errorMessage = "The workspace content root could not be discovered.";
 		}
 		if (!errorMessage.empty())
 		{

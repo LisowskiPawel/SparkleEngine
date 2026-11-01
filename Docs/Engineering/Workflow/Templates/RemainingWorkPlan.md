@@ -72,11 +72,11 @@ Fill the decision/check cards. Choose reuse, repair, bounded simplification/reti
 
 **Start when:** the exact supported candidate is available.
 
-{{Package, reproduction, failure and review work still needed, using existing tools and original artifacts. No new collector, runner, report framework or public fault API is implied by a check ID.}}
+{{Only this slice's missing integration/failure/review observations. Reuse the shared candidate/package/source rehearsal for applicable delivery cells; do not prescribe another archive, clean-machine campaign or adoption exercise per feature. Use existing tools and original artifacts; check IDs do not imply a new runner, collector or public fault API.}}
 
 **Exit:** {{existing report and retained artifacts}}, with disposable code/registrations removed and earlier stage cleanup verified. Repairs return to their owner and create a new candidate; final proof is not a feature-expansion or deferred-cleanup stage.
 
-Split step 2 only for a real independent prerequisite or reviewable slice. Every implementation handoff follows Change Lifecycle/Integration and its Stage Source-Style Gate after the final edit, including exact formatter coverage and authored spacing/responsibility review, narrow owner validation and git diff --check. No-source work records source-style N/A with its reason and applicable artifact/docs checks. Record candidate results only in their owning report; remove disposable probes and delivered instructions.
+Omit a separate step 3 when the same selected run already supplies its observations. Supporting work must name a required rendering/reviewer action or demonstrated failure; unselected infrastructure retains no executable implementation prompts. Split step 2 only for a real independent prerequisite or reviewable slice. Every implementation handoff follows Change Lifecycle/Integration and its Stage Source-Style Gate after the final edit, including exact formatter coverage and authored spacing/responsibility review, narrow owner validation and git diff --check. No-source work records source-style N/A with its reason and applicable artifact/docs checks. Record candidate results only in their owning report; remove disposable probes and delivered instructions.
 
 ## First Permitted Prompt
 

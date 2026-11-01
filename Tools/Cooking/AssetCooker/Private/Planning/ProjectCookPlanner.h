@@ -15,11 +15,11 @@ struct ProjectLevelCatalogEntry;
 class ProjectCookPlanner final
 {
 public:
-	static bool TryFindRepositoryRoot(const std::filesystem::path& startPath, std::filesystem::path& outRepositoryRoot);
+	static bool TryFindWorkspaceRoot(const std::filesystem::path& startPath, std::filesystem::path& outWorkspaceRoot);
 	static std::optional<std::string_view> ResolveToolProfile(std::string_view configuration) noexcept;
-	static std::vector<std::string> DiscoverProjects(const std::filesystem::path& repositoryRoot, AssetCookerDiagnostics& diagnostics);
+	static std::vector<std::string> DiscoverProjects(const std::filesystem::path& workspaceRoot, AssetCookerDiagnostics& diagnostics);
 	static bool BuildProjectCookPlan(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    std::string_view projectName,
 	    std::string_view toolProfile,
 	    AssetCookerCategory category,

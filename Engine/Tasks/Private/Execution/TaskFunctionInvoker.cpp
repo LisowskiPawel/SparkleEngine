@@ -7,7 +7,7 @@
 #include <exception>
 #include <format>
 
-TaskResult TaskFunctionInvoker::Invoke(const TaskGraphNode& node, TaskExecutionContext& context)
+TaskResult InvokeTaskFunction(const TaskGraphNode& node, TaskExecutionContext& context)
 {
 	if (!node.Function)
 	{

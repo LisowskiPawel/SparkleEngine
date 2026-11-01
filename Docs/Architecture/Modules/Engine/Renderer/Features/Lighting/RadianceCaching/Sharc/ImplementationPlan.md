@@ -103,7 +103,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Start:** SHARC-S4 and all technical criteria qualified.
 
-**Work:** Finish selector/status/refusal UI/automation, inject allocation/compile/device faults, package exact source/shader/license bytes and execute the documented comparison workflow as the author or agent. Record their original output and any repair/retest.
+**Work:** Finish selector/status/refusal through existing controls and allocation/compile/device fault proof. Join exact source/shader/license bytes to the [shared candidate](../../../../../../../../Acceptance/FirstRelease.md#shared-delivery-evidence) and execute the documented cache comparison in its rehearsal. Retain original output and affected repair/retest; no separate cache package or control surface.
 
 **Cleanup:** Remove sample/test assets, unused dependencies and completed prompts only after evidence is retained; narrow docs to the actual supported subset.
 

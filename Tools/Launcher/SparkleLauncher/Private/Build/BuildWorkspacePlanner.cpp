@@ -1,6 +1,6 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 #include "NativeBuildOutputReset.h"
 #include "BuildWorkspaceProcessRequests.h"
 #include "HostToolInstaller.h"
@@ -8,7 +8,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "SparkleLauncher/ArtifactNaming.h"
 #include "LauncherStatePaths.h"
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "ToolOutputPaths.h"
 
 #include <algorithm>
 #include <optional>
@@ -366,7 +366,7 @@ namespace SparkleLauncher
 		}
 
 		plan.Kind = definition->Kind;
-		plan.RepositoryRoot = request.RepositoryRoot;
+		plan.WorkspaceRoot = request.WorkspaceRoot;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Operation.Inputs.push_back({"content", request.ContentId});
 		plan.Operation.Inputs.push_back({"editorProfile", request.EditorProfile});
@@ -397,17 +397,17 @@ namespace SparkleLauncher
 		{
 			plan.Operation.Inputs.push_back({"hostTool", request.HostToolId});
 		}
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.RepositoryRoot, definition->Id, "Latest.txt");
+		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
 		plan.Request = request;
-		if (!Filesystem::IsSourceWorkspace(request.RepositoryRoot))
+		if (!HasBuildSources(request.WorkspaceRoot))
 		{
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Source workspace operations are unavailable in a portable package.", "Use a source checkout for this operation.");
 			AddReadiness(plan, plan.Operation.Failure->Summary);
 			return plan;
 		}
-		plan.Toolchain = DetectBuildToolchain(request.RepositoryRoot, request.PreferredIde, request.Compiler);
-		plan.Freshness = CheckBuildFilesFreshness(request.RepositoryRoot, plan.Toolchain);
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(request.RepositoryRoot);
+		plan.Toolchain = DetectBuildToolchain(request.WorkspaceRoot, request.PreferredIde, request.Compiler);
+		plan.Freshness = CheckBuildFilesFreshness(request.WorkspaceRoot, plan.Toolchain);
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(request.WorkspaceRoot);
 		plan.SourceDependencies = InspectSourceDependencyCache(workspaceOutputs.DependencyCacheRoot);
 
 		AddReadiness(plan, plan.Toolchain.RequiredToolsAvailable ? "Required toolchain is available." : "Required toolchain is incomplete.");

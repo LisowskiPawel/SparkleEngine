@@ -19,11 +19,10 @@ public:
 	bool IsOpen() const noexcept { return m_isOpen; }
 
 	void RequestFocus() noexcept;
-	void Clear() noexcept;
-	void BuildUI(bool disableInteraction);
 	void BuildContent(bool disableInteraction);
 
 private:
+	void Clear() noexcept;
 	static int HandleInputTextCallback(ImGuiInputTextCallbackData* data);
 	static std::size_t FindCompletionTokenStart(const std::string& input) noexcept;
 	static void ReplaceInputText(ImGuiInputTextCallbackData& data, const std::string& text);

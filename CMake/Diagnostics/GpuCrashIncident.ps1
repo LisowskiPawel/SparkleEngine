@@ -1,6 +1,7 @@
 Set-StrictMode -Version Latest
 
 . (Join-Path $PSScriptRoot '../Packaging/IncidentIdentity.ps1')
+. (Join-Path $PSScriptRoot '../Packaging/PackageVerification.ps1')
 
 function Get-GpuCrashIncident
 {

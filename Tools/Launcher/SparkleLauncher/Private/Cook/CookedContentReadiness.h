@@ -20,5 +20,5 @@ namespace SparkleLauncher
 		CookedShaderPublicationState Shaders = CookedShaderPublicationState::Missing;
 	};
 
-	CookedContentReadiness InspectCookedContentReadiness(const std::filesystem::path& repositoryRoot, std::string_view projectId, std::string_view variant = {});
+	CookedContentReadiness InspectCookedContentReadiness(const std::filesystem::path& workspaceRoot, std::string_view projectId, std::string_view variant = {});
 }

@@ -13,7 +13,7 @@ namespace SparkleLauncher
 {
 	using HostToolInstallAvailability = bool (*)(const BuildToolchainStatus& toolchain);
 	using HostToolInstallRequestFactory =
-	    std::optional<Process::ChildProcessRequest> (*)(const BuildToolchainStatus& toolchain, const std::filesystem::path& repositoryRoot, std::string_view operationId, std::string& errorMessage);
+	    std::optional<Process::ChildProcessRequest> (*)(const BuildToolchainStatus& toolchain, const std::filesystem::path& workspaceRoot, std::string_view operationId, std::string& errorMessage);
 
 	struct HostToolInstallerDefinition final
 	{
@@ -30,7 +30,7 @@ namespace SparkleLauncher
 	std::optional<Process::ChildProcessRequest> BuildHostToolInstallRequest(
 	    std::string_view toolId,
 	    const BuildToolchainStatus& toolchain,
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    std::string_view operationId,
 	    std::string& errorMessage);
 }

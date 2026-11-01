@@ -40,20 +40,18 @@ namespace SparkleLauncher
 
 	LauncherOperationUiModel LauncherUiModelForOperation(const QString& operationId)
 	{
-		if (operationId == "home.quick-start")
+		if (operationId == "levels.browse")
 		{
 			return MakeOperationUiModel(
 			    operationId,
-			    "Quick Start",
-			    "Quick Start",
-			    LauncherWorkflowPageKind::Home,
+			    "Scenes",
+			    "Scenes",
+			    LauncherWorkflowPageKind::Scenes,
 			    LauncherActionImpactKind::None,
 			    {},
 			    "Explore Sparkle",
-			    "Choose a level; Quick Start acquires missing content, prepares build and cook prerequisites, then opens that map using "
-			    "the "
-			    "selected Run Mode.",
-			    "workflow-home-quickstart.png");
+			    "Choose a scene and open Editor or Game using its existing binary and cooked files.",
+			    "workflow-scenes.png");
 		}
 		if (operationId == "levels.run")
 		{
@@ -61,12 +59,12 @@ namespace SparkleLauncher
 			    operationId,
 			    "Run Level",
 			    "Run",
-			    LauncherWorkflowPageKind::Home,
+			    LauncherWorkflowPageKind::Scenes,
 			    LauncherActionImpactKind::LevelAssets,
-			    "Quick Start goal: prepares the selected level and product prerequisites, then opens it using the selected Run Mode.",
+			    "Open the selected level using its existing binary and cooked files. Build and Cook remain explicit developer actions.",
 			    "Open level",
-			    "Uses the level selected from its Quick Start card.",
-			    "workflow-home-quickstart.png");
+			    "Uses the level selected from its scene card.",
+			    "workflow-scenes.png");
 		}
 		if (operationId == "workspace.sync-code")
 		{
@@ -115,7 +113,7 @@ namespace SparkleLauncher
 			    operationId,
 			    "Sync Levels",
 			    "Sync",
-			    LauncherWorkflowPageKind::Home,
+			    LauncherWorkflowPageKind::Scenes,
 			    LauncherActionImpactKind::LevelAssets,
 			    "Levels: syncs or cleans maps and their asset packs without changing code or SDK dependencies.",
 			    "Levels and assets",
@@ -171,7 +169,7 @@ namespace SparkleLauncher
 			    LauncherActionImpactKind::BuildOutputs,
 			    "Build outputs: prepares local cook tools for asset refresh workflows.",
 			    "Build outputs",
-			    "Creates the local cooking tools used by Quick Start and manual cook workflows.",
+			    "Builds the tools used by explicit cook actions.",
 			    "workflow-cook-tools.png");
 		}
 		if (operationId == "cook.all")
@@ -287,8 +285,8 @@ namespace SparkleLauncher
 	{
 		switch (pageKind)
 		{
-			case LauncherWorkflowPageKind::Home:
-				return "Quick Start";
+			case LauncherWorkflowPageKind::Scenes:
+				return "Scenes";
 			case LauncherWorkflowPageKind::Sync:
 				return "Sync";
 			case LauncherWorkflowPageKind::Build:

@@ -33,7 +33,7 @@ namespace SparkleLauncher
 
 	struct LevelRunOperationRequest
 	{
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		std::string ContentId = kDefaultContentId;
 		LevelRunMode RunMode = LevelRunMode::Editor;
 		std::string ProductProfile = "DevelopmentEditor";
@@ -64,7 +64,7 @@ namespace SparkleLauncher
 	struct LevelRunOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		LevelRunOperationRequest Request;
 		std::string TargetName;
 		std::string SessionId;

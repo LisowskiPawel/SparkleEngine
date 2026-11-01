@@ -42,29 +42,7 @@ public:
 		}
 	}
 
-	template <typename PrepareDispatch> void ProcessDeferredEvents(const LayerAvailability& layerAvailability, PrepareDispatch&& prepareDispatch)
-	{
-		if (m_isProcessingDeferredEvents)
-		{
-			return;
-		}
-
-		m_isProcessingDeferredEvents = true;
-		try
-		{
-			std::forward<PrepareDispatch>(prepareDispatch)();
-			ProcessDeferredEventsForType<KeyboardEvent>(layerAvailability);
-			ProcessDeferredEventsForType<MouseButtonEvent>(layerAvailability);
-			ProcessDeferredEventsForType<MouseMoveEvent>(layerAvailability);
-			ProcessDeferredEventsForType<MouseWheelEvent>(layerAvailability);
-		}
-		catch (...)
-		{
-			m_isProcessingDeferredEvents = false;
-			throw;
-		}
-		m_isProcessingDeferredEvents = false;
-	}
+	void ProcessDeferredEvents(const LayerAvailability& layerAvailability);
 
 	void ClearDeferredEvents();
 

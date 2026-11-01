@@ -92,77 +92,47 @@ namespace SparkleLauncher
 		painter.drawPixmap(targetRect.toRect(), scaled, cropRect);
 	}
 
-	LauncherArtworkSpec LauncherArtworkSpec::ForPreset(LauncherArtworkPreset preset)
+	LauncherArtworkSpec LauncherArtworkSpec::ForSceneHero()
 	{
 		LauncherArtworkSpec spec;
 		spec.BaseColor = HeroColor();
 		spec.AspectRatio = 16.0 / 9.0;
 
-		switch (preset)
-		{
-			case LauncherArtworkPreset::HeroPanorama:
-				spec.AspectRatio = static_cast<double>(LauncherUi::Hero::DesignWidth) / static_cast<double>(LauncherUi::Hero::DesignHeight);
+		spec.AspectRatio = static_cast<double>(LauncherUi::Hero::DesignWidth) / static_cast<double>(LauncherUi::Hero::DesignHeight);
 
-				spec.AccentLineX = static_cast<double>(LauncherUi::Hero::CopyDividerX) / static_cast<double>(LauncherUi::Hero::DesignWidth);
-				spec.AccentLineColor = AccentColor(105);
-				spec.AccentLineWidth = 1.0;
+		spec.AccentLineX = static_cast<double>(LauncherUi::Hero::CopyDividerX) / static_cast<double>(LauncherUi::Hero::DesignWidth);
+		spec.AccentLineColor = AccentColor(105);
+		spec.AccentLineWidth = 1.0;
 
-				AddLayer(
-				    spec.Layers,
-				    LauncherArtworkGradientAxis::Horizontal,
-				    {
-				        {0.00, NeutralShade(132)},
-				        {0.52, NeutralShade(72)},
-				        {1.00, NeutralShade(0)},
-				    },
-				    QRectF(0.0, 0.0, spec.AccentLineX, 1.0));
+		AddLayer(
+		    spec.Layers,
+		    LauncherArtworkGradientAxis::Horizontal,
+		    {
+		        {0.00, NeutralShade(132)},
+		        {0.52, NeutralShade(72)},
+		        {1.00, NeutralShade(0)},
+		    },
+		    QRectF(0.0, 0.0, spec.AccentLineX, 1.0));
 
-				AddLayer(
-				    spec.Layers,
-				    LauncherArtworkGradientAxis::Horizontal,
-				    {
-				        {0.00, NeutralShade(0)},
-				        {1.00, NeutralShade(84)},
-				    },
-				    QRectF(0.80, 0.0, 0.20, 1.0));
+		AddLayer(
+		    spec.Layers,
+		    LauncherArtworkGradientAxis::Horizontal,
+		    {
+		        {0.00, NeutralShade(0)},
+		        {1.00, NeutralShade(84)},
+		    },
+		    QRectF(0.80, 0.0, 0.20, 1.0));
 
-				AddLayer(
-				    spec.TopLayers,
-				    LauncherArtworkGradientAxis::Vertical,
-				    {
-				        {0.00, SurfaceShade(0)},
-				        {0.50, SurfaceShade(0)},
-				        {0.70, SurfaceShade(50)},
-				        {0.86, SurfaceShade(172)},
-				        {1.00, SurfaceShade(255)},
-				    });
-
-				break;
-
-			case LauncherArtworkPreset::WorkflowBanner:
-				spec.AspectRatio = 2.4;
-
-				AddLayer(
-				    spec.Layers,
-				    LauncherArtworkGradientAxis::Horizontal,
-				    {
-				        {0.00, NeutralShade(64)},
-				        {0.30, NeutralShade(28)},
-				        {0.74, NeutralShade(8)},
-				        {1.00, NeutralShade(0)},
-				    });
-
-				AddLayer(
-				    spec.Layers,
-				    LauncherArtworkGradientAxis::Vertical,
-				    {
-				        {0.00, NeutralShade(0)},
-				        {0.58, NeutralShade(0)},
-				        {1.00, NeutralShade(56)},
-				    });
-
-				break;
-		}
+		AddLayer(
+		    spec.TopLayers,
+		    LauncherArtworkGradientAxis::Vertical,
+		    {
+		        {0.00, SurfaceShade(0)},
+		        {0.50, SurfaceShade(0)},
+		        {0.70, SurfaceShade(50)},
+		        {0.86, SurfaceShade(172)},
+		        {1.00, SurfaceShade(255)},
+		    });
 
 		return spec;
 	}

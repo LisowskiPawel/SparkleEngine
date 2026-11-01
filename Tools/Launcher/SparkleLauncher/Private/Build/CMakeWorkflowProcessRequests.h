@@ -11,26 +11,26 @@
 namespace SparkleLauncher
 {
 	Process::ChildProcessRequest MakeCMakeConfigureRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view logFileName);
 
 	Process::ChildProcessRequest MakeCMakeDependencySyncRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view sourceDependencyId,
 	    std::string_view logFileName);
 
 	Process::ChildProcessRequest MakeCMakeLauncherConfigureRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view logFileName);
 
 	Process::ChildProcessRequest MakeCMakeBuildRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view profileName,
@@ -38,7 +38,7 @@ namespace SparkleLauncher
 	    std::string_view logFileName);
 
 	Process::ChildProcessRequest MakeCMakeLauncherBuildRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view profileName,

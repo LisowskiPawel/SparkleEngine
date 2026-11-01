@@ -13,7 +13,7 @@ namespace SparkleLauncher
 		QVector<QString> OperationIds;
 	};
 
-	QString LauncherHomeOperationId();
+	QString LauncherScenesOperationId();
 	QVector<LauncherWorkflowDefinition> CreateLauncherWorkflowCatalog();
 	QString LauncherOperationDisplayNameOverride(const QString& operationId);
 	QString LauncherOperationImpactText(const QString& operationId);

@@ -9,7 +9,7 @@
 #include "Cooking/ShaderCookPlanner.h"
 #include "Cooking/ShaderCookSettings.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 
 #include <algorithm>
 #include <format>
@@ -134,7 +134,7 @@ static void BuildDependencyManifest(ShaderCookPipelinePlan& plan)
 	if (!plan.dependencyManifest.MatchesShaderTypes(plan.registeredShaderTypes))
 	{
 		throw Diagnostics::Error(
-		    "Shader dependency metadata does not cover the current registered catalog. Run RecompileShaders Global to rebuild all "
+		    "Shader dependency metadata does not cover the current registered catalog. Use Launcher Cook shaders (full) to rebuild all "
 		    "shaders.");
 	}
 }

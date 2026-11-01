@@ -79,7 +79,7 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::Execute(std:
 	taskContext.Bind(node.Desc.Lane, cancellation);
 
 	const TaskResult result = blocked && node.Desc.CompletionPolicy == TaskCompletionPolicy::Normal ? TaskResult::Cancelled("Task execution was cancelled or a prerequisite did not succeed.")
-	                                                                                                : TaskFunctionInvoker::Invoke(node, taskContext);
+	                                                                                                : InvokeTaskFunction(node, taskContext);
 
 	RecordTaskResult(index, node, result);
 	TaskProfiler::End(node.Desc, m_generation, index, worker.LaneWorkerIndex, result, taskStart);

@@ -8,6 +8,37 @@
 #include "Scene/Meshes/SkeletalCookedMesh.h"
 
 #include <algorithm>
+#include <limits>
+
+std::uint64_t GpuMeshPreparation::CalculateDecodedByteSize(const ImmutableRenderMeshHandle& source)
+{
+	if (!source.IsValid())
+	{
+		throw Diagnostics::Error("GPU mesh preparation received an invalid source handle.");
+	}
+	const MeshData& mesh = source.GetResource()->GetMeshData();
+	std::uint64_t bytes = 0;
+	const auto add = [&bytes](std::size_t count, std::size_t elementSize)
+	{
+		if (count > ((std::numeric_limits<std::uint64_t>::max)() - bytes) / elementSize)
+		{
+			throw Diagnostics::Error("GPU mesh preparation exceeds the host byte range.");
+		}
+		bytes += count * elementSize;
+	};
+	add(mesh.vertices.size(), sizeof(RayTracingHitVertex));
+	add(mesh.indices.size(), sizeof(std::uint32_t));
+	add(mesh.vertices.size(), sizeof(VertexSkinInfluenceData));
+	if (const auto* skeletal = dynamic_cast<const SkeletalCookedMesh*>(source.GetResource().get()))
+	{
+		add(skeletal->GetSkeletalMeshData().skinInfluences.size(), sizeof(VertexSkinInfluence));
+		for (const MeshMorphTarget& target : skeletal->GetSkeletalMeshData().morphTargets)
+		{
+			add(target.deltas.size(), sizeof(MorphTargetDeltaData));
+		}
+	}
+	return bytes;
+}
 
 std::uint64_t GpuMeshPreparedData::GetDecodedByteSize() const noexcept
 {

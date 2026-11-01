@@ -40,19 +40,9 @@ ConsoleCommandRegistry& EditorConsoleSystem::GetCommandRegistry() noexcept
 	return *m_commandRegistry;
 }
 
-void EditorConsoleSystem::SubmitLine(std::string_view line)
-{
-	m_session->SubmitLine(line);
-}
-
 void EditorConsoleSystem::AppendOutput(ConsoleOutputRecord record)
 {
 	m_session->Append(std::move(record));
-}
-
-void EditorConsoleSystem::RequestConsoleFocus() noexcept
-{
-	OpenConsole();
 }
 
 void EditorConsoleSystem::OpenConsole() noexcept
@@ -76,11 +66,6 @@ bool EditorConsoleSystem::HandleShortcut(std::uint32_t message, std::uintptr_t k
 		return true;
 	}
 	return false;
-}
-
-void EditorConsoleSystem::BuildUI(bool disableInteraction)
-{
-	m_consolePanel->BuildUI(disableInteraction);
 }
 
 float EditorConsoleSystem::GetDockHeight(float availableHeight) noexcept

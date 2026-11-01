@@ -22,7 +22,7 @@
 | scene inspection/editing | outliner plus typed camera/light/mesh/sky/variant commands with generation checks | not a full content/model/material authoring environment |
 | history | command-based undo/redo for owned world edits | multi-document persistence and conflict behavior unproved |
 | rendering controls | viewport camera, display/settings controls, diagnostics, console, and capture | requested/active feature truth and per-viewport isolation still need evidence |
-| developer operations | shader recook and mesh/texture diagnostic tools through editor host services | workspace/tool availability and cancellation remain product constraints |
+| developer operations | explicit shader recompile/symbol-export requests, reload and mesh/texture inspection through editor host services | workspace/tool availability and cancellation remain product constraints |
 
 ```mermaid
 flowchart LR
@@ -69,7 +69,17 @@ have source/build evidence only.
 
 The Console starts collapsed. Its footer button, `~` outside text input, or `Window > Console` opens and focuses it; focused `Esc` closes it without discarding scrollback/history. These are source contracts, not interactive, DPI or shutdown acceptance.
 
-Shader inspection and mesh preview source ownership was reconciled on 2026-10-25. Private `Shaders/ShaderArtifactInspection` owns selected-artifact loading, text cache invalidation, and missing-file messages; `UsedShadersPanel` retains shader selection, actions, and tabs. Private `Panels/Diagnostics/MeshPreview` owns bounds, projection, triangle traversal, and preview drawing; `UsedMeshesPanel` retains selection, preview controls, and the diagnostic-provider binding. These are source and build boundaries, not interactive or visual acceptance.
+Shader inspection and mesh preview source ownership was reconciled on 2026-10-25. Private `Shaders/ShaderExportInspection` owns shader-export discovery, bundle validation, text loading, invalidation and missing-file messages; `ShaderToolsPanel` retains shader selection, actions, and tabs. Its registered-shader model is Editor-private; shader names are presentation and the stable shader type ID owns selection. Inspection accepts only a shader-export directory, caches that directory's optional text result and runs once after selection/refresh actions. It does not consume the panel's row type or duplicate shader identity. The table does not claim an active backend/target from a hardcoded compiler default. Private `Panels/Diagnostics/MeshPreview` owns bounds, projection, triangle traversal, and preview drawing; `UsedMeshesPanel` retains selection, preview controls, and the diagnostic-provider binding. These are source and build boundaries, not interactive or visual acceptance.
+
+**Host boundary, 2026-11-01:** Application appends output through `UI::AppendConsoleOutput`; the console controller, registry and session stay Editor-private. Capture operations return optional output records and composition chooses when to reveal the console. The docked console is the sole presentation path. Settings forwards the supplied restart action: Application closes its window only after Core successfully relaunches the process with its current command line and working directory. There is no allocated Editor restart service or Editor-owned argument encoder.
+
+Editor publicly depends on Core values, Renderer contracts, GameFramework read/edit contracts and the RHI capture types exposed by its overlay contract. Platform and ImGui are private dependencies; forward-declared window/input references do not require exporting Platform's implementation dependency.
+
+**Texture inspection boundary, 2026-11-01:** the texture panel consumes the live Renderer diagnostic snapshot for names, cooked paths, format, residency and previews. Current texture products provide no authored-source metadata. The panel therefore presents the cooked key directly without discovering, parsing or caching obsolete cooker summaries. Mesh metadata continues to come from its supported cooked sidecar; compiler-artifact inspection reads outputs still produced by ShaderCompiler. This source cleanup does not establish interactive or visual acceptance.
+
+### Explicit Shader Compilation
+
+Shader Tools exposes Recompile Shaders and Generate shader symbols; the console equivalent is `CompileShaders [symbols]`. The panel owns selection, requested options and presented status. Application owns one existing operation slot, admits one request at a time, settles it on close and reloads only on success. Showcase supplies the tooling action that invokes Launcher `cook.shaders`; Launcher owns tool/profile/argument/log policy and ShaderCompiler owns compilation, private symbols and publication. `Reload Cooked`/`ReloadShaders` consume existing outputs independently. There is no source watcher, completion receipt or second compiler/publication path. The [candidate report](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) records executable coverage and limits.
 
 ### Rendering Settings Ownership
 
@@ -112,7 +122,7 @@ This source separation was reconciled on 2026-10-04; it does not establish runti
 | `ED-014` | View modes | Implemented path | Top panel exposes the Renderer view-mode catalog, including lit and diagnostic modes. Exact 16-mode semantics/availability live in [Debug Views](../Renderer/Features/DebugViews/DebugViewsDesign.md). | `S` |
 | `ED-015` | Exposure overrides | Implemented path | Per-viewport manual/automatic exposure controls override view presentation without changing scene state. | `S` |
 | `ED-016` | Rendering settings | Implemented path | Separate searchable Display, Exposure, and Tone Mapping categories expose presentation/device controls, exposure/metering/adaptation, and the tone mapper respectively. Upscaling and Ray Reconstruction remain separate. Ray Tracing Scene keeps TLAS refit outside a PTLAS subgroup; the subgroup retains its enable toggle and hides partition tuning when disabled. PTLAS defaults off; saved choices are preserved. Vignette and chromatic aberration use dedicated passes with approved defaults; their widgets are deferred. Color grading and frame generation remain absent. Apply/restart behavior follows each setting owner. | `S` |
-| `ED-017` | Restart service | Implemented path | Settings can request an editor restart when a process-level setting requires it. Recovery/session restoration is not a current documented capability. | `S` |
+| `ED-017` | Restart request | Implemented path | Settings requests restart through the host action. Application closes only after successful process relaunch; failure leaves the current host open and reports an error. Recovery/session restoration is not a current documented capability. | `S` |
 | `ED-018` | Viewport capture | Implemented path | File menu queues a viewport capture through Application/Renderer coordination. The console shows admission/readback/write failure, cancellation or the saved path. Format/path/content correctness remains candidate evidence. | `S` |
 
 ## Developer Tools
@@ -120,7 +130,7 @@ This source separation was reconciled on 2026-10-04; it does not establish runti
 | ID | Capability | State | Exact current coverage and limit | Evidence |
 | --- | --- | --- | --- | --- |
 | `ED-019` | Editor console | Implemented path | Tilde shortcut opens a scoped console with parsing, history, autocomplete, output severity, built-in commands, and host-registered render/shader commands. | `S` |
-| `ED-020` | Shader tools | Capability-gated | Lists registered/cooked generation rows; filters; shows source, reflection, disassembly, parameter match, and compile request artifacts; reloads generation; recooks all or selected shader. Requires workspace source/tools. | `S` |
+| `ED-020` | Shader tools | Capability-gated | Lists registered/cooked generation rows; filters; shows source, reflection, disassembly, parameter match, and compile request artifacts; reloads existing generation. Compilation runs in Launcher; inspection needs only its available runtime/debug products. | `S` |
 | `ED-021` | Mesh diagnostics | Implemented path | Filterable used-mesh table with source/identity, CPU/GPU load and byte estimates, instancing summary, and local preview controls/geometry. Values are diagnostics, not profiler-certified truth. | `S` |
 | `ED-022` | Texture diagnostics | Implemented path | Filterable used-texture table with source/path, format/dimensions/mips, residency and byte estimates, selection inspector, and preview. | `S` |
 | `ED-023` | Memory/renderer diagnostics | Implemented path | Host wires Renderer memory/mesh/texture/shader providers to UI. External capture and performance authority remain outside the editor. | `S` |
@@ -131,6 +141,8 @@ This source separation was reconciled on 2026-10-04; it does not establish runti
 World publishes immutable read view/change sequence -> `EditorSceneModelBuilder` creates presentation rows -> user selects an object -> inspector creates forward and inverse typed commands -> transaction history submits with current world generation -> GameWorld queues and commits accepted edits -> change journal advances -> editor rebuilds affected presentation -> Renderer receives the resulting structural/dynamic publication. Undo runs the stored inverse through the same path.
 
 ## Product Journey Changes
+
+**Shader preparation boundary, 2026-11-01:** use Launcher Cook for shader generation. Editor retains the shader inspection panel and explicit Reload Cooked/`ReloadShaders` over the same files. Its compiler launch, automatic source watch, recook queue and completion-signal parser are deleted. Renderer generation/ABI validation remains authoritative. [Source checks](../../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json) remain separate from affected interactive/archive acceptance.
 
 The PD-1 route includes Help > Controls, File > Quit, level-operation status and Reset rendering defaults. Transient status is viewport-bounded and drawn after the workspace; a new failure receives focus without taking it every frame. Dedicated vignette/chromatic aberration passes retain approved defaults; effect widgets are deferred. Failed settings writes retain accepted state and show the error; reopening Settings preserves restart-required state. The existing shared settings capture/apply owner remains authoritative. [Candidate checks](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) record which journeys passed.
 
@@ -144,8 +156,8 @@ Sparkle Editor is a **required shipped product** for `v0.1.0`, currently impleme
 | --- | --- | --- |
 | `AC-PROD04-01` | A standard user can launch packaged Sparkle Editor without a source checkout or undeclared SDK, start Empty, and open each selected/synced release map with its expected identity, scene/camera, geometry/material bindings and presented viewport. Crashes, blank frames and wrong/missing content fail; lighting quality remains in renderer/release gates. A source adopter can build `ShowcaseEditor` through the documented toolchain. Workspace/helpers are explicit and owned operations settle within the frozen Editor budget. | PD-1 source journey; PD-2 adopter; PD-3 installed journey |
 | `AC-PROD04-02` | For one admitted authored level, open -> inspect -> supported typed edit -> undo -> redo -> explicit Save All -> reload produces the expected world/source result; only explicit Save All may mutate the selected `.level` source. | PD-1 disposable authored level; PD-3 selected-content store |
-| `AC-PROD04-03` | Missing source/tool/shader/cooked content, stale world generation, rejected edit, failed save, cancelled recook/capture, and restart-required setting remain distinguishable and preserve the previous accepted world/source/generation. | PD-1 source faults; PD-3 packaged equivalents |
-| `AC-PROD04-04` | Game component/import inspection contains no Editor linkage, UI, shader-recook/capture operation or Editor-only dependency. The separate Editor component is present in the three-product bundle and its declared helpers are verified against the manifest. | PD-1 link boundary; PD-3 component/helper inventory |
+| `AC-PROD04-03` | Missing required shader/cooked content, unavailable optional inspection artifacts, stale world generation, rejected edit, failed save, cancelled capture, and restart-required setting remain distinguishable and preserve the previous accepted world/source/generation. | PD-1 source faults; PD-3 packaged equivalents |
+| `AC-PROD04-04` | Game component/import inspection contains no Editor linkage, UI or Editor capture operation or Editor-only dependency. The separate Editor component is present in the three-product bundle and its declared helpers are verified against the manifest. | PD-1 link boundary; PD-3 component/helper inventory |
 
 | ID | Cause/injection, safe result, and affected criterion |
 | --- | --- |

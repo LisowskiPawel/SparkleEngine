@@ -2,6 +2,7 @@
 #include "Scene/RenderScene.h"
 
 #include "Meshes/GpuMeshCache.h"
+#include "Textures/TextureCache.h"
 #include "Scene/GpuScene/GpuSceneSlotAllocator.h"
 #include "Scene/GpuScene/RenderGpuScene.h"
 #include "Scene/RayTracing/RenderRayTracingScene.h"
@@ -205,7 +206,7 @@ void RenderScene::PublishResources(const RenderSceneDelta& delta)
 	}
 	if (delta.Textures)
 	{
-		m_textures = *delta.Textures;
+		m_textureCache->SynchronizeSceneTextures(*delta.Textures);
 	}
 	if (delta.Sky.Published)
 	{

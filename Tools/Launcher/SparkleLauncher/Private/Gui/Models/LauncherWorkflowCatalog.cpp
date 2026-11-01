@@ -4,15 +4,15 @@
 
 namespace SparkleLauncher
 {
-	QString LauncherHomeOperationId()
+	QString LauncherScenesOperationId()
 	{
-		return "home.quick-start";
+		return "levels.browse";
 	}
 
 	QVector<LauncherWorkflowDefinition> CreateLauncherWorkflowCatalog()
 	{
 		return {
-		    {LauncherWorkflowPageKind::Home, {LauncherHomeOperationId()}},
+		    {LauncherWorkflowPageKind::Scenes, {LauncherScenesOperationId()}},
 		    {LauncherWorkflowPageKind::Sync, {"workspace.sync-code"}},
 		    {LauncherWorkflowPageKind::Build, {"workspace.build"}},
 		    {LauncherWorkflowPageKind::Cook, {"cook.workspace"}},

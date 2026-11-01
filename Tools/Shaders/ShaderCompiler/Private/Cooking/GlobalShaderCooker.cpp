@@ -5,10 +5,9 @@
 #include "Backend/ShaderBackendPool.h"
 #include "Cooking/ShaderArtifactPublication.h"
 #include "Cooking/ShaderCompileBatch.h"
-#include "Cooking/ShaderCookCancellation.h"
 #include "Cooking/ShaderCookPlanBuilder.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 
 #include <span>
 
@@ -49,7 +48,6 @@ ShaderCookResult CookGlobalShaders(const ShaderCookSettings& settings, const Too
 	}
 	PrepareShaderProducts(plan, compileResults);
 
-	ThrowIfShaderCookCancelled(settings.cancellationSignalPath);
 	if (progress)
 	{
 		progress({.Action = "Publishing cooked shaders", .Completed = totalWork - 1, .Total = totalWork});

@@ -1,9 +1,6 @@
 include(${CMAKE_SOURCE_DIR}/CMake/SparkleHostTool.cmake)
+add_subdirectory(Support/ToolSupport)
 add_subdirectory(Launcher/SparkleLauncher)
-
-if(SPARKLE_ENABLE_CONTENT_PIPELINE OR SPARKLE_ENABLE_SHADER_COMPILER)
-	add_subdirectory(Support/ToolConsoleSupport)
-endif()
 
 if(SPARKLE_ENABLE_CONTENT_PIPELINE)
 	add_subdirectory(Cooking/TextureCooker)

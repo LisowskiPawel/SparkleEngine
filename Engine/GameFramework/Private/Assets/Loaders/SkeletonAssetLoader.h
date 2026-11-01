@@ -6,11 +6,12 @@
 
 namespace Assets
 {
+	class CookedAssetAllocationBudget;
 	struct LoadedSkeletonAsset;
 
 	class SkeletonAssetLoader final
 	{
 	public:
-		LoadedSkeletonAsset Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes) const;
+		LoadedSkeletonAsset Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const;
 	};
 }

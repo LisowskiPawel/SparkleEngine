@@ -6,12 +6,13 @@
 
 #include "EditorWorkspaceLayout.h"
 #include "Console/EditorConsoleSystem.h"
+#include "Core/Public/Console/ConsoleCommandRegistry.h"
 #include "Panels/MainMenuBarPanel.h"
 #include "Panels/SceneInspectorPanel.h"
 #include "Panels/SceneOutlinerPanel.h"
 #include "Panels/SettingsPanel.h"
 #include "Panels/UsedMeshesPanel.h"
-#include "Panels/UsedShadersPanel.h"
+#include "Panels/ShaderToolsPanel.h"
 #include "Panels/UsedTexturesPanel.h"
 #include "Panels/ViewportPanel.h"
 #include "Viewport/ViewportToolbar.h"
@@ -20,7 +21,6 @@
 #include "Scene/Model/EditorSceneModel.h"
 #include "Scene/Model/EditorSceneModelBuilder.h"
 #include "Scene/Transactions/EditorTransactionHistory.h"
-#include "Settings/EditorRestartService.h"
 #include "Style/SparkleUiTheme.h"
 #include "Viewport/EditorViewportSession.h"
 
@@ -52,32 +52,50 @@ void UI::Implementation::InitializeConsole(CVarControlExecutor&& consoleVariable
 {
 	m_consoleVariables = std::move(consoleVariables);
 	m_editorConsoleSystem = std::make_unique<EditorConsoleSystem>(m_consoleVariables);
+
+	m_editorConsoleSystem->GetCommandRegistry().Register(
+	    ConsoleCommandDescriptor{
+	        .Name = "CompileShaders",
+	        .Help = "Recompile through Launcher, then reload on success. Optional symbols exports private debug data.",
+	        .ArgumentSyntax = "[symbols]",
+	        .Scope = ConsoleCommandScope::Editor,
+	        .Execute = [this](ConsoleCommandScope, std::span<const std::string_view> arguments)
+	        {
+		        if (arguments.size() > 1 || (!arguments.empty() && arguments.front() != "symbols"))
+		        {
+			        return ConsoleCommandResult::Error("Usage: CompileShaders [symbols]");
+		        }
+		        return m_shaderToolsPanel->RequestCompile(!arguments.empty());
+	        }});
+
+	m_editorConsoleSystem->GetCommandRegistry().Register(
+	    ConsoleCommandDescriptor{
+	        .Name = "ReloadShaders",
+	        .Help = "Reloads the existing cooked shader files. Build/Cook runs in Launcher.",
+	        .Scope = ConsoleCommandScope::Editor,
+	        .Execute = [this](ConsoleCommandScope, std::span<const std::string_view>)
+	        {
+		        m_shaderReloadRequested = true;
+		        return ConsoleCommandResult::Success("Shader reload requested.");
+	        }});
 }
 
-void UI::Implementation::InitializeWorkspace()
+void UI::Implementation::InitializeWorkspace(std::function<void()> requestRestart)
 {
-	InitializeCorePanels();
+	InitializeCorePanels(std::move(requestRestart));
 	InitializeViewport();
 	InitializeAssetPanels();
 	InitializeScenePanels();
 }
 
-void UI::Implementation::InitializeCorePanels()
+void UI::Implementation::InitializeCorePanels(std::function<void()> requestRestart)
 {
 	m_mainMenuBar = std::make_unique<MainMenuBarPanel>(m_levelSession, m_window);
 	ConfigureMainMenuBarWindowActions();
-	m_restartService = std::make_unique<EditorRestartService>();
 	m_settingsPanel = std::make_unique<SettingsPanel>();
 	m_settingsPanel->SetRenderingSettings(m_renderingSettings.get());
 
-	m_settingsPanel->SetRestartHandler(
-	    [this]()
-	    {
-		    if (m_window != nullptr && m_restartService != nullptr)
-		    {
-			    (void) m_restartService->Restart(*m_window);
-		    }
-	    });
+	m_settingsPanel->SetRestartHandler(std::move(requestRestart));
 }
 
 void UI::Implementation::InitializeViewport()
@@ -90,24 +108,14 @@ void UI::Implementation::InitializeViewport()
 
 void UI::Implementation::InitializeAssetPanels()
 {
-	m_usedShadersPanel = std::make_unique<UsedShadersPanel>();
-	m_usedShadersPanel->SetGenerationProvider(m_shaderGenerationProvider);
+	m_shaderToolsPanel = std::make_unique<ShaderToolsPanel>();
+	m_shaderToolsPanel->SetGenerationProvider(m_shaderGenerationProvider);
 	m_usedMeshesPanel = std::make_unique<UsedMeshesPanel>();
 	m_usedMeshesPanel->SetDiagnosticsProvider(m_meshDiagnosticsProvider);
 	m_usedMeshesPanel->SetPreviewGeometryProvider(m_meshPreviewProvider);
 	m_usedTexturesPanel = std::make_unique<UsedTexturesPanel>();
 	m_usedTexturesPanel->SetDiagnosticsProvider(m_textureDiagnosticsProvider);
-	m_usedShadersPanel->SetReloadHandler([this]() { m_shaderReloadRequested = true; });
-	m_usedShadersPanel->SetRecookAllHandler([this]() { m_shaderRecookRequested = true; });
-
-	m_usedShadersPanel->SetRecookHandler(
-	    [this](const std::string& shaderId)
-	    {
-		    if (m_editorConsoleSystem)
-		    {
-			    m_editorConsoleSystem->SubmitLine("RecompileShaders Shader " + shaderId);
-		    }
-	    });
+	m_shaderToolsPanel->SetReloadHandler([this]() { m_shaderReloadRequested = true; });
 }
 
 void UI::Implementation::InitializeScenePanels()
@@ -132,9 +140,9 @@ void UI::Implementation::ConfigureMainMenuBarWindowActions()
 	m_mainMenuBar->SetShaderToolsOpenHandler(
 	    [this]()
 	    {
-		    if (m_usedShadersPanel)
+		    if (m_shaderToolsPanel)
 		    {
-			    m_usedShadersPanel->SetOpen(true);
+			    m_shaderToolsPanel->SetOpen(true);
 		    }
 	    });
 

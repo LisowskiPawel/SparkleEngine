@@ -77,7 +77,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 		TryParseWorkspaceIde(request.WorkspaceIde.toStdString(), workspaceIde);
 		WorkspaceCompiler workspaceCompiler = WorkspaceCompiler::Msvc;
 		TryParseWorkspaceCompiler(request.WorkspaceCompiler.toStdString(), workspaceCompiler);
-		mapped.RepositoryRoot = request.RepositoryRoot;
+		mapped.WorkspaceRoot = request.WorkspaceRoot;
 		mapped.ContentId = request.ContentId.toStdString();
 		mapped.EditorProfile = request.EditorProfile.toStdString();
 		mapped.GameProfile = request.GameProfile.toStdString();
@@ -92,7 +92,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 	LevelOperationRequest Levels(const LauncherOperationRequest& request)
 	{
 		LevelOperationRequest mapped;
-		mapped.RepositoryRoot = request.RepositoryRoot;
+		mapped.WorkspaceRoot = request.WorkspaceRoot;
 		mapped.ContentId = request.ContentId.toStdString();
 		mapped.RequestedLevelIds = SplitList(request.RequestedLevelIds);
 		return mapped;
@@ -101,7 +101,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 	LevelRunOperationRequest LevelRun(const LauncherOperationRequest& request)
 	{
 		LevelRunOperationRequest mapped;
-		mapped.RepositoryRoot = request.RepositoryRoot;
+		mapped.WorkspaceRoot = request.WorkspaceRoot;
 		mapped.ContentId = request.ContentId.toStdString();
 		mapped.RunMode = request.RunMode == "game" ? LevelRunMode::Game : LevelRunMode::Editor;
 		mapped.ProductProfile = mapped.RunMode == LevelRunMode::Game ? request.GameProfile.toStdString() : request.EditorProfile.toStdString();
@@ -120,18 +120,19 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 	CookOperationRequest Cook(const LauncherOperationRequest& request)
 	{
 		CookOperationRequest mapped;
-		mapped.RepositoryRoot = request.RepositoryRoot;
+		mapped.WorkspaceRoot = request.WorkspaceRoot;
 		mapped.ContentId = request.ContentId.toStdString();
 		mapped.GameProfile = request.GameProfile.toStdString();
 		mapped.SelectedScopes = ParseCookScopes(request.CookScopes);
 		mapped.ShaderBackend = request.ShaderBackend.toStdString();
+		mapped.ShaderEnableDebugInfo = request.ShaderSymbols;
 		return mapped;
 	}
 
 	MaintenanceOperationRequest Maintenance(const LauncherOperationRequest& request)
 	{
 		MaintenanceOperationRequest mapped;
-		mapped.RepositoryRoot = request.RepositoryRoot;
+		mapped.WorkspaceRoot = request.WorkspaceRoot;
 		mapped.ContentId = request.ContentId.toStdString();
 		mapped.EditorProfile = request.EditorProfile.toStdString();
 		mapped.RequestedCleanScope = ParseCleanScope(request.CleanScope);

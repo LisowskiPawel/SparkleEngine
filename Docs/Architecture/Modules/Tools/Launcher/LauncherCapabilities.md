@@ -4,9 +4,9 @@
 
 **Status:** capability snapshot; current, but not workflow success or distribution evidence
 
-**Snapshot:** 2026-10-04 against base revision `26803f97` with the current Launcher change applied; Launcher public contracts, planners/executors, Qt GUI, shell path, capability graph, dependencies, level catalog, state paths, process handoff/progress decoding, clean containment, and CMake membership inspected; evidence `S` only
+**Snapshot:** 2026-10-04 against base revision `26803f97` with subsequent source amendments below; Launcher public contracts, planners/executors, Qt GUI, shell path, dependencies, level catalog, state paths, process handoff/progress decoding, clean containment, and CMake membership inspected; evidence `S` only
 
-**Scope:** portfolio presentation and reproducible source/product entry through repository discovery, toolchain/dependency readiness, configure/build, cooking, selected content, previews, running products, cleaning, quick start, operation history, cancellation, and GUI/shell access
+**Scope:** portfolio presentation and reproducible source/product entry through repository discovery, toolchain/dependency readiness, configure/build, cooking, selected content, previews, running products, cleaning, direct scene launch, operation history, cancellation, and GUI/shell access
 
 **Owner:** `Tools/Launcher/SparkleLauncher` / `SparkleLauncherCore` and `SparkleLauncher`; entry paths are resolved by [LauncherRootResolver](../../../../../Tools/Launcher/SparkleLauncher/Private/Core/LauncherRootResolver.cpp) and [ProjectResolver](../../../../../Tools/Launcher/SparkleLauncher/Private/Core/ProjectResolver.cpp).
 
@@ -16,7 +16,7 @@
 
 Source ownership reconciled on 2026-10-06: maintenance core `BuildLevelCleanPaths` selects extracted level cleanup paths, walks parent packs, deduplicates targets, and retains parents used by other selected levels. Qt converts those path specifications for preview and submits the existing maintenance operation. Cached source archives remain outside the selected paths; catalog validation and maintenance containment still guard the paths before removal. This is source ownership evidence, not destructive-operation acceptance.
 
-The 2026-10-10 external-capture change adds **GPU Capture** beside **Graphics API** in the footer: None, Nsight Graphics, PIX, RenderDoc. Private capture discovery scans standard installed tool locations without SDK loading and reuses cached host GPU discovery. Known options remain visible with setup or unsupported-context reasons. Existing typed level-run preflight and process lowering recheck one selection and emit its explicit startup token for eligible Editor; Game/Shipping cannot enable it. The [capture owner](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/ExecutionArchitecture.md#implemented-editor-viewport-composition) defines the boundary and retained proof limits. This does not increase the Launcher readiness projection.
+**Launch controls (2026-11-01):** the footer places **Shader Compiler** between **Graphics API** and a compact, fixed-width **GPU Capture** selector: None, Nsight Graphics, PIX, RenderDoc. **GPU Crash Debugging** follows capture with one Enabled checkbox: checked selects Aftermath and unchecked selects Off. Its `...` button opens shader-export, incident and inspector controls instead of repeating the form on Scenes/Run. Private capture discovery scans installed tool locations without SDK loading and reuses cached host GPU discovery. Setup reasons and Nsight's experimental SDK status remain in option tooltips. Existing typed level-run preflight and process lowering recheck capture eligibility, diagnostic inputs and conflicts. The [capture owner](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/ExecutionArchitecture.md#implemented-editor-viewport-composition) defines retained proof limits; the [GPU crash route](../../../CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#launch-and-inspection-route) owns diagnostic preparation. This presentation adds no native GPU or release qualification and does not increase Launcher readiness.
 
 **Product vocabulary:** Editor and Game are the only project roles. Game uses `--game-profile`, `workspace.build.game`, the `game` build scope and `ShowcaseGame`; old product spellings are rejected. Asset-pack eligibility uses `GameSupported` and `GameBlocker` throughout the catalog and consumers.
 
@@ -33,17 +33,34 @@ The source and negative controls are recorded in [current FR-01 results](../../.
 
 The 2026-10-25 settings cleanup keeps Qt settings limited to controls with current callers. GUI cooking uses the operation core's incremental mode and shader defaults; explicit Force cooking and confirmation remain available through the shell/core contracts. Clean consent belongs to the individual request rather than persistent settings. Unused generic widget builders and the unconnected operation-preview signal path are removed. Unknown GUI-backend operation IDs return a typed failed operation result through the normal completion signal. A shell dry run with an unknown operation or missing planner reports the failure and exits nonzero; it never fabricates a preview. These are source changes; they do not establish GUI interaction or release acceptance.
 
+## Approved Prebuilt And Source-Rebuild Target
+
+**Current source, 2026-11-01; new-archive acceptance open:** preserve the current Launcher interface and existing operation owners. The release supplies precompiled products and a complete admitted cooked base; users may run it directly or obtain the matching source and optionally use that base before editing/rebuilding. [Packaging](../../BuildAndPackaging/PackagingAndInstallation.md#prebuilt-base-and-source-rebuild) owns composition, rights and exact distribution.
+
+| User intent | Launcher behavior to retain | Backend simplification |
+| --- | --- | --- |
+| Run the prebuilt release | Current map cards/previews, Editor/Game/API choice, readiness, progress, controls and actionable failure. | Resolve this release's cooked dependencies directly; no source-ready check, build toolchain, shared old store or initial source cook. |
+| Modify and rebuild | Existing source sync, Configure/Build/Cook/Run, logs, cancellation and explicit cleanup. | Use the matching source workspace; optionally import its precompiled products and cooked base into canonical outputs. Rebuild replaces those outputs. No new frontend or ongoing file-version database. |
+
+Ordinary use is extract one ready-to-run bundle -> open Launcher -> choose a supplied scene -> Run. Publisher supplies runtime closure, cooked inputs, defaults and authored cameras. Keep scene/API choice and launch feedback here; Game follows the [render-only presentation contract](../../../../Acceptance/FirstRelease.md#consumer-effort-and-game-presentation), while Editor keeps its existing UI. No source acquisition, SDK setup, recook/build prompt or manual content-part matching belongs in that ordinary journey. Build/Cook remains an explicit optional developer action.
+
+Fresh publisher build/cook is a release operation. Local source edits use ordinary explicit Build/Cook actions and may start from the supplied base; a new release never depends on the user's previous generated files. Missing source/build prerequisites affect the requested rebuild action, not ordinary prebuilt Run. Keep settings, authored files and diagnostic privacy under their current owners.
+
+**Source cleanup:** the shared store, raw-source Run gate, binary-only importer and automatic prerequisite graph are removed. `SyncProducts.ps1` writes binaries/cooked files to canonical outputs; local Build/Cook replaces them. [Source checks](../../../../../artifacts/validation/release-owner-slim-20261101/completion.json) and [FR-06](../../../CrossModule/FirstRelease/ImplementationPlan.md#prebuilt-delivery-simplification) distinguish bounded proof from future exact-archive acceptance.
+
+**Preparation owner:** Launcher invokes existing build/cook tools. Editor no longer launches ShaderCompiler or watches source. Source and bundle share the ordinary root markers and complete `artifacts/dev` paths; root `LaunchSparkle.cmd` opens the shipped Launcher. Canonical executable paths bind discovery to their own root; a partial extraction cannot fall back to its enclosing checkout. Only the requested developer action checks actual source prerequisites (`CMakeLists.txt`/sync scripts). Engine has no package bootstrap API or installed-mode flag. [Current source result](../../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json) retains affected archive proof in FR-06.
+
 ## At A Glance
 
 Launcher is an explicit exception to minimizing non-rendering product work. Its selected role is a polished way to find and run the rendering, understand readiness/progress/failure and reproduce the source/archive journey. [Roadmap](../../../../Strategy/Roadmap.md#portfolio-focus-and-existing-code-simplification) admits that presentation value; [PD-2/3 results](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) record the accepted source and installed delivery scope. Preserve useful current UX while removing duplicated Qt/Launcher Core operation/settings/status policy in its owning repair. This selects no general workflow platform, installer/updater, new capability registry or separate content database, and claims no fresh usability result.
 
-**Map admission:** `ReleaseSupported` in [Levels.catalog](../../../../../Projects/Showcase/Levels.catalog) identifies Empty and the seven release maps. GUI cards label release/development maps; installed sync/run planners reject development maps, while source workflows retain them. Run requires the requested catalog map to be selected and source-ready before checking cooked products; Empty remains the built-in starting map.
+**Map admission:** `ReleaseSupported` labels the seven advertised maps plus Empty; publisher membership remains packaging-owned. Runtime definitions use `Levels/<id>.level`. Launcher Run consumes supplied definitions/executables/cooked outputs without requiring selected flags, raw assets or acquisition manifest files. Explicit source Sync/Cook owns those preparation prerequisites through ToolSupport and existing acquisition scripts. A missing source manifest is checked when acquisition is requested, before downloading/publishing; it cannot disable ordinary Run. The per-root cooked presence check is preflight only; actual scene loading validates each dependency.
 
-Non-empty scene readiness requires `SceneAssetRegistry.sreg`, non-empty `SceneManifests` and `Meshes` in the same cooked scope. Mesh files alone cannot admit a handoff after a publication member is removed. The existing GUI preparation path can recook missing scene publication; typed run remains blocked until it is ready. Installed recovery evidence belongs to [PD-3](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
+Non-empty scene readiness requires `SceneAssetRegistry.sreg`, non-empty `SceneManifests` and `Meshes` in the same cooked scope. Mesh files alone cannot admit a handoff after a publication member is removed. Explicit Launcher Cook can regenerate missing scene publication; typed run remains blocked until it is ready. Installed recovery evidence belongs to [PD-3](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress).
 
 | User intent | Launcher responsibility | Success boundary |
 | --- | --- | --- |
-| prepare workspace | discover repository/project, inspect toolchain/dependencies, and propose the exact missing operation | readiness is revalidated immediately before execution |
+| prepare workspace | discover workspace/project, inspect toolchain/dependencies, and propose the exact missing operation | readiness is revalidated immediately before execution |
 | configure/build | select generator, compiler, profile, features, and focused targets; track freshness | final target exit plus expected attributable artifacts |
 | acquire/cook content | resolve catalog dependencies, download/verify/extract, and run scoped cooks | selected content products and manifests are ready, not merely downloaded |
 | run product | verify executable/runtime/cooked prerequisites and launch from project context | follow the live child/handoff and product log, not only the initial process ID |
@@ -51,25 +68,30 @@ Non-empty scene readiness requires `SceneAssetRegistry.sreg`, non-empty `SceneMa
 
 ```mermaid
 flowchart LR
-    Intent[User selects a capability] --> Evaluate[Capability registry evaluates prerequisites]
-    Evaluate -->|ready| Run[Launch requested operation or product]
-    Evaluate -->|blocked| Next[Return one concrete prerequisite operation]
-    Next --> Execute[Run bounded background operation]
-    Execute --> Invalidate[Invalidate affected readiness facts]
-    Invalidate --> Evaluate
+    Intent[User selects an explicit operation] --> Plan[Operation owner checks requested inputs]
+    Plan -->|ready| Run[Run bounded operation or launch product]
+    Plan -->|blocked| Failure[Report missing input and explicit recovery action]
     Run --> History[Publish logs, exit, artifacts, and recovery hints]
 ```
 
-Launcher is a capability planner and operation host. It is not a package manager, CI service, release installer, or proof that the product it launched remained healthy.
+Launcher hosts explicit operations. A blocked request reports the missing input; the user chooses whether to run its recovery action. Launch success does not prove that the product remained healthy.
 
 ## Frontend And Planning Model
 
+`WorkspaceLocator` names marker-based discovery for both a checkout and extracted bundle: `IsWorkspaceRoot`, `TryResolveWorkspaceRoot` and `TryFindWorkspaceRoot`. Launcher request/plan roots are `WorkspaceRoot`; Git/source-only packaging still names its actual repository. Application's `EditorShaderCompileOperation` wraps the supplied compile action and reload, without owning the compiler. These names follow existing responsibilities and add no installed-mode or compatibility path.
+
+The [2026-11-01 naming reconciliation](../../../../../artifacts/validation/naming-reconciliation-20261101/completion.json) records clean-break caller/build membership, 83-file source-style and token-preservation checks, focused builds and read-only root/usage controls. This is source/tooling proof; rendering and the repaired archive retain their own qualification. Global next work remains Roadmap's current Sponza result.
+
+ToolSupport owns `ProjectLevelCatalog` data/reader/validator/selection updates alongside existing tool output paths. Engine does not link this model. The catalog keeps source acquisition and cook selection in the preparation layer; its level paths must match the runtime `Levels/<id>.level` convention. `HasLevelSourceInputs` explicitly names a source-cook query; it is not runtime admission. Relative tool project roots normalize once at catalog entry. [Current controls](../../../../../artifacts/validation/runtime-inputs-slim-20261101/completion.json) exercise tool selection, runtime registration without source, and missing acquisition metadata at the requested action.
+
+**Structural ownership amendment, 2026-11-01:** ToolSupport is an unconditional Launcher dependency, including when both optional cooking and shader compilation are disabled. `SparkleLauncherCore` owns the public `RecompileEditorShaders` action and its implementation; Showcase binds that contract through the library target. Projects do not compile Launcher private sources. Application retains the background-operation lifetime and renderer reload; tool resolution, command construction and child-process execution stay in Launcher. This ownership description is source/build structure, not a new runtime or archive result.
+
 | ID | Capability | State | Exact current coverage and limit | Evidence |
 | --- | --- | --- | --- | --- |
-| `LAUNCH-001` | Qt GUI | Implemented path | Windows GUI with Home/Quick Start, workflow pages, options, toolchain/dependency/content status, level cards/thumbnails, activity/output, cancellation, and in-memory launcher selections. Qt 6.11.1 Widgets is required. | `S` |
+| `LAUNCH-001` | Qt GUI | Implemented path | Windows GUI with Scenes, workflow pages, options, toolchain/dependency/content status, level cards/thumbnails, activity/output, cancellation, and in-memory launcher selections. Qt 6.11.1 Widgets is required. | `S` |
 | `LAUNCH-002` | Shell route | Implemented path | Same executable accepts root/profile/compiler/IDE/scope/target/level/API/cook/clean options plus `--dry-run` and `--run <operation-id>`. It exposes core operation planners without the GUI. | `S` |
 | `LAUNCH-003` | Immutable operation plan | Implemented path | Each action records inputs, readiness, steps, display command lines, log paths, planned effects, destructive scope/confirmation, timing, exit code, status, and a typed terminal failure with problem kind, root summary, and expected action. Process I/O failures cannot become success through exit code 0 or readiness. CMake requests encode paths and environment values as UTF-8; previews use Core's execution quoting. | `S` |
-| `LAUNCH-004` | Quick Start dependency graph | Implemented path | Capability providers resolve level content, the selected product executable, and cooked products into the next genuinely missing operation. After each operation, the planner reads current output readiness again; it carries no parallel invalidation state and does not force build or cook work for existing outputs. Existing outputs are presumed current until the user explicitly rebuilds or recooks. Cooked-shader readiness still requires the complete non-empty publication set and matching map/library hashes so an interrupted or internally inconsistent publication cannot launch. Source timestamps and build-file freshness are not automatic Quick Start invalidators. | `S` |
+| `LAUNCH-004` | Direct scene launch | Implemented path | The `Scenes` page uses the `levels.browse` navigation identity, with `LauncherMainWindowScenesPage` composing `LauncherMainWindowLevels` cards and `LauncherMainWindowLevelRun` submitting the existing typed `levels.run` operation. It checks level metadata, executable and required cooked-file presence/incomplete markers; the loader validates actual formats. No automatic acquire/configure/build/cook chain or artifact-origin tracking. Explicit developer actions refresh the same outputs. | `S` |
 | `LAUNCH-005` | Background operation service | Implemented path | Each GUI run has a unique ToolInvocation task scope, streams output, retains activity, admits one active workflow, exposes Cancel in Activity, completes queued cancellation through a Tasks cleanup node, and joins scopes on teardown. Tool-owned action/item/count progress records drive the selected-run phase and progress bar without appearing in the human-readable log; producers publish semantic identities while shared progress support owns formatting and transport. A determinate percentage is shown only when the tool publishes authoritative completed and total work, while unknown totals remain indeterminate. | `S` |
 
 `BuildWorkspaceOperations` resolves product/helper targets for both plan readiness and process construction. `BuildFreshnessSignature` normalizes paths for both signatures and freshness messages.
@@ -90,7 +112,7 @@ Launcher is a capability planner and operation host. It is not a package manager
 | `LAUNCH-013` | Host-tool install | Partial | `workspace.install-host-tool` delegates to a registered launcher-owned provider when a detected tool advertises install support. This is not a general package manager. | `S` |
 
 Launcher source construction has its own top-level `Tools/Launcher` CMake
-entry point. That graph owns only Core, Tasks, ToolConsoleSupport, Launcher,
+entry point. That graph owns only Core, Tasks, ToolSupport, Launcher,
 Qt, spdlog, and the embedded icon asset, and writes CMake/compiler state beneath
 `build/private/tools/SparkleLauncher/`. The repository-root entry point owns
 the full workspace. This separation is structural: no bootstrap/product mode
@@ -117,11 +139,13 @@ fresh toolchain scan finds both the compiler and its MSBuild toolset.
 | `LAUNCH-015` | Cook workspace | Implemented path | `cook.workspace` runs selected shader/texture/scene scopes in one request after build/tool/runtime-bundle readiness checks. | `S` |
 | `LAUNCH-016` | Focused/full cooks | Implemented path | `cook.shaders`, `cook.textures`, `cook.assets`, and `cook.all`; incremental or confirmed Force mode; shader backend/debug/optimization/warnings/strip options. | `S` |
 | `LAUNCH-017` | Force recook safety | Implemented path | Force mode plans removal of the exact cooked output root and refuses execution without explicit confirmation. | `S` |
-| `LAUNCH-018` | Run level | Implemented path | `levels.run` resolves the editor/game target and matching profile, checks that the selected executable and required cooked mesh/texture/shader products exist, and launches them without an automatic incremental build or source-freshness cook. Missing outputs still select the narrow required build or cook operation. It sets level/API environment, uses the project directory, and launches the real product child process. Build and cook children complete on exit; an interactive product launch completes only when the Application host reports the exact requested level active through the Core process-readiness channel. Until that signal, cancellation retains process-tree ownership; afterward Core transfers product lifetime while its inherited output continues in the durable operation log. | `S` |
+| `LAUNCH-018` | Run level | Implemented path | `levels.run` resolves the editor/game target and matching profile, checks that the selected executable and required cooked mesh/texture/shader products exist, and launches them without an automatic incremental build or source-freshness cook. Missing outputs report the required action; Run does not execute Build/Cook for the user. It sets level/API environment, uses the project directory, and launches the real product child process. Build and cook children complete on exit; an interactive product launch completes only when the Application host reports the exact requested level active through the Core process-readiness channel. Until that signal, cancellation retains process-tree ownership; afterward Core transfers product lifetime while its inherited output continues in the durable operation log. | `S` |
 | `LAUNCH-019` | Build profiles | Implemented path | All six Debug/Development/Shipping x Editor/Game profiles; focused target name is `<Project>Editor` or `<Project>Game`. | `S` |
 | `LAUNCH-020` | Graphics API choice | Implemented path | Run request carries `d3d12` or other accepted API text to product environment; actual compiled backend/device validation remains product evidence. | `S` |
 | `LAUNCH-021` | Clean workspace | Implemented path | `workspace.clean` supports confirmed cooked outputs, build tree, artifacts, IDE state, dependency cache, typed per-user development logs/settings, legacy outputs, or pristine generated workspace; previews exact targets/counts/bytes and supports preserved paths. The GUI exposes the broad pristine scope only through an explicit All action; individually selecting every visible category retains those exact categories rather than silently broadening to pristine cleanup. Scopes containing project-local targets require a selected content project before planning. The running Launcher is preserved when artifacts are selected. | `S` |
 | `LAUNCH-022` | Logs/recovery | Partial | Per-step log paths, captured output, status/timing/exit code, typed problem categories, root summaries, expected actions, copy-output UI, and history records exist. GUI and shell render the same terminal contract; GUI state color supplements explicit text and icons. Direct child-start failures receive policy/access/missing-file/OS recovery from the shared operation model instead of frontend prose matching. A nested tool rejection is still flattened into its parent tool's nonzero exit unless that tool publishes a typed child-start result, so the named log remains the authority for the exact nested child. | `S`; nested propagation remains open |
+
+Shader symbol export is an explicit Cook option: Generate shader symbols in the GUI or `--shader-symbols --run cook.shaders` in the CLI. Both map to the existing compiler debug-info policy, preserve runtime optimization and keep debug/source material under the private symbols root. Editor requests this same operation through the Showcase tooling binding; it adds no second cook planner, compiler runner or output path.
 
 ## Path API Boundary
 
@@ -131,15 +155,15 @@ Launcher uses Core's `ChildProcessRequest`, `ChildProcessResult` and output call
 
 Launcher code consumes two deliberately separate contracts:
 
-- Core's `WorkspaceOutputPaths` owns repository-generated build and artifact
+- Tool support's `ToolOutputPaths` owns repository-generated build and artifact
   locations, including the dependency cache and owner/profile-specific
-  products. Build, cook, run, clean, capability, and GUI preview code all use
+  products. Build, cook, run, clean and GUI preview code all use
   this contract.
 - The private `LauncherStatePaths` collaboration owns per-user launcher
   settings, activity, archives, live instances, and operation logs. It never
   exposes or derives workspace products.
 
-Core privately implements workspace-output and user-state directory grammar;
+Tool support implements build-output grammar; Core implements ordinary roots and user-state paths;
 `SparkleLauncherCore` privately implements Launcher leaf paths. Callers do not
 own repository hashing, platform-local state selection, or literal root
 segments. Product/editor mutable state is not a Launcher path variant: the
@@ -168,13 +192,11 @@ build state cannot remove navigation or activity icons from a rebuilt
 launcher artifact. Existing binaries retain their original resource contract
 until rebuilt and relaunched.
 
-## Vertical Quick-Start Trace
+## Vertical Scene Launch Trace
 
-Configure runs once per requested step. A failed or cancelled child keeps its exit/result and downloaded dependency caches; Launcher does not infer cache corruption from log text or delete the cache to retry. Acquisition remains CMake-owned; explicit workspace cleanup remains a separate confirmed operation.
+Launcher loads the catalog -> user selects scene/product/profile/API -> `StartLevel` submits `levels.run` -> preflight checks required output presence -> process owner starts the selected product -> the existing committed level-change event confirms the requested activation identity. A missing output reports an actionable failure; Run never launches another preparation operation automatically. The committed source catalog selects Empty; explicit source Sync updates cook selection. Supplied cooked scenes can Run without their raw assets or acquisition state.
 
-The committed catalog selects only Empty. The seven release maps remain supported; selecting and syncing them explicitly determines the cook input set.
-
-Launcher discovers repository/content -> loads settings/catalog -> capability registry evaluates requested `levels.run` -> if content or a required executable/cooked product is absent or internally incomplete it returns one concrete operation -> user executes it in a scoped background task -> planner re-observes readiness immediately before each destructive/process step -> child output, typed phase progress, typed process-start result, and exit status update activity -> resolution reads current readiness again until `levels.run` launches the editor/game child. An existing executable is runnable regardless of build-file/source freshness, and an existing internally consistent cooked publication is runnable regardless of source timestamps; explicit Build and Cook actions own refreshing those outputs. Progress is producer-owned evidence: the backend process boundary decodes the shared tool-console record into a typed signal, while the activity widget only renders phase/count state. Launcher never estimates work or infers percentages from elapsed time. Interactive launch completion is also producer-owned: `LevelSession` publishes its existing committed level-change event, the Application host reports that active identity through Core, and the Launcher process boundary accepts only the identity requested by its plan. Activation is never inferred from log prose; native synchronization stays in Core. Process recovery follows the same boundary: Core classifies native launch failures once, executors retain that category in the operation record, and the frontend presents one workflow-independent recovery without parsing localized operating-system prose.
+Optional source Sync, Configure/Build and Cook remain independent existing operations with progress, logs, cancellation and process results. They write canonical outputs; readiness never hashes a package seed or infers source freshness. Runtime/RHI remain responsible for validating consumed schemas and dependencies. Native launch errors are classified once by Core; activity displays the typed result. No capability providers, dependency graph or Quick Start execution controller remains.
 
 ### Failure presentation contract
 
@@ -182,9 +204,9 @@ The operation owner must classify every non-successful terminal result and provi
 
 ## `FCR-PROD-03` Launcher Contract
 
-Sparkle Launcher is a **required shipped product** and remains a frontend over the existing operation owners. Users may start Empty, select any subset of the seven release maps to sync, and launch Sparkle Editor or Sparkle Game. Deliver required features and full content/helper closure for those maps; mark other choices development or unavailable. Game/Editor must run offline with synced content. Launcher does not become the package-policy owner.
+Sparkle Launcher is a **required shipped product** and remains a frontend over the existing operation owners. Users may start Empty, select any subset of the seven release maps and launch Editor/Game from their complete same-release cooked base offline. Users may also obtain the matching source, optionally import precompiled/cooked outputs, edit source and use Launcher to Build/Cook/Run. Preserve required rendering and label other choices development/unavailable; helpers are required only by the action that consumes them. Launcher does not become the package-policy owner.
 
-**Proof allocation:** source CLI/GUI operation equivalence and faults close in PD-2. Installed discovery, selection/sync and runtime handoff close in PD-3 against its archive. Source build/clean actions are unavailable in installed mode. [Product delivery progress](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) separates retained checks from these missing portions.
+**Proof allocation:** source CLI/GUI operation equivalence and faults close in PD-2. Prebuilt discovery/selection/handoff and optional source-base import/edit/rebuild need affected FR-06 proof against the new candidate. Source build/clean runs in an explicit source workspace; the prebuilt-only mode needs neither toolchain nor source acquisition. [Product delivery progress](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) separates retained checks from these missing portions.
 
 | ID | Binary acceptance criterion | Proof phase |
 | --- | --- | --- |
@@ -196,7 +218,7 @@ Sparkle Launcher is a **required shipped product** and remains a frontend over t
 
 | ID | Cause/injection, safe result, and affected criterion |
 | --- | --- |
-| `FM-PROD03-01` | Remove each required tool/SDK or expected output. The capability graph must name the missing owner and refuse dependent work; warning text, skipped work, or an old artifact cannot satisfy `AC-PROD03-02`. |
+| `FM-PROD03-01` | Remove each required tool/SDK or expected output. The requested operation must name the missing prerequisite and refuse its work; warning text, skipped work, or an old artifact cannot satisfy `AC-PROD03-02`. |
 | `FM-PROD03-02` | Start a child that exits, fails activation, or hands off to another process. Launcher follows the authoritative descendant/product log and reports failure unless the requested active identity is observed (`AC-PROD03-03`). |
 | `FM-PROD03-03` | Cancel during download/build/cook/run and close during cancellation. Descendants settle, previous accepted output remains, and exactly one Cancelled/Failed result is retained (`AC-PROD03-04`). |
 | `FM-PROD03-04` | Add source/sentinel/reparse/preserved/locked paths around a clean target. Path escape or source mutation is severity-critical; partial deletion must report failure (`AC-PROD03-05`). |

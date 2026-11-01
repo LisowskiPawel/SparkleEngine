@@ -5,6 +5,7 @@
 #include "Assets/SceneAssetCatalog.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Level/Loading/SceneLoadWorkState.h"
 #include "Level/Loading/SceneLoadTaskGraph.h"
 #include "Tasks/Public/TaskExecutor.h"
@@ -67,12 +68,8 @@ namespace Assets
 			throw Diagnostics::Error("Level exceeds the bounded scene-asset request capacity.");
 		}
 
-		if (!m_control->Catalog)
-		{
-			m_control->Catalog = LoadSceneAssetCatalog(m_control->NextCatalogGeneration++);
-		}
-
-		auto shared = std::make_shared<SceneLoadWorkState>();
+		auto shared = std::make_shared<SceneLoadWorkState>(Filesystem::GetCookedAssetRootPath());
+		m_control->Catalog = LoadSceneAssetCatalog(m_control->NextCatalogGeneration++);
 		shared->Package = std::make_unique<SceneLoadPackage>();
 		shared->Package->RequestId = requestId;
 		shared->Package->WorldGeneration = worldGeneration;
@@ -94,7 +91,7 @@ namespace Assets
 				throw Diagnostics::Error(
 				    std::format("Scene asset catalog ID '{}' for instance '{}' is absent from catalog generation {}.", id.GetCatalogValue(), id.value, m_control->Catalog->GetGeneration()));
 			}
-			shared->Assets.push_back(SceneAssetLoadWork{.Id = id, .ManifestPath = *manifest});
+			shared->Assets.emplace_back(shared->Publication, shared->AllocationBudget, id, *manifest);
 		}
 
 		const CompiledTaskGraph graph = BuildSceneLoadTaskGraph(shared);

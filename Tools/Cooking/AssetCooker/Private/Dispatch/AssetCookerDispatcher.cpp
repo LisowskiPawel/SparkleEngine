@@ -1,36 +1,53 @@
 #include "AssetCookerDispatcher.h"
 
-#include "AssetCookerStageExecutor.h"
+#include "Cooking/AssetCookStages.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "ToolWorkProgress.h"
-#include "Core/Public/FileSystemUtils.h"
-#include "ToolConsole.h"
 
+#include <array>
 #include <iostream>
 #include <string>
 
-bool AssetCookerDispatcher::DispatchPlan(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord>& outOutputs)
+struct AssetCookStage final
 {
-	if (!AssetCookerStageExecutor::ValidateCapabilities(plan, diagnostics))
+	const char* Name;
+	bool (*Validate)(const AssetCookerProjectCookPlan&, AssetCookerDiagnostics&);
+	bool (*Cook)(const AssetCookerProjectCookPlan&, AssetCookerDiagnostics&, std::vector<AssetCookerOutputRecord>&);
+};
+
+static constexpr std::array Stages{
+	AssetCookStage{"shaders", ValidateShaderCookStage, CookShaders},
+	AssetCookStage{"textures", ValidateTextureCookStage, CookTextures},
+	AssetCookStage{"scene-assets", nullptr, CookSceneAssets}};
+
+bool DispatchAssetCookPlan(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord>& outOutputs)
+{
+	for (const AssetCookerPlanStep step : plan.steps)
 	{
-		return false;
+		const auto index = static_cast<std::size_t>(step);
+		if (index >= Stages.size())
+		{
+			diagnostics.AddError(AssetCookerCategory::All, "Unknown asset cook stage.");
+			return false;
+		}
+		if (Stages[index].Validate && !Stages[index].Validate(plan, diagnostics))
+		{
+			return false;
+		}
 	}
 
 	Filesystem::ConfigureProjectRoot(plan.projectRoot);
 	ToolWorkProgressWriter progress(std::cout);
-
-	for (std::size_t stepIndex = 0; stepIndex < plan.steps.size(); ++stepIndex)
+	for (std::size_t index = 0; index < plan.steps.size(); ++index)
 	{
-		const AssetCookerPlanStep step = plan.steps[stepIndex];
-		const char* stepName = AssetCookerStageExecutor::GetStepName(step);
-		const std::string phase = "Asset cook stage: " + std::string(stepName);
-		progress.Report(phase, stepIndex, plan.steps.size());
-
-		const bool succeeded = AssetCookerStageExecutor::Execute(step, plan, diagnostics, outOutputs);
-		if (!succeeded)
+		const AssetCookStage& stage = Stages[static_cast<std::size_t>(plan.steps[index])];
+		const std::string phase = "Asset cook stage: " + std::string(stage.Name);
+		progress.Report(phase, index, plan.steps.size());
+		if (!stage.Cook(plan, diagnostics, outOutputs))
 		{
 			return false;
 		}
-		progress.Report(phase, stepIndex + 1u, plan.steps.size());
+		progress.Report(phase, index + 1u, plan.steps.size());
 	}
 	return true;
 }

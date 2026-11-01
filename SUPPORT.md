@@ -4,52 +4,36 @@
 
 No user support service, response deadline or guaranteed fix is offered. Check [known issues](KNOWN_ISSUES.md) and [security](SECURITY.md).
 
-For source builds, follow the [repository README](https://github.com/stoleckipawel/SparkleEngine#build-and-launch). The instructions below cover a verified portable archive; public release qualification remains open.
+**Approved public workflow target:** a fresh precompiled/cooked release base plus optional source modification/rebuild through Launcher. Current source uses one binary/cooked output layout; a public archive is not yet qualified. Earlier internal archives retain their recorded behavior. [Delivery contract and remaining changes](https://github.com/stoleckipawel/SparkleEngine/blob/master/Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#prebuilt-base-and-source-rebuild). Source-only build commands remain in the [README](https://github.com/stoleckipawel/SparkleEngine#build-and-launch).
 
 ## Start, recover and exit
 
-Start `Tools/SparkleLauncher/Binaries/ShippingEditor/SparkleLauncher.exe`, select Editor or Game, then select content. Empty is the initial selection. Downloads require internet access; offline use requires completed sync/cook.
+For the target release, extract the ready-to-run consumer bundle and open `LaunchSparkle.cmd` (the executable is `artifacts/dev/Tools/SparkleLauncher/Binaries/ShippingEditor/SparkleLauncher.exe`). Choose a supplied scene and Run Game, or open Editor for inspection. Empty remains the initial selection. Ordinary Run is offline; publisher supplies the cooked content, runtime dependencies and defaults. No source acquisition, SDK installation, manual content assembly, build, cook or old content store is required.
 
-In Game, Esc releases the mouse and opens the menu; F1 opens help. Hold right mouse to look; W/A/S/D or arrows move; E/Space and Q/C move up/down. Use the menu to select a level, reload the camera or Quit. Alt+F4 exits. Save Editor changes explicitly before exiting.
+The approved Game target has no ImGui menu, HUD, help or settings overlay. Hold right mouse to look; W/A/S/D or arrows move; E/Space and Q/C move up/down. Release mouse-look before changing focus; close the window or use Alt+F4 to exit. Choose scenes/API in Launcher; inspect/reset settings and cameras in Editor. Save Editor edits explicitly. Current source removes the Game UI; earlier internal archives retain their recorded menu behavior. New-archive runtime qualification remains open.
 
 For startup failure, follow Launcher's error and next action. Check prerequisites, backend and selected content before retrying. After a crash, device error or hang, preserve the local log. If normal exit fails, close the process through Windows.
 
-Packaged state is under `%LOCALAPPDATA%/SparkleEngine/Showcase/v0.1/`; source products use repository-specific development state. Exit all products and back up `Settings/EngineRendering.ini` before deleting that file to reset settings. Clear only the selected product's diagnostic files. Deleting the package directory preserves user state and selected content.
+Both source and extracted products use root-keyed state under `%LOCALAPPDATA%/SparkleEngine/Development/<workspace-key>/Showcase/`; there is no release-version state lookup or migration. Earlier internal archives retain their recorded paths. Exit all products and back up `Settings/EngineRendering.ini` before deleting that file to reset settings. Clear only the selected product's diagnostic files. Removing an extraction preserves per-user settings/authored data; old generated content must not be copied or migrated into a new release.
+
+## Modify source and rebuild
+
+Obtain the source tag matching the release. Optionally initialize its normal `artifacts/dev` binary and cooked outputs from that release's base, then open Launcher for the source workspace. Edit code, shaders or assets and use the existing Build/Cook/Run actions. Rebuilt output replaces that starting base in the same paths. A source-only start remains supported; source rebuilds need the documented public prerequisites. Ordinary prebuilt Run does not.
+
+`SyncProducts.ps1` imports matching binaries and the complete cooked base into canonical source-workspace outputs. Local Build/Cook overwrites those files; Run retains no origin marker or per-file version database. Source acquisition, Build and Cook are explicit optional Launcher actions. Editor can reload existing shaders after Launcher Cook; it does not invoke a compiler or watch source. Supplied level documents can run without acquisition/cook-selection metadata; missing cooked dependencies fail at their loader. No automatic update feed is advertised.
 
 ## Preview and export local diagnostics
 
-Use Windows PowerShell 5.1, the retained ZIP, its independently recorded SHA-256 and an unchanged read-only extraction. The package helper is `Tools/Diagnostics/ExportDiagnostics.ps1`; its source is `CMake/Packaging/ExportDiagnostics.ps1`.
+Use Launcher's actionable failure and local product/operation logs first. Keep the actual build identity and identify missing/unavailable evidence honestly. Diagnostic inspection must remain usable when the ZIP is gone or the installation is incomplete; it is not full package requalification.
 
-```powershell
-$arguments = @{
-    PackageRoot = 'C:/Sparkle'
-    ArchivePath = 'C:/Downloads/Sparkle.zip'
-    ArchiveSha256 = '<released archive SHA-256>'
-    Component = 'Game'
-    Incident = 'GpuDevice' # or Startup, Crash, HangTimeout
-    LogPath = '<selected product log>' # optional
-}
-$preview = & C:/Sparkle/Tools/Diagnostics/ExportDiagnostics.ps1 @arguments | ConvertFrom-Json
-$preview.Record | ConvertTo-Json -Depth 8
-# Inspect the preview before exporting:
-& C:/Sparkle/Tools/Diagnostics/ExportDiagnostics.ps1 @arguments -Consent `
-    -PreviewSha256 $preview.PreviewSha256 -OutputDirectory 'C:/Users/Public/Documents'
-```
+Review any files before voluntarily sharing them. Raw logs, dumps, captures, source and symbols may contain private paths/content. Nothing uploads automatically. Optional symbols must match before being called correlated; unavailable collection is stated explicitly. No diagnostic helper or support account is required for ordinary Run.
 
-Preview writes nothing. Export requires the matching preview digest and an existing directory outside the package. Changed previews require renewed consent. Nothing is uploaded.
-
-The JSON contains product/build identity, incident category, error counts and diagnostic availability. It excludes log text, private paths, settings, content, dumps and captures; originals stay untouched. Logs over 10 MiB or with lines over 64 Ki characters are rejected. Missing/empty data is identified explicitly. Incident categories are user observations, not proof of collection.
-
-Optional `-NativePdbPath` checks matching native symbols; mismatches reject export. Ordinary packages have no automatic crash/hang collection or qualified shader-symbol correlation. Review any files you voluntarily share; raw dumps/captures may contain private data.
-
-The opt-in source-only GPU crash variant has its own [qualified candidate and launch/inspection route](https://github.com/stoleckipawel/SparkleEngine/blob/master/Docs/Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#launch-and-inspection-route). Ordinary packages do not include that variant. Its source export helper accepts `-GpuCrashManifestPath <incident.json>`; preview contains sanitized metadata. Raw dump, NVIDIA debug data, source and symbols each require category consent and the matching preview digest. Full symbols also require Source consent because they can embed source. Nothing is uploaded.
+The generic archive-dependent exporter is removed. The source-only GPU crash tools retain the separate [qualified launch/inspection and consent contract](https://github.com/stoleckipawel/SparkleEngine/blob/master/Docs/Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#launch-and-inspection-route). Ordinary packages do not promise automatic CPU crash/hang collection or device recovery.
 
 ## Retention and replacement
 
 Core logs rotate at 5 MiB with two backups per name, with up to one message of overshoot. Launcher logs, captures and exports remain until manually removed. Close products before clearing files.
 
-Replacements use a new version and archive hash. Extract separately; keep the previous verified ZIP and back up settings. Side-by-side versions share `v0.1` settings.
+Each published version has fresh build/cooked outputs and a new immutable archive identity. Extract it separately and use its own supplied content; use its own generated files without importing old content state. A new release leaves old files alone. Back up authored source and settings before deliberate cleanup; ordinary settings Save/Reset and manual re-extraction are sufficient recovery.
 
-Selected content lives separately at `%LOCALAPPDATA%/SparkleEngine/Content/Showcase/` and belongs to one exact archive. Before switching archives, close all products and move that directory to a backup. The new Launcher initializes its own store; select, sync and cook the maps again. Keep authored levels in the backup; do not copy the `.sparkle-package` marker between candidates. To roll back, close all products, move the new store aside, restore the old store and settings backup, then re-extract the old ZIP.
-
-No automatic updater or compatibility guarantee is provided. Stop using an archive identified as withdrawn.
+Rollback means running the previously verified extraction or re-extracting its archive, with the documented settings backup/reset policy. There is no generated-content migration, automatic updater, local-file version tracker or compatibility guarantee. Stop using an archive identified as withdrawn.

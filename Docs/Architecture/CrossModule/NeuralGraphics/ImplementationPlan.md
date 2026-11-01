@@ -138,6 +138,8 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ### NG-S6 - Evaluation, Delivery And Adoption
 
+Global order: NG-S6a follows the checked NG-S5 runtime at M5 and qualifies the local neural candidate before case assembly or final adoption. M5R rendering work has independent prerequisites and takes priority when ready; it does not wait for this model. M6 joins both qualified technical branches, assembles/rehearses the cases and supplies actual adoption observations to NG-S6b. Requalify affected S6a cells only if renderer edits change its consumed inputs or runtime; preserve frozen data/domain identity.
+
 | Owner slice | Start and bounded work | Exit / pending proof |
 | --- | --- | --- |
 | `NG-S6a` Local evaluation and package | Supported NG-S5 candidate and frozen metric matrix. Use sealed San Miguel only for final testing; Bistro remains validation. Run raw/log/FLIP/temporal/value/cost/failure checks and the local package/hash/license/source joins. | All local AC-NG-01..09 obligations pass, including local 08 package checks. Its actual rehearsal result remains open. Hand the qualified candidate to portfolio stage 2 without waiting for its own later adoption. Remove probes and verify prior cleanup. |

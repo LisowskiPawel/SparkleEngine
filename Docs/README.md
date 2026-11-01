@@ -18,7 +18,7 @@ Use these pages to understand the engine, choose your next task and find the des
 | Contribute or review | [Contributing](../CONTRIBUTING.md) -> [engineering rules](Engineering/README.md#choose-by-task) |
 | Find results or workload checks | [Acceptance](Acceptance/README.md) |
 
-For renderer specialization, open the [depth-to-evidence map](Strategy/FeatureDeliveryCatalog.md#selected-rendering-depth) and [M5R order](Strategy/Roadmap.md#required-renderer-depth-wave): reference/direct/indirect, shading, denoising/upscaling, bounded volumes, SHaRC before NRC, NTC and PTLAS. This changes no current first-release next task.
+For renderer specialization, open the [depth-to-evidence map](Strategy/FeatureDeliveryCatalog.md#selected-rendering-depth) and [M5R order](Strategy/Roadmap.md#required-renderer-depth-wave): raw direct/indirect, raw material models, reconstruction and subject closure, PTLAS, bounded volumes, SHaRC before NRC, then NTC. This changes no current first-release next task.
 
 ## Design Or Implementation?
 

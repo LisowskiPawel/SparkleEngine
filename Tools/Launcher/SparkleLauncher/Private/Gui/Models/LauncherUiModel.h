@@ -8,7 +8,7 @@ namespace SparkleLauncher
 {
 	enum class LauncherWorkflowPageKind : std::uint8_t
 	{
-		Home,
+		Scenes,
 		Sync,
 		Build,
 		Cook,

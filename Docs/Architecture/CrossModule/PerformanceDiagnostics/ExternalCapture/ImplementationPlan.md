@@ -4,7 +4,7 @@
 
 Stages: [Stage 0](#stage-0--close-remaining-provider-discovery) / [Stage 1](#stage-1--verify-the-existing-pix-editor-workflow) / [Stage 2](#stage-2--close-pix-lifecycle-game-and-delivery) / [Stage 3](#stage-3--verify-the-existing-nsight-d3d12-workflow) / [Stage 4](#stage-4--deliver-the-missing-nsight-vulkan-route) / [Stage 5](#stage-5--verify-the-existing-renderdoc-d3d12-workflow) / [Stage 6](#stage-6--verify-the-existing-renderdoc-vulkan-workflow) / [Stage 7](#stage-7--finish-selected-specialist-handoffs) / [Stage 8](#stage-8--close-remaining-matrix-adoption-and-parent-evidence).
 
-Finish the missing capture routes and prove the integrations already present in Editor source.
+Qualify the existing capture route needed to inspect the selected rendering result. New Game controls and Nsight Vulkan integration are deferred.
 
 **Status:** remaining discovery, implementation deltas and candidate acceptance; existing Editor integrations and engine repairs are delivered
 
@@ -17,25 +17,25 @@ GPU failure tooling is qualified within the [GPU Crash Debugging candidate scope
 | What to do | Working route |
 | --- | --- |
 | First action | [remaining provider discovery](#stage-0--close-remaining-provider-discovery): close only unresolved native completion, target/generation, interposer and configuration cells. |
-| Result to reach | PIX candidate evidence first, then the remaining Nsight/RenderDoc lifecycle, Game and delivery cells without repeating delivered engine repairs. |
+| Result to reach | Actual native frame evidence from an existing compatible Editor/tool route, with only its missing lifecycle and delivery checks. |
 | Start / stop | Native finalization/lifetime must be proved before affected adapter work. Use installed tools/current hardware; unavailable specialist lanes and AMD profiling retain their stated exclusions. |
 
 ## Remaining Work At A Glance
 
-Existing graphics launch/event lifetime, nonblocking admission and coherent viewport publication have bounded `EC-G0A/0B/0C` handoffs in Discovery. Existing Editor source includes one startup provider selection, Launcher availability/selection, the shared icon service, viewport overlay, PIX/Nsight D3D12 and RenderDoc D3D12/Vulkan routes. Do not recreate those systems. Nsight Vulkan and DevelopmentGame capture control remain production deltas; wider native lifecycle, observer, package and adopter evidence remains open.
+Existing graphics launch/event lifetime, nonblocking admission and coherent viewport publication have bounded `EC-G0A/0B/0C` handoffs in Discovery. Existing Editor source includes one startup provider selection, Launcher availability/selection, the shared icon service, viewport overlay, PIX/Nsight D3D12 and RenderDoc D3D12/Vulkan routes. Do not recreate those systems. New Nsight Vulkan and DevelopmentGame controls are deferred by the [selected scope](ExternalCaptureDesign.md#product-and-support-disposition). Existing routes retain their native lifecycle, observer, Shipping-erasure and documented-reproduction obligations when claimed.
 
 The user's selected local scope uses installed software/current hardware, skips unavailable local specialist lanes without investment, and excludes AMD profiling. Missing/unrun product acceptance remains distinct from evidence-backed unsupported behavior. Accepted individual provider cells stay usable while aggregate closure is pending. No score or parent gate is advanced by this cleanup.
 
 | Remaining stage | Required disposition | Next dependency |
 | --- | --- | --- |
-| 0 | Close unresolved provider discovery; retain delivered engine prerequisites | PIX candidate evidence |
-| 1–2 | PIX Editor acceptance, lifecycle, Game and delivery | EC-G1/EC-G2 |
-| 3–4 | Nsight D3D12 acceptance, missing Vulkan lowering and specialist handoffs | EC-G3/EC-G4 |
-| 5–6 | RenderDoc D3D12/Vulkan candidate acceptance | EC-G5/EC-G6 |
+| 0 | Close only the selected provider discovery; retain delivered engine prerequisites | That provider's native acceptance; no other-provider prerequisite |
+| 1–2 | Selected PIX Editor acceptance, lifecycle and shared delivery proof | EC-G1/EC-G2 |
+| 3 | Existing Nsight D3D12 qualification only when used | EC-G3; Stage 4 deferred |
+| 5–6 | Existing compatible RenderDoc route needed by the selected frame | Applicable EC-G5/EC-G6 cells |
 | 7 | Remaining available specialist handoffs | EC-G7 disposition |
-| 8 | Matrix, Shipping products, observer and documented reproduction | EC-G8 and parent P1-GATE |
+| 8 | Join only the selected routes, shared Shipping-erasure and reproduction proof | Selected EC-G8 / parent P1-GATE; no provider-wide claim |
 
-Stage IDs remain stable for acceptance traceability. Close only the remaining delta at each gate; source delivery is not native acceptance. Earlier engine repair gates require revalidation only when drift invalidates their bounded evidence. Native target/finalization, failure and hook authorization remain mandatory before a production delta.
+Stage IDs remain stable for acceptance traceability; they are provider routes, not a serial prerequisite chain. Select only the existing adapter needed by the rendering check; Nsight qualification or deferred Stage 4 does not precede a necessary RenderDoc Vulkan check. Close only the remaining delta at that gate; source delivery is not native acceptance. Earlier engine repair gates require revalidation only when drift invalidates their bounded evidence. Native target/finalization, failure and hook authorization remain mandatory before a production delta.
 
 
 
@@ -65,8 +65,8 @@ Apply this to every prompt below; each prompt is standalone when pasted with its
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only the remaining Stage 0 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
-Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Execute only the remaining Stage 0 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md with that slice's stated source, target and native/lifetime prerequisites. Unrelated provider gates are not entry conditions. Apply the Universal Execution Contract and current design/discovery owners.
+Read this stage's Work/Exit and linked design/discovery. Reuse applicable source and evidence; execute only unmet checks or a demonstrated owning repair. Stop on unknown native target/finalization, unsafe lifetime or unadmitted hooks. Preserve exact identity, native artifacts and limits; perform same-stage deletion/probe cleanup and the Stage Source-Style Gate.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```
@@ -77,14 +77,14 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Remaining work:** Bind the existing Launcher/direct CLI, selected viewport overlay and native PIX route to one candidate. Exercise missing PIX, event-Game-only, invalid/duplicate intent, wrong/stale target and second-request Busy; retain three finalized/opened Sponza captures with pass/output/pipeline identity. Repair only defects exposed by these checks. The neutral contract, bootstrap, presenter, Launcher selection and PIX adapter already exist.
 
-**Exit `EC-G1`:** `CHK-EC-LAUNCH/BOOT/TARGET/NATIVE/UX/ARCH` relevant PIX cases pass, including missing PIX, event-Game-only, invalid provider intent, wrong/stale target and second-request Busy. Three finalized captures open and identify known Sponza pass/output/pipeline; narrow owning builds and configuration/source-erasure audit pass. Failure/lifetime rules needed by this slice are implemented; exhaustive stress and Game/adoption remain Stage 2.
+**Exit `EC-G1`:** `CHK-EC-LAUNCH/BOOT/TARGET/NATIVE/UX/ARCH` relevant PIX cases pass, including missing PIX, event-Game-only, invalid provider intent, wrong/stale target and second-request Busy. Three finalized captures open and identify known Sponza pass/output/pipeline; narrow owning builds and configuration/source-erasure audit pass. Failure/lifetime rules needed by this slice are implemented; affected lifecycle controls remain Stage 2; Game integration is deferred and shared reproduction closes at Stage 8.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only the remaining Stage 1 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
-Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Execute only the remaining Stage 1 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md with that slice's stated source, target and native/lifetime prerequisites. Unrelated provider gates are not entry conditions. Apply the Universal Execution Contract and current design/discovery owners.
+Read this stage's Work/Exit and linked design/discovery. Reuse applicable source and evidence; execute only unmet checks or a demonstrated owning repair. Stop on unknown native target/finalization, unsafe lifetime or unadmitted hooks. Preserve exact identity, native artifacts and limits; perform same-stage deletion/probe cleanup and the Stage Source-Style Gate.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```
@@ -93,16 +93,16 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## Stage 2 — Close PIX Lifecycle, Game And Delivery
 
-**Remaining work:** Complete cancellation/drain/deadline, native-hotkey Busy, target/device loss, late result and shutdown controls. Add the smallest approved DevelopmentGame control over the same authority; the current source excludes Game capture and does not claim that route. Finish CPU/shader provenance, optimized observer comparisons and actual Shipping product/import/package/tool-free checks. Reuse valid separate PIX Timing evidence, refreshing invalidated cells. Documented reproduction remains an explicit aggregate task.
+**Remaining work:** Complete cancellation/drain/deadline, native-hotkey Busy, target/device loss, late result and shutdown controls. Keep the existing Game capture exclusion; use an external tool-managed route only when a selected measurement requires it, without adding engine controls. Finish CPU/shader provenance, optimized observer comparisons and actual Shipping product/import/package/tool-free checks. Reuse valid separate PIX Timing evidence, refreshing invalidated cells. Documented reproduction remains an explicit aggregate task.
 
-**Exit `EC-G2`:** the PIX Editor/Game D3D12 cells assigned here from `AC-EC-01`–`AC-EC-10` and `AC-EC-12` pass, mapped negatives settle safely, and package/observer controls pass in the candidate report. Documented reproduction belongs to Stage 8 unless performed here; any criterion containing that unrun portion retains an open aggregate verdict. The separate PIX Timing lane has its own transcript/artifact or blocked prerequisite and cannot revoke an accepted GPU Capture cell. Retain Empty/Sponza controls here; the whole-map roster belongs to Stage 8.
+**Exit `EC-G2`:** the selected PIX Editor D3D12 cells assigned here from `AC-EC-01`–`AC-EC-10` and `AC-EC-12` pass, mapped negatives settle safely, and package/observer controls pass in the candidate report. Documented reproduction belongs to Stage 8 unless performed here; any criterion containing that unrun portion retains an open aggregate verdict. The separate PIX Timing lane has its own transcript/artifact or blocked prerequisite and cannot revoke an accepted GPU Capture cell. Retain Empty/Sponza controls here; add another map at Stage 8 only for a rendering feature or target behavior those controls cannot exercise.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only the remaining Stage 2 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
-Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Execute only the remaining Stage 2 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md with that slice's stated source, target and native/lifetime prerequisites. Unrelated provider gates are not entry conditions. Apply the Universal Execution Contract and current design/discovery owners.
+Read this stage's Work/Exit and linked design/discovery. Reuse applicable source and evidence; execute only unmet checks or a demonstrated owning repair. Stop on unknown native target/finalization, unsafe lifetime or unadmitted hooks. Preserve exact identity, native artifacts and limits; perform same-stage deletion/probe cleanup and the Stage Source-Style Gate.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```
@@ -119,8 +119,8 @@ Before handoff, update the stage result, remaining plan and next item.
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only the remaining Stage 3 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
-Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Execute only the remaining Stage 3 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md with that slice's stated source, target and native/lifetime prerequisites. Unrelated provider gates are not entry conditions. Apply the Universal Execution Contract and current design/discovery owners.
+Read this stage's Work/Exit and linked design/discovery. Reuse applicable source and evidence; execute only unmet checks or a demonstrated owning repair. Stop on unknown native target/finalization, unsafe lifetime or unadmitted hooks. Preserve exact identity, native artifacts and limits; perform same-stage deletion/probe cleanup and the Stage Source-Style Gate.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```
@@ -129,21 +129,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## Stage 4 — Deliver The Missing Nsight Vulkan Route
 
-**Remaining work:** After EC-G3 disposition and EC-D0-NG-VK, implement only the still-missing private Vulkan lowering and narrow composition hook. Current bootstrap rejects this provider on Vulkan; replace that unconditional exclusion with the proved capability/admission route in this slice, preserving explicit rejection for genuinely unsupported tuples. Reuse startup/control/presentation authority and remove duplicate provider/capability logic exposed by the integration. Prove pre-instance activity order, instance/device/layer/extension requirements, actual queue/Present or supported procedural delimiter, scene contribution, bounded artifact finalization and shutdown against installed headers. Finish distinct tool-managed GPU Trace and Systems handoffs, or identify unavailable prerequisites under the selected local scope. No API-specific UI or controller fork.
-
-**Exit `EC-G4`:** relevant native/lifecycle/target/combination/symbol/observer/profile checks pass for the Vulkan tuple or evidence-backed unsupported disposition; D3D12-neutral meanings remain identical, Vulkan native validation passes on compatible validation route. GPU Trace/Systems each have a native transcript/artifact or explicit unavailable prerequisite without masquerading as Graphics Capture. Unsupported vendor features are explicit matrix cells, not silently disabled.
-
-<details>
-<summary>Copy implementation prompt</summary>
-
-```text
-Execute only the remaining Stage 4 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
-Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
-Before handoff, update the stage result, remaining plan and next item.
-
-```
-
-</details>
+**Disposition:** deferred by the [rendering-portfolio scope](ExternalCaptureDesign.md#product-and-support-disposition). The former implementation prompt is retired. Keep explicit current unavailability; no Vulkan support is inferred from the D3D12 adapter or failed native attempts. Use an existing compatible Vulkan tool route for required frame evidence. A demonstrated missing rendering measurement and a separate bounded admission decision are required before new adapter work.
 
 ## Stage 5 — Verify The Existing RenderDoc D3D12 Workflow
 
@@ -155,8 +141,8 @@ Before handoff, update the stage result, remaining plan and next item.
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only the remaining Stage 5 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
-Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Execute only the remaining Stage 5 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md with that slice's stated source, target and native/lifetime prerequisites. Unrelated provider gates are not entry conditions. Apply the Universal Execution Contract and current design/discovery owners.
+Read this stage's Work/Exit and linked design/discovery. Reuse applicable source and evidence; execute only unmet checks or a demonstrated owning repair. Stop on unknown native target/finalization, unsafe lifetime or unadmitted hooks. Preserve exact identity, native artifacts and limits; perform same-stage deletion/probe cleanup and the Stage Source-Style Gate.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```
@@ -173,8 +159,8 @@ Before handoff, update the stage result, remaining plan and next item.
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only the remaining Stage 6 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
-Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Execute only the remaining Stage 6 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md with that slice's stated source, target and native/lifetime prerequisites. Unrelated provider gates are not entry conditions. Apply the Universal Execution Contract and current design/discovery owners.
+Read this stage's Work/Exit and linked design/discovery. Reuse applicable source and evidence; execute only unmet checks or a demonstrated owning repair. Stop on unknown native target/finalization, unsafe lifetime or unadmitted hooks. Preserve exact identity, native artifacts and limits; perform same-stage deletion/probe cleanup and the Stage Source-Style Gate.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```
@@ -191,8 +177,8 @@ Before handoff, update the stage result, remaining plan and next item.
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only the remaining Stage 7 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
-Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Execute only the remaining Stage 7 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md with that slice's stated source, target and native/lifetime prerequisites. Unrelated provider gates are not entry conditions. Apply the Universal Execution Contract and current design/discovery owners.
+Read this stage's Work/Exit and linked design/discovery. Reuse applicable source and evidence; execute only unmet checks or a demonstrated owning repair. Stop on unknown native target/finalization, unsafe lifetime or unadmitted hooks. Preserve exact identity, native artifacts and limits; perform same-stage deletion/probe cleanup and the Stage Source-Style Gate.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```
@@ -201,16 +187,16 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## Stage 8 — Close Remaining Matrix, Adoption And Parent Evidence
 
-**Remaining work:** Reuse valid narrow proof, then finish the frozen admitted release-map/representative-feature and API/profile/native-feature/interposer/validation/provider matrix from CHK-EC-MATRIX; catalog membership alone does not require every deferred scene per provider. Close actual ShippingEditor/Game import/package/optimized-callsite erasure, cold no-provider launch, user-state cleanliness, symbol mismatches, observer protocol, recovery and documented reproduction/review. Review EVOLUTION/LOCALITY/ARCH against the delivered owners and verify earlier stage cleanup; any surviving production residue returns to its owner as a bounded repair with affected proof invalidated. Missing or unrun cells remain open; documented author/agent reproduction is accepted, with actual commands and artifacts. P1-GATE closes only under the parent contract.
+**Remaining work:** Reuse valid narrow proof, then finish the frozen admitted release-map/representative-feature and API/profile/native-feature/interposer/validation/provider matrix from CHK-EC-MATRIX; catalog membership alone does not require every deferred scene per provider. Join actual ShippingEditor/Game import/package/optimized-callsite erasure, cold no-provider launch, user-state cleanliness, symbol mismatches, observer protocol, recovery and documented reproduction/review through [shared delivery evidence](../../../../Acceptance/FirstRelease.md#shared-delivery-evidence); run only missing capture-specific controls. Review EVOLUTION/LOCALITY/ARCH against the delivered owners and verify earlier stage cleanup; any surviving production residue returns to its owner as a bounded repair with affected proof invalidated. Missing or unrun cells remain open; documented author/agent reproduction is accepted, with actual commands and artifacts. P1-GATE closes only the frozen selected scope under the parent contract; it does not require deferred Game/Nsight Vulkan integrations or a provider-by-every-map campaign.
 
-**Exit `EC-G8`:** all relevant dossier criteria/failures/checks have retained results, no accepted cell lacks native artifact/identity/failure/Shipping/observer evidence, separate review/adoption complete. Record candidate disposition in existing completion report. Parent `P1-GATE` closes only with all selected `EXT-*` accepted or genuinely unsupported dispositions plus parent workload/erasure gates. Internal diagnostics packages remain unselected; Stage 8 admits or implements none of them.
+**Exit `EC-G8`:** all relevant dossier criteria/failures/checks have retained results, no accepted cell lacks native artifact/identity/failure/Shipping/observer evidence, separate review/adoption complete. Record candidate disposition in existing completion report. Parent `P1-GATE` closes only its selected existing-route matrix and applicable workload/erasure gates; parent Phase 6 reuses these observations for its FIN join, without a second campaign. Deferred cells are explicit scope exclusions, while missing required checks stay open; no full-provider acceptance is claimed. Internal diagnostics packages remain unselected; Stage 8 admits or implements none of them.
 
 <details>
 <summary>Copy implementation prompt</summary>
 
 ```text
-Execute only the remaining Stage 8 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md after verifying its preceding gate dispositions. Apply the Universal Execution Contract and current design/discovery owners.
-Inspect existing production consumers and retained artifacts before editing. Do not repeat delivered implementation. Implement only an identified missing route or defect; preserve one startup, admission, publication and native authority. Retain exact relevant dossier checks, candidate/artifact identity, failure results and limits. Stop on unsafe native lifetime, unknown target/finalization or an unauthorized hook. Remove disposable probes, pass the Stage Source-Style Gate for source changes, and reconcile this plan by removing completed work at handoff.
+Execute only the remaining Stage 8 delta of Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ImplementationPlan.md with that slice's stated source, target and native/lifetime prerequisites. Unrelated provider gates are not entry conditions. Apply the Universal Execution Contract and current design/discovery owners.
+Read this stage's Work/Exit and linked design/discovery. Reuse applicable source and evidence; execute only unmet checks or a demonstrated owning repair. Stop on unknown native target/finalization, unsafe lifetime or unadmitted hooks. Preserve exact identity, native artifacts and limits; perform same-stage deletion/probe cleanup and the Stage Source-Style Gate.
 Before handoff, update the stage result, remaining plan and next item.
 
 ```

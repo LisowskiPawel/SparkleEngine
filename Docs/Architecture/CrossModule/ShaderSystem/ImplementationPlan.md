@@ -10,6 +10,8 @@ Close the current shader, pipeline and ray-execution contract with focused compi
 
 Start with the smallest unresolved [CHK-SHS-*](Acceptance.md#controlled-failures-and-key-checks) for the selected release frame. Existing source checkpoints live in [Delivery Evidence](DeliveryEvidence.md); architecture and vocabulary live in [Shader System Design](ShaderSystemDesign.md). Source delivery does not pass a check, but an old migration prompt does not make delivered code unfinished again.
 
+Compiler/ABI/native correctness remains rendering work. Source-tool and distribution additions follow the [minimum supporting scope](../../../Acceptance/FirstRelease.md#minimum-supporting-scope): use the existing compile/cook/reload/capture paths, fix a demonstrated failure, and return to the selected frame. Compiler services, cache frameworks and new package/adoption runners are not prerequisites to proving it.
+
 ## Remaining Stages
 
 | Task | Necessary input | Output consumed by the release |

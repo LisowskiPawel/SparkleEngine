@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "GameApplication.h"
+#include "EditorShaderCompileAction.h"
 
 #include <memory>
 
@@ -11,7 +12,7 @@ class SPARKLE_APPLICATION_API EditorApplication final : public Application
 {
 public:
 	EditorApplication();
-	explicit EditorApplication(GameApplicationOptions options) noexcept;
+	explicit EditorApplication(GameApplicationOptions options, EditorShaderCompileAction compileShaders = {}) noexcept;
 	~EditorApplication();
 
 	EditorApplication(const EditorApplication&) = delete;
@@ -32,7 +33,8 @@ private:
 	void RenderEditorFrame(Renderer& renderer);
 
 	struct State;
-	std::unique_ptr<State> m_state;
 	GameApplicationOptions m_gameOptions;
+	EditorShaderCompileAction m_compileShaders;
+	std::unique_ptr<State> m_state;
 	bool m_isEditorSessionActive = false;
 };

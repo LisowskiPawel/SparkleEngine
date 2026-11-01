@@ -272,22 +272,6 @@ namespace SparkleLauncher
 		return effectiveTitle;
 	}
 
-	void LauncherActivityPanel::DisplayBlockedOperation(const QString& runId, const QString& title, const QString& message)
-	{
-		RegisterRun(runId, title);
-		SetRunState(runId, RunState::Blocked, title);
-
-		AppendRunOutput(
-		    runId,
-		    QStringLiteral(
-		        "Result: Blocked\nProblem type: Prerequisite\nWhat failed: %1\nNext action: Resolve the reported prerequisite, then retry "
-		        "Quick Start.\n")
-		        .arg(message));
-
-		ShowRunOutput(runId);
-		SetExpanded(true);
-	}
-
 	void LauncherActivityPanel::AppendRunOutput(const QString& runId, const QString& text)
 	{
 		auto run = m_runs.find(runId);

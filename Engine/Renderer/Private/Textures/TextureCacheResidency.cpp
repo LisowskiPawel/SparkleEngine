@@ -2,7 +2,7 @@
 #include "Textures/TextureCache.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "RHI/Public/Commands/RenderCommandList.h"
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"
@@ -153,7 +153,7 @@ bool TextureCache::HasPendingRequest(const std::filesystem::path& texturePath) c
 
 std::optional<TextureCache::ResolvedTexturePath> TextureCache::ResolveTexturePath(const std::filesystem::path& texturePath) const noexcept
 {
-	const auto resolvedPath = Filesystem::ResolveAssetPathNormalized(texturePath, AssetType::Texture);
+	const auto resolvedPath = Filesystem::ResolveCookedTexturePath(texturePath);
 	if (!resolvedPath)
 	{
 		return std::nullopt;

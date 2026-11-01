@@ -3,7 +3,7 @@
 #include "Diagnostics/GpuCrash/GpuCrashInputVerification.h"
 
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Json/JsonReader.h"
 #include "Core/Public/Formatting/HexFormat.h"

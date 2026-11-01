@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Public/Diagnostics/Error.h"
+#include "Assets/Loaders/CookedAssetAllocationBudget.h"
 #include "Core/Public/Files/BinarySpanReader.h"
 
 #include <limits>
@@ -10,7 +11,8 @@ namespace Assets
 	class CookedAssetByteReader final
 	{
 	public:
-		explicit CookedAssetByteReader(std::span<const std::uint8_t> bytes) noexcept :
+		explicit CookedAssetByteReader(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) noexcept :
+		    m_budget(budget),
 		    m_reader(bytes)
 		{
 		}
@@ -28,6 +30,7 @@ namespace Assets
 
 		template <typename T> std::vector<T> ReadArray(std::size_t elementCount)
 		{
+			m_budget.ReserveArray<T>(elementCount);
 			std::vector<T> values;
 			std::string error;
 			if (!m_reader.ReadArray(elementCount, values, error))
@@ -61,6 +64,7 @@ namespace Assets
 
 		std::string ReadString(std::size_t byteCount)
 		{
+			m_budget.Reserve(byteCount);
 			std::string value;
 			std::string error;
 			if (!m_reader.ReadString(byteCount, value, error))
@@ -82,6 +86,7 @@ namespace Assets
 			throw Diagnostics::Error("Unexpected end of cooked asset data.");
 		}
 
+		CookedAssetAllocationBudget& m_budget;
 		Files::BinarySpanReader m_reader;
 	};
 }

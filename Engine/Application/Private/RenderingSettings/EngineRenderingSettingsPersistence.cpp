@@ -3,11 +3,9 @@
 
 #include "Core/Public/Console/CVar.h"
 #include "Core/Public/Console/CVarRegistry.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Paths/PackagePaths.h"
-#include "Core/Public/Paths/ProductPaths.h"
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
@@ -25,16 +23,13 @@
 std::filesystem::path EngineRenderingSettingsPersistence::GetDefaultConfigPath()
 {
 	const std::filesystem::path& root = Filesystem::GetWorkspaceRootPath();
-	if (!Filesystem::IsSourceWorkspace(root))
+	const auto path = root / "Config" / "DefaultEngine.ini";
+	std::error_code error;
+	if (!std::filesystem::is_regular_file(path, error) || error)
 	{
-		const auto defaults = Filesystem::ResolvePackageFilePath(root, "Config/DefaultEngine.ini");
-		if (!defaults)
-		{
-			throw Diagnostics::Error("The packaged rendering defaults are missing or corrupt. Extract a verified package before retrying.");
-		}
-		return *defaults;
+		throw Diagnostics::Error("Rendering defaults are missing or inaccessible: " + path.string());
 	}
-	return root / "Config" / "DefaultEngine.ini";
+	return path;
 }
 
 std::filesystem::path EngineRenderingSettingsPersistence::GetUserConfigPath()

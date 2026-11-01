@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Style/SparkleUiPalette.h"
 #include "Style/SparkleUiTheme.h"

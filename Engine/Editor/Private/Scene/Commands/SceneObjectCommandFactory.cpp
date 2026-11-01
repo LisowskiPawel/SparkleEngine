@@ -8,7 +8,6 @@
 std::optional<EditorCommandPair> SceneObjectCommandFactory::SetVisibility(const EditorSceneModel& model, const SceneObjectSelection& selection, bool visible)
 {
 	EditorCommandPair commands;
-	commands.CoalescingKey = "visibility";
 	if (selection.type == SceneObjectType::Light)
 	{
 		const WorldLightReadData* light = model.FindLight(selection.entity);

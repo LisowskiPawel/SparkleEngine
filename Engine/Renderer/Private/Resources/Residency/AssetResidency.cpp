@@ -94,6 +94,9 @@ bool AssetResidency::BeginUpload(AssetGenerationHandle handle) noexcept
 	}
 
 	generation->State = AssetResidencyState::Uploading;
+	generation->ResidentBytes = generation->UploadBytes;
+	generation->ResidentAccounted = true;
+	m_counters.ResidentBytes += generation->ResidentBytes;
 	m_counters.PendingUploadBytes += generation->UploadBytes;
 	generation->PendingUploadAccounted = true;
 	return true;
@@ -103,12 +106,13 @@ bool AssetResidency::RecordUploadSubmission(AssetGenerationHandle handle, RhiSub
 {
 	AssetGenerationStatus* generation = FindMutable(handle);
 	if (generation == nullptr || (generation->State != AssetResidencyState::Uploading && generation->State != AssetResidencyState::Evicting) || !completionToken.IsValid()
-	    || residentBytes > m_budget.MaximumResidentBytes - m_counters.ResidentBytes)
+	    || !generation->ResidentAccounted || residentBytes > m_budget.MaximumResidentBytes - (m_counters.ResidentBytes - generation->ResidentBytes))
 	{
 		return false;
 	}
 
 	generation->Completion.MarkUsed(completionToken);
+	m_counters.ResidentBytes = m_counters.ResidentBytes - generation->ResidentBytes + residentBytes;
 	generation->ResidentBytes = residentBytes;
 	return true;
 }
@@ -156,7 +160,9 @@ void AssetResidency::Poll(RhiCommandSubmissionService& submissions) noexcept
 {
 	for (AssetGenerationStatus& generation : m_generations)
 	{
-		if (generation.State == AssetResidencyState::Uploading && IsComplete(generation.Completion, submissions))
+		if (generation.State == AssetResidencyState::Uploading
+		    && std::any_of(generation.Completion.Values.begin(), generation.Completion.Values.end(), [](std::uint64_t value) { return value != 0; })
+		    && IsComplete(generation.Completion, submissions))
 		{
 			if (generation.PendingUploadAccounted && generation.UploadBytes <= m_counters.PendingUploadBytes)
 			{
@@ -165,8 +171,6 @@ void AssetResidency::Poll(RhiCommandSubmissionService& submissions) noexcept
 			}
 			ReleaseCpuBudget(generation);
 			generation.State = AssetResidencyState::Resident;
-			m_counters.ResidentBytes += generation.ResidentBytes;
-			generation.ResidentAccounted = true;
 			ReleaseBacklog(generation);
 		}
 		else if (generation.State == AssetResidencyState::Evicting && IsComplete(generation.Completion, submissions))

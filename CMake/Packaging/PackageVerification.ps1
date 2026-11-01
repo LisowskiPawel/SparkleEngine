@@ -50,11 +50,13 @@ function Assert-PackageManifest
     foreach ($file in $Manifest.Files)
     {
         Assert-PackagePath $file.Path
-        if (!$paths.Add($file.Path) -or $file.Path -in @('.sparkle', 'manifests/sparkle-package-manifest.json'))
+        if (!$paths.Add($file.Path) -or $file.Path -eq 'manifests/sparkle-package-manifest.json')
         {
             throw "Duplicate or reserved manifest path: '$($file.Path)'."
         }
-        if ($file.Path -eq 'Engine/Cooked/Shaders/recook.signal' -or
+        if ($file.Path.StartsWith('Tools/Diagnostics/', [StringComparison]::OrdinalIgnoreCase) -or
+            $file.Path -match '(^|/)recook\.signal$' -or
+            $file.Path -match '(^|/)\.publication-incomplete$' -or
             $file.Path -match '\.(pdb|ilk|obj|lib|exp|cpp|cxx|h|hpp)$' -or
             $file.Path -match '(^|/)(build|_deps|\.git|Cache|Logs|Settings)(/|$)' -or
             $file.Path -match '(^|/)(Sponza|ModernSponza)/.*\.(glb|gltf|bin|dds|png|jpg|ktx2)$')
@@ -70,7 +72,7 @@ function Assert-PackageManifest
         {
             throw "Incomplete or private-path payload declaration: '$($file.Path)'."
         }
-        if (($file.Component -eq 'Game' -or $file.Path -match '^Projects/[^/]+/Binaries/ShippingGame/') -and $file.Path -match '(?i)(Qt6|SparkleEditor|AssetCooker|TextureCooker|ShaderCompiler)')
+        if (($file.Component -eq 'Game' -or $file.Path -match '^artifacts/dev/Projects/[^/]+/Binaries/ShippingGame/') -and $file.Path -match '(?i)(Qt6|SparkleEditor|AssetCooker|TextureCooker|ShaderCompiler)')
         {
             throw "Editor/authoring dependency in Game component: '$($file.Path)'."
         }
@@ -88,18 +90,12 @@ function Assert-PackageManifest
 function Assert-PackageLayout
 {
     param($Manifest)
-    foreach ($path in @($Manifest.ProjectPath, $Manifest.EnginePath, $Manifest.ContentStore)) { Assert-PackagePath $path }
-    if ($Manifest.ProjectPath -cne 'Projects/Showcase' -or $Manifest.EnginePath -cne 'Engine' -or $Manifest.ContentStore -cne 'Content/Showcase')
-    {
-        throw 'Package layout differs from the frozen three-product content-store contract.'
-    }
-    foreach ($path in @('Projects/Showcase/.sparkle-project', 'Projects/Showcase/Levels.catalog', 'Config/DefaultEngine.ini'))
+    foreach ($path in @('LaunchSparkle.cmd', '.sparkle', 'Engine/.sparkle-engine', 'Projects/Showcase/.sparkle-project', 'Projects/Showcase/Levels.catalog', 'Config/DefaultEngine.ini'))
     {
         if (@($Manifest.Files | Where-Object Path -ceq $path).Count -ne 1) { throw "Missing package recipe input: '$path'." }
     }
-    foreach ($path in @('Tools/Content/SyncAssetPack.cmake', 'Tools/Content/SyncAssetPackFiles.cmake',
-                        'Tools/Content/SyncAssetPackArchive.cmake', 'Engine/Cooked/Shaders/GlobalShaderMap.smap',
-                        'Engine/Cooked/Shaders/CookedShaderLibrary.slib', 'Engine/Cooked/Shaders/ShaderDependencies.sdep'))
+    foreach ($path in @('artifacts/dev/Projects/Showcase/Cooked/.publication-lock', 'artifacts/dev/Projects/Showcase/Cooked/Shaders/GlobalShaderMap.smap',
+                        'artifacts/dev/Projects/Showcase/Cooked/Shaders/CookedShaderLibrary.slib', 'artifacts/dev/Projects/Showcase/Cooked/Shaders/ShaderDependencies.sdep'))
     {
         if (@($Manifest.Files | Where-Object Path -ceq $path).Count -ne 1) { throw "Missing installed content input: '$path'." }
     }
@@ -109,7 +105,7 @@ function Assert-PackageLayout
     }
     foreach ($file in $Manifest.Files)
     {
-        if ($file.Path -match '^Projects/Showcase/(Cooked|Cache|Downloads)(/|$)')
+        if ($file.Path -match '^Projects/Showcase/(Cache|Downloads)(/|$)')
         {
             throw "Writable selected-content output inside immutable package: '$($file.Path)'."
         }

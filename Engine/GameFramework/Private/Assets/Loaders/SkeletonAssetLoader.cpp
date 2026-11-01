@@ -16,11 +16,11 @@
 
 namespace Assets
 {
-	LoadedSkeletonAsset SkeletonAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes) const
+	LoadedSkeletonAsset SkeletonAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const
 	{
 		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedSkeletonAsset");
 
-		CookedAssetByteReader reader(bytes);
+		CookedAssetByteReader reader(bytes, budget);
 		LoadedSkeletonAsset skeletonAsset;
 		skeletonAsset.header = reader.Read<CookedSkeletonAssetHeader>();
 

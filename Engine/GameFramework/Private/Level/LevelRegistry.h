@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -7,12 +8,11 @@
 #include <vector>
 
 class LevelAsset;
-struct ProjectLevelCatalogEntry;
 
 class LevelRegistry final
 {
 public:
-	LevelRegistry();
+	explicit LevelRegistry(const std::filesystem::path& projectRoot);
 	~LevelRegistry() noexcept;
 
 	LevelRegistry(const LevelRegistry&) = delete;
@@ -29,8 +29,8 @@ public:
 	std::string_view GetDefaultLevelName() const noexcept;
 
 private:
-	void DiscoverLevels();
-	void LoadCatalogLevel(const ProjectLevelCatalogEntry& entry);
+	void DiscoverLevels(const std::filesystem::path& projectRoot);
+	void LoadLevelFile(const std::filesystem::path& path);
 	void EnsureDefaultLevel();
 	void Register(std::unique_ptr<LevelAsset> level);
 

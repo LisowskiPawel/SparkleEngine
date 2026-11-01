@@ -5,10 +5,9 @@
 #include "Cooking/ShaderCompileFailureReplay.h"
 #include "Cooking/ShaderCompileJob.h"
 #include "Cooking/ShaderCompileJobExecutor.h"
-#include "Cooking/ShaderCookCancellation.h"
 #include "Cooking/ShaderCookSettings.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "TaskExecutor.h"
 #include "Verification/ShaderParameterStructCookVerifier.h"
 
@@ -116,7 +115,7 @@ static std::vector<ShaderCompileResult> CompileProducers(
 		    TaskDesc{TaskName("Compile shader"), TaskLane::Background},
 		    [&, producerIndex](TaskExecutionContext& context)
 		    {
-			    if (context.IsCancellationRequested() || IsShaderCookCancelled(settings.cancellationSignalPath))
+			    if (context.IsCancellationRequested())
 			    {
 				    return TaskResult::Cancelled("Shader cook was cancelled.");
 			    }
@@ -144,7 +143,6 @@ static std::vector<ShaderCompileResult> CompileProducers(
 	const TaskExecution execution = executor.Submit(graph.Compile(), context);
 	if (execution.GetStatus() == TaskExecutionStatus::Succeeded)
 	{
-		ThrowIfShaderCookCancelled(settings.cancellationSignalPath);
 		return results;
 	}
 
@@ -221,7 +219,6 @@ std::vector<ShaderCompileResult> CompileShaderBatch(const ShaderCookSettings& se
 	{
 		return {};
 	}
-	ThrowIfShaderCookCancelled(settings.cancellationSignalPath);
 
 	const ProducerMap producerMap = SelectProducers(jobs);
 	std::vector<ShaderCompileResult> producerResults = CompileProducers(settings, jobs, producerMap, totalWork, progress);

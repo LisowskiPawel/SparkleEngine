@@ -1,7 +1,7 @@
 #include "LauncherCleanUiModel.h"
 
 #include "Core/Public/Paths/ProductUserStatePaths.h"
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "ToolOutputPaths.h"
 #include "SparkleLauncher/BuildProfileCatalog.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
 
@@ -14,13 +14,13 @@
 
 namespace SparkleLauncher
 {
-	std::filesystem::path ResolveCleanScopePreviewPath(const std::filesystem::path& repositoryRoot, const QString& projectId, const QString& scope)
+	std::filesystem::path ResolveCleanScopePreviewPath(const std::filesystem::path& workspaceRoot, const QString& projectId, const QString& scope)
 	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
+		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
 		CleanScope cleanScope = CleanScope::CookedOutputs;
 		if (!TryParseCleanScope(scope.toStdString(), cleanScope))
 		{
-			return repositoryRoot;
+			return workspaceRoot;
 		}
 
 		switch (cleanScope)
@@ -33,13 +33,13 @@ namespace SparkleLauncher
 				return outputs.ArtifactRoot;
 			case CleanScope::WorkspaceState:
 			case CleanScope::PristineGeneratedWorkspace:
-				return repositoryRoot;
+				return workspaceRoot;
 			case CleanScope::ThirdPartyDependencyCache:
 				return outputs.DependencyCacheRoot;
 			case CleanScope::Logs:
-				return Filesystem::ResolveDevelopmentProductUserStatePaths(repositoryRoot, projectId.toStdString()).LogsRoot;
+				return Filesystem::ResolveDevelopmentProductUserStatePaths(workspaceRoot, projectId.toStdString()).LogsRoot;
 		}
-		return repositoryRoot;
+		return workspaceRoot;
 	}
 
 	QString CleanScopeDisplayName(const QString& scopeValue)
@@ -127,7 +127,7 @@ namespace SparkleLauncher
 
 	static void AddTargetOutputFiles(
 	    QVector<LauncherCleanTarget>& targets,
-	    const Filesystem::WorkspaceTargetOutputPaths& targetOutputs,
+	    const SparkleTools::ToolTargetOutputPaths& targetOutputs,
 	    const QString& targetName,
 	    const QString& detail,
 	    const std::filesystem::path& preservedPath = {})
@@ -144,14 +144,14 @@ namespace SparkleLauncher
 
 	void AddTargetArtifactOutputs(
 	    QVector<LauncherCleanTarget>& targets,
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const QString& profileName,
 	    const QString& targetName,
 	    const QString& detail,
 	    const std::filesystem::path& preservedPath)
 	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		Filesystem::WorkspaceTargetOutputPaths targetOutputs = outputs.RuntimeSupportTargetOutputs(targetName.toStdString(), profileName.toStdString());
+		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
+		SparkleTools::ToolTargetOutputPaths targetOutputs = outputs.RuntimeSupportTargetOutputs(targetName.toStdString(), profileName.toStdString());
 		if (targetName == "SparkleLauncher")
 		{
 			targetOutputs = outputs.LauncherTargetOutputs(profileName.toStdString());
@@ -165,22 +165,22 @@ namespace SparkleLauncher
 
 	void AddProjectTargetArtifactOutputs(
 	    QVector<LauncherCleanTarget>& targets,
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const QString& profileName,
 	    const QString& projectName,
 	    const QString& productRole,
 	    const QString& targetName,
 	    const QString& detail)
 	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		const Filesystem::WorkspaceTargetOutputPaths targetOutputs = outputs.ProjectTargetOutputs(projectName.toStdString(), productRole.toStdString(), profileName.toStdString());
+		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
+		const SparkleTools::ToolTargetOutputPaths targetOutputs = outputs.ProjectTargetOutputs(projectName.toStdString(), productRole.toStdString(), profileName.toStdString());
 		AddTargetOutputFiles(targets, targetOutputs, targetName, detail);
 	}
 
 	QVector<LauncherCleanTarget> BuildActionSpecificCleanTargets(const ActionCleanTargetContext& context)
 	{
 		QVector<LauncherCleanTarget> targets;
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(context.RepositoryRoot);
+		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(context.WorkspaceRoot);
 		const QStringList buildScopes = context.BuildScopes.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
 		const QStringList cookScopes = context.CookScopes.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
 		const bool workspaceBuild = context.OperationId == "workspace.build";
@@ -201,7 +201,7 @@ namespace SparkleLauncher
 			const QString productRole = profile->Target == BuildProfileTarget::Game ? "game" : "editor";
 			AddProjectTargetArtifactOutputs(
 			    targets,
-			    context.RepositoryRoot,
+			    context.WorkspaceRoot,
 			    profileName,
 			    projectName,
 			    productRole,
@@ -211,11 +211,11 @@ namespace SparkleLauncher
 
 		if (context.OperationId == "launcher.build.self" || (workspaceBuild && buildScopes.contains("launcher")))
 		{
-			const Filesystem::WorkspaceTargetOutputPaths launcherOutputs = outputs.LauncherTargetOutputs(context.EditorProfile.toStdString());
+			const SparkleTools::ToolTargetOutputPaths launcherOutputs = outputs.LauncherTargetOutputs(context.EditorProfile.toStdString());
 
 			AddTargetArtifactOutputs(
 			    targets,
-			    context.RepositoryRoot,
+			    context.WorkspaceRoot,
 			    context.EditorProfile,
 			    "SparkleLauncher",
 			    "Launcher direct build outputs. The currently running launcher executable is preserved until restart.",
@@ -247,11 +247,11 @@ namespace SparkleLauncher
 		if (context.OperationId == "cook.tools.prepare" || (workspaceBuild && buildScopes.contains("cook-tools")))
 		{
 #if SPARKLE_ENABLE_CONTENT_PIPELINE
-			AddTargetArtifactOutputs(targets, context.RepositoryRoot, context.EditorProfile, "AssetCooker", "AssetCooker executable outputs.");
-			AddTargetArtifactOutputs(targets, context.RepositoryRoot, context.EditorProfile, "TextureCooker", "TextureCooker executable outputs.");
+			AddTargetArtifactOutputs(targets, context.WorkspaceRoot, context.EditorProfile, "AssetCooker", "AssetCooker executable outputs.");
+			AddTargetArtifactOutputs(targets, context.WorkspaceRoot, context.EditorProfile, "TextureCooker", "TextureCooker executable outputs.");
 #endif
 #if SPARKLE_ENABLE_SHADER_COMPILER
-			AddTargetArtifactOutputs(targets, context.RepositoryRoot, context.EditorProfile, "ShaderCompiler", "ShaderCompiler executable outputs.");
+			AddTargetArtifactOutputs(targets, context.WorkspaceRoot, context.EditorProfile, "ShaderCompiler", "ShaderCompiler executable outputs.");
 #endif
 		}
 

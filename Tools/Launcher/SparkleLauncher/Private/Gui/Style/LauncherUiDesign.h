@@ -84,8 +84,7 @@ namespace SparkleLauncher::LauncherUi
 		inline constexpr int IdeComboMaxWidth = 150;
 		inline constexpr int CompilerComboMinWidth = 100;
 		inline constexpr int CompilerComboMaxWidth = 130;
-		inline constexpr int CaptureComboMinWidth = 130;
-		inline constexpr int CaptureComboMaxWidth = 200;
+		inline constexpr int CaptureComboWidth = 136;
 		inline constexpr int GraphicsApiComboMinWidth = 92;
 		inline constexpr int GraphicsApiComboMaxWidth = 116;
 		inline constexpr int ShaderBackendComboMinWidth = 82;
@@ -128,7 +127,7 @@ namespace SparkleLauncher::LauncherUi
 		inline constexpr int Spacing = 12;
 		inline constexpr int BottomMargin = 32;
 		inline const QMargins ContentMargins{36, 28, 36, BottomMargin};
-		inline const QMargins QuickStartMargins{0, 0, 0, BottomMargin};
+		inline const QMargins SceneSelectionMargins{0, 0, 0, BottomMargin};
 	}
 
 	namespace ActionMeta
@@ -180,20 +179,6 @@ namespace SparkleLauncher::LauncherUi
 		inline const QMargins GroupMargins{0, 6, 0, 6};
 	}
 
-	namespace WorkflowVisual
-	{
-		inline constexpr int MinHeight = 118;
-		inline constexpr int FallbackWidth = 360;
-		inline constexpr int FallbackHeight = 180;
-		inline constexpr int ContainerSpacing = 18;
-		inline constexpr int CopySpacing = 8;
-		inline constexpr int ActionTopMargin = 2;
-
-		inline const QSize ArtworkSize{360, MinHeight};
-		inline const QSize FallbackArtworkSize{FallbackWidth, FallbackHeight};
-		inline const QMargins CopyMargins{18, 14, 18, 14};
-	}
-
 	namespace Activity
 	{
 		inline constexpr int CollapsedHeight = 40;
@@ -233,7 +218,7 @@ namespace SparkleLauncher::LauncherUi
 		inline constexpr double MaximumCopyScale = 1.12;
 	}
 
-	namespace Home
+	namespace Scenes
 	{
 		inline constexpr int BodyLeft = 36;
 		inline constexpr int BodyTop = 26;

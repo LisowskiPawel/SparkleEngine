@@ -6,11 +6,12 @@
 
 namespace Assets
 {
+	class CookedAssetAllocationBudget;
 	struct LoadedSceneManifest;
 
 	class SceneManifestLoader final
 	{
 	public:
-		LoadedSceneManifest Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes) const;
+		LoadedSceneManifest Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const;
 	};
 }

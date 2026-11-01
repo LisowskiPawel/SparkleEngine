@@ -44,10 +44,10 @@ namespace SparkleLauncher
 		return compiler;
 	}
 
-	BuildWorkspaceOperationRequest BuildWorkspacePlanRequest(const std::filesystem::path& repositoryRoot, const LauncherContentModel& contentModel, const LauncherSettings& settings)
+	BuildWorkspaceOperationRequest BuildWorkspacePlanRequest(const std::filesystem::path& workspaceRoot, const LauncherContentModel& contentModel, const LauncherSettings& settings)
 	{
 		BuildWorkspaceOperationRequest request;
-		request.RepositoryRoot = repositoryRoot;
+		request.WorkspaceRoot = workspaceRoot;
 		request.ContentId = contentModel.ContentId().toStdString();
 		request.EditorProfile = settings.EditorProfile().toStdString();
 		request.GameProfile = settings.GameProfile().toStdString();
@@ -57,29 +57,14 @@ namespace SparkleLauncher
 		return request;
 	}
 
-	LauncherOperationRequest BuildQuickStartOperationRequest(const LauncherOperationRequest& goalRequest, const QString& operationId, const QStringList& requestedLevelIds)
-	{
-		LauncherOperationRequest request = goalRequest;
-		request.RunId.clear();
-		request.OperationId = operationId;
-		if (!requestedLevelIds.isEmpty())
-		{
-			request.RequestedLevelIds = requestedLevelIds.join(',');
-		}
-		request.SourceDependencyId.clear();
-		request.HostToolId.clear();
-		request.ConfirmClean = false;
-		return request;
-	}
-
 	LauncherOperationRequest BuildLauncherOperationRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
 	    const LauncherSettings& settings,
 	    const QString& operationId)
 	{
 		LauncherOperationRequest request;
-		request.RepositoryRoot = repositoryRoot;
+		request.WorkspaceRoot = workspaceRoot;
 		request.OperationId = operationId;
 		request.ContentId = contentModel.ContentId();
 		request.RunMode = settings.RunMode();
@@ -90,6 +75,7 @@ namespace SparkleLauncher
 		request.BuildScopes = settings.BuildScopes();
 		request.CookScopes = settings.CookScopes();
 		request.ShaderBackend = settings.ShaderBackend();
+		request.ShaderSymbols = settings.ShaderSymbols();
 		request.GraphicsApi = settings.GraphicsApi();
 		request.CaptureProvider = settings.CaptureProvider();
 		request.GpuCrashMode = settings.GpuCrashMode();
@@ -100,14 +86,14 @@ namespace SparkleLauncher
 	}
 
 	ActionCleanTargetContext BuildActionCleanTargetContext(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
 	    const LauncherSettings& settings,
 	    const std::filesystem::path& runningLauncherPath,
 	    const QString& operationId)
 	{
 		return ActionCleanTargetContext{
-		    repositoryRoot,
+		    workspaceRoot,
 		    runningLauncherPath,
 		    operationId,
 		    contentModel.ContentId(),
@@ -118,26 +104,26 @@ namespace SparkleLauncher
 	}
 
 	LauncherOperationRequest BuildActionCleanOperationRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
 	    const LauncherSettings& settings,
 	    const std::filesystem::path& runningLauncherPath,
 	    const QString& operationId)
 	{
-		LauncherOperationRequest request = BuildLauncherOperationRequest(repositoryRoot, contentModel, settings, "workspace.clean");
-		request.CleanTargets = BuildActionSpecificCleanTargets(BuildActionCleanTargetContext(repositoryRoot, contentModel, settings, runningLauncherPath, operationId));
+		LauncherOperationRequest request = BuildLauncherOperationRequest(workspaceRoot, contentModel, settings, "workspace.clean");
+		request.CleanTargets = BuildActionSpecificCleanTargets(BuildActionCleanTargetContext(workspaceRoot, contentModel, settings, runningLauncherPath, operationId));
 		request.ConfirmClean = false;
 		return request;
 	}
 
 	LauncherOperationRequest BuildScopedCleanOperationRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
 	    const LauncherSettings& settings,
 	    const QString& cleanScope,
 	    const std::filesystem::path& runningLauncherPath)
 	{
-		LauncherOperationRequest request = BuildLauncherOperationRequest(repositoryRoot, contentModel, settings, "workspace.clean");
+		LauncherOperationRequest request = BuildLauncherOperationRequest(workspaceRoot, contentModel, settings, "workspace.clean");
 		request.CleanScope = cleanScope;
 		request.CleanTargets.clear();
 		request.PreservedPaths.clear();

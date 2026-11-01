@@ -7,7 +7,7 @@
 #include "LauncherOperationRequestFactory.h"
 #include "LauncherSettings.h"
 
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "ToolOutputPaths.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
 #include "SparkleLauncher/SourceDependencyState.h"
 
@@ -24,7 +24,7 @@ namespace SparkleLauncher
 {
 	void LauncherMainWindow::AddSyncDependencies(QVBoxLayout& layout, bool optional)
 	{
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(m_repositoryRoot);
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
 		const std::filesystem::path dependencyCachePath = workspaceOutputs.DependencyCacheRoot;
 		for (const ThirdPartyDependencyUiEntry& dependency : GetTrackedThirdPartyDependencies())
 		{
@@ -82,7 +82,7 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::ApplySourceDependencyRowState(const ThirdPartyDependencyUiEntry& dependency, QLabel& statusLabel, QPushButton& button)
 	{
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(m_repositoryRoot);
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
 		const std::filesystem::path dependencyCachePath = workspaceOutputs.DependencyCacheRoot;
 		const ThirdPartyDependencyUiStatus status = BuildThirdPartyDependencyStatus(dependency, dependencyCachePath);
 		const QString runId = m_sourceDependencyRunIds.value(dependency.Id);
@@ -117,7 +117,7 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::SyncSourceDependency(const ThirdPartyDependencyUiEntry& dependency)
 	{
-		LauncherOperationRequest request = BuildLauncherOperationRequest(m_repositoryRoot, m_contentModel, m_settings, "workspace.sync-code");
+		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, "workspace.sync-code");
 		request.SourceDependencyId = dependency.Id;
 		StartOperation(std::move(request), "Sync " + dependency.Label);
 	}
@@ -130,8 +130,8 @@ namespace SparkleLauncher
 			return;
 		}
 
-		LauncherOperationRequest request = BuildLauncherOperationRequest(m_repositoryRoot, m_contentModel, m_settings, "workspace.clean");
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(m_repositoryRoot);
+		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, "workspace.clean");
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
 		const std::filesystem::path dependencyCachePath = workspaceOutputs.DependencyCacheRoot;
 		for (const std::filesystem::path& path : GetSourceDependencyCachePaths(*sourceDependency, dependencyCachePath))
 		{

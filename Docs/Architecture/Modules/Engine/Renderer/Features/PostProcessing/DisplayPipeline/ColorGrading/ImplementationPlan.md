@@ -210,7 +210,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## Stage 6 — Evidence, Package, And Close
 
-**Work:** run all predeclared `CHK-CGR-*` against the exact candidate; compare D3D12/Vulkan raw stage products, SDR/HDR joins, package operation, memory/cost, clean machine, and excluded-surface audit using current tools. Remove local probes and verify preceding stages' replacement deletions and addition budgets; audit CMake, generated shaders, assets, package allowlists, rights, docs, and dirty work. A production residue/defect returns to its owner and invalidates affected proof; this stage adds no runner, report framework or calibration product. Submit `FCR-REN-24`.
+**Work:** run the predeclared `CHK-CGR-*` on the exact candidate, including D3D12/Vulkan raw stage products, SDR/HDR joins, memory/cost and excluded-surface audit. Join package/clean-machine observations to [shared delivery evidence](../../../../../../../../Acceptance/FirstRelease.md#shared-delivery-evidence); run only missing grading-specific controls in that rehearsal, without another archive or machine campaign. Remove local probes and verify preceding stages' replacement deletions and addition budgets; audit CMake, generated shaders, assets, package allowlists, rights, docs, and dirty work. A production residue/defect returns to its owner and invalidates affected proof; this stage adds no runner, report framework or calibration product. Submit `FCR-REN-24`.
 
 **Exit:** all applicable `AC-CGR-01` through `08` pass conjunctively, every failure/risk has detecting evidence, all excluded surfaces remain absent, and the acceptance owner records the real verdict. Documentation, a successful build, or one attractive screenshot cannot close the feature.
 

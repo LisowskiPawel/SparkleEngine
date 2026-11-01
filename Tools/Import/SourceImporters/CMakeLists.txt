@@ -35,8 +35,8 @@ sparkle_target_precompile_headers(SourceImporters
 target_link_libraries(SourceImporters
     PUBLIC
         SparkleCore
-        SparkleGameFramework
     PRIVATE
+        ToolSupport
         cgltf
         mikktspace
         assimp::assimp

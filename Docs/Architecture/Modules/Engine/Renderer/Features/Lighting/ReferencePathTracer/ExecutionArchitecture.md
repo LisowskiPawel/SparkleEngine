@@ -2,7 +2,7 @@
 
 [Docs](../../../../../../../README.md) / [Up](ReferencePathTracerDesign.md) / [Implementation](ImplementationPlan.md)
 
-**Status:** target architecture retaining the `PTD-00-R1 PASS` transport/development baseline and the approved consumer release scope. Development source through Stage 9 remains **IMPLEMENTED / VALIDATION DEFERRED**; Shipping host/output integration, usable rendering and Reference authority remain open.
+**Status:** target architecture retaining accepted `PTD-00-R1` transport/development work and amended Editor consumer scope. Development source through Stage 9 remains **IMPLEMENTED / VALIDATION DEFERRED**; ShippingEditor interaction/output, usable rendering and Reference authority remain open.
 
 **Scope:** define the owner, contracts, lifetime, execution, sampling, accumulation, viewport interaction, manual artifact, and clean-break boundaries for SparkleEngine's eventual Reference Path Tracer
 
@@ -85,7 +85,7 @@ Display commits a complete row sweep's working mean/M2. The session advances its
 
 | Concern | Current source route | Required target |
 | --- | --- | --- |
-| Invocation | The current working source carries one `RenderViewMode` per view. Editor exposes `ReferencePathTracer = 1` immediately after Lit; Game can submit the same value through `GameApplication::SubmitViewportRenderRequest`; `RenderViewBuilder` freezes it into View; and `AddSceneRenderingPasses` owns the Lit-versus-Reference execution branch below the generic frame composition. | Retain this one request route and prove both hosts, navigation, progress, comparison, capability, and package behavior through executable evidence. No `LightingMode`, Editor mirror enum, target/show-flag split, selector CVar, or dedicated command may return. |
+| Invocation | The current working source carries one `RenderViewMode` per view. Editor exposes `ReferencePathTracer = 1` immediately after Lit; Game can submit the same value through `GameApplication::SubmitViewportRenderRequest`; `RenderViewBuilder` freezes it into View; and `AddSceneRenderingPasses` owns the Lit-versus-Reference execution branch below the generic frame composition. | Retain one request route. Prove Editor navigation/progress/comparison and shared Scene/Game Renderer/camera/session semantics, plus actual capability/package behavior. Game gains no UI/export frontend. No `LightingMode`, Editor mirror enum, target/show-flag split, selector CVar or dedicated command may return. |
 | Traversal frontend | The Reference middle uses the engine-wide automatic resolver: Pipeline when complete, otherwise Inline, with no feature-specific setting. Two thin entry adapters invoke one shared estimator kernel; Pipeline reuses generic material payload/hit shaders, scene SBT, and RHI pipeline/table/dispatch mechanisms. | Prove every applicable D3D12/Vulkan automatic route, both adapters through focused evidence, and unsupported-capability refusal. Source presence is not parity evidence. |
 | Primary visibility | The Reference kernel generates a canonical camera ray from the immutable View camera and traces the shared ray-tracing scene directly. It does not consume the Lit GBuffer or reconstruction output. | Prove center/edge/corner camera rays, hit semantics, and GBuffer independence through `CHK-RPT-03`. |
 | Estimator | One Reference transport kernel orders emission/environment hits, next-event estimation, MIS, BSDF continuation, compensated roulette, and invalid-result handling over shared path primitives. | Complete the equation-to-code, analytic, injected-fault, and independent numeric review; source correspondence alone is not estimator authority. |
@@ -133,7 +133,7 @@ flowchart LR
     RGS --> RHI
     Session --> Overlay[Progress and reset snapshot]
     Session --> Readback[Generic Radiance readback]
-    Overlay --> UI[Editor or approved Game presentation]
+    Overlay --> UI[Editor presentation]
     Readback --> Encode[Shared Application image encoding]
     Encode --> Schema[Reference checkpoint and manifest schema]
     Schema --> Publish[Shared atomic bundle publication]
@@ -156,6 +156,8 @@ flowchart LR
 | Evidence/release owner | Fixture manifests, thresholds, repetitions, comparisons, approval, and completion reports. | Mutating candidate output or treating source presence as a pass. |
 
 Each committed prefix is bound to immutable leases and identities over Scene/View-owned generations. It is not a deep-copied alternative world. A contributing mutation publishes a new generation, invalidates the old prefix before the next sample-range commit, and begins a new session digest at ordinal zero. If a producer cannot provide complete generation truth, that dynamic domain is rejected rather than blended.
+
+For shader inputs, the existing loaded map/library publication hash covers code and binding/compile metadata. `RenderPassRuntimeCache` exposes that value without another hash owner; `FramePipeline` snapshots it in `RenderFrameIdentity`, and the Reference shader component combines it with reload generation. Fresh launches therefore distinguish changed shader payloads while existing reload lifetime/invalidation remains intact. This is one private rendering-input scalar, with no frame-time file reads or artifact-schema change.
 
 ## Frame Integration Rule
 
@@ -200,7 +202,7 @@ This deliberate difference matters:
 - the **feature capsule** owns everything required to implement that mode;
 - the **frame** selects and invokes the capsule in one place;
 - the **RHI** executes generic resource, pipeline, trace, dispatch, barrier, queue, and readback operations; and
-- each approved **host** may present its own view-mode affordance, but submits the same concrete per-view Renderer semantics and renders a generic progress observation; Editor and Game adapters do not define separate transport behavior.
+- Editor presents the view-mode/progress affordances over the same concrete per-view Renderer semantics. Game remains render-only under the [render-only Game decision](../../../../../../../Acceptance/FirstRelease.md#consumer-effort-and-game-presentation); it adds no UI or export adapter. View kind never defines separate transport behavior.
 
 No plugin framework, generic renderer-feature registry, new renderer module, global job system, or feature-specific settings family is introduced to achieve this. Direct composition is preferred while one concrete feature is sufficient.
 
@@ -208,7 +210,7 @@ No plugin framework, generic renderer-feature registry, new renderer module, glo
 
 The steady-state implementation home is `Engine/Renderer/Private/Passes/Lighting/ReferencePathTracer/`, with shaders in one matching feature directory under `Engine/Assets/Shaders/Passes/Lighting/ReferencePathTracer/`. The feature home owns its entry point, session/accumulation lifetime, input digest, Reference estimator policy, resources, shader parameter records, traversal-to-estimator adapters, progress production, required error accounting, and cleanup. Its entry type is a narrow capsule boundary: identity construction/reset classification, the per-view lifecycle and work scheduler, persistent GPU accumulation-resource lifetime, and frame-graph pass declaration are separate private responsibilities with one authority each. The shader entry maps a dispatched pixel to the canonical camera sample and shared accumulator only; separate feature-local owners hold the frozen sample/dimension identity, admitted light-set ordering/PMF, direct-light/emission/environment MIS composition, path-loop/termination policy, and committed display derivative. Shared `Path*`, `RayTracing*`, `Lighting`, and `Common` owners retain the reusable BSDF, light primitive, visibility, endpoint, hit reconstruction, RNG permutation, and accumulation math. None may be folded into a single C++ or shader god class/file/function or fragmented into forwarding-only collaborators. The feature does not own copies or feature-prefixed variants of generic ray-query results, opaque traversal, material-hit loading, canonical camera rays, reusable path state/BSDF/radiance/throughput algebra, or RHI capability publication; those remain in the narrow existing Renderer/RayTracing, shader resource, and RHI owners and must have a current non-speculative consumer or remove a real duplicate. Reference shaders use ordinary HLSL binary32 directly and do not introduce a custom numeric layer. Private files split only on these real responsibility/lifetime/change boundaries and remain under this capsule. Feature-specific diagnostic passes, GPU readbacks, dashboards, debug panels, and parallel inspection APIs are excluded; implementation evidence uses real product outputs, existing generic capture/validation routes, or temporary probes removed before handoff.
 
-Shader registration remains in the repository's generated/registration route because the build system owns discovery. Registration files contain registration only; the shader implementation and feature policy remain in the capsule. Later artifact work stays with ApplicationEditor and consumes a narrow immutable destination-free `Radiance` readback result without entering the interactive rendering state machine. Shared private Application owners provide generic image-buffer encoding, task launch/settlement, and verified atomic bundle publication; the Reference capsule supplies only output semantics and schema. Renderer and RHI requests/results carry resource identity, bytes, format, and immutable product sample-prefix metadata only; the requesting Application workflow retains the output destination.
+Shader registration remains in the repository's generated/registration route because the build system owns discovery. Registration files contain registration only; the shader implementation and feature policy remain in the capsule. Later artifact work stays with ApplicationEditor and consumes a narrow immutable destination-free `Radiance` readback result without entering the interactive rendering state machine. Existing private ApplicationEditor owners provide generic image-buffer encoding, task launch/settlement, and verified atomic bundle publication; the Reference capsule supplies only output semantics and schema. Renderer and RHI requests/results carry resource identity, bytes, format, and immutable product sample-prefix metadata only; the requesting Application workflow retains the output destination.
 
 ### Integration-Hook Ledger
 
@@ -258,7 +260,7 @@ Do not create a top-level `PathTracer` engine, a new executable, a parallel `Ref
 ## End-To-End View Route
 
 ```text
-Editor or Game viewport selects RenderViewMode::ReferencePathTracer
+Editor viewport selects RenderViewMode::ReferencePathTracer (runtime requests share its Renderer semantic)
     -> View owner preserves Lit settings and resolves canonical RenderView identity/camera/extent
     -> Renderer resolves the accepted reference preset and validates domain/capability/resource budget
     -> acquire immutable SceneGeneration + View semantic identities + shader/asset identities
@@ -360,7 +362,7 @@ State invariants:
 6. `Paused` may retain a bounded in-memory prefix. A durable resume promise requires `Checkpointing` to hash and verify that exact prefix before promised GPU resources retire.
 7. `Checkpointing` and `Exporting` are orthogonal operation substates bound to an immutable committed prefix, not mutually exclusive session states. Camera/scene changes may reset and continue live accumulation under a new digest while the old immutable export completes; `Checkpoint And Pause` alone pauses after binding the prefix. Cancellation abandons only that operation's staging unless the explicitly selected action is `Cancel After Checkpoint`.
 8. A failed or cancelled export does not fail or mutate a valid in-memory session. Failed, cancelled, timed-out, corrupt, partial, or staged output cannot carry a completed-artifact marker.
-9. Device loss invalidates GPU-resident accumulation and fails the affected session; resume is allowed only from a verified host checkpoint.
+9. Device loss invalidates GPU-resident accumulation and fails the affected session. The first release restarts from ordinal zero after device recovery and validation; optional verified-host-checkpoint resume is outside release scope.
 10. Late completion/readback/export callbacks are generation checked and cannot publish into a reset, destroyed view, or later session.
 
 `Suspended` records the prior operational state. Revalidation returns an unchanged prefix to `Accumulating`, `Complete`, `Paused`, or `TimedOut` as recorded; a digest change enters `Resetting`, and eviction enters `Cancelled`. `Restart` always discards the current prefix with an explicit reason, enters `Resetting`, validates again, and begins ordinal zero. Mode close/shutdown settles any current state using the frozen cancel policy.
@@ -454,6 +456,8 @@ The existing fixed `MinT`, normal bias, grazing multiplier, and maximum distance
 
 ## Accumulation And Checkpoint
 
+For the [first demo release](../../../../../../../Acceptance/FirstRelease.md#portfolio-demo-delivery-boundary), checkpoint serialization is an emitted statistical snapshot, not a disk-session restore protocol. Keep exact mean/M2/count output, identity and integrity checks. In-memory resume remains required; optional file restore is not selected. After device loss, release the invalid prefix and start a new validated session after recovery. The future verified-host-checkpoint transitions below do not authorize a first-release loader, restore UI or migration path.
+
 The per-view session accumulator owns one complete fixed sample prefix for every pixel under one transport digest. The production representation is binary32 mean/M2 with an exact uint32 count through the maximum `1,048,576` SPP; architecture requires:
 
 - radiance sum or an arithmetic-mean representation with compensated/pairwise error control justified at the maximum accepted SPP;
@@ -478,7 +482,7 @@ The completed directory contains at minimum:
 | `manifest.json` | Canonical identity, scope, settings, hashes, backend/frontend, counts, accepted statistical summary, budgets, timing, lineage, and completed status; written last. |
 | `preview.*` | Optional derivative for humans, with exposure/tone/encoding settings and the raw artifact hash. It is never a comparison source. |
 
-OpenEXR is the required high-dynamic-range interchange container unless `PTD-00` records a stronger alternative. Existing readback, image-buffer encoding, operation, and bundle-publication mechanics are extended once rather than copied per feature. Current Reference encoding/publication lives under private Application Editor ownership. The approved Game/raw-export consumer requires moving the necessary host-independent mechanism to private Application ownership, with thin Editor/Game action adapters and deletion of the replaced Editor-only implementation in the same slice. Game acquires no Editor dependency; Renderer and RHI acquire no filesystem/codec/UI policy. Use the existing TinyEXR dependency only after write support, security, rights, build and package review; TextureCooker ownership does not automatically authorize a Renderer dependency.
+OpenEXR remains the required HDR interchange container unless `PTD-00` records a stronger alternative. Extend the existing private ApplicationEditor readback/operation/image encoding/atomic publication path once, retaining exact prefixes and reviewed TinyEXR write/security/rights/build/package dependencies. Keep that mechanism with its actual Editor consumer. The Game export/UI obligation is superseded: no encoder move into shared Application, Game action adapter, second writer or output framework is required. Renderer/RHI retain no filesystem, codec or UI policy.
 
 Raw publication defaults to the exact current session render extent and numeric precision. It never reads a UI-scaled backbuffer, screenshot surface, downsampled progress preview, or thumbnail. An explicitly requested different crop or extent creates a separate identity and result; it is not a convenient lower-resolution copy mislabeled as the viewport session.
 
@@ -503,7 +507,7 @@ The engine-wide automatic policy selects Pipeline when complete, otherwise Inlin
 [User Experience](UserExperience.md) owns the complete interaction contract. Architecture requires two interactive consumers in priority order:
 
 1. **Editor viewport adapter:** `Reference Path Tracer` is the second top-level Editor view-mode item, immediately after Lit. It selects `RenderViewMode::ReferencePathTracer`, preserves Lit settings, performs automatic preflight, starts accumulation on success, remains responsive while the camera moves, and displays the newest accepted composition with a compact progress/reset/completion overlay. Details expose exact settings and pause/restart without becoming a prerequisite; checkpoint/save appear later under a secondary Evidence/Output group.
-2. **Game adapter:** a Game-kind RenderView uses the same `RenderViewMode::ReferencePathTracer` through its approved viewport owner. Its UI may differ, but frame composition, estimator/session behavior, canonical camera identity, invalidation, progress, target completion, raw/presentation separation, and failure states cannot.
+2. **Runtime View producer:** Game-kind Views may submit the same Renderer mode at the ordinary request boundary, with identical camera identity, estimator/session, reset, prefix and raw/presentation semantics. This is a Renderer contract check, not a Game menu/progress/export feature. Game remains render-only.
 The primary comparison loop is Reference Path Tracer -> Lit -> Reference Path Tracer on one unchanged View. Leaving Reference Path Tracer restores untouched Lit state and, only when retention is admitted, suspends after a complete range. Without retention it settles/releases and return validates from ordinal zero. A retained prefix resumes only when the full digest still matches; scene/camera changes made while in Lit invalidate it. Memory-policy eviction and single-active-view capacity are explicit events, never silent loss.
 
 While Reference Path Tracer is selected, navigation is a first-class state transition rather than cancellation of a render job. The viewport may show low-SPP noise during movement, but not an unlabeled old composition or a frozen final frame. After the last movement update, the final identity accumulates immediately without a `Start` or `Restart` action.
@@ -512,7 +516,7 @@ The overlay displays exact committed/target prefix, target ratio, last reset rea
 
 Raw export is optional and secondary. `Save Complete`, `Save Current Prefix`, and `Save Checkpoint` read the current session prefix only after the user presses the corresponding viewport button; `Save Current Prefix` is explicitly partial. Export failure does not destroy the live prefix or a prior result. There is no deferred save intent or second render launched merely because the user saves.
 
-The [approved release scope](../../../../../../../Acceptance/FirstRelease.md#required-rendering-closure) includes the consumer Reference mode and raw-linear export. `ShippingEditor` and `ShippingGame` therefore retain the same Renderer session/selector and the smallest host controls, progress, pause/reset and explicit raw-output operation needed by that promise. Ordinary startup stays Lit; Reference starts only after explicit selection and successful preflight. Export uses the existing per-user writable output boundary, never the install tree. No Reference value enters RHI contracts. Developer console, generic debug panels, external capture SDKs and unrelated artifact tooling remain excluded from Shipping; this product feature does not admit them. The earlier development-only Shipping exclusion is superseded for this consumer slice, not for its mathematical domain or evidence gates. Stages 7/9 own the missing host/output integration; Stage 10 proves the exact shipped products. No support service or separate Game rendering-settings frontend is added.
+The [approved release scope](../../../../../../../Acceptance/FirstRelease.md#required-rendering-closure) and [render-only Game decision](../../../../../../../Acceptance/FirstRelease.md#consumer-effort-and-game-presentation) include interactive Reference controls and raw export in `ShippingEditor`. Keep the existing private ApplicationEditor output owner and per-user writable destination. `ShippingGame` has no ImGui selector, progress/actions or raw-export UI; no host/output adapter or codec dependency is added for it. Startup stays Lit; Reference selection/preflight belongs to Editor. Host-independent Renderer/session/estimator/native proof remains required, and RHI gains no mode field. Stages 7/9 close only missing Editor interaction/output cells; Stage 10 qualifies those and render-only Game through the shared archive rehearsal. This amendment changes presentation reachability, not transport, numerical or oracle gates.
 
 ## Failure And Recovery Contract
 
@@ -527,9 +531,9 @@ The [approved release scope](../../../../../../../Acceptance/FirstRelease.md#req
 | Invalid PDF/radiance/normal/event or safety-depth reach | Reject the affected numerical case or raw artifact. The viewport has no GPU numerical-feedback channel; submission completion is not numerical acceptance. Never hide the defect with a clamp. |
 | Timeout or user cancellation | Stop new batches, reach terminal state within budget, publish no completion manifest, retain only a verified checkpoint when requested, and retire resources safely. |
 | OOM or capacity refusal | Fail before unbounded allocation where predictable; otherwise preserve device/process integrity, classify the failure, and leave the prior valid output intact. |
-| Device loss/TDR | Fail the session with the available RHI error, invalidate GPU-only state, and permit resume only from a verified host checkpoint after device recovery. |
+| Device loss/TDR | Fail the session with the available RHI error, invalidate GPU-only state, and restart from ordinal zero after device recovery and validation. File-session restore is outside first-release scope. |
 | Disk full, access denied, writer/codec error | Fail publication, delete or quarantine only the new staging directory, preserve prior completed artifacts, and report required/available space. |
-| Corrupt or mismatched checkpoint | Reject without partial import, identify the first identity/hash mismatch, and offer a clean session restart. |
+| Corrupt or mismatched checkpoint | Verify emitted snapshot integrity. Import/restore rejection is a future optional contract, excluded from this release; no partial import or restored-session claim is available. |
 | Backend disagreement or native validation output | Mark evidence `Blocked`/`Inconclusive`; do not average, threshold-tune, or silently prefer one backend. |
 
 These behaviors refine [the runtime failure ledger](ReferencePathTracerDesign.md#runtime-failure-modes); the ledger, not this page, owns acceptance results.
@@ -569,7 +573,7 @@ The slice reopens only affected derivation, shader/resource/output and package c
 | Megakernel first, wavefront only from evidence | Minimizes coordination before correctness is known. | Importing a split-kernel framework because AMD/NVIDIA examples use one. |
 | Fixed sample prefix for production evidence | Makes accumulation, restart, and comparison exact and reviewable. | Adaptive stopping before its bias/statistics contract exists. |
 | Raw EXR plus manifest, preview derivative | Prevents presentation from contaminating the oracle. | BMP/screenshot/tone-mapped golden images as truth. |
-| Shared private Application encoder/publisher with a thin Reference schema composer | Serves admitted Editor/Game export without copying the writer or putting codec/filesystem/UI policy in Renderer/RHI; package only the actual output dependencies. | Turning the mechanism into a policy registry, importing Editor into Game, or shipping the unrelated development export stack. |
+| Existing private ApplicationEditor encoder/publisher and thin Reference schema composer | One writer serves the actual Editor raw-output consumer with exact prefix and atomicity; Renderer/RHI contain no codec/filesystem/UI policy. | Moving it to shared Application solely for superseded Game export, a new output service, or a second writer. |
 
 ## Support And Evidence Matrix
 
@@ -581,7 +585,8 @@ The slice reopens only affected derivation, shader/resource/output and package c
 | Vulkan + Pipeline | Required strict route | Reference Pipeline adapter and shared-kernel route are source-present; unproved on GPU. |
 | Editor viewport view mode and progress overlay | Required primary development-product route | Menu row, automatic start, progress/actions, and feature-local overlay are source-present; build and interaction evidence is deferred. |
 | Game-kind view semantic | Required shared camera/session behavior; product exposure gated separately | `GameApplication` accepts the same ordinary request/mode and reaches the same frame/session; a concrete host workflow has not been exercised. |
-| `ShippingEditor`, `ShippingGame` | Included consumer mode, bounded progress/control and explicit raw export through the same session | Host/output/build/package integration and exact-archive first-use/failure proof remain open; unrelated development tools stay excluded. |
+| `ShippingEditor` | Included consumer Reference mode, progress/control and raw export through existing Editor ownership | Affected interaction/output/package and exact-archive first-use/failure proof remain open. |
+| `ShippingGame` | Render-only Game, no ImGui/Reference/export frontend; same underlying Renderer contracts | Game removal/preservation proof follows FR-06, with no new output owner or host framework. |
 | Reference-produced `Radiance` EXR/manifest/checkpoint | Required for final evidence; secondary product surface after the live viewport milestone | Source-present through generic product readback and the private ApplicationEditor transaction; decoder round trip, corruption/failure injection, and publication evidence are deferred. |
 | Numerical/statistical/runtime/package proof | Required by `FCR-REN-08` | Not produced by this architecture work. |
 

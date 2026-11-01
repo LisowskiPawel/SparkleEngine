@@ -9,7 +9,7 @@
 #include "LauncherSettings.h"
 #include "LauncherWorkflowCatalog.h"
 
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "ToolOutputPaths.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QProcess>
@@ -29,7 +29,7 @@ namespace SparkleLauncher
 			return;
 		}
 
-		if (m_selectedOperationId == LauncherHomeOperationId())
+		if (m_selectedOperationId == LauncherScenesOperationId())
 		{
 			SyncAllLevels();
 			return;
@@ -37,7 +37,7 @@ namespace SparkleLauncher
 
 		if (OperationNeedsContent(m_selectedOperationId) && m_contentModel.ContentId().isEmpty())
 		{
-			const QString message = "Repository content is unavailable. Confirm this is a complete Sparkle workspace.";
+			const QString message = "Workspace content is unavailable. Confirm this is a complete Sparkle workspace.";
 			m_activityPanel->ShowMessage(message);
 			return;
 		}
@@ -55,8 +55,8 @@ namespace SparkleLauncher
 		}
 
 		LauncherOperationRequest request = m_selectedOperationId == "workspace.clean"
-		    ? BuildScopedCleanOperationRequest(m_repositoryRoot, m_contentModel, m_settings, m_settings.CleanScope(), std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()))
-		    : BuildLauncherOperationRequest(m_repositoryRoot, m_contentModel, m_settings, m_selectedOperationId);
+		    ? BuildScopedCleanOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_settings.CleanScope(), std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()))
+		    : BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
 
 		if (!ConfirmRunRequest(request))
 		{
@@ -73,7 +73,7 @@ namespace SparkleLauncher
 		{
 			return;
 		}
-		if (m_selectedOperationId == LauncherHomeOperationId())
+		if (m_selectedOperationId == LauncherScenesOperationId())
 		{
 			CleanAllLevels();
 			return;
@@ -85,7 +85,7 @@ namespace SparkleLauncher
 		}
 
 		LauncherOperationRequest request = BuildActionCleanOperationRequest(
-		    m_repositoryRoot,
+		    m_workspaceRoot,
 		    m_contentModel,
 		    m_settings,
 		    std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()),
@@ -93,7 +93,7 @@ namespace SparkleLauncher
 
 		if (request.CleanTargets.isEmpty())
 		{
-			const QString message = OperationNeedsContent(m_selectedOperationId) && m_contentModel.ContentId().isEmpty() ? "Repository content is unavailable for this workflow's generated outputs."
+			const QString message = OperationNeedsContent(m_selectedOperationId) && m_contentModel.ContentId().isEmpty() ? "Workspace content is unavailable for this workflow's generated outputs."
 			                                                                                                             : "No generated outputs were resolved for this workflow.";
 
 			m_activityPanel->ShowMessage(message);
@@ -127,7 +127,7 @@ namespace SparkleLauncher
 			return;
 		}
 
-		LauncherOperationRequest request = BuildLauncherOperationRequest(m_repositoryRoot, m_contentModel, m_settings, actionId);
+		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, actionId);
 		if (!ConfirmRunRequest(request))
 		{
 			return;
@@ -171,7 +171,8 @@ namespace SparkleLauncher
 			return m_settings.BuildScopes().contains("editor") || m_settings.BuildScopes().contains("game");
 		}
 
-		return operationId == LauncherHomeOperationId() || operationId == "levels.sync" || operationId == "levels.run" || operationId.startsWith("workspace.build.") || operationId.startsWith("cook.");
+		return operationId == LauncherScenesOperationId() || operationId == "levels.sync" || operationId == "levels.run" || operationId.startsWith("workspace.build.")
+		    || operationId.startsWith("cook.");
 	}
 
 	bool LauncherMainWindow::ConfirmRunRequest(LauncherOperationRequest& request) const
@@ -231,8 +232,8 @@ namespace SparkleLauncher
 			return;
 		}
 
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(m_repositoryRoot);
-		const Filesystem::WorkspaceTargetOutputPaths launcherOutputs = workspaceOutputs.LauncherTargetOutputs(m_settings.EditorProfile().toStdString());
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
+		const SparkleTools::ToolTargetOutputPaths launcherOutputs = workspaceOutputs.LauncherTargetOutputs(m_settings.EditorProfile().toStdString());
 		const std::filesystem::path relaunchedExecutablePath = launcherOutputs.BinaryDirectory / std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()).filename();
 		const QString executablePath = QString::fromStdString(relaunchedExecutablePath.string());
 		const bool started = QProcess::startDetached(executablePath, {});

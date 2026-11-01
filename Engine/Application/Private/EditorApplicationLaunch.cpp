@@ -6,14 +6,15 @@
 #include "EditorApplication.h"
 #include "Core/Public/Threading/ThreadOwnership.h"
 #include <exception>
+#include <utility>
 
-int RunEditorApplication()
+int RunEditorApplication(EditorShaderCompileAction compileShaders)
 {
 	Threading::SetCurrentThreadRole("Sparkle.EditorThread");
 	try
 	{
 		Application::ConfigureProcessFromCommandLine();
-		EditorApplication app;
+		EditorApplication app({}, std::move(compileShaders));
 		app.Run();
 		return 0;
 	}

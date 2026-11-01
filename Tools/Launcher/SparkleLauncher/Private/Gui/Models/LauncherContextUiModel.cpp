@@ -2,7 +2,7 @@
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
-#include "Core/Public/Paths/ProductPaths.h"
+#include "LauncherProductPaths.h"
 
 #include <QtCore/QStringList>
 
@@ -158,7 +158,7 @@ namespace SparkleLauncher
 
 	LauncherContextUiModel LauncherContextUiModel::Build(const BuildToolchainStatus& toolchain, const std::filesystem::path& root)
 	{
-		if (!Filesystem::IsSourceWorkspace(root))
+		if (!HasBuildSources(root))
 		{
 			return {
 			    .RunModes = BuildRunModeOptions(),

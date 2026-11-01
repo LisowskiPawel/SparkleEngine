@@ -27,7 +27,7 @@ function(sparkle_stage_aftermath_runtime target_name)
     if(NOT SPARKLE_WITH_GPU_CRASH_DEBUGGING)
         return()
     endif()
-    set(_destination "${_sparkle_development_artifact_root}/Engine/Binaries/Aftermath/$<CONFIG>")
+    set(_destination "${_sparkle_product_root}/Engine/Binaries/Aftermath/$<CONFIG>")
     add_custom_target(${target_name}AftermathRuntime
         COMMAND ${CMAKE_COMMAND} -E make_directory "${_destination}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different

@@ -114,7 +114,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Start:** Technical cells and held-out rules frozen.
 
-**Work:** Measure raw/shaded/temporal quality and whole-frame/peak-memory cost. Publish derivation/sampling/content-loss evidence and real cook/shader/package identities; documented author/agent rehearsal reproduces the comparison.
+**Work:** Measure raw/shaded/temporal quality and whole-frame/peak-memory cost. Publish derivation/sampling/content-loss evidence and real cook/shader/package identities. Reproduce the material comparison within the [shared delivery rehearsal](../../../../../../Acceptance/FirstRelease.md#shared-delivery-evidence); no standalone material package or adoption run.
 
 **Cleanup:** Remove probes, unused permutations/dependencies and completed instructions after preserving original evidence.
 

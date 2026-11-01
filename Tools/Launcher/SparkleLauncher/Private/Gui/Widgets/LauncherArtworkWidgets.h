@@ -14,12 +14,6 @@ class QPaintEvent;
 
 namespace SparkleLauncher
 {
-	enum class LauncherArtworkPreset : std::uint8_t
-	{
-		HeroPanorama,
-		WorkflowBanner,
-	};
-
 	enum class LauncherArtworkGradientAxis : std::uint8_t
 	{
 		Horizontal,
@@ -50,7 +44,7 @@ namespace SparkleLauncher
 		QVector<LauncherArtworkGradientLayer> Layers;
 		QVector<LauncherArtworkGradientLayer> TopLayers;
 
-		static LauncherArtworkSpec ForPreset(LauncherArtworkPreset preset);
+		static LauncherArtworkSpec ForSceneHero();
 	};
 
 	void PaintLauncherArtwork(QPainter& painter, const QRectF& targetRect, const QPixmap& source, const LauncherArtworkSpec& spec);

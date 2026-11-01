@@ -4,7 +4,7 @@
 #include "CMakeGeneratorModel.h"
 #include "BuildWorkspaceStateFiles.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "ToolOutputPaths.h"
 
 #include <fstream>
 #include <optional>
@@ -17,13 +17,13 @@ namespace SparkleLauncher
 		return value ? "ON" : "OFF";
 	}
 
-	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& repositoryRoot, const BuildToolchainStatus& toolchain)
+	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain)
 	{
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
 		BuildFilesFreshnessStatus status;
 		status.BuildDirectory = workspaceOutputs.BuildRoot;
 		status.CachePath = status.BuildDirectory / "CMakeCache.txt";
-		status.SolutionPath = GetBuildSolutionPath(repositoryRoot);
+		status.SolutionPath = GetBuildSolutionPath(workspaceRoot);
 		status.StampPath = status.BuildDirectory / "BuildFilesFreshness.json";
 
 		std::error_code errorCode;
@@ -106,7 +106,7 @@ namespace SparkleLauncher
 			return status;
 		}
 
-		const std::optional<std::string> sourceListHash = ComputeSourceListHash(repositoryRoot);
+		const std::optional<std::string> sourceListHash = ComputeSourceListHash(workspaceRoot);
 		if (!sourceListHash.has_value())
 		{
 			status.State = BuildFilesFreshnessState::Unsupported;
@@ -122,13 +122,13 @@ namespace SparkleLauncher
 		}
 
 		const std::filesystem::file_time_type stampTime = std::filesystem::last_write_time(status.StampPath, errorCode);
-		for (const std::filesystem::path& path : CollectBuildInputPaths(repositoryRoot))
+		for (const std::filesystem::path& path : CollectBuildInputPaths(workspaceRoot))
 		{
 			const std::filesystem::file_time_type inputTime = std::filesystem::last_write_time(path, errorCode);
 			if (!errorCode && inputTime > stampTime)
 			{
 				status.State = BuildFilesFreshnessState::BuildInputChanged;
-				status.Summary = "Build input changed: " + MakeFreshnessSignaturePath(repositoryRoot, path);
+				status.Summary = "Build input changed: " + MakeFreshnessSignaturePath(workspaceRoot, path);
 				return status;
 			}
 			errorCode.clear();
@@ -140,9 +140,9 @@ namespace SparkleLauncher
 		return status;
 	}
 
-	bool UpdateBuildFilesFreshnessStamp(const std::filesystem::path& repositoryRoot, const BuildToolchainStatus& toolchain, std::string& errorMessage)
+	bool UpdateBuildFilesFreshnessStamp(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain, std::string& errorMessage)
 	{
-		const std::optional<std::string> sourceListHash = ComputeSourceListHash(repositoryRoot);
+		const std::optional<std::string> sourceListHash = ComputeSourceListHash(workspaceRoot);
 		if (!sourceListHash.has_value())
 		{
 			errorMessage = "Native source-list hash is unavailable on this platform.";
@@ -151,7 +151,7 @@ namespace SparkleLauncher
 
 		const WorkspaceFeatureSettings featureSettings = GetLauncherWorkspaceFeatureSettings();
 
-		const Filesystem::WorkspaceOutputPaths workspaceOutputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
+		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
 		const std::filesystem::path stampPath = workspaceOutputs.BuildRoot / "BuildFilesFreshness.json";
 		std::error_code errorCode;
 		std::filesystem::create_directories(stampPath.parent_path(), errorCode);

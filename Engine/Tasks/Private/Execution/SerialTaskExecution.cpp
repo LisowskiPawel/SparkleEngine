@@ -129,7 +129,7 @@ void SerialTaskExecution::RunState::ExecuteTask(std::uint32_t index)
 	taskContext.Bind(node.Desc.Lane, m_cancellation);
 
 	TaskResult bodyResult = blocked && node.Desc.CompletionPolicy == TaskCompletionPolicy::Normal ? TaskResult::Cancelled("A prerequisite or nested parent did not succeed.")
-	                                                                                              : TaskFunctionInvoker::Invoke(node, taskContext);
+	                                                                                              : InvokeTaskFunction(node, taskContext);
 
 	TaskProfiler::End(node.Desc, m_generation, index, 0, bodyResult, taskStart);
 

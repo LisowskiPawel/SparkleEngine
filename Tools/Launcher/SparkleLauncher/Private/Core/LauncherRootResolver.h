@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SparkleLauncher/RepositoryLocator.h"
+#include "SparkleLauncher/WorkspaceLocator.h"
 
 #include <filesystem>
 #include <optional>

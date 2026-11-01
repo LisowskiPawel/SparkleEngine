@@ -3,6 +3,7 @@
 #include "Assets/Loaders/CookedAssetFileSet.h"
 
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Files/FileSetPublication.h"
 
 #include <cerrno>
 #include <format>
@@ -132,13 +133,22 @@ namespace Assets
 #endif
 	}
 
-	CookedAssetFileSet::CookedAssetFileSet() = default;
+	CookedAssetFileSet::CookedAssetFileSet(const Files::FileSetReadScope& publication, CookedAssetAllocationBudget& budget) :
+	    m_budget(&budget),
+	    m_publication(&publication)
+	{
+	}
+
 	CookedAssetFileSet::~CookedAssetFileSet() = default;
 	CookedAssetFileSet::CookedAssetFileSet(CookedAssetFileSet&&) noexcept = default;
 	CookedAssetFileSet& CookedAssetFileSet::operator=(CookedAssetFileSet&&) noexcept = default;
 
 	void CookedAssetFileSet::Read(const std::filesystem::path& path)
 	{
+		if (!m_publication->Contains(path))
+		{
+			throw Diagnostics::Error(std::format("Cooked asset '{}' escapes its pinned publication scope.", path.generic_string()));
+		}
 		const auto existing = m_files.find(path);
 		if (existing != m_files.end())
 		{

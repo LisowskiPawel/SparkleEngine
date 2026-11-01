@@ -87,8 +87,6 @@ void GameWorld::PublishCameraInputIntent(const CameraInputIntent& intent) noexce
 
 void GameWorld::CommitSceneLoadPackage(Assets::SceneLoadPackage package)
 {
-	ValidateSceneLoadEntityCount(package);
-
 	GameWorld stagedWorld(m_taskExecutor);
 	stagedWorld.InitializeStagedLevel(package.Level);
 

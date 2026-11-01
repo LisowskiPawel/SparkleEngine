@@ -13,6 +13,13 @@ add_executable(ShowcaseGame
 target_compile_features(ShowcaseEditor PRIVATE cxx_std_20)
 target_compile_features(ShowcaseGame PRIVATE cxx_std_20)
 
+# Bind the optional developer operation at the executable composition boundary.
+# Engine never resolves Launcher/compiler paths or constructs cook commands.
+target_compile_definitions(ShowcaseEditor PRIVATE SPARKLE_EDITOR_WITH_SHADER_COMPILATION=$<BOOL:${SPARKLE_ENABLE_SHADER_COMPILER}>)
+if(SPARKLE_ENABLE_SHADER_COMPILER)
+    target_link_libraries(ShowcaseEditor PRIVATE SparkleLauncherCore)
+endif()
+
 target_link_libraries(ShowcaseEditor PRIVATE
     SparkleApplicationEditor
     SparkleGameFramework

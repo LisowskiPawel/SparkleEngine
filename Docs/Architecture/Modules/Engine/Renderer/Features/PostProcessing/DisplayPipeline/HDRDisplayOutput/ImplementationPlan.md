@@ -222,7 +222,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## Stage 6 — Harden Transitions, Recovery, Backend Parity, And Package
 
-Exercise and repair monitor move/straddle policy, OS HDR toggle, resize/fullscreen/windowed, minimize/restore, suspend/resume, hotplug/display change, device loss, interposer availability, backend switch/restart, package dependencies, and clean-machine first use. Repair the existing event/lifecycle owner, deleting the replaced retry/event/state path with each fix; no recovery supervisor, polling service, second event bus or permanent fault API is selected. Measure transition latency/black frames, memory, and steady-state cost.
+Exercise and repair monitor move/straddle policy, OS HDR toggle, resize/fullscreen/windowed, minimize/restore, suspend/resume, hotplug/display change, device loss, interposer availability, backend switch/restart and affected package dependencies. Qualify clean-machine first use in the [shared delivery rehearsal](../../../../../../../../Acceptance/FirstRelease.md#shared-delivery-evidence), retaining the actual HDR display/OS/native tuple; no separate HDR archive or onboarding campaign. Repair the existing event/lifecycle owner, deleting the replaced retry/event/state path with each fix; no recovery supervisor, polling service, second event bus or permanent fault API is selected. Measure transition latency/black frames, memory, and steady-state cost.
 
 **Exit:** every transition reaches current HDR active or usable SDR fallback within frozen bounds; D3D12/Vulkan state semantics agree; no stale tuple, indefinite black output, leak, or package-only failure remains. Repairs meet the addition/retirement budget, retained SDR controls pass and temporary failure controls are removed before handoff.
 
@@ -241,7 +241,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 ## Stage 7 — Earn Candidate Evidence And Close
 
-Run the complete `CHK-HDR-*` protocol for one immutable candidate: raw numeric products, native tuple/state, output queries, metadata consistency if used, external HDR display measurements/images under frozen interpretation, SDR/HDR displays, both backends, UI, transitions, package, performance, capture lineage, excluded routes, and seeded defects. Reuse current tools and original records, verify preceding stages' cleanup/addition budgets, remove temporary probes and submit `FCR-REN-26`. This proof adds no calibration/capture/report product; a necessary production repair returns to its owner and invalidates affected candidate evidence.
+Run the complete `CHK-HDR-*` protocol for one immutable candidate: raw numeric products, native tuple/state, output queries, metadata consistency if used, external HDR display measurements/images under frozen interpretation, SDR/HDR displays, both backends, UI, transitions, package, performance, capture lineage, excluded routes, and seeded defects. Reuse current tools, original records and the shared package/reproduction observations; this stage adds only missing HDR-specific proof. Verify preceding stages' cleanup/addition budgets, remove temporary probes and submit `FCR-REN-26`. This proof adds no calibration/capture/report product; a necessary production repair returns to its owner and invalidates affected candidate evidence.
 
 **Exit:** all `AC-HDR-01` through `08` pass conjunctively; every `FM-HDR-*`/risk has detecting evidence; SDR remains proven; external/display limitations are explicit; acceptance owner records the verdict.
 

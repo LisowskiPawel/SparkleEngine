@@ -15,11 +15,10 @@ class SceneInspectorPanel;
 class ViewportPanel;
 class ViewportToolbar;
 class SettingsPanel;
-class UsedShadersPanel;
+class ShaderToolsPanel;
 class UsedMeshesPanel;
 class UsedTexturesPanel;
 class EngineRenderingSettingsController;
-class EditorRestartService;
 class InputSystem;
 class LevelSession;
 class Window;
@@ -36,12 +35,13 @@ public:
 	void SetViewportRenderProducts(const ViewportRenderProducts& products) noexcept;
 	void SetViewportFinalColorTexture(UiTextureHandle texture) noexcept;
 	void SetDiagnosticsProviders(EditorDiagnosticsProviders providers);
+	void SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
+	void SetShaderCompileStatus(bool busy, std::string_view message);
 	RendererMemoryDiagnosticsSnapshot CaptureMemoryDiagnostics() const;
 
-	EditorConsoleSystem* GetEditorConsoleSystem() noexcept { return m_editorConsoleSystem.get(); }
+	void AppendConsoleOutput(ConsoleOutputRecord record, bool showConsole);
 
 	bool ConsumeShaderReloadRequest() noexcept;
-	bool ConsumeShaderRecookRequest() noexcept;
 	ViewportOutputAction ConsumeViewportOutputAction() noexcept;
 	UiRenderPacket ConsumeRenderPacket();
 
@@ -66,8 +66,8 @@ private:
 	void InitializeRenderingSettings(EditorHostServices& hostServices);
 	void InitializeConsole(CVarControlExecutor&& consoleVariables);
 
-	void InitializeWorkspace();
-	void InitializeCorePanels();
+	void InitializeWorkspace(std::function<void()> requestRestart);
+	void InitializeCorePanels(std::function<void()> requestRestart);
 	void InitializeViewport();
 	void InitializeAssetPanels();
 	void InitializeScenePanels();
@@ -88,11 +88,10 @@ private:
 	std::unique_ptr<ViewportPanel> m_viewportPanel;
 	std::unique_ptr<class EditorViewportSession> m_viewportSession;
 	std::unique_ptr<SettingsPanel> m_settingsPanel;
-	std::unique_ptr<UsedShadersPanel> m_usedShadersPanel;
+	std::unique_ptr<ShaderToolsPanel> m_shaderToolsPanel;
 	std::unique_ptr<UsedMeshesPanel> m_usedMeshesPanel;
 	std::unique_ptr<UsedTexturesPanel> m_usedTexturesPanel;
 	std::unique_ptr<EngineRenderingSettingsController> m_renderingSettings;
-	std::unique_ptr<EditorRestartService> m_restartService;
 	Timer* m_timer = nullptr;
 	LevelSession* m_levelSession = nullptr;
 	Window* m_window = nullptr;
@@ -110,5 +109,4 @@ private:
 	UiRenderPacket m_renderPacket;
 	std::uint64_t m_viewportGeneration = 0;
 	bool m_shaderReloadRequested = false;
-	bool m_shaderRecookRequested = false;
 };

@@ -8,6 +8,8 @@
 #include "Editor/Public/UI.h"
 #include "Renderer.h"
 
+#include <utility>
+
 struct EditorViewportOutputCoordinator::State final
 {
 	explicit State(EditorOperationRuntime& operations) noexcept :
@@ -29,7 +31,10 @@ EditorViewportOutputCoordinator::~EditorViewportOutputCoordinator() noexcept = d
 
 void EditorViewportOutputCoordinator::Update(UI& ui, Renderer& renderer)
 {
-	m_state->PresentationCapture.Update(ui.GetEditorConsoleSystem(), renderer);
+	if (auto status = m_state->PresentationCapture.Update(renderer))
+	{
+		ui.AppendConsoleOutput(std::move(*status), true);
+	}
 	m_state->ReferenceArtifacts.Update(renderer, renderer.GetViewportPresentation().Products);
 }
 
@@ -38,7 +43,10 @@ void EditorViewportOutputCoordinator::HandleAction(UI& ui, Renderer& renderer, s
 	const ViewportOutputAction action = ui.ConsumeViewportOutputAction();
 	if (action == ViewportOutputAction::CapturePresentation)
 	{
-		m_state->PresentationCapture.Request(ui.GetEditorConsoleSystem(), renderer, frameId);
+		if (auto status = m_state->PresentationCapture.Request(renderer, frameId))
+		{
+			ui.AppendConsoleOutput(std::move(*status), true);
+		}
 		return;
 	}
 	ApplyReferencePathTracerArtifactAction(action, m_state->ReferenceArtifacts, renderer, renderer.GetViewportPresentation().Products);

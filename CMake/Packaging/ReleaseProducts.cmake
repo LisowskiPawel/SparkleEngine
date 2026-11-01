@@ -23,7 +23,7 @@ foreach(_product IN ITEMS
 
         string(TOUPPER "${_profile}" _profile_upper)
         get_target_property(_runtime_directory ${_target} RUNTIME_OUTPUT_DIRECTORY_${_profile_upper})
-        file(RELATIVE_PATH _directory "${_sparkle_development_artifact_root}" "${_runtime_directory}")
+        file(RELATIVE_PATH _directory "${SPARKLE_REPOSITORY_ROOT}" "${_runtime_directory}")
         if(_directory MATCHES "^\\.\\." OR IS_ABSOLUTE "${_directory}")
             message(FATAL_ERROR "Release product lies outside the canonical product layout: ${_target}")
         endif()
@@ -57,7 +57,7 @@ foreach(_profile IN LISTS _sparkle_release_profiles)
         CONDITION "$<CONFIG:${_profile}>")
 endforeach()
 
-set(SPARKLE_RELEASE_INPUTS "" CACHE FILEPATH "Reviewed candidate-bound release payload admission JSON")
+set(SPARKLE_RELEASE_INPUTS "" CACHE FILEPATH "Reviewed prepared payload inventory and final shader-export path")
 add_custom_target(release_package
     COMMAND ${SPARKLE_POWERSHELL_EXECUTABLE} -NoProfile -ExecutionPolicy Bypass
         -File "${CMAKE_CURRENT_LIST_DIR}/Package.ps1"

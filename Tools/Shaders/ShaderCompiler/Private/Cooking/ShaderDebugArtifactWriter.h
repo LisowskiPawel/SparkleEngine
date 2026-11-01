@@ -3,7 +3,7 @@
 #include "Compiler/ShaderCompileRequest.h"
 #include "Cooking/CookedStageBuild.h"
 #include "ShaderDebugArtifactSet.h"
-#include "Core/Public/Files/FileUtils.h"
+#include "Core/Public/Files/FileSetPublication.h"
 
 #include <string_view>
 #include <cstddef>

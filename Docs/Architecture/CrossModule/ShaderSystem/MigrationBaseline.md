@@ -13,6 +13,8 @@
 > [!NOTE]
 > This is frozen pre-migration provenance. Counts and names below intentionally describe the recorded baseline, not the current tree. Use the current capability inventories for implementation state and return here only to verify what the clean-break migration intended to replace.
 
+The retired recook files below retain their historical paths as provenance, not live source links or missing implementation tasks. [Delivery Evidence](DeliveryEvidence.md) records their replacement by current tooling ownership; the [current plan](ImplementationPlan.md) owns remaining proof.
+
 ## Purpose And Boundary
 
 This record preserves the frozen Phase 0 findings, exact counts, and deletion ledger used to design the clean-break migration. Revalidate current behavior in code, build configuration, and the capability inventories; do not use these historical counts as current-state claims.
@@ -131,11 +133,11 @@ Relevant implementation entry points:
 - [`RenderPassRuntimeCache.cpp`](../../../../Engine/Renderer/Private/Pipeline/RenderPassRuntimeCache.cpp)
 - [`D3D12Pipeline.cpp`](../../../../Engine/RHI/Private/D3D12/Pipeline/D3D12Pipeline.cpp)
 - [`VulkanPipeline.cpp`](../../../../Engine/RHI/Private/Vulkan/Pipeline/VulkanPipeline.cpp)
-- [`ShaderSourceChangeTracker.cpp`](../../../../Engine/Application/Private/ShaderRecook/ShaderSourceChangeTracker.cpp)
-- [`ShaderRecookCoordinator.cpp`](../../../../Engine/Application/Private/ShaderRecook/ShaderRecookCoordinator.cpp)
+- `Engine/Application/Private/ShaderRecook/ShaderSourceChangeTracker.cpp`
+- `Engine/Application/Private/ShaderRecook/ShaderRecookCoordinator.cpp`
 
 Historical Phase 0 entry points deleted by Phase 4 were `RendererShaderPackages.h`, `CookedShaderPackage.h`, `CookedPackageWriter.cpp`, `CookedShaderPackageCache.cpp`, and `CookedShaderPackageValidation.cpp`; they remain plain historical names rather than broken current links.
-- [`ShaderCompilerProcess.cpp`](../../../../Engine/Application/Private/ShaderRecook/ShaderCompilerProcess.cpp)
+- `Engine/Application/Private/ShaderRecook/ShaderCompilerProcess.cpp`
 - [`ShaderCompiler` build definition](../../../../Tools/Shaders/ShaderCompiler/CMakeLists.txt)
 - [`ValidateShaderCompilerCli.cmake`](../../../../Tools/Shaders/ShaderCompiler/ValidateShaderCompilerCli.cmake)
 

@@ -61,7 +61,7 @@ namespace SparkleLauncher
 
 	struct MaintenanceOperationRequest
 	{
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		std::string ContentId = kDefaultContentId;
 		std::string EditorProfile = "DevelopmentEditor";
 		CleanScope RequestedCleanScope = CleanScope::CookedOutputs;
@@ -84,7 +84,7 @@ namespace SparkleLauncher
 	struct MaintenanceOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		MaintenanceOperationRequest Request;
 		MaintenanceOperationKind Kind = MaintenanceOperationKind::CleanWorkspace;
 		BuildToolchainStatus Toolchain;

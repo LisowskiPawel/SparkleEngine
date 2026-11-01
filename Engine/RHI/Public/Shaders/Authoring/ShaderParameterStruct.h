@@ -384,5 +384,3 @@ template <> struct ShaderParameterResourceTraits<RaytracingAccelerationStructure
 	static constexpr CookedShaderResourceKind Kind = CookedShaderResourceKind::AccelerationStructure;
 	static constexpr CookedShaderResourceDimension Dimension = CookedShaderResourceDimension::Unknown;
 };
-
-SPARKLE_RHI_API std::string BuildShaderParameterStructReport(const ShaderParameterStructDescriptor& descriptor);

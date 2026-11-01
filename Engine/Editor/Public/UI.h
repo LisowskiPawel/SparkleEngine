@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Core/Public/Console/CVarControl.h"
+#include "Core/Public/Console/ConsoleCommandRegistry.h"
+#include "Core/Public/Console/ConsoleOutput.h"
 
 #include "EditorAPI.h"
 #include "Renderer/Public/Diagnostics/MeshPreviewGeometry.h"
@@ -24,7 +26,6 @@
 #include <memory>
 
 class Timer;
-class EditorConsoleSystem;
 class InputSystem;
 class LevelSession;
 class Window;
@@ -43,6 +44,7 @@ struct EditorHostServices final
 	std::function<void(EngineRenderingSettingsState)> SubmitRenderingSettings;
 	std::function<EngineRenderingSettingsState()> CaptureRenderingSettings;
 	CVarControlExecutor ConsoleVariables;
+	std::function<void()> RequestRestart;
 	Window& HostWindow;
 	InputSystem& Input;
 };
@@ -75,10 +77,11 @@ public:
 	void SetViewportRenderProducts(const ViewportRenderProducts& products) noexcept;
 	void SetViewportFinalColorTexture(UiTextureHandle texture) noexcept;
 	void SetDiagnosticsProviders(EditorDiagnosticsProviders providers);
+	void SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
+	void SetShaderCompileStatus(bool busy, std::string_view message = {});
 	RendererMemoryDiagnosticsSnapshot CaptureMemoryDiagnostics() const;
-	EditorConsoleSystem* GetEditorConsoleSystem() noexcept;
+	void AppendConsoleOutput(ConsoleOutputRecord record, bool showConsole = false);
 	bool ConsumeShaderReloadRequest() noexcept;
-	bool ConsumeShaderRecookRequest() noexcept;
 	ViewportOutputAction ConsumeViewportOutputAction() noexcept;
 	UiRenderPacket ConsumeRenderPacket();
 

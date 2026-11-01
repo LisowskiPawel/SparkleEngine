@@ -3,7 +3,7 @@
 #include "Cooking/Dependencies/ShaderDependencyManifest.h"
 
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "ToolOutputPaths.h"
 #include "Core/Public/Files/FileUtils.h"
 
 #include <algorithm>
@@ -18,7 +18,7 @@ static constexpr std::string_view kShaderDependencyManifestHeader = "SparkleShad
 
 std::filesystem::path ShaderDependencyManifest::GetPath(const std::filesystem::path& cookedShaderRoot)
 {
-	return Filesystem::BuildShaderDependencyManifestPath(cookedShaderRoot);
+	return SparkleTools::ShaderDependencyManifestPath(cookedShaderRoot);
 }
 
 ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::path& path)
@@ -27,7 +27,7 @@ ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::p
 	std::string fileError;
 	if (!Files::TryReadAllBytes(path, bytes, fileError))
 	{
-		throw Diagnostics::Error("Changed shader cooking requires valid dependency metadata. Run RecompileShaders Global to rebuild all shaders. " + fileError);
+		throw Diagnostics::Error("Changed shader cooking requires valid dependency metadata. Use Launcher Cook shaders (full) to rebuild all shaders. " + fileError);
 	}
 
 	std::istringstream input{std::string(reinterpret_cast<const char*>(bytes.data()), bytes.size())};
@@ -39,7 +39,7 @@ ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::p
 	}
 	if (header != kShaderDependencyManifestHeader)
 	{
-		throw Diagnostics::Error("Shader dependency metadata is invalid. Run RecompileShaders Global to rebuild all shaders.");
+		throw Diagnostics::Error("Shader dependency metadata is invalid. Use Launcher Cook shaders (full) to rebuild all shaders.");
 	}
 
 	ShaderDependencyManifest manifest;
@@ -63,7 +63,7 @@ ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::p
 			lineInput >> std::ws;
 			if (!lineInput || !lineInput.eof() || record.ShaderType == 0 || !recordIndices.emplace(record.ShaderType, manifest.m_records.size()).second)
 			{
-				throw Diagnostics::Error("Shader dependency metadata contains an invalid or duplicate shader record. Run RecompileShaders Global.");
+				throw Diagnostics::Error("Shader dependency metadata contains an invalid or duplicate shader record. Use Launcher Cook shaders (full).");
 			}
 			manifest.m_records.push_back(std::move(record));
 			continue;
@@ -78,7 +78,7 @@ ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::p
 			const auto record = recordIndices.find(shaderType);
 			if (!lineInput || !lineInput.eof() || record == recordIndices.end())
 			{
-				throw Diagnostics::Error("Shader dependency metadata contains an orphan dependency. Run RecompileShaders Global.");
+				throw Diagnostics::Error("Shader dependency metadata contains an orphan dependency. Use Launcher Cook shaders (full).");
 			}
 			manifest.m_records[record->second].VirtualDependencies.push_back(std::move(virtualPath));
 			continue;
@@ -92,13 +92,13 @@ ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::p
 			lineInput >> std::ws;
 			if (!lineInput || !lineInput.eof())
 			{
-				throw Diagnostics::Error("Shader dependency metadata contains an invalid reverse dependency. Run RecompileShaders Global.");
+				throw Diagnostics::Error("Shader dependency metadata contains an invalid reverse dependency. Use Launcher Cook shaders (full).");
 			}
 			persistedReverseDependencies.emplace_back(std::move(virtualPath), shaderType);
 			continue;
 		}
 
-		throw Diagnostics::Error("Shader dependency metadata contains an unknown record. Run RecompileShaders Global.");
+		throw Diagnostics::Error("Shader dependency metadata contains an unknown record. Use Launcher Cook shaders (full).");
 	}
 
 	manifest.SortAndValidate();
@@ -114,7 +114,7 @@ ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::p
 	std::ranges::sort(persistedReverseDependencies);
 	if (persistedReverseDependencies != expectedReverseDependencies)
 	{
-		throw Diagnostics::Error("Shader dependency metadata forward and reverse records disagree. Run RecompileShaders Global.");
+		throw Diagnostics::Error("Shader dependency metadata forward and reverse records disagree. Use Launcher Cook shaders (full).");
 	}
 	return manifest;
 }

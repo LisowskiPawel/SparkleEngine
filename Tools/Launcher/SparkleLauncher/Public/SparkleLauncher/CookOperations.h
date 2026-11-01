@@ -46,7 +46,7 @@ namespace SparkleLauncher
 
 	struct CookOperationRequest
 	{
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		std::string ContentId = kDefaultContentId;
 		std::string GameProfile = "DevelopmentGame";
 		CookMode Mode = CookMode::Incremental;
@@ -72,7 +72,7 @@ namespace SparkleLauncher
 	struct CookOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		CookOperationRequest Request;
 		CookOperationKind Kind = CookOperationKind::CookAllAssets;
 		std::string ToolProfile;

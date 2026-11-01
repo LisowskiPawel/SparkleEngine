@@ -1,5 +1,4 @@
 #include "AssetCookerService.h"
-#include "Core/Public/Paths/PackagePaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include "AssetCookerTypes.h"
@@ -15,11 +14,11 @@
 #include <utility>
 #include <vector>
 
-AssetCookerService::AssetCookerService(const char* repositoryRoot, const char* projectName, const char* configuration, const char* toolProfile)
+AssetCookerService::AssetCookerService(const char* workspaceRoot, const char* projectName, const char* configuration, const char* toolProfile)
 {
-	if (HasText(repositoryRoot))
+	if (HasText(workspaceRoot))
 	{
-		m_configuredRepositoryRoot = Strings::ToWide(std::string_view(repositoryRoot));
+		m_configuredWorkspaceRoot = Strings::ToWide(std::string_view(workspaceRoot));
 	}
 	if (HasText(projectName))
 	{
@@ -38,8 +37,8 @@ AssetCookerService::AssetCookerService(const char* repositoryRoot, const char* p
 AssetCookerServiceResult AssetCookerService::Cook(const char* projectName, const char* configuration, AssetCookerCategory category)
 {
 	AssetCookerDiagnostics diagnostics;
-	std::filesystem::path repositoryRoot;
-	if (!ResolveRepositoryRoot(diagnostics, repositoryRoot))
+	std::filesystem::path workspaceRoot;
+	if (!ResolveWorkspaceRoot(diagnostics, workspaceRoot))
 	{
 		return Finish(false, diagnostics);
 	}
@@ -60,17 +59,17 @@ AssetCookerServiceResult AssetCookerService::Cook(const char* projectName, const
 
 	const std::string resolvedProjectName = ResolveProjectName(projectName);
 	std::vector<std::string> projects;
-	if (!ResolveProjects(repositoryRoot, resolvedProjectName, diagnostics, projects))
+	if (!ResolveProjects(workspaceRoot, resolvedProjectName, diagnostics, projects))
 	{
 		return Finish(false, diagnostics);
 	}
 
 	std::vector<AssetCookerOutputRecord> outputs;
-	const bool succeeded = CookProjects(repositoryRoot, resolvedToolProfile, category, projects, diagnostics, outputs);
+	const bool succeeded = CookProjects(workspaceRoot, resolvedToolProfile, category, projects, diagnostics, outputs);
 	return Finish(succeeded, diagnostics, std::move(outputs));
 }
 
-bool AssetCookerService::ResolveProjects(const std::filesystem::path& repositoryRoot, std::string_view projectName, AssetCookerDiagnostics& diagnostics, std::vector<std::string>& outProjects) const
+bool AssetCookerService::ResolveProjects(const std::filesystem::path& workspaceRoot, std::string_view projectName, AssetCookerDiagnostics& diagnostics, std::vector<std::string>& outProjects) const
 {
 	if (!IsAllProjects(projectName))
 	{
@@ -78,12 +77,12 @@ bool AssetCookerService::ResolveProjects(const std::filesystem::path& repository
 		return true;
 	}
 
-	outProjects = ProjectCookPlanner::DiscoverProjects(repositoryRoot, diagnostics);
+	outProjects = ProjectCookPlanner::DiscoverProjects(workspaceRoot, diagnostics);
 	return !outProjects.empty();
 }
 
 bool AssetCookerService::CookProjects(
-    const std::filesystem::path& repositoryRoot,
+    const std::filesystem::path& workspaceRoot,
     std::string_view toolProfile,
     AssetCookerCategory category,
     const std::vector<std::string>& projects,
@@ -92,7 +91,7 @@ bool AssetCookerService::CookProjects(
 {
 	for (const std::string& projectName : projects)
 	{
-		if (!CookProject(repositoryRoot, projectName, toolProfile, category, diagnostics, outOutputs))
+		if (!CookProject(workspaceRoot, projectName, toolProfile, category, diagnostics, outOutputs))
 		{
 			return false;
 		}
@@ -102,7 +101,7 @@ bool AssetCookerService::CookProjects(
 }
 
 bool AssetCookerService::CookProject(
-    const std::filesystem::path& repositoryRoot,
+    const std::filesystem::path& workspaceRoot,
     std::string_view projectName,
     std::string_view toolProfile,
     AssetCookerCategory category,
@@ -110,12 +109,12 @@ bool AssetCookerService::CookProject(
     std::vector<AssetCookerOutputRecord>& outOutputs) const
 {
 	AssetCookerProjectCookPlan plan;
-	if (!ProjectCookPlanner::BuildProjectCookPlan(repositoryRoot, projectName, toolProfile, category, plan, diagnostics))
+	if (!ProjectCookPlanner::BuildProjectCookPlan(workspaceRoot, projectName, toolProfile, category, plan, diagnostics))
 	{
 		return false;
 	}
 
-	return AssetCookerDispatcher::DispatchPlan(plan, diagnostics, outOutputs);
+	return DispatchAssetCookPlan(plan, diagnostics, outOutputs);
 }
 
 bool AssetCookerService::HasText(const char* text) noexcept
@@ -137,29 +136,19 @@ AssetCookerServiceResult AssetCookerService::Finish(bool succeeded, AssetCookerD
 	return result;
 }
 
-bool AssetCookerService::ResolveRepositoryRoot(AssetCookerDiagnostics& diagnostics, std::filesystem::path& outRepositoryRoot) const
+bool AssetCookerService::ResolveWorkspaceRoot(AssetCookerDiagnostics& diagnostics, std::filesystem::path& outWorkspaceRoot) const
 {
-	if (const auto package = Filesystem::DiscoverPackageRoot())
+	if (!m_configuredWorkspaceRoot.empty())
 	{
-		if (!m_configuredRepositoryRoot.empty() && std::filesystem::absolute(m_configuredRepositoryRoot).lexically_normal() != *package)
-		{
-			diagnostics.AddError(AssetCookerCategory::All, "Installed cooker cannot select a source workspace.");
-			return false;
-		}
-		outRepositoryRoot = *package;
-		return true;
-	}
-	if (!m_configuredRepositoryRoot.empty())
-	{
-		outRepositoryRoot = std::filesystem::absolute(m_configuredRepositoryRoot).lexically_normal();
+		outWorkspaceRoot = std::filesystem::absolute(m_configuredWorkspaceRoot).lexically_normal();
 		return true;
 	}
 
 	std::error_code currentPathError;
 	const std::filesystem::path currentPath = std::filesystem::current_path(currentPathError);
-	if (currentPathError || !ProjectCookPlanner::TryFindRepositoryRoot(currentPath, outRepositoryRoot))
+	if (currentPathError || !ProjectCookPlanner::TryFindWorkspaceRoot(currentPath, outWorkspaceRoot))
 	{
-		diagnostics.AddError(AssetCookerCategory::All, "Failed to resolve repository root. Pass --root or set repositoryRoot.");
+		diagnostics.AddError(AssetCookerCategory::All, "Failed to resolve workspace root. Pass --root or set workspaceRoot.");
 		return false;
 	}
 

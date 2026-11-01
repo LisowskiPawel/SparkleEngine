@@ -72,6 +72,7 @@ ReferencePathTracerIdentity BuildReferencePathTracerIdentity(const RenderFrame& 
 
 	hash = Hash::kFnv64OffsetBasis;
 	hash = Hash::ContinueFnv1a64Value(hash, frame.Identity.ShaderGeneration);
+	hash = Hash::ContinueFnv1a64Value(hash, frame.Identity.ShaderPublicationHash);
 	identity.Components[ShaderComponent] = Hash::FinalizeFnv1a64(hash);
 	hash = Hash::kFnv64OffsetBasis;
 	hash = Hash::ContinueFnv1a64Value(hash, executionFrontend);

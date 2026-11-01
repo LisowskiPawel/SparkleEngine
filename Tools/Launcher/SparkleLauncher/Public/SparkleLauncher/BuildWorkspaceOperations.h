@@ -137,7 +137,7 @@ namespace SparkleLauncher
 
 	struct BuildWorkspaceOperationRequest
 	{
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		std::string ContentId = kDefaultContentId;
 		std::string EditorProfile = "DevelopmentEditor";
 		std::string GameProfile = "DevelopmentGame";
@@ -162,7 +162,7 @@ namespace SparkleLauncher
 	struct BuildWorkspaceOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		BuildWorkspaceOperationRequest Request;
 		BuildWorkspaceOperationKind Kind = BuildWorkspaceOperationKind::SyncCode;
 		BuildToolchainStatus Toolchain;
@@ -194,9 +194,9 @@ namespace SparkleLauncher
 	bool BuildWorkspaceOperationRequiresConfigureStep(const BuildWorkspaceOperationPlan& plan);
 	const std::vector<BuildWorkspaceOperationDefinition>& GetBuildWorkspaceOperationDefinitions();
 	std::optional<BuildWorkspaceOperationDefinition> FindBuildWorkspaceOperationDefinition(std::string_view operationId);
-	BuildToolchainStatus DetectBuildToolchain(const std::filesystem::path& repositoryRoot, WorkspaceIde preferredIde, WorkspaceCompiler compiler = WorkspaceCompiler::Msvc);
-	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& repositoryRoot, const BuildToolchainStatus& toolchain);
-	bool UpdateBuildFilesFreshnessStamp(const std::filesystem::path& repositoryRoot, const BuildToolchainStatus& toolchain, std::string& errorMessage);
+	BuildToolchainStatus DetectBuildToolchain(const std::filesystem::path& workspaceRoot, WorkspaceIde preferredIde, WorkspaceCompiler compiler = WorkspaceCompiler::Msvc);
+	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain);
+	bool UpdateBuildFilesFreshnessStamp(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain, std::string& errorMessage);
 	BuildWorkspaceOperationPlan PlanBuildWorkspaceOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request);
 	OperationRecord RunBuildWorkspaceOperationPlan(BuildWorkspaceOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback = {});
 }

@@ -14,6 +14,8 @@ Use RD-0 only for a missing identity/authority decision. A binding defect enters
 
 Run the stage that owns the demonstrated missing contract or failing check. Stage numbers identify responsibilities; they do not require rebuilding existing layers or completing unrelated stages first. Every stage and copied prompt follows the [Stage Source-Style Gate](../../../../../Engineering/Workflow/ChangeLifecycle.md#stage-source-style-gate) and the [shared delivery contract](../../../../CrossModule/FirstRelease/ImplementationPlan.md#phase-card-contract).
 
+Tool/UI changes follow the [minimum supporting scope](../../../../../Acceptance/FirstRelease.md#minimum-supporting-scope). Keep the current renderer inspection, controls, capture and local diagnostics needed by the demo. Do not expand this plan into general authoring, performance-dashboard or incident-management work; unavailable optional collection is a stated limit, not an instruction to build a collector. Native correctness and promised rendering outputs remain required.
+
 ## Dependencies
 
 RD-1 supplies valid bound programs to frame features. RD-2 applies requested state; RD-3/RD-4 observe and present the frame. RD-5 closes only admitted latency/provider behavior. These are dependency edges, not a serial rewrite from bindings to UI; RD-6 joins compatible results.
@@ -98,7 +100,7 @@ Before handoff, update the stage result, remaining plan and next item.
 
 **Start:** A current viewport/packet, resize/DPI transition or texture handle is the failing edge.
 
-**Work:** Check immutable packet ownership/copies, product/texture generations and retirement, blend/color/alpha, extent/DPI, level switch, missing/stale input and shutdown. Preserve the shipped product split: Game excludes Editor authoring; admitted Editor retains its UI route.
+**Work:** Check immutable packet ownership/copies, product/texture generations and retirement, blend/color/alpha, extent/DPI, level switch, missing/stale input and shutdown. Apply the [render-only Game contract](../../../../../Acceptance/FirstRelease.md#consumer-effort-and-game-presentation): Game submits no ImGui UI/overlay; preserve Editor context/capture/packets, controls and operations. FR-06 owns Game-only host/wiring removal; this stage verifies shared Renderer UI mechanics only for their actual Editor consumer.
 
 **Cleanup:** Remove redundant packet/product publication and mutable cross-thread UI state exposed by the repair; UI policy stays with its host.
 

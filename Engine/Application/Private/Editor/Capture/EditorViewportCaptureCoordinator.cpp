@@ -6,7 +6,6 @@
 #include "Editor/Capture/ViewportCaptureWriter.h"
 #include "Core/Public/Console/ConsoleOutput.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "Editor/Public/Console/EditorConsoleSystem.h"
 #include "Renderer.h"
 
 #include <format>
@@ -18,28 +17,27 @@ EditorViewportCaptureCoordinator::EditorViewportCaptureCoordinator(EditorOperati
 {
 }
 
-void EditorViewportCaptureCoordinator::Request(EditorConsoleSystem* console, Renderer& renderer, std::uint64_t frameId)
+std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Request(Renderer& renderer, std::uint64_t frameId)
 {
 	if (!m_capture.IsSettled() || m_writeOperation.IsOccupied())
 	{
-		PublishStatus(console, "Viewport capture is already in progress.", true);
-		return;
+		return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture is already in progress."};
 	}
 
 	m_outputPath = BuildOutputPath(frameId);
 	const ViewportCaptureAdmissionStatus admission = m_capture.Request(renderer, ViewportCaptureRequest{.Output = RenderOutputFlags::FinalColorLdr});
 	if (admission != ViewportCaptureAdmissionStatus::Accepted)
 	{
-		PublishStatus(
-		    console,
-		    admission == ViewportCaptureAdmissionStatus::Full ? "Viewport capture rejected: render request capacity is full." : "Viewport capture rejected: render owner is closed.",
-		    true);
-
 		m_outputPath.clear();
+
+		return ConsoleOutputRecord{
+		    ConsoleCommandSeverity::Error,
+		    admission == ViewportCaptureAdmissionStatus::Full ? "Viewport capture rejected: render request capacity is full." : "Viewport capture rejected: render owner is closed."};
 	}
+	return std::nullopt;
 }
 
-void EditorViewportCaptureCoordinator::Update(EditorConsoleSystem* console, Renderer& renderer)
+std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Update(Renderer& renderer)
 {
 	m_capture.Update(renderer);
 	if (m_capture.HasReadback())
@@ -47,8 +45,7 @@ void EditorViewportCaptureCoordinator::Update(EditorConsoleSystem* console, Rend
 		ViewportCaptureReadback readback = m_capture.TakeReadback();
 		if (!readback.Result)
 		{
-			PublishStatus(console, "Viewport capture failed: " + readback.Result.FailureReason, true);
-			return;
+			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture failed: " + readback.Result.FailureReason};
 		}
 
 		std::string errorMessage;
@@ -63,7 +60,7 @@ void EditorViewportCaptureCoordinator::Update(EditorConsoleSystem* console, Rend
 		        },
 		        errorMessage))
 		{
-			PublishStatus(console, "Viewport capture could not start: " + errorMessage, true);
+			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture could not start: " + errorMessage};
 		}
 	}
 
@@ -72,22 +69,14 @@ void EditorViewportCaptureCoordinator::Update(EditorConsoleSystem* console, Rend
 	{
 		if (!taskResult->Succeeded())
 		{
-			PublishStatus(console, std::format("Viewport capture {}: {}", taskResult->WasCancelled() ? "cancelled" : "failed", taskResult->GetMessage()), true);
+			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, std::format("Viewport capture {}: {}", taskResult->WasCancelled() ? "cancelled" : "failed", taskResult->GetMessage())};
 		}
 		else
 		{
-			PublishStatus(console, "Viewport captured: " + Strings::ToNarrow(m_outputPath.wstring()), false);
+			return ConsoleOutputRecord{ConsoleCommandSeverity::Info, "Viewport captured: " + Strings::ToNarrow(m_outputPath.wstring())};
 		}
 	}
-}
-
-void EditorViewportCaptureCoordinator::PublishStatus(EditorConsoleSystem* console, std::string status, bool failed)
-{
-	if (console != nullptr)
-	{
-		console->AppendOutput(ConsoleOutputRecord{.Severity = failed ? ConsoleCommandSeverity::Error : ConsoleCommandSeverity::Info, .Text = std::move(status)});
-		console->OpenConsole();
-	}
+	return std::nullopt;
 }
 
 std::filesystem::path EditorViewportCaptureCoordinator::BuildOutputPath(std::uint64_t frameId) const

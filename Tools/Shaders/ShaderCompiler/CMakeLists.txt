@@ -111,7 +111,7 @@ sparkle_target_precompile_headers(ShaderCompiler
 
 target_link_libraries(ShaderCompiler
     PRIVATE
-        ToolConsoleSupport
+        ToolSupport
         ShaderContracts
         SparkleCore
         SparkleTasks

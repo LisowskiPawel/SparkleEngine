@@ -25,6 +25,7 @@ public:
 	WorldEditResult Undo(std::uint64_t worldGeneration);
 	WorldEditResult Redo(std::uint64_t worldGeneration);
 	void InvalidateForWorldGeneration(std::uint64_t worldGeneration) noexcept;
+	void FinishInteraction() noexcept { m_coalescing = false; }
 
 	bool CanUndo() const noexcept { return !m_undo.empty(); }
 
@@ -49,4 +50,5 @@ private:
 	std::optional<WorldEditResult> m_lastResult;
 	std::uint64_t m_nextRequestId = 1;
 	std::uint64_t m_worldGeneration = 0;
+	bool m_coalescing = false;
 };

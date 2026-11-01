@@ -10,6 +10,8 @@
 
 **Owner:** `Engine/Platform` / `SparklePlatform`
 
+**Input cleanup, 2026-11-01:** the deleted Game UI left no producer for the capture-query callback. That API, storage and deferred-dispatch hook are removed; Editor continues to supply per-frame routing intent. [Submission checks](../../../../../artifacts/validation/changelist-submit-20261101/completion.json) retain source/build limits and do not establish new interactive input acceptance.
+
 **Evidence and disposition:** [Capability Evidence Plan](../../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../../Acceptance/FirstRelease.md)
 
 **Supported host:** Windows only. Linux support is excluded from the selected roadmap and has no delivery plan.
@@ -45,7 +47,7 @@ The present implementation is Windows-only: public `Window` exposes `HWND` and W
 | `PLAT-008` | Per-frame input state | Implemented path | Global and per-layer pressed/released/held state, pointer position/delta, wheel accumulation, modifiers, capture, and cursor-hidden state reset at `BeginFrame`. | `S` |
 | `PLAT-009` | Immediate/deferred dispatch | Implemented path | Subscribers choose typed event, Gameplay/UI/System layer, and immediate/deferred delivery. Deferred events are processed explicitly after the native message pump. | `S` |
 | `PLAT-010` | Layer routing | Implemented path | Gameplay/UI/System enablement, active fallback layer, per-frame UI target rectangles, text-input/interactions-disabled policy, point/mouse-move targeting, and layer cancellation. | `S` |
-| `PLAT-011` | UI capture integration | Implemented path | Host supplies a capture query (currently ImGui keyboard/mouse capture); routing uses it with registered viewport bounds to prevent UI/gameplay double-consumption. | `S` |
+| `PLAT-011` | UI capture integration | Implemented path | Editor supplies per-frame UI capture and viewport routing intent through `BeginInputRoutingFrame` and viewport registration. Game uses the gameplay layer directly. The unused Game-UI capture callback channel is removed. | `S` |
 | `PLAT-012` | Mouse/cursor control | Implemented path | Capture/release, hide/show/visibility, center cursor, and capture-layer tracking. Focus-loss and alt-tab recovery require runtime evidence. | `S` |
 | `PLAT-013` | Owner-thread enforcement | Implemented path | Registration and dispatch are guarded by Core `OwnerThread`; the module is not generally thread-safe. | `S` |
 

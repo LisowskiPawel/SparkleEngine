@@ -7,7 +7,7 @@
 #include "Assets/Loaders/MaterialAssetLoader.h"
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Core/Public/Formatting/HexFormat.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
+#include "Core/Public/Paths/ProductFilePaths.h"
 
 #include <filesystem>
 #include <format>
@@ -24,7 +24,8 @@ namespace Assets
 		for (const CookedSceneMaterialAssetRef& materialReference : sceneManifest.materialAssetReferences)
 		{
 			const std::filesystem::path materialAssetPath = Paths::CookedMaterialAsset(materialReference);
-			const LoadedMaterialAsset materialAsset = materialAssetLoader.Decode(materialAssetPath, files.Get(materialAssetPath));
+			const LoadedMaterialAsset materialAsset = materialAssetLoader.Decode(materialAssetPath, files.Get(materialAssetPath), files.GetAllocationBudget());
+			files.GetAllocationBudget().Reserve(files.Get(materialAssetPath).size());
 			sceneAssetPayload.materials.push_back(materialTranslator.Translate(materialAsset));
 			files.Release(materialAssetPath);
 		}

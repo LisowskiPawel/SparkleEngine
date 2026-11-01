@@ -62,6 +62,11 @@ namespace SparkleLauncher
 		}
 
 		const std::string& operationId = m_outArguments->RunOperationId.empty() ? m_outArguments->DryRunOperationId : m_outArguments->RunOperationId;
+		if (m_outArguments->ShaderSymbols && operationId != "cook.shaders" && operationId != "cook.all" && operationId != "cook.workspace")
+		{
+			*m_error << "SparkleLauncher: --shader-symbols requires cook.shaders, cook.all or cook.workspace.\n";
+			return false;
+		}
 		if (!m_outArguments->LevelId.empty() && !operationId.empty() && operationId != "levels.sync" && operationId != "levels.run")
 		{
 			*m_error << "SparkleLauncher: --level applies only to levels.sync and levels.run; it does not select cook scopes.\n";
@@ -167,6 +172,12 @@ namespace SparkleLauncher
 		if (argument == "--force-recook")
 		{
 			m_outArguments->RequestedCookMode = CookMode::Force;
+			return true;
+		}
+
+		if (argument == "--shader-symbols")
+		{
+			m_outArguments->ShaderSymbols = true;
 			return true;
 		}
 
@@ -322,16 +333,17 @@ namespace SparkleLauncher
 	{
 		output << "GPU crash launch: --gpu-crash-debugging off|aftermath --shader-export <absolute shader-export.json>\n";
 		output << "Usage:\n"
-		       << "  SparkleLauncher [--root <repo-root>] [--editor-profile <profile>] [--game-profile <profile>] "
+		       << "  SparkleLauncher [--root <workspace-root>] [--editor-profile <profile>] [--game-profile <profile>] "
 		          "[--ide <visual-studio|rider>] [--compiler <msvc|clang-cl>] "
 		          "[--level <catalog-id>] [--product <editor|game>] [--graphics-api <d3d12|vulkan>] "
-		          "[--clean-scope <scope>] "
+		          "[--clean-scope <scope>] [--shader-symbols] "
 		          "[--confirm-clean] [--force-recook] [--confirm-force-recook] [--dry-run [operation-id]] [--run <operation-id>]\n"
 		       << "\n"
 		       << "Examples:\n"
 		       << "  SparkleLauncher --dry-run\n"
 		       << "  SparkleLauncher --level Empty --product game --graphics-api d3d12 --dry-run levels.run\n"
 		       << "  SparkleLauncher --game-profile DevelopmentGame --dry-run cook.shaders\n"
+		       << "  SparkleLauncher --shader-symbols --run cook.shaders\n"
 		       << "  SparkleLauncher --force-recook --dry-run cook.all\n"
 		       << "  SparkleLauncher --clean-scope cooked --dry-run workspace.clean\n"
 		       << "  SparkleLauncher --clean-scope clean-all --dry-run workspace.clean\n";

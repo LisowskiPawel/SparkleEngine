@@ -29,7 +29,7 @@ namespace SparkleLauncher
 
 	struct LevelOperationRequest
 	{
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		std::string ContentId = kDefaultContentId;
 		std::vector<std::string> RequestedLevelIds;
 	};
@@ -45,7 +45,7 @@ namespace SparkleLauncher
 	struct LevelOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path RepositoryRoot;
+		std::filesystem::path WorkspaceRoot;
 		LevelOperationRequest Request;
 		LevelOperationKind Kind = LevelOperationKind::Sync;
 		std::filesystem::path CMakePath;

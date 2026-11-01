@@ -1,14 +1,13 @@
 #include "ProjectCookPlanner.h"
-#include "Core/Public/Paths/ProductPaths.h"
+#include "ToolOutputPaths.h"
 
-#include "Core/Public/Paths/PackagePaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include "../Discovery/CatalogedLevelSceneReader.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/FileSystemUtils.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
-#include "Core/Public/Projects/ProjectLevelCatalog.h"
+#include "ProjectLevelCatalog.h"
 #include "SourceSceneImporter.h"
 
 #include <algorithm>
@@ -17,7 +16,7 @@
 #include <system_error>
 #include <utility>
 
-bool ProjectCookPlanner::TryFindRepositoryRoot(const std::filesystem::path& startPath, std::filesystem::path& outRepositoryRoot)
+bool ProjectCookPlanner::TryFindWorkspaceRoot(const std::filesystem::path& startPath, std::filesystem::path& outWorkspaceRoot)
 {
 	std::error_code error;
 	std::filesystem::path currentPath = Paths::Normalize(startPath.empty() ? std::filesystem::current_path(error) : startPath);
@@ -36,7 +35,7 @@ bool ProjectCookPlanner::TryFindRepositoryRoot(const std::filesystem::path& star
 		return false;
 	}
 
-	outRepositoryRoot = *workspaceRoot;
+	outWorkspaceRoot = *workspaceRoot;
 	return true;
 }
 
@@ -57,20 +56,10 @@ std::optional<std::string_view> ProjectCookPlanner::ResolveToolProfile(std::stri
 	return std::nullopt;
 }
 
-std::vector<std::string> ProjectCookPlanner::DiscoverProjects(const std::filesystem::path& repositoryRoot, AssetCookerDiagnostics& diagnostics)
+std::vector<std::string> ProjectCookPlanner::DiscoverProjects(const std::filesystem::path& workspaceRoot, AssetCookerDiagnostics& diagnostics)
 {
 	std::vector<std::string> projects;
-	if (!Filesystem::IsSourceWorkspace(repositoryRoot))
-	{
-		const auto source = Filesystem::ResolvePackageSourceRoot(repositoryRoot);
-		if (source && PathExists(*source / std::string(Filesystem::kProjectMarker)))
-		{
-			return {Strings::ToNarrow(source->filename().wstring())};
-		}
-		diagnostics.AddError(AssetCookerCategory::All, "Package content store is not initialized. Start Launcher first.");
-		return {};
-	}
-	const std::filesystem::path projectsRoot = repositoryRoot / "Projects";
+	const std::filesystem::path projectsRoot = workspaceRoot / "Projects";
 	if (!PathExists(projectsRoot))
 	{
 		diagnostics.AddError(AssetCookerCategory::All, "Projects directory was not found.", projectsRoot);
@@ -97,7 +86,7 @@ std::vector<std::string> ProjectCookPlanner::DiscoverProjects(const std::filesys
 }
 
 bool ProjectCookPlanner::BuildProjectCookPlan(
-    const std::filesystem::path& repositoryRoot,
+    const std::filesystem::path& workspaceRoot,
     std::string_view projectName,
     std::string_view toolProfile,
     AssetCookerCategory category,
@@ -106,17 +95,13 @@ bool ProjectCookPlanner::BuildProjectCookPlan(
 {
 	outPlan = {};
 	outPlan.projectName = std::string(projectName);
-	outPlan.projectRoot = Filesystem::ResolveProductProjectRoot(repositoryRoot, projectName);
-	outPlan.cookedRoot = Filesystem::ResolveProductCookedRoot(repositoryRoot, projectName);
-	outPlan.shaderCompilerPath = Filesystem::ResolveProductToolPath(repositoryRoot, "ShaderCompiler", toolProfile);
-	outPlan.textureCookerPath = Filesystem::ResolveProductToolPath(repositoryRoot, "TextureCooker", toolProfile);
-	outPlan.temporaryRoot = Filesystem::ResolveProductToolScratch(repositoryRoot, "AssetCooker", toolProfile);
+	const auto outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
+	outPlan.projectRoot = workspaceRoot / "Projects" / projectName;
+	outPlan.cookedRoot = outputs.CookedProjectDirectory(projectName);
+	outPlan.shaderCompilerPath = outputs.ToolTargetOutputs("ShaderCompiler", toolProfile).BinaryDirectory / "ShaderCompiler.exe";
+	outPlan.textureCookerPath = outputs.ToolTargetOutputs("TextureCooker", toolProfile).BinaryDirectory / "TextureCooker.exe";
+	outPlan.temporaryRoot = outputs.ToolScratchDirectory("AssetCooker", toolProfile);
 	AddPlanSteps(category, outPlan.steps);
-	if (!Filesystem::IsSourceWorkspace(repositoryRoot) && (outPlan.projectRoot.empty() || outPlan.cookedRoot.empty() || outPlan.shaderCompilerPath.empty() || outPlan.textureCookerPath.empty()))
-	{
-		diagnostics.AddError(AssetCookerCategory::All, "Invalid package project, profile or cook-helper manifest entry.");
-		return false;
-	}
 
 	if (!PathExists(outPlan.projectRoot / std::string(Filesystem::kProjectMarker)))
 	{
@@ -222,7 +207,7 @@ bool ProjectCookPlanner::AppendLevelSceneIds(const ProjectLevelCatalog& catalog,
 		return true;
 	}
 
-	if (!catalog.IsLevelReady(level))
+	if (!catalog.HasLevelSourceInputs(level))
 	{
 		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Catalog level is unavailable: " + level.id, level.sourcePath);
 		return false;

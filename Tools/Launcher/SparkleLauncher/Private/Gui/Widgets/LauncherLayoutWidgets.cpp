@@ -99,7 +99,7 @@ namespace SparkleLauncher
 		QFrame::keyPressEvent(event);
 	}
 
-	HomeHeroCardWidget::HomeHeroCardWidget(QPixmap source, QWidget* parent) :
+	SceneHeroCardWidget::SceneHeroCardWidget(QPixmap source, QWidget* parent) :
 	    QFrame(parent),
 	    m_source(std::move(source))
 	{
@@ -112,7 +112,7 @@ namespace SparkleLauncher
 		setSizePolicy(policy);
 	}
 
-	void HomeHeroCardWidget::SetCopyPane(QWidget* copyPane)
+	void SceneHeroCardWidget::SetCopyPane(QWidget* copyPane)
 	{
 		m_copyPane = copyPane;
 		if (m_copyPane != nullptr)
@@ -124,28 +124,28 @@ namespace SparkleLauncher
 		}
 	}
 
-	bool HomeHeroCardWidget::hasHeightForWidth() const
+	bool SceneHeroCardWidget::hasHeightForWidth() const
 	{
 		return true;
 	}
 
-	int HomeHeroCardWidget::heightForWidth(int width) const
+	int SceneHeroCardWidget::heightForWidth(int width) const
 	{
 		const int proportionalHeight = static_cast<int>(std::round(static_cast<double>(width) * LauncherUi::Hero::DesignHeight / LauncherUi::Hero::DesignWidth));
 		return std::max(proportionalHeight, LauncherUi::Hero::MinimumHeight);
 	}
 
-	QSize HomeHeroCardWidget::sizeHint() const
+	QSize SceneHeroCardWidget::sizeHint() const
 	{
 		return QSize(LauncherUi::Hero::DesignWidth, LauncherUi::Hero::DesignHeight);
 	}
 
-	QSize HomeHeroCardWidget::minimumSizeHint() const
+	QSize SceneHeroCardWidget::minimumSizeHint() const
 	{
 		return QSize(LauncherUi::Hero::MinimumWidth, LauncherUi::Hero::MinimumHeight);
 	}
 
-	void HomeHeroCardWidget::paintEvent(QPaintEvent*)
+	void SceneHeroCardWidget::paintEvent(QPaintEvent*)
 	{
 		QPainter painter(this);
 		painter.setRenderHint(QPainter::Antialiasing, true);
@@ -164,19 +164,19 @@ namespace SparkleLauncher
 		heroPainter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
 		const QRect designRect(0, 0, LauncherUi::Hero::DesignWidth, LauncherUi::Hero::DesignHeight);
-		PaintLauncherArtwork(heroPainter, designRect, m_source, LauncherArtworkSpec::ForPreset(LauncherArtworkPreset::HeroPanorama));
+		PaintLauncherArtwork(heroPainter, designRect, m_source, LauncherArtworkSpec::ForSceneHero());
 
 		painter.drawImage(HeroSceneRect(), heroLayer);
 	}
 
-	void HomeHeroCardWidget::resizeEvent(QResizeEvent* event)
+	void SceneHeroCardWidget::resizeEvent(QResizeEvent* event)
 	{
 		QFrame::resizeEvent(event);
 		SyncProportionalHeight();
 		LayoutCopyPane();
 	}
 
-	void HomeHeroCardWidget::SyncProportionalHeight()
+	void SceneHeroCardWidget::SyncProportionalHeight()
 	{
 		if (width() <= 0)
 		{
@@ -194,7 +194,7 @@ namespace SparkleLauncher
 		updateGeometry();
 	}
 
-	void HomeHeroCardWidget::LayoutCopyPane()
+	void SceneHeroCardWidget::LayoutCopyPane()
 	{
 		if (m_copyPane == nullptr || width() <= 0 || height() <= 0)
 		{
@@ -219,7 +219,7 @@ namespace SparkleLauncher
 		m_copyPane->setGeometry(left, top, paneWidth, paneHeight);
 	}
 
-	QRectF HomeHeroCardWidget::HeroSceneRect() const
+	QRectF SceneHeroCardWidget::HeroSceneRect() const
 	{
 		if (width() <= 0 || height() <= 0)
 		{
@@ -232,7 +232,7 @@ namespace SparkleLauncher
 		return QRectF(sceneTopLeft, sceneSize);
 	}
 
-	double HomeHeroCardWidget::HeroSceneScale() const
+	double SceneHeroCardWidget::HeroSceneScale() const
 	{
 		if (width() <= 0 || height() <= 0)
 		{

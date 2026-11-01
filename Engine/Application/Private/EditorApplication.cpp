@@ -8,12 +8,14 @@
 #include "Editor/Public/UI.h"
 #include "Editor/Viewport/EditorViewportOutputCoordinator.h"
 #include "EditorOperations/EditorOperationRuntime.h"
+#include "Editor/Shaders/EditorShaderCompileOperation.h"
 #include "RenderingSettings/EngineRenderingSettingsPersistence.h"
 #include "Input/InputSystem.h"
 #include "Renderer.h"
 #include "GameApplication.h"
-#include "ShaderRecook/ShaderConsoleCommands.h"
-#include "ShaderRecook/ShaderRecookCoordinator.h"
+#include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Console/ConsoleOutput.h"
+#include "Core/Public/Process/ChildProcess.h"
 #include "Time/Timer.h"
 #include "World/GameWorld.h"
 #include "Window/Window.h"
@@ -25,14 +27,15 @@ struct EditorApplication::State final
 	std::unique_ptr<GameApplication> Game;
 	std::unique_ptr<UI> Ui;
 	std::unique_ptr<EditorOperationRuntime> OperationRuntime;
-	std::unique_ptr<ShaderRecookCoordinator> ShaderRecook;
+	std::unique_ptr<EditorShaderCompileOperation> ShaderCompileOperation;
 	std::unique_ptr<EditorViewportOutputCoordinator> ViewportOutput;
 };
 
 EditorApplication::EditorApplication() = default;
 
-EditorApplication::EditorApplication(GameApplicationOptions options) noexcept :
-    m_gameOptions(options)
+EditorApplication::EditorApplication(GameApplicationOptions options, EditorShaderCompileAction compileShaders) noexcept :
+    m_gameOptions(std::move(options)),
+    m_compileShaders(std::move(compileShaders))
 {
 }
 
@@ -71,8 +74,7 @@ void EditorApplication::InitializeGameApplication()
 	if (!m_state->Game)
 	{
 		GameApplicationOptions gameOptions = m_gameOptions;
-		gameOptions.EnableGameUi = false;
-		gameOptions.EnableGameConsole = false;
+		gameOptions.WindowTitle = "Sparkle Editor";
 		gameOptions.EnableUiRenderPackets = true;
 		m_state->Game = std::make_unique<GameApplication>(gameOptions);
 	}
@@ -87,20 +89,18 @@ void EditorApplication::InitializeEditorOperations()
 		m_state->OperationRuntime = std::make_unique<EditorOperationRuntime>(m_state->Game->GetTaskExecutor(), m_state->Game->GetApplicationTaskScope());
 	}
 
-	if (!m_state->ShaderRecook)
-	{
-		m_state->ShaderRecook = std::make_unique<ShaderRecookCoordinator>(*m_state->OperationRuntime);
-	}
-
 	if (!m_state->ViewportOutput)
 	{
 		m_state->ViewportOutput = std::make_unique<EditorViewportOutputCoordinator>(*m_state->OperationRuntime);
+	}
+	if (!m_state->ShaderCompileOperation && m_compileShaders)
+	{
+		m_state->ShaderCompileOperation = std::make_unique<EditorShaderCompileOperation>(*m_state->OperationRuntime, m_compileShaders);
 	}
 }
 
 void EditorApplication::InitializeUi()
 {
-	m_state->Game->GetInputSystem().ClearInputCaptureQuery();
 	m_state->Game->GetInputSystem().BeginInputRoutingFrame(false, false);
 	if (m_state->Ui)
 	{
@@ -128,11 +128,26 @@ void EditorApplication::InitializeUi()
 	    },
 	    .CaptureRenderingSettings = [&renderer]() { return renderer.CaptureRenderingSettings(); },
 	    .ConsoleVariables = [&renderer](CVarControlRequest request) { return renderer.ExecuteConsoleVariables(std::move(request)); },
+	    .RequestRestart =
+	        [this]()
+	    {
+		    if (Process::RelaunchCurrentProcess())
+		    {
+			    m_state->Game->GetWindow().RequestClose();
+		    }
+		    else
+		    {
+			    m_state->Ui->AppendConsoleOutput({ConsoleCommandSeverity::Error, "Editor restart could not launch a new process."}, true);
+		    }
+	    },
 	    .HostWindow = m_state->Game->GetWindow(),
 	    .Input = m_state->Game->GetInputSystem()});
 
 	ConfigureUiDiagnostics(renderer);
-	ShaderConsoleCommands::ConnectEditor(*m_state->Ui, *m_state->ShaderRecook);
+	if (m_state->ShaderCompileOperation)
+	{
+		m_state->Ui->SetShaderCompileHandler([this](bool generateSymbols) { return m_state->ShaderCompileOperation->Request(generateSymbols); });
+	}
 }
 
 void EditorApplication::ConfigureUiDiagnostics(Renderer& renderer)
@@ -179,13 +194,22 @@ bool EditorApplication::Tick()
 void EditorApplication::UpdateEditorOperations(Renderer& renderer)
 {
 	m_state->ViewportOutput->Update(*m_state->Ui, renderer);
-
-	if (m_state->Ui->ConsumeShaderRecookRequest())
+	if (m_state->ShaderCompileOperation)
 	{
-		m_state->ShaderRecook->RequestRecook();
+		m_state->ShaderCompileOperation->Update(*m_state->Ui, renderer);
 	}
 
-	m_state->ShaderRecook->Update(renderer, m_state->Ui->ConsumeShaderReloadRequest());
+	if (m_state->Ui->ConsumeShaderReloadRequest())
+	{
+		try
+		{
+			renderer.ReloadShaders();
+		}
+		catch (const Diagnostics::Error& error)
+		{
+			m_state->Ui->AppendConsoleOutput({ConsoleCommandSeverity::Error, error.what()});
+		}
+	}
 }
 
 void EditorApplication::RenderEditorFrame(Renderer& renderer)
@@ -204,7 +228,7 @@ void EditorApplication::Shutdown()
 	}
 	m_state->Ui.reset();
 	m_state->ViewportOutput.reset();
-	m_state->ShaderRecook.reset();
+	m_state->ShaderCompileOperation.reset();
 	m_state->OperationRuntime.reset();
 	if (m_state->Game)
 	{

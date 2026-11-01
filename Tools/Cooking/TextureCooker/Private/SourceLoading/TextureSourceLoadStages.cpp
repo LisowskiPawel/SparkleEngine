@@ -2,7 +2,8 @@
 
 #include "SourceLoading/TextureSourceLoadStages.h"
 
-#include "Core/Public/FileSystemUtils.h"
+#include "SourceAssetPaths.h"
+
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/FileUtils.h"
 
@@ -13,7 +14,7 @@
 
 TextureSourceFile ReadTextureSourceFile(const std::filesystem::path& sourcePath)
 {
-	const auto resolvedPathResult = Filesystem::ResolveAssetPathNormalized(sourcePath, AssetType::Texture);
+	const auto resolvedPathResult = SparkleTools::ResolveSourceAssetPath(sourcePath, SparkleTools::SourceAssetType::Texture);
 	if (!resolvedPathResult)
 	{
 		throw Diagnostics::Error(std::format("Failed to resolve source texture '{}'.", sourcePath.string()));

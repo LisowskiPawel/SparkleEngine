@@ -88,8 +88,8 @@ bool CookShadersArgumentParser::ConsumeFlag(std::string_view argument)
 
 bool CookShadersArgumentParser::ConsumeValueOption(std::string_view argument)
 {
-	if (argument != "--shader-id" && argument != "--changed" && argument != "--cancellation-signal" && argument != "--target" && argument != "--backend" && argument != "--debug-artifacts"
-	    && argument != "--analysis" && argument != "--parallel-compiles" && argument != "--warnings-as-errors" && argument != "--strip-debug")
+	if (argument != "--shader-id" && argument != "--changed" && argument != "--target" && argument != "--backend" && argument != "--debug-artifacts" && argument != "--analysis"
+	    && argument != "--parallel-compiles" && argument != "--warnings-as-errors" && argument != "--strip-debug")
 	{
 		return false;
 	}
@@ -113,12 +113,6 @@ void CookShadersArgumentParser::ApplyValue(std::string_view argument, std::strin
 			throw Diagnostics::Error("--changed requires a canonical virtual shader path beginning with '/'.");
 		}
 		m_settings.changedVirtualPaths.emplace_back(value);
-		return;
-	}
-
-	if (argument == "--cancellation-signal")
-	{
-		m_settings.cancellationSignalPath = std::filesystem::path(std::string(value));
 		return;
 	}
 

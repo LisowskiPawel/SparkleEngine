@@ -6,7 +6,8 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/BinaryStreamWriter.h"
 #include "Core/Public/Files/FileUtils.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
+#include "Core/Public/Files/FileSetPublication.h"
+#include "Core/Public/Paths/ProductFilePaths.h"
 
 #include <fstream>
 

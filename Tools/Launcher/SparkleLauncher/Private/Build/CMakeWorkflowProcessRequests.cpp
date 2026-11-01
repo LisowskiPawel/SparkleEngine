@@ -2,7 +2,7 @@
 
 #include "CMakeGeneratorModel.h"
 #include "LauncherStatePaths.h"
-#include "Core/Public/Paths/WorkspaceOutputPaths.h"
+#include "ToolOutputPaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 namespace SparkleLauncher
@@ -18,16 +18,16 @@ namespace SparkleLauncher
 	}
 
 	Process::ChildProcessRequest MakeCMakeConfigureRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view logFileName)
 	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
+		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
 		Process::ChildProcessRequest process;
 		process.ExecutablePath = toolchain.CMakePath;
 		process.WorkingDirectory = outputs.BuildRoot;
-		process.LogPath = ResolveLauncherOperationLogPath(repositoryRoot, operationId, logFileName);
+		process.LogPath = ResolveLauncherOperationLogPath(workspaceRoot, operationId, logFileName);
 		process.Arguments = {"-G", toolchain.Generator};
 		if (CMakeGeneratorUsesPlatformArgument(toolchain.Generator))
 		{
@@ -65,23 +65,23 @@ namespace SparkleLauncher
 		process.Arguments.push_back("-DSPARKLE_ENABLE_KTX_SUPPORT=" + ToCMakeBool(featureSettings.KtxSupportEnabled));
 		process.Arguments.push_back("-DSPARKLE_ENABLE_NVIDIA_STREAMLINE=" + ToCMakeBool(featureSettings.NvidiaStreamlineEnabled));
 		process.Arguments.push_back("-Wno-dev");
-		process.Arguments.push_back(Strings::ToNarrow(repositoryRoot.wstring()));
+		process.Arguments.push_back(Strings::ToNarrow(workspaceRoot.wstring()));
 		return process;
 	}
 
 	Process::ChildProcessRequest MakeCMakeBuildRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view profileName,
 	    const std::vector<std::string>& targets,
 	    std::string_view logFileName)
 	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
+		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
 		Process::ChildProcessRequest process;
 		process.ExecutablePath = toolchain.CMakePath;
-		process.WorkingDirectory = repositoryRoot;
-		process.LogPath = ResolveLauncherOperationLogPath(repositoryRoot, operationId, logFileName);
+		process.WorkingDirectory = workspaceRoot;
+		process.LogPath = ResolveLauncherOperationLogPath(workspaceRoot, operationId, logFileName);
 		process.Arguments = {"--build", Strings::ToNarrow(outputs.BuildRoot.wstring()), "--config", std::string(profileName), "--target"};
 		process.Arguments.insert(process.Arguments.end(), targets.begin(), targets.end());
 		if (CMakeGeneratorUsesMsBuildArguments(toolchain.Generator))
@@ -94,37 +94,37 @@ namespace SparkleLauncher
 	}
 
 	Process::ChildProcessRequest MakeCMakeLauncherConfigureRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view logFileName)
 	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		Process::ChildProcessRequest process = MakeCMakeConfigureRequest(repositoryRoot, toolchain, operationId, logFileName);
+		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
+		Process::ChildProcessRequest process = MakeCMakeConfigureRequest(workspaceRoot, toolchain, operationId, logFileName);
 		if (!process.Arguments.empty())
 		{
 			process.Arguments.pop_back();
 		}
-		process.WorkingDirectory = repositoryRoot;
+		process.WorkingDirectory = workspaceRoot;
 		process.Arguments.push_back("-S");
-		process.Arguments.push_back(Strings::ToNarrow((repositoryRoot / "Tools" / "Launcher").wstring()));
+		process.Arguments.push_back(Strings::ToNarrow((workspaceRoot / "Tools" / "Launcher").wstring()));
 		process.Arguments.push_back("-B");
 		process.Arguments.push_back(Strings::ToNarrow(outputs.LauncherBuildDirectory().wstring()));
 		return process;
 	}
 
 	Process::ChildProcessRequest MakeCMakeLauncherBuildRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view profileName,
 	    std::string_view logFileName)
 	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
+		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
 		Process::ChildProcessRequest process;
 		process.ExecutablePath = toolchain.CMakePath;
-		process.WorkingDirectory = repositoryRoot;
-		process.LogPath = ResolveLauncherOperationLogPath(repositoryRoot, operationId, logFileName);
+		process.WorkingDirectory = workspaceRoot;
+		process.LogPath = ResolveLauncherOperationLogPath(workspaceRoot, operationId, logFileName);
 		process.Arguments = {"--build", Strings::ToNarrow(outputs.LauncherBuildDirectory().wstring()), "--config", std::string(profileName), "--target", "SparkleLauncher"};
 		if (CMakeGeneratorUsesMsBuildArguments(toolchain.Generator))
 		{
@@ -136,25 +136,25 @@ namespace SparkleLauncher
 	}
 
 	Process::ChildProcessRequest MakeCMakeDependencySyncRequest(
-	    const std::filesystem::path& repositoryRoot,
+	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,
 	    std::string_view operationId,
 	    std::string_view sourceDependencyId,
 	    std::string_view logFileName)
 	{
-		const Filesystem::WorkspaceOutputPaths outputs = Filesystem::ResolveWorkspaceOutputPaths(repositoryRoot);
-		Process::ChildProcessRequest process = MakeCMakeConfigureRequest(repositoryRoot, toolchain, operationId, logFileName);
+		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
+		Process::ChildProcessRequest process = MakeCMakeConfigureRequest(workspaceRoot, toolchain, operationId, logFileName);
 		if (!process.Arguments.empty())
 		{
 			process.Arguments.pop_back();
 		}
 
 		const std::filesystem::path dependencySyncDirectory = outputs.SourceDependencySyncDirectory(sourceDependencyId);
-		process.WorkingDirectory = repositoryRoot;
+		process.WorkingDirectory = workspaceRoot;
 		process.Arguments.push_back("-DSPARKLE_SYNC_SOURCE_DEPENDENCY=" + std::string(sourceDependencyId));
 		process.Arguments.push_back("-DFETCHCONTENT_BASE_DIR=" + Strings::ToNarrow(outputs.DependencyCacheRoot.generic_wstring()));
 		process.Arguments.push_back("-S");
-		process.Arguments.push_back(Strings::ToNarrow(repositoryRoot.wstring()));
+		process.Arguments.push_back(Strings::ToNarrow(workspaceRoot.wstring()));
 		process.Arguments.push_back("-B");
 		process.Arguments.push_back(Strings::ToNarrow(dependencySyncDirectory.wstring()));
 		return process;

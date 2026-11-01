@@ -22,7 +22,7 @@ namespace SparkleLauncher
 		LauncherIcon icon = LauncherIcon::Start;
 		switch (pageKind)
 		{
-			case LauncherWorkflowPageKind::Home:
+			case LauncherWorkflowPageKind::Scenes:
 				icon = LauncherIcon::Start;
 				break;
 

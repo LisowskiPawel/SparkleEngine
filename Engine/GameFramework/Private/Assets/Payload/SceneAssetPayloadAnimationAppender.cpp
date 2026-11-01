@@ -7,7 +7,7 @@
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Assets/Translators/SceneAssetAnimationTranslator.h"
 #include "Core/Public/Formatting/HexFormat.h"
-#include "Core/Public/Paths/DirectoryPaths.h"
+#include "Core/Public/Paths/ProductFilePaths.h"
 
 #include <filesystem>
 #include <format>
@@ -22,7 +22,10 @@ namespace Assets
 		for (const CookedAnimationReference& animationRef : sceneManifest.animationReferences)
 		{
 			const std::filesystem::path animationAssetPath = Paths::CookedAnimationAsset(animationRef.animationAssetId);
-			const LoadedAnimationAsset animationAsset = animationAssetLoader.Decode(animationAssetPath, files.Get(animationAssetPath));
+			const LoadedAnimationAsset animationAsset = animationAssetLoader.Decode(animationAssetPath, files.Get(animationAssetPath), files.GetAllocationBudget());
+			files.GetAllocationBudget().ReserveArray<AnimationChannel>(animationAsset.channels.size());
+			files.GetAllocationBudget().ReserveArray<AnimationKeyframe>(animationAsset.keyframes.size());
+			files.GetAllocationBudget().Reserve(sizeof(animationAsset.header.name));
 			sceneAssetPayload.animations.push_back(BuildSceneAssetAnimation(animationAsset, animationRef.animationAssetId));
 			files.Release(animationAssetPath);
 		}

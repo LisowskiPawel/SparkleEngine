@@ -4,10 +4,10 @@
 
 namespace SparkleLauncher
 {
-	QString ToDisplayPath(const std::filesystem::path& repositoryRoot, const std::filesystem::path& path)
+	QString ToDisplayPath(const std::filesystem::path& workspaceRoot, const std::filesystem::path& path)
 	{
 		std::error_code errorCode;
-		const std::filesystem::path relative = std::filesystem::relative(path, repositoryRoot, errorCode);
+		const std::filesystem::path relative = std::filesystem::relative(path, workspaceRoot, errorCode);
 		return QString::fromStdString((!errorCode && !relative.empty()) ? relative.generic_string() : path.generic_string());
 	}
 
