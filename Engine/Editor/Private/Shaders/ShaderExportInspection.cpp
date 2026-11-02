@@ -2,7 +2,13 @@
 #include "Shaders/ShaderExportInspection.h"
 
 #include "Core/Public/Paths/FileSystemPaths.h"
-#include "Core/Public/Strings/StringUtils.h"
+#include "Core/Public/Files/FileUtils.h"
+#include "Core/Public/Files/FileSetPublication.h"
+#include "Core/Public/Json/JsonReader.h"
+#include "Core/Public/Diagnostics/Error.h"
+
+#include <algorithm>
+#include <charconv>
 
 #include <fstream>
 #include <sstream>
@@ -18,28 +24,97 @@ static bool IsShaderExportDirectory(const std::filesystem::path& directory)
 	return std::filesystem::is_regular_file(directory / "compile-request.json", error) && !error && std::filesystem::is_regular_file(directory.parent_path() / "shader-export.json", error) && !error;
 }
 
-std::filesystem::path ShaderExportInspection::FindExportDirectory(std::string_view shaderName)
+static bool ReadExportIdentity(std::string_view text, std::string_view key, std::uint64_t& value)
 {
-	const auto root = Filesystem::ResolveArtifactRootPath(Filesystem::GetWorkspaceRootPath()) / "symbols" / "shaders" / Filesystem::GetProjectPath().filename();
-	std::error_code error;
-	if (!std::filesystem::exists(root, error) || error)
+	std::string hex;
+	if (!Json::TryReadStringProperty(text, key, hex))
+	{
+		return false;
+	}
+	std::string_view digits(hex);
+	if (digits.starts_with("0x") || digits.starts_with("0X"))
+	{
+		digits.remove_prefix(2);
+	}
+	const auto parsed = std::from_chars(digits.data(), digits.data() + digits.size(), value, 16);
+	return parsed.ec == std::errc{} && parsed.ptr == digits.data() + digits.size();
+}
+
+static bool ReadExportShader(std::string_view text, ShaderTarget target, ShaderDiagnosticsEntry& shader)
+{
+	std::string exportTarget;
+
+	return ReadExportIdentity(text, "shaderTypeId", shader.ShaderType) && ReadExportIdentity(text, "compileInputHash", shader.CompileInputHash)
+	    && Json::TryReadStringProperty(text, "target", exportTarget) && exportTarget == GetShaderTargetName(target) && Json::TryReadStringProperty(text, "backend", shader.Backend);
+}
+
+static std::vector<std::filesystem::path> FindMatchingShaderExports(const std::filesystem::path& root, const ShaderDiagnosticsSnapshot& diagnostics)
+{
+	std::vector<std::filesystem::path> selected(diagnostics.Entries.size());
+	try
+	{
+		const Files::FileSetReadScope publication(root);
+		std::error_code error;
+		for (std::filesystem::directory_iterator cook(root, error), end; cook != end && !error; cook.increment(error))
+		{
+			if (!cook->is_directory(error) || error || !publication.Contains(cook->path()))
+			{
+				error.clear();
+				continue;
+			}
+			std::string manifest;
+			std::string failure;
+			std::vector<std::string_view> jobs;
+			if (!Files::TryReadAllText(cook->path() / "shader-export.json", manifest, failure) || !Json::TryReadArrayProperty(manifest, "jobs", jobs))
+			{
+				continue;
+			}
+			for (const std::string_view job : jobs)
+			{
+				std::string name;
+				if (!Json::TryReadStringProperty("{\"path\":" + std::string(job) + "}", "path", name))
+				{
+					continue;
+				}
+				const std::filesystem::path relative(name);
+				if (relative.has_root_path() || relative.filename() != "compile-request.json" || std::any_of(relative.begin(), relative.end(), [](const auto& component) { return component == ".."; }))
+				{
+					continue;
+				}
+				const auto request = cook->path() / relative;
+				std::string text;
+				ShaderDiagnosticsEntry shader;
+				if (!publication.Contains(request) || !Files::TryReadAllText(request, text, failure) || !ReadExportShader(text, diagnostics.Target, shader))
+				{
+					continue;
+				}
+				for (std::size_t index = 0; index < diagnostics.Entries.size(); ++index)
+				{
+					const ShaderDiagnosticsEntry& active = diagnostics.Entries[index];
+					if (active.ShaderType == shader.ShaderType && active.CompileInputHash == shader.CompileInputHash && active.Backend == shader.Backend
+					    && (selected[index].empty() || request.parent_path().native() > selected[index].native()))
+					{
+						selected[index] = request.parent_path();
+					}
+				}
+			}
+		}
+	}
+	catch (const Diagnostics::Error&)
+	{
+		return std::vector<std::filesystem::path>(diagnostics.Entries.size());
+	}
+	return selected;
+}
+
+std::vector<std::filesystem::path> ShaderExportInspection::FindExportDirectories(const ShaderDiagnosticsSnapshot& diagnostics)
+{
+	if (diagnostics.Entries.empty())
 	{
 		return {};
 	}
-	for (std::filesystem::recursive_directory_iterator it(root, error), end; it != end && !error; it.increment(error))
-	{
-		if (!it->is_directory(error) || error)
-		{
-			error.clear();
-			continue;
-		}
-		if (Strings::ContainsIgnoreCase(it->path().filename().generic_string(), shaderName) && IsShaderExportDirectory(it->path()))
-		{
-			return it->path();
-		}
-		error.clear();
-	}
-	return {};
+	const auto root = Filesystem::ResolveArtifactRootPath(Filesystem::GetWorkspaceRootPath()) / "symbols" / "shaders" / Filesystem::GetProjectPath().filename();
+	return FindMatchingShaderExports(root, diagnostics);
 }
 
 static std::string ReadTextFileOrMessage(const std::filesystem::path& path)

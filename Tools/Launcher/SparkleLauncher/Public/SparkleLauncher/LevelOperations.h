@@ -4,7 +4,6 @@
 #include "SparkleLauncher/OperationModel.h"
 #include "SparkleLauncher/ProcessRunner.h"
 
-#include <cstdint>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -13,14 +12,8 @@
 
 namespace SparkleLauncher
 {
-	enum class LevelOperationKind : std::uint8_t
-	{
-		Sync
-	};
-
 	struct LevelOperationDefinition
 	{
-		LevelOperationKind Kind = LevelOperationKind::Sync;
 		std::string Id;
 		std::string Group;
 		std::string DisplayName;
@@ -45,9 +38,7 @@ namespace SparkleLauncher
 	struct LevelOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path WorkspaceRoot;
 		LevelOperationRequest Request;
-		LevelOperationKind Kind = LevelOperationKind::Sync;
 		std::filesystem::path CMakePath;
 		std::vector<LevelOperationStep> Steps;
 		std::vector<std::string> PlannedEffects;
@@ -55,7 +46,6 @@ namespace SparkleLauncher
 		bool CanRun = false;
 	};
 
-	std::string ToString(LevelOperationKind kind);
 	const std::vector<LevelOperationDefinition>& GetLevelOperationDefinitions();
 	std::optional<LevelOperationDefinition> FindLevelOperationDefinition(std::string_view operationId);
 	LevelOperationPlan PlanLevelOperation(std::string_view operationId, const LevelOperationRequest& request);

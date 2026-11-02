@@ -22,7 +22,7 @@ World, transform, animation, skinning, and extraction semantics must preserve th
 - Systems declare phase, typed component reads/writes, non-ECS resource access, prerequisites, and execution/grain policy.
 - Read/read may overlap; write hazards require an explicit order or graph rejection.
 - Structural composition is frozen during queries.
-- Workers use typed task-local command buffers; the world owner commits deterministically.
+- Workers produce typed task-local outputs; the world owner commits deterministically.
 - Systems receive narrow views, not `GameWorld&`, registry access, a controller facade, renderer, UI, or platform services.
 - Small workloads preserve the final-contract serial path; parallel work follows [Tasks Engineering](Tasks.md).
 

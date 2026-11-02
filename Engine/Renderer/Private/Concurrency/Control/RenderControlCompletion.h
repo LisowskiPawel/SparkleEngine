@@ -2,6 +2,7 @@
 
 #include "Diagnostics/MeshPreviewGeometry.h"
 #include "Diagnostics/RendererMemoryDiagnostics.h"
+#include "Diagnostics/ShaderDiagnostics.h"
 #include "Meshes/MeshDiagnostics.h"
 #include "Resources/Textures/TextureDiagnostics.h"
 #include "Viewport/ViewportContracts.h"
@@ -25,6 +26,7 @@ using RenderControlResult = std::variant<
     MeshPreviewGeometry,
     TextureDiagnosticsSnapshot,
     RendererMemoryDiagnosticsSnapshot,
+    ShaderDiagnosticsSnapshot,
     CVarControlResult,
     EngineRenderingSettingsState>;
 

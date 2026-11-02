@@ -2,10 +2,10 @@
 
 #include "Console/EditorConsoleSystem.h"
 
-#include "Core/Public/Console/ConsoleBuiltinCommands.h"
-#include "Core/Public/Console/ConsoleCommandRegistry.h"
+#include "Console/ConsoleBuiltinCommands.h"
+#include "Console/ConsoleCommandRegistry.h"
 #include "Core/Public/Console/ConsoleOutput.h"
-#include "Core/Public/Console/ConsoleSession.h"
+#include "Console/ConsoleSession.h"
 #include "Panels/EditorConsolePanel.h"
 #include "Style/SparkleUiPalette.h"
 #include "Util/UiUtil.h"
@@ -29,7 +29,7 @@ EditorConsoleSystem::EditorConsoleSystem(CVarControlExecutor executor)
 {
 	m_commandRegistry = std::make_unique<ConsoleCommandRegistry>();
 	RegisterConsoleBuiltinCommands(*m_commandRegistry, std::move(executor));
-	m_session = std::make_unique<ConsoleSession>(*m_commandRegistry, ConsoleCommandScope::Editor);
+	m_session = std::make_unique<ConsoleSession>(*m_commandRegistry);
 	m_consolePanel = std::make_unique<EditorConsolePanel>(*m_session);
 }
 

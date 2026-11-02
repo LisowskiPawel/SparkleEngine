@@ -48,6 +48,7 @@ public:
 	ViewportPresentationSnapshot GetViewportPresentation() const;
 	void ReloadShaders();
 	std::uint64_t GetShaderGeneration() const noexcept;
+	ShaderDiagnosticsSnapshot CaptureShaderDiagnostics();
 	MeshDiagnosticsSnapshot CaptureMeshDiagnostics();
 	MeshPreviewGeometry CaptureMeshPreview(std::uintptr_t meshRuntimeId);
 	TextureDiagnosticsSnapshot CaptureTextureDiagnostics();

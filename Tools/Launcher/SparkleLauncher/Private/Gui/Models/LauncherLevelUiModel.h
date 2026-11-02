@@ -24,7 +24,6 @@ namespace SparkleLauncher
 		bool Ready = false;
 		bool CanSelect = true;
 		bool CanSync = false;
-		bool CanClean = false;
 	};
 
 	struct LauncherLevelUiModel final

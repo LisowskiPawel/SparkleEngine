@@ -1,13 +1,8 @@
-﻿#include "PCH.h"
+#include "PCH.h"
 
-#include "Core/Public/Console/ConsoleHistoryBuffer.h"
+#include "Console/ConsoleHistoryBuffer.h"
 
 #include "Core/Public/Strings/StringUtils.h"
-
-ConsoleHistoryBuffer::ConsoleHistoryBuffer(std::size_t maxEntries) :
-    m_maxEntries(maxEntries == 0 ? kDefaultMaxEntries : maxEntries)
-{
-}
 
 void ConsoleHistoryBuffer::Add(std::string_view line)
 {
@@ -25,16 +20,10 @@ void ConsoleHistoryBuffer::Add(std::string_view line)
 	}
 
 	m_entries.emplace_back(trimmedLine);
-	while (m_entries.size() > m_maxEntries)
+	while (m_entries.size() > kMaxEntries)
 	{
 		m_entries.erase(m_entries.begin());
 	}
-	ResetNavigation();
-}
-
-void ConsoleHistoryBuffer::Clear() noexcept
-{
-	m_entries.clear();
 	ResetNavigation();
 }
 

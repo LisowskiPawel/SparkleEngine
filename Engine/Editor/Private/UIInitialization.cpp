@@ -6,7 +6,7 @@
 
 #include "EditorWorkspaceLayout.h"
 #include "Console/EditorConsoleSystem.h"
-#include "Core/Public/Console/ConsoleCommandRegistry.h"
+#include "Console/ConsoleCommandRegistry.h"
 #include "Panels/MainMenuBarPanel.h"
 #include "Panels/SceneInspectorPanel.h"
 #include "Panels/SceneOutlinerPanel.h"
@@ -58,8 +58,7 @@ void UI::Implementation::InitializeConsole(CVarControlExecutor&& consoleVariable
 	        .Name = "CompileShaders",
 	        .Help = "Recompile through Launcher, then reload on success. Optional symbols exports private debug data.",
 	        .ArgumentSyntax = "[symbols]",
-	        .Scope = ConsoleCommandScope::Editor,
-	        .Execute = [this](ConsoleCommandScope, std::span<const std::string_view> arguments)
+	        .Execute = [this](std::span<const std::string_view> arguments)
 	        {
 		        if (arguments.size() > 1 || (!arguments.empty() && arguments.front() != "symbols"))
 		        {
@@ -72,8 +71,7 @@ void UI::Implementation::InitializeConsole(CVarControlExecutor&& consoleVariable
 	    ConsoleCommandDescriptor{
 	        .Name = "ReloadShaders",
 	        .Help = "Reloads the existing cooked shader files. Build/Cook runs in Launcher.",
-	        .Scope = ConsoleCommandScope::Editor,
-	        .Execute = [this](ConsoleCommandScope, std::span<const std::string_view>)
+	        .Execute = [this](std::span<const std::string_view>)
 	        {
 		        m_shaderReloadRequested = true;
 		        return ConsoleCommandResult::Success("Shader reload requested.");
@@ -109,7 +107,7 @@ void UI::Implementation::InitializeViewport()
 void UI::Implementation::InitializeAssetPanels()
 {
 	m_shaderToolsPanel = std::make_unique<ShaderToolsPanel>();
-	m_shaderToolsPanel->SetGenerationProvider(m_shaderGenerationProvider);
+	m_shaderToolsPanel->SetDiagnosticsProvider(m_shaderDiagnosticsProvider);
 	m_usedMeshesPanel = std::make_unique<UsedMeshesPanel>();
 	m_usedMeshesPanel->SetDiagnosticsProvider(m_meshDiagnosticsProvider);
 	m_usedMeshesPanel->SetPreviewGeometryProvider(m_meshPreviewProvider);

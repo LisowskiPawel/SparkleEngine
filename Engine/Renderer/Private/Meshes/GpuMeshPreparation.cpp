@@ -18,6 +18,7 @@ std::uint64_t GpuMeshPreparation::CalculateDecodedByteSize(const ImmutableRender
 	}
 	const MeshData& mesh = source.GetResource()->GetMeshData();
 	std::uint64_t bytes = 0;
+
 	const auto add = [&bytes](std::size_t count, std::size_t elementSize)
 	{
 		if (count > ((std::numeric_limits<std::uint64_t>::max)() - bytes) / elementSize)
@@ -26,14 +27,23 @@ std::uint64_t GpuMeshPreparation::CalculateDecodedByteSize(const ImmutableRender
 		}
 		bytes += count * elementSize;
 	};
+
 	add(mesh.vertices.size(), sizeof(RayTracingHitVertex));
 	add(mesh.indices.size(), sizeof(std::uint32_t));
 	add(mesh.vertices.size(), sizeof(VertexSkinInfluenceData));
 	if (const auto* skeletal = dynamic_cast<const SkeletalCookedMesh*>(source.GetResource().get()))
 	{
+		if (skeletal->GetSkeletalMeshData().skinInfluences.size() != mesh.vertices.size())
+		{
+			throw Diagnostics::Error("Skeletal mesh skin influence count does not match its vertex count.");
+		}
 		add(skeletal->GetSkeletalMeshData().skinInfluences.size(), sizeof(VertexSkinInfluence));
 		for (const MeshMorphTarget& target : skeletal->GetSkeletalMeshData().morphTargets)
 		{
+			if (!target.IsValidForVertexCount(mesh.vertices.size()))
+			{
+				throw Diagnostics::Error("Skeletal mesh morph target does not match its vertex count.");
+			}
 			add(target.deltas.size(), sizeof(MorphTargetDeltaData));
 		}
 	}

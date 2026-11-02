@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Renderer/Public/Diagnostics/ShaderDiagnostics.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
@@ -22,14 +24,14 @@ struct RegisteredShaderRow final
 class RegisteredShaderListModel final
 {
 public:
-	using GenerationProvider = std::function<std::uint64_t()>;
+	using DiagnosticsProvider = std::function<ShaderDiagnosticsSnapshot()>;
 
-	void SetGenerationProvider(GenerationProvider provider);
+	void SetDiagnosticsProvider(DiagnosticsProvider provider);
 	void Refresh();
 
 	const std::vector<RegisteredShaderRow>& GetRows() const noexcept { return m_rows; }
 
 private:
-	GenerationProvider m_generationProvider;
+	DiagnosticsProvider m_diagnosticsProvider;
 	std::vector<RegisteredShaderRow> m_rows;
 };

@@ -19,7 +19,7 @@
 | Layer | Current capability | Main boundary |
 | --- | --- | --- |
 | level/session | registered cooked level activation, cancellation/stale-generation rejection, and save of authored level state | source import/cook and package acquisition remain tool/product owners |
-| world/ECS | generation-aware entities, fixed component schemas, typed queries, deferred structure, and compiled system graph | purpose-built internal ECS, not a public arbitrary component framework |
+| world/ECS | generation-aware entities, fixed component types, typed queries, world-owner edits, and compiled system graph | purpose-built internal ECS, not a public arbitrary component framework |
 | simulation | transforms, camera, lights, material variants, skeletal animation, morph animation, and extraction | deterministic parallel equivalence and broad gameplay systems unproved |
 | render handoff | immutable `RenderFrameSubmission` carries current world result to Renderer | Renderer never reads live ECS; world never owns GPU resources or render technique |
 
@@ -39,6 +39,8 @@ This boundary trades direct Renderer access for deterministic publication and cl
 GameFramework depends on Core and Tasks but not Platform, Renderer, or RHI. It owns simulation/world truth and publishes Renderer-neutral `RenderFrameSubmission` data. This separation is a current implemented boundary, not merely an intended layering rule.
 
 ### World System Scheduling
+
+The fixed world pipeline uses task-local typed outputs and world-owner commits. There is no generic structural command buffer, temporary-entity remapping, command conflict tracker, or hashed component-schema catalog. The unused private scaffolding and registry/storage bulk-add, component-removal and reset APIs were retired; scene activation, real world edits, frozen queries and render extraction retain their existing paths.
 
 Source ownership reconciled on 2026-10-27. `GameWorldSystems.cpp` composes the
 eleven-stage graph in execution order and owns the frozen-epoch execution flow.
@@ -127,8 +129,8 @@ These checks retain their Windows x64 Game/Editor and D3D12/Vulkan product matri
 
 | ID | Capability | State | Exact current coverage and limit | Evidence |
 | --- | --- | --- | --- | --- |
-| `GF-009` | Entity identity/lifetime | Implemented path | Generation-aware entity IDs, registry-backed component storage, alive check, destruction, and deferred structural command commit. No public arbitrary entity/component creation API is exposed. | `S` |
-| `GF-010` | Fixed component schema | Implemented path | 13 stable hashed schemas: LocalTransform, WorldTransform, CameraDerivedState, MeshInstance, Visibility, Camera, Light, AnimationState, MorphState, SkinningState, Name, AuthoredIdentity, and EditorMetadata. | `S` |
+| `GF-009` | Entity identity/lifetime | Implemented path | Generation-aware entity IDs, registry-backed component storage, alive check, and world-owner destruction outside frozen query epochs. No public arbitrary entity/component creation API is exposed. | `S` |
+| `GF-010` | Fixed component types | Implemented path | 13 private runtime component types: LocalTransform, WorldTransform, CameraDerivedState, MeshInstance, Visibility, Camera, Light, AnimationState, MorphState, SkinningState, Name, AuthoredIdentity, and EditorMetadata. | `S` |
 | `GF-011` | Typed queries and frozen structure | Implemented path | Read/write query descriptors declare system access; world structure is frozen for a system epoch and structural changes commit outside it. This is a purpose-built ECS, not a generic public ECS framework. | `S` |
 | `GF-012` | Compiled system graph | Implemented path | Eleven stages execute camera movement; playback; pose; morph; skinning; morph commit; system-output commit; transforms; camera derived state; mesh extraction; extraction commit. Access and dependency topology are compiled; populated ranges are materialized at host wave boundaries. | `S` |
 | `GF-013` | Parallel world evaluation | Implemented path | Camera, animation, pose, transform, and extraction systems use explicit grain/serial/partition limits through Tasks. Deterministic numerical output under different worker counts is not yet evidenced. | `S` |

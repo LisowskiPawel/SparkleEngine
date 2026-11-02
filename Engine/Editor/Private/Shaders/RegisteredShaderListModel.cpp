@@ -7,16 +7,18 @@
 #include "RHI/Public/Shaders/ShaderStage.h"
 
 #include <utility>
+#include <algorithm>
 
-void RegisteredShaderListModel::SetGenerationProvider(GenerationProvider provider)
+void RegisteredShaderListModel::SetDiagnosticsProvider(DiagnosticsProvider provider)
 {
-	m_generationProvider = std::move(provider);
+	m_diagnosticsProvider = std::move(provider);
 }
 
 void RegisteredShaderListModel::Refresh()
 {
 	m_rows.clear();
-	const std::uint64_t generation = m_generationProvider ? m_generationProvider() : 0;
+	const ShaderDiagnosticsSnapshot diagnostics = m_diagnosticsProvider ? m_diagnosticsProvider() : ShaderDiagnosticsSnapshot{};
+	std::vector<std::filesystem::path> exportDirectories = ShaderExportInspection::FindExportDirectories(diagnostics);
 	for (const ShaderRegistrationDesc& shader : GlobalShaderRegistry::GetRegistrations())
 	{
 		const ShaderParameterStructDescriptor parameters = shader.BuildParameterStructDescriptor != nullptr ? shader.BuildParameterStructDescriptor() : ShaderParameterStructDescriptor{};
@@ -28,8 +30,12 @@ void RegisteredShaderListModel::Refresh()
 		row.EntryPoint = std::string(shader.EntryPoint);
 		row.Stage = GetShaderStagePrefix(shader.Stage);
 		row.ParameterCount = parameters.Fields.size();
-		row.RuntimeGeneration = generation;
-		row.ExportDirectory = ShaderExportInspection::FindExportDirectory(row.ShaderName);
+		row.RuntimeGeneration = diagnostics.Generation;
+		const auto active = std::ranges::find(diagnostics.Entries, shader.TypeId, &ShaderDiagnosticsEntry::ShaderType);
+		if (active != diagnostics.Entries.end())
+		{
+			row.ExportDirectory = std::move(exportDirectories[static_cast<std::size_t>(active - diagnostics.Entries.begin())]);
+		}
 		m_rows.push_back(std::move(row));
 	}
 }

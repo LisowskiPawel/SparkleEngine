@@ -12,7 +12,7 @@ static ConsoleCommandResult FormatControlResult(CVarControlResult result);
 static std::string FormatCommandHelp(std::string_view name, std::string_view arguments, std::string_view help);
 static std::string FormatCVar(const CVarControlValue& variable);
 
-ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandRegistry& commandRegistry, ConsoleCommandScope scope, std::span<const std::string_view> arguments)
+ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandRegistry& commandRegistry, std::span<const std::string_view> arguments)
 {
 	if (arguments.size() > 1)
 	{
@@ -22,10 +22,6 @@ ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandRegistry& commandReg
 	std::string output;
 	for (const ConsoleCommandDescriptor& command : commandRegistry.GetCommands())
 	{
-		if (!ConsoleCommandRegistry::IsScopeAllowed(command.Scope, scope))
-		{
-			continue;
-		}
 		if (!filter.empty() && !Strings::ContainsIgnoreCase(command.Name, filter) && !Strings::ContainsIgnoreCase(command.Help, filter))
 		{
 			continue;

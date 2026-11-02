@@ -20,7 +20,7 @@ namespace SparkleLauncher
 		request.ExecutablePath = plan.ExecutablePath;
 		request.WorkingDirectory = plan.WorkingDirectory;
 		request.Environment = plan.Environment;
-		request.LogPath = ResolveLauncherOperationLogPath(plan.WorkspaceRoot, plan.Operation.Id, "RunLevel.txt");
+		request.LogPath = ResolveLauncherOperationLogPath(plan.Request.WorkspaceRoot, plan.Operation.Id, "RunLevel.txt");
 		request.Arguments = {"--graphics-api", plan.Request.GraphicsApi};
 		if (plan.Request.ProductProfile == "DebugEditor" || plan.Request.ProductProfile == "DevelopmentEditor")
 		{

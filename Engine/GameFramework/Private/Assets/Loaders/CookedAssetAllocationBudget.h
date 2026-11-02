@@ -13,7 +13,10 @@ namespace Assets
 	class CookedAssetAllocationBudget final
 	{
 	public:
-		explicit CookedAssetAllocationBudget(std::uint64_t maximumBytes = 2ull * 1024ull * 1024ull * 1024ull) noexcept : m_maximumBytes(maximumBytes) {}
+		explicit CookedAssetAllocationBudget(std::uint64_t maximumBytes = 2ull * 1024ull * 1024ull * 1024ull) noexcept :
+		    m_maximumBytes(maximumBytes)
+		{
+		}
 
 		void Reserve(std::size_t count, std::size_t elementSize = 1)
 		{

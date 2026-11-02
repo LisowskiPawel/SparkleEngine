@@ -14,16 +14,16 @@ namespace SparkleLauncher
 {
 	static Process::ChildProcessRequest MakeAssetPackSyncRequest(const LevelOperationPlan& plan, const ProjectAssetPack& pack)
 	{
-		const std::filesystem::path projectRoot = ResolveProjectRoot(plan.WorkspaceRoot, plan.Request.ContentId);
-		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(plan.WorkspaceRoot);
+		const std::filesystem::path projectRoot = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
+		const LauncherStatePaths statePaths = ResolveLauncherStatePaths(plan.Request.WorkspaceRoot);
 		const std::filesystem::path cacheRoot = statePaths.ContentArchivesRoot / plan.Request.ContentId;
 		const std::filesystem::path rootRelativeToExtraction = pack.rootPath.lexically_relative(pack.extractionPath);
 
-		const std::filesystem::path syncScript = plan.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake";
+		const std::filesystem::path syncScript = plan.Request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake";
 
 		Process::ChildProcessRequest process;
-		process.WorkingDirectory = plan.WorkspaceRoot;
-		process.LogPath = ResolveLauncherOperationLogPath(plan.WorkspaceRoot, plan.Operation.Id, "AssetPack-" + pack.id + ".txt");
+		process.WorkingDirectory = plan.Request.WorkspaceRoot;
+		process.LogPath = ResolveLauncherOperationLogPath(plan.Request.WorkspaceRoot, plan.Operation.Id, "AssetPack-" + pack.id + ".txt");
 		process.ExecutablePath = plan.CMakePath;
 
 		process.Arguments = {
@@ -54,7 +54,7 @@ namespace SparkleLauncher
 	std::vector<LevelOperationProcessStep> BuildLevelOperationProcessSteps(const LevelOperationPlan& plan)
 	{
 		std::vector<LevelOperationProcessStep> steps;
-		const std::filesystem::path projectRoot = ResolveProjectRoot(plan.WorkspaceRoot, plan.Request.ContentId);
+		const std::filesystem::path projectRoot = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
 		const ProjectLevelCatalog catalog = ProjectLevelCatalogFile::Load(projectRoot);
 		for (const std::string& packId : BuildAssetPackSyncPlan(catalog, plan.Request.RequestedLevelIds))
 		{

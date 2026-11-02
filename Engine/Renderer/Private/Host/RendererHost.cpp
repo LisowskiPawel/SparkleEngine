@@ -38,6 +38,11 @@ RendererMemoryDiagnosticsSnapshot RendererHost::CaptureMemoryDiagnostics() const
 	return m_memoryMonitor->GetLatestSnapshot();
 }
 
+ShaderDiagnosticsSnapshot RendererHost::CaptureShaderDiagnostics() const
+{
+	return m_renderPassRuntimeCache->CaptureShaderDiagnostics();
+}
+
 void RendererHost::SettleForShutdown() noexcept
 {
 	m_backendOwner->GetDeviceServices().SettleForShutdown();

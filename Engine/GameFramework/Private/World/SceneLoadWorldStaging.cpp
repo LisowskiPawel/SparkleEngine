@@ -95,6 +95,7 @@ void InitializeSceneLoadLevel(ECS::GameWorldState& state, const LevelDesc& desc)
 void PopulateStagedScene(ECS::GameWorldState& state, GameWorldResourceStores& resources, Assets::SceneLoadPackage& package)
 {
 	std::size_t expectedEntityCount = 1;
+
 	const auto add = [&expectedEntityCount](std::size_t count)
 	{
 		if (count > (std::numeric_limits<std::size_t>::max)() - expectedEntityCount)
@@ -103,6 +104,7 @@ void PopulateStagedScene(ECS::GameWorldState& state, GameWorldResourceStores& re
 		}
 		expectedEntityCount += count;
 	};
+
 	add(package.Level.lights.size());
 	for (const SceneAssetPayload& payload : package.AssetPayloads)
 	{

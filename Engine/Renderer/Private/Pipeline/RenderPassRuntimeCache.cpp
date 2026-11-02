@@ -35,6 +35,25 @@ std::uint64_t RenderPassRuntimeCache::GetShaderPublicationHash() const noexcept
 	return m_activeGeneration != nullptr ? m_activeGeneration->Map.GetPublicationHash() : 0;
 }
 
+ShaderDiagnosticsSnapshot RenderPassRuntimeCache::CaptureShaderDiagnostics() const
+{
+	ShaderDiagnosticsSnapshot snapshot;
+	if (!m_activeGeneration)
+	{
+		return snapshot;
+	}
+	snapshot.Generation = m_activeGeneration->Generation;
+	snapshot.Target = m_activeGeneration->Target;
+	for (const GlobalShaderMapEntry& entry : m_activeGeneration->Map.GetEntries())
+	{
+		if (entry.Target == snapshot.Target)
+		{
+			snapshot.Entries.push_back({entry.ShaderType, entry.CompileInputHash, std::string(m_activeGeneration->Map.ResolveString(entry.BackendName))});
+		}
+	}
+	return snapshot;
+}
+
 void RenderPassRuntimeCache::ReloadShaders()
 {
 	PollRetiredGenerations();

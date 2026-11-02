@@ -9,9 +9,9 @@
 
 #include <utility>
 
-void ShaderToolsPanel::SetGenerationProvider(RegisteredShaderListModel::GenerationProvider provider)
+void ShaderToolsPanel::SetDiagnosticsProvider(RegisteredShaderListModel::DiagnosticsProvider provider)
 {
-	m_model.SetGenerationProvider(std::move(provider));
+	m_model.SetDiagnosticsProvider(std::move(provider));
 	m_hasRows = false;
 }
 
@@ -125,6 +125,8 @@ void ShaderToolsPanel::DrawToolbar(bool disableInteraction)
 	if (ImGui::Button(reloadLabel.c_str()) && m_reloadHandler)
 	{
 		m_reloadHandler();
+		m_hasRows = false;
+		m_exportInspection.Invalidate();
 	}
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(260.0f);

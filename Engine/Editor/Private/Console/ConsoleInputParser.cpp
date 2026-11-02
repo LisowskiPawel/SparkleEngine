@@ -1,6 +1,6 @@
-﻿#include "PCH.h"
+#include "PCH.h"
 
-#include "Core/Public/Console/ConsoleInputParser.h"
+#include "Console/ConsoleInputParser.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 ConsoleParsedInput ConsoleInputParser::Parse(std::string_view input)

@@ -65,7 +65,6 @@ public:
 
 	const RenderMaterialTable& GetMaterials() const noexcept { return m_materials; }
 
-
 	const std::optional<SceneSkyDesc>& GetSky() const noexcept { return m_sky; }
 
 	const std::vector<RenderMeshInstanceGroupData>& GetInstanceGroups() const noexcept { return m_instanceGroups; }

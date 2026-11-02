@@ -16,9 +16,9 @@ struct AssetCookStage final
 };
 
 static constexpr std::array Stages{
-	AssetCookStage{"shaders", ValidateShaderCookStage, CookShaders},
-	AssetCookStage{"textures", ValidateTextureCookStage, CookTextures},
-	AssetCookStage{"scene-assets", nullptr, CookSceneAssets}};
+    AssetCookStage{"shaders", ValidateShaderCookStage, CookShaders},
+    AssetCookStage{"textures", ValidateTextureCookStage, CookTextures},
+    AssetCookStage{"scene-assets", nullptr, CookSceneAssets}};
 
 bool DispatchAssetCookPlan(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord>& outOutputs)
 {

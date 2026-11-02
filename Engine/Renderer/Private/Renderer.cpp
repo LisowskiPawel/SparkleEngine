@@ -70,6 +70,11 @@ std::uint64_t Renderer::GetShaderGeneration() const noexcept
 	return m_state->Coordinator->GetShaderGeneration();
 }
 
+ShaderDiagnosticsSnapshot Renderer::CaptureShaderDiagnostics() const
+{
+	return m_state->Coordinator->CaptureShaderDiagnostics();
+}
+
 MeshDiagnosticsSnapshot Renderer::CaptureMeshDiagnostics() const
 {
 	return m_state->Coordinator->CaptureMeshDiagnostics();

@@ -28,6 +28,7 @@ struct RenderReloadShadersCommand final
 enum class RenderDiagnosticsRequestKind : std::uint8_t
 {
 	Meshes,
+	Shaders,
 	MeshPreview,
 	Textures,
 	Memory,

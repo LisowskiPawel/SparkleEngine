@@ -72,7 +72,6 @@ namespace SparkleLauncher
 	struct CookOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path WorkspaceRoot;
 		CookOperationRequest Request;
 		CookOperationKind Kind = CookOperationKind::CookAllAssets;
 		std::string ToolProfile;

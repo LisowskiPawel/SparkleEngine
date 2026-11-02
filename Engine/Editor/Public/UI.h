@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Core/Public/Console/CVarControl.h"
-#include "Core/Public/Console/ConsoleCommandRegistry.h"
 #include "Core/Public/Console/ConsoleOutput.h"
 
 #include "EditorAPI.h"
 #include "Renderer/Public/Diagnostics/MeshPreviewGeometry.h"
 #include "Renderer/Public/Diagnostics/RendererMemoryDiagnostics.h"
+#include "Renderer/Public/Diagnostics/ShaderDiagnostics.h"
 #include "Renderer/Public/UI/UiRenderPacket.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
 #include "Renderer/Public/Meshes/MeshDiagnostics.h"
@@ -51,7 +51,7 @@ struct EditorHostServices final
 
 struct EditorDiagnosticsProviders final
 {
-	std::function<std::uint64_t()> ShaderGeneration;
+	std::function<ShaderDiagnosticsSnapshot()> Shaders;
 	std::function<MeshDiagnosticsSnapshot()> MeshDiagnostics;
 	std::function<TextureDiagnosticsSnapshot()> TextureDiagnostics;
 	std::function<RendererMemoryDiagnosticsSnapshot()> MemoryDiagnostics;

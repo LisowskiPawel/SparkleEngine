@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Public/Diagnostics/Error.h"
+#include "Renderer/Public/Diagnostics/ShaderDiagnostics.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Pipeline/PassPipelineRuntime.h"
 #include "Pipeline/GraphicsPipelineMaterialization.h"
@@ -45,6 +46,7 @@ public:
 
 	std::uint64_t GetShaderGeneration() const noexcept;
 	std::uint64_t GetShaderPublicationHash() const noexcept;
+	ShaderDiagnosticsSnapshot CaptureShaderDiagnostics() const;
 	void ReloadShaders();
 	void PollRetiredGenerations() noexcept;
 

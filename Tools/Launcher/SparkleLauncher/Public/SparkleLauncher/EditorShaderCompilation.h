@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Public/Console/ConsoleCommandRegistry.h"
+#include "Core/Public/Console/ConsoleOutput.h"
 
 #include <stop_token>
 

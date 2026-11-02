@@ -1,29 +1,14 @@
 #include "PCH.h"
 
-#include "Core/Public/Console/ConsoleCommandRegistry.h"
+#include "Console/ConsoleCommandRegistry.h"
 
-#include "Core/Public/Console/ConsoleInputParser.h"
+#include "Console/ConsoleInputParser.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-ConsoleCommandResult ConsoleCommandResult::Success(std::string message)
-{
-	return ConsoleCommandResult{.Succeeded = true, .Severity = ConsoleCommandSeverity::Info, .Message = std::move(message)};
-}
-
-ConsoleCommandResult ConsoleCommandResult::Warning(std::string message)
-{
-	return ConsoleCommandResult{.Succeeded = true, .Severity = ConsoleCommandSeverity::Warning, .Message = std::move(message)};
-}
-
-ConsoleCommandResult ConsoleCommandResult::Error(std::string message)
-{
-	return ConsoleCommandResult{.Succeeded = false, .Severity = ConsoleCommandSeverity::Error, .Message = std::move(message)};
-}
 
 bool ConsoleCommandRegistry::Register(ConsoleCommandDescriptor descriptor)
 {
@@ -59,7 +44,7 @@ const ConsoleCommandDescriptor* ConsoleCommandRegistry::Find(std::string_view co
 	return &m_commands[iterator->second];
 }
 
-ConsoleCommandResult ConsoleCommandRegistry::ExecuteLine(std::string_view input, ConsoleCommandScope scope) const
+ConsoleCommandResult ConsoleCommandRegistry::ExecuteLine(std::string_view input) const
 {
 	const ConsoleParsedInput parsedInput = ConsoleInputParser::Parse(input);
 	if (!parsedInput.Succeeded)
@@ -76,16 +61,11 @@ ConsoleCommandResult ConsoleCommandRegistry::ExecuteLine(std::string_view input,
 	{
 		return ConsoleCommandResult::Error("unknown command: " + parsedInput.CommandName);
 	}
-	if (!IsScopeAllowed(descriptor->Scope, scope))
-	{
-		return ConsoleCommandResult::Error("command is not available in this console scope: " + descriptor->Name);
-	}
-
 	const std::vector<std::string_view> argumentViews = BuildArgumentViews(parsedInput.Arguments);
-	return descriptor->Execute(scope, argumentViews);
+	return descriptor->Execute(argumentViews);
 }
 
-std::vector<std::string> ConsoleCommandRegistry::CompleteLine(std::string_view input, ConsoleCommandScope scope) const
+std::vector<std::string> ConsoleCommandRegistry::CompleteLine(std::string_view input) const
 {
 	const bool commandNameOnly = !Strings::ContainsAsciiWhitespace(input);
 	if (commandNameOnly)
@@ -93,7 +73,7 @@ std::vector<std::string> ConsoleCommandRegistry::CompleteLine(std::string_view i
 		std::vector<std::string> completions;
 		for (const ConsoleCommandDescriptor& command : m_commands)
 		{
-			if (IsScopeAllowed(command.Scope, scope) && Strings::StartsWithIgnoreCase(command.Name, input))
+			if (Strings::StartsWithIgnoreCase(command.Name, input))
 			{
 				completions.push_back(command.Name);
 			}
@@ -108,7 +88,7 @@ std::vector<std::string> ConsoleCommandRegistry::CompleteLine(std::string_view i
 	}
 
 	const ConsoleCommandDescriptor* descriptor = Find(parsedInput.CommandName);
-	if (descriptor == nullptr || !descriptor->Complete || !IsScopeAllowed(descriptor->Scope, scope))
+	if (descriptor == nullptr || !descriptor->Complete)
 	{
 		return {};
 	}
@@ -117,25 +97,11 @@ std::vector<std::string> ConsoleCommandRegistry::CompleteLine(std::string_view i
 	const std::string_view currentToken = argumentViews.empty() ? std::string_view{} : argumentViews.back();
 
 	return descriptor->Complete(
-	    scope,
 	    ConsoleAutocompleteRequest{
 	        .CommandName = descriptor->Name,
 	        .Arguments = argumentViews,
 	        .CurrentToken = currentToken,
 	    });
-}
-
-bool ConsoleCommandRegistry::IsScopeAllowed(ConsoleCommandScope commandScope, ConsoleCommandScope contextScope) noexcept
-{
-	if (commandScope == ConsoleCommandScope::Game)
-	{
-		return true;
-	}
-	if (commandScope == ConsoleCommandScope::Editor)
-	{
-		return contextScope == ConsoleCommandScope::Editor || contextScope == ConsoleCommandScope::Developer;
-	}
-	return contextScope == ConsoleCommandScope::Developer;
 }
 
 std::vector<std::string_view> ConsoleCommandRegistry::BuildArgumentViews(const std::vector<std::string>& arguments)

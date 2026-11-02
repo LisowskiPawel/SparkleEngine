@@ -44,7 +44,6 @@ static std::filesystem::path MakeTemporaryPath(const AssetCookerProjectCookPlan&
 	return plan.temporaryRoot / (std::string(stem) + "-" + plan.projectName + "-" + std::to_string(timestamp) + std::string(extension));
 }
 
-
 bool ValidateTextureCookStage(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics)
 {
 	std::error_code error;

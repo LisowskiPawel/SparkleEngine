@@ -364,7 +364,6 @@ namespace SparkleLauncher
 		}
 
 		plan.Kind = definition->Kind;
-		plan.WorkspaceRoot = request.WorkspaceRoot;
 		plan.Request = request;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Operation.Inputs.push_back({"content", request.ContentId});

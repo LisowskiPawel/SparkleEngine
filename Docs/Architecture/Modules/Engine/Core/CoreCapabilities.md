@@ -43,7 +43,7 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 | --- | --- | --- | --- | --- |
 | `CORE-001` | Named diagnostics | Implemented path | Process-wide `spdlog` bootstrap, lightweight declared `LogCategory` frontend, Core-private named logger creation/lifetime, active log-file discovery, game level control, fatal/verify helpers, and debugger break-if-attached. Fatal paths are process-terminating policy, not recoverable errors. | `S` |
 | `CORE-002` | Console-variable registry | Implemented path | Statically registered typed CVars support bool, integral, floating, enum-as-number, and string values. Lookup and string mutation report parse errors. Enum owners can define a pure `IsValidConsoleVariableValue` overload, found by argument-dependent lookup, to reject unsupported numeric values before mutation; Core retains no feature-specific rules or validator registry. There is no persistence layer in Core. | `S` |
-| `CORE-003` | Console command/session | Implemented path | Game/editor command scopes, registry, argument parsing, autocomplete, bounded history, bounded 512-record session output, and built-ins for help/list/get/set. Product hosts decide which commands are reachable. | `S` |
+| `CORE-003` | Console command/session | Moved to Editor | Interactive registration, parsing, completion, history and session storage are private to Editor. Core retains the shared output/result values and CVar control consumed by the Editor host and shader actions. | `S` |
 | `CORE-004` | Event dispatch | Implemented path | Fixed-capacity typed synchronous events return handles; `ScopedEventHandle` removes a subscription on destruction. This is same-thread callback dispatch, not an asynchronous message bus. | `S` |
 | `CORE-005` | Whole-file I/O | Implemented path | Binary/text reads and writes, UTF-8 read-error paths, temporary paths, close/finalize helpers, atomic text write, and multi-file publication with cleanup. Atomicity/durability across crash or hostile filesystems is not runtime-proven. | `S` |
 | `CORE-006` | Bounded binary decode/encode | Implemented path | Span reader checks remaining bytes and multiplication overflow; buffer/stream writers cover trivially-copyable values/arrays, raw bytes, and UInt32-length strings. These helpers do not provide schema evolution by themselves. | `S` |
@@ -53,7 +53,7 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 | `CORE-010` | Child-process execution | Implemented path | Synchronous Win32 child launch with argv, working directory, environment overrides, output capture/callback, log path, cancellation token, exit code, and explicit launch/failure state. Native start failures classify missing executable/access denial/application-policy rejection without localized-text matching and expose Windows messages as UTF-8. Process-tree termination and package execution still need evidence. | `S` |
 | `CORE-011` | Environment and command-line utilities | Implemented path | String/bool/UInt environment access and UTF-8/wide conversion support tool and host boundaries. One Windows argument encoder serves child execution, Launcher previews and shader-command text, including embedded quotes and trailing backslashes. | `S` |
 | `CORE-012` | Project level/acquisition catalog | Moved to ToolSupport | Preparation-only metadata/parser/editor are outside Core. Launcher and Cooker consume the same model; runtime discovers ordinary level documents and consumes cooked data. This retained ID describes the former ownership, not an Engine dependency. | `S` |
-| `CORE-013` | Input vocabulary/state | Implemented path | Key, mouse button, modifier, device, dispatch-layer/mode, typed events, and per-frame pressed/released/held, pointer delta, wheel, capture, and cursor state. OS acquisition/routing belongs to Platform. | `S` |
+| `CORE-013` | Input vocabulary/state | Implemented path | Key, mouse button, modifier, device, dispatch-layer/mode and typed events; pressed/released/held polling, per-frame pointer/wheel accumulation, modifiers, capture and cursor state. Polling helpers and pixel/normalized/NDC conversion helpers remain available. OS acquisition and layered routing belong to Platform. | `S` |
 | `CORE-014` | Math and coordinate helpers | Implemented path | DirectXMath-based transforms/normalization/frustum utilities, declared world-coordinate convention, and Bessel/sinc/Kaiser functions used by filtering. This is not a general numerics library. | `S` |
 | `CORE-015` | Pixel conversions | Implemented path | Float conversion plus linear/sRGB byte encode/decode helpers. RHI format support and texture cooking own storage-format decisions. | `S` |
 | `CORE-016` | Timer | Implemented path | Per-frame raw/scaled delta and total time, frame count, time scale, pause/resume, and seconds/milliseconds conversion. No fixed-step simulation scheduler exists here. | `S` |
@@ -75,9 +75,10 @@ Static `ConsoleVariable<T>` construction registers with the singleton registry -
 Console ownership reconciled on 2026-10-26: `CVarControl.cpp` sequences batch
 resolution/validation, assignment and result collection; private
 `CVarControlOperations.cpp` owns those mechanisms and preserves validation of
-the whole batch before mutation. `RegisterConsoleBuiltinCommands` declares the
-four built-ins in `ConsoleBuiltinCommands.cpp`; their execution, completion and
-output formatting live in private `ConsoleBuiltinCommandOperations.cpp`.
+the whole batch before mutation. Editor-private `Console/ConsoleBuiltinCommands.cpp` declares the four built-ins;
+its execution and completion use the supplied `CVarControlExecutor`. Shared
+`ConsoleOutput` records/results stay in Core; command/session policy is described
+in the [Editor boundary](../Editor/EditorCapabilities.md#ui-implementation-boundary).
 
 ### Child-process execution
 

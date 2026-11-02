@@ -2,7 +2,7 @@
 
 #include "Shaders/RegisteredShaderListModel.h"
 #include "Shaders/ShaderExportInspection.h"
-#include "Core/Public/Console/ConsoleCommandRegistry.h"
+#include "Core/Public/Console/ConsoleOutput.h"
 
 #include <array>
 #include <cstdint>
@@ -19,7 +19,7 @@ public:
 
 	bool IsOpen() const noexcept { return m_isOpen; }
 
-	void SetGenerationProvider(RegisteredShaderListModel::GenerationProvider provider);
+	void SetDiagnosticsProvider(RegisteredShaderListModel::DiagnosticsProvider provider);
 	void SetReloadHandler(CommandHandler handler);
 	void SetCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
 	void SetCompileStatus(bool busy, std::string_view message);

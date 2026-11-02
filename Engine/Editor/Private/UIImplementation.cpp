@@ -99,7 +99,7 @@ void UI::Implementation::SetViewportFinalColorTexture(UiTextureHandle texture) n
 
 void UI::Implementation::SetDiagnosticsProviders(EditorDiagnosticsProviders providers)
 {
-	m_shaderGenerationProvider = std::move(providers.ShaderGeneration);
+	m_shaderDiagnosticsProvider = std::move(providers.Shaders);
 	m_meshDiagnosticsProvider = std::move(providers.MeshDiagnostics);
 	m_textureDiagnosticsProvider = std::move(providers.TextureDiagnostics);
 	m_memoryDiagnosticsProvider = std::move(providers.MemoryDiagnostics);
@@ -107,7 +107,7 @@ void UI::Implementation::SetDiagnosticsProviders(EditorDiagnosticsProviders prov
 
 	if (m_shaderToolsPanel)
 	{
-		m_shaderToolsPanel->SetGenerationProvider(m_shaderGenerationProvider);
+		m_shaderToolsPanel->SetDiagnosticsProvider(m_shaderDiagnosticsProvider);
 	}
 	if (m_usedMeshesPanel)
 	{

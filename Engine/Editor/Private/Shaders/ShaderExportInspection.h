@@ -1,9 +1,12 @@
 #pragma once
 
+#include "Renderer/Public/Diagnostics/ShaderDiagnostics.h"
+
 #include <filesystem>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 class ShaderExportInspection final
 {
@@ -17,7 +20,7 @@ public:
 		std::string CompileRequest;
 	};
 
-	static std::filesystem::path FindExportDirectory(std::string_view shaderName);
+	static std::vector<std::filesystem::path> FindExportDirectories(const ShaderDiagnosticsSnapshot& diagnostics);
 	void InspectExport(const std::filesystem::path& directory);
 	void Invalidate() noexcept;
 

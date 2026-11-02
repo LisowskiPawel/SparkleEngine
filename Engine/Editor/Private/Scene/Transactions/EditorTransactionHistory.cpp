@@ -10,15 +10,18 @@ static bool AffectsSameTarget(const WorldEditPayload& left, const WorldEditPaylo
 	{
 		return false;
 	}
-	return std::visit([&right](const auto& command)
-	{
-		using Command = std::remove_cvref_t<decltype(command)>;
-		if constexpr (requires { command.Entity; })
-		{
-			return command.Entity == std::get<Command>(right).Entity;
-		}
-		return true;
-	}, left);
+
+	return std::visit(
+	    [&right](const auto& command)
+	    {
+		    using Command = std::remove_cvref_t<decltype(command)>;
+		    if constexpr (requires { command.Entity; })
+		    {
+			    return command.Entity == std::get<Command>(right).Entity;
+		    }
+		    return true;
+	    },
+	    left);
 }
 
 class EditorTransactionHistoryLimits final

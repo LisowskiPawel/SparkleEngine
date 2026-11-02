@@ -361,7 +361,6 @@ namespace SparkleLauncher
 		}
 
 		plan.Kind = definition->Kind;
-		plan.WorkspaceRoot = request.WorkspaceRoot;
 		plan.Request = request;
 		if (plan.Kind == CookOperationKind::CookWorkspace)
 		{

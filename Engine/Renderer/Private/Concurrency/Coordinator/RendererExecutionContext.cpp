@@ -143,6 +143,9 @@ void RendererExecutionContext::CompleteDiagnostics(const RenderDiagnosticsComman
 		case RenderDiagnosticsRequestKind::Textures:
 			command.Completion->Complete(m_pipeline->CaptureTextureDiagnostics());
 			break;
+		case RenderDiagnosticsRequestKind::Shaders:
+			command.Completion->Complete(m_rendererHost->CaptureShaderDiagnostics());
+			break;
 		case RenderDiagnosticsRequestKind::Memory:
 			command.Completion->Complete(m_rendererHost->CaptureMemoryDiagnostics());
 			break;

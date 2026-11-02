@@ -35,6 +35,12 @@ std::uint64_t RenderCoordinator::GetShaderGeneration() const noexcept
 	return m_config.IsThreaded() ? m_shaderGeneration.load(std::memory_order_acquire) : GetSerialContext().GetShaderGeneration();
 }
 
+ShaderDiagnosticsSnapshot RenderCoordinator::CaptureShaderDiagnostics()
+{
+	m_producerOwner.AssertAccess();
+	return ExtractControlResult<ShaderDiagnosticsSnapshot>(ExecuteSynchronousControl(RenderDiagnosticsCommand{RenderDiagnosticsRequestKind::Shaders, 0, std::make_shared<RenderControlCompletion>()}));
+}
+
 MeshDiagnosticsSnapshot RenderCoordinator::CaptureMeshDiagnostics()
 {
 	m_producerOwner.AssertAccess();

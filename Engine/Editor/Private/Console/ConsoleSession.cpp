@@ -1,19 +1,18 @@
-﻿#include "PCH.h"
+#include "PCH.h"
 
-#include "Core/Public/Console/ConsoleSession.h"
+#include "Console/ConsoleSession.h"
 
 #include "Core/Public/Strings/StringUtils.h"
 
-ConsoleSession::ConsoleSession(ConsoleCommandRegistry& commandRegistry, ConsoleCommandScope scope) :
-    m_commandRegistry(&commandRegistry),
-    m_scope(scope)
+ConsoleSession::ConsoleSession(ConsoleCommandRegistry& commandRegistry) :
+    m_commandRegistry(commandRegistry)
 {
 }
 
 void ConsoleSession::SubmitLine(std::string_view line)
 {
 	const std::string_view trimmedLine = Strings::TrimAsciiWhitespace(line);
-	if (trimmedLine.empty() || m_commandRegistry == nullptr)
+	if (trimmedLine.empty())
 	{
 		return;
 	}
@@ -21,7 +20,7 @@ void ConsoleSession::SubmitLine(std::string_view line)
 	m_history.Add(trimmedLine);
 	AddOutput(ConsoleCommandSeverity::Info, "> " + std::string(trimmedLine));
 
-	const ConsoleCommandResult result = m_commandRegistry->ExecuteLine(trimmedLine, m_scope);
+	const ConsoleCommandResult result = m_commandRegistry.ExecuteLine(trimmedLine);
 	if (!result.Message.empty())
 	{
 		AddOutput(result.Severity, result.Message);
@@ -34,7 +33,7 @@ void ConsoleSession::SubmitLine(std::string_view line)
 
 std::vector<std::string> ConsoleSession::CompleteLine(std::string_view line) const
 {
-	return m_commandRegistry != nullptr ? m_commandRegistry->CompleteLine(line, m_scope) : std::vector<std::string>{};
+	return m_commandRegistry.CompleteLine(line);
 }
 
 void ConsoleSession::Append(ConsoleOutputRecord record)
@@ -64,9 +63,4 @@ std::optional<std::string> ConsoleSession::NavigateHistoryPrevious(std::string_v
 std::optional<std::string> ConsoleSession::NavigateHistoryNext()
 {
 	return m_history.NavigateNext();
-}
-
-void ConsoleSession::ResetHistoryNavigation() noexcept
-{
-	m_history.ResetNavigation();
 }

@@ -32,21 +32,10 @@ namespace SparkleLauncher
 		}
 	}
 
-	std::string ToString(LevelOperationKind kind)
-	{
-		switch (kind)
-		{
-			case LevelOperationKind::Sync:
-				return "Sync";
-		}
-
-		return "Unknown";
-	}
-
 	const std::vector<LevelOperationDefinition>& GetLevelOperationDefinitions()
 	{
 		static const std::vector<LevelOperationDefinition> definitions = {
-		    {LevelOperationKind::Sync, "levels.sync", "Levels", "Sync Levels", "Select levels and acquire their asset packs without changing code, workspace, or SDK dependencies."},
+		    {"levels.sync", "Levels", "Sync Levels", "Select levels and acquire their asset packs without changing code, workspace, or SDK dependencies."},
 		};
 
 		return definitions;
@@ -71,8 +60,6 @@ namespace SparkleLauncher
 			return plan;
 		}
 
-		plan.Kind = definition->Kind;
-		plan.WorkspaceRoot = request.WorkspaceRoot;
 		plan.Request = request;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Operation.Inputs.push_back({"content", request.ContentId});

@@ -28,7 +28,6 @@ static std::uint64_t MakeAuthoredInstanceId(std::string_view identity)
 	return hash;
 }
 
-
 namespace Assets
 {
 	void PrepareSceneAssetForCommit(SceneAssetLoadWork& work)

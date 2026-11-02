@@ -13,22 +13,22 @@ namespace SparkleLauncher
 	{
 		if (plan.Kind == BuildWorkspaceOperationKind::CompileLauncher)
 		{
-			return MakeCMakeLauncherConfigureRequest(plan.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, "Configure.txt");
+			return MakeCMakeLauncherConfigureRequest(plan.Request.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, "Configure.txt");
 		}
 		if (!plan.Request.SourceDependencyId.empty())
 		{
-			return MakeCMakeDependencySyncRequest(plan.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, plan.Request.SourceDependencyId, "SyncSourceDependency.txt");
+			return MakeCMakeDependencySyncRequest(plan.Request.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, plan.Request.SourceDependencyId, "SyncSourceDependency.txt");
 		}
-		return MakeCMakeConfigureRequest(plan.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, "Configure.txt");
+		return MakeCMakeConfigureRequest(plan.Request.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, "Configure.txt");
 	}
 
 	static Process::ChildProcessRequest MakeBuildRequest(const BuildWorkspaceOperationPlan& plan, std::string_view profileName, const std::vector<std::string>& targets)
 	{
 		if (plan.Kind == BuildWorkspaceOperationKind::CompileLauncher)
 		{
-			return MakeCMakeLauncherBuildRequest(plan.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, profileName, "Build.txt");
+			return MakeCMakeLauncherBuildRequest(plan.Request.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, profileName, "Build.txt");
 		}
-		return MakeCMakeBuildRequest(plan.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, profileName, targets, "Build.txt");
+		return MakeCMakeBuildRequest(plan.Request.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, profileName, targets, "Build.txt");
 	}
 
 	static void AppendTargets(std::vector<std::string>& destination, const std::vector<std::string>& targets)
@@ -58,7 +58,7 @@ namespace SparkleLauncher
 	static void AddHostToolInstallStep(std::vector<BuildWorkspaceProcessStep>& steps, const BuildWorkspaceOperationPlan& plan)
 	{
 		std::string errorMessage;
-		std::optional<Process::ChildProcessRequest> request = BuildHostToolInstallRequest(plan.Request.HostToolId, plan.Toolchain, plan.WorkspaceRoot, plan.Operation.Id, errorMessage);
+		std::optional<Process::ChildProcessRequest> request = BuildHostToolInstallRequest(plan.Request.HostToolId, plan.Toolchain, plan.Request.WorkspaceRoot, plan.Operation.Id, errorMessage);
 		if (!request.has_value())
 		{
 			throw Diagnostics::Error(errorMessage);

@@ -80,7 +80,7 @@ namespace SparkleLauncher
 		}
 
 		plan.ExecutablePath = ResolveProjectExecutable(
-		    plan.WorkspaceRoot,
+		    plan.Request.WorkspaceRoot,
 		    plan.Request.ContentId,
 		    plan.Request.RunMode == LevelRunMode::Editor ? "editor" : "game",
 		    plan.Request.ProductProfile,
@@ -198,7 +198,6 @@ namespace SparkleLauncher
 			return plan;
 		}
 
-		plan.WorkspaceRoot = request.WorkspaceRoot;
 		plan.Request = request;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 

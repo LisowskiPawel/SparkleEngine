@@ -12,6 +12,7 @@ class TaskExecutor;
 class TaskScope;
 class Window;
 struct RendererMemoryDiagnosticsSnapshot;
+struct ShaderDiagnosticsSnapshot;
 struct RhiDeviceLaunch;
 
 class RendererHost final
@@ -30,6 +31,7 @@ private:
 
 	std::unique_ptr<FramePipeline> CreateFramePipeline(TaskExecutor& taskExecutor, TaskScope& assetTaskParentScope, bool enableUiRenderPackets);
 	void ReloadShaders();
+	ShaderDiagnosticsSnapshot CaptureShaderDiagnostics() const;
 	std::uint64_t GetShaderGeneration() const noexcept;
 	RendererMemoryDiagnosticsSnapshot CaptureMemoryDiagnostics() const;
 	void SettleForShutdown() noexcept;

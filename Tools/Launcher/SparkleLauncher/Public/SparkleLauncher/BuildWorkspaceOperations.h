@@ -162,7 +162,6 @@ namespace SparkleLauncher
 	struct BuildWorkspaceOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path WorkspaceRoot;
 		BuildWorkspaceOperationRequest Request;
 		BuildWorkspaceOperationKind Kind = BuildWorkspaceOperationKind::SyncCode;
 		BuildToolchainStatus Toolchain;

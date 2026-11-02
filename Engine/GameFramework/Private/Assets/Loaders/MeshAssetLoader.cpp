@@ -94,7 +94,7 @@ namespace Assets
 			morphTarget.name = cookedMorphTarget.name;
 			morphTarget.defaultWeight = cookedMorphTarget.defaultWeight;
 			budget.ReserveArray<MeshMorphTargetDelta>(cookedMorphTarget.deltaCount);
-		morphTarget.deltas.resize(cookedMorphTarget.deltaCount);
+			morphTarget.deltas.resize(cookedMorphTarget.deltaCount);
 			for (std::uint32_t deltaIndex = 0; deltaIndex < cookedMorphTarget.deltaCount; ++deltaIndex)
 			{
 				const CookedMeshMorphTargetDelta cookedDelta = MeshAssetLoaderDetail::ReadRecord<CookedMeshMorphTargetDelta>(cookedMorphTargetDeltas, cookedMorphTarget.firstDelta + deltaIndex);
@@ -108,7 +108,7 @@ namespace Assets
 			loadedSkeletalMesh.geometry = std::move(geometry);
 			loadedSkeletalMesh.morphTargets = std::move(morphTargets);
 			budget.ReserveArray<VertexSkinInfluence>(header.skinInfluenceCount);
-		loadedSkeletalMesh.skinInfluences.resize(header.skinInfluenceCount);
+			loadedSkeletalMesh.skinInfluences.resize(header.skinInfluenceCount);
 			for (std::size_t influenceIndex = 0; influenceIndex < loadedSkeletalMesh.skinInfluences.size(); ++influenceIndex)
 			{
 				const CookedMeshSkinInfluence cookedInfluence = MeshAssetLoaderDetail::ReadRecord<CookedMeshSkinInfluence>(cookedSkinInfluences, influenceIndex);

@@ -84,7 +84,6 @@ namespace SparkleLauncher
 	struct MaintenanceOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path WorkspaceRoot;
 		MaintenanceOperationRequest Request;
 		MaintenanceOperationKind Kind = MaintenanceOperationKind::CleanWorkspace;
 		BuildToolchainStatus Toolchain;

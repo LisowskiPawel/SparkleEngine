@@ -56,8 +56,6 @@ namespace ECS
 			}
 		}
 
-		void Clear() noexcept { m_storages.clear(); }
-
 	private:
 		static RuntimeComponentTypeId AllocateRuntimeComponentTypeId() noexcept
 		{

@@ -67,7 +67,6 @@ namespace SparkleLauncher
 			const bool sourceReady = levelSourceReady && packSourceReady;
 			const bool canSelect = gameSupported && (ready || (hasSourceTools && levelSourceReady && (assetPack == nullptr || packSourceReady || acquisitionSupported)));
 			const bool canSync = hasSourceTools && levelSourceReady && assetPack != nullptr && acquisitionSupported && !packSourceReady;
-			const bool canClean = hasSourceTools && levelSourceReady && assetPack != nullptr && packSourceReady;
 
 			LauncherLevelUiEntry entry{
 			    .Id = QString::fromStdString(level.id),
@@ -82,8 +81,7 @@ namespace SparkleLauncher
 			    .GameSupported = gameSupported,
 			    .Ready = ready,
 			    .CanSelect = canSelect,
-			    .CanSync = canSync,
-			    .CanClean = canClean};
+			    .CanSync = canSync};
 
 			entry.Status = ResolveLevelStatus(entry);
 			entry.State = ResolveLevelState(entry);

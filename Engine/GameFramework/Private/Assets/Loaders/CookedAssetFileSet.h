@@ -19,6 +19,7 @@ namespace Assets
 	{
 	public:
 		CookedAssetAllocationBudget& GetAllocationBudget() const noexcept { return *m_budget; }
+
 		explicit CookedAssetFileSet(const Files::FileSetReadScope& publication, CookedAssetAllocationBudget& budget);
 		~CookedAssetFileSet();
 

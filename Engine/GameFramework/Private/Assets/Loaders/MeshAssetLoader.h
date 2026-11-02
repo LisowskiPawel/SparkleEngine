@@ -9,6 +9,7 @@
 namespace Assets
 {
 	class CookedAssetAllocationBudget;
+
 	class MeshAssetLoader final
 	{
 	public:

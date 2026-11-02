@@ -6,7 +6,6 @@
 
 #include <cstdint>
 #include <cstddef>
-#include <span>
 #include <utility>
 #include <vector>
 
@@ -20,8 +19,6 @@ namespace ECS
 		EntityId Create();
 		bool Destroy(EntityId entity);
 		bool IsAlive(EntityId entity) const noexcept;
-		bool Reserve(std::size_t entityCapacity);
-		bool Clear() noexcept;
 
 		std::size_t GetLiveCount() const noexcept { return m_liveCount; }
 
@@ -43,43 +40,6 @@ namespace ECS
 				AdvanceStructureVersion();
 			}
 			return added;
-		}
-
-		template <ComponentStorageCompatible T> bool AddRange(std::span<const EntityId> entities, std::span<T> components)
-		{
-			if (!CanMutateStructure() || entities.size() != components.size())
-			{
-				return false;
-			}
-			for (EntityId entity : entities)
-			{
-				if (!IsAlive(entity))
-				{
-					return false;
-				}
-			}
-			if (entities.empty())
-			{
-				return true;
-			}
-			const bool added = m_componentTypes.GetOrCreate<T>().AddRange(entities, components);
-			if (added && !entities.empty())
-			{
-				AdvanceStructureVersion();
-			}
-			return added;
-		}
-
-		template <ComponentStorageCompatible T> bool Remove(EntityId entity)
-		{
-			ComponentStorage<T>* storage = m_componentTypes.Find<T>();
-			if (!CanMutateStructure() || !IsAlive(entity) || storage == nullptr || !storage->Contains(entity))
-			{
-				return false;
-			}
-			storage->Remove(entity);
-			AdvanceStructureVersion();
-			return true;
 		}
 
 		template <ComponentStorageCompatible T> bool Replace(EntityId entity, T component)

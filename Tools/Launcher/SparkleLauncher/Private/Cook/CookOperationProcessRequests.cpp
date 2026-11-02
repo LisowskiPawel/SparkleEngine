@@ -39,19 +39,22 @@ namespace SparkleLauncher
 	static Process::ChildProcessRequest MakeAssetCookerRequest(const CookOperationPlan& plan, std::string_view command, std::string_view logFileName)
 	{
 		Process::ChildProcessRequest process;
-		process.ExecutablePath = ResolveToolExecutable(plan.WorkspaceRoot, "AssetCooker", plan.ToolProfile);
-		process.WorkingDirectory = plan.WorkspaceRoot;
-		process.LogPath = ResolveLauncherOperationLogPath(plan.WorkspaceRoot, plan.Operation.Id, logFileName);
-		process.Arguments = {std::string(command), plan.Request.ContentId, plan.Request.GameProfile, "--tool-profile", plan.ToolProfile, "--root", Strings::ToNarrow(plan.WorkspaceRoot.wstring())};
+		process.ExecutablePath = ResolveToolExecutable(plan.Request.WorkspaceRoot, "AssetCooker", plan.ToolProfile);
+		process.WorkingDirectory = plan.Request.WorkspaceRoot;
+		process.LogPath = ResolveLauncherOperationLogPath(plan.Request.WorkspaceRoot, plan.Operation.Id, logFileName);
+
+		process.Arguments =
+		    {std::string(command), plan.Request.ContentId, plan.Request.GameProfile, "--tool-profile", plan.ToolProfile, "--root", Strings::ToNarrow(plan.Request.WorkspaceRoot.wstring())};
+
 		return process;
 	}
 
 	static Process::ChildProcessRequest MakeShaderCompilerCookAllRequest(const CookOperationPlan& plan)
 	{
 		Process::ChildProcessRequest process;
-		process.ExecutablePath = ResolveToolExecutable(plan.WorkspaceRoot, "ShaderCompiler", plan.ToolProfile);
-		process.WorkingDirectory = ResolveProjectRoot(plan.WorkspaceRoot, plan.Request.ContentId);
-		process.LogPath = ResolveLauncherOperationLogPath(plan.WorkspaceRoot, plan.Operation.Id, "CookShaders.txt");
+		process.ExecutablePath = ResolveToolExecutable(plan.Request.WorkspaceRoot, "ShaderCompiler", plan.ToolProfile);
+		process.WorkingDirectory = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
+		process.LogPath = ResolveLauncherOperationLogPath(plan.Request.WorkspaceRoot, plan.Operation.Id, "CookShaders.txt");
 		process.Arguments = {"cook"};
 		AppendCommonShaderCompilerArguments(plan, process.Arguments);
 		return process;

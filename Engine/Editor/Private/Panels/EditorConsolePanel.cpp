@@ -2,7 +2,7 @@
 #include "Panels/EditorConsolePanel.h"
 
 #include "Core/Public/Console/ConsoleOutput.h"
-#include "Core/Public/Console/ConsoleSession.h"
+#include "Console/ConsoleSession.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Style/SparkleUiPalette.h"
 #include "Style/SparkleUiTheme.h"

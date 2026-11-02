@@ -64,7 +64,6 @@ namespace SparkleLauncher
 	struct LevelRunOperationPlan
 	{
 		OperationRecord Operation;
-		std::filesystem::path WorkspaceRoot;
 		LevelRunOperationRequest Request;
 		std::string TargetName;
 		std::string SessionId;

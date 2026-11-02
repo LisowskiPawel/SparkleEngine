@@ -6,6 +6,7 @@
 #include "ExternalCapture/RendererGraphicsLaunch.h"
 #include "RHI/Public/Core/RhiBackendApi.h"
 #include "Diagnostics/RendererMemoryDiagnostics.h"
+#include "Diagnostics/ShaderDiagnostics.h"
 #include "Meshes/MeshDiagnostics.h"
 #include "Diagnostics/MeshPreviewGeometry.h"
 #include "Resources/Textures/TextureDiagnostics.h"
@@ -49,6 +50,7 @@ public:
 
 	void ReloadShaders();
 	std::uint64_t GetShaderGeneration() const noexcept;
+	ShaderDiagnosticsSnapshot CaptureShaderDiagnostics() const;
 	MeshDiagnosticsSnapshot CaptureMeshDiagnostics() const;
 	MeshPreviewGeometry CaptureMeshPreview(std::uintptr_t meshRuntimeId) const;
 	TextureDiagnosticsSnapshot CaptureTextureDiagnostics() const;

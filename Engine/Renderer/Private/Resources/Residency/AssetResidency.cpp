@@ -160,8 +160,7 @@ void AssetResidency::Poll(RhiCommandSubmissionService& submissions) noexcept
 {
 	for (AssetGenerationStatus& generation : m_generations)
 	{
-		if (generation.State == AssetResidencyState::Uploading
-		    && std::any_of(generation.Completion.Values.begin(), generation.Completion.Values.end(), [](std::uint64_t value) { return value != 0; })
+		if (generation.State == AssetResidencyState::Uploading && std::any_of(generation.Completion.Values.begin(), generation.Completion.Values.end(), [](std::uint64_t value) { return value != 0; })
 		    && IsComplete(generation.Completion, submissions))
 		{
 			if (generation.PendingUploadAccounted && generation.UploadBytes <= m_counters.PendingUploadBytes)
