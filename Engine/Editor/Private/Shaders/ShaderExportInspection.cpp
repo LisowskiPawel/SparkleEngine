@@ -12,6 +12,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <string_view>
 #include <system_error>
 
 static bool IsShaderExportDirectory(const std::filesystem::path& directory)

@@ -18,7 +18,7 @@ void RegisteredShaderListModel::Refresh()
 {
 	m_rows.clear();
 	const ShaderDiagnosticsSnapshot diagnostics = m_diagnosticsProvider ? m_diagnosticsProvider() : ShaderDiagnosticsSnapshot{};
-	std::vector<std::filesystem::path> exportDirectories = ShaderExportInspection::FindExportDirectories(diagnostics);
+	const std::vector<std::filesystem::path> exportDirectories = ShaderExportInspection::FindExportDirectories(diagnostics);
 	for (const ShaderRegistrationDesc& shader : GlobalShaderRegistry::GetRegistrations())
 	{
 		const ShaderParameterStructDescriptor parameters = shader.BuildParameterStructDescriptor != nullptr ? shader.BuildParameterStructDescriptor() : ShaderParameterStructDescriptor{};
@@ -34,7 +34,7 @@ void RegisteredShaderListModel::Refresh()
 		const auto active = std::ranges::find(diagnostics.Entries, shader.TypeId, &ShaderDiagnosticsEntry::ShaderType);
 		if (active != diagnostics.Entries.end())
 		{
-			row.ExportDirectory = std::move(exportDirectories[static_cast<std::size_t>(active - diagnostics.Entries.begin())]);
+			row.ExportDirectory = exportDirectories[static_cast<std::size_t>(active - diagnostics.Entries.begin())];
 		}
 		m_rows.push_back(std::move(row));
 	}
