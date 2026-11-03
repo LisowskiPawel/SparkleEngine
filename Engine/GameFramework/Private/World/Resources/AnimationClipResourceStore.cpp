@@ -48,8 +48,4 @@ namespace ECS
 		return true;
 	}
 
-	void AnimationClipResourceStore::Clear() noexcept
-	{
-		m_entries.clear();
-	}
 }

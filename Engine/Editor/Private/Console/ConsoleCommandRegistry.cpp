@@ -21,27 +21,26 @@ bool ConsoleCommandRegistry::Register(ConsoleCommandDescriptor descriptor)
 		return false;
 	}
 
-	const std::string normalizedName = Strings::ToLowerCopy(descriptor.Name);
-	if (m_commandIndicesByName.contains(normalizedName))
+	if (Find(descriptor.Name) != nullptr)
 	{
 		return false;
 	}
 
-	m_commandIndicesByName.emplace(normalizedName, m_commands.size());
 	m_commands.push_back(std::move(descriptor));
 	return true;
 }
 
 const ConsoleCommandDescriptor* ConsoleCommandRegistry::Find(std::string_view commandName) const
 {
-	const std::string normalizedName = Strings::ToLowerCopy(commandName);
-	const auto iterator = m_commandIndicesByName.find(normalizedName);
-	if (iterator == m_commandIndicesByName.end())
+	for (const ConsoleCommandDescriptor& command : m_commands)
 	{
-		return nullptr;
+		if (Strings::EqualsIgnoreCase(command.Name, commandName))
+		{
+			return &command;
+		}
 	}
 
-	return &m_commands[iterator->second];
+	return nullptr;
 }
 
 ConsoleCommandResult ConsoleCommandRegistry::ExecuteLine(std::string_view input) const

@@ -81,6 +81,11 @@ direct mutation/query methods. The unused entity-destruction facade and its
 unproduced journal kinds are retired; private registry/resource removal remains
 for failed scene construction, and render extraction retains structural removals.
 
+Mesh extraction acquires immutable shared resource leases. Mesh, morph-weight and
+animation-clip stores retire with their owning world. Mesh/morph per-entry removal
+and slot-generation checks remain for construction rollback; there is no separate
+store-reset lifecycle or mutable mesh-resource lookup path.
+
 `GameWorldState::PublishReadView` owns snapshot allocation, generation/sequence,
 baseline-versus-incremental selection, sky capture and release publication. Its
 private baseline, change-application and entity-refresh functions own row

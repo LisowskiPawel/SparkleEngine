@@ -26,7 +26,6 @@ namespace ECS
 		AnimationResourceHandle Add(AnimationClipResource&& clip);
 		ResolvedAnimationClip Resolve(AnimationResourceHandle handle) const noexcept;
 		bool ResolveTargets(const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration) noexcept;
-		void Clear() noexcept;
 
 	private:
 		struct Entry final

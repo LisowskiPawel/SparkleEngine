@@ -119,22 +119,6 @@ namespace Logging
 		}
 	}
 
-	std::shared_ptr<spdlog::logger> GetCoreLogger() noexcept
-	{
-		return GetOrCreateLogger(kCoreLoggerName);
-	}
-
-	std::shared_ptr<spdlog::logger> GetLogger(std::string_view name) noexcept
-	{
-		Initialize();
-
-		LoggerRegistry& registry = GetLoggerRegistry();
-		std::lock_guard<std::mutex> lock(registry.Mutex);
-		auto& namedLoggers = registry.NamedLoggers;
-		const auto it = namedLoggers.find(std::string(name));
-		return it != namedLoggers.end() ? it->second : nullptr;
-	}
-
 	static std::shared_ptr<spdlog::logger> GetOrCreateLogger(std::string_view name) noexcept
 	{
 		Initialize();
@@ -183,38 +167,4 @@ namespace Logging
 		return nullptr;
 	}
 
-	void SetLevel(spdlog::level::level_enum level) noexcept
-	{
-		LoggerRegistry& registry = GetLoggerRegistry();
-		registry.Level.store(static_cast<int>(level), std::memory_order_relaxed);
-
-		if (!IsInitialized())
-		{
-			return;
-		}
-
-		std::vector<std::shared_ptr<spdlog::logger>> loggers;
-		{
-			std::lock_guard<std::mutex> lock(registry.Mutex);
-			loggers.reserve(registry.NamedLoggers.size());
-			for (const auto& [name, logger] : registry.NamedLoggers)
-			{
-				(void) name;
-				if (logger)
-				{
-					loggers.push_back(logger);
-				}
-			}
-		}
-
-		for (const std::shared_ptr<spdlog::logger>& logger : loggers)
-		{
-			logger->set_level(level);
-		}
-	}
-
-	spdlog::level::level_enum GetLevel() noexcept
-	{
-		return static_cast<spdlog::level::level_enum>(GetLoggerRegistry().Level.load(std::memory_order_relaxed));
-	}
 }

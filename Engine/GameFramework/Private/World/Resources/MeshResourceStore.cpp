@@ -31,21 +31,6 @@ namespace ECS
 		return MeshResourceHandle{slot, m_entries.back().Generation};
 	}
 
-	Mesh* MeshResourceStore::Resolve(MeshResourceHandle handle) noexcept
-	{
-		return const_cast<Mesh*>(std::as_const(*this).Resolve(handle));
-	}
-
-	const Mesh* MeshResourceStore::Resolve(MeshResourceHandle handle) const noexcept
-	{
-		if (!handle.IsValid() || handle.Slot >= m_entries.size())
-		{
-			return nullptr;
-		}
-		const Entry& entry = m_entries[handle.Slot];
-		return entry.Generation == handle.Generation ? entry.Resource.get() : nullptr;
-	}
-
 	std::shared_ptr<const Mesh> MeshResourceStore::ResolveImmutable(MeshResourceHandle handle) const noexcept
 	{
 		if (!handle.IsValid() || handle.Slot >= m_entries.size())
@@ -76,9 +61,4 @@ namespace ECS
 		return true;
 	}
 
-	void MeshResourceStore::Clear() noexcept
-	{
-		m_entries.clear();
-		m_freeSlots.clear();
-	}
 }

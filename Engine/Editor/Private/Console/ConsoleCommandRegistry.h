@@ -2,12 +2,10 @@
 
 #include "Core/Public/Console/ConsoleOutput.h"
 
-#include <cstddef>
 #include <functional>
 #include <span>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <vector>
 
 struct ConsoleAutocompleteRequest final
@@ -45,5 +43,4 @@ private:
 	static std::vector<std::string_view> BuildArgumentViews(const std::vector<std::string>& arguments);
 
 	std::vector<ConsoleCommandDescriptor> m_commands;
-	std::unordered_map<std::string, std::size_t> m_commandIndicesByName;
 };

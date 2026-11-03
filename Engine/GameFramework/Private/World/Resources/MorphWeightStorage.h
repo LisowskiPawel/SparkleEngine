@@ -17,7 +17,6 @@ namespace ECS
 		bool Write(AnimationOutputSlotHandle handle, std::span<const float> weights) noexcept;
 		std::span<const float> Read(AnimationOutputSlotHandle handle) const noexcept;
 		bool Remove(AnimationOutputSlotHandle handle) noexcept;
-		void Clear() noexcept;
 
 	private:
 		struct Entry final

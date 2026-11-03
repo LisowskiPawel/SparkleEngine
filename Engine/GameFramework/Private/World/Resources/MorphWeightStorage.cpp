@@ -88,9 +88,4 @@ namespace ECS
 		return true;
 	}
 
-	void MorphWeightStorage::Clear() noexcept
-	{
-		m_entries.clear();
-		m_freeSlots.clear();
-	}
 }
