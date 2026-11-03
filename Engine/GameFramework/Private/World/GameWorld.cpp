@@ -5,12 +5,10 @@
 #include "Core/Public/Diagnostics/Verify.h"
 #include "GameFramework/Public/Rendering/RenderFrameSubmission.h"
 #include "GameFramework/Public/Scene/Camera/CameraNavigation.h"
-#include "GameFramework/Public/Scene/Materials/MaterialVariant.h"
 #include "GameFramework/Public/World/WorldChange.h"
 #include "GameFramework/Public/World/WorldEditCommand.h"
 #include "GameFramework/Public/World/WorldMaterialVariantView.h"
 #include "World/SceneLoadWorldStaging.h"
-#include "Level/LevelDesc.h"
 #include "World/GameWorldState.h"
 #include "World/Extraction/RenderFrameSubmissionExtractor.h"
 #include "World/Editing/WorldEditCommandQueue.h"
@@ -35,13 +33,6 @@ GameWorld::GameWorld(TaskExecutor& taskExecutor) :
 }
 
 GameWorld::~GameWorld() noexcept = default;
-
-void GameWorld::InitializeStagedLevel(const LevelDesc& desc)
-{
-	m_activeLevelName = desc.name;
-	m_activeLevelDesc = desc;
-	InitializeSceneLoadLevel(*m_state, desc);
-}
 
 void GameWorld::Update(float deltaSeconds)
 {
@@ -88,14 +79,12 @@ void GameWorld::PublishCameraInputIntent(const CameraInputIntent& intent) noexce
 void GameWorld::CommitSceneLoadPackage(Assets::SceneLoadPackage package)
 {
 	GameWorld stagedWorld(m_taskExecutor);
-	stagedWorld.InitializeStagedLevel(package.Level);
+	InitializeSceneLoadLevel(*stagedWorld.m_state, package.Level);
 
 	PopulateStagedScene(*stagedWorld.m_state, *stagedWorld.m_resources, package);
 
 	m_state.swap(stagedWorld.m_state);
 	m_resources.swap(stagedWorld.m_resources);
-	m_activeLevelName.swap(stagedWorld.m_activeLevelName);
-	std::swap(m_activeLevelDesc, stagedWorld.m_activeLevelDesc);
 	++m_generation;
 }
 
@@ -106,17 +95,7 @@ RenderFrameSubmission GameWorld::ExtractRenderFrameSubmission(std::uint64_t fram
 
 void GameWorld::FinalizeSceneLoadCommit()
 {
-	CommitWorldChanges();
-}
-
-bool GameWorld::IsEntityAlive(EntityId entity) const noexcept
-{
-	return m_state->IsAlive(entity);
-}
-
-bool GameWorld::DestroyEntity(EntityId entity) noexcept
-{
-	return m_state->Destroy(entity);
+	m_state->CommitDerivedStateAndPublish();
 }
 
 WorldReadView GameWorld::AcquireReadView() const noexcept
@@ -138,36 +117,6 @@ bool GameWorld::AcknowledgeChanges(WorldChangeCursor& cursor, WorldSequence sequ
 	}
 	cursor.m_acknowledgedSequence = sequence;
 	return true;
-}
-
-void GameWorld::CommitWorldChanges()
-{
-	m_state->CommitDerivedStateAndPublish();
-}
-
-std::size_t GameWorld::GetMaterialVariantCount() const noexcept
-{
-	return m_resources->MaterialVariants.GetCount();
-}
-
-std::string_view GameWorld::GetMaterialVariantName(std::size_t index) const noexcept
-{
-	return m_resources->MaterialVariants.GetName(index);
-}
-
-MaterialVariantIndex GameWorld::GetActiveMaterialVariant() const noexcept
-{
-	return m_resources->MaterialVariants.GetActive();
-}
-
-bool GameWorld::ApplyMaterialVariant(MaterialVariantIndex index)
-{
-	const bool applied = m_resources->MaterialVariants.Apply(index, *m_state);
-	if (applied)
-	{
-		CommitWorldChanges();
-	}
-	return applied;
 }
 
 WorldMaterialVariantView GameWorld::CaptureMaterialVariants() const

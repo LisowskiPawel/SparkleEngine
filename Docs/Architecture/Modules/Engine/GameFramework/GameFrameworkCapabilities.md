@@ -60,9 +60,9 @@ Compiled system descriptors and their query/resource facts stay private to this 
 
 ### Scene Activation And Read Publication
 
-Source ownership reconciled on 2026-10-27. `GameWorld::CommitSceneLoadPackage`
-orders blueprint-count validation, isolated-world construction, level
-initialization, staged population and the accepted state/resource/document swap.
+Source ownership reconciled on 2026-11-03. `GameWorld::CommitSceneLoadPackage`
+orders isolated-world construction, level initialization, staged population and
+validation, and the accepted state/resource swap.
 Private `World/SceneLoadWorldStaging` owns entity-count validation, authored
 camera/sky/light initialization, payload traversal, camera selection and final
 resource/entity checks. `GameWorldSceneAssetCommitter` is a file owner for the
@@ -70,8 +70,14 @@ direct `CommitSceneAssetPayload` function; it retains no committer object or
 borrowed-reference members. Focused private functions transfer animation and
 material resources, construct mesh groups and material bindings, and add cameras
 and lights. Existing mesh and material-variant translators remain authoritative.
-LevelSession still owns request/generation admission, events and activation
-completion; it never observes a partially staged world.
+`LevelSession` owns the active level document and name, request/generation
+admission, events and activation completion; it never observes a partially staged
+world. `GameWorld` retains no duplicate level description or name. Its public
+editing path is generation-checked `SubmitEdit`; material variants remain
+available through that path and `CaptureMaterialVariants`, without separate
+direct mutation/query methods. The unused entity-destruction facade and its
+unproduced journal kinds are retired; private registry/resource removal remains
+for failed scene construction, and render extraction retains structural removals.
 
 `GameWorldState::PublishReadView` owns snapshot allocation, generation/sequence,
 baseline-versus-incremental selection, sky capture and release publication. Its
@@ -129,7 +135,7 @@ These checks retain their Windows x64 Game/Editor and D3D12/Vulkan product matri
 
 | ID | Capability | State | Exact current coverage and limit | Evidence |
 | --- | --- | --- | --- | --- |
-| `GF-009` | Entity identity/lifetime | Implemented path | Generation-aware entity IDs, registry-backed component storage, alive check, and world-owner destruction outside frozen query epochs. No public arbitrary entity/component creation API is exposed. | `S` |
+| `GF-009` | Entity identity/lifetime | Implemented path | Generation-aware entity IDs and registry-backed component storage; private alive checks validate typed edits, and private destruction rolls back failed scene construction. World replacement retires the previous scene. No public arbitrary entity/component creation or destruction API is exposed. | `S` |
 | `GF-010` | Fixed component types | Implemented path | 13 private runtime component types: LocalTransform, WorldTransform, CameraDerivedState, MeshInstance, Visibility, Camera, Light, AnimationState, MorphState, SkinningState, Name, AuthoredIdentity, and EditorMetadata. | `S` |
 | `GF-011` | Typed queries and frozen structure | Implemented path | Read/write query descriptors declare system access; world structure is frozen for a system epoch and structural changes commit outside it. This is a purpose-built ECS, not a generic public ECS framework. | `S` |
 | `GF-012` | Compiled system graph | Implemented path | Eleven stages execute camera movement; playback; pose; morph; skinning; morph commit; system-output commit; transforms; camera derived state; mesh extraction; extraction commit. Access and dependency topology are compiled; populated ranges are materialized at host wave boundaries. | `S` |

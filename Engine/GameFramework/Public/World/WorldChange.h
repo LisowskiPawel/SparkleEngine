@@ -20,9 +20,7 @@ enum class WorldChangeKind : std::uint8_t
 {
 	WorldReset = 0,
 	EntityCreated,
-	EntityDestroyed,
 	ComponentAdded,
-	ComponentRemoved,
 	ValueChanged,
 	ResourceChanged,
 };

@@ -25,33 +25,6 @@ namespace ECS
 		CommitDerivedStateAndPublish();
 	}
 
-	bool GameWorldState::Destroy(EntityId entity) noexcept
-	{
-		const MeshInstance* mesh = m_registry.Get<MeshInstance>(entity);
-		const MeshResourceHandle meshResource = mesh == nullptr ? MeshResourceHandle{} : mesh->Resource;
-		const MorphState* morph = m_registry.Get<MorphState>(entity);
-		const AnimationOutputSlotHandle morphState = morph == nullptr ? AnimationOutputSlotHandle{} : morph->Weights;
-		const bool destroyed = m_registry.Destroy(entity);
-		if (!destroyed)
-		{
-			return false;
-		}
-		if (entity == m_activeCamera)
-		{
-			m_activeCamera = EntityId::Invalid();
-		}
-		if (meshResource.IsValid())
-		{
-			m_meshResources.Remove(meshResource);
-		}
-		if (morphState.IsValid())
-		{
-			m_morphWeights.Remove(morphState);
-		}
-		RecordChange(entity, WorldChangeKind::EntityDestroyed, WorldDataKind::World);
-		return true;
-	}
-
 	void GameWorldState::MarkTransformDirty(EntityId entity) noexcept
 	{
 		if (!entity.IsValid())
