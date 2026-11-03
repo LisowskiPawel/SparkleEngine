@@ -31,7 +31,7 @@ namespace ECS
 				TaskGraphBuilder tasks;
 				for (std::size_t offset = 0; offset < wave.Systems.size(); ++offset)
 				{
-					const GameSystemDesc& system = m_data->Systems[wave.Systems[offset]];
+					const CompiledGameSystem& system = m_data->Systems[wave.Systems[offset]];
 					const auto count = wave.ItemCounts[offset];
 					if (count == 0)
 					{

@@ -18,9 +18,9 @@ namespace ECS
 	public:
 		explicit GameSystemGraphCompiler(std::vector<GameSystemDesc> systems) :
 		    m_data(std::make_unique<CompiledGameSystemGraphData>()),
-		    m_edges(systems.size())
+		    m_systems(std::move(systems)),
+		    m_edges(m_systems.size())
 		{
-			m_data->Systems = std::move(systems);
 		}
 
 		std::unique_ptr<CompiledGameSystemGraphData> Compile()
@@ -41,6 +41,12 @@ namespace ECS
 			}
 
 			BuildExecutionWaves();
+			m_data->Systems.reserve(m_systems.size());
+			for (GameSystemDesc& system : m_systems)
+			{
+				m_data->Systems.push_back(
+				    CompiledGameSystem{.Name = std::move(system.Name), .RangePolicy = system.RangePolicy, .GetItemCount = system.GetItemCount, .ExecuteRange = system.ExecuteRange});
+			}
 			return std::move(m_data);
 		}
 
@@ -162,14 +168,14 @@ namespace ECS
 
 		bool ValidateSystemDeclarations()
 		{
-			if (m_data->Systems.empty())
+			if (m_systems.empty())
 			{
 				m_data->Error = {GameSystemGraphErrorCode::TaskGraphRejected, "Game-system graph has no declared systems."};
 				return false;
 			}
-			for (std::uint32_t index = 0; index < m_data->Systems.size(); ++index)
+			for (std::uint32_t index = 0; index < m_systems.size(); ++index)
 			{
-				const GameSystemDesc& system = m_data->Systems[index];
+				const GameSystemDesc& system = m_systems[index];
 				if (system.Name.empty())
 				{
 					m_data->Error = {GameSystemGraphErrorCode::EmptySystemName, "A game system has an empty name."};
@@ -182,7 +188,7 @@ namespace ECS
 				}
 				for (std::uint32_t prior = 0; prior < index; ++prior)
 				{
-					if (m_data->Systems[prior].Name == system.Name)
+					if (m_systems[prior].Name == system.Name)
 					{
 						m_data->Error = {GameSystemGraphErrorCode::DuplicateSystem, std::format("Duplicate game system '{}'.", system.Name)};
 						return false;
@@ -248,17 +254,17 @@ namespace ECS
 
 		bool BuildDeclaredDependencies()
 		{
-			for (std::uint32_t index = 0; index < m_data->Systems.size(); ++index)
+			for (std::uint32_t index = 0; index < m_systems.size(); ++index)
 			{
-				const GameSystemDesc& system = m_data->Systems[index];
+				const GameSystemDesc& system = m_systems[index];
 				for (std::uint32_t prerequisite : system.Prerequisites)
 				{
-					if (prerequisite >= m_data->Systems.size())
+					if (prerequisite >= m_systems.size())
 					{
 						m_data->Error = {GameSystemGraphErrorCode::MissingPrerequisite, std::format("Game system '{}' has a missing prerequisite.", system.Name)};
 						return false;
 					}
-					if (m_data->Systems[prerequisite].Phase > system.Phase)
+					if (m_systems[prerequisite].Phase > system.Phase)
 					{
 						m_data->Error = {GameSystemGraphErrorCode::InvalidPhaseDependency, std::format("Game system '{}' depends on a later phase.", system.Name)};
 						return false;
@@ -271,12 +277,12 @@ namespace ECS
 
 		void AddPhaseDependencies()
 		{
-			for (std::uint32_t left = 0; left < m_data->Systems.size(); ++left)
+			for (std::uint32_t left = 0; left < m_systems.size(); ++left)
 			{
-				for (std::uint32_t right = left + 1; right < m_data->Systems.size(); ++right)
+				for (std::uint32_t right = left + 1; right < m_systems.size(); ++right)
 				{
-					const GameSystemDesc& lhs = m_data->Systems[left];
-					const GameSystemDesc& rhs = m_data->Systems[right];
+					const GameSystemDesc& lhs = m_systems[left];
+					const GameSystemDesc& rhs = m_systems[right];
 					if (lhs.Phase < rhs.Phase)
 					{
 						AddEdge(m_edges, left, right);
@@ -291,12 +297,12 @@ namespace ECS
 
 		bool ValidateHazardOrdering()
 		{
-			for (std::uint32_t left = 0; left < m_data->Systems.size(); ++left)
+			for (std::uint32_t left = 0; left < m_systems.size(); ++left)
 			{
-				for (std::uint32_t right = left + 1; right < m_data->Systems.size(); ++right)
+				for (std::uint32_t right = left + 1; right < m_systems.size(); ++right)
 				{
-					const GameSystemDesc& lhs = m_data->Systems[left];
-					const GameSystemDesc& rhs = m_data->Systems[right];
+					const GameSystemDesc& lhs = m_systems[left];
+					const GameSystemDesc& rhs = m_systems[right];
 					if (lhs.Phase != rhs.Phase || (!ComponentsConflict(lhs, rhs) && !ResourcesConflict(lhs, rhs)))
 					{
 						continue;
@@ -329,7 +335,7 @@ namespace ECS
 
 		void BuildExecutionWaves()
 		{
-			std::vector<std::uint32_t> remaining(m_data->Systems.size());
+			std::vector<std::uint32_t> remaining(m_systems.size());
 			for (const auto& outgoing : m_edges)
 			{
 				for (std::uint32_t target : outgoing)
@@ -337,7 +343,7 @@ namespace ECS
 					++remaining[target];
 				}
 			}
-			std::vector<bool> scheduled(m_data->Systems.size());
+			std::vector<bool> scheduled(m_systems.size());
 			std::size_t count = 0;
 			while (count < scheduled.size())
 			{
@@ -366,6 +372,7 @@ namespace ECS
 		}
 
 		std::unique_ptr<CompiledGameSystemGraphData> m_data;
+		std::vector<GameSystemDesc> m_systems;
 		std::vector<std::vector<std::uint32_t>> m_edges;
 	};
 
