@@ -74,22 +74,6 @@ namespace RenderingSettingsUi
 		}
 	}
 
-	template <typename OnChanged> void DrawUnsignedIntInputRow(const char* id, const char* label, std::uint32_t value, OnChanged&& onChanged)
-	{
-		ImGui::TableNextRow();
-		ImGui::TableSetColumnIndex(0);
-		ImGui::AlignTextToFramePadding();
-		ImGui::TextUnformatted(label);
-
-		ImGui::TableSetColumnIndex(1);
-		ImGui::SetNextItemWidth(-FLT_MIN);
-		int updatedValue = static_cast<int>(value);
-		if (ImGui::InputInt(id, &updatedValue, 1, 16))
-		{
-			onChanged(static_cast<std::uint32_t>((std::max) (updatedValue, 0)));
-		}
-	}
-
 	template <typename OnChanged> void DrawUnsignedIntSliderRow(const char* id, const char* label, std::uint32_t value, std::uint32_t minValue, std::uint32_t maxValue, OnChanged&& onChanged)
 	{
 		ImGui::TableNextRow();

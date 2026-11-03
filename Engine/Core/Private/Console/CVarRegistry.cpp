@@ -6,10 +6,9 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogCoreConsole, "Core.Console");
 
-ConsoleVariableBase::ConsoleVariableBase(std::string_view name, std::string_view description, std::type_index valueType) noexcept :
+ConsoleVariableBase::ConsoleVariableBase(std::string_view name, std::string_view description) noexcept :
     m_name(name),
-    m_description(description),
-    m_valueType(valueType)
+    m_description(description)
 {
 }
 

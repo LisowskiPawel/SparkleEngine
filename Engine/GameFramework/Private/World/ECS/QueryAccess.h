@@ -19,16 +19,10 @@ namespace ECS
 		using Component = T;
 	};
 
-	template <ComponentStorageCompatible T> struct Exclude final
-	{
-		using Component = T;
-	};
-
 	enum class ComponentAccessMode : std::uint8_t
 	{
 		Read,
 		Write,
-		Exclude,
 	};
 
 	struct ComponentAccessDesc final
@@ -58,7 +52,6 @@ namespace ECS
 	{
 		using Component = T;
 		static constexpr ComponentAccessMode Mode = ComponentAccessMode::Read;
-		static constexpr bool Included = true;
 		static constexpr bool Writable = false;
 	};
 
@@ -66,16 +59,7 @@ namespace ECS
 	{
 		using Component = T;
 		static constexpr ComponentAccessMode Mode = ComponentAccessMode::Write;
-		static constexpr bool Included = true;
 		static constexpr bool Writable = true;
-	};
-
-	template <ComponentStorageCompatible T> struct QueryAccessTraits<Exclude<T>> final
-	{
-		using Component = T;
-		static constexpr ComponentAccessMode Mode = ComponentAccessMode::Exclude;
-		static constexpr bool Included = false;
-		static constexpr bool Writable = false;
 	};
 
 	template <typename T> concept QueryAccessSpec = requires {

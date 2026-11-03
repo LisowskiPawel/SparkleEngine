@@ -27,7 +27,6 @@ template <typename T> static void PatchModelEntity(std::vector<T>& destination, 
 std::shared_ptr<EditorSceneModel> EditorSceneModelBuilder::BuildFull(const WorldReadView& view, std::uint64_t worldGeneration)
 {
 	auto model = std::make_shared<EditorSceneModel>();
-	model->m_modelGeneration = m_nextModelGeneration++;
 	model->m_worldGeneration = worldGeneration;
 	model->m_worldSequence = view.GetSequence();
 	model->m_cameras.assign(view.GetCameras().begin(), view.GetCameras().end());
@@ -45,7 +44,6 @@ std::shared_ptr<EditorSceneModel> EditorSceneModelBuilder::BuildFull(const World
 std::shared_ptr<EditorSceneModel> EditorSceneModelBuilder::BuildIncremental(const WorldReadView& view, const WorldChangeBatch& changes, std::uint64_t worldGeneration)
 {
 	auto model = std::make_shared<EditorSceneModel>(*m_current);
-	model->m_modelGeneration = m_nextModelGeneration++;
 	model->m_worldGeneration = worldGeneration;
 	model->m_worldSequence = view.GetSequence();
 	bool refreshSky = false;

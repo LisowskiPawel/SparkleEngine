@@ -4,13 +4,6 @@
 #include "Style/SparkleUiPalette.h"
 #include "Style/SparkleUiTheme.h"
 
-#include "Core/Public/Strings/StringUtils.h"
-
-#include <algorithm>
-#include <cfloat>
-#include <cmath>
-#include <vector>
-
 #include <imgui.h>
 
 #include "Util/UiWidgetPrimitives.h"
@@ -22,20 +15,6 @@ namespace UiUtil
 		ImFont* headingFont = SparkleUiTheme::GetHeadingFont();
 		ImFont* monoFont = SparkleUiTheme::GetMonoFont();
 		DrawHeaderBar(title, subtitle, 24.0f, SparkleUiPalette::PanelHeaderBackground(), SparkleUiPalette::PanelHeaderBorder(), headingFont, monoFont, ImVec2(8.0f, 3.0f));
-	}
-
-	void BeginSectionCard(const char* title)
-	{
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::BeginChild(title, ImVec2(0.0f, 0.0f), ImGuiChildFlags_AutoResizeY, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-		DrawSectionHeader(title);
-	}
-
-	void EndSectionCard()
-	{
-		ImGui::Spacing();
-		ImGui::EndChild();
-		ImGui::PopStyleVar(1);
 	}
 
 	void DrawKeyValueRow(const char* label, const char* value)
