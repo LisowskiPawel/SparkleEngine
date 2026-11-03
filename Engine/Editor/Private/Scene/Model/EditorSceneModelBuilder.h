@@ -10,8 +10,6 @@
 struct EditorSceneSource final
 {
 	std::function<WorldReadView()> AcquireReadView;
-	std::function<WorldChangeBatch(const WorldChangeCursor&)> ReadChanges;
-	std::function<bool(WorldChangeCursor&, WorldSequence)> AcknowledgeChanges;
 	std::function<std::uint64_t()> WorldGeneration;
 	std::function<WorldMaterialVariantView()> MaterialVariants;
 };
@@ -27,9 +25,6 @@ public:
 	std::shared_ptr<const EditorSceneModel> Update();
 
 private:
-	std::shared_ptr<EditorSceneModel> BuildFull(const WorldReadView& view, std::uint64_t worldGeneration);
-	std::shared_ptr<EditorSceneModel> BuildIncremental(const WorldReadView& view, const WorldChangeBatch& changes, std::uint64_t worldGeneration);
 	EditorSceneSource m_source;
-	WorldChangeCursor m_cursor;
 	std::shared_ptr<const EditorSceneModel> m_current;
 };

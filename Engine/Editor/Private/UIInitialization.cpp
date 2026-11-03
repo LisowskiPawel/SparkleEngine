@@ -32,8 +32,6 @@ void UI::Implementation::InitializeSceneEditing(EditorHostServices& hostServices
 {
 	m_sceneModelBuilder = std::make_unique<EditorSceneModelBuilder>(EditorSceneSource{
 	    .AcquireReadView = std::move(hostServices.AcquireWorldReadView),
-	    .ReadChanges = std::move(hostServices.ReadWorldChanges),
-	    .AcknowledgeChanges = std::move(hostServices.AcknowledgeWorldChanges),
 	    .WorldGeneration = std::move(hostServices.WorldGeneration),
 	    .MaterialVariants = std::move(hostServices.MaterialVariants)});
 

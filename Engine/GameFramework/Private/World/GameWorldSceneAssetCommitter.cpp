@@ -127,11 +127,10 @@ void CommitSceneAssetPayload(ECS::GameWorldState& state, GameWorldResourceStores
 
 	if (hasSkeletons)
 	{
-		state.NotifyResourceChanged(WorldDataKind::Skeleton);
+		state.NotifyResourceChanged();
 	}
 	if (hasMaterials)
 	{
-		state.NotifyResourceChanged(WorldDataKind::Material);
-		state.NotifyResourceChanged(WorldDataKind::Texture);
+		state.NotifyResourceChanged();
 	}
 }

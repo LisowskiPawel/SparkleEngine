@@ -5,7 +5,6 @@
 #include "Core/Public/Diagnostics/Verify.h"
 #include "GameFramework/Public/Rendering/RenderFrameSubmission.h"
 #include "GameFramework/Public/Scene/Camera/CameraNavigation.h"
-#include "GameFramework/Public/World/WorldChange.h"
 #include "GameFramework/Public/World/WorldEditCommand.h"
 #include "GameFramework/Public/World/WorldMaterialVariantView.h"
 #include "World/SceneLoadWorldStaging.h"
@@ -101,22 +100,6 @@ void GameWorld::FinalizeSceneLoadCommit()
 WorldReadView GameWorld::AcquireReadView() const noexcept
 {
 	return m_state->AcquireReadView();
-}
-
-WorldChangeBatch GameWorld::ReadChanges(const WorldChangeCursor& cursor) const
-{
-	return m_state->ReadChanges(cursor.m_acknowledgedSequence);
-}
-
-bool GameWorld::AcknowledgeChanges(WorldChangeCursor& cursor, WorldSequence sequence) const noexcept
-{
-	const WorldSequence publishedSequence = AcquireReadView().GetSequence();
-	if (sequence < cursor.m_acknowledgedSequence || sequence > publishedSequence)
-	{
-		return false;
-	}
-	cursor.m_acknowledgedSequence = sequence;
-	return true;
 }
 
 WorldMaterialVariantView GameWorld::CaptureMaterialVariants() const

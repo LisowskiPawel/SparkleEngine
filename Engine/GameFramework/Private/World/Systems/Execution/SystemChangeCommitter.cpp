@@ -21,7 +21,7 @@ namespace ECS
 		for (EntityId entity : changes)
 		{
 			state.m_systemArena.DirtyTransforms.push_back(entity);
-			state.RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::LocalTransform);
+			state.RecordChange(entity);
 		}
 	}
 
@@ -32,13 +32,13 @@ namespace ECS
 		SortUnique(state.m_systemArena.AnimationChanges);
 		for (EntityId entity : state.m_systemArena.AnimationChanges)
 		{
-			state.RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::AnimationState);
+			state.RecordChange(entity);
 		}
 		std::erase(state.m_systemArena.MorphChanges, EntityId::Invalid());
 		SortUnique(state.m_systemArena.MorphChanges);
 		for (EntityId entity : state.m_systemArena.MorphChanges)
 		{
-			state.RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::MorphState);
+			state.RecordChange(entity);
 		}
 		SortUnique(state.m_systemArena.DirtyTransforms);
 		return true;
@@ -51,13 +51,13 @@ namespace ECS
 		SortUnique(state.m_systemArena.EvaluatedTransforms);
 		for (EntityId entity : state.m_systemArena.EvaluatedTransforms)
 		{
-			state.RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::WorldTransform);
+			state.RecordChange(entity);
 		}
 		std::erase(state.m_systemArena.CameraDerivedChanges, EntityId::Invalid());
 		SortUnique(state.m_systemArena.CameraDerivedChanges);
 		for (EntityId entity : state.m_systemArena.CameraDerivedChanges)
 		{
-			state.RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::CameraDerivedState);
+			state.RecordChange(entity);
 		}
 		state.PublishPendingChanges();
 		return true;

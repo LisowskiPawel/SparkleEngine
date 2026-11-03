@@ -9,7 +9,6 @@
 #include "GameFramework/Public/Scene/Transform.h"
 #include "GameFramework/Public/World/EntityId.h"
 #include "GameFramework/Public/World/SkyEnvironment.h"
-#include "GameFramework/Public/World/WorldChange.h"
 
 #include <cstdint>
 #include <utility>
@@ -19,6 +18,8 @@
 #include <optional>
 #include <span>
 #include <string>
+
+using WorldSequence = std::uint64_t;
 
 namespace ECS
 {

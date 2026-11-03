@@ -67,7 +67,7 @@ without a temporary vector or entry copy. Model ownership, selection, transactio
 generation checks and public Editor contracts remain unchanged. These boundaries
 have source/build evidence only.
 
-Scene-model refresh uses world generation and change-journal sequence to reuse or replace immutable publications; it carries no independent model revision counter. Property inspection uses the active typed details editors, and rendering settings own their live row controls. Transaction generation checks and undo/redo remain on the existing world-edit path.
+`EditorSceneModel` pins the existing immutable `WorldReadView`; camera, light, mesh and sky access borrows that publication for the model's lifetime. Editor owns only presentation rows and separately captured material-variant metadata. The builder reuses an unchanged world-generation/sequence pair and constructs one new model from the latest publication otherwise. It keeps no copied scene vectors, incremental row patcher, cursor or acknowledgement bridge. Publication bursts and accepted variant rebindings therefore reach the inspector together. Property inspection uses the active typed details editors, and rendering settings own their live row controls. Transaction generation checks and undo/redo remain on the existing world-edit path.
 
 The Console starts collapsed. Its footer button, `~` outside text input, or `Window > Console` opens and focuses it; focused `Esc` closes it without discarding scrollback/history. Registration, lookup, help and completion share one command-descriptor vector; lookup and duplicate rejection are case-insensitive. These are source contracts, not interactive, DPI or shutdown acceptance.
 
@@ -140,7 +140,7 @@ This source separation was reconciled on 2026-10-04; it does not establish runti
 
 ## Vertical Edit Trace
 
-World publishes immutable read view/change sequence -> `EditorSceneModelBuilder` creates presentation rows -> user selects an object -> inspector creates forward and inverse typed commands -> transaction history submits with current world generation -> GameWorld queues and commits accepted edits -> change journal advances -> editor rebuilds affected presentation -> Renderer receives the resulting structural/dynamic publication. Undo runs the stored inverse through the same path.
+World publishes an immutable read view and sequence -> `EditorSceneModelBuilder` pins it and creates presentation rows -> user selects an object -> inspector creates forward and inverse typed commands -> transaction history submits with current world generation -> GameWorld queues and commits accepted edits -> a new immutable publication advances the sequence -> Editor pins the latest state and Renderer receives the resulting structural/dynamic publication. Undo runs the stored inverse through the same path. A held model keeps its previous read-view rows alive across newer publications and world retirement.
 
 ## Product Journey Changes
 

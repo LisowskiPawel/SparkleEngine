@@ -16,7 +16,6 @@
 #include "Viewport/ViewportOverlay.h"
 #include "GameFramework/Public/Rendering/RenderViewCameraData.h"
 #include "GameFramework/Public/Scene/Camera/CameraInputIntent.h"
-#include "GameFramework/Public/World/WorldChange.h"
 #include "GameFramework/Public/World/WorldEditCommand.h"
 #include "GameFramework/Public/World/WorldMaterialVariantView.h"
 #include "GameFramework/Public/World/WorldReadView.h"
@@ -35,8 +34,6 @@ struct EditorHostServices final
 	Timer& GameTimer;
 	LevelSession* Levels = nullptr;
 	std::function<WorldReadView()> AcquireWorldReadView;
-	std::function<WorldChangeBatch(const WorldChangeCursor&)> ReadWorldChanges;
-	std::function<bool(WorldChangeCursor&, WorldSequence)> AcknowledgeWorldChanges;
 	std::function<std::uint64_t()> WorldGeneration;
 	std::function<WorldMaterialVariantView()> MaterialVariants;
 	std::function<WorldEditResult(WorldEditCommand, std::uint64_t)> SubmitWorldEdit;

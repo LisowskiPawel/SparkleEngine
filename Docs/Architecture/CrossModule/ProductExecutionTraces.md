@@ -62,9 +62,9 @@ The [2026-11-01 delivery/presentation contract](../../Acceptance/FirstRelease.md
 | Stage | Owner and transition | Contract crossing the boundary | Open evidence/failure boundary |
 | --- | --- | --- | --- |
 | Open | Editor requests a catalog level through Application/LevelSession | Level-load state and eventual immutable read view | Loading, cancellation, missing assets, fallback, and active identity must be visible. |
-| Inspect | World read view/change journal -> Editor scene model/outliner/inspectors | Presentation rows keyed to world identity/generation | Stale rows or held snapshots must not become mutable world authority. |
+| Inspect | Immutable world read view -> pinned Editor scene model/outliner/inspectors | Presentation rows and borrowed scene data keyed to world generation/sequence | Stale rows or held snapshots must not become mutable world authority. |
 | Edit | Inspector emits a fixed typed forward command and inverse at current generation | Queued `WorldEditCommand` | Unsupported properties and stale generations require visible rejection. |
-| Commit | GameWorld validates and applies the command; journal/change sequence advances | New world state and change identity | Atomicity and failure must be observable; UI optimism cannot masquerade as commit. |
+| Commit | GameWorld validates and applies the command; immutable publication sequence advances | New world state and change identity | Atomicity and failure must be observable; UI optimism cannot masquerade as commit. |
 | Render | Subsequent extraction publishes structural/dynamic change to Renderer | Updated frame without direct Editor mutation of Renderer scene data | View-only camera/settings remain separate from authored world state. |
 | Undo/redo | Transaction history resubmits stored inverse/forward command through the same route | Reversible committed world result | Level replacement, stale identity, repeated undo/redo, and partial failure need evidence. |
 | Save | Editor serializes its supported level-document changes | Updated source level document | Dirty-state, Save As, autosave, recovery, arbitrary schema preservation, and source-control integration are not implied. |

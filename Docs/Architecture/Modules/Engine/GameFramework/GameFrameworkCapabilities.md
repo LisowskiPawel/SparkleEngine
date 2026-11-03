@@ -95,6 +95,12 @@ boundary; helpers borrow it for one call and retain no state. These are
 source/build preservation boundaries, not runtime, task-determinism, content,
 performance or release acceptance evidence.
 
+The world owner publishes pending dirty entity IDs directly into that snapshot
+and advances its sequence. The existing 4096-notification bound folds overflow
+into a full baseline. Resource-only changes also advance publication. Editor pins
+the current immutable publication; there is no event taxonomy, retained change
+history, cursor replay or acknowledgement protocol between modules.
+
 ### Animation Sampling Ownership
 
 Source ownership reconciled on 2026-10-06: [AnimationSampler](../../../../../Engine/GameFramework/Private/Animation/AnimationSampler.cpp) keeps step-key selection, segment selection, alpha calculation, and cubic interpolation as file-private operations. Vector and rotation sampling retain distinct interpolation and default contracts; step selection includes keys at the requested time, while linear/cubic selection preserves the existing segment boundary rule. Empty channels return zero vectors or identity rotations, and sampled rotations remain normalized. Keyframe indices stay within the sampling call; selection and interpolation allocate no storage and retain no references. Stateless sampling and pose-composition helpers have no class shells or value-loading forwarding layer; pose, morph, skinning, and output-storage owners remain separate. Focused CPU comparisons do not establish task determinism, rendered animation, or content/runtime acceptance.
@@ -155,7 +161,7 @@ These checks retain their Windows x64 Game/Editor and D3D12/Vulkan product matri
 | `GF-019` | Skeletal animation | Implemented path | Skeleton hierarchy, animation clips, linear/step/cubic sampling, playback advance, pose evaluation, up to eight imported influences, and joint-matrix ranges reach Renderer. | `S` |
 | `GF-020` | Morph animation | Implemented path | Per-target position/normal/tangent deltas, default/per-instance weights, animation weight channels, evaluated morph outputs, and render weight ranges reach Renderer. | `S` |
 | `GF-021` | World edits | Implemented path | Generation-checked commands can set active camera, local transform, camera description, visibility, light description, sky, and active material variant; result is Accepted/Stale/Rejected with message. | `S` |
-| `GF-022` | Read snapshots/change journal | Implemented path | Immutable shared `WorldReadView` snapshots expose cameras/lights/meshes/sky; sequence cursors read and acknowledge change batches. Retention/bounded-history behavior needs long-run evidence. | `S` |
+| `GF-022` | Immutable world read snapshots | Implemented path | Generation/sequence-pinned `WorldReadView` publications expose cameras/lights/meshes/sky. Editor borrows rows through a held publication, preserving old-model lifetime without cursor replay or retained change history. | `S` |
 
 ## Render Publication Boundary
 

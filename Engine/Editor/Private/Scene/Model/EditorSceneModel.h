@@ -1,13 +1,12 @@
 #pragma once
 
 #include "Scene/SceneObjectSelection.h"
-#include "World/WorldChange.h"
 #include "World/WorldMaterialVariantView.h"
 #include "World/WorldReadView.h"
 
 #include <cstdint>
-#include <memory>
 #include <optional>
+#include <span>
 #include <string>
 #include <vector>
 
@@ -25,15 +24,15 @@ class EditorSceneModel final
 public:
 	std::uint64_t GetWorldGeneration() const noexcept { return m_worldGeneration; }
 
-	WorldSequence GetWorldSequence() const noexcept { return m_worldSequence; }
+	WorldSequence GetWorldSequence() const noexcept { return m_readView.GetSequence(); }
 
-	const std::vector<WorldCameraReadData>& GetCameras() const noexcept { return m_cameras; }
+	std::span<const WorldCameraReadData> GetCameras() const noexcept { return m_readView.GetCameras(); }
 
-	const std::vector<WorldLightReadData>& GetLights() const noexcept { return m_lights; }
+	std::span<const WorldLightReadData> GetLights() const noexcept { return m_readView.GetLights(); }
 
-	const std::vector<WorldMeshReadData>& GetMeshes() const noexcept { return m_meshes; }
+	std::span<const WorldMeshReadData> GetMeshes() const noexcept { return m_readView.GetMeshes(); }
 
-	const std::optional<SkyEnvironment>& GetSkyEnvironment() const noexcept { return m_sky; }
+	const std::optional<SkyEnvironment>& GetSkyEnvironment() const noexcept { return m_readView.GetSkyEnvironment(); }
 
 	const WorldMaterialVariantView& GetMaterialVariants() const noexcept { return m_materialVariants; }
 
@@ -55,11 +54,7 @@ private:
 	friend class EditorSceneModelBuilder;
 	void RebuildEntries();
 	std::uint64_t m_worldGeneration = 0;
-	WorldSequence m_worldSequence = 0;
-	std::vector<WorldCameraReadData> m_cameras;
-	std::vector<WorldLightReadData> m_lights;
-	std::vector<WorldMeshReadData> m_meshes;
-	std::optional<SkyEnvironment> m_sky;
+	WorldReadView m_readView;
 	WorldMaterialVariantView m_materialVariants;
 	std::vector<EditorSceneEntry> m_cameraEntries;
 	std::vector<EditorSceneEntry> m_lightEntries;

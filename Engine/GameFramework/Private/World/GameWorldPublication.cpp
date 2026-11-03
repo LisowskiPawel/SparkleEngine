@@ -137,14 +137,14 @@ namespace ECS
 		}
 	}
 
-	void GameWorldState::ApplyReadViewChanges(WorldReadView::Storage& next, std::span<const WorldChange> changes) const
+	void GameWorldState::ApplyReadViewChanges(WorldReadView::Storage& next, std::span<const EntityId> changes) const
 	{
 		std::vector<EntityId> changedEntities;
-		for (const WorldChange& change : changes)
+		for (EntityId entity : changes)
 		{
-			if (change.Entity.IsValid())
+			if (entity.IsValid())
 			{
-				changedEntities.push_back(change.Entity);
+				changedEntities.push_back(entity);
 			}
 		}
 		std::sort(changedEntities.begin(), changedEntities.end());
@@ -155,7 +155,7 @@ namespace ECS
 		}
 	}
 
-	void GameWorldState::PublishReadView(std::span<const WorldChange> changes, WorldSequence sequence, bool fullBaseline)
+	void GameWorldState::PublishReadView(std::span<const EntityId> changes, WorldSequence sequence, bool fullBaseline)
 	{
 		const std::shared_ptr<const WorldReadView::Storage> previous = m_publishedReadView.load(std::memory_order_acquire);
 		auto next = previous != nullptr && !fullBaseline ? std::make_shared<WorldReadView::Storage>(*previous) : std::make_shared<WorldReadView::Storage>();

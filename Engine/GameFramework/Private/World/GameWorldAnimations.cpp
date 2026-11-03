@@ -46,8 +46,7 @@ namespace ECS
 				m_registry.Destroy(entity);
 				continue;
 			}
-			RecordChange(entity, WorldChangeKind::EntityCreated, WorldDataKind::World);
-			RecordChange(entity, WorldChangeKind::ComponentAdded, WorldDataKind::AnimationState);
+			RecordChange(entity);
 		}
 	}
 

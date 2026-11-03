@@ -10,7 +10,6 @@
 #include "GameFramework/Public/World/SkyEnvironment.h"
 #include "GameFramework/Public/World/WorldReadView.h"
 #include "World/ECS/EntityRegistry.h"
-#include "World/Publication/WorldChangeJournal.h"
 #include "World/Extraction/WorldExtractionStorage.h"
 #include "World/Resources/MorphWeightStorage.h"
 #include "World/Resources/MeshResourceStore.h"
@@ -92,13 +91,14 @@ namespace ECS
 
 		void WriteSkyEnvironment(SkyEnvironment environment) noexcept;
 		void RemoveSkyEnvironment() noexcept;
-		void NotifyResourceChanged(WorldDataKind data) noexcept;
+		void NotifyResourceChanged() noexcept;
 
 		void CommitDerivedStateAndPublish();
 		WorldReadView AcquireReadView() const noexcept;
-		WorldChangeBatch ReadChanges(WorldSequence acknowledgedSequence) const;
 
 	private:
+		static constexpr std::size_t MaximumPendingChanges = 4096;
+
 		friend class RenderFrameSubmissionExtractor;
 		friend class RenderSceneDynamicDataExtractor;
 		friend class SimulationSystemExecution;
@@ -121,11 +121,11 @@ namespace ECS
 		void MarkTransformDirty(EntityId entity) noexcept;
 		bool PrepareSystemExecution(GameWorldResourceStores& resources);
 		void PrepareSystemArena();
-		void RecordChange(EntityId entity, WorldChangeKind kind, WorldDataKind data) noexcept;
+		void RecordChange(EntityId entity) noexcept;
 		void PublishPendingChanges();
-		void PublishReadView(std::span<const WorldChange> changes, WorldSequence sequence, bool fullBaseline);
+		void PublishReadView(std::span<const EntityId> changes, WorldSequence sequence, bool fullBaseline);
 		void BuildReadViewBaseline(WorldReadView::Storage& next) const;
-		void ApplyReadViewChanges(WorldReadView::Storage& next, std::span<const WorldChange> changes) const;
+		void ApplyReadViewChanges(WorldReadView::Storage& next, std::span<const EntityId> changes) const;
 		void RefreshReadViewEntity(WorldReadView::Storage& next, EntityId entity) const;
 		WorldCameraReadData BuildCameraReadData(EntityId entity) const;
 		WorldLightReadData BuildLightReadData(EntityId entity) const;
@@ -153,8 +153,8 @@ namespace ECS
 		std::vector<SceneMeshInstanceGroupData> m_meshInstanceGroups;
 		std::optional<SkyEnvironment> m_skyEnvironment;
 		std::vector<EntityId> m_dirtyTransforms;
-		std::vector<WorldChange> m_pendingChanges;
-		WorldChangeJournal m_changeJournal;
+		std::vector<EntityId> m_pendingChanges;
+		WorldSequence m_readSequence = 0;
 		std::atomic<std::shared_ptr<const WorldReadView::Storage>> m_publishedReadView;
 		std::uint64_t m_readGeneration = 0;
 		bool m_forceFullPublication = true;

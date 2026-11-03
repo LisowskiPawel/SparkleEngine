@@ -114,8 +114,6 @@ void EditorApplication::InitializeUi()
 	    .GameTimer = m_state->Game->GetTimer(),
 	    .Levels = m_state->Game->GetLevelSession(),
 	    .AcquireWorldReadView = [&world]() { return world.AcquireReadView(); },
-	    .ReadWorldChanges = [&world](const WorldChangeCursor& cursor) { return world.ReadChanges(cursor); },
-	    .AcknowledgeWorldChanges = [&world](WorldChangeCursor& cursor, WorldSequence sequence) { return world.AcknowledgeChanges(cursor, sequence); },
 	    .WorldGeneration = [&world]() noexcept { return world.GetGeneration(); },
 	    .MaterialVariants = [&world]() { return world.CaptureMaterialVariants(); },
 	    .SubmitWorldEdit = [&world](WorldEditCommand command, std::uint64_t generation) { return world.SubmitEdit(std::move(command), generation); },

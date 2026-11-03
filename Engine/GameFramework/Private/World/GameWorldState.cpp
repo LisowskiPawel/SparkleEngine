@@ -20,8 +20,8 @@ namespace ECS
 		{
 			throw std::runtime_error(m_systemGraph.GetError().Message);
 		}
-		m_dirtyTransforms.reserve(WorldChangeJournal::MaxChangesPerBatch);
-		m_pendingChanges.reserve(WorldChangeJournal::MaxChangesPerBatch);
+		m_dirtyTransforms.reserve(MaximumPendingChanges);
+		m_pendingChanges.reserve(MaximumPendingChanges);
 		CommitDerivedStateAndPublish();
 	}
 
@@ -41,19 +41,19 @@ namespace ECS
 		}
 	}
 
-	void GameWorldState::RecordChange(EntityId entity, WorldChangeKind kind, WorldDataKind data) noexcept
+	void GameWorldState::RecordChange(EntityId entity) noexcept
 	{
 		if (m_changesOverflowed)
 		{
 			return;
 		}
-		if (m_pendingChanges.size() < m_pendingChanges.capacity())
+		if (m_pendingChanges.size() < MaximumPendingChanges)
 		{
-			m_pendingChanges.push_back(WorldChange{.Entity = entity, .Kind = kind, .Data = data});
+			m_pendingChanges.push_back(entity);
 			return;
 		}
 		m_pendingChanges.clear();
-		m_pendingChanges.push_back(WorldChange{.Kind = WorldChangeKind::WorldReset, .Data = WorldDataKind::World});
+		m_pendingChanges.push_back(EntityId::Invalid());
 		m_forceFullPublication = true;
 		m_changesOverflowed = true;
 	}
@@ -61,7 +61,7 @@ namespace ECS
 	void GameWorldState::WriteSkyEnvironment(SkyEnvironment environment) noexcept
 	{
 		m_skyEnvironment = std::move(environment);
-		RecordChange(EntityId::Invalid(), WorldChangeKind::ResourceChanged, WorldDataKind::SkyEnvironment);
+		RecordChange(EntityId::Invalid());
 	}
 
 	void GameWorldState::RemoveSkyEnvironment() noexcept
@@ -69,13 +69,13 @@ namespace ECS
 		if (m_skyEnvironment.has_value())
 		{
 			m_skyEnvironment.reset();
-			RecordChange(EntityId::Invalid(), WorldChangeKind::ResourceChanged, WorldDataKind::SkyEnvironment);
+			RecordChange(EntityId::Invalid());
 		}
 	}
 
-	void GameWorldState::NotifyResourceChanged(WorldDataKind data) noexcept
+	void GameWorldState::NotifyResourceChanged() noexcept
 	{
-		RecordChange(EntityId::Invalid(), WorldChangeKind::ResourceChanged, data);
+		RecordChange(EntityId::Invalid());
 	}
 
 	void GameWorldState::CommitDerivedStateAndPublish()
@@ -114,11 +114,7 @@ namespace ECS
 						m_registry.Replace(entity, derived);
 					}
 				}
-				RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::WorldTransform);
-				if (m_registry.Get<Camera>(entity) != nullptr)
-				{
-					RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::CameraDerivedState);
-				}
+				RecordChange(entity);
 			}
 		}
 		m_dirtyTransforms.clear();
@@ -132,13 +128,10 @@ namespace ECS
 		{
 			return;
 		}
-		const bool fullBaseline = m_forceFullPublication || m_pendingChanges.size() > WorldChangeJournal::MaxChangesPerBatch;
-		const WorldSequence previousSequence = m_changeJournal.GetLatestSequence();
-		const WorldSequence sequence = m_changeJournal.Publish(m_pendingChanges);
+		m_readSequence += static_cast<WorldSequence>(m_pendingChanges.size());
+		PublishReadView(m_pendingChanges, m_readSequence, m_forceFullPublication);
 		m_pendingChanges.clear();
 		m_changesOverflowed = false;
-		const WorldChangeBatch batch = m_changeJournal.ReadAfter(previousSequence);
-		PublishReadView(batch.GetChanges(), sequence, fullBaseline);
 		m_forceFullPublication = false;
 	}
 
@@ -147,8 +140,4 @@ namespace ECS
 		return WorldReadView(m_publishedReadView.load(std::memory_order_acquire));
 	}
 
-	WorldChangeBatch GameWorldState::ReadChanges(WorldSequence acknowledgedSequence) const
-	{
-		return m_changeJournal.ReadAfter(acknowledgedSequence);
-	}
 }

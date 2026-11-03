@@ -239,7 +239,7 @@ The [minimum supporting scope](../FirstRelease.md#minimum-supporting-scope) also
 | `GF-019` | Skeletal animation | Included | Game/source | Cesium Man skeletal animation is an Included example; exact clip and pose require cook/runtime proof. |
 | `GF-020` | Morph animation | Included | Game/source | Existing source morph capability; no consumer morph demonstration or arbitrary animation-format promise. |
 | `GF-021` | World edits | Included | Editor/source | Retain admitted Editor authoring; PD-1/PD-3 own edit/save/reload proof. Game remains a consumer of the published scene. |
-| `GF-022` | Read snapshots/change journal | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
+| `GF-022` | Immutable world read snapshots | Included | Game/source | Retain generation/sequence-pinned scene inspection and extraction. Editor pins the current publication; historical cursor replay is retired. Accept through existing owner/FCR and exact candidate, not source presence. |
 | `GF-023` | Structural publication | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `GF-024` | Dynamic publication | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |
 | `GF-025` | View publication | Included | Game/source | Required bounded product mechanic; accept through existing owner/FCR and exact candidate, not source presence. |

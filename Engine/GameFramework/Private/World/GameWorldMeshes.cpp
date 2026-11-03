@@ -62,9 +62,7 @@ namespace ECS
 			return EntityId::Invalid();
 		}
 		MarkTransformDirty(entity);
-		RecordChange(entity, WorldChangeKind::EntityCreated, WorldDataKind::World);
-		RecordChange(entity, WorldChangeKind::ComponentAdded, WorldDataKind::MeshInstance);
-		RecordChange(entity, WorldChangeKind::ComponentAdded, WorldDataKind::LocalTransform);
+		RecordChange(entity);
 		return entity;
 	}
 
@@ -90,7 +88,7 @@ namespace ECS
 		const bool written = m_registry.Replace(entity, updated);
 		if (written)
 		{
-			RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::MeshInstance);
+			RecordChange(entity);
 		}
 		return written;
 	}
@@ -99,7 +97,7 @@ namespace ECS
 	{
 		m_meshInstanceGroups.reserve(m_meshInstanceGroups.size() + groups.size());
 		std::ranges::move(groups, std::back_inserter(m_meshInstanceGroups));
-		RecordChange(EntityId::Invalid(), WorldChangeKind::ResourceChanged, WorldDataKind::MeshInstance);
+		RecordChange(EntityId::Invalid());
 	}
 
 }

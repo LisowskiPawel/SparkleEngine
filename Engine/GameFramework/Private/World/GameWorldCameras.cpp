@@ -47,9 +47,7 @@ namespace ECS
 			return EntityId::Invalid();
 		}
 		MarkTransformDirty(entity);
-		RecordChange(entity, WorldChangeKind::EntityCreated, WorldDataKind::World);
-		RecordChange(entity, WorldChangeKind::ComponentAdded, WorldDataKind::Camera);
-		RecordChange(entity, WorldChangeKind::ComponentAdded, WorldDataKind::LocalTransform);
+		RecordChange(entity);
 		if (active || !m_activeCamera.IsValid())
 		{
 			SetActiveCamera(entity);
@@ -111,7 +109,7 @@ namespace ECS
 				Camera inactive = *previous;
 				inactive.Active = false;
 				m_registry.Replace(m_activeCamera, inactive);
-				RecordChange(m_activeCamera, WorldChangeKind::ValueChanged, WorldDataKind::Camera);
+				RecordChange(m_activeCamera);
 			}
 		}
 		Camera active = *selected;
@@ -121,7 +119,7 @@ namespace ECS
 			return false;
 		}
 		m_activeCamera = entity;
-		RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::Camera);
+		RecordChange(entity);
 		return true;
 	}
 
@@ -136,7 +134,7 @@ namespace ECS
 		const bool written = WriteTransform(entity, transform) && m_registry.Replace(entity, CameraComponentTranslation::ToCameraData(desc, existing->AspectRatio, existing->Active));
 		if (written)
 		{
-			RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::Camera);
+			RecordChange(entity);
 		}
 		return written;
 	}
@@ -147,7 +145,7 @@ namespace ECS
 		if (written)
 		{
 			MarkTransformDirty(entity);
-			RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::LocalTransform);
+			RecordChange(entity);
 		}
 		return written;
 	}
@@ -170,7 +168,7 @@ namespace ECS
 		const bool written = m_registry.Replace(entity, updated);
 		if (written)
 		{
-			RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::Visibility);
+			RecordChange(entity);
 		}
 		return written;
 	}

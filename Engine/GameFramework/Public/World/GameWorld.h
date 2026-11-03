@@ -3,7 +3,6 @@
 #include "GameFramework/Public/GameFrameworkAPI.h"
 #include "GameFramework/Public/Scene/Camera/CameraInputIntent.h"
 #include "GameFramework/Public/Scene/Camera/CameraNavigationSettings.h"
-#include "GameFramework/Public/World/WorldChange.h"
 #include "GameFramework/Public/World/WorldReadView.h"
 #include "GameFramework/Public/Rendering/RenderFrameSubmission.h"
 #include "GameFramework/Public/World/WorldEditCommand.h"
@@ -41,8 +40,6 @@ public:
 	void Update(float deltaSeconds);
 	RenderFrameSubmission ExtractRenderFrameSubmission(std::uint64_t frameId);
 	WorldReadView AcquireReadView() const noexcept;
-	WorldChangeBatch ReadChanges(const WorldChangeCursor& cursor) const;
-	bool AcknowledgeChanges(WorldChangeCursor& cursor, WorldSequence sequence) const noexcept;
 
 	std::uint64_t GetGeneration() const noexcept { return m_generation; }
 

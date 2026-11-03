@@ -115,9 +115,7 @@ namespace ECS
 			return EntityId::Invalid();
 		}
 		MarkTransformDirty(entity);
-		RecordChange(entity, WorldChangeKind::EntityCreated, WorldDataKind::World);
-		RecordChange(entity, WorldChangeKind::ComponentAdded, WorldDataKind::Light);
-		RecordChange(entity, WorldChangeKind::ComponentAdded, WorldDataKind::LocalTransform);
+		RecordChange(entity);
 		return entity;
 	}
 
@@ -156,7 +154,7 @@ namespace ECS
 
 		if (written)
 		{
-			RecordChange(entity, WorldChangeKind::ValueChanged, WorldDataKind::Light);
+			RecordChange(entity);
 		}
 		return written;
 	}

@@ -8,7 +8,7 @@
 class EditorSceneModelLookup final
 {
 public:
-	template <typename T> static const T* FindByEntity(const std::vector<T>& values, EntityId entity) noexcept
+	template <typename T> static const T* FindByEntity(std::span<const T> values, EntityId entity) noexcept
 	{
 		const auto iterator = std::lower_bound(values.begin(), values.end(), entity, [](const T& value, EntityId key) { return value.Entity < key; });
 		return iterator != values.end() && iterator->Entity == entity ? &*iterator : nullptr;
@@ -17,17 +17,17 @@ public:
 
 const WorldCameraReadData* EditorSceneModel::FindCamera(EntityId entity) const noexcept
 {
-	return EditorSceneModelLookup::FindByEntity(m_cameras, entity);
+	return EditorSceneModelLookup::FindByEntity(GetCameras(), entity);
 }
 
 const WorldLightReadData* EditorSceneModel::FindLight(EntityId entity) const noexcept
 {
-	return EditorSceneModelLookup::FindByEntity(m_lights, entity);
+	return EditorSceneModelLookup::FindByEntity(GetLights(), entity);
 }
 
 const WorldMeshReadData* EditorSceneModel::FindMesh(EntityId entity) const noexcept
 {
-	return EditorSceneModelLookup::FindByEntity(m_meshes, entity);
+	return EditorSceneModelLookup::FindByEntity(GetMeshes(), entity);
 }
 
 bool EditorSceneModel::Contains(const SceneObjectSelection& selection) const noexcept
@@ -74,20 +74,24 @@ const EditorSceneEntry* EditorSceneModel::FindEntry(const SceneObjectSelection& 
 
 void EditorSceneModel::RebuildEntries()
 {
+	const auto cameras = GetCameras();
+	const auto lights = GetLights();
+	const auto meshes = GetMeshes();
+	const auto& sky = GetSkyEnvironment();
 	m_cameraEntries.clear();
 	m_lightEntries.clear();
 	m_meshEntries.clear();
-	m_cameraEntries.reserve(m_cameras.size());
-	m_lightEntries.reserve(m_lights.size());
-	m_meshEntries.reserve(m_meshes.size());
-	for (std::size_t index = 0; index < m_cameras.size(); ++index)
+	m_cameraEntries.reserve(cameras.size());
+	m_lightEntries.reserve(lights.size());
+	m_meshEntries.reserve(meshes.size());
+	for (std::size_t index = 0; index < cameras.size(); ++index)
 	{
-		const auto& camera = m_cameras[index];
+		const auto& camera = cameras[index];
 		m_cameraEntries.push_back({camera.Name.empty() ? "Camera " + std::to_string(index + 1) : camera.Name, "Camera", SceneObjectSelection::Camera(camera.Entity), camera.Visible});
 	}
-	for (std::size_t index = 0; index < m_lights.size(); ++index)
+	for (std::size_t index = 0; index < lights.size(); ++index)
 	{
-		const auto& light = m_lights[index];
+		const auto& light = lights[index];
 
 		m_lightEntries.push_back(
 		    {SceneObjectPresentation::BuildLightLabel(light.Description, index),
@@ -96,10 +100,10 @@ void EditorSceneModel::RebuildEntries()
 		        light.Description.common.visible,
 		        light.Description.GetKind()});
 	}
-	for (std::size_t index = 0; index < m_meshes.size(); ++index)
+	for (std::size_t index = 0; index < meshes.size(); ++index)
 	{
-		const auto& mesh = m_meshes[index];
+		const auto& mesh = meshes[index];
 		m_meshEntries.push_back({"Mesh " + std::to_string(index + 1), mesh.Kind == SceneMeshKind::Skeletal ? "Skeletal Mesh" : "Static Mesh", SceneObjectSelection::Mesh(mesh.Entity), mesh.Visible});
 	}
-	m_skyEntry = {m_sky ? "Sky" : "Sky (Engine Default)", "Sky", SceneObjectSelection::Sky(), !m_sky || m_sky->enabled};
+	m_skyEntry = {sky ? "Sky" : "Sky (Engine Default)", "Sky", SceneObjectSelection::Sky(), !sky || sky->enabled};
 }
