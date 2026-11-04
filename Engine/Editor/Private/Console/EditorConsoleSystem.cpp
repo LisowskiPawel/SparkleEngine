@@ -2,8 +2,7 @@
 
 #include "Console/EditorConsoleSystem.h"
 
-#include "Console/ConsoleBuiltinCommands.h"
-#include "Console/ConsoleCommandRegistry.h"
+#include "Console/ConsoleCommands.h"
 #include "Core/Public/Console/ConsoleOutput.h"
 #include "Console/ConsoleSession.h"
 #include "Panels/EditorConsolePanel.h"
@@ -25,20 +24,13 @@ public:
 	static constexpr float kMinimumViewportHeight = 64.0f;
 };
 
-EditorConsoleSystem::EditorConsoleSystem(CVarControlExecutor executor)
+EditorConsoleSystem::EditorConsoleSystem(ConsoleCommandActions actions) :
+    m_session(std::make_unique<ConsoleSession>(std::move(actions))),
+    m_consolePanel(std::make_unique<EditorConsolePanel>(*m_session))
 {
-	m_commandRegistry = std::make_unique<ConsoleCommandRegistry>();
-	RegisterConsoleBuiltinCommands(*m_commandRegistry, std::move(executor));
-	m_session = std::make_unique<ConsoleSession>(*m_commandRegistry);
-	m_consolePanel = std::make_unique<EditorConsolePanel>(*m_session);
 }
 
 EditorConsoleSystem::~EditorConsoleSystem() noexcept = default;
-
-ConsoleCommandRegistry& EditorConsoleSystem::GetCommandRegistry() noexcept
-{
-	return *m_commandRegistry;
-}
 
 void EditorConsoleSystem::AppendOutput(ConsoleOutputRecord record)
 {

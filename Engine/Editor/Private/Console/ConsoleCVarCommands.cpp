@@ -1,6 +1,6 @@
 #include "PCH.h"
 
-#include "Console/ConsoleBuiltinCommandOperations.h"
+#include "Console/ConsoleCVarCommands.h"
 
 #include "Core/Public/Console/CVar.h"
 #include "Core/Public/Console/CVarRegistry.h"
@@ -9,37 +9,7 @@
 #include <utility>
 
 static ConsoleCommandResult FormatControlResult(CVarControlResult result);
-static std::string FormatCommandHelp(std::string_view name, std::string_view arguments, std::string_view help);
 static std::string FormatCVar(const CVarControlValue& variable);
-
-ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandRegistry& commandRegistry, std::span<const std::string_view> arguments)
-{
-	if (arguments.size() > 1)
-	{
-		return ConsoleCommandResult::Error("usage: Help [filter]");
-	}
-	const std::string_view filter = arguments.empty() ? std::string_view{} : arguments.front();
-	std::string output;
-	for (const ConsoleCommandDescriptor& command : commandRegistry.GetCommands())
-	{
-		if (!filter.empty() && !Strings::ContainsIgnoreCase(command.Name, filter) && !Strings::ContainsIgnoreCase(command.Help, filter))
-		{
-			continue;
-		}
-
-		if (!output.empty())
-		{
-			output += '\n';
-		}
-		output += FormatCommandHelp(command.Name, command.ArgumentSyntax, command.Help);
-	}
-
-	if (output.empty())
-	{
-		return ConsoleCommandResult::Warning("no commands matched");
-	}
-	return ConsoleCommandResult::Success(output);
-}
 
 ConsoleCommandResult ExecuteConsoleListCVars(const CVarControlExecutor& executor, std::span<const std::string_view> arguments)
 {
@@ -111,22 +81,6 @@ std::vector<std::string> CompleteConsoleCVarName(const ConsoleVariableRegistry& 
 		}
 	}
 	return completions;
-}
-
-static std::string FormatCommandHelp(std::string_view name, std::string_view arguments, std::string_view help)
-{
-	std::string output(name);
-	if (!arguments.empty())
-	{
-		output += ' ';
-		output += arguments;
-	}
-	if (!help.empty())
-	{
-		output += " - ";
-		output += help;
-	}
-	return output;
 }
 
 static std::string FormatCVar(const CVarControlValue& variable)

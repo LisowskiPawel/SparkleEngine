@@ -6,7 +6,7 @@
 
 #include "EditorWorkspaceLayout.h"
 #include "Console/EditorConsoleSystem.h"
-#include "Console/ConsoleCommandRegistry.h"
+#include "Console/ConsoleCommands.h"
 #include "Panels/MainMenuBarPanel.h"
 #include "Panels/SceneInspectorPanel.h"
 #include "Panels/SceneOutlinerPanel.h"
@@ -49,31 +49,16 @@ void UI::Implementation::InitializeRenderingSettings(EditorHostServices& hostSer
 void UI::Implementation::InitializeConsole(CVarControlExecutor&& consoleVariables)
 {
 	m_consoleVariables = std::move(consoleVariables);
-	m_editorConsoleSystem = std::make_unique<EditorConsoleSystem>(m_consoleVariables);
 
-	m_editorConsoleSystem->GetCommandRegistry().Register(
-	    ConsoleCommandDescriptor{
-	        .Name = "CompileShaders",
-	        .Help = "Recompile through Launcher, then reload on success. Optional symbols exports private debug data.",
-	        .ArgumentSyntax = "[symbols]",
-	        .Execute = [this](std::span<const std::string_view> arguments)
-	        {
-		        if (arguments.size() > 1 || (!arguments.empty() && arguments.front() != "symbols"))
-		        {
-			        return ConsoleCommandResult::Error("Usage: CompileShaders [symbols]");
-		        }
-		        return m_shaderToolsPanel->RequestCompile(!arguments.empty());
-	        }});
-
-	m_editorConsoleSystem->GetCommandRegistry().Register(
-	    ConsoleCommandDescriptor{
-	        .Name = "ReloadShaders",
-	        .Help = "Reloads the existing cooked shader files. Build/Cook runs in Launcher.",
-	        .Execute = [this](std::span<const std::string_view>)
-	        {
-		        m_shaderReloadRequested = true;
-		        return ConsoleCommandResult::Success("Shader reload requested.");
-	        }});
+	m_editorConsoleSystem = std::make_unique<EditorConsoleSystem>(ConsoleCommandActions{
+	    .Variables = m_consoleVariables,
+	    .CompileShaders = [this](bool symbols) { return m_shaderToolsPanel->RequestCompile(symbols); },
+	    .ReloadShaders =
+	        [this]()
+	    {
+		    m_shaderReloadRequested = true;
+		    return ConsoleCommandResult::Success("Shader reload requested.");
+	    }});
 }
 
 void UI::Implementation::InitializeWorkspace(std::function<void()> requestRestart)

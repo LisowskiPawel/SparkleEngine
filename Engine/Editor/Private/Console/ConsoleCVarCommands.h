@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Console/ConsoleCommandRegistry.h"
+#include "Core/Public/Console/ConsoleOutput.h"
 #include "Core/Public/Console/CVarControl.h"
 
 #include <string>
@@ -10,7 +10,6 @@
 
 class ConsoleVariableRegistry;
 
-ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandRegistry& commandRegistry, std::span<const std::string_view> arguments);
 ConsoleCommandResult ExecuteConsoleListCVars(const CVarControlExecutor& executor, std::span<const std::string_view> arguments);
 ConsoleCommandResult ExecuteConsoleGetCVar(const CVarControlExecutor& executor, std::span<const std::string_view> arguments);
 ConsoleCommandResult ExecuteConsoleSetCVar(const CVarControlExecutor& executor, std::span<const std::string_view> arguments);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Console/ConsoleCommandRegistry.h"
+#include "Console/ConsoleCommands.h"
 #include "Console/ConsoleHistoryBuffer.h"
 #include "Core/Public/Console/ConsoleOutput.h"
 
@@ -13,7 +13,7 @@
 class ConsoleSession final
 {
 public:
-	explicit ConsoleSession(ConsoleCommandRegistry& commandRegistry);
+	explicit ConsoleSession(ConsoleCommandActions actions);
 
 	ConsoleSession(const ConsoleSession&) = delete;
 	ConsoleSession& operator=(const ConsoleSession&) = delete;
@@ -35,7 +35,7 @@ public:
 private:
 	static constexpr std::size_t kMaxOutputRecords = 512;
 
-	ConsoleCommandRegistry& m_commandRegistry;
+	ConsoleCommandActions m_actions;
 	ConsoleHistoryBuffer m_history;
 	std::vector<ConsoleOutputRecord> m_outputRecords;
 };

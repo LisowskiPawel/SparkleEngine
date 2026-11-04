@@ -4,8 +4,8 @@
 
 #include "Core/Public/Strings/StringUtils.h"
 
-ConsoleSession::ConsoleSession(ConsoleCommandRegistry& commandRegistry) :
-    m_commandRegistry(commandRegistry)
+ConsoleSession::ConsoleSession(ConsoleCommandActions actions) :
+    m_actions(std::move(actions))
 {
 }
 
@@ -20,7 +20,7 @@ void ConsoleSession::SubmitLine(std::string_view line)
 	m_history.Add(trimmedLine);
 	AddOutput(ConsoleCommandSeverity::Info, "> " + std::string(trimmedLine));
 
-	const ConsoleCommandResult result = m_commandRegistry.ExecuteLine(trimmedLine);
+	const ConsoleCommandResult result = ExecuteConsoleLine(m_actions, trimmedLine);
 	if (!result.Message.empty())
 	{
 		AddOutput(result.Severity, result.Message);
@@ -33,7 +33,7 @@ void ConsoleSession::SubmitLine(std::string_view line)
 
 std::vector<std::string> ConsoleSession::CompleteLine(std::string_view line) const
 {
-	return m_commandRegistry.CompleteLine(line);
+	return CompleteConsoleLine(line);
 }
 
 void ConsoleSession::Append(ConsoleOutputRecord record)

@@ -72,11 +72,13 @@ GameFramework holds one read scope from fresh catalog lookup through mapping/dec
 
 Static `ConsoleVariable<T>` construction registers with the singleton registry -> command-line or console host resolves the name -> string parsing mutates the typed value -> Application/Renderer/RHI reads it at its chosen boundary. Core provides no persistence, range schema, restart policy, or UI ownership; those remain with the consumer.
 
-Console ownership reconciled on 2026-10-26: `CVarControl.cpp` sequences batch
+Console ownership reconciled on 2026-11-04: `CVarControl.cpp` sequences batch
 resolution/validation, assignment and result collection; private
 `CVarControlOperations.cpp` owns those mechanisms and preserves validation of
-the whole batch before mutation. Editor-private `Console/ConsoleBuiltinCommands.cpp` declares the four built-ins;
-its execution and completion use the supplied `CVarControlExecutor`. Shared
+the whole batch before mutation. Editor-private `Console/ConsoleCommands.cpp`
+declares the fixed command set; `ConsoleCVarCommands.cpp` keeps list/get/set
+validation, result formatting and live name completion. CVar requests still use
+the supplied `CVarControlExecutor`. Shared
 `ConsoleOutput` records/results stay in Core; command/session policy is described
 in the [Editor boundary](../Editor/EditorCapabilities.md#ui-implementation-boundary).
 
