@@ -31,9 +31,28 @@ namespace SparkleLauncher
 		return MakeCMakeBuildRequest(plan.Request.WorkspaceRoot, plan.Toolchain, plan.Operation.Id, profileName, targets, "Build.txt");
 	}
 
-	static void AppendTargets(std::vector<std::string>& destination, const std::vector<std::string>& targets)
+	static std::vector<std::string> RequireBuildTargets(const BuildWorkspaceOperationPlan& plan, BuildWorkspaceScope scope)
 	{
-		destination.insert(destination.end(), targets.begin(), targets.end());
+		std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, scope);
+		if (!targets.empty())
+		{
+			return targets;
+		}
+		switch (scope)
+		{
+			case BuildWorkspaceScope::Editor:
+				throw Diagnostics::Error("No editor build target could be resolved.");
+			case BuildWorkspaceScope::Game:
+				throw Diagnostics::Error("No game build target could be resolved.");
+			case BuildWorkspaceScope::CookTools:
+				throw Diagnostics::Error(
+				    plan.Kind == BuildWorkspaceOperationKind::BuildWorkspace ? "No cook-tool targets are enabled in this workspace configuration."
+				                                                             : "No optional cook-tool targets are enabled in this workspace configuration.");
+
+			case BuildWorkspaceScope::Launcher:
+				throw Diagnostics::Error("No launcher build target could be resolved.");
+		}
+		throw Diagnostics::Error("Unknown workspace build scope.");
 	}
 
 	static void AddConfigureStep(std::vector<BuildWorkspaceProcessStep>& steps, const BuildWorkspaceOperationPlan& plan)
@@ -50,9 +69,40 @@ namespace SparkleLauncher
 	{
 		BuildWorkspaceProcessStep step;
 		step.Id = "build";
-		step.DisplayName = "Build targets";
+		step.DisplayName = "Build";
+		for (std::size_t index = 0; index < targets.size(); ++index)
+		{
+			step.DisplayName += index == 0 ? " " : ", ";
+			step.DisplayName += targets[index];
+		}
+		step.DisplayName += " for " + std::string(profileName);
 		step.Request = MakeBuildRequest(plan, profileName, targets);
 		steps.push_back(std::move(step));
+	}
+
+	static void AddWorkspaceBuildSteps(std::vector<BuildWorkspaceProcessStep>& steps, const BuildWorkspaceOperationPlan& plan)
+	{
+		if (BuildWorkspaceOperationRequiresConfigureStep(plan))
+		{
+			AddConfigureStep(steps, plan);
+		}
+		std::vector<std::string> editorProfileTargets;
+		for (BuildWorkspaceScope scope : {BuildWorkspaceScope::Launcher, BuildWorkspaceScope::Editor, BuildWorkspaceScope::CookTools})
+		{
+			if (HasSelectedBuildScope(plan.Request, scope))
+			{
+				const std::vector<std::string> targets = RequireBuildTargets(plan, scope);
+				editorProfileTargets.insert(editorProfileTargets.end(), targets.begin(), targets.end());
+			}
+		}
+		if (!editorProfileTargets.empty())
+		{
+			AddBuildStep(steps, plan, plan.Request.EditorProfile, editorProfileTargets);
+		}
+		if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Game))
+		{
+			AddBuildStep(steps, plan, plan.Request.GameProfile, RequireBuildTargets(plan, BuildWorkspaceScope::Game));
+		}
 	}
 
 	static void AddHostToolInstallStep(std::vector<BuildWorkspaceProcessStep>& steps, const BuildWorkspaceOperationPlan& plan)
@@ -91,65 +141,30 @@ namespace SparkleLauncher
 				AddConfigureStep(steps, plan);
 				return steps;
 			case BuildWorkspaceOperationKind::BuildWorkspace:
-			{
-				if (BuildWorkspaceOperationRequiresConfigureStep(plan))
-				{
-					AddConfigureStep(steps, plan);
-				}
-
-				std::vector<std::string> editorProfileTargets;
-				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Launcher))
-				{
-					const std::vector<std::string> launcherTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher);
-					AppendTargets(editorProfileTargets, launcherTargets);
-				}
-				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Editor))
-				{
-					const std::vector<std::string> editorTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor);
-					AppendTargets(editorProfileTargets, editorTargets);
-				}
-				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::CookTools))
-				{
-					const std::vector<std::string> cookToolTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools);
-					AppendTargets(editorProfileTargets, cookToolTargets);
-				}
-				if (!editorProfileTargets.empty())
-				{
-					AddBuildStep(steps, plan, plan.Request.EditorProfile, editorProfileTargets);
-				}
-				if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Game))
-				{
-					const std::vector<std::string> gameTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game);
-					AddBuildStep(steps, plan, plan.Request.GameProfile, gameTargets);
-				}
+				AddWorkspaceBuildSteps(steps, plan);
 				return steps;
-			}
 			case BuildWorkspaceOperationKind::CompileLauncher:
 			{
 				AddConfigureStep(steps, plan);
-				const std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher);
+				const std::vector<std::string> targets = RequireBuildTargets(plan, BuildWorkspaceScope::Launcher);
 				AddBuildStep(steps, plan, plan.Request.EditorProfile, targets);
 				return steps;
 			}
 			case BuildWorkspaceOperationKind::CompileEditor:
 			{
-				const std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor);
+				const std::vector<std::string> targets = RequireBuildTargets(plan, BuildWorkspaceScope::Editor);
 				AddBuildStep(steps, plan, plan.Request.EditorProfile, targets);
 				return steps;
 			}
 			case BuildWorkspaceOperationKind::CompileGame:
 			{
-				const std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game);
+				const std::vector<std::string> targets = RequireBuildTargets(plan, BuildWorkspaceScope::Game);
 				AddBuildStep(steps, plan, plan.Request.GameProfile, targets);
 				return steps;
 			}
 			case BuildWorkspaceOperationKind::BuildCookTools:
 			{
-				const std::vector<std::string> cookToolTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools);
-				if (!cookToolTargets.empty())
-				{
-					AddBuildStep(steps, plan, plan.Request.EditorProfile, cookToolTargets);
-				}
+				AddBuildStep(steps, plan, plan.Request.EditorProfile, RequireBuildTargets(plan, BuildWorkspaceScope::CookTools));
 				return steps;
 			}
 			case BuildWorkspaceOperationKind::InstallHostTool:

@@ -67,249 +67,94 @@ namespace SparkleLauncher
 		return false;
 	}
 
-	static void AppendTargets(std::vector<std::string>& destination, const std::vector<std::string>& targets)
+	static bool AdmitHostToolInstallation(BuildWorkspaceOperationPlan& plan)
 	{
-		destination.insert(destination.end(), targets.begin(), targets.end());
-	}
-
-	static void AddConfigureStep(BuildWorkspaceOperationPlan& plan)
-	{
-		AddPlannedEffect(plan, "Run CMake configure with generator '" + plan.Toolchain.Generator + "' for " + DisplayName(plan.Request.PreferredIde) + ".");
-	}
-
-	static void AddBuildStep(BuildWorkspaceOperationPlan& plan, std::string_view profileName, const std::vector<std::string>& targets)
-	{
-		std::vector<std::string_view> targetViews;
-		for (const std::string& target : targets)
+		const BuildWorkspaceOperationRequest& request = plan.Request;
+		const HostToolInstallerDefinition* installer = FindHostToolInstaller(request.HostToolId);
+		if (installer == nullptr)
 		{
-			targetViews.push_back(target);
+			AddReadiness(plan, "No launcher installer is registered for host tool '" + request.HostToolId + "'.");
+			return false;
 		}
-		AddPlannedEffect(plan, "Build " + Strings::Join(targetViews, ", ") + " for " + std::string(profileName) + ".");
+
+		const auto status = std::find_if(plan.Toolchain.Items.begin(), plan.Toolchain.Items.end(), [&request](const ToolchainItemStatus& item) { return item.Id == request.HostToolId; });
+		if (status != plan.Toolchain.Items.end() && status->State == ToolchainItemState::Found)
+		{
+			AddReadiness(plan, installer->DisplayName + " is already installed.");
+			return false;
+		}
+		if (!CanInstallHostTool(request.HostToolId, plan.Toolchain))
+		{
+			AddReadiness(plan, "The registered launcher installer for " + installer->DisplayName + " is unavailable on this machine.");
+			return false;
+		}
+
+		AddPlannedEffect(plan, installer->InstallEffect);
+		return true;
 	}
 
-	static void PopulatePlanSteps(BuildWorkspaceOperationPlan& plan, const BuildWorkspaceOperationRequest& request)
+	static bool AdmitWorkspaceOperation(BuildWorkspaceOperationPlan& plan)
 	{
 		if (plan.Kind == BuildWorkspaceOperationKind::InstallHostTool)
 		{
-			const HostToolInstallerDefinition* installer = FindHostToolInstaller(request.HostToolId);
-			if (installer == nullptr)
-			{
-				AddReadiness(plan, "No launcher installer is registered for host tool '" + request.HostToolId + "'.");
-				return;
-			}
-
-			const auto status = std::find_if(plan.Toolchain.Items.begin(), plan.Toolchain.Items.end(), [&request](const ToolchainItemStatus& item) { return item.Id == request.HostToolId; });
-			if (status != plan.Toolchain.Items.end() && status->State == ToolchainItemState::Found)
-			{
-				AddReadiness(plan, installer->DisplayName + " is already installed.");
-				return;
-			}
-			if (!CanInstallHostTool(request.HostToolId, plan.Toolchain))
-			{
-				AddReadiness(plan, "The registered launcher installer for " + installer->DisplayName + " is unavailable on this machine.");
-				return;
-			}
-
-			AddPlannedEffect(plan, installer->InstallEffect);
-			plan.CanRun = true;
-			return;
+			return AdmitHostToolInstallation(plan);
 		}
-
 		if (!plan.Toolchain.RequiredToolsAvailable)
 		{
 			AddReadiness(plan, "Required host prerequisites are missing or unsupported.");
-			return;
+			return false;
 		}
 
-		const bool sourceDependenciesMissing = HasIncompleteEnabledSourceDependencies(plan);
-		const bool needsConfigure = BuildWorkspaceOperationRequiresConfigureStep(plan);
 		switch (plan.Kind)
 		{
 			case BuildWorkspaceOperationKind::SyncCode:
 				if (!RequireConfigurePrerequisites(plan))
 				{
-					return;
+					return false;
 				}
 				AddPlannedEffect(plan, "Validate pinned source dependencies and acquire missing caches.");
-				AddConfigureStep(plan);
-				plan.CanRun = true;
-				return;
+				return true;
 			case BuildWorkspaceOperationKind::GenerateBuildFiles:
 				if (!RequireConfigurePrerequisites(plan))
 				{
-					return;
+					return false;
 				}
-				if (sourceDependenciesMissing)
+				if (HasIncompleteEnabledSourceDependencies(plan))
 				{
 					AddPlannedEffect(plan, "Repair incomplete enabled source dependency caches while refreshing generated workspace files.");
 				}
 				if (RequiresNativeBuildOutputReset(plan.Freshness.State))
 				{
-					AddPlannedEffect(
-					    plan,
-					    "Reset compiler-produced outputs that are incompatible with the selected toolchain while preserving source caches "
-					    "and cooked content.");
+					AddPlannedEffect(plan, "Reset compiler-produced outputs that are incompatible with the selected toolchain while preserving source caches and cooked content.");
 				}
-				AddConfigureStep(plan);
-				plan.CanRun = true;
-				return;
+				return true;
 			case BuildWorkspaceOperationKind::BuildWorkspace:
-			{
-				if (request.SelectedScopes.empty())
+				if (plan.Request.SelectedScopes.empty())
 				{
 					AddReadiness(plan, "Select at least one workspace build scope.");
-					return;
+					return false;
 				}
-				if (!RequireSyncedSourceDependencies(plan))
+				if (!RequireSyncedSourceDependencies(plan) || !RequireConfigurePrerequisites(plan))
 				{
-					return;
+					return false;
 				}
-				if (!RequireConfigurePrerequisites(plan))
+				if (BuildWorkspaceOperationRequiresConfigureStep(plan) && RequiresNativeBuildOutputReset(plan.Freshness.State))
 				{
-					return;
-				}
-				if (needsConfigure)
-				{
-					if (RequiresNativeBuildOutputReset(plan.Freshness.State))
-					{
-						AddPlannedEffect(
-						    plan,
-						    "Reset compiler-produced outputs that are incompatible with the selected toolchain while preserving source "
-						    "caches "
-						    "and cooked content.");
-					}
-					AddConfigureStep(plan);
-				}
-
-				std::vector<std::string> editorProfileTargets;
-				if (HasSelectedBuildScope(request, BuildWorkspaceScope::Launcher))
-				{
-					const std::vector<std::string> launcherTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher);
-					AppendTargets(editorProfileTargets, launcherTargets);
-				}
-				if (HasSelectedBuildScope(request, BuildWorkspaceScope::Editor))
-				{
-					const std::vector<std::string> editorTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor);
-					if (editorTargets.empty())
-					{
-						AddReadiness(plan, "No editor build target could be resolved.");
-						return;
-					}
-					AppendTargets(editorProfileTargets, editorTargets);
-				}
-				if (HasSelectedBuildScope(request, BuildWorkspaceScope::CookTools))
-				{
-					const std::vector<std::string> cookToolTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools);
-					if (cookToolTargets.empty())
-					{
-						AddReadiness(plan, "No cook-tool targets are enabled in this workspace configuration.");
-						return;
-					}
-					AppendTargets(editorProfileTargets, cookToolTargets);
-				}
-				if (!editorProfileTargets.empty())
-				{
-					AddBuildStep(plan, request.EditorProfile, editorProfileTargets);
-				}
-
-				if (HasSelectedBuildScope(request, BuildWorkspaceScope::Game))
-				{
-					const std::vector<std::string> gameTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game);
-					if (gameTargets.empty())
-					{
-						AddReadiness(plan, "No game build target could be resolved.");
-						return;
-					}
-					AddBuildStep(plan, request.GameProfile, gameTargets);
+					AddPlannedEffect(plan, "Reset compiler-produced outputs that are incompatible with the selected toolchain while preserving source caches and cooked content.");
 				}
 				AddPlannedEffect(plan, "Build the selected workspace products in dependency order using incremental CMake builds.");
-				plan.CanRun = true;
-				return;
-			}
+				return true;
 			case BuildWorkspaceOperationKind::CompileLauncher:
-			{
-				AddConfigureStep(plan);
-				const std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Launcher);
-				AddBuildStep(plan, request.EditorProfile, targets);
 				AddPlannedEffect(plan, "Configure the Launcher-owned product graph, then rebuild its executable and deployed support files.");
-				plan.CanRun = true;
-				return;
-			}
+				return true;
 			case BuildWorkspaceOperationKind::CompileEditor:
-			{
-				if (!RequireSyncedSourceDependencies(plan))
-				{
-					return;
-				}
-				if (!RequireConfigurePrerequisites(plan))
-				{
-					return;
-				}
-				if (!RequireCurrentWorkspace(plan))
-				{
-					return;
-				}
-				std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Editor);
-				if (targets.empty())
-				{
-					AddReadiness(plan, "No editor build target could be resolved.");
-					return;
-				}
-				AddBuildStep(plan, request.EditorProfile, targets);
-				plan.CanRun = true;
-				return;
-			}
 			case BuildWorkspaceOperationKind::CompileGame:
-			{
-				if (!RequireSyncedSourceDependencies(plan))
-				{
-					return;
-				}
-				if (!RequireConfigurePrerequisites(plan))
-				{
-					return;
-				}
-				if (!RequireCurrentWorkspace(plan))
-				{
-					return;
-				}
-				std::vector<std::string> targets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::Game);
-				if (targets.empty())
-				{
-					AddReadiness(plan, "No game build target could be resolved.");
-					return;
-				}
-				AddBuildStep(plan, request.GameProfile, targets);
-				plan.CanRun = true;
-				return;
-			}
 			case BuildWorkspaceOperationKind::BuildCookTools:
-				if (!RequireSyncedSourceDependencies(plan))
-				{
-					return;
-				}
-				if (!RequireConfigurePrerequisites(plan))
-				{
-					return;
-				}
-				if (!RequireCurrentWorkspace(plan))
-				{
-					return;
-				}
-				{
-					const std::vector<std::string> cookToolTargets = ResolveWorkspaceBuildTargets(plan, BuildWorkspaceScope::CookTools);
-					if (cookToolTargets.empty())
-					{
-						AddReadiness(plan, "No optional cook-tool targets are enabled in this workspace configuration.");
-						return;
-					}
-					AddBuildStep(plan, request.EditorProfile, cookToolTargets);
-				}
-				plan.CanRun = true;
-				return;
+				return RequireSyncedSourceDependencies(plan) && RequireConfigurePrerequisites(plan) && RequireCurrentWorkspace(plan);
 			case BuildWorkspaceOperationKind::InstallHostTool:
-				return;
+				return false;
 		}
+		return false;
 	}
 
 	const std::vector<BuildWorkspaceOperationDefinition>& GetBuildWorkspaceOperationDefinitions()
@@ -353,20 +198,9 @@ namespace SparkleLauncher
 		return found == definitions.end() ? std::nullopt : std::optional<BuildWorkspaceOperationDefinition>(*found);
 	}
 
-	BuildWorkspaceOperationPlan PlanBuildWorkspaceOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request)
+	static void RecordBuildInputs(BuildWorkspaceOperationPlan& plan)
 	{
-		BuildWorkspaceOperationPlan plan;
-		const std::optional<BuildWorkspaceOperationDefinition> definition = FindBuildWorkspaceOperationDefinition(operationId);
-		if (!definition.has_value())
-		{
-			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown build operation");
-			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown build/workspace operation id.", "Choose a registered Build or Sync operation, then retry.");
-			AddReadiness(plan, plan.Operation.Failure->Summary);
-			return plan;
-		}
-
-		plan.Kind = definition->Kind;
-		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
+		const BuildWorkspaceOperationRequest& request = plan.Request;
 		plan.Operation.Inputs.push_back({"content", request.ContentId});
 		plan.Operation.Inputs.push_back({"editorProfile", request.EditorProfile});
 		plan.Operation.Inputs.push_back({"gameProfile", request.GameProfile});
@@ -396,14 +230,11 @@ namespace SparkleLauncher
 		{
 			plan.Operation.Inputs.push_back({"hostTool", request.HostToolId});
 		}
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
-		plan.Request = request;
-		if (!HasBuildSources(request.WorkspaceRoot))
-		{
-			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Source workspace operations are unavailable in a portable package.", "Use a source checkout for this operation.");
-			AddReadiness(plan, plan.Operation.Failure->Summary);
-			return plan;
-		}
+	}
+
+	static void InspectWorkspacePrerequisites(BuildWorkspaceOperationPlan& plan)
+	{
+		const BuildWorkspaceOperationRequest& request = plan.Request;
 		plan.Toolchain = DetectBuildToolchain(request.WorkspaceRoot, request.PreferredIde, request.Compiler);
 		plan.Freshness = CheckBuildFilesFreshness(request.WorkspaceRoot, plan.Toolchain);
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(request.WorkspaceRoot);
@@ -418,33 +249,40 @@ namespace SparkleLauncher
 				AddReadiness(plan, message);
 			}
 		}
-		PopulatePlanSteps(plan, request);
-		if (plan.CanRun)
+	}
+
+	static void BuildExecutablePreview(BuildWorkspaceOperationPlan& plan)
+	{
+		try
 		{
-			try
+			const std::vector<BuildWorkspaceProcessStep> processSteps = BuildProcessStepsForPlan(plan);
+			for (const BuildWorkspaceProcessStep& processStep : processSteps)
 			{
-				const std::vector<BuildWorkspaceProcessStep> processSteps = BuildProcessStepsForPlan(plan);
-				for (const BuildWorkspaceProcessStep& processStep : processSteps)
+				BuildWorkspaceOperationStep step;
+				step.Id = processStep.Id;
+				step.DisplayName = processStep.DisplayName;
+				step.DisplayCommandLine = BuildDisplayCommandLine(processStep.Request.ExecutablePath, processStep.Request.Arguments);
+				step.LogPath = processStep.Request.LogPath;
+				step.UpdatesBuildFilesFreshness = processStep.UpdatesBuildFilesFreshness;
+				plan.Steps.push_back(std::move(step));
+				if (plan.Kind != BuildWorkspaceOperationKind::InstallHostTool)
 				{
-					BuildWorkspaceOperationStep step;
-					step.Id = processStep.Id;
-					step.DisplayName = processStep.DisplayName;
-					step.DisplayCommandLine = BuildDisplayCommandLine(processStep.Request.ExecutablePath, processStep.Request.Arguments);
-					step.LogPath = processStep.Request.LogPath;
-					step.UpdatesBuildFilesFreshness = processStep.UpdatesBuildFilesFreshness;
-					plan.Steps.push_back(std::move(step));
+					AddPlannedEffect(plan, processStep.DisplayName + ".");
 				}
 			}
-			catch (const Diagnostics::Error& error)
-			{
-				plan.CanRun = false;
-				plan.Steps.clear();
-				AddReadiness(plan, std::string("Operation planning failed: ") + error.what());
-			}
 		}
+		catch (const Diagnostics::Error& error)
+		{
+			plan.CanRun = false;
+			plan.Steps.clear();
+			AddReadiness(plan, std::string("Operation planning failed: ") + error.what());
+		}
+	}
 
+	static void DescribeBuildDryRun(BuildWorkspaceOperationPlan& plan, std::string_view displayName)
+	{
 		std::ostringstream dryRun;
-		dryRun << "Dry-run plan for " << definition->DisplayName << ":";
+		dryRun << "Dry-run plan for " << displayName << ":";
 		for (const BuildWorkspaceOperationStep& step : plan.Steps)
 		{
 			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
@@ -454,6 +292,39 @@ namespace SparkleLauncher
 			dryRun << "\n  No command step required.";
 		}
 		plan.Operation.DryRunText = dryRun.str();
+	}
+
+	BuildWorkspaceOperationPlan PlanBuildWorkspaceOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request)
+	{
+		BuildWorkspaceOperationPlan plan;
+		const std::optional<BuildWorkspaceOperationDefinition> definition = FindBuildWorkspaceOperationDefinition(operationId);
+		if (!definition.has_value())
+		{
+			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown build operation");
+			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown build/workspace operation id.", "Choose a registered Build or Sync operation, then retry.");
+			AddReadiness(plan, plan.Operation.Failure->Summary);
+			return plan;
+		}
+
+		plan.Kind = definition->Kind;
+		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
+		plan.Request = request;
+		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
+		RecordBuildInputs(plan);
+		if (!HasBuildSources(request.WorkspaceRoot))
+		{
+			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Source workspace operations are unavailable in a portable package.", "Use a source checkout for this operation.");
+			AddReadiness(plan, plan.Operation.Failure->Summary);
+			return plan;
+		}
+
+		InspectWorkspacePrerequisites(plan);
+		plan.CanRun = AdmitWorkspaceOperation(plan);
+		if (plan.CanRun)
+		{
+			BuildExecutablePreview(plan);
+		}
+		DescribeBuildDryRun(plan, definition->DisplayName);
 		return plan;
 	}
 }

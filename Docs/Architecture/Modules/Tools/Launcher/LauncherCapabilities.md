@@ -12,9 +12,19 @@
 
 **Evidence and disposition:** [Capability Evidence Plan](../../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../../Acceptance/FirstRelease.md)
 
-**Current readiness:** **50/100** â€” a broad developer workflow exists in source; clean-machine execution, cancellation/failure truth, distribution classification, and adoption evidence remain open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
+**Current readiness:** **50/100**: a broad developer workflow exists in source; clean-machine execution, cancellation/failure truth, distribution classification, and adoption evidence remain open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
 
 Source ownership reconciled on 2026-10-06: maintenance core `BuildLevelCleanPaths` selects extracted level cleanup paths, walks parent packs, deduplicates targets, and retains parents used by other selected levels. Qt converts those path specifications for preview and submits the existing maintenance operation. Cached source archives remain outside the selected paths; catalog validation and maintenance containment still guard the paths before removal. This is source ownership evidence, not destructive-operation acceptance.
+
+**Build planning, 2026-11-05:** `BuildWorkspacePlanner` records inputs, inspects
+prerequisites, admits intent, publishes the executable preview and describes the
+dry run. `BuildWorkspaceProcessRequests` owns required-target validation, profile
+grouping and configure/build order. Build-step labels name the actual targets and
+profile; planned effects use those same labels rather than resolving targets a
+second time. All eight operation kinds remain. Missing targets reject the whole
+plan, and execution retains its preview/request mismatch check, cancellation,
+freshness and failure owners. This source refactor adds no build/install or GUI
+workflow acceptance.
 
 **Launch controls (2026-11-01):** the footer places **Shader Compiler** between **Graphics API** and a compact, fixed-width **GPU Capture** selector: None, Nsight Graphics, PIX, RenderDoc. **GPU Crash Debugging** follows capture with one Enabled checkbox: checked selects Aftermath and unchecked selects Off. Its `...` button opens shader-export, incident and inspector controls instead of repeating the form on Scenes/Run. Private capture discovery scans installed tool locations without SDK loading and reuses cached host GPU discovery. Setup reasons and Nsight's experimental SDK status remain in option tooltips. Existing typed level-run preflight and process lowering recheck capture eligibility, diagnostic inputs and conflicts. The [capture owner](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/ExecutionArchitecture.md#implemented-editor-viewport-composition) defines retained proof limits; the [GPU crash route](../../../CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#launch-and-inspection-route) owns diagnostic preparation. This presentation adds no native GPU or release qualification and does not increase Launcher readiness.
 
