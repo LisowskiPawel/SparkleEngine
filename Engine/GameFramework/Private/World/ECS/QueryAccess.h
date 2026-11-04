@@ -1,6 +1,6 @@
 #pragma once
 
-#include "World/ECS/ComponentTypeRegistry.h"
+#include "World/ECS/WorldComponentStores.h"
 
 #include <concepts>
 #include <cstddef>
@@ -27,7 +27,7 @@ namespace ECS
 
 	struct ComponentAccessDesc final
 	{
-		RuntimeComponentTypeId Type;
+		std::uint32_t TypeIndex = 0;
 		ComponentAccessMode Mode = ComponentAccessMode::Read;
 	};
 

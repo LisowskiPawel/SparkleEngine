@@ -122,6 +122,8 @@ namespace ECS
 		bool PrepareSystemExecution(GameWorldResourceStores& resources);
 		void PrepareSystemArena();
 		void RecordChange(EntityId entity) noexcept;
+		std::span<const EntityId> PrepareDirtyTransforms();
+		void CommitDirtyTransforms(std::span<const EntityId> entities);
 		void PublishPendingChanges();
 		void PublishReadView(std::span<const EntityId> changes, WorldSequence sequence, bool fullBaseline);
 		void BuildReadViewBaseline(WorldReadView::Storage& next) const;
@@ -131,16 +133,12 @@ namespace ECS
 		WorldLightReadData BuildLightReadData(EntityId entity) const;
 		WorldMeshReadData BuildMeshReadData(EntityId entity) const;
 
-		template <typename T> std::size_t Count() const noexcept
-		{
-			const ComponentStorage<T>* storage = m_registry.FindStorage<T>();
-			return storage == nullptr ? 0 : storage->GetEntities().size();
-		}
+		template <typename T> std::size_t Count() const noexcept { return m_registry.GetStorage<T>().GetEntities().size(); }
 
 		template <typename T> EntityId EntityAt(std::size_t index) const noexcept
 		{
-			const ComponentStorage<T>* storage = m_registry.FindStorage<T>();
-			return storage != nullptr && index < storage->GetEntities().size() ? storage->GetEntities()[index] : EntityId::Invalid();
+			const std::span<const EntityId> entities = m_registry.GetStorage<T>().GetEntities();
+			return index < entities.size() ? entities[index] : EntityId::Invalid();
 		}
 
 		EntityRegistry m_registry;

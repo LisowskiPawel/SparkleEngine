@@ -71,6 +71,14 @@ namespace ECS
 			std::uint32_t Index = (std::numeric_limits<std::uint32_t>::max)();
 		};
 
+		void ResetOutputs();
+		void BuildAnimationWork(const EntityRegistry& registry, const AnimationClipResourceStore& clips, const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration);
+		void AppendPoseWork(EntityId entity, AnimationResourceHandle clipHandle, const ResolvedAnimationClip& clip, const SkeletonResourceStore& skeletons, std::uint64_t sourceInstanceId);
+		void AppendMorphSamples(EntityId entity, AnimationResourceHandle clipHandle, const ResolvedAnimationClip& clip, std::uint64_t sourceInstanceId);
+		void BuildPoseWorkIndex();
+		void BindMorphTargets(const EntityRegistry& registry, MorphWeightStorage& morphWeights);
+		void BindSkinningOutputs(EntityRegistry& registry, std::uint32_t targetGeneration);
+
 		std::vector<PoseWorkSlot> m_poseWork;
 		std::vector<MorphSampleSlot> m_morphSamples;
 		std::vector<EntityId> m_morphEntities;

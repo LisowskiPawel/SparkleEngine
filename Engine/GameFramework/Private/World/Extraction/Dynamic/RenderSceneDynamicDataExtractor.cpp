@@ -111,6 +111,12 @@ namespace ECS
 
 	void RenderSceneDynamicDataExtractor::ExtractMorphWeights(GameWorldState& state, const RenderObjectDeltaExtractor& objects, RenderSceneDynamicData& dynamic)
 	{
+		BuildMorphMetadata(state);
+		ExtractMorphWeightRanges(state, objects, dynamic);
+	}
+
+	void RenderSceneDynamicDataExtractor::BuildMorphMetadata(GameWorldState& state)
+	{
 		const AnimationOutput& output = state.m_animationOutput.GetOutput();
 		const auto samples = state.m_animationOutput.GetMorphSamples();
 
@@ -137,15 +143,13 @@ namespace ECS
 			        .TargetNodeIndex = morph.targetNodeIndex});
 		}
 		std::stable_sort(m_morphMetadata.begin(), m_morphMetadata.end(), [](const MorphMetadata& left, const MorphMetadata& right) { return left.Entity < right.Entity; });
+	}
 
-		const ComponentStorage<MorphState>* morphStates = state.m_registry.FindStorage<MorphState>();
-		if (morphStates == nullptr)
-		{
-			return;
-		}
-
-		const std::span<const EntityId> entities = morphStates->GetEntities();
-		const std::span<const MorphState> components = morphStates->GetComponents();
+	void RenderSceneDynamicDataExtractor::ExtractMorphWeightRanges(GameWorldState& state, const RenderObjectDeltaExtractor& objects, RenderSceneDynamicData& dynamic)
+	{
+		const ComponentStorage<MorphState>& morphStates = state.m_registry.GetStorage<MorphState>();
+		const std::span<const EntityId> entities = morphStates.GetEntities();
+		const std::span<const MorphState> components = morphStates.GetComponents();
 		dynamic.MorphWeightRanges.reserve(entities.size());
 		for (std::size_t index = 0; index < entities.size(); ++index)
 		{

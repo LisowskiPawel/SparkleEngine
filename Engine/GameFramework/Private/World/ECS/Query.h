@@ -34,7 +34,7 @@ namespace ECS
 				return;
 			}
 
-			m_storages = StorageTuple{registry.FindStorageForQuery<typename QueryAccessTraits<AccessSpecs>::Component>()...};
+			m_storages = StorageTuple{&registry.GetStorageForQuery<typename QueryAccessTraits<AccessSpecs>::Component>()...};
 			InitializePlan(std::index_sequence_for<AccessSpecs...>{});
 		}
 
@@ -43,9 +43,9 @@ namespace ECS
 		Query(Query&&) = delete;
 		Query& operator=(Query&&) = delete;
 
-		static std::array<ComponentAccessDesc, sizeof...(AccessSpecs)> GetAccessMetadata() noexcept
+		static constexpr std::array<ComponentAccessDesc, sizeof...(AccessSpecs)> GetAccessMetadata() noexcept
 		{
-			return {ComponentAccessDesc{ComponentTypeRegistry::GetTypeId<typename QueryAccessTraits<AccessSpecs>::Component>(), QueryAccessTraits<AccessSpecs>::Mode}...};
+			return {ComponentAccessDesc{GetWorldComponentIndex<typename QueryAccessTraits<AccessSpecs>::Component>(), QueryAccessTraits<AccessSpecs>::Mode}...};
 		}
 
 		bool IsValid() const noexcept { return GetValidity() == QueryIterationStatus::Success; }
@@ -119,34 +119,21 @@ namespace ECS
 	private:
 		template <typename AccessSpec> void ConsiderLeadingStorage(ComponentStorage<typename QueryAccessTraits<AccessSpec>::Component>* storage) noexcept
 		{
-			if (storage == nullptr)
-			{
-				m_allStoragesExist = false;
-				m_leadingEntities = {};
-				return;
-			}
 			const std::span<const EntityId> entities = storage->GetEntities();
-			if (!m_leadingStorageSelected || entities.size() < m_leadingEntities.size())
+			if (entities.size() < m_leadingEntities.size())
 			{
-				m_leadingStorageSelected = true;
 				m_leadingEntities = entities;
 			}
 		}
 
 		template <std::size_t... Indices> void InitializePlan(std::index_sequence<Indices...>) noexcept
 		{
+			m_leadingEntities = std::get<0>(m_storages)->GetEntities();
 			(ConsiderLeadingStorage<AccessSpecs>(std::get<Indices>(m_storages)), ...);
-			m_storageStructureVersions = {(std::get<Indices>(m_storages) != nullptr ? std::get<Indices>(m_storages)->GetVersion().Structure : 0)...};
-			if (!m_allStoragesExist)
-			{
-				m_leadingEntities = {};
-			}
+			m_storageStructureVersions = {std::get<Indices>(m_storages)->GetVersion().Structure...};
 		}
 
-		template <std::size_t... Indices> bool Matches(EntityId entity, std::index_sequence<Indices...>) const noexcept
-		{
-			return ((std::get<Indices>(m_storages) != nullptr && std::get<Indices>(m_storages)->Contains(entity)) && ...);
-		}
+		template <std::size_t... Indices> bool Matches(EntityId entity, std::index_sequence<Indices...>) const noexcept { return (std::get<Indices>(m_storages)->Contains(entity) && ...); }
 
 		template <typename AccessSpec> auto BuildArgument(EntityId entity, ComponentStorage<typename QueryAccessTraits<AccessSpec>::Component>* storage) const
 		{
@@ -170,10 +157,7 @@ namespace ECS
 		{
 			if constexpr (QueryAccessTraits<AccessSpec>::Writable)
 			{
-				if (storage != nullptr)
-				{
-					storage->MarkContentChanged();
-				}
+				storage->MarkContentChanged();
 			}
 		}
 
@@ -194,7 +178,7 @@ namespace ECS
 
 		template <std::size_t... Indices> bool StorageVersionsMatch(std::index_sequence<Indices...>) const noexcept
 		{
-			return ((std::get<Indices>(m_storages) == nullptr || std::get<Indices>(m_storages)->GetVersion().Structure == m_storageStructureVersions[Indices]) && ...);
+			return ((std::get<Indices>(m_storages)->GetVersion().Structure == m_storageStructureVersions[Indices]) && ...);
 		}
 
 		EntityRegistry* m_registry = nullptr;
@@ -203,7 +187,5 @@ namespace ECS
 		StorageTuple m_storages;
 		std::array<std::uint64_t, sizeof...(AccessSpecs)> m_storageStructureVersions{};
 		std::span<const EntityId> m_leadingEntities;
-		bool m_allStoragesExist = true;
-		bool m_leadingStorageSelected = false;
 	};
 }

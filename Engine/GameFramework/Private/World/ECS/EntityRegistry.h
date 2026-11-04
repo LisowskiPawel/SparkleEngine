@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GameFramework/Public/World/EntityId.h"
-#include "World/ECS/ComponentTypeRegistry.h"
+#include "World/ECS/WorldComponentStores.h"
 #include "World/ECS/StructureFrozenEpoch.h"
 
 #include <cstdint>
@@ -16,6 +16,12 @@ namespace ECS
 	class EntityRegistry final
 	{
 	public:
+		EntityRegistry() = default;
+		EntityRegistry(const EntityRegistry&) = delete;
+		EntityRegistry& operator=(const EntityRegistry&) = delete;
+		EntityRegistry(EntityRegistry&&) = delete;
+		EntityRegistry& operator=(EntityRegistry&&) = delete;
+
 		EntityId Create();
 		bool Destroy(EntityId entity);
 		bool IsAlive(EntityId entity) const noexcept;
@@ -34,7 +40,7 @@ namespace ECS
 			{
 				return false;
 			}
-			const bool added = m_componentTypes.GetOrCreate<T>().Add(entity, std::move(component));
+			const bool added = std::get<ComponentStorage<T>>(m_components).Add(entity, std::move(component));
 			if (added)
 			{
 				AdvanceStructureVersion();
@@ -44,17 +50,12 @@ namespace ECS
 
 		template <ComponentStorageCompatible T> bool Replace(EntityId entity, T component)
 		{
-			ComponentStorage<T>* storage = m_componentTypes.Find<T>();
-			return CanMutateStructure() && IsAlive(entity) && storage != nullptr && storage->Replace(entity, std::move(component));
+			return CanMutateStructure() && IsAlive(entity) && std::get<ComponentStorage<T>>(m_components).Replace(entity, std::move(component));
 		}
 
-		template <ComponentStorageCompatible T> const T* Get(EntityId entity) const noexcept
-		{
-			const ComponentStorage<T>* storage = m_componentTypes.Find<T>();
-			return IsAlive(entity) && storage != nullptr ? storage->Get(entity) : nullptr;
-		}
+		template <ComponentStorageCompatible T> const T* Get(EntityId entity) const noexcept { return IsAlive(entity) ? GetStorage<T>().Get(entity) : nullptr; }
 
-		template <ComponentStorageCompatible T> const ComponentStorage<T>* FindStorage() const noexcept { return m_componentTypes.Find<T>(); }
+		template <ComponentStorageCompatible T> const ComponentStorage<T>& GetStorage() const noexcept { return std::get<ComponentStorage<T>>(m_components); }
 
 	private:
 		friend class StructureFrozenEpoch;
@@ -75,11 +76,11 @@ namespace ECS
 
 		void AdvanceStructureVersion() noexcept { ++m_structureVersion; }
 
-		template <ComponentStorageCompatible T> ComponentStorage<T>* FindStorageForQuery() noexcept { return m_componentTypes.Find<T>(); }
+		template <ComponentStorageCompatible T> ComponentStorage<T>& GetStorageForQuery() noexcept { return std::get<ComponentStorage<T>>(m_components); }
 
 		std::vector<EntitySlot> m_slots;
 		std::vector<EntityId::Slot> m_freeSlots;
-		ComponentTypeRegistry m_componentTypes;
+		WorldComponentStores m_components;
 		std::size_t m_liveCount = 0;
 		std::uint64_t m_structureVersion = 0;
 		std::uint64_t m_frozenEpochGeneration = 0;

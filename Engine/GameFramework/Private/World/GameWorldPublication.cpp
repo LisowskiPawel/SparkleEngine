@@ -92,26 +92,17 @@ namespace ECS
 		next.Cameras.clear();
 		next.Lights.clear();
 		next.Meshes.clear();
-		if (const ComponentStorage<Camera>* cameras = m_registry.FindStorage<Camera>())
+		for (EntityId entity : m_registry.GetStorage<Camera>().GetEntities())
 		{
-			for (EntityId entity : cameras->GetEntities())
-			{
-				next.Cameras.push_back(BuildCameraReadData(entity));
-			}
+			next.Cameras.push_back(BuildCameraReadData(entity));
 		}
-		if (const ComponentStorage<Light>* lights = m_registry.FindStorage<Light>())
+		for (EntityId entity : m_registry.GetStorage<Light>().GetEntities())
 		{
-			for (EntityId entity : lights->GetEntities())
-			{
-				next.Lights.push_back(BuildLightReadData(entity));
-			}
+			next.Lights.push_back(BuildLightReadData(entity));
 		}
-		if (const ComponentStorage<MeshInstance>* meshes = m_registry.FindStorage<MeshInstance>())
+		for (EntityId entity : m_registry.GetStorage<MeshInstance>().GetEntities())
 		{
-			for (EntityId entity : meshes->GetEntities())
-			{
-				next.Meshes.push_back(BuildMeshReadData(entity));
-			}
+			next.Meshes.push_back(BuildMeshReadData(entity));
 		}
 		std::sort(next.Cameras.begin(), next.Cameras.end(), [](const auto& a, const auto& b) { return a.Entity < b.Entity; });
 		std::sort(next.Lights.begin(), next.Lights.end(), [](const auto& a, const auto& b) { return a.Entity < b.Entity; });

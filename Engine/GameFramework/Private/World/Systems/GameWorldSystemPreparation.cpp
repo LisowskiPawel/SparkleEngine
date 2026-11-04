@@ -9,8 +9,7 @@ namespace ECS
 {
 	template <typename T> static std::uint32_t StorageCount(const EntityRegistry& registry) noexcept
 	{
-		const ComponentStorage<T>* storage = registry.FindStorage<T>();
-		return storage == nullptr ? 0u : static_cast<std::uint32_t>(storage->GetEntities().size());
+		return static_cast<std::uint32_t>(registry.GetStorage<T>().GetEntities().size());
 	}
 
 	bool GameWorldState::PrepareSystemExecution(GameWorldResourceStores& resources)
@@ -32,11 +31,8 @@ namespace ECS
 		m_systemArena.DirtyTransforms.clear();
 		if (m_evaluateAllTransforms)
 		{
-			const ComponentStorage<LocalTransform>* transforms = m_registry.FindStorage<LocalTransform>();
-			if (transforms != nullptr)
-			{
-				m_systemArena.DirtyTransforms.assign(transforms->GetEntities().begin(), transforms->GetEntities().end());
-			}
+			const std::span<const EntityId> entities = m_registry.GetStorage<LocalTransform>().GetEntities();
+			m_systemArena.DirtyTransforms.assign(entities.begin(), entities.end());
 		}
 		else
 		{

@@ -24,28 +24,18 @@ namespace ECS
 		constexpr auto operator<=>(const ComponentStorageVersion&) const noexcept = default;
 	};
 
-	class ComponentStorageBase
-	{
-	public:
-		virtual ~ComponentStorageBase() = default;
-
-		ComponentStorageBase(const ComponentStorageBase&) = delete;
-		ComponentStorageBase& operator=(const ComponentStorageBase&) = delete;
-		ComponentStorageBase(ComponentStorageBase&&) = delete;
-		ComponentStorageBase& operator=(ComponentStorageBase&&) = delete;
-
-		virtual void Remove(EntityId entity) = 0;
-
-	protected:
-		ComponentStorageBase() = default;
-	};
-
 	template <typename T> concept ComponentStorageCompatible = std::copy_constructible<T> && std::is_copy_assignable_v<T> && std::is_nothrow_move_constructible_v<T>
 	    && std::is_nothrow_move_assignable_v<T>;
 
-	template <ComponentStorageCompatible T> class ComponentStorage final : public ComponentStorageBase
+	template <ComponentStorageCompatible T> class ComponentStorage final
 	{
 	public:
+		ComponentStorage() = default;
+		ComponentStorage(const ComponentStorage&) = delete;
+		ComponentStorage& operator=(const ComponentStorage&) = delete;
+		ComponentStorage(ComponentStorage&&) = delete;
+		ComponentStorage& operator=(ComponentStorage&&) = delete;
+
 		bool Add(EntityId entity, T component)
 		{
 			if (!entity.IsValid() || IsSlotOccupied(entity.GetSlot()) || m_entities.size() >= InvalidDenseIndex)
@@ -62,7 +52,7 @@ namespace ECS
 			return true;
 		}
 
-		void Remove(EntityId entity) override
+		void Remove(EntityId entity)
 		{
 			const std::uint32_t denseIndex = FindDenseIndex(entity);
 			if (denseIndex == InvalidDenseIndex)

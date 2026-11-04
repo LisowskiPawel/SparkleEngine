@@ -108,7 +108,7 @@ namespace ECS
 			{
 				for (const ComponentAccessDesc& right : rhs.Components)
 				{
-					if (left.Type == right.Type && (IsWrite(left.Mode) || IsWrite(right.Mode)))
+					if (left.TypeIndex == right.TypeIndex && (IsWrite(left.Mode) || IsWrite(right.Mode)))
 					{
 						return true;
 					}
@@ -208,7 +208,7 @@ namespace ECS
 			{
 				for (std::size_t right = left + 1; right < system.Components.size(); ++right)
 				{
-					if (system.Components[left].Type == system.Components[right].Type)
+					if (system.Components[left].TypeIndex == system.Components[right].TypeIndex)
 					{
 						m_data->Error = {
 						    system.Components[left].Mode == system.Components[right].Mode ? GameSystemGraphErrorCode::DuplicateAccess : GameSystemGraphErrorCode::ConflictingAccessDeclaration,

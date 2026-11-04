@@ -42,7 +42,7 @@ namespace ECS
 			return false;
 		}
 
-		m_componentTypes.RemoveEntity(entity);
+		std::apply([entity](auto&... stores) { (stores.Remove(entity), ...); }, m_components);
 		EntitySlot& entry = m_slots[entity.GetSlot()];
 		entry.Alive = false;
 		--m_liveCount;

@@ -38,6 +38,26 @@ This boundary trades direct Renderer access for deterministic publication and cl
 
 GameFramework depends on Core and Tasks but not Platform, Renderer, or RHI. It owns simulation/world truth and publishes Renderer-neutral `RenderFrameSubmission` data. This separation is a current implemented boundary, not merely an intended layering rule.
 
+### Fixed World Storage
+
+Source ownership reconciled on 2026-11-04. `WorldComponentStores` defines the
+thirteen private component stores once as a typed tuple owned directly by
+`EntityRegistry`. Its tuple position also supplies compile-time component-access
+identity for the system graph; it is neither persisted nor allocated at runtime.
+There is no runtime component registration, type-ID allocator, storage hash map
+or polymorphic storage owner. Adding a world component changes this one private
+schema rather than extending an arbitrary component framework.
+
+Every store exists for the world's lifetime. An unused component has an empty
+dense store, so queries and publication/extraction consumers borrow typed stores
+without a separate missing-store state. Stores cannot move or copy, and their
+vectors allocate payload only when populated. Entity generation checks,
+sparse/dense compaction, frozen-epoch validity, query ranges and graph hazard
+rejection retain their contracts. The empty registry contains more inline
+container metadata; populated stores avoid separate registry nodes and storage
+objects. This structural tradeoff is not a frame-time or GPU claim, and capability
+and release evidence remain with their existing owners.
+
 ### World System Scheduling
 
 The fixed world pipeline uses task-local typed outputs and world-owner commits. There is no generic structural command buffer, temporary-entity remapping, command conflict tracker, or hashed component-schema catalog. The unused private scaffolding and registry/storage bulk-add, component-removal and reset APIs were retired; scene activation, real world edits, frozen queries and render extraction retain their existing paths.
@@ -101,9 +121,26 @@ into a full baseline. Resource-only changes also advance publication. Editor pin
 the current immutable publication; there is no event taxonomy, retained change
 history, cursor replay or acknowledgement protocol between modules.
 
+Direct derived-state publication separates dirty-entity preparation from transform
+commit, then clears the dirty state and publishes. Dynamic render extraction
+orders its existing object, skinning, morph and light operations. Morph extraction
+builds entity/animation metadata before constructing packed weight ranges; both
+algorithms remain private to the existing extractor and add no state owner.
+
 ### Animation Sampling Ownership
 
 Source ownership reconciled on 2026-10-06: [AnimationSampler](../../../../../Engine/GameFramework/Private/Animation/AnimationSampler.cpp) keeps step-key selection, segment selection, alpha calculation, and cubic interpolation as file-private operations. Vector and rotation sampling retain distinct interpolation and default contracts; step selection includes keys at the requested time, while linear/cubic selection preserves the existing segment boundary rule. Empty channels return zero vectors or identity rotations, and sampled rotations remain normalized. Keyframe indices stay within the sampling call; selection and interpolation allocate no storage and retain no references. Stateless sampling and pose-composition helpers have no class shells or value-loading forwarding layer; pose, morph, skinning, and output-storage owners remain separate. Focused CPU comparisons do not establish task determinism, rendered animation, or content/runtime acceptance.
+
+### Animation Output Preparation
+
+`AnimationOutputStorage::Prepare` owns generation/structure admission, rebuild
+order and accepted cache identity. Its private operations reset outputs, build
+ordered animation work, index pose work, bind morph targets and bind skinning
+outputs. Pose-output allocation and morph-sample construction have separate
+implementations because they produce different products. The helpers borrow the
+current stores synchronously; output slots, source-instance matching, ordering and
+generation lifetime remain with the same storage owner. They introduce no
+collaborator objects, callbacks, copied context or alternate preparation path.
 
 ## Level And Cooked-Asset Capabilities
 
@@ -149,7 +186,7 @@ These checks retain their Windows x64 Game/Editor and D3D12/Vulkan product matri
 | ID | Capability | State | Exact current coverage and limit | Evidence |
 | --- | --- | --- | --- | --- |
 | `GF-009` | Entity identity/lifetime | Implemented path | Generation-aware entity IDs and registry-backed component storage; private alive checks validate typed edits, and private destruction rolls back failed scene construction. World replacement retires the previous scene. No public arbitrary entity/component creation or destruction API is exposed. | `S` |
-| `GF-010` | Fixed component types | Implemented path | 13 private runtime component types: LocalTransform, WorldTransform, CameraDerivedState, MeshInstance, Visibility, Camera, Light, AnimationState, MorphState, SkinningState, Name, AuthoredIdentity, and EditorMetadata. | `S` |
+| `GF-010` | Fixed component types | Implemented path | `WorldComponentStores` directly owns the 13 private types and defines their compile-time graph-access identity: LocalTransform, WorldTransform, CameraDerivedState, MeshInstance, Visibility, Camera, Light, AnimationState, MorphState, SkinningState, Name, AuthoredIdentity, and EditorMetadata. No runtime registration or nullable store lookup. | `S` |
 | `GF-011` | Typed queries and frozen structure | Implemented path | `Read<T>`/`Write<T>` descriptors declare system access. Index/entity-range traversal intersects component storage, prepares writes and rejects invalid ranges or expired epochs; world structure is frozen for the epoch and structural changes commit outside it. This is a purpose-built ECS, not a generic public ECS framework. | `S` |
 | `GF-012` | Compiled system graph | Implemented path | Eleven stages execute camera movement; playback; pose; morph; skinning; morph commit; system-output commit; transforms; camera derived state; mesh extraction; extraction commit. Access and dependency topology are compiled; populated ranges are materialized at host wave boundaries. | `S` |
 | `GF-013` | Parallel world evaluation | Implemented path | Camera, animation, pose, transform, and extraction systems use explicit grain/serial/partition limits through Tasks. Deterministic numerical output under different worker counts is not yet evidenced. | `S` |

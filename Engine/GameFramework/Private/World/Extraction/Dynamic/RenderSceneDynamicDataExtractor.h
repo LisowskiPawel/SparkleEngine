@@ -47,6 +47,8 @@ namespace ECS
 		    const RenderObjectDeltaExtractor& objects,
 		    RenderSceneDynamicData& dynamic);
 		void ExtractMorphWeights(GameWorldState& state, const RenderObjectDeltaExtractor& objects, RenderSceneDynamicData& dynamic);
+		void BuildMorphMetadata(GameWorldState& state);
+		void ExtractMorphWeightRanges(GameWorldState& state, const RenderObjectDeltaExtractor& objects, RenderSceneDynamicData& dynamic);
 		static void ExtractLights(const WorldReadView& readView, RenderObjectIdentityMap& identities, RenderSceneDynamicData& dynamic);
 
 		std::vector<RenderObjectDynamicData> m_publishedObjects;

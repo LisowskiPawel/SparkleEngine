@@ -11,8 +11,7 @@ namespace ECS
 {
 	bool WorldExtractionStorage::Prepare(const EntityRegistry& registry)
 	{
-		const ComponentStorage<MeshInstance>* meshes = registry.FindStorage<MeshInstance>();
-		const std::size_t meshCount = meshes == nullptr ? 0 : meshes->GetEntities().size();
+		const std::size_t meshCount = registry.GetStorage<MeshInstance>().GetEntities().size();
 		if (m_structureVersion != registry.GetStructureVersion() || m_meshSlots.size() != meshCount)
 		{
 			m_meshSlots.clear();

@@ -80,46 +80,45 @@ namespace ECS
 
 	void GameWorldState::CommitDerivedStateAndPublish()
 	{
-		std::span<const EntityId> dirtyEntities;
-		if (m_evaluateAllTransforms)
-		{
-			if (const ComponentStorage<LocalTransform>* transforms = m_registry.FindStorage<LocalTransform>())
-			{
-				dirtyEntities = transforms->GetEntities();
-			}
-		}
-		else
-		{
-			std::sort(m_dirtyTransforms.begin(), m_dirtyTransforms.end());
-			m_dirtyTransforms.erase(std::unique(m_dirtyTransforms.begin(), m_dirtyTransforms.end()), m_dirtyTransforms.end());
-			dirtyEntities = m_dirtyTransforms;
-		}
-		if (!dirtyEntities.empty())
-		{
-			for (EntityId entity : dirtyEntities)
-			{
-				if (!m_registry.IsAlive(entity))
-				{
-					continue;
-				}
-				if (const LocalTransform* local = m_registry.Get<LocalTransform>(entity))
-				{
-					WorldTransform world;
-					TransformEvaluationSystem::Evaluate(*local, world);
-					m_registry.Replace(entity, world);
-					if (m_registry.Get<Camera>(entity) != nullptr)
-					{
-						CameraDerivedState derived;
-						CameraDerivedStateEvaluationSystem::Evaluate(*local, derived);
-						m_registry.Replace(entity, derived);
-					}
-				}
-				RecordChange(entity);
-			}
-		}
+		CommitDirtyTransforms(PrepareDirtyTransforms());
 		m_dirtyTransforms.clear();
 		m_evaluateAllTransforms = false;
 		PublishPendingChanges();
+	}
+
+	std::span<const EntityId> GameWorldState::PrepareDirtyTransforms()
+	{
+		if (m_evaluateAllTransforms)
+		{
+			return m_registry.GetStorage<LocalTransform>().GetEntities();
+		}
+		std::sort(m_dirtyTransforms.begin(), m_dirtyTransforms.end());
+		m_dirtyTransforms.erase(std::unique(m_dirtyTransforms.begin(), m_dirtyTransforms.end()), m_dirtyTransforms.end());
+		return m_dirtyTransforms;
+	}
+
+	void GameWorldState::CommitDirtyTransforms(std::span<const EntityId> entities)
+	{
+		for (EntityId entity : entities)
+		{
+			if (!m_registry.IsAlive(entity))
+			{
+				continue;
+			}
+			if (const LocalTransform* local = m_registry.Get<LocalTransform>(entity))
+			{
+				WorldTransform world;
+				TransformEvaluationSystem::Evaluate(*local, world);
+				m_registry.Replace(entity, world);
+				if (m_registry.Get<Camera>(entity) != nullptr)
+				{
+					CameraDerivedState derived;
+					CameraDerivedStateEvaluationSystem::Evaluate(*local, derived);
+					m_registry.Replace(entity, derived);
+				}
+			}
+			RecordChange(entity);
+		}
 	}
 
 	void GameWorldState::PublishPendingChanges()
