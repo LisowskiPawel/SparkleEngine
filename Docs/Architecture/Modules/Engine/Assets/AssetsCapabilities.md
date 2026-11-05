@@ -37,6 +37,19 @@ Every arrow is owned elsewhere. The corpus owns source bytes and licenses only; 
 
 ## Tracked Corpus
 
+**Shader responsibility boundaries, 2026-11-05:** raster and ray-traced materials
+share [texture-slot/flag semantics](../../../../../Engine/Assets/Shaders/Material/MaterialTextureSlots.hlsli).
+Raster filtering and bindless ray-tracing sampling retain their different owners.
+[Ray material sampling](../../../../../Engine/Assets/Shaders/RayTracing/RayTracingMaterialSampling.hlsli)
+assembles properties through guarded modulation, normal decoding and occlusion
+operations. Its three typed modulation overloads preserve scalar, RGB and RGBA
+component selection without adding vector-conversion instructions. Texture gates,
+defaults, read order and alpha rejection remain unchanged.
+
+Reference transport keeps its cohesive estimator and continuation in one loop,
+preserving the existing SPIR-V control flow. Bounded compilation, ABI and
+temporary cooked-product round trips do not establish GPU images or timing.
+
 | ID | Family | Current content and purpose | Coverage boundary | Evidence |
 | --- | --- | --- | --- | --- |
 | `EASSET-001` | Shader entry sources | 29 `.hlsl` files implement registered compute, raster, ray-tracing, lighting, post, presentation, and debug entry points. Exact registrations are in the [Shader Program Catalog](../Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md). | An `.hlsl` file without a typed registration is not a runtime shader capability. | `S` |
