@@ -44,5 +44,5 @@ private:
 	FrameGraphRecordingExecutor m_recordingExecutor;
 	std::span<RhiSubmissionToken> m_batchTokens;
 	RhiSubmissionToken m_initializationToken{};
-	bool m_initialGraphicsListAvailable = true;
+	bool m_bInitialGraphicsListAvailable = true;
 };

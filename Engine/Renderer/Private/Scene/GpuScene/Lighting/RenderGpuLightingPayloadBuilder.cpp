@@ -56,7 +56,7 @@ void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, Re
 		        .Illuminance = light.illuminance,
 		        .Color = {light.color.x, light.color.y, light.color.z},
 		        .AngularSizeRadians = light.angularSizeRadians,
-		        .CastShadow = light.castShadow ? 1u : 0u});
+		        .CastShadow = light.bCastShadow ? 1u : 0u});
 	}
 
 	for (std::size_t lightIndex = 0; lightIndex < pointLightCount; ++lightIndex)
@@ -71,7 +71,7 @@ void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, Re
 		        .LuminousIntensity = light.luminousIntensity,
 		        .DistanceAttenuationCoefficients = light.distanceAttenuationCoefficients,
 		        .Radius = light.radius,
-		        .CastShadow = light.castShadow ? 1u : 0u});
+		        .CastShadow = light.bCastShadow ? 1u : 0u});
 	}
 
 	for (std::size_t lightIndex = 0; lightIndex < spotLightCount; ++lightIndex)
@@ -89,7 +89,7 @@ void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, Re
 		        .DistanceAttenuationCoefficients = light.distanceAttenuationCoefficients,
 		        .Radius = light.radius,
 		        .OuterAngleCosine = light.outerAngleCosine,
-		        .CastShadow = light.castShadow ? 1u : 0u});
+		        .CastShadow = light.bCastShadow ? 1u : 0u});
 	}
 
 	for (std::size_t lightIndex = 0; lightIndex < rectLightCount; ++lightIndex)
@@ -105,6 +105,6 @@ void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, Re
 		        .Tangent = {light.tangent.x, light.tangent.y, light.tangent.z},
 		        .Luminance = light.luminance,
 		        .Color = {light.color.x, light.color.y, light.color.z},
-		        .CastShadow = light.castShadow ? 1u : 0u});
+		        .CastShadow = light.bCastShadow ? 1u : 0u});
 	}
 }

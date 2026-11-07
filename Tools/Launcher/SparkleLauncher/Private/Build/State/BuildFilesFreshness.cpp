@@ -12,9 +12,9 @@
 
 namespace SparkleLauncher
 {
-	static std::string ToCMakeBool(bool value)
+	static std::string ToCMakeBool(bool bValue)
 	{
-		return value ? "ON" : "OFF";
+		return bValue ? "ON" : "OFF";
 	}
 
 	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain)
@@ -64,10 +64,10 @@ namespace SparkleLauncher
 		}
 
 		const WorkspaceFeatureSettings featureSettings = GetLauncherWorkspaceFeatureSettings();
-		const std::string selectedContentPipeline = ToCMakeBool(featureSettings.ContentPipelineEnabled);
-		const std::string selectedShaderCompiler = ToCMakeBool(featureSettings.ShaderCompilerEnabled);
-		const std::string selectedKtxSupport = ToCMakeBool(featureSettings.KtxSupportEnabled);
-		const std::string selectedNvidiaStreamline = ToCMakeBool(featureSettings.NvidiaStreamlineEnabled);
+		const std::string selectedContentPipeline = ToCMakeBool(featureSettings.bContentPipelineEnabled);
+		const std::string selectedShaderCompiler = ToCMakeBool(featureSettings.bShaderCompilerEnabled);
+		const std::string selectedKtxSupport = ToCMakeBool(featureSettings.bKtxSupportEnabled);
+		const std::string selectedNvidiaStreamline = ToCMakeBool(featureSettings.bNvidiaStreamlineEnabled);
 		const std::string cacheContentPipeline = ReadCMakeCacheValue(status.CachePath, "SPARKLE_ENABLE_CONTENT_PIPELINE").value_or(std::string());
 		const std::string cacheShaderCompiler = ReadCMakeCacheValue(status.CachePath, "SPARKLE_ENABLE_SHADER_COMPILER").value_or(std::string());
 		const std::string cacheKtxSupport = ReadCMakeCacheValue(status.CachePath, "SPARKLE_ENABLE_KTX_SUPPORT").value_or(std::string());
@@ -87,25 +87,25 @@ namespace SparkleLauncher
 			return status;
 		}
 
-		const bool stampGeneratorMatches = ReadBuildFilesFreshnessStampValue(status.StampPath, "generator").value_or(std::string()) == toolchain.Generator;
-		const bool stampPlatformMatches = stampGeneratorMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "platform").value_or(std::string()) == toolchain.Platform;
-		const bool stampToolsetMatches = stampPlatformMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "toolset").value_or(std::string()) == toolchain.Toolset;
-		const bool stampQtMatches = stampToolsetMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "qtRoot").value_or(std::string()) == selectedQtPrefixPath;
-		const bool stampVulkanMatches = stampQtMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "vulkanSdkRoot").value_or(std::string()) == selectedVulkanSdkRoot;
+		const bool bStampGeneratorMatches = ReadBuildFilesFreshnessStampValue(status.StampPath, "generator").value_or(std::string()) == toolchain.Generator;
+		const bool bStampPlatformMatches = bStampGeneratorMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "platform").value_or(std::string()) == toolchain.Platform;
+		const bool bStampToolsetMatches = bStampPlatformMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "toolset").value_or(std::string()) == toolchain.Toolset;
+		const bool bStampQtMatches = bStampToolsetMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "qtRoot").value_or(std::string()) == selectedQtPrefixPath;
+		const bool bStampVulkanMatches = bStampQtMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "vulkanSdkRoot").value_or(std::string()) == selectedVulkanSdkRoot;
 
-		if (!stampVulkanMatches)
+		if (!bStampVulkanMatches)
 		{
 			status.State = BuildFilesFreshnessState::FreshnessStampMismatch;
 			status.Summary = "Freshness stamp generator/platform/toolset/Qt prefix/Vulkan SDK differs from selected launcher toolchain.";
 			return status;
 		}
 
-		const bool stampContentPipelineMatches = ReadBuildFilesFreshnessStampValue(status.StampPath, "contentPipeline").value_or(std::string()) == selectedContentPipeline;
-		const bool stampShaderCompilerMatches = stampContentPipelineMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "shaderCompiler").value_or(std::string()) == selectedShaderCompiler;
-		const bool stampKtxMatches = stampShaderCompilerMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "ktxSupport").value_or(std::string()) == selectedKtxSupport;
-		const bool stampStreamlineMatches = stampKtxMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "nvidiaStreamline").value_or(std::string()) == selectedNvidiaStreamline;
+		const bool bStampContentPipelineMatches = ReadBuildFilesFreshnessStampValue(status.StampPath, "contentPipeline").value_or(std::string()) == selectedContentPipeline;
+		const bool bStampShaderCompilerMatches = bStampContentPipelineMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "shaderCompiler").value_or(std::string()) == selectedShaderCompiler;
+		const bool bStampKtxMatches = bStampShaderCompilerMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "ktxSupport").value_or(std::string()) == selectedKtxSupport;
+		const bool bStampStreamlineMatches = bStampKtxMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "nvidiaStreamline").value_or(std::string()) == selectedNvidiaStreamline;
 
-		if (!stampStreamlineMatches)
+		if (!bStampStreamlineMatches)
 		{
 			status.State = BuildFilesFreshnessState::FeatureSetMismatch;
 			status.Summary = "Build-file freshness stamp workspace feature toggles differ from the launcher feature set.";
@@ -141,7 +141,7 @@ namespace SparkleLauncher
 		}
 
 		status.State = BuildFilesFreshnessState::Current;
-		status.Current = true;
+		status.bCurrent = true;
 		status.Summary = "Build files are current.";
 		return status;
 	}
@@ -180,10 +180,10 @@ namespace SparkleLauncher
 		       << "    \"toolset\": \"" << Strings::EscapeJsonString(toolchain.Toolset) << "\",\n"
 		       << "    \"qtRoot\": \"" << Strings::EscapeJsonString(toolchain.QtRootPath.generic_string()) << "\",\n"
 		       << "    \"vulkanSdkRoot\": \"" << Strings::EscapeJsonString(toolchain.VulkanSdkRoot.generic_string()) << "\",\n"
-		       << "    \"contentPipeline\": \"" << ToCMakeBool(featureSettings.ContentPipelineEnabled) << "\",\n"
-		       << "    \"shaderCompiler\": \"" << ToCMakeBool(featureSettings.ShaderCompilerEnabled) << "\",\n"
-		       << "    \"ktxSupport\": \"" << ToCMakeBool(featureSettings.KtxSupportEnabled) << "\",\n"
-		       << "    \"nvidiaStreamline\": \"" << ToCMakeBool(featureSettings.NvidiaStreamlineEnabled) << "\",\n"
+		       << "    \"contentPipeline\": \"" << ToCMakeBool(featureSettings.bContentPipelineEnabled) << "\",\n"
+		       << "    \"shaderCompiler\": \"" << ToCMakeBool(featureSettings.bShaderCompilerEnabled) << "\",\n"
+		       << "    \"ktxSupport\": \"" << ToCMakeBool(featureSettings.bKtxSupportEnabled) << "\",\n"
+		       << "    \"nvidiaStreamline\": \"" << ToCMakeBool(featureSettings.bNvidiaStreamlineEnabled) << "\",\n"
 		       << "    \"sourceListHash\": \"" << *sourceListHash << "\",\n"
 		       << "    \"updatedUtc\": \"" << BuildUtcTimestamp() << "\"\n"
 		       << "}\n";

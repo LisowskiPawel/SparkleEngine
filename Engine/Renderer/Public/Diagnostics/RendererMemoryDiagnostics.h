@@ -35,9 +35,9 @@ struct SPARKLE_RENDERER_API TextureStreamingMemoryPolicySnapshot final
 {
 	RendererMemoryPressureLevel OverallPressure = RendererMemoryPressureLevel::Normal;
 	RendererMemoryPressureLevel TexturePressure = RendererMemoryPressureLevel::Normal;
-	bool ShouldConserveTextureMemory = false;
-	bool ShouldPreferMipDemotion = false;
-	bool ShouldBlockMipPromotion = false;
+	bool bShouldConserveTextureMemory = false;
+	bool bShouldPreferMipDemotion = false;
+	bool bShouldBlockMipPromotion = false;
 };
 
 struct SPARKLE_RENDERER_API SceneMemoryReport final
@@ -52,7 +52,7 @@ struct SPARKLE_RENDERER_API SceneMemoryReport final
 
 struct SPARKLE_RENDERER_API RendererMemoryDiagnosticsSnapshot final
 {
-	bool Available = false;
+	bool bAvailable = false;
 	std::uint64_t LastPollFrame = 0;
 	std::uint32_t PollIntervalFrames = 0;
 	RendererMemoryPressureLevel OverallPressure = RendererMemoryPressureLevel::Normal;

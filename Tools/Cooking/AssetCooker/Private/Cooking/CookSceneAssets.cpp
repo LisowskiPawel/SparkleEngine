@@ -14,9 +14,9 @@ bool CookSceneAssets(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnost
 		progress.Report(event);
 	};
 
-	const bool scenesCooked = AssetCookerSceneBatch::Execute(plan.sceneEntries, diagnostics, reportProgress);
+	const bool bScenesCooked = AssetCookerSceneBatch::Execute(plan.sceneEntries, diagnostics, reportProgress);
 
-	if (!scenesCooked)
+	if (!bScenesCooked)
 	{
 		return false;
 	}

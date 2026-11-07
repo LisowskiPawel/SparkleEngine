@@ -99,7 +99,7 @@ void FrameGraph::SyncImportedColorViews(FrameGraphResourceHandle handle, const F
 	{
 		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
 
-		access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
+		access.bOwnsShaderResourceView = static_cast<bool>(access.shaderResourceView);
 	}
 
 	if (RequiresUnorderedAccessView(m_compiledPlan, handle))
@@ -128,7 +128,7 @@ void FrameGraph::SyncImportedDepthViews(FrameGraphResourceHandle handle, const F
 	{
 		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(RhiResourceViewDesc::TextureShaderResource(access.resource, metadata.textureDesc.format));
 
-		access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
+		access.bOwnsShaderResourceView = static_cast<bool>(access.shaderResourceView);
 	}
 }
 
@@ -139,7 +139,7 @@ void FrameGraph::SyncImportedBufferViews(FrameGraphResourceHandle handle, const 
 		access.shaderResourceView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
 		    RhiResourceViewDesc::BufferShaderResource(access.resource, metadata.bufferDesc.sizeInBytes, metadata.bufferDesc.strideInBytes));
 
-		access.ownsShaderResourceView = static_cast<bool>(access.shaderResourceView);
+		access.bOwnsShaderResourceView = static_cast<bool>(access.shaderResourceView);
 	}
 
 	if (RequiresUnorderedAccessView(m_compiledPlan, handle))
@@ -198,12 +198,12 @@ void FrameGraph::ReleaseExternalResourceViews(FrameGraphResourceHandle handle) n
 
 	if (access.shaderResourceView)
 	{
-		if (access.ownsShaderResourceView)
+		if (access.bOwnsShaderResourceView)
 		{
 			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(access.shaderResourceView);
 		}
 		access.shaderResourceView = {};
-		access.ownsShaderResourceView = false;
+		access.bOwnsShaderResourceView = false;
 	}
 
 	if (access.unorderedAccessView)

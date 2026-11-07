@@ -362,7 +362,7 @@ namespace SparkleLauncher
 		{
 			if (const std::optional<std::filesystem::path> path = FindExecutableOnPath(candidateName))
 			{
-				result.Found = true;
+				result.bFound = true;
 				result.Path = *path;
 				return result;
 			}
@@ -370,7 +370,7 @@ namespace SparkleLauncher
 
 		if (const std::optional<std::filesystem::path> path = FindExistingExecutable(GetKnownInstallCandidates(tool)))
 		{
-			result.Found = true;
+			result.bFound = true;
 			result.Path = *path;
 			return result;
 		}

@@ -13,17 +13,17 @@ struct RayTracingTlasProviderCapabilityReport final
 struct RayTracingPtlasCapabilityReport final
 {
 	ERhiPtlasProvider Provider = ERhiPtlasProvider::None;
-	bool Supported = false;
-	bool SupportsDescriptor = false;
+	bool bSupported = false;
+	bool bSupportsDescriptor = false;
 	const char* CapabilityStatusReason = "not-queried";
 };
 
 struct RayTracingCapabilityReport final
 {
-	bool SupportsAccelerationStructure = false;
-	bool SupportsInlineRayQuery = false;
-	bool SupportsRayTracingPipeline = false;
-	bool SupportsDescriptorIndexing = false;
+	bool bSupportsAccelerationStructure = false;
+	bool bSupportsInlineRayQuery = false;
+	bool bSupportsRayTracingPipeline = false;
+	bool bSupportsDescriptorIndexing = false;
 	RayTracingTlasProviderCapabilityReport TlasProvider;
 	RayTracingPtlasCapabilityReport Ptlas;
 };

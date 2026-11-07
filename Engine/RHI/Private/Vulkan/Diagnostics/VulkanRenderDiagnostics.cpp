@@ -189,7 +189,7 @@ private:
 		}
 
 		// Host resets keep timestamp writes valid inside render passes as well as outside them.
-		if (!m_rhi.GetFeatureStatus().EnabledHostQueryReset)
+		if (!m_rhi.GetFeatureStatus().bEnabledHostQueryReset)
 		{
 			return;
 		}
@@ -289,7 +289,7 @@ std::unique_ptr<RenderDiagnostics> CreateVulkanRenderDiagnostics(VulkanRhi& rhi,
 {
 	const bool bSupportsGpuEventsUtilsLabel = rhi.GetSetDebugUtilsObjectName() != nullptr && rhi.GetCmdBeginDebugUtilsLabel() != nullptr;
 	const bool bSupportsGpuEventsUtilsLabel2 = bSupportsGpuEventsUtilsLabel && (rhi.GetCmdEndDebugUtilsLabel() != nullptr);
-	const bool supportsGpuEvents = bSupportsGpuEventsUtilsLabel2 && (rhi.GetCmdInsertDebugUtilsLabel() != nullptr);
+	const bool bSupportsGpuEvents = bSupportsGpuEventsUtilsLabel2 && (rhi.GetCmdInsertDebugUtilsLabel() != nullptr);
 
 	return CreateRhiDiagnosticsComposition(
 	    std::make_unique<VulkanRenderObjectDiagnostics>(rhi),
@@ -297,5 +297,5 @@ std::unique_ptr<RenderDiagnostics> CreateVulkanRenderDiagnostics(VulkanRhi& rhi,
 	    std::make_unique<VulkanRenderMessageDiagnostics>(rhi),
 	    nullptr,
 	    std::make_unique<VulkanRenderMemoryDiagnostics>(memoryAllocator),
-	    supportsGpuEvents);
+	    bSupportsGpuEvents);
 }

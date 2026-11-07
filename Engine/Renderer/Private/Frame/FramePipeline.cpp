@@ -35,7 +35,7 @@ FramePipeline::FramePipeline(
     RendererMemoryMonitor& memoryMonitor,
     TaskExecutor& taskExecutor,
     TaskScope& assetTaskParentScope,
-    bool enableUiRenderPackets) :
+    bool bEnableUiRenderPackets) :
     m_window(window),
     m_deviceServices(deviceServices),
     m_renderPassRuntimeCache(renderPassRuntimeCache),
@@ -68,7 +68,7 @@ FramePipeline::FramePipeline(
 
 	m_referencePathTracerSession = std::make_unique<ReferencePathTracerSession>(m_deviceServices, m_memoryMonitor, m_renderScene->GetRayTracingScene());
 
-	m_uiFrameRenderer = std::make_unique<UiFrameRenderer>(m_deviceServices, enableUiRenderPackets);
+	m_uiFrameRenderer = std::make_unique<UiFrameRenderer>(m_deviceServices, bEnableUiRenderPackets);
 	m_viewportCaptureService = std::make_unique<ViewportCaptureService>(m_deviceServices);
 	m_windowExtent = {static_cast<std::uint32_t>(m_window.GetWidth()), static_cast<std::uint32_t>(m_window.GetHeight())};
 
@@ -132,11 +132,11 @@ TextureDiagnosticsSnapshot FramePipeline::CaptureTextureDiagnostics()
 	return m_textureCache->CaptureDiagnosticsSnapshot([this](std::uint64_t nativeTextureId) { return m_uiFrameRenderer->RegisterUiTexture(nativeTextureId); });
 }
 
-void FramePipeline::RequestResize(RenderViewportExtent extent, bool minimized) noexcept
+void FramePipeline::RequestResize(RenderViewportExtent extent, bool bMinimized) noexcept
 {
 	m_windowExtent = extent;
-	m_windowMinimized = minimized;
-	m_resizePending = true;
+	m_bWindowMinimized = bMinimized;
+	m_bResizePending = true;
 }
 
 void FramePipeline::OnRender(RenderFrameSubmission submission, const RenderFrameTime& time, const UiRenderPacket& ui) noexcept
@@ -184,14 +184,14 @@ bool FramePipeline::AcceptFrameSubmission(RenderFrameSubmission& submission) noe
 		return false;
 	}
 
-	const bool sceneReset = submission.Scene.Structural.ResetScene;
+	const bool bSceneReset = submission.Scene.Structural.bResetScene;
 	if (!m_renderScene->Apply(submission.Scene.Structural, std::move(submission.Scene.Dynamic)))
 	{
 		return false;
 	}
 
 	m_frameId = submission.FrameId;
-	if (sceneReset)
+	if (bSceneReset)
 	{
 		m_textureCache->UnloadSceneTextures();
 		InvalidateViewHistory(RenderViewInvalidationReason::SceneGeneration);
@@ -232,8 +232,8 @@ void FramePipeline::PrepareRenderingState(RenderFrame& frame)
 	UpdateFrameHistory(*m_frameGraph, m_frameResources.History, frame.View);
 	m_restirLightingHistory.Update(*m_frameGraph, m_frameResources.History, frame, *m_imageProviders);
 
-	m_frameGraphExecutable = m_referencePathTracerSession->PrepareFrame(frame, m_viewportRenderRequest.RenderAction, m_viewportRenderRequest.RenderActionSequence);
-	if (m_frameGraphExecutable)
+	m_bFrameGraphExecutable = m_referencePathTracerSession->PrepareFrame(frame, m_viewportRenderRequest.RenderAction, m_viewportRenderRequest.RenderActionSequence);
+	if (m_bFrameGraphExecutable)
 	{
 		m_imageProviders->SetupFrame(frame.View, frame.Identity);
 	}
@@ -301,7 +301,7 @@ void FramePipeline::SubmitAndPresent(const UiRenderPacket& packet) noexcept
 void FramePipeline::RecordFrameSubmission() noexcept
 {
 	const RhiSubmissionToken graphicsToken = m_deviceServices.GetLastSubmittedToken(ERhiQueueType::Graphics);
-	if (m_frameGraphExecutable)
+	if (m_bFrameGraphExecutable)
 	{
 		m_referencePathTracerSession->OnFrameSubmitted(graphicsToken);
 	}

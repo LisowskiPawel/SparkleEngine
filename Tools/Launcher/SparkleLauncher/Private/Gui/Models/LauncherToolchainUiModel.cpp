@@ -4,30 +4,30 @@
 
 namespace SparkleLauncher
 {
-	QString ToolchainStatusState(ToolchainItemState state, bool required)
+	QString ToolchainStatusState(ToolchainItemState state, bool bRequired)
 	{
 		switch (state)
 		{
 			case ToolchainItemState::Found:
 				return "ok";
 			case ToolchainItemState::Warning:
-				return required ? "warning" : "neutral";
+				return bRequired ? "warning" : "neutral";
 			case ToolchainItemState::Missing:
-				return required ? "bad" : "neutral";
+				return bRequired ? "bad" : "neutral";
 		}
 		return "neutral";
 	}
 
-	QString ToolchainStatusText(ToolchainItemState state, bool required)
+	QString ToolchainStatusText(ToolchainItemState state, bool bRequired)
 	{
 		switch (state)
 		{
 			case ToolchainItemState::Found:
-				return required ? "Ready" : "Available";
+				return bRequired ? "Ready" : "Available";
 			case ToolchainItemState::Warning:
-				return required ? "Warning" : "Not installed";
+				return bRequired ? "Warning" : "Not installed";
 			case ToolchainItemState::Missing:
-				return required ? "Missing" : "Not installed";
+				return bRequired ? "Missing" : "Not installed";
 		}
 		return "Unknown";
 	}
@@ -46,7 +46,7 @@ namespace SparkleLauncher
 		QStringList problems;
 		for (const ToolchainItemStatus& item : toolchain.Items)
 		{
-			if (!item.Required || item.State == ToolchainItemState::Found)
+			if (!item.bRequired || item.State == ToolchainItemState::Found)
 			{
 				continue;
 			}

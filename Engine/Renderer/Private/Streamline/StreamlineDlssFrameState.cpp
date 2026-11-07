@@ -15,7 +15,7 @@ RenderViewportExtent StreamlineDlssFrameState::StoreResolution(RenderViewportExt
 {
 	m_resolvedOutputExtent = outputExtent;
 	m_resolvedRenderExtent = providerRenderExtent;
-	m_frameValid = false;
+	m_bFrameValid = false;
 	return providerRenderExtent;
 }
 
@@ -26,10 +26,10 @@ void StreamlineDlssFrameState::SetupFrame(const ImageProviderFrameInput& frameIn
 	if (qualityMode != m_qualityMode)
 	{
 		m_qualityMode = qualityMode;
-		m_frameInput.ResetHistory = true;
+		m_frameInput.bResetHistory = true;
 	}
 
-	m_frameValid = m_resolvedRenderExtent.IsValid() && frameInput.OutputExtent == m_resolvedOutputExtent && frameInput.RenderExtent == m_resolvedRenderExtent;
+	m_bFrameValid = m_resolvedRenderExtent.IsValid() && frameInput.OutputExtent == m_resolvedOutputExtent && frameInput.RenderExtent == m_resolvedRenderExtent;
 }
 
 void StreamlineDlssFrameState::Reset() noexcept
@@ -37,5 +37,5 @@ void StreamlineDlssFrameState::Reset() noexcept
 	m_frameInput = {};
 	m_resolvedOutputExtent = {};
 	m_resolvedRenderExtent = {};
-	m_frameValid = false;
+	m_bFrameValid = false;
 }

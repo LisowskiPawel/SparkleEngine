@@ -26,7 +26,7 @@ namespace SparkleLauncher
 		request.GameProfile = model.GameProfile;
 		request.PreferredIde = model.WorkspaceIdePreference;
 		request.Compiler = model.WorkspaceCompilerPreference;
-		request.ForceConfigure = false;
+		request.bForceConfigure = false;
 		return request;
 	}
 
@@ -37,8 +37,8 @@ namespace SparkleLauncher
 		request.ContentId = model.ContentId;
 		request.GameProfile = model.GameProfile;
 		request.Mode = arguments.RequestedCookMode;
-		request.ShaderEnableDebugInfo = arguments.ShaderSymbols;
-		request.ForceRecookConfirmed = arguments.ForceRecookConfirmed;
+		request.bShaderEnableDebugInfo = arguments.bShaderSymbols;
+		request.bForceRecookConfirmed = arguments.bForceRecookConfirmed;
 		request.SelectedScopes = {CookWorkspaceScope::Shaders, CookWorkspaceScope::Textures, CookWorkspaceScope::SceneAssets};
 		return request;
 	}
@@ -76,13 +76,13 @@ namespace SparkleLauncher
 		request.ContentId = model.ContentId;
 		request.EditorProfile = model.EditorProfile;
 		request.RequestedCleanScope = arguments.RequestedCleanScope;
-		request.DestructiveActionConfirmed = arguments.CleanConfirmed;
+		request.bDestructiveActionConfirmed = arguments.bCleanConfirmed;
 		return request;
 	}
 
 	void AppendBuildPlanDryRun(LauncherShellModel& model, const BuildWorkspaceOperationPlan& plan)
 	{
-		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.CanRun ? "Ready" : "Blocked") + "]");
+		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.bCanRun ? "Ready" : "Blocked") + "]");
 		model.JobOutput.push_back("Editor profile: " + model.EditorProfile);
 		model.JobOutput.push_back("Game profile: " + model.GameProfile);
 		model.JobOutput.push_back("Workspace IDE: " + DisplayName(model.WorkspaceIdePreference));
@@ -102,12 +102,12 @@ namespace SparkleLauncher
 
 	void AppendCookPlanDryRun(LauncherShellModel& model, const CookOperationPlan& plan)
 	{
-		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.CanRun ? "Ready" : "Blocked") + "]");
+		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.bCanRun ? "Ready" : "Blocked") + "]");
 		model.JobOutput.push_back("Game profile: " + model.GameProfile);
 		model.JobOutput.push_back("Cook mode: " + ToString(plan.Request.Mode));
 		model.JobOutput.push_back("Cooked output: " + plan.CookedOutputDirectory.string());
 		model.JobOutput.push_back("Latest log: " + plan.Operation.LogPath.string());
-		if (plan.Operation.RequiresConfirmation)
+		if (plan.Operation.bRequiresConfirmation)
 		{
 			model.JobOutput.push_back("Confirmation required: " + ToString(plan.Operation.DestructiveScope));
 		}
@@ -125,7 +125,7 @@ namespace SparkleLauncher
 
 	void AppendLevelPlanDryRun(LauncherShellModel& model, const LevelOperationPlan& plan)
 	{
-		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.CanRun ? "Ready" : "Blocked") + "]");
+		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.bCanRun ? "Ready" : "Blocked") + "]");
 		model.JobOutput.push_back("Content: " + model.ContentId);
 		for (const std::string& levelId : plan.Request.RequestedLevelIds)
 		{
@@ -146,7 +146,7 @@ namespace SparkleLauncher
 
 	void AppendLevelRunPlanDryRun(LauncherShellModel& model, const LevelRunOperationPlan& plan)
 	{
-		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.CanRun ? "Ready" : "Blocked") + "]");
+		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.bCanRun ? "Ready" : "Blocked") + "]");
 		for (const std::string& message : plan.ReadinessMessages)
 		{
 			model.JobOutput.push_back("Readiness: " + message);
@@ -161,11 +161,11 @@ namespace SparkleLauncher
 
 	void AppendMaintenancePlanDryRun(LauncherShellModel& model, const MaintenanceOperationPlan& plan)
 	{
-		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.CanRun ? "Ready" : "Blocked") + "]");
+		model.JobOutput.push_back(plan.Operation.DisplayName + " [" + std::string(plan.bCanRun ? "Ready" : "Blocked") + "]");
 		model.JobOutput.push_back("Editor profile: " + model.EditorProfile);
 		model.JobOutput.push_back("Clean scope: " + ToString(plan.Request.RequestedCleanScope));
 		model.JobOutput.push_back("Latest log: " + plan.Operation.LogPath.string());
-		if (plan.Operation.RequiresConfirmation)
+		if (plan.Operation.bRequiresConfirmation)
 		{
 			model.JobOutput.push_back("Confirmation required: " + ToString(plan.Operation.DestructiveScope));
 		}

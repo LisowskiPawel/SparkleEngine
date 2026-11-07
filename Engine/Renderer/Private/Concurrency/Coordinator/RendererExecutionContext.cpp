@@ -17,7 +17,7 @@ RendererExecutionContext::RendererExecutionContext(Window& window, const RhiDevi
 #endif
 	m_rendererHost = std::make_unique<RendererHost>(window, deviceLaunch);
 
-	m_pipeline = m_rendererHost->CreateFramePipeline(*executionConfig.AssetTaskExecutor, *executionConfig.AssetTaskParentScope, executionConfig.EnableUiRenderPackets);
+	m_pipeline = m_rendererHost->CreateFramePipeline(*executionConfig.AssetTaskExecutor, *executionConfig.AssetTaskParentScope, executionConfig.bEnableUiRenderPackets);
 }
 
 RendererExecutionContext::~RendererExecutionContext() noexcept
@@ -34,7 +34,7 @@ void RendererExecutionContext::ExecuteFrame(RenderExecutionRequest request) noex
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	if (m_externalCapture)
 	{
-		ValidateExternalCaptureContext(*m_externalCapture, m_pipeline->GetViewportRequestGeneration(), request.Submission.Scene.Structural.ResetScene);
+		ValidateExternalCaptureContext(*m_externalCapture, m_pipeline->GetViewportRequestGeneration(), request.Submission.Scene.Structural.bResetScene);
 	}
 #endif
 	m_pipeline->OnRender(std::move(request.Submission), request.Time, request.Ui);

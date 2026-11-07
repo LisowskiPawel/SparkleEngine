@@ -31,7 +31,7 @@ struct VulkanGpuAllocationRecord final
 	VkDeviceAddress DeviceAddress = 0;
 	VkDeviceAddress BufferDeviceAddress = 0;
 	VkAccelerationStructureTypeKHR AccelerationStructureType = VK_ACCELERATION_STRUCTURE_TYPE_MAX_ENUM_KHR;
-	bool IsPtlas = false;
+	bool bIsPtlas = false;
 	VmaAllocation_T* Allocation = nullptr;
 	VulkanGpuMemoryBlockRecord* ParentMemoryBlock = nullptr;
 	VulkanGpuAllocationResourceKind ResourceKind = VulkanGpuAllocationResourceKind::Unknown;
@@ -49,10 +49,10 @@ struct VulkanGpuAllocationRecord final
 	VkFlags Usage = 0;
 	std::wstring DebugName;
 	VulkanGpuMemoryAllocator* Owner = nullptr;
-	bool IsMapped = false;
+	bool bIsMapped = false;
 	void* CpuMappedAddress = nullptr;
-	bool OwnsAllocation = true;
-	bool PendingRelease = false;
+	bool bOwnsAllocation = true;
+	bool bPendingRelease = false;
 	RhiSubmissionState LastUse;
 	std::atomic<std::uint32_t> RecordingReferenceCount = 0;
 

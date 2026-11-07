@@ -87,24 +87,24 @@ static bool QueryShowControlIntent(const CVarControlExecutor& executor, std::arr
 	return true;
 }
 
-static void SetShowControlIntent(const CVarControlExecutor& executor, std::span<const ShowControl> leaves, bool enabled, std::string& error)
+static void SetShowControlIntent(const CVarControlExecutor& executor, std::span<const ShowControl> leaves, bool bEnabled, std::string& error)
 {
 	CVarControlRequest request;
 	request.Operation = CVarControlOperation::Set;
 	request.Entries.reserve(leaves.size());
 	for (const ShowControl& leaf : leaves)
 	{
-		request.Entries.push_back({leaf.CVarName, enabled ? "true" : "false"});
+		request.Entries.push_back({leaf.CVarName, bEnabled ? "true" : "false"});
 	}
 	error = executor(std::move(request)).Error;
 }
 
-static void DrawShowControl(const ShowControl& control, bool enabled, const CVarControlExecutor& executor, std::string& error)
+static void DrawShowControl(const ShowControl& control, bool bEnabled, const CVarControlExecutor& executor, std::string& error)
 {
-	const EditorWidgets::MenuCheckState state = enabled ? EditorWidgets::MenuCheckState::Checked : EditorWidgets::MenuCheckState::Unchecked;
+	const EditorWidgets::MenuCheckState state = bEnabled ? EditorWidgets::MenuCheckState::Checked : EditorWidgets::MenuCheckState::Unchecked;
 	if (EditorWidgets::DrawMenuItem(control.Label, control.Icon, state, ImGuiSelectableFlags_NoAutoClosePopups))
 	{
-		SetShowControlIntent(executor, std::span(&control, 1), !enabled, error);
+		SetShowControlIntent(executor, std::span(&control, 1), !bEnabled, error);
 	}
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 	{
@@ -129,19 +129,19 @@ static void DrawShowControlGroup(
 	{
 		return;
 	}
-	bool anyEnabled = false;
-	bool allEnabled = true;
-	for (bool enabled : intent)
+	bool bAnyEnabled = false;
+	bool bAllEnabled = true;
+	for (bool bEnabled : intent)
 	{
-		anyEnabled |= enabled;
-		allEnabled &= enabled;
+		bAnyEnabled |= bEnabled;
+		bAllEnabled &= bEnabled;
 	}
-	const EditorWidgets::MenuCheckState groupState = allEnabled ? EditorWidgets::MenuCheckState::Checked : anyEnabled ? EditorWidgets::MenuCheckState::Mixed : EditorWidgets::MenuCheckState::Unchecked;
+	const EditorWidgets::MenuCheckState groupState = bAllEnabled ? EditorWidgets::MenuCheckState::Checked : bAnyEnabled ? EditorWidgets::MenuCheckState::Mixed : EditorWidgets::MenuCheckState::Unchecked;
 	if (EditorWidgets::DrawMenuItem("All", EditorIcons::EditorIcon::None, groupState, ImGuiSelectableFlags_NoAutoClosePopups))
 	{
-		SetShowControlIntent(executor, leaves, !anyEnabled, error);
+		SetShowControlIntent(executor, leaves, !bAnyEnabled, error);
 	}
-	if (anyEnabled && !allEnabled && ImGui::IsItemHovered())
+	if (bAnyEnabled && !bAllEnabled && ImGui::IsItemHovered())
 	{
 		ImGui::SetTooltip("Mixed selection. Toggle to disable all %s controls.", label);
 	}
@@ -158,9 +158,9 @@ static float MeasureShowMenuWidth()
 	float menuWidth = EditorWidgets::MeasureMenuRow("Use Defaults", EditorWidgets::MenuRowKind::Action);
 	for (const ShowMenuEntry& group : showMenuEntries)
 	{
-		const bool isSubmenu = group.LeafCount > 1;
-		const char* label = isSubmenu ? group.Label : showControls[group.FirstLeaf].Label;
-		const auto kind = isSubmenu ? EditorWidgets::MenuRowKind::Submenu : EditorWidgets::MenuRowKind::Toggle;
+		const bool bIsSubmenu = group.LeafCount > 1;
+		const char* label = bIsSubmenu ? group.Label : showControls[group.FirstLeaf].Label;
+		const auto kind = bIsSubmenu ? EditorWidgets::MenuRowKind::Submenu : EditorWidgets::MenuRowKind::Toggle;
 		menuWidth = (std::max) (menuWidth, EditorWidgets::MeasureMenuRow(label, kind));
 		if (group.Section != nullptr)
 		{
@@ -170,22 +170,22 @@ static float MeasureShowMenuWidth()
 	return menuWidth;
 }
 
-static void DrawShowMenuContents(const CVarControlExecutor* executor, bool disableInteraction, std::string& error)
+static void DrawShowMenuContents(const CVarControlExecutor* executor, bool bDisableInteraction, std::string& error)
 {
 	std::array<bool, showControls.size()> intent{};
 	std::string queryError;
 	const bool bAvailableexecutor = executor != nullptr && *executor;
-	const bool available = bAvailableexecutor && (QueryShowControlIntent(*executor, intent, queryError));
-	if (!available)
+	const bool bAvailable = bAvailableexecutor && (QueryShowControlIntent(*executor, intent, queryError));
+	if (!bAvailable)
 	{
 		ImGui::TextWrapped("Show controls unavailable: %s", queryError.empty() ? "Host control executor is missing." : queryError.c_str());
 	}
 	else
 	{
-		ImGui::BeginDisabled(disableInteraction);
-		const bool useDefaultsSelected = EditorWidgets::DrawMenuItem("Use Defaults", EditorIcons::EditorIcon::None, EditorWidgets::MenuCheckState::Hidden, ImGuiSelectableFlags_NoAutoClosePopups);
+		ImGui::BeginDisabled(bDisableInteraction);
+		const bool bUseDefaultsSelected = EditorWidgets::DrawMenuItem("Use Defaults", EditorIcons::EditorIcon::None, EditorWidgets::MenuCheckState::Hidden, ImGuiSelectableFlags_NoAutoClosePopups);
 		
-		if (useDefaultsSelected)
+		if (bUseDefaultsSelected)
 		{
 			SetShowControlIntent(*executor, showControls, true, error);
 		}
@@ -213,9 +213,9 @@ static void DrawShowMenuContents(const CVarControlExecutor* executor, bool disab
 	}
 }
 
-void DrawViewportShowMenu(const CVarControlExecutor* executor, bool disableInteraction, std::string& error)
+void DrawViewportShowMenu(const CVarControlExecutor* executor, bool bDisableInteraction, std::string& error)
 {
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	const std::string showLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::EyeVisible, "Show");
 	if (ImGui::Button(showLabel.c_str()))
 	{
@@ -237,7 +237,7 @@ void DrawViewportShowMenu(const CVarControlExecutor* executor, bool disableInter
 	{
 		return;
 	}
-	DrawShowMenuContents(executor, disableInteraction, error);
+	DrawShowMenuContents(executor, bDisableInteraction, error);
 
 	if (!error.empty())
 	{

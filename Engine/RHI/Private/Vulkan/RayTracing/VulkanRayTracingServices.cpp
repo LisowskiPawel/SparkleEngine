@@ -43,7 +43,7 @@ VkAccelerationStructureGeometryKHR VulkanRayTracingServices::BuildBottomLevelGeo
 	    .pNext = nullptr,
 	    .geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR,
 	    .geometry = VkAccelerationStructureGeometryDataKHR{.triangles = triangles},
-	    .flags = geometry.Opaque ? VK_GEOMETRY_OPAQUE_BIT_KHR : 0u};
+	    .flags = geometry.bOpaque ? VK_GEOMETRY_OPAQUE_BIT_KHR : 0u};
 }
 
 VulkanRayTracingServices::VulkanRayTracingServices(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept :
@@ -81,7 +81,7 @@ RhiRayTracingCapabilities VulkanRayTracingServices::GetCapabilities() const noex
 
 RhiRayTracingAccelerationStructurePrebuildInfo VulkanRayTracingServices::GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept
 {
-	const bool bSizingUnavailableCapabilities = m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure;
+	const bool bSizingUnavailableCapabilities = m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure;
 	const bool bBlasSizingUnavailableBuildSizes = bSizingUnavailableCapabilities || (m_rhi->GetAccelerationStructureBuildSizes() == nullptr);
 	const bool bLasSizingUnavailable = bBlasSizingUnavailableBuildSizes || (!RhiContract::IsRayTracingGeometryDescUsable(geometry));
 	
@@ -139,15 +139,15 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreateScratchBuffer(std::uint64
 {
 	const std::uint64_t scratchAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().ScratchBufferByteAlignment : 0;
 	const bool bScratchInputsmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
-	const bool bScratchInputsTracingCapabilities = bScratchInputsmemoryAllocator || (!m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure);
-	const bool invalidBlasScratchInputs = bScratchInputsTracingCapabilities || (!RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, scratchAlignment));
+	const bool bScratchInputsTracingCapabilities = bScratchInputsmemoryAllocator || (!m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure);
+	const bool bInvalidBlasScratchInputs = bScratchInputsTracingCapabilities || (!RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, scratchAlignment));
 	
-	if (invalidBlasScratchInputs)
+	if (bInvalidBlasScratchInputs)
 	{
 		return {};
 	}
 
-	const RhiBufferResourceDesc desc{.SizeInBytes = sizeInBytes, .AllowUnorderedAccess = true};
+	const RhiBufferResourceDesc desc{.SizeInBytes = sizeInBytes, .bAllowUnorderedAccess = true};
 	const VkBufferCreateInfo bufferCreateInfo = VulkanTypeConversions::BuildBufferCreateInfo(desc, VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
 
 	std::unique_ptr<VulkanGpuAllocationRecord> record = m_memoryAllocator->CreateBuffer(
@@ -169,18 +169,18 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreateAccelerationStructureBuff
 {
 	const std::uint64_t asAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().AccelerationStructureByteAlignment : 0;
 	const bool bStorageInputsmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
-	const bool bStorageInputsTracingCapabilities = bStorageInputsmemoryAllocator || (!m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure);
+	const bool bStorageInputsTracingCapabilities = bStorageInputsmemoryAllocator || (!m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure);
 	const bool bStorageInputsStructure = bStorageInputsTracingCapabilities || (m_rhi->GetCreateAccelerationStructure() == nullptr);
 	const bool bInvalidStorageInputsDeviceAddress = bStorageInputsStructure || (m_rhi->GetAccelerationStructureDeviceAddress() == nullptr);
-	const bool invalidBlasStorageInputs = bInvalidStorageInputsDeviceAddress || (!RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, asAlignment));
+	const bool bInvalidBlasStorageInputs = bInvalidStorageInputsDeviceAddress || (!RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, asAlignment));
 	
-	if (invalidBlasStorageInputs)
+	if (bInvalidBlasStorageInputs)
 	{
 		return {};
 	}
 
 	const VkAccelerationStructureTypeKHR nativeType = ToVkAccelerationStructureType(type);
-	const RhiBufferResourceDesc desc{.SizeInBytes = sizeInBytes, .AllowUnorderedAccess = true};
+	const RhiBufferResourceDesc desc{.SizeInBytes = sizeInBytes, .bAllowUnorderedAccess = true};
 
 	const VkBufferCreateInfo bufferCreateInfo = VulkanTypeConversions::BuildBufferCreateInfo(
 	    desc,
@@ -245,7 +245,7 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreateRayTracingInstanceBuffer(
 
 std::unique_ptr<RayTracingShaderTable> VulkanRayTracingServices::CreateRayTracingShaderTable(const RayTracingShaderTableDesc& desc)
 {
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsRayTracingPipeline)
+	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !m_rhi->GetRayTracingCapabilities().bSupportsRayTracingPipeline)
 	{
 		throw Diagnostics::Error("Vulkan ray-tracing shader-table creation requires complete pipeline readiness.");
 	}

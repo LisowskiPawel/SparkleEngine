@@ -65,8 +65,8 @@ AssetCookerServiceResult AssetCookerService::Cook(const char* projectName, const
 	}
 
 	std::vector<AssetCookerOutputRecord> outputs;
-	const bool succeeded = CookProjects(workspaceRoot, resolvedToolProfile, category, projects, diagnostics, outputs);
-	return Finish(succeeded, diagnostics, std::move(outputs));
+	const bool bSucceeded = CookProjects(workspaceRoot, resolvedToolProfile, category, projects, diagnostics, outputs);
+	return Finish(bSucceeded, diagnostics, std::move(outputs));
 }
 
 bool AssetCookerService::ResolveProjects(const std::filesystem::path& workspaceRoot, std::string_view projectName, AssetCookerDiagnostics& diagnostics, std::vector<std::string>& outProjects) const
@@ -127,10 +127,10 @@ bool AssetCookerService::IsAllProjects(std::string_view projectName) noexcept
 	return projectName.empty() || projectName == "ALL" || projectName == "All" || projectName == "all";
 }
 
-AssetCookerServiceResult AssetCookerService::Finish(bool succeeded, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord> outputs)
+AssetCookerServiceResult AssetCookerService::Finish(bool bSucceeded, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord> outputs)
 {
 	AssetCookerServiceResult result;
-	result.exitCode = succeeded ? 0 : 1;
+	result.exitCode = bSucceeded ? 0 : 1;
 	result.diagnostics = diagnostics.ReleaseRecords();
 	result.outputs = std::move(outputs);
 	return result;

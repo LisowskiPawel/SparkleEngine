@@ -259,7 +259,7 @@ LRESULT Window::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 	WindowMessageEvent msgEvent{m_hWnd, msg, wParam, lParam, false};
 	OnWindowMessage.Broadcast(msgEvent);
 
-	if (msgEvent.handled)
+	if (msgEvent.bHandled)
 	{
 		return 0;
 	}

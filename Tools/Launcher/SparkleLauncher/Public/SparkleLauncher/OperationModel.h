@@ -81,7 +81,7 @@ namespace SparkleLauncher
 		std::optional<int> ExitCode;
 		std::string DryRunText;
 		OperationDestructiveScope DestructiveScope = OperationDestructiveScope::None;
-		bool RequiresConfirmation = false;
+		bool bRequiresConfirmation = false;
 		std::optional<OperationFailure> Failure;
 		std::optional<GpuCrashIncident> GpuCrash;
 		std::filesystem::path ShaderExportPath;

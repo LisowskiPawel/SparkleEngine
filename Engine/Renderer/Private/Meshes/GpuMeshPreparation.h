@@ -24,7 +24,7 @@ struct GpuMeshPreparedData final
 	std::vector<VertexSkinInfluenceData> GpuSkinInfluences;
 	std::vector<MorphTargetDeltaData> MorphTargetDeltas;
 	std::uint32_t MorphTargetCount = 0u;
-	bool HasLocalBounds = false;
+	bool bHasLocalBounds = false;
 
 	std::uint64_t GetDecodedByteSize() const noexcept;
 	std::uint64_t GetResidentByteSize() const noexcept;

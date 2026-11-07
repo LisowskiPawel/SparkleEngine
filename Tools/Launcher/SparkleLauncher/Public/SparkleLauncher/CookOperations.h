@@ -50,13 +50,13 @@ namespace SparkleLauncher
 		std::string ContentId = kDefaultContentId;
 		std::string GameProfile = "DevelopmentGame";
 		CookMode Mode = CookMode::Incremental;
-		bool ForceRecookConfirmed = false;
+		bool bForceRecookConfirmed = false;
 		std::vector<CookWorkspaceScope> SelectedScopes;
 		std::string ShaderBackend = "auto";
-		bool ShaderEnableDebugInfo = false;
-		bool ShaderEnableOptimizations = true;
-		bool ShaderWarningsAsErrors = true;
-		bool ShaderStripDebugInfo = true;
+		bool bShaderEnableDebugInfo = false;
+		bool bShaderEnableOptimizations = true;
+		bool bShaderWarningsAsErrors = true;
+		bool bShaderStripDebugInfo = true;
 	};
 
 	struct CookOperationStep
@@ -66,7 +66,7 @@ namespace SparkleLauncher
 		std::string DisplayCommandLine;
 		std::filesystem::path LogPath;
 		std::filesystem::path DestructivePath;
-		bool Destructive = false;
+		bool bDestructive = false;
 	};
 
 	struct CookOperationPlan
@@ -80,7 +80,7 @@ namespace SparkleLauncher
 		std::vector<CookOperationStep> Steps;
 		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
-		bool CanRun = false;
+		bool bCanRun = false;
 	};
 
 	std::string ToString(CookOperationKind kind);

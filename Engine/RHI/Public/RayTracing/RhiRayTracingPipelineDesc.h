@@ -53,7 +53,7 @@ public:
 		ShaderStage Stage = ShaderStage::Count;
 		std::uint32_t LocalRecordSizeInBytes = 0;
 		ShaderParameterSignature LocalRecordSignature = 0;
-		bool IsHitGroup = false;
+		bool bIsHitGroup = false;
 	};
 
 	explicit RayTracingPipeline(const RayTracingPipelineDesc& desc);

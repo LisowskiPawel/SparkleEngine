@@ -40,7 +40,7 @@ public:
 
 	VkCommandBuffer GetVulkanCommandBuffer() const noexcept { return m_commandBuffer; }
 
-	bool IsRecording() const noexcept { return m_isRecording; }
+	bool IsRecording() const noexcept { return m_bIsRecording; }
 
 	bool IsCoordinatorRecording() const noexcept;
 	NativeGraphicsCommandListHandle GetNativeHandle(const RhiNativeInteropRequest& request) const noexcept override;
@@ -144,7 +144,7 @@ private:
 
 	void SetRecordingUploadPage(VulkanRecordingUploadPage* uploadPage) noexcept { m_recordingUploadPage = uploadPage; }
 
-	void SetRecording(bool recording) noexcept { m_isRecording = recording; }
+	void SetRecording(bool bRecording) noexcept { m_bIsRecording = bRecording; }
 
 	void SetRecordingOwner(RhiCommandRecordingOwner owner) noexcept { m_recordingOwner = owner; }
 
@@ -228,8 +228,8 @@ private:
 	VkImageView m_depthStencil = VK_NULL_HANDLE;
 	VkImageAspectFlags m_depthStencilAspectMask = 0;
 	VkRect2D m_scissorRect = {};
-	bool m_hasScissorRect = false;
-	bool m_dynamicRenderingActive = false;
-	bool m_isRecording = false;
+	bool m_bHasScissorRect = false;
+	bool m_bDynamicRenderingActive = false;
+	bool m_bIsRecording = false;
 	RhiCommandRecordingOwner m_recordingOwner = {};
 };

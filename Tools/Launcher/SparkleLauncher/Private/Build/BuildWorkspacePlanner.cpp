@@ -29,7 +29,7 @@ namespace SparkleLauncher
 
 	static bool RequireCurrentWorkspace(BuildWorkspaceOperationPlan& plan)
 	{
-		if (plan.Freshness.Current)
+		if (plan.Freshness.bCurrent)
 		{
 			return true;
 		}
@@ -40,7 +40,7 @@ namespace SparkleLauncher
 
 	static bool RequireConfigurePrerequisites(BuildWorkspaceOperationPlan& plan)
 	{
-		if (plan.Toolchain.ConfigurePrerequisitesAvailable)
+		if (plan.Toolchain.bConfigurePrerequisitesAvailable)
 		{
 			return true;
 		}
@@ -50,9 +50,9 @@ namespace SparkleLauncher
 		{
 			const bool bUnresolvedRequiredToolId = item.Id == "shader-compiler-sdk" || item.Id == "vulkan-sdk";
 			const bool bUnresolvedRequiredToolState = bUnresolvedRequiredToolId && (item.State != ToolchainItemState::Found);
-			const bool unresolvedRequiredTool = bUnresolvedRequiredToolState && (!item.Detail.empty());
+			const bool bUnresolvedRequiredTool = bUnresolvedRequiredToolState && (!item.Detail.empty());
 			
-			if (unresolvedRequiredTool)
+			if (bUnresolvedRequiredTool)
 			{
 				AddReadiness(plan, item.Detail);
 			}
@@ -103,7 +103,7 @@ namespace SparkleLauncher
 		{
 			return AdmitHostToolInstallation(plan);
 		}
-		if (!plan.Toolchain.RequiredToolsAvailable)
+		if (!plan.Toolchain.bRequiredToolsAvailable)
 		{
 			AddReadiness(plan, "Required host prerequisites are missing or unsupported.");
 			return false;
@@ -244,9 +244,9 @@ namespace SparkleLauncher
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(request.WorkspaceRoot);
 		plan.SourceDependencies = InspectSourceDependencyCache(workspaceOutputs.DependencyCacheRoot);
 
-		AddReadiness(plan, plan.Toolchain.RequiredToolsAvailable ? "Required toolchain is available." : "Required toolchain is incomplete.");
+		AddReadiness(plan, plan.Toolchain.bRequiredToolsAvailable ? "Required toolchain is available." : "Required toolchain is incomplete.");
 		AddReadiness(plan, plan.Freshness.Summary);
-		if (!plan.SourceDependencies.AllEnabledDependenciesReady)
+		if (!plan.SourceDependencies.bAllEnabledDependenciesReady)
 		{
 			for (const std::string& message : plan.SourceDependencies.ReadinessMessages)
 			{
@@ -267,7 +267,7 @@ namespace SparkleLauncher
 				step.DisplayName = processStep.DisplayName;
 				step.DisplayCommandLine = BuildDisplayCommandLine(processStep.Request.ExecutablePath, processStep.Request.Arguments);
 				step.LogPath = processStep.Request.LogPath;
-				step.UpdatesBuildFilesFreshness = processStep.UpdatesBuildFilesFreshness;
+				step.bUpdatesBuildFilesFreshness = processStep.bUpdatesBuildFilesFreshness;
 				plan.Steps.push_back(std::move(step));
 				if (plan.Kind != BuildWorkspaceOperationKind::InstallHostTool)
 				{
@@ -277,7 +277,7 @@ namespace SparkleLauncher
 		}
 		catch (const Diagnostics::Error& error)
 		{
-			plan.CanRun = false;
+			plan.bCanRun = false;
 			plan.Steps.clear();
 			AddReadiness(plan, std::string("Operation planning failed: ") + error.what());
 		}
@@ -323,8 +323,8 @@ namespace SparkleLauncher
 		}
 
 		InspectWorkspacePrerequisites(plan);
-		plan.CanRun = AdmitWorkspaceOperation(plan);
-		if (plan.CanRun)
+		plan.bCanRun = AdmitWorkspaceOperation(plan);
+		if (plan.bCanRun)
 		{
 			BuildExecutablePreview(plan);
 		}

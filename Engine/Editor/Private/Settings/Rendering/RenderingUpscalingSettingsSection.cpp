@@ -23,10 +23,10 @@ void DrawUpscalingSettingsSection(EngineRenderingSettingsController& settingsCon
 	    {"Ultra performance", EUpscalerQualityMode::UltraPerformance},
 	};
 
-	const bool upscalingMatches = RenderingSettingsUi::MatchesFilter(filterText, "Upscaling", "upscaler upscaling linear bilinear dlss quality native aa balanced performance");
-	const bool upscalingOpen = upscalingMatches && RenderingSettingsUi::BeginSettingsCategory("Upscaling");
+	const bool bUpscalingMatches = RenderingSettingsUi::MatchesFilter(filterText, "Upscaling", "upscaler upscaling linear bilinear dlss quality native aa balanced performance");
+	const bool bUpscalingOpen = bUpscalingMatches && RenderingSettingsUi::BeginSettingsCategory("Upscaling");
 
-	if (!upscalingOpen)
+	if (!bUpscalingOpen)
 	{
 		return;
 	}

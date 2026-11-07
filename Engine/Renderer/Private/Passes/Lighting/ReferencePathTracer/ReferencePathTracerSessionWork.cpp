@@ -24,10 +24,10 @@ void ReferencePathTracerSession::CompletePendingCommit() noexcept
 		m_lastCommitTime = now;
 	}
 	m_pendingCommit = {};
-	if (m_pausePending)
+	if (m_bPausePending)
 	{
-		m_pausePending = false;
-		m_paused = true;
+		m_bPausePending = false;
+		m_bPaused = true;
 	}
 }
 
@@ -41,23 +41,23 @@ void ReferencePathTracerSession::PrepareWork(RenderViewportExtent extent) noexce
 	    .FirstRow = m_nextRow,
 	    .RowCount = (std::min) (WorkRowsPerDispatch, extent.Height - m_nextRow),
 	    .PriorSampleCount = m_committedSamples,
-	    .WorkFlags = ReferencePathTracerWork::WorkFlagTrace | (m_clearDisplay ? ReferencePathTracerWork::WorkFlagClearDisplay : 0u)};
+	    .WorkFlags = ReferencePathTracerWork::WorkFlagTrace | (m_bClearDisplay ? ReferencePathTracerWork::WorkFlagClearDisplay : 0u)};
 
 	m_preparedRowCount = m_work.RowCount;
 	if (m_nextRow + m_preparedRowCount == extent.Height)
 	{
 		m_work.WorkFlags |= ReferencePathTracerWork::WorkFlagCommitPrefix;
 	}
-	m_workPrepared = true;
+	m_bWorkPrepared = true;
 }
 
 void ReferencePathTracerSession::OnFrameSubmitted(RhiSubmissionToken token) noexcept
 {
-	if (m_selected && m_resources.IsAllocated())
+	if (m_bSelected && m_resources.IsAllocated())
 	{
 		m_resources.RecordSubmission();
 	}
-	if (m_workPrepared)
+	if (m_bWorkPrepared)
 	{
 		if ((m_work.WorkFlags & ReferencePathTracerWork::WorkFlagCommitPrefix) != 0u)
 		{
@@ -69,9 +69,9 @@ void ReferencePathTracerSession::OnFrameSubmitted(RhiSubmissionToken token) noex
 			m_nextRow += m_preparedRowCount;
 		}
 	}
-	m_workPrepared = false;
-	m_clearDisplay = false;
-	m_resetVisible = false;
+	m_bWorkPrepared = false;
+	m_bClearDisplay = false;
+	m_bResetVisible = false;
 	m_work = {};
 }
 
@@ -82,11 +82,11 @@ ViewportRenderProgress ReferencePathTracerSession::GetProgress() const noexcept
 	{
 		state = ViewportRenderProgressState::Unavailable;
 	}
-	else if (m_paused)
+	else if (m_bPaused)
 	{
 		state = ViewportRenderProgressState::Paused;
 	}
-	else if (m_resetVisible)
+	else if (m_bResetVisible)
 	{
 		state = ViewportRenderProgressState::Resetting;
 	}
@@ -107,7 +107,7 @@ ViewportRenderProgress ReferencePathTracerSession::GetProgress() const noexcept
 	    .OwnerViewportId = m_ownerViewportId,
 	    .SamplesPerSecond = m_samplesPerSecond,
 	    .EstimatedSecondsRemaining = estimatedSeconds,
-	    .RetentionAvailable = m_retentionAvailable};
+	    .bRetentionAvailable = m_bRetentionAvailable};
 }
 
 RenderProductSamplePrefix ReferencePathTracerSession::GetRadianceSamplePrefix() const noexcept
@@ -124,11 +124,11 @@ bool ReferencePathTracerSession::CanPublishRadiance() const noexcept
 void ReferencePathTracerSession::PrepareFrameWork(RenderViewportExtent extent) noexcept
 {
 	m_work = {};
-	if (m_clearDisplay)
+	if (m_bClearDisplay)
 	{
 		m_work.WorkFlags = ReferencePathTracerWork::WorkFlagClearDisplay;
 	}
-	if (!m_paused && !m_pausePending && !m_pendingCommit && m_committedSamples < TargetSampleCount)
+	if (!m_bPaused && !m_bPausePending && !m_pendingCommit && m_committedSamples < TargetSampleCount)
 	{
 		PrepareWork(extent);
 	}

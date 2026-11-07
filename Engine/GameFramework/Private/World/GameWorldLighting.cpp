@@ -19,7 +19,7 @@ public:
 			light.Direction = directional->direction;
 			light.Illuminance = directional->illuminance;
 			light.AngularSizeRadians = directional->angularSizeRadians;
-			light.CastShadow = directional->castShadow;
+			light.bCastShadow = directional->bCastShadow;
 		}
 		else if (const PointLightDesc* point = desc.GetPoint())
 		{
@@ -27,7 +27,7 @@ public:
 			light.Range = point->range;
 			light.Radius = point->radius;
 			light.DistanceAttenuationCoefficients = point->distanceAttenuationCoefficients;
-			light.CastShadow = point->castShadow;
+			light.bCastShadow = point->bCastShadow;
 		}
 		else if (const SpotLightDesc* spot = desc.GetSpot())
 		{
@@ -38,7 +38,7 @@ public:
 			light.DistanceAttenuationCoefficients = spot->distanceAttenuationCoefficients;
 			light.InnerAngleRadians = spot->innerAngleRadians;
 			light.OuterAngleRadians = spot->outerAngleRadians;
-			light.CastShadow = spot->castShadow;
+			light.bCastShadow = spot->bCastShadow;
 		}
 		else if (const RectLightDesc* rect = desc.GetRect())
 		{
@@ -46,7 +46,7 @@ public:
 			light.Luminance = rect->luminance;
 			light.Tangent = rect->tangent;
 			light.AreaSize = {rect->width, rect->height};
-			light.CastShadow = rect->castShadow;
+			light.bCastShadow = rect->bCastShadow;
 		}
 		return light;
 	}
@@ -56,7 +56,7 @@ public:
 		switch (light.Kind)
 		{
 			case SceneLightKind::Directional:
-				return SceneDirectionalLightDesc{.direction = light.Direction, .illuminance = light.Illuminance, .angularSizeRadians = light.AngularSizeRadians, .castShadow = light.CastShadow};
+				return SceneDirectionalLightDesc{.direction = light.Direction, .illuminance = light.Illuminance, .angularSizeRadians = light.AngularSizeRadians, .bCastShadow = light.bCastShadow};
 
 			case SceneLightKind::Point:
 				return PointLightDesc{
@@ -64,7 +64,7 @@ public:
 				    .range = light.Range,
 				    .radius = light.Radius,
 				    .distanceAttenuationCoefficients = light.DistanceAttenuationCoefficients,
-				    .castShadow = light.CastShadow};
+				    .bCastShadow = light.bCastShadow};
 
 			case SceneLightKind::Spot:
 				return SpotLightDesc{
@@ -75,7 +75,7 @@ public:
 				    .distanceAttenuationCoefficients = light.DistanceAttenuationCoefficients,
 				    .innerAngleRadians = light.InnerAngleRadians,
 				    .outerAngleRadians = light.OuterAngleRadians,
-				    .castShadow = light.CastShadow};
+				    .bCastShadow = light.bCastShadow};
 
 			case SceneLightKind::Rect:
 				return RectLightDesc{
@@ -84,7 +84,7 @@ public:
 				    .width = light.AreaSize.x,
 				    .tangent = light.Tangent,
 				    .height = light.AreaSize.y,
-				    .castShadow = light.CastShadow};
+				    .bCastShadow = light.bCastShadow};
 
 			case SceneLightKind::Unknown:
 			default:
@@ -107,12 +107,12 @@ namespace ECS
 
 		const bool bAddedAdd = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
 		const bool bAddedAdd2 = bAddedAdd && (m_registry.Add(entity, LightComponentTranslation::ToLightComponent(desc)));
-		const bool bAddedcommon = bAddedAdd2 && (m_registry.Add(entity, Visibility{.Visible = desc.common.visible}));
+		const bool bAddedcommon = bAddedAdd2 && (m_registry.Add(entity, Visibility{.bVisible = desc.common.bVisible}));
 		const bool bAddedcommon2 = bAddedcommon && (m_registry.Add(entity, Name{std::move(desc.common.name)}));
 		const bool bAddedAdd3 = bAddedcommon2 && (m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextLightIdentity, .Kind = AuthoredObjectKind::Light}));
-		const bool added = bAddedAdd3 && (m_registry.Add(entity, EditorMetadata{}));
+		const bool bAdded = bAddedAdd3 && (m_registry.Add(entity, EditorMetadata{}));
 
-		if (!added)
+		if (!bAdded)
 		{
 			m_registry.Destroy(entity);
 			return EntityId::Invalid();
@@ -139,7 +139,7 @@ namespace ECS
 			desc.common.worldTransform = transform->Matrix;
 		}
 		desc.common.color = light->Color;
-		desc.common.visible = ReadVisibility(entity);
+		desc.common.bVisible = ReadVisibility(entity);
 		desc.payload = LightComponentTranslation::ToLightPayload(*light);
 		return desc;
 	}
@@ -154,13 +154,13 @@ namespace ECS
 
 		const bool bWrittenReplace = WriteTransform(entity, transform) && m_registry.Replace(entity, LightComponentTranslation::ToLightComponent(desc));
 		const bool bWrittencommon = bWrittenReplace && (m_registry.Replace(entity, Name{std::move(desc.common.name)}));
-		const bool written = bWrittencommon && (WriteVisibility(entity, desc.common.visible));
+		const bool bWritten = bWrittencommon && (WriteVisibility(entity, desc.common.bVisible));
 
-		if (written)
+		if (bWritten)
 		{
 			RecordChange(entity);
 		}
-		return written;
+		return bWritten;
 	}
 
 }

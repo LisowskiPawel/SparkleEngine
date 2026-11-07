@@ -16,9 +16,9 @@ namespace SurfaceLighting
 		float DielectricF0;
 		float3 SubsurfaceColor;
 		float SubsurfaceStrength;
-		bool EvaluateDiffuse;
-		bool EvaluateSpecular;
-		bool EvaluateSubsurface;
+		bool bEvaluateDiffuse;
+		bool bEvaluateSpecular;
+		bool bEvaluateSubsurface;
 	};
 
 	struct Contribution
@@ -36,7 +36,7 @@ namespace SurfaceLighting
 	Contribution EvaluateDirectLightSample(Surface surface, LightSampling::DirectLightSample lightSample, float shadowVisibility)
 	{
 		Contribution result = (Contribution)0;
-		if (!lightSample.Valid || shadowVisibility <= 0.0f)
+		if (!lightSample.bValid || shadowVisibility <= 0.0f)
 		{
 			return result;
 		}
@@ -61,9 +61,9 @@ namespace SurfaceLighting
 		                                                           f0,
 		                                                           surface.SubsurfaceColor,
 		                                                           surface.SubsurfaceStrength,
-		                                                           surface.EvaluateDiffuse,
-		                                                           surface.EvaluateSpecular,
-		                                                           surface.EvaluateSubsurface);
+		                                                           surface.bEvaluateDiffuse,
+		                                                           surface.bEvaluateSpecular,
+		                                                           surface.bEvaluateSubsurface);
 
 		const float3 radiance = lightSample.IncidentRadiance * shadowVisibility / samplePdf;
 		const float3 incidentRadiance = radiance * shadingData.NoL;

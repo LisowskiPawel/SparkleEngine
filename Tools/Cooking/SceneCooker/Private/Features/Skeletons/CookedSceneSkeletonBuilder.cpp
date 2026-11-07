@@ -66,16 +66,16 @@ void CookedSceneSkeletonBuilder::BuildSkeletons(const SourceImportOutput& import
 		for (std::size_t jointIndex = 0; jointIndex < importedSkeleton.joints.size(); ++jointIndex)
 		{
 			const ImportedJoint& importedJoint = importedSkeleton.joints[jointIndex];
-			const bool jointIdentityValid = importedJoint.name.size() < sizeof(Assets::CookedSkeletonJointRecord::name) && importedJoint.sourceNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
-			const bool sourceNodeUnique = jointIdentityValid && sourceNodeIndices.insert(importedJoint.sourceNodeIndex).second;
-			const bool bParentIndexValidJointIndex = sourceNodeUnique && (importedJoint.parentJointIndex == (std::numeric_limits<std::uint32_t>::max)());
-			const bool bParentIndexValidGuardJointIndex = sourceNodeUnique && !bParentIndexValidJointIndex;
+			const bool bJointIdentityValid = importedJoint.name.size() < sizeof(Assets::CookedSkeletonJointRecord::name) && importedJoint.sourceNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
+			const bool bSourceNodeUnique = bJointIdentityValid && sourceNodeIndices.insert(importedJoint.sourceNodeIndex).second;
+			const bool bParentIndexValidJointIndex = bSourceNodeUnique && (importedJoint.parentJointIndex == (std::numeric_limits<std::uint32_t>::max)());
+			const bool bParentIndexValidGuardJointIndex = bSourceNodeUnique && !bParentIndexValidJointIndex;
 			const bool bParentIndexValidjoints = bParentIndexValidGuardJointIndex && (importedJoint.parentJointIndex < importedSkeleton.joints.size());
 			const bool bParentIndexValidJointIndex2 = bParentIndexValidjoints && (importedJoint.parentJointIndex != jointIndex);
 			const bool bParentIndexValidJointIndex3 = bParentIndexValidJointIndex || bParentIndexValidJointIndex2;
-			const bool parentIndexValid = sourceNodeUnique && bParentIndexValidJointIndex3;
+			const bool bParentIndexValid = bSourceNodeUnique && bParentIndexValidJointIndex3;
 			
-			if (!parentIndexValid)
+			if (!bParentIndexValid)
 			{
 				throw Diagnostics::Error(std::format("Imported skeleton {} has invalid joint {}.", skeletonIndex, jointIndex));
 			}
@@ -83,15 +83,15 @@ void CookedSceneSkeletonBuilder::BuildSkeletons(const SourceImportOutput& import
 			const DirectX::XMFLOAT4X4* parentBindModel = importedJoint.parentJointIndex < importedSkeleton.joints.size() ? &importedSkeleton.joints[importedJoint.parentJointIndex].bindModelTransform
 			                                                                                                             : nullptr;
 
-			const bool inverseBindFinite = SkeletonTransformContract::IsFinite(importedJoint.inverseBindMatrix);
-			const bool localBindFinite = inverseBindFinite && SkeletonTransformContract::IsFinite(importedJoint.bindLocalTransform);
-			const bool parentSpaceFinite = localBindFinite && SkeletonTransformContract::IsFinite(importedJoint.parentSpaceTransform);
-			const bool modelBindFinite = parentSpaceFinite && SkeletonTransformContract::IsFinite(importedJoint.bindModelTransform);
-			const bool inverseBindInvertible = modelBindFinite && SkeletonTransformContract::IsInvertible(importedJoint.inverseBindMatrix);
-			const bool localBindInvertible = inverseBindInvertible && SkeletonTransformContract::IsInvertible(importedJoint.bindLocalTransform);
-			const bool localBindDecomposable = localBindInvertible && SkeletonTransformContract::IsTrsDecomposable(importedJoint.bindLocalTransform);
+			const bool bInverseBindFinite = SkeletonTransformContract::IsFinite(importedJoint.inverseBindMatrix);
+			const bool bLocalBindFinite = bInverseBindFinite && SkeletonTransformContract::IsFinite(importedJoint.bindLocalTransform);
+			const bool bParentSpaceFinite = bLocalBindFinite && SkeletonTransformContract::IsFinite(importedJoint.parentSpaceTransform);
+			const bool bModelBindFinite = bParentSpaceFinite && SkeletonTransformContract::IsFinite(importedJoint.bindModelTransform);
+			const bool bInverseBindInvertible = bModelBindFinite && SkeletonTransformContract::IsInvertible(importedJoint.inverseBindMatrix);
+			const bool bLocalBindInvertible = bInverseBindInvertible && SkeletonTransformContract::IsInvertible(importedJoint.bindLocalTransform);
+			const bool bLocalBindDecomposable = bLocalBindInvertible && SkeletonTransformContract::IsTrsDecomposable(importedJoint.bindLocalTransform);
 
-			const bool bIndInvariantSatisfied = localBindDecomposable
+			const bool bIndInvariantSatisfied = bLocalBindDecomposable
 			    && SkeletonTransformContract::SatisfiesBindInvariant(importedJoint.bindLocalTransform, importedJoint.parentSpaceTransform, parentBindModel, importedJoint.bindModelTransform);
 
 			if (!bIndInvariantSatisfied)

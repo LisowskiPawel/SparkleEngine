@@ -367,12 +367,12 @@ void VulkanCommandRecordingContext::ResetSlot(CommandSlot& slot) noexcept
 	slot.RecordingOwner = {};
 	slot.RecordingThread = {};
 	slot.State = SlotState::Available;
-	slot.RequiresPoolReset = true;
+	slot.bRequiresPoolReset = true;
 }
 
 void VulkanCommandRecordingContext::ResetCommandPool(CommandSlot& slot) noexcept
 {
-	if (!slot.RequiresPoolReset)
+	if (!slot.bRequiresPoolReset)
 	{
 		return;
 	}
@@ -383,7 +383,7 @@ void VulkanCommandRecordingContext::ResetCommandPool(CommandSlot& slot) noexcept
 		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkResetCommandPool", result));
 	}
 
-	slot.RequiresPoolReset = false;
+	slot.bRequiresPoolReset = false;
 }
 
 void VulkanCommandRecordingContext::BeginSlot(CommandSlot& slot) noexcept

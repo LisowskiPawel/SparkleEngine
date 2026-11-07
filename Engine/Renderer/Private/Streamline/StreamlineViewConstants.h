@@ -12,9 +12,9 @@ struct StreamlineViewConstantsInput final
 	ViewCameraUniformData Camera = {};
 	ViewTemporalUniformData Temporal = {};
 	RenderViewportExtent RenderExtent = {};
-	bool MotionVectorsCurrentMinusPrevious = true;
-	bool ReversedDeviceDepth = true;
-	bool ResetRequested = false;
+	bool bMotionVectorsCurrentMinusPrevious = true;
+	bool bReversedDeviceDepth = true;
+	bool bResetRequested = false;
 };
 
 void FillStreamlineViewConstants(sl::Constants& constants, const StreamlineViewConstantsInput& input);

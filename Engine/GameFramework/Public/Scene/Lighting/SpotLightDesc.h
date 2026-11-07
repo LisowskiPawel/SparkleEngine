@@ -13,5 +13,5 @@ struct SPARKLE_ENGINE_API SpotLightDesc
 	DirectX::XMFLOAT3 distanceAttenuationCoefficients = {0.0f, 0.0f, 1.0f};
 	float innerAngleRadians = 0.0f;
 	float outerAngleRadians = DirectX::XM_PIDIV4;
-	bool castShadow = true;
+	bool bCastShadow = true;
 };

@@ -13,7 +13,7 @@ namespace Process
 		}
 		if (request.Cancellation.stop_requested())
 		{
-			result.Cancelled = true;
+			result.bCancelled = true;
 			return result;
 		}
 		return request.ReadinessValue.has_value() ? RunWindowsChildProcessUntilReady(request) : RunWindowsChildProcessToExit(request);

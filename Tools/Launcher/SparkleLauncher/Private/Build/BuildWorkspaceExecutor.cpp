@@ -29,7 +29,7 @@ namespace SparkleLauncher
 
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(plan.Request.WorkspaceRoot);
 		const SourceDependencyInventoryStatus status = InspectSourceDependencyCache(workspaceOutputs.DependencyCacheRoot);
-		if (status.AllEnabledDependenciesReady)
+		if (status.bAllEnabledDependenciesReady)
 		{
 			return std::nullopt;
 		}
@@ -62,7 +62,7 @@ namespace SparkleLauncher
 
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(plan.Request.WorkspaceRoot);
 		const SourceDependencyValidation validation = ValidateSourceDependency(*dependency, workspaceOutputs.DependencyCacheRoot);
-		if (validation.Ready)
+		if (validation.bReady)
 		{
 			return std::nullopt;
 		}
@@ -103,7 +103,7 @@ namespace SparkleLauncher
 	{
 		return planned.Id == executable.Id && planned.DisplayName == executable.DisplayName
 		    && planned.DisplayCommandLine == BuildDisplayCommandLine(executable.Request.ExecutablePath, executable.Request.Arguments) && planned.LogPath == executable.Request.LogPath
-		    && planned.UpdatesBuildFilesFreshness == executable.UpdatesBuildFilesFreshness;
+		    && planned.bUpdatesBuildFilesFreshness == executable.bUpdatesBuildFilesFreshness;
 	}
 
 	bool BuildWorkspaceExecutionPlanMatches(const BuildWorkspaceOperationPlan& plan, const std::vector<BuildWorkspaceProcessStep>& processSteps)
@@ -118,7 +118,7 @@ namespace SparkleLauncher
 
 	static bool PrepareBuildWorkspaceExecution(const BuildWorkspaceOperationPlan& plan, OperationRecord& operation, std::vector<BuildWorkspaceProcessStep>& processSteps)
 	{
-		if (!plan.CanRun)
+		if (!plan.bCanRun)
 		{
 			SetOperationFailure(
 			    operation,
@@ -211,7 +211,7 @@ namespace SparkleLauncher
 		const Process::ChildProcessResult result = processRunner.Run(request);
 		if (!result.Succeeded())
 		{
-			if (result.Cancelled)
+			if (result.bCancelled)
 			{
 				SetOperationFailure(operation, OperationProblemKind::Cancellation, step.DisplayName + " was canceled.", "Run the operation again when ready.");
 			}
@@ -219,7 +219,7 @@ namespace SparkleLauncher
 			{
 				SetProcessOperationFailure(operation, result.StartFailure, MakeBuildWorkspaceFailureSummary(step, result), BuildWorkspaceRecoveryAction(step));
 			}
-			MarkOperationFinished(operation, result.Cancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
+			MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 			return false;
 		}
 		return true;
@@ -252,7 +252,7 @@ namespace SparkleLauncher
 			return false;
 		}
 
-		if (step.UpdatesBuildFilesFreshness)
+		if (step.bUpdatesBuildFilesFreshness)
 		{
 			if (const std::optional<std::string> dependencyValidationFailure = ValidateEnabledSourceDependenciesAfterConfigure(plan))
 			{
@@ -291,10 +291,10 @@ namespace SparkleLauncher
 		{
 			const BuildWorkspaceProcessStep& step = processSteps[stepIndex];
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, processSteps.size());
-			const bool stepExecuted = RunBuildWorkspaceStep(plan, step, processRunner, outputCallback, operation);
-			const bool stepValidated = stepExecuted && ValidateBuildWorkspaceStep(plan, step, operation);
+			const bool bStepExecuted = RunBuildWorkspaceStep(plan, step, processRunner, outputCallback, operation);
+			const bool bStepValidated = bStepExecuted && ValidateBuildWorkspaceStep(plan, step, operation);
 
-			if (!stepValidated)
+			if (!bStepValidated)
 			{
 				return operation;
 			}

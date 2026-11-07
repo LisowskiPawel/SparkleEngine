@@ -163,10 +163,10 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanUploadService::CreateBufferStag
 	    .pQueueFamilyIndices = nullptr};
 
 	auto stagingResource = m_memoryAllocator->CreateBuffer(desc, RhiMemoryCategory::Upload, RhiMemoryResidencyClass::HostUpload, debugName.empty() ? L"BufferUpload" : debugName);
-	const bool stagingBufferAvailable = stagingResource != nullptr && stagingResource->Buffer != VK_NULL_HANDLE;
-	const bool stagingBytesWritten = stagingBufferAvailable && m_memoryAllocator->WriteAllocation(*stagingResource, data.data(), data.size());
+	const bool bStagingBufferAvailable = stagingResource != nullptr && stagingResource->Buffer != VK_NULL_HANDLE;
+	const bool bStagingBytesWritten = bStagingBufferAvailable && m_memoryAllocator->WriteAllocation(*stagingResource, data.data(), data.size());
 	
-	if (!stagingBytesWritten)
+	if (!bStagingBytesWritten)
 	{
 		return {};
 	}
@@ -210,9 +210,9 @@ bool VulkanUploadService::ValidateTextureUploadRequest(const RenderCommandList& 
 	const bool bTextureUploadRejecteddestination = m_memoryAllocator == nullptr || destination == nullptr;
 	const bool bTextureUploadRejectedImage = bTextureUploadRejecteddestination || (destination->Image == VK_NULL_HANDLE);
 	const bool bUploadRejectedtextureUploadValid = bTextureUploadRejectedImage || (!textureUpload.IsValid());
-	const bool textureUploadRejected = bUploadRejectedtextureUploadValid || (commandList.GetBackendApi() != ERhiBackendApi::Vulkan);
+	const bool bTextureUploadRejected = bUploadRejectedtextureUploadValid || (commandList.GetBackendApi() != ERhiBackendApi::Vulkan);
 	
-	if (textureUploadRejected)
+	if (bTextureUploadRejected)
 	{
 		return false;
 	}
@@ -250,10 +250,10 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanUploadService::CreateTextureSta
 	}
 
 	std::vector<std::uint8_t> uploadBytes(static_cast<std::size_t>(uploadBufferBytes));
-	const bool textureCopied = CopyTextureUploadData(textureUpload, uploadBytes, copyRegions);
-	const bool stagingWritten = textureCopied && m_memoryAllocator->WriteAllocation(*stagingResource, uploadBytes.data(), uploadBytes.size());
+	const bool bTextureCopied = CopyTextureUploadData(textureUpload, uploadBytes, copyRegions);
+	const bool bStagingWritten = bTextureCopied && m_memoryAllocator->WriteAllocation(*stagingResource, uploadBytes.data(), uploadBytes.size());
 
-	if (!stagingWritten)
+	if (!bStagingWritten)
 	{
 		return {};
 	}

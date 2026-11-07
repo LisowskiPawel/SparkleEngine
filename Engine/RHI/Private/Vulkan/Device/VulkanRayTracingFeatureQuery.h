@@ -4,21 +4,21 @@
 
 struct VulkanRayTracingFeatureStatus final
 {
-	bool SupportsAccelerationStructureExtension = false;
-	bool SupportsRayTracingPipelineExtension = false;
-	bool SupportsRayQueryExtension = false;
-	bool SupportsDeferredHostOperationsExtension = false;
-	bool SupportsBufferDeviceAddressExtension = false;
-	bool SupportsPtlasExtension = false;
-	bool SupportsBufferDeviceAddressFeature = false;
-	bool SupportsAccelerationStructureFeature = false;
-	bool SupportsRayTracingPipelineFeature = false;
-	bool SupportsRayQueryFeature = false;
-	bool SupportsPtlasFeature = false;
-	bool EnabledAccelerationStructure = false;
-	bool EnabledInlineRayQuery = false;
-	bool EnabledRayTracingPipeline = false;
-	bool EnabledPtlas = false;
+	bool bSupportsAccelerationStructureExtension = false;
+	bool bSupportsRayTracingPipelineExtension = false;
+	bool bSupportsRayQueryExtension = false;
+	bool bSupportsDeferredHostOperationsExtension = false;
+	bool bSupportsBufferDeviceAddressExtension = false;
+	bool bSupportsPtlasExtension = false;
+	bool bSupportsBufferDeviceAddressFeature = false;
+	bool bSupportsAccelerationStructureFeature = false;
+	bool bSupportsRayTracingPipelineFeature = false;
+	bool bSupportsRayQueryFeature = false;
+	bool bSupportsPtlasFeature = false;
+	bool bEnabledAccelerationStructure = false;
+	bool bEnabledInlineRayQuery = false;
+	bool bEnabledRayTracingPipeline = false;
+	bool bEnabledPtlas = false;
 };
 
 namespace VulkanRayTracingFeatureQuery

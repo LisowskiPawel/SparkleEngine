@@ -49,9 +49,9 @@ struct RhiBindingLimits
 
 struct RhiUploadReadbackCapabilities
 {
-	bool SupportsBufferUpload = false;
-	bool SupportsTextureUpload = false;
-	bool SupportsReadback = false;
+	bool bSupportsBufferUpload = false;
+	bool bSupportsTextureUpload = false;
+	bool bSupportsReadback = false;
 };
 
 struct RhiPresentationCapabilities
@@ -63,8 +63,8 @@ struct RhiPresentationCapabilities
 
 struct RhiDescriptorIndexingCapabilities
 {
-	bool SupportsSampledImageArrayNonUniformIndexing = false;
-	bool SupportsPartiallyBoundDescriptorArrays = false;
+	bool bNonUniformSampledImages = false;
+	bool bSupportsPartiallyBoundDescriptorArrays = false;
 };
 
 struct RhiBackendVersionInfo
@@ -80,22 +80,22 @@ struct RhiBackendVersionInfo
 
 struct RhiBackendDiagnosticsSupport
 {
-	bool ValidationEnabled = false;
-	bool SupportsDebugLayer = false;
-	bool SupportsObjectNames = false;
-	bool SupportsGpuEvents = false;
-	bool SupportsTimestampQueries = false;
-	bool SupportsDebugMessages = false;
-	bool SupportsLiveObjectReports = false;
-	bool SupportsCrashDiagnostics = false;
+	bool bValidationEnabled = false;
+	bool bSupportsDebugLayer = false;
+	bool bSupportsObjectNames = false;
+	bool bSupportsGpuEvents = false;
+	bool bSupportsTimestampQueries = false;
+	bool bSupportsDebugMessages = false;
+	bool bSupportsLiveObjectReports = false;
+	bool bSupportsCrashDiagnostics = false;
 };
 
 struct RhiBackendMemorySupport
 {
-	bool SupportsMemoryDiagnostics = false;
-	bool SupportsBudgetQueries = false;
-	bool SupportsDelayedDestructionTracking = false;
-	bool SupportsResidencyPressure = false;
+	bool bSupportsMemoryDiagnostics = false;
+	bool bSupportsBudgetQueries = false;
+	bool bSupportsDelayedDestructionTracking = false;
+	bool bSupportsResidencyPressure = false;
 };
 
 enum class ERhiExternalFeatureBridgeKind : std::uint8_t
@@ -119,23 +119,23 @@ struct RhiExternalFeatureInteropCapabilities
 {
 	ERhiExternalFeatureBridgeKind BridgeKind = ERhiExternalFeatureBridgeKind::None;
 	RhiAdapterIdentity Adapter;
-	bool ExposesNativeDevice = false;
-	bool ExposesNativeGraphicsQueue = false;
-	bool ExposesNativeGraphicsCommandList = false;
-	bool ExposesNativeResources = false;
-	bool SupportsExplicitResourceStates = false;
-	bool SupportsExternalProviderEvaluation = false;
-	bool SupportsRuntimeProviderChecks = false;
+	bool bExposesNativeDevice = false;
+	bool bExposesNativeGraphicsQueue = false;
+	bool bExposesNativeGraphicsCommandList = false;
+	bool bExposesNativeResources = false;
+	bool bSupportsExplicitResourceStates = false;
+	bool bSupportsExternalProviderEvaluation = false;
+	bool bSupportsRuntimeProviderChecks = false;
 };
 
 struct RhiFormatSupport
 {
 	PixelFormat Format = PixelFormat::Unknown;
-	bool SupportsTexture = false;
-	bool SupportsShaderResource = false;
-	bool SupportsUnorderedAccess = false;
-	bool SupportsRenderTarget = false;
-	bool SupportsDepthStencil = false;
+	bool bSupportsTexture = false;
+	bool bSupportsShaderResource = false;
+	bool bSupportsUnorderedAccess = false;
+	bool bSupportsRenderTarget = false;
+	bool bSupportsDepthStencil = false;
 };
 
 inline constexpr std::array<PixelFormat, 24> kRhiCapabilityPixelFormats = {
@@ -178,11 +178,11 @@ struct RhiCapabilities
 	std::array<RhiFormatSupport, kRhiCapabilityPixelFormats.size()> FormatSupport = {};
 	RhiBackendDiagnosticsSupport Diagnostics;
 	RhiRayTracingCapabilities RayTracing;
-	bool SupportsShaderFloat64 = false;
-	bool SupportsMeshShaders = false;
-	bool SupportsTaskShaders = false;
+	bool bSupportsShaderFloat64 = false;
+	bool bSupportsMeshShaders = false;
+	bool bSupportsTaskShaders = false;
 	RhiQueueCapabilities Queues;
-	bool SupportsPresent = false;
+	bool bSupportsPresent = false;
 	ERhiMemoryAllocatorBackend MemoryAllocator = ERhiMemoryAllocatorBackend::Unknown;
 	RhiBackendMemorySupport MemorySupport;
 	RhiExternalFeatureInteropCapabilities ExternalFeatureInterop;

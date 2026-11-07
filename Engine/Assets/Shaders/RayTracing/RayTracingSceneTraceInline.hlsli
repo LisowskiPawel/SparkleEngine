@@ -16,22 +16,22 @@ RayTracingTraceResult TraceSceneRay(RaytracingAccelerationStructure sceneTlas, f
 	query.TraceRayInline(sceneTlas, rayFlags | RAY_FLAG_SKIP_CLOSEST_HIT_SHADER, instanceMask, ray);
 	while (query.Proceed())
 	{
-		const bool nonOpaqueCandidate = query.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE;
-		const bool candidateAlphaAccepted = nonOpaqueCandidate && ResolveRayTracingCandidateAlpha(query.CandidateInstanceID(), query.CandidatePrimitiveIndex(), query.CandidateTriangleBarycentrics(), query.CandidateTriangleFrontFace());
+		const bool bNonOpaqueCandidate = query.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE;
+		const bool bCandidateAlphaAccepted = bNonOpaqueCandidate && ResolveRayTracingCandidateAlpha(query.CandidateInstanceID(), query.CandidatePrimitiveIndex(), query.CandidateTriangleBarycentrics(), query.CandidateTriangleFrontFace());
 		
-		if (candidateAlphaAccepted)
+		if (bCandidateAlphaAccepted)
 		{
 			query.CommitNonOpaqueTriangleHit();
 		}
 	}
 
 	RayTracingTraceResult result;
-	result.Hit = query.CommittedStatus() == COMMITTED_TRIANGLE_HIT;
-	result.FrontFace = result.Hit && query.CommittedTriangleFrontFace();
-	result.RayT = result.Hit ? query.CommittedRayT() : ray.TMax;
-	result.InstanceId = result.Hit ? query.CommittedInstanceID() : 0u;
-	result.PrimitiveIndex = result.Hit ? query.CommittedPrimitiveIndex() : 0u;
-	result.Barycentrics = result.Hit ? query.CommittedTriangleBarycentrics() : 0.0f.xx;
+	result.bHit = query.CommittedStatus() == COMMITTED_TRIANGLE_HIT;
+	result.bFrontFace = result.bHit && query.CommittedTriangleFrontFace();
+	result.RayT = result.bHit ? query.CommittedRayT() : ray.TMax;
+	result.InstanceId = result.bHit ? query.CommittedInstanceID() : 0u;
+	result.PrimitiveIndex = result.bHit ? query.CommittedPrimitiveIndex() : 0u;
+	result.Barycentrics = result.bHit ? query.CommittedTriangleBarycentrics() : 0.0f.xx;
 	return result;
 }
 

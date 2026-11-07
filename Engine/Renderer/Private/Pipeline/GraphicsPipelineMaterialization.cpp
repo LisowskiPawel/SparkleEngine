@@ -23,7 +23,7 @@ namespace GraphicsPipelineMaterialization
 			const RhiVertexInputBinding& binding = declaration.Bindings[index];
 			Append(hash, binding.Binding);
 			Append(hash, binding.StrideInBytes);
-			Append(hash, binding.PerInstance);
+			Append(hash, binding.bPerInstance);
 		}
 		for (std::uint32_t index = 0; index < elementCount; ++index)
 		{
@@ -39,13 +39,13 @@ namespace GraphicsPipelineMaterialization
 
 	void AppendBlend(std::uint64_t& hash, const RhiBlendState& blend) noexcept
 	{
-		Append(hash, blend.AlphaToCoverageEnable);
-		Append(hash, blend.IndependentBlendEnable);
-		const std::size_t targetCount = blend.IndependentBlendEnable ? blend.Targets.size() : 1;
+		Append(hash, blend.bAlphaToCoverageEnable);
+		Append(hash, blend.bIndependentBlendEnable);
+		const std::size_t targetCount = blend.bIndependentBlendEnable ? blend.Targets.size() : 1;
 		for (std::size_t index = 0; index < targetCount; ++index)
 		{
 			const RhiBlendTargetState& target = blend.Targets[index];
-			Append(hash, target.BlendEnable);
+			Append(hash, target.bBlendEnable);
 			Append(hash, target.SourceColor);
 			Append(hash, target.DestinationColor);
 			Append(hash, target.ColorOperation);
@@ -58,7 +58,7 @@ namespace GraphicsPipelineMaterialization
 
 	void AppendStencil(std::uint64_t& hash, const RhiStencilState& stencil) noexcept
 	{
-		Append(hash, stencil.StencilEnable);
+		Append(hash, stencil.bStencilEnable);
 		Append(hash, stencil.StencilReadMask);
 		Append(hash, stencil.StencilWriteMask);
 		Append(hash, stencil.FrontFaceStencilFunc);
@@ -83,9 +83,9 @@ std::size_t GraphicsPipelineKeyHash::operator()(const GraphicsPipelineKey& key) 
 	GraphicsPipelineMaterialization::Append(hash, key.Request.Rasterizer.FillMode);
 	GraphicsPipelineMaterialization::Append(hash, key.Request.Rasterizer.CullMode);
 	GraphicsPipelineMaterialization::Append(hash, key.Request.Rasterizer.FrontFaceWinding);
-	GraphicsPipelineMaterialization::Append(hash, key.Request.Rasterizer.DepthClipEnable);
-	GraphicsPipelineMaterialization::Append(hash, key.Request.Depth.DepthEnable);
-	GraphicsPipelineMaterialization::Append(hash, key.Request.Depth.DepthWriteEnable);
+	GraphicsPipelineMaterialization::Append(hash, key.Request.Rasterizer.bDepthClipEnable);
+	GraphicsPipelineMaterialization::Append(hash, key.Request.Depth.bDepthEnable);
+	GraphicsPipelineMaterialization::Append(hash, key.Request.Depth.bDepthWriteEnable);
 	GraphicsPipelineMaterialization::Append(hash, key.Request.Depth.DepthFunc);
 	GraphicsPipelineMaterialization::AppendStencil(hash, key.Request.Stencil);
 	GraphicsPipelineMaterialization::Append(hash, key.Request.PrimitiveTopology);

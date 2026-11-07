@@ -33,7 +33,7 @@ std::string ShaderDebugArtifactWriter::BuildCompileRequestJson(
 	writer.WriteHexUInt64("compileInputHash", compiledStage.compileInputHash);
 	writer.WriteString("codeSha256", codeSha256);
 	writer.WriteString("compilerInputSha256", compilerInputSha256);
-	writer.WriteRaw("optimized", request.EnableOptimizations ? "true" : "false");
+	writer.WriteRaw("optimized", request.bEnableOptimizations ? "true" : "false");
 	writer.WriteString("symbolName", symbolName);
 	if (debugArtifacts.CompilerLookupKey.empty())
 	{
@@ -115,7 +115,7 @@ std::string ShaderDebugArtifactWriter::BuildReflectionJson(const ShaderReflectio
 		    binding.Slot,
 		    binding.ArrayCount,
 		    binding.SizeInBytes,
-		    binding.IsReadOnly ? "true" : "false",
+		    binding.bIsReadOnly ? "true" : "false",
 		    binding.ConstantBufferIndex);
 		if (index + 1 < reflection.Bindings.size())
 		{

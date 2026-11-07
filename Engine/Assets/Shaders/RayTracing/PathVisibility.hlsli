@@ -9,7 +9,7 @@
 bool IsPathUnoccluded(RaytracingAccelerationStructure sceneTlas, RayTracingPathSurface surface, LightSampling::DirectLightSample lightSample)
 {
 	RayDesc ray;
-	if (lightSample.IsDirectional)
+	if (lightSample.bIsDirectional)
 	{
 		ray = RayEndpoints::Continuation(surface.PositionWorld, surface.GeometricNormalWorld, surface.PositionError, lightSample.DirectionWorld);
 	}
@@ -25,7 +25,7 @@ bool IsPathUnoccluded(RaytracingAccelerationStructure sceneTlas, RayTracingPathS
 	}
 
 	const RayTracingTraceResult trace = TraceSceneRay(sceneTlas, ray.Origin, ray.Direction, ray.TMin, ray.TMax, RAY_FLAG_CULL_BACK_FACING_TRIANGLES, 0xFFu);
-	return !trace.Hit || (trace.InstanceId == lightSample.TargetInstanceId && trace.PrimitiveIndex == lightSample.TargetPrimitiveIndex);
+	return !trace.bHit || (trace.InstanceId == lightSample.TargetInstanceId && trace.PrimitiveIndex == lightSample.TargetPrimitiveIndex);
 }
 
 #endif

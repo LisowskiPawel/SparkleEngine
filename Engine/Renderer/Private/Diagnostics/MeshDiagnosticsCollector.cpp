@@ -59,14 +59,14 @@ void MeshDiagnosticsCollector::CollectRows(const RenderScene& scene, const GpuMe
 		if (primitive.Static.MeshKind == SceneMeshKind::Skeletal)
 		{
 			++row->SkinnedInstanceCount;
-			row->HasSkeletonBinding = true;
-			row->HasSkinInfluences = true;
+			row->bHasSkeletonBinding = true;
+			row->bHasSkinInfluences = true;
 		}
 
 		const MaterialHandle materialHandle = primitive.Static.Material;
-		if (!row->HasMaterial && materialHandle.IsValid())
+		if (!row->bHasMaterial && materialHandle.IsValid())
 		{
-			row->HasMaterial = true;
+			row->bHasMaterial = true;
 			row->FirstMaterialSlot = materialHandle.GetIndex();
 		}
 	}
@@ -162,7 +162,7 @@ MeshGeometryInstancingDiagnostics MeshDiagnosticsCollector::CaptureGeometryInsta
 	    renderItems,
 	    primitives,
 	    renderInstanceGroups,
-	    MeshInstanceBatchBuildOptions{.EnableAutoBatching = CVarRendererMeshAutoBatching.Get(), .RequireMaterialBindingSet = false, .CollectDiagnostics = true},
+	    MeshInstanceBatchBuildOptions{.bEnableAutoBatching = CVarRendererMeshAutoBatching.Get(), .bRequireMaterialBindingSet = false, .bCollectDiagnostics = true},
 	    batchResult);
 
 	MeshGeometryInstancingDiagnostics diagnostics = batchResult.Diagnostics;
@@ -209,7 +209,7 @@ void MeshDiagnosticsCollector::PopulateMeshRow(MeshDiagnosticsRow& row, const Me
 	}
 
 	row.MeshRuntimeId = reinterpret_cast<std::uintptr_t>(&mesh);
-	row.CpuLoaded = meshData.IsValid();
+	row.bCpuLoaded = meshData.IsValid();
 	row.VertexCount = meshData.GetVertexCount();
 	row.IndexCount = meshData.GetIndexCount();
 	row.TriangleCount = row.IndexCount / 3u;
@@ -236,7 +236,7 @@ void MeshDiagnosticsCollector::PopulateMeshRow(MeshDiagnosticsRow& row, const Me
 		}
 		row.Bounds.Min = {minX, minY, minZ};
 		row.Bounds.Max = {maxX, maxY, maxZ};
-		row.Bounds.IsValid = true;
+		row.Bounds.bIsValid = true;
 	}
 
 	if (gpuMeshCache == nullptr)
@@ -247,7 +247,7 @@ void MeshDiagnosticsCollector::PopulateMeshRow(MeshDiagnosticsRow& row, const Me
 	if (const GpuMesh* gpuMesh = gpuMeshCache->Find(mesh))
 	{
 		row.GpuMeshRuntimeId = reinterpret_cast<std::uintptr_t>(gpuMesh);
-		row.GpuResident = gpuMesh->IsValid();
+		row.bGpuResident = gpuMesh->IsValid();
 		row.EstimatedGpuByteSize = static_cast<std::uint64_t>(gpuMesh->GetVertexBufferView().SizeInBytes) + static_cast<std::uint64_t>(gpuMesh->GetIndexBufferView().SizeInBytes);
 	}
 }

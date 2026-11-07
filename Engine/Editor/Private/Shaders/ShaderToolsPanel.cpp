@@ -12,7 +12,7 @@
 void ShaderToolsPanel::SetDiagnosticsProvider(RegisteredShaderListModel::DiagnosticsProvider provider)
 {
 	m_model.SetDiagnosticsProvider(std::move(provider));
-	m_hasRows = false;
+	m_bHasRows = false;
 }
 
 void ShaderToolsPanel::SetReloadHandler(CommandHandler handler)
@@ -25,27 +25,27 @@ void ShaderToolsPanel::SetCompileHandler(std::function<ConsoleCommandResult(bool
 	m_compileHandler = std::move(handler);
 }
 
-void ShaderToolsPanel::SetCompileStatus(bool busy, std::string_view message)
+void ShaderToolsPanel::SetCompileStatus(bool bBusy, std::string_view message)
 {
-	m_compiling = busy;
+	m_bCompiling = bBusy;
 	if (!message.empty())
 	{
 		m_compileStatus = message.substr(0, message.find('\n'));
-		m_hasRows = false;
+		m_bHasRows = false;
 		m_exportInspection.Invalidate();
 	}
 }
 
-ConsoleCommandResult ShaderToolsPanel::RequestCompile(bool generateSymbols)
+ConsoleCommandResult ShaderToolsPanel::RequestCompile(bool bGenerateSymbols)
 {
-	ConsoleCommandResult result = m_compileHandler ? m_compileHandler(generateSymbols) : ConsoleCommandResult::Error("Shader compilation is unavailable in this host.");
+	ConsoleCommandResult result = m_compileHandler ? m_compileHandler(bGenerateSymbols) : ConsoleCommandResult::Error("Shader compilation is unavailable in this host.");
 	m_compileStatus = result.Message;
 	return result;
 }
 
-void ShaderToolsPanel::BuildUI(bool disableInteraction)
+void ShaderToolsPanel::BuildUI(bool bDisableInteraction)
 {
-	if (!m_isOpen)
+	if (!m_bIsOpen)
 	{
 		return;
 	}
@@ -53,18 +53,18 @@ void ShaderToolsPanel::BuildUI(bool disableInteraction)
 	EnsureRows();
 	ImGui::SetNextWindowSize(ImVec2(1180.0f, 760.0f), ImGuiCond_FirstUseEver);
 	const std::string windowTitle = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Shader, "Shader Tools") + "##Shader Tools";
-	if (!ImGui::Begin(windowTitle.c_str(), &m_isOpen))
+	if (!ImGui::Begin(windowTitle.c_str(), &m_bIsOpen))
 	{
 		ImGui::End();
 		return;
 	}
 
-	DrawToolbar(disableInteraction);
+	DrawToolbar(bDisableInteraction);
 	ImGui::Separator();
 	const float availableHeight = ImGui::GetContentRegionAvail().y;
 	const float tableHeight = availableHeight * 0.48f;
 	ImGui::BeginChild("##ShaderToolsTableRegion", ImVec2(0.0f, tableHeight), ImGuiChildFlags_None);
-	DrawTable(disableInteraction);
+	DrawTable(bDisableInteraction);
 	ImGui::EndChild();
 	const std::string inspectionLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Shader, "Selected Shader Inspection");
 	ImGui::SeparatorText(inspectionLabel.c_str());
@@ -88,25 +88,25 @@ void ShaderToolsPanel::DrawExportText(const char* childId, const std::string& te
 
 void ShaderToolsPanel::EnsureRows()
 {
-	if (m_hasRows)
+	if (m_bHasRows)
 	{
 		return;
 	}
 
 	m_model.Refresh();
-	m_hasRows = true;
+	m_bHasRows = true;
 }
 
-void ShaderToolsPanel::DrawToolbar(bool disableInteraction)
+void ShaderToolsPanel::DrawToolbar(bool bDisableInteraction)
 {
-	ImGui::BeginDisabled(disableInteraction);
-	ImGui::BeginDisabled(m_compiling || !m_compileHandler);
-	if (ImGui::Button(m_compiling ? "Compiling shaders..." : "Recompile Shaders"))
+	ImGui::BeginDisabled(bDisableInteraction);
+	ImGui::BeginDisabled(m_bCompiling || !m_compileHandler);
+	if (ImGui::Button(m_bCompiling ? "Compiling shaders..." : "Recompile Shaders"))
 	{
-		(void) RequestCompile(m_generateSymbols);
+		(void) RequestCompile(m_bGenerateSymbols);
 	}
 	ImGui::SameLine();
-	ImGui::Checkbox("Generate shader symbols", &m_generateSymbols);
+	ImGui::Checkbox("Generate shader symbols", &m_bGenerateSymbols);
 	if (ImGui::IsItemHovered())
 	{
 		ImGui::SetTooltip("Export private shader debug data; runtime optimization is unchanged.");
@@ -117,7 +117,7 @@ void ShaderToolsPanel::DrawToolbar(bool disableInteraction)
 	if (ImGui::Button(refreshLabel.c_str()))
 	{
 		m_model.Refresh();
-		m_hasRows = true;
+		m_bHasRows = true;
 		m_exportInspection.Invalidate();
 	}
 	ImGui::SameLine();
@@ -125,7 +125,7 @@ void ShaderToolsPanel::DrawToolbar(bool disableInteraction)
 	if (ImGui::Button(reloadLabel.c_str()) && m_reloadHandler)
 	{
 		m_reloadHandler();
-		m_hasRows = false;
+		m_bHasRows = false;
 		m_exportInspection.Invalidate();
 	}
 	ImGui::SameLine();
@@ -141,7 +141,7 @@ void ShaderToolsPanel::DrawToolbar(bool disableInteraction)
 	}
 }
 
-void ShaderToolsPanel::DrawTable(bool disableInteraction)
+void ShaderToolsPanel::DrawTable(bool bDisableInteraction)
 {
 	const ImGuiTableFlags tableFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY;
 	if (!ImGui::BeginTable("##RegisteredShadersTable", 8, tableFlags, ImVec2(0.0f, 0.0f)))
@@ -160,7 +160,7 @@ void ShaderToolsPanel::DrawTable(bool disableInteraction)
 	ImGui::TableSetupColumn("Artifacts");
 	ImGui::TableHeadersRow();
 
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	for (const RegisteredShaderRow& row : m_model.GetRows())
 	{
 		if (!MatchesFilter(row))
@@ -170,8 +170,8 @@ void ShaderToolsPanel::DrawTable(bool disableInteraction)
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		const bool selected = row.ShaderTypeId == m_selectedShaderTypeId;
-		if (ImGui::Selectable(row.ShaderName.c_str(), selected, ImGuiSelectableFlags_SpanAllColumns))
+		const bool bSelected = row.ShaderTypeId == m_selectedShaderTypeId;
+		if (ImGui::Selectable(row.ShaderName.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
 		{
 			m_selectedShaderTypeId = row.ShaderTypeId;
 		}

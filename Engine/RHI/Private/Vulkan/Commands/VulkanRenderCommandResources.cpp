@@ -23,11 +23,11 @@ void VulkanRenderCommandList::CopyResource(RhiResourceHandle destinationResource
 
 	VulkanRecordingResource destination;
 	VulkanRecordingResource source;
-	const bool destinationResolved = ResolveResource(destinationResource, destination);
-	const bool sourceResolved = destinationResolved && ResolveResource(sourceResource, source);
-	const bool resourceKindsMatch = sourceResolved && destination.ResourceKind == source.ResourceKind;
+	const bool bDestinationResolved = ResolveResource(destinationResource, destination);
+	const bool bSourceResolved = bDestinationResolved && ResolveResource(sourceResource, source);
+	const bool bResourceKindsMatch = bSourceResolved && destination.ResourceKind == source.ResourceKind;
 
-	if (!resourceKindsMatch)
+	if (!bResourceKindsMatch)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan CopyResource requires two resolved resources of the same kind.");
 	}
@@ -140,9 +140,9 @@ void VulkanRenderCommandList::RecordBufferTransition(
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan buffer transition references incomplete recording metadata.");
 	}
-	const bool unsupportedBufferTransition = !VulkanTypeConversions::IsBufferResourceStateSupported(before) || !VulkanTypeConversions::IsBufferResourceStateSupported(after);
+	const bool bUnsupportedBufferTransition = !VulkanTypeConversions::IsBufferResourceStateSupported(before) || !VulkanTypeConversions::IsBufferResourceStateSupported(after);
 	
-	if (unsupportedBufferTransition)
+	if (bUnsupportedBufferTransition)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan buffer transition uses an image-only resource state.");
 	}
@@ -186,9 +186,9 @@ void VulkanRenderCommandList::RecordImageTransition(
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan image transition references incomplete recording metadata.");
 	}
-	const bool unsupportedImageTransition = !VulkanTypeConversions::IsImageResourceStateSupported(before) || !VulkanTypeConversions::IsImageResourceStateSupported(after);
+	const bool bUnsupportedImageTransition = !VulkanTypeConversions::IsImageResourceStateSupported(before) || !VulkanTypeConversions::IsImageResourceStateSupported(after);
 	
-	if (unsupportedImageTransition)
+	if (bUnsupportedImageTransition)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan image transition uses a buffer-only resource state.");
 	}
@@ -308,12 +308,12 @@ VkBuffer VulkanRenderCommandList::ResolveBuffer(RhiGpuVirtualAddress gpuAddress)
 
 bool VulkanRenderCommandList::ResolveResource(RhiResourceHandle resource, VulkanRecordingResource& outResource) const noexcept
 {
-	const bool recordingResourceResolved = m_memoryAllocator != nullptr && m_memoryAllocator->ResolveRecordingResource(resource, outResource);
-	const bool bLookupAvailablememoryAllocator = !recordingResourceResolved && m_memoryAllocator != nullptr;
-	const bool coordinatorLookupAvailable = bLookupAvailablememoryAllocator && (IsCoordinatorRecording());
-	const bool coordinatorResourceResolved = coordinatorLookupAvailable && m_memoryAllocator->ResolveCoordinatorRecordingResource(resource, outResource);
+	const bool bRecordingResourceResolved = m_memoryAllocator != nullptr && m_memoryAllocator->ResolveRecordingResource(resource, outResource);
+	const bool bLookupAvailablememoryAllocator = !bRecordingResourceResolved && m_memoryAllocator != nullptr;
+	const bool bCoordinatorLookupAvailable = bLookupAvailablememoryAllocator && (IsCoordinatorRecording());
+	const bool bCoordinatorResourceResolved = bCoordinatorLookupAvailable && m_memoryAllocator->ResolveCoordinatorRecordingResource(resource, outResource);
 
-	if (recordingResourceResolved || coordinatorResourceResolved)
+	if (bRecordingResourceResolved || bCoordinatorResourceResolved)
 	{
 		return true;
 	}
@@ -338,9 +338,9 @@ VulkanRenderCommandList::BufferBinding VulkanRenderCommandList::ResolveBufferBin
 	}
 
 	BufferBinding binding;
-	const bool uploadAddressResolved = m_recordingUploadPage != nullptr && m_recordingUploadPage->Resolve(gpuAddress, binding.Buffer, binding.Offset, binding.Range);
+	const bool bUploadAddressResolved = m_recordingUploadPage != nullptr && m_recordingUploadPage->Resolve(gpuAddress, binding.Buffer, binding.Offset, binding.Range);
 	
-	if (uploadAddressResolved)
+	if (bUploadAddressResolved)
 	{
 		return binding;
 	}

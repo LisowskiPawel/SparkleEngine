@@ -15,7 +15,7 @@ namespace LightSampling
 
 	struct DirectLightSample
 	{
-		bool Valid;
+		bool bValid;
 		float3 DirectionWorld;
 		float Distance;
 		float3 IncidentRadiance;
@@ -26,8 +26,8 @@ namespace LightSampling
 		float EmitterEndpointBaseOffset;
 		float4 EmitterEndpointTraversalSensitivity;
 		float VisibilityDistance;
-		bool IsDirectional;
-		bool Delta;
+		bool bIsDirectional;
+		bool bDelta;
 		uint TargetInstanceId;
 		uint TargetPrimitiveIndex;
 	};
@@ -35,7 +35,7 @@ namespace LightSampling
 	DirectLightSample InvalidDirectLightSample()
 	{
 		DirectLightSample result;
-		result.Valid = false;
+		result.bValid = false;
 		result.DirectionWorld = 0.0f.xxx;
 		result.Distance = 0.0f;
 		result.IncidentRadiance = 0.0f.xxx;
@@ -46,24 +46,24 @@ namespace LightSampling
 		result.EmitterEndpointBaseOffset = 0.0f;
 		result.EmitterEndpointTraversalSensitivity = 0.0f.xxxx;
 		result.VisibilityDistance = 0.0f;
-		result.IsDirectional = false;
-		result.Delta = false;
+		result.bIsDirectional = false;
+		result.bDelta = false;
 		result.TargetInstanceId = 0xFFFFFFFFu;
 		result.TargetPrimitiveIndex = 0xFFFFFFFFu;
 		return result;
 	}
 
-	DirectLightSample PunctualDirectLightSample(float3 directionWorld, float3 incidentRadiance, float distanceToLight, bool isDirectional)
+	DirectLightSample PunctualDirectLightSample(float3 directionWorld, float3 incidentRadiance, float distanceToLight, bool bIsDirectional)
 	{
 		DirectLightSample result = InvalidDirectLightSample();
-		result.Valid = any(incidentRadiance > 0.0f.xxx);
+		result.bValid = any(incidentRadiance > 0.0f.xxx);
 		result.DirectionWorld = SafeNormalize(directionWorld);
 		result.Distance = distanceToLight;
 		result.IncidentRadiance = max(incidentRadiance, 0.0f.xxx);
 		result.PdfW = 1.0f;
 		result.VisibilityDistance = distanceToLight;
-		result.IsDirectional = isDirectional;
-		result.Delta = true;
+		result.bIsDirectional = bIsDirectional;
+		result.bDelta = true;
 		return result;
 	}
 
@@ -96,7 +96,7 @@ namespace LightSampling
 		}
 
 		DirectLightSample result = InvalidDirectLightSample();
-		result.Valid = any(emittedRadiance > 0.0f.xxx);
+		result.bValid = any(emittedRadiance > 0.0f.xxx);
 		result.DirectionWorld = directionWorld;
 		result.Distance = distanceToLight;
 		result.IncidentRadiance = max(emittedRadiance, 0.0f.xxx) * rangeCutoff;
@@ -116,15 +116,15 @@ namespace LightSampling
 	DirectLightSample RadiometricDirectionalLightSample(float3 directionWorld, float3 irradiance)
 	{
 		DirectLightSample result = (DirectLightSample)0;
-		result.Valid = true;
+		result.bValid = true;
 		result.DirectionWorld = normalize(directionWorld);
 		result.Distance = FLT_MAX;
 		result.IncidentRadiance = irradiance;
 		result.PdfW = 0.0f;
 		result.LightSelectionPdf = 1.0f;
 		result.VisibilityDistance = FLT_MAX;
-		result.IsDirectional = true;
-		result.Delta = true;
+		result.bIsDirectional = true;
+		result.bDelta = true;
 		result.TargetInstanceId = 0xFFFFFFFFu;
 		result.TargetPrimitiveIndex = 0xFFFFFFFFu;
 		return result;
@@ -136,7 +136,7 @@ namespace LightSampling
 		const float3 toLight = lightPositionWorld - positionWorld;
 		const float distance2 = dot(toLight, toLight);
 		const float distance = sqrt(distance2);
-		result.Valid = true;
+		result.bValid = true;
 		result.DirectionWorld = toLight / distance;
 		result.Distance = distance;
 		result.IncidentRadiance = radiantIntensity / distance2;
@@ -146,14 +146,14 @@ namespace LightSampling
 		result.EmitterEndpointBaseOffset = 0.0f;
 		result.EmitterEndpointTraversalSensitivity = 0.0f.xxxx;
 		result.VisibilityDistance = distance;
-		result.IsDirectional = false;
-		result.Delta = true;
+		result.bIsDirectional = false;
+		result.bDelta = true;
 		result.TargetInstanceId = 0xFFFFFFFFu;
 		result.TargetPrimitiveIndex = 0xFFFFFFFFu;
 		return result;
 	}
 
-	DirectLightSample RadiometricAreaLightSample(float3 positionWorld, float3 samplePositionWorld, float3 emitterNormalWorld, float3 emittedRadiance, float pdfA, bool twoSided)
+	DirectLightSample RadiometricAreaLightSample(float3 positionWorld, float3 samplePositionWorld, float3 emitterNormalWorld, float3 emittedRadiance, float pdfA, bool bTwoSided)
 	{
 		DirectLightSample result = (DirectLightSample)0;
 		const float3 toLight = samplePositionWorld - positionWorld;
@@ -162,13 +162,13 @@ namespace LightSampling
 		const float3 directionWorld = toLight / distance;
 		const float3 normalWorld = normalize(emitterNormalWorld);
 		const float emitterCosine = dot(normalWorld, -directionWorld);
-		const float absoluteEmitterCosine = twoSided ? abs(emitterCosine) : emitterCosine;
+		const float absoluteEmitterCosine = bTwoSided ? abs(emitterCosine) : emitterCosine;
 		if (absoluteEmitterCosine <= 0.0f)
 		{
 			return (DirectLightSample)0;
 		}
 
-		result.Valid = true;
+		result.bValid = true;
 		result.DirectionWorld = directionWorld;
 		result.Distance = distance;
 		result.IncidentRadiance = emittedRadiance;
@@ -179,8 +179,8 @@ namespace LightSampling
 		result.EmitterEndpointBaseOffset = 0.0f;
 		result.EmitterEndpointTraversalSensitivity = 0.0f.xxxx;
 		result.VisibilityDistance = distance;
-		result.IsDirectional = false;
-		result.Delta = false;
+		result.bIsDirectional = false;
+		result.bDelta = false;
 		result.TargetInstanceId = 0xFFFFFFFFu;
 		result.TargetPrimitiveIndex = 0xFFFFFFFFu;
 		return result;

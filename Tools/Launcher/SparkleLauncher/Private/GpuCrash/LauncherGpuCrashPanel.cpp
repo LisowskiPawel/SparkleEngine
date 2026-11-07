@@ -59,21 +59,21 @@ namespace SparkleLauncher
 		layout->addWidget(enabled);
 		label->setBuddy(enabled);
 
-		const bool hasBuildSources = HasBuildSources(m_workspaceRoot);
+		const bool bHasBuildSources = HasBuildSources(m_workspaceRoot);
 
-		const auto refresh = [this, enabled, hasBuildSources]()
+		const auto refresh = [this, enabled, bHasBuildSources]()
 		{
-			const bool active = m_settings.GpuCrashMode() != RhiGpuCrashMode::Off;
-			enabled->setChecked(active);
-			enabled->setEnabled(hasBuildSources || active);
+			const bool bActive = m_settings.GpuCrashMode() != RhiGpuCrashMode::Off;
+			enabled->setChecked(bActive);
+			enabled->setEnabled(bHasBuildSources || bActive);
 		};
 
 		refresh();
 		connect(&m_settings, &LauncherSettings::SettingsChanged, item, refresh);
-		connect(enabled, &QCheckBox::clicked, this, [this](bool active) { m_settings.SetGpuCrashMode(active ? "aftermath" : "off"); });
+		connect(enabled, &QCheckBox::clicked, this, [this](bool bActive) { m_settings.SetGpuCrashMode(bActive ? "aftermath" : "off"); });
 
-		tools->setEnabled(hasBuildSources);
-		if (!hasBuildSources)
+		tools->setEnabled(bHasBuildSources);
+		if (!bHasBuildSources)
 		{
 			enabled->setToolTip("GPU crash debugging requires a source workspace and prepared diagnostic build.");
 		}
@@ -211,16 +211,16 @@ namespace SparkleLauncher
 
 	void LauncherGpuCrashPanel::RefreshGpuCrashIncident()
 	{
-		if (!m_gpuCrashIncident || m_gpuCrashQueryPending)
+		if (!m_gpuCrashIncident || m_bGpuCrashQueryPending)
 		{
 			return;
 		}
 
-		m_gpuCrashQueryPending = true;
+		m_bGpuCrashQueryPending = true;
 		const QPointer<LauncherGpuCrashPanel> window(this);
 		const auto sessionId = m_gpuCrashIncident->SessionId;
 
-		const bool accepted = m_backend.ObserveGpuCrash(
+		const bool bAccepted = m_backend.ObserveGpuCrash(
 		    *m_gpuCrashIncident,
 		    [window, sessionId](const QString& state)
 		    {
@@ -228,7 +228,7 @@ namespace SparkleLauncher
 			    {
 				    return;
 			    }
-			    window->m_gpuCrashQueryPending = false;
+			    window->m_bGpuCrashQueryPending = false;
 			    if (!window->m_gpuCrashIncident || window->m_gpuCrashIncident->SessionId != sessionId)
 			    {
 				    window->RefreshGpuCrashIncident();
@@ -237,9 +237,9 @@ namespace SparkleLauncher
 			    window->DisplayGpuCrashState(state);
 		    });
 
-		if (!accepted)
+		if (!bAccepted)
 		{
-			m_gpuCrashQueryPending = false;
+			m_bGpuCrashQueryPending = false;
 			DisplayGpuCrashState("Observation unavailable: the operation lane rejected this query");
 		}
 	}

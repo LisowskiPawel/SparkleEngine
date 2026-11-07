@@ -26,7 +26,7 @@ struct ReferencePathTracerArtifactWriteRequest final
 
 struct ReferencePathTracerArtifactWriteResult final
 {
-	bool Succeeded = false;
+	bool bSucceeded = false;
 	std::filesystem::path PublicationDirectory;
 	std::string ManifestSha256;
 	std::string ErrorMessage;

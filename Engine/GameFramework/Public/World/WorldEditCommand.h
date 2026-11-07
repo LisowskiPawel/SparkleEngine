@@ -33,7 +33,7 @@ struct SetCameraDescriptionCommand final
 struct SetEntityVisibilityCommand final
 {
 	EntityId Entity;
-	bool Value = true;
+	bool bValue = true;
 };
 
 struct SetLightDescriptionCommand final

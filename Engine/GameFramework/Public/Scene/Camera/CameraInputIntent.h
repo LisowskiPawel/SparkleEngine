@@ -11,6 +11,6 @@ struct SPARKLE_ENGINE_API CameraInputIntent final
 	float LookDeltaY = 0.0f;
 	float SpeedStepCount = 0.0f;
 	float AspectRatio = 1.0f;
-	bool Sprint = false;
-	bool HasAspectRatio = false;
+	bool bSprint = false;
+	bool bHasAspectRatio = false;
 };

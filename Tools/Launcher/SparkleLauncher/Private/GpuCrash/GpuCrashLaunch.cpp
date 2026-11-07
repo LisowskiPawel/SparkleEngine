@@ -67,9 +67,9 @@ namespace SparkleLauncher
 		const bool bInvalidIncidentIdentityfilename = !manifestPath.is_absolute() || manifestPath.filename() != "incident.json";
 		const bool bInvalidIncidentIdentitynative = bInvalidIncidentIdentityfilename || (manifestPath.native().starts_with(L"\\\\"));
 		const bool bIncidentIdentityIdentifiers = bInvalidIncidentIdentitynative || (!Identifiers::IsUuidV4String(sessionId));
-		const bool invalidIncidentIdentity = bIncidentIdentityIdentifiers || (childPid == 0);
+		const bool bInvalidIncidentIdentity = bIncidentIdentityIdentifiers || (childPid == 0);
 		
-		if (invalidIncidentIdentity)
+		if (bInvalidIncidentIdentity)
 		{
 			return {};
 		}
@@ -91,14 +91,14 @@ namespace SparkleLauncher
 		std::string identity;
 		std::string state;
 		std::uint32_t pid = 0;
-		const bool receiptRead = Files::TryReadAllText(manifestPath, json, error, 32u * 1024u * 1024u);
-		const bool identityRead = receiptRead && Json::TryReadStringProperty(json, "incidentId", identity);
-		const bool identityMatches = identityRead && identity == sessionId;
-		const bool pidRead = identityMatches && Json::TryReadUnsignedIntegerProperty(json, "childPid", pid);
-		const bool pidMatches = pidRead && pid == childPid;
-		const bool stateRead = pidMatches && Json::TryReadStringProperty(json, "state", state);
+		const bool bReceiptRead = Files::TryReadAllText(manifestPath, json, error, 32u * 1024u * 1024u);
+		const bool bIdentityRead = bReceiptRead && Json::TryReadStringProperty(json, "incidentId", identity);
+		const bool bIdentityMatches = bIdentityRead && identity == sessionId;
+		const bool bPidRead = bIdentityMatches && Json::TryReadUnsignedIntegerProperty(json, "childPid", pid);
+		const bool bPidMatches = bPidRead && pid == childPid;
+		const bool bStateRead = bPidMatches && Json::TryReadStringProperty(json, "state", state);
 
-		if (!stateRead)
+		if (!bStateRead)
 		{
 			return {};
 		}
@@ -162,11 +162,11 @@ namespace SparkleLauncher
 		}
 		Hash::Sha256Digest hash;
 		std::string executableHash;
-		const bool expectedHashRead = Json::TryReadStringProperty(json, "executableSha256", executableHash);
-		const bool executableHashed = expectedHashRead && Hash::TrySha256File(expected.ExecutablePath, hash, error);
-		const bool executableMatches = executableHashed && executableHash == Hash::Sha256ToHex(hash);
+		const bool bExpectedHashRead = Json::TryReadStringProperty(json, "executableSha256", executableHash);
+		const bool bExecutableHashed = bExpectedHashRead && Hash::TrySha256File(expected.ExecutablePath, hash, error);
+		const bool bExecutableMatches = bExecutableHashed && executableHash == Hash::Sha256ToHex(hash);
 
-		if (!executableMatches)
+		if (!bExecutableMatches)
 		{
 			error = "Child GPU crash identity does not match the selected executable.";
 			return Process::ChildReadinessDecision::Rejected;
@@ -176,16 +176,16 @@ namespace SparkleLauncher
 		std::string actualProfile;
 		std::string actualApi;
 		std::string actualExport;
-		const bool candidateRead = Json::TryReadObjectProperty(json, "candidate", candidate);
-		const bool profileRead = candidateRead && Json::TryReadStringProperty(candidate, "profile", actualProfile);
-		const bool profileMatches = profileRead && actualProfile == expected.Profile;
-		const bool apiRead = profileMatches && Json::TryReadStringProperty(candidate, "graphicsApi", actualApi);
-		const bool apiMatches = apiRead && Strings::EqualsIgnoreCase(actualApi, expected.GraphicsApi);
-		const bool exportHashRead = apiMatches && Json::TryReadStringProperty(candidate, "shaderExportSha256", actualExport);
-		const bool exportHashed = exportHashRead && Hash::TrySha256File(expected.ShaderExportPath, hash, error);
-		const bool exportMatches = exportHashed && actualExport == Hash::Sha256ToHex(hash);
+		const bool bCandidateRead = Json::TryReadObjectProperty(json, "candidate", candidate);
+		const bool bProfileRead = bCandidateRead && Json::TryReadStringProperty(candidate, "profile", actualProfile);
+		const bool bProfileMatches = bProfileRead && actualProfile == expected.Profile;
+		const bool bApiRead = bProfileMatches && Json::TryReadStringProperty(candidate, "graphicsApi", actualApi);
+		const bool bApiMatches = bApiRead && Strings::EqualsIgnoreCase(actualApi, expected.GraphicsApi);
+		const bool bExportHashRead = bApiMatches && Json::TryReadStringProperty(candidate, "shaderExportSha256", actualExport);
+		const bool bExportHashed = bExportHashRead && Hash::TrySha256File(expected.ShaderExportPath, hash, error);
+		const bool bExportMatches = bExportHashed && actualExport == Hash::Sha256ToHex(hash);
 
-		if (!exportMatches)
+		if (!bExportMatches)
 		{
 			error = "Child session belongs to another profile/API or shader export.";
 			return Process::ChildReadinessDecision::Rejected;

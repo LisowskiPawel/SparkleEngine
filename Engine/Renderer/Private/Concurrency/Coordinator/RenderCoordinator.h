@@ -105,8 +105,8 @@ private:
 	std::uint64_t m_lastConsumedThreadCommandSequence = 0;
 	mutable std::mutex m_startMutex;
 	std::condition_variable m_startedCondition;
-	bool m_started = false;
-	bool m_startSucceeded = false;
+	bool m_bStarted = false;
+	bool m_bStartSucceeded = false;
 	std::exception_ptr m_startFailure;
 	mutable std::mutex m_readStateMutex;
 	ViewportPresentationSnapshot m_publishedViewportPresentation;

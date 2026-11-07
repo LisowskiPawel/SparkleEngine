@@ -52,18 +52,18 @@ TextureCache::~TextureCache() noexcept
 void TextureCache::UpdateSceneTextures(RenderDeviceServices& deviceServices)
 {
 	RenderCommandList& graphicsCommandList = deviceServices.GetCurrentGraphicsCommandList();
-	const bool useCopyQueue = HasPendingSceneTextureUploads() && deviceServices.GetRenderHardwareInterface().GetCapabilities().Queues.SupportsIndependent(ERhiQueueType::Copy);
+	const bool bUseCopyQueue = HasPendingSceneTextureUploads() && deviceServices.GetRenderHardwareInterface().GetCapabilities().Queues.SupportsIndependent(ERhiQueueType::Copy);
 
 	RhiCommandRecordingLease uploadLease;
 	RenderCommandList* uploadCommandList = &graphicsCommandList;
-	if (useCopyQueue)
+	if (bUseCopyQueue)
 	{
 		uploadLease = deviceServices.AcquireCommandRecordingLease(ERhiQueueType::Copy);
 		uploadCommandList = &uploadLease.GetCommandList();
 	}
 
 	const std::vector<RhiResourceHandle> uploadedResources = LoadSceneTextures(*uploadCommandList);
-	if (!useCopyQueue)
+	if (!bUseCopyQueue)
 	{
 		return;
 	}
@@ -93,7 +93,7 @@ bool TextureCache::HasPendingSceneTextureUploads() const noexcept
 	return std::any_of(
 	    m_requests.begin(),
 	    m_requests.end(),
-	    [this](const TextureRequest& request) noexcept { return request.Wanted && request.Decoded.has_value() && m_residency.GetState(request.Generation) == AssetResidencyState::ReadyForUpload; });
+	    [this](const TextureRequest& request) noexcept { return request.bWanted && request.Decoded.has_value() && m_residency.GetState(request.Generation) == AssetResidencyState::ReadyForUpload; });
 }
 
 void TextureCache::RecordUploadSubmission(RhiSubmissionToken token) noexcept
@@ -102,7 +102,7 @@ void TextureCache::RecordUploadSubmission(RhiSubmissionToken token) noexcept
 	{
 		for (const TextureRequest& request : m_requests)
 		{
-			if (request.Uploaded && !request.UploadSubmitted)
+			if (request.Uploaded && !request.bUploadSubmitted)
 			{
 				Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "GPU texture upload completed without a submission token.");
 			}
@@ -112,13 +112,13 @@ void TextureCache::RecordUploadSubmission(RhiSubmissionToken token) noexcept
 
 	for (TextureRequest& request : m_requests)
 	{
-		if (request.Uploaded && !request.UploadSubmitted)
+		if (request.Uploaded && !request.bUploadSubmitted)
 		{
 			if (!m_residency.RecordUploadSubmission(request.Generation, token, request.Uploaded->EstimatedByteSize))
 			{
 				Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "GPU texture upload submission could not enter residency.");
 			}
-			request.UploadSubmitted = true;
+			request.bUploadSubmitted = true;
 		}
 	}
 }
@@ -146,11 +146,11 @@ void TextureCache::CommitBindingRevision(std::uint64_t bindingRevision) noexcept
 
 void TextureCache::UnloadSceneTextures() noexcept
 {
-	bool removedTexture = false;
+	bool bRemovedTexture = false;
 	const std::uint64_t nextBindingRevision = m_bindingRevision + 1u;
 	for (TextureRequest& request : m_requests)
 	{
-		request.Wanted = false;
+		request.bWanted = false;
 		if (!request.Execution.IsValid())
 		{
 			(void) m_residency.Cancel(request.Generation);
@@ -161,10 +161,10 @@ void TextureCache::UnloadSceneTextures() noexcept
 	{
 		QueueTextureRetirement(texture->second, nextBindingRevision);
 		texture = m_pathTextures.erase(texture);
-		removedTexture = true;
+		bRemovedTexture = true;
 	}
 
-	if (removedTexture)
+	if (bRemovedTexture)
 	{
 		m_bindingRevision = nextBindingRevision;
 	}
@@ -174,10 +174,10 @@ void TextureCache::UnloadSceneTextures() noexcept
 
 void TextureCache::UnloadAll() noexcept
 {
-	const bool hadActiveTextures = !m_pathTextures.empty() || !m_defaultTextures.empty();
+	const bool bHadActiveTextures = !m_pathTextures.empty() || !m_defaultTextures.empty();
 	for (TextureRequest& request : m_requests)
 	{
-		request.Wanted = false;
+		request.bWanted = false;
 		(void) m_residency.Cancel(request.Generation);
 		if (request.Uploaded)
 		{
@@ -207,8 +207,8 @@ void TextureCache::UnloadAll() noexcept
 	m_wantedPathTextureKeys.clear();
 	m_textureSlotKeys = {};
 	m_sceneTextureGeneration = 0;
-	m_defaultsLoaded = false;
-	if (hadActiveTextures)
+	m_bDefaultsLoaded = false;
+	if (bHadActiveTextures)
 	{
 		++m_bindingRevision;
 	}

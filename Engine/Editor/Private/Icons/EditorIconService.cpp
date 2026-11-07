@@ -71,9 +71,9 @@ ImFontAtlasRect EditorIconService::Implementation::Resolve(const EditorIconAsset
 	}
 
 	const bool bInvalidIconAssetExtent = asset.Extent < 1 || asset.Extent > 512;
-	const bool invalidIconAsset = bInvalidIconAssetExtent || (asset.Pixels.size() != static_cast<std::size_t>(asset.Extent) * asset.Extent * 4);
+	const bool bInvalidIconAsset = bInvalidIconAssetExtent || (asset.Pixels.size() != static_cast<std::size_t>(asset.Extent) * asset.Extent * 4);
 	
-	if (invalidIconAsset)
+	if (bInvalidIconAsset)
 	{
 		Diagnostics::Fatal(g_editorIconLogger, __FILE__, __LINE__, "Editor icon requires square RGBA8 pixels and extent in [1,512]");
 	}
@@ -109,9 +109,9 @@ bool EditorIconService::Implementation::DrawButton(const EditorIconAsset& asset,
 	}
 	const float padding = ImGui::GetStyle().FramePadding.y;
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(padding, padding));
-	const bool pressed = ImGui::ImageButton(id, m_atlas->TexRef, ImVec2(imageSize, imageSize), rectangle.uv0, rectangle.uv1);
+	const bool bPressed = ImGui::ImageButton(id, m_atlas->TexRef, ImVec2(imageSize, imageSize), rectangle.uv0, rectangle.uv1);
 	ImGui::PopStyleVar();
-	return pressed;
+	return bPressed;
 }
 
 EditorIconService::EditorIconService() :

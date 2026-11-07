@@ -5,6 +5,6 @@
 struct RenderViewInput final
 {
 	RenderViewCameraData Camera;
-	bool CameraCut = false;
-	bool CameraTeleported = false;
+	bool bCameraCut = false;
+	bool bCameraTeleported = false;
 };

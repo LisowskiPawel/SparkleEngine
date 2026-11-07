@@ -23,17 +23,17 @@ public:
 	ViewportToolbar& operator=(ViewportToolbar&&) = delete;
 
 	void SetGeometry(float leftPixels, float topPixels, float widthPixels) noexcept;
-	void Draw(std::string_view levelName, bool disableInteraction = false) noexcept;
+	void Draw(std::string_view levelName, bool bDisableInteraction = false) noexcept;
 
 	float GetHeightPixels() const noexcept { return m_heightPixels; }
 
 private:
-	void DrawLevelName(std::string_view levelName, bool compact) const noexcept;
+	void DrawLevelName(std::string_view levelName, bool bCompact) const noexcept;
 	bool BeginToolbarWindow() noexcept;
-	void DrawToolbarContents(std::string_view levelName, bool disableInteraction) noexcept;
+	void DrawToolbarContents(std::string_view levelName, bool bDisableInteraction) noexcept;
 	void DrawToolbarBorder() const noexcept;
 	void EndToolbarWindow() const noexcept;
-	void DrawCameraControls(bool disableInteraction, bool compact) noexcept;
+	void DrawCameraControls(bool bDisableInteraction, bool bCompact) noexcept;
 	void DrawFrameStats() const noexcept;
 
 	EditorViewportSession& m_viewportSession;

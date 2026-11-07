@@ -53,15 +53,15 @@ namespace Process
 	struct ChildProcessResult final
 	{
 		std::uint32_t ProcessId = 0;
-		bool Launched = false;
-		bool Ready = false;
-		bool Cancelled = false;
+		bool bLaunched = false;
+		bool bReady = false;
+		bool bCancelled = false;
 		int ExitCode = -1;
 		ChildProcessStartFailure StartFailure = ChildProcessStartFailure::None;
 		std::string CapturedOutput;
 		std::string FailureReason;
 
-		bool Succeeded() const noexcept { return Launched && !Cancelled && (Ready || ExitCode == 0) && FailureReason.empty(); }
+		bool Succeeded() const noexcept { return bLaunched && !bCancelled && (bReady || ExitCode == 0) && FailureReason.empty(); }
 	};
 
 	SPARKLE_CORE_API ChildProcessResult RunChildProcess(const ChildProcessRequest& request);

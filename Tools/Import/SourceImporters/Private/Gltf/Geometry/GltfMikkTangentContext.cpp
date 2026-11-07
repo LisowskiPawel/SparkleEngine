@@ -112,9 +112,9 @@ void GltfMikkTangentContext::ValidateTriangle(std::size_t faceIndex) const
 	const bool bTriangleFrameNonfinitenormal3 = bTriangleFrameNonfinitenormal2 || (!IsFinite(third.normal));
 	const bool bTriangleFrameNonfiniteuv = bTriangleFrameNonfinitenormal3 || (!IsFinite(first.uv));
 	const bool bTriangleFrameNonfiniteuv2 = bTriangleFrameNonfiniteuv || (!IsFinite(second.uv));
-	const bool triangleFrameNonfinite = bTriangleFrameNonfiniteuv2 || (!IsFinite(third.uv));
+	const bool bTriangleFrameNonfinite = bTriangleFrameNonfiniteuv2 || (!IsFinite(third.uv));
 	
-	if (triangleFrameNonfinite)
+	if (bTriangleFrameNonfinite)
 	{
 		throw Diagnostics::Error(std::format("Normal-mapped glTF triangle {} contains non-finite position, normal, or texture-coordinate data.", faceIndex));
 	}

@@ -16,11 +16,11 @@
 EngineRenderingSettingsState EngineRenderingSettingsControls::Capture() noexcept
 {
 	EngineRenderingSettingsState state;
-	state.VSync = CVarVSync.Get();
-	state.Vignette = CVarVignette.Get();
-	state.ChromaticAberration = CVarChromaticAberration.Get();
+	state.bVSync = CVarVSync.Get();
+	state.bVignette = CVarVignette.Get();
+	state.bChromaticAberration = CVarChromaticAberration.Get();
 	state.BackBufferFormat = CVarBackBufferFormat.Get();
-	state.PreferHighPerformanceAdapter = CVarPreferHighPerformanceAdapter.Get();
+	state.bPreferHighPerformanceAdapter = CVarPreferHighPerformanceAdapter.Get();
 	state.ToneMapper = CVarToneMapper.Get();
 	state.ExposureMode = CVarExposureMode.Get();
 	state.ExposureMeteringMethod = CVarExposureMeteringMethod.Get();
@@ -36,16 +36,16 @@ EngineRenderingSettingsState EngineRenderingSettingsControls::Capture() noexcept
 	state.UpscalerQualityMode = CVarUpscalerQualityMode.Get();
 	state.RayReconstructionMode = CVarRayReconstructionMode.Get();
 	state.SelectedGBufferAlgorithm = CVarGBufferAlgorithm.Get();
-	state.MeshAutoBatching = CVarRendererMeshAutoBatching.Get();
-	state.RefitTlas = CVarRayTracingTlasRefit.Get();
-	state.PtlasActive = CVarRayTracingPreferPtlas.Get();
+	state.bMeshAutoBatching = CVarRendererMeshAutoBatching.Get();
+	state.bRefitTlas = CVarRayTracingTlasRefit.Get();
+	state.bPtlasActive = CVarRayTracingPreferPtlas.Get();
 	state.PtlasPartitionsPerAxis = CVarRayTracingPartitionsPerAxis.Get();
 	state.PtlasPartitionUpdateMode = CVarRayTracingPtlasPartitionUpdateMode.Get();
-	state.PtlasMarkAllDynamicInPartition = CVarRayTracingPtlasMarkAllDynamicInPartition.Get();
+	state.bPtlasMarkAllDynamicInPartition = CVarRayTracingPtlasMarkAllDynamicInPartition.Get();
 	state.PtlasModeChangeDistance = CVarRayTracingPtlasModeChangeDistance.Get();
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	state.StartupCaptureProvider = CVarExternalCaptureStartupProvider.Get();
-	state.CaptureToolsInstalled = HasInstalledExternalCaptureProvider();
+	state.bCaptureToolsInstalled = HasInstalledExternalCaptureProvider();
 #endif
 	return state;
 }
@@ -60,11 +60,11 @@ void EngineRenderingSettingsControls::Apply(const EngineRenderingSettingsState& 
 		}
 	};
 
-	setCVarIfChanged(CVarVSync, state.VSync);
-	setCVarIfChanged(CVarVignette, state.Vignette);
-	setCVarIfChanged(CVarChromaticAberration, state.ChromaticAberration);
+	setCVarIfChanged(CVarVSync, state.bVSync);
+	setCVarIfChanged(CVarVignette, state.bVignette);
+	setCVarIfChanged(CVarChromaticAberration, state.bChromaticAberration);
 	setCVarIfChanged(CVarBackBufferFormat, state.BackBufferFormat);
-	setCVarIfChanged(CVarPreferHighPerformanceAdapter, state.PreferHighPerformanceAdapter);
+	setCVarIfChanged(CVarPreferHighPerformanceAdapter, state.bPreferHighPerformanceAdapter);
 	setCVarIfChanged(CVarToneMapper, state.ToneMapper);
 	setCVarIfChanged(CVarExposureMode, state.ExposureMode);
 	setCVarIfChanged(CVarExposureMeteringMethod, state.ExposureMeteringMethod);
@@ -80,12 +80,12 @@ void EngineRenderingSettingsControls::Apply(const EngineRenderingSettingsState& 
 	setCVarIfChanged(CVarUpscalerQualityMode, state.UpscalerQualityMode);
 	setCVarIfChanged(CVarRayReconstructionMode, state.RayReconstructionMode);
 	setCVarIfChanged(CVarGBufferAlgorithm, state.SelectedGBufferAlgorithm);
-	setCVarIfChanged(CVarRendererMeshAutoBatching, state.MeshAutoBatching);
-	setCVarIfChanged(CVarRayTracingTlasRefit, state.RefitTlas);
-	setCVarIfChanged(CVarRayTracingPreferPtlas, state.PtlasActive);
+	setCVarIfChanged(CVarRendererMeshAutoBatching, state.bMeshAutoBatching);
+	setCVarIfChanged(CVarRayTracingTlasRefit, state.bRefitTlas);
+	setCVarIfChanged(CVarRayTracingPreferPtlas, state.bPtlasActive);
 	setCVarIfChanged(CVarRayTracingPartitionsPerAxis, state.PtlasPartitionsPerAxis);
 	setCVarIfChanged(CVarRayTracingPtlasPartitionUpdateMode, state.PtlasPartitionUpdateMode);
-	setCVarIfChanged(CVarRayTracingPtlasMarkAllDynamicInPartition, state.PtlasMarkAllDynamicInPartition);
+	setCVarIfChanged(CVarRayTracingPtlasMarkAllDynamicInPartition, state.bPtlasMarkAllDynamicInPartition);
 	setCVarIfChanged(CVarRayTracingPtlasModeChangeDistance, state.PtlasModeChangeDistance);
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	setCVarIfChanged(CVarExternalCaptureStartupProvider, state.StartupCaptureProvider);

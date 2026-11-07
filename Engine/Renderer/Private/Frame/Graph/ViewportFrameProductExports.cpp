@@ -12,16 +12,16 @@ void ExportViewportFrameProducts(FrameGraphBuilder& builder, const RenderFrameGr
 		builder.ExportTexture(resources.ViewportProducts.FinalColorLdr, "Viewport.FinalColorLdr");
 	}
 
-	const bool exportSceneDepth = HasAnyRenderOutputFlags(settings.RequestedOutputs, RenderOutputFlags::SceneDepth) && resources.ViewportProducts.SceneDepth.IsValid();
+	const bool bExportSceneDepth = HasAnyRenderOutputFlags(settings.RequestedOutputs, RenderOutputFlags::SceneDepth) && resources.ViewportProducts.SceneDepth.IsValid();
 	
-	if (exportSceneDepth)
+	if (bExportSceneDepth)
 	{
 		builder.ExportTexture(resources.ViewportProducts.SceneDepth, "Viewport.SceneDepth");
 	}
 
-	const bool exportNormals = HasAnyRenderOutputFlags(settings.RequestedOutputs, RenderOutputFlags::Normals) && resources.ViewportProducts.Normals.IsValid();
+	const bool bExportNormals = HasAnyRenderOutputFlags(settings.RequestedOutputs, RenderOutputFlags::Normals) && resources.ViewportProducts.Normals.IsValid();
 	
-	if (exportNormals)
+	if (bExportNormals)
 	{
 		builder.ExportTexture(resources.ViewportProducts.Normals, "Viewport.Normals");
 	}

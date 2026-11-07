@@ -58,7 +58,7 @@ bool VulkanSwapChain::AcquireNextImage(std::uint32_t frameIndex) noexcept
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR)
 	{
-		m_resizeRequested = true;
+		m_bResizeRequested = true;
 		return false;
 	}
 	if (result == VK_SUBOPTIMAL_KHR || VulkanResult::Succeeded(result))
@@ -95,16 +95,16 @@ bool VulkanSwapChain::Present(VkSemaphore renderFinishedSemaphore) noexcept
 	const VkResult result = m_rhi.GetCommandQueue(ERhiQueueType::Graphics).Present(presentInfo);
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
 	{
-		m_resizeRequested = true;
+		m_bResizeRequested = true;
 		return true;
 	}
 	if (!VulkanResult::Succeeded(result))
 	{
 		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkQueuePresentKHR", result));
 	}
-	if (m_vsyncEnabled != CVarVSync.Get())
+	if (m_bVsyncEnabled != CVarVSync.Get())
 	{
-		m_resizeRequested = true;
+		m_bResizeRequested = true;
 		return true;
 	}
 	return false;
@@ -144,7 +144,7 @@ VkImageView VulkanSwapChain::GetCurrentBackBufferImageView() const noexcept
 
 bool VulkanSwapChain::ConsumeResizeRequest() noexcept
 {
-	return std::exchange(m_resizeRequested, false);
+	return std::exchange(m_bResizeRequested, false);
 }
 
 VkSemaphore VulkanSwapChain::GetImageAvailableSemaphore(std::uint32_t frameIndex) const noexcept
@@ -210,8 +210,8 @@ void VulkanSwapChain::CreateSwapChain(VkSwapchainKHR oldSwapChain)
 	}
 
 	m_surfaceFormat = SelectSurfaceFormat();
-	m_vsyncEnabled = CVarVSync.Get();
-	m_presentMode = SelectPresentMode(m_vsyncEnabled);
+	m_bVsyncEnabled = CVarVSync.Get();
+	m_presentMode = SelectPresentMode(m_bVsyncEnabled);
 	m_extent = SelectExtent(capabilities);
 
 	VkSwapchainCreateInfoKHR createInfo{
@@ -365,9 +365,9 @@ VkSurfaceFormatKHR VulkanSwapChain::SelectSurfaceFormat() const
 	Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, std::format("Requested Vulkan present format '{}' is not supported by the surface.", PixelFormatName(m_backBufferFormat)));
 }
 
-VkPresentModeKHR VulkanSwapChain::SelectPresentMode(bool vsyncEnabled) const
+VkPresentModeKHR VulkanSwapChain::SelectPresentMode(bool bVsyncEnabled) const
 {
-	if (vsyncEnabled)
+	if (bVsyncEnabled)
 	{
 		return VK_PRESENT_MODE_FIFO_KHR;
 	}

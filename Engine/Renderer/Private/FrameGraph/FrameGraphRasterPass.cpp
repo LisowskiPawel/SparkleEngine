@@ -6,7 +6,7 @@
 
 static bool StencilWrites(const RhiStencilState& stencil) noexcept
 {
-	return stencil.StencilEnable && stencil.StencilWriteMask != 0
+	return stencil.bStencilEnable && stencil.StencilWriteMask != 0
 	    && (stencil.FrontFaceStencilFailOp != RhiStencilOp::Keep || stencil.FrontFaceStencilDepthFailOp != RhiStencilOp::Keep || stencil.FrontFaceStencilPassOp != RhiStencilOp::Keep
 	        || stencil.BackFaceStencilFailOp != RhiStencilOp::Keep || stencil.BackFaceStencilDepthFailOp != RhiStencilOp::Keep || stencil.BackFaceStencilPassOp != RhiStencilOp::Keep);
 }
@@ -54,12 +54,12 @@ static void AddColorAttachment(FrameGraphRasterPass& result, const FrameGraphAtt
 
 static void AddDepthStencilAttachment(FrameGraphRasterPass& result, const FrameGraphAttachmentBinding& attachment, const FrameGraphTextureDesc& desc)
 {
-	if (result.HasDepthStencil || desc.kind != FrameGraphTextureKind::DepthStencil)
+	if (result.bHasDepthStencil || desc.kind != FrameGraphTextureKind::DepthStencil)
 	{
 		throw Diagnostics::Error("Raster pass must declare at most one compatible depth-stencil attachment.");
 	}
 	result.DepthStencil = attachment;
-	result.HasDepthStencil = true;
+	result.bHasDepthStencil = true;
 	result.Compatibility.DepthStencilAttachmentFormat = desc.format;
 }
 
@@ -105,26 +105,26 @@ static void ResolveColorSampleCount(FrameGraphRasterPass& result, const FrameGra
 
 static void ResolveDepthStencilCompatibility(FrameGraphRasterPass& result, const RasterPassRenderState& renderState, const FrameGraphResourceRegistry& resources)
 {
-	if (result.HasDepthStencil)
+	if (result.bHasDepthStencil)
 	{
 		const FrameGraphTextureDesc& depthDesc = resources.GetMetadata(result.DepthStencil.Handle.GetResourceHandle()).textureDesc;
-		const bool sampleCountMismatch = result.ColorCount != 0 && depthDesc.sampleCount != result.Compatibility.SampleCount;
-		const bool readOnlyAttachment = !sampleCountMismatch && result.DepthStencil.DepthStencilAccess == FrameGraphDepthStencilAccess::ReadOnly;
-		const bool bDepthWrittenDepthStencil = readOnlyAttachment && (result.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear);
-		const bool bDepthWrittenGuardGetDepth = readOnlyAttachment && !bDepthWrittenDepthStencil;
-		const bool bDepthWrittenGetDepth = bDepthWrittenGuardGetDepth && (renderState.GetDepth().DepthWriteEnable);
+		const bool bSampleCountMismatch = result.ColorCount != 0 && depthDesc.sampleCount != result.Compatibility.SampleCount;
+		const bool bReadOnlyAttachment = !bSampleCountMismatch && result.DepthStencil.DepthStencilAccess == FrameGraphDepthStencilAccess::ReadOnly;
+		const bool bDepthWrittenDepthStencil = bReadOnlyAttachment && (result.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear);
+		const bool bDepthWrittenGuardGetDepth = bReadOnlyAttachment && !bDepthWrittenDepthStencil;
+		const bool bDepthWrittenGetDepth = bDepthWrittenGuardGetDepth && (renderState.GetDepth().bDepthWriteEnable);
 		const bool bDepthWrittenGetDepth2 = bDepthWrittenDepthStencil || bDepthWrittenGetDepth;
-		const bool depthWritten = readOnlyAttachment && bDepthWrittenGetDepth2;
-		const bool bStencilWrittendepthWritten = readOnlyAttachment && !depthWritten;
-		const bool stencilWritten = bStencilWrittendepthWritten && (StencilWrites(renderState.GetStencil()));
+		const bool bDepthWritten = bReadOnlyAttachment && bDepthWrittenGetDepth2;
+		const bool bStencilWrittendepthWritten = bReadOnlyAttachment && !bDepthWritten;
+		const bool bStencilWritten = bStencilWrittendepthWritten && (StencilWrites(renderState.GetStencil()));
 
-		if (sampleCountMismatch || depthWritten || stencilWritten)
+		if (bSampleCountMismatch || bDepthWritten || bStencilWritten)
 		{
 			throw Diagnostics::Error("Raster depth attachment is incompatible with pass depth, stencil, access, load, or sample state.");
 		}
 		result.Compatibility.SampleCount = depthDesc.sampleCount;
 	}
-	else if (renderState.GetDepth().DepthEnable || renderState.GetStencil().StencilEnable)
+	else if (renderState.GetDepth().bDepthEnable || renderState.GetStencil().bStencilEnable)
 	{
 		throw Diagnostics::Error("Raster depth or stencil state requires a graph depth-stencil attachment.");
 	}
@@ -132,7 +132,7 @@ static void ResolveDepthStencilCompatibility(FrameGraphRasterPass& result, const
 
 static void ValidateRasterPassState(const FrameGraphRasterPass& result, const RasterPassRenderState& renderState)
 {
-	if (!renderState.GetDepth().DepthEnable && renderState.GetDepth().DepthWriteEnable)
+	if (!renderState.GetDepth().bDepthEnable && renderState.GetDepth().bDepthWriteEnable)
 	{
 		throw Diagnostics::Error("Raster depth writes require depth testing to be enabled.");
 	}
@@ -141,7 +141,7 @@ static void ValidateRasterPassState(const FrameGraphRasterPass& result, const Ra
 		throw Diagnostics::Error("Raster pass attachments use an unsupported sample count.");
 	}
 
-	if (result.ColorCount == 0 && !result.HasDepthStencil)
+	if (result.ColorCount == 0 && !result.bHasDepthStencil)
 	{
 		throw Diagnostics::Error("Raster pass requires at least one graph attachment.");
 	}

@@ -8,11 +8,11 @@ namespace SparkleLauncher
 {
 	struct ExternalCaptureAvailability final
 	{
-		bool Installed = false;
-		bool Supported = false;
+		bool bInstalled = false;
+		bool bSupported = false;
 		std::string Detail;
 
-		bool Available() const noexcept { return Installed && Supported; }
+		bool Available() const noexcept { return bInstalled && bSupported; }
 	};
 
 	ExternalCaptureAvailability InspectExternalCaptureProvider(ExternalCaptureProvider provider, std::string_view graphicsApi, std::string_view productProfile);

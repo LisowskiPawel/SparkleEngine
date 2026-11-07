@@ -30,8 +30,8 @@ void MaterialCache::BuildMaterials(const RenderMaterialTable& materials, std::ui
 {
 	const std::uint64_t textureRevision = m_textureCache.GetBindingRevision();
 	const bool bRebuildRequiredSourceRevision = m_currentGeneration == nullptr || m_currentGeneration->GetSourceRevision() != sourceRevision;
-	const bool rebuildRequired = bRebuildRequiredSourceRevision || (m_currentGeneration->GetTextureRevision() != textureRevision);
-	if (rebuildRequired)
+	const bool bRebuildRequired = bRebuildRequiredSourceRevision || (m_currentGeneration->GetTextureRevision() != textureRevision);
+	if (bRebuildRequired)
 	{
 		Rebuild(materials, sourceRevision, textureRevision);
 	}

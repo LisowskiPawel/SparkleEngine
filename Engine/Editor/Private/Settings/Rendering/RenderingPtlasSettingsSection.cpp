@@ -20,18 +20,18 @@ void DrawPtlasSettingsSection(EngineRenderingSettingsController& settingsControl
 	{
 		if (RenderingSettingsUi::BeginSettingsTable("##RenderingPtlasSettings"))
 		{
-			bool ptlasActive = settings.PtlasActive;
-			const bool ptlasActiveEdited = RenderingSettingsUi::DrawBooleanRow("##PtlasActive", "Enabled", ptlasActive);
-			if (ptlasActiveEdited)
+			bool bPtlasActive = settings.bPtlasActive;
+			const bool bPtlasActiveEdited = RenderingSettingsUi::DrawBooleanRow("##PtlasActive", "Enabled", bPtlasActive);
+			if (bPtlasActiveEdited)
 			{
-				settingsController.SetPtlasActive(ptlasActive);
+				settingsController.SetPtlasActive(bPtlasActive);
 			}
 
-			if (settings.PtlasActive)
+			if (settings.bPtlasActive)
 			{
 				std::uint32_t ptlasPartitionsPerAxis = settings.PtlasPartitionsPerAxis;
-				const bool ptlasPartitionsPerAxisEdited = RenderingSettingsUi::DrawUnsignedIntSliderRow("##PtlasPartitionsPerAxis", "Partitions per axis", ptlasPartitionsPerAxis, 1u, 64u);
-				if (ptlasPartitionsPerAxisEdited)
+				const bool bPtlasPartitionsPerAxisEdited = RenderingSettingsUi::DrawUnsignedIntSliderRow("##PtlasPartitionsPerAxis", "Partitions per axis", ptlasPartitionsPerAxis, 1u, 64u);
+				if (bPtlasPartitionsPerAxisEdited)
 				{
 					settingsController.SetPtlasPartitionsPerAxis(ptlasPartitionsPerAxis);
 				}
@@ -43,21 +43,21 @@ void DrawPtlasSettingsSection(EngineRenderingSettingsController& settingsControl
 				    partitionUpdateModeOptions,
 				    [&settingsController](RayTracingPtlasPartitionUpdateMode value) { settingsController.SetPtlasPartitionUpdateMode(value); });
 
-				bool ptlasMarkAllDynamicInPartition = settings.PtlasMarkAllDynamicInPartition;
+				bool bPtlasMarkAllDynamicInPartition = settings.bPtlasMarkAllDynamicInPartition;
 
-				const bool ptlasMarkAllDynamicInPartitionEdited = RenderingSettingsUi::DrawBooleanRow(
+				const bool bPtlasMarkAllDynamicInPartitionEdited = RenderingSettingsUi::DrawBooleanRow(
 				    "##PtlasMarkAllDynamicInPartition",
 				    "Mark all dynamic in partition",
-				    ptlasMarkAllDynamicInPartition);
+				    bPtlasMarkAllDynamicInPartition);
 
-				if (ptlasMarkAllDynamicInPartitionEdited)
+				if (bPtlasMarkAllDynamicInPartitionEdited)
 				{
-					settingsController.SetPtlasMarkAllDynamicInPartition(ptlasMarkAllDynamicInPartition);
+					settingsController.SetPtlasMarkAllDynamicInPartition(bPtlasMarkAllDynamicInPartition);
 				}
 
 				float ptlasModeChangeDistance = settings.PtlasModeChangeDistance;
-				const bool ptlasModeChangeDistanceEdited = RenderingSettingsUi::DrawFloatInputRow("##PtlasModeChangeDistance", "Mode change distance", ptlasModeChangeDistance);
-				if (ptlasModeChangeDistanceEdited)
+				const bool bPtlasModeChangeDistanceEdited = RenderingSettingsUi::DrawFloatInputRow("##PtlasModeChangeDistance", "Mode change distance", ptlasModeChangeDistance);
+				if (bPtlasModeChangeDistanceEdited)
 				{
 					settingsController.SetPtlasModeChangeDistance(ptlasModeChangeDistance);
 				}

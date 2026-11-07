@@ -213,13 +213,13 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::RefreshContextSelectors()
 	{
-		const bool installed = !HasBuildSources(m_workspaceRoot);
-		if (installed)
+		const bool bInstalled = !HasBuildSources(m_workspaceRoot);
+		if (bInstalled)
 		{
 			m_settings.SetBuildConfiguration("shipping");
 		}
 
-		const BuildToolchainStatus toolchain = installed ? BuildToolchainStatus{}
+		const BuildToolchainStatus toolchain = bInstalled ? BuildToolchainStatus{}
 		                                                 : DetectBuildToolchain(m_workspaceRoot, ResolveSelectedWorkspaceIde(m_settings), ResolveSelectedWorkspaceCompiler(m_settings));
 
 		const LauncherContextUiModel model = LauncherContextUiModel::Build(toolchain, m_workspaceRoot);
@@ -250,16 +250,16 @@ namespace SparkleLauncher
 
 		QWidget* content = new QWidget(scrollArea);
 		content->setObjectName("OptionsContent");
-		const bool isSceneSelection = operationId == LauncherScenesOperationId();
-		scrollArea->setAlignment(isSceneSelection ? Qt::AlignTop : (Qt::AlignHCenter | Qt::AlignTop));
+		const bool bIsSceneSelection = operationId == LauncherScenesOperationId();
+		scrollArea->setAlignment(bIsSceneSelection ? Qt::AlignTop : (Qt::AlignHCenter | Qt::AlignTop));
 		content->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-		if (!isSceneSelection)
+		if (!bIsSceneSelection)
 		{
 			content->setMaximumWidth(LauncherUi::Page::MaxContentWidth);
 		}
 		QVBoxLayout* layout = new QVBoxLayout(content);
-		layout->setContentsMargins(isSceneSelection ? LauncherUi::Page::SceneSelectionMargins : LauncherUi::Page::ContentMargins);
-		layout->setSpacing(isSceneSelection ? 0 : LauncherUi::Page::Spacing);
+		layout->setContentsMargins(bIsSceneSelection ? LauncherUi::Page::SceneSelectionMargins : LauncherUi::Page::ContentMargins);
+		layout->setSpacing(bIsSceneSelection ? 0 : LauncherUi::Page::Spacing);
 		AddOptionsForOperation(*layout, operationId);
 		layout->addStretch(1);
 		scrollArea->setWidget(content);

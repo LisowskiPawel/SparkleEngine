@@ -36,7 +36,7 @@ std::unique_ptr<D3D12GpuAllocationRecord> D3D12UploadBuffer::Upload(D3D12Rhi& rh
 	void* mappedData = nullptr;
 	D3D12_RANGE readRange = {0, 0};
 	CHECK(uploadBuffer->Resource->Map(0, &readRange, &mappedData));
-	uploadBuffer->IsMapped = true;
+	uploadBuffer->bIsMapped = true;
 	uploadBuffer->CpuMappedAddress = mappedData;
 
 	if (dataSize > 0 && data != nullptr && mappedData != nullptr)
@@ -44,7 +44,7 @@ std::unique_ptr<D3D12GpuAllocationRecord> D3D12UploadBuffer::Upload(D3D12Rhi& rh
 		std::memcpy(mappedData, data, dataSize);
 	}
 	uploadBuffer->Resource->Unmap(0, nullptr);
-	uploadBuffer->IsMapped = false;
+	uploadBuffer->bIsMapped = false;
 	uploadBuffer->CpuMappedAddress = nullptr;
 
 	return uploadBuffer;

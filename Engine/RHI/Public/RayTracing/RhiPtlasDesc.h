@@ -20,19 +20,19 @@ enum class ERhiPtlasProvider : std::uint8_t
 
 struct RhiPtlasCapabilities
 {
-	bool Supported = false;
+	bool bSupported = false;
 	ERhiPtlasProvider Provider = ERhiPtlasProvider::None;
-	bool NvidiaDeviceOnly = false;
-	bool CurrentDeviceIsNvidia = false;
-	bool SupportsDescriptorAccess = false;
-	bool SupportsCpuPackedOperations = false;
-	bool SupportsGpuDrivenOperations = false;
-	bool SupportsGpuOperationCount = false;
-	bool SupportsGpuWrittenInstanceRecords = false;
-	bool SupportsGpuWrittenPartitionRecords = false;
-	bool SupportsPartitionTranslation = false;
-	bool SupportsGlobalPartition = false;
-	bool SupportsExplicitInstanceAabb = false;
+	bool bNvidiaDeviceOnly = false;
+	bool bCurrentDeviceIsNvidia = false;
+	bool bSupportsDescriptorAccess = false;
+	bool bSupportsCpuPackedOperations = false;
+	bool bSupportsGpuDrivenOperations = false;
+	bool bSupportsGpuOperationCount = false;
+	bool bSupportsGpuWrittenInstanceRecords = false;
+	bool bSupportsGpuWrittenPartitionRecords = false;
+	bool bSupportsPartitionTranslation = false;
+	bool bSupportsGlobalPartition = false;
+	bool bSupportsExplicitInstanceAabb = false;
 	std::uint32_t MaxOperationsPerBuild = 0;
 	std::uint32_t InstanceWriteDataSizeInBytes = 0;
 	std::uint32_t InstanceUpdateDataSizeInBytes = 0;
@@ -49,8 +49,8 @@ struct RhiPtlasDesc
 	std::uint32_t MaxInstancesPerPartition = 0;
 	std::uint32_t MaxInstancesInGlobalPartition = 0;
 	std::uint32_t MaxOperations = 0;
-	bool AllowInstanceUpdates = false;
-	bool AllowPartitionTranslation = false;
+	bool bAllowInstanceUpdates = false;
+	bool bAllowPartitionTranslation = false;
 };
 
 struct RhiPtlasBuildSizes

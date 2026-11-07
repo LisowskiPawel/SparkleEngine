@@ -34,7 +34,7 @@ public:
 
 	bool HasActiveLevel() const noexcept { return m_activeLevel != nullptr; }
 
-	bool IsLevelChangeInProgress() const noexcept { return m_levelChangeInProgress; }
+	bool IsLevelChangeInProgress() const noexcept { return m_bLevelChangeInProgress; }
 
 	std::vector<std::string> GetRegisteredLevelNames() const;
 
@@ -73,5 +73,5 @@ private:
 	std::uint64_t m_latestRequestId = 0;
 	std::uint64_t m_documentGeneration = 1;
 	std::string m_lastLoadDiagnostic;
-	bool m_levelChangeInProgress = false;
+	bool m_bLevelChangeInProgress = false;
 };

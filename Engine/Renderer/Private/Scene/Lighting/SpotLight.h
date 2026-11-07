@@ -15,6 +15,6 @@ struct SpotLight
 	float luminousIntensity = 1.0f;
 	float outerAngleCosine = 0.0f;
 	DirectX::XMFLOAT3 distanceAttenuationCoefficients = {0.0f, 0.0f, 1.0f};
-	bool castShadow = true;
+	bool bCastShadow = true;
 	std::uint32_t padding = 0u;
 };

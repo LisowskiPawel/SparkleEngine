@@ -126,8 +126,8 @@ void ToolWorkProgressWriter::Report(std::string_view action, std::string_view it
 {
 	std::scoped_lock lock(m_mutex);
 	const std::size_t percentage = total != 0 ? static_cast<std::size_t>(static_cast<double>(completed) * 100.0 / static_cast<double>(total)) : std::numeric_limits<std::size_t>::max();
-	const bool samePhase = m_lastAction == action && m_lastTotal == total;
-	if (samePhase && (total == 0 || percentage <= m_lastPercentage))
+	const bool bSamePhase = m_lastAction == action && m_lastTotal == total;
+	if (bSamePhase && (total == 0 || percentage <= m_lastPercentage))
 	{
 		return;
 	}

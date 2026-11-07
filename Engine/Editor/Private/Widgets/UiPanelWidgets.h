@@ -2,7 +2,7 @@
 
 namespace EditorWidgets
 {
-	bool DrawFilterChip(const char* label, bool active) noexcept;
+	bool DrawFilterChip(const char* label, bool bActive) noexcept;
 	void DrawMutedText(const char* text, float alpha = 0.72f) noexcept;
 	void DrawPanelHeader(const char* title, const char* subtitle);
 	void DrawKeyValueRow(const char* label, const char* value);

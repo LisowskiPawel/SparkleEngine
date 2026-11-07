@@ -15,23 +15,23 @@ class ShaderToolsPanel final
 public:
 	using CommandHandler = std::function<void()>;
 
-	void SetOpen(bool open) noexcept { m_isOpen = open; }
+	void SetOpen(bool bOpen) noexcept { m_bIsOpen = bOpen; }
 
-	bool IsOpen() const noexcept { return m_isOpen; }
+	bool IsOpen() const noexcept { return m_bIsOpen; }
 
 	void SetDiagnosticsProvider(RegisteredShaderListModel::DiagnosticsProvider provider);
 	void SetReloadHandler(CommandHandler handler);
 	void SetCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
-	void SetCompileStatus(bool busy, std::string_view message);
-	ConsoleCommandResult RequestCompile(bool generateSymbols);
-	void BuildUI(bool disableInteraction);
+	void SetCompileStatus(bool bBusy, std::string_view message);
+	ConsoleCommandResult RequestCompile(bool bGenerateSymbols);
+	void BuildUI(bool bDisableInteraction);
 
 private:
 	static void DrawExportText(const char* childId, const std::string& text) noexcept;
 
 	void EnsureRows();
-	void DrawToolbar(bool disableInteraction);
-	void DrawTable(bool disableInteraction);
+	void DrawToolbar(bool bDisableInteraction);
+	void DrawTable(bool bDisableInteraction);
 	void DrawSelectedShaderExport();
 	const RegisteredShaderRow* GetSelectedRow() const noexcept;
 	bool MatchesFilter(const RegisteredShaderRow& row) const noexcept;
@@ -43,8 +43,8 @@ private:
 	ShaderExportInspection m_exportInspection;
 	std::array<char, 160> m_filterBuffer{};
 	std::uint64_t m_selectedShaderTypeId = 0;
-	bool m_hasRows = false;
-	bool m_isOpen = false;
-	bool m_compiling = false;
-	bool m_generateSymbols = false;
+	bool m_bHasRows = false;
+	bool m_bIsOpen = false;
+	bool m_bCompiling = false;
+	bool m_bGenerateSymbols = false;
 };

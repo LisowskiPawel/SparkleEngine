@@ -24,31 +24,31 @@
 
 namespace SparkleLauncher
 {
-	void LauncherWorkspaceSetup::AddSyncDependencies(QVBoxLayout& layout, bool optional)
+	void LauncherWorkspaceSetup::AddSyncDependencies(QVBoxLayout& layout, bool bOptional)
 	{
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
 		const std::filesystem::path dependencyCachePath = workspaceOutputs.DependencyCacheRoot;
 		for (const ThirdPartyDependencyUiEntry& dependency : GetTrackedThirdPartyDependencies())
 		{
-			if (dependency.Required == optional)
+			if (dependency.bRequired == bOptional)
 			{
 				continue;
 			}
 
 			const ThirdPartyDependencyUiStatus status = BuildThirdPartyDependencyStatus(dependency, dependencyCachePath);
 			const QString runId = m_sourceDependencyRunIds.value(dependency.Id);
-			const bool syncing = !runId.isEmpty() && !m_cleaningSourceDependencyRunIds.contains(runId);
-			const bool cleaning = !runId.isEmpty() && m_cleaningSourceDependencyRunIds.contains(runId);
+			const bool bSyncing = !runId.isEmpty() && !m_cleaningSourceDependencyRunIds.contains(runId);
+			const bool bCleaning = !runId.isEmpty() && m_cleaningSourceDependencyRunIds.contains(runId);
 			QPushButton* actionButton = CreateSourceDependencyActionButton(dependency);
 
 			QLabel* statusLabel = AddStatusRow(
 			    layout,
 			    dependency.Label,
-			    cleaning      ? QStringLiteral("Cleaning")
-			        : syncing ? QStringLiteral("Syncing")
+			    bCleaning      ? QStringLiteral("Cleaning")
+			        : bSyncing ? QStringLiteral("Syncing")
 			                  : status.Text,
 			    status.Detail,
-			    cleaning || syncing ? QStringLiteral("running") : status.State,
+			    bCleaning || bSyncing ? QStringLiteral("running") : status.State,
 			    actionButton);
 
 			ApplySourceDependencyRowState(dependency, *statusLabel, *actionButton);
@@ -88,13 +88,13 @@ namespace SparkleLauncher
 		const std::filesystem::path dependencyCachePath = workspaceOutputs.DependencyCacheRoot;
 		const ThirdPartyDependencyUiStatus status = BuildThirdPartyDependencyStatus(dependency, dependencyCachePath);
 		const QString runId = m_sourceDependencyRunIds.value(dependency.Id);
-		const bool cleaning = !runId.isEmpty() && m_cleaningSourceDependencyRunIds.contains(runId);
-		const bool syncing = !runId.isEmpty() && !cleaning;
-		const SyncItemState state = syncing ? SyncItemState::Syncing : status.Synced ? SyncItemState::Synced : SyncItemState::Missing;
+		const bool bCleaning = !runId.isEmpty() && m_cleaningSourceDependencyRunIds.contains(runId);
+		const bool bSyncing = !runId.isEmpty() && !bCleaning;
+		const SyncItemState state = bSyncing ? SyncItemState::Syncing : status.bSynced ? SyncItemState::Synced : SyncItemState::Missing;
 
-		ApplyInlineStatusLabel(statusLabel, cleaning ? QStringLiteral("Cleaning") : syncing ? QStringLiteral("Syncing") : status.Text, cleaning || syncing ? QStringLiteral("running") : status.State);
+		ApplyInlineStatusLabel(statusLabel, bCleaning ? QStringLiteral("Cleaning") : bSyncing ? QStringLiteral("Syncing") : status.Text, bCleaning || bSyncing ? QStringLiteral("running") : status.State);
 		ApplySyncActionButtonState(button, state, dependency.Label);
-		if (cleaning)
+		if (bCleaning)
 		{
 			button.setText("Cleaning...");
 			button.setProperty("ActionIntent", "none");
@@ -171,7 +171,7 @@ namespace SparkleLauncher
 
 		for (const ThirdPartyDependencyUiEntry& dependency : GetTrackedThirdPartyDependencies())
 		{
-			if (!dependency.Enabled)
+			if (!dependency.bEnabled)
 			{
 				continue;
 			}

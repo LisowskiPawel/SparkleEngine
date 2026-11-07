@@ -26,7 +26,7 @@ private:
 	ImportedMeshGeometry& m_geometry;
 	const GltfGeneratedTangentFrameSet& m_frames;
 	std::vector<std::vector<std::uint32_t>> m_variantsBySourceVertex;
-	bool m_hasSkinInfluences = false;
+	bool m_bHasSkinInfluences = false;
 	std::vector<ImportedVertex> m_vertices;
 	std::vector<std::uint32_t> m_indices;
 	std::vector<ImportedSkinInfluence> m_skinInfluences;

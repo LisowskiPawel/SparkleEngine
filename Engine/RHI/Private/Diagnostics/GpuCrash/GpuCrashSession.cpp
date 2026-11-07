@@ -48,9 +48,9 @@ GpuCrashSession::GpuCrashSession(ERhiBackendApi api, const RhiGpuCrashLaunch& la
 	const bool bInvalidCrashSessionsink = launch.Mode != RhiGpuCrashMode::Aftermath || m_sink == nullptr;
 	const bool bInvalidCrashSessionLibraryPath = bInvalidCrashSessionsink || (!launch.LibraryPath.is_absolute());
 	const bool bInvalidCrashSessionapi = api != ERhiBackendApi::D3D12 && api != ERhiBackendApi::Vulkan;
-	const bool invalidCrashSession = bInvalidCrashSessionLibraryPath || bInvalidCrashSessionapi;
+	const bool bInvalidCrashSession = bInvalidCrashSessionLibraryPath || bInvalidCrashSessionapi;
 	
-	if (invalidCrashSession)
+	if (bInvalidCrashSession)
 	{
 		throw Diagnostics::Error("Aftermath requires an admitted API, absolute DLL path and prepared artifact sink.");
 	}
@@ -78,16 +78,16 @@ GpuCrashSession::GpuCrashSession(ERhiBackendApi api, const RhiGpuCrashLaunch& la
 #endif
 	const auto watched = api == ERhiBackendApi::D3D12 ? GFSDK_Aftermath_GpuCrashDumpWatchedApiFlags_DX : GFSDK_Aftermath_GpuCrashDumpWatchedApiFlags_Vulkan;
 	HMODULE callbackModule = nullptr;
-	const bool callbackPinFailed = !GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN, reinterpret_cast<const wchar_t*>(&GpuCrashSession::DumpCallback), &callbackModule);
+	const bool bCallbackPinFailed = !GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN, reinterpret_cast<const wchar_t*>(&GpuCrashSession::DumpCallback), &callbackModule);
 	
-	if (callbackPinFailed)
+	if (bCallbackPinFailed)
 	{
 		throw Diagnostics::Error("Cannot retain GPU crash callback code for the process lifetime.");
 	}
-	const bool aftermathEnableFailed = m_enable(GFSDK_Aftermath_Version_API, watched, GFSDK_Aftermath_GpuCrashDumpFeatureFlags_Default, DumpCallback, DebugCallback, DescriptionCallback, MarkerCallback, this)
+	const bool bAftermathEnableFailed = m_enable(GFSDK_Aftermath_Version_API, watched, GFSDK_Aftermath_GpuCrashDumpFeatureFlags_Default, DumpCallback, DebugCallback, DescriptionCallback, MarkerCallback, this)
 		    != GFSDK_Aftermath_Result_Success;
 	
-	if (aftermathEnableFailed)
+	if (bAftermathEnableFailed)
 	{
 		// Even a failed enable has no callback-quiescence guarantee. Do not unwind the anchor.
 		Diagnostics::Fatal(LogGpuCrash, __FILE__, __LINE__, "Aftermath crash collection could not be enabled; requested launch rejected.");
@@ -111,12 +111,12 @@ void GpuCrashSession::InitializeLibrary(ERhiBackendApi api, const std::filesyste
 
 	std::array<wchar_t, 32'768> loadedPath{};
 	const DWORD count = GetModuleFileNameW(m_library, loadedPath.data(), static_cast<DWORD>(loadedPath.size()));
-	const bool loadedPathValid = count != 0 && count < loadedPath.size();
-	const bool libraryPathMatches = loadedPathValid && std::filesystem::equivalent(libraryPath, loadedPath.data());
-	const bool runtimeHashed = libraryPathMatches && Hash::TrySha256File(loadedPath.data(), hash, error);
-	const bool runtimeHashMatches = runtimeHashed && Hash::Sha256ToHex(hash) == SPARKLE_AFTERMATH_RUNTIME_SHA256;
+	const bool bLoadedPathValid = count != 0 && count < loadedPath.size();
+	const bool bLibraryPathMatches = bLoadedPathValid && std::filesystem::equivalent(libraryPath, loadedPath.data());
+	const bool bRuntimeHashed = bLibraryPathMatches && Hash::TrySha256File(loadedPath.data(), hash, error);
+	const bool bRuntimeHashMatches = bRuntimeHashed && Hash::Sha256ToHex(hash) == SPARKLE_AFTERMATH_RUNTIME_SHA256;
 
-	if (!runtimeHashMatches)
+	if (!bRuntimeHashMatches)
 	{
 		throw Diagnostics::Error("Loaded Aftermath DLL identity changed or resolved to another file.");
 	}
@@ -167,7 +167,7 @@ GpuCrashSession::SinkBorrow::SinkBorrow(GpuCrashSession& session) noexcept :
     m_session(session)
 {
 	std::lock_guard lock(session.m_sinkMutex);
-	if (session.m_accepting && session.m_sink != nullptr)
+	if (session.m_bAccepting && session.m_sink != nullptr)
 	{
 		m_sink = session.m_sink;
 		++session.m_borrows;
@@ -190,7 +190,7 @@ RhiGpuCrashArtifactSink* GpuCrashSession::SinkBorrow::Get() const noexcept
 
 void GpuCrashSession::Incomplete() noexcept
 {
-	m_incomplete.store(true, std::memory_order_relaxed);
+	m_bIncomplete.store(true, std::memory_order_relaxed);
 	SinkBorrow borrow(*this);
 	if (auto* sink = borrow.Get())
 	{
@@ -214,12 +214,12 @@ void GpuCrashSession::Enqueue(RhiGpuCrashArtifactId id, std::span<const std::byt
 	{
 		if (!sink->Enqueue(id, bytes))
 		{
-			m_incomplete.store(true, std::memory_order_relaxed);
+			m_bIncomplete.store(true, std::memory_order_relaxed);
 		}
 	}
 }
 
-void GpuCrashSession::ShaderIdentity(std::span<const std::byte> code, std::uint64_t nativeHash, bool hashAvailable, const GFSDK_Aftermath_ShaderDebugName* debugName) noexcept
+void GpuCrashSession::ShaderIdentity(std::span<const std::byte> code, std::uint64_t nativeHash, bool bHashAvailable, const GFSDK_Aftermath_ShaderDebugName* debugName) noexcept
 {
 	try
 	{
@@ -231,7 +231,7 @@ void GpuCrashSession::ShaderIdentity(std::span<const std::byte> code, std::uint6
 		}
 		Json::ObjectWriter json;
 		json.WriteString("codeSha256", sha256);
-		json.WriteRaw("nativeShaderHash", hashAvailable ? Json::QuoteHexUInt64(nativeHash) : "null");
+		json.WriteRaw("nativeShaderHash", bHashAvailable ? Json::QuoteHexUInt64(nativeHash) : "null");
 		if (debugName != nullptr)
 		{
 			json.WriteString("nativeDebugName", std::string_view(debugName->name, strnlen(debugName->name, sizeof(debugName->name))));
@@ -253,7 +253,7 @@ void GpuCrashSession::ShaderIdentity(std::span<const std::byte> code, std::uint6
 
 bool GpuCrashSession::BeginLoss(std::int64_t nativeFailure) noexcept
 {
-	if (m_lossClaimed.exchange(true))
+	if (m_bLossClaimed.exchange(true))
 	{
 		return false;
 	}
@@ -282,7 +282,7 @@ bool GpuCrashSession::SealSink(std::chrono::steady_clock::time_point deadline) n
 	{
 		{
 			std::lock_guard lock(m_sinkMutex);
-			m_accepting = false;
+			m_bAccepting = false;
 			if (m_borrows == 0)
 			{
 				return true;
@@ -296,11 +296,11 @@ bool GpuCrashSession::SealSink(std::chrono::steady_clock::time_point deadline) n
 	}
 }
 
-void GpuCrashSession::Settle(bool loss, std::int64_t nativeFailure) noexcept
+void GpuCrashSession::Settle(bool bLoss, std::int64_t nativeFailure) noexcept
 {
-	const auto deadline = loss ? m_lossDeadline : std::chrono::steady_clock::now() + std::chrono::seconds(10);
-	bool finished = false;
-	if (loss)
+	const auto deadline = bLoss ? m_lossDeadline : std::chrono::steady_clock::now() + std::chrono::seconds(10);
+	bool bFinished = false;
+	if (bLoss)
 	{
 		while (std::chrono::steady_clock::now() < deadline)
 		{
@@ -311,7 +311,7 @@ void GpuCrashSession::Settle(bool loss, std::int64_t nativeFailure) noexcept
 			}
 			if (status == GFSDK_Aftermath_CrashDump_Status_Finished)
 			{
-				finished = true;
+				bFinished = true;
 				break;
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -323,7 +323,7 @@ void GpuCrashSession::Settle(bool loss, std::int64_t nativeFailure) noexcept
 	}
 	if (!SealSink(deadline))
 	{
-		if (loss)
+		if (bLoss)
 		{
 			// The host preserves its original terminal native error.
 			return;
@@ -333,19 +333,19 @@ void GpuCrashSession::Settle(bool loss, std::int64_t nativeFailure) noexcept
 
 	// No callback can borrow Application storage past this point. The anchor remains.
 	auto* sink = m_sink;
-	if (m_incomplete.load(std::memory_order_relaxed))
+	if (m_bIncomplete.load(std::memory_order_relaxed))
 	{
 		sink->MarkIncomplete();
 	}
 
-	sink->Finalize(finished, std::chrono::steady_clock::now() >= deadline, nativeFailure);
+	sink->Finalize(bFinished, std::chrono::steady_clock::now() >= deadline, nativeFailure);
 	while (!sink->IsSettled() && std::chrono::steady_clock::now() < deadline)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	if (!sink->IsSettled())
 	{
-		if (loss)
+		if (bLoss)
 		{
 			// The host preserves its original terminal native error.
 			return;

@@ -62,11 +62,11 @@ public:
 	    const char* name,
 	    TField TParameters::* member,
 	    ShaderStageVisibility visibility = ShaderStageVisibility::All,
-	    bool usesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
+	    bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
 	{
 		ShaderParameterStructRegistry<TParameters>::AddField(
 		    name != nullptr ? name : "",
-		    [name, member, visibility, usesGraphResource](ShaderParameterStructBuilder<TParameters>& builder) { builder.Add(name, member, visibility, usesGraphResource); });
+		    [name, member, visibility, bUsesGraphResource](ShaderParameterStructBuilder<TParameters>& builder) { builder.Add(name, member, visibility, bUsesGraphResource); });
 	}
 };
 
@@ -113,13 +113,13 @@ public:
 			failedBindings->clear();
 		}
 
-		bool succeeded = true;
+		bool bSucceeded = true;
 		for (std::size_t index = 0; index < m_bindings.size(); ++index)
 		{
 			const auto& binding = m_bindings[index];
 			if (!binding.Bind || !binding.Bind(parameterSet, binding.Name.c_str(), parameters, storage[index]))
 			{
-				succeeded = false;
+				bSucceeded = false;
 				if (failedBindings != nullptr)
 				{
 					failedBindings->push_back(binding.Name);
@@ -129,7 +129,7 @@ public:
 
 		if (!parameterSet.HasAllRequiredBindings())
 		{
-			succeeded = false;
+			bSucceeded = false;
 			if (failedBindings != nullptr)
 			{
 				for (const std::string& missingBinding : parameterSet.GetMissingBindings())
@@ -142,7 +142,7 @@ public:
 			}
 		}
 
-		return succeeded;
+		return bSucceeded;
 	}
 
 private:
@@ -160,9 +160,9 @@ public:
 	}
 
 	template <typename TField>
-	std::uint32_t Add(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool usesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
+	std::uint32_t Add(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
 	{
-		return AddField<typename ShaderParameterFieldTraits<TField>::Semantic>(name, member, visibility, usesGraphResource);
+		return AddField<typename ShaderParameterFieldTraits<TField>::Semantic>(name, member, visibility, bUsesGraphResource);
 	}
 
 	template <typename TField> std::uint32_t RenderTarget(const char* name, TField TParameters::* member, ShaderStageVisibility visibility = ShaderStageVisibility::AllGraphics)
@@ -191,9 +191,9 @@ public:
 			{
 				parameter.Visibility = visibility;
 			}
-			const bool alreadyIncluded = m_layout.HasParameter(parameter.Name);
+			const bool bAlreadyIncluded = m_layout.HasParameter(parameter.Name);
 			m_layout.AddParameter(std::move(parameter));
-			if (alreadyIncluded)
+			if (bAlreadyIncluded)
 			{
 				continue;
 			}
@@ -277,7 +277,7 @@ public:
 
 private:
 	template <typename TExpectedSemantic, typename TField>
-	std::uint32_t AddField(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool usesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
+	std::uint32_t AddField(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
 	{
 		static_assert(IsShaderParameterFieldV<TField>, "Parameter registration requires a typed shader parameter field.");
 
@@ -289,7 +289,7 @@ private:
 		        .Name = name != nullptr ? name : "",
 		        .Bind = [member](PassParameterSet& parameterSet, const char* bindingName, const TParameters& parameters, std::vector<std::byte>&)
 		        { return BindParameterField(parameterSet, bindingName, parameters.*member); }});
-		m_graphResourceParameters.push_back(usesGraphResource);
+		m_graphResourceParameters.push_back(bUsesGraphResource);
 
 		return m_layout.Add<ActualSemantic>(name, visibility, ShaderParameterFieldTraits<TField>::FieldArrayCount);
 	}

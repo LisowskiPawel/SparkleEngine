@@ -134,34 +134,34 @@ void VulkanRhi::LogBootstrapSummary() noexcept
 	    "rtExtensions(as={}, pipeline={}, rayQuery={}, deferredHostOps={}, bda={}, ptlasNv={}), "
 	    "rtFeatures(as={}, pipeline={}, rayQuery={}, bda={}, ptlasNv={}), "
 	    "rtEnabled(as={}, pipeline={}, rayQuery={}, ptlasNv={})",
-	    m_validationEnabled,
-	    m_featureStatus.SupportsSynchronization2,
-	    m_featureStatus.EnabledSynchronization2,
-	    m_featureStatus.SupportsTimelineSemaphore,
-	    m_featureStatus.EnabledTimelineSemaphore,
-	    m_featureStatus.SupportsDynamicRendering,
-	    m_featureStatus.EnabledDynamicRendering,
-	    m_featureStatus.SupportsScalarBlockLayout,
-	    m_featureStatus.EnabledScalarBlockLayout,
-	    m_featureStatus.SupportsSamplerAnisotropy,
-	    m_featureStatus.EnabledSamplerAnisotropy,
-	    m_featureStatus.SupportsFillModeNonSolid,
-	    m_featureStatus.EnabledFillModeNonSolid,
-	    m_featureStatus.RayTracing.SupportsAccelerationStructureExtension,
-	    m_featureStatus.RayTracing.SupportsRayTracingPipelineExtension,
-	    m_featureStatus.RayTracing.SupportsRayQueryExtension,
-	    m_featureStatus.RayTracing.SupportsDeferredHostOperationsExtension,
-	    m_featureStatus.RayTracing.SupportsBufferDeviceAddressExtension,
-	    m_featureStatus.RayTracing.SupportsPtlasExtension,
-	    m_featureStatus.RayTracing.SupportsAccelerationStructureFeature,
-	    m_featureStatus.RayTracing.SupportsRayTracingPipelineFeature,
-	    m_featureStatus.RayTracing.SupportsRayQueryFeature,
-	    m_featureStatus.RayTracing.SupportsBufferDeviceAddressFeature,
-	    m_featureStatus.RayTracing.SupportsPtlasFeature,
-	    m_featureStatus.RayTracing.EnabledAccelerationStructure,
-	    m_featureStatus.RayTracing.EnabledRayTracingPipeline,
-	    m_featureStatus.RayTracing.EnabledInlineRayQuery,
-	    m_featureStatus.RayTracing.EnabledPtlas);
+	    m_bValidationEnabled,
+	    m_featureStatus.bSupportsSynchronization2,
+	    m_featureStatus.bEnabledSynchronization2,
+	    m_featureStatus.bSupportsTimelineSemaphore,
+	    m_featureStatus.bEnabledTimelineSemaphore,
+	    m_featureStatus.bSupportsDynamicRendering,
+	    m_featureStatus.bEnabledDynamicRendering,
+	    m_featureStatus.bSupportsScalarBlockLayout,
+	    m_featureStatus.bEnabledScalarBlockLayout,
+	    m_featureStatus.bSupportsSamplerAnisotropy,
+	    m_featureStatus.bEnabledSamplerAnisotropy,
+	    m_featureStatus.bSupportsFillModeNonSolid,
+	    m_featureStatus.bEnabledFillModeNonSolid,
+	    m_featureStatus.RayTracing.bSupportsAccelerationStructureExtension,
+	    m_featureStatus.RayTracing.bSupportsRayTracingPipelineExtension,
+	    m_featureStatus.RayTracing.bSupportsRayQueryExtension,
+	    m_featureStatus.RayTracing.bSupportsDeferredHostOperationsExtension,
+	    m_featureStatus.RayTracing.bSupportsBufferDeviceAddressExtension,
+	    m_featureStatus.RayTracing.bSupportsPtlasExtension,
+	    m_featureStatus.RayTracing.bSupportsAccelerationStructureFeature,
+	    m_featureStatus.RayTracing.bSupportsRayTracingPipelineFeature,
+	    m_featureStatus.RayTracing.bSupportsRayQueryFeature,
+	    m_featureStatus.RayTracing.bSupportsBufferDeviceAddressFeature,
+	    m_featureStatus.RayTracing.bSupportsPtlasFeature,
+	    m_featureStatus.RayTracing.bEnabledAccelerationStructure,
+	    m_featureStatus.RayTracing.bEnabledRayTracingPipeline,
+	    m_featureStatus.RayTracing.bEnabledInlineRayQuery,
+	    m_featureStatus.RayTracing.bEnabledPtlas);
 
 	const std::string adapterSummary = std::format(
 	    "Vulkan adapter: name='{}', api={}, driver={}, queues(graphics={}:{}, compute={}:{}, copy={}:{}), independent(compute={}, copy={})",
@@ -182,7 +182,7 @@ void VulkanRhi::LogBootstrapSummary() noexcept
 	    RhiRayTracingTlasProviderToString(m_rayTracingCapabilities.Groups.Provider.SelectedTlasProvider),
 	    m_rayTracingCapabilities.Groups.Provider.SelectedTlasProviderReason,
 	    RhiPtlasProviderToString(m_rayTracingCapabilities.Groups.Ptlas.Provider),
-	    m_rayTracingCapabilities.Groups.Ptlas.Supported,
+	    m_rayTracingCapabilities.Groups.Ptlas.bSupported,
 	    m_rayTracingCapabilities.Groups.Ptlas.CapabilityStatusReason);
 
 	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Driver, adapterSummary);
@@ -191,20 +191,20 @@ void VulkanRhi::LogBootstrapSummary() noexcept
 	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Driver, instanceExtensions);
 	PushDiagnosticMessage(ERhiDiagnosticMessageSeverity::Info, ERhiDiagnosticMessageCategory::Driver, deviceExtensions);
 
-	if (!m_featureStatus.RayTracing.EnabledAccelerationStructure)
+	if (!m_featureStatus.RayTracing.bEnabledAccelerationStructure)
 	{
 		const std::string rayTracingSummary = std::format(
 		    "Vulkan ray query backend disabled: hardwareExtensions(as={}, pipeline={}, rayQuery={}, deferredHostOps={}, bda={}) "
 		    "hardwareFeatures(as={}, pipeline={}, rayQuery={}, bda={}) functionsLoaded={}.",
-		    m_featureStatus.RayTracing.SupportsAccelerationStructureExtension,
-		    m_featureStatus.RayTracing.SupportsRayTracingPipelineExtension,
-		    m_featureStatus.RayTracing.SupportsRayQueryExtension,
-		    m_featureStatus.RayTracing.SupportsDeferredHostOperationsExtension,
-		    m_featureStatus.RayTracing.SupportsBufferDeviceAddressExtension,
-		    m_featureStatus.RayTracing.SupportsAccelerationStructureFeature,
-		    m_featureStatus.RayTracing.SupportsRayTracingPipelineFeature,
-		    m_featureStatus.RayTracing.SupportsRayQueryFeature,
-		    m_featureStatus.RayTracing.SupportsBufferDeviceAddressFeature,
+		    m_featureStatus.RayTracing.bSupportsAccelerationStructureExtension,
+		    m_featureStatus.RayTracing.bSupportsRayTracingPipelineExtension,
+		    m_featureStatus.RayTracing.bSupportsRayQueryExtension,
+		    m_featureStatus.RayTracing.bSupportsDeferredHostOperationsExtension,
+		    m_featureStatus.RayTracing.bSupportsBufferDeviceAddressExtension,
+		    m_featureStatus.RayTracing.bSupportsAccelerationStructureFeature,
+		    m_featureStatus.RayTracing.bSupportsRayTracingPipelineFeature,
+		    m_featureStatus.RayTracing.bSupportsRayQueryFeature,
+		    m_featureStatus.RayTracing.bSupportsBufferDeviceAddressFeature,
 		    m_getBufferDeviceAddress != nullptr && m_createAccelerationStructure != nullptr && m_destroyAccelerationStructure != nullptr && m_getAccelerationStructureBuildSizes != nullptr
 		        && m_cmdBuildAccelerationStructures != nullptr && m_getAccelerationStructureDeviceAddress != nullptr);
 

@@ -28,19 +28,19 @@ bool MaterialVariantResourceStore::Apply(MaterialVariantIndex index, ECS::GameWo
 	{
 		return false;
 	}
-	bool applied = false;
+	bool bApplied = false;
 	for (const MaterialVariantBinding& binding : m_bindings)
 	{
 		if (binding.Variant == index)
 		{
-			applied = world.WriteMeshMaterial(binding.Entity, binding.Material) || applied;
+			bApplied = world.WriteMeshMaterial(binding.Entity, binding.Material) || bApplied;
 		}
 	}
-	if (applied)
+	if (bApplied)
 	{
 		m_active = index;
 	}
-	return applied;
+	return bApplied;
 }
 
 std::string_view MaterialVariantResourceStore::GetName(std::size_t index) const noexcept

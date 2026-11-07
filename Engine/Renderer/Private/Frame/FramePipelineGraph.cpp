@@ -99,12 +99,12 @@ void FramePipeline::InvalidateViewHistory(RenderViewInvalidationReason reason) n
 
 void FramePipeline::ApplyPendingResize() noexcept
 {
-	if (m_resizePending)
+	if (m_bResizePending)
 	{
-		m_resizePending = false;
+		m_bResizePending = false;
 		InvalidateViewHistory(RenderViewInvalidationReason::GraphTopology);
 
-		if (!m_windowMinimized && m_windowExtent.IsValid())
+		if (!m_bWindowMinimized && m_windowExtent.IsValid())
 		{
 			m_deviceServices.ResizeSwapChain();
 			RebuildFrameExecutionAfterSwapChainDrain(ResolveFrameGraphSettings());
@@ -115,8 +115,8 @@ void FramePipeline::ApplyPendingResize() noexcept
 void FramePipeline::RefreshFrameResources() noexcept
 {
 	const ImageProviderGraphKey providerGraphKey = m_imageProviders->GetFrameGraphKey();
-	const bool providerChanged = providerGraphKey != m_imageProviderFrameGraphKey;
-	if (providerChanged)
+	const bool bProviderChanged = providerGraphKey != m_imageProviderFrameGraphKey;
+	if (bProviderChanged)
 	{
 		m_imageProviders->Refresh();
 	}
@@ -125,7 +125,7 @@ void FramePipeline::RefreshFrameResources() noexcept
 	const GBufferAlgorithm gBufferAlgorithm = CVarGBufferAlgorithm.Get();
 	const std::uint64_t rayTracingGraphGeneration = m_renderScene->GetRayTracingScene().GetGraphGeneration();
 	const std::uint64_t shaderGeneration = m_renderPassRuntimeCache.GetShaderGeneration();
-	if (providerChanged || settings != m_frameGraphSettings || gBufferAlgorithm != m_builtGBufferAlgorithm || rayTracingGraphGeneration != m_builtRayTracingGraphGeneration
+	if (bProviderChanged || settings != m_frameGraphSettings || gBufferAlgorithm != m_builtGBufferAlgorithm || rayTracingGraphGeneration != m_builtRayTracingGraphGeneration
 	    || shaderGeneration != m_builtShaderGeneration)
 	{
 		InvalidateViewHistory(RenderViewInvalidationReason::GraphTopology);

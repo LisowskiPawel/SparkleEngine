@@ -52,14 +52,14 @@ namespace ECS
 	{
 		using Component = T;
 		static constexpr ComponentAccessMode Mode = ComponentAccessMode::Read;
-		static constexpr bool Writable = false;
+		static constexpr bool bWritable = false;
 	};
 
 	template <ComponentStorageCompatible T> struct QueryAccessTraits<Write<T>> final
 	{
 		using Component = T;
 		static constexpr ComponentAccessMode Mode = ComponentAccessMode::Write;
-		static constexpr bool Writable = true;
+		static constexpr bool bWritable = true;
 	};
 
 	template <typename T> concept QueryAccessSpec = requires {

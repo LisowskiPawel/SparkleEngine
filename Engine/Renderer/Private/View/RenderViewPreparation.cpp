@@ -61,7 +61,7 @@ void RenderViewPreparation::BuildMeshBatches(const PreparedRenderScene& prepared
 	    m_run.Items,
 	    preparedScene.primitives,
 	    preparedScene.instanceGroups,
-	    MeshInstanceBatchBuildOptions{.EnableAutoBatching = CVarRendererMeshAutoBatching.Get(), .RequireMaterialBindingSet = true, .CollectDiagnostics = false},
+	    MeshInstanceBatchBuildOptions{.bEnableAutoBatching = CVarRendererMeshAutoBatching.Get(), .bRequireMaterialBindingSet = true, .bCollectDiagnostics = false},
 	    m_batchResult);
 
 	view.rasterPrimitiveIndices = std::move(m_batchResult.RasterInstanceIndices);

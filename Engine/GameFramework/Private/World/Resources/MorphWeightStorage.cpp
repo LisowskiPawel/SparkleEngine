@@ -15,7 +15,7 @@ namespace ECS
 			m_freeSlots.pop_back();
 			Entry& entry = m_entries[slot];
 			entry.Weights.assign(weights.begin(), weights.end());
-			entry.Occupied = true;
+			entry.bOccupied = true;
 			return {slot, entry.Generation};
 		}
 		if (m_entries.size() >= AnimationOutputSlotHandle{}.Slot)
@@ -23,7 +23,7 @@ namespace ECS
 			return {};
 		}
 		const auto slot = static_cast<std::uint32_t>(m_entries.size());
-		m_entries.push_back(Entry{.Weights = std::vector<float>(weights.begin(), weights.end()), .Occupied = true});
+		m_entries.push_back(Entry{.Weights = std::vector<float>(weights.begin(), weights.end()), .bOccupied = true});
 		return {slot, m_entries.back().Generation};
 	}
 
@@ -34,7 +34,7 @@ namespace ECS
 			return false;
 		}
 		Entry& entry = m_entries[handle.Slot];
-		if (!entry.Occupied || entry.Generation != handle.Generation)
+		if (!entry.bOccupied || entry.Generation != handle.Generation)
 		{
 			return false;
 		}
@@ -49,7 +49,7 @@ namespace ECS
 			return false;
 		}
 		Entry& entry = m_entries[handle.Slot];
-		if (!entry.Occupied || entry.Generation != handle.Generation || entry.Weights.size() != weights.size())
+		if (!entry.bOccupied || entry.Generation != handle.Generation || entry.Weights.size() != weights.size())
 		{
 			return false;
 		}
@@ -64,7 +64,7 @@ namespace ECS
 			return {};
 		}
 		const Entry& entry = m_entries[handle.Slot];
-		return entry.Occupied && entry.Generation == handle.Generation ? std::span<const float>(entry.Weights) : std::span<const float>{};
+		return entry.bOccupied && entry.Generation == handle.Generation ? std::span<const float>(entry.Weights) : std::span<const float>{};
 	}
 
 	bool MorphWeightStorage::Remove(AnimationOutputSlotHandle handle) noexcept
@@ -74,12 +74,12 @@ namespace ECS
 			return false;
 		}
 		Entry& entry = m_entries[handle.Slot];
-		if (!entry.Occupied || entry.Generation != handle.Generation)
+		if (!entry.bOccupied || entry.Generation != handle.Generation)
 		{
 			return false;
 		}
 		entry.Weights.clear();
-		entry.Occupied = false;
+		entry.bOccupied = false;
 		if (entry.Generation != (std::numeric_limits<std::uint32_t>::max)())
 		{
 			++entry.Generation;

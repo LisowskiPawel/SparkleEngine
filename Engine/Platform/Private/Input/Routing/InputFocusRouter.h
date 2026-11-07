@@ -19,7 +19,7 @@ public:
 	InputFocusRouter(InputFocusRouter&&) = delete;
 	InputFocusRouter& operator=(InputFocusRouter&&) = delete;
 
-	void BeginFrame(bool interactionDisabled, bool textInputActive);
+	void BeginFrame(bool bInteractionDisabled, bool bTextInputActive);
 	void RegisterTargetRegion(float left, float top, float right, float bottom, InputLayer targetLayer);
 
 	InputLayer ResolveTargetLayer(const InputBackendResult& result, InputLayer fallbackLayer) noexcept;
@@ -43,7 +43,7 @@ private:
 
 	std::vector<TargetRegion> m_targetRegions;
 	InputLayer m_activeTargetLayer = InputLayer::UI;
-	bool m_hasRoutingFrame = false;
-	bool m_interactionDisabled = false;
-	bool m_textInputActive = false;
+	bool m_bHasRoutingFrame = false;
+	bool m_bInteractionDisabled = false;
+	bool m_bTextInputActive = false;
 };

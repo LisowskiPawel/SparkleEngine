@@ -21,17 +21,17 @@ std::optional<UINT> D3D12DescriptorAllocator::TryAllocateContiguousFromFreeListL
 
 	for (std::size_t start = 0; start + count <= m_freeIndices.size(); ++start)
 	{
-		bool isContiguousRun = true;
+		bool bIsContiguousRun = true;
 		for (std::size_t offset = 1; offset < count; ++offset)
 		{
 			if (m_freeIndices[start + offset] != m_freeIndices[start] + offset)
 			{
-				isContiguousRun = false;
+				bIsContiguousRun = false;
 				break;
 			}
 		}
 
-		if (isContiguousRun)
+		if (bIsContiguousRun)
 		{
 			const UINT startIndex = m_freeIndices[start];
 			m_freeIndices.erase(m_freeIndices.begin() + static_cast<std::ptrdiff_t>(start), m_freeIndices.begin() + static_cast<std::ptrdiff_t>(start + count));

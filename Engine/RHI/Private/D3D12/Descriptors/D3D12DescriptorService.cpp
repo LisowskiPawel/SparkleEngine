@@ -121,9 +121,9 @@ RhiDescriptorTableHandle D3D12DescriptorService::AllocateDescriptorTable(ERhiDes
 	const bool bCapacityExhausteddescriptorCount = m_descriptorHeapManager == nullptr || descriptorCount == 0;
 	const bool bCapacityExhaustedEmpty = !bCapacityExhausteddescriptorCount && (m_freeDescriptorTableIndices.empty());
 	const bool bCapacityExhaustedTableRecordsSize = bCapacityExhaustedEmpty && (m_descriptorTableRecords.size() >= RhiDescriptorTableHandle::MaximumRecordCount);
-	const bool descriptorTableCapacityExhausted = bCapacityExhausteddescriptorCount || bCapacityExhaustedTableRecordsSize;
+	const bool bTableFull = bCapacityExhausteddescriptorCount || bCapacityExhaustedTableRecordsSize;
 	
-	if (descriptorTableCapacityExhausted)
+	if (bTableFull)
 	{
 		return {};
 	}
@@ -226,9 +226,9 @@ RhiResourceViewHandle D3D12DescriptorService::CreateResourceView(const RhiResour
 	const bool bAllocationRejectedHeapManager = bResourceAllocationRejectedrhi || (m_descriptorHeapManager == nullptr);
 	const bool bAllocationRejectedEmpty = !bAllocationRejectedHeapManager && (m_freeResourceViewIndices.empty());
 	const bool bAllocationRejectedViewRecordsSize = bAllocationRejectedEmpty && (m_resourceViewRecords.size() >= RhiResourceViewHandle::MaximumRecordCount);
-	const bool resourceViewAllocationRejected = bAllocationRejectedHeapManager || bAllocationRejectedViewRecordsSize;
+	const bool bViewAllocationRejected = bAllocationRejectedHeapManager || bAllocationRejectedViewRecordsSize;
 	
-	if (resourceViewAllocationRejected)
+	if (bViewAllocationRejected)
 	{
 		return {};
 	}

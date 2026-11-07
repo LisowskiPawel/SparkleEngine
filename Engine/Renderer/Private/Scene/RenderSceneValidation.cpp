@@ -5,11 +5,11 @@
 
 bool RenderScene::ValidateDynamic(const RenderSceneDynamicData& dynamic, const RenderSceneDelta& delta) const
 {
-	const bool objectsOrdered = HasStrictlyOrderedDynamicObjects(dynamic.Objects);
-	const bool jointMatricesOrdered = objectsOrdered && HasStrictlyOrderedJointMatrixRanges(dynamic.JointMatrixRanges);
-	const bool morphWeightsOrdered = jointMatricesOrdered && HasStrictlyOrderedMorphWeightRanges(dynamic.MorphWeightRanges);
+	const bool bObjectsOrdered = HasStrictlyOrderedDynamicObjects(dynamic.Objects);
+	const bool bJointMatricesOrdered = bObjectsOrdered && HasStrictlyOrderedJointMatrixRanges(dynamic.JointMatrixRanges);
+	const bool bMorphWeightsOrdered = bJointMatricesOrdered && HasStrictlyOrderedMorphWeightRanges(dynamic.MorphWeightRanges);
 
-	if (!morphWeightsOrdered)
+	if (!bMorphWeightsOrdered)
 	{
 		return false;
 	}
@@ -30,8 +30,8 @@ bool RenderScene::ValidateDynamic(const RenderSceneDynamicData& dynamic, const R
 		    create.Object,
 		    [](const RenderObjectDynamicData& primitive, RenderObjectId identity) { return primitive.Object < identity; });
 
-		const bool hasDynamicData = dynamicObject != dynamic.Objects.end() && dynamicObject->Object == create.Object;
-		if (!hasDynamicData)
+		const bool bHasDynamicData = dynamicObject != dynamic.Objects.end() && dynamicObject->Object == create.Object;
+		if (!bHasDynamicData)
 		{
 			return false;
 		}
@@ -41,9 +41,9 @@ bool RenderScene::ValidateDynamic(const RenderSceneDynamicData& dynamic, const R
 	{
 		const bool bInvalidMatrixRangeObject = !range.Object.IsValid() || !IsObjectAvailable(range.Object, delta);
 		const bool bInvalidMatrixRangeJointMatrices = bInvalidMatrixRangeObject || (range.JointMatrixOffset > dynamic.JointMatrices.size());
-		const bool invalidJointMatrixRange = bInvalidMatrixRangeJointMatrices || (range.JointMatrixCount > dynamic.JointMatrices.size() - range.JointMatrixOffset);
+		const bool bInvalidJointMatrixRange = bInvalidMatrixRangeJointMatrices || (range.JointMatrixCount > dynamic.JointMatrices.size() - range.JointMatrixOffset);
 		
-		if (invalidJointMatrixRange)
+		if (bInvalidJointMatrixRange)
 		{
 			return false;
 		}
@@ -53,9 +53,9 @@ bool RenderScene::ValidateDynamic(const RenderSceneDynamicData& dynamic, const R
 	{
 		const bool bInvalidWeightRangeObject = !morphWeightRange.Object.IsValid() || !IsObjectAvailable(morphWeightRange.Object, delta);
 		const bool bInvalidWeightRangeMorphWeights = bInvalidWeightRangeObject || (morphWeightRange.WeightOffset > dynamic.MorphWeights.size());
-		const bool invalidMorphWeightRange = bInvalidWeightRangeMorphWeights || (morphWeightRange.WeightCount > dynamic.MorphWeights.size() - morphWeightRange.WeightOffset);
+		const bool bInvalidMorphWeightRange = bInvalidWeightRangeMorphWeights || (morphWeightRange.WeightCount > dynamic.MorphWeights.size() - morphWeightRange.WeightOffset);
 		
-		if (invalidMorphWeightRange)
+		if (bInvalidMorphWeightRange)
 		{
 			return false;
 		}
@@ -81,7 +81,7 @@ bool RenderScene::ValidateDelta(const RenderSceneDelta& delta) const
 	{
 		return false;
 	}
-	if (delta.SceneGeneration > m_sceneGeneration && !delta.ResetScene)
+	if (delta.SceneGeneration > m_sceneGeneration && !delta.bResetScene)
 	{
 		return false;
 	}
@@ -96,21 +96,21 @@ bool RenderScene::ValidateDelta(const RenderSceneDelta& delta) const
 
 	for (RenderObjectId primitiveId : delta.Destroys)
 	{
-		if (!primitiveId.IsValid() || delta.ResetScene || Find(primitiveId) == nullptr)
+		if (!primitiveId.IsValid() || delta.bResetScene || Find(primitiveId) == nullptr)
 		{
 			return false;
 		}
 	}
 	for (const RenderObjectCreate& create : delta.Creates)
 	{
-		if (!create.Object.IsValid() || !create.Static.Mesh.IsValid() || (!delta.ResetScene && Find(create.Object) != nullptr))
+		if (!create.Object.IsValid() || !create.Static.Mesh.IsValid() || (!delta.bResetScene && Find(create.Object) != nullptr))
 		{
 			return false;
 		}
 	}
 	for (const RenderObjectUpdate& update : delta.Updates)
 	{
-		if (!update.Object.IsValid() || !update.Static.Mesh.IsValid() || delta.ResetScene || Find(update.Object) == nullptr)
+		if (!update.Object.IsValid() || !update.Static.Mesh.IsValid() || delta.bResetScene || Find(update.Object) == nullptr)
 		{
 			return false;
 		}
@@ -120,9 +120,9 @@ bool RenderScene::ValidateDelta(const RenderSceneDelta& delta) const
 
 bool RenderScene::HasOrderedDeltaObjects(const RenderSceneDelta& delta) noexcept
 {
-	const bool createsOrdered = std::is_sorted(delta.Creates.begin(), delta.Creates.end(), [](const RenderObjectCreate& left, const RenderObjectCreate& right) { return left.Object < right.Object; });
-	const bool updatesOrdered = std::is_sorted(delta.Updates.begin(), delta.Updates.end(), [](const RenderObjectUpdate& left, const RenderObjectUpdate& right) { return left.Object < right.Object; });
-	return createsOrdered && updatesOrdered && std::is_sorted(delta.Destroys.begin(), delta.Destroys.end());
+	const bool bCreatesOrdered = std::is_sorted(delta.Creates.begin(), delta.Creates.end(), [](const RenderObjectCreate& left, const RenderObjectCreate& right) { return left.Object < right.Object; });
+	const bool bUpdatesOrdered = std::is_sorted(delta.Updates.begin(), delta.Updates.end(), [](const RenderObjectUpdate& left, const RenderObjectUpdate& right) { return left.Object < right.Object; });
+	return bCreatesOrdered && bUpdatesOrdered && std::is_sorted(delta.Destroys.begin(), delta.Destroys.end());
 }
 
 bool RenderScene::HasConflictingDeltaObjects(const RenderSceneDelta& delta) noexcept
@@ -139,9 +139,9 @@ bool RenderScene::HasConflictingDeltaObjects(const RenderSceneDelta& delta) noex
 
 	const auto duplicateDestroys = std::adjacent_find(delta.Destroys.begin(), delta.Destroys.end());
 	const bool bDuplicateObjectMutationsUpdates = duplicateCreates != delta.Creates.end() || duplicateUpdates != delta.Updates.end();
-	const bool duplicateObjectMutations = bDuplicateObjectMutationsUpdates || (duplicateDestroys != delta.Destroys.end());
+	const bool bDuplicateObjectMutations = bDuplicateObjectMutationsUpdates || (duplicateDestroys != delta.Destroys.end());
 	
-	if (duplicateObjectMutations)
+	if (bDuplicateObjectMutations)
 	{
 		return true;
 	}
@@ -155,9 +155,9 @@ bool RenderScene::HasConflictingDeltaObjects(const RenderSceneDelta& delta) noex
 		    [](const RenderObjectUpdate& candidate, RenderObjectId identity) { return candidate.Object < identity; });
 
 		const bool bConflictingObjectMutationObject = update != delta.Updates.end() && update->Object == create.Object;
-		const bool conflictingObjectMutation = bConflictingObjectMutationObject || (std::binary_search(delta.Destroys.begin(), delta.Destroys.end(), create.Object));
+		const bool bConflictingObjectMutation = bConflictingObjectMutationObject || (std::binary_search(delta.Destroys.begin(), delta.Destroys.end(), create.Object));
 		
-		if (conflictingObjectMutation)
+		if (bConflictingObjectMutation)
 		{
 			return true;
 		}

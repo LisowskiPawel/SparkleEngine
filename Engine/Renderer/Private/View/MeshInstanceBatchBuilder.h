@@ -25,9 +25,9 @@ struct MeshRenderItem final
 
 struct MeshInstanceBatchBuildOptions final
 {
-	bool EnableAutoBatching = true;
-	bool RequireMaterialBindingSet = true;
-	bool CollectDiagnostics = false;
+	bool bEnableAutoBatching = true;
+	bool bRequireMaterialBindingSet = true;
+	bool bCollectDiagnostics = false;
 };
 
 struct MeshInstanceBatchBuildResult final
@@ -114,7 +114,7 @@ private:
 	    std::span<const PreparedRenderPrimitive> primitives,
 	    std::span<const std::size_t> itemIndices,
 	    MeshInstanceBatchSource source,
-	    bool collectDiagnostics,
+	    bool bCollectDiagnostics,
 	    MeshInstanceBatchBuildResult& result);
 
 	std::unique_ptr<BuildScratch> m_scratch;

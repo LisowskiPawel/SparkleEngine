@@ -57,9 +57,9 @@ void D3D12GpuCrash::Shader(const D3D12_SHADER_BYTECODE& code) noexcept
 		const auto name = reinterpret_cast<PFN_GFSDK_Aftermath_GetShaderDebugName>(session->RequireExport("GFSDK_Aftermath_GetShaderDebugName"));
 		GFSDK_Aftermath_ShaderBinaryHash id{};
 		GFSDK_Aftermath_ShaderDebugName debug{};
-		const bool hasHash = hash(GFSDK_Aftermath_Version_API, &code, &id) == GFSDK_Aftermath_Result_Success;
-		const bool hasName = name(GFSDK_Aftermath_Version_API, &code, &debug) == GFSDK_Aftermath_Result_Success;
-		session->ShaderIdentity({static_cast<const std::byte*>(code.pShaderBytecode), code.BytecodeLength}, id.hash, hasHash, hasName ? &debug : nullptr);
+		const bool bHasHash = hash(GFSDK_Aftermath_Version_API, &code, &id) == GFSDK_Aftermath_Result_Success;
+		const bool bHasName = name(GFSDK_Aftermath_Version_API, &code, &debug) == GFSDK_Aftermath_Result_Success;
+		session->ShaderIdentity({static_cast<const std::byte*>(code.pShaderBytecode), code.BytecodeLength}, id.hash, bHasHash, bHasName ? &debug : nullptr);
 	}
 }
 
@@ -79,11 +79,11 @@ void D3D12GpuCrash::ObserveLoss(ID3D12Device* device, HRESULT result) noexcept
 {
 	auto* session = GpuCrashSession::Current();
 	const bool bLossCandidatedevice = session != nullptr && device != nullptr;
-	const bool lossCandidate = bLossCandidatedevice && (FAILED(result));
-	const bool deviceRemoved = lossCandidate && FAILED(device->GetDeviceRemovedReason());
-	const bool lossStarted = deviceRemoved && session->BeginLoss(result);
+	const bool bLossCandidate = bLossCandidatedevice && (FAILED(result));
+	const bool bDeviceRemoved = bLossCandidate && FAILED(device->GetDeviceRemovedReason());
+	const bool bLossStarted = bDeviceRemoved && session->BeginLoss(result);
 
-	if (!lossStarted)
+	if (!bLossStarted)
 	{
 		return;
 	}

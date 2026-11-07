@@ -12,7 +12,7 @@ namespace SparkleLauncher
 		std::string Id;
 		std::string DisplayName;
 		Process::ChildProcessRequest Request;
-		bool UpdatesBuildFilesFreshness = false;
+		bool bUpdatesBuildFilesFreshness = false;
 	};
 
 	std::vector<BuildWorkspaceProcessStep> BuildProcessStepsForPlan(const BuildWorkspaceOperationPlan& plan);

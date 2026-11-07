@@ -41,9 +41,9 @@ VulkanGpuCrashConfiguration::VulkanGpuCrashConfiguration(VkPhysicalDevice physic
 	const std::array required{VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME};
 	for (const char* name : required)
 	{
-		const bool extensionUnavailable = !std::ranges::any_of(available, [name](const auto& extension) { return std::strcmp(name, extension.extensionName) == 0; });
+		const bool bExtensionUnavailable = !std::ranges::any_of(available, [name](const auto& extension) { return std::strcmp(name, extension.extensionName) == 0; });
 		
-		if (extensionUnavailable)
+		if (bExtensionUnavailable)
 		{
 			Diagnostics::Fatal(LogVulkanGpuCrash, __FILE__, __LINE__, "Required Aftermath Vulkan extension is unavailable.");
 		}
@@ -59,12 +59,12 @@ VulkanGpuCrashConfiguration::VulkanGpuCrashConfiguration(VkPhysicalDevice physic
 	m_config.flags = VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_SHADER_DEBUG_INFO_BIT_NV | VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_RESOURCE_TRACKING_BIT_NV
 	    | VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_SHADER_ERROR_REPORTING_BIT_NV;
 
-	m_enabled = true;
+	m_bEnabled = true;
 }
 
 void VulkanGpuCrashConfiguration::Attach(VkDeviceCreateInfo& device, VkPhysicalDeviceFeatures2& features) noexcept
 {
-	if (m_enabled)
+	if (m_bEnabled)
 	{
 		m_features.pNext = features.pNext;
 		features.pNext = &m_features;
@@ -102,9 +102,9 @@ void VulkanGpuCrash::Shader(std::span<const std::byte> code) noexcept
 		const GFSDK_Aftermath_SpirvCode spirv{code.data(), static_cast<std::uint32_t>(code.size())};
 		const auto hash = reinterpret_cast<PFN_GFSDK_Aftermath_GetShaderHashSpirv>(session->RequireExport("GFSDK_Aftermath_GetShaderHashSpirv"));
 		GFSDK_Aftermath_ShaderBinaryHash id{};
-		const bool hasHash = hash(GFSDK_Aftermath_Version_API, &spirv, &id) == GFSDK_Aftermath_Result_Success;
+		const bool bHasHash = hash(GFSDK_Aftermath_Version_API, &spirv, &id) == GFSDK_Aftermath_Result_Success;
 		// The SDK debug-name API requires a qualified full/stripped pair, which this cook does not emit.
-		session->ShaderIdentity(code, id.hash, hasHash, nullptr);
+		session->ShaderIdentity(code, id.hash, bHasHash, nullptr);
 	}
 }
 

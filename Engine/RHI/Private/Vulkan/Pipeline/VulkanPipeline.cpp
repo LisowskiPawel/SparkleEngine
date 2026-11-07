@@ -117,7 +117,7 @@ static VkPipelineVertexInputStateCreateInfo BuildVertexInputState(
 		vertexBindings[index] = VkVertexInputBindingDescription{
 		    .binding = binding.Binding,
 		    .stride = binding.StrideInBytes,
-		    .inputRate = binding.PerInstance ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX};
+		    .inputRate = binding.bPerInstance ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX};
 	}
 	for (std::uint32_t index = 0; index < input.ElementCount; ++index)
 	{
@@ -148,7 +148,7 @@ static VkPipelineRasterizationStateCreateInfo BuildRasterizationState(const RhiR
 	    .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 	    .pNext = nullptr,
 	    .flags = 0,
-	    .depthClampEnable = rasterizer.DepthClipEnable ? VK_FALSE : VK_TRUE,
+	    .depthClampEnable = rasterizer.bDepthClipEnable ? VK_FALSE : VK_TRUE,
 	    .rasterizerDiscardEnable = VK_FALSE,
 	    .polygonMode = ToVkPolygonMode(rasterizer.FillMode),
 	    .cullMode = VulkanTypeConversions::ToVkCullModeFlags(rasterizer.CullMode),
@@ -162,7 +162,7 @@ static VkPipelineRasterizationStateCreateInfo BuildRasterizationState(const RhiR
 	return rasterizationState;
 }
 
-static VkPipelineMultisampleStateCreateInfo BuildMultisampleState(std::uint32_t sampleCount, bool alphaToCoverage)
+static VkPipelineMultisampleStateCreateInfo BuildMultisampleState(std::uint32_t sampleCount, bool bAlphaToCoverage)
 {
 	const VkPipelineMultisampleStateCreateInfo multisampleState{
 	    .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
@@ -172,7 +172,7 @@ static VkPipelineMultisampleStateCreateInfo BuildMultisampleState(std::uint32_t 
 	    .sampleShadingEnable = VK_FALSE,
 	    .minSampleShading = 0.0f,
 	    .pSampleMask = nullptr,
-	    .alphaToCoverageEnable = alphaToCoverage ? VK_TRUE : VK_FALSE,
+	    .alphaToCoverageEnable = bAlphaToCoverage ? VK_TRUE : VK_FALSE,
 	    .alphaToOneEnable = VK_FALSE};
 
 	return multisampleState;
@@ -183,10 +183,10 @@ static std::array<VkPipelineColorBlendAttachmentState, 8> BuildBlendAttachments(
 	std::array<VkPipelineColorBlendAttachmentState, 8> blendAttachments = {};
 	for (std::uint32_t renderTargetIndex = 0; renderTargetIndex < desc.ColorAttachmentCount; ++renderTargetIndex)
 	{
-		const RhiBlendTargetState& blend = desc.Blend.Targets[desc.Blend.IndependentBlendEnable ? renderTargetIndex : 0];
+		const RhiBlendTargetState& blend = desc.Blend.Targets[desc.Blend.bIndependentBlendEnable ? renderTargetIndex : 0];
 
 		blendAttachments[renderTargetIndex] = VkPipelineColorBlendAttachmentState{
-		    .blendEnable = blend.BlendEnable ? VK_TRUE : VK_FALSE,
+		    .blendEnable = blend.bBlendEnable ? VK_TRUE : VK_FALSE,
 		    .srcColorBlendFactor = ToVkBlendFactor(blend.SourceColor),
 		    .dstColorBlendFactor = ToVkBlendFactor(blend.DestinationColor),
 		    .colorBlendOp = ToVkBlendOperation(blend.ColorOperation),
@@ -198,17 +198,17 @@ static std::array<VkPipelineColorBlendAttachmentState, 8> BuildBlendAttachments(
 	return blendAttachments;
 }
 
-static VkPipelineDepthStencilStateCreateInfo BuildDepthStencilState(const GraphicsPipelineDesc& desc, bool hasDepthStencilFormat, bool hasStencilFormat)
+static VkPipelineDepthStencilStateCreateInfo BuildDepthStencilState(const GraphicsPipelineDesc& desc, bool bHasDepthStencilFormat, bool bHasStencilFormat)
 {
 	const VkPipelineDepthStencilStateCreateInfo depthStencilState{
 	    .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 	    .pNext = nullptr,
 	    .flags = 0,
-	    .depthTestEnable = hasDepthStencilFormat && desc.Depth.DepthEnable ? VK_TRUE : VK_FALSE,
-	    .depthWriteEnable = hasDepthStencilFormat && desc.Depth.DepthWriteEnable ? VK_TRUE : VK_FALSE,
+	    .depthTestEnable = bHasDepthStencilFormat && desc.Depth.bDepthEnable ? VK_TRUE : VK_FALSE,
+	    .depthWriteEnable = bHasDepthStencilFormat && desc.Depth.bDepthWriteEnable ? VK_TRUE : VK_FALSE,
 	    .depthCompareOp = VulkanTypeConversions::ToVkCompareOp(desc.Depth.DepthFunc),
 	    .depthBoundsTestEnable = VK_FALSE,
-	    .stencilTestEnable = hasStencilFormat && desc.Stencil.StencilEnable ? VK_TRUE : VK_FALSE,
+	    .stencilTestEnable = bHasStencilFormat && desc.Stencil.bStencilEnable ? VK_TRUE : VK_FALSE,
 	    .front = BuildStencilFaceState(
 	        desc.Stencil.FrontFaceStencilFunc,
 	        desc.Stencil.FrontFaceStencilFailOp,
@@ -258,8 +258,8 @@ VulkanPipeline::VulkanPipeline(VulkanRhi& rhi, const GraphicsPipelineDesc& desc)
 
 void VulkanPipeline::CreateGraphicsPipeline(VulkanRhi& rhi, const GraphicsPipelineDesc& desc, std::span<const VkPipelineShaderStageCreateInfo> shaderStages, const std::string& debugName)
 {
-	const bool hasDepthStencilFormat = desc.DepthStencilAttachmentFormat != PixelFormat::Unknown;
-	const bool hasStencilFormat = PixelFormatHasStencilAspect(desc.DepthStencilAttachmentFormat);
+	const bool bHasDepthStencilFormat = desc.DepthStencilAttachmentFormat != PixelFormat::Unknown;
+	const bool bHasStencilFormat = PixelFormatHasStencilAspect(desc.DepthStencilAttachmentFormat);
 	std::array<VkVertexInputBindingDescription, 4> vertexBindings = {};
 	std::array<VkVertexInputAttributeDescription, 16> vertexAttributes = {};
 	const auto vertexInputState = BuildVertexInputState(desc.VertexInput, vertexBindings, vertexAttributes);
@@ -276,7 +276,7 @@ void VulkanPipeline::CreateGraphicsPipeline(VulkanRhi& rhi, const GraphicsPipeli
 
 	const auto rasterizationState = BuildRasterizationState(desc.Rasterizer);
 
-	const auto multisampleState = BuildMultisampleState(desc.SampleCount, desc.Blend.AlphaToCoverageEnable);
+	const auto multisampleState = BuildMultisampleState(desc.SampleCount, desc.Blend.bAlphaToCoverageEnable);
 
 	const auto blendAttachments = BuildBlendAttachments(desc);
 
@@ -290,7 +290,7 @@ void VulkanPipeline::CreateGraphicsPipeline(VulkanRhi& rhi, const GraphicsPipeli
 	    .pAttachments = blendAttachments.data(),
 	    .blendConstants = {0.0f, 0.0f, 0.0f, 0.0f}};
 
-	const auto depthStencilState = BuildDepthStencilState(desc, hasDepthStencilFormat, hasStencilFormat);
+	const auto depthStencilState = BuildDepthStencilState(desc, bHasDepthStencilFormat, bHasStencilFormat);
 
 	const std::array<VkDynamicState, 2> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 
@@ -310,7 +310,7 @@ void VulkanPipeline::CreateGraphicsPipeline(VulkanRhi& rhi, const GraphicsPipeli
 	    .colorAttachmentCount = desc.ColorAttachmentCount,
 	    .pColorAttachmentFormats = renderTargetFormats.data(),
 	    .depthAttachmentFormat = VulkanTypeConversions::ToVkFormat(desc.DepthStencilAttachmentFormat),
-	    .stencilAttachmentFormat = hasStencilFormat ? VulkanTypeConversions::ToVkFormat(desc.DepthStencilAttachmentFormat) : VK_FORMAT_UNDEFINED};
+	    .stencilAttachmentFormat = bHasStencilFormat ? VulkanTypeConversions::ToVkFormat(desc.DepthStencilAttachmentFormat) : VK_FORMAT_UNDEFINED};
 
 	const VkGraphicsPipelineCreateInfo createInfo{
 	    .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,

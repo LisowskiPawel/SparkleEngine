@@ -131,9 +131,9 @@ namespace Paths
 			const bool bAllowedcharacter5 = bAllowedcharacter3 || bAllowedcharacter4;
 			const bool bAllowedcharacter6 = bAllowedcharacter5 || (character == '_');
 			const bool bAllowedcharacter7 = bAllowedcharacter6 || (character == '-');
-			const bool allowed = bAllowedcharacter7 || (character == '.');
+			const bool bAllowed = bAllowedcharacter7 || (character == '.');
 
-			result.push_back(allowed ? character : '_');
+			result.push_back(bAllowed ? character : '_');
 		}
 		return result;
 	}

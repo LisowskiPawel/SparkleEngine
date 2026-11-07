@@ -72,12 +72,12 @@ private:
 			return {};
 		}
 
-		const bool opened = reinterpret_cast<std::intptr_t>(PIXOpenCaptureInUI(m_artifact.c_str())) > 32;
+		const bool bOpened = reinterpret_cast<std::intptr_t>(PIXOpenCaptureInUI(m_artifact.c_str())) > 32;
 
 		return {
 		    .State = ExternalCaptureState::Completed,
 		    .Artifact = m_artifact,
-		    .Message = opened ? "PIX native open confirmed finalization; capture handed to PIX." : "PIX native open confirmed finalization; viewer handoff failed. Open the artifact manually."};
+		    .Message = bOpened ? "PIX native open confirmed finalization; capture handed to PIX." : "PIX native open confirmed finalization; viewer handoff failed. Open the artifact manually."};
 	}
 
 	void TryStartNativeInspector()
@@ -98,9 +98,9 @@ private:
 		startup.wShowWindow = SW_HIDE;
 		PROCESS_INFORMATION process{};
 		const std::filesystem::path toolDirectory = m_tool.parent_path();
-		const bool processCreated = CreateProcessW(m_tool.c_str(), command.data(), nullptr, nullptr, FALSE, CREATE_NO_WINDOW, nullptr, toolDirectory.c_str(), &startup, &process) != FALSE;
+		const bool bProcessCreated = CreateProcessW(m_tool.c_str(), command.data(), nullptr, nullptr, FALSE, CREATE_NO_WINDOW, nullptr, toolDirectory.c_str(), &startup, &process) != FALSE;
 
-		if (processCreated)
+		if (bProcessCreated)
 		{
 			CloseHandle(process.hThread);
 			m_inspector = process.hProcess;
@@ -164,10 +164,10 @@ bool IsPixCaptureInstalled() noexcept
 	for (unsigned count = 0; !error && versions != end && count < 32; ++count, versions.increment(error))
 	{
 		std::error_code fileError;
-		const bool capturerPresent = std::filesystem::is_regular_file(versions->path() / L"WinPixGpuCapturer.dll", fileError);
-		const bool toolPresent = capturerPresent && std::filesystem::is_regular_file(versions->path() / L"pixtool.exe", fileError);
+		const bool bCapturerPresent = std::filesystem::is_regular_file(versions->path() / L"WinPixGpuCapturer.dll", fileError);
+		const bool bToolPresent = bCapturerPresent && std::filesystem::is_regular_file(versions->path() / L"pixtool.exe", fileError);
 
-		if (toolPresent)
+		if (bToolPresent)
 		{
 			return true;
 		}

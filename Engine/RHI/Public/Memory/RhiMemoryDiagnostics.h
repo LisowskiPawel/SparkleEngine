@@ -22,8 +22,8 @@ struct RhiMemoryCategoryStats
 struct RhiMemoryUsageSnapshot
 {
 	ERhiMemoryAllocatorBackend AllocatorBackend = ERhiMemoryAllocatorBackend::Unknown;
-	bool HasBudgetData = false;
-	bool HasDelayedDestructionTracking = false;
+	bool bHasBudgetData = false;
+	bool bHasDelayedDestructionTracking = false;
 	std::uint64_t TotalUsedBytes = 0;
 	std::uint64_t TotalAllocatedBytes = 0;
 	std::uint64_t TotalBudgetBytes = 0;

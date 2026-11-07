@@ -152,7 +152,7 @@ namespace LevelParsing
 		}
 		if (field == "Visible")
 		{
-			common.visible = ParseBool(line.value, "light visibility");
+			common.bVisible = ParseBool(line.value, "light visibility");
 			return;
 		}
 		if (field == "Position")
@@ -181,7 +181,7 @@ namespace LevelParsing
 		}
 		else if (field == "CastShadow")
 		{
-			value.castShadow = ParseBool(line.value, "directional light shadow flag");
+			value.bCastShadow = ParseBool(line.value, "directional light shadow flag");
 		}
 		else if (field == "IlluminanceLux")
 		{
@@ -228,7 +228,7 @@ namespace LevelParsing
 		}
 		else if (field == "CastShadow")
 		{
-			value.castShadow = ParseBool(line.value, "point light shadow flag");
+			value.bCastShadow = ParseBool(line.value, "point light shadow flag");
 		}
 		else
 		{
@@ -279,7 +279,7 @@ namespace LevelParsing
 		}
 		else if (field == "CastShadow")
 		{
-			value.castShadow = ParseBool(line.value, "spot light shadow flag");
+			value.bCastShadow = ParseBool(line.value, "spot light shadow flag");
 		}
 		else
 		{
@@ -322,7 +322,7 @@ namespace LevelParsing
 		}
 		else if (field == "CastShadow")
 		{
-			value.castShadow = ParseBool(line.value, "rect light shadow flag");
+			value.bCastShadow = ParseBool(line.value, "rect light shadow flag");
 		}
 		else
 		{

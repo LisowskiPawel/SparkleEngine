@@ -27,17 +27,17 @@ static RhiFormatSupport QueryFormatSupport(VulkanRhi& rhi, PixelFormat format) n
 	vkGetPhysicalDeviceFormatProperties(rhi.GetPhysicalDevice(), nativeFormat, &properties);
 	const VkFormatFeatureFlags optimal = properties.optimalTilingFeatures;
 
-	support.SupportsTexture = (optimal & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0 || (optimal & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT) != 0
+	support.bSupportsTexture = (optimal & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0 || (optimal & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT) != 0
 	    || (optimal & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0;
 
-	support.SupportsShaderResource = (optimal & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0;
-	support.SupportsUnorderedAccess = (optimal & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT) != 0;
-	support.SupportsRenderTarget = (optimal & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT) != 0;
-	support.SupportsDepthStencil = (optimal & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0;
+	support.bSupportsShaderResource = (optimal & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0;
+	support.bSupportsUnorderedAccess = (optimal & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT) != 0;
+	support.bSupportsRenderTarget = (optimal & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT) != 0;
+	support.bSupportsDepthStencil = (optimal & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0;
 	return support;
 }
 
-RhiCapabilities BuildVulkanCapabilities(VulkanRhi& rhi, VulkanSwapChain& swapChain, RenderDiagnostics& diagnostics, bool hasCommandRecordingContext) noexcept
+RhiCapabilities BuildVulkanCapabilities(VulkanRhi& rhi, VulkanSwapChain& swapChain, RenderDiagnostics& diagnostics, bool bHasCommandRecordingContext) noexcept
 {
 	VkPhysicalDeviceProperties properties{};
 	vkGetPhysicalDeviceProperties(rhi.GetPhysicalDevice(), &properties);
@@ -65,10 +65,10 @@ RhiCapabilities BuildVulkanCapabilities(VulkanRhi& rhi, VulkanSwapChain& swapCha
 	    .MaxPushConstantBytes = properties.limits.maxPushConstantsSize};
 
 	capabilities.DescriptorIndexing = RhiDescriptorIndexingCapabilities{
-	    .SupportsSampledImageArrayNonUniformIndexing = rhi.GetFeatureStatus().EnabledSampledImageArrayNonUniformIndexing,
-	    .SupportsPartiallyBoundDescriptorArrays = rhi.GetFeatureStatus().EnabledPartiallyBoundDescriptorArrays};
+	    .bNonUniformSampledImages = rhi.GetFeatureStatus().bNonUniformImagesEnabled,
+	    .bSupportsPartiallyBoundDescriptorArrays = rhi.GetFeatureStatus().bEnabledPartiallyBoundDescriptorArrays};
 
-	capabilities.UploadReadback = RhiUploadReadbackCapabilities{.SupportsBufferUpload = true, .SupportsTextureUpload = true, .SupportsReadback = true};
+	capabilities.UploadReadback = RhiUploadReadbackCapabilities{.bSupportsBufferUpload = true, .bSupportsTextureUpload = true, .bSupportsReadback = true};
 
 	capabilities.Presentation = RhiPresentationCapabilities{
 	    .BackBufferCount = swapChain.GetBackBufferCount(),
@@ -81,17 +81,17 @@ RhiCapabilities BuildVulkanCapabilities(VulkanRhi& rhi, VulkanSwapChain& swapCha
 	}
 	capabilities.Diagnostics = BuildRhiBackendDiagnosticsSupport(rhi.IsValidationEnabled(), diagnostics);
 	capabilities.RayTracing = rhi.GetRayTracingCapabilities();
-	capabilities.SupportsShaderFloat64 = rhi.GetFeatureStatus().EnabledShaderFloat64;
-	capabilities.SupportsMeshShaders = false;
-	capabilities.SupportsTaskShaders = false;
-	const bool hasComputeQueue = rhi.GetQueue(ERhiQueueType::Compute) != VK_NULL_HANDLE;
-	const bool hasCopyQueue = rhi.GetQueue(ERhiQueueType::Copy) != VK_NULL_HANDLE;
+	capabilities.bSupportsShaderFloat64 = rhi.GetFeatureStatus().bEnabledShaderFloat64;
+	capabilities.bSupportsMeshShaders = false;
+	capabilities.bSupportsTaskShaders = false;
+	const bool bHasComputeQueue = rhi.GetQueue(ERhiQueueType::Compute) != VK_NULL_HANDLE;
+	const bool bHasCopyQueue = rhi.GetQueue(ERhiQueueType::Copy) != VK_NULL_HANDLE;
 	capabilities.Queues.Set(ERhiQueueType::Graphics, true, true);
-	capabilities.Queues.Set(ERhiQueueType::Compute, hasComputeQueue, hasComputeQueue && rhi.HasIndependentQueue(ERhiQueueType::Compute));
-	capabilities.Queues.Set(ERhiQueueType::Copy, hasCopyQueue, hasCopyQueue && rhi.HasIndependentQueue(ERhiQueueType::Copy));
-	capabilities.SupportsPresent = swapChain.GetBackBufferFormat() != PixelFormat::Unknown;
+	capabilities.Queues.Set(ERhiQueueType::Compute, bHasComputeQueue, bHasComputeQueue && rhi.HasIndependentQueue(ERhiQueueType::Compute));
+	capabilities.Queues.Set(ERhiQueueType::Copy, bHasCopyQueue, bHasCopyQueue && rhi.HasIndependentQueue(ERhiQueueType::Copy));
+	capabilities.bSupportsPresent = swapChain.GetBackBufferFormat() != PixelFormat::Unknown;
 	capabilities.MemoryAllocator = ERhiMemoryAllocatorBackend::VulkanManaged;
 	capabilities.MemorySupport = BuildRhiBackendMemorySupport(diagnostics);
-	capabilities.ExternalFeatureInterop = BuildVulkanExternalFeatureInteropCapabilities(&rhi, hasCommandRecordingContext);
+	capabilities.ExternalFeatureInterop = BuildVulkanExternalFeatureInteropCapabilities(&rhi, bHasCommandRecordingContext);
 	return capabilities;
 }

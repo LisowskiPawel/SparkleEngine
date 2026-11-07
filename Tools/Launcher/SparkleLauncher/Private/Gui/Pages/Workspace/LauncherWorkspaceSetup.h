@@ -47,7 +47,7 @@ namespace SparkleLauncher
 		void CompilerSelected(WorkspaceCompiler compiler);
 
 	private:
-		void AddSyncDependencies(QVBoxLayout& layout, bool optional);
+		void AddSyncDependencies(QVBoxLayout& layout, bool bOptional);
 		QPushButton* CreateSourceDependencyActionButton(const ThirdPartyDependencyUiEntry& dependency);
 		void ApplySourceDependencyRowState(const ThirdPartyDependencyUiEntry& dependency, QLabel& statusLabel, QPushButton& button);
 		void RefreshSourceDependencyRows();
@@ -56,8 +56,8 @@ namespace SparkleLauncher
 		void InstallHostTool(const ToolchainItemStatus& item);
 		QPushButton* CreateHostToolActionButton(const ToolchainItemStatus& item);
 		void AddHostToolStatusRow(QVBoxLayout& layout, const ToolchainItemStatus& item);
-		void AddBuildFilesStatus(QVBoxLayout& layout, const BuildFilesFreshnessStatus& freshness, bool offerRefresh);
-		void AddSetupPrerequisiteStatus(QVBoxLayout& layout, const BuildWorkspaceOperationPlan& plan, bool isSourceSyncWorkflow);
+		void AddBuildFilesStatus(QVBoxLayout& layout, const BuildFilesFreshnessStatus& freshness, bool bOfferRefresh);
+		void AddSetupPrerequisiteStatus(QVBoxLayout& layout, const BuildWorkspaceOperationPlan& plan, bool bIsSourceSyncWorkflow);
 		void AddWorkspaceSetupStatus(
 		    QVBoxLayout& layout,
 		    const QString& operationId,
@@ -67,8 +67,8 @@ namespace SparkleLauncher
 		void AddWorkspaceBuildIssues(QVBoxLayout& layout, const BuildWorkspaceOperationRequest& request, const BuildWorkspaceOperationPlan& plan);
 		void AddBuildReadinessStatus(QVBoxLayout& layout, const BuildWorkspaceOperationPlan& plan);
 		void AddCookEnvironmentStatus(QVBoxLayout& layout, const QString& operationId);
-		QPushButton* CreateStatusActionButton(const QString& actionId, const QString& actionLabel, const QString& actionTitle, bool navigateInsteadOfRun = false);
-		void TriggerActionDependencyRegenerate(const QString& actionId, const QString& actionTitle, bool navigateInsteadOfRun);
+		QPushButton* CreateStatusActionButton(const QString& actionId, const QString& actionLabel, const QString& actionTitle, bool bNavigateInsteadOfRun = false);
+		void TriggerActionDependencyRegenerate(const QString& actionId, const QString& actionTitle, bool bNavigateInsteadOfRun);
 
 		const std::filesystem::path& m_workspaceRoot;
 		LauncherContentModel& m_contentModel;

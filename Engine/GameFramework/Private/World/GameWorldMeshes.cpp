@@ -47,15 +47,15 @@ namespace ECS
 		            .SourceInstanceId = instance.SourceInstanceId,
 		            .SourceObjectId = static_cast<std::uint64_t>(instance.SourceNodeIndex),
 		            .Kind = AuthoredObjectKind::MeshInstance}));
-		bool added = bAddedNodeIndex && (m_registry.Add(entity, EditorMetadata{}));
+		bool bAdded = bAddedNodeIndex && (m_registry.Add(entity, EditorMetadata{}));
 
 		const bool bSkeletalMesh = instance.Kind == SceneMeshKind::Skeletal;
-		const bool bMorphRequired = added && bSkeletalMesh;
+		const bool bMorphRequired = bAdded && bSkeletalMesh;
 		const bool bMorphValid = bMorphRequired && morphState.IsValid();
 		const bool bMorphStored = bMorphValid && m_registry.Add(entity, MorphState{.Weights = morphState});
 		const bool bSkinningStored = bMorphStored && m_registry.Add(entity, SkinningState{.SkeletonAssetId = instance.SkeletonAssetId});
 		const bool bSkinningComplete = !bSkeletalMesh || bSkinningStored;
-		const bool bMeshAdded = added && bSkinningComplete;
+		const bool bMeshAdded = bAdded && bSkinningComplete;
 
 		if (!bMeshAdded)
 		{
@@ -91,12 +91,12 @@ namespace ECS
 		}
 		MeshInstance updated = *mesh;
 		updated.Material = material;
-		const bool written = m_registry.Replace(entity, updated);
-		if (written)
+		const bool bWritten = m_registry.Replace(entity, updated);
+		if (bWritten)
 		{
 			RecordChange(entity);
 		}
-		return written;
+		return bWritten;
 	}
 
 	void GameWorldState::AppendMeshInstanceGroups(std::vector<SceneMeshInstanceGroupData> groups)

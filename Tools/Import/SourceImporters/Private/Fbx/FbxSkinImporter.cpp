@@ -33,7 +33,7 @@ public:
 
 		for (const aiNode* candidate = nodes.front(); candidate != nullptr; candidate = candidate->mParent)
 		{
-			bool containsAllNodes = true;
+			bool bContainsAllNodes = true;
 			for (const aiNode* node : nodes)
 			{
 				const aiNode* ancestor = node;
@@ -43,11 +43,11 @@ public:
 				}
 				if (ancestor == nullptr)
 				{
-					containsAllNodes = false;
+					bContainsAllNodes = false;
 					break;
 				}
 			}
-			if (containsAllNodes)
+			if (bContainsAllNodes)
 			{
 				return candidate;
 			}
@@ -169,9 +169,9 @@ void FbxSkinImporter::CollectSkeletonTopology(const aiScene& scene, const aiNode
 	FbxSkinTranslation::CollectRequiredNodes(*state.SkeletonRoot, state.BoneNodes, requiredNodes);
 	state.JointNodes.reserve(requiredNodes.size());
 	FbxSkinTranslation::AppendRequiredNodesDepthFirst(*state.SkeletonRoot, requiredNodes, state.JointNodes);
-	const bool invalidSkinJointCount = state.JointNodes.empty() || state.JointNodes.size() > static_cast<std::size_t>((std::numeric_limits<std::uint16_t>::max)()) + 1u;
+	const bool bInvalidSkinJointCount = state.JointNodes.empty() || state.JointNodes.size() > static_cast<std::size_t>((std::numeric_limits<std::uint16_t>::max)()) + 1u;
 	
-	if (invalidSkinJointCount)
+	if (bInvalidSkinJointCount)
 	{
 		throw Diagnostics::Error(std::format("FBX mesh '{}' has a skeleton joint count outside the engine range: {}.", FbxSkinTranslation::MeshName(mesh), state.JointNodes.size()));
 	}

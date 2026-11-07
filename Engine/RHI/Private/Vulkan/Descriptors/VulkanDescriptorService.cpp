@@ -197,7 +197,7 @@ RhiResourceViewHandle VulkanDescriptorService::CreateTextureDescriptorView(const
 	        .Usage = desc.Kind == ERhiResourceViewKind::TextureUnorderedAccess ? static_cast<VkImageUsageFlags>(VK_IMAGE_USAGE_STORAGE_BIT)
 	                                                                           : static_cast<VkImageUsageFlags>(VK_IMAGE_USAGE_SAMPLED_BIT),
 	        .DescriptorHandle = descriptorHandle,
-	        .OwnsImageView = true});
+	        .bOwnsImageView = true});
 }
 
 RhiResourceViewHandle VulkanDescriptorService::CreateAttachmentView(const RhiResourceViewDesc& desc)
@@ -217,7 +217,7 @@ RhiResourceViewHandle VulkanDescriptorService::CreateAttachmentView(const RhiRes
 	        .Texture = desc.Texture,
 	        .Usage = desc.Kind == ERhiResourceViewKind::DepthStencil ? static_cast<VkImageUsageFlags>(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
 	                                                                 : static_cast<VkImageUsageFlags>(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT),
-	        .OwnsImageView = true});
+	        .bOwnsImageView = true});
 }
 
 RhiResourceViewHandle VulkanDescriptorService::CreateBufferDescriptorView(const RhiResourceViewDesc& desc)
@@ -414,7 +414,7 @@ void VulkanDescriptorService::RebuildSwapChainBackBufferViews(const VulkanSwapCh
 		        .Format = swapChain.GetBackBufferFormat(),
 		        .Extent = swapChain.GetBackBufferExtent(),
 		        .Usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-		        .OwnsImageView = false}));
+		        .bOwnsImageView = false}));
 	}
 }
 
@@ -443,7 +443,7 @@ void VulkanDescriptorService::ReleaseAllResourceViews() noexcept
 
 void VulkanDescriptorService::DestroyResourceView(ResourceViewRecord& record) noexcept
 {
-	if (record.OwnsImageView && record.ImageView != VK_NULL_HANDLE)
+	if (record.bOwnsImageView && record.ImageView != VK_NULL_HANDLE)
 	{
 		vkDestroyImageView(m_rhi.GetDevice(), record.ImageView, nullptr);
 	}

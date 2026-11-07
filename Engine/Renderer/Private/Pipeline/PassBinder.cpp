@@ -10,9 +10,9 @@ void BindGraphicsPassParameters(
     const PassParameterSet& parameterSet,
     std::span<const char* const> bindingNames,
     const PassBindingOverrides* overrides,
-    bool bindLayout)
+    bool bBindLayout)
 {
-	BindPassParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, bindLayout, BindingDomain::Graphics);
+	BindPassParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, bBindLayout, BindingDomain::Graphics);
 }
 
 void BindComputePassParameters(
@@ -22,9 +22,9 @@ void BindComputePassParameters(
     const PassParameterSet& parameterSet,
     std::span<const char* const> bindingNames,
     const PassBindingOverrides* overrides,
-    bool bindLayout)
+    bool bBindLayout)
 {
-	BindPassParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, bindLayout, BindingDomain::Compute);
+	BindPassParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, bBindLayout, BindingDomain::Compute);
 }
 
 void BindRayTracingPassParameters(
@@ -34,7 +34,7 @@ void BindRayTracingPassParameters(
     const PassParameterSet& parameterSet,
     std::span<const char* const> bindingNames,
     const PassBindingOverrides* overrides,
-    bool bindLayout)
+    bool bBindLayout)
 {
-	BindPassParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, bindLayout, BindingDomain::RayTracing);
+	BindPassParameters(commandContext, resources, layout, parameterSet, bindingNames, overrides, bBindLayout, BindingDomain::RayTracing);
 }

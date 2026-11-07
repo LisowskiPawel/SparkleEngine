@@ -80,7 +80,7 @@ std::shared_ptr<D3D12RecordingResourceTable::ReadView> D3D12RecordingResourceTab
 
 	for (D3D12GpuAllocationRecord* record : records)
 	{
-		if (record == nullptr || record->PendingRelease || record->Resource == nullptr)
+		if (record == nullptr || record->bPendingRelease || record->Resource == nullptr)
 		{
 			continue;
 		}

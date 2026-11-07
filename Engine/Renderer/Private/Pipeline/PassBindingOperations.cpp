@@ -20,7 +20,7 @@ void BindPassParameters(
     const PassParameterSet& parameterSet,
     std::span<const char* const> bindingNames,
     const PassBindingOverrides* overrides,
-    bool bindLayout,
+    bool bBindLayout,
     BindingDomain domain);
 void BindCompiledPassParameter(
     RenderCommandContext& commandContext,
@@ -33,7 +33,7 @@ static void BindConstantBuffer(const BindingRequest& request);
 static void BindReadOnlyAddress(const BindingRequest& request);
 static void BindReadWriteAddress(const BindingRequest& request);
 static void BindAccelerationStructure(const BindingRequest& request);
-static void BindResourceTable(const BindingRequest& request, bool readWrite);
+static void BindResourceTable(const BindingRequest& request, bool bReadWrite);
 static void BindSamplerTable(const BindingRequest& request);
 static void BindPushConstantData(const BindingRequest& request);
 static void BindGpuAddress(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuVirtualAddress gpuAddress, BindingDomain domain);
@@ -41,7 +41,7 @@ static void BindDescriptorTableOverride(RenderCommandContext& commandContext, co
 static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuDescriptorHandle descriptorTable, BindingDomain domain);
 static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiDescriptorTableBinding descriptorTable, BindingDomain domain);
 static void BindPushConstants(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, const void* data, std::uint32_t constantCount, BindingDomain domain);
-static void Require(bool condition, std::string_view message);
+static void Require(bool bCondition, std::string_view message);
 
 struct BindingRequest final
 {
@@ -93,7 +93,7 @@ static void BindNamedParameters(
 {
 	for (const char* bindingName : bindingNames)
 	{
-		bool boundAny = false;
+		bool bBoundAny = false;
 		for (std::size_t bindingIndex = 0; bindingIndex < layout.GetBindingCount(); ++bindingIndex)
 		{
 			const CompiledBinding& compiledBinding = layout.GetBindings()[bindingIndex];
@@ -103,10 +103,10 @@ static void BindNamedParameters(
 			}
 
 			BindCompiledPassParameter(commandContext, resources, compiledBinding, parameterSet.FindBinding(bindingName), overrides, domain);
-			boundAny = true;
+			bBoundAny = true;
 		}
 
-		Require(boundAny, "A requested pass binding name is absent from the compiled binding layout.");
+		Require(bBoundAny, "A requested pass binding name is absent from the compiled binding layout.");
 	}
 }
 
@@ -117,11 +117,11 @@ void BindPassParameters(
     const PassParameterSet& parameterSet,
     std::span<const char* const> bindingNames,
     const PassBindingOverrides* overrides,
-    bool bindLayout,
+    bool bBindLayout,
     BindingDomain domain)
 {
 	ValidateParameterLayout(layout, parameterSet, bindingNames);
-	if (bindLayout)
+	if (bBindLayout)
 	{
 		BindDomainLayout(commandContext, layout, domain);
 	}
@@ -248,7 +248,7 @@ static void BindAccelerationStructure(const BindingRequest& request)
 	request.CommandContext.BindAccelerationStructure(request.Binding.BindingIndex, resource);
 }
 
-static void BindResourceTable(const BindingRequest& request, bool readWrite)
+static void BindResourceTable(const BindingRequest& request, bool bReadWrite)
 {
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::DescriptorTable) : nullptr;
 	if (bindingOverride != nullptr)
@@ -257,7 +257,7 @@ static void BindResourceTable(const BindingRequest& request, bool readWrite)
 		return;
 	}
 
-	Require(request.Parameters != nullptr, readWrite ? "Read-write resource binding is absent from the pass parameter set." : "Read-only resource binding is absent from the pass parameter set.");
+	Require(request.Parameters != nullptr, bReadWrite ? "Read-write resource binding is absent from the pass parameter set." : "Read-only resource binding is absent from the pass parameter set.");
 	if (const PassParameterDescriptorTableBindingData* descriptorTableData = request.Parameters->AsDescriptorTableData())
 	{
 		if (descriptorTableData->Table)
@@ -275,15 +275,15 @@ static void BindResourceTable(const BindingRequest& request, bool readWrite)
 	{
 		Require(!textureData->IsAttachment(), "Graph attachments cannot be bound as shader resource tables.");
 		Require(textureData->Handles.size() == 1, "Texture binding must contain exactly one resource.");
-		const RhiGpuDescriptorHandle view = readWrite ? request.Resources.ResolveUnorderedAccessView(textureData->Handles[0]) : request.Resources.ResolveShaderResourceView(textureData->Handles[0]);
+		const RhiGpuDescriptorHandle view = bReadWrite ? request.Resources.ResolveUnorderedAccessView(textureData->Handles[0]) : request.Resources.ResolveShaderResourceView(textureData->Handles[0]);
 		BindDescriptorTable(request.CommandContext, request.Binding, view, request.Domain);
 		return;
 	}
 
 	const PassParameterBufferBindingData* bufferData = request.Parameters->AsBufferData();
-	Require(bufferData != nullptr, readWrite ? "Read-write resource binding has incompatible parameter data." : "Read-only resource binding has incompatible parameter data.");
+	Require(bufferData != nullptr, bReadWrite ? "Read-write resource binding has incompatible parameter data." : "Read-only resource binding has incompatible parameter data.");
 	Require(bufferData->Handles.size() == 1, "Buffer binding must contain exactly one resource.");
-	const RhiGpuDescriptorHandle view = readWrite ? request.Resources.ResolveUnorderedAccessView(bufferData->Handles[0]) : request.Resources.ResolveShaderResourceView(bufferData->Handles[0]);
+	const RhiGpuDescriptorHandle view = bReadWrite ? request.Resources.ResolveUnorderedAccessView(bufferData->Handles[0]) : request.Resources.ResolveShaderResourceView(bufferData->Handles[0]);
 	BindDescriptorTable(request.CommandContext, request.Binding, view, request.Domain);
 }
 
@@ -319,9 +319,9 @@ static void BindPushConstantData(const BindingRequest& request)
 	BindPushConstants(request.CommandContext, request.Binding, uniformData->Data, uniformData->SizeInBytes / static_cast<std::uint32_t>(sizeof(std::uint32_t)), request.Domain);
 }
 
-static void Require(bool condition, std::string_view message)
+static void Require(bool bCondition, std::string_view message)
 {
-	if (!condition)
+	if (!bCondition)
 	{
 		Diagnostics::Fatal(g_passBinderLogger, __FILE__, __LINE__, std::string(message));
 	}

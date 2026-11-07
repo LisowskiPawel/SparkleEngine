@@ -44,7 +44,7 @@ struct FrameGraphResourceMetadata
 	FrameGraphResourceOwnership ownership = FrameGraphResourceOwnership::Transient;
 	ResourceState initialState = ResourceState::Common;
 	ResourceState finalState = ResourceState::Common;
-	bool hasExternalContents = false;
+	bool bHasExternalContents = false;
 	std::string debugName;
 	FrameGraphTextureDesc textureDesc{};
 	FrameGraphBufferDesc bufferDesc{};

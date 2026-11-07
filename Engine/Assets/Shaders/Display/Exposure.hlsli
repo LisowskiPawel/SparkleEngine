@@ -39,9 +39,9 @@ namespace Exposure
 		return clamp(unclampedExposure, safeMinExposure, safeMaxExposure);
 	}
 
-	float AdaptExposure(uint exposureMode, bool exposureHistoryValid, float previousExposure, float targetExposure, float frameDeltaSeconds, float adaptationSpeedUp, float adaptationSpeedDown)
+	float AdaptExposure(uint exposureMode, bool bExposureHistoryValid, float previousExposure, float targetExposure, float frameDeltaSeconds, float adaptationSpeedUp, float adaptationSpeedDown)
 	{
-		if (exposureMode == ExposureModeManual || !exposureHistoryValid)
+		if (exposureMode == ExposureModeManual || !bExposureHistoryValid)
 		{
 			return targetExposure;
 		}

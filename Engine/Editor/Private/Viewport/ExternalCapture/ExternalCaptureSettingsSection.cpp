@@ -30,11 +30,11 @@ static void DrawStartupCaptureSelection(EngineRenderingSettingsController& setti
 void DrawExternalCaptureSettingsSection(EngineRenderingSettingsController& settings, const char* filterText)
 {
 	const auto& state = settings.GetState();
-	const bool captureAvailable = state.CaptureToolsInstalled || state.StartupCaptureProvider != ExternalCaptureProvider::None;
-	const bool gpuCaptureMatches = captureAvailable && RenderingSettingsUi::MatchesFilter(filterText, "GPU Capture", "pix nsight renderdoc capture attach startup");
-	const bool gpuCaptureOpen = gpuCaptureMatches && RenderingSettingsUi::BeginSettingsCategory("GPU Capture");
+	const bool bCaptureAvailable = state.bCaptureToolsInstalled || state.StartupCaptureProvider != ExternalCaptureProvider::None;
+	const bool bGpuCaptureMatches = bCaptureAvailable && RenderingSettingsUi::MatchesFilter(filterText, "GPU Capture", "pix nsight renderdoc capture attach startup");
+	const bool bGpuCaptureOpen = bGpuCaptureMatches && RenderingSettingsUi::BeginSettingsCategory("GPU Capture");
 
-	if (!gpuCaptureOpen)
+	if (!bGpuCaptureOpen)
 	{
 		return;
 	}

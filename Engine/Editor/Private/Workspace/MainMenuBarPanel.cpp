@@ -77,9 +77,9 @@ void MainMenuBarPanel::BuildOpenLevelMenu() noexcept
 
 	for (const std::string& levelName : levelNames)
 	{
-		const bool isActive = levelName == activeLevelName;
+		const bool bIsActive = levelName == activeLevelName;
 		const std::string levelLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Level, levelName.c_str());
-		if (ImGui::MenuItem(levelLabel.c_str(), nullptr, isActive, !isActive))
+		if (ImGui::MenuItem(levelLabel.c_str(), nullptr, bIsActive, !bIsActive))
 		{
 			m_levelSession->RequestLevelChange(levelName);
 		}
@@ -88,19 +88,19 @@ void MainMenuBarPanel::BuildOpenLevelMenu() noexcept
 
 void MainMenuBarPanel::BuildFileMenu() noexcept
 {
-	const bool hasLevelSession = m_levelSession != nullptr;
-	const bool hasActiveLevel = hasLevelSession && m_levelSession->HasActiveLevel();
-	const bool levelChangeInProgress = hasLevelSession && m_levelSession->IsLevelChangeInProgress();
+	const bool bHasLevelSession = m_levelSession != nullptr;
+	const bool bHasActiveLevel = bHasLevelSession && m_levelSession->HasActiveLevel();
+	const bool bLevelChangeInProgress = bHasLevelSession && m_levelSession->IsLevelChangeInProgress();
 
 	const std::string openLevelLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::FolderOpen, "Open Level");
-	if (ImGui::BeginMenu(openLevelLabel.c_str(), hasLevelSession && !levelChangeInProgress))
+	if (ImGui::BeginMenu(openLevelLabel.c_str(), bHasLevelSession && !bLevelChangeInProgress))
 	{
 		BuildOpenLevelMenu();
 		ImGui::EndMenu();
 	}
 
 	const std::string saveAllLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Save, "Save All");
-	if (ImGui::MenuItem(saveAllLabel.c_str(), nullptr, false, hasActiveLevel && !levelChangeInProgress))
+	if (ImGui::MenuItem(saveAllLabel.c_str(), nullptr, false, bHasActiveLevel && !bLevelChangeInProgress))
 	{
 		m_levelSession->SaveActiveLevel();
 	}
@@ -180,7 +180,7 @@ void MainMenuBarPanel::BuildUI() noexcept
 		const std::string controlsLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Help, "Controls");
 		if (ImGui::MenuItem(controlsLabel.c_str()))
 		{
-			m_helpOpen = true;
+			m_bHelpOpen = true;
 		}
 		ImGui::EndMenu();
 	}
@@ -197,10 +197,10 @@ void MainMenuBarPanel::BuildOverlays() noexcept
 
 void MainMenuBarPanel::BuildHelpWindow() noexcept
 {
-	if (m_helpOpen)
+	if (m_bHelpOpen)
 	{
 		ImGui::SetNextWindowSize(ImVec2(520.0f, 320.0f), ImGuiCond_FirstUseEver);
-		if (ImGui::Begin("Editor Help", &m_helpOpen))
+		if (ImGui::Begin("Editor Help", &m_bHelpOpen))
 		{
 			ImGui::TextWrapped(
 			    "Start Editor or Game through Sparkle Launcher. File > Open Level selects a registered level; missing cooked content fails visibly. File > Save All explicitly saves the active level "
@@ -216,24 +216,24 @@ void MainMenuBarPanel::BuildHelpWindow() noexcept
 
 void MainMenuBarPanel::BuildLevelStatus() noexcept
 {
-	const bool failed = m_levelSession && !m_levelSession->GetLastLoadDiagnostic().empty();
-	const bool focusFailure = failed && !m_levelFailureVisible;
-	m_levelFailureVisible = failed;
-	if (m_levelSession && (m_levelSession->IsLevelChangeInProgress() || failed))
+	const bool bFailed = m_levelSession && !m_levelSession->GetLastLoadDiagnostic().empty();
+	const bool bFocusFailure = bFailed && !m_bLevelFailureVisible;
+	m_bLevelFailureVisible = bFailed;
+	if (m_levelSession && (m_levelSession->IsLevelChangeInProgress() || bFailed))
 	{
 		const ImGuiViewport* viewport = ImGui::GetMainViewport();
 		const ImVec2 center(viewport->WorkPos.x + viewport->WorkSize.x * 0.5f, viewport->WorkPos.y + viewport->WorkSize.y * 0.5f);
 		ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 		ImGui::SetNextWindowSize(ImVec2((std::min) (560.0f * ImGui::GetStyle().FontScaleDpi, viewport->WorkSize.x), 0.0f), ImGuiCond_Always);
 		ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), viewport->WorkSize);
-		if (focusFailure)
+		if (bFocusFailure)
 		{
 			ImGui::SetNextWindowFocus();
 		}
 
-		const bool operationWindowOpen = ImGui::Begin("Level operation", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+		const bool bOperationWindowOpen = ImGui::Begin("Level operation", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 		
-		if (operationWindowOpen)
+		if (bOperationWindowOpen)
 		{
 			ImGui::PushTextWrapPos(0.0f);
 			if (m_levelSession->IsLevelChangeInProgress())

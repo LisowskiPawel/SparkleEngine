@@ -33,5 +33,5 @@ private:
 	std::condition_variable m_notEmpty;
 	std::condition_variable m_notFull;
 	std::deque<RenderThreadCommand> m_commands;
-	bool m_closed = false;
+	bool m_bClosed = false;
 };

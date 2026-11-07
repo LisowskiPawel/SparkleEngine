@@ -59,12 +59,12 @@ namespace MeshDiagnosticsPresentation
 
 	std::string FormatMaterial(const MeshDiagnosticsRow& row)
 	{
-		return row.HasMaterial ? std::format("slot {}", row.FirstMaterialSlot) : std::string("none");
+		return row.bHasMaterial ? std::format("slot {}", row.FirstMaterialSlot) : std::string("none");
 	}
 
 	std::string FormatBoundsExtent(const MeshDiagnosticsBounds& bounds)
 	{
-		if (!bounds.IsValid)
+		if (!bounds.bIsValid)
 		{
 			return "unknown";
 		}
@@ -82,7 +82,7 @@ namespace MeshDiagnosticsPresentation
 		std::size_t residentCount = 0;
 		for (const MeshDiagnosticsRow& row : snapshot.Rows)
 		{
-			if (row.GpuResident)
+			if (row.bGpuResident)
 			{
 				++residentCount;
 			}

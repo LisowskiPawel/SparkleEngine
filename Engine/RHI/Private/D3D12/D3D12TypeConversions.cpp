@@ -10,7 +10,7 @@ namespace D3D12ResourceFormatTranslation
 {
 	DXGI_FORMAT ResolveTextureResourceFormat(const RhiTextureResourceDesc& desc) noexcept
 	{
-		if (!desc.AllowDepthStencil)
+		if (!desc.bAllowDepthStencil)
 		{
 			return D3D12TypeConversions::ToDxgiFormat(desc.Format);
 		}
@@ -230,15 +230,15 @@ D3D12_RESOURCE_DESC D3D12TypeConversions::BuildTextureResourceDesc(const RhiText
 	resourceDesc.SampleDesc.Quality = 0;
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-	if (desc.AllowRenderTarget)
+	if (desc.bAllowRenderTarget)
 	{
 		resourceDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 	}
-	if (desc.AllowDepthStencil)
+	if (desc.bAllowDepthStencil)
 	{
 		resourceDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 	}
-	if (desc.AllowUnorderedAccess)
+	if (desc.bAllowUnorderedAccess)
 	{
 		resourceDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 	}
@@ -258,7 +258,7 @@ D3D12_RESOURCE_DESC D3D12TypeConversions::BuildBufferResourceDesc(const RhiBuffe
 	resourceDesc.SampleDesc.Count = 1;
 	resourceDesc.SampleDesc.Quality = 0;
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	resourceDesc.Flags = desc.AllowUnorderedAccess ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
+	resourceDesc.Flags = desc.bAllowUnorderedAccess ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
 	return resourceDesc;
 }
 

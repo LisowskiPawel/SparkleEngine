@@ -70,12 +70,12 @@ DirectX::XMFLOAT4X4 FbxNodeTransformConverter::BuildNodeAttachedOrientation(cons
 	const DirectX::XMVECTOR localDirection = DirectX::XMVectorSet(direction.x, direction.y, direction.z, 0.0f);
 	const DirectX::XMVECTOR localUp = DirectX::XMVectorSet(up.x, up.y, up.z, 0.0f);
 	const float directionLengthSquared = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(localDirection));
-	const bool directionDegenerate = directionLengthSquared <= 1.0e-8f;
-	const bool upDegenerate = !directionDegenerate && DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(localUp)) <= 1.0e-8f;
-	const bool bFrameDegenerateupDegenerate = !directionDegenerate && !upDegenerate;
-	const bool frameDegenerate = bFrameDegenerateupDegenerate && (DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(DirectX::XMVector3Cross(localUp, localDirection))) <= 1.0e-8f);
+	const bool bDirectionDegenerate = directionLengthSquared <= 1.0e-8f;
+	const bool bUpDegenerate = !bDirectionDegenerate && DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(localUp)) <= 1.0e-8f;
+	const bool bFrameDegenerateupDegenerate = !bDirectionDegenerate && !bUpDegenerate;
+	const bool bFrameDegenerate = bFrameDegenerateupDegenerate && (DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(DirectX::XMVector3Cross(localUp, localDirection))) <= 1.0e-8f);
 
-	if (directionDegenerate || upDegenerate || frameDegenerate)
+	if (bDirectionDegenerate || bUpDegenerate || bFrameDegenerate)
 	{
 		throw Diagnostics::Error("FBX node attachment has no usable orientation basis.");
 	}

@@ -94,9 +94,9 @@ RhiGpuVirtualAddress VulkanRecordingUploadPage::AllocateAndCopy(const void* data
 	const bool bUploadPageExhaustedGuardBuffer2 = bUploadPageExhaustedBuffer && !bUploadPageExhaustedBuffer3;
 	const bool bUploadPageExhaustedBuffer4 = bUploadPageExhaustedGuardBuffer2 && (sizeInBytes > current.Buffer->ResourceSizeInBytes - alignedOffset);
 	const bool bUploadPageExhaustedBuffer5 = bUploadPageExhaustedBuffer3 || bUploadPageExhaustedBuffer4;
-	const bool uploadPageExhausted = bUploadPageExhaustedBuffer && bUploadPageExhaustedBuffer5;
+	const bool bUploadPageExhausted = bUploadPageExhaustedBuffer && bUploadPageExhaustedBuffer5;
 	
-	if (uploadPageExhausted)
+	if (bUploadPageExhausted)
 	{
 		// Allocation addresses stay stable while the recording spans more pages.
 		do

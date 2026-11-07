@@ -21,16 +21,16 @@ namespace SparkleLauncher
 
 		for (std::size_t offset = 0; offset + needle.size() <= text.size(); ++offset)
 		{
-			bool matches = true;
+			bool bMatches = true;
 			for (std::size_t index = 0; index < needle.size(); ++index)
 			{
 				if (std::towupper(text[offset + index]) != std::towupper(needle[index]))
 				{
-					matches = false;
+					bMatches = false;
 					break;
 				}
 			}
-			if (matches)
+			if (bMatches)
 			{
 				return true;
 			}
@@ -56,38 +56,38 @@ namespace SparkleLauncher
 		return HostGraphicsVendor::Other;
 	}
 
-	void MarkVendor(HostGraphicsCapabilities& capabilities, HostGraphicsVendor vendor, bool primaryAdapter)
+	void MarkVendor(HostGraphicsCapabilities& capabilities, HostGraphicsVendor vendor, bool bPrimaryAdapter)
 	{
 		switch (vendor)
 		{
 			case HostGraphicsVendor::Nvidia:
-				capabilities.HasNvidiaAdapter = true;
+				capabilities.bHasNvidiaAdapter = true;
 
-				if (primaryAdapter)
+				if (bPrimaryAdapter)
 				{
 					capabilities.PrimaryVendor = HostGraphicsVendor::Nvidia;
 				}
 				return;
 
 			case HostGraphicsVendor::Amd:
-				capabilities.HasAmdAdapter = true;
+				capabilities.bHasAmdAdapter = true;
 
-				if (primaryAdapter)
+				if (bPrimaryAdapter)
 				{
 					capabilities.PrimaryVendor = HostGraphicsVendor::Amd;
 				}
 				return;
 
 			case HostGraphicsVendor::Intel:
-				capabilities.HasIntelAdapter = true;
+				capabilities.bHasIntelAdapter = true;
 
-				if (primaryAdapter)
+				if (bPrimaryAdapter)
 				{
 					capabilities.PrimaryVendor = HostGraphicsVendor::Intel;
 				}
 				return;
 			case HostGraphicsVendor::Other:
-				if (primaryAdapter)
+				if (bPrimaryAdapter)
 				{
 					capabilities.PrimaryVendor = HostGraphicsVendor::Other;
 				}
@@ -118,46 +118,46 @@ namespace SparkleLauncher
 			}
 
 			const HostGraphicsVendor vendor = DetectVendorFromDeviceId(adapter.DeviceID);
-			const bool primaryAdapter = (adapter.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0;
-			capabilities.AdapterDetected = true;
-			MarkVendor(capabilities, vendor, primaryAdapter);
+			const bool bPrimaryAdapter = (adapter.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0;
+			capabilities.bAdapterDetected = true;
+			MarkVendor(capabilities, vendor, bPrimaryAdapter);
 		}
 
 		if (capabilities.PrimaryVendor == HostGraphicsVendor::Unknown)
 		{
-			if (capabilities.HasNvidiaAdapter)
+			if (capabilities.bHasNvidiaAdapter)
 			{
 				capabilities.PrimaryVendor = HostGraphicsVendor::Nvidia;
 			}
-			else if (capabilities.HasAmdAdapter)
+			else if (capabilities.bHasAmdAdapter)
 			{
 				capabilities.PrimaryVendor = HostGraphicsVendor::Amd;
 			}
-			else if (capabilities.HasIntelAdapter)
+			else if (capabilities.bHasIntelAdapter)
 			{
 				capabilities.PrimaryVendor = HostGraphicsVendor::Intel;
 			}
-			else if (capabilities.AdapterDetected)
+			else if (capabilities.bAdapterDetected)
 			{
 				capabilities.PrimaryVendor = HostGraphicsVendor::Other;
 			}
 		}
 #endif
 
-		if (capabilities.HasNvidiaAdapter)
+		if (capabilities.bHasNvidiaAdapter)
 		{
-			capabilities.Summary = capabilities.HasAmdAdapter ? "Detected NVIDIA and AMD graphics adapters; NVIDIA SDK dependencies stay enabled."
+			capabilities.Summary = capabilities.bHasAmdAdapter ? "Detected NVIDIA and AMD graphics adapters; NVIDIA SDK dependencies stay enabled."
 			                                                  : "Detected NVIDIA graphics adapter; NVIDIA SDK dependencies stay enabled.";
 		}
-		else if (capabilities.HasAmdAdapter)
+		else if (capabilities.bHasAmdAdapter)
 		{
 			capabilities.Summary = "Detected AMD graphics adapter; NVIDIA SDK dependencies stay disabled.";
 		}
-		else if (capabilities.HasIntelAdapter)
+		else if (capabilities.bHasIntelAdapter)
 		{
 			capabilities.Summary = "Detected Intel graphics adapter; NVIDIA SDK dependencies stay disabled.";
 		}
-		else if (capabilities.AdapterDetected)
+		else if (capabilities.bAdapterDetected)
 		{
 			capabilities.Summary = "Detected graphics adapter, but it does not identify as NVIDIA or AMD; NVIDIA SDK dependencies stay disabled.";
 		}

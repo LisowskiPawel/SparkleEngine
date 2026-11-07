@@ -43,7 +43,7 @@ namespace SparkleLauncher
 		std::vector<LevelOperationStep> Steps;
 		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
-		bool CanRun = false;
+		bool bCanRun = false;
 	};
 
 	const std::vector<LevelOperationDefinition>& GetLevelOperationDefinitions();

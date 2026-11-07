@@ -26,13 +26,13 @@ namespace TextureCookPipeline
 		return texture;
 	}
 
-	static TextureMipLevelData EncodeUncompressedMip(const WorkingMipLevel& sourceMip, bool sourceWasFloat, DXGI_FORMAT outputFormat)
+	static TextureMipLevelData EncodeUncompressedMip(const WorkingMipLevel& sourceMip, bool bSourceWasFloat, DXGI_FORMAT outputFormat)
 	{
 		TextureMipLevelData mip;
 		mip.width = sourceMip.width;
 		mip.height = sourceMip.height;
 
-		if (sourceWasFloat && outputFormat == DXGI_FORMAT_R32G32B32A32_FLOAT)
+		if (bSourceWasFloat && outputFormat == DXGI_FORMAT_R32G32B32A32_FLOAT)
 		{
 			mip.rowPitch = static_cast<std::uint32_t>(sourceMip.width * 4u * sizeof(float));
 			mip.slicePitch = mip.rowPitch * sourceMip.height;
@@ -44,14 +44,14 @@ namespace TextureCookPipeline
 		mip.rowPitch = sourceMip.width * 4u;
 		mip.slicePitch = mip.rowPitch * sourceMip.height;
 		mip.data.resize(mip.slicePitch);
-		const bool srgbOutput = ResolveFormatIntent(outputFormat) == TextureFormatIntent::ColorSrgb;
+		const bool bSrgbOutput = ResolveFormatIntent(outputFormat) == TextureFormatIntent::ColorSrgb;
 
 		for (std::uint32_t texelIndex = 0; texelIndex < sourceMip.width * sourceMip.height; ++texelIndex)
 		{
 			const std::size_t pixelOffset = static_cast<std::size_t>(texelIndex) * 4u;
-			mip.data[pixelOffset + 0u] = Pixel::EncodeByteChannel(sourceMip.pixels[pixelOffset + 0u], srgbOutput);
-			mip.data[pixelOffset + 1u] = Pixel::EncodeByteChannel(sourceMip.pixels[pixelOffset + 1u], srgbOutput);
-			mip.data[pixelOffset + 2u] = Pixel::EncodeByteChannel(sourceMip.pixels[pixelOffset + 2u], srgbOutput);
+			mip.data[pixelOffset + 0u] = Pixel::EncodeByteChannel(sourceMip.pixels[pixelOffset + 0u], bSrgbOutput);
+			mip.data[pixelOffset + 1u] = Pixel::EncodeByteChannel(sourceMip.pixels[pixelOffset + 1u], bSrgbOutput);
+			mip.data[pixelOffset + 2u] = Pixel::EncodeByteChannel(sourceMip.pixels[pixelOffset + 2u], bSrgbOutput);
 			mip.data[pixelOffset + 3u] = Pixel::EncodeByteChannel(sourceMip.pixels[pixelOffset + 3u], false);
 		}
 
@@ -60,7 +60,7 @@ namespace TextureCookPipeline
 
 	static TextureLoadResult BuildUncompressedTexture(const TextureCookRequest& request, const WorkingTexture& workingTexture)
 	{
-		const DXGI_FORMAT outputFormat = ResolveUncompressedOutputFormat(request, workingTexture.sourceWasFloat);
+		const DXGI_FORMAT outputFormat = ResolveUncompressedOutputFormat(request, workingTexture.bSourceWasFloat);
 		TextureLoadResult processedTexture = BuildOutputLayout(workingTexture, outputFormat);
 
 		for (std::size_t arraySliceIndex = 0; arraySliceIndex < workingTexture.arraySlices.size(); ++arraySliceIndex)
@@ -71,7 +71,7 @@ namespace TextureCookPipeline
 
 			for (const WorkingMipLevel& workingMip : workingSlice)
 			{
-				outputSlice.push_back(EncodeUncompressedMip(workingMip, workingTexture.sourceWasFloat, outputFormat));
+				outputSlice.push_back(EncodeUncompressedMip(workingMip, workingTexture.bSourceWasFloat, outputFormat));
 			}
 		}
 
@@ -81,10 +81,10 @@ namespace TextureCookPipeline
 	static TextureLoadResult BuildCompressedTexture(const TextureCookRequest& request, const WorkingTexture& workingTexture, CompressionTarget target)
 	{
 		const DXGI_FORMAT outputFormat = ResolveCompressedOutputFormat(request, workingTexture, target);
-		const bool srgbOutput = ResolveFormatIntent(outputFormat) == TextureFormatIntent::ColorSrgb;
+		const bool bSrgbOutput = ResolveFormatIntent(outputFormat) == TextureFormatIntent::ColorSrgb;
 
 		BCCompressor compressor(target);
-		compressor.Initialize(srgbOutput, HasMeaningfulAlpha(workingTexture));
+		compressor.Initialize(bSrgbOutput, HasMeaningfulAlpha(workingTexture));
 
 		TextureLoadResult processedTexture = BuildOutputLayout(workingTexture, outputFormat);
 

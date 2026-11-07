@@ -28,9 +28,9 @@ void UsedMeshesPanel::SetPreviewGeometryProvider(PreviewGeometryProvider provide
 	m_previewGeometryMeshRuntimeId = 0;
 }
 
-void UsedMeshesPanel::BuildUI(bool disableInteraction)
+void UsedMeshesPanel::BuildUI(bool bDisableInteraction)
 {
-	if (!m_isOpen)
+	if (!m_bIsOpen)
 	{
 		return;
 	}
@@ -38,7 +38,7 @@ void UsedMeshesPanel::BuildUI(bool disableInteraction)
 	RefreshSnapshot();
 	ImGui::SetNextWindowSize(ImVec2(1280.0f, 760.0f), ImGuiCond_FirstUseEver);
 	const std::string windowTitle = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::StaticMesh, "Mesh Tools") + "##Mesh Tools";
-	if (!ImGui::Begin(windowTitle.c_str(), &m_isOpen))
+	if (!ImGui::Begin(windowTitle.c_str(), &m_bIsOpen))
 	{
 		ImGui::End();
 		return;
@@ -55,11 +55,11 @@ void UsedMeshesPanel::BuildUI(bool disableInteraction)
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
 		ImGui::BeginChild("##MeshTablePane", ImVec2(0.0f, 0.0f), ImGuiChildFlags_None);
-		DrawMeshTable(disableInteraction);
+		DrawMeshTable(bDisableInteraction);
 		ImGui::EndChild();
 		ImGui::TableSetColumnIndex(1);
 		ImGui::BeginChild("##MeshPreviewPane", ImVec2(0.0f, 0.0f), ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-		DrawSelectedMeshInspector(disableInteraction);
+		DrawSelectedMeshInspector(bDisableInteraction);
 		ImGui::EndChild();
 		ImGui::EndTable();
 	}
@@ -122,7 +122,7 @@ void UsedMeshesPanel::DrawToolbar()
 	    PanelDiagnosticsFormatting::FormatByteSize(MeshDiagnosticsPresentation::SumCpuBytes(m_snapshot)).c_str());
 }
 
-void UsedMeshesPanel::DrawMeshTable(bool disableInteraction)
+void UsedMeshesPanel::DrawMeshTable(bool bDisableInteraction)
 {
 	const ImGuiTableFlags tableFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY;
 	if (!ImGui::BeginTable("##UsedMeshesTable", 9, tableFlags, ImVec2(0.0f, 0.0f)))
@@ -142,7 +142,7 @@ void UsedMeshesPanel::DrawMeshTable(bool disableInteraction)
 	ImGui::TableSetupColumn("Bounds");
 	ImGui::TableHeadersRow();
 
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	for (const MeshDiagnosticsRow& row : m_snapshot.Rows)
 	{
 		if (!MatchesFilter(row))
@@ -152,9 +152,9 @@ void UsedMeshesPanel::DrawMeshTable(bool disableInteraction)
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		const bool selected = row.MeshRuntimeId == m_selectedMeshRuntimeId;
+		const bool bSelected = row.MeshRuntimeId == m_selectedMeshRuntimeId;
 		const std::string displayName = MeshDiagnosticsPresentation::FormatMeshDisplayName(row);
-		if (ImGui::Selectable(displayName.c_str(), selected, ImGuiSelectableFlags_SpanAllColumns))
+		if (ImGui::Selectable(displayName.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
 		{
 			m_selectedMeshRuntimeId = row.MeshRuntimeId;
 			m_previewGeometryMeshRuntimeId = 0;
@@ -164,7 +164,7 @@ void UsedMeshesPanel::DrawMeshTable(bool disableInteraction)
 		const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(row);
 		ImGui::TextUnformatted(sourcePath.c_str());
 		ImGui::TableNextColumn();
-		ImGui::TextUnformatted(row.GpuResident ? "yes" : "no");
+		ImGui::TextUnformatted(row.bGpuResident ? "yes" : "no");
 		ImGui::TableNextColumn();
 		ImGui::Text("%u", static_cast<unsigned int>(row.VertexCount));
 		ImGui::TableNextColumn();
@@ -185,7 +185,7 @@ void UsedMeshesPanel::DrawMeshTable(bool disableInteraction)
 	ImGui::EndTable();
 }
 
-void UsedMeshesPanel::DrawSelectedMeshInspector(bool disableInteraction)
+void UsedMeshesPanel::DrawSelectedMeshInspector(bool bDisableInteraction)
 {
 	const MeshDiagnosticsRow* selectedRow = GetSelectedRow();
 	if (selectedRow == nullptr)
@@ -200,17 +200,17 @@ void UsedMeshesPanel::DrawSelectedMeshInspector(bool disableInteraction)
 	ImGui::TextUnformatted(displayName.c_str());
 	PanelDiagnosticsFormatting::DrawWrappedDisabledText(sourcePath);
 	ImGui::Separator();
-	DrawPreviewControls(disableInteraction);
-	MeshPreview::Draw(m_previewGeometry, selectedRow->GpuResident, m_previewYaw, m_previewPitch, m_previewModeIndex);
+	DrawPreviewControls(bDisableInteraction);
+	MeshPreview::Draw(m_previewGeometry, selectedRow->bGpuResident, m_previewYaw, m_previewPitch, m_previewModeIndex);
 	ImGui::SeparatorText("Runtime Properties");
 	ImGui::BeginChild("##MeshDetailsPane", ImVec2(0.0f, 0.0f), ImGuiChildFlags_None);
 	DrawSelectedMeshDetails(*selectedRow);
 	ImGui::EndChild();
 }
 
-void UsedMeshesPanel::DrawPreviewControls(bool disableInteraction)
+void UsedMeshesPanel::DrawPreviewControls(bool bDisableInteraction)
 {
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	ImGui::SetNextItemWidth(150.0f);
 	ImGui::Combo("Mode", &m_previewModeIndex, MeshPreview::Modes.data(), static_cast<int>(MeshPreview::Modes.size()));
 	ImGui::SameLine();
@@ -243,16 +243,16 @@ void UsedMeshesPanel::DrawSelectedMeshDetails(const MeshDiagnosticsRow& row) con
 	const std::string vertexStride = std::to_string(row.VertexStrideBytes);
 	const std::string indexStride = std::to_string(row.IndexStrideBytes);
 	const std::string material = MeshDiagnosticsPresentation::FormatMaterial(row);
-	const std::string boundsMin = row.Bounds.IsValid ? MeshDiagnosticsPresentation::FormatBoundsPoint(row.Bounds.Min) : std::string("unknown");
-	const std::string boundsMax = row.Bounds.IsValid ? MeshDiagnosticsPresentation::FormatBoundsPoint(row.Bounds.Max) : std::string("unknown");
+	const std::string boundsMin = row.Bounds.bIsValid ? MeshDiagnosticsPresentation::FormatBoundsPoint(row.Bounds.Min) : std::string("unknown");
+	const std::string boundsMax = row.Bounds.bIsValid ? MeshDiagnosticsPresentation::FormatBoundsPoint(row.Bounds.Max) : std::string("unknown");
 	const std::string boundsExtent = MeshDiagnosticsPresentation::FormatBoundsExtent(row.Bounds);
 
 	if (const std::optional<std::string> sourcePath = MeshDiagnosticsPresentation::FindAuthoredSourcePath(row))
 	{
 		EditorWidgets::DrawKeyValueRow("Source", sourcePath->c_str());
 	}
-	EditorWidgets::DrawKeyValueRow("CPU Loaded", row.CpuLoaded ? "yes" : "no");
-	EditorWidgets::DrawKeyValueRow("GPU Resident", row.GpuResident ? "yes" : "no");
+	EditorWidgets::DrawKeyValueRow("CPU Loaded", row.bCpuLoaded ? "yes" : "no");
+	EditorWidgets::DrawKeyValueRow("GPU Resident", row.bGpuResident ? "yes" : "no");
 	EditorWidgets::DrawKeyValueRow("Vertices", vertices.c_str());
 	EditorWidgets::DrawKeyValueRow("Indices", indices.c_str());
 	EditorWidgets::DrawKeyValueRow("Triangles", triangles.c_str());

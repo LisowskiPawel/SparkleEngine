@@ -65,7 +65,7 @@ namespace SparkleLauncher
 			QString ProgressPhase;
 			quint64 ProgressCompleted = 0;
 			quint64 ProgressTotal = 0;
-			bool HasProgress = false;
+			bool bHasProgress = false;
 		};
 
 		RunWidgets CreateRunWidgets(const QString& title);
@@ -75,7 +75,7 @@ namespace SparkleLauncher
 		void ToggleExpanded();
 		void SetRunState(const QString& runId, RunState state, const QString& title);
 		void UpdateRunProgressPresentation(RunRecord& run);
-		void SetExpanded(bool expanded);
+		void SetExpanded(bool bExpanded);
 		void UpdateRunSelectionVisuals();
 
 		QFrame* m_detailsPanel = nullptr;
@@ -93,6 +93,6 @@ namespace SparkleLauncher
 		QIcon m_canceledIcon;
 		QIcon m_failedIcon;
 		QString m_activeRunId;
-		bool m_expanded = false;
+		bool m_bExpanded = false;
 	};
 }

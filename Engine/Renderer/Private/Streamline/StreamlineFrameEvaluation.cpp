@@ -32,9 +32,9 @@ bool StreamlineFrameEvaluation::SetViewConstants(const ImageProviderFrameInput& 
 	        .Camera = frameInput.Camera,
 	        .Temporal = frameInput.Temporal,
 	        .RenderExtent = frameInput.RenderExtent,
-	        .MotionVectorsCurrentMinusPrevious = true,
-	        .ReversedDeviceDepth = true,
-	        .ResetRequested = frameInput.ResetHistory});
+	        .bMotionVectorsCurrentMinusPrevious = true,
+	        .bReversedDeviceDepth = true,
+	        .bResetRequested = frameInput.bResetHistory});
 
 	return slSetConstants(constants, *m_frameToken, m_viewport) == sl::Result::eOk;
 }

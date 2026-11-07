@@ -17,7 +17,7 @@ TaskExecution TaskExecutor::Submit(const CompiledTaskGraph& graph, TaskExecution
 	auto state = m_implementation->Launch(graph, context, nullptr);
 	{
 		std::unique_lock lock(state->Mutex);
-		state->Condition.wait(lock, [&state] { return state->Settled; });
+		state->Condition.wait(lock, [&state] { return state->bSettled; });
 	}
 	return TaskExecution(std::move(state));
 }

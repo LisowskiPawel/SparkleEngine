@@ -30,8 +30,8 @@ namespace SparkleLauncher
 		int m_argumentCount = 0;
 		char** m_arguments = nullptr;
 		int m_index = 1;
-		bool m_gpuCrashModeSelected = false;
-		bool m_shaderExportSelected = false;
+		bool m_bGpuCrashModeSelected = false;
+		bool m_bShaderExportSelected = false;
 		LauncherShellArguments* m_outArguments = nullptr;
 		std::ostream* m_error = nullptr;
 	};
@@ -62,7 +62,7 @@ namespace SparkleLauncher
 		}
 
 		const std::string& operationId = m_outArguments->RunOperationId.empty() ? m_outArguments->DryRunOperationId : m_outArguments->RunOperationId;
-		if (m_outArguments->ShaderSymbols && operationId != "cook.shaders" && operationId != "cook.all" && operationId != "cook.workspace")
+		if (m_outArguments->bShaderSymbols && operationId != "cook.shaders" && operationId != "cook.all" && operationId != "cook.workspace")
 		{
 			*m_error << "SparkleLauncher: --shader-symbols requires cook.shaders, cook.all or cook.workspace.\n";
 			return false;
@@ -80,7 +80,7 @@ namespace SparkleLauncher
 	{
 		if (argument == "--help" || argument == "-h" || argument == "/?")
 		{
-			m_outArguments->ShowHelp = true;
+			m_outArguments->bShowHelp = true;
 			return true;
 		}
 
@@ -177,13 +177,13 @@ namespace SparkleLauncher
 
 		if (argument == "--shader-symbols")
 		{
-			m_outArguments->ShaderSymbols = true;
+			m_outArguments->bShaderSymbols = true;
 			return true;
 		}
 
 		if (argument == "--confirm-force-recook")
 		{
-			m_outArguments->ForceRecookConfirmed = true;
+			m_outArguments->bForceRecookConfirmed = true;
 			return true;
 		}
 
@@ -194,7 +194,7 @@ namespace SparkleLauncher
 
 		if (argument == "--confirm-clean")
 		{
-			m_outArguments->CleanConfirmed = true;
+			m_outArguments->bCleanConfirmed = true;
 			return true;
 		}
 
@@ -205,13 +205,13 @@ namespace SparkleLauncher
 	bool LauncherShellArgumentParser::ParseGpuCrashOption(std::string_view argument)
 	{
 		const auto value = ReadRequiredValue("SparkleLauncher: GPU crash option requires one value.\n");
-		bool& selected = argument == "--shader-export" ? m_shaderExportSelected : m_gpuCrashModeSelected;
-		if (!value || selected)
+		bool& bSelected = argument == "--shader-export" ? m_bShaderExportSelected : m_bGpuCrashModeSelected;
+		if (!value || bSelected)
 		{
 			*m_error << "SparkleLauncher: missing or duplicate GPU crash option.\n";
 			return false;
 		}
-		selected = true;
+		bSelected = true;
 
 		if (argument == "--shader-export")
 		{

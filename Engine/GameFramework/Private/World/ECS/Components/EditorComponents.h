@@ -31,8 +31,8 @@ namespace ECS
 
 	struct EditorMetadata final
 	{
-		bool Selectable = true;
-		bool Locked = false;
-		bool HiddenInHierarchy = false;
+		bool bSelectable = true;
+		bool bLocked = false;
+		bool bHiddenInHierarchy = false;
 	};
 }

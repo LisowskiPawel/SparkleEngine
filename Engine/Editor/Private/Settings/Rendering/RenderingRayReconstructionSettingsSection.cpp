@@ -15,10 +15,10 @@ void DrawRayReconstructionSettingsSection(EngineRenderingSettingsController& set
 	    {"NVIDIA DLSS Ray Reconstruction", EngineRayReconstructionMode::NvidiaDlssRayReconstruction},
 	};
 
-	const bool rayReconstructionMatches = RenderingSettingsUi::MatchesFilter(filterText, "Ray Reconstruction", "dlss ray reconstruction indirect specular diffuse");
-	const bool rayReconstructionOpen = rayReconstructionMatches && RenderingSettingsUi::BeginSettingsCategory("Ray Reconstruction");
+	const bool bRayReconstructionMatches = RenderingSettingsUi::MatchesFilter(filterText, "Ray Reconstruction", "dlss ray reconstruction indirect specular diffuse");
+	const bool bRayReconstructionOpen = bRayReconstructionMatches && RenderingSettingsUi::BeginSettingsCategory("Ray Reconstruction");
 
-	if (!rayReconstructionOpen)
+	if (!bRayReconstructionOpen)
 	{
 		return;
 	}

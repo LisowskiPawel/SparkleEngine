@@ -52,12 +52,12 @@ std::optional<MousePosition> CenterWin32Cursor(void* windowHandle)
 	POINT position;
 	position.x = (rect.right - rect.left) / 2;
 	position.y = (rect.bottom - rect.top) / 2;
-	const bool screenPositionResolved = ClientToScreen(hWnd, &position);
-	const bool cursorCentered = screenPositionResolved && SetCursorPos(position.x, position.y);
-	const bool cursorPositionRead = cursorCentered && GetCursorPos(&position);
-	const bool clientPositionResolved = cursorPositionRead && ScreenToClient(hWnd, &position);
+	const bool bScreenPositionResolved = ClientToScreen(hWnd, &position);
+	const bool bCursorCentered = bScreenPositionResolved && SetCursorPos(position.x, position.y);
+	const bool bCursorPositionRead = bCursorCentered && GetCursorPos(&position);
+	const bool bClientPositionResolved = bCursorPositionRead && ScreenToClient(hWnd, &position);
 
-	if (!clientPositionResolved)
+	if (!bClientPositionResolved)
 	{
 		return std::nullopt;
 	}

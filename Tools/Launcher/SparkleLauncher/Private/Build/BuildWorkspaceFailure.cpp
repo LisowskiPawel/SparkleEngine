@@ -80,9 +80,9 @@ namespace SparkleLauncher
 		{
 			const std::string trimmedLine = Strings::TrimCopy(line);
 			const bool bNativeBuildErrorfind = trimmedLine.find(": error ") != std::string::npos || trimmedLine.find(" error C") != std::string::npos;
-			const bool nativeBuildError = bNativeBuildErrorfind || (trimmedLine.find("fatal error") != std::string::npos);
+			const bool bNativeBuildError = bNativeBuildErrorfind || (trimmedLine.find("fatal error") != std::string::npos);
 			
-			if (nativeBuildError)
+			if (bNativeBuildError)
 			{
 				return trimmedLine;
 			}
@@ -109,9 +109,9 @@ namespace SparkleLauncher
 		{
 			return ExtractBuildFailureDetail(text);
 		}
-		const bool installerBlockedByRunningProcess = step.Id == "install-host-tool" && text.find("Visual Studio Installer could not continue because Visual Studio or an MSBuild process is running.") != std::string::npos;
+		const bool bInstallerBlockedByRunningProcess = step.Id == "install-host-tool" && text.find("Visual Studio Installer could not continue because Visual Studio or an MSBuild process is running.") != std::string::npos;
 		
-		if (installerBlockedByRunningProcess)
+		if (bInstallerBlockedByRunningProcess)
 		{
 			return "Visual Studio or MSBuild is running. Close active IDEs and builds, then retry.";
 		}

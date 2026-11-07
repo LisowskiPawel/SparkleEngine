@@ -12,19 +12,19 @@
 
 static D3D12_SHADER_VISIBILITY ToD3D12Visibility(ShaderStageMask visibilityMask) noexcept
 {
-	const bool hasVertex = HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Vertex);
-	const bool hasPixel = HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Pixel);
+	const bool bHasVertex = HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Vertex);
+	const bool bHasPixel = HasAnyShaderStageMask(visibilityMask, ShaderStageMask::Pixel);
 
-	const bool hasOther = HasAnyShaderStageMask(
+	const bool bHasOther = HasAnyShaderStageMask(
 	    visibilityMask,
 	    ShaderStageMask::Geometry | ShaderStageMask::Hull | ShaderStageMask::Domain | ShaderStageMask::Compute | ShaderStageMask::AllRayTracing);
 
-	if (hasVertex && !hasPixel && !hasOther)
+	if (bHasVertex && !bHasPixel && !bHasOther)
 	{
 		return D3D12_SHADER_VISIBILITY_VERTEX;
 	}
 
-	if (hasPixel && !hasVertex && !hasOther)
+	if (bHasPixel && !bHasVertex && !bHasOther)
 	{
 		return D3D12_SHADER_VISIBILITY_PIXEL;
 	}
@@ -50,7 +50,7 @@ static void CompileUniformBinding(
 		const std::uint32_t shaderRegister = reflectedLocation.BindingPoint.Binding;
 		const std::uint32_t registerSpace = reflectedLocation.BindingPoint.Set;
 
-		if (desc.InlineUniformDataAsPushConstants)
+		if (desc.bInlineUniformDataAsPushConstants)
 		{
 			assert((bindingRecord.ValueSizeInBytes % sizeof(std::uint32_t)) == 0);
 
@@ -240,7 +240,7 @@ std::unique_ptr<D3D12BindingLayout> CompileD3D12BindingLayout(D3D12Rhi& rhi, con
 	const std::vector<PassParameterDesc>& bindingRecords = desc.ParameterLayout->GetParameters();
 
 	D3D12RootSignatureBuilder builder;
-	builder.SetFlags(desc.AllowInputAssemblerInputLayout ? D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT : D3D12_ROOT_SIGNATURE_FLAG_NONE);
+	builder.SetFlags(desc.bAllowInputAssemblerInputLayout ? D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT : D3D12_ROOT_SIGNATURE_FLAG_NONE);
 
 	std::vector<CompiledBinding> bindings;
 	std::vector<std::string> bindingNames;

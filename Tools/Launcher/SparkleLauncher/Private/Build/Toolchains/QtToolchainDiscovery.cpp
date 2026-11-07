@@ -68,10 +68,10 @@ namespace SparkleLauncher
 		if (ToLower(path.filename().string()) == "qt6")
 		{
 			const std::filesystem::path root = path.parent_path().parent_path();
-			const bool qmakePresent = std::filesystem::exists(root / "bin" / "qmake.exe", errorCode);
-			const bool configurationPresent = qmakePresent && std::filesystem::exists(root / "lib" / "cmake" / "Qt6" / "Qt6Config.cmake", errorCode);
+			const bool bQmakePresent = std::filesystem::exists(root / "bin" / "qmake.exe", errorCode);
+			const bool bConfigurationPresent = bQmakePresent && std::filesystem::exists(root / "lib" / "cmake" / "Qt6" / "Qt6Config.cmake", errorCode);
 
-			if (configurationPresent)
+			if (bConfigurationPresent)
 			{
 				return root;
 			}
@@ -129,9 +129,9 @@ namespace SparkleLauncher
 		std::ranges::sort(discovery.MsvcCandidates, byPath);
 		std::ranges::sort(discovery.MingwCandidates, byPath);
 
-		discovery.FoundMsvcKit = !discovery.MsvcCandidates.empty();
-		discovery.QtRootPath = discovery.FoundMsvcKit ? discovery.MsvcCandidates.front() : std::filesystem::path();
-		discovery.QtQmakePath = discovery.FoundMsvcKit ? discovery.QtRootPath / "bin" / "qmake.exe" : std::filesystem::path();
+		discovery.bFoundMsvcKit = !discovery.MsvcCandidates.empty();
+		discovery.QtRootPath = discovery.bFoundMsvcKit ? discovery.MsvcCandidates.front() : std::filesystem::path();
+		discovery.QtQmakePath = discovery.bFoundMsvcKit ? discovery.QtRootPath / "bin" / "qmake.exe" : std::filesystem::path();
 	}
 
 	QtToolchainDiscovery DiscoverQtToolchain()
@@ -188,7 +188,7 @@ namespace SparkleLauncher
 
 	std::string BuildQtToolchainStatusDetail(const QtToolchainDiscovery& discovery)
 	{
-		if (discovery.FoundMsvcKit)
+		if (discovery.bFoundMsvcKit)
 		{
 			return "Using Qt MSVC kit root: " + discovery.QtRootPath.string();
 		}

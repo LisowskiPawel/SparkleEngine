@@ -3,8 +3,8 @@
 
 struct RayTracingTraceResult
 {
-	bool Hit;
-	bool FrontFace;
+	bool bHit;
+	bool bFrontFace;
 	float RayT;
 	uint InstanceId;
 	uint PrimitiveIndex;

@@ -12,11 +12,11 @@ void Process::SignalParentReadiness(std::string_view value) noexcept
 #if defined(_WIN32)
 	std::string expectedValue;
 	std::string eventName;
-	const bool expectedValueRead = Environment::TryGetVariable(ReadinessValueEnvironmentVariable, expectedValue);
-	const bool eventNameRead = expectedValueRead && Environment::TryGetVariable(ReadinessEventEnvironmentVariable, eventName);
-	const bool readinessMatches = eventNameRead && value == expectedValue;
+	const bool bExpectedValueRead = Environment::TryGetVariable(ReadinessValueEnvironmentVariable, expectedValue);
+	const bool bEventNameRead = bExpectedValueRead && Environment::TryGetVariable(ReadinessEventEnvironmentVariable, eventName);
+	const bool bReadinessMatches = bEventNameRead && value == expectedValue;
 
-	if (!readinessMatches)
+	if (!bReadinessMatches)
 	{
 		return;
 	}

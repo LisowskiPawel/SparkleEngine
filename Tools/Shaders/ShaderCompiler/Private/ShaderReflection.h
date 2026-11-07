@@ -34,7 +34,7 @@ struct ShaderReflectionResourceBinding final
 	std::string Name;
 	CookedShaderResourceKind Kind = CookedShaderResourceKind::Unknown;
 	CookedShaderResourceDimension Dimension = CookedShaderResourceDimension::Unknown;
-	bool IsReadOnly = true;
+	bool bIsReadOnly = true;
 	std::uint32_t Set = 0;
 	std::uint32_t Slot = 0;
 	std::uint32_t ArrayCount = 1;

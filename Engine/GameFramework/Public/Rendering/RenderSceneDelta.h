@@ -48,13 +48,13 @@ struct RenderMeshInstanceGroupData final
 
 struct RenderInstanceGroupPublication final
 {
-	bool Published = false;
+	bool bPublished = false;
 	std::vector<RenderMeshInstanceGroupData> Values;
 };
 
 struct RenderSkyPublication final
 {
-	bool Published = false;
+	bool bPublished = false;
 	std::optional<SceneSkyDesc> Value;
 };
 
@@ -62,7 +62,7 @@ struct RenderSceneDelta final
 {
 	std::uint64_t SceneGeneration = 0;
 	std::uint64_t SequenceNumber = 0;
-	bool ResetScene = false;
+	bool bResetScene = false;
 	std::vector<RenderObjectCreate> Creates;
 	std::vector<RenderObjectUpdate> Updates;
 	std::vector<RenderObjectId> Destroys;

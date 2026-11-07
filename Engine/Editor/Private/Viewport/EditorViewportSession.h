@@ -26,7 +26,7 @@ public:
 
 	void SetMoveSpeed(float speedMetersPerSecond) noexcept;
 	void SetRotationSpeed(float degreesPerPixel) noexcept;
-	void SetInvertY(bool invertY) noexcept;
+	void SetInvertY(bool bInvertY) noexcept;
 	void SetProjectionKind(CameraProjectionKind projectionKind) noexcept;
 	void SetOrthographicHeight(float heightMeters) noexcept;
 	void SetExposureOverrides(ViewportExposureOverrides overrides) noexcept;
@@ -39,5 +39,5 @@ private:
 	std::function<void(RenderViewMode)> m_viewModeChangedHandler;
 	RenderViewMode m_viewMode = RenderViewMode::Lit;
 	std::uint64_t m_worldGeneration = 0;
-	bool m_cameraInitialized = false;
+	bool m_bCameraInitialized = false;
 };

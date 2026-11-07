@@ -46,7 +46,7 @@ D3D12TlasServices::D3D12TlasServices(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& mem
 
 RhiRayTracingAccelerationStructurePrebuildInfo D3D12TlasServices::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
 {
-	if (m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure)
+	if (m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure)
 	{
 		return {};
 	}
@@ -75,9 +75,9 @@ RhiRayTracingAccelerationStructurePrebuildInfo D3D12TlasServices::GetTlasPrebuil
 RhiOwnedResourceHandle D3D12TlasServices::CreateTlasInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
 	const bool bTlasInstancesmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
-	const bool invalidTlasInstances = bTlasInstancesmemoryAllocator || (!RhiContract::IsRayTracingInstanceListUsable(instances, instanceCount));
+	const bool bInvalidTlasInstances = bTlasInstancesmemoryAllocator || (!RhiContract::IsRayTracingInstanceListUsable(instances, instanceCount));
 	
-	if (invalidTlasInstances)
+	if (bInvalidTlasInstances)
 	{
 		return {};
 	}
@@ -121,11 +121,11 @@ RhiOwnedResourceHandle D3D12TlasServices::CreateTlasInstanceBuffer(const RhiRayT
 		return {};
 	}
 
-	ownedRecord->IsMapped = true;
+	ownedRecord->bIsMapped = true;
 	ownedRecord->CpuMappedAddress = mappedData;
 	std::memcpy(mappedData, nativeInstances.data(), static_cast<std::size_t>(sizeInBytes));
 	ownedResource->Unmap(0, nullptr);
-	ownedRecord->IsMapped = false;
+	ownedRecord->bIsMapped = false;
 	ownedRecord->CpuMappedAddress = nullptr;
 	return MakeD3D12OwnedResourceHandle(std::move(ownedRecord));
 }

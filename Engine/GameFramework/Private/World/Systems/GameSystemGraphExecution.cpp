@@ -19,14 +19,14 @@ namespace ECS
 		// Counts are read at the host boundary after prerequisite commits, including newly dirtied transforms.
 		for (auto& wave : m_data->Waves)
 		{
-			bool changed = !wave.Tasks.IsValid();
+			bool bChanged = !wave.Tasks.IsValid();
 			for (std::size_t offset = 0; offset < wave.Systems.size(); ++offset)
 			{
 				const auto count = m_data->Systems[wave.Systems[offset]].GetItemCount(systems);
-				changed |= count != wave.ItemCounts[offset];
+				bChanged |= count != wave.ItemCounts[offset];
 				wave.ItemCounts[offset] = count;
 			}
-			if (changed)
+			if (bChanged)
 			{
 				TaskGraphBuilder tasks;
 				for (std::size_t offset = 0; offset < wave.Systems.size(); ++offset)

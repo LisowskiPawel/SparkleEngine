@@ -114,11 +114,11 @@ void VulkanRecordingDescriptorPool::CreatePool(std::span<const VkDescriptorPoolS
 	    {.type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = 512},
 	    {.type = VK_DESCRIPTOR_TYPE_SAMPLER, .descriptorCount = 256}};
 
-	if (m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure)
+	if (m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure)
 	{
 		page.Capacity.push_back({.type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, .descriptorCount = 128});
 	}
-	if (m_rhi->GetFeatureStatus().RayTracing.EnabledPtlas)
+	if (m_rhi->GetFeatureStatus().RayTracing.bEnabledPtlas)
 	{
 		page.Capacity.push_back({.type = VK_DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV, .descriptorCount = 128});
 	}

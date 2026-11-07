@@ -32,7 +32,7 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::InitializeTa
 
 		task.RemainingPrerequisites.store(static_cast<std::uint32_t>(node.Prerequisites.size()), std::memory_order_relaxed);
 		task.UnfinishedCount.store(1u + static_cast<std::uint32_t>(node.NestedChildren.size()), std::memory_order_relaxed);
-		task.ParentBodyComplete.store(!node.Parent.has_value(), std::memory_order_relaxed);
+		task.bParentBodyComplete.store(!node.Parent.has_value(), std::memory_order_relaxed);
 	}
 }
 
@@ -74,7 +74,7 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::Execute(std:
 	const std::stop_token cancellation = m_execution->Cancellation.get_token();
 	const TaskProfiler::TimePoint taskStart = TaskProfiler::Begin(node.Desc, m_generation, index, worker.LaneWorkerIndex);
 
-	const bool bBlockedByParent = task.BlockedByPrerequisite.load(std::memory_order_acquire) || task.BlockedByParent.load(std::memory_order_acquire);
+	const bool bBlockedByParent = task.bBlockedByPrerequisite.load(std::memory_order_acquire) || task.bBlockedByParent.load(std::memory_order_acquire);
 	const bool bLocked = bBlockedByParent || (cancellation.stop_requested());
 	TaskExecutionContext taskContext = m_context;
 	taskContext.Bind(node.Desc.Lane, cancellation);
@@ -100,7 +100,7 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::RecordTaskRe
 	}
 	if (result.WasCancelled())
 	{
-		m_cancellationObserved = true;
+		m_bCancellationObserved = true;
 	}
 }
 
@@ -111,10 +111,10 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::ReleaseNeste
 		ScheduledTaskState& child = m_tasks[childIndex];
 		if (!result.Succeeded())
 		{
-			child.BlockedByParent.store(true, std::memory_order_release);
+			child.bBlockedByParent.store(true, std::memory_order_release);
 		}
 
-		child.ParentBodyComplete.store(true, std::memory_order_release);
+		child.bParentBodyComplete.store(true, std::memory_order_release);
 		TrySchedule(childIndex, &worker);
 	}
 }
@@ -122,15 +122,15 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::ReleaseNeste
 void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::TrySchedule(std::uint32_t index, TaskWorker* preferredWorker)
 {
 	ScheduledTaskState& task = m_tasks[index];
-	const bool prerequisitesPending = task.RemainingPrerequisites.load(std::memory_order_acquire) != 0 || !task.ParentBodyComplete.load(std::memory_order_acquire);
+	const bool bPrerequisitesPending = task.RemainingPrerequisites.load(std::memory_order_acquire) != 0 || !task.bParentBodyComplete.load(std::memory_order_acquire);
 	
-	if (prerequisitesPending)
+	if (bPrerequisitesPending)
 	{
 		return;
 	}
 
-	bool expected = false;
-	if (task.Scheduled.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
+	bool bExpected = false;
+	if (task.bScheduled.compare_exchange_strong(bExpected, true, std::memory_order_acq_rel))
 	{
 		const TaskLane lane = m_graph->Nodes[index].Desc.Lane;
 		m_owner.Enqueue(ReadyTask{.Execution = shared_from_this(), .TaskIndex = index}, preferredWorker != nullptr && preferredWorker->Lane == lane ? preferredWorker : nullptr, lane);
@@ -161,7 +161,7 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::SettleLogica
 		ScheduledTaskState& dependent = m_tasks[dependentIndex];
 		if (!completedResult.Succeeded())
 		{
-			dependent.BlockedByPrerequisite.store(true, std::memory_order_release);
+			dependent.bBlockedByPrerequisite.store(true, std::memory_order_release);
 		}
 		const std::uint32_t previousPrerequisiteCount = dependent.RemainingPrerequisites.fetch_sub(1, std::memory_order_acq_rel);
 		assert(previousPrerequisiteCount != 0 && "Task prerequisite was released more than once.");
@@ -212,7 +212,7 @@ TaskExecutionCompletion TaskExecutor::Implementation::Runtime::ScheduledTaskExec
 			completion.Status = TaskExecutionStatus::Failed;
 			completion.Result = m_firstFailure;
 		}
-		else if (m_cancellationObserved)
+		else if (m_bCancellationObserved)
 		{
 			completion.Status = TaskExecutionStatus::Cancelled;
 			completion.Result = TaskResult::Cancelled("Task execution contained cancellation.");

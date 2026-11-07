@@ -220,7 +220,7 @@ namespace Process
 		std::wstring commandLine = BuildCommandLine(request);
 		std::wstring workingDirectory = request.WorkingDirectory.wstring();
 		std::vector<wchar_t> environment = BuildEnvironment(environmentOverrides);
-		const bool childProcessCreationFailed = !CreateProcessW(
+		const bool bChildProcessCreationFailed = !CreateProcessW(
 				        nullptr,
 				        commandLine.data(),
 				        nullptr,
@@ -232,7 +232,7 @@ namespace Process
 				        &startup,
 				        &information);
 		
-		if (childProcessCreationFailed)
+		if (bChildProcessCreationFailed)
 		{
 			const DWORD startError = GetLastError();
 			result.StartFailure = ClassifyStartFailure(startError);
@@ -240,17 +240,17 @@ namespace Process
 			return false;
 		}
 
-		result.Launched = true;
+		result.bLaunched = true;
 		result.ProcessId = information.dwProcessId;
 		outProcess.Process.Reset(information.hProcess);
 		WindowsProcessHandle processThread(information.hThread);
 		outProcess.Job.Reset(CreateJobObjectW(nullptr, nullptr));
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobLimits{};
 		jobLimits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-		const bool jobConfigured = outProcess.Job && SetInformationJobObject(outProcess.Job.Get(), JobObjectExtendedLimitInformation, &jobLimits, static_cast<DWORD>(sizeof(jobLimits)));
-		const bool processAssigned = jobConfigured && AssignProcessToJobObject(outProcess.Job.Get(), outProcess.Process.Get());
+		const bool bJobConfigured = outProcess.Job && SetInformationJobObject(outProcess.Job.Get(), JobObjectExtendedLimitInformation, &jobLimits, static_cast<DWORD>(sizeof(jobLimits)));
+		const bool bProcessAssigned = bJobConfigured && AssignProcessToJobObject(outProcess.Job.Get(), outProcess.Process.Get());
 
-		if (!processAssigned)
+		if (!bProcessAssigned)
 		{
 			const DWORD ownershipError = GetLastError();
 			TerminateProcess(outProcess.Process.Get(), 1);

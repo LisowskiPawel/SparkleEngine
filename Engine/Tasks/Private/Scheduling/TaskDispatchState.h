@@ -47,6 +47,6 @@ struct TaskDispatch::State final : std::enable_shared_from_this<TaskDispatch::St
 	State* ReadyNext = nullptr;
 	std::size_t Slot = 0;
 	Phase CurrentPhase = Phase::Idle;
-	bool Closed = false;
-	bool Rerun = false;
+	bool bClosed = false;
+	bool bRerun = false;
 };

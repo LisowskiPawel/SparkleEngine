@@ -22,13 +22,13 @@ namespace SparkleLauncher
 		result.GpuCrash = operation.GpuCrash;
 		result.ShaderExportPath = QString::fromStdWString(operation.ShaderExportPath.wstring());
 		result.Status = QString::fromStdString(ToString(operation.Status));
-		result.Succeeded = operation.Status == OperationStatus::Succeeded;
-		result.Skipped = operation.Status == OperationStatus::Skipped;
-		result.Canceled = operation.Status == OperationStatus::Canceled;
+		result.bSucceeded = operation.Status == OperationStatus::Succeeded;
+		result.bSkipped = operation.Status == OperationStatus::Skipped;
+		result.bCanceled = operation.Status == OperationStatus::Canceled;
 		if (operation.ExitCode.has_value())
 		{
 			result.ExitCode = *operation.ExitCode;
-			result.HasExitCode = true;
+			result.bHasExitCode = true;
 		}
 		if (!operation.LogPath.empty())
 		{

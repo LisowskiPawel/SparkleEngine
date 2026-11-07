@@ -35,18 +35,18 @@ namespace SparkleLauncher
 			arguments.push_back("--backend");
 			arguments.push_back(plan.Request.ShaderBackend);
 		}
-		if (plan.Request.ShaderEnableDebugInfo)
+		if (plan.Request.bShaderEnableDebugInfo)
 		{
 			arguments.push_back("--debug-info");
 		}
-		if (!plan.Request.ShaderEnableOptimizations)
+		if (!plan.Request.bShaderEnableOptimizations)
 		{
 			arguments.push_back("--disable-optimizations");
 		}
 		arguments.push_back("--warnings-as-errors");
-		arguments.push_back(plan.Request.ShaderWarningsAsErrors ? "on" : "off");
+		arguments.push_back(plan.Request.bShaderWarningsAsErrors ? "on" : "off");
 		arguments.push_back("--strip-debug");
-		arguments.push_back(plan.Request.ShaderStripDebugInfo ? "on" : "off");
+		arguments.push_back(plan.Request.bShaderStripDebugInfo ? "on" : "off");
 	}
 
 	static Process::ChildProcessRequest MakeAssetCookerRequest(const CookOperationPlan& plan, std::string_view command, std::string_view logFileName)
@@ -88,8 +88,8 @@ namespace SparkleLauncher
 		step.Id = "clean-cooked-output";
 		step.DisplayName = "Clean cooked output scope";
 		step.DestructivePath = plan.CookedOutputDirectory;
-		step.HasProcessRequest = false;
-		step.DeletesCookedOutputs = true;
+		step.bHasProcessRequest = false;
+		step.bDeletesCookedOutputs = true;
 		steps.push_back(std::move(step));
 	}
 

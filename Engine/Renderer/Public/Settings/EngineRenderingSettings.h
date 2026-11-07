@@ -13,11 +13,11 @@
 
 struct EngineRenderingSettingsState final
 {
-	bool VSync = true;
-	bool Vignette = true;
-	bool ChromaticAberration = true;
+	bool bVSync = true;
+	bool bVignette = true;
+	bool bChromaticAberration = true;
 	PixelFormat BackBufferFormat = RhiPresentationDefaults::DefaultBackBufferFormat;
-	bool PreferHighPerformanceAdapter = true;
+	bool bPreferHighPerformanceAdapter = true;
 	EngineToneMapper ToneMapper = EngineToneMapper::AcesApprox;
 	EngineExposureMode ExposureMode = EngineExposureMode::Automatic;
 	EngineExposureMeteringMethod ExposureMeteringMethod = EngineExposureMeteringMethod::Histogram;
@@ -33,15 +33,15 @@ struct EngineRenderingSettingsState final
 	EUpscalerQualityMode UpscalerQualityMode = EUpscalerQualityMode::NativeAA;
 	EngineRayReconstructionMode RayReconstructionMode = EngineRayReconstructionMode::Off;
 	GBufferAlgorithm SelectedGBufferAlgorithm = GBufferAlgorithm::Rasterized;
-	bool MeshAutoBatching = true;
-	bool RefitTlas = true;
-	bool PtlasActive = false;
+	bool bMeshAutoBatching = true;
+	bool bRefitTlas = true;
+	bool bPtlasActive = false;
 	std::uint32_t PtlasPartitionsPerAxis = 8;
 	RayTracingPtlasPartitionUpdateMode PtlasPartitionUpdateMode = RayTracingPtlasPartitionUpdateMode::AlwaysUpdatePartition;
-	bool PtlasMarkAllDynamicInPartition = false;
+	bool bPtlasMarkAllDynamicInPartition = false;
 	float PtlasModeChangeDistance = 100.0f;
 #if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING
 	ExternalCaptureProvider StartupCaptureProvider = ExternalCaptureProvider::None;
-	bool CaptureToolsInstalled = false;
+	bool bCaptureToolsInstalled = false;
 #endif
 };

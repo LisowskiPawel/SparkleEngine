@@ -24,10 +24,10 @@ void D3D12Rhi::CheckRayTracingSupport() noexcept
 	m_rayTracingCapabilities = {};
 
 	m_rayTracingCapabilities.Groups.Ptlas = RhiPtlasCapabilities{
-	    .Supported = false,
+	    .bSupported = false,
 	    .Provider = ERhiPtlasProvider::D3D12NvapiPtlas,
-	    .NvidiaDeviceOnly = true,
-	    .CurrentDeviceIsNvidia = IsNvidiaAdapter(),
+	    .bNvidiaDeviceOnly = true,
+	    .bCurrentDeviceIsNvidia = IsNvidiaAdapter(),
 	    .CapabilityStatusReason = "d3d12-options5-not-queried"};
 
 	m_rayTracingCapabilities.Groups.Provider = RhiRayTracingProviderCapabilities{.SelectedTlasProvider = ERhiRayTracingTlasProvider::None, .SelectedTlasProviderReason = "ray-tracing-not-queried"};
@@ -42,10 +42,10 @@ void D3D12Rhi::CheckRayTracingSupport() noexcept
 	const HRESULT hr = m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &options5, sizeof(options5));
 	if (SUCCEEDED(hr))
 	{
-		m_rayTracingCapabilities.SupportsAccelerationStructure = options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_0;
-		m_rayTracingCapabilities.SupportsInlineRayQuery = options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_1;
-		m_rayTracingCapabilities.SupportsRayTracingPipeline = options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_0;
-		if (m_rayTracingCapabilities.SupportsAccelerationStructure)
+		m_rayTracingCapabilities.bSupportsAccelerationStructure = options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_0;
+		m_rayTracingCapabilities.bSupportsInlineRayQuery = options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_1;
+		m_rayTracingCapabilities.bSupportsRayTracingPipeline = options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_0;
+		if (m_rayTracingCapabilities.bSupportsAccelerationStructure)
 		{
 			m_rayTracingCapabilities.MaxTraceRecursionDepth = D3D12_RAYTRACING_MAX_DECLARABLE_TRACE_RECURSION_DEPTH;
 			m_rayTracingCapabilities.MaxRayPayloadSizeInBytes = std::min(kD3D12RayTracingMaxDeclarableShaderPayloadSizeInBytes, kRhiRayTracingMaxPayloadSizeInBytes);
@@ -62,13 +62,13 @@ void D3D12Rhi::CheckRayTracingSupport() noexcept
 		PopulateStandardRayTracingCapabilityGroups(m_rayTracingCapabilities);
 
 		m_rayTracingCapabilities.Groups.Ptlas = RhiPtlasCapabilities{
-		    .Supported = false,
+		    .bSupported = false,
 		    .Provider = ERhiPtlasProvider::D3D12NvapiPtlas,
-		    .NvidiaDeviceOnly = true,
-		    .CurrentDeviceIsNvidia = IsNvidiaAdapter(),
+		    .bNvidiaDeviceOnly = true,
+		    .bCurrentDeviceIsNvidia = IsNvidiaAdapter(),
 		    .CapabilityStatusReason = "d3d12-nvapi-ptlas-provider-not-queried"};
 
-		m_rayTracingCapabilities.Groups.Ptlas = m_nvapiRayTracingProvider.QueryPtlasCapabilities(m_device.Get(), IsNvidiaAdapter(), m_rayTracingCapabilities.SupportsAccelerationStructure);
+		m_rayTracingCapabilities.Groups.Ptlas = m_nvapiRayTracingProvider.QueryPtlasCapabilities(m_device.Get(), IsNvidiaAdapter(), m_rayTracingCapabilities.bSupportsAccelerationStructure);
 
 		SelectRayTracingTlasProvider();
 	}
@@ -84,19 +84,19 @@ void D3D12Rhi::CheckRayTracingSupport() noexcept
 void D3D12Rhi::SelectRayTracingTlasProvider() noexcept
 {
 	RhiRayTracingProviderCapabilities& provider = m_rayTracingCapabilities.Groups.Provider;
-	if (!m_rayTracingCapabilities.SupportsAccelerationStructure)
+	if (!m_rayTracingCapabilities.bSupportsAccelerationStructure)
 	{
 		provider = RhiRayTracingProviderCapabilities{.SelectedTlasProvider = ERhiRayTracingTlasProvider::None, .SelectedTlasProviderReason = "ray-tracing-unavailable"};
 		return;
 	}
 
 	const RhiPtlasCapabilities& ptlas = m_rayTracingCapabilities.Groups.Ptlas;
-	const bool bPtlasSelectedSupported = CVarRayTracingPreferPtlas.Get() && ptlas.Supported;
-	const bool ptlasSelected = bPtlasSelectedSupported && (ptlas.SupportsDescriptorAccess);
+	const bool bPtlasSelectedSupported = CVarRayTracingPreferPtlas.Get() && ptlas.bSupported;
+	const bool bPtlasSelected = bPtlasSelectedSupported && (ptlas.bSupportsDescriptorAccess);
 
 	provider = RhiRayTracingProviderCapabilities{
-	    .SelectedTlasProvider = ptlasSelected ? ERhiRayTracingTlasProvider::Ptlas : ERhiRayTracingTlasProvider::Tlas,
-	    .SelectedTlasProviderReason = ptlasSelected ? "d3d12-nvapi-ptlas-selected" : "TLAS-selected"};
+	    .SelectedTlasProvider = bPtlasSelected ? ERhiRayTracingTlasProvider::Ptlas : ERhiRayTracingTlasProvider::Tlas,
+	    .SelectedTlasProviderReason = bPtlasSelected ? "d3d12-nvapi-ptlas-selected" : "TLAS-selected"};
 }
 
 RhiRayTracingCapabilities D3D12Rhi::GetRayTracingCapabilities() const noexcept

@@ -75,11 +75,11 @@ struct ShaderCompileRequest final
 	ShaderCompileFeatureFlags RequiredFeatures = ShaderCompileFeatureFlags::None;
 	std::optional<ShaderParameterStructDescriptor> ParameterStruct;
 
-	bool EnableDebugInfo = false;
-	bool EnableOptimizations = true;
-	bool TreatWarningsAsErrors = true;
-	bool StripDebugInfo = true;
-	bool CaptureDebugArtifacts = false;
+	bool bEnableDebugInfo = false;
+	bool bEnableOptimizations = true;
+	bool bTreatWarningsAsErrors = true;
+	bool bStripDebugInfo = true;
+	bool bCaptureDebugArtifacts = false;
 
 	std::vector<std::string> Defines;
 	std::vector<ShaderDescriptorBindingRemap> DescriptorBindingRemaps;

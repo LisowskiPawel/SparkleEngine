@@ -23,7 +23,7 @@ namespace ECS
 		{
 			std::vector<float> Weights;
 			std::uint32_t Generation = 1;
-			bool Occupied = false;
+			bool bOccupied = false;
 		};
 
 		std::vector<Entry> m_entries;

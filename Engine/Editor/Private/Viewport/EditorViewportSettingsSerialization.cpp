@@ -93,7 +93,7 @@ namespace EditorViewportSettingsSerialization
 
 void EditorViewportSettingsSerialization::Read(std::istream& input, EditorViewportSettingsState& state)
 {
-	bool inSettingsSection = false;
+	bool bInSettingsSection = false;
 	for (std::string line; std::getline(input, line);)
 	{
 		const std::string trimmed = Strings::TrimCopy(line);
@@ -103,10 +103,10 @@ void EditorViewportSettingsSerialization::Read(std::istream& input, EditorViewpo
 		}
 		if (trimmed.starts_with('[') && trimmed.ends_with(']'))
 		{
-			inSettingsSection = trimmed == "[EditorViewport]";
+			bInSettingsSection = trimmed == "[EditorViewport]";
 			continue;
 		}
-		if (!inSettingsSection)
+		if (!bInSettingsSection)
 		{
 			continue;
 		}

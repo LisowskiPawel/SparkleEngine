@@ -99,6 +99,6 @@ private:
 	std::vector<RayTracingShaderTableRecordPlan> m_records;
 	std::uint64_t m_generation = 0u;
 	RayTracingShaderTableMetrics m_metrics = {};
-	bool m_hasMaterialized = false;
-	bool m_recordingUpdate = false;
+	bool m_bHasMaterialized = false;
+	bool m_bRecordingUpdate = false;
 };

@@ -16,7 +16,7 @@ struct UiRenderPacketPlayer::PlaybackStorage final
 	{
 		UiTextureHandle Handle;
 		std::unique_ptr<ImTextureData> Data;
-		bool PendingRelease = false;
+		bool bPendingRelease = false;
 	};
 
 	std::vector<std::unique_ptr<ImDrawList>> DrawLists;
@@ -34,9 +34,9 @@ UiRenderPacketPlayer::~UiRenderPacketPlayer() noexcept = default;
 
 void UiRenderPacketPlayer::SynchronizeTextures(const UiRenderPacket& packet, RhiImGuiRenderer& renderer)
 {
-	const bool hasPendingRelease = std::any_of(m_storage->Textures.begin(), m_storage->Textures.end(), [](const PlaybackStorage::Texture& texture) { return texture.PendingRelease; });
+	const bool bHasPendingRelease = std::any_of(m_storage->Textures.begin(), m_storage->Textures.end(), [](const PlaybackStorage::Texture& texture) { return texture.bPendingRelease; });
 
-	if (packet.TextureUploads.empty() && packet.TextureReleases.empty() && !hasPendingRelease)
+	if (packet.TextureUploads.empty() && packet.TextureReleases.empty() && !bHasPendingRelease)
 	{
 		return;
 	}
@@ -98,16 +98,16 @@ void UiRenderPacketPlayer::ApplyTextureChanges(const UiRenderPacket& packet)
 
 	for (PlaybackStorage::Texture& texture : m_storage->Textures)
 	{
-		if (!texture.PendingRelease)
+		if (!texture.bPendingRelease)
 		{
 			continue;
 		}
 
 		++texture.Data->UnusedFrames;
 
-		const bool textureUpdateMissing = std::find(m_storage->TextureUpdates.begin(), m_storage->TextureUpdates.end(), texture.Data.get()) == m_storage->TextureUpdates.end();
+		const bool bTextureUpdateMissing = std::find(m_storage->TextureUpdates.begin(), m_storage->TextureUpdates.end(), texture.Data.get()) == m_storage->TextureUpdates.end();
 		
-		if (textureUpdateMissing)
+		if (bTextureUpdateMissing)
 		{
 			m_storage->TextureUpdates.push_back(texture.Data.get());
 		}
@@ -119,16 +119,16 @@ void UiRenderPacketPlayer::ApplyTextureUpload(const UiRenderPacket& packet, cons
 	const std::size_t expectedPixelCount = static_cast<std::size_t>(upload.Width) * static_cast<std::size_t>(upload.Height) * 4;
 	const bool bInvalidTextureUploadPixelCount = !upload.Texture.IsImGuiTexture() || expectedPixelCount != upload.PixelCount;
 	const bool bInvalidTextureUploadTexturePixels = bInvalidTextureUploadPixelCount || (upload.PixelOffset > packet.TexturePixels.size());
-	const bool invalidUiTextureUpload = bInvalidTextureUploadTexturePixels || (upload.PixelCount > packet.TexturePixels.size() - upload.PixelOffset);
+	const bool bInvalidUiTextureUpload = bInvalidTextureUploadTexturePixels || (upload.PixelCount > packet.TexturePixels.size() - upload.PixelOffset);
 	
-	if (invalidUiTextureUpload)
+	if (bInvalidUiTextureUpload)
 	{
 		return;
 	}
 
 	ImTextureData* texture = FindTexture(upload.Texture);
-	const bool isNewTexture = texture == nullptr;
-	if (isNewTexture)
+	const bool bIsNewTexture = texture == nullptr;
+	if (bIsNewTexture)
 	{
 		auto data = std::make_unique<ImTextureData>();
 		data->UniqueID = static_cast<int>(upload.Texture.Generation);
@@ -143,7 +143,7 @@ void UiRenderPacketPlayer::ApplyTextureUpload(const UiRenderPacket& packet, cons
 
 	const std::byte* source = packet.TexturePixels.data() + upload.PixelOffset;
 	std::memcpy(texture->Pixels, source, upload.PixelCount);
-	if (!isNewTexture)
+	if (!bIsNewTexture)
 	{
 		texture->UpdateRect = ImTextureRect{.x = 0, .y = 0, .w = static_cast<unsigned short>(upload.Width), .h = static_cast<unsigned short>(upload.Height)};
 		texture->SetStatus(ImTextureStatus_WantUpdates);
@@ -167,7 +167,7 @@ void UiRenderPacketPlayer::QueueTextureRelease(UiTextureHandle handle) noexcept
 			continue;
 		}
 
-		storedTexture.PendingRelease = true;
+		storedTexture.bPendingRelease = true;
 		texture->WantDestroyNextFrame = true;
 		texture->SetStatus(ImTextureStatus_WantDestroy);
 		return;
@@ -189,7 +189,7 @@ ImTextureData* UiRenderPacketPlayer::FindTexture(UiTextureHandle handle) const n
 
 void UiRenderPacketPlayer::RetireReleasedTextures() noexcept
 {
-	std::erase_if(m_storage->Textures, [](const PlaybackStorage::Texture& texture) { return texture.PendingRelease && texture.Data->BackendUserData == nullptr; });
+	std::erase_if(m_storage->Textures, [](const PlaybackStorage::Texture& texture) { return texture.bPendingRelease && texture.Data->BackendUserData == nullptr; });
 
 	m_storage->TextureUpdates.resize(0);
 }

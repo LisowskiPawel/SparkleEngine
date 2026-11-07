@@ -85,7 +85,7 @@ private:
 		RhiTextureViewRange Texture = {};
 		VkImageUsageFlags Usage = 0;
 		RhiGpuDescriptorHandle DescriptorHandle = {};
-		bool OwnsImageView = false;
+		bool bOwnsImageView = false;
 		std::uint16_t Generation = 0;
 
 		bool IsAllocated() const noexcept;

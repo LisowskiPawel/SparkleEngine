@@ -36,7 +36,7 @@ struct ImportedLight
 	DirectX::XMFLOAT3 tangent = {1.0f, 0.0f, 0.0f};
 	float width = 1.0f;
 	float height = 1.0f;
-	bool visible = true;
+	bool bVisible = true;
 	std::uint32_t sourceNodeIndex = (std::numeric_limits<std::uint32_t>::max)();
 
 	bool IsDirectional() const noexcept { return kind == ImportedLightKind::Directional; }

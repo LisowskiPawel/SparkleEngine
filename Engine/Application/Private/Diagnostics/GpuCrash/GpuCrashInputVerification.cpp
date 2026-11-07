@@ -73,9 +73,9 @@ namespace GpuCrashInputVerification
 		const std::filesystem::path relative = Strings::ToWide(value);
 		const bool bInvalidRelativePathisabsolute = relative.empty() || relative.is_absolute();
 		const bool bInvalidRelativePathrootpath = bInvalidRelativePathisabsolute || (relative.has_root_path());
-		const bool invalidReceiptRelativePath = bInvalidRelativePathrootpath || (relative.generic_string().find(':') != std::string::npos);
+		const bool bInvalidReceiptRelativePath = bInvalidRelativePathrootpath || (relative.generic_string().find(':') != std::string::npos);
 		
-		if (invalidReceiptRelativePath)
+		if (bInvalidReceiptRelativePath)
 		{
 			throw Diagnostics::Error("GPU crash receipt requires relative file membership.");
 		}
@@ -103,11 +103,11 @@ namespace GpuCrashInputVerification
 			const auto path = ResolveReceiptFile(root, ReadRequiredString(file, "path"));
 			std::uint64_t bytes = 0;
 			const bool bYteCountRead = Json::TryReadUInt64Property(file, "bytes", bytes);
-			const bool pathUnique = bYteCountRead && verified.insert(Paths::MakePathKey(path)).second;
-			const bool fileHashMatches = pathUnique && HashFile(path) == ReadRequiredString(file, "sha256");
-			const bool fileSizeMatches = fileHashMatches && std::filesystem::file_size(path) == bytes;
+			const bool bPathUnique = bYteCountRead && verified.insert(Paths::MakePathKey(path)).second;
+			const bool bFileHashMatches = bPathUnique && HashFile(path) == ReadRequiredString(file, "sha256");
+			const bool bFileSizeMatches = bFileHashMatches && std::filesystem::file_size(path) == bytes;
 
-			if (!fileSizeMatches)
+			if (!bFileSizeMatches)
 			{
 				throw Diagnostics::Error("GPU crash input is stale, duplicated or incomplete.");
 			}

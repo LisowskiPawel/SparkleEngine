@@ -23,9 +23,9 @@ RhiTimestampQueryHandle RhiTimestampQueryAllocator::Allocate(std::uint32_t poolI
 {
 	std::lock_guard lock(m_mutex);
 	const bool bQueryPoolExhaustedQueryIndices = poolIndex >= m_freeQueryIndices.size() || m_freeQueryIndices[poolIndex].empty();
-	const bool queryPoolExhausted = bQueryPoolExhaustedQueryIndices || (m_queryLocations.size() >= std::numeric_limits<std::uint32_t>::max() - 1);
+	const bool bQueryPoolExhausted = bQueryPoolExhaustedQueryIndices || (m_queryLocations.size() >= std::numeric_limits<std::uint32_t>::max() - 1);
 	
-	if (queryPoolExhausted)
+	if (bQueryPoolExhausted)
 	{
 		Diagnostics::Fatal(g_rhiTimestampQueryAllocatorLogger, __FILE__, __LINE__, "Timestamp query capacity was exhausted or addressed with an invalid pool index.");
 	}

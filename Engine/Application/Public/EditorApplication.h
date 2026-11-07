@@ -36,5 +36,5 @@ private:
 	GameApplicationOptions m_gameOptions;
 	EditorShaderCompileAction m_compileShaders;
 	std::unique_ptr<State> m_state;
-	bool m_isEditorSessionActive = false;
+	bool m_bIsEditorSessionActive = false;
 };

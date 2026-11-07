@@ -13,7 +13,7 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderLightPreparationLogger, "Renderer.Ren
 
 static DirectionalLight PrepareDirectional(const SceneLightDesc& light, const SceneDirectionalLightDesc& directional) noexcept
 {
-	return DirectionalLight{directional.direction, directional.illuminance, light.common.color, directional.angularSizeRadians, directional.castShadow};
+	return DirectionalLight{directional.direction, directional.illuminance, light.common.color, directional.angularSizeRadians, directional.bCastShadow};
 }
 
 static PointLight PreparePoint(const SceneLightDesc& light, const PointLightDesc& point, const DirectX::XMFLOAT3& position) noexcept
@@ -25,7 +25,7 @@ static PointLight PreparePoint(const SceneLightDesc& light, const PointLightDesc
 	    .luminousIntensity = point.luminousIntensity,
 	    .radius = point.radius,
 	    .distanceAttenuationCoefficients = point.distanceAttenuationCoefficients,
-	    .castShadow = point.castShadow};
+	    .bCastShadow = point.bCastShadow};
 }
 
 static SpotLight PrepareSpot(const SceneLightDesc& light, const SpotLightDesc& spot, const DirectX::XMFLOAT3& position) noexcept
@@ -40,7 +40,7 @@ static SpotLight PrepareSpot(const SceneLightDesc& light, const SpotLightDesc& s
 	    .luminousIntensity = spot.luminousIntensity,
 	    .outerAngleCosine = std::cos(spot.outerAngleRadians),
 	    .distanceAttenuationCoefficients = spot.distanceAttenuationCoefficients,
-	    .castShadow = spot.castShadow};
+	    .bCastShadow = spot.bCastShadow};
 }
 
 static RectLight PrepareRect(const SceneLightDesc& light, const RectLightDesc& rect, const DirectX::XMFLOAT3& position) noexcept
@@ -53,7 +53,7 @@ static RectLight PrepareRect(const SceneLightDesc& light, const RectLightDesc& r
 	    .tangent = rect.tangent,
 	    .luminance = rect.luminance,
 	    .color = light.common.color,
-	    .castShadow = rect.castShadow};
+	    .bCastShadow = rect.bCastShadow};
 }
 
 void PrepareRenderLights(std::span<const RenderLightData> inputs, std::span<PreparedRenderLight> outputs) noexcept
@@ -70,7 +70,7 @@ void PrepareRenderLights(std::span<const RenderLightData> inputs, std::span<Prep
 		output = PreparedRenderLight{.Object = row.Object};
 
 		const SceneLightDesc& light = row.Description;
-		if (!light.common.visible || !IsLightRenderingEnabled(light.GetKind()))
+		if (!light.common.bVisible || !IsLightRenderingEnabled(light.GetKind()))
 		{
 			continue;
 		}

@@ -46,31 +46,31 @@ RayTracingPtlasPartitionPlan RenderViewState::BuildRayTracingPlan(const Prepared
 
 void RenderViewState::ObserveIdentityAndGenerations(const RenderViewStateBuildInput& input) noexcept
 {
-	if (!m_hasIdentity || !(m_identity == input.Identity))
+	if (!m_bHasIdentity || !(m_identity == input.Identity))
 	{
 		Invalidate(RenderViewInvalidationReason::ViewIdentity);
 	}
-	if (m_hasIdentity && m_sceneGeneration != input.SceneGeneration)
+	if (m_bHasIdentity && m_sceneGeneration != input.SceneGeneration)
 	{
 		Invalidate(RenderViewInvalidationReason::SceneGeneration);
 	}
-	if (m_hasIdentity && m_shaderGeneration != input.ShaderGeneration)
+	if (m_bHasIdentity && m_shaderGeneration != input.ShaderGeneration)
 	{
 		Invalidate(RenderViewInvalidationReason::ShaderGeneration);
 	}
-	if (m_hasIdentity && m_imageProviderGeneration != input.ImageProviderGeneration)
+	if (m_bHasIdentity && m_imageProviderGeneration != input.ImageProviderGeneration)
 	{
 		Invalidate(RenderViewInvalidationReason::ImageProviderGeneration);
 	}
-	if (m_hasIdentity && m_graphTopologyGeneration != input.GraphTopologyGeneration)
+	if (m_bHasIdentity && m_graphTopologyGeneration != input.GraphTopologyGeneration)
 	{
 		Invalidate(RenderViewInvalidationReason::GraphTopology);
 	}
-	if (input.ViewInput.CameraCut)
+	if (input.ViewInput.bCameraCut)
 	{
 		Invalidate(RenderViewInvalidationReason::CameraCut);
 	}
-	if (input.ViewInput.CameraTeleported)
+	if (input.ViewInput.bCameraTeleported)
 	{
 		Invalidate(RenderViewInvalidationReason::CameraTeleport);
 	}
@@ -80,7 +80,7 @@ void RenderViewState::ObserveIdentityAndGenerations(const RenderViewStateBuildIn
 	m_shaderGeneration = input.ShaderGeneration;
 	m_imageProviderGeneration = input.ImageProviderGeneration;
 	m_graphTopologyGeneration = input.GraphTopologyGeneration;
-	m_hasIdentity = true;
+	m_bHasIdentity = true;
 }
 
 RenderViewState::CameraPose RenderViewState::CapturePose(const RenderViewStateBuildInput& input) noexcept
@@ -128,11 +128,11 @@ ViewTemporalUniformData RenderViewState::BuildTemporal(const RenderViewStateBuil
 {
 	ObserveIdentityAndGenerations(input);
 	const CameraPose currentPose = CapturePose(input);
-	if (m_hasPreviousPose && HasProjectionChange(m_previousPose, currentPose))
+	if (m_bHasPreviousPose && HasProjectionChange(m_previousPose, currentPose))
 	{
 		Invalidate(RenderViewInvalidationReason::ProjectionChange);
 	}
-	if (m_hasPreviousPose && IsLikelyCameraCut(m_previousPose, currentPose))
+	if (m_bHasPreviousPose && IsLikelyCameraCut(m_previousPose, currentPose))
 	{
 		Invalidate(RenderViewInvalidationReason::CameraDiscontinuity);
 	}
@@ -148,8 +148,8 @@ ViewTemporalUniformData RenderViewState::BuildTemporal(const RenderViewStateBuil
 
 	temporal.PreviousJitterNdc = m_previousJitterNdc;
 
-	const bool historyValid = m_hasPreviousPose && m_pendingInvalidationReasons == RenderViewInvalidationReason::None;
-	if (historyValid)
+	const bool bHistoryValid = m_bHasPreviousPose && m_pendingInvalidationReasons == RenderViewInvalidationReason::None;
+	if (bHistoryValid)
 	{
 		temporal.PreviousWorldToViewMatrix = m_previousPose.WorldToViewMatrix;
 		temporal.PreviousViewToClipMatrix = m_previousPose.ViewToClipMatrix;
@@ -159,7 +159,7 @@ ViewTemporalUniformData RenderViewState::BuildTemporal(const RenderViewStateBuil
 
 	m_previousPose = currentPose;
 	m_previousJitterNdc = temporal.CurrentJitterNdc;
-	m_hasPreviousPose = true;
+	m_bHasPreviousPose = true;
 	m_lastInvalidationReasons = m_pendingInvalidationReasons;
 	m_pendingInvalidationReasons = RenderViewInvalidationReason::None;
 	return temporal;

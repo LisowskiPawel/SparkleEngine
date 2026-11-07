@@ -13,13 +13,13 @@
 #include "RHI/Public/UI/RhiImGuiRenderer.h"
 #include "UI/UiRenderPacketPlayer.h"
 
-UiFrameRenderer::UiFrameRenderer(RenderDeviceServices& deviceServices, bool ownsBackend) :
+UiFrameRenderer::UiFrameRenderer(RenderDeviceServices& deviceServices, bool bOwnsBackend) :
     m_deviceServices(deviceServices),
     m_packetPlayer(std::make_unique<UiRenderPacketPlayer>()),
     m_textureRegistry(std::make_unique<UiTextureRegistry>()),
-    m_ownsBackend(ownsBackend)
+    m_bOwnsBackend(bOwnsBackend)
 {
-	if (m_ownsBackend)
+	if (m_bOwnsBackend)
 	{
 		m_deviceServices.GetImGuiRenderer().Initialize();
 	}
@@ -27,7 +27,7 @@ UiFrameRenderer::UiFrameRenderer(RenderDeviceServices& deviceServices, bool owns
 
 UiFrameRenderer::~UiFrameRenderer() noexcept
 {
-	if (m_ownsBackend)
+	if (m_bOwnsBackend)
 	{
 		m_packetPlayer->Shutdown(m_deviceServices.GetImGuiRenderer());
 		m_deviceServices.GetImGuiRenderer().Shutdown();
@@ -41,7 +41,7 @@ UiTextureHandle UiFrameRenderer::RegisterUiTexture(std::uint64_t nativeTextureId
 
 void UiFrameRenderer::BeginFrame() noexcept
 {
-	if (m_ownsBackend)
+	if (m_bOwnsBackend)
 	{
 		m_deviceServices.GetImGuiRenderer().BeginFrame();
 	}
@@ -105,8 +105,8 @@ void UiFrameRenderer::EndViewportPresentation(FrameGraph& frameGraph, const View
 void UiFrameRenderer::RenderViewport(const UiRenderPacket& packet, FrameGraph* frameGraph, ViewportRenderProducts& viewportProducts) noexcept
 {
 	const bool bPresentingViewportGetGeneration = frameGraph != nullptr && packet.ViewportGeneration == viewportProducts.GetGeneration();
-	const bool presentingViewport = bPresentingViewportGetGeneration && (BeginViewportPresentation(*frameGraph, viewportProducts));
-	if (!presentingViewport)
+	const bool bPresentingViewport = bPresentingViewportGetGeneration && (BeginViewportPresentation(*frameGraph, viewportProducts));
+	if (!bPresentingViewport)
 	{
 		m_textureRegistry->RetireViewportTexture();
 		m_viewportTexture = {};
@@ -120,7 +120,7 @@ void UiFrameRenderer::RenderViewport(const UiRenderPacket& packet, FrameGraph* f
 		Play(packet);
 		presentation.EndPresentRenderPass();
 	}
-	if (presentingViewport)
+	if (bPresentingViewport)
 	{
 		EndViewportPresentation(*frameGraph, viewportProducts);
 	}

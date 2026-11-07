@@ -54,7 +54,7 @@ void FrameGraphCompiler::CullDeadPasses() noexcept
 
 	for (FrameGraphPassNode& passRecord : m_plan.passes)
 	{
-		passRecord.alive = false;
+		passRecord.bAlive = false;
 		if (GetRootPassReason(passRecord) != nullptr)
 		{
 			rootPasses.push_back(passRecord.index);
@@ -71,12 +71,12 @@ void FrameGraphCompiler::MarkPassAliveRecursive(FrameGraphPassIndex passIndex) n
 {
 	assert(passIndex < m_plan.passes.size());
 	FrameGraphPassNode& passRecord = m_plan.passes[passIndex];
-	if (passRecord.alive)
+	if (passRecord.bAlive)
 	{
 		return;
 	}
 
-	passRecord.alive = true;
+	passRecord.bAlive = true;
 	for (const FrameGraphPassIndex dependency : passRecord.dependsOn)
 	{
 		if (dependency == INVALID_FRAME_GRAPH_PASS_INDEX)
@@ -151,7 +151,7 @@ void FrameGraphCompiler::BuildPassSuccessorsAndInDegrees() noexcept
 
 	for (FrameGraphPassNode& passRecord : m_plan.passes)
 	{
-		if (!passRecord.alive)
+		if (!passRecord.bAlive)
 		{
 			continue;
 		}
@@ -183,7 +183,7 @@ void FrameGraphCompiler::BuildTopologicalExecutionOrder() noexcept
 	ready.reserve(m_plan.passes.size());
 	for (const FrameGraphPassNode& passRecord : m_plan.passes)
 	{
-		if (passRecord.alive && passRecord.inDegree == 0)
+		if (passRecord.bAlive && passRecord.inDegree == 0)
 		{
 			ready.push_back(passRecord.index);
 		}
@@ -200,7 +200,7 @@ void FrameGraphCompiler::BuildTopologicalExecutionOrder() noexcept
 			assert(successor < remainingInDegree.size());
 			assert(remainingInDegree[successor] > 0);
 			--remainingInDegree[successor];
-			if (remainingInDegree[successor] == 0 && m_plan.passes[successor].alive)
+			if (remainingInDegree[successor] == 0 && m_plan.passes[successor].bAlive)
 			{
 				ready.push_back(successor);
 			}
@@ -216,7 +216,7 @@ void FrameGraphCompiler::ValidateExecutionOrder() const noexcept
 
 	for (const FrameGraphPassNode& passRecord : m_plan.passes)
 	{
-		if (passRecord.alive)
+		if (passRecord.bAlive)
 		{
 			++alivePassCount;
 		}
@@ -242,7 +242,7 @@ void FrameGraphCompiler::ValidateExecutionOrder() const noexcept
 
 	for (const FrameGraphPassNode& passRecord : m_plan.passes)
 	{
-		if (!passRecord.alive)
+		if (!passRecord.bAlive)
 		{
 			continue;
 		}

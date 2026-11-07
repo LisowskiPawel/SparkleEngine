@@ -25,7 +25,7 @@ namespace TextureCookPipeline
 		Destroy();
 	}
 
-	void BCCompressor::Initialize(bool srgbOutput, bool imageNeedsAlpha)
+	void BCCompressor::Initialize(bool bSrgbOutput, bool bImageNeedsAlpha)
 	{
 		Destroy();
 
@@ -76,7 +76,7 @@ namespace TextureCookPipeline
 				{
 					SetQualityBC7(options_, kBlockCompressionQuality);
 					SetMaskBC7(options_, 0xffu);
-					SetAlphaOptionsBC7(options_, imageNeedsAlpha, false, false);
+					SetAlphaOptionsBC7(options_, bImageNeedsAlpha, false, false);
 				}
 				break;
 			case CompressionTarget::None:
@@ -88,7 +88,7 @@ namespace TextureCookPipeline
 			throw Diagnostics::Error("Failed to initialize CMP_Core compression options.");
 		}
 
-		if (srgbOutput && target_ == CompressionTarget::BC1)
+		if (bSrgbOutput && target_ == CompressionTarget::BC1)
 		{
 			SetSrgbBC1(options_, false);
 		}
@@ -105,7 +105,7 @@ namespace TextureCookPipeline
 
 		const std::uint32_t blockCountX = (std::max) (1u, (sourceMip.width + 3u) / 4u);
 		const std::uint32_t blockCountY = (std::max) (1u, (sourceMip.height + 3u) / 4u);
-		const bool srgbOutput = request.policy.colorSpace == TextureColorSpace::Srgb;
+		const bool bSrgbOutput = request.policy.colorSpace == TextureColorSpace::Srgb;
 
 		for (std::uint32_t blockY = 0; blockY < blockCountY; ++blockY)
 		{
@@ -125,9 +125,9 @@ namespace TextureCookPipeline
 							const std::uint32_t sampleY = (std::min) (sourceMip.height - 1u, (blockY * 4u) + localY);
 							const std::size_t sourceOffset = (static_cast<std::size_t>(sampleY) * sourceMip.width + sampleX) * 4u;
 							const std::size_t blockOffset = (static_cast<std::size_t>(localY) * 4u + localX) * 4u;
-							rgbaBlock[blockOffset + 0u] = Pixel::EncodeByteChannel(sourceMip.pixels[sourceOffset + 0u], srgbOutput);
-							rgbaBlock[blockOffset + 1u] = Pixel::EncodeByteChannel(sourceMip.pixels[sourceOffset + 1u], srgbOutput);
-							rgbaBlock[blockOffset + 2u] = Pixel::EncodeByteChannel(sourceMip.pixels[sourceOffset + 2u], srgbOutput);
+							rgbaBlock[blockOffset + 0u] = Pixel::EncodeByteChannel(sourceMip.pixels[sourceOffset + 0u], bSrgbOutput);
+							rgbaBlock[blockOffset + 1u] = Pixel::EncodeByteChannel(sourceMip.pixels[sourceOffset + 1u], bSrgbOutput);
+							rgbaBlock[blockOffset + 2u] = Pixel::EncodeByteChannel(sourceMip.pixels[sourceOffset + 2u], bSrgbOutput);
 							rgbaBlock[blockOffset + 3u] = Pixel::EncodeByteChannel(sourceMip.pixels[sourceOffset + 3u], false);
 						}
 					}

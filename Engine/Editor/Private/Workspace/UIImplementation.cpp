@@ -34,10 +34,10 @@
 #include <memory>
 #include <utility>
 
-void UI::Implementation::AppendConsoleOutput(ConsoleOutputRecord record, bool showConsole)
+void UI::Implementation::AppendConsoleOutput(ConsoleOutputRecord record, bool bShowConsole)
 {
 	m_editorConsoleSystem->AppendOutput(std::move(record));
-	if (showConsole)
+	if (bShowConsole)
 	{
 		m_editorConsoleSystem->OpenConsole();
 	}
@@ -128,9 +128,9 @@ RendererMemoryDiagnosticsSnapshot UI::Implementation::CaptureMemoryDiagnostics()
 
 bool UI::Implementation::ConsumeShaderReloadRequest() noexcept
 {
-	const bool requested = m_shaderReloadRequested;
-	m_shaderReloadRequested = false;
-	return requested;
+	const bool bRequested = m_bShaderReloadRequested;
+	m_bShaderReloadRequested = false;
+	return bRequested;
 }
 
 void UI::Implementation::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler)
@@ -138,9 +138,9 @@ void UI::Implementation::SetShaderCompileHandler(std::function<ConsoleCommandRes
 	m_shaderToolsPanel->SetCompileHandler(std::move(handler));
 }
 
-void UI::Implementation::SetShaderCompileStatus(bool busy, std::string_view message)
+void UI::Implementation::SetShaderCompileStatus(bool bBusy, std::string_view message)
 {
-	m_shaderToolsPanel->SetCompileStatus(busy, message);
+	m_shaderToolsPanel->SetCompileStatus(bBusy, message);
 }
 
 ViewportOutputAction UI::Implementation::ConsumeViewportOutputAction() noexcept

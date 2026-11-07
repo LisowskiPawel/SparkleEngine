@@ -18,7 +18,7 @@ public:
 private:
 	static bool HasText(const char* text) noexcept;
 	static bool IsAllProjects(std::string_view projectName) noexcept;
-	static AssetCookerServiceResult Finish(bool succeeded, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord> outputs = {});
+	static AssetCookerServiceResult Finish(bool bSucceeded, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord> outputs = {});
 
 	bool ResolveWorkspaceRoot(AssetCookerDiagnostics& diagnostics, std::filesystem::path& outWorkspaceRoot) const;
 	bool ResolveProjects(const std::filesystem::path& workspaceRoot, std::string_view projectName, AssetCookerDiagnostics& diagnostics, std::vector<std::string>& outProjects) const;

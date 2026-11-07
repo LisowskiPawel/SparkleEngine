@@ -27,8 +27,8 @@ namespace ECS
 			SceneMeshKind Kind = SceneMeshKind::Static;
 			SceneMeshAssetIndex MeshAssetIndex = kInvalidSceneMeshAssetIndex;
 			SceneMeshInstanceGroupIndex InstanceGroupIndex = kInvalidSceneMeshInstanceGroupIndex;
-			bool Visible = true;
-			bool Included = false;
+			bool bVisible = true;
+			bool bIncluded = false;
 		};
 
 		bool Prepare(const EntityRegistry& registry);

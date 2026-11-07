@@ -39,11 +39,11 @@ void AddDirectLightReservoirTemporalPass(FrameGraphBuilder& builder, const Rende
 
 	BindDirectLightReservoirSurface(builder, frame, parameters, resources);
 
-	const bool sampleHistoryValid = builder.IsTextureHistoryValid(resources.History.DirectLightReservoir.Sample);
-	const bool weightHistoryValid = sampleHistoryValid && builder.IsTextureHistoryValid(resources.History.DirectLightReservoir.Weight);
-	const bool surfaceHistoryValid = weightHistoryValid && builder.IsTextureHistoryValid(resources.History.DirectLightReservoir.Surface);
+	const bool bSampleHistoryValid = builder.IsTextureHistoryValid(resources.History.DirectLightReservoir.Sample);
+	const bool bWeightHistoryValid = bSampleHistoryValid && builder.IsTextureHistoryValid(resources.History.DirectLightReservoir.Weight);
+	const bool bSurfaceHistoryValid = bWeightHistoryValid && builder.IsTextureHistoryValid(resources.History.DirectLightReservoir.Surface);
 
-	if (!surfaceHistoryValid)
+	if (!bSurfaceHistoryValid)
 	{
 		ViewTemporalUniformData temporal = frame.View.temporalUniform;
 		temporal.HistoryValid = 0u;

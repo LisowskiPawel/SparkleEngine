@@ -14,7 +14,7 @@ struct ConsoleCommandEntry final
 	std::string_view Help;
 	std::string_view ArgumentSyntax;
 	ConsoleCommandResult (*Execute)(const ConsoleCommandActions&, std::span<const std::string_view>);
-	bool CompletesCVarName = false;
+	bool bCompletesCVarName = false;
 };
 
 static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std::span<const std::string_view> arguments);
@@ -67,7 +67,7 @@ static std::vector<std::string_view> BuildArgumentViews(const std::vector<std::s
 ConsoleCommandResult ExecuteConsoleLine(const ConsoleCommandActions& actions, std::string_view input)
 {
 	const ConsoleParsedInput parsed = ConsoleInputParser::Parse(input);
-	if (!parsed.Succeeded)
+	if (!parsed.bSucceeded)
 	{
 		return ConsoleCommandResult::Error(parsed.ErrorMessage);
 	}
@@ -98,8 +98,8 @@ std::vector<std::string> CompleteConsoleLine(std::string_view input)
 		return completions;
 	}
 	const ConsoleParsedInput parsed = ConsoleInputParser::Parse(input);
-	const ConsoleCommandEntry* command = parsed.Succeeded ? FindCommand(parsed.CommandName) : nullptr;
-	if (command == nullptr || !command->CompletesCVarName)
+	const ConsoleCommandEntry* command = parsed.bSucceeded ? FindCommand(parsed.CommandName) : nullptr;
+	if (command == nullptr || !command->bCompletesCVarName)
 	{
 		return {};
 	}
@@ -117,9 +117,9 @@ static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std
 	for (const ConsoleCommandEntry& command : kCommands)
 	{
 		const bool bCommandByFilterName = !filter.empty() && !Strings::ContainsIgnoreCase(command.Name, filter);
-		const bool commandExcludedByFilter = bCommandByFilterName && (!Strings::ContainsIgnoreCase(command.Help, filter));
+		const bool bCommandExcludedByFilter = bCommandByFilterName && (!Strings::ContainsIgnoreCase(command.Help, filter));
 		
-		if (commandExcludedByFilter)
+		if (bCommandExcludedByFilter)
 		{
 			continue;
 		}

@@ -15,12 +15,12 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderRayTracingSceneLogger, "Renderer.Rend
 
 static RayTracingExecutionFrontend SelectExecutionFrontend(const RayTracingCapabilityReport& capabilities) noexcept
 {
-	const bool sharedRequirements = capabilities.SupportsAccelerationStructure && capabilities.SupportsDescriptorIndexing;
-	if (sharedRequirements && capabilities.SupportsRayTracingPipeline)
+	const bool bSharedRequirements = capabilities.bSupportsAccelerationStructure && capabilities.bSupportsDescriptorIndexing;
+	if (bSharedRequirements && capabilities.bSupportsRayTracingPipeline)
 	{
 		return RayTracingExecutionFrontend::Pipeline;
 	}
-	if (sharedRequirements && capabilities.SupportsInlineRayQuery)
+	if (bSharedRequirements && capabilities.bSupportsInlineRayQuery)
 	{
 		return RayTracingExecutionFrontend::Inline;
 	}
@@ -33,9 +33,9 @@ RenderRayTracingScene::RenderRayTracingScene(RenderHardwareInterface& renderHard
 	m_performanceMetrics.Providers.TlasProvider = capabilityReport.TlasProvider.SelectedProvider;
 	m_performanceMetrics.Providers.TlasProviderReason = capabilityReport.TlasProvider.SelectionReason;
 	m_performanceMetrics.Providers.PtlasProvider = capabilityReport.Ptlas.Provider;
-	m_performanceMetrics.Providers.SupportsPtlas = capabilityReport.Ptlas.Supported;
+	m_performanceMetrics.Providers.bSupportsPtlas = capabilityReport.Ptlas.bSupported;
 	m_performanceMetrics.Providers.PtlasCapabilityReason = capabilityReport.Ptlas.CapabilityStatusReason;
-	if (!capabilityReport.SupportsAccelerationStructure)
+	if (!capabilityReport.bSupportsAccelerationStructure)
 	{
 		return;
 	}

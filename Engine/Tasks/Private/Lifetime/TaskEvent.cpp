@@ -20,7 +20,7 @@ struct TaskEvent::State final
 	std::uint64_t Generation = 1;
 	std::mutex Mutex;
 	std::condition_variable Condition;
-	bool Signalled = false;
+	bool bSignalled = false;
 	std::uint32_t WaiterCount = 0;
 	TaskResult Result = TaskResult::Success();
 };
@@ -89,12 +89,12 @@ bool TaskEvent::Signal(TaskEventToken token, TaskResult result) noexcept
 {
 	{
 		std::lock_guard lock(m_state->Mutex);
-		if (!token || token.m_identity != m_state->Identity || token.m_generation != m_state->Generation || m_state->Signalled)
+		if (!token || token.m_identity != m_state->Identity || token.m_generation != m_state->Generation || m_state->bSignalled)
 		{
 			return false;
 		}
 		m_state->Result = std::move(result);
-		m_state->Signalled = true;
+		m_state->bSignalled = true;
 	}
 	m_state->Condition.notify_all();
 	return true;
@@ -103,12 +103,12 @@ bool TaskEvent::Signal(TaskEventToken token, TaskResult result) noexcept
 TaskEventToken TaskEvent::Reset() noexcept
 {
 	std::lock_guard lock(m_state->Mutex);
-	if (!m_state->Signalled || m_state->WaiterCount != 0 || m_state->Generation == std::numeric_limits<std::uint64_t>::max())
+	if (!m_state->bSignalled || m_state->WaiterCount != 0 || m_state->Generation == std::numeric_limits<std::uint64_t>::max())
 	{
 		return {};
 	}
 	++m_state->Generation;
-	m_state->Signalled = false;
+	m_state->bSignalled = false;
 	m_state->Result = TaskResult::Success();
 	return TaskEventToken(m_state->Identity, m_state->Generation);
 }
@@ -130,7 +130,7 @@ TaskResult TaskEvent::Wait(TaskEventToken token, TaskExecutionContext& context)
 	    });
 	std::unique_lock lock(state->Mutex);
 	State::WaitRegistration waiterRegistration(*state);
-	state->Condition.wait(lock, [&] { return context.IsCancellationRequested() || token.m_identity != state->Identity || token.m_generation != state->Generation || state->Signalled; });
+	state->Condition.wait(lock, [&] { return context.IsCancellationRequested() || token.m_identity != state->Identity || token.m_generation != state->Generation || state->bSignalled; });
 
 	if (context.IsCancellationRequested())
 	{

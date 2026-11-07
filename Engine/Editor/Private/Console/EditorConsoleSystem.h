@@ -21,9 +21,9 @@ public:
 
 	void AppendOutput(ConsoleOutputRecord record);
 	void OpenConsole() noexcept;
-	bool HandleShortcut(std::uint32_t message, std::uintptr_t key, bool wantsTextInput) noexcept;
+	bool HandleShortcut(std::uint32_t message, std::uintptr_t key, bool bWantsTextInput) noexcept;
 	float GetDockHeight(float availableHeight) noexcept;
-	void BuildDockedUI(float left, float bottom, float width, float availableHeight, bool disableInteraction);
+	void BuildDockedUI(float left, float bottom, float width, float availableHeight, bool bDisableInteraction);
 
 private:
 	std::unique_ptr<ConsoleSession> m_session;

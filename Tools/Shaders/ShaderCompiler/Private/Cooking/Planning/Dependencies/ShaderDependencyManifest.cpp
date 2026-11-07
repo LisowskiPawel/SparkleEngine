@@ -62,10 +62,10 @@ ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::p
 			lineInput >> std::hex >> record.ShaderType >> std::quoted(record.ShaderTypeName) >> std::quoted(record.VirtualSourcePath);
 			lineInput >> std::ws;
 			const bool bRecordParsedeof = static_cast<bool>(lineInput) && lineInput.eof();
-			const bool recordParsed = bRecordParsedeof && (record.ShaderType != 0);
-			const bool recordInserted = recordParsed && recordIndices.emplace(record.ShaderType, manifest.m_records.size()).second;
+			const bool bRecordParsed = bRecordParsedeof && (record.ShaderType != 0);
+			const bool bRecordInserted = bRecordParsed && recordIndices.emplace(record.ShaderType, manifest.m_records.size()).second;
 
-			if (!recordInserted)
+			if (!bRecordInserted)
 			{
 				throw Diagnostics::Error("Shader dependency metadata contains an invalid or duplicate shader record. Use Launcher Cook shaders (full).");
 			}
@@ -132,12 +132,12 @@ ShaderDependencyManifest ShaderDependencyManifest::ReadRequired(const std::files
 std::optional<ShaderDependencyManifest> ShaderDependencyManifest::ReadForUpdate(const std::filesystem::path& path)
 {
 	std::error_code errorCode;
-	const bool exists = std::filesystem::exists(path, errorCode);
+	const bool bExists = std::filesystem::exists(path, errorCode);
 	if (errorCode)
 	{
 		throw Diagnostics::Error(std::format("Failed to inspect shader dependency metadata '{}': {}", path.string(), errorCode.message()));
 	}
-	if (!exists)
+	if (!bExists)
 	{
 		return std::nullopt;
 	}
@@ -218,10 +218,10 @@ void ShaderDependencyManifest::Replace(ShaderDependencyRecord record)
 
 std::size_t ShaderDependencyManifest::RemoveUnregisteredShaderTypes(std::span<const ShaderTypeId> registeredShaderTypes)
 {
-	const bool typesSorted = std::ranges::is_sorted(registeredShaderTypes);
-	const bool typesUnique = typesSorted && std::adjacent_find(registeredShaderTypes.begin(), registeredShaderTypes.end()) == registeredShaderTypes.end();
+	const bool bTypesSorted = std::ranges::is_sorted(registeredShaderTypes);
+	const bool bTypesUnique = bTypesSorted && std::adjacent_find(registeredShaderTypes.begin(), registeredShaderTypes.end()) == registeredShaderTypes.end();
 
-	if (!typesUnique)
+	if (!bTypesUnique)
 	{
 		throw Diagnostics::Error("Current shader catalog identities must be sorted and unique before dependency reconciliation.");
 	}

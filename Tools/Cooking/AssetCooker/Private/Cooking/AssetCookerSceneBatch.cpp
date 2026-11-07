@@ -23,10 +23,10 @@ bool AssetCookerSceneBatch::Execute(const std::vector<AssetCookerSceneEntry>& sc
 		progress({.Action = "Cooking scene assets", .Total = totalWork});
 	}
 	std::vector<Item> items(sceneEntries.size());
-	const bool built = BuildProducts(sceneEntries, items, progress, totalWork);
+	const bool bBuilt = BuildProducts(sceneEntries, items, progress, totalWork);
 
 	MergeDiagnostics(items, diagnostics);
-	if (!built)
+	if (!bBuilt)
 	{
 		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene asset generation failed before publication.");
 		return false;
@@ -36,12 +36,12 @@ bool AssetCookerSceneBatch::Execute(const std::vector<AssetCookerSceneEntry>& sc
 	{
 		progress({.Action = "Publishing cooked scene assets", .Completed = sceneEntries.size(), .Total = totalWork});
 	}
-	const bool published = PublishProducts(items, diagnostics);
-	if (published && progress)
+	const bool bPublished = PublishProducts(items, diagnostics);
+	if (bPublished && progress)
 	{
 		progress({.Action = "Cooked scene assets published", .Completed = totalWork, .Total = totalWork});
 	}
-	return published;
+	return bPublished;
 }
 
 std::uint32_t AssetCookerSceneBatch::ResolveWorkerCount() noexcept

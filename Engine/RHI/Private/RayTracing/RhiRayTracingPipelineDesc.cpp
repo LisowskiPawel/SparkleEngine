@@ -24,7 +24,7 @@ RayTracingPipeline::RayTracingPipeline(const RayTracingPipelineDesc& desc) :
 		        .ExportName = std::string(hitGroup.ExportName),
 		        .LocalRecordSizeInBytes = closestHit != nullptr ? closestHit->LocalRecordSizeInBytes : 0,
 		        .LocalRecordSignature = closestHit != nullptr ? closestHit->LocalRecordSignature : 0,
-		        .IsHitGroup = true});
+		        .bIsHitGroup = true});
 	}
 }
 

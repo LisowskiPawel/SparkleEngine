@@ -4,9 +4,9 @@
 
 namespace LightingStateHash
 {
-	std::uint64_t AppendBool(std::uint64_t hash, bool value) noexcept
+	std::uint64_t AppendBool(std::uint64_t hash, bool bValue) noexcept
 	{
-		return Hash::ContinueFnv1a64Value(hash, static_cast<std::uint8_t>(value));
+		return Hash::ContinueFnv1a64Value(hash, static_cast<std::uint8_t>(bValue));
 	}
 
 	std::uint64_t AppendFloat3(std::uint64_t hash, const DirectX::XMFLOAT3& value) noexcept

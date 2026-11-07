@@ -152,12 +152,12 @@ void ReferencePathTracerArtifactCoordinator::PublishIfReady()
 			return TaskResult::Cancelled("Reference Path Tracer artifact publication was cancelled.");
 		}
 		result = ReferencePathTracerArtifactWriter::Write(std::move(request), context.GetCancellationToken());
-		return result.Succeeded ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.ErrorMessage) : TaskResult::Failure(result.ErrorMessage));
+		return result.bSucceeded ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.ErrorMessage) : TaskResult::Failure(result.ErrorMessage));
 	};
 
-	const bool operationStarted = m_writeOperation.Start(taskName, "A Reference Path Tracer artifact is already being written.", std::move(operationTask), errorMessage);
+	const bool bOperationStarted = m_writeOperation.Start(taskName, "A Reference Path Tracer artifact is already being written.", std::move(operationTask), errorMessage);
 
-	if (!operationStarted)
+	if (!bOperationStarted)
 	{
 		Fail(std::move(errorMessage));
 		return;
@@ -197,7 +197,7 @@ void ReferencePathTracerArtifactCoordinator::Update(Renderer& renderer, const Vi
 	{
 		if (!taskResult->Succeeded())
 		{
-			result.Succeeded = false;
+			result.bSucceeded = false;
 			if (result.ErrorMessage.empty())
 			{
 				result.ErrorMessage = taskResult->GetMessage();
@@ -220,7 +220,7 @@ void ReferencePathTracerArtifactCoordinator::Fail(std::string message)
 	m_moment2.reset();
 	m_pendingKind.reset();
 	m_capturePrefix = {};
-	m_lastResult = ReferencePathTracerArtifactWriteResult{.Succeeded = false, .PublicationDirectory = m_publicationDirectory, .ErrorMessage = std::move(message)};
+	m_lastResult = ReferencePathTracerArtifactWriteResult{.bSucceeded = false, .PublicationDirectory = m_publicationDirectory, .ErrorMessage = std::move(message)};
 }
 
 std::filesystem::path ReferencePathTracerArtifactCoordinator::DefaultOutputRoot()

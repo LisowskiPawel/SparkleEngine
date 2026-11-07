@@ -38,10 +38,10 @@ namespace PathFormatting
 
 	bool IsAsciiAlphaNumeric(char character) noexcept
 	{
-		const bool isLower = character >= 'a' && character <= 'z';
-		const bool isUpper = character >= 'A' && character <= 'Z';
-		const bool isDigit = character >= '0' && character <= '9';
-		return isLower || isUpper || isDigit;
+		const bool bIsLower = character >= 'a' && character <= 'z';
+		const bool bIsUpper = character >= 'A' && character <= 'Z';
+		const bool bIsDigit = character >= '0' && character <= '9';
+		return bIsLower || bIsUpper || bIsDigit;
 	}
 
 	char ToLowerAscii(char character) noexcept

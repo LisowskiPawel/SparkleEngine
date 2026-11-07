@@ -26,7 +26,7 @@ public:
 	void BeginFrame() noexcept;
 	bool AcquireBackBuffer() noexcept;
 
-	bool HasAcquiredBackBuffer() const noexcept { return m_hasAcquiredBackBuffer; }
+	bool HasAcquiredBackBuffer() const noexcept { return m_bHasAcquiredBackBuffer; }
 
 	void ResetPresentation() noexcept;
 	void DrainForSwapChainRecreation() noexcept;
@@ -52,6 +52,6 @@ private:
 	VulkanCommandRecordingContext& m_commandContext;
 	const std::uint32_t& m_currentFrameIndex;
 	std::array<RhiSubmissionState, RhiQueueTypeCount> m_pendingQueueWaits;
-	bool m_hasAcquiredBackBuffer = false;
-	bool m_hasConsumedAcquireSemaphore = false;
+	bool m_bHasAcquiredBackBuffer = false;
+	bool m_bHasConsumedAcquireSemaphore = false;
 };

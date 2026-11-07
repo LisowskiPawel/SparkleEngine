@@ -58,16 +58,16 @@ namespace SparkleLauncher
 		WorkspaceFeatureSettings settings;
 		const HostGraphicsCapabilities& hostGraphics = GetHostGraphicsCapabilities();
 #if SPARKLE_ENABLE_CONTENT_PIPELINE
-		settings.ContentPipelineEnabled = true;
+		settings.bContentPipelineEnabled = true;
 #endif
 #if SPARKLE_ENABLE_SHADER_COMPILER
-		settings.ShaderCompilerEnabled = true;
+		settings.bShaderCompilerEnabled = true;
 #endif
 #if SPARKLE_ENABLE_KTX_SUPPORT
 		settings.KtxSupportEnabled = true;
 #endif
 #if SPARKLE_ENABLE_NVIDIA_STREAMLINE
-		settings.NvidiaStreamlineEnabled = hostGraphics.HasNvidiaAdapter;
+		settings.bNvidiaStreamlineEnabled = hostGraphics.bHasNvidiaAdapter;
 #endif
 		return settings;
 	}
@@ -302,7 +302,7 @@ namespace SparkleLauncher
 			case BuildWorkspaceOperationKind::GenerateBuildFiles:
 				return true;
 			case BuildWorkspaceOperationKind::BuildWorkspace:
-				return plan.Request.ForceConfigure || !plan.Freshness.Current;
+				return plan.Request.bForceConfigure || !plan.Freshness.bCurrent;
 			case BuildWorkspaceOperationKind::InstallHostTool:
 				return false;
 			default:

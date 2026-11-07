@@ -11,6 +11,6 @@ struct FrameGraphRasterPass final
 	std::array<FrameGraphAttachmentBinding, 8> Colors = {};
 	std::uint32_t ColorCount = 0;
 	FrameGraphAttachmentBinding DepthStencil = {};
-	bool HasDepthStencil = false;
+	bool bHasDepthStencil = false;
 	GraphicsAttachmentSignature Compatibility = {};
 };

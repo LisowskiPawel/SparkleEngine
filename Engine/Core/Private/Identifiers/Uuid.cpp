@@ -44,8 +44,8 @@ namespace Identifiers
 		{
 			const bool bSeparatorindex = index == 8 || index == 13;
 			const bool bSeparatorindex2 = bSeparatorindex || (index == 18);
-			const bool separator = bSeparatorindex2 || (index == 23);
-			if (separator ? value[index] != '-' : std::string_view("0123456789abcdef").find(value[index]) == std::string_view::npos)
+			const bool bSeparator = bSeparatorindex2 || (index == 23);
+			if (bSeparator ? value[index] != '-' : std::string_view("0123456789abcdef").find(value[index]) == std::string_view::npos)
 			{
 				return false;
 			}

@@ -10,21 +10,21 @@ ComPtr<ID3D12CommandQueue> D3D12Rhi::CreateInterposerGraphicsQueue() noexcept
 	graphicsQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
 	graphicsQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	graphicsQueueDesc.NodeMask = 0;
-	if (m_interposerActive)
+	if (m_bInterposerActive)
 	{
 		ComPtr<ID3D12Device10> externalDevice;
-		const bool deviceUpgraded = TryUpgradeInterposerInterface(ERhiInterposerInterfaceKind::GraphicsDevice, m_device.Get(), IID_PPV_ARGS(externalDevice.ReleaseAndGetAddressOf()));
+		const bool bDeviceUpgraded = TryUpgradeInterposerInterface(ERhiInterposerInterfaceKind::GraphicsDevice, m_device.Get(), IID_PPV_ARGS(externalDevice.ReleaseAndGetAddressOf()));
 
-		if (deviceUpgraded)
+		if (bDeviceUpgraded)
 		{
 			ComPtr<ID3D12CommandQueue> externalQueue;
 			const HRESULT createResult = externalDevice->CreateCommandQueue(&graphicsQueueDesc, IID_PPV_ARGS(externalQueue.ReleaseAndGetAddressOf()));
 			if (SUCCEEDED(createResult))
 			{
 				ComPtr<ID3D12CommandQueue> nativeQueue;
-				const bool queueResolved = TryResolveNativeInterface(ERhiInterposerInterfaceKind::GraphicsQueue, externalQueue.Get(), IID_PPV_ARGS(nativeQueue.ReleaseAndGetAddressOf()));
+				const bool bQueueResolved = TryResolveNativeInterface(ERhiInterposerInterfaceKind::GraphicsQueue, externalQueue.Get(), IID_PPV_ARGS(nativeQueue.ReleaseAndGetAddressOf()));
 
-				if (queueResolved)
+				if (bQueueResolved)
 				{
 					m_externalDevice = std::move(externalDevice);
 					m_externalCommandQueue = std::move(externalQueue);
@@ -44,7 +44,7 @@ ComPtr<ID3D12CommandQueue> D3D12Rhi::CreateInterposerGraphicsQueue() noexcept
 
 bool D3D12Rhi::TryUpgradeInterposerInterface(ERhiInterposerInterfaceKind kind, IUnknown* nativeInterface, REFIID requestedInterface, void** upgradedInterface) noexcept
 {
-	if (!m_interposerActive || m_interposerHooks.UpgradeInterface == nullptr || nativeInterface == nullptr || upgradedInterface == nullptr)
+	if (!m_bInterposerActive || m_interposerHooks.UpgradeInterface == nullptr || nativeInterface == nullptr || upgradedInterface == nullptr)
 	{
 		return false;
 	}
@@ -76,10 +76,10 @@ bool D3D12Rhi::TryResolveNativeInterface(ERhiInterposerInterfaceKind kind, IUnkn
 
 	*nativeInterface = nullptr;
 	void* resolved = nullptr;
-	const bool interfaceResolved = m_interposerHooks.ResolveNativeInterface(kind, externalInterface, &resolved, m_interposerHooks.UserData);
-	const bool interfaceAvailable = interfaceResolved && resolved != nullptr;
+	const bool bInterfaceResolved = m_interposerHooks.ResolveNativeInterface(kind, externalInterface, &resolved, m_interposerHooks.UserData);
+	const bool bInterfaceAvailable = bInterfaceResolved && resolved != nullptr;
 	
-	if (!interfaceAvailable)
+	if (!bInterfaceAvailable)
 	{
 		return false;
 	}
@@ -92,17 +92,17 @@ bool D3D12Rhi::TryResolveNativeInterface(ERhiInterposerInterfaceKind kind, IUnkn
 	return SUCCEEDED(result) && *nativeInterface != nullptr;
 }
 
-void D3D12Rhi::NotifyInterposerPresentationReady(bool ready) noexcept
+void D3D12Rhi::NotifyInterposerPresentationReady(bool bReady) noexcept
 {
 	if (m_interposerHooks.PresentationReady != nullptr)
 	{
-		m_interposerHooks.PresentationReady(ready && m_interposerActive, m_interposerHooks.UserData);
+		m_interposerHooks.PresentationReady(bReady && m_bInterposerActive, m_interposerHooks.UserData);
 	}
 }
 
 void D3D12Rhi::NotifyFrameLatencyMarker(ERhiFrameLatencyMarker marker, std::uint64_t frameId) noexcept
 {
-	if (m_interposerActive && m_interposerHooks.FrameMarker != nullptr)
+	if (m_bInterposerActive && m_interposerHooks.FrameMarker != nullptr)
 	{
 		m_interposerHooks.FrameMarker(marker, frameId, m_interposerHooks.UserData);
 	}
@@ -110,7 +110,7 @@ void D3D12Rhi::NotifyFrameLatencyMarker(ERhiFrameLatencyMarker marker, std::uint
 
 void D3D12Rhi::DisableInterposer() noexcept
 {
-	m_interposerActive = false;
+	m_bInterposerActive = false;
 	NotifyInterposerPresentationReady(false);
 }
 

@@ -24,12 +24,12 @@ struct PendingDescriptorBinding final
 	VkSampler ImmutableSampler = VK_NULL_HANDLE;
 };
 
-static CompiledBindingType ToCompiledBindingType(ShaderParameterSemanticKind semanticKind, bool inlineUniformDataAsPushConstants) noexcept
+static CompiledBindingType ToCompiledBindingType(ShaderParameterSemanticKind semanticKind, bool bInlineUniformDataAsPushConstants) noexcept
 {
 	switch (semanticKind)
 	{
 		case ShaderParameterSemanticKind::UniformData:
-			return inlineUniformDataAsPushConstants ? CompiledBindingType::PushConstants : CompiledBindingType::ConstantBuffer;
+			return bInlineUniformDataAsPushConstants ? CompiledBindingType::PushConstants : CompiledBindingType::ConstantBuffer;
 		case ShaderParameterSemanticKind::ReadTexture:
 		case ShaderParameterSemanticKind::ReadBuffer:
 			return CompiledBindingType::ReadOnlyResourceTable;
@@ -201,15 +201,15 @@ static void CompileParameterBindings(
 
 		CompiledBinding compiledBinding{};
 		compiledBinding.Name = bindingNames.back().c_str();
-		compiledBinding.Type = ToCompiledBindingType(bindingRecord.Kind, desc.InlineUniformDataAsPushConstants);
+		compiledBinding.Type = ToCompiledBindingType(bindingRecord.Kind, desc.bInlineUniformDataAsPushConstants);
 		compiledBinding.SemanticKind = bindingRecord.Kind;
 		compiledBinding.BindingIndex = static_cast<std::uint32_t>(parameterIndex);
 		compiledBinding.BindingPoint = bindingPoint;
 		compiledBinding.VisibilityMask = reflectedLocations.front().VisibilityMask;
 		compiledBinding.DescriptorCount = std::max(1u, bindingRecord.ArrayCount);
 		compiledBinding.PushConstantCount = bindingRecord.ValueSizeInBytes / sizeof(std::uint32_t);
-		compiledBinding.Bindless.BindlessEligible = bindingRecord.ArrayCount > 1u;
-		compiledBinding.Bindless.ReservedDescriptorCount = compiledBinding.Bindless.BindlessEligible ? compiledBinding.DescriptorCount : 0u;
+		compiledBinding.Bindless.bBindlessEligible = bindingRecord.ArrayCount > 1u;
+		compiledBinding.Bindless.ReservedDescriptorCount = compiledBinding.Bindless.bBindlessEligible ? compiledBinding.DescriptorCount : 0u;
 		bindings.push_back(compiledBinding);
 
 		if (compiledBinding.Type == CompiledBindingType::PushConstants)
@@ -225,7 +225,7 @@ static void CompileParameterBindings(
 		{
 			continue;
 		}
-		if (compiledBinding.Bindless.BindlessEligible && !rhi.GetFeatureStatus().EnabledPartiallyBoundDescriptorArrays)
+		if (compiledBinding.Bindless.bBindlessEligible && !rhi.GetFeatureStatus().bEnabledPartiallyBoundDescriptorArrays)
 		{
 			Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, std::format("Vulkan shader descriptor array '{}' cannot be partially bound on this device.", bindingName));
 		}
@@ -239,7 +239,7 @@ static void CompileParameterBindings(
 		        .descriptorCount = std::max(1u, bindingRecord.ArrayCount),
 		        .stageFlags = VulkanTypeConversions::ToVkShaderStages(compiledBinding.VisibilityMask),
 		        .pImmutableSamplers = nullptr},
-		    compiledBinding.Bindless.BindlessEligible ? VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT : 0u);
+		    compiledBinding.Bindless.bBindlessEligible ? VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT : 0u);
 	}
 }
 
@@ -286,7 +286,7 @@ static void CreateDescriptorSetLayouts(
 			}
 		}
 
-		const bool hasBindingFlags = std::any_of(nativeBindingFlags.begin(), nativeBindingFlags.end(), [](VkDescriptorBindingFlags flags) noexcept { return flags != 0; });
+		const bool bHasBindingFlags = std::any_of(nativeBindingFlags.begin(), nativeBindingFlags.end(), [](VkDescriptorBindingFlags flags) noexcept { return flags != 0; });
 
 		const VkDescriptorSetLayoutBindingFlagsCreateInfo bindingFlagsCreateInfo{
 		    .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
@@ -296,7 +296,7 @@ static void CreateDescriptorSetLayouts(
 
 		const VkDescriptorSetLayoutCreateInfo createInfo{
 		    .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-		    .pNext = hasBindingFlags ? static_cast<const void*>(&bindingFlagsCreateInfo) : nullptr,
+		    .pNext = bHasBindingFlags ? static_cast<const void*>(&bindingFlagsCreateInfo) : nullptr,
 		    .flags = 0,
 		    .bindingCount = static_cast<std::uint32_t>(nativeBindings.size()),
 		    .pBindings = nativeBindings.data()};

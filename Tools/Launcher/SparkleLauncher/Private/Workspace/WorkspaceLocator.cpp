@@ -16,16 +16,16 @@ namespace SparkleLauncher
 
 		std::error_code errorCode;
 		const std::filesystem::path enginePath = path / "Engine";
-		const bool hasWorkspaceMarker = std::filesystem::exists(path / std::string(Filesystem::kWorkspaceMarker), errorCode);
+		const bool bHasWorkspaceMarker = std::filesystem::exists(path / std::string(Filesystem::kWorkspaceMarker), errorCode);
 		errorCode.clear();
-		const bool hasEngineMarker = std::filesystem::exists(enginePath / std::string(Filesystem::kEngineMarker), errorCode);
+		const bool bHasEngineMarker = std::filesystem::exists(enginePath / std::string(Filesystem::kEngineMarker), errorCode);
 		errorCode.clear();
-		const bool hasEngineDirectory = std::filesystem::is_directory(enginePath, errorCode);
+		const bool bHasEngineDirectory = std::filesystem::is_directory(enginePath, errorCode);
 		errorCode.clear();
-		const bool hasConfigDirectory = std::filesystem::is_directory(path / "Config", errorCode);
+		const bool bHasConfigDirectory = std::filesystem::is_directory(path / "Config", errorCode);
 		errorCode.clear();
-		const bool hasProjectsDirectory = std::filesystem::is_directory(path / "Projects", errorCode);
-		return hasWorkspaceMarker && hasEngineMarker && hasEngineDirectory && hasConfigDirectory && hasProjectsDirectory;
+		const bool bHasProjectsDirectory = std::filesystem::is_directory(path / "Projects", errorCode);
+		return bHasWorkspaceMarker && bHasEngineMarker && bHasEngineDirectory && bHasConfigDirectory && bHasProjectsDirectory;
 	}
 
 	std::optional<std::filesystem::path> TryResolveWorkspaceRoot(const std::filesystem::path& rootPath, std::string& outErrorMessage)

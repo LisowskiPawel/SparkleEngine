@@ -39,8 +39,8 @@ namespace SceneMaterialVariantInspector
 			for (std::size_t variantIndex = 0; variantIndex < variantCount; ++variantIndex)
 			{
 				const std::string& variantName = variants.Names[variantIndex];
-				const bool selected = variantIndex == activeVariantIndex;
-				if (ImGui::Selectable(variantName.c_str(), selected))
+				const bool bSelected = variantIndex == activeVariantIndex;
+				if (ImGui::Selectable(variantName.c_str(), bSelected))
 				{
 					const MaterialVariantIndex selected = static_cast<MaterialVariantIndex>(variantIndex);
 					if (activeVariantIndex != kInvalidMaterialVariantIndex)
@@ -53,7 +53,7 @@ namespace SceneMaterialVariantInspector
 					}
 				}
 
-				if (selected)
+				if (bSelected)
 				{
 					ImGui::SetItemDefaultFocus();
 				}

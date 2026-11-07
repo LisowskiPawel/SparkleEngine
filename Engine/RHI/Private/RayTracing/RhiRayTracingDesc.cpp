@@ -5,9 +5,9 @@
 void PopulateStandardRayTracingCapabilityGroups(RhiRayTracingCapabilities& capabilities) noexcept
 {
 	capabilities.Groups.Tlas = RhiTlasCapabilities{
-	    .SupportsTlasBuild = capabilities.SupportsAccelerationStructure,
-	    .SupportsTlasUpdate = capabilities.SupportsAccelerationStructure,
-	    .SupportsGpuReadableInstanceBuffer = capabilities.SupportsAccelerationStructure,
+	    .bSupportsTlasBuild = capabilities.bSupportsAccelerationStructure,
+	    .bSupportsTlasUpdate = capabilities.bSupportsAccelerationStructure,
+	    .bSupportsGpuReadableInstanceBuffer = capabilities.bSupportsAccelerationStructure,
 	    .InstanceDescSizeInBytes = capabilities.InstanceDescSizeInBytes};
 }
 

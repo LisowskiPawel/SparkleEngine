@@ -28,21 +28,21 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::DisplayOperationFinished(const QString& runId, const QString& operationId, const QString& title, const LauncherOperationResult& result)
 	{
-		const bool succeeded = result.Succeeded;
+		const bool bSucceeded = result.bSucceeded;
 		if (result.GpuCrash)
 		{
 			m_gpuCrashPanel->SetIncident(*result.GpuCrash);
 		}
-		if (succeeded && !result.ShaderExportPath.isEmpty())
+		if (bSucceeded && !result.ShaderExportPath.isEmpty())
 		{
 			m_settings.SetShaderExportPath(result.ShaderExportPath);
 		}
 		const QString effectiveTitle = m_activityPanel->DisplayOperationFinished(runId, title, result);
 		m_workflowPanel->setEnabled(!m_activityPanel->HasActiveRun());
 
-		const bool sceneStatusHandled = m_sceneCatalog->CompleteOperation(runId, operationId, effectiveTitle, result);
-		const bool setupStatusHandled = m_workspaceSetup->CompleteOperation(runId);
-		if (sceneStatusHandled || setupStatusHandled)
+		const bool bSceneStatusHandled = m_sceneCatalog->CompleteOperation(runId, operationId, effectiveTitle, result);
+		const bool bSetupStatusHandled = m_workspaceSetup->CompleteOperation(runId);
+		if (bSceneStatusHandled || bSetupStatusHandled)
 		{
 			UpdateRunAvailability();
 		}
@@ -51,8 +51,8 @@ namespace SparkleLauncher
 			ScheduleUiRefresh(true);
 		}
 
-		const bool launcherRestartPending = m_pendingRestartRunIds.removeAll(runId) > 0;
-		if (succeeded && launcherRestartPending)
+		const bool bLauncherRestartPending = m_pendingRestartRunIds.removeAll(runId) > 0;
+		if (bSucceeded && bLauncherRestartPending)
 		{
 			PromptForLauncherRestart();
 		}

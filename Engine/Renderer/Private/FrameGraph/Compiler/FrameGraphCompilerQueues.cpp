@@ -10,23 +10,23 @@ void FrameGraphCompiler::AssignPassQueues() noexcept
 	for (FrameGraphPassNode& passRecord : m_plan.passes)
 	{
 		passRecord.queue = ERhiQueueType::Graphics;
-		if (!passRecord.alive || WritesBackBuffer(passRecord))
+		if (!passRecord.bAlive || WritesBackBuffer(passRecord))
 		{
 			continue;
 		}
 
-		const bool independentComputeRequested = passRecord.queuePreference == EFrameGraphQueuePreference::AsyncCompute && m_queueCapabilities.SupportsIndependent(ERhiQueueType::Compute);
+		const bool bIndependentComputeRequested = passRecord.queuePreference == EFrameGraphQueuePreference::AsyncCompute && m_queueCapabilities.SupportsIndependent(ERhiQueueType::Compute);
 		
-		if (independentComputeRequested)
+		if (bIndependentComputeRequested)
 		{
 			assert(passRecord.kind == EFrameGraphPassKind::Compute);
 			passRecord.queue = ERhiQueueType::Compute;
 		}
 		else
 		{
-			const bool independentCopyRequested = passRecord.queuePreference == EFrameGraphQueuePreference::Copy && m_queueCapabilities.SupportsIndependent(ERhiQueueType::Copy);
+			const bool bIndependentCopyRequested = passRecord.queuePreference == EFrameGraphQueuePreference::Copy && m_queueCapabilities.SupportsIndependent(ERhiQueueType::Copy);
 
-			if (independentCopyRequested)
+			if (bIndependentCopyRequested)
 		{
 			assert(passRecord.kind == EFrameGraphPassKind::Transfer);
 			passRecord.queue = ERhiQueueType::Copy;
@@ -41,9 +41,9 @@ void FrameGraphCompiler::AddSynchronizationDependency(FrameGraphPassNode& passRe
 	{
 		return;
 	}
-	const bool synchronizationDependencyMissing = std::find(passRecord.synchronizationDependencies.begin(), passRecord.synchronizationDependencies.end(), dependency) == passRecord.synchronizationDependencies.end();
+	const bool bSynchronizationDependencyMissing = std::find(passRecord.synchronizationDependencies.begin(), passRecord.synchronizationDependencies.end(), dependency) == passRecord.synchronizationDependencies.end();
 	
-	if (synchronizationDependencyMissing)
+	if (bSynchronizationDependencyMissing)
 	{
 		passRecord.synchronizationDependencies.push_back(dependency);
 	}
@@ -78,23 +78,23 @@ void FrameGraphCompiler::BuildSubmissionBatches() noexcept
 			}
 		}
 
-		bool startNewBatch = m_plan.submissionBatches.empty() || m_plan.submissionBatches.back().queue != passRecord.queue;
-		if (!startNewBatch)
+		bool bStartNewBatch = m_plan.submissionBatches.empty() || m_plan.submissionBatches.back().queue != passRecord.queue;
+		if (!bStartNewBatch)
 		{
 			const FrameGraphSubmissionBatch& currentBatch = m_plan.submissionBatches.back();
 			for (const FrameGraphSubmissionBatchIndex dependencyBatch : crossQueueDependencies)
 			{
-				const bool waitBatchMissing = std::find(currentBatch.waitForBatches.begin(), currentBatch.waitForBatches.end(), dependencyBatch) == currentBatch.waitForBatches.end();
+				const bool bWaitBatchMissing = std::find(currentBatch.waitForBatches.begin(), currentBatch.waitForBatches.end(), dependencyBatch) == currentBatch.waitForBatches.end();
 				
-				if (waitBatchMissing)
+				if (bWaitBatchMissing)
 				{
-					startNewBatch = true;
+					bStartNewBatch = true;
 					break;
 				}
 			}
 		}
 
-		if (startNewBatch)
+		if (bStartNewBatch)
 		{
 			const auto batchIndex = static_cast<FrameGraphSubmissionBatchIndex>(m_plan.submissionBatches.size());
 			m_plan.submissionBatches.push_back(FrameGraphSubmissionBatch{.index = batchIndex, .queue = passRecord.queue, .passes = {}, .waitForBatches = std::move(crossQueueDependencies)});

@@ -171,7 +171,8 @@ public static class CodeStyleIfConditions
             {
                 ++next;
             }
-            if (name == "operator" || (next < masked.Length && masked[next] == '('))
+            bool qualifiedFunction = next + 1 < masked.Length && masked[next] == ':' && masked[next + 1] == ':';
+            if (name == "operator" || qualifiedFunction || (next < masked.Length && (masked[next] == '(' || masked[next] == '<')))
             {
                 continue;
             }

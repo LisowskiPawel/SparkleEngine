@@ -15,9 +15,9 @@ struct ShaderCookSettings final
 	std::vector<std::string> changedVirtualPaths;
 	std::filesystem::path debugArtifactDirectory;
 	std::vector<std::string> analysisPasses;
-	bool enableDebugInfo = false;
-	bool enableOptimizations = true;
-	bool treatWarningsAsErrors = true;
-	bool stripDebugInfo = true;
+	bool bEnableDebugInfo = false;
+	bool bEnableOptimizations = true;
+	bool bTreatWarningsAsErrors = true;
+	bool bStripDebugInfo = true;
 	std::uint32_t maximumParallelCompiles = 4;
 };

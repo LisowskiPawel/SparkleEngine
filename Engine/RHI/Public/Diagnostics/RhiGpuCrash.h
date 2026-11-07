@@ -43,7 +43,7 @@ public:
 	virtual void MarkIncomplete() noexcept = 0;
 	virtual void MarkReady() noexcept = 0;
 	virtual void BeginCollection(std::int64_t nativeFailure) noexcept = 0;
-	virtual void Finalize(bool sdkFinished, bool timedOut, std::int64_t nativeFailure) noexcept = 0;
+	virtual void Finalize(bool bSdkFinished, bool bTimedOut, std::int64_t nativeFailure) noexcept = 0;
 	virtual bool IsSettled() const noexcept = 0;
 };
 

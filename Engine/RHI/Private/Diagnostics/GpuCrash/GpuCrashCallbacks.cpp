@@ -29,10 +29,10 @@ void GFSDK_AFTERMATH_CALL GpuCrashSession::DebugCallback(const void* data, std::
 	try
 	{
 		GFSDK_Aftermath_ShaderDebugInfoIdentifier id{};
-		const bool debugPayloadAvailable = data != nullptr && size != 0;
-		const bool debugIdentifierRead = debugPayloadAvailable && session.m_debugIdentifier(GFSDK_Aftermath_Version_API, data, size, &id) == GFSDK_Aftermath_Result_Success;
+		const bool bDebugPayloadAvailable = data != nullptr && size != 0;
+		const bool bDebugIdentifierRead = bDebugPayloadAvailable && session.m_debugIdentifier(GFSDK_Aftermath_Version_API, data, size, &id) == GFSDK_Aftermath_Result_Success;
 		
-		if (!debugIdentifierRead)
+		if (!bDebugIdentifierRead)
 		{
 			session.Incomplete();
 			return;

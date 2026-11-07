@@ -24,7 +24,7 @@ namespace EditorWidgets
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, SparkleUiPalette::ButtonBackgroundHovered());
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, SparkleUiPalette::ButtonBackgroundActive());
 		ImGui::PushStyleColor(ImGuiCol_Text, SparkleUiPalette::TextMuted());
-		const bool pressed = ImGui::Button(EditorIcons::GetEditorIconGlyph(icon), ImVec2(EditorIconSize, EditorIconSize));
+		const bool bPressed = ImGui::Button(EditorIcons::GetEditorIconGlyph(icon), ImVec2(EditorIconSize, EditorIconSize));
 		if (tooltip != nullptr && tooltip[0] != '\0' && ImGui::IsItemHovered())
 		{
 			ImGui::SetTooltip("%s", tooltip);
@@ -32,20 +32,20 @@ namespace EditorWidgets
 		ImGui::PopStyleColor(4);
 		ImGui::PopStyleVar();
 		ImGui::PopID();
-		return pressed;
+		return bPressed;
 	}
 
-	bool DrawCenteredVisibilityIconButton(const char* id, bool visible) noexcept
+	bool DrawCenteredVisibilityIconButton(const char* id, bool bVisible) noexcept
 	{
 		const float availableWidth = ImGui::GetContentRegionAvail().x;
 		const float horizontalOffset = (std::max) (0.0f, (availableWidth - EditorIconSize) * 0.5f);
 		const float verticalOffset = (std::max) (0.0f, (ImGui::GetFrameHeight() - EditorIconSize) * 0.5f);
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + horizontalOffset);
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + verticalOffset);
-		return DrawVisibilityIconButton(id, visible);
+		return DrawVisibilityIconButton(id, bVisible);
 	}
 
-	void DrawEditorIcon(EditorIcons::EditorIcon icon, const char* tooltip, bool drawBadgeBackground)
+	void DrawEditorIcon(EditorIcons::EditorIcon icon, const char* tooltip, bool bDrawBadgeBackground)
 	{
 		const char* text = EditorIcons::GetEditorIconGlyph(icon);
 		const ImVec2 size(EditorIconSize, EditorIconSize);
@@ -54,7 +54,7 @@ namespace EditorWidgets
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 		const ImVec2 end(start.x + size.x, start.y + size.y);
-		if (drawBadgeBackground)
+		if (bDrawBadgeBackground)
 		{
 			drawList->AddRectFilled(start, end, SparkleUiPalette::SceneOutlinerBadgeBackground(), 3.0f);
 			drawList->AddRect(start, end, SparkleUiPalette::PanelHeaderBorder(), 3.0f, 0, 1.0f);
@@ -73,32 +73,32 @@ namespace EditorWidgets
 		}
 	}
 
-	bool DrawVisibilityIconButton(const char* id, bool visible)
+	bool DrawVisibilityIconButton(const char* id, bool bVisible)
 	{
 		ImGui::PushID(id);
 		const ImVec2 start = ImGui::GetCursorScreenPos();
 		const ImVec2 size(EditorIconSize, EditorIconSize);
-		const bool pressed = ImGui::InvisibleButton("##visibility", size);
-		const bool hovered = ImGui::IsItemHovered();
-		const bool active = ImGui::IsItemActive();
+		const bool bPressed = ImGui::InvisibleButton("##visibility", size);
+		const bool bHovered = ImGui::IsItemHovered();
+		const bool bActive = ImGui::IsItemActive();
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 		const ImVec2 end(start.x + size.x, start.y + size.y);
-		if (hovered || active)
+		if (bHovered || bActive)
 		{
 			drawList->AddRectFilled(start, end, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::ButtonBackgroundHovered()), 3.0f);
 		}
 
-		const ImVec4 iconColor = visible ? WithAlpha(SparkleUiPalette::TextMuted(), 0.58f) : SparkleUiPalette::AccentStrong();
+		const ImVec4 iconColor = bVisible ? WithAlpha(SparkleUiPalette::TextMuted(), 0.58f) : SparkleUiPalette::AccentStrong();
 		const ImU32 iconColorU32 = ImGui::ColorConvertFloat4ToU32(iconColor);
-		DrawCenteredGlyph(drawList, start, size, EditorIcons::GetEditorIconGlyph(visible ? EditorIcons::EditorIcon::EyeVisible : EditorIcons::EditorIcon::EyeHidden), iconColorU32);
+		DrawCenteredGlyph(drawList, start, size, EditorIcons::GetEditorIconGlyph(bVisible ? EditorIcons::EditorIcon::EyeVisible : EditorIcons::EditorIcon::EyeHidden), iconColorU32);
 
-		if (hovered)
+		if (bHovered)
 		{
-			ImGui::SetTooltip("%s", visible ? "Visible" : "Hidden");
+			ImGui::SetTooltip("%s", bVisible ? "Visible" : "Hidden");
 		}
 		ImGui::PopID();
-		return pressed;
+		return bPressed;
 	}
 
 }

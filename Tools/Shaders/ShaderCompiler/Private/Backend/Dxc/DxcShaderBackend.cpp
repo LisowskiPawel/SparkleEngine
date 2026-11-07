@@ -40,12 +40,12 @@ DxcShaderBackend::DxcShaderBackend()
 ShaderBackendCapabilities DxcShaderBackend::GetStaticCapabilities() noexcept
 {
 	ShaderBackendCapabilities capabilities;
-	capabilities.SupportsDxil = true;
-	capabilities.SupportsSpirV = true;
-	capabilities.SupportsDxilRayTracingLibrary = true;
-	capabilities.SupportsSpirVRayTracingLibrary = true;
-	capabilities.SupportsDxilInlineRayQuery = true;
-	capabilities.SupportsSpirVInlineRayQuery = true;
+	capabilities.bSupportsDxil = true;
+	capabilities.bSupportsSpirV = true;
+	capabilities.bSupportsDxilRayTracingLibrary = true;
+	capabilities.bSupportsSpirVRayTracingLibrary = true;
+	capabilities.bSupportsDxilInlineRayQuery = true;
+	capabilities.bSupportsSpirVInlineRayQuery = true;
 	return capabilities;
 }
 
@@ -87,12 +87,12 @@ std::uint64_t DxcShaderBackend::QueryBackendVersion(IDxcCompiler3& compiler)
 ShaderBackendCapabilities DxcShaderBackend::GetCapabilities() const
 {
 	ShaderBackendCapabilities capabilities = GetStaticCapabilities();
-	capabilities.SupportsDxil = capabilities.SupportsDxil && IsValid();
-	capabilities.SupportsSpirV = capabilities.SupportsSpirV && IsValid();
-	capabilities.SupportsDxilRayTracingLibrary = capabilities.SupportsDxilRayTracingLibrary && IsValid();
-	capabilities.SupportsSpirVRayTracingLibrary = capabilities.SupportsSpirVRayTracingLibrary && IsValid();
-	capabilities.SupportsDxilInlineRayQuery = capabilities.SupportsDxilInlineRayQuery && IsValid();
-	capabilities.SupportsSpirVInlineRayQuery = capabilities.SupportsSpirVInlineRayQuery && IsValid();
+	capabilities.bSupportsDxil = capabilities.bSupportsDxil && IsValid();
+	capabilities.bSupportsSpirV = capabilities.bSupportsSpirV && IsValid();
+	capabilities.bSupportsDxilRayTracingLibrary = capabilities.bSupportsDxilRayTracingLibrary && IsValid();
+	capabilities.bSupportsSpirVRayTracingLibrary = capabilities.bSupportsSpirVRayTracingLibrary && IsValid();
+	capabilities.bSupportsDxilInlineRayQuery = capabilities.bSupportsDxilInlineRayQuery && IsValid();
+	capabilities.bSupportsSpirVInlineRayQuery = capabilities.bSupportsSpirVInlineRayQuery && IsValid();
 	return capabilities;
 }
 
@@ -146,7 +146,7 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 	                                                            : ExtractDxilReflection(*m_utils.Get(), result.Get(), request.Stage);
 
 	ShaderDebugArtifactSet debugArtifacts;
-	if (request.CaptureDebugArtifacts)
+	if (request.bCaptureDebugArtifacts)
 	{
 		debugArtifacts = CaptureDebugArtifacts(request, *result.Get(), sourceBuffer, bytecode, args, compilerOutput);
 	}
@@ -160,7 +160,7 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 Microsoft::WRL::ComPtr<IDxcResult> DxcShaderBackend::CompileSource(const ShaderCompileRequest& request, const DxcBuffer& sourceBuffer, std::span<LPCWSTR> args, std::string& compilerOutput)
 {
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
-	if (!request.CaptureDebugArtifacts)
+	if (!request.bCaptureDebugArtifacts)
 	{
 		m_utils->CreateDefaultIncludeHandler(includeHandler.ReleaseAndGetAddressOf());
 	}
@@ -281,9 +281,9 @@ std::string DxcShaderBackend::ExtractDisassembly(IDxcUtils& utils, IDxcCompiler3
 
 	Microsoft::WRL::ComPtr<IDxcResult> disassemblyResult;
 	const HRESULT disassemblyStatus = compiler.Disassemble(&objectBuffer, IID_PPV_ARGS(disassemblyResult.ReleaseAndGetAddressOf()));
-	const bool disassemblyAvailable = SUCCEEDED(disassemblyStatus) && disassemblyResult;
+	const bool bDisassemblyAvailable = SUCCEEDED(disassemblyStatus) && disassemblyResult;
 	
-	if (!disassemblyAvailable)
+	if (!bDisassemblyAvailable)
 	{
 		return {};
 	}

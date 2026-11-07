@@ -15,11 +15,11 @@ RendererMemoryMonitor::RendererMemoryMonitor(RenderDiagnostics& diagnostics, std
 void RendererMemoryMonitor::Tick(std::uint64_t frameIndex)
 {
 	const bool bMemoryNotDuediagnostics = m_diagnostics == nullptr;
-	const bool bMemoryNotDuehasPolled = !bMemoryNotDuediagnostics && (m_hasPolled);
+	const bool bMemoryNotDuehasPolled = !bMemoryNotDuediagnostics && (m_bHasPolled);
 	const bool bMemoryNotDueIntervalFrames = bMemoryNotDuehasPolled && (!HasReachedPollInterval(frameIndex, m_latestSnapshot.LastPollFrame, m_latestSnapshot.PollIntervalFrames));
-	const bool memoryPollNotDue = bMemoryNotDuediagnostics || bMemoryNotDueIntervalFrames;
+	const bool bMemoryPollNotDue = bMemoryNotDuediagnostics || bMemoryNotDueIntervalFrames;
 	
-	if (memoryPollNotDue)
+	if (bMemoryPollNotDue)
 	{
 		return;
 	}
@@ -27,14 +27,14 @@ void RendererMemoryMonitor::Tick(std::uint64_t frameIndex)
 	RenderMemoryDiagnostics* memoryDiagnostics = m_diagnostics->GetMemoryDiagnostics();
 	if (memoryDiagnostics == nullptr || !memoryDiagnostics->SupportsBudgetQueries())
 	{
-		m_latestSnapshot.Available = false;
+		m_latestSnapshot.bAvailable = false;
 		m_latestSnapshot.LastPollFrame = frameIndex;
-		m_hasPolled = true;
+		m_bHasPolled = true;
 		return;
 	}
 
 	RendererMemoryDiagnosticsSnapshot snapshot;
-	snapshot.Available = true;
+	snapshot.bAvailable = true;
 	snapshot.LastPollFrame = frameIndex;
 	snapshot.PollIntervalFrames = m_latestSnapshot.PollIntervalFrames;
 	snapshot.MemoryUsage = memoryDiagnostics->GetLatestMemorySnapshot();
@@ -61,7 +61,7 @@ void RendererMemoryMonitor::Tick(std::uint64_t frameIndex)
 	snapshot.TextureStreamingPolicy = BuildTextureStreamingPolicy(overallPressure, snapshot.CategoryPressure);
 	snapshot.SceneReport = BuildSceneMemoryReport(snapshot.MemoryUsage);
 	m_latestSnapshot = std::move(snapshot);
-	m_hasPolled = true;
+	m_bHasPolled = true;
 }
 
 RendererMemoryPressureLevel RendererMemoryMonitor::ClassifyPressure(float usageRatio) noexcept
@@ -108,9 +108,9 @@ TextureStreamingMemoryPolicySnapshot RendererMemoryMonitor::BuildTextureStreamin
 	return TextureStreamingMemoryPolicySnapshot{
 	    .OverallPressure = overallPressure,
 	    .TexturePressure = texturePressure,
-	    .ShouldConserveTextureMemory = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Watch) || IsAtLeast(overallPressure, RendererMemoryPressureLevel::Pressure),
-	    .ShouldPreferMipDemotion = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Pressure) || IsAtLeast(overallPressure, RendererMemoryPressureLevel::Critical),
-	    .ShouldBlockMipPromotion = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Critical)};
+	    .bShouldConserveTextureMemory = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Watch) || IsAtLeast(overallPressure, RendererMemoryPressureLevel::Pressure),
+	    .bShouldPreferMipDemotion = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Pressure) || IsAtLeast(overallPressure, RendererMemoryPressureLevel::Critical),
+	    .bShouldBlockMipPromotion = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Critical)};
 }
 
 SceneMemoryReport RendererMemoryMonitor::BuildSceneMemoryReport(const RhiMemoryUsageSnapshot& memoryUsage)

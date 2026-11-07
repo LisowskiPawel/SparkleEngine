@@ -21,7 +21,7 @@ static std::uint64_t AppendLightState(std::uint64_t hash, const DirectionalLight
 	hash = Hash::ContinueFnv1a64Value(hash, light.illuminance);
 	hash = LightingStateHash::AppendFloat3(hash, light.color);
 	hash = Hash::ContinueFnv1a64Value(hash, light.angularSizeRadians);
-	return LightingStateHash::AppendBool(hash, light.castShadow);
+	return LightingStateHash::AppendBool(hash, light.bCastShadow);
 }
 
 static std::uint64_t AppendLightState(std::uint64_t hash, const PointLight& light) noexcept
@@ -32,7 +32,7 @@ static std::uint64_t AppendLightState(std::uint64_t hash, const PointLight& ligh
 	hash = Hash::ContinueFnv1a64Value(hash, light.luminousIntensity);
 	hash = Hash::ContinueFnv1a64Value(hash, light.radius);
 	hash = LightingStateHash::AppendFloat3(hash, light.distanceAttenuationCoefficients);
-	return LightingStateHash::AppendBool(hash, light.castShadow);
+	return LightingStateHash::AppendBool(hash, light.bCastShadow);
 }
 
 static std::uint64_t AppendLightState(std::uint64_t hash, const SpotLight& light) noexcept
@@ -46,7 +46,7 @@ static std::uint64_t AppendLightState(std::uint64_t hash, const SpotLight& light
 	hash = Hash::ContinueFnv1a64Value(hash, light.luminousIntensity);
 	hash = Hash::ContinueFnv1a64Value(hash, light.outerAngleCosine);
 	hash = LightingStateHash::AppendFloat3(hash, light.distanceAttenuationCoefficients);
-	return LightingStateHash::AppendBool(hash, light.castShadow);
+	return LightingStateHash::AppendBool(hash, light.bCastShadow);
 }
 
 static std::uint64_t AppendLightState(std::uint64_t hash, const RectLight& light) noexcept
@@ -58,7 +58,7 @@ static std::uint64_t AppendLightState(std::uint64_t hash, const RectLight& light
 	hash = LightingStateHash::AppendFloat3(hash, light.tangent);
 	hash = Hash::ContinueFnv1a64Value(hash, light.luminance);
 	hash = LightingStateHash::AppendFloat3(hash, light.color);
-	return LightingStateHash::AppendBool(hash, light.castShadow);
+	return LightingStateHash::AppendBool(hash, light.bCastShadow);
 }
 
 template <typename TLight> static std::uint64_t AppendLightsState(std::uint64_t hash, const RenderLightCollection<TLight>& lights) noexcept
@@ -101,7 +101,7 @@ static std::uint64_t AppendMaterialState(std::uint64_t hash, const MaterialData&
 	hash = Hash::ContinueFnv1a64Value(hash, material.alphaMode);
 	hash = Hash::ContinueFnv1a64Value(hash, material.alphaCutoff);
 	hash = Hash::ContinueFnv1a64Value(hash, material.textureFlags);
-	hash = LightingStateHash::AppendBool(hash, material.doubleSided);
+	hash = LightingStateHash::AppendBool(hash, material.bDoubleSided);
 	for (const std::uint32_t textureIndex : material.materialTextureIndices)
 	{
 		hash = Hash::ContinueFnv1a64Value(hash, textureIndex);
@@ -120,7 +120,7 @@ static std::uint64_t AppendMaterialState(std::uint64_t hash, const MaterialData&
 
 static std::uint64_t AppendSkyState(std::uint64_t hash, const RenderSkyData& sky) noexcept
 {
-	hash = LightingStateHash::AppendBool(hash, sky.enabled);
+	hash = LightingStateHash::AppendBool(hash, sky.bEnabled);
 	hash = LightingStateHash::AppendFloat3(hash, sky.color);
 	hash = Hash::ContinueFnv1a64Value(hash, sky.brightness);
 	hash = LightingStateHash::AppendBool(hash, sky.HasTexture());

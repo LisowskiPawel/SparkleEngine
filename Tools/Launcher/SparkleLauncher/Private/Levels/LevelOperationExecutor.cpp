@@ -39,7 +39,7 @@ namespace SparkleLauncher
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
 
-		if (!plan.CanRun)
+		if (!plan.bCanRun)
 		{
 			SetOperationFailure(
 			    operation,
@@ -84,7 +84,7 @@ namespace SparkleLauncher
 			const Process::ChildProcessResult result = processRunner.Run(request);
 			if (!result.Succeeded())
 			{
-				if (result.Cancelled)
+				if (result.bCancelled)
 				{
 					SetOperationFailure(operation, OperationProblemKind::Cancellation, step.DisplayName + " was canceled.", "Run Sync again when ready.");
 				}
@@ -96,7 +96,7 @@ namespace SparkleLauncher
 					    MakeLevelOperationFailureSummary(step, result),
 					    "Correct the first asset acquisition error in the named log, then retry Sync.");
 				}
-				MarkOperationFinished(operation, result.Cancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
+				MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 				return operation;
 			}
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, processSteps.size());

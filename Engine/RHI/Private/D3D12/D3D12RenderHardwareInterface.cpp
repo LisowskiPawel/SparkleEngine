@@ -55,9 +55,9 @@ D3D12RenderHardwareInterface::D3D12RenderHardwareInterface(
 
 D3D12RenderHardwareInterface::~D3D12RenderHardwareInterface() noexcept = default;
 
-D3D12RecordingResourceUseToken D3D12RenderHardwareInterface::BeginResourceTracking(RhiResourceHandle resource, bool coordinatorRecording) noexcept
+D3D12RecordingResourceUseToken D3D12RenderHardwareInterface::BeginResourceTracking(RhiResourceHandle resource, bool bCoordinatorRecording) noexcept
 {
-	return m_resourceService->BeginResourceTracking(resource, coordinatorRecording);
+	return m_resourceService->BeginResourceTracking(resource, bCoordinatorRecording);
 }
 
 void D3D12RenderHardwareInterface::EndResourceTracking(D3D12RecordingResourceUseToken use, RhiSubmissionToken submissionToken) noexcept

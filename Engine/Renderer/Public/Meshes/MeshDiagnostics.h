@@ -10,7 +10,7 @@ struct SPARKLE_RENDERER_API MeshDiagnosticsBounds final
 {
 	std::array<float, 3> Min = {0.0f, 0.0f, 0.0f};
 	std::array<float, 3> Max = {0.0f, 0.0f, 0.0f};
-	bool IsValid = false;
+	bool bIsValid = false;
 };
 
 struct SPARKLE_RENDERER_API MeshDiagnosticsRow final
@@ -30,11 +30,11 @@ struct SPARKLE_RENDERER_API MeshDiagnosticsRow final
 	std::uint32_t SkinnedInstanceCount = 0;
 	std::uint32_t FirstMaterialSlot = 0;
 	MeshDiagnosticsBounds Bounds;
-	bool CpuLoaded = false;
-	bool GpuResident = false;
-	bool HasMaterial = false;
-	bool HasSkinInfluences = false;
-	bool HasSkeletonBinding = false;
+	bool bCpuLoaded = false;
+	bool bGpuResident = false;
+	bool bHasMaterial = false;
+	bool bHasSkinInfluences = false;
+	bool bHasSkeletonBinding = false;
 };
 
 struct SPARKLE_RENDERER_API MeshGeometryInstancingDiagnostics final

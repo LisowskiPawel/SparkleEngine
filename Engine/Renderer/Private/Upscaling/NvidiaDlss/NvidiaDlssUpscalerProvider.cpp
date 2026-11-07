@@ -21,8 +21,8 @@ public:
 bool NvidiaDlssUpscalerProvider::Initialize(const RhiCapabilities& capabilities, RhiNativeDeviceQueueInterop nativeInterop)
 {
 #if SPARKLE_WITH_NVIDIA_STREAMLINE
-	m_initialized = IsStreamlineFeatureSupported(sl::kFeatureDLSS, capabilities, nativeInterop);
-	return m_initialized;
+	m_bInitialized = IsStreamlineFeatureSupported(sl::kFeatureDLSS, capabilities, nativeInterop);
+	return m_bInitialized;
 #else
 	(void) capabilities;
 	(void) nativeInterop;
@@ -34,7 +34,7 @@ RenderViewportExtent NvidiaDlssUpscalerProvider::ResolveRenderExtent(RenderViewp
 {
 	RenderViewportExtent providerRenderExtent = {};
 #if SPARKLE_WITH_NVIDIA_STREAMLINE
-	if (m_initialized)
+	if (m_bInitialized)
 	{
 		providerRenderExtent = QueryStreamlineDlssOptimalRenderExtent(outputExtent, m_frameState.GetRequestedQualityMode());
 	}
@@ -49,7 +49,7 @@ void NvidiaDlssUpscalerProvider::SetupFrame(const ImageProviderFrameInput& frame
 
 bool NvidiaDlssUpscalerProvider::Evaluate(const UpscalerEvaluationDesc& evaluation)
 {
-	if (!m_initialized || !m_frameState.IsValid())
+	if (!m_bInitialized || !m_frameState.IsValid())
 	{
 		return false;
 	}
@@ -65,11 +65,11 @@ bool NvidiaDlssUpscalerProvider::Evaluate(const UpscalerEvaluationDesc& evaluati
 void NvidiaDlssUpscalerProvider::Shutdown() noexcept
 {
 #if SPARKLE_WITH_NVIDIA_STREAMLINE
-	if (m_initialized)
+	if (m_bInitialized)
 	{
 		(void) slFreeResources(sl::kFeatureDLSS, sl::ViewportHandle{NvidiaDlssUpscalerProviderConstants::kDlssViewportId});
 	}
 #endif
-	m_initialized = false;
+	m_bInitialized = false;
 	m_frameState.Reset();
 }

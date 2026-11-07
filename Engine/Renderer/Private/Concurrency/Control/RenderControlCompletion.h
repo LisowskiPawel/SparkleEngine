@@ -41,5 +41,5 @@ private:
 	std::mutex m_mutex;
 	std::condition_variable m_completedCondition;
 	RenderControlResult m_result;
-	bool m_completed = false;
+	bool m_bCompleted = false;
 };

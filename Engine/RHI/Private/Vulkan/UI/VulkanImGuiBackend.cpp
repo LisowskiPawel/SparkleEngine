@@ -27,7 +27,7 @@ void VulkanImGuiBackend::Initialize()
 		return;
 	}
 
-	ImGuiContext* previousContext = AcquireImGuiContext(m_imguiContext, m_ownsContext);
+	ImGuiContext* previousContext = AcquireImGuiContext(m_imguiContext, m_bOwnsContext);
 
 	InitializeRendererBackend(previousContext);
 	CreateTextureSampler(previousContext);
@@ -213,5 +213,5 @@ void VulkanImGuiBackend::Shutdown() noexcept
 
 	ImGui_ImplVulkan_Shutdown();
 	RestoreImGuiContext(previousContext);
-	ReleaseImGuiContext(m_imguiContext, m_ownsContext);
+	ReleaseImGuiContext(m_imguiContext, m_bOwnsContext);
 }

@@ -72,7 +72,7 @@ void FrameGraphRecordingChunkRecorder::RecordPass(FrameGraphPassIndex passIndex,
 
 	PassCommandContext passContext{commands, passDiagnostics, FrameGraphResourceCommands{m_frameGraph}};
 	const FrameGraph::RegisteredPass& registeredPass = m_frameGraph.m_passes[passIndex];
-	if (registeredPass.active)
+	if (registeredPass.bActive)
 	{
 		registeredPass.executeCallback(passContext);
 	}

@@ -3,14 +3,14 @@
 
 #include <imgui.h>
 
-ImGuiContext* AcquireImGuiContext(ImGuiContext*& context, bool& ownsContext)
+ImGuiContext* AcquireImGuiContext(ImGuiContext*& context, bool& bOwnsContext)
 {
 	ImGuiContext* previousContext = ImGui::GetCurrentContext();
 	context = previousContext;
 	if (context == nullptr)
 	{
 		context = ImGui::CreateContext();
-		ownsContext = true;
+		bOwnsContext = true;
 	}
 	ImGui::SetCurrentContext(context);
 	return previousContext;
@@ -28,12 +28,12 @@ void RestoreImGuiContext(ImGuiContext* context) noexcept
 	ImGui::SetCurrentContext(context);
 }
 
-void ReleaseImGuiContext(ImGuiContext*& context, bool& ownsContext) noexcept
+void ReleaseImGuiContext(ImGuiContext*& context, bool& bOwnsContext) noexcept
 {
-	if (ownsContext)
+	if (bOwnsContext)
 	{
 		ImGui::DestroyContext(context);
 	}
 	context = nullptr;
-	ownsContext = false;
+	bOwnsContext = false;
 }

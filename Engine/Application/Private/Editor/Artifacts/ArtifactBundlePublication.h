@@ -31,7 +31,7 @@ struct ArtifactBundlePublishedFile final
 
 struct ArtifactBundlePublicationResult final
 {
-	bool Succeeded = false;
+	bool bSucceeded = false;
 	std::filesystem::path PublicationDirectory;
 	std::vector<ArtifactBundlePublishedFile> Files;
 	std::string ErrorMessage;

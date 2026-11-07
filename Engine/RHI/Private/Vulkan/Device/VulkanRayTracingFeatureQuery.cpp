@@ -11,12 +11,12 @@ VulkanRayTracingFeatureStatus VulkanRayTracingFeatureQuery::Query(VkPhysicalDevi
 		return status;
 	}
 
-	status.SupportsAccelerationStructureExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-	status.SupportsRayTracingPipelineExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
-	status.SupportsRayQueryExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_RAY_QUERY_EXTENSION_NAME);
-	status.SupportsDeferredHostOperationsExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
-	status.SupportsBufferDeviceAddressExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
-	status.SupportsPtlasExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_NV_PARTITIONED_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+	status.bSupportsAccelerationStructureExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+	status.bSupportsRayTracingPipelineExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+	status.bSupportsRayQueryExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_RAY_QUERY_EXTENSION_NAME);
+	status.bSupportsDeferredHostOperationsExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+	status.bSupportsBufferDeviceAddressExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
+	status.bSupportsPtlasExtension = VulkanDeviceExtensions::IsAvailable(physicalDevice, VK_NV_PARTITIONED_ACCELERATION_STRUCTURE_EXTENSION_NAME);
 
 	VkPhysicalDeviceFeatures2 features{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
 	VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES};
@@ -28,37 +28,37 @@ VulkanRayTracingFeatureStatus VulkanRayTracingFeatureQuery::Query(VkPhysicalDevi
 	void** next = &features.pNext;
 	*next = &bufferDeviceAddressFeatures;
 	next = &bufferDeviceAddressFeatures.pNext;
-	if (status.SupportsAccelerationStructureExtension)
+	if (status.bSupportsAccelerationStructureExtension)
 	{
 		*next = &accelerationStructureFeatures;
 		next = &accelerationStructureFeatures.pNext;
 	}
-	if (status.SupportsRayTracingPipelineExtension)
+	if (status.bSupportsRayTracingPipelineExtension)
 	{
 		*next = &rayTracingPipelineFeatures;
 		next = &rayTracingPipelineFeatures.pNext;
 	}
-	if (status.SupportsRayQueryExtension)
+	if (status.bSupportsRayQueryExtension)
 	{
 		*next = &rayQueryFeatures;
 		next = &rayQueryFeatures.pNext;
 	}
-	if (status.SupportsPtlasExtension)
+	if (status.bSupportsPtlasExtension)
 	{
 		*next = &ptlasFeatures;
 	}
 
 	vkGetPhysicalDeviceFeatures2(physicalDevice, &features);
-	status.SupportsBufferDeviceAddressFeature = bufferDeviceAddressFeatures.bufferDeviceAddress == VK_TRUE;
-	status.SupportsAccelerationStructureFeature = accelerationStructureFeatures.accelerationStructure == VK_TRUE;
-	status.SupportsRayTracingPipelineFeature = rayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE;
-	status.SupportsRayQueryFeature = rayQueryFeatures.rayQuery == VK_TRUE;
-	status.SupportsPtlasFeature = ptlasFeatures.partitionedAccelerationStructure == VK_TRUE;
+	status.bSupportsBufferDeviceAddressFeature = bufferDeviceAddressFeatures.bufferDeviceAddress == VK_TRUE;
+	status.bSupportsAccelerationStructureFeature = accelerationStructureFeatures.accelerationStructure == VK_TRUE;
+	status.bSupportsRayTracingPipelineFeature = rayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE;
+	status.bSupportsRayQueryFeature = rayQueryFeatures.rayQuery == VK_TRUE;
+	status.bSupportsPtlasFeature = ptlasFeatures.partitionedAccelerationStructure == VK_TRUE;
 
-	status.EnabledAccelerationStructure = status.SupportsAccelerationStructureExtension && status.SupportsDeferredHostOperationsExtension && status.SupportsBufferDeviceAddressFeature
-	    && status.SupportsAccelerationStructureFeature;
+	status.bEnabledAccelerationStructure = status.bSupportsAccelerationStructureExtension && status.bSupportsDeferredHostOperationsExtension && status.bSupportsBufferDeviceAddressFeature
+	    && status.bSupportsAccelerationStructureFeature;
 
-	status.EnabledInlineRayQuery = status.EnabledAccelerationStructure && status.SupportsRayQueryExtension && status.SupportsRayQueryFeature;
-	status.EnabledRayTracingPipeline = status.EnabledAccelerationStructure && status.SupportsRayTracingPipelineExtension && status.SupportsRayTracingPipelineFeature;
+	status.bEnabledInlineRayQuery = status.bEnabledAccelerationStructure && status.bSupportsRayQueryExtension && status.bSupportsRayQueryFeature;
+	status.bEnabledRayTracingPipeline = status.bEnabledAccelerationStructure && status.bSupportsRayTracingPipelineExtension && status.bSupportsRayTracingPipelineFeature;
 	return status;
 }

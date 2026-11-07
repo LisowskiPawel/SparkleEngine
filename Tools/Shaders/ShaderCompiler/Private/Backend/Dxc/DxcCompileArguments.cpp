@@ -61,7 +61,7 @@ static void AppendArtifactOptions(const ShaderCompileRequest& request, std::vect
 		outArgs.push_back(L"0");
 	}
 
-	if (request.TreatWarningsAsErrors)
+	if (request.bTreatWarningsAsErrors)
 	{
 		outArgs.push_back(DXC_ARG_WARNINGS_ARE_ERRORS);
 	}
@@ -71,19 +71,19 @@ static void AppendArtifactOptions(const ShaderCompileRequest& request, std::vect
 	if (!IsSpirVTarget(request.Target))
 	{
 		outArgs.push_back(L"-Qstrip_reflect");
-		if (request.StripDebugInfo)
+		if (request.bStripDebugInfo)
 		{
 			outArgs.push_back(L"-Qstrip_debug");
 		}
 	}
 
-	if (request.EnableDebugInfo)
+	if (request.bEnableDebugInfo)
 	{
 		outArgs.push_back(DXC_ARG_DEBUG);
 		outArgs.push_back(IsSpirVTarget(request.Target) ? L"-fspv-debug=vulkan-with-source" : L"-Qsource_in_debug_module");
 	}
 
-	if (request.EnableOptimizations)
+	if (request.bEnableOptimizations)
 	{
 		outArgs.push_back(DXC_ARG_OPTIMIZATION_LEVEL3);
 	}
@@ -100,11 +100,11 @@ static void AppendSpirVOptions(const ShaderCompileRequest& request, std::vector<
 	if (IsSpirVTarget(request.Target))
 	{
 		outArgs.push_back(L"-spirv");
-		if constexpr (SpirVUseDirectXBufferLayout)
+		if constexpr (bSpirVUseDirectXBufferLayout)
 		{
 			outArgs.push_back(L"-fvk-use-dx-layout");
 		}
-		if constexpr (SpirVUseUnknownStorageImageFormat)
+		if constexpr (bSpirVUseUnknownStorageImageFormat)
 		{
 			outArgs.push_back(L"-fspv-use-unknown-image-format");
 		}
@@ -126,10 +126,10 @@ static void AppendSpirVOptions(const ShaderCompileRequest& request, std::vector<
 		{
 			outArgs.push_back(L"-fspv-extension=SPV_KHR_ray_query");
 		}
-		const bool requiresRayTracingExtension = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::AccelerationStructure)
+		const bool bRequiresRayTracingExtension = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::AccelerationStructure)
 				    || HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::RayTracingPipeline);
 		
-		if (requiresRayTracingExtension)
+		if (bRequiresRayTracingExtension)
 		{
 			outArgs.push_back(L"-fspv-extension=SPV_KHR_ray_tracing");
 		}

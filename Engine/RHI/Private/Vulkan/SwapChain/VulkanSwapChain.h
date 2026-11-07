@@ -70,7 +70,7 @@ private:
 	void ReleaseSwapChain() noexcept;
 	bool HasValidWindowSize() const noexcept;
 	VkSurfaceFormatKHR SelectSurfaceFormat() const;
-	VkPresentModeKHR SelectPresentMode(bool vsyncEnabled) const;
+	VkPresentModeKHR SelectPresentMode(bool bVsyncEnabled) const;
 	VkExtent2D SelectExtent(const VkSurfaceCapabilitiesKHR& capabilities) const noexcept;
 	std::uint32_t SelectImageCount(const VkSurfaceCapabilitiesKHR& capabilities) const noexcept;
 	VkImageView CreateImageView(VkImage image, VkFormat format) const;
@@ -81,7 +81,7 @@ private:
 	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
 	VkSurfaceFormatKHR m_surfaceFormat = {};
 	VkPresentModeKHR m_presentMode = VK_PRESENT_MODE_FIFO_KHR;
-	bool m_vsyncEnabled = true;
+	bool m_bVsyncEnabled = true;
 	VkExtent2D m_extent = {};
 	PixelFormat m_backBufferFormat = PixelFormat::Unknown;
 	std::uint32_t m_configuredBackBufferCount = 0;
@@ -89,5 +89,5 @@ private:
 	std::vector<BackBufferRecord> m_backBuffers;
 	std::vector<VkSemaphore> m_imageAvailableSemaphores;
 	std::uint32_t m_currentBackBufferIndex = 0;
-	bool m_resizeRequested = false;
+	bool m_bResizeRequested = false;
 };

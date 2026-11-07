@@ -76,48 +76,48 @@ void FrameGraph::PrepareTextureHistories(const FrameGraphPlan& plan)
 
 void FrameGraph::PrepareTextureHistory(const FrameGraphPlan& plan, TextureHistoryRecord& history, std::uint32_t historyResourceCount, RhiResourceService& resourceService)
 {
-	history.usedThisFrame = false;
-	history.writtenThisFrame = false;
-	bool requiresRenderTarget = false;
-	bool requiresDepthStencil = history.desc.kind == FrameGraphTextureKind::DepthStencil;
-	bool requiresUnorderedAccess = false;
+	history.bUsedThisFrame = false;
+	history.bWrittenThisFrame = false;
+	bool bRequiresRenderTarget = false;
+	bool bRequiresDepthStencil = history.desc.kind == FrameGraphTextureKind::DepthStencil;
+	bool bRequiresUnorderedAccess = false;
 	for (const FrameGraphPassNode& pass : plan.passes)
 	{
 		for (const PassResourceDeclaration& declaration : pass.declarations)
 		{
-			const bool usesPrevious = UsesHandle(declaration, history.handles.Previous);
-			const bool usesCurrent = UsesHandle(declaration, history.handles.Current);
-			if (!usesPrevious && !usesCurrent)
+			const bool bUsesPrevious = UsesHandle(declaration, history.handles.Previous);
+			const bool bUsesCurrent = UsesHandle(declaration, history.handles.Current);
+			if (!bUsesPrevious && !bUsesCurrent)
 			{
 				continue;
 			}
 
-			history.usedThisFrame = true;
-			history.writtenThisFrame = history.writtenThisFrame || (usesCurrent && WritesToUsage(declaration.usage));
-			requiresRenderTarget = requiresRenderTarget || declaration.usage == ResourceUsage::RenderTarget;
-			requiresDepthStencil = requiresDepthStencil || declaration.usage == ResourceUsage::DepthWrite;
-			requiresUnorderedAccess = requiresUnorderedAccess || declaration.usage == ResourceUsage::UnorderedAccess;
+			history.bUsedThisFrame = true;
+			history.bWrittenThisFrame = history.bWrittenThisFrame || (bUsesCurrent && WritesToUsage(declaration.usage));
+			bRequiresRenderTarget = bRequiresRenderTarget || declaration.usage == ResourceUsage::RenderTarget;
+			bRequiresDepthStencil = bRequiresDepthStencil || declaration.usage == ResourceUsage::DepthWrite;
+			bRequiresUnorderedAccess = bRequiresUnorderedAccess || declaration.usage == ResourceUsage::UnorderedAccess;
 		}
 	}
 
-	if (!history.usedThisFrame)
+	if (!history.bUsedThisFrame)
 	{
 		return;
 	}
 
-	const bool bRequiresRecreationRenderTarget = requiresRenderTarget && !history.allowRenderTarget;
-	const bool bRequiresRecreationDepthStencil = requiresDepthStencil && !history.allowDepthStencil;
+	const bool bRequiresRecreationRenderTarget = bRequiresRenderTarget && !history.bAllowRenderTarget;
+	const bool bRequiresRecreationDepthStencil = bRequiresDepthStencil && !history.bAllowDepthStencil;
 	const bool bRequiresRecreationDepthStencil2 = bRequiresRecreationRenderTarget || bRequiresRecreationDepthStencil;
-	const bool bRequiresRecreationUnorderedAccess = requiresUnorderedAccess && !history.allowUnorderedAccess;
-	const bool requiresRecreation = bRequiresRecreationDepthStencil2 || bRequiresRecreationUnorderedAccess;
+	const bool bRequiresRecreationUnorderedAccess = bRequiresUnorderedAccess && !history.bAllowUnorderedAccess;
+	const bool bRequiresRecreation = bRequiresRecreationDepthStencil2 || bRequiresRecreationUnorderedAccess;
 
-	if (requiresRecreation && history.resources.front())
+	if (bRequiresRecreation && history.resources.front())
 	{
 		ResetTextureHistoryResources(history, resourceService);
 	}
-	history.allowRenderTarget = history.allowRenderTarget || requiresRenderTarget;
-	history.allowDepthStencil = history.allowDepthStencil || requiresDepthStencil;
-	history.allowUnorderedAccess = history.allowUnorderedAccess || requiresUnorderedAccess;
+	history.bAllowRenderTarget = history.bAllowRenderTarget || bRequiresRenderTarget;
+	history.bAllowDepthStencil = history.bAllowDepthStencil || bRequiresDepthStencil;
+	history.bAllowUnorderedAccess = history.bAllowUnorderedAccess || bRequiresUnorderedAccess;
 
 	AllocateTextureHistoryResources(history, historyResourceCount, resourceService);
 	BindTextureHistory(history, historyResourceCount);
@@ -159,9 +159,9 @@ void FrameGraph::AllocateTextureHistoryResources(TextureHistoryRecord& history, 
 			        .Format = resolvedDesc.format,
 			        .MipLevels = 1u,
 			        .SampleCount = resolvedDesc.sampleCount,
-			        .AllowRenderTarget = history.allowRenderTarget,
-			        .AllowDepthStencil = history.allowDepthStencil,
-			        .AllowUnorderedAccess = history.allowUnorderedAccess},
+			        .bAllowRenderTarget = history.bAllowRenderTarget,
+			        .bAllowDepthStencil = history.bAllowDepthStencil,
+			        .bAllowUnorderedAccess = history.bAllowUnorderedAccess},
 			    ResourceState::Undefined,
 			    RhiMemoryCategory::Texture,
 			    RhiMemoryResidencyClass::DeviceLocal,
@@ -188,14 +188,14 @@ void FrameGraph::CommitTextureHistories() const noexcept
 {
 	for (TextureHistoryRecord& history : m_textureHistories)
 	{
-		if (!history.usedThisFrame)
+		if (!history.bUsedThisFrame)
 		{
 			continue;
 		}
 
 		history.states[history.previousIndex] = ResourceState::ShaderResource;
 		history.states[history.currentIndex] = ResourceState::ShaderResource;
-		if (history.writtenThisFrame)
+		if (history.bWrittenThisFrame)
 		{
 			history.generations[history.currentIndex] = history.generation;
 		}

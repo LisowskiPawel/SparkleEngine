@@ -105,7 +105,7 @@ D3D12RayTracingPipeline::D3D12RayTracingPipeline(D3D12Rhi& rhi, const RayTracing
     RayTracingPipeline(desc)
 {
 	const RhiRayTracingCapabilities capabilities = rhi.GetRayTracingCapabilities();
-	if (!capabilities.SupportsRayTracingPipeline || desc.MaxPayloadSizeInBytes > capabilities.MaxRayPayloadSizeInBytes || desc.MaxAttributeSizeInBytes > capabilities.MaxRayAttributeSizeInBytes
+	if (!capabilities.bSupportsRayTracingPipeline || desc.MaxPayloadSizeInBytes > capabilities.MaxRayPayloadSizeInBytes || desc.MaxAttributeSizeInBytes > capabilities.MaxRayAttributeSizeInBytes
 	    || desc.MaxRecursionDepth > capabilities.MaxTraceRecursionDepth)
 	{
 		throw Diagnostics::Error("D3D12 ray-tracing pipeline exceeds device readiness or limits.");

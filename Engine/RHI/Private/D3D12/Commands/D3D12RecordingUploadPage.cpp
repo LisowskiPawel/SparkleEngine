@@ -49,7 +49,7 @@ void D3D12RecordingUploadPage::AddPage(std::uint64_t capacityInBytes, const wcha
 		throw std::runtime_error("Failed to map a D3D12 command-recording upload page.");
 	}
 
-	page->Allocation->IsMapped = true;
+	page->Allocation->bIsMapped = true;
 	page->GpuBase = page->Allocation->Resource->GetGPUVirtualAddress();
 	page->CapacityInBytes = capacityInBytes;
 	m_pages.push_back(std::move(page));

@@ -19,7 +19,7 @@ void BindGraphicsPassParameters(
     const PassParameterSet& parameterSet,
     std::span<const char* const> bindingNames = {},
     const PassBindingOverrides* overrides = nullptr,
-    bool bindLayout = true);
+    bool bBindLayout = true);
 
 void BindComputePassParameters(
     RenderCommandContext& commandContext,
@@ -28,7 +28,7 @@ void BindComputePassParameters(
     const PassParameterSet& parameterSet,
     std::span<const char* const> bindingNames = {},
     const PassBindingOverrides* overrides = nullptr,
-    bool bindLayout = true);
+    bool bBindLayout = true);
 void BindRayTracingPassParameters(
     RenderCommandContext& commandContext,
     const FrameGraphResourceCommands& resources,
@@ -36,4 +36,4 @@ void BindRayTracingPassParameters(
     const PassParameterSet& parameterSet,
     std::span<const char* const> bindingNames = {},
     const PassBindingOverrides* overrides = nullptr,
-    bool bindLayout = true);
+    bool bBindLayout = true);

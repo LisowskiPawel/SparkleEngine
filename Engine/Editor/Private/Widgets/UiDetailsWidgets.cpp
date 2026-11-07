@@ -14,10 +14,10 @@
 
 namespace EditorWidgets
 {
-	bool DrawDetailsCategory(const char* title, bool defaultOpen)
+	bool DrawDetailsCategory(const char* title, bool bDefaultOpen)
 	{
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Framed;
-		if (defaultOpen)
+		if (bDefaultOpen)
 		{
 			flags |= ImGuiTreeNodeFlags_DefaultOpen;
 		}
@@ -27,10 +27,10 @@ namespace EditorWidgets
 		ImGui::PushStyleColor(ImGuiCol_Header, ImGui::ColorConvertU32ToFloat4(SparkleUiPalette::SectionHeaderBackground()));
 		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.21f, 0.22f, 0.24f, 1.0f));
 		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.19f, 0.26f, 0.36f, 1.0f));
-		const bool open = ImGui::CollapsingHeader(title, flags);
+		const bool bOpen = ImGui::CollapsingHeader(title, flags);
 		ImGui::PopStyleColor(3);
 		ImGui::PopStyleVar(2);
-		return open;
+		return bOpen;
 	}
 
 	void DrawDetailsEmptyState(const char* text)
@@ -62,13 +62,13 @@ namespace EditorWidgets
 
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
-		bool changed = ImGui::DragFloat("##value", &value, speed, minValue, maxValue, format);
+		bool bChanged = ImGui::DragFloat("##value", &value, speed, minValue, maxValue, format);
 		if (resetValue != nullptr)
 		{
 			if (DrawDetailsResetButton(2, IsDifferentFromDefault(value, *resetValue)))
 			{
 				value = *resetValue;
-				changed = true;
+				bChanged = true;
 			}
 		}
 		else
@@ -77,7 +77,7 @@ namespace EditorWidgets
 		}
 
 		EndDetailsRow();
-		return changed;
+		return bChanged;
 	}
 
 	bool EditDetailsFloat3(const char* label, float values[3], float speed, float minValue, float maxValue, const char* format, const float* resetValues)
@@ -87,15 +87,15 @@ namespace EditorWidgets
 			return false;
 		}
 
-		bool changed = false;
+		bool bChanged = false;
 		static constexpr const char* axisLabels[] = {"X", "Y", "Z"};
 		for (int axisIndex = 0; axisIndex < 3; ++axisIndex)
 		{
 			ImGui::PushID(axisIndex);
 			ImGui::TableSetColumnIndex(axisIndex + 1);
-			const bool axisTableOpen = ImGui::BeginTable("##axis_field", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoPadInnerX);
+			const bool bAxisTableOpen = ImGui::BeginTable("##axis_field", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoPadInnerX);
 			
-			if (axisTableOpen)
+			if (bAxisTableOpen)
 			{
 				ImGui::TableSetupColumn("axis", ImGuiTableColumnFlags_WidthFixed, DetailsAxisLabelWidth);
 				ImGui::TableSetupColumn("value", ImGuiTableColumnFlags_WidthStretch);
@@ -109,7 +109,7 @@ namespace EditorWidgets
 
 				ImGui::TableSetColumnIndex(1);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				changed = ImGui::DragFloat("##value", &values[axisIndex], speed, minValue, maxValue, format) || changed;
+				bChanged = ImGui::DragFloat("##value", &values[axisIndex], speed, minValue, maxValue, format) || bChanged;
 
 				ImGui::EndTable();
 			}
@@ -122,7 +122,7 @@ namespace EditorWidgets
 				values[0] = resetValues[0];
 				values[1] = resetValues[1];
 				values[2] = resetValues[2];
-				changed = true;
+				bChanged = true;
 			}
 		}
 		else
@@ -131,7 +131,7 @@ namespace EditorWidgets
 		}
 
 		EndDetailsRow();
-		return changed;
+		return bChanged;
 	}
 
 	bool EditDetailsColor3(const char* label, float values[3], const float* resetValues)
@@ -143,7 +143,7 @@ namespace EditorWidgets
 
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
-		bool changed = ImGui::ColorEdit3("##value", values, ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar);
+		bool bChanged = ImGui::ColorEdit3("##value", values, ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar);
 		if (resetValues != nullptr)
 		{
 			if (DrawDetailsResetButton(2, IsDifferentFromDefault(values, resetValues)))
@@ -151,7 +151,7 @@ namespace EditorWidgets
 				values[0] = resetValues[0];
 				values[1] = resetValues[1];
 				values[2] = resetValues[2];
-				changed = true;
+				bChanged = true;
 			}
 		}
 		else
@@ -160,10 +160,10 @@ namespace EditorWidgets
 		}
 
 		EndDetailsRow();
-		return changed;
+		return bChanged;
 	}
 
-	bool EditDetailsCheckbox(const char* label, bool& value, const bool* resetValue)
+	bool EditDetailsCheckbox(const char* label, bool& bValue, const bool* resetValue)
 	{
 		if (!BeginDetailsRow(label, 1))
 		{
@@ -171,13 +171,13 @@ namespace EditorWidgets
 		}
 
 		ImGui::TableSetColumnIndex(1);
-		bool changed = ImGui::Checkbox("##value", &value);
+		bool bChanged = ImGui::Checkbox("##value", &bValue);
 		if (resetValue != nullptr)
 		{
-			if (DrawDetailsResetButton(2, value != *resetValue))
+			if (DrawDetailsResetButton(2, bValue != *resetValue))
 			{
-				value = *resetValue;
-				changed = true;
+				bValue = *resetValue;
+				bChanged = true;
 			}
 		}
 		else
@@ -186,7 +186,7 @@ namespace EditorWidgets
 		}
 
 		EndDetailsRow();
-		return changed;
+		return bChanged;
 	}
 
 	bool EditDetailsText(const char* label, std::string& value, const std::string* resetValue)
@@ -200,8 +200,8 @@ namespace EditorWidgets
 		std::copy(value.begin(), value.end(), buffer.begin());
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
-		bool changed = ImGui::InputText("##value", buffer.data(), buffer.size());
-		if (changed)
+		bool bChanged = ImGui::InputText("##value", buffer.data(), buffer.size());
+		if (bChanged)
 		{
 			value = buffer.data();
 		}
@@ -211,7 +211,7 @@ namespace EditorWidgets
 			if (DrawDetailsResetButton(2, value != *resetValue))
 			{
 				value = *resetValue;
-				changed = true;
+				bChanged = true;
 			}
 		}
 		else
@@ -220,7 +220,7 @@ namespace EditorWidgets
 		}
 
 		EndDetailsRow();
-		return changed;
+		return bChanged;
 	}
 
 	bool MatchesDetailsFilter(const std::string& filterText, const char* title, const char* keywords) noexcept

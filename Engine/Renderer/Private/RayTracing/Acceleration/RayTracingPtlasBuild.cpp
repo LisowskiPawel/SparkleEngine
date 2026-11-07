@@ -32,7 +32,7 @@ RhiPtlasInstanceFlags RayTracingPtlasStrategy::ResolveInstanceFlags(const Prepar
 		Diagnostics::Fatal(g_rayTracingPtlasBuildLogger, __FILE__, __LINE__, "PTLAS input references a material outside the render scene.");
 	}
 	const MaterialData& material = preparedScene.materials[draw.MaterialSlot];
-	if (material.doubleSided)
+	if (material.bDoubleSided)
 	{
 		flags = flags | RhiPtlasInstanceFlags::TriangleFacingCullDisable;
 	}
@@ -97,13 +97,13 @@ void RayTracingPtlasStrategy::CollectPtlasInstances(
 		const RayTracingBlasCache::BlasHandle blas = blasCache.EnsureBlas(commandContext, preparedScene, draw, input.GpuSceneSlot, diagnostics);
 
 		commandContext.TrackResource(blas.resource);
-		if (blas.builtThisFrame)
+		if (blas.bBuiltThisFrame)
 		{
 			state.BuiltBlasResources.insert(blas.resource.Value);
 		}
 
 		const RayTracingPtlasPartitionEntry* entry = partitionPlan.FindByPrimitive(input.PrimitiveIndex);
-		if (entry == nullptr || !entry->Valid || entry->Identity.GpuSceneSlot != input.GpuSceneSlot)
+		if (entry == nullptr || !entry->bValid || entry->Identity.GpuSceneSlot != input.GpuSceneSlot)
 		{
 			Diagnostics::Fatal(g_rayTracingPtlasBuildLogger, __FILE__, __LINE__, "PTLAS work has no valid partition-plan entry.");
 		}
@@ -123,7 +123,7 @@ void RayTracingPtlasStrategy::CollectPtlasInstances(
 		        .InstanceContributionToHitGroupIndex = instanceContribution,
 		        .Flags = ResolveInstanceFlags(preparedScene, draw),
 		        .InstanceIndex = input.GpuSceneSlot,
-		        .PartitionIndex = entry->Update.UsesGlobalPartition ? RhiPtlasGlobalPartitionIndex : entry->Assignment.PartitionId,
+		        .PartitionIndex = entry->Update.bUsesGlobalPartition ? RhiPtlasGlobalPartitionIndex : entry->Assignment.PartitionId,
 		        .AccelerationStructure = blas.gpuAddress});
 	}
 }

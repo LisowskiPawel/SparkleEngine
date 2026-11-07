@@ -61,17 +61,17 @@ RhiRayTracingCapabilities D3D12RayTracingServices::GetCapabilities() const noexc
 
 RhiRayTracingAccelerationStructurePrebuildInfo D3D12RayTracingServices::GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept
 {
-	const bool bBlasGeometryTracingCapabilities = m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure;
-	const bool invalidBlasGeometry = bBlasGeometryTracingCapabilities || (!RhiContract::IsRayTracingGeometryDescUsable(geometry));
+	const bool bBlasGeometryTracingCapabilities = m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure;
+	const bool bInvalidBlasGeometry = bBlasGeometryTracingCapabilities || (!RhiContract::IsRayTracingGeometryDescUsable(geometry));
 	
-	if (invalidBlasGeometry)
+	if (bInvalidBlasGeometry)
 	{
 		return {};
 	}
 
 	D3D12_RAYTRACING_GEOMETRY_DESC nativeGeometry{};
 	nativeGeometry.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-	nativeGeometry.Flags = geometry.Opaque ? D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE : D3D12_RAYTRACING_GEOMETRY_FLAG_NONE;
+	nativeGeometry.Flags = geometry.bOpaque ? D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE : D3D12_RAYTRACING_GEOMETRY_FLAG_NONE;
 	nativeGeometry.Triangles.Transform3x4 = 0;
 	nativeGeometry.Triangles.IndexFormat = D3D12TypeConversions::ToIndexFormat(geometry.IndexFormat);
 	nativeGeometry.Triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -123,14 +123,14 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreateScratchBuffer(std::uint64_
 {
 	const std::uint64_t scratchAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().ScratchBufferByteAlignment : 0;
 	const bool bScratchAllocationmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
-	const bool invalidScratchAllocation = bScratchAllocationmemoryAllocator || (!RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, scratchAlignment));
+	const bool bInvalidScratchAllocation = bScratchAllocationmemoryAllocator || (!RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, scratchAlignment));
 	
-	if (invalidScratchAllocation)
+	if (bInvalidScratchAllocation)
 	{
 		return {};
 	}
 
-	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(RhiBufferResourceDesc{.SizeInBytes = sizeInBytes, .AllowUnorderedAccess = true});
+	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(RhiBufferResourceDesc{.SizeInBytes = sizeInBytes, .bAllowUnorderedAccess = true});
 
 	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(
 	    resourceDesc,
@@ -155,7 +155,7 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreateAccelerationStructureBuffe
 		return {};
 	}
 
-	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(RhiBufferResourceDesc{.SizeInBytes = sizeInBytes, .AllowUnorderedAccess = true});
+	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(RhiBufferResourceDesc{.SizeInBytes = sizeInBytes, .bAllowUnorderedAccess = true});
 
 	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(
 	    resourceDesc,
@@ -185,7 +185,7 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingInstanceBuffer(c
 bool D3D12RayTracingServices::BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept
 {
 	const RhiRayTracingCapabilities capabilities = GetCapabilities();
-	if (!capabilities.Groups.Ptlas.Supported)
+	if (!capabilities.Groups.Ptlas.bSupported)
 	{
 		return false;
 	}
@@ -194,7 +194,7 @@ bool D3D12RayTracingServices::BuildPtlas(ID3D12GraphicsCommandList7* commandList
 
 std::unique_ptr<RayTracingShaderTable> D3D12RayTracingServices::CreateRayTracingShaderTable(const RayTracingShaderTableDesc& desc)
 {
-	if (m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsRayTracingPipeline)
+	if (m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().bSupportsRayTracingPipeline)
 	{
 		throw Diagnostics::Error("D3D12 ray-tracing shader-table creation requires complete pipeline readiness.");
 	}

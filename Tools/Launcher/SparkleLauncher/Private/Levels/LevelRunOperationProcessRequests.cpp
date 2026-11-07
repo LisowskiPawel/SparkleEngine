@@ -11,7 +11,7 @@ namespace SparkleLauncher
 	std::vector<LevelRunOperationProcessStep> BuildLevelRunProcessStepsForPlan(const LevelRunOperationPlan& plan)
 	{
 		std::vector<LevelRunOperationProcessStep> steps;
-		if (!plan.CanRun)
+		if (!plan.bCanRun)
 		{
 			return steps;
 		}

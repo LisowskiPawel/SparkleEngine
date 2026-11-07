@@ -10,11 +10,11 @@ struct ShaderBackendCapabilities final
 	{
 		if (IsDxilTarget(target))
 		{
-			return SupportsDxil;
+			return bSupportsDxil;
 		}
 		if (IsSpirVTarget(target))
 		{
-			return SupportsSpirV;
+			return bSupportsSpirV;
 		}
 		return false;
 	}
@@ -23,11 +23,11 @@ struct ShaderBackendCapabilities final
 	{
 		if (IsDxilTarget(target))
 		{
-			return SupportsDxilRayTracingLibrary;
+			return bSupportsDxilRayTracingLibrary;
 		}
 		if (IsSpirVTarget(target))
 		{
-			return SupportsSpirVRayTracingLibrary;
+			return bSupportsSpirVRayTracingLibrary;
 		}
 		return false;
 	}
@@ -36,19 +36,19 @@ struct ShaderBackendCapabilities final
 	{
 		if (IsDxilTarget(target))
 		{
-			return SupportsDxilInlineRayQuery;
+			return bSupportsDxilInlineRayQuery;
 		}
 		if (IsSpirVTarget(target))
 		{
-			return SupportsSpirVInlineRayQuery;
+			return bSupportsSpirVInlineRayQuery;
 		}
 		return false;
 	}
 
-	bool SupportsDxil = false;
-	bool SupportsSpirV = false;
-	bool SupportsDxilRayTracingLibrary = false;
-	bool SupportsSpirVRayTracingLibrary = false;
-	bool SupportsDxilInlineRayQuery = false;
-	bool SupportsSpirVInlineRayQuery = false;
+	bool bSupportsDxil = false;
+	bool bSupportsSpirV = false;
+	bool bSupportsDxilRayTracingLibrary = false;
+	bool bSupportsSpirVRayTracingLibrary = false;
+	bool bSupportsDxilInlineRayQuery = false;
+	bool bSupportsSpirVInlineRayQuery = false;
 };

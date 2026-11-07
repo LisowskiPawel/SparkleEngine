@@ -70,7 +70,7 @@ PFN_vkCmdTraceRaysKHR VulkanRhi::GetCmdTraceRays() const noexcept
 
 void VulkanRhi::LoadRayTracingFunctions() noexcept
 {
-	if (m_device == VK_NULL_HANDLE || !m_featureStatus.RayTracing.EnabledAccelerationStructure)
+	if (m_device == VK_NULL_HANDLE || !m_featureStatus.RayTracing.bEnabledAccelerationStructure)
 	{
 		return;
 	}
@@ -85,13 +85,13 @@ void VulkanRhi::LoadRayTracingFunctions() noexcept
 	m_getAccelerationStructureBuildSizes = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(vkGetDeviceProcAddr(m_device, "vkGetAccelerationStructureBuildSizesKHR"));
 	m_cmdBuildAccelerationStructures = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(m_device, "vkCmdBuildAccelerationStructuresKHR"));
 	m_getAccelerationStructureDeviceAddress = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(vkGetDeviceProcAddr(m_device, "vkGetAccelerationStructureDeviceAddressKHR"));
-	if (m_featureStatus.RayTracing.EnabledRayTracingPipeline)
+	if (m_featureStatus.RayTracing.bEnabledRayTracingPipeline)
 	{
 		m_createRayTracingPipelines = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(m_device, "vkCreateRayTracingPipelinesKHR"));
 		m_getRayTracingShaderGroupHandles = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(m_device, "vkGetRayTracingShaderGroupHandlesKHR"));
 		m_cmdTraceRays = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(m_device, "vkCmdTraceRaysKHR"));
 	}
-	if (m_featureStatus.RayTracing.EnabledPtlas)
+	if (m_featureStatus.RayTracing.bEnabledPtlas)
 	{
 		m_getPtlasBuildSizes = reinterpret_cast<PFN_vkGetPartitionedAccelerationStructuresBuildSizesNV>(vkGetDeviceProcAddr(m_device, "vkGetPartitionedAccelerationStructuresBuildSizesNV"));
 
@@ -102,22 +102,22 @@ void VulkanRhi::LoadRayTracingFunctions() noexcept
 	const bool bLoadedAccelerationStructure2 = bLoadedAccelerationStructure && (m_destroyAccelerationStructure != nullptr);
 	const bool bLoadedBuildSizes = bLoadedAccelerationStructure2 && (m_getAccelerationStructureBuildSizes != nullptr);
 	const bool bLoadedAccelerationStructures = bLoadedBuildSizes && (m_cmdBuildAccelerationStructures != nullptr);
-	const bool loaded = bLoadedAccelerationStructures && (m_getAccelerationStructureDeviceAddress != nullptr);
+	const bool bLoaded = bLoadedAccelerationStructures && (m_getAccelerationStructureDeviceAddress != nullptr);
 
-	if (!loaded)
+	if (!bLoaded)
 	{
-		m_featureStatus.RayTracing.EnabledAccelerationStructure = false;
-		m_featureStatus.RayTracing.EnabledInlineRayQuery = false;
-		m_featureStatus.RayTracing.EnabledRayTracingPipeline = false;
-		m_featureStatus.RayTracing.EnabledPtlas = false;
+		m_featureStatus.RayTracing.bEnabledAccelerationStructure = false;
+		m_featureStatus.RayTracing.bEnabledInlineRayQuery = false;
+		m_featureStatus.RayTracing.bEnabledRayTracingPipeline = false;
+		m_featureStatus.RayTracing.bEnabledPtlas = false;
 	}
 	if (m_createRayTracingPipelines == nullptr || m_getRayTracingShaderGroupHandles == nullptr || m_cmdTraceRays == nullptr)
 	{
-		m_featureStatus.RayTracing.EnabledRayTracingPipeline = false;
+		m_featureStatus.RayTracing.bEnabledRayTracingPipeline = false;
 	}
-	if (m_featureStatus.RayTracing.EnabledPtlas && (m_getPtlasBuildSizes == nullptr || m_cmdBuildPtlas == nullptr))
+	if (m_featureStatus.RayTracing.bEnabledPtlas && (m_getPtlasBuildSizes == nullptr || m_cmdBuildPtlas == nullptr))
 	{
-		m_featureStatus.RayTracing.EnabledPtlas = false;
+		m_featureStatus.RayTracing.bEnabledPtlas = false;
 	}
 }
 
@@ -126,20 +126,20 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 	m_rayTracingCapabilities = {};
 
 	m_rayTracingCapabilities.Groups.Ptlas = RhiPtlasCapabilities{
-	    .Supported = false,
+	    .bSupported = false,
 	    .Provider = ERhiPtlasProvider::VulkanNvPtlas,
-	    .NvidiaDeviceOnly = true,
-	    .CurrentDeviceIsNvidia = m_adapterInfo.VendorId == NvidiaVendorId,
-	    .SupportsDescriptorAccess = false,
+	    .bNvidiaDeviceOnly = true,
+	    .bCurrentDeviceIsNvidia = m_adapterInfo.VendorId == NvidiaVendorId,
+	    .bSupportsDescriptorAccess = false,
 	    .CapabilityStatusReason = m_adapterInfo.VendorId != NvidiaVendorId
 	        ? "vulkan-nv-ptlas-requires-nvidia-device"
-	        : (!m_featureStatus.RayTracing.SupportsPtlasExtension
+	        : (!m_featureStatus.RayTracing.bSupportsPtlasExtension
 	                  ? "vulkan-nv-ptlas-extension-not-present"
-	                  : (!m_featureStatus.RayTracing.SupportsPtlasFeature ? "vulkan-nv-ptlas-feature-not-present" : "vulkan-ray-tracing-backend-not-enabled"))};
+	                  : (!m_featureStatus.RayTracing.bSupportsPtlasFeature ? "vulkan-nv-ptlas-feature-not-present" : "vulkan-ray-tracing-backend-not-enabled"))};
 
 	m_rayTracingCapabilities.Groups.Provider = RhiRayTracingProviderCapabilities{.SelectedTlasProvider = ERhiRayTracingTlasProvider::None, .SelectedTlasProviderReason = "ray-tracing-not-enabled"};
 
-	if (m_physicalDevice == VK_NULL_HANDLE || !m_featureStatus.RayTracing.EnabledAccelerationStructure)
+	if (m_physicalDevice == VK_NULL_HANDLE || !m_featureStatus.RayTracing.bEnabledAccelerationStructure)
 	{
 		return;
 	}
@@ -148,55 +148,55 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 	VkPhysicalDeviceRayTracingPipelinePropertiesKHR pipelineProperties{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR};
 	VkPhysicalDeviceProperties2 properties{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
 	properties.pNext = &accelerationStructureProperties;
-	if (m_featureStatus.RayTracing.EnabledRayTracingPipeline)
+	if (m_featureStatus.RayTracing.bEnabledRayTracingPipeline)
 	{
 		pipelineProperties.pNext = properties.pNext;
 		properties.pNext = &pipelineProperties;
 	}
 	vkGetPhysicalDeviceProperties2(m_physicalDevice, &properties);
 
-	const bool bPipelineReadyTracingPipelines = m_featureStatus.RayTracing.EnabledRayTracingPipeline && m_createRayTracingPipelines != nullptr;
+	const bool bPipelineReadyTracingPipelines = m_featureStatus.RayTracing.bEnabledRayTracingPipeline && m_createRayTracingPipelines != nullptr;
 	const bool bPipelineReadyGroupHandles = bPipelineReadyTracingPipelines && (m_getRayTracingShaderGroupHandles != nullptr);
 	const bool bPipelineReadyTraceRays = bPipelineReadyGroupHandles && (m_cmdTraceRays != nullptr);
 	const bool bPipelineReadyHandleSize = bPipelineReadyTraceRays && (pipelineProperties.shaderGroupHandleSize != 0);
 	const bool bPipelineReadyBaseAlignment = bPipelineReadyHandleSize && (pipelineProperties.shaderGroupBaseAlignment != 0);
 	const bool bPipelineReadyHandleAlignment = bPipelineReadyBaseAlignment && (pipelineProperties.shaderGroupHandleAlignment != 0);
-	const bool pipelineReady = bPipelineReadyHandleAlignment && (pipelineProperties.maxShaderGroupStride != 0);
+	const bool bPipelineReady = bPipelineReadyHandleAlignment && (pipelineProperties.maxShaderGroupStride != 0);
 
 	m_rayTracingCapabilities = RhiRayTracingCapabilities{
-	    .SupportsAccelerationStructure = true,
-	    .SupportsInlineRayQuery = m_featureStatus.RayTracing.EnabledInlineRayQuery,
-	    .SupportsRayTracingPipeline = pipelineReady,
-	    .MaxTraceRecursionDepth = pipelineReady ? pipelineProperties.maxRayRecursionDepth : 0,
-	    .MaxRayPayloadSizeInBytes = pipelineReady ? kRhiRayTracingMaxPayloadSizeInBytes : 0u,
-	    .MaxRayAttributeSizeInBytes = pipelineReady ? pipelineProperties.maxRayHitAttributeSize : 0,
-	    .ShaderGroupHandleSizeInBytes = pipelineReady ? pipelineProperties.shaderGroupHandleSize : 0,
-	    .ShaderTableAlignmentInBytes = pipelineReady ? pipelineProperties.shaderGroupBaseAlignment : 0,
-	    .ShaderTableRecordAlignmentInBytes = pipelineReady ? pipelineProperties.shaderGroupHandleAlignment : 0,
-	    .MaxShaderTableRecordStrideInBytes = pipelineReady ? pipelineProperties.maxShaderGroupStride : 0,
+	    .bSupportsAccelerationStructure = true,
+	    .bSupportsInlineRayQuery = m_featureStatus.RayTracing.bEnabledInlineRayQuery,
+	    .bSupportsRayTracingPipeline = bPipelineReady,
+	    .MaxTraceRecursionDepth = bPipelineReady ? pipelineProperties.maxRayRecursionDepth : 0,
+	    .MaxRayPayloadSizeInBytes = bPipelineReady ? kRhiRayTracingMaxPayloadSizeInBytes : 0u,
+	    .MaxRayAttributeSizeInBytes = bPipelineReady ? pipelineProperties.maxRayHitAttributeSize : 0,
+	    .ShaderGroupHandleSizeInBytes = bPipelineReady ? pipelineProperties.shaderGroupHandleSize : 0,
+	    .ShaderTableAlignmentInBytes = bPipelineReady ? pipelineProperties.shaderGroupBaseAlignment : 0,
+	    .ShaderTableRecordAlignmentInBytes = bPipelineReady ? pipelineProperties.shaderGroupHandleAlignment : 0,
+	    .MaxShaderTableRecordStrideInBytes = bPipelineReady ? pipelineProperties.maxShaderGroupStride : 0,
 	    .AccelerationStructureByteAlignment = 256,
 	    .ScratchBufferByteAlignment = accelerationStructureProperties.minAccelerationStructureScratchOffsetAlignment,
 	    .InstanceDescSizeInBytes = static_cast<std::uint32_t>(sizeof(VkAccelerationStructureInstanceKHR))};
 
 	PopulateStandardRayTracingCapabilityGroups(m_rayTracingCapabilities);
 
-	const bool bPtlasReadyBuildSizes = m_featureStatus.RayTracing.EnabledPtlas && m_getPtlasBuildSizes != nullptr;
-	const bool ptlasReady = bPtlasReadyBuildSizes && (m_cmdBuildPtlas != nullptr);
+	const bool bPtlasReadyBuildSizes = m_featureStatus.RayTracing.bEnabledPtlas && m_getPtlasBuildSizes != nullptr;
+	const bool bPtlasReady = bPtlasReadyBuildSizes && (m_cmdBuildPtlas != nullptr);
 
 	m_rayTracingCapabilities.Groups.Ptlas = RhiPtlasCapabilities{
-	    .Supported = ptlasReady,
+	    .bSupported = bPtlasReady,
 	    .Provider = ERhiPtlasProvider::VulkanNvPtlas,
-	    .NvidiaDeviceOnly = true,
-	    .CurrentDeviceIsNvidia = m_adapterInfo.VendorId == NvidiaVendorId,
-	    .SupportsDescriptorAccess = ptlasReady,
-	    .SupportsCpuPackedOperations = m_featureStatus.RayTracing.EnabledPtlas,
-	    .SupportsGpuDrivenOperations = m_featureStatus.RayTracing.EnabledPtlas,
-	    .SupportsGpuOperationCount = m_featureStatus.RayTracing.EnabledPtlas,
-	    .SupportsGpuWrittenInstanceRecords = m_featureStatus.RayTracing.EnabledPtlas,
-	    .SupportsGpuWrittenPartitionRecords = m_featureStatus.RayTracing.EnabledPtlas,
-	    .SupportsPartitionTranslation = m_featureStatus.RayTracing.EnabledPtlas,
-	    .SupportsGlobalPartition = true,
-	    .SupportsExplicitInstanceAabb = true,
+	    .bNvidiaDeviceOnly = true,
+	    .bCurrentDeviceIsNvidia = m_adapterInfo.VendorId == NvidiaVendorId,
+	    .bSupportsDescriptorAccess = bPtlasReady,
+	    .bSupportsCpuPackedOperations = m_featureStatus.RayTracing.bEnabledPtlas,
+	    .bSupportsGpuDrivenOperations = m_featureStatus.RayTracing.bEnabledPtlas,
+	    .bSupportsGpuOperationCount = m_featureStatus.RayTracing.bEnabledPtlas,
+	    .bSupportsGpuWrittenInstanceRecords = m_featureStatus.RayTracing.bEnabledPtlas,
+	    .bSupportsGpuWrittenPartitionRecords = m_featureStatus.RayTracing.bEnabledPtlas,
+	    .bSupportsPartitionTranslation = m_featureStatus.RayTracing.bEnabledPtlas,
+	    .bSupportsGlobalPartition = true,
+	    .bSupportsExplicitInstanceAabb = true,
 	    .MaxOperationsPerBuild = std::numeric_limits<std::uint32_t>::max(),
 	    .InstanceWriteDataSizeInBytes = static_cast<std::uint32_t>(sizeof(VkPartitionedAccelerationStructureWriteInstanceDataNV)),
 	    .InstanceUpdateDataSizeInBytes = static_cast<std::uint32_t>(sizeof(VkPartitionedAccelerationStructureUpdateInstanceDataNV)),
@@ -205,11 +205,11 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 	    .OperationCountDataSizeInBytes = static_cast<std::uint32_t>(sizeof(std::uint32_t)),
 	    .CapabilityStatusReason = m_adapterInfo.VendorId != NvidiaVendorId
 	        ? "vulkan-nv-ptlas-requires-nvidia-device"
-	        : (!m_featureStatus.RayTracing.SupportsPtlasExtension
+	        : (!m_featureStatus.RayTracing.bSupportsPtlasExtension
 	                  ? "vulkan-nv-ptlas-extension-not-present"
-	                  : (!m_featureStatus.RayTracing.SupportsPtlasFeature
+	                  : (!m_featureStatus.RayTracing.bSupportsPtlasFeature
 	                            ? "vulkan-nv-ptlas-feature-not-present"
-	                            : (!m_featureStatus.RayTracing.EnabledPtlas
+	                            : (!m_featureStatus.RayTracing.bEnabledPtlas
 	                                      ? "vulkan-nv-ptlas-not-enabled"
 	                                      : (m_getPtlasBuildSizes == nullptr || m_cmdBuildPtlas == nullptr ? "vulkan-nv-ptlas-functions-not-loaded" : "vulkan-nv-ptlas-provider-ready"))))};
 
@@ -219,27 +219,27 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 void VulkanRhi::SelectRayTracingTlasProvider() noexcept
 {
 	RhiRayTracingProviderCapabilities& provider = m_rayTracingCapabilities.Groups.Provider;
-	if (!m_rayTracingCapabilities.SupportsAccelerationStructure)
+	if (!m_rayTracingCapabilities.bSupportsAccelerationStructure)
 	{
 		provider = RhiRayTracingProviderCapabilities{.SelectedTlasProvider = ERhiRayTracingTlasProvider::None, .SelectedTlasProviderReason = "ray-tracing-unavailable"};
 		return;
 	}
 
 	const RhiPtlasCapabilities& ptlas = m_rayTracingCapabilities.Groups.Ptlas;
-	const bool ptlasRequested = CVarRayTracingPreferPtlas.Get();
-	const bool bPtlasSelectedSupported = ptlasRequested && ptlas.Supported;
-	const bool ptlasSelected = bPtlasSelectedSupported && (ptlas.SupportsDescriptorAccess);
+	const bool bPtlasRequested = CVarRayTracingPreferPtlas.Get();
+	const bool bPtlasSelectedSupported = bPtlasRequested && ptlas.bSupported;
+	const bool bPtlasSelected = bPtlasSelectedSupported && (ptlas.bSupportsDescriptorAccess);
 	const char* selectionReason = "TLAS-selected";
-	if (ptlasSelected)
+	if (bPtlasSelected)
 	{
 		selectionReason = "vulkan-nv-ptlas-selected";
 	}
-	else if (ptlasRequested && ptlas.Supported)
+	else if (bPtlasRequested && ptlas.bSupported)
 	{
 		selectionReason = "vulkan-ptlas-descriptor-path-unavailable";
 	}
 
 	provider = RhiRayTracingProviderCapabilities{
-	    .SelectedTlasProvider = ptlasSelected ? ERhiRayTracingTlasProvider::Ptlas : ERhiRayTracingTlasProvider::Tlas,
+	    .SelectedTlasProvider = bPtlasSelected ? ERhiRayTracingTlasProvider::Ptlas : ERhiRayTracingTlasProvider::Tlas,
 	    .SelectedTlasProviderReason = selectionReason};
 }

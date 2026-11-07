@@ -66,12 +66,12 @@ WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, Worl
 		return result;
 	}
 
-	const bool bCoalesceTransactionEmpty = m_coalescing && !coalescingKey.empty();
+	const bool bCoalesceTransactionEmpty = m_bCoalescing && !coalescingKey.empty();
 	const bool bCanCoalesceTransactionundoEmpty = bCoalesceTransactionEmpty && (!m_undo.empty());
 	const bool bCanCoalesceTransactionback = bCanCoalesceTransactionundoEmpty && (m_undo.back().CoalescingKey == coalescingKey);
-	const bool canCoalesceTransaction = bCanCoalesceTransactionback && (AffectsSameTarget(m_undo.back().Forward.Payload, forward.Payload));
+	const bool bCanCoalesceTransaction = bCanCoalesceTransactionback && (AffectsSameTarget(m_undo.back().Forward.Payload, forward.Payload));
 	
-	if (canCoalesceTransaction)
+	if (bCanCoalesceTransaction)
 	{
 		m_undo.back().Forward = std::move(forward);
 	}
@@ -84,7 +84,7 @@ WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, Worl
 		m_undo.push_back({std::move(forward), std::move(inverse), std::move(coalescingKey)});
 	}
 	m_redo.clear();
-	m_coalescing = !m_undo.back().CoalescingKey.empty();
+	m_bCoalescing = !m_undo.back().CoalescingKey.empty();
 	return result;
 }
 

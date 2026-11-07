@@ -35,8 +35,8 @@ struct TaskScope::State final : std::enable_shared_from_this<TaskScope::State>
 	std::vector<std::weak_ptr<TaskExecution::State>> Executions;
 	std::uint32_t ActiveExecutions = 0;
 	std::uint32_t OpenChildren = 0;
-	bool Closed = false;
-	bool CancellationRequested = false;
-	bool Settled = false;
-	bool ParentNotified = false;
+	bool bClosed = false;
+	bool bCancellationRequested = false;
+	bool bSettled = false;
+	bool bParentNotified = false;
 };

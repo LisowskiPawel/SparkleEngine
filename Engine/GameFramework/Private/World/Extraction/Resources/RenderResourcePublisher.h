@@ -29,6 +29,6 @@ namespace ECS
 		std::uint64_t m_textureRevision = 0;
 		std::optional<std::filesystem::path> m_skyTexturePath;
 		std::optional<SceneSkyDesc> m_sky;
-		bool m_skyPublished = false;
+		bool m_bSkyPublished = false;
 	};
 }

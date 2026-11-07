@@ -30,8 +30,8 @@ bool D3D12SamplerLibrary::TryGetSlot(const RhiSamplerDesc& samplerDesc, Slot& ou
 
 	if (samplerDesc.MaxAnisotropy != RhiSamplerAnisotropy::X1)
 	{
-		const bool anisotropyApplies = samplerDesc.MinMagFilter == RhiSamplerMinMagFilter::Linear && samplerDesc.MipFilter == RhiSamplerMipFilter::Linear;
-		if (anisotropyApplies)
+		const bool bAnisotropyApplies = samplerDesc.MinMagFilter == RhiSamplerMinMagFilter::Linear && samplerDesc.MipFilter == RhiSamplerMipFilter::Linear;
+		if (bAnisotropyApplies)
 		{
 			return TryGetAnisotropicSlot(samplerDesc.MaxAnisotropy, addressMode, outSlot);
 		}
@@ -121,10 +121,10 @@ D3D12SamplerLibrary::~D3D12SamplerLibrary() noexcept
 void D3D12SamplerLibrary::CreateSampler(Slot slot, const RhiSamplerDesc& samplerDesc)
 {
 	const std::uint32_t maxAnisotropy = static_cast<std::uint32_t>(samplerDesc.MaxAnisotropy);
-	const bool isAnisotropic = maxAnisotropy > 1;
+	const bool bIsAnisotropic = maxAnisotropy > 1;
 
 	D3D12_SAMPLER_DESC desc = {};
-	desc.Filter = ToD3D12Filter(samplerDesc.MinMagFilter, samplerDesc.MipFilter, isAnisotropic);
+	desc.Filter = ToD3D12Filter(samplerDesc.MinMagFilter, samplerDesc.MipFilter, bIsAnisotropic);
 	desc.AddressU = ToD3D12Address(samplerDesc.Address.U);
 	desc.AddressV = ToD3D12Address(samplerDesc.Address.V);
 	desc.AddressW = ToD3D12Address(samplerDesc.Address.W);
@@ -216,9 +216,9 @@ bool D3D12SamplerLibrary::TryGetAnisotropicSlot(RhiSamplerAnisotropy maxAnisotro
 	return true;
 }
 
-D3D12_FILTER D3D12SamplerLibrary::ToD3D12Filter(RhiSamplerMinMagFilter minMag, RhiSamplerMipFilter mip, bool anisotropic)
+D3D12_FILTER D3D12SamplerLibrary::ToD3D12Filter(RhiSamplerMinMagFilter minMag, RhiSamplerMipFilter mip, bool bAnisotropic)
 {
-	if (anisotropic)
+	if (bAnisotropic)
 	{
 		return D3D12_FILTER_ANISOTROPIC;
 	}

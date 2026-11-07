@@ -88,7 +88,7 @@ private:
 		std::uint32_t ContextIndex = 0;
 		ERhiQueueType QueueType = ERhiQueueType::Graphics;
 		SlotState State = SlotState::Available;
-		bool RequiresPoolReset = false;
+		bool bRequiresPoolReset = false;
 	};
 
 	struct QueueFrameState final
@@ -117,7 +117,7 @@ private:
 
 	static void BeginLease(void* state) noexcept;
 	static void CloseLease(void* state) noexcept;
-	static void ReleaseLease(void* state, bool closed) noexcept;
+	static void ReleaseLease(void* state, bool bClosed) noexcept;
 	[[noreturn]] void FailExhausted(ERhiQueueType queueType, std::uint32_t frameIndex) noexcept;
 	[[noreturn]] static void FailOwnershipViolation(const CommandSlot& slot, const char* operation) noexcept;
 

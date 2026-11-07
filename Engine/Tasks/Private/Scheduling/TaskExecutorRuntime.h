@@ -37,7 +37,7 @@ struct TaskExecutor::Implementation::Runtime final
 		std::mutex QueueMutex;
 		std::deque<ReadyTask> ReadyQueue;
 		std::thread Thread;
-		bool PreferDispatch = true;
+		bool bPreferDispatch = true;
 	};
 
 	struct TaskLaneState final
@@ -49,7 +49,7 @@ struct TaskExecutor::Implementation::Runtime final
 		std::mutex WakeMutex;
 		std::condition_variable WakeCondition;
 		std::uint64_t WakeEpoch = 0;
-		bool WorkersStopping = false;
+		bool bWorkersStopping = false;
 		std::vector<TaskWorker*> Workers;
 	};
 

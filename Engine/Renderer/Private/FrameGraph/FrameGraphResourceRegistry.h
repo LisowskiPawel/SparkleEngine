@@ -25,7 +25,7 @@ public:
 	void RegisterPersistentBuffer(FrameGraphResourceHandle handle, const FrameGraphBufferDesc& desc, ResourceState initialState) noexcept;
 	void RegisterPersistentAccelerationStructure(FrameGraphResourceHandle handle, std::string_view name, ResourceState initialState) noexcept;
 	void SetBoundaryStates(FrameGraphResourceHandle handle, ResourceState initialState, ResourceState finalState) noexcept;
-	void SetExternalContentsProduced(FrameGraphResourceHandle handle, bool hasBeenProduced) noexcept;
+	void SetExternalContentsProduced(FrameGraphResourceHandle handle, bool bHasBeenProduced) noexcept;
 	bool IsRegistered(FrameGraphResourceHandle handle) const noexcept;
 
 	FrameGraphResourceMetadata& GetMetadata(FrameGraphResourceHandle handle) noexcept;

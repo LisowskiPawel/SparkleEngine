@@ -65,24 +65,24 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 	const bool bInvalidPackPathRelativePath2 = bInvalidPackPathRelativePath || (pack.requiredRelativePath.has_root_name());
 	const bool bInvalidPackPathRelativePath3 = bInvalidPackPathRelativePath2 || (pack.requiredRelativePath.has_root_directory());
 	const bool bInvalidPackPathRelativePath4 = bInvalidPackPathRelativePath3 || (pack.requiredRelativePath.is_absolute());
-	const bool invalidRequiredPackPath = bInvalidPackPathRelativePath4 || (pack.requiredRelativePath.generic_string().starts_with(".."));
+	const bool bInvalidRequiredPackPath = bInvalidPackPathRelativePath4 || (pack.requiredRelativePath.generic_string().starts_with(".."));
 	
-	if (invalidRequiredPackPath)
+	if (bInvalidRequiredPackPath)
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' has an unsafe required path.", pack.id));
 	}
-	if (pack.downloadSupported && !pack.external)
+	if (pack.bDownloadSupported && !pack.bExternal)
 	{
 		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' must be declared external.", pack.id));
 	}
-	const bool filesPayload = !pack.sourceFilesManifestPath.empty();
-	const bool bDescriptionIncompleteSupported = pack.downloadSupported;
+	const bool bFilesPayload = !pack.sourceFilesManifestPath.empty();
+	const bool bDescriptionIncompleteSupported = pack.bDownloadSupported;
 	const bool bDescriptionIncompletesourceUrl = bDescriptionIncompleteSupported && (pack.sourceUrl.empty());
 	const bool bDescriptionIncompleteGuardPath = bDescriptionIncompleteSupported && !bDescriptionIncompletesourceUrl;
 	const bool bDescriptionIncompletePath = bDescriptionIncompleteGuardPath && (pack.extractionPath.empty());
 	const bool bDescriptionIncompletePath2 = bDescriptionIncompletesourceUrl || bDescriptionIncompletePath;
 	const bool bDescriptionIncompleteGuardSha256 = bDescriptionIncompleteSupported && !bDescriptionIncompletePath2;
-	const bool bDescriptionIncompletefilesPayload = bDescriptionIncompleteGuardSha256 && (!filesPayload);
+	const bool bDescriptionIncompletefilesPayload = bDescriptionIncompleteGuardSha256 && (!bFilesPayload);
 	const bool bDescriptionIncompletearchiveName = bDescriptionIncompletefilesPayload && (pack.archiveName.empty());
 	const bool bDescriptionIncompleteGuardBytes = bDescriptionIncompletefilesPayload && !bDescriptionIncompletearchiveName;
 	const bool bDescriptionIncompletearchiveBytes = bDescriptionIncompleteGuardBytes && (pack.archiveBytes == 0);
@@ -92,61 +92,61 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 	const bool bDescriptionIncompleteSha2562 = bDescriptionIncompletearchiveBytes2 || bDescriptionIncompleteSha256;
 	const bool bDescriptionIncompleteSha2563 = bDescriptionIncompletefilesPayload && bDescriptionIncompleteSha2562;
 	const bool bDescriptionIncompleteSha2564 = bDescriptionIncompletePath2 || bDescriptionIncompleteSha2563;
-	const bool downloadDescriptionIncomplete = bDescriptionIncompleteSupported && bDescriptionIncompleteSha2564;
+	const bool bDownloadDescriptionIncomplete = bDescriptionIncompleteSupported && bDescriptionIncompleteSha2564;
 	
-	if (downloadDescriptionIncomplete)
+	if (bDownloadDescriptionIncomplete)
 	{
 		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' has incomplete acquisition metadata.", pack.id));
 	}
-	const bool bDescriptionInvalidSupported = filesPayload && (!pack.downloadSupported);
-	const bool bDescriptionInvalidGuardName = filesPayload && !bDescriptionInvalidSupported;
+	const bool bDescriptionInvalidSupported = bFilesPayload && (!pack.bDownloadSupported);
+	const bool bDescriptionInvalidGuardName = bFilesPayload && !bDescriptionInvalidSupported;
 	const bool bDescriptionInvalidarchiveName = bDescriptionInvalidGuardName && (!pack.archiveName.empty());
 	const bool bDescriptionInvalidarchiveName2 = bDescriptionInvalidSupported || bDescriptionInvalidarchiveName;
-	const bool bDescriptionInvalidGuardBytes = filesPayload && !bDescriptionInvalidarchiveName2;
+	const bool bDescriptionInvalidGuardBytes = bFilesPayload && !bDescriptionInvalidarchiveName2;
 	const bool bDescriptionInvalidarchiveBytes = bDescriptionInvalidGuardBytes && (pack.archiveBytes != 0);
 	const bool bDescriptionInvalidarchiveBytes2 = bDescriptionInvalidarchiveName2 || bDescriptionInvalidarchiveBytes;
-	const bool bDescriptionInvalidGuardSha256 = filesPayload && !bDescriptionInvalidarchiveBytes2;
+	const bool bDescriptionInvalidGuardSha256 = bFilesPayload && !bDescriptionInvalidarchiveBytes2;
 	const bool bFilesDescriptionInvalidSha256 = bDescriptionInvalidGuardSha256 && (!pack.archiveSha256.empty());
 	const bool bFilesDescriptionInvalidSha2562 = bDescriptionInvalidarchiveBytes2 || bFilesDescriptionInvalidSha256;
-	const bool filesPayloadDescriptionInvalid = filesPayload && bFilesDescriptionInvalidSha2562;
+	const bool bInvalidFilesPayload = bFilesPayload && bFilesDescriptionInvalidSha2562;
 	
-	if (filesPayloadDescriptionInvalid)
+	if (bInvalidFilesPayload)
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' must choose either a file manifest or an archive payload.", pack.id));
 	}
-	if (filesPayload && (!pack.sourceUrl.ends_with('/') || pack.requiredRelativePath != ".sparkle-acquisition.txt"))
+	if (bFilesPayload && (!pack.sourceUrl.ends_with('/') || pack.requiredRelativePath != ".sparkle-acquisition.txt"))
 	{
 		throw Diagnostics::Error(std::format("Loose-file asset pack '{}' needs a source directory URL and acquisition receipt.", pack.id));
 	}
-	if (pack.downloadSupported && !pack.sourceUrl.starts_with("https://"))
+	if (pack.bDownloadSupported && !pack.sourceUrl.starts_with("https://"))
 	{
 		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' must use an HTTPS source URL.", pack.id));
 	}
-	if (pack.downloadSupported && !filesPayload && !IsSha256(pack.archiveSha256))
+	if (pack.bDownloadSupported && !bFilesPayload && !IsSha256(pack.archiveSha256))
 	{
 		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' has an invalid SHA-256 digest.", pack.id));
 	}
-	if (!pack.gameSupported && pack.gameBlocker.empty())
+	if (!pack.bGameSupported && pack.gameBlocker.empty())
 	{
 		throw Diagnostics::Error(std::format("Game-unsupported asset pack '{}' must declare a game blocker.", pack.id));
 	}
-	if (pack.gameSupported && !pack.gameBlocker.empty())
+	if (pack.bGameSupported && !pack.gameBlocker.empty())
 	{
 		throw Diagnostics::Error(std::format("Game-supported asset pack '{}' declares a contradictory blocker.", pack.id));
 	}
-	if (pack.external && !pack.downloadSupported && pack.downloadBlocker.empty())
+	if (pack.bExternal && !pack.bDownloadSupported && pack.downloadBlocker.empty())
 	{
 		throw Diagnostics::Error(std::format("External asset pack '{}' without acquisition support must declare its blocker.", pack.id));
 	}
-	if (pack.downloadSupported && !pack.downloadBlocker.empty())
+	if (pack.bDownloadSupported && !pack.downloadBlocker.empty())
 	{
 		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' declares a contradictory blocker.", pack.id));
 	}
-	if (pack.external && (pack.sourcePageUrl.empty() || pack.version.empty() || pack.license.empty()))
+	if (pack.bExternal && (pack.sourcePageUrl.empty() || pack.version.empty() || pack.license.empty()))
 	{
 		throw Diagnostics::Error(std::format("External asset pack '{}' has incomplete provenance metadata.", pack.id));
 	}
-	if (pack.external && !pack.sourcePageUrl.starts_with("https://"))
+	if (pack.bExternal && !pack.sourcePageUrl.starts_with("https://"))
 	{
 		throw Diagnostics::Error(std::format("External asset pack '{}' must use an HTTPS source page URL.", pack.id));
 	}
@@ -155,7 +155,7 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 		throw Diagnostics::Error(std::format("Asset pack '{}' root must remain within its extraction root.", pack.id));
 	}
 	const std::filesystem::path archiveNamePath(pack.archiveName);
-	const bool bInvalidArchiveNamefilesPayload = pack.downloadSupported && !filesPayload;
+	const bool bInvalidArchiveNamefilesPayload = pack.bDownloadSupported && !bFilesPayload;
 	const bool bInvalidArchiveNameNamePath = bInvalidArchiveNamefilesPayload && (archiveNamePath == ".");
 	const bool bInvalidArchiveNameGuardNamePath = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNameNamePath;
 	const bool bInvalidArchiveNameNamePath2 = bInvalidArchiveNameGuardNamePath && (archiveNamePath == "..");
@@ -169,9 +169,9 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 	const bool bInvalidArchiveNameGuardfilename = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNamerootdirectory2;
 	const bool bInvalidArchiveNamefilename = bInvalidArchiveNameGuardfilename && (archiveNamePath.filename() != archiveNamePath);
 	const bool bInvalidArchiveNamefilename2 = bInvalidArchiveNamerootdirectory2 || bInvalidArchiveNamefilename;
-	const bool invalidArchiveName = bInvalidArchiveNamefilesPayload && bInvalidArchiveNamefilename2;
+	const bool bInvalidArchiveName = bInvalidArchiveNamefilesPayload && bInvalidArchiveNamefilename2;
 	
-	if (invalidArchiveName)
+	if (bInvalidArchiveName)
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' archive name must not contain a path.", pack.id));
 	}
@@ -188,7 +188,7 @@ static void ValidateParentChain(const ProjectLevelCatalog& catalog, const Projec
 			throw Diagnostics::Error(std::format("Asset pack '{}' has a cyclic parent chain.", pack.id));
 		}
 		ancestor = &catalog.assetPacks.at(ancestor->parentPackId);
-		if (pack.gameSupported && !ancestor->gameSupported)
+		if (pack.bGameSupported && !ancestor->bGameSupported)
 		{
 			throw Diagnostics::Error(std::format("Game-supported asset pack '{}' depends on game-unsupported parent '{}'.", pack.id, ancestor->id));
 		}
@@ -203,9 +203,9 @@ static void ValidateExtractionRoots(const std::vector<const ProjectAssetPack*>& 
 		{
 			const ProjectAssetPack& left = *downloadablePacks[leftIndex];
 			const ProjectAssetPack& right = *downloadablePacks[rightIndex];
-			const bool extractionRootsOverlap = Paths::IsUnderRoot(left.extractionPath, right.extractionPath) || Paths::IsUnderRoot(right.extractionPath, left.extractionPath);
+			const bool bExtractionRootsOverlap = Paths::IsUnderRoot(left.extractionPath, right.extractionPath) || Paths::IsUnderRoot(right.extractionPath, left.extractionPath);
 			
-			if (extractionRootsOverlap)
+			if (bExtractionRootsOverlap)
 			{
 				throw Diagnostics::Error(std::format("Downloadable asset packs '{}' and '{}' have overlapping extraction roots.", left.id, right.id));
 			}
@@ -239,11 +239,11 @@ void ValidateProjectLevelCatalog(const ProjectLevelCatalog& catalog, const std::
 	for (const auto& [packId, pack] : catalog.assetPacks)
 	{
 		ValidateAssetPackMetadata(catalog, packId, pack);
-		if (pack.downloadSupported && !pack.archiveName.empty() && !archiveNames.insert(pack.archiveName).second)
+		if (pack.bDownloadSupported && !pack.archiveName.empty() && !archiveNames.insert(pack.archiveName).second)
 		{
 			throw Diagnostics::Error(std::format("Downloadable asset pack archive name '{}' is duplicated.", pack.archiveName));
 		}
-		if (pack.downloadSupported)
+		if (pack.bDownloadSupported)
 		{
 			downloadablePacks.push_back(&pack);
 		}

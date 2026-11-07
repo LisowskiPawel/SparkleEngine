@@ -36,5 +36,5 @@ private:
 	std::span<const std::string_view> m_arguments;
 	ShaderCookSettings m_settings;
 	std::size_t m_index = 0;
-	bool m_targetWasSpecified = false;
+	bool m_bTargetWasSpecified = false;
 };

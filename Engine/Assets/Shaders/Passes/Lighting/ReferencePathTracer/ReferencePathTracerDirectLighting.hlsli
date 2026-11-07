@@ -13,19 +13,19 @@ namespace ReferencePathTracer
 	{
 		float3 PositionWorld;
 		float BsdfPdfW;
-		bool Delta;
+		bool bDelta;
 	};
 
 	float3 EvaluateEnvironmentRadiance(LightCounts lightCounts, PreviousPathEvent previousEvent, float3 directionWorld, Texture2D skyTexture, SamplerState skySampler)
 	{
 		const float lightPdfW = EnvironmentPdfW(lightCounts);
-		const float misWeight = previousEvent.Delta ? 1.0f : PathTracer::PowerHeuristic(previousEvent.BsdfPdfW, lightPdfW);
+		const float misWeight = previousEvent.bDelta ? 1.0f : PathTracer::PowerHeuristic(previousEvent.BsdfPdfW, lightPdfW);
 		return SampleSkyRadiance(skyTexture, skySampler, directionWorld) * misWeight;
 	}
 
 	float3 EvaluateSurfaceEmission(LightCounts lightCounts, PreviousPathEvent previousEvent, RayTracingPathSurface surface)
 	{
-		if (previousEvent.Delta || !any(surface.EmissiveColor > 0.0f))
+		if (previousEvent.bDelta || !any(surface.EmissiveColor > 0.0f))
 		{
 			return surface.EmissiveColor;
 		}
@@ -43,7 +43,7 @@ namespace ReferencePathTracer
 	                            SampleIdentity sampleIdentity,
 	                            uint surfaceDepth)
 	{
-		if (lightCounts.Total == 0u || (lobeMasses.Diffuse == 0.0f && (lobeMasses.Specular == 0.0f || lobeMasses.SpecularDelta)))
+		if (lightCounts.Total == 0u || (lobeMasses.Diffuse == 0.0f && (lobeMasses.Specular == 0.0f || lobeMasses.bSpecularDelta)))
 		{
 			return 0.0f.xxx;
 		}
@@ -55,21 +55,21 @@ namespace ReferencePathTracer
 		                                       CommonRandom::OpenUnitInterval(RandomWord(sampleIdentity, SurfaceDimension(surfaceDepth, LightShapeYOffset))));
 
 		const LightSampling::DirectLightSample light = SampleLight(selection, surface.PositionWorld, lightShapeSample, skyTexture, skySampler);
-		if (!light.Valid)
+		if (!light.bValid)
 		{
 			return 0.0f.xxx;
 		}
 
 		const PathBsdf::Evaluation bsdf = PathBsdf::EvaluateContinuous(surface, light.DirectionWorld, lobeMasses, true, true);
-		if (!bsdf.HasSupport || !IsPathUnoccluded(sceneTlas, surface, light))
+		if (!bsdf.bHasSupport || !IsPathUnoccluded(sceneTlas, surface, light))
 		{
 			return 0.0f.xxx;
 		}
 
-		const float lightProbability = light.LightSelectionPdf * (light.Delta ? 1.0f : light.PdfW);
-		const bool continuesPath = FinitePathDiagnosticSurfaceVertices == 0u || surfaceDepth + 1u < FinitePathDiagnosticSurfaceVertices;
-		const float competingPdfW = continuesPath && selection.Kind != KindAnalytic ? bsdf.PdfW : 0.0f;
-		const float misWeight = light.Delta ? 1.0f : PathTracer::PowerHeuristic(lightProbability, competingPdfW);
+		const float lightProbability = light.LightSelectionPdf * (light.bDelta ? 1.0f : light.PdfW);
+		const bool bContinuesPath = FinitePathDiagnosticSurfaceVertices == 0u || surfaceDepth + 1u < FinitePathDiagnosticSurfaceVertices;
+		const float competingPdfW = bContinuesPath && selection.Kind != KindAnalytic ? bsdf.PdfW : 0.0f;
+		const float misWeight = light.bDelta ? 1.0f : PathTracer::PowerHeuristic(lightProbability, competingPdfW);
 		return (bsdf.Diffuse + bsdf.Specular) * light.IncidentRadiance * bsdf.Cosine * misWeight / lightProbability;
 	}
 }

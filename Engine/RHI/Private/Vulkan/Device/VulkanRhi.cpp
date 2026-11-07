@@ -103,5 +103,5 @@ const std::vector<std::string>& VulkanRhi::GetEnabledDeviceExtensions() const no
 
 bool VulkanRhi::IsValidationEnabled() const noexcept
 {
-	return m_validationEnabled;
+	return m_bValidationEnabled;
 }

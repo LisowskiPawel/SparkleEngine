@@ -9,7 +9,7 @@ struct SPARKLE_ENGINE_API CameraNavigationSettings final
 	float MaximumMoveSpeedMetersPerSecond = 1000.0f;
 	float RotationSpeedDegreesPerPixel = 0.0716197f;
 	float SprintMultiplier = 2.0f;
-	bool InvertY = false;
+	bool bInvertY = false;
 
 	bool operator==(const CameraNavigationSettings&) const noexcept = default;
 };

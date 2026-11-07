@@ -14,10 +14,10 @@ namespace ECS
 
 	bool GameWorldState::PrepareSystemExecution(GameWorldResourceStores& resources)
 	{
-		const bool animationPrepared = m_systemGraph && m_animationOutput.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation);
-		const bool extractionPrepared = animationPrepared && m_extraction.Prepare(m_registry);
+		const bool bAnimationPrepared = m_systemGraph && m_animationOutput.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation);
+		const bool bExtractionPrepared = bAnimationPrepared && m_extraction.Prepare(m_registry);
 
-		if (!extractionPrepared)
+		if (!bExtractionPrepared)
 		{
 			return false;
 		}
@@ -32,7 +32,7 @@ namespace ECS
 		m_systemArena.AnimationChanges.assign(StorageCount<AnimationState>(m_registry), EntityId::Invalid());
 		m_systemArena.MorphChanges.assign(m_animationOutput.GetMorphBindings().size(), EntityId::Invalid());
 		m_systemArena.DirtyTransforms.clear();
-		if (m_evaluateAllTransforms)
+		if (m_bEvaluateAllTransforms)
 		{
 			const std::span<const EntityId> entities = m_registry.GetStorage<LocalTransform>().GetEntities();
 			m_systemArena.DirtyTransforms.assign(entities.begin(), entities.end());

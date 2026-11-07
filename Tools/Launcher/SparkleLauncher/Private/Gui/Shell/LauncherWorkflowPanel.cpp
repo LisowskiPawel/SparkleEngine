@@ -211,8 +211,8 @@ namespace SparkleLauncher
 	{
 		for (QAbstractButton* button : m_workflowGroupButtons->buttons())
 		{
-			const bool active = button != nullptr && button->property("WorkflowIndex").toInt() == workflowIndex;
-			button->setProperty("ActiveState", active ? "true" : "false");
+			const bool bActive = button != nullptr && button->property("WorkflowIndex").toInt() == workflowIndex;
+			button->setProperty("ActiveState", bActive ? "true" : "false");
 			button->style()->unpolish(button);
 			button->style()->polish(button);
 			button->update();

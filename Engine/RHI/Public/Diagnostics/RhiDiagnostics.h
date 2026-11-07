@@ -55,15 +55,15 @@ struct RhiDiagnosticMessage
 
 struct RhiDiagnosticsCapabilities
 {
-	bool SupportsObjectNames = false;
-	bool SupportsGpuEvents = false;
-	bool RequiresBaselineScopes = false;
-	bool SupportsTimestampQueries = false;
-	bool SupportsDebugMessages = false;
-	bool SupportsLiveObjectReports = false;
-	bool SupportsCrashDiagnostics = false;
-	bool SupportsMemoryDiagnostics = false;
-	bool SupportsMemoryBudgetQueries = false;
+	bool bSupportsObjectNames = false;
+	bool bSupportsGpuEvents = false;
+	bool bRequiresBaselineScopes = false;
+	bool bSupportsTimestampQueries = false;
+	bool bSupportsDebugMessages = false;
+	bool bSupportsLiveObjectReports = false;
+	bool bSupportsCrashDiagnostics = false;
+	bool bSupportsMemoryDiagnostics = false;
+	bool bSupportsMemoryBudgetQueries = false;
 };
 
 class SPARKLE_RHI_API RenderObjectDiagnostics

@@ -112,7 +112,7 @@ std::string ShaderParameterStructVerificationResult::BuildJsonReport() const
 
 namespace ShaderParameterVerification
 {
-	static void VerifyAutomaticValues(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool allowUnreflectedDeclarations, std::vector<std::string>& mismatches)
+	static void VerifyAutomaticValues(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool bAllowUnreflectedDeclarations, std::vector<std::string>& mismatches)
 	{
 		if (!descriptor.Values.empty())
 		{
@@ -123,9 +123,9 @@ namespace ShaderParameterVerification
 				{
 					const auto member = std::ranges::find_if(block->Members, [&value](const auto& reflected) { return reflected.Name == value.Name; });
 					const bool bReflectedMemberMismatchInBytes = member == block->Members.end() || member->OffsetInBytes != value.OffsetInBytes;
-					const bool reflectedMemberMismatch = bReflectedMemberMismatchInBytes || (member->SizeInBytes != value.SizeInBytes);
+					const bool bReflectedMemberMismatch = bReflectedMemberMismatchInBytes || (member->SizeInBytes != value.SizeInBytes);
 					
-					if (reflectedMemberMismatch)
+					if (bReflectedMemberMismatch)
 					{
 						mismatches.push_back(
 						    std::format(
@@ -137,7 +137,7 @@ namespace ShaderParameterVerification
 					}
 				}
 			}
-			else if (!allowUnreflectedDeclarations)
+			else if (!bAllowUnreflectedDeclarations)
 			{
 				mismatches.push_back(std::format("SC2007 automatic parameter block '{}' has no reflected members.", descriptor.AutoParametersName));
 			}
@@ -147,12 +147,12 @@ namespace ShaderParameterVerification
 	static void VerifyDeclaredBindings(
 	    const ShaderParameterStructDescriptor& descriptor,
 	    const ShaderReflection& reflection,
-	    bool allowUnreflectedDeclarations,
+	    bool bAllowUnreflectedDeclarations,
 	    ShaderParameterStructVerificationResult& result)
 	{
 		for (const ShaderParameterStructFieldDescriptor& field : descriptor.Fields)
 		{
-			if (!field.Reflected)
+			if (!field.bReflected)
 			{
 				continue;
 			}
@@ -160,7 +160,7 @@ namespace ShaderParameterVerification
 			const ShaderReflectionResourceBinding* binding = FindReflectionBinding(reflection, field.Name);
 			if (binding == nullptr)
 			{
-				if (allowUnreflectedDeclarations)
+				if (bAllowUnreflectedDeclarations)
 				{
 					result.diagnostics.push_back(
 					    std::format(
@@ -247,11 +247,11 @@ namespace ShaderParameterVerification
 
 }
 
-ShaderParameterStructVerificationResult VerifyShaderParameterStruct(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool allowUnreflectedDeclarations)
+ShaderParameterStructVerificationResult VerifyShaderParameterStruct(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool bAllowUnreflectedDeclarations)
 {
 	ShaderParameterStructVerificationResult result;
-	ShaderParameterVerification::VerifyAutomaticValues(descriptor, reflection, allowUnreflectedDeclarations, result.mismatches);
-	ShaderParameterVerification::VerifyDeclaredBindings(descriptor, reflection, allowUnreflectedDeclarations, result);
+	ShaderParameterVerification::VerifyAutomaticValues(descriptor, reflection, bAllowUnreflectedDeclarations, result.mismatches);
+	ShaderParameterVerification::VerifyDeclaredBindings(descriptor, reflection, bAllowUnreflectedDeclarations, result);
 	ShaderParameterVerification::ReportUndeclaredBindings(descriptor, reflection, result.diagnostics);
 	ShaderParameterVerification::PublishDiagnostics(descriptor.Name, result);
 	return result;

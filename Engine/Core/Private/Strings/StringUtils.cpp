@@ -59,7 +59,7 @@ namespace Strings
 		return std::string(Unquote(TrimAsciiWhitespace(str)));
 	}
 
-	std::vector<std::string_view> Split(std::string_view str, char separator, bool keepEmptyFields)
+	std::vector<std::string_view> Split(std::string_view str, char separator, bool bKeepEmptyFields)
 	{
 		std::vector<std::string_view> fields;
 		std::size_t start = 0;
@@ -68,7 +68,7 @@ namespace Strings
 			const std::size_t separatorIndex = str.find(separator, start);
 			const std::size_t end = separatorIndex == std::string_view::npos ? str.size() : separatorIndex;
 			const std::string_view field = str.substr(start, end - start);
-			if (keepEmptyFields || !field.empty())
+			if (bKeepEmptyFields || !field.empty())
 			{
 				fields.push_back(field);
 			}
@@ -192,26 +192,26 @@ namespace Strings
 		return false;
 	}
 
-	bool TryParseBool(std::string_view str, bool& outValue)
+	bool TryParseBool(std::string_view str, bool& bOutValue)
 	{
 		const std::string_view trimmed = TrimAsciiWhitespace(str);
 		const bool bIsTrueTokentrimmed = EqualsIgnoreCase(trimmed, "true") || trimmed == "1";
 		const bool bIsTrueTokenIgnoreCase = bIsTrueTokentrimmed || (EqualsIgnoreCase(trimmed, "yes"));
-		const bool isTrueToken = bIsTrueTokenIgnoreCase || (EqualsIgnoreCase(trimmed, "on"));
+		const bool bIsTrueToken = bIsTrueTokenIgnoreCase || (EqualsIgnoreCase(trimmed, "on"));
 		
-		if (isTrueToken)
+		if (bIsTrueToken)
 		{
-			outValue = true;
+			bOutValue = true;
 			return true;
 		}
 
 		const bool bIsFalseTokentrimmed = EqualsIgnoreCase(trimmed, "false") || trimmed == "0";
 		const bool bIsFalseTokenIgnoreCase = bIsFalseTokentrimmed || (EqualsIgnoreCase(trimmed, "no"));
-		const bool isFalseToken = bIsFalseTokenIgnoreCase || (EqualsIgnoreCase(trimmed, "off"));
+		const bool bIsFalseToken = bIsFalseTokenIgnoreCase || (EqualsIgnoreCase(trimmed, "off"));
 		
-		if (isFalseToken)
+		if (bIsFalseToken)
 		{
-			outValue = false;
+			bOutValue = false;
 			return true;
 		}
 

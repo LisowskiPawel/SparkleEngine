@@ -58,14 +58,14 @@ namespace Assets
 		LoadedAnimationAsset animationAsset;
 		animationAsset.header = reader.Read<CookedAnimationAssetHeader>();
 
-		const bool magicValid = animationAsset.header.fileHeader.HasMagic(kCookedAnimationAssetMagic);
+		const bool bMagicValid = animationAsset.header.fileHeader.HasMagic(kCookedAnimationAssetMagic);
 
-		const bool bStridesValidheader = magicValid && animationAsset.header.channelStride == sizeof(CookedAnimationChannelRecord);
-		const bool stridesValid = bStridesValidheader && (animationAsset.header.keyframeStride == sizeof(CookedAnimationKeyframeRecord));
+		const bool bStridesValidheader = bMagicValid && animationAsset.header.channelStride == sizeof(CookedAnimationChannelRecord);
+		const bool bStridesValid = bStridesValidheader && (animationAsset.header.keyframeStride == sizeof(CookedAnimationKeyframeRecord));
 
-		const bool nameTerminated = stridesValid && Strings::IsNullTerminated(std::span(animationAsset.header.name));
+		const bool bNameTerminated = bStridesValid && Strings::IsNullTerminated(std::span(animationAsset.header.name));
 
-		if (!nameTerminated)
+		if (!bNameTerminated)
 		{
 			throw diagnostics.MakeError("header", "animation magic and current channel/keyframe strides", "Invalid cooked animation asset header; recook the asset");
 		}
@@ -80,43 +80,43 @@ namespace Assets
 		for (std::size_t channelIndex = 0; channelIndex < animationAsset.channels.size(); ++channelIndex)
 		{
 			const CookedAnimationChannelRecord& channel = animationAsset.channels[channelIndex];
-			const bool targetKnown = IsKnownTargetPath(channel.targetPath);
-			const bool interpolationKnown = targetKnown && IsKnownInterpolation(channel.interpolation);
-			const bool targetNodeValid = interpolationKnown && channel.targetNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
-			const bool bKeyframeOffsetValidkeyframeCount = targetNodeValid && channel.keyframeCount != 0u;
-			const bool keyframeOffsetValid = bKeyframeOffsetValidkeyframeCount && (channel.firstKeyframe <= animationAsset.keyframes.size());
-			const bool keyframeCountValid = keyframeOffsetValid && channel.keyframeCount <= animationAsset.keyframes.size() - channel.firstKeyframe;
+			const bool bTargetKnown = IsKnownTargetPath(channel.targetPath);
+			const bool bInterpolationKnown = bTargetKnown && IsKnownInterpolation(channel.interpolation);
+			const bool bTargetNodeValid = bInterpolationKnown && channel.targetNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
+			const bool bKeyframeOffsetValidkeyframeCount = bTargetNodeValid && channel.keyframeCount != 0u;
+			const bool bKeyframeOffsetValid = bKeyframeOffsetValidkeyframeCount && (channel.firstKeyframe <= animationAsset.keyframes.size());
+			const bool bKeyframeCountValid = bKeyframeOffsetValid && channel.keyframeCount <= animationAsset.keyframes.size() - channel.firstKeyframe;
 
-			if (!keyframeCountValid)
+			if (!bKeyframeCountValid)
 			{
 				throw diagnostics.MakeError("payload", "known channel semantics and an in-range non-empty keyframe span", std::format("Cooked animation channel {} is invalid", channelIndex));
 			}
 
 			float previousTime = -1.0f;
 			DirectX::XMFLOAT4 previousRotation{};
-			bool hasPreviousRotation = false;
+			bool bHasPreviousRotation = false;
 			for (std::uint32_t keyframeOffset = 0; keyframeOffset < channel.keyframeCount; ++keyframeOffset)
 			{
 				const CookedAnimationKeyframeRecord& keyframe = animationAsset.keyframes[channel.firstKeyframe + keyframeOffset];
-				const bool cubicSpline = channel.interpolation == CookedAnimationInterpolation::CubicSpline;
-				const bool timeFinite = std::isfinite(keyframe.timeSeconds);
+				const bool bCubicSpline = channel.interpolation == CookedAnimationInterpolation::CubicSpline;
+				const bool bTimeFinite = std::isfinite(keyframe.timeSeconds);
 				const bool bTimeOrderedtimeSeconds = keyframe.timeSeconds < 0.0f || keyframe.timeSeconds <= previousTime;
 				const bool bTimeOrderedheader = bTimeOrderedtimeSeconds || (keyframe.timeSeconds > animationAsset.header.durationSeconds);
 				const bool bTimeOrderedheader2 = !bTimeOrderedheader;
-				const bool timeOrdered = timeFinite && bTimeOrderedheader2;
-				const bool valueFinite = timeOrdered && IsFinite(keyframe.value);
-				const bool bInTangentValidcubicSpline = valueFinite && (!cubicSpline);
-				const bool bInTangentValidGuardinTangent = valueFinite && !bInTangentValidcubicSpline;
+				const bool bTimeOrdered = bTimeFinite && bTimeOrderedheader2;
+				const bool bValueFinite = bTimeOrdered && IsFinite(keyframe.value);
+				const bool bInTangentValidcubicSpline = bValueFinite && (!bCubicSpline);
+				const bool bInTangentValidGuardinTangent = bValueFinite && !bInTangentValidcubicSpline;
 				const bool bInTangentValidinTangent = bInTangentValidGuardinTangent && (IsFinite(keyframe.inTangent));
 				const bool bInTangentValidinTangent2 = bInTangentValidcubicSpline || bInTangentValidinTangent;
-				const bool inTangentValid = valueFinite && bInTangentValidinTangent2;
-				const bool bOutTangentValidcubicSpline = inTangentValid && (!cubicSpline);
-				const bool bOutTangentValidGuardoutTangent = inTangentValid && !bOutTangentValidcubicSpline;
+				const bool bInTangentValid = bValueFinite && bInTangentValidinTangent2;
+				const bool bOutTangentValidcubicSpline = bInTangentValid && (!bCubicSpline);
+				const bool bOutTangentValidGuardoutTangent = bInTangentValid && !bOutTangentValidcubicSpline;
 				const bool bOutTangentValidoutTangent = bOutTangentValidGuardoutTangent && (IsFinite(keyframe.outTangent));
 				const bool bOutTangentValidoutTangent2 = bOutTangentValidcubicSpline || bOutTangentValidoutTangent;
-				const bool outTangentValid = inTangentValid && bOutTangentValidoutTangent2;
+				const bool bOutTangentValid = bInTangentValid && bOutTangentValidoutTangent2;
 
-				if (!outTangentValid)
+				if (!bOutTangentValid)
 				{
 					throw diagnostics.MakeError(
 					    "payload",
@@ -128,15 +128,15 @@ namespace Assets
 				{
 					const DirectX::XMVECTOR rotation = DirectX::XMLoadFloat4(&keyframe.value);
 					const float lengthSquared = DirectX::XMVectorGetX(DirectX::XMVector4LengthSq(rotation));
-					const bool rotationFinite = std::isfinite(lengthSquared);
-					const bool rotationNormalized = rotationFinite && !(std::abs(lengthSquared - 1.0f) > 1.0e-3f);
+					const bool bRotationFinite = std::isfinite(lengthSquared);
+					const bool bRotationNormalized = bRotationFinite && !(std::abs(lengthSquared - 1.0f) > 1.0e-3f);
 
-					const bool bRotationContinuousRotation = rotationNormalized && (hasPreviousRotation);
+					const bool bRotationContinuousRotation = bRotationNormalized && (bHasPreviousRotation);
 					const bool bRotationContinuous0e = bRotationContinuousRotation && (DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(&previousRotation), rotation)) < -1.0e-5f);
-					const bool bRotationContinuous0e2 = rotationNormalized && !bRotationContinuous0e;
-					const bool rotationContinuous = rotationNormalized && bRotationContinuous0e2;
+					const bool bRotationContinuous0e2 = bRotationNormalized && !bRotationContinuous0e;
+					const bool bRotationContinuous = bRotationNormalized && bRotationContinuous0e2;
 
-					if (!rotationContinuous)
+					if (!bRotationContinuous)
 					{
 						throw diagnostics.MakeError(
 						    "payload",
@@ -144,7 +144,7 @@ namespace Assets
 						    std::format("Cooked animation channel {} keyframe {} has an invalid rotation", channelIndex, keyframeOffset));
 					}
 					previousRotation = keyframe.value;
-					hasPreviousRotation = true;
+					bHasPreviousRotation = true;
 				}
 				previousTime = keyframe.timeSeconds;
 			}

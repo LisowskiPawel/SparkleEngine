@@ -23,7 +23,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	}
 
 	const DirectReservoir::Surface surface = DirectReservoir::LoadSurface(pixelCoord);
-	if (!surface.Valid)
+	if (!surface.bValid)
 	{
 		TemporalReservoirSample[pixelCoord] = DirectReservoir::PackReservoirSample(DirectReservoir::EmptyReservoir());
 		TemporalReservoirWeight[pixelCoord] = DirectReservoir::PackReservoirWeight(DirectReservoir::EmptyReservoir());

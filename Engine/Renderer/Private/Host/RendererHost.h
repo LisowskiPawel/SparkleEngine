@@ -29,7 +29,7 @@ public:
 private:
 	friend class RendererExecutionContext;
 
-	std::unique_ptr<FramePipeline> CreateFramePipeline(TaskExecutor& taskExecutor, TaskScope& assetTaskParentScope, bool enableUiRenderPackets);
+	std::unique_ptr<FramePipeline> CreateFramePipeline(TaskExecutor& taskExecutor, TaskScope& assetTaskParentScope, bool bEnableUiRenderPackets);
 	void ReloadShaders();
 	ShaderDiagnosticsSnapshot CaptureShaderDiagnostics() const;
 	std::uint64_t GetShaderGeneration() const noexcept;

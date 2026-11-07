@@ -96,7 +96,7 @@ VkSamplerAddressMode VulkanSamplerLibrary::ToVkAddressMode(RhiSamplerAddressMode
 VkSampler VulkanSamplerLibrary::CreateSampler(const RhiSamplerDesc& desc) const
 {
 	const std::uint32_t maxAnisotropy = static_cast<std::uint32_t>(desc.MaxAnisotropy);
-	const bool anisotropyEnabled = maxAnisotropy > 1 && m_rhi.GetFeatureStatus().EnabledSamplerAnisotropy;
+	const bool bAnisotropyEnabled = maxAnisotropy > 1 && m_rhi.GetFeatureStatus().bEnabledSamplerAnisotropy;
 
 	const VkSamplerCreateInfo createInfo{
 	    .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
@@ -109,7 +109,7 @@ VkSampler VulkanSamplerLibrary::CreateSampler(const RhiSamplerDesc& desc) const
 	    .addressModeV = ToVkAddressMode(desc.Address.V),
 	    .addressModeW = ToVkAddressMode(desc.Address.W),
 	    .mipLodBias = 0.0f,
-	    .anisotropyEnable = anisotropyEnabled ? VK_TRUE : VK_FALSE,
+	    .anisotropyEnable = bAnisotropyEnabled ? VK_TRUE : VK_FALSE,
 	    .maxAnisotropy = static_cast<float>(std::max(1u, maxAnisotropy)),
 	    .compareEnable = VK_FALSE,
 	    .compareOp = VK_COMPARE_OP_ALWAYS,

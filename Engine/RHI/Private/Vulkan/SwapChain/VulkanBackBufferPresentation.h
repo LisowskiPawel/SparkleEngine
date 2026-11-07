@@ -41,7 +41,7 @@ public:
 private:
 	RhiResourceViewHandle GetCurrentBackBufferViewHandle() const noexcept;
 	VulkanRenderCommandList& PrepareBackBufferRendering() noexcept;
-	void BeginCurrentBackBufferRendering(const float* clearColor, bool clear) noexcept;
+	void BeginCurrentBackBufferRendering(const float* clearColor, bool bClear) noexcept;
 	void EndCurrentBackBufferRendering() noexcept;
 	RenderCommandList& GetGraphicsCommandList() noexcept;
 

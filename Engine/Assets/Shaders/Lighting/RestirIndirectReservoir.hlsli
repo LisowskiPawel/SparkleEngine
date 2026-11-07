@@ -31,12 +31,12 @@ namespace IndirectReservoir
 
 	float4 PackSurface(GBufferPathSurface surface)
 	{
-		return RestirReservoirCommon::PackSurface(surface.Valid, surface.GBuffer.NormalWorld, surface.ViewDistance);
+		return RestirReservoirCommon::PackSurface(surface.bValid, surface.GBuffer.NormalWorld, surface.ViewDistance);
 	}
 
 	bool AreSurfacesCompatible(GBufferPathSurface surface, float4 packedSurface)
 	{
-		return RestirReservoirCommon::AreSurfacesCompatible(surface.Valid, surface.GBuffer.NormalWorld, surface.ViewDistance, packedSurface);
+		return RestirReservoirCommon::AreSurfacesCompatible(surface.bValid, surface.GBuffer.NormalWorld, surface.ViewDistance, packedSurface);
 	}
 
 	Reservoir EmptyReservoir()
@@ -117,20 +117,20 @@ namespace IndirectReservoir
 		}
 
 		const float newWeightSum = reservoir.WeightSum + target;
-		const bool selected = random * newWeightSum <= target;
+		const bool bSelected = random * newWeightSum <= target;
 		reservoir.WeightSum = newWeightSum;
-		if (selected)
+		if (bSelected)
 		{
 			reservoir.Selected = candidate;
 			reservoir.Target = target;
 			reservoir.Valid = 1.0f;
 		}
-		return selected;
+		return bSelected;
 	}
 
 	bool CombineReservoir(inout Reservoir reservoir, Reservoir candidateReservoir, GBufferPathSurface surface, Texture2D skyTexture, SamplerState skySampler, float maxM, float random)
 	{
-		if (!surface.Valid || candidateReservoir.M <= 0.0f)
+		if (!surface.bValid || candidateReservoir.M <= 0.0f)
 		{
 			return false;
 		}
@@ -152,21 +152,21 @@ namespace IndirectReservoir
 
 		const float sampleWeight = candidateReservoir.WeightSum * (acceptedM / candidateM) * target / max(candidateReservoir.Target, MinTarget);
 		const float newWeightSum = reservoir.WeightSum + sampleWeight;
-		const bool selected = random * newWeightSum <= sampleWeight;
+		const bool bSelected = random * newWeightSum <= sampleWeight;
 		reservoir.WeightSum = newWeightSum;
-		if (selected)
+		if (bSelected)
 		{
 			reservoir.Selected = candidateReservoir.Selected;
 			reservoir.Target = target;
 			reservoir.Valid = 1.0f;
 		}
-		return selected;
+		return bSelected;
 	}
 
 	Reservoir BuildInitialReservoir(GBufferPathSurface surface, uint2 pixelCoord, Texture2D skyTexture, SamplerState skySampler)
 	{
 		Reservoir reservoir = EmptyReservoir();
-		if (!surface.Valid)
+		if (!surface.bValid)
 		{
 			return reservoir;
 		}

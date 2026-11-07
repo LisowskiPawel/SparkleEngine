@@ -9,9 +9,9 @@ void ArmExternalCapture(RhiExternalCapture& capture, const RenderExternalCapture
 		return;
 	}
 	const bool bProductUnavailableContextToken = snapshot.ContextToken == 0 || products.GetGeneration() != snapshot.ContextToken;
-	const bool captureProductUnavailable = bProductUnavailableContextToken || (!products.HasOutput(RenderOutputFlags::FinalColorLdr));
+	const bool bCaptureProductUnavailable = bProductUnavailableContextToken || (!products.HasOutput(RenderOutputFlags::FinalColorLdr));
 	
-	if (captureProductUnavailable)
+	if (bCaptureProductUnavailable)
 	{
 		capture.Reject(command.RequestId, "The requested viewport generation is stale. Wait for its current output and retry.");
 		return;
@@ -19,10 +19,10 @@ void ArmExternalCapture(RhiExternalCapture& capture, const RenderExternalCapture
 	capture.Arm(command.RequestId);
 }
 
-void ValidateExternalCaptureContext(RhiExternalCapture& capture, std::uint64_t currentGeneration, bool sceneReset) noexcept
+void ValidateExternalCaptureContext(RhiExternalCapture& capture, std::uint64_t currentGeneration, bool bSceneReset) noexcept
 {
 	const auto snapshot = capture.Observe();
-	if ((snapshot.State == ExternalCaptureState::Queued || snapshot.State == ExternalCaptureState::Capturing) && (snapshot.ContextToken != currentGeneration || sceneReset))
+	if ((snapshot.State == ExternalCaptureState::Queued || snapshot.State == ExternalCaptureState::Capturing) && (snapshot.ContextToken != currentGeneration || bSceneReset))
 	{
 		capture.InvalidateTarget();
 	}

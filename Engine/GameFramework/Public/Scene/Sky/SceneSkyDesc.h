@@ -7,7 +7,7 @@
 
 struct SPARKLE_ENGINE_API SceneSkyDesc
 {
-	bool enabled = true;
+	bool bEnabled = true;
 	DirectX::XMFLOAT3 color{1.0f, 1.0f, 1.0f};
 	float brightness = 1.0f;
 	Assets::CookedTextureReference skyTexture{{}, TextureGroup::HdrColor};

@@ -29,9 +29,9 @@ void ViewportCaptureSlot::Update(Renderer& renderer)
 		return;
 	}
 	m_capture = {};
-	if (m_discard)
+	if (m_bDiscard)
 	{
-		m_discard = false;
+		m_bDiscard = false;
 		return;
 	}
 	m_readback = std::move(readback);
@@ -40,7 +40,7 @@ void ViewportCaptureSlot::Update(Renderer& renderer)
 void ViewportCaptureSlot::Discard() noexcept
 {
 	m_readback.reset();
-	m_discard = static_cast<bool>(m_capture);
+	m_bDiscard = static_cast<bool>(m_capture);
 }
 
 ViewportCaptureReadback ViewportCaptureSlot::TakeReadback()

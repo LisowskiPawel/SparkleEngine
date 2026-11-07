@@ -57,11 +57,11 @@ public:
 
 	const InputState& GetState(InputLayer layer) const noexcept;
 
-	void BeginInputRoutingFrame(bool interactionDisabled, bool textInputActive);
+	void BeginInputRoutingFrame(bool bInteractionDisabled, bool bTextInputActive);
 	void RegisterInputTargetRegion(float left, float top, float right, float bottom, InputLayer targetLayer);
 
 	void SetActiveLayer(InputLayer layer) noexcept;
-	void SetLayerEnabled(InputLayer layer, bool enabled);
+	void SetLayerEnabled(InputLayer layer, bool bEnabled);
 
 	bool IsLayerEnabled(InputLayer layer) const noexcept;
 
@@ -89,7 +89,7 @@ public:
 
 	bool IsCursorHidden() const noexcept;
 
-	void SetCursorVisibility(bool visible);
+	void SetCursorVisibility(bool bVisible);
 
 	void CenterCursor(void* windowHandle);
 
@@ -125,7 +125,7 @@ private:
 
 	int32_t m_lastMouseX = 0;
 	int32_t m_lastMouseY = 0;
-	bool m_hasLastMousePosition = false;
+	bool m_bHasLastMousePosition = false;
 
 	ScopedEventHandle m_windowMessageHandle;
 };

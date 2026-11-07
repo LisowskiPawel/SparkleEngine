@@ -147,9 +147,9 @@ public:
 		    parameters,
 		    [shaderTable](PassResourceBuilder& builder, const TParameterBindings& typedParameters, const char* passName)
 		    {
-			    const bool parametersValid = SetupShaderParameters(builder, typedParameters, passName);
+			    const bool bParametersValid = SetupShaderParameters(builder, typedParameters, passName);
 			    builder.Read(shaderTable, ResourceUsage::RayTracingShaderTableRead, "ShaderTable");
-			    return parametersValid;
+			    return bParametersValid;
 		    },
 		    std::forward<ExecuteFn>(executeFn));
 	}
@@ -316,11 +316,11 @@ private:
 		std::uint64_t generation = 1u;
 		std::uint32_t previousIndex = 0u;
 		std::uint32_t currentIndex = 0u;
-		bool usedThisFrame = false;
-		bool writtenThisFrame = false;
-		bool allowRenderTarget = false;
-		bool allowDepthStencil = false;
-		bool allowUnorderedAccess = false;
+		bool bUsedThisFrame = false;
+		bool bWrittenThisFrame = false;
+		bool bAllowRenderTarget = false;
+		bool bAllowDepthStencil = false;
+		bool bAllowUnorderedAccess = false;
 	};
 
 	void PrepareTextureHistory(const FrameGraphPlan& plan, TextureHistoryRecord& history, std::uint32_t historyResourceCount, RhiResourceService& resourceService);
@@ -346,7 +346,7 @@ private:
 		FrameGraphPassExecutionModel executionModel = FrameGraphPassExecutionModel::Callback;
 		SetupCallback setupCallback;
 		ExecuteCallback executeCallback;
-		bool active = true;
+		bool bActive = true;
 	};
 
 	std::unordered_map<std::string, std::shared_ptr<RayTracingShaderTable>> m_rayTracingShaderTables;

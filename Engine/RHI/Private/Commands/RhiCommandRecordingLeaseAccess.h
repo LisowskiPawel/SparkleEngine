@@ -29,7 +29,7 @@ struct RhiCommandRecordingLeaseBackendState final
 	std::uint32_t FrameSlot = 0;
 	RhiCommandRecordingContextId ContextId = {};
 	RhiCommandRecordingOwner Owner = {};
-	bool Closed = false;
+	bool bClosed = false;
 };
 
 class RhiCommandRecordingLeaseAccess final
@@ -45,15 +45,15 @@ public:
 		const RhiCommandRecordingLeaseBackendState leaseState = Consume(std::move(lease));
 		auto* const slot = static_cast<Slot*>(leaseState.State);
 		const bool bSlotOwnedOwner = slot != nullptr && slot->Owner == recordingContext;
-		const bool slotOwned = bSlotOwnedOwner && (slot->State == closedState);
-		if (!slotOwned)
+		const bool bSlotOwned = bSlotOwnedOwner && (slot->State == closedState);
+		if (!bSlotOwned)
 		{
 			return nullptr;
 		}
 		const RhiCommandRecordingLeaseBackendState expected{.State = slot, .CommandList = slot->CommandList.get(), .QueueType = slot->QueueType, .FrameSlot = slot->FrameSlot, .ContextId = RhiCommandRecordingContextId{.Value = slot->ContextIndex}, .Owner = slot->RecordingOwner, .Closed = true};
-		const bool leaseMatches = Matches(leaseState, expected);
+		const bool bLeaseMatches = Matches(leaseState, expected);
 		
-		if (!leaseMatches)
+		if (!bLeaseMatches)
 		{
 			return nullptr;
 		}

@@ -154,7 +154,7 @@ void VulkanRecordingResourceTable::CollectPublishedResources(std::span<VulkanGpu
 	std::size_t publicationOrder = 0;
 	for (VulkanGpuAllocationRecord* record : records)
 	{
-		if (record == nullptr || record->PendingRelease)
+		if (record == nullptr || record->bPendingRelease)
 		{
 			continue;
 		}
@@ -256,7 +256,7 @@ VulkanRecordingResource VulkanRecordingResourceTable::BuildResource(const Vulkan
 	    .Usage = record.Usage,
 	    .AccelerationStructureType = record.AccelerationStructureType,
 	    .ResourceKind = record.ResourceKind,
-	    .IsPtlas = record.IsPtlas};
+	    .bIsPtlas = record.bIsPtlas};
 }
 
 void VulkanRecordingResourceTable::RetainReference(VulkanGpuAllocationRecord& record) noexcept

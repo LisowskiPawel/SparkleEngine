@@ -21,7 +21,7 @@ namespace RenderingSettingsUi
 	bool BeginSettingsTable(const char* id);
 	void BeginSettingsRow(const char* label);
 
-	bool DrawBooleanRow(const char* id, const char* label, bool& value);
+	bool DrawBooleanRow(const char* id, const char* label, bool& bValue);
 	bool DrawUnsignedIntSliderRow(const char* id, const char* label, std::uint32_t& value, std::uint32_t minValue, std::uint32_t maxValue);
 	bool DrawFloatInputRow(const char* id, const char* label, float& value, float step = 1.0f, float stepFast = 10.0f, const char* format = "%.3f");
 
@@ -46,12 +46,12 @@ namespace RenderingSettingsUi
 		{
 			for (const ComboOption<ValueType>& option : options)
 			{
-				const bool selected = option.Value == value;
-				if (ImGui::Selectable(option.Label, selected))
+				const bool bSelected = option.Value == value;
+				if (ImGui::Selectable(option.Label, bSelected))
 				{
 					onChanged(option.Value);
 				}
-				if (selected)
+				if (bSelected)
 				{
 					ImGui::SetItemDefaultFocus();
 				}

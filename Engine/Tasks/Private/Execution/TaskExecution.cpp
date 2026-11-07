@@ -37,12 +37,12 @@ void TaskExecution::State::Publish(TaskExecutionCompletion completion)
 	std::function<void()> onSettled;
 	{
 		std::scoped_lock lock(Mutex);
-		if (Settled)
+		if (bSettled)
 		{
 			Diagnostics::Fatal(LogTaskExecution, __FILE__, __LINE__, "Task execution completion was published more than once.");
 		}
 		Data = std::move(completion);
-		Settled = true;
+		bSettled = true;
 		onSettled = std::move(OnSettled);
 	}
 	Condition.notify_all();
@@ -77,21 +77,21 @@ bool TaskExecution::IsSettled() const noexcept
 		return false;
 	}
 	std::scoped_lock lock(m_state->Mutex);
-	return m_state->Settled;
+	return m_state->bSettled;
 }
 
 bool TaskExecution::WaitFor(std::chrono::milliseconds timeout) const
 {
 	const bool bInvalidJoinRequesttimeout = m_state == nullptr || timeout < std::chrono::milliseconds::zero();
 	const bool bJoinRequestExecutorIdentity = bInvalidJoinRequesttimeout || (TaskWorkerContext::IsWorkerFor(m_state->ExecutorIdentity));
-	const bool invalidJoinRequest = bJoinRequestExecutorIdentity || (std::this_thread::get_id() != m_state->JoinThread);
+	const bool bInvalidJoinRequest = bJoinRequestExecutorIdentity || (std::this_thread::get_id() != m_state->JoinThread);
 	
-	if (invalidJoinRequest)
+	if (bInvalidJoinRequest)
 	{
 		return false;
 	}
 	std::unique_lock lock(m_state->Mutex);
-	return m_state->Condition.wait_for(lock, timeout, [this] { return m_state->Settled; });
+	return m_state->Condition.wait_for(lock, timeout, [this] { return m_state->bSettled; });
 }
 
 std::uint64_t TaskExecution::GetGeneration() const noexcept
@@ -145,10 +145,10 @@ std::optional<TaskResult> TaskExecution::GetTaskResult(TaskNodeHandle handle) co
 	std::scoped_lock lock(m_state->Mutex);
 	const auto& data = m_state->Data;
 	std::uint32_t index = 0;
-	const bool handleDecoded = TaskGraphAccess::Decode(handle, data.BuilderIdentity, data.BuilderGeneration, static_cast<std::uint32_t>(data.TaskResults.size()), index);
-	const bool taskSettled = handleDecoded && data.Settled[index];
+	const bool bHandleDecoded = TaskGraphAccess::Decode(handle, data.BuilderIdentity, data.BuilderGeneration, static_cast<std::uint32_t>(data.TaskResults.size()), index);
+	const bool bTaskSettled = bHandleDecoded && data.Settled[index];
 	
-	if (!taskSettled)
+	if (!bTaskSettled)
 	{
 		return std::nullopt;
 	}

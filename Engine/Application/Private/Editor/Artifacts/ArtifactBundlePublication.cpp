@@ -37,12 +37,12 @@ bool ArtifactBundlePublication::WriteFile(const std::filesystem::path& stagingDi
 	const std::filesystem::path stagedPath = stagingDirectory / file.RelativePath;
 	Hash::Sha256Digest sourceHash{};
 	Hash::Sha256Digest storedHash{};
-	const bool sourceHashed = Hash::TrySha256(file.Bytes.data(), file.Bytes.size(), sourceHash, errorMessage);
-	const bool fileWritten = sourceHashed && Files::TryWriteAllBytes(stagedPath, file.Bytes, errorMessage);
-	const bool storedFileHashed = fileWritten && Hash::TrySha256File(stagedPath, storedHash, errorMessage);
-	const bool storedBytesMatch = storedFileHashed && sourceHash == storedHash;
+	const bool bSourceHashed = Hash::TrySha256(file.Bytes.data(), file.Bytes.size(), sourceHash, errorMessage);
+	const bool bFileWritten = bSourceHashed && Files::TryWriteAllBytes(stagedPath, file.Bytes, errorMessage);
+	const bool bStoredFileHashed = bFileWritten && Hash::TrySha256File(stagedPath, storedHash, errorMessage);
+	const bool bStoredBytesMatch = bStoredFileHashed && sourceHash == storedHash;
 
-	if (!storedBytesMatch)
+	if (!bStoredBytesMatch)
 	{
 		if (errorMessage.empty())
 		{
@@ -58,12 +58,12 @@ ArtifactBundlePublicationResult ArtifactBundlePublication::Publish(ArtifactBundl
 {
 	ArtifactBundlePublicationResult result{.PublicationDirectory = request.PublicationDirectory};
 	std::filesystem::path stagingDirectory;
-	bool ownsStagingDirectory = false;
+	bool bOwnsStagingDirectory = false;
 
 	auto fail = [&](std::string message)
 	{
 		result.ErrorMessage = std::move(message);
-		if (ownsStagingDirectory)
+		if (bOwnsStagingDirectory)
 		{
 			std::error_code cleanupError;
 			std::filesystem::remove_all(stagingDirectory, cleanupError);
@@ -117,12 +117,12 @@ ArtifactBundlePublicationResult ArtifactBundlePublication::Publish(ArtifactBundl
 		}
 		fileError.clear();
 		const std::filesystem::path publicationDirectory = std::filesystem::weakly_canonical(request.PublicationDirectory, fileError);
-		const bool publicationResolved = !fileError && publicationDirectory != allowedRoot;
-		const bool publicationContained = publicationResolved && Paths::IsUnderRoot(publicationDirectory, allowedRoot);
-		const bool publicationAbsent = publicationContained && !std::filesystem::exists(publicationDirectory, fileError);
-		const bool publicationAvailable = publicationAbsent && !fileError;
+		const bool bPublicationResolved = !fileError && publicationDirectory != allowedRoot;
+		const bool bPublicationContained = bPublicationResolved && Paths::IsUnderRoot(publicationDirectory, allowedRoot);
+		const bool bPublicationAbsent = bPublicationContained && !std::filesystem::exists(publicationDirectory, fileError);
+		const bool bPublicationAvailable = bPublicationAbsent && !fileError;
 
-		if (!publicationAvailable)
+		if (!bPublicationAvailable)
 		{
 			return fail("Artifact publication path is outside its allowed root or already exists.");
 		}
@@ -135,14 +135,14 @@ ArtifactBundlePublicationResult ArtifactBundlePublication::Publish(ArtifactBundl
 
 		stagingDirectory = publicationDirectory;
 		stagingDirectory += ".staging";
-		const bool stagingAbsent = !std::filesystem::exists(stagingDirectory, fileError) && !fileError;
-		const bool stagingCreated = stagingAbsent && std::filesystem::create_directories(stagingDirectory, fileError);
+		const bool bStagingAbsent = !std::filesystem::exists(stagingDirectory, fileError) && !fileError;
+		const bool bStagingCreated = bStagingAbsent && std::filesystem::create_directories(stagingDirectory, fileError);
 
-		if (!stagingCreated || fileError)
+		if (!bStagingCreated || fileError)
 		{
 			return fail("Artifact staging directory could not be created.");
 		}
-		ownsStagingDirectory = true;
+		bOwnsStagingDirectory = true;
 		result.Files.reserve(request.Files.size());
 		for (const ArtifactBundleFile& file : request.Files)
 		{
@@ -175,8 +175,8 @@ ArtifactBundlePublicationResult ArtifactBundlePublication::Publish(ArtifactBundl
 		{
 			return fail("Staged artifact bundle could not be published.");
 		}
-		ownsStagingDirectory = false;
-		result.Succeeded = true;
+		bOwnsStagingDirectory = false;
+		result.bSucceeded = true;
 		result.PublicationDirectory = publicationDirectory;
 		return result;
 	}

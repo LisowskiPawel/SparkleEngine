@@ -25,9 +25,9 @@ namespace RestirReservoirCommon
 		return CommonRandom::Hash(seed);
 	}
 
-	float4 PackSurface(bool valid, float3 normalWorld, float viewDistance)
+	float4 PackSurface(bool bValid, float3 normalWorld, float viewDistance)
 	{
-		return valid ? float4(normalWorld, viewDistance) : 0.0f.xxxx;
+		return bValid ? float4(normalWorld, viewDistance) : 0.0f.xxxx;
 	}
 
 	bool IsPackedSurfaceValid(float4 packedSurface)
@@ -35,9 +35,9 @@ namespace RestirReservoirCommon
 		return packedSurface.w > 0.0f && dot(packedSurface.xyz, packedSurface.xyz) > 0.25f;
 	}
 
-	bool AreSurfacesCompatible(bool valid, float3 normalWorld, float viewDistance, float4 packedSurface)
+	bool AreSurfacesCompatible(bool bValid, float3 normalWorld, float viewDistance, float4 packedSurface)
 	{
-		if (!valid || !IsPackedSurfaceValid(packedSurface))
+		if (!bValid || !IsPackedSurfaceValid(packedSurface))
 		{
 			return false;
 		}

@@ -54,9 +54,9 @@ static const char* GetReasonLabel(ViewportRenderProgressReason reason) noexcept
 
 static void BeginReferenceOverlay(const ViewportRenderProgress& progress) noexcept
 {
-	const bool unavailable = progress.State == ViewportRenderProgressState::Unavailable;
-	const bool complete = progress.State == ViewportRenderProgressState::Complete;
-	const float overlayHeight = unavailable ? 118.0f : (complete ? 92.0f : 142.0f);
+	const bool bUnavailable = progress.State == ViewportRenderProgressState::Unavailable;
+	const bool bComplete = progress.State == ViewportRenderProgressState::Complete;
+	const float overlayHeight = bUnavailable ? 118.0f : (bComplete ? 92.0f : 142.0f);
 
 	ImGui::BeginChild(
 	    "##ViewportRenderProgress",
@@ -89,20 +89,20 @@ static void DrawUnavailableSession(const ViewportRenderProgress& progress, Viewp
 
 static void DrawAccumulationProgress(const ViewportRenderProgress& progress) noexcept
 {
-	const bool complete = progress.State == ViewportRenderProgressState::Complete;
+	const bool bComplete = progress.State == ViewportRenderProgressState::Complete;
 	const char* stateLabel = GetStateLabel(progress.State);
 	const char* reasonLabel = GetReasonLabel(progress.Reason);
 	const float fraction = progress.TargetSamples == 0 ? 0.0f : (std::min) (1.0f, static_cast<float>(progress.CompletedSamples) / static_cast<float>(progress.TargetSamples));
 	char sampleLabel[64] = {};
 	std::snprintf(sampleLabel, sizeof(sampleLabel), "%llu / %llu SPP", static_cast<unsigned long long>(progress.CompletedSamples), static_cast<unsigned long long>(progress.TargetSamples));
-	ImGui::Text("%s%s", stateLabel, complete ? " - target prefix reached" : "");
+	ImGui::Text("%s%s", stateLabel, bComplete ? " - target prefix reached" : "");
 	ImGui::ProgressBar(fraction, ImVec2(-1.0f, 0.0f), sampleLabel);
 
-	if (progress.SamplesPerSecond > 0.0 && !complete)
+	if (progress.SamplesPerSecond > 0.0 && !bComplete)
 	{
 		ImGui::Text("%.2f Msamples/s  ETA about %.0f s", progress.SamplesPerSecond / 1000000.0, progress.EstimatedSecondsRemaining);
 	}
-	else if (!complete)
+	else if (!bComplete)
 	{
 		ImGui::TextUnformatted("Throughput and ETA calculating");
 	}
@@ -114,31 +114,31 @@ static void DrawAccumulationProgress(const ViewportRenderProgress& progress) noe
 
 static void DrawPlaybackControls(const ViewportRenderProgress& progress, ViewportRenderRequest& request) noexcept
 {
-	const bool paused = progress.State == ViewportRenderProgressState::Paused;
-	const bool complete = progress.State == ViewportRenderProgressState::Complete;
+	const bool bPaused = progress.State == ViewportRenderProgressState::Paused;
+	const bool bComplete = progress.State == ViewportRenderProgressState::Complete;
 
-	if (paused)
+	if (bPaused)
 	{
 		if (ImGui::Button("Resume"))
 		{
 			RequestAction(request, ViewportRenderAction::Resume);
 		}
 	}
-	else if (!complete)
+	else if (!bComplete)
 	{
-		ImGui::BeginDisabled(!progress.RetentionAvailable);
+		ImGui::BeginDisabled(!progress.bRetentionAvailable);
 		if (ImGui::Button("Pause"))
 		{
 			RequestAction(request, ViewportRenderAction::Pause);
 		}
 		ImGui::EndDisabled();
-		if (!progress.RetentionAvailable && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+		if (!progress.bRetentionAvailable && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 		{
 			ImGui::SetTooltip("Retention unavailable for the current GPU memory budget");
 		}
 	}
 
-	if (!complete || paused)
+	if (!bComplete || bPaused)
 	{
 		ImGui::SameLine();
 	}
@@ -150,10 +150,10 @@ static void DrawPlaybackControls(const ViewportRenderProgress& progress, Viewpor
 
 static void DrawOutputActions(const ViewportRenderProgress& progress, ViewportRenderRequest& request, ViewportOutputAction& outputAction) noexcept
 {
-	const bool unavailable = progress.State == ViewportRenderProgressState::Unavailable;
-	const bool complete = progress.State == ViewportRenderProgressState::Complete;
-	const bool hasPrefix = !unavailable && progress.CompletedSamples > 0;
-	ImGui::BeginDisabled(!hasPrefix || complete);
+	const bool bUnavailable = progress.State == ViewportRenderProgressState::Unavailable;
+	const bool bComplete = progress.State == ViewportRenderProgressState::Complete;
+	const bool bHasPrefix = !bUnavailable && progress.CompletedSamples > 0;
+	ImGui::BeginDisabled(!bHasPrefix || bComplete);
 	if (ImGui::Button("Save partial prefix"))
 	{
 		RequestAction(request, ViewportRenderAction::Pause);
@@ -161,13 +161,13 @@ static void DrawOutputActions(const ViewportRenderProgress& progress, ViewportRe
 	}
 	ImGui::EndDisabled();
 	ImGui::SameLine();
-	ImGui::BeginDisabled(!complete);
+	ImGui::BeginDisabled(!bComplete);
 	if (ImGui::Button("Save complete"))
 	{
 		outputAction = ViewportOutputAction::SaveComplete;
 	}
 	ImGui::EndDisabled();
-	ImGui::BeginDisabled(!hasPrefix);
+	ImGui::BeginDisabled(!bHasPrefix);
 	if (ImGui::Button("Save checkpoint"))
 	{
 		RequestAction(request, ViewportRenderAction::Pause);
@@ -179,8 +179,8 @@ static void DrawOutputActions(const ViewportRenderProgress& progress, ViewportRe
 
 static void DrawDetails(const ViewportRenderProgress& progress, ViewportRenderRequest& request, ViewportOutputAction& outputAction) noexcept
 {
-	const bool unavailable = progress.State == ViewportRenderProgressState::Unavailable;
-	if (!unavailable || progress.Reason == ViewportRenderProgressReason::SessionCapacity)
+	const bool bUnavailable = progress.State == ViewportRenderProgressState::Unavailable;
+	if (!bUnavailable || progress.Reason == ViewportRenderProgressReason::SessionCapacity)
 	{
 		ImGui::SameLine();
 	}

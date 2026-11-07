@@ -23,5 +23,5 @@ struct VulkanCaptureService::PendingReadback final
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 	std::uint64_t ByteCount = 0;
 	std::uint32_t RowPitch = 0;
-	bool Cancelled = false;
+	bool bCancelled = false;
 };

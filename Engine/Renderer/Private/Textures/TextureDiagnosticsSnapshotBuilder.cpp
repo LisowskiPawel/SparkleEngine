@@ -14,7 +14,7 @@ TextureDiagnosticsSnapshotBuilder::TextureDiagnosticsSnapshotBuilder(const RhiDe
 	m_snapshot.reserve(expectedRowCount);
 }
 
-void TextureDiagnosticsSnapshotBuilder::Add(const RendererTexture& texture, TextureDiagnosticsKind kind, std::string key, bool streamManaged)
+void TextureDiagnosticsSnapshotBuilder::Add(const RendererTexture& texture, TextureDiagnosticsKind kind, std::string key, bool bStreamManaged)
 {
 	if (!texture)
 	{
@@ -34,7 +34,7 @@ void TextureDiagnosticsSnapshotBuilder::Add(const RendererTexture& texture, Text
 	row.EstimatedByteSize = texture.EstimatedByteSize;
 	const std::uint64_t nativeTextureId = m_descriptorService.GetResourceViewGpuHandle(texture.ShaderResourceView).Value;
 	row.PreviewTexture = m_resolvePreviewTexture ? m_resolvePreviewTexture(nativeTextureId) : UiTextureHandle{};
-	row.StreamManaged = streamManaged;
+	row.bStreamManaged = bStreamManaged;
 	m_snapshot.push_back(std::move(row));
 }
 

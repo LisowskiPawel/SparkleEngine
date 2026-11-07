@@ -29,7 +29,7 @@ struct RhiRayTracingGeometryDesc
 	RhiRayTracingBufferBinding IndexBuffer = {};
 	std::uint32_t IndexCount = 0;
 	RhiIndexFormat IndexFormat = RhiIndexFormat::UInt32;
-	bool Opaque = true;
+	bool bOpaque = true;
 };
 
 struct RhiRayTracingAccelerationStructurePrebuildInfo

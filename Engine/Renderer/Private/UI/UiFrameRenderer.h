@@ -16,7 +16,7 @@ class ViewportRenderProducts;
 class UiFrameRenderer final
 {
 public:
-	UiFrameRenderer(RenderDeviceServices& deviceServices, bool ownsBackend);
+	UiFrameRenderer(RenderDeviceServices& deviceServices, bool bOwnsBackend);
 	~UiFrameRenderer() noexcept;
 
 	UiFrameRenderer(const UiFrameRenderer&) = delete;
@@ -41,5 +41,5 @@ private:
 	std::unique_ptr<UiRenderPacketPlayer> m_packetPlayer;
 	std::unique_ptr<UiTextureRegistry> m_textureRegistry;
 	UiTextureHandle m_viewportTexture;
-	bool m_ownsBackend = false;
+	bool m_bOwnsBackend = false;
 };

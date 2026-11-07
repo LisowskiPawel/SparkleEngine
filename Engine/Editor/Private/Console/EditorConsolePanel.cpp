@@ -20,8 +20,8 @@ EditorConsolePanel::EditorConsolePanel(ConsoleSession& session) noexcept :
 
 void EditorConsolePanel::RequestFocus() noexcept
 {
-	m_isOpen = true;
-	m_focusInput = true;
+	m_bIsOpen = true;
+	m_bFocusInput = true;
 }
 
 void EditorConsolePanel::Clear() noexcept
@@ -31,16 +31,16 @@ void EditorConsolePanel::Clear() noexcept
 		m_session->ClearOutput();
 		m_seenConsoleOutputCount = 0;
 	}
-	m_scrollToBottom = true;
+	m_bScrollToBottom = true;
 }
 
-void EditorConsolePanel::BuildContent(bool disableInteraction)
+void EditorConsolePanel::BuildContent(bool bDisableInteraction)
 {
-	DrawToolbar(disableInteraction);
+	DrawToolbar(bDisableInteraction);
 	ImGui::Separator();
 	DrawScrollback();
 	ImGui::Separator();
-	DrawInputLine(disableInteraction);
+	DrawInputLine(bDisableInteraction);
 	DrawAutocompletePreview();
 }
 
@@ -122,7 +122,7 @@ int EditorConsolePanel::HandleCompletionCallback(ImGuiInputTextCallbackData& dat
 	if (completions.size() > 1)
 	{
 		m_session->AddOutput(ConsoleCommandSeverity::Info, BuildCompletionList(completions));
-		m_scrollToBottom = true;
+		m_bScrollToBottom = true;
 		return 0;
 	}
 
@@ -147,13 +147,13 @@ void EditorConsolePanel::SubmitInput()
 	m_session->SubmitLine(input);
 	m_inputBuffer[0] = '\0';
 	m_seenConsoleOutputCount = m_session->GetOutputRecords().size();
-	m_scrollToBottom = true;
-	m_focusInput = true;
+	m_bScrollToBottom = true;
+	m_bFocusInput = true;
 }
 
-void EditorConsolePanel::DrawToolbar(bool disableInteraction)
+void EditorConsolePanel::DrawToolbar(bool bDisableInteraction)
 {
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	if (ImGui::BeginTable("##EditorConsoleToolbar", 5, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoPadOuterX))
 	{
 		ImGui::TableSetupColumn("help", ImGuiTableColumnFlags_WidthFixed, 66.0f);
@@ -168,7 +168,7 @@ void EditorConsolePanel::DrawToolbar(bool disableInteraction)
 		if (ImGui::Button(helpLabel.c_str(), ImVec2(-1.0f, 0.0f)) && m_session != nullptr)
 		{
 			m_session->SubmitLine("Help");
-			m_scrollToBottom = true;
+			m_bScrollToBottom = true;
 		}
 
 		ImGui::TableSetColumnIndex(1);
@@ -203,7 +203,7 @@ void EditorConsolePanel::DrawScrollback()
 	if (m_session != nullptr && m_session->GetOutputRecords().size() != m_seenConsoleOutputCount)
 	{
 		m_seenConsoleOutputCount = m_session->GetOutputRecords().size();
-		m_scrollToBottom = true;
+		m_bScrollToBottom = true;
 	}
 
 	const std::string_view filter(m_filterBuffer.data());
@@ -227,27 +227,27 @@ void EditorConsolePanel::DrawScrollback()
 	{
 		ImGui::PopFont();
 	}
-	if (m_scrollToBottom)
+	if (m_bScrollToBottom)
 	{
-		m_scrollToBottom = false;
+		m_bScrollToBottom = false;
 	}
 }
 
-void EditorConsolePanel::DrawInputLine(bool disableInteraction)
+void EditorConsolePanel::DrawInputLine(bool bDisableInteraction)
 {
-	ImGui::BeginDisabled(disableInteraction || m_session == nullptr);
-	if (m_focusInput)
+	ImGui::BeginDisabled(bDisableInteraction || m_session == nullptr);
+	if (m_bFocusInput)
 	{
 		ImGui::SetKeyboardFocusHere();
-		m_focusInput = false;
+		m_bFocusInput = false;
 	}
 
 	ImGui::SetNextItemWidth(-1.0f);
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, SparkleUiPalette::ConsoleInputBackground());
 	const ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_CallbackCompletion;
-	const bool consoleCommandSubmitted = ImGui::InputTextWithHint("##EditorConsoleCommandInput", "Enter command", m_inputBuffer.data(), m_inputBuffer.size(), flags, &HandleInputTextCallback, this);
+	const bool bConsoleCommandSubmitted = ImGui::InputTextWithHint("##EditorConsoleCommandInput", "Enter command", m_inputBuffer.data(), m_inputBuffer.size(), flags, &HandleInputTextCallback, this);
 	
-	if (consoleCommandSubmitted)
+	if (bConsoleCommandSubmitted)
 	{
 		SubmitInput();
 	}

@@ -20,12 +20,12 @@ VulkanRayTracingPipeline::VulkanRayTracingPipeline(VulkanRhi& rhi, const RayTrac
 {
 	RhiContract::ValidateRayTracingPipelineDesc(desc);
 	const RhiRayTracingCapabilities capabilities = rhi.GetRayTracingCapabilities();
-	const bool bTracingPipelineTracingPipelines = !capabilities.SupportsRayTracingPipeline || rhi.GetCreateRayTracingPipelines() == nullptr;
+	const bool bTracingPipelineTracingPipelines = !capabilities.bSupportsRayTracingPipeline || rhi.GetCreateRayTracingPipelines() == nullptr;
 	const bool bUnsupportedTracingPipelineInBytes = bTracingPipelineTracingPipelines || (desc.MaxPayloadSizeInBytes > capabilities.MaxRayPayloadSizeInBytes);
 	const bool bUnsupportedTracingPipelineInBytes2 = bUnsupportedTracingPipelineInBytes || (desc.MaxAttributeSizeInBytes > capabilities.MaxRayAttributeSizeInBytes);
-	const bool unsupportedRayTracingPipeline = bUnsupportedTracingPipelineInBytes2 || (desc.MaxRecursionDepth > capabilities.MaxTraceRecursionDepth);
+	const bool bUnsupportedRayTracingPipeline = bUnsupportedTracingPipelineInBytes2 || (desc.MaxRecursionDepth > capabilities.MaxTraceRecursionDepth);
 	
-	if (unsupportedRayTracingPipeline)
+	if (bUnsupportedRayTracingPipeline)
 	{
 		throw Diagnostics::Error("Vulkan ray-tracing pipeline is not fully ready.");
 	}

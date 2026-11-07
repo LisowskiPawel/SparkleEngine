@@ -11,18 +11,18 @@ class UsedTexturesPanel final
 public:
 	using DiagnosticsProvider = std::function<TextureDiagnosticsSnapshot()>;
 
-	void SetOpen(bool open) noexcept { m_isOpen = open; }
+	void SetOpen(bool bOpen) noexcept { m_bIsOpen = bOpen; }
 
-	bool IsOpen() const noexcept { return m_isOpen; }
+	bool IsOpen() const noexcept { return m_bIsOpen; }
 
 	void SetDiagnosticsProvider(DiagnosticsProvider provider);
-	void BuildUI(bool disableInteraction);
+	void BuildUI(bool bDisableInteraction);
 
 private:
 	void RefreshSnapshot();
 	void DrawToolbar();
-	void DrawTextureTable(bool disableInteraction);
-	void DrawSelectedTextureInspector(bool disableInteraction);
+	void DrawTextureTable(bool bDisableInteraction);
+	void DrawSelectedTextureInspector(bool bDisableInteraction);
 	void DrawPreview(const TextureDiagnosticsRow& row) const;
 	void DrawSelectedTextureDetails(const TextureDiagnosticsRow& row) const;
 	const TextureDiagnosticsRow* GetSelectedRow() const noexcept;
@@ -32,5 +32,5 @@ private:
 	TextureDiagnosticsSnapshot m_snapshot;
 	std::array<char, 160> m_filterBuffer{};
 	std::string m_selectedKey;
-	bool m_isOpen = false;
+	bool m_bIsOpen = false;
 };

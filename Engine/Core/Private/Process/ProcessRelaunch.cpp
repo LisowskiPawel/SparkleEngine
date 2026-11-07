@@ -25,9 +25,9 @@ namespace Process
 		STARTUPINFOW startup{};
 		startup.cb = sizeof(startup);
 		PROCESS_INFORMATION child{};
-		const bool processRelaunchFailed = !CreateProcessW(executable.c_str(), commandLine.data(), nullptr, nullptr, FALSE, 0, nullptr, workingDirectory.c_str(), &startup, &child);
+		const bool bProcessRelaunchFailed = !CreateProcessW(executable.c_str(), commandLine.data(), nullptr, nullptr, FALSE, 0, nullptr, workingDirectory.c_str(), &startup, &child);
 		
-		if (processRelaunchFailed)
+		if (bProcessRelaunchFailed)
 		{
 			return false;
 		}

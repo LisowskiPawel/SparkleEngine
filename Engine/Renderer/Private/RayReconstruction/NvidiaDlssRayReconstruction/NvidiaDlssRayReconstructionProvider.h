@@ -16,5 +16,5 @@ public:
 
 private:
 	StreamlineDlssFrameState m_frameState;
-	bool m_initialized = false;
+	bool m_bInitialized = false;
 };

@@ -57,12 +57,12 @@ namespace Json
 
 	void ObjectWriter::WritePrefix(std::string_view name)
 	{
-		if (m_hasProperty)
+		if (m_bHasProperty)
 		{
 			m_stream << ",\n";
 		}
 		m_stream << m_indent << QuoteString(name) << ": ";
-		m_hasProperty = true;
+		m_bHasProperty = true;
 	}
 
 	std::string WriteStringArray(std::span<const std::string> values)

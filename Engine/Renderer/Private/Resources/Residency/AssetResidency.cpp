@@ -46,7 +46,7 @@ std::optional<AssetGenerationHandle> AssetResidency::BeginGeneration(std::uint64
 	}
 
 	PruneTerminalGenerations();
-	m_generations.push_back(AssetGenerationStatus{.Handle = handle, .State = AssetResidencyState::Reading, .BacklogAccounted = true});
+	m_generations.push_back(AssetGenerationStatus{.Handle = handle, .State = AssetResidencyState::Reading, .bBacklogAccounted = true});
 	++m_counters.RequestBacklog;
 	return handle;
 }
@@ -95,10 +95,10 @@ bool AssetResidency::BeginUpload(AssetGenerationHandle handle) noexcept
 
 	generation->State = AssetResidencyState::Uploading;
 	generation->ResidentBytes = generation->UploadBytes;
-	generation->ResidentAccounted = true;
+	generation->bResidentAccounted = true;
 	m_counters.ResidentBytes += generation->ResidentBytes;
 	m_counters.PendingUploadBytes += generation->UploadBytes;
-	generation->PendingUploadAccounted = true;
+	generation->bPendingUploadAccounted = true;
 	return true;
 }
 
@@ -110,10 +110,10 @@ bool AssetResidency::RecordUploadSubmission(AssetGenerationHandle handle, RhiSub
 	const bool bResidencyCompletionRejectedState2 = bResidencyCompletionRejectedState && (generation->State != AssetResidencyState::Evicting);
 	const bool bResidencyCompletionRejectedState3 = bCompletionRejectedgeneration || bResidencyCompletionRejectedState2;
 	const bool bCompletionRejectedValid = bResidencyCompletionRejectedState3 || (!completionToken.IsValid());
-	const bool bCompletionRejectedAccounted = bCompletionRejectedValid || (!generation->ResidentAccounted);
-	const bool residencyCompletionRejected = bCompletionRejectedAccounted || (residentBytes > m_budget.MaximumResidentBytes - (m_counters.ResidentBytes - generation->ResidentBytes));
+	const bool bCompletionRejectedAccounted = bCompletionRejectedValid || (!generation->bResidentAccounted);
+	const bool bResidencyCompletionRejected = bCompletionRejectedAccounted || (residentBytes > m_budget.MaximumResidentBytes - (m_counters.ResidentBytes - generation->ResidentBytes));
 	
-	if (residencyCompletionRejected)
+	if (bResidencyCompletionRejected)
 	{
 		return false;
 	}
@@ -168,14 +168,14 @@ void AssetResidency::Poll(RhiCommandSubmissionService& submissions) noexcept
 	for (AssetGenerationStatus& generation : m_generations)
 	{
 		const bool bUploadCompletedend = generation.State == AssetResidencyState::Uploading && std::any_of(generation.Completion.Values.begin(), generation.Completion.Values.end(), [](std::uint64_t value) { return value != 0; });
-		const bool uploadCompleted = bUploadCompletedend && (IsComplete(generation.Completion, submissions));
+		const bool bUploadCompleted = bUploadCompletedend && (IsComplete(generation.Completion, submissions));
 		
-		if (uploadCompleted)
+		if (bUploadCompleted)
 		{
-			if (generation.PendingUploadAccounted && generation.UploadBytes <= m_counters.PendingUploadBytes)
+			if (generation.bPendingUploadAccounted && generation.UploadBytes <= m_counters.PendingUploadBytes)
 			{
 				m_counters.PendingUploadBytes -= generation.UploadBytes;
-				generation.PendingUploadAccounted = false;
+				generation.bPendingUploadAccounted = false;
 			}
 			ReleaseCpuBudget(generation);
 			generation.State = AssetResidencyState::Resident;
@@ -230,24 +230,24 @@ void AssetResidency::ReleaseCpuBudget(AssetGenerationStatus& generation) noexcep
 
 void AssetResidency::ReleaseBacklog(AssetGenerationStatus& generation) noexcept
 {
-	if (generation.BacklogAccounted && m_counters.RequestBacklog != 0)
+	if (generation.bBacklogAccounted && m_counters.RequestBacklog != 0)
 	{
 		--m_counters.RequestBacklog;
-		generation.BacklogAccounted = false;
+		generation.bBacklogAccounted = false;
 	}
 }
 
 void AssetResidency::Retire(AssetGenerationStatus& generation) noexcept
 {
-	if (generation.PendingUploadAccounted && generation.UploadBytes <= m_counters.PendingUploadBytes)
+	if (generation.bPendingUploadAccounted && generation.UploadBytes <= m_counters.PendingUploadBytes)
 	{
 		m_counters.PendingUploadBytes -= generation.UploadBytes;
-		generation.PendingUploadAccounted = false;
+		generation.bPendingUploadAccounted = false;
 	}
-	if (generation.ResidentAccounted && generation.ResidentBytes <= m_counters.ResidentBytes)
+	if (generation.bResidentAccounted && generation.ResidentBytes <= m_counters.ResidentBytes)
 	{
 		m_counters.ResidentBytes -= generation.ResidentBytes;
-		generation.ResidentAccounted = false;
+		generation.bResidentAccounted = false;
 	}
 	ReleaseCpuBudget(generation);
 	generation.State = AssetResidencyState::Retired;

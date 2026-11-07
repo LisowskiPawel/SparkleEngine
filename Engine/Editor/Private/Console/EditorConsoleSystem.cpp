@@ -44,9 +44,9 @@ void EditorConsoleSystem::OpenConsole() noexcept
 	m_consolePanel->RequestFocus();
 }
 
-bool EditorConsoleSystem::HandleShortcut(std::uint32_t message, std::uintptr_t key, bool wantsTextInput) noexcept
+bool EditorConsoleSystem::HandleShortcut(std::uint32_t message, std::uintptr_t key, bool bWantsTextInput) noexcept
 {
-	if (message == EditorConsoleSystemConstants::kWindowsKeyDownMessage && key == EditorConsoleSystemConstants::kTildeKey && !wantsTextInput)
+	if (message == EditorConsoleSystemConstants::kWindowsKeyDownMessage && key == EditorConsoleSystemConstants::kTildeKey && !bWantsTextInput)
 	{
 		if (m_consolePanel->IsOpen())
 		{
@@ -79,7 +79,7 @@ float EditorConsoleSystem::GetDockHeight(float availableHeight) noexcept
 	return m_dockHeight;
 }
 
-void EditorConsoleSystem::BuildDockedUI(float left, float bottom, float width, float availableHeight, bool disableInteraction)
+void EditorConsoleSystem::BuildDockedUI(float left, float bottom, float width, float availableHeight, bool bDisableInteraction)
 {
 	const float height = GetDockHeight(availableHeight);
 	if (width <= 0.0f || height <= 0.0f)
@@ -111,12 +111,12 @@ void EditorConsoleSystem::BuildDockedUI(float left, float bottom, float width, f
 		return;
 	}
 
-	ImGui::BeginDisabled(disableInteraction);
-	const bool open = m_consolePanel->IsOpen();
+	ImGui::BeginDisabled(bDisableInteraction);
+	const bool bOpen = m_consolePanel->IsOpen();
 	const std::string consoleLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Console, "Console");
-	if (EditorWidgets::DrawFilterChip(consoleLabel.c_str(), open))
+	if (EditorWidgets::DrawFilterChip(consoleLabel.c_str(), bOpen))
 	{
-		if (open)
+		if (bOpen)
 		{
 			m_consolePanel->SetOpen(false);
 		}
@@ -127,20 +127,20 @@ void EditorConsoleSystem::BuildDockedUI(float left, float bottom, float width, f
 	}
 	ImGui::SameLine();
 	ImGui::AlignTextToFramePadding();
-	ImGui::TextDisabled(open ? "Esc to close" : "~ to open");
+	ImGui::TextDisabled(bOpen ? "Esc to close" : "~ to open");
 	ImGui::EndDisabled();
 
-	if (open)
+	if (bOpen)
 	{
 		ImGui::Separator();
-		m_consolePanel->BuildContent(disableInteraction);
+		m_consolePanel->BuildContent(bDisableInteraction);
 		m_dockHeight = ImGui::GetWindowHeight();
 		GetDockHeight(availableHeight);
-		const bool bCloseConsoleRequestedImGui = !disableInteraction && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+		const bool bCloseConsoleRequestedImGui = !bDisableInteraction && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 		const bool bCloseConsoleRequestedImGui2 = bCloseConsoleRequestedImGui && (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId));
-		const bool closeConsoleRequested = bCloseConsoleRequestedImGui2 && (ImGui::IsKeyPressed(ImGuiKey_Escape));
+		const bool bCloseConsoleRequested = bCloseConsoleRequestedImGui2 && (ImGui::IsKeyPressed(ImGuiKey_Escape));
 		
-		if (closeConsoleRequested)
+		if (bCloseConsoleRequested)
 		{
 			m_consolePanel->SetOpen(false);
 		}

@@ -44,9 +44,9 @@ namespace PathSampling
 		return result;
 	}
 
-	PathSample::DirectionSample SampleBSDF(RayTracingPathSurface surface, uint specularSampleMode, RandomSamples randomSamples, bool evaluateDiffuse, bool evaluateSpecular)
+	PathSample::DirectionSample SampleBSDF(RayTracingPathSurface surface, uint specularSampleMode, RandomSamples randomSamples, bool bEvaluateDiffuse, bool bEvaluateSpecular)
 	{
-		if (!surface.Valid)
+		if (!surface.bValid)
 		{
 			return InvalidSample();
 		}
@@ -57,8 +57,8 @@ namespace PathSampling
 		masses.Diffuse = diffuseMass;
 		masses.Specular = 1.0f - diffuseMass;
 		masses.Count = (masses.Diffuse > 0.0f ? 1u : 0u) + (masses.Specular > 0.0f ? 1u : 0u);
-		masses.SpecularDelta = surface.Roughness == 0.0f;
-		if (specularSampleMode != SpecularSampleModeStochasticGGX && !masses.SpecularDelta)
+		masses.bSpecularDelta = surface.Roughness == 0.0f;
+		if (specularSampleMode != SpecularSampleModeStochasticGGX && !masses.bSpecularDelta)
 		{
 			return InvalidSample();
 		}
@@ -69,7 +69,7 @@ namespace PathSampling
 			selectedLobe = PathSample::LobeDiffuse;
 		}
 
-		return PathBsdf::Sample(surface, masses, selectedLobe, randomSamples.Direction, evaluateDiffuse, evaluateSpecular);
+		return PathBsdf::Sample(surface, masses, selectedLobe, randomSamples.Direction, bEvaluateDiffuse, bEvaluateSpecular);
 	}
 
 	float RussianRouletteSurvivalProbability(float3 throughput, uint bounceIndex)

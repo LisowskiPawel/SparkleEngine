@@ -27,12 +27,12 @@ RhiCaptureTicket D3D12CaptureService::BeginTextureReadback(const RhiTextureCaptu
 {
 	DrainCancelledReadbacks();
 	auto pending = PrepareReadback(request);
-	const bool bufferAllocated = pending && AllocateReadbackBuffer(*pending);
-	const bool commandsStarted = bufferAllocated && BeginReadbackCommands(*pending);
-	const bool copyRecorded = commandsStarted && RecordReadbackCopy(*pending);
-	const bool readbackSubmitted = copyRecorded && SubmitReadback(*pending);
+	const bool bBufferAllocated = pending && AllocateReadbackBuffer(*pending);
+	const bool bCommandsStarted = bBufferAllocated && BeginReadbackCommands(*pending);
+	const bool bCopyRecorded = bCommandsStarted && RecordReadbackCopy(*pending);
+	const bool bReadbackSubmitted = bCopyRecorded && SubmitReadback(*pending);
 
-	if (!readbackSubmitted)
+	if (!bReadbackSubmitted)
 	{
 		return {};
 	}
@@ -73,7 +73,7 @@ void D3D12CaptureService::CancelTextureReadback(RhiCaptureTicket ticket) noexcep
 	{
 		return;
 	}
-	(*iterator)->Cancelled = true;
+	(*iterator)->bCancelled = true;
 	DrainCancelledReadbacks();
 }
 
@@ -82,7 +82,7 @@ void D3D12CaptureService::DrainCancelledReadbacks() noexcept
 	for (std::size_t index = 0; index < m_pendingReadbacks.size();)
 	{
 		const std::unique_ptr<PendingReadback>& pending = m_pendingReadbacks[index];
-		if (!pending || !pending->Cancelled || !IsReadbackComplete(*pending))
+		if (!pending || !pending->bCancelled || !IsReadbackComplete(*pending))
 		{
 			++index;
 			continue;

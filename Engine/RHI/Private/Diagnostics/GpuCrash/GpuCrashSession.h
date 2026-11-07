@@ -23,7 +23,7 @@ public:
 	void Ready() noexcept;
 	void Incomplete() noexcept;
 	void Enqueue(RhiGpuCrashArtifactId id, std::span<const std::byte> bytes) noexcept;
-	void ShaderIdentity(std::span<const std::byte> code, std::uint64_t nativeHash, bool hashAvailable, const GFSDK_Aftermath_ShaderDebugName* debugName) noexcept;
+	void ShaderIdentity(std::span<const std::byte> code, std::uint64_t nativeHash, bool bHashAvailable, const GFSDK_Aftermath_ShaderDebugName* debugName) noexcept;
 	bool BeginLoss(std::int64_t nativeFailure) noexcept;
 	void FinishLoss(std::int64_t nativeFailure) noexcept;
 	void Shutdown() noexcept;
@@ -60,7 +60,7 @@ private:
 	static void GFSDK_AFTERMATH_CALL MarkerCallback(const void* marker, std::uint32_t size, void* user, PFN_GFSDK_Aftermath_ResolveMarker resolve) noexcept;
 
 	void InitializeLibrary(ERhiBackendApi api, const std::filesystem::path& libraryPath);
-	void Settle(bool loss, std::int64_t nativeFailure) noexcept;
+	void Settle(bool bLoss, std::int64_t nativeFailure) noexcept;
 	bool SealSink(std::chrono::steady_clock::time_point deadline) noexcept;
 
 	static constexpr std::size_t MaximumMarkers = 65'536;
@@ -74,9 +74,9 @@ private:
 	mutable std::mutex m_sinkMutex;
 	RhiGpuCrashArtifactSink* m_sink = nullptr;
 	std::size_t m_borrows = 0;
-	bool m_accepting = true;
-	std::atomic<bool> m_lossClaimed{false};
-	std::atomic<bool> m_incomplete{false};
+	bool m_bAccepting = true;
+	std::atomic<bool> m_bLossClaimed{false};
+	std::atomic<bool> m_bIncomplete{false};
 	std::atomic<std::uint64_t> m_shaderSequence{0};
 	std::array<char, 37> m_incidentId{};
 

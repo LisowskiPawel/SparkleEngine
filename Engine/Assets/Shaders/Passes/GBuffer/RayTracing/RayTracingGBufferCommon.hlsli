@@ -81,14 +81,14 @@ namespace RayTracingGBuffer
 
 	void StoreTraceResult(uint2 pixelCoord, RayTracingTraceResult trace)
 	{
-		if (!trace.Hit)
+		if (!trace.bHit)
 		{
 			StoreMiss(pixelCoord);
 			return;
 		}
 
 		const RayTracingHitSurfaceData surface = ReconstructRayTracingHitSurfaceWithPrevious(trace);
-		if (!surface.Valid)
+		if (!surface.bValid)
 		{
 			StoreMiss(pixelCoord);
 			return;

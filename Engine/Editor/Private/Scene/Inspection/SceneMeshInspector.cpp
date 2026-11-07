@@ -25,10 +25,10 @@ namespace SceneMeshInspector
 
 	static void BuildTransformCategory(const std::string& filter, const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool transformMatches = EditorWidgets::MatchesDetailsFilter(filter, "Transform", "location rotation scale transform");
-		const bool transformOpen = transformMatches && EditorWidgets::DrawDetailsCategory("Transform");
+		const bool bTransformMatches = EditorWidgets::MatchesDetailsFilter(filter, "Transform", "location rotation scale transform");
+		const bool bTransformOpen = bTransformMatches && EditorWidgets::DrawDetailsCategory("Transform");
 
-		if (!transformOpen)
+		if (!bTransformOpen)
 		{
 			return;
 		}
@@ -42,16 +42,16 @@ namespace SceneMeshInspector
 
 	static void BuildMeshCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept
 	{
-		const bool meshMatches = EditorWidgets::MatchesDetailsFilter(filter, "Mesh", "type asset rendering skeletal static");
-		const bool meshOpen = meshMatches && EditorWidgets::DrawDetailsCategory("Mesh");
+		const bool bMeshMatches = EditorWidgets::MatchesDetailsFilter(filter, "Mesh", "type asset rendering skeletal static");
+		const bool bMeshOpen = bMeshMatches && EditorWidgets::DrawDetailsCategory("Mesh");
 
-		if (!meshOpen)
+		if (!bMeshOpen)
 		{
 			return;
 		}
 
-		const bool skeletal = mesh.Kind == SceneMeshKind::Skeletal;
-		EditorWidgets::DrawDetailsValueRow("Type", skeletal ? "Skeletal" : "Static");
+		const bool bSkeletal = mesh.Kind == SceneMeshKind::Skeletal;
+		EditorWidgets::DrawDetailsValueRow("Type", bSkeletal ? "Skeletal" : "Static");
 		char value[64] = {};
 		std::snprintf(value, sizeof(value), "%llu", static_cast<unsigned long long>(mesh.MeshAssetId));
 		EditorWidgets::DrawDetailsValueRow("Asset Id", value);
@@ -59,28 +59,28 @@ namespace SceneMeshInspector
 
 	static void BuildAdvancedParametersCategory(const std::string& filter, const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool advancedMatches = EditorWidgets::MatchesDetailsFilter(filter, "Advanced", "visible visibility hidden");
-		const bool advancedOpen = advancedMatches && EditorWidgets::DrawDetailsCategory("Advanced", false);
+		const bool bAdvancedMatches = EditorWidgets::MatchesDetailsFilter(filter, "Advanced", "visible visibility hidden");
+		const bool bAdvancedOpen = bAdvancedMatches && EditorWidgets::DrawDetailsCategory("Advanced", false);
 
-		if (!advancedOpen)
+		if (!bAdvancedOpen)
 		{
 			return;
 		}
 
-		bool visible = mesh.Visible;
-		const bool defaultVisible = true;
-		if (EditorWidgets::EditDetailsCheckbox("Visible", visible, &defaultVisible))
+		bool bVisible = mesh.bVisible;
+		const bool bDefaultVisible = true;
+		if (EditorWidgets::EditDetailsCheckbox("Visible", bVisible, &bDefaultVisible))
 		{
-			(void) transactionHistory.Execute({0, SetEntityVisibilityCommand{mesh.Entity, visible}}, {0, SetEntityVisibilityCommand{mesh.Entity, mesh.Visible}}, generation, "mesh-visibility");
+			(void) transactionHistory.Execute({0, SetEntityVisibilityCommand{mesh.Entity, bVisible}}, {0, SetEntityVisibilityCommand{mesh.Entity, mesh.bVisible}}, generation, "mesh-visibility");
 		}
 	}
 
 	static void BuildMaterialsCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept
 	{
-		const bool materialsMatches = EditorWidgets::MatchesDetailsFilter(filter, "Materials", "element material slot surface");
-		const bool materialsOpen = materialsMatches && EditorWidgets::DrawDetailsCategory("Materials");
+		const bool bMaterialsMatches = EditorWidgets::MatchesDetailsFilter(filter, "Materials", "element material slot surface");
+		const bool bMaterialsOpen = bMaterialsMatches && EditorWidgets::DrawDetailsCategory("Materials");
 
-		if (!materialsOpen)
+		if (!bMaterialsOpen)
 		{
 			return;
 		}

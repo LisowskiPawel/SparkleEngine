@@ -150,9 +150,9 @@ bool PassParameterSet::SetAttachment(const char* name, FrameGraphAttachmentBindi
 	const bool bInvalidTextureAttachmentKind = !bTextureAttachmentResourceDomain && (parameter->Kind != ShaderParameterSemanticKind::RenderTarget);
 	const bool bInvalidTextureAttachmentKind2 = bInvalidTextureAttachmentKind && (parameter->Kind != ShaderParameterSemanticKind::DepthTarget);
 	const bool bInvalidTextureAttachmentKind3 = bTextureAttachmentResourceDomain || bInvalidTextureAttachmentKind2;
-	const bool invalidTextureAttachment = bInvalidTextureAttachmentKind3 || (!binding.Handle.IsValid());
+	const bool bInvalidTextureAttachment = bInvalidTextureAttachmentKind3 || (!binding.Handle.IsValid());
 	
-	if (invalidTextureAttachment)
+	if (bInvalidTextureAttachment)
 	{
 		return false;
 	}

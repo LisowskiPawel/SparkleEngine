@@ -41,14 +41,14 @@ public:
 		{
 			const float timeSeconds = static_cast<float>(keys[keyIndex].mTime / ticksPerSecond);
 			const aiVector3D& value = keys[keyIndex].mValue;
-			const bool timeFinite = std::isfinite(timeSeconds);
+			const bool bTimeFinite = std::isfinite(timeSeconds);
 			const bool bTimeOrderedtimeSeconds = !(timeSeconds < 0.0f || timeSeconds <= previousTime);
-			const bool timeOrdered = timeFinite && bTimeOrderedtimeSeconds;
-			const bool bValueFinitex = timeOrdered && std::isfinite(value.x);
+			const bool bTimeOrdered = bTimeFinite && bTimeOrderedtimeSeconds;
+			const bool bValueFinitex = bTimeOrdered && std::isfinite(value.x);
 			const bool bValueFinitey = bValueFinitex && (std::isfinite(value.y));
-			const bool valueFinite = bValueFinitey && (std::isfinite(value.z));
+			const bool bValueFinite = bValueFinitey && (std::isfinite(value.z));
 
-			if (!valueFinite)
+			if (!bValueFinite)
 			{
 				throw Diagnostics::Error(std::format("FBX animation vector key {} is invalid or not strictly time ordered.", keyIndex));
 			}
@@ -78,30 +78,30 @@ public:
 		sampler.keyframes.reserve(keyCount);
 		float previousTime = -1.0f;
 		DirectX::XMVECTOR previousRotation = DirectX::XMQuaternionIdentity();
-		bool hasPreviousRotation = false;
+		bool bHasPreviousRotation = false;
 		for (unsigned int keyIndex = 0; keyIndex < keyCount; ++keyIndex)
 		{
 			const float timeSeconds = static_cast<float>(keys[keyIndex].mTime / ticksPerSecond);
 			const aiQuaternion& value = keys[keyIndex].mValue;
 			DirectX::XMVECTOR quaternion = DirectX::XMVectorSet(value.x, value.y, value.z, value.w);
 			const float lengthSquared = DirectX::XMVectorGetX(DirectX::XMVector4LengthSq(quaternion));
-			const bool timeFinite = std::isfinite(timeSeconds);
+			const bool bTimeFinite = std::isfinite(timeSeconds);
 			const bool bTimeOrderedtimeSeconds = !(timeSeconds < 0.0f || timeSeconds <= previousTime);
-			const bool timeOrdered = timeFinite && bTimeOrderedtimeSeconds;
-			const bool bValueFinitex = timeOrdered && std::isfinite(value.x);
+			const bool bTimeOrdered = bTimeFinite && bTimeOrderedtimeSeconds;
+			const bool bValueFinitex = bTimeOrdered && std::isfinite(value.x);
 			const bool bValueFinitey = bValueFinitex && (std::isfinite(value.y));
 			const bool bValueFinitez = bValueFinitey && (std::isfinite(value.z));
-			const bool valueFinite = bValueFinitez && (std::isfinite(value.w));
-			const bool bRotationUsableisfinite = valueFinite && std::isfinite(lengthSquared);
-			const bool rotationUsable = bRotationUsableisfinite && (!(lengthSquared <= 1.0e-8f));
+			const bool bValueFinite = bValueFinitez && (std::isfinite(value.w));
+			const bool bRotationUsableisfinite = bValueFinite && std::isfinite(lengthSquared);
+			const bool bRotationUsable = bRotationUsableisfinite && (!(lengthSquared <= 1.0e-8f));
 
-			if (!rotationUsable)
+			if (!bRotationUsable)
 			{
 				throw Diagnostics::Error(std::format("FBX animation rotation key {} is invalid or not strictly time ordered.", keyIndex));
 			}
 
 			quaternion = DirectX::XMQuaternionNormalize(quaternion);
-			if (hasPreviousRotation && DirectX::XMVectorGetX(DirectX::XMVector4Dot(previousRotation, quaternion)) < 0.0f)
+			if (bHasPreviousRotation && DirectX::XMVectorGetX(DirectX::XMVector4Dot(previousRotation, quaternion)) < 0.0f)
 			{
 				quaternion = DirectX::XMVectorNegate(quaternion);
 			}
@@ -112,7 +112,7 @@ public:
 			clip.durationSeconds = (std::max) (clip.durationSeconds, timeSeconds);
 			previousTime = timeSeconds;
 			previousRotation = quaternion;
-			hasPreviousRotation = true;
+			bHasPreviousRotation = true;
 		}
 
 		const std::uint32_t samplerIndex = static_cast<std::uint32_t>(clip.samplers.size());
@@ -175,17 +175,17 @@ void FbxAnimationImporter::ImportAnimations(const aiScene& scene, SourceImportOu
 	for (unsigned int animationIndex = 0; animationIndex < scene.mNumAnimations; ++animationIndex)
 	{
 		const aiAnimation* sourceAnimation = scene.mAnimations[animationIndex];
-		const bool animationPresent = sourceAnimation != nullptr;
-		const bool bDurationFinitemDuration = animationPresent && std::isfinite(sourceAnimation->mDuration);
-		const bool durationFinite = bDurationFinitemDuration && (!(sourceAnimation->mDuration < 0.0));
-		const bool bTickRateValidPerSecond = durationFinite && std::isfinite(sourceAnimation->mTicksPerSecond);
-		const bool tickRateValid = bTickRateValidPerSecond && (!(sourceAnimation->mTicksPerSecond <= 0.0));
-		const bool bChannelsPresentNumChannels = tickRateValid && sourceAnimation->mNumChannels != 0;
-		const bool channelsPresent = bChannelsPresentNumChannels && (sourceAnimation->mChannels != nullptr);
-		const bool bChannelKindsSupportedMeshChannels = channelsPresent && sourceAnimation->mNumMeshChannels == 0;
-		const bool channelKindsSupported = bChannelKindsSupportedMeshChannels && (sourceAnimation->mNumMorphMeshChannels == 0);
+		const bool bAnimationPresent = sourceAnimation != nullptr;
+		const bool bDurationFinitemDuration = bAnimationPresent && std::isfinite(sourceAnimation->mDuration);
+		const bool bDurationFinite = bDurationFinitemDuration && (!(sourceAnimation->mDuration < 0.0));
+		const bool bTickRateValidPerSecond = bDurationFinite && std::isfinite(sourceAnimation->mTicksPerSecond);
+		const bool bTickRateValid = bTickRateValidPerSecond && (!(sourceAnimation->mTicksPerSecond <= 0.0));
+		const bool bChannelsPresentNumChannels = bTickRateValid && sourceAnimation->mNumChannels != 0;
+		const bool bChannelsPresent = bChannelsPresentNumChannels && (sourceAnimation->mChannels != nullptr);
+		const bool bChannelKindsSupportedMeshChannels = bChannelsPresent && sourceAnimation->mNumMeshChannels == 0;
+		const bool bChannelKindsSupported = bChannelKindsSupportedMeshChannels && (sourceAnimation->mNumMorphMeshChannels == 0);
 
-		if (!channelKindsSupported)
+		if (!bChannelKindsSupported)
 		{
 			throw Diagnostics::Error(std::format("FBX animation {} has incomplete or unsupported channel data.", animationIndex));
 		}

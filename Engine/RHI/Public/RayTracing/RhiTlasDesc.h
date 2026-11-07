@@ -7,9 +7,9 @@
 
 struct RhiTlasCapabilities
 {
-	bool SupportsTlasBuild = false;
-	bool SupportsTlasUpdate = false;
-	bool SupportsGpuReadableInstanceBuffer = false;
+	bool bSupportsTlasBuild = false;
+	bool bSupportsTlasUpdate = false;
+	bool bSupportsGpuReadableInstanceBuffer = false;
 	std::uint32_t InstanceDescSizeInBytes = 0;
 };
 

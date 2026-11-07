@@ -156,7 +156,7 @@ void SceneInspectorPanel::BuildInspectorTabs() noexcept
 	}
 }
 
-void SceneInspectorPanel::BuildUI(bool disableInteraction)
+void SceneInspectorPanel::BuildUI(bool bDisableInteraction)
 {
 	BeginWindow();
 
@@ -167,7 +167,7 @@ void SceneInspectorPanel::BuildUI(bool disableInteraction)
 		return;
 	}
 
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 
 	constexpr float kContentPad = 8.0f;
 	ImGui::Indent(kContentPad);

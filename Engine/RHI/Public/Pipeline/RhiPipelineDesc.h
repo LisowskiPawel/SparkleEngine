@@ -98,8 +98,8 @@ struct RhiBindingPoint
 struct RhiBindlessBindingMetadata
 {
 	// Reserved for descriptor-indexing/bindless layout compilation; bindful paths keep these fields disabled.
-	bool BindlessEligible = false;
-	bool RuntimeSizedArray = false;
+	bool bBindlessEligible = false;
+	bool bRuntimeSizedArray = false;
 	std::uint32_t ReservedDescriptorCount = 0;
 };
 
@@ -120,9 +120,9 @@ struct RenderBindingLayoutCompileDesc
 {
 	const PassParameterLayout* ParameterLayout = nullptr;
 	std::span<const ResolvedShader> Shaders;
-	bool AllowInputAssemblerInputLayout = false;
+	bool bAllowInputAssemblerInputLayout = false;
 	const wchar_t* DebugName = L"RHI_BindingLayout";
-	bool InlineUniformDataAsPushConstants = false;
+	bool bInlineUniformDataAsPushConstants = false;
 };
 
 class SPARKLE_RHI_API RenderBindingLayout
@@ -151,7 +151,7 @@ private:
 
 struct RhiBlendTargetState
 {
-	bool BlendEnable = false;
+	bool bBlendEnable = false;
 	RhiBlendFactor SourceColor = RhiBlendFactor::One;
 	RhiBlendFactor DestinationColor = RhiBlendFactor::Zero;
 	RhiBlendOperation ColorOperation = RhiBlendOperation::Add;
@@ -165,17 +165,17 @@ struct RhiBlendTargetState
 
 struct RhiBlendState
 {
-	bool AlphaToCoverageEnable = false;
-	bool IndependentBlendEnable = false;
+	bool bAlphaToCoverageEnable = false;
+	bool bIndependentBlendEnable = false;
 	std::array<RhiBlendTargetState, 8> Targets = {};
 
 	bool operator==(const RhiBlendState& other) const noexcept
 	{
-		if (AlphaToCoverageEnable != other.AlphaToCoverageEnable || IndependentBlendEnable != other.IndependentBlendEnable)
+		if (bAlphaToCoverageEnable != other.bAlphaToCoverageEnable || bIndependentBlendEnable != other.bIndependentBlendEnable)
 		{
 			return false;
 		}
-		const std::size_t targetCount = IndependentBlendEnable ? Targets.size() : 1;
+		const std::size_t targetCount = bIndependentBlendEnable ? Targets.size() : 1;
 		for (std::size_t index = 0; index < targetCount; ++index)
 		{
 			if (Targets[index] != other.Targets[index])
@@ -192,15 +192,15 @@ struct RhiRasterizerState
 	RhiFillMode FillMode = RhiFillMode::Solid;
 	ERhiCullMode CullMode = ERhiCullMode::Back;
 	ERhiFrontFaceWinding FrontFaceWinding = ERhiFrontFaceWinding::Clockwise;
-	bool DepthClipEnable = true;
+	bool bDepthClipEnable = true;
 
 	bool operator==(const RhiRasterizerState&) const noexcept = default;
 };
 
 struct RhiDepthState
 {
-	bool DepthEnable = true;
-	bool DepthWriteEnable = true;
+	bool bDepthEnable = true;
+	bool bDepthWriteEnable = true;
 	CompareOp DepthFunc = CompareOp::Less;
 
 	bool operator==(const RhiDepthState&) const noexcept = default;
@@ -208,7 +208,7 @@ struct RhiDepthState
 
 struct RhiStencilState
 {
-	bool StencilEnable = false;
+	bool bStencilEnable = false;
 	std::uint8_t StencilReadMask = 0xFF;
 	std::uint8_t StencilWriteMask = 0xFF;
 	CompareOp FrontFaceStencilFunc = CompareOp::Always;
@@ -227,7 +227,7 @@ struct RhiVertexInputBinding
 {
 	std::uint32_t Binding = 0;
 	std::uint32_t StrideInBytes = 0;
-	bool PerInstance = false;
+	bool bPerInstance = false;
 
 	bool operator==(const RhiVertexInputBinding&) const noexcept = default;
 };

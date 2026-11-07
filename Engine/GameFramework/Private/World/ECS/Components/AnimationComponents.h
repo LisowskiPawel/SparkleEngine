@@ -34,8 +34,8 @@ namespace ECS
 		Assets::CookedAssetId AnimationAssetId = Assets::InvalidCookedAssetId;
 		float TimeSeconds = 0.0f;
 		float PlaybackRate = 1.0f;
-		bool Playing = true;
-		bool Looping = true;
+		bool bPlaying = true;
+		bool bLooping = true;
 	};
 
 	struct MorphState final

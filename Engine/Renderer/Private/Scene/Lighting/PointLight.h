@@ -11,5 +11,5 @@ struct PointLight
 	float luminousIntensity = 1.0f;
 	float radius = 0.05f;
 	DirectX::XMFLOAT3 distanceAttenuationCoefficients = {0.0f, 0.0f, 1.0f};
-	bool castShadow = true;
+	bool bCastShadow = true;
 };

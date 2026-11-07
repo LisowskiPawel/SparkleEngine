@@ -38,7 +38,7 @@ bool RenderingSettingsPanel::HasPendingRestart() const noexcept
 	return m_settings != nullptr && m_settings->HasPendingRestart();
 }
 
-void RenderingSettingsPanel::BuildUI(bool disableInteraction, const char* filterText)
+void RenderingSettingsPanel::BuildUI(bool bDisableInteraction, const char* filterText)
 {
 	if (m_settings == nullptr)
 	{
@@ -67,7 +67,7 @@ void RenderingSettingsPanel::BuildUI(bool disableInteraction, const char* filter
 		ImGui::TextWrapped("Settings were not saved: %s", m_settings->GetLastError().c_str());
 		ImGui::Dummy(ImVec2(0.0f, 4.0f));
 	}
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	DrawDisplaySettingsSection(*m_settings, settings, filterText);
 	DrawExposureSettingsSection(*m_settings, settings, filterText);
 	DrawToneMappingSettingsSection(*m_settings, settings, filterText);

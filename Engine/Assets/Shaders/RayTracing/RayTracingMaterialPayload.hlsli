@@ -16,8 +16,8 @@ struct RayTracingMaterialPayload
 RayTracingTraceResult ResolveRayTracingMaterialPayload(RayTracingMaterialPayload payload)
 {
 	RayTracingTraceResult result;
-	result.Hit = payload.Hit != 0u;
-	result.FrontFace = payload.FrontFace != 0u;
+	result.bHit = payload.Hit != 0u;
+	result.bFrontFace = payload.FrontFace != 0u;
 	result.RayT = payload.RayT;
 	result.InstanceId = payload.InstanceId;
 	result.PrimitiveIndex = payload.PrimitiveIndex;

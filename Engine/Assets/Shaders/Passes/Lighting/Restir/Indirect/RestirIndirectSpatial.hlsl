@@ -24,7 +24,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 
 	IndirectReservoir::Reservoir reservoir = IndirectReservoir::UnpackReservoir(TemporalReservoirSampleTexture.Load(int3(pixelCoord, 0)), TemporalReservoirWeightTexture.Load(int3(pixelCoord, 0)));
 
-	if (surface.Valid && RestirIndirectSpatialReuse != 0u)
+	if (surface.bValid && RestirIndirectSpatialReuse != 0u)
 	{
 		IndirectReservoir::ReuseSpatial(pixelCoord,
 		                                uint2(width, height),

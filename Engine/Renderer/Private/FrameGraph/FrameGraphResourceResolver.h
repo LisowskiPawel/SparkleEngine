@@ -13,7 +13,7 @@ struct FrameGraphResourceAccess
 	RhiResourceViewHandle depthStencilView = {};
 	RhiResourceViewHandle shaderResourceView = {};
 	RhiResourceViewHandle unorderedAccessView = {};
-	bool ownsShaderResourceView = false;
+	bool bOwnsShaderResourceView = false;
 
 	bool IsResolved() const noexcept { return static_cast<bool>(resource); }
 };

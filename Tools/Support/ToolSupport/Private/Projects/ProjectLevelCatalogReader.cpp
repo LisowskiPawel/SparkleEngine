@@ -189,11 +189,11 @@ void ProjectLevelCatalogReader::ParseLevelField(std::string_view key, std::strin
 	}
 	else if (key == "ReleaseSupported")
 	{
-		m_currentLevel->releaseSupported = ParseBool(value);
+		m_currentLevel->bReleaseSupported = ParseBool(value);
 	}
 	else if (key == "Selected")
 	{
-		m_currentLevel->selected = ParseBool(value);
+		m_currentLevel->bSelected = ParseBool(value);
 	}
 	else
 	{
@@ -264,15 +264,15 @@ void ProjectLevelCatalogReader::ParseAssetPackField(std::string_view key, std::s
 	}
 	else if (key == "External")
 	{
-		m_currentPack->external = ParseBool(value);
+		m_currentPack->bExternal = ParseBool(value);
 	}
 	else if (key == "DownloadSupported")
 	{
-		m_currentPack->downloadSupported = ParseBool(value);
+		m_currentPack->bDownloadSupported = ParseBool(value);
 	}
 	else if (key == "GameSupported")
 	{
-		m_currentPack->gameSupported = ParseBool(value);
+		m_currentPack->bGameSupported = ParseBool(value);
 	}
 	else
 	{
@@ -311,12 +311,12 @@ void ProjectLevelCatalogReader::ValidateCurrentSection() const
 
 bool ProjectLevelCatalogReader::ParseBool(std::string_view value) const
 {
-	bool parsed = false;
-	if (!Strings::TryParseBool(value, parsed))
+	bool bParsed = false;
+	if (!Strings::TryParseBool(value, bParsed))
 	{
 		throw Diagnostics::Error(std::format("Invalid catalog boolean value '{}'.", value));
 	}
-	return parsed;
+	return bParsed;
 }
 
 std::uintmax_t ProjectLevelCatalogReader::ParseByteCount(std::string_view value) const

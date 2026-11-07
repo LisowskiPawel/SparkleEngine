@@ -33,10 +33,10 @@ void GpuSkinInfluenceBuffer::Upload(RenderHardwareInterface& renderHardwareInter
 	    RhiMemoryResidencyClass::DeviceLocal,
 	    L"GpuMesh_SkinInfluences");
 
-	const bool skinInfluencesUploaded = m_buffer
+	const bool bSkinInfluencesUploaded = m_buffer
 	    && m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_buffer, std::as_bytes(skinInfluences), ResourceState::ShaderResource, L"GpuMesh_SkinInfluencesUpload");
 
-	if (!skinInfluencesUploaded)
+	if (!bSkinInfluencesUploaded)
 	{
 		Release();
 		Diagnostics::Fatal(g_gpuSkinInfluenceBufferLogger, __FILE__, __LINE__, "GPU skin influence upload failed.");

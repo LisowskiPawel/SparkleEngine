@@ -40,5 +40,5 @@ private:
 	D3D12SwapChain& m_swapChain;
 	D3D12DescriptorService& m_descriptorService;
 	ImGuiContext* m_imguiContext = nullptr;
-	bool m_ownsContext = false;
+	bool m_bOwnsContext = false;
 };

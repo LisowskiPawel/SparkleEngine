@@ -17,7 +17,7 @@ struct PreviewBounds final
 {
 	MeshPreviewVertex Min;
 	MeshPreviewVertex Max;
-	bool IsValid = false;
+	bool bIsValid = false;
 };
 
 struct PreviewProjection final
@@ -48,7 +48,7 @@ static PreviewBounds ComputePreviewBounds(const MeshPreviewGeometry& geometry) n
 		bounds.Max.Y = (std::max) (bounds.Max.Y, vertex.Y);
 		bounds.Max.Z = (std::max) (bounds.Max.Z, vertex.Z);
 	}
-	bounds.IsValid = true;
+	bounds.bIsValid = true;
 	return bounds;
 }
 
@@ -117,22 +117,22 @@ template <typename Callback> static void ForEachProjectedTriangle(const MeshPrev
 	}
 }
 
-static void DrawSolidTriangles(ImDrawList& drawList, const MeshPreviewGeometry& geometry, const PreviewProjection& projection, std::size_t triangleCount, bool gpuResident, bool drawWire)
+static void DrawSolidTriangles(ImDrawList& drawList, const MeshPreviewGeometry& geometry, const PreviewProjection& projection, std::size_t triangleCount, bool bGpuResident, bool bDrawWire)
 {
 	const ImDrawListFlags previousFlags = drawList.Flags;
-	if (!drawWire)
+	if (!bDrawWire)
 	{
 		drawList.Flags &= ~ImDrawListFlags_AntiAliasedFill;
 	}
 
-	const ImU32 color = gpuResident ? (drawWire ? IM_COL32(89, 142, 199, 84) : IM_COL32(89, 142, 199, 230)) : (drawWire ? IM_COL32(128, 128, 128, 72) : IM_COL32(128, 128, 128, 220));
+	const ImU32 color = bGpuResident ? (bDrawWire ? IM_COL32(89, 142, 199, 84) : IM_COL32(89, 142, 199, 230)) : (bDrawWire ? IM_COL32(128, 128, 128, 72) : IM_COL32(128, 128, 128, 220));
 	ForEachProjectedTriangle(geometry, projection, triangleCount, [&](const std::array<ImVec2, 3>& triangle) { drawList.AddTriangleFilled(triangle[0], triangle[1], triangle[2], color); });
 	drawList.Flags = previousFlags;
 }
 
-static void DrawWireTriangles(ImDrawList& drawList, const MeshPreviewGeometry& geometry, const PreviewProjection& projection, std::size_t triangleCount, bool gpuResident)
+static void DrawWireTriangles(ImDrawList& drawList, const MeshPreviewGeometry& geometry, const PreviewProjection& projection, std::size_t triangleCount, bool bGpuResident)
 {
-	const ImU32 color = gpuResident ? IM_COL32(176, 212, 255, 220) : IM_COL32(184, 184, 184, 210);
+	const ImU32 color = bGpuResident ? IM_COL32(176, 212, 255, 220) : IM_COL32(184, 184, 184, 210);
 
 	ForEachProjectedTriangle(
 	    geometry,
@@ -146,7 +146,7 @@ static void DrawWireTriangles(ImDrawList& drawList, const MeshPreviewGeometry& g
 	    });
 }
 
-void MeshPreview::Draw(const MeshPreviewGeometry& geometry, bool gpuResident, float yaw, float pitch, int modeIndex)
+void MeshPreview::Draw(const MeshPreviewGeometry& geometry, bool bGpuResident, float yaw, float pitch, int modeIndex)
 {
 	ImVec2 availableRegion = ImGui::GetContentRegionAvail();
 	availableRegion.y = (std::max) (128.0f, availableRegion.y - 214.0f);
@@ -166,24 +166,24 @@ void MeshPreview::Draw(const MeshPreviewGeometry& geometry, bool gpuResident, fl
 	}
 
 	const PreviewBounds bounds = ComputePreviewBounds(geometry);
-	if (!bounds.IsValid || canvasSize.x <= 1.0f || canvasSize.y <= 1.0f)
+	if (!bounds.bIsValid || canvasSize.x <= 1.0f || canvasSize.y <= 1.0f)
 	{
 		ImGui::EndChild();
 		return;
 	}
 
 	const PreviewProjection projection = BuildProjection(geometry, bounds, canvasMin, canvasSize, yaw, pitch);
-	const bool drawSolid = modeIndex == 1 || modeIndex == 2;
-	const bool drawWire = modeIndex == 0 || modeIndex == 2;
+	const bool bDrawSolid = modeIndex == 1 || modeIndex == 2;
+	const bool bDrawWire = modeIndex == 0 || modeIndex == 2;
 	const std::size_t triangleCount = geometry.Indices.size() / 3;
 	const std::size_t previewTriangleCount = (std::min) (triangleCount, MaxPreviewTriangles);
-	if (drawSolid)
+	if (bDrawSolid)
 	{
-		DrawSolidTriangles(drawList, geometry, projection, previewTriangleCount, gpuResident, drawWire);
+		DrawSolidTriangles(drawList, geometry, projection, previewTriangleCount, bGpuResident, bDrawWire);
 	}
-	if (drawWire)
+	if (bDrawWire)
 	{
-		DrawWireTriangles(drawList, geometry, projection, previewTriangleCount, gpuResident);
+		DrawWireTriangles(drawList, geometry, projection, previewTriangleCount, bGpuResident);
 	}
 	if (triangleCount > previewTriangleCount)
 	{

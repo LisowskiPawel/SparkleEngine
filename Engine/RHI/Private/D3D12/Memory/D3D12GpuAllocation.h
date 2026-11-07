@@ -32,8 +32,8 @@ struct D3D12GpuAllocationRecord final
 	RhiMemoryResidencyClass ResidencyClass = RhiMemoryResidencyClass::DeviceLocal;
 	std::wstring DebugName;
 	D3D12GpuMemoryAllocator* Owner = nullptr;
-	bool IsMapped = false;
-	bool PendingRelease = false;
+	bool bIsMapped = false;
+	bool bPendingRelease = false;
 	void* CpuMappedAddress = nullptr;
 	RhiSubmissionState LastUse;
 	std::atomic<std::uint32_t> RecordingReferenceCount = 0;

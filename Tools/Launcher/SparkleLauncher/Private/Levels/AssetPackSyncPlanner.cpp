@@ -43,7 +43,7 @@ namespace SparkleLauncher
 
 			for (const ProjectLevelCatalogEntry& level : m_catalog.levels)
 			{
-				if (!level.selected || level.assetPackId.empty())
+				if (!level.bSelected || level.assetPackId.empty())
 				{
 					continue;
 				}
@@ -51,7 +51,7 @@ namespace SparkleLauncher
 			}
 		}
 
-		void AppendLevelPack(const ProjectLevelCatalogEntry& level, bool selected)
+		void AppendLevelPack(const ProjectLevelCatalogEntry& level, bool bSelected)
 		{
 			if (level.assetPackId.empty())
 			{
@@ -59,7 +59,7 @@ namespace SparkleLauncher
 			}
 
 			const ProjectAssetPack& pack = m_catalog.assetPacks.at(level.assetPackId);
-			if (selected && !pack.gameSupported)
+			if (bSelected && !pack.bGameSupported)
 			{
 				throw Diagnostics::Error("Selected level '" + level.id + "' requires game-unsupported asset pack '" + pack.id + "': " + pack.gameBlocker);
 			}
@@ -72,7 +72,7 @@ namespace SparkleLauncher
 			{
 				return;
 			}
-			if (!pack.downloadSupported && !m_catalog.IsAssetPackPayloadPresent(pack))
+			if (!pack.bDownloadSupported && !m_catalog.IsAssetPackPayloadPresent(pack))
 			{
 				throw Diagnostics::Error("Asset pack '" + pack.id + "' is required but has no supported acquisition path.");
 			}

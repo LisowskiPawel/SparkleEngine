@@ -81,9 +81,9 @@ GpuMeshPreparedData GpuMeshPreparation::Build(const ImmutableRenderMeshHandle& s
 	BuildSkinInfluences(output);
 	BuildMorphTargets(output);
 	const bool bPreparedSkinningTracingIndices = output.RayTracingVertices.empty() || output.RayTracingIndices.size() < 3u;
-	const bool invalidPreparedSkinning = bPreparedSkinningTracingIndices || (output.GpuSkinInfluences.size() != output.RayTracingVertices.size());
+	const bool bInvalidPreparedSkinning = bPreparedSkinningTracingIndices || (output.GpuSkinInfluences.size() != output.RayTracingVertices.size());
 	
-	if (invalidPreparedSkinning)
+	if (bInvalidPreparedSkinning)
 	{
 		throw Diagnostics::Error("GPU mesh preparation produced incomplete geometry.");
 	}
@@ -96,11 +96,11 @@ void GpuMeshPreparation::BuildBoundsAndRayTracing(GpuMeshPreparedData& output)
 	output.RayTracingVertices.reserve(meshData.vertices.size());
 	for (const VertexData& vertex : meshData.vertices)
 	{
-		if (!output.HasLocalBounds)
+		if (!output.bHasLocalBounds)
 		{
 			output.LocalBoundsMin = vertex.position;
 			output.LocalBoundsMax = vertex.position;
-			output.HasLocalBounds = true;
+			output.bHasLocalBounds = true;
 		}
 		else
 		{

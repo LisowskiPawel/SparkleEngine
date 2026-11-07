@@ -7,9 +7,9 @@
 template <typename TParameterInstance> void BindRayTracedShadowParameters(const PreparedRenderScene& scene, TParameterInstance& parameters)
 {
 	const auto& rayTracing = scene.gpuBindings->RayTracing;
-	const bool hasInstances = rayTracing.InstanceCount != 0u;
-	parameters->RayTracedDirectionalShadowsEnabled = hasInstances ? 1u : 0u;
-	parameters->RayTracedLocalLightShadowsEnabled = hasInstances ? 1u : 0u;
-	parameters->RayTracedShadowNormalBias = hasInstances ? CVarRayTracedShadowNormalBias.Get() : 0.0f;
-	parameters->RayTracedShadowMaxDistance = hasInstances ? CVarRayTracedShadowMaxDistance.Get() : 0.0f;
+	const bool bHasInstances = rayTracing.InstanceCount != 0u;
+	parameters->RayTracedDirectionalShadowsEnabled = bHasInstances ? 1u : 0u;
+	parameters->RayTracedLocalLightShadowsEnabled = bHasInstances ? 1u : 0u;
+	parameters->RayTracedShadowNormalBias = bHasInstances ? CVarRayTracedShadowNormalBias.Get() : 0.0f;
+	parameters->RayTracedShadowMaxDistance = bHasInstances ? CVarRayTracedShadowMaxDistance.Get() : 0.0f;
 }

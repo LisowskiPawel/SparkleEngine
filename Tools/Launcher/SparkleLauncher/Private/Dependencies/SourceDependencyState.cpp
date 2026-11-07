@@ -56,11 +56,11 @@ namespace SparkleLauncher
 			        {"fontawesome-6.7.1/fa-solid-900.ttf", "fontawesome-6.7.1/LICENSE.txt"},
 			        true,
 			        true},
-			    {"cgltf", "cgltf", "v1.15", "Single-header glTF 2.0 parser for source scene imports.", "cgltf-src", {"cgltf.h"}, false, features.ContentPipelineEnabled},
-			    {"stb", "stb", "git 2c980bb", "Header-only image loading and mip resize helpers.", "stb-src", {"stb_image.h", "stb_image_resize2.h"}, false, features.ContentPipelineEnabled},
-			    {"tinyexr", "tinyexr", "v1.0.7", "Header-only OpenEXR image loading support.", "tinyexr-src", {"tinyexr.h", "deps/miniz/miniz.h"}, false, features.ContentPipelineEnabled},
-			    {"zlib", "zlib", "v1.3.1", "Compression backend used by Assimp.", "zlib-src", {"zlib.h", "CMakeLists.txt"}, false, features.ContentPipelineEnabled},
-			    {"assimp", "Assimp", "v5.4.3", "FBX and DCC scene import support.", "assimp-src", {"include/assimp/Importer.hpp", "CMakeLists.txt"}, false, features.ContentPipelineEnabled},
+			    {"cgltf", "cgltf", "v1.15", "Single-header glTF 2.0 parser for source scene imports.", "cgltf-src", {"cgltf.h"}, false, features.bContentPipelineEnabled},
+			    {"stb", "stb", "git 2c980bb", "Header-only image loading and mip resize helpers.", "stb-src", {"stb_image.h", "stb_image_resize2.h"}, false, features.bContentPipelineEnabled},
+			    {"tinyexr", "tinyexr", "v1.0.7", "Header-only OpenEXR image loading support.", "tinyexr-src", {"tinyexr.h", "deps/miniz/miniz.h"}, false, features.bContentPipelineEnabled},
+			    {"zlib", "zlib", "v1.3.1", "Compression backend used by Assimp.", "zlib-src", {"zlib.h", "CMakeLists.txt"}, false, features.bContentPipelineEnabled},
+			    {"assimp", "Assimp", "v5.4.3", "FBX and DCC scene import support.", "assimp-src", {"include/assimp/Importer.hpp", "CMakeLists.txt"}, false, features.bContentPipelineEnabled},
 			    {"compressonator",
 			        "Compressonator",
 			        "git f4b53d7 (sparse)",
@@ -68,8 +68,8 @@ namespace SparkleLauncher
 			        "compressonator-src",
 			        {"cmp_core/source/cmp_core.cpp", "applications/_libs/cmp_math/cmp_math_common.cpp"},
 			        false,
-			        features.ContentPipelineEnabled},
-			    {"ktx", "KTX-Software", "v4.3.2", "KTX2 texture container read/write support.", "ktx-src", {"include/ktx.h", "CMakeLists.txt"}, false, features.KtxSupportEnabled},
+			        features.bContentPipelineEnabled},
+			    {"ktx", "KTX-Software", "v4.3.2", "KTX2 texture container read/write support.", "ktx-src", {"include/ktx.h", "CMakeLists.txt"}, false, features.bKtxSupportEnabled},
 			    {"spirv-reflect",
 			        "SPIRV-Reflect",
 			        "vulkan-sdk-1.3.290.0",
@@ -77,7 +77,7 @@ namespace SparkleLauncher
 			        "spirv_reflect-src",
 			        {"spirv_reflect.h", "spirv_reflect.c"},
 			        false,
-			        features.ShaderCompilerEnabled},
+			        features.bShaderCompilerEnabled},
 			    {"nvidia-nvapi",
 			        "NVIDIA NVAPI SDK",
 			        "git 9b181ea",
@@ -85,7 +85,7 @@ namespace SparkleLauncher
 			        "sparkle_nvapi-src",
 			        {"nvapi.h", "amd64/nvapi64.lib"},
 			        false,
-			        features.NvidiaStreamlineEnabled},
+			        features.bNvidiaStreamlineEnabled},
 			    {"nvidia-streamline",
 			        "NVIDIA Streamline SDK",
 			        "v2.11.1",
@@ -103,7 +103,7 @@ namespace SparkleLauncher
 			            "bin/x64/nvngx_dlss.dll",
 			            "bin/x64/nvngx_dlssd.dll"},
 			        false,
-			        features.NvidiaStreamlineEnabled},
+			        features.bNvidiaStreamlineEnabled},
 			};
 		}();
 
@@ -134,7 +134,7 @@ namespace SparkleLauncher
 			}
 		}
 
-		validation.Ready = validation.MissingRelativePaths.empty();
+		validation.bReady = validation.MissingRelativePaths.empty();
 		return validation;
 	}
 
@@ -158,26 +158,26 @@ namespace SparkleLauncher
 
 		for (const SourceDependencyEntry& dependency : GetSourceDependencies())
 		{
-			if (!dependency.Enabled)
+			if (!dependency.bEnabled)
 			{
 				continue;
 			}
 
 			++status.EnabledDependencyCount;
 			const SourceDependencyValidation validation = ValidateSourceDependency(dependency, dependencyCacheRoot);
-			if (validation.Ready)
+			if (validation.bReady)
 			{
 				++status.ReadyDependencyCount;
 				continue;
 			}
 
-			status.AllEnabledDependenciesReady = false;
+			status.bAllEnabledDependenciesReady = false;
 			status.ReadinessMessages.push_back(dependency.Label + " cache is incomplete. Missing: " + JoinPaths(validation.MissingRelativePaths) + ".");
 		}
 
 		if (status.EnabledDependencyCount == 0)
 		{
-			status.AllEnabledDependenciesReady = true;
+			status.bAllEnabledDependenciesReady = true;
 		}
 
 		return status;

@@ -21,9 +21,9 @@ namespace EditorWidgets
 	{
 		ImFont* monoFont = SparkleUiTheme::GetMonoFont();
 		ImGui::PushID(label);
-		const bool propertyTableOpen = ImGui::BeginTable("##kv_row", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoPadInnerX);
+		const bool bPropertyTableOpen = ImGui::BeginTable("##kv_row", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoPadInnerX);
 		
-		if (propertyTableOpen)
+		if (bPropertyTableOpen)
 		{
 			ImGui::TableSetupColumn("label", ImGuiTableColumnFlags_WidthFixed, PropertyLabelWidth);
 			ImGui::TableSetupColumn("value", ImGuiTableColumnFlags_WidthStretch);
@@ -53,10 +53,10 @@ namespace EditorWidgets
 		ImGui::PopID();
 	}
 
-	bool DrawFilterChip(const char* label, bool active) noexcept
+	bool DrawFilterChip(const char* label, bool bActive) noexcept
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5.0f, 2.0f));
-		if (active)
+		if (bActive)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, SparkleUiPalette::ButtonBackgroundActive());
 			ImGui::PushStyleColor(ImGuiCol_Text, SparkleUiPalette::TextPrimary());
@@ -68,11 +68,11 @@ namespace EditorWidgets
 		}
 
 		ImGui::PushID("FilterChip");
-		const bool pressed = ImGui::SmallButton(label);
+		const bool bPressed = ImGui::SmallButton(label);
 		ImGui::PopID();
 		ImGui::PopStyleColor(2);
 		ImGui::PopStyleVar();
-		return pressed;
+		return bPressed;
 	}
 
 	void DrawMutedText(const char* text, float alpha) noexcept

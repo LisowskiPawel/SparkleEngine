@@ -39,6 +39,6 @@ namespace SparkleLauncher
 		QPointer<QLabel> m_gpuCrashStatusLabel;
 		QCheckBox* m_enabled = nullptr;
 		QToolButton* m_tools = nullptr;
-		bool m_gpuCrashQueryPending = false;
+		bool m_bGpuCrashQueryPending = false;
 	};
 }

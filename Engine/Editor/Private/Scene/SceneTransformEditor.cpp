@@ -48,8 +48,8 @@ static bool EditScale(Transform& transform) noexcept
 
 bool EditSceneTransform(Transform& transform, const float (&defaultPosition)[3]) noexcept
 {
-	bool changed = EditTranslation(transform, defaultPosition);
-	changed |= EditRotation(transform);
-	changed |= EditScale(transform);
-	return changed;
+	bool bChanged = EditTranslation(transform, defaultPosition);
+	bChanged |= EditRotation(transform);
+	bChanged |= EditScale(transform);
+	return bChanged;
 }

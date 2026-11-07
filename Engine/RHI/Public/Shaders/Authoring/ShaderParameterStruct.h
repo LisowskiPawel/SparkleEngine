@@ -36,7 +36,7 @@ struct ShaderParameterStructFieldDescriptor final
 	std::uint32_t ValueSizeInBytes = 0;
 	std::uint32_t ValueAlignmentInBytes = 0;
 	std::uint64_t ValueLayoutHash = 0;
-	bool Reflected = true;
+	bool bReflected = true;
 	ShaderParameterSamplerBindingPolicy SamplerPolicy = ShaderParameterSamplerBindingPolicy::None;
 };
 
@@ -189,7 +189,7 @@ public:
 	    std::uint32_t arrayCount,
 	    std::uint32_t valueSizeInBytes,
 	    std::uint32_t valueAlignmentInBytes,
-	    bool reflected,
+	    bool bReflected,
 	    ShaderParameterSamplerBindingPolicy samplerPolicy = ShaderParameterSamplerBindingPolicy::None)
 	{
 		ShaderParameterDescriptorRegistry<TParameters>::AddField(
@@ -204,7 +204,7 @@ public:
 		        .ArrayCount = arrayCount,
 		        .ValueSizeInBytes = valueSizeInBytes,
 		        .ValueAlignmentInBytes = valueAlignmentInBytes,
-		        .Reflected = reflected,
+		        .bReflected = bReflected,
 		        .SamplerPolicy = samplerPolicy,
 		    });
 	}

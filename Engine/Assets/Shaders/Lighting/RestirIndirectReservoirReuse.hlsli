@@ -22,10 +22,10 @@ namespace IndirectReservoir
 		const int2 previousPixelCoord = int2(floor(previousPixel));
 		const bool bPreviousInBoundsy = previousPixelCoord.x >= 0 && previousPixelCoord.y >= 0;
 		const bool bPreviousInBoundsx = bPreviousInBoundsy && (previousPixelCoord.x < int(extent.x));
-		const bool previousPixelInBounds = bPreviousInBoundsx && (previousPixelCoord.y < int(extent.y));
-		const bool previousSurfaceCompatible = previousPixelInBounds && AreSurfacesCompatible(surface, previousSurfaceTexture.Load(int3(previousPixelCoord, 0)));
+		const bool bPreviousPixelInBounds = bPreviousInBoundsx && (previousPixelCoord.y < int(extent.y));
+		const bool bPreviousSurfaceCompatible = bPreviousPixelInBounds && AreSurfacesCompatible(surface, previousSurfaceTexture.Load(int3(previousPixelCoord, 0)));
 		
-		if (previousSurfaceCompatible)
+		if (bPreviousSurfaceCompatible)
 		{
 			const Reservoir previous = UnpackReservoir(previousSamples.Load(int3(previousPixelCoord, 0)), previousWeights.Load(int3(previousPixelCoord, 0)));
 

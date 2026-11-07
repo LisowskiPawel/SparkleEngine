@@ -37,13 +37,13 @@ namespace ECS
 		}
 		else
 		{
-			m_evaluateAllTransforms = true;
+			m_bEvaluateAllTransforms = true;
 		}
 	}
 
 	void GameWorldState::RecordChange(EntityId entity) noexcept
 	{
-		if (m_changesOverflowed)
+		if (m_bChangesOverflowed)
 		{
 			return;
 		}
@@ -54,8 +54,8 @@ namespace ECS
 		}
 		m_pendingChanges.clear();
 		m_pendingChanges.push_back(EntityId::Invalid());
-		m_forceFullPublication = true;
-		m_changesOverflowed = true;
+		m_bForceFullPublication = true;
+		m_bChangesOverflowed = true;
 	}
 
 	void GameWorldState::WriteSkyEnvironment(SkyEnvironment environment) noexcept
@@ -82,13 +82,13 @@ namespace ECS
 	{
 		CommitDirtyTransforms(PrepareDirtyTransforms());
 		m_dirtyTransforms.clear();
-		m_evaluateAllTransforms = false;
+		m_bEvaluateAllTransforms = false;
 		PublishPendingChanges();
 	}
 
 	std::span<const EntityId> GameWorldState::PrepareDirtyTransforms()
 	{
-		if (m_evaluateAllTransforms)
+		if (m_bEvaluateAllTransforms)
 		{
 			return m_registry.GetStorage<LocalTransform>().GetEntities();
 		}
@@ -128,10 +128,10 @@ namespace ECS
 			return;
 		}
 		m_readSequence += static_cast<WorldSequence>(m_pendingChanges.size());
-		PublishReadView(m_pendingChanges, m_readSequence, m_forceFullPublication);
+		PublishReadView(m_pendingChanges, m_readSequence, m_bForceFullPublication);
 		m_pendingChanges.clear();
-		m_changesOverflowed = false;
-		m_forceFullPublication = false;
+		m_bChangesOverflowed = false;
+		m_bForceFullPublication = false;
 	}
 
 	WorldReadView GameWorldState::AcquireReadView() const noexcept

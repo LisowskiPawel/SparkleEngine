@@ -67,11 +67,11 @@ private:
 	    RendererMemoryMonitor& memoryMonitor,
 	    TaskExecutor& taskExecutor,
 	    TaskScope& assetTaskParentScope,
-	    bool enableUiRenderPackets);
+	    bool bEnableUiRenderPackets);
 
 	void SubmitViewportRenderRequest(ViewportRenderRequest request) noexcept { m_viewportRenderRequest = std::move(request); }
 
-	void RequestResize(RenderViewportExtent extent, bool minimized) noexcept;
+	void RequestResize(RenderViewportExtent extent, bool bMinimized) noexcept;
 
 	std::uint64_t GetViewportRequestGeneration() const noexcept { return m_viewportRenderRequest.Generation; }
 
@@ -148,8 +148,8 @@ private:
 	std::unique_ptr<ViewportCaptureService> m_viewportCaptureService;
 	std::unique_ptr<ReferencePathTracerSession> m_referencePathTracerSession;
 	RestirLightingHistory m_restirLightingHistory;
-	bool m_resizePending = false;
-	bool m_windowMinimized = false;
-	bool m_frameGraphExecutable = true;
+	bool m_bResizePending = false;
+	bool m_bWindowMinimized = false;
+	bool m_bFrameGraphExecutable = true;
 	ImageProviderGraphKey m_imageProviderFrameGraphKey = {};
 };

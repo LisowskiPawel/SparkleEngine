@@ -31,9 +31,9 @@ void D3D12RenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRayT
 	const bool bInvalidBuildInputsBufferAddress = bInvalidBuildInputsRhiContract || (vertexBufferAddress == 0);
 	const bool bInvalidBuildInputsBufferAddress2 = bInvalidBuildInputsBufferAddress || (indexBufferAddress == 0);
 	const bool bInvalidBuildInputsRhiContract2 = bInvalidBuildInputsBufferAddress2 || (!RhiContract::IsRayTracingGpuAddressPresent(scratchGpuAddress));
-	const bool invalidBlasBuildInputs = bInvalidBuildInputsRhiContract2 || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
+	const bool bInvalidBlasBuildInputs = bInvalidBuildInputsRhiContract2 || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
 	
-	if (invalidBlasBuildInputs)
+	if (bInvalidBlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 BLAS build received incomplete geometry, command-list, or GPU-address inputs.");
 	}
@@ -43,7 +43,7 @@ void D3D12RenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRayT
 
 	D3D12_RAYTRACING_GEOMETRY_DESC nativeGeometry{};
 	nativeGeometry.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-	nativeGeometry.Flags = geometry.Opaque ? D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE : D3D12_RAYTRACING_GEOMETRY_FLAG_NONE;
+	nativeGeometry.Flags = geometry.bOpaque ? D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE : D3D12_RAYTRACING_GEOMETRY_FLAG_NONE;
 	nativeGeometry.Triangles.Transform3x4 = 0;
 	nativeGeometry.Triangles.IndexFormat = D3D12TypeConversions::ToIndexFormat(geometry.IndexFormat);
 	nativeGeometry.Triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -82,9 +82,9 @@ void D3D12RenderCommandList::BuildTlas(
 {
 	const bool bInvalidBuildInputsRhiContract = m_commandList == nullptr || !RhiContract::IsRayTracingGpuAddressPresent(instanceDescsGpuAddress);
 	const bool bInvalidBuildInputsRhiContract2 = bInvalidBuildInputsRhiContract || (!RhiContract::IsRayTracingGpuAddressPresent(scratchGpuAddress));
-	const bool invalidTlasBuildInputs = bInvalidBuildInputsRhiContract2 || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
+	const bool bInvalidTlasBuildInputs = bInvalidBuildInputsRhiContract2 || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
 	
-	if (invalidTlasBuildInputs)
+	if (bInvalidTlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 TLAS build received no command list or an empty GPU address.");
 	}
@@ -120,9 +120,9 @@ void D3D12RenderCommandList::BuildPtlas(const RhiPtlasBuildCommandDesc& desc) no
 	}
 
 	BeginDiagnosticScope("RayTracing.PTLAS.Build", RhiDiagnosticLabelColor{92, 148, 255, 255});
-	const bool submitted = m_owner->BuildPtlas(m_commandList, desc);
+	const bool bSubmitted = m_owner->BuildPtlas(m_commandList, desc);
 	EndDiagnosticScope();
-	if (!submitted)
+	if (!bSubmitted)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 PTLAS provider rejected the build command.");
 	}

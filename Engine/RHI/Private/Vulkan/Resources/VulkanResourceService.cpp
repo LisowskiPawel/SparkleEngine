@@ -28,9 +28,9 @@ RhiOwnedResourceHandle VulkanResourceService::CreateTextureResource(
 {
 	(void) initialState;
 	const bool bTextureDescriptorcapabilities = m_memoryAllocator == nullptr || m_capabilities == nullptr;
-	const bool invalidTextureDescriptor = bTextureDescriptorcapabilities || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc));
+	const bool bInvalidTextureDescriptor = bTextureDescriptorcapabilities || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc));
 	
-	if (invalidTextureDescriptor)
+	if (bInvalidTextureDescriptor)
 	{
 		return {};
 	}
@@ -73,7 +73,7 @@ bool VulkanResourceService::CreateVertexBuffer(
 		return false;
 	}
 
-	const RhiBufferResourceDesc desc{.SizeInBytes = sizeInBytes, .StrideInBytes = strideInBytes, .Kind = RhiBufferKind::Vertex, .AllowRayTracingBuildInput = true};
+	const RhiBufferResourceDesc desc{.SizeInBytes = sizeInBytes, .StrideInBytes = strideInBytes, .Kind = RhiBufferKind::Vertex, .bAllowRayTracingBuildInput = true};
 
 	const VkBufferCreateInfo bufferCreateInfo = VulkanTypeConversions::BuildBufferCreateInfo(
 	    desc,
@@ -146,7 +146,7 @@ bool VulkanResourceService::CreateIndexBuffer(
 		return false;
 	}
 
-	const RhiBufferResourceDesc desc{.SizeInBytes = sizeInBytes, .Kind = RhiBufferKind::Index, .AllowRayTracingBuildInput = true};
+	const RhiBufferResourceDesc desc{.SizeInBytes = sizeInBytes, .Kind = RhiBufferKind::Index, .bAllowRayTracingBuildInput = true};
 
 	const VkBufferCreateInfo bufferCreateInfo = VulkanTypeConversions::BuildBufferCreateInfo(
 	    desc,
@@ -307,9 +307,9 @@ RhiOwnedResourceHandle VulkanResourceService::CreateAliasingTextureResource(
 	(void) desc.ClearValue;
 	const bool bTextureDescriptorcapabilities = m_memoryAllocator == nullptr || m_capabilities == nullptr;
 	const bool bTextureDescriptormemoryBlock = bTextureDescriptorcapabilities || (!memoryBlock);
-	const bool invalidPlacedTextureDescriptor = bTextureDescriptormemoryBlock || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc.ResourceDesc));
+	const bool bInvalidPlacement = bTextureDescriptormemoryBlock || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc.ResourceDesc));
 	
-	if (invalidPlacedTextureDescriptor)
+	if (bInvalidPlacement)
 	{
 		return {};
 	}

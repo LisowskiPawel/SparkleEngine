@@ -56,7 +56,7 @@ public:
 	bool SupportsLiveObjectReports() const noexcept;
 	bool SupportsCrashDiagnostics() const noexcept;
 
-	bool IsInterposerActive() const noexcept { return m_interposerActive; }
+	bool IsInterposerActive() const noexcept { return m_bInterposerActive; }
 
 	void ReportLiveObjects() noexcept;
 	void CollectCrashDiagnostics() noexcept;
@@ -79,7 +79,7 @@ public:
 	const D3D12GpuMemoryAllocator& GetMemoryAllocator() const noexcept;
 	bool TryUpgradeInterposerInterface(ERhiInterposerInterfaceKind kind, IUnknown* nativeInterface, REFIID requestedInterface, void** upgradedInterface) noexcept;
 	bool TryResolveNativeInterface(ERhiInterposerInterfaceKind kind, IUnknown* externalInterface, REFIID requestedInterface, void** nativeInterface) noexcept;
-	void NotifyInterposerPresentationReady(bool ready) noexcept;
+	void NotifyInterposerPresentationReady(bool bReady) noexcept;
 	void NotifyFrameLatencyMarker(ERhiFrameLatencyMarker marker, std::uint64_t frameId) noexcept;
 
 private:
@@ -113,5 +113,5 @@ private:
 	D3D_FEATURE_LEVEL m_desiredD3DFeatureLevel = D3D_FEATURE_LEVEL_12_1;
 	RhiRayTracingCapabilities m_rayTracingCapabilities = {};
 	RhiInterposerHooks m_interposerHooks = {};
-	bool m_interposerActive = false;
+	bool m_bInterposerActive = false;
 };

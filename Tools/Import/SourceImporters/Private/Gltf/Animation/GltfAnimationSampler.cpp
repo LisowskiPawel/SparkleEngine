@@ -84,11 +84,11 @@ namespace GltfAnimationSampler
 	static float ReadInputTime(const cgltf_accessor* accessor, std::size_t index)
 	{
 		float time = 0.0f;
-		const bool timeElementAvailable = accessor != nullptr && index < accessor->count;
-		const bool timeDecoded = timeElementAvailable && cgltf_accessor_read_float(accessor, index, &time, 1);
-		const bool timeFinite = timeDecoded && std::isfinite(time);
+		const bool bTimeElementAvailable = accessor != nullptr && index < accessor->count;
+		const bool bTimeDecoded = bTimeElementAvailable && cgltf_accessor_read_float(accessor, index, &time, 1);
+		const bool bTimeFinite = bTimeDecoded && std::isfinite(time);
 		
-		if (!timeFinite)
+		if (!bTimeFinite)
 		{
 			throw Diagnostics::Error(std::format("Cannot decode glTF animation input time {}.", index));
 		}
@@ -100,22 +100,22 @@ namespace GltfAnimationSampler
 		return std::isfinite(value.x) && std::isfinite(value.y) && std::isfinite(value.z) && std::isfinite(value.w);
 	}
 
-	static DirectX::XMFLOAT4 ConvertTranslationValue(const DirectX::XMFLOAT4& source, bool tangent) noexcept
+	static DirectX::XMFLOAT4 ConvertTranslationValue(const DirectX::XMFLOAT4& source, bool bTangent) noexcept
 	{
-		const DirectX::XMFLOAT3 converted = tangent ? GltfCoordinateConverter::ConvertTranslationTangent({source.x, source.y, source.z})
+		const DirectX::XMFLOAT3 converted = bTangent ? GltfCoordinateConverter::ConvertTranslationTangent({source.x, source.y, source.z})
 		                                            : GltfCoordinateConverter::ConvertTranslation({source.x, source.y, source.z});
 
 		return {converted.x, converted.y, converted.z, 0.0f};
 	}
 
-	static DirectX::XMFLOAT4 ConvertAnimationValue(ImportedAnimationTargetPath targetPath, const DirectX::XMFLOAT4& source, bool tangent) noexcept
+	static DirectX::XMFLOAT4 ConvertAnimationValue(ImportedAnimationTargetPath targetPath, const DirectX::XMFLOAT4& source, bool bTangent) noexcept
 	{
 		switch (targetPath)
 		{
 			case ImportedAnimationTargetPath::Translation:
-				return ConvertTranslationValue(source, tangent);
+				return ConvertTranslationValue(source, bTangent);
 			case ImportedAnimationTargetPath::Rotation:
-				return tangent ? GltfCoordinateConverter::ConvertRotationTangent(source) : GltfCoordinateConverter::ConvertRotation(source);
+				return bTangent ? GltfCoordinateConverter::ConvertRotationTangent(source) : GltfCoordinateConverter::ConvertRotation(source);
 			case ImportedAnimationTargetPath::Scale:
 			case ImportedAnimationTargetPath::Weights:
 			case ImportedAnimationTargetPath::Unknown:
@@ -124,15 +124,15 @@ namespace GltfAnimationSampler
 		}
 	}
 
-	static void NormalizeKeyframe(ImportedAnimationTargetPath targetPath, bool cubicSpline, const DirectX::XMFLOAT4* previousRotation, ImportedAnimationKeyframe& keyframe)
+	static void NormalizeKeyframe(ImportedAnimationTargetPath targetPath, bool bCubicSpline, const DirectX::XMFLOAT4* previousRotation, ImportedAnimationKeyframe& keyframe)
 	{
 		keyframe.value = ConvertAnimationValue(targetPath, keyframe.value, false);
-		if (cubicSpline)
+		if (bCubicSpline)
 		{
 			keyframe.inTangent = ConvertAnimationValue(targetPath, keyframe.inTangent, true);
 			keyframe.outTangent = ConvertAnimationValue(targetPath, keyframe.outTangent, true);
 		}
-		if (!IsFinite(keyframe.value) || (cubicSpline && (!IsFinite(keyframe.inTangent) || !IsFinite(keyframe.outTangent))))
+		if (!IsFinite(keyframe.value) || (bCubicSpline && (!IsFinite(keyframe.inTangent) || !IsFinite(keyframe.outTangent))))
 		{
 			throw Diagnostics::Error("glTF animation contains a non-finite keyframe value or tangent.");
 		}
@@ -148,12 +148,12 @@ namespace GltfAnimationSampler
 			throw Diagnostics::Error("glTF animation contains a zero-length rotation keyframe.");
 		}
 		rotation = DirectX::XMQuaternionNormalize(rotation);
-		const bool rotationSignNeedsFlip = previousRotation != nullptr && DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(previousRotation), rotation)) < 0.0f;
+		const bool bRotationSignNeedsFlip = previousRotation != nullptr && DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(previousRotation), rotation)) < 0.0f;
 		
-		if (rotationSignNeedsFlip)
+		if (bRotationSignNeedsFlip)
 		{
 			rotation = DirectX::XMVectorNegate(rotation);
-			if (cubicSpline)
+			if (bCubicSpline)
 			{
 				DirectX::XMStoreFloat4(&keyframe.inTangent, DirectX::XMVectorNegate(DirectX::XMLoadFloat4(&keyframe.inTangent)));
 				DirectX::XMStoreFloat4(&keyframe.outTangent, DirectX::XMVectorNegate(DirectX::XMLoadFloat4(&keyframe.outTangent)));
@@ -177,18 +177,18 @@ namespace GltfAnimationSampler
 			throw Diagnostics::Error("glTF animation sampler has incompatible input or output accessors.");
 		}
 
-		const bool morphWeights = targetPath == ImportedAnimationTargetPath::Weights;
-		if ((morphWeights && morphWeightCount != 4u) || (!morphWeights && componentCount == 0u))
+		const bool bMorphWeights = targetPath == ImportedAnimationTargetPath::Weights;
+		if ((bMorphWeights && morphWeightCount != 4u) || (!bMorphWeights && componentCount == 0u))
 		{
 			throw Diagnostics::Error("glTF animation sampler has an incompatible target value shape.");
 		}
-		const cgltf_type expectedOutputType = morphWeights ? cgltf_type_scalar : componentCount == 3u ? cgltf_type_vec3 : cgltf_type_vec4;
+		const cgltf_type expectedOutputType = bMorphWeights ? cgltf_type_scalar : componentCount == 3u ? cgltf_type_vec3 : cgltf_type_vec4;
 		if (output->type != expectedOutputType)
 		{
 			throw Diagnostics::Error("glTF animation sampler output type differs from its target path.");
 		}
-		const bool cubicSpline = interpolation == ImportedAnimationInterpolation::CubicSpline;
-		const std::size_t outputElementsPerKeyframe = (cubicSpline ? 3u : 1u) * (morphWeights ? morphWeightCount : 1u);
+		const bool bCubicSpline = interpolation == ImportedAnimationInterpolation::CubicSpline;
+		const std::size_t outputElementsPerKeyframe = (bCubicSpline ? 3u : 1u) * (bMorphWeights ? morphWeightCount : 1u);
 		if (input->count > (std::numeric_limits<std::size_t>::max)() / outputElementsPerKeyframe)
 		{
 			throw Diagnostics::Error("glTF animation sampler keyframe count exceeds the engine range.");
@@ -201,16 +201,16 @@ namespace GltfAnimationSampler
 		return outputElementsPerKeyframe;
 	}
 
-	static void ReadKeyframeValues(const cgltf_accessor* output, std::size_t baseIndex, std::uint32_t componentCount, bool morphWeights, bool cubicSpline, ImportedAnimationKeyframe& keyframe)
+	static void ReadKeyframeValues(const cgltf_accessor* output, std::size_t baseIndex, std::uint32_t componentCount, bool bMorphWeights, bool bCubicSpline, ImportedAnimationKeyframe& keyframe)
 	{
-		const auto readValue = [output, componentCount, morphWeights](std::size_t index)
+		const auto readValue = [output, componentCount, bMorphWeights](std::size_t index)
 		{
-			return morphWeights ? ReadWeightOutputValue(output, index) : ReadOutputValue(output, index, componentCount);
+			return bMorphWeights ? ReadWeightOutputValue(output, index) : ReadOutputValue(output, index, componentCount);
 		};
 
-		if (cubicSpline)
+		if (bCubicSpline)
 		{
-			const std::size_t stride = morphWeights ? 4u : 1u;
+			const std::size_t stride = bMorphWeights ? 4u : 1u;
 			keyframe.inTangent = readValue(baseIndex);
 			keyframe.value = readValue(baseIndex + stride);
 			keyframe.outTangent = readValue(baseIndex + 2u * stride);
@@ -226,15 +226,15 @@ namespace GltfAnimationSampler
 		ImportedAnimationSampler importedSampler;
 		importedSampler.interpolation = ToImportedInterpolation(sampler.interpolation);
 		const std::uint32_t componentCount = GetValueComponentCount(targetPath);
-		const bool morphWeights = targetPath == ImportedAnimationTargetPath::Weights;
-		const bool cubicSpline = importedSampler.interpolation == ImportedAnimationInterpolation::CubicSpline;
+		const bool bMorphWeights = targetPath == ImportedAnimationTargetPath::Weights;
+		const bool bCubicSpline = importedSampler.interpolation == ImportedAnimationInterpolation::CubicSpline;
 		const std::size_t outputElementsPerKeyframe = ValidateSamplerAccessors(sampler, targetPath, morphWeightCount, importedSampler.interpolation, componentCount);
 		const cgltf_accessor* input = sampler.input;
 		const cgltf_accessor* output = sampler.output;
 		importedSampler.keyframes.reserve(input->count);
 		float previousTime = -1.0f;
 		DirectX::XMFLOAT4 previousRotation{};
-		bool hasPreviousRotation = false;
+		bool bHasPreviousRotation = false;
 		for (cgltf_size keyframeIndex = 0; keyframeIndex < input->count; ++keyframeIndex)
 		{
 			ImportedAnimationKeyframe keyframe;
@@ -245,13 +245,13 @@ namespace GltfAnimationSampler
 			}
 
 			const std::size_t outputBaseIndex = static_cast<std::size_t>(keyframeIndex) * outputElementsPerKeyframe;
-			ReadKeyframeValues(output, outputBaseIndex, componentCount, morphWeights, cubicSpline, keyframe);
+			ReadKeyframeValues(output, outputBaseIndex, componentCount, bMorphWeights, bCubicSpline, keyframe);
 
-			NormalizeKeyframe(targetPath, cubicSpline, hasPreviousRotation ? &previousRotation : nullptr, keyframe);
+			NormalizeKeyframe(targetPath, bCubicSpline, bHasPreviousRotation ? &previousRotation : nullptr, keyframe);
 			if (targetPath == ImportedAnimationTargetPath::Rotation)
 			{
 				previousRotation = keyframe.value;
-				hasPreviousRotation = true;
+				bHasPreviousRotation = true;
 			}
 			inOutClipDurationSeconds = (std::max) (inOutClipDurationSeconds, keyframe.timeSeconds);
 			importedSampler.keyframes.push_back(keyframe);

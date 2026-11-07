@@ -124,10 +124,10 @@ bool ReferencePathTracerArtifactEncoding::Encode(const ReferencePathTracerArtifa
 
 	LinearRgbImage moment2;
 	artifact.Checkpoint.emplace();
-	const bool momentDecoded = ImageEncoding::DecodeLinearRgb(moment2Source, moment2, errorMessage);
-	const bool checkpointEncoded = momentDecoded && EncodeCheckpoint(mean, moment2, request.Mean.Result, *artifact.Checkpoint, errorMessage);
+	const bool bMomentDecoded = ImageEncoding::DecodeLinearRgb(moment2Source, moment2, errorMessage);
+	const bool bCheckpointEncoded = bMomentDecoded && EncodeCheckpoint(mean, moment2, request.Mean.Result, *artifact.Checkpoint, errorMessage);
 
-	if (!checkpointEncoded)
+	if (!bCheckpointEncoded)
 	{
 		artifact.Checkpoint.reset();
 		return false;

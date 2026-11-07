@@ -51,15 +51,15 @@ namespace ViewportDisplaySettings
 
 	void ApplyExposureOverrides(ResolvedViewportDisplaySettings& resolved, const ViewportExposureOverrides& overrides) noexcept
 	{
-		resolved.ExposureMode = overrides.OverrideMode ? ResolveMode(overrides.Mode, resolved.ExposureMode) : resolved.ExposureMode;
-		resolved.ExposureMeteringMethod = overrides.OverrideMeteringMethod ? ResolveMeteringMethod(overrides.MeteringMethod, resolved.ExposureMeteringMethod) : resolved.ExposureMeteringMethod;
-		resolved.ManualExposure = overrides.OverrideManualExposure ? overrides.ManualExposure : resolved.ManualExposure;
-		resolved.ExposureCompensation = overrides.OverrideCompensation ? overrides.Compensation : resolved.ExposureCompensation;
-		resolved.ExposureTargetLuminance = overrides.OverrideTargetLuminance ? overrides.TargetLuminance : resolved.ExposureTargetLuminance;
-		resolved.ExposureMin = overrides.OverrideMinimum ? overrides.Minimum : resolved.ExposureMin;
-		resolved.ExposureMax = overrides.OverrideMaximum ? overrides.Maximum : resolved.ExposureMax;
-		resolved.ExposureAdaptationSpeedUp = overrides.OverrideAdaptationSpeedUp ? overrides.AdaptationSpeedUp : resolved.ExposureAdaptationSpeedUp;
-		resolved.ExposureAdaptationSpeedDown = overrides.OverrideAdaptationSpeedDown ? overrides.AdaptationSpeedDown : resolved.ExposureAdaptationSpeedDown;
+		resolved.ExposureMode = overrides.bOverrideMode ? ResolveMode(overrides.Mode, resolved.ExposureMode) : resolved.ExposureMode;
+		resolved.ExposureMeteringMethod = overrides.bOverrideMeteringMethod ? ResolveMeteringMethod(overrides.MeteringMethod, resolved.ExposureMeteringMethod) : resolved.ExposureMeteringMethod;
+		resolved.ManualExposure = overrides.bOverrideManualExposure ? overrides.ManualExposure : resolved.ManualExposure;
+		resolved.ExposureCompensation = overrides.bOverrideCompensation ? overrides.Compensation : resolved.ExposureCompensation;
+		resolved.ExposureTargetLuminance = overrides.bOverrideTargetLuminance ? overrides.TargetLuminance : resolved.ExposureTargetLuminance;
+		resolved.ExposureMin = overrides.bOverrideMinimum ? overrides.Minimum : resolved.ExposureMin;
+		resolved.ExposureMax = overrides.bOverrideMaximum ? overrides.Maximum : resolved.ExposureMax;
+		resolved.ExposureAdaptationSpeedUp = overrides.bOverrideAdaptationSpeedUp ? overrides.AdaptationSpeedUp : resolved.ExposureAdaptationSpeedUp;
+		resolved.ExposureAdaptationSpeedDown = overrides.bOverrideAdaptationSpeedDown ? overrides.AdaptationSpeedDown : resolved.ExposureAdaptationSpeedDown;
 	}
 
 	void ValidateDisplayModes(const ResolvedViewportDisplaySettings& resolved) noexcept

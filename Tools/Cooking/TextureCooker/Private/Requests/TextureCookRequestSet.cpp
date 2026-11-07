@@ -31,7 +31,7 @@ void TextureCookRequestSet::Add(const TextureCookRequest& request)
 {
 	ValidateTextureCookRequest(request);
 	const auto [position, inserted] = m_requestIndices.try_emplace(request.assetId, m_requests.size());
-	if (inserted)
+	if (bInserted)
 	{
 		try
 		{

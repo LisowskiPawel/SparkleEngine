@@ -44,7 +44,7 @@ private:
 	std::function<void()> m_settingsOpenHandler;
 	std::function<void()> m_consoleOpenHandler;
 	std::function<void()> m_viewportCaptureHandler;
-	bool m_helpOpen = false;
-	bool m_levelFailureVisible = false;
+	bool m_bHelpOpen = false;
+	bool m_bLevelFailureVisible = false;
 	float m_heightPixels = 0.0f;
 };

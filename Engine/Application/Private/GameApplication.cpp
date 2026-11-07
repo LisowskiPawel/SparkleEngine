@@ -86,7 +86,7 @@ TaskScope& GameApplication::GetApplicationTaskScope() noexcept
 
 void GameApplication::Initialize()
 {
-	if (m_isInitialized)
+	if (m_bIsInitialized)
 	{
 		return;
 	}
@@ -100,7 +100,7 @@ void GameApplication::Initialize()
 		return;
 	}
 
-	m_isInitialized = true;
+	m_bIsInitialized = true;
 }
 
 void GameApplication::InitializeHost()
@@ -140,7 +140,7 @@ void GameApplication::InitializeRenderer()
 #endif
 
 	RendererExecutionConfig rendererConfig;
-	if (m_options.AllowThreadedRenderer && ConcurrencyLaunchCVars::UseThreadedRenderer())
+	if (m_options.bAllowThreadedRenderer && ConcurrencyLaunchCVars::UseThreadedRenderer())
 	{
 		rendererConfig.Mode = RendererExecutionMode::Threaded;
 		rendererConfig.RenderPipelineDepth = ConcurrencyLaunchCVars::ResolveRenderPipelineDepth();
@@ -155,7 +155,7 @@ void GameApplication::InitializeRenderer()
 		}
 	}
 
-	rendererConfig.EnableUiRenderPackets = m_options.EnableUiRenderPackets;
+	rendererConfig.bEnableUiRenderPackets = m_options.bEnableUiRenderPackets;
 	rendererConfig.AssetTaskExecutor = &m_taskRuntime->GetExecutor();
 	rendererConfig.AssetTaskParentScope = &m_taskRuntime->GetApplicationScope();
 
@@ -178,7 +178,7 @@ void GameApplication::InitializeRenderer()
 
 GameApplicationFrameResult GameApplication::BeginFrame()
 {
-	if (!m_isInitialized)
+	if (!m_bIsInitialized)
 	{
 		return GameApplicationFrameResult::Exit;
 	}
@@ -320,5 +320,5 @@ void GameApplication::Shutdown()
 	m_inputSystem.reset();
 	m_window.reset();
 	m_timer.reset();
-	m_isInitialized = false;
+	m_bIsInitialized = false;
 }

@@ -140,7 +140,7 @@ namespace Material
 		const float tangentSign = Input.TangentWorld.w >= 0.0f ? 1.0f : -1.0f;
 		const float3 bitangentWorld = ComputeBitangentFromSign(Input.NormalWorld, Input.TangentWorld.xyz, tangentSign);
 		props.NormalWorld = TransformTangentNormalToWorld(normalTangent, Input.NormalWorld, Input.TangentWorld.xyz, bitangentWorld);
-		if (!Input.IsFrontFace)
+		if (!Input.bIsFrontFace)
 		{
 			props.NormalWorld = -props.NormalWorld;
 		}

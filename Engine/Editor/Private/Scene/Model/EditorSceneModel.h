@@ -15,7 +15,7 @@ struct EditorSceneEntry final
 	std::string Label;
 	std::string TypeLabel;
 	SceneObjectSelection Selection;
-	bool Visible = true;
+	bool bVisible = true;
 	SceneLightKind LightKind = SceneLightKind::Unknown;
 };
 

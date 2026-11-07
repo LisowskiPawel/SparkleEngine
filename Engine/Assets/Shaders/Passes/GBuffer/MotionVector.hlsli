@@ -21,8 +21,8 @@ namespace MotionVectors
 
 	float2 Compute(const float4 currentClipPosition, const float4 previousClipPosition, const float2 viewportSize)
 	{
-		const bool hasValidPreviousFrame = (HistoryValid != 0u);
-		if (!hasValidPreviousFrame || currentClipPosition.w <= 1e-6f || previousClipPosition.w <= 1e-6f)
+		const bool bHasValidPreviousFrame = (HistoryValid != 0u);
+		if (!bHasValidPreviousFrame || currentClipPosition.w <= 1e-6f || previousClipPosition.w <= 1e-6f)
 		{
 			return float2(0.0f, 0.0f);
 		}

@@ -61,10 +61,10 @@ namespace D3D12DebugLayerDiagnostics
 
 using namespace D3D12DebugLayerDiagnostics;
 
-D3D12DebugLayer::D3D12DebugLayer(bool enableValidation)
+D3D12DebugLayer::D3D12DebugLayer(bool bEnableValidation)
 {
 	InitDredSettings();
-	if (enableValidation)
+	if (bEnableValidation)
 	{
 		InitD3D12Debug();
 		InitDXGIDebug();
@@ -150,7 +150,7 @@ bool D3D12DebugLayer::SupportsLiveObjectReports() const noexcept
 
 bool D3D12DebugLayer::SupportsCrashDiagnostics() const noexcept
 {
-	return m_supportsCrashDiagnostics;
+	return m_bSupportsCrashDiagnostics;
 }
 
 void D3D12DebugLayer::ReportLiveObjects(ID3D12Device* device)
@@ -165,7 +165,7 @@ void D3D12DebugLayer::InitDredSettings() noexcept
 	const HRESULT dredHr = D3D12GetDebugInterface(IID_PPV_ARGS(dredSettings.ReleaseAndGetAddressOf()));
 	if (FAILED(dredHr))
 	{
-		m_supportsCrashDiagnostics = false;
+		m_bSupportsCrashDiagnostics = false;
 		SPDLOG_LOGGER_WARN(g_d3d12DiagnosticsLogger, "D3D12 crash diagnostics unavailable: DRED settings interface query failed with HRESULT {}.", FormatHRESULT(dredHr));
 		return;
 	}
@@ -180,7 +180,7 @@ void D3D12DebugLayer::InitDredSettings() noexcept
 		dredSettings1->SetBreadcrumbContextEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
 	}
 
-	m_supportsCrashDiagnostics = true;
+	m_bSupportsCrashDiagnostics = true;
 }
 
 void D3D12DebugLayer::InitD3D12Debug()
@@ -228,7 +228,7 @@ void D3D12DebugLayer::DrainStoredMessages()
 	}
 
 	const UINT64 numMessages = m_infoQueue->GetNumStoredMessagesAllowedByRetrievalFilter();
-	bool truncated = numMessages > 256;
+	bool bTruncated = numMessages > 256;
 	for (UINT64 messageIndex = 0; messageIndex < (std::min) (numMessages, UINT64{256}); ++messageIndex)
 	{
 		SIZE_T messageLength = 0;
@@ -238,7 +238,7 @@ void D3D12DebugLayer::DrainStoredMessages()
 		}
 		if (messageLength > 64u * 1024u)
 		{
-			truncated = true;
+			bTruncated = true;
 			continue;
 		}
 
@@ -253,7 +253,7 @@ void D3D12DebugLayer::DrainStoredMessages()
 			        .Text = message->pDescription != nullptr ? std::string(message->pDescription, strnlen(message->pDescription, messageLength)) : ""});
 		}
 	}
-	if (truncated)
+	if (bTruncated)
 	{
 		m_messages.push_back(
 		    RhiDiagnosticMessage{

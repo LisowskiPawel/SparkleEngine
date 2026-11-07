@@ -40,30 +40,30 @@ std::vector<ShaderContractVerificationFailure> ValidateShaderContracts(const Sha
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "unsupported-stage"));
 		}
-		if (!shader.hasParameterStruct && !IsRayTracingShaderStage(shader.stage))
+		if (!shader.bHasParameterStruct && !IsRayTracingShaderStage(shader.stage))
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "missing-parameter-descriptor-builder"));
 		}
-		if (!shader.hasParameterStruct && shader.stage == ShaderStage::RayGeneration)
+		if (!shader.bHasParameterStruct && shader.stage == ShaderStage::RayGeneration)
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "ray-generation-missing-root-parameter-struct"));
 		}
-		if (shader.hasParameterStruct && IsRayTracingShaderStage(shader.stage) && shader.stage != ShaderStage::RayGeneration)
+		if (shader.bHasParameterStruct && IsRayTracingShaderStage(shader.stage) && shader.stage != ShaderStage::RayGeneration)
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "non-ray-generation-root-parameter-struct"));
 		}
 		const bool bHasTracingContractrayTracing = shader.rayTracing.PayloadSizeInBytes != 0 || shader.rayTracing.AttributeSizeInBytes != 0;
-		const bool hasSharedRayTracingContract = bHasTracingContractrayTracing || (shader.rayTracing.MinimumRecursionDepth != 0);
-		const bool hasLocalRecord = shader.rayTracing.LocalRecordSizeInBytes != 0 || shader.rayTracing.LocalRecordSignature != 0;
+		const bool bHasSharedRayTracingContract = bHasTracingContractrayTracing || (shader.rayTracing.MinimumRecursionDepth != 0);
+		const bool bHasLocalRecord = shader.rayTracing.LocalRecordSizeInBytes != 0 || shader.rayTracing.LocalRecordSignature != 0;
 		if (shader.stage == ShaderStage::RayGeneration && (shader.rayTracing.PayloadSizeInBytes == 0 || shader.rayTracing.AttributeSizeInBytes == 0 || shader.rayTracing.MinimumRecursionDepth == 0))
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "incomplete-ray-tracing-contract"));
 		}
-		if (IsRayTracingShaderStage(shader.stage) && shader.stage != ShaderStage::RayGeneration && hasSharedRayTracingContract)
+		if (IsRayTracingShaderStage(shader.stage) && shader.stage != ShaderStage::RayGeneration && bHasSharedRayTracingContract)
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "shared-ray-tracing-contract-on-non-dispatch-stage"));
 		}
-		if (!IsRayTracingShaderStage(shader.stage) && (hasSharedRayTracingContract || hasLocalRecord))
+		if (!IsRayTracingShaderStage(shader.stage) && (bHasSharedRayTracingContract || bHasLocalRecord))
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "ray-tracing-contract-on-non-ray-tracing-stage"));
 		}

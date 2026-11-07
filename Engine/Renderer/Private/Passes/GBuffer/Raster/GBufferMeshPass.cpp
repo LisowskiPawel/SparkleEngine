@@ -74,9 +74,9 @@ void GBufferMeshPass::BindMaterial(DrawParameterInstance& drawParameters, const 
 const GpuMesh* GBufferMeshPass::ResolveBatch(const RenderView& view, const MeshInstanceBatch& batch, const GpuMeshCache& meshes) noexcept
 {
 	const bool bInvalidMeshBatchPrimitiveIndices = batch.instanceCount == 0u || batch.firstInstance >= view.rasterPrimitiveIndices.size();
-	const bool invalidMeshBatch = bInvalidMeshBatchPrimitiveIndices || (batch.instanceCount > view.rasterPrimitiveIndices.size() - batch.firstInstance);
+	const bool bInvalidMeshBatch = bInvalidMeshBatchPrimitiveIndices || (batch.instanceCount > view.rasterPrimitiveIndices.size() - batch.firstInstance);
 	
-	if (invalidMeshBatch)
+	if (bInvalidMeshBatch)
 	{
 		return nullptr;
 	}
@@ -111,13 +111,13 @@ void GBufferMeshPass::ConfigureDrawParameters(const Parameters& passParameters, 
 	drawParameters->Vertex.FirstInstance = firstInstance;
 }
 
-RhiRasterizerState GBufferMeshPass::ResolveRasterizerState(const MaterialData& material, const GpuMesh& gpuMesh, bool wireframe) noexcept
+RhiRasterizerState GBufferMeshPass::ResolveRasterizerState(const MaterialData& material, const GpuMesh& gpuMesh, bool bWireframe) noexcept
 {
 	return RhiRasterizerState{
-	    .FillMode = wireframe ? RhiFillMode::Wireframe : RhiFillMode::Solid,
-	    .CullMode = material.doubleSided || wireframe ? ERhiCullMode::None : ERhiCullMode::Back,
+	    .FillMode = bWireframe ? RhiFillMode::Wireframe : RhiFillMode::Solid,
+	    .CullMode = material.bDoubleSided || bWireframe ? ERhiCullMode::None : ERhiCullMode::Back,
 	    .FrontFaceWinding = gpuMesh.GetFrontFaceWinding(),
-	    .DepthClipEnable = gpuMesh.UsesDepthClipping()};
+	    .bDepthClipEnable = gpuMesh.UsesDepthClipping()};
 }
 
 bool GBufferMeshPass::BindBatchPipeline(const FrameGraphResourceCommands& resources, RenderCommandContext& commandContext, DrawParameterInstance& drawParameters, const PreparedDraw& draw)
@@ -168,7 +168,7 @@ void GBufferMeshPass::MaterializePipelines(const RenderPassRuntimeCache& runtime
 {
 	const PreparedRenderScene& preparedScene = m_scene;
 	const RenderView& view = m_view;
-	const bool wireframe = view.viewMode == RenderViewMode::Wireframe;
+	const bool bWireframe = view.viewMode == RenderViewMode::Wireframe;
 
 	m_preparedDraws.clear();
 	if (preparedScene.gpuBindings == nullptr || !preparedScene.gpuBindings->Geometry.HasMeshInstanceBuffers())
@@ -188,26 +188,26 @@ void GBufferMeshPass::MaterializePipelines(const RenderPassRuntimeCache& runtime
 			continue;
 		}
 		const MaterialData& material = preparedScene.materials[batch.materialSlot];
-		const bool materialGpuBindingsAvailable = material.gpuHandle && material.rasterTextureTable;
-		const bool bSkinningBuffersAvailablemeshKind = materialGpuBindingsAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
-		const bool bBuffersAvailableGuardBuffers = materialGpuBindingsAvailable && !bSkinningBuffersAvailablemeshKind;
+		const bool bMaterialGpuBindingsAvailable = material.gpuHandle && material.rasterTextureTable;
+		const bool bSkinningBuffersAvailablemeshKind = bMaterialGpuBindingsAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
+		const bool bBuffersAvailableGuardBuffers = bMaterialGpuBindingsAvailable && !bSkinningBuffersAvailablemeshKind;
 		const bool bBuffersAvailableSkinningBuffers = bBuffersAvailableGuardBuffers && (preparedScene.gpuBindings->Geometry.HasSkinningBuffers());
 		const bool bBuffersAvailableSkinningBuffers2 = bSkinningBuffersAvailablemeshKind || bBuffersAvailableSkinningBuffers;
-		const bool skinningBuffersAvailable = materialGpuBindingsAvailable && bBuffersAvailableSkinningBuffers2;
-		const bool bSkinningValidmeshKind = skinningBuffersAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
-		const bool bSkinningValidGuardValidSkinning = skinningBuffersAvailable && !bSkinningValidmeshKind;
+		const bool bSkinningBuffersAvailable = bMaterialGpuBindingsAvailable && bBuffersAvailableSkinningBuffers2;
+		const bool bSkinningValidmeshKind = bSkinningBuffersAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
+		const bool bSkinningValidGuardValidSkinning = bSkinningBuffersAvailable && !bSkinningValidmeshKind;
 		const bool bSkinningValidValidSkinning = bSkinningValidGuardValidSkinning && (HasValidSkinning(preparedScene, view, batch));
 		const bool bSkinningValidValidSkinning2 = bSkinningValidmeshKind || bSkinningValidValidSkinning;
-		const bool skinningValid = skinningBuffersAvailable && bSkinningValidValidSkinning2;
+		const bool bSkinningValid = bSkinningBuffersAvailable && bSkinningValidValidSkinning2;
 		
-		if (!skinningValid)
+		if (!bSkinningValid)
 		{
 			continue;
 		}
 
 		const GraphicsPipelineRequest pipelineRequest = BuildGraphicsPipelineRequest(
 		    renderState,
-		    ResolveRasterizerState(material, *gpuMesh, wireframe),
+		    ResolveRasterizerState(material, *gpuMesh, bWireframe),
 		    gpuMesh->GetPrimitiveTopology(),
 		    gpuMesh->GetVertexInputDeclaration(),
 		    attachments);

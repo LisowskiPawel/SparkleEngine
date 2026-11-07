@@ -9,14 +9,14 @@ namespace SparkleLauncher
 {
 	bool ConfirmLauncherRunRequest(QWidget& parent, LauncherOperationRequest& request)
 	{
-		if (request.OperationId != "workspace.clean" || request.ConfirmClean)
+		if (request.OperationId != "workspace.clean" || request.bConfirmClean)
 		{
 			return true;
 		}
 
-		const bool customCleanRequested = !request.CleanTargets.isEmpty();
+		const bool bCustomCleanRequested = !request.CleanTargets.isEmpty();
 		QStringList scopeNames;
-		if (customCleanRequested)
+		if (bCustomCleanRequested)
 		{
 			for (const LauncherCleanTarget& target : request.CleanTargets)
 			{
@@ -31,12 +31,12 @@ namespace SparkleLauncher
 			}
 		}
 
-		QString message = customCleanRequested ? "Generated outputs to clean:\n\n" + scopeNames.join("\n\n") : "Clean scopes:\n" + scopeNames.join('\n');
-		message += customCleanRequested ? "\n\nThis removes only the generated outputs mapped to the selected action. Continue?" : "\n\nThis removes generated files for the selected scope. Continue?";
+		QString message = bCustomCleanRequested ? "Generated outputs to clean:\n\n" + scopeNames.join("\n\n") : "Clean scopes:\n" + scopeNames.join('\n');
+		message += bCustomCleanRequested ? "\n\nThis removes only the generated outputs mapped to the selected action. Continue?" : "\n\nThis removes generated files for the selected scope. Continue?";
 
 		const QMessageBox::StandardButton result = QMessageBox::question(
 		    &parent,
-		    customCleanRequested ? "Confirm Action Clean" : "Confirm Clean Workspace",
+		    bCustomCleanRequested ? "Confirm Action Clean" : "Confirm Clean Workspace",
 		    message,
 		    QMessageBox::Ok | QMessageBox::Cancel,
 		    QMessageBox::Cancel);
@@ -46,7 +46,7 @@ namespace SparkleLauncher
 			return false;
 		}
 
-		request.ConfirmClean = true;
+		request.bConfirmClean = true;
 		return true;
 	}
 }

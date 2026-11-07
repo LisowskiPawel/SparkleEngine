@@ -18,7 +18,7 @@ namespace PathLightSampling
 		MeshInstanceData Mesh;
 		float3 Normal;
 		float Area;
-		bool TwoSided;
+		bool bTwoSided;
 	};
 
 	uint CountEmissiveTriangles(uint instanceId)
@@ -161,7 +161,7 @@ namespace PathLightSampling
 		const float twiceArea = length(normalUnnormalized);
 		emissiveTriangle.Normal = RayEndpoints::TransformGeometricNormal(normalObject, emissiveTriangle.Mesh);
 		emissiveTriangle.Area = 0.5f * twiceArea;
-		emissiveTriangle.TwoSided = (evaluated.Instance.Flags & HitSurface::InstanceFlagTwoSided) != 0u;
+		emissiveTriangle.bTwoSided = (evaluated.Instance.Flags & HitSurface::InstanceFlagTwoSided) != 0u;
 		return emissiveTriangle;
 	}
 
@@ -181,9 +181,9 @@ namespace PathLightSampling
 		const float3 samplePosition = RayEndpoints::TransformPosition(positionObject, emissiveTriangle.Mesh.WorldMatrix);
 		const float2 sampledTexCoord = InterpolateRayTracingTexCoord0(sampledTriangle);
 		const float4 sampledColor = InterpolateRayTracingColor(sampledTriangle);
-		const bool sampledAlphaAccepted = PassesRayTracingMaterialAlpha(emissiveTriangle.Material, sampledTexCoord, sampledColor);
+		const bool bSampledAlphaAccepted = PassesRayTracingMaterialAlpha(emissiveTriangle.Material, sampledTexCoord, sampledColor);
 		
-		if (!sampledAlphaAccepted)
+		if (!bSampledAlphaAccepted)
 		{
 			return (LightSampling::DirectLightSample)0;
 		}
@@ -199,7 +199,7 @@ namespace PathLightSampling
 		                                                                                    emissiveTriangle.Normal,
 		                                                                                    emittedRadiance,
 		                                                                                    rcp(emissiveTriangle.Area),
-		                                                                                    emissiveTriangle.TwoSided);
+		                                                                                    emissiveTriangle.bTwoSided);
 
 		const float3 normalObject = cross(sampledTriangle.V1.Position - sampledTriangle.V0.Position, sampledTriangle.V2.Position - sampledTriangle.V0.Position);
 		const RayEndpoints::SurfaceEndpointError endpointError = RayEndpoints::BuildSurfaceEndpointError(sampledTriangle, emissiveTriangle.Mesh, positionObject, normalObject);
@@ -224,7 +224,7 @@ namespace PathLightSampling
 		                                                                                          emissiveTriangle.Normal,
 		                                                                                          emissiveTriangle.Material.EmissiveColor,
 		                                                                                          rcp(emissiveTriangle.Area),
-		                                                                                          emissiveTriangle.TwoSided);
+		                                                                                          emissiveTriangle.bTwoSided);
 
 		return sample.PdfW;
 	}

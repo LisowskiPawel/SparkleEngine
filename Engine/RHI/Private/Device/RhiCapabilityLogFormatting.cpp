@@ -19,19 +19,19 @@ std::string FormatBackendDiagnosticsSupport(const RhiBackendDiagnosticsSupport& 
 	return std::format(
 	    "diagnostics(validation={}, debugLayer={}, objectNames={}, gpuEvents={}, timestampQueries={}, debugMessages={}, "
 	    "liveObjectReports={}, crashDiagnostics={})",
-	    diagnostics.ValidationEnabled,
-	    diagnostics.SupportsDebugLayer,
-	    diagnostics.SupportsObjectNames,
-	    diagnostics.SupportsGpuEvents,
-	    diagnostics.SupportsTimestampQueries,
-	    diagnostics.SupportsDebugMessages,
-	    diagnostics.SupportsLiveObjectReports,
-	    diagnostics.SupportsCrashDiagnostics);
+	    diagnostics.bValidationEnabled,
+	    diagnostics.bSupportsDebugLayer,
+	    diagnostics.bSupportsObjectNames,
+	    diagnostics.bSupportsGpuEvents,
+	    diagnostics.bSupportsTimestampQueries,
+	    diagnostics.bSupportsDebugMessages,
+	    diagnostics.bSupportsLiveObjectReports,
+	    diagnostics.bSupportsCrashDiagnostics);
 }
 
 std::string FormatBackendMemorySupport(const RhiBackendMemorySupport& memory)
 {
-	return std::format("memorySupport(diagnostics={}, budgetQueries={}, residencyPressure={})", memory.SupportsMemoryDiagnostics, memory.SupportsBudgetQueries, memory.SupportsResidencyPressure);
+	return std::format("memorySupport(diagnostics={}, budgetQueries={}, residencyPressure={})", memory.bSupportsMemoryDiagnostics, memory.bSupportsBudgetQueries, memory.bSupportsResidencyPressure);
 }
 
 std::string FormatExternalFeatureInteropCapabilities(const RhiExternalFeatureInteropCapabilities& capabilities)
@@ -44,11 +44,11 @@ std::string FormatExternalFeatureInteropCapabilities(const RhiExternalFeatureInt
 	    capabilities.Adapter.VendorId,
 	    capabilities.Adapter.DeviceId,
 	    capabilities.Adapter.DriverDescription,
-	    capabilities.ExposesNativeDevice,
-	    capabilities.ExposesNativeGraphicsQueue,
-	    capabilities.ExposesNativeGraphicsCommandList,
-	    capabilities.ExposesNativeResources,
-	    capabilities.SupportsExplicitResourceStates,
-	    capabilities.SupportsExternalProviderEvaluation,
-	    capabilities.SupportsRuntimeProviderChecks);
+	    capabilities.bExposesNativeDevice,
+	    capabilities.bExposesNativeGraphicsQueue,
+	    capabilities.bExposesNativeGraphicsCommandList,
+	    capabilities.bExposesNativeResources,
+	    capabilities.bSupportsExplicitResourceStates,
+	    capabilities.bSupportsExternalProviderEvaluation,
+	    capabilities.bSupportsRuntimeProviderChecks);
 }

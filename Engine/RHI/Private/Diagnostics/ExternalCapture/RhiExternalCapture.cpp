@@ -28,8 +28,8 @@ public:
 	std::chrono::steady_clock::time_point StartedAt;
 	std::uint64_t NextRequestId = 1;
 	std::uint64_t ArmedRequestId = 0;
-	bool FrameStarted = false;
-	bool Closed = false;
+	bool bFrameStarted = false;
+	bool bClosed = false;
 
 	void ExpireRequest(std::chrono::steady_clock::time_point now)
 	{
@@ -155,7 +155,7 @@ ExternalCaptureSnapshot RhiExternalCapture::Observe() const
 ExternalCaptureAdmission RhiExternalCapture::Reserve(std::uint64_t contextToken)
 {
 	std::lock_guard lock(m_state->Mutex);
-	if (m_state->Closed)
+	if (m_state->bClosed)
 	{
 		return {.Status = ExternalCaptureAdmissionStatus::Closed};
 	}
@@ -223,7 +223,7 @@ void RhiExternalCapture::BeginFrame(std::uint64_t frameId) noexcept
 			return;
 		}
 
-		state.FrameStarted = true;
+		state.bFrameStarted = true;
 		SPDLOG_LOGGER_INFO(g_externalCaptureLogger.GetLogger(), "Capture request={} scheduled at host frame={}", requestId, frameId);
 	}
 	catch (const std::exception& error)
@@ -235,10 +235,10 @@ void RhiExternalCapture::BeginFrame(std::uint64_t frameId) noexcept
 void RhiExternalCapture::EndFrame() noexcept
 {
 	auto& state = *m_state;
-	if (state.FrameStarted)
+	if (state.bFrameStarted)
 	{
 		state.Adapter->End(state.Target);
-		state.FrameStarted = false;
+		state.bFrameStarted = false;
 	}
 
 	const auto snapshot = Observe();
@@ -273,5 +273,5 @@ void RhiExternalCapture::Shutdown() noexcept
 	Reject(snapshot.RequestId, "Editor closed before capture started.");
 
 	std::lock_guard lock(m_state->Mutex);
-	m_state->Closed = true;
+	m_state->bClosed = true;
 }

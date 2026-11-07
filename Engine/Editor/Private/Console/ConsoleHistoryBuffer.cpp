@@ -31,7 +31,7 @@ void ConsoleHistoryBuffer::ResetNavigation() noexcept
 {
 	m_pendingLine.clear();
 	m_navigationIndex = m_entries.size();
-	m_isNavigating = false;
+	m_bIsNavigating = false;
 }
 
 std::optional<std::string> ConsoleHistoryBuffer::NavigatePrevious(std::string_view currentLine)
@@ -41,11 +41,11 @@ std::optional<std::string> ConsoleHistoryBuffer::NavigatePrevious(std::string_vi
 		return std::nullopt;
 	}
 
-	if (!m_isNavigating)
+	if (!m_bIsNavigating)
 	{
 		m_pendingLine = std::string(currentLine);
 		m_navigationIndex = m_entries.size();
-		m_isNavigating = true;
+		m_bIsNavigating = true;
 	}
 
 	if (m_navigationIndex == 0)
@@ -59,7 +59,7 @@ std::optional<std::string> ConsoleHistoryBuffer::NavigatePrevious(std::string_vi
 
 std::optional<std::string> ConsoleHistoryBuffer::NavigateNext()
 {
-	if (!m_isNavigating)
+	if (!m_bIsNavigating)
 	{
 		return std::nullopt;
 	}

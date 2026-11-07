@@ -22,5 +22,5 @@ public:
 private:
 	ViewportCaptureId m_capture;
 	std::optional<ViewportCaptureReadback> m_readback;
-	bool m_discard = false;
+	bool m_bDiscard = false;
 };

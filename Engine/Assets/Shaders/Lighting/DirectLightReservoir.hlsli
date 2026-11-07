@@ -15,23 +15,23 @@ namespace DirectReservoir
 
 	struct Surface
 	{
-		bool Valid;
+		bool bValid;
 		GBufferData GBuffer;
 		float3 PositionWorld;
 		float3 ViewDirWorld;
 		float ViewDistance;
-		bool EvaluateSubsurface;
+		bool bEvaluateSubsurface;
 	};
 
 	Surface LoadSurface(uint2 pixelCoord)
 	{
 		Surface surface;
-		surface.Valid = false;
+		surface.bValid = false;
 		surface.GBuffer = LoadGBuffer(pixelCoord);
 		surface.PositionWorld = 0.0f.xxx;
 		surface.ViewDirWorld = 0.0f.xxx;
 		surface.ViewDistance = 0.0f;
-		surface.EvaluateSubsurface = false;
+		surface.bEvaluateSubsurface = false;
 
 		if (IsSkyPixel(surface.GBuffer.SceneDepth))
 		{
@@ -42,22 +42,22 @@ namespace DirectReservoir
 		const float3 cameraToSurface = surface.PositionWorld - Position;
 		surface.ViewDistance = length(cameraToSurface);
 		surface.ViewDirWorld = surface.ViewDistance > 1.0e-5f ? -cameraToSurface / surface.ViewDistance : 0.0f.xxx;
-		surface.EvaluateSubsurface = DirectLightingEvaluateSubsurface != 0u && HasSubsurface(surface.GBuffer);
-		surface.Valid = true;
+		surface.bEvaluateSubsurface = DirectLightingEvaluateSubsurface != 0u && HasSubsurface(surface.GBuffer);
+		surface.bValid = true;
 		return surface;
 	}
 
 	float4 PackSurface(Surface surface)
 	{
-		return RestirReservoirCommon::PackSurface(surface.Valid, surface.GBuffer.NormalWorld, surface.ViewDistance);
+		return RestirReservoirCommon::PackSurface(surface.bValid, surface.GBuffer.NormalWorld, surface.ViewDistance);
 	}
 
 	bool AreSurfacesCompatible(Surface surface, float4 packedSurface)
 	{
-		return RestirReservoirCommon::AreSurfacesCompatible(surface.Valid, surface.GBuffer.NormalWorld, surface.ViewDistance, packedSurface);
+		return RestirReservoirCommon::AreSurfacesCompatible(surface.bValid, surface.GBuffer.NormalWorld, surface.ViewDistance, packedSurface);
 	}
 
-	SurfaceLighting::Surface BuildLightingSurface(GBufferData gBuffer, float3 viewDirWorld, bool evaluateSubsurface)
+	SurfaceLighting::Surface BuildLightingSurface(GBufferData gBuffer, float3 viewDirWorld, bool bEvaluateSubsurface)
 	{
 		SurfaceLighting::Surface lightingSurface = {viewDirWorld,
 		                                            gBuffer.NormalWorld,
@@ -69,21 +69,21 @@ namespace DirectReservoir
 		                                            gBuffer.SubsurfaceStrength,
 		                                            DirectLightingEvaluateDiffuse != 0u,
 		                                            DirectLightingEvaluateSpecular != 0u,
-		                                            evaluateSubsurface};
+		                                            bEvaluateSubsurface};
 
 		return lightingSurface;
 	}
 
 	float3 EvaluateCandidateContribution(Surface surface, Reservoir reservoir)
 	{
-		if (!surface.Valid || !IsValid(reservoir))
+		if (!surface.bValid || !IsValid(reservoir))
 		{
 			return 0.0f.xxx;
 		}
 
 		const LightSampling::DirectLightSample lightSample = ReplayLightSample(reservoir, surface.PositionWorld);
 
-		const SurfaceLighting::Surface lightingSurface = BuildLightingSurface(surface.GBuffer, surface.ViewDirWorld, surface.EvaluateSubsurface);
+		const SurfaceLighting::Surface lightingSurface = BuildLightingSurface(surface.GBuffer, surface.ViewDirWorld, surface.bEvaluateSubsurface);
 
 		const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, 1.0f);
 
@@ -97,7 +97,7 @@ namespace DirectReservoir
 
 		SurfaceLighting::Contribution directLighting = (SurfaceLighting::Contribution)0;
 
-		const bool evaluateSubsurface = DirectLightingEvaluateSubsurface != 0u && HasSubsurface(gBuffer);
+		const bool bEvaluateSubsurface = DirectLightingEvaluateSubsurface != 0u && HasSubsurface(gBuffer);
 		if (!IsValid(reservoir))
 		{
 			return directLighting;
@@ -105,12 +105,12 @@ namespace DirectReservoir
 
 		const LightSampling::DirectLightSample lightSample = ReplayLightSample(reservoir, positionWorld);
 		const float reservoirWeight = GetFinalWeight(reservoir);
-		if (!lightSample.Valid || reservoirWeight <= 0.0f)
+		if (!lightSample.bValid || reservoirWeight <= 0.0f)
 		{
 			return directLighting;
 		}
 
-		const SurfaceLighting::Surface lightingSurface = BuildLightingSurface(gBuffer, viewDirWorld, evaluateSubsurface);
+		const SurfaceLighting::Surface lightingSurface = BuildLightingSurface(gBuffer, viewDirWorld, bEvaluateSubsurface);
 
 		const SurfaceLighting::Contribution contribution = SurfaceLighting::EvaluateDirectLightSample(lightingSurface, lightSample, visibility);
 
@@ -135,9 +135,9 @@ namespace DirectReservoir
 
 		const float sampleWeight = targetPdf / sourcePdf;
 		const float newWeightSum = reservoir.WeightSum + sampleWeight;
-		const bool selected = random * newWeightSum <= sampleWeight;
+		const bool bSelected = random * newWeightSum <= sampleWeight;
 		reservoir.WeightSum = newWeightSum;
-		if (selected)
+		if (bSelected)
 		{
 			reservoir.Candidate = candidate;
 			reservoir.Candidate.SelectionPdf = 1.0f;
@@ -145,12 +145,12 @@ namespace DirectReservoir
 			reservoir.TargetPdf = targetPdf;
 			reservoir.Valid = 1.0f;
 		}
-		return selected;
+		return bSelected;
 	}
 
 	bool CombineReservoir(inout Reservoir reservoir, Reservoir candidateReservoir, Surface surface, float maxM, float random)
 	{
-		if (!surface.Valid || candidateReservoir.M <= 0.0f)
+		if (!surface.bValid || candidateReservoir.M <= 0.0f)
 		{
 			return false;
 		}
@@ -177,21 +177,21 @@ namespace DirectReservoir
 		}
 
 		const float newWeightSum = reservoir.WeightSum + sampleWeight;
-		const bool selected = random * newWeightSum <= sampleWeight;
+		const bool bSelected = random * newWeightSum <= sampleWeight;
 		reservoir.WeightSum = newWeightSum;
-		if (selected)
+		if (bSelected)
 		{
 			reservoir.Candidate = candidateReservoir.Candidate;
 			reservoir.ShapeSample = candidateReservoir.ShapeSample;
 			reservoir.TargetPdf = targetPdf;
 			reservoir.Valid = 1.0f;
 		}
-		return selected;
+		return bSelected;
 	}
 
 	Reservoir BuildInitialReservoir(Surface surface, uint2 pixelCoord)
 	{
-		if (!surface.Valid)
+		if (!surface.bValid)
 		{
 			return EmptyReservoir();
 		}

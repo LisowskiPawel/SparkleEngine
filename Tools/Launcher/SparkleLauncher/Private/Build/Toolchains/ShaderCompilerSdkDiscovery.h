@@ -9,7 +9,7 @@ namespace SparkleLauncher
 {
 	struct ShaderCompilerSdkStatus final
 	{
-		bool Available = false;
+		bool bAvailable = false;
 		std::filesystem::path Root;
 		std::string Detail;
 	};

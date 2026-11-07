@@ -11,9 +11,9 @@ bool IsDirectShadowsActive() noexcept
 	return CVarDirectShadows.Get() && IsDirectLightingAdmitted();
 }
 
-void RequireDirectShadowSignal(bool available) noexcept
+void RequireDirectShadowSignal(bool bAvailable) noexcept
 {
-	if (!available)
+	if (!bAvailable)
 	{
 		SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogDirectShadows, "Renderer.DirectShadows");
 		Diagnostics::Fatal(LogDirectShadows, __FILE__, __LINE__, "Active direct shadows require their visibility signal.");

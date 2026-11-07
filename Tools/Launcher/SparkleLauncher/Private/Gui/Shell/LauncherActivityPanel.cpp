@@ -190,7 +190,7 @@ namespace SparkleLauncher
 		SetRunState(runId, RunState::Queued, title);
 		m_runList->setCurrentItem(item);
 		m_activeRunId = runId;
-		SetExpanded(m_expanded);
+		SetExpanded(m_bExpanded);
 	}
 
 	void LauncherActivityPanel::DisplayOperationStarted(const QString& runId, const QString& title)
@@ -220,7 +220,7 @@ namespace SparkleLauncher
 			return;
 		}
 
-		run->HasProgress = true;
+		run->bHasProgress = true;
 		run->ProgressPhase = phase;
 		run->ProgressCompleted = completed;
 		run->ProgressTotal = total;
@@ -238,10 +238,10 @@ namespace SparkleLauncher
 	{
 		auto run = m_runs.find(runId);
 		const QString effectiveTitle = run == m_runs.end() ? title : run->Title;
-		const RunState terminalState = result.Succeeded ? RunState::Done : result.Skipped ? RunState::Blocked : result.Canceled ? RunState::Canceled : RunState::Failed;
+		const RunState terminalState = result.bSucceeded ? RunState::Done : result.bSkipped ? RunState::Blocked : result.bCanceled ? RunState::Canceled : RunState::Failed;
 		SetRunState(runId, terminalState, effectiveTitle);
 
-		if (result.Succeeded)
+		if (result.bSucceeded)
 		{
 			AppendRunOutput(runId, "\nResult: " + result.Status + "\n");
 		}
@@ -256,7 +256,7 @@ namespace SparkleLauncher
 			diagnosis += "Problem type: " + result.ProblemKind + "\n";
 			diagnosis += "What failed: " + result.Problem + "\n";
 			diagnosis += "Next action: " + result.ExpectedAction + "\n";
-			if (result.HasExitCode)
+			if (result.bHasExitCode)
 			{
 				diagnosis += QStringLiteral("Exit code: %1\n").arg(result.ExitCode);
 			}
@@ -332,7 +332,7 @@ namespace SparkleLauncher
 			case RunState::Running:
 				stateName = "running";
 
-				if (run->HasProgress)
+				if (run->bHasProgress)
 				{
 					QString progressText = run->ProgressPhase;
 					if (run->ProgressTotal != 0)
@@ -378,9 +378,9 @@ namespace SparkleLauncher
 		m_selectedRunSummary->style()->unpolish(m_selectedRunSummary);
 		m_selectedRunSummary->style()->polish(m_selectedRunSummary);
 
-		const bool showProgress = state == RunState::Running && run->HasProgress;
-		m_progressBar->setVisible(showProgress);
-		if (showProgress)
+		const bool bShowProgress = state == RunState::Running && run->bHasProgress;
+		m_progressBar->setVisible(bShowProgress);
+		if (bShowProgress)
 		{
 			if (run->ProgressTotal == 0)
 			{
@@ -396,16 +396,16 @@ namespace SparkleLauncher
 			m_progressBar->setAccessibleDescription(m_selectedRunSummary->text());
 		}
 
-		const bool compactOutput = state == RunState::Done;
-		m_operationOutput->setMinimumHeight(compactOutput ? LauncherUi::OperationOutput::MinHeight : LauncherUi::OperationOutput::ProminentMinHeight);
-		m_operationOutput->setMaximumHeight(compactOutput ? LauncherUi::OperationOutput::CompactMaxHeight : LauncherUi::OperationOutput::MaxHeight);
+		const bool bCompactOutput = state == RunState::Done;
+		m_operationOutput->setMinimumHeight(bCompactOutput ? LauncherUi::OperationOutput::MinHeight : LauncherUi::OperationOutput::ProminentMinHeight);
+		m_operationOutput->setMaximumHeight(bCompactOutput ? LauncherUi::OperationOutput::CompactMaxHeight : LauncherUi::OperationOutput::MaxHeight);
 		m_operationOutput->setPlainText(run->Output);
 		m_operationOutput->moveCursor(QTextCursor::End);
 
-		const bool canCopyOutput = m_expanded && !m_operationOutput->toPlainText().isEmpty();
+		const bool bCanCopyOutput = m_bExpanded && !m_operationOutput->toPlainText().isEmpty();
 		m_copyOutputButton->setVisible(!runId.isEmpty());
-		m_copyOutputButton->setEnabled(canCopyOutput);
-		m_copyOutputButton->setToolTip(canCopyOutput ? "Copy output for the selected run. Shortcut: Ctrl+Shift+C." : "Select a run to copy its output. Shortcut: Ctrl+Shift+C.");
+		m_copyOutputButton->setEnabled(bCanCopyOutput);
+		m_copyOutputButton->setToolTip(bCanCopyOutput ? "Copy output for the selected run. Shortcut: Ctrl+Shift+C." : "Select a run to copy its output. Shortcut: Ctrl+Shift+C.");
 	}
 
 	bool LauncherActivityPanel::HasActiveRun() const
@@ -496,7 +496,7 @@ namespace SparkleLauncher
 		{
 			return;
 		}
-		SetExpanded(!m_expanded);
+		SetExpanded(!m_bExpanded);
 	}
 
 	void LauncherActivityPanel::SetRunState(const QString& runId, RunState state, const QString& title)
@@ -569,35 +569,35 @@ namespace SparkleLauncher
 		UpdateRunSelectionVisuals();
 	}
 
-	void LauncherActivityPanel::SetExpanded(bool expanded)
+	void LauncherActivityPanel::SetExpanded(bool bExpanded)
 	{
-		const bool hasRuns = !m_runs.isEmpty();
-		expanded = expanded && hasRuns;
-		m_expanded = expanded;
-		setMinimumHeight(expanded ? LauncherUi::Activity::ExpandedHeight : LauncherUi::Activity::CollapsedHeight);
-		setMaximumHeight(expanded ? LauncherUi::Activity::ExpandedHeight : LauncherUi::Activity::CollapsedHeight);
-		m_detailsPanel->setVisible(expanded);
-		m_operationOutput->setVisible(expanded);
+		const bool bHasRuns = !m_runs.isEmpty();
+		bExpanded = bExpanded && bHasRuns;
+		m_bExpanded = bExpanded;
+		setMinimumHeight(bExpanded ? LauncherUi::Activity::ExpandedHeight : LauncherUi::Activity::CollapsedHeight);
+		setMaximumHeight(bExpanded ? LauncherUi::Activity::ExpandedHeight : LauncherUi::Activity::CollapsedHeight);
+		m_detailsPanel->setVisible(bExpanded);
+		m_operationOutput->setVisible(bExpanded);
 
-		m_toggleOutputButton->setEnabled(hasRuns);
-		m_toggleOutputButton->setVisible(hasRuns);
-		m_toggleOutputButton->setText(QString::fromLatin1(expanded ? LauncherUi::Activity::CollapseGlyph : LauncherUi::Activity::ExpandGlyph));
-		m_toggleOutputButton->setToolTip(!hasRuns ? "Run a workflow to view its activity." : expanded ? "Minimize recent runs and raw process output." : "Show recent runs and raw process output.");
+		m_toggleOutputButton->setEnabled(bHasRuns);
+		m_toggleOutputButton->setVisible(bHasRuns);
+		m_toggleOutputButton->setText(QString::fromLatin1(bExpanded ? LauncherUi::Activity::CollapseGlyph : LauncherUi::Activity::ExpandGlyph));
+		m_toggleOutputButton->setToolTip(!bHasRuns ? "Run a workflow to view its activity." : bExpanded ? "Minimize recent runs and raw process output." : "Show recent runs and raw process output.");
 		m_toggleOutputButton->setAccessibleDescription(m_toggleOutputButton->toolTip());
 
-		const bool canCopyOutput = expanded && !m_operationOutput->toPlainText().isEmpty();
-		m_copyOutputButton->setVisible(expanded && !m_activeRunId.isEmpty());
-		m_copyOutputButton->setEnabled(canCopyOutput);
+		const bool bCanCopyOutput = bExpanded && !m_operationOutput->toPlainText().isEmpty();
+		m_copyOutputButton->setVisible(bExpanded && !m_activeRunId.isEmpty());
+		m_copyOutputButton->setEnabled(bCanCopyOutput);
 	}
 
 	void LauncherActivityPanel::UpdateRunSelectionVisuals()
 	{
 		for (auto it = m_runs.begin(); it != m_runs.end(); ++it)
 		{
-			const bool selected = it.key() == m_activeRunId;
+			const bool bSelected = it.key() == m_activeRunId;
 			if (it->Widgets.Root != nullptr)
 			{
-				it->Widgets.Root->setProperty("Selected", selected);
+				it->Widgets.Root->setProperty("Selected", bSelected);
 				it->Widgets.Root->style()->unpolish(it->Widgets.Root);
 				it->Widgets.Root->style()->polish(it->Widgets.Root);
 			}

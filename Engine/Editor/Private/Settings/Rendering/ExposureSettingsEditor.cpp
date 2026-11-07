@@ -16,7 +16,7 @@ namespace ExposureSettingsEditor
 {
 	template <typename TValue> struct ExposureOverrideBinding final
 	{
-		bool& Enabled;
+		bool& bEnabled;
 		TValue& Value;
 		TValue DefaultValue;
 	};
@@ -48,7 +48,7 @@ namespace ExposureSettingsEditor
 	constexpr ExposureFloatOverride FloatOverrides[] = {
 	    {"Manual",
 	        "Manual exposure",
-	        &ViewportExposureOverrides::OverrideManualExposure,
+	        &ViewportExposureOverrides::bOverrideManualExposure,
 	        &ViewportExposureOverrides::ManualExposure,
 	        &EngineRenderingSettingsState::ManualExposure,
 	        0.05f,
@@ -58,7 +58,7 @@ namespace ExposureSettingsEditor
 	        EngineExposureMode::Manual},
 	    {"Compensation",
 	        "Compensation (EV)",
-	        &ViewportExposureOverrides::OverrideCompensation,
+	        &ViewportExposureOverrides::bOverrideCompensation,
 	        &ViewportExposureOverrides::Compensation,
 	        &EngineRenderingSettingsState::ExposureCompensation,
 	        0.1f,
@@ -68,7 +68,7 @@ namespace ExposureSettingsEditor
 	        std::nullopt},
 	    {"Target",
 	        "Target luminance",
-	        &ViewportExposureOverrides::OverrideTargetLuminance,
+	        &ViewportExposureOverrides::bOverrideTargetLuminance,
 	        &ViewportExposureOverrides::TargetLuminance,
 	        &EngineRenderingSettingsState::ExposureTargetLuminance,
 	        0.01f,
@@ -78,7 +78,7 @@ namespace ExposureSettingsEditor
 	        EngineExposureMode::Automatic},
 	    {"Minimum",
 	        "Minimum exposure",
-	        &ViewportExposureOverrides::OverrideMinimum,
+	        &ViewportExposureOverrides::bOverrideMinimum,
 	        &ViewportExposureOverrides::Minimum,
 	        &EngineRenderingSettingsState::ExposureMin,
 	        0.001f,
@@ -88,7 +88,7 @@ namespace ExposureSettingsEditor
 	        EngineExposureMode::Automatic},
 	    {"Maximum",
 	        "Maximum exposure",
-	        &ViewportExposureOverrides::OverrideMaximum,
+	        &ViewportExposureOverrides::bOverrideMaximum,
 	        &ViewportExposureOverrides::Maximum,
 	        &EngineRenderingSettingsState::ExposureMax,
 	        1.0f,
@@ -98,7 +98,7 @@ namespace ExposureSettingsEditor
 	        EngineExposureMode::Automatic},
 	    {"AdaptUp",
 	        "Adapt rate up (1/s)",
-	        &ViewportExposureOverrides::OverrideAdaptationSpeedUp,
+	        &ViewportExposureOverrides::bOverrideAdaptationSpeedUp,
 	        &ViewportExposureOverrides::AdaptationSpeedUp,
 	        &EngineRenderingSettingsState::ExposureAdaptationSpeedUp,
 	        0.1f,
@@ -108,7 +108,7 @@ namespace ExposureSettingsEditor
 	        EngineExposureMode::Automatic},
 	    {"AdaptDown",
 	        "Adapt rate down (1/s)",
-	        &ViewportExposureOverrides::OverrideAdaptationSpeedDown,
+	        &ViewportExposureOverrides::bOverrideAdaptationSpeedDown,
 	        &ViewportExposureOverrides::AdaptationSpeedDown,
 	        &EngineRenderingSettingsState::ExposureAdaptationSpeedDown,
 	        0.1f,
@@ -118,7 +118,7 @@ namespace ExposureSettingsEditor
 	        EngineExposureMode::Automatic},
 	};
 
-	template <typename TValue> void BeginOverrideRow(const char* label, ExposureOverrideBinding<TValue> binding, bool& changed) noexcept
+	template <typename TValue> void BeginOverrideRow(const char* label, ExposureOverrideBinding<TValue> binding, bool& bChanged) noexcept
 	{
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
@@ -128,7 +128,7 @@ namespace ExposureSettingsEditor
 			{
 				binding.Value = binding.DefaultValue;
 			}
-			changed = true;
+			bChanged = true;
 		}
 		ImGui::TableSetColumnIndex(1);
 		ImGui::AlignTextToFramePadding();
@@ -152,9 +152,9 @@ namespace ExposureSettingsEditor
 	template <typename TEnum, std::size_t N>
 	bool DrawEnumOverride(const char* id, const char* label, const RenderingSettingsUi::ComboOption<TEnum> (&options)[N], ExposureOverrideBinding<TEnum> binding) noexcept
 	{
-		bool changed = false;
+		bool bChanged = false;
 		ImGui::PushID(id);
-		BeginOverrideRow(label, binding, changed);
+		BeginOverrideRow(label, binding, bChanged);
 		ImGui::BeginDisabled(!binding.Enabled);
 		const char* preview = "Unknown";
 		for (const RenderingSettingsUi::ComboOption<TEnum>& option : options)
@@ -172,28 +172,28 @@ namespace ExposureSettingsEditor
 				if (ImGui::Selectable(option.Label, binding.Value == option.Value))
 				{
 					binding.Value = option.Value;
-					changed = true;
+					bChanged = true;
 				}
 			}
 			ImGui::EndCombo();
 		}
 		ImGui::EndDisabled();
 		ImGui::PopID();
-		return changed;
+		return bChanged;
 	}
 
 	bool DrawFloatOverride(const ExposureFloatOverride& property, ViewportExposureOverrides& exposure, const EngineRenderingSettingsState& defaults, EngineExposureMode effectiveMode) noexcept
 	{
 		ExposureOverrideBinding<float> binding{exposure.*property.Enabled, exposure.*property.Value, defaults.*property.DefaultValue};
-		bool changed = false;
+		bool bChanged = false;
 		ImGui::PushID(property.Id);
-		BeginOverrideRow(property.Label, binding, changed);
-		const bool valueEnabled = !property.RequiredMode || effectiveMode == *property.RequiredMode;
-		ImGui::BeginDisabled(!binding.Enabled || !valueEnabled);
-		changed |= ImGui::DragFloat("##Value", &binding.Value, property.Speed, property.Minimum, property.Maximum, property.Format);
+		BeginOverrideRow(property.Label, binding, bChanged);
+		const bool bValueEnabled = !property.RequiredMode || effectiveMode == *property.RequiredMode;
+		ImGui::BeginDisabled(!binding.bEnabled || !bValueEnabled);
+		bChanged |= ImGui::DragFloat("##Value", &binding.Value, property.Speed, property.Minimum, property.Maximum, property.Format);
 		ImGui::EndDisabled();
 		ImGui::PopID();
-		return changed;
+		return bChanged;
 	}
 
 	void DrawDefaultExposureModes(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings)
@@ -218,8 +218,8 @@ namespace ExposureSettingsEditor
 		ImGui::BeginDisabled(settings.ExposureMode != EngineExposureMode::Manual);
 
 		float manualExposure = settings.ManualExposure;
-		const bool manualExposureEdited = RenderingSettingsUi::DrawFloatInputRow("##ManualExposure", "Manual exposure", manualExposure, 0.1f, 1.0f, "%.4f");
-		if (manualExposureEdited)
+		const bool bManualExposureEdited = RenderingSettingsUi::DrawFloatInputRow("##ManualExposure", "Manual exposure", manualExposure, 0.1f, 1.0f, "%.4f");
+		if (bManualExposureEdited)
 		{
 			settingsController.SetManualExposure(manualExposure);
 		}
@@ -227,45 +227,45 @@ namespace ExposureSettingsEditor
 		ImGui::EndDisabled();
 
 		float exposureCompensation = settings.ExposureCompensation;
-		const bool exposureCompensationEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureCompensation", "Exposure compensation EV", exposureCompensation, 0.1f, 1.0f, "%.2f");
-		if (exposureCompensationEdited)
+		const bool bExposureCompensationEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureCompensation", "Exposure compensation EV", exposureCompensation, 0.1f, 1.0f, "%.2f");
+		if (bExposureCompensationEdited)
 		{
 			settingsController.SetExposureCompensation(exposureCompensation);
 		}
 
 		float exposureTargetLuminance = settings.ExposureTargetLuminance;
-		const bool exposureTargetLuminanceEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureTargetLuminance", "Target luminance", exposureTargetLuminance, 0.01f, 0.1f, "%.4f");
-		if (exposureTargetLuminanceEdited)
+		const bool bExposureTargetLuminanceEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureTargetLuminance", "Target luminance", exposureTargetLuminance, 0.01f, 0.1f, "%.4f");
+		if (bExposureTargetLuminanceEdited)
 		{
 			settingsController.SetExposureTargetLuminance(exposureTargetLuminance);
 		}
 
 		float exposureMin = settings.ExposureMin;
-		const bool exposureMinEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMin", "Min exposure", exposureMin, 0.0001f, 0.01f, "%.6f");
-		if (exposureMinEdited)
+		const bool bExposureMinEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMin", "Min exposure", exposureMin, 0.0001f, 0.01f, "%.6f");
+		if (bExposureMinEdited)
 		{
 			settingsController.SetExposureMin(exposureMin);
 		}
 
 		float exposureMax = settings.ExposureMax;
-		const bool exposureMaxEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMax", "Max exposure", exposureMax, 1.0f, 64.0f, "%.3f");
-		if (exposureMaxEdited)
+		const bool bExposureMaxEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMax", "Max exposure", exposureMax, 1.0f, 64.0f, "%.3f");
+		if (bExposureMaxEdited)
 		{
 			settingsController.SetExposureMax(exposureMax);
 		}
 
 		float exposureAdaptationSpeedUp = settings.ExposureAdaptationSpeedUp;
-		const bool exposureAdaptationSpeedUpEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedUp", "Adapt rate up (1/s)", exposureAdaptationSpeedUp, 0.1f, 1.0f, "%.3f");
-		if (exposureAdaptationSpeedUpEdited)
+		const bool bExposureAdaptationSpeedUpEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedUp", "Adapt rate up (1/s)", exposureAdaptationSpeedUp, 0.1f, 1.0f, "%.3f");
+		if (bExposureAdaptationSpeedUpEdited)
 		{
 			settingsController.SetExposureAdaptationSpeedUp(exposureAdaptationSpeedUp);
 		}
 
 		float exposureAdaptationSpeedDown = settings.ExposureAdaptationSpeedDown;
 
-		const bool adaptationSpeedDownEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedDown", "Adapt rate down (1/s)", exposureAdaptationSpeedDown, 0.1f, 1.0f, "%.3f");
+		const bool bAdaptationSpeedDownEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedDown", "Adapt rate down (1/s)", exposureAdaptationSpeedDown, 0.1f, 1.0f, "%.3f");
 
-		if (adaptationSpeedDownEdited)
+		if (bAdaptationSpeedDownEdited)
 		{
 			settingsController.SetExposureAdaptationSpeedDown(exposureAdaptationSpeedDown);
 		}
@@ -273,26 +273,26 @@ namespace ExposureSettingsEditor
 
 	bool DrawOverrideModes(ViewportExposureOverrides& exposure, const EngineRenderingSettingsState& defaults) noexcept
 	{
-		bool changed = DrawEnumOverride("Mode", "Mode", ExposureModeOptions, ExposureOverrideBinding<EngineExposureMode>{exposure.OverrideMode, exposure.Mode, defaults.ExposureMode});
+		bool bChanged = DrawEnumOverride("Mode", "Mode", ExposureModeOptions, ExposureOverrideBinding<EngineExposureMode>{exposure.bOverrideMode, exposure.Mode, defaults.ExposureMode});
 
-		changed |= DrawEnumOverride(
+		bChanged |= DrawEnumOverride(
 		    "Metering",
 		    "Metering",
 		    ExposureMeteringOptions,
-		    ExposureOverrideBinding<EngineExposureMeteringMethod>{exposure.OverrideMeteringMethod, exposure.MeteringMethod, defaults.ExposureMeteringMethod});
+		    ExposureOverrideBinding<EngineExposureMeteringMethod>{exposure.bOverrideMeteringMethod, exposure.MeteringMethod, defaults.ExposureMeteringMethod});
 
-		return changed;
+		return bChanged;
 	}
 
 	bool DrawOverrideValues(ViewportExposureOverrides& exposure, const EngineRenderingSettingsState& defaults) noexcept
 	{
-		const EngineExposureMode effectiveMode = exposure.OverrideMode ? exposure.Mode : defaults.ExposureMode;
-		bool changed = false;
+		const EngineExposureMode effectiveMode = exposure.bOverrideMode ? exposure.Mode : defaults.ExposureMode;
+		bool bChanged = false;
 		for (const ExposureFloatOverride& property : FloatOverrides)
 		{
-			changed |= DrawFloatOverride(property, exposure, defaults, effectiveMode);
+			bChanged |= DrawFloatOverride(property, exposure, defaults, effectiveMode);
 		}
-		return changed;
+		return bChanged;
 	}
 }
 
@@ -308,8 +308,8 @@ bool ExposureSettingsEditor::DrawOverrides(ViewportExposureOverrides& exposure, 
 	{
 		return false;
 	}
-	bool changed = DrawOverrideModes(exposure, defaults);
-	changed |= DrawOverrideValues(exposure, defaults);
+	bool bChanged = DrawOverrideModes(exposure, defaults);
+	bChanged |= DrawOverrideValues(exposure, defaults);
 	ImGui::EndTable();
-	return changed;
+	return bChanged;
 }

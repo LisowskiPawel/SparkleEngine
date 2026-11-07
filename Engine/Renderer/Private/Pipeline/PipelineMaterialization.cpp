@@ -17,27 +17,27 @@ void PipelineMaterialization::ValidateShaderCapabilities(RenderHardwareInterface
 		throw Diagnostics::Error(std::format("Shader '{}' did not resolve through the active global shader map.", shaderName));
 	}
 	const RhiCapabilities& capabilities = renderHardwareInterface.GetCapabilities();
-	const bool accelerationStructuresUnsupported = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesAccelerationStructure) && !capabilities.RayTracing.SupportsAccelerationStructure;
+	const bool bAccelerationStructuresUnsupported = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesAccelerationStructure) && !capabilities.RayTracing.bSupportsAccelerationStructure;
 	
-	if (accelerationStructuresUnsupported)
+	if (bAccelerationStructuresUnsupported)
 	{
 		throw Diagnostics::Error(std::format("Shader '{}' requires ray tracing, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
 	}
-	const bool inlineRayQueriesUnsupported = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesInlineRayQuery) && !capabilities.RayTracing.SupportsInlineRayQuery;
+	const bool bInlineRayQueriesUnsupported = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesInlineRayQuery) && !capabilities.RayTracing.bSupportsInlineRayQuery;
 	
-	if (inlineRayQueriesUnsupported)
+	if (bInlineRayQueriesUnsupported)
 	{
 		throw Diagnostics::Error(std::format("Shader '{}' requires inline ray query, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
 	}
 	const bool bIndexingUnsupportedEntry = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesDescriptorIndexing);
-	const bool bIndexingUnsupportedIndexing = !capabilities.DescriptorIndexing.SupportsSampledImageArrayNonUniformIndexing || !capabilities.DescriptorIndexing.SupportsPartiallyBoundDescriptorArrays;
-	const bool descriptorIndexingUnsupported = bIndexingUnsupportedEntry && bIndexingUnsupportedIndexing;
+	const bool bIndexingUnsupportedIndexing = !capabilities.DescriptorIndexing.bNonUniformSampledImages || !capabilities.DescriptorIndexing.bSupportsPartiallyBoundDescriptorArrays;
+	const bool bDescriptorIndexingUnsupported = bIndexingUnsupportedEntry && bIndexingUnsupportedIndexing;
 	
-	if (descriptorIndexingUnsupported)
+	if (bDescriptorIndexingUnsupported)
 	{
 		throw Diagnostics::Error(std::format("Shader '{}' requires descriptor indexing, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
 	}
-	if (HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesFloat64) && !capabilities.SupportsShaderFloat64)
+	if (HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesFloat64) && !capabilities.bSupportsShaderFloat64)
 	{
 		throw Diagnostics::Error(std::format("Shader '{}' requires float64 arithmetic, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
 	}
@@ -51,9 +51,9 @@ void PipelineMaterialization::ValidateResolvedShader(
 	{
 	PipelineMaterialization::ValidateShaderCapabilities(renderHardwareInterface, registration.ShaderName, shader);
 	const bool bShaderContractMismatchFeatures = shader.Entry->Stage != registration.Stage || shader.Entry->Features != registration.Features;
-	const bool shaderContractMismatch = bShaderContractMismatchFeatures || (shader.Entry->ParameterSignature != BuildShaderParameterSignature(parameterLayout));
+	const bool bShaderContractMismatch = bShaderContractMismatchFeatures || (shader.Entry->ParameterSignature != BuildShaderParameterSignature(parameterLayout));
 	
-	if (shaderContractMismatch)
+	if (bShaderContractMismatch)
 	{
 		throw Diagnostics::Error(std::format("Shader '{}' map metadata does not match its registered contract.", registration.ShaderName));
 	}
@@ -63,13 +63,13 @@ std::unique_ptr<RenderBindingLayout> PipelineMaterialization::CreateBindingLayou
     RenderHardwareInterface& renderHardwareInterface,
     const PassParameterLayout& parameterLayout,
     std::span<const ResolvedShader> shaders,
-    bool allowInputAssemblerInputLayout,
+    bool bAllowInputAssemblerInputLayout,
     const wchar_t* debugName)
 {
 	RenderBindingLayoutCompileDesc desc;
 	desc.ParameterLayout = &parameterLayout;
 	desc.Shaders = shaders;
-	desc.AllowInputAssemblerInputLayout = allowInputAssemblerInputLayout;
+	desc.bAllowInputAssemblerInputLayout = bAllowInputAssemblerInputLayout;
 	desc.DebugName = debugName;
 	std::unique_ptr<RenderBindingLayout> layout = renderHardwareInterface.GetPipelineService().CreateBindingLayout(desc);
 	if (!layout)

@@ -71,7 +71,7 @@ void TaskDispatch::State::CancellationHook::operator()() const noexcept
 bool TaskDispatch::State::Notify() noexcept
 {
 	std::lock_guard lock(Gate);
-	if (Closed || Owner == nullptr || Execution->Cancellation.stop_requested())
+	if (bClosed || Owner == nullptr || Execution->Cancellation.stop_requested())
 	{
 		return false;
 	}
@@ -83,7 +83,7 @@ bool TaskDispatch::State::Notify() noexcept
 	}
 	else if (CurrentPhase == Phase::Running)
 	{
-		Rerun = true;
+		bRerun = true;
 	}
 	return true;
 }
@@ -93,7 +93,7 @@ void TaskDispatch::State::Close() noexcept
 	const auto keepAlive = shared_from_this();
 	{
 		std::lock_guard lock(Gate);
-		Closed = true;
+		bClosed = true;
 		if (Owner == nullptr || CurrentPhase != Phase::Idle)
 		{
 			return;
@@ -128,17 +128,17 @@ void TaskDispatch::State::Execute() noexcept
 		}
 		if (!result.Succeeded())
 		{
-			Closed = true;
-			Rerun = false;
+			bClosed = true;
+			bRerun = false;
 		}
-		if (Rerun)
+		if (bRerun)
 		{
-			Rerun = false;
+			bRerun = false;
 			CurrentPhase = Phase::Queued;
 			Owner->EnqueueDispatch(*this);
 			return;
 		}
-		if (!Closed)
+		if (!bClosed)
 		{
 			CurrentPhase = Phase::Idle;
 			return;

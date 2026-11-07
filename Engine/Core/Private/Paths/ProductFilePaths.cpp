@@ -13,9 +13,9 @@
 
 namespace Paths
 {
-	std::filesystem::path LogFile(std::string_view configuredFile, bool ensureParentExists)
+	std::filesystem::path LogFile(std::string_view configuredFile, bool bEnsureParentExists)
 	{
-		const Private::LogParentDirectoryPolicy parentDirectoryPolicy = ensureParentExists ? Private::LogParentDirectoryPolicy::EnsureExists : Private::LogParentDirectoryPolicy::Preserve;
+		const Private::LogParentDirectoryPolicy parentDirectoryPolicy = bEnsureParentExists ? Private::LogParentDirectoryPolicy::EnsureExists : Private::LogParentDirectoryPolicy::Preserve;
 		return Private::ResolveBootstrapLogFile(configuredFile, parentDirectoryPolicy);
 	}
 

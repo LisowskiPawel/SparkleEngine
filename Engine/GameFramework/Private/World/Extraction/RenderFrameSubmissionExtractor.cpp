@@ -29,9 +29,9 @@ namespace ECS
 		submission.FrameId = frameId;
 		submission.Scene.Structural.SceneGeneration = sceneGeneration;
 		submission.Scene.Structural.SequenceNumber = ++m_sequence;
-		submission.Scene.Structural.ResetScene = m_sceneGeneration != sceneGeneration;
-		submission.View.CameraCut = submission.Scene.Structural.ResetScene;
-		if (!submission.Scene.Structural.ResetScene)
+		submission.Scene.Structural.bResetScene = m_sceneGeneration != sceneGeneration;
+		submission.View.bCameraCut = submission.Scene.Structural.bResetScene;
+		if (!submission.Scene.Structural.bResetScene)
 		{
 			return;
 		}
@@ -47,7 +47,7 @@ namespace ECS
 	{
 		for (const WorldCameraReadData& camera : readView.GetCameras())
 		{
-			if (!camera.Active)
+			if (!camera.bActive)
 			{
 				continue;
 			}

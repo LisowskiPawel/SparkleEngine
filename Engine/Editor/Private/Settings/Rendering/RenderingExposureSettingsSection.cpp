@@ -9,14 +9,14 @@
 
 void DrawExposureSettingsSection(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings, const char* filterText)
 {
-	const bool exposureMatches = RenderingSettingsUi::MatchesFilter(
+	const bool bExposureMatches = RenderingSettingsUi::MatchesFilter(
 	    filterText,
 	    "Exposure",
 	    "exposure automatic manual metering reduction downsample pyramid compensation ev luminance min max adapt speed");
 
-	const bool exposureOpen = exposureMatches && RenderingSettingsUi::BeginSettingsCategory("Exposure");
+	const bool bExposureOpen = bExposureMatches && RenderingSettingsUi::BeginSettingsCategory("Exposure");
 
-	if (!exposureOpen)
+	if (!bExposureOpen)
 	{
 		return;
 	}

@@ -45,7 +45,7 @@ namespace ECS
 		m_currentObjects.reserve(meshes.size());
 		for (const WorldExtractionStorage::MeshSlot& mesh : meshes)
 		{
-			m_currentObjects.push_back({objects.FindObject(mesh.Entity), mesh.WorldMatrix, mesh.WorldInverseTranspose, mesh.Visible});
+			m_currentObjects.push_back({objects.FindObject(mesh.Entity), mesh.WorldMatrix, mesh.WorldInverseTranspose, mesh.bVisible});
 		}
 
 		std::sort(m_currentObjects.begin(), m_currentObjects.end(), [](const RenderObjectDynamicData& left, const RenderObjectDynamicData& right) { return left.Object < right.Object; });
@@ -60,9 +60,9 @@ namespace ECS
 			}
 
 			const bool bUnchangedObject = publishedIndex < m_publishedObjects.size() && m_publishedObjects[publishedIndex].Object == object.Object;
-			const bool unchanged = bUnchangedObject && (HasSameObjectData(m_publishedObjects[publishedIndex], object));
+			const bool bUnchanged = bUnchangedObject && (HasSameObjectData(m_publishedObjects[publishedIndex], object));
 
-			if (!unchanged)
+			if (!bUnchanged)
 			{
 				dynamic.Objects.push_back(object);
 			}
@@ -73,7 +73,7 @@ namespace ECS
 
 	bool RenderSceneDynamicDataExtractor::HasSameObjectData(const RenderObjectDynamicData& left, const RenderObjectDynamicData& right) noexcept
 	{
-		return left.Visible == right.Visible && std::memcmp(&left.WorldMatrix, &right.WorldMatrix, sizeof(left.WorldMatrix)) == 0
+		return left.bVisible == right.bVisible && std::memcmp(&left.WorldMatrix, &right.WorldMatrix, sizeof(left.WorldMatrix)) == 0
 		    && std::memcmp(&left.WorldInverseTranspose, &right.WorldInverseTranspose, sizeof(left.WorldInverseTranspose)) == 0;
 	}
 
@@ -90,9 +90,9 @@ namespace ECS
 			const SkinningState* skinning = state.m_registry.Get<SkinningState>(mesh.Entity);
 			const bool bInvalidSkinningOutputPose = skinning == nullptr || !skinning->Pose.IsValid();
 			const bool bSkinningOutputanimationOutput = bInvalidSkinningOutputPose || (skinning->Pose.Generation != state.m_animationOutput.GetTargetGeneration());
-			const bool invalidSkinningOutput = bSkinningOutputanimationOutput || (skinning->Pose.Slot >= output.poses.size());
+			const bool bInvalidSkinningOutput = bSkinningOutputanimationOutput || (skinning->Pose.Slot >= output.poses.size());
 			
-			if (invalidSkinningOutput)
+			if (bInvalidSkinningOutput)
 			{
 				continue;
 			}

@@ -20,12 +20,12 @@ private:
 	{
 		std::uint32_t RemainingPrerequisites = 0;
 		std::uint32_t UnfinishedCount = 1;
-		bool ParentBodyComplete = true;
-		bool BlockedByPrerequisite = false;
-		bool BlockedByParent = false;
-		bool Scheduled = false;
-		bool BodyComplete = false;
-		bool Terminal = false;
+		bool bParentBodyComplete = true;
+		bool bBlockedByPrerequisite = false;
+		bool bBlockedByParent = false;
+		bool bScheduled = false;
+		bool bBodyComplete = false;
+		bool bTerminal = false;
 		TaskResult AggregateResult = TaskResult::Success();
 	};
 
@@ -44,7 +44,7 @@ private:
 	TaskExecutionCompletion m_completion;
 	std::vector<TaskState> m_tasks;
 	std::priority_queue<std::uint32_t, std::vector<std::uint32_t>, std::greater<>> m_ready;
-	bool m_cancellationObserved = false;
+	bool m_bCancellationObserved = false;
 };
 
 SerialTaskExecution::RunState::RunState(const TaskGraphStorage& graph, TaskExecutionContext& context, std::uint64_t generation, std::stop_token cancellation) :
@@ -79,7 +79,7 @@ void SerialTaskExecution::RunState::Initialize()
 
 		task.RemainingPrerequisites = static_cast<std::uint32_t>(node.Prerequisites.size());
 		task.UnfinishedCount += static_cast<std::uint32_t>(node.NestedChildren.size());
-		task.ParentBodyComplete = !node.Parent.has_value();
+		task.bParentBodyComplete = !node.Parent.has_value();
 
 		for (const std::uint32_t prerequisite : node.Prerequisites)
 		{
@@ -99,12 +99,12 @@ void SerialTaskExecution::RunState::ScheduleInitialTasks()
 void SerialTaskExecution::RunState::TrySchedule(std::uint32_t index)
 {
 	TaskState& task = m_tasks[index];
-	if (task.Scheduled || task.BodyComplete || task.RemainingPrerequisites != 0 || !task.ParentBodyComplete)
+	if (task.bScheduled || task.bBodyComplete || task.RemainingPrerequisites != 0 || !task.bParentBodyComplete)
 	{
 		return;
 	}
 
-	task.Scheduled = true;
+	task.bScheduled = true;
 	m_ready.push(index);
 }
 
@@ -124,7 +124,7 @@ void SerialTaskExecution::RunState::ExecuteTask(std::uint32_t index)
 	const TaskGraphNode& node = m_graph.Nodes[index];
 	const TaskProfiler::TimePoint taskStart = TaskProfiler::Begin(node.Desc, m_generation, index, 0);
 
-	const bool bBlockedByParent = task.BlockedByPrerequisite || task.BlockedByParent;
+	const bool bBlockedByParent = task.bBlockedByPrerequisite || task.bBlockedByParent;
 	const bool bLocked = bBlockedByParent || (m_cancellation.stop_requested());
 	TaskExecutionContext taskContext = m_context;
 	taskContext.Bind(node.Desc.Lane, m_cancellation);
@@ -134,20 +134,20 @@ void SerialTaskExecution::RunState::ExecuteTask(std::uint32_t index)
 
 	TaskProfiler::End(node.Desc, m_generation, index, 0, bodyResult, taskStart);
 
-	task.BodyComplete = true;
+	task.bBodyComplete = true;
 	task.AggregateResult = bodyResult;
 	if (bodyResult.Failed() && m_completion.FirstFailureTaskName.empty())
 	{
 		m_completion.FirstFailureTaskName = std::string(node.Desc.Name.Get());
 		m_completion.Result = bodyResult;
 	}
-	m_cancellationObserved |= bodyResult.WasCancelled();
+	m_bCancellationObserved |= bodyResult.WasCancelled();
 
 	for (const std::uint32_t childIndex : node.NestedChildren)
 	{
 		TaskState& child = m_tasks[childIndex];
-		child.ParentBodyComplete = true;
-		child.BlockedByParent = !bodyResult.Succeeded();
+		child.bParentBodyComplete = true;
+		child.bBlockedByParent = !bodyResult.Succeeded();
 		TrySchedule(childIndex);
 	}
 
@@ -160,12 +160,12 @@ void SerialTaskExecution::RunState::ExecuteTask(std::uint32_t index)
 void SerialTaskExecution::RunState::CompleteTask(std::uint32_t index)
 {
 	TaskState& completed = m_tasks[index];
-	if (completed.Terminal)
+	if (completed.bTerminal)
 	{
 		return;
 	}
 
-	completed.Terminal = true;
+	completed.bTerminal = true;
 	m_completion.TaskResults[index] = completed.AggregateResult;
 	m_completion.Settled[index] = true;
 	++m_completion.SettledTaskCount;
@@ -173,7 +173,7 @@ void SerialTaskExecution::RunState::CompleteTask(std::uint32_t index)
 	for (const std::uint32_t dependentIndex : m_graph.Nodes[index].Dependents)
 	{
 		TaskState& dependent = m_tasks[dependentIndex];
-		dependent.BlockedByPrerequisite |= !completed.AggregateResult.Succeeded();
+		dependent.bBlockedByPrerequisite |= !completed.AggregateResult.Succeeded();
 		--dependent.RemainingPrerequisites;
 		TrySchedule(dependentIndex);
 	}
@@ -206,7 +206,7 @@ void SerialTaskExecution::RunState::PublishFinalStatus()
 	{
 		m_completion.Status = TaskExecutionStatus::Failed;
 	}
-	else if (m_cancellationObserved)
+	else if (m_bCancellationObserved)
 	{
 		m_completion.Status = TaskExecutionStatus::Cancelled;
 		m_completion.Result = TaskResult::Cancelled("Task execution contained cancellation.");

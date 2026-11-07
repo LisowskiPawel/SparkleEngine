@@ -35,9 +35,9 @@ void AddUpscalerPass(FrameGraphBuilder& builder, IUpscalerProvider& provider, Re
 		        .NativeScalingOutputColorView = context.Resources.ResolveNativeTextureView(inputs.OutputColor, ResourceState::UnorderedAccess, interopRequest),
 		        .RenderExtent = renderExtent,
 		        .OutputExtent = outputExtent};
-		    const bool evaluated = provider.Evaluate(evaluation);
+		    const bool bEvaluated = provider.Evaluate(evaluation);
 
-		    if (!evaluated)
+		    if (!bEvaluated)
 		    {
 			    Diagnostics::Fatal(g_upscalerPassLogger, __FILE__, __LINE__, "The configured upscaler failed to evaluate the active frame.");
 		    }

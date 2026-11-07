@@ -89,7 +89,7 @@ static void ReflectLibraryBindings(ID3D12FunctionReflection& function, UINT coun
 		binding.Name = bindingDesc.Name != nullptr ? bindingDesc.Name : "";
 		binding.Kind = MapDxilResourceKind(bindingDesc.Type, bindingDesc.Dimension);
 		binding.Dimension = MapDxilDimension(bindingDesc.Dimension);
-		binding.IsReadOnly = IsDxilReadOnlyKind(binding.Kind);
+		binding.bIsReadOnly = IsDxilReadOnlyKind(binding.Kind);
 		binding.Set = bindingDesc.Space;
 		binding.Slot = bindingDesc.BindPoint;
 		binding.ArrayCount = bindingDesc.BindCount == 0 ? 0u : bindingDesc.BindCount;

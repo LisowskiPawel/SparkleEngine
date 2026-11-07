@@ -2,4 +2,4 @@
 
 class EditorViewportSession;
 
-void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool disableInteraction, bool compact) noexcept;
+void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool bDisableInteraction, bool bCompact) noexcept;

@@ -24,7 +24,7 @@ int AssetCookerToolProcess::Run(const std::filesystem::path& executablePath, con
 	        },
 	        .Cancellation = std::move(cancellation)});
 
-	if (!result.Launched)
+	if (!result.bLaunched)
 	{
 		ToolConsole::Message(
 		    std::cerr,

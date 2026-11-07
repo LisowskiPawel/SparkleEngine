@@ -14,8 +14,8 @@ namespace SparkleLauncher
 		std::string DisplayName;
 		Process::ChildProcessRequest Request;
 		std::filesystem::path DestructivePath;
-		bool HasProcessRequest = true;
-		bool DeletesCookedOutputs = false;
+		bool bHasProcessRequest = true;
+		bool bDeletesCookedOutputs = false;
 	};
 
 	bool IncludesCookScope(const CookOperationPlan& plan, CookWorkspaceScope scope);

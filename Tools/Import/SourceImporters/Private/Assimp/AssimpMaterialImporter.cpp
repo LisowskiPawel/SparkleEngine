@@ -114,9 +114,9 @@ static void ApplyMaterialColors(const aiMaterial& material, ImportedMaterial& im
 {
 	aiColor4D baseColor;
 	const bool bAseColorRead = aiGetMaterialColor(&material, AI_MATKEY_BASE_COLOR, &baseColor) == AI_SUCCESS;
-	const bool diffuseColorRead = !bAseColorRead && aiGetMaterialColor(&material, AI_MATKEY_COLOR_DIFFUSE, &baseColor) == AI_SUCCESS;
+	const bool bDiffuseColorRead = !bAseColorRead && aiGetMaterialColor(&material, AI_MATKEY_COLOR_DIFFUSE, &baseColor) == AI_SUCCESS;
 
-	if (bAseColorRead || diffuseColorRead)
+	if (bAseColorRead || bDiffuseColorRead)
 	{
 		importedMaterial.baseColor = DirectX::XMFLOAT4(baseColor.r, baseColor.g, baseColor.b, baseColor.a);
 	}
@@ -155,7 +155,7 @@ static void ApplyMaterialFactors(const aiMaterial& material, ImportedMaterial& i
 	int twoSided = 0;
 	if (material.Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS)
 	{
-		importedMaterial.doubleSided = twoSided != 0;
+		importedMaterial.bDoubleSided = twoSided != 0;
 	}
 }
 
@@ -188,9 +188,9 @@ static std::optional<std::filesystem::path> ResolveTexturePath(
 	if (embeddedTexture != nullptr)
 	{
 		const bool bTextureUnavailableTexturePaths = embeddedTextureIndex < 0 || static_cast<std::size_t>(embeddedTextureIndex) >= textureContext.embeddedTexturePaths.size();
-		const bool embeddedTextureUnavailable = bTextureUnavailableTexturePaths || (textureContext.embeddedTexturePaths[static_cast<std::size_t>(embeddedTextureIndex)].empty());
+		const bool bEmbeddedTextureUnavailable = bTextureUnavailableTexturePaths || (textureContext.embeddedTexturePaths[static_cast<std::size_t>(embeddedTextureIndex)].empty());
 		
-		if (embeddedTextureUnavailable)
+		if (bEmbeddedTextureUnavailable)
 		{
 			throw Diagnostics::Error(std::format("Assimp material {} has unresolved embedded {} texture '{}'.", materialIndex, slotName, *texturePath));
 		}
@@ -215,9 +215,9 @@ static std::optional<std::filesystem::path> ResolvePreferredTexturePath(
     aiTextureType alternateType,
     std::string_view alternateSlotName)
 {
-	const bool hasPreferred = material.GetTextureCount(preferredType) > 0;
-	const bool hasAlternate = material.GetTextureCount(alternateType) > 0;
-	if (hasPreferred && hasAlternate)
+	const bool bHasPreferred = material.GetTextureCount(preferredType) > 0;
+	const bool bHasAlternate = material.GetTextureCount(alternateType) > 0;
+	if (bHasPreferred && bHasAlternate)
 	{
 		const std::optional<std::filesystem::path> preferredPath = ResolveTexturePath(material, materialIndex, textureContext, preferredType, preferredSlotName);
 		const std::optional<std::filesystem::path> alternatePath = ResolveTexturePath(material, materialIndex, textureContext, alternateType, alternateSlotName);
@@ -229,12 +229,12 @@ static std::optional<std::filesystem::path> ResolvePreferredTexturePath(
 		return preferredPath;
 	}
 
-	if (hasPreferred)
+	if (bHasPreferred)
 	{
 		return ResolveTexturePath(material, materialIndex, textureContext, preferredType, preferredSlotName);
 	}
 
-	return hasAlternate ? ResolveTexturePath(material, materialIndex, textureContext, alternateType, alternateSlotName) : std::nullopt;
+	return bHasAlternate ? ResolveTexturePath(material, materialIndex, textureContext, alternateType, alternateSlotName) : std::nullopt;
 }
 
 static void ValidateTextureMappings(const aiMaterial& material, ImportedMaterialIndex materialIndex)

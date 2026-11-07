@@ -18,17 +18,17 @@ void StoreIndirectLighting(uint2 pixelCoord, GBufferPathSurface surface, PathLig
 		IndirectDiffuse[pixelCoord] = float4(diffuse, any(diffuse > 0.0f) ? 1.0f : 0.0f);
 	}
 
-	bool hasSpecular = false;
+	bool bHasSpecular = false;
 	if (RestirIndirectEvaluateSpecular != 0u)
 	{
 		const float3 specular = path.SpecularContribution * reservoirWeight;
-		hasSpecular = any(specular > 0.0f);
-		IndirectSpecular[pixelCoord] = float4(specular, hasSpecular ? 1.0f : 0.0f);
+		bHasSpecular = any(specular > 0.0f);
+		IndirectSpecular[pixelCoord] = float4(specular, bHasSpecular ? 1.0f : 0.0f);
 	}
 
 	if (WriteRayReconstructionGuides != 0u)
 	{
-		RayReconstructionGuides::WriteSpecularHitDistance(pixelCoord, path.FirstLighting.HitPositionWorld, surface.PathSurface.PositionWorld, hasSpecular && path.FirstLighting.Hit);
+		RayReconstructionGuides::WriteSpecularHitDistance(pixelCoord, path.FirstLighting.HitPositionWorld, surface.PathSurface.PositionWorld, bHasSpecular && path.FirstLighting.bHit);
 	}
 }
 
@@ -48,7 +48,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 
 	const IndirectReservoir::Reservoir reservoir = IndirectReservoir::UnpackReservoir(CurrentReservoirSampleTexture.Load(int3(pixelCoord, 0)), CurrentReservoirWeightTexture.Load(int3(pixelCoord, 0)));
 
-	if (!surface.Valid)
+	if (!surface.bValid)
 	{
 		if (WriteRayReconstructionGuides != 0u)
 		{

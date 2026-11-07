@@ -129,21 +129,21 @@ void RenderPassRuntimeCache::ValidateGenerationContracts(const RenderPassRuntime
 
 		const PassParameterLayout parameterLayout = BuildShaderParameterLayout(registration);
 		const std::uint64_t expectedParameterSignature = BuildShaderParameterSignature(parameterLayout);
-		const bool shaderNameMatches = generation.Map.ResolveString(entry->ShaderName) == registration.ShaderName;
-		const bool entryPointMatches = shaderNameMatches && generation.Map.ResolveString(entry->EntryPoint) == registration.EntryPoint;
-		const bool bShaderMetadataMatchesStage = entryPointMatches && entry->Stage == registration.Stage;
-		const bool shaderMetadataMatches = bShaderMetadataMatchesStage && (entry->Features == registration.Features);
+		const bool bShaderNameMatches = generation.Map.ResolveString(entry->ShaderName) == registration.ShaderName;
+		const bool bEntryPointMatches = bShaderNameMatches && generation.Map.ResolveString(entry->EntryPoint) == registration.EntryPoint;
+		const bool bShaderMetadataMatchesStage = bEntryPointMatches && entry->Stage == registration.Stage;
+		const bool bShaderMetadataMatches = bShaderMetadataMatchesStage && (entry->Features == registration.Features);
 
-		const bool bRayContractMatchesRayTracing = shaderMetadataMatches && entry->RayPayloadSizeInBytes == registration.RayTracing.PayloadSizeInBytes;
+		const bool bRayContractMatchesRayTracing = bShaderMetadataMatches && entry->RayPayloadSizeInBytes == registration.RayTracing.PayloadSizeInBytes;
 		const bool bRayContractMatchesRayTracing2 = bRayContractMatchesRayTracing && (entry->RayAttributeSizeInBytes == registration.RayTracing.AttributeSizeInBytes);
-		const bool rayTracingContractMatches = bRayContractMatchesRayTracing2 && (entry->MinimumRayRecursionDepth == registration.RayTracing.MinimumRecursionDepth);
+		const bool bRayTracingContractMatches = bRayContractMatchesRayTracing2 && (entry->MinimumRayRecursionDepth == registration.RayTracing.MinimumRecursionDepth);
 
-		const bool bLocalRecordMatchesRayTracing = rayTracingContractMatches && entry->LocalRecordSizeInBytes == registration.RayTracing.LocalRecordSizeInBytes;
-		const bool localRecordMatches = bLocalRecordMatchesRayTracing && (entry->LocalRecordSignature == registration.RayTracing.LocalRecordSignature);
+		const bool bLocalRecordMatchesRayTracing = bRayTracingContractMatches && entry->LocalRecordSizeInBytes == registration.RayTracing.LocalRecordSizeInBytes;
+		const bool bLocalRecordMatches = bLocalRecordMatchesRayTracing && (entry->LocalRecordSignature == registration.RayTracing.LocalRecordSignature);
 
-		const bool parameterSignatureMatches = localRecordMatches && entry->ParameterSignature == expectedParameterSignature;
+		const bool bParameterSignatureMatches = bLocalRecordMatches && entry->ParameterSignature == expectedParameterSignature;
 
-		if (!parameterSignatureMatches)
+		if (!bParameterSignatureMatches)
 		{
 			throw Diagnostics::Error(
 			    std::format(

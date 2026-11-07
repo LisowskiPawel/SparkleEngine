@@ -63,7 +63,7 @@ namespace ViewportCameraProperties
 	{
 		const auto& settings = viewportSession.GetSettings();
 		float moveSpeed = settings.Navigation.MoveSpeedMetersPerSecond;
-		const bool moveSpeedEdited = DrawFloat(
+		const bool bMoveSpeedEdited = DrawFloat(
 				        "##ViewportMoveSpeed",
 				        "Move speed (m/s)",
 				        moveSpeed,
@@ -73,24 +73,24 @@ namespace ViewportCameraProperties
 				        "%.4f",
 				        ImGuiSliderFlags_Logarithmic);
 		
-		if (moveSpeedEdited)
+		if (bMoveSpeedEdited)
 		{
 			viewportSession.SetMoveSpeed(moveSpeed);
 		}
 
 		float rotationSpeed = settings.Navigation.RotationSpeedDegreesPerPixel;
-		const bool rotationSpeedEdited = DrawFloat("##ViewportRotationSpeed", "Rotation speed (deg/px)", rotationSpeed, 0.005f, 0.001f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
+		const bool bRotationSpeedEdited = DrawFloat("##ViewportRotationSpeed", "Rotation speed (deg/px)", rotationSpeed, 0.005f, 0.001f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
 		
-		if (rotationSpeedEdited)
+		if (bRotationSpeedEdited)
 		{
 			viewportSession.SetRotationSpeed(rotationSpeed);
 		}
 
 		BeginPropertyRow("Invert Y");
-		bool invertY = settings.Navigation.InvertY;
-		if (ImGui::Checkbox("##ViewportInvertY", &invertY))
+		bool bInvertY = settings.Navigation.bInvertY;
+		if (ImGui::Checkbox("##ViewportInvertY", &bInvertY))
 		{
-			viewportSession.SetInvertY(invertY);
+			viewportSession.SetInvertY(bInvertY);
 		}
 	}
 
@@ -100,9 +100,9 @@ namespace ViewportCameraProperties
 		if (settings.ProjectionKind == CameraProjectionKind::Orthographic)
 		{
 			float orthographicHeight = settings.OrthographicHeightMeters;
-			const bool orthographicHeightEdited = DrawFloat("##ViewportOrthographicHeight", "Ortho height (m)", orthographicHeight, 0.1f, 0.001f, 1000000.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+			const bool bOrthographicHeightEdited = DrawFloat("##ViewportOrthographicHeight", "Ortho height (m)", orthographicHeight, 0.1f, 0.001f, 1000000.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
 			
-			if (orthographicHeightEdited)
+			if (bOrthographicHeightEdited)
 			{
 				viewportSession.SetOrthographicHeight(orthographicHeight);
 			}
@@ -141,14 +141,14 @@ void ViewportCameraProperties::OpenPopup() noexcept
 	ImGui::OpenPopup("##ViewportCameraProperties");
 }
 
-void ViewportCameraProperties::BuildPopup(EditorViewportSession& viewportSession, const EngineRenderingSettingsState& renderingDefaults, bool disableInteraction) noexcept
+void ViewportCameraProperties::BuildPopup(EditorViewportSession& viewportSession, const EngineRenderingSettingsState& renderingDefaults, bool bDisableInteraction) noexcept
 {
 	ImGui::SetNextWindowSizeConstraints(ImVec2(430.0f, 0.0f), ImVec2(560.0f, 720.0f));
 	if (!ImGui::BeginPopup("##ViewportCameraProperties"))
 	{
 		return;
 	}
-	if (disableInteraction)
+	if (bDisableInteraction)
 	{
 		ImGui::CloseCurrentPopup();
 		ImGui::EndPopup();

@@ -34,9 +34,9 @@ void VulkanRenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRay
 	const bool bInvalidBuildInputsBufferAddress = bInvalidBuildInputsRhiContract || (vertexBufferAddress == 0);
 	const bool bInvalidBuildInputsBufferAddress2 = bInvalidBuildInputsBufferAddress || (indexBufferAddress == 0);
 	const bool bInvalidBuildInputsGpuAddress = bInvalidBuildInputsBufferAddress2 || (scratchGpuAddress == 0);
-	const bool invalidBlasBuildInputs = bInvalidBuildInputsGpuAddress || (resultGpuAddress == 0);
+	const bool bInvalidBlasBuildInputs = bInvalidBuildInputsGpuAddress || (resultGpuAddress == 0);
 	
-	if (invalidBlasBuildInputs)
+	if (bInvalidBlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan BLAS build received incomplete geometry, device, command-buffer, or GPU-address inputs.");
 	}
@@ -46,11 +46,11 @@ void VulkanRenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRay
 	TrackResource(geometry.IndexBuffer.Resource);
 
 	VulkanRecordingResource resultResource;
-	const bool resultResolved = ResolveAddress(resultGpuAddress, resultResource);
-	const bool bStructureMatchesStructure = resultResolved && resultResource.AccelerationStructure != VK_NULL_HANDLE;
-	const bool accelerationStructureMatches = bStructureMatchesStructure && (resultResource.AccelerationStructureType == VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR);
+	const bool bResultResolved = ResolveAddress(resultGpuAddress, resultResource);
+	const bool bStructureMatchesStructure = bResultResolved && resultResource.AccelerationStructure != VK_NULL_HANDLE;
+	const bool bAccelerationStructureMatches = bStructureMatchesStructure && (resultResource.AccelerationStructureType == VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR);
 	
-	if (!accelerationStructureMatches)
+	if (!bAccelerationStructureMatches)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan BLAS destination does not resolve to a bottom-level acceleration structure.");
 	}
@@ -71,7 +71,7 @@ void VulkanRenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRay
 	    .pNext = nullptr,
 	    .geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR,
 	    .geometry = VkAccelerationStructureGeometryDataKHR{.triangles = triangles},
-	    .flags = geometry.Opaque ? VK_GEOMETRY_OPAQUE_BIT_KHR : 0u};
+	    .flags = geometry.bOpaque ? VK_GEOMETRY_OPAQUE_BIT_KHR : 0u};
 
 	const VkAccelerationStructureBuildGeometryInfoKHR buildInfo{
 	    .sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR,
@@ -125,20 +125,20 @@ void VulkanRenderCommandList::BuildTlas(
 	const bool bBuildInputsAccelerationStructures = bInvalidBuildInputsmemoryAllocator || (m_rhi->GetCmdBuildAccelerationStructures() == nullptr);
 	const bool bInvalidBuildInputsGpuAddress = bBuildInputsAccelerationStructures || (instanceDescsGpuAddress == 0);
 	const bool bInvalidBuildInputsGpuAddress2 = bInvalidBuildInputsGpuAddress || (scratchGpuAddress == 0);
-	const bool invalidTlasBuildInputs = bInvalidBuildInputsGpuAddress2 || (resultGpuAddress == 0);
+	const bool bInvalidTlasBuildInputs = bInvalidBuildInputsGpuAddress2 || (resultGpuAddress == 0);
 	
-	if (invalidTlasBuildInputs)
+	if (bInvalidTlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan TLAS build received no device, command buffer, build entry point, or GPU address.");
 	}
 	EndDynamicRenderingIfNeeded();
 
 	VulkanRecordingResource resultResource;
-	const bool resultResolved = ResolveAddress(resultGpuAddress, resultResource);
-	const bool bStructureMatchesStructure = resultResolved && resultResource.AccelerationStructure != VK_NULL_HANDLE;
-	const bool accelerationStructureMatches = bStructureMatchesStructure && (resultResource.AccelerationStructureType == VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR);
+	const bool bResultResolved = ResolveAddress(resultGpuAddress, resultResource);
+	const bool bStructureMatchesStructure = bResultResolved && resultResource.AccelerationStructure != VK_NULL_HANDLE;
+	const bool bAccelerationStructureMatches = bStructureMatchesStructure && (resultResource.AccelerationStructureType == VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR);
 	
-	if (!accelerationStructureMatches)
+	if (!bAccelerationStructureMatches)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan TLAS destination does not resolve to a TLAS.");
 	}
@@ -209,9 +209,9 @@ void VulkanRenderCommandList::BuildPtlas(const RhiPtlasBuildCommandDesc& desc) n
 	const bool bBuildInputsOperationHeaders = bInvalidBuildInputsScratch || (desc.OperationHeaders == 0);
 	const bool bInvalidBuildInputsOperationCount = bBuildInputsOperationHeaders || (desc.OperationCount == 0);
 	const bool bInvalidBuildInputsLayout = bInvalidBuildInputsOperationCount || (desc.Layout.InstanceCapacity == 0);
-	const bool invalidPtlasBuildInputs = bInvalidBuildInputsLayout || (desc.Layout.PartitionCount == 0);
+	const bool bInvalidPtlasBuildInputs = bInvalidBuildInputsLayout || (desc.Layout.PartitionCount == 0);
 	
-	if (invalidPtlasBuildInputs)
+	if (bInvalidPtlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan PTLAS build received incomplete device, command-buffer, layout, or GPU-address inputs.");
 	}
@@ -291,9 +291,9 @@ void VulkanRenderCommandList::TraceRays(const TraceRaysDesc& desc) noexcept
 	const bool bRayDispatchUnavailablerhi = m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr;
 	const bool bRayDispatchUnavailableTraceRays = bRayDispatchUnavailablerhi || (m_rhi->GetCmdTraceRays() == nullptr);
 	const bool bRayDispatchUnavailablepipeline = bRayDispatchUnavailableTraceRays || (pipeline == nullptr);
-	const bool rayDispatchUnavailable = bRayDispatchUnavailablepipeline || (table == nullptr);
+	const bool bRayDispatchUnavailable = bRayDispatchUnavailablepipeline || (table == nullptr);
 	
-	if (rayDispatchUnavailable)
+	if (bRayDispatchUnavailable)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan TraceRays requires a command buffer, loaded function, and matching native objects.");
 	}

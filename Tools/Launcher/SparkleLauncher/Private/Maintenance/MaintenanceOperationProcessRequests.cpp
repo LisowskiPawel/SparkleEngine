@@ -25,22 +25,22 @@ namespace SparkleLauncher
 		step.PreservedPath = std::move(preservedPath);
 		step.PreviewDetail = std::move(previewDetail);
 		step.CleanBehavior = behavior;
-		step.DeletesGeneratedOutput = true;
+		step.bDeletesGeneratedOutput = true;
 		steps.push_back(std::move(step));
 	}
 
-	static void AddContentGeneratedCleanSteps(std::vector<MaintenanceOperationProcessStep>& steps, const MaintenanceOperationPlan& plan, bool includeBuild, bool includeLogs, bool includeState)
+	static void AddContentGeneratedCleanSteps(std::vector<MaintenanceOperationProcessStep>& steps, const MaintenanceOperationPlan& plan, bool bIncludeBuild, bool bIncludeLogs, bool bIncludeState)
 	{
 		const std::filesystem::path contentPath = plan.Request.WorkspaceRoot / "Projects" / plan.Request.ContentId;
-		if (includeBuild)
+		if (bIncludeBuild)
 		{
 			AddCleanStep(steps, "clean-content-build", "Clean content build tree", contentPath / "build", MaintenanceCleanBehavior::RemovePath);
 		}
-		if (includeLogs)
+		if (bIncludeLogs)
 		{
 			AddCleanStep(steps, "clean-content-logs", "Clean content logs", contentPath / "logs", MaintenanceCleanBehavior::RemovePath);
 		}
-		if (includeState)
+		if (bIncludeState)
 		{
 			AddCleanStep(steps, "clean-content-imgui", "Clean content ImGui state", contentPath / "imgui.ini", MaintenanceCleanBehavior::RemovePath);
 		}
@@ -164,7 +164,7 @@ namespace SparkleLauncher
 	std::vector<MaintenanceOperationProcessStep> BuildMaintenanceProcessStepsForPlan(const MaintenanceOperationPlan& plan)
 	{
 		std::vector<MaintenanceOperationProcessStep> steps;
-		if (!plan.CanRun)
+		if (!plan.bCanRun)
 		{
 			return steps;
 		}

@@ -36,7 +36,7 @@ bool EvaluateStreamlineRayReconstructionFrame(
     sl::ViewportHandle viewport,
     const RayReconstructionEvaluationDesc& evaluation)
 {
-	const bool invalidReconstructionInputs = !evaluation.NativeCommandList
+	const bool bInvalidReconstructionInputs = !evaluation.NativeCommandList
 		    || !AreStreamlineTextureViewsValid(
 		        evaluation.BackendApi,
 		        evaluation.NativeNoisyInputColorView,
@@ -50,7 +50,7 @@ bool EvaluateStreamlineRayReconstructionFrame(
 		        evaluation.NativeSpecularHitDistanceView,
 		        evaluation.NativeExposureView);
 	
-	if (invalidReconstructionInputs)
+	if (bInvalidReconstructionInputs)
 	{
 		return false;
 	}

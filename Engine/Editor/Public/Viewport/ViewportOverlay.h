@@ -16,7 +16,7 @@ public:
 	ViewportOverlay& operator=(ViewportOverlay&&) = delete;
 
 	virtual float MeasureWidth() const noexcept = 0;
-	virtual void Draw(EditorIconService& icons, bool disableInteraction) noexcept = 0;
+	virtual void Draw(EditorIconService& icons, bool bDisableInteraction) noexcept = 0;
 
 protected:
 	ViewportOverlay() noexcept = default;

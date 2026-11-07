@@ -6,8 +6,8 @@
 
 namespace SparkleLauncher
 {
-	QString ToolchainStatusState(ToolchainItemState state, bool required);
-	QString ToolchainStatusText(ToolchainItemState state, bool required);
+	QString ToolchainStatusState(ToolchainItemState state, bool bRequired);
+	QString ToolchainStatusText(ToolchainItemState state, bool bRequired);
 	QString BuildGeneratorSummary(const BuildToolchainStatus& toolchain);
 	QString RequiredToolProblemSummary(const BuildToolchainStatus& toolchain);
 }

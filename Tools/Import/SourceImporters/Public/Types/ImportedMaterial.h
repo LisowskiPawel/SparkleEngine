@@ -28,7 +28,7 @@ struct ImportedMaterial
 	DirectX::XMFLOAT3 emissiveColor = {0.0f, 0.0f, 0.0f};
 	ImportedAlphaMode alphaMode = ImportedAlphaMode::Opaque;
 	float alphaCutoff = 0.5f;
-	bool doubleSided = false;
+	bool bDoubleSided = false;
 
 	std::vector<ImportedTextureSource> textureSources;
 };

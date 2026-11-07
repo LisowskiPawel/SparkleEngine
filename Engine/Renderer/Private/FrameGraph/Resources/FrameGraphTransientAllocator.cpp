@@ -41,8 +41,8 @@ bool FrameGraphTransientAllocator::Prepare(const FrameGraphTransientPlan& plan) 
 		        .physicalBlockIndex = resource.physicalAllocation.physicalBlockIndex,
 		        .textureDesc = resource.physicalAllocation.textureResourceDesc,
 		        .bufferDesc = resource.physicalAllocation.bufferResourceDesc,
-		        .requiresShaderResourceView = RequiresShaderResourceView(resource),
-		        .requiresUnorderedAccessView = RequiresUnorderedAccessView(resource)});
+		        .bRequiresShaderResourceView = RequiresShaderResourceView(resource),
+		        .bRequiresUnorderedAccessView = RequiresUnorderedAccessView(resource)});
 	}
 
 	if (planEntries == m_planEntries)

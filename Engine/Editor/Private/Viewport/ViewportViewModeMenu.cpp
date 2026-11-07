@@ -53,20 +53,20 @@ static const ViewModePresentation& DescribeViewMode(RenderViewMode viewMode) noe
 
 static void DrawViewModeOption(EditorViewportSession& viewportSession, const ViewModePresentation& option, RenderViewMode currentViewMode) noexcept
 {
-	const bool selected = option.Mode == currentViewMode;
-	const EditorWidgets::MenuCheckState checkState = selected ? EditorWidgets::MenuCheckState::Checked : EditorWidgets::MenuCheckState::Unchecked;
+	const bool bSelected = option.Mode == currentViewMode;
+	const EditorWidgets::MenuCheckState checkState = bSelected ? EditorWidgets::MenuCheckState::Checked : EditorWidgets::MenuCheckState::Unchecked;
 	if (EditorWidgets::DrawMenuItem(option.Label, option.Icon, checkState))
 	{
 		viewportSession.SetViewMode(option.Mode);
 	}
 
-	if (selected)
+	if (bSelected)
 	{
 		ImGui::SetItemDefaultFocus();
 	}
 }
 
-void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool disableInteraction, bool compact) noexcept
+void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool bDisableInteraction, bool bCompact) noexcept
 {
 	RenderViewMode currentViewMode = viewportSession.GetViewMode();
 	if (currentViewMode >= RenderViewMode::Count)
@@ -74,11 +74,11 @@ void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool disab
 		currentViewMode = RenderViewMode::Lit;
 	}
 
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	const ViewModePresentation& currentPresentation = DescribeViewMode(currentViewMode);
 	const std::string previewLabel = EditorIcons::MakeIconLabel(currentPresentation.Icon, currentPresentation.Label);
 	const float previewWidth = ImGui::CalcTextSize(previewLabel.c_str()).x + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.x * 2.0f;
-	ImGui::SetNextItemWidth((std::clamp) (previewWidth, 100.0f, compact ? 145.0f : 260.0f));
+	ImGui::SetNextItemWidth((std::clamp) (previewWidth, 100.0f, bCompact ? 145.0f : 260.0f));
 	const EditorWidgets::MenuStyleScope menuStyle;
 	if (ImGui::BeginCombo("##ViewportViewMode", previewLabel.c_str()))
 	{

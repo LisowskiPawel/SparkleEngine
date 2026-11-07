@@ -40,7 +40,7 @@ namespace ECS
 	struct Visibility final
 	{
 		std::uint32_t LayerMask = (std::numeric_limits<std::uint32_t>::max)();
-		bool Visible = true;
+		bool bVisible = true;
 	};
 
 	struct Camera final
@@ -50,7 +50,7 @@ namespace ECS
 		float FarZ = 1000.0f;
 		float AspectRatio = 1.0f;
 		CameraProjectionKind ProjectionKind = CameraProjectionKind::Perspective;
-		bool Active = true;
+		bool bActive = true;
 	};
 
 	struct Light final
@@ -69,6 +69,6 @@ namespace ECS
 		DirectX::XMFLOAT3 Tangent{1.0f, 0.0f, 0.0f};
 		float Radius = 0.05f;
 		float AngularSizeRadians = 0.009308f;
-		bool CastShadow = true;
+		bool bCastShadow = true;
 	};
 }

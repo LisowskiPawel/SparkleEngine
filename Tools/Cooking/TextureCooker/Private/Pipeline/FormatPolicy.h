@@ -5,7 +5,7 @@
 
 namespace TextureCookPipeline
 {
-	DXGI_FORMAT ResolveUncompressedOutputFormat(const TextureCookRequest& request, bool sourceWasFloat) noexcept;
+	DXGI_FORMAT ResolveUncompressedOutputFormat(const TextureCookRequest& request, bool bSourceWasFloat) noexcept;
 	TextureFormatIntent ResolveFormatIntent(DXGI_FORMAT format) noexcept;
 	DXGI_FORMAT ApplyRequestedColorSpace(DXGI_FORMAT format, TextureColorSpace colorSpace) noexcept;
 

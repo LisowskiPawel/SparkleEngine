@@ -49,9 +49,9 @@ void RenderCoordinator::StartRenderThread()
 bool RenderCoordinator::WaitForRenderThreadStart()
 {
 	std::unique_lock lock(m_startMutex);
-	m_startedCondition.wait(lock, [this] { return m_started; });
+	m_startedCondition.wait(lock, [this] { return m_bStarted; });
 
-	return m_startSucceeded;
+	return m_bStartSucceeded;
 }
 
 void RenderCoordinator::HandleRenderThreadStartFailure()
@@ -77,8 +77,8 @@ void RenderCoordinator::RenderThreadMain()
 		m_context = std::make_unique<RendererExecutionContext>(*m_window, m_deviceLaunch, m_config);
 		{
 			std::lock_guard lock(m_startMutex);
-			m_startSucceeded = true;
-			m_started = true;
+			m_bStartSucceeded = true;
+			m_bStarted = true;
 		}
 		m_startedCondition.notify_one();
 		PublishReadState();
@@ -101,11 +101,11 @@ void RenderCoordinator::RenderThreadMain()
 
 	{
 		std::lock_guard lock(m_startMutex);
-		if (!m_startSucceeded)
+		if (!m_bStartSucceeded)
 		{
 			m_startFailure = std::move(failure);
 		}
-		m_started = true;
+		m_bStarted = true;
 	}
 	m_startedCondition.notify_one();
 	SettleAbandonedWork();
@@ -179,9 +179,9 @@ void RenderCoordinator::SettleAbandonedWork() noexcept
 	std::lock_guard lock(m_readStateMutex);
 	for (ViewportCaptureId id : m_outstandingViewportCaptures)
 	{
-		const bool duplicateCaptureCompletion = !id || std::any_of(m_publishedViewportCaptures.begin(), m_publishedViewportCaptures.end(), [id](const ViewportCaptureCompletion& completion) { return completion.Id.Value == id.Value; });
+		const bool bDuplicateCaptureCompletion = !id || std::any_of(m_publishedViewportCaptures.begin(), m_publishedViewportCaptures.end(), [id](const ViewportCaptureCompletion& completion) { return completion.Id.Value == id.Value; });
 		
-		if (duplicateCaptureCompletion)
+		if (bDuplicateCaptureCompletion)
 		{
 			continue;
 		}

@@ -8,14 +8,14 @@ namespace ConsoleInputParser
 	static bool ReadNextToken(std::string_view input, std::size_t& cursor, std::string& token, std::string& error)
 	{
 		token.clear();
-		bool tokenActive = false;
+		bool bTokenActive = false;
 		char quoteCharacter = '\0';
 		while (cursor < input.size())
 		{
 			const char character = input[cursor++];
 			if (character == '\\' && cursor < input.size())
 			{
-				tokenActive = true;
+				bTokenActive = true;
 				token.push_back(input[cursor++]);
 				continue;
 			}
@@ -33,19 +33,19 @@ namespace ConsoleInputParser
 			}
 			if (character == '"' || character == '\'')
 			{
-				tokenActive = true;
+				bTokenActive = true;
 				quoteCharacter = character;
 				continue;
 			}
 			if (Strings::IsAsciiWhitespace(character))
 			{
-				if (tokenActive)
+				if (bTokenActive)
 				{
 					return true;
 				}
 				continue;
 			}
-			tokenActive = true;
+			bTokenActive = true;
 			token.push_back(character);
 		}
 		if (quoteCharacter != '\0')
@@ -53,7 +53,7 @@ namespace ConsoleInputParser
 			error = "unterminated quoted string";
 			return false;
 		}
-		return tokenActive;
+		return bTokenActive;
 	}
 
 	ConsoleParsedInput Parse(std::string_view input)
@@ -71,7 +71,7 @@ namespace ConsoleInputParser
 		}
 		if (!error.empty())
 		{
-			return {.Succeeded = false, .ErrorMessage = std::move(error)};
+			return {.bSucceeded = false, .ErrorMessage = std::move(error)};
 		}
 		return result;
 	}

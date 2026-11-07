@@ -33,7 +33,7 @@ public:
 	void MarkIncomplete() noexcept override;
 	void MarkReady() noexcept override;
 	void BeginCollection(std::int64_t nativeFailure) noexcept override;
-	void Finalize(bool sdkFinished, bool timedOut, std::int64_t nativeFailure) noexcept override;
+	void Finalize(bool bSdkFinished, bool bTimedOut, std::int64_t nativeFailure) noexcept override;
 	bool IsSettled() const noexcept override;
 
 private:
@@ -72,8 +72,8 @@ private:
 	std::string m_identity;
 	std::string m_executableHash;
 	std::unique_ptr<GpuCrashInputs> m_inputs;
-	bool m_readyPublished = false;
-	bool m_keepSlot = false;
+	bool m_bReadyPublished = false;
+	bool m_bKeepSlot = false;
 	std::map<std::string, FileReceipt> m_files;
 	std::size_t m_writtenBytes = 0;
 
@@ -83,12 +83,12 @@ private:
 	std::size_t m_count = 0;
 	std::size_t m_outstandingCount = 0;
 	std::size_t m_outstandingBytes = 0;
-	std::atomic_bool m_incomplete{false};
-	std::atomic_bool m_writeFailed{false};
+	std::atomic_bool m_bIncomplete{false};
+	std::atomic_bool m_bWriteFailed{false};
 	const char* m_pendingState = nullptr;
-	bool m_finalizing = false;
-	bool m_sdkFinished = false;
-	bool m_timedOut = false;
+	bool m_bFinalizing = false;
+	bool m_bSdkFinished = false;
+	bool m_bTimedOut = false;
 	std::int64_t m_nativeFailure = 0;
-	bool m_hasDump = false;
+	bool m_bHasDump = false;
 };

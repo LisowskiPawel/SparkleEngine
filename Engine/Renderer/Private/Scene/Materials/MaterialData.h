@@ -48,7 +48,7 @@ struct MaterialData
 	std::uint32_t alphaMode = 0;
 	float alphaCutoff = 0.5f;
 	std::uint32_t textureFlags = 0;
-	bool doubleSided = false;
+	bool bDoubleSided = false;
 
 	std::array<std::uint32_t, MaterialTextureSlots::Count> materialTextureIndices = {
 	    InvalidMaterialTextureIndex,

@@ -78,9 +78,9 @@ void SceneOutlinerPanel::BuildFooter() noexcept
 {
 	const std::size_t totalCount = m_model ? 1u + m_model->GetCameras().size() + m_model->GetLights().size() + m_model->GetMeshes().size() : 0u;
 	const std::size_t displayedCount = CountVisibleEntries();
-	const bool hasValidSelection = IsSelectionValid();
+	const bool bHasValidSelection = IsSelectionValid();
 	ImGui::Separator();
-	ImGui::TextDisabled("%zu actors%s", displayedCount, hasValidSelection ? " (1 selected)" : "");
+	ImGui::TextDisabled("%zu actors%s", displayedCount, bHasValidSelection ? " (1 selected)" : "");
 	if (displayedCount != totalCount)
 	{
 		ImGui::SameLine();
@@ -113,9 +113,9 @@ void SceneOutlinerPanel::DrawEntrySection(SceneOutlinerFilter filter, const char
 		return;
 	}
 
-	bool open = true;
-	DrawSectionRow(id, label, entries.size(), open);
-	if (open)
+	bool bOpen = true;
+	DrawSectionRow(id, label, entries.size(), bOpen);
+	if (bOpen)
 	{
 		if (entries.empty())
 		{
@@ -192,7 +192,7 @@ std::size_t SceneOutlinerPanel::CountVisibleEntries() const noexcept
 bool SceneOutlinerPanel::IsEntryVisible(const SceneObjectSelection& selection) const noexcept
 {
 	const EditorSceneEntry* entry = m_model ? m_model->FindEntry(selection) : nullptr;
-	return entry == nullptr || entry->Visible;
+	return entry == nullptr || entry->bVisible;
 }
 
 void SceneOutlinerPanel::ToggleEntryVisibility(const SceneObjectSelection& selection) noexcept
@@ -228,7 +228,7 @@ void SceneOutlinerPanel::SelectEntry(const SceneObjectSelection& selection) noex
 	}
 }
 
-void SceneOutlinerPanel::DrawSectionRow(const char* id, const char* label, std::size_t count, bool& open) noexcept
+void SceneOutlinerPanel::DrawSectionRow(const char* id, const char* label, std::size_t count, bool& bOpen) noexcept
 {
 	ImGui::TableNextRow();
 	ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, SparkleUiPalette::SectionHeaderBackground());
@@ -236,20 +236,20 @@ void SceneOutlinerPanel::DrawSectionRow(const char* id, const char* label, std::
 	ImGui::PushID(id);
 	const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth;
 	const std::string sectionLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::FolderOpen, label);
-	open = ImGui::TreeNodeEx("##section", flags, "%s (%zu)", sectionLabel.c_str(), count);
+	bOpen = ImGui::TreeNodeEx("##section", flags, "%s (%zu)", sectionLabel.c_str(), count);
 	ImGui::PopID();
 	ImGui::TableSetColumnIndex(2);
 	const std::string typeLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Folder, "Folder");
 	EditorWidgets::DrawMutedText(typeLabel.c_str(), 0.58f);
-	if (open)
+	if (bOpen)
 	{
 		ImGui::TreePop();
 	}
 }
 
-void SceneOutlinerPanel::DrawSelectionCell(const char* label, const SceneObjectSelection& selection, bool isSelected, int flags) noexcept
+void SceneOutlinerPanel::DrawSelectionCell(const char* label, const SceneObjectSelection& selection, bool bIsSelected, int flags) noexcept
 {
-	if (isSelected)
+	if (bIsSelected)
 	{
 		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -258,7 +258,7 @@ void SceneOutlinerPanel::DrawSelectionCell(const char* label, const SceneObjectS
 	{
 		SelectEntry(selection);
 	}
-	if (isSelected)
+	if (bIsSelected)
 	{
 		ImGui::PopStyleColor(2);
 	}
@@ -266,17 +266,17 @@ void SceneOutlinerPanel::DrawSelectionCell(const char* label, const SceneObjectS
 
 void SceneOutlinerPanel::DrawSelectionEntry(const char* label, const char* typeLabel, const SceneObjectSelection& selection) noexcept
 {
-	const bool isSelected = m_selection != nullptr && *m_selection == selection;
-	const bool isVisible = IsEntryVisible(selection);
+	const bool bIsSelected = m_selection != nullptr && *m_selection == selection;
+	const bool bIsVisible = IsEntryVisible(selection);
 	ImGui::TableNextRow();
-	if (isSelected)
+	if (bIsSelected)
 	{
 		ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::SelectionOverlay()));
 		ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::SelectionOverlay()));
 	}
 	ImGui::PushID(label);
 	ImGui::TableSetColumnIndex(0);
-	if (EditorWidgets::DrawCenteredVisibilityIconButton("visibility", isVisible))
+	if (EditorWidgets::DrawCenteredVisibilityIconButton("visibility", bIsVisible))
 	{
 		ToggleEntryVisibility(selection);
 	}
@@ -284,22 +284,22 @@ void SceneOutlinerPanel::DrawSelectionEntry(const char* label, const char* typeL
 	ImGui::TableSetColumnIndex(1);
 	ImGui::Indent(16.0f);
 	const EditorSceneEntry* entry = m_model ? m_model->FindEntry(selection) : nullptr;
-	EditorWidgets::DrawEditorIcon(SceneObjectPresentation::BuildSelectionIcon(selection, entry ? entry->LightKind : SceneLightKind::Unknown), typeLabel, !isSelected);
+	EditorWidgets::DrawEditorIcon(SceneObjectPresentation::BuildSelectionIcon(selection, entry ? entry->LightKind : SceneLightKind::Unknown), typeLabel, !bIsSelected);
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 	{
 		SelectEntry(selection);
 	}
 	ImGui::SameLine(0.0f, 6.0f);
-	if (!isVisible)
+	if (!bIsVisible)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, SparkleUiPalette::TextMuted());
 	}
-	else if (isSelected)
+	else if (bIsSelected)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, SparkleUiPalette::TextPrimary());
 	}
-	DrawSelectionCell(label, selection, isSelected, ImGuiSelectableFlags_SpanAllColumns);
-	if (!isVisible || isSelected)
+	DrawSelectionCell(label, selection, bIsSelected, ImGuiSelectableFlags_SpanAllColumns);
+	if (!bIsVisible || bIsSelected)
 	{
 		ImGui::PopStyleColor();
 	}
@@ -308,7 +308,7 @@ void SceneOutlinerPanel::DrawSelectionEntry(const char* label, const char* typeL
 	ImVec4 mutedTypeColor = SparkleUiPalette::TextMuted();
 	mutedTypeColor.w *= 0.62f;
 	ImGui::PushStyleColor(ImGuiCol_Text, mutedTypeColor);
-	DrawSelectionCell(typeLabel, selection, isSelected, 0);
+	DrawSelectionCell(typeLabel, selection, bIsSelected, 0);
 	ImGui::PopStyleColor();
 	ImGui::PopID();
 }
@@ -340,9 +340,9 @@ void SceneOutlinerPanel::BuildSceneTable() noexcept
 	ImGui::Spacing();
 	ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(4.0f, 2.0f));
 	constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoPadOuterX;
-	const bool tableOpen = ImGui::BeginTable("##OutlinerTable", 3, tableFlags, ImVec2(0.0f, -28.0f));
+	const bool bTableOpen = ImGui::BeginTable("##OutlinerTable", 3, tableFlags, ImVec2(0.0f, -28.0f));
 
-	if (tableOpen)
+	if (bTableOpen)
 	{
 		ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 20.0f);
 		ImGui::TableSetupColumn("Item Label", ImGuiTableColumnFlags_WidthStretch);
@@ -358,7 +358,7 @@ void SceneOutlinerPanel::BuildSceneTable() noexcept
 	ImGui::PopStyleVar();
 }
 
-void SceneOutlinerPanel::BuildUI(bool disableInteraction)
+void SceneOutlinerPanel::BuildUI(bool bDisableInteraction)
 {
 	BeginWindow();
 	EditorWidgets::DrawPanelHeader("Scene", "Outliner");
@@ -371,7 +371,7 @@ void SceneOutlinerPanel::BuildUI(bool disableInteraction)
 	}
 
 	EnsureValidSelection();
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	BuildToolbar();
 	BuildSceneTable();
 	BuildFooter();

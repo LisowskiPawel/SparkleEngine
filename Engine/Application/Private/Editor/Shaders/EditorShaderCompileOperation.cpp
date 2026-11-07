@@ -14,7 +14,7 @@ EditorShaderCompileOperation::EditorShaderCompileOperation(EditorOperationRuntim
 {
 }
 
-ConsoleCommandResult EditorShaderCompileOperation::Request(bool generateSymbols)
+ConsoleCommandResult EditorShaderCompileOperation::Request(bool bGenerateSymbols)
 {
 	if (!m_compile)
 	{
@@ -24,19 +24,19 @@ ConsoleCommandResult EditorShaderCompileOperation::Request(bool generateSymbols)
 	std::string error;
 	const TaskName taskName = TaskName{"Compile editor shaders"};
 
-	auto operationTask = [compile = m_compile, generateSymbols](ConsoleCommandResult& result, TaskExecutionContext& context)
+	auto operationTask = [compile = m_compile, bGenerateSymbols](ConsoleCommandResult& result, TaskExecutionContext& context)
 	{
-		result = compile(generateSymbols, context.GetCancellationToken());
+		result = compile(bGenerateSymbols, context.GetCancellationToken());
 		if (context.IsCancellationRequested())
 		{
 			return TaskResult::Cancelled("Shader compilation cancelled.");
 		}
-		return result.Succeeded ? TaskResult::Success() : TaskResult::Failure(result.Message);
+		return result.bSucceeded ? TaskResult::Success() : TaskResult::Failure(result.Message);
 	};
 
-	const bool operationStarted = m_operation.Start(taskName, "Shader compilation is already running.", std::move(operationTask), error);
+	const bool bOperationStarted = m_operation.Start(taskName, "Shader compilation is already running.", std::move(operationTask), error);
 
-	if (!operationStarted)
+	if (!bOperationStarted)
 	{
 		return ConsoleCommandResult::Error(std::move(error));
 	}
@@ -65,7 +65,7 @@ void EditorShaderCompileOperation::Update(UI& ui, Renderer& renderer)
 			}
 		}
 		ui.SetShaderCompileStatus(false, result.Message);
-		ui.AppendConsoleOutput({result.Severity, std::move(result.Message)}, !result.Succeeded);
+		ui.AppendConsoleOutput({result.Severity, std::move(result.Message)}, !result.bSucceeded);
 	}
 	ui.SetShaderCompileStatus(m_operation.IsOccupied());
 }

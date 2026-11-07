@@ -55,10 +55,10 @@ namespace SparkleLauncher
 	void ProportionalCardFrame::SetActivationButton(QAbstractButton* button)
 	{
 		m_activationButton = button;
-		const bool interactive = m_activationButton != nullptr;
-		setCursor(interactive ? Qt::PointingHandCursor : Qt::ArrowCursor);
-		setFocusPolicy(interactive ? Qt::StrongFocus : Qt::NoFocus);
-		setProperty("Interactive", interactive ? "true" : "false");
+		const bool bInteractive = m_activationButton != nullptr;
+		setCursor(bInteractive ? Qt::PointingHandCursor : Qt::ArrowCursor);
+		setFocusPolicy(bInteractive ? Qt::StrongFocus : Qt::NoFocus);
+		setProperty("Interactive", bInteractive ? "true" : "false");
 		if (m_activationButton != nullptr)
 		{
 			m_activationButton->setFocusPolicy(Qt::NoFocus);
@@ -97,9 +97,9 @@ namespace SparkleLauncher
 		const bool bActivationKeyPressedGuardkey2 = bActivationKeyPressedevent && !bActivationKeyPressedkey3;
 		const bool bActivationKeyPressedkey4 = bActivationKeyPressedGuardkey2 && (event->key() == Qt::Key_Space);
 		const bool bActivationKeyPressedkey5 = bActivationKeyPressedkey3 || bActivationKeyPressedkey4;
-		const bool activationKeyPressed = bActivationKeyPressedevent && bActivationKeyPressedkey5;
+		const bool bActivationKeyPressed = bActivationKeyPressedevent && bActivationKeyPressedkey5;
 		
-		if (activationKeyPressed)
+		if (bActivationKeyPressed)
 		{
 			m_activationButton->click();
 			event->accept();

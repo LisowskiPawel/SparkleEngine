@@ -96,9 +96,9 @@ private:
 		std::optional<LoadedTextureData> Decoded;
 		std::optional<RendererTexture> Uploaded;
 		RhiResourceHandle UploadedResource;
-		bool LoadStarted = false;
-		bool UploadSubmitted = false;
-		bool Wanted = true;
+		bool bLoadStarted = false;
+		bool bUploadSubmitted = false;
+		bool bWanted = true;
 	};
 
 	struct ActiveTexture final
@@ -150,5 +150,5 @@ private:
 	std::vector<TextureRequest> m_requests;
 	std::uint32_t m_sceneTextureGeneration = 0;
 	std::uint64_t m_bindingRevision = 0;
-	bool m_defaultsLoaded = false;
+	bool m_bDefaultsLoaded = false;
 };

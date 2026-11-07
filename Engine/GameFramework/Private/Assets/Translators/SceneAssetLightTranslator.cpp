@@ -32,7 +32,7 @@ namespace Assets
 					point.range = lightRecord.range;
 					point.radius = lightRecord.radius;
 					point.distanceAttenuationCoefficients = lightRecord.distanceAttenuationCoefficients;
-					point.castShadow = true;
+					point.bCastShadow = true;
 					return point;
 				}
 				case CookedSceneLightKind::Spot:
@@ -45,7 +45,7 @@ namespace Assets
 					spot.distanceAttenuationCoefficients = lightRecord.distanceAttenuationCoefficients;
 					spot.innerAngleRadians = lightRecord.innerAngleRadians;
 					spot.outerAngleRadians = lightRecord.outerAngleRadians;
-					spot.castShadow = true;
+					spot.bCastShadow = true;
 					return spot;
 				}
 				case CookedSceneLightKind::Rect:
@@ -56,7 +56,7 @@ namespace Assets
 					rect.tangent = lightRecord.tangent;
 					rect.width = lightRecord.width;
 					rect.height = lightRecord.height;
-					rect.castShadow = true;
+					rect.bCastShadow = true;
 					return rect;
 				}
 				case CookedSceneLightKind::Unknown:
@@ -72,7 +72,7 @@ namespace Assets
 		light.common.name = lightRecord.name;
 		light.common.worldTransform = lightRecord.worldTransform;
 		light.common.color = lightRecord.color;
-		light.common.visible = (lightRecord.flags & 1u) != 0u;
+		light.common.bVisible = (lightRecord.flags & 1u) != 0u;
 		light.payload = SceneAssetLightTranslation::BuildPayload(lightRecord);
 		return light;
 	}

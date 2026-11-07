@@ -19,17 +19,17 @@ public:
 	}
 };
 
-RhiExternalFeatureInteropCapabilities BuildVulkanExternalFeatureInteropCapabilities(const VulkanRhi* rhi, bool hasGraphicsCommandContext) noexcept
+RhiExternalFeatureInteropCapabilities BuildVulkanExternalFeatureInteropCapabilities(const VulkanRhi* rhi, bool bHasGraphicsCommandContext) noexcept
 {
 	RhiExternalFeatureInteropCapabilities capabilities{};
 	capabilities.BridgeKind = ERhiExternalFeatureBridgeKind::None;
 	capabilities.Adapter = VulkanExternalFeatureAdapterIdentity::BuildVulkanAdapterIdentity(rhi);
-	capabilities.ExposesNativeDevice = rhi != nullptr && rhi->GetDevice() != VK_NULL_HANDLE;
-	capabilities.ExposesNativeGraphicsQueue = rhi != nullptr && rhi->GetGraphicsQueue() != VK_NULL_HANDLE;
-	capabilities.ExposesNativeGraphicsCommandList = hasGraphicsCommandContext;
-	capabilities.ExposesNativeResources = true;
-	capabilities.SupportsExplicitResourceStates = true;
-	capabilities.SupportsExternalProviderEvaluation = false;
-	capabilities.SupportsRuntimeProviderChecks = false;
+	capabilities.bExposesNativeDevice = rhi != nullptr && rhi->GetDevice() != VK_NULL_HANDLE;
+	capabilities.bExposesNativeGraphicsQueue = rhi != nullptr && rhi->GetGraphicsQueue() != VK_NULL_HANDLE;
+	capabilities.bExposesNativeGraphicsCommandList = bHasGraphicsCommandContext;
+	capabilities.bExposesNativeResources = true;
+	capabilities.bSupportsExplicitResourceStates = true;
+	capabilities.bSupportsExternalProviderEvaluation = false;
+	capabilities.bSupportsRuntimeProviderChecks = false;
 	return capabilities;
 }

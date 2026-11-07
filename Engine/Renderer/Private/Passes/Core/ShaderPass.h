@@ -45,7 +45,7 @@ void BindComputeShaderPass(
     const char* const* bindingNames = nullptr,
     std::uint32_t bindingNameCount = 0,
     const PassBindingOverrides* overrides = nullptr,
-    bool bindLayout = true) noexcept;
+    bool bBindLayout = true) noexcept;
 
 void BindRasterShaderPass(
     RenderCommandContext& commandContext,
@@ -56,7 +56,7 @@ void BindRasterShaderPass(
     const char* const* bindingNames = nullptr,
     std::uint32_t bindingNameCount = 0,
     const PassBindingOverrides* overrides = nullptr,
-    bool bindLayout = true) noexcept;
+    bool bBindLayout = true) noexcept;
 void BindRayTracingShaderPass(
     RenderCommandContext& commandContext,
     const FrameGraphResourceCommands& resources,
@@ -104,7 +104,7 @@ template <typename TParameterBindings> bool DispatchComputeShader(
     std::uint32_t bindingNameCount = 0,
     const PassBindingOverrides* overrides = nullptr,
     const char* passName = nullptr,
-    bool bindLayout = true) noexcept
+    bool bBindLayout = true) noexcept
 {
 	const PassParameterSet& parameterSet = ShaderPassDetail::GetPassParameterSet(parameters);
 	if (!ValidateShaderParameters(parameterSet, passName, bindingNames, bindingNameCount, overrides))
@@ -112,7 +112,7 @@ template <typename TParameterBindings> bool DispatchComputeShader(
 		return false;
 	}
 
-	BindComputeShaderPass(commandContext, resources, bindingLayout, pipeline, parameterSet, bindingNames, bindingNameCount, overrides, bindLayout);
+	BindComputeShaderPass(commandContext, resources, bindingLayout, pipeline, parameterSet, bindingNames, bindingNameCount, overrides, bBindLayout);
 	DispatchComputeShaderPass(commandContext, dispatch);
 	return true;
 }
@@ -127,7 +127,7 @@ template <typename TParameterBindings> bool BindRasterShader(
     std::uint32_t bindingNameCount = 0,
     const PassBindingOverrides* overrides = nullptr,
     const char* passName = nullptr,
-    bool bindLayout = true) noexcept
+    bool bBindLayout = true) noexcept
 {
 	const PassParameterSet& parameterSet = ShaderPassDetail::GetPassParameterSet(parameters);
 	if (!ValidateShaderParameters(parameterSet, passName, bindingNames, bindingNameCount, overrides))
@@ -135,6 +135,6 @@ template <typename TParameterBindings> bool BindRasterShader(
 		return false;
 	}
 
-	BindRasterShaderPass(commandContext, resources, bindingLayout, pipeline, parameterSet, bindingNames, bindingNameCount, overrides, bindLayout);
+	BindRasterShaderPass(commandContext, resources, bindingLayout, pipeline, parameterSet, bindingNames, bindingNameCount, overrides, bBindLayout);
 	return true;
 }

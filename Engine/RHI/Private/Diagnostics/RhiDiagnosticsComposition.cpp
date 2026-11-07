@@ -17,33 +17,33 @@ public:
 	    std::unique_ptr<RenderMessageDiagnostics> messageDiagnostics,
 	    std::unique_ptr<RenderFailureDiagnostics> failureDiagnostics,
 	    std::unique_ptr<RenderMemoryDiagnostics> memoryDiagnostics,
-	    bool supportsGpuEvents) noexcept :
+	    bool bSupportsGpuEvents) noexcept :
 	    m_objectDiagnostics(std::move(objectDiagnostics)),
 	    m_timingDiagnostics(std::move(timingDiagnostics)),
 	    m_messageDiagnostics(std::move(messageDiagnostics)),
 	    m_failureDiagnostics(std::move(failureDiagnostics)),
 	    m_memoryDiagnostics(std::move(memoryDiagnostics)),
-	    m_supportsGpuEvents(supportsGpuEvents)
+	    m_bSupportsGpuEvents(bSupportsGpuEvents)
 	{
 		assert(m_objectDiagnostics != nullptr);
 	}
 
 	RhiDiagnosticsCapabilities GetCapabilities() const noexcept override
 	{
-		bool requiresScopes = false;
+		bool bRequiresScopes = false;
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 		requiresScopes = GpuCrashSession::Current() != nullptr;
 #endif
 		return RhiDiagnosticsCapabilities{
-		    .SupportsObjectNames = m_objectDiagnostics->SupportsObjectNames(),
-		    .SupportsGpuEvents = m_supportsGpuEvents || requiresScopes,
-		    .RequiresBaselineScopes = requiresScopes,
-		    .SupportsTimestampQueries = GetTimingDiagnostics() != nullptr,
-		    .SupportsDebugMessages = GetMessageDiagnostics() != nullptr,
-		    .SupportsLiveObjectReports = m_failureDiagnostics != nullptr && m_failureDiagnostics->SupportsLiveObjectReports(),
-		    .SupportsCrashDiagnostics = m_failureDiagnostics != nullptr && m_failureDiagnostics->SupportsCrashDiagnostics(),
-		    .SupportsMemoryDiagnostics = m_memoryDiagnostics != nullptr,
-		    .SupportsMemoryBudgetQueries = m_memoryDiagnostics != nullptr && m_memoryDiagnostics->SupportsBudgetQueries()};
+		    .bSupportsObjectNames = m_objectDiagnostics->SupportsObjectNames(),
+		    .bSupportsGpuEvents = m_bSupportsGpuEvents || bRequiresScopes,
+		    .bRequiresBaselineScopes = bRequiresScopes,
+		    .bSupportsTimestampQueries = GetTimingDiagnostics() != nullptr,
+		    .bSupportsDebugMessages = GetMessageDiagnostics() != nullptr,
+		    .bSupportsLiveObjectReports = m_failureDiagnostics != nullptr && m_failureDiagnostics->SupportsLiveObjectReports(),
+		    .bSupportsCrashDiagnostics = m_failureDiagnostics != nullptr && m_failureDiagnostics->SupportsCrashDiagnostics(),
+		    .bSupportsMemoryDiagnostics = m_memoryDiagnostics != nullptr,
+		    .bSupportsMemoryBudgetQueries = m_memoryDiagnostics != nullptr && m_memoryDiagnostics->SupportsBudgetQueries()};
 	}
 
 	RenderObjectDiagnostics& GetObjectDiagnostics() noexcept override { return *m_objectDiagnostics; }
@@ -86,7 +86,7 @@ private:
 	std::unique_ptr<RenderMessageDiagnostics> m_messageDiagnostics;
 	std::unique_ptr<RenderFailureDiagnostics> m_failureDiagnostics;
 	std::unique_ptr<RenderMemoryDiagnostics> m_memoryDiagnostics;
-	bool m_supportsGpuEvents = false;
+	bool m_bSupportsGpuEvents = false;
 };
 
 std::unique_ptr<RenderDiagnostics> CreateRhiDiagnosticsComposition(
@@ -95,7 +95,7 @@ std::unique_ptr<RenderDiagnostics> CreateRhiDiagnosticsComposition(
     std::unique_ptr<RenderMessageDiagnostics> messageDiagnostics,
     std::unique_ptr<RenderFailureDiagnostics> failureDiagnostics,
     std::unique_ptr<RenderMemoryDiagnostics> memoryDiagnostics,
-    bool supportsGpuEvents)
+    bool bSupportsGpuEvents)
 {
 	return std::make_unique<RhiDiagnosticsComposition>(
 	    std::move(objectDiagnostics),
@@ -103,5 +103,5 @@ std::unique_ptr<RenderDiagnostics> CreateRhiDiagnosticsComposition(
 	    std::move(messageDiagnostics),
 	    std::move(failureDiagnostics),
 	    std::move(memoryDiagnostics),
-	    supportsGpuEvents);
+	    bSupportsGpuEvents);
 }

@@ -39,9 +39,9 @@ namespace Json
 		}
 		const bool bUnquotedValueContinuesobjectText = cursor < objectText.size() && objectText[cursor] != ',';
 		const bool bUnquotedValueContinuesobjectText2 = bUnquotedValueContinuesobjectText && (objectText[cursor] != '}');
-		const bool unquotedValueContinues = bUnquotedValueContinuesobjectText2 && (!std::isspace(static_cast<unsigned char>(objectText[cursor])));
+		const bool bUnquotedValueContinues = bUnquotedValueContinuesobjectText2 && (!std::isspace(static_cast<unsigned char>(objectText[cursor])));
 		
-		if (unquotedValueContinues)
+		if (bUnquotedValueContinues)
 		{
 			return false;
 		}

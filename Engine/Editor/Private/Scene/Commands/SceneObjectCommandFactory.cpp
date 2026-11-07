@@ -5,7 +5,7 @@
 #include "Scene/Model/EditorSceneModel.h"
 #include "Scene/SceneObjectSelection.h"
 
-std::optional<EditorCommandPair> SceneObjectCommandFactory::SetVisibility(const EditorSceneModel& model, const SceneObjectSelection& selection, bool visible)
+std::optional<EditorCommandPair> SceneObjectCommandFactory::SetVisibility(const EditorSceneModel& model, const SceneObjectSelection& selection, bool bVisible)
 {
 	EditorCommandPair commands;
 	if (selection.type == SceneObjectType::Light)
@@ -16,14 +16,14 @@ std::optional<EditorCommandPair> SceneObjectCommandFactory::SetVisibility(const 
 			return std::nullopt;
 		}
 		SceneLightDesc after = light->Description;
-		after.common.visible = visible;
+		after.common.bVisible = bVisible;
 		commands.Forward.Payload = SetLightDescriptionCommand{selection.entity, after};
 		commands.Inverse.Payload = SetLightDescriptionCommand{selection.entity, light->Description};
 	}
 	else if (selection.type == SceneObjectType::Sky)
 	{
 		SkyEnvironment after = model.GetSkyEnvironment().value_or(SkyEnvironment{});
-		after.enabled = visible;
+		after.bEnabled = bVisible;
 		commands.Forward.Payload = SetSkyEnvironmentCommand{after};
 		commands.Inverse.Payload = SetSkyEnvironmentCommand{model.GetSkyEnvironment()};
 	}
@@ -34,8 +34,8 @@ std::optional<EditorCommandPair> SceneObjectCommandFactory::SetVisibility(const 
 		{
 			return std::nullopt;
 		}
-		commands.Forward.Payload = SetEntityVisibilityCommand{selection.entity, visible};
-		commands.Inverse.Payload = SetEntityVisibilityCommand{selection.entity, entry->Visible};
+		commands.Forward.Payload = SetEntityVisibilityCommand{selection.entity, bVisible};
+		commands.Inverse.Payload = SetEntityVisibilityCommand{selection.entity, entry->bVisible};
 	}
 	else
 	{
@@ -53,7 +53,7 @@ std::optional<EditorCommandPair> SceneObjectCommandFactory::SetActiveCamera(cons
 	EntityId previous = EntityId::Invalid();
 	for (const WorldCameraReadData& entry : model.GetCameras())
 	{
-		if (entry.Active)
+		if (entry.bActive)
 		{
 			previous = entry.Entity;
 		}

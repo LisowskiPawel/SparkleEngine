@@ -40,7 +40,7 @@ namespace Logging
 		LoggerMap NamedLoggers;
 		std::vector<spdlog::sink_ptr> SharedSinks;
 		std::atomic<int> Level{static_cast<int>(spdlog::level::info)};
-		std::atomic<bool> Initialized{false};
+		std::atomic<bool> bInitialized{false};
 		std::optional<std::filesystem::path> ActiveLogFilePath;
 	};
 
@@ -72,7 +72,7 @@ namespace Logging
 	static void EnsureInitializedLocked()
 	{
 		LoggerRegistry& registry = GetLoggerRegistry();
-		if (registry.Initialized.load(std::memory_order_acquire))
+		if (registry.bInitialized.load(std::memory_order_acquire))
 		{
 			return;
 		}
@@ -82,7 +82,7 @@ namespace Logging
 		auto coreLogger = CreateLogger(kCoreLoggerName);
 		registry.NamedLoggers.emplace(std::string(kCoreLoggerName), coreLogger);
 		spdlog::set_default_logger(coreLogger);
-		registry.Initialized.store(true, std::memory_order_release);
+		registry.bInitialized.store(true, std::memory_order_release);
 	}
 
 	void Initialize() noexcept
@@ -100,7 +100,7 @@ namespace Logging
 
 	bool IsInitialized() noexcept
 	{
-		return GetLoggerRegistry().Initialized.load(std::memory_order_acquire);
+		return GetLoggerRegistry().bInitialized.load(std::memory_order_acquire);
 	}
 
 	std::optional<std::filesystem::path> GetActiveLogFilePath() noexcept
@@ -148,7 +148,7 @@ namespace Logging
 		std::lock_guard<std::mutex> lock(registry.Mutex);
 		auto& namedLoggers = registry.NamedLoggers;
 		const auto [it, inserted] = namedLoggers.emplace(std::string(name), logger);
-		if (!inserted)
+		if (!bInserted)
 		{
 			return it->second;
 		}

@@ -88,14 +88,14 @@ private:
 	{
 		ERhiDescriptorAllocatorType Type = ERhiDescriptorAllocatorType::ShaderResource;
 		std::shared_ptr<std::vector<DescriptorEntry>> Entries;
-		bool Allocated = false;
+		bool bAllocated = false;
 		std::uint16_t Generation = 0;
 	};
 
 	struct DescriptorTableReadRecord final
 	{
 		std::shared_ptr<const std::vector<DescriptorEntry>> Entries;
-		bool Allocated = false;
+		bool bAllocated = false;
 		std::uint16_t Generation = 0;
 	};
 

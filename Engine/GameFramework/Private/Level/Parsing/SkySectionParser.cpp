@@ -20,7 +20,7 @@ namespace LevelParsing
 		SceneSkyDesc& sky = *levelDesc.sky;
 		if (parsedLine.key == "Enabled")
 		{
-			sky.enabled = ParseBool(parsedLine.value, "sky enabled value");
+			sky.bEnabled = ParseBool(parsedLine.value, "sky enabled value");
 		}
 		else if (parsedLine.key == "Color")
 		{
@@ -51,7 +51,7 @@ namespace LevelParsing
 		const SceneSkyDesc& sky = *levelDesc.sky;
 		output << std::setprecision(9);
 		output << "[Sky]\n";
-		output << "Enabled = " << (sky.enabled ? "true" : "false") << "\n";
+		output << "Enabled = " << (sky.bEnabled ? "true" : "false") << "\n";
 		output << "Color = " << sky.color.x << ", " << sky.color.y << ", " << sky.color.z << "\n";
 		output << "Brightness = " << sky.brightness << "\n";
 		output << "Texture = " << sky.skyTexture.texturePath << "\n\n";

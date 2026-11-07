@@ -125,7 +125,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 		mapped.GameProfile = request.GameProfile.toStdString();
 		mapped.SelectedScopes = ParseCookScopes(request.CookScopes);
 		mapped.ShaderBackend = request.ShaderBackend.toStdString();
-		mapped.ShaderEnableDebugInfo = request.ShaderSymbols;
+		mapped.bShaderEnableDebugInfo = request.bShaderSymbols;
 		return mapped;
 	}
 
@@ -155,7 +155,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 				mapped.PreservedPaths.push_back(path.toStdString());
 			}
 		}
-		mapped.DestructiveActionConfirmed = request.ConfirmClean;
+		mapped.bDestructiveActionConfirmed = request.bConfirmClean;
 		return mapped;
 	}
 }

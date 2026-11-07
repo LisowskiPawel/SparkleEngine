@@ -25,9 +25,9 @@ std::uint64_t HashShaderCompileRequest(const ShaderCompileRequest& request)
 	if (IsSpirVTarget(request.Target))
 	{
 		appendString("StorageImageFormatUnknown");
-		canonical += SpirVUseUnknownStorageImageFormat ? '1' : '0';
+		canonical += bSpirVUseUnknownStorageImageFormat ? '1' : '0';
 		appendString("DirectXBufferLayout");
-		canonical += SpirVUseDirectXBufferLayout ? '1' : '0';
+		canonical += bSpirVUseDirectXBufferLayout ? '1' : '0';
 		appendString("DescriptorBindings=Canonical");
 	}
 	canonical += std::to_string(static_cast<std::uint32_t>(request.Stage));
@@ -38,10 +38,10 @@ std::uint64_t HashShaderCompileRequest(const ShaderCompileRequest& request)
 	canonical += '|';
 	canonical += std::to_string(static_cast<std::uint32_t>(request.RequiredFeatures));
 	canonical += '|';
-	canonical += request.EnableDebugInfo ? '1' : '0';
-	canonical += request.EnableOptimizations ? '1' : '0';
-	canonical += request.TreatWarningsAsErrors ? '1' : '0';
-	canonical += request.StripDebugInfo ? '1' : '0';
+	canonical += request.bEnableDebugInfo ? '1' : '0';
+	canonical += request.bEnableOptimizations ? '1' : '0';
+	canonical += request.bTreatWarningsAsErrors ? '1' : '0';
+	canonical += request.bStripDebugInfo ? '1' : '0';
 	for (const std::string& define : request.Defines)
 	{
 		appendString(define);

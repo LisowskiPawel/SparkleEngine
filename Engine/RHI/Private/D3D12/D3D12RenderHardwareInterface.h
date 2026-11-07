@@ -82,7 +82,7 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE ResolveDescriptorTableCpuHandle(RhiDescriptorTableHandle tableHandle, std::uint32_t descriptorIndex = 0) const noexcept;
 	D3D12_GPU_DESCRIPTOR_HANDLE ResolveDescriptorTableGpuHandle(RhiDescriptorTableHandle tableHandle, std::uint32_t descriptorIndex = 0) const noexcept;
-	D3D12RecordingResourceUseToken BeginResourceTracking(RhiResourceHandle resource, bool coordinatorRecording) noexcept;
+	D3D12RecordingResourceUseToken BeginResourceTracking(RhiResourceHandle resource, bool bCoordinatorRecording) noexcept;
 	void EndResourceTracking(D3D12RecordingResourceUseToken use, RhiSubmissionToken submissionToken) noexcept;
 	bool BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept;
 

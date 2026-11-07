@@ -10,7 +10,7 @@ namespace ShaderArtifactWriter
 {
 	ShaderCookOutput Write(
 	    const ShaderCookPipelinePlan& plan,
-	    bool replaceCompleteCatalog,
+	    bool bReplaceCompleteCatalog,
 	    const std::filesystem::path& mapPath,
 	    const std::filesystem::path& libraryPath,
 	    const std::filesystem::path& stagedMapPath,

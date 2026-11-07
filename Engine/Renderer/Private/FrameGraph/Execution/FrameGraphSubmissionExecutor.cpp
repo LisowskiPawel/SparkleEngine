@@ -30,7 +30,7 @@ RenderCommandList& FrameGraphSubmissionExecutor::Execute(RenderCommandList& init
 		ExecuteBatch(batch);
 	}
 
-	if (m_initialGraphicsListAvailable)
+	if (m_bInitialGraphicsListAvailable)
 	{
 		return initialGraphicsCommandList;
 	}
@@ -46,7 +46,7 @@ void FrameGraphSubmissionExecutor::SubmitInitializationIfRequired()
 	}
 
 	m_initializationToken = m_submissionService.SubmitCurrentGraphicsCommandList();
-	m_initialGraphicsListAvailable = false;
+	m_bInitialGraphicsListAvailable = false;
 }
 
 FrameGraphSubmissionExecutor::BatchWaitTokens FrameGraphSubmissionExecutor::ResolveBatchWaits(const FrameGraphSubmissionBatch& batch) const noexcept
@@ -73,12 +73,12 @@ FrameGraphSubmissionExecutor::BatchWaitTokens FrameGraphSubmissionExecutor::Reso
 void FrameGraphSubmissionExecutor::ExecuteBatch(const FrameGraphSubmissionBatch& batch)
 {
 	const BatchWaitTokens waits = ResolveBatchWaits(batch);
-	const bool usesCurrentGraphics = batch.queue == ERhiQueueType::Graphics && m_initialGraphicsListAvailable;
+	const bool bUsesCurrentGraphics = batch.queue == ERhiQueueType::Graphics && m_bInitialGraphicsListAvailable;
 	RhiCommandRecordingLease initializationLease;
-	if (usesCurrentGraphics)
+	if (bUsesCurrentGraphics)
 	{
 		initializationLease = m_submissionService.TakeCurrentGraphicsCommandRecordingLease();
-		m_initialGraphicsListAvailable = false;
+		m_bInitialGraphicsListAvailable = false;
 	}
 
 	m_batchTokens[batch.index] = RecordAndSubmitBatch(batch, waits, std::move(initializationLease));

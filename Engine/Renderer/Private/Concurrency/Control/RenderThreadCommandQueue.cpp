@@ -16,8 +16,8 @@ bool RenderThreadCommandQueue::WaitPush(RenderThreadCommand command)
 {
 	{
 		std::unique_lock lock(m_mutex);
-		m_notFull.wait(lock, [this] { return m_closed || m_commands.size() < m_capacity; });
-		if (m_closed)
+		m_notFull.wait(lock, [this] { return m_bClosed || m_commands.size() < m_capacity; });
+		if (m_bClosed)
 		{
 			return false;
 		}
@@ -31,7 +31,7 @@ RenderThreadCommandAdmission RenderThreadCommandQueue::TryPush(RenderThreadComma
 {
 	{
 		std::lock_guard lock(m_mutex);
-		if (m_closed)
+		if (m_bClosed)
 		{
 			return RenderThreadCommandAdmission::Closed;
 		}
@@ -48,8 +48,8 @@ RenderThreadCommandAdmission RenderThreadCommandQueue::TryPush(RenderThreadComma
 std::optional<RenderThreadCommand> RenderThreadCommandQueue::WaitPop()
 {
 	std::unique_lock lock(m_mutex);
-	m_notEmpty.wait(lock, [this] { return m_closed || !m_commands.empty(); });
-	if (m_closed || m_commands.empty())
+	m_notEmpty.wait(lock, [this] { return m_bClosed || !m_commands.empty(); });
+	if (m_bClosed || m_commands.empty())
 	{
 		return std::nullopt;
 	}
@@ -80,7 +80,7 @@ void RenderThreadCommandQueue::Close() noexcept
 {
 	{
 		std::lock_guard lock(m_mutex);
-		m_closed = true;
+		m_bClosed = true;
 	}
 	m_notEmpty.notify_all();
 	m_notFull.notify_all();

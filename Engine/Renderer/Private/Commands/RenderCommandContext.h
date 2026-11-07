@@ -18,7 +18,7 @@ public:
 
 	void EnableDrawDispatchDiagnostics() noexcept;
 
-	bool IsDrawDispatchDiagnosticsEnabled() const noexcept { return m_drawDispatchDiagnosticsEnabled; }
+	bool IsDrawDispatchDiagnosticsEnabled() const noexcept { return m_bDrawDispatchDiagnosticsEnabled; }
 
 	void SetPipeline(const RenderPipeline& pipeline) noexcept;
 	void SetGraphicsBindingLayout(const RenderBindingLayout& bindingLayout) noexcept;
@@ -110,7 +110,7 @@ private:
 	void EmitDispatchMarker(std::uint32_t groupCountX, std::uint32_t groupCountY, std::uint32_t groupCountZ) noexcept;
 
 	RenderCommandList* m_commandList = nullptr;
-	bool m_drawDispatchDiagnosticsEnabled = false;
+	bool m_bDrawDispatchDiagnosticsEnabled = false;
 	std::uint32_t m_drawCount = 0;
 	std::uint32_t m_dispatchCount = 0;
 	std::uint16_t m_gpuDiagnosticScopeDepth = 0;

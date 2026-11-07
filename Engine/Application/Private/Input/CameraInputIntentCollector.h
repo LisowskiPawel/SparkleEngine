@@ -36,5 +36,5 @@ private:
 	float m_lookDeltaX = 0.0f;
 	float m_lookDeltaY = 0.0f;
 	float m_speedStepCount = 0.0f;
-	bool m_mouseLookActive = false;
+	bool m_bMouseLookActive = false;
 };

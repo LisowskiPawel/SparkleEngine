@@ -61,13 +61,13 @@ public:
 
 	float MeasureWidth() const noexcept override { return 2.0f * (ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y); }
 
-	void Draw(EditorIconService& icons, bool disableInteraction) noexcept override;
+	void Draw(EditorIconService& icons, bool bDisableInteraction) noexcept override;
 
 private:
 	std::unique_ptr<EditorExternalCaptureCommands> m_commands;
 };
 
-void ExternalCaptureOverlay::Draw(EditorIconService& icons, bool disableInteraction) noexcept
+void ExternalCaptureOverlay::Draw(EditorIconService& icons, bool bDisableInteraction) noexcept
 {
 	const auto snapshot = m_commands->Observe();
 	const auto presentation = GetCaptureButtonPresentation(snapshot.Provider);
@@ -76,7 +76,7 @@ void ExternalCaptureOverlay::Draw(EditorIconService& icons, bool disableInteract
 		return;
 	}
 
-	ImGui::BeginDisabled(disableInteraction || !CanRequestExternalCapture(snapshot.State));
+	ImGui::BeginDisabled(bDisableInteraction || !CanRequestExternalCapture(snapshot.State));
 	if (icons.DrawButton(*presentation.Icon, presentation.Label, ImGui::GetFontSize() * 2.0f))
 	{
 		(void) m_commands->Request();

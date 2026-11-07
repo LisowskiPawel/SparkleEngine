@@ -34,7 +34,7 @@ namespace EditorWidgets
 	float MeasureMenuSection(const char* label);
 	// Pair successful calls with native EndPopup/EndMenu; MenuStyleScope owns style restoration.
 	bool BeginMenuPopup(const char* id, ImVec2 anchor, float width);
-	bool BeginMenu(const char* label, EditorIcons::EditorIcon icon, float childWidth, bool enabled = true);
+	bool BeginMenu(const char* label, EditorIcons::EditorIcon icon, float childWidth, bool bEnabled = true);
 	bool DrawMenuItem(
 	    const char* label,
 	    EditorIcons::EditorIcon icon = EditorIcons::EditorIcon::None,

@@ -66,26 +66,26 @@ namespace SparkleLauncher
 
 	bool LauncherSceneCatalog::CompleteOperation(const QString& runId, const QString& operationId, const QString& title, const LauncherOperationResult& result)
 	{
-		const bool catalogChanged = operationId == QStringLiteral("levels.sync") || m_pendingLevelSelectionUpdates.contains(runId);
+		const bool bCatalogChanged = operationId == QStringLiteral("levels.sync") || m_pendingLevelSelectionUpdates.contains(runId);
 		if (m_pendingLevelSelectionUpdates.contains(runId))
 		{
 			const PendingLevelSelectionUpdate update = m_pendingLevelSelectionUpdates.take(runId);
-			if (result.Succeeded)
+			if (result.bSucceeded)
 			{
-				SetLevelsSelected(update.ContentRoot, update.LevelIds, update.Selected, title);
+				SetLevelsSelected(update.ContentRoot, update.LevelIds, update.bSelected, title);
 			}
 		}
-		const bool launchSettled = runId == m_startingLevelRunId;
-		if (launchSettled)
+		const bool bLaunchSettled = runId == m_startingLevelRunId;
+		if (bLaunchSettled)
 		{
 			m_startingLevelRunId.clear();
 			m_startingLevelId.clear();
 		}
-		if (catalogChanged || launchSettled)
+		if (bCatalogChanged || bLaunchSettled)
 		{
 			RefreshLevelActionButtons();
 		}
-		return catalogChanged;
+		return bCatalogChanged;
 	}
 
 	static QPixmap CreateMapPlaceholder(const LauncherLevelUiEntry& level)
@@ -163,7 +163,7 @@ namespace SparkleLauncher
 		}
 
 		const LauncherLevelUiModel model = LauncherLevelUiModel::Build(*content);
-		if (!model.Loaded)
+		if (!model.bLoaded)
 		{
 			AddNoOptionsMessage(*catalogLayout, model.LoadError.isEmpty() ? QStringLiteral("The repository has no readable Levels.catalog.") : model.LoadError);
 			return;
@@ -295,41 +295,41 @@ namespace SparkleLauncher
 	void LauncherSceneCatalog::ApplyLevelActionButtonState(QLabel& statusLabel, QPushButton& button, const LauncherLevelUiEntry& level)
 	{
 		ApplyInlineStatusLabel(statusLabel, level.Status, level.State);
-		const bool preparing = !m_startingLevelRunId.isEmpty() && m_startingLevelId == level.Id;
+		const bool bPreparing = !m_startingLevelRunId.isEmpty() && m_startingLevelId == level.Id;
 		button.setObjectName("MapCardActionButton");
 		button.setFixedSize(LauncherUi::Row::StatusActionWidth, LauncherUi::Row::StatusActionHeight);
-		const bool bSyncAvailableSourceReady = !level.Ready && !level.SourceReady;
-		const bool bSyncAvailableCanSync = bSyncAvailableSourceReady && (level.CanSync);
-		const bool syncAvailable = bSyncAvailableCanSync && (level.GameSupported);
-		const bool explainBlocker = !level.GameSupported || !level.CanSelect;
-		button.setProperty("ActionIntent", preparing ? QStringLiteral("none") : syncAvailable ? QStringLiteral("sync") : explainBlocker ? QStringLiteral("details") : QStringLiteral("run"));
-		const bool editorMode = m_settings.RunMode() != QStringLiteral("game");
-		const QString actionName = editorMode ? QStringLiteral("Open") : QStringLiteral("Run");
-		button.setText(preparing ? QStringLiteral("Opening...") : syncAvailable ? QStringLiteral("Sync") : explainBlocker ? QStringLiteral("Details") : actionName);
+		const bool bSyncAvailableSourceReady = !level.bReady && !level.bSourceReady;
+		const bool bSyncAvailableCanSync = bSyncAvailableSourceReady && (level.bCanSync);
+		const bool bSyncAvailable = bSyncAvailableCanSync && (level.bGameSupported);
+		const bool bExplainBlocker = !level.bGameSupported || !level.bCanSelect;
+		button.setProperty("ActionIntent", bPreparing ? QStringLiteral("none") : bSyncAvailable ? QStringLiteral("sync") : bExplainBlocker ? QStringLiteral("details") : QStringLiteral("run"));
+		const bool bEditorMode = m_settings.RunMode() != QStringLiteral("game");
+		const QString actionName = bEditorMode ? QStringLiteral("Open") : QStringLiteral("Run");
+		button.setText(bPreparing ? QStringLiteral("Opening...") : bSyncAvailable ? QStringLiteral("Sync") : bExplainBlocker ? QStringLiteral("Details") : actionName);
 
 		button.setAccessibleName(
-		    preparing            ? QStringLiteral("Opening ") + level.DisplayName
-		        : syncAvailable  ? QStringLiteral("Sync ") + level.DisplayName
-		        : explainBlocker ? QStringLiteral("Why ") + level.DisplayName + QStringLiteral(" is unavailable")
+		    bPreparing            ? QStringLiteral("Opening ") + level.DisplayName
+		        : bSyncAvailable  ? QStringLiteral("Sync ") + level.DisplayName
+		        : bExplainBlocker ? QStringLiteral("Why ") + level.DisplayName + QStringLiteral(" is unavailable")
 		                         : actionName + QStringLiteral(" ") + level.DisplayName);
 
 		button.setEnabled(m_startingLevelRunId.isEmpty());
-		if (preparing)
+		if (bPreparing)
 		{
 			button.setToolTip(QStringLiteral("Waiting for this level to start."));
 		}
-		else if (syncAvailable)
+		else if (bSyncAvailable)
 		{
 			button.setToolTip(QStringLiteral("Download and verify this level's source assets."));
 		}
-		else if (explainBlocker)
+		else if (bExplainBlocker)
 		{
 			button.setToolTip(level.UnsupportedReason);
 		}
 		else
 		{
 			button.setToolTip(
-			    editorMode ? QStringLiteral("Open this level in the editor. Use Build and Cook first if required output files are missing.")
+			    bEditorMode ? QStringLiteral("Open this level in the editor. Use Build and Cook first if required output files are missing.")
 			               : QStringLiteral("Run this level in the standalone game. Use Build and Cook first if required output files are missing."));
 		}
 	}
@@ -343,7 +343,7 @@ namespace SparkleLauncher
 		}
 
 		const LauncherLevelUiModel model = LauncherLevelUiModel::Build(*content);
-		if (!model.Loaded)
+		if (!model.bLoaded)
 		{
 			return;
 		}
@@ -359,10 +359,10 @@ namespace SparkleLauncher
 		}
 	}
 
-	bool LauncherSceneCatalog::SetLevelsSelected(const std::filesystem::path& contentRoot, const std::vector<std::string>& levelIds, bool selected, const QString& actionName)
+	bool LauncherSceneCatalog::SetLevelsSelected(const std::filesystem::path& contentRoot, const std::vector<std::string>& levelIds, bool bSelected, const QString& actionName)
 	{
 		std::string errorMessage;
-		if (ProjectLevelCatalogFile::SetLevelsSelected(contentRoot, levelIds, selected, errorMessage))
+		if (ProjectLevelCatalogFile::SetLevelsSelected(contentRoot, levelIds, bSelected, errorMessage))
 		{
 			return true;
 		}
@@ -398,7 +398,7 @@ namespace SparkleLauncher
 			{
 				continue;
 			}
-			if (level.CanSelect)
+			if (level.bCanSelect)
 			{
 				levelIdsToSelect.push_back(level.Id.toStdString());
 				levelIdsToSync.push_back(level.Id);
@@ -456,7 +456,7 @@ namespace SparkleLauncher
 
 		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, QStringLiteral("workspace.clean"));
 		request.CleanTargets = targets;
-		request.ConfirmClean = false;
+		request.bConfirmClean = false;
 		if (!ConfirmLauncherRunRequest(m_dialogParent, request))
 		{
 			return;
@@ -477,19 +477,19 @@ namespace SparkleLauncher
 		return LauncherLevelUiModel::Build(*content);
 	}
 
-	void LauncherSceneCatalog::UpdateActionAvailability(QPushButton& cleanButton, QPushButton& runButton, bool hasActionCleanTargets)
+	void LauncherSceneCatalog::UpdateActionAvailability(QPushButton& cleanButton, QPushButton& runButton, bool bHasActionCleanTargets)
 	{
-		bool canSyncLevel = false;
-		bool hasSelectedLevels = false;
-		bool hasExtractedLevelContent = false;
+		bool bCanSyncLevel = false;
+		bool bHasSelectedLevels = false;
+		bool bHasExtractedLevelContent = false;
 		const LauncherLevelUiModel levelModel = BuildLevelUiModel();
 		for (const LauncherLevelUiEntry& level : levelModel.Levels)
 		{
-			const bool bSelectableLevel = level.Id != "Empty" && level.CanSelect;
-			canSyncLevel = canSyncLevel || bSelectableLevel;
-			if (level.Id != "Empty" && level.Selected)
+			const bool bSelectableLevel = level.Id != "Empty" && level.bCanSelect;
+			bCanSyncLevel = bCanSyncLevel || bSelectableLevel;
+			if (level.Id != "Empty" && level.bSelected)
 			{
-				hasSelectedLevels = true;
+				bHasSelectedLevels = true;
 				break;
 			}
 		}
@@ -499,22 +499,22 @@ namespace SparkleLauncher
 		{
 			try
 			{
-				hasExtractedLevelContent = !BuildLevelCleanTargets(*content).empty();
+				bHasExtractedLevelContent = !BuildLevelCleanTargets(*content).empty();
 			}
 			catch (const Diagnostics::Error&)
 			{
 				// The catalog page owns the detailed load diagnostic. Keep the footer safely disabled here.
 			}
 		}
-		const bool bCanCleanLevelContent = hasSelectedLevels || hasExtractedLevelContent;
-		const bool canClean = bCanCleanLevelContent || (hasActionCleanTargets);
+		const bool bCanCleanLevelContent = bHasSelectedLevels || bHasExtractedLevelContent;
+		const bool bCanClean = bCanCleanLevelContent || (bHasActionCleanTargets);
 
 		ApplyActionAvailability(
 		    cleanButton,
-		    canClean,
-		    canClean ? "Disable all selected levels and clean extracted external level content. Cached archives are preserved." : "No selected levels are available to clean.");
+		    bCanClean,
+		    bCanClean ? "Disable all selected levels and clean extracted external level content. Cached archives are preserved." : "No selected levels are available to clean.");
 
-		const QString reason = canSyncLevel ? QStringLiteral("Sync all available levels. Existing runs keep going.") : QStringLiteral("No catalog levels are available to sync.");
-		ApplyActionAvailability(runButton, canSyncLevel, reason);
+		const QString reason = bCanSyncLevel ? QStringLiteral("Sync all available levels. Existing runs keep going.") : QStringLiteral("No catalog levels are available to sync.");
+		ApplyActionAvailability(runButton, bCanSyncLevel, reason);
 	}
 }

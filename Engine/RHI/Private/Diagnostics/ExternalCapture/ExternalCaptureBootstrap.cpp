@@ -14,11 +14,11 @@ static bool ValidateInjectedCaptureActivity(ExternalCaptureProvider provider, st
 		return false;
 	}
 
-	const bool pixLoaded = ExternalToolActivity::IsCaptureProviderLoaded(ExternalCaptureProvider::Pix);
-	const bool renderDocLoaded = ExternalToolActivity::IsCaptureProviderLoaded(ExternalCaptureProvider::RenderDoc);
-	const bool nsightLoaded = ExternalToolActivity::IsCaptureProviderLoaded(ExternalCaptureProvider::NsightGraphics);
-	if ((pixLoaded && provider != ExternalCaptureProvider::Pix) || (renderDocLoaded && provider != ExternalCaptureProvider::RenderDoc)
-	    || (nsightLoaded && provider != ExternalCaptureProvider::NsightGraphics))
+	const bool bPixLoaded = ExternalToolActivity::IsCaptureProviderLoaded(ExternalCaptureProvider::Pix);
+	const bool bRenderDocLoaded = ExternalToolActivity::IsCaptureProviderLoaded(ExternalCaptureProvider::RenderDoc);
+	const bool bNsightLoaded = ExternalToolActivity::IsCaptureProviderLoaded(ExternalCaptureProvider::NsightGraphics);
+	if ((bPixLoaded && provider != ExternalCaptureProvider::Pix) || (bRenderDocLoaded && provider != ExternalCaptureProvider::RenderDoc)
+	    || (bNsightLoaded && provider != ExternalCaptureProvider::NsightGraphics))
 	{
 		error = "Another capture provider is injected. Restart with one provider; hook combinations are unverified.";
 		return false;

@@ -21,7 +21,7 @@ using RhiDeviceCreatedCallback = bool (*)(NativeGraphicsDeviceHandle nativeDevic
 // reference to the caller. ResolveNativeInterface does the same.
 using RhiInterfaceUpgradeCallback = bool (*)(ERhiInterposerInterfaceKind kind, void** nativeInterface, void* userData) noexcept;
 using RhiInterfaceResolveCallback = bool (*)(ERhiInterposerInterfaceKind kind, void* externalInterface, void** nativeInterface, void* userData) noexcept;
-using RhiPresentationReadyCallback = void (*)(bool ready, void* userData) noexcept;
+using RhiPresentationReadyCallback = void (*)(bool bReady, void* userData) noexcept;
 using RhiFrameMarkerCallback = void (*)(ERhiFrameLatencyMarker marker, std::uint64_t frameId, void* userData) noexcept;
 using RhiRuntimeShutdownCallback = void (*)(void* userData) noexcept;
 

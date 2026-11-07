@@ -59,7 +59,7 @@ std::vector<ShaderCookDesc> SelectShadersForCook(const ShaderCookSettings& setti
 		        .features = contract.features,
 		        .rayTracing = contract.rayTracing,
 		        .parameterLayout = contract.parameterLayout,
-		        .parameterStruct = contract.hasParameterStruct ? std::optional(contract.parameterStruct) : std::nullopt});
+		        .parameterStruct = contract.bHasParameterStruct ? std::optional(contract.parameterStruct) : std::nullopt});
 	}
 	if (!settings.shaderId.empty() && shaders.empty())
 	{

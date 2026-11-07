@@ -18,8 +18,8 @@ struct ProjectLevelCatalogEntry final
 	std::string assetPackId;
 	std::string family;
 	std::string variantKind;
-	bool releaseSupported = false;
-	bool selected = false;
+	bool bReleaseSupported = false;
+	bool bSelected = false;
 };
 
 struct ProjectAssetPack final
@@ -41,9 +41,9 @@ struct ProjectAssetPack final
 	std::string gameBlocker;
 	std::string downloadBlocker;
 	std::uintmax_t archiveBytes = 0;
-	bool external = false;
-	bool downloadSupported = false;
-	bool gameSupported = false;
+	bool bExternal = false;
+	bool bDownloadSupported = false;
+	bool bGameSupported = false;
 };
 
 struct ProjectLevelCatalog final
@@ -60,6 +60,6 @@ class ProjectLevelCatalogFile final
 {
 public:
 	static ProjectLevelCatalog Load(const std::filesystem::path& projectRoot);
-	static bool SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool selected, std::string& outErrorMessage);
-	static bool SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool selected, std::string& outErrorMessage);
+	static bool SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool bSelected, std::string& outErrorMessage);
+	static bool SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool bSelected, std::string& outErrorMessage);
 };

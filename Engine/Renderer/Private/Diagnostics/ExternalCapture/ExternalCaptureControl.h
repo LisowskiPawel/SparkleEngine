@@ -12,4 +12,4 @@ struct RenderExternalCaptureCommand final
 
 void ArmExternalCapture(RhiExternalCapture& capture, const RenderExternalCaptureCommand& command, const ViewportRenderProducts& products) noexcept;
 
-void ValidateExternalCaptureContext(RhiExternalCapture& capture, std::uint64_t currentGeneration, bool sceneReset) noexcept;
+void ValidateExternalCaptureContext(RhiExternalCapture& capture, std::uint64_t currentGeneration, bool bSceneReset) noexcept;

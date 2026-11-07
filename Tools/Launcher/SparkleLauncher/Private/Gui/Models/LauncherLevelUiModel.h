@@ -18,17 +18,17 @@ namespace SparkleLauncher
 		QString State;
 		QString SourcePageUrl;
 		QString UnsupportedReason;
-		bool Selected = false;
-		bool SourceReady = false;
-		bool GameSupported = true;
-		bool Ready = false;
-		bool CanSelect = true;
-		bool CanSync = false;
+		bool bSelected = false;
+		bool bSourceReady = false;
+		bool bGameSupported = true;
+		bool bReady = false;
+		bool bCanSelect = true;
+		bool bCanSync = false;
 	};
 
 	struct LauncherLevelUiModel final
 	{
-		bool Loaded = false;
+		bool bLoaded = false;
 		QString LoadError;
 		QVector<LauncherLevelUiEntry> Levels;
 

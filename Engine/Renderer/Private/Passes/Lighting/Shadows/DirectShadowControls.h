@@ -5,4 +5,4 @@
 extern ConsoleVariable<bool> CVarDirectShadows;
 
 bool IsDirectShadowsActive() noexcept;
-void RequireDirectShadowSignal(bool available) noexcept;
+void RequireDirectShadowSignal(bool bAvailable) noexcept;

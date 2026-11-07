@@ -20,37 +20,37 @@ namespace ShadowRays
 	bool PrepareDirectLightShadow(float3 positionWorld,
 	                              float3 normalWorld,
 	                              LightSampling::DirectLightSample lightSample,
-	                              bool castsShadow,
+	                              bool bCastsShadow,
 	                              out RayTracedShadowRequest request,
 	                              out ShadowVisibilitySample immediateSignal)
 	{
 		request = (RayTracedShadowRequest)0;
 		immediateSignal = BuildUnshadowedSignal(0.0f);
-		if (!lightSample.Valid)
+		if (!lightSample.bValid)
 		{
 			return false;
 		}
 
-		const bool bSupportedIsDirectional = lightSample.IsDirectional;
+		const bool bSupportedIsDirectional = lightSample.bIsDirectional;
 		const bool bSupportedShadowsEnabled = bSupportedIsDirectional && (RayTracedDirectionalShadowsEnabled != 0u);
 		const bool bSupportedShadowsEnabled2 = !bSupportedIsDirectional && (RayTracedLocalLightShadowsEnabled != 0u);
-		const bool supported = bSupportedShadowsEnabled || bSupportedShadowsEnabled2;
-		const float maxDistance = lightSample.IsDirectional ? RayTracedShadowMaxDistance : lightSample.VisibilityDistance;
+		const bool bSupported = bSupportedShadowsEnabled || bSupportedShadowsEnabled2;
+		const float maxDistance = lightSample.bIsDirectional ? RayTracedShadowMaxDistance : lightSample.VisibilityDistance;
 		immediateSignal = BuildUnshadowedSignal(maxDistance);
-		if (!castsShadow || !supported || (!lightSample.IsDirectional && lightSample.VisibilityDistance <= MinimumShadowTMin))
+		if (!bCastsShadow || !bSupported || (!lightSample.bIsDirectional && lightSample.VisibilityDistance <= MinimumShadowTMin))
 		{
 			return false;
 		}
 
 		request.OriginWorld = positionWorld + normalize(normalWorld) * RayTracedShadowNormalBias;
 		request.DirectionWorld = lightSample.DirectionWorld;
-		request.MaxDistance = lightSample.IsDirectional ? RayTracedShadowMaxDistance : max(lightSample.VisibilityDistance - MinimumShadowTMin, MinimumShadowTMin);
+		request.MaxDistance = lightSample.bIsDirectional ? RayTracedShadowMaxDistance : max(lightSample.VisibilityDistance - MinimumShadowTMin, MinimumShadowTMin);
 		return true;
 	}
 
-	ShadowVisibilitySample ResolveTrace(bool occluded, float hitDistance, float maxDistance)
+	ShadowVisibilitySample ResolveTrace(bool bOccluded, float hitDistance, float maxDistance)
 	{
-		if (occluded)
+		if (bOccluded)
 		{
 			return BuildOccludedSignal(hitDistance, maxDistance);
 		}

@@ -24,10 +24,10 @@ public:
 
 	std::string BuildPendingRestartMessage() const;
 
-	void SetVSync(bool enabled);
+	void SetVSync(bool bEnabled);
 	void ResetDefaults();
 	void SetBackBufferFormat(PixelFormat format);
-	void SetPreferHighPerformanceAdapter(bool enabled);
+	void SetPreferHighPerformanceAdapter(bool bEnabled);
 	void SetToneMapper(EngineToneMapper toneMapper);
 	void SetExposureMode(EngineExposureMode mode);
 	void SetExposureMeteringMethod(EngineExposureMeteringMethod method);
@@ -43,12 +43,12 @@ public:
 	void SetUpscalerQualityMode(EUpscalerQualityMode mode);
 	void SetRayReconstructionMode(EngineRayReconstructionMode mode);
 	void SetGBufferAlgorithm(GBufferAlgorithm algorithm);
-	void SetMeshAutoBatching(bool enabled);
-	void SetRefitTlas(bool enabled);
-	void SetPtlasActive(bool active);
+	void SetMeshAutoBatching(bool bEnabled);
+	void SetRefitTlas(bool bEnabled);
+	void SetPtlasActive(bool bActive);
 	void SetPtlasPartitionsPerAxis(std::uint32_t partitionsPerAxis);
 	void SetPtlasPartitionUpdateMode(RayTracingPtlasPartitionUpdateMode mode);
-	void SetPtlasMarkAllDynamicInPartition(bool enabled);
+	void SetPtlasMarkAllDynamicInPartition(bool bEnabled);
 	void SetPtlasModeChangeDistance(float distance);
 #if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING
 	void SetStartupCaptureProvider(ExternalCaptureProvider provider);
@@ -76,7 +76,7 @@ private:
 	EngineRenderingSettingsState m_state{};
 	std::string m_lastError;
 	PixelFormat m_sessionBackBufferFormat = RhiPresentationDefaults::DefaultBackBufferFormat;
-	bool m_sessionPreferHighPerformanceAdapter = true;
+	bool m_bSessionPreferHighPerformanceAdapter = true;
 #if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING
 	ExternalCaptureProvider m_sessionStartupCaptureProvider = ExternalCaptureProvider::None;
 #endif

@@ -21,11 +21,11 @@ namespace SparkleLauncher
 		for (unsigned visited = 0; !error && directory != end && visited < MaxCaptureInstallationEntries; directory.increment(error), ++visited)
 		{
 			const auto path = directory->path();
-			const bool toolDirectoryMatches = path.filename().string().starts_with(prefix);
-			const bool captureLibraryInstalled = toolDirectoryMatches && IsInstalledToolFile(path / library);
-			const bool captureViewerInstalled = captureLibraryInstalled && IsInstalledToolFile(path / viewer);
+			const bool bToolDirectoryMatches = path.filename().string().starts_with(prefix);
+			const bool bCaptureLibraryInstalled = bToolDirectoryMatches && IsInstalledToolFile(path / library);
+			const bool bCaptureViewerInstalled = bCaptureLibraryInstalled && IsInstalledToolFile(path / viewer);
 			
-			if (!captureViewerInstalled)
+			if (!bCaptureViewerInstalled)
 			{
 				return path;
 			}
@@ -81,7 +81,7 @@ namespace SparkleLauncher
 		{
 			return "This capture route is currently available on D3D12.";
 		}
-		if (provider == ExternalCaptureProvider::NsightGraphics && !GetHostGraphicsCapabilities().HasNvidiaAdapter)
+		if (provider == ExternalCaptureProvider::NsightGraphics && !GetHostGraphicsCapabilities().bHasNvidiaAdapter)
 		{
 			return "Nsight Graphics requires an NVIDIA GPU.";
 		}
@@ -101,13 +101,13 @@ namespace SparkleLauncher
 		}
 
 		const auto path = FindInstalledCaptureTool(provider);
-		const bool installed = !path.empty();
+		const bool bInstalled = !path.empty();
 		const auto unsupportedReason = GetUnsupportedCaptureReason(provider, graphicsApi, productProfile);
 		if (!unsupportedReason.empty())
 		{
-			return {installed, false, std::string(unsupportedReason)};
+			return {bInstalled, false, std::string(unsupportedReason)};
 		}
 
-		return {installed, true, installed ? path.string() : "Install " + std::string(ExternalCaptureProviderDisplayName(provider)) + "."};
+		return {bInstalled, true, bInstalled ? path.string() : "Install " + std::string(ExternalCaptureProviderDisplayName(provider)) + "."};
 	}
 }

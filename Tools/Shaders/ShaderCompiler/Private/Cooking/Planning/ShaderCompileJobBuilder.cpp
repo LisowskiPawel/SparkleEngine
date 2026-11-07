@@ -89,7 +89,7 @@ ShaderCompileJob ShaderCompileJobBuilder::Build(const ShaderCookSettings& settin
 IncludeClosureHash ShaderCompileJobBuilder::PreprocessSource(ShaderCompileRequest& request)
 {
 	const IncludeClosureHash before = HashShaderIncludeClosure(request);
-	request.SourceCode = PreprocessShaderSource(request.VirtualSourcePath, request, request.CaptureDebugArtifacts ? &request.SourceFiles : nullptr);
+	request.SourceCode = PreprocessShaderSource(request.VirtualSourcePath, request, request.bCaptureDebugArtifacts ? &request.SourceFiles : nullptr);
 	IncludeClosureHash closure = HashShaderIncludeClosure(request);
 	if (before.sourceHash != closure.sourceHash || before.includeClosureHash != closure.includeClosureHash || before.virtualDependencies != closure.virtualDependencies)
 	{
@@ -115,11 +115,11 @@ ShaderCompileRequest ShaderCompileJobBuilder::BuildRequest(const ShaderCookSetti
 	}
 
 	request.ParameterStruct = shader.parameterStruct;
-	request.CaptureDebugArtifacts = settings.enableDebugInfo || !settings.debugArtifactDirectory.empty();
-	request.EnableDebugInfo = request.CaptureDebugArtifacts;
-	request.EnableOptimizations = settings.enableOptimizations;
-	request.TreatWarningsAsErrors = settings.treatWarningsAsErrors;
-	request.StripDebugInfo = settings.stripDebugInfo;
+	request.bCaptureDebugArtifacts = settings.bEnableDebugInfo || !settings.debugArtifactDirectory.empty();
+	request.bEnableDebugInfo = request.bCaptureDebugArtifacts;
+	request.bEnableOptimizations = settings.bEnableOptimizations;
+	request.bTreatWarningsAsErrors = settings.bTreatWarningsAsErrors;
+	request.bStripDebugInfo = settings.bStripDebugInfo;
 	AppendDescriptorBindingRemaps(shader, request);
 	return request;
 }
@@ -131,9 +131,9 @@ void ShaderCompileJobBuilder::AppendDescriptorBindingRemaps(const ShaderCookDesc
 		for (std::size_t index = 0; index < m_descriptorBindings.size(); ++index)
 		{
 			const PassParameterDesc& binding = *m_descriptorBindings[index];
-			const bool duplicateBefore = index > 0 && m_descriptorBindings[index - 1]->Name == binding.Name;
-			const bool duplicateAfter = index + 1 < m_descriptorBindings.size() && m_descriptorBindings[index + 1]->Name == binding.Name;
-			if (!duplicateBefore && !duplicateAfter)
+			const bool bDuplicateBefore = index > 0 && m_descriptorBindings[index - 1]->Name == binding.Name;
+			const bool bDuplicateAfter = index + 1 < m_descriptorBindings.size() && m_descriptorBindings[index + 1]->Name == binding.Name;
+			if (!bDuplicateBefore && !bDuplicateAfter)
 			{
 				request.DescriptorBindingRemaps.push_back(ShaderDescriptorBindingRemap{.Name = binding.Name, .Set = 0, .Binding = static_cast<std::uint32_t>(index)});
 			}

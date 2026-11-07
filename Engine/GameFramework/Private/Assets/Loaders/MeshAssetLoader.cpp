@@ -30,28 +30,28 @@ namespace Assets
 		const CookedMeshAssetHeader header = reader.Read<CookedMeshAssetHeader>();
 
 		const bool bMeshHeaderInvalidvertexStride = !header.fileHeader.HasMagic(kCookedMeshAssetMagic) || header.vertexStride != sizeof(CookedMeshVertex);
-		const bool meshHeaderInvalid = bMeshHeaderInvalidvertexStride || (header.indexStride != sizeof(std::uint32_t));
+		const bool bMeshHeaderInvalid = bMeshHeaderInvalidvertexStride || (header.indexStride != sizeof(std::uint32_t));
 		
-		if (meshHeaderInvalid)
+		if (bMeshHeaderInvalid)
 		{
 			throw diagnostics.MakeError("header", "mesh magic and current vertex/index strides", "Invalid cooked mesh asset header; recook the asset");
 		}
 
-		const bool hasSkinInfluences = (header.flags & static_cast<std::uint32_t>(CookedMeshAssetFlag::HasSkinInfluences)) != 0u;
-		const bool hasMorphTargets = (header.flags & static_cast<std::uint32_t>(CookedMeshAssetFlag::HasMorphTargets)) != 0u;
-		const bool isSkeletal = header.assetKind == CookedMeshAssetKind::Skeletal;
+		const bool bHasSkinInfluences = (header.flags & static_cast<std::uint32_t>(CookedMeshAssetFlag::HasSkinInfluences)) != 0u;
+		const bool bHasMorphTargets = (header.flags & static_cast<std::uint32_t>(CookedMeshAssetFlag::HasMorphTargets)) != 0u;
+		const bool bIsSkeletal = header.assetKind == CookedMeshAssetKind::Skeletal;
 		if (header.assetKind != CookedMeshAssetKind::Static && header.assetKind != CookedMeshAssetKind::Skeletal)
 		{
 			throw diagnostics.MakeError("header.assetKind", "Static or Skeletal", "Invalid cooked mesh asset kind");
 		}
 
-		if ((isSkeletal && (!hasSkinInfluences || header.skinInfluenceCount != header.vertexCount)) || (!isSkeletal && (hasSkinInfluences || header.skinInfluenceCount != 0u))
+		if ((bIsSkeletal && (!bHasSkinInfluences || header.skinInfluenceCount != header.vertexCount)) || (!bIsSkeletal && (bHasSkinInfluences || header.skinInfluenceCount != 0u))
 		    || header.skinInfluenceStride != sizeof(CookedMeshSkinInfluence))
 		{
 			throw diagnostics.MakeError("skinInfluences", "skeletal meshes have one influence record per vertex", "Invalid cooked mesh skin influence stream");
 		}
-		if ((!isSkeletal && hasMorphTargets) || (hasMorphTargets && (header.morphTargetCount == 0u || header.morphTargetDeltaCount == 0u))
-		    || (!hasMorphTargets && (header.morphTargetCount != 0u || header.morphTargetDeltaCount != 0u)) || header.morphTargetRecordStride != sizeof(CookedMeshMorphTargetRecord)
+		if ((!bIsSkeletal && bHasMorphTargets) || (bHasMorphTargets && (header.morphTargetCount == 0u || header.morphTargetDeltaCount == 0u))
+		    || (!bHasMorphTargets && (header.morphTargetCount != 0u || header.morphTargetDeltaCount != 0u)) || header.morphTargetRecordStride != sizeof(CookedMeshMorphTargetRecord)
 		    || header.morphTargetDeltaStride != sizeof(CookedMeshMorphTargetDelta))
 		{
 			throw diagnostics.MakeError("morphTargets", "skeletal morph target flags, counts, and strides are consistent", "Invalid cooked mesh morph target stream");
@@ -105,7 +105,7 @@ namespace Assets
 			}
 			morphTargets.push_back(std::move(morphTarget));
 		}
-		if (isSkeletal)
+		if (bIsSkeletal)
 		{
 			SkeletalMeshData loadedSkeletalMesh;
 			loadedSkeletalMesh.geometry = std::move(geometry);

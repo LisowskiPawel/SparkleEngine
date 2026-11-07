@@ -246,7 +246,7 @@ static void ReflectResourceBindings(ID3D12ShaderReflection& shader, UINT count, 
 		binding.Name = bindDesc.Name ? bindDesc.Name : "";
 		binding.Kind = MapDxilResourceKind(bindDesc.Type, bindDesc.Dimension);
 		binding.Dimension = MapDxilDimension(bindDesc.Dimension);
-		binding.IsReadOnly = IsDxilReadOnlyKind(binding.Kind);
+		binding.bIsReadOnly = IsDxilReadOnlyKind(binding.Kind);
 		binding.Set = bindDesc.Space;
 		binding.Slot = bindDesc.BindPoint;
 		binding.ArrayCount = (bindDesc.BindCount == 0) ? 0u /* unbounded */ : bindDesc.BindCount;

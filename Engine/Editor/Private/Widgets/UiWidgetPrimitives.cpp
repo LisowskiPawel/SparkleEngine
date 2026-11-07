@@ -175,10 +175,10 @@ namespace EditorWidgets
 		return true;
 	}
 
-	bool DrawDetailsResetButton(int utilityColumnIndex, bool dirty, const char* tooltip)
+	bool DrawDetailsResetButton(int utilityColumnIndex, bool bDirty, const char* tooltip)
 	{
 		ImGui::TableSetColumnIndex(utilityColumnIndex);
-		if (!dirty)
+		if (!bDirty)
 		{
 			ImGui::Dummy(ImVec2(DetailsUtilityColumnWidth, DetailsResetButtonSize));
 			return false;
@@ -187,27 +187,27 @@ namespace EditorWidgets
 		ImGui::PushID("reset");
 		const ImVec2 start = ImGui::GetCursorScreenPos();
 		const ImVec2 size(DetailsResetButtonSize, DetailsResetButtonSize);
-		const bool pressed = ImGui::InvisibleButton("##reset", size);
-		const bool hovered = ImGui::IsItemHovered();
-		const bool active = ImGui::IsItemActive();
+		const bool bPressed = ImGui::InvisibleButton("##reset", size);
+		const bool bHovered = ImGui::IsItemHovered();
+		const bool bActive = ImGui::IsItemActive();
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 		const ImVec2 end(start.x + size.x, start.y + size.y);
-		if (hovered || active)
+		if (bHovered || bActive)
 		{
 			drawList->AddRectFilled(start, end, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::ButtonBackgroundHovered()), 3.0f);
 		}
 
-		const ImVec4 iconColor = hovered ? SparkleUiPalette::TextPrimary() : WithAlpha(SparkleUiPalette::TextMuted(), 0.62f);
+		const ImVec4 iconColor = bHovered ? SparkleUiPalette::TextPrimary() : WithAlpha(SparkleUiPalette::TextMuted(), 0.62f);
 		const ImU32 iconColorU32 = ImGui::ColorConvertFloat4ToU32(iconColor);
 		DrawCenteredGlyph(drawList, start, size, EditorIcons::GetEditorIconGlyph(EditorIcons::EditorIcon::Reset), iconColorU32);
-		if (tooltip != nullptr && tooltip[0] != '\0' && hovered)
+		if (tooltip != nullptr && tooltip[0] != '\0' && bHovered)
 		{
 			ImGui::SetTooltip("%s", tooltip);
 		}
 
 		ImGui::PopID();
-		return pressed;
+		return bPressed;
 	}
 
 	void DrawDetailsEmptyUtility(int utilityColumnIndex)

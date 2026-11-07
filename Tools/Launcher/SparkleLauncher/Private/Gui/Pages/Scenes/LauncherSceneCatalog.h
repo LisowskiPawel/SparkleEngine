@@ -43,7 +43,7 @@ namespace SparkleLauncher
 		void ResetWidgets();
 		// Catalog changes refresh cards locally; launch completion still requires content rediscovery.
 		bool CompleteOperation(const QString& runId, const QString& operationId, const QString& title, const LauncherOperationResult& result);
-		void UpdateActionAvailability(QPushButton& cleanButton, QPushButton& runButton, bool hasActionCleanTargets);
+		void UpdateActionAvailability(QPushButton& cleanButton, QPushButton& runButton, bool bHasActionCleanTargets);
 
 	signals:
 		void FocusableWidgetCreated(QWidget* widget);
@@ -54,7 +54,7 @@ namespace SparkleLauncher
 		{
 			std::filesystem::path ContentRoot;
 			std::vector<std::string> LevelIds;
-			bool Selected = false;
+			bool bSelected = false;
 		};
 
 		void AddLevelContentGroups(QVBoxLayout& layout);
@@ -62,7 +62,7 @@ namespace SparkleLauncher
 		void AddSyncLevelRow(ResponsiveCardGridWidget& grid, const LauncherContentSummary& content, const LauncherLevelUiEntry& level);
 		void ApplyLevelActionButtonState(QLabel& statusLabel, QPushButton& button, const LauncherLevelUiEntry& level);
 		void RefreshLevelActionButtons();
-		bool SetLevelsSelected(const std::filesystem::path& contentRoot, const std::vector<std::string>& levelIds, bool selected, const QString& actionName);
+		bool SetLevelsSelected(const std::filesystem::path& contentRoot, const std::vector<std::string>& levelIds, bool bSelected, const QString& actionName);
 		QVector<LauncherCleanTarget> BuildLevelCleanTargets(const LauncherContentSummary& content, const QString& levelId = QString()) const;
 		LauncherLevelUiModel BuildLevelUiModel() const;
 		void StartLevel(const LauncherContentSummary& content, const LauncherLevelUiEntry& level);

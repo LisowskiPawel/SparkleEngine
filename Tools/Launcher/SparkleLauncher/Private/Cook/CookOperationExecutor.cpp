@@ -84,7 +84,7 @@ namespace SparkleLauncher
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
 
-		if (!plan.CanRun)
+		if (!plan.bCanRun)
 		{
 			SetOperationFailure(
 			    operation,
@@ -101,7 +101,7 @@ namespace SparkleLauncher
 		{
 			CookOperationProcessStep& step = processSteps[stepIndex];
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, processSteps.size());
-			if (step.DeletesCookedOutputs)
+			if (step.bDeletesCookedOutputs)
 			{
 				std::string errorMessage;
 				if (!CleanCookedOutputs(step.DestructivePath, errorMessage))
@@ -131,7 +131,7 @@ namespace SparkleLauncher
 			const Process::ChildProcessResult result = processRunner.Run(request);
 			if (!result.Succeeded())
 			{
-				if (result.Cancelled)
+				if (result.bCancelled)
 				{
 					SetOperationFailure(operation, OperationProblemKind::Cancellation, step.DisplayName + " was canceled.", "Run the cook operation again when ready.");
 				}
@@ -139,7 +139,7 @@ namespace SparkleLauncher
 				{
 					SetProcessOperationFailure(operation, result.StartFailure, MakeCookFailureSummary(step, result), CookRecoveryAction(step));
 				}
-				MarkOperationFinished(operation, result.Cancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
+				MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 				return operation;
 			}
 			if (step.Id == "cook-shaders")

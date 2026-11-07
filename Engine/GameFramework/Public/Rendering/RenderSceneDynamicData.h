@@ -15,7 +15,7 @@ struct RenderObjectDynamicData final
 	RenderObjectId Object;
 	DirectX::XMFLOAT4X4 WorldMatrix{};
 	DirectX::XMFLOAT3X4 WorldInverseTranspose{};
-	bool Visible = true;
+	bool bVisible = true;
 };
 
 struct RenderJointMatrixRange final

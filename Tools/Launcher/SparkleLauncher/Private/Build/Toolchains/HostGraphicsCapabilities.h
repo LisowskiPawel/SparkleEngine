@@ -17,10 +17,10 @@ namespace SparkleLauncher
 	struct HostGraphicsCapabilities
 	{
 		HostGraphicsVendor PrimaryVendor = HostGraphicsVendor::Unknown;
-		bool HasNvidiaAdapter = false;
-		bool HasAmdAdapter = false;
-		bool HasIntelAdapter = false;
-		bool AdapterDetected = false;
+		bool bHasNvidiaAdapter = false;
+		bool bHasAmdAdapter = false;
+		bool bHasIntelAdapter = false;
+		bool bAdapterDetected = false;
 		std::string Summary;
 	};
 

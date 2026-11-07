@@ -38,13 +38,13 @@ void UI::Implementation::Build()
 	}
 	UpdateSceneModel();
 	HandleTransactionShortcuts();
-	const bool disableInteraction = m_levelSession != nullptr && m_levelSession->IsLevelChangeInProgress();
-	BeginInputRouting(disableInteraction);
+	const bool bDisableInteraction = m_levelSession != nullptr && m_levelSession->IsLevelChangeInProgress();
+	BeginInputRouting(bDisableInteraction);
 	const float mainMenuBarHeight = BuildMainMenuBar();
-	BuildSceneOutliner(disableInteraction, mainMenuBarHeight);
-	BuildCenterWorkspace(disableInteraction, mainMenuBarHeight);
-	BuildSceneInspector(disableInteraction, mainMenuBarHeight);
-	BuildUtilityPanels(disableInteraction);
+	BuildSceneOutliner(bDisableInteraction, mainMenuBarHeight);
+	BuildCenterWorkspace(bDisableInteraction, mainMenuBarHeight);
+	BuildSceneInspector(bDisableInteraction, mainMenuBarHeight);
+	BuildUtilityPanels(bDisableInteraction);
 
 #if USE_IMGUI_DEMO_WINDOW
 	bool showDemoWindow = true;
@@ -63,7 +63,7 @@ void UI::Implementation::Build()
 	ImGui::Render();
 }
 
-void UI::Implementation::BeginInputRouting(bool disableInteraction)
+void UI::Implementation::BeginInputRouting(bool bDisableInteraction)
 {
 	if (m_inputSystem == nullptr)
 	{
@@ -71,7 +71,7 @@ void UI::Implementation::BeginInputRouting(bool disableInteraction)
 	}
 
 	const ImGuiIO& io = ImGui::GetIO();
-	m_inputSystem->BeginInputRoutingFrame(disableInteraction, io.WantTextInput || io.WantCaptureKeyboard);
+	m_inputSystem->BeginInputRoutingFrame(bDisableInteraction, io.WantTextInput || io.WantCaptureKeyboard);
 }
 
 float UI::Implementation::BuildMainMenuBar()
@@ -85,7 +85,7 @@ float UI::Implementation::BuildMainMenuBar()
 	return m_mainMenuBar->GetHeight();
 }
 
-void UI::Implementation::BuildSceneOutliner(bool disableInteraction, float mainMenuBarHeight)
+void UI::Implementation::BuildSceneOutliner(bool bDisableInteraction, float mainMenuBarHeight)
 {
 	if (!m_sceneOutlinerPanel)
 	{
@@ -93,10 +93,10 @@ void UI::Implementation::BuildSceneOutliner(bool disableInteraction, float mainM
 	}
 
 	m_sceneOutlinerPanel->SetTopInset(mainMenuBarHeight);
-	m_sceneOutlinerPanel->BuildUI(disableInteraction);
+	m_sceneOutlinerPanel->BuildUI(bDisableInteraction);
 }
 
-void UI::Implementation::BuildCenterWorkspace(bool disableInteraction, float mainMenuBarHeight)
+void UI::Implementation::BuildCenterWorkspace(bool bDisableInteraction, float mainMenuBarHeight)
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	const float outlinerWidth = m_sceneOutlinerPanel ? m_sceneOutlinerPanel->GetWidth() : EditorWorkspaceLayout::SceneOutlinerWidth;
@@ -109,21 +109,21 @@ void UI::Implementation::BuildCenterWorkspace(bool disableInteraction, float mai
 	{
 		m_viewportToolbar->SetGeometry(outlinerWidth, mainMenuBarHeight, viewportWidth);
 		const LevelAsset* activeLevel = m_levelSession != nullptr ? m_levelSession->GetActiveLevel() : nullptr;
-		m_viewportToolbar->Draw(activeLevel != nullptr ? activeLevel->GetName() : "<None>", disableInteraction);
+		m_viewportToolbar->Draw(activeLevel != nullptr ? activeLevel->GetName() : "<None>", bDisableInteraction);
 		viewportToolbarHeight = m_viewportToolbar->GetHeightPixels();
 	}
 
 	const float availableViewportHeight = (std::max) (0.0f, availableCenterHeight - viewportToolbarHeight);
 	const float consoleDockHeight = m_editorConsoleSystem ? m_editorConsoleSystem->GetDockHeight(availableViewportHeight) : 0.0f;
-	BuildViewport(disableInteraction, mainMenuBarHeight + viewportToolbarHeight, consoleDockHeight, outlinerWidth, inspectorWidth);
+	BuildViewport(bDisableInteraction, mainMenuBarHeight + viewportToolbarHeight, consoleDockHeight, outlinerWidth, inspectorWidth);
 
 	if (m_editorConsoleSystem)
 	{
-		m_editorConsoleSystem->BuildDockedUI(outlinerWidth, mainMenuBarHeight + availableCenterHeight, viewportWidth, availableViewportHeight, disableInteraction);
+		m_editorConsoleSystem->BuildDockedUI(outlinerWidth, mainMenuBarHeight + availableCenterHeight, viewportWidth, availableViewportHeight, bDisableInteraction);
 	}
 }
 
-void UI::Implementation::BuildViewport(bool disableInteraction, float topInset, float bottomInset, float outlinerWidth, float inspectorWidth)
+void UI::Implementation::BuildViewport(bool bDisableInteraction, float topInset, float bottomInset, float outlinerWidth, float inspectorWidth)
 {
 	if (!m_viewportPanel)
 	{
@@ -133,7 +133,7 @@ void UI::Implementation::BuildViewport(bool disableInteraction, float topInset, 
 	m_viewportPanel->SetTopInset(topInset);
 	m_viewportPanel->SetBottomInset(bottomInset);
 	m_viewportPanel->SetSideInsets(outlinerWidth, inspectorWidth);
-	m_viewportPanel->BuildUI(*m_icons, disableInteraction);
+	m_viewportPanel->BuildUI(*m_icons, bDisableInteraction);
 	RegisterViewportInputRegion();
 }
 
@@ -156,7 +156,7 @@ void UI::Implementation::RegisterViewportInputRegion()
 	m_inputSystem->RegisterInputTargetRegion(viewportLeft, viewportTop, viewportRight, viewportBottom, m_viewportPanel->GetTargetInputLayer());
 }
 
-void UI::Implementation::BuildSceneInspector(bool disableInteraction, float mainMenuBarHeight)
+void UI::Implementation::BuildSceneInspector(bool bDisableInteraction, float mainMenuBarHeight)
 {
 	if (!m_sceneInspectorPanel)
 	{
@@ -164,25 +164,25 @@ void UI::Implementation::BuildSceneInspector(bool disableInteraction, float main
 	}
 
 	m_sceneInspectorPanel->SetTopInset(mainMenuBarHeight);
-	m_sceneInspectorPanel->BuildUI(disableInteraction);
+	m_sceneInspectorPanel->BuildUI(bDisableInteraction);
 }
 
-void UI::Implementation::BuildUtilityPanels(bool disableInteraction)
+void UI::Implementation::BuildUtilityPanels(bool bDisableInteraction)
 {
 	if (m_shaderToolsPanel)
 	{
-		m_shaderToolsPanel->BuildUI(disableInteraction);
+		m_shaderToolsPanel->BuildUI(bDisableInteraction);
 	}
 	if (m_usedMeshesPanel)
 	{
-		m_usedMeshesPanel->BuildUI(disableInteraction);
+		m_usedMeshesPanel->BuildUI(bDisableInteraction);
 	}
 	if (m_usedTexturesPanel)
 	{
-		m_usedTexturesPanel->BuildUI(disableInteraction);
+		m_usedTexturesPanel->BuildUI(bDisableInteraction);
 	}
 	if (m_settingsPanel)
 	{
-		m_settingsPanel->BuildUI(disableInteraction);
+		m_settingsPanel->BuildUI(bDisableInteraction);
 	}
 }

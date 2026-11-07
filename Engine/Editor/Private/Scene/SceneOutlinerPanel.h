@@ -32,7 +32,7 @@ public:
 
 	void SetModel(std::shared_ptr<const EditorSceneModel> model) noexcept { m_model = std::move(model); }
 
-	void BuildUI(bool disableInteraction = false);
+	void BuildUI(bool bDisableInteraction = false);
 
 private:
 	void BeginWindow() noexcept;
@@ -48,8 +48,8 @@ private:
 	bool IsEntryVisible(const SceneObjectSelection& selection) const noexcept;
 	void ToggleEntryVisibility(const SceneObjectSelection& selection) noexcept;
 	void SelectEntry(const SceneObjectSelection& selection) noexcept;
-	void DrawSectionRow(const char* id, const char* label, std::size_t count, bool& open) noexcept;
-	void DrawSelectionCell(const char* label, const SceneObjectSelection& selection, bool isSelected, int flags) noexcept;
+	void DrawSectionRow(const char* id, const char* label, std::size_t count, bool& bOpen) noexcept;
+	void DrawSelectionCell(const char* label, const SceneObjectSelection& selection, bool bIsSelected, int flags) noexcept;
 	void DrawSelectionEntry(const char* label, const char* typeLabel, const SceneObjectSelection& selection) noexcept;
 
 	std::shared_ptr<const EditorSceneModel> m_model;

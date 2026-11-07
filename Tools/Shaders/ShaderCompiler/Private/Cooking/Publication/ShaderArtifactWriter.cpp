@@ -97,22 +97,22 @@ namespace ShaderArtifactWriter
 		}
 
 		const ShaderCodeHash codeHash = Hash::Fnv1a64(product.compiled.bytecode.data(), product.compiled.bytecode.size());
-		const bool shaderIdentityMatches = product.shaderTypeId == shader.shaderTypeId;
-		const bool targetValid = shaderIdentityMatches && IsShaderTarget(product.target);
-		const bool bShaderMetadataMatchesfeatures = targetValid && product.features == shader.features;
+		const bool bShaderIdentityMatches = product.shaderTypeId == shader.shaderTypeId;
+		const bool bTargetValid = bShaderIdentityMatches && IsShaderTarget(product.target);
+		const bool bShaderMetadataMatchesfeatures = bTargetValid && product.features == shader.features;
 		const bool bShaderMetadataMatchesrayTracing = bShaderMetadataMatchesfeatures && (product.rayTracing == shader.rayTracing);
-		const bool shaderMetadataMatches = bShaderMetadataMatchesrayTracing && (product.compiled.stage == shader.stage);
-		const bool bInaryFormatMatches = shaderMetadataMatches && product.compiled.format == GetShaderBinaryFormat(product.target);
+		const bool bShaderMetadataMatches = bShaderMetadataMatchesrayTracing && (product.compiled.stage == shader.stage);
+		const bool bInaryFormatMatches = bShaderMetadataMatches && product.compiled.format == GetShaderBinaryFormat(product.target);
 		const bool bSourceMatchessourcePath = bInaryFormatMatches && product.compiled.sourcePath == shader.sourcePath;
 		const bool bSourceMatchesentryPoint = bSourceMatchessourcePath && (product.compiled.entryPoint == shader.entryPoint);
-		const bool sourceMatches = bSourceMatchesentryPoint && (!product.compiled.backendName.empty());
-		const bool codegenTargetMatches = sourceMatches && product.compiled.codegenTarget == GetShaderTargetName(product.target);
-		const bool bCompiledIdentityValidcompiled = codegenTargetMatches && product.compiled.backendVersion != 0;
+		const bool bSourceMatches = bSourceMatchesentryPoint && (!product.compiled.backendName.empty());
+		const bool bCodegenTargetMatches = bSourceMatches && product.compiled.codegenTarget == GetShaderTargetName(product.target);
+		const bool bCompiledIdentityValidcompiled = bCodegenTargetMatches && product.compiled.backendVersion != 0;
 		const bool bCompiledIdentityValidcompiled2 = bCompiledIdentityValidcompiled && (product.compiled.compileInputHash != 0);
-		const bool compiledIdentityValid = bCompiledIdentityValidcompiled2 && (product.compiled.bytecodeHash == codeHash);
-		const bool parameterLayoutMatches = compiledIdentityValid && BuildShaderParameterSignature(product.parameterLayout) == BuildShaderParameterSignature(shader.parameterLayout);
+		const bool bCompiledIdentityValid = bCompiledIdentityValidcompiled2 && (product.compiled.bytecodeHash == codeHash);
+		const bool bParameterLayoutMatches = bCompiledIdentityValid && BuildShaderParameterSignature(product.parameterLayout) == BuildShaderParameterSignature(shader.parameterLayout);
 
-		if (!parameterLayoutMatches)
+		if (!bParameterLayoutMatches)
 		{
 			throw Diagnostics::Error(std::format("Compiled shader product for '{}' does not match its catalog contract.", shader.shaderTypeName));
 		}
@@ -216,7 +216,7 @@ namespace ShaderArtifactWriter
 	{
 		const std::span<const std::uint8_t> bytecode(source.Code);
 		const auto [code, inserted] = tables.UniqueCode.try_emplace(source.CodeHash, bytecode);
-		if (!inserted && !std::ranges::equal(code->second, bytecode))
+		if (!bInserted && !std::ranges::equal(code->second, bytecode))
 		{
 			throw Diagnostics::Error("Two shader code records collided on one code hash.");
 		}
@@ -337,21 +337,21 @@ namespace ShaderArtifactWriter
 		mapHeader.StringTableSizeInBytes = tables.Strings.SizeInBytes();
 		std::ofstream output;
 		std::string error;
-		const bool outputOpened = Files::TryOpenBinaryOutput(path, output, error);
-		const bool headerWritten = outputOpened && Files::BinaryStreamWriter::WriteValue(output, mapHeader, error);
-		const bool entriesWritten = headerWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Entries, error);
-		const bool bIndingsWritten = entriesWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Bindings, error);
-		const bool reflectionWritten = bIndingsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.reflectionRecords, error);
-		const bool resourcesWritten = reflectionWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.resourceBindings, error);
-		const bool constantBuffersWritten = resourcesWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBuffers, error);
-		const bool constantMembersWritten = constantBuffersWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBufferMembers, error);
-		const bool inputElementsWritten = constantMembersWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.inputElements, error);
-		const bool pushConstantsWritten = inputElementsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.pushConstantRanges, error);
-		const bool specializationConstantsWritten = pushConstantsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.specializationConstants, error);
-		const bool stringsWritten = specializationConstantsWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Strings.GetBytes(), error);
-		const bool outputClosed = stringsWritten && Files::TryCloseOutput(output, path, error);
+		const bool bOutputOpened = Files::TryOpenBinaryOutput(path, output, error);
+		const bool bHeaderWritten = bOutputOpened && Files::BinaryStreamWriter::WriteValue(output, mapHeader, error);
+		const bool bEntriesWritten = bHeaderWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Entries, error);
+		const bool bIndingsWritten = bEntriesWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Bindings, error);
+		const bool bReflectionWritten = bIndingsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.reflectionRecords, error);
+		const bool bResourcesWritten = bReflectionWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.resourceBindings, error);
+		const bool bConstantBuffersWritten = bResourcesWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBuffers, error);
+		const bool bConstantMembersWritten = bConstantBuffersWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBufferMembers, error);
+		const bool bInputElementsWritten = bConstantMembersWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.inputElements, error);
+		const bool bPushConstantsWritten = bInputElementsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.pushConstantRanges, error);
+		const bool bSpecializationConstantsWritten = bPushConstantsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.specializationConstants, error);
+		const bool bStringsWritten = bSpecializationConstantsWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Strings.GetBytes(), error);
+		const bool bOutputClosed = bStringsWritten && Files::TryCloseOutput(output, path, error);
 
-		if (!outputClosed)
+		if (!bOutputClosed)
 		{
 			throw Diagnostics::Error(error);
 		}
@@ -366,13 +366,13 @@ namespace ShaderArtifactWriter
 
 		std::ofstream output;
 		std::string error;
-		const bool outputOpened = Files::TryOpenBinaryOutput(path, output, error);
-		const bool headerWritten = outputOpened && Files::BinaryStreamWriter::WriteValue(output, libraryHeader, error);
-		const bool recordsWritten = headerWritten && Files::BinaryStreamWriter::WriteArray(output, records, error);
-		const bool codeWritten = recordsWritten && Files::BinaryStreamWriter::WriteArray(output, code, error);
-		const bool outputClosed = codeWritten && Files::TryCloseOutput(output, path, error);
+		const bool bOutputOpened = Files::TryOpenBinaryOutput(path, output, error);
+		const bool bHeaderWritten = bOutputOpened && Files::BinaryStreamWriter::WriteValue(output, libraryHeader, error);
+		const bool bRecordsWritten = bHeaderWritten && Files::BinaryStreamWriter::WriteArray(output, records, error);
+		const bool bCodeWritten = bRecordsWritten && Files::BinaryStreamWriter::WriteArray(output, code, error);
+		const bool bOutputClosed = bCodeWritten && Files::TryCloseOutput(output, path, error);
 
-		if (!outputClosed)
+		if (!bOutputClosed)
 		{
 			throw Diagnostics::Error(error);
 		}
@@ -394,10 +394,10 @@ namespace ShaderArtifactWriter
 		return result;
 	}
 
-	static std::vector<ArtifactEntry> BuildEntries(const ShaderCookPipelinePlan& plan, bool replaceCompleteCatalog, const std::filesystem::path& mapPath, const std::filesystem::path& libraryPath)
+	static std::vector<ArtifactEntry> BuildEntries(const ShaderCookPipelinePlan& plan, bool bReplaceCompleteCatalog, const std::filesystem::path& mapPath, const std::filesystem::path& libraryPath)
 	{
 		std::map<std::pair<ShaderTypeId, ShaderTarget>, ArtifactEntry> entries;
-		if (!replaceCompleteCatalog)
+		if (!bReplaceCompleteCatalog)
 		{
 			const CookedShaderLibrary existingLibrary = CookedShaderLibrary::Open(libraryPath);
 			const GlobalShaderMap existingMap = GlobalShaderMap::Open(mapPath, existingLibrary);
@@ -430,13 +430,13 @@ namespace ShaderArtifactWriter
 
 	ShaderCookOutput Write(
 	    const ShaderCookPipelinePlan& plan,
-	    bool replaceCompleteCatalog,
+	    bool bReplaceCompleteCatalog,
 	    const std::filesystem::path& mapPath,
 	    const std::filesystem::path& libraryPath,
 	    const std::filesystem::path& stagedMapPath,
 	    const std::filesystem::path& stagedLibraryPath)
 	{
-		std::vector<ArtifactEntry> entries = BuildEntries(plan, replaceCompleteCatalog, mapPath, libraryPath);
+		std::vector<ArtifactEntry> entries = BuildEntries(plan, bReplaceCompleteCatalog, mapPath, libraryPath);
 		return WriteArtifacts(std::move(entries), stagedMapPath, stagedLibraryPath);
 	}
 

@@ -72,9 +72,9 @@ void FrameGraphResourceRegistry::SetBoundaryStates(FrameGraphResourceHandle hand
 	metadata.finalState = finalState;
 }
 
-void FrameGraphResourceRegistry::SetExternalContentsProduced(FrameGraphResourceHandle handle, bool hasBeenProduced) noexcept
+void FrameGraphResourceRegistry::SetExternalContentsProduced(FrameGraphResourceHandle handle, bool bHasBeenProduced) noexcept
 {
-	GetMetadata(handle).hasExternalContents = hasBeenProduced;
+	GetMetadata(handle).bHasExternalContents = bHasBeenProduced;
 }
 
 bool FrameGraphResourceRegistry::IsRegistered(FrameGraphResourceHandle handle) const noexcept
@@ -113,7 +113,7 @@ FrameGraphResourceMetadata& FrameGraphResourceRegistry::RegisterMetadata(
     ResourceState initialState,
     ResourceState finalState) noexcept
 {
-	const bool alreadyRegistered = IsRegistered(handle);
+	const bool bAlreadyRegistered = IsRegistered(handle);
 	EnsureStorage(handle);
 	FrameGraphResourceMetadata& entry = m_metadataEntries[handle.index];
 	entry.handle = handle;
@@ -124,9 +124,9 @@ FrameGraphResourceMetadata& FrameGraphResourceRegistry::RegisterMetadata(
 	entry.finalState = finalState;
 	entry.debugName = std::string(debugName);
 
-	if (!alreadyRegistered)
+	if (!bAlreadyRegistered)
 	{
-		entry.hasExternalContents = false;
+		entry.bHasExternalContents = false;
 		m_registeredHandles.push_back(handle);
 	}
 

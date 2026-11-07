@@ -11,26 +11,26 @@
 
 void DrawRayTracingSceneSettingsSection(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings, const char* filterText)
 {
-	const bool rayTracingSceneMatches = RenderingSettingsUi::MatchesFilter(
+	const bool bRayTracingSceneMatches = RenderingSettingsUi::MatchesFilter(
 	    filterText,
 	    "Ray Tracing Scene",
 	    "ray tracing scene tlas refit ptlas active partition update mode partitions dynamic distance acceleration structure");
 
-	const bool rayTracingSceneOpen = rayTracingSceneMatches && RenderingSettingsUi::BeginSettingsCategory("Ray Tracing Scene");
+	const bool bRayTracingSceneOpen = bRayTracingSceneMatches && RenderingSettingsUi::BeginSettingsCategory("Ray Tracing Scene");
 
-	if (!rayTracingSceneOpen)
+	if (!bRayTracingSceneOpen)
 	{
 		return;
 	}
 
 	if (RenderingSettingsUi::BeginSettingsTable("##RenderingRayTracingSceneSettings"))
 	{
-		ImGui::BeginDisabled(settings.PtlasActive);
-		bool refitTlas = settings.RefitTlas;
-		const bool refitTlasEdited = RenderingSettingsUi::DrawBooleanRow("##RefitTlas", "Refit TLAS", refitTlas);
-		if (refitTlasEdited)
+		ImGui::BeginDisabled(settings.bPtlasActive);
+		bool bRefitTlas = settings.bRefitTlas;
+		const bool bRefitTlasEdited = RenderingSettingsUi::DrawBooleanRow("##RefitTlas", "Refit TLAS", bRefitTlas);
+		if (bRefitTlasEdited)
 		{
-			settingsController.SetRefitTlas(refitTlas);
+			settingsController.SetRefitTlas(bRefitTlas);
 		}
 
 		ImGui::EndDisabled();

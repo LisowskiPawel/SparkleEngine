@@ -4,4 +4,4 @@
 
 #include <string>
 
-void DrawViewportShowMenu(const CVarControlExecutor* executor, bool disableInteraction, std::string& error);
+void DrawViewportShowMenu(const CVarControlExecutor* executor, bool bDisableInteraction, std::string& error);

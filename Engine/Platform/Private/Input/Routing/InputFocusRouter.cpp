@@ -2,13 +2,13 @@
 #include "Input/Routing/InputFocusRouter.h"
 #include "Input/InputBackendResult.h"
 
-void InputFocusRouter::BeginFrame(bool interactionDisabled, bool textInputActive)
+void InputFocusRouter::BeginFrame(bool bInteractionDisabled, bool bTextInputActive)
 {
 	m_targetRegions.clear();
-	m_hasRoutingFrame = true;
-	m_interactionDisabled = interactionDisabled;
-	m_textInputActive = textInputActive;
-	if (m_interactionDisabled)
+	m_bHasRoutingFrame = true;
+	m_bInteractionDisabled = bInteractionDisabled;
+	m_bTextInputActive = bTextInputActive;
+	if (m_bInteractionDisabled)
 	{
 		m_activeTargetLayer = InputLayer::UI;
 	}
@@ -30,12 +30,12 @@ void InputFocusRouter::RegisterTargetRegion(float left, float top, float right, 
 
 InputLayer InputFocusRouter::ResolveTargetLayer(const InputBackendResult& result, InputLayer fallbackLayer) noexcept
 {
-	if (!m_hasRoutingFrame)
+	if (!m_bHasRoutingFrame)
 	{
 		return fallbackLayer;
 	}
 
-	if (m_interactionDisabled)
+	if (m_bInteractionDisabled)
 	{
 		return InputLayer::UI;
 	}
@@ -48,7 +48,7 @@ InputLayer InputFocusRouter::ResolveTargetLayer(const InputBackendResult& result
 				m_activeTargetLayer = ResolvePointTarget(result.MouseButton.Position);
 				if (m_activeTargetLayer == InputLayer::Gameplay)
 				{
-					m_textInputActive = false;
+					m_bTextInputActive = false;
 				}
 				return m_activeTargetLayer;
 			}
@@ -58,7 +58,7 @@ InputLayer InputFocusRouter::ResolveTargetLayer(const InputBackendResult& result
 		case InputEventType::MouseWheel:
 			return ResolvePointTarget(result.MouseWheel.Position);
 		case InputEventType::Keyboard:
-			if (m_textInputActive && m_activeTargetLayer != InputLayer::Gameplay)
+			if (m_bTextInputActive && m_activeTargetLayer != InputLayer::Gameplay)
 			{
 				return InputLayer::UI;
 			}
@@ -72,12 +72,12 @@ InputLayer InputFocusRouter::ResolveTargetLayer(const InputBackendResult& result
 
 InputLayer InputFocusRouter::GetActiveTargetLayer() const noexcept
 {
-	if (!m_hasRoutingFrame)
+	if (!m_bHasRoutingFrame)
 	{
 		return InputLayer::System;
 	}
 
-	if (m_interactionDisabled)
+	if (m_bInteractionDisabled)
 	{
 		return InputLayer::UI;
 	}

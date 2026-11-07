@@ -12,9 +12,9 @@ namespace SparkleLauncher
 		return {"/nologo", "/v:minimal", "/m:1", "/p:UseMultiToolTask=false", "/nodeReuse:false"};
 	}
 
-	static std::string ToCMakeBool(bool value)
+	static std::string ToCMakeBool(bool bValue)
 	{
-		return value ? "ON" : "OFF";
+		return bValue ? "ON" : "OFF";
 	}
 
 	Process::ChildProcessRequest MakeCMakeConfigureRequest(
@@ -60,10 +60,10 @@ namespace SparkleLauncher
 			process.Environment.push_back({"VK_SDK_PATH", Strings::ToNarrow(toolchain.VulkanSdkRoot.generic_wstring())});
 		}
 		const WorkspaceFeatureSettings featureSettings = GetLauncherWorkspaceFeatureSettings();
-		process.Arguments.push_back("-DSPARKLE_ENABLE_CONTENT_PIPELINE=" + ToCMakeBool(featureSettings.ContentPipelineEnabled));
-		process.Arguments.push_back("-DSPARKLE_ENABLE_SHADER_COMPILER=" + ToCMakeBool(featureSettings.ShaderCompilerEnabled));
-		process.Arguments.push_back("-DSPARKLE_ENABLE_KTX_SUPPORT=" + ToCMakeBool(featureSettings.KtxSupportEnabled));
-		process.Arguments.push_back("-DSPARKLE_ENABLE_NVIDIA_STREAMLINE=" + ToCMakeBool(featureSettings.NvidiaStreamlineEnabled));
+		process.Arguments.push_back("-DSPARKLE_ENABLE_CONTENT_PIPELINE=" + ToCMakeBool(featureSettings.bContentPipelineEnabled));
+		process.Arguments.push_back("-DSPARKLE_ENABLE_SHADER_COMPILER=" + ToCMakeBool(featureSettings.bShaderCompilerEnabled));
+		process.Arguments.push_back("-DSPARKLE_ENABLE_KTX_SUPPORT=" + ToCMakeBool(featureSettings.bKtxSupportEnabled));
+		process.Arguments.push_back("-DSPARKLE_ENABLE_NVIDIA_STREAMLINE=" + ToCMakeBool(featureSettings.bNvidiaStreamlineEnabled));
 		process.Arguments.push_back("-Wno-dev");
 		process.Arguments.push_back(Strings::ToNarrow(workspaceRoot.wstring()));
 		return process;

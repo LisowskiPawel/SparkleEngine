@@ -20,7 +20,7 @@ public:
 
 	void SetModel(std::shared_ptr<const EditorSceneModel> model) noexcept { m_model = std::move(model); }
 
-	void BuildUI(bool disableInteraction = false);
+	void BuildUI(bool bDisableInteraction = false);
 
 private:
 	void BeginWindow() noexcept;

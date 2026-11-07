@@ -112,9 +112,9 @@ namespace Process
 	static bool ReleaseWindowsProcessOwnership(const WindowsOwnedProcess& child, ChildProcessResult& result)
 	{
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION releasedLimits{};
-		const bool limitsReleased = SetInformationJobObject(child.Job.Get(), JobObjectExtendedLimitInformation, &releasedLimits, static_cast<DWORD>(sizeof(releasedLimits))) != FALSE;
+		const bool bLimitsReleased = SetInformationJobObject(child.Job.Get(), JobObjectExtendedLimitInformation, &releasedLimits, static_cast<DWORD>(sizeof(releasedLimits))) != FALSE;
 
-		if (!limitsReleased)
+		if (!bLimitsReleased)
 		{
 			const DWORD releaseError = GetLastError();
 			TerminateOwnedWindowsProcess(child);
@@ -140,8 +140,8 @@ namespace Process
 		{
 			return;
 		}
-		result.Ready = decision == ChildReadinessDecision::Ready;
-		result.ExitCode = result.Ready ? 0 : -1;
+		result.bReady = decision == ChildReadinessDecision::Ready;
+		result.ExitCode = result.bReady ? 0 : -1;
 	}
 
 	static void WaitForChildReadiness(const ChildProcessRequest& request, const WindowsOwnedProcess& child, const WindowsProcessHandle& readinessEvent, ChildProcessResult& result)
@@ -182,7 +182,7 @@ namespace Process
 			}
 			if (waitResult == WAIT_OBJECT_0 + 2)
 			{
-				result.Cancelled = true;
+				result.bCancelled = true;
 				TerminateOwnedWindowsProcess(child);
 				return;
 			}

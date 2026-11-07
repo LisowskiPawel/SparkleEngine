@@ -3,7 +3,7 @@
 
 bool HasInstalledExternalCaptureProvider() noexcept
 {
-	static const bool installed = []
+	static const bool bInstalled = []
 	{
 		if (IsRenderDocCaptureInstalled())
 		{
@@ -16,5 +16,5 @@ bool HasInstalledExternalCaptureProvider() noexcept
 #endif
 	}();
 
-	return installed;
+	return bInstalled;
 }

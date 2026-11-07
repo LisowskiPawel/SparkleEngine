@@ -29,7 +29,7 @@ namespace SparkleLauncher
 			return 1;
 		}
 
-		if (arguments.ShowHelp)
+		if (arguments.bShowHelp)
 		{
 			PrintLauncherShellUsage(output);
 			return 0;
@@ -47,7 +47,7 @@ namespace SparkleLauncher
 		{
 			LauncherShadowCompletionPolicy completionPolicy = LauncherShadowCompletionPolicy::WaitForCompletion;
 			const std::optional<BuildWorkspaceOperationDefinition> buildOperation = FindBuildWorkspaceOperationDefinition(arguments.RunOperationId);
-			if (buildOperation.has_value() && buildOperation->ReplacesLauncherArtifact)
+			if (buildOperation.has_value() && buildOperation->bReplacesLauncherArtifact)
 			{
 				completionPolicy = LauncherShadowCompletionPolicy::ReleaseCallingArtifact;
 			}
@@ -85,8 +85,8 @@ namespace SparkleLauncher
 		{
 			return RunLauncherShellOperation(model, arguments, output, error);
 		}
-		const bool previewSucceeded = arguments.DryRunOperationId.empty() || ApplyLauncherShellDryRun(model, arguments);
+		const bool bPreviewSucceeded = arguments.DryRunOperationId.empty() || ApplyLauncherShellDryRun(model, arguments);
 		RenderLauncherShell(model, output);
-		return previewSucceeded ? 0 : 1;
+		return bPreviewSucceeded ? 0 : 1;
 	}
 }

@@ -48,7 +48,7 @@ void ReferencePathTracerResources::Allocate(RenderViewportExtent extent)
 	Release();
 
 	RhiResourceService& resources = m_deviceServices.GetRenderHardwareInterface().GetResourceService();
-	const RhiTextureResourceDesc desc{.Width = extent.Width, .Height = extent.Height, .Format = PixelFormat::R32G32B32A32_Float, .AllowUnorderedAccess = true};
+	const RhiTextureResourceDesc desc{.Width = extent.Width, .Height = extent.Height, .Format = PixelFormat::R32G32B32A32_Float, .bAllowUnorderedAccess = true};
 
 	m_allocation.WorkingMean = resources.CreateTextureResource(desc, ResourceState::Undefined, RhiMemoryCategory::Texture, RhiMemoryResidencyClass::DeviceLocal, L"ReferencePathTracer.WorkingMean");
 	m_allocation.WorkingM2 = resources.CreateTextureResource(desc, ResourceState::Undefined, RhiMemoryCategory::Texture, RhiMemoryResidencyClass::DeviceLocal, L"ReferencePathTracer.WorkingM2");
@@ -107,7 +107,7 @@ void ReferencePathTracerResources::RecordSubmission() noexcept
 bool ReferencePathTracerResources::CanRetain() const noexcept
 {
 	const RendererMemoryDiagnosticsSnapshot& memory = m_memoryMonitor.GetLatestSnapshot();
-	if (!memory.Available || !memory.MemoryUsage.HasBudgetData)
+	if (!memory.bAvailable || !memory.MemoryUsage.bHasBudgetData)
 	{
 		return false;
 	}

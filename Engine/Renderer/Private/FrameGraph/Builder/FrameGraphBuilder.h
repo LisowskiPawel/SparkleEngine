@@ -107,7 +107,7 @@ public:
 			    {
 				    ReportInvalidShaderPassParameterSet(diagnosticLabel.c_str(), passParameters.GetPassParameterSet());
 			    }
-			    const bool dispatched = DispatchComputeShader(
+			    const bool bDispatched = DispatchComputeShader(
 			        context.Resources,
 			        context.Commands,
 			        runtime->BindingLayout,

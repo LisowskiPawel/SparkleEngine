@@ -9,14 +9,14 @@
 
 namespace Filesystem::Private
 {
-	static void ValidatePath(const std::shared_ptr<spdlog::logger>& logger, const char* label, const std::filesystem::path& path, bool required)
+	static void ValidatePath(const std::shared_ptr<spdlog::logger>& logger, const char* label, const std::filesystem::path& path, bool bRequired)
 	{
 		constexpr std::size_t LabelWidth = 24;
 		const std::size_t labelLength = std::strlen(label);
 		const std::string paddedLabel = std::string(label) + std::string(LabelWidth - labelLength, ' ');
 		if (path.empty())
 		{
-			if (required)
+			if (bRequired)
 			{
 				Diagnostics::Fatal(logger, __FILE__, __LINE__, "[MISSING]  " + paddedLabel + ": (not configured)");
 			}
@@ -29,7 +29,7 @@ namespace Filesystem::Private
 			return;
 		}
 
-		if (required)
+		if (bRequired)
 		{
 			Diagnostics::Fatal(logger, __FILE__, __LINE__, "[MISSING]  " + paddedLabel + ": " + path.string());
 		}

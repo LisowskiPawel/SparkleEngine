@@ -51,23 +51,23 @@ struct SPARKLE_RENDERER_API RenderViewportExtent
 
 struct SPARKLE_RENDERER_API ViewportExposureOverrides final
 {
-	bool OverrideMode = false;
+	bool bOverrideMode = false;
 	EngineExposureMode Mode = EngineExposureMode::Automatic;
-	bool OverrideMeteringMethod = false;
+	bool bOverrideMeteringMethod = false;
 	EngineExposureMeteringMethod MeteringMethod = EngineExposureMeteringMethod::Histogram;
-	bool OverrideManualExposure = false;
+	bool bOverrideManualExposure = false;
 	float ManualExposure = 1.0f;
-	bool OverrideCompensation = false;
+	bool bOverrideCompensation = false;
 	float Compensation = 0.0f;
-	bool OverrideTargetLuminance = false;
+	bool bOverrideTargetLuminance = false;
 	float TargetLuminance = 0.18f;
-	bool OverrideMinimum = false;
+	bool bOverrideMinimum = false;
 	float Minimum = 0.000001f;
-	bool OverrideMaximum = false;
+	bool bOverrideMaximum = false;
 	float Maximum = 65536.0f;
-	bool OverrideAdaptationSpeedUp = false;
+	bool bOverrideAdaptationSpeedUp = false;
 	float AdaptationSpeedUp = 3.0f;
-	bool OverrideAdaptationSpeedDown = false;
+	bool bOverrideAdaptationSpeedDown = false;
 	float AdaptationSpeedDown = 1.0f;
 
 	bool operator==(const ViewportExposureOverrides&) const noexcept = default;
@@ -236,7 +236,7 @@ struct SPARKLE_RENDERER_API ViewportRenderProgress final
 	std::uint64_t OwnerViewportId = 0;
 	double SamplesPerSecond = 0.0;
 	double EstimatedSecondsRemaining = 0.0;
-	bool RetentionAvailable = false;
+	bool bRetentionAvailable = false;
 };
 
 struct SPARKLE_RENDERER_API ViewportRenderProducts

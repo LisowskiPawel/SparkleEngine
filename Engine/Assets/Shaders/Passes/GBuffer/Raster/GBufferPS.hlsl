@@ -26,7 +26,7 @@ void main(in PS::Input Input, out GBufferOutput Output)
 	Output.BaseColor = GBufferPacking::PackBaseColor(MatProps.BaseColor, MatProps.Alpha, MatProps.AlphaMode, Material::AlphaModeBlend);
 	Output.WorldNormal = GBufferPacking::PackWorldNormal(MatProps.NormalWorld);
 	const float3 worldTangent = OrthonormalizeTangent(Input.TangentWorld.xyz, Input.NormalWorld);
-	Output.WorldTangent = GBufferPacking::PackWorldTangent(Input.IsFrontFace ? worldTangent : -worldTangent);
+	Output.WorldTangent = GBufferPacking::PackWorldTangent(Input.bIsFrontFace ? worldTangent : -worldTangent);
 	Output.Material = GBufferPacking::PackMaterial(MatProps.Metallic, MatProps.Roughness, MatProps.AmbientOcclusion, MatProps.DielectricF0);
 	Output.Emissive = GBufferPacking::PackEmissive(MatProps.Emissive);
 	Output.Subsurface = GBufferPacking::PackSubsurface(MatProps.SubsurfaceColor, MatProps.SubsurfaceStrength);

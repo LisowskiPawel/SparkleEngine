@@ -25,11 +25,11 @@ static RhiFormatSupport QueryFormatSupport(D3D12Rhi& rhi, PixelFormat format) no
 		return support;
 	}
 
-	support.SupportsTexture = (data.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE2D) != 0;
-	support.SupportsShaderResource = (data.Support1 & (D3D12_FORMAT_SUPPORT1_SHADER_LOAD | D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE)) != 0;
-	support.SupportsUnorderedAccess = (data.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE) != 0;
-	support.SupportsRenderTarget = (data.Support1 & D3D12_FORMAT_SUPPORT1_RENDER_TARGET) != 0;
-	support.SupportsDepthStencil = (data.Support1 & D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL) != 0;
+	support.bSupportsTexture = (data.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE2D) != 0;
+	support.bSupportsShaderResource = (data.Support1 & (D3D12_FORMAT_SUPPORT1_SHADER_LOAD | D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE)) != 0;
+	support.bSupportsUnorderedAccess = (data.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE) != 0;
+	support.bSupportsRenderTarget = (data.Support1 & D3D12_FORMAT_SUPPORT1_RENDER_TARGET) != 0;
+	support.bSupportsDepthStencil = (data.Support1 & D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL) != 0;
 	return support;
 }
 
@@ -65,8 +65,8 @@ RhiCapabilities BuildD3D12Capabilities(D3D12Rhi& rhi, D3D12SwapChain& swapChain,
 	    .MaxDescriptorTableEntries = D3D12_MAX_SHADER_VISIBLE_DESCRIPTOR_HEAP_SIZE_TIER_2,
 	    .MaxPushConstantBytes = 256};
 
-	capabilities.DescriptorIndexing = RhiDescriptorIndexingCapabilities{.SupportsSampledImageArrayNonUniformIndexing = true, .SupportsPartiallyBoundDescriptorArrays = true};
-	capabilities.UploadReadback = RhiUploadReadbackCapabilities{.SupportsBufferUpload = true, .SupportsTextureUpload = true, .SupportsReadback = true};
+	capabilities.DescriptorIndexing = RhiDescriptorIndexingCapabilities{.bNonUniformSampledImages = true, .bSupportsPartiallyBoundDescriptorArrays = true};
+	capabilities.UploadReadback = RhiUploadReadbackCapabilities{.bSupportsBufferUpload = true, .bSupportsTextureUpload = true, .bSupportsReadback = true};
 
 	capabilities.Presentation = RhiPresentationCapabilities{
 	    .BackBufferCount = swapChain.GetBackBufferCount(),
@@ -80,13 +80,13 @@ RhiCapabilities BuildD3D12Capabilities(D3D12Rhi& rhi, D3D12SwapChain& swapChain,
 	capabilities.Diagnostics = BuildRhiBackendDiagnosticsSupport(rhi.IsValidationEnabled(), diagnostics);
 	capabilities.RayTracing = rhi.GetRayTracingCapabilities();
 	D3D12_FEATURE_DATA_D3D12_OPTIONS options{};
-	capabilities.SupportsShaderFloat64 = SUCCEEDED(rhi.GetDevice()->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(options))) && options.DoublePrecisionFloatShaderOps != FALSE;
-	capabilities.SupportsMeshShaders = false;
-	capabilities.SupportsTaskShaders = false;
+	capabilities.bSupportsShaderFloat64 = SUCCEEDED(rhi.GetDevice()->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(options))) && options.DoublePrecisionFloatShaderOps != FALSE;
+	capabilities.bSupportsMeshShaders = false;
+	capabilities.bSupportsTaskShaders = false;
 	capabilities.Queues.Set(ERhiQueueType::Graphics, true, true);
 	capabilities.Queues.Set(ERhiQueueType::Compute, true, true);
 	capabilities.Queues.Set(ERhiQueueType::Copy, true, true);
-	capabilities.SupportsPresent = swapChain.GetBackBufferFormat() != PixelFormat::Unknown;
+	capabilities.bSupportsPresent = swapChain.GetBackBufferFormat() != PixelFormat::Unknown;
 	capabilities.MemoryAllocator = ERhiMemoryAllocatorBackend::D3D12Managed;
 	capabilities.MemorySupport = BuildRhiBackendMemorySupport(diagnostics);
 	capabilities.ExternalFeatureInterop = BuildD3D12ExternalFeatureInteropCapabilities(&rhi, rhi.GetDevice() != nullptr);

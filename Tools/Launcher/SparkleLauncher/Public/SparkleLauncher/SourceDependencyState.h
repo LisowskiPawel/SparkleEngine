@@ -15,14 +15,14 @@ namespace SparkleLauncher
 		std::string Purpose;
 		std::string CacheDirectoryName;
 		std::vector<std::string> RequiredRelativePaths;
-		bool Required = false;
-		bool Enabled = false;
+		bool bRequired = false;
+		bool bEnabled = false;
 	};
 
 	struct SourceDependencyValidation
 	{
 		std::filesystem::path CachePath;
-		bool Ready = false;
+		bool bReady = false;
 		std::vector<std::string> MissingRelativePaths;
 	};
 
@@ -31,7 +31,7 @@ namespace SparkleLauncher
 		std::filesystem::path CacheRoot;
 		int EnabledDependencyCount = 0;
 		int ReadyDependencyCount = 0;
-		bool AllEnabledDependenciesReady = true;
+		bool bAllEnabledDependenciesReady = true;
 		std::vector<std::string> ReadinessMessages;
 	};
 

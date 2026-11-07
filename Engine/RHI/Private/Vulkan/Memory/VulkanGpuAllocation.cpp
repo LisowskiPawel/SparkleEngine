@@ -20,7 +20,7 @@ VulkanGpuAllocationRecord::~VulkanGpuAllocationRecord() noexcept
 		Owner->UnregisterAllocationRecord(*this);
 	}
 
-	if (Owner != nullptr && IsMapped && Allocation != nullptr)
+	if (Owner != nullptr && bIsMapped && Allocation != nullptr)
 	{
 		Owner->UnmapAllocation(*this);
 	}

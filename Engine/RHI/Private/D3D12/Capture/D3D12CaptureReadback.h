@@ -15,5 +15,5 @@ struct D3D12CaptureService::PendingReadback final
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CommandList;
 	D3D12_PLACED_SUBRESOURCE_FOOTPRINT Footprint{};
 	std::uint64_t TotalBytes = 0;
-	bool Cancelled = false;
+	bool bCancelled = false;
 };

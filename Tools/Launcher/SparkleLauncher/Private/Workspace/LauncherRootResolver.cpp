@@ -19,9 +19,9 @@ namespace SparkleLauncher
 		const auto products = tools.parent_path();
 		const bool bLauncherLayoutMatchesfilename = binaries.filename() == "Binaries" && tool.filename() == "SparkleLauncher";
 		const bool bLauncherLayoutMatchesfilename2 = bLauncherLayoutMatchesfilename && (tools.filename() == "Tools");
-		const bool launcherArtifactLayoutMatches = bLauncherLayoutMatchesfilename2 && (products.filename() == "dev");
+		const bool bLauncherArtifactLayoutMatches = bLauncherLayoutMatchesfilename2 && (products.filename() == "dev");
 		
-		if (launcherArtifactLayoutMatches)
+		if (bLauncherArtifactLayoutMatches)
 		{
 			auto artifacts = products.parent_path();
 			if (artifacts.filename() != "artifacts")

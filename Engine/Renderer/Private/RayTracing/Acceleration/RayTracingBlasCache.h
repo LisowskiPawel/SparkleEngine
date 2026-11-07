@@ -28,7 +28,7 @@ public:
 	{
 		RhiResourceHandle resource = {};
 		RhiGpuVirtualAddress gpuAddress = 0;
-		bool builtThisFrame = false;
+		bool bBuiltThisFrame = false;
 
 		bool IsValid() const noexcept;
 	};
@@ -82,7 +82,7 @@ private:
 		RhiOwnedResourceHandle accelerationStructureBuffer = {};
 		std::uint64_t scratchBufferSizeInBytes = 0;
 		std::uint64_t accelerationStructureSizeInBytes = 0;
-		bool touchedThisFrame = false;
+		bool bTouchedThisFrame = false;
 	};
 
 	void ReleaseEntryResources(Entry& entry) noexcept;

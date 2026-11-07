@@ -51,15 +51,15 @@ void RenderDeformationPreparation::PrepareJointMatrices(
 			++primitiveIndex;
 		}
 
-		const bool primitiveInRange = primitiveIndex < primitives.size();
-		const bool objectMatches = primitiveInRange && primitives[primitiveIndex].Object == range.Object;
-		const bool bDeformationHandlesValidSkeleton = objectMatches && range.Skeleton.IsValid();
-		const bool deformationHandlesValid = bDeformationHandlesValidSkeleton && (range.Animation.IsValid());
-		const bool bJointOffsetValidMatrixCount = deformationHandlesValid && range.JointMatrixCount != 0;
-		const bool jointMatrixOffsetValid = bJointOffsetValidMatrixCount && (range.JointMatrixOffset <= jointMatrices.size());
-		const bool jointMatrixCountValid = jointMatrixOffsetValid && range.JointMatrixCount <= jointMatrices.size() - range.JointMatrixOffset;
+		const bool bPrimitiveInRange = primitiveIndex < primitives.size();
+		const bool bObjectMatches = bPrimitiveInRange && primitives[primitiveIndex].Object == range.Object;
+		const bool bDeformationHandlesValidSkeleton = bObjectMatches && range.Skeleton.IsValid();
+		const bool bDeformationHandlesValid = bDeformationHandlesValidSkeleton && (range.Animation.IsValid());
+		const bool bJointOffsetValidMatrixCount = bDeformationHandlesValid && range.JointMatrixCount != 0;
+		const bool bJointMatrixOffsetValid = bJointOffsetValidMatrixCount && (range.JointMatrixOffset <= jointMatrices.size());
+		const bool bJointMatrixCountValid = bJointMatrixOffsetValid && range.JointMatrixCount <= jointMatrices.size() - range.JointMatrixOffset;
 
-		if (!jointMatrixCountValid)
+		if (!bJointMatrixCountValid)
 		{
 			continue;
 		}
@@ -110,8 +110,8 @@ void RenderDeformationPreparation::PrepareMorphWeights(
 		}
 
 		const bool bValidSampleweightsSize = sample != nullptr && sample->WeightOffset <= weights.size();
-		const bool validSample = bValidSampleweightsSize && (sample->WeightCount <= weights.size() - sample->WeightOffset);
-		const std::span<const float> current = validSample ? weights.subspan(sample->WeightOffset, sample->WeightCount) : std::span<const float>{};
+		const bool bValidSample = bValidSampleweightsSize && (sample->WeightCount <= weights.size() - sample->WeightOffset);
+		const std::span<const float> current = bValidSample ? weights.subspan(sample->WeightOffset, sample->WeightCount) : std::span<const float>{};
 		const std::span<const float> previous = history.size() == primitive.MorphTargetCount ? history : current;
 
 		primitive.Draw.Morph = MeshDrawMorph{.WeightOffset = static_cast<std::uint32_t>(morphWeightCount), .TargetCount = primitive.MorphTargetCount, .VertexCount = primitive.MorphTargetVertexCount};

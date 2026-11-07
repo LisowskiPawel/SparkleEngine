@@ -25,14 +25,14 @@ namespace Strings
 	SPARKLE_CORE_API std::string_view Unquote(std::string_view str) noexcept;
 	SPARKLE_CORE_API std::string TrimCopy(std::string_view str);
 	SPARKLE_CORE_API std::string UnquoteCopy(std::string_view str);
-	SPARKLE_CORE_API std::vector<std::string_view> Split(std::string_view str, char separator, bool keepEmptyFields = true);
+	SPARKLE_CORE_API std::vector<std::string_view> Split(std::string_view str, char separator, bool bKeepEmptyFields = true);
 	SPARKLE_CORE_API std::string ToLowerCopy(std::string_view str);
 	SPARKLE_CORE_API std::string EscapeCsvField(std::string_view str);
 	SPARKLE_CORE_API std::string EscapeJsonString(std::string_view str);
 	SPARKLE_CORE_API bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs) noexcept;
 	SPARKLE_CORE_API bool StartsWithIgnoreCase(std::string_view value, std::string_view prefix) noexcept;
 	SPARKLE_CORE_API bool ContainsIgnoreCase(std::string_view haystack, std::string_view needle) noexcept;
-	SPARKLE_CORE_API bool TryParseBool(std::string_view str, bool& outValue);
+	SPARKLE_CORE_API bool TryParseBool(std::string_view str, bool& bOutValue);
 	SPARKLE_CORE_API bool TrySplitKeyValue(std::string_view str, char separator, std::string_view& outKey, std::string_view& outValue) noexcept;
 	SPARKLE_CORE_API std::string Join(std::span<const std::string_view> values, std::string_view separator, std::size_t firstValueIndex = 0);
 

@@ -24,7 +24,7 @@ namespace SparkleLauncher
 		std::filesystem::path PreservedPath;
 		std::string PreviewDetail;
 		MaintenanceCleanBehavior CleanBehavior = MaintenanceCleanBehavior::RemovePath;
-		bool DeletesGeneratedOutput = false;
+		bool bDeletesGeneratedOutput = false;
 	};
 
 	std::vector<CleanScope> ResolveRequestedCleanScopes(const MaintenanceOperationRequest& request);

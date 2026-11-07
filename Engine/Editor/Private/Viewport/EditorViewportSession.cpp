@@ -18,7 +18,7 @@ void EditorViewportSession::SetViewModeChangedHandler(std::function<void(RenderV
 
 void EditorViewportSession::SynchronizeWorld(std::span<const WorldCameraReadData> cameras, std::uint64_t worldGeneration) noexcept
 {
-	if (m_cameraInitialized && m_worldGeneration == worldGeneration)
+	if (m_bCameraInitialized && m_worldGeneration == worldGeneration)
 	{
 		return;
 	}
@@ -26,7 +26,7 @@ void EditorViewportSession::SynchronizeWorld(std::span<const WorldCameraReadData
 	const WorldCameraReadData* source = nullptr;
 	for (const WorldCameraReadData& camera : cameras)
 	{
-		if (camera.Active)
+		if (camera.bActive)
 		{
 			source = &camera;
 			break;
@@ -48,7 +48,7 @@ void EditorViewportSession::SynchronizeWorld(std::span<const WorldCameraReadData
 		m_camera.FarZ = source->Description.farZ;
 	}
 	m_worldGeneration = worldGeneration;
-	m_cameraInitialized = true;
+	m_bCameraInitialized = true;
 }
 
 RenderViewCameraData EditorViewportSession::UpdateCamera(const CameraInputIntent& intent, float deltaSeconds, RenderViewportExtent extent) noexcept
@@ -82,9 +82,9 @@ void EditorViewportSession::SetRotationSpeed(float degreesPerPixel) noexcept
 	(void) m_settings.SetRotationSpeed(degreesPerPixel);
 }
 
-void EditorViewportSession::SetInvertY(bool invertY) noexcept
+void EditorViewportSession::SetInvertY(bool bInvertY) noexcept
 {
-	(void) m_settings.SetInvertY(invertY);
+	(void) m_settings.SetInvertY(bInvertY);
 }
 
 void EditorViewportSession::SetProjectionKind(CameraProjectionKind projectionKind) noexcept

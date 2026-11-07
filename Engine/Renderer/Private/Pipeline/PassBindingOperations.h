@@ -16,5 +16,5 @@ void BindPassParameters(
     const PassParameterSet& parameterSet,
     std::span<const char* const> bindingNames,
     const PassBindingOverrides* overrides,
-    bool bindLayout,
+    bool bBindLayout,
     BindingDomain domain);

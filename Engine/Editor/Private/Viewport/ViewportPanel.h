@@ -41,7 +41,7 @@ public:
 
 	bool GetInputBounds(float& left, float& top, float& right, float& bottom) const noexcept;
 	void SetOverlay(std::unique_ptr<ViewportOverlay> overlay) noexcept;
-	void BuildUI(EditorIconService& icons, bool disableInteraction = false);
+	void BuildUI(EditorIconService& icons, bool bDisableInteraction = false);
 
 private:
 	void BeginViewportWindow() const;
@@ -50,7 +50,7 @@ private:
 	void UpdateRequestedExtent(float availableWidth, float availableHeight) noexcept;
 	void BuildEmptyState() noexcept;
 	void BuildProgressOverlay() noexcept;
-	void BuildOverlay(EditorIconService& icons, bool disableInteraction) noexcept;
+	void BuildOverlay(EditorIconService& icons, bool bDisableInteraction) noexcept;
 
 	ViewportRenderRequest m_renderRequest = {};
 	ViewportRenderProducts m_renderProducts = {};
@@ -63,7 +63,7 @@ private:
 	float m_inputTop = 0.0f;
 	float m_inputRight = 0.0f;
 	float m_inputBottom = 0.0f;
-	bool m_hasInputBounds = false;
+	bool m_bHasInputBounds = false;
 	ViewportOutputAction m_outputAction = ViewportOutputAction::None;
 	std::unique_ptr<ViewportOverlay> m_overlay;
 };

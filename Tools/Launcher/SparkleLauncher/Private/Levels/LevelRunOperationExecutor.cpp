@@ -12,7 +12,7 @@ namespace SparkleLauncher
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
-		if (!plan.CanRun)
+		if (!plan.bCanRun)
 		{
 			SetOperationFailure(
 			    operation,
@@ -41,9 +41,9 @@ namespace SparkleLauncher
 					operation.GpuCrash = GpuCrashIncident{path, plan.SessionId, result.ProcessId};
 				}
 			}
-			if (!result.Ready || !result.Succeeded())
+			if (!result.bReady || !result.Succeeded())
 			{
-				if (result.Cancelled)
+				if (result.bCancelled)
 				{
 					SetOperationFailure(operation, OperationProblemKind::Cancellation, step.DisplayName + " was canceled.", "Open the level again when ready.");
 				}
@@ -55,7 +55,7 @@ namespace SparkleLauncher
 					    result.FailureReason.empty() ? step.DisplayName + " failed." : result.FailureReason,
 					    "Review the application startup log, correct the first startup or readiness failure, then retry this level.");
 				}
-				MarkOperationFinished(operation, result.Cancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
+				MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 				return operation;
 			}
 		}

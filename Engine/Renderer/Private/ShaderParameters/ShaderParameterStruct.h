@@ -94,7 +94,7 @@ template <typename TValue> struct ShaderBufferUAVField<RWStructuredBuffer<TValue
 	SPARKLE_REGISTER_SHADER_VALUE(Name)
 
 #define SHADER_PARAMETER_CBUFFER(UniformType, Name)                                                                                         \
-	static_assert(::IsSupportedShaderUniformV<UniformType>, "Uniform buffers are limited to shared globals and existing per-object data."); \
+	static_assert(::bIsSupportedShaderUniformV<UniformType>, "Uniform buffers are limited to shared globals and existing per-object data."); \
 	::ShaderUniform<UniformType> Name{};                                                                                                    \
 	inline static const ::ShaderParameterDescriptorAutoRegister<ThisShaderParameterStruct> AutoRegisterParameter_##Name{                    \
 	    #Name,                                                                                                                              \

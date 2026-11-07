@@ -46,7 +46,7 @@ EditorApplication::~EditorApplication()
 
 void EditorApplication::Initialize()
 {
-	if (m_isEditorSessionActive)
+	if (m_bIsEditorSessionActive)
 	{
 		return;
 	}
@@ -66,7 +66,7 @@ void EditorApplication::Initialize()
 #if SPARKLE_APPLICATION_WITH_EXTERNAL_CAPTURE_UI
 	m_state->Ui->SetViewportOverlay(CreateEditorExternalCaptureOverlay(m_state->Game->GetRenderer()));
 #endif
-	m_isEditorSessionActive = true;
+	m_bIsEditorSessionActive = true;
 }
 
 void EditorApplication::InitializeGameApplication()
@@ -75,7 +75,7 @@ void EditorApplication::InitializeGameApplication()
 	{
 		GameApplicationOptions gameOptions = m_gameOptions;
 		gameOptions.WindowTitle = "Sparkle Editor";
-		gameOptions.EnableUiRenderPackets = true;
+		gameOptions.bEnableUiRenderPackets = true;
 		m_state->Game = std::make_unique<GameApplication>(gameOptions);
 	}
 
@@ -144,7 +144,7 @@ void EditorApplication::InitializeUi()
 	ConfigureUiDiagnostics(renderer);
 	if (m_state->ShaderCompileOperation)
 	{
-		m_state->Ui->SetShaderCompileHandler([this](bool generateSymbols) { return m_state->ShaderCompileOperation->Request(generateSymbols); });
+		m_state->Ui->SetShaderCompileHandler([this](bool bGenerateSymbols) { return m_state->ShaderCompileOperation->Request(bGenerateSymbols); });
 	}
 }
 
@@ -161,7 +161,7 @@ void EditorApplication::ConfigureUiDiagnostics(Renderer& renderer)
 
 bool EditorApplication::Tick()
 {
-	if (!m_isEditorSessionActive || !m_state->Game || !m_state->Ui)
+	if (!m_bIsEditorSessionActive || !m_state->Game || !m_state->Ui)
 	{
 		return false;
 	}
@@ -232,5 +232,5 @@ void EditorApplication::Shutdown()
 	{
 		m_state->Game->Shutdown();
 	}
-	m_isEditorSessionActive = false;
+	m_bIsEditorSessionActive = false;
 }

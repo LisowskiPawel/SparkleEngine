@@ -97,12 +97,12 @@ namespace SparkleLauncher
 
 	bool LauncherWorkspaceSetup::CompleteOperation(const QString& runId)
 	{
-		bool changed = false;
+		bool bChanged = false;
 		for (auto dependencyRun = m_sourceDependencyRunIds.begin(); dependencyRun != m_sourceDependencyRunIds.end();)
 		{
 			if (dependencyRun.value() == runId)
 			{
-				changed = true;
+				bChanged = true;
 				dependencyRun = m_sourceDependencyRunIds.erase(dependencyRun);
 			}
 			else
@@ -111,11 +111,11 @@ namespace SparkleLauncher
 			}
 		}
 		m_cleaningSourceDependencyRunIds.remove(runId);
-		if (changed)
+		if (bChanged)
 		{
 			RefreshSourceDependencyRows();
 		}
-		return changed;
+		return bChanged;
 	}
 
 	static constexpr int kSpaceSmall = LauncherUi::Space::Small;
@@ -147,32 +147,32 @@ namespace SparkleLauncher
 	QPushButton* LauncherWorkspaceSetup::CreateHostToolActionButton(const ToolchainItemStatus& item)
 	{
 		const std::optional<WorkspaceCompiler> compiler = item.Compiler;
-		const bool selected = compiler.has_value() && *compiler == ResolveSelectedWorkspaceCompiler(m_settings);
-		if (item.State == ToolchainItemState::Found && (!compiler.has_value() || selected))
+		const bool bSelected = compiler.has_value() && *compiler == ResolveSelectedWorkspaceCompiler(m_settings);
+		if (item.State == ToolchainItemState::Found && (!compiler.has_value() || bSelected))
 		{
 			return nullptr;
 		}
-		if (item.State != ToolchainItemState::Found && !item.CanInstall)
+		if (item.State != ToolchainItemState::Found && !item.bCanInstall)
 		{
 			return nullptr;
 		}
 
-		const bool install = item.State != ToolchainItemState::Found;
-		const QString label = install ? QStringLiteral("Install") : QStringLiteral("Use");
+		const bool bInstall = item.State != ToolchainItemState::Found;
+		const QString label = bInstall ? QStringLiteral("Install") : QStringLiteral("Use");
 		const QString displayName = QString::fromStdString(item.DisplayName);
 		QPushButton* button = new QPushButton(&m_dialogParent);
-		ApplyStatusActionButtonPresentation(*button, label, install ? QStringLiteral("warning") : QStringLiteral("neutral"));
+		ApplyStatusActionButtonPresentation(*button, label, bInstall ? QStringLiteral("warning") : QStringLiteral("neutral"));
 		button->setAccessibleName(label + " " + displayName);
-		button->setToolTip(install ? "Install " + displayName + ". It becomes selectable after detection confirms the installation." : "Select " + displayName + " for launcher builds.");
+		button->setToolTip(bInstall ? "Install " + displayName + ". It becomes selectable after detection confirms the installation." : "Select " + displayName + " for launcher builds.");
 		emit FocusableWidgetCreated(button);
 
 		connect(
 		    button,
 		    &QPushButton::clicked,
 		    this,
-		    [this, item, compiler, install]()
+		    [this, item, compiler, bInstall]()
 		    {
-			    if (install)
+			    if (bInstall)
 			    {
 				    InstallHostTool(item);
 			    }
@@ -190,36 +190,36 @@ namespace SparkleLauncher
 		AddStatusRow(
 		    layout,
 		    QString::fromStdString(item.DisplayName),
-		    ToolchainStatusText(item.State, item.Required),
+		    ToolchainStatusText(item.State, item.bRequired),
 		    CompactToolchainDetail(item),
-		    ToolchainStatusState(item.State, item.Required),
+		    ToolchainStatusState(item.State, item.bRequired),
 		    CreateHostToolActionButton(item));
 	}
 
-	void LauncherWorkspaceSetup::AddBuildFilesStatus(QVBoxLayout& layout, const BuildFilesFreshnessStatus& freshness, bool offerRefresh)
+	void LauncherWorkspaceSetup::AddBuildFilesStatus(QVBoxLayout& layout, const BuildFilesFreshnessStatus& freshness, bool bOfferRefresh)
 	{
 		AddStatusRow(
 		    layout,
 		    "Build files",
-		    freshness.Current ? "Ready" : "Needs refresh",
+		    freshness.bCurrent ? "Ready" : "Needs refresh",
 		    CombineStatusDetail(QString::fromStdString(freshness.Summary), BuildFilesExpectedAction(freshness)),
-		    freshness.Current ? "ok" : "warning",
-		    !offerRefresh || freshness.Current ? nullptr : CreateStatusActionButton("workspace.generate-build-files", "Generate", "Generate Build Files"));
+		    freshness.bCurrent ? "ok" : "warning",
+		    !bOfferRefresh || freshness.bCurrent ? nullptr : CreateStatusActionButton("workspace.generate-build-files", "Generate", "Generate Build Files"));
 	}
 
-	void LauncherWorkspaceSetup::AddSetupPrerequisiteStatus(QVBoxLayout& layout, const BuildWorkspaceOperationPlan& plan, bool isSourceSyncWorkflow)
+	void LauncherWorkspaceSetup::AddSetupPrerequisiteStatus(QVBoxLayout& layout, const BuildWorkspaceOperationPlan& plan, bool bIsSourceSyncWorkflow)
 	{
-		const QString configurePrerequisiteDetail = !plan.CanRun && !plan.ReadinessMessages.empty() ? QString::fromStdString(plan.ReadinessMessages.back()) : QString();
+		const QString configurePrerequisiteDetail = !plan.bCanRun && !plan.ReadinessMessages.empty() ? QString::fromStdString(plan.ReadinessMessages.back()) : QString();
 
-		if (!plan.Toolchain.RequiredToolsAvailable)
+		if (!plan.Toolchain.bRequiredToolsAvailable)
 		{
 			AddStatusRow(layout, "Action needed", "Blocked", RequiredToolProblemSummary(plan.Toolchain), "bad", CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true));
 		}
-		else if (!plan.CanRun && !configurePrerequisiteDetail.isEmpty())
+		else if (!plan.bCanRun && !configurePrerequisiteDetail.isEmpty())
 		{
 			AddStatusRow(
 			    layout,
-			    isSourceSyncWorkflow ? "Missing host prerequisite" : "Renderer prerequisites",
+			    bIsSourceSyncWorkflow ? "Missing host prerequisite" : "Renderer prerequisites",
 			    "Blocked",
 			    configurePrerequisiteDetail,
 			    "bad",
@@ -234,15 +234,15 @@ namespace SparkleLauncher
 	    const BuildWorkspaceOperationPlan& plan,
 	    const QString& workspaceIdeName)
 	{
-		const bool isSourceSyncWorkflow = operationId == "workspace.sync-code";
+		const bool bIsSourceSyncWorkflow = operationId == "workspace.sync-code";
 
 		QVBoxLayout* machineLayout = AddOptionGroup(layout, "Dependencies", QString());
 
-		const auto addToolchainItems = [this, machineLayout, &plan](bool requiredOnly)
+		const auto addToolchainItems = [this, machineLayout, &plan](bool bRequiredOnly)
 		{
 			for (const ToolchainItemStatus& item : plan.Toolchain.Items)
 			{
-				if (item.Required != requiredOnly)
+				if (item.bRequired != bRequiredOnly)
 				{
 					continue;
 				}
@@ -261,17 +261,17 @@ namespace SparkleLauncher
 		        : (plan.Toolchain.VisualStudioIdePath.empty() ? "Visual Studio IDE was not found." : QString::fromStdString(plan.Toolchain.VisualStudioIdePath.string())),
 		    request.PreferredIde == WorkspaceIde::Rider ? (plan.Toolchain.RiderPath.empty() ? "warning" : "ok") : (plan.Toolchain.VisualStudioIdePath.empty() ? "warning" : "ok"));
 
-		if (!isSourceSyncWorkflow)
+		if (!bIsSourceSyncWorkflow)
 		{
 			AddBuildFilesStatus(*machineLayout, plan.Freshness, false);
 		}
 
-		AddSetupPrerequisiteStatus(*machineLayout, plan, isSourceSyncWorkflow);
+		AddSetupPrerequisiteStatus(*machineLayout, plan, bIsSourceSyncWorkflow);
 
 		machineLayout->addSpacing(kSpaceSmall);
 		machineLayout->addWidget(CreateSectionLabel("Optional host tools"));
 		addToolchainItems(false);
-		if (isSourceSyncWorkflow)
+		if (bIsSourceSyncWorkflow)
 		{
 			machineLayout->addSpacing(kSpaceSmall);
 			machineLayout->addWidget(CreateSectionLabel("Source dependencies"));
@@ -297,7 +297,7 @@ namespace SparkleLauncher
 
 		for (const ToolchainItemStatus& item : plan.Toolchain.Items)
 		{
-			if (!item.Required || item.State == ToolchainItemState::Found)
+			if (!item.bRequired || item.State == ToolchainItemState::Found)
 			{
 				continue;
 			}
@@ -316,7 +316,7 @@ namespace SparkleLauncher
 			    CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true));
 		}
 
-		if (!plan.CanRun && issueLayout == nullptr && !request.SelectedScopes.empty())
+		if (!plan.bCanRun && issueLayout == nullptr && !request.SelectedScopes.empty())
 		{
 			const QString detail = plan.ReadinessMessages.empty() ? QStringLiteral("The selected build cannot run with the current workspace configuration.")
 			                                                      : QString::fromStdString(plan.ReadinessMessages.back());
@@ -332,10 +332,10 @@ namespace SparkleLauncher
 		AddStatusRow(
 		    *buildLayout,
 		    "Required tools",
-		    plan.Toolchain.RequiredToolsAvailable ? "Ready" : "Blocked",
-		    plan.Toolchain.RequiredToolsAvailable ? BuildGeneratorSummary(plan.Toolchain) : RequiredToolProblemSummary(plan.Toolchain),
-		    plan.Toolchain.RequiredToolsAvailable ? "ok" : "bad",
-		    plan.Toolchain.RequiredToolsAvailable ? nullptr : CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true));
+		    plan.Toolchain.bRequiredToolsAvailable ? "Ready" : "Blocked",
+		    plan.Toolchain.bRequiredToolsAvailable ? BuildGeneratorSummary(plan.Toolchain) : RequiredToolProblemSummary(plan.Toolchain),
+		    plan.Toolchain.bRequiredToolsAvailable ? "ok" : "bad",
+		    plan.Toolchain.bRequiredToolsAvailable ? nullptr : CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true));
 
 		AddBuildFilesStatus(*buildLayout, plan.Freshness, true);
 	}
@@ -402,7 +402,7 @@ namespace SparkleLauncher
 			    CreateStatusActionButton("cook.tools.prepare", "Build", "Build Cooking Tools"));
 		}
 
-		if (!cookPlan.CanRun && issueLayout == nullptr && !cookPlan.Request.SelectedScopes.empty())
+		if (!cookPlan.bCanRun && issueLayout == nullptr && !cookPlan.Request.SelectedScopes.empty())
 		{
 			const QString detail = cookPlan.ReadinessMessages.empty() ? QStringLiteral("The selected cooking stages cannot run with the current workspace configuration.")
 			                                                          : QString::fromStdString(cookPlan.ReadinessMessages.back());
@@ -412,20 +412,20 @@ namespace SparkleLauncher
 		}
 	}
 
-	QPushButton* LauncherWorkspaceSetup::CreateStatusActionButton(const QString& actionId, const QString& actionLabel, const QString& actionTitle, bool navigateInsteadOfRun)
+	QPushButton* LauncherWorkspaceSetup::CreateStatusActionButton(const QString& actionId, const QString& actionLabel, const QString& actionTitle, bool bNavigateInsteadOfRun)
 	{
 		QPushButton* button = new QPushButton(&m_dialogParent);
 		ApplyStatusActionButtonPresentation(*button, actionLabel, "warning");
 		button->setAccessibleName(actionTitle);
 		button->setToolTip(actionTitle + ".");
 		emit FocusableWidgetCreated(button);
-		connect(button, &QPushButton::clicked, this, [this, actionId, actionTitle, navigateInsteadOfRun]() { TriggerActionDependencyRegenerate(actionId, actionTitle, navigateInsteadOfRun); });
+		connect(button, &QPushButton::clicked, this, [this, actionId, actionTitle, bNavigateInsteadOfRun]() { TriggerActionDependencyRegenerate(actionId, actionTitle, bNavigateInsteadOfRun); });
 		return button;
 	}
 
-	void LauncherWorkspaceSetup::TriggerActionDependencyRegenerate(const QString& actionId, const QString& actionTitle, bool navigateInsteadOfRun)
+	void LauncherWorkspaceSetup::TriggerActionDependencyRegenerate(const QString& actionId, const QString& actionTitle, bool bNavigateInsteadOfRun)
 	{
-		if (navigateInsteadOfRun)
+		if (bNavigateInsteadOfRun)
 		{
 			emit OperationSelected(actionId);
 			return;

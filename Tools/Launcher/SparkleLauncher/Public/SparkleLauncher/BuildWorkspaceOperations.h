@@ -31,12 +31,12 @@ namespace SparkleLauncher
 	{
 		std::string Id;
 		std::string DisplayName;
-		bool Required = true;
+		bool bRequired = true;
 		ToolchainItemState State = ToolchainItemState::Missing;
 		std::filesystem::path Path;
 		std::string Detail;
 		std::optional<WorkspaceCompiler> Compiler;
-		bool CanInstall = false;
+		bool bCanInstall = false;
 	};
 
 	struct BuildToolchainStatus
@@ -61,16 +61,16 @@ namespace SparkleLauncher
 		std::string WindowsSdkVersion;
 		std::vector<ToolchainItemStatus> Items;
 		WorkspaceCompiler Compiler = WorkspaceCompiler::Msvc;
-		bool RequiredToolsAvailable = false;
-		bool ConfigurePrerequisitesAvailable = true;
+		bool bRequiredToolsAvailable = false;
+		bool bConfigurePrerequisitesAvailable = true;
 	};
 
 	struct WorkspaceFeatureSettings
 	{
-		bool ContentPipelineEnabled = false;
-		bool ShaderCompilerEnabled = false;
-		bool KtxSupportEnabled = false;
-		bool NvidiaStreamlineEnabled = false;
+		bool bContentPipelineEnabled = false;
+		bool bShaderCompilerEnabled = false;
+		bool bKtxSupportEnabled = false;
+		bool bNvidiaStreamlineEnabled = false;
 	};
 
 	enum class WorkspaceIde : std::uint8_t
@@ -97,7 +97,7 @@ namespace SparkleLauncher
 	struct BuildFilesFreshnessStatus
 	{
 		BuildFilesFreshnessState State = BuildFilesFreshnessState::Unsupported;
-		bool Current = false;
+		bool bCurrent = false;
 		std::filesystem::path BuildDirectory;
 		std::filesystem::path CachePath;
 		std::filesystem::path SolutionPath;
@@ -132,7 +132,7 @@ namespace SparkleLauncher
 		std::string Group;
 		std::string DisplayName;
 		std::string Description;
-		bool ReplacesLauncherArtifact = false;
+		bool bReplacesLauncherArtifact = false;
 	};
 
 	struct BuildWorkspaceOperationRequest
@@ -147,7 +147,7 @@ namespace SparkleLauncher
 		std::vector<std::string> SelectedTargets;
 		std::string SourceDependencyId;
 		std::string HostToolId;
-		bool ForceConfigure = false;
+		bool bForceConfigure = false;
 	};
 
 	struct BuildWorkspaceOperationStep
@@ -156,7 +156,7 @@ namespace SparkleLauncher
 		std::string DisplayName;
 		std::string DisplayCommandLine;
 		std::filesystem::path LogPath;
-		bool UpdatesBuildFilesFreshness = false;
+		bool bUpdatesBuildFilesFreshness = false;
 	};
 
 	struct BuildWorkspaceOperationPlan
@@ -170,7 +170,7 @@ namespace SparkleLauncher
 		std::vector<BuildWorkspaceOperationStep> Steps;
 		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
-		bool CanRun = false;
+		bool bCanRun = false;
 	};
 
 	std::string ToString(ToolchainItemState state);

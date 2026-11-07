@@ -12,7 +12,7 @@ RayTracingPtlasPartitionPlan RenderRayTracingViewPlanner::Build(const PreparedRe
 	    RayTracingPtlasPartitionPlannerConfig{
 	        .PartitionsPerAxis = CVarRayTracingPartitionsPerAxis.Get(),
 	        .PartitionUpdateMode = CVarRayTracingPtlasPartitionUpdateMode.Get(),
-	        .MarkAllDynamicInPartition = CVarRayTracingPtlasMarkAllDynamicInPartition.Get(),
+	        .bMarkAllDynamicInPartition = CVarRayTracingPtlasMarkAllDynamicInPartition.Get(),
 	        .CameraPosition = cameraPosition,
 	        .ModeChangeDistance = CVarRayTracingPtlasModeChangeDistance.Get()});
 }

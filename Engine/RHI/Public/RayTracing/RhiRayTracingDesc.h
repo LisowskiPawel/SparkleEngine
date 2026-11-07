@@ -31,9 +31,9 @@ struct RhiRayTracingCapabilityGroups
 
 struct RhiRayTracingCapabilities
 {
-	bool SupportsAccelerationStructure = false;
-	bool SupportsInlineRayQuery = false;
-	bool SupportsRayTracingPipeline = false;
+	bool bSupportsAccelerationStructure = false;
+	bool bSupportsInlineRayQuery = false;
+	bool bSupportsRayTracingPipeline = false;
 	std::uint32_t MaxTraceRecursionDepth = 0;
 	std::uint32_t MaxRayPayloadSizeInBytes = 0;
 	std::uint32_t MaxRayAttributeSizeInBytes = 0;

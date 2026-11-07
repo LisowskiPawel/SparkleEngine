@@ -20,7 +20,7 @@ namespace PipelineMaterialization
 	    RenderHardwareInterface& renderHardwareInterface,
 	    const PassParameterLayout& parameterLayout,
 	    std::span<const ResolvedShader> shaders,
-	    bool allowInputAssemblerInputLayout,
+	    bool bAllowInputAssemblerInputLayout,
 	    const wchar_t* debugName);
 
 	std::unique_ptr<RenderPipeline> CreateGraphicsPipeline(RenderHardwareInterface& renderHardwareInterface, const GraphicsPipelineDesc& pipelineDesc);

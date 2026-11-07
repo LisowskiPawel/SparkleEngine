@@ -220,7 +220,7 @@ private:
 		const RhiBufferResourceDesc readbackBufferDesc{
 		    .SizeInBytes = static_cast<std::uint64_t>(kQueriesPerQueuePerFrame) * sizeof(std::uint64_t),
 		    .StrideInBytes = sizeof(std::uint64_t),
-		    .AllowUnorderedAccess = false};
+		    .bAllowUnorderedAccess = false};
 
 		const D3D12_RESOURCE_DESC nativeReadbackDesc = D3D12TypeConversions::BuildBufferResourceDesc(readbackBufferDesc);
 		const std::wstring queueName = Strings::ToWide(std::string_view(RhiQueueTypeToString(queueType)));
@@ -238,7 +238,7 @@ private:
 		{
 			Diagnostics::Fatal(g_d3d12RenderDiagnosticsLogger, __FILE__, __LINE__, "Failed to map a D3D12 timestamp readback buffer.");
 		}
-		readbackAllocation->IsMapped = true;
+		readbackAllocation->bIsMapped = true;
 		readbackAllocation->CpuMappedAddress = poolState.MappedReadback;
 
 		std::memset(poolState.MappedReadback, 0, static_cast<std::size_t>(readbackBufferDesc.SizeInBytes));

@@ -104,6 +104,6 @@ private:
 	std::uint32_t m_temporalSampleIndex = 0u;
 	RenderViewInvalidationReason m_pendingInvalidationReasons = RenderViewInvalidationReason::ExplicitReset;
 	RenderViewInvalidationReason m_lastInvalidationReasons = RenderViewInvalidationReason::ExplicitReset;
-	bool m_hasIdentity = false;
-	bool m_hasPreviousPose = false;
+	bool m_bHasIdentity = false;
+	bool m_bHasPreviousPose = false;
 };

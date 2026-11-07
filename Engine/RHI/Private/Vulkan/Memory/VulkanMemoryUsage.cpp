@@ -13,8 +13,8 @@ namespace VulkanMemoryUsage
 		VmaTotalStatistics totalStats = {};
 		vmaCalculateStatistics(allocator, &totalStats);
 		snapshot.AllocatorBackend = ERhiMemoryAllocatorBackend::VulkanManaged;
-		snapshot.HasBudgetData = true;
-		snapshot.HasDelayedDestructionTracking = true;
+		snapshot.bHasBudgetData = true;
+		snapshot.bHasDelayedDestructionTracking = true;
 		snapshot.TotalUsedBytes = totalStats.total.statistics.allocationBytes;
 		snapshot.TotalAllocatedBytes = totalStats.total.statistics.blockBytes;
 		for (std::uint32_t heapIndex = 0; heapIndex < memoryProperties.memoryHeapCount; ++heapIndex)

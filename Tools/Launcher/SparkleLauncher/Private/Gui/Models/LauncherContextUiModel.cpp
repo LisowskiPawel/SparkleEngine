@@ -65,8 +65,8 @@ namespace SparkleLauncher
 	{
 		QString DisplayName;
 		QString Value;
-		bool HasEditorProfile = false;
-		bool HasGameProfile = false;
+		bool bHasEditorProfile = false;
+		bool bHasGameProfile = false;
 	};
 
 	static QVector<LauncherSelectionOption> BuildConfigurationOptions()
@@ -88,21 +88,21 @@ namespace SparkleLauncher
 				found = std::prev(supportedConfigurations.end());
 			}
 
-			found->HasEditorProfile = found->HasEditorProfile || profile.Target == BuildProfileTarget::Editor;
-			found->HasGameProfile = found->HasGameProfile || profile.Target == BuildProfileTarget::Game;
+			found->bHasEditorProfile = found->bHasEditorProfile || profile.Target == BuildProfileTarget::Editor;
+			found->bHasGameProfile = found->bHasGameProfile || profile.Target == BuildProfileTarget::Game;
 		}
 
 		QVector<LauncherSelectionOption> options;
 		options.reserve(supportedConfigurations.size());
 		for (const BuildConfigurationSupport& configuration : supportedConfigurations)
 		{
-			const bool available = configuration.HasEditorProfile && configuration.HasGameProfile;
+			const bool bAvailable = configuration.bHasEditorProfile && configuration.bHasGameProfile;
 			QStringList missingProfiles;
-			if (!configuration.HasEditorProfile)
+			if (!configuration.bHasEditorProfile)
 			{
 				missingProfiles.push_back("editor");
 			}
-			if (!configuration.HasGameProfile)
+			if (!configuration.bHasGameProfile)
 			{
 				missingProfiles.push_back("game");
 			}
@@ -110,50 +110,50 @@ namespace SparkleLauncher
 			options.push_back(
 			    {configuration.DisplayName,
 			        configuration.Value,
-			        available ? QStringLiteral("Editor and game profiles can be prepared automatically.") : QStringLiteral("Missing %1 build profile support.").arg(missingProfiles.join(" and ")),
-			        available});
+			        bAvailable ? QStringLiteral("Editor and game profiles can be prepared automatically.") : QStringLiteral("Missing %1 build profile support.").arg(missingProfiles.join(" and ")),
+			        bAvailable});
 		}
 		return options;
 	}
 
 	static QVector<LauncherSelectionOption> BuildCompilerOptions(const BuildToolchainStatus& toolchain)
 	{
-		const bool visualStudioAvailable = IsToolAvailable(toolchain, "visualstudio");
-		const bool msvcAvailable = visualStudioAvailable && IsToolAvailable(toolchain, "msbuild");
+		const bool bVisualStudioAvailable = IsToolAvailable(toolchain, "visualstudio");
+		const bool bMsvcAvailable = bVisualStudioAvailable && IsToolAvailable(toolchain, "msbuild");
 		const ToolchainItemStatus* clangCl = FindToolchainItem(toolchain, "clangcl");
-		const bool bClangClAvailableclangCl = visualStudioAvailable && clangCl != nullptr;
-		const bool clangClAvailable = bClangClAvailableclangCl && (clangCl->State == ToolchainItemState::Found);
+		const bool bClangClAvailableclangCl = bVisualStudioAvailable && clangCl != nullptr;
+		const bool bClangClAvailable = bClangClAvailableclangCl && (clangCl->State == ToolchainItemState::Found);
 
 		return {
 		    {"MSVC",
 		        "msvc",
-		        msvcAvailable ? PathDetail(toolchain.VisualStudioPath, QStringLiteral("Visual Studio C++ tools are installed."))
+		        bMsvcAvailable ? PathDetail(toolchain.VisualStudioPath, QStringLiteral("Visual Studio C++ tools are installed."))
 		                      : QStringLiteral("Install Visual Studio C++ tools and MSBuild, then reactivate the launcher."),
-		        msvcAvailable},
+		        bMsvcAvailable},
 		    {"clang-cl",
 		        "clang-cl",
-		        clangClAvailable ? PathDetail(toolchain.ClangClPath, QStringLiteral("clang-cl is installed."))
-		                         : (clangCl != nullptr && clangCl->CanInstall ? QStringLiteral("Open Sync > Sync Code and choose Install for clang-cl.")
+		        bClangClAvailable ? PathDetail(toolchain.ClangClPath, QStringLiteral("clang-cl is installed."))
+		                         : (clangCl != nullptr && clangCl->bCanInstall ? QStringLiteral("Open Sync > Sync Code and choose Install for clang-cl.")
 		                                                                      : QStringLiteral("Install the Visual Studio clang-cl component, then reactivate the launcher.")),
-		        clangClAvailable},
+		        bClangClAvailable},
 		};
 	}
 
 	static QVector<LauncherSelectionOption> BuildIdeOptions(const BuildToolchainStatus& toolchain)
 	{
-		const bool visualStudioAvailable = IsToolAvailable(toolchain, "visualstudio-ide");
-		const bool riderAvailable = IsToolAvailable(toolchain, "rider");
+		const bool bVisualStudioAvailable = IsToolAvailable(toolchain, "visualstudio-ide");
+		const bool bRiderAvailable = IsToolAvailable(toolchain, "rider");
 
 		return {
 		    {"Visual Studio",
 		        "visual-studio",
-		        visualStudioAvailable ? PathDetail(toolchain.VisualStudioIdePath, QStringLiteral("Visual Studio is installed."))
+		        bVisualStudioAvailable ? PathDetail(toolchain.VisualStudioIdePath, QStringLiteral("Visual Studio is installed."))
 		                              : QStringLiteral("Install Visual Studio with C++ tools, then reactivate the launcher."),
-		        visualStudioAvailable},
+		        bVisualStudioAvailable},
 		    {"Rider",
 		        "rider",
-		        riderAvailable ? PathDetail(toolchain.RiderPath, QStringLiteral("Rider is installed.")) : QStringLiteral("Install Rider, then reactivate the launcher."),
-		        riderAvailable},
+		        bRiderAvailable ? PathDetail(toolchain.RiderPath, QStringLiteral("Rider is installed.")) : QStringLiteral("Install Rider, then reactivate the launcher."),
+		        bRiderAvailable},
 		};
 	}
 

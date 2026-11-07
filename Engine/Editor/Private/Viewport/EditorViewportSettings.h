@@ -24,7 +24,7 @@ public:
 
 	bool SetMoveSpeed(float speedMetersPerSecond) noexcept;
 	bool SetRotationSpeed(float degreesPerPixel) noexcept;
-	bool SetInvertY(bool invertY) noexcept;
+	bool SetInvertY(bool bInvertY) noexcept;
 	bool SetProjectionKind(CameraProjectionKind projectionKind) noexcept;
 	bool SetOrthographicHeight(float heightMeters) noexcept;
 	bool SetExposureOverrides(ViewportExposureOverrides overrides) noexcept;

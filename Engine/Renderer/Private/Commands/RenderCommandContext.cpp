@@ -12,7 +12,7 @@ RenderCommandContext::RenderCommandContext(RenderCommandList& commandList) noexc
 
 void RenderCommandContext::EnableDrawDispatchDiagnostics() noexcept
 {
-	m_drawDispatchDiagnosticsEnabled = SupportsDiagnosticScopes();
+	m_bDrawDispatchDiagnosticsEnabled = SupportsDiagnosticScopes();
 }
 
 void RenderCommandContext::SetPipeline(const RenderPipeline& pipeline) noexcept
@@ -226,7 +226,7 @@ void RenderCommandContext::DrawIndexedInstanced(
     std::int32_t baseVertexLocation,
     std::uint32_t startInstanceLocation) noexcept
 {
-	if (m_drawDispatchDiagnosticsEnabled)
+	if (m_bDrawDispatchDiagnosticsEnabled)
 	{
 		EmitDrawMarker();
 	}
@@ -235,7 +235,7 @@ void RenderCommandContext::DrawIndexedInstanced(
 
 void RenderCommandContext::DrawInstanced(std::uint32_t vertexCountPerInstance, std::uint32_t instanceCount, std::uint32_t startVertexLocation, std::uint32_t startInstanceLocation) noexcept
 {
-	if (m_drawDispatchDiagnosticsEnabled)
+	if (m_bDrawDispatchDiagnosticsEnabled)
 	{
 		EmitDrawMarker();
 	}
@@ -244,7 +244,7 @@ void RenderCommandContext::DrawInstanced(std::uint32_t vertexCountPerInstance, s
 
 void RenderCommandContext::Dispatch(std::uint32_t groupCountX, std::uint32_t groupCountY, std::uint32_t groupCountZ) noexcept
 {
-	if (m_drawDispatchDiagnosticsEnabled)
+	if (m_bDrawDispatchDiagnosticsEnabled)
 	{
 		EmitDispatchMarker(groupCountX, groupCountY, groupCountZ);
 	}
@@ -253,7 +253,7 @@ void RenderCommandContext::Dispatch(std::uint32_t groupCountX, std::uint32_t gro
 
 void RenderCommandContext::TraceRays(const TraceRaysDesc& desc) noexcept
 {
-	if (m_drawDispatchDiagnosticsEnabled)
+	if (m_bDrawDispatchDiagnosticsEnabled)
 	{
 		EmitDispatchMarker(desc.Width, desc.Height, desc.Depth);
 	}

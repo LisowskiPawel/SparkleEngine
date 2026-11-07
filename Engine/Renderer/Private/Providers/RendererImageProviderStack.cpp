@@ -43,8 +43,8 @@ void RendererImageProviderStack::Initialize()
 	{
 		const RhiNativeInteropRequest request{.Consumer = ERhiNativeInteropConsumer::ExternalProvider, .Reason = "Renderer upscaler provider initialization"};
 		const auto nativeInterop = interop.GetDeviceQueueInterop(request);
-		const bool initialized = m_upscaler->Initialize(capabilities, nativeInterop);
-		if (!initialized)
+		const bool bInitialized = m_upscaler->Initialize(capabilities, nativeInterop);
+		if (!bInitialized)
 		{
 			Diagnostics::Fatal(
 			    g_rendererImageProviderStackLogger,
@@ -59,8 +59,8 @@ void RendererImageProviderStack::Initialize()
 	{
 		const RhiNativeInteropRequest request{.Consumer = ERhiNativeInteropConsumer::ExternalProvider, .Reason = "Renderer ray-reconstruction provider initialization"};
 		const auto nativeInterop = interop.GetDeviceQueueInterop(request);
-		const bool initialized = m_rayReconstruction->Initialize(capabilities, nativeInterop);
-		if (!initialized)
+		const bool bInitialized = m_rayReconstruction->Initialize(capabilities, nativeInterop);
+		if (!bInitialized)
 		{
 			Diagnostics::Fatal(
 			    g_rendererImageProviderStackLogger,
@@ -71,7 +71,7 @@ void RendererImageProviderStack::Initialize()
 		}
 	}
 
-	m_resetHistoryPending = true;
+	m_bResetHistoryPending = true;
 }
 
 void RendererImageProviderStack::Shutdown() noexcept
@@ -142,7 +142,7 @@ void RendererImageProviderStack::PollRetiredGenerations() noexcept
 
 void RendererImageProviderStack::ResetHistory() noexcept
 {
-	m_resetHistoryPending = true;
+	m_bResetHistoryPending = true;
 }
 
 void RendererImageProviderStack::SetupFrame(const RenderView& view, const RenderFrameIdentity& identity)
@@ -154,9 +154,9 @@ void RendererImageProviderStack::SetupFrame(const RenderView& view, const Render
 	    .ProviderGeneration = identity.ImageProviderGeneration,
 	    .Camera = view.cameraUniform,
 	    .Temporal = view.temporalUniform,
-	    .ResetHistory = view.temporalUniform.HistoryValid == 0u || m_resetHistoryPending};
+	    .bResetHistory = view.temporalUniform.HistoryValid == 0u || m_bResetHistoryPending};
 
-	m_resetHistoryPending = false;
+	m_bResetHistoryPending = false;
 
 	if (m_upscaler != nullptr)
 	{

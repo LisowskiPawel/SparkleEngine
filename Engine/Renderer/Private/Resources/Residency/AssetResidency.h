@@ -58,9 +58,9 @@ struct AssetGenerationStatus final
 	std::uint64_t UploadBytes = 0;
 	std::uint64_t ResidentBytes = 0;
 	RhiSubmissionState Completion;
-	bool BacklogAccounted = false;
-	bool PendingUploadAccounted = false;
-	bool ResidentAccounted = false;
+	bool bBacklogAccounted = false;
+	bool bPendingUploadAccounted = false;
+	bool bResidentAccounted = false;
 };
 
 class AssetResidency final

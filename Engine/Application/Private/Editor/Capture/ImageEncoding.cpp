@@ -131,9 +131,9 @@ bool ImageEncoding::DecodeLinearRgb(const ImageBufferView& source, LinearRgbImag
 	const bool bInvalidFloatImageWidth = source.Format != PixelFormat::R32G32B32A32_Float || source.Width == 0u;
 	const bool bInvalidFloatImageHeight = bInvalidFloatImageWidth || (source.Height == 0u);
 	const bool bInvalidFloatImageRowPitch = bInvalidFloatImageHeight || (source.RowPitch < minimumRowPitch);
-	const bool invalidFloatImage = bInvalidFloatImageRowPitch || (source.Pixels.size() < requiredBytes);
+	const bool bInvalidFloatImage = bInvalidFloatImageRowPitch || (source.Pixels.size() < requiredBytes);
 	
-	if (invalidFloatImage)
+	if (bInvalidFloatImage)
 	{
 		errorMessage = "Image is not a complete RGBA32_FLOAT buffer.";
 		return false;
@@ -170,13 +170,13 @@ bool ImageEncoding::EncodeBmp(const ImageBufferView& image, std::vector<std::byt
 	ImagePixelEncoding imageFormat = ImagePixelEncoding::Rgba8Unorm;
 	const std::uint32_t bytesPerPixel = PixelFormatBytesPerTexel(image.Format);
 	const std::uint64_t requiredBytes = static_cast<std::uint64_t>(image.RowPitch) * image.Height;
-	const bool pixelFormatResolved = ResolvePixelFormat(image.Format, imageFormat);
-	const bool bImageStorageUsableWidth = pixelFormatResolved && image.Width != 0u;
+	const bool bPixelFormatResolved = ResolvePixelFormat(image.Format, imageFormat);
+	const bool bImageStorageUsableWidth = bPixelFormatResolved && image.Width != 0u;
 	const bool bImageStorageUsableHeight = bImageStorageUsableWidth && (image.Height != 0u);
 	const bool bImageStorageUsableWidth2 = bImageStorageUsableHeight && (image.RowPitch >= static_cast<std::uint64_t>(image.Width) * bytesPerPixel);
-	const bool imageStorageUsable = bImageStorageUsableWidth2 && (image.Pixels.size() >= requiredBytes);
+	const bool bImageStorageUsable = bImageStorageUsableWidth2 && (image.Pixels.size() >= requiredBytes);
 	
-	if (!imageStorageUsable)
+	if (!bImageStorageUsable)
 	{
 		errorMessage = "Image cannot be encoded as BMP.";
 		return false;

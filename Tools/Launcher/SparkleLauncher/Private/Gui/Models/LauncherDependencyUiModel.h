@@ -14,8 +14,8 @@ namespace SparkleLauncher
 		QString Version;
 		QString Purpose;
 		QString CacheDirectoryName;
-		bool Required = false;
-		bool Enabled = false;
+		bool bRequired = false;
+		bool bEnabled = false;
 	};
 
 	struct ThirdPartyDependencyUiStatus
@@ -23,7 +23,7 @@ namespace SparkleLauncher
 		QString Text;
 		QString Detail;
 		QString State;
-		bool Synced = false;
+		bool bSynced = false;
 	};
 
 	const std::vector<ThirdPartyDependencyUiEntry>& GetTrackedThirdPartyDependencies();

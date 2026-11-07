@@ -19,7 +19,7 @@ static std::string FormatHandle(FrameGraphResourceHandle handle)
 	return handle.IsValid() ? std::format("{}", handle.index) : "invalid";
 }
 
-static void FailInvalidAccelerationStructureBinding(std::string_view operation, std::string_view resourceName, FrameGraphResourceHandle handle, ResourceState state, bool hasResource) noexcept
+static void FailInvalidAccelerationStructureBinding(std::string_view operation, std::string_view resourceName, FrameGraphResourceHandle handle, ResourceState state, bool bHasResource) noexcept
 {
 	Diagnostics::Fatal(
 	    g_frameGraphAccelerationStructureLogger,
@@ -32,7 +32,7 @@ static void FailInvalidAccelerationStructureBinding(std::string_view operation, 
 	        resourceName.empty() ? "<unnamed>" : resourceName,
 	        FormatHandle(handle),
 	        ResourceStateToString(state),
-	        hasResource));
+	        bHasResource));
 }
 
 FrameGraphAccelerationStructureHandle FrameGraph::ReservePersistentAccelerationStructure(std::string_view name, ResourceState initialState) noexcept

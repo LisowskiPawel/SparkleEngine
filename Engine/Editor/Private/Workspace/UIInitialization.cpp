@@ -52,11 +52,11 @@ void UI::Implementation::InitializeConsole(CVarControlExecutor&& consoleVariable
 
 	m_editorConsoleSystem = std::make_unique<EditorConsoleSystem>(ConsoleCommandActions{
 	    .Variables = m_consoleVariables,
-	    .CompileShaders = [this](bool symbols) { return m_shaderToolsPanel->RequestCompile(symbols); },
+	    .CompileShaders = [this](bool bSymbols) { return m_shaderToolsPanel->RequestCompile(bSymbols); },
 	    .ReloadShaders =
 	        [this]()
 	    {
-		    m_shaderReloadRequested = true;
+		    m_bShaderReloadRequested = true;
 		    return ConsoleCommandResult::Success("Shader reload requested.");
 	    }});
 }
@@ -96,7 +96,7 @@ void UI::Implementation::InitializeAssetPanels()
 	m_usedMeshesPanel->SetPreviewGeometryProvider(m_meshPreviewProvider);
 	m_usedTexturesPanel = std::make_unique<UsedTexturesPanel>();
 	m_usedTexturesPanel->SetDiagnosticsProvider(m_textureDiagnosticsProvider);
-	m_shaderToolsPanel->SetReloadHandler([this]() { m_shaderReloadRequested = true; });
+	m_shaderToolsPanel->SetReloadHandler([this]() { m_bShaderReloadRequested = true; });
 }
 
 void UI::Implementation::InitializeScenePanels()
@@ -185,5 +185,5 @@ void UI::Implementation::InitializeImGuiContext()
 void UI::Implementation::SubscribeToWindowEvents()
 {
 	m_imguiContext->SubscribeToWindowEvents(
-	    [this](std::uint32_t message, std::uintptr_t key, bool wantsTextInput) { return m_editorConsoleSystem != nullptr && m_editorConsoleSystem->HandleShortcut(message, key, wantsTextInput); });
+	    [this](std::uint32_t message, std::uintptr_t key, bool bWantsTextInput) { return m_editorConsoleSystem != nullptr && m_editorConsoleSystem->HandleShortcut(message, key, bWantsTextInput); });
 }

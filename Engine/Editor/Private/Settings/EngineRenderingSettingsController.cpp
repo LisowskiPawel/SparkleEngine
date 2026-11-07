@@ -9,7 +9,7 @@
 EngineRenderingSettingsController::EngineRenderingSettingsController(EngineRenderingSettingsState state, CommitHandler commitHandler, RefreshHandler refreshHandler) :
     m_state(std::move(state)),
     m_sessionBackBufferFormat(m_state.BackBufferFormat),
-    m_sessionPreferHighPerformanceAdapter(m_state.PreferHighPerformanceAdapter),
+    m_bSessionPreferHighPerformanceAdapter(m_state.bPreferHighPerformanceAdapter),
     m_commitHandler(std::move(commitHandler)),
     m_refreshHandler(std::move(refreshHandler))
 {
@@ -67,9 +67,9 @@ void EngineRenderingSettingsController::ResetDefaults()
 	}
 }
 
-void EngineRenderingSettingsController::SetVSync(bool enabled)
+void EngineRenderingSettingsController::SetVSync(bool bEnabled)
 {
-	SetValue(m_state.VSync, enabled);
+	SetValue(m_state.bVSync, bEnabled);
 }
 
 void EngineRenderingSettingsController::SetBackBufferFormat(PixelFormat format)
@@ -84,9 +84,9 @@ void EngineRenderingSettingsController::SetStartupCaptureProvider(ExternalCaptur
 }
 #endif
 
-void EngineRenderingSettingsController::SetPreferHighPerformanceAdapter(bool enabled)
+void EngineRenderingSettingsController::SetPreferHighPerformanceAdapter(bool bEnabled)
 {
-	SetValue(m_state.PreferHighPerformanceAdapter, enabled);
+	SetValue(m_state.bPreferHighPerformanceAdapter, bEnabled);
 }
 
 void EngineRenderingSettingsController::SetToneMapper(EngineToneMapper toneMapper)
@@ -164,19 +164,19 @@ void EngineRenderingSettingsController::SetGBufferAlgorithm(GBufferAlgorithm alg
 	SetValue(m_state.SelectedGBufferAlgorithm, algorithm);
 }
 
-void EngineRenderingSettingsController::SetMeshAutoBatching(bool enabled)
+void EngineRenderingSettingsController::SetMeshAutoBatching(bool bEnabled)
 {
-	SetValue(m_state.MeshAutoBatching, enabled);
+	SetValue(m_state.bMeshAutoBatching, bEnabled);
 }
 
-void EngineRenderingSettingsController::SetRefitTlas(bool enabled)
+void EngineRenderingSettingsController::SetRefitTlas(bool bEnabled)
 {
-	SetValue(m_state.RefitTlas, enabled);
+	SetValue(m_state.bRefitTlas, bEnabled);
 }
 
-void EngineRenderingSettingsController::SetPtlasActive(bool active)
+void EngineRenderingSettingsController::SetPtlasActive(bool bActive)
 {
-	SetValue(m_state.PtlasActive, active);
+	SetValue(m_state.bPtlasActive, bActive);
 }
 
 void EngineRenderingSettingsController::SetPtlasPartitionsPerAxis(std::uint32_t partitionsPerAxis)
@@ -189,9 +189,9 @@ void EngineRenderingSettingsController::SetPtlasPartitionUpdateMode(RayTracingPt
 	SetValue(m_state.PtlasPartitionUpdateMode, mode);
 }
 
-void EngineRenderingSettingsController::SetPtlasMarkAllDynamicInPartition(bool enabled)
+void EngineRenderingSettingsController::SetPtlasMarkAllDynamicInPartition(bool bEnabled)
 {
-	SetValue(m_state.PtlasMarkAllDynamicInPartition, enabled);
+	SetValue(m_state.bPtlasMarkAllDynamicInPartition, bEnabled);
 }
 
 void EngineRenderingSettingsController::SetPtlasModeChangeDistance(float distance)
@@ -207,7 +207,7 @@ bool EngineRenderingSettingsController::ComputePendingRestart() const noexcept
 		return true;
 	}
 #endif
-	return m_sessionPreferHighPerformanceAdapter != m_state.PreferHighPerformanceAdapter || m_sessionBackBufferFormat != m_state.BackBufferFormat;
+	return m_bSessionPreferHighPerformanceAdapter != m_state.bPreferHighPerformanceAdapter || m_sessionBackBufferFormat != m_state.BackBufferFormat;
 }
 
 std::string EngineRenderingSettingsController::DescribePendingRestart() const
@@ -219,7 +219,7 @@ std::string EngineRenderingSettingsController::DescribePendingRestart() const
 		reasons.emplace_back("capture startup provider");
 	}
 #endif
-	if (m_sessionPreferHighPerformanceAdapter != m_state.PreferHighPerformanceAdapter)
+	if (m_bSessionPreferHighPerformanceAdapter != m_state.bPreferHighPerformanceAdapter)
 	{
 		reasons.emplace_back("GPU adapter preference");
 	}

@@ -67,7 +67,7 @@ public:
 
 	bool IsValid() const noexcept { return m_commandList != nullptr; }
 
-	bool IsClosed() const noexcept { return m_closed; }
+	bool IsClosed() const noexcept { return m_bClosed; }
 
 	RenderCommandList& GetCommandList() noexcept;
 	RhiTransientDescriptorRange AllocateTransientDescriptors(std::uint32_t count) noexcept;
@@ -98,5 +98,5 @@ private:
 	RhiCommandRecordingOwner m_owner = {};
 	RhiCommandRecordingDescriptorPage m_descriptorPage = {};
 	RhiSubmissionToken m_retirementToken = {};
-	bool m_closed = false;
+	bool m_bClosed = false;
 };

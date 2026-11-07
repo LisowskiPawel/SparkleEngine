@@ -49,9 +49,9 @@ static bool ResolveExportRequest(const std::filesystem::path& cookDirectory, std
 
 	const std::filesystem::path relative(name);
 	const bool bInvalidRequestPathfilename = relative.has_root_path() || relative.filename() != "compile-request.json";
-	const bool invalidCompileRequestPath = bInvalidRequestPathfilename || (std::any_of(relative.begin(), relative.end(), [](const auto& component) { return component == ".."; }));
+	const bool bInvalidCompileRequestPath = bInvalidRequestPathfilename || (std::any_of(relative.begin(), relative.end(), [](const auto& component) { return component == ".."; }));
 	
-	if (invalidCompileRequestPath)
+	if (bInvalidCompileRequestPath)
 	{
 		return false;
 	}
@@ -75,9 +75,9 @@ static void SelectNewestShaderExport(
 		const bool bMatchingExportGuardparentpath = bNewerMatchingExportBackend && !bNewerMatchingExportselected;
 		const bool bNewerMatchingExportparentpath = bMatchingExportGuardparentpath && (request.parent_path().native() > selected[index].native());
 		const bool bNewerMatchingExportparentpath2 = bNewerMatchingExportselected || bNewerMatchingExportparentpath;
-		const bool newerMatchingExport = bNewerMatchingExportBackend && bNewerMatchingExportparentpath2;
+		const bool bNewerMatchingExport = bNewerMatchingExportBackend && bNewerMatchingExportparentpath2;
 		
-		if (newerMatchingExport)
+		if (bNewerMatchingExport)
 		{
 			selected[index] = request.parent_path();
 		}
@@ -93,11 +93,11 @@ static void InspectPublishedShaderRequest(
 	std::string text;
 	std::string failure;
 	ShaderDiagnosticsEntry shader;
-	const bool requestPublished = publication.Contains(request);
-	const bool requestRead = requestPublished && Files::TryReadAllText(request, text, failure);
-	const bool shaderDecoded = requestRead && ReadExportShader(text, diagnostics.Target, shader);
+	const bool bRequestPublished = publication.Contains(request);
+	const bool bRequestRead = bRequestPublished && Files::TryReadAllText(request, text, failure);
+	const bool bShaderDecoded = bRequestRead && ReadExportShader(text, diagnostics.Target, shader);
 
-	if (!shaderDecoded)
+	if (!bShaderDecoded)
 	{
 		return;
 	}
@@ -114,10 +114,10 @@ static void InspectPublishedCook(
 	std::string manifest;
 	std::string failure;
 	std::vector<std::string_view> jobs;
-	const bool manifestRead = Files::TryReadAllText(cookDirectory / "shader-export.json", manifest, failure);
-	const bool jobsRead = manifestRead && Json::TryReadArrayProperty(manifest, "jobs", jobs);
+	const bool bManifestRead = Files::TryReadAllText(cookDirectory / "shader-export.json", manifest, failure);
+	const bool bJobsRead = bManifestRead && Json::TryReadArrayProperty(manifest, "jobs", jobs);
 
-	if (!jobsRead)
+	if (!bJobsRead)
 	{
 		return;
 	}

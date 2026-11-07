@@ -35,7 +35,7 @@ private:
 
 	Window& m_window;
 	ImGuiContext* m_context = nullptr;
-	bool m_platformInitialized = false;
+	bool m_bPlatformInitialized = false;
 	std::string m_iniPath;
 	ShortcutHandler m_shortcutHandler;
 	ScopedEventHandle m_windowMessageHandle;

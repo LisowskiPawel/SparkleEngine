@@ -19,10 +19,10 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanRhiLogger, "RHI.Vulkan");
 
 bool VulkanRhi::AppendAvailableDeviceExtension(VkPhysicalDevice physicalDevice, std::vector<const char*>& extensions, const char* extensionName) noexcept
 {
-	const bool extensionAlreadyEnabled = extensionName == nullptr
+	const bool bExtensionAlreadyEnabled = extensionName == nullptr
 		    || std::find_if(extensions.begin(), extensions.end(), [extensionName](const char* enabled) noexcept { return std::strcmp(enabled, extensionName) == 0; }) != extensions.end();
 	
-	if (extensionAlreadyEnabled)
+	if (bExtensionAlreadyEnabled)
 	{
 		return false;
 	}
@@ -41,12 +41,12 @@ bool VulkanRhi::AppendAvailableDeviceExtension(VkPhysicalDevice physicalDevice, 
 		return false;
 	}
 
-	const bool availableOnDevice = std::any_of(
+	const bool bAvailableOnDevice = std::any_of(
 	    available.begin(),
 	    available.end(),
 	    [extensionName](const VkExtensionProperties& properties) noexcept { return std::strcmp(properties.extensionName, extensionName) == 0; });
 
-	if (!availableOnDevice)
+	if (!bAvailableOnDevice)
 	{
 		return false;
 	}
@@ -81,7 +81,7 @@ void VulkanRhi::CreateInstance() noexcept
 	if (IsLayerAvailable("VK_LAYER_KHRONOS_validation"))
 	{
 		m_enabledLayers.emplace_back("VK_LAYER_KHRONOS_validation");
-		m_validationEnabled = true;
+		m_bValidationEnabled = true;
 	}
 	else
 	{
@@ -184,9 +184,9 @@ void VulkanRhi::SelectPhysicalDevice() noexcept
 		}
 		candidate.QueueTopology = VulkanQueueTopology::Select(device);
 		const bool bRequiredQueueMissingQueueTopology = !candidate.QueueTopology.Supports(ERhiQueueType::Graphics) || !candidate.QueueTopology.Supports(ERhiQueueType::Compute);
-		const bool requiredQueueMissing = bRequiredQueueMissingQueueTopology || (!candidate.QueueTopology.Supports(ERhiQueueType::Copy));
+		const bool bRequiredQueueMissing = bRequiredQueueMissingQueueTopology || (!candidate.QueueTopology.Supports(ERhiQueueType::Copy));
 		
-		if (requiredQueueMissing)
+		if (bRequiredQueueMissing)
 		{
 			continue;
 		}
@@ -205,20 +205,20 @@ void VulkanRhi::SelectPhysicalDevice() noexcept
 	m_physicalDevice = selected.Device;
 	m_queueTopology = selected.QueueTopology;
 	m_adapterInfo = BuildAdapterInfo(selected.Properties);
-	m_featureStatus.SupportsSynchronization2 = selected.Features13.synchronization2 == VK_TRUE;
-	m_featureStatus.SupportsTimelineSemaphore = selected.Features12.timelineSemaphore == VK_TRUE;
-	m_featureStatus.SupportsDynamicRendering = selected.Features13.dynamicRendering == VK_TRUE;
-	m_featureStatus.SupportsSamplerAnisotropy = selected.Features.features.samplerAnisotropy == VK_TRUE;
-	m_featureStatus.SupportsFillModeNonSolid = selected.Features.features.fillModeNonSolid == VK_TRUE;
-	m_featureStatus.SupportsShaderInt64 = selected.Features.features.shaderInt64 == VK_TRUE;
-	m_featureStatus.SupportsShaderFloat64 = selected.Features.features.shaderFloat64 == VK_TRUE;
-	m_featureStatus.SupportsScalarBlockLayout = selected.Features12.scalarBlockLayout == VK_TRUE;
-	m_featureStatus.SupportsHostQueryReset = selected.Features12.hostQueryReset == VK_TRUE;
-	m_featureStatus.SupportsStorageImageReadWithoutFormat = selected.Features.features.shaderStorageImageReadWithoutFormat == VK_TRUE;
-	m_featureStatus.SupportsStorageImageWriteWithoutFormat = selected.Features.features.shaderStorageImageWriteWithoutFormat == VK_TRUE;
-	m_featureStatus.SupportsSampledImageArrayNonUniformIndexing = selected.Features12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
-	m_featureStatus.SupportsPartiallyBoundDescriptorArrays = selected.Features12.descriptorBindingPartiallyBound == VK_TRUE;
-	m_featureStatus.SupportsShaderDemoteToHelperInvocation = selected.Features13.shaderDemoteToHelperInvocation == VK_TRUE;
+	m_featureStatus.bSupportsSynchronization2 = selected.Features13.synchronization2 == VK_TRUE;
+	m_featureStatus.bSupportsTimelineSemaphore = selected.Features12.timelineSemaphore == VK_TRUE;
+	m_featureStatus.bSupportsDynamicRendering = selected.Features13.dynamicRendering == VK_TRUE;
+	m_featureStatus.bSupportsSamplerAnisotropy = selected.Features.features.samplerAnisotropy == VK_TRUE;
+	m_featureStatus.bSupportsFillModeNonSolid = selected.Features.features.fillModeNonSolid == VK_TRUE;
+	m_featureStatus.bSupportsShaderInt64 = selected.Features.features.shaderInt64 == VK_TRUE;
+	m_featureStatus.bSupportsShaderFloat64 = selected.Features.features.shaderFloat64 == VK_TRUE;
+	m_featureStatus.bSupportsScalarBlockLayout = selected.Features12.scalarBlockLayout == VK_TRUE;
+	m_featureStatus.bSupportsHostQueryReset = selected.Features12.hostQueryReset == VK_TRUE;
+	m_featureStatus.bSupportsStorageImageReadWithoutFormat = selected.Features.features.shaderStorageImageReadWithoutFormat == VK_TRUE;
+	m_featureStatus.bSupportsStorageImageWriteWithoutFormat = selected.Features.features.shaderStorageImageWriteWithoutFormat == VK_TRUE;
+	m_featureStatus.bNonUniformSampledImages = selected.Features12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
+	m_featureStatus.bSupportsPartiallyBoundDescriptorArrays = selected.Features12.descriptorBindingPartiallyBound == VK_TRUE;
+	m_featureStatus.bSupportsShaderDemoteToHelperInvocation = selected.Features13.shaderDemoteToHelperInvocation == VK_TRUE;
 	m_featureStatus.RayTracing = VulkanRayTracingFeatureQuery::Query(m_physicalDevice);
 }
 
@@ -252,26 +252,26 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 	{
 		deviceExtensions.push_back(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME);
 	}
-	if (m_featureStatus.RayTracing.EnabledAccelerationStructure)
+	if (m_featureStatus.RayTracing.bEnabledAccelerationStructure)
 	{
 		deviceExtensions.push_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
 		deviceExtensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
-		if (m_featureStatus.RayTracing.EnabledInlineRayQuery)
+		if (m_featureStatus.RayTracing.bEnabledInlineRayQuery)
 		{
 			deviceExtensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
 		}
-		if (m_featureStatus.RayTracing.EnabledRayTracingPipeline)
+		if (m_featureStatus.RayTracing.bEnabledRayTracingPipeline)
 		{
 			deviceExtensions.push_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
 		}
-		if (m_adapterInfo.ApiVersion < VK_API_VERSION_1_2 && m_featureStatus.RayTracing.SupportsBufferDeviceAddressExtension)
+		if (m_adapterInfo.ApiVersion < VK_API_VERSION_1_2 && m_featureStatus.RayTracing.bSupportsBufferDeviceAddressExtension)
 		{
 			deviceExtensions.push_back(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
 		}
-		if (m_adapterInfo.VendorId == NvidiaVendorId && m_featureStatus.RayTracing.SupportsPtlasExtension && m_featureStatus.RayTracing.SupportsPtlasFeature)
+		if (m_adapterInfo.VendorId == NvidiaVendorId && m_featureStatus.RayTracing.bSupportsPtlasExtension && m_featureStatus.RayTracing.bSupportsPtlasFeature)
 		{
 			deviceExtensions.push_back(VK_NV_PARTITIONED_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-			m_featureStatus.RayTracing.EnabledPtlas = true;
+			m_featureStatus.RayTracing.bEnabledPtlas = true;
 		}
 	}
 	AppendAvailableDeviceExtension(m_physicalDevice, deviceExtensions, NvidiaBinaryImportExtensionName);
@@ -285,47 +285,47 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 	}
 
 	VkPhysicalDeviceFeatures2 enabledFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
-	enabledFeatures.features.samplerAnisotropy = m_featureStatus.SupportsSamplerAnisotropy ? VK_TRUE : VK_FALSE;
-	enabledFeatures.features.fillModeNonSolid = m_featureStatus.SupportsFillModeNonSolid ? VK_TRUE : VK_FALSE;
-	enabledFeatures.features.shaderInt64 = m_featureStatus.SupportsShaderInt64 ? VK_TRUE : VK_FALSE;
-	enabledFeatures.features.shaderFloat64 = m_featureStatus.SupportsShaderFloat64 ? VK_TRUE : VK_FALSE;
-	enabledFeatures.features.shaderStorageImageReadWithoutFormat = m_featureStatus.SupportsStorageImageReadWithoutFormat ? VK_TRUE : VK_FALSE;
-	enabledFeatures.features.shaderStorageImageWriteWithoutFormat = m_featureStatus.SupportsStorageImageWriteWithoutFormat ? VK_TRUE : VK_FALSE;
-	m_featureStatus.EnabledSamplerAnisotropy = enabledFeatures.features.samplerAnisotropy == VK_TRUE;
-	m_featureStatus.EnabledFillModeNonSolid = enabledFeatures.features.fillModeNonSolid == VK_TRUE;
-	m_featureStatus.EnabledShaderInt64 = enabledFeatures.features.shaderInt64 == VK_TRUE;
-	m_featureStatus.EnabledShaderFloat64 = enabledFeatures.features.shaderFloat64 == VK_TRUE;
-	m_featureStatus.EnabledStorageImageReadWithoutFormat = enabledFeatures.features.shaderStorageImageReadWithoutFormat == VK_TRUE;
-	m_featureStatus.EnabledStorageImageWriteWithoutFormat = enabledFeatures.features.shaderStorageImageWriteWithoutFormat == VK_TRUE;
+	enabledFeatures.features.samplerAnisotropy = m_featureStatus.bSupportsSamplerAnisotropy ? VK_TRUE : VK_FALSE;
+	enabledFeatures.features.fillModeNonSolid = m_featureStatus.bSupportsFillModeNonSolid ? VK_TRUE : VK_FALSE;
+	enabledFeatures.features.shaderInt64 = m_featureStatus.bSupportsShaderInt64 ? VK_TRUE : VK_FALSE;
+	enabledFeatures.features.shaderFloat64 = m_featureStatus.bSupportsShaderFloat64 ? VK_TRUE : VK_FALSE;
+	enabledFeatures.features.shaderStorageImageReadWithoutFormat = m_featureStatus.bSupportsStorageImageReadWithoutFormat ? VK_TRUE : VK_FALSE;
+	enabledFeatures.features.shaderStorageImageWriteWithoutFormat = m_featureStatus.bSupportsStorageImageWriteWithoutFormat ? VK_TRUE : VK_FALSE;
+	m_featureStatus.bEnabledSamplerAnisotropy = enabledFeatures.features.samplerAnisotropy == VK_TRUE;
+	m_featureStatus.bEnabledFillModeNonSolid = enabledFeatures.features.fillModeNonSolid == VK_TRUE;
+	m_featureStatus.bEnabledShaderInt64 = enabledFeatures.features.shaderInt64 == VK_TRUE;
+	m_featureStatus.bEnabledShaderFloat64 = enabledFeatures.features.shaderFloat64 == VK_TRUE;
+	m_featureStatus.bEnabledStorageImageReadWithoutFormat = enabledFeatures.features.shaderStorageImageReadWithoutFormat == VK_TRUE;
+	m_featureStatus.bEnabledStorageImageWriteWithoutFormat = enabledFeatures.features.shaderStorageImageWriteWithoutFormat == VK_TRUE;
 	VkPhysicalDeviceVulkan13Features enabledFeatures13{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
 	VkPhysicalDeviceVulkan12Features enabledFeatures12{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES};
 	void** enabledNext = &enabledFeatures.pNext;
 	if (m_adapterInfo.ApiVersion >= VK_API_VERSION_1_2)
 	{
-		enabledFeatures12.scalarBlockLayout = m_featureStatus.SupportsScalarBlockLayout ? VK_TRUE : VK_FALSE;
-		m_featureStatus.EnabledScalarBlockLayout = enabledFeatures12.scalarBlockLayout == VK_TRUE;
-		enabledFeatures12.hostQueryReset = m_featureStatus.SupportsHostQueryReset ? VK_TRUE : VK_FALSE;
-		m_featureStatus.EnabledHostQueryReset = enabledFeatures12.hostQueryReset == VK_TRUE;
-		enabledFeatures12.timelineSemaphore = m_featureStatus.SupportsTimelineSemaphore ? VK_TRUE : VK_FALSE;
-		enabledFeatures12.shaderSampledImageArrayNonUniformIndexing = m_featureStatus.SupportsSampledImageArrayNonUniformIndexing ? VK_TRUE : VK_FALSE;
-		enabledFeatures12.descriptorBindingPartiallyBound = m_featureStatus.SupportsPartiallyBoundDescriptorArrays ? VK_TRUE : VK_FALSE;
+		enabledFeatures12.scalarBlockLayout = m_featureStatus.bSupportsScalarBlockLayout ? VK_TRUE : VK_FALSE;
+		m_featureStatus.bEnabledScalarBlockLayout = enabledFeatures12.scalarBlockLayout == VK_TRUE;
+		enabledFeatures12.hostQueryReset = m_featureStatus.bSupportsHostQueryReset ? VK_TRUE : VK_FALSE;
+		m_featureStatus.bEnabledHostQueryReset = enabledFeatures12.hostQueryReset == VK_TRUE;
+		enabledFeatures12.timelineSemaphore = m_featureStatus.bSupportsTimelineSemaphore ? VK_TRUE : VK_FALSE;
+		enabledFeatures12.shaderSampledImageArrayNonUniformIndexing = m_featureStatus.bNonUniformSampledImages ? VK_TRUE : VK_FALSE;
+		enabledFeatures12.descriptorBindingPartiallyBound = m_featureStatus.bSupportsPartiallyBoundDescriptorArrays ? VK_TRUE : VK_FALSE;
 		*enabledNext = &enabledFeatures12;
 		enabledNext = &enabledFeatures12.pNext;
-		m_featureStatus.EnabledSampledImageArrayNonUniformIndexing = enabledFeatures12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
-		m_featureStatus.EnabledPartiallyBoundDescriptorArrays = enabledFeatures12.descriptorBindingPartiallyBound == VK_TRUE;
-		m_featureStatus.EnabledTimelineSemaphore = enabledFeatures12.timelineSemaphore == VK_TRUE;
+		m_featureStatus.bNonUniformImagesEnabled = enabledFeatures12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
+		m_featureStatus.bEnabledPartiallyBoundDescriptorArrays = enabledFeatures12.descriptorBindingPartiallyBound == VK_TRUE;
+		m_featureStatus.bEnabledTimelineSemaphore = enabledFeatures12.timelineSemaphore == VK_TRUE;
 	}
 	if (m_adapterInfo.ApiVersion >= VK_API_VERSION_1_3)
 	{
-		enabledFeatures13.synchronization2 = m_featureStatus.SupportsSynchronization2 ? VK_TRUE : VK_FALSE;
-		enabledFeatures13.dynamicRendering = m_featureStatus.SupportsDynamicRendering ? VK_TRUE : VK_FALSE;
-		enabledFeatures13.shaderDemoteToHelperInvocation = m_featureStatus.SupportsShaderDemoteToHelperInvocation ? VK_TRUE : VK_FALSE;
+		enabledFeatures13.synchronization2 = m_featureStatus.bSupportsSynchronization2 ? VK_TRUE : VK_FALSE;
+		enabledFeatures13.dynamicRendering = m_featureStatus.bSupportsDynamicRendering ? VK_TRUE : VK_FALSE;
+		enabledFeatures13.shaderDemoteToHelperInvocation = m_featureStatus.bSupportsShaderDemoteToHelperInvocation ? VK_TRUE : VK_FALSE;
 		*enabledNext = &enabledFeatures13;
 		enabledNext = &enabledFeatures13.pNext;
-		m_featureStatus.EnabledSynchronization2 = enabledFeatures13.synchronization2 == VK_TRUE;
-		m_featureStatus.EnabledDynamicRendering = enabledFeatures13.dynamicRendering == VK_TRUE;
+		m_featureStatus.bEnabledSynchronization2 = enabledFeatures13.synchronization2 == VK_TRUE;
+		m_featureStatus.bEnabledDynamicRendering = enabledFeatures13.dynamicRendering == VK_TRUE;
 
-		m_featureStatus.EnabledShaderDemoteToHelperInvocation = enabledFeatures13.shaderDemoteToHelperInvocation == VK_TRUE;
+		m_featureStatus.bEnabledShaderDemoteToHelperInvocation = enabledFeatures13.shaderDemoteToHelperInvocation == VK_TRUE;
 	}
 	VkPhysicalDeviceAccelerationStructureFeaturesKHR enabledAccelerationStructureFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
 	VkPhysicalDeviceBufferDeviceAddressFeatures enabledBufferDeviceAddressFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES};
@@ -334,7 +334,7 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 
 	VkPhysicalDevicePartitionedAccelerationStructureFeaturesNV enabledPtlasFeatures{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PARTITIONED_ACCELERATION_STRUCTURE_FEATURES_NV};
 
-	if (m_featureStatus.RayTracing.EnabledAccelerationStructure)
+	if (m_featureStatus.RayTracing.bEnabledAccelerationStructure)
 	{
 		if (m_adapterInfo.ApiVersion >= VK_API_VERSION_1_2)
 		{
@@ -349,19 +349,19 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 		enabledAccelerationStructureFeatures.accelerationStructure = VK_TRUE;
 		*enabledNext = &enabledAccelerationStructureFeatures;
 		enabledNext = &enabledAccelerationStructureFeatures.pNext;
-		if (m_featureStatus.RayTracing.EnabledRayTracingPipeline)
+		if (m_featureStatus.RayTracing.bEnabledRayTracingPipeline)
 		{
 			enabledRayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
 			*enabledNext = &enabledRayTracingPipelineFeatures;
 			enabledNext = &enabledRayTracingPipelineFeatures.pNext;
 		}
-		if (m_featureStatus.RayTracing.EnabledInlineRayQuery)
+		if (m_featureStatus.RayTracing.bEnabledInlineRayQuery)
 		{
 			enabledRayQueryFeatures.rayQuery = VK_TRUE;
 			*enabledNext = &enabledRayQueryFeatures;
 			enabledNext = &enabledRayQueryFeatures.pNext;
 		}
-		if (m_featureStatus.RayTracing.EnabledPtlas)
+		if (m_featureStatus.RayTracing.bEnabledPtlas)
 		{
 			enabledPtlasFeatures.partitionedAccelerationStructure = VK_TRUE;
 			*enabledNext = &enabledPtlasFeatures;

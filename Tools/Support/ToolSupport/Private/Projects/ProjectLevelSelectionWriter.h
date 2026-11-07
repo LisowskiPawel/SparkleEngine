@@ -8,11 +8,11 @@
 class ProjectLevelSelectionWriter final
 {
 public:
-	static bool SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool selected, std::string& outErrorMessage);
-	static bool SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool selected, std::string& outErrorMessage);
+	static bool SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool bSelected, std::string& outErrorMessage);
+	static bool SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool bSelected, std::string& outErrorMessage);
 
 private:
-	ProjectLevelSelectionWriter(std::filesystem::path catalogPath, std::vector<std::string> levelIds, bool selected);
+	ProjectLevelSelectionWriter(std::filesystem::path catalogPath, std::vector<std::string> levelIds, bool bSelected);
 
 	bool Apply(std::string& outErrorMessage);
 	bool Read(std::string& outErrorMessage);

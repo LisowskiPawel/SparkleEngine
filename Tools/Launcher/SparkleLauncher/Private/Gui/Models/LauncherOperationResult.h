@@ -18,10 +18,10 @@ namespace SparkleLauncher
 		QString ExpectedAction;
 		QString LogPath;
 		int ExitCode = 0;
-		bool HasExitCode = false;
-		bool Succeeded = false;
-		bool Skipped = false;
-		bool Canceled = false;
+		bool bHasExitCode = false;
+		bool bSucceeded = false;
+		bool bSkipped = false;
+		bool bCanceled = false;
 	};
 }
 

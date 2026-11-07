@@ -96,8 +96,8 @@ void EngineRenderingSettingsPersistence::ApplyFile(const std::filesystem::path& 
 	}
 	std::istringstream input(text);
 	std::vector<std::pair<ConsoleVariableBase*, std::string>> assignments;
-	bool inTargetSection = false;
-	bool foundSection = false;
+	bool bInTargetSection = false;
+	bool bFoundSection = false;
 	for (std::string line; std::getline(input, line);)
 	{
 		const std::string trimmed = Strings::TrimCopy(line);
@@ -107,11 +107,11 @@ void EngineRenderingSettingsPersistence::ApplyFile(const std::filesystem::path& 
 		}
 		if (trimmed.starts_with('[') && trimmed.ends_with(']'))
 		{
-			inTargetSection = trimmed.substr(1, trimmed.size() - 2) == GetSectionName();
-			foundSection = foundSection || inTargetSection;
+			bInTargetSection = trimmed.substr(1, trimmed.size() - 2) == GetSectionName();
+			bFoundSection = bFoundSection || bInTargetSection;
 			continue;
 		}
-		if (!inTargetSection)
+		if (!bInTargetSection)
 		{
 			continue;
 		}
@@ -137,7 +137,7 @@ void EngineRenderingSettingsPersistence::ApplyFile(const std::filesystem::path& 
 		}
 		assignments.emplace_back(variable, value);
 	}
-	if (!foundSection || assignments.empty())
+	if (!bFoundSection || assignments.empty())
 	{
 		throw Diagnostics::Error("No valid rendering settings in " + path.string() + ". Repair or remove this file before retrying.");
 	}
@@ -184,14 +184,14 @@ void EngineRenderingSettingsPersistence::Write(const EngineRenderingSettingsStat
 		sectionLines.emplace_back(std::string(key) + "=" + persistedValue);
 	};
 
-	appendConfigValue("r.VSync", state.VSync);
-	appendConfigValue("r.Vignette", state.Vignette);
-	appendConfigValue("r.ChromaticAberration", state.ChromaticAberration);
+	appendConfigValue("r.VSync", state.bVSync);
+	appendConfigValue("r.Vignette", state.bVignette);
+	appendConfigValue("r.ChromaticAberration", state.bChromaticAberration);
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	appendConfigValue("r.ExternalCapture.StartupProvider", state.StartupCaptureProvider);
 #endif
 	appendConfigValue("r.BackBufferFormat", state.BackBufferFormat);
-	appendConfigValue("r.PreferHighPerformanceAdapter", state.PreferHighPerformanceAdapter);
+	appendConfigValue("r.PreferHighPerformanceAdapter", state.bPreferHighPerformanceAdapter);
 	appendConfigValue("r.ToneMapper", state.ToneMapper);
 	appendConfigValue("r.Exposure.Mode", state.ExposureMode);
 	appendConfigValue("r.Exposure.MeteringMethod", state.ExposureMeteringMethod);
@@ -203,16 +203,16 @@ void EngineRenderingSettingsPersistence::Write(const EngineRenderingSettingsStat
 	appendConfigValue("r.Exposure.Max", state.ExposureMax);
 	appendConfigValue("r.Exposure.AdaptationSpeedUp", state.ExposureAdaptationSpeedUp);
 	appendConfigValue("r.Exposure.AdaptationSpeedDown", state.ExposureAdaptationSpeedDown);
-	appendConfigValue("r.MeshAutoBatching", state.MeshAutoBatching);
+	appendConfigValue("r.MeshAutoBatching", state.bMeshAutoBatching);
 	appendConfigValue("r.Upscaler.Provider", state.UpscalerProvider);
 	appendConfigValue("r.Upscaler.QualityMode", state.UpscalerQualityMode);
 	appendConfigValue("r.RayReconstruction.Mode", state.RayReconstructionMode);
 	appendConfigValue("r.GBuffer.Algorithm", state.SelectedGBufferAlgorithm);
-	appendConfigValue("r.RayTracing.Tlas.Refit", state.RefitTlas);
-	appendConfigValue("r.RayTracing.PreferPtlas", state.PtlasActive);
+	appendConfigValue("r.RayTracing.Tlas.Refit", state.bRefitTlas);
+	appendConfigValue("r.RayTracing.PreferPtlas", state.bPtlasActive);
 	appendConfigValue("r.RayTracing.Ptlas.PartitionsPerAxis", state.PtlasPartitionsPerAxis);
 	appendConfigValue("r.RayTracing.Ptlas.PartitionUpdateMode", state.PtlasPartitionUpdateMode);
-	appendConfigValue("r.RayTracing.Ptlas.MarkAllDynamicInPartition", state.PtlasMarkAllDynamicInPartition);
+	appendConfigValue("r.RayTracing.Ptlas.MarkAllDynamicInPartition", state.bPtlasMarkAllDynamicInPartition);
 	appendConfigValue("r.RayTracing.Ptlas.ModeChangeDistance", state.PtlasModeChangeDistance);
 
 	std::size_t sectionStart = lines.size();

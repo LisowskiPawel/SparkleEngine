@@ -81,10 +81,10 @@ namespace ShaderCompileFailureReplay
 			writer.WriteString("profile", job.TargetProfile);
 			writer.WriteUInt64("unitKind", static_cast<std::uint64_t>(job.Request.UnitKind));
 			writer.WriteUInt64("requiredFeatures", static_cast<std::uint64_t>(job.Request.RequiredFeatures));
-			writer.WriteRaw("enableDebugInfo", job.Request.EnableDebugInfo ? "true" : "false");
-			writer.WriteRaw("enableOptimizations", job.Request.EnableOptimizations ? "true" : "false");
-			writer.WriteRaw("treatWarningsAsErrors", job.Request.TreatWarningsAsErrors ? "true" : "false");
-			writer.WriteRaw("stripDebugInfo", job.Request.StripDebugInfo ? "true" : "false");
+			writer.WriteRaw("enableDebugInfo", job.Request.bEnableDebugInfo ? "true" : "false");
+			writer.WriteRaw("enableOptimizations", job.Request.bEnableOptimizations ? "true" : "false");
+			writer.WriteRaw("treatWarningsAsErrors", job.Request.bTreatWarningsAsErrors ? "true" : "false");
+			writer.WriteRaw("stripDebugInfo", job.Request.bStripDebugInfo ? "true" : "false");
 			writer.WriteHexUInt64("sourceContentHash", job.SourceContentHash);
 			writer.WriteHexUInt64("dependencyClosureHash", job.DependencyClosureHash);
 			writer.WriteHexUInt64("requestHash", job.RequestHash);

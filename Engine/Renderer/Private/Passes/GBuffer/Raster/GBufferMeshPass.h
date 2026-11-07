@@ -88,7 +88,7 @@ private:
 	static const GpuMesh* ResolveBatch(const RenderView& view, const MeshInstanceBatch& batch, const GpuMeshCache& meshes) noexcept;
 	static bool HasValidSkinning(const PreparedRenderScene& preparedScene, const RenderView& view, const MeshInstanceBatch& batch) noexcept;
 	static void ConfigureDrawParameters(const Parameters& passParameters, std::uint32_t firstInstance, DrawParameterInstance& drawParameters);
-	static RhiRasterizerState ResolveRasterizerState(const MaterialData& material, const GpuMesh& gpuMesh, bool wireframe) noexcept;
+	static RhiRasterizerState ResolveRasterizerState(const MaterialData& material, const GpuMesh& gpuMesh, bool bWireframe) noexcept;
 	static bool BindBatchPipeline(const FrameGraphResourceCommands& resources, RenderCommandContext& commandContext, DrawParameterInstance& drawParameters, const PreparedDraw& draw);
 	static void DrawBatch(
 	    const FrameGraphResourceCommands& resources,

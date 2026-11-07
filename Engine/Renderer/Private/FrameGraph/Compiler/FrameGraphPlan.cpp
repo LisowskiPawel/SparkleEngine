@@ -8,8 +8,8 @@ void FrameGraphTransientLifetime::Clear() noexcept
 	lastUserPass = INVALID_FRAME_GRAPH_PASS_INDEX;
 	firstExecutionIndex = INVALID_FRAME_GRAPH_PASS_INDEX;
 	lastExecutionIndex = INVALID_FRAME_GRAPH_PASS_INDEX;
-	readUsed = false;
-	writeUsed = false;
+	bReadUsed = false;
+	bWriteUsed = false;
 	requiredStates.clear();
 }
 

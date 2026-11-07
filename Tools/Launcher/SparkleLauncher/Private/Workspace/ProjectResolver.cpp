@@ -12,21 +12,21 @@ namespace SparkleLauncher
 
 		const std::filesystem::path projectsDirectory = workspaceRoot / "Projects";
 		std::error_code errorCode;
-		const bool projectsDirectoryExists = std::filesystem::exists(projectsDirectory, errorCode);
+		const bool bProjectsDirectoryExists = std::filesystem::exists(projectsDirectory, errorCode);
 		if (errorCode)
 		{
 			outErrorMessage = "Failed to inspect workspace content directory: " + errorCode.message();
 			return std::nullopt;
 		}
 
-		const bool projectsDirectoryIsDirectory = projectsDirectoryExists && std::filesystem::is_directory(projectsDirectory, errorCode);
+		const bool bProjectsDirectoryIsDirectory = bProjectsDirectoryExists && std::filesystem::is_directory(projectsDirectory, errorCode);
 		if (errorCode)
 		{
 			outErrorMessage = "Failed to inspect workspace content directory: " + errorCode.message();
 			return std::nullopt;
 		}
 
-		if (!projectsDirectoryIsDirectory)
+		if (!bProjectsDirectoryIsDirectory)
 		{
 			outErrorMessage = "Workspace content directory was not found: " + projectsDirectory.string();
 			return std::nullopt;
@@ -46,25 +46,25 @@ namespace SparkleLauncher
 		{
 			const std::filesystem::directory_entry& entry = *projectIterator;
 			errorCode.clear();
-			const bool isDirectory = entry.is_directory(errorCode);
+			const bool bIsDirectory = entry.is_directory(errorCode);
 			if (errorCode)
 			{
 				outErrorMessage = "Failed to inspect workspace content entry: " + errorCode.message();
 				return std::nullopt;
 			}
 
-			if (isDirectory)
+			if (bIsDirectory)
 			{
 				const std::filesystem::path markerPath = entry.path() / std::string(Filesystem::kProjectMarker);
 				errorCode.clear();
-				const bool markerExists = std::filesystem::exists(markerPath, errorCode);
+				const bool bMarkerExists = std::filesystem::exists(markerPath, errorCode);
 				if (errorCode)
 				{
 					outErrorMessage = "Failed to inspect workspace content marker: " + errorCode.message();
 					return std::nullopt;
 				}
 
-				if (markerExists)
+				if (bMarkerExists)
 				{
 					++contentCount;
 					if (!discoveredContent)

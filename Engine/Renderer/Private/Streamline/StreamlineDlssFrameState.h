@@ -14,7 +14,7 @@ public:
 	void SetupFrame(const ImageProviderFrameInput& frameInput) noexcept;
 	void Reset() noexcept;
 
-	bool IsValid() const noexcept { return m_frameValid; }
+	bool IsValid() const noexcept { return m_bFrameValid; }
 
 	EUpscalerQualityMode GetQualityMode() const noexcept { return m_qualityMode; }
 
@@ -26,5 +26,5 @@ private:
 	RenderViewportExtent m_resolvedOutputExtent = {};
 	RenderViewportExtent m_resolvedRenderExtent = {};
 	EUpscalerQualityMode m_qualityMode = EUpscalerQualityMode::Quality;
-	bool m_frameValid = false;
+	bool m_bFrameValid = false;
 };

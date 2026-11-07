@@ -26,7 +26,7 @@ namespace SparkleLauncher
 	    const QString& value,
 	    const QString& detail,
 	    const QString& metadata,
-	    bool available,
+	    bool bAvailable,
 	    const QStringList& selectedScopes,
 	    QVector<QCheckBox*>& scopeBoxes,
 	    const std::function<void(QWidget*)>& registerFocusable);

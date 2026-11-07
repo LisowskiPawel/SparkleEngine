@@ -15,7 +15,7 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_textureCacheLogger, "Renderer.TextureCache"
 
 void TextureCache::LoadDefaultTextures(RenderCommandList& commandList, std::vector<RhiResourceHandle>& uploadedResources)
 {
-	if (m_defaultsLoaded)
+	if (m_bDefaultsLoaded)
 	{
 		return;
 	}
@@ -58,7 +58,7 @@ void TextureCache::LoadDefaultTextures(RenderCommandList& commandList, std::vect
 	}
 	m_textureSlotKeys[static_cast<std::size_t>(TextureId::Checker)] = checker->CacheKey;
 	m_textureSlotKeys[static_cast<std::size_t>(TextureId::DefaultSky)] = sky->CacheKey;
-	m_defaultsLoaded = true;
+	m_bDefaultsLoaded = true;
 	++m_bindingRevision;
 }
 
@@ -118,14 +118,14 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 
 	for (TextureRequest& request : m_requests)
 	{
-		request.Wanted = request.Generation.Generation == generation && m_wantedPathTextureKeys.contains(request.Source.CacheKey);
-		if (!request.Wanted && !request.Execution.IsValid())
+		request.bWanted = request.Generation.Generation == generation && m_wantedPathTextureKeys.contains(request.Source.CacheKey);
+		if (!request.bWanted && !request.Execution.IsValid())
 		{
 			(void) m_residency.Cancel(request.Generation);
 		}
 	}
 
-	bool retiredTexture = false;
+	bool bRetiredTexture = false;
 	const std::uint64_t nextBindingRevision = m_bindingRevision + 1u;
 	for (auto texture = m_pathTextures.begin(); texture != m_pathTextures.end();)
 	{
@@ -137,10 +137,10 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 
 		QueueTextureRetirement(texture->second, nextBindingRevision);
 		texture = m_pathTextures.erase(texture);
-		retiredTexture = true;
+		bRetiredTexture = true;
 	}
 
-	if (retiredTexture || m_sceneTextureGeneration != generation)
+	if (bRetiredTexture || m_sceneTextureGeneration != generation)
 	{
 		m_bindingRevision = nextBindingRevision;
 	}
@@ -150,7 +150,7 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 void TextureCache::LaunchPendingRequests()
 {
 	const std::size_t activeLoadCount = static_cast<std::size_t>(
-	    std::count_if(m_requests.begin(), m_requests.end(), [](const TextureRequest& request) noexcept { return request.LoadStarted && request.Execution.IsValid(); }));
+	    std::count_if(m_requests.begin(), m_requests.end(), [](const TextureRequest& request) noexcept { return request.bLoadStarted && request.Execution.IsValid(); }));
 
 	std::size_t availableSlots = activeLoadCount < kMaximumConcurrentLoads ? kMaximumConcurrentLoads - activeLoadCount : 0;
 	const AssetResidencyBudget& budget = m_residency.GetBudget();
@@ -162,7 +162,7 @@ void TextureCache::LaunchPendingRequests()
 		{
 			return;
 		}
-		if (request.LoadStarted || !request.Wanted || request.Payload == nullptr)
+		if (request.bLoadStarted || !request.bWanted || request.Payload == nullptr)
 		{
 			continue;
 		}
@@ -172,7 +172,7 @@ void TextureCache::LaunchPendingRequests()
 			return;
 		}
 		request.Execution = CookedTextureLoadTask::Launch(m_taskExecutor, *m_taskScope, request.Source.Path, request.Payload, maximumDecodedBytes);
-		request.LoadStarted = true;
+		request.bLoadStarted = true;
 		--availableSlots;
 	}
 }
@@ -189,7 +189,7 @@ void TextureCache::ConsumeCompletedRequests() noexcept
 		const TaskExecutionStatus executionStatus = request.Execution.GetStatus();
 		const TaskResult executionResult = request.Execution.GetResult();
 		request.Execution = {};
-		if (!request.Wanted)
+		if (!request.bWanted)
 		{
 			(void) m_residency.Cancel(request.Generation);
 			request.Payload.reset();

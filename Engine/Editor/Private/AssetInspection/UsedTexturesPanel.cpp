@@ -19,9 +19,9 @@ void UsedTexturesPanel::SetDiagnosticsProvider(DiagnosticsProvider provider)
 	m_diagnosticsProvider = std::move(provider);
 }
 
-void UsedTexturesPanel::BuildUI(bool disableInteraction)
+void UsedTexturesPanel::BuildUI(bool bDisableInteraction)
 {
-	if (!m_isOpen)
+	if (!m_bIsOpen)
 	{
 		return;
 	}
@@ -29,7 +29,7 @@ void UsedTexturesPanel::BuildUI(bool disableInteraction)
 	RefreshSnapshot();
 	ImGui::SetNextWindowSize(ImVec2(1280.0f, 760.0f), ImGuiCond_FirstUseEver);
 	const std::string windowTitle = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Material, "Texture Tools") + "##Texture Tools";
-	if (!ImGui::Begin(windowTitle.c_str(), &m_isOpen))
+	if (!ImGui::Begin(windowTitle.c_str(), &m_bIsOpen))
 	{
 		ImGui::End();
 		return;
@@ -46,11 +46,11 @@ void UsedTexturesPanel::BuildUI(bool disableInteraction)
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
 		ImGui::BeginChild("##TextureTablePane", ImVec2(0.0f, 0.0f), ImGuiChildFlags_None);
-		DrawTextureTable(disableInteraction);
+		DrawTextureTable(bDisableInteraction);
 		ImGui::EndChild();
 		ImGui::TableSetColumnIndex(1);
 		ImGui::BeginChild("##TexturePreviewPane", ImVec2(0.0f, 0.0f), ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-		DrawSelectedTextureInspector(disableInteraction);
+		DrawSelectedTextureInspector(bDisableInteraction);
 		ImGui::EndChild();
 		ImGui::EndTable();
 	}
@@ -75,7 +75,7 @@ void UsedTexturesPanel::DrawToolbar()
 	ImGui::TextDisabled("%zu texture(s), %s estimated", m_snapshot.size(), PanelDiagnosticsFormatting::FormatByteSize(TextureDiagnosticsPresentation::SumEstimatedTextureBytes(m_snapshot)).c_str());
 }
 
-void UsedTexturesPanel::DrawTextureTable(bool disableInteraction)
+void UsedTexturesPanel::DrawTextureTable(bool bDisableInteraction)
 {
 	const ImGuiTableFlags tableFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY;
 	if (!ImGui::BeginTable("##UsedTexturesTable", 7, tableFlags, ImVec2(0.0f, 0.0f)))
@@ -93,7 +93,7 @@ void UsedTexturesPanel::DrawTextureTable(bool disableInteraction)
 	ImGui::TableSetupColumn("Memory");
 	ImGui::TableHeadersRow();
 
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	for (const TextureDiagnosticsRow& row : m_snapshot)
 	{
 		if (!MatchesFilter(row))
@@ -103,9 +103,9 @@ void UsedTexturesPanel::DrawTextureTable(bool disableInteraction)
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		const bool selected = row.Key == m_selectedKey;
+		const bool bSelected = row.Key == m_selectedKey;
 		const std::string displayName = TextureDiagnosticsPresentation::FormatTextureDisplayName(row);
-		if (ImGui::Selectable(displayName.c_str(), selected, ImGuiSelectableFlags_SpanAllColumns))
+		if (ImGui::Selectable(displayName.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
 		{
 			m_selectedKey = row.Key;
 		}
@@ -128,7 +128,7 @@ void UsedTexturesPanel::DrawTextureTable(bool disableInteraction)
 	ImGui::EndTable();
 }
 
-void UsedTexturesPanel::DrawSelectedTextureInspector(bool disableInteraction)
+void UsedTexturesPanel::DrawSelectedTextureInspector(bool bDisableInteraction)
 {
 	const TextureDiagnosticsRow* selectedRow = GetSelectedRow();
 	if (selectedRow == nullptr)
@@ -187,7 +187,7 @@ void UsedTexturesPanel::DrawSelectedTextureDetails(const TextureDiagnosticsRow& 
 	const char* textureFormat = TextureDiagnosticsPresentation::FormatTextureFormat(row.Format);
 
 	EditorWidgets::DrawKeyValueRow("Kind", TextureDiagnosticsPresentation::FormatTextureKind(row.Kind));
-	EditorWidgets::DrawKeyValueRow("Streamed", row.StreamManaged ? "yes" : "no");
+	EditorWidgets::DrawKeyValueRow("Streamed", row.bStreamManaged ? "yes" : "no");
 	EditorWidgets::DrawKeyValueRow("Default", row.Kind == TextureDiagnosticsKind::Scene ? "no" : "yes");
 	EditorWidgets::DrawKeyValueRow("Dimension", TextureDiagnosticsPresentation::FormatTextureDimension(row.Dimension));
 	EditorWidgets::DrawKeyValueRow("Size", extent.c_str());

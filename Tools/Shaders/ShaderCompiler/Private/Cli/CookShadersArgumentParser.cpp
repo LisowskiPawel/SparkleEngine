@@ -73,13 +73,13 @@ bool CookShadersArgumentParser::ConsumeFlag(std::string_view argument)
 {
 	if (argument == "--debug-info")
 	{
-		m_settings.enableDebugInfo = true;
+		m_settings.bEnableDebugInfo = true;
 		return true;
 	}
 
 	if (argument == "--disable-optimizations")
 	{
-		m_settings.enableOptimizations = false;
+		m_settings.bEnableOptimizations = false;
 		return true;
 	}
 
@@ -160,10 +160,10 @@ void CookShadersArgumentParser::AddTarget(std::string_view value)
 		throw Diagnostics::Error("Unknown shader target '" + std::string(value) + "'");
 	}
 
-	if (!m_targetWasSpecified)
+	if (!m_bTargetWasSpecified)
 	{
 		m_settings.targets.clear();
-		m_targetWasSpecified = true;
+		m_bTargetWasSpecified = true;
 	}
 
 	if (!ContainsTarget(m_settings.targets, *target))
@@ -194,11 +194,11 @@ void CookShadersArgumentParser::SetBooleanOption(std::string_view argument, std:
 
 	if (argument == "--warnings-as-errors")
 	{
-		m_settings.treatWarningsAsErrors = *parsedValue;
+		m_settings.bTreatWarningsAsErrors = *parsedValue;
 	}
 	else
 	{
-		m_settings.stripDebugInfo = *parsedValue;
+		m_settings.bStripDebugInfo = *parsedValue;
 	}
 }
 

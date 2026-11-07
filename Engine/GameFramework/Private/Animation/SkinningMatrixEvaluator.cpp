@@ -7,9 +7,9 @@ namespace SkinningMatrixEvaluator
 	bool Evaluate(const ECS::SkeletonEvaluationData& skeleton, std::span<const DirectX::XMFLOAT4X4> modelSpaceTransforms, std::span<DirectX::XMFLOAT4X4> jointMatrices) noexcept
 	{
 		const bool bInvalidSkinningPosejointsSize = !skeleton.IsValid() || modelSpaceTransforms.size() != skeleton.Resource->joints.size();
-		const bool invalidSkinningPose = bInvalidSkinningPosejointsSize || (jointMatrices.size() != skeleton.Resource->joints.size());
+		const bool bInvalidSkinningPose = bInvalidSkinningPosejointsSize || (jointMatrices.size() != skeleton.Resource->joints.size());
 		
-		if (invalidSkinningPose)
+		if (bInvalidSkinningPose)
 		{
 			return false;
 		}

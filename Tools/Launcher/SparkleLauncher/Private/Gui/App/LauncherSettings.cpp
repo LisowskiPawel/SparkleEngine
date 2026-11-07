@@ -88,11 +88,11 @@ namespace SparkleLauncher
 		return m_shaderBackend;
 	}
 
-	void LauncherSettings::SetShaderSymbols(bool enabled)
+	void LauncherSettings::SetShaderSymbols(bool bEnabled)
 	{
-		if (m_shaderSymbols != enabled)
+		if (m_bShaderSymbols != bEnabled)
 		{
-			m_shaderSymbols = enabled;
+			m_bShaderSymbols = bEnabled;
 			emit SettingsChanged();
 		}
 	}

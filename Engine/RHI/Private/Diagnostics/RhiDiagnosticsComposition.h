@@ -10,4 +10,4 @@ std::unique_ptr<RenderDiagnostics> CreateRhiDiagnosticsComposition(
     std::unique_ptr<RenderMessageDiagnostics> messageDiagnostics,
     std::unique_ptr<RenderFailureDiagnostics> failureDiagnostics,
     std::unique_ptr<RenderMemoryDiagnostics> memoryDiagnostics,
-    bool supportsGpuEvents);
+    bool bSupportsGpuEvents);

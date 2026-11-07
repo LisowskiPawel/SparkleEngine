@@ -19,8 +19,8 @@ RenderFrameQueue::RenderFrameQueue(std::uint32_t capacity) :
 std::optional<RenderFrameQueueTicket> RenderFrameQueue::Acquire()
 {
 	std::unique_lock lock(m_mutex);
-	m_reusable.wait(lock, [this] { return m_closed || FindFreeSlotLocked().has_value(); });
-	if (m_closed)
+	m_reusable.wait(lock, [this] { return m_bClosed || FindFreeSlotLocked().has_value(); });
+	if (m_bClosed)
 	{
 		return std::nullopt;
 	}
@@ -102,15 +102,15 @@ bool RenderFrameQueue::WaitUntilReusable(RenderFrameQueueTicket ticket)
 		return false;
 	}
 
-	m_reusable.wait(lock, [this, ticket] { return m_closed || !IsTicketCurrentLocked(ticket) || m_slots[ticket.SlotIndex].State == RenderFrameSlotState::Free; });
-	return !m_closed && IsTicketCurrentLocked(ticket) && m_slots[ticket.SlotIndex].State == RenderFrameSlotState::Free;
+	m_reusable.wait(lock, [this, ticket] { return m_bClosed || !IsTicketCurrentLocked(ticket) || m_slots[ticket.SlotIndex].State == RenderFrameSlotState::Free; });
+	return !m_bClosed && IsTicketCurrentLocked(ticket) && m_slots[ticket.SlotIndex].State == RenderFrameSlotState::Free;
 }
 
 void RenderFrameQueue::Close() noexcept
 {
 	{
 		std::lock_guard lock(m_mutex);
-		m_closed = true;
+		m_bClosed = true;
 	}
 	m_reusable.notify_all();
 }
@@ -121,7 +121,7 @@ void RenderFrameQueue::SettleAll() noexcept
 	abandoned.reserve(m_capacity);
 	{
 		std::lock_guard lock(m_mutex);
-		m_closed = true;
+		m_bClosed = true;
 		for (std::uint32_t slotIndex = 0; slotIndex < m_capacity; ++slotIndex)
 		{
 			Slot& slot = m_slots[slotIndex];

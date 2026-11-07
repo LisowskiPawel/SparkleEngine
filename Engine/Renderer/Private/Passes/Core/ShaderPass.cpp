@@ -127,9 +127,9 @@ void BindComputeShaderPass(
     const char* const* bindingNames,
     std::uint32_t bindingNameCount,
     const PassBindingOverrides* overrides,
-    bool bindLayout) noexcept
+    bool bBindLayout) noexcept
 {
-	if (bindLayout)
+	if (bBindLayout)
 	{
 		resources.BindGlobalDescriptorState(commandContext);
 	}
@@ -143,7 +143,7 @@ void BindComputeShaderPass(
 	    parameterSet,
 	    bindingNames != nullptr ? std::span<const char* const>(bindingNames, bindingNameCount) : std::span<const char* const>{},
 	    overrides,
-	    bindLayout);
+	    bBindLayout);
 }
 
 void BindRasterShaderPass(
@@ -155,9 +155,9 @@ void BindRasterShaderPass(
     const char* const* bindingNames,
     std::uint32_t bindingNameCount,
     const PassBindingOverrides* overrides,
-    bool bindLayout) noexcept
+    bool bBindLayout) noexcept
 {
-	if (bindLayout)
+	if (bBindLayout)
 	{
 		resources.BindGlobalDescriptorState(commandContext);
 	}
@@ -171,7 +171,7 @@ void BindRasterShaderPass(
 	    parameterSet,
 	    bindingNames != nullptr ? std::span<const char* const>(bindingNames, bindingNameCount) : std::span<const char* const>{},
 	    overrides,
-	    bindLayout);
+	    bBindLayout);
 }
 
 void BindRayTracingShaderPass(

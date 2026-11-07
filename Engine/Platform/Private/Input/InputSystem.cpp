@@ -63,7 +63,7 @@ void InputSystem::HandleWindowMessage(WindowMessageEvent& event)
 {
 	if (OnWindowMessage(event.msg, event.wParam, event.lParam))
 	{
-		event.handled = true;
+		event.bHandled = true;
 	}
 }
 
@@ -95,7 +95,7 @@ void InputSystem::UpdateMouseMoveDelta(MouseMoveEvent& event) noexcept
 	int32_t deltaX = 0;
 	int32_t deltaY = 0;
 
-	if (m_hasLastMousePosition)
+	if (m_bHasLastMousePosition)
 	{
 		deltaX = event.Position.X - m_lastMouseX;
 		deltaY = event.Position.Y - m_lastMouseY;
@@ -103,7 +103,7 @@ void InputSystem::UpdateMouseMoveDelta(MouseMoveEvent& event) noexcept
 
 	m_lastMouseX = event.Position.X;
 	m_lastMouseY = event.Position.Y;
-	m_hasLastMousePosition = true;
+	m_bHasLastMousePosition = true;
 	event.Delta.X = deltaX;
 	event.Delta.Y = deltaY;
 }
@@ -131,9 +131,9 @@ bool InputSystem::DispatchInputEvent(const InputBackendResult& result, InputLaye
 	return true;
 }
 
-void InputSystem::BeginInputRoutingFrame(bool interactionDisabled, bool textInputActive)
+void InputSystem::BeginInputRoutingFrame(bool bInteractionDisabled, bool bTextInputActive)
 {
-	m_dispatch->FocusRouter.BeginFrame(interactionDisabled, textInputActive);
+	m_dispatch->FocusRouter.BeginFrame(bInteractionDisabled, bTextInputActive);
 }
 
 void InputSystem::RegisterInputTargetRegion(float left, float top, float right, float bottom, InputLayer targetLayer)
@@ -161,13 +161,13 @@ void InputSystem::SetActiveLayer(InputLayer layer) noexcept
 	}
 }
 
-void InputSystem::SetLayerEnabled(InputLayer layer, bool enabled)
+void InputSystem::SetLayerEnabled(InputLayer layer, bool bEnabled)
 {
 	const auto index = static_cast<std::size_t>(layer);
 	if (index < LayerCount)
 	{
-		m_layerEnabled[index] = enabled;
-		if (!enabled && m_activeLayer == layer)
+		m_layerEnabled[index] = bEnabled;
+		if (!bEnabled && m_activeLayer == layer)
 		{
 			SetActiveLayer(InputLayer::System);
 		}
@@ -278,19 +278,19 @@ void InputSystem::CenterCursor(void* windowHandle)
 	}
 }
 
-void InputSystem::SetCursorVisibility(bool visible)
+void InputSystem::SetCursorVisibility(bool bVisible)
 {
-	const bool currentlyHidden = m_inputState.IsCursorHidden();
-	if (visible && !currentlyHidden)
+	const bool bCurrentlyHidden = m_inputState.IsCursorHidden();
+	if (bVisible && !bCurrentlyHidden)
 	{
 		return;
 	}
-	if (!visible && currentlyHidden)
+	if (!bVisible && bCurrentlyHidden)
 	{
 		return;
 	}
 
-	if (visible)
+	if (bVisible)
 	{
 		ShowCursor();
 	}

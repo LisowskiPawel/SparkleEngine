@@ -64,9 +64,9 @@ private:
 		std::shared_ptr<GpuMeshPreparedData> Prepared;
 		std::unique_ptr<GpuMesh> Uploaded;
 		std::uint64_t ResidentBytes = 0;
-		bool PreparationStarted = false;
-		bool UploadSubmitted = false;
-		bool Wanted = true;
+		bool bPreparationStarted = false;
+		bool bUploadSubmitted = false;
+		bool bWanted = true;
 	};
 
 	static constexpr std::size_t kMaximumConcurrentPreparations = 16;

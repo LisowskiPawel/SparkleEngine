@@ -54,13 +54,13 @@ static void ValidateReflection(
     std::span<const CookedShaderSpecializationConstantRecord> specializationConstants,
     std::span<const std::uint8_t> strings)
 {
-	const bool resourcesInRange = ContainsRange(resources.size(), reflection.ResourceBindingOffset, reflection.ResourceBindingCount);
-	const bool constantBuffersInRange = resourcesInRange && ContainsRange(constantBuffers.size(), reflection.ConstantBufferOffset, reflection.ConstantBufferCount);
-	const bool inputsInRange = constantBuffersInRange && ContainsRange(inputs.size(), reflection.InputElementOffset, reflection.InputElementCount);
-	const bool pushConstantsInRange = inputsInRange && ContainsRange(pushConstants.size(), reflection.PushConstantRangeOffset, reflection.PushConstantRangeCount);
-	const bool specializationConstantsInRange = pushConstantsInRange && ContainsRange(specializationConstants.size(), reflection.SpecializationConstantOffset, reflection.SpecializationConstantCount);
+	const bool bResourcesInRange = ContainsRange(resources.size(), reflection.ResourceBindingOffset, reflection.ResourceBindingCount);
+	const bool bConstantBuffersInRange = bResourcesInRange && ContainsRange(constantBuffers.size(), reflection.ConstantBufferOffset, reflection.ConstantBufferCount);
+	const bool bInputsInRange = bConstantBuffersInRange && ContainsRange(inputs.size(), reflection.InputElementOffset, reflection.InputElementCount);
+	const bool bPushConstantsInRange = bInputsInRange && ContainsRange(pushConstants.size(), reflection.PushConstantRangeOffset, reflection.PushConstantRangeCount);
+	const bool bSpecializationConstantsInRange = bPushConstantsInRange && ContainsRange(specializationConstants.size(), reflection.SpecializationConstantOffset, reflection.SpecializationConstantCount);
 
-	if (!specializationConstantsInRange)
+	if (!bSpecializationConstantsInRange)
 	{
 		throw Diagnostics::Error("Global shader map contains an out-of-range reflection record.");
 	}
@@ -69,12 +69,12 @@ static void ValidateReflection(
 	{
 		const bool bValidConstantBufferBufferIndex = resource.ConstantBufferIndex == kCookedShaderReflectionInvalidIndex;
 		const bool bValidConstantBufferBufferCount = resource.ConstantBufferIndex >= reflection.ConstantBufferOffset && resource.ConstantBufferIndex < reflection.ConstantBufferOffset + reflection.ConstantBufferCount;
-		const bool validConstantBuffer = bValidConstantBufferBufferIndex || bValidConstantBufferBufferCount;
+		const bool bValidConstantBuffer = bValidConstantBufferBufferIndex || bValidConstantBufferBufferCount;
 		const bool bInvalidReflectedResourceInBytes = !ContainsRange(strings.size(), resource.NameOffsetInBytes, resource.NameSizeInBytes) || resource.NameSizeInBytes == 0;
 		const bool bReflectedResourceArrayCount = bInvalidReflectedResourceInBytes || (resource.ArrayCount == 0);
-		const bool invalidReflectedResource = bReflectedResourceArrayCount || (!validConstantBuffer);
+		const bool bInvalidReflectedResource = bReflectedResourceArrayCount || (!bValidConstantBuffer);
 		
-		if (invalidReflectedResource)
+		if (bInvalidReflectedResource)
 		{
 			throw Diagnostics::Error("Global shader map contains an invalid reflected resource binding.");
 		}
@@ -82,10 +82,10 @@ static void ValidateReflection(
 
 	for (const CookedShaderConstantBufferRecord& buffer : constantBuffers.subspan(reflection.ConstantBufferOffset, reflection.ConstantBufferCount))
 	{
-		const bool nameInRange = ContainsRange(strings.size(), buffer.NameOffsetInBytes, buffer.NameSizeInBytes) && buffer.NameSizeInBytes != 0;
-		const bool membersInRange = nameInRange && ContainsRange(constantBufferMembers.size(), buffer.MemberOffset, buffer.MemberCount);
+		const bool bNameInRange = ContainsRange(strings.size(), buffer.NameOffsetInBytes, buffer.NameSizeInBytes) && buffer.NameSizeInBytes != 0;
+		const bool bMembersInRange = bNameInRange && ContainsRange(constantBufferMembers.size(), buffer.MemberOffset, buffer.MemberCount);
 
-		if (!membersInRange)
+		if (!bMembersInRange)
 		{
 			throw Diagnostics::Error("Global shader map contains an invalid reflected constant buffer.");
 		}
@@ -94,9 +94,9 @@ static void ValidateReflection(
 			const bool bInvalidReflectedMemberInBytes = !ContainsRange(strings.size(), member.NameOffsetInBytes, member.NameSizeInBytes) || member.NameSizeInBytes == 0;
 			const bool bInvalidReflectedMemberArrayCount = bInvalidReflectedMemberInBytes || (member.ArrayCount == 0);
 			const bool bInvalidReflectedMemberInBytes2 = bInvalidReflectedMemberArrayCount || (member.OffsetInBytes > buffer.SizeInBytes);
-			const bool invalidReflectedMember = bInvalidReflectedMemberInBytes2 || (member.SizeInBytes > buffer.SizeInBytes - member.OffsetInBytes);
+			const bool bInvalidReflectedMember = bInvalidReflectedMemberInBytes2 || (member.SizeInBytes > buffer.SizeInBytes - member.OffsetInBytes);
 			
-			if (invalidReflectedMember)
+			if (bInvalidReflectedMember)
 			{
 				throw Diagnostics::Error("Global shader map contains an invalid reflected constant-buffer member.");
 			}
@@ -136,11 +136,11 @@ CookedShaderLibrary CookedShaderLibrary::Open(const std::filesystem::path& path)
 		throw Diagnostics::Error(std::format("Invalid cooked shader library header in '{}'.", path.string()));
 	}
 
-	const bool publicationIdentified = library.m_header.PublicationHash != 0;
-	const bool recordsRead = publicationIdentified && reader.ReadArray(library.m_header.RecordCount, library.m_records, error);
-	const bool codeRead = recordsRead && reader.ReadArray(library.m_header.CodeBlobSizeInBytes, library.m_codeBlob, error);
+	const bool bPublicationIdentified = library.m_header.PublicationHash != 0;
+	const bool bRecordsRead = bPublicationIdentified && reader.ReadArray(library.m_header.RecordCount, library.m_records, error);
+	const bool bCodeRead = bRecordsRead && reader.ReadArray(library.m_header.CodeBlobSizeInBytes, library.m_codeBlob, error);
 
-	if (!codeRead)
+	if (!bCodeRead)
 	{
 		if (error.empty())
 		{
@@ -210,18 +210,18 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 		throw Diagnostics::Error("Global shader map and cooked shader library do not belong to the same publication.");
 	}
 
-	const bool entriesRead = reader.ReadArray(map.m_header.EntryCount, map.m_entries, error);
-	const bool bIndingsRead = entriesRead && reader.ReadArray(map.m_header.BindingRecordCount, map.m_bindingRecords, error);
-	const bool reflectionRead = bIndingsRead && reader.ReadArray(map.m_header.ReflectionRecordCount, map.m_reflectionRecords, error);
-	const bool resourcesRead = reflectionRead && reader.ReadArray(map.m_header.ResourceBindingRecordCount, map.m_resourceBindings, error);
-	const bool constantBuffersRead = resourcesRead && reader.ReadArray(map.m_header.ConstantBufferRecordCount, map.m_constantBuffers, error);
-	const bool constantMembersRead = constantBuffersRead && reader.ReadArray(map.m_header.ConstantBufferMemberRecordCount, map.m_constantBufferMembers, error);
-	const bool inputElementsRead = constantMembersRead && reader.ReadArray(map.m_header.InputElementRecordCount, map.m_inputElements, error);
-	const bool pushConstantsRead = inputElementsRead && reader.ReadArray(map.m_header.PushConstantRangeRecordCount, map.m_pushConstantRanges, error);
-	const bool specializationConstantsRead = pushConstantsRead && reader.ReadArray(map.m_header.SpecializationConstantRecordCount, map.m_specializationConstants, error);
-	const bool stringsRead = specializationConstantsRead && reader.ReadArray(map.m_header.StringTableSizeInBytes, map.m_stringTable, error);
+	const bool bEntriesRead = reader.ReadArray(map.m_header.EntryCount, map.m_entries, error);
+	const bool bIndingsRead = bEntriesRead && reader.ReadArray(map.m_header.BindingRecordCount, map.m_bindingRecords, error);
+	const bool bReflectionRead = bIndingsRead && reader.ReadArray(map.m_header.ReflectionRecordCount, map.m_reflectionRecords, error);
+	const bool bResourcesRead = bReflectionRead && reader.ReadArray(map.m_header.ResourceBindingRecordCount, map.m_resourceBindings, error);
+	const bool bConstantBuffersRead = bResourcesRead && reader.ReadArray(map.m_header.ConstantBufferRecordCount, map.m_constantBuffers, error);
+	const bool bConstantMembersRead = bConstantBuffersRead && reader.ReadArray(map.m_header.ConstantBufferMemberRecordCount, map.m_constantBufferMembers, error);
+	const bool bInputElementsRead = bConstantMembersRead && reader.ReadArray(map.m_header.InputElementRecordCount, map.m_inputElements, error);
+	const bool bPushConstantsRead = bInputElementsRead && reader.ReadArray(map.m_header.PushConstantRangeRecordCount, map.m_pushConstantRanges, error);
+	const bool bSpecializationConstantsRead = bPushConstantsRead && reader.ReadArray(map.m_header.SpecializationConstantRecordCount, map.m_specializationConstants, error);
+	const bool bStringsRead = bSpecializationConstantsRead && reader.ReadArray(map.m_header.StringTableSizeInBytes, map.m_stringTable, error);
 
-	if (!stringsRead)
+	if (!bStringsRead)
 	{
 		throw Diagnostics::Error(error);
 	}
@@ -232,12 +232,12 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 
 	ShaderTypeId previousType = 0;
 	ShaderTarget previousTarget = kDefaultShaderTarget;
-	bool hasPrevious = false;
+	bool bHasPrevious = false;
 	for (const GlobalShaderMapEntry& entry : map.m_entries)
 	{
-		const bool bOrderedShaderType = !hasPrevious || previousType < entry.ShaderType;
+		const bool bOrderedShaderType = !bHasPrevious || previousType < entry.ShaderType;
 		const bool bOrderedTarget = previousType == entry.ShaderType && static_cast<std::uint16_t>(previousTarget) < static_cast<std::uint16_t>(entry.Target);
-		const bool ordered = bOrderedShaderType || bOrderedTarget;
+		const bool bOrdered = bOrderedShaderType || bOrderedTarget;
 		const std::uint32_t featureBits = static_cast<std::uint32_t>(entry.Features);
 		constexpr std::uint32_t knownFeatureBits = static_cast<std::uint32_t>(ShaderFeatureFlags::UsesInlineRayQuery) | static_cast<std::uint32_t>(ShaderFeatureFlags::UsesAccelerationStructure)
 		    | static_cast<std::uint32_t>(ShaderFeatureFlags::UsesDescriptorIndexing) | static_cast<std::uint32_t>(ShaderFeatureFlags::UsesFloat64);
@@ -248,9 +248,9 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 		const bool bInvalidShaderEntryStage = bInvalidShaderEntryBackendVersion || (entry.Stage >= ShaderStage::Count);
 		const bool bInvalidShaderEntryTarget = bInvalidShaderEntryStage || (!IsShaderTarget(entry.Target));
 		const bool bInvalidShaderEntryfeatureBits = bInvalidShaderEntryTarget || ((featureBits & ~knownFeatureBits) != 0);
-		const bool invalidShaderEntry = bInvalidShaderEntryfeatureBits || (!ordered);
+		const bool bInvalidShaderEntry = bInvalidShaderEntryfeatureBits || (!bOrdered);
 		
-		if (invalidShaderEntry)
+		if (bInvalidShaderEntry)
 		{
 			throw Diagnostics::Error("Global shader map contains an invalid or duplicate logical key.");
 		}
@@ -259,49 +259,50 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 			throw Diagnostics::Error("Global shader map entry references missing or incompatible shader code.");
 		}
 
-		const bool hasLocalRecord = entry.LocalRecordSizeInBytes != 0 || entry.LocalRecordSignature != 0;
+		const bool bHasLocalRecord = entry.LocalRecordSizeInBytes != 0 || entry.LocalRecordSignature != 0;
 		const bool bHasTracingContractInBytes = entry.RayPayloadSizeInBytes != 0 || entry.RayAttributeSizeInBytes != 0;
-		const bool hasSharedRayTracingContract = bHasTracingContractInBytes || (entry.MinimumRayRecursionDepth != 0);
-		const bool localRecordMismatch = (entry.LocalRecordSizeInBytes == 0) != (entry.LocalRecordSignature == 0);
-		const bool bRayGenerationIncompleteStage = !localRecordMismatch && entry.Stage == ShaderStage::RayGeneration;
+		const bool bHasSharedRayTracingContract = bHasTracingContractInBytes || (entry.MinimumRayRecursionDepth != 0);
+		const bool bLocalRecordMismatch = (entry.LocalRecordSizeInBytes == 0) != (entry.LocalRecordSignature == 0);
+		const bool bRayGenerationIncompleteStage = !bLocalRecordMismatch && entry.Stage == ShaderStage::RayGeneration;
 		const bool bRayGenerationIncompleteInBytes = entry.RayPayloadSizeInBytes == 0 || entry.RayAttributeSizeInBytes == 0;
 		const bool bGenerationIncompleteDepth = bRayGenerationIncompleteInBytes || (entry.MinimumRayRecursionDepth == 0);
-		const bool rayGenerationIncomplete = bRayGenerationIncompleteStage && bGenerationIncompleteDepth;
-		const bool bContractMisplacedIncomplete = !localRecordMismatch && !rayGenerationIncomplete;
-		const bool bSharedContractMisplacedStage = bContractMisplacedIncomplete && (IsRayTracingShaderStage(entry.Stage));
+		const bool bRayGenerationIncomplete = bRayGenerationIncompleteStage && bGenerationIncompleteDepth;
+		
+		const bool bContractShapeValid = !bLocalRecordMismatch && !bRayGenerationIncomplete;
+		const bool bSharedContractMisplacedStage = bContractShapeValid && (IsRayTracingShaderStage(entry.Stage));
 		const bool bSharedContractMisplacedStage2 = bSharedContractMisplacedStage && (entry.Stage != ShaderStage::RayGeneration);
-		const bool sharedContractMisplaced = bSharedContractMisplacedStage2 && (hasSharedRayTracingContract);
-		const bool bContractMisplacedIncomplete = !localRecordMismatch && !rayGenerationIncomplete;
-		const bool bContractMisplacedMisplaced = bContractMisplacedIncomplete && (!sharedContractMisplaced);
+		const bool bSharedContractMisplaced = bSharedContractMisplacedStage2 && (bHasSharedRayTracingContract);
+		
+		const bool bContractMisplacedMisplaced = bContractShapeValid && (!bSharedContractMisplaced);
 		const bool bRasterContractMisplacedStage = bContractMisplacedMisplaced && (!IsRayTracingShaderStage(entry.Stage));
-		const bool bContractMisplacedLocalRecord = hasSharedRayTracingContract || hasLocalRecord;
-		const bool rasterContractMisplaced = bRasterContractMisplacedStage && bContractMisplacedLocalRecord;
+		const bool bContractMisplacedLocalRecord = bHasSharedRayTracingContract || bHasLocalRecord;
+		const bool bRasterContractMisplaced = bRasterContractMisplacedStage && bContractMisplacedLocalRecord;
 
-		if (localRecordMismatch || rayGenerationIncomplete || sharedContractMisplaced || rasterContractMisplaced)
+		if (bLocalRecordMismatch || bRayGenerationIncomplete || bSharedContractMisplaced || bRasterContractMisplaced)
 		{
 			throw Diagnostics::Error("Global shader map entry contains an invalid ray-tracing contract.");
 		}
 
 		const bool bNamesValidEntryPoint = entry.ShaderName.IsValid() && entry.EntryPoint.IsValid();
 		const bool bNamesValidBackendName = bNamesValidEntryPoint && (entry.BackendName.IsValid());
-		const bool namesValid = bNamesValidBackendName && (entry.CodegenTarget.IsValid());
-		const bool shaderNameInRange = namesValid && ContainsString(map.m_stringTable, entry.ShaderName);
-		const bool entryPointInRange = shaderNameInRange && ContainsString(map.m_stringTable, entry.EntryPoint);
-		const bool bAckendNameInRange = entryPointInRange && ContainsString(map.m_stringTable, entry.BackendName);
-		const bool codegenTargetInRange = bAckendNameInRange && ContainsString(map.m_stringTable, entry.CodegenTarget);
-		const bool bIndingsInRange = codegenTargetInRange && ContainsRange(map.m_bindingRecords.size(), entry.BindingRecordOffset, entry.BindingRecordCount);
-		const bool reflectionInRange = bIndingsInRange && entry.ReflectionRecordIndex < map.m_reflectionRecords.size();
+		const bool bNamesValid = bNamesValidBackendName && (entry.CodegenTarget.IsValid());
+		const bool bShaderNameInRange = bNamesValid && ContainsString(map.m_stringTable, entry.ShaderName);
+		const bool bEntryPointInRange = bShaderNameInRange && ContainsString(map.m_stringTable, entry.EntryPoint);
+		const bool bAckendNameInRange = bEntryPointInRange && ContainsString(map.m_stringTable, entry.BackendName);
+		const bool bCodegenTargetInRange = bAckendNameInRange && ContainsString(map.m_stringTable, entry.CodegenTarget);
+		const bool bIndingsInRange = bCodegenTargetInRange && ContainsRange(map.m_bindingRecords.size(), entry.BindingRecordOffset, entry.BindingRecordCount);
+		const bool bReflectionInRange = bIndingsInRange && entry.ReflectionRecordIndex < map.m_reflectionRecords.size();
 
-		if (!reflectionInRange)
+		if (!bReflectionInRange)
 		{
 			throw Diagnostics::Error("Global shader map entry contains an out-of-range metadata reference.");
 		}
 
 		const ShaderTypeId resolvedShaderType = BuildShaderTypeId(map.ResolveString(entry.ShaderName));
-		const bool shaderTypeMatches = resolvedShaderType == entry.ShaderType;
-		const bool codegenTargetMatches = shaderTypeMatches && map.ResolveString(entry.CodegenTarget) == GetShaderTargetName(entry.Target);
+		const bool bShaderTypeMatches = resolvedShaderType == entry.ShaderType;
+		const bool bCodegenTargetMatches = bShaderTypeMatches && map.ResolveString(entry.CodegenTarget) == GetShaderTargetName(entry.Target);
 
-		if (!codegenTargetMatches)
+		if (!bCodegenTargetMatches)
 		{
 			throw Diagnostics::Error("Global shader map entry contains inconsistent identity or target provenance.");
 		}
@@ -323,7 +324,7 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 		}
 		previousType = entry.ShaderType;
 		previousTarget = entry.Target;
-		hasPrevious = true;
+		bHasPrevious = true;
 	}
 	return map;
 }

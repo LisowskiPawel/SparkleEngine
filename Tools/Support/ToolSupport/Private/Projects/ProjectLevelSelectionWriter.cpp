@@ -10,21 +10,21 @@
 #include <unordered_set>
 #include <utility>
 
-bool ProjectLevelSelectionWriter::SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool selected, std::string& outErrorMessage)
+bool ProjectLevelSelectionWriter::SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool bSelected, std::string& outErrorMessage)
 {
-	return SetLevelsSelected(projectRoot, {std::string(levelId)}, selected, outErrorMessage);
+	return SetLevelsSelected(projectRoot, {std::string(levelId)}, bSelected, outErrorMessage);
 }
 
-bool ProjectLevelSelectionWriter::SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool selected, std::string& outErrorMessage)
+bool ProjectLevelSelectionWriter::SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool bSelected, std::string& outErrorMessage)
 {
-	ProjectLevelSelectionWriter writer(projectRoot / "Levels.catalog", levelIds, selected);
+	ProjectLevelSelectionWriter writer(projectRoot / "Levels.catalog", levelIds, bSelected);
 	return writer.Apply(outErrorMessage);
 }
 
-ProjectLevelSelectionWriter::ProjectLevelSelectionWriter(std::filesystem::path catalogPath, std::vector<std::string> levelIds, bool selected) :
+ProjectLevelSelectionWriter::ProjectLevelSelectionWriter(std::filesystem::path catalogPath, std::vector<std::string> levelIds, bool bSelected) :
     m_catalogPath(std::move(catalogPath)),
     m_levelIds(std::move(levelIds)),
-    m_valueLine(std::string("Selected = ") + (selected ? "true" : "false"))
+    m_valueLine(std::string("Selected = ") + (bSelected ? "true" : "false"))
 {
 }
 
@@ -71,8 +71,8 @@ bool ProjectLevelSelectionWriter::UpdateEntries(std::string& outErrorMessage)
 		return true;
 	}
 
-	bool inLevelSection = false;
-	bool inTargetEntry = false;
+	bool bInLevelSection = false;
+	bool bInTargetEntry = false;
 	std::string currentLevelId;
 
 	for (std::size_t index = 0; index < m_lines.size(); ++index)
@@ -85,13 +85,13 @@ bool ProjectLevelSelectionWriter::UpdateEntries(std::string& outErrorMessage)
 
 		if (trimmed.front() == '[' && trimmed.back() == ']')
 		{
-			inLevelSection = trimmed == "[Level]";
-			inTargetEntry = false;
+			bInLevelSection = trimmed == "[Level]";
+			bInTargetEntry = false;
 			currentLevelId.clear();
 			continue;
 		}
 
-		if (!inLevelSection)
+		if (!bInLevelSection)
 		{
 			continue;
 		}
@@ -106,13 +106,13 @@ bool ProjectLevelSelectionWriter::UpdateEntries(std::string& outErrorMessage)
 		if (key == "Id")
 		{
 			currentLevelId = Strings::UnquoteCopy(value);
-			inTargetEntry = remainingLevelIds.contains(currentLevelId);
+			bInTargetEntry = remainingLevelIds.contains(currentLevelId);
 		}
-		else if (inTargetEntry && key == "Selected")
+		else if (bInTargetEntry && key == "Selected")
 		{
 			m_lines[index] = m_valueLine;
 			remainingLevelIds.erase(currentLevelId);
-			inTargetEntry = false;
+			bInTargetEntry = false;
 		}
 	}
 

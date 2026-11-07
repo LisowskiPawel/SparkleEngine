@@ -16,7 +16,7 @@ class TaskExecutor;
 struct RecordingChunkResult final
 {
 	RhiCommandRecordingLease Lease;
-	bool UsesInitializationLease = false;
+	bool bUsesInitializationLease = false;
 };
 
 class FrameGraphRecordingExecutor final

@@ -76,15 +76,15 @@ namespace SparkleLauncher
 		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
 
 		std::error_code sourceError;
-		const bool assetSyncScriptMissing = !std::filesystem::is_regular_file(request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) || sourceError;
+		const bool bAssetSyncScriptMissing = !std::filesystem::is_regular_file(request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) || sourceError;
 		
-		if (assetSyncScriptMissing)
+		if (bAssetSyncScriptMissing)
 		{
 			AddReadiness(plan, "Asset sync requires the source acquisition script. Open the matching source checkout to use this developer tool.");
 			return plan;
 		}
 		const ToolResolveResult cmake = ResolveKnownTool(KnownTool::CMake);
-		if (cmake.Found)
+		if (cmake.bFound)
 		{
 			plan.CMakePath = cmake.Path;
 			AddReadiness(plan, "CMake is available for level asset acquisition.");
@@ -103,12 +103,12 @@ namespace SparkleLauncher
 		                                      : "Acquire asset packs referenced by the requested maps into gitignored content roots; map selection and Game support "
 		                                        "remain unchanged.");
 
-		if (cmake.Found && !request.ContentId.empty())
+		if (cmake.bFound && !request.ContentId.empty())
 		{
 			try
 			{
 				PopulateLevelOperationSteps(plan);
-				plan.CanRun = true;
+				plan.bCanRun = true;
 			}
 			catch (const Diagnostics::Error& error)
 			{
@@ -125,7 +125,7 @@ namespace SparkleLauncher
 		}
 		if (plan.Steps.empty())
 		{
-			dryRun << (plan.CanRun ? "\n  All requested level asset packs are already present." : "\n  No acquisition step available until readiness issues are resolved.");
+			dryRun << (plan.bCanRun ? "\n  All requested level asset packs are already present." : "\n  No acquisition step available until readiness issues are resolved.");
 		}
 		plan.Operation.DryRunText = dryRun.str();
 		return plan;

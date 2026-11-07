@@ -39,7 +39,7 @@ namespace SparkleLauncher
 		{
 			for (const ProjectLevelCatalogEntry& level : catalog.levels)
 			{
-				if (level.selected && level.id != levelId)
+				if (level.bSelected && level.id != levelId)
 				{
 					retainPackAndParents(retainPackAndParents, level.assetPackId);
 				}
@@ -75,7 +75,7 @@ namespace SparkleLauncher
 				targets.push_back(std::move(target));
 			};
 
-			if (pack.external && !pack.extractionPath.empty())
+			if (pack.bExternal && !pack.extractionPath.empty())
 			{
 				appendExistingTarget(pack.displayName + " level content", pack.extractionPath, "Extracted level content. The cached source archive is preserved for fast re-sync.");
 			}
@@ -87,7 +87,7 @@ namespace SparkleLauncher
 		{
 			for (const ProjectLevelCatalogEntry& level : catalog.levels)
 			{
-				if (level.selected)
+				if (level.bSelected)
 				{
 					appendPackAndParents(appendPackAndParents, level.assetPackId);
 				}
@@ -119,8 +119,8 @@ namespace SparkleLauncher
 	static void CountCleanTarget(MaintenanceCleanTarget& target)
 	{
 		std::error_code errorCode;
-		target.Exists = std::filesystem::exists(target.Path, errorCode);
-		if (!target.Exists || errorCode)
+		target.bExists = std::filesystem::exists(target.Path, errorCode);
+		if (!target.bExists || errorCode)
 		{
 			return;
 		}
@@ -206,7 +206,7 @@ namespace SparkleLauncher
 
 	static std::string FormatCleanTargetStats(const MaintenanceCleanTarget& target)
 	{
-		if (!target.Exists)
+		if (!target.bExists)
 		{
 			return "not present";
 		}
@@ -239,7 +239,7 @@ namespace SparkleLauncher
 
 	static void PopulatePlanSteps(MaintenanceOperationPlan& plan)
 	{
-		if (!plan.CanRun)
+		if (!plan.bCanRun)
 		{
 			return;
 		}
@@ -250,7 +250,7 @@ namespace SparkleLauncher
 			MaintenanceOperationStep step;
 			step.Id = processStep.Id;
 			step.DisplayName = processStep.DisplayName;
-			step.Destructive = processStep.DeletesGeneratedOutput;
+			step.bDestructive = processStep.bDeletesGeneratedOutput;
 			step.DestructivePath = processStep.DestructivePath;
 			step.DisplayCommandLine = "Delete " + processStep.DestructivePath.string();
 			plan.Steps.push_back(std::move(step));
@@ -392,9 +392,9 @@ namespace SparkleLauncher
 				const std::vector<CleanScope> requestedCleanScopes = ResolveRequestedCleanScopes(request);
 
 				const bool bMissingContentCleanTargets = request.ContentId.empty() && request.RequestedCleanTargets.empty();
-				const bool missingContent = bMissingContentCleanTargets && (std::any_of(requestedCleanScopes.begin(), requestedCleanScopes.end(), CleanScopeRequiresContent));
+				const bool bMissingContent = bMissingContentCleanTargets && (std::any_of(requestedCleanScopes.begin(), requestedCleanScopes.end(), CleanScopeRequiresContent));
 
-				if (missingContent)
+				if (bMissingContent)
 				{
 					SetOperationFailure(
 					    plan.Operation,
@@ -411,13 +411,13 @@ namespace SparkleLauncher
 				plan.Operation.DestructiveScope = request.RequestedCleanTargets.empty() && requestedCleanScopes.size() == 1 ? ToOperationDestructiveScope(requestedCleanScopes.front())
 				                                                                                                            : OperationDestructiveScope::None;
 
-				plan.Operation.RequiresConfirmation = true;
-				AddReadiness(plan, request.DestructiveActionConfirmed ? "Clean scope was confirmed." : "Clean scope requires explicit confirmation.");
+				plan.Operation.bRequiresConfirmation = true;
+				AddReadiness(plan, request.bDestructiveActionConfirmed ? "Clean scope was confirmed." : "Clean scope requires explicit confirmation.");
 				for (const MaintenanceCleanTarget& target : plan.CleanTargets)
 				{
 					AddPlannedEffect(plan, target.DisplayName + ": " + target.Path.string() + " (" + target.Detail + "; " + FormatCleanTargetStats(target) + ")");
 				}
-				plan.CanRun = request.DestructiveActionConfirmed;
+				plan.bCanRun = request.bDestructiveActionConfirmed;
 				break;
 			}
 		}
@@ -430,7 +430,7 @@ namespace SparkleLauncher
 		{
 			dryRun << "\n  Latest log: " << plan.Operation.LogPath.string();
 		}
-		if (plan.Operation.RequiresConfirmation)
+		if (plan.Operation.bRequiresConfirmation)
 		{
 			dryRun << "\n  Confirmation required for clean scope: " << ToString(plan.Request.RequestedCleanScope);
 		}
@@ -441,7 +441,7 @@ namespace SparkleLauncher
 			{
 				dryRun << "\n    Log: " << step.LogPath.string();
 			}
-			if (step.Destructive)
+			if (step.bDestructive)
 			{
 				dryRun << "\n    Scope: " << step.DestructivePath.string();
 			}

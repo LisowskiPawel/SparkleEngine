@@ -81,9 +81,9 @@ struct RhiTextureResourceDesc
 	std::uint16_t ArraySize = 1;
 	std::uint8_t SampleCount = 1;
 	TextureResourceDimension Dimension = TextureResourceDimension::Texture2D;
-	bool AllowRenderTarget = false;
-	bool AllowDepthStencil = false;
-	bool AllowUnorderedAccess = false;
+	bool bAllowRenderTarget = false;
+	bool bAllowDepthStencil = false;
+	bool bAllowUnorderedAccess = false;
 	bool operator==(const RhiTextureResourceDesc&) const = default;
 };
 
@@ -92,8 +92,8 @@ struct RhiBufferResourceDesc
 	std::uint64_t SizeInBytes = 0;
 	std::uint32_t StrideInBytes = 0;
 	RhiBufferKind Kind = RhiBufferKind::Generic;
-	bool AllowUnorderedAccess = false;
-	bool AllowRayTracingBuildInput = false;
+	bool bAllowUnorderedAccess = false;
+	bool bAllowRayTracingBuildInput = false;
 	bool operator==(const RhiBufferResourceDesc&) const = default;
 };
 

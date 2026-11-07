@@ -12,7 +12,7 @@ namespace SparkleLauncher
 			detail.prepend("Experimental SDK. ");
 		}
 
-		return {name, QString::fromUtf8(ExternalCaptureProviderToString(provider).data()), detail, availability.Available(), availability.Supported};
+		return {name, QString::fromUtf8(ExternalCaptureProviderToString(provider).data()), detail, availability.Available(), availability.bSupported};
 	}
 
 	QVector<LauncherSelectionOption> BuildExternalCaptureOptions(std::string_view api, std::string_view profile)

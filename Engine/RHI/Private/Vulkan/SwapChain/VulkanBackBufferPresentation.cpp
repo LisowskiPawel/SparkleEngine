@@ -79,10 +79,10 @@ RhiResourceViewHandle VulkanBackBufferPresentation::GetCurrentBackBufferViewHand
 	return m_descriptorService->GetSwapChainBackBufferView(backBufferIndex);
 }
 
-static void RecordBackBufferRendering(VkCommandBuffer commandBuffer, VkImageView backBufferView, const RhiRect& scissorRect, const float* clearColor, bool clear) noexcept
+static void RecordBackBufferRendering(VkCommandBuffer commandBuffer, VkImageView backBufferView, const RhiRect& scissorRect, const float* clearColor, bool bClear) noexcept
 {
 	VkClearValue nativeClearValue = {};
-	if (clear && clearColor != nullptr)
+	if (bClear && clearColor != nullptr)
 	{
 		nativeClearValue.color.float32[0] = clearColor[0];
 		nativeClearValue.color.float32[1] = clearColor[1];
@@ -98,7 +98,7 @@ static void RecordBackBufferRendering(VkCommandBuffer commandBuffer, VkImageView
 	    .resolveMode = VK_RESOLVE_MODE_NONE,
 	    .resolveImageView = VK_NULL_HANDLE,
 	    .resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-	    .loadOp = clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD,
+	    .loadOp = bClear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD,
 	    .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 	    .clearValue = nativeClearValue};
 
@@ -145,10 +145,10 @@ VulkanRenderCommandList& VulkanBackBufferPresentation::PrepareBackBufferRenderin
 	return commandList;
 }
 
-void VulkanBackBufferPresentation::BeginCurrentBackBufferRendering(const float* clearColor, bool clear) noexcept
+void VulkanBackBufferPresentation::BeginCurrentBackBufferRendering(const float* clearColor, bool bClear) noexcept
 {
 	VulkanRenderCommandList& commandList = PrepareBackBufferRendering();
-	RecordBackBufferRendering(commandList.GetVulkanCommandBuffer(), m_swapChain->GetCurrentBackBufferImageView(), GetBackBufferScissorRect(), clearColor, clear);
+	RecordBackBufferRendering(commandList.GetVulkanCommandBuffer(), m_swapChain->GetCurrentBackBufferImageView(), GetBackBufferScissorRect(), clearColor, bClear);
 }
 
 void VulkanBackBufferPresentation::EndCurrentBackBufferRendering() noexcept
@@ -168,8 +168,8 @@ void VulkanBackBufferPresentation::PrepareCurrentBackBufferForPresentation(Vulka
 {
 	const RhiResourceHandle backBuffer = m_swapChain->GetCurrentBackBufferResource();
 	const std::span<const RhiResourceHandle> trackedResources = commandList.GetTrackedResources();
-	const bool transitionedByCommandList = std::any_of(trackedResources.begin(), trackedResources.end(), [backBuffer](RhiResourceHandle resource) { return resource.Value == backBuffer.Value; });
-	if (!transitionedByCommandList)
+	const bool bTransitionedByCommandList = std::any_of(trackedResources.begin(), trackedResources.end(), [backBuffer](RhiResourceHandle resource) { return resource.Value == backBuffer.Value; });
+	if (!bTransitionedByCommandList)
 	{
 		TransitionCurrentBackBuffer(commandList.GetVulkanCommandBuffer(), ResourceState::Present);
 		return;

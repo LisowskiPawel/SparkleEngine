@@ -11,5 +11,5 @@ struct SPARKLE_ENGINE_API RectLightDesc
 	float width = 1.0f;
 	DirectX::XMFLOAT3 tangent = {1.0f, 0.0f, 0.0f};
 	float height = 1.0f;
-	bool castShadow = true;
+	bool bCastShadow = true;
 };

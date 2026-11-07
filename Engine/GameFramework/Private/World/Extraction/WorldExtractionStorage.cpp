@@ -21,7 +21,7 @@ namespace ECS
 		}
 		for (MeshSlot& slot : m_meshSlots)
 		{
-			slot.Included = false;
+			slot.bIncluded = false;
 		}
 		return true;
 	}
@@ -38,7 +38,7 @@ namespace ECS
 		}
 		for (const MeshSlot& slot : m_meshSlots)
 		{
-			if (!slot.Included)
+			if (!slot.bIncluded)
 			{
 				continue;
 			}

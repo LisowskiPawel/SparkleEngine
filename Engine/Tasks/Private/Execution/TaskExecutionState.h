@@ -38,6 +38,6 @@ struct TaskExecution::State final
 	std::stop_source Cancellation;
 	std::thread::id JoinThread;
 	const void* ExecutorIdentity = nullptr;
-	bool Settled = false;
+	bool bSettled = false;
 	std::function<void()> OnSettled;
 };

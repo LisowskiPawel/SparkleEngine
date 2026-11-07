@@ -19,7 +19,7 @@ VulkanFrameSubmission::VulkanFrameSubmission(VulkanRhi& rhi, VulkanSwapChain& sw
 
 void VulkanFrameSubmission::BeginFrame() noexcept
 {
-	m_hasConsumedAcquireSemaphore = false;
+	m_bHasConsumedAcquireSemaphore = false;
 	for (RhiSubmissionState& waits : m_pendingQueueWaits)
 	{
 		waits.Clear();
@@ -28,14 +28,14 @@ void VulkanFrameSubmission::BeginFrame() noexcept
 
 bool VulkanFrameSubmission::AcquireBackBuffer() noexcept
 {
-	m_hasAcquiredBackBuffer = m_swapChain.AcquireNextImage(m_currentFrameIndex);
-	return m_hasAcquiredBackBuffer;
+	m_bHasAcquiredBackBuffer = m_swapChain.AcquireNextImage(m_currentFrameIndex);
+	return m_bHasAcquiredBackBuffer;
 }
 
 void VulkanFrameSubmission::ResetPresentation() noexcept
 {
-	m_hasAcquiredBackBuffer = false;
-	m_hasConsumedAcquireSemaphore = false;
+	m_bHasAcquiredBackBuffer = false;
+	m_bHasConsumedAcquireSemaphore = false;
 }
 
 RhiSubmissionToken VulkanFrameSubmission::Submit(RhiCommandRecordingLease&& lease, std::span<const RhiSubmissionToken> waitTokens) noexcept
@@ -80,9 +80,9 @@ RhiSubmissionState VulkanFrameSubmission::ConsumeQueueWaits(ERhiQueueType queueT
 
 VkSemaphore VulkanFrameSubmission::ConsumeAcquireSemaphore(ERhiQueueType queueType) noexcept
 {
-	if (queueType == ERhiQueueType::Graphics && m_hasAcquiredBackBuffer && !m_hasConsumedAcquireSemaphore)
+	if (queueType == ERhiQueueType::Graphics && m_bHasAcquiredBackBuffer && !m_bHasConsumedAcquireSemaphore)
 	{
-		m_hasConsumedAcquireSemaphore = true;
+		m_bHasConsumedAcquireSemaphore = true;
 		return m_swapChain.GetImageAvailableSemaphore(m_currentFrameIndex);
 	}
 
@@ -174,15 +174,15 @@ bool VulkanFrameSubmission::CompletePresentation(RhiSubmissionToken frameToken, 
 {
 	if (!frameToken.IsValid())
 	{
-		m_hasAcquiredBackBuffer = false;
+		m_bHasAcquiredBackBuffer = false;
 		return false;
 	}
 
-	const bool resizeRequired = m_swapChain.Present(renderFinishedSemaphore);
-	if (resizeRequired)
+	const bool bResizeRequired = m_swapChain.Present(renderFinishedSemaphore);
+	if (bResizeRequired)
 	{
 		(void) m_swapChain.ConsumeResizeRequest();
 	}
 	ResetPresentation();
-	return resizeRequired;
+	return bResizeRequired;
 }

@@ -26,21 +26,21 @@ namespace PathLighting
 	                                           uint pathSampleIndex,
 	                                           uint bounceIndex,
 	                                           uint randomFrameIndex,
-	                                           bool traceSecondaryShadows,
+	                                           bool bTraceSecondaryShadows,
 	                                           out RayTracingHitSurfaceData outHitSurface)
 	{
 		outHitSurface = (RayTracingHitSurfaceData)0;
 
 		PathSample::LightingResult result = (PathSample::LightingResult)0;
-		result.Hit = trace.Hit;
+		result.bHit = trace.bHit;
 
-		if (trace.Hit)
+		if (trace.bHit)
 		{
 			outHitSurface = ReconstructRayTracingHitSurface(trace);
-			result.Hit = outHitSurface.Valid;
-			result.HitPositionWorld = outHitSurface.Valid ? outHitSurface.PositionWorld : 0.0f.xxx;
+			result.bHit = outHitSurface.bValid;
+			result.HitPositionWorld = outHitSurface.bValid ? outHitSurface.PositionWorld : 0.0f.xxx;
 
-			result.IncidentRadiance = outHitSurface.Valid ? ShadeRayTracingHitIncidentRadiance(outHitSurface, directionWorld, pathSampleIndex, bounceIndex, randomFrameIndex, traceSecondaryShadows)
+			result.IncidentRadiance = outHitSurface.bValid ? ShadeRayTracingHitIncidentRadiance(outHitSurface, directionWorld, pathSampleIndex, bounceIndex, randomFrameIndex, bTraceSecondaryShadows)
 			                                              : 0.0f.xxx;
 
 			return result;
@@ -53,8 +53,8 @@ namespace PathLighting
 	void AdvanceThroughput(inout PathTracer::PathState path,
 	                       PathSample::DirectionSample sample,
 	                       uint bounceIndex,
-	                       bool evaluatePrimaryDiffuse,
-	                       bool evaluatePrimarySpecular,
+	                       bool bEvaluatePrimaryDiffuse,
+	                       bool bEvaluatePrimarySpecular,
 	                       inout float3 diffuseThroughput,
 	                       inout float3 specularThroughput)
 	{
@@ -67,11 +67,11 @@ namespace PathLighting
 		else
 		{
 			const float3 continuationThroughput = sample.DiffuseThroughput + sample.SpecularThroughput;
-			if (evaluatePrimaryDiffuse)
+			if (bEvaluatePrimaryDiffuse)
 			{
 				diffuseThroughput *= continuationThroughput;
 			}
-			if (evaluatePrimarySpecular)
+			if (bEvaluatePrimarySpecular)
 			{
 				specularThroughput *= continuationThroughput;
 			}
@@ -81,8 +81,8 @@ namespace PathLighting
 	bool SurvivesRoulette(inout PathTracer::PathState path,
 	                      float random,
 	                      uint bounceIndex,
-	                      bool evaluatePrimaryDiffuse,
-	                      bool evaluatePrimarySpecular,
+	                      bool bEvaluatePrimaryDiffuse,
+	                      bool bEvaluatePrimarySpecular,
 	                      inout float3 diffuseThroughput,
 	                      inout float3 specularThroughput)
 	{
@@ -94,11 +94,11 @@ namespace PathLighting
 		if (survivalProbability < 1.0f)
 		{
 			PathTracer::ApplySurvivalCompensation(path.Throughput, survivalProbability);
-			if (evaluatePrimaryDiffuse)
+			if (bEvaluatePrimaryDiffuse)
 			{
 				PathTracer::ApplySurvivalCompensation(diffuseThroughput, survivalProbability);
 			}
-			if (evaluatePrimarySpecular)
+			if (bEvaluatePrimarySpecular)
 			{
 				PathTracer::ApplySurvivalCompensation(specularThroughput, survivalProbability);
 			}
@@ -107,13 +107,13 @@ namespace PathLighting
 		return true;
 	}
 
-	void AccumulateLighting(inout Result result, float3 diffuseThroughput, float3 specularThroughput, float3 incidentRadiance, bool evaluatePrimaryDiffuse, bool evaluatePrimarySpecular)
+	void AccumulateLighting(inout Result result, float3 diffuseThroughput, float3 specularThroughput, float3 incidentRadiance, bool bEvaluatePrimaryDiffuse, bool bEvaluatePrimarySpecular)
 	{
-		if (evaluatePrimaryDiffuse)
+		if (bEvaluatePrimaryDiffuse)
 		{
 			PathTracer::AddRadiance(result.DiffuseContribution, diffuseThroughput, incidentRadiance);
 		}
-		if (evaluatePrimarySpecular)
+		if (bEvaluatePrimarySpecular)
 		{
 			PathTracer::AddRadiance(result.SpecularContribution, specularThroughput, incidentRadiance);
 		}
@@ -127,9 +127,9 @@ namespace PathLighting
 	                        uint specularSampleMode,
 	                        uint bounceCount,
 	                        uint randomFrameIndex,
-	                        bool evaluatePrimaryDiffuse,
-	                        bool evaluatePrimarySpecular,
-	                        bool traceSecondaryShadows)
+	                        bool bEvaluatePrimaryDiffuse,
+	                        bool bEvaluatePrimarySpecular,
+	                        bool bTraceSecondaryShadows)
 	{
 		Result result = (Result)0;
 
@@ -148,19 +148,19 @@ namespace PathLighting
 			const PathSample::DirectionSample sample = PathSampling::SampleBSDF(surface,
 			                                                                    specularSampleMode,
 			                                                                    randomSamples,
-			                                                                    bounceIndex != 0u || evaluatePrimaryDiffuse,
-			                                                                    bounceIndex != 0u || evaluatePrimarySpecular);
+			                                                                    bounceIndex != 0u || bEvaluatePrimaryDiffuse,
+			                                                                    bounceIndex != 0u || bEvaluatePrimarySpecular);
 
-			if (!sample.HasSupport)
+			if (!sample.bHasSupport)
 			{
 				break;
 			}
 
-			AdvanceThroughput(path, sample, bounceIndex, evaluatePrimaryDiffuse, evaluatePrimarySpecular, diffuseThroughput, specularThroughput);
+			AdvanceThroughput(path, sample, bounceIndex, bEvaluatePrimaryDiffuse, bEvaluatePrimarySpecular, diffuseThroughput, specularThroughput);
 
-			const bool rouletteTerminated = !SurvivesRoulette(path, randomSamples.Roulette, bounceIndex, evaluatePrimaryDiffuse, evaluatePrimarySpecular, diffuseThroughput, specularThroughput);
+			const bool bRouletteTerminated = !SurvivesRoulette(path, randomSamples.Roulette, bounceIndex, bEvaluatePrimaryDiffuse, bEvaluatePrimarySpecular, diffuseThroughput, specularThroughput);
 			
-			if (rouletteTerminated)
+			if (bRouletteTerminated)
 			{
 				break;
 			}
@@ -171,15 +171,15 @@ namespace PathLighting
 			RayTracingHitSurfaceData hitSurface;
 
 			const PathSample::LightingResult
-			    lighting = ResolveLighting(trace, sample.DirectionWorld, skyTexture, skySampler, sampleIndex, bounceIndex, randomFrameIndex, traceSecondaryShadows, hitSurface);
+			    lighting = ResolveLighting(trace, sample.DirectionWorld, skyTexture, skySampler, sampleIndex, bounceIndex, randomFrameIndex, bTraceSecondaryShadows, hitSurface);
 
-			AccumulateLighting(result, diffuseThroughput, specularThroughput, lighting.IncidentRadiance, evaluatePrimaryDiffuse, evaluatePrimarySpecular);
+			AccumulateLighting(result, diffuseThroughput, specularThroughput, lighting.IncidentRadiance, bEvaluatePrimaryDiffuse, bEvaluatePrimarySpecular);
 
 			if (bounceIndex == 0u)
 			{
 				result.FirstLighting = lighting;
 			}
-			if (!lighting.Hit)
+			if (!lighting.bHit)
 			{
 				break;
 			}

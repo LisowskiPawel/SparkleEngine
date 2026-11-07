@@ -25,7 +25,7 @@ void ConsoleSession::SubmitLine(std::string_view line)
 	{
 		AddOutput(result.Severity, result.Message);
 	}
-	else if (!result.Succeeded)
+	else if (!result.bSucceeded)
 	{
 		AddOutput(ConsoleCommandSeverity::Error, "command failed");
 	}

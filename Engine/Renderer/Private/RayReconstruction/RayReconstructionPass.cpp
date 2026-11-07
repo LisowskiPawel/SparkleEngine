@@ -51,9 +51,9 @@ void AddRayReconstructionPass(
 		        .NativeSpecularHitDistanceView = context.Resources.ResolveNativeTextureView(providerInputs.SpecularHitDistance, ResourceState::ShaderResource, interopRequest),
 		        .RenderExtent = renderExtent,
 		        .OutputExtent = outputExtent};
-		    const bool evaluated = provider.Evaluate(evaluation);
+		    const bool bEvaluated = provider.Evaluate(evaluation);
 
-		    if (!evaluated)
+		    if (!bEvaluated)
 		    {
 			    Diagnostics::Fatal(g_rayReconstructionPassLogger, __FILE__, __LINE__, "The configured ray-reconstruction provider failed to evaluate the active frame.");
 		    }

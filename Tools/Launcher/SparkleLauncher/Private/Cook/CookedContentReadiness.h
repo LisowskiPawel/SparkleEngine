@@ -15,8 +15,8 @@ namespace SparkleLauncher
 
 	struct CookedContentReadiness
 	{
-		bool MeshesReady = false;
-		bool TexturesReady = false;
+		bool bMeshesReady = false;
+		bool bTexturesReady = false;
 		CookedShaderPublicationState Shaders = CookedShaderPublicationState::Missing;
 	};
 

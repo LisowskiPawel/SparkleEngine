@@ -21,15 +21,15 @@ namespace ECS
 
 	bool CameraMovementSystem::Apply(EntityId entity, Camera& camera, LocalTransform& transform) const noexcept
 	{
-		if (entity != m_activeCamera || !camera.Active)
+		if (entity != m_activeCamera || !camera.bActive)
 		{
 			return false;
 		}
-		bool changed = false;
-		if (m_intent.HasAspectRatio && m_intent.AspectRatio > 0.0f && camera.AspectRatio != m_intent.AspectRatio)
+		bool bChanged = false;
+		if (m_intent.bHasAspectRatio && m_intent.AspectRatio > 0.0f && camera.AspectRatio != m_intent.AspectRatio)
 		{
 			camera.AspectRatio = m_intent.AspectRatio;
-			changed = true;
+			bChanged = true;
 		}
 
 		CameraNavigationState navigationState;
@@ -45,8 +45,8 @@ namespace ECS
 		{
 			transform.Translation = navigationState.Position;
 			DirectX::XMStoreFloat4(&transform.Rotation, DirectX::XMQuaternionRotationRollPitchYaw(navigationState.PitchRadians, navigationState.YawRadians, 0.0f));
-			changed = true;
+			bChanged = true;
 		}
-		return changed;
+		return bChanged;
 	}
 }

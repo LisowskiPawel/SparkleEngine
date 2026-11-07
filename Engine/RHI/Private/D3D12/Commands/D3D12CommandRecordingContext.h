@@ -100,7 +100,7 @@ private:
 
 	static void BeginLease(void* state) noexcept;
 	static void CloseLease(void* state) noexcept;
-	static void ReleaseLease(void* state, bool closed) noexcept;
+	static void ReleaseLease(void* state, bool bClosed) noexcept;
 	static RhiTransientDescriptorRange AllocateLeaseDescriptors(void* state, std::uint32_t count) noexcept;
 	static const wchar_t* QueueTypeName(ERhiQueueType queueType) noexcept;
 	[[noreturn]] static void FailClose(const CommandSlot& slot, HRESULT result) noexcept;

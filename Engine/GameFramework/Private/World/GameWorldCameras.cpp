@@ -11,7 +11,7 @@
 class CameraComponentTranslation final
 {
 public:
-	static ECS::Camera ToCameraData(const CameraDesc& desc, float aspectRatio, bool active) noexcept
+	static ECS::Camera ToCameraData(const CameraDesc& desc, float aspectRatio, bool bActive) noexcept
 	{
 		return ECS::Camera{
 		    .FovYDegrees = std::clamp(desc.fovYDegrees, 1.0f, 179.0f),
@@ -19,13 +19,13 @@ public:
 		    .FarZ = desc.farZ,
 		    .AspectRatio = aspectRatio,
 		    .ProjectionKind = desc.projectionKind,
-		    .Active = active};
+		    .bActive = bActive};
 	}
 };
 
 namespace ECS
 {
-	EntityId GameWorldState::AddCamera(SceneCameraEntry&& entry, bool active)
+	EntityId GameWorldState::AddCamera(SceneCameraEntry&& entry, bool bActive)
 	{
 		const EntityId entity = m_registry.Create();
 		if (!entity.IsValid())
@@ -37,21 +37,21 @@ namespace ECS
 		const LocalTransform local = WorldTransformConversion::ToLocal(transform);
 
 		const bool bAddedAdd = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
-		const bool bAdded0f = bAddedAdd && (m_registry.Add(entity, CameraComponentTranslation::ToCameraData(entry.desc, 16.0f / 9.0f, active)));
+		const bool bAdded0f = bAddedAdd && (m_registry.Add(entity, CameraComponentTranslation::ToCameraData(entry.desc, 16.0f / 9.0f, bActive)));
 		const bool bAddedAdd2 = bAdded0f && (m_registry.Add(entity, CameraDerivedState{}));
 		const bool bAddedAdd3 = bAddedAdd2 && (m_registry.Add(entity, Visibility{}));
 		const bool bAddedname = bAddedAdd3 && (m_registry.Add(entity, Name{std::move(entry.name)}));
 		const bool bAddedAdd4 = bAddedname && (m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextCameraIdentity, .Kind = AuthoredObjectKind::Camera}));
-		const bool added = bAddedAdd4 && (m_registry.Add(entity, EditorMetadata{}));
+		const bool bAdded = bAddedAdd4 && (m_registry.Add(entity, EditorMetadata{}));
 
-		if (!added)
+		if (!bAdded)
 		{
 			m_registry.Destroy(entity);
 			return EntityId::Invalid();
 		}
 		MarkTransformDirty(entity);
 		RecordChange(entity);
-		if (active || !m_activeCamera.IsValid())
+		if (bActive || !m_activeCamera.IsValid())
 		{
 			SetActiveCamera(entity);
 		}
@@ -110,13 +110,13 @@ namespace ECS
 			if (const Camera* previous = m_registry.Get<Camera>(m_activeCamera))
 			{
 				Camera inactive = *previous;
-				inactive.Active = false;
+				inactive.bActive = false;
 				m_registry.Replace(m_activeCamera, inactive);
 				RecordChange(m_activeCamera);
 			}
 		}
 		Camera active = *selected;
-		active.Active = true;
+		active.bActive = true;
 		if (!m_registry.Replace(entity, active))
 		{
 			return false;
@@ -134,23 +134,23 @@ namespace ECS
 			return false;
 		}
 		Transform transform(desc.position, {desc.pitchRadians, desc.yawRadians, 0.0f});
-		const bool written = WriteTransform(entity, transform) && m_registry.Replace(entity, CameraComponentTranslation::ToCameraData(desc, existing->AspectRatio, existing->Active));
-		if (written)
+		const bool bWritten = WriteTransform(entity, transform) && m_registry.Replace(entity, CameraComponentTranslation::ToCameraData(desc, existing->AspectRatio, existing->bActive));
+		if (bWritten)
 		{
 			RecordChange(entity);
 		}
-		return written;
+		return bWritten;
 	}
 
 	bool GameWorldState::WriteTransform(EntityId entity, const Transform& transform) noexcept
 	{
-		const bool written = m_registry.Replace(entity, WorldTransformConversion::ToLocal(transform));
-		if (written)
+		const bool bWritten = m_registry.Replace(entity, WorldTransformConversion::ToLocal(transform));
+		if (bWritten)
 		{
 			MarkTransformDirty(entity);
 			RecordChange(entity);
 		}
-		return written;
+		return bWritten;
 	}
 
 	Transform GameWorldState::ReadTransform(EntityId entity) const noexcept
@@ -159,7 +159,7 @@ namespace ECS
 		return local == nullptr ? Transform{} : WorldTransformConversion::ToPublic(*local);
 	}
 
-	bool GameWorldState::WriteVisibility(EntityId entity, bool visible) noexcept
+	bool GameWorldState::WriteVisibility(EntityId entity, bool bVisible) noexcept
 	{
 		const Visibility* visibility = m_registry.Get<Visibility>(entity);
 		if (visibility == nullptr)
@@ -167,19 +167,19 @@ namespace ECS
 			return false;
 		}
 		Visibility updated = *visibility;
-		updated.Visible = visible;
-		const bool written = m_registry.Replace(entity, updated);
-		if (written)
+		updated.bVisible = bVisible;
+		const bool bWritten = m_registry.Replace(entity, updated);
+		if (bWritten)
 		{
 			RecordChange(entity);
 		}
-		return written;
+		return bWritten;
 	}
 
 	bool GameWorldState::ReadVisibility(EntityId entity) const noexcept
 	{
 		const Visibility* visibility = m_registry.Get<Visibility>(entity);
-		return visibility != nullptr && visibility->Visible;
+		return visibility != nullptr && visibility->bVisible;
 	}
 
 }

@@ -24,8 +24,8 @@ D3D12NvapiRayTracingProvider::D3D12NvapiRayTracingProvider() noexcept
 {
 #if SPARKLE_RHI_WITH_D3D12_NVAPI
 	const NvAPI_Status status = NvAPI_Initialize();
-	m_runtimeInitialized = status == NVAPI_OK;
-	m_runtimeStatusReason = m_runtimeInitialized ? "d3d12-nvapi-runtime-initialized" : ToNvapiStatusReason(status);
+	m_bRuntimeInitialized = status == NVAPI_OK;
+	m_runtimeStatusReason = m_bRuntimeInitialized ? "d3d12-nvapi-runtime-initialized" : ToNvapiStatusReason(status);
 #else
 	m_runtimeInitialized = false;
 	m_runtimeStatusReason = "d3d12-nvapi-headers-not-compiled";
@@ -35,7 +35,7 @@ D3D12NvapiRayTracingProvider::D3D12NvapiRayTracingProvider() noexcept
 D3D12NvapiRayTracingProvider::~D3D12NvapiRayTracingProvider() noexcept
 {
 #if SPARKLE_RHI_WITH_D3D12_NVAPI
-	if (m_runtimeInitialized)
+	if (m_bRuntimeInitialized)
 	{
 		const NvAPI_Status status = NvAPI_Unload();
 		if (status != NVAPI_OK)
@@ -82,7 +82,7 @@ const char* D3D12NvapiRayTracingProvider::ToNvapiStatusReason(int status) noexce
 
 bool D3D12NvapiRayTracingProvider::IsRuntimeInitialized() const noexcept
 {
-	return m_runtimeInitialized;
+	return m_bRuntimeInitialized;
 }
 
 const char* D3D12NvapiRayTracingProvider::GetRuntimeStatusReason() const noexcept
@@ -90,21 +90,21 @@ const char* D3D12NvapiRayTracingProvider::GetRuntimeStatusReason() const noexcep
 	return m_runtimeStatusReason;
 }
 
-RhiPtlasCapabilities D3D12NvapiRayTracingProvider::QueryPtlasCapabilities(ID3D12Device10* device, bool runsOnNvidiaDevice, bool supportsAccelerationStructure) const noexcept
+RhiPtlasCapabilities D3D12NvapiRayTracingProvider::QueryPtlasCapabilities(ID3D12Device10* device, bool bRunsOnNvidiaDevice, bool bSupportsAccelerationStructure) const noexcept
 {
 	RhiPtlasCapabilities capabilities{
-	    .Supported = false,
+	    .bSupported = false,
 	    .Provider = ERhiPtlasProvider::D3D12NvapiPtlas,
-	    .NvidiaDeviceOnly = true,
-	    .CurrentDeviceIsNvidia = runsOnNvidiaDevice,
+	    .bNvidiaDeviceOnly = true,
+	    .bCurrentDeviceIsNvidia = bRunsOnNvidiaDevice,
 	    .CapabilityStatusReason = "d3d12-nvapi-ptlas-not-queried"};
 
-	if (!supportsAccelerationStructure)
+	if (!bSupportsAccelerationStructure)
 	{
 		capabilities.CapabilityStatusReason = "d3d12-ray-tracing-unavailable";
 		return capabilities;
 	}
-	if (!runsOnNvidiaDevice)
+	if (!bRunsOnNvidiaDevice)
 	{
 		capabilities.CapabilityStatusReason = "d3d12-nvapi-ptlas-requires-nvidia-device";
 		return capabilities;
@@ -118,7 +118,7 @@ RhiPtlasCapabilities D3D12NvapiRayTracingProvider::QueryPtlasCapabilities(ID3D12
 	capabilities.CapabilityStatusReason = SPARKLE_RHI_WITH_D3D12_NVAPI ? "d3d12-nvapi-ptlas-symbols-missing" : "d3d12-nvapi-headers-not-compiled";
 	return capabilities;
 #else
-	if (!m_runtimeInitialized)
+	if (!m_bRuntimeInitialized)
 	{
 		capabilities.CapabilityStatusReason = m_runtimeStatusReason;
 		return capabilities;
@@ -132,31 +132,31 @@ RhiPtlasCapabilities D3D12NvapiRayTracingProvider::QueryPtlasCapabilities(ID3D12
 		return capabilities;
 	}
 
-	const bool supportsStandard = (nativeCaps & NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_CAP_STANDARD) == NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_CAP_STANDARD;
-	capabilities.SupportsDescriptorAccess = supportsStandard;
-	capabilities.Supported = supportsStandard;
-	capabilities.SupportsCpuPackedOperations = supportsStandard;
-	capabilities.SupportsGpuDrivenOperations = supportsStandard;
-	capabilities.SupportsGpuOperationCount = supportsStandard;
-	capabilities.SupportsGpuWrittenInstanceRecords = supportsStandard;
-	capabilities.SupportsGpuWrittenPartitionRecords = supportsStandard;
-	capabilities.SupportsPartitionTranslation = supportsStandard;
-	capabilities.SupportsGlobalPartition = supportsStandard;
-	capabilities.SupportsExplicitInstanceAabb = supportsStandard;
+	const bool bSupportsStandard = (nativeCaps & NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_CAP_STANDARD) == NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_CAP_STANDARD;
+	capabilities.bSupportsDescriptorAccess = bSupportsStandard;
+	capabilities.bSupported = bSupportsStandard;
+	capabilities.bSupportsCpuPackedOperations = bSupportsStandard;
+	capabilities.bSupportsGpuDrivenOperations = bSupportsStandard;
+	capabilities.bSupportsGpuOperationCount = bSupportsStandard;
+	capabilities.bSupportsGpuWrittenInstanceRecords = bSupportsStandard;
+	capabilities.bSupportsGpuWrittenPartitionRecords = bSupportsStandard;
+	capabilities.bSupportsPartitionTranslation = bSupportsStandard;
+	capabilities.bSupportsGlobalPartition = bSupportsStandard;
+	capabilities.bSupportsExplicitInstanceAabb = bSupportsStandard;
 	capabilities.MaxOperationsPerBuild = 3;
 	capabilities.OperationDataSizeInBytes = static_cast<std::uint32_t>(sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP));
 	capabilities.OperationCountDataSizeInBytes = static_cast<std::uint32_t>(sizeof(NvU32));
 	capabilities.InstanceWriteDataSizeInBytes = static_cast<std::uint32_t>(sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_INSTANCE));
 	capabilities.InstanceUpdateDataSizeInBytes = static_cast<std::uint32_t>(sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_UPDATE_INSTANCE));
 	capabilities.PartitionWriteDataSizeInBytes = static_cast<std::uint32_t>(sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_PARTITION));
-	capabilities.CapabilityStatusReason = supportsStandard ? "d3d12-nvapi-ptlas-standard-supported" : "d3d12-nvapi-ptlas-standard-cap-missing";
+	capabilities.CapabilityStatusReason = bSupportsStandard ? "d3d12-nvapi-ptlas-standard-supported" : "d3d12-nvapi-ptlas-standard-cap-missing";
 	return capabilities;
 #endif
 }
 
 RhiPtlasBuildSizes D3D12NvapiRayTracingProvider::GetPtlasBuildSizes(ID3D12Device10* device, const RhiPtlasDesc& desc) const noexcept
 {
-	if (device == nullptr || desc.InstanceCapacity == 0 || desc.PartitionCount == 0 || !m_runtimeInitialized)
+	if (device == nullptr || desc.InstanceCapacity == 0 || desc.PartitionCount == 0 || !m_bRuntimeInitialized)
 	{
 		return {};
 	}
@@ -167,7 +167,7 @@ RhiPtlasBuildSizes D3D12NvapiRayTracingProvider::GetPtlasBuildSizes(ID3D12Device
 
 	inputs.flags = static_cast<NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAGS>(
 	    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_FAST_TRACE
-	    | (desc.AllowPartitionTranslation ? NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_ENABLE_PARTITION_TRANSLATION : NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_NONE));
+	    | (desc.bAllowPartitionTranslation ? NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_ENABLE_PARTITION_TRANSLATION : NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_NONE));
 
 	inputs.instanceCount = desc.InstanceCapacity;
 	inputs.maxInstancePerPartitionCount = desc.MaxInstancesPerPartition;
@@ -195,9 +195,9 @@ RhiPtlasBuildSizes D3D12NvapiRayTracingProvider::GetPtlasBuildSizes(ID3D12Device
 	    .OperationInfoSizeInBytes = sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP) * static_cast<std::uint64_t>(desc.MaxOperations),
 	    .OperationCountSizeInBytes = sizeof(NvU32),
 	    .InstanceWriteInfoSizeInBytes = sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_INSTANCE) * static_cast<std::uint64_t>(desc.InstanceCapacity),
-	    .InstanceUpdateInfoSizeInBytes = desc.AllowInstanceUpdates ? sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_UPDATE_INSTANCE) * static_cast<std::uint64_t>(desc.InstanceCapacity)
+	    .InstanceUpdateInfoSizeInBytes = desc.bAllowInstanceUpdates ? sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_UPDATE_INSTANCE) * static_cast<std::uint64_t>(desc.InstanceCapacity)
 	                                                               : 0u,
-	    .PartitionWriteInfoSizeInBytes = desc.AllowPartitionTranslation
+	    .PartitionWriteInfoSizeInBytes = desc.bAllowPartitionTranslation
 	        ? sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_PARTITION) * static_cast<std::uint64_t>(desc.PartitionCount + 1u)
 	        : 0u};
 #endif
@@ -205,7 +205,7 @@ RhiPtlasBuildSizes D3D12NvapiRayTracingProvider::GetPtlasBuildSizes(ID3D12Device
 
 bool D3D12NvapiRayTracingProvider::BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept
 {
-	if (commandList == nullptr || !m_runtimeInitialized || desc.DestinationAccelerationStructure == 0 || desc.Scratch == 0 || desc.OperationHeaders == 0 || desc.OperationCount == 0)
+	if (commandList == nullptr || !m_bRuntimeInitialized || desc.DestinationAccelerationStructure == 0 || desc.Scratch == 0 || desc.OperationHeaders == 0 || desc.OperationCount == 0)
 	{
 		return false;
 	}
@@ -216,7 +216,7 @@ bool D3D12NvapiRayTracingProvider::BuildPtlas(ID3D12GraphicsCommandList7* comman
 
 	inputs.flags = static_cast<NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAGS>(
 	    NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_FAST_TRACE
-	    | (desc.Layout.AllowPartitionTranslation ? NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_ENABLE_PARTITION_TRANSLATION : NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_NONE));
+	    | (desc.Layout.bAllowPartitionTranslation ? NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_ENABLE_PARTITION_TRANSLATION : NVAPI_D3D12_RAYTRACING_PARTITIONED_TLAS_FLAG_NONE));
 
 	inputs.instanceCount = desc.Layout.InstanceCapacity;
 	inputs.maxInstancePerPartitionCount = desc.Layout.MaxInstancesPerPartition;

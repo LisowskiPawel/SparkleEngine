@@ -51,14 +51,14 @@ void UI::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handl
 	m_implementation->SetShaderCompileHandler(std::move(handler));
 }
 
-void UI::SetShaderCompileStatus(bool busy, std::string_view message)
+void UI::SetShaderCompileStatus(bool bBusy, std::string_view message)
 {
-	m_implementation->SetShaderCompileStatus(busy, message);
+	m_implementation->SetShaderCompileStatus(bBusy, message);
 }
 
-void UI::AppendConsoleOutput(ConsoleOutputRecord record, bool showConsole)
+void UI::AppendConsoleOutput(ConsoleOutputRecord record, bool bShowConsole)
 {
-	m_implementation->AppendConsoleOutput(std::move(record), showConsole);
+	m_implementation->AppendConsoleOutput(std::move(record), bShowConsole);
 }
 
 bool UI::ConsumeShaderReloadRequest() noexcept

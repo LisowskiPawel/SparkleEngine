@@ -12,7 +12,7 @@ namespace PS
 		float4 TangentWorld : TEXCOORD3;
 		float4 PrevClipPosition : TEXCOORD7;
 		nointerpolation uint GpuSceneSlot : TEXCOORD8;
-		bool IsFrontFace : SV_IsFrontFace;
+		bool bIsFrontFace : SV_IsFrontFace;
 	};
 
 	void PrepareInput(inout Input input)

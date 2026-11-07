@@ -20,12 +20,12 @@ void InputEventDispatcher::Unsubscribe(EventHandle handle)
 
 void InputEventDispatcher::ProcessDeferredEvents(const LayerAvailability& layerAvailability)
 {
-	if (m_isProcessingDeferredEvents)
+	if (m_bIsProcessingDeferredEvents)
 	{
 		return;
 	}
 
-	m_isProcessingDeferredEvents = true;
+	m_bIsProcessingDeferredEvents = true;
 	try
 	{
 		ProcessDeferredEventsForType<KeyboardEvent>(layerAvailability);
@@ -35,10 +35,10 @@ void InputEventDispatcher::ProcessDeferredEvents(const LayerAvailability& layerA
 	}
 	catch (...)
 	{
-		m_isProcessingDeferredEvents = false;
+		m_bIsProcessingDeferredEvents = false;
 		throw;
 	}
-	m_isProcessingDeferredEvents = false;
+	m_bIsProcessingDeferredEvents = false;
 }
 
 void InputEventDispatcher::ClearDeferredEvents()

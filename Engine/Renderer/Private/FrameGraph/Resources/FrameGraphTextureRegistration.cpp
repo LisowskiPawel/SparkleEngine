@@ -40,7 +40,7 @@ namespace FrameGraphTextureRegistration
 		return handle.IsValid() ? std::format("{}", handle.index) : "invalid";
 	}
 
-	void FailInvalidPersistentBufferBinding(std::string_view operation, std::string_view resourceName, FrameGraphResourceHandle handle, ResourceState state, bool hasResource) noexcept
+	void FailInvalidPersistentBufferBinding(std::string_view operation, std::string_view resourceName, FrameGraphResourceHandle handle, ResourceState state, bool bHasResource) noexcept
 	{
 		Diagnostics::Fatal(
 		    g_frameGraphTextureLogger,
@@ -54,10 +54,10 @@ namespace FrameGraphTextureRegistration
 		        resourceName.empty() ? "<unnamed>" : resourceName,
 		        FormatResourceHandle(handle),
 		        ResourceStateToString(state),
-		        hasResource));
+		        bHasResource));
 	}
 
-	void FailInvalidPersistentTextureBinding(std::string_view operation, std::string_view resourceName, FrameGraphResourceHandle handle, ResourceState state, bool hasResource) noexcept
+	void FailInvalidPersistentTextureBinding(std::string_view operation, std::string_view resourceName, FrameGraphResourceHandle handle, ResourceState state, bool bHasResource) noexcept
 	{
 		Diagnostics::Fatal(
 		    g_frameGraphTextureLogger,
@@ -71,7 +71,7 @@ namespace FrameGraphTextureRegistration
 		        resourceName.empty() ? "<unnamed>" : resourceName,
 		        FormatResourceHandle(handle),
 		        ResourceStateToString(state),
-		        hasResource));
+		        bHasResource));
 	}
 }
 
@@ -276,12 +276,12 @@ void FrameGraph::BindPersistentTexture(
 	FrameGraphResourceAccess& access = m_resourceResolver.GetResolvedAccess(resourceHandle);
 	if (access.shaderResourceView != shaderResourceView)
 	{
-		if (access.shaderResourceView && access.ownsShaderResourceView)
+		if (access.shaderResourceView && access.bOwnsShaderResourceView)
 		{
 			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(access.shaderResourceView);
 		}
 		access.shaderResourceView = shaderResourceView;
-		access.ownsShaderResourceView = false;
+		access.bOwnsShaderResourceView = false;
 	}
 }
 

@@ -104,20 +104,20 @@ static CookedShaderScalarType MapInputFormat(SpvReflectFormat format, std::uint8
 	return found != std::end(formats) ? found->ScalarType : CookedShaderScalarType::Unknown;
 }
 
-static CookedShaderScalarType MapNumericScalar(const SpvReflectNumericTraits& traits, bool isSigned)
+static CookedShaderScalarType MapNumericScalar(const SpvReflectNumericTraits& traits, bool bIsSigned)
 {
 	const std::uint32_t width = traits.scalar.width;
 	if (width == 32u)
 	{
-		return isSigned ? CookedShaderScalarType::Int32 : CookedShaderScalarType::UInt32;
+		return bIsSigned ? CookedShaderScalarType::Int32 : CookedShaderScalarType::UInt32;
 	}
 	if (width == 16u)
 	{
-		return isSigned ? CookedShaderScalarType::Int16 : CookedShaderScalarType::UInt16;
+		return bIsSigned ? CookedShaderScalarType::Int16 : CookedShaderScalarType::UInt16;
 	}
 	if (width == 64u)
 	{
-		return isSigned ? CookedShaderScalarType::Int64 : CookedShaderScalarType::UInt64;
+		return bIsSigned ? CookedShaderScalarType::Int64 : CookedShaderScalarType::UInt64;
 	}
 	return CookedShaderScalarType::Unknown;
 }
@@ -150,8 +150,8 @@ static void FlattenBlockMembers(const SpvReflectBlockVariable& block, std::uint3
 			}
 			else if (flags & SPV_REFLECT_TYPE_FLAG_INT)
 			{
-				const bool isSigned = (m.numeric.scalar.signedness != 0u);
-				member.ScalarType = MapNumericScalar(m.numeric, isSigned);
+				const bool bIsSigned = (m.numeric.scalar.signedness != 0u);
+				member.ScalarType = MapNumericScalar(m.numeric, bIsSigned);
 			}
 			else if (flags & SPV_REFLECT_TYPE_FLAG_BOOL)
 			{
@@ -229,7 +229,7 @@ static void ReflectDescriptorBindings(SpvReflectShaderModule& module, ShaderRefl
 				break;
 		}
 
-		binding.IsReadOnly =
+		binding.bIsReadOnly =
 		    (binding.Kind != CookedShaderResourceKind::RWTexture && binding.Kind != CookedShaderResourceKind::RWStructuredBuffer && binding.Kind != CookedShaderResourceKind::RWByteAddressBuffer
 		        && binding.Kind != CookedShaderResourceKind::RWTypedBuffer);
 
@@ -324,7 +324,7 @@ static void ReflectPushConstants(SpvReflectShaderModule& module, ShaderStage sta
 			binding.Name = cb.Name;
 			binding.Kind = CookedShaderResourceKind::PushConstantBlock;
 			binding.Dimension = CookedShaderResourceDimension::Unknown;
-			binding.IsReadOnly = true;
+			binding.bIsReadOnly = true;
 			binding.Set = 0;
 			binding.Slot = 0;
 			binding.ArrayCount = 1;

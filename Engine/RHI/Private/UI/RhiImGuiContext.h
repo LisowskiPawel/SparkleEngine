@@ -2,7 +2,7 @@
 
 struct ImGuiContext;
 
-ImGuiContext* AcquireImGuiContext(ImGuiContext*& context, bool& ownsContext);
+ImGuiContext* AcquireImGuiContext(ImGuiContext*& context, bool& bOwnsContext);
 ImGuiContext* ActivateImGuiContext(ImGuiContext* context) noexcept;
 void RestoreImGuiContext(ImGuiContext* context) noexcept;
-void ReleaseImGuiContext(ImGuiContext*& context, bool& ownsContext) noexcept;
+void ReleaseImGuiContext(ImGuiContext*& context, bool& bOwnsContext) noexcept;

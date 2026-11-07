@@ -26,15 +26,15 @@ namespace ShaderCompileJobExecutor
 		{
 			throw Diagnostics::Error(std::string{"Active shader backend does not support target '"} + GetShaderTargetName(request.Target) + "'.");
 		}
-		const bool requiresUnsupportedRayTracingLibrary = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::RayTracingPipeline) && !capabilities.SupportsRayTracingLibrary(request.Target);
+		const bool bRayLibraryUnsupported = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::RayTracingPipeline) && !capabilities.SupportsRayTracingLibrary(request.Target);
 		
-		if (requiresUnsupportedRayTracingLibrary)
+		if (bRayLibraryUnsupported)
 		{
 			throw Diagnostics::Error(std::string{"Active shader backend does not support shader libraries for target '"} + GetShaderTargetName(request.Target) + "'.");
 		}
-		const bool requiresUnsupportedInlineRayQuery = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::InlineRayQuery) && !capabilities.SupportsInlineRayQuery(request.Target);
+		const bool bInlineQueryUnsupported = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::InlineRayQuery) && !capabilities.SupportsInlineRayQuery(request.Target);
 		
-		if (requiresUnsupportedInlineRayQuery)
+		if (bInlineQueryUnsupported)
 		{
 			throw Diagnostics::Error(std::string{"Active shader backend does not support inline ray queries for target '"} + GetShaderTargetName(request.Target) + "'.");
 		}
@@ -73,7 +73,7 @@ namespace ShaderCompileJobExecutor
 		CookedStageBuild output;
 		try
 		{
-			output = CompileStage(*backend, job.Request, job.Request.CaptureDebugArtifacts ? &debugArtifacts : nullptr);
+			output = CompileStage(*backend, job.Request, job.Request.bCaptureDebugArtifacts ? &debugArtifacts : nullptr);
 		}
 		catch (const Diagnostics::Error& error)
 		{

@@ -19,24 +19,24 @@ namespace Files
 			return false;
 		}
 		std::size_t offset = 0;
-		bool success = true;
+		bool bSuccess = true;
 		while (offset < bytes.size())
 		{
 			const DWORD count = static_cast<DWORD>(std::min<std::size_t>(bytes.size() - offset, 16u * 1024u * 1024u));
 			DWORD written = 0;
 			if (!WriteFile(file, bytes.data() + offset, count, &written, nullptr) || written != count)
 			{
-				success = false;
+				bSuccess = false;
 				break;
 			}
 			offset += written;
 		}
-		if (success)
+		if (bSuccess)
 		{
-			success = FlushFileBuffers(file) != FALSE;
+			bSuccess = FlushFileBuffers(file) != FALSE;
 		}
-		const bool closed = CloseHandle(file) != FALSE;
-		if (!success || !closed)
+		const bool bClosed = CloseHandle(file) != FALSE;
+		if (!bSuccess || !bClosed)
 		{
 			outErrorMessage = "Durable output did not finish writing, flushing and closing.";
 			return false;
@@ -101,10 +101,10 @@ namespace Files
 	{
 		const std::filesystem::path temporaryPath = BuildTemporaryPath(path);
 		CleanupTemporaryFile(temporaryPath);
-		const bool temporaryFileWritten = TryWriteAllBytes(temporaryPath, bytes, outErrorMessage);
-		const bool filePublished = temporaryFileWritten && TryFinalizeTemporaryFile(temporaryPath, path, outErrorMessage);
+		const bool bTemporaryFileWritten = TryWriteAllBytes(temporaryPath, bytes, outErrorMessage);
+		const bool bFilePublished = bTemporaryFileWritten && TryFinalizeTemporaryFile(temporaryPath, path, outErrorMessage);
 		
-		if (!filePublished)
+		if (!bFilePublished)
 		{
 			CleanupTemporaryFile(temporaryPath);
 			return false;

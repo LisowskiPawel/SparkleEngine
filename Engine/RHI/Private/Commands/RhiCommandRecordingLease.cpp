@@ -47,7 +47,7 @@ RenderCommandList& RhiCommandRecordingLease::GetCommandList() noexcept
 
 RhiTransientDescriptorRange RhiCommandRecordingLease::AllocateTransientDescriptors(std::uint32_t count) noexcept
 {
-	if (m_backendState == nullptr || m_allocateDescriptors == nullptr || m_closed || count == 0)
+	if (m_backendState == nullptr || m_allocateDescriptors == nullptr || m_bClosed || count == 0)
 	{
 		return {};
 	}
@@ -58,7 +58,7 @@ RhiTransientDescriptorRange RhiCommandRecordingLease::AllocateTransientDescripto
 
 void RhiCommandRecordingLease::Close() noexcept
 {
-	if (m_backendState == nullptr || m_closed)
+	if (m_backendState == nullptr || m_bClosed)
 	{
 		return;
 	}
@@ -68,7 +68,7 @@ void RhiCommandRecordingLease::Close() noexcept
 	{
 		m_close(m_backendState);
 	}
-	m_closed = true;
+	m_bClosed = true;
 }
 
 void RhiCommandRecordingLease::Reset() noexcept
@@ -85,14 +85,14 @@ void RhiCommandRecordingLease::Reset() noexcept
 	m_owner = {};
 	m_descriptorPage = {};
 	m_retirementToken = {};
-	m_closed = false;
+	m_bClosed = false;
 }
 
 void RhiCommandRecordingLease::Release() noexcept
 {
 	if (m_backendState != nullptr && m_release != nullptr)
 	{
-		m_release(m_backendState, m_closed);
+		m_release(m_backendState, m_bClosed);
 	}
 	Reset();
 }
@@ -111,7 +111,7 @@ void RhiCommandRecordingLease::MoveFrom(RhiCommandRecordingLease& other) noexcep
 	m_owner = other.m_owner;
 	m_descriptorPage = other.m_descriptorPage;
 	m_retirementToken = other.m_retirementToken;
-	m_closed = other.m_closed;
+	m_bClosed = other.m_bClosed;
 
 	other.Reset();
 }
@@ -153,7 +153,7 @@ RhiCommandRecordingLeaseBackendState RhiCommandRecordingLeaseAccess::Consume(Rhi
 	    .FrameSlot = lease.m_frameSlot,
 	    .ContextId = lease.m_contextId,
 	    .Owner = lease.m_owner,
-	    .Closed = lease.m_closed};
+	    .bClosed = lease.m_bClosed};
 	lease.Reset();
 	return state;
 }
@@ -162,5 +162,5 @@ bool RhiCommandRecordingLeaseAccess::Matches(const RhiCommandRecordingLeaseBacke
 {
 	return state.State == expected.State && state.CommandList == expected.CommandList && state.QueueType == expected.QueueType && state.FrameSlot == expected.FrameSlot
 	    && state.ContextId.Value == expected.ContextId.Value && state.Owner.PartitionIndex == expected.Owner.PartitionIndex && state.Owner.TaskIdentity == expected.Owner.TaskIdentity
-	    && state.Closed == expected.Closed;
+	    && state.bClosed == expected.bClosed;
 }

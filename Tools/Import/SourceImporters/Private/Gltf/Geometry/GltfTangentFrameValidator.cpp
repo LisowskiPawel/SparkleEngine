@@ -58,9 +58,9 @@ void GltfTangentFrameValidator::ValidateBaseFrame(const ImportedVertex& vertex, 
 	const float tangentLengthSquared = tangent.x * tangent.x + tangent.y * tangent.y + tangent.z * tangent.z;
 	const float tangentNormalDot = vertex.normal.x * tangent.x + vertex.normal.y * tangent.y + vertex.normal.z * tangent.z;
 	const bool bTangentNotOrthonormal0f = std::abs(normalLengthSquared - 1.0f) > kUnitFrameTolerance || std::abs(tangentLengthSquared - 1.0f) > kUnitFrameTolerance;
-	const bool tangentFrameNotOrthonormal = bTangentNotOrthonormal0f || (std::abs(tangentNormalDot) > kUnitFrameTolerance);
+	const bool bTangentFrameNotOrthonormal = bTangentNotOrthonormal0f || (std::abs(tangentNormalDot) > kUnitFrameTolerance);
 	
-	if (tangentFrameNotOrthonormal)
+	if (bTangentFrameNotOrthonormal)
 	{
 		throw Diagnostics::Error(std::format("Normal-mapped glTF vertex {} does not contain an orthonormal tangent frame.", vertexIndex));
 	}

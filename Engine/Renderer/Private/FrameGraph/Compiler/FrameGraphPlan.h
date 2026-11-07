@@ -74,7 +74,7 @@ struct FrameGraphPassNode
 	std::vector<FrameGraphPassIndex> synchronizationDependencies;
 	std::vector<FrameGraphPassIndex> successors;
 	std::uint32_t inDegree = 0;
-	bool alive = true;
+	bool bAlive = true;
 	std::vector<FrameGraphAliasingBarrier> transientAliasingBarriers;
 	std::vector<FrameGraphBarrier> compiledBarriers;
 	std::vector<FrameGraphBarrier> compiledReleaseBarriers;
@@ -106,7 +106,7 @@ struct FrameGraphResourceNode
 	ResourceState finalState = ResourceState::Common;
 	ResourceState currentState = ResourceState::Common;
 	std::string debugName;
-	bool pendingAccelerationStructureBarrier = false;
+	bool bPendingAccelerationStructureBarrier = false;
 	FrameGraphPassIndex lastWriterPass = INVALID_FRAME_GRAPH_PASS_INDEX;
 	std::vector<FrameGraphPassIndex> readersSinceLastWrite;
 };
@@ -117,8 +117,8 @@ struct FrameGraphTransientLifetime
 	FrameGraphPassIndex lastUserPass = INVALID_FRAME_GRAPH_PASS_INDEX;
 	FrameGraphPassIndex firstExecutionIndex = INVALID_FRAME_GRAPH_PASS_INDEX;
 	FrameGraphPassIndex lastExecutionIndex = INVALID_FRAME_GRAPH_PASS_INDEX;
-	bool readUsed = false;
-	bool writeUsed = false;
+	bool bReadUsed = false;
+	bool bWriteUsed = false;
 	std::vector<ResourceState> requiredStates;
 
 	void Clear() noexcept;
@@ -136,7 +136,7 @@ struct FrameGraphTransientResourcePlan
 		RhiTextureResourceDesc textureResourceDesc{};
 		RhiBufferResourceDesc bufferResourceDesc{};
 		RhiOptimizedClearValue optimizedClearValue{};
-		bool hasOptimizedClearValue = false;
+		bool bHasOptimizedClearValue = false;
 		ResourceState initialState = ResourceState::Common;
 	};
 

@@ -37,9 +37,9 @@ namespace SparkleLauncher
 		    *selectionLayout,
 		    "Shaders",
 		    "shaders",
-		    features.ShaderCompilerEnabled ? "Compile every registered shader into the cooked map and code library." : "Shader cooking is not enabled by this workspace configuration.",
-		    features.ShaderCompilerEnabled ? QStringLiteral("DXIL + SPIR-V") : QStringLiteral("Unavailable"),
-		    features.ShaderCompilerEnabled,
+		    features.bShaderCompilerEnabled ? "Compile every registered shader into the cooked map and code library." : "Shader cooking is not enabled by this workspace configuration.",
+		    features.bShaderCompilerEnabled ? QStringLiteral("DXIL + SPIR-V") : QStringLiteral("Unavailable"),
+		    features.bShaderCompilerEnabled,
 		    selectedScopes,
 		    scopeBoxes,
 		    registerFocusable);
@@ -48,9 +48,9 @@ namespace SparkleLauncher
 		    *selectionLayout,
 		    "Textures",
 		    "textures",
-		    features.ContentPipelineEnabled ? "Create cooked texture products." : "Texture cooking is not enabled by this workspace configuration.",
-		    features.ContentPipelineEnabled ? QStringLiteral("Asset + Texture cooker") : QStringLiteral("Unavailable"),
-		    features.ContentPipelineEnabled,
+		    features.bContentPipelineEnabled ? "Create cooked texture products." : "Texture cooking is not enabled by this workspace configuration.",
+		    features.bContentPipelineEnabled ? QStringLiteral("Asset + Texture cooker") : QStringLiteral("Unavailable"),
+		    features.bContentPipelineEnabled,
 		    selectedScopes,
 		    scopeBoxes,
 		    registerFocusable);
@@ -59,9 +59,9 @@ namespace SparkleLauncher
 		    *selectionLayout,
 		    "Scene assets",
 		    "assets",
-		    features.ContentPipelineEnabled ? "Cook scenes, meshes, and materials." : "Scene-asset cooking is not enabled by this workspace configuration.",
-		    features.ContentPipelineEnabled ? QStringLiteral("Asset cooker") : QStringLiteral("Unavailable"),
-		    features.ContentPipelineEnabled,
+		    features.bContentPipelineEnabled ? "Cook scenes, meshes, and materials." : "Scene-asset cooking is not enabled by this workspace configuration.",
+		    features.bContentPipelineEnabled ? QStringLiteral("Asset cooker") : QStringLiteral("Unavailable"),
+		    features.bContentPipelineEnabled,
 		    selectedScopes,
 		    scopeBoxes,
 		    registerFocusable);
@@ -69,7 +69,7 @@ namespace SparkleLauncher
 		cookLayout->addWidget(selectionPanel);
 		QCheckBox* shaderSymbols = new QCheckBox("Generate shader symbols", cookLayout->parentWidget());
 		shaderSymbols->setChecked(settings.ShaderSymbols());
-		shaderSymbols->setEnabled(features.ShaderCompilerEnabled);
+		shaderSymbols->setEnabled(features.bShaderCompilerEnabled);
 		shaderSymbols->setToolTip("Export private shader debug data. Runtime optimization is unchanged.");
 		registerFocusable(shaderSymbols);
 		cookLayout->addWidget(shaderSymbols);

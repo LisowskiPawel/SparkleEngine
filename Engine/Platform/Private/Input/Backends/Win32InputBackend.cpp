@@ -286,20 +286,20 @@ static ModifierFlags GetCurrentModifiers() noexcept
 	return flags;
 }
 
-static void DecodeKeyboardEvent(InputBackendResult& result, WPARAM virtualKey, LPARAM keyFlags, bool pressed)
+static void DecodeKeyboardEvent(InputBackendResult& result, WPARAM virtualKey, LPARAM keyFlags, bool bPressed)
 {
 	result.Type = InputEventType::Keyboard;
 	result.Keyboard.KeyCode = TranslateVirtualKey(virtualKey);
-	result.Keyboard.bPressed = pressed;
-	result.Keyboard.bRepeat = pressed && (keyFlags & 0x40000000) != 0;
+	result.Keyboard.bPressed = bPressed;
+	result.Keyboard.bRepeat = bPressed && (keyFlags & 0x40000000) != 0;
 	result.Keyboard.Modifiers = GetCurrentModifiers();
 }
 
-static void DecodeMouseButtonEvent(InputBackendResult& result, MouseButton button, bool pressed, LPARAM position)
+static void DecodeMouseButtonEvent(InputBackendResult& result, MouseButton button, bool bPressed, LPARAM position)
 {
 	result.Type = InputEventType::MouseButton;
 	result.MouseButton.Button = button;
-	result.MouseButton.bPressed = pressed;
+	result.MouseButton.bPressed = bPressed;
 	result.MouseButton.Position.X = GET_X_LPARAM(position);
 	result.MouseButton.Position.Y = GET_Y_LPARAM(position);
 	result.MouseButton.Modifiers = GetCurrentModifiers();
@@ -314,11 +314,11 @@ static void DecodeMouseMoveEvent(InputBackendResult& result, LPARAM position)
 	result.MouseMove.Delta.Y = 0;
 }
 
-static void DecodeMouseWheelEvent(InputBackendResult& result, WPARAM wheelDelta, LPARAM position, bool horizontal)
+static void DecodeMouseWheelEvent(InputBackendResult& result, WPARAM wheelDelta, LPARAM position, bool bHorizontal)
 {
 	result.Type = InputEventType::MouseWheel;
 	result.MouseWheel.Delta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wheelDelta)) / WHEEL_DELTA;
-	result.MouseWheel.bHorizontal = horizontal;
+	result.MouseWheel.bHorizontal = bHorizontal;
 	result.MouseWheel.Position.X = GET_X_LPARAM(position);
 	result.MouseWheel.Position.Y = GET_Y_LPARAM(position);
 }

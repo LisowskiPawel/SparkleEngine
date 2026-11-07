@@ -23,7 +23,7 @@ namespace SparkleLauncher
 
 	const LauncherContentSummary* LauncherContentModel::Content() const
 	{
-		return m_hasContent ? &m_content : nullptr;
+		return m_bHasContent ? &m_content : nullptr;
 	}
 
 	void LauncherContentModel::Refresh(const std::filesystem::path& workspaceRoot)
@@ -32,22 +32,22 @@ namespace SparkleLauncher
 		const std::optional<LauncherProject> discoveredContent = ResolveLauncherProject(workspaceRoot, errorMessage);
 
 		LauncherContentSummary refreshedContent;
-		const bool hasRefreshedContent = discoveredContent.has_value();
-		if (hasRefreshedContent)
+		const bool bHasRefreshedContent = discoveredContent.has_value();
+		if (bHasRefreshedContent)
 		{
 			const LauncherProject& content = *discoveredContent;
 			const QString projectName = QString::fromStdString(content.Id);
 			refreshedContent = {projectName, projectName, content.RootPath};
 		}
 
-		const bool bContentChangedhasContent = m_hasContent != hasRefreshedContent;
-		const bool bContentChangedhasContent2 = !bContentChangedhasContent && (m_hasContent);
+		const bool bContentChangedhasContent = m_bHasContent != bHasRefreshedContent;
+		const bool bContentChangedhasContent2 = !bContentChangedhasContent && (m_bHasContent);
 		const bool bContentChangedContentMatches = bContentChangedhasContent2 && (!ContentMatches(m_content, refreshedContent));
-		const bool contentChanged = bContentChangedhasContent || bContentChangedContentMatches;
+		const bool bContentChanged = bContentChangedhasContent || bContentChangedContentMatches;
 		m_content = std::move(refreshedContent);
-		m_hasContent = hasRefreshedContent;
+		m_bHasContent = bHasRefreshedContent;
 
-		if (contentChanged)
+		if (bContentChanged)
 		{
 			emit ContentChanged();
 		}

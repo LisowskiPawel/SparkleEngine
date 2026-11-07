@@ -62,11 +62,11 @@ void LevelSession::RequestLevelChange(std::string_view requestedLevelName) noexc
 		SPDLOG_LOGGER_WARN(g_levelSessionLogger, "Requested level '{}' is not registered.", std::string(requestedLevelName));
 		return;
 	}
-	if (!m_levelChangeInProgress && m_activeLevel == requestedLevel)
+	if (!m_bLevelChangeInProgress && m_activeLevel == requestedLevel)
 	{
 		return;
 	}
-	if (m_pendingLevelChange == requestedLevel || (m_levelChangeInProgress && m_loadingLevel == requestedLevel))
+	if (m_pendingLevelChange == requestedLevel || (m_bLevelChangeInProgress && m_loadingLevel == requestedLevel))
 	{
 		return;
 	}
@@ -75,7 +75,7 @@ void LevelSession::RequestLevelChange(std::string_view requestedLevelName) noexc
 
 void LevelSession::RequestLevelReload() noexcept
 {
-	if (m_activeLevel && !m_levelChangeInProgress)
+	if (m_activeLevel && !m_bLevelChangeInProgress)
 	{
 		m_pendingLevelChange = m_activeLevel;
 	}
@@ -83,11 +83,11 @@ void LevelSession::RequestLevelReload() noexcept
 
 void LevelSession::ProcessPendingLevelChange() noexcept
 {
-	if (m_pendingLevelChange && m_levelChangeInProgress)
+	if (m_pendingLevelChange && m_bLevelChangeInProgress)
 	{
 		m_loadExecutor->Cancel();
 		CompleteLevelChange();
-		if (m_levelChangeInProgress)
+		if (m_bLevelChangeInProgress)
 		{
 			return;
 		}
@@ -110,7 +110,7 @@ void LevelSession::StartLevelChange(LevelAsset& requestedLevel) noexcept
 	m_loadExecutor->Cancel();
 	m_latestRequestId = requestId;
 	m_loadingLevel = &requestedLevel;
-	m_levelChangeInProgress = true;
+	m_bLevelChangeInProgress = true;
 	m_lastLoadDiagnostic.clear();
 
 	LevelChangeStartedEventArgs startedArgs;
@@ -127,7 +127,7 @@ void LevelSession::StartLevelChange(LevelAsset& requestedLevel) noexcept
 	{
 		m_lastLoadDiagnostic = error.what();
 		m_loadingLevel = nullptr;
-		m_levelChangeInProgress = false;
+		m_bLevelChangeInProgress = false;
 		SPDLOG_LOGGER_ERROR(g_levelSessionLogger, "Failed to start loading level '{}': {}", requestedLevelName, m_lastLoadDiagnostic);
 		m_levelChangeEvents.OnLevelLoadFailed.Broadcast(requestedLevelName);
 	}
@@ -155,7 +155,7 @@ void LevelSession::CompleteLevelChange() noexcept
 	if (completion->Stage != LevelLoadOperationStage::Ready)
 	{
 		m_lastLoadDiagnostic = std::move(completion->Diagnostic);
-		m_levelChangeInProgress = false;
+		m_bLevelChangeInProgress = false;
 		if (completion->Stage != LevelLoadOperationStage::Cancelled)
 		{
 			SPDLOG_LOGGER_ERROR(g_levelSessionLogger, "Failed to load level '{}': {}", std::string(loadedLevel->GetName()), m_lastLoadDiagnostic);
@@ -171,12 +171,12 @@ void LevelSession::CompleteLevelChange() noexcept
 	Assets::SceneLoadPackage& package = *completion->Package;
 
 	const bool bStaleDocumentGeneration = package.WorldGeneration != m_gameWorld->GetGeneration() || package.DocumentGeneration != m_documentGeneration;
-	const bool stale = bStaleDocumentGeneration || (package.CatalogGeneration != m_loadExecutor->GetCatalogGeneration());
+	const bool bStale = bStaleDocumentGeneration || (package.CatalogGeneration != m_loadExecutor->GetCatalogGeneration());
 
-	if (stale)
+	if (bStale)
 	{
 		m_lastLoadDiagnostic = "Scene load package was rejected because an owner generation changed.";
-		m_levelChangeInProgress = false;
+		m_bLevelChangeInProgress = false;
 		SPDLOG_LOGGER_ERROR(g_levelSessionLogger, "Failed to load level '{}': {}", std::string(loadedLevel->GetName()), m_lastLoadDiagnostic);
 		m_levelChangeEvents.OnLevelLoadFailed.Broadcast(loadedLevel->GetName());
 		return;
@@ -202,7 +202,7 @@ void LevelSession::CompleteLevelChange() noexcept
 	changedArgs.previousLevelName = previousLevelName;
 	changedArgs.activeLevelName = loadedLevelName;
 	m_levelChangeEvents.OnLevelChanged.Broadcast(changedArgs);
-	m_levelChangeInProgress = false;
+	m_bLevelChangeInProgress = false;
 	m_lastLoadDiagnostic.clear();
 }
 
@@ -213,7 +213,7 @@ LevelLoadOperationProgress LevelSession::GetLoadProgress() const noexcept
 
 bool LevelSession::SaveActiveLevel() noexcept
 {
-	if (!m_activeLevel || m_levelChangeInProgress)
+	if (!m_activeLevel || m_bLevelChangeInProgress)
 	{
 		return false;
 	}
@@ -248,7 +248,7 @@ void LevelSession::CaptureSceneToLevel() noexcept
 	desc.sky = view.GetSkyEnvironment();
 	for (const WorldCameraReadData& camera : view.GetCameras())
 	{
-		if (camera.Active)
+		if (camera.bActive)
 		{
 			desc.cameraDesc = camera.Description;
 			break;

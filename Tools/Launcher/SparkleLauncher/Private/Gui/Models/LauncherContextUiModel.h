@@ -14,8 +14,8 @@ namespace SparkleLauncher
 		QString DisplayName;
 		QString Value;
 		QString Detail;
-		bool Available = false;
-		bool Supported = true;
+		bool bAvailable = false;
+		bool bSupported = true;
 	};
 
 	struct LauncherContextUiModel final

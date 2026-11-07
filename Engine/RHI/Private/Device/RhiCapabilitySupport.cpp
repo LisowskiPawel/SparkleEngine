@@ -4,19 +4,19 @@
 #include "Diagnostics/RhiDiagnostics.h"
 #include "Memory/RhiMemoryDiagnostics.h"
 
-RhiBackendDiagnosticsSupport BuildRhiBackendDiagnosticsSupport(bool validationEnabled, RenderDiagnostics& renderDiagnostics) noexcept
+RhiBackendDiagnosticsSupport BuildRhiBackendDiagnosticsSupport(bool bValidationEnabled, RenderDiagnostics& renderDiagnostics) noexcept
 {
 	const RhiDiagnosticsCapabilities diagnosticsCapabilities = renderDiagnostics.GetCapabilities();
 
 	return RhiBackendDiagnosticsSupport{
-	    .ValidationEnabled = validationEnabled,
-	    .SupportsDebugLayer = validationEnabled,
-	    .SupportsObjectNames = diagnosticsCapabilities.SupportsObjectNames,
-	    .SupportsGpuEvents = diagnosticsCapabilities.SupportsGpuEvents,
-	    .SupportsTimestampQueries = diagnosticsCapabilities.SupportsTimestampQueries,
-	    .SupportsDebugMessages = diagnosticsCapabilities.SupportsDebugMessages,
-	    .SupportsLiveObjectReports = diagnosticsCapabilities.SupportsLiveObjectReports,
-	    .SupportsCrashDiagnostics = diagnosticsCapabilities.SupportsCrashDiagnostics};
+	    .bValidationEnabled = bValidationEnabled,
+	    .bSupportsDebugLayer = bValidationEnabled,
+	    .bSupportsObjectNames = diagnosticsCapabilities.bSupportsObjectNames,
+	    .bSupportsGpuEvents = diagnosticsCapabilities.bSupportsGpuEvents,
+	    .bSupportsTimestampQueries = diagnosticsCapabilities.bSupportsTimestampQueries,
+	    .bSupportsDebugMessages = diagnosticsCapabilities.bSupportsDebugMessages,
+	    .bSupportsLiveObjectReports = diagnosticsCapabilities.bSupportsLiveObjectReports,
+	    .bSupportsCrashDiagnostics = diagnosticsCapabilities.bSupportsCrashDiagnostics};
 }
 
 RhiBackendMemorySupport BuildRhiBackendMemorySupport(RenderDiagnostics& renderDiagnostics) noexcept
@@ -24,8 +24,8 @@ RhiBackendMemorySupport BuildRhiBackendMemorySupport(RenderDiagnostics& renderDi
 	const RenderMemoryDiagnostics* const memoryDiagnostics = renderDiagnostics.GetMemoryDiagnostics();
 
 	return RhiBackendMemorySupport{
-	    .SupportsMemoryDiagnostics = memoryDiagnostics != nullptr,
-	    .SupportsBudgetQueries = memoryDiagnostics != nullptr && memoryDiagnostics->SupportsBudgetQueries(),
-	    .SupportsDelayedDestructionTracking = memoryDiagnostics != nullptr && memoryDiagnostics->SupportsDelayedDestructionTracking(),
-	    .SupportsResidencyPressure = memoryDiagnostics != nullptr && memoryDiagnostics->SupportsBudgetQueries()};
+	    .bSupportsMemoryDiagnostics = memoryDiagnostics != nullptr,
+	    .bSupportsBudgetQueries = memoryDiagnostics != nullptr && memoryDiagnostics->SupportsBudgetQueries(),
+	    .bSupportsDelayedDestructionTracking = memoryDiagnostics != nullptr && memoryDiagnostics->SupportsDelayedDestructionTracking(),
+	    .bSupportsResidencyPressure = memoryDiagnostics != nullptr && memoryDiagnostics->SupportsBudgetQueries()};
 }

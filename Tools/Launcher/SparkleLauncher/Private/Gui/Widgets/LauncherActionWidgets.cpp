@@ -96,9 +96,9 @@ namespace SparkleLauncher
 		return primaryVerb.isEmpty() ? QString("Run") : primaryVerb;
 	}
 
-	void ApplyActionAvailability(QPushButton& button, bool enabled, const QString& reason)
+	void ApplyActionAvailability(QPushButton& button, bool bEnabled, const QString& reason)
 	{
-		button.setEnabled(enabled);
+		button.setEnabled(bEnabled);
 		button.setToolTip(reason);
 		button.setAccessibleDescription(reason);
 	}

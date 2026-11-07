@@ -85,13 +85,13 @@ namespace Process
 		std::array<char, 4096> buffer{};
 		OVERLAPPED readOperation{};
 		readOperation.hEvent = readEvent.Get();
-		bool readPending = false;
-		bool pipeClosed = false;
-		bool processExited = false;
-		bool terminationRequested = false;
-		while (!processExited || !pipeClosed)
+		bool bReadPending = false;
+		bool bPipeClosed = false;
+		bool bProcessExited = false;
+		bool bTerminationRequested = false;
+		while (!bProcessExited || !bPipeClosed)
 		{
-			if (!pipeClosed && !readPending)
+			if (!bPipeClosed && !bReadPending)
 			{
 				ResetEvent(readEvent.Get());
 				DWORD bytesRead = 0;
@@ -99,7 +99,7 @@ namespace Process
 				{
 					if (bytesRead == 0)
 					{
-						pipeClosed = true;
+						bPipeClosed = true;
 					}
 					else
 					{
@@ -110,16 +110,16 @@ namespace Process
 				const DWORD readError = GetLastError();
 				if (readError == ERROR_IO_PENDING)
 				{
-					readPending = true;
+					bReadPending = true;
 				}
 				else if (readError == ERROR_BROKEN_PIPE)
 				{
-					pipeClosed = true;
+					bPipeClosed = true;
 				}
 				else
 				{
 					result.FailureReason = "Failed while reading child output: " + FormatWindowsProcessError(readError);
-					pipeClosed = true;
+					bPipeClosed = true;
 				}
 			}
 
@@ -128,17 +128,17 @@ namespace Process
 			DWORD readIndex = MAXDWORD;
 			DWORD cancelIndex = MAXDWORD;
 			DWORD count = 0;
-			if (!processExited)
+			if (!bProcessExited)
 			{
 				processIndex = count;
 				waits[count++] = child.Process.Get();
 			}
-			if (readPending)
+			if (bReadPending)
 			{
 				readIndex = count;
 				waits[count++] = readEvent.Get();
 			}
-			if (!terminationRequested)
+			if (!bTerminationRequested)
 			{
 				cancelIndex = count;
 				waits[count++] = cancelEvent.Get();
@@ -157,32 +157,32 @@ namespace Process
 			const DWORD signalled = waitResult - WAIT_OBJECT_0;
 			if (signalled == processIndex)
 			{
-				processExited = true;
+				bProcessExited = true;
 				continue;
 			}
 			if (signalled == cancelIndex)
 			{
-				result.Cancelled = true;
-				terminationRequested = true;
+				result.bCancelled = true;
+				bTerminationRequested = true;
 				TerminateJobObject(child.Job.Get(), 1);
 				continue;
 			}
 			if (signalled == readIndex)
 			{
 				DWORD bytesRead = 0;
-				readPending = false;
+				bReadPending = false;
 				if (GetOverlappedResult(readPipe.Get(), &readOperation, &bytesRead, FALSE) && bytesRead != 0)
 				{
 					ConsumeOutput(result, request, log, buffer.data(), bytesRead);
 				}
 				else if (GetLastError() == ERROR_BROKEN_PIPE || bytesRead == 0)
 				{
-					pipeClosed = true;
+					bPipeClosed = true;
 				}
 				else
 				{
 					result.FailureReason = "Failed while completing child output read: " + FormatWindowsProcessError(GetLastError());
-					pipeClosed = true;
+					bPipeClosed = true;
 				}
 			}
 		}

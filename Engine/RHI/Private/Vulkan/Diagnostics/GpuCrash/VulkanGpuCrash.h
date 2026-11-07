@@ -15,7 +15,7 @@ public:
 	void Attach(VkDeviceCreateInfo& device, VkPhysicalDeviceFeatures2& features) noexcept;
 
 private:
-	bool m_enabled = false;
+	bool m_bEnabled = false;
 	VkPhysicalDeviceDiagnosticsConfigFeaturesNV m_features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DIAGNOSTICS_CONFIG_FEATURES_NV};
 	VkDeviceDiagnosticsConfigCreateInfoNV m_config{VK_STRUCTURE_TYPE_DEVICE_DIAGNOSTICS_CONFIG_CREATE_INFO_NV};
 };

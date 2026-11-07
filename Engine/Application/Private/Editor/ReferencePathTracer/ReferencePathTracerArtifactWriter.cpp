@@ -24,9 +24,9 @@ ReferencePathTracerArtifactWriteResult ReferencePathTracerArtifactWriter::Write(
 	const bool bCheckpointHashedGuardErrorMessage = bEautyHashed && !bCheckpointHashedCheckpoint;
 	const bool bCheckpointHashedErrorMessage = bCheckpointHashedGuardErrorMessage && (Hash::TrySha256Hex(*artifact.Checkpoint, checkpointHash, result.ErrorMessage));
 	const bool bCheckpointHashedErrorMessage2 = bCheckpointHashedCheckpoint || bCheckpointHashedErrorMessage;
-	const bool checkpointHashed = bEautyHashed && bCheckpointHashedErrorMessage2;
+	const bool bCheckpointHashed = bEautyHashed && bCheckpointHashedErrorMessage2;
 
-	if (!checkpointHashed)
+	if (!bCheckpointHashed)
 	{
 		return result;
 	}
@@ -51,10 +51,10 @@ ReferencePathTracerArtifactWriteResult ReferencePathTracerArtifactWriter::Write(
 	        .Bytes = std::vector<std::byte>(reinterpret_cast<const std::byte*>(manifest.data()), reinterpret_cast<const std::byte*>(manifest.data() + manifest.size()))});
 
 	ArtifactBundlePublicationResult publicationResult = ArtifactBundlePublication::Publish(std::move(publication), cancellationToken);
-	result.Succeeded = publicationResult.Succeeded;
+	result.bSucceeded = publicationResult.bSucceeded;
 	result.PublicationDirectory = std::move(publicationResult.PublicationDirectory);
 	result.ErrorMessage = std::move(publicationResult.ErrorMessage);
-	if (result.Succeeded && !publicationResult.Files.empty())
+	if (result.bSucceeded && !publicationResult.Files.empty())
 	{
 		result.ManifestSha256 = std::move(publicationResult.Files.back().Sha256);
 	}

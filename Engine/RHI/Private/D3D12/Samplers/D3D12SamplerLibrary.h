@@ -76,7 +76,7 @@ private:
 	static bool TryGetUniformAddressMode(const RhiSamplerDesc& samplerDesc, RhiSamplerAddressMode& outAddressMode) noexcept;
 	static bool TryGetFilteredSlot(RhiSamplerMinMagFilter minMagFilter, RhiSamplerMipFilter mipFilter, RhiSamplerAddressMode addressMode, Slot& outSlot) noexcept;
 	static bool TryGetAnisotropicSlot(RhiSamplerAnisotropy maxAnisotropy, RhiSamplerAddressMode addressMode, Slot& outSlot) noexcept;
-	static D3D12_FILTER ToD3D12Filter(RhiSamplerMinMagFilter minMag, RhiSamplerMipFilter mip, bool anisotropic);
+	static D3D12_FILTER ToD3D12Filter(RhiSamplerMinMagFilter minMag, RhiSamplerMipFilter mip, bool bAnisotropic);
 	static D3D12_TEXTURE_ADDRESS_MODE ToD3D12Address(RhiSamplerAddressMode address);
 
 	bool m_bInitialized = false;

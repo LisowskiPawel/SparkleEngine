@@ -18,21 +18,21 @@ struct ShaderBackendDescriptor final
 	std::span<const std::string_view> BinaryFormats;
 	ShaderBackendCapabilities Capabilities;
 	std::uint64_t Version = 0;
-	bool IsAvailable = false;
+	bool bIsAvailable = false;
 	std::string UnavailableReason;
 };
 
 struct ShaderBinaryFormatDescriptor final
 {
 	std::string_view Name;
-	bool IsAvailable = true;
+	bool bIsAvailable = true;
 };
 
 struct ShaderCodegenTargetDescriptor final
 {
 	ShaderTarget Target = kDefaultShaderTarget;
 	std::string_view BinaryFormat;
-	bool IsAvailable = true;
+	bool bIsAvailable = true;
 };
 
 std::vector<ShaderBackendDescriptor> ListShaderBackends();

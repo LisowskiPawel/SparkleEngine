@@ -89,13 +89,13 @@ bool EditorViewportSettings::SetRotationSpeed(float degreesPerPixel) noexcept
 	return Save();
 }
 
-bool EditorViewportSettings::SetInvertY(bool invertY) noexcept
+bool EditorViewportSettings::SetInvertY(bool bInvertY) noexcept
 {
-	if (invertY == m_state.Navigation.InvertY)
+	if (bInvertY == m_state.Navigation.bInvertY)
 	{
 		return true;
 	}
-	m_state.Navigation.InvertY = invertY;
+	m_state.Navigation.bInvertY = bInvertY;
 	return Save();
 }
 

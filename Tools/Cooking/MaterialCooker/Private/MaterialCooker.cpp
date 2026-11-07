@@ -75,7 +75,7 @@ CookedMaterialAssetBuild MaterialCookPipeline::BuildMaterialAsset(const Imported
 	materialAsset.header.subsurfaceStrength = importedMaterial.subsurfaceStrength;
 	materialAsset.header.alphaCutoff = importedMaterial.alphaCutoff;
 	materialAsset.header.emissiveColor = importedMaterial.emissiveColor;
-	materialAsset.header.doubleSided = importedMaterial.doubleSided ? 1u : 0u;
+	materialAsset.header.doubleSided = importedMaterial.bDoubleSided ? 1u : 0u;
 
 	for (const ImportedTextureSource& textureSource : importedMaterial.textureSources)
 	{

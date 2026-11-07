@@ -40,8 +40,8 @@ bool RhiContract::IsTextureResourceDescUsable(const RhiCapabilities& capabilitie
 
 	const RhiFormatSupport* const formatSupport = capabilities.FindFormatSupport(desc.Format);
 
-	return formatSupport != nullptr && formatSupport->SupportsTexture && (!desc.AllowRenderTarget || formatSupport->SupportsRenderTarget)
-	    && (!desc.AllowDepthStencil || formatSupport->SupportsDepthStencil) && (!desc.AllowUnorderedAccess || formatSupport->SupportsUnorderedAccess);
+	return formatSupport != nullptr && formatSupport->bSupportsTexture && (!desc.bAllowRenderTarget || formatSupport->bSupportsRenderTarget)
+	    && (!desc.bAllowDepthStencil || formatSupport->bSupportsDepthStencil) && (!desc.bAllowUnorderedAccess || formatSupport->bSupportsUnorderedAccess);
 }
 
 bool RhiContract::IsResourceViewDescUsable(const RhiResourceViewDesc& desc) noexcept

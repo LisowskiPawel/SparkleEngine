@@ -58,7 +58,7 @@ namespace ReferencePathTracer
 		PreviousPathEvent previousEvent;
 		previousEvent.PositionWorld = 0.0f.xxx;
 		previousEvent.BsdfPdfW = 0.0f;
-		previousEvent.Delta = true;
+		previousEvent.bDelta = true;
 
 		float3 contribution = 0.0f.xxx;
 
@@ -67,14 +67,14 @@ namespace ReferencePathTracer
 		{
 			const RayTracingTraceResult trace = TraceSceneRay(sceneTlas, path.OriginWorld, path.DirectionWorld, traversal.TMin, traversal.TMax, RAY_FLAG_CULL_BACK_FACING_TRIANGLES, 0xFFu);
 
-			if (!trace.Hit)
+			if (!trace.bHit)
 			{
 				PathTracer::AddRadiance(contribution, path.Throughput, EvaluateEnvironmentRadiance(lightCounts, previousEvent, path.DirectionWorld, skyTexture, skySampler));
 				break;
 			}
 
 			const RayTracingHitSurfaceData hitSurface = ReconstructRayTracingHitSurface(trace);
-			if (!hitSurface.Valid)
+			if (!hitSurface.bValid)
 			{
 				return asfloat(0x7FC00000u).xxx;
 			}
@@ -98,21 +98,21 @@ namespace ReferencePathTracer
 			}
 
 			const PathSample::DirectionSample bsdf = SamplePathDirection(surface, lobeMasses, sampleIdentity, path.SurfaceDepth);
-			if (!bsdf.HasSupport)
+			if (!bsdf.bHasSupport)
 			{
 				break;
 			}
 
 			previousEvent.PositionWorld = surface.PositionWorld;
 			previousEvent.BsdfPdfW = bsdf.PdfW;
-			previousEvent.Delta = bsdf.Delta;
+			previousEvent.bDelta = bsdf.bDelta;
 
 			PathTracer::ApplyDirectionSample(path, bsdf);
 
 			const bool bRouletteTerminatedSurfaceDepth = FinitePathDiagnosticSurfaceVertices == 0u && path.SurfaceDepth >= 3u;
-			const bool rouletteTerminated = bRouletteTerminatedSurfaceDepth && (!SurvivesRussianRoulette(path.Throughput, sampleIdentity, surfaceVertexCount));
+			const bool bRouletteTerminated = bRouletteTerminatedSurfaceDepth && (!SurvivesRussianRoulette(path.Throughput, sampleIdentity, surfaceVertexCount));
 			
-			if (rouletteTerminated)
+			if (bRouletteTerminated)
 			{
 				break;
 			}

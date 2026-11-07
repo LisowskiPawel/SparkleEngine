@@ -145,7 +145,7 @@ static void AddResourceBinding(slang::VariableLayoutReflection& variableLayout, 
 	binding.Kind = MapResourceKind(variableLayout.getTypeLayout(), category);
 	binding.Dimension = MapResourceDimension(variableLayout.getTypeLayout());
 
-	binding.IsReadOnly = binding.Kind != CookedShaderResourceKind::RWTexture && binding.Kind != CookedShaderResourceKind::RWStructuredBuffer
+	binding.bIsReadOnly = binding.Kind != CookedShaderResourceKind::RWTexture && binding.Kind != CookedShaderResourceKind::RWStructuredBuffer
 	    && binding.Kind != CookedShaderResourceKind::RWByteAddressBuffer && binding.Kind != CookedShaderResourceKind::RWTypedBuffer;
 
 	binding.Set = static_cast<std::uint32_t>(variableLayout.getBindingSpace(category));
@@ -157,12 +157,12 @@ static void AddResourceBinding(slang::VariableLayoutReflection& variableLayout, 
 		AddConstantBuffer(variableLayout, binding, outReflection);
 	}
 
-	const bool duplicate = std::ranges::any_of(
+	const bool bDuplicate = std::ranges::any_of(
 	    outReflection.Bindings,
 	    [&binding](const ShaderReflectionResourceBinding& existing)
 	    { return existing.Name == binding.Name && existing.Kind == binding.Kind && existing.Set == binding.Set && existing.Slot == binding.Slot; });
 
-	if (!duplicate)
+	if (!bDuplicate)
 	{
 		outReflection.Bindings.push_back(std::move(binding));
 	}
@@ -249,49 +249,49 @@ static CookedShaderResourceKind MapResourceKind(slang::TypeLayoutReflection* typ
 	const SlangResourceShape shape = typeLayout != nullptr ? typeLayout->getResourceShape() : SLANG_RESOURCE_NONE;
 	const SlangResourceShape baseShape = static_cast<SlangResourceShape>(shape & SLANG_RESOURCE_BASE_SHAPE_MASK);
 	const SlangResourceAccess access = typeLayout != nullptr ? typeLayout->getResourceAccess() : SLANG_RESOURCE_ACCESS_NONE;
-	const bool writable = category == slang::ParameterCategory::UnorderedAccess || access != SLANG_RESOURCE_ACCESS_READ;
+	const bool bWritable = category == slang::ParameterCategory::UnorderedAccess || access != SLANG_RESOURCE_ACCESS_READ;
 
 	if (baseShape == SLANG_STRUCTURED_BUFFER)
 	{
-		return writable ? CookedShaderResourceKind::RWStructuredBuffer : CookedShaderResourceKind::StructuredBuffer;
+		return bWritable ? CookedShaderResourceKind::RWStructuredBuffer : CookedShaderResourceKind::StructuredBuffer;
 	}
 	if (baseShape == SLANG_BYTE_ADDRESS_BUFFER)
 	{
-		return writable ? CookedShaderResourceKind::RWByteAddressBuffer : CookedShaderResourceKind::ByteAddressBuffer;
+		return bWritable ? CookedShaderResourceKind::RWByteAddressBuffer : CookedShaderResourceKind::ByteAddressBuffer;
 	}
 	if (baseShape == SLANG_TEXTURE_BUFFER)
 	{
-		return writable ? CookedShaderResourceKind::RWTypedBuffer : CookedShaderResourceKind::TypedBuffer;
+		return bWritable ? CookedShaderResourceKind::RWTypedBuffer : CookedShaderResourceKind::TypedBuffer;
 	}
 	if (baseShape == SLANG_ACCELERATION_STRUCTURE)
 	{
 		return CookedShaderResourceKind::AccelerationStructure;
 	}
 
-	return writable ? CookedShaderResourceKind::RWTexture : CookedShaderResourceKind::Texture;
+	return bWritable ? CookedShaderResourceKind::RWTexture : CookedShaderResourceKind::Texture;
 }
 
 static CookedShaderResourceDimension MapResourceDimension(slang::TypeLayoutReflection* typeLayout)
 {
 	const SlangResourceShape shape = typeLayout != nullptr ? typeLayout->getResourceShape() : SLANG_RESOURCE_NONE;
 	const SlangResourceShape baseShape = static_cast<SlangResourceShape>(shape & SLANG_RESOURCE_BASE_SHAPE_MASK);
-	const bool arrayed = (shape & SLANG_TEXTURE_ARRAY_FLAG) != 0;
-	const bool multisampled = (shape & SLANG_TEXTURE_MULTISAMPLE_FLAG) != 0;
+	const bool bArrayed = (shape & SLANG_TEXTURE_ARRAY_FLAG) != 0;
+	const bool bMultisampled = (shape & SLANG_TEXTURE_MULTISAMPLE_FLAG) != 0;
 
 	switch (baseShape)
 	{
 		case SLANG_TEXTURE_1D:
-			return arrayed ? CookedShaderResourceDimension::Texture1DArray : CookedShaderResourceDimension::Texture1D;
+			return bArrayed ? CookedShaderResourceDimension::Texture1DArray : CookedShaderResourceDimension::Texture1D;
 		case SLANG_TEXTURE_2D:
-			if (multisampled)
+			if (bMultisampled)
 			{
-				return arrayed ? CookedShaderResourceDimension::Texture2DMSArray : CookedShaderResourceDimension::Texture2DMS;
+				return bArrayed ? CookedShaderResourceDimension::Texture2DMSArray : CookedShaderResourceDimension::Texture2DMS;
 			}
-			return arrayed ? CookedShaderResourceDimension::Texture2DArray : CookedShaderResourceDimension::Texture2D;
+			return bArrayed ? CookedShaderResourceDimension::Texture2DArray : CookedShaderResourceDimension::Texture2D;
 		case SLANG_TEXTURE_3D:
 			return CookedShaderResourceDimension::Texture3D;
 		case SLANG_TEXTURE_CUBE:
-			return arrayed ? CookedShaderResourceDimension::TextureCubeArray : CookedShaderResourceDimension::TextureCube;
+			return bArrayed ? CookedShaderResourceDimension::TextureCubeArray : CookedShaderResourceDimension::TextureCube;
 		case SLANG_TEXTURE_BUFFER:
 		case SLANG_STRUCTURED_BUFFER:
 		case SLANG_BYTE_ADDRESS_BUFFER:

@@ -39,12 +39,12 @@ namespace Assets
 	SceneAssetRegistryEntries SceneAssetRegistryReader::Read() const
 	{
 		std::error_code errorCode;
-		const bool exists = std::filesystem::exists(m_registryPath, errorCode);
+		const bool bExists = std::filesystem::exists(m_registryPath, errorCode);
 		if (errorCode)
 		{
 			throw Diagnostics::Error(std::format("Could not inspect scene asset registry '{}': {}.", m_registryPath.string(), errorCode.message()));
 		}
-		if (!exists)
+		if (!bExists)
 		{
 			return {};
 		}
@@ -61,9 +61,9 @@ namespace Assets
 	SceneAssetRegistryEntries SceneAssetRegistryReader::ParseEntries(std::istream& input) const
 	{
 		SceneAssetRegistryEntries entries;
-		bool foundRegistryHeader = false;
-		bool foundEntriesHeader = false;
-		bool inEntriesSection = false;
+		bool bFoundRegistryHeader = false;
+		bool bFoundEntriesHeader = false;
+		bool bInEntriesSection = false;
 		std::size_t lineNumber = 0;
 		for (std::string line; std::getline(input, line);)
 		{
@@ -76,33 +76,33 @@ namespace Assets
 
 			if (trimmedLine == kSceneAssetRegistryHeader)
 			{
-				if (foundRegistryHeader)
+				if (bFoundRegistryHeader)
 				{
 					throw Diagnostics::Error(std::format("Scene asset registry '{}' repeats its header at line {}.", m_registryPath.string(), lineNumber));
 				}
-				foundRegistryHeader = true;
-				inEntriesSection = false;
+				bFoundRegistryHeader = true;
+				bInEntriesSection = false;
 				continue;
 			}
 
 			if (trimmedLine == kSceneAssetEntriesHeader)
 			{
-				if (!foundRegistryHeader || foundEntriesHeader)
+				if (!bFoundRegistryHeader || bFoundEntriesHeader)
 				{
 					throw Diagnostics::Error(std::format("Scene asset registry '{}' has an invalid entries section at line {}.", m_registryPath.string(), lineNumber));
 				}
-				foundEntriesHeader = true;
-				inEntriesSection = true;
+				bFoundEntriesHeader = true;
+				bInEntriesSection = true;
 				continue;
 			}
 
 			std::string_view key;
 			std::string_view value;
-			const bool entrySectionActive = inEntriesSection;
-			const bool entryDecoded = entrySectionActive && Strings::TrySplitKeyValue(trimmedLine, '=', key, value);
-			const bool entryKeyMatches = entryDecoded && Strings::EqualsIgnoreCase(key, "Entry");
+			const bool bEntrySectionActive = bInEntriesSection;
+			const bool bEntryDecoded = bEntrySectionActive && Strings::TrySplitKeyValue(trimmedLine, '=', key, value);
+			const bool bEntryKeyMatches = bEntryDecoded && Strings::EqualsIgnoreCase(key, "Entry");
 			
-			if (!entryKeyMatches)
+			if (!bEntryKeyMatches)
 			{
 				throw Diagnostics::Error(std::format("Scene asset registry '{}' has an invalid field at line {}.", m_registryPath.string(), lineNumber));
 			}
@@ -114,7 +114,7 @@ namespace Assets
 			}
 		}
 
-		if (!foundRegistryHeader || !foundEntriesHeader)
+		if (!bFoundRegistryHeader || !bFoundEntriesHeader)
 		{
 			throw Diagnostics::Error("Scene asset registry '" + m_registryPath.string() + "' has an incomplete structure.");
 		}

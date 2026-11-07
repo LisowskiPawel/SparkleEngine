@@ -12,7 +12,7 @@
 
 namespace SparkleLauncher
 {
-	ConsoleCommandResult RecompileEditorShaders(bool generateSymbols, std::stop_token cancellation)
+	ConsoleCommandResult RecompileEditorShaders(bool bGenerateSymbols, std::stop_token cancellation)
 	{
 		const auto editorProfile = FindBuildProfile(Filesystem::GetExecutableDirectory().filename().string());
 		if (!editorProfile || editorProfile->Target != BuildProfileTarget::Editor)
@@ -33,7 +33,7 @@ namespace SparkleLauncher
 		request.LogPath = Filesystem::GetProductUserStatePaths().LogsRoot / "ShaderCompile.txt";
 		request.Cancellation = cancellation;
 		request.Arguments = {"--root", Strings::ToNarrow(root.wstring()), "--editor-profile", editorProfile->Name, "--game-profile", gameProfile->Name, "--run", "cook.shaders"};
-		if (generateSymbols)
+		if (bGenerateSymbols)
 		{
 			request.Arguments.push_back("--shader-symbols");
 		}
@@ -49,6 +49,6 @@ namespace SparkleLauncher
 			    "Shader compilation failed; see " + Strings::ToNarrow(request.LogPath.wstring()) + ".\n" + result.FailureReason + "\n"
 			    + result.CapturedOutput.substr(result.CapturedOutput.size() > 2048 ? result.CapturedOutput.size() - 2048 : 0));
 		}
-		return ConsoleCommandResult::Success(generateSymbols ? "Shaders recompiled with private symbols." : "Shaders recompiled.");
+		return ConsoleCommandResult::Success(bGenerateSymbols ? "Shaders recompiled with private symbols." : "Shaders recompiled.");
 	}
 }

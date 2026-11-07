@@ -7,13 +7,13 @@ RWTexture2D<float4> LuminanceMomentsOutput;
 
 namespace ExposureDownsample
 {
-	float2 LoadMoments(Texture2D inputTexture, uint2 pixel, bool sceneColorInput)
+	float2 LoadMoments(Texture2D inputTexture, uint2 pixel, bool bSceneColorInput)
 	{
 		const float4 sampleValue = inputTexture.Load(int3(pixel, 0));
-		return sceneColorInput ? Exposure::BuildLogLuminanceMoment(sampleValue.rgb) : sampleValue.xy;
+		return bSceneColorInput ? Exposure::BuildLogLuminanceMoment(sampleValue.rgb) : sampleValue.xy;
 	}
 
-	float2 SumMoments2x2(Texture2D inputTexture, uint2 outputPixel, bool sceneColorInput)
+	float2 SumMoments2x2(Texture2D inputTexture, uint2 outputPixel, bool bSceneColorInput)
 	{
 		uint inputWidth = 0u;
 		uint inputHeight = 0u;
@@ -29,7 +29,7 @@ namespace ExposureDownsample
 				const uint2 pixel = outputPixel * 2u + uint2(x, y);
 				if (pixel.x < inputWidth && pixel.y < inputHeight)
 				{
-					moments += LoadMoments(inputTexture, pixel, sceneColorInput);
+					moments += LoadMoments(inputTexture, pixel, bSceneColorInput);
 				}
 			}
 		}

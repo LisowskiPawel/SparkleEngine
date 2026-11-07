@@ -53,7 +53,7 @@ public:
 		lightRecord.width = importedLight.width;
 		lightRecord.height = importedLight.height;
 		lightRecord.sourceNodeIndex = importedLight.sourceNodeIndex;
-		lightRecord.flags = importedLight.visible ? 1u : 0u;
+		lightRecord.flags = importedLight.bVisible ? 1u : 0u;
 		return lightRecord;
 	}
 };
@@ -66,9 +66,9 @@ void CookedSceneLightBuilder::BuildLights(const SourceImportOutput& importOutput
 	for (std::size_t lightIndex = 0; lightIndex < importOutput.scene.lights.size(); ++lightIndex)
 	{
 		const ImportedLight& importedLight = importOutput.scene.lights[lightIndex];
-		const bool invalidLightDescription = importedLight.name.size() >= Assets::kCookedSceneLightNameCapacity || CookedLightTranslation::ToCookedLightKind(importedLight.kind) == Assets::CookedSceneLightKind::Unknown;
+		const bool bInvalidLightDescription = importedLight.name.size() >= Assets::kCookedSceneLightNameCapacity || CookedLightTranslation::ToCookedLightKind(importedLight.kind) == Assets::CookedSceneLightKind::Unknown;
 		
-		if (invalidLightDescription)
+		if (bInvalidLightDescription)
 		{
 			throw Diagnostics::Error(std::format("Imported light {} exceeds the cooked light contract.", lightIndex));
 		}

@@ -13,22 +13,22 @@
 static constexpr std::string_view kAutoShaderBackendName = "auto";
 
 static constexpr std::array<ShaderBinaryFormatDescriptor, 2> kShaderBinaryFormats = {{
-    {.Name = "Dxil", .IsAvailable = true},
-    {.Name = "SpirV", .IsAvailable = true},
+    {.Name = "Dxil", .bIsAvailable = true},
+    {.Name = "SpirV", .bIsAvailable = true},
 }};
 
 static constexpr std::array<ShaderCodegenTargetDescriptor, 11> kShaderCodegenTargets = {{
-    {.Target = ShaderTarget::DxilSm60, .BinaryFormat = "Dxil", .IsAvailable = true},
-    {.Target = ShaderTarget::DxilSm61, .BinaryFormat = "Dxil", .IsAvailable = true},
-    {.Target = ShaderTarget::DxilSm62, .BinaryFormat = "Dxil", .IsAvailable = true},
-    {.Target = ShaderTarget::DxilSm63, .BinaryFormat = "Dxil", .IsAvailable = true},
-    {.Target = ShaderTarget::DxilSm64, .BinaryFormat = "Dxil", .IsAvailable = true},
-    {.Target = ShaderTarget::DxilSm65, .BinaryFormat = "Dxil", .IsAvailable = true},
-    {.Target = ShaderTarget::DxilSm66, .BinaryFormat = "Dxil", .IsAvailable = true},
-    {.Target = ShaderTarget::DxilSm67, .BinaryFormat = "Dxil", .IsAvailable = true},
-    {.Target = ShaderTarget::SpirV14, .BinaryFormat = "SpirV", .IsAvailable = true},
-    {.Target = ShaderTarget::SpirV15, .BinaryFormat = "SpirV", .IsAvailable = true},
-    {.Target = ShaderTarget::SpirV16, .BinaryFormat = "SpirV", .IsAvailable = true},
+    {.Target = ShaderTarget::DxilSm60, .BinaryFormat = "Dxil", .bIsAvailable = true},
+    {.Target = ShaderTarget::DxilSm61, .BinaryFormat = "Dxil", .bIsAvailable = true},
+    {.Target = ShaderTarget::DxilSm62, .BinaryFormat = "Dxil", .bIsAvailable = true},
+    {.Target = ShaderTarget::DxilSm63, .BinaryFormat = "Dxil", .bIsAvailable = true},
+    {.Target = ShaderTarget::DxilSm64, .BinaryFormat = "Dxil", .bIsAvailable = true},
+    {.Target = ShaderTarget::DxilSm65, .BinaryFormat = "Dxil", .bIsAvailable = true},
+    {.Target = ShaderTarget::DxilSm66, .BinaryFormat = "Dxil", .bIsAvailable = true},
+    {.Target = ShaderTarget::DxilSm67, .BinaryFormat = "Dxil", .bIsAvailable = true},
+    {.Target = ShaderTarget::SpirV14, .BinaryFormat = "SpirV", .bIsAvailable = true},
+    {.Target = ShaderTarget::SpirV15, .BinaryFormat = "SpirV", .bIsAvailable = true},
+    {.Target = ShaderTarget::SpirV16, .BinaryFormat = "SpirV", .bIsAvailable = true},
 }};
 
 static std::string NormalizeShaderBackendName(std::string_view name)
@@ -98,7 +98,7 @@ std::vector<ShaderBackendDescriptor> ListShaderBackends()
 		descriptor.CodegenTargets = registration.Descriptor.CodegenTargets;
 		descriptor.BinaryFormats = registration.Descriptor.BinaryFormats;
 		descriptor.Capabilities = registration.Descriptor.Capabilities;
-		descriptor.IsAvailable = QueryBackendAvailability(registration.Descriptor, descriptor.UnavailableReason);
+		descriptor.bIsAvailable = QueryBackendAvailability(registration.Descriptor, descriptor.UnavailableReason);
 		descriptor.Version = registration.Descriptor.QueryVersion != nullptr ? registration.Descriptor.QueryVersion() : 0;
 
 		descriptors.push_back(descriptor);

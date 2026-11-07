@@ -26,9 +26,9 @@ namespace Filesystem::Private
 
 	std::string InferProjectNameFromExecutableStem(std::string executableStem)
 	{
-		const bool executableHasEditorSuffix = executableStem.size() > std::string_view("Editor").size() && PathFormatting::EndsWithIgnoreCase(executableStem, "Editor");
+		const bool bExecutableHasEditorSuffix = executableStem.size() > std::string_view("Editor").size() && PathFormatting::EndsWithIgnoreCase(executableStem, "Editor");
 		
-		if (executableHasEditorSuffix)
+		if (bExecutableHasEditorSuffix)
 		{
 			executableStem.resize(executableStem.size() - std::string_view("Editor").size());
 		}

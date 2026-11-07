@@ -23,10 +23,10 @@ private:
 	{
 		std::atomic_uint32_t RemainingPrerequisites{0};
 		std::atomic_uint32_t UnfinishedCount{1};
-		std::atomic_bool ParentBodyComplete{true};
-		std::atomic_bool BlockedByPrerequisite{false};
-		std::atomic_bool BlockedByParent{false};
-		std::atomic_bool Scheduled{false};
+		std::atomic_bool bParentBodyComplete{true};
+		std::atomic_bool bBlockedByPrerequisite{false};
+		std::atomic_bool bBlockedByParent{false};
+		std::atomic_bool bScheduled{false};
 	};
 
 	void InitializeTaskStates();
@@ -52,5 +52,5 @@ private:
 	std::string m_firstFailureTaskName;
 	TaskResult m_firstFailure = TaskResult::Success();
 	std::atomic_uint32_t m_settledTaskCount{0};
-	bool m_cancellationObserved = false;
+	bool m_bCancellationObserved = false;
 };

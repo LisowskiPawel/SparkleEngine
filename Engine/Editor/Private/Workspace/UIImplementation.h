@@ -36,10 +36,10 @@ public:
 	void SetViewportFinalColorTexture(UiTextureHandle texture) noexcept;
 	void SetDiagnosticsProviders(EditorDiagnosticsProviders providers);
 	void SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
-	void SetShaderCompileStatus(bool busy, std::string_view message);
+	void SetShaderCompileStatus(bool bBusy, std::string_view message);
 	RendererMemoryDiagnosticsSnapshot CaptureMemoryDiagnostics() const;
 
-	void AppendConsoleOutput(ConsoleOutputRecord record, bool showConsole);
+	void AppendConsoleOutput(ConsoleOutputRecord record, bool bShowConsole);
 
 	bool ConsumeShaderReloadRequest() noexcept;
 	ViewportOutputAction ConsumeViewportOutputAction() noexcept;
@@ -51,14 +51,14 @@ private:
 	void NewFrame();
 
 	void Build();
-	void BeginInputRouting(bool disableInteraction);
+	void BeginInputRouting(bool bDisableInteraction);
 	float BuildMainMenuBar();
-	void BuildSceneOutliner(bool disableInteraction, float mainMenuBarHeight);
-	void BuildCenterWorkspace(bool disableInteraction, float mainMenuBarHeight);
-	void BuildViewport(bool disableInteraction, float topInset, float bottomInset, float outlinerWidth, float inspectorWidth);
+	void BuildSceneOutliner(bool bDisableInteraction, float mainMenuBarHeight);
+	void BuildCenterWorkspace(bool bDisableInteraction, float mainMenuBarHeight);
+	void BuildViewport(bool bDisableInteraction, float topInset, float bottomInset, float outlinerWidth, float inspectorWidth);
 	void RegisterViewportInputRegion();
-	void BuildSceneInspector(bool disableInteraction, float mainMenuBarHeight);
-	void BuildUtilityPanels(bool disableInteraction);
+	void BuildSceneInspector(bool bDisableInteraction, float mainMenuBarHeight);
+	void BuildUtilityPanels(bool bDisableInteraction);
 	bool IsReady() const noexcept;
 
 	void InitializeImGuiContext();
@@ -108,5 +108,5 @@ private:
 	std::unique_ptr<class ImGuiRenderPacketBuilder> m_renderPacketBuilder;
 	UiRenderPacket m_renderPacket;
 	std::uint64_t m_viewportGeneration = 0;
-	bool m_shaderReloadRequested = false;
+	bool m_bShaderReloadRequested = false;
 };

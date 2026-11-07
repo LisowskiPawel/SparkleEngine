@@ -58,9 +58,9 @@ std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Update(Rend
 			return result ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.FailureReason) : TaskResult::Failure(result.FailureReason));
 		};
 
-		const bool operationStarted = m_writeOperation.Start(taskName, "A viewport capture is already being written.", std::move(operationTask), errorMessage);
+		const bool bOperationStarted = m_writeOperation.Start(taskName, "A viewport capture is already being written.", std::move(operationTask), errorMessage);
 
-		if (!operationStarted)
+		if (!bOperationStarted)
 		{
 			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture could not start: " + errorMessage};
 		}

@@ -117,16 +117,16 @@ namespace SparkleLauncher
 			}
 		}
 
-		bool hasPreservedDescendant = false;
+		bool bHasPreservedDescendant = false;
 		for (const std::filesystem::path& preservedPath : preservedPaths)
 		{
 			if (IsSameOrDescendantPath(preservedPath, path))
 			{
-				hasPreservedDescendant = true;
+				bHasPreservedDescendant = true;
 				break;
 			}
 		}
-		if (!hasPreservedDescendant)
+		if (!bHasPreservedDescendant)
 		{
 			return RemovePath(path, outErrorMessage);
 		}
@@ -155,8 +155,8 @@ namespace SparkleLauncher
 			}
 		}
 
-		const bool pathStillHasEntries = std::filesystem::directory_iterator(path, errorCode) != std::filesystem::directory_iterator();
-		if (!errorCode && !pathStillHasEntries)
+		const bool bPathStillHasEntries = std::filesystem::directory_iterator(path, errorCode) != std::filesystem::directory_iterator();
+		if (!errorCode && !bPathStillHasEntries)
 		{
 			return RemovePath(path, outErrorMessage);
 		}
@@ -196,11 +196,11 @@ namespace SparkleLauncher
 		const std::string filename = path.filename().string();
 		static constexpr std::string_view kRiderSettingsSuffix = ".DotSettings.user";
 
-		const bool isRiderSettingsFile = filename.size() >= kRiderSettingsSuffix.size()
+		const bool bIsRiderSettingsFile = filename.size() >= kRiderSettingsSuffix.size()
 		    && filename.compare(filename.size() - kRiderSettingsSuffix.size(), kRiderSettingsSuffix.size(), kRiderSettingsSuffix) == 0;
 
 		return extension == ".sln" || extension == ".slnx" || extension == ".vcxproj" || extension == ".filters" || extension == ".user" || filename == "CMakeCache.txt"
-		    || filename == "cmake_install.cmake" || filename == "Makefile" || isRiderSettingsFile;
+		    || filename == "cmake_install.cmake" || filename == "Makefile" || bIsRiderSettingsFile;
 	}
 
 	static bool RemoveRootGeneratedFiles(const std::filesystem::path& workspaceRoot, std::string& outErrorMessage)
@@ -264,7 +264,7 @@ namespace SparkleLauncher
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
 
-		if (!plan.CanRun)
+		if (!plan.bCanRun)
 		{
 			SetOperationFailure(
 			    operation,

@@ -12,10 +12,10 @@ namespace SparkleLauncher
 	static bool DirectoryHasRegularFiles(const std::filesystem::path& directory)
 	{
 		std::error_code errorCode;
-		const bool publicationComplete = !std::filesystem::exists(directory / ".publication-incomplete", errorCode) && !errorCode;
-		const bool directoryPresent = publicationComplete && std::filesystem::is_directory(directory, errorCode);
+		const bool bPublicationComplete = !std::filesystem::exists(directory / ".publication-incomplete", errorCode) && !errorCode;
+		const bool bDirectoryPresent = bPublicationComplete && std::filesystem::is_directory(directory, errorCode);
 
-		if (!directoryPresent)
+		if (!bDirectoryPresent)
 		{
 			return false;
 		}
@@ -46,14 +46,14 @@ namespace SparkleLauncher
 		std::error_code errorCode;
 
 		const bool bPublicationCompletefilesystem = !cooked.empty() && !std::filesystem::exists(cooked / ".publication-incomplete", errorCode);
-		const bool publicationComplete = bPublicationCompletefilesystem && (!errorCode);
-		const bool bPublicationLockPresentfilesystem = publicationComplete && std::filesystem::is_regular_file(cooked / ".publication-lock", errorCode);
-		const bool publicationLockPresent = bPublicationLockPresentfilesystem && (!errorCode);
-		const bool bRegistryPresentfilesystem = publicationLockPresent && std::filesystem::is_regular_file(cooked / "SceneAssetRegistry.sreg", errorCode);
-		const bool registryPresent = bRegistryPresentfilesystem && (!errorCode);
-		const bool manifestsPresent = registryPresent && DirectoryHasRegularFiles(cooked / "SceneManifests");
-		const bool meshesPresent = manifestsPresent && DirectoryHasRegularFiles(cooked / "Meshes");
-		return meshesPresent;
+		const bool bPublicationComplete = bPublicationCompletefilesystem && (!errorCode);
+		const bool bPublicationLockPresentfilesystem = bPublicationComplete && std::filesystem::is_regular_file(cooked / ".publication-lock", errorCode);
+		const bool bPublicationLockPresent = bPublicationLockPresentfilesystem && (!errorCode);
+		const bool bRegistryPresentfilesystem = bPublicationLockPresent && std::filesystem::is_regular_file(cooked / "SceneAssetRegistry.sreg", errorCode);
+		const bool bRegistryPresent = bRegistryPresentfilesystem && (!errorCode);
+		const bool bManifestsPresent = bRegistryPresent && DirectoryHasRegularFiles(cooked / "SceneManifests");
+		const bool bMeshesPresent = bManifestsPresent && DirectoryHasRegularFiles(cooked / "Meshes");
+		return bMeshesPresent;
 	}
 
 	static CookedShaderPublicationState InspectCookedShaderPublication(const std::filesystem::path& cookedShaderDirectory)
@@ -71,11 +71,11 @@ namespace SparkleLauncher
 
 		for (const auto& artifact : requiredArtifacts)
 		{
-			const bool artifactPresent = std::filesystem::is_regular_file(artifact, errorCode) && !errorCode;
-			const bool bArtifactNonemptyfilesystem = artifactPresent && std::filesystem::file_size(artifact, errorCode) != 0;
-			const bool artifactNonempty = bArtifactNonemptyfilesystem && (!errorCode);
+			const bool bArtifactPresent = std::filesystem::is_regular_file(artifact, errorCode) && !errorCode;
+			const bool bArtifactNonemptyfilesystem = bArtifactPresent && std::filesystem::file_size(artifact, errorCode) != 0;
+			const bool bArtifactNonempty = bArtifactNonemptyfilesystem && (!errorCode);
 
-			if (!artifactNonempty)
+			if (!bArtifactNonempty)
 			{
 				return CookedShaderPublicationState::Missing;
 			}
@@ -90,8 +90,8 @@ namespace SparkleLauncher
 		const auto shared = outputs.SharedCookedProjectDirectory();
 
 		return CookedContentReadiness{
-		    .MeshesReady = CookedSceneScopeIsReady(cooked) || CookedSceneScopeIsReady(shared),
-		    .TexturesReady = CookedAssetScopeHasFiles(cooked, shared, "Textures"),
+		    .bMeshesReady = CookedSceneScopeIsReady(cooked) || CookedSceneScopeIsReady(shared),
+		    .bTexturesReady = CookedAssetScopeHasFiles(cooked, shared, "Textures"),
 		    .Shaders = cooked.empty() ? CookedShaderPublicationState::Missing : InspectCookedShaderPublication(cooked / "Shaders")};
 	}
 }

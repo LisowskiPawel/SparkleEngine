@@ -40,7 +40,7 @@ struct MeshDrawGeometry final
 	GpuMeshHandle Mesh;
 	DirectX::XMFLOAT3 LocalBoundsMin = {};
 	DirectX::XMFLOAT3 LocalBoundsMax = {};
-	bool HasLocalBounds = false;
+	bool bHasLocalBounds = false;
 };
 
 struct MeshDraw

@@ -24,9 +24,9 @@ namespace RhiPipelineDescValidation
 		return false;
 	}
 
-	void Require(bool condition, const char* message)
+	void Require(bool bCondition, const char* message)
 	{
-		if (!condition)
+		if (!bCondition)
 		{
 			throw Diagnostics::Error(message);
 		}
@@ -59,7 +59,7 @@ void RhiContract::ValidateGraphicsPipelineDesc(const GraphicsPipelineDesc& desc)
 	    desc.SampleCount == 1 || desc.SampleCount == 2 || desc.SampleCount == 4 || desc.SampleCount == 8,
 	    "Graphics pipeline sample count is unsupported by the neutral RHI contract.");
 
-	RhiPipelineDescValidation::Require(desc.Depth.DepthEnable || !desc.Depth.DepthWriteEnable, "Graphics pipeline depth writes require depth testing.");
+	RhiPipelineDescValidation::Require(desc.Depth.bDepthEnable || !desc.Depth.bDepthWriteEnable, "Graphics pipeline depth writes require depth testing.");
 
 	for (std::uint32_t index = 0; index < desc.VertexInput.ElementCount; ++index)
 	{
@@ -68,14 +68,14 @@ void RhiContract::ValidateGraphicsPipelineDesc(const GraphicsPipelineDesc& desc)
 		    "Graphics pipeline vertex input references a missing binding.");
 	}
 
-	const bool hasDepthStencilFormat = desc.DepthStencilAttachmentFormat != PixelFormat::Unknown;
+	const bool bHasDepthStencilFormat = desc.DepthStencilAttachmentFormat != PixelFormat::Unknown;
 
 	RhiPipelineDescValidation::Require(
-	    (!desc.Depth.DepthEnable && !desc.Depth.DepthWriteEnable && !desc.Stencil.StencilEnable) || hasDepthStencilFormat,
+	    (!desc.Depth.bDepthEnable && !desc.Depth.bDepthWriteEnable && !desc.Stencil.bStencilEnable) || bHasDepthStencilFormat,
 	    "Graphics pipeline depth-stencil state requires an attachment format.");
 
 	RhiPipelineDescValidation::Require(
-	    !desc.Stencil.StencilEnable || PixelFormatHasStencilAspect(desc.DepthStencilAttachmentFormat),
+	    !desc.Stencil.bStencilEnable || PixelFormatHasStencilAspect(desc.DepthStencilAttachmentFormat),
 	    "Graphics pipeline stencil state requires a stencil-capable attachment format.");
 
 	for (std::uint32_t index = 0; index < desc.ColorAttachmentCount; ++index)
@@ -84,10 +84,10 @@ void RhiContract::ValidateGraphicsPipelineDesc(const GraphicsPipelineDesc& desc)
 	}
 
 	RhiPipelineDescValidation::Require(
-	    !hasDepthStencilFormat || IsDepthStencilPixelFormat(desc.DepthStencilAttachmentFormat),
+	    !bHasDepthStencilFormat || IsDepthStencilPixelFormat(desc.DepthStencilAttachmentFormat),
 	    "Graphics pipeline depth-stencil attachment format is not depth-stencil capable.");
 
-	const std::uint32_t blendTargetCount = desc.Blend.IndependentBlendEnable ? desc.ColorAttachmentCount : 1;
+	const std::uint32_t blendTargetCount = desc.Blend.bIndependentBlendEnable ? desc.ColorAttachmentCount : 1;
 	for (std::uint32_t index = 0; index < blendTargetCount; ++index)
 	{
 		RhiPipelineDescValidation::Require((desc.Blend.Targets[index].ColorWriteMask & 0xF0u) == 0, "Graphics pipeline color write mask contains unsupported bits.");
@@ -124,9 +124,9 @@ void RhiContract::ValidateRayTracingPipelineDesc(const RayTracingPipelineDesc& d
 		const bool bSharedContractMatchesInBytes = !bSharedContractMatchesstage && (shaderExport.Shader->Entry->RayPayloadSizeInBytes == desc.MaxPayloadSizeInBytes);
 		const bool bSharedContractMatchesInBytes2 = bSharedContractMatchesInBytes && (shaderExport.Shader->Entry->RayAttributeSizeInBytes == desc.MaxAttributeSizeInBytes);
 		const bool bContractMatchesRecursionDepth = bSharedContractMatchesInBytes2 && (shaderExport.Shader->Entry->MinimumRayRecursionDepth <= desc.MaxRecursionDepth);
-		const bool sharedContractMatches = bSharedContractMatchesstage || bContractMatchesRecursionDepth;
+		const bool bSharedContractMatches = bSharedContractMatchesstage || bContractMatchesRecursionDepth;
 
-		RhiPipelineDescValidation::Require(sharedContractMatches, "Ray-tracing pipeline export metadata does not match its map contract.");
+		RhiPipelineDescValidation::Require(bSharedContractMatches, "Ray-tracing pipeline export metadata does not match its map contract.");
 
 		RhiPipelineDescValidation::Require(
 		    (shaderExport.Shader->Entry->LocalRecordSizeInBytes == 0) == (shaderExport.Shader->Entry->LocalRecordSignature == 0),
@@ -169,14 +169,14 @@ void RhiContract::ValidateRayTracingShaderTableDesc(const RayTracingShaderTableD
 	RhiPipelineDescValidation::Require(desc.Pipeline != nullptr && desc.Pipeline->GetGeneration() == desc.Generation, "Ray-tracing shader table generation does not match its pipeline.");
 	RhiPipelineDescValidation::Require(desc.RayGenerationRecords.size() == 1, "Ray-tracing shader table requires exactly one ray-generation record.");
 
-	const auto validateRecords = [&desc](std::span<const RhiRayTracingShaderRecord> records, ShaderStage expectedStage, bool expectedHitGroup)
+	const auto validateRecords = [&desc](std::span<const RhiRayTracingShaderRecord> records, ShaderStage expectedStage, bool bExpectedHitGroup)
 	{
 		for (const RhiRayTracingShaderRecord& record : records)
 		{
 			RhiPipelineDescValidation::Require(!record.ExportName.empty(), "Ray-tracing shader record has no export name.");
 			const RayTracingPipeline::RecordContract* contract = desc.Pipeline->FindRecordContract(record.ExportName);
 			RhiPipelineDescValidation::Require(
-			    contract != nullptr && contract->IsHitGroup == expectedHitGroup && (expectedHitGroup || contract->Stage == expectedStage),
+			    contract != nullptr && contract->bIsHitGroup == bExpectedHitGroup && (bExpectedHitGroup || contract->Stage == expectedStage),
 			    "Ray-tracing shader record references an export from the wrong table region.");
 			RhiPipelineDescValidation::Require(
 			    record.LocalData.size() == contract->LocalRecordSizeInBytes && record.LocalRecordSignature == contract->LocalRecordSignature,
@@ -203,9 +203,9 @@ void RhiContract::ValidateTraceRaysDesc(const TraceRaysDesc& desc, ERhiQueueType
 
 	RhiPipelineDescValidation::Require(desc.Width != 0 && desc.Height != 0 && desc.Depth != 0, "TraceRays dimensions must be nonzero.");
 
-	const auto validateRegion = [](const RhiRayTracingShaderTableRegion& region, bool required)
+	const auto validateRegion = [](const RhiRayTracingShaderTableRegion& region, bool bRequired)
 	{
-		RhiPipelineDescValidation::Require(!required || (region.SizeInBytes != 0 && region.StrideInBytes != 0), "TraceRays required shader-table region is empty.");
+		RhiPipelineDescValidation::Require(!bRequired || (region.SizeInBytes != 0 && region.StrideInBytes != 0), "TraceRays required shader-table region is empty.");
 		RhiPipelineDescValidation::Require(
 		    region.SizeInBytes == 0 || (region.StrideInBytes != 0 && region.SizeInBytes % region.StrideInBytes == 0),
 		    "TraceRays shader-table region has invalid size or stride.");

@@ -114,14 +114,14 @@ bool TaskExecutor::Implementation::Runtime::TrySteal(TaskWorker& worker, ReadyTa
 
 bool TaskExecutor::Implementation::Runtime::TryTakeWork(TaskWorker& worker, ReadyTask& task)
 {
-	if (worker.PreferDispatch && TryPopDispatch(worker.Lane, task))
+	if (worker.bPreferDispatch && TryPopDispatch(worker.Lane, task))
 	{
-		worker.PreferDispatch = false;
+		worker.bPreferDispatch = false;
 		return true;
 	}
 	if (TryPopLocal(worker, task) || TryPopInjection(worker.Lane, task) || TrySteal(worker, task))
 	{
-		worker.PreferDispatch = true;
+		worker.bPreferDispatch = true;
 		return true;
 	}
 	return TryPopDispatch(worker.Lane, task);
@@ -141,8 +141,8 @@ bool TaskExecutor::Implementation::Runtime::WaitForWork(TaskWorker& worker, Read
 		}
 
 		lock.lock();
-		laneState.WakeCondition.wait(lock, [&laneState, observedWakeEpoch] { return laneState.WorkersStopping || laneState.WakeEpoch != observedWakeEpoch; });
-		if (laneState.WorkersStopping)
+		laneState.WakeCondition.wait(lock, [&laneState, observedWakeEpoch] { return laneState.bWorkersStopping || laneState.WakeEpoch != observedWakeEpoch; });
+		if (laneState.bWorkersStopping)
 		{
 			return false;
 		}
@@ -178,7 +178,7 @@ void TaskExecutor::Implementation::Runtime::RequestWorkerStop() noexcept
 	{
 		{
 			std::lock_guard lock(lane.WakeMutex);
-			lane.WorkersStopping = true;
+			lane.bWorkersStopping = true;
 			++lane.WakeEpoch;
 		}
 		lane.WakeCondition.notify_all();

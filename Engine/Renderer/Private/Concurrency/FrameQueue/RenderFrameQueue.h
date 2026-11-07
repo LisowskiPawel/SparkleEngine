@@ -57,5 +57,5 @@ private:
 	std::mutex m_mutex;
 	std::condition_variable m_reusable;
 	std::uint64_t m_nextSequenceNumber = 1;
-	bool m_closed = false;
+	bool m_bClosed = false;
 };

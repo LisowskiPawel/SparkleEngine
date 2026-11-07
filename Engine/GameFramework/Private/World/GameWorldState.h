@@ -48,7 +48,7 @@ namespace ECS
 
 		std::size_t GetEntityCount() const noexcept { return m_registry.GetLiveCount(); }
 
-		EntityId AddCamera(SceneCameraEntry&& entry, bool active = false);
+		EntityId AddCamera(SceneCameraEntry&& entry, bool bActive = false);
 		std::size_t GetCameraCount() const noexcept;
 		EntityId GetCameraEntity(std::size_t index) const noexcept;
 		bool IsCamera(EntityId entity) const noexcept;
@@ -60,7 +60,7 @@ namespace ECS
 		bool WriteCameraDesc(EntityId entity, const CameraDesc& desc) noexcept;
 		bool WriteTransform(EntityId entity, const Transform& transform) noexcept;
 		Transform ReadTransform(EntityId entity) const noexcept;
-		bool WriteVisibility(EntityId entity, bool visible) noexcept;
+		bool WriteVisibility(EntityId entity, bool bVisible) noexcept;
 		bool ReadVisibility(EntityId entity) const noexcept;
 
 		EntityId AddMesh(SceneMeshInstanceData&& instance);
@@ -125,7 +125,7 @@ namespace ECS
 		std::span<const EntityId> PrepareDirtyTransforms();
 		void CommitDirtyTransforms(std::span<const EntityId> entities);
 		void PublishPendingChanges();
-		void PublishReadView(std::span<const EntityId> changes, WorldSequence sequence, bool fullBaseline);
+		void PublishReadView(std::span<const EntityId> changes, WorldSequence sequence, bool bFullBaseline);
 		void BuildReadViewBaseline(WorldReadView::Storage& next) const;
 		void ApplyReadViewChanges(WorldReadView::Storage& next, std::span<const EntityId> changes) const;
 		void RefreshReadViewEntity(WorldReadView::Storage& next, EntityId entity) const;
@@ -155,9 +155,9 @@ namespace ECS
 		WorldSequence m_readSequence = 0;
 		std::atomic<std::shared_ptr<const WorldReadView::Storage>> m_publishedReadView;
 		std::uint64_t m_readGeneration = 0;
-		bool m_forceFullPublication = true;
-		bool m_evaluateAllTransforms = false;
-		bool m_changesOverflowed = false;
+		bool m_bForceFullPublication = true;
+		bool m_bEvaluateAllTransforms = false;
+		bool m_bChangesOverflowed = false;
 		EntityId m_activeCamera;
 		std::uint64_t m_nextCameraIdentity = 0;
 		std::uint64_t m_nextLightIdentity = 0;

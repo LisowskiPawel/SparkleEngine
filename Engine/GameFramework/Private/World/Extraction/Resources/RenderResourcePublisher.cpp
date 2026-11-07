@@ -13,7 +13,7 @@ namespace ECS
 		m_textureRevision = 0;
 		m_skyTexturePath.reset();
 		m_sky.reset();
-		m_skyPublished = false;
+		m_bSkyPublished = false;
 	}
 
 	void RenderResourcePublisher::Publish(
@@ -35,11 +35,11 @@ namespace ECS
 
 	void RenderResourcePublisher::PublishInstanceGroups(std::span<const SceneMeshInstanceGroupData> instanceGroups, RenderSceneDelta& delta) const
 	{
-		if (!delta.ResetScene)
+		if (!delta.bResetScene)
 		{
 			return;
 		}
-		delta.InstanceGroups.Published = true;
+		delta.InstanceGroups.bPublished = true;
 		delta.InstanceGroups.Values.reserve(instanceGroups.size());
 		for (const SceneMeshInstanceGroupData& group : instanceGroups)
 		{
@@ -49,27 +49,27 @@ namespace ECS
 
 	void RenderResourcePublisher::PublishSky(const std::optional<SceneSkyDesc>& sky, RenderSceneDelta& delta)
 	{
-		if (!delta.ResetScene && m_skyPublished && HasSameSky(sky, m_sky))
+		if (!delta.bResetScene && m_bSkyPublished && HasSameSky(sky, m_sky))
 		{
 			return;
 		}
-		delta.Sky.Published = true;
+		delta.Sky.bPublished = true;
 		delta.Sky.Value = sky;
 		m_sky = sky;
-		m_skyPublished = true;
+		m_bSkyPublished = true;
 	}
 
 	void RenderResourcePublisher::PublishChangedTables(GameWorldResourceStores& resources, const std::optional<std::filesystem::path>& skyTexturePath, RenderSceneDelta& delta)
 	{
 		const std::uint64_t materialRevision = resources.Materials.GetContentRevision();
-		if (delta.ResetScene || materialRevision != m_materialRevision)
+		if (delta.bResetScene || materialRevision != m_materialRevision)
 		{
 			delta.Materials = resources.Materials.CaptureRenderTable();
 			m_materialRevision = materialRevision;
 		}
 
 		const std::uint64_t textureRevision = resources.Textures.GetContentRevision();
-		if (delta.ResetScene || textureRevision != m_textureRevision || skyTexturePath != m_skyTexturePath)
+		if (delta.bResetScene || textureRevision != m_textureRevision || skyTexturePath != m_skyTexturePath)
 		{
 			if (skyTexturePath)
 			{
@@ -95,7 +95,7 @@ namespace ECS
 			return true;
 		}
 
-		return left->enabled == right->enabled && left->color.x == right->color.x && left->color.y == right->color.y && left->color.z == right->color.z && left->brightness == right->brightness
+		return left->bEnabled == right->bEnabled && left->color.x == right->color.x && left->color.y == right->color.y && left->color.z == right->color.z && left->brightness == right->brightness
 		    && left->skyTexture.texturePath == right->skyTexture.texturePath && left->skyTexture.textureGroup == right->skyTexture.textureGroup;
 	}
 }

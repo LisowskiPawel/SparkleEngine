@@ -25,9 +25,9 @@ static void ValidateTargets(std::span<const ShaderTarget> targets)
 	}
 	for (std::size_t targetIndex = 0; targetIndex < targets.size(); ++targetIndex)
 	{
-		const bool invalidOrDuplicateTarget = !IsShaderTarget(targets[targetIndex]) || std::find(targets.begin(), targets.begin() + targetIndex, targets[targetIndex]) != targets.begin() + targetIndex;
+		const bool bInvalidOrDuplicateTarget = !IsShaderTarget(targets[targetIndex]) || std::find(targets.begin(), targets.begin() + targetIndex, targets[targetIndex]) != targets.begin() + targetIndex;
 		
-		if (invalidOrDuplicateTarget)
+		if (bInvalidOrDuplicateTarget)
 		{
 			throw Diagnostics::Error("Shader cooking received an invalid or duplicate target.");
 		}
@@ -120,7 +120,7 @@ static void BuildDependencyManifest(ShaderCookPipelinePlan& plan)
 		    job.Request.ShaderType,
 		    ShaderDependencyRecord{.ShaderType = job.Request.ShaderType, .ShaderTypeName = job.Request.ShaderTypeName, .VirtualSourcePath = job.Request.VirtualSourcePath});
 
-		if (!inserted && (record->second.ShaderTypeName != job.Request.ShaderTypeName || record->second.VirtualSourcePath != job.Request.VirtualSourcePath))
+		if (!bInserted && (record->second.ShaderTypeName != job.Request.ShaderTypeName || record->second.VirtualSourcePath != job.Request.VirtualSourcePath))
 		{
 			throw Diagnostics::Error(std::format("Shader type '{}' produced conflicting dependency identities.", job.Request.ShaderTypeName));
 		}

@@ -39,12 +39,12 @@ public:
 
 	void EndPresentRenderPass() noexcept override
 	{
-		if (!m_rendering)
+		if (!m_bRendering)
 		{
 			Fail("Present rendering ended without a matching begin.");
 		}
 		m_implementation.EndPresentRenderPass();
-		m_rendering = false;
+		m_bRendering = false;
 	}
 
 	PixelFormat GetPresentColorFormat() const noexcept override { return m_implementation.GetPresentColorFormat(); }
@@ -52,11 +52,11 @@ public:
 private:
 	void Begin() noexcept
 	{
-		if (m_rendering)
+		if (m_bRendering)
 		{
 			Fail("Present rendering began while another present render pass was active.");
 		}
-		m_rendering = true;
+		m_bRendering = true;
 	}
 
 	[[noreturn]] static void Fail(const char* message) noexcept
@@ -66,5 +66,5 @@ private:
 	}
 
 	Implementation m_implementation;
-	bool m_rendering = false;
+	bool m_bRendering = false;
 };

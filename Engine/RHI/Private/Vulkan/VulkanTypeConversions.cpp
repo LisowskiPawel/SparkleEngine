@@ -357,11 +357,11 @@ VkBufferCreateInfo VulkanTypeConversions::BuildBufferCreateInfo(const RhiBufferR
 		default:
 			Diagnostics::Fatal(g_vulkanTypeConversionsLogger, __FILE__, __LINE__, "Unsupported Vulkan buffer kind.");
 	}
-	if (desc.AllowUnorderedAccess)
+	if (desc.bAllowUnorderedAccess)
 	{
 		usage |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 	}
-	if (desc.AllowRayTracingBuildInput)
+	if (desc.bAllowRayTracingBuildInput)
 	{
 		usage |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
 	}
@@ -380,15 +380,15 @@ VkBufferCreateInfo VulkanTypeConversions::BuildBufferCreateInfo(const RhiBufferR
 VkImageCreateInfo VulkanTypeConversions::BuildTextureCreateInfo(const RhiTextureResourceDesc& desc, VkImageUsageFlags extraUsage) noexcept
 {
 	VkImageUsageFlags usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | extraUsage;
-	if (desc.AllowRenderTarget)
+	if (desc.bAllowRenderTarget)
 	{
 		usage |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 	}
-	if (desc.AllowDepthStencil)
+	if (desc.bAllowDepthStencil)
 	{
 		usage |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 	}
-	if (desc.AllowUnorderedAccess)
+	if (desc.bAllowUnorderedAccess)
 	{
 		usage |= VK_IMAGE_USAGE_STORAGE_BIT;
 	}
@@ -433,7 +433,7 @@ void VulkanTypeConversions::ConfigurePtlasInput(const RhiPtlasDesc& desc, VkPart
 	flags = VkPartitionedAccelerationStructureFlagsNV{
 	    .sType = VK_STRUCTURE_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_FLAGS_NV,
 	    .pNext = nullptr,
-	    .enablePartitionTranslation = desc.AllowPartitionTranslation ? VK_TRUE : VK_FALSE};
+	    .enablePartitionTranslation = desc.bAllowPartitionTranslation ? VK_TRUE : VK_FALSE};
 
 	input = VkPartitionedAccelerationStructureInstancesInputNV{
 	    .sType = VK_STRUCTURE_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_INSTANCES_INPUT_NV,

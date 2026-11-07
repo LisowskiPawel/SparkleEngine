@@ -12,9 +12,9 @@ static bool DrawTitleBarButton(const char* id, const ImVec2& size, const ImVec4&
 	ImGui::PushStyleColor(ImGuiCol_Button, baseColor);
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hoveredColor);
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, activeColor);
-	const bool pressed = ImGui::Button(id, size);
+	const bool bPressed = ImGui::Button(id, size);
 	ImGui::PopStyleColor(3);
-	return pressed;
+	return bPressed;
 }
 
 static void DrawMinimizeIcon() noexcept
@@ -94,14 +94,14 @@ void DrawTitleBarWindowControls(Window* window) noexcept
 
 	ImGui::SameLine(0.0f, style.ItemSpacing.x);
 
-	const bool minimizeRequested = DrawTitleBarButton(
+	const bool bMinimizeRequested = DrawTitleBarButton(
 	    "##MinimizeWindow",
 	    ImVec2(buttonWidth, buttonHeight),
 	    SparkleUiPalette::TitleBarControlBackground(),
 	    SparkleUiPalette::TitleBarControlBackgroundHovered(),
 	    SparkleUiPalette::TitleBarControlBackgroundActive());
 
-	if (minimizeRequested)
+	if (bMinimizeRequested)
 	{
 		window->Minimize();
 	}
@@ -109,14 +109,14 @@ void DrawTitleBarWindowControls(Window* window) noexcept
 
 	ImGui::SameLine(0.0f, style.ItemSpacing.x);
 
-	const bool maximizeRequested = DrawTitleBarButton(
+	const bool bMaximizeRequested = DrawTitleBarButton(
 	    "##ToggleMaximizeWindow",
 	    ImVec2(buttonWidth, buttonHeight),
 	    SparkleUiPalette::TitleBarControlBackground(),
 	    SparkleUiPalette::TitleBarControlBackgroundHovered(),
 	    SparkleUiPalette::TitleBarControlBackgroundActive());
 
-	if (maximizeRequested)
+	if (bMaximizeRequested)
 	{
 		window->ToggleMaximizeRestore();
 	}
@@ -124,14 +124,14 @@ void DrawTitleBarWindowControls(Window* window) noexcept
 
 	ImGui::SameLine(0.0f, style.ItemSpacing.x);
 
-	const bool closeRequested = DrawTitleBarButton(
+	const bool bCloseRequested = DrawTitleBarButton(
 	    "##CloseWindow",
 	    ImVec2(buttonWidth, buttonHeight),
 	    SparkleUiPalette::DangerBackground(),
 	    SparkleUiPalette::DangerBackgroundHovered(),
 	    SparkleUiPalette::DangerBackgroundActive());
 
-	if (closeRequested)
+	if (bCloseRequested)
 	{
 		window->RequestClose();
 	}

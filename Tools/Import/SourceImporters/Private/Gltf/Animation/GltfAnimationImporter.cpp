@@ -99,9 +99,9 @@ namespace GltfAnimationImporter
 		const ImportedAnimationTargetPath targetPath = ToImportedTargetPath(channel.target_path);
 		const std::uint32_t samplerIndex = FindSamplerIndex(animation, channel.sampler);
 		const bool bInvalidAnimationChannelsamplers = targetPath == ImportedAnimationTargetPath::Unknown || samplerIndex >= clip.samplers.size();
-		const bool invalidAnimationChannel = bInvalidAnimationChannelsamplers || (channel.target_node == nullptr);
+		const bool bInvalidAnimationChannel = bInvalidAnimationChannelsamplers || (channel.target_node == nullptr);
 		
-		if (invalidAnimationChannel)
+		if (bInvalidAnimationChannel)
 		{
 			throw Diagnostics::Error(std::format("glTF animation channel {} has an invalid target or sampler.", channelIndex));
 		}
@@ -134,13 +134,13 @@ namespace GltfAnimationImporter
 		}
 		clip.targetSkeletonIndex = targetSkeletonIndex;
 
-		const bool duplicateAnimationChannel = std::any_of(
+		const bool bDuplicateAnimationChannel = std::any_of(
 				        clip.channels.begin(),
 				        clip.channels.end(),
 				        [targetPath, targetNodeIndex](const ImportedAnimationChannel& importedChannel)
 				        { return importedChannel.targetPath == targetPath && importedChannel.targetNodeIndex == targetNodeIndex; });
 		
-		if (duplicateAnimationChannel)
+		if (bDuplicateAnimationChannel)
 		{
 			throw Diagnostics::Error(std::format("glTF animation channel {} duplicates an existing target path.", channelIndex));
 		}

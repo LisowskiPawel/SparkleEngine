@@ -143,10 +143,10 @@ namespace SparkleLauncher
 			}
 			case CookOperationKind::CookShaders:
 				AddPlannedEffect(plan, "Shader backend: " + plan.Request.ShaderBackend + ".");
-				AddPlannedEffect(plan, std::string("Shader debug info: ") + (plan.Request.ShaderEnableDebugInfo ? "enabled." : "disabled."));
-				AddPlannedEffect(plan, std::string("Shader optimizations: ") + (plan.Request.ShaderEnableOptimizations ? "enabled." : "disabled."));
-				AddPlannedEffect(plan, std::string("Warnings as errors: ") + (plan.Request.ShaderWarningsAsErrors ? "enabled." : "disabled."));
-				AddPlannedEffect(plan, std::string("Strip debug info: ") + (plan.Request.ShaderStripDebugInfo ? "enabled." : "disabled."));
+				AddPlannedEffect(plan, std::string("Shader debug info: ") + (plan.Request.bShaderEnableDebugInfo ? "enabled." : "disabled."));
+				AddPlannedEffect(plan, std::string("Shader optimizations: ") + (plan.Request.bShaderEnableOptimizations ? "enabled." : "disabled."));
+				AddPlannedEffect(plan, std::string("Warnings as errors: ") + (plan.Request.bShaderWarningsAsErrors ? "enabled." : "disabled."));
+				AddPlannedEffect(plan, std::string("Strip debug info: ") + (plan.Request.bShaderStripDebugInfo ? "enabled." : "disabled."));
 				AddPlannedEffect(plan, "Cook the global shader map and code library for the DXIL and SPIR-V targets.");
 				return;
 			case CookOperationKind::BuildTextures:
@@ -157,8 +157,8 @@ namespace SparkleLauncher
 				return;
 			case CookOperationKind::CookAllAssets:
 				AddPlannedEffect(plan, "Shader phase backend: " + plan.Request.ShaderBackend + ".");
-				AddPlannedEffect(plan, std::string("Shader phase debug info: ") + (plan.Request.ShaderEnableDebugInfo ? "enabled." : "disabled."));
-				AddPlannedEffect(plan, std::string("Shader phase optimizations: ") + (plan.Request.ShaderEnableOptimizations ? "enabled." : "disabled."));
+				AddPlannedEffect(plan, std::string("Shader phase debug info: ") + (plan.Request.bShaderEnableDebugInfo ? "enabled." : "disabled."));
+				AddPlannedEffect(plan, std::string("Shader phase optimizations: ") + (plan.Request.bShaderEnableOptimizations ? "enabled." : "disabled."));
 				AddPlannedEffect(plan, "Cook all selected level assets.");
 				return;
 		}
@@ -172,9 +172,9 @@ namespace SparkleLauncher
 			CookOperationStep step;
 			step.Id = processStep.Id;
 			step.DisplayName = processStep.DisplayName;
-			step.Destructive = processStep.DeletesCookedOutputs;
+			step.bDestructive = processStep.bDeletesCookedOutputs;
 			step.DestructivePath = processStep.DestructivePath;
-			if (processStep.HasProcessRequest)
+			if (processStep.bHasProcessRequest)
 			{
 				step.DisplayCommandLine = BuildDisplayCommandLine(processStep.Request.ExecutablePath, processStep.Request.Arguments);
 				step.LogPath = processStep.Request.LogPath;
@@ -305,7 +305,7 @@ namespace SparkleLauncher
 			return true;
 #endif
 		}
-		bool supported = true;
+		bool bSupported = true;
 #if !SPARKLE_ENABLE_SHADER_COMPILER
 		if (IncludesCookScope(plan, CookWorkspaceScope::Shaders))
 		{
@@ -320,19 +320,19 @@ namespace SparkleLauncher
 			AddReadiness(plan, "Content pipeline tools are disabled in this workspace configuration.");
 		}
 #endif
-		return supported;
+		return bSupported;
 	}
 
 	static bool CheckRequiredCookTools(CookOperationPlan& plan)
 	{
-		bool requiredCookToolsAvailable = true;
+		bool bRequiredCookToolsAvailable = true;
 		for (const std::filesystem::path& toolPath : plan.RequiredToolPaths)
 		{
 			std::error_code errorCode;
-			const bool toolExists = std::filesystem::exists(toolPath, errorCode);
-			if (!toolExists || errorCode)
+			const bool bToolExists = std::filesystem::exists(toolPath, errorCode);
+			if (!bToolExists || errorCode)
 			{
-				requiredCookToolsAvailable = false;
+				bRequiredCookToolsAvailable = false;
 				AddReadiness(plan, "Cook tool is missing; sync products or build cooking tools: " + toolPath.string());
 				continue;
 			}
@@ -343,7 +343,7 @@ namespace SparkleLauncher
 				continue;
 			}
 
-			requiredCookToolsAvailable = false;
+			bRequiredCookToolsAvailable = false;
 			std::vector<std::string_view> missingSupportEntryViews;
 			missingSupportEntryViews.reserve(missingSupportEntries.size());
 			for (const std::string& supportEntry : missingSupportEntries)
@@ -356,7 +356,7 @@ namespace SparkleLauncher
 			    "Cook tool runtime support bundle is incomplete beside " + toolPath.filename().string()
 			        + "; sync the complete product bundle or rebuild cooking tools: " + Strings::Join(missingSupportEntryViews, ", "));
 		}
-		return requiredCookToolsAvailable;
+		return bRequiredCookToolsAvailable;
 	}
 
 	static void NormalizeCookScopes(CookOperationPlan& plan)
@@ -388,13 +388,13 @@ namespace SparkleLauncher
 		if (request.Mode == CookMode::Force)
 		{
 			plan.Operation.DestructiveScope = OperationDestructiveScope::CookedOutputs;
-			plan.Operation.RequiresConfirmation = true;
+			plan.Operation.bRequiresConfirmation = true;
 		}
 	}
 
 	static bool CheckCookConfirmation(CookOperationPlan& plan)
 	{
-		if (plan.Request.Mode != CookMode::Force || plan.Request.ForceRecookConfirmed)
+		if (plan.Request.Mode != CookMode::Force || plan.Request.bForceRecookConfirmed)
 		{
 			return true;
 		}
@@ -442,23 +442,23 @@ namespace SparkleLauncher
 		RecordCookInputs(plan);
 		ResolveRequiredCookTools(plan);
 
-		const bool contentAvailable = !request.ContentId.empty();
-		if (!contentAvailable)
+		const bool bContentAvailable = !request.ContentId.empty();
+		if (!bContentAvailable)
 		{
 			AddReadiness(plan, "Workspace content is unavailable for cooking.");
 		}
-		const bool scopesSupported = ValidateCookScopes(plan);
-		const bool toolsAvailable = CheckRequiredCookTools(plan);
-		const bool confirmed = CheckCookConfirmation(plan);
+		const bool bScopesSupported = ValidateCookScopes(plan);
+		const bool bToolsAvailable = CheckRequiredCookTools(plan);
+		const bool bConfirmed = CheckCookConfirmation(plan);
 		PopulateCookEffects(plan);
 
-		const bool bInputsReadyscopesSupported = contentAvailable && scopesSupported;
-		const bool inputsReady = bInputsReadyscopesSupported && (toolsAvailable);
-		if (inputsReady)
+		const bool bInputsReadyscopesSupported = bContentAvailable && bScopesSupported;
+		const bool bInputsReady = bInputsReadyscopesSupported && (bToolsAvailable);
+		if (bInputsReady)
 		{
 			PopulateCookSteps(plan);
 		}
-		plan.CanRun = inputsReady && confirmed;
+		plan.bCanRun = bInputsReady && bConfirmed;
 		DescribeCookDryRun(plan, definition->DisplayName);
 		return plan;
 	}

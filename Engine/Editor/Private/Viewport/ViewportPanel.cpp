@@ -106,7 +106,7 @@ ViewportOutputAction ViewportPanel::ConsumeOutputAction() noexcept
 
 bool ViewportPanel::GetInputBounds(float& left, float& top, float& right, float& bottom) const noexcept
 {
-	if (!m_hasInputBounds)
+	if (!m_bHasInputBounds)
 	{
 		return false;
 	}
@@ -150,7 +150,7 @@ void ViewportPanel::SetOverlay(std::unique_ptr<ViewportOverlay> overlay) noexcep
 	m_overlay = std::move(overlay);
 }
 
-void ViewportPanel::BuildOverlay(EditorIconService& icons, bool disableInteraction) noexcept
+void ViewportPanel::BuildOverlay(EditorIconService& icons, bool bDisableInteraction) noexcept
 {
 	if (!m_overlay)
 	{
@@ -160,21 +160,21 @@ void ViewportPanel::BuildOverlay(EditorIconService& icons, bool disableInteracti
 	const ImVec2 origin = ImGui::GetWindowPos();
 	const float width = m_overlay->MeasureWidth();
 	ImGui::SetCursorScreenPos(ImVec2(origin.x + (std::max) (margin, ImGui::GetWindowWidth() - width - margin), origin.y + margin));
-	m_overlay->Draw(icons, disableInteraction);
+	m_overlay->Draw(icons, bDisableInteraction);
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 	{
-		m_hasInputBounds = false;
+		m_bHasInputBounds = false;
 	}
 }
 
-void ViewportPanel::BuildUI(EditorIconService& icons, bool disableInteraction)
+void ViewportPanel::BuildUI(EditorIconService& icons, bool bDisableInteraction)
 {
 	BeginViewportWindow();
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	BeginViewportSurface();
 	BuildViewportImage();
 	BuildProgressOverlay();
-	BuildOverlay(icons, disableInteraction);
+	BuildOverlay(icons, bDisableInteraction);
 	ImGui::EndChild();
 	ImGui::EndDisabled();
 	ImGui::End();
@@ -196,7 +196,7 @@ void ViewportPanel::BeginViewportWindow() const
 
 void ViewportPanel::BeginViewportSurface()
 {
-	m_hasInputBounds = false;
+	m_bHasInputBounds = false;
 	const float surfaceRegionHeight = (std::max) (MinimumViewportExtent, ImGui::GetContentRegionAvail().y);
 	ImGui::BeginChild("##ViewportSurface", ImVec2(0.0f, surfaceRegionHeight), ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	const ImVec2 viewportMin = ImGui::GetWindowPos();
@@ -204,7 +204,7 @@ void ViewportPanel::BeginViewportSurface()
 	m_inputTop = viewportMin.y;
 	m_inputRight = viewportMin.x + ImGui::GetWindowWidth();
 	m_inputBottom = viewportMin.y + ImGui::GetWindowHeight();
-	m_hasInputBounds = m_inputRight > m_inputLeft && m_inputBottom > m_inputTop;
+	m_bHasInputBounds = m_inputRight > m_inputLeft && m_inputBottom > m_inputTop;
 }
 
 void ViewportPanel::BuildViewportImage()

@@ -25,33 +25,33 @@ public:
 
 		{
 			std::lock_guard lock(s_mutex);
-			if (s_initialized)
+			if (s_bInitialized)
 			{
 				return true;
 			}
-			if (s_initializing || s_shuttingDown)
+			if (s_bInitializing || s_bShuttingDown)
 			{
 				return false;
 			}
-			s_initializing = true;
+			s_bInitializing = true;
 		}
 
 		sl::Preferences preferences{};
 		FillPreferences(preferences);
-		const bool initialized = slInit(preferences, sl::kSDKVersion) == sl::Result::eOk;
+		const bool bInitialized = slInit(preferences, sl::kSDKVersion) == sl::Result::eOk;
 		{
 			std::lock_guard lock(s_mutex);
-			s_initializing = false;
-			s_initialized = initialized;
+			s_bInitializing = false;
+			s_bInitialized = bInitialized;
 		}
 		s_idle.notify_all();
-		return initialized;
+		return bInitialized;
 	}
 
 	static RhiInterposerHooks GetInterposerHooks() noexcept
 	{
 		std::lock_guard lock(s_mutex);
-		if (!s_initialized || s_shuttingDown)
+		if (!s_bInitialized || s_bShuttingDown)
 		{
 			return {};
 		}
@@ -67,25 +67,25 @@ public:
 
 	static void Shutdown() noexcept
 	{
-		bool initialized = false;
+		bool bInitialized = false;
 		{
 			std::unique_lock lock(s_mutex);
-			s_shuttingDown = true;
-			s_idle.wait(lock, [] { return s_activeCalls == 0 && !s_initializing; });
-			initialized = s_initialized;
+			s_bShuttingDown = true;
+			s_idle.wait(lock, [] { return s_activeCalls == 0 && !s_bInitializing; });
+			bInitialized = s_bInitialized;
 		}
-		if (initialized)
+		if (bInitialized)
 		{
 			(void) slShutdown();
 		}
 		{
 			std::lock_guard lock(s_mutex);
-			s_initialized = false;
-			s_deviceBound = false;
-			s_presentationReady = false;
-			s_pclSupported = false;
-			s_reflexSupported = false;
-			s_shuttingDown = false;
+			s_bInitialized = false;
+			s_bDeviceBound = false;
+			s_bPresentationReady = false;
+			s_bPclSupported = false;
+			s_bReflexSupported = false;
+			s_bShuttingDown = false;
 		}
 	}
 
@@ -126,16 +126,16 @@ private:
 		explicit CallLease(CallRequirement requirement) noexcept
 		{
 			std::lock_guard lock(s_mutex);
-			if (!s_shuttingDown && MeetsRequirement(requirement))
+			if (!s_bShuttingDown && MeetsRequirement(requirement))
 			{
 				++s_activeCalls;
-				m_acquired = true;
+				m_bAcquired = true;
 			}
 		}
 
 		~CallLease() noexcept
 		{
-			if (!m_acquired)
+			if (!m_bAcquired)
 			{
 				return;
 			}
@@ -146,15 +146,15 @@ private:
 			s_idle.notify_all();
 		}
 
-		explicit operator bool() const noexcept { return m_acquired; }
+		explicit operator bool() const noexcept { return m_bAcquired; }
 
 	private:
-		bool m_acquired = false;
+		bool m_bAcquired = false;
 	};
 
 	static bool MeetsRequirement(CallRequirement requirement) noexcept
 	{
-		if (!s_initialized)
+		if (!s_bInitialized)
 		{
 			return false;
 		}
@@ -162,11 +162,11 @@ private:
 		{
 			return true;
 		}
-		if (!s_deviceBound)
+		if (!s_bDeviceBound)
 		{
 			return false;
 		}
-		return requirement == CallRequirement::DeviceBound || s_presentationReady;
+		return requirement == CallRequirement::DeviceBound || s_bPresentationReady;
 	}
 
 	static bool SetNativeDevice(NativeGraphicsDeviceHandle nativeDevice, const RhiAdapterIdentity& adapter, void*) noexcept
@@ -177,29 +177,29 @@ private:
 			return false;
 		}
 
-		const bool deviceBound = slSetD3DDevice(nativeDevice.Value) == sl::Result::eOk;
-		bool pclSupported = false;
-		bool reflexSupported = false;
-		if (deviceBound && HasAdapterLuid(adapter))
+		const bool bDeviceBound = slSetD3DDevice(nativeDevice.Value) == sl::Result::eOk;
+		bool bPclSupported = false;
+		bool bReflexSupported = false;
+		if (bDeviceBound && HasAdapterLuid(adapter))
 		{
 			auto adapterLuid = adapter.NativeLuid;
 			sl::AdapterInfo adapterInfo{};
 			adapterInfo.deviceLUID = adapterLuid.data();
 			adapterInfo.deviceLUIDSizeInBytes = adapter.NativeLuidSizeInBytes;
-			pclSupported = slIsFeatureSupported(sl::kFeaturePCL, adapterInfo) == sl::Result::eOk;
-			reflexSupported = slIsFeatureSupported(sl::kFeatureReflex, adapterInfo) == sl::Result::eOk;
-			if (reflexSupported && slReflexSetOptions(sl::ReflexOptions{}) != sl::Result::eOk)
+			bPclSupported = slIsFeatureSupported(sl::kFeaturePCL, adapterInfo) == sl::Result::eOk;
+			bReflexSupported = slIsFeatureSupported(sl::kFeatureReflex, adapterInfo) == sl::Result::eOk;
+			if (bReflexSupported && slReflexSetOptions(sl::ReflexOptions{}) != sl::Result::eOk)
 			{
 				Diagnostics::Fatal(g_streamlineRuntimeLogger, __FILE__, __LINE__, "Streamline Reflex rejected its initial latency configuration.");
 			}
 		}
 		{
 			std::lock_guard lock(s_mutex);
-			s_deviceBound = deviceBound;
-			s_pclSupported = pclSupported;
-			s_reflexSupported = reflexSupported;
+			s_bDeviceBound = bDeviceBound;
+			s_bPclSupported = bPclSupported;
+			s_bReflexSupported = bReflexSupported;
 		}
-		return deviceBound;
+		return bDeviceBound;
 	}
 
 	static bool UpgradeInterface(ERhiInterposerInterfaceKind, void** nativeInterface, void*) noexcept
@@ -214,12 +214,12 @@ private:
 		return call && externalInterface != nullptr && nativeInterface != nullptr && slGetNativeInterface(externalInterface, nativeInterface) == sl::Result::eOk;
 	}
 
-	static void SetPresentationReady(bool ready, void*) noexcept
+	static void SetPresentationReady(bool bReady, void*) noexcept
 	{
 		std::lock_guard lock(s_mutex);
-		const bool bRuntimeActive = !s_shuttingDown && s_initialized;
-		const bool bDeviceReady = bRuntimeActive && s_deviceBound;
-		s_presentationReady = bDeviceReady && ready;
+		const bool bRuntimeActive = !s_bShuttingDown && s_bInitialized;
+		const bool bDeviceReady = bRuntimeActive && s_bDeviceBound;
+		s_bPresentationReady = bDeviceReady && bReady;
 	}
 
 	static sl::PCLMarker ToPclMarker(ERhiFrameLatencyMarker marker) noexcept
@@ -245,7 +245,7 @@ private:
 	static void SetFrameMarker(ERhiFrameLatencyMarker marker, std::uint64_t frameId, void*) noexcept
 	{
 		CallLease call(CallRequirement::RuntimeReady);
-		if (!call || !s_pclSupported)
+		if (!call || !s_bPclSupported)
 		{
 			return;
 		}
@@ -256,7 +256,7 @@ private:
 		{
 			Diagnostics::Fatal(g_streamlineRuntimeLogger, __FILE__, __LINE__, "Streamline could not resolve the logical frame token.");
 		}
-		if (marker == ERhiFrameLatencyMarker::SimulationStart && s_reflexSupported && slReflexSleep(*frameToken) != sl::Result::eOk)
+		if (marker == ERhiFrameLatencyMarker::SimulationStart && s_bReflexSupported && slReflexSleep(*frameToken) != sl::Result::eOk)
 		{
 			Diagnostics::Fatal(g_streamlineRuntimeLogger, __FILE__, __LINE__, "Streamline Reflex sleep failed for the active frame.");
 		}
@@ -289,35 +289,35 @@ private:
 	{
 		const RhiExternalFeatureInteropCapabilities& interop = capabilities.ExternalFeatureInterop;
 
-		const bool bCommonInteropGraphicsQueue = interop.ExposesNativeDevice && interop.ExposesNativeGraphicsQueue;
-		const bool bCommonInteropCommandList = bCommonInteropGraphicsQueue && (interop.ExposesNativeGraphicsCommandList);
-		const bool bCommonInteropNativeResources = bCommonInteropCommandList && (interop.ExposesNativeResources);
-		const bool commonInterop = bCommonInteropNativeResources && (interop.SupportsExternalProviderEvaluation);
+		const bool bCommonInteropGraphicsQueue = interop.bExposesNativeDevice && interop.bExposesNativeGraphicsQueue;
+		const bool bCommonInteropCommandList = bCommonInteropGraphicsQueue && (interop.bExposesNativeGraphicsCommandList);
+		const bool bCommonInteropNativeResources = bCommonInteropCommandList && (interop.bExposesNativeResources);
+		const bool bCommonInterop = bCommonInteropNativeResources && (interop.bSupportsExternalProviderEvaluation);
 
-		return capabilities.BackendApi == ERhiBackendApi::D3D12 && commonInterop && nativeInterop && HasAdapterLuid(interop.Adapter);
+		return capabilities.BackendApi == ERhiBackendApi::D3D12 && bCommonInterop && nativeInterop && HasAdapterLuid(interop.Adapter);
 	}
 
 	static std::mutex s_mutex;
 	static std::condition_variable s_idle;
-	static bool s_initialized;
-	static bool s_deviceBound;
-	static bool s_presentationReady;
-	static bool s_pclSupported;
-	static bool s_reflexSupported;
-	static bool s_initializing;
-	static bool s_shuttingDown;
+	static bool s_bInitialized;
+	static bool s_bDeviceBound;
+	static bool s_bPresentationReady;
+	static bool s_bPclSupported;
+	static bool s_bReflexSupported;
+	static bool s_bInitializing;
+	static bool s_bShuttingDown;
 	static std::uint32_t s_activeCalls;
 };
 
 std::mutex StreamlineRuntime::s_mutex;
 std::condition_variable StreamlineRuntime::s_idle;
-bool StreamlineRuntime::s_initialized = false;
-bool StreamlineRuntime::s_deviceBound = false;
-bool StreamlineRuntime::s_presentationReady = false;
-bool StreamlineRuntime::s_pclSupported = false;
-bool StreamlineRuntime::s_reflexSupported = false;
-bool StreamlineRuntime::s_initializing = false;
-bool StreamlineRuntime::s_shuttingDown = false;
+bool StreamlineRuntime::s_bInitialized = false;
+bool StreamlineRuntime::s_bDeviceBound = false;
+bool StreamlineRuntime::s_bPresentationReady = false;
+bool StreamlineRuntime::s_bPclSupported = false;
+bool StreamlineRuntime::s_bReflexSupported = false;
+bool StreamlineRuntime::s_bInitializing = false;
+bool StreamlineRuntime::s_bShuttingDown = false;
 std::uint32_t StreamlineRuntime::s_activeCalls = 0;
 #endif
 

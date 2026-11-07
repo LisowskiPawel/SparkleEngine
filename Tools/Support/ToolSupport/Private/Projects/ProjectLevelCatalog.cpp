@@ -42,12 +42,12 @@ bool ProjectLevelCatalog::IsAssetPackSourceReady(std::string_view packId) const
 bool ProjectLevelCatalog::HasLevelSourceInputs(const ProjectLevelCatalogEntry& level) const
 {
 	std::error_code error;
-	const bool sourceSpecified = !level.id.empty() && !level.sourcePath.empty();
-	const bool bSourcePresentsourcePath = sourceSpecified && std::filesystem::is_regular_file(level.sourcePath, error);
-	const bool sourcePresent = bSourcePresentsourcePath && (!error);
-	const bool sourceReady = sourcePresent && IsAssetPackSourceReady(level.assetPackId);
+	const bool bSourceSpecified = !level.id.empty() && !level.sourcePath.empty();
+	const bool bSourcePresentsourcePath = bSourceSpecified && std::filesystem::is_regular_file(level.sourcePath, error);
+	const bool bSourcePresent = bSourcePresentsourcePath && (!error);
+	const bool bSourceReady = bSourcePresent && IsAssetPackSourceReady(level.assetPackId);
 
-	if (!sourceReady)
+	if (!bSourceReady)
 	{
 		return false;
 	}
@@ -56,7 +56,7 @@ bool ProjectLevelCatalog::HasLevelSourceInputs(const ProjectLevelCatalogEntry& l
 	while (!packId.empty())
 	{
 		const auto pack = assetPacks.find(packId);
-		if (pack == assetPacks.end() || !pack->second.gameSupported)
+		if (pack == assetPacks.end() || !pack->second.bGameSupported)
 		{
 			return false;
 		}
@@ -70,12 +70,12 @@ ProjectLevelCatalog ProjectLevelCatalogFile::Load(const std::filesystem::path& p
 	return ProjectLevelCatalogReader::Read(projectRoot);
 }
 
-bool ProjectLevelCatalogFile::SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool selected, std::string& outErrorMessage)
+bool ProjectLevelCatalogFile::SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool bSelected, std::string& outErrorMessage)
 {
-	return ProjectLevelSelectionWriter::SetLevelSelected(projectRoot, levelId, selected, outErrorMessage);
+	return ProjectLevelSelectionWriter::SetLevelSelected(projectRoot, levelId, bSelected, outErrorMessage);
 }
 
-bool ProjectLevelCatalogFile::SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool selected, std::string& outErrorMessage)
+bool ProjectLevelCatalogFile::SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool bSelected, std::string& outErrorMessage)
 {
-	return ProjectLevelSelectionWriter::SetLevelsSelected(projectRoot, levelIds, selected, outErrorMessage);
+	return ProjectLevelSelectionWriter::SetLevelsSelected(projectRoot, levelIds, bSelected, outErrorMessage);
 }

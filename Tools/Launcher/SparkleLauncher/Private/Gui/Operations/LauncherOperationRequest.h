@@ -34,7 +34,7 @@ namespace SparkleLauncher
 		QString SourceDependencyId;
 		QString HostToolId;
 		QString ShaderBackend;
-		bool ShaderSymbols = false;
+		bool bShaderSymbols = false;
 		QString GraphicsApi;
 		ExternalCaptureProvider CaptureProvider = ExternalCaptureProvider::None;
 		RhiGpuCrashMode GpuCrashMode = RhiGpuCrashMode::Off;
@@ -42,6 +42,6 @@ namespace SparkleLauncher
 		QString CleanScope = "cooked";
 		QVector<LauncherCleanTarget> CleanTargets;
 		QVector<QString> PreservedPaths;
-		bool ConfirmClean = false;
+		bool bConfirmClean = false;
 	};
 }

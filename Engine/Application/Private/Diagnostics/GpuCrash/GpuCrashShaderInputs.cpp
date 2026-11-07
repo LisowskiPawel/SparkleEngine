@@ -91,11 +91,11 @@ namespace GpuCrashInputVerification
 				VerifyShaderDebugData(format, requestPath, request, bundleRoot, files);
 				std::uint64_t type = 0;
 				std::uint64_t input = 0;
-				const bool shaderTypeRead = Formatting::TryParseHexUInt64(ReadRequiredString(request, "shaderTypeId"), type);
-				const bool compileInputRead = shaderTypeRead && Formatting::TryParseHexUInt64(ReadRequiredString(request, "compileInputHash"), input);
-				const bool jobUnique = compileInputRead && exportedJobs.emplace(type, ReadRequiredString(request, "target"), input, ReadRequiredString(request, "codeSha256")).second;
+				const bool bShaderTypeRead = Formatting::TryParseHexUInt64(ReadRequiredString(request, "shaderTypeId"), type);
+				const bool bCompileInputRead = bShaderTypeRead && Formatting::TryParseHexUInt64(ReadRequiredString(request, "compileInputHash"), input);
+				const bool bJobUnique = bCompileInputRead && exportedJobs.emplace(type, ReadRequiredString(request, "target"), input, ReadRequiredString(request, "codeSha256")).second;
 
-				if (!jobUnique)
+				if (!bJobUnique)
 				{
 					throw Diagnostics::Error("Shader export has invalid or duplicate permutation identity.");
 				}
@@ -126,10 +126,10 @@ namespace GpuCrashInputVerification
 			const auto bytes = library.GetBytecode(*code);
 			std::string hash;
 			std::string error;
-			const bool codeHashed = Hash::TrySha256Hex(std::span(static_cast<const std::byte*>(bytes.Data), bytes.Size), hash, error);
-			const bool jobExported = codeHashed && exportedJobs.contains({entry.ShaderType, GetShaderTargetName(entry.Target), entry.CompileInputHash, hash});
+			const bool bCodeHashed = Hash::TrySha256Hex(std::span(static_cast<const std::byte*>(bytes.Data), bytes.Size), hash, error);
+			const bool bJobExported = bCodeHashed && exportedJobs.contains({entry.ShaderType, GetShaderTargetName(entry.Target), entry.CompileInputHash, hash});
 
-			if (!jobExported)
+			if (!bJobExported)
 			{
 				throw Diagnostics::Error("Export omits an active shader or permutation; perform a complete diagnostic shader cook.");
 			}
@@ -166,13 +166,13 @@ namespace GpuCrashInputVerification
 			}
 		}
 
-		const bool compilerMatches = ReadRequiredString(compiler, "product") == "ShaderCompiler";
-		const bool variantMatches = compilerMatches && ReadRequiredString(compiler, "variant") == "gpu-crash";
-		const bool compilerHashMatches = variantMatches && ReadRequiredString(compiler, "executableSha256") == ReadRequiredString(bundle, "shaderCompilerExecutableSha256");
-		const bool mapMatches = compilerHashMatches && ReadRequiredString(bundle, "globalShaderMapSha256") == HashFile(Filesystem::GetGlobalShaderMapPath());
-		const bool libraryMatches = mapMatches && ReadRequiredString(bundle, "cookedShaderLibrarySha256") == HashFile(Filesystem::GetCookedShaderLibraryPath());
+		const bool bCompilerMatches = ReadRequiredString(compiler, "product") == "ShaderCompiler";
+		const bool bVariantMatches = bCompilerMatches && ReadRequiredString(compiler, "variant") == "gpu-crash";
+		const bool bCompilerHashMatches = bVariantMatches && ReadRequiredString(compiler, "executableSha256") == ReadRequiredString(bundle, "shaderCompilerExecutableSha256");
+		const bool bMapMatches = bCompilerHashMatches && ReadRequiredString(bundle, "globalShaderMapSha256") == HashFile(Filesystem::GetGlobalShaderMapPath());
+		const bool bLibraryMatches = bMapMatches && ReadRequiredString(bundle, "cookedShaderLibrarySha256") == HashFile(Filesystem::GetCookedShaderLibraryPath());
 
-		if (!libraryMatches)
+		if (!bLibraryMatches)
 		{
 			throw Diagnostics::Error("Shader export does not match the active cooked publication.");
 		}

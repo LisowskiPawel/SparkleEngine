@@ -8,7 +8,7 @@ public:
 	void SetSettings(EngineRenderingSettingsController* settings) noexcept;
 	void RefreshFromRuntimeState() noexcept;
 	bool HasPendingRestart() const noexcept;
-	void BuildUI(bool disableInteraction, const char* filterText = nullptr);
+	void BuildUI(bool bDisableInteraction, const char* filterText = nullptr);
 
 private:
 	EngineRenderingSettingsController* m_settings = nullptr;

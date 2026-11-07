@@ -6,5 +6,5 @@
 
 namespace SparkleLauncher
 {
-	ConsoleCommandResult RecompileEditorShaders(bool generateSymbols, std::stop_token cancellation);
+	ConsoleCommandResult RecompileEditorShaders(bool bGenerateSymbols, std::stop_token cancellation);
 }

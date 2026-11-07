@@ -49,7 +49,7 @@ namespace SparkleLauncher
 		}
 
 		ProcessRunnerFactory m_processRunnerFactory;
-		std::atomic<bool> m_operationRunning{false};
+		std::atomic<bool> m_bOperationRunning{false};
 		TaskExecutor m_executor{TaskExecutorConfig{.FrameCriticalWorkerCount = 1, .BackgroundWorkerCount = 1, .BlockingIoWorkerCount = 2, .MaximumActiveExecutions = 16}};
 		TaskScope m_rootScope{TaskScopeDesc{TaskScopeKind::Application, "Launcher operations"}};
 		std::map<std::string, std::unique_ptr<TaskScope>, std::less<>> m_operationScopes;
@@ -70,9 +70,9 @@ namespace SparkleLauncher
 		{
 			throw std::logic_error("Launcher operation run identity is empty.");
 		}
-		const bool operationAdmissionBusy = m_implementation->m_operationRunning.load(std::memory_order_acquire) || m_implementation->m_operationScopes.contains(runId);
+		const bool bOperationAdmissionBusy = m_implementation->m_bOperationRunning.load(std::memory_order_acquire) || m_implementation->m_operationScopes.contains(runId);
 		
-		if (operationAdmissionBusy)
+		if (bOperationAdmissionBusy)
 		{
 			OperationRecord record = MakeOperationRecord(request.OperationId.toStdString(), title);
 
@@ -91,7 +91,7 @@ namespace SparkleLauncher
 		auto operationScope = std::make_unique<TaskScope>(TaskScopeDesc{TaskScopeKind::ToolInvocation, "Launcher operation " + runId}, &m_implementation->m_rootScope);
 		TaskScope& scope = *operationScope;
 		m_implementation->m_operationScopes.emplace(runId, std::move(operationScope));
-		m_implementation->m_operationRunning.store(true, std::memory_order_release);
+		m_implementation->m_bOperationRunning.store(true, std::memory_order_release);
 		try
 		{
 			TaskGraphBuilder graph;
@@ -131,18 +131,18 @@ namespace SparkleLauncher
 			    {
 				    if (record->Status == OperationStatus::Pending)
 				    {
-					    const bool canceled = context.IsCancellationRequested();
+					    const bool bCanceled = context.IsCancellationRequested();
 
 					    SetOperationFailure(
 					        *record,
-					        canceled ? OperationProblemKind::Cancellation : OperationProblemKind::Internal,
-					        canceled ? "Launcher operation was canceled before starting." : "Launcher operation did not produce a result.",
+					        bCanceled ? OperationProblemKind::Cancellation : OperationProblemKind::Internal,
+					        bCanceled ? "Launcher operation was canceled before starting." : "Launcher operation did not produce a result.",
 					        "Retry the operation when ready.");
 
-					    MarkOperationFinished(*record, canceled ? OperationStatus::Canceled : OperationStatus::Failed, std::nullopt);
+					    MarkOperationFinished(*record, bCanceled ? OperationStatus::Canceled : OperationStatus::Failed, std::nullopt);
 				    }
 				    // Mutating work has settled; scope bookkeeping can finish after the next workflow starts.
-				    implementation->m_operationRunning.store(false, std::memory_order_release);
+				    implementation->m_bOperationRunning.store(false, std::memory_order_release);
 				    completionCallback(std::move(*record));
 				    return TaskResult::Success();
 			    });
@@ -154,7 +154,7 @@ namespace SparkleLauncher
 				MarkOperationFinished(*record, OperationStatus::Failed, std::nullopt);
 				scope.JoinFor(std::chrono::milliseconds::zero());
 				m_implementation->m_operationScopes.erase(runId);
-				m_implementation->m_operationRunning.store(false, std::memory_order_release);
+				m_implementation->m_bOperationRunning.store(false, std::memory_order_release);
 				completionCallback(std::move(*record));
 			}
 		}
@@ -163,7 +163,7 @@ namespace SparkleLauncher
 			const auto operation = m_implementation->m_operationScopes.find(runId);
 			if (operation != m_implementation->m_operationScopes.end())
 			{
-				m_implementation->m_operationRunning.store(false, std::memory_order_release);
+				m_implementation->m_bOperationRunning.store(false, std::memory_order_release);
 				operation->second->JoinFor(std::chrono::milliseconds::zero());
 				m_implementation->m_operationScopes.erase(operation);
 			}

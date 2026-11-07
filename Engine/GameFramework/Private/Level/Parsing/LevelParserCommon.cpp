@@ -117,11 +117,11 @@ namespace LevelParsing
 
 	bool ParseBool(std::string_view value, std::string_view fieldName)
 	{
-		bool parsed = false;
-		if (!Strings::TryParseBool(value, parsed))
+		bool bParsed = false;
+		if (!Strings::TryParseBool(value, bParsed))
 		{
 			throw Diagnostics::Error(std::format("Invalid {}.", fieldName));
 		}
-		return parsed;
+		return bParsed;
 	}
 }

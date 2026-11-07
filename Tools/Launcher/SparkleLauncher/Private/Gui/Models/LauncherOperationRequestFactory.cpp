@@ -18,10 +18,10 @@ namespace SparkleLauncher
 		{
 			BuildWorkspaceScope scope = BuildWorkspaceScope::Editor;
 			const std::string scopeText = part.trimmed().toStdString();
-			const bool scopeParsed = TryParseBuildWorkspaceScope(scopeText, scope);
-			const bool scopeMissing = scopeParsed && std::find(scopes.begin(), scopes.end(), scope) == scopes.end();
+			const bool bScopeParsed = TryParseBuildWorkspaceScope(scopeText, scope);
+			const bool bScopeMissing = bScopeParsed && std::find(scopes.begin(), scopes.end(), scope) == scopes.end();
 
-			if (scopeMissing)
+			if (bScopeMissing)
 			{
 				scopes.push_back(scope);
 			}
@@ -79,7 +79,7 @@ namespace SparkleLauncher
 		request.BuildScopes = settings.BuildScopes();
 		request.CookScopes = settings.CookScopes();
 		request.ShaderBackend = settings.ShaderBackend();
-		request.ShaderSymbols = settings.ShaderSymbols();
+		request.bShaderSymbols = settings.ShaderSymbols();
 		request.GraphicsApi = settings.GraphicsApi();
 		request.CaptureProvider = settings.CaptureProvider();
 		request.GpuCrashMode = settings.GpuCrashMode();
@@ -126,7 +126,7 @@ namespace SparkleLauncher
 	{
 		LauncherOperationRequest request = BuildLauncherOperationRequest(workspaceRoot, contentModel, settings, "workspace.clean");
 		request.CleanTargets = BuildActionSpecificCleanTargets(BuildActionCleanTargetRequest(workspaceRoot, contentModel, settings, runningLauncherPath, operationId));
-		request.ConfirmClean = false;
+		request.bConfirmClean = false;
 		return request;
 	}
 
@@ -153,7 +153,7 @@ namespace SparkleLauncher
 				request.PreservedPaths.push_back(QString::fromStdString(launcherDirectory.string()));
 			}
 		}
-		request.ConfirmClean = false;
+		request.bConfirmClean = false;
 		return request;
 	}
 

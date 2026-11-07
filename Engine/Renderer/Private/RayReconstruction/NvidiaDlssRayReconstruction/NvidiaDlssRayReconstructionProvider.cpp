@@ -22,8 +22,8 @@ public:
 bool NvidiaDlssRayReconstructionProvider::Initialize(const RhiCapabilities& capabilities, RhiNativeDeviceQueueInterop nativeInterop)
 {
 #if SPARKLE_WITH_NVIDIA_STREAMLINE
-	m_initialized = IsStreamlineFeatureSupported(sl::kFeatureDLSS_RR, capabilities, nativeInterop);
-	return m_initialized;
+	m_bInitialized = IsStreamlineFeatureSupported(sl::kFeatureDLSS_RR, capabilities, nativeInterop);
+	return m_bInitialized;
 #else
 	(void) capabilities;
 	(void) nativeInterop;
@@ -43,7 +43,7 @@ void NvidiaDlssRayReconstructionProvider::SetupFrame(const ImageProviderFrameInp
 
 bool NvidiaDlssRayReconstructionProvider::Evaluate(const RayReconstructionEvaluationDesc& evaluation)
 {
-	if (!m_initialized || !m_frameState.IsValid())
+	if (!m_bInitialized || !m_frameState.IsValid())
 	{
 		return false;
 	}
@@ -63,11 +63,11 @@ bool NvidiaDlssRayReconstructionProvider::Evaluate(const RayReconstructionEvalua
 void NvidiaDlssRayReconstructionProvider::Shutdown() noexcept
 {
 #if SPARKLE_WITH_NVIDIA_STREAMLINE
-	if (m_initialized)
+	if (m_bInitialized)
 	{
 		(void) slFreeResources(sl::kFeatureDLSS_RR, sl::ViewportHandle{NvidiaDlssRayReconstructionProviderConstants::kRayReconstructionViewportId});
 	}
 #endif
-	m_initialized = false;
+	m_bInitialized = false;
 	m_frameState.Reset();
 }

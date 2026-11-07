@@ -19,7 +19,7 @@
 struct SlangShaderBackend::SymbolSelection final
 {
 	std::string Name;
-	bool Failed = false;
+	bool bFailed = false;
 };
 
 SlangShaderBackend::SlangShaderBackend()
@@ -35,7 +35,7 @@ SlangShaderBackend::SlangShaderBackend()
 
 ShaderBackendCapabilities SlangShaderBackend::GetStaticCapabilities() noexcept
 {
-	return ShaderBackendCapabilities{.SupportsDxil = true, .SupportsSpirV = true, .SupportsSpirVRayTracingLibrary = true, .SupportsSpirVInlineRayQuery = true};
+	return ShaderBackendCapabilities{.bSupportsDxil = true, .bSupportsSpirV = true, .bSupportsSpirVRayTracingLibrary = true, .bSupportsSpirVInlineRayQuery = true};
 }
 
 std::uint64_t SlangShaderBackend::QueryBackendVersion()
@@ -57,10 +57,10 @@ std::uint64_t SlangShaderBackend::QueryBackendVersion(slang::IGlobalSession& glo
 ShaderBackendCapabilities SlangShaderBackend::GetCapabilities() const
 {
 	ShaderBackendCapabilities capabilities = GetStaticCapabilities();
-	capabilities.SupportsDxil = capabilities.SupportsDxil && IsValid();
-	capabilities.SupportsSpirV = capabilities.SupportsSpirV && IsValid();
-	capabilities.SupportsSpirVRayTracingLibrary = capabilities.SupportsSpirVRayTracingLibrary && IsValid();
-	capabilities.SupportsSpirVInlineRayQuery = capabilities.SupportsSpirVInlineRayQuery && IsValid();
+	capabilities.bSupportsDxil = capabilities.bSupportsDxil && IsValid();
+	capabilities.bSupportsSpirV = capabilities.bSupportsSpirV && IsValid();
+	capabilities.bSupportsSpirVRayTracingLibrary = capabilities.bSupportsSpirVRayTracingLibrary && IsValid();
+	capabilities.bSupportsSpirVInlineRayQuery = capabilities.bSupportsSpirVInlineRayQuery && IsValid();
 	return capabilities;
 }
 
@@ -92,7 +92,7 @@ CompiledShader SlangShaderBackend::Compile(const ShaderCompileRequest& request)
 
 	ShaderReflection reflection = ExtractReflection(request, *program.get(), bytecode, diagnostics);
 	ShaderDebugArtifactSet debugArtifacts;
-	if (request.CaptureDebugArtifacts)
+	if (request.bCaptureDebugArtifacts)
 	{
 		debugArtifacts = CaptureDebugArtifacts(request, *program.get(), bytecode, diagnostics);
 	}
@@ -129,19 +129,19 @@ Slang::ComPtr<slang::ISession> SlangShaderBackend::CreateSession(const ShaderCom
 
 	std::array<slang::CompilerOptionEntry, 6> targetOptions{};
 	std::uint32_t targetOptionCount = 0;
-	const auto optimization = request.EnableOptimizations ? SLANG_OPTIMIZATION_LEVEL_MAXIMAL : SLANG_OPTIMIZATION_LEVEL_NONE;
-	const auto debugInformation = request.EnableDebugInfo ? SLANG_DEBUG_INFO_LEVEL_STANDARD : SLANG_DEBUG_INFO_LEVEL_NONE;
+	const auto optimization = request.bEnableOptimizations ? SLANG_OPTIMIZATION_LEVEL_MAXIMAL : SLANG_OPTIMIZATION_LEVEL_NONE;
+	const auto debugInformation = request.bEnableDebugInfo ? SLANG_DEBUG_INFO_LEVEL_STANDARD : SLANG_DEBUG_INFO_LEVEL_NONE;
 	targetOptions[targetOptionCount++] = {slang::CompilerOptionName::Optimization, {slang::CompilerOptionValueKind::Int, static_cast<std::int32_t>(optimization), 0, nullptr, nullptr}};
 	targetOptions[targetOptionCount++] = {slang::CompilerOptionName::DebugInformation, {slang::CompilerOptionValueKind::Int, static_cast<std::int32_t>(debugInformation), 0, nullptr, nullptr}};
 	if (IsSpirVTarget(request.Target))
 	{
 		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::EmitSpirvDirectly, {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}};
 		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::VulkanUseEntryPointName, {slang::CompilerOptionValueKind::Int, 1, 0, nullptr, nullptr}};
-		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::ForceDXLayout, {slang::CompilerOptionValueKind::Int, SpirVUseDirectXBufferLayout, 0, nullptr, nullptr}};
+		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::ForceDXLayout, {slang::CompilerOptionValueKind::Int, bSpirVUseDirectXBufferLayout, 0, nullptr, nullptr}};
 
-		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::DefaultImageFormatUnknown, {slang::CompilerOptionValueKind::Int, SpirVUseUnknownStorageImageFormat, 0, nullptr, nullptr}};
+		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::DefaultImageFormatUnknown, {slang::CompilerOptionValueKind::Int, bSpirVUseUnknownStorageImageFormat, 0, nullptr, nullptr}};
 	}
-	else if (request.EnableDebugInfo)
+	else if (request.bEnableDebugInfo)
 	{
 		targetOptions[targetOptionCount++] = {slang::CompilerOptionName::DebugInformationFormat, {slang::CompilerOptionValueKind::Int, SLANG_DEBUG_INFO_FORMAT_PDB, 0, nullptr, nullptr}};
 	}
@@ -156,7 +156,7 @@ Slang::ComPtr<slang::ISession> SlangShaderBackend::CreateSession(const ShaderCom
 	sessionDesc.preprocessorMacros = macroDescs.data();
 	sessionDesc.preprocessorMacroCount = static_cast<SlangInt>(macroDescs.size());
 	Slang::ComPtr<ISlangFileSystem> sourceFiles;
-	if (request.CaptureDebugArtifacts)
+	if (request.bCaptureDebugArtifacts)
 	{
 		sourceFiles.attach(new SlangSourceFiles(request.SourceFiles));
 		sessionDesc.fileSystem = sourceFiles.get();
@@ -176,7 +176,7 @@ Slang::ComPtr<slang::IComponentType> SlangShaderBackend::LinkProgram(slang::ISes
 	Slang::ComPtr<slang::IBlob> diagnosticBlob;
 	constexpr std::string_view moduleName = "SparkleShader";
 	// The expanded input is not the original file named by its #line directives.
-	const std::string modulePath = request.CaptureDebugArtifacts ? "/SparkleCompilerInput.hlsl" : request.VirtualSourcePath;
+	const std::string modulePath = request.bCaptureDebugArtifacts ? "/SparkleCompilerInput.hlsl" : request.VirtualSourcePath;
 	slang::IModule* module = session.loadModuleFromSourceString(moduleName.data(), modulePath.c_str(), request.SourceCode.c_str(), diagnosticBlob.writeRef());
 	diagnostics += BlobToString(diagnosticBlob);
 	if (module == nullptr)
@@ -212,7 +212,7 @@ Slang::ComPtr<slang::IComponentType> SlangShaderBackend::LinkProgram(slang::ISes
 	{
 		throw Diagnostics::Error("Slang failed to link shader program - " + diagnostics);
 	}
-	if (request.CaptureDebugArtifacts)
+	if (request.bCaptureDebugArtifacts)
 	{
 		for (SlangInt32 index = 0; index < module->getDependencyFileCount(); ++index)
 		{
@@ -220,9 +220,9 @@ Slang::ComPtr<slang::IComponentType> SlangShaderBackend::LinkProgram(slang::ISes
 			const bool bSourceFileUnregisteredpath = path == nullptr;
 			const bool bSourceFileUnregisteredpath2 = !bSourceFileUnregisteredpath && (path != modulePath);
 			const bool bSourceFileUnregisteredSourceFiles = bSourceFileUnregisteredpath2 && (std::ranges::find(request.SourceFiles, std::string_view(path), &ShaderSourceFile::VirtualPath) == request.SourceFiles.end());
-			const bool sourceFileUnregistered = bSourceFileUnregisteredpath || bSourceFileUnregisteredSourceFiles;
+			const bool bSourceFileUnregistered = bSourceFileUnregisteredpath || bSourceFileUnregisteredSourceFiles;
 			
-			if (sourceFileUnregistered)
+			if (bSourceFileUnregistered)
 			{
 				throw Diagnostics::Error("Slang read a source dependency outside the captured compile inputs.");
 			}
@@ -337,9 +337,9 @@ std::vector<std::string> SlangShaderBackend::BuildDebugArgumentStrings(const Sha
 	args.push_back(IsSpirVTarget(request.Target) ? "spirv" : "dxil");
 	args.push_back("-profile");
 	args.push_back(GetSlangTargetProfileName(request.Target));
-	args.push_back(request.EnableOptimizations ? "-O3" : "-O0");
-	args.push_back(request.EnableDebugInfo ? "-g2" : "-g0");
-	if (!IsSpirVTarget(request.Target) && request.EnableDebugInfo)
+	args.push_back(request.bEnableOptimizations ? "-O3" : "-O0");
+	args.push_back(request.bEnableDebugInfo ? "-g2" : "-g0");
+	if (!IsSpirVTarget(request.Target) && request.bEnableDebugInfo)
 	{
 		args.push_back("-gpdb");
 	}
@@ -347,11 +347,11 @@ std::vector<std::string> SlangShaderBackend::BuildDebugArgumentStrings(const Sha
 	{
 		args.push_back("-emit-spirv-directly");
 		args.push_back("-fvk-use-entrypoint-name");
-		if constexpr (SpirVUseDirectXBufferLayout)
+		if constexpr (bSpirVUseDirectXBufferLayout)
 		{
 			args.push_back("-fvk-use-dx-layout");
 		}
-		if constexpr (SpirVUseUnknownStorageImageFormat)
+		if constexpr (bSpirVUseUnknownStorageImageFormat)
 		{
 			args.push_back("-default-image-format-unknown");
 		}
@@ -407,14 +407,14 @@ void SlangShaderBackend::ExtractSymbols(slang::IComponentType& program, ShaderDe
 			{
 				if (!output.Name.empty())
 				{
-					output.Failed = true;
+					output.bFailed = true;
 				}
 				output.Name = name;
 			}
 		}
 		catch (...)
 		{
-			output.Failed = true;
+			output.bFailed = true;
 		}
 	};
 

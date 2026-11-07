@@ -22,10 +22,10 @@ EditorImGuiContext::EditorImGuiContext(Window& window) noexcept :
 EditorImGuiContext::~EditorImGuiContext() noexcept
 {
 	UnsubscribeFromWindowEvents();
-	if (m_platformInitialized)
+	if (m_bPlatformInitialized)
 	{
 		ImGui_ImplWin32_Shutdown();
-		m_platformInitialized = false;
+		m_bPlatformInitialized = false;
 	}
 	if (m_context != nullptr)
 	{
@@ -55,7 +55,7 @@ bool EditorImGuiContext::InitializePlatformBackend()
 	}
 
 	ImGui_ImplWin32_Init(m_window.GetHWND());
-	m_platformInitialized = true;
+	m_bPlatformInitialized = true;
 	return true;
 }
 
@@ -71,7 +71,7 @@ void EditorImGuiContext::ApplyDpiScale(float dpiScale) noexcept
 
 bool EditorImGuiContext::IsReady() const noexcept
 {
-	return m_context != nullptr && m_platformInitialized;
+	return m_context != nullptr && m_bPlatformInitialized;
 }
 
 void EditorImGuiContext::SubscribeToWindowEvents(ShortcutHandler shortcutHandler)
@@ -100,25 +100,25 @@ void EditorImGuiContext::UnsubscribeFromWindowEvents() noexcept
 
 void EditorImGuiContext::HandleWindowMessage(WindowMessageEvent& event)
 {
-	if (!m_platformInitialized)
+	if (!m_bPlatformInitialized)
 	{
 		return;
 	}
 
 	const bool bShortcutAvailableImGui = m_shortcutHandler && ImGui::GetCurrentContext() != nullptr;
-	const bool shortcutAvailable = bShortcutAvailableImGui && ((event.lParam & (LPARAM{1} << 30)) == 0);
-	const bool wantsTextInput = shortcutAvailable && ImGui::GetIO().WantTextInput;
-	const bool shortcutHandled = shortcutAvailable && m_shortcutHandler(static_cast<std::uint32_t>(event.msg), static_cast<std::uintptr_t>(event.wParam), wantsTextInput);
+	const bool bShortcutAvailable = bShortcutAvailableImGui && ((event.lParam & (LPARAM{1} << 30)) == 0);
+	const bool bWantsTextInput = bShortcutAvailable && ImGui::GetIO().WantTextInput;
+	const bool bShortcutHandled = bShortcutAvailable && m_shortcutHandler(static_cast<std::uint32_t>(event.msg), static_cast<std::uintptr_t>(event.wParam), bWantsTextInput);
 
-	if (shortcutHandled)
+	if (bShortcutHandled)
 	{
-		event.handled = true;
+		event.bHandled = true;
 		return;
 	}
 
 	if (ImGui_ImplWin32_WndProcHandler(event.hWnd, event.msg, event.wParam, event.lParam) != 0)
 	{
-		event.handled = true;
+		event.bHandled = true;
 	}
 }
 

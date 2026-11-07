@@ -87,7 +87,7 @@ void EditorSceneModel::RebuildEntries()
 	for (std::size_t index = 0; index < cameras.size(); ++index)
 	{
 		const auto& camera = cameras[index];
-		m_cameraEntries.push_back({camera.Name.empty() ? "Camera " + std::to_string(index + 1) : camera.Name, "Camera", SceneObjectSelection::Camera(camera.Entity), camera.Visible});
+		m_cameraEntries.push_back({camera.Name.empty() ? "Camera " + std::to_string(index + 1) : camera.Name, "Camera", SceneObjectSelection::Camera(camera.Entity), camera.bVisible});
 	}
 	for (std::size_t index = 0; index < lights.size(); ++index)
 	{
@@ -97,13 +97,13 @@ void EditorSceneModel::RebuildEntries()
 		    {SceneObjectPresentation::BuildLightLabel(light.Description, index),
 		        SceneObjectPresentation::GetLightTypeLabel(light.Description.GetKind()),
 		        SceneObjectSelection::Light(light.Entity),
-		        light.Description.common.visible,
+		        light.Description.common.bVisible,
 		        light.Description.GetKind()});
 	}
 	for (std::size_t index = 0; index < meshes.size(); ++index)
 	{
 		const auto& mesh = meshes[index];
-		m_meshEntries.push_back({"Mesh " + std::to_string(index + 1), mesh.Kind == SceneMeshKind::Skeletal ? "Skeletal Mesh" : "Static Mesh", SceneObjectSelection::Mesh(mesh.Entity), mesh.Visible});
+		m_meshEntries.push_back({"Mesh " + std::to_string(index + 1), mesh.Kind == SceneMeshKind::Skeletal ? "Skeletal Mesh" : "Static Mesh", SceneObjectSelection::Mesh(mesh.Entity), mesh.bVisible});
 	}
-	m_skyEntry = {sky ? "Sky" : "Sky (Engine Default)", "Sky", SceneObjectSelection::Sky(), !sky || sky->enabled};
+	m_skyEntry = {sky ? "Sky" : "Sky (Engine Default)", "Sky", SceneObjectSelection::Sky(), !sky || sky->bEnabled};
 }

@@ -18,7 +18,7 @@ struct ShaderContract final
 	RayTracingShaderMetadata rayTracing;
 	ShaderParameterStructDescriptor parameterStruct;
 	PassParameterLayout parameterLayout;
-	bool hasParameterStruct = false;
+	bool bHasParameterStruct = false;
 };
 
 using ShaderContractCatalog = std::vector<ShaderContract>;

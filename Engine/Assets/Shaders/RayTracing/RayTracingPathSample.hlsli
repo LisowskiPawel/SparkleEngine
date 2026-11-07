@@ -11,13 +11,13 @@ namespace PathSample
 		float PdfW;
 		float3 DiffuseThroughput;
 		float3 SpecularThroughput;
-		bool Delta;
-		bool HasSupport;
+		bool bDelta;
+		bool bHasSupport;
 	};
 
 	struct LightingResult
 	{
-		bool Hit;
+		bool bHit;
 		float3 IncidentRadiance;
 		float3 HitPositionWorld;
 	};

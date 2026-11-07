@@ -12,9 +12,9 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_streamlineViewConstantsLogger, "Renderer.St
 class StreamlineViewConstantTranslation final
 {
 public:
-	static void Require(bool condition, std::string_view message)
+	static void Require(bool bCondition, std::string_view message)
 	{
-		if (!condition)
+		if (!bCondition)
 		{
 			Diagnostics::Fatal(g_streamlineViewConstantsLogger, __FILE__, __LINE__, std::string(message));
 		}
@@ -78,7 +78,7 @@ public:
 	static sl::float2 BuildMotionVectorScale(const StreamlineViewConstantsInput& input)
 	{
 		Require(input.RenderExtent.Width > 0 && input.RenderExtent.Height > 0, "Streamline motion-vector scale requires a non-empty render extent.");
-		const float directionScale = input.MotionVectorsCurrentMinusPrevious ? -1.0f : 1.0f;
+		const float directionScale = input.bMotionVectorsCurrentMinusPrevious ? -1.0f : 1.0f;
 		return sl::float2{directionScale / static_cast<float>(input.RenderExtent.Width), directionScale / static_cast<float>(input.RenderExtent.Height)};
 	}
 };
@@ -125,10 +125,10 @@ void FillStreamlineViewConstants(sl::Constants& constants, const StreamlineViewC
 	constants.cameraFar = input.Camera.FarZ;
 	constants.cameraFOV = StreamlineViewConstantTranslation::CalculateVerticalFovRadians(input.Camera.ProjectionMTX);
 	constants.cameraAspectRatio = StreamlineViewConstantTranslation::CalculateAspectRatio(input.Camera.ProjectionMTX);
-	constants.depthInverted = input.ReversedDeviceDepth ? sl::Boolean::eTrue : sl::Boolean::eFalse;
+	constants.depthInverted = input.bReversedDeviceDepth ? sl::Boolean::eTrue : sl::Boolean::eFalse;
 	constants.cameraMotionIncluded = sl::Boolean::eTrue;
 	constants.motionVectors3D = sl::Boolean::eFalse;
-	constants.reset = input.ResetRequested || input.Temporal.HistoryValid == 0u ? sl::Boolean::eTrue : sl::Boolean::eFalse;
+	constants.reset = input.bResetRequested || input.Temporal.HistoryValid == 0u ? sl::Boolean::eTrue : sl::Boolean::eFalse;
 	constants.motionVectorsJittered = sl::Boolean::eFalse;
 }
 #endif

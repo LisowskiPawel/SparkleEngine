@@ -27,7 +27,7 @@ void D3D12ImGuiBackend::Initialize()
 		return;
 	}
 
-	ImGuiContext* previousContext = AcquireImGuiContext(m_imguiContext, m_ownsContext);
+	ImGuiContext* previousContext = AcquireImGuiContext(m_imguiContext, m_bOwnsContext);
 
 	InitializeRendererBackend(previousContext);
 	RestoreImGuiContext(previousContext);
@@ -55,7 +55,7 @@ void D3D12ImGuiBackend::InitializeRendererBackend(ImGuiContext* previousContext)
 	if (!ImGui_ImplDX12_Init(&initInfo))
 	{
 		RestoreImGuiContext(previousContext);
-		ReleaseImGuiContext(m_imguiContext, m_ownsContext);
+		ReleaseImGuiContext(m_imguiContext, m_bOwnsContext);
 		Diagnostics::Fatal(g_d3d12ImGuiBackendLogger, __FILE__, __LINE__, "ImGui D3D12 renderer initialization failed.");
 	}
 }
@@ -107,7 +107,7 @@ void D3D12ImGuiBackend::Shutdown() noexcept
 	ImGui_ImplDX12_InvalidateDeviceObjects();
 	ImGui_ImplDX12_Shutdown();
 	RestoreImGuiContext(previousContext);
-	ReleaseImGuiContext(m_imguiContext, m_ownsContext);
+	ReleaseImGuiContext(m_imguiContext, m_bOwnsContext);
 }
 
 void D3D12ImGuiBackend::AllocateDescriptor(ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE* outCpuHandle, D3D12_GPU_DESCRIPTOR_HANDLE* outGpuHandle)

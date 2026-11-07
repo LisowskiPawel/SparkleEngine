@@ -33,7 +33,7 @@ namespace SparkleLauncher
 			try
 			{
 				m_catalog = ProjectLevelCatalogFile::Load(m_content.RootPath);
-				m_model.Loaded = true;
+				m_model.bLoaded = true;
 			}
 			catch (const Diagnostics::Error& error)
 			{
@@ -44,38 +44,38 @@ namespace SparkleLauncher
 			const auto root = m_content.RootPath.parent_path().parent_path();
 			const auto cooked = InspectCookedContentReadiness(root, m_content.Id.toStdString());
 			std::error_code sourceError;
-			const bool hasSourceTools = std::filesystem::is_regular_file(root / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) && !sourceError;
+			const bool bHasSourceTools = std::filesystem::is_regular_file(root / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) && !sourceError;
 			m_model.Levels.reserve(static_cast<qsizetype>(m_catalog.levels.size()));
 			for (const ProjectLevelCatalogEntry& level : m_catalog.levels)
 			{
-				m_model.Levels.push_back(BuildLevel(level, cooked, hasSourceTools));
+				m_model.Levels.push_back(BuildLevel(level, cooked, bHasSourceTools));
 			}
 			return std::move(m_model);
 		}
 
 	private:
-		LauncherLevelUiEntry BuildLevel(const ProjectLevelCatalogEntry& level, const CookedContentReadiness& cooked, bool hasSourceTools) const
+		LauncherLevelUiEntry BuildLevel(const ProjectLevelCatalogEntry& level, const CookedContentReadiness& cooked, bool bHasSourceTools) const
 		{
 			const auto pack = level.assetPackId.empty() ? m_catalog.assetPacks.end() : m_catalog.assetPacks.find(level.assetPackId);
 			const ProjectAssetPack* assetPack = pack == m_catalog.assetPacks.end() ? nullptr : &pack->second;
 			std::error_code sourceError;
-			const bool levelSourceReady = std::filesystem::exists(level.sourcePath, sourceError) && !sourceError;
-			const bool packSourceReady = assetPack == nullptr || m_catalog.IsAssetPackSourceReady(assetPack->id);
-			const bool gameSupported = assetPack == nullptr || assetPack->gameSupported;
-			const bool bMeshesReady = level.id == "Empty" || cooked.MeshesReady;
-			const bool bMeshSourceReady = levelSourceReady && bMeshesReady;
-			const bool bAssetsReady = bMeshSourceReady && cooked.TexturesReady;
-			const bool ready = bAssetsReady && cooked.Shaders == CookedShaderPublicationState::Ready;
-			const bool acquisitionSupported = assetPack != nullptr && assetPack->downloadSupported;
-			const bool sourceReady = levelSourceReady && packSourceReady;
-			const bool bCanUseTools = hasSourceTools && levelSourceReady;
-			const bool bPackAvailable = assetPack == nullptr || packSourceReady;
-			const bool bCanPreparePack = bPackAvailable || acquisitionSupported;
+			const bool bLevelSourceReady = std::filesystem::exists(level.sourcePath, sourceError) && !sourceError;
+			const bool bPackSourceReady = assetPack == nullptr || m_catalog.IsAssetPackSourceReady(assetPack->id);
+			const bool bGameSupported = assetPack == nullptr || assetPack->bGameSupported;
+			const bool bMeshesReady = level.id == "Empty" || cooked.bMeshesReady;
+			const bool bMeshSourceReady = bLevelSourceReady && bMeshesReady;
+			const bool bAssetsReady = bMeshSourceReady && cooked.bTexturesReady;
+			const bool bReady = bAssetsReady && cooked.Shaders == CookedShaderPublicationState::Ready;
+			const bool bAcquisitionSupported = assetPack != nullptr && assetPack->bDownloadSupported;
+			const bool bSourceReady = bLevelSourceReady && bPackSourceReady;
+			const bool bCanUseTools = bHasSourceTools && bLevelSourceReady;
+			const bool bPackAvailable = assetPack == nullptr || bPackSourceReady;
+			const bool bCanPreparePack = bPackAvailable || bAcquisitionSupported;
 			const bool bCanPrepareLevel = bCanUseTools && bCanPreparePack;
-			const bool bLevelAvailable = ready || bCanPrepareLevel;
-			const bool canSelect = gameSupported && bLevelAvailable;
-			const bool bCanAcquirePack = bCanUseTools && acquisitionSupported;
-			const bool canSync = bCanAcquirePack && !packSourceReady;
+			const bool bLevelAvailable = bReady || bCanPrepareLevel;
+			const bool bCanSelect = bGameSupported && bLevelAvailable;
+			const bool bCanAcquirePack = bCanUseTools && bAcquisitionSupported;
+			const bool bCanSync = bCanAcquirePack && !bPackSourceReady;
 
 			LauncherLevelUiEntry entry{
 			    .Id = QString::fromStdString(level.id),
@@ -84,26 +84,26 @@ namespace SparkleLauncher
 			    .ThumbnailPath = QString::fromStdWString(level.thumbnailPath.wstring()),
 			    .Detail = BuildLevelDetail(level, assetPack),
 			    .SourcePageUrl = QString::fromStdString(level.sourcePageUrl.empty() && assetPack != nullptr ? assetPack->sourcePageUrl : level.sourcePageUrl),
-			    .UnsupportedReason = ResolveUnavailableReason(level, assetPack, levelSourceReady, packSourceReady, canSelect),
-			    .Selected = level.selected,
-			    .SourceReady = sourceReady,
-			    .GameSupported = gameSupported,
-			    .Ready = ready,
-			    .CanSelect = canSelect,
-			    .CanSync = canSync};
+			    .UnsupportedReason = ResolveUnavailableReason(level, assetPack, bLevelSourceReady, bPackSourceReady, bCanSelect),
+			    .bSelected = level.bSelected,
+			    .bSourceReady = bSourceReady,
+			    .bGameSupported = bGameSupported,
+			    .bReady = bReady,
+			    .bCanSelect = bCanSelect,
+			    .bCanSync = bCanSync};
 
 			entry.Status = ResolveLevelStatus(entry);
 			entry.State = ResolveLevelState(entry);
 			return entry;
 		}
 
-		QString ResolveUnavailableReason(const ProjectLevelCatalogEntry& level, const ProjectAssetPack* pack, bool levelSourceReady, bool packSourceReady, bool canSelect) const
+		QString ResolveUnavailableReason(const ProjectLevelCatalogEntry& level, const ProjectAssetPack* pack, bool bLevelSourceReady, bool bPackSourceReady, bool bCanSelect) const
 		{
-			if (canSelect)
+			if (bCanSelect)
 			{
 				return {};
 			}
-			if (!levelSourceReady)
+			if (!bLevelSourceReady)
 			{
 				return QStringLiteral("Level definition is missing: %1").arg(QString::fromStdString(level.sourcePath.string()));
 			}
@@ -111,11 +111,11 @@ namespace SparkleLauncher
 			{
 				return QStringLiteral("This workspace map has no available source content.");
 			}
-			if (!packSourceReady && !pack->downloadSupported)
+			if (!bPackSourceReady && !pack->bDownloadSupported)
 			{
-				return QString::fromStdString(pack->downloadBlocker) + (pack->gameSupported ? QString() : QStringLiteral("\n\n") + QString::fromStdString(pack->gameBlocker));
+				return QString::fromStdString(pack->downloadBlocker) + (pack->bGameSupported ? QString() : QStringLiteral("\n\n") + QString::fromStdString(pack->gameBlocker));
 			}
-			if (!pack->gameSupported)
+			if (!pack->bGameSupported)
 			{
 				return QString::fromStdString(pack->gameBlocker);
 			}
@@ -124,7 +124,7 @@ namespace SparkleLauncher
 
 		QString BuildLevelDetail(const ProjectLevelCatalogEntry& level, const ProjectAssetPack* pack) const
 		{
-			QStringList traits{level.releaseSupported ? QStringLiteral("Release map") : QStringLiteral("Development map")};
+			QStringList traits{level.bReleaseSupported ? QStringLiteral("Release map") : QStringLiteral("Development map")};
 			if (level.variantKind == "SceneVariant")
 			{
 				traits.push_back("variant");
@@ -155,7 +155,7 @@ namespace SparkleLauncher
 			std::uintmax_t total = 0;
 			while (pack != nullptr)
 			{
-				if (pack->downloadSupported)
+				if (pack->bDownloadSupported)
 				{
 					if (pack->archiveBytes > std::numeric_limits<std::uintmax_t>::max() - total)
 					{
@@ -176,40 +176,40 @@ namespace SparkleLauncher
 
 		QString ResolveLevelStatus(const LauncherLevelUiEntry& level) const
 		{
-			if (!level.GameSupported)
+			if (!level.bGameSupported)
 			{
 				return QStringLiteral("Game unsupported");
 			}
-			if (!level.CanSelect)
+			if (!level.bCanSelect)
 			{
 				return "Unavailable";
 			}
-			if (level.Ready)
+			if (level.bReady)
 			{
 				return "Ready";
 			}
-			if (level.Selected)
+			if (level.bSelected)
 			{
 				return "Download required";
 			}
-			return level.SourceReady ? QStringLiteral("Source ready") : QStringLiteral("Available to sync");
+			return level.bSourceReady ? QStringLiteral("Source ready") : QStringLiteral("Available to sync");
 		}
 
 		QString ResolveLevelState(const LauncherLevelUiEntry& level) const
 		{
-			if (!level.GameSupported || !level.CanSelect)
+			if (!level.bGameSupported || !level.bCanSelect)
 			{
 				return "warning";
 			}
-			if (level.Ready)
+			if (level.bReady)
 			{
 				return "ok";
 			}
-			if (level.Selected)
+			if (level.bSelected)
 			{
 				return "warning";
 			}
-			return level.SourceReady ? QStringLiteral("ok") : QStringLiteral("neutral");
+			return level.bSourceReady ? QStringLiteral("ok") : QStringLiteral("neutral");
 		}
 
 		QString DisplayNameOrId(std::string_view displayName, std::string_view id) const { return QString::fromStdString(std::string(displayName.empty() ? id : displayName)); }

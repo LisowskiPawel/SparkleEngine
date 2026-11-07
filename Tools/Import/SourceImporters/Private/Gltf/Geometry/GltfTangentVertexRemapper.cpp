@@ -20,22 +20,22 @@ GltfTangentVertexRemapper::GltfTangentVertexRemapper(ImportedMeshGeometry& geome
     m_geometry(geometry),
     m_frames(frames),
     m_variantsBySourceVertex(geometry.vertices.size()),
-    m_hasSkinInfluences(geometry.HasSkinInfluences())
+    m_bHasSkinInfluences(geometry.HasSkinInfluences())
 {
-	const bool tangentFrameCountsMismatch = frames.baseCornerTangents.size() != geometry.indices.size() || frames.morphCornerTangentDeltas.size() != geometry.deformation.morphTargets.size();
+	const bool bTangentFrameCountsMismatch = frames.baseCornerTangents.size() != geometry.indices.size() || frames.morphCornerTangentDeltas.size() != geometry.deformation.morphTargets.size();
 	
-	if (tangentFrameCountsMismatch)
+	if (bTangentFrameCountsMismatch)
 	{
 		throw Diagnostics::Error("Generated glTF tangent frames do not match the geometry and deformation streams.");
 	}
-	if (m_hasSkinInfluences && geometry.deformation.skinInfluences.size() != geometry.vertices.size())
+	if (m_bHasSkinInfluences && geometry.deformation.skinInfluences.size() != geometry.vertices.size())
 	{
 		throw Diagnostics::Error("Cannot remap incomplete glTF skin influences across tangent seams.");
 	}
 
 	m_vertices.reserve(geometry.indices.size());
 	m_indices.reserve(geometry.indices.size());
-	if (m_hasSkinInfluences)
+	if (m_bHasSkinInfluences)
 	{
 		m_skinInfluences.reserve(geometry.indices.size());
 	}
@@ -78,9 +78,9 @@ bool GltfTangentVertexRemapper::FrameSetsMatch(std::uint32_t remappedVertexIndex
 	}
 	for (std::size_t targetIndex = 0; targetIndex < m_morphTargets.size(); ++targetIndex)
 	{
-		const bool morphTangentMismatch = !TangentsMatch(m_morphTargets[targetIndex].deltas[remappedVertexIndex].tangent, m_frames.morphCornerTangentDeltas[targetIndex][cornerIndex]);
+		const bool bMorphTangentMismatch = !TangentsMatch(m_morphTargets[targetIndex].deltas[remappedVertexIndex].tangent, m_frames.morphCornerTangentDeltas[targetIndex][cornerIndex]);
 		
-		if (morphTangentMismatch)
+		if (bMorphTangentMismatch)
 		{
 			return false;
 		}
@@ -114,7 +114,7 @@ std::uint32_t GltfTangentVertexRemapper::ResolveVertex(std::size_t cornerIndex)
 	ImportedVertex vertex = m_geometry.vertices[sourceVertexIndex];
 	vertex.tangent = m_frames.baseCornerTangents[cornerIndex];
 	m_vertices.push_back(vertex);
-	if (m_hasSkinInfluences)
+	if (m_bHasSkinInfluences)
 	{
 		m_skinInfluences.push_back(m_geometry.deformation.skinInfluences[sourceVertexIndex]);
 	}

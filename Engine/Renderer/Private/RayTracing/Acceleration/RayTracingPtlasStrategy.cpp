@@ -15,7 +15,7 @@ RayTracingPtlasStrategy::RayTracingPtlasStrategy(RenderHardwareInterface& render
     m_renderHardwareInterface(renderHardwareInterface)
 {
 	const RhiPtlasCapabilities& nativeCapabilities = renderHardwareInterface.GetCapabilities().RayTracing.Groups.Ptlas;
-	if (!capabilityReport.Ptlas.Supported || !capabilityReport.Ptlas.SupportsDescriptor || !nativeCapabilities.SupportsCpuPackedOperations || nativeCapabilities.MaxOperationsPerBuild < 1u)
+	if (!capabilityReport.Ptlas.bSupported || !capabilityReport.Ptlas.bSupportsDescriptor || !nativeCapabilities.bSupportsCpuPackedOperations || nativeCapabilities.MaxOperationsPerBuild < 1u)
 	{
 		Diagnostics::Fatal(g_rayTracingPtlasStrategyLogger, __FILE__, __LINE__, "PTLAS requires descriptor access and CPU-packed instance writes.");
 	}
@@ -54,7 +54,7 @@ RhiPtlasDesc RayTracingPtlasStrategy::BuildPtlasLayout(const PreparedRenderScene
 	{
 		return RhiPtlasDesc{.InstanceCapacity = 1, .PartitionCount = 1, .MaxInstancesPerPartition = 1, .MaxOperations = 1};
 	}
-	if (partitionPlan.Validation.HasDuplicateStableIndices || partitionPlan.Validation.HasPartitionOverflow || partitionPlan.Counts.GridPartitionCount == 0)
+	if (partitionPlan.Validation.bHasDuplicateStableIndices || partitionPlan.Validation.bHasPartitionOverflow || partitionPlan.Counts.GridPartitionCount == 0)
 	{
 		Diagnostics::Fatal(g_rayTracingPtlasStrategyLogger, __FILE__, __LINE__, "PTLAS requires a valid partition plan with unique GPU-scene slots.");
 	}
@@ -75,9 +75,9 @@ void RayTracingPtlasStrategy::EnsurePtlasResources(const RhiPtlasDesc& requiredL
 	const bool bCanReuseInstanceCapacity = bCanReuseScratch && (allocated.InstanceCapacity >= requiredLayout.InstanceCapacity);
 	const bool bCanReusePartitionCount = bCanReuseInstanceCapacity && (allocated.PartitionCount == requiredLayout.PartitionCount);
 	const bool bCanReusePerPartition = bCanReusePartitionCount && (allocated.MaxInstancesPerPartition >= requiredLayout.MaxInstancesPerPartition);
-	const bool canReuse = bCanReusePerPartition && (allocated.MaxInstancesInGlobalPartition >= requiredLayout.MaxInstancesInGlobalPartition);
+	const bool bCanReuse = bCanReusePerPartition && (allocated.MaxInstancesInGlobalPartition >= requiredLayout.MaxInstancesInGlobalPartition);
 
-	if (canReuse)
+	if (bCanReuse)
 	{
 		return;
 	}
@@ -96,9 +96,9 @@ void RayTracingPtlasStrategy::EnsurePtlasResources(const RhiPtlasDesc& requiredL
 	RhiResourceService& resources = m_renderHardwareInterface.GetResourceService();
 	const bool bPtlasAddressUnavailableScratch = !m_ptlasResources.Storage || !m_ptlasResources.Scratch;
 	const bool bPtlasAddressUnavailableStorage = bPtlasAddressUnavailableScratch || (resources.GetResourceGpuVirtualAddress(m_ptlasResources.Storage) == 0);
-	const bool ptlasAddressUnavailable = bPtlasAddressUnavailableStorage || (resources.GetResourceGpuVirtualAddress(m_ptlasResources.Scratch) == 0);
+	const bool bPtlasAddressUnavailable = bPtlasAddressUnavailableStorage || (resources.GetResourceGpuVirtualAddress(m_ptlasResources.Scratch) == 0);
 	
-	if (ptlasAddressUnavailable)
+	if (bPtlasAddressUnavailable)
 	{
 		Diagnostics::Fatal(g_rayTracingPtlasStrategyLogger, __FILE__, __LINE__, "PTLAS storage or scratch allocation has no GPU address.");
 	}

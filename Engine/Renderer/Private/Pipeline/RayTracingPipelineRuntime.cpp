@@ -14,7 +14,7 @@ std::unique_ptr<RayTracingPipelineRuntime> RayTracingPipelineRuntime::Create(
     std::uint64_t generation,
     const RayTracingPipelineComposition& composition)
 {
-	if (!renderHardwareInterface.GetCapabilities().RayTracing.SupportsRayTracingPipeline || generation == 0)
+	if (!renderHardwareInterface.GetCapabilities().RayTracing.bSupportsRayTracingPipeline || generation == 0)
 	{
 		throw Diagnostics::Error("Ray-tracing pipeline materialization requires complete backend readiness and a generation.");
 	}

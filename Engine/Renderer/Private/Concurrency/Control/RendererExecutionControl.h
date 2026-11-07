@@ -12,7 +12,7 @@
 struct RenderResizeCommand final
 {
 	RenderViewportExtent Extent;
-	bool Minimized = false;
+	bool bMinimized = false;
 };
 
 struct RenderViewportCommand final

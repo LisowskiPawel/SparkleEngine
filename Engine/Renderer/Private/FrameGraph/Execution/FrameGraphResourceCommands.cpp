@@ -26,7 +26,7 @@ void FrameGraphResourceCommands::BeginRasterPass(RenderCommandContext& commandCo
 	BindRenderTargets(
 	    commandContext,
 	    std::span<const FrameGraphTextureHandle>(colorHandles.data(), rasterPass.ColorCount),
-	    rasterPass.HasDepthStencil ? rasterPass.DepthStencil.Handle : FrameGraphTextureHandle::Invalid());
+	    rasterPass.bHasDepthStencil ? rasterPass.DepthStencil.Handle : FrameGraphTextureHandle::Invalid());
 
 	for (std::uint32_t index = 0; index < rasterPass.ColorCount; ++index)
 	{
@@ -35,7 +35,7 @@ void FrameGraphResourceCommands::BeginRasterPass(RenderCommandContext& commandCo
 			ClearRenderTarget(commandContext, rasterPass.Colors[index].Handle);
 		}
 	}
-	if (rasterPass.HasDepthStencil && rasterPass.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear)
+	if (rasterPass.bHasDepthStencil && rasterPass.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear)
 	{
 		ClearDepthStencil(commandContext, rasterPass.DepthStencil.Handle);
 	}

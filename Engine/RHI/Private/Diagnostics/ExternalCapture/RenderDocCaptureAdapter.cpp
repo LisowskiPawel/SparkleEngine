@@ -36,7 +36,7 @@ public:
 		m_api.SetCaptureFilePathTemplate(filename.c_str());
 		m_api.SetActiveWindow(target.Root, target.Window);
 		m_api.StartFrameCapture(target.Root, target.Window);
-		m_ended = false;
+		m_bEnded = false;
 
 		if (!m_api.IsFrameCapturing())
 		{
@@ -46,11 +46,11 @@ public:
 		return true;
 	}
 
-	void End(const ExternalCaptureNativeTarget& target) noexcept override { m_ended = m_api.EndFrameCapture(target.Root, target.Window) == 1; }
+	void End(const ExternalCaptureNativeTarget& target) noexcept override { m_bEnded = m_api.EndFrameCapture(target.Root, target.Window) == 1; }
 
 	ExternalCaptureNativeResult Poll() override
 	{
-		if (!m_ended)
+		if (!m_bEnded)
 		{
 			return {.State = m_api.IsFrameCapturing() ? ExternalCaptureState::Quarantined : ExternalCaptureState::Failed, .Message = "RenderDoc failed to end the requested native interval."};
 		}
@@ -74,11 +74,11 @@ private:
 		std::array<char, 4096> path{};
 		std::uint32_t length = static_cast<std::uint32_t>(path.size());
 		std::uint64_t timestamp = 0;
-		const bool captureSizeRead = m_api.GetCapture(m_firstCapture, nullptr, &length, &timestamp);
-		const bool captureFits = captureSizeRead && length <= path.size();
-		const bool capturePathRead = captureFits && m_api.GetCapture(m_firstCapture, path.data(), &length, &timestamp);
+		const bool bCaptureSizeRead = m_api.GetCapture(m_firstCapture, nullptr, &length, &timestamp);
+		const bool bCaptureFits = bCaptureSizeRead && length <= path.size();
+		const bool bCapturePathRead = bCaptureFits && m_api.GetCapture(m_firstCapture, path.data(), &length, &timestamp);
 
-		if (!capturePathRead)
+		if (!bCapturePathRead)
 		{
 			return false;
 		}
@@ -91,17 +91,17 @@ private:
 	{
 		const auto utf8 = artifact.u8string();
 		const std::string replayArguments = "\"" + std::string(utf8.begin(), utf8.end()) + "\"";
-		const bool opened = m_api.LaunchReplayUI(0, replayArguments.c_str()) != 0;
+		const bool bOpened = m_api.LaunchReplayUI(0, replayArguments.c_str()) != 0;
 
 		return {
 		    .State = ExternalCaptureState::Completed,
 		    .Artifact = artifact,
-		    .Message = opened ? "Capture finalized and handed to RenderDoc." : "Capture finalized; RenderDoc replay UI launch failed. Open the artifact manually."};
+		    .Message = bOpened ? "Capture finalized and handed to RenderDoc." : "Capture finalized; RenderDoc replay UI launch failed. Open the artifact manually."};
 	}
 
 	RENDERDOC_API_1_6_0& m_api;
 	std::uint32_t m_firstCapture = 0;
-	bool m_ended = false;
+	bool m_bEnded = false;
 };
 #endif
 

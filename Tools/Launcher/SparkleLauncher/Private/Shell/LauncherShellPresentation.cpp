@@ -47,11 +47,11 @@ namespace SparkleLauncher
 	{
 		output << "Sparkle Launcher\n";
 		output << "Root: " << Strings::ToNarrow(model.WorkspaceRoot.wstring()) << "\n\n";
-		const bool installed = !HasBuildSources(model.WorkspaceRoot);
+		const bool bInstalled = !HasBuildSources(model.WorkspaceRoot);
 		output << "Profile selectors\n";
-		output << "  Editor: " << model.EditorProfile << " | options: " << (installed ? model.EditorProfile : BuildProfileOptionText(BuildProfileTarget::Editor)) << '\n';
-		output << "  Game/Cook: " << model.GameProfile << " | options: " << (installed ? model.GameProfile : BuildProfileOptionText(BuildProfileTarget::Game)) << '\n';
-		if (!installed)
+		output << "  Editor: " << model.EditorProfile << " | options: " << (bInstalled ? model.EditorProfile : BuildProfileOptionText(BuildProfileTarget::Editor)) << '\n';
+		output << "  Game/Cook: " << model.GameProfile << " | options: " << (bInstalled ? model.GameProfile : BuildProfileOptionText(BuildProfileTarget::Game)) << '\n';
+		if (!bInstalled)
 		{
 			output << "  Workspace IDE: " << DisplayName(model.WorkspaceIdePreference) << " | options: Visual Studio, Rider\n";
 			output << "  Workspace compiler: " << DisplayName(model.WorkspaceCompilerPreference) << " | options: MSVC, clang-cl\n\n";

@@ -22,7 +22,7 @@ ShaderContractCatalog BuildShaderContractCatalog(ShaderContractSelectionKind sel
 	for (const ShaderRegistrationDesc& registration : GlobalShaderRegistry::GetRegistrations())
 	{
 		const auto [existing, inserted] = shaderTypeNames.emplace(registration.TypeId, registration.ShaderName);
-		if (!inserted && existing->second != registration.ShaderName)
+		if (!bInserted && existing->second != registration.ShaderName)
 		{
 			throw Diagnostics::Error(std::format("Shader type id collision between '{}' and '{}'.", existing->second, registration.ShaderName));
 		}
@@ -43,7 +43,7 @@ ShaderContractCatalog BuildShaderContractCatalog(ShaderContractSelectionKind sel
 		{
 			shader.parameterStruct = registration.BuildParameterStructDescriptor();
 			shader.parameterLayout = BuildShaderParameterLayout(registration);
-			shader.hasParameterStruct = true;
+			shader.bHasParameterStruct = true;
 		}
 		catalog.push_back(std::move(shader));
 	}

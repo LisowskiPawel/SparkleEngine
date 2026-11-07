@@ -34,10 +34,10 @@ namespace EditorWidgets
 		return next;
 	}
 
-	static void DrawMenuRowContent(ImDrawList& drawList, ImVec2 position, const char* label, EditorIcons::EditorIcon icon, bool hasCheckColumn)
+	static void DrawMenuRowContent(ImDrawList& drawList, ImVec2 position, const char* label, EditorIcons::EditorIcon icon, bool bHasCheckColumn)
 	{
 		const float fontSize = ImGui::GetFontSize();
-		const float checkOffset = hasCheckColumn ? menuCheckColumnWidth : 0.0f;
+		const float checkOffset = bHasCheckColumn ? menuCheckColumnWidth : 0.0f;
 		if (icon != EditorIcons::EditorIcon::None)
 		{
 			drawList.AddText(ImVec2(position.x + (menuIconOffset + checkOffset) * fontSize, position.y), ImGui::GetColorU32(SparkleUiPalette::Menu().Icon), EditorIcons::GetEditorIconGlyph(icon));
@@ -102,7 +102,7 @@ namespace EditorWidgets
 		return ImGui::BeginPopup(id);
 	}
 
-	bool BeginMenu(const char* label, EditorIcons::EditorIcon icon, float childWidth, bool enabled)
+	bool BeginMenu(const char* label, EditorIcons::EditorIcon icon, float childWidth, bool bEnabled)
 	{
 		const ImVec2 position = ImGui::GetCursorScreenPos();
 		const float width = ImGui::GetContentRegionAvail().x;
@@ -110,9 +110,9 @@ namespace EditorWidgets
 		ImDrawList& drawList = *ImGui::GetWindowDrawList();
 		ImGui::SetNextWindowSizeConstraints(ImVec2(childWidth, 0.0f), ImVec2(childWidth, ImGui::GetIO().DisplaySize.y));
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-		const bool open = ImGui::BeginMenu(label, enabled);
+		const bool bOpen = ImGui::BeginMenu(label, bEnabled);
 		ImGui::PopStyleColor();
-		ImGui::BeginDisabled(!enabled);
+		ImGui::BeginDisabled(!bEnabled);
 		DrawMenuRowContent(drawList, position, label, icon, false);
 		const float arrowX = position.x + width - menuHorizontalPadding * fontSize;
 		const float centerY = position.y + 0.5f * fontSize;
@@ -120,20 +120,20 @@ namespace EditorWidgets
 		drawList.AddLine(ImVec2(arrowX, centerY - 0.25f * fontSize), ImVec2(arrowX + 0.25f * fontSize, centerY), arrowColor, 0.09f * fontSize);
 		drawList.AddLine(ImVec2(arrowX + 0.25f * fontSize, centerY), ImVec2(arrowX, centerY + 0.25f * fontSize), arrowColor, 0.09f * fontSize);
 		ImGui::EndDisabled();
-		return open;
+		return bOpen;
 	}
 
 	bool DrawMenuItem(const char* label, EditorIcons::EditorIcon icon, MenuCheckState checkState, ImGuiSelectableFlags flags)
 	{
 		const ImVec2 position = ImGui::GetCursorScreenPos();
-		const bool hasCheckColumn = checkState != MenuCheckState::Hidden;
-		const float minimumWidth = MeasureMenuRow(label, hasCheckColumn ? MenuRowKind::Toggle : MenuRowKind::Action) - 2.0f * ImGui::GetStyle().WindowPadding.x;
+		const bool bHasCheckColumn = checkState != MenuCheckState::Hidden;
+		const float minimumWidth = MeasureMenuRow(label, bHasCheckColumn ? MenuRowKind::Toggle : MenuRowKind::Action) - 2.0f * ImGui::GetStyle().WindowPadding.x;
 		const float width = (std::max) (minimumWidth, ImGui::GetContentRegionAvail().x);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-		const bool pressed = ImGui::Selectable(label, false, flags, ImVec2(width, ImGui::GetFontSize()));
+		const bool bPressed = ImGui::Selectable(label, false, flags, ImVec2(width, ImGui::GetFontSize()));
 		ImGui::PopStyleColor();
 		ImDrawList& drawList = *ImGui::GetWindowDrawList();
-		DrawMenuRowContent(drawList, position, label, icon, hasCheckColumn);
+		DrawMenuRowContent(drawList, position, label, icon, bHasCheckColumn);
 		const float fontSize = ImGui::GetFontSize();
 		const float centerY = position.y + 0.5f * fontSize;
 		const ImU32 color = ImGui::GetColorU32(ImGuiCol_Text);
@@ -146,7 +146,7 @@ namespace EditorWidgets
 		{
 			drawList.AddLine(ImVec2(position.x + 0.1f * fontSize, centerY), ImVec2(position.x + 0.85f * fontSize, centerY), color, 0.11f * fontSize);
 		}
-		return pressed;
+		return bPressed;
 	}
 
 	void DrawMenuSection(const char* label)

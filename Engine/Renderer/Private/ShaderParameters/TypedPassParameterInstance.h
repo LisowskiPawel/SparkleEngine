@@ -24,7 +24,7 @@ public:
 
 	TParameters& GetFields() noexcept
 	{
-		m_isDirty = true;
+		m_bIsDirty = true;
 		return m_fields;
 	}
 
@@ -32,7 +32,7 @@ public:
 
 	TParameters* operator->() noexcept
 	{
-		m_isDirty = true;
+		m_bIsDirty = true;
 		return &m_fields;
 	}
 
@@ -48,12 +48,12 @@ public:
 
 	bool Sync() const
 	{
-		if (!m_isDirty)
+		if (!m_bIsDirty)
 		{
 			return m_missingBindings.empty() && m_parameterSet.HasAllRequiredBindings();
 		}
 
-		m_isDirty = false;
+		m_bIsDirty = false;
 		return m_metadata->Commit(m_fields, m_parameterSet, m_bindingStorage, &m_missingBindings);
 	}
 
@@ -72,7 +72,7 @@ public:
 private:
 	const Metadata* m_metadata = nullptr;
 	TParameters m_fields = {};
-	mutable bool m_isDirty = true;
+	mutable bool m_bIsDirty = true;
 	mutable std::vector<std::string> m_missingBindings;
 	mutable PassParameterSet m_parameterSet;
 	mutable std::vector<std::vector<std::byte>> m_bindingStorage;

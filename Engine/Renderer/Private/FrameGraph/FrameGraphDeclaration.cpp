@@ -38,7 +38,7 @@ void FrameGraph::PreparePasses()
 {
 	for (const auto& [passIndex, prepare] : m_passPreparations)
 	{
-		if (passIndex < m_compiledPlan.passes.size() && m_compiledPlan.passes[passIndex].alive)
+		if (passIndex < m_compiledPlan.passes.size() && m_compiledPlan.passes[passIndex].bAlive)
 		{
 			prepare();
 		}
@@ -56,7 +56,7 @@ void FrameGraph::Setup()
 		auto& pass = m_passes[passIndex];
 		std::vector<PassResourceDeclaration> declarations;
 		PassResourceBuilder builder(declarations);
-		pass.active = pass.setupCallback(builder);
+		pass.bActive = pass.setupCallback(builder);
 		FrameGraphResourceContractDiagnostics::ValidatePassDeclarations(pass.name, pass.kind, declarations);
 		assert(IsQueuePreferenceCompatible(pass.kind, pass.queuePreference));
 

@@ -49,7 +49,7 @@ std::vector<TextureCookRequest> LoadTextureCookRequestList(const std::filesystem
 	}
 
 	TextureCookRequestSet requestSet;
-	bool foundHeader = false;
+	bool bFoundHeader = false;
 	std::size_t lineNumber = 0;
 	for (std::string line; std::getline(input, line);)
 	{
@@ -59,13 +59,13 @@ std::vector<TextureCookRequest> LoadTextureCookRequestList(const std::filesystem
 		{
 			continue;
 		}
-		if (!foundHeader)
+		if (!bFoundHeader)
 		{
 			if (!TextureCookRequestCodec::IsHeader(trimmedLine))
 			{
 				throw Diagnostics::Error("Texture cook request file '" + Strings::ToNarrow(inputPath.wstring()) + "' has an invalid header.");
 			}
-			foundHeader = true;
+			bFoundHeader = true;
 			continue;
 		}
 
@@ -79,7 +79,7 @@ std::vector<TextureCookRequest> LoadTextureCookRequestList(const std::filesystem
 		}
 	}
 
-	if (!foundHeader)
+	if (!bFoundHeader)
 	{
 		throw Diagnostics::Error("Texture cook request file '" + Strings::ToNarrow(inputPath.wstring()) + "' is empty.");
 	}

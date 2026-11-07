@@ -22,5 +22,5 @@ private:
 	std::vector<std::string> m_entries;
 	std::string m_pendingLine;
 	std::size_t m_navigationIndex = 0;
-	bool m_isNavigating = false;
+	bool m_bIsNavigating = false;
 };

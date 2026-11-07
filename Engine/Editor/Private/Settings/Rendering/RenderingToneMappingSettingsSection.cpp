@@ -16,10 +16,10 @@ void DrawToneMappingSettingsSection(EngineRenderingSettingsController& settingsC
 	    {"ACES fitted filmic", EngineToneMapper::AcesFilmic},
 	};
 
-	const bool toneMappingMatches = RenderingSettingsUi::MatchesFilter(filterText, "Tone Mapping", "tone mapper aces reinhard filmic");
-	const bool toneMappingOpen = toneMappingMatches && RenderingSettingsUi::BeginSettingsCategory("Tone Mapping");
+	const bool bToneMappingMatches = RenderingSettingsUi::MatchesFilter(filterText, "Tone Mapping", "tone mapper aces reinhard filmic");
+	const bool bToneMappingOpen = bToneMappingMatches && RenderingSettingsUi::BeginSettingsCategory("Tone Mapping");
 
-	if (!toneMappingOpen)
+	if (!bToneMappingOpen)
 	{
 		return;
 	}

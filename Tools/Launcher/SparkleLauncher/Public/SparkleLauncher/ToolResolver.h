@@ -21,7 +21,7 @@ namespace SparkleLauncher
 	struct ToolResolveResult
 	{
 		KnownTool Tool = KnownTool::CMake;
-		bool Found = false;
+		bool bFound = false;
 		std::filesystem::path Path;
 		std::string DisplayName;
 		std::string FailureReason;

@@ -48,11 +48,11 @@ void RayTracingBlasCache::BeginFrame() noexcept
 	m_currentFrameStats = {};
 	for (auto& [mesh, entry] : m_entries)
 	{
-		entry.touchedThisFrame = false;
+		entry.bTouchedThisFrame = false;
 	}
 	for (auto& [key, entry] : m_skinnedEntries)
 	{
-		entry.touchedThisFrame = false;
+		entry.bTouchedThisFrame = false;
 	}
 }
 
@@ -68,10 +68,10 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureBlas(RenderCommandCon
 	const RhiRayTracingGeometryDesc geometry = gpuMesh.GetRayTracingGeometry();
 	auto [it, inserted] = m_entries.try_emplace(gpuMesh.GetHandle());
 	Entry& entry = it->second;
-	entry.touchedThisFrame = true;
+	entry.bTouchedThisFrame = true;
 
-	const bool geometryChanged = inserted || !GeometryMatches(entry, geometry);
-	if (!geometryChanged && entry.accelerationStructureBuffer)
+	const bool bGeometryChanged = bInserted || !GeometryMatches(entry, geometry);
+	if (!bGeometryChanged && entry.accelerationStructureBuffer)
 	{
 		++m_currentFrameStats.reusedBlasCount;
 		return BuildHandle(entry);
@@ -127,7 +127,7 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::BuildBlas(
 	}
 	++m_currentFrameStats.builtBlasCount;
 	BlasHandle handle = BuildHandle(entry);
-	handle.builtThisFrame = true;
+	handle.bBuiltThisFrame = true;
 	return handle;
 }
 
@@ -148,9 +148,9 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureSkinnedBlas(
 
 	SkinnedEntryKey key{.Mesh = draw.Geometry.Mesh, .GpuSceneSlot = gpuSceneSlot};
 	auto [it, inserted] = m_skinnedEntries.try_emplace(key);
-	(void) inserted;
+	(void) bInserted;
 	Entry& entry = it->second;
-	entry.touchedThisFrame = true;
+	entry.bTouchedThisFrame = true;
 
 	return BuildBlas(commandContext, BuildSkinnedGeometry(preparedScene, draw, entry), entry, diagnostics);
 }
@@ -159,7 +159,7 @@ RayTracingBlasCache::BuildStats RayTracingBlasCache::EndFrame() noexcept
 {
 	for (auto it = m_entries.begin(); it != m_entries.end();)
 	{
-		if (it->second.touchedThisFrame)
+		if (it->second.bTouchedThisFrame)
 		{
 			++it;
 			continue;
@@ -170,7 +170,7 @@ RayTracingBlasCache::BuildStats RayTracingBlasCache::EndFrame() noexcept
 	}
 	for (auto it = m_skinnedEntries.begin(); it != m_skinnedEntries.end();)
 	{
-		if (it->second.touchedThisFrame)
+		if (it->second.bTouchedThisFrame)
 		{
 			++it;
 			continue;
@@ -246,7 +246,7 @@ void RayTracingBlasCache::ReplaceDynamicVertexBuffer(std::span<const DirectX::XM
 		entry.dynamicVertexBufferView = {};
 	}
 
-	const bool vertexBufferCreated = m_renderHardwareInterface->GetResourceService().CreateVertexBuffer(
+	const bool bVertexBufferCreated = m_renderHardwareInterface->GetResourceService().CreateVertexBuffer(
 	    positions.data(),
 	    positions.size() * sizeof(DirectX::XMFLOAT3),
 	    static_cast<std::uint32_t>(sizeof(DirectX::XMFLOAT3)),
@@ -254,9 +254,9 @@ void RayTracingBlasCache::ReplaceDynamicVertexBuffer(std::span<const DirectX::XM
 	    entry.dynamicVertexBuffer,
 	    entry.dynamicVertexBufferView);
 
-	const bool vertexBufferAvailable = vertexBufferCreated && entry.dynamicVertexBuffer;
+	const bool bVertexBufferAvailable = bVertexBufferCreated && entry.dynamicVertexBuffer;
 
-	if (!vertexBufferAvailable)
+	if (!bVertexBufferAvailable)
 	{
 		Diagnostics::Fatal(g_rayTracingBlasCacheLogger, __FILE__, __LINE__, "Skinned BLAS dynamic vertex-buffer allocation failed.");
 	}
@@ -274,7 +274,7 @@ RhiRayTracingGeometryDesc RayTracingBlasCache::BuildSkinnedGeometryDesc(const Gp
 	    .IndexBuffer = RhiRayTracingBufferBinding{.Resource = resources.GetResourceHandle(gpuMesh.GetIndexBufferResource())},
 	    .IndexCount = gpuMesh.GetIndexCount(),
 	    .IndexFormat = indexBufferView.Format,
-	    .Opaque = true};
+	    .bOpaque = true};
 }
 
 void RayTracingBlasCache::EnsureEntryResources(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, Entry& entry) noexcept

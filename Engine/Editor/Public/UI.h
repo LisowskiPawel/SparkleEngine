@@ -75,9 +75,9 @@ public:
 	void SetViewportFinalColorTexture(UiTextureHandle texture) noexcept;
 	void SetDiagnosticsProviders(EditorDiagnosticsProviders providers);
 	void SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
-	void SetShaderCompileStatus(bool busy, std::string_view message = {});
+	void SetShaderCompileStatus(bool bBusy, std::string_view message = {});
 	RendererMemoryDiagnosticsSnapshot CaptureMemoryDiagnostics() const;
-	void AppendConsoleOutput(ConsoleOutputRecord record, bool showConsole = false);
+	void AppendConsoleOutput(ConsoleOutputRecord record, bool bShowConsole = false);
 	bool ConsumeShaderReloadRequest() noexcept;
 	ViewportOutputAction ConsumeViewportOutputAction() noexcept;
 	UiRenderPacket ConsumeRenderPacket();

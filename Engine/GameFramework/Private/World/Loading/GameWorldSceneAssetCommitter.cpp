@@ -21,9 +21,9 @@ static void ValidatePayloadContents(const SceneAssetPayload& sceneAssetPayload)
 	const bool bScenePayloadEmptyskeletons = bScenePayloadEmptylights && (sceneAssetPayload.skeletons.empty());
 	const bool bScenePayloadEmptyanimations = bScenePayloadEmptyskeletons && (sceneAssetPayload.animations.empty());
 	const bool bScenePayloadEmptymaterials = bScenePayloadEmptyanimations && (sceneAssetPayload.materials.empty());
-	const bool scenePayloadEmpty = bScenePayloadEmptymaterials && (sceneAssetPayload.materialVariants.empty());
+	const bool bScenePayloadEmpty = bScenePayloadEmptymaterials && (sceneAssetPayload.materialVariants.empty());
 	
-	if (scenePayloadEmpty)
+	if (bScenePayloadEmpty)
 	{
 		Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "A validated scene asset payload contains no resources or entities.");
 	}
@@ -120,8 +120,8 @@ static void AppendLights(ECS::GameWorldState& state, SceneAssetPayload& sceneAss
 void CommitSceneAssetPayload(ECS::GameWorldState& state, GameWorldResourceStores& resources, SceneAssetPayload&& sceneAssetPayload)
 {
 	ValidatePayloadContents(sceneAssetPayload);
-	const bool hasSkeletons = !sceneAssetPayload.skeletons.empty();
-	const bool hasMaterials = !sceneAssetPayload.materials.empty();
+	const bool bHasSkeletons = !sceneAssetPayload.skeletons.empty();
+	const bool bHasMaterials = !sceneAssetPayload.materials.empty();
 
 	AppendAnimationResources(state, resources, sceneAssetPayload);
 	const MaterialHandle materialBaseHandle = AppendMaterials(resources, sceneAssetPayload);
@@ -131,11 +131,11 @@ void CommitSceneAssetPayload(ECS::GameWorldState& state, GameWorldResourceStores
 	AppendCameras(state, sceneAssetPayload);
 	AppendLights(state, sceneAssetPayload);
 
-	if (hasSkeletons)
+	if (bHasSkeletons)
 	{
 		state.NotifyResourceChanged();
 	}
-	if (hasMaterials)
+	if (bHasMaterials)
 	{
 		state.NotifyResourceChanged();
 	}

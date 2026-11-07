@@ -17,7 +17,7 @@ struct SPARKLE_RENDERER_API RendererExecutionConfig final
 {
 	RendererExecutionMode Mode = RendererExecutionMode::Serial;
 	std::uint32_t RenderPipelineDepth = 0;
-	bool EnableUiRenderPackets = false;
+	bool bEnableUiRenderPackets = false;
 	TaskExecutor* AssetTaskExecutor = nullptr;
 	TaskScope* AssetTaskParentScope = nullptr;
 

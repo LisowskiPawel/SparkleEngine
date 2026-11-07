@@ -61,10 +61,10 @@ namespace SparkleLauncher
 		void RefreshContextSelectors();
 		void AddOptionsForOperation(QVBoxLayout& layout, const QString& operationId);
 		void SelectWorkspaceCompiler(WorkspaceCompiler compiler);
-		void SetControlsEnabled(bool enabled);
+		void SetControlsEnabled(bool bEnabled);
 		void EnsureOptionsPage(const QString& operationId);
 		void RebuildOptionsPages();
-		void ScheduleUiRefresh(bool refreshContent);
+		void ScheduleUiRefresh(bool bRefreshContent);
 		void ApplyScheduledUiRefresh();
 		void RegisterFocusable(QWidget* widget);
 		void ConfigureTabOrder();
@@ -103,10 +103,10 @@ namespace SparkleLauncher
 		LauncherActivityPanel* m_activityPanel = nullptr;
 		LauncherGpuCrashPanel* m_gpuCrashPanel = nullptr;
 		QString m_selectedOperationId;
-		bool m_isRebuildingOptions = false;
-		bool m_isApplyingUiRefresh = false;
-		bool m_uiRefreshQueued = false;
-		bool m_refreshContentRequested = false;
+		bool m_bIsRebuildingOptions = false;
+		bool m_bIsApplyingUiRefresh = false;
+		bool m_bUiRefreshQueued = false;
+		bool m_bRefreshContentRequested = false;
 		qint64 m_lastActivationRefreshMs = 0;
 		int m_nextRunIndex = 0;
 		QStringList m_pendingRestartRunIds;

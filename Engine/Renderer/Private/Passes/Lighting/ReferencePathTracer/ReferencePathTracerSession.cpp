@@ -17,12 +17,12 @@ ReferencePathTracerSession::ReferencePathTracerSession(RenderDeviceServices& dev
 bool ReferencePathTracerSession::PrepareFrame(const RenderFrame& frame, ViewportRenderAction action, std::uint64_t actionSequence) noexcept
 {
 	Update(frame, action, actionSequence, m_rayTracingScene.GetExecutionFrontend());
-	return !m_selected || (m_unavailableReason == ViewportRenderProgressReason::None && m_resources.IsAllocated());
+	return !m_bSelected || (m_unavailableReason == ViewportRenderProgressReason::None && m_resources.IsAllocated());
 }
 
 void ReferencePathTracerSession::PublishFrameProducts(ViewportFrameProducts& products) const noexcept
 {
-	products.Progress = m_selected ? GetProgress() : ViewportRenderProgress{};
+	products.Progress = m_bSelected ? GetProgress() : ViewportRenderProgress{};
 	products.RadianceSamplePrefix = GetRadianceSamplePrefix();
 }
 
@@ -52,5 +52,5 @@ void ReferencePathTracerSession::ReserveGraphResources(FrameGraphBuilder& builde
 
 bool ReferencePathTracerSession::BindResources(FrameGraphBuilder& builder) const noexcept
 {
-	return !m_selected || (m_unavailableReason == ViewportRenderProgressReason::None && m_resources.Bind(builder));
+	return !m_bSelected || (m_unavailableReason == ViewportRenderProgressReason::None && m_resources.Bind(builder));
 }

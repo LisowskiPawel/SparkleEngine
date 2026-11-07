@@ -17,5 +17,5 @@ struct ImageProviderFrameInput final
 	std::uint64_t ProviderGeneration = 0;
 	ViewCameraUniformData Camera = {};
 	ViewTemporalUniformData Temporal = {};
-	bool ResetHistory = true;
+	bool bResetHistory = true;
 };

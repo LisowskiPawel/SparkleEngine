@@ -21,7 +21,7 @@ namespace Assets
 		materialDesc.emissiveColor = materialAsset.header.emissiveColor;
 		materialDesc.alphaMode = TranslateAlphaMode(materialAsset.header.alphaMode);
 		materialDesc.alphaCutoff = materialAsset.header.alphaCutoff;
-		materialDesc.doubleSided = materialAsset.header.doubleSided != 0;
+		materialDesc.bDoubleSided = materialAsset.header.doubleSided != 0;
 		materialDesc.textureReferences.reserve(materialAsset.textureReferences.size());
 
 		for (const CookedTextureReference& textureReference : materialAsset.textureReferences)

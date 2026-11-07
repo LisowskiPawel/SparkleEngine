@@ -180,9 +180,9 @@ namespace ECS
 			{
 				const bool bMatchingAnimationTargetInstanceId = targetIdentity != nullptr && work.SourceInstanceId == targetIdentity->SourceInstanceId;
 				const bool bMatchingAnimationTargetposes = bMatchingAnimationTargetInstanceId && (work.PoseOutputIndex < m_output.poses.size());
-				const bool matchingAnimationTarget = bMatchingAnimationTargetposes && (m_output.poses[work.PoseOutputIndex].skeletonAssetId == updated.SkeletonAssetId);
+				const bool bMatchingAnimationTarget = bMatchingAnimationTargetposes && (m_output.poses[work.PoseOutputIndex].skeletonAssetId == updated.SkeletonAssetId);
 				
-				if (matchingAnimationTarget)
+				if (bMatchingAnimationTarget)
 				{
 					updated.Pose = AnimationOutputSlotHandle{work.PoseOutputIndex, targetGeneration};
 					break;

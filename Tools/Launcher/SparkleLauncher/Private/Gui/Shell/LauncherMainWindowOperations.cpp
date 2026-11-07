@@ -170,8 +170,8 @@ namespace SparkleLauncher
 		const SparkleTools::ToolTargetOutputPaths launcherOutputs = workspaceOutputs.LauncherTargetOutputs(m_settings.EditorProfile().toStdString());
 		const std::filesystem::path relaunchedExecutablePath = launcherOutputs.BinaryDirectory / std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()).filename();
 		const QString executablePath = QString::fromStdString(relaunchedExecutablePath.string());
-		const bool started = QProcess::startDetached(executablePath, {});
-		if (!started)
+		const bool bStarted = QProcess::startDetached(executablePath, {});
+		if (!bStarted)
 		{
 			QMessageBox::warning(this, "Restart Failed", "The rebuilt launcher is ready, but the restart command could not be started.");
 			return;

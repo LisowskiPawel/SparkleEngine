@@ -27,11 +27,11 @@ static DirectX::XMFLOAT3 TransformPoint(const DirectX::XMFLOAT3& point, DirectX:
 
 static void ExpandBounds(const DirectX::XMFLOAT3& point, RenderMeshWorldBounds& bounds) noexcept
 {
-	if (!bounds.Valid)
+	if (!bounds.bValid)
 	{
 		bounds.Min = point;
 		bounds.Max = point;
-		bounds.Valid = true;
+		bounds.bValid = true;
 		return;
 	}
 
@@ -45,10 +45,10 @@ static void ExpandBounds(const DirectX::XMFLOAT3& point, RenderMeshWorldBounds& 
 
 static RenderMeshWorldBounds TransformBounds(const MeshDrawGeometry& geometry, const DirectX::XMFLOAT4X4& worldMatrix) noexcept
 {
-	if (!geometry.HasLocalBounds)
+	if (!geometry.bHasLocalBounds)
 	{
 		const DirectX::XMFLOAT3 position{worldMatrix._41, worldMatrix._42, worldMatrix._43};
-		return RenderMeshWorldBounds{.Min = position, .Max = position, .Valid = true};
+		return RenderMeshWorldBounds{.Min = position, .Max = position, .bValid = true};
 	}
 
 	const DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&worldMatrix);

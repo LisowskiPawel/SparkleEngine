@@ -23,12 +23,12 @@ FrameExecutionDiagnostics::~FrameExecutionDiagnostics() noexcept
 
 bool FrameExecutionDiagnostics::SupportsGpuEvents() const noexcept
 {
-	return m_backendDiagnostics != nullptr && m_backendDiagnostics->GetCapabilities().SupportsGpuEvents;
+	return m_backendDiagnostics != nullptr && m_backendDiagnostics->GetCapabilities().bSupportsGpuEvents;
 }
 
 bool FrameExecutionDiagnostics::RequiresBaselineScopes() const noexcept
 {
-	return m_backendDiagnostics != nullptr && m_backendDiagnostics->GetCapabilities().RequiresBaselineScopes;
+	return m_backendDiagnostics != nullptr && m_backendDiagnostics->GetCapabilities().bRequiresBaselineScopes;
 }
 
 bool FrameExecutionDiagnostics::SupportsTimestampQueries() const noexcept
@@ -115,10 +115,10 @@ void FrameExecutionDiagnostics::ResolveTimings() noexcept
 		const std::uint32_t timestampValidBits = m_timingDiagnostics->GetTimestampValidBits(record.BeginQuery);
 		std::uint64_t beginTicks = 0;
 		std::uint64_t endTicks = 0;
-		const bool beginResolved = m_timingDiagnostics->TryResolveTimestamp(record.BeginQuery, beginTicks);
-		const bool endResolved = beginResolved && m_timingDiagnostics->TryResolveTimestamp(record.EndQuery, endTicks);
+		const bool bBeginResolved = m_timingDiagnostics->TryResolveTimestamp(record.BeginQuery, beginTicks);
+		const bool bEndResolved = bBeginResolved && m_timingDiagnostics->TryResolveTimestamp(record.EndQuery, endTicks);
 
-		if (!endResolved)
+		if (!bEndResolved)
 		{
 			Diagnostics::Fatal(g_frameExecutionDiagnosticsLogger, __FILE__, __LINE__, "A GPU timestamp was unavailable after its frame slot retired.");
 		}

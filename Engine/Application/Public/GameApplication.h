@@ -35,8 +35,8 @@ enum class GameApplicationFrameResult : std::uint8_t
 struct GameApplicationOptions final
 {
 	std::string WindowTitle = "Sparkle Game";
-	bool AllowThreadedRenderer = true;
-	bool EnableUiRenderPackets = false;
+	bool bAllowThreadedRenderer = true;
+	bool bEnableUiRenderPackets = false;
 };
 
 class SPARKLE_APPLICATION_API GameApplication final : public Application
@@ -95,5 +95,5 @@ private:
 	std::unique_ptr<ApplicationTaskRuntime> m_taskRuntime;
 	std::unique_ptr<CameraInputIntentCollector> m_cameraInputIntentCollector;
 	GameApplicationOptions m_options;
-	bool m_isInitialized = false;
+	bool m_bIsInitialized = false;
 };

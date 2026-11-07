@@ -18,11 +18,11 @@ ViewportCaptureResult ViewportCaptureWriter::Write(ViewportCaptureReadback readb
 	const ImageBufferView image{.Pixels = readback.Pixels, .Width = readback.Width, .Height = readback.Height, .RowPitch = readback.RowPitch, .Format = readback.Format};
 	std::vector<std::byte> encodedBytes;
 	std::string failureReason;
-	const bool encoded = ImageEncoding::EncodeBmp(image, encodedBytes, failureReason);
-	const bool bWrittenstoprequested = encoded && !cancellationToken.stop_requested();
-	const bool written = bWrittenstoprequested && (Files::TryWriteAllBytesAtomic(outputPath, encodedBytes, failureReason));
-	result.Status = written ? ViewportCaptureStatus::Succeeded : ViewportCaptureStatus::Failed;
-	if (!written)
+	const bool bEncoded = ImageEncoding::EncodeBmp(image, encodedBytes, failureReason);
+	const bool bWrittenstoprequested = bEncoded && !cancellationToken.stop_requested();
+	const bool bWritten = bWrittenstoprequested && (Files::TryWriteAllBytesAtomic(outputPath, encodedBytes, failureReason));
+	result.Status = bWritten ? ViewportCaptureStatus::Succeeded : ViewportCaptureStatus::Failed;
+	if (!bWritten)
 	{
 		result.FailureReason = cancellationToken.stop_requested() ? "Viewport capture write was cancelled."
 		                                                          : (failureReason.empty() ? "Viewport capture BMP encoding failed" : std::move(failureReason));

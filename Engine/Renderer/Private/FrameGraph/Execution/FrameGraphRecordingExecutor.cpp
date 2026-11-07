@@ -48,8 +48,8 @@ void FrameGraphRecordingExecutor::RecordBatchSerial(const FrameGraphSubmissionBa
 
 	RecordingChunkResult& result = m_results.front();
 	result = RecordingChunkResult{};
-	result.UsesInitializationLease = initializationLease.IsValid();
-	if (result.UsesInitializationLease)
+	result.bUsesInitializationLease = initializationLease.IsValid();
+	if (result.bUsesInitializationLease)
 	{
 		result.Lease = std::move(initializationLease);
 	}
@@ -82,7 +82,7 @@ void FrameGraphRecordingExecutor::AcquireBatchLeases(const FrameGraphSubmissionB
 		if (resultIndex == 0 && initializationLease.IsValid())
 		{
 			result.Lease = std::move(initializationLease);
-			result.UsesInitializationLease = true;
+			result.bUsesInitializationLease = true;
 			continue;
 		}
 
@@ -185,7 +185,7 @@ void FrameGraphRecordingExecutor::RecordChunk(std::uint32_t resultIndex)
 
 bool FrameGraphRecordingExecutor::CanRecordParallel(const RecordingChunkResult& result, const RecordingChunk& chunk) const noexcept
 {
-	return !result.UsesInitializationLease && chunk.ContextRequirement == RecordingContextRequirement::ExclusiveLease;
+	return !result.bUsesInitializationLease && chunk.ContextRequirement == RecordingContextRequirement::ExclusiveLease;
 }
 
 bool FrameGraphRecordingExecutor::ShouldExecuteParallelRange(std::uint32_t firstResult, std::uint32_t resultCount) const noexcept

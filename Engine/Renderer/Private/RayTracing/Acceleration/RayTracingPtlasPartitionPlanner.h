@@ -17,7 +17,7 @@ struct RayTracingPtlasPartitionPlannerConfig final
 {
 	std::uint32_t PartitionsPerAxis = 8;
 	RayTracingPtlasPartitionUpdateMode PartitionUpdateMode = RayTracingPtlasPartitionUpdateMode::AlwaysUpdatePartition;
-	bool MarkAllDynamicInPartition = false;
+	bool bMarkAllDynamicInPartition = false;
 	DirectX::XMFLOAT3 CameraPosition = {};
 	float ModeChangeDistance = 100.0f;
 	float TransformDirtyEpsilon = 0.0001f;
@@ -37,10 +37,10 @@ struct RayTracingPtlasPartitionAssignment final
 
 struct RayTracingPtlasPartitionUpdateState final
 {
-	bool DirtyTransform = true;
-	bool MovedPartition = false;
-	bool GlobalPartitionEligible = false;
-	bool UsesGlobalPartition = false;
+	bool bDirtyTransform = true;
+	bool bMovedPartition = false;
+	bool bGlobalPartitionEligible = false;
+	bool bUsesGlobalPartition = false;
 };
 
 struct RayTracingPtlasPartitionEntry final
@@ -48,7 +48,7 @@ struct RayTracingPtlasPartitionEntry final
 	RayTracingPtlasPartitionEntryIdentity Identity;
 	RayTracingPtlasPartitionAssignment Assignment;
 	RayTracingPtlasPartitionUpdateState Update;
-	bool Valid = true;
+	bool bValid = true;
 };
 
 struct RayTracingPtlasPartitionPlanIndices final
@@ -69,8 +69,8 @@ struct RayTracingPtlasPartitionPlanCounts final
 
 struct RayTracingPtlasPartitionPlanValidation final
 {
-	bool HasDuplicateStableIndices = false;
-	bool HasPartitionOverflow = false;
+	bool bHasDuplicateStableIndices = false;
+	bool bHasPartitionOverflow = false;
 };
 
 struct RayTracingPtlasPartitionPlan final
@@ -101,13 +101,13 @@ private:
 		DirectX::XMFLOAT4X4 WorldMatrix = {};
 		std::uint32_t LocalPartitionId = 0;
 		std::uint32_t PartitionId = 0;
-		bool Valid = false;
+		bool bValid = false;
 	};
 
 	struct PartitionRuntimeState final
 	{
-		bool TouchedThisFrame = false;
-		bool FarFromCamera = false;
+		bool bTouchedThisFrame = false;
+		bool bFarFromCamera = false;
 	};
 
 	static void ValidateConfig(const RayTracingPtlasPartitionPlannerConfig& config) noexcept;

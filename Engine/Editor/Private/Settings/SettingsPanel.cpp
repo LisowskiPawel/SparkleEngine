@@ -17,13 +17,13 @@
 SettingsPanel::SettingsPanel() = default;
 SettingsPanel::~SettingsPanel() = default;
 
-void SettingsPanel::SetOpen(bool open) noexcept
+void SettingsPanel::SetOpen(bool bOpen) noexcept
 {
-	if (open && !m_isOpen)
+	if (bOpen && !m_bIsOpen)
 	{
-		m_refreshFromRuntimeOnNextOpen = true;
+		m_bRefreshFromRuntimeOnNextOpen = true;
 	}
-	m_isOpen = open;
+	m_bIsOpen = bOpen;
 }
 
 void SettingsPanel::SetRenderingSettings(EngineRenderingSettingsController* renderingSettings) noexcept
@@ -41,20 +41,20 @@ void SettingsPanel::SetRestartHandler(std::function<void()> restartHandler)
 	m_restartHandler = std::move(restartHandler);
 }
 
-void SettingsPanel::BuildUI(bool disableInteraction)
+void SettingsPanel::BuildUI(bool bDisableInteraction)
 {
-	if (!m_isOpen || m_renderingSettings == nullptr)
+	if (!m_bIsOpen || m_renderingSettings == nullptr)
 	{
 		return;
 	}
 
-	if (m_refreshFromRuntimeOnNextOpen)
+	if (m_bRefreshFromRuntimeOnNextOpen)
 	{
 		if (m_renderingPanel != nullptr)
 		{
 			m_renderingPanel->RefreshFromRuntimeState();
 		}
-		m_refreshFromRuntimeOnNextOpen = false;
+		m_bRefreshFromRuntimeOnNextOpen = false;
 	}
 
 	if (!BeginWindow())
@@ -62,19 +62,19 @@ void SettingsPanel::BuildUI(bool disableInteraction)
 		return;
 	}
 
-	const bool showRestartBar = HasPendingRestart();
-	const float restartBarHeight = showRestartBar ? 34.0f : 0.0f;
+	const bool bShowRestartBar = HasPendingRestart();
+	const float restartBarHeight = bShowRestartBar ? 34.0f : 0.0f;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(14.0f, 10.0f));
 	ImGui::BeginChild("##SettingsContent", ImVec2(0.0f, -restartBarHeight));
-	DrawToolbar(disableInteraction);
+	DrawToolbar(bDisableInteraction);
 	ImGui::Dummy(ImVec2(0.0f, 4.0f));
 	if (m_renderingPanel != nullptr)
 	{
-		m_renderingPanel->BuildUI(disableInteraction, m_filterText.c_str());
+		m_renderingPanel->BuildUI(bDisableInteraction, m_filterText.c_str());
 	}
 	ImGui::EndChild();
 
-	if (showRestartBar)
+	if (bShowRestartBar)
 	{
 		DrawRestartBar(restartBarHeight);
 	}
@@ -90,7 +90,7 @@ bool SettingsPanel::BeginWindow()
 	ImGui::SetNextWindowSize(ImVec2(1120.0f, 780.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), viewport->WorkSize);
 	const std::string windowTitle = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Settings, "Settings") + "##EditorSettings";
-	if (!ImGui::Begin(windowTitle.c_str(), &m_isOpen))
+	if (!ImGui::Begin(windowTitle.c_str(), &m_bIsOpen))
 	{
 		ImGui::End();
 		return false;
@@ -126,9 +126,9 @@ void SettingsPanel::DrawRestartBar(float restartBarHeight)
 	ImGui::PopStyleVar();
 }
 
-void SettingsPanel::DrawToolbar(bool disableInteraction)
+void SettingsPanel::DrawToolbar(bool bDisableInteraction)
 {
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	const std::string resetLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Reset, "Reset rendering defaults");
 	if (ImGui::Button(resetLabel.c_str()))
 	{
@@ -147,9 +147,9 @@ void SettingsPanel::DrawToolbar(bool disableInteraction)
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 	ImGui::SetNextItemWidth(-FLT_MIN);
 	const std::string searchHint = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Search, "Search");
-	const bool filterEdited = ImGui::InputTextWithHint("##SettingsSearch", searchHint.c_str(), filterBuffer.data(), filterBuffer.size());
+	const bool bFilterEdited = ImGui::InputTextWithHint("##SettingsSearch", searchHint.c_str(), filterBuffer.data(), filterBuffer.size());
 
-	if (filterEdited)
+	if (bFilterEdited)
 	{
 		m_filterText = filterBuffer.data();
 	}

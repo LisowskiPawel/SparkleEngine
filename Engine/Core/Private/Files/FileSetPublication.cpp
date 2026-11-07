@@ -33,10 +33,10 @@ namespace Files
 	class FileSetLock final
 	{
 	public:
-		FileSetLock(const std::filesystem::path& root, bool writing)
+		FileSetLock(const std::filesystem::path& root, bool bWriting)
 		{
 			std::error_code error;
-			if (writing)
+			if (bWriting)
 			{
 				std::filesystem::create_directories(root, error);
 			}
@@ -50,7 +50,7 @@ namespace Files
 			    GENERIC_READ | (writing ? GENERIC_WRITE : 0),
 			    FILE_SHARE_READ | FILE_SHARE_WRITE,
 			    nullptr,
-			    writing ? OPEN_ALWAYS : OPEN_EXISTING,
+			    bWriting ? OPEN_ALWAYS : OPEN_EXISTING,
 			    FILE_ATTRIBUTE_NORMAL,
 			    nullptr);
 
@@ -88,12 +88,12 @@ namespace Files
 		for (const auto& root : roots)
 		{
 			const auto normalized = PublicationRoot(root);
-			bool contained = false;
+			bool bContained = false;
 			for (const auto& accepted : result)
 			{
-				contained |= Paths::IsUnderRoot(normalized, accepted);
+				bContained |= Paths::IsUnderRoot(normalized, accepted);
 			}
-			if (!contained)
+			if (!bContained)
 			{
 				result.push_back(normalized);
 			}
@@ -160,8 +160,8 @@ namespace Files
 		struct Replacement final
 		{
 			FilePublication File;
-			bool Preserved = false;
-			bool Published = false;
+			bool bPreserved = false;
+			bool bPublished = false;
 		};
 
 		explicit Implementation(std::span<const std::filesystem::path> roots) :
@@ -186,12 +186,12 @@ namespace Files
 		{
 			for (const auto& path : {file.StagedPath, file.PublishedPath, BuildTemporaryPath(file.PublishedPath, ".previous-generation")})
 			{
-				bool contained = false;
+				bool bContained = false;
 				for (const auto& root : Roots)
 				{
-					contained |= path != root && Paths::IsUnderRoot(path, root);
+					bContained |= path != root && Paths::IsUnderRoot(path, root);
 				}
-				if (!contained)
+				if (!bContained)
 				{
 					throw Diagnostics::Error(std::format("Publication path '{}' escapes its output directories.", path.string()));
 				}
@@ -209,8 +209,8 @@ namespace Files
 			{
 				throw Diagnostics::Error("Publication staging input is missing or is not a regular file.");
 			}
-			const bool publishedExists = std::filesystem::exists(file.PublishedPath, error);
-			if (error || (publishedExists && !std::filesystem::is_regular_file(file.PublishedPath, error)) || error)
+			const bool bPublishedExists = std::filesystem::exists(file.PublishedPath, error);
+			if (error || (bPublishedExists && !std::filesystem::is_regular_file(file.PublishedPath, error)) || error)
 			{
 				throw Diagnostics::Error("Publication destination is not a regular file.");
 			}
@@ -264,18 +264,18 @@ namespace Files
 			for (Replacement& replacement : replacements)
 			{
 				std::error_code error;
-				const bool exists = std::filesystem::exists(replacement.File.PublishedPath, error);
+				const bool bExists = std::filesystem::exists(replacement.File.PublishedPath, error);
 				if (error)
 				{
 					throw Diagnostics::Error("Could not inspect the previous publication output.");
 				}
-				if (exists)
+				if (bExists)
 				{
 					MovePublishedFile(replacement.File.PublishedPath, BuildTemporaryPath(replacement.File.PublishedPath, ".previous-generation"));
-					replacement.Preserved = true;
+					replacement.bPreserved = true;
 				}
 				MovePublishedFile(replacement.File.StagedPath, replacement.File.PublishedPath);
-				replacement.Published = true;
+				replacement.bPublished = true;
 			}
 		}
 
@@ -283,7 +283,7 @@ namespace Files
 		{
 			for (const Replacement& replacement : replacements)
 			{
-				if (replacement.Preserved)
+				if (replacement.bPreserved)
 				{
 					RemovePublicationFile(BuildTemporaryPath(replacement.File.PublishedPath, ".previous-generation"));
 				}
@@ -294,11 +294,11 @@ namespace Files
 		{
 			for (auto replacement = replacements.rbegin(); replacement != replacements.rend(); ++replacement)
 			{
-				if (replacement->Preserved)
+				if (replacement->bPreserved)
 				{
 					MovePublishedFile(BuildTemporaryPath(replacement->File.PublishedPath, ".previous-generation"), replacement->File.PublishedPath);
 				}
-				else if (replacement->Published)
+				else if (replacement->bPublished)
 				{
 					RemovePublicationFile(replacement->File.PublishedPath);
 				}
@@ -309,20 +309,20 @@ namespace Files
 		bool Publish(std::span<const FilePublication> files, std::string& outErrorMessage)
 		{
 			std::vector<Replacement> replacements;
-			bool started = false;
-			bool committed = false;
+			bool bStarted = false;
+			bool bCommitted = false;
 			try
 			{
 				RequireComplete();
 				replacements = PlanReplacements(files);
-				started = !files.empty();
-				if (started)
+				bStarted = !files.empty();
+				if (bStarted)
 				{
 					MarkIncomplete();
 				}
 				ReplaceFiles(replacements);
 
-				committed = true;
+				bCommitted = true;
 				DiscardBackups(replacements);
 				ClearMarkers();
 				outErrorMessage.clear();
@@ -331,7 +331,7 @@ namespace Files
 			catch (const Diagnostics::Error& error)
 			{
 				outErrorMessage = error.what();
-				if (started && !committed)
+				if (bStarted && !bCommitted)
 				{
 					try
 					{
@@ -344,7 +344,7 @@ namespace Files
 						outErrorMessage += std::format(" Rollback failed: {}", rollback.what());
 					}
 				}
-				if (started)
+				if (bStarted)
 				{
 					outErrorMessage += " Clean generated output and cook again.";
 				}

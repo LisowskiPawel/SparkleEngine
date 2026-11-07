@@ -9,24 +9,24 @@
 
 bool CameraNavigation::Apply(const CameraInputIntent& intent, const CameraNavigationSettings& settings, float deltaSeconds, CameraNavigationState& state) noexcept
 {
-	bool changed = false;
+	bool bChanged = false;
 	if (intent.LookDeltaX != 0.0f || intent.LookDeltaY != 0.0f)
 	{
 		const float rotationSpeedRadiansPerPixel = DirectX::XMConvertToRadians(settings.RotationSpeedDegreesPerPixel);
-		const float ySign = settings.InvertY ? -1.0f : 1.0f;
+		const float ySign = settings.bInvertY ? -1.0f : 1.0f;
 		constexpr float maximumPitch = DirectX::XM_PIDIV2 - 0.01f;
 		state.PitchRadians = std::clamp(state.PitchRadians + ySign * intent.LookDeltaY * rotationSpeedRadiansPerPixel, -maximumPitch, maximumPitch);
 		state.YawRadians += intent.LookDeltaX * rotationSpeedRadiansPerPixel;
-		changed = true;
+		bChanged = true;
 	}
 
 	const float clampedDeltaSeconds = (std::max) (0.0f, deltaSeconds);
 	if (clampedDeltaSeconds <= 0.0f || (intent.ForwardAxis == 0.0f && intent.RightAxis == 0.0f && intent.UpAxis == 0.0f))
 	{
-		return changed;
+		return bChanged;
 	}
 
-	const float speed = settings.MoveSpeedMetersPerSecond * (intent.Sprint ? settings.SprintMultiplier : 1.0f);
+	const float speed = settings.MoveSpeedMetersPerSecond * (intent.bSprint ? settings.SprintMultiplier : 1.0f);
 	const float distance = speed * clampedDeltaSeconds;
 	const DirectX::XMVECTOR orientation = DirectX::XMQuaternionRotationRollPitchYaw(state.PitchRadians, state.YawRadians, 0.0f);
 	const DirectX::XMVECTOR forward = DirectX::XMVector3Rotate(DirectX::XMVectorSet(WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ, 0.0f), orientation);

@@ -9,11 +9,11 @@ bool SupportsMaterialTextureTable(const RhiCapabilities& capabilities) noexcept
 	{
 		return false;
 	}
-	if (!capabilities.DescriptorIndexing.SupportsSampledImageArrayNonUniformIndexing)
+	if (!capabilities.DescriptorIndexing.bNonUniformSampledImages)
 	{
 		return false;
 	}
-	if (!capabilities.DescriptorIndexing.SupportsPartiallyBoundDescriptorArrays)
+	if (!capabilities.DescriptorIndexing.bSupportsPartiallyBoundDescriptorArrays)
 	{
 		return false;
 	}

@@ -174,13 +174,13 @@ void VulkanRenderDeviceServices::BeginFrameRecording()
 
 void VulkanRenderDeviceServices::AcquireFrameBackBuffer()
 {
-	bool acquired = m_frameSubmission->AcquireBackBuffer();
-	if (!acquired && m_swapChain->ConsumeResizeRequest())
+	bool bAcquired = m_frameSubmission->AcquireBackBuffer();
+	if (!bAcquired && m_swapChain->ConsumeResizeRequest())
 	{
 		ResizeSwapChain();
-		acquired = m_frameSubmission->AcquireBackBuffer();
+		bAcquired = m_frameSubmission->AcquireBackBuffer();
 	}
-	if (!acquired)
+	if (!bAcquired)
 	{
 		m_commandRecordingContext->CancelFrame(m_currentFrameIndex);
 		m_renderHardwareInterface->RebuildSwapChainBackBufferViews();

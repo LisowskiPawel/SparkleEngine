@@ -22,7 +22,7 @@ namespace SparkleLauncher
 			m_activityPanel->ShowRunOutput(m_startingLevelRunId);
 			return;
 		}
-		if (!level.GameSupported || !level.CanSelect)
+		if (!level.bGameSupported || !level.bCanSelect)
 		{
 			return;
 		}

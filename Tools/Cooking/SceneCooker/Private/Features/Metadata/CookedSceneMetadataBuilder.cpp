@@ -22,17 +22,17 @@ public:
 			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::Lights);
 		}
 
-		bool hasSkinnedMeshes = !importOutput.scene.skeletons.empty();
+		bool bHasSkinnedMeshes = !importOutput.scene.skeletons.empty();
 		for (const ImportedMeshPrimitive& primitive : importOutput.scene.meshPrimitives)
 		{
 			if (primitive.geometry.HasSkinInfluences())
 			{
-				hasSkinnedMeshes = true;
+				bHasSkinnedMeshes = true;
 				break;
 			}
 		}
 
-		if (hasSkinnedMeshes)
+		if (bHasSkinnedMeshes)
 		{
 			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::SkinnedMeshes);
 			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::Skeletons);
@@ -43,17 +43,17 @@ public:
 			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::Animations);
 		}
 
-		bool hasSkeletalMorphTargets = false;
+		bool bHasSkeletalMorphTargets = false;
 		for (const ImportedMeshPrimitive& primitive : importOutput.scene.meshPrimitives)
 		{
 			if (primitive.geometry.HasSkinInfluences() && primitive.geometry.HasMorphTargets())
 			{
-				hasSkeletalMorphTargets = true;
+				bHasSkeletalMorphTargets = true;
 				break;
 			}
 		}
 
-		if (hasSkeletalMorphTargets)
+		if (bHasSkeletalMorphTargets)
 		{
 			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::MorphTargets);
 		}

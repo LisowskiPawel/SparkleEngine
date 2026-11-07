@@ -54,12 +54,12 @@ namespace ECS
 		}
 		GameWorldSystemExecution systems(state, context, epoch);
 		GameSystemGraphError error;
-		const bool executed = state.m_systemGraph.Execute(context.Executor, systems, error);
-		if (executed)
+		const bool bExecuted = state.m_systemGraph.Execute(context.Executor, systems, error);
+		if (bExecuted)
 		{
 			state.m_dirtyTransforms.clear();
-			state.m_evaluateAllTransforms = false;
+			state.m_bEvaluateAllTransforms = false;
 		}
-		return executed;
+		return bExecuted;
 	}
 }

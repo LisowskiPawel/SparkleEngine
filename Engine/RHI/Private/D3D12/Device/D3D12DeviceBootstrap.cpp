@@ -86,9 +86,9 @@ void D3D12Rhi::CreateFactory()
 	if (m_interposerHooks.ResolveNativeInterface != nullptr)
 	{
 		ComPtr<IDXGIFactory7> nativeFactory;
-		const bool factoryResolved = TryResolveNativeInterface(ERhiInterposerInterfaceKind::PresentationFactory, createdFactory.Get(), IID_PPV_ARGS(nativeFactory.ReleaseAndGetAddressOf()));
+		const bool bFactoryResolved = TryResolveNativeInterface(ERhiInterposerInterfaceKind::PresentationFactory, createdFactory.Get(), IID_PPV_ARGS(nativeFactory.ReleaseAndGetAddressOf()));
 
-		if (factoryResolved)
+		if (bFactoryResolved)
 		{
 			m_dxgiFactory = std::move(nativeFactory);
 			return;
@@ -110,9 +110,9 @@ void D3D12Rhi::CreateDevice()
 	if (m_interposerHooks.ResolveNativeInterface != nullptr)
 	{
 		ComPtr<ID3D12Device10> nativeDevice;
-		const bool deviceResolved = TryResolveNativeInterface(ERhiInterposerInterfaceKind::GraphicsDevice, createdDevice.Get(), IID_PPV_ARGS(nativeDevice.ReleaseAndGetAddressOf()));
+		const bool bDeviceResolved = TryResolveNativeInterface(ERhiInterposerInterfaceKind::GraphicsDevice, createdDevice.Get(), IID_PPV_ARGS(nativeDevice.ReleaseAndGetAddressOf()));
 
-		if (deviceResolved)
+		if (bDeviceResolved)
 		{
 			m_device = std::move(nativeDevice);
 		}
@@ -126,7 +126,7 @@ void D3D12Rhi::CreateDevice()
 #endif
 	if (m_interposerHooks.DeviceCreated != nullptr)
 	{
-		m_interposerActive = m_interposerHooks.DeviceCreated(NativeGraphicsDeviceHandle{m_device.Get()}, BuildD3D12AdapterIdentity(this), m_interposerHooks.UserData);
+		m_bInterposerActive = m_interposerHooks.DeviceCreated(NativeGraphicsDeviceHandle{m_device.Get()}, BuildD3D12AdapterIdentity(this), m_interposerHooks.UserData);
 	}
 	CheckRayTracingSupport();
 }

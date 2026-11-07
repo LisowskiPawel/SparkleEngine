@@ -61,14 +61,14 @@ void RenderGpuGeometryState::UpdateMeshInstances(const PreparedRenderScene& prep
 	}
 
 	const std::uint64_t nextRevision = m_meshInstanceRevision + 1u;
-	bool changed = false;
+	bool bChanged = false;
 	if (requiredCapacity > m_payloads.MeshInstances.size())
 	{
 		const std::size_t previousCapacity = m_payloads.MeshInstances.size();
 		m_payloads.MeshInstances.resize(requiredCapacity);
 		m_meshInstanceElementRevisions.resize(requiredCapacity);
 		std::fill(m_meshInstanceElementRevisions.begin() + previousCapacity, m_meshInstanceElementRevisions.end(), nextRevision);
-		changed = true;
+		bChanged = true;
 	}
 
 	for (const PreparedRenderPrimitive& primitive : preparedScene.primitives)
@@ -83,10 +83,10 @@ void RenderGpuGeometryState::UpdateMeshInstances(const PreparedRenderScene& prep
 
 		m_payloads.MeshInstances[slot] = value;
 		m_meshInstanceElementRevisions[slot] = nextRevision;
-		changed = true;
+		bChanged = true;
 	}
 
-	if (changed)
+	if (bChanged)
 	{
 		m_meshInstanceRevision = nextRevision;
 	}

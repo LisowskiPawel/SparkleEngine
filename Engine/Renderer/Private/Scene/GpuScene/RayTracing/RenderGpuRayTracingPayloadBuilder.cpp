@@ -39,21 +39,21 @@ static RenderGpuMeshHitDataOffsets ResolveMeshOffsets(MeshHitDataOffsets& meshOf
 	constexpr std::size_t maximumPayloadElementCount = (std::numeric_limits<std::uint32_t>::max)();
 	const bool bMeshDataValidmeshVerticesEmpty = mesh.HasRayTracingHitData() && !meshVertices.empty();
 	const bool bMeshDataValidmeshIndicesSize = bMeshDataValidmeshVerticesEmpty && (meshIndices.size() >= 3u);
-	const bool meshHitDataValid = bMeshDataValidmeshIndicesSize && (meshIndices.size() % 3u == 0u);
-	const bool bSkinInfluencesValidSkinInfluences = meshHitDataValid && (mesh.HasSkinInfluences());
+	const bool bMeshHitDataValid = bMeshDataValidmeshIndicesSize && (meshIndices.size() % 3u == 0u);
+	const bool bSkinInfluencesValidSkinInfluences = bMeshHitDataValid && (mesh.HasSkinInfluences());
 	const bool bInfluencesValidmeshVerticesSize = bSkinInfluencesValidSkinInfluences && (skinInfluences.size() != meshVertices.size());
-	const bool bInfluencesValidmeshVerticesSize2 = meshHitDataValid && !bInfluencesValidmeshVerticesSize;
-	const bool skinInfluencesValid = meshHitDataValid && bInfluencesValidmeshVerticesSize2;
+	const bool bInfluencesValidmeshVerticesSize2 = bMeshHitDataValid && !bInfluencesValidmeshVerticesSize;
+	const bool bSkinInfluencesValid = bMeshHitDataValid && bInfluencesValidmeshVerticesSize2;
 
-	const bool bPayloadSizesValidVertices = skinInfluencesValid && payloads.Vertices.size() <= maximumPayloadElementCount;
+	const bool bPayloadSizesValidVertices = bSkinInfluencesValid && payloads.Vertices.size() <= maximumPayloadElementCount;
 	const bool bPayloadSizesValidIndices = bPayloadSizesValidVertices && (payloads.Indices.size() <= maximumPayloadElementCount);
-	const bool payloadSizesValid = bPayloadSizesValidIndices && (payloads.MorphTargetDeltas.size() <= maximumPayloadElementCount);
+	const bool bPayloadSizesValid = bPayloadSizesValidIndices && (payloads.MorphTargetDeltas.size() <= maximumPayloadElementCount);
 
-	const bool verticesFit = payloadSizesValid && meshVertices.size() <= maximumPayloadElementCount - payloads.Vertices.size();
-	const bool indicesFit = verticesFit && meshIndices.size() <= maximumPayloadElementCount - payloads.Indices.size();
-	const bool morphTargetsFit = indicesFit && morphTargetDeltas.size() <= maximumPayloadElementCount - payloads.MorphTargetDeltas.size();
+	const bool bVerticesFit = bPayloadSizesValid && meshVertices.size() <= maximumPayloadElementCount - payloads.Vertices.size();
+	const bool bIndicesFit = bVerticesFit && meshIndices.size() <= maximumPayloadElementCount - payloads.Indices.size();
+	const bool bMorphTargetsFit = bIndicesFit && morphTargetDeltas.size() <= maximumPayloadElementCount - payloads.MorphTargetDeltas.size();
 
-	if (!morphTargetsFit)
+	if (!bMorphTargetsFit)
 	{
 		Diagnostics::Fatal(g_renderGpuRayTracingPayloadBuilderLogger, __FILE__, __LINE__, "Ray-tracing work references invalid mesh hit data.");
 	}
@@ -85,7 +85,7 @@ static RenderGpuMeshHitDataOffsets ResolveMeshOffsets(MeshHitDataOffsets& meshOf
 
 static std::uint32_t BuildMaterialFlags(const MaterialData& material) noexcept
 {
-	std::uint32_t flags = material.doubleSided ? RayTracingHitData::MaterialFlag_DoubleSided : 0u;
+	std::uint32_t flags = material.bDoubleSided ? RayTracingHitData::MaterialFlag_DoubleSided : 0u;
 	if (material.alphaMode == 0)
 	{
 		flags |= RayTracingHitData::MaterialFlag_Opaque;
@@ -124,7 +124,7 @@ static std::uint32_t BuildGeometryFlags(const MeshDraw& draw, const MaterialData
 	{
 		flags |= RayTracingHitData::GeometryFlag_TexturedMaterial;
 	}
-	if (material.doubleSided)
+	if (material.bDoubleSided)
 	{
 		flags |= RayTracingHitData::GeometryFlag_DoubleSided;
 	}
@@ -184,10 +184,10 @@ static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpu
 	std::unordered_set<std::uint32_t> occupiedGpuSceneSlots;
 	for (const RenderRayTracingInstance& input : preparedScene.rayTracingInstances)
 	{
-		const bool gpuSceneSlotValid = input.GpuSceneSlot != (std::numeric_limits<std::uint32_t>::max)();
-		const bool gpuSceneSlotUnique = gpuSceneSlotValid && occupiedGpuSceneSlots.insert(input.GpuSceneSlot).second;
+		const bool bGpuSceneSlotValid = input.GpuSceneSlot != (std::numeric_limits<std::uint32_t>::max)();
+		const bool bGpuSceneSlotUnique = bGpuSceneSlotValid && occupiedGpuSceneSlots.insert(input.GpuSceneSlot).second;
 		
-		if (!gpuSceneSlotUnique)
+		if (!bGpuSceneSlotUnique)
 		{
 			Diagnostics::Fatal(g_renderGpuRayTracingPayloadBuilderLogger, __FILE__, __LINE__, "Ray-tracing work contains an invalid or duplicate GPU-scene slot.");
 		}
@@ -226,9 +226,9 @@ static void AppendInstance(
 	const bool bMissingSkinningGuardInfluences = bMissingSkinningGeometry && !bMissingSkinninggpuMesh2;
 	const bool bMissingSkinningSkinInfluences = bMissingSkinningGuardInfluences && (!gpuMesh->HasSkinInfluences());
 	const bool bMissingSkinningSkinInfluences2 = bMissingSkinninggpuMesh2 || bMissingSkinningSkinInfluences;
-	const bool missingSkinning = bMissingSkinningGeometry && bMissingSkinningSkinInfluences2;
+	const bool bMissingSkinning = bMissingSkinningGeometry && bMissingSkinningSkinInfluences2;
 
-	if (gpuMesh == nullptr || missingSkinning)
+	if (gpuMesh == nullptr || bMissingSkinning)
 	{
 		Diagnostics::Fatal(g_renderGpuRayTracingPayloadBuilderLogger, __FILE__, __LINE__, "Ray-tracing work references incomplete mesh or skinning data.");
 	}
@@ -244,7 +244,7 @@ static void AppendInstance(
 	    .IndexCount = offsets.IndexCount,
 	    .MaterialSlot = draw.MaterialSlot,
 	    .Flags = RayTracingHitData::InstanceFlag_Valid | (material.alphaMode == 0 ? RayTracingHitData::InstanceFlag_Opaque : 0u)
-	        | (draw.Geometry.MeshKind == RenderMeshKind::Static ? RayTracingHitData::InstanceFlag_StaticMesh : 0u) | (material.doubleSided ? RayTracingHitData::InstanceFlag_TwoSided : 0u),
+	        | (draw.Geometry.MeshKind == RenderMeshKind::Static ? RayTracingHitData::InstanceFlag_StaticMesh : 0u) | (material.bDoubleSided ? RayTracingHitData::InstanceFlag_TwoSided : 0u),
 	    .GeometryFlags = BuildGeometryFlags(draw, material),
 	    .RejectionReason = RayTracingHitData::Reason_None,
 	    .AlphaMode = material.alphaMode,

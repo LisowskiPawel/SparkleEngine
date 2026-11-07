@@ -60,9 +60,9 @@ private:
 	static void ValidateGeometry(const ImportedMeshGeometry& geometry, std::size_t primitiveIndex)
 	{
 		const bool bMeshGeometryInvalidvertices = !geometry.IsValid() || geometry.vertices.size() > (std::numeric_limits<std::uint32_t>::max)();
-		const bool meshGeometryInvalid = bMeshGeometryInvalidvertices || (geometry.indices.size() % 3u != 0u);
+		const bool bMeshGeometryInvalid = bMeshGeometryInvalidvertices || (geometry.indices.size() % 3u != 0u);
 		
-		if (meshGeometryInvalid)
+		if (bMeshGeometryInvalid)
 		{
 			throw Diagnostics::Error(std::format("Imported mesh primitive {} has invalid triangle geometry.", primitiveIndex));
 		}

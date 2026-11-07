@@ -7,7 +7,7 @@
 
 void FramePipeline::ExecuteFrame()
 {
-	if (!m_frameGraphExecutable)
+	if (!m_bFrameGraphExecutable)
 	{
 		return;
 	}

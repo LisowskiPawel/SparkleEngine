@@ -5,8 +5,8 @@
 #include <string>
 
 // Fixed SPIR-V ABI shared by compile identity and every backend's native option mapping.
-inline constexpr bool SpirVUseDirectXBufferLayout = true;
-inline constexpr bool SpirVUseUnknownStorageImageFormat = true;
+inline constexpr bool bSpirVUseDirectXBufferLayout = true;
+inline constexpr bool bSpirVUseUnknownStorageImageFormat = true;
 
 const char* GetShaderModelProfileName(ShaderTarget target);
 const char* GetSpirVProfileName(ShaderTarget target);

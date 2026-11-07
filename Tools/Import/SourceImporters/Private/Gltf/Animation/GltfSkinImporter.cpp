@@ -67,20 +67,20 @@ ImportedSkinInfluence GltfSkinImporter::ReadSkinInfluence(
 
 	cgltf_uint jointValues[8] = {};
 	cgltf_float weightValues[8] = {};
-	const bool primaryJointsRead = cgltf_accessor_read_uint(joints0, vertexIndex, jointValues, 4);
-	const bool primaryWeightsRead = primaryJointsRead && cgltf_accessor_read_float(weights0, vertexIndex, weightValues, 4);
-	const bool bSecondaryJointsReadyjoints1 = primaryWeightsRead && (joints1 == nullptr);
-	const bool bSecondaryJointsReadyGuardreaduint = primaryWeightsRead && !bSecondaryJointsReadyjoints1;
+	const bool bPrimaryJointsRead = cgltf_accessor_read_uint(joints0, vertexIndex, jointValues, 4);
+	const bool bPrimaryWeightsRead = bPrimaryJointsRead && cgltf_accessor_read_float(weights0, vertexIndex, weightValues, 4);
+	const bool bSecondaryJointsReadyjoints1 = bPrimaryWeightsRead && (joints1 == nullptr);
+	const bool bSecondaryJointsReadyGuardreaduint = bPrimaryWeightsRead && !bSecondaryJointsReadyjoints1;
 	const bool bSecondaryJointsReadyreaduint = bSecondaryJointsReadyGuardreaduint && (cgltf_accessor_read_uint(joints1, vertexIndex, jointValues + 4, 4));
 	const bool bSecondaryJointsReadyreaduint2 = bSecondaryJointsReadyjoints1 || bSecondaryJointsReadyreaduint;
-	const bool secondaryJointsReady = primaryWeightsRead && bSecondaryJointsReadyreaduint2;
-	const bool bSecondaryWeightsReadyjoints1 = secondaryJointsReady && (joints1 == nullptr);
-	const bool bWeightsReadyGuardreadfloat = secondaryJointsReady && !bSecondaryWeightsReadyjoints1;
+	const bool bSecondaryJointsReady = bPrimaryWeightsRead && bSecondaryJointsReadyreaduint2;
+	const bool bSecondaryWeightsReadyjoints1 = bSecondaryJointsReady && (joints1 == nullptr);
+	const bool bWeightsReadyGuardreadfloat = bSecondaryJointsReady && !bSecondaryWeightsReadyjoints1;
 	const bool bSecondaryWeightsReadyreadfloat = bWeightsReadyGuardreadfloat && (cgltf_accessor_read_float(weights1, vertexIndex, weightValues + 4, 4));
 	const bool bSecondaryWeightsReadyreadfloat2 = bSecondaryWeightsReadyjoints1 || bSecondaryWeightsReadyreadfloat;
-	const bool secondaryWeightsReady = secondaryJointsReady && bSecondaryWeightsReadyreadfloat2;
+	const bool bSecondaryWeightsReady = bSecondaryJointsReady && bSecondaryWeightsReadyreadfloat2;
 
-	if (!secondaryWeightsReady)
+	if (!bSecondaryWeightsReady)
 	{
 		throw Diagnostics::Error(std::format("Cannot decode glTF skin influence at vertex {}.", vertexIndex));
 	}

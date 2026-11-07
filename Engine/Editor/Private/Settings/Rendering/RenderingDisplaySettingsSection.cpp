@@ -23,21 +23,21 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 	    {"sRGB", EngineOutputColorEncoding::Srgb},
 	};
 
-	const bool displayMatches = RenderingSettingsUi::MatchesFilter(filterText, "Display", "display vsync high-performance adapter gpu back buffer format sdr srgb linear output encoding");
-	const bool displayOpen = displayMatches && RenderingSettingsUi::BeginSettingsCategory("Display");
+	const bool bDisplayMatches = RenderingSettingsUi::MatchesFilter(filterText, "Display", "display vsync high-performance adapter gpu back buffer format sdr srgb linear output encoding");
+	const bool bDisplayOpen = bDisplayMatches && RenderingSettingsUi::BeginSettingsCategory("Display");
 
-	if (!displayOpen)
+	if (!bDisplayOpen)
 	{
 		return;
 	}
 
 	if (RenderingSettingsUi::BeginSettingsTable("##RenderingDisplaySettings"))
 	{
-		bool vSync = settings.VSync;
-		const bool vSyncEdited = RenderingSettingsUi::DrawBooleanRow("##VSync", "VSync", vSync);
-		if (vSyncEdited)
+		bool bVSync = settings.bVSync;
+		const bool bVSyncEdited = RenderingSettingsUi::DrawBooleanRow("##VSync", "VSync", bVSync);
+		if (bVSyncEdited)
 		{
-			settingsController.SetVSync(vSync);
+			settingsController.SetVSync(bVSync);
 		}
 
 		RenderingSettingsUi::DrawComboOptionRow(
@@ -47,11 +47,11 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 		    backBufferFormatOptions,
 		    [&settingsController](PixelFormat value) { settingsController.SetBackBufferFormat(value); });
 
-		bool preferHighPerformanceAdapter = settings.PreferHighPerformanceAdapter;
-		const bool preferHighPerformanceAdapterEdited = RenderingSettingsUi::DrawBooleanRow("##PreferHighPerformanceAdapter", "Prefer high-performance adapter", preferHighPerformanceAdapter);
-		if (preferHighPerformanceAdapterEdited)
+		bool bPreferHighPerformanceAdapter = settings.bPreferHighPerformanceAdapter;
+		const bool bPreferHighPerformanceAdapterEdited = RenderingSettingsUi::DrawBooleanRow("##PreferHighPerformanceAdapter", "Prefer high-performance adapter", bPreferHighPerformanceAdapter);
+		if (bPreferHighPerformanceAdapterEdited)
 		{
-			settingsController.SetPreferHighPerformanceAdapter(preferHighPerformanceAdapter);
+			settingsController.SetPreferHighPerformanceAdapter(bPreferHighPerformanceAdapter);
 		}
 
 		RenderingSettingsUi::DrawComboOptionRow(

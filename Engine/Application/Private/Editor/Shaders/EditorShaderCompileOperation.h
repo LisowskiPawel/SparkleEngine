@@ -10,7 +10,7 @@ class EditorShaderCompileOperation final
 {
 public:
 	explicit EditorShaderCompileOperation(EditorOperationRuntime& operations, const EditorShaderCompileAction& compile);
-	ConsoleCommandResult Request(bool generateSymbols);
+	ConsoleCommandResult Request(bool bGenerateSymbols);
 	void Update(UI& ui, Renderer& renderer);
 
 private:

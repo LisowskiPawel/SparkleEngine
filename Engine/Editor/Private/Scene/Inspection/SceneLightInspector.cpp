@@ -34,9 +34,9 @@ namespace SceneLightInspector
 	{
 		float luminousIntensity = value;
 		constexpr float kDefaultLuminousIntensity = 1.0f;
-		const bool luminousIntensityEdited = EditorWidgets::EditDetailsFloat("Luminous Intensity (candela)", luminousIntensity, 10.0f, 0.0f, 0.0f, "%.3f", &kDefaultLuminousIntensity);
+		const bool bLuminousIntensityEdited = EditorWidgets::EditDetailsFloat("Luminous Intensity (candela)", luminousIntensity, 10.0f, 0.0f, 0.0f, "%.3f", &kDefaultLuminousIntensity);
 		
-		if (luminousIntensityEdited)
+		if (bLuminousIntensityEdited)
 		{
 			value = luminousIntensity;
 			return true;
@@ -48,9 +48,9 @@ namespace SceneLightInspector
 	{
 		float directionValues[3] = {value.x, value.y, value.z};
 		const float defaultDirection[3] = {0.0f, -1.0f, 0.0f};
-		const bool lightDirectionEdited = EditorWidgets::EditDetailsFloat3("Direction", directionValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultDirection);
+		const bool bLightDirectionEdited = EditorWidgets::EditDetailsFloat3("Direction", directionValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultDirection);
 		
-		if (lightDirectionEdited)
+		if (bLightDirectionEdited)
 		{
 			value = {directionValues[0], directionValues[1], directionValues[2]};
 			return true;
@@ -82,13 +82,13 @@ namespace SceneLightInspector
 		return false;
 	}
 
-	static bool EditLightCastShadow(bool& value) noexcept
+	static bool EditLightCastShadow(bool& bValue) noexcept
 	{
-		bool castShadow = value;
-		constexpr bool kDefaultCastShadow = true;
-		if (EditorWidgets::EditDetailsCheckbox("Cast Shadow", castShadow, &kDefaultCastShadow))
+		bool bCastShadow = bValue;
+		constexpr bool bKDefaultCastShadow = true;
+		if (EditorWidgets::EditDetailsCheckbox("Cast Shadow", bCastShadow, &bKDefaultCastShadow))
 		{
-			value = castShadow;
+			bValue = bCastShadow;
 			return true;
 		}
 		return false;
@@ -98,9 +98,9 @@ namespace SceneLightInspector
 	{
 		if (SceneDirectionalLightDesc* directional = lightDesc.GetDirectional())
 		{
-			bool changed = BuildDirectionalLightTransformCategory(filterText, *directional);
-			changed |= BuildDirectionalLightCategory(filterText, *directional);
-			return changed;
+			bool bChanged = BuildDirectionalLightTransformCategory(filterText, *directional);
+			bChanged |= BuildDirectionalLightCategory(filterText, *directional);
+			return bChanged;
 		}
 		else if (PointLightDesc* point = lightDesc.GetPoint())
 		{
@@ -121,11 +121,11 @@ namespace SceneLightInspector
 	void Build(const SceneLightDesc& sceneLight, EntityId lightEntity, EditorTransactionHistory& transactionHistory, std::uint64_t worldGeneration, const std::string& filterText) noexcept
 	{
 		SceneLightDesc lightDesc = sceneLight;
-		bool changed = BuildLightCommonCategory(filterText, lightDesc);
+		bool bChanged = BuildLightCommonCategory(filterText, lightDesc);
 
-		changed |= BuildLightTypeCategories(filterText, lightDesc);
+		bChanged |= BuildLightTypeCategories(filterText, lightDesc);
 
-		if (!changed)
+		if (!bChanged)
 		{
 			return;
 		}
@@ -135,11 +135,11 @@ namespace SceneLightInspector
 
 	static bool BuildLightCommonCategory(const std::string& filterText, SceneLightDesc& lightDesc) noexcept
 	{
-		bool changed = false;
-		const bool lightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Light", "color visible visibility rendering");
-		const bool lightOpen = lightMatches && EditorWidgets::DrawDetailsCategory("Light");
+		bool bChanged = false;
+		const bool bLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Light", "color visible visibility rendering");
+		const bool bLightOpen = bLightMatches && EditorWidgets::DrawDetailsCategory("Light");
 
-		if (!lightOpen)
+		if (!bLightOpen)
 		{
 			return false;
 		}
@@ -149,25 +149,25 @@ namespace SceneLightInspector
 		if (EditorWidgets::EditDetailsColor3("Color", colorValues, defaultColor))
 		{
 			lightDesc.common.color = {colorValues[0], colorValues[1], colorValues[2]};
-			changed = true;
+			bChanged = true;
 		}
 
-		constexpr bool kDefaultVisible = true;
-		bool visible = lightDesc.common.visible;
-		if (EditorWidgets::EditDetailsCheckbox("Visible", visible, &kDefaultVisible))
+		constexpr bool bKDefaultVisible = true;
+		bool bVisible = lightDesc.common.bVisible;
+		if (EditorWidgets::EditDetailsCheckbox("Visible", bVisible, &bKDefaultVisible))
 		{
-			lightDesc.common.visible = visible;
-			changed = true;
+			lightDesc.common.bVisible = bVisible;
+			bChanged = true;
 		}
-		return changed;
+		return bChanged;
 	}
 
 	static bool BuildDirectionalLightTransformCategory(const std::string& filterText, SceneDirectionalLightDesc& lightDesc) noexcept
 	{
-		const bool transformMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Transform", "rotation direction transform");
-		const bool transformOpen = transformMatches && EditorWidgets::DrawDetailsCategory("Transform");
+		const bool bTransformMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Transform", "rotation direction transform");
+		const bool bTransformOpen = bTransformMatches && EditorWidgets::DrawDetailsCategory("Transform");
 
-		if (!transformOpen)
+		if (!bTransformOpen)
 		{
 			return false;
 		}
@@ -186,11 +186,11 @@ namespace SceneLightInspector
 
 	static bool BuildDirectionalLightCategory(const std::string& filterText, SceneDirectionalLightDesc& lightDesc) noexcept
 	{
-		bool changed = false;
-		const bool directionalLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Directional Light", "illuminance lux angular size direction cast shadow rendering");
-		const bool directionalLightOpen = directionalLightMatches && EditorWidgets::DrawDetailsCategory("Directional Light");
+		bool bChanged = false;
+		const bool bDirectionalLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Directional Light", "illuminance lux angular size direction cast shadow rendering");
+		const bool bDirectionalLightOpen = bDirectionalLightMatches && EditorWidgets::DrawDetailsCategory("Directional Light");
 
-		if (!directionalLightOpen)
+		if (!bDirectionalLightOpen)
 		{
 			return false;
 		}
@@ -200,92 +200,92 @@ namespace SceneLightInspector
 		if (EditorWidgets::EditDetailsFloat("Illuminance (lux)", illuminance, 100.0f, 0.0f, 0.0f, "%.3f", &kDefaultIlluminance))
 		{
 			lightDesc.illuminance = illuminance;
-			changed = true;
+			bChanged = true;
 		}
 
-		changed |= EditLightDirection(lightDesc.direction);
+		bChanged |= EditLightDirection(lightDesc.direction);
 
-		changed |= EditLightCastShadow(lightDesc.castShadow);
+		bChanged |= EditLightCastShadow(lightDesc.bCastShadow);
 
 		float angularSizeDegrees = MathUtils::RadiansToDegrees(lightDesc.angularSizeRadians);
 		constexpr float kDefaultAngularSizeDegrees = 0.533f;
-		const bool angularSizeEdited = EditorWidgets::EditDetailsFloat("Angular Size", angularSizeDegrees, kAngularSizeDragSpeedDegrees, 0.0f, kAngularSizeSliderMaxDegrees, "%.3f", &kDefaultAngularSizeDegrees);
+		const bool bAngularSizeEdited = EditorWidgets::EditDetailsFloat("Angular Size", angularSizeDegrees, kAngularSizeDragSpeedDegrees, 0.0f, kAngularSizeSliderMaxDegrees, "%.3f", &kDefaultAngularSizeDegrees);
 		
-		if (angularSizeEdited)
+		if (bAngularSizeEdited)
 		{
 			lightDesc.angularSizeRadians = MathUtils::DegreesToRadians(angularSizeDegrees);
-			changed = true;
+			bChanged = true;
 		}
-		return changed;
+		return bChanged;
 	}
 
 	static bool BuildPointLightCategory(const std::string& filterText, PointLightDesc& lightDesc) noexcept
 	{
-		bool changed = false;
-		const bool pointLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Point Light", "luminous intensity candela range radius distance attenuation point");
-		const bool pointLightOpen = pointLightMatches && EditorWidgets::DrawDetailsCategory("Point Light");
+		bool bChanged = false;
+		const bool bPointLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Point Light", "luminous intensity candela range radius distance attenuation point");
+		const bool bPointLightOpen = bPointLightMatches && EditorWidgets::DrawDetailsCategory("Point Light");
 
-		if (!pointLightOpen)
+		if (!bPointLightOpen)
 		{
 			return false;
 		}
 
-		changed |= EditLuminousIntensity(lightDesc.luminousIntensity);
+		bChanged |= EditLuminousIntensity(lightDesc.luminousIntensity);
 
-		changed |= EditLightRange(lightDesc.range);
+		bChanged |= EditLightRange(lightDesc.range);
 
-		changed |= EditLightRadius(lightDesc.radius);
-		return changed;
+		bChanged |= EditLightRadius(lightDesc.radius);
+		return bChanged;
 	}
 
 	static bool BuildSpotLightCategory(const std::string& filterText, SpotLightDesc& lightDesc) noexcept
 	{
-		bool changed = false;
-		const bool spotLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Spot Light", "luminous intensity candela direction range radius distance attenuation inner outer angle spot");
-		const bool spotLightOpen = spotLightMatches && EditorWidgets::DrawDetailsCategory("Spot Light");
+		bool bChanged = false;
+		const bool bSpotLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Spot Light", "luminous intensity candela direction range radius distance attenuation inner outer angle spot");
+		const bool bSpotLightOpen = bSpotLightMatches && EditorWidgets::DrawDetailsCategory("Spot Light");
 
-		if (!spotLightOpen)
+		if (!bSpotLightOpen)
 		{
 			return false;
 		}
 
-		changed |= EditLuminousIntensity(lightDesc.luminousIntensity);
+		bChanged |= EditLuminousIntensity(lightDesc.luminousIntensity);
 
-		changed |= EditLightDirection(lightDesc.direction);
+		bChanged |= EditLightDirection(lightDesc.direction);
 
-		changed |= EditLightRange(lightDesc.range);
+		bChanged |= EditLightRange(lightDesc.range);
 
-		changed |= EditLightRadius(lightDesc.radius);
+		bChanged |= EditLightRadius(lightDesc.radius);
 
 		float innerAngleDegrees = MathUtils::RadiansToDegrees(lightDesc.innerAngleRadians);
 		constexpr float kDefaultInnerAngleDegrees = 0.0f;
-		const bool innerAngleEdited = EditorWidgets::EditDetailsFloat("Inner Angle", innerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultInnerAngleDegrees);
+		const bool bInnerAngleEdited = EditorWidgets::EditDetailsFloat("Inner Angle", innerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultInnerAngleDegrees);
 		
-		if (innerAngleEdited)
+		if (bInnerAngleEdited)
 		{
 			lightDesc.innerAngleRadians = MathUtils::DegreesToRadians(innerAngleDegrees);
-			changed = true;
+			bChanged = true;
 		}
 
 		float outerAngleDegrees = MathUtils::RadiansToDegrees(lightDesc.outerAngleRadians);
 		constexpr float kDefaultOuterAngleDegrees = 45.0f;
-		const bool outerAngleEdited = EditorWidgets::EditDetailsFloat("Outer Angle", outerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultOuterAngleDegrees);
+		const bool bOuterAngleEdited = EditorWidgets::EditDetailsFloat("Outer Angle", outerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultOuterAngleDegrees);
 		
-		if (outerAngleEdited)
+		if (bOuterAngleEdited)
 		{
 			lightDesc.outerAngleRadians = MathUtils::DegreesToRadians(outerAngleDegrees);
-			changed = true;
+			bChanged = true;
 		}
-		return changed;
+		return bChanged;
 	}
 
 	static bool BuildRectLightCategory(const std::string& filterText, RectLightDesc& lightDesc) noexcept
 	{
-		bool changed = false;
-		const bool rectLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Rect Light", "luminance candela square meter direction tangent width height area rectangle quad shadow");
-		const bool rectLightOpen = rectLightMatches && EditorWidgets::DrawDetailsCategory("Rect Light");
+		bool bChanged = false;
+		const bool bRectLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Rect Light", "luminance candela square meter direction tangent width height area rectangle quad shadow");
+		const bool bRectLightOpen = bRectLightMatches && EditorWidgets::DrawDetailsCategory("Rect Light");
 
-		if (!rectLightOpen)
+		if (!bRectLightOpen)
 		{
 			return false;
 		}
@@ -295,19 +295,19 @@ namespace SceneLightInspector
 		if (EditorWidgets::EditDetailsFloat("Luminance (cd/m^2)", luminance, 10.0f, 0.0f, 0.0f, "%.3f", &kDefaultLuminance))
 		{
 			lightDesc.luminance = luminance;
-			changed = true;
+			bChanged = true;
 		}
 
-		changed |= EditLightDirection(lightDesc.direction);
+		bChanged |= EditLightDirection(lightDesc.direction);
 
 		float tangentValues[3] = {lightDesc.tangent.x, lightDesc.tangent.y, lightDesc.tangent.z};
 		const float defaultTangent[3] = {1.0f, 0.0f, 0.0f};
-		const bool lightTangentEdited = EditorWidgets::EditDetailsFloat3("Tangent", tangentValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultTangent);
+		const bool bLightTangentEdited = EditorWidgets::EditDetailsFloat3("Tangent", tangentValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultTangent);
 		
-		if (lightTangentEdited)
+		if (bLightTangentEdited)
 		{
 			lightDesc.tangent = {tangentValues[0], tangentValues[1], tangentValues[2]};
-			changed = true;
+			bChanged = true;
 		}
 
 		float width = lightDesc.width;
@@ -315,17 +315,17 @@ namespace SceneLightInspector
 		if (EditorWidgets::EditDetailsFloat("Width", width, 0.05f, 0.0f, kAreaLightSizeSliderMax, "%.3f", &kDefaultSize))
 		{
 			lightDesc.width = width;
-			changed = true;
+			bChanged = true;
 		}
 
 		float height = lightDesc.height;
 		if (EditorWidgets::EditDetailsFloat("Height", height, 0.05f, 0.0f, kAreaLightSizeSliderMax, "%.3f", &kDefaultSize))
 		{
 			lightDesc.height = height;
-			changed = true;
+			bChanged = true;
 		}
 
-		changed |= EditLightCastShadow(lightDesc.castShadow);
-		return changed;
+		bChanged |= EditLightCastShadow(lightDesc.bCastShadow);
+		return bChanged;
 	}
 }

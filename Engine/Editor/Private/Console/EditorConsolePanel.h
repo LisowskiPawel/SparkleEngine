@@ -14,12 +14,12 @@ class EditorConsolePanel final
 public:
 	explicit EditorConsolePanel(ConsoleSession& session) noexcept;
 
-	void SetOpen(bool open) noexcept { m_isOpen = open; }
+	void SetOpen(bool bOpen) noexcept { m_bIsOpen = bOpen; }
 
-	bool IsOpen() const noexcept { return m_isOpen; }
+	bool IsOpen() const noexcept { return m_bIsOpen; }
 
 	void RequestFocus() noexcept;
-	void BuildContent(bool disableInteraction);
+	void BuildContent(bool bDisableInteraction);
 
 private:
 	void Clear() noexcept;
@@ -30,9 +30,9 @@ private:
 	int HandleHistoryCallback(ImGuiInputTextCallbackData& data);
 	int HandleCompletionCallback(ImGuiInputTextCallbackData& data);
 	void SubmitInput();
-	void DrawToolbar(bool disableInteraction);
+	void DrawToolbar(bool bDisableInteraction);
 	void DrawScrollback();
-	void DrawInputLine(bool disableInteraction);
+	void DrawInputLine(bool bDisableInteraction);
 	void DrawAutocompletePreview();
 	void BuildOutputTextBuffer(std::string_view filter);
 	std::vector<std::string> GetCurrentCompletions() const;
@@ -43,7 +43,7 @@ private:
 	std::array<char, 512> m_inputBuffer{};
 	std::array<char, 128> m_filterBuffer{};
 	std::size_t m_seenConsoleOutputCount = 0;
-	bool m_isOpen = false;
-	bool m_scrollToBottom = true;
-	bool m_focusInput = false;
+	bool m_bIsOpen = false;
+	bool m_bScrollToBottom = true;
+	bool m_bFocusInput = false;
 };

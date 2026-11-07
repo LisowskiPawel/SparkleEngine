@@ -145,8 +145,8 @@ RhiMemoryUsageSnapshot D3D12GpuMemoryAllocator::CreateMemoryUsageSnapshot() cons
 	D3D12MA::TotalStatistics totalStats = {};
 	m_impl->allocator->CalculateStatistics(&totalStats);
 	snapshot.AllocatorBackend = ERhiMemoryAllocatorBackend::D3D12Managed;
-	snapshot.HasBudgetData = true;
-	snapshot.HasDelayedDestructionTracking = false;
+	snapshot.bHasBudgetData = true;
+	snapshot.bHasDelayedDestructionTracking = false;
 	snapshot.TotalUsedBytes = totalStats.Total.Stats.AllocationBytes;
 	snapshot.TotalAllocatedBytes = totalStats.Total.Stats.BlockBytes;
 	snapshot.TotalBudgetBytes = localBudget.BudgetBytes + nonLocalBudget.BudgetBytes;
@@ -468,7 +468,7 @@ D3D12GpuAllocationRecord* D3D12GpuMemoryAllocator::FindAllocationRecord(ID3D12Re
 	const auto record = std::find_if(
 	    m_impl->liveRecords.begin(),
 	    m_impl->liveRecords.end(),
-	    [resource](const D3D12GpuAllocationRecord* candidate) noexcept { return candidate != nullptr && !candidate->PendingRelease && candidate->Resource.Get() == resource; });
+	    [resource](const D3D12GpuAllocationRecord* candidate) noexcept { return candidate != nullptr && !candidate->bPendingRelease && candidate->Resource.Get() == resource; });
 
 	return record != m_impl->liveRecords.end() ? *record : nullptr;
 }

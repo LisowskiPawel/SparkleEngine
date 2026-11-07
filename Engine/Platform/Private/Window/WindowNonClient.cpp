@@ -5,47 +5,47 @@
 
 static std::optional<LRESULT> ClassifyResizeBorder(const POINT& cursorPoint, const RECT& windowRect, int border) noexcept
 {
-	const bool onLeft = cursorPoint.x >= windowRect.left && cursorPoint.x < windowRect.left + border;
-	const bool onRight = cursorPoint.x <= windowRect.right && cursorPoint.x > windowRect.right - border;
-	const bool onTop = cursorPoint.y >= windowRect.top && cursorPoint.y < windowRect.top + border;
-	const bool onBottom = cursorPoint.y <= windowRect.bottom && cursorPoint.y > windowRect.bottom - border;
+	const bool bOnLeft = cursorPoint.x >= windowRect.left && cursorPoint.x < windowRect.left + border;
+	const bool bOnRight = cursorPoint.x <= windowRect.right && cursorPoint.x > windowRect.right - border;
+	const bool bOnTop = cursorPoint.y >= windowRect.top && cursorPoint.y < windowRect.top + border;
+	const bool bOnBottom = cursorPoint.y <= windowRect.bottom && cursorPoint.y > windowRect.bottom - border;
 
-	if (onTop && onLeft)
+	if (bOnTop && bOnLeft)
 	{
 		return HTTOPLEFT;
 	}
 
-	if (onTop && onRight)
+	if (bOnTop && bOnRight)
 	{
 		return HTTOPRIGHT;
 	}
 
-	if (onBottom && onLeft)
+	if (bOnBottom && bOnLeft)
 	{
 		return HTBOTTOMLEFT;
 	}
 
-	if (onBottom && onRight)
+	if (bOnBottom && bOnRight)
 	{
 		return HTBOTTOMRIGHT;
 	}
 
-	if (onLeft)
+	if (bOnLeft)
 	{
 		return HTLEFT;
 	}
 
-	if (onRight)
+	if (bOnRight)
 	{
 		return HTRIGHT;
 	}
 
-	if (onTop)
+	if (bOnTop)
 	{
 		return HTTOP;
 	}
 
-	if (onBottom)
+	if (bOnBottom)
 	{
 		return HTBOTTOM;
 	}

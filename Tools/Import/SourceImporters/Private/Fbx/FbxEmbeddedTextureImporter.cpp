@@ -134,9 +134,9 @@ private:
 		{
 			return ".exr";
 		}
-		const bool isRadianceImage = StartsWith(bytes, {0x23u, 0x3Fu, 0x52u, 0x41u, 0x44u, 0x49u, 0x41u, 0x4Eu, 0x43u, 0x45u}) || StartsWith(bytes, {0x23u, 0x3Fu, 0x52u, 0x47u, 0x42u, 0x45u});
+		const bool bIsRadianceImage = StartsWith(bytes, {0x23u, 0x3Fu, 0x52u, 0x41u, 0x44u, 0x49u, 0x41u, 0x4Eu, 0x43u, 0x45u}) || StartsWith(bytes, {0x23u, 0x3Fu, 0x52u, 0x47u, 0x42u, 0x45u});
 		
-		if (isRadianceImage)
+		if (bIsRadianceImage)
 		{
 			return ".hdr";
 		}
@@ -167,14 +167,14 @@ std::vector<std::filesystem::path> FbxEmbeddedTextureImporter::ExtractTextures(c
 		const std::uint64_t contentHash = Hash::Fnv1a64(payload.Bytes.data(), payload.Bytes.size());
 		const std::filesystem::path cachePath = SparkleTools::ImportedTextureCacheRoot() / (Formatting::FormatHexUInt64(contentHash) + payload.Extension);
 		std::error_code errorCode;
-		const bool cacheEntryExists = std::filesystem::exists(cachePath, errorCode);
+		const bool bCacheEntryExists = std::filesystem::exists(cachePath, errorCode);
 		if (errorCode)
 		{
 			throw Diagnostics::Error("Failed to inspect embedded texture cache entry '" + cachePath.string() + "': " + errorCode.message());
 		}
 
 		std::string fileError;
-		if (cacheEntryExists)
+		if (bCacheEntryExists)
 		{
 			std::uint64_t cachedHash = 0;
 			if (!Hash::TryFnv1a64File(cachePath, cachedHash, fileError))

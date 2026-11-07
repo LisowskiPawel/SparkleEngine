@@ -8,7 +8,7 @@ namespace SparkleLauncher
 {
 	struct QtToolchainDiscovery final
 	{
-		bool FoundMsvcKit = false;
+		bool bFoundMsvcKit = false;
 		std::filesystem::path QtRootPath;
 		std::filesystem::path QtQmakePath;
 		std::vector<std::filesystem::path> MsvcCandidates;

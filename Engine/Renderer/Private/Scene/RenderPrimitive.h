@@ -15,6 +15,6 @@ struct RenderPrimitive final
 	RenderObjectStaticData PendingStatic;
 	GpuMeshHandle PendingGpuMesh;
 	std::uint32_t GpuSceneSlot = 0;
-	bool GpuMeshResident = false;
-	bool HasPendingStatic = false;
+	bool bGpuMeshResident = false;
+	bool bHasPendingStatic = false;
 };

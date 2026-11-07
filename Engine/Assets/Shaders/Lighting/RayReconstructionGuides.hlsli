@@ -61,9 +61,9 @@ namespace RayReconstructionGuides
 		RayReconstructionRoughness[pixelCoord] = saturate(gBuffer.Roughness);
 	}
 
-	void WriteSpecularHitDistance(uint2 pixelCoord, float3 hitPositionWorld, float3 primaryPositionWorld, bool hasSpecularHit)
+	void WriteSpecularHitDistance(uint2 pixelCoord, float3 hitPositionWorld, float3 primaryPositionWorld, bool bHasSpecularHit)
 	{
-		const float hitDistance = hasSpecularHit ? length(hitPositionWorld - primaryPositionWorld) : 0.0f;
+		const float hitDistance = bHasSpecularHit ? length(hitPositionWorld - primaryPositionWorld) : 0.0f;
 		RayReconstructionSpecularHitDistance[pixelCoord] = hitDistance;
 	}
 }

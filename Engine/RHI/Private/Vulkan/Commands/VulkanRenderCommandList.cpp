@@ -37,7 +37,7 @@ void VulkanRenderCommandList::CloseOpenRendering() noexcept
 
 RhiGpuVirtualAddress VulkanRenderCommandList::AllocateUniformConstantBuffer(const void* data, std::uint32_t sizeInBytes) noexcept
 {
-	return m_isRecording && m_recordingUploadPage != nullptr ? m_recordingUploadPage->AllocateAndCopy(data, sizeInBytes) : RhiGpuVirtualAddress{};
+	return m_bIsRecording && m_recordingUploadPage != nullptr ? m_recordingUploadPage->AllocateAndCopy(data, sizeInBytes) : RhiGpuVirtualAddress{};
 }
 
 void VulkanRenderCommandList::SetNativeCommandBuffer(
@@ -50,12 +50,12 @@ void VulkanRenderCommandList::SetNativeCommandBuffer(
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	m_gpuCrashScopes.Reset();
 #endif
-	m_dynamicRenderingActive = false;
+	m_bDynamicRenderingActive = false;
 	m_renderTargets = {};
 	m_renderTargetCount = 0;
 	m_depthStencil = VK_NULL_HANDLE;
 	m_depthStencilAspectMask = 0;
-	m_hasScissorRect = false;
+	m_bHasScissorRect = false;
 	ClearShaderBindingDescriptors(m_graphicsBindings);
 	ClearShaderBindingDescriptors(m_computeBindings);
 	ClearShaderBindingDescriptors(m_rayTracingBindings);

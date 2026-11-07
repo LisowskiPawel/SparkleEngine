@@ -15,9 +15,9 @@ static std::uint32_t FindMemoryType(VkPhysicalDevice physicalDevice, std::uint32
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &properties);
 	for (std::uint32_t index = 0; index < properties.memoryTypeCount; ++index)
 	{
-		const bool typeAvailable = (typeBits & (1u << index)) != 0;
-		const bool flagsMatch = (properties.memoryTypes[index].propertyFlags & requiredFlags) == requiredFlags;
-		if (typeAvailable && flagsMatch)
+		const bool bTypeAvailable = (typeBits & (1u << index)) != 0;
+		const bool bFlagsMatch = (properties.memoryTypes[index].propertyFlags & requiredFlags) == requiredFlags;
+		if (bTypeAvailable && bFlagsMatch)
 		{
 			return index;
 		}
@@ -84,9 +84,9 @@ std::unique_ptr<VulkanCaptureService::PendingReadback> VulkanCaptureService::Pre
 	const VkImage sourceImage = static_cast<VkImage>(request.Resource.Value);
 	const bool bCaptureSourcephysicalDevice = device == VK_NULL_HANDLE || physicalDevice == VK_NULL_HANDLE;
 	const bool bInvalidCaptureSourcesourceImage = bCaptureSourcephysicalDevice || (sourceImage == VK_NULL_HANDLE);
-	const bool invalidCaptureSource = bInvalidCaptureSourcesourceImage || (!IsRhiCaptureFormatSupported(request.SourceFormat));
+	const bool bInvalidCaptureSource = bInvalidCaptureSourcesourceImage || (!IsRhiCaptureFormatSupported(request.SourceFormat));
 	
-	if (invalidCaptureSource)
+	if (bInvalidCaptureSource)
 	{
 		return {};
 	}
@@ -120,8 +120,8 @@ bool VulkanCaptureService::AllocateReadbackBuffer(PendingReadback& pending) noex
 
 	const VkMemoryAllocateInfo allocation{.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, .allocationSize = requirements.size, .memoryTypeIndex = memoryType};
 	const VkResult allocationResult = vkAllocateMemory(device, &allocation, nullptr, &pending.Memory);
-	const bool memoryAllocated = allocationResult == VK_SUCCESS && pending.Memory != VK_NULL_HANDLE;
-	const bool bUfferBound = memoryAllocated && vkBindBufferMemory(device, pending.Buffer, pending.Memory, 0) == VK_SUCCESS;
+	const bool bMemoryAllocated = allocationResult == VK_SUCCESS && pending.Memory != VK_NULL_HANDLE;
+	const bool bUfferBound = bMemoryAllocated && vkBindBufferMemory(device, pending.Buffer, pending.Memory, 0) == VK_SUCCESS;
 
 	if (!bUfferBound)
 	{

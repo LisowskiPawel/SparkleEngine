@@ -174,8 +174,8 @@ static std::vector<D3D12_INPUT_ELEMENT_DESC> BuildVertexInput(const RhiVertexInp
 		        ToD3D12VertexFormat(element.Format),
 		        element.Binding,
 		        element.OffsetInBytes,
-		        binding->PerInstance ? D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA : D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-		        binding->PerInstance ? 1u : 0u});
+		        binding->bPerInstance ? D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA : D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+		        binding->bPerInstance ? 1u : 0u});
 	}
 	return result;
 }
@@ -220,7 +220,7 @@ void D3D12Pipeline::SetRasterizerState(D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDe
 	rs.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 	rs.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 	rs.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
-	rs.DepthClipEnable = rasterizer.DepthClipEnable ? TRUE : FALSE;
+	rs.DepthClipEnable = rasterizer.bDepthClipEnable ? TRUE : FALSE;
 	rs.MultisampleEnable = FALSE;
 	rs.AntialiasedLineEnable = FALSE;
 	rs.ForcedSampleCount = 0;
@@ -230,13 +230,13 @@ void D3D12Pipeline::SetRasterizerState(D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDe
 void D3D12Pipeline::SetRenderTargetBlendState(D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDesc, const RhiBlendState& blend, std::uint32_t colorAttachmentCount) noexcept
 {
 	psoDesc.BlendState = {};
-	psoDesc.BlendState.AlphaToCoverageEnable = blend.AlphaToCoverageEnable ? TRUE : FALSE;
-	psoDesc.BlendState.IndependentBlendEnable = blend.IndependentBlendEnable ? TRUE : FALSE;
+	psoDesc.BlendState.AlphaToCoverageEnable = blend.bAlphaToCoverageEnable ? TRUE : FALSE;
+	psoDesc.BlendState.IndependentBlendEnable = blend.bIndependentBlendEnable ? TRUE : FALSE;
 	for (std::uint32_t index = 0; index < colorAttachmentCount; ++index)
 	{
-		const RhiBlendTargetState& source = blend.Targets[blend.IndependentBlendEnable ? index : 0];
+		const RhiBlendTargetState& source = blend.Targets[blend.bIndependentBlendEnable ? index : 0];
 		D3D12_RENDER_TARGET_BLEND_DESC& target = psoDesc.BlendState.RenderTarget[index];
-		target.BlendEnable = source.BlendEnable ? TRUE : FALSE;
+		target.BlendEnable = source.bBlendEnable ? TRUE : FALSE;
 		target.SrcBlend = ToD3D12Blend(source.SourceColor);
 		target.DestBlend = ToD3D12Blend(source.DestinationColor);
 		target.BlendOp = ToD3D12BlendOperation(source.ColorOperation);
@@ -251,15 +251,15 @@ void D3D12Pipeline::SetDepthTestState(D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDes
 {
 	auto& ds = psoDesc.DepthStencilState;
 	ds = {};
-	ds.DepthEnable = depthDesc.DepthEnable ? TRUE : FALSE;
-	ds.DepthWriteMask = depthDesc.DepthWriteEnable ? D3D12_DEPTH_WRITE_MASK_ALL : D3D12_DEPTH_WRITE_MASK_ZERO;
+	ds.DepthEnable = depthDesc.bDepthEnable ? TRUE : FALSE;
+	ds.DepthWriteMask = depthDesc.bDepthWriteEnable ? D3D12_DEPTH_WRITE_MASK_ALL : D3D12_DEPTH_WRITE_MASK_ZERO;
 	ds.DepthFunc = D3D12TypeConversions::ToComparisonFunc(depthDesc.DepthFunc);
 }
 
 void D3D12Pipeline::SetStencilTestState(D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDesc, const RhiStencilState& stencilDesc) noexcept
 {
 	auto& ds = psoDesc.DepthStencilState;
-	ds.StencilEnable = stencilDesc.StencilEnable ? TRUE : FALSE;
+	ds.StencilEnable = stencilDesc.bStencilEnable ? TRUE : FALSE;
 	ds.StencilReadMask = stencilDesc.StencilReadMask;
 	ds.StencilWriteMask = stencilDesc.StencilWriteMask;
 

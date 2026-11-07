@@ -6,4 +6,4 @@ class VulkanRhi;
 class VulkanSwapChain;
 class RenderDiagnostics;
 
-RhiCapabilities BuildVulkanCapabilities(VulkanRhi& rhi, VulkanSwapChain& swapChain, RenderDiagnostics& diagnostics, bool hasCommandRecordingContext) noexcept;
+RhiCapabilities BuildVulkanCapabilities(VulkanRhi& rhi, VulkanSwapChain& swapChain, RenderDiagnostics& diagnostics, bool bHasCommandRecordingContext) noexcept;

@@ -358,10 +358,10 @@ TextureLoadResult LoadDdsTextureSource(const std::filesystem::path& sourcePath)
 	const TextureSourceFile sourceFile = ReadTextureSourceFile(sourcePath);
 	const DdsHeader header = ReadHeader(sourceFile.Bytes);
 
-	const bool hasDx10Header = HasDx10Header(header);
-	const DdsHeaderDx10 dx10Header = hasDx10Header ? ReadDx10Header(sourceFile.Bytes) : DdsHeaderDx10{};
+	const bool bHasDx10Header = HasDx10Header(header);
+	const DdsHeaderDx10 dx10Header = bHasDx10Header ? ReadDx10Header(sourceFile.Bytes) : DdsHeaderDx10{};
 
-	const DdsHeaderDx10* dx10HeaderPtr = hasDx10Header ? &dx10Header : nullptr;
+	const DdsHeaderDx10* dx10HeaderPtr = bHasDx10Header ? &dx10Header : nullptr;
 	ValidateHeader(header, dx10HeaderPtr, sourceFile.ResolvedPath);
 	const DXGI_FORMAT dxgiFormat = ResolveDxgiFormat(header, dx10HeaderPtr, sourceFile.ResolvedPath);
 

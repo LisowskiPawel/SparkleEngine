@@ -44,14 +44,14 @@ ShaderCookOutput PublishShaderArtifacts(
     const ShaderCookSettings& settings,
     const std::filesystem::path& outputDirectory)
 {
-	const bool replaceCompleteCatalog = settings.shaderId.empty() && settings.changedVirtualPaths.empty();
+	const bool bReplaceCompleteCatalog = settings.shaderId.empty() && settings.changedVirtualPaths.empty();
 
 	const std::filesystem::path debugDirectory = settings.debugArtifactDirectory.empty()
 	    ? (Filesystem::ResolveArtifactRootPath(Filesystem::GetWorkspaceRootPath()) / "symbols" / "shaders" / Filesystem::GetProjectPath().filename())
 	    : settings.debugArtifactDirectory;
 
 	std::vector<std::filesystem::path> publicationRoots{outputDirectory};
-	if (settings.enableDebugInfo || !settings.debugArtifactDirectory.empty())
+	if (settings.bEnableDebugInfo || !settings.debugArtifactDirectory.empty())
 	{
 		publicationRoots.push_back(debugDirectory);
 	}
@@ -74,14 +74,14 @@ ShaderCookOutput PublishShaderArtifacts(
 
 	try
 	{
-		ShaderCookOutput result = ShaderArtifactWriter::Write(plan, replaceCompleteCatalog, mapPath, libraryPath, stagedMapPath, stagedLibraryPath);
+		ShaderCookOutput result = ShaderArtifactWriter::Write(plan, bReplaceCompleteCatalog, mapPath, libraryPath, stagedMapPath, stagedLibraryPath);
 		result.mapPath = mapPath;
 		result.libraryPath = libraryPath;
 		const CookedShaderLibrary stagedLibrary = CookedShaderLibrary::Open(stagedLibraryPath);
 		const GlobalShaderMap stagedMap = GlobalShaderMap::Open(stagedMapPath, stagedLibrary);
 		ShaderDependencyManifest::Write(plan.dependencyManifest, stagedDependencyPath);
 		std::vector<Files::FilePublication> files = {{stagedMapPath, mapPath}, {stagedLibraryPath, libraryPath}, {stagedDependencyPath, dependencyPath}};
-		if (settings.enableDebugInfo || !settings.debugArtifactDirectory.empty())
+		if (settings.bEnableDebugInfo || !settings.debugArtifactDirectory.empty())
 		{
 			ShaderDebugArtifactWriter debugWriter(debugDirectory);
 			Files::FilePublication debugPublication = debugWriter.StageManifest(plan, compileResults, stagedMap, stagedLibrary, stagedMapPath, stagedLibraryPath);

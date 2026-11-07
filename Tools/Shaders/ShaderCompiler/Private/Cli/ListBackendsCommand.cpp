@@ -46,11 +46,11 @@ static std::string BuildTargetList(std::span<const ShaderTarget> targets)
 static std::string BuildRayTracingFeatureList(const ShaderBackendCapabilities& capabilities)
 {
 	std::string features;
-	if (capabilities.SupportsDxilRayTracingLibrary)
+	if (capabilities.bSupportsDxilRayTracingLibrary)
 	{
 		features = "dxil-rt-library";
 	}
-	if (capabilities.SupportsSpirVRayTracingLibrary)
+	if (capabilities.bSupportsSpirVRayTracingLibrary)
 	{
 		if (!features.empty())
 		{
@@ -58,7 +58,7 @@ static std::string BuildRayTracingFeatureList(const ShaderBackendCapabilities& c
 		}
 		features += "spirv-rt-library";
 	}
-	if (capabilities.SupportsDxilInlineRayQuery)
+	if (capabilities.bSupportsDxilInlineRayQuery)
 	{
 		if (!features.empty())
 		{
@@ -66,7 +66,7 @@ static std::string BuildRayTracingFeatureList(const ShaderBackendCapabilities& c
 		}
 		features += "dxil-inline-ray-query";
 	}
-	if (capabilities.SupportsSpirVInlineRayQuery)
+	if (capabilities.bSupportsSpirVInlineRayQuery)
 	{
 		if (!features.empty())
 		{
@@ -94,7 +94,7 @@ int ListShaderBackends(std::span<const std::string_view> args)
 	for (const ShaderBackendDescriptor& backend : backends)
 	{
 		std::cout << "  name='" << backend.Name << "'"
-		          << " available=" << (backend.IsAvailable ? "true" : "false") << " sourceExtensions='" << BuildStringList(backend.SourceExtensions) << "'"
+		          << " available=" << (backend.bIsAvailable ? "true" : "false") << " sourceExtensions='" << BuildStringList(backend.SourceExtensions) << "'"
 		          << " codegenTargets='" << BuildTargetList(backend.CodegenTargets) << "'"
 		          << " binaryFormats='" << BuildStringList(backend.BinaryFormats) << "'"
 		          << " rt='" << BuildRayTracingFeatureList(backend.Capabilities) << "'"
@@ -111,7 +111,7 @@ int ListShaderBackends(std::span<const std::string_view> args)
 	for (const ShaderBinaryFormatDescriptor& binaryFormat : binaryFormats)
 	{
 		std::cout << "  name='" << binaryFormat.Name << "'"
-		          << " available=" << (binaryFormat.IsAvailable ? "true" : "false") << "\n";
+		          << " available=" << (binaryFormat.bIsAvailable ? "true" : "false") << "\n";
 	}
 
 	const std::span<const ShaderCodegenTargetDescriptor> codegenTargets = ListShaderCodegenTargets();
@@ -120,7 +120,7 @@ int ListShaderBackends(std::span<const std::string_view> args)
 	{
 		std::cout << "  name='" << GetShaderTargetName(codegenTarget.Target) << "'"
 		          << " binaryFormat='" << codegenTarget.BinaryFormat << "'"
-		          << " available=" << (codegenTarget.IsAvailable ? "true" : "false") << "\n";
+		          << " available=" << (codegenTarget.bIsAvailable ? "true" : "false") << "\n";
 	}
 
 	return kExitCodeSuccess;

@@ -242,13 +242,13 @@ public:
 	ShaderUniform& operator=(const TValue& value) noexcept
 	{
 		m_value = value;
-		m_isBound = true;
+		m_bIsBound = true;
 		return *this;
 	}
 
-	const TValue* GetValue() const noexcept { return m_isBound ? &m_value : nullptr; }
+	const TValue* GetValue() const noexcept { return m_bIsBound ? &m_value : nullptr; }
 
-	bool IsBound() const noexcept { return m_isBound; }
+	bool IsBound() const noexcept { return m_bIsBound; }
 
 	void Reset() noexcept
 	{
@@ -258,7 +258,7 @@ public:
 
 private:
 	TValue m_value = {};
-	bool m_isBound = false;
+	bool m_bIsBound = false;
 };
 
 class SPARKLE_RENDERER_API ShaderSamplerSet final
@@ -271,24 +271,24 @@ public:
 	ShaderSamplerSet& operator=(RhiSamplerDesc sampler) noexcept
 	{
 		m_sampler = sampler;
-		m_isBound = true;
+		m_bIsBound = true;
 		return *this;
 	}
 
 	const RhiSamplerDesc& GetSampler() const noexcept { return m_sampler; }
 
-	bool IsBound() const noexcept { return m_isBound; }
+	bool IsBound() const noexcept { return m_bIsBound; }
 
 	void Reset() noexcept
 	{
 		m_sampler = {};
-		m_isBound = false;
+		m_bIsBound = false;
 	}
 
 private:
 	RhiSamplerDesc m_sampler = {};
 
-	bool m_isBound = false;
+	bool m_bIsBound = false;
 };
 
 template <typename T> struct ShaderParameterFieldTraits;
@@ -297,91 +297,91 @@ template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTr
 {
 	using Semantic = ReadTexture;
 	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool UsesGraphResource = true;
+	static constexpr bool bUsesGraphResource = true;
 };
 
 template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderTexture3D<TValue, ArrayCount>>
 {
 	using Semantic = ReadTexture;
 	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool UsesGraphResource = true;
+	static constexpr bool bUsesGraphResource = true;
 };
 
 template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderTextureCube<TValue, ArrayCount>>
 {
 	using Semantic = ReadTexture;
 	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool UsesGraphResource = true;
+	static constexpr bool bUsesGraphResource = true;
 };
 
 template <> struct ShaderParameterFieldTraits<ShaderTexture2DSRV>
 {
 	using Semantic = ReadTexture;
 	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool UsesGraphResource = false;
+	static constexpr bool bUsesGraphResource = false;
 };
 
 template <std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderTexture2DTableSRV<ArrayCount>>
 {
 	using Semantic = ReadTexture;
 	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool UsesGraphResource = false;
+	static constexpr bool bUsesGraphResource = false;
 };
 
 template <> struct ShaderParameterFieldTraits<ShaderAccelerationStructure>
 {
 	using Semantic = AccelerationStructure;
 	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool UsesGraphResource = true;
+	static constexpr bool bUsesGraphResource = true;
 };
 
 template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderRWTexture2D<TValue, ArrayCount>>
 {
 	using Semantic = RWTexture;
 	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool UsesGraphResource = true;
+	static constexpr bool bUsesGraphResource = true;
 };
 
 template <> struct ShaderParameterFieldTraits<ShaderRenderTarget>
 {
 	using Semantic = RenderTarget;
 	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool UsesGraphResource = true;
+	static constexpr bool bUsesGraphResource = true;
 };
 
 template <> struct ShaderParameterFieldTraits<ShaderDepthTarget>
 {
 	using Semantic = DepthTarget;
 	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool UsesGraphResource = true;
+	static constexpr bool bUsesGraphResource = true;
 };
 
 template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderBuffer<TValue, ArrayCount>>
 {
 	using Semantic = ReadBuffer;
 	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool UsesGraphResource = true;
+	static constexpr bool bUsesGraphResource = true;
 };
 
 template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderRWBuffer<TValue, ArrayCount>>
 {
 	using Semantic = RWBuffer;
 	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool UsesGraphResource = true;
+	static constexpr bool bUsesGraphResource = true;
 };
 
 template <typename TValue> struct ShaderParameterFieldTraits<ShaderUniform<TValue>>
 {
 	using Semantic = UniformData<TValue>;
 	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool UsesGraphResource = false;
+	static constexpr bool bUsesGraphResource = false;
 };
 
 template <> struct ShaderParameterFieldTraits<ShaderSamplerSet>
 {
 	using Semantic = SamplerSet;
 	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool UsesGraphResource = false;
+	static constexpr bool bUsesGraphResource = false;
 };
 
 template <typename T, typename = void> struct IsShaderParameterField : std::false_type

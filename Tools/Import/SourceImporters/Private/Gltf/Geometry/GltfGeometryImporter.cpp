@@ -86,8 +86,8 @@ void GltfGeometryImporter::ImportNode(const cgltf_data& data, const cgltf_node& 
 
 	GltfMeshGpuInstancingTransforms meshGpuInstancingTransforms;
 	const std::string nodeLabel = node.name != nullptr ? node.name : std::format("node {}", nodeIndex);
-	const bool hasMeshGpuInstancing = node.has_mesh_gpu_instancing && node.mesh_gpu_instancing.attributes_count > 0;
-	if (hasMeshGpuInstancing)
+	const bool bHasMeshGpuInstancing = node.has_mesh_gpu_instancing && node.mesh_gpu_instancing.attributes_count > 0;
+	if (bHasMeshGpuInstancing)
 	{
 		meshGpuInstancingTransforms = GltfMeshInstancingImporter::ReadMeshGpuInstancingTransforms(node, nodeLabel);
 	}
@@ -101,7 +101,7 @@ void GltfGeometryImporter::ImportNode(const cgltf_data& data, const cgltf_node& 
 	const NodeImportContext context{
 	    .Data = data,
 	    .Node = node,
-	    .MeshGpuInstancingTransforms = hasMeshGpuInstancing ? &meshGpuInstancingTransforms : nullptr,
+	    .MeshGpuInstancingTransforms = bHasMeshGpuInstancing ? &meshGpuInstancingTransforms : nullptr,
 	    .WorldTransform = node.skin == nullptr ? GltfCoordinateConverter::ComputeNodeWorldTransform(&node) : GltfSkinImporter::ComputeSkinReferenceToWorldTransform(node.skin),
 	    .SkeletonIndex = skeletonIndex,
 	    .NodeIndex = nodeIndex};

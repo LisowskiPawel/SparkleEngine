@@ -26,5 +26,5 @@ private:
 
 	RenderDiagnostics* m_diagnostics = nullptr;
 	RendererMemoryDiagnosticsSnapshot m_latestSnapshot;
-	bool m_hasPolled = false;
+	bool m_bHasPolled = false;
 };

@@ -53,17 +53,17 @@ RhiAdapterIdentity BuildD3D12AdapterIdentity(const D3D12Rhi* rhi) noexcept
 	return D3D12ExternalFeatureAdapterIdentity::Build(rhi);
 }
 
-RhiExternalFeatureInteropCapabilities BuildD3D12ExternalFeatureInteropCapabilities(const D3D12Rhi* rhi, bool hasGraphicsCommandList) noexcept
+RhiExternalFeatureInteropCapabilities BuildD3D12ExternalFeatureInteropCapabilities(const D3D12Rhi* rhi, bool bHasGraphicsCommandList) noexcept
 {
 	RhiExternalFeatureInteropCapabilities capabilities{};
 	capabilities.BridgeKind = rhi != nullptr && rhi->IsInterposerActive() ? ERhiExternalFeatureBridgeKind::Interposer : ERhiExternalFeatureBridgeKind::None;
 	capabilities.Adapter = BuildD3D12AdapterIdentity(rhi);
-	capabilities.ExposesNativeDevice = rhi != nullptr && rhi->GetDevice() != nullptr;
-	capabilities.ExposesNativeGraphicsQueue = rhi != nullptr && rhi->GetCommandQueue() != nullptr;
-	capabilities.ExposesNativeGraphicsCommandList = hasGraphicsCommandList;
-	capabilities.ExposesNativeResources = true;
-	capabilities.SupportsExplicitResourceStates = true;
-	capabilities.SupportsExternalProviderEvaluation = capabilities.ExposesNativeDevice && capabilities.ExposesNativeGraphicsQueue && capabilities.ExposesNativeGraphicsCommandList;
-	capabilities.SupportsRuntimeProviderChecks = capabilities.SupportsExternalProviderEvaluation;
+	capabilities.bExposesNativeDevice = rhi != nullptr && rhi->GetDevice() != nullptr;
+	capabilities.bExposesNativeGraphicsQueue = rhi != nullptr && rhi->GetCommandQueue() != nullptr;
+	capabilities.bExposesNativeGraphicsCommandList = bHasGraphicsCommandList;
+	capabilities.bExposesNativeResources = true;
+	capabilities.bSupportsExplicitResourceStates = true;
+	capabilities.bSupportsExternalProviderEvaluation = capabilities.bExposesNativeDevice && capabilities.bExposesNativeGraphicsQueue && capabilities.bExposesNativeGraphicsCommandList;
+	capabilities.bSupportsRuntimeProviderChecks = capabilities.bSupportsExternalProviderEvaluation;
 	return capabilities;
 }

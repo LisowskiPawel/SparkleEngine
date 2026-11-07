@@ -67,9 +67,9 @@ void RenderScene::CommitJointMatrixContinuity(const RenderDeformationWork& defor
 		{
 			++jointRangeIndex;
 		}
-		const bool jointHistoryUnavailable = jointRangeIndex >= deformation.JointMatrixCopyRanges.size() || deformation.JointMatrixCopyRanges[jointRangeIndex].Object != history->first;
+		const bool bJointHistoryUnavailable = jointRangeIndex >= deformation.JointMatrixCopyRanges.size() || deformation.JointMatrixCopyRanges[jointRangeIndex].Object != history->first;
 		
-		if (jointHistoryUnavailable)
+		if (bJointHistoryUnavailable)
 		{
 			history = m_jointMatrixHistory.erase(history);
 		}
@@ -114,9 +114,9 @@ void RenderScene::CommitMorphWeightContinuity(const RenderDeformationWork& defor
 		}
 
 		const bool bRetainfirst = morphRangeIndex < deformation.MorphWeightCopyRanges.size() && deformation.MorphWeightCopyRanges[morphRangeIndex].Object == history->first;
-		const bool retain = bRetainfirst && (retainsMorphHistory(deformation.MorphWeightCopyRanges[morphRangeIndex]));
+		const bool bRetain = bRetainfirst && (retainsMorphHistory(deformation.MorphWeightCopyRanges[morphRangeIndex]));
 
-		if (!retain)
+		if (!bRetain)
 		{
 			history = m_morphWeightHistory.erase(history);
 		}

@@ -23,10 +23,10 @@ namespace SceneCameraInspector
 
 	static void BuildTransformCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool transformMatches = EditorWidgets::MatchesDetailsFilter(filter, "Transform", "location rotation scale position");
-		const bool transformOpen = transformMatches && EditorWidgets::DrawDetailsCategory("Transform");
+		const bool bTransformMatches = EditorWidgets::MatchesDetailsFilter(filter, "Transform", "location rotation scale position");
+		const bool bTransformOpen = bTransformMatches && EditorWidgets::DrawDetailsCategory("Transform");
 
-		if (!transformOpen)
+		if (!bTransformOpen)
 		{
 			return;
 		}
@@ -41,27 +41,27 @@ namespace SceneCameraInspector
 
 	static void BuildCameraCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool cameraMatches = EditorWidgets::MatchesDetailsFilter(filter, "Camera", "field of view near clip far clip aspect ratio");
-		const bool cameraOpen = cameraMatches && EditorWidgets::DrawDetailsCategory("Camera");
+		const bool bCameraMatches = EditorWidgets::MatchesDetailsFilter(filter, "Camera", "field of view near clip far clip aspect ratio");
+		const bool bCameraOpen = bCameraMatches && EditorWidgets::DrawDetailsCategory("Camera");
 
-		if (!cameraOpen)
+		if (!bCameraOpen)
 		{
 			return;
 		}
 
 		CameraDesc after = camera.Description;
-		bool changed = false;
+		bool bChanged = false;
 		const float defaultFov = 60.0f, defaultNear = 0.1f, defaultFar = 1000.0f;
 
-		changed |= EditorWidgets::EditDetailsFloat("Field Of View", after.fovYDegrees, 0.1f, 1.0f, 179.0f, "%.1f", &defaultFov);
-		changed |= EditorWidgets::EditDetailsFloat("Near Clip", after.nearZ, 0.01f, 0.001f, after.farZ, "%.3f", &defaultNear);
-		changed |= EditorWidgets::EditDetailsFloat("Far Clip", after.farZ, 1.0f, after.nearZ, 100000.0f, "%.3f", &defaultFar);
+		bChanged |= EditorWidgets::EditDetailsFloat("Field Of View", after.fovYDegrees, 0.1f, 1.0f, 179.0f, "%.1f", &defaultFov);
+		bChanged |= EditorWidgets::EditDetailsFloat("Near Clip", after.nearZ, 0.01f, 0.001f, after.farZ, "%.3f", &defaultNear);
+		bChanged |= EditorWidgets::EditDetailsFloat("Far Clip", after.farZ, 1.0f, after.nearZ, 100000.0f, "%.3f", &defaultFar);
 
 		char buffer[64] = {};
 		std::snprintf(buffer, sizeof(buffer), "%.3f", camera.AspectRatio);
 		EditorWidgets::DrawDetailsValueRow("Aspect Ratio", buffer);
 
-		if (changed)
+		if (bChanged)
 		{
 			(void) transactionHistory
 			    .Execute({0, SetCameraDescriptionCommand{camera.Entity, after}}, {0, SetCameraDescriptionCommand{camera.Entity, camera.Description}}, generation, "camera-description");
@@ -70,19 +70,19 @@ namespace SceneCameraInspector
 
 	static void BuildAdvancedParametersCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool advancedMatches = EditorWidgets::MatchesDetailsFilter(filter, "Advanced", "visible visibility hidden");
-		const bool advancedOpen = advancedMatches && EditorWidgets::DrawDetailsCategory("Advanced", false);
+		const bool bAdvancedMatches = EditorWidgets::MatchesDetailsFilter(filter, "Advanced", "visible visibility hidden");
+		const bool bAdvancedOpen = bAdvancedMatches && EditorWidgets::DrawDetailsCategory("Advanced", false);
 
-		if (!advancedOpen)
+		if (!bAdvancedOpen)
 		{
 			return;
 		}
 
-		bool visible = camera.Visible;
-		const bool defaultVisible = true;
-		if (EditorWidgets::EditDetailsCheckbox("Visible", visible, &defaultVisible))
+		bool bVisible = camera.bVisible;
+		const bool bDefaultVisible = true;
+		if (EditorWidgets::EditDetailsCheckbox("Visible", bVisible, &bDefaultVisible))
 		{
-			(void) transactionHistory.Execute({0, SetEntityVisibilityCommand{camera.Entity, visible}}, {0, SetEntityVisibilityCommand{camera.Entity, camera.Visible}}, generation, "camera-visibility");
+			(void) transactionHistory.Execute({0, SetEntityVisibilityCommand{camera.Entity, bVisible}}, {0, SetEntityVisibilityCommand{camera.Entity, camera.bVisible}}, generation, "camera-visibility");
 		}
 	}
 }

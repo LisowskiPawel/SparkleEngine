@@ -30,7 +30,7 @@ namespace ECS
 
 		std::uint64_t GetStructureVersion() const noexcept { return m_structureVersion; }
 
-		bool IsStructureFrozen() const noexcept { return m_structureFrozen; }
+		bool IsStructureFrozen() const noexcept { return m_bStructureFrozen; }
 
 		StructureFrozenEpoch FreezeStructure() noexcept;
 
@@ -40,12 +40,12 @@ namespace ECS
 			{
 				return false;
 			}
-			const bool added = std::get<ComponentStorage<T>>(m_components).Add(entity, std::move(component));
-			if (added)
+			const bool bAdded = std::get<ComponentStorage<T>>(m_components).Add(entity, std::move(component));
+			if (bAdded)
 			{
 				AdvanceStructureVersion();
 			}
-			return added;
+			return bAdded;
 		}
 
 		template <ComponentStorageCompatible T> bool Replace(EntityId entity, T component)
@@ -64,13 +64,13 @@ namespace ECS
 		struct EntitySlot final
 		{
 			EntityId::Generation Generation = 1;
-			bool Alive = false;
-			bool Retired = false;
+			bool bAlive = false;
+			bool bRetired = false;
 		};
 
-		bool CanMutateStructure() const noexcept { return !m_structureFrozen; }
+		bool CanMutateStructure() const noexcept { return !m_bStructureFrozen; }
 
-		bool IsFrozenEpochCurrent(std::uint64_t generation) const noexcept { return m_structureFrozen && generation != 0 && m_frozenEpochGeneration == generation; }
+		bool IsFrozenEpochCurrent(std::uint64_t generation) const noexcept { return m_bStructureFrozen && generation != 0 && m_frozenEpochGeneration == generation; }
 
 		void ReleaseFrozenEpoch(std::uint64_t generation) noexcept;
 
@@ -84,6 +84,6 @@ namespace ECS
 		std::size_t m_liveCount = 0;
 		std::uint64_t m_structureVersion = 0;
 		std::uint64_t m_frozenEpochGeneration = 0;
-		bool m_structureFrozen = false;
+		bool m_bStructureFrozen = false;
 	};
 }

@@ -54,11 +54,11 @@ namespace SparkleLauncher
 
 	struct LevelRunReadinessState
 	{
-		bool ExecutableReady = false;
-		bool ContentDirectoryReady = false;
-		bool CookedMeshesReady = false;
-		bool CookedTexturesReady = false;
-		bool CookedShadersReady = false;
+		bool bExecutableReady = false;
+		bool bContentDirectoryReady = false;
+		bool bCookedMeshesReady = false;
+		bool bCookedTexturesReady = false;
+		bool bCookedShadersReady = false;
 	};
 
 	struct LevelRunOperationPlan
@@ -74,7 +74,7 @@ namespace SparkleLauncher
 		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
 		LevelRunReadinessState Readiness;
-		bool CanRun = false;
+		bool bCanRun = false;
 	};
 
 	std::string_view ToString(LevelRunMode mode) noexcept;

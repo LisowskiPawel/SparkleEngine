@@ -90,12 +90,12 @@ public:
 		{
 			return {.State = ExternalCaptureState::Failed, .Message = "Nsight completed capture but did not provide a finalized artifact path."};
 		}
-		const bool opened = OpenNsightCaptureInDesktopShell(path.data());
+		const bool bOpened = OpenNsightCaptureInDesktopShell(path.data());
 
 		return {
 		    .State = ExternalCaptureState::Completed,
 		    .Artifact = std::filesystem::path(path.data()),
-		    .Message = opened ? "Experimental SDK: capture finalized and handed to Nsight." : "Experimental SDK: capture finalized; open the artifact in Nsight Graphics."};
+		    .Message = bOpened ? "Experimental SDK: capture finalized and handed to Nsight." : "Experimental SDK: capture finalized; open the artifact in Nsight Graphics."};
 	}
 
 private:

@@ -18,7 +18,7 @@ namespace TextureCookPipeline
 	{
 		TextureResourceDimension dimension = TextureResourceDimension::Texture2D;
 		std::uint32_t arraySize = 1;
-		bool sourceWasFloat = false;
+		bool bSourceWasFloat = false;
 		std::vector<std::vector<WorkingMipLevel>> arraySlices;
 	};
 }

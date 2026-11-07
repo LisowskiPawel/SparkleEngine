@@ -7,7 +7,7 @@ class RasterPassRenderState final
 public:
 	void SetOpaqueBlend() noexcept;
 	void SetDepthTest(CompareOp comparison) noexcept;
-	void SetDepthWrite(bool enabled) noexcept;
+	void SetDepthWrite(bool bEnabled) noexcept;
 	void DisableStencil() noexcept;
 
 	const RhiBlendState& GetBlend() const noexcept { return m_blend; }

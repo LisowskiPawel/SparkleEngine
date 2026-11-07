@@ -10,7 +10,7 @@ struct RayTracingProviderMetrics final
 	ERhiRayTracingTlasProvider TlasProvider = ERhiRayTracingTlasProvider::None;
 	const char* TlasProviderReason = "not-queried";
 	ERhiPtlasProvider PtlasProvider = ERhiPtlasProvider::None;
-	bool SupportsPtlas = false;
+	bool bSupportsPtlas = false;
 	const char* PtlasCapabilityReason = "not-queried";
 };
 

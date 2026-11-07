@@ -30,7 +30,7 @@ namespace EditorWidgets
 	ImVec4 WithAlpha(ImVec4 color, float alpha) noexcept;
 	void DrawCenteredGlyph(ImDrawList* drawList, const ImVec2& start, const ImVec2& size, const char* glyph, ImU32 color) noexcept;
 	bool BeginDetailsRow(const char* label, int valueColumnCount);
-	bool DrawDetailsResetButton(int utilityColumnIndex, bool dirty, const char* tooltip = "Reset to default");
+	bool DrawDetailsResetButton(int utilityColumnIndex, bool bDirty, const char* tooltip = "Reset to default");
 	void DrawDetailsEmptyUtility(int utilityColumnIndex);
 	void EndDetailsRow();
 }

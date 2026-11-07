@@ -226,31 +226,31 @@ namespace SparkleLauncher
 		ScheduleUiRefresh(true);
 	}
 
-	void LauncherMainWindow::ScheduleUiRefresh(bool refreshContent)
+	void LauncherMainWindow::ScheduleUiRefresh(bool bRefreshContent)
 	{
-		m_refreshContentRequested = m_refreshContentRequested || refreshContent;
-		if (m_isApplyingUiRefresh || m_uiRefreshQueued)
+		m_bRefreshContentRequested = m_bRefreshContentRequested || bRefreshContent;
+		if (m_bIsApplyingUiRefresh || m_bUiRefreshQueued)
 		{
 			return;
 		}
 
-		m_uiRefreshQueued = true;
+		m_bUiRefreshQueued = true;
 		QTimer::singleShot(0, this, &LauncherMainWindow::ApplyScheduledUiRefresh);
 	}
 
 	void LauncherMainWindow::ApplyScheduledUiRefresh()
 	{
-		if (m_isApplyingUiRefresh)
+		if (m_bIsApplyingUiRefresh)
 		{
 			return;
 		}
 
-		m_uiRefreshQueued = false;
-		const bool refreshContent = m_refreshContentRequested;
-		m_refreshContentRequested = false;
-		m_isApplyingUiRefresh = true;
+		m_bUiRefreshQueued = false;
+		const bool bRefreshContent = m_bRefreshContentRequested;
+		m_bRefreshContentRequested = false;
+		m_bIsApplyingUiRefresh = true;
 
-		if (refreshContent)
+		if (bRefreshContent)
 		{
 			m_contentModel.Refresh(m_workspaceRoot);
 			RefreshContextSelectors();
@@ -258,32 +258,32 @@ namespace SparkleLauncher
 
 		RebuildOptionsPages();
 		UpdateRunAvailability();
-		m_isApplyingUiRefresh = false;
-		if (m_refreshContentRequested)
+		m_bIsApplyingUiRefresh = false;
+		if (m_bRefreshContentRequested)
 		{
 			ScheduleUiRefresh(false);
 		}
 	}
 
-	void LauncherMainWindow::SetControlsEnabled(bool enabled)
+	void LauncherMainWindow::SetControlsEnabled(bool bEnabled)
 	{
 		if (m_cleanButton != nullptr)
 		{
-			m_cleanButton->setEnabled(enabled);
+			m_cleanButton->setEnabled(bEnabled);
 		}
 		if (m_runButton != nullptr)
 		{
-			m_runButton->setEnabled(enabled);
+			m_runButton->setEnabled(bEnabled);
 		}
 		if (m_optionsStack != nullptr)
 		{
-			m_optionsStack->setVisible(enabled);
+			m_optionsStack->setVisible(bEnabled);
 		}
 	}
 
 	void LauncherMainWindow::RebuildOptionsPages()
 	{
-		if (m_optionsStack == nullptr || m_isRebuildingOptions)
+		if (m_optionsStack == nullptr || m_bIsRebuildingOptions)
 		{
 			return;
 		}
@@ -302,7 +302,7 @@ namespace SparkleLauncher
 			}
 		}
 
-		m_isRebuildingOptions = true;
+		m_bIsRebuildingOptions = true;
 
 		while (m_optionsStack->count() > 0)
 		{
@@ -326,7 +326,7 @@ namespace SparkleLauncher
 		}
 
 		ConfigureTabOrder();
-		m_isRebuildingOptions = false;
+		m_bIsRebuildingOptions = false;
 	}
 
 	void LauncherMainWindow::EnsureOptionsPage(const QString& operationId)
@@ -388,8 +388,8 @@ namespace SparkleLauncher
 		}
 
 		m_runButton->setVisible(true);
-		const bool isLevelCatalog = m_selectedOperationId == LauncherScenesOperationId();
-		m_cleanButton->setVisible(isLevelCatalog || SupportsActionSpecificClean(m_selectedOperationId.toStdString()));
+		const bool bIsLevelCatalog = m_selectedOperationId == LauncherScenesOperationId();
+		m_cleanButton->setVisible(bIsLevelCatalog || SupportsActionSpecificClean(m_selectedOperationId.toStdString()));
 
 		if (OperationNeedsContent(m_selectedOperationId) && m_contentModel.ContentId().isEmpty())
 		{
@@ -404,24 +404,24 @@ namespace SparkleLauncher
 		          BuildActionCleanTargetRequest(m_workspaceRoot, m_contentModel, m_settings, std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()), m_selectedOperationId))
 		    : QVector<LauncherCleanTarget>();
 
-		const bool cleanWorkspaceSelected = m_selectedOperationId == "workspace.clean";
-		const QString cleanScopeError = cleanWorkspaceSelected ? CleanScopeSelectionError(m_settings.CleanScope()) : QString();
+		const bool bCleanWorkspaceSelected = m_selectedOperationId == "workspace.clean";
+		const QString cleanScopeError = bCleanWorkspaceSelected ? CleanScopeSelectionError(m_settings.CleanScope()) : QString();
 		if (!cleanScopeError.isEmpty())
 		{
 			ApplyActionAvailability(*m_runButton, false, cleanScopeError);
 			return;
 		}
-		if (isLevelCatalog)
+		if (bIsLevelCatalog)
 		{
 			m_sceneCatalog->UpdateActionAvailability(*m_cleanButton, *m_runButton, !cleanTargets.isEmpty());
 			return;
 		}
-		const bool canClean = !cleanTargets.isEmpty();
+		const bool bCanClean = !cleanTargets.isEmpty();
 
 		ApplyActionAvailability(
 		    *m_cleanButton,
-		    canClean,
-		    canClean ? "Clean only the generated outputs tied to " + DisplayNameForOperation(m_selectedOperationId) + "." : "Clean is not available for this workflow.");
+		    bCanClean,
+		    bCanClean ? "Clean only the generated outputs tied to " + DisplayNameForOperation(m_selectedOperationId) + "." : "Clean is not available for this workflow.");
 
 		UpdateWorkflowRunAvailability();
 	}
@@ -432,8 +432,8 @@ namespace SparkleLauncher
 		{
 			const BuildWorkspaceOperationRequest request = BuildWorkspacePlanRequest(m_workspaceRoot, m_contentModel, m_settings);
 			const BuildWorkspaceOperationPlan plan = PlanBuildWorkspaceOperation(m_selectedOperationId.toStdString(), request);
-			const QString reason = plan.CanRun ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going." : FirstBlockingReadinessMessage(plan.ReadinessMessages);
-			ApplyActionAvailability(*m_runButton, plan.CanRun, reason);
+			const QString reason = plan.bCanRun ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going." : FirstBlockingReadinessMessage(plan.ReadinessMessages);
+			ApplyActionAvailability(*m_runButton, plan.bCanRun, reason);
 			return;
 		}
 
@@ -442,11 +442,11 @@ namespace SparkleLauncher
 			const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
 			const CookOperationPlan plan = PlanCookOperation(m_selectedOperationId.toStdString(), LauncherOperationRequestMapping::Cook(operationRequest));
 
-			const QString reason = plan.CanRun
+			const QString reason = plan.bCanRun
 			    ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going."
 			    : (plan.ReadinessMessages.empty() ? QStringLiteral("This cooking workflow is currently blocked.") : QString::fromStdString(plan.ReadinessMessages.back()));
 
-			ApplyActionAvailability(*m_runButton, plan.CanRun, reason);
+			ApplyActionAvailability(*m_runButton, plan.bCanRun, reason);
 			return;
 		}
 
@@ -465,7 +465,7 @@ namespace SparkleLauncher
 		}
 		if (m_runButton != nullptr)
 		{
-			const bool destructive = operationId == "workspace.clean";
+			const bool bDestructive = operationId == "workspace.clean";
 			LauncherIcon actionIcon = LauncherIcon::Run;
 			if (operationId == LauncherScenesOperationId() || operationId.startsWith("workspace.sync"))
 			{
@@ -479,12 +479,12 @@ namespace SparkleLauncher
 			{
 				actionIcon = LauncherIcon::Cook;
 			}
-			else if (destructive)
+			else if (bDestructive)
 			{
 				actionIcon = LauncherIcon::Clean;
 			}
-			m_runButton->setProperty("ActionTone", destructive ? "destructive" : "primary");
-			m_runButton->setIcon(m_icons.Icon(actionIcon, QColor(destructive ? "#ffffff" : "#071006")));
+			m_runButton->setProperty("ActionTone", bDestructive ? "destructive" : "primary");
+			m_runButton->setIcon(m_icons.Icon(actionIcon, QColor(bDestructive ? "#ffffff" : "#071006")));
 			m_runButton->setText(operationId == LauncherScenesOperationId() ? "Sync All" : operationId == "workspace.clean" ? "Clean" : PrimaryActionLabelForOperationId(operationId));
 
 			m_runButton->setAccessibleName(
@@ -497,9 +497,9 @@ namespace SparkleLauncher
 		}
 		if (m_cleanButton != nullptr)
 		{
-			const bool cleanAllLevels = operationId == LauncherScenesOperationId();
+			const bool bCleanAllLevels = operationId == LauncherScenesOperationId();
 			m_cleanButton->setProperty("ActionTone", "destructive");
-			m_cleanButton->setText(cleanAllLevels ? "Clean All" : "Clean");
+			m_cleanButton->setText(bCleanAllLevels ? "Clean All" : "Clean");
 			m_cleanButton->setAccessibleName(operationId == LauncherScenesOperationId() ? "Clean all selected levels" : "Clean selected workflow outputs");
 			m_cleanButton->style()->unpolish(m_cleanButton);
 			m_cleanButton->style()->polish(m_cleanButton);

@@ -21,7 +21,7 @@ struct VulkanRecordingResource final
 	VkFlags Usage = 0;
 	VkAccelerationStructureTypeKHR AccelerationStructureType = VK_ACCELERATION_STRUCTURE_TYPE_MAX_ENUM_KHR;
 	VulkanGpuAllocationResourceKind ResourceKind = VulkanGpuAllocationResourceKind::Unknown;
-	bool IsPtlas = false;
+	bool bIsPtlas = false;
 };
 
 class VulkanRecordingResourceUseToken final

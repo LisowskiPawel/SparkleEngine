@@ -30,12 +30,12 @@ bool ProjectCookPlanner::TryFindWorkspaceRoot(const std::filesystem::path& start
 	}
 
 	const std::optional<std::filesystem::path> workspaceRoot = Filesystem::FindAncestorWithMarker(currentPath, Filesystem::kWorkspaceMarker);
-	const bool workspaceFound = workspaceRoot.has_value();
-	const bool enginePresent = workspaceFound && PathExists(*workspaceRoot / "Engine" / std::string(Filesystem::kEngineMarker));
-	const bool projectsPresent = enginePresent && PathExists(*workspaceRoot / "Projects");
-	const bool toolsPresent = projectsPresent && PathExists(*workspaceRoot / "Tools");
+	const bool bWorkspaceFound = workspaceRoot.has_value();
+	const bool bEnginePresent = bWorkspaceFound && PathExists(*workspaceRoot / "Engine" / std::string(Filesystem::kEngineMarker));
+	const bool bProjectsPresent = bEnginePresent && PathExists(*workspaceRoot / "Projects");
+	const bool bToolsPresent = bProjectsPresent && PathExists(*workspaceRoot / "Tools");
 
-	if (!toolsPresent)
+	if (!bToolsPresent)
 	{
 		return false;
 	}
@@ -76,10 +76,10 @@ std::vector<std::string> ProjectCookPlanner::DiscoverProjects(const std::filesys
 	{
 		std::error_code statusError;
 		const std::string projectName = entry.path().filename().string();
-		const bool projectDirectory = entry.is_directory(statusError) && projectName != "TemplateProject";
-		const bool projectMarkerPresent = projectDirectory && PathExists(entry.path() / std::string(Filesystem::kProjectMarker));
+		const bool bProjectDirectory = entry.is_directory(statusError) && projectName != "TemplateProject";
+		const bool bProjectMarkerPresent = bProjectDirectory && PathExists(entry.path() / std::string(Filesystem::kProjectMarker));
 
-		if (projectMarkerPresent)
+		if (bProjectMarkerPresent)
 		{
 			projects.push_back(projectName);
 		}
@@ -210,7 +210,7 @@ bool ProjectCookPlanner::CollectSceneIds(const std::filesystem::path& projectRoo
 
 bool ProjectCookPlanner::AppendLevelSceneIds(const ProjectLevelCatalog& catalog, const ProjectLevelCatalogEntry& level, std::vector<std::string>& outSceneIds, AssetCookerDiagnostics& diagnostics)
 {
-	if (!level.selected)
+	if (!level.bSelected)
 	{
 		return true;
 	}

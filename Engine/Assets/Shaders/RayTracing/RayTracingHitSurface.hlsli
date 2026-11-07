@@ -2,7 +2,7 @@
 
 struct RayTracingHitSurfaceData
 {
-	bool Valid;
+	bool bValid;
 	float3 PositionWorld;
 	float3 PreviousPositionWorld;
 	float3 GeometricNormalWorld;
@@ -22,7 +22,7 @@ struct RayTracingHitSurfaceData
 	uint GpuSceneSlot;
 	uint InstanceId;
 	uint PrimitiveIndex;
-	bool EmissionTwoSided;
+	bool bEmissionTwoSided;
 };
 
 namespace HitSurface

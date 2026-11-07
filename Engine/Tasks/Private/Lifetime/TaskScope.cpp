@@ -20,7 +20,7 @@ TaskScope::State::State(TaskScopeDesc desc) :
 bool TaskScope::State::RegisterExecution(const std::shared_ptr<TaskExecution::State>& execution)
 {
 	std::lock_guard lock(Mutex);
-	if (Closed || Settled || std::this_thread::get_id() != OwnerThread)
+	if (bClosed || bSettled || std::this_thread::get_id() != OwnerThread)
 	{
 		return false;
 	}
@@ -57,7 +57,7 @@ bool TaskScope::State::RegisterExecution(const std::shared_ptr<TaskExecution::St
 bool TaskScope::State::RegisterChild(const std::shared_ptr<State>& child)
 {
 	std::lock_guard lock(Mutex);
-	if (Closed || Settled)
+	if (bClosed || bSettled)
 	{
 		return false;
 	}
@@ -70,15 +70,15 @@ bool TaskScope::State::RegisterChild(const std::shared_ptr<State>& child)
 
 void TaskScope::State::NotifyParentIfSettled(std::unique_lock<std::mutex>& lock)
 {
-	if (!Closed || ActiveExecutions != 0 || OpenChildren != 0 || Settled)
+	if (!bClosed || ActiveExecutions != 0 || OpenChildren != 0 || bSettled)
 	{
 		return;
 	}
 
-	Settled = true;
+	bSettled = true;
 	Condition.notify_all();
-	auto parent = ParentNotified ? std::shared_ptr<State>{} : Parent.lock();
-	ParentNotified = true;
+	auto parent = bParentNotified ? std::shared_ptr<State>{} : Parent.lock();
+	bParentNotified = true;
 	lock.unlock();
 	if (parent)
 	{
@@ -109,8 +109,8 @@ void TaskScope::State::Cancel() noexcept
 	std::vector<std::shared_ptr<TaskExecution::State>> executions;
 	{
 		std::unique_lock lock(Mutex);
-		CancellationRequested = true;
-		Closed = true;
+		bCancellationRequested = true;
+		bClosed = true;
 		for (auto& child : Children)
 		{
 			if (auto state = child.lock())
@@ -145,9 +145,9 @@ bool TaskScope::State::JoinFor(std::chrono::milliseconds timeout)
 	}
 
 	std::unique_lock lock(Mutex);
-	Closed = true;
+	bClosed = true;
 	NotifyParentIfSettled(lock);
-	return Condition.wait_for(lock, timeout, [this] { return Settled; });
+	return Condition.wait_for(lock, timeout, [this] { return bSettled; });
 }
 
 void TaskScope::State::CancelAndJoin() noexcept
@@ -159,19 +159,19 @@ void TaskScope::State::CancelAndJoin() noexcept
 	}
 
 	std::unique_lock lock(Mutex);
-	Condition.wait(lock, [this] { return Settled; });
+	Condition.wait(lock, [this] { return bSettled; });
 }
 
 bool TaskScope::State::IsCancellationRequested() const noexcept
 {
 	std::lock_guard lock(Mutex);
-	return CancellationRequested;
+	return bCancellationRequested;
 }
 
 bool TaskScope::State::IsSettled() const noexcept
 {
 	std::lock_guard lock(Mutex);
-	return Settled;
+	return bSettled;
 }
 
 TaskScope::TaskScope(TaskScopeDesc desc, TaskScope* parent) :
@@ -185,8 +185,8 @@ TaskScope::TaskScope(TaskScopeDesc desc, TaskScope* parent) :
 
 TaskScope::~TaskScope()
 {
-	const bool settledBeforeDestruction = m_state->IsSettled();
-	if (!settledBeforeDestruction)
+	const bool bSettledBeforeDestruction = m_state->IsSettled();
+	if (!bSettledBeforeDestruction)
 	{
 		m_state->CancelAndJoin();
 	}

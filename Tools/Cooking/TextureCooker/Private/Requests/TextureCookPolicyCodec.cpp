@@ -79,9 +79,9 @@ TextureGroup TextureCookPolicyCodec::ParseTextureGroup(std::string_view value)
 	const bool bIsColorGroupStrings = Strings::EqualsIgnoreCase(value, "diffuse") || Strings::EqualsIgnoreCase(value, "albedo");
 	const bool bIsColorGroupStrings2 = bIsColorGroupStrings || (Strings::EqualsIgnoreCase(value, "base-color"));
 	const bool bIsColorGroupStrings3 = bIsColorGroupStrings2 || (Strings::EqualsIgnoreCase(value, "basecolor"));
-	const bool isBaseColorGroup = bIsColorGroupStrings3 || (Strings::EqualsIgnoreCase(value, "color"));
+	const bool bIsBaseColorGroup = bIsColorGroupStrings3 || (Strings::EqualsIgnoreCase(value, "color"));
 	
-	if (isBaseColorGroup)
+	if (bIsBaseColorGroup)
 	{
 		return TextureGroup::Diffuse;
 	}
@@ -96,9 +96,9 @@ TextureGroup TextureCookPolicyCodec::ParseTextureGroup(std::string_view value)
 	const bool bIsOcclusionGroupStrings = Strings::EqualsIgnoreCase(value, "ambient-occlusion") || Strings::EqualsIgnoreCase(value, "ambientocclusion");
 	const bool bIsOcclusionGroupStrings2 = bIsOcclusionGroupStrings || (Strings::EqualsIgnoreCase(value, "occlusion"));
 	const bool bIsOcclusionGroupStrings3 = bIsOcclusionGroupStrings2 || (Strings::EqualsIgnoreCase(value, "ao"));
-	const bool isOcclusionGroup = bIsOcclusionGroupStrings3 || (Strings::EqualsIgnoreCase(value, "masks"));
+	const bool bIsOcclusionGroup = bIsOcclusionGroupStrings3 || (Strings::EqualsIgnoreCase(value, "masks"));
 	
-	if (isOcclusionGroup)
+	if (bIsOcclusionGroup)
 	{
 		return TextureGroup::AmbientOcclusion;
 	}
@@ -141,9 +141,9 @@ TextureDimension TextureCookPolicyCodec::ParseDimension(std::string_view value)
 TextureChannelMask TextureCookPolicyCodec::ParseChannelMask(std::string_view value)
 {
 	const bool bIsAllChannelsStrings = Strings::EqualsIgnoreCase(value, "rgba") || Strings::EqualsIgnoreCase(value, "all");
-	const bool isAllChannels = bIsAllChannelsStrings || (Strings::EqualsIgnoreCase(value, "none"));
+	const bool bIsAllChannels = bIsAllChannelsStrings || (Strings::EqualsIgnoreCase(value, "none"));
 	
-	if (isAllChannels)
+	if (bIsAllChannels)
 	{
 		return TextureChannelMask::Rgba;
 	}

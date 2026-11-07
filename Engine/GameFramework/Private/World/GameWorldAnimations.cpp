@@ -39,9 +39,9 @@ namespace ECS
 			const bool bAddedAdd2 = bAddedAdd && (m_registry.Add(
 			        entity,
 			        AuthoredIdentity{.SourceAssetId = animationAssetId, .SourceInstanceId = sourceInstanceId, .SourceObjectId = sourceAnimationIndex, .Kind = AuthoredObjectKind::Animation}));
-			const bool added = bAddedAdd2 && (m_registry.Add(entity, EditorMetadata{}));
+			const bool bAdded = bAddedAdd2 && (m_registry.Add(entity, EditorMetadata{}));
 
-			if (!added)
+			if (!bAdded)
 			{
 				m_registry.Destroy(entity);
 				continue;

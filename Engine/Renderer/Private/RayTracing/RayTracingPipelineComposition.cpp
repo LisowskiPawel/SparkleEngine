@@ -9,9 +9,9 @@
 
 namespace RayTracingCompositionValidation
 {
-	void Require(bool condition, std::string_view message)
+	void Require(bool bCondition, std::string_view message)
 	{
-		if (!condition)
+		if (!bCondition)
 		{
 			throw Diagnostics::Error(std::string(message));
 		}
@@ -37,9 +37,9 @@ namespace RayTracingCompositionValidation
 		    "Ray-tracing composition contains an invalid typed shader selection.");
 
 		const auto [shaderByType, insertedType] = shadersByType.emplace(shader, expectedStage);
-		Require(insertedType || shaderByType->second == expectedStage, "One ray-tracing shader type resolves to conflicting composition contracts.");
+		Require(bInsertedType || shaderByType->second == expectedStage, "One ray-tracing shader type resolves to conflicting composition contracts.");
 		const auto [typeByExport, insertedExport] = shaderTypesByExport.emplace(std::string(registration->EntryPoint), shader);
-		Require(insertedExport || typeByExport->second == shader, "One ray-tracing export name resolves to multiple shader types.");
+		Require(bInsertedExport || typeByExport->second == shader, "One ray-tracing export name resolves to multiple shader types.");
 	}
 }
 

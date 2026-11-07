@@ -15,15 +15,15 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	const float3 normalObject = cross(evaluatedTriangle.V1.Position - evaluatedTriangle.V0.Position, evaluatedTriangle.V2.Position - evaluatedTriangle.V0.Position);
 	const float3 outwardGeometricNormal = RayEndpoints::TransformGeometricNormal(normalObject, mesh);
 
-	const bool twoSided = (evaluatedTriangle.Instance.Flags & HitSurface::InstanceFlagTwoSided) != 0u;
+	const bool bTwoSided = (evaluatedTriangle.Instance.Flags & HitSurface::InstanceFlagTwoSided) != 0u;
 
 	RayTracingHitSurfaceData surface = (RayTracingHitSurfaceData)0;
-	if (!trace.FrontFace && !twoSided)
+	if (!trace.bFrontFace && !bTwoSided)
 	{
 		return surface;
 	}
 
-	const float faceSign = trace.FrontFace ? 1.0f : -1.0f;
+	const float faceSign = trace.bFrontFace ? 1.0f : -1.0f;
 	const float3 geometricNormal = outwardGeometricNormal * faceSign;
 
 	float3 vertexNormal;
@@ -43,7 +43,7 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 		return surface;
 	}
 
-	surface.Valid = true;
+	surface.bValid = true;
 	surface.PositionWorld = positionWorld;
 	surface.PreviousPositionWorld = positionWorld;
 
@@ -66,7 +66,7 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	surface.GpuSceneSlot = mesh.GpuSceneSlot;
 	surface.InstanceId = trace.InstanceId;
 	surface.PrimitiveIndex = trace.PrimitiveIndex;
-	surface.EmissionTwoSided = twoSided;
+	surface.bEmissionTwoSided = bTwoSided;
 
 	return surface;
 }
@@ -74,7 +74,7 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 RayTracingHitSurfaceData ReconstructRayTracingHitSurfaceWithPrevious(RayTracingTraceResult trace)
 {
 	RayTracingHitSurfaceData surface = ReconstructRayTracingHitSurface(trace);
-	if (surface.Valid)
+	if (surface.bValid)
 	{
 		const RayTracingHitTriangle hitTriangle = LoadRayTracingHitTriangle(trace.InstanceId, trace.PrimitiveIndex, trace.Barycentrics);
 		const MeshInstanceData mesh = MeshInstances[trace.InstanceId];

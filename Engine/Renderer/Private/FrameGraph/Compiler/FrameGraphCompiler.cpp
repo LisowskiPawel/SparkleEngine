@@ -71,7 +71,7 @@ void FrameGraphCompiler::InitializeCompilation() noexcept
 		passRecord.dependsOn.clear();
 		passRecord.successors.clear();
 		passRecord.inDegree = 0;
-		passRecord.alive = true;
+		passRecord.bAlive = true;
 		passRecord.compiledBarriers.clear();
 		passRecord.compiledReleaseBarriers.clear();
 		passRecord.synchronizationDependencies.clear();
@@ -113,7 +113,7 @@ void FrameGraphCompiler::ResetCompiledResourceStatesForBarrierPlanning() noexcep
 	{
 		compiledResource.currentState = m_resourceStateTracker.GetRuntimeState(compiledResource.handle);
 		compiledResource.planningStartState = compiledResource.currentState;
-		compiledResource.pendingAccelerationStructureBarrier = false;
+		compiledResource.bPendingAccelerationStructureBarrier = false;
 		m_resourceStateTracker.UpdateCurrentState(compiledResource.handle, compiledResource.currentState);
 	}
 }

@@ -107,5 +107,5 @@ private:
 	CallbackTuple m_callbacks;
 	DeferredQueueTuple m_deferredQueues;
 	std::uint32_t m_nextCallbackId = 1;
-	bool m_isProcessingDeferredEvents = false;
+	bool m_bIsProcessingDeferredEvents = false;
 };

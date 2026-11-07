@@ -33,9 +33,9 @@ namespace GpuCrashIncidentFiles
 			current /= component;
 			const DWORD attributes = GetFileAttributesW(current.c_str());
 			const bool bAttributeLookupFailedLastError = attributes == INVALID_FILE_ATTRIBUTES && GetLastError() != ERROR_FILE_NOT_FOUND;
-			const bool attributeLookupFailed = bAttributeLookupFailedLastError && (GetLastError() != ERROR_PATH_NOT_FOUND);
+			const bool bAttributeLookupFailed = bAttributeLookupFailedLastError && (GetLastError() != ERROR_PATH_NOT_FOUND);
 			
-			if (attributeLookupFailed)
+			if (bAttributeLookupFailed)
 			{
 				throw Diagnostics::Error("Cannot inspect GPU crash storage.");
 			}
@@ -137,17 +137,17 @@ void GpuCrashIncidentSink::WritePayload(const Payload& payload)
 	}
 
 	m_files.emplace(name, FileReceipt{std::move(hash), payload.Bytes.size()});
-	m_hasDump |= payload.Id.Kind == RhiGpuCrashArtifactKind::Dump;
+	m_bHasDump |= payload.Id.Kind == RhiGpuCrashArtifactKind::Dump;
 }
 
 std::string GpuCrashIncidentSink::BuildManifest(std::string_view state) const
 {
 	std::int64_t nativeFailure;
-	bool sdkFinished;
+	bool bSdkFinished;
 	{
 		std::lock_guard lock(m_mutex);
 		nativeFailure = m_nativeFailure;
-		sdkFinished = m_sdkFinished;
+		bSdkFinished = m_bSdkFinished;
 	}
 
 	Json::ObjectWriter manifest;
@@ -160,7 +160,7 @@ std::string GpuCrashIncidentSink::BuildManifest(std::string_view state) const
 	manifest.WriteString("sourceMapping", "unqualified");
 
 	manifest.WriteRaw("nativeFailure", std::to_string(nativeFailure));
-	manifest.WriteRaw("sdkFinished", sdkFinished ? "true" : "false");
+	manifest.WriteRaw("sdkFinished", bSdkFinished ? "true" : "false");
 	std::string files = "[";
 	for (const auto& [name, receipt] : m_files)
 	{
@@ -199,13 +199,13 @@ void GpuCrashIncidentSink::WriteManifest(std::string_view state)
 	if (state == "Ready")
 	{
 		std::lock_guard lock(m_mutex);
-		m_readyPublished = m_nativeFailure == 0 && !m_finalizing;
+		m_bReadyPublished = m_nativeFailure == 0 && !m_bFinalizing;
 	}
 }
 
 void GpuCrashIncidentSink::RemoveUnusedSlot() noexcept
 {
-	if (m_directory.empty() || m_keepSlot || m_hasDump || m_nativeFailure != 0)
+	if (m_directory.empty() || m_bKeepSlot || m_bHasDump || m_nativeFailure != 0)
 	{
 		return;
 	}

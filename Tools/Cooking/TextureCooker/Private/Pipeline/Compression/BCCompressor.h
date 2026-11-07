@@ -13,7 +13,7 @@ namespace TextureCookPipeline
 		BCCompressor(const BCCompressor&) = delete;
 		BCCompressor& operator=(const BCCompressor&) = delete;
 
-		void Initialize(bool srgbOutput, bool imageNeedsAlpha);
+		void Initialize(bool bSrgbOutput, bool bImageNeedsAlpha);
 		TextureMipLevelData CompressMip(const TextureCookRequest& request, const WorkingMipLevel& sourceMip) const;
 
 	private:

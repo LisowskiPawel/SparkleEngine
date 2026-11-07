@@ -47,7 +47,7 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 	{
 		if (!m_directory.empty())
 		{
-			m_keepSlot = true;
+			m_bKeepSlot = true;
 			try
 			{
 				WriteManifest("Unavailable");
@@ -67,18 +67,18 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 bool GpuCrashIncidentSink::IsReadyPublished() const
 {
 	std::lock_guard lock(m_mutex);
-	const bool bCollectionIncompletefinalizing = m_nativeFailure == 0 && !m_finalizing;
-	const bool bCollectionIncompleteState = bCollectionIncompletefinalizing && (m_incomplete.load(std::memory_order_relaxed));
+	const bool bCollectionIncompletefinalizing = m_nativeFailure == 0 && !m_bFinalizing;
+	const bool bCollectionIncompleteState = bCollectionIncompletefinalizing && (m_bIncomplete.load(std::memory_order_relaxed));
 	const bool bCollectionIncompleteGuardState = bCollectionIncompletefinalizing && !bCollectionIncompleteState;
-	const bool bCollectionIncompleteState2 = bCollectionIncompleteGuardState && (m_writeFailed.load(std::memory_order_relaxed));
+	const bool bCollectionIncompleteState2 = bCollectionIncompleteGuardState && (m_bWriteFailed.load(std::memory_order_relaxed));
 	const bool bCollectionIncompleteState3 = bCollectionIncompleteState || bCollectionIncompleteState2;
-	const bool collectionIncomplete = bCollectionIncompletefinalizing && bCollectionIncompleteState3;
+	const bool bCollectionIncomplete = bCollectionIncompletefinalizing && bCollectionIncompleteState3;
 	
-	if (collectionIncomplete)
+	if (bCollectionIncomplete)
 	{
 		throw Diagnostics::Error("GPU crash startup publication failed; this child cannot confirm diagnostic readiness.");
 	}
-	return m_readyPublished;
+	return m_bReadyPublished;
 }
 
 GpuCrashIncidentSink::~GpuCrashIncidentSink()
@@ -97,7 +97,7 @@ GpuCrashIncidentSink::~GpuCrashIncidentSink()
 
 void GpuCrashIncidentSink::AbortPreparation() noexcept
 {
-	m_keepSlot = true;
+	m_bKeepSlot = true;
 	MarkIncomplete();
 	Finalize(false, false, 0);
 	// Startup owns this scope; any successfully enabled RHI session has sealed first.
@@ -109,24 +109,24 @@ void GpuCrashIncidentSink::AbortPreparation() noexcept
 
 bool GpuCrashIncidentSink::Enqueue(RhiGpuCrashArtifactId id, std::span<const std::byte> bytes) noexcept
 {
-	bool reserved = false;
+	bool bReserved = false;
 	try
 	{
 		{
 			std::lock_guard lock(m_mutex);
-			const bool bAdmissionRejectedwriteFailedState = m_finalizing || m_writeFailed.load(std::memory_order_relaxed);
+			const bool bAdmissionRejectedwriteFailedState = m_bFinalizing || m_bWriteFailed.load(std::memory_order_relaxed);
 			const bool bAdmissionRejectedbytesEmpty = bAdmissionRejectedwriteFailedState || (bytes.empty());
 			const bool bAdmissionRejectedoutstandingCount = bAdmissionRejectedbytesEmpty || (m_outstandingCount == MaximumPayloads);
-			const bool payloadAdmissionRejected = bAdmissionRejectedoutstandingCount || (bytes.size() > MaximumQueuedBytes - m_outstandingBytes);
+			const bool bPayloadAdmissionRejected = bAdmissionRejectedoutstandingCount || (bytes.size() > MaximumQueuedBytes - m_outstandingBytes);
 			
-			if (payloadAdmissionRejected)
+			if (bPayloadAdmissionRejected)
 			{
 				MarkIncomplete();
 				return false;
 			}
 			++m_outstandingCount;
 			m_outstandingBytes += bytes.size();
-			reserved = true;
+			bReserved = true;
 		}
 
 		Payload payload;
@@ -137,7 +137,7 @@ bool GpuCrashIncidentSink::Enqueue(RhiGpuCrashArtifactId id, std::span<const std
 			std::lock_guard lock(m_mutex);
 			m_queue[(m_head + m_count) % MaximumPayloads] = std::move(payload);
 			++m_count;
-			reserved = false;
+			bReserved = false;
 		}
 
 		if (!m_dispatch.Notify())
@@ -149,7 +149,7 @@ bool GpuCrashIncidentSink::Enqueue(RhiGpuCrashArtifactId id, std::span<const std
 	}
 	catch (...)
 	{
-		if (reserved)
+		if (bReserved)
 		{
 			std::lock_guard lock(m_mutex);
 			--m_outstandingCount;
@@ -162,14 +162,14 @@ bool GpuCrashIncidentSink::Enqueue(RhiGpuCrashArtifactId id, std::span<const std
 
 void GpuCrashIncidentSink::MarkIncomplete() noexcept
 {
-	m_incomplete.store(true, std::memory_order_relaxed);
+	m_bIncomplete.store(true, std::memory_order_relaxed);
 }
 
 void GpuCrashIncidentSink::MarkReady() noexcept
 {
 	{
 		std::lock_guard lock(m_mutex);
-		if (m_nativeFailure == 0 && !m_finalizing)
+		if (m_nativeFailure == 0 && !m_bFinalizing)
 		{
 			m_pendingState = "Ready";
 		}
@@ -184,8 +184,8 @@ void GpuCrashIncidentSink::BeginCollection(std::int64_t nativeFailure) noexcept
 {
 	{
 		std::lock_guard lock(m_mutex);
-		m_readyPublished = false;
-		if (m_finalizing)
+		m_bReadyPublished = false;
+		if (m_bFinalizing)
 		{
 			return;
 		}
@@ -198,18 +198,18 @@ void GpuCrashIncidentSink::BeginCollection(std::int64_t nativeFailure) noexcept
 	}
 }
 
-void GpuCrashIncidentSink::Finalize(bool sdkFinished, bool timedOut, std::int64_t nativeFailure) noexcept
+void GpuCrashIncidentSink::Finalize(bool bSdkFinished, bool bTimedOut, std::int64_t nativeFailure) noexcept
 {
 	{
 		std::lock_guard lock(m_mutex);
-		m_readyPublished = false;
-		if (m_finalizing)
+		m_bReadyPublished = false;
+		if (m_bFinalizing)
 		{
 			return;
 		}
-		m_finalizing = true;
-		m_sdkFinished = sdkFinished;
-		m_timedOut = timedOut;
+		m_bFinalizing = true;
+		m_bSdkFinished = bSdkFinished;
+		m_bTimedOut = bTimedOut;
 		m_nativeFailure = nativeFailure;
 	}
 	if (!m_dispatch.Notify())
@@ -254,7 +254,7 @@ TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
 		}
 		try
 		{
-			if (!m_writeFailed.load(std::memory_order_relaxed))
+			if (!m_bWriteFailed.load(std::memory_order_relaxed))
 			{
 				WritePayload(payload);
 			}
@@ -262,7 +262,7 @@ TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
 		catch (...)
 		{
 			MarkIncomplete();
-			m_writeFailed.store(true, std::memory_order_relaxed);
+			m_bWriteFailed.store(true, std::memory_order_relaxed);
 		}
 
 		const std::size_t size = payload.Bytes.size();
@@ -281,24 +281,24 @@ TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
 		}
 		catch (...)
 		{
-			m_writeFailed.store(true, std::memory_order_relaxed);
+			m_bWriteFailed.store(true, std::memory_order_relaxed);
 		}
 		m_dispatch.Close();
 		return TaskResult::Cancelled("GPU crash artifact publication was cancelled.");
 	}
 
 	const char* pendingState = nullptr;
-	bool finalize = false;
-	bool more = false;
+	bool bFinalize = false;
+	bool bMore = false;
 	{
 		std::lock_guard lock(m_mutex);
 		pendingState = std::exchange(m_pendingState, nullptr);
-		if (m_finalizing)
+		if (m_bFinalizing)
 		{
 			pendingState = nullptr;
 		}
-		finalize = m_finalizing && m_outstandingCount == 0;
-		more = m_count != 0;
+		bFinalize = m_bFinalizing && m_outstandingCount == 0;
+		bMore = m_count != 0;
 	}
 
 	if (pendingState != nullptr)
@@ -310,15 +310,15 @@ TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
 		catch (...)
 		{
 			MarkIncomplete();
-			m_writeFailed.store(true, std::memory_order_relaxed);
+			m_bWriteFailed.store(true, std::memory_order_relaxed);
 		}
 	}
 
-	if (finalize)
+	if (bFinalize)
 	{
 		try
 		{
-			const char* state = m_timedOut ? "Timed out" : m_sdkFinished && m_hasDump && !m_incomplete.load(std::memory_order_relaxed) ? "Collected" : "Partial";
+			const char* state = m_bTimedOut ? "Timed out" : m_bSdkFinished && m_bHasDump && !m_bIncomplete.load(std::memory_order_relaxed) ? "Collected" : "Partial";
 			WriteManifest(state);
 		}
 		catch (...)
@@ -329,7 +329,7 @@ TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
 		}
 		m_dispatch.Close();
 	}
-	else if (more && !m_dispatch.Notify())
+	else if (bMore && !m_dispatch.Notify())
 	{
 		MarkIncomplete();
 	}

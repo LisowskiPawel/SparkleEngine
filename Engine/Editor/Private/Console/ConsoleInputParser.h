@@ -6,12 +6,12 @@
 
 struct ConsoleParsedInput final
 {
-	bool Succeeded = true;
+	bool bSucceeded = true;
 	std::string CommandName;
 	std::vector<std::string> Arguments;
 	std::string ErrorMessage;
 
-	bool IsEmpty() const noexcept { return Succeeded && CommandName.empty(); }
+	bool IsEmpty() const noexcept { return bSucceeded && CommandName.empty(); }
 };
 
 namespace ConsoleInputParser

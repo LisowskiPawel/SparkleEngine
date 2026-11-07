@@ -64,7 +64,7 @@ private:
 	friend class D3D12BackBufferPresentation;
 	void DrainCompletedResourceReleases() noexcept;
 	void FlushDeferredResourceReleases() noexcept;
-	D3D12RecordingResourceUseToken BeginResourceTracking(RhiResourceHandle resource, bool coordinatorRecording) noexcept;
+	D3D12RecordingResourceUseToken BeginResourceTracking(RhiResourceHandle resource, bool bCoordinatorRecording) noexcept;
 	void EndResourceTracking(D3D12RecordingResourceUseToken use, RhiSubmissionToken submissionToken) noexcept;
 
 	static std::wstring MakeDebugName(std::wstring_view debugName, std::wstring_view defaultDebugName);
@@ -78,5 +78,5 @@ private:
 	const RhiCapabilities* m_capabilities = nullptr;
 	std::vector<std::unique_ptr<D3D12GpuAllocationRecord>> m_pendingOwnedResourceReleases;
 	std::vector<std::unique_ptr<D3D12GpuHeapRecord>> m_pendingOwnedMemoryBlockReleases;
-	bool m_crashDiagnosticsCollected = false;
+	bool m_bCrashDiagnosticsCollected = false;
 };

@@ -39,9 +39,9 @@ void RestirLightingHistory::Update(FrameGraph& frameGraph, const FrameHistoryRes
 	}
 
 	const std::uint64_t hash = BuildRestirLightingHistoryInvalidationHash(frame.PreparedScene);
-	const bool invalidated = !m_invalidationHash || *m_invalidationHash != hash;
+	const bool bInvalidated = !m_invalidationHash || *m_invalidationHash != hash;
 	m_invalidationHash = hash;
-	if (invalidated)
+	if (bInvalidated)
 	{
 		InvalidateReservoirHistory(frameGraph, history.DirectLightReservoir);
 		InvalidateReservoirHistory(frameGraph, history.RestirIndirectReservoir);

@@ -25,26 +25,26 @@ namespace BRDF
 	                              float3 F0,
 	                              float3 subsurfaceColor,
 	                              float subsurfaceStrength,
-	                              bool evaluateDiffuse,
-	                              bool evaluateSpecular,
-	                              bool evaluateSubsurface)
+	                              bool bEvaluateDiffuse,
+	                              bool bEvaluateSpecular,
+	                              bool bEvaluateSubsurface)
 	{
 		DirectResponse response = (DirectResponse)0;
 		const float3 F = Fresnel::EvaluateDirect(sd.VoH, F0);
 
-		if (evaluateSpecular)
+		if (bEvaluateSpecular)
 		{
 			response.Specular = Specular::EvaluateDirect(sd, roughness, F);
 		}
 
 		const float3 kD = (1.0f - F) * (1.0f - metallic);
 		const float subsurfaceWeight = saturate(subsurfaceStrength);
-		if (evaluateDiffuse)
+		if (bEvaluateDiffuse)
 		{
 			response.Diffuse = Diffuse::EvaluateDirect(albedo, roughness, sd) * kD * (1.0f - subsurfaceWeight);
 		}
 
-		if (evaluateSubsurface && subsurfaceWeight > 0.0f)
+		if (bEvaluateSubsurface && subsurfaceWeight > 0.0f)
 		{
 			response.Subsurface = Subsurface::EvaluateDirect(albedo, subsurfaceColor, roughness, subsurfaceWeight, sd) * kD * subsurfaceWeight;
 		}

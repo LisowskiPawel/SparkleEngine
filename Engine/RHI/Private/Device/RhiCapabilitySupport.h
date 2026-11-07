@@ -4,5 +4,5 @@
 
 class RenderDiagnostics;
 
-RhiBackendDiagnosticsSupport BuildRhiBackendDiagnosticsSupport(bool validationEnabled, RenderDiagnostics& renderDiagnostics) noexcept;
+RhiBackendDiagnosticsSupport BuildRhiBackendDiagnosticsSupport(bool bValidationEnabled, RenderDiagnostics& renderDiagnostics) noexcept;
 RhiBackendMemorySupport BuildRhiBackendMemorySupport(RenderDiagnostics& renderDiagnostics) noexcept;

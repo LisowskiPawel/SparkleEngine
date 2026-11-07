@@ -54,7 +54,7 @@ namespace SparkleLauncher
 		{
 			return false;
 		}
-		if (m_hasProgress && progress.phase == m_lastProgress.phase)
+		if (m_bHasProgress && progress.phase == m_lastProgress.phase)
 		{
 			if (progress.total != m_lastProgress.total || progress.completed < m_lastProgress.completed)
 			{
@@ -67,7 +67,7 @@ namespace SparkleLauncher
 		}
 
 		m_lastProgress = progress;
-		m_hasProgress = true;
+		m_bHasProgress = true;
 		return true;
 	}
 }

@@ -24,5 +24,5 @@ namespace SparkleLauncher
 	void ApplySyncActionButtonState(QPushButton& button, SyncItemState state, const QString& displayName);
 
 	QString PrimaryActionLabelForOperationId(const QString& operationId);
-	void ApplyActionAvailability(QPushButton& button, bool enabled, const QString& reason);
+	void ApplyActionAvailability(QPushButton& button, bool bEnabled, const QString& reason);
 }

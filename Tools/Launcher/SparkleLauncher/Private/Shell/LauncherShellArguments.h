@@ -27,10 +27,10 @@ namespace SparkleLauncher
 		std::filesystem::path ShaderExportPath;
 		CookMode RequestedCookMode = CookMode::Incremental;
 		CleanScope RequestedCleanScope = CleanScope::CookedOutputs;
-		bool ForceRecookConfirmed = false;
-		bool CleanConfirmed = false;
-		bool ShowHelp = false;
-		bool ShaderSymbols = false;
+		bool bForceRecookConfirmed = false;
+		bool bCleanConfirmed = false;
+		bool bShowHelp = false;
+		bool bShaderSymbols = false;
 	};
 
 	bool ParseLauncherShellArguments(int argc, char** argv, LauncherShellArguments& outArguments, std::ostream& error);

@@ -46,8 +46,8 @@ private:
 		std::uint32_t physicalBlockIndex = INVALID_FRAME_GRAPH_RESOURCE_INDEX;
 		RhiTextureResourceDesc textureDesc = {};
 		RhiBufferResourceDesc bufferDesc = {};
-		bool requiresShaderResourceView = false;
-		bool requiresUnorderedAccessView = false;
+		bool bRequiresShaderResourceView = false;
+		bool bRequiresUnorderedAccessView = false;
 		bool operator==(const PlanEntry&) const = default;
 	};
 

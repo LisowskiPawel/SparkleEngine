@@ -33,8 +33,8 @@ namespace ECS
 			        WorldExtractionStorage::MeshSlot& slot = slots[index];
 			        slot.Entity = entity;
 			        const std::shared_ptr<const Mesh> resource = m_state.m_meshResources.ResolveImmutable(mesh.Resource);
-			        slot.Included = resource != nullptr;
-			        if (!slot.Included)
+			        slot.bIncluded = resource != nullptr;
+			        if (!slot.bIncluded)
 			        {
 				        return;
 			        }
@@ -47,7 +47,7 @@ namespace ECS
 			        slot.Kind = mesh.Kind;
 			        slot.MeshAssetIndex = mesh.MeshAssetIndex;
 			        slot.InstanceGroupIndex = mesh.InstanceGroupIndex;
-			        slot.Visible = visibility.Visible;
+			        slot.bVisible = visibility.bVisible;
 		        })
 		    .Succeeded();
 	}

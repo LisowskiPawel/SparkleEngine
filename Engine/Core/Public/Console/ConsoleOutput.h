@@ -14,7 +14,7 @@ enum class ConsoleCommandSeverity : std::uint8_t
 
 struct SPARKLE_CORE_API ConsoleCommandResult final
 {
-	bool Succeeded = true;
+	bool bSucceeded = true;
 	ConsoleCommandSeverity Severity = ConsoleCommandSeverity::Info;
 	std::string Message;
 

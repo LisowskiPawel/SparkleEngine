@@ -42,5 +42,5 @@ private:
 	VkSampler m_imguiSampler = VK_NULL_HANDLE;
 	std::vector<TextureBinding> m_textureBindings;
 	ImGuiContext* m_imguiContext = nullptr;
-	bool m_ownsContext = false;
+	bool m_bOwnsContext = false;
 };

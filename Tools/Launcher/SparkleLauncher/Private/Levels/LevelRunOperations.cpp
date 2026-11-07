@@ -48,7 +48,7 @@ namespace SparkleLauncher
 
 	static void PopulateRunStep(LevelRunOperationPlan& plan)
 	{
-		if (!plan.CanRun)
+		if (!plan.bCanRun)
 		{
 			return;
 		}
@@ -93,9 +93,9 @@ namespace SparkleLauncher
 	static void InspectRunReadiness(LevelRunOperationPlan& plan)
 	{
 		std::error_code errorCode;
-		plan.Readiness.ExecutableReady = std::filesystem::is_regular_file(plan.ExecutablePath, errorCode);
+		plan.Readiness.bExecutableReady = std::filesystem::is_regular_file(plan.ExecutablePath, errorCode);
 		errorCode.clear();
-		plan.Readiness.ContentDirectoryReady = std::filesystem::exists(plan.WorkingDirectory / std::string(Filesystem::kProjectMarker), errorCode);
+		plan.Readiness.bContentDirectoryReady = std::filesystem::exists(plan.WorkingDirectory / std::string(Filesystem::kProjectMarker), errorCode);
 
 		const CookedContentReadiness cookedContent = InspectCookedContentReadiness(
 		    plan.Request.WorkspaceRoot,
@@ -103,23 +103,23 @@ namespace SparkleLauncher
 		    plan.Request.GpuCrashMode == RhiGpuCrashMode::Off ? "" : "gpu-crash");
 
 		// GameFramework always registers built-in Empty without imported scene assets.
-		plan.Readiness.CookedMeshesReady = plan.Request.LevelId == "Empty" || cookedContent.MeshesReady;
-		plan.Readiness.CookedTexturesReady = cookedContent.TexturesReady;
-		plan.Readiness.CookedShadersReady = cookedContent.Shaders == CookedShaderPublicationState::Ready;
+		plan.Readiness.bCookedMeshesReady = plan.Request.LevelId == "Empty" || cookedContent.bMeshesReady;
+		plan.Readiness.bCookedTexturesReady = cookedContent.bTexturesReady;
+		plan.Readiness.bCookedShadersReady = cookedContent.Shaders == CookedShaderPublicationState::Ready;
 
-		if (!plan.Readiness.ExecutableReady)
+		if (!plan.Readiness.bExecutableReady)
 		{
 			plan.ReadinessMessages.push_back("Selected product executable is missing; compile " + plan.TargetName + " first.");
 		}
-		if (!plan.Readiness.ContentDirectoryReady)
+		if (!plan.Readiness.bContentDirectoryReady)
 		{
 			plan.ReadinessMessages.push_back("Content working directory is missing or invalid: " + Strings::ToNarrow(plan.WorkingDirectory.wstring()));
 		}
-		if (!plan.Readiness.CookedMeshesReady)
+		if (!plan.Readiness.bCookedMeshesReady)
 		{
 			plan.ReadinessMessages.push_back("Cooked scenes and meshes are missing.");
 		}
-		if (!plan.Readiness.CookedTexturesReady)
+		if (!plan.Readiness.bCookedTexturesReady)
 		{
 			plan.ReadinessMessages.push_back("Cooked textures are missing.");
 		}
@@ -251,8 +251,8 @@ namespace SparkleLauncher
 
 		plan.PlannedEffects.push_back("Use graphics API: " + plan.Request.GraphicsApi + ".");
 
-		plan.CanRun = plan.Readiness.ExecutableReady && plan.Readiness.ContentDirectoryReady && plan.Readiness.CookedMeshesReady && plan.Readiness.CookedTexturesReady
-		    && plan.Readiness.CookedShadersReady;
+		plan.bCanRun = plan.Readiness.bExecutableReady && plan.Readiness.bContentDirectoryReady && plan.Readiness.bCookedMeshesReady && plan.Readiness.bCookedTexturesReady
+		    && plan.Readiness.bCookedShadersReady;
 
 		PopulateRunStep(plan);
 

@@ -47,7 +47,7 @@ namespace SparkleLauncher
 		std::uintmax_t FileCount = 0;
 		std::uintmax_t DirectoryCount = 0;
 		std::uintmax_t ByteCount = 0;
-		bool Exists = false;
+		bool bExists = false;
 	};
 
 	struct MaintenanceCleanPathSpec
@@ -83,7 +83,7 @@ namespace SparkleLauncher
 		std::vector<CleanScope> RequestedCleanScopes;
 		std::vector<MaintenanceCleanPathSpec> RequestedCleanTargets;
 		std::vector<std::filesystem::path> PreservedPaths;
-		bool DestructiveActionConfirmed = false;
+		bool bDestructiveActionConfirmed = false;
 	};
 
 	struct MaintenanceOperationStep
@@ -93,7 +93,7 @@ namespace SparkleLauncher
 		std::string DisplayCommandLine;
 		std::filesystem::path LogPath;
 		std::filesystem::path DestructivePath;
-		bool Destructive = false;
+		bool bDestructive = false;
 	};
 
 	struct MaintenanceOperationPlan
@@ -107,7 +107,7 @@ namespace SparkleLauncher
 		std::vector<MaintenanceOperationStep> Steps;
 		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
-		bool CanRun = false;
+		bool bCanRun = false;
 	};
 
 	std::string ToString(MaintenanceOperationKind kind);

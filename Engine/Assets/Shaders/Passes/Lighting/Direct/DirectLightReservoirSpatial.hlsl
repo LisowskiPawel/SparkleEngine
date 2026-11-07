@@ -20,7 +20,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	}
 
 	const DirectReservoir::Surface surface = DirectReservoir::LoadSurface(pixelCoord);
-	if (!surface.Valid)
+	if (!surface.bValid)
 	{
 		const DirectReservoir::Reservoir emptyReservoir = DirectReservoir::EmptyReservoir();
 		CurrentReservoirSample[pixelCoord] = DirectReservoir::PackReservoirSample(emptyReservoir);

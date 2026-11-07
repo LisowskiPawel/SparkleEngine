@@ -25,10 +25,10 @@ D3D12GpuAllocationRecord::~D3D12GpuAllocationRecord() noexcept
 		Owner = nullptr;
 	}
 
-	if (IsMapped && Resource != nullptr)
+	if (bIsMapped && Resource != nullptr)
 	{
 		Resource->Unmap(0, nullptr);
-		IsMapped = false;
+		bIsMapped = false;
 		CpuMappedAddress = nullptr;
 	}
 

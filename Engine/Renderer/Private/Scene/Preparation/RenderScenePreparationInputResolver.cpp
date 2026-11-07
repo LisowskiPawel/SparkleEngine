@@ -50,7 +50,7 @@ void RenderScenePreparationInputResolver::ResolvePrimitives(const RenderScene& s
 	run.ResolvedPrimitives.reserve(scene.GetPrimitives().size());
 	for (const RenderPrimitive& primitive : scene.GetPrimitives())
 	{
-		if (!primitive.Dynamic.Visible || !primitive.GpuMeshResident || !IsMeshRenderingEnabled(primitive.Static.MeshKind))
+		if (!primitive.Dynamic.bVisible || !primitive.bGpuMeshResident || !IsMeshRenderingEnabled(primitive.Static.MeshKind))
 		{
 			continue;
 		}
@@ -89,7 +89,7 @@ ResolvedRenderPrimitive RenderScenePreparationInputResolver::ResolvePrimitive(
 	draw.Geometry.Mesh = gpuMesh->GetHandle();
 	draw.Geometry.LocalBoundsMin = gpuMesh->GetLocalBounds().Min;
 	draw.Geometry.LocalBoundsMax = gpuMesh->GetLocalBounds().Max;
-	draw.Geometry.HasLocalBounds = gpuMesh->GetLocalBounds().Valid;
+	draw.Geometry.bHasLocalBounds = gpuMesh->GetLocalBounds().bValid;
 
 	return ResolvedRenderPrimitive{
 	    .Object = primitive.Object,
@@ -125,7 +125,7 @@ void RenderScenePreparationInputResolver::ResolveSky(const RenderScene& scene, P
 	}
 	else
 	{
-		preparedScene.sky.enabled = sky->enabled;
+		preparedScene.sky.bEnabled = sky->bEnabled;
 		preparedScene.sky.color = sky->color;
 		preparedScene.sky.brightness = sky->brightness;
 		if (!sky->skyTexture.IsValid())
@@ -142,5 +142,5 @@ void RenderScenePreparationInputResolver::ResolveSky(const RenderScene& scene, P
 		Diagnostics::Fatal(g_renderPreparationInputResolverLogger, __FILE__, __LINE__, "Scene sky texture is unavailable.");
 	}
 	preparedScene.sky.texture = skyTexture;
-	preparedScene.sky.enabled = preparedScene.sky.enabled && CVarSkyEnabled.Get();
+	preparedScene.sky.bEnabled = preparedScene.sky.bEnabled && CVarSkyEnabled.Get();
 }

@@ -24,9 +24,9 @@ static bool CollectFilteredCVars(ConsoleVariableRegistry& registry, const CVarCo
 		const bool bCvarMatchesFilterGuardFilter2 = bCvarMatchesFiltervariable && !bCvarMatchesFilterFilter3;
 		const bool bCvarMatchesFilterFilter4 = bCvarMatchesFilterGuardFilter2 && (Strings::ContainsIgnoreCase(variable->GetDescription(), request.Filter));
 		const bool bCvarMatchesFilterFilter5 = bCvarMatchesFilterFilter3 || bCvarMatchesFilterFilter4;
-		const bool cvarMatchesFilter = bCvarMatchesFiltervariable && bCvarMatchesFilterFilter5;
+		const bool bCvarMatchesFilter = bCvarMatchesFiltervariable && bCvarMatchesFilterFilter5;
 		
-		if (cvarMatchesFilter)
+		if (bCvarMatchesFilter)
 		{
 			variables.push_back(variable);
 		}

@@ -6,15 +6,15 @@
 
 ConsoleCommandResult ConsoleCommandResult::Success(std::string message)
 {
-	return ConsoleCommandResult{.Succeeded = true, .Severity = ConsoleCommandSeverity::Info, .Message = std::move(message)};
+	return ConsoleCommandResult{.bSucceeded = true, .Severity = ConsoleCommandSeverity::Info, .Message = std::move(message)};
 }
 
 ConsoleCommandResult ConsoleCommandResult::Warning(std::string message)
 {
-	return ConsoleCommandResult{.Succeeded = true, .Severity = ConsoleCommandSeverity::Warning, .Message = std::move(message)};
+	return ConsoleCommandResult{.bSucceeded = true, .Severity = ConsoleCommandSeverity::Warning, .Message = std::move(message)};
 }
 
 ConsoleCommandResult ConsoleCommandResult::Error(std::string message)
 {
-	return ConsoleCommandResult{.Succeeded = false, .Severity = ConsoleCommandSeverity::Error, .Message = std::move(message)};
+	return ConsoleCommandResult{.bSucceeded = false, .Severity = ConsoleCommandSeverity::Error, .Message = std::move(message)};
 }

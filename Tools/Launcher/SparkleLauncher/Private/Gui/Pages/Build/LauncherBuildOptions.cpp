@@ -17,7 +17,7 @@ namespace SparkleLauncher
 	void BuildLauncherBuildOptions(QVBoxLayout& layout, LauncherSettings& settings, const std::function<void(QWidget*)>& registerFocusable, const std::function<void()>& selectionChanged)
 	{
 		const WorkspaceFeatureSettings features = GetLauncherWorkspaceFeatureSettings();
-		const bool cookToolsAvailable = features.ContentPipelineEnabled || features.ShaderCompilerEnabled;
+		const bool bCookToolsAvailable = features.bContentPipelineEnabled || features.bShaderCompilerEnabled;
 		const QStringList selectedScopes = settings.BuildScopes().split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
 		QVector<QCheckBox*> scopeBoxes;
 
@@ -41,9 +41,9 @@ namespace SparkleLauncher
 		    *selectionLayout,
 		    "Cooking tools",
 		    "cook-tools",
-		    cookToolsAvailable ? "Asset, texture, and shader cooking tools." : "No cooking-tool targets are enabled by this workspace configuration.",
-		    cookToolsAvailable ? settings.EditorProfile() : QStringLiteral("Unavailable"),
-		    cookToolsAvailable,
+		    bCookToolsAvailable ? "Asset, texture, and shader cooking tools." : "No cooking-tool targets are enabled by this workspace configuration.",
+		    bCookToolsAvailable ? settings.EditorProfile() : QStringLiteral("Unavailable"),
+		    bCookToolsAvailable,
 		    selectedScopes,
 		    scopeBoxes,
 		    registerFocusable);

@@ -55,11 +55,11 @@ GpuMeshHandle GpuMeshCache::Request(const ImmutableRenderMeshHandle& mesh)
 	MeshRequest* const existingRequest = FindRequest(key);
 	if (existingRequest != nullptr)
 	{
-		if (!existingRequest->Wanted)
+		if (!existingRequest->bWanted)
 		{
 			return {};
 		}
-		existingRequest->Wanted = true;
+		existingRequest->bWanted = true;
 		return existingRequest->Handle;
 	}
 
@@ -117,12 +117,12 @@ void GpuMeshCache::UploadReadyMeshes(RenderCommandList& commandList)
 	for (auto& entry : m_requests)
 	{
 		MeshRequest& request = entry.second;
-		const bool bUploadWantedPrepared = request.Wanted && request.Prepared != nullptr;
-		const bool uploadWanted = bUploadWantedPrepared && (request.Uploaded == nullptr);
-		const bool uploadReady = uploadWanted && m_residency.GetState(request.Generation) == AssetResidencyState::ReadyForUpload;
-		const bool uploadStarted = uploadReady && m_residency.BeginUpload(request.Generation);
+		const bool bUploadWantedPrepared = request.bWanted && request.Prepared != nullptr;
+		const bool bUploadWanted = bUploadWantedPrepared && (request.Uploaded == nullptr);
+		const bool bUploadReady = bUploadWanted && m_residency.GetState(request.Generation) == AssetResidencyState::ReadyForUpload;
+		const bool bUploadStarted = bUploadReady && m_residency.BeginUpload(request.Generation);
 
-		if (!uploadStarted)
+		if (!bUploadStarted)
 		{
 			continue;
 		}
@@ -143,7 +143,7 @@ void GpuMeshCache::RecordUploadSubmission(RhiSubmissionToken token) noexcept
 		for (const auto& entry : m_requests)
 		{
 			const MeshRequest& request = entry.second;
-			if (request.Uploaded != nullptr && !request.UploadSubmitted)
+			if (request.Uploaded != nullptr && !request.bUploadSubmitted)
 			{
 				Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh upload completed without a submission token.");
 			}
@@ -154,13 +154,13 @@ void GpuMeshCache::RecordUploadSubmission(RhiSubmissionToken token) noexcept
 	for (auto& entry : m_requests)
 	{
 		MeshRequest& request = entry.second;
-		if (request.Uploaded != nullptr && !request.UploadSubmitted)
+		if (request.Uploaded != nullptr && !request.bUploadSubmitted)
 		{
 			if (!m_residency.RecordUploadSubmission(request.Generation, token, request.ResidentBytes))
 			{
 				Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh upload submission could not enter residency.");
 			}
-			request.UploadSubmitted = true;
+			request.bUploadSubmitted = true;
 		}
 	}
 }
@@ -196,8 +196,8 @@ void GpuMeshCache::RetainOnly(std::span<const GpuMeshHandle> handles) noexcept
 	for (auto& entry : m_requests)
 	{
 		MeshRequest& request = entry.second;
-		request.Wanted = isWanted(request.Handle);
-		if (!request.Wanted)
+		request.bWanted = isWanted(request.Handle);
+		if (!request.bWanted)
 		{
 			(void) m_residency.Cancel(request.Generation);
 			if (!request.Execution.IsValid() && request.Uploaded == nullptr)

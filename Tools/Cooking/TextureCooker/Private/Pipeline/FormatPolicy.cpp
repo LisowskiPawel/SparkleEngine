@@ -11,9 +11,9 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_textureFormatPolicyLogger, "TextureCooker.F
 
 namespace TextureCookPipeline
 {
-	DXGI_FORMAT ResolveUncompressedOutputFormat(const TextureCookRequest& request, bool sourceWasFloat) noexcept
+	DXGI_FORMAT ResolveUncompressedOutputFormat(const TextureCookRequest& request, bool bSourceWasFloat) noexcept
 	{
-		if (sourceWasFloat)
+		if (bSourceWasFloat)
 		{
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
 		}

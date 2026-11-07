@@ -35,8 +35,8 @@ struct WorldCameraReadData final
 	DirectX::XMFLOAT4X4 WorldMatrix{};
 	DirectX::XMFLOAT3 Direction{0.0f, 0.0f, 1.0f};
 	float AspectRatio = 1.0f;
-	bool Visible = true;
-	bool Active = false;
+	bool bVisible = true;
+	bool bActive = false;
 };
 
 struct WorldLightReadData final
@@ -55,7 +55,7 @@ struct WorldMeshReadData final
 	Assets::CookedAssetId SkeletonAssetId = Assets::InvalidCookedAssetId;
 	SceneMeshKind Kind = SceneMeshKind::Static;
 	std::uint32_t SourceNodeIndex = (std::numeric_limits<std::uint32_t>::max)();
-	bool Visible = true;
+	bool bVisible = true;
 };
 
 class SPARKLE_ENGINE_API WorldReadView final

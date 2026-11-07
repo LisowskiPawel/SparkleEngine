@@ -116,9 +116,9 @@ namespace SparkleLauncher
 		    scopeBox,
 		    &QCheckBox::toggled,
 		    scopeRow,
-		    [scopeRow](bool selected)
+		    [scopeRow](bool bSelected)
 		    {
-			    scopeRow->setProperty("Selected", selected);
+			    scopeRow->setProperty("Selected", bSelected);
 			    scopeRow->style()->unpolish(scopeRow);
 			    scopeRow->style()->polish(scopeRow);
 		    });
@@ -214,10 +214,10 @@ namespace SparkleLauncher
 		}
 		cleanLayout->addWidget(selectionPanel);
 
-		const auto commitSelection = [&settings, scopeBoxes, selectionChanged](bool cleanAllRequested)
+		const auto commitSelection = [&settings, scopeBoxes, selectionChanged](bool bCleanAllRequested)
 		{
 			const QStringList selectedValues = CollectSelectedScopeValues(scopeBoxes);
-			settings.SetCleanScope(cleanAllRequested ? QStringLiteral("clean-all") : selectedValues.join(';'));
+			settings.SetCleanScope(bCleanAllRequested ? QStringLiteral("clean-all") : selectedValues.join(';'));
 			selectionChanged();
 		};
 

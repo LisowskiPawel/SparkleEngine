@@ -61,7 +61,7 @@ namespace SparkleLauncher
 		step.Id = "configure";
 		step.DisplayName = "Generate build files";
 		step.Request = MakeConfigureRequest(plan);
-		step.UpdatesBuildFilesFreshness = plan.Kind != BuildWorkspaceOperationKind::CompileLauncher && plan.Request.SourceDependencyId.empty();
+		step.bUpdatesBuildFilesFreshness = plan.Kind != BuildWorkspaceOperationKind::CompileLauncher && plan.Request.SourceDependencyId.empty();
 		steps.push_back(std::move(step));
 	}
 
@@ -129,7 +129,7 @@ namespace SparkleLauncher
 			AddHostToolInstallStep(steps, plan);
 			return steps;
 		}
-		if (!plan.Toolchain.RequiredToolsAvailable)
+		if (!plan.Toolchain.bRequiredToolsAvailable)
 		{
 			return steps;
 		}

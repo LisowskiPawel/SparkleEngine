@@ -40,7 +40,7 @@ void FrameGraphTransientAllocator::CreateTextureAllocation(
 	    transientPlan.physicalAllocation.memoryBlockOffset,
 	    RhiTransientTextureAllocationDesc{
 	        .ResourceDesc = transientPlan.physicalAllocation.textureResourceDesc,
-	        .ClearValue = transientPlan.physicalAllocation.hasOptimizedClearValue ? transientPlan.physicalAllocation.optimizedClearValue : RhiOptimizedClearValue{},
+	        .ClearValue = transientPlan.physicalAllocation.bHasOptimizedClearValue ? transientPlan.physicalAllocation.optimizedClearValue : RhiOptimizedClearValue{},
 	        .InitialState = transientPlan.physicalAllocation.initialState},
 	    debugName);
 
@@ -64,7 +64,7 @@ void FrameGraphTransientAllocator::CreateColorAllocation(AllocationRecord& alloc
 {
 	CreateTextureAllocation(allocation, transientPlan, memoryBlock, L"FG_ColorTransient");
 
-	if (transientPlan.physicalAllocation.textureResourceDesc.AllowRenderTarget)
+	if (transientPlan.physicalAllocation.textureResourceDesc.bAllowRenderTarget)
 	{
 		allocation.renderTargetView = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(RhiResourceViewDesc::RenderTarget(allocation.resource, transientPlan.textureDesc.format));
 	}

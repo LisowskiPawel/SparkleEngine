@@ -30,7 +30,7 @@ namespace TextureCookPipeline
 			case TextureGroup::Diffuse:
 			case TextureGroup::Emissive:
 			case TextureGroup::SubsurfaceColor:
-				if (workingTexture.sourceWasFloat)
+				if (workingTexture.bSourceWasFloat)
 				{
 					return CompressionTarget::BC6H;
 				}

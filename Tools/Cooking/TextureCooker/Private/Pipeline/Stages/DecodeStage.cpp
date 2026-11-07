@@ -39,20 +39,20 @@ namespace TextureCookPipeline
 			throw Diagnostics::Error("Byte source mip payload size does not match its declared dimensions.");
 		}
 
-		const bool sourceIsBgra = sourceFormat == DXGI_FORMAT_B8G8R8A8_UNORM || sourceFormat == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
-		const bool decodeSrgb = colorProcessingPolicy == TextureColorProcessingPolicy::SrgbLinearize;
+		const bool bSourceIsBgra = sourceFormat == DXGI_FORMAT_B8G8R8A8_UNORM || sourceFormat == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+		const bool bDecodeSrgb = colorProcessingPolicy == TextureColorProcessingPolicy::SrgbLinearize;
 
 		for (std::uint32_t texelIndex = 0; texelIndex < sourceMip.width * sourceMip.height; ++texelIndex)
 		{
 			const std::size_t sourceOffset = static_cast<std::size_t>(texelIndex) * 4u;
-			const std::uint8_t red = sourceIsBgra ? sourceMip.data[sourceOffset + 2u] : sourceMip.data[sourceOffset + 0u];
+			const std::uint8_t red = bSourceIsBgra ? sourceMip.data[sourceOffset + 2u] : sourceMip.data[sourceOffset + 0u];
 			const std::uint8_t green = sourceMip.data[sourceOffset + 1u];
-			const std::uint8_t blue = sourceIsBgra ? sourceMip.data[sourceOffset + 0u] : sourceMip.data[sourceOffset + 2u];
+			const std::uint8_t blue = bSourceIsBgra ? sourceMip.data[sourceOffset + 0u] : sourceMip.data[sourceOffset + 2u];
 			const std::uint8_t alpha = sourceMip.data[sourceOffset + 3u];
 
-			workingMip.pixels[sourceOffset + 0u] = Pixel::DecodeByteChannel(red, decodeSrgb);
-			workingMip.pixels[sourceOffset + 1u] = Pixel::DecodeByteChannel(green, decodeSrgb);
-			workingMip.pixels[sourceOffset + 2u] = Pixel::DecodeByteChannel(blue, decodeSrgb);
+			workingMip.pixels[sourceOffset + 0u] = Pixel::DecodeByteChannel(red, bDecodeSrgb);
+			workingMip.pixels[sourceOffset + 1u] = Pixel::DecodeByteChannel(green, bDecodeSrgb);
+			workingMip.pixels[sourceOffset + 2u] = Pixel::DecodeByteChannel(blue, bDecodeSrgb);
 			workingMip.pixels[sourceOffset + 3u] = Pixel::DecodeByteChannel(alpha, false);
 		}
 
@@ -70,7 +70,7 @@ namespace TextureCookPipeline
 		WorkingTexture workingTexture;
 		workingTexture.dimension = sourceTexture.dimension;
 		workingTexture.arraySize = sourceTexture.arraySize;
-		workingTexture.sourceWasFloat = IsFloatFormat(sourceTexture.dxgiFormat);
+		workingTexture.bSourceWasFloat = IsFloatFormat(sourceTexture.dxgiFormat);
 		workingTexture.arraySlices.resize(sourceTexture.arraySlices.size());
 
 		for (std::size_t arraySliceIndex = 0; arraySliceIndex < sourceTexture.arraySlices.size(); ++arraySliceIndex)

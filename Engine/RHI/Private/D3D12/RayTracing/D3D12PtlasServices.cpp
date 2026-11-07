@@ -118,7 +118,7 @@ D3D12PtlasServices::D3D12PtlasServices(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& m
 RhiPtlasBuildSizes D3D12PtlasServices::GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || m_nvapiProvider == nullptr || !capabilities.Groups.Ptlas.Supported)
+	if (m_rhi == nullptr || m_nvapiProvider == nullptr || !capabilities.Groups.Ptlas.bSupported)
 	{
 		return {};
 	}
@@ -128,14 +128,14 @@ RhiPtlasBuildSizes D3D12PtlasServices::GetPtlasBuildSizes(const RhiPtlasDesc& de
 RhiOwnedResourceHandle D3D12PtlasServices::CreatePtlasBuffer(const RhiPtlasBuildSizes& sizes, std::wstring_view debugName)
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !capabilities.Groups.Ptlas.Supported || sizes.AccelerationStructureSizeInBytes == 0)
+	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !capabilities.Groups.Ptlas.bSupported || sizes.AccelerationStructureSizeInBytes == 0)
 	{
 		return {};
 	}
 
 	const RhiBufferResourceDesc desc{
 	    .SizeInBytes = RhiPtlasOperationLayout::AlignUp(sizes.AccelerationStructureSizeInBytes, capabilities.AccelerationStructureByteAlignment),
-	    .AllowUnorderedAccess = true};
+	    .bAllowUnorderedAccess = true};
 
 	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(desc);
 
@@ -153,10 +153,10 @@ RhiOwnedResourceHandle D3D12PtlasServices::CreatePtlasOperationBuffer(const RhiP
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
 	const bool bOperationPackmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
-	const bool bInvalidOperationPackSupported = bOperationPackmemoryAllocator || (!capabilities.Groups.Ptlas.Supported);
-	const bool invalidPtlasOperationPack = bInvalidOperationPackSupported || (!RhiContract::IsPtlasOperationPackUsable(operationPack));
+	const bool bInvalidOperationPackSupported = bOperationPackmemoryAllocator || (!capabilities.Groups.Ptlas.bSupported);
+	const bool bInvalidPtlasOperationPack = bInvalidOperationPackSupported || (!RhiContract::IsPtlasOperationPackUsable(operationPack));
 	
-	if (invalidPtlasOperationPack)
+	if (bInvalidPtlasOperationPack)
 	{
 		return {};
 	}
@@ -264,11 +264,11 @@ RhiOwnedResourceHandle D3D12PtlasServices::CreatePtlasOperationBuffer(const RhiP
 	{
 		return {};
 	}
-	ownedRecord->IsMapped = true;
+	ownedRecord->bIsMapped = true;
 	ownedRecord->CpuMappedAddress = mappedData;
 	std::memcpy(mappedData, packed.data(), packed.size());
 	ownedRecord->Resource->Unmap(0, nullptr);
-	ownedRecord->IsMapped = false;
+	ownedRecord->bIsMapped = false;
 	ownedRecord->CpuMappedAddress = nullptr;
 	return MakeD3D12OwnedResourceHandle(std::move(ownedRecord));
 #endif
@@ -277,7 +277,7 @@ RhiOwnedResourceHandle D3D12PtlasServices::CreatePtlasOperationBuffer(const RhiP
 RhiPtlasOperationBufferLayout D3D12PtlasServices::GetPtlasOperationBufferLayout(const RhiPtlasDesc& desc) const noexcept
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || !capabilities.Groups.Ptlas.Supported || desc.MaxOperations == 0)
+	if (m_rhi == nullptr || !capabilities.Groups.Ptlas.bSupported || desc.MaxOperations == 0)
 	{
 		return {};
 	}
@@ -289,8 +289,8 @@ RhiPtlasOperationBufferLayout D3D12PtlasServices::GetPtlasOperationBufferLayout(
 	return RhiPtlasOperationLayout::Build(
 	    desc.MaxOperations,
 	    desc.InstanceCapacity,
-	    desc.AllowInstanceUpdates ? desc.InstanceCapacity : 0u,
-	    desc.AllowPartitionTranslation ? desc.PartitionCount + 1u : 0u,
+	    desc.bAllowInstanceUpdates ? desc.InstanceCapacity : 0u,
+	    desc.bAllowPartitionTranslation ? desc.PartitionCount + 1u : 0u,
 	    GetNativeOperationLayout());
 #endif
 }

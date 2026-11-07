@@ -19,8 +19,8 @@ namespace SparkleLauncher
 		    ToQString(dependency.Version),
 		    ToQString(dependency.Purpose),
 		    ToQString(dependency.CacheDirectoryName),
-		    dependency.Required,
-		    dependency.Enabled,
+		    dependency.bRequired,
+		    dependency.bEnabled,
 		};
 	}
 
@@ -56,6 +56,6 @@ namespace SparkleLauncher
 	{
 		const SourceDependencyValidation validation = ValidateDependency(dependency, dependencyCachePath);
 		const QString detail = dependency.Purpose.isEmpty() ? dependency.Version : QStringLiteral("%1 · %2").arg(dependency.Version, dependency.Purpose);
-		return validation.Ready ? ThirdPartyDependencyUiStatus{"Synced", detail, "ok", true} : ThirdPartyDependencyUiStatus{"Missing", detail, "warning", false};
+		return validation.bReady ? ThirdPartyDependencyUiStatus{"Synced", detail, "ok", true} : ThirdPartyDependencyUiStatus{"Missing", detail, "warning", false};
 	}
 }

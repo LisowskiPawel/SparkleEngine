@@ -49,9 +49,9 @@ namespace ECS
 		if (const Camera* camera = m_registry.Get<Camera>(entity))
 		{
 			read.AspectRatio = camera->AspectRatio;
-			read.Active = camera->Active;
+			read.bActive = camera->bActive;
 		}
-		read.Visible = ReadVisibility(entity);
+		read.bVisible = ReadVisibility(entity);
 		return read;
 	}
 
@@ -83,7 +83,7 @@ namespace ECS
 			read.Kind = mesh->Kind;
 			read.SourceNodeIndex = mesh->SourceNodeIndex;
 		}
-		read.Visible = ReadVisibility(entity);
+		read.bVisible = ReadVisibility(entity);
 		return read;
 	}
 
@@ -146,14 +146,14 @@ namespace ECS
 		}
 	}
 
-	void GameWorldState::PublishReadView(std::span<const EntityId> changes, WorldSequence sequence, bool fullBaseline)
+	void GameWorldState::PublishReadView(std::span<const EntityId> changes, WorldSequence sequence, bool bFullBaseline)
 	{
 		const std::shared_ptr<const WorldReadView::Storage> previous = m_publishedReadView.load(std::memory_order_acquire);
-		auto next = previous != nullptr && !fullBaseline ? std::make_shared<WorldReadView::Storage>(*previous) : std::make_shared<WorldReadView::Storage>();
+		auto next = previous != nullptr && !bFullBaseline ? std::make_shared<WorldReadView::Storage>(*previous) : std::make_shared<WorldReadView::Storage>();
 		next->Generation = ++m_readGeneration;
 		next->Sequence = sequence;
 
-		if (previous == nullptr || fullBaseline)
+		if (previous == nullptr || bFullBaseline)
 		{
 			BuildReadViewBaseline(*next);
 		}

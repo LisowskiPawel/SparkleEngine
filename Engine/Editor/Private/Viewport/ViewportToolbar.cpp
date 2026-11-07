@@ -31,12 +31,12 @@ void ViewportToolbar::SetGeometry(float leftPixels, float topPixels, float width
 	m_widthPixels = widthPixels;
 }
 
-void ViewportToolbar::DrawLevelName(std::string_view levelName, bool compact) const noexcept
+void ViewportToolbar::DrawLevelName(std::string_view levelName, bool bCompact) const noexcept
 {
 	const std::string activeLevelName(levelName);
 
 	ImGui::AlignTextToFramePadding();
-	if (compact)
+	if (bCompact)
 	{
 		const std::string compactLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Level, activeLevelName.c_str());
 		ImGui::TextUnformatted(compactLabel.c_str());
@@ -50,24 +50,24 @@ void ViewportToolbar::DrawLevelName(std::string_view levelName, bool compact) co
 	ImGui::TextUnformatted(activeLevelName.c_str());
 }
 
-void ViewportToolbar::DrawCameraControls(bool disableInteraction, bool compact) noexcept
+void ViewportToolbar::DrawCameraControls(bool bDisableInteraction, bool bCompact) noexcept
 {
 	const CameraProjectionKind projectionKind = m_viewportSession.GetSettings().ProjectionKind;
 	const char* projectionLabel = projectionKind == CameraProjectionKind::Orthographic ? "Orthographic" : "Perspective";
-	const std::string cameraText = compact ? EditorIcons::GetEditorIconGlyph(EditorIcons::EditorIcon::Camera) : EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Camera, projectionLabel);
+	const std::string cameraText = bCompact ? EditorIcons::GetEditorIconGlyph(EditorIcons::EditorIcon::Camera) : EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Camera, projectionLabel);
 	const std::string cameraLabel = cameraText + "##ViewportCameraPropertiesButton";
 
-	ImGui::BeginDisabled(disableInteraction);
+	ImGui::BeginDisabled(bDisableInteraction);
 	if (ImGui::Button(cameraLabel.c_str()))
 	{
 		ViewportCameraProperties::OpenPopup();
 	}
-	if (compact && ImGui::IsItemHovered())
+	if (bCompact && ImGui::IsItemHovered())
 	{
 		ImGui::SetTooltip("Camera properties (%s)", projectionLabel);
 	}
 	ImGui::EndDisabled();
-	ViewportCameraProperties::BuildPopup(m_viewportSession, m_renderingDefaults, disableInteraction);
+	ViewportCameraProperties::BuildPopup(m_viewportSession, m_renderingDefaults, bDisableInteraction);
 }
 
 void ViewportToolbar::DrawFrameStats() const noexcept
@@ -88,13 +88,13 @@ void ViewportToolbar::DrawFrameStats() const noexcept
 	}
 }
 
-void ViewportToolbar::Draw(std::string_view levelName, bool disableInteraction) noexcept
+void ViewportToolbar::Draw(std::string_view levelName, bool bDisableInteraction) noexcept
 {
 	if (!BeginToolbarWindow())
 	{
 		return;
 	}
-	DrawToolbarContents(levelName, disableInteraction);
+	DrawToolbarContents(levelName, bDisableInteraction);
 	DrawToolbarBorder();
 	EndToolbarWindow();
 }
@@ -139,25 +139,25 @@ bool ViewportToolbar::BeginToolbarWindow() noexcept
 	return true;
 }
 
-void ViewportToolbar::DrawToolbarContents(std::string_view levelName, bool disableInteraction) noexcept
+void ViewportToolbar::DrawToolbarContents(std::string_view levelName, bool bDisableInteraction) noexcept
 {
-	const bool compactToolbar = m_widthPixels < 760.0f;
+	const bool bCompactToolbar = m_widthPixels < 760.0f;
 
-	const bool showLevel = m_widthPixels >= 480.0f;
-	if (showLevel)
+	const bool bShowLevel = m_widthPixels >= 480.0f;
+	if (bShowLevel)
 	{
-		DrawLevelName(levelName, compactToolbar);
-		ImGui::SameLine(0.0f, compactToolbar ? 8.0f : 14.0f);
+		DrawLevelName(levelName, bCompactToolbar);
+		ImGui::SameLine(0.0f, bCompactToolbar ? 8.0f : 14.0f);
 		ImGui::AlignTextToFramePadding();
 		ImGui::TextDisabled("|");
-		ImGui::SameLine(0.0f, compactToolbar ? 8.0f : 14.0f);
+		ImGui::SameLine(0.0f, bCompactToolbar ? 8.0f : 14.0f);
 	}
-	DrawCameraControls(disableInteraction, compactToolbar);
+	DrawCameraControls(bDisableInteraction, bCompactToolbar);
 	ImGui::SameLine();
-	DrawViewportViewModeMenu(m_viewportSession, disableInteraction, compactToolbar);
+	DrawViewportViewModeMenu(m_viewportSession, bDisableInteraction, bCompactToolbar);
 	ImGui::SameLine();
-	DrawViewportShowMenu(&m_consoleVariables, disableInteraction, m_showControlError);
-	if (!compactToolbar)
+	DrawViewportShowMenu(&m_consoleVariables, bDisableInteraction, m_showControlError);
+	if (!bCompactToolbar)
 	{
 		DrawFrameStats();
 	}

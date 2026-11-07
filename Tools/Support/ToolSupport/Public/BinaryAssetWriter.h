@@ -15,11 +15,11 @@ namespace SparkleTools
 	{
 		std::string errorMessage;
 		std::ofstream output;
-		const bool outputOpened = Files::TryOpenBinaryOutput(path, output, errorMessage);
-		const bool headerWritten = outputOpened && Files::BinaryStreamWriter::WriteValue(output, header, errorMessage);
-		const bool arraysWritten = headerWritten && (Files::BinaryStreamWriter::WriteArray(output, arrays, errorMessage) && ...);
-		const bool outputClosed = arraysWritten && Files::TryCloseOutput(output, path, errorMessage);
-		if (!outputClosed)
+		const bool bOutputOpened = Files::TryOpenBinaryOutput(path, output, errorMessage);
+		const bool bHeaderWritten = bOutputOpened && Files::BinaryStreamWriter::WriteValue(output, header, errorMessage);
+		const bool bArraysWritten = bHeaderWritten && (Files::BinaryStreamWriter::WriteArray(output, arrays, errorMessage) && ...);
+		const bool bOutputClosed = bArraysWritten && Files::TryCloseOutput(output, path, errorMessage);
+		if (!bOutputClosed)
 		{
 			throw Diagnostics::Error(errorMessage);
 		}

@@ -94,12 +94,12 @@ void D3D12SwapChain::Create()
 	ComPtr<IDXGIFactory7> externalFactory;
 	const auto& presentationFactory = m_rhi.GetDxgiFactory();
 
-	const bool factoryUpgraded = m_rhi.TryUpgradeInterposerInterface(
+	const bool bFactoryUpgraded = m_rhi.TryUpgradeInterposerInterface(
 	    ERhiInterposerInterfaceKind::PresentationFactory,
 	    presentationFactory.Get(),
 	    IID_PPV_ARGS(externalFactory.ReleaseAndGetAddressOf()));
 
-	if (factoryUpgraded)
+	if (bFactoryUpgraded)
 	{
 		ComPtr<IDXGISwapChain1> externalSwapChain;
 
@@ -111,13 +111,13 @@ void D3D12SwapChain::Create()
 		    nullptr,
 		    externalSwapChain.ReleaseAndGetAddressOf());
 
-		const bool swapChainCreated = SUCCEEDED(createResult);
-		const bool swapChainUpgraded = swapChainCreated && SUCCEEDED(externalSwapChain.As(&m_externalSwapChain));
+		const bool bSwapChainCreated = SUCCEEDED(createResult);
+		const bool bSwapChainUpgraded = bSwapChainCreated && SUCCEEDED(externalSwapChain.As(&m_externalSwapChain));
 
-		const bool nativeSwapChainResolved = swapChainUpgraded
+		const bool bNativeSwapChainResolved = bSwapChainUpgraded
 		    && m_rhi.TryResolveNativeInterface(ERhiInterposerInterfaceKind::PresentationSurface, m_externalSwapChain.Get(), IID_PPV_ARGS(m_swapChain.ReleaseAndGetAddressOf()));
 
-		if (!nativeSwapChainResolved)
+		if (!bNativeSwapChainResolved)
 		{
 			m_rhi.NotifyInterposerPresentationReady(true);
 			return;

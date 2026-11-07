@@ -31,7 +31,7 @@ namespace LevelParsing
 		}
 		output << prefix << "Position = " << common.worldTransform._41 << ", " << common.worldTransform._42 << ", " << common.worldTransform._43 << "\n";
 		output << prefix << "Color = " << common.color.x << ", " << common.color.y << ", " << common.color.z << "\n";
-		output << prefix << "Visible = " << (common.visible ? "true" : "false") << "\n";
+		output << prefix << "Visible = " << (common.bVisible ? "true" : "false") << "\n";
 	}
 
 	void LightingSectionSerialization::WriteDirectional(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SceneDirectionalLightDesc& value)
@@ -40,7 +40,7 @@ namespace LevelParsing
 		output << prefix << "IlluminanceLux = " << value.illuminance << "\n";
 		output << prefix << "Direction = " << value.direction.x << ", " << value.direction.y << ", " << value.direction.z << "\n";
 		output << prefix << "AngularSizeRadians = " << value.angularSizeRadians << "\n";
-		output << prefix << "CastShadow = " << (value.castShadow ? "true" : "false") << "\n";
+		output << prefix << "CastShadow = " << (value.bCastShadow ? "true" : "false") << "\n";
 	}
 
 	void LightingSectionSerialization::WritePoint(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const PointLightDesc& value)
@@ -51,7 +51,7 @@ namespace LevelParsing
 		output << prefix << "Radius = " << value.radius << "\n";
 		output << prefix << "DistanceAttenuationCoefficients = " << value.distanceAttenuationCoefficients.x << ", " << value.distanceAttenuationCoefficients.y << ", "
 		       << value.distanceAttenuationCoefficients.z << "\n";
-		output << prefix << "CastShadow = " << (value.castShadow ? "true" : "false") << "\n";
+		output << prefix << "CastShadow = " << (value.bCastShadow ? "true" : "false") << "\n";
 	}
 
 	void LightingSectionSerialization::WriteSpot(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SpotLightDesc& value)
@@ -65,7 +65,7 @@ namespace LevelParsing
 		       << value.distanceAttenuationCoefficients.z << "\n";
 		output << prefix << "InnerAngleRadians = " << value.innerAngleRadians << "\n";
 		output << prefix << "OuterAngleRadians = " << value.outerAngleRadians << "\n";
-		output << prefix << "CastShadow = " << (value.castShadow ? "true" : "false") << "\n";
+		output << prefix << "CastShadow = " << (value.bCastShadow ? "true" : "false") << "\n";
 	}
 
 	void LightingSectionSerialization::WriteRect(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const RectLightDesc& value)
@@ -76,7 +76,7 @@ namespace LevelParsing
 		output << prefix << "Tangent = " << value.tangent.x << ", " << value.tangent.y << ", " << value.tangent.z << "\n";
 		output << prefix << "Width = " << value.width << "\n";
 		output << prefix << "Height = " << value.height << "\n";
-		output << prefix << "CastShadow = " << (value.castShadow ? "true" : "false") << "\n";
+		output << prefix << "CastShadow = " << (value.bCastShadow ? "true" : "false") << "\n";
 	}
 
 	void WriteLightingSectionValues(std::ostream& output, const LevelDesc& levelDesc)

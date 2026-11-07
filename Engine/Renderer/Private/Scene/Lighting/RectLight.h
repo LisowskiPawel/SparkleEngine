@@ -12,5 +12,5 @@ struct RectLight
 	// Luminance in candela per square meter.
 	float luminance = 1.0f;
 	DirectX::XMFLOAT3 color = {1.0f, 1.0f, 1.0f};
-	bool castShadow = true;
+	bool bCastShadow = true;
 };

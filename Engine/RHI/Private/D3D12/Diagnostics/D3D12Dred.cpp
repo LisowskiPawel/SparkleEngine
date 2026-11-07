@@ -226,7 +226,7 @@ using namespace D3D12DredDiagnostics;
 
 void D3D12DebugLayer::CollectCrashDiagnostics(ID3D12Device* device)
 {
-	if (device == nullptr || !m_supportsCrashDiagnostics)
+	if (device == nullptr || !m_bSupportsCrashDiagnostics)
 	{
 		return;
 	}

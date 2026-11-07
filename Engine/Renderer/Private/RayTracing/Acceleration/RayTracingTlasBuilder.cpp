@@ -35,7 +35,7 @@ std::uint64_t RayTracingTlasBuilder::AlignRayTracingBufferSize(std::uint64_t siz
 
 bool RayTracingTlasBuilder::SupportsTlasRefit(RenderHardwareInterface& renderHardwareInterface) noexcept
 {
-	return renderHardwareInterface.GetCapabilities().RayTracing.Groups.Tlas.SupportsTlasUpdate;
+	return renderHardwareInterface.GetCapabilities().RayTracing.Groups.Tlas.bSupportsTlasUpdate;
 }
 
 ERhiTlasBuildFlags RayTracingTlasBuilder::ResolveTlasBuildFlags(RenderHardwareInterface& renderHardwareInterface) noexcept
@@ -60,7 +60,7 @@ RhiRayTracingInstanceFlags RayTracingTlasBuilder::ResolveInstanceFlags(const Pre
 		Diagnostics::Fatal(g_rayTracingTlasBuilderLogger, __FILE__, __LINE__, "TLAS input references a material outside the render scene.");
 	}
 	const MaterialData& material = preparedScene.materials[draw.MaterialSlot];
-	if (material.doubleSided)
+	if (material.bDoubleSided)
 	{
 		flags = flags | RhiRayTracingInstanceFlags::TriangleFacingCullDisable;
 	}
@@ -142,7 +142,7 @@ void RayTracingTlasBuilder::CollectInstances(
 		const RayTracingBlasCache::BlasHandle blas = blasCache.EnsureBlas(commandContext, preparedScene, draw, input.GpuSceneSlot, diagnostics);
 
 		commandContext.TrackResource(blas.resource);
-		if (blas.builtThisFrame)
+		if (blas.bBuiltThisFrame)
 		{
 			state.BuiltBlasResources.insert(blas.resource.Value);
 		}
@@ -165,7 +165,7 @@ void RayTracingTlasBuilder::CollectInstances(
 
 void RayTracingTlasBuilder::PrepareBuild(BuildState& state) noexcept
 {
-	state.RequestedFlags = m_resourcesAllowUpdate ? ERhiTlasBuildFlags::AllowUpdate : ERhiTlasBuildFlags::None;
+	state.RequestedFlags = m_bResourcesAllowUpdate ? ERhiTlasBuildFlags::AllowUpdate : ERhiTlasBuildFlags::None;
 	state.PrebuildInfo = m_renderHardwareInterface.GetRayTracingService().GetTlasPrebuildInfo(static_cast<std::uint32_t>(state.Instances.size()), state.RequestedFlags);
 	const std::uint64_t scratchSizeInBytes = ResolveScratchSize(state.PrebuildInfo, state.RequestedFlags);
 	if (state.PrebuildInfo.ResultDataMaxSizeInBytes == 0 || scratchSizeInBytes == 0)
@@ -191,13 +191,13 @@ void RayTracingTlasBuilder::PrepareBuild(BuildState& state) noexcept
 		Diagnostics::Fatal(g_rayTracingTlasBuilderLogger, __FILE__, __LINE__, "TLAS instance-buffer allocation failed.");
 	}
 
-	const bool bCanRefitAllowUpdate = !state.Instances.empty() && m_resourcesAllowUpdate;
+	const bool bCanRefitAllowUpdate = !state.Instances.empty() && m_bResourcesAllowUpdate;
 	const bool bCanRefitInstances = bCanRefitAllowUpdate && (m_builtInstanceCount == state.Instances.size());
-	const bool canRefit = bCanRefitInstances && (state.PrebuildInfo.UpdateScratchDataSizeInBytes > 0);
+	const bool bCanRefit = bCanRefitInstances && (state.PrebuildInfo.UpdateScratchDataSizeInBytes > 0);
 
-	state.Mode = canRefit ? ERhiTlasBuildMode::Update : (HasFlag(state.RequestedFlags, ERhiTlasBuildFlags::AllowUpdate) ? ERhiTlasBuildMode::BuildAllowUpdate : ERhiTlasBuildMode::Build);
+	state.Mode = bCanRefit ? ERhiTlasBuildMode::Update : (HasFlag(state.RequestedFlags, ERhiTlasBuildFlags::AllowUpdate) ? ERhiTlasBuildMode::BuildAllowUpdate : ERhiTlasBuildMode::Build);
 
-	state.EventName = canRefit ? "TLAS Refit" : "TLAS Build";
+	state.EventName = bCanRefit ? "TLAS Refit" : "TLAS Build";
 }
 
 void RayTracingTlasBuilder::RecordBuild(RenderCommandContext& commandContext, const BuildState& state, RayTracingPerformanceDiagnostics* diagnostics) const noexcept
@@ -253,15 +253,15 @@ void RayTracingTlasBuilder::ReleaseResources() noexcept
 	m_accelerationStructureBuffer = {};
 	m_scratchBufferSizeInBytes = 0;
 	m_accelerationStructureSizeInBytes = 0;
-	m_resourcesAllowUpdate = false;
+	m_bResourcesAllowUpdate = false;
 	m_builtInstanceCount.reset();
 }
 
 void RayTracingTlasBuilder::EnsureResources(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, ERhiTlasBuildFlags buildFlags) noexcept
 {
-	const bool requestedAllowUpdate = HasFlag(buildFlags, ERhiTlasBuildFlags::AllowUpdate);
+	const bool bRequestedAllowUpdate = HasFlag(buildFlags, ERhiTlasBuildFlags::AllowUpdate);
 	const std::uint64_t scratchSizeInBytes = ResolveScratchSize(prebuildInfo, buildFlags);
-	if (m_resourcesAllowUpdate != requestedAllowUpdate)
+	if (m_bResourcesAllowUpdate != bRequestedAllowUpdate)
 	{
 		if (m_scratchBuffer)
 		{
@@ -276,7 +276,7 @@ void RayTracingTlasBuilder::EnsureResources(const RhiRayTracingAccelerationStruc
 			m_accelerationStructureSizeInBytes = 0;
 		}
 		m_builtInstanceCount.reset();
-		m_resourcesAllowUpdate = requestedAllowUpdate;
+		m_bResourcesAllowUpdate = bRequestedAllowUpdate;
 	}
 
 	if (m_scratchBuffer && m_scratchBufferSizeInBytes < scratchSizeInBytes)

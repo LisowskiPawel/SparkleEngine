@@ -28,9 +28,9 @@ RhiOwnedResourceHandle D3D12ResourceService::CreateTextureResource(
     std::wstring_view debugName)
 {
 	const bool bTextureDescriptorcapabilities = m_memoryAllocator == nullptr || m_capabilities == nullptr;
-	const bool invalidTextureDescriptor = bTextureDescriptorcapabilities || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc));
+	const bool bInvalidTextureDescriptor = bTextureDescriptorcapabilities || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc));
 	
-	if (invalidTextureDescriptor)
+	if (bInvalidTextureDescriptor)
 	{
 		return {};
 	}
@@ -111,11 +111,11 @@ bool D3D12ResourceService::CreateVertexBuffer(
 		return false;
 	}
 
-	ownedRecord->IsMapped = true;
+	ownedRecord->bIsMapped = true;
 	ownedRecord->CpuMappedAddress = mappedData;
 	std::memcpy(mappedData, data, sizeInBytes);
 	ownedResource->Unmap(0, nullptr);
-	ownedRecord->IsMapped = false;
+	ownedRecord->bIsMapped = false;
 	ownedRecord->CpuMappedAddress = nullptr;
 
 	outView = RhiVertexBufferView{.BufferLocation = ownedResource->GetGPUVirtualAddress(), .SizeInBytes = static_cast<std::uint32_t>(sizeInBytes), .StrideInBytes = strideInBytes};
@@ -156,11 +156,11 @@ bool D3D12ResourceService::CreateStructuredBufferResource(const void* data, std:
 		return false;
 	}
 
-	ownedRecord->IsMapped = true;
+	ownedRecord->bIsMapped = true;
 	ownedRecord->CpuMappedAddress = mappedData;
 	std::memcpy(mappedData, data, sizeInBytes);
 	ownedResource->Unmap(0, nullptr);
-	ownedRecord->IsMapped = false;
+	ownedRecord->bIsMapped = false;
 	ownedRecord->CpuMappedAddress = nullptr;
 
 	outResource = WrapOwnedResource(std::move(ownedRecord));
@@ -192,12 +192,12 @@ bool D3D12ResourceService::WriteBufferResource(RhiOwnedResourceHandle resource, 
 		return false;
 	}
 
-	record->IsMapped = true;
+	record->bIsMapped = true;
 	record->CpuMappedAddress = mappedData;
 	std::memcpy(static_cast<std::byte*>(mappedData) + destinationOffsetInBytes, data, sizeInBytes);
 	const D3D12_RANGE writtenRange{destinationOffsetInBytes, destinationOffsetInBytes + sizeInBytes};
 	record->Resource->Unmap(0, &writtenRange);
-	record->IsMapped = false;
+	record->bIsMapped = false;
 	record->CpuMappedAddress = nullptr;
 	return true;
 }
@@ -241,11 +241,11 @@ bool D3D12ResourceService::CreateIndexBuffer(
 		return false;
 	}
 
-	ownedRecord->IsMapped = true;
+	ownedRecord->bIsMapped = true;
 	ownedRecord->CpuMappedAddress = mappedData;
 	std::memcpy(mappedData, data, sizeInBytes);
 	ownedResource->Unmap(0, nullptr);
-	ownedRecord->IsMapped = false;
+	ownedRecord->bIsMapped = false;
 	ownedRecord->CpuMappedAddress = nullptr;
 
 	outView = RhiIndexBufferView{.BufferLocation = ownedResource->GetGPUVirtualAddress(), .SizeInBytes = static_cast<std::uint32_t>(sizeInBytes), .Format = format};
@@ -267,7 +267,7 @@ void D3D12ResourceService::ReleaseOwnedResource(RhiOwnedResourceHandle resource)
 	}
 
 	DrainCompletedResourceReleases();
-	ownedRecord->PendingRelease = true;
+	ownedRecord->bPendingRelease = true;
 	m_pendingOwnedResourceReleases.push_back(std::move(ownedRecord));
 }
 
@@ -382,9 +382,9 @@ RhiOwnedResourceHandle D3D12ResourceService::CreateAliasingTextureResource(
 	const bool bTextureDescriptormemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
 	const bool bTextureDescriptorcapabilities = bTextureDescriptormemoryAllocator || (m_capabilities == nullptr);
 	const bool bTextureDescriptorMemoryBlock = bTextureDescriptorcapabilities || (ownedMemoryBlock == nullptr);
-	const bool invalidPlacedTextureDescriptor = bTextureDescriptorMemoryBlock || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc.ResourceDesc));
+	const bool bInvalidPlacement = bTextureDescriptorMemoryBlock || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc.ResourceDesc));
 	
-	if (invalidPlacedTextureDescriptor)
+	if (bInvalidPlacement)
 	{
 		return {};
 	}
@@ -435,7 +435,7 @@ bool D3D12ResourceService::SupportsUnorderedAccess(RhiResourceHandle resource) c
 	return ResourceSupportsUnorderedAccess(static_cast<ID3D12Resource*>(resource.Value));
 }
 
-D3D12RecordingResourceUseToken D3D12ResourceService::BeginResourceTracking(RhiResourceHandle resource, bool coordinatorRecording) noexcept
+D3D12RecordingResourceUseToken D3D12ResourceService::BeginResourceTracking(RhiResourceHandle resource, bool bCoordinatorRecording) noexcept
 {
 	if (m_memoryAllocator == nullptr || !resource)
 	{
@@ -443,7 +443,7 @@ D3D12RecordingResourceUseToken D3D12ResourceService::BeginResourceTracking(RhiRe
 	}
 
 	D3D12RecordingResourceUseToken use = m_memoryAllocator->RetainRecordingResource(resource);
-	if (!use && coordinatorRecording)
+	if (!use && bCoordinatorRecording)
 	{
 		use = m_memoryAllocator->RetainCoordinatorRecordingResource(resource);
 	}
@@ -485,12 +485,12 @@ bool D3D12ResourceService::ResourceSupportsUnorderedAccess(ID3D12Resource* resou
 
 void D3D12ResourceService::CollectCrashDiagnosticsOnce() noexcept
 {
-	if (m_crashDiagnosticsCollected || m_rhi == nullptr || !m_rhi->SupportsCrashDiagnostics())
+	if (m_bCrashDiagnosticsCollected || m_rhi == nullptr || !m_rhi->SupportsCrashDiagnostics())
 	{
 		return;
 	}
 
-	m_crashDiagnosticsCollected = true;
+	m_bCrashDiagnosticsCollected = true;
 	m_rhi->CollectCrashDiagnostics();
 
 	RhiDiagnosticMessage message{};

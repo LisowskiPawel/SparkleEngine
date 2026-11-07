@@ -169,12 +169,12 @@ const CompiledBinding* VulkanRenderCommandList::FindBindingByIndex(const VulkanB
 void VulkanRenderCommandList::WriteAccelerationStructureBinding(VkDescriptorSet descriptorSet, const CompiledBinding& binding, RhiResourceHandle resourceHandle) noexcept
 {
 	VulkanGpuAllocationRecord* const allocation = m_memoryAllocator != nullptr ? m_memoryAllocator->FindAllocationRecord(resourceHandle) : nullptr;
-	if (allocation == nullptr || (allocation->AccelerationStructure == VK_NULL_HANDLE && !allocation->IsPtlas))
+	if (allocation == nullptr || (allocation->AccelerationStructure == VK_NULL_HANDLE && !allocation->bIsPtlas))
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan acceleration-structure binding references an unresolved resource.");
 	}
 
-	if (allocation->IsPtlas)
+	if (allocation->bIsPtlas)
 	{
 		m_descriptorAllocator->WritePtlasDescriptor(descriptorSet, binding, allocation->DeviceAddress);
 		return;
@@ -191,9 +191,9 @@ VkDescriptorSet VulkanRenderCommandList::EnsureDescriptorSet(
 {
 	const bool bSetBindingdescriptorAllocator = layout == nullptr || m_descriptorAllocator == nullptr;
 	const bool bInvalidSetBindingDescriptorPool = bSetBindingdescriptorAllocator || (m_recordingDescriptorPool == nullptr);
-	const bool invalidDescriptorSetBinding = bInvalidSetBindingDescriptorPool || (setIndex >= layout->GetDescriptorSetLayouts().size());
+	const bool bInvalidDescriptorSetBinding = bInvalidSetBindingDescriptorPool || (setIndex >= layout->GetDescriptorSetLayouts().size());
 	
-	if (invalidDescriptorSetBinding)
+	if (bInvalidDescriptorSetBinding)
 	{
 		return VK_NULL_HANDLE;
 	}

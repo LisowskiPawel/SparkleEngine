@@ -58,5 +58,5 @@ private:
 	std::unique_ptr<IRayReconstructionProvider> m_rayReconstruction;
 	std::vector<RetiredGeneration> m_retiredGenerations;
 	std::uint64_t m_generation = 1;
-	bool m_resetHistoryPending = true;
+	bool m_bResetHistoryPending = true;
 };

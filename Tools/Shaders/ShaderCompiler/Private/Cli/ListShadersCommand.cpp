@@ -12,8 +12,8 @@
 
 int ListShaders(std::span<const std::string_view> args)
 {
-	const bool validateOnly = args.size() == 1 && args[0] == "--validate";
-	if (!args.empty() && !validateOnly)
+	const bool bValidateOnly = args.size() == 1 && args[0] == "--validate";
+	if (!args.empty() && !bValidateOnly)
 	{
 		std::cerr << "ShaderCompiler: list-shaders accepts only optional --validate\n";
 		return kExitCodeUsage;
@@ -38,7 +38,7 @@ int ListShaders(std::span<const std::string_view> args)
 	{
 		return kExitCodeCookFailure;
 	}
-	if (validateOnly)
+	if (bValidateOnly)
 	{
 		std::cout << "ShaderCompiler: " << catalog.size() << " typed shader registration(s) valid\n";
 		return kExitCodeSuccess;

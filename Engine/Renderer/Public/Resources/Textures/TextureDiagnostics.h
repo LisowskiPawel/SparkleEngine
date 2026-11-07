@@ -31,7 +31,7 @@ struct SPARKLE_RENDERER_API TextureDiagnosticsRow final
 	std::uint16_t MipCount = 0;
 	std::uint64_t EstimatedByteSize = 0;
 	UiTextureHandle PreviewTexture = {};
-	bool StreamManaged = false;
+	bool bStreamManaged = false;
 };
 
 using TextureDiagnosticsSnapshot = std::vector<TextureDiagnosticsRow>;

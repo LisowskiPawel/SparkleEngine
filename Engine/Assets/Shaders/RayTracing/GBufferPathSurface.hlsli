@@ -8,7 +8,7 @@
 
 struct GBufferPathSurface
 {
-	bool Valid;
+	bool bValid;
 	GBufferData GBuffer;
 	RayTracingPathSurface PathSurface;
 	float ViewDistance;
@@ -36,7 +36,7 @@ GBufferPathSurface LoadGBufferPathSurface(uint2 pixelCoord)
 	                                                        surface.GBuffer.Metallic,
 	                                                        surface.GBuffer.DielectricF0);
 
-	surface.Valid = true;
+	surface.bValid = true;
 	return surface;
 }
 

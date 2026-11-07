@@ -29,7 +29,7 @@ namespace Json
 
 		std::ostringstream m_stream;
 		std::string m_indent;
-		bool m_hasProperty = false;
+		bool m_bHasProperty = false;
 	};
 
 	SPARKLE_CORE_API std::string WriteStringArray(std::span<const std::string> values);

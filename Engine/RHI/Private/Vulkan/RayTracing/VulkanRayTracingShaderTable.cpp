@@ -29,9 +29,9 @@ std::vector<std::byte> VulkanRayTracingShaderTable::CollectShaderIdentifiers(
 	{
 		const RhiRayTracingShaderRecord& record = records[index];
 		const std::uint32_t groupIndex = pipeline.FindShaderGroup(record.ExportName);
-		const bool invalidShaderGroupIndex = groupIndex == std::numeric_limits<std::uint32_t>::max() || groupIndex > std::numeric_limits<std::uint64_t>::max() / handleSize;
+		const bool bInvalidShaderGroupIndex = groupIndex == std::numeric_limits<std::uint32_t>::max() || groupIndex > std::numeric_limits<std::uint64_t>::max() / handleSize;
 		
-		if (invalidShaderGroupIndex)
+		if (bInvalidShaderGroupIndex)
 		{
 			throw Diagnostics::Error("Vulkan shader-table record references an export absent from its pipeline generation.");
 		}
@@ -53,7 +53,7 @@ VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanG
 	RhiContract::ValidateRayTracingShaderTableDesc(desc);
 	const auto* pipeline = dynamic_cast<const VulkanRayTracingPipeline*>(desc.Pipeline);
 	const RhiRayTracingCapabilities capabilities = rhi.GetRayTracingCapabilities();
-	if (pipeline == nullptr || !capabilities.SupportsRayTracingPipeline || rhi.GetRayTracingShaderGroupHandles() == nullptr)
+	if (pipeline == nullptr || !capabilities.bSupportsRayTracingPipeline || rhi.GetRayTracingShaderGroupHandles() == nullptr)
 	{
 		throw Diagnostics::Error("Vulkan shader-table creation requires a ready Vulkan pipeline.");
 	}
@@ -119,10 +119,10 @@ VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanG
 	    capabilities.ShaderTableAlignmentInBytes);
 
 	const bool bTableBufferAvailableBuffer = m_allocation != nullptr && m_allocation->Buffer != VK_NULL_HANDLE;
-	const bool tableBufferAvailable = bTableBufferAvailableBuffer && (m_allocation->BufferDeviceAddress != 0);
-	const bool tableBytesWritten = tableBufferAvailable && memoryAllocator.WriteAllocation(*m_allocation, bytes.data(), bytes.size());
+	const bool bTableBufferAvailable = bTableBufferAvailableBuffer && (m_allocation->BufferDeviceAddress != 0);
+	const bool bTableBytesWritten = bTableBufferAvailable && memoryAllocator.WriteAllocation(*m_allocation, bytes.data(), bytes.size());
 	
-	if (!tableBytesWritten)
+	if (!bTableBytesWritten)
 	{
 		throw Diagnostics::Error("Vulkan shader-table allocation or upload failed.");
 	}

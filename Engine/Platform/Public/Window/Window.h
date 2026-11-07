@@ -14,7 +14,7 @@ struct SPARKLE_PLATFORM_API WindowMessageEvent
 	UINT msg;
 	WPARAM wParam;
 	LPARAM lParam;
-	bool handled = false;
+	bool bHandled = false;
 };
 
 class SPARKLE_PLATFORM_API Window final

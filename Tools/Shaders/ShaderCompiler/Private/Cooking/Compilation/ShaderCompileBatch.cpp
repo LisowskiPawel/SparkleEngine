@@ -30,8 +30,8 @@ static bool HasSameCompilerInput(const ShaderCompileJob& lhs, const ShaderCompil
 {
 	const bool bSourceIdentityMatchesClosureHash = lhs.SourceContentHash == rhs.SourceContentHash && lhs.DependencyClosureHash == rhs.DependencyClosureHash;
 	const bool bSourceIdentityMatchesRequestHash = bSourceIdentityMatchesClosureHash && (lhs.RequestHash == rhs.RequestHash);
-	const bool sourceIdentityMatches = bSourceIdentityMatchesRequestHash && (lhs.VirtualDependencies == rhs.VirtualDependencies);
-	const bool bBackendIdentityMatchesBackendName = sourceIdentityMatches && lhs.BackendName == rhs.BackendName;
+	const bool bSourceIdentityMatches = bSourceIdentityMatchesRequestHash && (lhs.VirtualDependencies == rhs.VirtualDependencies);
+	const bool bBackendIdentityMatchesBackendName = bSourceIdentityMatches && lhs.BackendName == rhs.BackendName;
 	const bool bIdentityMatchesBackendVersion = bBackendIdentityMatchesBackendName && (lhs.BackendVersion == rhs.BackendVersion);
 	const bool bAckendIdentityMatches = bIdentityMatchesBackendVersion && (lhs.TargetProfile == rhs.TargetProfile);
 	const bool bProgramIdentityMatchesRequest = bAckendIdentityMatches && lhs.Request.VirtualSourcePath == rhs.Request.VirtualSourcePath;
@@ -40,15 +40,15 @@ static bool HasSameCompilerInput(const ShaderCompileJob& lhs, const ShaderCompil
 	const bool bProgramIdentityMatchesRequest4 = bProgramIdentityMatchesRequest3 && (lhs.Request.Stage == rhs.Request.Stage);
 	const bool bProgramIdentityMatchesRequest5 = bProgramIdentityMatchesRequest4 && (lhs.Request.Target == rhs.Request.Target);
 	const bool bProgramIdentityMatchesRequest6 = bProgramIdentityMatchesRequest5 && (lhs.Request.UnitKind == rhs.Request.UnitKind);
-	const bool programIdentityMatches = bProgramIdentityMatchesRequest6 && (lhs.Request.RequiredFeatures == rhs.Request.RequiredFeatures);
-	const bool bCompileOptionsMatchRequest = programIdentityMatches && lhs.Request.EnableDebugInfo == rhs.Request.EnableDebugInfo;
-	const bool bCompileOptionsMatchRequest2 = bCompileOptionsMatchRequest && (lhs.Request.EnableOptimizations == rhs.Request.EnableOptimizations);
-	const bool bCompileOptionsMatchRequest3 = bCompileOptionsMatchRequest2 && (lhs.Request.TreatWarningsAsErrors == rhs.Request.TreatWarningsAsErrors);
-	const bool bCompileOptionsMatchRequest4 = bCompileOptionsMatchRequest3 && (lhs.Request.StripDebugInfo == rhs.Request.StripDebugInfo);
-	const bool compileOptionsMatch = bCompileOptionsMatchRequest4 && (lhs.Request.Defines == rhs.Request.Defines);
-	const bool remapCountsMatch = compileOptionsMatch && lhs.Request.DescriptorBindingRemaps.size() == rhs.Request.DescriptorBindingRemaps.size();
+	const bool bProgramIdentityMatches = bProgramIdentityMatchesRequest6 && (lhs.Request.RequiredFeatures == rhs.Request.RequiredFeatures);
+	const bool bCompileOptionsMatchRequest = bProgramIdentityMatches && lhs.Request.bEnableDebugInfo == rhs.Request.bEnableDebugInfo;
+	const bool bCompileOptionsMatchRequest2 = bCompileOptionsMatchRequest && (lhs.Request.bEnableOptimizations == rhs.Request.bEnableOptimizations);
+	const bool bCompileOptionsMatchRequest3 = bCompileOptionsMatchRequest2 && (lhs.Request.bTreatWarningsAsErrors == rhs.Request.bTreatWarningsAsErrors);
+	const bool bCompileOptionsMatchRequest4 = bCompileOptionsMatchRequest3 && (lhs.Request.bStripDebugInfo == rhs.Request.bStripDebugInfo);
+	const bool bCompileOptionsMatch = bCompileOptionsMatchRequest4 && (lhs.Request.Defines == rhs.Request.Defines);
+	const bool bRemapCountsMatch = bCompileOptionsMatch && lhs.Request.DescriptorBindingRemaps.size() == rhs.Request.DescriptorBindingRemaps.size();
 	
-	if (!remapCountsMatch)
+	if (!bRemapCountsMatch)
 	{
 		return false;
 	}

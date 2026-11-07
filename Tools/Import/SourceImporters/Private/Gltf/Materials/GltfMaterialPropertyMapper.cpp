@@ -16,7 +16,7 @@ void GltfMaterialPropertyMapper::Apply(const cgltf_material& material, ImportedM
 	}
 
 	importedMaterial.alphaCutoff = material.alpha_cutoff;
-	importedMaterial.doubleSided = material.double_sided;
+	importedMaterial.bDoubleSided = material.double_sided;
 
 	switch (material.alpha_mode)
 	{

@@ -8,13 +8,13 @@ void RasterPassRenderState::SetOpaqueBlend() noexcept
 
 void RasterPassRenderState::SetDepthTest(CompareOp comparison) noexcept
 {
-	m_depth.DepthEnable = true;
+	m_depth.bDepthEnable = true;
 	m_depth.DepthFunc = comparison;
 }
 
-void RasterPassRenderState::SetDepthWrite(bool enabled) noexcept
+void RasterPassRenderState::SetDepthWrite(bool bEnabled) noexcept
 {
-	m_depth.DepthWriteEnable = enabled;
+	m_depth.bDepthWriteEnable = bEnabled;
 }
 
 void RasterPassRenderState::DisableStencil() noexcept

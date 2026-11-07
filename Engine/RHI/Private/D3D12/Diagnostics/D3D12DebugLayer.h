@@ -13,7 +13,7 @@ using Microsoft::WRL::ComPtr;
 class D3D12DebugLayer final
 {
 public:
-	explicit D3D12DebugLayer(bool enableValidation = true);
+	explicit D3D12DebugLayer(bool bEnableValidation = true);
 
 	~D3D12DebugLayer() noexcept;
 
@@ -47,7 +47,7 @@ private:
 	ComPtr<IDXGIDebug1> m_dxgiDebug;
 	ComPtr<ID3D12InfoQueue> m_infoQueue;
 	std::deque<RhiDiagnosticMessage> m_messages;
-	bool m_supportsCrashDiagnostics = false;
+	bool m_bSupportsCrashDiagnostics = false;
 };
 
 #endif

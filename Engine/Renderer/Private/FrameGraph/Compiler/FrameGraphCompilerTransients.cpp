@@ -68,14 +68,14 @@ static bool CanSharePhysicalBlock(const FrameGraphTransientResourcePlan& current
 		return false;
 	}
 
-	if (ownerPhysicalPlan.hasOptimizedClearValue != physicalPlan.hasOptimizedClearValue)
+	if (ownerPhysicalPlan.bHasOptimizedClearValue != physicalPlan.bHasOptimizedClearValue)
 	{
 		return false;
 	}
 
-	const bool optimizedClearValueMismatch = ownerPhysicalPlan.hasOptimizedClearValue && !AreClearValuesEqual(ownerPhysicalPlan.optimizedClearValue, physicalPlan.optimizedClearValue, transientPlan.kind);
+	const bool bOptimizedClearValueMismatch = ownerPhysicalPlan.bHasOptimizedClearValue && !AreClearValuesEqual(ownerPhysicalPlan.optimizedClearValue, physicalPlan.optimizedClearValue, transientPlan.kind);
 	
-	if (optimizedClearValueMismatch)
+	if (bOptimizedClearValueMismatch)
 	{
 		return false;
 	}
@@ -123,12 +123,12 @@ void FrameGraphCompiler::BuildTransientResourceLifetimes() noexcept
 
 			if (ReadsFromUsage(declaration.usage))
 			{
-				transientPlan->lifetime.readUsed = true;
+				transientPlan->lifetime.bReadUsed = true;
 			}
 
 			if (WritesToUsage(declaration.usage))
 			{
-				transientPlan->lifetime.writeUsed = true;
+				transientPlan->lifetime.bWriteUsed = true;
 			}
 
 			const ResourceState requiredState = InferRequiredResourceState(declaration, compiledResource);
@@ -153,7 +153,7 @@ void FrameGraphCompiler::BuildTransientResourceLifetimes() noexcept
 		{
 			transientPlan->lifetime.requiredStates.push_back(productRoot.requiredState);
 		}
-		transientPlan->lifetime.readUsed = true;
+		transientPlan->lifetime.bReadUsed = true;
 		if (!m_plan.executionOrder.empty())
 		{
 			transientPlan->lifetime.lastExecutionIndex = static_cast<FrameGraphPassIndex>(m_plan.executionOrder.size() - 1);

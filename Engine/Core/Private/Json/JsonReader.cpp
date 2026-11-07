@@ -204,8 +204,8 @@ namespace Json
 
 	static bool SkipContainer(std::string_view document, std::size_t& cursor, std::size_t depth)
 	{
-		const bool isObject = document[cursor++] == '{';
-		const char end = isObject ? '}' : ']';
+		const bool bIsObject = document[cursor++] == '{';
+		const char end = bIsObject ? '}' : ']';
 		SkipWhitespace(document, cursor);
 		if (cursor < document.size() && document[cursor] == end)
 		{
@@ -214,7 +214,7 @@ namespace Json
 		}
 		while (cursor < document.size())
 		{
-			if (isObject)
+			if (bIsObject)
 			{
 				std::string ignored;
 				if (!TryReadPropertyName(document, cursor, ignored))

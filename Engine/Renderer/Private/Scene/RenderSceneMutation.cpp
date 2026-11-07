@@ -12,10 +12,10 @@
 
 void RenderScene::PromoteResidentGpuMeshes() noexcept
 {
-	bool changed = false;
+	bool bChanged = false;
 	for (RenderPrimitive& primitive : m_primitives)
 	{
-		if (primitive.HasPendingStatic)
+		if (primitive.bHasPendingStatic)
 		{
 			if (!primitive.PendingGpuMesh)
 			{
@@ -27,9 +27,9 @@ void RenderScene::PromoteResidentGpuMeshes() noexcept
 				primitive.Static = std::move(primitive.PendingStatic);
 				primitive.GpuMesh = primitive.PendingGpuMesh;
 				primitive.PendingGpuMesh = {};
-				primitive.GpuMeshResident = true;
-				primitive.HasPendingStatic = false;
-				changed = true;
+				primitive.bGpuMeshResident = true;
+				primitive.bHasPendingStatic = false;
+				bChanged = true;
 			}
 			continue;
 		}
@@ -39,14 +39,14 @@ void RenderScene::PromoteResidentGpuMeshes() noexcept
 			primitive.GpuMesh = m_gpuMeshCache->Request(primitive.Static.Mesh);
 		}
 
-		if (!primitive.GpuMeshResident && m_gpuMeshCache->Resolve(primitive.GpuMesh) != nullptr)
+		if (!primitive.bGpuMeshResident && m_gpuMeshCache->Resolve(primitive.GpuMesh) != nullptr)
 		{
-			primitive.GpuMeshResident = true;
-			changed = true;
+			primitive.bGpuMeshResident = true;
+			bChanged = true;
 		}
 	}
 
-	if (changed)
+	if (bChanged)
 	{
 		++m_structuralRevision;
 		m_renderRayTracingScene->SynchronizeShaderTablePlan(m_primitives, m_materials);
@@ -61,7 +61,7 @@ void RenderScene::ApplyValidatedDelta(const RenderSceneDelta& delta)
 	std::vector<GpuMeshHandle> updateMeshes;
 	ResolveGpuMeshes(delta, createMeshes, updateMeshes);
 
-	if (delta.ResetScene)
+	if (delta.bResetScene)
 	{
 		m_renderGpuScene->Reset();
 		m_renderRayTracingScene->Clear();
@@ -72,13 +72,13 @@ void RenderScene::ApplyValidatedDelta(const RenderSceneDelta& delta)
 		m_primitives.clear();
 		ResetContinuity();
 	}
-	const bool bTopologyChangedCreates = delta.ResetScene || !delta.Creates.empty();
+	const bool bTopologyChangedCreates = delta.bResetScene || !delta.Creates.empty();
 	const bool bTopologyChangedUpdates = bTopologyChangedCreates || (!delta.Updates.empty());
 	const bool bTopologyChangedDestroys = bTopologyChangedUpdates || (!delta.Destroys.empty());
-	const bool bTopologyChangedInstanceGroups = bTopologyChangedDestroys || (delta.InstanceGroups.Published);
-	const bool topologyChanged = bTopologyChangedInstanceGroups || (delta.Sky.Published);
+	const bool bTopologyChangedInstanceGroups = bTopologyChangedDestroys || (delta.InstanceGroups.bPublished);
+	const bool bTopologyChanged = bTopologyChangedInstanceGroups || (delta.Sky.bPublished);
 	
-	if (topologyChanged)
+	if (bTopologyChanged)
 	{
 		++m_structuralRevision;
 	}
@@ -91,7 +91,7 @@ void RenderScene::ApplyValidatedDelta(const RenderSceneDelta& delta)
 	ApplyUpdates(delta, updateMeshes);
 	PublishResources(delta);
 	RetainReferencedGpuMeshes();
-	if (delta.ResetScene || !delta.Creates.empty() || !delta.Updates.empty() || !delta.Destroys.empty() || delta.Materials)
+	if (delta.bResetScene || !delta.Creates.empty() || !delta.Updates.empty() || !delta.Destroys.empty() || delta.Materials)
 	{
 		m_renderRayTracingScene->SynchronizeShaderTablePlan(m_primitives, m_materials);
 	}
@@ -171,7 +171,7 @@ void RenderScene::ApplyCreates(const RenderSceneDelta& delta, std::span<const Gp
 		        .Static = create.Static,
 		        .GpuMesh = meshes[index],
 		        .GpuSceneSlot = m_gpuSceneSlots->Allocate(),
-		        .GpuMeshResident = m_gpuMeshCache->Resolve(meshes[index]) != nullptr});
+		        .bGpuMeshResident = m_gpuMeshCache->Resolve(meshes[index]) != nullptr});
 	}
 }
 
@@ -192,14 +192,14 @@ void RenderScene::ApplyUpdates(const RenderSceneDelta& delta, std::span<const Gp
 			primitive->GpuMesh = meshes[index];
 			primitive->PendingStatic = {};
 			primitive->PendingGpuMesh = {};
-			primitive->GpuMeshResident = true;
-			primitive->HasPendingStatic = false;
+			primitive->bGpuMeshResident = true;
+			primitive->bHasPendingStatic = false;
 		}
 		else
 		{
 			primitive->PendingStatic = update.Static;
 			primitive->PendingGpuMesh = meshes[index];
-			primitive->HasPendingStatic = true;
+			primitive->bHasPendingStatic = true;
 		}
 	}
 }
@@ -214,11 +214,11 @@ void RenderScene::PublishResources(const RenderSceneDelta& delta)
 	{
 		m_textureCache->SynchronizeSceneTextures(*delta.Textures);
 	}
-	if (delta.Sky.Published)
+	if (delta.Sky.bPublished)
 	{
 		m_sky = delta.Sky.Value;
 	}
-	if (delta.InstanceGroups.Published)
+	if (delta.InstanceGroups.bPublished)
 	{
 		m_instanceGroups = delta.InstanceGroups.Values;
 	}
@@ -251,13 +251,13 @@ bool RenderScene::IsObjectAvailable(RenderObjectId primitiveId, const RenderScen
 		return true;
 	}
 
-	if (delta.ResetScene)
+	if (delta.bResetScene)
 	{
 		return false;
 	}
 
-	const bool destroyed = std::binary_search(delta.Destroys.begin(), delta.Destroys.end(), primitiveId);
-	return !destroyed && Find(primitiveId) != nullptr;
+	const bool bDestroyed = std::binary_search(delta.Destroys.begin(), delta.Destroys.end(), primitiveId);
+	return !bDestroyed && Find(primitiveId) != nullptr;
 }
 
 const RenderPrimitive* RenderScene::Find(RenderObjectId primitiveId) const noexcept

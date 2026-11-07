@@ -14,7 +14,7 @@ bool CatalogedLevelSceneReader::AppendSceneIds(const std::filesystem::path& leve
 		return false;
 	}
 
-	bool inSceneAssetsSection = false;
+	bool bInSceneAssetsSection = false;
 	for (std::string line; std::getline(input, line);)
 	{
 		line = Strings::TrimCopy(line);
@@ -25,11 +25,11 @@ bool CatalogedLevelSceneReader::AppendSceneIds(const std::filesystem::path& leve
 
 		if (line.front() == '[' && line.back() == ']')
 		{
-			inSceneAssetsSection = line == "[SceneAssets]";
+			bInSceneAssetsSection = line == "[SceneAssets]";
 			continue;
 		}
 
-		if (!inSceneAssetsSection)
+		if (!bInSceneAssetsSection)
 		{
 			continue;
 		}

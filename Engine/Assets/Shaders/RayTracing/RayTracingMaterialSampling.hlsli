@@ -29,10 +29,10 @@ bool PassesRayTracingMaterialAlpha(RayTracingHitMaterial material, float2 texCoo
 	return alpha * vertexColor.a >= material.AlphaCutoff;
 }
 
-bool ResolveRayTracingCandidateAlpha(uint instanceId, uint primitiveIndex, float2 barycentrics, bool frontFace)
+bool ResolveRayTracingCandidateAlpha(uint instanceId, uint primitiveIndex, float2 barycentrics, bool bFrontFace)
 {
 	const RayTracingHitTriangle hitTriangle = LoadRayTracingHitTriangle(instanceId, primitiveIndex, barycentrics);
-	if (!frontFace && (hitTriangle.Instance.Flags & HitSurface::InstanceFlagTwoSided) == 0u)
+	if (!bFrontFace && (hitTriangle.Instance.Flags & HitSurface::InstanceFlagTwoSided) == 0u)
 	{
 		return false;
 	}
@@ -52,25 +52,25 @@ struct RayTracingMaterialSample
 	float SubsurfaceStrength;
 };
 
-void ModulateRayTracingMaterialTexture(RayTracingHitMaterial material, uint textureSlot, float2 uv, float4 factor, inout float4 result, bool enabled = true)
+void ModulateRayTracingMaterialTexture(RayTracingHitMaterial material, uint textureSlot, float2 uv, float4 factor, inout float4 result, bool bEnabled = true)
 {
-	if (enabled && MaterialTextures::HasTexture(material.TextureFlags, textureSlot))
+	if (bEnabled && MaterialTextures::HasTexture(material.TextureFlags, textureSlot))
 	{
 		result = SampleRayTracingMaterialTexture(material, textureSlot, uv) * factor;
 	}
 }
 
-void ModulateRayTracingMaterialTexture(RayTracingHitMaterial material, uint textureSlot, float2 uv, float factor, inout float result, bool enabled = true)
+void ModulateRayTracingMaterialTexture(RayTracingHitMaterial material, uint textureSlot, float2 uv, float factor, inout float result, bool bEnabled = true)
 {
-	if (enabled && MaterialTextures::HasTexture(material.TextureFlags, textureSlot))
+	if (bEnabled && MaterialTextures::HasTexture(material.TextureFlags, textureSlot))
 	{
 		result = SampleRayTracingMaterialTexture(material, textureSlot, uv).r * factor;
 	}
 }
 
-void ModulateRayTracingMaterialTexture(RayTracingHitMaterial material, uint textureSlot, float2 uv, float3 factor, inout float3 result, bool enabled = true)
+void ModulateRayTracingMaterialTexture(RayTracingHitMaterial material, uint textureSlot, float2 uv, float3 factor, inout float3 result, bool bEnabled = true)
 {
-	if (enabled && MaterialTextures::HasTexture(material.TextureFlags, textureSlot))
+	if (bEnabled && MaterialTextures::HasTexture(material.TextureFlags, textureSlot))
 	{
 		result = SampleRayTracingMaterialTexture(material, textureSlot, uv).rgb * factor;
 	}
@@ -95,11 +95,11 @@ void ApplyRayTracingMaterialOcclusion(RayTracingHitMaterial material, float2 uv,
 	}
 }
 
-RayTracingMaterialSample SampleRayTracingMaterial(RayTracingHitMaterial material, float2 uv, float4 vertexColor, bool evaluateEmissive)
+RayTracingMaterialSample SampleRayTracingMaterial(RayTracingHitMaterial material, float2 uv, float4 vertexColor, bool bEvaluateEmissive)
 {
 	RayTracingMaterialSample result;
 	result.BaseColor = material.BaseColor;
-	result.Emissive = evaluateEmissive ? material.EmissiveColor : 0.0f.xxx;
+	result.Emissive = bEvaluateEmissive ? material.EmissiveColor : 0.0f.xxx;
 	result.NormalTangent = float3(0.0f, 0.0f, 1.0f);
 	result.SubsurfaceColor = material.SubsurfaceColor;
 	result.Roughness = material.Roughness;
@@ -111,7 +111,7 @@ RayTracingMaterialSample SampleRayTracingMaterial(RayTracingHitMaterial material
 	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotBaseColor, uv, material.BaseColor, result.BaseColor);
 	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotRoughness, uv, material.Roughness, result.Roughness);
 	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotMetallic, uv, material.Metallic, result.Metallic);
-	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotEmissive, uv, material.EmissiveColor, result.Emissive, evaluateEmissive);
+	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotEmissive, uv, material.EmissiveColor, result.Emissive, bEvaluateEmissive);
 	ApplyRayTracingMaterialOcclusion(material, uv, result.AmbientOcclusion);
 	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceColor, uv, material.SubsurfaceColor, result.SubsurfaceColor);
 	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceStrength, uv, material.SubsurfaceStrength, result.SubsurfaceStrength);

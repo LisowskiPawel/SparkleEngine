@@ -105,7 +105,7 @@ namespace SparkleLauncher
 
 		if (missingEntries.empty())
 		{
-			status.Available = true;
+			status.bAvailable = true;
 			status.Detail = "Using VULKAN_SDK root: " + status.Root.string();
 			return status;
 		}
