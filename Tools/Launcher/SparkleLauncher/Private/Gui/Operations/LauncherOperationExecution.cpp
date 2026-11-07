@@ -64,7 +64,7 @@ namespace SparkleLauncher
 		    [&taskProcessRunner, &outputCallback](auto&& typedPlan) -> OperationRecord
 		    {
 			    using Plan = std::remove_cvref_t<decltype(typedPlan)>;
-			    if (!typedPlan.CanRun)
+			    if (!typedPlan.bCanRun)
 			    {
 				    OperationRecord record = std::move(typedPlan.Operation);
 				    if (!record.Failure.has_value())

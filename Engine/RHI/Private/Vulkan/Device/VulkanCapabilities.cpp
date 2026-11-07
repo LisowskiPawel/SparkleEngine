@@ -64,7 +64,7 @@ RhiCapabilities BuildVulkanCapabilities(VulkanRhi& rhi, VulkanSwapChain& swapCha
 	    .MaxPushConstantBytes = properties.limits.maxPushConstantsSize};
 
 	capabilities.DescriptorIndexing = RhiDescriptorIndexingCapabilities{
-	    .bNonUniformSampledImages = rhi.GetFeatureStatus().bNonUniformImagesEnabled,
+	    .bNonUniformSampledImages = rhi.GetFeatureStatus().bNonUniformSampledImagesEnabled,
 	    .bSupportsPartiallyBoundDescriptorArrays = rhi.GetFeatureStatus().bEnabledPartiallyBoundDescriptorArrays};
 
 	capabilities.UploadReadback = RhiUploadReadbackCapabilities{.bSupportsBufferUpload = true, .bSupportsTextureUpload = true, .bSupportsReadback = true};

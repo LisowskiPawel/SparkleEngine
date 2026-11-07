@@ -21,26 +21,26 @@ namespace EditorViewportSettingsSerialization
 	{
 		visit("MoveSpeedMetersPerSecond", state.Navigation.MoveSpeedMetersPerSecond);
 		visit("RotationSpeedDegreesPerPixel", state.Navigation.RotationSpeedDegreesPerPixel);
-		visit("InvertY", state.Navigation.InvertY);
+		visit("InvertY", state.Navigation.bInvertY);
 		visit("ProjectionKind", state.ProjectionKind);
 		visit("OrthographicHeightMeters", state.OrthographicHeightMeters);
-		visit("OverrideExposureMode", state.Exposure.OverrideMode);
+		visit("OverrideExposureMode", state.Exposure.bOverrideMode);
 		visit("ExposureMode", state.Exposure.Mode);
-		visit("OverrideExposureMeteringMethod", state.Exposure.OverrideMeteringMethod);
+		visit("OverrideExposureMeteringMethod", state.Exposure.bOverrideMeteringMethod);
 		visit("ExposureMeteringMethod", state.Exposure.MeteringMethod);
-		visit("OverrideManualExposure", state.Exposure.OverrideManualExposure);
+		visit("OverrideManualExposure", state.Exposure.bOverrideManualExposure);
 		visit("ManualExposure", state.Exposure.ManualExposure);
-		visit("OverrideExposureCompensation", state.Exposure.OverrideCompensation);
+		visit("OverrideExposureCompensation", state.Exposure.bOverrideCompensation);
 		visit("ExposureCompensation", state.Exposure.Compensation);
-		visit("OverrideExposureTargetLuminance", state.Exposure.OverrideTargetLuminance);
+		visit("OverrideExposureTargetLuminance", state.Exposure.bOverrideTargetLuminance);
 		visit("ExposureTargetLuminance", state.Exposure.TargetLuminance);
-		visit("OverrideExposureMinimum", state.Exposure.OverrideMinimum);
+		visit("OverrideExposureMinimum", state.Exposure.bOverrideMinimum);
 		visit("ExposureMinimum", state.Exposure.Minimum);
-		visit("OverrideExposureMaximum", state.Exposure.OverrideMaximum);
+		visit("OverrideExposureMaximum", state.Exposure.bOverrideMaximum);
 		visit("ExposureMaximum", state.Exposure.Maximum);
-		visit("OverrideExposureAdaptationSpeedUp", state.Exposure.OverrideAdaptationSpeedUp);
+		visit("OverrideExposureAdaptationSpeedUp", state.Exposure.bOverrideAdaptationSpeedUp);
 		visit("ExposureAdaptationSpeedUp", state.Exposure.AdaptationSpeedUp);
-		visit("OverrideExposureAdaptationSpeedDown", state.Exposure.OverrideAdaptationSpeedDown);
+		visit("OverrideExposureAdaptationSpeedDown", state.Exposure.bOverrideAdaptationSpeedDown);
 		visit("ExposureAdaptationSpeedDown", state.Exposure.AdaptationSpeedDown);
 	}
 

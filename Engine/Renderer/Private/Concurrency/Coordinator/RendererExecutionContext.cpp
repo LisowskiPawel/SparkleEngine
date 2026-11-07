@@ -50,7 +50,7 @@ void RendererExecutionContext::ExecuteControl(RendererExecutionControl control) 
 		    using TCommand = std::decay_t<decltype(command)>;
 		    if constexpr (std::is_same_v<TCommand, RenderResizeCommand>)
 		    {
-			    m_pipeline->RequestResize(command.Extent, command.Minimized);
+			    m_pipeline->RequestResize(command.Extent, command.bMinimized);
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderViewportCommand>)
 		    {

@@ -122,9 +122,9 @@ namespace ExposureSettingsEditor
 	{
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
-		if (ImGui::Checkbox("##Override", &binding.Enabled))
+		if (ImGui::Checkbox("##Override", &binding.bEnabled))
 		{
-			if (binding.Enabled)
+			if (binding.bEnabled)
 			{
 				binding.Value = binding.DefaultValue;
 			}
@@ -155,7 +155,7 @@ namespace ExposureSettingsEditor
 		bool bChanged = false;
 		ImGui::PushID(id);
 		BeginOverrideRow(label, binding, bChanged);
-		ImGui::BeginDisabled(!binding.Enabled);
+		ImGui::BeginDisabled(!binding.bEnabled);
 		const char* preview = "Unknown";
 		for (const RenderingSettingsUi::ComboOption<TEnum>& option : options)
 		{

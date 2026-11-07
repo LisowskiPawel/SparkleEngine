@@ -85,7 +85,7 @@ namespace ShaderParameterVerification
 
 	static const ShaderParameterStructFieldDescriptor* FindDescriptorField(const ShaderParameterStructDescriptor& descriptor, std::string_view name) noexcept
 	{
-		const auto field = std::ranges::find_if(descriptor.Fields, [name](const auto& candidate) { return candidate.Reflected && candidate.Name == name; });
+		const auto field = std::ranges::find_if(descriptor.Fields, [name](const auto& candidate) { return candidate.bReflected && candidate.Name == name; });
 		return field != descriptor.Fields.end() ? &*field : nullptr;
 	}
 }

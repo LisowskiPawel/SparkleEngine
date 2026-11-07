@@ -116,7 +116,7 @@ Relevant implementation entry points:
 - [`ShaderMap.cpp`](../../../../Engine/RHI/Private/Shaders/ShaderMap.cpp)
 - [`DirectLighting.h`](../../../../Engine/Renderer/Private/Passes/Lighting/Direct/DirectLighting.h)
 - [`DirectLighting.cpp`](../../../../Engine/Renderer/Private/Passes/Lighting/Direct/DirectLighting.cpp)
-- [`DirectLightingShaders.cpp`](../../../../Engine/Renderer/ShaderRegistrations/DirectLightingShaders.cpp)
+- [`DirectLightingShaders.cpp`](https://github.com/LisowskiPawel/SparkleEngine/blob/5b0bd1469339897eef1fde3e5c9ab07137860d0f/Engine/Renderer/ShaderRegistrations/DirectLightingShaders.cpp)
 - [`FrameGraphBuilder.h`](../../../../Engine/Renderer/Private/FrameGraph/Builder/FrameGraphBuilder.h)
 - [`ShaderContractCatalogBuilder.cpp`](../../../../Tools/Shaders/ShaderCompiler/Private/Contracts/ShaderContractCatalogBuilder.cpp)
 - [`ShaderContractValidator.cpp`](../../../../Tools/Shaders/ShaderCompiler/Private/Contracts/ShaderContractValidator.cpp)

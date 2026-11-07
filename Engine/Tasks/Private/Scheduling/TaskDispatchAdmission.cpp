@@ -57,7 +57,7 @@ std::shared_ptr<TaskDispatch::State> TaskExecutor::Implementation::Runtime::Prep
 			    return true;
 		    }
 		    std::lock_guard lock(state->Mutex);
-		    return state->Settled;
+		    return state->bSettled;
 	    });
 
 	// Reserve before scope admission. Nothing after RegisterExecution can allocate.

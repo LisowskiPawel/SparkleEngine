@@ -311,7 +311,7 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 		enabledFeatures12.descriptorBindingPartiallyBound = m_featureStatus.bSupportsPartiallyBoundDescriptorArrays ? VK_TRUE : VK_FALSE;
 		*enabledNext = &enabledFeatures12;
 		enabledNext = &enabledFeatures12.pNext;
-		m_featureStatus.bNonUniformImagesEnabled = enabledFeatures12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
+		m_featureStatus.bNonUniformSampledImagesEnabled = enabledFeatures12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
 		m_featureStatus.bEnabledPartiallyBoundDescriptorArrays = enabledFeatures12.descriptorBindingPartiallyBound == VK_TRUE;
 		m_featureStatus.bEnabledTimelineSemaphore = enabledFeatures12.timelineSemaphore == VK_TRUE;
 	}

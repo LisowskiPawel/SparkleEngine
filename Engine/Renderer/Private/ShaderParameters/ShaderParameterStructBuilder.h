@@ -62,7 +62,7 @@ public:
 	    const char* name,
 	    TField TParameters::* member,
 	    ShaderStageVisibility visibility = ShaderStageVisibility::All,
-	    bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
+	    bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::bUsesGraphResource)
 	{
 		ShaderParameterStructRegistry<TParameters>::AddField(
 		    name != nullptr ? name : "",
@@ -160,7 +160,7 @@ public:
 	}
 
 	template <typename TField>
-	std::uint32_t Add(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
+	std::uint32_t Add(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::bUsesGraphResource)
 	{
 		return AddField<typename ShaderParameterFieldTraits<TField>::Semantic>(name, member, visibility, bUsesGraphResource);
 	}
@@ -277,7 +277,7 @@ public:
 
 private:
 	template <typename TExpectedSemantic, typename TField>
-	std::uint32_t AddField(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
+	std::uint32_t AddField(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::bUsesGraphResource)
 	{
 		static_assert(bIsShaderParameterFieldV<TField>, "Parameter registration requires a typed shader parameter field.");
 

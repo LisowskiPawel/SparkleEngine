@@ -56,7 +56,7 @@ struct VulkanFeatureStatus final
 	bool bEnabledHostQueryReset = false;
 	bool bEnabledStorageImageReadWithoutFormat = false;
 	bool bEnabledStorageImageWriteWithoutFormat = false;
-	bool bNonUniformImagesEnabled = false;
+	bool bNonUniformSampledImagesEnabled = false;
 	bool bEnabledPartiallyBoundDescriptorArrays = false;
 	bool bEnabledShaderDemoteToHelperInvocation = false;
 	VulkanRayTracingFeatureStatus RayTracing;

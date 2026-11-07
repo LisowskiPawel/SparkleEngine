@@ -155,7 +155,7 @@ namespace ECS
 
 		template <typename AccessSpec> void MarkWrite(ComponentStorage<typename QueryAccessTraits<AccessSpec>::Component>* storage) noexcept
 		{
-			if constexpr (QueryAccessTraits<AccessSpec>::Writable)
+			if constexpr (QueryAccessTraits<AccessSpec>::bWritable)
 			{
 				storage->MarkContentChanged();
 			}

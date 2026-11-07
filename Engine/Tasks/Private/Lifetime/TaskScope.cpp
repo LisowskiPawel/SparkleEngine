@@ -35,7 +35,7 @@ bool TaskScope::State::RegisterExecution(const std::shared_ptr<TaskExecution::St
 			    return true;
 		    }
 		    std::lock_guard lock(state->Mutex);
-		    return state->Settled;
+		    return state->bSettled;
 	    });
 
 	std::function<void()> onSettled = [scope = weak_from_this()]

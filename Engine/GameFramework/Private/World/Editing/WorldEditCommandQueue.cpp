@@ -107,7 +107,7 @@ void WorldEditCommandQueue::ApplyPayload(WorldEditPayload& payload, ECS::GameWor
 		    }
 		    else if constexpr (std::is_same_v<T, SetEntityVisibilityCommand>)
 		    {
-			    (void) state.WriteVisibility(command.Entity, command.Value);
+			    (void) state.WriteVisibility(command.Entity, command.bValue);
 		    }
 		    else if constexpr (std::is_same_v<T, SetLightDescriptionCommand>)
 		    {

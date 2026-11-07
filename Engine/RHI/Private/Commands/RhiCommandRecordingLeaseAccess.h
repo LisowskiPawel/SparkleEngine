@@ -58,7 +58,7 @@ public:
 		    .FrameSlot = slot->FrameSlot,
 		    .ContextId = RhiCommandRecordingContextId{.Value = slot->ContextIndex},
 		    .Owner = slot->RecordingOwner,
-		    .Closed = true};
+		    .bClosed = true};
 
 		const bool bLeaseMatches = Matches(leaseState, expected);
 
