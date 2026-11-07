@@ -238,8 +238,10 @@ namespace Process
 		outProcess.Job.Reset(CreateJobObjectW(nullptr, nullptr));
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobLimits{};
 		jobLimits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-		if (!outProcess.Job || !SetInformationJobObject(outProcess.Job.Get(), JobObjectExtendedLimitInformation, &jobLimits, static_cast<DWORD>(sizeof(jobLimits)))
-		    || !AssignProcessToJobObject(outProcess.Job.Get(), outProcess.Process.Get()))
+		const bool jobConfigured = outProcess.Job && SetInformationJobObject(outProcess.Job.Get(), JobObjectExtendedLimitInformation, &jobLimits, static_cast<DWORD>(sizeof(jobLimits)));
+		const bool processAssigned = jobConfigured && AssignProcessToJobObject(outProcess.Job.Get(), outProcess.Process.Get());
+		
+		if (!processAssigned)
 		{
 			const DWORD ownershipError = GetLastError();
 			TerminateProcess(outProcess.Process.Get(), 1);

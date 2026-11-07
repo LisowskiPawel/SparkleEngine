@@ -5,9 +5,10 @@
 #include "Console/ConsoleCommands.h"
 #include "Core/Public/Console/ConsoleOutput.h"
 #include "Console/ConsoleSession.h"
-#include "Panels/EditorConsolePanel.h"
+#include "Console/EditorConsolePanel.h"
 #include "Style/SparkleUiPalette.h"
-#include "Util/UiUtil.h"
+#include "Icons/EditorIcon.h"
+#include "Widgets/UiPanelWidgets.h"
 
 #include <imgui.h>
 
@@ -112,8 +113,8 @@ void EditorConsoleSystem::BuildDockedUI(float left, float bottom, float width, f
 
 	ImGui::BeginDisabled(disableInteraction);
 	const bool open = m_consolePanel->IsOpen();
-	const std::string consoleLabel = UiUtil::MakeIconLabel(UiUtil::EditorIcon::Console, "Console");
-	if (UiUtil::DrawFilterChip(consoleLabel.c_str(), open))
+	const std::string consoleLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Console, "Console");
+	if (EditorWidgets::DrawFilterChip(consoleLabel.c_str(), open))
 	{
 		if (open)
 		{

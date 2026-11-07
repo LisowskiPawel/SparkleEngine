@@ -30,7 +30,12 @@ RhiCaptureTicket VulkanCaptureService::BeginTextureReadback(const RhiTextureCapt
 {
 	DrainCancelledReadbacks();
 	auto pending = PrepareReadback(request);
-	if (!pending || !AllocateReadbackBuffer(*pending) || !BeginReadbackCommands(*pending) || !RecordReadbackCopy(*pending) || !SubmitReadback(*pending))
+	const bool bufferAllocated = pending && AllocateReadbackBuffer(*pending);
+	const bool commandsStarted = bufferAllocated && BeginReadbackCommands(*pending);
+	const bool copyRecorded = commandsStarted && RecordReadbackCopy(*pending);
+	const bool readbackSubmitted = copyRecorded && SubmitReadback(*pending);
+	
+	if (!readbackSubmitted)
 	{
 		return {};
 	}

@@ -86,7 +86,9 @@ void D3D12Rhi::CreateFactory()
 	if (m_interposerHooks.ResolveNativeInterface != nullptr)
 	{
 		ComPtr<IDXGIFactory7> nativeFactory;
-		if (TryResolveNativeInterface(ERhiInterposerInterfaceKind::PresentationFactory, createdFactory.Get(), IID_PPV_ARGS(nativeFactory.ReleaseAndGetAddressOf())))
+		const bool factoryResolved = TryResolveNativeInterface(ERhiInterposerInterfaceKind::PresentationFactory, createdFactory.Get(), IID_PPV_ARGS(nativeFactory.ReleaseAndGetAddressOf()));
+		
+		if (factoryResolved)
 		{
 			m_dxgiFactory = std::move(nativeFactory);
 			return;
@@ -108,7 +110,9 @@ void D3D12Rhi::CreateDevice()
 	if (m_interposerHooks.ResolveNativeInterface != nullptr)
 	{
 		ComPtr<ID3D12Device10> nativeDevice;
-		if (TryResolveNativeInterface(ERhiInterposerInterfaceKind::GraphicsDevice, createdDevice.Get(), IID_PPV_ARGS(nativeDevice.ReleaseAndGetAddressOf())))
+		const bool deviceResolved = TryResolveNativeInterface(ERhiInterposerInterfaceKind::GraphicsDevice, createdDevice.Get(), IID_PPV_ARGS(nativeDevice.ReleaseAndGetAddressOf()));
+		
+		if (deviceResolved)
 		{
 			m_device = std::move(nativeDevice);
 		}

@@ -1,4 +1,4 @@
-#include "LauncherContentModel.h"
+#include "Gui/Models/LauncherContentModel.h"
 
 #include "SparkleLauncher/ProjectResolver.h"
 

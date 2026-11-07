@@ -18,58 +18,58 @@ set(SPARKLE_LAUNCHER_CORE_PUBLIC_HEADERS
 )
 
 set(SPARKLE_LAUNCHER_CORE_FOUNDATION_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/BuildProfileCatalog.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildProfileCatalog.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Editor/EditorShaderCompilation.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherRootResolver.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherRootResolver.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherOperationProgress.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherOperationProgress.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherStatePaths.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherStatePaths.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/OperationModel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/ProcessRunner.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/ProjectResolver.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherProductPaths.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherProductPaths.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/WorkspaceLocator.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/SourceDependencyState.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/HostGraphicsCapabilities.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/ToolResolver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Workspace/LauncherRootResolver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Workspace/LauncherRootResolver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Operations/LauncherOperationProgress.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Operations/LauncherOperationProgress.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Workspace/LauncherStatePaths.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Workspace/LauncherStatePaths.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Operations/OperationModel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Operations/ProcessRunner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Workspace/ProjectResolver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Workspace/LauncherProductPaths.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Workspace/LauncherProductPaths.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Workspace/WorkspaceLocator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dependencies/SourceDependencyState.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/HostGraphicsCapabilities.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/ToolResolver.cpp
 )
 
 set(SPARKLE_LAUNCHER_CORE_BUILD_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildFilesFreshness.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildFreshnessSignature.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/State/BuildFilesFreshness.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/State/BuildFreshnessSignature.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/NativeBuildOutputReset.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildToolchainDetection.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/HostToolInstaller.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/QtToolchainDiscovery.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/ShaderCompilerSdkDiscovery.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/VisualStudioToolchainDiscovery.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/VulkanSdkDiscovery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/BuildToolchainDetection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/HostToolInstaller.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/QtToolchainDiscovery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/ShaderCompilerSdkDiscovery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/VisualStudioToolchainDiscovery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/VulkanSdkDiscovery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildWorkspaceExecutor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildWorkspaceFailure.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildWorkspaceOperations.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildWorkspacePlanner.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildWorkspaceProcessRequests.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildWorkspaceStateFiles.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/CMakeGeneratorModel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/State/BuildWorkspaceStateFiles.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/CMakeGeneratorModel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/CMakeWorkflowProcessRequests.cpp
 )
 
 set(SPARKLE_LAUNCHER_CORE_BUILD_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildFreshnessSignature.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/State/BuildFreshnessSignature.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/NativeBuildOutputReset.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildWorkspaceProcessRequests.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildWorkspaceFailure.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildWorkspaceStateFiles.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/CMakeGeneratorModel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/State/BuildWorkspaceStateFiles.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/CMakeGeneratorModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/CMakeWorkflowProcessRequests.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/HostToolInstaller.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/QtToolchainDiscovery.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/ShaderCompilerSdkDiscovery.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/VisualStudioToolchainDiscovery.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/VulkanSdkDiscovery.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/HostToolInstaller.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/QtToolchainDiscovery.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/ShaderCompilerSdkDiscovery.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/VisualStudioToolchainDiscovery.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/VulkanSdkDiscovery.h
 )
 
 set(SPARKLE_LAUNCHER_CORE_LEVEL_SOURCES
@@ -108,6 +108,7 @@ set(SPARKLE_LAUNCHER_CORE_MAINTENANCE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceOperationExecutor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceOperationProcessRequests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceOperations.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/ActionCleanPaths.cpp
 )
 
 set(SPARKLE_LAUNCHER_CORE_MAINTENANCE_HEADERS
@@ -117,6 +118,17 @@ set(SPARKLE_LAUNCHER_CORE_MAINTENANCE_HEADERS
 find_package(Qt6 6.11.1 EXACT REQUIRED COMPONENTS Widgets)
 
 set(SPARKLE_LAUNCHER_GUI_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationConfirmation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Build/LauncherBuildOptions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Clean/LauncherCleanOptions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Cook/LauncherCookOptions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneCards.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneCatalog.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneLaunch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Workspace/LauncherDependencyRows.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Workspace/LauncherWorkspaceSetup.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowPages.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Widgets/LauncherOptionWidgets.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash/LauncherGpuCrashPanel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash/LauncherGpuCrashPanel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherBackend.cpp
@@ -140,16 +152,8 @@ set(SPARKLE_LAUNCHER_GUI_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherWorkflowPanel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowActivity.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherPageUtilities.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowScenesPage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowLevels.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowOptionPages.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowOperations.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowPagePrimitives.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowLevelRun.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowShell.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowStatusPages.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowSyncPages.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Style/LauncherIconLibrary.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Style/LauncherUiDesign.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Style/LauncherVisualStyle.cpp
@@ -161,6 +165,13 @@ set(SPARKLE_LAUNCHER_GUI_SOURCES
 )
 
 set(SPARKLE_LAUNCHER_GUI_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationConfirmation.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Build/LauncherBuildOptions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Clean/LauncherCleanOptions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Cook/LauncherCookOptions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneCatalog.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Workspace/LauncherWorkspaceSetup.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Widgets/LauncherOptionWidgets.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherBackend.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherGuiApp.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherSettings.h
@@ -183,7 +194,6 @@ set(SPARKLE_LAUNCHER_GUI_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherActivityPanel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherWorkflowPanel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherPageUtilities.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Style/LauncherIconLibrary.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Style/LauncherUiDesign.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Style/LauncherVisualStyle.h
@@ -196,7 +206,7 @@ set(SPARKLE_LAUNCHER_GUI_HEADERS
 
 set(SPARKLE_LAUNCHER_PRIVATE_SOURCES
     ${SPARKLE_LAUNCHER_GUI_SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherShadowExecution.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Startup/LauncherShadowExecution.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellArguments.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShell.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellModel.cpp
@@ -206,7 +216,7 @@ set(SPARKLE_LAUNCHER_PRIVATE_SOURCES
 
 set(SPARKLE_LAUNCHER_PRIVATE_HEADERS
     ${SPARKLE_LAUNCHER_GUI_HEADERS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/LauncherShadowExecution.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Startup/LauncherShadowExecution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellArguments.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShell.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellModel.h
@@ -233,13 +243,7 @@ target_include_directories(SparkleLauncherCore
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/Public
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/ExternalCapture
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance
+        ${CMAKE_CURRENT_SOURCE_DIR}/Private
 )
 
 target_compile_features(SparkleLauncherCore PUBLIC cxx_std_20)
@@ -284,17 +288,7 @@ qt_add_resources(SparkleLauncher SparkleLauncherFontResources
 
 target_include_directories(SparkleLauncher
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Core
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/ExternalCapture
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Style
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Widgets
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell
+        ${CMAKE_CURRENT_SOURCE_DIR}/Private
 )
 
 target_link_libraries(SparkleLauncher

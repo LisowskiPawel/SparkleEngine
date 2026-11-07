@@ -14,7 +14,7 @@
 #include <format>
 #include <unordered_set>
 
-RenderPassRuntimeCache::IRuntimeStorageHolder::~IRuntimeStorageHolder() noexcept = default;
+RenderPassRuntimeStorage::Holder::~Holder() noexcept = default;
 
 RenderPassRuntimeCache::RenderPassRuntimeCache(RenderDeviceServices& deviceServices) :
     m_deviceServices(&deviceServices),
@@ -70,18 +70,8 @@ void RenderPassRuntimeCache::ReloadShaders()
 
 	try
 	{
-		auto replacement = OpenGeneration(replacementGeneration);
-		for (const auto& [shaderType, activeHolder] : m_activeGeneration->RuntimeStorageByShaderType)
-		{
-			if (activeHolder == nullptr)
-			{
-				HandleRuntimeCreationFailure("Shader runtime cache contains an empty shader holder.");
-			}
-
-			replacement->RuntimeStorageByShaderType.emplace(shaderType, activeHolder->CreateReplacement(*m_renderHardwareInterface, *replacement));
-		}
-		m_retiredGenerations.push_back(RetiredShaderRuntimeGeneration{.LastUse = CaptureLastSubmittedState(), .Runtime = std::move(m_activeGeneration)});
-		m_activeGeneration = std::move(replacement);
+		auto replacement = CreateReplacementGeneration(replacementGeneration);
+		ActivateGeneration(std::move(replacement));
 	}
 	catch (const Diagnostics::Error& error)
 	{
@@ -89,10 +79,30 @@ void RenderPassRuntimeCache::ReloadShaders()
 	}
 }
 
-std::unique_ptr<RenderPassRuntimeCache::ShaderRuntimeGeneration> RenderPassRuntimeCache::OpenGeneration(std::uint64_t generation) const
+std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> RenderPassRuntimeCache::CreateReplacementGeneration(std::uint64_t generation) const
+{
+	auto replacement = OpenGeneration(generation);
+	for (const auto& [storageType, activeHolder] : m_activeGeneration->RuntimeStorageByType)
+	{
+		if (activeHolder == nullptr)
+		{
+			HandleRuntimeCreationFailure("Shader runtime cache contains an empty shader holder.");
+		}
+		replacement->RuntimeStorageByType.emplace(storageType, activeHolder->CreateReplacement(*m_renderHardwareInterface, *replacement));
+	}
+	return replacement;
+}
+
+void RenderPassRuntimeCache::ActivateGeneration(std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> replacement)
+{
+	m_retiredGenerations.push_back(RetiredShaderRuntimeGeneration{.LastUse = CaptureLastSubmittedState(), .Runtime = std::move(m_activeGeneration)});
+	m_activeGeneration = std::move(replacement);
+}
+
+std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> RenderPassRuntimeCache::OpenGeneration(std::uint64_t generation) const
 {
 	const Files::FileSetReadScope publication(Filesystem::GetCookedShaderRootPath());
-	auto result = std::make_unique<ShaderRuntimeGeneration>();
+	auto result = std::make_unique<RenderPassRuntimeStorage::ShaderGeneration>();
 	result->Generation = generation;
 	result->Target = GetRuntimeShaderTarget(m_renderHardwareInterface->GetCapabilities().RuntimeShaderBinaryFormat);
 	result->Library = CookedShaderLibrary::Open(Filesystem::GetCookedShaderLibraryPath());
@@ -101,7 +111,7 @@ std::unique_ptr<RenderPassRuntimeCache::ShaderRuntimeGeneration> RenderPassRunti
 	return result;
 }
 
-void RenderPassRuntimeCache::ValidateGenerationContracts(const ShaderRuntimeGeneration& generation)
+void RenderPassRuntimeCache::ValidateGenerationContracts(const RenderPassRuntimeStorage::ShaderGeneration& generation)
 {
 	std::unordered_set<ShaderTypeId> registeredShaderTypes;
 	for (const ShaderRegistrationDesc& registration : GlobalShaderRegistry::GetRegistrations())
@@ -174,6 +184,21 @@ bool RenderPassRuntimeCache::IsComplete(const RhiSubmissionState& state) const n
 		}
 	}
 	return true;
+}
+
+std::unique_ptr<RayTracingShaderTable> RenderPassRuntimeCache::CreateRayTracingShaderTable(
+    const RayTracingPipelineRuntime& runtime,
+    const RayTracingPipelineComposition& composition,
+    const RayTracingShaderTablePlan* plan) const noexcept
+{
+	try
+	{
+		return plan != nullptr ? runtime.CreateShaderTable(*m_renderHardwareInterface, composition, *plan) : runtime.CreateShaderTable(*m_renderHardwareInterface, composition);
+	}
+	catch (const Diagnostics::Error& error)
+	{
+		HandleRuntimeCreationFailure(error.what());
+	}
 }
 
 [[noreturn]] void RenderPassRuntimeCache::HandleRuntimeCreationFailure(std::string_view errorMessage) const

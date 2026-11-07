@@ -1,12 +1,12 @@
-#include "LauncherShellModel.h"
+#include "Shell/LauncherShellModel.h"
 
-#include "LauncherShellArguments.h"
+#include "Shell/LauncherShellArguments.h"
 
 #include "SparkleLauncher/CookOperations.h"
 #include "SparkleLauncher/LevelOperations.h"
 #include "SparkleLauncher/LevelRunOperations.h"
-#include "LauncherStatePaths.h"
-#include "LauncherProductPaths.h"
+#include "Workspace/LauncherStatePaths.h"
+#include "Workspace/LauncherProductPaths.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
 
 #include <algorithm>

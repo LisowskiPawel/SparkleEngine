@@ -12,7 +12,7 @@
 #include "Renderer/Public/Meshes/MeshDiagnostics.h"
 #include "Renderer/Public/Resources/Textures/TextureDiagnostics.h"
 #include "Renderer/Public/Viewport/ViewportContracts.h"
-#include "Panels/ViewportOutputAction.h"
+#include "Viewport/ViewportOutputAction.h"
 #include "Viewport/ViewportOverlay.h"
 #include "GameFramework/Public/Rendering/RenderViewCameraData.h"
 #include "GameFramework/Public/Scene/Camera/CameraInputIntent.h"

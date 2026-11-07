@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LauncherWorkflowCatalog.h"
+#include "Gui/Models/LauncherWorkflowCatalog.h"
 
 #include <QtCore/QHash>
 #include <QtCore/QVector>

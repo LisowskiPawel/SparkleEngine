@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LauncherOperationRequest.h"
+#include "Gui/Operations/LauncherOperationRequest.h"
 #include "SparkleLauncher/OperationModel.h"
 #include "SparkleLauncher/ProcessRunner.h"
 

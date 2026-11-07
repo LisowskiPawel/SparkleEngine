@@ -1,8 +1,7 @@
-#include "LauncherCleanUiModel.h"
+#include "Gui/Models/LauncherCleanUiModel.h"
 
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "ToolOutputPaths.h"
-#include "SparkleLauncher/BuildProfileCatalog.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
 
 #include <QtCore/QRegularExpression>
@@ -110,184 +109,13 @@ namespace SparkleLauncher
 		return scopes.has_value() && std::any_of(scopes->begin(), scopes->end(), CleanScopeRequiresContent);
 	}
 
-	bool SupportsActionSpecificClean(const QString& operationId)
-	{
-		return operationId == "launcher.build.self" || operationId.startsWith("workspace.build") || operationId == "cook.tools.prepare" || operationId == "cook.workspace" || operationId == "cook.all"
-		    || operationId == "cook.shaders" || operationId == "cook.textures" || operationId == "cook.assets";
-	}
-
-	void AddExplicitCleanTarget(QVector<LauncherCleanTarget>& targets, const QString& displayName, const std::filesystem::path& path, const QString& detail)
-	{
-		LauncherCleanTarget target;
-		target.DisplayName = displayName;
-		target.Path = QString::fromStdString(path.string());
-		target.Detail = detail;
-		targets.push_back(std::move(target));
-	}
-
-	static void AddTargetOutputFiles(
-	    QVector<LauncherCleanTarget>& targets,
-	    const SparkleTools::ToolTargetOutputPaths& targetOutputs,
-	    const QString& targetName,
-	    const QString& detail,
-	    const std::filesystem::path& preservedPath = {})
-	{
-		const std::filesystem::path executablePath = targetOutputs.BinaryDirectory / (targetName.toStdString() + ".exe");
-		if (preservedPath.empty() || executablePath != preservedPath)
-		{
-			AddExplicitCleanTarget(targets, targetName + " executable", executablePath, detail);
-		}
-		AddExplicitCleanTarget(targets, targetName + " program database", targetOutputs.SymbolDirectory / (targetName.toStdString() + ".pdb"), detail);
-		AddExplicitCleanTarget(targets, targetName + " import library", targetOutputs.LibraryDirectory / (targetName.toStdString() + ".lib"), detail);
-		AddExplicitCleanTarget(targets, targetName + " compile database", targetOutputs.SymbolDirectory / "obj" / (targetName.toStdString() + ".pdb"), detail);
-	}
-
-	void AddTargetArtifactOutputs(
-	    QVector<LauncherCleanTarget>& targets,
-	    const std::filesystem::path& workspaceRoot,
-	    const QString& profileName,
-	    const QString& targetName,
-	    const QString& detail,
-	    const std::filesystem::path& preservedPath)
-	{
-		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
-		SparkleTools::ToolTargetOutputPaths targetOutputs = outputs.RuntimeSupportTargetOutputs(targetName.toStdString(), profileName.toStdString());
-		if (targetName == "SparkleLauncher")
-		{
-			targetOutputs = outputs.LauncherTargetOutputs(profileName.toStdString());
-		}
-		else if (targetName == "AssetCooker" || targetName == "TextureCooker" || targetName == "ShaderCompiler")
-		{
-			targetOutputs = outputs.ToolTargetOutputs(targetName.toStdString(), profileName.toStdString());
-		}
-		AddTargetOutputFiles(targets, targetOutputs, targetName, detail, preservedPath);
-	}
-
-	void AddProjectTargetArtifactOutputs(
-	    QVector<LauncherCleanTarget>& targets,
-	    const std::filesystem::path& workspaceRoot,
-	    const QString& profileName,
-	    const QString& projectName,
-	    const QString& productRole,
-	    const QString& targetName,
-	    const QString& detail)
-	{
-		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
-		const SparkleTools::ToolTargetOutputPaths targetOutputs = outputs.ProjectTargetOutputs(projectName.toStdString(), productRole.toStdString(), profileName.toStdString());
-		AddTargetOutputFiles(targets, targetOutputs, targetName, detail);
-	}
-
-	QVector<LauncherCleanTarget> BuildActionSpecificCleanTargets(const ActionCleanTargetContext& context)
+	QVector<LauncherCleanTarget> BuildActionSpecificCleanTargets(const ActionCleanTargetRequest& request)
 	{
 		QVector<LauncherCleanTarget> targets;
-		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(context.WorkspaceRoot);
-		const QStringList buildScopes = context.BuildScopes.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
-		const QStringList cookScopes = context.CookScopes.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
-		const bool workspaceBuild = context.OperationId == "workspace.build";
-		const bool buildsContentProduct = workspaceBuild && (buildScopes.contains("editor") || buildScopes.contains("game"));
-		if ((buildsContentProduct || context.OperationId == "workspace.build.editor" || context.OperationId == "workspace.build.game" || context.OperationId.startsWith("cook."))
-		    && context.ContentId.isEmpty())
+		for (const MaintenanceCleanPathSpec& path : BuildActionCleanPaths(request))
 		{
-			return targets;
+			targets.push_back({QString::fromStdString(path.DisplayName), QString::fromStdString(path.Path.string()), QString::fromStdString(path.Detail)});
 		}
-
-		const auto addProjectArtifacts = [&context, &targets](const QString& profileName, const QString& projectName, const QString& detail)
-		{
-			const std::optional<BuildProfile> profile = FindBuildProfile(profileName.toStdString());
-			if (!profile.has_value())
-			{
-				return;
-			}
-			const QString productRole = profile->Target == BuildProfileTarget::Game ? "game" : "editor";
-			AddProjectTargetArtifactOutputs(
-			    targets,
-			    context.WorkspaceRoot,
-			    profileName,
-			    projectName,
-			    productRole,
-			    QString::fromStdString(BuildProjectTargetName(projectName.toStdString(), *profile)),
-			    detail);
-		};
-
-		if (context.OperationId == "launcher.build.self" || (workspaceBuild && buildScopes.contains("launcher")))
-		{
-			const SparkleTools::ToolTargetOutputPaths launcherOutputs = outputs.LauncherTargetOutputs(context.EditorProfile.toStdString());
-
-			AddTargetArtifactOutputs(
-			    targets,
-			    context.WorkspaceRoot,
-			    context.EditorProfile,
-			    "SparkleLauncher",
-			    "Launcher direct build outputs. The currently running launcher executable is preserved until restart.",
-			    context.RunningLauncherPath);
-
-			AddExplicitCleanTarget(
-			    targets,
-			    "SparkleLauncherCore library",
-			    launcherOutputs.SymbolDirectory / "lib" / "SparkleLauncherCore.lib",
-			    "Launcher support library built for the selected editor profile.");
-
-			AddExplicitCleanTarget(
-			    targets,
-			    "SparkleLauncherCore program database",
-			    launcherOutputs.SymbolDirectory / "lib" / "SparkleLauncherCore.pdb",
-			    "Launcher support library debug symbols built for the selected editor profile.");
-		}
-
-		if (context.OperationId == "workspace.build.editor" || (workspaceBuild && buildScopes.contains("editor")))
-		{
-			addProjectArtifacts(context.EditorProfile, context.ContentId, "Editor target outputs.");
-		}
-
-		if (context.OperationId == "workspace.build.game" || (workspaceBuild && buildScopes.contains("game")))
-		{
-			addProjectArtifacts(context.GameProfile, context.ContentId, "Game target outputs.");
-		}
-
-		if (context.OperationId == "cook.tools.prepare" || (workspaceBuild && buildScopes.contains("cook-tools")))
-		{
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-			AddTargetArtifactOutputs(targets, context.WorkspaceRoot, context.EditorProfile, "AssetCooker", "AssetCooker executable outputs.");
-			AddTargetArtifactOutputs(targets, context.WorkspaceRoot, context.EditorProfile, "TextureCooker", "TextureCooker executable outputs.");
-#endif
-#if SPARKLE_ENABLE_SHADER_COMPILER
-			AddTargetArtifactOutputs(targets, context.WorkspaceRoot, context.EditorProfile, "ShaderCompiler", "ShaderCompiler executable outputs.");
-#endif
-		}
-
-		if (context.OperationId == "cook.workspace")
-		{
-			if (cookScopes.contains("textures") || cookScopes.contains("assets"))
-			{
-				AddExplicitCleanTarget(
-				    targets,
-				    "Cooked content",
-				    outputs.CookedProjectDirectory(context.ContentId.toStdString()),
-				    "Generated texture, scene, mesh, and material outputs selected by Cook Workspace.");
-			}
-			if (cookScopes.contains("shaders"))
-			{
-				AddExplicitCleanTarget(targets, "Cooked shaders", outputs.CookedProjectDirectory(context.ContentId.toStdString()) / "Shaders", "Generated shader outputs selected by Cook Workspace.");
-			}
-		}
-		else if (context.OperationId == "cook.all")
-		{
-			AddExplicitCleanTarget(targets, "Cooked content", outputs.CookedProjectDirectory(context.ContentId.toStdString()), "All generated cooked content.");
-			AddExplicitCleanTarget(targets, "Cooked shaders", outputs.CookedProjectDirectory(context.ContentId.toStdString()) / "Shaders", "Generated shader outputs refreshed by cook operations.");
-		}
-		else if (context.OperationId == "cook.shaders")
-		{
-			AddExplicitCleanTarget(targets, "Cooked shaders", outputs.CookedProjectDirectory(context.ContentId.toStdString()) / "Shaders", "Generated shader outputs refreshed by shader cooking.");
-		}
-		else if (context.OperationId == "cook.textures" || context.OperationId == "cook.assets")
-		{
-			AddExplicitCleanTarget(
-			    targets,
-			    "Cooked content",
-			    outputs.CookedProjectDirectory(context.ContentId.toStdString()),
-			    context.OperationId == "cook.textures" ? "Cooked texture outputs." : "Cooked mesh and material outputs.");
-		}
-
 		return targets;
 	}
 }

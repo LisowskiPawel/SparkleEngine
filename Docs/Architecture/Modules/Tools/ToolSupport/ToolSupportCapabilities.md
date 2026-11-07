@@ -6,7 +6,7 @@
 
 **Snapshot:** 2026-09-28 at committed `master` revision `452c1f32`; `Tools/Support/ToolConsoleSupport`, its CMake membership, and current Launcher, AssetCooker, TextureCooker, and ShaderCompiler consumers inspected; evidence `S` only
 
-**Scope:** shared host-tool console formatting, output paths, source-asset lookup and project preparation metadata
+**Scope:** shared host-tool console formatting, output paths, source-asset lookup, project preparation metadata and sequential binary asset output
 
 **Owner:** `Tools/Support/ToolSupport` / `ToolSupport`
 
@@ -35,6 +35,16 @@ The library standardizes presentation and one deliberately narrow cross-process 
 **Source-path ownership, 2026-11-01:** at revision `81c6a4e4` plus the working-tree cleanup, `SourceAssetPaths` owns project-before-engine source lookup for shaders, textures and meshes, plus the imported-texture cache location. Source roots are derived on demand from Core's engine/project roots rather than retained in a second cache. `ToolOutputPaths` owns the compiler dependency-manifest location. Importers and cookers use private ToolSupport dependencies; runtime has no source-family vocabulary or ToolSupport dependency. This source/build boundary does not qualify cooked content, GPU output or a release candidate.
 
 ## Capability Surface
+
+**Responsibility boundaries, 2026-11-05:** the [catalog reader](../../../../../Tools/Support/ToolSupport/Private/Projects/ProjectLevelCatalogReader.cpp)
+uses typed field tables for textual assignment. Section admission, path resolution,
+boolean/byte parsing and catalog validation retain their separate owners. The
+[binary asset writer](../../../../../Tools/Support/ToolSupport/Public/BinaryAssetWriter.h)
+owns opening, ordered header/array writes, closing and stream-error translation
+for mesh, scene-manifest, skeleton and animation products. Product headers,
+payload order, staging paths and generation publication remain with the cookers.
+This is a host-tool byte protocol, not a serializer registry or runtime facility.
+Source/build and bounded CPU controls do not qualify full cooking or publication.
 
 | ID | Capability | State | Exact current coverage and limit | Evidence |
 | --- | --- | --- | --- | --- |

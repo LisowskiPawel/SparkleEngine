@@ -9,6 +9,7 @@
 #include "Core/Public/Diagnostics/Verify.h"
 
 #include <algorithm>
+#include <utility>
 #include <array>
 #include <format>
 
@@ -412,15 +413,7 @@ VkImageLayout VulkanDescriptorAllocator::ToImageLayout(EntryKind kind) noexcept
 
 VulkanDescriptorAllocator::DescriptorTableRecord* VulkanDescriptorAllocator::FindTableRecord(RhiDescriptorTableHandle tableHandle) noexcept
 {
-	std::uint32_t tableIndex = 0;
-	std::uint16_t generation = 0;
-	if (!tableHandle.Decode(tableIndex, generation) || tableIndex >= m_tables.size())
-	{
-		return nullptr;
-	}
-
-	DescriptorTableRecord& record = m_tables[tableIndex];
-	return record.Allocated && record.Generation == generation ? &record : nullptr;
+	return const_cast<DescriptorTableRecord*>(std::as_const(*this).FindTableRecord(tableHandle));
 }
 
 const VulkanDescriptorAllocator::DescriptorTableRecord* VulkanDescriptorAllocator::FindTableRecord(RhiDescriptorTableHandle tableHandle) const noexcept
@@ -483,17 +476,7 @@ void VulkanDescriptorAllocator::RecycleTableRecord(std::uint32_t tableIndex) noe
 
 VulkanDescriptorAllocator::DescriptorEntry* VulkanDescriptorAllocator::FindRegisteredEntry(RhiGpuDescriptorHandle handle) noexcept
 {
-	if (m_registeredDescriptors == nullptr)
-	{
-		return nullptr;
-	}
-
-	std::uint32_t index = 0;
-	if (!VulkanDescriptorHandles::DecodeGpuDescriptorHandle(handle, index) || index >= m_registeredDescriptors->size())
-	{
-		return nullptr;
-	}
-	return &(*m_registeredDescriptors)[index];
+	return const_cast<DescriptorEntry*>(std::as_const(*this).FindRegisteredEntry(handle));
 }
 
 const VulkanDescriptorAllocator::DescriptorEntry* VulkanDescriptorAllocator::FindRegisteredEntry(RhiGpuDescriptorHandle handle) const noexcept

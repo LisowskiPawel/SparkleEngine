@@ -1,52 +1,37 @@
 #pragma once
 
-#include "LauncherBackend.h"
-#include "LauncherCleanUiModel.h"
-#include "LauncherIconLibrary.h"
+#include "Gui/Style/LauncherIconLibrary.h"
+#include "Gui/Models/LauncherOperationResult.h"
+#include "Gui/Operations/LauncherOperationRequest.h"
 
-#include <QtCore/QString>
-#include <QtCore/QVector>
 #include <QtCore/QHash>
 #include <QtCore/QPointer>
-#include <QtCore/QSet>
-#include <QtGui/QColor>
+#include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QFrame>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QListWidget>
-#include <QtWidgets/QLineEdit>
+#include <QtCore/QVector>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QStackedWidget>
-#include <QtWidgets/QTextEdit>
-#include <QtWidgets/QVBoxLayout>
 
 #include <cstdint>
 #include <filesystem>
-#include <optional>
-#include <string>
-#include <vector>
 
-class QGridLayout;
+class QComboBox;
+class QFrame;
+class QPushButton;
+class QStackedWidget;
+class QVBoxLayout;
 
 namespace SparkleLauncher
 {
 	struct LauncherOperationDescriptor;
-	struct ToolchainItemStatus;
 	enum class WorkspaceCompiler : std::uint8_t;
+	class LauncherBackend;
 	class LauncherContentModel;
 	class LauncherSettings;
 	class LauncherActivityPanel;
 	class LauncherGpuCrashPanel;
 	class LauncherWorkflowPanel;
-	struct ThirdPartyDependencyUiEntry;
-	struct ThirdPartyDependencyUiStatus;
-	struct LauncherLevelUiEntry;
-	struct LauncherLevelUiModel;
-	class ResponsiveCardGridWidget;
-	struct LauncherContentSummary;
+	class LauncherSceneCatalog;
+	class LauncherWorkspaceSetup;
 
 	class LauncherMainWindow final : public QMainWindow
 	{
@@ -68,69 +53,14 @@ namespace SparkleLauncher
 		void DisplayOperationFinished(const QString& runId, const QString& operationId, const QString& title, const LauncherOperationResult& result);
 
 	private:
-		struct PendingLevelSelectionUpdate
-		{
-			std::filesystem::path ContentRoot;
-			std::vector<std::string> LevelIds;
-			bool Selected = false;
-		};
-
+		void InitializeWorkflowPresentation(QWidget& parent);
 		QWidget* CreateOptionsPanel(QWidget* parent);
 		QWidget* CreateOptionsPage(const QString& operationId, QWidget* parent);
 		QWidget* CreateFooterContextPanel(QWidget* parent);
-		QLabel* CreateSectionLabel(const QString& title) const;
-		QLabel* CreateFieldLabel(const QString& title) const;
-		QLineEdit* CreateBoundLineEdit(const QString& text, const QString& placeholder, const QString& tooltip, void (LauncherSettings::*setter)(const QString&));
-		QComboBox* CreateValueCombo(const QVector<QPair<QString, QString>>& options, const QString& currentValue, void (LauncherSettings::*setter)(const QString&));
 		QComboBox* CreateContextCombo(void (LauncherSettings::*setter)(const QString&));
 		void RefreshContextSelectors();
-		static bool UsesBuildEnvironmentStatus(const QString& operationId);
 		void AddOptionsForOperation(QVBoxLayout& layout, const QString& operationId);
-		void AddBuildOptions(QVBoxLayout& layout);
-		void AddCookOptions(QVBoxLayout& layout);
-		void AddWorkflowScopeRow(
-		    QVBoxLayout& layout,
-		    const QString& label,
-		    const QString& value,
-		    const QString& detail,
-		    const QString& metadata,
-		    bool available,
-		    const QStringList& selectedScopes,
-		    QVector<QCheckBox*>& scopeBoxes);
-		void AddWorkflowAutomationNote(QVBoxLayout& layout, const QString& detail);
-		void UpdateBuildScopeSetting(const QVector<QCheckBox*>& scopeBoxes);
-		void UpdateCookScopeSetting(const QVector<QCheckBox*>& scopeBoxes);
-		void AddCleanOptions(QVBoxLayout& layout, const QString& operationId);
-		void AddCleanScopeRow(QVBoxLayout& layout, const CleanScopeUiOption& scope, const QString& activeContentId, const QStringList& selectedScopes, QVector<QCheckBox*>& scopeBoxes);
-		void UpdateCleanScopeSetting(const QVector<QCheckBox*>& scopeBoxes, bool cleanAllRequested);
-		QWidget* AddOptionField(QVBoxLayout& layout, const QString& label, QWidget* control);
-		QVBoxLayout* AddOptionGroup(QVBoxLayout& layout, const QString& title, const QString& detail);
-		QLabel* AddStatusRow(QVBoxLayout& layout, const QString& label, const QString& status, const QString& detail, const QString& state, QWidget* accessory = nullptr);
-		void AddSyncDependencies(QVBoxLayout& layout, bool optional);
-		QPushButton* CreateSourceDependencyActionButton(const ThirdPartyDependencyUiEntry& dependency);
-		void ApplySourceDependencyRowState(const ThirdPartyDependencyUiEntry& dependency, QLabel& statusLabel, QPushButton& button);
-		void RefreshSourceDependencyRows();
-		void SyncSourceDependency(const ThirdPartyDependencyUiEntry& dependency);
-		void CleanSourceDependency(const ThirdPartyDependencyUiEntry& dependency);
-		void TrackSourceDependencyRun(const LauncherOperationRequest& request, const QString& runId);
-		void AddLevelContentGroups(QVBoxLayout& layout);
-		void AddSyncLevelRows(QVBoxLayout& layout, const LauncherContentSummary& content, const LauncherLevelUiModel& model);
-		void AddSyncLevelRow(ResponsiveCardGridWidget& grid, const LauncherContentSummary& content, const LauncherLevelUiEntry& level);
-		void ApplyLevelActionButtonState(QLabel& statusLabel, QPushButton& button, const LauncherLevelUiEntry& level);
-		void RefreshLevelActionButtons();
-		void SyncAllLevels();
-		void CleanAllLevels();
-		QVector<LauncherCleanTarget> BuildLevelCleanTargets(const LauncherContentSummary& content, const QString& levelId = QString()) const;
-		bool SetLevelsSelected(const std::filesystem::path& contentRoot, const std::vector<std::string>& levelIds, bool selected, const QString& actionName);
-		LauncherLevelUiModel BuildLevelUiModel() const;
-		void AddSceneSelection(QVBoxLayout& layout);
-		void StartLevel(const LauncherContentSummary& content, const LauncherLevelUiEntry& level);
-		void AddBuildEnvironmentStatus(QVBoxLayout& layout, const QString& operationId);
-		void AddCookEnvironmentStatus(QVBoxLayout& layout, const QString& operationId);
-		QPushButton* CreateHostToolActionButton(const ToolchainItemStatus& item);
 		void SelectWorkspaceCompiler(WorkspaceCompiler compiler);
-		void InstallHostTool(const ToolchainItemStatus& item);
-		void AddNoOptionsMessage(QVBoxLayout& layout, const QString& text);
 		void SetControlsEnabled(bool enabled);
 		void EnsureOptionsPage(const QString& operationId);
 		void RebuildOptionsPages();
@@ -139,12 +69,10 @@ namespace SparkleLauncher
 		void RegisterFocusable(QWidget* widget);
 		void ConfigureTabOrder();
 		void UpdateRunAvailability();
-		QPushButton* CreateStatusActionButton(const QString& actionId, const QString& actionLabel, const QString& actionTitle, bool navigateInsteadOfRun = false);
-		void TriggerActionDependencyRegenerate(const QString& actionId, const QString& actionTitle, bool navigateInsteadOfRun);
+		void UpdateWorkflowRunAvailability();
 		const LauncherOperationDescriptor* FindOperationDescriptor(const QString& operationId) const;
 		QString DisplayNameForOperation(const QString& operationId) const;
 		bool OperationNeedsContent(const QString& operationId) const;
-		bool ConfirmRunRequest(LauncherOperationRequest& request) const;
 		void PromptForLauncherRestart();
 		QString CreateRunId();
 		QString StartOperation(LauncherOperationRequest request, const QString& title);
@@ -157,7 +85,9 @@ namespace SparkleLauncher
 		LauncherBackend& m_backend;
 		LauncherIconLibrary m_icons;
 		LauncherWorkflowPanel* m_workflowPanel = nullptr;
-		QVector<QWidget*> m_tabOrderWidgets;
+		LauncherSceneCatalog* m_sceneCatalog = nullptr;
+		LauncherWorkspaceSetup* m_workspaceSetup = nullptr;
+		QVector<QPointer<QWidget>> m_tabOrderWidgets;
 		QComboBox* m_runModeCombo = nullptr;
 		QComboBox* m_buildConfigurationCombo = nullptr;
 		QComboBox* m_workspaceCompilerCombo = nullptr;
@@ -172,15 +102,6 @@ namespace SparkleLauncher
 		QFrame* m_actionMetaPanel = nullptr;
 		LauncherActivityPanel* m_activityPanel = nullptr;
 		LauncherGpuCrashPanel* m_gpuCrashPanel = nullptr;
-		QString m_startingLevelRunId;
-		QString m_startingLevelId;
-		QHash<QString, PendingLevelSelectionUpdate> m_pendingLevelSelectionUpdates;
-		QHash<QString, QPointer<QLabel>> m_levelStatusLabels;
-		QHash<QString, QPointer<QPushButton>> m_levelActionButtons;
-		QHash<QString, QString> m_sourceDependencyRunIds;
-		QHash<QString, QPointer<QLabel>> m_sourceDependencyStatusLabels;
-		QHash<QString, QPointer<QPushButton>> m_sourceDependencyActionButtons;
-		QSet<QString> m_cleaningSourceDependencyRunIds;
 		QString m_selectedOperationId;
 		bool m_isRebuildingOptions = false;
 		bool m_isApplyingUiRefresh = false;

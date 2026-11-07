@@ -1,15 +1,15 @@
 #include "SparkleLauncher/LevelRunOperations.h"
 
 #include "Core/Public/Strings/StringUtils.h"
-#include "LauncherProductPaths.h"
+#include "Workspace/LauncherProductPaths.h"
 #include "ProjectLevelCatalog.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "CookedContentReadiness.h"
-#include "LevelRunOperationProcessRequests.h"
-#include "ExternalCaptureDiscovery.h"
-#include "GpuCrashLaunch.h"
+#include "Cook/CookedContentReadiness.h"
+#include "Levels/LevelRunOperationProcessRequests.h"
+#include "ExternalCapture/ExternalCaptureDiscovery.h"
+#include "GpuCrash/GpuCrashLaunch.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
-#include "LauncherStatePaths.h"
+#include "Workspace/LauncherStatePaths.h"
 #include "SparkleLauncher/ToolResolver.h"
 
 #include <algorithm>

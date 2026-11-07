@@ -1,7 +1,7 @@
-#include "BuildWorkspaceProcessRequests.h"
+#include "Build/BuildWorkspaceProcessRequests.h"
 
-#include "CMakeWorkflowProcessRequests.h"
-#include "HostToolInstaller.h"
+#include "Build/CMakeWorkflowProcessRequests.h"
+#include "Build/Toolchains/HostToolInstaller.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <string_view>

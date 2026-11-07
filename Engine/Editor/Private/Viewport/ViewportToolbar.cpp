@@ -2,7 +2,7 @@
 #include "Viewport/ViewportToolbar.h"
 
 #include "Style/SparkleUiPalette.h"
-#include "Util/UiUtil.h"
+#include "Icons/EditorIcon.h"
 #include "Viewport/ViewportCameraProperties.h"
 #include "Viewport/EditorViewportSession.h"
 #include "Viewport/ViewportShowMenu.h"
@@ -38,12 +38,12 @@ void ViewportToolbar::DrawLevelName(std::string_view levelName, bool compact) co
 	ImGui::AlignTextToFramePadding();
 	if (compact)
 	{
-		const std::string compactLabel = UiUtil::MakeIconLabel(UiUtil::EditorIcon::Level, activeLevelName.c_str());
+		const std::string compactLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Level, activeLevelName.c_str());
 		ImGui::TextUnformatted(compactLabel.c_str());
 		return;
 	}
 
-	const std::string levelLabel = UiUtil::MakeIconLabel(UiUtil::EditorIcon::Level, "Level");
+	const std::string levelLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Level, "Level");
 	ImGui::TextDisabled("%s", levelLabel.c_str());
 	ImGui::SameLine();
 	ImGui::AlignTextToFramePadding();
@@ -54,7 +54,7 @@ void ViewportToolbar::DrawCameraControls(bool disableInteraction, bool compact) 
 {
 	const CameraProjectionKind projectionKind = m_viewportSession.GetSettings().ProjectionKind;
 	const char* projectionLabel = projectionKind == CameraProjectionKind::Orthographic ? "Orthographic" : "Perspective";
-	const std::string cameraText = compact ? UiUtil::GetEditorIconGlyph(UiUtil::EditorIcon::Camera) : UiUtil::MakeIconLabel(UiUtil::EditorIcon::Camera, projectionLabel);
+	const std::string cameraText = compact ? EditorIcons::GetEditorIconGlyph(EditorIcons::EditorIcon::Camera) : EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Camera, projectionLabel);
 	const std::string cameraLabel = cameraText + "##ViewportCameraPropertiesButton";
 
 	ImGui::BeginDisabled(disableInteraction);

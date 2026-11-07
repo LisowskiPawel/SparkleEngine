@@ -1,7 +1,7 @@
-#include "CMakeWorkflowProcessRequests.h"
+#include "Build/CMakeWorkflowProcessRequests.h"
 
-#include "CMakeGeneratorModel.h"
-#include "LauncherStatePaths.h"
+#include "Build/Toolchains/CMakeGeneratorModel.h"
+#include "Workspace/LauncherStatePaths.h"
 #include "ToolOutputPaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 

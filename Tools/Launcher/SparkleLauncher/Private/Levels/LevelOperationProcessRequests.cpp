@@ -1,11 +1,11 @@
-#include "LevelOperationProcessRequests.h"
+#include "Levels/LevelOperationProcessRequests.h"
 #include "Core/Public/Strings/StringUtils.h"
 
-#include "LauncherProductPaths.h"
-#include "AssetPackSyncPlanner.h"
+#include "Workspace/LauncherProductPaths.h"
+#include "Levels/AssetPackSyncPlanner.h"
 
 #include "ProjectLevelCatalog.h"
-#include "LauncherStatePaths.h"
+#include "Workspace/LauncherStatePaths.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <utility>

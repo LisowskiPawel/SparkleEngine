@@ -1,13 +1,13 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
-#include "LauncherProductPaths.h"
-#include "NativeBuildOutputReset.h"
-#include "BuildWorkspaceProcessRequests.h"
-#include "HostToolInstaller.h"
+#include "Workspace/LauncherProductPaths.h"
+#include "Build/NativeBuildOutputReset.h"
+#include "Build/BuildWorkspaceProcessRequests.h"
+#include "Build/Toolchains/HostToolInstaller.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "SparkleLauncher/ArtifactNaming.h"
-#include "LauncherStatePaths.h"
+#include "Workspace/LauncherStatePaths.h"
 #include "ToolOutputPaths.h"
 
 #include <algorithm>

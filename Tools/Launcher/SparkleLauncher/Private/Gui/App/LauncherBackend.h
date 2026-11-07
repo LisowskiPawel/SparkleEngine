@@ -1,8 +1,8 @@
 #pragma once
 
-#include "LauncherOperationRequest.h"
-#include "LauncherProgressStreamDecoder.h"
-#include "Models/LauncherOperationResult.h"
+#include "Gui/Operations/LauncherOperationRequest.h"
+#include "Gui/Operations/LauncherProgressStreamDecoder.h"
+#include "Gui/Models/LauncherOperationResult.h"
 #include "SparkleLauncher/OperationModel.h"
 #include "SparkleLauncher/ProcessRunner.h"
 

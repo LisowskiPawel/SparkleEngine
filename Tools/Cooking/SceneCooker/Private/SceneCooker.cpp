@@ -11,7 +11,7 @@
 #include "Features/Metadata/CookedSceneMetadataBuilder.h"
 #include "Features/Skeletons/CookedSceneSkeletonBuilder.h"
 #include "SourceAssetPaths.h"
-#include "Core/Public/Files/BinaryStreamWriter.h"
+#include "BinaryAssetWriter.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
@@ -103,32 +103,20 @@ void SceneCookPipeline::StageManifest(const CookedSceneBuild& build, std::vector
 	Files::CleanupTemporaryFile(stagedPath);
 	outPublication.push_back({stagedPath, build.identity.manifestPath});
 
-	std::ofstream manifestOutput;
-	std::string errorMessage;
-	if (!Files::TryOpenBinaryOutput(stagedPath, manifestOutput, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
-
-	if (!Files::BinaryStreamWriter::WriteValue(manifestOutput, build.manifest.header, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.meshAssetReferences, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.materialAssetReferences, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.instances, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.instanceGroups, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.cameras, errorMessage) || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.lights, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.skeletonRefs, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.animationReferences, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.morphWeights, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.materialVariants, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(manifestOutput, build.manifest.materialVariantMappings, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
-
-	if (!Files::TryCloseOutput(manifestOutput, stagedPath, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
+	SparkleTools::WriteBinaryAssetFile(
+	    stagedPath,
+	    build.manifest.header,
+	    build.manifest.meshAssetReferences,
+	    build.manifest.materialAssetReferences,
+	    build.manifest.instances,
+	    build.manifest.instanceGroups,
+	    build.manifest.cameras,
+	    build.manifest.lights,
+	    build.manifest.skeletonRefs,
+	    build.manifest.animationReferences,
+	    build.manifest.morphWeights,
+	    build.manifest.materialVariants,
+	    build.manifest.materialVariantMappings);
 }
 
 std::filesystem::path SceneCookPipeline::ResolveSourceScenePath(const std::filesystem::path& sourceScenePath)

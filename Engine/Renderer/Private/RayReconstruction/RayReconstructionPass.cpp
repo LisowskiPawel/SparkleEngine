@@ -36,22 +36,24 @@ void AddRayReconstructionPass(
 	    {
 		    RenderCommandList& commandList = context.Commands.GetRenderCommandList();
 		    const RhiNativeInteropRequest interopRequest{.Consumer = ERhiNativeInteropConsumer::ExternalProvider, .Reason = passName};
-		    if (!provider.Evaluate(
-		            RayReconstructionEvaluationDesc{
-		                .BackendApi = commandList.GetBackendApi(),
-		                .NativeCommandList = commandList.GetNativeHandle(interopRequest),
-		                .NativeNoisyInputColorView = context.Resources.ResolveNativeTextureView(providerInputs.NoisyInputColor, ResourceState::ShaderResource, interopRequest),
-		                .NativeOutputColorView = context.Resources.ResolveNativeTextureView(providerInputs.OutputColor, ResourceState::UnorderedAccess, interopRequest),
-		                .NativeDepthView = context.Resources.ResolveNativeTextureView(providerInputs.Depth, ResourceState::ShaderResource, interopRequest),
-		                .NativeMotionVectorsView = context.Resources.ResolveNativeTextureView(providerInputs.MotionVectors, ResourceState::ShaderResource, interopRequest),
-		                .NativeExposureView = context.Resources.ResolveNativeTextureView(providerInputs.Exposure, ResourceState::ShaderResource, interopRequest),
-		                .NativeNormalsView = context.Resources.ResolveNativeTextureView(providerInputs.Normals, ResourceState::ShaderResource, interopRequest),
-		                .NativeRoughnessView = context.Resources.ResolveNativeTextureView(providerInputs.Roughness, ResourceState::ShaderResource, interopRequest),
-		                .NativeDiffuseAlbedoView = context.Resources.ResolveNativeTextureView(providerInputs.DiffuseAlbedo, ResourceState::ShaderResource, interopRequest),
-		                .NativeSpecularAlbedoView = context.Resources.ResolveNativeTextureView(providerInputs.SpecularAlbedo, ResourceState::ShaderResource, interopRequest),
-		                .NativeSpecularHitDistanceView = context.Resources.ResolveNativeTextureView(providerInputs.SpecularHitDistance, ResourceState::ShaderResource, interopRequest),
-		                .RenderExtent = renderExtent,
-		                .OutputExtent = outputExtent}))
+		    const RayReconstructionEvaluationDesc evaluation = RayReconstructionEvaluationDesc{
+		    		                .BackendApi = commandList.GetBackendApi(),
+		    		                .NativeCommandList = commandList.GetNativeHandle(interopRequest),
+		    		                .NativeNoisyInputColorView = context.Resources.ResolveNativeTextureView(providerInputs.NoisyInputColor, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeOutputColorView = context.Resources.ResolveNativeTextureView(providerInputs.OutputColor, ResourceState::UnorderedAccess, interopRequest),
+		    		                .NativeDepthView = context.Resources.ResolveNativeTextureView(providerInputs.Depth, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeMotionVectorsView = context.Resources.ResolveNativeTextureView(providerInputs.MotionVectors, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeExposureView = context.Resources.ResolveNativeTextureView(providerInputs.Exposure, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeNormalsView = context.Resources.ResolveNativeTextureView(providerInputs.Normals, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeRoughnessView = context.Resources.ResolveNativeTextureView(providerInputs.Roughness, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeDiffuseAlbedoView = context.Resources.ResolveNativeTextureView(providerInputs.DiffuseAlbedo, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeSpecularAlbedoView = context.Resources.ResolveNativeTextureView(providerInputs.SpecularAlbedo, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeSpecularHitDistanceView = context.Resources.ResolveNativeTextureView(providerInputs.SpecularHitDistance, ResourceState::ShaderResource, interopRequest),
+		    		                .RenderExtent = renderExtent,
+		    		                .OutputExtent = outputExtent};
+		    const bool evaluated = provider.Evaluate(evaluation);
+		    
+		    if (!evaluated)
 		    {
 			    Diagnostics::Fatal(g_rayReconstructionPassLogger, __FILE__, __LINE__, "The configured ray-reconstruction provider failed to evaluate the active frame.");
 		    }

@@ -1,11 +1,11 @@
-#include "LauncherGuiApp.h"
+#include "Gui/App/LauncherGuiApp.h"
 
-#include "LauncherBackend.h"
-#include "LauncherMainWindow.h"
-#include "LauncherContentModel.h"
-#include "LauncherRootResolver.h"
-#include "LauncherSettings.h"
-#include "LauncherShadowExecution.h"
+#include "Gui/App/LauncherBackend.h"
+#include "Gui/Shell/LauncherMainWindow.h"
+#include "Gui/Models/LauncherContentModel.h"
+#include "Workspace/LauncherRootResolver.h"
+#include "Gui/App/LauncherSettings.h"
+#include "Startup/LauncherShadowExecution.h"
 #include "SparkleLauncher/WorkspaceLocator.h"
 #include "Core/Public/Strings/StringUtils.h"
 

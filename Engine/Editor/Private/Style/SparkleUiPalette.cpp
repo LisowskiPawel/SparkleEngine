@@ -207,4 +207,10 @@ namespace SparkleUiPalette
 	{
 		return ImVec4(0.13f, 0.15f, 0.17f, 1.0f);
 	}
+
+	ImU32 WithAlphaU32(ImVec4 color, float alpha) noexcept
+	{
+		color.w *= alpha;
+		return ImGui::ColorConvertFloat4ToU32(color);
+	}
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RHI/Public/Shaders/ShaderTarget.h"
-#include "Cooking/ShaderCompileJob.h"
+#include "Cooking/Compilation/ShaderCompileJob.h"
 
 #include <string>
 #include <string_view>

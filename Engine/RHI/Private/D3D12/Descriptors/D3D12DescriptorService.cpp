@@ -636,15 +636,7 @@ bool D3D12DescriptorService::WriteResourceViewDescriptor(const RhiResourceViewDe
 
 D3D12DescriptorService::DescriptorTableRecord* D3D12DescriptorService::FindDescriptorTableRecord(RhiDescriptorTableHandle tableHandle) noexcept
 {
-	std::uint32_t recordIndex = 0;
-	std::uint16_t generation = 0;
-	if (!tableHandle.Decode(recordIndex, generation) || recordIndex >= m_descriptorTableRecords.size())
-	{
-		return nullptr;
-	}
-
-	DescriptorTableRecord& record = m_descriptorTableRecords[recordIndex];
-	return record.IsAllocated() && record.generation == generation ? &record : nullptr;
+	return const_cast<DescriptorTableRecord*>(std::as_const(*this).FindDescriptorTableRecord(tableHandle));
 }
 
 const D3D12DescriptorService::DescriptorTableRecord* D3D12DescriptorService::FindDescriptorTableRecord(RhiDescriptorTableHandle tableHandle) const noexcept
@@ -662,15 +654,7 @@ const D3D12DescriptorService::DescriptorTableRecord* D3D12DescriptorService::Fin
 
 D3D12DescriptorService::ResourceViewRecord* D3D12DescriptorService::FindResourceViewRecord(RhiResourceViewHandle view) noexcept
 {
-	std::uint32_t recordIndex = 0;
-	std::uint16_t generation = 0;
-	if (!view.Decode(recordIndex, generation) || recordIndex >= m_resourceViewRecords.size())
-	{
-		return nullptr;
-	}
-
-	ResourceViewRecord& record = m_resourceViewRecords[recordIndex];
-	return record.IsAllocated() && record.generation == generation ? &record : nullptr;
+	return const_cast<ResourceViewRecord*>(std::as_const(*this).FindResourceViewRecord(view));
 }
 
 const D3D12DescriptorService::ResourceViewRecord* D3D12DescriptorService::FindResourceViewRecord(RhiResourceViewHandle view) const noexcept

@@ -69,8 +69,7 @@ function(sparkle_boundary_scan_file absolute_path)
             "${_relative_path}")
     endif()
 
-    if(_relative_path MATCHES "^Engine/Editor/Public/Panels/" AND
-       NOT _relative_path STREQUAL "Engine/Editor/Public/Panels/ViewportOutputAction.h")
+    if(_relative_path MATCHES "^Engine/Editor/Public/Panels/")
         sparkle_boundary_append_failure(
             "EDITOR_PANELS_REMAIN_PRIVATE"
             "${_relative_path}"
@@ -268,7 +267,7 @@ function(sparkle_boundary_scan_file absolute_path)
 
 		if(_line MATCHES "FormatToolWorkProgress|ParseToolWorkProgress" AND
 		   NOT _relative_path MATCHES "^Tools/Support/ToolSupport/(Private|Public)/ToolWorkProgress[.](cpp|h)$" AND
-		   NOT _relative_path MATCHES "^Tools/Launcher/SparkleLauncher/Private/(Core/LauncherOperationProgress|Gui/Operations/LauncherProgressStreamDecoder)[.]cpp$")
+		   NOT _relative_path MATCHES "^Tools/Launcher/SparkleLauncher/Private/(Operations/LauncherOperationProgress|Gui/Operations/LauncherProgressStreamDecoder)[.]cpp$")
 			sparkle_boundary_append_failure(
 				"TOOL_PROGRESS_TRANSPORT_REMAINS_AT_PROCESS_BOUNDARY"
 				"${_relative_path}"

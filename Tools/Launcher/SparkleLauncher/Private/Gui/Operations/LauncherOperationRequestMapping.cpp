@@ -1,4 +1,4 @@
-#include "LauncherOperationRequestMapping.h"
+#include "Gui/Operations/LauncherOperationRequestMapping.h"
 
 #include <QtCore/QRegularExpression>
 

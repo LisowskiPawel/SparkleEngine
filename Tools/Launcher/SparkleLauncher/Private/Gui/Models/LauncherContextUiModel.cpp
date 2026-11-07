@@ -1,8 +1,8 @@
-#include "LauncherContextUiModel.h"
+#include "Gui/Models/LauncherContextUiModel.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
-#include "LauncherProductPaths.h"
+#include "Workspace/LauncherProductPaths.h"
 
 #include <QtCore/QStringList>
 

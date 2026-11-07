@@ -3,12 +3,12 @@
 #include "Gltf/GltfImporter.h"
 
 #include "Gltf/GltfCameraImporter.h"
-#include "Gltf/GltfAnimationImporter.h"
+#include "Gltf/Animation/GltfAnimationImporter.h"
 #include "Gltf/GltfSceneReader.h"
-#include "Gltf/GltfGeometryImporter.h"
+#include "Gltf/Geometry/GltfGeometryImporter.h"
 #include "Gltf/GltfLightImporter.h"
-#include "Gltf/GltfMaterialImporter.h"
-#include "Gltf/GltfMaterialVariantImporter.h"
+#include "Gltf/Materials/GltfMaterialImporter.h"
+#include "Gltf/Materials/GltfMaterialVariantImporter.h"
 
 #include <cgltf.h>
 

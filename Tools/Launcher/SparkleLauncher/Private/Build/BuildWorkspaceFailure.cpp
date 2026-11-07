@@ -1,6 +1,6 @@
-#include "BuildWorkspaceFailure.h"
+#include "Build/BuildWorkspaceFailure.h"
 
-#include "BuildWorkspaceProcessRequests.h"
+#include "Build/BuildWorkspaceProcessRequests.h"
 #include "Core/Public/Process/ChildProcess.h"
 #include "Core/Public/Strings/StringUtils.h"
 

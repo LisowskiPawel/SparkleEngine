@@ -2,7 +2,7 @@
 
 #include "Viewport/ViewportCameraProperties.h"
 
-#include "Panels/ExposureSettingsEditor.h"
+#include "Settings/Rendering/ExposureSettingsEditor.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
 #include "Viewport/EditorViewportSession.h"
 
@@ -10,10 +10,9 @@
 
 #include <cfloat>
 
-class ViewportCameraPropertyTable final
+namespace ViewportCameraProperties
 {
-public:
-	static bool Begin() noexcept
+	bool BeginPropertiesTable() noexcept
 	{
 		if (!ImGui::BeginTable("##ViewportCameraCore", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerH))
 		{
@@ -24,17 +23,112 @@ public:
 		return true;
 	}
 
-	static bool DrawFloat(const char* id, const char* label, float& value, float speed, float minimum, float maximum, const char* format, ImGuiSliderFlags flags = ImGuiSliderFlags_None) noexcept
+	void BeginPropertyRow(const char* label) noexcept
 	{
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
 		ImGui::AlignTextToFramePadding();
 		ImGui::TextUnformatted(label);
 		ImGui::TableSetColumnIndex(1);
+	}
+
+	bool DrawFloat(const char* id, const char* label, float& value, float speed, float minimum, float maximum, const char* format, ImGuiSliderFlags flags = ImGuiSliderFlags_None) noexcept
+	{
+		BeginPropertyRow(label);
 		ImGui::SetNextItemWidth(-FLT_MIN);
 		return ImGui::DragFloat(id, &value, speed, minimum, maximum, format, flags);
 	}
-};
+
+	void DrawProjection(EditorViewportSession& viewportSession) noexcept
+	{
+		const auto& settings = viewportSession.GetSettings();
+		BeginPropertyRow("Projection");
+		ImGui::SetNextItemWidth(-FLT_MIN);
+		const char* projectionPreview = settings.ProjectionKind == CameraProjectionKind::Orthographic ? "Orthographic" : "Perspective";
+		if (ImGui::BeginCombo("##ViewportProjection", projectionPreview))
+		{
+			if (ImGui::Selectable("Perspective", settings.ProjectionKind == CameraProjectionKind::Perspective))
+			{
+				viewportSession.SetProjectionKind(CameraProjectionKind::Perspective);
+			}
+			if (ImGui::Selectable("Orthographic", settings.ProjectionKind == CameraProjectionKind::Orthographic))
+			{
+				viewportSession.SetProjectionKind(CameraProjectionKind::Orthographic);
+			}
+			ImGui::EndCombo();
+		}
+	}
+
+	void DrawNavigation(EditorViewportSession& viewportSession) noexcept
+	{
+		const auto& settings = viewportSession.GetSettings();
+		float moveSpeed = settings.Navigation.MoveSpeedMetersPerSecond;
+		if (DrawFloat(
+		        "##ViewportMoveSpeed",
+		        "Move speed (m/s)",
+		        moveSpeed,
+		        0.01f,
+		        settings.Navigation.MinimumMoveSpeedMetersPerSecond,
+		        settings.Navigation.MaximumMoveSpeedMetersPerSecond,
+		        "%.4f",
+		        ImGuiSliderFlags_Logarithmic))
+		{
+			viewportSession.SetMoveSpeed(moveSpeed);
+		}
+
+		float rotationSpeed = settings.Navigation.RotationSpeedDegreesPerPixel;
+		if (DrawFloat("##ViewportRotationSpeed", "Rotation speed (deg/px)", rotationSpeed, 0.005f, 0.001f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic))
+		{
+			viewportSession.SetRotationSpeed(rotationSpeed);
+		}
+
+		BeginPropertyRow("Invert Y");
+		bool invertY = settings.Navigation.InvertY;
+		if (ImGui::Checkbox("##ViewportInvertY", &invertY))
+		{
+			viewportSession.SetInvertY(invertY);
+		}
+	}
+
+	void DrawOrthographicSettings(EditorViewportSession& viewportSession) noexcept
+	{
+		const auto& settings = viewportSession.GetSettings();
+		if (settings.ProjectionKind == CameraProjectionKind::Orthographic)
+		{
+			float orthographicHeight = settings.OrthographicHeightMeters;
+			if (DrawFloat("##ViewportOrthographicHeight", "Ortho height (m)", orthographicHeight, 0.1f, 0.001f, 1000000.0f, "%.3f", ImGuiSliderFlags_Logarithmic))
+			{
+				viewportSession.SetOrthographicHeight(orthographicHeight);
+			}
+		}
+	}
+
+	void DrawCameraProperties(EditorViewportSession& viewportSession) noexcept
+	{
+		ImGui::TextDisabled("Viewport Camera");
+		ImGui::Separator();
+		if (!BeginPropertiesTable())
+		{
+			return;
+		}
+		DrawProjection(viewportSession);
+		DrawNavigation(viewportSession);
+		DrawOrthographicSettings(viewportSession);
+		ImGui::EndTable();
+	}
+
+	void DrawExposureOverrides(EditorViewportSession& viewportSession, const EngineRenderingSettingsState& renderingDefaults) noexcept
+	{
+		ImGui::Spacing();
+		ImGui::TextDisabled("Exposure");
+		ImGui::TextWrapped("Unchecked properties use the current renderer defaults.");
+		ViewportExposureOverrides exposureDraft = viewportSession.GetSettings().Exposure;
+		if (ExposureSettingsEditor::DrawOverrides(exposureDraft, renderingDefaults))
+		{
+			viewportSession.SetExposureOverrides(exposureDraft);
+		}
+	}
+}
 
 void ViewportCameraProperties::OpenPopup() noexcept
 {
@@ -55,81 +149,7 @@ void ViewportCameraProperties::BuildPopup(EditorViewportSession& viewportSession
 		return;
 	}
 
-	const EditorViewportSettingsState& settings = viewportSession.GetSettings();
-	ImGui::TextDisabled("Viewport Camera");
-	ImGui::Separator();
-	if (ViewportCameraPropertyTable::Begin())
-	{
-		ImGui::TableNextRow();
-		ImGui::TableSetColumnIndex(0);
-		ImGui::AlignTextToFramePadding();
-		ImGui::TextUnformatted("Projection");
-		ImGui::TableSetColumnIndex(1);
-		ImGui::SetNextItemWidth(-FLT_MIN);
-		const char* projectionPreview = settings.ProjectionKind == CameraProjectionKind::Orthographic ? "Orthographic" : "Perspective";
-		if (ImGui::BeginCombo("##ViewportProjection", projectionPreview))
-		{
-			if (ImGui::Selectable("Perspective", settings.ProjectionKind == CameraProjectionKind::Perspective))
-			{
-				viewportSession.SetProjectionKind(CameraProjectionKind::Perspective);
-			}
-			if (ImGui::Selectable("Orthographic", settings.ProjectionKind == CameraProjectionKind::Orthographic))
-			{
-				viewportSession.SetProjectionKind(CameraProjectionKind::Orthographic);
-			}
-			ImGui::EndCombo();
-		}
-
-		float moveSpeed = settings.Navigation.MoveSpeedMetersPerSecond;
-		if (ViewportCameraPropertyTable::DrawFloat(
-		        "##ViewportMoveSpeed",
-		        "Move speed (m/s)",
-		        moveSpeed,
-		        0.01f,
-		        settings.Navigation.MinimumMoveSpeedMetersPerSecond,
-		        settings.Navigation.MaximumMoveSpeedMetersPerSecond,
-		        "%.4f",
-		        ImGuiSliderFlags_Logarithmic))
-		{
-			viewportSession.SetMoveSpeed(moveSpeed);
-		}
-
-		float rotationSpeed = settings.Navigation.RotationSpeedDegreesPerPixel;
-		if (ViewportCameraPropertyTable::DrawFloat("##ViewportRotationSpeed", "Rotation speed (deg/px)", rotationSpeed, 0.005f, 0.001f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic))
-		{
-			viewportSession.SetRotationSpeed(rotationSpeed);
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableSetColumnIndex(0);
-		ImGui::AlignTextToFramePadding();
-		ImGui::TextUnformatted("Invert Y");
-		ImGui::TableSetColumnIndex(1);
-		bool invertY = settings.Navigation.InvertY;
-		if (ImGui::Checkbox("##ViewportInvertY", &invertY))
-		{
-			viewportSession.SetInvertY(invertY);
-		}
-
-		if (settings.ProjectionKind == CameraProjectionKind::Orthographic)
-		{
-			float orthographicHeight = settings.OrthographicHeightMeters;
-			if (ViewportCameraPropertyTable::DrawFloat("##ViewportOrthographicHeight", "Ortho height (m)", orthographicHeight, 0.1f, 0.001f, 1000000.0f, "%.3f", ImGuiSliderFlags_Logarithmic))
-			{
-				viewportSession.SetOrthographicHeight(orthographicHeight);
-			}
-		}
-		ImGui::EndTable();
-	}
-
-	ImGui::Spacing();
-	ImGui::TextDisabled("Exposure");
-	ImGui::TextWrapped("Unchecked properties use the current renderer defaults.");
-	ViewportExposureOverrides exposureDraft = settings.Exposure;
-	if (ExposureSettingsEditor::DrawOverrides(exposureDraft, renderingDefaults))
-	{
-		viewportSession.SetExposureOverrides(exposureDraft);
-	}
-
+	DrawCameraProperties(viewportSession);
+	DrawExposureOverrides(viewportSession, renderingDefaults);
 	ImGui::EndPopup();
 }

@@ -1,7 +1,7 @@
-#include "LauncherOperationService.h"
+#include "Gui/Operations/LauncherOperationService.h"
 
-#include "LauncherOperationExecution.h"
-#include "GpuCrashLaunch.h"
+#include "Gui/Operations/LauncherOperationExecution.h"
+#include "GpuCrash/GpuCrashLaunch.h"
 #include "Tasks/Public/TaskExecutor.h"
 #include "Tasks/Public/TaskGraph.h"
 #include "Tasks/Public/TaskScope.h"

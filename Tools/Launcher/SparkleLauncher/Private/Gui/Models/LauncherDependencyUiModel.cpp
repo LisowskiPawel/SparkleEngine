@@ -1,4 +1,4 @@
-#include "LauncherDependencyUiModel.h"
+#include "Gui/Models/LauncherDependencyUiModel.h"
 
 #include "SparkleLauncher/SourceDependencyState.h"
 

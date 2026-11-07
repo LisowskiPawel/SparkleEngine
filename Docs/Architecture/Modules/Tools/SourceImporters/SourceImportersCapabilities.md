@@ -20,6 +20,24 @@ glTF texture mapping reconciled on 2026-10-11: `GltfMaterialTextureMapper::Apply
 
 ## At A Glance
 
+**Private capability placement, 2026-11-07:** reconciled against `8cbd850c`
+plus the scoped working tree. The glTF entry point, parsed-scene lifetime,
+accessor reading, coordinate conversion, cameras and lights remain at the format
+root. `Gltf/Geometry` owns primitive extraction, instances, tangent frames and
+morph targets; `Gltf/Materials` owns property/texture/variant mapping and primitive
+material resolution; `Gltf/Animation` owns animation sampling and skeleton import.
+They consume the existing imported values and stay in `SourceImporters`.
+No parser, conversion, fidelity, output or failure contract changes.
+
+**Animation boundaries, 2026-11-05:** the [glTF animation importer](../../../../../Tools/Import/SourceImporters/Private/Gltf/Animation/GltfAnimationImporter.cpp)
+owns channel identity, target-node/skeleton binding, sampler reuse and clip
+assembly. The private [sampler decoder](../../../../../Tools/Import/SourceImporters/Private/Gltf/Animation/GltfAnimationSampler.cpp)
+owns accessor shape/count checks, time ordering, scalar/vector and cubic-spline
+reads, coordinate conversion, quaternion continuity and clip-duration updates.
+It returns the existing imported sampler value without introducing another
+representation. Coordinate policy and format coverage remain unchanged; bounded
+native controls do not establish source-scene fidelity or rendered acceptance.
+
 | Source family | Current coverage | Principal exclusions |
 | --- | --- | --- |
 | glTF 2.0 / GLB | triangle geometry, instances, transforms, metallic-roughness materials, UV0 texture transforms, cameras, punctual lights, skins, morphs, animations, variants | embedded GLB material images, nonzero UV sets, many material extensions, Draco/Meshopt/BasisU/WebP |

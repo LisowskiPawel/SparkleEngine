@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Icons/EditorIcon.h"
 #include "Scene/SceneObjectPresentation.h"
 
 #include "Scene/Model/EditorSceneModel.h"
@@ -80,7 +81,7 @@ namespace SceneObjectPresentation
 		const std::string title = BuildSelectionTitle(model, selection);
 		const char* subtitle = BuildSelectionSubtitle(model, selection);
 		const EditorSceneEntry* entry = model && selection ? model->FindEntry(*selection) : nullptr;
-		const UiUtil::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(selection, entry ? entry->LightKind : SceneLightKind::Unknown);
+		const EditorIcons::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(selection, entry ? entry->LightKind : SceneLightKind::Unknown);
 
 		constexpr float kHeaderHeight = 30.0f;
 		constexpr float kHeaderPaddingX = 8.0f;
@@ -91,13 +92,13 @@ namespace SceneObjectPresentation
 
 		drawList->AddRectFilled(start, end, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::HeaderBackgroundActive()));
 		drawList->AddRectFilled(start, ImVec2(start.x + 3.0f, end.y), ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::Accent()));
-		drawList->AddLine(ImVec2(start.x, start.y), ImVec2(end.x, start.y), UiUtil::WithAlphaU32(SparkleUiPalette::Border(), 0.52f));
-		drawList->AddLine(ImVec2(start.x, end.y - 1.0f), ImVec2(end.x, end.y - 1.0f), UiUtil::WithAlphaU32(SparkleUiPalette::Border(), 0.58f));
+		drawList->AddLine(ImVec2(start.x, start.y), ImVec2(end.x, start.y), SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.52f));
+		drawList->AddLine(ImVec2(start.x, end.y - 1.0f), ImVec2(end.x, end.y - 1.0f), SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.58f));
 
 		ImGui::InvisibleButton("##DetailsSelectionHeader", ImVec2(width, kHeaderHeight));
 
 		ImGui::SetCursorScreenPos(ImVec2(start.x + kHeaderPaddingX + 10.0f, start.y + 7.0f));
-		ImGui::TextUnformatted(UiUtil::GetEditorIconGlyph(icon));
+		ImGui::TextUnformatted(EditorIcons::GetEditorIconGlyph(icon));
 		ImGui::SameLine(0.0f, 8.0f);
 		ImGui::TextUnformatted(title.c_str());
 		ImGui::SameLine();
@@ -106,21 +107,21 @@ namespace SceneObjectPresentation
 		ImGui::SetCursorScreenPos(ImVec2(start.x, end.y));
 	}
 
-	UiUtil::EditorIcon GetLightIcon(SceneLightKind kind) noexcept
+	EditorIcons::EditorIcon GetLightIcon(SceneLightKind kind) noexcept
 	{
 		switch (kind)
 		{
 			case SceneLightKind::Directional:
-				return UiUtil::EditorIcon::DirectionalLight;
+				return EditorIcons::EditorIcon::DirectionalLight;
 			case SceneLightKind::Point:
-				return UiUtil::EditorIcon::PointLight;
+				return EditorIcons::EditorIcon::PointLight;
 			case SceneLightKind::Spot:
-				return UiUtil::EditorIcon::SpotLight;
+				return EditorIcons::EditorIcon::SpotLight;
 			case SceneLightKind::Rect:
-				return UiUtil::EditorIcon::Light;
+				return EditorIcons::EditorIcon::Light;
 			case SceneLightKind::Unknown:
 			default:
-				return UiUtil::EditorIcon::Light;
+				return EditorIcons::EditorIcon::Light;
 		}
 	}
 
@@ -152,26 +153,26 @@ namespace SceneObjectPresentation
 		return std::string(GetLightTypeLabel(light.GetKind())) + " " + std::to_string(lightIndex + 1);
 	}
 
-	UiUtil::EditorIcon BuildSelectionIcon(const SceneObjectSelection& selection, SceneLightKind lightKind) noexcept
+	EditorIcons::EditorIcon BuildSelectionIcon(const SceneObjectSelection& selection, SceneLightKind lightKind) noexcept
 	{
 		switch (selection.type)
 		{
 			case SceneObjectType::Camera:
-				return UiUtil::EditorIcon::Camera;
+				return EditorIcons::EditorIcon::Camera;
 			case SceneObjectType::Sky:
-				return UiUtil::EditorIcon::ViewLit;
+				return EditorIcons::EditorIcon::ViewLit;
 			case SceneObjectType::Light:
 				return GetLightIcon(lightKind);
 			case SceneObjectType::Mesh:
-				return UiUtil::EditorIcon::StaticMesh;
+				return EditorIcons::EditorIcon::StaticMesh;
 			case SceneObjectType::None:
 			default:
-				return UiUtil::EditorIcon::None;
+				return EditorIcons::EditorIcon::None;
 		}
 	}
 
-	UiUtil::EditorIcon BuildSelectionIcon(const SceneObjectSelection* selection, SceneLightKind lightKind) noexcept
+	EditorIcons::EditorIcon BuildSelectionIcon(const SceneObjectSelection* selection, SceneLightKind lightKind) noexcept
 	{
-		return selection != nullptr ? BuildSelectionIcon(*selection, lightKind) : UiUtil::EditorIcon::None;
+		return selection != nullptr ? BuildSelectionIcon(*selection, lightKind) : EditorIcons::EditorIcon::None;
 	}
 }

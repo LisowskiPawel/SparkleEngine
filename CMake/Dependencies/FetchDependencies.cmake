@@ -941,7 +941,7 @@ if(_sparkle_fetch_spirv_reflect AND (SPARKLE_ENABLE_SHADER_COMPILER OR NOT SPARK
     # SPIRV-Reflect - SPIR-V reflection (Khronos)
     # https://github.com/KhronosGroup/SPIRV-Reflect
     #
-    # Used by Tools/Shaders/ShaderCompiler/Backends/Dxc to extract reflection from the
+    # Used by Tools/Shaders/ShaderCompiler/Private/Backend/Dxc to extract reflection from the
     # SPIR-V blobs DXC emits in `-spirv` mode. Single .c + headers; we build it
     # as a small static library so its symbols stay out of every translation
     # unit that includes the header.

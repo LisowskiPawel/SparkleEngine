@@ -1,10 +1,10 @@
-#include "LauncherShellPresentation.h"
+#include "Shell/LauncherShellPresentation.h"
 
 #include "Core/Public/Strings/StringUtils.h"
-#include "LauncherShellModel.h"
+#include "Shell/LauncherShellModel.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
-#include "LauncherProductPaths.h"
+#include "Workspace/LauncherProductPaths.h"
 
 #include <ostream>
 #include <string>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LauncherContextUiModel.h"
+#include "Gui/Models/LauncherContextUiModel.h"
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -11,6 +11,8 @@
 class QCheckBox;
 class QComboBox;
 class QObject;
+class QWidget;
+class QVBoxLayout;
 
 namespace SparkleLauncher
 {
@@ -18,4 +20,15 @@ namespace SparkleLauncher
 
 	void ConnectSelectAllScopeBox(QCheckBox* selectAllBox, const QVector<QCheckBox*>& scopeBoxes, QObject* context, std::function<void(bool)> commitSelection);
 	QStringList CollectSelectedScopeValues(const QVector<QCheckBox*>& scopeBoxes);
+	void AddWorkflowScopeRow(
+	    QVBoxLayout& layout,
+	    const QString& label,
+	    const QString& value,
+	    const QString& detail,
+	    const QString& metadata,
+	    bool available,
+	    const QStringList& selectedScopes,
+	    QVector<QCheckBox*>& scopeBoxes,
+	    const std::function<void(QWidget*)>& registerFocusable);
+	void AddWorkflowAutomationNote(QVBoxLayout& layout, const QString& detail);
 }

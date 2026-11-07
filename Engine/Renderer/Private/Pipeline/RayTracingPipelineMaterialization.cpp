@@ -4,7 +4,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "PipelineRuntime/PipelineRuntimeLibrary.h"
+#include "Pipeline/PipelineMaterialization.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "RHI/Public/Shaders/ShaderParameterLayoutBuilder.h"
 
@@ -78,7 +78,7 @@ std::vector<RhiRayTracingShaderExportDesc> RayTracingPipelineRuntime::ResolveSha
 		const CookedShaderCodeRecord* code = entry != nullptr ? library.Find(entry->CodeHash) : nullptr;
 		m_shaders.push_back(ResolvedShader{.Map = &map, .Library = &library, .Entry = entry, .Code = code});
 		exports.push_back(RhiRayTracingShaderExportDesc{.Shader = &m_shaders.back(), .ExportName = registration.EntryPoint});
-		PipelineRuntimeLibrary::ValidateShaderCapabilities(renderHardwareInterface, registration.ShaderName, m_shaders.back());
+		PipelineMaterialization::ValidateShaderCapabilities(renderHardwareInterface, registration.ShaderName, m_shaders.back());
 	}
 
 	return exports;
@@ -117,7 +117,7 @@ void RayTracingPipelineRuntime::MaterializePipeline(
 	}
 	m_parameterLayout = BuildShaderParameterLayout(rayGenerationRegistration);
 	std::wstring debugName = Strings::ToWide(rayGenerationRegistration.ShaderName);
-	m_bindingLayout = PipelineRuntimeLibrary::CreateBindingLayout(renderHardwareInterface, m_parameterLayout, m_shaders, false, debugName.c_str());
+	m_bindingLayout = PipelineMaterialization::CreateBindingLayout(renderHardwareInterface, m_parameterLayout, m_shaders, false, debugName.c_str());
 
 	const std::vector<RhiRayTracingHitGroupDesc> hitGroups = BuildHitGroups(composition);
 	const RayTracingShaderMetadata& rayGenerationMetadata = rayGenerationRegistration.RayTracing;

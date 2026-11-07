@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Cooking/Dependencies/ShaderDependencyManifest.h"
-#include "Cooking/ShaderCompileJob.h"
+#include "Cooking/Planning/Dependencies/ShaderDependencyManifest.h"
+#include "Cooking/Compilation/ShaderCompileJob.h"
 #include "Cooking/ShaderCookTypes.h"
 
 #include <cstddef>

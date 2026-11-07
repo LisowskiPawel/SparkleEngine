@@ -1,22 +1,28 @@
-#include "LauncherMainWindow.h"
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QStackedWidget>
+#include "Gui/Pages/Scenes/LauncherSceneCatalog.h"
+#include "Gui/Pages/Workspace/LauncherWorkspaceSetup.h"
+#include "Gui/Widgets/LauncherOptionWidgets.h"
+#include "Gui/Operations/LauncherOperationConfirmation.h"
+#include "Gui/Shell/LauncherMainWindow.h"
 
-#include "LauncherActivityPanel.h"
-#include "LauncherWorkflowPanel.h"
-#include "LauncherActionWidgets.h"
-#include "LauncherBackend.h"
-#include "LauncherCleanUiModel.h"
-#include "LauncherDependencyUiModel.h"
-#include "LauncherIconLibrary.h"
-#include "LauncherLayoutWidgets.h"
-#include "LauncherLevelUiModel.h"
-#include "LauncherOperationRequestFactory.h"
-#include "LauncherOperationRequestMapping.h"
-#include "LauncherContentModel.h"
-#include "LauncherSettings.h"
-#include "LauncherToolchainUiModel.h"
-#include "LauncherUiDesign.h"
-#include "LauncherUiModel.h"
-#include "LauncherVisualStyle.h"
+#include "Gui/Shell/LauncherActivityPanel.h"
+#include "Gui/Shell/LauncherWorkflowPanel.h"
+#include "Gui/Widgets/LauncherActionWidgets.h"
+#include "Gui/App/LauncherBackend.h"
+#include "Gui/Models/LauncherCleanUiModel.h"
+#include "Gui/Models/LauncherDependencyUiModel.h"
+#include "Gui/Style/LauncherIconLibrary.h"
+#include "Gui/Widgets/LauncherLayoutWidgets.h"
+#include "Gui/Models/LauncherLevelUiModel.h"
+#include "Gui/Models/LauncherOperationRequestFactory.h"
+#include "Gui/Operations/LauncherOperationRequestMapping.h"
+#include "Gui/Models/LauncherContentModel.h"
+#include "Gui/App/LauncherSettings.h"
+#include "Gui/Models/LauncherToolchainUiModel.h"
+#include "Gui/Style/LauncherUiDesign.h"
+#include "Gui/Models/LauncherUiModel.h"
+#include "Gui/Style/LauncherVisualStyle.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "SparkleLauncher/CookOperations.h"
@@ -66,49 +72,11 @@
 
 namespace SparkleLauncher
 {
-	static constexpr int kSpaceTiny = LauncherUi::Space::Tiny;
-	static constexpr int kSpaceSmall = LauncherUi::Space::Small;
-	static constexpr int kSpaceMedium = LauncherUi::Space::Medium;
-	static constexpr int kSpaceLarge = LauncherUi::Space::Large;
-	static constexpr int kPanelHorizontalMargin = LauncherUi::Shell::PanelHorizontalMargin;
-	static constexpr int kPanelVerticalMargin = LauncherUi::Shell::PanelVerticalMargin;
-	static constexpr int kFieldLabelWidth = LauncherUi::Row::FieldLabelWidth;
-	static constexpr int kLauncherIconSize = LauncherUi::Icon::DefaultSize;
 	static constexpr int kLauncherMinimumWidth = LauncherUi::Window::MinimumWidth;
 	static constexpr int kLauncherMinimumHeight = LauncherUi::Window::MinimumHeight;
 	static constexpr int kLauncherInitialWidth = LauncherUi::Window::InitialWidth;
 	static constexpr int kLauncherInitialHeight = LauncherUi::Window::InitialHeight;
-	static constexpr const char* kColorStateRunning = LauncherUi::Color::StateRunning;
-	static constexpr const char* kColorStateSuccess = LauncherUi::Color::StateSuccess;
-	static constexpr const char* kColorStateDestructive = LauncherUi::Color::StateDestructive;
-	static constexpr const char* kColorStateWarning = LauncherUi::Color::StateWarning;
 	static constexpr qint64 kActivationRefreshIntervalMs = 1500;
-
-	static QString FirstReadinessContaining(const std::vector<std::string>& messages, const QString& needle)
-	{
-		for (const std::string& message : messages)
-		{
-			const QString text = QString::fromStdString(message);
-			if (text.contains(needle, Qt::CaseInsensitive))
-			{
-				return text;
-			}
-		}
-		return QString();
-	}
-
-	static QString FirstBlockingReadinessMessage(const BuildWorkspaceOperationPlan& plan)
-	{
-		for (const std::string& message : plan.ReadinessMessages)
-		{
-			if (!message.empty())
-			{
-				return QString::fromStdString(message);
-			}
-		}
-
-		return "This workflow is currently blocked.";
-	}
 
 	static QString FirstBlockingReadinessMessage(const std::vector<std::string>& readinessMessages)
 	{
@@ -121,6 +89,26 @@ namespace SparkleLauncher
 		}
 
 		return "This workflow is currently blocked.";
+	}
+
+	static void RestoreScrollBarPosition(QScrollBar* scrollBar, int position, QObject* context)
+	{
+		if (scrollBar == nullptr)
+		{
+			return;
+		}
+		QPointer<QScrollBar> guardedScrollBar(scrollBar);
+
+		QTimer::singleShot(
+		    0,
+		    context,
+		    [guardedScrollBar, position]()
+		    {
+			    if (guardedScrollBar != nullptr)
+			    {
+				    guardedScrollBar->setValue(position);
+			    }
+		    });
 	}
 
 	LauncherMainWindow::LauncherMainWindow(std::filesystem::path workspaceRoot, LauncherContentModel& contentModel, LauncherSettings& settings, LauncherBackend& backend, QWidget* parent) :
@@ -143,6 +131,9 @@ namespace SparkleLauncher
 		rootLayout->setContentsMargins(0, 0, 0, 0);
 		rootLayout->setSpacing(0);
 
+		// The workflow panel invokes its page factory during construction.
+		InitializeWorkflowPresentation(*centralWidget);
+
 		m_workflowPanel = new LauncherWorkflowPanel(
 		    m_icons,
 		    [this](const QString& operationId) { return DisplayNameForOperation(operationId); },
@@ -152,7 +143,6 @@ namespace SparkleLauncher
 
 		connect(m_workflowPanel, &LauncherWorkflowPanel::OperationSelected, this, &LauncherMainWindow::SetSelectedOperation);
 		rootLayout->addWidget(m_workflowPanel, 1);
-		m_activityPanel = new LauncherActivityPanel(m_icons, [this](QWidget* widget) { RegisterFocusable(widget); }, [this](const QString& runId) { m_backend.CancelOperation(runId); }, centralWidget);
 
 		rootLayout->addWidget(m_activityPanel, 0);
 		rootLayout->addWidget(CreateFooterContextPanel(centralWidget), 0);
@@ -178,6 +168,32 @@ namespace SparkleLauncher
 		connect(qApp, &QGuiApplication::applicationStateChanged, this, &LauncherMainWindow::HandleApplicationStateChanged);
 
 		QTimer::singleShot(0, this, &LauncherMainWindow::RefreshContent);
+	}
+
+	void LauncherMainWindow::InitializeWorkflowPresentation(QWidget& parent)
+	{
+		m_activityPanel = new LauncherActivityPanel(m_icons, [this](QWidget* widget) { RegisterFocusable(widget); }, [this](const QString& runId) { m_backend.CancelOperation(runId); }, &parent);
+
+		m_sceneCatalog = new LauncherSceneCatalog(
+		    m_workspaceRoot,
+		    m_contentModel,
+		    m_settings,
+		    *m_activityPanel,
+		    [this](LauncherOperationRequest request, const QString& title) { return StartOperation(std::move(request), title); },
+		    *this);
+
+		m_workspaceSetup = new LauncherWorkspaceSetup(
+		    m_workspaceRoot,
+		    m_contentModel,
+		    m_settings,
+		    [this](LauncherOperationRequest request, const QString& title) { return StartOperation(std::move(request), title); },
+		    *this);
+
+		connect(m_sceneCatalog, &LauncherSceneCatalog::FocusableWidgetCreated, this, &LauncherMainWindow::RegisterFocusable);
+		connect(m_sceneCatalog, &LauncherSceneCatalog::StateChanged, this, &LauncherMainWindow::UpdateRunAvailability);
+		connect(m_workspaceSetup, &LauncherWorkspaceSetup::FocusableWidgetCreated, this, &LauncherMainWindow::RegisterFocusable);
+		connect(m_workspaceSetup, &LauncherWorkspaceSetup::OperationSelected, this, &LauncherMainWindow::SetSelectedOperation);
+		connect(m_workspaceSetup, &LauncherWorkspaceSetup::CompilerSelected, this, &LauncherMainWindow::SelectWorkspaceCompiler);
 	}
 
 	void LauncherMainWindow::HandleApplicationStateChanged(Qt::ApplicationState state)
@@ -295,10 +311,8 @@ namespace SparkleLauncher
 			page->deleteLater();
 		}
 		m_optionsPageByOperation.clear();
-		m_levelStatusLabels.clear();
-		m_levelActionButtons.clear();
-		m_sourceDependencyStatusLabels.clear();
-		m_sourceDependencyActionButtons.clear();
+		m_sceneCatalog->ResetWidgets();
+		m_workspaceSetup->ResetWidgets();
 
 		EnsureOptionsPage(m_selectedOperationId);
 		if (m_optionsPageByOperation.contains(m_selectedOperationId))
@@ -306,39 +320,12 @@ namespace SparkleLauncher
 			m_optionsStack->setCurrentIndex(m_optionsPageByOperation.value(m_selectedOperationId));
 			if (QScrollArea* rebuiltScrollArea = qobject_cast<QScrollArea*>(m_optionsStack->currentWidget()))
 			{
-				if (QScrollBar* verticalScrollBar = rebuiltScrollArea->verticalScrollBar())
-				{
-					QPointer<QScrollBar> guardedScrollBar(verticalScrollBar);
-
-					QTimer::singleShot(
-					    0,
-					    this,
-					    [guardedScrollBar, preservedVerticalScroll]()
-					    {
-						    if (guardedScrollBar != nullptr)
-						    {
-							    guardedScrollBar->setValue(preservedVerticalScroll);
-						    }
-					    });
-				}
-				if (QScrollBar* horizontalScrollBar = rebuiltScrollArea->horizontalScrollBar())
-				{
-					QPointer<QScrollBar> guardedScrollBar(horizontalScrollBar);
-
-					QTimer::singleShot(
-					    0,
-					    this,
-					    [guardedScrollBar, preservedHorizontalScroll]()
-					    {
-						    if (guardedScrollBar != nullptr)
-						    {
-							    guardedScrollBar->setValue(preservedHorizontalScroll);
-						    }
-					    });
-				}
+				RestoreScrollBarPosition(rebuiltScrollArea->verticalScrollBar(), preservedVerticalScroll, this);
+				RestoreScrollBarPosition(rebuiltScrollArea->horizontalScrollBar(), preservedHorizontalScroll, this);
 			}
 		}
 
+		ConfigureTabOrder();
 		m_isRebuildingOptions = false;
 	}
 
@@ -362,14 +349,16 @@ namespace SparkleLauncher
 		}
 
 		widget->setFocusPolicy(Qt::StrongFocus);
+		m_tabOrderWidgets.removeAll(nullptr);
 		m_tabOrderWidgets.push_back(widget);
 	}
 
 	void LauncherMainWindow::ConfigureTabOrder()
 	{
 		QWidget* previousWidget = nullptr;
-		for (QWidget* widget : m_tabOrderWidgets)
+		for (const QPointer<QWidget>& guardedWidget : m_tabOrderWidgets)
 		{
+			QWidget* widget = guardedWidget.data();
 			if (widget == nullptr)
 			{
 				continue;
@@ -393,99 +382,58 @@ namespace SparkleLauncher
 		if (m_selectedOperationId.isEmpty())
 		{
 			const QString reason = "Select a workflow before running.";
-			m_runButton->setEnabled(false);
-			m_runButton->setToolTip(reason);
-			m_runButton->setAccessibleDescription(reason);
-			m_cleanButton->setEnabled(false);
-			m_cleanButton->setToolTip("Select a workflow before cleaning generated outputs.");
-			m_cleanButton->setAccessibleDescription("Select a workflow before cleaning generated outputs.");
+			ApplyActionAvailability(*m_runButton, false, reason);
+			ApplyActionAvailability(*m_cleanButton, false, "Select a workflow before cleaning generated outputs.");
 			return;
 		}
 
 		m_runButton->setVisible(true);
 		const bool isLevelCatalog = m_selectedOperationId == LauncherScenesOperationId();
-		m_cleanButton->setVisible(isLevelCatalog || SupportsActionSpecificClean(m_selectedOperationId));
+		m_cleanButton->setVisible(isLevelCatalog || SupportsActionSpecificClean(m_selectedOperationId.toStdString()));
 
 		if (OperationNeedsContent(m_selectedOperationId) && m_contentModel.ContentId().isEmpty())
 		{
 			const QString reason = "Workspace content is unavailable. Confirm this is a complete Sparkle workspace, then regenerate build files if needed.";
-			m_runButton->setEnabled(false);
-			m_runButton->setToolTip(reason);
-			m_runButton->setAccessibleDescription(reason);
-			m_cleanButton->setEnabled(false);
-			m_cleanButton->setToolTip("Workspace content is unavailable for this clean action.");
-			m_cleanButton->setAccessibleDescription("Workspace content is unavailable for this clean action.");
+			ApplyActionAvailability(*m_runButton, false, reason);
+			ApplyActionAvailability(*m_cleanButton, false, "Workspace content is unavailable for this clean action.");
 			return;
 		}
 
-		const QVector<LauncherCleanTarget> cleanTargets = SupportsActionSpecificClean(m_selectedOperationId)
+		const QVector<LauncherCleanTarget> cleanTargets = SupportsActionSpecificClean(m_selectedOperationId.toStdString())
 		    ? BuildActionSpecificCleanTargets(
-		          BuildActionCleanTargetContext(m_workspaceRoot, m_contentModel, m_settings, std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()), m_selectedOperationId))
+		          BuildActionCleanTargetRequest(m_workspaceRoot, m_contentModel, m_settings, std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()), m_selectedOperationId))
 		    : QVector<LauncherCleanTarget>();
 
 		const bool cleanWorkspaceSelected = m_selectedOperationId == "workspace.clean";
 		const QString cleanScopeError = cleanWorkspaceSelected ? CleanScopeSelectionError(m_settings.CleanScope()) : QString();
 		if (!cleanScopeError.isEmpty())
 		{
-			m_runButton->setEnabled(false);
-			m_runButton->setToolTip(cleanScopeError);
-			m_runButton->setAccessibleDescription(cleanScopeError);
+			ApplyActionAvailability(*m_runButton, false, cleanScopeError);
 			return;
 		}
-		bool canSyncLevel = false;
-		bool hasSelectedLevels = false;
-		bool hasExtractedLevelContent = false;
 		if (isLevelCatalog)
 		{
-			const LauncherLevelUiModel levelModel = BuildLevelUiModel();
-			for (const LauncherLevelUiEntry& level : levelModel.Levels)
-			{
-				canSyncLevel = canSyncLevel || (level.Id != "Empty" && level.CanSelect);
-				if (level.Id != "Empty" && level.Selected)
-				{
-					hasSelectedLevels = true;
-					break;
-				}
-			}
-
-			const LauncherContentSummary* content = m_contentModel.Content();
-			if (content != nullptr)
-			{
-				try
-				{
-					hasExtractedLevelContent = !BuildLevelCleanTargets(*content).empty();
-				}
-				catch (const Diagnostics::Error&)
-				{
-					// The catalog page owns the detailed load diagnostic. Keep the footer safely disabled here.
-				}
-			}
-		}
-		const bool canClean = hasSelectedLevels || hasExtractedLevelContent || !cleanTargets.isEmpty();
-		m_cleanButton->setEnabled(canClean);
-
-		m_cleanButton->setToolTip(
-		    isLevelCatalog ? (canClean ? "Disable all selected levels and clean extracted external level content. Cached archives are preserved." : "No selected levels are available to clean.")
-		                   : (canClean ? "Clean only the generated outputs tied to " + DisplayNameForOperation(m_selectedOperationId) + "." : "Clean is not available for this workflow."));
-
-		m_cleanButton->setAccessibleDescription(m_cleanButton->toolTip());
-		if (isLevelCatalog)
-		{
-			const QString reason = canSyncLevel ? QStringLiteral("Sync all available levels. Existing runs keep going.") : QStringLiteral("No catalog levels are available to sync.");
-			m_runButton->setEnabled(canSyncLevel);
-			m_runButton->setToolTip(reason);
-			m_runButton->setAccessibleDescription(reason);
+			m_sceneCatalog->UpdateActionAvailability(*m_cleanButton, *m_runButton, !cleanTargets.isEmpty());
 			return;
 		}
+		const bool canClean = !cleanTargets.isEmpty();
 
+		ApplyActionAvailability(
+		    *m_cleanButton,
+		    canClean,
+		    canClean ? "Clean only the generated outputs tied to " + DisplayNameForOperation(m_selectedOperationId) + "." : "Clean is not available for this workflow.");
+
+		UpdateWorkflowRunAvailability();
+	}
+
+	void LauncherMainWindow::UpdateWorkflowRunAvailability()
+	{
 		if (FindBuildWorkspaceOperationDefinition(m_selectedOperationId.toStdString()).has_value())
 		{
 			const BuildWorkspaceOperationRequest request = BuildWorkspacePlanRequest(m_workspaceRoot, m_contentModel, m_settings);
 			const BuildWorkspaceOperationPlan plan = PlanBuildWorkspaceOperation(m_selectedOperationId.toStdString(), request);
-			const QString reason = plan.CanRun ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going." : FirstBlockingReadinessMessage(plan);
-			m_runButton->setEnabled(plan.CanRun);
-			m_runButton->setToolTip(reason);
-			m_runButton->setAccessibleDescription(reason);
+			const QString reason = plan.CanRun ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going." : FirstBlockingReadinessMessage(plan.ReadinessMessages);
+			ApplyActionAvailability(*m_runButton, plan.CanRun, reason);
 			return;
 		}
 
@@ -498,17 +446,13 @@ namespace SparkleLauncher
 			    ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going."
 			    : (plan.ReadinessMessages.empty() ? QStringLiteral("This cooking workflow is currently blocked.") : QString::fromStdString(plan.ReadinessMessages.back()));
 
-			m_runButton->setEnabled(plan.CanRun);
-			m_runButton->setToolTip(reason);
-			m_runButton->setAccessibleDescription(reason);
+			ApplyActionAvailability(*m_runButton, plan.CanRun, reason);
 			return;
 		}
 
 		const QString title = DisplayNameForOperation(m_selectedOperationId);
 		const QString actionDescription = "Run " + title + ". Existing runs keep going.";
-		m_runButton->setEnabled(true);
-		m_runButton->setToolTip(actionDescription);
-		m_runButton->setAccessibleDescription(actionDescription);
+		ApplyActionAvailability(*m_runButton, true, actionDescription);
 	}
 
 	void LauncherMainWindow::SetSelectedOperation(const QString& operationId)

@@ -105,13 +105,7 @@ namespace Hash
 
 	uint64_t Fnv1a64(std::string_view str) noexcept
 	{
-		uint64_t hash = kFnv64OffsetBasis;
-		for (const char character : str)
-		{
-			hash ^= static_cast<uint64_t>(static_cast<unsigned char>(character));
-			hash *= kFnv64Prime;
-		}
-		return hash;
+		return ContinueFnv1a64(kFnv64OffsetBasis, str.data(), str.size());
 	}
 
 	uint64_t Fnv1a64(const void* data, size_t size) noexcept

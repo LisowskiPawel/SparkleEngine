@@ -1,4 +1,4 @@
-#include "LauncherProgressStreamDecoder.h"
+#include "Gui/Operations/LauncherProgressStreamDecoder.h"
 
 #include "ToolWorkProgress.h"
 

@@ -1,6 +1,6 @@
-#include "LauncherVisualStyle.h"
+#include "Gui/Style/LauncherVisualStyle.h"
 
-#include "LauncherUiDesign.h"
+#include "Gui/Style/LauncherUiDesign.h"
 
 #include <QtCore/QString>
 #include <QtWidgets/QWidget>

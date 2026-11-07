@@ -1,6 +1,6 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
-#include "HostGraphicsCapabilities.h"
+#include "Build/Toolchains/HostGraphicsCapabilities.h"
 #include "SparkleLauncher/BuildProfileCatalog.h"
 
 #include <algorithm>

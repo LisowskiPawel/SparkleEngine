@@ -1,4 +1,4 @@
-#include "LauncherSettings.h"
+#include "Gui/App/LauncherSettings.h"
 
 namespace SparkleLauncher
 {

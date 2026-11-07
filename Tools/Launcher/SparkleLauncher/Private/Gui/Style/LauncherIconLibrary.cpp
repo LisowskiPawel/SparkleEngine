@@ -1,6 +1,6 @@
-#include "LauncherIconLibrary.h"
+#include "Gui/Style/LauncherIconLibrary.h"
 
-#include "LauncherUiDesign.h"
+#include "Gui/Style/LauncherUiDesign.h"
 
 #include <QtCore/QStringList>
 #include <QtGui/QFont>

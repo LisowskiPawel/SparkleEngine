@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LauncherBackend.h"
+#include "Gui/App/LauncherBackend.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
@@ -11,7 +11,7 @@
 
 namespace SparkleLauncher
 {
-	struct ActionCleanTargetContext;
+	struct ActionCleanTargetRequest;
 	class LauncherContentModel;
 	class LauncherSettings;
 
@@ -27,7 +27,7 @@ namespace SparkleLauncher
 	    const LauncherSettings& settings,
 	    const QString& operationId);
 
-	ActionCleanTargetContext BuildActionCleanTargetContext(
+	ActionCleanTargetRequest BuildActionCleanTargetRequest(
 	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
 	    const LauncherSettings& settings,

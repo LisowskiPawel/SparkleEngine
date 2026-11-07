@@ -182,7 +182,45 @@ namespace Files
 			}
 		}
 
-		std::vector<Replacement> Plan(std::span<const FilePublication> files) const
+		void RequirePublicationPaths(const FilePublication& file, std::unordered_set<std::wstring>& paths) const
+		{
+			for (const auto& path : {file.StagedPath, file.PublishedPath, BuildTemporaryPath(file.PublishedPath, ".previous-generation")})
+			{
+				bool contained = false;
+				for (const auto& root : Roots)
+				{
+					contained |= path != root && Paths::IsUnderRoot(path, root);
+				}
+				if (!contained)
+				{
+					throw Diagnostics::Error(std::format("Publication path '{}' escapes its output directories.", path.string()));
+				}
+				if (path.filename().wstring().starts_with(L".publication-") || !paths.insert(Paths::MakePathKey(path)).second)
+				{
+					throw Diagnostics::Error("Publication paths overlap each other or coordination files.");
+				}
+			}
+		}
+
+		static void RequirePublicationInputs(const FilePublication& file)
+		{
+			std::error_code error;
+			if (!std::filesystem::is_regular_file(file.StagedPath, error) || error)
+			{
+				throw Diagnostics::Error("Publication staging input is missing or is not a regular file.");
+			}
+			const bool publishedExists = std::filesystem::exists(file.PublishedPath, error);
+			if (error || (publishedExists && !std::filesystem::is_regular_file(file.PublishedPath, error)) || error)
+			{
+				throw Diagnostics::Error("Publication destination is not a regular file.");
+			}
+			if (std::filesystem::exists(BuildTemporaryPath(file.PublishedPath, ".previous-generation"), error) || error)
+			{
+				throw Diagnostics::Error("Publication has an orphaned backup. Clean generated output and cook again.");
+			}
+		}
+
+		std::vector<Replacement> PlanReplacements(std::span<const FilePublication> files) const
 		{
 			std::vector<Replacement> replacements;
 			replacements.reserve(files.size());
@@ -195,36 +233,8 @@ namespace Files
 				}
 				Replacement& replacement = replacements.emplace_back();
 				replacement.File = {Paths::Normalize(file.StagedPath), Paths::Normalize(file.PublishedPath)};
-				for (const auto& path : {replacement.File.StagedPath, replacement.File.PublishedPath, BuildTemporaryPath(replacement.File.PublishedPath, ".previous-generation")})
-				{
-					bool contained = false;
-					for (const auto& root : Roots)
-					{
-						contained |= path != root && Paths::IsUnderRoot(path, root);
-					}
-					if (!contained)
-					{
-						throw Diagnostics::Error(std::format("Publication path '{}' escapes its output directories.", path.string()));
-					}
-					if (path.filename().wstring().starts_with(L".publication-") || !paths.insert(Paths::MakePathKey(path)).second)
-					{
-						throw Diagnostics::Error("Publication paths overlap each other or coordination files.");
-					}
-				}
-				std::error_code error;
-				if (!std::filesystem::is_regular_file(replacement.File.StagedPath, error) || error)
-				{
-					throw Diagnostics::Error("Publication staging input is missing or is not a regular file.");
-				}
-				const bool publishedExists = std::filesystem::exists(replacement.File.PublishedPath, error);
-				if (error || (publishedExists && !std::filesystem::is_regular_file(replacement.File.PublishedPath, error)) || error)
-				{
-					throw Diagnostics::Error("Publication destination is not a regular file.");
-				}
-				if (std::filesystem::exists(BuildTemporaryPath(replacement.File.PublishedPath, ".previous-generation"), error) || error)
-				{
-					throw Diagnostics::Error("Publication has an orphaned backup. Clean generated output and cook again.");
-				}
+				RequirePublicationPaths(replacement.File, paths);
+				RequirePublicationInputs(replacement.File);
 			}
 			return replacements;
 		}
@@ -304,7 +314,7 @@ namespace Files
 			try
 			{
 				RequireComplete();
-				replacements = Plan(files);
+				replacements = PlanReplacements(files);
 				started = !files.empty();
 				if (started)
 				{

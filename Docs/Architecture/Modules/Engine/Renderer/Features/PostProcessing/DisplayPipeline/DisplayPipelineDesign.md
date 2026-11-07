@@ -99,6 +99,7 @@ Default exposure is Automatic with Histogram. Default multiplier bounds are `0.0
 ### Ownership And Frame Placement
 
 - `RenderView` owns resolved display intent for the frame; global settings are not a second runtime authority.
+- `ViewportDisplaySettings.cpp` resolves that intent by reading global CVars, applying viewport exposure overrides, validating display modes and sanitizing exposure values in separate functions. The 2026-11-05 structural cleanup retains those stages in that order and adds no settings representation or CVar policy.
 - The exposure pass reads the original scene-linear lighting result after lighting and before reconstruction/upscaling/debug/presentation consumers.
 - Current/prior 1x1 textures own adaptation history. Scene/view/topology discontinuities invalidate affected history.
 - Exposure is an input to image providers and tone mapping; it does not own either feature.

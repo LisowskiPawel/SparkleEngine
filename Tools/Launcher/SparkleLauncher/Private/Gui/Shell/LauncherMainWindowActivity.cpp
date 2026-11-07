@@ -1,10 +1,12 @@
-#include "LauncherGpuCrashPanel.h"
-#include "LauncherMainWindow.h"
+#include "Gui/Pages/Scenes/LauncherSceneCatalog.h"
+#include "Gui/Pages/Workspace/LauncherWorkspaceSetup.h"
+#include "GpuCrash/LauncherGpuCrashPanel.h"
+#include "Gui/Shell/LauncherMainWindow.h"
 
-#include "LauncherActivityPanel.h"
-#include "Models/LauncherOperationResult.h"
-#include "LauncherSettings.h"
-#include "LauncherWorkflowPanel.h"
+#include "Gui/Shell/LauncherActivityPanel.h"
+#include "Gui/Models/LauncherOperationResult.h"
+#include "Gui/App/LauncherSettings.h"
+#include "Gui/Shell/LauncherWorkflowPanel.h"
 
 namespace SparkleLauncher
 {
@@ -38,38 +40,10 @@ namespace SparkleLauncher
 		const QString effectiveTitle = m_activityPanel->DisplayOperationFinished(runId, title, result);
 		m_workflowPanel->setEnabled(!m_activityPanel->HasActiveRun());
 
-		bool refreshesSourceDependencyState = false;
-		for (auto dependencyRun = m_sourceDependencyRunIds.begin(); dependencyRun != m_sourceDependencyRunIds.end();)
+		const bool sceneStatusHandled = m_sceneCatalog->CompleteOperation(runId, operationId, effectiveTitle, result);
+		const bool setupStatusHandled = m_workspaceSetup->CompleteOperation(runId);
+		if (sceneStatusHandled || setupStatusHandled)
 		{
-			if (dependencyRun.value() == runId)
-			{
-				refreshesSourceDependencyState = true;
-				dependencyRun = m_sourceDependencyRunIds.erase(dependencyRun);
-			}
-			else
-			{
-				++dependencyRun;
-			}
-		}
-		m_cleaningSourceDependencyRunIds.remove(runId);
-
-		const bool refreshesLevelState = operationId == QStringLiteral("levels.sync") || m_pendingLevelSelectionUpdates.contains(runId);
-		if (m_pendingLevelSelectionUpdates.contains(runId))
-		{
-			const PendingLevelSelectionUpdate update = m_pendingLevelSelectionUpdates.take(runId);
-			if (succeeded)
-			{
-				SetLevelsSelected(update.ContentRoot, update.LevelIds, update.Selected, effectiveTitle);
-			}
-		}
-		if (refreshesLevelState)
-		{
-			RefreshLevelActionButtons();
-			UpdateRunAvailability();
-		}
-		else if (refreshesSourceDependencyState)
-		{
-			RefreshSourceDependencyRows();
 			UpdateRunAvailability();
 		}
 		else
@@ -81,13 +55,6 @@ namespace SparkleLauncher
 		if (succeeded && launcherRestartPending)
 		{
 			PromptForLauncherRestart();
-		}
-
-		if (runId == m_startingLevelRunId)
-		{
-			m_startingLevelRunId.clear();
-			m_startingLevelId.clear();
-			RefreshLevelActionButtons();
 		}
 	}
 }

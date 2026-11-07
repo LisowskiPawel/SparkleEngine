@@ -1,6 +1,6 @@
-#include "LauncherOperationExecution.h"
+#include "Gui/Operations/LauncherOperationExecution.h"
 
-#include "LauncherOperationRequestMapping.h"
+#include "Gui/Operations/LauncherOperationRequestMapping.h"
 #include "Tasks/Public/TaskExecutionContext.h"
 
 #include <stdexcept>

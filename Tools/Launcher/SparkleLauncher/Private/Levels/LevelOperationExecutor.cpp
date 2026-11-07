@@ -1,7 +1,7 @@
 #include "SparkleLauncher/LevelOperations.h"
 
-#include "LevelOperationProcessRequests.h"
-#include "LauncherOperationProgress.h"
+#include "Levels/LevelOperationProcessRequests.h"
+#include "Operations/LauncherOperationProgress.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 

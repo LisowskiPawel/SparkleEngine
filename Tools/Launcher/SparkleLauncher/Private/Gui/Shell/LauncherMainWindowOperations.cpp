@@ -1,13 +1,18 @@
-#include "LauncherMainWindow.h"
+#include "Gui/Models/LauncherCleanUiModel.h"
+#include "Gui/Pages/Scenes/LauncherSceneCatalog.h"
+#include "Gui/Pages/Workspace/LauncherWorkspaceSetup.h"
+#include "Gui/Widgets/LauncherOptionWidgets.h"
+#include "Gui/Operations/LauncherOperationConfirmation.h"
+#include "Gui/Shell/LauncherMainWindow.h"
 
-#include "LauncherActivityPanel.h"
-#include "LauncherActionWidgets.h"
-#include "LauncherBackend.h"
-#include "LauncherOperationRequestFactory.h"
-#include "LauncherOperationRequestMapping.h"
-#include "LauncherContentModel.h"
-#include "LauncherSettings.h"
-#include "LauncherWorkflowCatalog.h"
+#include "Gui/Shell/LauncherActivityPanel.h"
+#include "Gui/Widgets/LauncherActionWidgets.h"
+#include "Gui/App/LauncherBackend.h"
+#include "Gui/Models/LauncherOperationRequestFactory.h"
+#include "Gui/Operations/LauncherOperationRequestMapping.h"
+#include "Gui/Models/LauncherContentModel.h"
+#include "Gui/App/LauncherSettings.h"
+#include "Gui/Models/LauncherWorkflowCatalog.h"
 
 #include "ToolOutputPaths.h"
 
@@ -31,7 +36,7 @@ namespace SparkleLauncher
 
 		if (m_selectedOperationId == LauncherScenesOperationId())
 		{
-			SyncAllLevels();
+			m_sceneCatalog->SyncAllLevels();
 			return;
 		}
 
@@ -50,7 +55,7 @@ namespace SparkleLauncher
 
 		if (m_selectedOperationId == "levels.sync")
 		{
-			SyncAllLevels();
+			m_sceneCatalog->SyncAllLevels();
 			return;
 		}
 
@@ -58,7 +63,7 @@ namespace SparkleLauncher
 		    ? BuildScopedCleanOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_settings.CleanScope(), std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()))
 		    : BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
 
-		if (!ConfirmRunRequest(request))
+		if (!ConfirmLauncherRunRequest(*this, request))
 		{
 			return;
 		}
@@ -75,11 +80,11 @@ namespace SparkleLauncher
 		}
 		if (m_selectedOperationId == LauncherScenesOperationId())
 		{
-			CleanAllLevels();
+			m_sceneCatalog->CleanAllLevels();
 			return;
 		}
 
-		if (!SupportsActionSpecificClean(m_selectedOperationId))
+		if (!SupportsActionSpecificClean(m_selectedOperationId.toStdString()))
 		{
 			return;
 		}
@@ -100,40 +105,12 @@ namespace SparkleLauncher
 			return;
 		}
 
-		if (!ConfirmRunRequest(request))
+		if (!ConfirmLauncherRunRequest(*this, request))
 		{
 			return;
 		}
 
 		StartOperation(std::move(request), "Clean " + DisplayNameForOperation(m_selectedOperationId));
-	}
-
-	QPushButton* LauncherMainWindow::CreateStatusActionButton(const QString& actionId, const QString& actionLabel, const QString& actionTitle, bool navigateInsteadOfRun)
-	{
-		QPushButton* button = new QPushButton(this);
-		ApplyStatusActionButtonPresentation(*button, actionLabel, "warning");
-		button->setAccessibleName(actionTitle);
-		button->setToolTip(actionTitle + ".");
-		RegisterFocusable(button);
-		connect(button, &QPushButton::clicked, this, [this, actionId, actionTitle, navigateInsteadOfRun]() { TriggerActionDependencyRegenerate(actionId, actionTitle, navigateInsteadOfRun); });
-		return button;
-	}
-
-	void LauncherMainWindow::TriggerActionDependencyRegenerate(const QString& actionId, const QString& actionTitle, bool navigateInsteadOfRun)
-	{
-		if (navigateInsteadOfRun)
-		{
-			SetSelectedOperation(actionId);
-			return;
-		}
-
-		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, actionId);
-		if (!ConfirmRunRequest(request))
-		{
-			return;
-		}
-
-		StartOperation(std::move(request), actionTitle);
 	}
 
 	const LauncherOperationDescriptor* LauncherMainWindow::FindOperationDescriptor(const QString& operationId) const
@@ -173,49 +150,6 @@ namespace SparkleLauncher
 
 		return operationId == LauncherScenesOperationId() || operationId == "levels.sync" || operationId == "levels.run" || operationId.startsWith("workspace.build.")
 		    || operationId.startsWith("cook.");
-	}
-
-	bool LauncherMainWindow::ConfirmRunRequest(LauncherOperationRequest& request) const
-	{
-		if (request.OperationId != "workspace.clean" || request.ConfirmClean)
-		{
-			return true;
-		}
-
-		const bool customCleanRequested = !request.CleanTargets.isEmpty();
-		QStringList scopeNames;
-		if (customCleanRequested)
-		{
-			for (const LauncherCleanTarget& target : request.CleanTargets)
-			{
-				scopeNames.push_back(target.DisplayName + "\n" + target.Path);
-			}
-		}
-		else
-		{
-			for (const QString& scopeValue : request.CleanScope.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts))
-			{
-				scopeNames.push_back(CleanScopeDisplayName(scopeValue));
-			}
-		}
-
-		QString message = customCleanRequested ? "Generated outputs to clean:\n\n" + scopeNames.join("\n\n") : "Clean scopes:\n" + scopeNames.join('\n');
-		message += customCleanRequested ? "\n\nThis removes only the generated outputs mapped to the selected action. Continue?" : "\n\nThis removes generated files for the selected scope. Continue?";
-
-		const QMessageBox::StandardButton result = QMessageBox::question(
-		    const_cast<LauncherMainWindow*>(this),
-		    customCleanRequested ? "Confirm Action Clean" : "Confirm Clean Workspace",
-		    message,
-		    QMessageBox::Ok | QMessageBox::Cancel,
-		    QMessageBox::Cancel);
-
-		if (result != QMessageBox::Ok)
-		{
-			return false;
-		}
-
-		request.ConfirmClean = true;
-		return true;
 	}
 
 	void LauncherMainWindow::PromptForLauncherRestart()
@@ -263,7 +197,7 @@ namespace SparkleLauncher
 			m_pendingRestartRunIds.push_back(runId);
 		}
 		m_activityPanel->RegisterRun(request.RunId, title);
-		TrackSourceDependencyRun(request, runId);
+		m_workspaceSetup->TrackSourceDependencyRun(request, runId);
 		m_backend.RunOperation(std::move(request));
 		return runId;
 	}

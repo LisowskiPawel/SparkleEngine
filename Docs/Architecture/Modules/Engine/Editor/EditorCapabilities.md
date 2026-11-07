@@ -37,10 +37,22 @@ The Editor should expose owner commands and read models, not mutate Renderer/RHI
 
 ### UI Implementation Boundary
 
+**Capability placement, 2026-11-07:** source organization was reconciled against
+`8cbd850c` plus the scoped working tree. `Private/Workspace` owns UI composition
+and window chrome; `Scene/Inspection` owns typed inspectors beside scene models
+and transactions; `Settings/Rendering`, `Shaders`, `AssetInspection`, `Console`
+and `Viewport` contain their own presentation. Public viewport output intent
+lives under `Public/Viewport`. Icons have one vocabulary in
+[`Icons/EditorIcon.h`](../../../../../Engine/Editor/Private/Icons/EditorIcon.h).
+Menu, property-editing, icon and panel widgets expose focused headers under
+`Private/Widgets`; no utility umbrella or panel forwarding headers remain.
+The host API, world commands, settings authority and render-packet lifetime are
+preserved. This source map makes no visual or release acceptance claim.
+
 - Private `UIImplementation` owns panels, controllers, scene/history state and their composition. Private `ImGui/EditorImGuiContext` owns the ImGui context, stable ini filename, platform backend, DPI and window-message subscriptions. UI binds its logical shortcut handler through that owner; native message/repeat handling stays below composition. Normal teardown removes subscriptions, destroys viewport overlays/widgets and icons, then releases the platform backend and context. The context member is declared before its clients so constructor unwinding preserves their context lifetime; partial subscription setup rolls back. The public `UI` facade retains host services and viewport operations.
 - [ViewportToolbar](../../../../../Engine/Editor/Private/Viewport/ViewportToolbar.h) owns camera, view-mode and Show controls. `ViewportPanel` composes layout, fresh input bounds, aspect-fitted image and progress; its request is the mode/extent publication boundary.
 - [ViewportOverlay](../../../../../Engine/Editor/Public/Viewport/ViewportOverlay.h) is the optional Application-installed surface overlay. ViewportPanel destroys it before icon/ImGui teardown. See [capture composition](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/ExecutionArchitecture.md#implemented-editor-viewport-composition) for clients and evidence.
-- [Menu widgets](../../../../../Engine/Editor/Private/Util/UiMenuWidgets.cpp) own shared palette, font-relative metrics and semantic drawing. ImGui owns input, navigation and popup lifetime; panels retain labels, control state and commands. `MenuStyleScope` restores style on every exit.
+- [Menu widgets](../../../../../Engine/Editor/Private/Widgets/UiMenuWidgets.cpp) own shared palette, font-relative metrics and semantic drawing. ImGui owns input, navigation and popup lifetime; panels retain labels, control state and commands. `MenuStyleScope` restores style on every exit.
 - The [icon service](Icons.md) owns shared image resources and per-profile admission; clients borrow drawing and own layout. `UiIconWidgets.cpp` maps `EditorIcon` glyphs and owns badge/tooltip drawing with one `EditorIconSize`.
 
 Orchestration ownership was reconciled on 2026-10-27. The UI constructor orders
@@ -48,7 +60,7 @@ scene editing, render-packet construction, rendering settings, console, ImGui,
 workspace and subscription setup; `UIInitialization.cpp` implements host-service
 binding without changing member or teardown lifetime. `MainMenuBarPanel` composes
 menus and delegates drag regions, window buttons and glyph geometry to private
-`Panels/TitleBarWindowControls`. `ViewportToolbar::Draw` sequences window
+`Workspace/TitleBarWindowControls`. `ViewportToolbar::Draw` sequences window
 admission, controls, decoration and closure; private `ViewportViewModeMenu` owns
 the mode catalog, grouped rows and selection routing through the existing
 viewport session. Both toolbar exit paths restore the same window/style stack.
@@ -71,13 +83,48 @@ have source/build evidence only.
 
 The Console starts collapsed. Its footer button, `~` outside text input, or `Window > Console` opens and focuses it; focused `Esc` closes it without discarding scrollback/history. Registration, lookup, help and completion share one command-descriptor vector; lookup and duplicate rejection are case-insensitive. These are source contracts, not interactive, DPI or shutdown acceptance.
 
-Shader inspection and mesh preview source ownership was reconciled on 2026-10-25. Private `Shaders/ShaderExportInspection` owns shader-export discovery, bundle validation, text loading, invalidation and missing-file messages; `ShaderToolsPanel` retains shader selection, actions, and tabs. Its registered-shader model is Editor-private; shader names are presentation and the stable shader type ID owns selection. Each model refresh captures one Renderer diagnostic snapshot and resolves all export directories in one traversal under the existing publication read scope. A bundle must match shader type, compile-input hash, target and backend, and its manifest paths must remain relative and inside that scope. Resolved paths populate the existing rows, preserving per-row availability; no second persistent catalog or cache is retained. Text inspection caches only the selected directory's optional result and reload/refresh invalidates it. The inspector does not consume the panel's row type or duplicate shader identity. Private `Panels/Diagnostics/MeshPreview` owns bounds, projection, triangle traversal, and preview drawing; `UsedMeshesPanel` retains selection, preview controls, and the diagnostic-provider binding. These are source and build boundaries, not interactive or visual acceptance.
+Shader inspection and mesh preview source ownership was reconciled on 2026-10-25. Private `Shaders/ShaderExportInspection` owns shader-export discovery, bundle validation, text loading, invalidation and missing-file messages; `ShaderToolsPanel` retains shader selection, actions, and tabs. Its registered-shader model is Editor-private; shader names are presentation and the stable shader type ID owns selection. Each model refresh captures one Renderer diagnostic snapshot and resolves all export directories in one traversal under the existing publication read scope. A bundle must match shader type, compile-input hash, target and backend, and its manifest paths must remain relative and inside that scope. Resolved paths populate the existing rows, preserving per-row availability; no second persistent catalog or cache is retained. Text inspection caches only the selected directory's optional result and reload/refresh invalidates it. The inspector does not consume the panel's row type or duplicate shader identity. Private `AssetInspection/MeshPreview` owns bounds, projection, triangle traversal, and preview drawing; `UsedMeshesPanel` retains selection, preview controls, and the diagnostic-provider binding. These are source and build boundaries, not interactive or visual acceptance.
 
 **Host boundary, 2026-11-04:** Application appends output through `UI::AppendConsoleOutput`; the console controller, parser, fixed 128-entry history and bounded 512-record session live under `Engine/Editor/Private/Console`. `ConsoleCommands` owns one immutable six-command table for help, dispatch and completion. UI composition binds CVar control, shader compilation and shader reload actions; the session owns those synchronous callables. There is no mutable command registry or per-command captured callback collection. `ConsoleCVarCommands` preserves list/get/set argument validation, typed requests, result formatting and live name completion. Core and the host-bound execution owner retain all CVar mechanics and rendering-control policy. Capture operations return optional output records and composition chooses when to reveal the console. The docked console is the sole presentation path. Settings forwards the supplied restart action: Application closes its window only after Core successfully relaunches the process with its current command line and working directory. There is no allocated Editor restart service or Editor-owned argument encoder.
 
 Editor publicly depends on Core values, Renderer contracts, GameFramework read/edit contracts and the RHI capture types exposed by its overlay contract. Platform and ImGui are private dependencies; forward-declared window/input references do not require exporting Platform's implementation dependency.
 
 **Texture inspection boundary, 2026-11-01:** the texture panel consumes the live Renderer diagnostic snapshot for names, cooked paths, format, residency and previews. Current texture products provide no authored-source metadata. The panel therefore presents the cooked key directly without discovering, parsing or caching obsolete cooker summaries. Mesh metadata continues to come from its supported cooked sidecar; compiler-artifact inspection reads outputs still produced by ShaderCompiler. This source cleanup does not establish interactive or visual acceptance.
+
+The 2026-11-05 Editor responsibility pass separates
+[`ShaderExportDiscovery`](../../../../../Engine/Editor/Private/Shaders/ShaderExportDiscovery.cpp)
+from the selected-artifact text cache. Discovery holds the publication read scope
+while it reads cook manifests, validates request paths and matches active shader
+identities. The registered-shader model consumes discovery directly;
+`ShaderExportInspection` owns only selected-directory text and invalidation.
+
+[`ConsoleInputParser`](../../../../../Engine/Editor/Private/Console/ConsoleInputParser.cpp)
+reads tokens directly into the command and arguments, retaining its own quoting,
+escaping and empty-token grammar. The
+[`light inspector`](../../../../../Engine/Editor/Private/Scene/Inspection/SceneLightInspector.cpp)
+composes common and type-specific categories, shares repeated field policies and
+submits one forward/inverse transaction. Widgets commit only accepted field
+drafts. The
+[`outliner`](../../../../../Engine/Editor/Private/Scene/SceneOutlinerPanel.cpp)
+shares section admission and selection-cell drawing while keeping selection and
+visibility commands on the existing transaction path.
+
+Camera and mesh inspectors share
+[`SceneTransformEditor`](../../../../../Engine/Editor/Private/Scene/SceneTransformEditor.cpp)
+for translation, rotation and scale widgets. Each inspector supplies its reset
+position and owns category admission, immutable-source drafts and semantic
+forward/inverse transactions. Settings rows share one label/column setup while
+their typed widgets retain value handling, focus and change callbacks.
+`DrawDetailsCategory` draws a collapsing header and returns admission; its style
+scope closes within that call. Property widgets retain their real row/table scopes.
+
+The [`settings window`](../../../../../Engine/Editor/Private/Settings/SettingsPanel.cpp)
+delegates window admission/constraints and restart-footer drawing, and the
+[`Show menu`](../../../../../Engine/Editor/Private/Viewport/ViewportShowMenu.cpp)
+delegates width measurement and control composition. Existing refresh order,
+ImGui scopes, host command boundaries, input and CVar controls remain in place.
+Source comparisons, controlled native CPU checks and the Editor library build
+support these changes; GUI, visual, GPU and release acceptance remain open.
 
 ### Explicit Shader Compilation
 
@@ -93,6 +140,18 @@ The settings UI separates window orchestration, category presentation, and edit 
 - `EngineRenderingSettingsController` owns the mutable interaction state, semantic setters, commit/refresh callbacks, and restart comparison. Application persistence and Renderer-owned value/active-state policy remain outside these UI implementations.
 
 This source separation was reconciled on 2026-10-04; it does not establish runtime or usability acceptance.
+
+The 2026-11-05 cleanup keeps exposure entry points as mode/value composition and uses one fixed seven-row override catalog for field binding, widget limits and mode-dependent availability. Shared enum options and namespace functions replace duplicate option types and stateless class shells. Global edits still use the settings controller; viewport edits still mutate only the caller's override draft. [`ViewportCameraProperties`](../../../../../Engine/Editor/Private/Viewport/ViewportCameraProperties.cpp) composes camera controls and exposure while focused functions draw projection, navigation and orthographic properties.
+
+[`EditorViewportSettingsSerialization`](../../../../../Engine/Editor/Private/Viewport/EditorViewportSettingsSerialization.cpp)
+owns INI stream parsing and writing through one field list. Numeric fields commit
+only after a complete finite conversion; malformed input and enum values outside
+their representation leave the existing field unchanged. `EditorViewportSettings`
+retains path admission, semantic sanitization, mutation and save results.
+[`ReferencePathTracerOverlay`](../../../../../Engine/Editor/Private/Viewport/ReferencePathTracer/ReferencePathTracerOverlay.cpp)
+composes status, playback and details while focused functions retain widget and
+export-action mechanics. This changes no settings representation, CVar, viewport
+action or host lifetime and does not establish visual or interactive acceptance.
 
 ## Workspace And Level Surface
 

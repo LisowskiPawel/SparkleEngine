@@ -1,7 +1,7 @@
-#include "LauncherShellOperations.h"
+#include "Shell/LauncherShellOperations.h"
 
-#include "LauncherShellArguments.h"
-#include "LauncherShellModel.h"
+#include "Shell/LauncherShellArguments.h"
+#include "Shell/LauncherShellModel.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "SparkleLauncher/CookOperations.h"

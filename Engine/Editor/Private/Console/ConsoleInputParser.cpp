@@ -3,92 +3,76 @@
 #include "Console/ConsoleInputParser.h"
 #include "Core/Public/Strings/StringUtils.h"
 
-ConsoleParsedInput ConsoleInputParser::Parse(std::string_view input)
+namespace ConsoleInputParser
 {
-	std::vector<std::string> tokens;
-	std::string currentToken;
-	bool tokenActive = false;
-	bool insideQuote = false;
-	char quoteCharacter = '\0';
-
-	for (std::size_t index = 0; index < input.size(); ++index)
+	static bool ReadNextToken(std::string_view input, std::size_t& cursor, std::string& token, std::string& error)
 	{
-		const char character = input[index];
-		if (character == '\\' && index + 1 < input.size())
+		token.clear();
+		bool tokenActive = false;
+		char quoteCharacter = '\0';
+		while (cursor < input.size())
 		{
-			tokenActive = true;
-			currentToken.push_back(input[++index]);
-			continue;
-		}
-
-		if (insideQuote)
-		{
-			if (character == quoteCharacter)
+			const char character = input[cursor++];
+			if (character == '\\' && cursor < input.size())
 			{
 				tokenActive = true;
-				insideQuote = false;
-				quoteCharacter = '\0';
+				token.push_back(input[cursor++]);
+				continue;
 			}
-			else
+			if (quoteCharacter != '\0')
+			{
+				if (character == quoteCharacter)
+				{
+					quoteCharacter = '\0';
+				}
+				else
+				{
+					token.push_back(character);
+				}
+				continue;
+			}
+			if (character == '"' || character == '\'')
 			{
 				tokenActive = true;
-				currentToken.push_back(character);
+				quoteCharacter = character;
+				continue;
 			}
-			continue;
-		}
-
-		if (character == '"' || character == '\'')
-		{
-			tokenActive = true;
-			insideQuote = true;
-			quoteCharacter = character;
-			continue;
-		}
-
-		if (Strings::IsAsciiWhitespace(character))
-		{
-			if (tokenActive)
+			if (Strings::IsAsciiWhitespace(character))
 			{
-				tokens.push_back(std::move(currentToken));
-				currentToken.clear();
-				tokenActive = false;
+				if (tokenActive)
+				{
+					return true;
+				}
+				continue;
 			}
-			continue;
+			tokenActive = true;
+			token.push_back(character);
 		}
-
-		tokenActive = true;
-		currentToken.push_back(character);
+		if (quoteCharacter != '\0')
+		{
+			error = "unterminated quoted string";
+			return false;
+		}
+		return tokenActive;
 	}
 
-	if (insideQuote)
+	ConsoleParsedInput Parse(std::string_view input)
 	{
-		return Fail("unterminated quoted string");
-	}
-
-	if (tokenActive)
-	{
-		tokens.push_back(std::move(currentToken));
-	}
-
-	ConsoleParsedInput result;
-	if (tokens.empty())
-	{
+		ConsoleParsedInput result;
+		std::size_t cursor = 0;
+		std::string error;
+		if (ReadNextToken(input, cursor, result.CommandName, error))
+		{
+			std::string argument;
+			while (ReadNextToken(input, cursor, argument, error))
+			{
+				result.Arguments.push_back(std::move(argument));
+			}
+		}
+		if (!error.empty())
+		{
+			return {.Succeeded = false, .ErrorMessage = std::move(error)};
+		}
 		return result;
 	}
-
-	result.CommandName = std::move(tokens.front());
-	result.Arguments.reserve(tokens.size() - 1);
-	for (std::size_t index = 1; index < tokens.size(); ++index)
-	{
-		result.Arguments.push_back(std::move(tokens[index]));
-	}
-	return result;
-}
-
-ConsoleParsedInput ConsoleInputParser::Fail(std::string errorMessage)
-{
-	ConsoleParsedInput result;
-	result.Succeeded = false;
-	result.ErrorMessage = std::move(errorMessage);
-	return result;
 }

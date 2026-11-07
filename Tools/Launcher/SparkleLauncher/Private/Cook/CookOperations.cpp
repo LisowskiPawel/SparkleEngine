@@ -1,16 +1,17 @@
 #include "SparkleLauncher/CookOperations.h"
 
-#include "CookOperationProcessRequests.h"
-#include "ShaderCompilerSdkDiscovery.h"
+#include "Cook/CookOperationProcessRequests.h"
+#include "Build/Toolchains/ShaderCompilerSdkDiscovery.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "SparkleLauncher/BuildProfileCatalog.h"
-#include "LauncherStatePaths.h"
-#include "LauncherProductPaths.h"
+#include "Workspace/LauncherStatePaths.h"
+#include "Workspace/LauncherProductPaths.h"
 
 #include <algorithm>
 #include <filesystem>
 #include <optional>
 #include <sstream>
+#include <span>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -20,18 +21,12 @@
 namespace SparkleLauncher
 {
 
-	struct CookToolRuntimeReadiness
+	static std::vector<std::string> FindMissingCookToolSupport(const std::filesystem::path& toolPath)
 	{
-		bool Ready = true;
-		std::vector<std::string> MissingSupportEntries;
-	};
-
-	CookToolRuntimeReadiness InspectCookToolRuntimeReadiness(const std::filesystem::path& toolPath)
-	{
-		CookToolRuntimeReadiness readiness;
+		std::vector<std::string> missingEntries;
 		if (toolPath.stem() != "ShaderCompiler")
 		{
-			return readiness;
+			return missingEntries;
 		}
 		const std::filesystem::path toolDirectory = toolPath.parent_path();
 		std::error_code errorCode;
@@ -49,17 +44,15 @@ namespace SparkleLauncher
 				continue;
 			}
 
-			readiness.Ready = false;
-			readiness.MissingSupportEntries.emplace_back(runtimeFileName);
+			missingEntries.emplace_back(runtimeFileName);
 		}
 
 		if (!HasShaderCompilerStandardModules(toolDirectory))
 		{
-			readiness.Ready = false;
-			readiness.MissingSupportEntries.emplace_back("slang-standard-module-*");
+			missingEntries.emplace_back("slang-standard-module-*");
 		}
 
-		return readiness;
+		return missingEntries;
 	}
 
 	static void AddReadiness(CookOperationPlan& plan, std::string message)
@@ -70,19 +63,6 @@ namespace SparkleLauncher
 	static void AddPlannedEffect(CookOperationPlan& plan, std::string message)
 	{
 		plan.PlannedEffects.push_back(std::move(message));
-	}
-
-	static bool IncludesScope(const CookOperationPlan& plan, CookWorkspaceScope scope)
-	{
-		return std::find(plan.Request.SelectedScopes.begin(), plan.Request.SelectedScopes.end(), scope) != plan.Request.SelectedScopes.end();
-	}
-
-	static void AddUniqueTool(std::vector<std::string>& tools, std::string tool)
-	{
-		if (std::find(tools.begin(), tools.end(), tool) == tools.end())
-		{
-			tools.push_back(std::move(tool));
-		}
 	}
 
 	static std::string ResolveCookToolProfile(std::string_view gameProfileName)
@@ -104,66 +84,38 @@ namespace SparkleLauncher
 		return "DevelopmentEditor";
 	}
 
-	static std::vector<std::string> GetRequiredCookToolNames(const CookOperationPlan& plan)
+	static void ResolveRequiredCookTools(CookOperationPlan& plan)
 	{
-		switch (plan.Kind)
+#if SPARKLE_ENABLE_SHADER_COMPILER
+		if (IncludesCookScope(plan, CookWorkspaceScope::Shaders))
 		{
-			case CookOperationKind::CookWorkspace:
-			{
-				std::vector<std::string> tools;
-#if SPARKLE_ENABLE_SHADER_COMPILER
-				if (IncludesScope(plan, CookWorkspaceScope::Shaders))
-				{
-					AddUniqueTool(tools, "ShaderCompiler");
-				}
-#endif
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-				if (IncludesScope(plan, CookWorkspaceScope::Textures))
-				{
-					AddUniqueTool(tools, "AssetCooker");
-					AddUniqueTool(tools, "TextureCooker");
-				}
-				if (IncludesScope(plan, CookWorkspaceScope::SceneAssets))
-				{
-					AddUniqueTool(tools, "AssetCooker");
-				}
-#endif
-				return tools;
-			}
-
-			case CookOperationKind::CookShaders:
-#if SPARKLE_ENABLE_SHADER_COMPILER
-				return {"ShaderCompiler"};
-#else
-				return {};
-#endif
-			case CookOperationKind::BuildTextures:
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-				return {"AssetCooker", "TextureCooker"};
-#else
-				return {};
-#endif
-			case CookOperationKind::BuildSceneAssets:
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-				return {"AssetCooker"};
-#else
-				return {};
-#endif
-			case CookOperationKind::CookAllAssets:
-			{
-				std::vector<std::string> tools;
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-				tools.push_back("AssetCooker");
-				tools.push_back("TextureCooker");
-#endif
-#if SPARKLE_ENABLE_SHADER_COMPILER
-				tools.push_back("ShaderCompiler");
-#endif
-				return tools;
-			}
+			plan.RequiredToolPaths.push_back(ResolveToolExecutable(plan.Request.WorkspaceRoot, "ShaderCompiler", plan.ToolProfile));
 		}
+#endif
+#if SPARKLE_ENABLE_CONTENT_PIPELINE
+		if (IncludesCookScope(plan, CookWorkspaceScope::Textures) || IncludesCookScope(plan, CookWorkspaceScope::SceneAssets))
+		{
+			plan.RequiredToolPaths.push_back(ResolveToolExecutable(plan.Request.WorkspaceRoot, "AssetCooker", plan.ToolProfile));
+		}
+		if (IncludesCookScope(plan, CookWorkspaceScope::Textures))
+		{
+			plan.RequiredToolPaths.push_back(ResolveToolExecutable(plan.Request.WorkspaceRoot, "TextureCooker", plan.ToolProfile));
+		}
+#endif
+	}
 
-		return {};
+	static std::string JoinCookScopeNames(std::span<const CookWorkspaceScope> scopes, std::string (*describeScope)(CookWorkspaceScope))
+	{
+		std::string names;
+		for (const CookWorkspaceScope scope : scopes)
+		{
+			if (!names.empty())
+			{
+				names += ", ";
+			}
+			names += describeScope(scope);
+		}
+		return names;
 	}
 
 	static void PopulateCookEffects(CookOperationPlan& plan)
@@ -177,23 +129,12 @@ namespace SparkleLauncher
 		{
 			case CookOperationKind::CookWorkspace:
 			{
-				std::vector<std::string> scopeNames;
-				scopeNames.reserve(plan.Request.SelectedScopes.size());
-				for (const CookWorkspaceScope scope : plan.Request.SelectedScopes)
+				const std::string scopeNames = JoinCookScopeNames(plan.Request.SelectedScopes, DisplayName);
+				if (!scopeNames.empty())
 				{
-					scopeNames.push_back(DisplayName(scope));
+					AddPlannedEffect(plan, "Cook selected outputs: " + scopeNames + ".");
 				}
-				std::vector<std::string_view> scopeNameViews;
-				scopeNameViews.reserve(scopeNames.size());
-				for (const std::string& scopeName : scopeNames)
-				{
-					scopeNameViews.push_back(scopeName);
-				}
-				if (!scopeNameViews.empty())
-				{
-					AddPlannedEffect(plan, "Cook selected outputs: " + Strings::Join(scopeNameViews, ", ") + ".");
-				}
-				if (IncludesScope(plan, CookWorkspaceScope::Shaders))
+				if (IncludesCookScope(plan, CookWorkspaceScope::Shaders))
 				{
 					AddPlannedEffect(plan, "Shader backend: " + plan.Request.ShaderBackend + ".");
 					AddPlannedEffect(plan, "Cook the global shader map and code library for the DXIL and SPIR-V targets.");
@@ -348,6 +289,138 @@ namespace SparkleLauncher
 		return found == definitions.end() ? std::nullopt : std::optional<CookOperationDefinition>(*found);
 	}
 
+	static bool ValidateCookScopes(CookOperationPlan& plan)
+	{
+		if (plan.Kind == CookOperationKind::CookWorkspace && plan.Request.SelectedScopes.empty())
+		{
+			AddReadiness(plan, "Select at least one output to cook.");
+			return false;
+		}
+		if (plan.Kind == CookOperationKind::CookAllAssets)
+		{
+#if !SPARKLE_ENABLE_CONTENT_PIPELINE && !SPARKLE_ENABLE_SHADER_COMPILER
+			AddReadiness(plan, "No cook features are enabled in this workspace configuration.");
+			return false;
+#else
+			return true;
+#endif
+		}
+		bool supported = true;
+#if !SPARKLE_ENABLE_SHADER_COMPILER
+		if (IncludesCookScope(plan, CookWorkspaceScope::Shaders))
+		{
+			supported = false;
+			AddReadiness(plan, "ShaderCompiler is disabled in this workspace configuration.");
+		}
+#endif
+#if !SPARKLE_ENABLE_CONTENT_PIPELINE
+		if (IncludesCookScope(plan, CookWorkspaceScope::Textures) || IncludesCookScope(plan, CookWorkspaceScope::SceneAssets))
+		{
+			supported = false;
+			AddReadiness(plan, "Content pipeline tools are disabled in this workspace configuration.");
+		}
+#endif
+		return supported;
+	}
+
+	static bool CheckRequiredCookTools(CookOperationPlan& plan)
+	{
+		bool requiredCookToolsAvailable = true;
+		for (const std::filesystem::path& toolPath : plan.RequiredToolPaths)
+		{
+			std::error_code errorCode;
+			const bool toolExists = std::filesystem::exists(toolPath, errorCode);
+			if (!toolExists || errorCode)
+			{
+				requiredCookToolsAvailable = false;
+				AddReadiness(plan, "Cook tool is missing; sync products or build cooking tools: " + toolPath.string());
+				continue;
+			}
+
+			const std::vector<std::string> missingSupportEntries = FindMissingCookToolSupport(toolPath);
+			if (missingSupportEntries.empty())
+			{
+				continue;
+			}
+
+			requiredCookToolsAvailable = false;
+			std::vector<std::string_view> missingSupportEntryViews;
+			missingSupportEntryViews.reserve(missingSupportEntries.size());
+			for (const std::string& supportEntry : missingSupportEntries)
+			{
+				missingSupportEntryViews.push_back(supportEntry);
+			}
+
+			AddReadiness(
+			    plan,
+			    "Cook tool runtime support bundle is incomplete beside " + toolPath.filename().string()
+			        + "; sync the complete product bundle or rebuild cooking tools: " + Strings::Join(missingSupportEntryViews, ", "));
+		}
+		return requiredCookToolsAvailable;
+	}
+
+	static void NormalizeCookScopes(CookOperationPlan& plan)
+	{
+		if (plan.Kind != CookOperationKind::CookWorkspace)
+		{
+			return;
+		}
+		std::vector<CookWorkspaceScope>& scopes = plan.Request.SelectedScopes;
+		for (std::size_t index = 0; index < scopes.size(); ++index)
+		{
+			scopes.erase(std::remove(scopes.begin() + index + 1, scopes.end(), scopes[index]), scopes.end());
+		}
+	}
+
+	static void RecordCookInputs(CookOperationPlan& plan)
+	{
+		const CookOperationRequest& request = plan.Request;
+		plan.Operation.Inputs.push_back({"content", request.ContentId});
+		plan.Operation.Inputs.push_back({"gameProfile", request.GameProfile});
+		plan.Operation.Inputs.push_back({"cookMode", ToString(request.Mode)});
+		plan.Operation.Inputs.push_back({"toolProfile", plan.ToolProfile});
+		plan.Operation.Inputs.push_back({"shaderBackend", request.ShaderBackend});
+		if (plan.Kind == CookOperationKind::CookWorkspace && !plan.Request.SelectedScopes.empty())
+		{
+			plan.Operation.Inputs.push_back({"cookScopes", JoinCookScopeNames(plan.Request.SelectedScopes, ToString)});
+		}
+		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, plan.Operation.Id, "Latest.txt");
+		if (request.Mode == CookMode::Force)
+		{
+			plan.Operation.DestructiveScope = OperationDestructiveScope::CookedOutputs;
+			plan.Operation.RequiresConfirmation = true;
+		}
+	}
+
+	static bool CheckCookConfirmation(CookOperationPlan& plan)
+	{
+		if (plan.Request.Mode != CookMode::Force || plan.Request.ForceRecookConfirmed)
+		{
+			return true;
+		}
+		AddReadiness(plan, "Clean before cooking requires confirmation for: " + plan.CookedOutputDirectory.string());
+		return false;
+	}
+
+	static void DescribeCookDryRun(CookOperationPlan& plan, std::string_view displayName)
+	{
+		std::ostringstream dryRun;
+		dryRun << "Dry-run plan for " << displayName << ":";
+		for (const CookOperationStep& step : plan.Steps)
+		{
+			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
+			if (!step.LogPath.empty())
+			{
+				dryRun << "\n    Log: " << step.LogPath.string();
+			}
+		}
+		if (plan.Steps.empty())
+		{
+			dryRun << "\n  No command step available until readiness issues are resolved.";
+		}
+		plan.Operation.DryRunText = dryRun.str();
+	}
+
 	CookOperationPlan PlanCookOperation(std::string_view operationId, const CookOperationRequest& request)
 	{
 		CookOperationPlan plan;
@@ -362,165 +435,30 @@ namespace SparkleLauncher
 
 		plan.Kind = definition->Kind;
 		plan.Request = request;
-		if (plan.Kind == CookOperationKind::CookWorkspace)
-		{
-			plan.Request.SelectedScopes.clear();
-			for (const CookWorkspaceScope scope : request.SelectedScopes)
-			{
-				if (!IncludesScope(plan, scope))
-				{
-					plan.Request.SelectedScopes.push_back(scope);
-				}
-			}
-		}
+		NormalizeCookScopes(plan);
 		plan.ToolProfile = ResolveCookToolProfile(request.GameProfile);
 		plan.CookedOutputDirectory = ResolveCookedRoot(request.WorkspaceRoot, request.ContentId);
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
-		plan.Operation.Inputs.push_back({"content", request.ContentId});
-		plan.Operation.Inputs.push_back({"gameProfile", request.GameProfile});
-		plan.Operation.Inputs.push_back({"cookMode", ToString(request.Mode)});
-		plan.Operation.Inputs.push_back({"toolProfile", plan.ToolProfile});
-		plan.Operation.Inputs.push_back({"shaderBackend", request.ShaderBackend});
-		if (plan.Kind == CookOperationKind::CookWorkspace && !plan.Request.SelectedScopes.empty())
-		{
-			std::vector<std::string> scopeNames;
-			scopeNames.reserve(plan.Request.SelectedScopes.size());
-			for (const CookWorkspaceScope scope : plan.Request.SelectedScopes)
-			{
-				scopeNames.push_back(ToString(scope));
-			}
-			std::vector<std::string_view> scopeNameViews;
-			scopeNameViews.reserve(scopeNames.size());
-			for (const std::string& scopeName : scopeNames)
-			{
-				scopeNameViews.push_back(scopeName);
-			}
-			plan.Operation.Inputs.push_back({"cookScopes", Strings::Join(scopeNameViews, ", ")});
-		}
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
-		if (request.Mode == CookMode::Force)
-		{
-			plan.Operation.DestructiveScope = OperationDestructiveScope::CookedOutputs;
-			plan.Operation.RequiresConfirmation = true;
-		}
+		RecordCookInputs(plan);
+		ResolveRequiredCookTools(plan);
 
-		for (const std::string& toolName : GetRequiredCookToolNames(plan))
-		{
-			plan.RequiredToolPaths.push_back(ResolveToolExecutable(request.WorkspaceRoot, toolName, plan.ToolProfile));
-		}
-		if (request.ContentId.empty())
+		const bool contentAvailable = !request.ContentId.empty();
+		if (!contentAvailable)
 		{
 			AddReadiness(plan, "Workspace content is unavailable for cooking.");
 		}
-		const bool hasSelectedScopes = plan.Kind != CookOperationKind::CookWorkspace || !plan.Request.SelectedScopes.empty();
-		bool selectedScopesSupported = true;
-		if (!hasSelectedScopes)
-		{
-			AddReadiness(plan, "Select at least one output to cook.");
-		}
-		switch (plan.Kind)
-		{
-			case CookOperationKind::CookWorkspace:
-#if !SPARKLE_ENABLE_SHADER_COMPILER
-				if (IncludesScope(plan, CookWorkspaceScope::Shaders))
-				{
-					selectedScopesSupported = false;
-					AddReadiness(plan, "ShaderCompiler is disabled in this workspace configuration.");
-				}
-#endif
-#if !SPARKLE_ENABLE_CONTENT_PIPELINE
-				if (IncludesScope(plan, CookWorkspaceScope::Textures) || IncludesScope(plan, CookWorkspaceScope::SceneAssets))
-				{
-					selectedScopesSupported = false;
-					AddReadiness(plan, "Content pipeline tools are disabled in this workspace configuration.");
-				}
-#endif
-				break;
-
-			case CookOperationKind::CookShaders:
-#if !SPARKLE_ENABLE_SHADER_COMPILER
-				selectedScopesSupported = false;
-
-				AddReadiness(plan, "ShaderCompiler is disabled in this workspace configuration.");
-#endif
-				break;
-
-			case CookOperationKind::BuildTextures:
-			case CookOperationKind::BuildSceneAssets:
-#if !SPARKLE_ENABLE_CONTENT_PIPELINE
-				selectedScopesSupported = false;
-
-				AddReadiness(plan, "Content pipeline tools are disabled in this workspace configuration.");
-#endif
-				break;
-
-			case CookOperationKind::CookAllAssets:
-#if !SPARKLE_ENABLE_CONTENT_PIPELINE && !SPARKLE_ENABLE_SHADER_COMPILER
-				selectedScopesSupported = false;
-
-				AddReadiness(plan, "No cook features are enabled in this workspace configuration.");
-#endif
-				break;
-		}
-		bool requiredCookToolsAvailable = true;
-		for (const std::filesystem::path& toolPath : plan.RequiredToolPaths)
-		{
-			std::error_code errorCode;
-			const bool toolExists = std::filesystem::exists(toolPath, errorCode);
-			if (!toolExists || errorCode)
-			{
-				requiredCookToolsAvailable = false;
-				AddReadiness(plan, "Cook tool is missing; sync products or build cooking tools: " + toolPath.string());
-				continue;
-			}
-
-			const CookToolRuntimeReadiness runtimeReadiness = InspectCookToolRuntimeReadiness(toolPath);
-			requiredCookToolsAvailable = requiredCookToolsAvailable && runtimeReadiness.Ready;
-			if (runtimeReadiness.Ready)
-			{
-				continue;
-			}
-
-			std::vector<std::string_view> missingSupportEntryViews;
-			missingSupportEntryViews.reserve(runtimeReadiness.MissingSupportEntries.size());
-			for (const std::string& supportEntry : runtimeReadiness.MissingSupportEntries)
-			{
-				missingSupportEntryViews.push_back(supportEntry);
-			}
-
-			AddReadiness(
-			    plan,
-			    "Cook tool runtime support bundle is incomplete beside " + toolPath.filename().string()
-			        + "; sync the complete product bundle or rebuild cooking tools: " + Strings::Join(missingSupportEntryViews, ", "));
-		}
-		if (request.Mode == CookMode::Force && !request.ForceRecookConfirmed)
-		{
-			AddReadiness(plan, "Clean before cooking requires confirmation for: " + plan.CookedOutputDirectory.string());
-		}
-
+		const bool scopesSupported = ValidateCookScopes(plan);
+		const bool toolsAvailable = CheckRequiredCookTools(plan);
+		const bool confirmed = CheckCookConfirmation(plan);
 		PopulateCookEffects(plan);
-		if (requiredCookToolsAvailable && !request.ContentId.empty() && hasSelectedScopes && selectedScopesSupported)
+
+		const bool inputsReady = contentAvailable && scopesSupported && toolsAvailable;
+		if (inputsReady)
 		{
 			PopulateCookSteps(plan);
 		}
-
-		plan.CanRun = requiredCookToolsAvailable && !request.ContentId.empty() && hasSelectedScopes && selectedScopesSupported && (request.Mode != CookMode::Force || request.ForceRecookConfirmed);
-
-		std::ostringstream dryRun;
-		dryRun << "Dry-run plan for " << definition->DisplayName << ":";
-		for (const CookOperationStep& step : plan.Steps)
-		{
-			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
-			if (!step.LogPath.empty())
-			{
-				dryRun << "\n    Log: " << step.LogPath.string();
-			}
-		}
-		if (plan.Steps.empty())
-		{
-			dryRun << "\n  No command step available until readiness issues are resolved.";
-		}
-		plan.Operation.DryRunText = dryRun.str();
+		plan.CanRun = inputsReady && confirmed;
+		DescribeCookDryRun(plan, definition->DisplayName);
 		return plan;
 	}
 }

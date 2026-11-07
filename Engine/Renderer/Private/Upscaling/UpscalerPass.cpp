@@ -25,17 +25,19 @@ void AddUpscalerPass(FrameGraphBuilder& builder, IUpscalerProvider& provider, Re
 	    {
 		    RenderCommandList& commandList = context.Commands.GetRenderCommandList();
 		    const RhiNativeInteropRequest interopRequest{.Consumer = ERhiNativeInteropConsumer::ExternalProvider, .Reason = "Evaluate upscaler pass"};
-		    if (!provider.Evaluate(
-		            UpscalerEvaluationDesc{
-		                .BackendApi = commandList.GetBackendApi(),
-		                .NativeCommandList = commandList.GetNativeHandle(interopRequest),
-		                .NativeScalingInputColorView = context.Resources.ResolveNativeTextureView(inputs.InputColor, ResourceState::ShaderResource, interopRequest),
-		                .NativeDepthView = context.Resources.ResolveNativeTextureView(inputs.Depth, ResourceState::ShaderResource, interopRequest),
-		                .NativeMotionVectorsView = context.Resources.ResolveNativeTextureView(inputs.MotionVectors, ResourceState::ShaderResource, interopRequest),
-		                .NativeExposureView = context.Resources.ResolveNativeTextureView(inputs.Exposure, ResourceState::ShaderResource, interopRequest),
-		                .NativeScalingOutputColorView = context.Resources.ResolveNativeTextureView(inputs.OutputColor, ResourceState::UnorderedAccess, interopRequest),
-		                .RenderExtent = renderExtent,
-		                .OutputExtent = outputExtent}))
+		    const UpscalerEvaluationDesc evaluation = UpscalerEvaluationDesc{
+		    		                .BackendApi = commandList.GetBackendApi(),
+		    		                .NativeCommandList = commandList.GetNativeHandle(interopRequest),
+		    		                .NativeScalingInputColorView = context.Resources.ResolveNativeTextureView(inputs.InputColor, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeDepthView = context.Resources.ResolveNativeTextureView(inputs.Depth, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeMotionVectorsView = context.Resources.ResolveNativeTextureView(inputs.MotionVectors, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeExposureView = context.Resources.ResolveNativeTextureView(inputs.Exposure, ResourceState::ShaderResource, interopRequest),
+		    		                .NativeScalingOutputColorView = context.Resources.ResolveNativeTextureView(inputs.OutputColor, ResourceState::UnorderedAccess, interopRequest),
+		    		                .RenderExtent = renderExtent,
+		    		                .OutputExtent = outputExtent};
+		    const bool evaluated = provider.Evaluate(evaluation);
+		    
+		    if (!evaluated)
 		    {
 			    Diagnostics::Fatal(g_upscalerPassLogger, __FILE__, __LINE__, "The configured upscaler failed to evaluate the active frame.");
 		    }

@@ -1,18 +1,20 @@
-#include "LauncherGpuCrashPanel.h"
-#include "LauncherMainWindow.h"
+#include <QtCore/QSignalBlocker>
+#include "Gui/Widgets/LauncherOptionWidgets.h"
+#include "GpuCrash/LauncherGpuCrashPanel.h"
+#include "Gui/Shell/LauncherMainWindow.h"
 
-#include "LauncherLayoutWidgets.h"
-#include "LauncherContentModel.h"
-#include "LauncherContextUiModel.h"
-#include "LauncherExternalCaptureUiModel.h"
-#include "LauncherOperationRequestFactory.h"
-#include "LauncherSelectionWidgets.h"
-#include "LauncherSettings.h"
-#include "LauncherUiDesign.h"
-#include "LauncherWorkflowCatalog.h"
+#include "Gui/Widgets/LauncherLayoutWidgets.h"
+#include "Gui/Models/LauncherContentModel.h"
+#include "Gui/Models/LauncherContextUiModel.h"
+#include "Gui/Models/LauncherExternalCaptureUiModel.h"
+#include "Gui/Models/LauncherOperationRequestFactory.h"
+#include "Gui/Widgets/LauncherSelectionWidgets.h"
+#include "Gui/App/LauncherSettings.h"
+#include "Gui/Style/LauncherUiDesign.h"
+#include "Gui/Models/LauncherWorkflowCatalog.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
-#include "LauncherProductPaths.h"
+#include "Workspace/LauncherProductPaths.h"
 
 #include <QtGui/QColor>
 #include <QtWidgets/QCheckBox>
@@ -29,7 +31,6 @@
 
 namespace SparkleLauncher
 {
-	static constexpr int kSpaceTiny = LauncherUi::Space::Tiny;
 	static constexpr int kLauncherIconSize = LauncherUi::Icon::DefaultSize;
 
 	static void ApplyFooterContextComboMetrics(QComboBox& combo, int minWidth, int maxWidth)
@@ -265,47 +266,20 @@ namespace SparkleLauncher
 		return scrollArea;
 	}
 
-	QLabel* LauncherMainWindow::CreateSectionLabel(const QString& title) const
+	void LauncherMainWindow::SelectWorkspaceCompiler(WorkspaceCompiler compiler)
 	{
-		QLabel* label = new QLabel(title);
-		label->setObjectName("SectionLabel");
-		label->setAccessibleName(title);
-		return label;
-	}
-
-	QLabel* LauncherMainWindow::CreateFieldLabel(const QString& title) const
-	{
-		QLabel* label = new QLabel(title);
-		label->setObjectName("FieldLabel");
-		label->setAccessibleName(title);
-		return label;
-	}
-
-	QLineEdit* LauncherMainWindow::CreateBoundLineEdit(const QString& text, const QString& placeholder, const QString& tooltip, void (LauncherSettings::*setter)(const QString&))
-	{
-		QLineEdit* edit = new QLineEdit(this);
-		edit->setText(text);
-		edit->setPlaceholderText(placeholder);
-		edit->setToolTip(tooltip);
-		edit->setAccessibleDescription(tooltip);
-		RegisterFocusable(edit);
-		connect(edit, &QLineEdit::textChanged, &m_settings, setter);
-		return edit;
-	}
-
-	QComboBox* LauncherMainWindow::CreateValueCombo(const QVector<QPair<QString, QString>>& options, const QString& currentValue, void (LauncherSettings::*setter)(const QString&))
-	{
-		QComboBox* combo = new QComboBox(this);
-		combo->setAccessibleName("Option value");
-		RegisterFocusable(combo);
-		for (const QPair<QString, QString>& option : options)
+		const QString value = QString::fromStdString(WorkspaceCompilerCommandLineValue(compiler));
+		m_settings.SetWorkspaceCompiler(value);
+		if (m_workspaceCompilerCombo == nullptr)
 		{
-			combo->addItem(option.first, option.second);
+			return;
 		}
-		const int currentIndex = combo->findData(currentValue);
-		combo->setCurrentIndex(currentIndex >= 0 ? currentIndex : 0);
-		connect(combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [combo, setter, this]() { (m_settings.*setter)(combo->currentData().toString()); });
-		return combo;
-	}
 
+		const int index = m_workspaceCompilerCombo->findData(value);
+		if (index >= 0 && index != m_workspaceCompilerCombo->currentIndex())
+		{
+			const QSignalBlocker blocker(m_workspaceCompilerCombo);
+			m_workspaceCompilerCombo->setCurrentIndex(index);
+		}
+	}
 }

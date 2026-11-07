@@ -1,4 +1,4 @@
-#include "LauncherToolchainUiModel.h"
+#include "Gui/Models/LauncherToolchainUiModel.h"
 
 #include <QtCore/QStringList>
 

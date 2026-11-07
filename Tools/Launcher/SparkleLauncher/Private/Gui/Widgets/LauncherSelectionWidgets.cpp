@@ -1,6 +1,10 @@
-#include "LauncherSelectionWidgets.h"
-
-#include "LauncherUiDesign.h"
+#include "Gui/Style/LauncherUiDesign.h"
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QStyle>
+#include "Gui/Widgets/LauncherSelectionWidgets.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QSignalBlocker>
@@ -13,7 +17,6 @@
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QStyle>
 
 #include <algorithm>
 
@@ -210,5 +213,81 @@ namespace SparkleLauncher
 		const int contentWidth = combo.view()->sizeHintForColumn(0) + LauncherUi::Selector::PopupHorizontalPadding;
 		combo.view()->setMinimumWidth(qBound(combo.minimumWidth(), contentWidth, LauncherUi::Selector::PopupMaxWidth));
 		return selectedIndex < 0 ? QString() : combo.currentData().toString();
+	}
+
+	void AddWorkflowScopeRow(
+	    QVBoxLayout& layout,
+	    const QString& label,
+	    const QString& value,
+	    const QString& detail,
+	    const QString& metadata,
+	    bool available,
+	    const QStringList& selectedScopes,
+	    QVector<QCheckBox*>& scopeBoxes,
+	    const std::function<void(QWidget*)>& registerFocusable)
+	{
+		QFrame* scopeRow = new QFrame(layout.parentWidget());
+		scopeRow->setObjectName("WorkflowScopeRow");
+		QHBoxLayout* scopeRowLayout = new QHBoxLayout(scopeRow);
+		scopeRowLayout->setContentsMargins(LauncherUi::ScopeSelection::RowMargins);
+		scopeRowLayout->setSpacing(LauncherUi::ScopeSelection::RowSpacing);
+
+		QVBoxLayout* descriptionLayout = new QVBoxLayout();
+		descriptionLayout->setContentsMargins(0, 0, 0, 0);
+		descriptionLayout->setSpacing(2);
+		QCheckBox* scopeBox = new QCheckBox(label, scopeRow);
+		scopeBox->setObjectName("WorkflowScopeCheckBox");
+		scopeBox->setProperty("ScopeValue", value);
+		scopeBox->setToolTip(detail);
+		scopeBox->setChecked(available && selectedScopes.contains(value));
+		scopeBox->setEnabled(available);
+		registerFocusable(scopeBox);
+		descriptionLayout->addWidget(scopeBox);
+
+		QLabel* scopeDescription = new QLabel(detail, scopeRow);
+		scopeDescription->setObjectName("WorkflowScopeDescription");
+		scopeDescription->setWordWrap(true);
+		descriptionLayout->addWidget(scopeDescription);
+		scopeRowLayout->addLayout(descriptionLayout, 1);
+
+		QLabel* scopeMetadata = new QLabel(metadata, scopeRow);
+		scopeMetadata->setObjectName("WorkflowScopeMetadata");
+		scopeMetadata->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		scopeRowLayout->addWidget(scopeMetadata, 0);
+
+		scopeRow->setProperty("Selected", scopeBox->isChecked());
+
+		QObject::connect(
+		    scopeBox,
+		    &QCheckBox::toggled,
+		    scopeRow,
+		    [scopeRow](bool selected)
+		    {
+			    scopeRow->setProperty("Selected", selected);
+			    scopeRow->style()->unpolish(scopeRow);
+			    scopeRow->style()->polish(scopeRow);
+		    });
+
+		layout.addWidget(scopeRow);
+		scopeBoxes.push_back(scopeBox);
+	}
+
+	void AddWorkflowAutomationNote(QVBoxLayout& layout, const QString& detail)
+	{
+		QFrame* automationNote = new QFrame(layout.parentWidget());
+		automationNote->setObjectName("WorkflowAutomationNote");
+		automationNote->setMinimumWidth(LauncherUi::ScopeSelection::ContentMinWidth);
+		automationNote->setMaximumWidth(LauncherUi::ScopeSelection::ContentMaxWidth);
+		QHBoxLayout* automationLayout = new QHBoxLayout(automationNote);
+		automationLayout->setContentsMargins(LauncherUi::ScopeSelection::RowMargins);
+		automationLayout->setSpacing(LauncherUi::ScopeSelection::RowSpacing);
+		QLabel* automationTitle = new QLabel("AUTOMATIC", automationNote);
+		automationTitle->setObjectName("WorkflowAutomationTitle");
+		automationLayout->addWidget(automationTitle, 0, Qt::AlignTop);
+		QLabel* automationDetail = new QLabel(detail, automationNote);
+		automationDetail->setObjectName("WorkflowAutomationDetail");
+		automationDetail->setWordWrap(true);
+		automationLayout->addWidget(automationDetail, 1);
+		layout.addWidget(automationNote);
 	}
 }

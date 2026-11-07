@@ -1,12 +1,12 @@
 #include "SparkleLauncher/LevelOperations.h"
 
-#include "LevelOperationProcessRequests.h"
+#include "Levels/LevelOperationProcessRequests.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "LauncherStatePaths.h"
+#include "Workspace/LauncherStatePaths.h"
 #include "SparkleLauncher/ToolResolver.h"
-#include "LauncherProductPaths.h"
+#include "Workspace/LauncherProductPaths.h"
 
 #include <algorithm>
 #include <sstream>

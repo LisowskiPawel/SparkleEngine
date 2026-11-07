@@ -72,6 +72,29 @@ namespace Json
 		return Strings::AppendUtf8CodePoint(codePoint, value);
 	}
 
+	static bool TryReadStringEscape(std::string_view document, std::size_t& cursor, std::string& value)
+	{
+		if (cursor >= document.size())
+		{
+			return false;
+		}
+		const char escape = document[cursor++];
+		if (escape == 'u')
+		{
+			return TryReadUnicodeEscape(document, cursor, value);
+		}
+		constexpr std::string_view escapeCodes = "\"\\/bfnrt";
+		constexpr std::string_view escapedCharacters = "\"\\/\b\f\n\r\t";
+		static_assert(escapeCodes.size() == escapedCharacters.size());
+		const std::size_t index = escapeCodes.find(escape);
+		if (index == std::string_view::npos)
+		{
+			return false;
+		}
+		value.push_back(escapedCharacters[index]);
+		return true;
+	}
+
 	static bool TryReadString(std::string_view document, std::size_t& cursor, std::string& outValue)
 	{
 		if (cursor >= document.size() || document[cursor++] != '"')
@@ -101,48 +124,9 @@ namespace Json
 				value.push_back(static_cast<char>(character));
 				continue;
 			}
-			if (cursor >= document.size())
+			if (!TryReadStringEscape(document, cursor, value))
 			{
 				return false;
-			}
-
-			const char escape = document[cursor++];
-			switch (escape)
-			{
-				case '"':
-					value.push_back('"');
-					break;
-				case '\\':
-					value.push_back('\\');
-					break;
-				case '/':
-					value.push_back('/');
-					break;
-				case 'b':
-					value.push_back('\b');
-					break;
-				case 'f':
-					value.push_back('\f');
-					break;
-				case 'n':
-					value.push_back('\n');
-					break;
-				case 'r':
-					value.push_back('\r');
-					break;
-				case 't':
-					value.push_back('\t');
-					break;
-				case 'u':
-				{
-					if (!TryReadUnicodeEscape(document, cursor, value))
-					{
-						return false;
-					}
-					break;
-				}
-				default:
-					return false;
 			}
 		}
 		return false;
@@ -206,6 +190,61 @@ namespace Json
 		return true;
 	}
 
+	static bool TryReadPropertyName(std::string_view document, std::size_t& cursor, std::string& name)
+	{
+		if (!TryReadString(document, cursor, name))
+		{
+			return false;
+		}
+		SkipWhitespace(document, cursor);
+		return cursor < document.size() && document[cursor++] == ':';
+	}
+
+	static bool SkipValue(std::string_view document, std::size_t& cursor, std::size_t depth);
+
+	static bool SkipContainer(std::string_view document, std::size_t& cursor, std::size_t depth)
+	{
+		const bool isObject = document[cursor++] == '{';
+		const char end = isObject ? '}' : ']';
+		SkipWhitespace(document, cursor);
+		if (cursor < document.size() && document[cursor] == end)
+		{
+			++cursor;
+			return true;
+		}
+		while (cursor < document.size())
+		{
+			if (isObject)
+			{
+				std::string ignored;
+				if (!TryReadPropertyName(document, cursor, ignored))
+				{
+					return false;
+				}
+			}
+			if (!SkipValue(document, cursor, depth + 1u))
+			{
+				return false;
+			}
+			SkipWhitespace(document, cursor);
+			if (cursor == document.size())
+			{
+				return false;
+			}
+			if (document[cursor] == end)
+			{
+				++cursor;
+				return true;
+			}
+			if (document[cursor++] != ',')
+			{
+				return false;
+			}
+			SkipWhitespace(document, cursor);
+		}
+		return false;
+	}
+
 	static bool SkipValue(std::string_view document, std::size_t& cursor, std::size_t depth)
 	{
 		SkipWhitespace(document, cursor);
@@ -220,50 +259,7 @@ namespace Json
 		}
 		if (document[cursor] == '{' || document[cursor] == '[')
 		{
-			const bool isObject = document[cursor++] == '{';
-			const char end = isObject ? '}' : ']';
-			SkipWhitespace(document, cursor);
-			if (cursor < document.size() && document[cursor] == end)
-			{
-				++cursor;
-				return true;
-			}
-			while (cursor < document.size())
-			{
-				if (isObject)
-				{
-					std::string ignored;
-					if (!TryReadString(document, cursor, ignored))
-					{
-						return false;
-					}
-					SkipWhitespace(document, cursor);
-					if (cursor == document.size() || document[cursor++] != ':')
-					{
-						return false;
-					}
-				}
-				if (!SkipValue(document, cursor, depth + 1u))
-				{
-					return false;
-				}
-				SkipWhitespace(document, cursor);
-				if (cursor == document.size())
-				{
-					return false;
-				}
-				if (document[cursor] == end)
-				{
-					++cursor;
-					return true;
-				}
-				if (document[cursor++] != ',')
-				{
-					return false;
-				}
-				SkipWhitespace(document, cursor);
-			}
-			return false;
+			return SkipContainer(document, cursor, depth);
 		}
 		for (const std::string_view literal : {"true", "false", "null"})
 		{
@@ -289,12 +285,7 @@ namespace Json
 		while (cursor < objectText.size() && objectText[cursor] != '}')
 		{
 			std::string property;
-			if (!TryReadString(objectText, cursor, property))
-			{
-				return std::string_view::npos;
-			}
-			SkipWhitespace(objectText, cursor);
-			if (cursor == objectText.size() || objectText[cursor++] != ':')
+			if (!TryReadPropertyName(objectText, cursor, property))
 			{
 				return std::string_view::npos;
 			}

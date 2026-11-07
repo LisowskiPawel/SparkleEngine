@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "Viewport/ExternalCapture/ExternalCaptureSettingsSection.h"
-#include "Panels/RenderingSettingsUi.h"
+#include "Settings/Rendering/RenderingSettingsUi.h"
 #include "Settings/EngineRenderingSettingsController.h"
 
 #include <imgui.h>
@@ -30,8 +30,11 @@ static void DrawStartupCaptureSelection(EngineRenderingSettingsController& setti
 void DrawExternalCaptureSettingsSection(EngineRenderingSettingsController& settings, const char* filterText)
 {
 	const auto& state = settings.GetState();
-	if ((!state.CaptureToolsInstalled && state.StartupCaptureProvider == ExternalCaptureProvider::None)
-	    || !RenderingSettingsUi::MatchesFilter(filterText, "GPU Capture", "pix nsight renderdoc capture attach startup") || !RenderingSettingsUi::BeginSettingsCategory("GPU Capture"))
+	const bool captureAvailable = state.CaptureToolsInstalled || state.StartupCaptureProvider != ExternalCaptureProvider::None;
+	const bool gpuCaptureMatches = captureAvailable && RenderingSettingsUi::MatchesFilter(filterText, "GPU Capture", "pix nsight renderdoc capture attach startup");
+	const bool gpuCaptureOpen = gpuCaptureMatches && RenderingSettingsUi::BeginSettingsCategory("GPU Capture");
+	
+	if (!gpuCaptureOpen)
 	{
 		return;
 	}

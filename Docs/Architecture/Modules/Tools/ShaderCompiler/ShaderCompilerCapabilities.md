@@ -33,11 +33,47 @@ Reflection ownership was reconciled on 2026-10-25 against `c02956f3` plus the sc
 
 ## Read This Page
 
+**Reflection codec boundaries, 2026-11-05:** [reflection serialization](../../../../../Tools/Shaders/ShaderCompiler/Private/Cooking/Publication/ReflectionSerializer.cpp)
+orders record initialization, constant buffers/members, resource bindings, input
+elements, push constants and specialization constants through focused operations.
+Decoding names the same metadata families. Each family owns its record mapping;
+the outer functions own table reset, stage order and final publication. String
+insertion order, constant-buffer index rebasing and existing RHI record layouts
+are retained. Source/build and CPU round-trip controls do not qualify native
+compiler backends, shader-map loading or GPU execution.
+
 - **Use the tool:** [Command-line surface](#command-line-surface) and [supported compiler targets](#authored-languages-compiler-backends-and-targets).
 - **Understand the pipeline:** Read compile planning, ABI checks and cooked publication below; [Shader System](../../../CrossModule/ShaderSystem/ShaderSystemDesign.md) owns the architecture.
 - **Audit a shader:** The [registered program inventory](#registered-runtime-program-inventory) joins names to the exact runtime catalog.
 
 ## Build And Delivery Shape
+
+**Private capability placement, 2026-11-07:** reconciled against `8cbd850c`
+plus the scoped working tree. DXC and Slang implementation live under
+`Private/Backend/Dxc` and `Private/Backend/Slang`, beside the private backend
+contract. `Cooking/Planning` owns selection, source dependencies and compile
+identity; `Cooking/Compilation` owns job execution and failure replay;
+`Cooking/Publication` owns reflection encoding, runtime artifacts and private
+debug artifacts. The top-level cooker sequences those operations, and shared
+cook values retain their existing lifetime boundaries. All remain in the existing
+compiler target; crash-debug source exclusion follows the publication path.
+Compiler flags, artifact identities and publication behavior are preserved.
+
+**Compiler responsibility boundaries, 2026-11-05:** the DXC backend retains COM
+compiler lifetime, invocation and output extraction. Private
+[argument construction](../../../../../Tools/Shaders/ShaderCompiler/Private/Backend/Dxc/DxcCompileArguments.cpp)
+orders source/entry selection, defines, artifact options and SPIR-V options.
+Define conversion finishes before argument pointers borrow caller-owned string
+storage. The SPIR-V extractor uses one typed format/scalar/component mapping;
+DXIL's different native reflection protocol remains local to DXIL.
+
+[Parameter verification](../../../../../Tools/Shaders/ShaderCompiler/Private/Verification/ShaderParameterStructVerifier.cpp)
+composes automatic-value layout checks, declared bindings, extra reflection and
+diagnostic publication. First-match lookup, unknown-dimension handling, library
+export allowances, mismatch ordering and JSON reports retain their contracts.
+Native before/after controls and registered DXIL/SPIR-V compilations with
+temporary map/library loading bound these source changes; full cooking,
+publication failure, native GPU execution and release acceptance remain separate.
 
 | Capability ID | Capability | State | Exact current coverage and limit | Evidence | Release disposition |
 | --- | --- | --- | --- | --- | --- |
@@ -208,8 +244,8 @@ This describes what the validation target is designed to exercise. It was **not 
 
 - Shared contracts: `Tools/Shaders/ShaderContracts`.
 - Compiler executable and orchestration: `Tools/Shaders/ShaderCompiler`.
-- DXC backend: `Tools/Shaders/ShaderCompiler/Backends/Dxc`.
-- Slang backend: `Tools/Shaders/ShaderCompiler/Backends/Slang`.
+- DXC backend: `Tools/Shaders/ShaderCompiler/Private/Backend/Dxc`.
+- Slang backend: `Tools/Shaders/ShaderCompiler/Private/Backend/Slang`.
 - Existing CLI validation: `Tools/Shaders/ShaderCompiler/ValidateShaderCompilerCli.cmake`.
 - Engine sources: `Engine/Assets/Shaders`.
 - Renderer registrations: `Engine/Renderer/ShaderRegistrations`.

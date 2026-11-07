@@ -1,15 +1,13 @@
 file(GLOB_RECURSE SHADER_COMPILER_PRIVATE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Backends/*.cpp
 )
 
 file(GLOB_RECURSE SHADER_COMPILER_PRIVATE_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Backends/*.h
 )
 
 if(NOT SPARKLE_WITH_GPU_CRASH_DEBUGGING)
-    list(FILTER SHADER_COMPILER_PRIVATE_SOURCES EXCLUDE REGEX "/Cooking/ShaderDebugSourceIdentity\\.cpp$")
+    list(FILTER SHADER_COMPILER_PRIVATE_SOURCES EXCLUDE REGEX "/Cooking/Publication/ShaderDebugSourceIdentity\\.cpp$")
 endif()
 
 add_executable(ShaderCompiler
@@ -90,7 +88,6 @@ set_target_properties(slang::slang PROPERTIES
 target_include_directories(ShaderCompiler
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Private
-        ${CMAKE_CURRENT_SOURCE_DIR}/Backends
         ${DXC_INCLUDE_DIR}
         ${SLANG_INCLUDE_DIR}
         ${SPIRV_TOOLS_INCLUDE_DIR}

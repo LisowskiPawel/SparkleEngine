@@ -52,6 +52,49 @@ struct RayTracingMaterialSample
 	float SubsurfaceStrength;
 };
 
+void ModulateRayTracingMaterialTexture(RayTracingHitMaterial material, uint textureSlot, float2 uv, float4 factor, inout float4 result, bool enabled = true)
+{
+	if (enabled && MaterialTextures::HasTexture(material.TextureFlags, textureSlot))
+	{
+		result = SampleRayTracingMaterialTexture(material, textureSlot, uv) * factor;
+	}
+}
+
+void ModulateRayTracingMaterialTexture(RayTracingHitMaterial material, uint textureSlot, float2 uv, float factor, inout float result, bool enabled = true)
+{
+	if (enabled && MaterialTextures::HasTexture(material.TextureFlags, textureSlot))
+	{
+		result = SampleRayTracingMaterialTexture(material, textureSlot, uv).r * factor;
+	}
+}
+
+void ModulateRayTracingMaterialTexture(RayTracingHitMaterial material, uint textureSlot, float2 uv, float3 factor, inout float3 result, bool enabled = true)
+{
+	if (enabled && MaterialTextures::HasTexture(material.TextureFlags, textureSlot))
+	{
+		result = SampleRayTracingMaterialTexture(material, textureSlot, uv).rgb * factor;
+	}
+}
+
+void ApplyRayTracingMaterialNormal(RayTracingHitMaterial material, float2 uv, inout float3 normalTangent)
+{
+	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotNormal))
+	{
+		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextures::TextureSlotNormal];
+		normalTangent = DecodeBc5TangentNormal(SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotNormal, uv).rg, mapping.Strength);
+	}
+}
+
+void ApplyRayTracingMaterialOcclusion(RayTracingHitMaterial material, float2 uv, inout float occlusion)
+{
+	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotOcclusion))
+	{
+		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextures::TextureSlotOcclusion];
+		const float sampledOcclusion = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotOcclusion, uv).r;
+		occlusion = lerp(1.0f, sampledOcclusion, mapping.Strength);
+	}
+}
+
 RayTracingMaterialSample SampleRayTracingMaterial(RayTracingHitMaterial material, float2 uv, float4 vertexColor, bool evaluateEmissive)
 {
 	RayTracingMaterialSample result;
@@ -64,51 +107,14 @@ RayTracingMaterialSample SampleRayTracingMaterial(RayTracingHitMaterial material
 	result.AmbientOcclusion = 1.0f;
 	result.SubsurfaceStrength = material.SubsurfaceStrength;
 
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotNormal))
-	{
-		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextures::TextureSlotNormal];
-
-		result.NormalTangent = DecodeBc5TangentNormal(SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotNormal, uv).rg, mapping.Strength);
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotBaseColor))
-	{
-		result.BaseColor = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotBaseColor, uv) * material.BaseColor;
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotRoughness))
-	{
-		result.Roughness = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotRoughness, uv).r * material.Roughness;
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotMetallic))
-	{
-		result.Metallic = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotMetallic, uv).r * material.Metallic;
-	}
-
-	if (evaluateEmissive && MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotEmissive))
-	{
-		result.Emissive = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotEmissive, uv).rgb * material.EmissiveColor;
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotOcclusion))
-	{
-		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextures::TextureSlotOcclusion];
-		const float sampledOcclusion = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotOcclusion, uv).r;
-
-		result.AmbientOcclusion = lerp(1.0f, sampledOcclusion, mapping.Strength);
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotSubsurfaceColor))
-	{
-		result.SubsurfaceColor = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceColor, uv).rgb * material.SubsurfaceColor;
-	}
-
-	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotSubsurfaceStrength))
-	{
-		result.SubsurfaceStrength = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceStrength, uv).r * material.SubsurfaceStrength;
-	}
-
+	ApplyRayTracingMaterialNormal(material, uv, result.NormalTangent);
+	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotBaseColor, uv, material.BaseColor, result.BaseColor);
+	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotRoughness, uv, material.Roughness, result.Roughness);
+	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotMetallic, uv, material.Metallic, result.Metallic);
+	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotEmissive, uv, material.EmissiveColor, result.Emissive, evaluateEmissive);
+	ApplyRayTracingMaterialOcclusion(material, uv, result.AmbientOcclusion);
+	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceColor, uv, material.SubsurfaceColor, result.SubsurfaceColor);
+	ModulateRayTracingMaterialTexture(material, MaterialTextures::TextureSlotSubsurfaceStrength, uv, material.SubsurfaceStrength, result.SubsurfaceStrength);
 	result.BaseColor *= vertexColor;
 	return result;
 }

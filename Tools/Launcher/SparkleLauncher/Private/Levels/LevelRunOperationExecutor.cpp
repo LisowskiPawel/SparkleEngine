@@ -1,8 +1,8 @@
 #include "SparkleLauncher/LevelRunOperations.h"
 
-#include "LevelRunOperationProcessRequests.h"
-#include "LauncherOperationProgress.h"
-#include "GpuCrashLaunch.h"
+#include "Levels/LevelRunOperationProcessRequests.h"
+#include "Operations/LauncherOperationProgress.h"
+#include "GpuCrash/GpuCrashLaunch.h"
 
 #include <optional>
 

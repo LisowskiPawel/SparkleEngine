@@ -1,7 +1,7 @@
-#include "LauncherWorkflowPanel.h"
+#include "Gui/Shell/LauncherWorkflowPanel.h"
 
-#include "LauncherIconLibrary.h"
-#include "LauncherUiDesign.h"
+#include "Gui/Style/LauncherIconLibrary.h"
+#include "Gui/Style/LauncherUiDesign.h"
 
 #include <QtCore/QtGlobal>
 #include <QtGui/QColor>

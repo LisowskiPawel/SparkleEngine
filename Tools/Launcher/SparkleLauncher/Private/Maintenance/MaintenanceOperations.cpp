@@ -1,7 +1,7 @@
 #include "SparkleLauncher/MaintenanceOperations.h"
 
-#include "LauncherProductPaths.h"
-#include "MaintenanceOperationProcessRequests.h"
+#include "Workspace/LauncherProductPaths.h"
+#include "Maintenance/MaintenanceOperationProcessRequests.h"
 #include "ProjectLevelCatalog.h"
 
 #include <set>

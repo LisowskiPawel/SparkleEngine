@@ -15,12 +15,11 @@
 
 #include <vector>
 
-class CookedSceneGenerationStager final
+namespace CookedSceneStaging
 {
-public:
 	static void StageAssets(std::span<const CookedSceneBuild* const> builds, std::vector<Files::FilePublication>& outPublication);
 	static void Cleanup(std::span<const Files::FilePublication> publication) noexcept;
-};
+}
 
 void CookedSceneGenerationWriter::Publish(std::span<const CookedSceneBuild* const> builds)
 {
@@ -29,7 +28,7 @@ void CookedSceneGenerationWriter::Publish(std::span<const CookedSceneBuild* cons
 	std::vector<Files::FilePublication> publication;
 	try
 	{
-		CookedSceneGenerationStager::StageAssets(builds, publication);
+		CookedSceneStaging::StageAssets(builds, publication);
 		SceneCooker::StageManifestsAndRegistry(builds, publication);
 		std::string errorMessage;
 		if (!publisher.Publish(publication, errorMessage))
@@ -39,12 +38,12 @@ void CookedSceneGenerationWriter::Publish(std::span<const CookedSceneBuild* cons
 	}
 	catch (...)
 	{
-		CookedSceneGenerationStager::Cleanup(publication);
+		CookedSceneStaging::Cleanup(publication);
 		throw;
 	}
 }
 
-void CookedSceneGenerationStager::StageAssets(std::span<const CookedSceneBuild* const> builds, std::vector<Files::FilePublication>& outPublication)
+void CookedSceneStaging::StageAssets(std::span<const CookedSceneBuild* const> builds, std::vector<Files::FilePublication>& outPublication)
 {
 	for (const CookedSceneBuild* build : builds)
 	{
@@ -60,7 +59,7 @@ void CookedSceneGenerationStager::StageAssets(std::span<const CookedSceneBuild* 
 	}
 }
 
-void CookedSceneGenerationStager::Cleanup(std::span<const Files::FilePublication> publication) noexcept
+void CookedSceneStaging::Cleanup(std::span<const Files::FilePublication> publication) noexcept
 {
 	for (const Files::FilePublication& file : publication)
 	{

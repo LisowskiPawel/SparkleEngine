@@ -1,9 +1,9 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
-#include "NativeBuildOutputReset.h"
-#include "BuildWorkspaceProcessRequests.h"
-#include "BuildWorkspaceFailure.h"
-#include "LauncherOperationProgress.h"
+#include "Build/NativeBuildOutputReset.h"
+#include "Build/BuildWorkspaceProcessRequests.h"
+#include "Build/BuildWorkspaceFailure.h"
+#include "Operations/LauncherOperationProgress.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "ToolOutputPaths.h"
 #include "SparkleLauncher/SourceDependencyState.h"

@@ -111,25 +111,7 @@ namespace Files
 
 	bool TryWriteAllText(const std::filesystem::path& path, std::string_view text, std::string& outErrorMessage)
 	{
-		std::ofstream output;
-		if (!TryOpenBinaryOutput(path, output, outErrorMessage))
-		{
-			return false;
-		}
-		if (!text.empty() && !output.write(text.data(), static_cast<std::streamsize>(text.size())))
-		{
-			outErrorMessage = std::format("Failed to write '{}'", path.string());
-			return false;
-		}
-
-		output.flush();
-		if (!output)
-		{
-			outErrorMessage = std::format("Failed to flush '{}'", path.string());
-			return false;
-		}
-		outErrorMessage.clear();
-		return true;
+		return TryWriteAllBytes(path, std::as_bytes(std::span(text)), outErrorMessage);
 	}
 
 	bool TryWriteAllTextAtomic(const std::filesystem::path& path, std::string_view text, std::string& outErrorMessage)

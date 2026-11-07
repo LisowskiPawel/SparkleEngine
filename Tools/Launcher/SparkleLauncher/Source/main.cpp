@@ -1,5 +1,5 @@
-#include "LauncherGuiApp.h"
-#include "../Private/Shell/LauncherShell.h"
+#include "Gui/App/LauncherGuiApp.h"
+#include "Shell/LauncherShell.h"
 #include "Core/Public/Threading/ThreadOwnership.h"
 #include "Core/Public/Process/CommandLineUtils.h"
 #include <vector>

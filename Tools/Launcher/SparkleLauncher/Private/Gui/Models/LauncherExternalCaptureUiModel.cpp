@@ -1,5 +1,5 @@
-#include "LauncherExternalCaptureUiModel.h"
-#include "ExternalCaptureDiscovery.h"
+#include "Gui/Models/LauncherExternalCaptureUiModel.h"
+#include "ExternalCapture/ExternalCaptureDiscovery.h"
 
 namespace SparkleLauncher
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LauncherOperationRequest.h"
+#include "Gui/Operations/LauncherOperationRequest.h"
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "SparkleLauncher/CookOperations.h"
 #include "SparkleLauncher/LevelOperations.h"

@@ -1,11 +1,11 @@
-#include "LauncherShell.h"
+#include "Shell/LauncherShell.h"
 
-#include "LauncherShellArguments.h"
-#include "LauncherShellModel.h"
-#include "LauncherShellOperations.h"
-#include "LauncherShellPresentation.h"
-#include "LauncherShadowExecution.h"
-#include "LauncherRootResolver.h"
+#include "Shell/LauncherShellArguments.h"
+#include "Shell/LauncherShellModel.h"
+#include "Shell/LauncherShellOperations.h"
+#include "Shell/LauncherShellPresentation.h"
+#include "Startup/LauncherShadowExecution.h"
+#include "Workspace/LauncherRootResolver.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
 
 #include "SparkleLauncher/ProjectResolver.h"

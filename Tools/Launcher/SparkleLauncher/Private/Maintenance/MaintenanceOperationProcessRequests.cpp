@@ -1,7 +1,7 @@
-#include "MaintenanceOperationProcessRequests.h"
+#include "Maintenance/MaintenanceOperationProcessRequests.h"
 
 #include "Core/Public/Paths/ProductUserStatePaths.h"
-#include "LauncherStatePaths.h"
+#include "Workspace/LauncherStatePaths.h"
 #include "ToolOutputPaths.h"
 
 #include <algorithm>

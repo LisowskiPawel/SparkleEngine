@@ -3,9 +3,9 @@
 #include "Cooking/GlobalShaderCooker.h"
 
 #include "Backend/ShaderBackendPool.h"
-#include "Cooking/ShaderArtifactPublication.h"
-#include "Cooking/ShaderCompileBatch.h"
-#include "Cooking/ShaderCookPlanBuilder.h"
+#include "Cooking/Publication/ShaderArtifactPublication.h"
+#include "Cooking/Compilation/ShaderCompileBatch.h"
+#include "Cooking/Planning/ShaderCookPlanBuilder.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
 

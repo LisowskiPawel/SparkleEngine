@@ -1,0 +1,69 @@
+#pragma once
+
+#include "EditorAPI.h"
+#include "Viewport/ViewportOutputAction.h"
+#include "../../../Renderer/Public/Viewport/ViewportContracts.h"
+#include "../../../Renderer/Public/UI/UiTextureHandle.h"
+#include "Input/Dispatch/InputLayer.h"
+
+#include <cstdint>
+#include <memory>
+
+class EditorIconService;
+class ViewportOverlay;
+
+class SPARKLE_EDITOR_API ViewportPanel final
+{
+public:
+	ViewportPanel(float leftInsetPixels = 320.0f, float rightInsetPixels = 456.0f) noexcept;
+	~ViewportPanel() noexcept;
+
+	ViewportPanel(const ViewportPanel&) = delete;
+	ViewportPanel(ViewportPanel&&) = delete;
+	ViewportPanel& operator=(const ViewportPanel&) = delete;
+	ViewportPanel& operator=(ViewportPanel&&) = delete;
+
+	void SetTopInset(float topInsetPixels) noexcept;
+	void SetBottomInset(float bottomInsetPixels) noexcept;
+	void SetSideInsets(float leftInsetPixels, float rightInsetPixels) noexcept;
+	void SetRequestedExtent(RenderViewportExtent extent) noexcept;
+	void SetViewMode(RenderViewMode viewMode) noexcept;
+	void SetExposureOverrides(const ViewportExposureOverrides& overrides) noexcept;
+	void SetRenderProducts(const ViewportRenderProducts& renderProducts) noexcept;
+	void SetFinalColorTexture(UiTextureHandle texture) noexcept;
+	const ViewportRenderRequest& GetRenderRequest() const noexcept;
+
+	void RequestOutputAction(ViewportOutputAction action) noexcept { m_outputAction = action; }
+
+	ViewportOutputAction ConsumeOutputAction() noexcept;
+
+	InputLayer GetTargetInputLayer() const noexcept { return InputLayer::Gameplay; }
+
+	bool GetInputBounds(float& left, float& top, float& right, float& bottom) const noexcept;
+	void SetOverlay(std::unique_ptr<ViewportOverlay> overlay) noexcept;
+	void BuildUI(EditorIconService& icons, bool disableInteraction = false);
+
+private:
+	void BeginViewportWindow() const;
+	void BeginViewportSurface();
+	void BuildViewportImage();
+	void UpdateRequestedExtent(float availableWidth, float availableHeight) noexcept;
+	void BuildEmptyState() noexcept;
+	void BuildProgressOverlay() noexcept;
+	void BuildOverlay(EditorIconService& icons, bool disableInteraction) noexcept;
+
+	ViewportRenderRequest m_renderRequest = {};
+	ViewportRenderProducts m_renderProducts = {};
+	float m_topInsetPixels = 0.0f;
+	float m_bottomInsetPixels = 0.0f;
+	float m_leftInsetPixels = 320.0f;
+	float m_rightInsetPixels = 456.0f;
+	UiTextureHandle m_finalColorTexture;
+	float m_inputLeft = 0.0f;
+	float m_inputTop = 0.0f;
+	float m_inputRight = 0.0f;
+	float m_inputBottom = 0.0f;
+	bool m_hasInputBounds = false;
+	ViewportOutputAction m_outputAction = ViewportOutputAction::None;
+	std::unique_ptr<ViewportOverlay> m_overlay;
+};

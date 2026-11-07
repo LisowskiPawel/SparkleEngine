@@ -98,6 +98,8 @@ private:
 	void UnregisterMemoryBlockRecord(VulkanGpuMemoryBlockRecord& record) noexcept;
 	static std::uint32_t ResolveVmaMemoryUsage(RhiMemoryResidencyClass residencyClass) noexcept;
 	static std::uint32_t ResolveVmaAllocationFlags(RhiMemoryResidencyClass residencyClass) noexcept;
+	VkResult AllocateMemoryBlock(VulkanGpuMemoryBlockRecord& memoryBlock, VkMemoryRequirements& memoryRequirements) noexcept;
+	bool CompleteMemoryBlockAllocation(VulkanGpuMemoryBlockRecord& memoryBlock, VkResult allocationResult) noexcept;
 	bool EnsureMemoryBlockAllocationForImage(VulkanGpuMemoryBlockRecord& memoryBlock, const VkImageCreateInfo& imageCreateInfo) noexcept;
 	bool EnsureMemoryBlockAllocationForBuffer(VulkanGpuMemoryBlockRecord& memoryBlock, const VkBufferCreateInfo& bufferCreateInfo) noexcept;
 

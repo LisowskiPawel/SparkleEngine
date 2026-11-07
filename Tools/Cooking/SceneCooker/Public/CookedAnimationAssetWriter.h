@@ -9,8 +9,7 @@ namespace Files
 
 struct CookedAnimationAssetBuild;
 
-class CookedAnimationAssetWriter final
+namespace CookedAnimationAssetWriter
 {
-public:
-	static void StageAnimationAssets(const std::vector<CookedAnimationAssetBuild>& animationAssets, std::vector<Files::FilePublication>& outPublication);
-};
+	void StageAnimationAssets(const std::vector<CookedAnimationAssetBuild>& animationAssets, std::vector<Files::FilePublication>& outPublication);
+}

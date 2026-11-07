@@ -1,8 +1,8 @@
-#include "LauncherLevelUiModel.h"
+#include "Gui/Models/LauncherLevelUiModel.h"
 
-#include "LauncherContentModel.h"
-#include "../../Cook/CookedContentReadiness.h"
-#include "LauncherProductPaths.h"
+#include "Gui/Models/LauncherContentModel.h"
+#include "Cook/CookedContentReadiness.h"
+#include "Workspace/LauncherProductPaths.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "ProjectLevelCatalog.h"

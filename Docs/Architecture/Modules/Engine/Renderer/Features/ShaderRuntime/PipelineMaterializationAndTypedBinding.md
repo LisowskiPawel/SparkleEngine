@@ -39,6 +39,29 @@ typed C++ pass struct + shader registration
 
 The benefit is fail-fast ABI and state validation with one cache owner. Feature passes do not hand-build backend root signatures/descriptor layouts, and a shader reload cannot partially replace only some materialized programs.
 
+The 2026-11-05 ownership cleanup separates generation activation and retirement
+in `RenderPassRuntimeCache` from compute, graphics and ray holder mechanics in
+`RenderPassRuntimeStorage.h`. One typed lookup/admission path keys holders by
+their complete storage type; graphics vertex/pixel pairs and ray-generation
+types remain distinct. Holder state and creation details are private; the cache
+uses materialization and exact lookup operations, including compute readiness.
+Graphics materialization passes its computed key into pipeline creation instead
+of rebuilding its parameter signature. Exact ray-composition lookup and
+shader-table failure handling each have one implementation. Stateless shader
+validation and layout creation are namespace functions; compute creation no
+longer accepts an unused configuration callback. Reload orchestration builds the
+complete replacement before activating it and retaining the old generation for
+queue completion. This source organization does not establish native pipeline,
+GPU output or reload-stress acceptance.
+
+The 2026-11-07 folder refinement places stateless capability validation,
+binding-layout creation and graphics/compute creation in
+[`Pipeline/PipelineMaterialization`](../../../../../../../Engine/Renderer/Private/Pipeline/PipelineMaterialization.h),
+beside the existing materialization and generation-cache owners. The former
+sibling runtime-helper folder and namespace are removed. The helper has no
+independent target or retained state; pipeline identity, generation retirement
+and the Renderer/RHI contract are preserved.
+
 ## Build And Registration Membership
 
 | Target/owner | Current role | Boundary |
@@ -138,7 +161,8 @@ Primary evidence destination: `REN-E31` in the [Capability Evidence Plan](../../
 ## Primary Source Routes
 
 - [`RenderPassRuntimeCache.h`](../../../../../../../Engine/Renderer/Private/Pipeline/RenderPassRuntimeCache.h) and [`RenderPassRuntimeCache.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/RenderPassRuntimeCache.cpp)
-- [`PipelineRuntimeLibrary.cpp`](../../../../../../../Engine/Renderer/Private/PipelineRuntime/PipelineRuntimeLibrary.cpp)
+- [`RenderPassRuntimeStorage.h`](../../../../../../../Engine/Renderer/Private/Pipeline/RenderPassRuntimeStorage.h)
+- [`PipelineMaterialization.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/PipelineMaterialization.cpp)
 - [`GraphicsPipelineMaterialization.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/GraphicsPipelineMaterialization.cpp)
 - [`RayTracingPipelineRuntime.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/RayTracingPipelineRuntime.cpp)
 - [`RayTracingPipelineMaterialization.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/RayTracingPipelineMaterialization.cpp) and [`RayTracingShaderTableMaterialization.cpp`](../../../../../../../Engine/Renderer/Private/Pipeline/RayTracingShaderTableMaterialization.cpp)

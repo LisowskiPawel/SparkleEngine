@@ -22,19 +22,19 @@ ConsoleCommandResult EditorShaderCompileOperation::Request(bool generateSymbols)
 	}
 
 	std::string error;
-	if (!m_operation.Start(
-	        TaskName{"Compile editor shaders"},
-	        "Shader compilation is already running.",
-	        [compile = m_compile, generateSymbols](ConsoleCommandResult& result, TaskExecutionContext& context)
-	        {
-		        result = compile(generateSymbols, context.GetCancellationToken());
-		        if (context.IsCancellationRequested())
+	const TaskName taskName = TaskName{"Compile editor shaders"};
+	auto operationTask = [compile = m_compile, generateSymbols](ConsoleCommandResult& result, TaskExecutionContext& context)
 		        {
-			        return TaskResult::Cancelled("Shader compilation cancelled.");
-		        }
-		        return result.Succeeded ? TaskResult::Success() : TaskResult::Failure(result.Message);
-	        },
-	        error))
+			        result = compile(generateSymbols, context.GetCancellationToken());
+			        if (context.IsCancellationRequested())
+			        {
+				        return TaskResult::Cancelled("Shader compilation cancelled.");
+			        }
+			        return result.Succeeded ? TaskResult::Success() : TaskResult::Failure(result.Message);
+		        };
+	const bool operationStarted = m_operation.Start(taskName, "Shader compilation is already running.", std::move(operationTask), error);
+	
+	if (!operationStarted)
 	{
 		return ConsoleCommandResult::Error(std::move(error));
 	}

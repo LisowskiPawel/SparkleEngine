@@ -13,6 +13,28 @@
 #include <system_error>
 #include <utility>
 
+namespace ProjectLevelCatalogParsing
+{
+	template <typename TRecord> struct TextField final
+	{
+		std::string_view Key;
+		std::string TRecord::* Member;
+	};
+
+	template <typename TRecord, std::size_t N> bool AssignTextField(TRecord& record, std::string_view key, std::string_view value, const TextField<TRecord> (&fields)[N])
+	{
+		for (const TextField<TRecord>& field : fields)
+		{
+			if (key == field.Key)
+			{
+				record.*field.Member = Strings::UnquoteCopy(value);
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
 ProjectLevelCatalog ProjectLevelCatalogReader::Read(const std::filesystem::path& projectRoot)
 {
 	const std::filesystem::path normalizedRoot = Paths::Normalize(projectRoot);
@@ -142,41 +164,28 @@ void ProjectLevelCatalogReader::BeginAssetPack()
 
 void ProjectLevelCatalogReader::ParseLevelField(std::string_view key, std::string_view value)
 {
-	if (key == "Id")
+	static constexpr ProjectLevelCatalogParsing::TextField<ProjectLevelCatalogEntry> textFields[] = {
+	    {"Id", &ProjectLevelCatalogEntry::id},
+	    {"DisplayName", &ProjectLevelCatalogEntry::displayName},
+	    {"Description", &ProjectLevelCatalogEntry::description},
+	    {"SourcePage", &ProjectLevelCatalogEntry::sourcePageUrl},
+	    {"AssetPack", &ProjectLevelCatalogEntry::assetPackId},
+	    {"Family", &ProjectLevelCatalogEntry::family},
+	    {"VariantKind", &ProjectLevelCatalogEntry::variantKind},
+	};
+
+	if (ProjectLevelCatalogParsing::AssignTextField(*m_currentLevel, key, value, textFields))
 	{
-		m_currentLevel->id = Strings::UnquoteCopy(value);
+		return;
 	}
-	else if (key == "DisplayName")
-	{
-		m_currentLevel->displayName = Strings::UnquoteCopy(value);
-	}
-	else if (key == "Description")
-	{
-		m_currentLevel->description = Strings::UnquoteCopy(value);
-	}
-	else if (key == "Source")
+
+	if (key == "Source")
 	{
 		m_currentLevel->sourcePath = ResolveProjectPath(value);
 	}
 	else if (key == "Thumbnail")
 	{
 		m_currentLevel->thumbnailPath = ResolveProjectPath(value);
-	}
-	else if (key == "SourcePage")
-	{
-		m_currentLevel->sourcePageUrl = Strings::UnquoteCopy(value);
-	}
-	else if (key == "AssetPack")
-	{
-		m_currentLevel->assetPackId = Strings::UnquoteCopy(value);
-	}
-	else if (key == "Family")
-	{
-		m_currentLevel->family = Strings::UnquoteCopy(value);
-	}
-	else if (key == "VariantKind")
-	{
-		m_currentLevel->variantKind = Strings::UnquoteCopy(value);
 	}
 	else if (key == "ReleaseSupported")
 	{
@@ -213,11 +222,27 @@ void ProjectLevelCatalogReader::ParseAssetPackField(std::string_view key, std::s
 	{
 		throw Diagnostics::Error("Asset pack field appears before its identity.");
 	}
-	if (key == "DisplayName")
+
+	static constexpr ProjectLevelCatalogParsing::TextField<ProjectAssetPack> textFields[] = {
+	    {"DisplayName", &ProjectAssetPack::displayName},
+	    {"Parent", &ProjectAssetPack::parentPackId},
+	    {"Kind", &ProjectAssetPack::contentKind},
+	    {"SourceUrl", &ProjectAssetPack::sourceUrl},
+	    {"SourcePage", &ProjectAssetPack::sourcePageUrl},
+	    {"Archive", &ProjectAssetPack::archiveName},
+	    {"ArchiveSha256", &ProjectAssetPack::archiveSha256},
+	    {"Version", &ProjectAssetPack::version},
+	    {"License", &ProjectAssetPack::license},
+	    {"GameBlocker", &ProjectAssetPack::gameBlocker},
+	    {"DownloadBlocker", &ProjectAssetPack::downloadBlocker},
+	};
+
+	if (ProjectLevelCatalogParsing::AssignTextField(*m_currentPack, key, value, textFields))
 	{
-		m_currentPack->displayName = Strings::UnquoteCopy(value);
+		return;
 	}
-	else if (key == "Root")
+
+	if (key == "Root")
 	{
 		m_currentPack->rootPath = ResolveProjectPath(value);
 	}
@@ -229,53 +254,13 @@ void ProjectLevelCatalogReader::ParseAssetPackField(std::string_view key, std::s
 	{
 		m_currentPack->requiredRelativePath = std::filesystem::path(Strings::UnquoteCopy(value)).lexically_normal();
 	}
-	else if (key == "Parent")
-	{
-		m_currentPack->parentPackId = Strings::UnquoteCopy(value);
-	}
-	else if (key == "Kind")
-	{
-		m_currentPack->contentKind = Strings::UnquoteCopy(value);
-	}
-	else if (key == "SourceUrl")
-	{
-		m_currentPack->sourceUrl = Strings::UnquoteCopy(value);
-	}
-	else if (key == "SourcePage")
-	{
-		m_currentPack->sourcePageUrl = Strings::UnquoteCopy(value);
-	}
 	else if (key == "SourceFiles")
 	{
 		m_currentPack->sourceFilesManifestPath = ResolveProjectPath(value);
 	}
-	else if (key == "Archive")
-	{
-		m_currentPack->archiveName = Strings::UnquoteCopy(value);
-	}
 	else if (key == "ArchiveBytes")
 	{
 		m_currentPack->archiveBytes = ParseByteCount(value);
-	}
-	else if (key == "ArchiveSha256")
-	{
-		m_currentPack->archiveSha256 = Strings::UnquoteCopy(value);
-	}
-	else if (key == "Version")
-	{
-		m_currentPack->version = Strings::UnquoteCopy(value);
-	}
-	else if (key == "License")
-	{
-		m_currentPack->license = Strings::UnquoteCopy(value);
-	}
-	else if (key == "GameBlocker")
-	{
-		m_currentPack->gameBlocker = Strings::UnquoteCopy(value);
-	}
-	else if (key == "DownloadBlocker")
-	{
-		m_currentPack->downloadBlocker = Strings::UnquoteCopy(value);
 	}
 	else if (key == "External")
 	{

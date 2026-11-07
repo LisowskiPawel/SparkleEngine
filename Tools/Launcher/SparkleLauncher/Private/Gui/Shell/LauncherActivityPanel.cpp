@@ -1,8 +1,8 @@
-#include "LauncherActivityPanel.h"
+#include "Gui/Shell/LauncherActivityPanel.h"
 
-#include "LauncherIconLibrary.h"
-#include "LauncherUiDesign.h"
-#include "Models/LauncherOperationResult.h"
+#include "Gui/Style/LauncherIconLibrary.h"
+#include "Gui/Style/LauncherUiDesign.h"
+#include "Gui/Models/LauncherOperationResult.h"
 
 #include <QtGui/QClipboard>
 #include <QtGui/QColor>

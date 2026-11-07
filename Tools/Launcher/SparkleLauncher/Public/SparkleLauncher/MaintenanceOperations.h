@@ -59,6 +59,21 @@ namespace SparkleLauncher
 
 	std::vector<MaintenanceCleanPathSpec> BuildLevelCleanPaths(const std::filesystem::path& contentRoot, std::string_view levelId);
 
+	struct ActionCleanTargetRequest
+	{
+		std::filesystem::path WorkspaceRoot;
+		std::filesystem::path RunningLauncherPath;
+		std::string OperationId;
+		std::string ContentId;
+		std::string EditorProfile;
+		std::string GameProfile;
+		std::vector<std::string> BuildScopes;
+		std::vector<std::string> CookScopes;
+	};
+
+	bool SupportsActionSpecificClean(std::string_view operationId);
+	std::vector<MaintenanceCleanPathSpec> BuildActionCleanPaths(const ActionCleanTargetRequest& request);
+
 	struct MaintenanceOperationRequest
 	{
 		std::filesystem::path WorkspaceRoot;

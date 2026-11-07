@@ -195,6 +195,16 @@ A complete neutral binding layout plus type-correct writes becomes backend descr
 
 Descriptor operation ownership was reconciled on 2026-10-25. Frame admission names descriptor allocation/table/view reclamation in the existing order. D3D12 view dispatch selects focused render-target, depth, texture SRV/UAV and buffer SRV/UAV writers; each owns its native descriptor fields and validation. Vulkan descriptor snapshots, table identity, pool capacity and retirement state remain under their existing owners.
 
+**Responsibility cleanup, 2026-11-05:** D3D12 sampler construction sequences table
+allocation, shared-sampler creation and readiness. Filtered slot selection uses
+one fixed lookup for point and linear filtering; anisotropic selection retains
+its explicit factor-to-slot mapping. The sampler catalog, native descriptors,
+mixed-address special case and unsupported-input behavior remain unchanged.
+Mutable descriptor lookups in both backends reuse their existing const
+validators; generation, allocation and bounds checks retain one authority.
+CPU lookup controls and backend builds are bounded source/contract evidence,
+not GPU sampling, descriptor-lifetime or backend-parity acceptance.
+
 ### Descriptor Binding: Acceptance Criteria
 
 #### Vulkan Recording-Pool Capacity
@@ -415,6 +425,19 @@ Synchronous-looking helper calls do not waive queue completion. Texture capture 
 | retirement | last queue consumer token | graph execution retirement token(s) | transfer completion plus result ownership |
 
 ### Capacity, Failure, And Non-Claims
+
+**Memory responsibility cleanup, 2026-11-05:** `VulkanGpuMemoryAllocator` sequences
+native budget queries, locked live/pending accounting and category projection.
+Private `VulkanMemoryUsage` owns the stateless accounting algorithms; live record
+spans remain borrowed under the existing records mutex. Native budget queries and
+final category projection retain their positions outside that lock. The private
+native budget query requires a writable `VK_MAX_MEMORY_HEAPS` view, matching the
+allocator's fixed output array and preventing undersized-buffer calls. Shared alias
+block allocation and finalization keep image/buffer creation, requirements query,
+allocation, temporary destruction and metadata publication in the existing order.
+Recording references, queue completion, deferred release and destruction remain
+with the allocator. Controlled Vulkan/VMA-provider cases and backend builds do
+not qualify real device allocation, alias execution, pressure or GPU retirement.
 
 - The 23-format vocabulary and per-adapter support query define candidates; they do not prove sampled/storage/RT/DS/copy/filtering support for every format.
 - D3D12MA/VMA presence proves allocator integration, not graceful oversubscription, eviction, priority, defragmentation, or equal memory behavior.

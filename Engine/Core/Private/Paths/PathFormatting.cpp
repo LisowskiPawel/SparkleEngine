@@ -75,12 +75,11 @@ namespace PathFormatting
 			return false;
 		}
 
-		const std::string valueTail = std::string(value.substr(value.size() - suffix.size()));
-		const std::string suffixString(suffix);
+		const std::string_view valueTail = value.substr(value.size() - suffix.size());
 		for (std::size_t index = 0; index < suffix.size(); ++index)
 		{
 			const char lhs = ToLowerAscii(valueTail[index]);
-			const char rhs = ToLowerAscii(suffixString[index]);
+			const char rhs = ToLowerAscii(suffix[index]);
 			if (lhs != rhs)
 			{
 				return false;

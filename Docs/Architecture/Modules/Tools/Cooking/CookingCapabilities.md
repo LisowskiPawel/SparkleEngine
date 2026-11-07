@@ -86,6 +86,17 @@ Source loading was rechecked on 2026-10-06: `LoadTextureSource` selects direct D
 
 ## Scene Product Coverage
 
+**Writing boundaries, 2026-11-05:** mesh, animation, skeleton and scene-manifest
+writers build their own headers and pass their ordered arrays to ToolSupport's
+[binary asset writer](../../../../../Tools/Support/ToolSupport/Public/BinaryAssetWriter.h).
+They retain staging-path selection and registration in the generation file set.
+[Scene generation publication](../../../../../Tools/Cooking/SceneCooker/Private/CookedSceneGenerationWriter.cpp)
+still owns the publisher lifetime, asset staging, manifest/registry staging,
+publication and failure cleanup. Its friend access to private manifest staging is
+retained. Material strings and texture mip alignment keep their distinct write
+protocols. The shared stream lifecycle does not change cooked layouts or establish
+transactional, runtime-consumption or full-cook acceptance.
+
 | ID | Product | Current payload | Publication/consumer | Evidence |
 | --- | --- | --- | --- | --- |
 | `COOK-017` | Mesh | Vertices/indices, static/skeletal kind, skin influences, morph targets/defaults, mesh metadata | Staged by MeshCooker; GameFramework mesh loader | `S` |

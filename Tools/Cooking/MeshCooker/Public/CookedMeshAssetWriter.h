@@ -9,8 +9,7 @@ namespace Files
 
 struct CookedMeshAssetBuild;
 
-class CookedMeshAssetWriter final
+namespace CookedMeshAssetWriter
 {
-public:
-	static void StageMeshAssets(const std::vector<CookedMeshAssetBuild>& meshAssets, std::vector<Files::FilePublication>& outPublication);
-};
+	void StageMeshAssets(const std::vector<CookedMeshAssetBuild>& meshAssets, std::vector<Files::FilePublication>& outPublication);
+}

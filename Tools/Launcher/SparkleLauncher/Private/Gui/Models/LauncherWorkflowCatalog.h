@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LauncherUiModel.h"
+#include "Gui/Models/LauncherUiModel.h"
 
 #include <QtCore/QString>
 #include <QtCore/QVector>

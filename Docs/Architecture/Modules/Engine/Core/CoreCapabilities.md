@@ -24,7 +24,7 @@ Path ownership amendment (2026-11-01): package/installed discovery, manifest par
 
 | Foundation | Current role | Deliberate boundary |
 | --- | --- | --- |
-| diagnostics and console | logging/fatal/verify, typed CVars, commands, bounded interactive session | product hosts decide reachability; Core does not persist settings or define feature policy |
+| diagnostics and configuration | logging/fatal/verify, typed CVars and control requests, shared console output values | Editor owns commands and sessions; product hosts decide reachability; Core does not persist settings or define feature policy |
 | files, paths, processes, serialization | validated paths, transactional publication helpers, bounded byte decoding, lightweight JSON, child execution | no general asset database, schema migration system, or package manager |
 | events, input vocabulary, time, ownership | synchronous typed events, platform-neutral input state, timer, thread-role assertions | not an async bus, fixed-step simulation scheduler, or automatic thread safety |
 | math, pixels, hashing/string tables | shared transforms, sampling helpers, linear/sRGB conversion, deterministic identifiers | consuming schemas own units, collision policy, formats, and numerical oracles |
@@ -35,7 +35,7 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 
 ## Module Boundary
 
-`SparkleCore` is the base engine library. It has no other engine dependency; it publicly carries the header-only `spdlog` contract and links Windows `bcrypt` privately. It can be static or shared. Logging compile level is Trace in Debug, Info in Development, and Warning in Shipping profiles.
+`SparkleCore` is the base engine library. It has no other engine dependency; it publicly carries the header-only `spdlog` contract and links Windows `bcrypt`, `ole32` and `shell32` privately. It can be static or shared. Logging compile level is Trace in Debug, Info in Development, and Warning in Shipping profiles.
 
 ## Capability Surface
 
@@ -43,7 +43,7 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 | --- | --- | --- | --- | --- |
 | `CORE-001` | Named diagnostics | Implemented path | Process-wide `spdlog` bootstrap, lightweight declared `LogCategory` frontend, Core-private named logger creation/lifetime, active log-file discovery, startup verbosity from `SPARKLE_LOG_LEVEL`, fatal/verify helpers, and debugger break-if-attached. Fatal paths are process-terminating policy, not recoverable errors. | `S` |
 | `CORE-002` | Console-variable registry | Implemented path | Statically registered typed CVars support bool, integral, floating, enum-as-number, and string values. Lookup and string mutation report parse errors. Display type names derive from the typed implementation; variables retain no RTTI type-index metadata. Enum owners can define a pure `IsValidConsoleVariableValue` overload, found by argument-dependent lookup, to reject unsupported numeric values before mutation; Core retains no feature-specific rules or validator registry. There is no persistence layer in Core. | `S` |
-| `CORE-003` | Console command/session | Moved to Editor | Interactive registration, parsing, completion, history and session storage are private to Editor. Core retains the shared output/result values and CVar control consumed by the Editor host and shader actions. | `S` |
+| `CORE-003` | Console command/session | Moved to Editor | Command dispatch, parsing, completion, history and session storage are private to Editor. Core retains the shared output/result values and CVar control consumed by the Editor host and shader actions. | `S` |
 | `CORE-004` | Event dispatch | Implemented path | Fixed-capacity typed synchronous events return handles; `ScopedEventHandle` removes a subscription on destruction. This is same-thread callback dispatch, not an asynchronous message bus. | `S` |
 | `CORE-005` | Whole-file I/O | Implemented path | Binary/text reads and writes, UTF-8 read-error paths, temporary paths, close/finalize helpers, atomic text write, and multi-file publication with cleanup. Atomicity/durability across crash or hostile filesystems is not runtime-proven. | `S` |
 | `CORE-006` | Bounded binary decode/encode | Implemented path | Span reader checks remaining bytes and multiplication overflow; buffer/stream writers cover trivially-copyable values/arrays, raw bytes, and UInt32-length strings. These helpers do not provide schema evolution by themselves. | `S` |
@@ -62,7 +62,31 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 
 ## Vertical Traces
 
+### Text and JSON decoding
+
+Responsibility cleanup, 2026-11-05: `Strings/StringEncoding.cpp` owns UTF-8
+validation, scalar encoding and native-wide conversion. `StringUtils.cpp` keeps
+ordinary string operations under the existing public contract. JSON value
+dispatch delegates string escapes, member names and container traversal to
+focused private functions. Unicode, duplicate-key, complete-object and nesting
+rejection rules remain unchanged; this adds no DOM or schema system.
+
+The FNV string overload and workspace-state key construction use the existing
+byte-hash implementation. ASCII suffix comparison borrows views rather than
+copying both operands. Workspace-key spelling and hash values remain unchanged.
+The native before/after controls cover encoding boundaries, malformed documents,
+hash vectors and workspace keys; they do not qualify other platforms or package
+behavior.
+
 ### Transactional file publication
+
+Responsibility cleanup, 2026-11-05: replacement planning invokes separate path
+admission and filesystem-input checks before publication begins. Lock, marker,
+commit and rollback lifetime remain together in the existing publisher. Text
+and byte writes share one byte-writing path. Bounded native controls exercise
+exact file bytes, rejected plans, reader/writer exclusion, successful rollback
+and failed rollback retaining an incomplete marker. This is same-process Windows
+filesystem evidence, not power-loss, hostile-filesystem or release acceptance.
 
 Cooking declares the output directories and complete staged file set. Core provides fail-fast read/write scopes, containment checks and checked in-process rollback. Writers mark output incomplete before replacement and clear the marker only after successful publication or ordinary rollback. A killed publisher or failed cleanup leaves generated output unusable: clean it and regenerate it from source. There is no persisted transaction log, checksum parser, file-identity recovery or cross-directory recovery protocol.
 
@@ -138,7 +162,7 @@ Path ownership reconciled on 2026-11-01: public `Paths/FileSystemPaths.h` declar
 
 - No networking, sockets, plugin loader, reflection/type system, general archive/container format, database, allocator framework, or cross-platform process implementation was found in this module.
 - `Windows.h`, DirectXMath, Win32 process code, and private `bcrypt` make the current Core surface Windows-oriented despite otherwise portable helpers.
-- CVar assignment is mutable global state and not synchronized or persisted by Core.
+- Individual CVar values use atomic storage or a value mutex. Registry mutation and multi-variable batches still require host-owned ordering; Core provides no persistence or frame-consistent batch publication.
 - `Files::BinarySpanReader` owns cursor advancement, bounds, multiplication overflow, and borrowed raw array bytes. GameFramework's cooked reader translates failures into domain exceptions around that same cursor; it does not implement another byte decoder. The owning cooked schema still validates magic, counts, cross-references, and semantic invariants. This source boundary was rechecked on 2026-10-06.
 - Reader surface rechecked on 2026-10-25: non-template decoding lives in Core's matching source file. The unused typed-array reinterpretation and skip APIs are removed; consumers borrow raw bytes or copy decoded values without requiring aligned file storage. Cooked representations are unchanged.
 - Source presence does not establish crash-safe publication, Unicode/path edge behavior, privilege behavior, or packaged path correctness.

@@ -18,5 +18,6 @@ namespace SparkleLauncher
 		bool DeletesCookedOutputs = false;
 	};
 
+	bool IncludesCookScope(const CookOperationPlan& plan, CookWorkspaceScope scope);
 	std::vector<CookOperationProcessStep> BuildCookProcessStepsForPlan(const CookOperationPlan& plan);
 }

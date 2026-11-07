@@ -3,7 +3,7 @@
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifactActions.h"
 
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifactCoordinator.h"
-#include "Editor/Public/Panels/ViewportOutputAction.h"
+#include "Editor/Public/Viewport/ViewportOutputAction.h"
 
 void ApplyReferencePathTracerArtifactAction(ViewportOutputAction action, ReferencePathTracerArtifactCoordinator& artifacts, Renderer& renderer, const ViewportRenderProducts& products)
 {

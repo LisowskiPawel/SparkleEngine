@@ -1,7 +1,7 @@
-#include "LauncherLayoutWidgets.h"
+#include "Gui/Widgets/LauncherLayoutWidgets.h"
 
-#include "LauncherArtworkWidgets.h"
-#include "LauncherUiDesign.h"
+#include "Gui/Widgets/LauncherArtworkWidgets.h"
+#include "Gui/Style/LauncherUiDesign.h"
 
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>

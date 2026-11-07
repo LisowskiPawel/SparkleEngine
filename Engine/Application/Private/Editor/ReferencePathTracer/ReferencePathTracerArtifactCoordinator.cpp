@@ -142,19 +142,19 @@ void ReferencePathTracerArtifactCoordinator::PublishIfReady()
 
 	m_mean.reset();
 	m_moment2.reset();
-	if (!m_writeOperation.Start(
-	        TaskName("Publish Reference Path Tracer artifact"),
-	        "A Reference Path Tracer artifact is already being written.",
-	        [request = std::move(request)](ReferencePathTracerArtifactWriteResult& result, TaskExecutionContext& context) mutable
-	        {
-		        if (context.IsCancellationRequested())
+	const TaskName taskName = TaskName("Publish Reference Path Tracer artifact");
+	auto operationTask = [request = std::move(request)](ReferencePathTracerArtifactWriteResult& result, TaskExecutionContext& context) mutable
 		        {
-			        return TaskResult::Cancelled("Reference Path Tracer artifact publication was cancelled.");
-		        }
-		        result = ReferencePathTracerArtifactWriter::Write(std::move(request), context.GetCancellationToken());
-		        return result.Succeeded ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.ErrorMessage) : TaskResult::Failure(result.ErrorMessage));
-	        },
-	        errorMessage))
+			        if (context.IsCancellationRequested())
+			        {
+				        return TaskResult::Cancelled("Reference Path Tracer artifact publication was cancelled.");
+			        }
+			        result = ReferencePathTracerArtifactWriter::Write(std::move(request), context.GetCancellationToken());
+			        return result.Succeeded ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.ErrorMessage) : TaskResult::Failure(result.ErrorMessage));
+		        };
+	const bool operationStarted = m_writeOperation.Start(taskName, "A Reference Path Tracer artifact is already being written.", std::move(operationTask), errorMessage);
+	
+	if (!operationStarted)
 	{
 		Fail(std::move(errorMessage));
 		return;

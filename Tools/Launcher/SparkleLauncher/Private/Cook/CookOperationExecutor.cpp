@@ -1,7 +1,7 @@
 #include "SparkleLauncher/CookOperations.h"
 
-#include "CookOperationProcessRequests.h"
-#include "LauncherOperationProgress.h"
+#include "Cook/CookOperationProcessRequests.h"
+#include "Operations/LauncherOperationProgress.h"
 
 #include <optional>
 #include <system_error>

@@ -1,7 +1,7 @@
-#include "LauncherActionWidgets.h"
+#include "Gui/Widgets/LauncherActionWidgets.h"
 
-#include "LauncherUiDesign.h"
-#include "LauncherUiModel.h"
+#include "Gui/Style/LauncherUiDesign.h"
+#include "Gui/Models/LauncherUiModel.h"
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
@@ -94,5 +94,12 @@ namespace SparkleLauncher
 	{
 		const QString primaryVerb = LauncherUiModelForOperation(operationId).PrimaryVerb;
 		return primaryVerb.isEmpty() ? QString("Run") : primaryVerb;
+	}
+
+	void ApplyActionAvailability(QPushButton& button, bool enabled, const QString& reason)
+	{
+		button.setEnabled(enabled);
+		button.setToolTip(reason);
+		button.setAccessibleDescription(reason);
 	}
 }

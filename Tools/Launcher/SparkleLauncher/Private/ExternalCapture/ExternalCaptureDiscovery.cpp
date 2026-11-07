@@ -1,5 +1,5 @@
-#include "ExternalCaptureDiscovery.h"
-#include "HostGraphicsCapabilities.h"
+#include "ExternalCapture/ExternalCaptureDiscovery.h"
+#include "Build/Toolchains/HostGraphicsCapabilities.h"
 #include "Core/Public/Environment/EnvironmentVariables.h"
 
 #include <filesystem>

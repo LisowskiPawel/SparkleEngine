@@ -477,15 +477,7 @@ RhiResourceViewHandle VulkanDescriptorService::AddResourceView(ResourceViewRecor
 
 VulkanDescriptorService::ResourceViewRecord* VulkanDescriptorService::FindResourceViewRecord(RhiResourceViewHandle view) noexcept
 {
-	std::uint32_t recordIndex = 0;
-	std::uint16_t generation = 0;
-	if (!view.Decode(recordIndex, generation) || recordIndex >= m_resourceViewRecords.size())
-	{
-		return nullptr;
-	}
-
-	ResourceViewRecord& record = m_resourceViewRecords[recordIndex];
-	return record.IsAllocated() && record.Generation == generation ? &record : nullptr;
+	return const_cast<ResourceViewRecord*>(std::as_const(*this).FindResourceViewRecord(view));
 }
 
 const VulkanDescriptorService::ResourceViewRecord* VulkanDescriptorService::FindResourceViewRecord(RhiResourceViewHandle view) const noexcept

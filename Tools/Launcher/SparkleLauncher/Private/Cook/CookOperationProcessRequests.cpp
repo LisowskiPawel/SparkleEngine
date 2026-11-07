@@ -1,18 +1,31 @@
-#include "CookOperationProcessRequests.h"
+#include "Cook/CookOperationProcessRequests.h"
 #include "Core/Public/Strings/StringUtils.h"
 
-#include "LauncherProductPaths.h"
-#include "CMakeWorkflowProcessRequests.h"
-#include "LauncherStatePaths.h"
+#include "Workspace/LauncherProductPaths.h"
+#include "Build/CMakeWorkflowProcessRequests.h"
+#include "Workspace/LauncherStatePaths.h"
 
 #include <algorithm>
 #include <utility>
 
 namespace SparkleLauncher
 {
-	static bool IncludesScope(const CookOperationPlan& plan, CookWorkspaceScope scope)
+	bool IncludesCookScope(const CookOperationPlan& plan, CookWorkspaceScope scope)
 	{
-		return std::find(plan.Request.SelectedScopes.begin(), plan.Request.SelectedScopes.end(), scope) != plan.Request.SelectedScopes.end();
+		switch (plan.Kind)
+		{
+			case CookOperationKind::CookWorkspace:
+				return std::find(plan.Request.SelectedScopes.begin(), plan.Request.SelectedScopes.end(), scope) != plan.Request.SelectedScopes.end();
+			case CookOperationKind::CookShaders:
+				return scope == CookWorkspaceScope::Shaders;
+			case CookOperationKind::BuildTextures:
+				return scope == CookWorkspaceScope::Textures;
+			case CookOperationKind::BuildSceneAssets:
+				return scope == CookWorkspaceScope::SceneAssets;
+			case CookOperationKind::CookAllAssets:
+				return true;
+		}
+		return false;
 	}
 
 	static void AppendCommonShaderCompilerArguments(const CookOperationPlan& plan, std::vector<std::string>& arguments)
@@ -80,16 +93,6 @@ namespace SparkleLauncher
 		steps.push_back(std::move(step));
 	}
 
-	static void AddShaderCookSteps(std::vector<CookOperationProcessStep>& steps, const CookOperationPlan& plan)
-	{
-#if SPARKLE_ENABLE_SHADER_COMPILER
-		AddStep(steps, "cook-shaders", "Cook shaders", MakeShaderCompilerCookAllRequest(plan));
-#else
-		(void) steps;
-		(void) plan;
-#endif
-	}
-
 	std::vector<CookOperationProcessStep> BuildCookProcessStepsForPlan(const CookOperationPlan& plan)
 	{
 		std::vector<CookOperationProcessStep> steps;
@@ -98,48 +101,22 @@ namespace SparkleLauncher
 			AddCleanStep(steps, plan);
 		}
 
-		switch (plan.Kind)
-		{
-			case CookOperationKind::CookWorkspace:
-				if (IncludesScope(plan, CookWorkspaceScope::Shaders))
-				{
-					AddShaderCookSteps(steps, plan);
-				}
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-				if (IncludesScope(plan, CookWorkspaceScope::Textures))
-				{
-					AddStep(steps, "cook-textures", "Cook textures", MakeAssetCookerRequest(plan, "cook-textures", "CookTextures.txt"));
-				}
-				if (IncludesScope(plan, CookWorkspaceScope::SceneAssets))
-				{
-					AddStep(steps, "cook-scene-assets", "Cook meshes", MakeAssetCookerRequest(plan, "cook-assets", "CookSceneAssets.txt"));
-				}
-#endif
-				return steps;
-			case CookOperationKind::CookShaders:
-				AddShaderCookSteps(steps, plan);
-				return steps;
-			case CookOperationKind::BuildTextures:
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-				AddStep(steps, "cook-textures", "Cook textures", MakeAssetCookerRequest(plan, "cook-textures", "CookTextures.txt"));
-#endif
-				return steps;
-			case CookOperationKind::BuildSceneAssets:
-#if SPARKLE_ENABLE_CONTENT_PIPELINE
-				AddStep(steps, "cook-scene-assets", "Cook meshes", MakeAssetCookerRequest(plan, "cook-assets", "CookSceneAssets.txt"));
-#endif
-				return steps;
-			case CookOperationKind::CookAllAssets:
 #if SPARKLE_ENABLE_SHADER_COMPILER
-				AddStep(steps, "cook-shaders", "Cook shaders", MakeShaderCompilerCookAllRequest(plan));
+		if (IncludesCookScope(plan, CookWorkspaceScope::Shaders))
+		{
+			AddStep(steps, "cook-shaders", "Cook shaders", MakeShaderCompilerCookAllRequest(plan));
+		}
 #endif
 #if SPARKLE_ENABLE_CONTENT_PIPELINE
-				AddStep(steps, "cook-textures", "Cook textures", MakeAssetCookerRequest(plan, "cook-textures", "CookTextures.txt"));
-				AddStep(steps, "cook-scene-assets", "Cook meshes", MakeAssetCookerRequest(plan, "cook-assets", "CookSceneAssets.txt"));
-#endif
-				return steps;
+		if (IncludesCookScope(plan, CookWorkspaceScope::Textures))
+		{
+			AddStep(steps, "cook-textures", "Cook textures", MakeAssetCookerRequest(plan, "cook-textures", "CookTextures.txt"));
 		}
-
+		if (IncludesCookScope(plan, CookWorkspaceScope::SceneAssets))
+		{
+			AddStep(steps, "cook-scene-assets", "Cook meshes", MakeAssetCookerRequest(plan, "cook-assets", "CookSceneAssets.txt"));
+		}
+#endif
 		return steps;
 	}
 }

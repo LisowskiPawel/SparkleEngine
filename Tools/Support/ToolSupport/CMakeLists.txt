@@ -1,4 +1,5 @@
 set(TOOL_SUPPORT_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Public/BinaryAssetWriter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SourceAssetPaths.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/ToolConsole.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/ProjectLevelCatalog.h

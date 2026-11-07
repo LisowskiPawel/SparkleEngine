@@ -1,11 +1,11 @@
-#include "LauncherBackend.h"
+#include "Gui/App/LauncherBackend.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "SparkleLauncher/CookOperations.h"
 #include "SparkleLauncher/LevelOperations.h"
 #include "SparkleLauncher/LevelRunOperations.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
-#include "Operations/LauncherOperationService.h"
+#include "Gui/Operations/LauncherOperationService.h"
 
 #include <QtCore/QMetaObject>
 

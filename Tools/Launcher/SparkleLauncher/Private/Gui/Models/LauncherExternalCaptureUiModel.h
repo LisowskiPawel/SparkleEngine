@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LauncherContextUiModel.h"
+#include "Gui/Models/LauncherContextUiModel.h"
 #include <string_view>
 
 namespace SparkleLauncher

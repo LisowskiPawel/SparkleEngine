@@ -51,7 +51,7 @@ The descriptor and pixels are immutable and borrowed for the service lifetime. G
 
 All calls and cleanup run on the creating Editor thread and ImGui context. UI creates the service after typography has configured/cleared the atlas. UI destroys action clients, then the service's rectangles, then the backend/context. A client's replacement/removal does not destroy shared resources still used by another client; resources remain cached until UI teardown. Invalid context/thread/asset/allocation contracts fail at the service owner through existing fatal diagnostics. Atlas growth is supported by fresh rectangle/texture lookup; replacing the context/atlas or clearing typography while clients are live is not a supported operation.
 
-Existing ImGuiRenderPacketBuilder remains the only cross-thread texture upload/publication route. No live atlas pointer escapes the Editor thread. Font glyphs embedded in textual labels remain typography through the existing `UiUtil::EditorIcon` mapping; they are not converted into redundant image descriptors. Runtime image loading/decoding, SVGs, arbitrary hot reload and resolution variants are outside this implemented service.
+Existing ImGuiRenderPacketBuilder remains the only cross-thread texture upload/publication route. No live atlas pointer escapes the Editor thread. Font glyphs embedded in textual labels remain typography through the existing `EditorIcons::EditorIcon` mapping; they are not converted into redundant image descriptors. Runtime image loading/decoding, SVGs, arbitrary hot reload and resolution variants are outside this implemented service.
 
 ## Validation Limits
 

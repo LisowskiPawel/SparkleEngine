@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "Core/Public/Strings/StringUtils.h"
+#include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Paths/WorkspaceUserStatePaths.h"
 
@@ -73,12 +74,7 @@ namespace Filesystem::Private
 			character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
 		}
 #endif
-		std::uint64_t hash = 14695981039346656037ull;
-		for (const unsigned char character : pathKey)
-		{
-			hash ^= character;
-			hash *= 1099511628211ull;
-		}
+		const std::uint64_t hash = Hash::Fnv1a64(pathKey);
 
 		std::string workspaceName = Paths::MakeSafePathComponent(Strings::ToNarrow(normalizedRoot.filename().wstring()));
 		if (workspaceName.empty())

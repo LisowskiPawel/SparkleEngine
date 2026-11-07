@@ -3,65 +3,48 @@
 #include "CookedAnimationAssetWriter.h"
 
 #include "CookedSceneBuild.h"
-#include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Files/BinaryStreamWriter.h"
+#include "BinaryAssetWriter.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Paths/ProductFilePaths.h"
 
 #include <cstring>
-#include <fstream>
 
-class CookedAnimationAssetStager final
+namespace CookedAnimationAssetWriter
 {
-public:
-	static void StageAnimationAsset(const CookedAnimationAssetBuild& animationAsset, std::vector<Files::FilePublication>& outPublication);
-	static void BuildHeader(const CookedAnimationAssetBuild& animationAsset, Assets::CookedAnimationAssetHeader& header) noexcept;
-};
-
-void CookedAnimationAssetWriter::StageAnimationAssets(const std::vector<CookedAnimationAssetBuild>& animationAssets, std::vector<Files::FilePublication>& outPublication)
-{
-	for (const CookedAnimationAssetBuild& animationAsset : animationAssets)
+	static void BuildHeader(const CookedAnimationAssetBuild& animationAsset, Assets::CookedAnimationAssetHeader& header) noexcept
 	{
-		CookedAnimationAssetStager::StageAnimationAsset(animationAsset, outPublication);
-	}
-}
-
-void CookedAnimationAssetStager::StageAnimationAsset(const CookedAnimationAssetBuild& animationAsset, std::vector<Files::FilePublication>& outPublication)
-{
-	const std::filesystem::path outputPath = Paths::CookedAnimationAsset(animationAsset.assetId);
-	const std::filesystem::path stagedOutputPath = Files::BuildTemporaryPath(outputPath, ".cook-generation");
-
-	Files::CleanupTemporaryFile(stagedOutputPath);
-	outPublication.push_back({stagedOutputPath, outputPath});
-
-	Assets::CookedAnimationAssetHeader header;
-	BuildHeader(animationAsset, header);
-	std::string errorMessage;
-	std::ofstream output;
-	if (!Files::TryOpenBinaryOutput(stagedOutputPath, output, errorMessage) || !Files::BinaryStreamWriter::WriteValue(output, header, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(output, animationAsset.channels, errorMessage) || !Files::BinaryStreamWriter::WriteArray(output, animationAsset.keyframes, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
+		// The binary header includes alignment bytes that must be deterministic too.
+		std::memset(&header, 0, sizeof(header));
+		header.fileHeader.magic = Assets::kCookedAnimationAssetMagic;
+		header.targetSkeletonAssetId = animationAsset.targetSkeletonAssetId;
+		header.sourceAnimationIndex = animationAsset.sourceAnimationIndex;
+		header.durationSeconds = animationAsset.durationSeconds;
+		header.channelCount = static_cast<std::uint32_t>(animationAsset.channels.size());
+		header.keyframeCount = static_cast<std::uint32_t>(animationAsset.keyframes.size());
+		header.channelStride = sizeof(Assets::CookedAnimationChannelRecord);
+		header.keyframeStride = sizeof(Assets::CookedAnimationKeyframeRecord);
+		std::memcpy(header.name, animationAsset.name.data(), animationAsset.name.size());
 	}
 
-	if (!Files::TryCloseOutput(output, stagedOutputPath, errorMessage))
+	static void StageAnimationAsset(const CookedAnimationAssetBuild& animationAsset, std::vector<Files::FilePublication>& outPublication)
 	{
-		throw Diagnostics::Error(errorMessage);
-	}
-}
+		const std::filesystem::path outputPath = Paths::CookedAnimationAsset(animationAsset.assetId);
+		const std::filesystem::path stagedOutputPath = Files::BuildTemporaryPath(outputPath, ".cook-generation");
 
-void CookedAnimationAssetStager::BuildHeader(const CookedAnimationAssetBuild& animationAsset, Assets::CookedAnimationAssetHeader& header) noexcept
-{
-	// The binary header includes alignment bytes that must be deterministic too.
-	std::memset(&header, 0, sizeof(header));
-	header.fileHeader.magic = Assets::kCookedAnimationAssetMagic;
-	header.targetSkeletonAssetId = animationAsset.targetSkeletonAssetId;
-	header.sourceAnimationIndex = animationAsset.sourceAnimationIndex;
-	header.durationSeconds = animationAsset.durationSeconds;
-	header.channelCount = static_cast<std::uint32_t>(animationAsset.channels.size());
-	header.keyframeCount = static_cast<std::uint32_t>(animationAsset.keyframes.size());
-	header.channelStride = sizeof(Assets::CookedAnimationChannelRecord);
-	header.keyframeStride = sizeof(Assets::CookedAnimationKeyframeRecord);
-	std::memcpy(header.name, animationAsset.name.data(), animationAsset.name.size());
+		Files::CleanupTemporaryFile(stagedOutputPath);
+		outPublication.push_back({stagedOutputPath, outputPath});
+
+		Assets::CookedAnimationAssetHeader header;
+		BuildHeader(animationAsset, header);
+		SparkleTools::WriteBinaryAssetFile(stagedOutputPath, header, animationAsset.channels, animationAsset.keyframes);
+	}
+
+	void StageAnimationAssets(const std::vector<CookedAnimationAssetBuild>& animationAssets, std::vector<Files::FilePublication>& outPublication)
+	{
+		for (const CookedAnimationAssetBuild& animationAsset : animationAssets)
+		{
+			StageAnimationAsset(animationAsset, outPublication);
+		}
+	}
 }

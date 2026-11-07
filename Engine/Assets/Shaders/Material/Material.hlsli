@@ -6,6 +6,7 @@
 #include "/Engine/Geometry/Basis.hlsli"
 #include "/Engine/Geometry/PixelInput.hlsli"
 #include "/Engine/Material/MaterialNormal.hlsli"
+#include "/Engine/Material/MaterialTextureSlots.hlsli"
 
 Texture2D TextureBaseColor;
 Texture2D TextureNormal;
@@ -18,28 +19,9 @@ Texture2D TextureSubsurfaceStrength;
 
 namespace Material
 {
-	static const uint TextureGroupDiffuse = 1u;
-	static const uint TextureGroupNormalMap = 2u;
-	static const uint TextureGroupRoughness = 3u;
-	static const uint TextureGroupMetallic = 4u;
-	static const uint TextureGroupAmbientOcclusion = 5u;
-	static const uint TextureGroupEmissive = 6u;
-	static const uint TextureGroupSubsurfaceColor = 7u;
-	static const uint TextureGroupSubsurfaceStrength = 8u;
-
 	static const uint AlphaModeOpaque = 0u;
 	static const uint AlphaModeMask = 1u;
 	static const uint AlphaModeBlend = 2u;
-
-	uint TextureGroupFlag(uint textureGroup)
-	{
-		return 1u << textureGroup;
-	}
-
-	bool HasTexture(uint textureGroup)
-	{
-		return (TextureFlags & TextureGroupFlag(textureGroup)) != 0u;
-	}
 
 	void ApplyAlphaMode(float alpha)
 	{
@@ -68,12 +50,12 @@ namespace Material
 
 	float4 SampleBaseColor(float2 UV)
 	{
-		return HasTexture(TextureGroupDiffuse) ? TextureBaseColor.Sample(SamplerAniso16xWrap, UV) * BaseColor : BaseColor;
+		return MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotBaseColor) ? TextureBaseColor.Sample(SamplerAniso16xWrap, UV) * BaseColor : BaseColor;
 	}
 
 	float3 SampleNormalTangent(float2 UV)
 	{
-		if (!HasTexture(TextureGroupNormalMap))
+		if (!MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotNormal))
 		{
 			return float3(0.0f, 0.0f, 1.0f);
 		}
@@ -83,7 +65,7 @@ namespace Material
 
 	float SampleRoughness(float2 UV)
 	{
-		if (!HasTexture(TextureGroupRoughness))
+		if (!MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotRoughness))
 		{
 			return Roughness;
 		}
@@ -97,7 +79,7 @@ namespace Material
 		{
 			return 0.0f.xxx;
 		}
-		if (!HasTexture(TextureGroupEmissive))
+		if (!MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotEmissive))
 		{
 			return EmissiveColor;
 		}
@@ -107,7 +89,7 @@ namespace Material
 
 	float SampleMetallic(float2 UV)
 	{
-		if (!HasTexture(TextureGroupMetallic))
+		if (!MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotMetallic))
 		{
 			return Metallic;
 		}
@@ -117,7 +99,7 @@ namespace Material
 
 	float SampleAmbientOcclusion(float2 UV)
 	{
-		if (!HasTexture(TextureGroupAmbientOcclusion))
+		if (!MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotOcclusion))
 		{
 			return 1.0f;
 		}
@@ -127,7 +109,7 @@ namespace Material
 
 	float3 SampleSubsurfaceColor(float2 UV)
 	{
-		if (!HasTexture(TextureGroupSubsurfaceColor))
+		if (!MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotSubsurfaceColor))
 		{
 			return SubsurfaceColor;
 		}
@@ -137,7 +119,7 @@ namespace Material
 
 	float SampleSubsurfaceStrength(float2 UV)
 	{
-		if (!HasTexture(TextureGroupSubsurfaceStrength))
+		if (!MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotSubsurfaceStrength))
 		{
 			return SubsurfaceStrength;
 		}

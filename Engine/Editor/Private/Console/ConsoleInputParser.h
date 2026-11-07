@@ -14,11 +14,7 @@ struct ConsoleParsedInput final
 	bool IsEmpty() const noexcept { return Succeeded && CommandName.empty(); }
 };
 
-class ConsoleInputParser final
+namespace ConsoleInputParser
 {
-public:
-	static ConsoleParsedInput Parse(std::string_view input);
-
-private:
-	static ConsoleParsedInput Fail(std::string errorMessage);
-};
+	ConsoleParsedInput Parse(std::string_view input);
+}

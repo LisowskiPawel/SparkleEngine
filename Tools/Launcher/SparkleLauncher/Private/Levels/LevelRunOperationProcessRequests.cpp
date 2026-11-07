@@ -1,7 +1,7 @@
-#include "LevelRunOperationProcessRequests.h"
+#include "Levels/LevelRunOperationProcessRequests.h"
 
-#include "LauncherStatePaths.h"
-#include "GpuCrashLaunch.h"
+#include "Workspace/LauncherStatePaths.h"
+#include "GpuCrash/GpuCrashLaunch.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <utility>

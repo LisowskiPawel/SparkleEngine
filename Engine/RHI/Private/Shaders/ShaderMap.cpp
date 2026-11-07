@@ -189,12 +189,18 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 	{
 		throw Diagnostics::Error("Global shader map and cooked shader library do not belong to the same publication.");
 	}
-	if (!reader.ReadArray(map.m_header.EntryCount, map.m_entries, error) || !reader.ReadArray(map.m_header.BindingRecordCount, map.m_bindingRecords, error)
-	    || !reader.ReadArray(map.m_header.ReflectionRecordCount, map.m_reflectionRecords, error) || !reader.ReadArray(map.m_header.ResourceBindingRecordCount, map.m_resourceBindings, error)
-	    || !reader.ReadArray(map.m_header.ConstantBufferRecordCount, map.m_constantBuffers, error)
-	    || !reader.ReadArray(map.m_header.ConstantBufferMemberRecordCount, map.m_constantBufferMembers, error) || !reader.ReadArray(map.m_header.InputElementRecordCount, map.m_inputElements, error)
-	    || !reader.ReadArray(map.m_header.PushConstantRangeRecordCount, map.m_pushConstantRanges, error)
-	    || !reader.ReadArray(map.m_header.SpecializationConstantRecordCount, map.m_specializationConstants, error) || !reader.ReadArray(map.m_header.StringTableSizeInBytes, map.m_stringTable, error))
+	const bool entriesRead = reader.ReadArray(map.m_header.EntryCount, map.m_entries, error);
+	const bool bindingsRead = entriesRead && reader.ReadArray(map.m_header.BindingRecordCount, map.m_bindingRecords, error);
+	const bool reflectionRead = bindingsRead && reader.ReadArray(map.m_header.ReflectionRecordCount, map.m_reflectionRecords, error);
+	const bool resourcesRead = reflectionRead && reader.ReadArray(map.m_header.ResourceBindingRecordCount, map.m_resourceBindings, error);
+	const bool constantBuffersRead = resourcesRead && reader.ReadArray(map.m_header.ConstantBufferRecordCount, map.m_constantBuffers, error);
+	const bool constantMembersRead = constantBuffersRead && reader.ReadArray(map.m_header.ConstantBufferMemberRecordCount, map.m_constantBufferMembers, error);
+	const bool inputElementsRead = constantMembersRead && reader.ReadArray(map.m_header.InputElementRecordCount, map.m_inputElements, error);
+	const bool pushConstantsRead = inputElementsRead && reader.ReadArray(map.m_header.PushConstantRangeRecordCount, map.m_pushConstantRanges, error);
+	const bool specializationConstantsRead = pushConstantsRead && reader.ReadArray(map.m_header.SpecializationConstantRecordCount, map.m_specializationConstants, error);
+	const bool stringsRead = specializationConstantsRead && reader.ReadArray(map.m_header.StringTableSizeInBytes, map.m_stringTable, error);
+	
+	if (!stringsRead)
 	{
 		throw Diagnostics::Error(error);
 	}

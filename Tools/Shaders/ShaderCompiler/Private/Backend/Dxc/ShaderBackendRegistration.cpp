@@ -1,0 +1,60 @@
+#include "PCH.h"
+
+#include "Backend/Dxc/ShaderBackendRegistration.h"
+
+#include "Backend/Dxc/DxcShaderBackend.h"
+
+#include <array>
+
+static constexpr std::array<std::string_view, 1> kDxcSourceExtensions = {{".hlsl"}};
+
+static constexpr std::array<ShaderTarget, 11> kDxcCodegenTargets = {{
+    ShaderTarget::DxilSm60,
+    ShaderTarget::DxilSm61,
+    ShaderTarget::DxilSm62,
+    ShaderTarget::DxilSm63,
+    ShaderTarget::DxilSm64,
+    ShaderTarget::DxilSm65,
+    ShaderTarget::DxilSm66,
+    ShaderTarget::DxilSm67,
+    ShaderTarget::SpirV14,
+    ShaderTarget::SpirV15,
+    ShaderTarget::SpirV16,
+}};
+
+static constexpr std::array<std::string_view, 2> kDxcBinaryFormats = {{"Dxil", "SpirV"}};
+
+static std::unique_ptr<IShaderBackend> CreateBackendInstance()
+{
+	return std::make_unique<DxcShaderBackend>();
+}
+
+static bool QueryBackendAvailability(std::string& outUnavailableReason)
+{
+	outUnavailableReason.clear();
+	return true;
+}
+
+ShaderBackendRegistration GetDxcBackendRegistration() noexcept
+{
+	return ShaderBackendRegistration{
+	    .Descriptor =
+	        ShaderBackendStaticDescriptor{
+	            .Name = "dxc",
+	            .SourceExtensions = std::span<const std::string_view>(kDxcSourceExtensions.data(), kDxcSourceExtensions.size()),
+	            .CodegenTargets = std::span<const ShaderTarget>(kDxcCodegenTargets.data(), kDxcCodegenTargets.size()),
+	            .BinaryFormats = std::span<const std::string_view>(kDxcBinaryFormats.data(), kDxcBinaryFormats.size()),
+	            .Capabilities = DxcShaderBackend::GetStaticCapabilities(),
+	            .QueryVersion = &DxcShaderBackend::QueryBackendVersion,
+	            .QueryAvailability = &QueryBackendAvailability,
+	        },
+	    .create = &CreateBackendInstance,
+	};
+}
+
+struct DxcBackendRegistrar final
+{
+	DxcBackendRegistrar() { RegisterBuiltinShaderBackend(GetDxcBackendRegistration()); }
+};
+
+static DxcBackendRegistrar g_dxcBackendRegistrar;

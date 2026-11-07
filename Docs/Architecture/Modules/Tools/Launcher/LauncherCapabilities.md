@@ -8,13 +8,33 @@
 
 **Scope:** portfolio presentation and reproducible source/product entry through repository discovery, toolchain/dependency readiness, configure/build, cooking, selected content, previews, running products, cleaning, direct scene launch, operation history, cancellation, and GUI/shell access
 
-**Owner:** `Tools/Launcher/SparkleLauncher` / `SparkleLauncherCore` and `SparkleLauncher`; entry paths are resolved by [LauncherRootResolver](../../../../../Tools/Launcher/SparkleLauncher/Private/Core/LauncherRootResolver.cpp) and [ProjectResolver](../../../../../Tools/Launcher/SparkleLauncher/Private/Core/ProjectResolver.cpp).
+**Owner:** `Tools/Launcher/SparkleLauncher` / `SparkleLauncherCore` and `SparkleLauncher`; entry paths are resolved by [LauncherRootResolver](../../../../../Tools/Launcher/SparkleLauncher/Private/Workspace/LauncherRootResolver.cpp) and [ProjectResolver](../../../../../Tools/Launcher/SparkleLauncher/Private/Workspace/ProjectResolver.cpp).
 
 **Evidence and disposition:** [Capability Evidence Plan](../../CapabilityEvidencePlan.md) and [First Release Acceptance Contract](../../../../Acceptance/FirstRelease.md)
 
 **Current readiness:** **50/100**: a broad developer workflow exists in source; clean-machine execution, cancellation/failure truth, distribution classification, and adoption evidence remain open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
 
 Source ownership reconciled on 2026-10-06: maintenance core `BuildLevelCleanPaths` selects extracted level cleanup paths, walks parent packs, deduplicates targets, and retains parents used by other selected levels. Qt converts those path specifications for preview and submits the existing maintenance operation. Cached source archives remain outside the selected paths; catalog validation and maintenance containment still guard the paths before removal. This is source ownership evidence, not destructive-operation acceptance.
+
+**Action clean ownership, 2026-11-05:** [maintenance core](../../../../../Tools/Launcher/SparkleLauncher/Private/Maintenance/ActionCleanPaths.cpp)
+owns action-specific target selection, profile/output paths, feature gates and
+preservation of the running executable. Qt captures the request and projects the
+returned path specifications for preview; it no longer duplicates artifact-layout
+policy. LauncherCore cleanup now names the library directory and the compile-PDB
+`obj` directory defined by CMake. The existing maintenance executor retains
+confirmation, containment and removal. An immutable operation UI table separately
+owns labels, help and presentation defaults, with exact IDs preceding family
+fallbacks. Planning comparisons and builds do not qualify destructive execution
+or GUI interaction.
+
+**Status-page composition, 2026-11-05:** the window's environment-status entry
+point routes cooking, workspace setup, selected-build issues and target readiness
+to their focused view operations. Toolchain rows and build-file rows each have
+one presentation owner. Setup retains required/optional tool ordering, prerequisite
+recovery and source-dependency sections; selected builds still create the issue
+group only when needed. Plan and tool-detection authority stays in core. Native
+before/after controls use real Qt layouts with controlled providers and do not
+establish interactive workflow acceptance.
 
 **Build planning, 2026-11-05:** `BuildWorkspacePlanner` records inputs, inspects
 prerequisites, admits intent, publishes the executable preview and describes the
@@ -25,6 +45,30 @@ second time. All eight operation kinds remain. Missing targets reject the whole
 plan, and execution retains its preview/request mismatch check, cancellation,
 freshness and failure owners. This source refactor adds no build/install or GUI
 workflow acceptance.
+
+**Cook planning, 2026-11-05:** `CookOperations` normalizes selection, records
+inputs, resolves and checks required tools, validates feature availability and
+confirmation, then publishes steps and the dry run. The existing private process
+owner defines effective cook scopes once for tool requirements, admission and
+command construction. Missing runtime entries are the readiness truth; no
+separate ready flag is stored. Selected-scope effect text and input metadata use
+one ordered formatter with their existing display and identifier spellings;
+formatting retains no temporary name or string-view vectors. All five verbs,
+shader options, profile selection,
+command order and failure guards remain. Required-tool diagnostics use
+shader/asset/texture order. Unconfirmed force cooking retains its destructive
+preview and remains blocked. These source and planner controls do not qualify
+actual cooks, destructive execution, GUI interaction or release delivery.
+
+**Footer availability, 2026-11-05:** the window orders input guards, clean-target
+inspection and scene/workflow availability. Scene selection and extracted-content
+inspection share one private phase; build/cook readiness stays with the existing
+planners. One button projection applies enabled state, tooltip and accessibility
+description together. Before/after controls use real Qt buttons with controlled
+providers; they preserve decisions and inspection order without starting an
+operation. Options-page rebuilding shares one deferred scroll-restoration helper
+with the existing window context and guarded scroll bar. This is bounded
+widget-state evidence, not an interactive GUI or release acceptance result.
 
 **Launch controls (2026-11-01):** the footer places **Shader Compiler** between **Graphics API** and a compact, fixed-width **GPU Capture** selector: None, Nsight Graphics, PIX, RenderDoc. **GPU Crash Debugging** follows capture with one Enabled checkbox: checked selects Aftermath and unchecked selects Off. Its `...` button opens shader-export, incident and inspector controls instead of repeating the form on Scenes/Run. Private capture discovery scans installed tool locations without SDK loading and reuses cached host GPU discovery. Setup reasons and Nsight's experimental SDK status remain in option tooltips. Existing typed level-run preflight and process lowering recheck capture eligibility, diagnostic inputs and conflicts. The [capture owner](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/ExecutionArchitecture.md#implemented-editor-viewport-composition) defines retained proof limits; the [GPU crash route](../../../CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#launch-and-inspection-route) owns diagnostic preparation. This presentation adds no native GPU or release qualification and does not increase Launcher readiness.
 
@@ -88,6 +132,26 @@ Launcher hosts explicit operations. A blocked request reports the missing input;
 
 ## Frontend And Planning Model
 
+**Presentation and private capability placement, 2026-11-07:** reconciled against
+`8cbd850c` plus the scoped working tree. The shell composes
+[`LauncherSceneCatalog`](../../../../../Tools/Launcher/SparkleLauncher/Private/Gui/Pages/Scenes/LauncherSceneCatalog.h)
+and [`LauncherWorkspaceSetup`](../../../../../Tools/Launcher/SparkleLauncher/Private/Gui/Pages/Workspace/LauncherWorkspaceSetup.h).
+The scene owner retains launch admission, pending catalog selections and guarded
+card controls; the setup owner retains dependency run tracking, guarded status
+rows and toolchain actions. Rebuilding pages drops widget guards while preserving
+in-flight interaction state; completion passes through each owner before the
+shell refreshes availability. Build, cook and clean scope rendering are direct
+operations beside their workflow, and selection/status primitives remain shared
+widgets. `LauncherBackend` and its existing operation service retain execution,
+cancellation and result authority. The shell retains navigation, footer context,
+activity composition and restart handling.
+
+Private core code is grouped under `Workspace`, `Startup`, `Operations`,
+`Dependencies`, `Build/State` and `Build/Toolchains`. Implementation includes are
+relative to one target-private root; GUI code still consumes public core
+contracts. No public operation, settings representation or result policy changes.
+This ownership map does not establish destructive-operation or release acceptance.
+
 `WorkspaceLocator` names marker-based discovery for both a checkout and extracted bundle: `IsWorkspaceRoot`, `TryResolveWorkspaceRoot` and `TryFindWorkspaceRoot`. Launcher request/plan roots are `WorkspaceRoot`; Git/source-only packaging still names its actual repository. Application's `EditorShaderCompileOperation` wraps the supplied compile action and reload, without owning the compiler. These names follow existing responsibilities and add no installed-mode or compatibility path.
 
 The [2026-11-01 naming reconciliation](../../../../../artifacts/validation/naming-reconciliation-20261101/completion.json) records clean-break caller/build membership, 83-file source-style and token-preservation checks, focused builds and read-only root/usage controls. This is source/tooling proof; rendering and the repaired archive retain their own qualification. Global next work remains Roadmap's current Sponza result.
@@ -101,7 +165,7 @@ ToolSupport owns `ProjectLevelCatalog` data/reader/validator/selection updates a
 | `LAUNCH-001` | Qt GUI | Implemented path | Windows GUI with Scenes, workflow pages, options, toolchain/dependency/content status, level cards/thumbnails, activity/output, cancellation, and in-memory launcher selections. Qt 6.11.1 Widgets is required. | `S` |
 | `LAUNCH-002` | Shell route | Implemented path | Same executable accepts root/profile/compiler/IDE/scope/target/level/API/cook/clean options plus `--dry-run` and `--run <operation-id>`. It exposes core operation planners without the GUI. | `S` |
 | `LAUNCH-003` | Immutable operation plan | Implemented path | Each action records inputs, readiness, steps, display command lines, log paths, planned effects, destructive scope/confirmation, timing, exit code, status, and a typed terminal failure with problem kind, root summary, and expected action. Process I/O failures cannot become success through exit code 0 or readiness. CMake requests encode paths and environment values as UTF-8; previews use Core's execution quoting. Build, cook, level sync/run and maintenance plans own their immutable request as the sole workspace-root authority; process requests read that value directly. | `S` |
-| `LAUNCH-004` | Direct scene launch | Implemented path | The `Scenes` page uses the `levels.browse` navigation identity, with `LauncherMainWindowScenesPage` composing `LauncherMainWindowLevels` cards and `LauncherMainWindowLevelRun` submitting the existing typed `levels.run` operation. It checks level metadata, executable and required cooked-file presence/incomplete markers; the loader validates actual formats. No automatic acquire/configure/build/cook chain or artifact-origin tracking. Explicit developer actions refresh the same outputs. | `S` |
+| `LAUNCH-004` | Direct scene launch | Implemented path | The `Scenes` page uses the `levels.browse` navigation identity, with `LauncherSceneCatalog` composing its scene cards and submitting the existing typed `levels.run` operation. It checks level metadata, executable and required cooked-file presence/incomplete markers; the loader validates actual formats. No automatic acquire/configure/build/cook chain or artifact-origin tracking. Explicit developer actions refresh the same outputs. | `S` |
 | `LAUNCH-005` | Background operation service | Implemented path | Each GUI run has a unique ToolInvocation task scope, streams output, retains activity, admits one active workflow, exposes Cancel in Activity, completes queued cancellation through a Tasks cleanup node, and joins scopes on teardown. Tool-owned action/item/count progress records drive the selected-run phase and progress bar without appearing in the human-readable log; producers publish semantic identities while shared progress support owns formatting and transport. A determinate percentage is shown only when the tool publishes authoritative completed and total work, while unknown totals remain indeterminate. | `S` |
 
 `BuildWorkspaceOperations` resolves product/helper targets for both plan readiness and process construction. `BuildFreshnessSignature` normalizes paths for both signatures and freshness messages.

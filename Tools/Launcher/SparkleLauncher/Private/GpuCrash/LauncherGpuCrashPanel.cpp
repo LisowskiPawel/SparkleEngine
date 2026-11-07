@@ -1,11 +1,11 @@
-#include "LauncherGpuCrashPanel.h"
-#include "LauncherBackend.h"
+#include "GpuCrash/LauncherGpuCrashPanel.h"
+#include "Gui/App/LauncherBackend.h"
 
 #include <utility>
 
-#include "LauncherSettings.h"
-#include "LauncherProductPaths.h"
-#include "LauncherUiDesign.h"
+#include "Gui/App/LauncherSettings.h"
+#include "Workspace/LauncherProductPaths.h"
+#include "Gui/Style/LauncherUiDesign.h"
 
 #include <QtCore/QProcess>
 #include <QtCore/QUrl>

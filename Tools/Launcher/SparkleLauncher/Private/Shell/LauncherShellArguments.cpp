@@ -1,4 +1,4 @@
-#include "LauncherShellArguments.h"
+#include "Shell/LauncherShellArguments.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"

@@ -3,6 +3,10 @@
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/D3D12TypeConversions.h"
 
+#include <algorithm>
+#include <array>
+#include <utility>
+
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_samplerLibraryLogger, "RHI.D3D12.Samplers");
 
 bool D3D12SamplerLibrary::TryGetSlot(const RhiSamplerDesc& samplerDesc, Slot& outSlot) noexcept
@@ -33,15 +37,7 @@ bool D3D12SamplerLibrary::TryGetSlot(const RhiSamplerDesc& samplerDesc, Slot& ou
 		}
 	}
 
-	switch (samplerDesc.MinMagFilter)
-	{
-		case RhiSamplerMinMagFilter::Point:
-			return TryGetPointSlot(samplerDesc.MipFilter, addressMode, outSlot);
-		case RhiSamplerMinMagFilter::Linear:
-			return TryGetLinearSlot(samplerDesc.MipFilter, addressMode, outSlot);
-		default:
-			return false;
-	}
+	return TryGetFilteredSlot(samplerDesc.MinMagFilter, samplerDesc.MipFilter, addressMode, outSlot);
 }
 
 D3D12SamplerLibrary::D3D12SamplerLibrary(D3D12Rhi& rhi, RhiDescriptorService& descriptorService) :
@@ -57,6 +53,12 @@ D3D12SamplerLibrary::D3D12SamplerLibrary(D3D12Rhi& rhi, RhiDescriptorService& de
 		return;
 	}
 
+	CreateSharedSamplers();
+	m_bInitialized = true;
+}
+
+void D3D12SamplerLibrary::CreateSharedSamplers()
+{
 	const auto createSampler = [this](Slot slot, RhiSamplerMinMagFilter minMagFilter, RhiSamplerMipFilter mipFilter, RhiSamplerAddressMode addressMode, RhiSamplerAnisotropy maxAnisotropy)
 	{
 		CreateSampler(slot, MakeSamplerDesc(minMagFilter, mipFilter, addressMode, maxAnisotropy));
@@ -104,8 +106,6 @@ D3D12SamplerLibrary::D3D12SamplerLibrary(D3D12Rhi& rhi, RhiDescriptorService& de
 	createSampler(Slot::Aniso16xWrap, RhiSamplerMinMagFilter::Linear, RhiSamplerMipFilter::Linear, RhiSamplerAddressMode::Wrap, RhiSamplerAnisotropy::X16);
 	createSampler(Slot::Aniso16xClamp, RhiSamplerMinMagFilter::Linear, RhiSamplerMipFilter::Linear, RhiSamplerAddressMode::Clamp, RhiSamplerAnisotropy::X16);
 	createSampler(Slot::Aniso16xMirror, RhiSamplerMinMagFilter::Linear, RhiSamplerMipFilter::Linear, RhiSamplerAddressMode::Mirror, RhiSamplerAnisotropy::X16);
-
-	m_bInitialized = true;
 }
 
 D3D12SamplerLibrary::~D3D12SamplerLibrary() noexcept
@@ -146,22 +146,17 @@ RhiSamplerDesc D3D12SamplerLibrary::MakeSamplerDesc(RhiSamplerMinMagFilter minMa
 
 bool D3D12SamplerLibrary::TryGetAddressOffset(RhiSamplerAddressMode addressMode, std::uint32_t& outOffset) noexcept
 {
-	switch (addressMode)
+	static_assert(
+	    static_cast<std::uint32_t>(RhiSamplerAddressMode::Wrap) == 0 && static_cast<std::uint32_t>(RhiSamplerAddressMode::Clamp) == 1
+	    && static_cast<std::uint32_t>(RhiSamplerAddressMode::Mirror) == 2);
+
+	const std::uint32_t offset = static_cast<std::uint32_t>(addressMode);
+	if (offset > 2)
 	{
-		case RhiSamplerAddressMode::Wrap:
-			outOffset = 0;
-			return true;
-
-		case RhiSamplerAddressMode::Clamp:
-			outOffset = 1;
-			return true;
-
-		case RhiSamplerAddressMode::Mirror:
-			outOffset = 2;
-			return true;
-		default:
-			return false;
+		return false;
 	}
+	outOffset = offset;
+	return true;
 }
 
 bool D3D12SamplerLibrary::TryGetUniformAddressMode(const RhiSamplerDesc& samplerDesc, RhiSamplerAddressMode& outAddressMode) noexcept
@@ -175,63 +170,25 @@ bool D3D12SamplerLibrary::TryGetUniformAddressMode(const RhiSamplerDesc& sampler
 	return true;
 }
 
-bool D3D12SamplerLibrary::TryGetPointSlot(RhiSamplerMipFilter mipFilter, RhiSamplerAddressMode addressMode, Slot& outSlot) noexcept
+bool D3D12SamplerLibrary::TryGetFilteredSlot(RhiSamplerMinMagFilter minMagFilter, RhiSamplerMipFilter mipFilter, RhiSamplerAddressMode addressMode, Slot& outSlot) noexcept
 {
+	static_assert(static_cast<std::uint32_t>(RhiSamplerMinMagFilter::Point) == 0 && static_cast<std::uint32_t>(RhiSamplerMinMagFilter::Linear) == 1);
+
+	static_assert(
+	    static_cast<std::uint32_t>(RhiSamplerMipFilter::None) == 0 && static_cast<std::uint32_t>(RhiSamplerMipFilter::Point) == 1 && static_cast<std::uint32_t>(RhiSamplerMipFilter::Linear) == 2);
+
+	constexpr std::array baseSlots{
+	    std::array{Slot::PointNoMipWrap, Slot::PointMipPointWrap, Slot::PointMipLinearWrap},
+	    std::array{Slot::LinearNoMipWrap, Slot::LinearMipPointWrap, Slot::LinearMipLinearWrap}};
+
+	const std::uint32_t filterIndex = static_cast<std::uint32_t>(minMagFilter);
+	const std::uint32_t mipIndex = static_cast<std::uint32_t>(mipFilter);
 	std::uint32_t addressOffset = 0;
-	if (!TryGetAddressOffset(addressMode, addressOffset))
+	if (filterIndex >= baseSlots.size() || mipIndex >= baseSlots[0].size() || !TryGetAddressOffset(addressMode, addressOffset))
 	{
 		return false;
 	}
-
-	Slot baseSlot = Slot::Count;
-	switch (mipFilter)
-	{
-		case RhiSamplerMipFilter::None:
-			baseSlot = Slot::PointNoMipWrap;
-			break;
-
-		case RhiSamplerMipFilter::Point:
-			baseSlot = Slot::PointMipPointWrap;
-			break;
-
-		case RhiSamplerMipFilter::Linear:
-			baseSlot = Slot::PointMipLinearWrap;
-			break;
-		default:
-			return false;
-	}
-
-	outSlot = static_cast<Slot>(static_cast<std::uint32_t>(baseSlot) + addressOffset);
-	return true;
-}
-
-bool D3D12SamplerLibrary::TryGetLinearSlot(RhiSamplerMipFilter mipFilter, RhiSamplerAddressMode addressMode, Slot& outSlot) noexcept
-{
-	std::uint32_t addressOffset = 0;
-	if (!TryGetAddressOffset(addressMode, addressOffset))
-	{
-		return false;
-	}
-
-	Slot baseSlot = Slot::Count;
-	switch (mipFilter)
-	{
-		case RhiSamplerMipFilter::None:
-			baseSlot = Slot::LinearNoMipWrap;
-			break;
-
-		case RhiSamplerMipFilter::Point:
-			baseSlot = Slot::LinearMipPointWrap;
-			break;
-
-		case RhiSamplerMipFilter::Linear:
-			baseSlot = Slot::LinearMipLinearWrap;
-			break;
-		default:
-			return false;
-	}
-
-	outSlot = static_cast<Slot>(static_cast<std::uint32_t>(baseSlot) + addressOffset);
+	outSlot = static_cast<Slot>(static_cast<std::uint32_t>(baseSlots[filterIndex][mipIndex]) + addressOffset);
 	return true;
 }
 
@@ -243,33 +200,19 @@ bool D3D12SamplerLibrary::TryGetAnisotropicSlot(RhiSamplerAnisotropy maxAnisotro
 		return false;
 	}
 
-	Slot baseSlot = Slot::Count;
-	switch (maxAnisotropy)
+	constexpr std::array baseSlots{
+	    std::pair{RhiSamplerAnisotropy::X1, Slot::Aniso1xWrap},
+	    std::pair{RhiSamplerAnisotropy::X2, Slot::Aniso2xWrap},
+	    std::pair{RhiSamplerAnisotropy::X4, Slot::Aniso4xWrap},
+	    std::pair{RhiSamplerAnisotropy::X8, Slot::Aniso8xWrap},
+	    std::pair{RhiSamplerAnisotropy::X16, Slot::Aniso16xWrap}};
+
+	const auto found = std::find_if(baseSlots.begin(), baseSlots.end(), [maxAnisotropy](const auto& entry) { return entry.first == maxAnisotropy; });
+	if (found == baseSlots.end())
 	{
-		case RhiSamplerAnisotropy::X1:
-			baseSlot = Slot::Aniso1xWrap;
-			break;
-
-		case RhiSamplerAnisotropy::X2:
-			baseSlot = Slot::Aniso2xWrap;
-			break;
-
-		case RhiSamplerAnisotropy::X4:
-			baseSlot = Slot::Aniso4xWrap;
-			break;
-
-		case RhiSamplerAnisotropy::X8:
-			baseSlot = Slot::Aniso8xWrap;
-			break;
-
-		case RhiSamplerAnisotropy::X16:
-			baseSlot = Slot::Aniso16xWrap;
-			break;
-		default:
-			return false;
+		return false;
 	}
-
-	outSlot = static_cast<Slot>(static_cast<std::uint32_t>(baseSlot) + addressOffset);
+	outSlot = static_cast<Slot>(static_cast<std::uint32_t>(found->second) + addressOffset);
 	return true;
 }
 

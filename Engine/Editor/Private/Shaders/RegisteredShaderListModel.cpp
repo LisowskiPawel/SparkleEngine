@@ -1,7 +1,7 @@
 #include "PCH.h"
 
 #include "Shaders/RegisteredShaderListModel.h"
-#include "Shaders/ShaderExportInspection.h"
+#include "Shaders/ShaderExportDiscovery.h"
 
 #include "RHI/Public/Shaders/Authoring/GlobalShader.h"
 #include "RHI/Public/Shaders/ShaderStage.h"
@@ -18,7 +18,7 @@ void RegisteredShaderListModel::Refresh()
 {
 	m_rows.clear();
 	const ShaderDiagnosticsSnapshot diagnostics = m_diagnosticsProvider ? m_diagnosticsProvider() : ShaderDiagnosticsSnapshot{};
-	const std::vector<std::filesystem::path> exportDirectories = ShaderExportInspection::FindExportDirectories(diagnostics);
+	const std::vector<std::filesystem::path> exportDirectories = FindShaderExportDirectories(diagnostics);
 	for (const ShaderRegistrationDesc& shader : GlobalShaderRegistry::GetRegistrations())
 	{
 		const ShaderParameterStructDescriptor parameters = shader.BuildParameterStructDescriptor != nullptr ? shader.BuildParameterStructDescriptor() : ShaderParameterStructDescriptor{};

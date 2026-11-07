@@ -36,8 +36,6 @@ target_include_directories(SparkleEditor
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Private
         ${CMAKE_CURRENT_SOURCE_DIR}/Private/ImGui
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Panels
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Sections
         # Engine root for module-prefixed includes
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         # Core module subdirectories for direct includes

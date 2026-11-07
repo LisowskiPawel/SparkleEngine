@@ -1,7 +1,7 @@
-#include "LauncherSceneWidgets.h"
+#include "Gui/Widgets/LauncherSceneWidgets.h"
 
-#include "LauncherLayoutWidgets.h"
-#include "LauncherUiDesign.h"
+#include "Gui/Widgets/LauncherLayoutWidgets.h"
+#include "Gui/Style/LauncherUiDesign.h"
 
 #include "ToolOutputPaths.h"
 

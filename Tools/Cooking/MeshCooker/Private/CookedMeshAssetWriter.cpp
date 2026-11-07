@@ -4,7 +4,7 @@
 
 #include "CookedMeshAssetBuild.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Files/BinaryStreamWriter.h"
+#include "BinaryAssetWriter.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Json/JsonWriter.h"
@@ -12,19 +12,17 @@
 
 #include <cstdint>
 #include <filesystem>
-#include <fstream>
 
-class CookedMeshAssetStager final
+namespace CookedMeshAssetWriter
 {
-public:
 	static void StageMeshAsset(const CookedMeshAssetBuild& meshAsset, std::vector<Files::FilePublication>& outPublication);
 	static void WriteMeshAsset(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath);
 	static void WriteMeshMetadata(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath);
 	static Assets::CookedMeshAssetHeader BuildHeader(const CookedMeshAssetBuild& meshAsset) noexcept;
 	static std::filesystem::path BuildMetadataPath(Assets::CookedAssetId assetId);
-};
+}
 
-void CookedMeshAssetStager::StageMeshAsset(const CookedMeshAssetBuild& meshAsset, std::vector<Files::FilePublication>& outPublication)
+void CookedMeshAssetWriter::StageMeshAsset(const CookedMeshAssetBuild& meshAsset, std::vector<Files::FilePublication>& outPublication)
 {
 	const std::filesystem::path outputPath = Paths::CookedMeshAsset(meshAsset.assetId);
 	const std::filesystem::path stagedOutputPath = Files::BuildTemporaryPath(outputPath, ".cook-generation");
@@ -41,27 +39,14 @@ void CookedMeshAssetStager::StageMeshAsset(const CookedMeshAssetBuild& meshAsset
 	WriteMeshMetadata(meshAsset, stagedMetadataPath);
 }
 
-void CookedMeshAssetStager::WriteMeshAsset(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath)
+void CookedMeshAssetWriter::WriteMeshAsset(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath)
 {
 	const Assets::CookedMeshAssetHeader header = BuildHeader(meshAsset);
 
-	std::string errorMessage;
-	std::ofstream output;
-	if (!Files::TryOpenBinaryOutput(outputPath, output, errorMessage) || !Files::BinaryStreamWriter::WriteValue(output, header, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(output, meshAsset.vertices, errorMessage) || !Files::BinaryStreamWriter::WriteArray(output, meshAsset.indices, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(output, meshAsset.skinInfluences, errorMessage) || !Files::BinaryStreamWriter::WriteArray(output, meshAsset.morphTargets, errorMessage)
-	    || !Files::BinaryStreamWriter::WriteArray(output, meshAsset.morphTargetDeltas, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
-
-	if (!Files::TryCloseOutput(output, outputPath, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
+	SparkleTools::WriteBinaryAssetFile(outputPath, header, meshAsset.vertices, meshAsset.indices, meshAsset.skinInfluences, meshAsset.morphTargets, meshAsset.morphTargetDeltas);
 }
 
-void CookedMeshAssetStager::WriteMeshMetadata(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath)
+void CookedMeshAssetWriter::WriteMeshMetadata(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath)
 {
 	Json::ObjectWriter writer;
 	writer.WriteString("schema", "cooked-mesh-metadata");
@@ -75,7 +60,7 @@ void CookedMeshAssetStager::WriteMeshMetadata(const CookedMeshAssetBuild& meshAs
 	}
 }
 
-Assets::CookedMeshAssetHeader CookedMeshAssetStager::BuildHeader(const CookedMeshAssetBuild& meshAsset) noexcept
+Assets::CookedMeshAssetHeader CookedMeshAssetWriter::BuildHeader(const CookedMeshAssetBuild& meshAsset) noexcept
 {
 	return Assets::CookedMeshAssetHeader{
 	    .fileHeader = {Assets::kCookedMeshAssetMagic},
@@ -94,7 +79,7 @@ Assets::CookedMeshAssetHeader CookedMeshAssetStager::BuildHeader(const CookedMes
 	    .assetKind = meshAsset.assetKind};
 }
 
-std::filesystem::path CookedMeshAssetStager::BuildMetadataPath(Assets::CookedAssetId assetId)
+std::filesystem::path CookedMeshAssetWriter::BuildMetadataPath(Assets::CookedAssetId assetId)
 {
 	std::filesystem::path metadataPath = Paths::CookedMeshAsset(assetId);
 	metadataPath += ".meta.json";
@@ -105,6 +90,6 @@ void CookedMeshAssetWriter::StageMeshAssets(const std::vector<CookedMeshAssetBui
 {
 	for (const CookedMeshAssetBuild& meshAsset : meshAssets)
 	{
-		CookedMeshAssetStager::StageMeshAsset(meshAsset, outPublication);
+		CookedMeshAssetWriter::StageMeshAsset(meshAsset, outPublication);
 	}
 }

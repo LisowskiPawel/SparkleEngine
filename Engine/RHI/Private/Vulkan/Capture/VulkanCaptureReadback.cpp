@@ -113,8 +113,11 @@ bool VulkanCaptureService::AllocateReadbackBuffer(PendingReadback& pending) noex
 		return false;
 	}
 	const VkMemoryAllocateInfo allocation{.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, .allocationSize = requirements.size, .memoryTypeIndex = memoryType};
-	if (vkAllocateMemory(device, &allocation, nullptr, &pending.Memory) != VK_SUCCESS || pending.Memory == VK_NULL_HANDLE
-	    || vkBindBufferMemory(device, pending.Buffer, pending.Memory, 0) != VK_SUCCESS)
+	const VkResult allocationResult = vkAllocateMemory(device, &allocation, nullptr, &pending.Memory);
+	const bool memoryAllocated = allocationResult == VK_SUCCESS && pending.Memory != VK_NULL_HANDLE;
+	const bool bufferBound = memoryAllocated && vkBindBufferMemory(device, pending.Buffer, pending.Memory, 0) == VK_SUCCESS;
+	
+	if (!bufferBound)
 	{
 		return false;
 	}

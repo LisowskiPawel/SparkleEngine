@@ -3,9 +3,8 @@
 class EditorViewportSession;
 struct EngineRenderingSettingsState;
 
-class ViewportCameraProperties final
+namespace ViewportCameraProperties
 {
-public:
-	static void OpenPopup() noexcept;
-	static void BuildPopup(EditorViewportSession& viewportSession, const EngineRenderingSettingsState& renderingDefaults, bool disableInteraction) noexcept;
-};
+	void OpenPopup() noexcept;
+	void BuildPopup(EditorViewportSession& viewportSession, const EngineRenderingSettingsState& renderingDefaults, bool disableInteraction) noexcept;
+}

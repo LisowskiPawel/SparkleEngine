@@ -1,4 +1,4 @@
-#include "GpuCrashLaunch.h"
+#include "GpuCrash/GpuCrashLaunch.h"
 
 #include "SparkleLauncher/LevelRunOperations.h"
 #include "SparkleLauncher/GpuCrashIncident.h"
@@ -6,7 +6,7 @@
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Identifiers/Uuid.h"
 #include "Core/Public/Json/JsonReader.h"
-#include "LauncherProductPaths.h"
+#include "Workspace/LauncherProductPaths.h"
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 

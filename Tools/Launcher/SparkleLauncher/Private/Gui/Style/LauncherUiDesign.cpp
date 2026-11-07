@@ -1,4 +1,4 @@
-#include "LauncherUiDesign.h"
+#include "Gui/Style/LauncherUiDesign.h"
 
 #include <QtCore/QString>
 

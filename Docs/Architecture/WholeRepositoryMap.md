@@ -53,6 +53,13 @@ its original paths.
 
 The top-level CMake project requires C++20, loads the Sparkle build profiles and artifact/project contracts, adds `Engine` and `Tools`, then discovers runnable projects through `Projects/*/.sparkle-project`. Optional content-pipeline, shader-compiler, KTX, NVIDIA Streamline, sanitizer, and strict-warning features are explicit CMake options.
 
+Private source capability placement was reconciled on 2026-11-07 against
+`8cbd850c` plus the scoped working tree. [Editor](Modules/Engine/Editor/EditorCapabilities.md#ui-implementation-boundary),
+[Launcher](Modules/Tools/Launcher/LauncherCapabilities.md#frontend-and-planning-model),
+[SourceImporters](Modules/Tools/SourceImporters/SourceImportersCapabilities.md#at-a-glance)
+and [ShaderCompiler](Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md#build-and-delivery-shape)
+own the current folder maps. Module targets and dependency direction are preserved.
+
 ## Build And Module Boundaries
 
 | Source owner | Primary target or product | Direct engine dependency shape |

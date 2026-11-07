@@ -1,6 +1,6 @@
-#include "LauncherArtworkWidgets.h"
+#include "Gui/Widgets/LauncherArtworkWidgets.h"
 
-#include "LauncherUiDesign.h"
+#include "Gui/Style/LauncherUiDesign.h"
 
 #include <QtGui/QLinearGradient>
 #include <QtGui/QPainter>

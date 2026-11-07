@@ -1,6 +1,6 @@
-#include "LauncherWorkflowCatalog.h"
+#include "Gui/Models/LauncherWorkflowCatalog.h"
 
-#include "LauncherUiModel.h"
+#include "Gui/Models/LauncherUiModel.h"
 
 namespace SparkleLauncher
 {
