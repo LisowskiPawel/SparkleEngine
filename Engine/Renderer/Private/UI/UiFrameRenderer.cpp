@@ -104,7 +104,8 @@ void UiFrameRenderer::EndViewportPresentation(FrameGraph& frameGraph, const View
 
 void UiFrameRenderer::RenderViewport(const UiRenderPacket& packet, FrameGraph* frameGraph, ViewportRenderProducts& viewportProducts) noexcept
 {
-	const bool presentingViewport = frameGraph != nullptr && packet.ViewportGeneration == viewportProducts.GetGeneration() && BeginViewportPresentation(*frameGraph, viewportProducts);
+	const bool bPresentingViewportGetGeneration = frameGraph != nullptr && packet.ViewportGeneration == viewportProducts.GetGeneration();
+	const bool presentingViewport = bPresentingViewportGetGeneration && (BeginViewportPresentation(*frameGraph, viewportProducts));
 	if (!presentingViewport)
 	{
 		m_textureRegistry->RetireViewportTexture();

@@ -178,8 +178,11 @@ namespace ECS
 			const AuthoredIdentity* targetIdentity = registry.Get<AuthoredIdentity>(skinnedMeshes.GetEntities()[index]);
 			for (const PoseWorkSlot& work : m_poseWork)
 			{
-				if (targetIdentity != nullptr && work.SourceInstanceId == targetIdentity->SourceInstanceId && work.PoseOutputIndex < m_output.poses.size()
-				    && m_output.poses[work.PoseOutputIndex].skeletonAssetId == updated.SkeletonAssetId)
+				const bool bMatchingAnimationTargetInstanceId = targetIdentity != nullptr && work.SourceInstanceId == targetIdentity->SourceInstanceId;
+				const bool bMatchingAnimationTargetposes = bMatchingAnimationTargetInstanceId && (work.PoseOutputIndex < m_output.poses.size());
+				const bool matchingAnimationTarget = bMatchingAnimationTargetposes && (m_output.poses[work.PoseOutputIndex].skeletonAssetId == updated.SkeletonAssetId);
+				
+				if (matchingAnimationTarget)
 				{
 					updated.Pose = AnimationOutputSlotHandle{work.PoseOutputIndex, targetGeneration};
 					break;

@@ -2,7 +2,7 @@
 
 #include "Scene/Preparation/RenderScenePreparationMerger.h"
 
-#include "Scene/Preparation/RenderLightPreparation.h"
+#include "Scene/Preparation/Lighting/RenderLightPreparation.h"
 #include "Scene/Preparation/RenderScenePreparationRun.h"
 #include "Tasks/Public/TaskExecutionContext.h"
 

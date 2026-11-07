@@ -20,8 +20,12 @@ namespace IndirectReservoir
 		const float2 motionPixels = motionVectors.Load(int3(pixelCoord, 0)).xy;
 		const float2 previousPixel = MotionVectors::ReprojectToPreviousPixelCenter(pixelCoord, motionPixels, float2(extent.x, extent.y));
 		const int2 previousPixelCoord = int2(floor(previousPixel));
-		if (previousPixelCoord.x >= 0 && previousPixelCoord.y >= 0 && previousPixelCoord.x < int(extent.x) && previousPixelCoord.y < int(extent.y)
-		    && AreSurfacesCompatible(surface, previousSurfaceTexture.Load(int3(previousPixelCoord, 0))))
+		const bool bPreviousInBoundsy = previousPixelCoord.x >= 0 && previousPixelCoord.y >= 0;
+		const bool bPreviousInBoundsx = bPreviousInBoundsy && (previousPixelCoord.x < int(extent.x));
+		const bool previousPixelInBounds = bPreviousInBoundsx && (previousPixelCoord.y < int(extent.y));
+		const bool previousSurfaceCompatible = previousPixelInBounds && AreSurfacesCompatible(surface, previousSurfaceTexture.Load(int3(previousPixelCoord, 0)));
+		
+		if (previousSurfaceCompatible)
 		{
 			const Reservoir previous = UnpackReservoir(previousSamples.Load(int3(previousPixelCoord, 0)), previousWeights.Load(int3(previousPixelCoord, 0)));
 

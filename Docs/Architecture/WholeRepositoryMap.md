@@ -60,6 +60,8 @@ Private source capability placement was reconciled on 2026-11-07 against
 and [ShaderCompiler](Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md#build-and-delivery-shape)
 own the current folder maps. Module targets and dependency direction are preserved.
 
+The 2026-11-07 second ownership pass colocates shader registrations with their typed capability declarations while preserving the runtime/cook descriptor targets. Renderer scene preparation separates Geometry, Lighting and Deformation implementors; GPU-scene state separates Geometry, Lighting and RayTracing lifetimes. GameFramework `World/Loading` owns staging and commit; Application `Startup` owns command-line, graphics and crash launch parsing; RHI backend selection lives with `Device`. Core, Tasks and Platform retain their cohesive capability owners. Public module surfaces, shader virtual paths and registration identities remain unchanged.
+
 ## Build And Module Boundaries
 
 | Source owner | Primary target or product | Direct engine dependency shape |
@@ -215,7 +217,7 @@ typed compute / graphics / ray-tracing materialization
 FrameGraph Draw / Dispatch / TraceRays
 ```
 
-`Engine/Renderer/ShaderRegistrations` contains 32 typed shader registrations in the current source tree. Product source registrations use vertex, pixel, compute, ray-generation, miss, closest-hit, and any-hit stages. Geometry, hull, domain, intersection, and callable remain schema/compiler vocabulary without a current Renderer product registration.
+Renderer `*ShaderRegistration*.cpp` files live beside their typed declarations under `Engine/Renderer/Private`; `SparkleRendererShaderRegistrations` and `SparkleRendererShaderCookRegistrations` consume the same descriptor source set. The current catalog reports 39 typed shader registrations. Product source registrations use vertex, pixel, compute, ray-generation, miss, closest-hit, and any-hit stages. Geometry, hull, domain, intersection, and callable remain schema/compiler vocabulary without a current Renderer product registration.
 
 The ShaderCompiler default selection cooks the catalog; `--shader-id` selects one registered shader and repeatable `--changed` paths select affected types through the persisted dependency manifest. Default targets are DXIL SM 6.6 and SPIR-V 1.6. Every selected job compiles, while identical jobs within one operation share a producer/result; no persistent compiler-result cache is retained.
 

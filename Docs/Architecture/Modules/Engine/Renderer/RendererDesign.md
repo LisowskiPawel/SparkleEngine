@@ -175,7 +175,7 @@ Silent substitution is not support. A requested ray/provider/debug path that can
 | Smallest missing checks | [Renderer Evidence Plan](../../CapabilityEvidencePlan.md#renderer-capability-to-evidence-map) |
 | Candidate/release status | `FCR-REN-*` families in [Feature Completion Reports](../../../../Acceptance/FeatureCompletionReports.md) and [First Release](../../../../Acceptance/FirstRelease.md) |
 
-Primary implementation routes are `Engine/Renderer/Public`, `Engine/Renderer/Private`, `Engine/Renderer/ShaderRegistrations`, and `Engine/Renderer/CMakeLists.txt`. Verify those paths before changing a current-state claim. Treat `Public` as a budgeted host contract and start implementation headers in the narrowest owning `Private` subsystem or feature capsule.
+Primary implementation routes are `Engine/Renderer/Public`, `Engine/Renderer/Private`, and `Engine/Renderer/CMakeLists.txt`. Registration descriptors named `*ShaderRegistration*.cpp` live beside their typed declarations under `Private`; CMake selects the shared runtime/cook descriptor membership separately from ordinary implementation sources. Verify those paths before changing a current-state claim. Treat `Public` as a budgeted host contract and start implementation headers in the narrowest owning `Private` subsystem or feature capsule.
 
 ## Release Implementation Rules
 

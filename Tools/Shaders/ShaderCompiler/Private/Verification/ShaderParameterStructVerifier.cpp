@@ -122,7 +122,10 @@ namespace ShaderParameterVerification
 				for (const auto& value : descriptor.Values)
 				{
 					const auto member = std::ranges::find_if(block->Members, [&value](const auto& reflected) { return reflected.Name == value.Name; });
-					if (member == block->Members.end() || member->OffsetInBytes != value.OffsetInBytes || member->SizeInBytes != value.SizeInBytes)
+					const bool bReflectedMemberMismatchInBytes = member == block->Members.end() || member->OffsetInBytes != value.OffsetInBytes;
+					const bool reflectedMemberMismatch = bReflectedMemberMismatchInBytes || (member->SizeInBytes != value.SizeInBytes);
+					
+					if (reflectedMemberMismatch)
 					{
 						mismatches.push_back(
 						    std::format(

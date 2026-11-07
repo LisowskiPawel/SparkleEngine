@@ -44,17 +44,16 @@ public:
 	{
 		const RhiCommandRecordingLeaseBackendState leaseState = Consume(std::move(lease));
 		auto* const slot = static_cast<Slot*>(leaseState.State);
-		if (slot == nullptr || slot->Owner != recordingContext || slot->State != closedState
-		    || !Matches(
-		        leaseState,
-		        RhiCommandRecordingLeaseBackendState{
-		            .State = slot,
-		            .CommandList = slot->CommandList.get(),
-		            .QueueType = slot->QueueType,
-		            .FrameSlot = slot->FrameSlot,
-		            .ContextId = RhiCommandRecordingContextId{.Value = slot->ContextIndex},
-		            .Owner = slot->RecordingOwner,
-		            .Closed = true}))
+		const bool bSlotOwnedOwner = slot != nullptr && slot->Owner == recordingContext;
+		const bool slotOwned = bSlotOwnedOwner && (slot->State == closedState);
+		if (!slotOwned)
+		{
+			return nullptr;
+		}
+		const RhiCommandRecordingLeaseBackendState expected{.State = slot, .CommandList = slot->CommandList.get(), .QueueType = slot->QueueType, .FrameSlot = slot->FrameSlot, .ContextId = RhiCommandRecordingContextId{.Value = slot->ContextIndex}, .Owner = slot->RecordingOwner, .Closed = true};
+		const bool leaseMatches = Matches(leaseState, expected);
+		
+		if (!leaseMatches)
 		{
 			return nullptr;
 		}

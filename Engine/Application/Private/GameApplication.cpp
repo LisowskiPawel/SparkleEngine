@@ -1,7 +1,7 @@
 #include "PCH.h"
 #include "GameApplication.h"
-#include "ApplicationGraphicsLaunch.h"
-#include "ApplicationGpuCrashStartup.h"
+#include "Startup/ApplicationGraphicsLaunch.h"
+#include "Startup/ApplicationGpuCrashStartup.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Diagnostics/GpuCrash/GpuCrashIncidentSink.h"
   #include "Diagnostics/GpuCrash/GpuCrashInputs.h"

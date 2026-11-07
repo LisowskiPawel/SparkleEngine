@@ -14,7 +14,12 @@ RendererMemoryMonitor::RendererMemoryMonitor(RenderDiagnostics& diagnostics, std
 
 void RendererMemoryMonitor::Tick(std::uint64_t frameIndex)
 {
-	if (m_diagnostics == nullptr || (m_hasPolled && !HasReachedPollInterval(frameIndex, m_latestSnapshot.LastPollFrame, m_latestSnapshot.PollIntervalFrames)))
+	const bool bMemoryNotDuediagnostics = m_diagnostics == nullptr;
+	const bool bMemoryNotDuehasPolled = !bMemoryNotDuediagnostics && (m_hasPolled);
+	const bool bMemoryNotDueIntervalFrames = bMemoryNotDuehasPolled && (!HasReachedPollInterval(frameIndex, m_latestSnapshot.LastPollFrame, m_latestSnapshot.PollIntervalFrames));
+	const bool memoryPollNotDue = bMemoryNotDuediagnostics || bMemoryNotDueIntervalFrames;
+	
+	if (memoryPollNotDue)
 	{
 		return;
 	}

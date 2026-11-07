@@ -158,7 +158,9 @@ namespace PathLighting
 
 			AdvanceThroughput(path, sample, bounceIndex, evaluatePrimaryDiffuse, evaluatePrimarySpecular, diffuseThroughput, specularThroughput);
 
-			if (!SurvivesRoulette(path, randomSamples.Roulette, bounceIndex, evaluatePrimaryDiffuse, evaluatePrimarySpecular, diffuseThroughput, specularThroughput))
+			const bool rouletteTerminated = !SurvivesRoulette(path, randomSamples.Roulette, bounceIndex, evaluatePrimaryDiffuse, evaluatePrimarySpecular, diffuseThroughput, specularThroughput);
+			
+			if (rouletteTerminated)
 			{
 				break;
 			}

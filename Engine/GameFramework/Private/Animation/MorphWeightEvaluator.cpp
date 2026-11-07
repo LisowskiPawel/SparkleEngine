@@ -8,7 +8,10 @@ namespace MorphWeightEvaluator
 {
 	bool Evaluate(const AnimationClipResource& clip, std::uint32_t channelIndex, float playbackTimeSeconds, std::span<float> outputWeights) noexcept
 	{
-		if (channelIndex >= clip.channels.size() || outputWeights.size() != 4 || clip.channels[channelIndex].targetPath != Assets::CookedAnimationTargetPath::Weights)
+		const bool bMorphChanneloutputWeightsSize = channelIndex >= clip.channels.size() || outputWeights.size() != 4;
+		const bool invalidMorphChannel = bMorphChanneloutputWeightsSize || (clip.channels[channelIndex].targetPath != Assets::CookedAnimationTargetPath::Weights);
+		
+		if (invalidMorphChannel)
 		{
 			return false;
 		}

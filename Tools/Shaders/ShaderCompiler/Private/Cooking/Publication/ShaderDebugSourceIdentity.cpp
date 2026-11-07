@@ -17,11 +17,18 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 	std::string receipt;
 	std::string executableHash;
 	std::vector<std::string_view> files;
-	if (!Files::TryReadAllText(path, receipt, error, 32u * 1024u * 1024u) || !Json::TryReadStringProperty(receipt, "executableSha256", executableHash)
-	    || executableHash != HashFile(Filesystem::GetExecutablePath()) || !Json::TryReadArrayProperty(receipt, "sourceFiles", files) || files.empty() || files.size() > 65'536)
+	const bool receiptRead = Files::TryReadAllText(path, receipt, error, 32u * 1024u * 1024u);
+	const bool executableHashRead = receiptRead && Json::TryReadStringProperty(receipt, "executableSha256", executableHash);
+	const bool executableMatches = executableHashRead && executableHash == HashFile(Filesystem::GetExecutablePath());
+	const bool sourcesRead = executableMatches && Json::TryReadArrayProperty(receipt, "sourceFiles", files);
+	const bool bSourcesBoundedfilesEmpty = sourcesRead && !files.empty();
+	const bool sourcesBounded = bSourcesBoundedfilesEmpty && (files.size() <= 65'536);
+
+	if (!sourcesBounded)
 	{
 		throw Diagnostics::Error("Diagnostic shader export requires this compiler's complete source receipt.");
 	}
+
 	const auto& root = Filesystem::GetWorkspaceRootPath();
 	for (const auto file : files)
 	{
@@ -31,9 +38,14 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 		{
 			throw Diagnostics::Error("Source receipt membership is malformed.");
 		}
+
 		const std::filesystem::path relativePath = Strings::ToWide(std::string_view{relative});
 		const auto source = root / relativePath;
-		if (relativePath.is_absolute() || relativePath.has_root_path() || relative.find(':') != std::string::npos || !Paths::IsUnderRoot(source, root))
+		const bool bInvalidReceiptPathrootpath = relativePath.is_absolute() || relativePath.has_root_path();
+		const bool bInvalidReceiptPathfind = bInvalidReceiptPathrootpath || (relative.find(':') != std::string::npos);
+		const bool invalidSourceReceiptPath = bInvalidReceiptPathfind || (!Paths::IsUnderRoot(source, root));
+		
+		if (invalidSourceReceiptPath)
 		{
 			throw Diagnostics::Error("Source receipt escapes the workspace.");
 		}

@@ -12,7 +12,11 @@ void Process::SignalParentReadiness(std::string_view value) noexcept
 #if defined(_WIN32)
 	std::string expectedValue;
 	std::string eventName;
-	if (!Environment::TryGetVariable(ReadinessValueEnvironmentVariable, expectedValue) || !Environment::TryGetVariable(ReadinessEventEnvironmentVariable, eventName) || value != expectedValue)
+	const bool expectedValueRead = Environment::TryGetVariable(ReadinessValueEnvironmentVariable, expectedValue);
+	const bool eventNameRead = expectedValueRead && Environment::TryGetVariable(ReadinessEventEnvironmentVariable, eventName);
+	const bool readinessMatches = eventNameRead && value == expectedValue;
+
+	if (!readinessMatches)
 	{
 		return;
 	}
@@ -22,6 +26,7 @@ void Process::SignalParentReadiness(std::string_view value) noexcept
 	{
 		return;
 	}
+
 	std::wstring wideEventName(static_cast<std::size_t>(nameLength), L'\0');
 	MultiByteToWideChar(CP_UTF8, 0, eventName.data(), static_cast<int>(eventName.size()), wideEventName.data(), nameLength);
 

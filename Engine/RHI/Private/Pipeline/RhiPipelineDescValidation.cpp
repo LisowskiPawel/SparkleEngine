@@ -120,9 +120,11 @@ void RhiContract::ValidateRayTracingPipelineDesc(const RayTracingPipelineDesc& d
 		RhiPipelineDescValidation::Require(IsRayTracingShaderStage(stage), "Ray-tracing pipeline contains a non-RT shader stage.");
 		RhiPipelineDescValidation::Require(exportStages.emplace(shaderExport.ExportName, stage).second, "Ray-tracing pipeline contains a duplicate shader export.");
 
-		const bool sharedContractMatches = stage != ShaderStage::RayGeneration
-		    || (shaderExport.Shader->Entry->RayPayloadSizeInBytes == desc.MaxPayloadSizeInBytes && shaderExport.Shader->Entry->RayAttributeSizeInBytes == desc.MaxAttributeSizeInBytes
-		        && shaderExport.Shader->Entry->MinimumRayRecursionDepth <= desc.MaxRecursionDepth);
+		const bool bSharedContractMatchesstage = stage != ShaderStage::RayGeneration;
+		const bool bSharedContractMatchesInBytes = !bSharedContractMatchesstage && (shaderExport.Shader->Entry->RayPayloadSizeInBytes == desc.MaxPayloadSizeInBytes);
+		const bool bSharedContractMatchesInBytes2 = bSharedContractMatchesInBytes && (shaderExport.Shader->Entry->RayAttributeSizeInBytes == desc.MaxAttributeSizeInBytes);
+		const bool bContractMatchesRecursionDepth = bSharedContractMatchesInBytes2 && (shaderExport.Shader->Entry->MinimumRayRecursionDepth <= desc.MaxRecursionDepth);
+		const bool sharedContractMatches = bSharedContractMatchesstage || bContractMatchesRecursionDepth;
 
 		RhiPipelineDescValidation::Require(sharedContractMatches, "Ray-tracing pipeline export metadata does not match its map contract.");
 

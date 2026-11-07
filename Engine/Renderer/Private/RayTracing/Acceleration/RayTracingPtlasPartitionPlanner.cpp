@@ -279,7 +279,12 @@ void RayTracingPtlasPartitionPlanner::CollectObservedInstances(
 		{
 			m_partitionStates[localPartitionId].TouchedThisFrame = true;
 		}
-		if (globalEligible && dirtyTransform && previous != nullptr && previous->PartitionId == plan.Counts.GlobalPartitionIndex && previous->LocalPartitionId < m_partitionStates.size())
+		const bool bUpdateEligibledirtyTransform = globalEligible && dirtyTransform;
+		const bool bGlobalUpdateEligibleprevious = bUpdateEligibledirtyTransform && (previous != nullptr);
+		const bool bGlobalUpdateEligibleCounts = bGlobalUpdateEligibleprevious && (previous->PartitionId == plan.Counts.GlobalPartitionIndex);
+		const bool globalPartitionUpdateEligible = bGlobalUpdateEligibleCounts && (previous->LocalPartitionId < m_partitionStates.size());
+		
+		if (globalPartitionUpdateEligible)
 		{
 			m_partitionStates[previous->LocalPartitionId].TouchedThisFrame = true;
 		}
@@ -309,13 +314,18 @@ void RayTracingPtlasPartitionPlanner::AppendPlanEntries(const RayTracingPtlasPar
 	{
 		const PartitionRuntimeState* partitionState = observed.LocalPartitionId < m_partitionStates.size() ? &m_partitionStates[observed.LocalPartitionId] : nullptr;
 		const bool partitionTouched = partitionState != nullptr && partitionState->TouchedThisFrame;
-		const bool instanceOrPartitionUpdated = observed.DirtyTransform || (config.MarkAllDynamicInPartition && partitionTouched);
+		const bool bPartitionUpdatedDirtyTransform = observed.DirtyTransform;
+		const bool bPartitionUpdatedpartitionTouched = config.MarkAllDynamicInPartition && partitionTouched;
+		const bool instanceOrPartitionUpdated = bPartitionUpdatedDirtyTransform || bPartitionUpdatedpartitionTouched;
 		const bool moveDynamicToGlobal = config.PartitionUpdateMode == RayTracingPtlasPartitionUpdateMode::AlwaysMoveDynamicToGlobal;
 
-		const bool moveFarDynamicToGlobal = config.PartitionUpdateMode == RayTracingPtlasPartitionUpdateMode::UpdatePartitionNearbyMoveToGlobalOtherwise && partitionState != nullptr
-		    && partitionState->FarFromCamera;
+		const bool bMoveToGlobalpartitionState = config.PartitionUpdateMode == RayTracingPtlasPartitionUpdateMode::UpdatePartitionNearbyMoveToGlobalOtherwise && partitionState != nullptr;
+		const bool moveFarDynamicToGlobal = bMoveToGlobalpartitionState && (partitionState->FarFromCamera);
 
-		const bool useGlobalPartition = observed.GlobalEligible && !plan.Validation.HasPartitionOverflow && instanceOrPartitionUpdated && (moveDynamicToGlobal || moveFarDynamicToGlobal);
+		const bool bUseGlobalPartitionValidation = observed.GlobalEligible && !plan.Validation.HasPartitionOverflow;
+		const bool bGlobalPartitionPartitionUpdated = bUseGlobalPartitionValidation && (instanceOrPartitionUpdated);
+		const bool bUseGlobalPartitionToGlobal = moveDynamicToGlobal || moveFarDynamicToGlobal;
+		const bool useGlobalPartition = bGlobalPartitionPartitionUpdated && bUseGlobalPartitionToGlobal;
 		const std::uint32_t partitionId = useGlobalPartition ? plan.Counts.GlobalPartitionIndex : observed.LocalPartitionId;
 
 		const RayTracingPtlasPartitionEntry entry{

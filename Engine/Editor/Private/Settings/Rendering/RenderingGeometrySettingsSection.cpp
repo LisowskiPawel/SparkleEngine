@@ -13,7 +13,7 @@ void DrawGeometrySettingsSection(EngineRenderingSettingsController& settingsCont
 	static constexpr RenderingSettingsUi::ComboOption<GBufferAlgorithm> gBufferAlgorithmOptions[] = {{"Rasterized", GBufferAlgorithm::Rasterized}, {"Ray tracing", GBufferAlgorithm::RayTracing}};
 	const bool geometryMatches = RenderingSettingsUi::MatchesFilter(filterText, "Geometry", "geometry mesh auto batching");
 	const bool geometryOpen = geometryMatches && RenderingSettingsUi::BeginSettingsCategory("Geometry");
-	
+
 	if (geometryOpen)
 	{
 		if (RenderingSettingsUi::BeginSettingsTable("##RenderingGeometrySettings"))
@@ -25,11 +25,12 @@ void DrawGeometrySettingsSection(EngineRenderingSettingsController& settingsCont
 			    gBufferAlgorithmOptions,
 			    [&settingsController](GBufferAlgorithm value) { settingsController.SetGBufferAlgorithm(value); });
 
-			RenderingSettingsUi::DrawBooleanRow(
-			    "##MeshAutoBatching",
-			    "Mesh auto batching",
-			    settings.MeshAutoBatching,
-			    [&settingsController](bool value) { settingsController.SetMeshAutoBatching(value); });
+			bool meshAutoBatching = settings.MeshAutoBatching;
+			const bool meshAutoBatchingEdited = RenderingSettingsUi::DrawBooleanRow("##MeshAutoBatching", "Mesh auto batching", meshAutoBatching);
+			if (meshAutoBatchingEdited)
+			{
+				settingsController.SetMeshAutoBatching(meshAutoBatching);
+			}
 
 			ImGui::EndTable();
 		}

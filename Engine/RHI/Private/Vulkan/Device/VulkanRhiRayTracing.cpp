@@ -98,8 +98,11 @@ void VulkanRhi::LoadRayTracingFunctions() noexcept
 		m_cmdBuildPtlas = reinterpret_cast<PFN_vkCmdBuildPartitionedAccelerationStructuresNV>(vkGetDeviceProcAddr(m_device, "vkCmdBuildPartitionedAccelerationStructuresNV"));
 	}
 
-	const bool loaded = m_getBufferDeviceAddress != nullptr && m_createAccelerationStructure != nullptr && m_destroyAccelerationStructure != nullptr && m_getAccelerationStructureBuildSizes != nullptr
-	    && m_cmdBuildAccelerationStructures != nullptr && m_getAccelerationStructureDeviceAddress != nullptr;
+	const bool bLoadedAccelerationStructure = m_getBufferDeviceAddress != nullptr && m_createAccelerationStructure != nullptr;
+	const bool bLoadedAccelerationStructure2 = bLoadedAccelerationStructure && (m_destroyAccelerationStructure != nullptr);
+	const bool bLoadedBuildSizes = bLoadedAccelerationStructure2 && (m_getAccelerationStructureBuildSizes != nullptr);
+	const bool bLoadedAccelerationStructures = bLoadedBuildSizes && (m_cmdBuildAccelerationStructures != nullptr);
+	const bool loaded = bLoadedAccelerationStructures && (m_getAccelerationStructureDeviceAddress != nullptr);
 
 	if (!loaded)
 	{
@@ -152,9 +155,13 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 	}
 	vkGetPhysicalDeviceProperties2(m_physicalDevice, &properties);
 
-	const bool pipelineReady = m_featureStatus.RayTracing.EnabledRayTracingPipeline && m_createRayTracingPipelines != nullptr && m_getRayTracingShaderGroupHandles != nullptr
-	    && m_cmdTraceRays != nullptr && pipelineProperties.shaderGroupHandleSize != 0 && pipelineProperties.shaderGroupBaseAlignment != 0 && pipelineProperties.shaderGroupHandleAlignment != 0
-	    && pipelineProperties.maxShaderGroupStride != 0;
+	const bool bPipelineReadyTracingPipelines = m_featureStatus.RayTracing.EnabledRayTracingPipeline && m_createRayTracingPipelines != nullptr;
+	const bool bPipelineReadyGroupHandles = bPipelineReadyTracingPipelines && (m_getRayTracingShaderGroupHandles != nullptr);
+	const bool bPipelineReadyTraceRays = bPipelineReadyGroupHandles && (m_cmdTraceRays != nullptr);
+	const bool bPipelineReadyHandleSize = bPipelineReadyTraceRays && (pipelineProperties.shaderGroupHandleSize != 0);
+	const bool bPipelineReadyBaseAlignment = bPipelineReadyHandleSize && (pipelineProperties.shaderGroupBaseAlignment != 0);
+	const bool bPipelineReadyHandleAlignment = bPipelineReadyBaseAlignment && (pipelineProperties.shaderGroupHandleAlignment != 0);
+	const bool pipelineReady = bPipelineReadyHandleAlignment && (pipelineProperties.maxShaderGroupStride != 0);
 
 	m_rayTracingCapabilities = RhiRayTracingCapabilities{
 	    .SupportsAccelerationStructure = true,
@@ -173,7 +180,8 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 
 	PopulateStandardRayTracingCapabilityGroups(m_rayTracingCapabilities);
 
-	const bool ptlasReady = m_featureStatus.RayTracing.EnabledPtlas && m_getPtlasBuildSizes != nullptr && m_cmdBuildPtlas != nullptr;
+	const bool bPtlasReadyBuildSizes = m_featureStatus.RayTracing.EnabledPtlas && m_getPtlasBuildSizes != nullptr;
+	const bool ptlasReady = bPtlasReadyBuildSizes && (m_cmdBuildPtlas != nullptr);
 
 	m_rayTracingCapabilities.Groups.Ptlas = RhiPtlasCapabilities{
 	    .Supported = ptlasReady,
@@ -219,7 +227,8 @@ void VulkanRhi::SelectRayTracingTlasProvider() noexcept
 
 	const RhiPtlasCapabilities& ptlas = m_rayTracingCapabilities.Groups.Ptlas;
 	const bool ptlasRequested = CVarRayTracingPreferPtlas.Get();
-	const bool ptlasSelected = ptlasRequested && ptlas.Supported && ptlas.SupportsDescriptorAccess;
+	const bool bPtlasSelectedSupported = ptlasRequested && ptlas.Supported;
+	const bool ptlasSelected = bPtlasSelectedSupported && (ptlas.SupportsDescriptorAccess);
 	const char* selectionReason = "TLAS-selected";
 	if (ptlasSelected)
 	{

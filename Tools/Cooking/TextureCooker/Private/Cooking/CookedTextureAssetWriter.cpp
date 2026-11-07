@@ -81,7 +81,7 @@ void WriteCookedTextureAsset(const TextureLoadResult& cookedTexture, const std::
 
 		const bool headerWritten = Files::BinaryStreamWriter::WriteValue(output, header, fileError);
 		const bool mipHeadersWritten = headerWritten && Files::BinaryStreamWriter::WriteBytes(output, mipHeaders.data(), sizeof(CookedTextureMipHeader) * mipHeaders.size(), fileError);
-		
+
 		if (!mipHeadersWritten)
 		{
 			throw Diagnostics::Error(fileError);

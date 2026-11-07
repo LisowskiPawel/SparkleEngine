@@ -61,7 +61,10 @@ RhiRayTracingCapabilities D3D12RayTracingServices::GetCapabilities() const noexc
 
 RhiRayTracingAccelerationStructurePrebuildInfo D3D12RayTracingServices::GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept
 {
-	if (m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure || !RhiContract::IsRayTracingGeometryDescUsable(geometry))
+	const bool bBlasGeometryTracingCapabilities = m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure;
+	const bool invalidBlasGeometry = bBlasGeometryTracingCapabilities || (!RhiContract::IsRayTracingGeometryDescUsable(geometry));
+	
+	if (invalidBlasGeometry)
 	{
 		return {};
 	}
@@ -119,7 +122,10 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreatePtlasOperationBuffer(const
 RhiOwnedResourceHandle D3D12RayTracingServices::CreateScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
 {
 	const std::uint64_t scratchAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().ScratchBufferByteAlignment : 0;
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, scratchAlignment))
+	const bool bScratchAllocationmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
+	const bool invalidScratchAllocation = bScratchAllocationmemoryAllocator || (!RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, scratchAlignment));
+	
+	if (invalidScratchAllocation)
 	{
 		return {};
 	}

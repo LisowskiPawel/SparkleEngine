@@ -95,12 +95,24 @@ namespace ShaderArtifactWriter
 		{
 			throw Diagnostics::Error("A compiled shader product cannot publish empty bytecode.");
 		}
+
 		const ShaderCodeHash codeHash = Hash::Fnv1a64(product.compiled.bytecode.data(), product.compiled.bytecode.size());
-		if (product.shaderTypeId != shader.shaderTypeId || !IsShaderTarget(product.target) || product.features != shader.features || product.rayTracing != shader.rayTracing
-		    || product.compiled.stage != shader.stage || product.compiled.format != GetShaderBinaryFormat(product.target) || product.compiled.sourcePath != shader.sourcePath
-		    || product.compiled.entryPoint != shader.entryPoint || product.compiled.backendName.empty() || product.compiled.codegenTarget != GetShaderTargetName(product.target)
-		    || product.compiled.backendVersion == 0 || product.compiled.compileInputHash == 0 || product.compiled.bytecodeHash != codeHash
-		    || BuildShaderParameterSignature(product.parameterLayout) != BuildShaderParameterSignature(shader.parameterLayout))
+		const bool shaderIdentityMatches = product.shaderTypeId == shader.shaderTypeId;
+		const bool targetValid = shaderIdentityMatches && IsShaderTarget(product.target);
+		const bool bShaderMetadataMatchesfeatures = targetValid && product.features == shader.features;
+		const bool bShaderMetadataMatchesrayTracing = bShaderMetadataMatchesfeatures && (product.rayTracing == shader.rayTracing);
+		const bool shaderMetadataMatches = bShaderMetadataMatchesrayTracing && (product.compiled.stage == shader.stage);
+		const bool bInaryFormatMatches = shaderMetadataMatches && product.compiled.format == GetShaderBinaryFormat(product.target);
+		const bool bSourceMatchessourcePath = bInaryFormatMatches && product.compiled.sourcePath == shader.sourcePath;
+		const bool bSourceMatchesentryPoint = bSourceMatchessourcePath && (product.compiled.entryPoint == shader.entryPoint);
+		const bool sourceMatches = bSourceMatchesentryPoint && (!product.compiled.backendName.empty());
+		const bool codegenTargetMatches = sourceMatches && product.compiled.codegenTarget == GetShaderTargetName(product.target);
+		const bool bCompiledIdentityValidcompiled = codegenTargetMatches && product.compiled.backendVersion != 0;
+		const bool bCompiledIdentityValidcompiled2 = bCompiledIdentityValidcompiled && (product.compiled.compileInputHash != 0);
+		const bool compiledIdentityValid = bCompiledIdentityValidcompiled2 && (product.compiled.bytecodeHash == codeHash);
+		const bool parameterLayoutMatches = compiledIdentityValid && BuildShaderParameterSignature(product.parameterLayout) == BuildShaderParameterSignature(shader.parameterLayout);
+
+		if (!parameterLayoutMatches)
 		{
 			throw Diagnostics::Error(std::format("Compiled shader product for '{}' does not match its catalog contract.", shader.shaderTypeName));
 		}
@@ -179,6 +191,7 @@ namespace ShaderArtifactWriter
 		{
 			throw Diagnostics::Error("Existing global shader map references missing library code.");
 		}
+
 		const ShaderBytecode bytecode = library.GetBytecode(*code);
 		entry.Code.assign(static_cast<const std::uint8_t*>(bytecode.Data), static_cast<const std::uint8_t*>(bytecode.Data) + bytecode.Size);
 		return entry;
@@ -327,8 +340,8 @@ namespace ShaderArtifactWriter
 		const bool outputOpened = Files::TryOpenBinaryOutput(path, output, error);
 		const bool headerWritten = outputOpened && Files::BinaryStreamWriter::WriteValue(output, mapHeader, error);
 		const bool entriesWritten = headerWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Entries, error);
-		const bool bindingsWritten = entriesWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Bindings, error);
-		const bool reflectionWritten = bindingsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.reflectionRecords, error);
+		const bool bIndingsWritten = entriesWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Bindings, error);
+		const bool reflectionWritten = bIndingsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.reflectionRecords, error);
 		const bool resourcesWritten = reflectionWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.resourceBindings, error);
 		const bool constantBuffersWritten = resourcesWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBuffers, error);
 		const bool constantMembersWritten = constantBuffersWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBufferMembers, error);
@@ -337,7 +350,7 @@ namespace ShaderArtifactWriter
 		const bool specializationConstantsWritten = pushConstantsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.specializationConstants, error);
 		const bool stringsWritten = specializationConstantsWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Strings.GetBytes(), error);
 		const bool outputClosed = stringsWritten && Files::TryCloseOutput(output, path, error);
-		
+
 		if (!outputClosed)
 		{
 			throw Diagnostics::Error(error);
@@ -358,7 +371,7 @@ namespace ShaderArtifactWriter
 		const bool recordsWritten = headerWritten && Files::BinaryStreamWriter::WriteArray(output, records, error);
 		const bool codeWritten = recordsWritten && Files::BinaryStreamWriter::WriteArray(output, code, error);
 		const bool outputClosed = codeWritten && Files::TryCloseOutput(output, path, error);
-		
+
 		if (!outputClosed)
 		{
 			throw Diagnostics::Error(error);
@@ -405,6 +418,7 @@ namespace ShaderArtifactWriter
 				entries.insert_or_assign(std::pair{entry.ShaderType, entry.Target}, std::move(entry));
 			}
 		}
+
 		std::vector<ArtifactEntry> orderedEntries;
 		for (auto& [key, entry] : entries)
 		{

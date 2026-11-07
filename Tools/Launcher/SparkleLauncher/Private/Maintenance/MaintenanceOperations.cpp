@@ -391,8 +391,8 @@ namespace SparkleLauncher
 			{
 				const std::vector<CleanScope> requestedCleanScopes = ResolveRequestedCleanScopes(request);
 
-				const bool missingContent = request.ContentId.empty() && request.RequestedCleanTargets.empty()
-				    && std::any_of(requestedCleanScopes.begin(), requestedCleanScopes.end(), CleanScopeRequiresContent);
+				const bool bMissingContentCleanTargets = request.ContentId.empty() && request.RequestedCleanTargets.empty();
+				const bool missingContent = bMissingContentCleanTargets && (std::any_of(requestedCleanScopes.begin(), requestedCleanScopes.end(), CleanScopeRequiresContent));
 
 				if (missingContent)
 				{

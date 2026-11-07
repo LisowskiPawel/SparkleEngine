@@ -135,8 +135,13 @@ bool VulkanUploadService::UploadTexture(
 
 bool VulkanUploadService::ValidateBufferUploadRequest(const RenderCommandList& commandList, const VulkanGpuAllocationRecord* destination, std::span<const std::byte> data) const noexcept
 {
-	if (m_memoryAllocator == nullptr || destination == nullptr || destination->Buffer == VK_NULL_HANDLE || data.empty() || data.size() > destination->ResourceSizeInBytes
-	    || commandList.GetBackendApi() != ERhiBackendApi::Vulkan)
+	const bool bBufferUploadRejecteddestination = m_memoryAllocator == nullptr || destination == nullptr;
+	const bool bBufferUploadRejectedBuffer = bBufferUploadRejecteddestination || (destination->Buffer == VK_NULL_HANDLE);
+	const bool bBufferUploadRejecteddataEmpty = bBufferUploadRejectedBuffer || (data.empty());
+	const bool bBufferUploadRejectedInBytes = bBufferUploadRejecteddataEmpty || (data.size() > destination->ResourceSizeInBytes);
+	const bool bUfferUploadRejected = bBufferUploadRejectedInBytes || (commandList.GetBackendApi() != ERhiBackendApi::Vulkan);
+	
+	if (bUfferUploadRejected)
 	{
 		return false;
 	}
@@ -158,7 +163,10 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanUploadService::CreateBufferStag
 	    .pQueueFamilyIndices = nullptr};
 
 	auto stagingResource = m_memoryAllocator->CreateBuffer(desc, RhiMemoryCategory::Upload, RhiMemoryResidencyClass::HostUpload, debugName.empty() ? L"BufferUpload" : debugName);
-	if (stagingResource == nullptr || stagingResource->Buffer == VK_NULL_HANDLE || !m_memoryAllocator->WriteAllocation(*stagingResource, data.data(), data.size()))
+	const bool stagingBufferAvailable = stagingResource != nullptr && stagingResource->Buffer != VK_NULL_HANDLE;
+	const bool stagingBytesWritten = stagingBufferAvailable && m_memoryAllocator->WriteAllocation(*stagingResource, data.data(), data.size());
+	
+	if (!stagingBytesWritten)
 	{
 		return {};
 	}
@@ -199,7 +207,12 @@ void VulkanUploadService::RecordBufferUpload(
 
 bool VulkanUploadService::ValidateTextureUploadRequest(const RenderCommandList& commandList, const VulkanGpuAllocationRecord* destination, const RhiTextureUploadDesc& textureUpload) const noexcept
 {
-	if (m_memoryAllocator == nullptr || destination == nullptr || destination->Image == VK_NULL_HANDLE || !textureUpload.IsValid() || commandList.GetBackendApi() != ERhiBackendApi::Vulkan)
+	const bool bTextureUploadRejecteddestination = m_memoryAllocator == nullptr || destination == nullptr;
+	const bool bTextureUploadRejectedImage = bTextureUploadRejecteddestination || (destination->Image == VK_NULL_HANDLE);
+	const bool bUploadRejectedtextureUploadValid = bTextureUploadRejectedImage || (!textureUpload.IsValid());
+	const bool textureUploadRejected = bUploadRejectedtextureUploadValid || (commandList.GetBackendApi() != ERhiBackendApi::Vulkan);
+	
+	if (textureUploadRejected)
 	{
 		return false;
 	}
@@ -237,7 +250,10 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanUploadService::CreateTextureSta
 	}
 
 	std::vector<std::uint8_t> uploadBytes(static_cast<std::size_t>(uploadBufferBytes));
-	if (!CopyTextureUploadData(textureUpload, uploadBytes, copyRegions) || !m_memoryAllocator->WriteAllocation(*stagingResource, uploadBytes.data(), uploadBytes.size()))
+	const bool textureCopied = CopyTextureUploadData(textureUpload, uploadBytes, copyRegions);
+	const bool stagingWritten = textureCopied && m_memoryAllocator->WriteAllocation(*stagingResource, uploadBytes.data(), uploadBytes.size());
+
+	if (!stagingWritten)
 	{
 		return {};
 	}

@@ -3,7 +3,7 @@
 #include "Renderer/Public/Meshes/MeshDiagnostics.h"
 #include "Rendering/RenderObjectId.h"
 #include "Scene/Materials/MaterialData.h"
-#include "Scene/Preparation/RenderPrimitivePreparation.h"
+#include "Scene/Preparation/Geometry/RenderPrimitivePreparation.h"
 #include "View/MeshInstanceBatch.h"
 
 #include <cstddef>

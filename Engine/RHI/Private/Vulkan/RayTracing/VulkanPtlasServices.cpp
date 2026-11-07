@@ -96,7 +96,12 @@ VulkanPtlasServices::VulkanPtlasServices(VulkanRhi& rhi, VulkanGpuMemoryAllocato
 RhiPtlasBuildSizes VulkanPtlasServices::GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || !capabilities.Groups.Ptlas.Supported || m_rhi->GetPtlasBuildSizes() == nullptr || desc.InstanceCapacity == 0 || desc.PartitionCount == 0)
+	const bool bInvalidSizingInputsSupported = m_rhi == nullptr || !capabilities.Groups.Ptlas.Supported;
+	const bool bInvalidSizingInputsBuildSizes = bInvalidSizingInputsSupported || (m_rhi->GetPtlasBuildSizes() == nullptr);
+	const bool bSizingInputsInstanceCapacity = bInvalidSizingInputsBuildSizes || (desc.InstanceCapacity == 0);
+	const bool invalidPtlasSizingInputs = bSizingInputsInstanceCapacity || (desc.PartitionCount == 0);
+	
+	if (invalidPtlasSizingInputs)
 	{
 		return {};
 	}
@@ -156,7 +161,11 @@ RhiOwnedResourceHandle VulkanPtlasServices::CreatePtlasBuffer(const RhiPtlasBuil
 RhiOwnedResourceHandle VulkanPtlasServices::CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName)
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !capabilities.Groups.Ptlas.Supported || !RhiContract::IsPtlasOperationPackUsable(operationPack))
+	const bool bOperationPackmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
+	const bool bInvalidOperationPackSupported = bOperationPackmemoryAllocator || (!capabilities.Groups.Ptlas.Supported);
+	const bool invalidPtlasOperationPack = bInvalidOperationPackSupported || (!RhiContract::IsPtlasOperationPackUsable(operationPack));
+	
+	if (invalidPtlasOperationPack)
 	{
 		return {};
 	}

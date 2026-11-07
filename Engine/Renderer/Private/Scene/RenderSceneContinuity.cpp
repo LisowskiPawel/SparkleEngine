@@ -1,8 +1,8 @@
 #include "PCH.h"
 #include "Scene/RenderScene.h"
 
-#include "Scene/Preparation/RenderDeformationPreparation.h"
-#include "Scene/Preparation/RenderPrimitivePreparation.h"
+#include "Scene/Preparation/Deformation/RenderDeformationPreparation.h"
+#include "Scene/Preparation/Geometry/RenderPrimitivePreparation.h"
 
 #include <algorithm>
 
@@ -67,7 +67,9 @@ void RenderScene::CommitJointMatrixContinuity(const RenderDeformationWork& defor
 		{
 			++jointRangeIndex;
 		}
-		if (jointRangeIndex >= deformation.JointMatrixCopyRanges.size() || deformation.JointMatrixCopyRanges[jointRangeIndex].Object != history->first)
+		const bool jointHistoryUnavailable = jointRangeIndex >= deformation.JointMatrixCopyRanges.size() || deformation.JointMatrixCopyRanges[jointRangeIndex].Object != history->first;
+		
+		if (jointHistoryUnavailable)
 		{
 			history = m_jointMatrixHistory.erase(history);
 		}
@@ -111,8 +113,8 @@ void RenderScene::CommitMorphWeightContinuity(const RenderDeformationWork& defor
 			++morphRangeIndex;
 		}
 
-		const bool retain = morphRangeIndex < deformation.MorphWeightCopyRanges.size() && deformation.MorphWeightCopyRanges[morphRangeIndex].Object == history->first
-		    && retainsMorphHistory(deformation.MorphWeightCopyRanges[morphRangeIndex]);
+		const bool bRetainfirst = morphRangeIndex < deformation.MorphWeightCopyRanges.size() && deformation.MorphWeightCopyRanges[morphRangeIndex].Object == history->first;
+		const bool retain = bRetainfirst && (retainsMorphHistory(deformation.MorphWeightCopyRanges[morphRangeIndex]));
 
 		if (!retain)
 		{

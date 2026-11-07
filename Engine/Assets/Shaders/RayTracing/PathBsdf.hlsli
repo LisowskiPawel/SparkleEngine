@@ -163,8 +163,12 @@ namespace PathBsdf
 	{
 		PathSample::DirectionSample result = (PathSample::DirectionSample)0;
 		result.DirectionWorld = normalize(reflect(-surface.ViewDirWorld, surface.NormalWorld));
-		if (specularMass <= 0.0f || dot(surface.ViewDirWorld, surface.NormalWorld) <= 0.0f || dot(surface.ViewDirWorld, surface.GeometricNormalWorld) <= 0.0f
-		    || dot(result.DirectionWorld, surface.GeometricNormalWorld) <= 0.0f)
+		const bool specularMassUsable = !(specularMass <= 0.0f);
+		const bool viewAboveShadingSurface = specularMassUsable && !(dot(surface.ViewDirWorld, surface.NormalWorld) <= 0.0f);
+		const bool viewAboveGeometricSurface = viewAboveShadingSurface && !(dot(surface.ViewDirWorld, surface.GeometricNormalWorld) <= 0.0f);
+		const bool sampleAboveGeometricSurface = viewAboveGeometricSurface && !(dot(result.DirectionWorld, surface.GeometricNormalWorld) <= 0.0f);
+		
+		if (!sampleAboveGeometricSurface)
 		{
 			return result;
 		}

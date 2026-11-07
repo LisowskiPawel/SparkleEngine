@@ -116,7 +116,10 @@ static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std
 	std::string output;
 	for (const ConsoleCommandEntry& command : kCommands)
 	{
-		if (!filter.empty() && !Strings::ContainsIgnoreCase(command.Name, filter) && !Strings::ContainsIgnoreCase(command.Help, filter))
+		const bool bCommandByFilterName = !filter.empty() && !Strings::ContainsIgnoreCase(command.Name, filter);
+		const bool commandExcludedByFilter = bCommandByFilterName && (!Strings::ContainsIgnoreCase(command.Help, filter));
+		
+		if (commandExcludedByFilter)
 		{
 			continue;
 		}

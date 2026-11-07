@@ -8,7 +8,10 @@ void ArmExternalCapture(RhiExternalCapture& capture, const RenderExternalCapture
 	{
 		return;
 	}
-	if (snapshot.ContextToken == 0 || products.GetGeneration() != snapshot.ContextToken || !products.HasOutput(RenderOutputFlags::FinalColorLdr))
+	const bool bProductUnavailableContextToken = snapshot.ContextToken == 0 || products.GetGeneration() != snapshot.ContextToken;
+	const bool captureProductUnavailable = bProductUnavailableContextToken || (!products.HasOutput(RenderOutputFlags::FinalColorLdr));
+	
+	if (captureProductUnavailable)
 	{
 		capture.Reject(command.RequestId, "The requested viewport generation is stale. Wait for its current output and retry.");
 		return;

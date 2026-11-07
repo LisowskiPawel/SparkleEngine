@@ -75,8 +75,16 @@ bool GltfMeshGeometryExtractor::HasValidTangentFrame(const ImportedMeshGeometry&
 
 void GltfMeshGeometryExtractor::ValidateAttributes(const cgltf_primitive& primitive, const Attributes& attributes)
 {
-	if (attributes.Positions == nullptr || attributes.Normals == nullptr || (GltfGeometryRequirements::RequiresTextureCoordinates(primitive.material) && attributes.TextureCoordinates == nullptr)
-	    || attributes.Positions->count == 0 || attributes.Positions->count > (std::numeric_limits<std::uint32_t>::max)())
+	const bool requiredAccessorsPresent = attributes.Positions != nullptr && attributes.Normals != nullptr;
+	const bool bTextureCoordinatesPresentmaterial = requiredAccessorsPresent && (!GltfGeometryRequirements::RequiresTextureCoordinates(primitive.material));
+	const bool bCoordinatesPresentGuardCoordinates = requiredAccessorsPresent && !bTextureCoordinatesPresentmaterial;
+	const bool bCoordinatesPresentCoordinates = bCoordinatesPresentGuardCoordinates && (attributes.TextureCoordinates != nullptr);
+	const bool bCoordinatesPresentCoordinates2 = bTextureCoordinatesPresentmaterial || bCoordinatesPresentCoordinates;
+	const bool textureCoordinatesPresent = requiredAccessorsPresent && bCoordinatesPresentCoordinates2;
+	const bool bVertexCountUsablePositions = textureCoordinatesPresent && attributes.Positions->count != 0;
+	const bool vertexCountUsable = bVertexCountUsablePositions && (attributes.Positions->count <= (std::numeric_limits<std::uint32_t>::max)());
+	
+	if (!vertexCountUsable)
 	{
 		throw Diagnostics::Error("glTF primitive contains unsupported or malformed vertex attributes.");
 	}
@@ -85,10 +93,15 @@ void GltfMeshGeometryExtractor::ValidateAttributes(const cgltf_primitive& primit
 	{
 		const cgltf_attribute& attribute = primitive.attributes[attributeIndex];
 
-		const bool supported = ((attribute.type == cgltf_attribute_type_position || attribute.type == cgltf_attribute_type_normal || attribute.type == cgltf_attribute_type_tangent)
-		                           && attribute.index == 0)
-		    || attribute.type == cgltf_attribute_type_texcoord || attribute.type == cgltf_attribute_type_color
-		    || ((attribute.type == cgltf_attribute_type_joints || attribute.type == cgltf_attribute_type_weights) && (attribute.index == 0 || attribute.index == 1));
+		const bool bSupportedtype = attribute.type == cgltf_attribute_type_position || attribute.type == cgltf_attribute_type_normal;
+		const bool bSupportedtype2 = bSupportedtype || (attribute.type == cgltf_attribute_type_tangent);
+		const bool bSupportedindex = bSupportedtype2 && (attribute.index == 0);
+		const bool bSupportedtype3 = bSupportedindex || (attribute.type == cgltf_attribute_type_texcoord);
+		const bool bSupportedtype4 = bSupportedtype3 || (attribute.type == cgltf_attribute_type_color);
+		const bool bSupportedtype5 = attribute.type == cgltf_attribute_type_joints || attribute.type == cgltf_attribute_type_weights;
+		const bool bSupportedindex2 = attribute.index == 0 || attribute.index == 1;
+		const bool bSupportedindex3 = bSupportedtype5 && bSupportedindex2;
+		const bool supported = bSupportedtype4 || bSupportedindex3;
 
 		if (!supported || attribute.data == nullptr || attribute.data->count != attributes.Positions->count)
 		{
@@ -96,11 +109,31 @@ void GltfMeshGeometryExtractor::ValidateAttributes(const cgltf_primitive& primit
 		}
 	}
 
-	if (attributes.Positions->type != cgltf_type_vec3 || attributes.Normals->type != cgltf_type_vec3
-	    || (attributes.TextureCoordinates != nullptr && attributes.TextureCoordinates->type != cgltf_type_vec2) || (attributes.Tangents != nullptr && attributes.Tangents->type != cgltf_type_vec4)
-	    || (attributes.Colors != nullptr && attributes.Colors->type != cgltf_type_vec3 && attributes.Colors->type != cgltf_type_vec4)
-	    || (attributes.Joints0 == nullptr) != (attributes.Weights0 == nullptr) || (attributes.Joints1 == nullptr) != (attributes.Weights1 == nullptr)
-	    || GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_joints, 2) != nullptr || GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_weights, 2) != nullptr)
+	const bool positionNormalShapesValid = attributes.Positions->type == cgltf_type_vec3 && attributes.Normals->type == cgltf_type_vec3;
+	const bool bShapeValidTextureCoordinates = positionNormalShapesValid && (attributes.TextureCoordinates == nullptr);
+	const bool bShapeValidGuardTextureCoordinates = positionNormalShapesValid && !bShapeValidTextureCoordinates;
+	const bool bShapeValidTextureCoordinates2 = bShapeValidGuardTextureCoordinates && (attributes.TextureCoordinates->type == cgltf_type_vec2);
+	const bool bShapeValidTextureCoordinates3 = bShapeValidTextureCoordinates || bShapeValidTextureCoordinates2;
+	const bool textureCoordinateShapeValid = positionNormalShapesValid && bShapeValidTextureCoordinates3;
+	const bool bTangentShapeValidTangents = textureCoordinateShapeValid && (attributes.Tangents == nullptr);
+	const bool bTangentShapeValidGuardTangents = textureCoordinateShapeValid && !bTangentShapeValidTangents;
+	const bool bTangentShapeValidTangents2 = bTangentShapeValidGuardTangents && (attributes.Tangents->type == cgltf_type_vec4);
+	const bool bTangentShapeValidTangents3 = bTangentShapeValidTangents || bTangentShapeValidTangents2;
+	const bool tangentShapeValid = textureCoordinateShapeValid && bTangentShapeValidTangents3;
+	const bool bColorShapeValidColors = tangentShapeValid && (attributes.Colors == nullptr);
+	const bool bColorShapeValidGuardColors = tangentShapeValid && !bColorShapeValidColors;
+	const bool bColorShapeValidColors2 = bColorShapeValidGuardColors && (attributes.Colors->type == cgltf_type_vec3);
+	const bool bColorShapeValidColors3 = bColorShapeValidColors || bColorShapeValidColors2;
+	const bool bColorShapeValidGuardColors2 = tangentShapeValid && !bColorShapeValidColors3;
+	const bool bColorShapeValidColors4 = bColorShapeValidGuardColors2 && (attributes.Colors->type == cgltf_type_vec4);
+	const bool bColorShapeValidColors5 = bColorShapeValidColors3 || bColorShapeValidColors4;
+	const bool colorShapeValid = tangentShapeValid && bColorShapeValidColors5;
+	const bool primarySkinSetPaired = colorShapeValid && (attributes.Joints0 == nullptr) == (attributes.Weights0 == nullptr);
+	const bool attributeShapesValid = primarySkinSetPaired && (attributes.Joints1 == nullptr) == (attributes.Weights1 == nullptr);
+	const bool jointSetsSupported = attributeShapesValid && GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_joints, 2) == nullptr;
+	const bool weightSetsSupported = jointSetsSupported && GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_weights, 2) == nullptr;
+
+	if (!weightSetsSupported)
 	{
 		throw Diagnostics::Error("glTF primitive contains unsupported or malformed vertex attributes.");
 	}

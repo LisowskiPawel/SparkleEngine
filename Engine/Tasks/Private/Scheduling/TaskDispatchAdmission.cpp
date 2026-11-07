@@ -13,8 +13,19 @@ std::shared_ptr<TaskDispatch::State> TaskExecutor::Implementation::Runtime::Prep
     TaskFunction function,
     TaskExecutionContext context)
 {
-	if (TaskWorkerContext::IsWorker() || std::this_thread::get_id() != scope->OwnerThread || !desc.Name.IsValid() || !function || desc.CompletionPolicy != TaskCompletionPolicy::Normal
-	    || GetWorkerCount(desc.Lane) == 0 || (context.HasUserData() && !context.HasOwnedUserData()))
+	const bool callerIsHost = !TaskWorkerContext::IsWorker();
+	const bool ownerThreadMatches = callerIsHost && std::this_thread::get_id() == scope->OwnerThread;
+	const bool bTaskDescriptionValidName = ownerThreadMatches && desc.Name.IsValid();
+	const bool bTaskDescriptionValidfunction = bTaskDescriptionValidName && (function);
+	const bool taskDescriptionValid = bTaskDescriptionValidfunction && (desc.CompletionPolicy == TaskCompletionPolicy::Normal);
+	const bool laneAvailable = taskDescriptionValid && GetWorkerCount(desc.Lane) != 0;
+	const bool bUserDataOwnedUserData = laneAvailable && (!context.HasUserData());
+	const bool bUserDataOwnedGuardUserData = laneAvailable && !bUserDataOwnedUserData;
+	const bool bUserDataOwnedUserData2 = bUserDataOwnedGuardUserData && (context.HasOwnedUserData());
+	const bool bUserDataOwnedUserData3 = bUserDataOwnedUserData || bUserDataOwnedUserData2;
+	const bool userDataOwned = laneAvailable && bUserDataOwnedUserData3;
+	
+	if (!userDataOwned)
 	{
 		throw std::invalid_argument("Prepared dispatch requires its scope owner, a callable, owned context and an asynchronous Normal lane.");
 	}

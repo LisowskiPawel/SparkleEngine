@@ -29,7 +29,8 @@ MaterialCache::~MaterialCache() noexcept = default;
 void MaterialCache::BuildMaterials(const RenderMaterialTable& materials, std::uint64_t sourceRevision, PreparedRenderScene& preparedScene)
 {
 	const std::uint64_t textureRevision = m_textureCache.GetBindingRevision();
-	const bool rebuildRequired = m_currentGeneration == nullptr || m_currentGeneration->GetSourceRevision() != sourceRevision || m_currentGeneration->GetTextureRevision() != textureRevision;
+	const bool bRebuildRequiredSourceRevision = m_currentGeneration == nullptr || m_currentGeneration->GetSourceRevision() != sourceRevision;
+	const bool rebuildRequired = bRebuildRequiredSourceRevision || (m_currentGeneration->GetTextureRevision() != textureRevision);
 	if (rebuildRequired)
 	{
 		Rebuild(materials, sourceRevision, textureRevision);

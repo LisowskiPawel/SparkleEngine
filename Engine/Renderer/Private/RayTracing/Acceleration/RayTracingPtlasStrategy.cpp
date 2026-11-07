@@ -71,9 +71,11 @@ void RayTracingPtlasStrategy::EnsurePtlasResources(const RhiPtlasDesc& requiredL
 {
 	const RhiPtlasDesc& allocated = m_ptlasResources.Layout;
 
-	const bool canReuse = m_ptlasResources.Storage && m_ptlasResources.Scratch && allocated.InstanceCapacity >= requiredLayout.InstanceCapacity
-	    && allocated.PartitionCount == requiredLayout.PartitionCount && allocated.MaxInstancesPerPartition >= requiredLayout.MaxInstancesPerPartition
-	    && allocated.MaxInstancesInGlobalPartition >= requiredLayout.MaxInstancesInGlobalPartition;
+	const bool bCanReuseScratch = m_ptlasResources.Storage && m_ptlasResources.Scratch;
+	const bool bCanReuseInstanceCapacity = bCanReuseScratch && (allocated.InstanceCapacity >= requiredLayout.InstanceCapacity);
+	const bool bCanReusePartitionCount = bCanReuseInstanceCapacity && (allocated.PartitionCount == requiredLayout.PartitionCount);
+	const bool bCanReusePerPartition = bCanReusePartitionCount && (allocated.MaxInstancesPerPartition >= requiredLayout.MaxInstancesPerPartition);
+	const bool canReuse = bCanReusePerPartition && (allocated.MaxInstancesInGlobalPartition >= requiredLayout.MaxInstancesInGlobalPartition);
 
 	if (canReuse)
 	{
@@ -92,8 +94,11 @@ void RayTracingPtlasStrategy::EnsurePtlasResources(const RhiPtlasDesc& requiredL
 	m_ptlasResources.Scratch = rayTracingService.CreateRayTracingScratchBuffer(buildSizes.BuildScratchSizeInBytes, L"RayTracingPtlasScratch");
 	m_ptlasResources.Layout = requiredLayout;
 	RhiResourceService& resources = m_renderHardwareInterface.GetResourceService();
-	if (!m_ptlasResources.Storage || !m_ptlasResources.Scratch || resources.GetResourceGpuVirtualAddress(m_ptlasResources.Storage) == 0
-	    || resources.GetResourceGpuVirtualAddress(m_ptlasResources.Scratch) == 0)
+	const bool bPtlasAddressUnavailableScratch = !m_ptlasResources.Storage || !m_ptlasResources.Scratch;
+	const bool bPtlasAddressUnavailableStorage = bPtlasAddressUnavailableScratch || (resources.GetResourceGpuVirtualAddress(m_ptlasResources.Storage) == 0);
+	const bool ptlasAddressUnavailable = bPtlasAddressUnavailableStorage || (resources.GetResourceGpuVirtualAddress(m_ptlasResources.Scratch) == 0);
+	
+	if (ptlasAddressUnavailable)
 	{
 		Diagnostics::Fatal(g_rayTracingPtlasStrategyLogger, __FILE__, __LINE__, "PTLAS storage or scratch allocation has no GPU address.");
 	}

@@ -86,8 +86,17 @@ RhiGpuVirtualAddress VulkanRecordingUploadPage::AllocateAndCopy(const void* data
 
 	std::uint64_t alignedOffset = (m_offset + m_alignment - 1) & ~(m_alignment - 1);
 	const Page& current = *m_pages[m_pageIndex];
-	if (current.Buffer != nullptr
-	    && (current.AllocationCount == current.Allocations.size() || alignedOffset > current.Buffer->ResourceSizeInBytes || sizeInBytes > current.Buffer->ResourceSizeInBytes - alignedOffset))
+	const bool bUploadPageExhaustedBuffer = current.Buffer != nullptr;
+	const bool bUploadPageExhaustedAllocations = bUploadPageExhaustedBuffer && (current.AllocationCount == current.Allocations.size());
+	const bool bUploadPageExhaustedGuardBuffer = bUploadPageExhaustedBuffer && !bUploadPageExhaustedAllocations;
+	const bool bUploadPageExhaustedBuffer2 = bUploadPageExhaustedGuardBuffer && (alignedOffset > current.Buffer->ResourceSizeInBytes);
+	const bool bUploadPageExhaustedBuffer3 = bUploadPageExhaustedAllocations || bUploadPageExhaustedBuffer2;
+	const bool bUploadPageExhaustedGuardBuffer2 = bUploadPageExhaustedBuffer && !bUploadPageExhaustedBuffer3;
+	const bool bUploadPageExhaustedBuffer4 = bUploadPageExhaustedGuardBuffer2 && (sizeInBytes > current.Buffer->ResourceSizeInBytes - alignedOffset);
+	const bool bUploadPageExhaustedBuffer5 = bUploadPageExhaustedBuffer3 || bUploadPageExhaustedBuffer4;
+	const bool uploadPageExhausted = bUploadPageExhaustedBuffer && bUploadPageExhaustedBuffer5;
+	
+	if (uploadPageExhausted)
 	{
 		// Allocation addresses stay stable while the recording spans more pages.
 		do

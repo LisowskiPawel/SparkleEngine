@@ -22,18 +22,6 @@ struct RenderPassShaderRuntimeStorage
 
 namespace RenderPassShaderRuntime
 {
-	inline void ValidateResolvedShader(
-	    RenderHardwareInterface& renderHardwareInterface,
-	    const ShaderRegistrationDesc& registration,
-	    const ResolvedShader& shader,
-	    const PassParameterLayout& parameterLayout)
-	{
-		PipelineMaterialization::ValidateShaderCapabilities(renderHardwareInterface, registration.ShaderName, shader);
-		if (shader.Entry->Stage != registration.Stage || shader.Entry->Features != registration.Features || shader.Entry->ParameterSignature != BuildShaderParameterSignature(parameterLayout))
-		{
-			throw Diagnostics::Error(std::format("Shader '{}' map metadata does not match its registered contract.", registration.ShaderName));
-		}
-	}
 
 	template <typename TVertexShader, typename TPixelShader> void CreateGraphicsRuntime(
 	    RenderHardwareInterface& renderHardwareInterface,
@@ -50,8 +38,8 @@ namespace RenderPassShaderRuntime
 		const ShaderRegistrationDesc* registrations[] = {&vertexRegistration, &pixelRegistration};
 		storage.ParameterLayout = BuildShaderPipelineParameterLayout(registrations);
 		storage.Shaders = {vertexShader.GetResolvedShader(), pixelShader.GetResolvedShader()};
-		ValidateResolvedShader(renderHardwareInterface, vertexRegistration, storage.Shaders[0], BuildShaderParameterLayout(vertexRegistration));
-		ValidateResolvedShader(renderHardwareInterface, pixelRegistration, storage.Shaders[1], BuildShaderParameterLayout(pixelRegistration));
+		PipelineMaterialization::ValidateResolvedShader(renderHardwareInterface, vertexRegistration, storage.Shaders[0], BuildShaderParameterLayout(vertexRegistration));
+		PipelineMaterialization::ValidateResolvedShader(renderHardwareInterface, pixelRegistration, storage.Shaders[1], BuildShaderParameterLayout(pixelRegistration));
 		std::wstring debugName = Strings::ToWide(vertexRegistration.ShaderName);
 		storage.BindingLayout = PipelineMaterialization::CreateBindingLayout(renderHardwareInterface, storage.ParameterLayout, storage.Shaders, true, debugName.c_str());
 	}
@@ -69,7 +57,7 @@ namespace RenderPassShaderRuntime
 		}
 		storage.ParameterLayout = BuildShaderParameterLayout(registration);
 		storage.Shaders = {shader.GetResolvedShader()};
-		ValidateResolvedShader(renderHardwareInterface, registration, storage.Shaders.front(), storage.ParameterLayout);
+		PipelineMaterialization::ValidateResolvedShader(renderHardwareInterface, registration, storage.Shaders.front(), storage.ParameterLayout);
 		std::wstring debugName = Strings::ToWide(registration.ShaderName);
 		storage.BindingLayout = PipelineMaterialization::CreateBindingLayout(renderHardwareInterface, storage.ParameterLayout, storage.Shaders, false, debugName.c_str());
 		ComputePipelineDesc pipeline;

@@ -37,21 +37,27 @@ namespace ECS
 		    .InstanceGroupIndex = instance.InstanceGroupIndex,
 		    .SourceNodeIndex = instance.SourceNodeIndex};
 
-		bool added = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{}) && m_registry.Add(entity, mesh) && m_registry.Add(entity, Visibility{})
-		    && m_registry.Add(
+		const bool bAddedAdd = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
+		const bool bAddedAdd2 = bAddedAdd && (m_registry.Add(entity, mesh));
+		const bool bAddedAdd3 = bAddedAdd2 && (m_registry.Add(entity, Visibility{}));
+		const bool bAddedNodeIndex = bAddedAdd3 && (m_registry.Add(
 		        entity,
 		        AuthoredIdentity{
 		            .SourceAssetId = instance.MeshAssetId,
 		            .SourceInstanceId = instance.SourceInstanceId,
 		            .SourceObjectId = static_cast<std::uint64_t>(instance.SourceNodeIndex),
-		            .Kind = AuthoredObjectKind::MeshInstance})
-		    && m_registry.Add(entity, EditorMetadata{});
+		            .Kind = AuthoredObjectKind::MeshInstance}));
+		bool added = bAddedNodeIndex && (m_registry.Add(entity, EditorMetadata{}));
 
-		if (added && instance.Kind == SceneMeshKind::Skeletal)
-		{
-			added = morphState.IsValid() && m_registry.Add(entity, MorphState{.Weights = morphState}) && m_registry.Add(entity, SkinningState{.SkeletonAssetId = instance.SkeletonAssetId});
-		}
-		if (!added)
+		const bool bSkeletalMesh = instance.Kind == SceneMeshKind::Skeletal;
+		const bool bMorphRequired = added && bSkeletalMesh;
+		const bool bMorphValid = bMorphRequired && morphState.IsValid();
+		const bool bMorphStored = bMorphValid && m_registry.Add(entity, MorphState{.Weights = morphState});
+		const bool bSkinningStored = bMorphStored && m_registry.Add(entity, SkinningState{.SkeletonAssetId = instance.SkeletonAssetId});
+		const bool bSkinningComplete = !bSkeletalMesh || bSkinningStored;
+		const bool bMeshAdded = added && bSkinningComplete;
+
+		if (!bMeshAdded)
 		{
 			m_registry.Destroy(entity);
 			m_meshResources.Remove(resource);

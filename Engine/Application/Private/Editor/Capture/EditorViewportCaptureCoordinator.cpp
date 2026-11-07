@@ -51,13 +51,15 @@ std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Update(Rend
 		std::string errorMessage;
 
 		const TaskName taskName = TaskName("Write viewport capture");
+
 		auto operationTask = [readback = std::move(readback), outputPath = m_outputPath](ViewportCaptureResult& result, TaskExecutionContext& context) mutable
-				        {
-					        result = ViewportCaptureWriter::Write(std::move(readback), outputPath, context.GetCancellationToken());
-					        return result ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.FailureReason) : TaskResult::Failure(result.FailureReason));
-				        };
+		{
+			result = ViewportCaptureWriter::Write(std::move(readback), outputPath, context.GetCancellationToken());
+			return result ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.FailureReason) : TaskResult::Failure(result.FailureReason));
+		};
+
 		const bool operationStarted = m_writeOperation.Start(taskName, "A viewport capture is already being written.", std::move(operationTask), errorMessage);
-		
+
 		if (!operationStarted)
 		{
 			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture could not start: " + errorMessage};

@@ -14,7 +14,10 @@ namespace ECS
 
 	bool GameWorldState::PrepareSystemExecution(GameWorldResourceStores& resources)
 	{
-		if (!m_systemGraph || !m_animationOutput.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation) || !m_extraction.Prepare(m_registry))
+		const bool animationPrepared = m_systemGraph && m_animationOutput.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation);
+		const bool extractionPrepared = animationPrepared && m_extraction.Prepare(m_registry);
+
+		if (!extractionPrepared)
 		{
 			return false;
 		}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ApplicationGpuCrashStartup.h"
+#include "Startup/ApplicationGpuCrashStartup.h"
 #include "RHI/Public/Core/RhiBackendSelection.h"
 
 #include <Windows.h>

@@ -3,7 +3,7 @@
 #include "RHI/Public/Frame/RhiFrameConstants.h"
 #include "Scene/GpuScene/PersistentStructuredBuffer.h"
 #include "Scene/GpuScene/RenderSceneGpuBindings.h"
-#include "Scene/GpuScene/RenderGpuLightingPayloadBuilder.h"
+#include "Scene/GpuScene/Lighting/RenderGpuLightingPayloadBuilder.h"
 
 #include <array>
 

@@ -120,7 +120,8 @@ FrameGraphTransientResourcePlan FrameGraph::BuildTransientResourcePlan(
 	const bool requiresUnorderedAccess = RequiresUnorderedAccess(plan, transientResource.handle);
 	const bool requiresRenderTarget = RequiresRenderTarget(plan, transientResource.handle);
 	const bool isBuffer = resourceMetadata.resourceClass == FrameGraphResourceClass::Buffer;
-	const bool hasOptimizedClearValue = !isBuffer && (resourceMetadata.kind == FrameGraphResourceKind::DepthStencil || requiresRenderTarget);
+	const bool bHasClearValueRenderTarget = resourceMetadata.kind == FrameGraphResourceKind::DepthStencil || requiresRenderTarget;
+	const bool hasOptimizedClearValue = !isBuffer && bHasClearValueRenderTarget;
 
 	const RhiBufferResourceDesc bufferResourceDesc = isBuffer ? BuildTransientBufferDesc(transientResource.bufferDesc, requiresUnorderedAccess) : RhiBufferResourceDesc{};
 

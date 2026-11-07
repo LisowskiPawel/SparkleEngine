@@ -112,7 +112,9 @@ namespace Process
 	static bool ReleaseWindowsProcessOwnership(const WindowsOwnedProcess& child, ChildProcessResult& result)
 	{
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION releasedLimits{};
-		if (!SetInformationJobObject(child.Job.Get(), JobObjectExtendedLimitInformation, &releasedLimits, static_cast<DWORD>(sizeof(releasedLimits))))
+		const bool limitsReleased = SetInformationJobObject(child.Job.Get(), JobObjectExtendedLimitInformation, &releasedLimits, static_cast<DWORD>(sizeof(releasedLimits))) != FALSE;
+
+		if (!limitsReleased)
 		{
 			const DWORD releaseError = GetLastError();
 			TerminateOwnedWindowsProcess(child);
@@ -152,6 +154,7 @@ namespace Process
 			result.FailureReason = "Failed to create the child cancellation event: " + FormatWindowsProcessError(eventError);
 			return;
 		}
+
 		std::stop_callback cancellationWake(request.Cancellation, [event = cancelEvent.Get()] { SetEvent(event); });
 
 		std::uint64_t consumedLogBytes = 0;
@@ -215,6 +218,7 @@ namespace Process
 		{
 			return result;
 		}
+
 		const auto environmentOverrides = BuildReadinessEnvironment(request, eventName);
 		WindowsOwnedProcess child;
 		if (!LaunchOwnedWindowsProcess(request, environmentOverrides, outputFile.Get(), result, child))

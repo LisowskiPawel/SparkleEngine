@@ -20,11 +20,13 @@ static bool ReadExportIdentity(std::string_view text, std::string_view key, std:
 	{
 		return false;
 	}
+
 	std::string_view digits(hex);
 	if (digits.starts_with("0x") || digits.starts_with("0X"))
 	{
 		digits.remove_prefix(2);
 	}
+
 	const auto parsed = std::from_chars(digits.data(), digits.data() + digits.size(), value, 16);
 	return parsed.ec == std::errc{} && parsed.ptr == digits.data() + digits.size();
 }
@@ -44,8 +46,12 @@ static bool ResolveExportRequest(const std::filesystem::path& cookDirectory, std
 	{
 		return false;
 	}
+
 	const std::filesystem::path relative(name);
-	if (relative.has_root_path() || relative.filename() != "compile-request.json" || std::any_of(relative.begin(), relative.end(), [](const auto& component) { return component == ".."; }))
+	const bool bInvalidRequestPathfilename = relative.has_root_path() || relative.filename() != "compile-request.json";
+	const bool invalidCompileRequestPath = bInvalidRequestPathfilename || (std::any_of(relative.begin(), relative.end(), [](const auto& component) { return component == ".."; }));
+	
+	if (invalidCompileRequestPath)
 	{
 		return false;
 	}
@@ -63,8 +69,15 @@ static void SelectNewestShaderExport(
 	for (std::size_t index = 0; index < diagnostics.Entries.size(); ++index)
 	{
 		const ShaderDiagnosticsEntry& active = diagnostics.Entries[index];
-		if (active.ShaderType == shader.ShaderType && active.CompileInputHash == shader.CompileInputHash && active.Backend == shader.Backend
-		    && (selected[index].empty() || request.parent_path().native() > selected[index].native()))
+		const bool bNewerMatchingExportInputHash = active.ShaderType == shader.ShaderType && active.CompileInputHash == shader.CompileInputHash;
+		const bool bNewerMatchingExportBackend = bNewerMatchingExportInputHash && (active.Backend == shader.Backend);
+		const bool bNewerMatchingExportselected = bNewerMatchingExportBackend && (selected[index].empty());
+		const bool bMatchingExportGuardparentpath = bNewerMatchingExportBackend && !bNewerMatchingExportselected;
+		const bool bNewerMatchingExportparentpath = bMatchingExportGuardparentpath && (request.parent_path().native() > selected[index].native());
+		const bool bNewerMatchingExportparentpath2 = bNewerMatchingExportselected || bNewerMatchingExportparentpath;
+		const bool newerMatchingExport = bNewerMatchingExportBackend && bNewerMatchingExportparentpath2;
+		
+		if (newerMatchingExport)
 		{
 			selected[index] = request.parent_path();
 		}
@@ -80,7 +93,11 @@ static void InspectPublishedShaderRequest(
 	std::string text;
 	std::string failure;
 	ShaderDiagnosticsEntry shader;
-	if (!publication.Contains(request) || !Files::TryReadAllText(request, text, failure) || !ReadExportShader(text, diagnostics.Target, shader))
+	const bool requestPublished = publication.Contains(request);
+	const bool requestRead = requestPublished && Files::TryReadAllText(request, text, failure);
+	const bool shaderDecoded = requestRead && ReadExportShader(text, diagnostics.Target, shader);
+
+	if (!shaderDecoded)
 	{
 		return;
 	}
@@ -97,7 +114,10 @@ static void InspectPublishedCook(
 	std::string manifest;
 	std::string failure;
 	std::vector<std::string_view> jobs;
-	if (!Files::TryReadAllText(cookDirectory / "shader-export.json", manifest, failure) || !Json::TryReadArrayProperty(manifest, "jobs", jobs))
+	const bool manifestRead = Files::TryReadAllText(cookDirectory / "shader-export.json", manifest, failure);
+	const bool jobsRead = manifestRead && Json::TryReadArrayProperty(manifest, "jobs", jobs);
+
+	if (!jobsRead)
 	{
 		return;
 	}
@@ -141,6 +161,7 @@ std::vector<std::filesystem::path> FindShaderExportDirectories(const ShaderDiagn
 	{
 		return {};
 	}
+
 	const auto root = Filesystem::ResolveArtifactRootPath(Filesystem::GetWorkspaceRootPath()) / "symbols" / "shaders" / Filesystem::GetProjectPath().filename();
 	return FindMatchingShaderExports(root, diagnostics);
 }

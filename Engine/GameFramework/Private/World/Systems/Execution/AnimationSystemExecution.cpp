@@ -78,9 +78,13 @@ namespace ECS
 			        {
 				        return;
 			        }
+
 			        const ResolvedAnimationClip clip = m_resources.AnimationClips.Resolve(state.Resource);
 			        const SkeletonEvaluationData skeleton = m_resources.Skeletons.Resolve(work->Skeleton);
-			        if (!clip.IsValid() || !AnimationPoseEvaluator::Evaluate(*clip.Resource, skeleton, state.TimeSeconds, work->LocalTransforms, work->ModelSpaceTransforms))
+			        const bool clipAvailable = clip.IsValid();
+			        const bool poseEvaluated = clipAvailable && AnimationPoseEvaluator::Evaluate(*clip.Resource, skeleton, state.TimeSeconds, work->LocalTransforms, work->ModelSpaceTransforms);
+
+			        if (!poseEvaluated)
 			        {
 				        return;
 			        }
@@ -123,7 +127,11 @@ namespace ECS
 			{
 				continue;
 			}
-			if (!SkinningMatrixEvaluator::Evaluate(m_resources.Skeletons.Resolve(slot.Skeleton), slot.ModelSpaceTransforms, output.poses[slot.PoseOutputIndex].jointMatrices))
+
+			const auto& skeleton = m_resources.Skeletons.Resolve(slot.Skeleton);
+			const bool matricesEvaluated = SkinningMatrixEvaluator::Evaluate(skeleton, slot.ModelSpaceTransforms, output.poses[slot.PoseOutputIndex].jointMatrices);
+
+			if (!matricesEvaluated)
 			{
 				return false;
 			}
@@ -143,8 +151,12 @@ namespace ECS
 			{
 				return false;
 			}
+
 			const std::uint32_t outputIndex = samples[binding.SampleIndex].OutputIndex;
-			if (outputIndex >= output.morphWeights.size() || !m_state.m_morphWeights.Write(binding.TargetWeights, output.morphWeights[outputIndex].weights))
+			const bool morphOutputAvailable = outputIndex < output.morphWeights.size();
+			const bool morphWeightsWritten = morphOutputAvailable && m_state.m_morphWeights.Write(binding.TargetWeights, output.morphWeights[outputIndex].weights);
+			
+			if (!morphWeightsWritten)
 			{
 				return false;
 			}

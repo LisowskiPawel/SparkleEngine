@@ -101,7 +101,10 @@ namespace Files
 	{
 		const std::filesystem::path temporaryPath = BuildTemporaryPath(path);
 		CleanupTemporaryFile(temporaryPath);
-		if (!TryWriteAllBytes(temporaryPath, bytes, outErrorMessage) || !TryFinalizeTemporaryFile(temporaryPath, path, outErrorMessage))
+		const bool temporaryFileWritten = TryWriteAllBytes(temporaryPath, bytes, outErrorMessage);
+		const bool filePublished = temporaryFileWritten && TryFinalizeTemporaryFile(temporaryPath, path, outErrorMessage);
+		
+		if (!filePublished)
 		{
 			CleanupTemporaryFile(temporaryPath);
 			return false;

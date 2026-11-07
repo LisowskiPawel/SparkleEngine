@@ -31,6 +31,7 @@ static void RecordTransition(VkCommandBuffer commandBuffer, VkImage image, Resou
 	{
 		return;
 	}
+
 	const VulkanResourceStateMapping source = VulkanTypeConversions::ToResourceStateMapping(before);
 	const VulkanResourceStateMapping destination = VulkanTypeConversions::ToResourceStateMapping(after);
 
@@ -81,7 +82,11 @@ std::unique_ptr<VulkanCaptureService::PendingReadback> VulkanCaptureService::Pre
 	const VkDevice device = m_rhi.GetDevice();
 	const VkPhysicalDevice physicalDevice = m_rhi.GetPhysicalDevice();
 	const VkImage sourceImage = static_cast<VkImage>(request.Resource.Value);
-	if (device == VK_NULL_HANDLE || physicalDevice == VK_NULL_HANDLE || sourceImage == VK_NULL_HANDLE || !IsRhiCaptureFormatSupported(request.SourceFormat))
+	const bool bCaptureSourcephysicalDevice = device == VK_NULL_HANDLE || physicalDevice == VK_NULL_HANDLE;
+	const bool bInvalidCaptureSourcesourceImage = bCaptureSourcephysicalDevice || (sourceImage == VK_NULL_HANDLE);
+	const bool invalidCaptureSource = bInvalidCaptureSourcesourceImage || (!IsRhiCaptureFormatSupported(request.SourceFormat));
+	
+	if (invalidCaptureSource)
 	{
 		return {};
 	}
@@ -112,12 +117,13 @@ bool VulkanCaptureService::AllocateReadbackBuffer(PendingReadback& pending) noex
 	{
 		return false;
 	}
+
 	const VkMemoryAllocateInfo allocation{.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, .allocationSize = requirements.size, .memoryTypeIndex = memoryType};
 	const VkResult allocationResult = vkAllocateMemory(device, &allocation, nullptr, &pending.Memory);
 	const bool memoryAllocated = allocationResult == VK_SUCCESS && pending.Memory != VK_NULL_HANDLE;
-	const bool bufferBound = memoryAllocated && vkBindBufferMemory(device, pending.Buffer, pending.Memory, 0) == VK_SUCCESS;
-	
-	if (!bufferBound)
+	const bool bUfferBound = memoryAllocated && vkBindBufferMemory(device, pending.Buffer, pending.Memory, 0) == VK_SUCCESS;
+
+	if (!bUfferBound)
 	{
 		return false;
 	}
@@ -144,6 +150,7 @@ bool VulkanCaptureService::BeginReadbackCommands(PendingReadback& pending) noexc
 	{
 		return false;
 	}
+
 	const VkCommandBufferBeginInfo beginInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT};
 	if (vkBeginCommandBuffer(pending.CommandBuffer, &beginInfo) != VK_SUCCESS)
 	{

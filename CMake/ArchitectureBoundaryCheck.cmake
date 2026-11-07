@@ -504,7 +504,7 @@ function(sparkle_boundary_scan_file absolute_path)
         endif()
 
         if(NOT _relative_path MATCHES "^Engine/Renderer/Private/(Frame/FramePipeline[.]cpp|Passes/Scene/SceneRenderingPasses[.]cpp|Passes/Lighting/ReferencePathTracer/)" AND
-           NOT _relative_path STREQUAL "Engine/Renderer/ShaderRegistrations/ReferencePathTracerShaders.cpp" AND
+           NOT _relative_path STREQUAL "Engine/Renderer/Private/Passes/Lighting/ReferencePathTracer/ReferencePathTracerShaderRegistrations.cpp" AND
            _line MATCHES "#include[^\n]*Passes/Lighting/ReferencePathTracer/")
             sparkle_boundary_append_failure(
                 "REFERENCE_PATH_TRACER_CPP_CAPSULE"

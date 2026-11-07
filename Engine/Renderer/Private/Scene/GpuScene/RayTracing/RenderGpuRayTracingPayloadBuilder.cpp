@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Scene/GpuScene/RenderGpuRayTracingPayloadBuilder.h"
+#include "Scene/GpuScene/RayTracing/RenderGpuRayTracingPayloadBuilder.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Meshes/GpuMesh.h"
@@ -37,10 +37,23 @@ static RenderGpuMeshHitDataOffsets ResolveMeshOffsets(MeshHitDataOffsets& meshOf
 	const std::span<const VertexSkinInfluence> skinInfluences = mesh.GetSkinInfluences();
 	const std::span<const MorphTargetDeltaData> morphTargetDeltas = mesh.GetMorphTargetDeltas();
 	constexpr std::size_t maximumPayloadElementCount = (std::numeric_limits<std::uint32_t>::max)();
-	if (!mesh.HasRayTracingHitData() || meshVertices.empty() || meshIndices.size() < 3u || meshIndices.size() % 3u != 0u || (mesh.HasSkinInfluences() && skinInfluences.size() != meshVertices.size())
-	    || payloads.Vertices.size() > maximumPayloadElementCount || payloads.Indices.size() > maximumPayloadElementCount || payloads.MorphTargetDeltas.size() > maximumPayloadElementCount
-	    || meshVertices.size() > maximumPayloadElementCount - payloads.Vertices.size() || meshIndices.size() > maximumPayloadElementCount - payloads.Indices.size()
-	    || morphTargetDeltas.size() > maximumPayloadElementCount - payloads.MorphTargetDeltas.size())
+	const bool bMeshDataValidmeshVerticesEmpty = mesh.HasRayTracingHitData() && !meshVertices.empty();
+	const bool bMeshDataValidmeshIndicesSize = bMeshDataValidmeshVerticesEmpty && (meshIndices.size() >= 3u);
+	const bool meshHitDataValid = bMeshDataValidmeshIndicesSize && (meshIndices.size() % 3u == 0u);
+	const bool bSkinInfluencesValidSkinInfluences = meshHitDataValid && (mesh.HasSkinInfluences());
+	const bool bInfluencesValidmeshVerticesSize = bSkinInfluencesValidSkinInfluences && (skinInfluences.size() != meshVertices.size());
+	const bool bInfluencesValidmeshVerticesSize2 = meshHitDataValid && !bInfluencesValidmeshVerticesSize;
+	const bool skinInfluencesValid = meshHitDataValid && bInfluencesValidmeshVerticesSize2;
+
+	const bool bPayloadSizesValidVertices = skinInfluencesValid && payloads.Vertices.size() <= maximumPayloadElementCount;
+	const bool bPayloadSizesValidIndices = bPayloadSizesValidVertices && (payloads.Indices.size() <= maximumPayloadElementCount);
+	const bool payloadSizesValid = bPayloadSizesValidIndices && (payloads.MorphTargetDeltas.size() <= maximumPayloadElementCount);
+
+	const bool verticesFit = payloadSizesValid && meshVertices.size() <= maximumPayloadElementCount - payloads.Vertices.size();
+	const bool indicesFit = verticesFit && meshIndices.size() <= maximumPayloadElementCount - payloads.Indices.size();
+	const bool morphTargetsFit = indicesFit && morphTargetDeltas.size() <= maximumPayloadElementCount - payloads.MorphTargetDeltas.size();
+
+	if (!morphTargetsFit)
 	{
 		Diagnostics::Fatal(g_renderGpuRayTracingPayloadBuilderLogger, __FILE__, __LINE__, "Ray-tracing work references invalid mesh hit data.");
 	}
@@ -171,7 +184,10 @@ static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpu
 	std::unordered_set<std::uint32_t> occupiedGpuSceneSlots;
 	for (const RenderRayTracingInstance& input : preparedScene.rayTracingInstances)
 	{
-		if (input.GpuSceneSlot == (std::numeric_limits<std::uint32_t>::max)() || !occupiedGpuSceneSlots.insert(input.GpuSceneSlot).second)
+		const bool gpuSceneSlotValid = input.GpuSceneSlot != (std::numeric_limits<std::uint32_t>::max)();
+		const bool gpuSceneSlotUnique = gpuSceneSlotValid && occupiedGpuSceneSlots.insert(input.GpuSceneSlot).second;
+		
+		if (!gpuSceneSlotUnique)
 		{
 			Diagnostics::Fatal(g_renderGpuRayTracingPayloadBuilderLogger, __FILE__, __LINE__, "Ray-tracing work contains an invalid or duplicate GPU-scene slot.");
 		}
@@ -193,6 +209,7 @@ static void AppendInstance(
 	{
 		Diagnostics::Fatal(g_renderGpuRayTracingPayloadBuilderLogger, __FILE__, __LINE__, "Ray-tracing work references a mesh instance outside the render scene.");
 	}
+
 	const MeshDraw& draw = preparedScene.primitives[input.PrimitiveIndex].Draw;
 	if (draw.MaterialSlot >= preparedScene.materials.size())
 	{
@@ -201,8 +218,15 @@ static void AppendInstance(
 
 	const GpuMesh* gpuMesh = meshes.Resolve(draw.Geometry.Mesh);
 
-	const bool missingSkinning = draw.Geometry.MeshKind == RenderMeshKind::Skeletal
-	    && (draw.Skinning.JointMatrixOffset == kInvalidMeshInstanceJointMatrixOffset || gpuMesh == nullptr || !gpuMesh->HasSkinInfluences());
+	const bool bMissingSkinningGeometry = draw.Geometry.MeshKind == RenderMeshKind::Skeletal;
+	const bool bMissingSkinningSkinning = bMissingSkinningGeometry && (draw.Skinning.JointMatrixOffset == kInvalidMeshInstanceJointMatrixOffset);
+	const bool bMissingSkinningGuardgpuMesh = bMissingSkinningGeometry && !bMissingSkinningSkinning;
+	const bool bMissingSkinninggpuMesh = bMissingSkinningGuardgpuMesh && (gpuMesh == nullptr);
+	const bool bMissingSkinninggpuMesh2 = bMissingSkinningSkinning || bMissingSkinninggpuMesh;
+	const bool bMissingSkinningGuardInfluences = bMissingSkinningGeometry && !bMissingSkinninggpuMesh2;
+	const bool bMissingSkinningSkinInfluences = bMissingSkinningGuardInfluences && (!gpuMesh->HasSkinInfluences());
+	const bool bMissingSkinningSkinInfluences2 = bMissingSkinninggpuMesh2 || bMissingSkinningSkinInfluences;
+	const bool missingSkinning = bMissingSkinningGeometry && bMissingSkinningSkinInfluences2;
 
 	if (gpuMesh == nullptr || missingSkinning)
 	{

@@ -27,14 +27,14 @@ namespace SceneMeshInspector
 	{
 		const bool transformMatches = EditorWidgets::MatchesDetailsFilter(filter, "Transform", "location rotation scale transform");
 		const bool transformOpen = transformMatches && EditorWidgets::DrawDetailsCategory("Transform");
-		
+
 		if (!transformOpen)
 		{
 			return;
 		}
 		Transform after = mesh.LocalTransform;
 
-		if (SceneTransformEditor::Edit(after, {0.0f, 0.0f, 0.0f}))
+		if (EditSceneTransform(after, {0.0f, 0.0f, 0.0f}))
 		{
 			(void) transactionHistory.Execute({0, SetLocalTransformCommand{mesh.Entity, after}}, {0, SetLocalTransformCommand{mesh.Entity, mesh.LocalTransform}}, generation, "mesh-transform");
 		}
@@ -44,11 +44,12 @@ namespace SceneMeshInspector
 	{
 		const bool meshMatches = EditorWidgets::MatchesDetailsFilter(filter, "Mesh", "type asset rendering skeletal static");
 		const bool meshOpen = meshMatches && EditorWidgets::DrawDetailsCategory("Mesh");
-		
+
 		if (!meshOpen)
 		{
 			return;
 		}
+
 		const bool skeletal = mesh.Kind == SceneMeshKind::Skeletal;
 		EditorWidgets::DrawDetailsValueRow("Type", skeletal ? "Skeletal" : "Static");
 		char value[64] = {};
@@ -60,11 +61,12 @@ namespace SceneMeshInspector
 	{
 		const bool advancedMatches = EditorWidgets::MatchesDetailsFilter(filter, "Advanced", "visible visibility hidden");
 		const bool advancedOpen = advancedMatches && EditorWidgets::DrawDetailsCategory("Advanced", false);
-		
+
 		if (!advancedOpen)
 		{
 			return;
 		}
+
 		bool visible = mesh.Visible;
 		const bool defaultVisible = true;
 		if (EditorWidgets::EditDetailsCheckbox("Visible", visible, &defaultVisible))
@@ -77,7 +79,7 @@ namespace SceneMeshInspector
 	{
 		const bool materialsMatches = EditorWidgets::MatchesDetailsFilter(filter, "Materials", "element material slot surface");
 		const bool materialsOpen = materialsMatches && EditorWidgets::DrawDetailsCategory("Materials");
-		
+
 		if (!materialsOpen)
 		{
 			return;

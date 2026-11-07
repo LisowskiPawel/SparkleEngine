@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Scene/GpuScene/RenderGpuLighting.h"
+#include "Scene/GpuScene/Lighting/RenderGpuLighting.h"
 
 #include "Scene/Preparation/PreparedRenderScene.h"
 

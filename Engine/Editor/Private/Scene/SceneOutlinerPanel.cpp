@@ -201,6 +201,7 @@ void SceneOutlinerPanel::ToggleEntryVisibility(const SceneObjectSelection& selec
 	{
 		return;
 	}
+
 	auto commands = SceneObjectCommandFactory::SetVisibility(*m_model, selection, !IsEntryVisible(selection));
 	if (!commands)
 	{
@@ -338,11 +339,10 @@ void SceneOutlinerPanel::BuildSceneTable() noexcept
 	ImGui::Separator();
 	ImGui::Spacing();
 	ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(4.0f, 2.0f));
-	if (ImGui::BeginTable(
-	        "##OutlinerTable",
-	        3,
-	        ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoPadOuterX,
-	        ImVec2(0.0f, -28.0f)))
+	constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoPadOuterX;
+	const bool tableOpen = ImGui::BeginTable("##OutlinerTable", 3, tableFlags, ImVec2(0.0f, -28.0f));
+
+	if (tableOpen)
 	{
 		ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 20.0f);
 		ImGui::TableSetupColumn("Item Label", ImGuiTableColumnFlags_WidthStretch);

@@ -27,7 +27,10 @@ RhiOwnedResourceHandle VulkanResourceService::CreateTextureResource(
     std::wstring_view debugName)
 {
 	(void) initialState;
-	if (m_memoryAllocator == nullptr || m_capabilities == nullptr || !RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc))
+	const bool bTextureDescriptorcapabilities = m_memoryAllocator == nullptr || m_capabilities == nullptr;
+	const bool invalidTextureDescriptor = bTextureDescriptorcapabilities || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc));
+	
+	if (invalidTextureDescriptor)
 	{
 		return {};
 	}
@@ -302,7 +305,11 @@ RhiOwnedResourceHandle VulkanResourceService::CreateAliasingTextureResource(
 {
 	(void) desc.InitialState;
 	(void) desc.ClearValue;
-	if (m_memoryAllocator == nullptr || m_capabilities == nullptr || !memoryBlock || !RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc.ResourceDesc))
+	const bool bTextureDescriptorcapabilities = m_memoryAllocator == nullptr || m_capabilities == nullptr;
+	const bool bTextureDescriptormemoryBlock = bTextureDescriptorcapabilities || (!memoryBlock);
+	const bool invalidPlacedTextureDescriptor = bTextureDescriptormemoryBlock || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc.ResourceDesc));
+	
+	if (invalidPlacedTextureDescriptor)
 	{
 		return {};
 	}

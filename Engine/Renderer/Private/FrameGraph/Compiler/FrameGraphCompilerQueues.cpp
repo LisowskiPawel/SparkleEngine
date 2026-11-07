@@ -15,15 +15,22 @@ void FrameGraphCompiler::AssignPassQueues() noexcept
 			continue;
 		}
 
-		if (passRecord.queuePreference == EFrameGraphQueuePreference::AsyncCompute && m_queueCapabilities.SupportsIndependent(ERhiQueueType::Compute))
+		const bool independentComputeRequested = passRecord.queuePreference == EFrameGraphQueuePreference::AsyncCompute && m_queueCapabilities.SupportsIndependent(ERhiQueueType::Compute);
+		
+		if (independentComputeRequested)
 		{
 			assert(passRecord.kind == EFrameGraphPassKind::Compute);
 			passRecord.queue = ERhiQueueType::Compute;
 		}
-		else if (passRecord.queuePreference == EFrameGraphQueuePreference::Copy && m_queueCapabilities.SupportsIndependent(ERhiQueueType::Copy))
+		else
+		{
+			const bool independentCopyRequested = passRecord.queuePreference == EFrameGraphQueuePreference::Copy && m_queueCapabilities.SupportsIndependent(ERhiQueueType::Copy);
+
+			if (independentCopyRequested)
 		{
 			assert(passRecord.kind == EFrameGraphPassKind::Transfer);
 			passRecord.queue = ERhiQueueType::Copy;
+		}
 		}
 	}
 }
@@ -34,7 +41,9 @@ void FrameGraphCompiler::AddSynchronizationDependency(FrameGraphPassNode& passRe
 	{
 		return;
 	}
-	if (std::find(passRecord.synchronizationDependencies.begin(), passRecord.synchronizationDependencies.end(), dependency) == passRecord.synchronizationDependencies.end())
+	const bool synchronizationDependencyMissing = std::find(passRecord.synchronizationDependencies.begin(), passRecord.synchronizationDependencies.end(), dependency) == passRecord.synchronizationDependencies.end();
+	
+	if (synchronizationDependencyMissing)
 	{
 		passRecord.synchronizationDependencies.push_back(dependency);
 	}
@@ -75,7 +84,9 @@ void FrameGraphCompiler::BuildSubmissionBatches() noexcept
 			const FrameGraphSubmissionBatch& currentBatch = m_plan.submissionBatches.back();
 			for (const FrameGraphSubmissionBatchIndex dependencyBatch : crossQueueDependencies)
 			{
-				if (std::find(currentBatch.waitForBatches.begin(), currentBatch.waitForBatches.end(), dependencyBatch) == currentBatch.waitForBatches.end())
+				const bool waitBatchMissing = std::find(currentBatch.waitForBatches.begin(), currentBatch.waitForBatches.end(), dependencyBatch) == currentBatch.waitForBatches.end();
+				
+				if (waitBatchMissing)
 				{
 					startNewBatch = true;
 					break;

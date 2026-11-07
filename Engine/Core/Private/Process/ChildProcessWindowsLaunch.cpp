@@ -58,11 +58,13 @@ namespace Process
 		{
 			return {};
 		}
+
 		const int length = MultiByteToWideChar(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), nullptr, 0);
 		if (length <= 0)
 		{
 			return std::wstring(text.begin(), text.end());
 		}
+
 		std::wstring result(static_cast<std::size_t>(length), L'\0');
 		MultiByteToWideChar(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), result.data(), length);
 		return result;
@@ -74,11 +76,13 @@ namespace Process
 		{
 			return {};
 		}
+
 		const int length = WideCharToMultiByte(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), nullptr, 0, nullptr, nullptr);
 		if (length <= 0)
 		{
 			return "Unknown Windows error";
 		}
+
 		std::string result(static_cast<std::size_t>(length), '\0');
 		WideCharToMultiByte(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), result.data(), length, nullptr, nullptr);
 		return result;
@@ -101,6 +105,7 @@ namespace Process
 		{
 			return {};
 		}
+
 		std::vector<std::wstring> entries;
 		if (LPWCH environment = GetEnvironmentStringsW())
 		{
@@ -124,6 +129,7 @@ namespace Process
 				*entry = replacement;
 			}
 		}
+
 		std::sort(entries.begin(), entries.end());
 		std::vector<wchar_t> block;
 		for (const std::wstring& entry : entries)
@@ -153,6 +159,7 @@ namespace Process
 		{
 			LocalFree(raw);
 		}
+
 		const std::size_t lastContent = message.find_last_not_of(" \t\r\n");
 		message.erase(lastContent == std::string::npos ? 0 : lastContent + 1);
 		return message;
@@ -213,17 +220,19 @@ namespace Process
 		std::wstring commandLine = BuildCommandLine(request);
 		std::wstring workingDirectory = request.WorkingDirectory.wstring();
 		std::vector<wchar_t> environment = BuildEnvironment(environmentOverrides);
-		if (!CreateProcessW(
-		        nullptr,
-		        commandLine.data(),
-		        nullptr,
-		        nullptr,
-		        TRUE,
-		        CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT | CREATE_SUSPENDED,
-		        environment.empty() ? nullptr : environment.data(),
-		        workingDirectory.empty() ? nullptr : workingDirectory.c_str(),
-		        &startup,
-		        &information))
+		const bool childProcessCreationFailed = !CreateProcessW(
+				        nullptr,
+				        commandLine.data(),
+				        nullptr,
+				        nullptr,
+				        TRUE,
+				        CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT | CREATE_SUSPENDED,
+				        environment.empty() ? nullptr : environment.data(),
+				        workingDirectory.empty() ? nullptr : workingDirectory.c_str(),
+				        &startup,
+				        &information);
+		
+		if (childProcessCreationFailed)
 		{
 			const DWORD startError = GetLastError();
 			result.StartFailure = ClassifyStartFailure(startError);
@@ -240,7 +249,7 @@ namespace Process
 		jobLimits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 		const bool jobConfigured = outProcess.Job && SetInformationJobObject(outProcess.Job.Get(), JobObjectExtendedLimitInformation, &jobLimits, static_cast<DWORD>(sizeof(jobLimits)));
 		const bool processAssigned = jobConfigured && AssignProcessToJobObject(outProcess.Job.Get(), outProcess.Process.Get());
-		
+
 		if (!processAssigned)
 		{
 			const DWORD ownershipError = GetLastError();

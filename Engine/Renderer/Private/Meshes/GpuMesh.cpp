@@ -75,7 +75,9 @@ void GpuMesh::CreateVertexBuffer(RenderCommandList& commandList, const MeshData&
 	}
 
 	const std::span<const VertexData> vertices{meshData.vertices};
-	if (!m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_vertexBuffer, std::as_bytes(vertices), ResourceState::Common, L"GpuMesh_VertexUpload"))
+	const bool verticesUploaded = m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_vertexBuffer, std::as_bytes(vertices), ResourceState::Common, L"GpuMesh_VertexUpload");
+
+	if (!verticesUploaded)
 	{
 		resources.ReleaseOwnedResource(m_vertexBuffer);
 		m_vertexBuffer = {};
@@ -110,7 +112,9 @@ void GpuMesh::CreateIndexBuffer(RenderCommandList& commandList, const MeshData& 
 	}
 
 	const std::span<const std::uint32_t> indices{meshData.indices};
-	if (!m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_indexBuffer, std::as_bytes(indices), ResourceState::Common, L"GpuMesh_IndexUpload"))
+	const bool indicesUploaded = m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_indexBuffer, std::as_bytes(indices), ResourceState::Common, L"GpuMesh_IndexUpload");
+
+	if (!indicesUploaded)
 	{
 		resources.ReleaseOwnedResource(m_indexBuffer);
 		m_indexBuffer = {};

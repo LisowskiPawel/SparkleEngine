@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Scene/GpuScene/RenderGpuLightingPayloadBuilder.h"
+#include "Scene/GpuScene/Lighting/RenderGpuLightingPayloadBuilder.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Scene/Preparation/PreparedRenderScene.h"

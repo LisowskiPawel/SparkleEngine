@@ -210,7 +210,10 @@ namespace SparkleLauncher
 		{
 			const std::filesystem::path visualStudioRoot = root / "Microsoft Visual Studio";
 			std::error_code errorCode;
-			if (std::filesystem::exists(visualStudioRoot / "18", errorCode) || std::filesystem::exists(visualStudioRoot / "2026", errorCode))
+			const bool version18Installed = std::filesystem::exists(visualStudioRoot / "18", errorCode);
+			const bool version2026Installed = !version18Installed && std::filesystem::exists(visualStudioRoot / "2026", errorCode);
+			
+			if (version18Installed || version2026Installed)
 			{
 				return "Visual Studio 18 2026";
 			}

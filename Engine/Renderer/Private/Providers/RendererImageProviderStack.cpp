@@ -39,30 +39,36 @@ void RendererImageProviderStack::Initialize()
 
 	m_upscaler = CreateConfiguredUpscalerProvider();
 	m_rayReconstruction = CreateConfiguredRayReconstructionProvider();
-	if (m_upscaler != nullptr
-	    && !m_upscaler->Initialize(
-	        capabilities,
-	        interop.GetDeviceQueueInterop(RhiNativeInteropRequest{.Consumer = ERhiNativeInteropConsumer::ExternalProvider, .Reason = "Renderer upscaler provider initialization"})))
+	if (m_upscaler != nullptr)
 	{
-		Diagnostics::Fatal(
-		    g_rendererImageProviderStackLogger,
-		    __FILE__,
-		    __LINE__,
-		    "The selected renderer upscaler failed initialization on the selected backend and adapter. Selection is unchanged; choose a "
-		    "supported provider or repair its prerequisites.");
+		const RhiNativeInteropRequest request{.Consumer = ERhiNativeInteropConsumer::ExternalProvider, .Reason = "Renderer upscaler provider initialization"};
+		const auto nativeInterop = interop.GetDeviceQueueInterop(request);
+		const bool initialized = m_upscaler->Initialize(capabilities, nativeInterop);
+		if (!initialized)
+		{
+			Diagnostics::Fatal(
+			    g_rendererImageProviderStackLogger,
+			    __FILE__,
+			    __LINE__,
+			    "The selected renderer upscaler failed initialization on the selected backend and adapter. Selection is unchanged; choose a "
+			    "supported provider or repair its prerequisites.");
+		}
 	}
 
-	if (m_rayReconstruction != nullptr
-	    && !m_rayReconstruction->Initialize(
-	        capabilities,
-	        interop.GetDeviceQueueInterop(RhiNativeInteropRequest{.Consumer = ERhiNativeInteropConsumer::ExternalProvider, .Reason = "Renderer ray-reconstruction provider initialization"})))
+	if (m_rayReconstruction != nullptr)
 	{
-		Diagnostics::Fatal(
-		    g_rendererImageProviderStackLogger,
-		    __FILE__,
-		    __LINE__,
-		    "The selected ray-reconstruction provider failed initialization on the selected backend and adapter. Selection is unchanged; "
-		    "choose a supported provider or repair its prerequisites.");
+		const RhiNativeInteropRequest request{.Consumer = ERhiNativeInteropConsumer::ExternalProvider, .Reason = "Renderer ray-reconstruction provider initialization"};
+		const auto nativeInterop = interop.GetDeviceQueueInterop(request);
+		const bool initialized = m_rayReconstruction->Initialize(capabilities, nativeInterop);
+		if (!initialized)
+		{
+			Diagnostics::Fatal(
+			    g_rendererImageProviderStackLogger,
+			    __FILE__,
+			    __LINE__,
+			    "The selected ray-reconstruction provider failed initialization on the selected backend and adapter. Selection is unchanged; "
+			    "choose a supported provider or repair its prerequisites.");
+		}
 	}
 
 	m_resetHistoryPending = true;

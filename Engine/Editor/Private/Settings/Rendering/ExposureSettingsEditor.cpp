@@ -217,70 +217,58 @@ namespace ExposureSettingsEditor
 	{
 		ImGui::BeginDisabled(settings.ExposureMode != EngineExposureMode::Manual);
 
-		RenderingSettingsUi::DrawFloatInputRow(
-		    "##ManualExposure",
-		    "Manual exposure",
-		    settings.ManualExposure,
-		    [&settingsController](float value) { settingsController.SetManualExposure(value); },
-		    0.1f,
-		    1.0f,
-		    "%.4f");
+		float manualExposure = settings.ManualExposure;
+		const bool manualExposureEdited = RenderingSettingsUi::DrawFloatInputRow("##ManualExposure", "Manual exposure", manualExposure, 0.1f, 1.0f, "%.4f");
+		if (manualExposureEdited)
+		{
+			settingsController.SetManualExposure(manualExposure);
+		}
 
 		ImGui::EndDisabled();
 
-		RenderingSettingsUi::DrawFloatInputRow(
-		    "##ExposureCompensation",
-		    "Exposure compensation EV",
-		    settings.ExposureCompensation,
-		    [&settingsController](float value) { settingsController.SetExposureCompensation(value); },
-		    0.1f,
-		    1.0f,
-		    "%.2f");
+		float exposureCompensation = settings.ExposureCompensation;
+		const bool exposureCompensationEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureCompensation", "Exposure compensation EV", exposureCompensation, 0.1f, 1.0f, "%.2f");
+		if (exposureCompensationEdited)
+		{
+			settingsController.SetExposureCompensation(exposureCompensation);
+		}
 
-		RenderingSettingsUi::DrawFloatInputRow(
-		    "##ExposureTargetLuminance",
-		    "Target luminance",
-		    settings.ExposureTargetLuminance,
-		    [&settingsController](float value) { settingsController.SetExposureTargetLuminance(value); },
-		    0.01f,
-		    0.1f,
-		    "%.4f");
+		float exposureTargetLuminance = settings.ExposureTargetLuminance;
+		const bool exposureTargetLuminanceEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureTargetLuminance", "Target luminance", exposureTargetLuminance, 0.01f, 0.1f, "%.4f");
+		if (exposureTargetLuminanceEdited)
+		{
+			settingsController.SetExposureTargetLuminance(exposureTargetLuminance);
+		}
 
-		RenderingSettingsUi::DrawFloatInputRow(
-		    "##ExposureMin",
-		    "Min exposure",
-		    settings.ExposureMin,
-		    [&settingsController](float value) { settingsController.SetExposureMin(value); },
-		    0.0001f,
-		    0.01f,
-		    "%.6f");
+		float exposureMin = settings.ExposureMin;
+		const bool exposureMinEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMin", "Min exposure", exposureMin, 0.0001f, 0.01f, "%.6f");
+		if (exposureMinEdited)
+		{
+			settingsController.SetExposureMin(exposureMin);
+		}
 
-		RenderingSettingsUi::DrawFloatInputRow(
-		    "##ExposureMax",
-		    "Max exposure",
-		    settings.ExposureMax,
-		    [&settingsController](float value) { settingsController.SetExposureMax(value); },
-		    1.0f,
-		    64.0f,
-		    "%.3f");
+		float exposureMax = settings.ExposureMax;
+		const bool exposureMaxEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMax", "Max exposure", exposureMax, 1.0f, 64.0f, "%.3f");
+		if (exposureMaxEdited)
+		{
+			settingsController.SetExposureMax(exposureMax);
+		}
 
-		RenderingSettingsUi::DrawFloatInputRow(
-		    "##ExposureAdaptationSpeedUp",
-		    "Adapt rate up (1/s)",
-		    settings.ExposureAdaptationSpeedUp,
-		    [&settingsController](float value) { settingsController.SetExposureAdaptationSpeedUp(value); },
-		    0.1f,
-		    1.0f,
-		    "%.3f");
+		float exposureAdaptationSpeedUp = settings.ExposureAdaptationSpeedUp;
+		const bool exposureAdaptationSpeedUpEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedUp", "Adapt rate up (1/s)", exposureAdaptationSpeedUp, 0.1f, 1.0f, "%.3f");
+		if (exposureAdaptationSpeedUpEdited)
+		{
+			settingsController.SetExposureAdaptationSpeedUp(exposureAdaptationSpeedUp);
+		}
 
-		RenderingSettingsUi::DrawFloatInputRow(
-		    "##ExposureAdaptationSpeedDown",
-		    "Adapt rate down (1/s)",
-		    settings.ExposureAdaptationSpeedDown,
-		    [&settingsController](float value) { settingsController.SetExposureAdaptationSpeedDown(value); },
-		    0.1f,
-		    1.0f,
-		    "%.3f");
+		float exposureAdaptationSpeedDown = settings.ExposureAdaptationSpeedDown;
+
+		const bool adaptationSpeedDownEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedDown", "Adapt rate down (1/s)", exposureAdaptationSpeedDown, 0.1f, 1.0f, "%.3f");
+
+		if (adaptationSpeedDownEdited)
+		{
+			settingsController.SetExposureAdaptationSpeedDown(exposureAdaptationSpeedDown);
+		}
 	}
 
 	bool DrawOverrideModes(ViewportExposureOverrides& exposure, const EngineRenderingSettingsState& defaults) noexcept

@@ -97,7 +97,10 @@ private:
 		startup.dwFlags = STARTF_USESHOWWINDOW;
 		startup.wShowWindow = SW_HIDE;
 		PROCESS_INFORMATION process{};
-		if (CreateProcessW(m_tool.c_str(), command.data(), nullptr, nullptr, FALSE, CREATE_NO_WINDOW, nullptr, m_tool.parent_path().c_str(), &startup, &process))
+		const std::filesystem::path toolDirectory = m_tool.parent_path();
+		const bool processCreated = CreateProcessW(m_tool.c_str(), command.data(), nullptr, nullptr, FALSE, CREATE_NO_WINDOW, nullptr, toolDirectory.c_str(), &startup, &process) != FALSE;
+
+		if (processCreated)
 		{
 			CloseHandle(process.hThread);
 			m_inspector = process.hProcess;
@@ -124,6 +127,7 @@ std::unique_ptr<ExternalCaptureAdapter> CreatePixCaptureAdapter(std::string& err
 		error = "PIX GPU Capturer is not installed or could not be loaded.";
 		return {};
 	}
+
 	std::array<wchar_t, 4096> path{};
 	const DWORD length = GetModuleFileNameW(module, path.data(), static_cast<DWORD>(path.size()));
 	const auto tool = std::filesystem::path(path.data()).parent_path() / L"pixtool.exe";
@@ -146,19 +150,24 @@ bool IsPixCaptureInstalled() noexcept
 	{
 		return true;
 	}
+
 	std::array<wchar_t, 4096> programFiles{};
 	const DWORD length = GetEnvironmentVariableW(L"ProgramFiles", programFiles.data(), static_cast<DWORD>(programFiles.size()));
 	if (!length || length >= programFiles.size())
 	{
 		return false;
 	}
+
 	std::error_code error;
 	const auto root = std::filesystem::path(programFiles.data()) / L"Microsoft PIX";
 	std::filesystem::directory_iterator versions(root, error), end;
 	for (unsigned count = 0; !error && versions != end && count < 32; ++count, versions.increment(error))
 	{
 		std::error_code fileError;
-		if (std::filesystem::is_regular_file(versions->path() / L"WinPixGpuCapturer.dll", fileError) && std::filesystem::is_regular_file(versions->path() / L"pixtool.exe", fileError))
+		const bool capturerPresent = std::filesystem::is_regular_file(versions->path() / L"WinPixGpuCapturer.dll", fileError);
+		const bool toolPresent = capturerPresent && std::filesystem::is_regular_file(versions->path() / L"pixtool.exe", fileError);
+
+		if (toolPresent)
 		{
 			return true;
 		}

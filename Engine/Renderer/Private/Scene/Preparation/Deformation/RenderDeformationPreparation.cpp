@@ -1,9 +1,9 @@
 #include "PCH.h"
 
-#include "Scene/Preparation/RenderDeformationPreparation.h"
+#include "Scene/Preparation/Deformation/RenderDeformationPreparation.h"
 
 #include "Scene/RenderScene.h"
-#include "Scene/Preparation/RenderPrimitivePreparation.h"
+#include "Scene/Preparation/Geometry/RenderPrimitivePreparation.h"
 #include "ShaderData/MeshInstanceShaderData.h"
 
 #include <algorithm>
@@ -50,8 +50,16 @@ void RenderDeformationPreparation::PrepareJointMatrices(
 		{
 			++primitiveIndex;
 		}
-		if (primitiveIndex >= primitives.size() || primitives[primitiveIndex].Object != range.Object || !range.Skeleton.IsValid() || !range.Animation.IsValid() || range.JointMatrixCount == 0
-		    || range.JointMatrixOffset > jointMatrices.size() || range.JointMatrixCount > jointMatrices.size() - range.JointMatrixOffset)
+
+		const bool primitiveInRange = primitiveIndex < primitives.size();
+		const bool objectMatches = primitiveInRange && primitives[primitiveIndex].Object == range.Object;
+		const bool bDeformationHandlesValidSkeleton = objectMatches && range.Skeleton.IsValid();
+		const bool deformationHandlesValid = bDeformationHandlesValidSkeleton && (range.Animation.IsValid());
+		const bool bJointOffsetValidMatrixCount = deformationHandlesValid && range.JointMatrixCount != 0;
+		const bool jointMatrixOffsetValid = bJointOffsetValidMatrixCount && (range.JointMatrixOffset <= jointMatrices.size());
+		const bool jointMatrixCountValid = jointMatrixOffsetValid && range.JointMatrixCount <= jointMatrices.size() - range.JointMatrixOffset;
+
+		if (!jointMatrixCountValid)
 		{
 			continue;
 		}
@@ -101,7 +109,8 @@ void RenderDeformationPreparation::PrepareMorphWeights(
 			continue;
 		}
 
-		const bool validSample = sample != nullptr && sample->WeightOffset <= weights.size() && sample->WeightCount <= weights.size() - sample->WeightOffset;
+		const bool bValidSampleweightsSize = sample != nullptr && sample->WeightOffset <= weights.size();
+		const bool validSample = bValidSampleweightsSize && (sample->WeightCount <= weights.size() - sample->WeightOffset);
 		const std::span<const float> current = validSample ? weights.subspan(sample->WeightOffset, sample->WeightCount) : std::span<const float>{};
 		const std::span<const float> previous = history.size() == primitive.MorphTargetCount ? history : current;
 
@@ -132,6 +141,7 @@ void RenderDeformationPreparation::CopyJointMatrixRanges(std::span<const RenderJ
 		{
 			continue;
 		}
+
 		std::copy(range.Current.begin(), range.Current.end(), current.begin() + begin);
 		std::copy(range.Previous.begin(), range.Previous.end(), previous.begin() + begin);
 	}

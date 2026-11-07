@@ -48,7 +48,11 @@ namespace SparkleLauncher
 		AddReadiness(plan, "Enabled workspace configure prerequisites are incomplete.");
 		for (const ToolchainItemStatus& item : plan.Toolchain.Items)
 		{
-			if ((item.Id == "shader-compiler-sdk" || item.Id == "vulkan-sdk") && item.State != ToolchainItemState::Found && !item.Detail.empty())
+			const bool bUnresolvedRequiredToolId = item.Id == "shader-compiler-sdk" || item.Id == "vulkan-sdk";
+			const bool bUnresolvedRequiredToolState = bUnresolvedRequiredToolId && (item.State != ToolchainItemState::Found);
+			const bool unresolvedRequiredTool = bUnresolvedRequiredToolState && (!item.Detail.empty());
+			
+			if (unresolvedRequiredTool)
 			{
 				AddReadiness(plan, item.Detail);
 			}

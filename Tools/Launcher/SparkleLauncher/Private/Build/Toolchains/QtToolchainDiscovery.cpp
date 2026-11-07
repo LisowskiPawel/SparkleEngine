@@ -68,7 +68,10 @@ namespace SparkleLauncher
 		if (ToLower(path.filename().string()) == "qt6")
 		{
 			const std::filesystem::path root = path.parent_path().parent_path();
-			if (std::filesystem::exists(root / "bin" / "qmake.exe", errorCode) && std::filesystem::exists(root / "lib" / "cmake" / "Qt6" / "Qt6Config.cmake", errorCode))
+			const bool qmakePresent = std::filesystem::exists(root / "bin" / "qmake.exe", errorCode);
+			const bool configurationPresent = qmakePresent && std::filesystem::exists(root / "lib" / "cmake" / "Qt6" / "Qt6Config.cmake", errorCode);
+
+			if (configurationPresent)
 			{
 				return root;
 			}

@@ -74,7 +74,10 @@ RhiRayTracingAccelerationStructurePrebuildInfo D3D12TlasServices::GetTlasPrebuil
 
 RhiOwnedResourceHandle D3D12TlasServices::CreateTlasInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !RhiContract::IsRayTracingInstanceListUsable(instances, instanceCount))
+	const bool bTlasInstancesmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
+	const bool invalidTlasInstances = bTlasInstancesmemoryAllocator || (!RhiContract::IsRayTracingInstanceListUsable(instances, instanceCount));
+	
+	if (invalidTlasInstances)
 	{
 		return {};
 	}

@@ -298,7 +298,9 @@ namespace SparkleLauncher
 		const bool preparing = !m_startingLevelRunId.isEmpty() && m_startingLevelId == level.Id;
 		button.setObjectName("MapCardActionButton");
 		button.setFixedSize(LauncherUi::Row::StatusActionWidth, LauncherUi::Row::StatusActionHeight);
-		const bool syncAvailable = !level.Ready && !level.SourceReady && level.CanSync && level.GameSupported;
+		const bool bSyncAvailableSourceReady = !level.Ready && !level.SourceReady;
+		const bool bSyncAvailableCanSync = bSyncAvailableSourceReady && (level.CanSync);
+		const bool syncAvailable = bSyncAvailableCanSync && (level.GameSupported);
 		const bool explainBlocker = !level.GameSupported || !level.CanSelect;
 		button.setProperty("ActionIntent", preparing ? QStringLiteral("none") : syncAvailable ? QStringLiteral("sync") : explainBlocker ? QStringLiteral("details") : QStringLiteral("run"));
 		const bool editorMode = m_settings.RunMode() != QStringLiteral("game");
@@ -483,7 +485,8 @@ namespace SparkleLauncher
 		const LauncherLevelUiModel levelModel = BuildLevelUiModel();
 		for (const LauncherLevelUiEntry& level : levelModel.Levels)
 		{
-			canSyncLevel = canSyncLevel || (level.Id != "Empty" && level.CanSelect);
+			const bool bSelectableLevel = level.Id != "Empty" && level.CanSelect;
+			canSyncLevel = canSyncLevel || bSelectableLevel;
 			if (level.Id != "Empty" && level.Selected)
 			{
 				hasSelectedLevels = true;
@@ -503,7 +506,8 @@ namespace SparkleLauncher
 				// The catalog page owns the detailed load diagnostic. Keep the footer safely disabled here.
 			}
 		}
-		const bool canClean = hasSelectedLevels || hasExtractedLevelContent || hasActionCleanTargets;
+		const bool bCanCleanLevelContent = hasSelectedLevels || hasExtractedLevelContent;
+		const bool canClean = bCanCleanLevelContent || (hasActionCleanTargets);
 
 		ApplyActionAvailability(
 		    cleanButton,

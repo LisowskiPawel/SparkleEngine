@@ -1,6 +1,6 @@
 #include "PCH.h"
 
-#include "Scene/Preparation/RenderLightPreparation.h"
+#include "Scene/Preparation/Lighting/RenderLightPreparation.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Scene/Preparation/PreparedRenderScene.h"

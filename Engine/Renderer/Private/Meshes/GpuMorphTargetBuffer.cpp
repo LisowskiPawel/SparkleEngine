@@ -38,7 +38,10 @@ void GpuMorphTargetBuffer::Upload(RenderHardwareInterface& renderHardwareInterfa
 	    RhiMemoryResidencyClass::DeviceLocal,
 	    L"GpuMesh_MorphTargetDeltas");
 
-	if (!m_buffer || !m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_buffer, std::as_bytes(payload), ResourceState::ShaderResource, L"GpuMesh_MorphTargetUpload"))
+	const bool morphTargetsUploaded = m_buffer
+	    && m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_buffer, std::as_bytes(payload), ResourceState::ShaderResource, L"GpuMesh_MorphTargetUpload");
+
+	if (!morphTargetsUploaded)
 	{
 		Release();
 		Diagnostics::Fatal(g_gpuMorphTargetBufferLogger, __FILE__, __LINE__, "GPU morph target upload failed.");

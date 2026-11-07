@@ -81,8 +81,11 @@ RhiRayTracingCapabilities VulkanRayTracingServices::GetCapabilities() const noex
 
 RhiRayTracingAccelerationStructurePrebuildInfo VulkanRayTracingServices::GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept
 {
-	if (m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure || m_rhi->GetAccelerationStructureBuildSizes() == nullptr
-	    || !RhiContract::IsRayTracingGeometryDescUsable(geometry))
+	const bool bSizingUnavailableCapabilities = m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure;
+	const bool bBlasSizingUnavailableBuildSizes = bSizingUnavailableCapabilities || (m_rhi->GetAccelerationStructureBuildSizes() == nullptr);
+	const bool bLasSizingUnavailable = bBlasSizingUnavailableBuildSizes || (!RhiContract::IsRayTracingGeometryDescUsable(geometry));
+	
+	if (bLasSizingUnavailable)
 	{
 		return {};
 	}
@@ -135,8 +138,11 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreatePtlasOperationBuffer(cons
 RhiOwnedResourceHandle VulkanRayTracingServices::CreateScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
 {
 	const std::uint64_t scratchAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().ScratchBufferByteAlignment : 0;
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure
-	    || !RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, scratchAlignment))
+	const bool bScratchInputsmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
+	const bool bScratchInputsTracingCapabilities = bScratchInputsmemoryAllocator || (!m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure);
+	const bool invalidBlasScratchInputs = bScratchInputsTracingCapabilities || (!RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, scratchAlignment));
+	
+	if (invalidBlasScratchInputs)
 	{
 		return {};
 	}
@@ -162,8 +168,13 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreateRayTracingScratchBuffer(s
 RhiOwnedResourceHandle VulkanRayTracingServices::CreateAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName)
 {
 	const std::uint64_t asAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().AccelerationStructureByteAlignment : 0;
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure || m_rhi->GetCreateAccelerationStructure() == nullptr
-	    || m_rhi->GetAccelerationStructureDeviceAddress() == nullptr || !RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, asAlignment))
+	const bool bStorageInputsmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
+	const bool bStorageInputsTracingCapabilities = bStorageInputsmemoryAllocator || (!m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure);
+	const bool bStorageInputsStructure = bStorageInputsTracingCapabilities || (m_rhi->GetCreateAccelerationStructure() == nullptr);
+	const bool bInvalidStorageInputsDeviceAddress = bStorageInputsStructure || (m_rhi->GetAccelerationStructureDeviceAddress() == nullptr);
+	const bool invalidBlasStorageInputs = bInvalidStorageInputsDeviceAddress || (!RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, asAlignment));
+	
+	if (invalidBlasStorageInputs)
 	{
 		return {};
 	}

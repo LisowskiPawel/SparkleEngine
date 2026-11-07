@@ -115,7 +115,10 @@ void FrameExecutionDiagnostics::ResolveTimings() noexcept
 		const std::uint32_t timestampValidBits = m_timingDiagnostics->GetTimestampValidBits(record.BeginQuery);
 		std::uint64_t beginTicks = 0;
 		std::uint64_t endTicks = 0;
-		if (!m_timingDiagnostics->TryResolveTimestamp(record.BeginQuery, beginTicks) || !m_timingDiagnostics->TryResolveTimestamp(record.EndQuery, endTicks))
+		const bool beginResolved = m_timingDiagnostics->TryResolveTimestamp(record.BeginQuery, beginTicks);
+		const bool endResolved = beginResolved && m_timingDiagnostics->TryResolveTimestamp(record.EndQuery, endTicks);
+
+		if (!endResolved)
 		{
 			Diagnostics::Fatal(g_frameExecutionDiagnosticsLogger, __FILE__, __LINE__, "A GPU timestamp was unavailable after its frame slot retired.");
 		}
@@ -129,6 +132,7 @@ void FrameExecutionDiagnostics::ResolveTimings() noexcept
 			}
 			durationTicks = (std::uint64_t{1} << timestampValidBits) - beginTicks + endTicks;
 		}
+
 		const double durationMilliseconds = static_cast<double>(durationTicks) * timestampPeriodNanoseconds / 1'000'000.0;
 
 		m_resolvedTimers.push_back(

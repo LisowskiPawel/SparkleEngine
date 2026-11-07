@@ -104,8 +104,8 @@ private:
 		{
 			return hint;
 		}
-		if (const std::string fileExtension = NormalizeExtension(texture.mFilename.length > 0 ? std::filesystem::path(texture.mFilename.C_Str()).extension().string() : std::string{});
-		    !fileExtension.empty())
+		const std::string fileExtension = NormalizeExtension(texture.mFilename.length > 0 ? std::filesystem::path(texture.mFilename.C_Str()).extension().string() : std::string{});
+		if (!fileExtension.empty())
 		{
 			return fileExtension;
 		}
@@ -134,7 +134,9 @@ private:
 		{
 			return ".exr";
 		}
-		if (StartsWith(bytes, {0x23u, 0x3Fu, 0x52u, 0x41u, 0x44u, 0x49u, 0x41u, 0x4Eu, 0x43u, 0x45u}) || StartsWith(bytes, {0x23u, 0x3Fu, 0x52u, 0x47u, 0x42u, 0x45u}))
+		const bool isRadianceImage = StartsWith(bytes, {0x23u, 0x3Fu, 0x52u, 0x41u, 0x44u, 0x49u, 0x41u, 0x4Eu, 0x43u, 0x45u}) || StartsWith(bytes, {0x23u, 0x3Fu, 0x52u, 0x47u, 0x42u, 0x45u});
+		
+		if (isRadianceImage)
 		{
 			return ".hdr";
 		}

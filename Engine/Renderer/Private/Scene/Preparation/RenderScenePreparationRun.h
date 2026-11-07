@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Scene/Preparation/RenderDeformationPreparation.h"
-#include "Scene/Preparation/RenderLightPreparation.h"
-#include "Scene/Preparation/RenderPrimitivePreparation.h"
+#include "Scene/Preparation/Deformation/RenderDeformationPreparation.h"
+#include "Scene/Preparation/Lighting/RenderLightPreparation.h"
+#include "Scene/Preparation/Geometry/RenderPrimitivePreparation.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
 
 #include <span>

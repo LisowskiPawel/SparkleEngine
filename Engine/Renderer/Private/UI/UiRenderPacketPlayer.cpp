@@ -105,7 +105,9 @@ void UiRenderPacketPlayer::ApplyTextureChanges(const UiRenderPacket& packet)
 
 		++texture.Data->UnusedFrames;
 
-		if (std::find(m_storage->TextureUpdates.begin(), m_storage->TextureUpdates.end(), texture.Data.get()) == m_storage->TextureUpdates.end())
+		const bool textureUpdateMissing = std::find(m_storage->TextureUpdates.begin(), m_storage->TextureUpdates.end(), texture.Data.get()) == m_storage->TextureUpdates.end();
+		
+		if (textureUpdateMissing)
 		{
 			m_storage->TextureUpdates.push_back(texture.Data.get());
 		}
@@ -115,8 +117,11 @@ void UiRenderPacketPlayer::ApplyTextureChanges(const UiRenderPacket& packet)
 void UiRenderPacketPlayer::ApplyTextureUpload(const UiRenderPacket& packet, const UiTextureUpload& upload)
 {
 	const std::size_t expectedPixelCount = static_cast<std::size_t>(upload.Width) * static_cast<std::size_t>(upload.Height) * 4;
-	if (!upload.Texture.IsImGuiTexture() || expectedPixelCount != upload.PixelCount || upload.PixelOffset > packet.TexturePixels.size()
-	    || upload.PixelCount > packet.TexturePixels.size() - upload.PixelOffset)
+	const bool bInvalidTextureUploadPixelCount = !upload.Texture.IsImGuiTexture() || expectedPixelCount != upload.PixelCount;
+	const bool bInvalidTextureUploadTexturePixels = bInvalidTextureUploadPixelCount || (upload.PixelOffset > packet.TexturePixels.size());
+	const bool invalidUiTextureUpload = bInvalidTextureUploadTexturePixels || (upload.PixelCount > packet.TexturePixels.size() - upload.PixelOffset);
+	
+	if (invalidUiTextureUpload)
 	{
 		return;
 	}

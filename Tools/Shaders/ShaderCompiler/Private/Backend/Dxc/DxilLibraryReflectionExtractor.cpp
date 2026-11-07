@@ -57,6 +57,7 @@ static void ReflectLibraryConstantBuffers(ID3D12FunctionReflection& function, UI
 			{
 				throw Diagnostics::Error("DXIL library reflection could not read a constant-buffer member type.");
 			}
+
 			const std::uint32_t arrayCount = typeDesc.Elements > 0 ? typeDesc.Elements : 1u;
 
 			reflectedBuffer.Members.push_back(
@@ -115,11 +116,12 @@ static void ReflectLibraryBindings(ID3D12FunctionReflection& function, UINT coun
 static Microsoft::WRL::ComPtr<ID3D12LibraryReflection> OpenLibraryReflection(IDxcUtils& utils, IDxcResult* result, Microsoft::WRL::ComPtr<IDxcBlob>& reflectionBlob)
 {
 	const HRESULT reflectionStatus = result->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(reflectionBlob.ReleaseAndGetAddressOf()), nullptr);
-	
+
 	if (FAILED(reflectionStatus) || !reflectionBlob || reflectionBlob->GetBufferSize() == 0)
 	{
 		throw Diagnostics::Error("DXIL library reflection: DXC produced no reflection part.");
 	}
+
 	const DxcBuffer reflectionBuffer{.Ptr = reflectionBlob->GetBufferPointer(), .Size = reflectionBlob->GetBufferSize(), .Encoding = 0};
 	Microsoft::WRL::ComPtr<ID3D12LibraryReflection> library;
 	if (FAILED(utils.CreateReflection(&reflectionBuffer, IID_PPV_ARGS(library.ReleaseAndGetAddressOf()))) || !library)

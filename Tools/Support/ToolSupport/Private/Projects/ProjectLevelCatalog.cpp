@@ -42,10 +42,16 @@ bool ProjectLevelCatalog::IsAssetPackSourceReady(std::string_view packId) const
 bool ProjectLevelCatalog::HasLevelSourceInputs(const ProjectLevelCatalogEntry& level) const
 {
 	std::error_code error;
-	if (level.id.empty() || level.sourcePath.empty() || !std::filesystem::is_regular_file(level.sourcePath, error) || error || !IsAssetPackSourceReady(level.assetPackId))
+	const bool sourceSpecified = !level.id.empty() && !level.sourcePath.empty();
+	const bool bSourcePresentsourcePath = sourceSpecified && std::filesystem::is_regular_file(level.sourcePath, error);
+	const bool sourcePresent = bSourcePresentsourcePath && (!error);
+	const bool sourceReady = sourcePresent && IsAssetPackSourceReady(level.assetPackId);
+
+	if (!sourceReady)
 	{
 		return false;
 	}
+
 	std::string_view packId = level.assetPackId;
 	while (!packId.empty())
 	{

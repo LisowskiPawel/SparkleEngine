@@ -26,7 +26,9 @@ namespace RenderingSettingsUi
 		ImGui::PushStyleColor(ImGuiCol_HeaderActive, SparkleUiPalette::HeaderBackgroundActive());
 		ImGui::PushStyleColor(ImGuiCol_Text, SparkleUiPalette::TextPrimary());
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.0f, 5.0f));
+
 		const bool open = ImGui::CollapsingHeader(label, ImGuiTreeNodeFlags_DefaultOpen);
+
 		ImGui::PopStyleVar();
 		ImGui::PopStyleColor(4);
 		return open;
@@ -51,6 +53,40 @@ namespace RenderingSettingsUi
 		ImGui::TableSetColumnIndex(0);
 		ImGui::AlignTextToFramePadding();
 		ImGui::TextUnformatted(label);
+	}
+
+	bool DrawBooleanRow(const char* id, const char* label, bool& value)
+	{
+		BeginSettingsRow(label);
+		ImGui::TableSetColumnIndex(1);
+		return ImGui::Checkbox(id, &value);
+	}
+
+	bool DrawUnsignedIntSliderRow(const char* id, const char* label, std::uint32_t& value, std::uint32_t minValue, std::uint32_t maxValue)
+	{
+		BeginSettingsRow(label);
+		ImGui::TableSetColumnIndex(1);
+		ImGui::SetNextItemWidth(-FLT_MIN);
+
+		int updatedValue = static_cast<int>(value);
+		const int minInt = static_cast<int>(minValue);
+		const int maxInt = static_cast<int>(maxValue);
+		const bool edited = ImGui::SliderInt(id, &updatedValue, minInt, maxInt);
+		if (!edited)
+		{
+			return false;
+		}
+
+		value = static_cast<std::uint32_t>(updatedValue);
+		return true;
+	}
+
+	bool DrawFloatInputRow(const char* id, const char* label, float& value, float step, float stepFast, const char* format)
+	{
+		BeginSettingsRow(label);
+		ImGui::TableSetColumnIndex(1);
+		ImGui::SetNextItemWidth(-FLT_MIN);
+		return ImGui::InputFloat(id, &value, step, stepFast, format);
 	}
 
 }

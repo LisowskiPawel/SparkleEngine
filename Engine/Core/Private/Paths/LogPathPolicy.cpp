@@ -19,7 +19,9 @@ namespace Paths::Private
 	{
 		const std::string sanitizedExecutableStem = PathFormatting::SanitizePathSegment(executableStem.empty() ? "Sparkle" : executableStem);
 		std::filesystem::path logDirectory;
-		if (PathFormatting::EndsWithIgnoreCase(sanitizedExecutableStem, "Editor") || PathFormatting::EndsWithIgnoreCase(sanitizedExecutableStem, "Game"))
+		const bool executableHasProductSuffix = PathFormatting::EndsWithIgnoreCase(sanitizedExecutableStem, "Editor") || PathFormatting::EndsWithIgnoreCase(sanitizedExecutableStem, "Game");
+		
+		if (executableHasProductSuffix)
 		{
 			std::string projectName = Filesystem::Private::InferProjectNameFromExecutableStem(sanitizedExecutableStem);
 			if (projectName.empty())

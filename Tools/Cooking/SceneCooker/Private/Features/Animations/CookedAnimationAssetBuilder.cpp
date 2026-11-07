@@ -78,8 +78,11 @@ CookedAnimationAssetBuild CookedAnimationTranslation::BuildAsset(
     std::size_t clipIndex,
     const CookedSceneBuild& build)
 {
-	if (!importedClip.IsValid() || importedClip.name.size() >= sizeof(Assets::CookedAnimationAssetHeader::name) || importedClip.targetSkeletonIndex >= build.outputs.skeletonAssets.size()
-	    || importedClip.targetSkeletonIndex >= build.manifest.skeletonRefs.size())
+	const bool bAnimationClipInvalidname = !importedClip.IsValid() || importedClip.name.size() >= sizeof(Assets::CookedAnimationAssetHeader::name);
+	const bool bClipInvalidskeletonAssetsSize = bAnimationClipInvalidname || (importedClip.targetSkeletonIndex >= build.outputs.skeletonAssets.size());
+	const bool animationClipInvalid = bClipInvalidskeletonAssetsSize || (importedClip.targetSkeletonIndex >= build.manifest.skeletonRefs.size());
+	
+	if (animationClipInvalid)
 	{
 		throw Diagnostics::Error(std::format("Imported animation clip {} is invalid.", clipIndex));
 	}
@@ -125,11 +128,15 @@ void CookedAnimationTranslation::AppendChannel(
 	}
 	const Assets::CookedAnimationTargetPath targetPath = ToCookedTargetPath(importedChannel.targetPath);
 	const Assets::CookedAnimationInterpolation interpolation = ToCookedInterpolation(sampler.interpolation);
-	if (importedChannel.targetPath != ImportedAnimationTargetPath::Weights && importedChannel.targetJointIndex >= skeleton.joints.size())
+	const bool invalidAnimationJoint = importedChannel.targetPath != ImportedAnimationTargetPath::Weights && importedChannel.targetJointIndex >= skeleton.joints.size();
+	
+	if (invalidAnimationJoint)
 	{
 		throw Diagnostics::Error(std::format("Imported animation clip {} channel {} references an invalid target joint.", clipIndex, channelIndex));
 	}
-	if (asset.keyframes.size() > (std::numeric_limits<std::uint32_t>::max)() || sampler.keyframes.size() > (std::numeric_limits<std::uint32_t>::max)() - asset.keyframes.size())
+	const bool keyframeStorageOverflow = asset.keyframes.size() > (std::numeric_limits<std::uint32_t>::max)() || sampler.keyframes.size() > (std::numeric_limits<std::uint32_t>::max)() - asset.keyframes.size();
+	
+	if (keyframeStorageOverflow)
 	{
 		throw Diagnostics::Error(std::format("Imported animation clip {} channel {} has too many keyframes.", clipIndex, channelIndex));
 	}

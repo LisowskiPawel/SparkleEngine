@@ -44,7 +44,10 @@ VulkanTlasServices::VulkanTlasServices(VulkanRhi& rhi, VulkanGpuMemoryAllocator&
 
 RhiRayTracingAccelerationStructurePrebuildInfo VulkanTlasServices::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
 {
-	if (m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure || m_rhi->GetAccelerationStructureBuildSizes() == nullptr)
+	const bool bSizingUnavailableCapabilities = m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure;
+	const bool tlasSizingUnavailable = bSizingUnavailableCapabilities || (m_rhi->GetAccelerationStructureBuildSizes() == nullptr);
+	
+	if (tlasSizingUnavailable)
 	{
 		return {};
 	}
@@ -90,7 +93,11 @@ RhiRayTracingAccelerationStructurePrebuildInfo VulkanTlasServices::GetTlasPrebui
 
 RhiOwnedResourceHandle VulkanTlasServices::CreateTlasInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure || !RhiContract::IsRayTracingInstanceListUsable(instances, instanceCount))
+	const bool bInvalidTlasInputsmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
+	const bool bTlasInputsTracingCapabilities = bInvalidTlasInputsmemoryAllocator || (!m_rhi->GetRayTracingCapabilities().SupportsAccelerationStructure);
+	const bool invalidTlasInputs = bTlasInputsTracingCapabilities || (!RhiContract::IsRayTracingInstanceListUsable(instances, instanceCount));
+	
+	if (invalidTlasInputs)
 	{
 		return {};
 	}
@@ -124,7 +131,10 @@ RhiOwnedResourceHandle VulkanTlasServices::CreateTlasInstanceBuffer(const RhiRay
 	    RhiMemoryResidencyClass::HostUpload,
 	    debugName.empty() ? L"RayTracingTlasInstanceBuffer" : debugName);
 
-	if (record == nullptr || record->Buffer == VK_NULL_HANDLE || !m_memoryAllocator->WriteAllocation(*record, nativeInstances.data(), static_cast<std::size_t>(sizeInBytes)))
+	const bool instanceBufferAvailable = record != nullptr && record->Buffer != VK_NULL_HANDLE;
+	const bool instancesWritten = instanceBufferAvailable && m_memoryAllocator->WriteAllocation(*record, nativeInstances.data(), static_cast<std::size_t>(sizeInBytes));
+	
+	if (!instancesWritten)
 	{
 		return {};
 	}

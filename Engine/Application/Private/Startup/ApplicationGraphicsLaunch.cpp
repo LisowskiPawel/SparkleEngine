@@ -1,6 +1,6 @@
 #include "PCH.h"
 
-#include "ApplicationGraphicsLaunch.h"
+#include "Startup/ApplicationGraphicsLaunch.h"
 
 #include "Core/Public/Environment/EnvironmentVariables.h"
 #include "Core/Public/Process/CommandLineUtils.h"
@@ -51,7 +51,10 @@ namespace ApplicationGraphicsLaunch
 				}
 			}
 
-			if (Strings::EqualsIgnoreCase(token, "--renderer") || Strings::EqualsIgnoreCase(token, "--rhi") || Strings::EqualsIgnoreCase(token, "--graphics-api"))
+			const bool bIsApiSwitchStrings = Strings::EqualsIgnoreCase(token, "--renderer") || Strings::EqualsIgnoreCase(token, "--rhi");
+			const bool isGraphicsApiSwitch = bIsApiSwitchStrings || (Strings::EqualsIgnoreCase(token, "--graphics-api"));
+			
+			if (isGraphicsApiSwitch)
 			{
 				api = ParseSelection(Strings::ToNarrow(CommandLine::ReadToken(commandLine, offset)));
 				return true;

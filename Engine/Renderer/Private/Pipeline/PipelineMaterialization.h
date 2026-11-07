@@ -8,9 +8,12 @@
 
 class PassParameterLayout;
 class RenderHardwareInterface;
+struct ShaderRegistrationDesc;
 
 namespace PipelineMaterialization
 {
+	void ValidateResolvedShader(RenderHardwareInterface& renderHardwareInterface, const ShaderRegistrationDesc& registration, const ResolvedShader& shader, const PassParameterLayout& parameterLayout);
+
 	void ValidateShaderCapabilities(RenderHardwareInterface& renderHardwareInterface, std::string_view shaderName, const ResolvedShader& shader);
 
 	std::unique_ptr<RenderBindingLayout> CreateBindingLayout(

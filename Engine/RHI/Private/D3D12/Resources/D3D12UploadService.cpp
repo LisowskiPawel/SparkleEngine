@@ -208,7 +208,9 @@ bool D3D12UploadService::RecordTextureUpload(
 		}
 	}
 
-	if (UpdateSubresources(nativeCommandList, destination.Resource.Get(), stagingResource.Resource.Get(), 0, 0, subresourceCount, subresources.data()) == 0)
+	const UINT64 uploadedBytes = UpdateSubresources(nativeCommandList, destination.Resource.Get(), stagingResource.Resource.Get(), 0, 0, subresourceCount, subresources.data());
+
+	if (uploadedBytes == 0)
 	{
 		return false;
 	}

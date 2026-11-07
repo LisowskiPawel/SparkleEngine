@@ -27,8 +27,16 @@ void VulkanRenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRay
 {
 	const VkDeviceAddress vertexBufferAddress = ResolveRayTracingBufferAddress(geometry.VertexBuffer);
 	const VkDeviceAddress indexBufferAddress = ResolveRayTracingBufferAddress(geometry.IndexBuffer);
-	if (m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr || m_memoryAllocator == nullptr || m_rhi->GetCmdBuildAccelerationStructures() == nullptr
-	    || !RhiContract::IsRayTracingGeometryDescUsable(geometry) || vertexBufferAddress == 0 || indexBufferAddress == 0 || scratchGpuAddress == 0 || resultGpuAddress == 0)
+	const bool bInvalidBuildInputsrhi = m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr;
+	const bool bInvalidBuildInputsmemoryAllocator = bInvalidBuildInputsrhi || (m_memoryAllocator == nullptr);
+	const bool bBuildInputsAccelerationStructures = bInvalidBuildInputsmemoryAllocator || (m_rhi->GetCmdBuildAccelerationStructures() == nullptr);
+	const bool bInvalidBuildInputsRhiContract = bBuildInputsAccelerationStructures || (!RhiContract::IsRayTracingGeometryDescUsable(geometry));
+	const bool bInvalidBuildInputsBufferAddress = bInvalidBuildInputsRhiContract || (vertexBufferAddress == 0);
+	const bool bInvalidBuildInputsBufferAddress2 = bInvalidBuildInputsBufferAddress || (indexBufferAddress == 0);
+	const bool bInvalidBuildInputsGpuAddress = bInvalidBuildInputsBufferAddress2 || (scratchGpuAddress == 0);
+	const bool invalidBlasBuildInputs = bInvalidBuildInputsGpuAddress || (resultGpuAddress == 0);
+	
+	if (invalidBlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan BLAS build received incomplete geometry, device, command-buffer, or GPU-address inputs.");
 	}
@@ -38,8 +46,11 @@ void VulkanRenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRay
 	TrackResource(geometry.IndexBuffer.Resource);
 
 	VulkanRecordingResource resultResource;
-	if (!ResolveAddress(resultGpuAddress, resultResource) || resultResource.AccelerationStructure == VK_NULL_HANDLE
-	    || resultResource.AccelerationStructureType != VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR)
+	const bool resultResolved = ResolveAddress(resultGpuAddress, resultResource);
+	const bool bStructureMatchesStructure = resultResolved && resultResource.AccelerationStructure != VK_NULL_HANDLE;
+	const bool accelerationStructureMatches = bStructureMatchesStructure && (resultResource.AccelerationStructureType == VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR);
+	
+	if (!accelerationStructureMatches)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan BLAS destination does not resolve to a bottom-level acceleration structure.");
 	}
@@ -109,16 +120,25 @@ void VulkanRenderCommandList::BuildTlas(
     RhiGpuVirtualAddress resultGpuAddress,
     ERhiTlasBuildMode buildMode) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr || m_memoryAllocator == nullptr || m_rhi->GetCmdBuildAccelerationStructures() == nullptr || instanceDescsGpuAddress == 0
-	    || scratchGpuAddress == 0 || resultGpuAddress == 0)
+	const bool bInvalidBuildInputsrhi = m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr;
+	const bool bInvalidBuildInputsmemoryAllocator = bInvalidBuildInputsrhi || (m_memoryAllocator == nullptr);
+	const bool bBuildInputsAccelerationStructures = bInvalidBuildInputsmemoryAllocator || (m_rhi->GetCmdBuildAccelerationStructures() == nullptr);
+	const bool bInvalidBuildInputsGpuAddress = bBuildInputsAccelerationStructures || (instanceDescsGpuAddress == 0);
+	const bool bInvalidBuildInputsGpuAddress2 = bInvalidBuildInputsGpuAddress || (scratchGpuAddress == 0);
+	const bool invalidTlasBuildInputs = bInvalidBuildInputsGpuAddress2 || (resultGpuAddress == 0);
+	
+	if (invalidTlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan TLAS build received no device, command buffer, build entry point, or GPU address.");
 	}
 	EndDynamicRenderingIfNeeded();
 
 	VulkanRecordingResource resultResource;
-	if (!ResolveAddress(resultGpuAddress, resultResource) || resultResource.AccelerationStructure == VK_NULL_HANDLE
-	    || resultResource.AccelerationStructureType != VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR)
+	const bool resultResolved = ResolveAddress(resultGpuAddress, resultResource);
+	const bool bStructureMatchesStructure = resultResolved && resultResource.AccelerationStructure != VK_NULL_HANDLE;
+	const bool accelerationStructureMatches = bStructureMatchesStructure && (resultResource.AccelerationStructureType == VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR);
+	
+	if (!accelerationStructureMatches)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan TLAS destination does not resolve to a TLAS.");
 	}
@@ -181,8 +201,17 @@ void VulkanRenderCommandList::BuildTlas(
 
 void VulkanRenderCommandList::BuildPtlas(const RhiPtlasBuildCommandDesc& desc) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr || m_rhi->GetCmdBuildPtlas() == nullptr || !desc.DestinationResource || desc.DestinationAccelerationStructure == 0 || desc.Scratch == 0
-	    || desc.OperationHeaders == 0 || desc.OperationCount == 0 || desc.Layout.InstanceCapacity == 0 || desc.Layout.PartitionCount == 0)
+	const bool bInvalidBuildInputsrhi = m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr;
+	const bool bInvalidBuildInputsBuildPtlas = bInvalidBuildInputsrhi || (m_rhi->GetCmdBuildPtlas() == nullptr);
+	const bool bBuildInputsDestinationResource = bInvalidBuildInputsBuildPtlas || (!desc.DestinationResource);
+	const bool bBuildInputsAccelerationStructure = bBuildInputsDestinationResource || (desc.DestinationAccelerationStructure == 0);
+	const bool bInvalidBuildInputsScratch = bBuildInputsAccelerationStructure || (desc.Scratch == 0);
+	const bool bBuildInputsOperationHeaders = bInvalidBuildInputsScratch || (desc.OperationHeaders == 0);
+	const bool bInvalidBuildInputsOperationCount = bBuildInputsOperationHeaders || (desc.OperationCount == 0);
+	const bool bInvalidBuildInputsLayout = bInvalidBuildInputsOperationCount || (desc.Layout.InstanceCapacity == 0);
+	const bool invalidPtlasBuildInputs = bInvalidBuildInputsLayout || (desc.Layout.PartitionCount == 0);
+	
+	if (invalidPtlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan PTLAS build received incomplete device, command-buffer, layout, or GPU-address inputs.");
 	}
@@ -259,7 +288,12 @@ void VulkanRenderCommandList::TraceRays(const TraceRaysDesc& desc) noexcept
 	}
 	const auto* pipeline = dynamic_cast<const VulkanRayTracingPipeline*>(desc.Pipeline);
 	const auto* table = dynamic_cast<const VulkanRayTracingShaderTable*>(desc.ShaderTable);
-	if (m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr || m_rhi->GetCmdTraceRays() == nullptr || pipeline == nullptr || table == nullptr)
+	const bool bRayDispatchUnavailablerhi = m_commandBuffer == VK_NULL_HANDLE || m_rhi == nullptr;
+	const bool bRayDispatchUnavailableTraceRays = bRayDispatchUnavailablerhi || (m_rhi->GetCmdTraceRays() == nullptr);
+	const bool bRayDispatchUnavailablepipeline = bRayDispatchUnavailableTraceRays || (pipeline == nullptr);
+	const bool rayDispatchUnavailable = bRayDispatchUnavailablepipeline || (table == nullptr);
+	
+	if (rayDispatchUnavailable)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan TraceRays requires a command buffer, loaded function, and matching native objects.");
 	}

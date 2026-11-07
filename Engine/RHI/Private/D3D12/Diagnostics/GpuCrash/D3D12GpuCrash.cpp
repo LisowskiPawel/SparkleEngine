@@ -78,7 +78,12 @@ void D3D12GpuCrash::Resource(ID3D12Resource* resource) noexcept
 void D3D12GpuCrash::ObserveLoss(ID3D12Device* device, HRESULT result) noexcept
 {
 	auto* session = GpuCrashSession::Current();
-	if (session == nullptr || device == nullptr || SUCCEEDED(result) || SUCCEEDED(device->GetDeviceRemovedReason()) || !session->BeginLoss(result))
+	const bool bLossCandidatedevice = session != nullptr && device != nullptr;
+	const bool lossCandidate = bLossCandidatedevice && (FAILED(result));
+	const bool deviceRemoved = lossCandidate && FAILED(device->GetDeviceRemovedReason());
+	const bool lossStarted = deviceRemoved && session->BeginLoss(result);
+
+	if (!lossStarted)
 	{
 		return;
 	}

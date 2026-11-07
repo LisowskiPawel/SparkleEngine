@@ -98,7 +98,11 @@ namespace Assets
 
 			std::string_view key;
 			std::string_view value;
-			if (!inEntriesSection || !Strings::TrySplitKeyValue(trimmedLine, '=', key, value) || !Strings::EqualsIgnoreCase(key, "Entry"))
+			const bool entrySectionActive = inEntriesSection;
+			const bool entryDecoded = entrySectionActive && Strings::TrySplitKeyValue(trimmedLine, '=', key, value);
+			const bool entryKeyMatches = entryDecoded && Strings::EqualsIgnoreCase(key, "Entry");
+			
+			if (!entryKeyMatches)
 			{
 				throw Diagnostics::Error(std::format("Scene asset registry '{}' has an invalid field at line {}.", m_registryPath.string(), lineNumber));
 			}

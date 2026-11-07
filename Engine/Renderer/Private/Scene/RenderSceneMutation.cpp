@@ -72,7 +72,13 @@ void RenderScene::ApplyValidatedDelta(const RenderSceneDelta& delta)
 		m_primitives.clear();
 		ResetContinuity();
 	}
-	if (delta.ResetScene || !delta.Creates.empty() || !delta.Updates.empty() || !delta.Destroys.empty() || delta.InstanceGroups.Published || delta.Sky.Published)
+	const bool bTopologyChangedCreates = delta.ResetScene || !delta.Creates.empty();
+	const bool bTopologyChangedUpdates = bTopologyChangedCreates || (!delta.Updates.empty());
+	const bool bTopologyChangedDestroys = bTopologyChangedUpdates || (!delta.Destroys.empty());
+	const bool bTopologyChangedInstanceGroups = bTopologyChangedDestroys || (delta.InstanceGroups.Published);
+	const bool topologyChanged = bTopologyChangedInstanceGroups || (delta.Sky.Published);
+	
+	if (topologyChanged)
 	{
 		++m_structuralRevision;
 	}

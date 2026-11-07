@@ -121,7 +121,8 @@ namespace SparkleLauncher
 		const bool visualStudioAvailable = IsToolAvailable(toolchain, "visualstudio");
 		const bool msvcAvailable = visualStudioAvailable && IsToolAvailable(toolchain, "msbuild");
 		const ToolchainItemStatus* clangCl = FindToolchainItem(toolchain, "clangcl");
-		const bool clangClAvailable = visualStudioAvailable && clangCl != nullptr && clangCl->State == ToolchainItemState::Found;
+		const bool bClangClAvailableclangCl = visualStudioAvailable && clangCl != nullptr;
+		const bool clangClAvailable = bClangClAvailableclangCl && (clangCl->State == ToolchainItemState::Found);
 
 		return {
 		    {"MSVC",

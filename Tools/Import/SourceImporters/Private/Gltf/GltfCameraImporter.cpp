@@ -61,8 +61,24 @@ void GltfCameraImporter::ImportCameras(const cgltf_data* data, SourceImportOutpu
 		const cgltf_camera_perspective& perspective = sourceCamera.data.perspective;
 		// The renderer derives aspect ratio from the current viewport. A source aspect ratio is therefore intentionally
 		// discarded, while the vertical field of view and finite clip range remain authoritative camera data.
-		if (!perspective.has_zfar || !std::isfinite(perspective.yfov) || !std::isfinite(perspective.znear) || !std::isfinite(perspective.zfar) || perspective.yfov <= 0.0f || perspective.znear <= 0.0f
-		    || perspective.zfar <= perspective.znear || (perspective.has_aspect_ratio && (!std::isfinite(perspective.aspect_ratio) || perspective.aspect_ratio <= 0.0f)))
+		const bool farPlaneSpecified = perspective.has_zfar;
+		const bool bProjectionFiniteyfov = farPlaneSpecified && std::isfinite(perspective.yfov);
+		const bool bProjectionFiniteznear = bProjectionFiniteyfov && (std::isfinite(perspective.znear));
+		const bool projectionFinite = bProjectionFiniteznear && (std::isfinite(perspective.zfar));
+		const bool bProjectionOrdered0f = perspective.yfov <= 0.0f || perspective.znear <= 0.0f;
+		const bool bProjectionOrderedznear = bProjectionOrdered0f || (perspective.zfar <= perspective.znear);
+		const bool bProjectionOrderedznear2 = !bProjectionOrderedznear;
+		const bool projectionOrdered = projectionFinite && bProjectionOrderedznear2;
+		const bool bAspectRatioValidaspectratio = projectionOrdered && (perspective.has_aspect_ratio);
+		const bool bAspectRatioValidaspectratio2 = bAspectRatioValidaspectratio && (!std::isfinite(perspective.aspect_ratio));
+		const bool bAspectRatioValidGuard0f = bAspectRatioValidaspectratio && !bAspectRatioValidaspectratio2;
+		const bool bAspectRatioValid0f = bAspectRatioValidGuard0f && (perspective.aspect_ratio <= 0.0f);
+		const bool bAspectRatioValid0f2 = bAspectRatioValidaspectratio2 || bAspectRatioValid0f;
+		const bool bAspectRatioValid0f3 = bAspectRatioValidaspectratio && bAspectRatioValid0f2;
+		const bool bAspectRatioValid0f4 = projectionOrdered && !bAspectRatioValid0f3;
+		const bool aspectRatioValid = projectionOrdered && bAspectRatioValid0f4;
+
+		if (!aspectRatioValid)
 		{
 			throw Diagnostics::Error(std::format("glTF camera {} uses unsupported perspective parameters.", nodeIndex));
 		}

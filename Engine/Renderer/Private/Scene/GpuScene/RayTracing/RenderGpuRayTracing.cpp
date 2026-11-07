@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Scene/GpuScene/RenderGpuRayTracing.h"
+#include "Scene/GpuScene/RayTracing/RenderGpuRayTracing.h"
 
 #include "Core/Public/Hash/HashUtils.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
@@ -28,11 +28,16 @@ void RenderGpuRayTracing::RefreshPayloads(const PreparedRenderScene& preparedSce
 	}
 	topologyHash = Hash::FinalizeFnv1a64(topologyHash);
 	const bool topologyChanged = preparedScene.structuralRevision != m_structuralRevision || topologyHash != m_workTopologyHash;
-	const bool payloadChanged = topologyChanged || preparedScene.materialRevision != m_materialRevision || textureGeneration != m_textureGeneration;
+	const bool bPayloadChangedmaterialRevision = topologyChanged || preparedScene.materialRevision != m_materialRevision;
+	const bool payloadChanged = bPayloadChangedmaterialRevision || (textureGeneration != m_textureGeneration);
 	if (payloadChanged)
 	{
 		BuildRenderGpuRayTracingPayloads(preparedScene, m_meshes, m_payloads);
-		if (topologyChanged || m_payloads.InstanceCount == 0u || !m_topology.Vertices.GetBinding() || !m_topology.MorphTargetDeltas.GetBinding())
+		const bool bRebuildRequiredInstanceCount = topologyChanged || m_payloads.InstanceCount == 0u;
+		const bool bTopologyRebuildRequiredVertices = bRebuildRequiredInstanceCount || (!m_topology.Vertices.GetBinding());
+		const bool topologyRebuildRequired = bTopologyRebuildRequiredVertices || (!m_topology.MorphTargetDeltas.GetBinding());
+		
+		if (topologyRebuildRequired)
 		{
 			UpdateTopology();
 		}

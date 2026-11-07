@@ -7,7 +7,7 @@
 #include "GameFramework/Public/Scene/Camera/CameraNavigation.h"
 #include "GameFramework/Public/World/WorldEditCommand.h"
 #include "GameFramework/Public/World/WorldMaterialVariantView.h"
-#include "World/SceneLoadWorldStaging.h"
+#include "World/Loading/SceneLoadWorldStaging.h"
 #include "World/GameWorldState.h"
 #include "World/Extraction/RenderFrameSubmissionExtractor.h"
 #include "World/Editing/WorldEditCommandQueue.h"

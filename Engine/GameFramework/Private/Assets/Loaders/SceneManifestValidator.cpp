@@ -72,12 +72,17 @@ namespace Assets
 			Invalid("Cooked scene manifest has skeleton refs but is missing the Skeletons feature flag");
 		}
 
-		if (!manifest.animationReferences.empty() && !HasFeatureFlag(manifest.header.featureFlags, CookedSceneFeatureFlags::Animations))
+		const bool animationFeatureMissing = !manifest.animationReferences.empty() && !HasFeatureFlag(manifest.header.featureFlags, CookedSceneFeatureFlags::Animations);
+		
+		if (animationFeatureMissing)
 		{
 			Invalid("Cooked scene manifest has animation refs but is missing the Animations feature flag");
 		}
 
-		if ((!manifest.materialVariants.empty() || !manifest.materialVariantMappings.empty()) && !HasFeatureFlag(manifest.header.featureFlags, CookedSceneFeatureFlags::MaterialVariants))
+		const bool bFeatureMissingVariantMappings = !manifest.materialVariants.empty() || !manifest.materialVariantMappings.empty();
+		const bool materialVariantFeatureMissing = bFeatureMissingVariantMappings && (!HasFeatureFlag(manifest.header.featureFlags, CookedSceneFeatureFlags::MaterialVariants));
+		
+		if (materialVariantFeatureMissing)
 		{
 			Invalid("Cooked scene manifest has material variant records but is missing the MaterialVariants feature flag");
 		}
@@ -107,7 +112,9 @@ namespace Assets
 			Invalid(std::format("Cooked scene instance {} references mesh asset index {} but only {} mesh assets exist", instanceIndex, instance.meshAssetIndex, manifest.meshAssetReferences.size()));
 		}
 
-		if (instance.materialAssetIndex != kInvalidCookedMaterialAssetIndex && instance.materialAssetIndex >= manifest.materialAssetReferences.size())
+		const bool invalidInstanceMaterial = instance.materialAssetIndex != kInvalidCookedMaterialAssetIndex && instance.materialAssetIndex >= manifest.materialAssetReferences.size();
+		
+		if (invalidInstanceMaterial)
 		{
 			Invalid(
 			    std::format(
@@ -122,14 +129,19 @@ namespace Assets
 			Invalid(std::format("Cooked scene instance {} references instance group index {} but only {} groups exist", instanceIndex, instance.groupIndex, manifest.instanceGroups.size()));
 		}
 
-		if (instance.skeletonRefIndex != kInvalidCookedSceneSkeletonRefIndex && instance.skeletonRefIndex >= manifest.skeletonRefs.size())
+		const bool invalidInstanceSkeleton = instance.skeletonRefIndex != kInvalidCookedSceneSkeletonRefIndex && instance.skeletonRefIndex >= manifest.skeletonRefs.size();
+		
+		if (invalidInstanceSkeleton)
 		{
 			Invalid(std::format("Cooked scene instance {} references skeleton ref index {} but only {} skeleton refs exist", instanceIndex, instance.skeletonRefIndex, manifest.skeletonRefs.size()));
 		}
 
 		if (instance.firstMorphWeight != kInvalidCookedSceneMorphWeightIndex)
 		{
-			if (instance.morphWeightCount == 0u || instance.firstMorphWeight >= manifest.morphWeights.size() || instance.morphWeightCount > manifest.morphWeights.size() - instance.firstMorphWeight)
+			const bool bInvalidWeightRangemorphWeights = instance.morphWeightCount == 0u || instance.firstMorphWeight >= manifest.morphWeights.size();
+			const bool invalidMorphWeightRange = bInvalidWeightRangemorphWeights || (instance.morphWeightCount > manifest.morphWeights.size() - instance.firstMorphWeight);
+			
+			if (invalidMorphWeightRange)
 			{
 				Invalid(
 				    std::format(
@@ -177,7 +189,9 @@ namespace Assets
 			Invalid(std::format("Cooked scene instance group {} references mesh asset index {} but only {} mesh assets exist", groupIndex, group.meshAssetIndex, manifest.meshAssetReferences.size()));
 		}
 
-		if (group.materialAssetIndex != kInvalidCookedMaterialAssetIndex && group.materialAssetIndex >= manifest.materialAssetReferences.size())
+		const bool invalidGroupMaterial = group.materialAssetIndex != kInvalidCookedMaterialAssetIndex && group.materialAssetIndex >= manifest.materialAssetReferences.size();
+		
+		if (invalidGroupMaterial)
 		{
 			Invalid(
 			    std::format(
@@ -191,7 +205,10 @@ namespace Assets
 	void SceneManifestValidation::ValidateInstanceGroupRange(const LoadedSceneManifest& manifest, std::size_t groupIndex)
 	{
 		const CookedSceneInstanceGroupRecord& group = manifest.instanceGroups[groupIndex];
-		if (group.instanceCount == 0 || group.firstInstance >= manifest.instances.size() || group.instanceCount > manifest.instances.size() - group.firstInstance)
+		const bool bInvalidInstanceRangeinstances = group.instanceCount == 0 || group.firstInstance >= manifest.instances.size();
+		const bool invalidGroupInstanceRange = bInvalidInstanceRangeinstances || (group.instanceCount > manifest.instances.size() - group.firstInstance);
+		
+		if (invalidGroupInstanceRange)
 		{
 			Invalid(
 			    std::format(
@@ -238,8 +255,11 @@ namespace Assets
 		for (std::size_t cameraIndex = 0; cameraIndex < manifest.cameras.size(); ++cameraIndex)
 		{
 			const CookedSceneCameraRecord& camera = manifest.cameras[cameraIndex];
-			if (!HasTerminatedName(camera.name) || camera.projectionKind != CookedSceneCameraProjectionKind::Perspective || camera.sourceNodeIndex == (std::numeric_limits<std::uint32_t>::max)()
-			    || camera.flags != 0u)
+			const bool bInvalidCameraRecordprojectionKind = !HasTerminatedName(camera.name) || camera.projectionKind != CookedSceneCameraProjectionKind::Perspective;
+			const bool bInvalidCameraRecordNodeIndex = bInvalidCameraRecordprojectionKind || (camera.sourceNodeIndex == (std::numeric_limits<std::uint32_t>::max)());
+			const bool invalidCameraRecord = bInvalidCameraRecordNodeIndex || (camera.flags != 0u);
+			
+			if (invalidCameraRecord)
 			{
 				Invalid(std::format("Cooked scene camera {} has an unsupported or invalid projection", cameraIndex));
 			}
@@ -251,9 +271,13 @@ namespace Assets
 		for (std::size_t lightIndex = 0; lightIndex < manifest.lights.size(); ++lightIndex)
 		{
 			const CookedSceneLightRecord& light = manifest.lights[lightIndex];
-			if (!HasTerminatedName(light.name)
-			    || (light.kind != CookedSceneLightKind::Directional && light.kind != CookedSceneLightKind::Point && light.kind != CookedSceneLightKind::Spot
-			        && light.kind != CookedSceneLightKind::Rect))
+			const bool bInvalidLightRecordname = !HasTerminatedName(light.name);
+			const bool bInvalidLightRecordkind = light.kind != CookedSceneLightKind::Directional && light.kind != CookedSceneLightKind::Point;
+			const bool bInvalidLightRecordkind2 = bInvalidLightRecordkind && (light.kind != CookedSceneLightKind::Spot);
+			const bool bInvalidLightRecordkind3 = bInvalidLightRecordkind2 && (light.kind != CookedSceneLightKind::Rect);
+			const bool invalidLightRecord = bInvalidLightRecordname || bInvalidLightRecordkind3;
+			
+			if (invalidLightRecord)
 			{
 				Invalid(std::format("Cooked scene light {} uses an unknown light kind", lightIndex));
 			}

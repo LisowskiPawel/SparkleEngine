@@ -1,7 +1,7 @@
 #include "PCH.h"
-#include "Scene/GpuScene/RenderGpuGeometryBuffers.h"
+#include "Scene/GpuScene/Geometry/RenderGpuGeometryBuffers.h"
 
-#include "Scene/GpuScene/RenderGpuGeometryState.h"
+#include "Scene/GpuScene/Geometry/RenderGpuGeometryState.h"
 
 RenderGpuGeometryBuffers::RenderGpuGeometryBuffers(RhiResourceService& resources) noexcept :
     m_resourceService(resources)

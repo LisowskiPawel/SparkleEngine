@@ -139,8 +139,10 @@ namespace SparkleLauncher
 
 	std::vector<MaintenanceCleanPathSpec> BuildActionCleanPaths(const ActionCleanTargetRequest& request)
 	{
-		const bool needsContent = IncludesBuildScope(request, "editor") || IncludesBuildScope(request, "game") || request.OperationId == "workspace.build.editor"
-		    || request.OperationId == "workspace.build.game" || request.OperationId.starts_with("cook.");
+		const bool bNeedsContentBuildScope = IncludesBuildScope(request, "editor") || IncludesBuildScope(request, "game");
+		const bool bNeedsContentOperationId = bNeedsContentBuildScope || (request.OperationId == "workspace.build.editor");
+		const bool bNeedsContentOperationId2 = bNeedsContentOperationId || (request.OperationId == "workspace.build.game");
+		const bool needsContent = bNeedsContentOperationId2 || (request.OperationId.starts_with("cook."));
 
 		if (needsContent && request.ContentId.empty())
 		{

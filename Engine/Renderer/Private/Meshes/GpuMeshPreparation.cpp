@@ -80,7 +80,10 @@ GpuMeshPreparedData GpuMeshPreparation::Build(const ImmutableRenderMeshHandle& s
 	BuildBoundsAndRayTracing(output);
 	BuildSkinInfluences(output);
 	BuildMorphTargets(output);
-	if (output.RayTracingVertices.empty() || output.RayTracingIndices.size() < 3u || output.GpuSkinInfluences.size() != output.RayTracingVertices.size())
+	const bool bPreparedSkinningTracingIndices = output.RayTracingVertices.empty() || output.RayTracingIndices.size() < 3u;
+	const bool invalidPreparedSkinning = bPreparedSkinningTracingIndices || (output.GpuSkinInfluences.size() != output.RayTracingVertices.size());
+	
+	if (invalidPreparedSkinning)
 	{
 		throw Diagnostics::Error("GPU mesh preparation produced incomplete geometry.");
 	}

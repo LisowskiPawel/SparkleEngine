@@ -93,36 +93,45 @@ void DrawTitleBarWindowControls(Window* window) noexcept
 	}
 
 	ImGui::SameLine(0.0f, style.ItemSpacing.x);
-	if (DrawTitleBarButton(
-	        "##MinimizeWindow",
-	        ImVec2(buttonWidth, buttonHeight),
-	        SparkleUiPalette::TitleBarControlBackground(),
-	        SparkleUiPalette::TitleBarControlBackgroundHovered(),
-	        SparkleUiPalette::TitleBarControlBackgroundActive()))
+
+	const bool minimizeRequested = DrawTitleBarButton(
+	    "##MinimizeWindow",
+	    ImVec2(buttonWidth, buttonHeight),
+	    SparkleUiPalette::TitleBarControlBackground(),
+	    SparkleUiPalette::TitleBarControlBackgroundHovered(),
+	    SparkleUiPalette::TitleBarControlBackgroundActive());
+
+	if (minimizeRequested)
 	{
 		window->Minimize();
 	}
 	DrawMinimizeIcon();
 
 	ImGui::SameLine(0.0f, style.ItemSpacing.x);
-	if (DrawTitleBarButton(
-	        "##ToggleMaximizeWindow",
-	        ImVec2(buttonWidth, buttonHeight),
-	        SparkleUiPalette::TitleBarControlBackground(),
-	        SparkleUiPalette::TitleBarControlBackgroundHovered(),
-	        SparkleUiPalette::TitleBarControlBackgroundActive()))
+
+	const bool maximizeRequested = DrawTitleBarButton(
+	    "##ToggleMaximizeWindow",
+	    ImVec2(buttonWidth, buttonHeight),
+	    SparkleUiPalette::TitleBarControlBackground(),
+	    SparkleUiPalette::TitleBarControlBackgroundHovered(),
+	    SparkleUiPalette::TitleBarControlBackgroundActive());
+
+	if (maximizeRequested)
 	{
 		window->ToggleMaximizeRestore();
 	}
 	DrawMaximizeIcon(*window);
 
 	ImGui::SameLine(0.0f, style.ItemSpacing.x);
-	if (DrawTitleBarButton(
-	        "##CloseWindow",
-	        ImVec2(buttonWidth, buttonHeight),
-	        SparkleUiPalette::DangerBackground(),
-	        SparkleUiPalette::DangerBackgroundHovered(),
-	        SparkleUiPalette::DangerBackgroundActive()))
+
+	const bool closeRequested = DrawTitleBarButton(
+	    "##CloseWindow",
+	    ImVec2(buttonWidth, buttonHeight),
+	    SparkleUiPalette::DangerBackground(),
+	    SparkleUiPalette::DangerBackgroundHovered(),
+	    SparkleUiPalette::DangerBackgroundActive());
+
+	if (closeRequested)
 	{
 		window->RequestClose();
 	}

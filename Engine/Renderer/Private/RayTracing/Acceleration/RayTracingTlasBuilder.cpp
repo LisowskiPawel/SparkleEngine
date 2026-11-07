@@ -191,7 +191,9 @@ void RayTracingTlasBuilder::PrepareBuild(BuildState& state) noexcept
 		Diagnostics::Fatal(g_rayTracingTlasBuilderLogger, __FILE__, __LINE__, "TLAS instance-buffer allocation failed.");
 	}
 
-	const bool canRefit = !state.Instances.empty() && m_resourcesAllowUpdate && m_builtInstanceCount == state.Instances.size() && state.PrebuildInfo.UpdateScratchDataSizeInBytes > 0;
+	const bool bCanRefitAllowUpdate = !state.Instances.empty() && m_resourcesAllowUpdate;
+	const bool bCanRefitInstances = bCanRefitAllowUpdate && (m_builtInstanceCount == state.Instances.size());
+	const bool canRefit = bCanRefitInstances && (state.PrebuildInfo.UpdateScratchDataSizeInBytes > 0);
 
 	state.Mode = canRefit ? ERhiTlasBuildMode::Update : (HasFlag(state.RequestedFlags, ERhiTlasBuildFlags::AllowUpdate) ? ERhiTlasBuildMode::BuildAllowUpdate : ERhiTlasBuildMode::Build);
 

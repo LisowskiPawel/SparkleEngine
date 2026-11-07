@@ -2,7 +2,6 @@
 
 #include <imgui.h>
 
-#include <algorithm>
 #include <cstddef>
 #include <cfloat>
 #include <cstdint>
@@ -22,17 +21,9 @@ namespace RenderingSettingsUi
 	bool BeginSettingsTable(const char* id);
 	void BeginSettingsRow(const char* label);
 
-	template <typename OnChanged> void DrawBooleanRow(const char* id, const char* label, bool value, OnChanged&& onChanged)
-	{
-		BeginSettingsRow(label);
-
-		ImGui::TableSetColumnIndex(1);
-		bool updatedValue = value;
-		if (ImGui::Checkbox(id, &updatedValue))
-		{
-			onChanged(updatedValue);
-		}
-	}
+	bool DrawBooleanRow(const char* id, const char* label, bool& value);
+	bool DrawUnsignedIntSliderRow(const char* id, const char* label, std::uint32_t& value, std::uint32_t minValue, std::uint32_t maxValue);
+	bool DrawFloatInputRow(const char* id, const char* label, float& value, float step = 1.0f, float stepFast = 10.0f, const char* format = "%.3f");
 
 	template <typename ValueType, std::size_t OptionCount, typename OnChanged>
 	void DrawComboOptionRow(const char* id, const char* label, ValueType value, const ComboOption<ValueType> (&options)[OptionCount], OnChanged&& onChanged)
@@ -66,34 +57,6 @@ namespace RenderingSettingsUi
 				}
 			}
 			ImGui::EndCombo();
-		}
-	}
-
-	template <typename OnChanged> void DrawUnsignedIntSliderRow(const char* id, const char* label, std::uint32_t value, std::uint32_t minValue, std::uint32_t maxValue, OnChanged&& onChanged)
-	{
-		BeginSettingsRow(label);
-
-		ImGui::TableSetColumnIndex(1);
-		ImGui::SetNextItemWidth(-FLT_MIN);
-		int updatedValue = static_cast<int>(value);
-		const int minInt = static_cast<int>(minValue);
-		const int maxInt = static_cast<int>(maxValue);
-		if (ImGui::SliderInt(id, &updatedValue, minInt, maxInt))
-		{
-			onChanged(static_cast<std::uint32_t>(updatedValue));
-		}
-	}
-
-	template <typename OnChanged> void DrawFloatInputRow(const char* id, const char* label, float value, OnChanged&& onChanged, float step = 1.0f, float stepFast = 10.0f, const char* format = "%.3f")
-	{
-		BeginSettingsRow(label);
-
-		ImGui::TableSetColumnIndex(1);
-		ImGui::SetNextItemWidth(-FLT_MIN);
-		float updatedValue = value;
-		if (ImGui::InputFloat(id, &updatedValue, step, stepFast, format))
-		{
-			onChanged(updatedValue);
 		}
 	}
 }

@@ -28,8 +28,11 @@ namespace SparkleLauncher
 			}
 			return true;
 		}
-		if (plan.Request.GpuCrashMode != RhiGpuCrashMode::Aftermath || !HasBuildSources(plan.Request.WorkspaceRoot) || plan.Request.CaptureProvider != ExternalCaptureProvider::None
-		    || plan.Request.ProductProfile.starts_with("Debug"))
+		const bool bAftermathRequested = plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath;
+		const bool bSourceBuildAvailable = bAftermathRequested && HasBuildSources(plan.Request.WorkspaceRoot);
+		const bool bCaptureCompatible = bSourceBuildAvailable && plan.Request.CaptureProvider == ExternalCaptureProvider::None;
+		const bool bGpuCrashLaunchSupported = bCaptureCompatible && !plan.Request.ProductProfile.starts_with("Debug");
+		if (!bGpuCrashLaunchSupported)
 		{
 			plan.ReadinessMessages.emplace_back("Aftermath requires a Development/Shipping diagnostic product and a separate launch from frame capture.");
 			return false;
@@ -39,6 +42,7 @@ namespace SparkleLauncher
 			plan.ReadinessMessages.emplace_back("Provide the exact absolute shader-export.json path returned by the diagnostic shader cook.");
 			return false;
 		}
+
 		std::error_code error;
 		if (!std::filesystem::is_regular_file(plan.Request.ShaderExportPath, error) || error)
 		{
@@ -60,7 +64,12 @@ namespace SparkleLauncher
 
 	std::string ReadGpuCrashState(const std::filesystem::path& manifestPath, std::string_view sessionId, std::uint32_t childPid, std::string* verifiedSnapshot)
 	{
-		if (!manifestPath.is_absolute() || manifestPath.filename() != "incident.json" || manifestPath.native().starts_with(L"\\\\") || !Identifiers::IsUuidV4String(sessionId) || childPid == 0)
+		const bool bInvalidIncidentIdentityfilename = !manifestPath.is_absolute() || manifestPath.filename() != "incident.json";
+		const bool bInvalidIncidentIdentitynative = bInvalidIncidentIdentityfilename || (manifestPath.native().starts_with(L"\\\\"));
+		const bool bIncidentIdentityIdentifiers = bInvalidIncidentIdentitynative || (!Identifiers::IsUuidV4String(sessionId));
+		const bool invalidIncidentIdentity = bIncidentIdentityIdentifiers || (childPid == 0);
+		
+		if (invalidIncidentIdentity)
 		{
 			return {};
 		}
@@ -76,13 +85,20 @@ namespace SparkleLauncher
 				break;
 			}
 		}
+
 		std::string json;
 		std::string error;
 		std::string identity;
 		std::string state;
 		std::uint32_t pid = 0;
-		if (!Files::TryReadAllText(manifestPath, json, error, 32u * 1024u * 1024u) || !Json::TryReadStringProperty(json, "incidentId", identity) || identity != sessionId
-		    || !Json::TryReadUnsignedIntegerProperty(json, "childPid", pid) || pid != childPid || !Json::TryReadStringProperty(json, "state", state))
+		const bool receiptRead = Files::TryReadAllText(manifestPath, json, error, 32u * 1024u * 1024u);
+		const bool identityRead = receiptRead && Json::TryReadStringProperty(json, "incidentId", identity);
+		const bool identityMatches = identityRead && identity == sessionId;
+		const bool pidRead = identityMatches && Json::TryReadUnsignedIntegerProperty(json, "childPid", pid);
+		const bool pidMatches = pidRead && pid == childPid;
+		const bool stateRead = pidMatches && Json::TryReadStringProperty(json, "state", state);
+
+		if (!stateRead)
 		{
 			return {};
 		}
@@ -114,6 +130,7 @@ namespace SparkleLauncher
 				{
 					return "Incomplete or process unavailable; last state " + state;
 				}
+
 				const DWORD observation = WaitForSingleObject(child, 0);
 				CloseHandle(child);
 				if (observation == WAIT_OBJECT_0)
@@ -145,18 +162,30 @@ namespace SparkleLauncher
 		}
 		Hash::Sha256Digest hash;
 		std::string executableHash;
-		if (!Json::TryReadStringProperty(json, "executableSha256", executableHash) || !Hash::TrySha256File(expected.ExecutablePath, hash, error) || executableHash != Hash::Sha256ToHex(hash))
+		const bool expectedHashRead = Json::TryReadStringProperty(json, "executableSha256", executableHash);
+		const bool executableHashed = expectedHashRead && Hash::TrySha256File(expected.ExecutablePath, hash, error);
+		const bool executableMatches = executableHashed && executableHash == Hash::Sha256ToHex(hash);
+
+		if (!executableMatches)
 		{
 			error = "Child GPU crash identity does not match the selected executable.";
 			return Process::ChildReadinessDecision::Rejected;
 		}
+
 		std::string_view candidate;
 		std::string actualProfile;
 		std::string actualApi;
 		std::string actualExport;
-		if (!Json::TryReadObjectProperty(json, "candidate", candidate) || !Json::TryReadStringProperty(candidate, "profile", actualProfile) || actualProfile != expected.Profile
-		    || !Json::TryReadStringProperty(candidate, "graphicsApi", actualApi) || !Strings::EqualsIgnoreCase(actualApi, expected.GraphicsApi)
-		    || !Json::TryReadStringProperty(candidate, "shaderExportSha256", actualExport) || !Hash::TrySha256File(expected.ShaderExportPath, hash, error) || actualExport != Hash::Sha256ToHex(hash))
+		const bool candidateRead = Json::TryReadObjectProperty(json, "candidate", candidate);
+		const bool profileRead = candidateRead && Json::TryReadStringProperty(candidate, "profile", actualProfile);
+		const bool profileMatches = profileRead && actualProfile == expected.Profile;
+		const bool apiRead = profileMatches && Json::TryReadStringProperty(candidate, "graphicsApi", actualApi);
+		const bool apiMatches = apiRead && Strings::EqualsIgnoreCase(actualApi, expected.GraphicsApi);
+		const bool exportHashRead = apiMatches && Json::TryReadStringProperty(candidate, "shaderExportSha256", actualExport);
+		const bool exportHashed = exportHashRead && Hash::TrySha256File(expected.ShaderExportPath, hash, error);
+		const bool exportMatches = exportHashed && actualExport == Hash::Sha256ToHex(hash);
+
+		if (!exportMatches)
 		{
 			error = "Child session belongs to another profile/API or shader export.";
 			return Process::ChildReadinessDecision::Rejected;

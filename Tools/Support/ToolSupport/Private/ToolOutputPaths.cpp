@@ -22,8 +22,10 @@ namespace SparkleTools
 
 	ToolOutputPaths ResolveToolOutputPaths(const std::filesystem::path& workspaceRoot, std::string_view variant)
 	{
-		if (variant == "." || variant == ".."
-		    || std::ranges::any_of(variant, [](unsigned char character) { return !std::isalnum(character) && character != '-' && character != '_' && character != '.'; }))
+		const bool reservedVariantName = variant == "." || variant == "..";
+		const bool invalidVariantCharacter = !reservedVariantName && std::ranges::any_of(variant, [](unsigned char character) { return !std::isalnum(character) && character != '-' && character != '_' && character != '.'; });
+		
+		if (reservedVariantName || invalidVariantCharacter)
 		{
 			throw Diagnostics::Error("Invalid artifact variant.");
 		}

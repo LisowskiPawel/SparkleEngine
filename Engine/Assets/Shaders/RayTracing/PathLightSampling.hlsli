@@ -179,7 +179,11 @@ namespace PathLightSampling
 		const RayTracingEvaluatedTriangle sampledTriangle = EvaluateRayTracingTriangle(instanceId, primitiveIndex, barycentrics12);
 		const float3 positionObject = InterpolateRayTracingPosition(sampledTriangle);
 		const float3 samplePosition = RayEndpoints::TransformPosition(positionObject, emissiveTriangle.Mesh.WorldMatrix);
-		if (!PassesRayTracingMaterialAlpha(emissiveTriangle.Material, InterpolateRayTracingTexCoord0(sampledTriangle), InterpolateRayTracingColor(sampledTriangle)))
+		const float2 sampledTexCoord = InterpolateRayTracingTexCoord0(sampledTriangle);
+		const float4 sampledColor = InterpolateRayTracingColor(sampledTriangle);
+		const bool sampledAlphaAccepted = PassesRayTracingMaterialAlpha(emissiveTriangle.Material, sampledTexCoord, sampledColor);
+		
+		if (!sampledAlphaAccepted)
 		{
 			return (LightSampling::DirectLightSample)0;
 		}

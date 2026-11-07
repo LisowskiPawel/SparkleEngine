@@ -152,7 +152,11 @@ RhiOwnedResourceHandle D3D12PtlasServices::CreatePtlasBuffer(const RhiPtlasBuild
 RhiOwnedResourceHandle D3D12PtlasServices::CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName)
 {
 	const RhiRayTracingCapabilities capabilities = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !capabilities.Groups.Ptlas.Supported || !RhiContract::IsPtlasOperationPackUsable(operationPack))
+	const bool bOperationPackmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
+	const bool bInvalidOperationPackSupported = bOperationPackmemoryAllocator || (!capabilities.Groups.Ptlas.Supported);
+	const bool invalidPtlasOperationPack = bInvalidOperationPackSupported || (!RhiContract::IsPtlasOperationPackUsable(operationPack));
+	
+	if (invalidPtlasOperationPack)
 	{
 		return {};
 	}

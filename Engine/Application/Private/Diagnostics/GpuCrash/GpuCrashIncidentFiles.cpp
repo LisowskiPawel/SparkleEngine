@@ -32,7 +32,10 @@ namespace GpuCrashIncidentFiles
 		{
 			current /= component;
 			const DWORD attributes = GetFileAttributesW(current.c_str());
-			if (attributes == INVALID_FILE_ATTRIBUTES && GetLastError() != ERROR_FILE_NOT_FOUND && GetLastError() != ERROR_PATH_NOT_FOUND)
+			const bool bAttributeLookupFailedLastError = attributes == INVALID_FILE_ATTRIBUTES && GetLastError() != ERROR_FILE_NOT_FOUND;
+			const bool attributeLookupFailed = bAttributeLookupFailedLastError && (GetLastError() != ERROR_PATH_NOT_FOUND);
+			
+			if (attributeLookupFailed)
 			{
 				throw Diagnostics::Error("Cannot inspect GPU crash storage.");
 			}

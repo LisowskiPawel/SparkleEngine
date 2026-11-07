@@ -12,7 +12,7 @@ void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, Edit
 	bool hasSky = current.has_value();
 	const bool skyMatches = EditorWidgets::MatchesDetailsFilter(filter, "Sky", "override default texture color brightness enabled visible");
 	const bool skyOpen = skyMatches && EditorWidgets::DrawDetailsCategory("Sky");
-	
+
 	if (skyOpen)
 	{
 		const bool defaultHasSky = false;
@@ -35,7 +35,7 @@ void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, Edit
 	bool changed = false;
 	const bool renderingMatches = EditorWidgets::MatchesDetailsFilter(filter, "Rendering", "sky texture color brightness enabled visible");
 	const bool renderingOpen = renderingMatches && EditorWidgets::DrawDetailsCategory("Rendering");
-	
+
 	if (renderingOpen)
 	{
 		const bool defaultEnabled = true;
@@ -47,12 +47,14 @@ void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, Edit
 			after.color = {(std::max) (0.0f, color[0]), (std::max) (0.0f, color[1]), (std::max) (0.0f, color[2])};
 			changed = true;
 		}
+
 		const float defaultBrightness = 1.0f;
 		if (EditorWidgets::EditDetailsFloat("Brightness", after.brightness, 0.01f, 0.0f, 0.0f, "%.3f", &defaultBrightness))
 		{
 			after.brightness = (std::max) (0.0f, after.brightness);
 			changed = true;
 		}
+
 		const std::string defaultTexture;
 		if (EditorWidgets::EditDetailsText("Texture", after.skyTexture.texturePath, &defaultTexture))
 		{

@@ -148,7 +148,7 @@ void SettingsPanel::DrawToolbar(bool disableInteraction)
 	ImGui::SetNextItemWidth(-FLT_MIN);
 	const std::string searchHint = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Search, "Search");
 	const bool filterEdited = ImGui::InputTextWithHint("##SettingsSearch", searchHint.c_str(), filterBuffer.data(), filterBuffer.size());
-	
+
 	if (filterEdited)
 	{
 		m_filterText = filterBuffer.data();

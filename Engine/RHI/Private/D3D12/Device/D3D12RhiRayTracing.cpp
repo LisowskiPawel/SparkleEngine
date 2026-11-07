@@ -91,7 +91,8 @@ void D3D12Rhi::SelectRayTracingTlasProvider() noexcept
 	}
 
 	const RhiPtlasCapabilities& ptlas = m_rayTracingCapabilities.Groups.Ptlas;
-	const bool ptlasSelected = CVarRayTracingPreferPtlas.Get() && ptlas.Supported && ptlas.SupportsDescriptorAccess;
+	const bool bPtlasSelectedSupported = CVarRayTracingPreferPtlas.Get() && ptlas.Supported;
+	const bool ptlasSelected = bPtlasSelectedSupported && (ptlas.SupportsDescriptorAccess);
 
 	provider = RhiRayTracingProviderCapabilities{
 	    .SelectedTlasProvider = ptlasSelected ? ERhiRayTracingTlasProvider::Ptlas : ERhiRayTracingTlasProvider::Tlas,

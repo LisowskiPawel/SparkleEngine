@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Scene/GpuScene/RenderGpuGeometryState.h"
+#include "Scene/GpuScene/Geometry/RenderGpuGeometryState.h"
 
 #include "Core/Public/Math/MathUtils.h"
 #include "Scene/Preparation/PreparedRenderScene.h"

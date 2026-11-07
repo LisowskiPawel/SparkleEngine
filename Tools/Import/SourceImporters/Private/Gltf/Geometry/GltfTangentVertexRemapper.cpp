@@ -22,7 +22,9 @@ GltfTangentVertexRemapper::GltfTangentVertexRemapper(ImportedMeshGeometry& geome
     m_variantsBySourceVertex(geometry.vertices.size()),
     m_hasSkinInfluences(geometry.HasSkinInfluences())
 {
-	if (frames.baseCornerTangents.size() != geometry.indices.size() || frames.morphCornerTangentDeltas.size() != geometry.deformation.morphTargets.size())
+	const bool tangentFrameCountsMismatch = frames.baseCornerTangents.size() != geometry.indices.size() || frames.morphCornerTangentDeltas.size() != geometry.deformation.morphTargets.size();
+	
+	if (tangentFrameCountsMismatch)
 	{
 		throw Diagnostics::Error("Generated glTF tangent frames do not match the geometry and deformation streams.");
 	}
@@ -76,7 +78,9 @@ bool GltfTangentVertexRemapper::FrameSetsMatch(std::uint32_t remappedVertexIndex
 	}
 	for (std::size_t targetIndex = 0; targetIndex < m_morphTargets.size(); ++targetIndex)
 	{
-		if (!TangentsMatch(m_morphTargets[targetIndex].deltas[remappedVertexIndex].tangent, m_frames.morphCornerTangentDeltas[targetIndex][cornerIndex]))
+		const bool morphTangentMismatch = !TangentsMatch(m_morphTargets[targetIndex].deltas[remappedVertexIndex].tangent, m_frames.morphCornerTangentDeltas[targetIndex][cornerIndex]);
+		
+		if (morphTangentMismatch)
 		{
 			return false;
 		}

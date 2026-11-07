@@ -14,7 +14,7 @@ ComPtr<ID3D12CommandQueue> D3D12Rhi::CreateInterposerGraphicsQueue() noexcept
 	{
 		ComPtr<ID3D12Device10> externalDevice;
 		const bool deviceUpgraded = TryUpgradeInterposerInterface(ERhiInterposerInterfaceKind::GraphicsDevice, m_device.Get(), IID_PPV_ARGS(externalDevice.ReleaseAndGetAddressOf()));
-		
+
 		if (deviceUpgraded)
 		{
 			ComPtr<ID3D12CommandQueue> externalQueue;
@@ -23,7 +23,7 @@ ComPtr<ID3D12CommandQueue> D3D12Rhi::CreateInterposerGraphicsQueue() noexcept
 			{
 				ComPtr<ID3D12CommandQueue> nativeQueue;
 				const bool queueResolved = TryResolveNativeInterface(ERhiInterposerInterfaceKind::GraphicsQueue, externalQueue.Get(), IID_PPV_ARGS(nativeQueue.ReleaseAndGetAddressOf()));
-				
+
 				if (queueResolved)
 				{
 					m_externalDevice = std::move(externalDevice);
@@ -76,7 +76,10 @@ bool D3D12Rhi::TryResolveNativeInterface(ERhiInterposerInterfaceKind kind, IUnkn
 
 	*nativeInterface = nullptr;
 	void* resolved = nullptr;
-	if (!m_interposerHooks.ResolveNativeInterface(kind, externalInterface, &resolved, m_interposerHooks.UserData) || resolved == nullptr)
+	const bool interfaceResolved = m_interposerHooks.ResolveNativeInterface(kind, externalInterface, &resolved, m_interposerHooks.UserData);
+	const bool interfaceAvailable = interfaceResolved && resolved != nullptr;
+	
+	if (!interfaceAvailable)
 	{
 		return false;
 	}

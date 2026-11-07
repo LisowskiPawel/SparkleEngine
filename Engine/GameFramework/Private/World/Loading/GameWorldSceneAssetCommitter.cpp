@@ -1,6 +1,6 @@
 #include "PCH.h"
 
-#include "World/GameWorldSceneAssetCommitter.h"
+#include "World/Loading/GameWorldSceneAssetCommitter.h"
 
 #include "Assets/SceneAssetPayload.h"
 #include "Core/Public/Diagnostics/Verify.h"
@@ -16,8 +16,14 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_sceneAssetCommitterLogger, "GameFramework.S
 
 static void ValidatePayloadContents(const SceneAssetPayload& sceneAssetPayload)
 {
-	if (!sceneAssetPayload.HasMeshes() && sceneAssetPayload.cameras.empty() && sceneAssetPayload.lights.empty() && sceneAssetPayload.skeletons.empty() && sceneAssetPayload.animations.empty()
-	    && sceneAssetPayload.materials.empty() && sceneAssetPayload.materialVariants.empty())
+	const bool bScenePayloadEmptycameras = !sceneAssetPayload.HasMeshes() && sceneAssetPayload.cameras.empty();
+	const bool bScenePayloadEmptylights = bScenePayloadEmptycameras && (sceneAssetPayload.lights.empty());
+	const bool bScenePayloadEmptyskeletons = bScenePayloadEmptylights && (sceneAssetPayload.skeletons.empty());
+	const bool bScenePayloadEmptyanimations = bScenePayloadEmptyskeletons && (sceneAssetPayload.animations.empty());
+	const bool bScenePayloadEmptymaterials = bScenePayloadEmptyanimations && (sceneAssetPayload.materials.empty());
+	const bool scenePayloadEmpty = bScenePayloadEmptymaterials && (sceneAssetPayload.materialVariants.empty());
+	
+	if (scenePayloadEmpty)
 	{
 		Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "A validated scene asset payload contains no resources or entities.");
 	}

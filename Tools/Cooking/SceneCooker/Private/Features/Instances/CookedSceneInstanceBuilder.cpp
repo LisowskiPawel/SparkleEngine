@@ -135,8 +135,10 @@ void CookedSceneInstanceBuilder::BuildInstances(const SourceImportOutput& import
 
 		const std::uint32_t materialAssetIndex = CookedSceneInstanceTranslation::ResolveMaterialAssetIndex(importedGroup, build);
 
-		if (!importedGroup.HasInstanceRange() || importedGroup.firstInstanceIndex >= build.manifest.instances.size()
-		    || importedGroup.instanceCount > build.manifest.instances.size() - importedGroup.firstInstanceIndex)
+		const bool bInvalidGroupRangeinstancesSize = !importedGroup.HasInstanceRange() || importedGroup.firstInstanceIndex >= build.manifest.instances.size();
+		const bool invalidInstanceGroupRange = bInvalidGroupRangeinstancesSize || (importedGroup.instanceCount > build.manifest.instances.size() - importedGroup.firstInstanceIndex);
+		
+		if (invalidInstanceGroupRange)
 		{
 			throw Diagnostics::Error("Imported mesh instance group references an instance range outside the cooked instance set.");
 		}

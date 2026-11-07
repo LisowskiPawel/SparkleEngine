@@ -18,7 +18,11 @@ static void ValidateHeader(const CookedTextureAssetHeader& header, const std::fi
 		throw Diagnostics::Error("Invalid cooked texture asset header for '" + resolvedPath.string() + "'");
 	}
 
-	if (header.width == 0 || header.height == 0 || header.mipCount == 0 || PixelFormatFromSerializedTextureFormat(header.format) == PixelFormat::Unknown)
+	const bool bInvalidTextureHeaderheight = header.width == 0 || header.height == 0;
+	const bool bInvalidTextureHeadermipCount = bInvalidTextureHeaderheight || (header.mipCount == 0);
+	const bool invalidTextureHeader = bInvalidTextureHeadermipCount || (PixelFormatFromSerializedTextureFormat(header.format) == PixelFormat::Unknown);
+	
+	if (invalidTextureHeader)
 	{
 		throw Diagnostics::Error("Cooked texture asset header has invalid dimensions, mip count, or format for '" + resolvedPath.string() + "'");
 	}
@@ -28,7 +32,9 @@ static void ValidateHeader(const CookedTextureAssetHeader& header, const std::fi
 		throw Diagnostics::Error("Cooked texture asset header has an invalid array size for '" + resolvedPath.string() + "'");
 	}
 
-	if (header.GetDimension() != TextureResourceDimension::Texture2D && header.GetDimension() != TextureResourceDimension::TextureCube)
+	const bool unsupportedTextureDimension = header.GetDimension() != TextureResourceDimension::Texture2D && header.GetDimension() != TextureResourceDimension::TextureCube;
+	
+	if (unsupportedTextureDimension)
 	{
 		throw Diagnostics::Error("Cooked texture asset header has an invalid texture dimension for '" + resolvedPath.string() + "'");
 	}

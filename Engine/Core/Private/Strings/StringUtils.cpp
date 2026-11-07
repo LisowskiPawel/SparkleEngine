@@ -195,13 +195,21 @@ namespace Strings
 	bool TryParseBool(std::string_view str, bool& outValue)
 	{
 		const std::string_view trimmed = TrimAsciiWhitespace(str);
-		if (EqualsIgnoreCase(trimmed, "true") || trimmed == "1" || EqualsIgnoreCase(trimmed, "yes") || EqualsIgnoreCase(trimmed, "on"))
+		const bool bIsTrueTokentrimmed = EqualsIgnoreCase(trimmed, "true") || trimmed == "1";
+		const bool bIsTrueTokenIgnoreCase = bIsTrueTokentrimmed || (EqualsIgnoreCase(trimmed, "yes"));
+		const bool isTrueToken = bIsTrueTokenIgnoreCase || (EqualsIgnoreCase(trimmed, "on"));
+		
+		if (isTrueToken)
 		{
 			outValue = true;
 			return true;
 		}
 
-		if (EqualsIgnoreCase(trimmed, "false") || trimmed == "0" || EqualsIgnoreCase(trimmed, "no") || EqualsIgnoreCase(trimmed, "off"))
+		const bool bIsFalseTokentrimmed = EqualsIgnoreCase(trimmed, "false") || trimmed == "0";
+		const bool bIsFalseTokenIgnoreCase = bIsFalseTokentrimmed || (EqualsIgnoreCase(trimmed, "no"));
+		const bool isFalseToken = bIsFalseTokenIgnoreCase || (EqualsIgnoreCase(trimmed, "off"));
+		
+		if (isFalseToken)
 		{
 			outValue = false;
 			return true;

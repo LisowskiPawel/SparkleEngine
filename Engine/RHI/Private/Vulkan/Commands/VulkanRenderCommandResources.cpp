@@ -23,7 +23,11 @@ void VulkanRenderCommandList::CopyResource(RhiResourceHandle destinationResource
 
 	VulkanRecordingResource destination;
 	VulkanRecordingResource source;
-	if (!ResolveResource(destinationResource, destination) || !ResolveResource(sourceResource, source) || destination.ResourceKind != source.ResourceKind)
+	const bool destinationResolved = ResolveResource(destinationResource, destination);
+	const bool sourceResolved = destinationResolved && ResolveResource(sourceResource, source);
+	const bool resourceKindsMatch = sourceResolved && destination.ResourceKind == source.ResourceKind;
+
+	if (!resourceKindsMatch)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan CopyResource requires two resolved resources of the same kind.");
 	}
@@ -34,6 +38,7 @@ void VulkanRenderCommandList::CopyResource(RhiResourceHandle destinationResource
 		{
 			Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan CopyResource requires equal non-empty buffer sizes.");
 		}
+
 		const VkBufferCopy copyRegion{.srcOffset = 0, .dstOffset = 0, .size = destination.ResourceSizeInBytes};
 		vkCmdCopyBuffer(m_commandBuffer, source.Buffer, destination.Buffer, 1, &copyRegion);
 		return;
@@ -135,7 +140,9 @@ void VulkanRenderCommandList::RecordBufferTransition(
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan buffer transition references incomplete recording metadata.");
 	}
-	if (!VulkanTypeConversions::IsBufferResourceStateSupported(before) || !VulkanTypeConversions::IsBufferResourceStateSupported(after))
+	const bool unsupportedBufferTransition = !VulkanTypeConversions::IsBufferResourceStateSupported(before) || !VulkanTypeConversions::IsBufferResourceStateSupported(after);
+	
+	if (unsupportedBufferTransition)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan buffer transition uses an image-only resource state.");
 	}
@@ -179,7 +186,9 @@ void VulkanRenderCommandList::RecordImageTransition(
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan image transition references incomplete recording metadata.");
 	}
-	if (!VulkanTypeConversions::IsImageResourceStateSupported(before) || !VulkanTypeConversions::IsImageResourceStateSupported(after))
+	const bool unsupportedImageTransition = !VulkanTypeConversions::IsImageResourceStateSupported(before) || !VulkanTypeConversions::IsImageResourceStateSupported(after);
+	
+	if (unsupportedImageTransition)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan image transition uses a buffer-only resource state.");
 	}
@@ -299,8 +308,12 @@ VkBuffer VulkanRenderCommandList::ResolveBuffer(RhiGpuVirtualAddress gpuAddress)
 
 bool VulkanRenderCommandList::ResolveResource(RhiResourceHandle resource, VulkanRecordingResource& outResource) const noexcept
 {
-	if (m_memoryAllocator != nullptr
-	    && (m_memoryAllocator->ResolveRecordingResource(resource, outResource) || (IsCoordinatorRecording() && m_memoryAllocator->ResolveCoordinatorRecordingResource(resource, outResource))))
+	const bool recordingResourceResolved = m_memoryAllocator != nullptr && m_memoryAllocator->ResolveRecordingResource(resource, outResource);
+	const bool bLookupAvailablememoryAllocator = !recordingResourceResolved && m_memoryAllocator != nullptr;
+	const bool coordinatorLookupAvailable = bLookupAvailablememoryAllocator && (IsCoordinatorRecording());
+	const bool coordinatorResourceResolved = coordinatorLookupAvailable && m_memoryAllocator->ResolveCoordinatorRecordingResource(resource, outResource);
+
+	if (recordingResourceResolved || coordinatorResourceResolved)
 	{
 		return true;
 	}
@@ -325,7 +338,9 @@ VulkanRenderCommandList::BufferBinding VulkanRenderCommandList::ResolveBufferBin
 	}
 
 	BufferBinding binding;
-	if (m_recordingUploadPage != nullptr && m_recordingUploadPage->Resolve(gpuAddress, binding.Buffer, binding.Offset, binding.Range))
+	const bool uploadAddressResolved = m_recordingUploadPage != nullptr && m_recordingUploadPage->Resolve(gpuAddress, binding.Buffer, binding.Offset, binding.Range);
+	
+	if (uploadAddressResolved)
 	{
 		return binding;
 	}
@@ -337,6 +352,7 @@ VulkanRenderCommandList::BufferBinding VulkanRenderCommandList::ResolveBufferBin
 		{
 			Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan buffer binding resolved incomplete address metadata.");
 		}
+
 		const VkDeviceSize offset = gpuAddress - resource.BufferDeviceAddress;
 		if (offset >= resource.ResourceSizeInBytes)
 		{

@@ -129,4 +129,4 @@ Shader source ownership was reconciled on 2026-10-25. The existing reservoir sco
 - [`DirectLightSampling.hlsli`](../../../../../../../../Engine/Assets/Shaders/Lighting/DirectLightSampling.hlsli)
 - [`DirectShadowSignal.cpp`](../../../../../../../../Engine/Renderer/Private/Passes/Lighting/Shadows/DirectShadowSignal.cpp)
 - [`SurfaceLighting.hlsli`](../../../../../../../../Engine/Assets/Shaders/Lighting/SurfaceLighting.hlsli) and [`BRDF.hlsli`](../../../../../../../../Engine/Assets/Shaders/BRDF/BRDF.hlsli)
-- [`RenderGpuLightingPayloadBuilder.cpp`](../../../../../../../../Engine/Renderer/Private/Scene/GpuScene/RenderGpuLightingPayloadBuilder.cpp)
+- [`RenderGpuLightingPayloadBuilder.cpp`](../../../../../../../../Engine/Renderer/Private/Scene/GpuScene/Lighting/RenderGpuLightingPayloadBuilder.cpp)

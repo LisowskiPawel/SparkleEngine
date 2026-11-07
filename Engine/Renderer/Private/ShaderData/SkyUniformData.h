@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Scene/Preparation/RenderSkyData.h"
+#include "Scene/Preparation/Lighting/RenderSkyData.h"
 
 #include <DirectXMath.h>
 

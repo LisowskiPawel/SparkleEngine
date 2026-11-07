@@ -291,7 +291,10 @@ namespace SparkleLauncher
 		{
 			const BuildWorkspaceProcessStep& step = processSteps[stepIndex];
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, processSteps.size());
-			if (!RunBuildWorkspaceStep(plan, step, processRunner, outputCallback, operation) || !ValidateBuildWorkspaceStep(plan, step, operation))
+			const bool stepExecuted = RunBuildWorkspaceStep(plan, step, processRunner, outputCallback, operation);
+			const bool stepValidated = stepExecuted && ValidateBuildWorkspaceStep(plan, step, operation);
+
+			if (!stepValidated)
 			{
 				return operation;
 			}

@@ -116,9 +116,13 @@ TextureDimension TextureCookRequestBuilder::ResolveTextureDimension(TextureGroup
 
 std::filesystem::path TextureCookRequestBuilder::NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath)
 {
-	if (const auto resolvedPath = SparkleTools::ResolveSourceAssetPath(sourceTexturePath, SparkleTools::SourceAssetType::Texture))
 	{
-		return *resolvedPath;
+		const auto resolvedPath = SparkleTools::ResolveSourceAssetPath(sourceTexturePath, SparkleTools::SourceAssetType::Texture);
+
+		if (resolvedPath)
+		{
+			return *resolvedPath;
+		}
 	}
 
 	throw Diagnostics::Error("Unable to resolve source texture path '" + sourceTexturePath.string() + "'.");
@@ -165,9 +169,13 @@ std::filesystem::path TextureCookRequestBuilder::BuildTextureOutputPath(const Te
 		return *outputPath;
 	}
 
-	if (const auto outputPath = BuildTextureOutputPathForRoot(request.sourcePath, SparkleTools::ImportedTextureCacheRoot(), "Imported", variantSuffix))
 	{
-		return *outputPath;
+		const auto outputPath = BuildTextureOutputPathForRoot(request.sourcePath, SparkleTools::ImportedTextureCacheRoot(), "Imported", variantSuffix);
+
+		if (outputPath)
+		{
+			return *outputPath;
+		}
 	}
 
 	throw Diagnostics::Error(

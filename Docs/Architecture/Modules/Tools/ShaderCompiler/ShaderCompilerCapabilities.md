@@ -8,7 +8,7 @@
 
 **Scope:** authored-language and stage coverage, compiler targets/backends, typed registration, source dependency planning, reflection/ABI validation, cooked publication, diagnostics, recook, and runtime loading
 
-**Owners:** `Tools/Shaders` for offline compilation/publication, `Engine/Assets/Shaders` for engine shader sources, `Engine/Renderer/ShaderRegistrations` for Renderer global-program registration, and `Engine/Renderer` for runtime materialization/consumption
+**Owners:** `Tools/Shaders` for offline compilation/publication, `Engine/Assets/Shaders` for engine shader sources, Renderer `Private/**/*ShaderRegistration*.cpp` capability files for Renderer global-program registration, and `Engine/Renderer` for runtime materialization/consumption
 
 **Current system architecture:** [Shader System](../../../CrossModule/ShaderSystem/ShaderSystemDesign.md)
 
@@ -135,7 +135,7 @@ The current Renderer contract target contains 32 typed global shader registratio
 | `SHD-CAT-11` | Intersection | 0 | RHI/composition vocabulary exists; no registered procedural intersection program. |
 | `SHD-CAT-12` | Callable | 0 | RHI/composition vocabulary exists; no registered callable program. |
 
-Counts are a dated inventory, not an architectural target. Recount from `Engine/Renderer/ShaderRegistrations` whenever registrations change.
+Counts are a dated inventory, not an architectural target. Recount from Renderer `Private/**/*ShaderRegistration*.cpp` capability files whenever registrations change.
 
 ## Registration And Contract Validation
 
@@ -248,7 +248,7 @@ This describes what the validation target is designed to exercise. It was **not 
 - Slang backend: `Tools/Shaders/ShaderCompiler/Private/Backend/Slang`.
 - Existing CLI validation: `Tools/Shaders/ShaderCompiler/ValidateShaderCompilerCli.cmake`.
 - Engine sources: `Engine/Assets/Shaders`.
-- Renderer registrations: `Engine/Renderer/ShaderRegistrations`.
+- Renderer registrations: Renderer `Private/**/*ShaderRegistration*.cpp` capability files.
 - Renderer runtime shader ownership/materialization: `Engine/Renderer/Private/Pipeline` and `Engine/Renderer/Private/RayTracing`.
 - Editor/application recook ownership: `Engine/Application/Private/ShaderRecook` and the corresponding Editor consumers.
 - Build membership: root CMake options plus `Tools/Shaders/ShaderContracts/CMakeLists.txt`, `Tools/Shaders/ShaderCompiler/CMakeLists.txt`, `Engine/Renderer/CMakeLists.txt`, and `Engine/Application/CMakeLists.txt`.

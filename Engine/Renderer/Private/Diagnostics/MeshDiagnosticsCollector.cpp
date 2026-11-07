@@ -9,7 +9,7 @@
 #include "Scene/Meshes/Mesh.h"
 #include "Scene/Meshes/MeshData.h"
 #include "View/MeshInstanceBatchBuilder.h"
-#include "Scene/Preparation/RenderMeshClassificationConversion.h"
+#include "Scene/Preparation/Geometry/RenderMeshClassificationConversion.h"
 #include "Scene/RenderScene.h"
 
 #include <algorithm>

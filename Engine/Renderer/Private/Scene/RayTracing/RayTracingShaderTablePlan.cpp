@@ -18,8 +18,12 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 	instances.reserve(primitives.size());
 	for (const RenderPrimitive& primitive : primitives)
 	{
-		if (!primitive.GpuMeshResident || !primitive.GpuMesh || !primitive.Static.Material.IsValid() || primitive.Static.Material.GetGeneration() != materials.Generation
-		    || primitive.Static.Material.GetIndex() >= materials.Values.size())
+		const bool bInvalidTracingMaterialGpuMesh = !primitive.GpuMeshResident || !primitive.GpuMesh;
+		const bool bTracingMaterialMaterialValid = bInvalidTracingMaterialGpuMesh || (!primitive.Static.Material.IsValid());
+		const bool bInvalidTracingMaterialGeneration = bTracingMaterialMaterialValid || (primitive.Static.Material.GetGeneration() != materials.Generation);
+		const bool invalidRayTracingMaterial = bInvalidTracingMaterialGeneration || (primitive.Static.Material.GetIndex() >= materials.Values.size());
+		
+		if (invalidRayTracingMaterial)
 		{
 			continue;
 		}
@@ -58,7 +62,9 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 			for (std::uint32_t rayContribution = 0u; rayContribution < geometryMultiplier; ++rayContribution)
 			{
 				std::uint32_t recordIndex = 0u;
-				if (!ComputeCheckedRecordIndex(rayContribution, geometryMultiplier, geometryIndex, instance.InstanceContribution, static_cast<std::uint32_t>(nextInstanceContribution), recordIndex))
+				const bool recordIndexComputed = ComputeCheckedRecordIndex(rayContribution, geometryMultiplier, geometryIndex, instance.InstanceContribution, static_cast<std::uint32_t>(nextInstanceContribution), recordIndex);
+				
+				if (!recordIndexComputed)
 				{
 					Diagnostics::Fatal(g_rayTracingShaderTablePlanLogger, __FILE__, __LINE__, "Ray-tracing shader-table record formula overflowed or escaped the planned table.");
 				}
@@ -81,8 +87,9 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 		const RayTracingShaderTableInstancePlan& incoming = instances[index];
 		const RayTracingShaderTableInstancePlan& current = m_instances[index];
 
-		geometryChanged = incoming.GpuSceneSlot != current.GpuSceneSlot || incoming.InstanceContribution != current.InstanceContribution || incoming.GeometryCount != current.GeometryCount
-		    || incoming.GeometryIdentity != current.GeometryIdentity;
+		const bool bBindingChanged = incoming.GpuSceneSlot != current.GpuSceneSlot || incoming.InstanceContribution != current.InstanceContribution;
+		const bool bShapeChanged = incoming.GeometryCount != current.GeometryCount || incoming.GeometryIdentity != current.GeometryIdentity;
+		geometryChanged = bBindingChanged || bShapeChanged;
 
 		materialSemanticsChanged = materialSemanticsChanged || incoming.HitGroup != current.HitGroup;
 	}
@@ -153,7 +160,11 @@ bool RayTracingShaderTablePlan::Validate() const noexcept
 	{
 		const RayTracingShaderTableRecordPlan& record = m_records[index];
 		std::uint32_t computedIndex = 0u;
-		if (record.RecordIndex != index || !ComputeRecordIndex(record.GpuSceneSlot, record.GeometryIndex, record.RayType, computedIndex) || computedIndex != record.RecordIndex)
+		const bool recordOrdered = record.RecordIndex == index;
+		const bool recordIndexComputed = recordOrdered && ComputeRecordIndex(record.GpuSceneSlot, record.GeometryIndex, record.RayType, computedIndex);
+		const bool recordIndexMatches = recordIndexComputed && computedIndex == record.RecordIndex;
+		
+		if (!recordIndexMatches)
 		{
 			return false;
 		}

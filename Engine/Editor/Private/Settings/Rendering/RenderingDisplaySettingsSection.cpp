@@ -25,7 +25,7 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 
 	const bool displayMatches = RenderingSettingsUi::MatchesFilter(filterText, "Display", "display vsync high-performance adapter gpu back buffer format sdr srgb linear output encoding");
 	const bool displayOpen = displayMatches && RenderingSettingsUi::BeginSettingsCategory("Display");
-	
+
 	if (!displayOpen)
 	{
 		return;
@@ -33,7 +33,12 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 
 	if (RenderingSettingsUi::BeginSettingsTable("##RenderingDisplaySettings"))
 	{
-		RenderingSettingsUi::DrawBooleanRow("##VSync", "VSync", settings.VSync, [&settingsController](bool value) { settingsController.SetVSync(value); });
+		bool vSync = settings.VSync;
+		const bool vSyncEdited = RenderingSettingsUi::DrawBooleanRow("##VSync", "VSync", vSync);
+		if (vSyncEdited)
+		{
+			settingsController.SetVSync(vSync);
+		}
 
 		RenderingSettingsUi::DrawComboOptionRow(
 		    "##BackBufferFormat",
@@ -42,11 +47,12 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 		    backBufferFormatOptions,
 		    [&settingsController](PixelFormat value) { settingsController.SetBackBufferFormat(value); });
 
-		RenderingSettingsUi::DrawBooleanRow(
-		    "##PreferHighPerformanceAdapter",
-		    "Prefer high-performance adapter",
-		    settings.PreferHighPerformanceAdapter,
-		    [&settingsController](bool value) { settingsController.SetPreferHighPerformanceAdapter(value); });
+		bool preferHighPerformanceAdapter = settings.PreferHighPerformanceAdapter;
+		const bool preferHighPerformanceAdapterEdited = RenderingSettingsUi::DrawBooleanRow("##PreferHighPerformanceAdapter", "Prefer high-performance adapter", preferHighPerformanceAdapter);
+		if (preferHighPerformanceAdapterEdited)
+		{
+			settingsController.SetPreferHighPerformanceAdapter(preferHighPerformanceAdapter);
+		}
 
 		RenderingSettingsUi::DrawComboOptionRow(
 		    "##OutputColorEncoding",

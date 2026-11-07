@@ -35,11 +35,11 @@ namespace ECS
 				continue;
 			}
 
-			const bool added = m_registry.Add(entity, AnimationState{.Resource = resource, .AnimationAssetId = animationAssetId}) && m_registry.Add(entity, Name{name})
-			    && m_registry.Add(
+			const bool bAddedAdd = m_registry.Add(entity, AnimationState{.Resource = resource, .AnimationAssetId = animationAssetId}) && m_registry.Add(entity, Name{name});
+			const bool bAddedAdd2 = bAddedAdd && (m_registry.Add(
 			        entity,
-			        AuthoredIdentity{.SourceAssetId = animationAssetId, .SourceInstanceId = sourceInstanceId, .SourceObjectId = sourceAnimationIndex, .Kind = AuthoredObjectKind::Animation})
-			    && m_registry.Add(entity, EditorMetadata{});
+			        AuthoredIdentity{.SourceAssetId = animationAssetId, .SourceInstanceId = sourceInstanceId, .SourceObjectId = sourceAnimationIndex, .Kind = AuthoredObjectKind::Animation}));
+			const bool added = bAddedAdd2 && (m_registry.Add(entity, EditorMetadata{}));
 
 			if (!added)
 			{

@@ -9,9 +9,10 @@
 ## General Naming Baseline
 
 - Types, functions, and methods use `UpperCamelCase`.
-- Local variables and parameters use `lowerCamelCase`.
+- Local variables and parameters use `lowerCamelCase`, except boolean variables use `b` followed by `UpperCamelCase` (for example `bSourceReady`). Apply the boolean convention consistently to locals, parameters, fields, constants and atomic boolean state. Preserve an existing scope prefix before `b`, for example `m_bReady` or `s_bInitialized`; do not introduce a scope prefix where the owner does not use one. External serialized/native spellings retain their contract names; update owned producers and consumers together when a source identifier changes.
 - Private data members use `m_` plus descriptive lower camel case.
-- Booleans describe a state or predicate and follow configured boolean naming checks.
+- Booleans describe a state or predicate. The `b` prefix follows [Epic's boolean naming convention](https://dev.epicgames.com/documentation/en-us/unreal-engine/epic-cplusplus-coding-standard-for-unreal-engine); Sparkle keeps its existing scope-prefix conventions. The prefix is a type-specific rule; the configured camel-back local naming check also accepts it.
+- Use the surrounding function, type and capability folder as naming context. Prefer a short domain fact such as `bPackAvailable` over repeating the entire operation name. Avoid generated `Evaluation`, numbered stages and repeated context in intermediate names. Expand a name only when it resolves a real ambiguity; do not shorten it into an unexplained abbreviation.
 - Enum values use `UpperCamelCase`.
 - Macros are reserved for build/export/preprocessor needs and follow existing module spelling.
 - Acronyms use canonical Sparkle casing such as `Rhi`, `Gpu`, and `Io` in C++ names unless an external ABI requires exact spelling.

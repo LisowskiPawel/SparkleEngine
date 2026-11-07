@@ -25,7 +25,10 @@ ScopedGpuScope PassExecutionDiagnostics::BeginPassGpuScope() noexcept
 
 ScopedGpuScope PassExecutionDiagnostics::BeginGpuScope(std::string_view label) noexcept
 {
-	if (m_frameDiagnostics == nullptr || m_commands == nullptr || CVarRendererDiagnosticMarkerVerbosity.Get() != RendererDiagnosticMarkerVerbosity::Detailed)
+	const bool bDetailedMarkersDisabledcommands = m_frameDiagnostics == nullptr || m_commands == nullptr;
+	const bool detailedMarkersDisabled = bDetailedMarkersDisabledcommands || (CVarRendererDiagnosticMarkerVerbosity.Get() != RendererDiagnosticMarkerVerbosity::Detailed);
+	
+	if (detailedMarkersDisabled)
 	{
 		return {};
 	}

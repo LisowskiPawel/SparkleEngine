@@ -61,8 +61,13 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' has no content root.", pack.id));
 	}
-	if (pack.requiredRelativePath.empty() || pack.requiredRelativePath == "." || pack.requiredRelativePath.has_root_name() || pack.requiredRelativePath.has_root_directory()
-	    || pack.requiredRelativePath.is_absolute() || pack.requiredRelativePath.generic_string().starts_with(".."))
+	const bool bInvalidPackPathRelativePath = pack.requiredRelativePath.empty() || pack.requiredRelativePath == ".";
+	const bool bInvalidPackPathRelativePath2 = bInvalidPackPathRelativePath || (pack.requiredRelativePath.has_root_name());
+	const bool bInvalidPackPathRelativePath3 = bInvalidPackPathRelativePath2 || (pack.requiredRelativePath.has_root_directory());
+	const bool bInvalidPackPathRelativePath4 = bInvalidPackPathRelativePath3 || (pack.requiredRelativePath.is_absolute());
+	const bool invalidRequiredPackPath = bInvalidPackPathRelativePath4 || (pack.requiredRelativePath.generic_string().starts_with(".."));
+	
+	if (invalidRequiredPackPath)
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' has an unsafe required path.", pack.id));
 	}
@@ -71,11 +76,41 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' must be declared external.", pack.id));
 	}
 	const bool filesPayload = !pack.sourceFilesManifestPath.empty();
-	if (pack.downloadSupported && (pack.sourceUrl.empty() || pack.extractionPath.empty() || (!filesPayload && (pack.archiveName.empty() || pack.archiveBytes == 0 || pack.archiveSha256.empty()))))
+	const bool bDescriptionIncompleteSupported = pack.downloadSupported;
+	const bool bDescriptionIncompletesourceUrl = bDescriptionIncompleteSupported && (pack.sourceUrl.empty());
+	const bool bDescriptionIncompleteGuardPath = bDescriptionIncompleteSupported && !bDescriptionIncompletesourceUrl;
+	const bool bDescriptionIncompletePath = bDescriptionIncompleteGuardPath && (pack.extractionPath.empty());
+	const bool bDescriptionIncompletePath2 = bDescriptionIncompletesourceUrl || bDescriptionIncompletePath;
+	const bool bDescriptionIncompleteGuardSha256 = bDescriptionIncompleteSupported && !bDescriptionIncompletePath2;
+	const bool bDescriptionIncompletefilesPayload = bDescriptionIncompleteGuardSha256 && (!filesPayload);
+	const bool bDescriptionIncompletearchiveName = bDescriptionIncompletefilesPayload && (pack.archiveName.empty());
+	const bool bDescriptionIncompleteGuardBytes = bDescriptionIncompletefilesPayload && !bDescriptionIncompletearchiveName;
+	const bool bDescriptionIncompletearchiveBytes = bDescriptionIncompleteGuardBytes && (pack.archiveBytes == 0);
+	const bool bDescriptionIncompletearchiveBytes2 = bDescriptionIncompletearchiveName || bDescriptionIncompletearchiveBytes;
+	const bool bDescriptionIncompleteGuardSha2562 = bDescriptionIncompletefilesPayload && !bDescriptionIncompletearchiveBytes2;
+	const bool bDescriptionIncompleteSha256 = bDescriptionIncompleteGuardSha2562 && (pack.archiveSha256.empty());
+	const bool bDescriptionIncompleteSha2562 = bDescriptionIncompletearchiveBytes2 || bDescriptionIncompleteSha256;
+	const bool bDescriptionIncompleteSha2563 = bDescriptionIncompletefilesPayload && bDescriptionIncompleteSha2562;
+	const bool bDescriptionIncompleteSha2564 = bDescriptionIncompletePath2 || bDescriptionIncompleteSha2563;
+	const bool downloadDescriptionIncomplete = bDescriptionIncompleteSupported && bDescriptionIncompleteSha2564;
+	
+	if (downloadDescriptionIncomplete)
 	{
 		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' has incomplete acquisition metadata.", pack.id));
 	}
-	if (filesPayload && (!pack.downloadSupported || !pack.archiveName.empty() || pack.archiveBytes != 0 || !pack.archiveSha256.empty()))
+	const bool bDescriptionInvalidSupported = filesPayload && (!pack.downloadSupported);
+	const bool bDescriptionInvalidGuardName = filesPayload && !bDescriptionInvalidSupported;
+	const bool bDescriptionInvalidarchiveName = bDescriptionInvalidGuardName && (!pack.archiveName.empty());
+	const bool bDescriptionInvalidarchiveName2 = bDescriptionInvalidSupported || bDescriptionInvalidarchiveName;
+	const bool bDescriptionInvalidGuardBytes = filesPayload && !bDescriptionInvalidarchiveName2;
+	const bool bDescriptionInvalidarchiveBytes = bDescriptionInvalidGuardBytes && (pack.archiveBytes != 0);
+	const bool bDescriptionInvalidarchiveBytes2 = bDescriptionInvalidarchiveName2 || bDescriptionInvalidarchiveBytes;
+	const bool bDescriptionInvalidGuardSha256 = filesPayload && !bDescriptionInvalidarchiveBytes2;
+	const bool bFilesDescriptionInvalidSha256 = bDescriptionInvalidGuardSha256 && (!pack.archiveSha256.empty());
+	const bool bFilesDescriptionInvalidSha2562 = bDescriptionInvalidarchiveBytes2 || bFilesDescriptionInvalidSha256;
+	const bool filesPayloadDescriptionInvalid = filesPayload && bFilesDescriptionInvalidSha2562;
+	
+	if (filesPayloadDescriptionInvalid)
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' must choose either a file manifest or an archive payload.", pack.id));
 	}
@@ -120,8 +155,23 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 		throw Diagnostics::Error(std::format("Asset pack '{}' root must remain within its extraction root.", pack.id));
 	}
 	const std::filesystem::path archiveNamePath(pack.archiveName);
-	if (pack.downloadSupported && !filesPayload
-	    && (archiveNamePath == "." || archiveNamePath == ".." || archiveNamePath.has_root_name() || archiveNamePath.has_root_directory() || archiveNamePath.filename() != archiveNamePath))
+	const bool bInvalidArchiveNamefilesPayload = pack.downloadSupported && !filesPayload;
+	const bool bInvalidArchiveNameNamePath = bInvalidArchiveNamefilesPayload && (archiveNamePath == ".");
+	const bool bInvalidArchiveNameGuardNamePath = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNameNamePath;
+	const bool bInvalidArchiveNameNamePath2 = bInvalidArchiveNameGuardNamePath && (archiveNamePath == "..");
+	const bool bInvalidArchiveNameNamePath3 = bInvalidArchiveNameNamePath || bInvalidArchiveNameNamePath2;
+	const bool bInvalidArchiveNameGuardrootname = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNameNamePath3;
+	const bool bInvalidArchiveNamerootname = bInvalidArchiveNameGuardrootname && (archiveNamePath.has_root_name());
+	const bool bInvalidArchiveNamerootname2 = bInvalidArchiveNameNamePath3 || bInvalidArchiveNamerootname;
+	const bool bArchiveNameGuardrootdirectory = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNamerootname2;
+	const bool bInvalidArchiveNamerootdirectory = bArchiveNameGuardrootdirectory && (archiveNamePath.has_root_directory());
+	const bool bInvalidArchiveNamerootdirectory2 = bInvalidArchiveNamerootname2 || bInvalidArchiveNamerootdirectory;
+	const bool bInvalidArchiveNameGuardfilename = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNamerootdirectory2;
+	const bool bInvalidArchiveNamefilename = bInvalidArchiveNameGuardfilename && (archiveNamePath.filename() != archiveNamePath);
+	const bool bInvalidArchiveNamefilename2 = bInvalidArchiveNamerootdirectory2 || bInvalidArchiveNamefilename;
+	const bool invalidArchiveName = bInvalidArchiveNamefilesPayload && bInvalidArchiveNamefilename2;
+	
+	if (invalidArchiveName)
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' archive name must not contain a path.", pack.id));
 	}
@@ -153,7 +203,9 @@ static void ValidateExtractionRoots(const std::vector<const ProjectAssetPack*>& 
 		{
 			const ProjectAssetPack& left = *downloadablePacks[leftIndex];
 			const ProjectAssetPack& right = *downloadablePacks[rightIndex];
-			if (Paths::IsUnderRoot(left.extractionPath, right.extractionPath) || Paths::IsUnderRoot(right.extractionPath, left.extractionPath))
+			const bool extractionRootsOverlap = Paths::IsUnderRoot(left.extractionPath, right.extractionPath) || Paths::IsUnderRoot(right.extractionPath, left.extractionPath);
+			
+			if (extractionRootsOverlap)
 			{
 				throw Diagnostics::Error(std::format("Downloadable asset packs '{}' and '{}' have overlapping extraction roots.", left.id, right.id));
 			}

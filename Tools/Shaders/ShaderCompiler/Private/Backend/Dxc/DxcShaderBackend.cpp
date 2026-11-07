@@ -252,7 +252,7 @@ std::string DxcShaderBackend::ExtractPreprocessedSource(IDxcCompiler3& compiler,
 
 	Microsoft::WRL::ComPtr<IDxcResult> preprocessResult;
 	const HRESULT preprocessStatus = compiler.Compile(&sourceBuffer, preprocessArgs.data(), static_cast<UINT>(preprocessArgs.size()), nullptr, IID_PPV_ARGS(preprocessResult.ReleaseAndGetAddressOf()));
-	
+
 	if (FAILED(preprocessStatus) || !preprocessResult)
 	{
 		return {};
@@ -280,7 +280,10 @@ std::string DxcShaderBackend::ExtractDisassembly(IDxcUtils& utils, IDxcCompiler3
 	objectBuffer.Encoding = 0;
 
 	Microsoft::WRL::ComPtr<IDxcResult> disassemblyResult;
-	if (FAILED(compiler.Disassemble(&objectBuffer, IID_PPV_ARGS(disassemblyResult.ReleaseAndGetAddressOf()))) || !disassemblyResult)
+	const HRESULT disassemblyStatus = compiler.Disassemble(&objectBuffer, IID_PPV_ARGS(disassemblyResult.ReleaseAndGetAddressOf()));
+	const bool disassemblyAvailable = SUCCEEDED(disassemblyStatus) && disassemblyResult;
+	
+	if (!disassemblyAvailable)
 	{
 		return {};
 	}
@@ -299,7 +302,7 @@ std::string DxcShaderBackend::ExtractDisassembly(IDxcUtils& utils, IDxcCompiler3
 
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding> objectBlob;
 	const HRESULT blobStatus = utils.CreateBlobFromPinned(bytecode.data(), static_cast<UINT32>(bytecode.size()), 0, objectBlob.ReleaseAndGetAddressOf());
-	
+
 	if (FAILED(blobStatus) || !objectBlob)
 	{
 		return {};
@@ -359,22 +362,23 @@ void DxcShaderBackend::ExtractSymbols(IDxcResult& result, ShaderDebugArtifactSet
 	Microsoft::WRL::ComPtr<IDxcBlob> pdbBlob;
 	Microsoft::WRL::ComPtr<IDxcBlobUtf16> pdbNameBlob;
 	const HRESULT symbolStatus = result.GetOutput(DXC_OUT_PDB, IID_PPV_ARGS(pdbBlob.ReleaseAndGetAddressOf()), pdbNameBlob.ReleaseAndGetAddressOf());
-	
-	if (FAILED(symbolStatus) || !pdbBlob || pdbBlob->GetBufferSize() == 0 || !pdbNameBlob
-		    || pdbNameBlob->GetStringLength() == 0)
+
+	if (FAILED(symbolStatus) || !pdbBlob || pdbBlob->GetBufferSize() == 0 || !pdbNameBlob || pdbNameBlob->GetStringLength() == 0)
 	{
 		throw Diagnostics::Error("DXC did not return the requested full shader PDB and debug name.");
 	}
+
 	const auto* pdbBytes = static_cast<const std::uint8_t*>(pdbBlob->GetBufferPointer());
 	artifacts.Symbols.assign(pdbBytes, pdbBytes + pdbBlob->GetBufferSize());
 	artifacts.SymbolName = Strings::ToNarrow(std::wstring_view(pdbNameBlob->GetStringPointer(), pdbNameBlob->GetStringLength()));
 	Microsoft::WRL::ComPtr<IDxcBlob> hashBlob;
 	const HRESULT hashStatus = result.GetOutput(DXC_OUT_SHADER_HASH, IID_PPV_ARGS(hashBlob.ReleaseAndGetAddressOf()), nullptr);
-	
+
 	if (FAILED(hashStatus) || !hashBlob || hashBlob->GetBufferSize() != sizeof(DxcShaderHash))
 	{
 		throw Diagnostics::Error("DXC did not return the requested compiler shader hash.");
 	}
+
 	const auto* hashBytes = static_cast<const std::uint8_t*>(hashBlob->GetBufferPointer());
 	artifacts.CompilerLookupKey.assign(hashBytes, hashBytes + hashBlob->GetBufferSize());
 }

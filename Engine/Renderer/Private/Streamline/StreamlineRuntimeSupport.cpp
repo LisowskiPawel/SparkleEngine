@@ -217,7 +217,9 @@ private:
 	static void SetPresentationReady(bool ready, void*) noexcept
 	{
 		std::lock_guard lock(s_mutex);
-		s_presentationReady = !s_shuttingDown && s_initialized && s_deviceBound && ready;
+		const bool bRuntimeActive = !s_shuttingDown && s_initialized;
+		const bool bDeviceReady = bRuntimeActive && s_deviceBound;
+		s_presentationReady = bDeviceReady && ready;
 	}
 
 	static sl::PCLMarker ToPclMarker(ERhiFrameLatencyMarker marker) noexcept
@@ -287,8 +289,10 @@ private:
 	{
 		const RhiExternalFeatureInteropCapabilities& interop = capabilities.ExternalFeatureInterop;
 
-		const bool commonInterop = interop.ExposesNativeDevice && interop.ExposesNativeGraphicsQueue && interop.ExposesNativeGraphicsCommandList && interop.ExposesNativeResources
-		    && interop.SupportsExternalProviderEvaluation;
+		const bool bCommonInteropGraphicsQueue = interop.ExposesNativeDevice && interop.ExposesNativeGraphicsQueue;
+		const bool bCommonInteropCommandList = bCommonInteropGraphicsQueue && (interop.ExposesNativeGraphicsCommandList);
+		const bool bCommonInteropNativeResources = bCommonInteropCommandList && (interop.ExposesNativeResources);
+		const bool commonInterop = bCommonInteropNativeResources && (interop.SupportsExternalProviderEvaluation);
 
 		return capabilities.BackendApi == ERhiBackendApi::D3D12 && commonInterop && nativeInterop && HasAdapterLuid(interop.Adapter);
 	}

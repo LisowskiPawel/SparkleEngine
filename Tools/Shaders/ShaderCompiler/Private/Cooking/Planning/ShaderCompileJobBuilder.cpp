@@ -23,12 +23,9 @@
 #include <utility>
 #include <vector>
 
-namespace ShaderDescriptorBindings
+static auto GetDescriptorBindingIdentity(const PassParameterDesc* parameter) noexcept
 {
-	auto GetIdentity(const PassParameterDesc* parameter) noexcept
-	{
-		return std::tie(parameter->Name, parameter->Kind, parameter->ResourceDomain, parameter->Access);
-	}
+	return std::tie(parameter->Name, parameter->Kind, parameter->ResourceDomain, parameter->Access);
 }
 
 ShaderCompileJobBuilder::ShaderCompileJobBuilder(const ShaderContractCatalog& catalog)
@@ -43,8 +40,9 @@ ShaderCompileJobBuilder::ShaderCompileJobBuilder(const ShaderContractCatalog& ca
 			}
 		}
 	}
-	std::ranges::sort(m_descriptorBindings, {}, ShaderDescriptorBindings::GetIdentity);
-	const auto duplicates = std::ranges::unique(m_descriptorBindings, {}, ShaderDescriptorBindings::GetIdentity);
+
+	std::ranges::sort(m_descriptorBindings, {}, GetDescriptorBindingIdentity);
+	const auto duplicates = std::ranges::unique(m_descriptorBindings, {}, GetDescriptorBindingIdentity);
 	m_descriptorBindings.erase(duplicates.begin(), duplicates.end());
 }
 
@@ -115,6 +113,7 @@ ShaderCompileRequest ShaderCompileJobBuilder::BuildRequest(const ShaderCookSetti
 	{
 		request.RequiredFeatures |= ShaderCompileFeatureFlags::RayTracingPipeline;
 	}
+
 	request.ParameterStruct = shader.parameterStruct;
 	request.CaptureDebugArtifacts = settings.enableDebugInfo || !settings.debugArtifactDirectory.empty();
 	request.EnableDebugInfo = request.CaptureDebugArtifacts;
@@ -141,15 +140,17 @@ void ShaderCompileJobBuilder::AppendDescriptorBindingRemaps(const ShaderCookDesc
 		}
 		return;
 	}
+
 	for (const PassParameterDesc& parameter : shader.parameterLayout.GetParameters())
 	{
 		if (parameter.Kind == ShaderParameterSemanticKind::RenderTarget || parameter.Kind == ShaderParameterSemanticKind::DepthTarget)
 		{
 			continue;
 		}
-		const auto identity = ShaderDescriptorBindings::GetIdentity(&parameter);
-		const auto found = std::ranges::lower_bound(m_descriptorBindings, identity, {}, ShaderDescriptorBindings::GetIdentity);
-		if (found == m_descriptorBindings.end() || ShaderDescriptorBindings::GetIdentity(*found) != identity)
+
+		const auto identity = GetDescriptorBindingIdentity(&parameter);
+		const auto found = std::ranges::lower_bound(m_descriptorBindings, identity, {}, GetDescriptorBindingIdentity);
+		if (found == m_descriptorBindings.end() || GetDescriptorBindingIdentity(*found) != identity)
 		{
 			throw Diagnostics::Error(std::format("Shader parameter '{}' is missing from the global binding assignment.", parameter.Name));
 		}

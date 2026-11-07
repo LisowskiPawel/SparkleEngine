@@ -30,7 +30,12 @@ bool RayTracingBlasGeometryBuilder::IsSkinnedDraw(const MeshDraw& draw) noexcept
 
 void RayTracingBlasGeometryBuilder::ComputeSkinnedPositions(const PreparedRenderScene& preparedScene, const MeshDraw& draw, const GpuMesh& mesh, std::vector<DirectX::XMFLOAT3>& outPositions) noexcept
 {
-	if (!mesh.HasRayTracingHitData() || !mesh.HasSkinInfluences() || mesh.GetRayTracingHitVertices().size() != mesh.GetSkinInfluences().size() || preparedScene.jointMatrices.empty())
+	const bool hitDataPresent = mesh.HasRayTracingHitData();
+	const bool skinInfluencesPresent = hitDataPresent && mesh.HasSkinInfluences();
+	const bool skinInfluencesAligned = skinInfluencesPresent && mesh.GetRayTracingHitVertices().size() == mesh.GetSkinInfluences().size();
+	const bool jointMatricesPresent = skinInfluencesAligned && !preparedScene.jointMatrices.empty();
+
+	if (!jointMatricesPresent)
 	{
 		Diagnostics::Fatal(g_rayTracingBlasGeometryBuilderLogger, __FILE__, __LINE__, "Skinned BLAS input has incomplete hit, skin-influence, or joint-matrix data.");
 	}
@@ -111,9 +116,13 @@ void RayTracingBlasGeometryBuilder::ValidateMorphInputs(const PreparedRenderScen
 		return;
 	}
 
-	if (draw.Morph.VertexCount != mesh.GetVertexCount() || mesh.GetMorphTargetCount() != draw.Morph.TargetCount || draw.Morph.WeightOffset > preparedScene.morphWeights.size()
-	    || draw.Morph.TargetCount > preparedScene.morphWeights.size() - draw.Morph.WeightOffset
-	    || mesh.GetMorphTargetDeltas().size() != static_cast<std::size_t>(draw.Morph.TargetCount) * draw.Morph.VertexCount)
+	const bool vertexCountMatches = draw.Morph.VertexCount == mesh.GetVertexCount();
+	const bool targetCountMatches = vertexCountMatches && mesh.GetMorphTargetCount() == draw.Morph.TargetCount;
+	const bool weightOffsetValid = targetCountMatches && draw.Morph.WeightOffset <= preparedScene.morphWeights.size();
+	const bool weightCountValid = weightOffsetValid && draw.Morph.TargetCount <= preparedScene.morphWeights.size() - draw.Morph.WeightOffset;
+	const bool deltaCountMatches = weightCountValid && mesh.GetMorphTargetDeltas().size() == static_cast<std::size_t>(draw.Morph.TargetCount) * draw.Morph.VertexCount;
+
+	if (!deltaCountMatches)
 	{
 		Diagnostics::Fatal(g_rayTracingBlasGeometryBuilderLogger, __FILE__, __LINE__, "Skinned BLAS morph inputs do not match the mesh and render-scene ranges.");
 	}

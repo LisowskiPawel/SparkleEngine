@@ -204,7 +204,7 @@ private:
 		PoolTimingState& poolState = m_poolStates[GetPoolIndex(frameIndex, queueType)];
 		poolState.QueueType = queueType;
 		const HRESULT timestampStatus = m_rhi.GetCommandQueue(queueType)->GetTimestampFrequency(&poolState.TimestampFrequencyHz);
-		
+
 		if (FAILED(timestampStatus) || poolState.TimestampFrequencyHz == 0)
 		{
 			Diagnostics::Fatal(g_d3d12RenderDiagnosticsLogger, __FILE__, __LINE__, "D3D12 command queue does not expose a timestamp frequency.");

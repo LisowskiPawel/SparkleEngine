@@ -3,7 +3,7 @@
 #include "Scene/Preparation/RenderScenePreparation.h"
 
 #include "Scene/RenderScene.h"
-#include "Scene/Preparation/RenderDeformationPreparation.h"
+#include "Scene/Preparation/Deformation/RenderDeformationPreparation.h"
 #include "Scene/Preparation/RenderScenePreparationInputResolver.h"
 #include "Scene/Preparation/RenderScenePreparationMerger.h"
 #include "Scene/Preparation/RenderScenePreparationRun.h"

@@ -60,22 +60,19 @@ list(FILTER SPARKLE_RENDERER_PRIVATE_HEADERS EXCLUDE REGEX "/Private/Upscaling/N
 list(FILTER SPARKLE_RENDERER_PRIVATE_HEADERS EXCLUDE REGEX "/Private/RayReconstruction/NvidiaDlssRayReconstruction/")
 list(FILTER SPARKLE_RENDERER_PRIVATE_HEADERS EXCLUDE REGEX "/Private/Streamline/")
 
+# Registration descriptors live beside their shader capability; both descriptor targets
+# consume this one source set, and the runtime implementation must not compile it again.
 file(GLOB_RECURSE SPARKLE_RENDERER_SHADER_REGISTRATION_SOURCES CONFIGURE_DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/ShaderRegistrations/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/*ShaderRegistration*.cpp
 )
-
-file(GLOB_RECURSE SPARKLE_RENDERER_SHADER_REGISTRATION_HEADERS CONFIGURE_DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/ShaderRegistrations/*.h
-)
+list(REMOVE_ITEM SPARKLE_RENDERER_PRIVATE_SOURCES ${SPARKLE_RENDERER_SHADER_REGISTRATION_SOURCES})
 
 add_library(SparkleRendererShaderRegistrations OBJECT
     ${SPARKLE_RENDERER_SHADER_REGISTRATION_SOURCES}
-    ${SPARKLE_RENDERER_SHADER_REGISTRATION_HEADERS}
 )
 
 target_include_directories(SparkleRendererShaderRegistrations
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/ShaderRegistrations
         ${CMAKE_CURRENT_SOURCE_DIR}/Public
         ${CMAKE_CURRENT_SOURCE_DIR}/Private
         ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -97,12 +94,10 @@ sparkle_target_precompile_headers(SparkleRendererShaderRegistrations
 
 add_library(SparkleRendererShaderCookRegistrations OBJECT
     ${SPARKLE_RENDERER_SHADER_REGISTRATION_SOURCES}
-    ${SPARKLE_RENDERER_SHADER_REGISTRATION_HEADERS}
 )
 
 target_include_directories(SparkleRendererShaderCookRegistrations
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/ShaderRegistrations
         ${CMAKE_CURRENT_SOURCE_DIR}/Public
         ${CMAKE_CURRENT_SOURCE_DIR}/Private
         ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -245,7 +240,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${S
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/Upscaling/NvidiaDlss PREFIX "Private\\Upscaling\\NvidiaDlss" FILES ${SPARKLE_RENDERER_UPSCALING_NVIDIA_DLSS_SOURCES} ${SPARKLE_RENDERER_UPSCALING_NVIDIA_DLSS_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/RayReconstruction/NvidiaDlssRayReconstruction PREFIX "Private\\RayReconstruction\\NvidiaDlssRayReconstruction" FILES ${SPARKLE_RENDERER_NVIDIA_RAY_RECONSTRUCTION_SOURCES} ${SPARKLE_RENDERER_NVIDIA_RAY_RECONSTRUCTION_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/Streamline PREFIX "Private\\Streamline" FILES ${SPARKLE_RENDERER_STREAMLINE_SHARED_SOURCES} ${SPARKLE_RENDERER_STREAMLINE_SHARED_HEADERS})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/ShaderRegistrations PREFIX "ShaderRegistrations" FILES ${SPARKLE_RENDERER_SHADER_REGISTRATION_SOURCES} ${SPARKLE_RENDERER_SHADER_REGISTRATION_HEADERS})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${SPARKLE_RENDERER_SHADER_REGISTRATION_SOURCES})
 
 target_compile_definitions(SparkleRenderer PRIVATE SPARKLE_WITH_EXTERNAL_CAPTURE=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>)
 

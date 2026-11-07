@@ -452,7 +452,8 @@ namespace SparkleLauncher
 		const bool confirmed = CheckCookConfirmation(plan);
 		PopulateCookEffects(plan);
 
-		const bool inputsReady = contentAvailable && scopesSupported && toolsAvailable;
+		const bool bInputsReadyscopesSupported = contentAvailable && scopesSupported;
+		const bool inputsReady = bInputsReadyscopesSupported && (toolsAvailable);
 		if (inputsReady)
 		{
 			PopulateCookSteps(plan);

@@ -19,10 +19,18 @@ ReferencePathTracerArtifactWriteResult ReferencePathTracerArtifactWriter::Write(
 
 	std::string beautyHash;
 	std::string checkpointHash;
-	if (!Hash::TrySha256Hex(artifact.Beauty, beautyHash, result.ErrorMessage) || (artifact.Checkpoint && !Hash::TrySha256Hex(*artifact.Checkpoint, checkpointHash, result.ErrorMessage)))
+	const bool bEautyHashed = Hash::TrySha256Hex(artifact.Beauty, beautyHash, result.ErrorMessage);
+	const bool bCheckpointHashedCheckpoint = bEautyHashed && (!artifact.Checkpoint);
+	const bool bCheckpointHashedGuardErrorMessage = bEautyHashed && !bCheckpointHashedCheckpoint;
+	const bool bCheckpointHashedErrorMessage = bCheckpointHashedGuardErrorMessage && (Hash::TrySha256Hex(*artifact.Checkpoint, checkpointHash, result.ErrorMessage));
+	const bool bCheckpointHashedErrorMessage2 = bCheckpointHashedCheckpoint || bCheckpointHashedErrorMessage;
+	const bool checkpointHashed = bEautyHashed && bCheckpointHashedErrorMessage2;
+
+	if (!checkpointHashed)
 	{
 		return result;
 	}
+
 	const std::string manifest = ReferencePathTracerArtifactEncoding::BuildManifest(request, artifact, beautyHash, checkpointHash);
 
 	ArtifactBundlePublicationRequest publication{

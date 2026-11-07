@@ -31,7 +31,7 @@ RhiCaptureTicket D3D12CaptureService::BeginTextureReadback(const RhiTextureCaptu
 	const bool commandsStarted = bufferAllocated && BeginReadbackCommands(*pending);
 	const bool copyRecorded = commandsStarted && RecordReadbackCopy(*pending);
 	const bool readbackSubmitted = copyRecorded && SubmitReadback(*pending);
-	
+
 	if (!readbackSubmitted)
 	{
 		return {};

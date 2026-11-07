@@ -84,7 +84,11 @@ namespace GltfAnimationSampler
 	static float ReadInputTime(const cgltf_accessor* accessor, std::size_t index)
 	{
 		float time = 0.0f;
-		if (accessor == nullptr || index >= accessor->count || !cgltf_accessor_read_float(accessor, index, &time, 1) || !std::isfinite(time))
+		const bool timeElementAvailable = accessor != nullptr && index < accessor->count;
+		const bool timeDecoded = timeElementAvailable && cgltf_accessor_read_float(accessor, index, &time, 1);
+		const bool timeFinite = timeDecoded && std::isfinite(time);
+		
+		if (!timeFinite)
 		{
 			throw Diagnostics::Error(std::format("Cannot decode glTF animation input time {}.", index));
 		}
@@ -144,7 +148,9 @@ namespace GltfAnimationSampler
 			throw Diagnostics::Error("glTF animation contains a zero-length rotation keyframe.");
 		}
 		rotation = DirectX::XMQuaternionNormalize(rotation);
-		if (previousRotation != nullptr && DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(previousRotation), rotation)) < 0.0f)
+		const bool rotationSignNeedsFlip = previousRotation != nullptr && DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(previousRotation), rotation)) < 0.0f;
+		
+		if (rotationSignNeedsFlip)
 		{
 			rotation = DirectX::XMVectorNegate(rotation);
 			if (cubicSpline)

@@ -169,7 +169,9 @@ void FbxSkinImporter::CollectSkeletonTopology(const aiScene& scene, const aiNode
 	FbxSkinTranslation::CollectRequiredNodes(*state.SkeletonRoot, state.BoneNodes, requiredNodes);
 	state.JointNodes.reserve(requiredNodes.size());
 	FbxSkinTranslation::AppendRequiredNodesDepthFirst(*state.SkeletonRoot, requiredNodes, state.JointNodes);
-	if (state.JointNodes.empty() || state.JointNodes.size() > static_cast<std::size_t>((std::numeric_limits<std::uint16_t>::max)()) + 1u)
+	const bool invalidSkinJointCount = state.JointNodes.empty() || state.JointNodes.size() > static_cast<std::size_t>((std::numeric_limits<std::uint16_t>::max)()) + 1u;
+	
+	if (invalidSkinJointCount)
 	{
 		throw Diagnostics::Error(std::format("FBX mesh '{}' has a skeleton joint count outside the engine range: {}.", FbxSkinTranslation::MeshName(mesh), state.JointNodes.size()));
 	}

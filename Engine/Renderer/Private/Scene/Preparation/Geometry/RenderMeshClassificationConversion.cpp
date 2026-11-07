@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Scene/Preparation/RenderMeshClassificationConversion.h"
+#include "Scene/Preparation/Geometry/RenderMeshClassificationConversion.h"
 
 namespace RenderMeshClassificationConversion
 {

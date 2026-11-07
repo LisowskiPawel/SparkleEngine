@@ -40,7 +40,10 @@ namespace SparkleLauncher
 			refreshedContent = {projectName, projectName, content.RootPath};
 		}
 
-		const bool contentChanged = m_hasContent != hasRefreshedContent || (m_hasContent && !ContentMatches(m_content, refreshedContent));
+		const bool bContentChangedhasContent = m_hasContent != hasRefreshedContent;
+		const bool bContentChangedhasContent2 = !bContentChangedhasContent && (m_hasContent);
+		const bool bContentChangedContentMatches = bContentChangedhasContent2 && (!ContentMatches(m_content, refreshedContent));
+		const bool contentChanged = bContentChangedhasContent || bContentChangedContentMatches;
 		m_content = std::move(refreshedContent);
 		m_hasContent = hasRefreshedContent;
 

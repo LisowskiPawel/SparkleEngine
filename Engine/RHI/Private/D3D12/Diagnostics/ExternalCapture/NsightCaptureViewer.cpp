@@ -40,7 +40,7 @@ bool OpenNsightCaptureInDesktopShell(const wchar_t* path)
 		const bool folderAvailable = backgroundAvailable && SUCCEEDED(background.As(&folder));
 		const bool applicationAvailable = folderAvailable && SUCCEEDED(folder->get_Application(&application));
 		const bool shellAvailable = applicationAvailable && SUCCEEDED(application.As(&shell));
-		
+
 		if (shellAvailable)
 		{
 			if (BSTR filename = SysAllocString(path))

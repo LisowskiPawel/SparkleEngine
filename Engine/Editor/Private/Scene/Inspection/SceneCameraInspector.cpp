@@ -25,7 +25,7 @@ namespace SceneCameraInspector
 	{
 		const bool transformMatches = EditorWidgets::MatchesDetailsFilter(filter, "Transform", "location rotation scale position");
 		const bool transformOpen = transformMatches && EditorWidgets::DrawDetailsCategory("Transform");
-		
+
 		if (!transformOpen)
 		{
 			return;
@@ -33,7 +33,7 @@ namespace SceneCameraInspector
 
 		Transform after = camera.LocalTransform;
 
-		if (SceneTransformEditor::Edit(after, {0.0f, 0.0f, -4.0f}))
+		if (EditSceneTransform(after, {0.0f, 0.0f, -4.0f}))
 		{
 			(void) transactionHistory.Execute({0, SetLocalTransformCommand{camera.Entity, after}}, {0, SetLocalTransformCommand{camera.Entity, camera.LocalTransform}}, generation, "camera-transform");
 		}
@@ -43,7 +43,7 @@ namespace SceneCameraInspector
 	{
 		const bool cameraMatches = EditorWidgets::MatchesDetailsFilter(filter, "Camera", "field of view near clip far clip aspect ratio");
 		const bool cameraOpen = cameraMatches && EditorWidgets::DrawDetailsCategory("Camera");
-		
+
 		if (!cameraOpen)
 		{
 			return;
@@ -72,7 +72,7 @@ namespace SceneCameraInspector
 	{
 		const bool advancedMatches = EditorWidgets::MatchesDetailsFilter(filter, "Advanced", "visible visibility hidden");
 		const bool advancedOpen = advancedMatches && EditorWidgets::DrawDetailsCategory("Advanced", false);
-		
+
 		if (!advancedOpen)
 		{
 			return;

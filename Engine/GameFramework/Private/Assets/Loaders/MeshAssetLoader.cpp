@@ -29,7 +29,10 @@ namespace Assets
 		CookedAssetByteReader reader(bytes, budget);
 		const CookedMeshAssetHeader header = reader.Read<CookedMeshAssetHeader>();
 
-		if (!header.fileHeader.HasMagic(kCookedMeshAssetMagic) || header.vertexStride != sizeof(CookedMeshVertex) || header.indexStride != sizeof(std::uint32_t))
+		const bool bMeshHeaderInvalidvertexStride = !header.fileHeader.HasMagic(kCookedMeshAssetMagic) || header.vertexStride != sizeof(CookedMeshVertex);
+		const bool meshHeaderInvalid = bMeshHeaderInvalidvertexStride || (header.indexStride != sizeof(std::uint32_t));
+		
+		if (meshHeaderInvalid)
 		{
 			throw diagnostics.MakeError("header", "mesh magic and current vertex/index strides", "Invalid cooked mesh asset header; recook the asset");
 		}

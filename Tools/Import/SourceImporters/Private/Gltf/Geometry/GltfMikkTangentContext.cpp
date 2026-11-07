@@ -105,8 +105,16 @@ void GltfMikkTangentContext::ValidateTriangle(std::size_t faceIndex) const
 	const ImportedVertex& first = m_vertices[firstIndex];
 	const ImportedVertex& second = m_vertices[secondIndex];
 	const ImportedVertex& third = m_vertices[thirdIndex];
-	if (!IsFinite(first.position) || !IsFinite(second.position) || !IsFinite(third.position) || !IsFinite(first.normal) || !IsFinite(second.normal) || !IsFinite(third.normal) || !IsFinite(first.uv)
-	    || !IsFinite(second.uv) || !IsFinite(third.uv))
+	const bool bTriangleFrameNonfiniteposition = !IsFinite(first.position) || !IsFinite(second.position);
+	const bool bTriangleFrameNonfiniteposition2 = bTriangleFrameNonfiniteposition || (!IsFinite(third.position));
+	const bool bTriangleFrameNonfinitenormal = bTriangleFrameNonfiniteposition2 || (!IsFinite(first.normal));
+	const bool bTriangleFrameNonfinitenormal2 = bTriangleFrameNonfinitenormal || (!IsFinite(second.normal));
+	const bool bTriangleFrameNonfinitenormal3 = bTriangleFrameNonfinitenormal2 || (!IsFinite(third.normal));
+	const bool bTriangleFrameNonfiniteuv = bTriangleFrameNonfinitenormal3 || (!IsFinite(first.uv));
+	const bool bTriangleFrameNonfiniteuv2 = bTriangleFrameNonfiniteuv || (!IsFinite(second.uv));
+	const bool triangleFrameNonfinite = bTriangleFrameNonfiniteuv2 || (!IsFinite(third.uv));
+	
+	if (triangleFrameNonfinite)
 	{
 		throw Diagnostics::Error(std::format("Normal-mapped glTF triangle {} contains non-finite position, normal, or texture-coordinate data.", faceIndex));
 	}

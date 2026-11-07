@@ -106,7 +106,11 @@ ShaderSourceMountTable::ShaderSourceMountTable(const std::filesystem::path& engi
 
 std::string ShaderSourceMountTable::CanonicalizeVirtualPath(std::string_view path) const
 {
-	if (path.empty() || path.front() != '/' || path.find('\\') != std::string_view::npos || path.find(':') != std::string_view::npos)
+	const bool bInvalidSourcePathfront = path.empty() || path.front() != '/';
+	const bool bInvalidSourcePathfind = bInvalidSourcePathfront || (path.find('\\') != std::string_view::npos);
+	const bool invalidVirtualSourcePath = bInvalidSourcePathfind || (path.find(':') != std::string_view::npos);
+	
+	if (invalidVirtualSourcePath)
 	{
 		throw Diagnostics::Error(std::format("Shader source path '{}' is not a canonical virtual path.", path));
 	}
@@ -182,7 +186,12 @@ std::filesystem::path ShaderSourceMountTable::ResolvePhysicalPath(std::string_vi
 
 std::string ShaderSourceMountTable::CanonicalizeMountRoot(std::string_view root)
 {
-	if (root.empty() || root.front() != '/' || root.back() == '/' || root.find('\\') != std::string_view::npos || root.find("//") != std::string_view::npos)
+	const bool bInvalidVirtualRootfront = root.empty() || root.front() != '/';
+	const bool bInvalidVirtualRootback = bInvalidVirtualRootfront || (root.back() == '/');
+	const bool bInvalidVirtualRootfind = bInvalidVirtualRootback || (root.find('\\') != std::string_view::npos);
+	const bool invalidVirtualRoot = bInvalidVirtualRootfind || (root.find("//") != std::string_view::npos);
+	
+	if (invalidVirtualRoot)
 	{
 		throw Diagnostics::Error(std::format("Shader source mount '{}' is not canonical.", root));
 	}
@@ -203,8 +212,13 @@ const ShaderSourceMountTable::Mount& ShaderSourceMountTable::ResolveMount(std::s
 {
 	for (const Mount& mount : m_mounts)
 	{
-		if (canonicalVirtualPath == mount.VirtualRoot
-		    || (canonicalVirtualPath.starts_with(mount.VirtualRoot) && canonicalVirtualPath.size() > mount.VirtualRoot.size() && canonicalVirtualPath[mount.VirtualRoot.size()] == '/'))
+		const bool bMountContainsPathVirtualRoot = canonicalVirtualPath == mount.VirtualRoot;
+		const bool bMountContainsPathVirtualRoot2 = !bMountContainsPathVirtualRoot && (canonicalVirtualPath.starts_with(mount.VirtualRoot));
+		const bool bMountContainsPathVirtualRoot3 = bMountContainsPathVirtualRoot2 && (canonicalVirtualPath.size() > mount.VirtualRoot.size());
+		const bool bMountContainsPathVirtualRoot4 = bMountContainsPathVirtualRoot3 && (canonicalVirtualPath[mount.VirtualRoot.size()] == '/');
+		const bool mountContainsPath = bMountContainsPathVirtualRoot || bMountContainsPathVirtualRoot4;
+		
+		if (mountContainsPath)
 		{
 			return mount;
 		}

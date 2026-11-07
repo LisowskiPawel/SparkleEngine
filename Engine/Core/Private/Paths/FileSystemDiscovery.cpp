@@ -26,7 +26,9 @@ namespace Filesystem::Private
 
 	std::string InferProjectNameFromExecutableStem(std::string executableStem)
 	{
-		if (executableStem.size() > std::string_view("Editor").size() && PathFormatting::EndsWithIgnoreCase(executableStem, "Editor"))
+		const bool executableHasEditorSuffix = executableStem.size() > std::string_view("Editor").size() && PathFormatting::EndsWithIgnoreCase(executableStem, "Editor");
+		
+		if (executableHasEditorSuffix)
 		{
 			executableStem.resize(executableStem.size() - std::string_view("Editor").size());
 		}
@@ -164,9 +166,13 @@ namespace Filesystem
 		}
 
 		std::error_code errorCode;
-		if (const auto workingRoot = FindAncestorWithMarker(std::filesystem::current_path(errorCode), marker); workingRoot && !errorCode)
+		{
+			const auto workingRoot = FindAncestorWithMarker(std::filesystem::current_path(errorCode), marker);
+
+			if (workingRoot && !errorCode)
 		{
 			return Paths::Normalize(*workingRoot);
+		}
 		}
 		return std::nullopt;
 	}

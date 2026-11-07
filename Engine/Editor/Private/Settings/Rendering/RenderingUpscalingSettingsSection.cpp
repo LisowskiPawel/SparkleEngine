@@ -25,7 +25,7 @@ void DrawUpscalingSettingsSection(EngineRenderingSettingsController& settingsCon
 
 	const bool upscalingMatches = RenderingSettingsUi::MatchesFilter(filterText, "Upscaling", "upscaler upscaling linear bilinear dlss quality native aa balanced performance");
 	const bool upscalingOpen = upscalingMatches && RenderingSettingsUi::BeginSettingsCategory("Upscaling");
-	
+
 	if (!upscalingOpen)
 	{
 		return;

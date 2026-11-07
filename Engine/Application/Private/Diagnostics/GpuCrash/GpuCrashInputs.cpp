@@ -18,18 +18,29 @@ namespace GpuCrashInputVerification
 		for (const auto key : {"revision", "sourceInputsSha256", "dirtyPatchSha256"})
 		{
 			const auto value = ReadRequiredString(product, key);
-			if (value.size() != (std::string_view(key) == "revision" ? 40 : 64) || value.find_first_not_of("0123456789abcdef") != std::string::npos)
+			const auto expectedDigestLength = std::string_view(key) == "revision" ? 40u : 64u;
+			const bool invalidCandidateDigest = value.size() != expectedDigestLength || value.find_first_not_of("0123456789abcdef") != std::string::npos;
+			
+			if (invalidCandidateDigest)
 			{
 				throw Diagnostics::Error("Diagnostic source candidate identity is malformed.");
 			}
 		}
-		if ((profile != "DevelopmentEditor" && profile != "DevelopmentGame" && profile != "ShippingEditor" && profile != "ShippingGame")
-		    || profile != Strings::ToNarrow(executable.parent_path().filename().wstring()) || ReadRequiredString(product, "variant") != "gpu-crash"
-		    || Strings::ToNarrow(executable.stem().wstring()).ends_with("Editor") != profile.ends_with("Editor")
-		    || ReadRequiredString(product, "product") != Strings::ToNarrow(executable.stem().wstring()) || ReadRequiredString(product, "executableSha256") != HashFile(executable))
+
+		const bool bProfileKnownprofile = profile == "DevelopmentEditor" || profile == "DevelopmentGame";
+		const bool bProfileKnownprofile2 = bProfileKnownprofile || (profile == "ShippingEditor");
+		const bool profileKnown = bProfileKnownprofile2 || (profile == "ShippingGame");
+		const bool directoryMatches = profileKnown && profile == Strings::ToNarrow(executable.parent_path().filename().wstring());
+		const bool variantMatches = directoryMatches && ReadRequiredString(product, "variant") == "gpu-crash";
+		const bool productKindMatches = variantMatches && Strings::ToNarrow(executable.stem().wstring()).ends_with("Editor") == profile.ends_with("Editor");
+		const bool productNameMatches = productKindMatches && ReadRequiredString(product, "product") == Strings::ToNarrow(executable.stem().wstring());
+		const bool executableMatches = productNameMatches && ReadRequiredString(product, "executableSha256") == HashFile(executable);
+
+		if (!executableMatches)
 		{
 			throw Diagnostics::Error("GPU crash product/profile receipt does not match this executable.");
 		}
+
 		const std::filesystem::path retainedReceipt = Strings::ToWide(std::string_view{ReadRequiredString(product, "retainedReceiptPath")});
 		if (ReadReceipt(retainedReceipt) != product)
 		{
@@ -125,7 +136,9 @@ std::filesystem::path ResolveAftermathLibraryPath()
 	// Both local and staged products use Projects/<project>/Binaries/<profile>.
 	const auto directory = Filesystem::GetExecutableDirectory();
 	const auto productRoot = directory.parent_path().parent_path().parent_path().parent_path();
-	if (directory.parent_path().filename() != "Binaries" || directory.parent_path().parent_path().parent_path().filename() != "Projects")
+	const bool invalidProductLocation = directory.parent_path().filename() != "Binaries" || directory.parent_path().parent_path().parent_path().filename() != "Projects";
+	
+	if (invalidProductLocation)
 	{
 		throw Diagnostics::Error("GPU crash startup requires the product Binaries layout.");
 	}

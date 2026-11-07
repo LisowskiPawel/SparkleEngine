@@ -84,6 +84,7 @@ GpuMeshHandle GpuMeshCache::Request(const ImmutableRenderMeshHandle& mesh)
 	{
 		return {};
 	}
+
 	const GpuMeshHandle handle = AllocateHandle();
 
 	MeshRequest request;
@@ -116,8 +117,12 @@ void GpuMeshCache::UploadReadyMeshes(RenderCommandList& commandList)
 	for (auto& entry : m_requests)
 	{
 		MeshRequest& request = entry.second;
-		if (!request.Wanted || request.Prepared == nullptr || request.Uploaded != nullptr || m_residency.GetState(request.Generation) != AssetResidencyState::ReadyForUpload
-		    || !m_residency.BeginUpload(request.Generation))
+		const bool bUploadWantedPrepared = request.Wanted && request.Prepared != nullptr;
+		const bool uploadWanted = bUploadWantedPrepared && (request.Uploaded == nullptr);
+		const bool uploadReady = uploadWanted && m_residency.GetState(request.Generation) == AssetResidencyState::ReadyForUpload;
+		const bool uploadStarted = uploadReady && m_residency.BeginUpload(request.Generation);
+
+		if (!uploadStarted)
 		{
 			continue;
 		}

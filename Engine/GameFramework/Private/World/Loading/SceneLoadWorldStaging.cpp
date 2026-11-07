@@ -1,10 +1,10 @@
 #include "PCH.h"
-#include "World/SceneLoadWorldStaging.h"
+#include "World/Loading/SceneLoadWorldStaging.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Level/Loading/SceneLoadPackage.h"
-#include "World/GameWorldSceneAssetCommitter.h"
+#include "World/Loading/GameWorldSceneAssetCommitter.h"
 #include "World/GameWorldState.h"
 #include "World/Resources/GameWorldResourceStores.h"
 

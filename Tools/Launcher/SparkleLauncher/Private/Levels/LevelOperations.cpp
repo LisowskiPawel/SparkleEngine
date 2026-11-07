@@ -76,7 +76,9 @@ namespace SparkleLauncher
 		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
 
 		std::error_code sourceError;
-		if (!std::filesystem::is_regular_file(request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) || sourceError)
+		const bool assetSyncScriptMissing = !std::filesystem::is_regular_file(request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) || sourceError;
+		
+		if (assetSyncScriptMissing)
 		{
 			AddReadiness(plan, "Asset sync requires the source acquisition script. Open the matching source checkout to use this developer tool.");
 			return plan;

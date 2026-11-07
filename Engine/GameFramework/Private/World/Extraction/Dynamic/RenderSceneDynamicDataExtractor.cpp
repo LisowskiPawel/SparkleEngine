@@ -59,8 +59,8 @@ namespace ECS
 				++publishedIndex;
 			}
 
-			const bool unchanged = publishedIndex < m_publishedObjects.size() && m_publishedObjects[publishedIndex].Object == object.Object
-			    && HasSameObjectData(m_publishedObjects[publishedIndex], object);
+			const bool bUnchangedObject = publishedIndex < m_publishedObjects.size() && m_publishedObjects[publishedIndex].Object == object.Object;
+			const bool unchanged = bUnchangedObject && (HasSameObjectData(m_publishedObjects[publishedIndex], object));
 
 			if (!unchanged)
 			{
@@ -88,7 +88,11 @@ namespace ECS
 		for (const WorldExtractionStorage::MeshSlot& mesh : meshes)
 		{
 			const SkinningState* skinning = state.m_registry.Get<SkinningState>(mesh.Entity);
-			if (skinning == nullptr || !skinning->Pose.IsValid() || skinning->Pose.Generation != state.m_animationOutput.GetTargetGeneration() || skinning->Pose.Slot >= output.poses.size())
+			const bool bInvalidSkinningOutputPose = skinning == nullptr || !skinning->Pose.IsValid();
+			const bool bSkinningOutputanimationOutput = bInvalidSkinningOutputPose || (skinning->Pose.Generation != state.m_animationOutput.GetTargetGeneration());
+			const bool invalidSkinningOutput = bSkinningOutputanimationOutput || (skinning->Pose.Slot >= output.poses.size());
+			
+			if (invalidSkinningOutput)
 			{
 				continue;
 			}

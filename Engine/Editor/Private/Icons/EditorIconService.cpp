@@ -70,7 +70,10 @@ ImFontAtlasRect EditorIconService::Implementation::Resolve(const EditorIconAsset
 		return rectangle;
 	}
 
-	if (asset.Extent < 1 || asset.Extent > 512 || asset.Pixels.size() != static_cast<std::size_t>(asset.Extent) * asset.Extent * 4)
+	const bool bInvalidIconAssetExtent = asset.Extent < 1 || asset.Extent > 512;
+	const bool invalidIconAsset = bInvalidIconAssetExtent || (asset.Pixels.size() != static_cast<std::size_t>(asset.Extent) * asset.Extent * 4);
+	
+	if (invalidIconAsset)
 	{
 		Diagnostics::Fatal(g_editorIconLogger, __FILE__, __LINE__, "Editor icon requires square RGBA8 pixels and extent in [1,512]");
 	}

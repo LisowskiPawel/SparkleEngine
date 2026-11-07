@@ -12,7 +12,9 @@
 
 **Scope:** the exact Renderer global-program membership linked into the shader-contract target, including source, entry point, stage, consumer, traversal model, game target expectation, and important binding boundary
 
-**Owners:** `Engine/Renderer/ShaderRegistrations` for registration membership, typed declarations and pass consumers in `Engine/Renderer`, and `Tools/Shaders` for compilation/publication
+**Placement update:** 2026-11-07: registration translation units are colocated with their typed capability declarations under Renderer `Private`. The two CMake descriptor targets retain one shared source set; virtual shader paths and identities are unchanged. The September snapshot above records its historical folder layout.
+
+**Owners:** Renderer `Private/**/*ShaderRegistration*.cpp` files beside their typed declarations for registration membership, typed declarations and pass consumers in `Engine/Renderer`, and `Tools/Shaders` for compilation/publication
 
 **Compilation inventory:** [Shader Compilation Capability Inventory](../../../../Tools/ShaderCompiler/ShaderCompilerCapabilities.md)
 
@@ -189,7 +191,7 @@ This catalog contract is **defined but unproved**. It completes only exact membe
 
 When adding, removing, or changing a program:
 
-1. update the typed declaration and `ShaderRegistrations` entry;
+1. update the typed declaration and its colocated `*ShaderRegistration*.cpp` entry;
 2. update every frame-graph producer/consumer and pipeline composition;
 3. update this exact catalog and the stage counts in [Shader Compilation](../../../../Tools/ShaderCompiler/ShaderCompilerCapabilities.md);
 4. run registration validation, both runtime-target cooks, reflection/ABI checks, and the smallest consuming runtime path;

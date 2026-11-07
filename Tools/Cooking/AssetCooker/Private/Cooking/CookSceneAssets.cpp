@@ -8,7 +8,15 @@
 bool CookSceneAssets(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord>& outputs)
 {
 	ToolWorkProgressWriter progress(std::cout);
-	if (!AssetCookerSceneBatch::Execute(plan.sceneEntries, diagnostics, [&progress](const ToolWorkProgressEvent& event) { progress.Report(event); }))
+
+	const auto reportProgress = [&progress](const ToolWorkProgressEvent& event)
+	{
+		progress.Report(event);
+	};
+
+	const bool scenesCooked = AssetCookerSceneBatch::Execute(plan.sceneEntries, diagnostics, reportProgress);
+
+	if (!scenesCooked)
 	{
 		return false;
 	}

@@ -138,9 +138,13 @@ ImportedMeshPrimitiveIndex GltfGeometryImporter::ResolveImportedPrimitive(
 	}
 
 	const std::uint32_t sourceMeshIndex = static_cast<std::uint32_t>(cgltf_mesh_index(&context.Data, context.Node.mesh));
-	if (const ImportedMeshPrimitiveIndex existing = FindImportedPrimitiveIndex(output.scene, sourceMeshIndex, primitiveIndex); existing != kInvalidImportedMeshPrimitiveIndex)
 	{
-		return existing;
+		const ImportedMeshPrimitiveIndex existing = FindImportedPrimitiveIndex(output.scene, sourceMeshIndex, primitiveIndex);
+
+		if (existing != kInvalidImportedMeshPrimitiveIndex)
+		{
+			return existing;
+		}
 	}
 
 	ImportedMeshGeometry meshGeometry;

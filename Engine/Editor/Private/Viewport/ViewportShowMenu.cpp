@@ -174,7 +174,8 @@ static void DrawShowMenuContents(const CVarControlExecutor* executor, bool disab
 {
 	std::array<bool, showControls.size()> intent{};
 	std::string queryError;
-	const bool available = executor != nullptr && *executor && QueryShowControlIntent(*executor, intent, queryError);
+	const bool bAvailableexecutor = executor != nullptr && *executor;
+	const bool available = bAvailableexecutor && (QueryShowControlIntent(*executor, intent, queryError));
 	if (!available)
 	{
 		ImGui::TextWrapped("Show controls unavailable: %s", queryError.empty() ? "Host control executor is missing." : queryError.c_str());
@@ -182,7 +183,9 @@ static void DrawShowMenuContents(const CVarControlExecutor* executor, bool disab
 	else
 	{
 		ImGui::BeginDisabled(disableInteraction);
-		if (EditorWidgets::DrawMenuItem("Use Defaults", EditorIcons::EditorIcon::None, EditorWidgets::MenuCheckState::Hidden, ImGuiSelectableFlags_NoAutoClosePopups))
+		const bool useDefaultsSelected = EditorWidgets::DrawMenuItem("Use Defaults", EditorIcons::EditorIcon::None, EditorWidgets::MenuCheckState::Hidden, ImGuiSelectableFlags_NoAutoClosePopups);
+		
+		if (useDefaultsSelected)
 		{
 			SetShowControlIntent(*executor, showControls, true, error);
 		}

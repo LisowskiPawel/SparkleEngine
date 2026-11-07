@@ -50,7 +50,15 @@ TaskNodeHandle ParallelFor(TaskGraphBuilder& graph, TaskDesc desc, std::uint32_t
 		const std::uint32_t end = static_cast<std::uint32_t>(static_cast<std::uint64_t>(itemCount) * (partition + 1u) / partitionCount);
 		TaskDesc partitionDesc = desc;
 		partitionDesc.Name = DerivedTaskName(desc.Name, ".Range" + std::to_string(partition));
-		if (!graph.AddNested(group, std::move(partitionDesc), [begin, end, function](TaskExecutionContext& context) { return function ? function(begin, end, context) : TaskResult::Success(); }))
+
+		auto partitionTask = [begin, end, function](TaskExecutionContext& context)
+		{
+			return function ? function(begin, end, context) : TaskResult::Success();
+		};
+
+		const TaskNodeHandle partitionHandle = graph.AddNested(group, std::move(partitionDesc), std::move(partitionTask));
+
+		if (!partitionHandle)
 		{
 			return {};
 		}

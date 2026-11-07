@@ -105,10 +105,11 @@ void EditorImGuiContext::HandleWindowMessage(WindowMessageEvent& event)
 		return;
 	}
 
-	const bool shortcutAvailable = m_shortcutHandler && ImGui::GetCurrentContext() != nullptr && (event.lParam & (LPARAM{1} << 30)) == 0;
+	const bool bShortcutAvailableImGui = m_shortcutHandler && ImGui::GetCurrentContext() != nullptr;
+	const bool shortcutAvailable = bShortcutAvailableImGui && ((event.lParam & (LPARAM{1} << 30)) == 0);
 	const bool wantsTextInput = shortcutAvailable && ImGui::GetIO().WantTextInput;
 	const bool shortcutHandled = shortcutAvailable && m_shortcutHandler(static_cast<std::uint32_t>(event.msg), static_cast<std::uintptr_t>(event.wParam), wantsTextInput);
-	
+
 	if (shortcutHandled)
 	{
 		event.handled = true;

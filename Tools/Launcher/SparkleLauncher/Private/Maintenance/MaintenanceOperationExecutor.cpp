@@ -277,9 +277,13 @@ namespace SparkleLauncher
 		}
 
 		std::vector<std::filesystem::path> preservedPaths = plan.Request.PreservedPaths;
-		if (const std::optional<std::filesystem::path> activeLogFilePath = Logging::GetActiveLogFilePath(); activeLogFilePath.has_value())
 		{
-			preservedPaths.push_back(*activeLogFilePath);
+			const std::optional<std::filesystem::path> activeLogFilePath = Logging::GetActiveLogFilePath();
+
+			if (activeLogFilePath.has_value())
+			{
+				preservedPaths.push_back(*activeLogFilePath);
+			}
 		}
 		for (MaintenanceOperationProcessStep& step : BuildMaintenanceProcessStepsForPlan(plan))
 		{

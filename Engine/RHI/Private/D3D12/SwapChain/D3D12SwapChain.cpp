@@ -92,7 +92,14 @@ void D3D12SwapChain::Create()
 	swapChainFullsceenDesc.Windowed = true;
 
 	ComPtr<IDXGIFactory7> externalFactory;
-	if (m_rhi.TryUpgradeInterposerInterface(ERhiInterposerInterfaceKind::PresentationFactory, m_rhi.GetDxgiFactory().Get(), IID_PPV_ARGS(externalFactory.ReleaseAndGetAddressOf())))
+	const auto& presentationFactory = m_rhi.GetDxgiFactory();
+
+	const bool factoryUpgraded = m_rhi.TryUpgradeInterposerInterface(
+	    ERhiInterposerInterfaceKind::PresentationFactory,
+	    presentationFactory.Get(),
+	    IID_PPV_ARGS(externalFactory.ReleaseAndGetAddressOf()));
+
+	if (factoryUpgraded)
 	{
 		ComPtr<IDXGISwapChain1> externalSwapChain;
 
@@ -104,8 +111,13 @@ void D3D12SwapChain::Create()
 		    nullptr,
 		    externalSwapChain.ReleaseAndGetAddressOf());
 
-		if (SUCCEEDED(createResult) && SUCCEEDED(externalSwapChain.As(&m_externalSwapChain))
-		    && m_rhi.TryResolveNativeInterface(ERhiInterposerInterfaceKind::PresentationSurface, m_externalSwapChain.Get(), IID_PPV_ARGS(m_swapChain.ReleaseAndGetAddressOf())))
+		const bool swapChainCreated = SUCCEEDED(createResult);
+		const bool swapChainUpgraded = swapChainCreated && SUCCEEDED(externalSwapChain.As(&m_externalSwapChain));
+
+		const bool nativeSwapChainResolved = swapChainUpgraded
+		    && m_rhi.TryResolveNativeInterface(ERhiInterposerInterfaceKind::PresentationSurface, m_externalSwapChain.Get(), IID_PPV_ARGS(m_swapChain.ReleaseAndGetAddressOf()));
+
+		if (!nativeSwapChainResolved)
 		{
 			m_rhi.NotifyInterposerPresentationReady(true);
 			return;
@@ -209,6 +221,7 @@ void D3D12SwapChain::Present()
 		m_rhi.GetDxgiFactory()->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing));
 		presentFlags = (allowTearing == TRUE) ? DXGI_PRESENT_ALLOW_TEARING : 0u;
 	}
+
 	const HRESULT result = GetPresentationInterface()->Present(presentInterval, presentFlags);
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	D3D12GpuCrash::ObserveLoss(m_rhi.GetDevice().Get(), result);

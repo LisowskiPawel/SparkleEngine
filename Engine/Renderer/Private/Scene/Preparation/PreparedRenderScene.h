@@ -5,11 +5,11 @@
 #include "Scene/Lighting/RectLight.h"
 #include "Scene/Lighting/SpotLight.h"
 #include "Scene/Materials/MaterialData.h"
-#include "Scene/Preparation/RenderLightCollection.h"
-#include "Scene/Preparation/RenderMeshWorldBounds.h"
-#include "Scene/Preparation/RenderPrimitivePreparation.h"
-#include "Scene/Preparation/RenderRayTracingInstance.h"
-#include "Scene/Preparation/RenderSkyData.h"
+#include "Scene/Preparation/Lighting/RenderLightCollection.h"
+#include "Scene/Preparation/Geometry/RenderMeshWorldBounds.h"
+#include "Scene/Preparation/Geometry/RenderPrimitivePreparation.h"
+#include "Scene/Preparation/Geometry/RenderRayTracingInstance.h"
+#include "Scene/Preparation/Lighting/RenderSkyData.h"
 #include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
 
 #include <DirectXMath.h>

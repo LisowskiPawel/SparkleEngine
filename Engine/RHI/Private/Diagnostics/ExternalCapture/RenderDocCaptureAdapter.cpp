@@ -58,6 +58,7 @@ public:
 		{
 			return {.State = ExternalCaptureState::Quarantined, .Message = "RenderDoc artifact count is ambiguous; restart before another request."};
 		}
+
 		std::filesystem::path artifact;
 		if (!TryGetCaptureArtifact(artifact))
 		{
@@ -73,7 +74,11 @@ private:
 		std::array<char, 4096> path{};
 		std::uint32_t length = static_cast<std::uint32_t>(path.size());
 		std::uint64_t timestamp = 0;
-		if (!m_api.GetCapture(m_firstCapture, nullptr, &length, &timestamp) || length > path.size() || !m_api.GetCapture(m_firstCapture, path.data(), &length, &timestamp))
+		const bool captureSizeRead = m_api.GetCapture(m_firstCapture, nullptr, &length, &timestamp);
+		const bool captureFits = captureSizeRead && length <= path.size();
+		const bool capturePathRead = captureFits && m_api.GetCapture(m_firstCapture, path.data(), &length, &timestamp);
+
+		if (!capturePathRead)
 		{
 			return false;
 		}
@@ -143,6 +148,7 @@ bool IsRenderDocCaptureInstalled() noexcept
 	{
 		return true;
 	}
+
 	std::error_code error;
 	return std::filesystem::is_regular_file(GetInstalledRenderDocLibraryPath(), error);
 #else

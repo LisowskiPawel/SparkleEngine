@@ -34,7 +34,9 @@ namespace SceneLightInspector
 	{
 		float luminousIntensity = value;
 		constexpr float kDefaultLuminousIntensity = 1.0f;
-		if (EditorWidgets::EditDetailsFloat("Luminous Intensity (candela)", luminousIntensity, 10.0f, 0.0f, 0.0f, "%.3f", &kDefaultLuminousIntensity))
+		const bool luminousIntensityEdited = EditorWidgets::EditDetailsFloat("Luminous Intensity (candela)", luminousIntensity, 10.0f, 0.0f, 0.0f, "%.3f", &kDefaultLuminousIntensity);
+		
+		if (luminousIntensityEdited)
 		{
 			value = luminousIntensity;
 			return true;
@@ -46,7 +48,9 @@ namespace SceneLightInspector
 	{
 		float directionValues[3] = {value.x, value.y, value.z};
 		const float defaultDirection[3] = {0.0f, -1.0f, 0.0f};
-		if (EditorWidgets::EditDetailsFloat3("Direction", directionValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultDirection))
+		const bool lightDirectionEdited = EditorWidgets::EditDetailsFloat3("Direction", directionValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultDirection);
+		
+		if (lightDirectionEdited)
 		{
 			value = {directionValues[0], directionValues[1], directionValues[2]};
 			return true;
@@ -134,7 +138,7 @@ namespace SceneLightInspector
 		bool changed = false;
 		const bool lightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Light", "color visible visibility rendering");
 		const bool lightOpen = lightMatches && EditorWidgets::DrawDetailsCategory("Light");
-		
+
 		if (!lightOpen)
 		{
 			return false;
@@ -162,7 +166,7 @@ namespace SceneLightInspector
 	{
 		const bool transformMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Transform", "rotation direction transform");
 		const bool transformOpen = transformMatches && EditorWidgets::DrawDetailsCategory("Transform");
-		
+
 		if (!transformOpen)
 		{
 			return false;
@@ -185,7 +189,7 @@ namespace SceneLightInspector
 		bool changed = false;
 		const bool directionalLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Directional Light", "illuminance lux angular size direction cast shadow rendering");
 		const bool directionalLightOpen = directionalLightMatches && EditorWidgets::DrawDetailsCategory("Directional Light");
-		
+
 		if (!directionalLightOpen)
 		{
 			return false;
@@ -205,7 +209,9 @@ namespace SceneLightInspector
 
 		float angularSizeDegrees = MathUtils::RadiansToDegrees(lightDesc.angularSizeRadians);
 		constexpr float kDefaultAngularSizeDegrees = 0.533f;
-		if (EditorWidgets::EditDetailsFloat("Angular Size", angularSizeDegrees, kAngularSizeDragSpeedDegrees, 0.0f, kAngularSizeSliderMaxDegrees, "%.3f", &kDefaultAngularSizeDegrees))
+		const bool angularSizeEdited = EditorWidgets::EditDetailsFloat("Angular Size", angularSizeDegrees, kAngularSizeDragSpeedDegrees, 0.0f, kAngularSizeSliderMaxDegrees, "%.3f", &kDefaultAngularSizeDegrees);
+		
+		if (angularSizeEdited)
 		{
 			lightDesc.angularSizeRadians = MathUtils::DegreesToRadians(angularSizeDegrees);
 			changed = true;
@@ -218,7 +224,7 @@ namespace SceneLightInspector
 		bool changed = false;
 		const bool pointLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Point Light", "luminous intensity candela range radius distance attenuation point");
 		const bool pointLightOpen = pointLightMatches && EditorWidgets::DrawDetailsCategory("Point Light");
-		
+
 		if (!pointLightOpen)
 		{
 			return false;
@@ -237,7 +243,7 @@ namespace SceneLightInspector
 		bool changed = false;
 		const bool spotLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Spot Light", "luminous intensity candela direction range radius distance attenuation inner outer angle spot");
 		const bool spotLightOpen = spotLightMatches && EditorWidgets::DrawDetailsCategory("Spot Light");
-		
+
 		if (!spotLightOpen)
 		{
 			return false;
@@ -253,7 +259,9 @@ namespace SceneLightInspector
 
 		float innerAngleDegrees = MathUtils::RadiansToDegrees(lightDesc.innerAngleRadians);
 		constexpr float kDefaultInnerAngleDegrees = 0.0f;
-		if (EditorWidgets::EditDetailsFloat("Inner Angle", innerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultInnerAngleDegrees))
+		const bool innerAngleEdited = EditorWidgets::EditDetailsFloat("Inner Angle", innerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultInnerAngleDegrees);
+		
+		if (innerAngleEdited)
 		{
 			lightDesc.innerAngleRadians = MathUtils::DegreesToRadians(innerAngleDegrees);
 			changed = true;
@@ -261,7 +269,9 @@ namespace SceneLightInspector
 
 		float outerAngleDegrees = MathUtils::RadiansToDegrees(lightDesc.outerAngleRadians);
 		constexpr float kDefaultOuterAngleDegrees = 45.0f;
-		if (EditorWidgets::EditDetailsFloat("Outer Angle", outerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultOuterAngleDegrees))
+		const bool outerAngleEdited = EditorWidgets::EditDetailsFloat("Outer Angle", outerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultOuterAngleDegrees);
+		
+		if (outerAngleEdited)
 		{
 			lightDesc.outerAngleRadians = MathUtils::DegreesToRadians(outerAngleDegrees);
 			changed = true;
@@ -274,7 +284,7 @@ namespace SceneLightInspector
 		bool changed = false;
 		const bool rectLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Rect Light", "luminance candela square meter direction tangent width height area rectangle quad shadow");
 		const bool rectLightOpen = rectLightMatches && EditorWidgets::DrawDetailsCategory("Rect Light");
-		
+
 		if (!rectLightOpen)
 		{
 			return false;
@@ -292,7 +302,9 @@ namespace SceneLightInspector
 
 		float tangentValues[3] = {lightDesc.tangent.x, lightDesc.tangent.y, lightDesc.tangent.z};
 		const float defaultTangent[3] = {1.0f, 0.0f, 0.0f};
-		if (EditorWidgets::EditDetailsFloat3("Tangent", tangentValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultTangent))
+		const bool lightTangentEdited = EditorWidgets::EditDetailsFloat3("Tangent", tangentValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultTangent);
+		
+		if (lightTangentEdited)
 		{
 			lightDesc.tangent = {tangentValues[0], tangentValues[1], tangentValues[2]};
 			changed = true;

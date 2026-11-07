@@ -17,7 +17,7 @@ void DrawRayReconstructionSettingsSection(EngineRenderingSettingsController& set
 
 	const bool rayReconstructionMatches = RenderingSettingsUi::MatchesFilter(filterText, "Ray Reconstruction", "dlss ray reconstruction indirect specular diffuse");
 	const bool rayReconstructionOpen = rayReconstructionMatches && RenderingSettingsUi::BeginSettingsCategory("Ray Reconstruction");
-	
+
 	if (!rayReconstructionOpen)
 	{
 		return;

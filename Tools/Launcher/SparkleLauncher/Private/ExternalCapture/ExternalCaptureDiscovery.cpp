@@ -21,7 +21,11 @@ namespace SparkleLauncher
 		for (unsigned visited = 0; !error && directory != end && visited < MaxCaptureInstallationEntries; directory.increment(error), ++visited)
 		{
 			const auto path = directory->path();
-			if (path.filename().string().starts_with(prefix) && IsInstalledToolFile(path / library) && IsInstalledToolFile(path / viewer))
+			const bool toolDirectoryMatches = path.filename().string().starts_with(prefix);
+			const bool captureLibraryInstalled = toolDirectoryMatches && IsInstalledToolFile(path / library);
+			const bool captureViewerInstalled = captureLibraryInstalled && IsInstalledToolFile(path / viewer);
+			
+			if (!captureViewerInstalled)
 			{
 				return path;
 			}

@@ -34,8 +34,12 @@ std::unique_ptr<D3D12CaptureService::PendingReadback> D3D12CaptureService::Prepa
 	}
 
 	const D3D12_RESOURCE_DESC sourceDesc = sourceResource->GetDesc();
-	if (sourceDesc.Dimension != D3D12_RESOURCE_DIMENSION_TEXTURE2D || sourceDesc.Width == 0 || sourceDesc.Height == 0 || !IsRhiCaptureFormatSupported(request.SourceFormat)
-	    || sourceDesc.Format != D3D12TypeConversions::ToDxgiFormat(request.SourceFormat))
+	const bool bIncompatibleCaptureSourceWidth = sourceDesc.Dimension != D3D12_RESOURCE_DIMENSION_TEXTURE2D || sourceDesc.Width == 0;
+	const bool bIncompatibleCaptureSourceHeight = bIncompatibleCaptureSourceWidth || (sourceDesc.Height == 0);
+	const bool bCaptureSourceSourceFormat = bIncompatibleCaptureSourceHeight || (!IsRhiCaptureFormatSupported(request.SourceFormat));
+	const bool incompatibleCaptureSource = bCaptureSourceSourceFormat || (sourceDesc.Format != D3D12TypeConversions::ToDxgiFormat(request.SourceFormat));
+	
+	if (incompatibleCaptureSource)
 	{
 		return {};
 	}

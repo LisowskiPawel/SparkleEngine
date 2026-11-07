@@ -18,7 +18,12 @@ void TextureCache::UploadReadyTextures(RenderCommandList& commandList, std::vect
 {
 	for (TextureRequest& request : m_requests)
 	{
-		if (!request.Wanted || !request.Decoded || request.Uploaded || m_residency.GetState(request.Generation) != AssetResidencyState::ReadyForUpload || !m_residency.BeginUpload(request.Generation))
+		const bool bUploadWantedDecoded = request.Wanted && request.Decoded;
+		const bool uploadWanted = bUploadWantedDecoded && (!request.Uploaded);
+		const bool uploadReady = uploadWanted && m_residency.GetState(request.Generation) == AssetResidencyState::ReadyForUpload;
+		const bool uploadStarted = uploadReady && m_residency.BeginUpload(request.Generation);
+
+		if (!uploadStarted)
 		{
 			continue;
 		}
@@ -130,11 +135,13 @@ const RendererTexture* TextureCache::FindPathTexture(const std::filesystem::path
 	{
 		return nullptr;
 	}
+
 	const auto defaultTexture = m_defaultTextures.find(resolved->CacheKey);
 	if (defaultTexture != m_defaultTextures.end())
 	{
 		return &defaultTexture->second;
 	}
+
 	const auto texture = m_pathTextures.find(resolved->CacheKey);
 	return texture != m_pathTextures.end() && texture->second.Generation.Generation == m_sceneTextureGeneration ? &texture->second.Texture : nullptr;
 }

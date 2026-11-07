@@ -12,7 +12,10 @@ namespace SparkleLauncher
 	static bool DirectoryHasRegularFiles(const std::filesystem::path& directory)
 	{
 		std::error_code errorCode;
-		if (std::filesystem::exists(directory / ".publication-incomplete", errorCode) || errorCode || !std::filesystem::is_directory(directory, errorCode))
+		const bool publicationComplete = !std::filesystem::exists(directory / ".publication-incomplete", errorCode) && !errorCode;
+		const bool directoryPresent = publicationComplete && std::filesystem::is_directory(directory, errorCode);
+
+		if (!directoryPresent)
 		{
 			return false;
 		}
@@ -42,9 +45,15 @@ namespace SparkleLauncher
 	{
 		std::error_code errorCode;
 
-		return !cooked.empty() && !std::filesystem::exists(cooked / ".publication-incomplete", errorCode) && !errorCode && std::filesystem::is_regular_file(cooked / ".publication-lock", errorCode)
-		    && !errorCode && std::filesystem::is_regular_file(cooked / "SceneAssetRegistry.sreg", errorCode) && !errorCode && DirectoryHasRegularFiles(cooked / "SceneManifests")
-		    && DirectoryHasRegularFiles(cooked / "Meshes");
+		const bool bPublicationCompletefilesystem = !cooked.empty() && !std::filesystem::exists(cooked / ".publication-incomplete", errorCode);
+		const bool publicationComplete = bPublicationCompletefilesystem && (!errorCode);
+		const bool bPublicationLockPresentfilesystem = publicationComplete && std::filesystem::is_regular_file(cooked / ".publication-lock", errorCode);
+		const bool publicationLockPresent = bPublicationLockPresentfilesystem && (!errorCode);
+		const bool bRegistryPresentfilesystem = publicationLockPresent && std::filesystem::is_regular_file(cooked / "SceneAssetRegistry.sreg", errorCode);
+		const bool registryPresent = bRegistryPresentfilesystem && (!errorCode);
+		const bool manifestsPresent = registryPresent && DirectoryHasRegularFiles(cooked / "SceneManifests");
+		const bool meshesPresent = manifestsPresent && DirectoryHasRegularFiles(cooked / "Meshes");
+		return meshesPresent;
 	}
 
 	static CookedShaderPublicationState InspectCookedShaderPublication(const std::filesystem::path& cookedShaderDirectory)
@@ -62,7 +71,11 @@ namespace SparkleLauncher
 
 		for (const auto& artifact : requiredArtifacts)
 		{
-			if (!std::filesystem::is_regular_file(artifact, errorCode) || errorCode || std::filesystem::file_size(artifact, errorCode) == 0 || errorCode)
+			const bool artifactPresent = std::filesystem::is_regular_file(artifact, errorCode) && !errorCode;
+			const bool bArtifactNonemptyfilesystem = artifactPresent && std::filesystem::file_size(artifact, errorCode) != 0;
+			const bool artifactNonempty = bArtifactNonemptyfilesystem && (!errorCode);
+
+			if (!artifactNonempty)
 			{
 				return CookedShaderPublicationState::Missing;
 			}

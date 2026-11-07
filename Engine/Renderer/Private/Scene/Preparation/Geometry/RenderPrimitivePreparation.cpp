@@ -1,6 +1,6 @@
 #include "PCH.h"
 
-#include "Scene/Preparation/RenderPrimitivePreparation.h"
+#include "Scene/Preparation/Geometry/RenderPrimitivePreparation.h"
 
 #include <algorithm>
 #include <array>

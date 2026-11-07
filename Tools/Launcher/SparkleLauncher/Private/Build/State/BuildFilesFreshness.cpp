@@ -86,20 +86,26 @@ namespace SparkleLauncher
 			status.Summary = "Build-file freshness stamp is missing.";
 			return status;
 		}
-		if (ReadBuildFilesFreshnessStampValue(status.StampPath, "generator").value_or(std::string()) != toolchain.Generator
-		    || ReadBuildFilesFreshnessStampValue(status.StampPath, "platform").value_or(std::string()) != toolchain.Platform
-		    || ReadBuildFilesFreshnessStampValue(status.StampPath, "toolset").value_or(std::string()) != toolchain.Toolset
-		    || ReadBuildFilesFreshnessStampValue(status.StampPath, "qtRoot").value_or(std::string()) != selectedQtPrefixPath
-		    || ReadBuildFilesFreshnessStampValue(status.StampPath, "vulkanSdkRoot").value_or(std::string()) != selectedVulkanSdkRoot)
+
+		const bool stampGeneratorMatches = ReadBuildFilesFreshnessStampValue(status.StampPath, "generator").value_or(std::string()) == toolchain.Generator;
+		const bool stampPlatformMatches = stampGeneratorMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "platform").value_or(std::string()) == toolchain.Platform;
+		const bool stampToolsetMatches = stampPlatformMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "toolset").value_or(std::string()) == toolchain.Toolset;
+		const bool stampQtMatches = stampToolsetMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "qtRoot").value_or(std::string()) == selectedQtPrefixPath;
+		const bool stampVulkanMatches = stampQtMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "vulkanSdkRoot").value_or(std::string()) == selectedVulkanSdkRoot;
+
+		if (!stampVulkanMatches)
 		{
 			status.State = BuildFilesFreshnessState::FreshnessStampMismatch;
 			status.Summary = "Freshness stamp generator/platform/toolset/Qt prefix/Vulkan SDK differs from selected launcher toolchain.";
 			return status;
 		}
-		if (ReadBuildFilesFreshnessStampValue(status.StampPath, "contentPipeline").value_or(std::string()) != selectedContentPipeline
-		    || ReadBuildFilesFreshnessStampValue(status.StampPath, "shaderCompiler").value_or(std::string()) != selectedShaderCompiler
-		    || ReadBuildFilesFreshnessStampValue(status.StampPath, "ktxSupport").value_or(std::string()) != selectedKtxSupport
-		    || ReadBuildFilesFreshnessStampValue(status.StampPath, "nvidiaStreamline").value_or(std::string()) != selectedNvidiaStreamline)
+
+		const bool stampContentPipelineMatches = ReadBuildFilesFreshnessStampValue(status.StampPath, "contentPipeline").value_or(std::string()) == selectedContentPipeline;
+		const bool stampShaderCompilerMatches = stampContentPipelineMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "shaderCompiler").value_or(std::string()) == selectedShaderCompiler;
+		const bool stampKtxMatches = stampShaderCompilerMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "ktxSupport").value_or(std::string()) == selectedKtxSupport;
+		const bool stampStreamlineMatches = stampKtxMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "nvidiaStreamline").value_or(std::string()) == selectedNvidiaStreamline;
+
+		if (!stampStreamlineMatches)
 		{
 			status.State = BuildFilesFreshnessState::FeatureSetMismatch;
 			status.Summary = "Build-file freshness stamp workspace feature toggles differ from the launcher feature set.";

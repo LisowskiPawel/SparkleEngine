@@ -124,11 +124,12 @@ void SerialTaskExecution::RunState::ExecuteTask(std::uint32_t index)
 	const TaskGraphNode& node = m_graph.Nodes[index];
 	const TaskProfiler::TimePoint taskStart = TaskProfiler::Begin(node.Desc, m_generation, index, 0);
 
-	const bool blocked = task.BlockedByPrerequisite || task.BlockedByParent || m_cancellation.stop_requested();
+	const bool bBlockedByParent = task.BlockedByPrerequisite || task.BlockedByParent;
+	const bool bLocked = bBlockedByParent || (m_cancellation.stop_requested());
 	TaskExecutionContext taskContext = m_context;
 	taskContext.Bind(node.Desc.Lane, m_cancellation);
 
-	TaskResult bodyResult = blocked && node.Desc.CompletionPolicy == TaskCompletionPolicy::Normal ? TaskResult::Cancelled("A prerequisite or nested parent did not succeed.")
+	TaskResult bodyResult = bLocked && node.Desc.CompletionPolicy == TaskCompletionPolicy::Normal ? TaskResult::Cancelled("A prerequisite or nested parent did not succeed.")
 	                                                                                              : InvokeTaskFunction(node, taskContext);
 
 	TaskProfiler::End(node.Desc, m_generation, index, 0, bodyResult, taskStart);

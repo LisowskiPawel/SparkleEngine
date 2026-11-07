@@ -82,7 +82,11 @@ bool TaskExecution::IsSettled() const noexcept
 
 bool TaskExecution::WaitFor(std::chrono::milliseconds timeout) const
 {
-	if (m_state == nullptr || timeout < std::chrono::milliseconds::zero() || TaskWorkerContext::IsWorkerFor(m_state->ExecutorIdentity) || std::this_thread::get_id() != m_state->JoinThread)
+	const bool bInvalidJoinRequesttimeout = m_state == nullptr || timeout < std::chrono::milliseconds::zero();
+	const bool bJoinRequestExecutorIdentity = bInvalidJoinRequesttimeout || (TaskWorkerContext::IsWorkerFor(m_state->ExecutorIdentity));
+	const bool invalidJoinRequest = bJoinRequestExecutorIdentity || (std::this_thread::get_id() != m_state->JoinThread);
+	
+	if (invalidJoinRequest)
 	{
 		return false;
 	}
@@ -141,7 +145,10 @@ std::optional<TaskResult> TaskExecution::GetTaskResult(TaskNodeHandle handle) co
 	std::scoped_lock lock(m_state->Mutex);
 	const auto& data = m_state->Data;
 	std::uint32_t index = 0;
-	if (!TaskGraphAccess::Decode(handle, data.BuilderIdentity, data.BuilderGeneration, static_cast<std::uint32_t>(data.TaskResults.size()), index) || !data.Settled[index])
+	const bool handleDecoded = TaskGraphAccess::Decode(handle, data.BuilderIdentity, data.BuilderGeneration, static_cast<std::uint32_t>(data.TaskResults.size()), index);
+	const bool taskSettled = handleDecoded && data.Settled[index];
+	
+	if (!taskSettled)
 	{
 		return std::nullopt;
 	}

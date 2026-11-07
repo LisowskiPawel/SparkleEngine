@@ -146,8 +146,13 @@ bool PassParameterSet::SetAttachment(const char* name, FrameGraphAttachmentBindi
 {
 	std::uint32_t index = 0;
 	const PassParameterDesc* parameter = FindParameter(name, index);
-	if (parameter == nullptr || parameter->ResourceDomain != ShaderParameterResourceDomain::Texture
-	    || (parameter->Kind != ShaderParameterSemanticKind::RenderTarget && parameter->Kind != ShaderParameterSemanticKind::DepthTarget) || !binding.Handle.IsValid())
+	const bool bTextureAttachmentResourceDomain = parameter == nullptr || parameter->ResourceDomain != ShaderParameterResourceDomain::Texture;
+	const bool bInvalidTextureAttachmentKind = !bTextureAttachmentResourceDomain && (parameter->Kind != ShaderParameterSemanticKind::RenderTarget);
+	const bool bInvalidTextureAttachmentKind2 = bInvalidTextureAttachmentKind && (parameter->Kind != ShaderParameterSemanticKind::DepthTarget);
+	const bool bInvalidTextureAttachmentKind3 = bTextureAttachmentResourceDomain || bInvalidTextureAttachmentKind2;
+	const bool invalidTextureAttachment = bInvalidTextureAttachmentKind3 || (!binding.Handle.IsValid());
+	
+	if (invalidTextureAttachment)
 	{
 		return false;
 	}

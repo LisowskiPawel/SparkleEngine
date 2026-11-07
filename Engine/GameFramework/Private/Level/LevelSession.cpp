@@ -170,8 +170,8 @@ void LevelSession::CompleteLevelChange() noexcept
 	}
 	Assets::SceneLoadPackage& package = *completion->Package;
 
-	const bool stale = package.WorldGeneration != m_gameWorld->GetGeneration() || package.DocumentGeneration != m_documentGeneration
-	    || package.CatalogGeneration != m_loadExecutor->GetCatalogGeneration();
+	const bool bStaleDocumentGeneration = package.WorldGeneration != m_gameWorld->GetGeneration() || package.DocumentGeneration != m_documentGeneration;
+	const bool stale = bStaleDocumentGeneration || (package.CatalogGeneration != m_loadExecutor->GetCatalogGeneration());
 
 	if (stale)
 	{

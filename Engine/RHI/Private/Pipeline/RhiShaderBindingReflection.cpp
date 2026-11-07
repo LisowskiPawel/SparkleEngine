@@ -45,7 +45,9 @@ static void CollectBindingLocations(const ResolvedShader& shader, std::string_vi
 	for (std::uint32_t index = 0; index < reflection.ResourceBindingCount; ++index)
 	{
 		const CookedShaderResourceBindingRecord& resource = resources[reflection.ResourceBindingOffset + index];
-		if (!ResourceKindMatches(resource.Kind, semanticKind) || shader.Map->ResolveString(ShaderMapStringRef{resource.NameOffsetInBytes, resource.NameSizeInBytes}) != bindingName)
+		const bool reflectedBindingMismatch = !ResourceKindMatches(resource.Kind, semanticKind) || shader.Map->ResolveString(ShaderMapStringRef{resource.NameOffsetInBytes, resource.NameSizeInBytes}) != bindingName;
+		
+		if (reflectedBindingMismatch)
 		{
 			continue;
 		}

@@ -287,8 +287,9 @@ private:
 
 std::unique_ptr<RenderDiagnostics> CreateVulkanRenderDiagnostics(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator)
 {
-	const bool supportsGpuEvents = rhi.GetSetDebugUtilsObjectName() != nullptr && rhi.GetCmdBeginDebugUtilsLabel() != nullptr && rhi.GetCmdEndDebugUtilsLabel() != nullptr
-	    && rhi.GetCmdInsertDebugUtilsLabel() != nullptr;
+	const bool bSupportsGpuEventsUtilsLabel = rhi.GetSetDebugUtilsObjectName() != nullptr && rhi.GetCmdBeginDebugUtilsLabel() != nullptr;
+	const bool bSupportsGpuEventsUtilsLabel2 = bSupportsGpuEventsUtilsLabel && (rhi.GetCmdEndDebugUtilsLabel() != nullptr);
+	const bool supportsGpuEvents = bSupportsGpuEventsUtilsLabel2 && (rhi.GetCmdInsertDebugUtilsLabel() != nullptr);
 
 	return CreateRhiDiagnosticsComposition(
 	    std::make_unique<VulkanRenderObjectDiagnostics>(rhi),

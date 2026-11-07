@@ -14,11 +14,8 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogGpuCrash, "RHI.GpuCrash");
 
-namespace GpuCrashLifetime
-{
-	std::atomic<GpuCrashSession*> Session{nullptr};
-	std::atomic_flag Claimed;
-}
+static std::atomic<GpuCrashSession*> g_gpuCrashSession{nullptr};
+static std::atomic_flag g_gpuCrashSessionClaimed;
 
 RhiGpuCrash::RhiGpuCrash(ERhiBackendApi api, const RhiGpuCrashLaunch& launch)
 {
@@ -26,14 +23,14 @@ RhiGpuCrash::RhiGpuCrash(ERhiBackendApi api, const RhiGpuCrashLaunch& launch)
 	{
 		return;
 	}
-	if (GpuCrashLifetime::Claimed.test_and_set())
+	if (g_gpuCrashSessionClaimed.test_and_set())
 	{
 		throw Diagnostics::Error("GPU crash collection permits one session per process.");
 	}
 
 	// Callbacks and their DLL have no documented join barrier. Retain the anchor.
 	m_session = new GpuCrashSession(api, launch);
-	GpuCrashLifetime::Session.store(m_session, std::memory_order_release);
+	g_gpuCrashSession.store(m_session, std::memory_order_release);
 }
 
 RhiGpuCrash::~RhiGpuCrash()
@@ -48,7 +45,12 @@ GpuCrashSession::GpuCrashSession(ERhiBackendApi api, const RhiGpuCrashLaunch& la
     m_sink(launch.Sink),
     m_markers(std::make_unique<MarkerEntry[]>(MaximumMarkers))
 {
-	if (launch.Mode != RhiGpuCrashMode::Aftermath || m_sink == nullptr || !launch.LibraryPath.is_absolute() || (api != ERhiBackendApi::D3D12 && api != ERhiBackendApi::Vulkan))
+	const bool bInvalidCrashSessionsink = launch.Mode != RhiGpuCrashMode::Aftermath || m_sink == nullptr;
+	const bool bInvalidCrashSessionLibraryPath = bInvalidCrashSessionsink || (!launch.LibraryPath.is_absolute());
+	const bool bInvalidCrashSessionapi = api != ERhiBackendApi::D3D12 && api != ERhiBackendApi::Vulkan;
+	const bool invalidCrashSession = bInvalidCrashSessionLibraryPath || bInvalidCrashSessionapi;
+	
+	if (invalidCrashSession)
 	{
 		throw Diagnostics::Error("Aftermath requires an admitted API, absolute DLL path and prepared artifact sink.");
 	}
@@ -76,12 +78,16 @@ GpuCrashSession::GpuCrashSession(ERhiBackendApi api, const RhiGpuCrashLaunch& la
 #endif
 	const auto watched = api == ERhiBackendApi::D3D12 ? GFSDK_Aftermath_GpuCrashDumpWatchedApiFlags_DX : GFSDK_Aftermath_GpuCrashDumpWatchedApiFlags_Vulkan;
 	HMODULE callbackModule = nullptr;
-	if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN, reinterpret_cast<const wchar_t*>(&GpuCrashSession::DumpCallback), &callbackModule))
+	const bool callbackPinFailed = !GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN, reinterpret_cast<const wchar_t*>(&GpuCrashSession::DumpCallback), &callbackModule);
+	
+	if (callbackPinFailed)
 	{
 		throw Diagnostics::Error("Cannot retain GPU crash callback code for the process lifetime.");
 	}
-	if (m_enable(GFSDK_Aftermath_Version_API, watched, GFSDK_Aftermath_GpuCrashDumpFeatureFlags_Default, DumpCallback, DebugCallback, DescriptionCallback, MarkerCallback, this)
-	    != GFSDK_Aftermath_Result_Success)
+	const bool aftermathEnableFailed = m_enable(GFSDK_Aftermath_Version_API, watched, GFSDK_Aftermath_GpuCrashDumpFeatureFlags_Default, DumpCallback, DebugCallback, DescriptionCallback, MarkerCallback, this)
+		    != GFSDK_Aftermath_Result_Success;
+	
+	if (aftermathEnableFailed)
 	{
 		// Even a failed enable has no callback-quiescence guarantee. Do not unwind the anchor.
 		Diagnostics::Fatal(LogGpuCrash, __FILE__, __LINE__, "Aftermath crash collection could not be enabled; requested launch rejected.");
@@ -105,8 +111,12 @@ void GpuCrashSession::InitializeLibrary(ERhiBackendApi api, const std::filesyste
 
 	std::array<wchar_t, 32'768> loadedPath{};
 	const DWORD count = GetModuleFileNameW(m_library, loadedPath.data(), static_cast<DWORD>(loadedPath.size()));
-	if (count == 0 || count >= loadedPath.size() || !std::filesystem::equivalent(libraryPath, loadedPath.data()) || !Hash::TrySha256File(loadedPath.data(), hash, error)
-	    || Hash::Sha256ToHex(hash) != SPARKLE_AFTERMATH_RUNTIME_SHA256)
+	const bool loadedPathValid = count != 0 && count < loadedPath.size();
+	const bool libraryPathMatches = loadedPathValid && std::filesystem::equivalent(libraryPath, loadedPath.data());
+	const bool runtimeHashed = libraryPathMatches && Hash::TrySha256File(loadedPath.data(), hash, error);
+	const bool runtimeHashMatches = runtimeHashed && Hash::Sha256ToHex(hash) == SPARKLE_AFTERMATH_RUNTIME_SHA256;
+
+	if (!runtimeHashMatches)
 	{
 		throw Diagnostics::Error("Loaded Aftermath DLL identity changed or resolved to another file.");
 	}
@@ -140,7 +150,7 @@ void GpuCrashSession::InitializeLibrary(ERhiBackendApi api, const std::filesyste
 
 GpuCrashSession* GpuCrashSession::Current() noexcept
 {
-	return GpuCrashLifetime::Session.load(std::memory_order_acquire);
+	return g_gpuCrashSession.load(std::memory_order_acquire);
 }
 
 FARPROC GpuCrashSession::RequireExport(const char* name) const

@@ -36,19 +36,21 @@ bool EvaluateStreamlineRayReconstructionFrame(
     sl::ViewportHandle viewport,
     const RayReconstructionEvaluationDesc& evaluation)
 {
-	if (!evaluation.NativeCommandList
-	    || !AreStreamlineTextureViewsValid(
-	        evaluation.BackendApi,
-	        evaluation.NativeNoisyInputColorView,
-	        evaluation.NativeOutputColorView,
-	        evaluation.NativeDepthView,
-	        evaluation.NativeMotionVectorsView,
-	        evaluation.NativeNormalsView,
-	        evaluation.NativeRoughnessView,
-	        evaluation.NativeDiffuseAlbedoView,
-	        evaluation.NativeSpecularAlbedoView,
-	        evaluation.NativeSpecularHitDistanceView,
-	        evaluation.NativeExposureView))
+	const bool invalidReconstructionInputs = !evaluation.NativeCommandList
+		    || !AreStreamlineTextureViewsValid(
+		        evaluation.BackendApi,
+		        evaluation.NativeNoisyInputColorView,
+		        evaluation.NativeOutputColorView,
+		        evaluation.NativeDepthView,
+		        evaluation.NativeMotionVectorsView,
+		        evaluation.NativeNormalsView,
+		        evaluation.NativeRoughnessView,
+		        evaluation.NativeDiffuseAlbedoView,
+		        evaluation.NativeSpecularAlbedoView,
+		        evaluation.NativeSpecularHitDistanceView,
+		        evaluation.NativeExposureView);
+	
+	if (invalidReconstructionInputs)
 	{
 		return false;
 	}

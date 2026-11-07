@@ -2,10 +2,10 @@
 #include "Scene/GpuScene/RenderGpuScene.h"
 
 #include "RHI/Public/Frame/RhiFrameConstants.h"
-#include "Scene/GpuScene/RenderGpuGeometryBuffers.h"
-#include "Scene/GpuScene/RenderGpuGeometryState.h"
-#include "Scene/GpuScene/RenderGpuLighting.h"
-#include "Scene/GpuScene/RenderGpuRayTracing.h"
+#include "Scene/GpuScene/Geometry/RenderGpuGeometryBuffers.h"
+#include "Scene/GpuScene/Geometry/RenderGpuGeometryState.h"
+#include "Scene/GpuScene/Lighting/RenderGpuLighting.h"
+#include "Scene/GpuScene/RayTracing/RenderGpuRayTracing.h"
 
 #include <array>
 

@@ -63,21 +63,25 @@ namespace ViewportCameraProperties
 	{
 		const auto& settings = viewportSession.GetSettings();
 		float moveSpeed = settings.Navigation.MoveSpeedMetersPerSecond;
-		if (DrawFloat(
-		        "##ViewportMoveSpeed",
-		        "Move speed (m/s)",
-		        moveSpeed,
-		        0.01f,
-		        settings.Navigation.MinimumMoveSpeedMetersPerSecond,
-		        settings.Navigation.MaximumMoveSpeedMetersPerSecond,
-		        "%.4f",
-		        ImGuiSliderFlags_Logarithmic))
+		const bool moveSpeedEdited = DrawFloat(
+				        "##ViewportMoveSpeed",
+				        "Move speed (m/s)",
+				        moveSpeed,
+				        0.01f,
+				        settings.Navigation.MinimumMoveSpeedMetersPerSecond,
+				        settings.Navigation.MaximumMoveSpeedMetersPerSecond,
+				        "%.4f",
+				        ImGuiSliderFlags_Logarithmic);
+		
+		if (moveSpeedEdited)
 		{
 			viewportSession.SetMoveSpeed(moveSpeed);
 		}
 
 		float rotationSpeed = settings.Navigation.RotationSpeedDegreesPerPixel;
-		if (DrawFloat("##ViewportRotationSpeed", "Rotation speed (deg/px)", rotationSpeed, 0.005f, 0.001f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic))
+		const bool rotationSpeedEdited = DrawFloat("##ViewportRotationSpeed", "Rotation speed (deg/px)", rotationSpeed, 0.005f, 0.001f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
+		
+		if (rotationSpeedEdited)
 		{
 			viewportSession.SetRotationSpeed(rotationSpeed);
 		}
@@ -96,7 +100,9 @@ namespace ViewportCameraProperties
 		if (settings.ProjectionKind == CameraProjectionKind::Orthographic)
 		{
 			float orthographicHeight = settings.OrthographicHeightMeters;
-			if (DrawFloat("##ViewportOrthographicHeight", "Ortho height (m)", orthographicHeight, 0.1f, 0.001f, 1000000.0f, "%.3f", ImGuiSliderFlags_Logarithmic))
+			const bool orthographicHeightEdited = DrawFloat("##ViewportOrthographicHeight", "Ortho height (m)", orthographicHeight, 0.1f, 0.001f, 1000000.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+			
+			if (orthographicHeightEdited)
 			{
 				viewportSession.SetOrthographicHeight(orthographicHeight);
 			}

@@ -134,7 +134,10 @@ void VulkanRenderCommandList::ClearRenderTarget(RhiCpuDescriptorHandle renderTar
 
 void VulkanRenderCommandList::ClearDepthStencil(RhiCpuDescriptorHandle depthStencil, float depth, std::uint8_t stencil) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || !m_hasScissorRect || VulkanDescriptorHandles::DecodeImageViewCpuHandle(depthStencil) != m_depthStencil)
+	const bool bDepthClearUnavailableScissorRect = m_commandBuffer == VK_NULL_HANDLE || !m_hasScissorRect;
+	const bool depthClearUnavailable = bDepthClearUnavailableScissorRect || (VulkanDescriptorHandles::DecodeImageViewCpuHandle(depthStencil) != m_depthStencil);
+	
+	if (depthClearUnavailable)
 	{
 		return;
 	}

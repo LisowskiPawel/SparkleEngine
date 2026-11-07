@@ -19,8 +19,10 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanRhiLogger, "RHI.Vulkan");
 
 bool VulkanRhi::AppendAvailableDeviceExtension(VkPhysicalDevice physicalDevice, std::vector<const char*>& extensions, const char* extensionName) noexcept
 {
-	if (extensionName == nullptr
-	    || std::find_if(extensions.begin(), extensions.end(), [extensionName](const char* enabled) noexcept { return std::strcmp(enabled, extensionName) == 0; }) != extensions.end())
+	const bool extensionAlreadyEnabled = extensionName == nullptr
+		    || std::find_if(extensions.begin(), extensions.end(), [extensionName](const char* enabled) noexcept { return std::strcmp(enabled, extensionName) == 0; }) != extensions.end();
+	
+	if (extensionAlreadyEnabled)
 	{
 		return false;
 	}
@@ -181,7 +183,10 @@ void VulkanRhi::SelectPhysicalDevice() noexcept
 			continue;
 		}
 		candidate.QueueTopology = VulkanQueueTopology::Select(device);
-		if (!candidate.QueueTopology.Supports(ERhiQueueType::Graphics) || !candidate.QueueTopology.Supports(ERhiQueueType::Compute) || !candidate.QueueTopology.Supports(ERhiQueueType::Copy))
+		const bool bRequiredQueueMissingQueueTopology = !candidate.QueueTopology.Supports(ERhiQueueType::Graphics) || !candidate.QueueTopology.Supports(ERhiQueueType::Compute);
+		const bool requiredQueueMissing = bRequiredQueueMissingQueueTopology || (!candidate.QueueTopology.Supports(ERhiQueueType::Copy));
+		
+		if (requiredQueueMissing)
 		{
 			continue;
 		}

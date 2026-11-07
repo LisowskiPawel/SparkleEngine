@@ -246,14 +246,17 @@ void RayTracingBlasCache::ReplaceDynamicVertexBuffer(std::span<const DirectX::XM
 		entry.dynamicVertexBufferView = {};
 	}
 
-	if (!m_renderHardwareInterface->GetResourceService().CreateVertexBuffer(
-	        positions.data(),
-	        positions.size() * sizeof(DirectX::XMFLOAT3),
-	        static_cast<std::uint32_t>(sizeof(DirectX::XMFLOAT3)),
-	        L"RayTracingSkinnedBlasVertices",
-	        entry.dynamicVertexBuffer,
-	        entry.dynamicVertexBufferView)
-	    || !entry.dynamicVertexBuffer)
+	const bool vertexBufferCreated = m_renderHardwareInterface->GetResourceService().CreateVertexBuffer(
+	    positions.data(),
+	    positions.size() * sizeof(DirectX::XMFLOAT3),
+	    static_cast<std::uint32_t>(sizeof(DirectX::XMFLOAT3)),
+	    L"RayTracingSkinnedBlasVertices",
+	    entry.dynamicVertexBuffer,
+	    entry.dynamicVertexBufferView);
+
+	const bool vertexBufferAvailable = vertexBufferCreated && entry.dynamicVertexBuffer;
+
+	if (!vertexBufferAvailable)
 	{
 		Diagnostics::Fatal(g_rayTracingBlasCacheLogger, __FILE__, __LINE__, "Skinned BLAS dynamic vertex-buffer allocation failed.");
 	}

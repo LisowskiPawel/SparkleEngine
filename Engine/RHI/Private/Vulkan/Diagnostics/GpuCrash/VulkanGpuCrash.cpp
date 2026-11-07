@@ -41,7 +41,9 @@ VulkanGpuCrashConfiguration::VulkanGpuCrashConfiguration(VkPhysicalDevice physic
 	const std::array required{VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME, VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME};
 	for (const char* name : required)
 	{
-		if (!std::ranges::any_of(available, [name](const auto& extension) { return std::strcmp(name, extension.extensionName) == 0; }))
+		const bool extensionUnavailable = !std::ranges::any_of(available, [name](const auto& extension) { return std::strcmp(name, extension.extensionName) == 0; });
+		
+		if (extensionUnavailable)
 		{
 			Diagnostics::Fatal(LogVulkanGpuCrash, __FILE__, __LINE__, "Required Aftermath Vulkan extension is unavailable.");
 		}

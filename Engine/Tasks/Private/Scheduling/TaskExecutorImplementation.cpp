@@ -17,10 +17,13 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogTaskExecutor, "Tasks.Executor");
 void TaskExecutor::Implementation::Runtime::ValidateConfiguration(const TaskExecutorConfig& config)
 {
 	const std::uint64_t totalWorkers = static_cast<std::uint64_t>(config.FrameCriticalWorkerCount) + config.BackgroundWorkerCount + config.BlockingIoWorkerCount;
-	const bool invalidSerialMix = config.FrameCriticalWorkerCount == 0 && (config.BackgroundWorkerCount != 0 || config.BlockingIoWorkerCount != 0);
+	const bool bInvalidSerialMixWorkerCount = config.FrameCriticalWorkerCount == 0;
+	const bool bInvalidSerialMixWorkerCount2 = config.BackgroundWorkerCount != 0 || config.BlockingIoWorkerCount != 0;
+	const bool invalidSerialMix = bInvalidSerialMixWorkerCount && bInvalidSerialMixWorkerCount2;
 
-	const bool invalidCapacity = config.MaximumTasksPerExecution == 0 || config.MaximumTasksPerExecution > TaskGraphLimits::HardMaximumTasks
-	    || config.MaximumEdgesPerExecution > TaskGraphLimits::HardMaximumEdges || config.MaximumActiveExecutions == 0;
+	const bool bInvalidCapacityPerExecution = config.MaximumTasksPerExecution == 0 || config.MaximumTasksPerExecution > TaskGraphLimits::HardMaximumTasks;
+	const bool bInvalidCapacityPerExecution2 = bInvalidCapacityPerExecution || (config.MaximumEdgesPerExecution > TaskGraphLimits::HardMaximumEdges);
+	const bool invalidCapacity = bInvalidCapacityPerExecution2 || (config.MaximumActiveExecutions == 0);
 
 	if (totalWorkers > MaximumWorkerCount || invalidSerialMix || invalidCapacity)
 	{

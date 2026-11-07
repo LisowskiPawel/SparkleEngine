@@ -3,7 +3,7 @@
 #include "Scene/Geometry/MeshDraw.h"
 #include "Rendering/RenderObjectId.h"
 #include "Scene/Materials/MaterialData.h"
-#include "Scene/Preparation/RenderMeshWorldBounds.h"
+#include "Scene/Preparation/Geometry/RenderMeshWorldBounds.h"
 
 #include <DirectXMath.h>
 

@@ -108,9 +108,17 @@ static void ResolveDepthStencilCompatibility(FrameGraphRasterPass& result, const
 	if (result.HasDepthStencil)
 	{
 		const FrameGraphTextureDesc& depthDesc = resources.GetMetadata(result.DepthStencil.Handle.GetResourceHandle()).textureDesc;
-		if ((result.ColorCount != 0 && depthDesc.sampleCount != result.Compatibility.SampleCount)
-		    || (result.DepthStencil.DepthStencilAccess == FrameGraphDepthStencilAccess::ReadOnly
-		        && (result.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear || renderState.GetDepth().DepthWriteEnable || StencilWrites(renderState.GetStencil()))))
+		const bool sampleCountMismatch = result.ColorCount != 0 && depthDesc.sampleCount != result.Compatibility.SampleCount;
+		const bool readOnlyAttachment = !sampleCountMismatch && result.DepthStencil.DepthStencilAccess == FrameGraphDepthStencilAccess::ReadOnly;
+		const bool bDepthWrittenDepthStencil = readOnlyAttachment && (result.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear);
+		const bool bDepthWrittenGuardGetDepth = readOnlyAttachment && !bDepthWrittenDepthStencil;
+		const bool bDepthWrittenGetDepth = bDepthWrittenGuardGetDepth && (renderState.GetDepth().DepthWriteEnable);
+		const bool bDepthWrittenGetDepth2 = bDepthWrittenDepthStencil || bDepthWrittenGetDepth;
+		const bool depthWritten = readOnlyAttachment && bDepthWrittenGetDepth2;
+		const bool bStencilWrittendepthWritten = readOnlyAttachment && !depthWritten;
+		const bool stencilWritten = bStencilWrittendepthWritten && (StencilWrites(renderState.GetStencil()));
+
+		if (sampleCountMismatch || depthWritten || stencilWritten)
 		{
 			throw Diagnostics::Error("Raster depth attachment is incompatible with pass depth, stencil, access, load, or sample state.");
 		}

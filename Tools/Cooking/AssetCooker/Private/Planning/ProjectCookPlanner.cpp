@@ -30,7 +30,12 @@ bool ProjectCookPlanner::TryFindWorkspaceRoot(const std::filesystem::path& start
 	}
 
 	const std::optional<std::filesystem::path> workspaceRoot = Filesystem::FindAncestorWithMarker(currentPath, Filesystem::kWorkspaceMarker);
-	if (!workspaceRoot || !PathExists(*workspaceRoot / "Engine" / std::string(Filesystem::kEngineMarker)) || !PathExists(*workspaceRoot / "Projects") || !PathExists(*workspaceRoot / "Tools"))
+	const bool workspaceFound = workspaceRoot.has_value();
+	const bool enginePresent = workspaceFound && PathExists(*workspaceRoot / "Engine" / std::string(Filesystem::kEngineMarker));
+	const bool projectsPresent = enginePresent && PathExists(*workspaceRoot / "Projects");
+	const bool toolsPresent = projectsPresent && PathExists(*workspaceRoot / "Tools");
+
+	if (!toolsPresent)
 	{
 		return false;
 	}
@@ -71,7 +76,10 @@ std::vector<std::string> ProjectCookPlanner::DiscoverProjects(const std::filesys
 	{
 		std::error_code statusError;
 		const std::string projectName = entry.path().filename().string();
-		if (entry.is_directory(statusError) && projectName != "TemplateProject" && PathExists(entry.path() / std::string(Filesystem::kProjectMarker)))
+		const bool projectDirectory = entry.is_directory(statusError) && projectName != "TemplateProject";
+		const bool projectMarkerPresent = projectDirectory && PathExists(entry.path() / std::string(Filesystem::kProjectMarker));
+
+		if (projectMarkerPresent)
 		{
 			projects.push_back(projectName);
 		}

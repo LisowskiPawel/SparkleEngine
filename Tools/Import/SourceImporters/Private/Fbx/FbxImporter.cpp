@@ -38,8 +38,14 @@ SourceImportOutput ImportFbxScene(const std::filesystem::path& filePath)
 	FbxLightImporter::ImportLights(scene, sourceMetersPerUnit, output);
 	FbxAnimationImporter::ImportAnimations(scene, output);
 
-	if (output.scene.meshPrimitives.empty() != output.scene.meshInstances.empty()
-	    || (output.scene.meshPrimitives.empty() && output.scene.cameras.empty() && output.scene.lights.empty() && output.scene.animations.empty()))
+	const bool bOrInconsistentmeshInstancesEmpty = output.scene.meshPrimitives.empty() != output.scene.meshInstances.empty();
+	const bool bOrInconsistentmeshPrimitivesEmpty = !bOrInconsistentmeshInstancesEmpty && (output.scene.meshPrimitives.empty());
+	const bool bOrInconsistentcamerasEmpty = bOrInconsistentmeshPrimitivesEmpty && (output.scene.cameras.empty());
+	const bool bImportedOrInconsistentlightsEmpty = bOrInconsistentcamerasEmpty && (output.scene.lights.empty());
+	const bool bOrInconsistentanimationsEmpty = bImportedOrInconsistentlightsEmpty && (output.scene.animations.empty());
+	const bool importedSceneEmptyOrInconsistent = bOrInconsistentmeshInstancesEmpty || bOrInconsistentanimationsEmpty;
+	
+	if (importedSceneEmptyOrInconsistent)
 	{
 		throw Diagnostics::Error("FBX import produced incomplete mesh content or no supported scene content.");
 	}

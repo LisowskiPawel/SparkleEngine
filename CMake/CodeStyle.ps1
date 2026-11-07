@@ -464,7 +464,8 @@ if ($Mode -eq "Check" -and $SourceFamily -ne "Shaders")
 $ownedCppPaths = @($ownedSourcePaths | Where-Object { [IO.Path]::GetExtension($_) -notin @(".hlsl", ".hlsli") })
 $ownedShaderPaths = @($ownedSourcePaths | Where-Object { [IO.Path]::GetExtension($_) -in @(".hlsl", ".hlsli") })
 
-Add-Type -Path (Join-Path $PSScriptRoot "CodeStyleParagraphSpacing.cs")
+Add-Type -Path (Join-Path $PSScriptRoot "CodeStyle/CodeStyleParagraphSpacing.cs")
+Add-Type -Path (Join-Path $PSScriptRoot "CodeStyle/CodeStyleIfConditions.cs")
 
 $formatFailed = $false
 $braceCheckStylePath = $null
@@ -607,6 +608,19 @@ $multipleInheritancePattern = [regex]::new(
 foreach ($relativePath in $ownedSourcePaths)
 {
     $absolutePath = Join-Path $repositoryRoot ($relativePath -replace "/", [IO.Path]::DirectorySeparatorChar)
+    $sourceText = [IO.File]::ReadAllText($absolutePath)
+    foreach ($lineNumber in [CodeStyleIfConditions]::FindViolations($sourceText))
+    {
+        Add-PolicyViolation $policyViolations $relativePath $lineNumber "long call-bearing if conditions must resolve named local results"
+    }
+    foreach ($lineNumber in [CodeStyleIfConditions]::FindBooleanBudgetViolations($sourceText))
+    {
+        Add-PolicyViolation $policyViolations $relativePath $lineNumber "boolean decisions allow at most two atomic checks; use small named expressions"
+    }
+    foreach ($lineNumber in [CodeStyleIfConditions]::FindBooleanNameViolations($sourceText))
+    {
+        Add-PolicyViolation $policyViolations $relativePath $lineNumber "boolean variables require bUpperCamelCase, after any existing scope prefix"
+    }
     $lines = @(Get-Content -LiteralPath $absolutePath)
     for ($lineIndex = 0; $lineIndex -lt $lines.Count; ++$lineIndex)
     {

@@ -62,11 +62,20 @@ namespace SparkleLauncher
 			const bool levelSourceReady = std::filesystem::exists(level.sourcePath, sourceError) && !sourceError;
 			const bool packSourceReady = assetPack == nullptr || m_catalog.IsAssetPackSourceReady(assetPack->id);
 			const bool gameSupported = assetPack == nullptr || assetPack->gameSupported;
-			const bool ready = levelSourceReady && (level.id == "Empty" || cooked.MeshesReady) && cooked.TexturesReady && cooked.Shaders == CookedShaderPublicationState::Ready;
+			const bool bMeshesReady = level.id == "Empty" || cooked.MeshesReady;
+			const bool bMeshSourceReady = levelSourceReady && bMeshesReady;
+			const bool bAssetsReady = bMeshSourceReady && cooked.TexturesReady;
+			const bool ready = bAssetsReady && cooked.Shaders == CookedShaderPublicationState::Ready;
 			const bool acquisitionSupported = assetPack != nullptr && assetPack->downloadSupported;
 			const bool sourceReady = levelSourceReady && packSourceReady;
-			const bool canSelect = gameSupported && (ready || (hasSourceTools && levelSourceReady && (assetPack == nullptr || packSourceReady || acquisitionSupported)));
-			const bool canSync = hasSourceTools && levelSourceReady && assetPack != nullptr && acquisitionSupported && !packSourceReady;
+			const bool bCanUseTools = hasSourceTools && levelSourceReady;
+			const bool bPackAvailable = assetPack == nullptr || packSourceReady;
+			const bool bCanPreparePack = bPackAvailable || acquisitionSupported;
+			const bool bCanPrepareLevel = bCanUseTools && bCanPreparePack;
+			const bool bLevelAvailable = ready || bCanPrepareLevel;
+			const bool canSelect = gameSupported && bLevelAvailable;
+			const bool bCanAcquirePack = bCanUseTools && acquisitionSupported;
+			const bool canSync = bCanAcquirePack && !packSourceReady;
 
 			LauncherLevelUiEntry entry{
 			    .Id = QString::fromStdString(level.id),

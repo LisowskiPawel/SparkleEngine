@@ -67,7 +67,14 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 bool GpuCrashIncidentSink::IsReadyPublished() const
 {
 	std::lock_guard lock(m_mutex);
-	if (m_nativeFailure == 0 && !m_finalizing && (m_incomplete.load(std::memory_order_relaxed) || m_writeFailed.load(std::memory_order_relaxed)))
+	const bool bCollectionIncompletefinalizing = m_nativeFailure == 0 && !m_finalizing;
+	const bool bCollectionIncompleteState = bCollectionIncompletefinalizing && (m_incomplete.load(std::memory_order_relaxed));
+	const bool bCollectionIncompleteGuardState = bCollectionIncompletefinalizing && !bCollectionIncompleteState;
+	const bool bCollectionIncompleteState2 = bCollectionIncompleteGuardState && (m_writeFailed.load(std::memory_order_relaxed));
+	const bool bCollectionIncompleteState3 = bCollectionIncompleteState || bCollectionIncompleteState2;
+	const bool collectionIncomplete = bCollectionIncompletefinalizing && bCollectionIncompleteState3;
+	
+	if (collectionIncomplete)
 	{
 		throw Diagnostics::Error("GPU crash startup publication failed; this child cannot confirm diagnostic readiness.");
 	}
@@ -107,7 +114,12 @@ bool GpuCrashIncidentSink::Enqueue(RhiGpuCrashArtifactId id, std::span<const std
 	{
 		{
 			std::lock_guard lock(m_mutex);
-			if (m_finalizing || m_writeFailed.load(std::memory_order_relaxed) || bytes.empty() || m_outstandingCount == MaximumPayloads || bytes.size() > MaximumQueuedBytes - m_outstandingBytes)
+			const bool bAdmissionRejectedwriteFailedState = m_finalizing || m_writeFailed.load(std::memory_order_relaxed);
+			const bool bAdmissionRejectedbytesEmpty = bAdmissionRejectedwriteFailedState || (bytes.empty());
+			const bool bAdmissionRejectedoutstandingCount = bAdmissionRejectedbytesEmpty || (m_outstandingCount == MaximumPayloads);
+			const bool payloadAdmissionRejected = bAdmissionRejectedoutstandingCount || (bytes.size() > MaximumQueuedBytes - m_outstandingBytes);
+			
+			if (payloadAdmissionRejected)
 			{
 				MarkIncomplete();
 				return false;

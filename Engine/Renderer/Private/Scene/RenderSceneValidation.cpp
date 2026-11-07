@@ -5,7 +5,11 @@
 
 bool RenderScene::ValidateDynamic(const RenderSceneDynamicData& dynamic, const RenderSceneDelta& delta) const
 {
-	if (!HasStrictlyOrderedDynamicObjects(dynamic.Objects) || !HasStrictlyOrderedJointMatrixRanges(dynamic.JointMatrixRanges) || !HasStrictlyOrderedMorphWeightRanges(dynamic.MorphWeightRanges))
+	const bool objectsOrdered = HasStrictlyOrderedDynamicObjects(dynamic.Objects);
+	const bool jointMatricesOrdered = objectsOrdered && HasStrictlyOrderedJointMatrixRanges(dynamic.JointMatrixRanges);
+	const bool morphWeightsOrdered = jointMatricesOrdered && HasStrictlyOrderedMorphWeightRanges(dynamic.MorphWeightRanges);
+
+	if (!morphWeightsOrdered)
 	{
 		return false;
 	}
@@ -35,8 +39,11 @@ bool RenderScene::ValidateDynamic(const RenderSceneDynamicData& dynamic, const R
 
 	for (const RenderJointMatrixRange& range : dynamic.JointMatrixRanges)
 	{
-		if (!range.Object.IsValid() || !IsObjectAvailable(range.Object, delta) || range.JointMatrixOffset > dynamic.JointMatrices.size()
-		    || range.JointMatrixCount > dynamic.JointMatrices.size() - range.JointMatrixOffset)
+		const bool bInvalidMatrixRangeObject = !range.Object.IsValid() || !IsObjectAvailable(range.Object, delta);
+		const bool bInvalidMatrixRangeJointMatrices = bInvalidMatrixRangeObject || (range.JointMatrixOffset > dynamic.JointMatrices.size());
+		const bool invalidJointMatrixRange = bInvalidMatrixRangeJointMatrices || (range.JointMatrixCount > dynamic.JointMatrices.size() - range.JointMatrixOffset);
+		
+		if (invalidJointMatrixRange)
 		{
 			return false;
 		}
@@ -44,8 +51,11 @@ bool RenderScene::ValidateDynamic(const RenderSceneDynamicData& dynamic, const R
 
 	for (const RenderMorphWeightRange& morphWeightRange : dynamic.MorphWeightRanges)
 	{
-		if (!morphWeightRange.Object.IsValid() || !IsObjectAvailable(morphWeightRange.Object, delta) || morphWeightRange.WeightOffset > dynamic.MorphWeights.size()
-		    || morphWeightRange.WeightCount > dynamic.MorphWeights.size() - morphWeightRange.WeightOffset)
+		const bool bInvalidWeightRangeObject = !morphWeightRange.Object.IsValid() || !IsObjectAvailable(morphWeightRange.Object, delta);
+		const bool bInvalidWeightRangeMorphWeights = bInvalidWeightRangeObject || (morphWeightRange.WeightOffset > dynamic.MorphWeights.size());
+		const bool invalidMorphWeightRange = bInvalidWeightRangeMorphWeights || (morphWeightRange.WeightCount > dynamic.MorphWeights.size() - morphWeightRange.WeightOffset);
+		
+		if (invalidMorphWeightRange)
 		{
 			return false;
 		}
@@ -128,7 +138,10 @@ bool RenderScene::HasConflictingDeltaObjects(const RenderSceneDelta& delta) noex
 	    [](const RenderObjectUpdate& left, const RenderObjectUpdate& right) { return left.Object == right.Object; });
 
 	const auto duplicateDestroys = std::adjacent_find(delta.Destroys.begin(), delta.Destroys.end());
-	if (duplicateCreates != delta.Creates.end() || duplicateUpdates != delta.Updates.end() || duplicateDestroys != delta.Destroys.end())
+	const bool bDuplicateObjectMutationsUpdates = duplicateCreates != delta.Creates.end() || duplicateUpdates != delta.Updates.end();
+	const bool duplicateObjectMutations = bDuplicateObjectMutationsUpdates || (duplicateDestroys != delta.Destroys.end());
+	
+	if (duplicateObjectMutations)
 	{
 		return true;
 	}
@@ -141,7 +154,10 @@ bool RenderScene::HasConflictingDeltaObjects(const RenderSceneDelta& delta) noex
 		    create.Object,
 		    [](const RenderObjectUpdate& candidate, RenderObjectId identity) { return candidate.Object < identity; });
 
-		if ((update != delta.Updates.end() && update->Object == create.Object) || std::binary_search(delta.Destroys.begin(), delta.Destroys.end(), create.Object))
+		const bool bConflictingObjectMutationObject = update != delta.Updates.end() && update->Object == create.Object;
+		const bool conflictingObjectMutation = bConflictingObjectMutationObject || (std::binary_search(delta.Destroys.begin(), delta.Destroys.end(), create.Object));
+		
+		if (conflictingObjectMutation)
 		{
 			return true;
 		}

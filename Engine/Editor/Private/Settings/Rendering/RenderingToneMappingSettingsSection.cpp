@@ -18,7 +18,7 @@ void DrawToneMappingSettingsSection(EngineRenderingSettingsController& settingsC
 
 	const bool toneMappingMatches = RenderingSettingsUi::MatchesFilter(filterText, "Tone Mapping", "tone mapper aces reinhard filmic");
 	const bool toneMappingOpen = toneMappingMatches && RenderingSettingsUi::BeginSettingsCategory("Tone Mapping");
-	
+
 	if (!toneMappingOpen)
 	{
 		return;

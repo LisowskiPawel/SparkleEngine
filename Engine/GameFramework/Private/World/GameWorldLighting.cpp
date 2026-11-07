@@ -105,9 +105,12 @@ namespace ECS
 		const Transform transform(DirectX::XMLoadFloat4x4(&desc.common.worldTransform));
 		const LocalTransform local = WorldTransformConversion::ToLocal(transform);
 
-		const bool added = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{}) && m_registry.Add(entity, LightComponentTranslation::ToLightComponent(desc))
-		    && m_registry.Add(entity, Visibility{.Visible = desc.common.visible}) && m_registry.Add(entity, Name{std::move(desc.common.name)})
-		    && m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextLightIdentity, .Kind = AuthoredObjectKind::Light}) && m_registry.Add(entity, EditorMetadata{});
+		const bool bAddedAdd = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
+		const bool bAddedAdd2 = bAddedAdd && (m_registry.Add(entity, LightComponentTranslation::ToLightComponent(desc)));
+		const bool bAddedcommon = bAddedAdd2 && (m_registry.Add(entity, Visibility{.Visible = desc.common.visible}));
+		const bool bAddedcommon2 = bAddedcommon && (m_registry.Add(entity, Name{std::move(desc.common.name)}));
+		const bool bAddedAdd3 = bAddedcommon2 && (m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextLightIdentity, .Kind = AuthoredObjectKind::Light}));
+		const bool added = bAddedAdd3 && (m_registry.Add(entity, EditorMetadata{}));
 
 		if (!added)
 		{
@@ -149,8 +152,9 @@ namespace ECS
 		}
 		const Transform transform(DirectX::XMLoadFloat4x4(&desc.common.worldTransform));
 
-		const bool written = WriteTransform(entity, transform) && m_registry.Replace(entity, LightComponentTranslation::ToLightComponent(desc))
-		    && m_registry.Replace(entity, Name{std::move(desc.common.name)}) && WriteVisibility(entity, desc.common.visible);
+		const bool bWrittenReplace = WriteTransform(entity, transform) && m_registry.Replace(entity, LightComponentTranslation::ToLightComponent(desc));
+		const bool bWrittencommon = bWrittenReplace && (m_registry.Replace(entity, Name{std::move(desc.common.name)}));
+		const bool written = bWrittencommon && (WriteVisibility(entity, desc.common.visible));
 
 		if (written)
 		{

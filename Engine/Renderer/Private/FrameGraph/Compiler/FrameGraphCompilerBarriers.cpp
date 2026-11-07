@@ -67,7 +67,8 @@ void FrameGraphCompiler::BuildQueueOwnershipBarriers(
     FrameGraphResourceNode& compiledResource,
     const LastResourceAccess& lastAccess) noexcept
 {
-	const bool crossesQueue = lastAccess.Pass != INVALID_FRAME_GRAPH_PASS_INDEX && lastAccess.Pass != passIndex && lastAccess.Queue != passRecord.queue;
+	const bool bCrossesQueuePass = lastAccess.Pass != INVALID_FRAME_GRAPH_PASS_INDEX && lastAccess.Pass != passIndex;
+	const bool crossesQueue = bCrossesQueuePass && (lastAccess.Queue != passRecord.queue);
 	if (crossesQueue)
 	{
 		AddSynchronizationDependency(passRecord, lastAccess.Pass);
@@ -120,7 +121,9 @@ void FrameGraphCompiler::BuildRequiredResourceBarriers(FrameGraphPassNode& passR
 			m_resourceStateTracker.UpdateCurrentState(declaration.handle, requiredState);
 		}
 
-		if (compiledResource.pendingAccelerationStructureBarrier && !HasCompiledBarrier(passRecord, declaration.handle, FrameGraphBarrier::Type::AccelerationStructure))
+		const bool accelerationBarrierMissing = compiledResource.pendingAccelerationStructureBarrier && !HasCompiledBarrier(passRecord, declaration.handle, FrameGraphBarrier::Type::AccelerationStructure);
+		
+		if (accelerationBarrierMissing)
 		{
 			passRecord.compiledBarriers.push_back(
 			    FrameGraphBarrier{.handle = declaration.handle, .type = FrameGraphBarrier::Type::AccelerationStructure, .before = requiredState, .after = requiredState, .label = declaration.label});
@@ -140,8 +143,8 @@ void FrameGraphCompiler::BuildRequiredResourceBarriers(FrameGraphPassNode& passR
 		return;
 	}
 
-	const bool requiresUnorderedAccessBarrier = requiredState == ResourceState::UnorderedAccess && WritesToUsage(declaration.usage)
-	    && !HasCompiledBarrier(passRecord, declaration.handle, FrameGraphBarrier::Type::UnorderedAccess);
+	const bool bRequiresAccessBarrierusage = requiredState == ResourceState::UnorderedAccess && WritesToUsage(declaration.usage);
+	const bool requiresUnorderedAccessBarrier = bRequiresAccessBarrierusage && (!HasCompiledBarrier(passRecord, declaration.handle, FrameGraphBarrier::Type::UnorderedAccess));
 
 	if (requiresUnorderedAccessBarrier)
 	{

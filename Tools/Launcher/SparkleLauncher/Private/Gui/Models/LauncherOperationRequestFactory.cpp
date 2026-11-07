@@ -17,7 +17,11 @@ namespace SparkleLauncher
 		for (const QString& part : settings.BuildScopes().split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts))
 		{
 			BuildWorkspaceScope scope = BuildWorkspaceScope::Editor;
-			if (TryParseBuildWorkspaceScope(part.trimmed().toStdString(), scope) && std::find(scopes.begin(), scopes.end(), scope) == scopes.end())
+			const std::string scopeText = part.trimmed().toStdString();
+			const bool scopeParsed = TryParseBuildWorkspaceScope(scopeText, scope);
+			const bool scopeMissing = scopeParsed && std::find(scopes.begin(), scopes.end(), scope) == scopes.end();
+
+			if (scopeMissing)
 			{
 				scopes.push_back(scope);
 			}

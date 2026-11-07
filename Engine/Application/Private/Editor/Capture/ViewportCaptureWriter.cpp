@@ -19,7 +19,8 @@ ViewportCaptureResult ViewportCaptureWriter::Write(ViewportCaptureReadback readb
 	std::vector<std::byte> encodedBytes;
 	std::string failureReason;
 	const bool encoded = ImageEncoding::EncodeBmp(image, encodedBytes, failureReason);
-	const bool written = encoded && !cancellationToken.stop_requested() && Files::TryWriteAllBytesAtomic(outputPath, encodedBytes, failureReason);
+	const bool bWrittenstoprequested = encoded && !cancellationToken.stop_requested();
+	const bool written = bWrittenstoprequested && (Files::TryWriteAllBytesAtomic(outputPath, encodedBytes, failureReason));
 	result.Status = written ? ViewportCaptureStatus::Succeeded : ViewportCaptureStatus::Failed;
 	if (!written)
 	{

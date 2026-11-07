@@ -37,8 +37,12 @@ bool ArtifactBundlePublication::WriteFile(const std::filesystem::path& stagingDi
 	const std::filesystem::path stagedPath = stagingDirectory / file.RelativePath;
 	Hash::Sha256Digest sourceHash{};
 	Hash::Sha256Digest storedHash{};
-	if (!Hash::TrySha256(file.Bytes.data(), file.Bytes.size(), sourceHash, errorMessage) || !Files::TryWriteAllBytes(stagedPath, file.Bytes, errorMessage)
-	    || !Hash::TrySha256File(stagedPath, storedHash, errorMessage) || sourceHash != storedHash)
+	const bool sourceHashed = Hash::TrySha256(file.Bytes.data(), file.Bytes.size(), sourceHash, errorMessage);
+	const bool fileWritten = sourceHashed && Files::TryWriteAllBytes(stagedPath, file.Bytes, errorMessage);
+	const bool storedFileHashed = fileWritten && Hash::TrySha256File(stagedPath, storedHash, errorMessage);
+	const bool storedBytesMatch = storedFileHashed && sourceHash == storedHash;
+
+	if (!storedBytesMatch)
 	{
 		if (errorMessage.empty())
 		{
@@ -73,6 +77,7 @@ ArtifactBundlePublicationResult ArtifactBundlePublication::Publish(ArtifactBundl
 		{
 			return fail("Artifact publication was cancelled.");
 		}
+
 		std::unordered_set<std::string> relativePaths;
 		std::uintmax_t publicationBytes = 0u;
 		const ArtifactBundleFile* completionFile = nullptr;
@@ -104,6 +109,7 @@ ArtifactBundlePublicationResult ArtifactBundlePublication::Publish(ArtifactBundl
 		{
 			return fail("Artifact output root is not writable.");
 		}
+
 		const std::filesystem::path allowedRoot = std::filesystem::weakly_canonical(request.AllowedRoot, fileError);
 		if (fileError)
 		{
@@ -111,10 +117,16 @@ ArtifactBundlePublicationResult ArtifactBundlePublication::Publish(ArtifactBundl
 		}
 		fileError.clear();
 		const std::filesystem::path publicationDirectory = std::filesystem::weakly_canonical(request.PublicationDirectory, fileError);
-		if (fileError || publicationDirectory == allowedRoot || !Paths::IsUnderRoot(publicationDirectory, allowedRoot) || std::filesystem::exists(publicationDirectory, fileError) || fileError)
+		const bool publicationResolved = !fileError && publicationDirectory != allowedRoot;
+		const bool publicationContained = publicationResolved && Paths::IsUnderRoot(publicationDirectory, allowedRoot);
+		const bool publicationAbsent = publicationContained && !std::filesystem::exists(publicationDirectory, fileError);
+		const bool publicationAvailable = publicationAbsent && !fileError;
+
+		if (!publicationAvailable)
 		{
 			return fail("Artifact publication path is outside its allowed root or already exists.");
 		}
+
 		const std::filesystem::space_info space = std::filesystem::space(allowedRoot, fileError);
 		if (fileError || space.available < RequiredFreeSpace(publicationBytes))
 		{
@@ -123,7 +135,10 @@ ArtifactBundlePublicationResult ArtifactBundlePublication::Publish(ArtifactBundl
 
 		stagingDirectory = publicationDirectory;
 		stagingDirectory += ".staging";
-		if (std::filesystem::exists(stagingDirectory, fileError) || fileError || !std::filesystem::create_directories(stagingDirectory, fileError) || fileError)
+		const bool stagingAbsent = !std::filesystem::exists(stagingDirectory, fileError) && !fileError;
+		const bool stagingCreated = stagingAbsent && std::filesystem::create_directories(stagingDirectory, fileError);
+
+		if (!stagingCreated || fileError)
 		{
 			return fail("Artifact staging directory could not be created.");
 		}

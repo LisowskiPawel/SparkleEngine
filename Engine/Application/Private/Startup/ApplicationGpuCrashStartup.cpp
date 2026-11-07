@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "ApplicationGpuCrashStartup.h"
+#include "Startup/ApplicationGpuCrashStartup.h"
 #include "Core/Public/Process/CommandLineUtils.h"
 
 #include "Core/Public/Diagnostics/Error.h"
@@ -53,7 +53,10 @@ GpuCrashStartup ResolveGpuCrashStartup()
 	GpuCrashStartup startup;
 	startup.ShaderExport = Strings::ToWide(std::string_view{options.at("--shader-export")});
 	startup.SessionId = options.contains("--gpu-crash-session") ? options.at("--gpu-crash-session") : Identifiers::CreateUuidV4String();
-	if (!startup.ShaderExport.is_absolute() || startup.ShaderExport.filename() != "shader-export.json" || !Identifiers::IsUuidV4String(startup.SessionId))
+	const bool bInvalidCrashStartupShaderExport = !startup.ShaderExport.is_absolute() || startup.ShaderExport.filename() != "shader-export.json";
+	const bool invalidGpuCrashStartup = bInvalidCrashStartupShaderExport || (!Identifiers::IsUuidV4String(startup.SessionId));
+	
+	if (invalidGpuCrashStartup)
 	{
 		throw Diagnostics::Error("Aftermath requires an absolute shader-export.json path and a valid fresh session UUID.");
 	}
