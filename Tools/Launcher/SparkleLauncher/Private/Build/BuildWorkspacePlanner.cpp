@@ -51,7 +51,7 @@ namespace SparkleLauncher
 			const bool bUnresolvedRequiredToolId = item.Id == "shader-compiler-sdk" || item.Id == "vulkan-sdk";
 			const bool bUnresolvedRequiredToolState = bUnresolvedRequiredToolId && (item.State != ToolchainItemState::Found);
 			const bool bUnresolvedRequiredTool = bUnresolvedRequiredToolState && (!item.Detail.empty());
-			
+
 			if (bUnresolvedRequiredTool)
 			{
 				AddReadiness(plan, item.Detail);

@@ -75,7 +75,7 @@ const GpuMesh* GBufferMeshPass::ResolveBatch(const RenderView& view, const MeshI
 {
 	const bool bInvalidMeshBatchPrimitiveIndices = batch.instanceCount == 0u || batch.firstInstance >= view.rasterPrimitiveIndices.size();
 	const bool bInvalidMeshBatch = bInvalidMeshBatchPrimitiveIndices || (batch.instanceCount > view.rasterPrimitiveIndices.size() - batch.firstInstance);
-	
+
 	if (bInvalidMeshBatch)
 	{
 		return nullptr;
@@ -189,17 +189,17 @@ void GBufferMeshPass::MaterializePipelines(const RenderPassRuntimeCache& runtime
 		}
 		const MaterialData& material = preparedScene.materials[batch.materialSlot];
 		const bool bMaterialGpuBindingsAvailable = material.gpuHandle && material.rasterTextureTable;
-		const bool bSkinningBuffersAvailablemeshKind = bMaterialGpuBindingsAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
-		const bool bBuffersAvailableGuardBuffers = bMaterialGpuBindingsAvailable && !bSkinningBuffersAvailablemeshKind;
+		const bool bSkinningBuffersAvailableMeshKind = bMaterialGpuBindingsAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
+		const bool bBuffersAvailableGuardBuffers = bMaterialGpuBindingsAvailable && !bSkinningBuffersAvailableMeshKind;
 		const bool bBuffersAvailableSkinningBuffers = bBuffersAvailableGuardBuffers && (preparedScene.gpuBindings->Geometry.HasSkinningBuffers());
-		const bool bBuffersAvailableSkinningBuffers2 = bSkinningBuffersAvailablemeshKind || bBuffersAvailableSkinningBuffers;
-		const bool bSkinningBuffersAvailable = bMaterialGpuBindingsAvailable && bBuffersAvailableSkinningBuffers2;
-		const bool bSkinningValidmeshKind = bSkinningBuffersAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
-		const bool bSkinningValidGuardValidSkinning = bSkinningBuffersAvailable && !bSkinningValidmeshKind;
+		const bool bBuffersAccepted = bSkinningBuffersAvailableMeshKind || bBuffersAvailableSkinningBuffers;
+		const bool bSkinningBuffersAvailable = bMaterialGpuBindingsAvailable && bBuffersAccepted;
+		const bool bSkinningValidMeshKind = bSkinningBuffersAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
+		const bool bSkinningValidGuardValidSkinning = bSkinningBuffersAvailable && !bSkinningValidMeshKind;
 		const bool bSkinningValidValidSkinning = bSkinningValidGuardValidSkinning && (HasValidSkinning(preparedScene, view, batch));
-		const bool bSkinningValidValidSkinning2 = bSkinningValidmeshKind || bSkinningValidValidSkinning;
-		const bool bSkinningValid = bSkinningBuffersAvailable && bSkinningValidValidSkinning2;
-		
+		const bool bSkinningAccepted = bSkinningValidMeshKind || bSkinningValidValidSkinning;
+		const bool bSkinningValid = bSkinningBuffersAvailable && bSkinningAccepted;
+
 		if (!bSkinningValid)
 		{
 			continue;

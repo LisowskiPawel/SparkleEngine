@@ -231,8 +231,11 @@ void MainMenuBarPanel::BuildLevelStatus() noexcept
 			ImGui::SetNextWindowFocus();
 		}
 
-		const bool bOperationWindowOpen = ImGui::Begin("Level operation", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-		
+		const bool bOperationWindowOpen = ImGui::Begin(
+		    "Level operation",
+		    nullptr,
+		    ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
 		if (bOperationWindowOpen)
 		{
 			ImGui::PushTextWrapPos(0.0f);

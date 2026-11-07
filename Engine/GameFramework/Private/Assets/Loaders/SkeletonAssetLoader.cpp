@@ -25,7 +25,7 @@ namespace Assets
 		skeletonAsset.header = reader.Read<CookedSkeletonAssetHeader>();
 
 		const bool bSkeletonHeaderInvalid = !skeletonAsset.header.fileHeader.HasMagic(kCookedSkeletonAssetMagic) || skeletonAsset.header.jointStride != sizeof(CookedSkeletonJointRecord);
-		
+
 		if (bSkeletonHeaderInvalid)
 		{
 			throw diagnostics.MakeError("header", "skeleton magic and current joint stride", "Invalid cooked skeleton asset header; recook the asset");
@@ -44,10 +44,10 @@ namespace Assets
 
 			const bool bParentValidJointIndex = bSourceNodeUnique && (joint.parentJointIndex == kInvalidCookedSkeletonJointIndex);
 			const bool bParentValidGuardJointIndex = bSourceNodeUnique && !bParentValidJointIndex;
-			const bool bParentValidjoints = bParentValidGuardJointIndex && (joint.parentJointIndex < skeletonAsset.joints.size());
-			const bool bParentValidJointIndex2 = bParentValidjoints && (joint.parentJointIndex != jointIndex);
-			const bool bParentValidJointIndex3 = bParentValidJointIndex || bParentValidJointIndex2;
-			const bool bParentValid = bSourceNodeUnique && bParentValidJointIndex3;
+			const bool bParentValidJoints = bParentValidGuardJointIndex && (joint.parentJointIndex < skeletonAsset.joints.size());
+			const bool bDistinctParent = bParentValidJoints && (joint.parentJointIndex != jointIndex);
+			const bool bParentAccepted = bParentValidJointIndex || bDistinctParent;
+			const bool bParentValid = bSourceNodeUnique && bParentAccepted;
 
 			const bool bInverseBindFinite = bParentValid && SkeletonTransformContract::IsFinite(joint.inverseBindMatrix);
 			const bool bLocalBindFinite = bInverseBindFinite && SkeletonTransformContract::IsFinite(joint.bindLocalTransform);
@@ -57,10 +57,10 @@ namespace Assets
 			const bool bLocalBindInvertible = bInverseBindInvertible && SkeletonTransformContract::IsInvertible(joint.bindLocalTransform);
 			const bool bLocalBindDecomposable = bLocalBindInvertible && SkeletonTransformContract::IsTrsDecomposable(joint.bindLocalTransform);
 
-			const bool bIndInvariantSatisfied = bLocalBindDecomposable
+			const bool bBindInvariantSatisfied = bLocalBindDecomposable
 			    && SkeletonTransformContract::SatisfiesBindInvariant(joint.bindLocalTransform, joint.parentSpaceTransform, parentBindModel, joint.bindModelTransform);
 
-			if (!bIndInvariantSatisfied)
+			if (!bBindInvariantSatisfied)
 			{
 				throw diagnostics.MakeError(
 				    "joints",

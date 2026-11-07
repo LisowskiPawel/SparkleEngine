@@ -42,7 +42,7 @@ bool RenderScene::ValidateDynamic(const RenderSceneDynamicData& dynamic, const R
 		const bool bInvalidMatrixRangeObject = !range.Object.IsValid() || !IsObjectAvailable(range.Object, delta);
 		const bool bInvalidMatrixRangeJointMatrices = bInvalidMatrixRangeObject || (range.JointMatrixOffset > dynamic.JointMatrices.size());
 		const bool bInvalidJointMatrixRange = bInvalidMatrixRangeJointMatrices || (range.JointMatrixCount > dynamic.JointMatrices.size() - range.JointMatrixOffset);
-		
+
 		if (bInvalidJointMatrixRange)
 		{
 			return false;
@@ -54,7 +54,7 @@ bool RenderScene::ValidateDynamic(const RenderSceneDynamicData& dynamic, const R
 		const bool bInvalidWeightRangeObject = !morphWeightRange.Object.IsValid() || !IsObjectAvailable(morphWeightRange.Object, delta);
 		const bool bInvalidWeightRangeMorphWeights = bInvalidWeightRangeObject || (morphWeightRange.WeightOffset > dynamic.MorphWeights.size());
 		const bool bInvalidMorphWeightRange = bInvalidWeightRangeMorphWeights || (morphWeightRange.WeightCount > dynamic.MorphWeights.size() - morphWeightRange.WeightOffset);
-		
+
 		if (bInvalidMorphWeightRange)
 		{
 			return false;
@@ -140,7 +140,7 @@ bool RenderScene::HasConflictingDeltaObjects(const RenderSceneDelta& delta) noex
 	const auto duplicateDestroys = std::adjacent_find(delta.Destroys.begin(), delta.Destroys.end());
 	const bool bDuplicateObjectMutationsUpdates = duplicateCreates != delta.Creates.end() || duplicateUpdates != delta.Updates.end();
 	const bool bDuplicateObjectMutations = bDuplicateObjectMutationsUpdates || (duplicateDestroys != delta.Destroys.end());
-	
+
 	if (bDuplicateObjectMutations)
 	{
 		return true;
@@ -156,7 +156,7 @@ bool RenderScene::HasConflictingDeltaObjects(const RenderSceneDelta& delta) noex
 
 		const bool bConflictingObjectMutationObject = update != delta.Updates.end() && update->Object == create.Object;
 		const bool bConflictingObjectMutation = bConflictingObjectMutationObject || (std::binary_search(delta.Destroys.begin(), delta.Destroys.end(), create.Object));
-		
+
 		if (bConflictingObjectMutation)
 		{
 			return true;

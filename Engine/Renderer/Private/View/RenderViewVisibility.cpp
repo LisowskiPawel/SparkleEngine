@@ -44,7 +44,7 @@ static RenderMaterialClassification ClassifyMaterial(std::uint32_t alphaMode) no
 static float ComputeCameraDistanceSquared(const DirectX::XMFLOAT3& cameraPosition, const RenderMeshWorldBounds& bounds, const DirectX::XMFLOAT4X4& worldMatrix) noexcept
 {
 	const DirectX::XMFLOAT3 center = bounds.bValid ? DirectX::XMFLOAT3{0.5f * (bounds.Min.x + bounds.Max.x), 0.5f * (bounds.Min.y + bounds.Max.y), 0.5f * (bounds.Min.z + bounds.Max.z)}
-	                                              : DirectX::XMFLOAT3{worldMatrix._41, worldMatrix._42, worldMatrix._43};
+	                                               : DirectX::XMFLOAT3{worldMatrix._41, worldMatrix._42, worldMatrix._43};
 
 	const float x = center.x - cameraPosition.x;
 	const float y = center.y - cameraPosition.y;

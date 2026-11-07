@@ -21,8 +21,8 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 	const bool bExecutableHashRead = bReceiptRead && Json::TryReadStringProperty(receipt, "executableSha256", executableHash);
 	const bool bExecutableMatches = bExecutableHashRead && executableHash == HashFile(Filesystem::GetExecutablePath());
 	const bool bSourcesRead = bExecutableMatches && Json::TryReadArrayProperty(receipt, "sourceFiles", files);
-	const bool bSourcesBoundedfilesEmpty = bSourcesRead && !files.empty();
-	const bool bSourcesBounded = bSourcesBoundedfilesEmpty && (files.size() <= 65'536);
+	const bool bSourcesBoundedFilesEmpty = bSourcesRead && !files.empty();
+	const bool bSourcesBounded = bSourcesBoundedFilesEmpty && (files.size() <= 65'536);
 
 	if (!bSourcesBounded)
 	{
@@ -41,10 +41,10 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 
 		const std::filesystem::path relativePath = Strings::ToWide(std::string_view{relative});
 		const auto source = root / relativePath;
-		const bool bInvalidReceiptPathrootpath = relativePath.is_absolute() || relativePath.has_root_path();
-		const bool bInvalidReceiptPathfind = bInvalidReceiptPathrootpath || (relative.find(':') != std::string::npos);
-		const bool bInvalidSourceReceiptPath = bInvalidReceiptPathfind || (!Paths::IsUnderRoot(source, root));
-		
+		const bool bInvalidReceiptPathRootpath = relativePath.is_absolute() || relativePath.has_root_path();
+		const bool bInvalidReceiptPathFind = bInvalidReceiptPathRootpath || (relative.find(':') != std::string::npos);
+		const bool bInvalidSourceReceiptPath = bInvalidReceiptPathFind || (!Paths::IsUnderRoot(source, root));
+
 		if (bInvalidSourceReceiptPath)
 		{
 			throw Diagnostics::Error("Source receipt escapes the workspace.");

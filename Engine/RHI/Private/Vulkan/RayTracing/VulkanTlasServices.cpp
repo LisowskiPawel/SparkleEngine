@@ -46,7 +46,7 @@ RhiRayTracingAccelerationStructurePrebuildInfo VulkanTlasServices::GetTlasPrebui
 {
 	const bool bSizingUnavailableCapabilities = m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure;
 	const bool bTlasSizingUnavailable = bSizingUnavailableCapabilities || (m_rhi->GetAccelerationStructureBuildSizes() == nullptr);
-	
+
 	if (bTlasSizingUnavailable)
 	{
 		return {};
@@ -93,10 +93,10 @@ RhiRayTracingAccelerationStructurePrebuildInfo VulkanTlasServices::GetTlasPrebui
 
 RhiOwnedResourceHandle VulkanTlasServices::CreateTlasInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
 {
-	const bool bInvalidTlasInputsmemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
-	const bool bTlasInputsTracingCapabilities = bInvalidTlasInputsmemoryAllocator || (!m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure);
+	const bool bInvalidTlasInputsMemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
+	const bool bTlasInputsTracingCapabilities = bInvalidTlasInputsMemoryAllocator || (!m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure);
 	const bool bInvalidTlasInputs = bTlasInputsTracingCapabilities || (!RhiContract::IsRayTracingInstanceListUsable(instances, instanceCount));
-	
+
 	if (bInvalidTlasInputs)
 	{
 		return {};
@@ -133,7 +133,7 @@ RhiOwnedResourceHandle VulkanTlasServices::CreateTlasInstanceBuffer(const RhiRay
 
 	const bool bInstanceBufferAvailable = record != nullptr && record->Buffer != VK_NULL_HANDLE;
 	const bool bInstancesWritten = bInstanceBufferAvailable && m_memoryAllocator->WriteAllocation(*record, nativeInstances.data(), static_cast<std::size_t>(sizeInBytes));
-	
+
 	if (!bInstancesWritten)
 	{
 		return {};

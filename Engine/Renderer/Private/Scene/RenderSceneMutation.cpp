@@ -77,7 +77,7 @@ void RenderScene::ApplyValidatedDelta(const RenderSceneDelta& delta)
 	const bool bTopologyChangedDestroys = bTopologyChangedUpdates || (!delta.Destroys.empty());
 	const bool bTopologyChangedInstanceGroups = bTopologyChangedDestroys || (delta.InstanceGroups.bPublished);
 	const bool bTopologyChanged = bTopologyChangedInstanceGroups || (delta.Sky.bPublished);
-	
+
 	if (bTopologyChanged)
 	{
 		++m_structuralRevision;

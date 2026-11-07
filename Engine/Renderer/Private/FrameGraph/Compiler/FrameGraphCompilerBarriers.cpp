@@ -121,8 +121,9 @@ void FrameGraphCompiler::BuildRequiredResourceBarriers(FrameGraphPassNode& passR
 			m_resourceStateTracker.UpdateCurrentState(declaration.handle, requiredState);
 		}
 
-		const bool bAccelerationBarrierMissing = compiledResource.bPendingAccelerationStructureBarrier && !HasCompiledBarrier(passRecord, declaration.handle, FrameGraphBarrier::Type::AccelerationStructure);
-		
+		const bool bAccelerationBarrierMissing = compiledResource.bPendingAccelerationStructureBarrier
+		    && !HasCompiledBarrier(passRecord, declaration.handle, FrameGraphBarrier::Type::AccelerationStructure);
+
 		if (bAccelerationBarrierMissing)
 		{
 			passRecord.compiledBarriers.push_back(
@@ -143,8 +144,8 @@ void FrameGraphCompiler::BuildRequiredResourceBarriers(FrameGraphPassNode& passR
 		return;
 	}
 
-	const bool bRequiresAccessBarrierusage = requiredState == ResourceState::UnorderedAccess && WritesToUsage(declaration.usage);
-	const bool bNeedsUavBarrier = bRequiresAccessBarrierusage && (!HasCompiledBarrier(passRecord, declaration.handle, FrameGraphBarrier::Type::UnorderedAccess));
+	const bool bRequiresAccessBarrierUsage = requiredState == ResourceState::UnorderedAccess && WritesToUsage(declaration.usage);
+	const bool bNeedsUavBarrier = bRequiresAccessBarrierUsage && (!HasCompiledBarrier(passRecord, declaration.handle, FrameGraphBarrier::Type::UnorderedAccess));
 
 	if (bNeedsUavBarrier)
 	{

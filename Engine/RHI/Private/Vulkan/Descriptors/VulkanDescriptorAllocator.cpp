@@ -68,7 +68,7 @@ void VulkanDescriptorAllocator::ReleaseDescriptor(ERhiDescriptorAllocatorType, c
 	std::uint32_t descriptorIndex = 0;
 	const bool bAllocationDecoded = VulkanDescriptorHandles::DecodeCpuDescriptorHandle(allocation.CpuHandle, tableHandle, descriptorIndex);
 	const bool bAllocationStartsAtZero = bAllocationDecoded && descriptorIndex == 0;
-	
+
 	if (!bAllocationStartsAtZero)
 	{
 		return;
@@ -217,7 +217,7 @@ void VulkanDescriptorAllocator::WriteSamplerDescriptor(RhiCpuDescriptorHandle de
 	std::uint32_t descriptorIndex = 0;
 	const bool bDestinationDecoded = VulkanDescriptorHandles::DecodeCpuDescriptorHandle(destination, tableHandle, descriptorIndex);
 	const bool bSamplerAvailable = bDestinationDecoded && sampler != VK_NULL_HANDLE;
-	
+
 	if (!bSamplerAvailable)
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan sampler write requires a valid destination descriptor and sampler.");
@@ -248,10 +248,10 @@ bool VulkanDescriptorAllocator::WriteRegisteredDescriptor(RhiCpuDescriptorHandle
 	DescriptorTableRecord* const table = FindTableRecord(tableHandle);
 	const DescriptorEntry* const sourceEntry = FindRegisteredEntry(source);
 	const bool bInvalidDescriptorCopyEntries = table == nullptr || table->Entries == nullptr;
-	const bool bInvalidDescriptorCopysourceEntry = bInvalidDescriptorCopyEntries || (sourceEntry == nullptr);
-	const bool bInvalidDescriptorCopyKind = bInvalidDescriptorCopysourceEntry || (sourceEntry->Kind == EntryKind::Empty);
+	const bool bInvalidDescriptorCopySourceEntry = bInvalidDescriptorCopyEntries || (sourceEntry == nullptr);
+	const bool bInvalidDescriptorCopyKind = bInvalidDescriptorCopySourceEntry || (sourceEntry->Kind == EntryKind::Empty);
 	const bool bInvalidDescriptorCopy = bInvalidDescriptorCopyKind || (descriptorIndex >= table->Entries->size());
-	
+
 	if (bInvalidDescriptorCopy)
 	{
 		return false;
@@ -280,7 +280,7 @@ void VulkanDescriptorAllocator::WriteDescriptorTable(VkDescriptorSet descriptorS
 	const bool bInvalidDescriptorTableGeneration = !table.bAllocated || table.Generation != generation;
 	const bool bInvalidDescriptorTableEntries = bInvalidDescriptorTableGeneration || (table.Entries == nullptr);
 	const bool bInvalidDescriptorTable = bInvalidDescriptorTableEntries || (tableBinding.DescriptorIndex >= table.Entries->size());
-	
+
 	if (bInvalidDescriptorTable)
 	{
 		Diagnostics::Fatal(
@@ -320,7 +320,7 @@ void VulkanDescriptorAllocator::WriteDescriptorHandle(VkDescriptorSet descriptor
 	const bool bDescriptorViewAvailable = readView != nullptr && readView->RegisteredDescriptors != nullptr;
 	const bool bDescriptorDecoded = bDescriptorViewAvailable && VulkanDescriptorHandles::DecodeGpuDescriptorHandle(handle, descriptorIndex);
 	const bool bDescriptorInRange = bDescriptorDecoded && descriptorIndex < readView->RegisteredDescriptors->size();
-	
+
 	if (!bDescriptorInRange)
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor-handle binding cannot resolve its recording snapshot.");
@@ -604,8 +604,8 @@ void VulkanDescriptorAllocator::CommitWriteChunk(
 	    .accelerationStructureCount = chunk.Count,
 	    .pAccelerationStructures = chunk.PtlasAddresses.data()};
 
-	const bool bWritesImagesentryKind = entryKind == EntryKind::SampledImage || entryKind == EntryKind::StorageImage;
-	const bool bWritesImages = bWritesImagesentryKind || (entryKind == EntryKind::Sampler);
+	const bool bWritesImagesEntryKind = entryKind == EntryKind::SampledImage || entryKind == EntryKind::StorageImage;
+	const bool bWritesImages = bWritesImagesEntryKind || (entryKind == EntryKind::Sampler);
 	const bool bWritesBuffers = entryKind == EntryKind::UniformBuffer || entryKind == EntryKind::StorageBuffer;
 
 	const VkWriteDescriptorSet write{
@@ -632,9 +632,9 @@ void VulkanDescriptorAllocator::WriteEntries(VkDescriptorSet descriptorSet, cons
 	}
 	const bool bDescriptorCountDescriptorCount = entries.size() > binding.DescriptorCount;
 	const bool bInvalidDescriptorCountBindless = !bDescriptorCountDescriptorCount && (!binding.Bindless.bBindlessEligible);
-	const bool bDescriptorCountDescriptorCount2 = bInvalidDescriptorCountBindless && (entries.size() != binding.DescriptorCount);
-	const bool bInvalidDescriptorCount = bDescriptorCountDescriptorCount || bDescriptorCountDescriptorCount2;
-	
+	const bool bFixedCountMismatch = bInvalidDescriptorCountBindless && (entries.size() != binding.DescriptorCount);
+	const bool bInvalidDescriptorCount = bDescriptorCountDescriptorCount || bFixedCountMismatch;
+
 	if (bInvalidDescriptorCount)
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor write cardinality does not match the compiled shader binding.");

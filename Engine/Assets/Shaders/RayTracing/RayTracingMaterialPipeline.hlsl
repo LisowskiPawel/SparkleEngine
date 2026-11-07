@@ -22,7 +22,7 @@ void RayTracingMaterialClosestHit(inout RayTracingMaterialPayload payload, Built
 void RayTracingMaterialAnyHit(inout RayTracingMaterialPayload payload, BuiltInTriangleIntersectionAttributes attributes)
 {
 	const bool bCandidateAlphaRejected = !ResolveRayTracingCandidateAlpha(InstanceID(), PrimitiveIndex(), attributes.barycentrics, HitKind() == HIT_KIND_TRIANGLE_FRONT_FACE);
-	
+
 	if (bCandidateAlphaRejected)
 	{
 		IgnoreHit();

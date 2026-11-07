@@ -23,9 +23,9 @@ const char* RhiBackendApiToString(ERhiBackendApi api) noexcept
 
 bool TryParseRhiBackendApi(std::string_view value, ERhiBackendApi& outApi) noexcept
 {
-	const bool bIs12AliasStrings = Strings::EqualsIgnoreCase(value, "d3d12") || Strings::EqualsIgnoreCase(value, "dx12");
-	const bool bIsD3D12Alias = bIs12AliasStrings || (Strings::EqualsIgnoreCase(value, "direct3d12"));
-	
+	const bool bShortD3D12Alias = Strings::EqualsIgnoreCase(value, "d3d12") || Strings::EqualsIgnoreCase(value, "dx12");
+	const bool bIsD3D12Alias = bShortD3D12Alias || (Strings::EqualsIgnoreCase(value, "direct3d12"));
+
 	if (bIsD3D12Alias)
 	{
 		outApi = ERhiBackendApi::D3D12;

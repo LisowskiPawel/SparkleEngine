@@ -36,13 +36,13 @@ namespace ECS
 		Transform transform(entry.desc.position, {entry.desc.pitchRadians, entry.desc.yawRadians, 0.0f});
 		const LocalTransform local = WorldTransformConversion::ToLocal(transform);
 
-		const bool bAddedAdd = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
-		const bool bAdded0f = bAddedAdd && (m_registry.Add(entity, CameraComponentTranslation::ToCameraData(entry.desc, 16.0f / 9.0f, bActive)));
-		const bool bAddedAdd2 = bAdded0f && (m_registry.Add(entity, CameraDerivedState{}));
-		const bool bAddedAdd3 = bAddedAdd2 && (m_registry.Add(entity, Visibility{}));
-		const bool bAddedname = bAddedAdd3 && (m_registry.Add(entity, Name{std::move(entry.name)}));
-		const bool bAddedAdd4 = bAddedname && (m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextCameraIdentity, .Kind = AuthoredObjectKind::Camera}));
-		const bool bAdded = bAddedAdd4 && (m_registry.Add(entity, EditorMetadata{}));
+		const bool bTransformsAdded = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
+		const bool bCameraAdded = bTransformsAdded && (m_registry.Add(entity, CameraComponentTranslation::ToCameraData(entry.desc, 16.0f / 9.0f, bActive)));
+		const bool bDerivedStateAdded = bCameraAdded && (m_registry.Add(entity, CameraDerivedState{}));
+		const bool bVisibilityAdded = bDerivedStateAdded && (m_registry.Add(entity, Visibility{}));
+		const bool bNameAdded = bVisibilityAdded && (m_registry.Add(entity, Name{std::move(entry.name)}));
+		const bool bIdentityAdded = bNameAdded && (m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextCameraIdentity, .Kind = AuthoredObjectKind::Camera}));
+		const bool bAdded = bIdentityAdded && (m_registry.Add(entity, EditorMetadata{}));
 
 		if (!bAdded)
 		{

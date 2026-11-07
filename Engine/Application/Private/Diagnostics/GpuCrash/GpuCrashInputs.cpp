@@ -20,16 +20,16 @@ namespace GpuCrashInputVerification
 			const auto value = ReadRequiredString(product, key);
 			const auto expectedDigestLength = std::string_view(key) == "revision" ? 40u : 64u;
 			const bool bInvalidCandidateDigest = value.size() != expectedDigestLength || value.find_first_not_of("0123456789abcdef") != std::string::npos;
-			
+
 			if (bInvalidCandidateDigest)
 			{
 				throw Diagnostics::Error("Diagnostic source candidate identity is malformed.");
 			}
 		}
 
-		const bool bProfileKnownprofile = profile == "DevelopmentEditor" || profile == "DevelopmentGame";
-		const bool bProfileKnownprofile2 = bProfileKnownprofile || (profile == "ShippingEditor");
-		const bool bProfileKnown = bProfileKnownprofile2 || (profile == "ShippingGame");
+		const bool bProfileKnownProfile = profile == "DevelopmentEditor" || profile == "DevelopmentGame";
+		const bool bKnownEditorProfile = bProfileKnownProfile || (profile == "ShippingEditor");
+		const bool bProfileKnown = bKnownEditorProfile || (profile == "ShippingGame");
 		const bool bDirectoryMatches = bProfileKnown && profile == Strings::ToNarrow(executable.parent_path().filename().wstring());
 		const bool bVariantMatches = bDirectoryMatches && ReadRequiredString(product, "variant") == "gpu-crash";
 		const bool bProductKindMatches = bVariantMatches && Strings::ToNarrow(executable.stem().wstring()).ends_with("Editor") == profile.ends_with("Editor");
@@ -137,7 +137,7 @@ std::filesystem::path ResolveAftermathLibraryPath()
 	const auto directory = Filesystem::GetExecutableDirectory();
 	const auto productRoot = directory.parent_path().parent_path().parent_path().parent_path();
 	const bool bInvalidProductLocation = directory.parent_path().filename() != "Binaries" || directory.parent_path().parent_path().parent_path().filename() != "Projects";
-	
+
 	if (bInvalidProductLocation)
 	{
 		throw Diagnostics::Error("GPU crash startup requires the product Binaries layout.");

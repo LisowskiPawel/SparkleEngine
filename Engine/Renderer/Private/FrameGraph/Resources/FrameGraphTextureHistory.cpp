@@ -107,9 +107,9 @@ void FrameGraph::PrepareTextureHistory(const FrameGraphPlan& plan, TextureHistor
 
 	const bool bRequiresRecreationRenderTarget = bRequiresRenderTarget && !history.bAllowRenderTarget;
 	const bool bRequiresRecreationDepthStencil = bRequiresDepthStencil && !history.bAllowDepthStencil;
-	const bool bRequiresRecreationDepthStencil2 = bRequiresRecreationRenderTarget || bRequiresRecreationDepthStencil;
+	const bool bAttachmentShapeChanged = bRequiresRecreationRenderTarget || bRequiresRecreationDepthStencil;
 	const bool bRequiresRecreationUnorderedAccess = bRequiresUnorderedAccess && !history.bAllowUnorderedAccess;
-	const bool bRequiresRecreation = bRequiresRecreationDepthStencil2 || bRequiresRecreationUnorderedAccess;
+	const bool bRequiresRecreation = bAttachmentShapeChanged || bRequiresRecreationUnorderedAccess;
 
 	if (bRequiresRecreation && history.resources.front())
 	{

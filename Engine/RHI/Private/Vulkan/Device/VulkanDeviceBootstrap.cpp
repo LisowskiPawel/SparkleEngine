@@ -20,8 +20,8 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanRhiLogger, "RHI.Vulkan");
 bool VulkanRhi::AppendAvailableDeviceExtension(VkPhysicalDevice physicalDevice, std::vector<const char*>& extensions, const char* extensionName) noexcept
 {
 	const bool bExtensionAlreadyEnabled = extensionName == nullptr
-		    || std::find_if(extensions.begin(), extensions.end(), [extensionName](const char* enabled) noexcept { return std::strcmp(enabled, extensionName) == 0; }) != extensions.end();
-	
+	    || std::find_if(extensions.begin(), extensions.end(), [extensionName](const char* enabled) noexcept { return std::strcmp(enabled, extensionName) == 0; }) != extensions.end();
+
 	if (bExtensionAlreadyEnabled)
 	{
 		return false;
@@ -185,7 +185,7 @@ void VulkanRhi::SelectPhysicalDevice() noexcept
 		candidate.QueueTopology = VulkanQueueTopology::Select(device);
 		const bool bRequiredQueueMissingQueueTopology = !candidate.QueueTopology.Supports(ERhiQueueType::Graphics) || !candidate.QueueTopology.Supports(ERhiQueueType::Compute);
 		const bool bRequiredQueueMissing = bRequiredQueueMissingQueueTopology || (!candidate.QueueTopology.Supports(ERhiQueueType::Copy));
-		
+
 		if (bRequiredQueueMissing)
 		{
 			continue;

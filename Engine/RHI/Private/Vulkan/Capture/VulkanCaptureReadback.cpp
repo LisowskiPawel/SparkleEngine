@@ -82,10 +82,10 @@ std::unique_ptr<VulkanCaptureService::PendingReadback> VulkanCaptureService::Pre
 	const VkDevice device = m_rhi.GetDevice();
 	const VkPhysicalDevice physicalDevice = m_rhi.GetPhysicalDevice();
 	const VkImage sourceImage = static_cast<VkImage>(request.Resource.Value);
-	const bool bCaptureSourcephysicalDevice = device == VK_NULL_HANDLE || physicalDevice == VK_NULL_HANDLE;
-	const bool bInvalidCaptureSourcesourceImage = bCaptureSourcephysicalDevice || (sourceImage == VK_NULL_HANDLE);
-	const bool bInvalidCaptureSource = bInvalidCaptureSourcesourceImage || (!IsRhiCaptureFormatSupported(request.SourceFormat));
-	
+	const bool bCaptureSourcePhysicalDevice = device == VK_NULL_HANDLE || physicalDevice == VK_NULL_HANDLE;
+	const bool bInvalidCaptureSourceSourceImage = bCaptureSourcePhysicalDevice || (sourceImage == VK_NULL_HANDLE);
+	const bool bInvalidCaptureSource = bInvalidCaptureSourceSourceImage || (!IsRhiCaptureFormatSupported(request.SourceFormat));
+
 	if (bInvalidCaptureSource)
 	{
 		return {};
@@ -121,9 +121,9 @@ bool VulkanCaptureService::AllocateReadbackBuffer(PendingReadback& pending) noex
 	const VkMemoryAllocateInfo allocation{.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, .allocationSize = requirements.size, .memoryTypeIndex = memoryType};
 	const VkResult allocationResult = vkAllocateMemory(device, &allocation, nullptr, &pending.Memory);
 	const bool bMemoryAllocated = allocationResult == VK_SUCCESS && pending.Memory != VK_NULL_HANDLE;
-	const bool bUfferBound = bMemoryAllocated && vkBindBufferMemory(device, pending.Buffer, pending.Memory, 0) == VK_SUCCESS;
+	const bool bBufferBound = bMemoryAllocated && vkBindBufferMemory(device, pending.Buffer, pending.Memory, 0) == VK_SUCCESS;
 
-	if (!bUfferBound)
+	if (!bBufferBound)
 	{
 		return false;
 	}

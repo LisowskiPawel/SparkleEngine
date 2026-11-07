@@ -25,7 +25,7 @@ static void BindRayTracingScene(FrameGraph& frameGraph, const RenderFrameGraphRe
 	const bool bPayloadMissingTraceableInstances = bindings.HasTraceableInstances();
 	const bool bTraceablePayloadMissingRayTracing = gpuBindings.RayTracing.InstanceCount == 0u || gpuBindings.RayTracing.MaterialCount == 0u;
 	const bool bTraceablePayloadMissing = bPayloadMissingTraceableInstances && bTraceablePayloadMissingRayTracing;
-	
+
 	if (bTraceablePayloadMissing)
 	{
 		Diagnostics::Fatal(g_renderSceneFrameGraphLogger, __FILE__, __LINE__, "Traceable SceneTlas instances have no matching hit-instance or material records.");

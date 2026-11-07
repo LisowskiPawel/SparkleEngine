@@ -89,16 +89,16 @@ namespace SparkleLauncher
 
 	void ProportionalCardFrame::keyPressEvent(QKeyEvent* event)
 	{
-		const bool bActivationKeyPressedevent = m_activationButton != nullptr && event != nullptr;
-		const bool bActivationKeyPressedkey = bActivationKeyPressedevent && (event->key() == Qt::Key_Return);
-		const bool bActivationKeyPressedGuardkey = bActivationKeyPressedevent && !bActivationKeyPressedkey;
-		const bool bActivationKeyPressedkey2 = bActivationKeyPressedGuardkey && (event->key() == Qt::Key_Enter);
-		const bool bActivationKeyPressedkey3 = bActivationKeyPressedkey || bActivationKeyPressedkey2;
-		const bool bActivationKeyPressedGuardkey2 = bActivationKeyPressedevent && !bActivationKeyPressedkey3;
-		const bool bActivationKeyPressedkey4 = bActivationKeyPressedGuardkey2 && (event->key() == Qt::Key_Space);
-		const bool bActivationKeyPressedkey5 = bActivationKeyPressedkey3 || bActivationKeyPressedkey4;
-		const bool bActivationKeyPressed = bActivationKeyPressedevent && bActivationKeyPressedkey5;
-		
+		const bool bActivationKeyPressedEvent = m_activationButton != nullptr && event != nullptr;
+		const bool bActivationKeyPressedKey = bActivationKeyPressedEvent && (event->key() == Qt::Key_Return);
+		const bool bActivationKeyPressedGuardkey = bActivationKeyPressedEvent && !bActivationKeyPressedKey;
+		const bool bEnterPressed = bActivationKeyPressedGuardkey && (event->key() == Qt::Key_Enter);
+		const bool bReturnOrEnter = bActivationKeyPressedKey || bEnterPressed;
+		const bool bCheckSpace = bActivationKeyPressedEvent && !bReturnOrEnter;
+		const bool bSpacePressed = bCheckSpace && (event->key() == Qt::Key_Space);
+		const bool bActivationPressed = bReturnOrEnter || bSpacePressed;
+		const bool bActivationKeyPressed = bActivationKeyPressedEvent && bActivationPressed;
+
 		if (bActivationKeyPressed)
 		{
 			m_activationButton->click();

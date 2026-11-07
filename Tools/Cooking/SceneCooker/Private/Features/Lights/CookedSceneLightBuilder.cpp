@@ -66,8 +66,10 @@ void CookedSceneLightBuilder::BuildLights(const SourceImportOutput& importOutput
 	for (std::size_t lightIndex = 0; lightIndex < importOutput.scene.lights.size(); ++lightIndex)
 	{
 		const ImportedLight& importedLight = importOutput.scene.lights[lightIndex];
-		const bool bInvalidLightDescription = importedLight.name.size() >= Assets::kCookedSceneLightNameCapacity || CookedLightTranslation::ToCookedLightKind(importedLight.kind) == Assets::CookedSceneLightKind::Unknown;
-		
+
+		const bool bInvalidLightDescription = importedLight.name.size() >= Assets::kCookedSceneLightNameCapacity
+		    || CookedLightTranslation::ToCookedLightKind(importedLight.kind) == Assets::CookedSceneLightKind::Unknown;
+
 		if (bInvalidLightDescription)
 		{
 			throw Diagnostics::Error(std::format("Imported light {} exceeds the cooked light contract.", lightIndex));

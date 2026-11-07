@@ -40,7 +40,7 @@ void ShaderSourceMountTable::ValidatePhysicalPathCase(const std::filesystem::pat
 		{
 			throw Diagnostics::Error(
 			    bExactMatch ? std::format("Shader source path '{}' collides with another authored file under the virtual-path case policy.", virtualPath)
-			               : std::format("Shader source path '{}' does not match the authored file casing.", virtualPath));
+			                : std::format("Shader source path '{}' does not match the authored file casing.", virtualPath));
 		}
 		if (!bExactMatch)
 		{
@@ -106,10 +106,10 @@ ShaderSourceMountTable::ShaderSourceMountTable(const std::filesystem::path& engi
 
 std::string ShaderSourceMountTable::CanonicalizeVirtualPath(std::string_view path) const
 {
-	const bool bInvalidSourcePathfront = path.empty() || path.front() != '/';
-	const bool bInvalidSourcePathfind = bInvalidSourcePathfront || (path.find('\\') != std::string_view::npos);
-	const bool bInvalidVirtualSourcePath = bInvalidSourcePathfind || (path.find(':') != std::string_view::npos);
-	
+	const bool bInvalidSourcePathFront = path.empty() || path.front() != '/';
+	const bool bInvalidSourcePathFind = bInvalidSourcePathFront || (path.find('\\') != std::string_view::npos);
+	const bool bInvalidVirtualSourcePath = bInvalidSourcePathFind || (path.find(':') != std::string_view::npos);
+
 	if (bInvalidVirtualSourcePath)
 	{
 		throw Diagnostics::Error(std::format("Shader source path '{}' is not a canonical virtual path.", path));
@@ -186,11 +186,11 @@ std::filesystem::path ShaderSourceMountTable::ResolvePhysicalPath(std::string_vi
 
 std::string ShaderSourceMountTable::CanonicalizeMountRoot(std::string_view root)
 {
-	const bool bInvalidVirtualRootfront = root.empty() || root.front() != '/';
-	const bool bInvalidVirtualRootback = bInvalidVirtualRootfront || (root.back() == '/');
-	const bool bInvalidVirtualRootfind = bInvalidVirtualRootback || (root.find('\\') != std::string_view::npos);
-	const bool bInvalidVirtualRoot = bInvalidVirtualRootfind || (root.find("//") != std::string_view::npos);
-	
+	const bool bInvalidVirtualRootFront = root.empty() || root.front() != '/';
+	const bool bInvalidVirtualRootBack = bInvalidVirtualRootFront || (root.back() == '/');
+	const bool bInvalidVirtualRootFind = bInvalidVirtualRootBack || (root.find('\\') != std::string_view::npos);
+	const bool bInvalidVirtualRoot = bInvalidVirtualRootFind || (root.find("//") != std::string_view::npos);
+
 	if (bInvalidVirtualRoot)
 	{
 		throw Diagnostics::Error(std::format("Shader source mount '{}' is not canonical.", root));
@@ -213,11 +213,11 @@ const ShaderSourceMountTable::Mount& ShaderSourceMountTable::ResolveMount(std::s
 	for (const Mount& mount : m_mounts)
 	{
 		const bool bMountContainsPathVirtualRoot = canonicalVirtualPath == mount.VirtualRoot;
-		const bool bMountContainsPathVirtualRoot2 = !bMountContainsPathVirtualRoot && (canonicalVirtualPath.starts_with(mount.VirtualRoot));
-		const bool bMountContainsPathVirtualRoot3 = bMountContainsPathVirtualRoot2 && (canonicalVirtualPath.size() > mount.VirtualRoot.size());
-		const bool bMountContainsPathVirtualRoot4 = bMountContainsPathVirtualRoot3 && (canonicalVirtualPath[mount.VirtualRoot.size()] == '/');
-		const bool bMountContainsPath = bMountContainsPathVirtualRoot || bMountContainsPathVirtualRoot4;
-		
+		const bool bRootPrefixMatches = !bMountContainsPathVirtualRoot && (canonicalVirtualPath.starts_with(mount.VirtualRoot));
+		const bool bPathExtendsRoot = bRootPrefixMatches && (canonicalVirtualPath.size() > mount.VirtualRoot.size());
+		const bool bRootBoundaryMatches = bPathExtendsRoot && (canonicalVirtualPath[mount.VirtualRoot.size()] == '/');
+		const bool bMountContainsPath = bMountContainsPathVirtualRoot || bRootBoundaryMatches;
+
 		if (bMountContainsPath)
 		{
 			return mount;

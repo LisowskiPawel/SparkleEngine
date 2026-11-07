@@ -52,8 +52,8 @@ std::vector<ShaderContractVerificationFailure> ValidateShaderContracts(const Sha
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "non-ray-generation-root-parameter-struct"));
 		}
-		const bool bHasTracingContractrayTracing = shader.rayTracing.PayloadSizeInBytes != 0 || shader.rayTracing.AttributeSizeInBytes != 0;
-		const bool bHasSharedRayTracingContract = bHasTracingContractrayTracing || (shader.rayTracing.MinimumRecursionDepth != 0);
+		const bool bHasTracingContractRayTracing = shader.rayTracing.PayloadSizeInBytes != 0 || shader.rayTracing.AttributeSizeInBytes != 0;
+		const bool bHasSharedRayTracingContract = bHasTracingContractRayTracing || (shader.rayTracing.MinimumRecursionDepth != 0);
 		const bool bHasLocalRecord = shader.rayTracing.LocalRecordSizeInBytes != 0 || shader.rayTracing.LocalRecordSignature != 0;
 		if (shader.stage == ShaderStage::RayGeneration && (shader.rayTracing.PayloadSizeInBytes == 0 || shader.rayTracing.AttributeSizeInBytes == 0 || shader.rayTracing.MinimumRecursionDepth == 0))
 		{

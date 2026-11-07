@@ -32,7 +32,9 @@ namespace SparkleLauncher
 		}
 
 		QString message = bCustomCleanRequested ? "Generated outputs to clean:\n\n" + scopeNames.join("\n\n") : "Clean scopes:\n" + scopeNames.join('\n');
-		message += bCustomCleanRequested ? "\n\nThis removes only the generated outputs mapped to the selected action. Continue?" : "\n\nThis removes generated files for the selected scope. Continue?";
+
+		message += bCustomCleanRequested ? "\n\nThis removes only the generated outputs mapped to the selected action. Continue?"
+		                                 : "\n\nThis removes generated files for the selected scope. Continue?";
 
 		const QMessageBox::StandardButton result = QMessageBox::question(
 		    &parent,

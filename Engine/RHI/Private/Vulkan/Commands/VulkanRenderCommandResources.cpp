@@ -141,7 +141,7 @@ void VulkanRenderCommandList::RecordBufferTransition(
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan buffer transition references incomplete recording metadata.");
 	}
 	const bool bUnsupportedBufferTransition = !VulkanTypeConversions::IsBufferResourceStateSupported(before) || !VulkanTypeConversions::IsBufferResourceStateSupported(after);
-	
+
 	if (bUnsupportedBufferTransition)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan buffer transition uses an image-only resource state.");
@@ -187,7 +187,7 @@ void VulkanRenderCommandList::RecordImageTransition(
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan image transition references incomplete recording metadata.");
 	}
 	const bool bUnsupportedImageTransition = !VulkanTypeConversions::IsImageResourceStateSupported(before) || !VulkanTypeConversions::IsImageResourceStateSupported(after);
-	
+
 	if (bUnsupportedImageTransition)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan image transition uses a buffer-only resource state.");
@@ -309,8 +309,8 @@ VkBuffer VulkanRenderCommandList::ResolveBuffer(RhiGpuVirtualAddress gpuAddress)
 bool VulkanRenderCommandList::ResolveResource(RhiResourceHandle resource, VulkanRecordingResource& outResource) const noexcept
 {
 	const bool bRecordingResourceResolved = m_memoryAllocator != nullptr && m_memoryAllocator->ResolveRecordingResource(resource, outResource);
-	const bool bLookupAvailablememoryAllocator = !bRecordingResourceResolved && m_memoryAllocator != nullptr;
-	const bool bCoordinatorLookupAvailable = bLookupAvailablememoryAllocator && (IsCoordinatorRecording());
+	const bool bLookupAvailableMemoryAllocator = !bRecordingResourceResolved && m_memoryAllocator != nullptr;
+	const bool bCoordinatorLookupAvailable = bLookupAvailableMemoryAllocator && (IsCoordinatorRecording());
 	const bool bCoordinatorResourceResolved = bCoordinatorLookupAvailable && m_memoryAllocator->ResolveCoordinatorRecordingResource(resource, outResource);
 
 	if (bRecordingResourceResolved || bCoordinatorResourceResolved)
@@ -339,7 +339,7 @@ VulkanRenderCommandList::BufferBinding VulkanRenderCommandList::ResolveBufferBin
 
 	BufferBinding binding;
 	const bool bUploadAddressResolved = m_recordingUploadPage != nullptr && m_recordingUploadPage->Resolve(gpuAddress, binding.Buffer, binding.Offset, binding.Range);
-	
+
 	if (bUploadAddressResolved)
 	{
 		return binding;

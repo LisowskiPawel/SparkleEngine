@@ -58,7 +58,8 @@ static void ValidateReflection(
 	const bool bConstantBuffersInRange = bResourcesInRange && ContainsRange(constantBuffers.size(), reflection.ConstantBufferOffset, reflection.ConstantBufferCount);
 	const bool bInputsInRange = bConstantBuffersInRange && ContainsRange(inputs.size(), reflection.InputElementOffset, reflection.InputElementCount);
 	const bool bPushConstantsInRange = bInputsInRange && ContainsRange(pushConstants.size(), reflection.PushConstantRangeOffset, reflection.PushConstantRangeCount);
-	const bool bSpecializationConstantsInRange = bPushConstantsInRange && ContainsRange(specializationConstants.size(), reflection.SpecializationConstantOffset, reflection.SpecializationConstantCount);
+	const bool bSpecializationConstantsInRange = bPushConstantsInRange
+	    && ContainsRange(specializationConstants.size(), reflection.SpecializationConstantOffset, reflection.SpecializationConstantCount);
 
 	if (!bSpecializationConstantsInRange)
 	{
@@ -68,12 +69,13 @@ static void ValidateReflection(
 	for (const CookedShaderResourceBindingRecord& resource : resources.subspan(reflection.ResourceBindingOffset, reflection.ResourceBindingCount))
 	{
 		const bool bValidConstantBufferBufferIndex = resource.ConstantBufferIndex == kCookedShaderReflectionInvalidIndex;
-		const bool bValidConstantBufferBufferCount = resource.ConstantBufferIndex >= reflection.ConstantBufferOffset && resource.ConstantBufferIndex < reflection.ConstantBufferOffset + reflection.ConstantBufferCount;
+		const bool bValidConstantBufferBufferCount = resource.ConstantBufferIndex >= reflection.ConstantBufferOffset
+		    && resource.ConstantBufferIndex < reflection.ConstantBufferOffset + reflection.ConstantBufferCount;
 		const bool bValidConstantBuffer = bValidConstantBufferBufferIndex || bValidConstantBufferBufferCount;
 		const bool bInvalidReflectedResourceInBytes = !ContainsRange(strings.size(), resource.NameOffsetInBytes, resource.NameSizeInBytes) || resource.NameSizeInBytes == 0;
 		const bool bReflectedResourceArrayCount = bInvalidReflectedResourceInBytes || (resource.ArrayCount == 0);
 		const bool bInvalidReflectedResource = bReflectedResourceArrayCount || (!bValidConstantBuffer);
-		
+
 		if (bInvalidReflectedResource)
 		{
 			throw Diagnostics::Error("Global shader map contains an invalid reflected resource binding.");
@@ -93,9 +95,9 @@ static void ValidateReflection(
 		{
 			const bool bInvalidReflectedMemberInBytes = !ContainsRange(strings.size(), member.NameOffsetInBytes, member.NameSizeInBytes) || member.NameSizeInBytes == 0;
 			const bool bInvalidReflectedMemberArrayCount = bInvalidReflectedMemberInBytes || (member.ArrayCount == 0);
-			const bool bInvalidReflectedMemberInBytes2 = bInvalidReflectedMemberArrayCount || (member.OffsetInBytes > buffer.SizeInBytes);
-			const bool bInvalidReflectedMember = bInvalidReflectedMemberInBytes2 || (member.SizeInBytes > buffer.SizeInBytes - member.OffsetInBytes);
-			
+			const bool bOffsetInvalid = bInvalidReflectedMemberArrayCount || (member.OffsetInBytes > buffer.SizeInBytes);
+			const bool bInvalidReflectedMember = bOffsetInvalid || (member.SizeInBytes > buffer.SizeInBytes - member.OffsetInBytes);
+
 			if (bInvalidReflectedMember)
 			{
 				throw Diagnostics::Error("Global shader map contains an invalid reflected constant-buffer member.");
@@ -211,8 +213,8 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 	}
 
 	const bool bEntriesRead = reader.ReadArray(map.m_header.EntryCount, map.m_entries, error);
-	const bool bIndingsRead = bEntriesRead && reader.ReadArray(map.m_header.BindingRecordCount, map.m_bindingRecords, error);
-	const bool bReflectionRead = bIndingsRead && reader.ReadArray(map.m_header.ReflectionRecordCount, map.m_reflectionRecords, error);
+	const bool bBindingsRead = bEntriesRead && reader.ReadArray(map.m_header.BindingRecordCount, map.m_bindingRecords, error);
+	const bool bReflectionRead = bBindingsRead && reader.ReadArray(map.m_header.ReflectionRecordCount, map.m_reflectionRecords, error);
 	const bool bResourcesRead = bReflectionRead && reader.ReadArray(map.m_header.ResourceBindingRecordCount, map.m_resourceBindings, error);
 	const bool bConstantBuffersRead = bResourcesRead && reader.ReadArray(map.m_header.ConstantBufferRecordCount, map.m_constantBuffers, error);
 	const bool bConstantMembersRead = bConstantBuffersRead && reader.ReadArray(map.m_header.ConstantBufferMemberRecordCount, map.m_constantBufferMembers, error);
@@ -247,9 +249,9 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 		const bool bInvalidShaderEntryBackendVersion = bInvalidShaderEntryInputHash || (entry.BackendVersion == 0);
 		const bool bInvalidShaderEntryStage = bInvalidShaderEntryBackendVersion || (entry.Stage >= ShaderStage::Count);
 		const bool bInvalidShaderEntryTarget = bInvalidShaderEntryStage || (!IsShaderTarget(entry.Target));
-		const bool bInvalidShaderEntryfeatureBits = bInvalidShaderEntryTarget || ((featureBits & ~knownFeatureBits) != 0);
-		const bool bInvalidShaderEntry = bInvalidShaderEntryfeatureBits || (!bOrdered);
-		
+		const bool bInvalidShaderEntryFeatureBits = bInvalidShaderEntryTarget || ((featureBits & ~knownFeatureBits) != 0);
+		const bool bInvalidShaderEntry = bInvalidShaderEntryFeatureBits || (!bOrdered);
+
 		if (bInvalidShaderEntry)
 		{
 			throw Diagnostics::Error("Global shader map contains an invalid or duplicate logical key.");
@@ -267,12 +269,12 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 		const bool bRayGenerationIncompleteInBytes = entry.RayPayloadSizeInBytes == 0 || entry.RayAttributeSizeInBytes == 0;
 		const bool bGenerationIncompleteDepth = bRayGenerationIncompleteInBytes || (entry.MinimumRayRecursionDepth == 0);
 		const bool bRayGenerationIncomplete = bRayGenerationIncompleteStage && bGenerationIncompleteDepth;
-		
+
 		const bool bContractShapeValid = !bLocalRecordMismatch && !bRayGenerationIncomplete;
 		const bool bSharedContractMisplacedStage = bContractShapeValid && (IsRayTracingShaderStage(entry.Stage));
-		const bool bSharedContractMisplacedStage2 = bSharedContractMisplacedStage && (entry.Stage != ShaderStage::RayGeneration);
-		const bool bSharedContractMisplaced = bSharedContractMisplacedStage2 && (bHasSharedRayTracingContract);
-		
+		const bool bNonRayGenerationStage = bSharedContractMisplacedStage && (entry.Stage != ShaderStage::RayGeneration);
+		const bool bSharedContractMisplaced = bNonRayGenerationStage && (bHasSharedRayTracingContract);
+
 		const bool bContractMisplacedMisplaced = bContractShapeValid && (!bSharedContractMisplaced);
 		const bool bRasterContractMisplacedStage = bContractMisplacedMisplaced && (!IsRayTracingShaderStage(entry.Stage));
 		const bool bContractMisplacedLocalRecord = bHasSharedRayTracingContract || bHasLocalRecord;
@@ -288,10 +290,10 @@ GlobalShaderMap GlobalShaderMap::Open(const std::filesystem::path& path, const C
 		const bool bNamesValid = bNamesValidBackendName && (entry.CodegenTarget.IsValid());
 		const bool bShaderNameInRange = bNamesValid && ContainsString(map.m_stringTable, entry.ShaderName);
 		const bool bEntryPointInRange = bShaderNameInRange && ContainsString(map.m_stringTable, entry.EntryPoint);
-		const bool bAckendNameInRange = bEntryPointInRange && ContainsString(map.m_stringTable, entry.BackendName);
-		const bool bCodegenTargetInRange = bAckendNameInRange && ContainsString(map.m_stringTable, entry.CodegenTarget);
-		const bool bIndingsInRange = bCodegenTargetInRange && ContainsRange(map.m_bindingRecords.size(), entry.BindingRecordOffset, entry.BindingRecordCount);
-		const bool bReflectionInRange = bIndingsInRange && entry.ReflectionRecordIndex < map.m_reflectionRecords.size();
+		const bool bBackendNameInRange = bEntryPointInRange && ContainsString(map.m_stringTable, entry.BackendName);
+		const bool bCodegenTargetInRange = bBackendNameInRange && ContainsString(map.m_stringTable, entry.CodegenTarget);
+		const bool bBindingsInRange = bCodegenTargetInRange && ContainsRange(map.m_bindingRecords.size(), entry.BindingRecordOffset, entry.BindingRecordCount);
+		const bool bReflectionInRange = bBindingsInRange && entry.ReflectionRecordIndex < map.m_reflectionRecords.size();
 
 		if (!bReflectionInRange)
 		{

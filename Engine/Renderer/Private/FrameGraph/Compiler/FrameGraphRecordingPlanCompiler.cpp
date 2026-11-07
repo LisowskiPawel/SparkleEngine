@@ -118,7 +118,7 @@ void FrameGraphRecordingPlanCompiler::BuildGroupPrerequisites()
 			const RecordingGroupIndex prerequisite = m_passToGroup[dependency];
 			const bool bRecordingPrerequisiteMissingIndex = prerequisite != InvalidRecordingGroupIndex && prerequisite != group.Index;
 			const bool bMissingPrerequisite = bRecordingPrerequisiteMissingIndex && (!ContainsGroup(group.Prerequisites, prerequisite));
-			
+
 			if (bMissingPrerequisite)
 			{
 				group.Prerequisites.push_back(prerequisite);

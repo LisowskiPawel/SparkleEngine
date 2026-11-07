@@ -196,7 +196,7 @@ RhiPtlasBuildSizes D3D12NvapiRayTracingProvider::GetPtlasBuildSizes(ID3D12Device
 	    .OperationCountSizeInBytes = sizeof(NvU32),
 	    .InstanceWriteInfoSizeInBytes = sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_INSTANCE) * static_cast<std::uint64_t>(desc.InstanceCapacity),
 	    .InstanceUpdateInfoSizeInBytes = desc.bAllowInstanceUpdates ? sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_UPDATE_INSTANCE) * static_cast<std::uint64_t>(desc.InstanceCapacity)
-	                                                               : 0u,
+	                                                                : 0u,
 	    .PartitionWriteInfoSizeInBytes = desc.bAllowPartitionTranslation
 	        ? sizeof(NVAPI_D3D12_BUILD_RAYTRACING_PARTITIONED_TLAS_OP_ARG_WRITE_PARTITION) * static_cast<std::uint64_t>(desc.PartitionCount + 1u)
 	        : 0u};

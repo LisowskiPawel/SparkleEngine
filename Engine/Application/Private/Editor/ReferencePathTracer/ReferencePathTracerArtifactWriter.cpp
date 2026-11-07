@@ -19,12 +19,12 @@ ReferencePathTracerArtifactWriteResult ReferencePathTracerArtifactWriter::Write(
 
 	std::string beautyHash;
 	std::string checkpointHash;
-	const bool bEautyHashed = Hash::TrySha256Hex(artifact.Beauty, beautyHash, result.ErrorMessage);
-	const bool bCheckpointHashedCheckpoint = bEautyHashed && (!artifact.Checkpoint);
-	const bool bCheckpointHashedGuardErrorMessage = bEautyHashed && !bCheckpointHashedCheckpoint;
-	const bool bCheckpointHashedErrorMessage = bCheckpointHashedGuardErrorMessage && (Hash::TrySha256Hex(*artifact.Checkpoint, checkpointHash, result.ErrorMessage));
-	const bool bCheckpointHashedErrorMessage2 = bCheckpointHashedCheckpoint || bCheckpointHashedErrorMessage;
-	const bool bCheckpointHashed = bEautyHashed && bCheckpointHashedErrorMessage2;
+	const bool bBeautyHashed = Hash::TrySha256Hex(artifact.Beauty, beautyHash, result.ErrorMessage);
+	const bool bNoCheckpoint = bBeautyHashed && (!artifact.Checkpoint);
+	const bool bHashCheckpoint = bBeautyHashed && !bNoCheckpoint;
+	const bool bCheckpointDigestWritten = bHashCheckpoint && (Hash::TrySha256Hex(*artifact.Checkpoint, checkpointHash, result.ErrorMessage));
+	const bool bCheckpointHashAvailable = bNoCheckpoint || bCheckpointDigestWritten;
+	const bool bCheckpointHashed = bBeautyHashed && bCheckpointHashAvailable;
 
 	if (!bCheckpointHashed)
 	{

@@ -25,14 +25,14 @@ RenderViewportExtent QueryStreamlineDlssOptimalRenderExtent(RenderViewportExtent
 bool EvaluateStreamlineDlssFrame(const ImageProviderFrameInput& frameInput, EUpscalerQualityMode qualityMode, sl::ViewportHandle viewport, const UpscalerEvaluationDesc& evaluation)
 {
 	const bool bInvalidDlssInputs = !evaluation.NativeCommandList
-		    || !AreStreamlineTextureViewsValid(
-		        evaluation.BackendApi,
-		        evaluation.NativeScalingInputColorView,
-		        evaluation.NativeDepthView,
-		        evaluation.NativeMotionVectorsView,
-		        evaluation.NativeExposureView,
-		        evaluation.NativeScalingOutputColorView);
-	
+	    || !AreStreamlineTextureViewsValid(
+	        evaluation.BackendApi,
+	        evaluation.NativeScalingInputColorView,
+	        evaluation.NativeDepthView,
+	        evaluation.NativeMotionVectorsView,
+	        evaluation.NativeExposureView,
+	        evaluation.NativeScalingOutputColorView);
+
 	if (bInvalidDlssInputs)
 	{
 		return false;

@@ -35,7 +35,7 @@ namespace SceneLightInspector
 		float luminousIntensity = value;
 		constexpr float kDefaultLuminousIntensity = 1.0f;
 		const bool bLuminousIntensityEdited = EditorWidgets::EditDetailsFloat("Luminous Intensity (candela)", luminousIntensity, 10.0f, 0.0f, 0.0f, "%.3f", &kDefaultLuminousIntensity);
-		
+
 		if (bLuminousIntensityEdited)
 		{
 			value = luminousIntensity;
@@ -49,7 +49,7 @@ namespace SceneLightInspector
 		float directionValues[3] = {value.x, value.y, value.z};
 		const float defaultDirection[3] = {0.0f, -1.0f, 0.0f};
 		const bool bLightDirectionEdited = EditorWidgets::EditDetailsFloat3("Direction", directionValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultDirection);
-		
+
 		if (bLightDirectionEdited)
 		{
 			value = {directionValues[0], directionValues[1], directionValues[2]};
@@ -209,8 +209,16 @@ namespace SceneLightInspector
 
 		float angularSizeDegrees = MathUtils::RadiansToDegrees(lightDesc.angularSizeRadians);
 		constexpr float kDefaultAngularSizeDegrees = 0.533f;
-		const bool bAngularSizeEdited = EditorWidgets::EditDetailsFloat("Angular Size", angularSizeDegrees, kAngularSizeDragSpeedDegrees, 0.0f, kAngularSizeSliderMaxDegrees, "%.3f", &kDefaultAngularSizeDegrees);
-		
+
+		const bool bAngularSizeEdited = EditorWidgets::EditDetailsFloat(
+		    "Angular Size",
+		    angularSizeDegrees,
+		    kAngularSizeDragSpeedDegrees,
+		    0.0f,
+		    kAngularSizeSliderMaxDegrees,
+		    "%.3f",
+		    &kDefaultAngularSizeDegrees);
+
 		if (bAngularSizeEdited)
 		{
 			lightDesc.angularSizeRadians = MathUtils::DegreesToRadians(angularSizeDegrees);
@@ -260,7 +268,7 @@ namespace SceneLightInspector
 		float innerAngleDegrees = MathUtils::RadiansToDegrees(lightDesc.innerAngleRadians);
 		constexpr float kDefaultInnerAngleDegrees = 0.0f;
 		const bool bInnerAngleEdited = EditorWidgets::EditDetailsFloat("Inner Angle", innerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultInnerAngleDegrees);
-		
+
 		if (bInnerAngleEdited)
 		{
 			lightDesc.innerAngleRadians = MathUtils::DegreesToRadians(innerAngleDegrees);
@@ -270,7 +278,7 @@ namespace SceneLightInspector
 		float outerAngleDegrees = MathUtils::RadiansToDegrees(lightDesc.outerAngleRadians);
 		constexpr float kDefaultOuterAngleDegrees = 45.0f;
 		const bool bOuterAngleEdited = EditorWidgets::EditDetailsFloat("Outer Angle", outerAngleDegrees, 0.1f, 0.0f, 180.0f, "%.2f", &kDefaultOuterAngleDegrees);
-		
+
 		if (bOuterAngleEdited)
 		{
 			lightDesc.outerAngleRadians = MathUtils::DegreesToRadians(outerAngleDegrees);
@@ -303,7 +311,7 @@ namespace SceneLightInspector
 		float tangentValues[3] = {lightDesc.tangent.x, lightDesc.tangent.y, lightDesc.tangent.z};
 		const float defaultTangent[3] = {1.0f, 0.0f, 0.0f};
 		const bool bLightTangentEdited = EditorWidgets::EditDetailsFloat3("Tangent", tangentValues, 0.01f, kDirectionSliderMin, kDirectionSliderMax, "%.3f", defaultTangent);
-		
+
 		if (bLightTangentEdited)
 		{
 			lightDesc.tangent = {tangentValues[0], tangentValues[1], tangentValues[2]};

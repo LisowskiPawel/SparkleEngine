@@ -55,7 +55,7 @@ GpuCrashStartup ResolveGpuCrashStartup()
 	startup.SessionId = options.contains("--gpu-crash-session") ? options.at("--gpu-crash-session") : Identifiers::CreateUuidV4String();
 	const bool bInvalidCrashStartupShaderExport = !startup.ShaderExport.is_absolute() || startup.ShaderExport.filename() != "shader-export.json";
 	const bool bInvalidGpuCrashStartup = bInvalidCrashStartupShaderExport || (!Identifiers::IsUuidV4String(startup.SessionId));
-	
+
 	if (bInvalidGpuCrashStartup)
 	{
 		throw Diagnostics::Error("Aftermath requires an absolute shader-export.json path and a valid fresh session UUID.");

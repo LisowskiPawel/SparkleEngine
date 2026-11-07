@@ -99,8 +99,8 @@ void VulkanRhi::LoadRayTracingFunctions() noexcept
 	}
 
 	const bool bLoadedAccelerationStructure = m_getBufferDeviceAddress != nullptr && m_createAccelerationStructure != nullptr;
-	const bool bLoadedAccelerationStructure2 = bLoadedAccelerationStructure && (m_destroyAccelerationStructure != nullptr);
-	const bool bLoadedBuildSizes = bLoadedAccelerationStructure2 && (m_getAccelerationStructureBuildSizes != nullptr);
+	const bool bDestroyFunctionLoaded = bLoadedAccelerationStructure && (m_destroyAccelerationStructure != nullptr);
+	const bool bLoadedBuildSizes = bDestroyFunctionLoaded && (m_getAccelerationStructureBuildSizes != nullptr);
 	const bool bLoadedAccelerationStructures = bLoadedBuildSizes && (m_cmdBuildAccelerationStructures != nullptr);
 	const bool bLoaded = bLoadedAccelerationStructures && (m_getAccelerationStructureDeviceAddress != nullptr);
 

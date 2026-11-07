@@ -118,11 +118,11 @@ void D3D12DescriptorService::ReleaseDescriptor(ERhiDescriptorAllocatorType descr
 
 RhiDescriptorTableHandle D3D12DescriptorService::AllocateDescriptorTable(ERhiDescriptorAllocatorType descriptorType, std::uint32_t descriptorCount)
 {
-	const bool bCapacityExhausteddescriptorCount = m_descriptorHeapManager == nullptr || descriptorCount == 0;
-	const bool bCapacityExhaustedEmpty = !bCapacityExhausteddescriptorCount && (m_freeDescriptorTableIndices.empty());
+	const bool bCapacityExhaustedDescriptorCount = m_descriptorHeapManager == nullptr || descriptorCount == 0;
+	const bool bCapacityExhaustedEmpty = !bCapacityExhaustedDescriptorCount && (m_freeDescriptorTableIndices.empty());
 	const bool bCapacityExhaustedTableRecordsSize = bCapacityExhaustedEmpty && (m_descriptorTableRecords.size() >= RhiDescriptorTableHandle::MaximumRecordCount);
-	const bool bTableFull = bCapacityExhausteddescriptorCount || bCapacityExhaustedTableRecordsSize;
-	
+	const bool bTableFull = bCapacityExhaustedDescriptorCount || bCapacityExhaustedTableRecordsSize;
+
 	if (bTableFull)
 	{
 		return {};
@@ -222,12 +222,12 @@ void D3D12DescriptorService::SetSamplerTableHandle(RhiDescriptorTableHandle samp
 
 RhiResourceViewHandle D3D12DescriptorService::CreateResourceView(const RhiResourceViewDesc& desc)
 {
-	const bool bResourceAllocationRejectedrhi = !RhiContract::IsResourceViewDescUsable(desc) || m_rhi == nullptr;
-	const bool bAllocationRejectedHeapManager = bResourceAllocationRejectedrhi || (m_descriptorHeapManager == nullptr);
+	const bool bResourceAllocationRejectedRhi = !RhiContract::IsResourceViewDescUsable(desc) || m_rhi == nullptr;
+	const bool bAllocationRejectedHeapManager = bResourceAllocationRejectedRhi || (m_descriptorHeapManager == nullptr);
 	const bool bAllocationRejectedEmpty = !bAllocationRejectedHeapManager && (m_freeResourceViewIndices.empty());
 	const bool bAllocationRejectedViewRecordsSize = bAllocationRejectedEmpty && (m_resourceViewRecords.size() >= RhiResourceViewHandle::MaximumRecordCount);
 	const bool bViewAllocationRejected = bAllocationRejectedHeapManager || bAllocationRejectedViewRecordsSize;
-	
+
 	if (bViewAllocationRejected)
 	{
 		return {};

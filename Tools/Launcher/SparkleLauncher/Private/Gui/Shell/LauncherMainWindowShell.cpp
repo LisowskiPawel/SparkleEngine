@@ -220,7 +220,7 @@ namespace SparkleLauncher
 		}
 
 		const BuildToolchainStatus toolchain = bInstalled ? BuildToolchainStatus{}
-		                                                 : DetectBuildToolchain(m_workspaceRoot, ResolveSelectedWorkspaceIde(m_settings), ResolveSelectedWorkspaceCompiler(m_settings));
+		                                                  : DetectBuildToolchain(m_workspaceRoot, ResolveSelectedWorkspaceIde(m_settings), ResolveSelectedWorkspaceCompiler(m_settings));
 
 		const LauncherContextUiModel model = LauncherContextUiModel::Build(toolchain, m_workspaceRoot);
 		PopulateBoundContextCombo(m_runModeCombo, model.RunModes, m_settings.RunMode(), m_settings, &LauncherSettings::SetRunMode);

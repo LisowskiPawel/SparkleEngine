@@ -33,7 +33,7 @@ CameraInputIntentCollector::~CameraInputIntentCollector() noexcept
 CameraInputIntent CameraInputIntentCollector::Collect(float aspectRatio) noexcept
 {
 	const bool bCameraInputBlocked = GetForegroundWindow() != m_window.GetHWND() || m_inputSystem.GetState(InputLayer::Gameplay).IsMouseButtonDown(MouseButton::Right) == false;
-	
+
 	if (bCameraInputBlocked)
 	{
 		EndMouseLook();

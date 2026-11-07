@@ -167,7 +167,7 @@ namespace PathBsdf
 		const bool bViewAboveShadingSurface = bSpecularMassUsable && !(dot(surface.ViewDirWorld, surface.NormalWorld) <= 0.0f);
 		const bool bViewAboveGeometricSurface = bViewAboveShadingSurface && !(dot(surface.ViewDirWorld, surface.GeometricNormalWorld) <= 0.0f);
 		const bool bSampleAboveGeometricSurface = bViewAboveGeometricSurface && !(dot(result.DirectionWorld, surface.GeometricNormalWorld) <= 0.0f);
-		
+
 		if (!bSampleAboveGeometricSurface)
 		{
 			return result;

@@ -18,10 +18,10 @@ static void ValidateHeader(const CookedTextureAssetHeader& header, const std::fi
 		throw Diagnostics::Error("Invalid cooked texture asset header for '" + resolvedPath.string() + "'");
 	}
 
-	const bool bInvalidTextureHeaderheight = header.width == 0 || header.height == 0;
-	const bool bInvalidTextureHeadermipCount = bInvalidTextureHeaderheight || (header.mipCount == 0);
-	const bool bInvalidTextureHeader = bInvalidTextureHeadermipCount || (PixelFormatFromSerializedTextureFormat(header.format) == PixelFormat::Unknown);
-	
+	const bool bInvalidTextureHeaderHeight = header.width == 0 || header.height == 0;
+	const bool bInvalidTextureHeaderMipCount = bInvalidTextureHeaderHeight || (header.mipCount == 0);
+	const bool bInvalidTextureHeader = bInvalidTextureHeaderMipCount || (PixelFormatFromSerializedTextureFormat(header.format) == PixelFormat::Unknown);
+
 	if (bInvalidTextureHeader)
 	{
 		throw Diagnostics::Error("Cooked texture asset header has invalid dimensions, mip count, or format for '" + resolvedPath.string() + "'");
@@ -33,7 +33,7 @@ static void ValidateHeader(const CookedTextureAssetHeader& header, const std::fi
 	}
 
 	const bool bUnsupportedTextureDimension = header.GetDimension() != TextureResourceDimension::Texture2D && header.GetDimension() != TextureResourceDimension::TextureCube;
-	
+
 	if (bUnsupportedTextureDimension)
 	{
 		throw Diagnostics::Error("Cooked texture asset header has an invalid texture dimension for '" + resolvedPath.string() + "'");

@@ -37,17 +37,20 @@ namespace ECS
 		    .InstanceGroupIndex = instance.InstanceGroupIndex,
 		    .SourceNodeIndex = instance.SourceNodeIndex};
 
-		const bool bAddedAdd = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
-		const bool bAddedAdd2 = bAddedAdd && (m_registry.Add(entity, mesh));
-		const bool bAddedAdd3 = bAddedAdd2 && (m_registry.Add(entity, Visibility{}));
-		const bool bAddedNodeIndex = bAddedAdd3 && (m_registry.Add(
+		const bool bTransformsAdded = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
+		const bool bMeshStored = bTransformsAdded && (m_registry.Add(entity, mesh));
+		const bool bVisibilityAdded = bMeshStored && (m_registry.Add(entity, Visibility{}));
+
+		const bool bIdentityAdded = bVisibilityAdded
+		    && (m_registry.Add(
 		        entity,
 		        AuthoredIdentity{
 		            .SourceAssetId = instance.MeshAssetId,
 		            .SourceInstanceId = instance.SourceInstanceId,
 		            .SourceObjectId = static_cast<std::uint64_t>(instance.SourceNodeIndex),
 		            .Kind = AuthoredObjectKind::MeshInstance}));
-		bool bAdded = bAddedNodeIndex && (m_registry.Add(entity, EditorMetadata{}));
+
+		bool bAdded = bIdentityAdded && (m_registry.Add(entity, EditorMetadata{}));
 
 		const bool bSkeletalMesh = instance.Kind == SceneMeshKind::Skeletal;
 		const bool bMorphRequired = bAdded && bSkeletalMesh;

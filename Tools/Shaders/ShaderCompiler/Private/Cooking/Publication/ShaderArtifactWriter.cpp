@@ -99,17 +99,17 @@ namespace ShaderArtifactWriter
 		const ShaderCodeHash codeHash = Hash::Fnv1a64(product.compiled.bytecode.data(), product.compiled.bytecode.size());
 		const bool bShaderIdentityMatches = product.shaderTypeId == shader.shaderTypeId;
 		const bool bTargetValid = bShaderIdentityMatches && IsShaderTarget(product.target);
-		const bool bShaderMetadataMatchesfeatures = bTargetValid && product.features == shader.features;
-		const bool bShaderMetadataMatchesrayTracing = bShaderMetadataMatchesfeatures && (product.rayTracing == shader.rayTracing);
-		const bool bShaderMetadataMatches = bShaderMetadataMatchesrayTracing && (product.compiled.stage == shader.stage);
-		const bool bInaryFormatMatches = bShaderMetadataMatches && product.compiled.format == GetShaderBinaryFormat(product.target);
-		const bool bSourceMatchessourcePath = bInaryFormatMatches && product.compiled.sourcePath == shader.sourcePath;
-		const bool bSourceMatchesentryPoint = bSourceMatchessourcePath && (product.compiled.entryPoint == shader.entryPoint);
-		const bool bSourceMatches = bSourceMatchesentryPoint && (!product.compiled.backendName.empty());
+		const bool bShaderMetadataMatchesFeatures = bTargetValid && product.features == shader.features;
+		const bool bShaderMetadataMatchesRayTracing = bShaderMetadataMatchesFeatures && (product.rayTracing == shader.rayTracing);
+		const bool bShaderMetadataMatches = bShaderMetadataMatchesRayTracing && (product.compiled.stage == shader.stage);
+		const bool bBinaryFormatMatches = bShaderMetadataMatches && product.compiled.format == GetShaderBinaryFormat(product.target);
+		const bool bSourceMatchesSourcePath = bBinaryFormatMatches && product.compiled.sourcePath == shader.sourcePath;
+		const bool bSourceMatchesEntryPoint = bSourceMatchesSourcePath && (product.compiled.entryPoint == shader.entryPoint);
+		const bool bSourceMatches = bSourceMatchesEntryPoint && (!product.compiled.backendName.empty());
 		const bool bCodegenTargetMatches = bSourceMatches && product.compiled.codegenTarget == GetShaderTargetName(product.target);
-		const bool bCompiledIdentityValidcompiled = bCodegenTargetMatches && product.compiled.backendVersion != 0;
-		const bool bCompiledIdentityValidcompiled2 = bCompiledIdentityValidcompiled && (product.compiled.compileInputHash != 0);
-		const bool bCompiledIdentityValid = bCompiledIdentityValidcompiled2 && (product.compiled.bytecodeHash == codeHash);
+		const bool bCompiledIdentityValidCompiled = bCodegenTargetMatches && product.compiled.backendVersion != 0;
+		const bool bInputHashPresent = bCompiledIdentityValidCompiled && (product.compiled.compileInputHash != 0);
+		const bool bCompiledIdentityValid = bInputHashPresent && (product.compiled.bytecodeHash == codeHash);
 		const bool bParameterLayoutMatches = bCompiledIdentityValid && BuildShaderParameterSignature(product.parameterLayout) == BuildShaderParameterSignature(shader.parameterLayout);
 
 		if (!bParameterLayoutMatches)
@@ -340,8 +340,8 @@ namespace ShaderArtifactWriter
 		const bool bOutputOpened = Files::TryOpenBinaryOutput(path, output, error);
 		const bool bHeaderWritten = bOutputOpened && Files::BinaryStreamWriter::WriteValue(output, mapHeader, error);
 		const bool bEntriesWritten = bHeaderWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Entries, error);
-		const bool bIndingsWritten = bEntriesWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Bindings, error);
-		const bool bReflectionWritten = bIndingsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.reflectionRecords, error);
+		const bool bBindingsWritten = bEntriesWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Bindings, error);
+		const bool bReflectionWritten = bBindingsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.reflectionRecords, error);
 		const bool bResourcesWritten = bReflectionWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.resourceBindings, error);
 		const bool bConstantBuffersWritten = bResourcesWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBuffers, error);
 		const bool bConstantMembersWritten = bConstantBuffersWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBufferMembers, error);

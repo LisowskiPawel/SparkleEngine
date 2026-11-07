@@ -147,7 +147,7 @@ namespace SparkleLauncher
 		if (capabilities.bHasNvidiaAdapter)
 		{
 			capabilities.Summary = capabilities.bHasAmdAdapter ? "Detected NVIDIA and AMD graphics adapters; NVIDIA SDK dependencies stay enabled."
-			                                                  : "Detected NVIDIA graphics adapter; NVIDIA SDK dependencies stay enabled.";
+			                                                   : "Detected NVIDIA graphics adapter; NVIDIA SDK dependencies stay enabled.";
 		}
 		else if (capabilities.bHasAmdAdapter)
 		{

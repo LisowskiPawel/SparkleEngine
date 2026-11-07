@@ -217,11 +217,14 @@ Slang::ComPtr<slang::IComponentType> SlangShaderBackend::LinkProgram(slang::ISes
 		for (SlangInt32 index = 0; index < module->getDependencyFileCount(); ++index)
 		{
 			const char* path = module->getDependencyFilePath(index);
-			const bool bSourceFileUnregisteredpath = path == nullptr;
-			const bool bSourceFileUnregisteredpath2 = !bSourceFileUnregisteredpath && (path != modulePath);
-			const bool bSourceFileUnregisteredSourceFiles = bSourceFileUnregisteredpath2 && (std::ranges::find(request.SourceFiles, std::string_view(path), &ShaderSourceFile::VirtualPath) == request.SourceFiles.end());
-			const bool bSourceFileUnregistered = bSourceFileUnregisteredpath || bSourceFileUnregisteredSourceFiles;
-			
+			const bool bSourceFileUnregisteredPath = path == nullptr;
+			const bool bDifferentModulePath = !bSourceFileUnregisteredPath && (path != modulePath);
+
+			const bool bSourceFileUnregisteredSourceFiles = bDifferentModulePath
+			    && (std::ranges::find(request.SourceFiles, std::string_view(path), &ShaderSourceFile::VirtualPath) == request.SourceFiles.end());
+
+			const bool bSourceFileUnregistered = bSourceFileUnregisteredPath || bSourceFileUnregisteredSourceFiles;
+
 			if (bSourceFileUnregistered)
 			{
 				throw Diagnostics::Error("Slang read a source dependency outside the captured compile inputs.");

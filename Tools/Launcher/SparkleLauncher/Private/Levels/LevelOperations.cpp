@@ -77,7 +77,7 @@ namespace SparkleLauncher
 
 		std::error_code sourceError;
 		const bool bAssetSyncScriptMissing = !std::filesystem::is_regular_file(request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) || sourceError;
-		
+
 		if (bAssetSyncScriptMissing)
 		{
 			AddReadiness(plan, "Asset sync requires the source acquisition script. Open the matching source checkout to use this developer tool.");

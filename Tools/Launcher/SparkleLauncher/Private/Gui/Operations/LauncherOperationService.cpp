@@ -71,7 +71,7 @@ namespace SparkleLauncher
 			throw std::logic_error("Launcher operation run identity is empty.");
 		}
 		const bool bOperationAdmissionBusy = m_implementation->m_bOperationRunning.load(std::memory_order_acquire) || m_implementation->m_operationScopes.contains(runId);
-		
+
 		if (bOperationAdmissionBusy)
 		{
 			OperationRecord record = MakeOperationRecord(request.OperationId.toStdString(), title);

@@ -33,8 +33,8 @@ namespace ShadowRays
 
 		const bool bSupportedIsDirectional = lightSample.bIsDirectional;
 		const bool bSupportedShadowsEnabled = bSupportedIsDirectional && (RayTracedDirectionalShadowsEnabled != 0u);
-		const bool bSupportedShadowsEnabled2 = !bSupportedIsDirectional && (RayTracedLocalLightShadowsEnabled != 0u);
-		const bool bSupported = bSupportedShadowsEnabled || bSupportedShadowsEnabled2;
+		const bool bLocalShadowsEnabled = !bSupportedIsDirectional && (RayTracedLocalLightShadowsEnabled != 0u);
+		const bool bSupported = bSupportedShadowsEnabled || bLocalShadowsEnabled;
 		const float maxDistance = lightSample.bIsDirectional ? RayTracedShadowMaxDistance : lightSample.VisibilityDistance;
 		immediateSignal = BuildUnshadowedSignal(maxDistance);
 		if (!bCastsShadow || !bSupported || (!lightSample.bIsDirectional && lightSample.VisibilityDistance <= MinimumShadowTMin))

@@ -140,7 +140,7 @@ namespace SparkleLauncher
 		const int row = combo.count() - 1;
 
 		const QString availability = option.bAvailable ? QStringLiteral("Available")
-		                                              : (option.bSupported ? QStringLiteral("Supported, setup required") : QStringLiteral("Unavailable in this configuration"));
+		                                               : (option.bSupported ? QStringLiteral("Supported, setup required") : QStringLiteral("Unavailable in this configuration"));
 
 		const QString detail = option.Detail.isEmpty() ? availability : availability + ". " + option.Detail;
 		combo.setItemData(row, detail, Qt::ToolTipRole);

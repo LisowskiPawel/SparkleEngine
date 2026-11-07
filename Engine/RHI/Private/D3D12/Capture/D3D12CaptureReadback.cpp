@@ -38,7 +38,7 @@ std::unique_ptr<D3D12CaptureService::PendingReadback> D3D12CaptureService::Prepa
 	const bool bIncompatibleCaptureSourceHeight = bIncompatibleCaptureSourceWidth || (sourceDesc.Height == 0);
 	const bool bCaptureSourceSourceFormat = bIncompatibleCaptureSourceHeight || (!IsRhiCaptureFormatSupported(request.SourceFormat));
 	const bool bIncompatibleCaptureSource = bCaptureSourceSourceFormat || (sourceDesc.Format != D3D12TypeConversions::ToDxgiFormat(request.SourceFormat));
-	
+
 	if (bIncompatibleCaptureSource)
 	{
 		return {};

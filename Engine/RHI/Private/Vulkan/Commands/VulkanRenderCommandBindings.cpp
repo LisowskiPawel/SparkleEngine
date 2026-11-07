@@ -189,10 +189,10 @@ VkDescriptorSet VulkanRenderCommandList::EnsureDescriptorSet(
     std::vector<VkDescriptorSet>& descriptorSets,
     std::vector<bool>& boundSets) noexcept
 {
-	const bool bSetBindingdescriptorAllocator = layout == nullptr || m_descriptorAllocator == nullptr;
-	const bool bInvalidSetBindingDescriptorPool = bSetBindingdescriptorAllocator || (m_recordingDescriptorPool == nullptr);
+	const bool bSetBindingDescriptorAllocator = layout == nullptr || m_descriptorAllocator == nullptr;
+	const bool bInvalidSetBindingDescriptorPool = bSetBindingDescriptorAllocator || (m_recordingDescriptorPool == nullptr);
 	const bool bInvalidDescriptorSetBinding = bInvalidSetBindingDescriptorPool || (setIndex >= layout->GetDescriptorSetLayouts().size());
-	
+
 	if (bInvalidDescriptorSetBinding)
 	{
 		return VK_NULL_HANDLE;

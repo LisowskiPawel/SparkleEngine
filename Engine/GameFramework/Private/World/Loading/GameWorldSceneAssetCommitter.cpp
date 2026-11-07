@@ -16,13 +16,13 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_sceneAssetCommitterLogger, "GameFramework.S
 
 static void ValidatePayloadContents(const SceneAssetPayload& sceneAssetPayload)
 {
-	const bool bScenePayloadEmptycameras = !sceneAssetPayload.HasMeshes() && sceneAssetPayload.cameras.empty();
-	const bool bScenePayloadEmptylights = bScenePayloadEmptycameras && (sceneAssetPayload.lights.empty());
-	const bool bScenePayloadEmptyskeletons = bScenePayloadEmptylights && (sceneAssetPayload.skeletons.empty());
-	const bool bScenePayloadEmptyanimations = bScenePayloadEmptyskeletons && (sceneAssetPayload.animations.empty());
-	const bool bScenePayloadEmptymaterials = bScenePayloadEmptyanimations && (sceneAssetPayload.materials.empty());
-	const bool bScenePayloadEmpty = bScenePayloadEmptymaterials && (sceneAssetPayload.materialVariants.empty());
-	
+	const bool bScenePayloadEmptyCameras = !sceneAssetPayload.HasMeshes() && sceneAssetPayload.cameras.empty();
+	const bool bScenePayloadEmptyLights = bScenePayloadEmptyCameras && (sceneAssetPayload.lights.empty());
+	const bool bScenePayloadEmptySkeletons = bScenePayloadEmptyLights && (sceneAssetPayload.skeletons.empty());
+	const bool bScenePayloadEmptyAnimations = bScenePayloadEmptySkeletons && (sceneAssetPayload.animations.empty());
+	const bool bScenePayloadEmptyMaterials = bScenePayloadEmptyAnimations && (sceneAssetPayload.materials.empty());
+	const bool bScenePayloadEmpty = bScenePayloadEmptyMaterials && (sceneAssetPayload.materialVariants.empty());
+
 	if (bScenePayloadEmpty)
 	{
 		Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "A validated scene asset payload contains no resources or entities.");

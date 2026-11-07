@@ -141,8 +141,8 @@ namespace SparkleLauncher
 	{
 		const bool bNeedsContentBuildScope = IncludesBuildScope(request, "editor") || IncludesBuildScope(request, "game");
 		const bool bNeedsContentOperationId = bNeedsContentBuildScope || (request.OperationId == "workspace.build.editor");
-		const bool bNeedsContentOperationId2 = bNeedsContentOperationId || (request.OperationId == "workspace.build.game");
-		const bool bNeedsContent = bNeedsContentOperationId2 || (request.OperationId.starts_with("cook."));
+		const bool bBuildNeedsContent = bNeedsContentOperationId || (request.OperationId == "workspace.build.game");
+		const bool bNeedsContent = bBuildNeedsContent || (request.OperationId.starts_with("cook."));
 
 		if (bNeedsContent && request.ContentId.empty())
 		{

@@ -29,10 +29,10 @@ void D3D12RenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRayT
 	const D3D12_GPU_VIRTUAL_ADDRESS indexBufferAddress = ResolveRayTracingBufferAddress(geometry.IndexBuffer);
 	const bool bInvalidBuildInputsRhiContract = m_commandList == nullptr || !RhiContract::IsRayTracingGeometryDescUsable(geometry);
 	const bool bInvalidBuildInputsBufferAddress = bInvalidBuildInputsRhiContract || (vertexBufferAddress == 0);
-	const bool bInvalidBuildInputsBufferAddress2 = bInvalidBuildInputsBufferAddress || (indexBufferAddress == 0);
-	const bool bInvalidBuildInputsRhiContract2 = bInvalidBuildInputsBufferAddress2 || (!RhiContract::IsRayTracingGpuAddressPresent(scratchGpuAddress));
-	const bool bInvalidBlasBuildInputs = bInvalidBuildInputsRhiContract2 || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
-	
+	const bool bInvalidBufferAddresses = bInvalidBuildInputsBufferAddress || (indexBufferAddress == 0);
+	const bool bInvalidScratchAddress = bInvalidBufferAddresses || (!RhiContract::IsRayTracingGpuAddressPresent(scratchGpuAddress));
+	const bool bInvalidBlasBuildInputs = bInvalidScratchAddress || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
+
 	if (bInvalidBlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 BLAS build received incomplete geometry, command-list, or GPU-address inputs.");
@@ -81,9 +81,9 @@ void D3D12RenderCommandList::BuildTlas(
     ERhiTlasBuildMode buildMode) noexcept
 {
 	const bool bInvalidBuildInputsRhiContract = m_commandList == nullptr || !RhiContract::IsRayTracingGpuAddressPresent(instanceDescsGpuAddress);
-	const bool bInvalidBuildInputsRhiContract2 = bInvalidBuildInputsRhiContract || (!RhiContract::IsRayTracingGpuAddressPresent(scratchGpuAddress));
-	const bool bInvalidTlasBuildInputs = bInvalidBuildInputsRhiContract2 || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
-	
+	const bool bInvalidScratchAddress = bInvalidBuildInputsRhiContract || (!RhiContract::IsRayTracingGpuAddressPresent(scratchGpuAddress));
+	const bool bInvalidTlasBuildInputs = bInvalidScratchAddress || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
+
 	if (bInvalidTlasBuildInputs)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 TLAS build received no command list or an empty GPU address.");

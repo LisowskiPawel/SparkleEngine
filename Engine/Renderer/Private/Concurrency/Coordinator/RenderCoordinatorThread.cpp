@@ -179,8 +179,9 @@ void RenderCoordinator::SettleAbandonedWork() noexcept
 	std::lock_guard lock(m_readStateMutex);
 	for (ViewportCaptureId id : m_outstandingViewportCaptures)
 	{
-		const bool bDuplicateCaptureCompletion = !id || std::any_of(m_publishedViewportCaptures.begin(), m_publishedViewportCaptures.end(), [id](const ViewportCaptureCompletion& completion) { return completion.Id.Value == id.Value; });
-		
+		const bool bDuplicateCaptureCompletion = !id
+		    || std::any_of(m_publishedViewportCaptures.begin(), m_publishedViewportCaptures.end(), [id](const ViewportCaptureCompletion& completion) { return completion.Id.Value == id.Value; });
+
 		if (bDuplicateCaptureCompletion)
 		{
 			continue;

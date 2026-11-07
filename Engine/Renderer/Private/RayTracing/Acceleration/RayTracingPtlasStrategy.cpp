@@ -97,7 +97,7 @@ void RayTracingPtlasStrategy::EnsurePtlasResources(const RhiPtlasDesc& requiredL
 	const bool bPtlasAddressUnavailableScratch = !m_ptlasResources.Storage || !m_ptlasResources.Scratch;
 	const bool bPtlasAddressUnavailableStorage = bPtlasAddressUnavailableScratch || (resources.GetResourceGpuVirtualAddress(m_ptlasResources.Storage) == 0);
 	const bool bPtlasAddressUnavailable = bPtlasAddressUnavailableStorage || (resources.GetResourceGpuVirtualAddress(m_ptlasResources.Scratch) == 0);
-	
+
 	if (bPtlasAddressUnavailable)
 	{
 		Diagnostics::Fatal(g_rayTracingPtlasStrategyLogger, __FILE__, __LINE__, "PTLAS storage or scratch allocation has no GPU address.");

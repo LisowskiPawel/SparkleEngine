@@ -106,7 +106,7 @@ void UiRenderPacketPlayer::ApplyTextureChanges(const UiRenderPacket& packet)
 		++texture.Data->UnusedFrames;
 
 		const bool bTextureUpdateMissing = std::find(m_storage->TextureUpdates.begin(), m_storage->TextureUpdates.end(), texture.Data.get()) == m_storage->TextureUpdates.end();
-		
+
 		if (bTextureUpdateMissing)
 		{
 			m_storage->TextureUpdates.push_back(texture.Data.get());
@@ -120,7 +120,7 @@ void UiRenderPacketPlayer::ApplyTextureUpload(const UiRenderPacket& packet, cons
 	const bool bInvalidTextureUploadPixelCount = !upload.Texture.IsImGuiTexture() || expectedPixelCount != upload.PixelCount;
 	const bool bInvalidTextureUploadTexturePixels = bInvalidTextureUploadPixelCount || (upload.PixelOffset > packet.TexturePixels.size());
 	const bool bInvalidUiTextureUpload = bInvalidTextureUploadTexturePixels || (upload.PixelCount > packet.TexturePixels.size() - upload.PixelOffset);
-	
+
 	if (bInvalidUiTextureUpload)
 	{
 		return;

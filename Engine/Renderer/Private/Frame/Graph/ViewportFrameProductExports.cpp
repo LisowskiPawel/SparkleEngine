@@ -13,14 +13,14 @@ void ExportViewportFrameProducts(FrameGraphBuilder& builder, const RenderFrameGr
 	}
 
 	const bool bExportSceneDepth = HasAnyRenderOutputFlags(settings.RequestedOutputs, RenderOutputFlags::SceneDepth) && resources.ViewportProducts.SceneDepth.IsValid();
-	
+
 	if (bExportSceneDepth)
 	{
 		builder.ExportTexture(resources.ViewportProducts.SceneDepth, "Viewport.SceneDepth");
 	}
 
 	const bool bExportNormals = HasAnyRenderOutputFlags(settings.RequestedOutputs, RenderOutputFlags::Normals) && resources.ViewportProducts.Normals.IsValid();
-	
+
 	if (bExportNormals)
 	{
 		builder.ExportTexture(resources.ViewportProducts.Normals, "Viewport.Normals");

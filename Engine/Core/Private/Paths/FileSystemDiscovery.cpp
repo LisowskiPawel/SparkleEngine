@@ -27,7 +27,7 @@ namespace Filesystem::Private
 	std::string InferProjectNameFromExecutableStem(std::string executableStem)
 	{
 		const bool bExecutableHasEditorSuffix = executableStem.size() > std::string_view("Editor").size() && PathFormatting::EndsWithIgnoreCase(executableStem, "Editor");
-		
+
 		if (bExecutableHasEditorSuffix)
 		{
 			executableStem.resize(executableStem.size() - std::string_view("Editor").size());
@@ -170,9 +170,9 @@ namespace Filesystem
 			const auto workingRoot = FindAncestorWithMarker(std::filesystem::current_path(errorCode), marker);
 
 			if (workingRoot && !errorCode)
-		{
-			return Paths::Normalize(*workingRoot);
-		}
+			{
+				return Paths::Normalize(*workingRoot);
+			}
 		}
 		return std::nullopt;
 	}

@@ -136,7 +136,7 @@ void VulkanRenderCommandList::ClearDepthStencil(RhiCpuDescriptorHandle depthSten
 {
 	const bool bDepthClearUnavailableScissorRect = m_commandBuffer == VK_NULL_HANDLE || !m_bHasScissorRect;
 	const bool bDepthClearUnavailable = bDepthClearUnavailableScissorRect || (VulkanDescriptorHandles::DecodeImageViewCpuHandle(depthStencil) != m_depthStencil);
-	
+
 	if (bDepthClearUnavailable)
 	{
 		return;

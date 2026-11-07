@@ -34,10 +34,10 @@ namespace SparkleLauncher
 		errorCode.clear();
 		const std::filesystem::path repositoryRelativeToBuildDirectory = std::filesystem::relative(normalizedWorkspaceRoot, normalizedBuildDirectory, errorCode);
 		const bool bContainsRepositoryEmpty = !errorCode && !repositoryRelativeToBuildDirectory.empty();
-		const bool bUildDirectoryContainsRepository = bContainsRepositoryEmpty && (*repositoryRelativeToBuildDirectory.begin() != "..");
-		const bool bUnsafeBuildDirectoryrootpath = normalizedBuildDirectory.empty() || normalizedBuildDirectory == normalizedBuildDirectory.root_path();
-		const bool bUnsafeBuildDirectory = bUnsafeBuildDirectoryrootpath || (bUildDirectoryContainsRepository);
-		
+		const bool bContainsRepository = bContainsRepositoryEmpty && (*repositoryRelativeToBuildDirectory.begin() != "..");
+		const bool bUnsafeBuildDirectoryRootpath = normalizedBuildDirectory.empty() || normalizedBuildDirectory == normalizedBuildDirectory.root_path();
+		const bool bUnsafeBuildDirectory = bUnsafeBuildDirectoryRootpath || (bContainsRepository);
+
 		if (bUnsafeBuildDirectory)
 		{
 			errorMessage = "Refusing to reset native build outputs because the configured build directory contains the workspace: " + normalizedBuildDirectory.string();

@@ -57,8 +57,13 @@ namespace SparkleLauncher
 	{
 		const ToolResolveResult resolvedTool = ResolveKnownTool(tool);
 
-		status.Items.push_back(
-		    MakeToolStatus(Strings::ToLowerCopy(ToString(tool)), ToString(tool), bRequired, resolvedTool.bFound, resolvedTool.Path, resolvedTool.bFound ? std::move(detail) : resolvedTool.FailureReason));
+		status.Items.push_back(MakeToolStatus(
+		    Strings::ToLowerCopy(ToString(tool)),
+		    ToString(tool),
+		    bRequired,
+		    resolvedTool.bFound,
+		    resolvedTool.Path,
+		    resolvedTool.bFound ? std::move(detail) : resolvedTool.FailureReason));
 
 		switch (tool)
 		{
@@ -153,7 +158,7 @@ namespace SparkleLauncher
 		    !status.ClangClPath.empty(),
 		    status.ClangClPath,
 		    bClangClRequired ? "Selected compiler. The launcher configures CMake with the Visual Studio ClangCL toolset."
-		                    : (!status.ClangClPath.empty() ? "Available as a launcher compiler choice." : "Not installed."));
+		                     : (!status.ClangClPath.empty() ? "Available as a launcher compiler choice." : "Not installed."));
 
 		clangCl.Compiler = WorkspaceCompiler::ClangCl;
 		status.Items.push_back(std::move(clangCl));
@@ -174,7 +179,9 @@ namespace SparkleLauncher
 		const ShaderCompilerSdkStatus shaderCompilerSdk = DetectShaderCompilerSdk();
 		status.ShaderCompilerSdkRoot = shaderCompilerSdk.Root;
 		status.bConfigurePrerequisitesAvailable = shaderCompilerSdk.bAvailable;
-		status.Items.push_back(MakeToolStatus("shader-compiler-sdk", "Shader compiler SDK (DXC + Slang bundle)", false, shaderCompilerSdk.bAvailable, shaderCompilerSdk.Root, shaderCompilerSdk.Detail));
+
+		status.Items.push_back(
+		    MakeToolStatus("shader-compiler-sdk", "Shader compiler SDK (DXC + Slang bundle)", false, shaderCompilerSdk.bAvailable, shaderCompilerSdk.Root, shaderCompilerSdk.Detail));
 #else
 		status.ConfigurePrerequisitesAvailable = true;
 #endif
@@ -203,7 +210,7 @@ namespace SparkleLauncher
 			if (item.Id == "clangcl" && item.State != ToolchainItemState::Found)
 			{
 				item.Detail = item.bCanInstall ? "Not installed. The launcher can add the Visual Studio clang-cl component."
-				                              : "Not installed and no supported launcher installer is available on this machine.";
+				                               : "Not installed and no supported launcher installer is available on this machine.";
 			}
 		}
 

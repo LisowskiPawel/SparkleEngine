@@ -25,8 +25,9 @@ static void ValidateTargets(std::span<const ShaderTarget> targets)
 	}
 	for (std::size_t targetIndex = 0; targetIndex < targets.size(); ++targetIndex)
 	{
-		const bool bInvalidOrDuplicateTarget = !IsShaderTarget(targets[targetIndex]) || std::find(targets.begin(), targets.begin() + targetIndex, targets[targetIndex]) != targets.begin() + targetIndex;
-		
+		const bool bInvalidOrDuplicateTarget = !IsShaderTarget(targets[targetIndex])
+		    || std::find(targets.begin(), targets.begin() + targetIndex, targets[targetIndex]) != targets.begin() + targetIndex;
+
 		if (bInvalidOrDuplicateTarget)
 		{
 			throw Diagnostics::Error("Shader cooking received an invalid or duplicate target.");

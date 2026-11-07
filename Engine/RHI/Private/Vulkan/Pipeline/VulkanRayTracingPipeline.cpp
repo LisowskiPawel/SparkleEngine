@@ -22,9 +22,9 @@ VulkanRayTracingPipeline::VulkanRayTracingPipeline(VulkanRhi& rhi, const RayTrac
 	const RhiRayTracingCapabilities capabilities = rhi.GetRayTracingCapabilities();
 	const bool bTracingPipelineTracingPipelines = !capabilities.bSupportsRayTracingPipeline || rhi.GetCreateRayTracingPipelines() == nullptr;
 	const bool bUnsupportedTracingPipelineInBytes = bTracingPipelineTracingPipelines || (desc.MaxPayloadSizeInBytes > capabilities.MaxRayPayloadSizeInBytes);
-	const bool bUnsupportedTracingPipelineInBytes2 = bUnsupportedTracingPipelineInBytes || (desc.MaxAttributeSizeInBytes > capabilities.MaxRayAttributeSizeInBytes);
-	const bool bUnsupportedRayTracingPipeline = bUnsupportedTracingPipelineInBytes2 || (desc.MaxRecursionDepth > capabilities.MaxTraceRecursionDepth);
-	
+	const bool bAttributeSizeUnsupported = bUnsupportedTracingPipelineInBytes || (desc.MaxAttributeSizeInBytes > capabilities.MaxRayAttributeSizeInBytes);
+	const bool bUnsupportedRayTracingPipeline = bAttributeSizeUnsupported || (desc.MaxRecursionDepth > capabilities.MaxTraceRecursionDepth);
+
 	if (bUnsupportedRayTracingPipeline)
 	{
 		throw Diagnostics::Error("Vulkan ray-tracing pipeline is not fully ready.");

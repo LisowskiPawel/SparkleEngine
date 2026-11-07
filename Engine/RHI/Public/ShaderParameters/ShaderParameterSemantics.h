@@ -180,4 +180,4 @@ template <typename T> struct IsShaderParameterSemantic<UniformData<T>> : std::tr
 {
 };
 
-template <typename T> constexpr bool IsShaderParameterSemanticV = IsShaderParameterSemantic<T>::value;
+template <typename T> constexpr bool bIsShaderParameterSemanticV = IsShaderParameterSemantic<T>::value;

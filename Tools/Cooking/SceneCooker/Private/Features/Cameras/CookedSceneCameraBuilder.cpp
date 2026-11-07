@@ -50,7 +50,7 @@ void CookedSceneCameraBuilder::BuildCameras(const SourceImportOutput& importOutp
 	{
 		const ImportedCamera& importedCamera = importOutput.scene.cameras[cameraIndex];
 		const bool bInvalidCameraDescription = importedCamera.name.size() >= Assets::kCookedSceneCameraNameCapacity || importedCamera.projectionKind != ImportedCameraProjectionKind::Perspective;
-		
+
 		if (bInvalidCameraDescription)
 		{
 			throw Diagnostics::Error(std::format("Imported camera {} exceeds the cooked camera contract.", cameraIndex));

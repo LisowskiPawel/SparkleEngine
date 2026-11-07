@@ -62,21 +62,21 @@ void GltfCameraImporter::ImportCameras(const cgltf_data* data, SourceImportOutpu
 		// The renderer derives aspect ratio from the current viewport. A source aspect ratio is therefore intentionally
 		// discarded, while the vertical field of view and finite clip range remain authoritative camera data.
 		const bool bFarPlaneSpecified = perspective.has_zfar;
-		const bool bProjectionFiniteyfov = bFarPlaneSpecified && std::isfinite(perspective.yfov);
-		const bool bProjectionFiniteznear = bProjectionFiniteyfov && (std::isfinite(perspective.znear));
-		const bool bProjectionFinite = bProjectionFiniteznear && (std::isfinite(perspective.zfar));
-		const bool bProjectionOrdered0f = perspective.yfov <= 0.0f || perspective.znear <= 0.0f;
-		const bool bProjectionOrderedznear = bProjectionOrdered0f || (perspective.zfar <= perspective.znear);
-		const bool bProjectionOrderedznear2 = !bProjectionOrderedznear;
-		const bool bProjectionOrdered = bProjectionFinite && bProjectionOrderedznear2;
-		const bool bAspectRatioValidaspectratio = bProjectionOrdered && (perspective.has_aspect_ratio);
-		const bool bAspectRatioValidaspectratio2 = bAspectRatioValidaspectratio && (!std::isfinite(perspective.aspect_ratio));
-		const bool bAspectRatioValidGuard0f = bAspectRatioValidaspectratio && !bAspectRatioValidaspectratio2;
-		const bool bAspectRatioValid0f = bAspectRatioValidGuard0f && (perspective.aspect_ratio <= 0.0f);
-		const bool bAspectRatioValid0f2 = bAspectRatioValidaspectratio2 || bAspectRatioValid0f;
-		const bool bAspectRatioValid0f3 = bAspectRatioValidaspectratio && bAspectRatioValid0f2;
-		const bool bAspectRatioValid0f4 = bProjectionOrdered && !bAspectRatioValid0f3;
-		const bool bAspectRatioValid = bProjectionOrdered && bAspectRatioValid0f4;
+		const bool bProjectionFiniteYfov = bFarPlaneSpecified && std::isfinite(perspective.yfov);
+		const bool bProjectionFiniteZnear = bProjectionFiniteYfov && (std::isfinite(perspective.znear));
+		const bool bProjectionFinite = bProjectionFiniteZnear && (std::isfinite(perspective.zfar));
+		const bool bInvalidNearRange = perspective.yfov <= 0.0f || perspective.znear <= 0.0f;
+		const bool bProjectionOrderedZnear = bInvalidNearRange || (perspective.zfar <= perspective.znear);
+		const bool bProjectionRangeValid = !bProjectionOrderedZnear;
+		const bool bProjectionOrdered = bProjectionFinite && bProjectionRangeValid;
+		const bool bCheckAspectRatio = bProjectionOrdered && (perspective.has_aspect_ratio);
+		const bool bAspectNonfinite = bCheckAspectRatio && (!std::isfinite(perspective.aspect_ratio));
+		const bool bCheckAspectSign = bCheckAspectRatio && !bAspectNonfinite;
+		const bool bAspectNonpositive = bCheckAspectSign && (perspective.aspect_ratio <= 0.0f);
+		const bool bAspectInvalid = bAspectNonfinite || bAspectNonpositive;
+		const bool bExplicitAspectInvalid = bCheckAspectRatio && bAspectInvalid;
+		const bool bAspectAccepted = bProjectionOrdered && !bExplicitAspectInvalid;
+		const bool bAspectRatioValid = bProjectionOrdered && bAspectAccepted;
 
 		if (!bAspectRatioValid)
 		{

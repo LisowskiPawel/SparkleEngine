@@ -47,8 +47,8 @@ void UI::Implementation::Build()
 	BuildUtilityPanels(bDisableInteraction);
 
 #if USE_IMGUI_DEMO_WINDOW
-	bool showDemoWindow = true;
-	ImGui::ShowDemoWindow(&showDemoWindow);
+	bool bShowDemoWindow = true;
+	ImGui::ShowDemoWindow(&bShowDemoWindow);
 #endif
 
 	if (m_mainMenuBar)

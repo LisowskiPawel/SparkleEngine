@@ -21,9 +21,9 @@ namespace AnimationPoseEvaluator
 	    std::span<ECS::AnimationJointTransform> localTransforms,
 	    std::span<DirectX::XMFLOAT4X4> modelSpaceTransforms) noexcept
 	{
-		const bool bInvalidAnimationPosejointsSize = !skeleton.IsValid() || localTransforms.size() != skeleton.Resource->joints.size();
-		const bool bInvalidAnimationPose = bInvalidAnimationPosejointsSize || (modelSpaceTransforms.size() != skeleton.Resource->joints.size());
-		
+		const bool bInvalidAnimationPoseJointsSize = !skeleton.IsValid() || localTransforms.size() != skeleton.Resource->joints.size();
+		const bool bInvalidAnimationPose = bInvalidAnimationPoseJointsSize || (modelSpaceTransforms.size() != skeleton.Resource->joints.size());
+
 		if (bInvalidAnimationPose)
 		{
 			return false;

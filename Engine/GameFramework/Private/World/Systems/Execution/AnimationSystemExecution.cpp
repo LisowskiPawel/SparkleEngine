@@ -155,7 +155,7 @@ namespace ECS
 			const std::uint32_t outputIndex = samples[binding.SampleIndex].OutputIndex;
 			const bool bMorphOutputAvailable = outputIndex < output.morphWeights.size();
 			const bool bMorphWeightsWritten = bMorphOutputAvailable && m_state.m_morphWeights.Write(binding.TargetWeights, output.morphWeights[outputIndex].weights);
-			
+
 			if (!bMorphWeightsWritten)
 			{
 				return false;

@@ -137,9 +137,9 @@ void EditorConsoleSystem::BuildDockedUI(float left, float bottom, float width, f
 		m_dockHeight = ImGui::GetWindowHeight();
 		GetDockHeight(availableHeight);
 		const bool bCloseConsoleRequestedImGui = !bDisableInteraction && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-		const bool bCloseConsoleRequestedImGui2 = bCloseConsoleRequestedImGui && (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId));
-		const bool bCloseConsoleRequested = bCloseConsoleRequestedImGui2 && (ImGui::IsKeyPressed(ImGuiKey_Escape));
-		
+		const bool bNoPopup = bCloseConsoleRequestedImGui && (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId));
+		const bool bCloseConsoleRequested = bNoPopup && (ImGui::IsKeyPressed(ImGuiKey_Escape));
+
 		if (bCloseConsoleRequested)
 		{
 			m_consolePanel->SetOpen(false);

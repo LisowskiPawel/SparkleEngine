@@ -72,8 +72,8 @@ DirectX::XMFLOAT4X4 FbxNodeTransformConverter::BuildNodeAttachedOrientation(cons
 	const float directionLengthSquared = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(localDirection));
 	const bool bDirectionDegenerate = directionLengthSquared <= 1.0e-8f;
 	const bool bUpDegenerate = !bDirectionDegenerate && DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(localUp)) <= 1.0e-8f;
-	const bool bFrameDegenerateupDegenerate = !bDirectionDegenerate && !bUpDegenerate;
-	const bool bFrameDegenerate = bFrameDegenerateupDegenerate && (DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(DirectX::XMVector3Cross(localUp, localDirection))) <= 1.0e-8f);
+	const bool bFrameDegenerateUpDegenerate = !bDirectionDegenerate && !bUpDegenerate;
+	const bool bFrameDegenerate = bFrameDegenerateUpDegenerate && (DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(DirectX::XMVector3Cross(localUp, localDirection))) <= 1.0e-8f);
 
 	if (bDirectionDegenerate || bUpDegenerate || bFrameDegenerate)
 	{

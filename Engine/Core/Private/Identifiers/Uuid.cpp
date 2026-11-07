@@ -42,9 +42,9 @@ namespace Identifiers
 		}
 		for (std::size_t index = 0; index < value.size(); ++index)
 		{
-			const bool bSeparatorindex = index == 8 || index == 13;
-			const bool bSeparatorindex2 = bSeparatorindex || (index == 18);
-			const bool bSeparator = bSeparatorindex2 || (index == 23);
+			const bool bSeparatorIndex = index == 8 || index == 13;
+			const bool bEarlierSeparator = bSeparatorIndex || (index == 18);
+			const bool bSeparator = bEarlierSeparator || (index == 23);
 			if (bSeparator ? value[index] != '-' : std::string_view("0123456789abcdef").find(value[index]) == std::string_view::npos)
 			{
 				return false;

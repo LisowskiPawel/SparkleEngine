@@ -126,10 +126,10 @@ FrameGraphTransientResourcePlan FrameGraph::BuildTransientResourcePlan(
 	const RhiBufferResourceDesc bufferResourceDesc = bIsBuffer ? BuildTransientBufferDesc(transientResource.bufferDesc, bRequiresUnorderedAccess) : RhiBufferResourceDesc{};
 
 	const RhiTextureResourceDesc textureResourceDesc = bIsBuffer ? RhiTextureResourceDesc{}
-	                                                            : BuildTransientResourceDesc(transientResource.textureDesc, resourceMetadata.kind, bRequiresRenderTarget, bRequiresUnorderedAccess);
+	                                                             : BuildTransientResourceDesc(transientResource.textureDesc, resourceMetadata.kind, bRequiresRenderTarget, bRequiresUnorderedAccess);
 
 	const RhiResourceAllocationInfo allocationInfo = bIsBuffer ? m_renderHardwareInterface->GetResourceService().GetBufferAllocationInfo(bufferResourceDesc)
-	                                                          : m_renderHardwareInterface->GetResourceService().GetTextureAllocationInfo(textureResourceDesc);
+	                                                           : m_renderHardwareInterface->GetResourceService().GetTextureAllocationInfo(textureResourceDesc);
 
 	return FrameGraphTransientResourcePlan{
 	    .handle = transientResource.handle,

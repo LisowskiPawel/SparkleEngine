@@ -75,12 +75,12 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::Execute(std:
 	const TaskProfiler::TimePoint taskStart = TaskProfiler::Begin(node.Desc, m_generation, index, worker.LaneWorkerIndex);
 
 	const bool bBlockedByParent = task.bBlockedByPrerequisite.load(std::memory_order_acquire) || task.bBlockedByParent.load(std::memory_order_acquire);
-	const bool bLocked = bBlockedByParent || (cancellation.stop_requested());
+	const bool bBlocked = bBlockedByParent || (cancellation.stop_requested());
 	TaskExecutionContext taskContext = m_context;
 	taskContext.Bind(node.Desc.Lane, cancellation);
 
-	const TaskResult result = bLocked && node.Desc.CompletionPolicy == TaskCompletionPolicy::Normal ? TaskResult::Cancelled("Task execution was cancelled or a prerequisite did not succeed.")
-	                                                                                                : InvokeTaskFunction(node, taskContext);
+	const TaskResult result = bBlocked && node.Desc.CompletionPolicy == TaskCompletionPolicy::Normal ? TaskResult::Cancelled("Task execution was cancelled or a prerequisite did not succeed.")
+	                                                                                                 : InvokeTaskFunction(node, taskContext);
 
 	RecordTaskResult(index, node, result);
 	TaskProfiler::End(node.Desc, m_generation, index, worker.LaneWorkerIndex, result, taskStart);
@@ -123,7 +123,7 @@ void TaskExecutor::Implementation::Runtime::ScheduledTaskExecution::TrySchedule(
 {
 	ScheduledTaskState& task = m_tasks[index];
 	const bool bPrerequisitesPending = task.RemainingPrerequisites.load(std::memory_order_acquire) != 0 || !task.bParentBodyComplete.load(std::memory_order_acquire);
-	
+
 	if (bPrerequisitesPending)
 	{
 		return;

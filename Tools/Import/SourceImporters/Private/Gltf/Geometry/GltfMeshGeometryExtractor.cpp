@@ -76,14 +76,14 @@ bool GltfMeshGeometryExtractor::HasValidTangentFrame(const ImportedMeshGeometry&
 void GltfMeshGeometryExtractor::ValidateAttributes(const cgltf_primitive& primitive, const Attributes& attributes)
 {
 	const bool bRequiredAccessorsPresent = attributes.Positions != nullptr && attributes.Normals != nullptr;
-	const bool bTextureCoordinatesPresentmaterial = bRequiredAccessorsPresent && (!GltfGeometryRequirements::RequiresTextureCoordinates(primitive.material));
-	const bool bCoordinatesPresentGuardCoordinates = bRequiredAccessorsPresent && !bTextureCoordinatesPresentmaterial;
+	const bool bTextureCoordinatesPresentMaterial = bRequiredAccessorsPresent && (!GltfGeometryRequirements::RequiresTextureCoordinates(primitive.material));
+	const bool bCoordinatesPresentGuardCoordinates = bRequiredAccessorsPresent && !bTextureCoordinatesPresentMaterial;
 	const bool bCoordinatesPresentCoordinates = bCoordinatesPresentGuardCoordinates && (attributes.TextureCoordinates != nullptr);
-	const bool bCoordinatesPresentCoordinates2 = bTextureCoordinatesPresentmaterial || bCoordinatesPresentCoordinates;
-	const bool bTextureCoordinatesPresent = bRequiredAccessorsPresent && bCoordinatesPresentCoordinates2;
+	const bool bCoordinatesAccepted = bTextureCoordinatesPresentMaterial || bCoordinatesPresentCoordinates;
+	const bool bTextureCoordinatesPresent = bRequiredAccessorsPresent && bCoordinatesAccepted;
 	const bool bVertexCountUsablePositions = bTextureCoordinatesPresent && attributes.Positions->count != 0;
 	const bool bVertexCountUsable = bVertexCountUsablePositions && (attributes.Positions->count <= (std::numeric_limits<std::uint32_t>::max)());
-	
+
 	if (!bVertexCountUsable)
 	{
 		throw Diagnostics::Error("glTF primitive contains unsupported or malformed vertex attributes.");
@@ -93,15 +93,15 @@ void GltfMeshGeometryExtractor::ValidateAttributes(const cgltf_primitive& primit
 	{
 		const cgltf_attribute& attribute = primitive.attributes[attributeIndex];
 
-		const bool bSupportedtype = attribute.type == cgltf_attribute_type_position || attribute.type == cgltf_attribute_type_normal;
-		const bool bSupportedtype2 = bSupportedtype || (attribute.type == cgltf_attribute_type_tangent);
-		const bool bSupportedindex = bSupportedtype2 && (attribute.index == 0);
-		const bool bSupportedtype3 = bSupportedindex || (attribute.type == cgltf_attribute_type_texcoord);
-		const bool bSupportedtype4 = bSupportedtype3 || (attribute.type == cgltf_attribute_type_color);
-		const bool bSupportedtype5 = attribute.type == cgltf_attribute_type_joints || attribute.type == cgltf_attribute_type_weights;
-		const bool bSupportedindex2 = attribute.index == 0 || attribute.index == 1;
-		const bool bSupportedindex3 = bSupportedtype5 && bSupportedindex2;
-		const bool bSupported = bSupportedtype4 || bSupportedindex3;
+		const bool bSupportedType = attribute.type == cgltf_attribute_type_position || attribute.type == cgltf_attribute_type_normal;
+		const bool bGeometryAttribute = bSupportedType || (attribute.type == cgltf_attribute_type_tangent);
+		const bool bSupportedIndex = bGeometryAttribute && (attribute.index == 0);
+		const bool bCoordinateAttribute = bSupportedIndex || (attribute.type == cgltf_attribute_type_texcoord);
+		const bool bColorAttribute = bCoordinateAttribute || (attribute.type == cgltf_attribute_type_color);
+		const bool bSkinAttribute = attribute.type == cgltf_attribute_type_joints || attribute.type == cgltf_attribute_type_weights;
+		const bool bSupportedSkinSet = attribute.index == 0 || attribute.index == 1;
+		const bool bSkinSetAccepted = bSkinAttribute && bSupportedSkinSet;
+		const bool bSupported = bColorAttribute || bSkinSetAccepted;
 
 		if (!bSupported || attribute.data == nullptr || attribute.data->count != attributes.Positions->count)
 		{
@@ -112,22 +112,22 @@ void GltfMeshGeometryExtractor::ValidateAttributes(const cgltf_primitive& primit
 	const bool bPositionNormalShapesValid = attributes.Positions->type == cgltf_type_vec3 && attributes.Normals->type == cgltf_type_vec3;
 	const bool bShapeValidTextureCoordinates = bPositionNormalShapesValid && (attributes.TextureCoordinates == nullptr);
 	const bool bShapeValidGuardTextureCoordinates = bPositionNormalShapesValid && !bShapeValidTextureCoordinates;
-	const bool bShapeValidTextureCoordinates2 = bShapeValidGuardTextureCoordinates && (attributes.TextureCoordinates->type == cgltf_type_vec2);
-	const bool bShapeValidTextureCoordinates3 = bShapeValidTextureCoordinates || bShapeValidTextureCoordinates2;
-	const bool bTextureCoordinateShapeValid = bPositionNormalShapesValid && bShapeValidTextureCoordinates3;
+	const bool bCoordinateShapeMatches = bShapeValidGuardTextureCoordinates && (attributes.TextureCoordinates->type == cgltf_type_vec2);
+	const bool bCoordinateShapeAccepted = bShapeValidTextureCoordinates || bCoordinateShapeMatches;
+	const bool bTextureCoordinateShapeValid = bPositionNormalShapesValid && bCoordinateShapeAccepted;
 	const bool bTangentShapeValidTangents = bTextureCoordinateShapeValid && (attributes.Tangents == nullptr);
 	const bool bTangentShapeValidGuardTangents = bTextureCoordinateShapeValid && !bTangentShapeValidTangents;
-	const bool bTangentShapeValidTangents2 = bTangentShapeValidGuardTangents && (attributes.Tangents->type == cgltf_type_vec4);
-	const bool bTangentShapeValidTangents3 = bTangentShapeValidTangents || bTangentShapeValidTangents2;
-	const bool bTangentShapeValid = bTextureCoordinateShapeValid && bTangentShapeValidTangents3;
+	const bool bTangentShapeMatches = bTangentShapeValidGuardTangents && (attributes.Tangents->type == cgltf_type_vec4);
+	const bool bTangentShapeAccepted = bTangentShapeValidTangents || bTangentShapeMatches;
+	const bool bTangentShapeValid = bTextureCoordinateShapeValid && bTangentShapeAccepted;
 	const bool bColorShapeValidColors = bTangentShapeValid && (attributes.Colors == nullptr);
 	const bool bColorShapeValidGuardColors = bTangentShapeValid && !bColorShapeValidColors;
-	const bool bColorShapeValidColors2 = bColorShapeValidGuardColors && (attributes.Colors->type == cgltf_type_vec3);
-	const bool bColorShapeValidColors3 = bColorShapeValidColors || bColorShapeValidColors2;
-	const bool bColorShapeValidGuardColors2 = bTangentShapeValid && !bColorShapeValidColors3;
-	const bool bColorShapeValidColors4 = bColorShapeValidGuardColors2 && (attributes.Colors->type == cgltf_type_vec4);
-	const bool bColorShapeValidColors5 = bColorShapeValidColors3 || bColorShapeValidColors4;
-	const bool bColorShapeValid = bTangentShapeValid && bColorShapeValidColors5;
+	const bool bRgbColorMatches = bColorShapeValidGuardColors && (attributes.Colors->type == cgltf_type_vec3);
+	const bool bRgbOrNoColors = bColorShapeValidColors || bRgbColorMatches;
+	const bool bCheckRgba = bTangentShapeValid && !bRgbOrNoColors;
+	const bool bRgbaColorMatches = bCheckRgba && (attributes.Colors->type == cgltf_type_vec4);
+	const bool bColorShapeAccepted = bRgbOrNoColors || bRgbaColorMatches;
+	const bool bColorShapeValid = bTangentShapeValid && bColorShapeAccepted;
 	const bool bPrimarySkinSetPaired = bColorShapeValid && (attributes.Joints0 == nullptr) == (attributes.Weights0 == nullptr);
 	const bool bAttributeShapesValid = bPrimarySkinSetPaired && (attributes.Joints1 == nullptr) == (attributes.Weights1 == nullptr);
 	const bool bJointSetsSupported = bAttributeShapesValid && GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_joints, 2) == nullptr;

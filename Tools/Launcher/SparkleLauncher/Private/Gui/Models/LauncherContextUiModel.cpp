@@ -121,20 +121,20 @@ namespace SparkleLauncher
 		const bool bVisualStudioAvailable = IsToolAvailable(toolchain, "visualstudio");
 		const bool bMsvcAvailable = bVisualStudioAvailable && IsToolAvailable(toolchain, "msbuild");
 		const ToolchainItemStatus* clangCl = FindToolchainItem(toolchain, "clangcl");
-		const bool bClangClAvailableclangCl = bVisualStudioAvailable && clangCl != nullptr;
-		const bool bClangClAvailable = bClangClAvailableclangCl && (clangCl->State == ToolchainItemState::Found);
+		const bool bClangClAvailableClangCl = bVisualStudioAvailable && clangCl != nullptr;
+		const bool bClangClAvailable = bClangClAvailableClangCl && (clangCl->State == ToolchainItemState::Found);
 
 		return {
 		    {"MSVC",
 		        "msvc",
 		        bMsvcAvailable ? PathDetail(toolchain.VisualStudioPath, QStringLiteral("Visual Studio C++ tools are installed."))
-		                      : QStringLiteral("Install Visual Studio C++ tools and MSBuild, then reactivate the launcher."),
+		                       : QStringLiteral("Install Visual Studio C++ tools and MSBuild, then reactivate the launcher."),
 		        bMsvcAvailable},
 		    {"clang-cl",
 		        "clang-cl",
 		        bClangClAvailable ? PathDetail(toolchain.ClangClPath, QStringLiteral("clang-cl is installed."))
-		                         : (clangCl != nullptr && clangCl->bCanInstall ? QStringLiteral("Open Sync > Sync Code and choose Install for clang-cl.")
-		                                                                      : QStringLiteral("Install the Visual Studio clang-cl component, then reactivate the launcher.")),
+		                          : (clangCl != nullptr && clangCl->bCanInstall ? QStringLiteral("Open Sync > Sync Code and choose Install for clang-cl.")
+		                                                                        : QStringLiteral("Install the Visual Studio clang-cl component, then reactivate the launcher.")),
 		        bClangClAvailable},
 		};
 	}
@@ -148,7 +148,7 @@ namespace SparkleLauncher
 		    {"Visual Studio",
 		        "visual-studio",
 		        bVisualStudioAvailable ? PathDetail(toolchain.VisualStudioIdePath, QStringLiteral("Visual Studio is installed."))
-		                              : QStringLiteral("Install Visual Studio with C++ tools, then reactivate the launcher."),
+		                               : QStringLiteral("Install Visual Studio with C++ tools, then reactivate the launcher."),
 		        bVisualStudioAvailable},
 		    {"Rider",
 		        "rider",

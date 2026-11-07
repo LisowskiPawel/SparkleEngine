@@ -79,7 +79,7 @@ VulkanGpuMemoryAllocator::VulkanGpuMemoryAllocator(VulkanRhi& rhi) noexcept :
 {
 	const bool bHandlesUnavailablePhysicalDevice = m_rhi.GetInstance() == VK_NULL_HANDLE || m_rhi.GetPhysicalDevice() == VK_NULL_HANDLE;
 	const bool bDeviceHandlesUnavailable = bHandlesUnavailablePhysicalDevice || (m_rhi.GetDevice() == VK_NULL_HANDLE);
-	
+
 	if (bDeviceHandlesUnavailable)
 	{
 		Diagnostics::Fatal(g_vulkanMemoryLogger, __FILE__, __LINE__, "VulkanGpuMemoryAllocator requires a valid instance, physical device, and device");
@@ -197,9 +197,9 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateBuffe
 	{
 		record->ResourceSizeInBytes = bufferCreateInfo.size;
 		record->Usage = bufferCreateInfo.usage;
-		const bool bUfferDeviceAddressEnabled = (bufferCreateInfo.usage & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) != 0 && m_rhi.GetGetBufferDeviceAddress() != nullptr;
-		
-		if (bUfferDeviceAddressEnabled)
+		const bool bBufferDeviceAddressEnabled = (bufferCreateInfo.usage & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) != 0 && m_rhi.GetGetBufferDeviceAddress() != nullptr;
+
+		if (bBufferDeviceAddressEnabled)
 		{
 			const VkBufferDeviceAddressInfo addressInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO, .pNext = nullptr, .buffer = buffer};
 			record->BufferDeviceAddress = m_rhi.GetGetBufferDeviceAddress()(m_rhi.GetDevice(), &addressInfo);
@@ -280,7 +280,7 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateAlias
 	const bool bAllocatorAvailable = m_impl != nullptr && m_impl->Allocator != nullptr;
 	const bool bMemoryBlockPrepared = bAllocatorAvailable && EnsureMemoryBlockAllocationForImage(memoryBlock, nativeCreateInfo);
 	const bool bMemoryBlockAllocated = bMemoryBlockPrepared && memoryBlock.Allocation != nullptr;
-	
+
 	if (!bMemoryBlockAllocated)
 	{
 		return {};
@@ -316,7 +316,7 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateAlias
 	const bool bAllocatorAvailable = m_impl != nullptr && m_impl->Allocator != nullptr;
 	const bool bMemoryBlockPrepared = bAllocatorAvailable && EnsureMemoryBlockAllocationForBuffer(memoryBlock, nativeCreateInfo);
 	const bool bMemoryBlockAllocated = bMemoryBlockPrepared && memoryBlock.Allocation != nullptr;
-	
+
 	if (!bMemoryBlockAllocated)
 	{
 		return {};
@@ -556,11 +556,11 @@ void VulkanGpuMemoryAllocator::DrainCompletedReleases(const std::array<std::uint
 		auto pending = m_impl->PendingReleases.begin();
 		while (pending != m_impl->PendingReleases.end())
 		{
-			const bool bResourceRetirementReadypending = *pending == nullptr;
-			const bool bRetirementReadyState = !bResourceRetirementReadypending && ((*pending)->RecordingReferenceCount.load(std::memory_order_relaxed) == 0);
+			const bool bResourceRetirementReadyPending = *pending == nullptr;
+			const bool bRetirementReadyState = !bResourceRetirementReadyPending && ((*pending)->RecordingReferenceCount.load(std::memory_order_relaxed) == 0);
 			const bool bResourceRetirementReadyIsComplete = bRetirementReadyState && ((*pending)->LastUse.IsComplete(completedValues));
-			const bool bResourceRetirementReady = bResourceRetirementReadypending || bResourceRetirementReadyIsComplete;
-			
+			const bool bResourceRetirementReady = bResourceRetirementReadyPending || bResourceRetirementReadyIsComplete;
+
 			if (bResourceRetirementReady)
 			{
 				readyReleases.push_back(std::move(*pending));
@@ -576,11 +576,11 @@ void VulkanGpuMemoryAllocator::DrainCompletedReleases(const std::array<std::uint
 		while (pendingMemoryBlock != m_impl->PendingMemoryBlockReleases.end())
 		{
 			const bool bMemoryRetirementReadyMemoryBlock = *pendingMemoryBlock == nullptr;
-			const bool bMemoryRetirementReadyMemoryBlock2 = !bMemoryRetirementReadyMemoryBlock && ((*pendingMemoryBlock)->AliasingResourceCount == 0);
-			const bool bRetirementReadyState = bMemoryRetirementReadyMemoryBlock2 && ((*pendingMemoryBlock)->RecordingReferenceCount.load(std::memory_order_relaxed) == 0);
+			const bool bNoAliasedResources = !bMemoryRetirementReadyMemoryBlock && ((*pendingMemoryBlock)->AliasingResourceCount == 0);
+			const bool bRetirementReadyState = bNoAliasedResources && ((*pendingMemoryBlock)->RecordingReferenceCount.load(std::memory_order_relaxed) == 0);
 			const bool bMemoryRetirementReadyIsComplete = bRetirementReadyState && ((*pendingMemoryBlock)->LastUse.IsComplete(completedValues));
 			const bool bMemoryBlockRetirementReady = bMemoryRetirementReadyMemoryBlock || bMemoryRetirementReadyIsComplete;
-			
+
 			if (bMemoryBlockRetirementReady)
 			{
 				readyMemoryBlockReleases.push_back(std::move(*pendingMemoryBlock));
@@ -787,7 +787,7 @@ void VulkanGpuMemoryAllocator::RegisterMemoryBlockRecord(VulkanGpuMemoryBlockRec
 
 	std::scoped_lock lock(m_impl->RecordsMutex);
 	const bool bMemoryBlockNotRegistered = std::find(m_impl->LiveMemoryBlockRecords.begin(), m_impl->LiveMemoryBlockRecords.end(), &record) == m_impl->LiveMemoryBlockRecords.end();
-	
+
 	if (bMemoryBlockNotRegistered)
 	{
 		m_impl->LiveMemoryBlockRecords.push_back(&record);

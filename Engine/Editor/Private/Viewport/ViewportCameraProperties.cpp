@@ -63,16 +63,17 @@ namespace ViewportCameraProperties
 	{
 		const auto& settings = viewportSession.GetSettings();
 		float moveSpeed = settings.Navigation.MoveSpeedMetersPerSecond;
+
 		const bool bMoveSpeedEdited = DrawFloat(
-				        "##ViewportMoveSpeed",
-				        "Move speed (m/s)",
-				        moveSpeed,
-				        0.01f,
-				        settings.Navigation.MinimumMoveSpeedMetersPerSecond,
-				        settings.Navigation.MaximumMoveSpeedMetersPerSecond,
-				        "%.4f",
-				        ImGuiSliderFlags_Logarithmic);
-		
+		    "##ViewportMoveSpeed",
+		    "Move speed (m/s)",
+		    moveSpeed,
+		    0.01f,
+		    settings.Navigation.MinimumMoveSpeedMetersPerSecond,
+		    settings.Navigation.MaximumMoveSpeedMetersPerSecond,
+		    "%.4f",
+		    ImGuiSliderFlags_Logarithmic);
+
 		if (bMoveSpeedEdited)
 		{
 			viewportSession.SetMoveSpeed(moveSpeed);
@@ -80,7 +81,7 @@ namespace ViewportCameraProperties
 
 		float rotationSpeed = settings.Navigation.RotationSpeedDegreesPerPixel;
 		const bool bRotationSpeedEdited = DrawFloat("##ViewportRotationSpeed", "Rotation speed (deg/px)", rotationSpeed, 0.005f, 0.001f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
-		
+
 		if (bRotationSpeedEdited)
 		{
 			viewportSession.SetRotationSpeed(rotationSpeed);
@@ -101,7 +102,7 @@ namespace ViewportCameraProperties
 		{
 			float orthographicHeight = settings.OrthographicHeightMeters;
 			const bool bOrthographicHeightEdited = DrawFloat("##ViewportOrthographicHeight", "Ortho height (m)", orthographicHeight, 0.1f, 0.001f, 1000000.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
-			
+
 			if (bOrthographicHeightEdited)
 			{
 				viewportSession.SetOrthographicHeight(orthographicHeight);

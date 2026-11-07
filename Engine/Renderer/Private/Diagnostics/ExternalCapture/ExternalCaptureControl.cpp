@@ -10,7 +10,7 @@ void ArmExternalCapture(RhiExternalCapture& capture, const RenderExternalCapture
 	}
 	const bool bProductUnavailableContextToken = snapshot.ContextToken == 0 || products.GetGeneration() != snapshot.ContextToken;
 	const bool bCaptureProductUnavailable = bProductUnavailableContextToken || (!products.HasOutput(RenderOutputFlags::FinalColorLdr));
-	
+
 	if (bCaptureProductUnavailable)
 	{
 		capture.Reject(command.RequestId, "The requested viewport generation is stale. Wait for its current output and retry.");

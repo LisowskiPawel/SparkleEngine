@@ -22,7 +22,7 @@ namespace EditorWidgets
 		ImFont* monoFont = SparkleUiTheme::GetMonoFont();
 		ImGui::PushID(label);
 		const bool bPropertyTableOpen = ImGui::BeginTable("##kv_row", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoPadInnerX);
-		
+
 		if (bPropertyTableOpen)
 		{
 			ImGui::TableSetupColumn("label", ImGuiTableColumnFlags_WidthFixed, PropertyLabelWidth);

@@ -35,7 +35,7 @@ namespace RhiRayTracingShaderTablePacking
 		}
 		const bool bInvalidIdentifierBlockInBytes = rules.IdentifierSizeInBytes == 0 || records.size() > std::numeric_limits<std::uint64_t>::max() / rules.IdentifierSizeInBytes;
 		const bool bInvalidShaderIdentifierBlock = bInvalidIdentifierBlockInBytes || (records.size() * rules.IdentifierSizeInBytes != identifiers.size());
-		
+
 		if (bInvalidShaderIdentifierBlock)
 		{
 			throw Diagnostics::Error("Ray-tracing shader-table identifiers do not match the record count.");

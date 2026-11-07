@@ -109,8 +109,8 @@ void RenderDeformationPreparation::PrepareMorphWeights(
 			continue;
 		}
 
-		const bool bValidSampleweightsSize = sample != nullptr && sample->WeightOffset <= weights.size();
-		const bool bValidSample = bValidSampleweightsSize && (sample->WeightCount <= weights.size() - sample->WeightOffset);
+		const bool bValidSampleWeightsSize = sample != nullptr && sample->WeightOffset <= weights.size();
+		const bool bValidSample = bValidSampleWeightsSize && (sample->WeightCount <= weights.size() - sample->WeightOffset);
 		const std::span<const float> current = bValidSample ? weights.subspan(sample->WeightOffset, sample->WeightCount) : std::span<const float>{};
 		const std::span<const float> previous = history.size() == primitive.MorphTargetCount ? history : current;
 

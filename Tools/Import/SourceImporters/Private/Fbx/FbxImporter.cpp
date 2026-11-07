@@ -38,13 +38,13 @@ SourceImportOutput ImportFbxScene(const std::filesystem::path& filePath)
 	FbxLightImporter::ImportLights(scene, sourceMetersPerUnit, output);
 	FbxAnimationImporter::ImportAnimations(scene, output);
 
-	const bool bOrInconsistentmeshInstancesEmpty = output.scene.meshPrimitives.empty() != output.scene.meshInstances.empty();
-	const bool bOrInconsistentmeshPrimitivesEmpty = !bOrInconsistentmeshInstancesEmpty && (output.scene.meshPrimitives.empty());
-	const bool bOrInconsistentcamerasEmpty = bOrInconsistentmeshPrimitivesEmpty && (output.scene.cameras.empty());
-	const bool bImportedOrInconsistentlightsEmpty = bOrInconsistentcamerasEmpty && (output.scene.lights.empty());
-	const bool bOrInconsistentanimationsEmpty = bImportedOrInconsistentlightsEmpty && (output.scene.animations.empty());
-	const bool bInvalidScene = bOrInconsistentmeshInstancesEmpty || bOrInconsistentanimationsEmpty;
-	
+	const bool bOrInconsistentMeshInstancesEmpty = output.scene.meshPrimitives.empty() != output.scene.meshInstances.empty();
+	const bool bOrInconsistentMeshPrimitivesEmpty = !bOrInconsistentMeshInstancesEmpty && (output.scene.meshPrimitives.empty());
+	const bool bOrInconsistentCamerasEmpty = bOrInconsistentMeshPrimitivesEmpty && (output.scene.cameras.empty());
+	const bool bImportedOrInconsistentLightsEmpty = bOrInconsistentCamerasEmpty && (output.scene.lights.empty());
+	const bool bOrInconsistentAnimationsEmpty = bImportedOrInconsistentLightsEmpty && (output.scene.animations.empty());
+	const bool bInvalidScene = bOrInconsistentMeshInstancesEmpty || bOrInconsistentAnimationsEmpty;
+
 	if (bInvalidScene)
 	{
 		throw Diagnostics::Error("FBX import produced incomplete mesh content or no supported scene content.");

@@ -51,9 +51,9 @@ ViewportRenderProgressReason ReferencePathTracerSession::ResolveAvailability(con
 {
 	const RhiCapabilities& capabilities = m_deviceServices.GetCapabilities();
 	const RhiFormatSupport* format = capabilities.FindFormatSupport(PixelFormat::R32G32B32A32_Float);
-	const bool bSupportsViewrenderExtent = view.camera.ProjectionKind == CameraProjectionKind::Perspective && view.renderExtent.IsValid();
-	const bool bSupportsViewrenderExtent2 = bSupportsViewrenderExtent && (view.renderExtent.Width <= 16384u);
-	const bool bSupportsView = bSupportsViewrenderExtent2 && (view.renderExtent.Height <= 16384u);
+	const bool bSupportsViewRenderExtent = view.camera.ProjectionKind == CameraProjectionKind::Perspective && view.renderExtent.IsValid();
+	const bool bWidthSupported = bSupportsViewRenderExtent && (view.renderExtent.Width <= 16384u);
+	const bool bSupportsView = bWidthSupported && (view.renderExtent.Height <= 16384u);
 	if (!bSupportsView)
 	{
 		return ViewportRenderProgressReason::UnsupportedView;
@@ -64,7 +64,7 @@ ViewportRenderProgressReason ReferencePathTracerSession::ResolveAvailability(con
 
 	const bool bAccumulatorUnsupportedFrontend = !bSupportsAccumulation || executionFrontend == RayTracingExecutionFrontend::None;
 	const bool bAccumulatorUnsupported = bAccumulatorUnsupportedFrontend || (!SupportsMaterialTextureTable(capabilities));
-	
+
 	if (bAccumulatorUnsupported)
 	{
 		return ViewportRenderProgressReason::UnsupportedCapability;

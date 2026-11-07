@@ -27,9 +27,9 @@ RhiOwnedResourceHandle D3D12ResourceService::CreateTextureResource(
     RhiMemoryResidencyClass residencyClass,
     std::wstring_view debugName)
 {
-	const bool bTextureDescriptorcapabilities = m_memoryAllocator == nullptr || m_capabilities == nullptr;
-	const bool bInvalidTextureDescriptor = bTextureDescriptorcapabilities || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc));
-	
+	const bool bTextureDescriptorCapabilities = m_memoryAllocator == nullptr || m_capabilities == nullptr;
+	const bool bInvalidTextureDescriptor = bTextureDescriptorCapabilities || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc));
+
 	if (bInvalidTextureDescriptor)
 	{
 		return {};
@@ -171,16 +171,16 @@ bool D3D12ResourceService::WriteBufferResource(RhiOwnedResourceHandle resource, 
 {
 	D3D12GpuAllocationRecord* const record = GetD3D12GpuAllocationRecord(resource);
 	const bool bBufferInputsAvailableResource = record != nullptr && record->Resource != nullptr;
-	const bool bBufferInputsAvailabledata = bBufferInputsAvailableResource && (data != nullptr);
-	const bool bUfferWriteInputsAvailable = bBufferInputsAvailabledata && (sizeInBytes != 0);
-	if (!bUfferWriteInputsAvailable)
+	const bool bBufferInputsAvailableData = bBufferInputsAvailableResource && (data != nullptr);
+	const bool bBufferWriteInputsAvailable = bBufferInputsAvailableData && (sizeInBytes != 0);
+	if (!bBufferWriteInputsAvailable)
 	{
 		return false;
 	}
 	const D3D12_RESOURCE_DESC resourceDesc = record->Resource->GetDesc();
-	const bool bUfferWriteInRange = destinationOffsetInBytes <= resourceDesc.Width && sizeInBytes <= resourceDesc.Width - destinationOffsetInBytes;
-	
-	if (!bUfferWriteInRange)
+	const bool bBufferWriteInRange = destinationOffsetInBytes <= resourceDesc.Width && sizeInBytes <= resourceDesc.Width - destinationOffsetInBytes;
+
+	if (!bBufferWriteInRange)
 	{
 		return false;
 	}
@@ -379,11 +379,11 @@ RhiOwnedResourceHandle D3D12ResourceService::CreateAliasingTextureResource(
     std::wstring_view debugName)
 {
 	D3D12GpuHeapRecord* const ownedMemoryBlock = GetD3D12GpuHeapRecord(memoryBlock);
-	const bool bTextureDescriptormemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
-	const bool bTextureDescriptorcapabilities = bTextureDescriptormemoryAllocator || (m_capabilities == nullptr);
-	const bool bTextureDescriptorMemoryBlock = bTextureDescriptorcapabilities || (ownedMemoryBlock == nullptr);
+	const bool bTextureDescriptorMemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
+	const bool bTextureDescriptorCapabilities = bTextureDescriptorMemoryAllocator || (m_capabilities == nullptr);
+	const bool bTextureDescriptorMemoryBlock = bTextureDescriptorCapabilities || (ownedMemoryBlock == nullptr);
 	const bool bInvalidPlacement = bTextureDescriptorMemoryBlock || (!RhiContract::IsTextureResourceDescUsable(*m_capabilities, desc.ResourceDesc));
-	
+
 	if (bInvalidPlacement)
 	{
 		return {};

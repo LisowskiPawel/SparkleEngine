@@ -45,11 +45,11 @@ GpuCrashSession::GpuCrashSession(ERhiBackendApi api, const RhiGpuCrashLaunch& la
     m_sink(launch.Sink),
     m_markers(std::make_unique<MarkerEntry[]>(MaximumMarkers))
 {
-	const bool bInvalidCrashSessionsink = launch.Mode != RhiGpuCrashMode::Aftermath || m_sink == nullptr;
-	const bool bInvalidCrashSessionLibraryPath = bInvalidCrashSessionsink || (!launch.LibraryPath.is_absolute());
-	const bool bInvalidCrashSessionapi = api != ERhiBackendApi::D3D12 && api != ERhiBackendApi::Vulkan;
-	const bool bInvalidCrashSession = bInvalidCrashSessionLibraryPath || bInvalidCrashSessionapi;
-	
+	const bool bInvalidCrashSessionSink = launch.Mode != RhiGpuCrashMode::Aftermath || m_sink == nullptr;
+	const bool bInvalidCrashSessionLibraryPath = bInvalidCrashSessionSink || (!launch.LibraryPath.is_absolute());
+	const bool bInvalidCrashSessionApi = api != ERhiBackendApi::D3D12 && api != ERhiBackendApi::Vulkan;
+	const bool bInvalidCrashSession = bInvalidCrashSessionLibraryPath || bInvalidCrashSessionApi;
+
 	if (bInvalidCrashSession)
 	{
 		throw Diagnostics::Error("Aftermath requires an admitted API, absolute DLL path and prepared artifact sink.");
@@ -78,15 +78,28 @@ GpuCrashSession::GpuCrashSession(ERhiBackendApi api, const RhiGpuCrashLaunch& la
 #endif
 	const auto watched = api == ERhiBackendApi::D3D12 ? GFSDK_Aftermath_GpuCrashDumpWatchedApiFlags_DX : GFSDK_Aftermath_GpuCrashDumpWatchedApiFlags_Vulkan;
 	HMODULE callbackModule = nullptr;
-	const bool bCallbackPinFailed = !GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN, reinterpret_cast<const wchar_t*>(&GpuCrashSession::DumpCallback), &callbackModule);
-	
+
+	const bool bCallbackPinFailed = !GetModuleHandleExW(
+	    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
+	    reinterpret_cast<const wchar_t*>(&GpuCrashSession::DumpCallback),
+	    &callbackModule);
+
 	if (bCallbackPinFailed)
 	{
 		throw Diagnostics::Error("Cannot retain GPU crash callback code for the process lifetime.");
 	}
-	const bool bAftermathEnableFailed = m_enable(GFSDK_Aftermath_Version_API, watched, GFSDK_Aftermath_GpuCrashDumpFeatureFlags_Default, DumpCallback, DebugCallback, DescriptionCallback, MarkerCallback, this)
-		    != GFSDK_Aftermath_Result_Success;
-	
+
+	const bool bAftermathEnableFailed = m_enable(
+	                                        GFSDK_Aftermath_Version_API,
+	                                        watched,
+	                                        GFSDK_Aftermath_GpuCrashDumpFeatureFlags_Default,
+	                                        DumpCallback,
+	                                        DebugCallback,
+	                                        DescriptionCallback,
+	                                        MarkerCallback,
+	                                        this)
+	    != GFSDK_Aftermath_Result_Success;
+
 	if (bAftermathEnableFailed)
 	{
 		// Even a failed enable has no callback-quiescence guarantee. Do not unwind the anchor.

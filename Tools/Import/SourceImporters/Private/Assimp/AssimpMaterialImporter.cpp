@@ -113,10 +113,10 @@ static void ValidateShadingModel(const aiMaterial& material, ImportedMaterialInd
 static void ApplyMaterialColors(const aiMaterial& material, ImportedMaterial& importedMaterial)
 {
 	aiColor4D baseColor;
-	const bool bAseColorRead = aiGetMaterialColor(&material, AI_MATKEY_BASE_COLOR, &baseColor) == AI_SUCCESS;
-	const bool bDiffuseColorRead = !bAseColorRead && aiGetMaterialColor(&material, AI_MATKEY_COLOR_DIFFUSE, &baseColor) == AI_SUCCESS;
+	const bool bBaseColorRead = aiGetMaterialColor(&material, AI_MATKEY_BASE_COLOR, &baseColor) == AI_SUCCESS;
+	const bool bDiffuseColorRead = !bBaseColorRead && aiGetMaterialColor(&material, AI_MATKEY_COLOR_DIFFUSE, &baseColor) == AI_SUCCESS;
 
-	if (bAseColorRead || bDiffuseColorRead)
+	if (bBaseColorRead || bDiffuseColorRead)
 	{
 		importedMaterial.baseColor = DirectX::XMFLOAT4(baseColor.r, baseColor.g, baseColor.b, baseColor.a);
 	}
@@ -189,7 +189,7 @@ static std::optional<std::filesystem::path> ResolveTexturePath(
 	{
 		const bool bTextureUnavailableTexturePaths = embeddedTextureIndex < 0 || static_cast<std::size_t>(embeddedTextureIndex) >= textureContext.embeddedTexturePaths.size();
 		const bool bEmbeddedTextureUnavailable = bTextureUnavailableTexturePaths || (textureContext.embeddedTexturePaths[static_cast<std::size_t>(embeddedTextureIndex)].empty());
-		
+
 		if (bEmbeddedTextureUnavailable)
 		{
 			throw Diagnostics::Error(std::format("Assimp material {} has unresolved embedded {} texture '{}'.", materialIndex, slotName, *texturePath));

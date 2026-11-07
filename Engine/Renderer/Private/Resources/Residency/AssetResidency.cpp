@@ -105,14 +105,14 @@ bool AssetResidency::BeginUpload(AssetGenerationHandle handle) noexcept
 bool AssetResidency::RecordUploadSubmission(AssetGenerationHandle handle, RhiSubmissionToken completionToken, std::uint64_t residentBytes) noexcept
 {
 	AssetGenerationStatus* generation = FindMutable(handle);
-	const bool bCompletionRejectedgeneration = generation == nullptr;
-	const bool bResidencyCompletionRejectedState = !bCompletionRejectedgeneration && (generation->State != AssetResidencyState::Uploading);
-	const bool bResidencyCompletionRejectedState2 = bResidencyCompletionRejectedState && (generation->State != AssetResidencyState::Evicting);
-	const bool bResidencyCompletionRejectedState3 = bCompletionRejectedgeneration || bResidencyCompletionRejectedState2;
-	const bool bCompletionRejectedValid = bResidencyCompletionRejectedState3 || (!completionToken.IsValid());
+	const bool bCompletionRejectedGeneration = generation == nullptr;
+	const bool bResidencyCompletionRejectedState = !bCompletionRejectedGeneration && (generation->State != AssetResidencyState::Uploading);
+	const bool bUnexpectedState = bResidencyCompletionRejectedState && (generation->State != AssetResidencyState::Evicting);
+	const bool bGenerationRejected = bCompletionRejectedGeneration || bUnexpectedState;
+	const bool bCompletionRejectedValid = bGenerationRejected || (!completionToken.IsValid());
 	const bool bCompletionRejectedAccounted = bCompletionRejectedValid || (!generation->bResidentAccounted);
 	const bool bResidencyCompletionRejected = bCompletionRejectedAccounted || (residentBytes > m_budget.MaximumResidentBytes - (m_counters.ResidentBytes - generation->ResidentBytes));
-	
+
 	if (bResidencyCompletionRejected)
 	{
 		return false;
@@ -167,9 +167,11 @@ void AssetResidency::Poll(RhiCommandSubmissionService& submissions) noexcept
 {
 	for (AssetGenerationStatus& generation : m_generations)
 	{
-		const bool bUploadCompletedend = generation.State == AssetResidencyState::Uploading && std::any_of(generation.Completion.Values.begin(), generation.Completion.Values.end(), [](std::uint64_t value) { return value != 0; });
-		const bool bUploadCompleted = bUploadCompletedend && (IsComplete(generation.Completion, submissions));
-		
+		const bool bUploadCompletedEnd = generation.State == AssetResidencyState::Uploading
+		    && std::any_of(generation.Completion.Values.begin(), generation.Completion.Values.end(), [](std::uint64_t value) { return value != 0; });
+
+		const bool bUploadCompleted = bUploadCompletedEnd && (IsComplete(generation.Completion, submissions));
+
 		if (bUploadCompleted)
 		{
 			if (generation.bPendingUploadAccounted && generation.UploadBytes <= m_counters.PendingUploadBytes)

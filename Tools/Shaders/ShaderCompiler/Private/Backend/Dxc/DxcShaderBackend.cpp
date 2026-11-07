@@ -282,7 +282,7 @@ std::string DxcShaderBackend::ExtractDisassembly(IDxcUtils& utils, IDxcCompiler3
 	Microsoft::WRL::ComPtr<IDxcResult> disassemblyResult;
 	const HRESULT disassemblyStatus = compiler.Disassemble(&objectBuffer, IID_PPV_ARGS(disassemblyResult.ReleaseAndGetAddressOf()));
 	const bool bDisassemblyAvailable = SUCCEEDED(disassemblyStatus) && disassemblyResult;
-	
+
 	if (!bDisassemblyAvailable)
 	{
 		return {};

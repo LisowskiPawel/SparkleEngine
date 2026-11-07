@@ -46,7 +46,7 @@ namespace SparkleLauncher
 			    dependency.Label,
 			    bCleaning      ? QStringLiteral("Cleaning")
 			        : bSyncing ? QStringLiteral("Syncing")
-			                  : status.Text,
+			                   : status.Text,
 			    status.Detail,
 			    bCleaning || bSyncing ? QStringLiteral("running") : status.State,
 			    actionButton);
@@ -92,7 +92,13 @@ namespace SparkleLauncher
 		const bool bSyncing = !runId.isEmpty() && !bCleaning;
 		const SyncItemState state = bSyncing ? SyncItemState::Syncing : status.bSynced ? SyncItemState::Synced : SyncItemState::Missing;
 
-		ApplyInlineStatusLabel(statusLabel, bCleaning ? QStringLiteral("Cleaning") : bSyncing ? QStringLiteral("Syncing") : status.Text, bCleaning || bSyncing ? QStringLiteral("running") : status.State);
+		ApplyInlineStatusLabel(
+		    statusLabel,
+		    bCleaning      ? QStringLiteral("Cleaning")
+		        : bSyncing ? QStringLiteral("Syncing")
+		                   : status.Text,
+		    bCleaning || bSyncing ? QStringLiteral("running") : status.State);
+
 		ApplySyncActionButtonState(button, state, dependency.Label);
 		if (bCleaning)
 		{

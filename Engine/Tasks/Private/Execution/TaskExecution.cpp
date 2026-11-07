@@ -82,10 +82,10 @@ bool TaskExecution::IsSettled() const noexcept
 
 bool TaskExecution::WaitFor(std::chrono::milliseconds timeout) const
 {
-	const bool bInvalidJoinRequesttimeout = m_state == nullptr || timeout < std::chrono::milliseconds::zero();
-	const bool bJoinRequestExecutorIdentity = bInvalidJoinRequesttimeout || (TaskWorkerContext::IsWorkerFor(m_state->ExecutorIdentity));
+	const bool bInvalidJoinRequestTimeout = m_state == nullptr || timeout < std::chrono::milliseconds::zero();
+	const bool bJoinRequestExecutorIdentity = bInvalidJoinRequestTimeout || (TaskWorkerContext::IsWorkerFor(m_state->ExecutorIdentity));
 	const bool bInvalidJoinRequest = bJoinRequestExecutorIdentity || (std::this_thread::get_id() != m_state->JoinThread);
-	
+
 	if (bInvalidJoinRequest)
 	{
 		return false;
@@ -147,7 +147,7 @@ std::optional<TaskResult> TaskExecution::GetTaskResult(TaskNodeHandle handle) co
 	std::uint32_t index = 0;
 	const bool bHandleDecoded = TaskGraphAccess::Decode(handle, data.BuilderIdentity, data.BuilderGeneration, static_cast<std::uint32_t>(data.TaskResults.size()), index);
 	const bool bTaskSettled = bHandleDecoded && data.Settled[index];
-	
+
 	if (!bTaskSettled)
 	{
 		return std::nullopt;

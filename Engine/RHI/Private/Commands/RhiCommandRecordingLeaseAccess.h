@@ -50,9 +50,18 @@ public:
 		{
 			return nullptr;
 		}
-		const RhiCommandRecordingLeaseBackendState expected{.State = slot, .CommandList = slot->CommandList.get(), .QueueType = slot->QueueType, .FrameSlot = slot->FrameSlot, .ContextId = RhiCommandRecordingContextId{.Value = slot->ContextIndex}, .Owner = slot->RecordingOwner, .Closed = true};
+
+		const RhiCommandRecordingLeaseBackendState expected{
+		    .State = slot,
+		    .CommandList = slot->CommandList.get(),
+		    .QueueType = slot->QueueType,
+		    .FrameSlot = slot->FrameSlot,
+		    .ContextId = RhiCommandRecordingContextId{.Value = slot->ContextIndex},
+		    .Owner = slot->RecordingOwner,
+		    .Closed = true};
+
 		const bool bLeaseMatches = Matches(leaseState, expected);
-		
+
 		if (!bLeaseMatches)
 		{
 			return nullptr;

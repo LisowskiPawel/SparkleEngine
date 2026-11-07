@@ -18,12 +18,12 @@ void TaskExecutor::Implementation::Runtime::ValidateConfiguration(const TaskExec
 {
 	const std::uint64_t totalWorkers = static_cast<std::uint64_t>(config.FrameCriticalWorkerCount) + config.BackgroundWorkerCount + config.BlockingIoWorkerCount;
 	const bool bInvalidSerialMixWorkerCount = config.FrameCriticalWorkerCount == 0;
-	const bool bInvalidSerialMixWorkerCount2 = config.BackgroundWorkerCount != 0 || config.BlockingIoWorkerCount != 0;
-	const bool bInvalidSerialMix = bInvalidSerialMixWorkerCount && bInvalidSerialMixWorkerCount2;
+	const bool bWorkerLanesConfigured = config.BackgroundWorkerCount != 0 || config.BlockingIoWorkerCount != 0;
+	const bool bInvalidSerialMix = bInvalidSerialMixWorkerCount && bWorkerLanesConfigured;
 
 	const bool bInvalidCapacityPerExecution = config.MaximumTasksPerExecution == 0 || config.MaximumTasksPerExecution > TaskGraphLimits::HardMaximumTasks;
-	const bool bInvalidCapacityPerExecution2 = bInvalidCapacityPerExecution || (config.MaximumEdgesPerExecution > TaskGraphLimits::HardMaximumEdges);
-	const bool bInvalidCapacity = bInvalidCapacityPerExecution2 || (config.MaximumActiveExecutions == 0);
+	const bool bEdgeCapacityInvalid = bInvalidCapacityPerExecution || (config.MaximumEdgesPerExecution > TaskGraphLimits::HardMaximumEdges);
+	const bool bInvalidCapacity = bEdgeCapacityInvalid || (config.MaximumActiveExecutions == 0);
 
 	if (totalWorkers > MaximumWorkerCount || bInvalidSerialMix || bInvalidCapacity)
 	{

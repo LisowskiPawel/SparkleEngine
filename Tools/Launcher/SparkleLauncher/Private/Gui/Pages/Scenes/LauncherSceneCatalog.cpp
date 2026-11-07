@@ -311,7 +311,7 @@ namespace SparkleLauncher
 		    bPreparing            ? QStringLiteral("Opening ") + level.DisplayName
 		        : bSyncAvailable  ? QStringLiteral("Sync ") + level.DisplayName
 		        : bExplainBlocker ? QStringLiteral("Why ") + level.DisplayName + QStringLiteral(" is unavailable")
-		                         : actionName + QStringLiteral(" ") + level.DisplayName);
+		                          : actionName + QStringLiteral(" ") + level.DisplayName);
 
 		button.setEnabled(m_startingLevelRunId.isEmpty());
 		if (bPreparing)
@@ -330,7 +330,7 @@ namespace SparkleLauncher
 		{
 			button.setToolTip(
 			    bEditorMode ? QStringLiteral("Open this level in the editor. Use Build and Cook first if required output files are missing.")
-			               : QStringLiteral("Run this level in the standalone game. Use Build and Cook first if required output files are missing."));
+			                : QStringLiteral("Run this level in the standalone game. Use Build and Cook first if required output files are missing."));
 		}
 	}
 

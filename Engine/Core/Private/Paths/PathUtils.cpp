@@ -124,14 +124,14 @@ namespace Paths
 		result.reserve(value.size());
 		for (const char character : value)
 		{
-			const bool bAllowedcharacter = character >= 'a' && character <= 'z';
-			const bool bAllowedcharacter2 = character >= 'A' && character <= 'Z';
-			const bool bAllowedcharacter3 = bAllowedcharacter || bAllowedcharacter2;
-			const bool bAllowedcharacter4 = character >= '0' && character <= '9';
-			const bool bAllowedcharacter5 = bAllowedcharacter3 || bAllowedcharacter4;
-			const bool bAllowedcharacter6 = bAllowedcharacter5 || (character == '_');
-			const bool bAllowedcharacter7 = bAllowedcharacter6 || (character == '-');
-			const bool bAllowed = bAllowedcharacter7 || (character == '.');
+			const bool bAllowedCharacter = character >= 'a' && character <= 'z';
+			const bool bUppercase = character >= 'A' && character <= 'Z';
+			const bool bLetter = bAllowedCharacter || bUppercase;
+			const bool bDigit = character >= '0' && character <= '9';
+			const bool bAlphanumeric = bLetter || bDigit;
+			const bool bAllowsUnderscore = bAlphanumeric || (character == '_');
+			const bool bAllowsDash = bAllowsUnderscore || (character == '-');
+			const bool bAllowed = bAllowsDash || (character == '.');
 
 			result.push_back(bAllowed ? character : '_');
 		}

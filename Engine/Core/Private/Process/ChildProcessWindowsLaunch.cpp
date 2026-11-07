@@ -221,17 +221,17 @@ namespace Process
 		std::wstring workingDirectory = request.WorkingDirectory.wstring();
 		std::vector<wchar_t> environment = BuildEnvironment(environmentOverrides);
 		const bool bChildProcessCreationFailed = !CreateProcessW(
-				        nullptr,
-				        commandLine.data(),
-				        nullptr,
-				        nullptr,
-				        TRUE,
-				        CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT | CREATE_SUSPENDED,
-				        environment.empty() ? nullptr : environment.data(),
-				        workingDirectory.empty() ? nullptr : workingDirectory.c_str(),
-				        &startup,
-				        &information);
-		
+		    nullptr,
+		    commandLine.data(),
+		    nullptr,
+		    nullptr,
+		    TRUE,
+		    CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT | CREATE_SUSPENDED,
+		    environment.empty() ? nullptr : environment.data(),
+		    workingDirectory.empty() ? nullptr : workingDirectory.c_str(),
+		    &startup,
+		    &information);
+
 		if (bChildProcessCreationFailed)
 		{
 			const DWORD startError = GetLastError();

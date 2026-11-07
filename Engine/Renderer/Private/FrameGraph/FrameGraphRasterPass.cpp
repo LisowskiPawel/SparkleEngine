@@ -113,10 +113,10 @@ static void ResolveDepthStencilCompatibility(FrameGraphRasterPass& result, const
 		const bool bDepthWrittenDepthStencil = bReadOnlyAttachment && (result.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear);
 		const bool bDepthWrittenGuardGetDepth = bReadOnlyAttachment && !bDepthWrittenDepthStencil;
 		const bool bDepthWrittenGetDepth = bDepthWrittenGuardGetDepth && (renderState.GetDepth().bDepthWriteEnable);
-		const bool bDepthWrittenGetDepth2 = bDepthWrittenDepthStencil || bDepthWrittenGetDepth;
-		const bool bDepthWritten = bReadOnlyAttachment && bDepthWrittenGetDepth2;
-		const bool bStencilWrittendepthWritten = bReadOnlyAttachment && !bDepthWritten;
-		const bool bStencilWritten = bStencilWrittendepthWritten && (StencilWrites(renderState.GetStencil()));
+		const bool bDepthOutputWritten = bDepthWrittenDepthStencil || bDepthWrittenGetDepth;
+		const bool bDepthWritten = bReadOnlyAttachment && bDepthOutputWritten;
+		const bool bStencilWrittenDepthWritten = bReadOnlyAttachment && !bDepthWritten;
+		const bool bStencilWritten = bStencilWrittenDepthWritten && (StencilWrites(renderState.GetStencil()));
 
 		if (bSampleCountMismatch || bDepthWritten || bStencilWritten)
 		{

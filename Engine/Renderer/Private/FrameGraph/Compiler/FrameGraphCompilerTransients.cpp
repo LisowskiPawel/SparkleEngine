@@ -73,8 +73,9 @@ static bool CanSharePhysicalBlock(const FrameGraphTransientResourcePlan& current
 		return false;
 	}
 
-	const bool bOptimizedClearValueMismatch = ownerPhysicalPlan.bHasOptimizedClearValue && !AreClearValuesEqual(ownerPhysicalPlan.optimizedClearValue, physicalPlan.optimizedClearValue, transientPlan.kind);
-	
+	const bool bOptimizedClearValueMismatch = ownerPhysicalPlan.bHasOptimizedClearValue
+	    && !AreClearValuesEqual(ownerPhysicalPlan.optimizedClearValue, physicalPlan.optimizedClearValue, transientPlan.kind);
+
 	if (bOptimizedClearValueMismatch)
 	{
 		return false;

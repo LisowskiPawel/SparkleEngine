@@ -135,8 +135,8 @@ void RenderPassRuntimeCache::ValidateGenerationContracts(const RenderPassRuntime
 		const bool bShaderMetadataMatches = bShaderMetadataMatchesStage && (entry->Features == registration.Features);
 
 		const bool bRayContractMatchesRayTracing = bShaderMetadataMatches && entry->RayPayloadSizeInBytes == registration.RayTracing.PayloadSizeInBytes;
-		const bool bRayContractMatchesRayTracing2 = bRayContractMatchesRayTracing && (entry->RayAttributeSizeInBytes == registration.RayTracing.AttributeSizeInBytes);
-		const bool bRayTracingContractMatches = bRayContractMatchesRayTracing2 && (entry->MinimumRayRecursionDepth == registration.RayTracing.MinimumRecursionDepth);
+		const bool bAttributeSizeMatches = bRayContractMatchesRayTracing && (entry->RayAttributeSizeInBytes == registration.RayTracing.AttributeSizeInBytes);
+		const bool bRayTracingContractMatches = bAttributeSizeMatches && (entry->MinimumRayRecursionDepth == registration.RayTracing.MinimumRecursionDepth);
 
 		const bool bLocalRecordMatchesRayTracing = bRayTracingContractMatches && entry->LocalRecordSizeInBytes == registration.RayTracing.LocalRecordSizeInBytes;
 		const bool bLocalRecordMatches = bLocalRecordMatchesRayTracing && (entry->LocalRecordSignature == registration.RayTracing.LocalRecordSignature);

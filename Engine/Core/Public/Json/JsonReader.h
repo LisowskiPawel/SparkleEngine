@@ -37,10 +37,10 @@ namespace Json
 		{
 			return false;
 		}
-		const bool bUnquotedValueContinuesobjectText = cursor < objectText.size() && objectText[cursor] != ',';
-		const bool bUnquotedValueContinuesobjectText2 = bUnquotedValueContinuesobjectText && (objectText[cursor] != '}');
-		const bool bUnquotedValueContinues = bUnquotedValueContinuesobjectText2 && (!std::isspace(static_cast<unsigned char>(objectText[cursor])));
-		
+		const bool bUnquotedValueContinuesObjectText = cursor < objectText.size() && objectText[cursor] != ',';
+		const bool bInsideObject = bUnquotedValueContinuesObjectText && (objectText[cursor] != '}');
+		const bool bUnquotedValueContinues = bInsideObject && (!std::isspace(static_cast<unsigned char>(objectText[cursor])));
+
 		if (bUnquotedValueContinues)
 		{
 			return false;

@@ -279,7 +279,7 @@ private:
 	template <typename TExpectedSemantic, typename TField>
 	std::uint32_t AddField(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::UsesGraphResource)
 	{
-		static_assert(IsShaderParameterFieldV<TField>, "Parameter registration requires a typed shader parameter field.");
+		static_assert(bIsShaderParameterFieldV<TField>, "Parameter registration requires a typed shader parameter field.");
 
 		using ActualSemantic = typename ShaderParameterFieldTraits<TField>::Semantic;
 		static_assert(std::is_same_v<ActualSemantic, TExpectedSemantic>, "Builder registration method does not match the shader parameter field type.");

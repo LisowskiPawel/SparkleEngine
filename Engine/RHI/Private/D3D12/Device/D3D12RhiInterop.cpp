@@ -78,7 +78,7 @@ bool D3D12Rhi::TryResolveNativeInterface(ERhiInterposerInterfaceKind kind, IUnkn
 	void* resolved = nullptr;
 	const bool bInterfaceResolved = m_interposerHooks.ResolveNativeInterface(kind, externalInterface, &resolved, m_interposerHooks.UserData);
 	const bool bInterfaceAvailable = bInterfaceResolved && resolved != nullptr;
-	
+
 	if (!bInterfaceAvailable)
 	{
 		return false;

@@ -27,13 +27,13 @@ namespace ShaderCompileJobExecutor
 			throw Diagnostics::Error(std::string{"Active shader backend does not support target '"} + GetShaderTargetName(request.Target) + "'.");
 		}
 		const bool bRayLibraryUnsupported = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::RayTracingPipeline) && !capabilities.SupportsRayTracingLibrary(request.Target);
-		
+
 		if (bRayLibraryUnsupported)
 		{
 			throw Diagnostics::Error(std::string{"Active shader backend does not support shader libraries for target '"} + GetShaderTargetName(request.Target) + "'.");
 		}
 		const bool bInlineQueryUnsupported = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::InlineRayQuery) && !capabilities.SupportsInlineRayQuery(request.Target);
-		
+
 		if (bInlineQueryUnsupported)
 		{
 			throw Diagnostics::Error(std::string{"Active shader backend does not support inline ray queries for target '"} + GetShaderTargetName(request.Target) + "'.");

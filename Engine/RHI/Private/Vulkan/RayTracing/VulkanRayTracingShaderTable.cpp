@@ -30,7 +30,7 @@ std::vector<std::byte> VulkanRayTracingShaderTable::CollectShaderIdentifiers(
 		const RhiRayTracingShaderRecord& record = records[index];
 		const std::uint32_t groupIndex = pipeline.FindShaderGroup(record.ExportName);
 		const bool bInvalidShaderGroupIndex = groupIndex == std::numeric_limits<std::uint32_t>::max() || groupIndex > std::numeric_limits<std::uint64_t>::max() / handleSize;
-		
+
 		if (bInvalidShaderGroupIndex)
 		{
 			throw Diagnostics::Error("Vulkan shader-table record references an export absent from its pipeline generation.");
@@ -121,7 +121,7 @@ VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanG
 	const bool bTableBufferAvailableBuffer = m_allocation != nullptr && m_allocation->Buffer != VK_NULL_HANDLE;
 	const bool bTableBufferAvailable = bTableBufferAvailableBuffer && (m_allocation->BufferDeviceAddress != 0);
 	const bool bTableBytesWritten = bTableBufferAvailable && memoryAllocator.WriteAllocation(*m_allocation, bytes.data(), bytes.size());
-	
+
 	if (!bTableBytesWritten)
 	{
 		throw Diagnostics::Error("Vulkan shader-table allocation or upload failed.");

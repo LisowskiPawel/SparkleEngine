@@ -101,7 +101,10 @@ namespace SparkleLauncher
 		}
 
 		const bool bStampContentPipelineMatches = ReadBuildFilesFreshnessStampValue(status.StampPath, "contentPipeline").value_or(std::string()) == selectedContentPipeline;
-		const bool bStampShaderCompilerMatches = bStampContentPipelineMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "shaderCompiler").value_or(std::string()) == selectedShaderCompiler;
+
+		const bool bStampShaderCompilerMatches = bStampContentPipelineMatches
+		    && ReadBuildFilesFreshnessStampValue(status.StampPath, "shaderCompiler").value_or(std::string()) == selectedShaderCompiler;
+
 		const bool bStampKtxMatches = bStampShaderCompilerMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "ktxSupport").value_or(std::string()) == selectedKtxSupport;
 		const bool bStampStreamlineMatches = bStampKtxMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "nvidiaStreamline").value_or(std::string()) == selectedNvidiaStreamline;
 

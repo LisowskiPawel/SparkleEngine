@@ -22,7 +22,7 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 		const bool bTracingMaterialMaterialValid = bInvalidTracingMaterialGpuMesh || (!primitive.Static.Material.IsValid());
 		const bool bInvalidTracingMaterialGeneration = bTracingMaterialMaterialValid || (primitive.Static.Material.GetGeneration() != materials.Generation);
 		const bool bInvalidRayTracingMaterial = bInvalidTracingMaterialGeneration || (primitive.Static.Material.GetIndex() >= materials.Values.size());
-		
+
 		if (bInvalidRayTracingMaterial)
 		{
 			continue;
@@ -62,8 +62,15 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 			for (std::uint32_t rayContribution = 0u; rayContribution < geometryMultiplier; ++rayContribution)
 			{
 				std::uint32_t recordIndex = 0u;
-				const bool bRecordIndexComputed = ComputeCheckedRecordIndex(rayContribution, geometryMultiplier, geometryIndex, instance.InstanceContribution, static_cast<std::uint32_t>(nextInstanceContribution), recordIndex);
-				
+
+				const bool bRecordIndexComputed = ComputeCheckedRecordIndex(
+				    rayContribution,
+				    geometryMultiplier,
+				    geometryIndex,
+				    instance.InstanceContribution,
+				    static_cast<std::uint32_t>(nextInstanceContribution),
+				    recordIndex);
+
 				if (!bRecordIndexComputed)
 				{
 					Diagnostics::Fatal(g_rayTracingShaderTablePlanLogger, __FILE__, __LINE__, "Ray-tracing shader-table record formula overflowed or escaped the planned table.");
@@ -109,7 +116,7 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 	m_metrics.LastUpdateTimeMicroseconds = 0u;
 
 	m_metrics.InvalidationReason = m_generation == 1u ? RayTracingShaderTableInvalidationReason::RayTypeLayout
-	    : bGeometryChanged                             ? RayTracingShaderTableInvalidationReason::GeometryLayout
+	    : bGeometryChanged                            ? RayTracingShaderTableInvalidationReason::GeometryLayout
 	                                                  : RayTracingShaderTableInvalidationReason::MaterialSemantics;
 
 	if (!Validate())
@@ -163,7 +170,7 @@ bool RayTracingShaderTablePlan::Validate() const noexcept
 		const bool bRecordOrdered = record.RecordIndex == index;
 		const bool bRecordIndexComputed = bRecordOrdered && ComputeRecordIndex(record.GpuSceneSlot, record.GeometryIndex, record.RayType, computedIndex);
 		const bool bRecordIndexMatches = bRecordIndexComputed && computedIndex == record.RecordIndex;
-		
+
 		if (!bRecordIndexMatches)
 		{
 			return false;

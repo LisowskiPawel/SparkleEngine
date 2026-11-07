@@ -87,7 +87,7 @@ namespace GltfAnimationSampler
 		const bool bTimeElementAvailable = accessor != nullptr && index < accessor->count;
 		const bool bTimeDecoded = bTimeElementAvailable && cgltf_accessor_read_float(accessor, index, &time, 1);
 		const bool bTimeFinite = bTimeDecoded && std::isfinite(time);
-		
+
 		if (!bTimeFinite)
 		{
 			throw Diagnostics::Error(std::format("Cannot decode glTF animation input time {}.", index));
@@ -103,7 +103,7 @@ namespace GltfAnimationSampler
 	static DirectX::XMFLOAT4 ConvertTranslationValue(const DirectX::XMFLOAT4& source, bool bTangent) noexcept
 	{
 		const DirectX::XMFLOAT3 converted = bTangent ? GltfCoordinateConverter::ConvertTranslationTangent({source.x, source.y, source.z})
-		                                            : GltfCoordinateConverter::ConvertTranslation({source.x, source.y, source.z});
+		                                             : GltfCoordinateConverter::ConvertTranslation({source.x, source.y, source.z});
 
 		return {converted.x, converted.y, converted.z, 0.0f};
 	}
@@ -149,7 +149,7 @@ namespace GltfAnimationSampler
 		}
 		rotation = DirectX::XMQuaternionNormalize(rotation);
 		const bool bRotationSignNeedsFlip = previousRotation != nullptr && DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(previousRotation), rotation)) < 0.0f;
-		
+
 		if (bRotationSignNeedsFlip)
 		{
 			rotation = DirectX::XMVectorNegate(rotation);

@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 struct FrameUniformData;
 struct ViewUniformData;
@@ -15,9 +16,15 @@ struct SkyUniformData;
 struct RayTracingHitUniformData;
 struct PerObjectPSConstantBufferData;
 
-template <typename T> inline constexpr bool IsSupportedShaderUniformV = std::is_same_v<T, FrameUniformData> || std::is_same_v<T, ViewUniformData> || std::is_same_v<T, ViewCameraUniformData>
-    || std::is_same_v<T, ViewTemporalUniformData> || std::is_same_v<T, SceneLightingUniformData> || std::is_same_v<T, SkyUniformData> || std::is_same_v<T, RayTracingHitUniformData>
-    || std::is_same_v<T, PerObjectPSConstantBufferData>;
+template <typename T> inline constexpr bool bIsSupportedShaderUniformV = std::disjunction_v<
+    std::is_same<T, FrameUniformData>,
+    std::is_same<T, ViewUniformData>,
+    std::is_same<T, ViewCameraUniformData>,
+    std::is_same<T, ViewTemporalUniformData>,
+    std::is_same<T, SceneLightingUniformData>,
+    std::is_same<T, SkyUniformData>,
+    std::is_same<T, RayTracingHitUniformData>,
+    std::is_same<T, PerObjectPSConstantBufferData>>;
 
 template <typename TResource, std::size_t ArrayCount = 1> struct ShaderTextureSRVField;
 
@@ -93,21 +100,21 @@ template <typename TValue> struct ShaderBufferUAVField<RWStructuredBuffer<TValue
 	}();                                                                                            \
 	SPARKLE_REGISTER_SHADER_VALUE(Name)
 
-#define SHADER_PARAMETER_CBUFFER(UniformType, Name)                                                                                         \
+#define SHADER_PARAMETER_CBUFFER(UniformType, Name)                                                                                          \
 	static_assert(::bIsSupportedShaderUniformV<UniformType>, "Uniform buffers are limited to shared globals and existing per-object data."); \
-	::ShaderUniform<UniformType> Name{};                                                                                                    \
-	inline static const ::ShaderParameterDescriptorAutoRegister<ThisShaderParameterStruct> AutoRegisterParameter_##Name{                    \
-	    #Name,                                                                                                                              \
-	    ::CookedShaderResourceKind::ConstantBuffer,                                                                                         \
-	    ::CookedShaderResourceDimension::Buffer,                                                                                            \
-	    ::ShaderParameterSemanticKind::UniformData,                                                                                         \
-	    ::ShaderParameterResourceDomain::Uniform,                                                                                           \
-	    ::ShaderParameterAccess::None,                                                                                                      \
-	    ::ShaderStageVisibility::None,                                                                                                      \
-	    1u,                                                                                                                                 \
-	    static_cast<std::uint32_t>(sizeof(UniformType)),                                                                                    \
-	    static_cast<std::uint32_t>(alignof(UniformType)),                                                                                   \
-	    true};                                                                                                                              \
+	::ShaderUniform<UniformType> Name{};                                                                                                     \
+	inline static const ::ShaderParameterDescriptorAutoRegister<ThisShaderParameterStruct> AutoRegisterParameter_##Name{                     \
+	    #Name,                                                                                                                               \
+	    ::CookedShaderResourceKind::ConstantBuffer,                                                                                          \
+	    ::CookedShaderResourceDimension::Buffer,                                                                                             \
+	    ::ShaderParameterSemanticKind::UniformData,                                                                                          \
+	    ::ShaderParameterResourceDomain::Uniform,                                                                                            \
+	    ::ShaderParameterAccess::None,                                                                                                       \
+	    ::ShaderStageVisibility::None,                                                                                                       \
+	    1u,                                                                                                                                  \
+	    static_cast<std::uint32_t>(sizeof(UniformType)),                                                                                     \
+	    static_cast<std::uint32_t>(alignof(UniformType)),                                                                                    \
+	    true};                                                                                                                               \
 	SPARKLE_REGISTER_GRAPH_SHADER_PARAMETER(Name, ::ShaderStageVisibility::All);
 
 #define SHADER_PARAMETER_TEXTURE_SRV(ResourceType, Name)                                                                                                                    \

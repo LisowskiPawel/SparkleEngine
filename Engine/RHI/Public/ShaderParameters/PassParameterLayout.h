@@ -79,7 +79,7 @@ public:
 
 	template <typename T> std::uint32_t Add(const char* name, ShaderStageVisibility visibility = ShaderStageVisibility::All, std::uint32_t arrayCount = 1)
 	{
-		static_assert(IsShaderParameterSemanticV<T>, "Add<T> requires a shader-parameter semantic type.");
+		static_assert(bIsShaderParameterSemanticV<T>, "Add<T> requires a shader-parameter semantic type.");
 
 		PassParameterDesc parameter{};
 		parameter.Name = name != nullptr ? name : "";

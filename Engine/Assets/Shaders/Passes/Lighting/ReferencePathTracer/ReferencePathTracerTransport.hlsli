@@ -111,7 +111,7 @@ namespace ReferencePathTracer
 
 			const bool bRouletteTerminatedSurfaceDepth = FinitePathDiagnosticSurfaceVertices == 0u && path.SurfaceDepth >= 3u;
 			const bool bRouletteTerminated = bRouletteTerminatedSurfaceDepth && (!SurvivesRussianRoulette(path.Throughput, sampleIdentity, surfaceVertexCount));
-			
+
 			if (bRouletteTerminated)
 			{
 				break;

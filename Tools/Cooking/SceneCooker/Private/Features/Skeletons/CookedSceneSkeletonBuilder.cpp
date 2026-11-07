@@ -66,15 +66,18 @@ void CookedSceneSkeletonBuilder::BuildSkeletons(const SourceImportOutput& import
 		for (std::size_t jointIndex = 0; jointIndex < importedSkeleton.joints.size(); ++jointIndex)
 		{
 			const ImportedJoint& importedJoint = importedSkeleton.joints[jointIndex];
-			const bool bJointIdentityValid = importedJoint.name.size() < sizeof(Assets::CookedSkeletonJointRecord::name) && importedJoint.sourceNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
+
+			const bool bJointIdentityValid = importedJoint.name.size() < sizeof(Assets::CookedSkeletonJointRecord::name)
+			    && importedJoint.sourceNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
+
 			const bool bSourceNodeUnique = bJointIdentityValid && sourceNodeIndices.insert(importedJoint.sourceNodeIndex).second;
 			const bool bParentIndexValidJointIndex = bSourceNodeUnique && (importedJoint.parentJointIndex == (std::numeric_limits<std::uint32_t>::max)());
 			const bool bParentIndexValidGuardJointIndex = bSourceNodeUnique && !bParentIndexValidJointIndex;
-			const bool bParentIndexValidjoints = bParentIndexValidGuardJointIndex && (importedJoint.parentJointIndex < importedSkeleton.joints.size());
-			const bool bParentIndexValidJointIndex2 = bParentIndexValidjoints && (importedJoint.parentJointIndex != jointIndex);
-			const bool bParentIndexValidJointIndex3 = bParentIndexValidJointIndex || bParentIndexValidJointIndex2;
-			const bool bParentIndexValid = bSourceNodeUnique && bParentIndexValidJointIndex3;
-			
+			const bool bParentIndexValidJoints = bParentIndexValidGuardJointIndex && (importedJoint.parentJointIndex < importedSkeleton.joints.size());
+			const bool bDistinctParent = bParentIndexValidJoints && (importedJoint.parentJointIndex != jointIndex);
+			const bool bParentAccepted = bParentIndexValidJointIndex || bDistinctParent;
+			const bool bParentIndexValid = bSourceNodeUnique && bParentAccepted;
+
 			if (!bParentIndexValid)
 			{
 				throw Diagnostics::Error(std::format("Imported skeleton {} has invalid joint {}.", skeletonIndex, jointIndex));
@@ -91,10 +94,10 @@ void CookedSceneSkeletonBuilder::BuildSkeletons(const SourceImportOutput& import
 			const bool bLocalBindInvertible = bInverseBindInvertible && SkeletonTransformContract::IsInvertible(importedJoint.bindLocalTransform);
 			const bool bLocalBindDecomposable = bLocalBindInvertible && SkeletonTransformContract::IsTrsDecomposable(importedJoint.bindLocalTransform);
 
-			const bool bIndInvariantSatisfied = bLocalBindDecomposable
+			const bool bBindInvariantSatisfied = bLocalBindDecomposable
 			    && SkeletonTransformContract::SatisfiesBindInvariant(importedJoint.bindLocalTransform, importedJoint.parentSpaceTransform, parentBindModel, importedJoint.bindModelTransform);
 
-			if (!bIndInvariantSatisfied)
+			if (!bBindInvariantSatisfied)
 			{
 				throw Diagnostics::Error(std::format("Imported skeleton {} joint {} violates the canonical transform contract.", skeletonIndex, jointIndex));
 			}

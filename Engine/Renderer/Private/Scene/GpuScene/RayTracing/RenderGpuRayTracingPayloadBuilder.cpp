@@ -37,13 +37,13 @@ static RenderGpuMeshHitDataOffsets ResolveMeshOffsets(MeshHitDataOffsets& meshOf
 	const std::span<const VertexSkinInfluence> skinInfluences = mesh.GetSkinInfluences();
 	const std::span<const MorphTargetDeltaData> morphTargetDeltas = mesh.GetMorphTargetDeltas();
 	constexpr std::size_t maximumPayloadElementCount = (std::numeric_limits<std::uint32_t>::max)();
-	const bool bMeshDataValidmeshVerticesEmpty = mesh.HasRayTracingHitData() && !meshVertices.empty();
-	const bool bMeshDataValidmeshIndicesSize = bMeshDataValidmeshVerticesEmpty && (meshIndices.size() >= 3u);
-	const bool bMeshHitDataValid = bMeshDataValidmeshIndicesSize && (meshIndices.size() % 3u == 0u);
+	const bool bMeshDataValidMeshVerticesEmpty = mesh.HasRayTracingHitData() && !meshVertices.empty();
+	const bool bMeshDataValidMeshIndicesSize = bMeshDataValidMeshVerticesEmpty && (meshIndices.size() >= 3u);
+	const bool bMeshHitDataValid = bMeshDataValidMeshIndicesSize && (meshIndices.size() % 3u == 0u);
 	const bool bSkinInfluencesValidSkinInfluences = bMeshHitDataValid && (mesh.HasSkinInfluences());
-	const bool bInfluencesValidmeshVerticesSize = bSkinInfluencesValidSkinInfluences && (skinInfluences.size() != meshVertices.size());
-	const bool bInfluencesValidmeshVerticesSize2 = bMeshHitDataValid && !bInfluencesValidmeshVerticesSize;
-	const bool bSkinInfluencesValid = bMeshHitDataValid && bInfluencesValidmeshVerticesSize2;
+	const bool bInfluencesValidMeshVerticesSize = bSkinInfluencesValidSkinInfluences && (skinInfluences.size() != meshVertices.size());
+	const bool bCheckInfluenceRange = bMeshHitDataValid && !bInfluencesValidMeshVerticesSize;
+	const bool bSkinInfluencesValid = bMeshHitDataValid && bCheckInfluenceRange;
 
 	const bool bPayloadSizesValidVertices = bSkinInfluencesValid && payloads.Vertices.size() <= maximumPayloadElementCount;
 	const bool bPayloadSizesValidIndices = bPayloadSizesValidVertices && (payloads.Indices.size() <= maximumPayloadElementCount);
@@ -186,7 +186,7 @@ static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpu
 	{
 		const bool bGpuSceneSlotValid = input.GpuSceneSlot != (std::numeric_limits<std::uint32_t>::max)();
 		const bool bGpuSceneSlotUnique = bGpuSceneSlotValid && occupiedGpuSceneSlots.insert(input.GpuSceneSlot).second;
-		
+
 		if (!bGpuSceneSlotUnique)
 		{
 			Diagnostics::Fatal(g_renderGpuRayTracingPayloadBuilderLogger, __FILE__, __LINE__, "Ray-tracing work contains an invalid or duplicate GPU-scene slot.");
@@ -221,12 +221,12 @@ static void AppendInstance(
 	const bool bMissingSkinningGeometry = draw.Geometry.MeshKind == RenderMeshKind::Skeletal;
 	const bool bMissingSkinningSkinning = bMissingSkinningGeometry && (draw.Skinning.JointMatrixOffset == kInvalidMeshInstanceJointMatrixOffset);
 	const bool bMissingSkinningGuardgpuMesh = bMissingSkinningGeometry && !bMissingSkinningSkinning;
-	const bool bMissingSkinninggpuMesh = bMissingSkinningGuardgpuMesh && (gpuMesh == nullptr);
-	const bool bMissingSkinninggpuMesh2 = bMissingSkinningSkinning || bMissingSkinninggpuMesh;
-	const bool bMissingSkinningGuardInfluences = bMissingSkinningGeometry && !bMissingSkinninggpuMesh2;
+	const bool bMissingSkinningGpuMesh = bMissingSkinningGuardgpuMesh && (gpuMesh == nullptr);
+	const bool bSkinningStorageMissing = bMissingSkinningSkinning || bMissingSkinningGpuMesh;
+	const bool bMissingSkinningGuardInfluences = bMissingSkinningGeometry && !bSkinningStorageMissing;
 	const bool bMissingSkinningSkinInfluences = bMissingSkinningGuardInfluences && (!gpuMesh->HasSkinInfluences());
-	const bool bMissingSkinningSkinInfluences2 = bMissingSkinninggpuMesh2 || bMissingSkinningSkinInfluences;
-	const bool bMissingSkinning = bMissingSkinningGeometry && bMissingSkinningSkinInfluences2;
+	const bool bSkinInfluencesMissing = bSkinningStorageMissing || bMissingSkinningSkinInfluences;
+	const bool bMissingSkinning = bMissingSkinningGeometry && bSkinInfluencesMissing;
 
 	if (gpuMesh == nullptr || bMissingSkinning)
 	{

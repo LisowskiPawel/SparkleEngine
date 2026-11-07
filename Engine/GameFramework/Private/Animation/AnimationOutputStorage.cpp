@@ -179,9 +179,9 @@ namespace ECS
 			for (const PoseWorkSlot& work : m_poseWork)
 			{
 				const bool bMatchingAnimationTargetInstanceId = targetIdentity != nullptr && work.SourceInstanceId == targetIdentity->SourceInstanceId;
-				const bool bMatchingAnimationTargetposes = bMatchingAnimationTargetInstanceId && (work.PoseOutputIndex < m_output.poses.size());
-				const bool bMatchingAnimationTarget = bMatchingAnimationTargetposes && (m_output.poses[work.PoseOutputIndex].skeletonAssetId == updated.SkeletonAssetId);
-				
+				const bool bMatchingAnimationTargetPoses = bMatchingAnimationTargetInstanceId && (work.PoseOutputIndex < m_output.poses.size());
+				const bool bMatchingAnimationTarget = bMatchingAnimationTargetPoses && (m_output.poses[work.PoseOutputIndex].skeletonAssetId == updated.SkeletonAssetId);
+
 				if (bMatchingAnimationTarget)
 				{
 					updated.Pose = AnimationOutputSlotHandle{work.PoseOutputIndex, targetGeneration};

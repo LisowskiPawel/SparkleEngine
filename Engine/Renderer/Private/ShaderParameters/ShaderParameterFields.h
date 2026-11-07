@@ -392,7 +392,7 @@ template <typename T> struct IsShaderParameterField<T, std::void_t<typename Shad
 {
 };
 
-template <typename T> constexpr bool IsShaderParameterFieldV = IsShaderParameterField<T>::value;
+template <typename T> constexpr bool bIsShaderParameterFieldV = IsShaderParameterField<T>::value;
 
 template <typename TValue, std::size_t ArrayCount>
 std::enable_if_t<ArrayCount == 1, bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderTexture2D<TValue, ArrayCount>& field)

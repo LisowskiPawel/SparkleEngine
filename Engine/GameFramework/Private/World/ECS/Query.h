@@ -170,7 +170,7 @@ namespace ECS
 				return QueryIterationStatus::InvalidEpoch;
 			}
 			const bool bQueryCacheStale = m_registry->GetStructureVersion() != m_registryStructureVersion || !StorageVersionsMatch(std::index_sequence_for<AccessSpecs...>{});
-			
+
 			if (bQueryCacheStale)
 			{
 				return QueryIterationStatus::StaleView;

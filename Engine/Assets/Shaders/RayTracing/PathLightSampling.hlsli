@@ -182,7 +182,7 @@ namespace PathLightSampling
 		const float2 sampledTexCoord = InterpolateRayTracingTexCoord0(sampledTriangle);
 		const float4 sampledColor = InterpolateRayTracingColor(sampledTriangle);
 		const bool bSampledAlphaAccepted = PassesRayTracingMaterialAlpha(emissiveTriangle.Material, sampledTexCoord, sampledColor);
-		
+
 		if (!bSampledAlphaAccepted)
 		{
 			return (LightSampling::DirectLightSample)0;

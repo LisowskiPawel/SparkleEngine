@@ -118,7 +118,7 @@ static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std
 	{
 		const bool bCommandByFilterName = !filter.empty() && !Strings::ContainsIgnoreCase(command.Name, filter);
 		const bool bCommandExcludedByFilter = bCommandByFilterName && (!Strings::ContainsIgnoreCase(command.Help, filter));
-		
+
 		if (bCommandExcludedByFilter)
 		{
 			continue;

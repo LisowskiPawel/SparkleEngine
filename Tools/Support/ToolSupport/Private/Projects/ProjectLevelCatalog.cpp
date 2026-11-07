@@ -43,8 +43,8 @@ bool ProjectLevelCatalog::HasLevelSourceInputs(const ProjectLevelCatalogEntry& l
 {
 	std::error_code error;
 	const bool bSourceSpecified = !level.id.empty() && !level.sourcePath.empty();
-	const bool bSourcePresentsourcePath = bSourceSpecified && std::filesystem::is_regular_file(level.sourcePath, error);
-	const bool bSourcePresent = bSourcePresentsourcePath && (!error);
+	const bool bSourcePresentSourcePath = bSourceSpecified && std::filesystem::is_regular_file(level.sourcePath, error);
+	const bool bSourcePresent = bSourcePresentSourcePath && (!error);
 	const bool bSourceReady = bSourcePresent && IsAssetPackSourceReady(level.assetPackId);
 
 	if (!bSourceReady)

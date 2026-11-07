@@ -23,7 +23,7 @@ GltfTangentVertexRemapper::GltfTangentVertexRemapper(ImportedMeshGeometry& geome
     m_bHasSkinInfluences(geometry.HasSkinInfluences())
 {
 	const bool bTangentFrameCountsMismatch = frames.baseCornerTangents.size() != geometry.indices.size() || frames.morphCornerTangentDeltas.size() != geometry.deformation.morphTargets.size();
-	
+
 	if (bTangentFrameCountsMismatch)
 	{
 		throw Diagnostics::Error("Generated glTF tangent frames do not match the geometry and deformation streams.");
@@ -79,7 +79,7 @@ bool GltfTangentVertexRemapper::FrameSetsMatch(std::uint32_t remappedVertexIndex
 	for (std::size_t targetIndex = 0; targetIndex < m_morphTargets.size(); ++targetIndex)
 	{
 		const bool bMorphTangentMismatch = !TangentsMatch(m_morphTargets[targetIndex].deltas[remappedVertexIndex].tangent, m_frames.morphCornerTangentDeltas[targetIndex][cornerIndex]);
-		
+
 		if (bMorphTangentMismatch)
 		{
 			return false;

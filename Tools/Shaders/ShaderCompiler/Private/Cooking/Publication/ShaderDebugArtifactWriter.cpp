@@ -132,16 +132,16 @@ void ShaderDebugArtifactWriter::RecordCompilerModule(const wchar_t* name)
 void ShaderDebugArtifactWriter::Write(const ShaderCompileRequest& request, const CookedStageBuild& compiledStage, const ShaderDebugArtifactSet& debugArtifacts)
 {
 	const bool bInputsIncompleteSourceFiles = !request.bEnableDebugInfo || request.SourceFiles.empty();
-	const bool bInputsIncompletebytecode = bInputsIncompleteSourceFiles || (compiledStage.bytecode.empty());
-	const bool bInputsIncompleteCompileArguments = bInputsIncompletebytecode || (debugArtifacts.CompileArguments.empty());
-	const bool bDiagnosticInputsIncompleteformat = !bInputsIncompleteCompileArguments && (compiledStage.format == ShaderBinaryFormat::Dxil);
-	const bool bDiagnosticInputsIncompleteSymbols = bDiagnosticInputsIncompleteformat && (debugArtifacts.Symbols.empty());
-	const bool bInputsIncompleteGuardSymbolName = bDiagnosticInputsIncompleteformat && !bDiagnosticInputsIncompleteSymbols;
+	const bool bInputsIncompleteBytecode = bInputsIncompleteSourceFiles || (compiledStage.bytecode.empty());
+	const bool bInputsIncompleteCompileArguments = bInputsIncompleteBytecode || (debugArtifacts.CompileArguments.empty());
+	const bool bDiagnosticInputsIncompleteFormat = !bInputsIncompleteCompileArguments && (compiledStage.format == ShaderBinaryFormat::Dxil);
+	const bool bDiagnosticInputsIncompleteSymbols = bDiagnosticInputsIncompleteFormat && (debugArtifacts.Symbols.empty());
+	const bool bInputsIncompleteGuardSymbolName = bDiagnosticInputsIncompleteFormat && !bDiagnosticInputsIncompleteSymbols;
 	const bool bInputsIncompleteSymbolName = bInputsIncompleteGuardSymbolName && (debugArtifacts.SymbolName.empty());
-	const bool bInputsIncompleteSymbolName2 = bDiagnosticInputsIncompleteSymbols || bInputsIncompleteSymbolName;
-	const bool bInputsIncompleteSymbolName3 = bDiagnosticInputsIncompleteformat && bInputsIncompleteSymbolName2;
-	const bool bDiagnosticInputsIncomplete = bInputsIncompleteCompileArguments || bInputsIncompleteSymbolName3;
-	
+	const bool bSymbolsMissing = bDiagnosticInputsIncompleteSymbols || bInputsIncompleteSymbolName;
+	const bool bDxilInputsMissing = bDiagnosticInputsIncompleteFormat && bSymbolsMissing;
+	const bool bDiagnosticInputsIncomplete = bInputsIncompleteCompileArguments || bDxilInputsMissing;
+
 	if (bDiagnosticInputsIncomplete)
 	{
 		throw Diagnostics::Error("Shader debug export is missing requested code, source or compiler debug data.");
@@ -252,12 +252,12 @@ void ShaderDebugArtifactWriter::WriteCompiledJobs(
 		const auto& products = plan.shaderOutputs[job.ShaderIndex];
 		const auto product = std::ranges::find(products, job.Request.Target, &ShaderCookProduct::target);
 		const GlobalShaderMapEntry* entry = map.Find(job.Request.ShaderType, job.Request.Target);
-		const bool bDiagnosticProductMismatchentry = product == products.end() || entry == nullptr;
-		const bool bProductMismatchInputHash = bDiagnosticProductMismatchentry || (entry->CompileInputHash != job.InputHash);
-		const bool bProductMismatchInputHash2 = bProductMismatchInputHash || (result.InputHash != job.InputHash);
-		const bool bDiagnosticProductMismatchRequest = bProductMismatchInputHash2 || (result.ShaderType != job.Request.ShaderType);
+		const bool bDiagnosticProductMismatchEntry = product == products.end() || entry == nullptr;
+		const bool bProductMismatchInputHash = bDiagnosticProductMismatchEntry || (entry->CompileInputHash != job.InputHash);
+		const bool bInputHashMismatch = bProductMismatchInputHash || (result.InputHash != job.InputHash);
+		const bool bDiagnosticProductMismatchRequest = bInputHashMismatch || (result.ShaderType != job.Request.ShaderType);
 		const bool bDiagnosticProductMismatch = bDiagnosticProductMismatchRequest || (result.Target != job.Request.Target);
-		
+
 		if (bDiagnosticProductMismatch)
 		{
 			throw Diagnostics::Error("Shader debug export does not match its staged runtime entry.");
@@ -270,7 +270,7 @@ void ShaderDebugArtifactWriter::WriteCompiledJobs(
 		const ShaderBytecode code = library.GetBytecode(*record);
 		const auto* bytes = static_cast<const std::uint8_t*>(code.Data);
 		const bool bDiagnosticBytecodeMismatch = code.Size != product->compiled.bytecode.size() || !std::equal(product->compiled.bytecode.begin(), product->compiled.bytecode.end(), bytes);
-		
+
 		if (bDiagnosticBytecodeMismatch)
 		{
 			throw Diagnostics::Error("Shader debug export bytes differ from the staged runtime code.");

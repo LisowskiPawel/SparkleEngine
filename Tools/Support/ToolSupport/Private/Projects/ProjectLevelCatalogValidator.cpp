@@ -62,11 +62,11 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 		throw Diagnostics::Error(std::format("Asset pack '{}' has no content root.", pack.id));
 	}
 	const bool bInvalidPackPathRelativePath = pack.requiredRelativePath.empty() || pack.requiredRelativePath == ".";
-	const bool bInvalidPackPathRelativePath2 = bInvalidPackPathRelativePath || (pack.requiredRelativePath.has_root_name());
-	const bool bInvalidPackPathRelativePath3 = bInvalidPackPathRelativePath2 || (pack.requiredRelativePath.has_root_directory());
-	const bool bInvalidPackPathRelativePath4 = bInvalidPackPathRelativePath3 || (pack.requiredRelativePath.is_absolute());
-	const bool bInvalidRequiredPackPath = bInvalidPackPathRelativePath4 || (pack.requiredRelativePath.generic_string().starts_with(".."));
-	
+	const bool bPackNameInvalid = bInvalidPackPathRelativePath || (pack.requiredRelativePath.has_root_name());
+	const bool bPackRootInvalid = bPackNameInvalid || (pack.requiredRelativePath.has_root_directory());
+	const bool bAbsolutePathInvalid = bPackRootInvalid || (pack.requiredRelativePath.is_absolute());
+	const bool bInvalidRequiredPackPath = bAbsolutePathInvalid || (pack.requiredRelativePath.generic_string().starts_with(".."));
+
 	if (bInvalidRequiredPackPath)
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' has an unsafe required path.", pack.id));
@@ -77,39 +77,39 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 	}
 	const bool bFilesPayload = !pack.sourceFilesManifestPath.empty();
 	const bool bDescriptionIncompleteSupported = pack.bDownloadSupported;
-	const bool bDescriptionIncompletesourceUrl = bDescriptionIncompleteSupported && (pack.sourceUrl.empty());
-	const bool bDescriptionIncompleteGuardPath = bDescriptionIncompleteSupported && !bDescriptionIncompletesourceUrl;
+	const bool bDescriptionIncompleteSourceUrl = bDescriptionIncompleteSupported && (pack.sourceUrl.empty());
+	const bool bDescriptionIncompleteGuardPath = bDescriptionIncompleteSupported && !bDescriptionIncompleteSourceUrl;
 	const bool bDescriptionIncompletePath = bDescriptionIncompleteGuardPath && (pack.extractionPath.empty());
-	const bool bDescriptionIncompletePath2 = bDescriptionIncompletesourceUrl || bDescriptionIncompletePath;
-	const bool bDescriptionIncompleteGuardSha256 = bDescriptionIncompleteSupported && !bDescriptionIncompletePath2;
-	const bool bDescriptionIncompletefilesPayload = bDescriptionIncompleteGuardSha256 && (!bFilesPayload);
-	const bool bDescriptionIncompletearchiveName = bDescriptionIncompletefilesPayload && (pack.archiveName.empty());
-	const bool bDescriptionIncompleteGuardBytes = bDescriptionIncompletefilesPayload && !bDescriptionIncompletearchiveName;
-	const bool bDescriptionIncompletearchiveBytes = bDescriptionIncompleteGuardBytes && (pack.archiveBytes == 0);
-	const bool bDescriptionIncompletearchiveBytes2 = bDescriptionIncompletearchiveName || bDescriptionIncompletearchiveBytes;
-	const bool bDescriptionIncompleteGuardSha2562 = bDescriptionIncompletefilesPayload && !bDescriptionIncompletearchiveBytes2;
-	const bool bDescriptionIncompleteSha256 = bDescriptionIncompleteGuardSha2562 && (pack.archiveSha256.empty());
-	const bool bDescriptionIncompleteSha2562 = bDescriptionIncompletearchiveBytes2 || bDescriptionIncompleteSha256;
-	const bool bDescriptionIncompleteSha2563 = bDescriptionIncompletefilesPayload && bDescriptionIncompleteSha2562;
-	const bool bDescriptionIncompleteSha2564 = bDescriptionIncompletePath2 || bDescriptionIncompleteSha2563;
-	const bool bDownloadDescriptionIncomplete = bDescriptionIncompleteSupported && bDescriptionIncompleteSha2564;
-	
+	const bool bDownloadLocationMissing = bDescriptionIncompleteSourceUrl || bDescriptionIncompletePath;
+	const bool bCheckArchive = bDescriptionIncompleteSupported && !bDownloadLocationMissing;
+	const bool bDescriptionIncompleteFilesPayload = bCheckArchive && (!bFilesPayload);
+	const bool bDescriptionIncompleteArchiveName = bDescriptionIncompleteFilesPayload && (pack.archiveName.empty());
+	const bool bDescriptionIncompleteGuardBytes = bDescriptionIncompleteFilesPayload && !bDescriptionIncompleteArchiveName;
+	const bool bDescriptionIncompleteArchiveBytes = bDescriptionIncompleteGuardBytes && (pack.archiveBytes == 0);
+	const bool bArchiveMetadataMissing = bDescriptionIncompleteArchiveName || bDescriptionIncompleteArchiveBytes;
+	const bool bCheckArchiveDigest = bDescriptionIncompleteFilesPayload && !bArchiveMetadataMissing;
+	const bool bArchiveDigestMissing = bCheckArchiveDigest && (pack.archiveSha256.empty());
+	const bool bArchiveIncomplete = bArchiveMetadataMissing || bArchiveDigestMissing;
+	const bool bDownloadArchiveIncomplete = bDescriptionIncompleteFilesPayload && bArchiveIncomplete;
+	const bool bDownloadIncomplete = bDownloadLocationMissing || bDownloadArchiveIncomplete;
+	const bool bDownloadDescriptionIncomplete = bDescriptionIncompleteSupported && bDownloadIncomplete;
+
 	if (bDownloadDescriptionIncomplete)
 	{
 		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' has incomplete acquisition metadata.", pack.id));
 	}
 	const bool bDescriptionInvalidSupported = bFilesPayload && (!pack.bDownloadSupported);
 	const bool bDescriptionInvalidGuardName = bFilesPayload && !bDescriptionInvalidSupported;
-	const bool bDescriptionInvalidarchiveName = bDescriptionInvalidGuardName && (!pack.archiveName.empty());
-	const bool bDescriptionInvalidarchiveName2 = bDescriptionInvalidSupported || bDescriptionInvalidarchiveName;
-	const bool bDescriptionInvalidGuardBytes = bFilesPayload && !bDescriptionInvalidarchiveName2;
-	const bool bDescriptionInvalidarchiveBytes = bDescriptionInvalidGuardBytes && (pack.archiveBytes != 0);
-	const bool bDescriptionInvalidarchiveBytes2 = bDescriptionInvalidarchiveName2 || bDescriptionInvalidarchiveBytes;
-	const bool bDescriptionInvalidGuardSha256 = bFilesPayload && !bDescriptionInvalidarchiveBytes2;
-	const bool bFilesDescriptionInvalidSha256 = bDescriptionInvalidGuardSha256 && (!pack.archiveSha256.empty());
-	const bool bFilesDescriptionInvalidSha2562 = bDescriptionInvalidarchiveBytes2 || bFilesDescriptionInvalidSha256;
-	const bool bInvalidFilesPayload = bFilesPayload && bFilesDescriptionInvalidSha2562;
-	
+	const bool bDescriptionInvalidArchiveName = bDescriptionInvalidGuardName && (!pack.archiveName.empty());
+	const bool bArchiveNameUnexpected = bDescriptionInvalidSupported || bDescriptionInvalidArchiveName;
+	const bool bDescriptionInvalidGuardBytes = bFilesPayload && !bArchiveNameUnexpected;
+	const bool bDescriptionInvalidArchiveBytes = bDescriptionInvalidGuardBytes && (pack.archiveBytes != 0);
+	const bool bArchiveBytesUnexpected = bArchiveNameUnexpected || bDescriptionInvalidArchiveBytes;
+	const bool bCheckUnexpectedDigest = bFilesPayload && !bArchiveBytesUnexpected;
+	const bool bArchiveDigestUnexpected = bCheckUnexpectedDigest && (!pack.archiveSha256.empty());
+	const bool bArchiveMetadataUnexpected = bArchiveBytesUnexpected || bArchiveDigestUnexpected;
+	const bool bInvalidFilesPayload = bFilesPayload && bArchiveMetadataUnexpected;
+
 	if (bInvalidFilesPayload)
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' must choose either a file manifest or an archive payload.", pack.id));
@@ -155,22 +155,22 @@ static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::s
 		throw Diagnostics::Error(std::format("Asset pack '{}' root must remain within its extraction root.", pack.id));
 	}
 	const std::filesystem::path archiveNamePath(pack.archiveName);
-	const bool bInvalidArchiveNamefilesPayload = pack.bDownloadSupported && !bFilesPayload;
-	const bool bInvalidArchiveNameNamePath = bInvalidArchiveNamefilesPayload && (archiveNamePath == ".");
-	const bool bInvalidArchiveNameGuardNamePath = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNameNamePath;
-	const bool bInvalidArchiveNameNamePath2 = bInvalidArchiveNameGuardNamePath && (archiveNamePath == "..");
-	const bool bInvalidArchiveNameNamePath3 = bInvalidArchiveNameNamePath || bInvalidArchiveNameNamePath2;
-	const bool bInvalidArchiveNameGuardrootname = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNameNamePath3;
-	const bool bInvalidArchiveNamerootname = bInvalidArchiveNameGuardrootname && (archiveNamePath.has_root_name());
-	const bool bInvalidArchiveNamerootname2 = bInvalidArchiveNameNamePath3 || bInvalidArchiveNamerootname;
-	const bool bArchiveNameGuardrootdirectory = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNamerootname2;
-	const bool bInvalidArchiveNamerootdirectory = bArchiveNameGuardrootdirectory && (archiveNamePath.has_root_directory());
-	const bool bInvalidArchiveNamerootdirectory2 = bInvalidArchiveNamerootname2 || bInvalidArchiveNamerootdirectory;
-	const bool bInvalidArchiveNameGuardfilename = bInvalidArchiveNamefilesPayload && !bInvalidArchiveNamerootdirectory2;
-	const bool bInvalidArchiveNamefilename = bInvalidArchiveNameGuardfilename && (archiveNamePath.filename() != archiveNamePath);
-	const bool bInvalidArchiveNamefilename2 = bInvalidArchiveNamerootdirectory2 || bInvalidArchiveNamefilename;
-	const bool bInvalidArchiveName = bInvalidArchiveNamefilesPayload && bInvalidArchiveNamefilename2;
-	
+	const bool bInvalidArchiveNameFilesPayload = pack.bDownloadSupported && !bFilesPayload;
+	const bool bInvalidArchiveNameNamePath = bInvalidArchiveNameFilesPayload && (archiveNamePath == ".");
+	const bool bInvalidArchiveNameGuardNamePath = bInvalidArchiveNameFilesPayload && !bInvalidArchiveNameNamePath;
+	const bool bParentDirectoryName = bInvalidArchiveNameGuardNamePath && (archiveNamePath == "..");
+	const bool bArchiveNameInvalid = bInvalidArchiveNameNamePath || bParentDirectoryName;
+	const bool bInvalidArchiveNameGuardrootname = bInvalidArchiveNameFilesPayload && !bArchiveNameInvalid;
+	const bool bInvalidArchiveNameRootname = bInvalidArchiveNameGuardrootname && (archiveNamePath.has_root_name());
+	const bool bNameOrRootInvalid = bArchiveNameInvalid || bInvalidArchiveNameRootname;
+	const bool bArchiveNameGuardrootdirectory = bInvalidArchiveNameFilesPayload && !bNameOrRootInvalid;
+	const bool bInvalidArchiveNameRootdirectory = bArchiveNameGuardrootdirectory && (archiveNamePath.has_root_directory());
+	const bool bArchiveRootInvalid = bNameOrRootInvalid || bInvalidArchiveNameRootdirectory;
+	const bool bInvalidArchiveNameGuardfilename = bInvalidArchiveNameFilesPayload && !bArchiveRootInvalid;
+	const bool bInvalidArchiveNameFilename = bInvalidArchiveNameGuardfilename && (archiveNamePath.filename() != archiveNamePath);
+	const bool bNestedNameInvalid = bArchiveRootInvalid || bInvalidArchiveNameFilename;
+	const bool bInvalidArchiveName = bInvalidArchiveNameFilesPayload && bNestedNameInvalid;
+
 	if (bInvalidArchiveName)
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' archive name must not contain a path.", pack.id));
@@ -204,7 +204,7 @@ static void ValidateExtractionRoots(const std::vector<const ProjectAssetPack*>& 
 			const ProjectAssetPack& left = *downloadablePacks[leftIndex];
 			const ProjectAssetPack& right = *downloadablePacks[rightIndex];
 			const bool bExtractionRootsOverlap = Paths::IsUnderRoot(left.extractionPath, right.extractionPath) || Paths::IsUnderRoot(right.extractionPath, left.extractionPath);
-			
+
 			if (bExtractionRootsOverlap)
 			{
 				throw Diagnostics::Error(std::format("Downloadable asset packs '{}' and '{}' have overlapping extraction roots.", left.id, right.id));

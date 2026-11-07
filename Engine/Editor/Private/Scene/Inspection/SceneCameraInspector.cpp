@@ -82,7 +82,8 @@ namespace SceneCameraInspector
 		const bool bDefaultVisible = true;
 		if (EditorWidgets::EditDetailsCheckbox("Visible", bVisible, &bDefaultVisible))
 		{
-			(void) transactionHistory.Execute({0, SetEntityVisibilityCommand{camera.Entity, bVisible}}, {0, SetEntityVisibilityCommand{camera.Entity, camera.bVisible}}, generation, "camera-visibility");
+			(void)
+			    transactionHistory.Execute({0, SetEntityVisibilityCommand{camera.Entity, bVisible}}, {0, SetEntityVisibilityCommand{camera.Entity, camera.bVisible}}, generation, "camera-visibility");
 		}
 	}
 }

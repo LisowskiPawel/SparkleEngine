@@ -94,7 +94,7 @@ namespace EditorWidgets
 			ImGui::PushID(axisIndex);
 			ImGui::TableSetColumnIndex(axisIndex + 1);
 			const bool bAxisTableOpen = ImGui::BeginTable("##axis_field", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoPadInnerX);
-			
+
 			if (bAxisTableOpen)
 			{
 				ImGui::TableSetupColumn("axis", ImGuiTableColumnFlags_WidthFixed, DetailsAxisLabelWidth);

@@ -195,20 +195,20 @@ namespace Strings
 	bool TryParseBool(std::string_view str, bool& bOutValue)
 	{
 		const std::string_view trimmed = TrimAsciiWhitespace(str);
-		const bool bIsTrueTokentrimmed = EqualsIgnoreCase(trimmed, "true") || trimmed == "1";
-		const bool bIsTrueTokenIgnoreCase = bIsTrueTokentrimmed || (EqualsIgnoreCase(trimmed, "yes"));
+		const bool bIsTrueTokenTrimmed = EqualsIgnoreCase(trimmed, "true") || trimmed == "1";
+		const bool bIsTrueTokenIgnoreCase = bIsTrueTokenTrimmed || (EqualsIgnoreCase(trimmed, "yes"));
 		const bool bIsTrueToken = bIsTrueTokenIgnoreCase || (EqualsIgnoreCase(trimmed, "on"));
-		
+
 		if (bIsTrueToken)
 		{
 			bOutValue = true;
 			return true;
 		}
 
-		const bool bIsFalseTokentrimmed = EqualsIgnoreCase(trimmed, "false") || trimmed == "0";
-		const bool bIsFalseTokenIgnoreCase = bIsFalseTokentrimmed || (EqualsIgnoreCase(trimmed, "no"));
+		const bool bIsFalseTokenTrimmed = EqualsIgnoreCase(trimmed, "false") || trimmed == "0";
+		const bool bIsFalseTokenIgnoreCase = bIsFalseTokenTrimmed || (EqualsIgnoreCase(trimmed, "no"));
 		const bool bIsFalseToken = bIsFalseTokenIgnoreCase || (EqualsIgnoreCase(trimmed, "off"));
-		
+
 		if (bIsFalseToken)
 		{
 			bOutValue = false;

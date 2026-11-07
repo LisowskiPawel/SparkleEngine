@@ -246,7 +246,7 @@ void EditorConsolePanel::DrawInputLine(bool bDisableInteraction)
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, SparkleUiPalette::ConsoleInputBackground());
 	const ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_CallbackCompletion;
 	const bool bConsoleCommandSubmitted = ImGui::InputTextWithHint("##EditorConsoleCommandInput", "Enter command", m_inputBuffer.data(), m_inputBuffer.size(), flags, &HandleInputTextCallback, this);
-	
+
 	if (bConsoleCommandSubmitted)
 	{
 		SubmitInput();

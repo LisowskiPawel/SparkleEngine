@@ -48,9 +48,9 @@ static bool ResolveExportRequest(const std::filesystem::path& cookDirectory, std
 	}
 
 	const std::filesystem::path relative(name);
-	const bool bInvalidRequestPathfilename = relative.has_root_path() || relative.filename() != "compile-request.json";
-	const bool bInvalidCompileRequestPath = bInvalidRequestPathfilename || (std::any_of(relative.begin(), relative.end(), [](const auto& component) { return component == ".."; }));
-	
+	const bool bInvalidRequestPathFilename = relative.has_root_path() || relative.filename() != "compile-request.json";
+	const bool bInvalidCompileRequestPath = bInvalidRequestPathFilename || (std::any_of(relative.begin(), relative.end(), [](const auto& component) { return component == ".."; }));
+
 	if (bInvalidCompileRequestPath)
 	{
 		return false;
@@ -71,12 +71,12 @@ static void SelectNewestShaderExport(
 		const ShaderDiagnosticsEntry& active = diagnostics.Entries[index];
 		const bool bNewerMatchingExportInputHash = active.ShaderType == shader.ShaderType && active.CompileInputHash == shader.CompileInputHash;
 		const bool bNewerMatchingExportBackend = bNewerMatchingExportInputHash && (active.Backend == shader.Backend);
-		const bool bNewerMatchingExportselected = bNewerMatchingExportBackend && (selected[index].empty());
-		const bool bMatchingExportGuardparentpath = bNewerMatchingExportBackend && !bNewerMatchingExportselected;
-		const bool bNewerMatchingExportparentpath = bMatchingExportGuardparentpath && (request.parent_path().native() > selected[index].native());
-		const bool bNewerMatchingExportparentpath2 = bNewerMatchingExportselected || bNewerMatchingExportparentpath;
-		const bool bNewerMatchingExport = bNewerMatchingExportBackend && bNewerMatchingExportparentpath2;
-		
+		const bool bNewerMatchingExportSelected = bNewerMatchingExportBackend && (selected[index].empty());
+		const bool bMatchingExportGuardparentpath = bNewerMatchingExportBackend && !bNewerMatchingExportSelected;
+		const bool bNewerMatchingExportParentpath = bMatchingExportGuardparentpath && (request.parent_path().native() > selected[index].native());
+		const bool bExportChosen = bNewerMatchingExportSelected || bNewerMatchingExportParentpath;
+		const bool bNewerMatchingExport = bNewerMatchingExportBackend && bExportChosen;
+
 		if (bNewerMatchingExport)
 		{
 			selected[index] = request.parent_path();

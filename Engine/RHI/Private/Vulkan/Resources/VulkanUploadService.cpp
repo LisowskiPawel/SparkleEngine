@@ -135,13 +135,13 @@ bool VulkanUploadService::UploadTexture(
 
 bool VulkanUploadService::ValidateBufferUploadRequest(const RenderCommandList& commandList, const VulkanGpuAllocationRecord* destination, std::span<const std::byte> data) const noexcept
 {
-	const bool bBufferUploadRejecteddestination = m_memoryAllocator == nullptr || destination == nullptr;
-	const bool bBufferUploadRejectedBuffer = bBufferUploadRejecteddestination || (destination->Buffer == VK_NULL_HANDLE);
-	const bool bBufferUploadRejecteddataEmpty = bBufferUploadRejectedBuffer || (data.empty());
-	const bool bBufferUploadRejectedInBytes = bBufferUploadRejecteddataEmpty || (data.size() > destination->ResourceSizeInBytes);
-	const bool bUfferUploadRejected = bBufferUploadRejectedInBytes || (commandList.GetBackendApi() != ERhiBackendApi::Vulkan);
-	
-	if (bUfferUploadRejected)
+	const bool bBufferUploadRejectedDestination = m_memoryAllocator == nullptr || destination == nullptr;
+	const bool bBufferUploadRejectedBuffer = bBufferUploadRejectedDestination || (destination->Buffer == VK_NULL_HANDLE);
+	const bool bBufferUploadRejectedDataEmpty = bBufferUploadRejectedBuffer || (data.empty());
+	const bool bBufferUploadRejectedInBytes = bBufferUploadRejectedDataEmpty || (data.size() > destination->ResourceSizeInBytes);
+	const bool bBufferUploadRejected = bBufferUploadRejectedInBytes || (commandList.GetBackendApi() != ERhiBackendApi::Vulkan);
+
+	if (bBufferUploadRejected)
 	{
 		return false;
 	}
@@ -165,7 +165,7 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanUploadService::CreateBufferStag
 	auto stagingResource = m_memoryAllocator->CreateBuffer(desc, RhiMemoryCategory::Upload, RhiMemoryResidencyClass::HostUpload, debugName.empty() ? L"BufferUpload" : debugName);
 	const bool bStagingBufferAvailable = stagingResource != nullptr && stagingResource->Buffer != VK_NULL_HANDLE;
 	const bool bStagingBytesWritten = bStagingBufferAvailable && m_memoryAllocator->WriteAllocation(*stagingResource, data.data(), data.size());
-	
+
 	if (!bStagingBytesWritten)
 	{
 		return {};
@@ -207,11 +207,11 @@ void VulkanUploadService::RecordBufferUpload(
 
 bool VulkanUploadService::ValidateTextureUploadRequest(const RenderCommandList& commandList, const VulkanGpuAllocationRecord* destination, const RhiTextureUploadDesc& textureUpload) const noexcept
 {
-	const bool bTextureUploadRejecteddestination = m_memoryAllocator == nullptr || destination == nullptr;
-	const bool bTextureUploadRejectedImage = bTextureUploadRejecteddestination || (destination->Image == VK_NULL_HANDLE);
-	const bool bUploadRejectedtextureUploadValid = bTextureUploadRejectedImage || (!textureUpload.IsValid());
-	const bool bTextureUploadRejected = bUploadRejectedtextureUploadValid || (commandList.GetBackendApi() != ERhiBackendApi::Vulkan);
-	
+	const bool bTextureUploadRejectedDestination = m_memoryAllocator == nullptr || destination == nullptr;
+	const bool bTextureUploadRejectedImage = bTextureUploadRejectedDestination || (destination->Image == VK_NULL_HANDLE);
+	const bool bUploadRejectedTextureUploadValid = bTextureUploadRejectedImage || (!textureUpload.IsValid());
+	const bool bTextureUploadRejected = bUploadRejectedTextureUploadValid || (commandList.GetBackendApi() != ERhiBackendApi::Vulkan);
+
 	if (bTextureUploadRejected)
 	{
 		return false;

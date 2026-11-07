@@ -53,7 +53,7 @@ namespace ApplicationGraphicsLaunch
 
 			const bool bIsApiSwitchStrings = Strings::EqualsIgnoreCase(token, "--renderer") || Strings::EqualsIgnoreCase(token, "--rhi");
 			const bool bIsGraphicsApiSwitch = bIsApiSwitchStrings || (Strings::EqualsIgnoreCase(token, "--graphics-api"));
-			
+
 			if (bIsGraphicsApiSwitch)
 			{
 				api = ParseSelection(Strings::ToNarrow(CommandLine::ReadToken(commandLine, offset)));

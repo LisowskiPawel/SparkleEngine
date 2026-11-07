@@ -89,9 +89,9 @@ namespace ECS
 		{
 			const SkinningState* skinning = state.m_registry.Get<SkinningState>(mesh.Entity);
 			const bool bInvalidSkinningOutputPose = skinning == nullptr || !skinning->Pose.IsValid();
-			const bool bSkinningOutputanimationOutput = bInvalidSkinningOutputPose || (skinning->Pose.Generation != state.m_animationOutput.GetTargetGeneration());
-			const bool bInvalidSkinningOutput = bSkinningOutputanimationOutput || (skinning->Pose.Slot >= output.poses.size());
-			
+			const bool bSkinningOutputAnimationOutput = bInvalidSkinningOutputPose || (skinning->Pose.Generation != state.m_animationOutput.GetTargetGeneration());
+			const bool bInvalidSkinningOutput = bSkinningOutputAnimationOutput || (skinning->Pose.Slot >= output.poses.size());
+
 			if (bInvalidSkinningOutput)
 			{
 				continue;

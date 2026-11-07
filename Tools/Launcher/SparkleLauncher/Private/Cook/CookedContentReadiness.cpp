@@ -45,12 +45,12 @@ namespace SparkleLauncher
 	{
 		std::error_code errorCode;
 
-		const bool bPublicationCompletefilesystem = !cooked.empty() && !std::filesystem::exists(cooked / ".publication-incomplete", errorCode);
-		const bool bPublicationComplete = bPublicationCompletefilesystem && (!errorCode);
-		const bool bPublicationLockPresentfilesystem = bPublicationComplete && std::filesystem::is_regular_file(cooked / ".publication-lock", errorCode);
-		const bool bPublicationLockPresent = bPublicationLockPresentfilesystem && (!errorCode);
-		const bool bRegistryPresentfilesystem = bPublicationLockPresent && std::filesystem::is_regular_file(cooked / "SceneAssetRegistry.sreg", errorCode);
-		const bool bRegistryPresent = bRegistryPresentfilesystem && (!errorCode);
+		const bool bPublicationCompleteFilesystem = !cooked.empty() && !std::filesystem::exists(cooked / ".publication-incomplete", errorCode);
+		const bool bPublicationComplete = bPublicationCompleteFilesystem && (!errorCode);
+		const bool bPublicationLockPresentFilesystem = bPublicationComplete && std::filesystem::is_regular_file(cooked / ".publication-lock", errorCode);
+		const bool bPublicationLockPresent = bPublicationLockPresentFilesystem && (!errorCode);
+		const bool bRegistryPresentFilesystem = bPublicationLockPresent && std::filesystem::is_regular_file(cooked / "SceneAssetRegistry.sreg", errorCode);
+		const bool bRegistryPresent = bRegistryPresentFilesystem && (!errorCode);
 		const bool bManifestsPresent = bRegistryPresent && DirectoryHasRegularFiles(cooked / "SceneManifests");
 		const bool bMeshesPresent = bManifestsPresent && DirectoryHasRegularFiles(cooked / "Meshes");
 		return bMeshesPresent;
@@ -72,8 +72,8 @@ namespace SparkleLauncher
 		for (const auto& artifact : requiredArtifacts)
 		{
 			const bool bArtifactPresent = std::filesystem::is_regular_file(artifact, errorCode) && !errorCode;
-			const bool bArtifactNonemptyfilesystem = bArtifactPresent && std::filesystem::file_size(artifact, errorCode) != 0;
-			const bool bArtifactNonempty = bArtifactNonemptyfilesystem && (!errorCode);
+			const bool bArtifactNonemptyFilesystem = bArtifactPresent && std::filesystem::file_size(artifact, errorCode) != 0;
+			const bool bArtifactNonempty = bArtifactNonemptyFilesystem && (!errorCode);
 
 			if (!bArtifactNonempty)
 			{

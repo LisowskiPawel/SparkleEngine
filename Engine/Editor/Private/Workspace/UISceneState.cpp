@@ -52,10 +52,10 @@ void UI::Implementation::HandleTransactionShortcuts()
 {
 	const bool bInteractionBlockedHistory = !m_sceneModel || !m_transactionHistory;
 	const bool bSceneInteractionBlockedImGui = bInteractionBlockedHistory || (ImGui::GetIO().WantTextInput);
-	const bool bInteractionBlockedlevelSession = !bSceneInteractionBlockedImGui && (m_levelSession != nullptr);
-	const bool bSceneInteractionBlockedInProgress = bInteractionBlockedlevelSession && (m_levelSession->IsLevelChangeInProgress());
+	const bool bInteractionBlockedLevelSession = !bSceneInteractionBlockedImGui && (m_levelSession != nullptr);
+	const bool bSceneInteractionBlockedInProgress = bInteractionBlockedLevelSession && (m_levelSession->IsLevelChangeInProgress());
 	const bool bSceneInteractionBlocked = bSceneInteractionBlockedImGui || bSceneInteractionBlockedInProgress;
-	
+
 	if (bSceneInteractionBlocked)
 	{
 		return;

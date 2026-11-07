@@ -42,11 +42,11 @@ public:
 			const float timeSeconds = static_cast<float>(keys[keyIndex].mTime / ticksPerSecond);
 			const aiVector3D& value = keys[keyIndex].mValue;
 			const bool bTimeFinite = std::isfinite(timeSeconds);
-			const bool bTimeOrderedtimeSeconds = !(timeSeconds < 0.0f || timeSeconds <= previousTime);
-			const bool bTimeOrdered = bTimeFinite && bTimeOrderedtimeSeconds;
-			const bool bValueFinitex = bTimeOrdered && std::isfinite(value.x);
-			const bool bValueFinitey = bValueFinitex && (std::isfinite(value.y));
-			const bool bValueFinite = bValueFinitey && (std::isfinite(value.z));
+			const bool bTimeOrderedTimeSeconds = !(timeSeconds < 0.0f || timeSeconds <= previousTime);
+			const bool bTimeOrdered = bTimeFinite && bTimeOrderedTimeSeconds;
+			const bool bValueFiniteX = bTimeOrdered && std::isfinite(value.x);
+			const bool bValueFiniteY = bValueFiniteX && (std::isfinite(value.y));
+			const bool bValueFinite = bValueFiniteY && (std::isfinite(value.z));
 
 			if (!bValueFinite)
 			{
@@ -86,14 +86,14 @@ public:
 			DirectX::XMVECTOR quaternion = DirectX::XMVectorSet(value.x, value.y, value.z, value.w);
 			const float lengthSquared = DirectX::XMVectorGetX(DirectX::XMVector4LengthSq(quaternion));
 			const bool bTimeFinite = std::isfinite(timeSeconds);
-			const bool bTimeOrderedtimeSeconds = !(timeSeconds < 0.0f || timeSeconds <= previousTime);
-			const bool bTimeOrdered = bTimeFinite && bTimeOrderedtimeSeconds;
-			const bool bValueFinitex = bTimeOrdered && std::isfinite(value.x);
-			const bool bValueFinitey = bValueFinitex && (std::isfinite(value.y));
-			const bool bValueFinitez = bValueFinitey && (std::isfinite(value.z));
-			const bool bValueFinite = bValueFinitez && (std::isfinite(value.w));
-			const bool bRotationUsableisfinite = bValueFinite && std::isfinite(lengthSquared);
-			const bool bRotationUsable = bRotationUsableisfinite && (!(lengthSquared <= 1.0e-8f));
+			const bool bTimeOrderedTimeSeconds = !(timeSeconds < 0.0f || timeSeconds <= previousTime);
+			const bool bTimeOrdered = bTimeFinite && bTimeOrderedTimeSeconds;
+			const bool bValueFiniteX = bTimeOrdered && std::isfinite(value.x);
+			const bool bValueFiniteY = bValueFiniteX && (std::isfinite(value.y));
+			const bool bValueFiniteZ = bValueFiniteY && (std::isfinite(value.z));
+			const bool bValueFinite = bValueFiniteZ && (std::isfinite(value.w));
+			const bool bRotationUsableIsfinite = bValueFinite && std::isfinite(lengthSquared);
+			const bool bRotationUsable = bRotationUsableIsfinite && (!(lengthSquared <= 1.0e-8f));
 
 			if (!bRotationUsable)
 			{
@@ -176,8 +176,8 @@ void FbxAnimationImporter::ImportAnimations(const aiScene& scene, SourceImportOu
 	{
 		const aiAnimation* sourceAnimation = scene.mAnimations[animationIndex];
 		const bool bAnimationPresent = sourceAnimation != nullptr;
-		const bool bDurationFinitemDuration = bAnimationPresent && std::isfinite(sourceAnimation->mDuration);
-		const bool bDurationFinite = bDurationFinitemDuration && (!(sourceAnimation->mDuration < 0.0));
+		const bool bDurationFiniteMDuration = bAnimationPresent && std::isfinite(sourceAnimation->mDuration);
+		const bool bDurationFinite = bDurationFiniteMDuration && (!(sourceAnimation->mDuration < 0.0));
 		const bool bTickRateValidPerSecond = bDurationFinite && std::isfinite(sourceAnimation->mTicksPerSecond);
 		const bool bTickRateValid = bTickRateValidPerSecond && (!(sourceAnimation->mTicksPerSecond <= 0.0));
 		const bool bChannelsPresentNumChannels = bTickRateValid && sourceAnimation->mNumChannels != 0;

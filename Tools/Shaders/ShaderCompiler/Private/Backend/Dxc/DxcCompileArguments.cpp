@@ -126,9 +126,10 @@ static void AppendSpirVOptions(const ShaderCompileRequest& request, std::vector<
 		{
 			outArgs.push_back(L"-fspv-extension=SPV_KHR_ray_query");
 		}
+
 		const bool bRequiresRayTracingExtension = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::AccelerationStructure)
-				    || HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::RayTracingPipeline);
-		
+		    || HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::RayTracingPipeline);
+
 		if (bRequiresRayTracingExtension)
 		{
 			outArgs.push_back(L"-fspv-extension=SPV_KHR_ray_tracing");

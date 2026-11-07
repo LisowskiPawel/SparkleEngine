@@ -18,13 +18,13 @@ void PipelineMaterialization::ValidateShaderCapabilities(RenderHardwareInterface
 	}
 	const RhiCapabilities& capabilities = renderHardwareInterface.GetCapabilities();
 	const bool bAccelerationStructuresUnsupported = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesAccelerationStructure) && !capabilities.RayTracing.bSupportsAccelerationStructure;
-	
+
 	if (bAccelerationStructuresUnsupported)
 	{
 		throw Diagnostics::Error(std::format("Shader '{}' requires ray tracing, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
 	}
 	const bool bInlineRayQueriesUnsupported = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesInlineRayQuery) && !capabilities.RayTracing.bSupportsInlineRayQuery;
-	
+
 	if (bInlineRayQueriesUnsupported)
 	{
 		throw Diagnostics::Error(std::format("Shader '{}' requires inline ray query, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
@@ -32,7 +32,7 @@ void PipelineMaterialization::ValidateShaderCapabilities(RenderHardwareInterface
 	const bool bIndexingUnsupportedEntry = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesDescriptorIndexing);
 	const bool bIndexingUnsupportedIndexing = !capabilities.DescriptorIndexing.bNonUniformSampledImages || !capabilities.DescriptorIndexing.bSupportsPartiallyBoundDescriptorArrays;
 	const bool bDescriptorIndexingUnsupported = bIndexingUnsupportedEntry && bIndexingUnsupportedIndexing;
-	
+
 	if (bDescriptorIndexingUnsupported)
 	{
 		throw Diagnostics::Error(std::format("Shader '{}' requires descriptor indexing, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
@@ -44,15 +44,15 @@ void PipelineMaterialization::ValidateShaderCapabilities(RenderHardwareInterface
 }
 
 void PipelineMaterialization::ValidateResolvedShader(
-	    RenderHardwareInterface& renderHardwareInterface,
-	    const ShaderRegistrationDesc& registration,
-	    const ResolvedShader& shader,
-	    const PassParameterLayout& parameterLayout)
-	{
+    RenderHardwareInterface& renderHardwareInterface,
+    const ShaderRegistrationDesc& registration,
+    const ResolvedShader& shader,
+    const PassParameterLayout& parameterLayout)
+{
 	PipelineMaterialization::ValidateShaderCapabilities(renderHardwareInterface, registration.ShaderName, shader);
 	const bool bShaderContractMismatchFeatures = shader.Entry->Stage != registration.Stage || shader.Entry->Features != registration.Features;
 	const bool bShaderContractMismatch = bShaderContractMismatchFeatures || (shader.Entry->ParameterSignature != BuildShaderParameterSignature(parameterLayout));
-	
+
 	if (bShaderContractMismatch)
 	{
 		throw Diagnostics::Error(std::format("Shader '{}' map metadata does not match its registered contract.", registration.ShaderName));

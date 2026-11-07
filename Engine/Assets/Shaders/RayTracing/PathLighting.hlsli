@@ -41,7 +41,7 @@ namespace PathLighting
 			result.HitPositionWorld = outHitSurface.bValid ? outHitSurface.PositionWorld : 0.0f.xxx;
 
 			result.IncidentRadiance = outHitSurface.bValid ? ShadeRayTracingHitIncidentRadiance(outHitSurface, directionWorld, pathSampleIndex, bounceIndex, randomFrameIndex, bTraceSecondaryShadows)
-			                                              : 0.0f.xxx;
+			                                               : 0.0f.xxx;
 
 			return result;
 		}
@@ -159,7 +159,7 @@ namespace PathLighting
 			AdvanceThroughput(path, sample, bounceIndex, bEvaluatePrimaryDiffuse, bEvaluatePrimarySpecular, diffuseThroughput, specularThroughput);
 
 			const bool bRouletteTerminated = !SurvivesRoulette(path, randomSamples.Roulette, bounceIndex, bEvaluatePrimaryDiffuse, bEvaluatePrimarySpecular, diffuseThroughput, specularThroughput);
-			
+
 			if (bRouletteTerminated)
 			{
 				break;

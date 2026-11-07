@@ -28,15 +28,15 @@ void RenderGpuRayTracing::RefreshPayloads(const PreparedRenderScene& preparedSce
 	}
 	topologyHash = Hash::FinalizeFnv1a64(topologyHash);
 	const bool bTopologyChanged = preparedScene.structuralRevision != m_structuralRevision || topologyHash != m_workTopologyHash;
-	const bool bPayloadChangedmaterialRevision = bTopologyChanged || preparedScene.materialRevision != m_materialRevision;
-	const bool bPayloadChanged = bPayloadChangedmaterialRevision || (textureGeneration != m_textureGeneration);
+	const bool bPayloadChangedMaterialRevision = bTopologyChanged || preparedScene.materialRevision != m_materialRevision;
+	const bool bPayloadChanged = bPayloadChangedMaterialRevision || (textureGeneration != m_textureGeneration);
 	if (bPayloadChanged)
 	{
 		BuildRenderGpuRayTracingPayloads(preparedScene, m_meshes, m_payloads);
 		const bool bRebuildRequiredInstanceCount = bTopologyChanged || m_payloads.InstanceCount == 0u;
 		const bool bTopologyRebuildRequiredVertices = bRebuildRequiredInstanceCount || (!m_topology.Vertices.GetBinding());
 		const bool bTopologyRebuildRequired = bTopologyRebuildRequiredVertices || (!m_topology.MorphTargetDeltas.GetBinding());
-		
+
 		if (bTopologyRebuildRequired)
 		{
 			UpdateTopology();

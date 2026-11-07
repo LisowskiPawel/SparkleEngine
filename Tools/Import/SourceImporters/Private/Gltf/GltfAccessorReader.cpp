@@ -47,7 +47,7 @@ DirectX::XMFLOAT2 GltfAccessorReader::ReadFloat2(const cgltf_accessor* accessor,
 	DirectX::XMFLOAT2 element{};
 	const bool bAccessorElementAvailable = accessor != nullptr && index < accessor->count;
 	const bool bElementDecoded = bAccessorElementAvailable && cgltf_accessor_read_float(accessor, index, reinterpret_cast<cgltf_float*>(&element), 2);
-	
+
 	if (!bElementDecoded)
 	{
 		throw Diagnostics::Error(std::format("Cannot decode glTF float2 accessor element {}.", index));
@@ -60,7 +60,7 @@ DirectX::XMFLOAT3 GltfAccessorReader::ReadFloat3(const cgltf_accessor* accessor,
 	DirectX::XMFLOAT3 element{};
 	const bool bAccessorElementAvailable = accessor != nullptr && index < accessor->count;
 	const bool bElementDecoded = bAccessorElementAvailable && cgltf_accessor_read_float(accessor, index, reinterpret_cast<cgltf_float*>(&element), 3);
-	
+
 	if (!bElementDecoded)
 	{
 		throw Diagnostics::Error(std::format("Cannot decode glTF float3 accessor element {}.", index));
@@ -73,7 +73,7 @@ DirectX::XMFLOAT4 GltfAccessorReader::ReadFloat4(const cgltf_accessor* accessor,
 	DirectX::XMFLOAT4 element{};
 	const bool bAccessorElementAvailable = accessor != nullptr && index < accessor->count;
 	const bool bElementDecoded = bAccessorElementAvailable && cgltf_accessor_read_float(accessor, index, reinterpret_cast<cgltf_float*>(&element), 4);
-	
+
 	if (!bElementDecoded)
 	{
 		throw Diagnostics::Error(std::format("Cannot decode glTF float4 accessor element {}.", index));
@@ -86,7 +86,7 @@ DirectX::XMMATRIX GltfAccessorReader::ReadFloat4x4(const cgltf_accessor* accesso
 	DirectX::XMFLOAT4X4 element{};
 	const bool bAccessorElementAvailable = accessor != nullptr && index < accessor->count;
 	const bool bElementDecoded = bAccessorElementAvailable && cgltf_accessor_read_float(accessor, index, reinterpret_cast<cgltf_float*>(&element), 16);
-	
+
 	if (!bElementDecoded)
 	{
 		throw Diagnostics::Error(std::format("Cannot decode glTF float4x4 accessor element {}.", index));

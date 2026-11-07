@@ -16,16 +16,16 @@ static bool CollectFilteredCVars(ConsoleVariableRegistry& registry, const CVarCo
 	}
 	for (ConsoleVariableBase* variable : registry.GetVariables())
 	{
-		const bool bCvarMatchesFiltervariable = variable != nullptr;
-		const bool bCvarMatchesFilterFilter = bCvarMatchesFiltervariable && (request.Filter.empty());
-		const bool bCvarMatchesFilterGuardFilter = bCvarMatchesFiltervariable && !bCvarMatchesFilterFilter;
-		const bool bCvarMatchesFilterFilter2 = bCvarMatchesFilterGuardFilter && (Strings::ContainsIgnoreCase(variable->GetName(), request.Filter));
-		const bool bCvarMatchesFilterFilter3 = bCvarMatchesFilterFilter || bCvarMatchesFilterFilter2;
-		const bool bCvarMatchesFilterGuardFilter2 = bCvarMatchesFiltervariable && !bCvarMatchesFilterFilter3;
-		const bool bCvarMatchesFilterFilter4 = bCvarMatchesFilterGuardFilter2 && (Strings::ContainsIgnoreCase(variable->GetDescription(), request.Filter));
-		const bool bCvarMatchesFilterFilter5 = bCvarMatchesFilterFilter3 || bCvarMatchesFilterFilter4;
-		const bool bCvarMatchesFilter = bCvarMatchesFiltervariable && bCvarMatchesFilterFilter5;
-		
+		const bool bCvarMatchesFilterVariable = variable != nullptr;
+		const bool bCvarMatchesFilterFilter = bCvarMatchesFilterVariable && (request.Filter.empty());
+		const bool bCvarMatchesFilterGuardFilter = bCvarMatchesFilterVariable && !bCvarMatchesFilterFilter;
+		const bool bNameMatches = bCvarMatchesFilterGuardFilter && (Strings::ContainsIgnoreCase(variable->GetName(), request.Filter));
+		const bool bNameOrNoFilter = bCvarMatchesFilterFilter || bNameMatches;
+		const bool bCheckDescription = bCvarMatchesFilterVariable && !bNameOrNoFilter;
+		const bool bDescriptionMatches = bCheckDescription && (Strings::ContainsIgnoreCase(variable->GetDescription(), request.Filter));
+		const bool bFilterMatched = bNameOrNoFilter || bDescriptionMatches;
+		const bool bCvarMatchesFilter = bCvarMatchesFilterVariable && bFilterMatched;
+
 		if (bCvarMatchesFilter)
 		{
 			variables.push_back(variable);

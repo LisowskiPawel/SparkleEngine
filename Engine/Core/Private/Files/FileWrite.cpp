@@ -103,7 +103,7 @@ namespace Files
 		CleanupTemporaryFile(temporaryPath);
 		const bool bTemporaryFileWritten = TryWriteAllBytes(temporaryPath, bytes, outErrorMessage);
 		const bool bFilePublished = bTemporaryFileWritten && TryFinalizeTemporaryFile(temporaryPath, path, outErrorMessage);
-		
+
 		if (!bFilePublished)
 		{
 			CleanupTemporaryFile(temporaryPath);

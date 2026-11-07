@@ -60,8 +60,8 @@ namespace Assets
 
 		const bool bMagicValid = animationAsset.header.fileHeader.HasMagic(kCookedAnimationAssetMagic);
 
-		const bool bStridesValidheader = bMagicValid && animationAsset.header.channelStride == sizeof(CookedAnimationChannelRecord);
-		const bool bStridesValid = bStridesValidheader && (animationAsset.header.keyframeStride == sizeof(CookedAnimationKeyframeRecord));
+		const bool bStridesValidHeader = bMagicValid && animationAsset.header.channelStride == sizeof(CookedAnimationChannelRecord);
+		const bool bStridesValid = bStridesValidHeader && (animationAsset.header.keyframeStride == sizeof(CookedAnimationKeyframeRecord));
 
 		const bool bNameTerminated = bStridesValid && Strings::IsNullTerminated(std::span(animationAsset.header.name));
 
@@ -83,8 +83,8 @@ namespace Assets
 			const bool bTargetKnown = IsKnownTargetPath(channel.targetPath);
 			const bool bInterpolationKnown = bTargetKnown && IsKnownInterpolation(channel.interpolation);
 			const bool bTargetNodeValid = bInterpolationKnown && channel.targetNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
-			const bool bKeyframeOffsetValidkeyframeCount = bTargetNodeValid && channel.keyframeCount != 0u;
-			const bool bKeyframeOffsetValid = bKeyframeOffsetValidkeyframeCount && (channel.firstKeyframe <= animationAsset.keyframes.size());
+			const bool bKeyframeOffsetValidKeyframeCount = bTargetNodeValid && channel.keyframeCount != 0u;
+			const bool bKeyframeOffsetValid = bKeyframeOffsetValidKeyframeCount && (channel.firstKeyframe <= animationAsset.keyframes.size());
 			const bool bKeyframeCountValid = bKeyframeOffsetValid && channel.keyframeCount <= animationAsset.keyframes.size() - channel.firstKeyframe;
 
 			if (!bKeyframeCountValid)
@@ -100,21 +100,21 @@ namespace Assets
 				const CookedAnimationKeyframeRecord& keyframe = animationAsset.keyframes[channel.firstKeyframe + keyframeOffset];
 				const bool bCubicSpline = channel.interpolation == CookedAnimationInterpolation::CubicSpline;
 				const bool bTimeFinite = std::isfinite(keyframe.timeSeconds);
-				const bool bTimeOrderedtimeSeconds = keyframe.timeSeconds < 0.0f || keyframe.timeSeconds <= previousTime;
-				const bool bTimeOrderedheader = bTimeOrderedtimeSeconds || (keyframe.timeSeconds > animationAsset.header.durationSeconds);
-				const bool bTimeOrderedheader2 = !bTimeOrderedheader;
-				const bool bTimeOrdered = bTimeFinite && bTimeOrderedheader2;
+				const bool bTimeOrderedTimeSeconds = keyframe.timeSeconds < 0.0f || keyframe.timeSeconds <= previousTime;
+				const bool bTimeOrderedHeader = bTimeOrderedTimeSeconds || (keyframe.timeSeconds > animationAsset.header.durationSeconds);
+				const bool bTimeInRange = !bTimeOrderedHeader;
+				const bool bTimeOrdered = bTimeFinite && bTimeInRange;
 				const bool bValueFinite = bTimeOrdered && IsFinite(keyframe.value);
-				const bool bInTangentValidcubicSpline = bValueFinite && (!bCubicSpline);
-				const bool bInTangentValidGuardinTangent = bValueFinite && !bInTangentValidcubicSpline;
-				const bool bInTangentValidinTangent = bInTangentValidGuardinTangent && (IsFinite(keyframe.inTangent));
-				const bool bInTangentValidinTangent2 = bInTangentValidcubicSpline || bInTangentValidinTangent;
-				const bool bInTangentValid = bValueFinite && bInTangentValidinTangent2;
-				const bool bOutTangentValidcubicSpline = bInTangentValid && (!bCubicSpline);
-				const bool bOutTangentValidGuardoutTangent = bInTangentValid && !bOutTangentValidcubicSpline;
-				const bool bOutTangentValidoutTangent = bOutTangentValidGuardoutTangent && (IsFinite(keyframe.outTangent));
-				const bool bOutTangentValidoutTangent2 = bOutTangentValidcubicSpline || bOutTangentValidoutTangent;
-				const bool bOutTangentValid = bInTangentValid && bOutTangentValidoutTangent2;
+				const bool bInTangentValidCubicSpline = bValueFinite && (!bCubicSpline);
+				const bool bInTangentValidGuardinTangent = bValueFinite && !bInTangentValidCubicSpline;
+				const bool bInTangentValidInTangent = bInTangentValidGuardinTangent && (IsFinite(keyframe.inTangent));
+				const bool bInTangentAccepted = bInTangentValidCubicSpline || bInTangentValidInTangent;
+				const bool bInTangentValid = bValueFinite && bInTangentAccepted;
+				const bool bOutTangentValidCubicSpline = bInTangentValid && (!bCubicSpline);
+				const bool bOutTangentValidGuardoutTangent = bInTangentValid && !bOutTangentValidCubicSpline;
+				const bool bOutTangentValidOutTangent = bOutTangentValidGuardoutTangent && (IsFinite(keyframe.outTangent));
+				const bool bOutTangentAccepted = bOutTangentValidCubicSpline || bOutTangentValidOutTangent;
+				const bool bOutTangentValid = bInTangentValid && bOutTangentAccepted;
 
 				if (!bOutTangentValid)
 				{
@@ -131,10 +131,10 @@ namespace Assets
 					const bool bRotationFinite = std::isfinite(lengthSquared);
 					const bool bRotationNormalized = bRotationFinite && !(std::abs(lengthSquared - 1.0f) > 1.0e-3f);
 
-					const bool bRotationContinuousRotation = bRotationNormalized && (bHasPreviousRotation);
-					const bool bRotationContinuous0e = bRotationContinuousRotation && (DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(&previousRotation), rotation)) < -1.0e-5f);
-					const bool bRotationContinuous0e2 = bRotationNormalized && !bRotationContinuous0e;
-					const bool bRotationContinuous = bRotationNormalized && bRotationContinuous0e2;
+					const bool bHasPriorRotation = bRotationNormalized && (bHasPreviousRotation);
+					const bool bOppositeHemisphere = bHasPriorRotation && (DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(&previousRotation), rotation)) < -1.0e-5f);
+					const bool bSameHemisphere = bRotationNormalized && !bOppositeHemisphere;
+					const bool bRotationContinuous = bRotationNormalized && bSameHemisphere;
 
 					if (!bRotationContinuous)
 					{

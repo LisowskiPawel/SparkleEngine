@@ -196,10 +196,10 @@ void GpuMeshCache::RemoveTerminalRequests() noexcept
 	{
 		const AssetResidencyState state = m_residency.GetState(request->second.Generation);
 
-		const bool bTerminalsecond = !request->second.Execution.IsValid() && request->second.Prepared == nullptr;
-		const bool bTerminalsecond2 = bTerminalsecond && (request->second.Uploaded == nullptr);
-		const bool bTerminalstate = state == AssetResidencyState::Resident || state == AssetResidencyState::Retired;
-		const bool bTerminal = bTerminalsecond2 && bTerminalstate;
+		const bool bTerminalSecond = !request->second.Execution.IsValid() && request->second.Prepared == nullptr;
+		const bool bUploadMissing = bTerminalSecond && (request->second.Uploaded == nullptr);
+		const bool bTerminalState = state == AssetResidencyState::Resident || state == AssetResidencyState::Retired;
+		const bool bTerminal = bUploadMissing && bTerminalState;
 
 		if (bTerminal)
 		{

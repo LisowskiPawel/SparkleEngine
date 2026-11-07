@@ -136,7 +136,11 @@ static void DrawShowControlGroup(
 		bAnyEnabled |= bEnabled;
 		bAllEnabled &= bEnabled;
 	}
-	const EditorWidgets::MenuCheckState groupState = bAllEnabled ? EditorWidgets::MenuCheckState::Checked : bAnyEnabled ? EditorWidgets::MenuCheckState::Mixed : EditorWidgets::MenuCheckState::Unchecked;
+
+	const EditorWidgets::MenuCheckState groupState = bAllEnabled ? EditorWidgets::MenuCheckState::Checked
+	    : bAnyEnabled                                            ? EditorWidgets::MenuCheckState::Mixed
+	                                                             : EditorWidgets::MenuCheckState::Unchecked;
+
 	if (EditorWidgets::DrawMenuItem("All", EditorIcons::EditorIcon::None, groupState, ImGuiSelectableFlags_NoAutoClosePopups))
 	{
 		SetShowControlIntent(executor, leaves, !bAnyEnabled, error);
@@ -174,8 +178,8 @@ static void DrawShowMenuContents(const CVarControlExecutor* executor, bool bDisa
 {
 	std::array<bool, showControls.size()> intent{};
 	std::string queryError;
-	const bool bAvailableexecutor = executor != nullptr && *executor;
-	const bool bAvailable = bAvailableexecutor && (QueryShowControlIntent(*executor, intent, queryError));
+	const bool bAvailableExecutor = executor != nullptr && *executor;
+	const bool bAvailable = bAvailableExecutor && (QueryShowControlIntent(*executor, intent, queryError));
 	if (!bAvailable)
 	{
 		ImGui::TextWrapped("Show controls unavailable: %s", queryError.empty() ? "Host control executor is missing." : queryError.c_str());
@@ -184,7 +188,7 @@ static void DrawShowMenuContents(const CVarControlExecutor* executor, bool bDisa
 	{
 		ImGui::BeginDisabled(bDisableInteraction);
 		const bool bUseDefaultsSelected = EditorWidgets::DrawMenuItem("Use Defaults", EditorIcons::EditorIcon::None, EditorWidgets::MenuCheckState::Hidden, ImGuiSelectableFlags_NoAutoClosePopups);
-		
+
 		if (bUseDefaultsSelected)
 		{
 			SetShowControlIntent(*executor, showControls, true, error);

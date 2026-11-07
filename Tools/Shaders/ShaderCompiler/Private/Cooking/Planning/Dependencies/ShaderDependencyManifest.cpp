@@ -61,8 +61,8 @@ ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::p
 			ShaderDependencyRecord record;
 			lineInput >> std::hex >> record.ShaderType >> std::quoted(record.ShaderTypeName) >> std::quoted(record.VirtualSourcePath);
 			lineInput >> std::ws;
-			const bool bRecordParsedeof = static_cast<bool>(lineInput) && lineInput.eof();
-			const bool bRecordParsed = bRecordParsedeof && (record.ShaderType != 0);
+			const bool bRecordParsedEof = static_cast<bool>(lineInput) && lineInput.eof();
+			const bool bRecordParsed = bRecordParsedEof && (record.ShaderType != 0);
 			const bool bRecordInserted = bRecordParsed && recordIndices.emplace(record.ShaderType, manifest.m_records.size()).second;
 
 			if (!bRecordInserted)

@@ -37,19 +37,19 @@ bool EvaluateStreamlineRayReconstructionFrame(
     const RayReconstructionEvaluationDesc& evaluation)
 {
 	const bool bInvalidReconstructionInputs = !evaluation.NativeCommandList
-		    || !AreStreamlineTextureViewsValid(
-		        evaluation.BackendApi,
-		        evaluation.NativeNoisyInputColorView,
-		        evaluation.NativeOutputColorView,
-		        evaluation.NativeDepthView,
-		        evaluation.NativeMotionVectorsView,
-		        evaluation.NativeNormalsView,
-		        evaluation.NativeRoughnessView,
-		        evaluation.NativeDiffuseAlbedoView,
-		        evaluation.NativeSpecularAlbedoView,
-		        evaluation.NativeSpecularHitDistanceView,
-		        evaluation.NativeExposureView);
-	
+	    || !AreStreamlineTextureViewsValid(
+	        evaluation.BackendApi,
+	        evaluation.NativeNoisyInputColorView,
+	        evaluation.NativeOutputColorView,
+	        evaluation.NativeDepthView,
+	        evaluation.NativeMotionVectorsView,
+	        evaluation.NativeNormalsView,
+	        evaluation.NativeRoughnessView,
+	        evaluation.NativeDiffuseAlbedoView,
+	        evaluation.NativeSpecularAlbedoView,
+	        evaluation.NativeSpecularHitDistanceView,
+	        evaluation.NativeExposureView);
+
 	if (bInvalidReconstructionInputs)
 	{
 		return false;

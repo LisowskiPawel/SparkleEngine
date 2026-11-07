@@ -24,7 +24,7 @@ namespace SparkleLauncher
 			const bool bToolDirectoryMatches = path.filename().string().starts_with(prefix);
 			const bool bCaptureLibraryInstalled = bToolDirectoryMatches && IsInstalledToolFile(path / library);
 			const bool bCaptureViewerInstalled = bCaptureLibraryInstalled && IsInstalledToolFile(path / viewer);
-			
+
 			if (!bCaptureViewerInstalled)
 			{
 				return path;

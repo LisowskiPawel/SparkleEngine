@@ -64,11 +64,11 @@ namespace SparkleLauncher
 
 	std::string ReadGpuCrashState(const std::filesystem::path& manifestPath, std::string_view sessionId, std::uint32_t childPid, std::string* verifiedSnapshot)
 	{
-		const bool bInvalidIncidentIdentityfilename = !manifestPath.is_absolute() || manifestPath.filename() != "incident.json";
-		const bool bInvalidIncidentIdentitynative = bInvalidIncidentIdentityfilename || (manifestPath.native().starts_with(L"\\\\"));
-		const bool bIncidentIdentityIdentifiers = bInvalidIncidentIdentitynative || (!Identifiers::IsUuidV4String(sessionId));
+		const bool bInvalidIncidentIdentityFilename = !manifestPath.is_absolute() || manifestPath.filename() != "incident.json";
+		const bool bInvalidIncidentIdentityNative = bInvalidIncidentIdentityFilename || (manifestPath.native().starts_with(L"\\\\"));
+		const bool bIncidentIdentityIdentifiers = bInvalidIncidentIdentityNative || (!Identifiers::IsUuidV4String(sessionId));
 		const bool bInvalidIncidentIdentity = bIncidentIdentityIdentifiers || (childPid == 0);
-		
+
 		if (bInvalidIncidentIdentity)
 		{
 			return {};

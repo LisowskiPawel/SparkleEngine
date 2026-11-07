@@ -77,10 +77,10 @@ TextureGroup TextureCookPolicyCodec::ParseTextureGroup(std::string_view value)
 		return TextureGroup::Default;
 	}
 	const bool bIsColorGroupStrings = Strings::EqualsIgnoreCase(value, "diffuse") || Strings::EqualsIgnoreCase(value, "albedo");
-	const bool bIsColorGroupStrings2 = bIsColorGroupStrings || (Strings::EqualsIgnoreCase(value, "base-color"));
-	const bool bIsColorGroupStrings3 = bIsColorGroupStrings2 || (Strings::EqualsIgnoreCase(value, "basecolor"));
-	const bool bIsBaseColorGroup = bIsColorGroupStrings3 || (Strings::EqualsIgnoreCase(value, "color"));
-	
+	const bool bBaseColorAlias = bIsColorGroupStrings || (Strings::EqualsIgnoreCase(value, "base-color"));
+	const bool bCompactColorAlias = bBaseColorAlias || (Strings::EqualsIgnoreCase(value, "basecolor"));
+	const bool bIsBaseColorGroup = bCompactColorAlias || (Strings::EqualsIgnoreCase(value, "color"));
+
 	if (bIsBaseColorGroup)
 	{
 		return TextureGroup::Diffuse;
@@ -94,10 +94,10 @@ TextureGroup TextureCookPolicyCodec::ParseTextureGroup(std::string_view value)
 		return TextureGroup::Metallic;
 	}
 	const bool bIsOcclusionGroupStrings = Strings::EqualsIgnoreCase(value, "ambient-occlusion") || Strings::EqualsIgnoreCase(value, "ambientocclusion");
-	const bool bIsOcclusionGroupStrings2 = bIsOcclusionGroupStrings || (Strings::EqualsIgnoreCase(value, "occlusion"));
-	const bool bIsOcclusionGroupStrings3 = bIsOcclusionGroupStrings2 || (Strings::EqualsIgnoreCase(value, "ao"));
-	const bool bIsOcclusionGroup = bIsOcclusionGroupStrings3 || (Strings::EqualsIgnoreCase(value, "masks"));
-	
+	const bool bOcclusionAlias = bIsOcclusionGroupStrings || (Strings::EqualsIgnoreCase(value, "occlusion"));
+	const bool bAmbientOcclusionAlias = bOcclusionAlias || (Strings::EqualsIgnoreCase(value, "ao"));
+	const bool bIsOcclusionGroup = bAmbientOcclusionAlias || (Strings::EqualsIgnoreCase(value, "masks"));
+
 	if (bIsOcclusionGroup)
 	{
 		return TextureGroup::AmbientOcclusion;
@@ -142,7 +142,7 @@ TextureChannelMask TextureCookPolicyCodec::ParseChannelMask(std::string_view val
 {
 	const bool bIsAllChannelsStrings = Strings::EqualsIgnoreCase(value, "rgba") || Strings::EqualsIgnoreCase(value, "all");
 	const bool bIsAllChannels = bIsAllChannelsStrings || (Strings::EqualsIgnoreCase(value, "none"));
-	
+
 	if (bIsAllChannels)
 	{
 		return TextureChannelMask::Rgba;
