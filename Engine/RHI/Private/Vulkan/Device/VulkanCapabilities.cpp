@@ -27,13 +27,12 @@ static RhiFormatSupport QueryFormatSupport(VulkanRhi& rhi, PixelFormat format) n
 	vkGetPhysicalDeviceFormatProperties(rhi.GetPhysicalDevice(), nativeFormat, &properties);
 	const VkFormatFeatureFlags optimal = properties.optimalTilingFeatures;
 
-	support.bSupportsTexture = (optimal & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0 || (optimal & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT) != 0
-	    || (optimal & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0;
-
 	support.bSupportsShaderResource = (optimal & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) != 0;
 	support.bSupportsUnorderedAccess = (optimal & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT) != 0;
 	support.bSupportsRenderTarget = (optimal & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT) != 0;
 	support.bSupportsDepthStencil = (optimal & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0;
+	const bool bAttachmentSupported = support.bSupportsRenderTarget || support.bSupportsDepthStencil;
+	support.bSupportsTexture = support.bSupportsShaderResource || bAttachmentSupported;
 	return support;
 }
 

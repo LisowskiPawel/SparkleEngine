@@ -14,7 +14,8 @@ public static class CodeStyleIfConditions
     private static readonly Regex IfHead = new Regex(@"\bif\s*(?:constexpr\s*)?\(", RegexOptions.Compiled);
     private static readonly Regex Identifier = new Regex(@"\b(?<name>[A-Za-z_]\w*)\b", RegexOptions.Compiled);
     private static readonly Regex Whitespace = new Regex(@"\s+", RegexOptions.Compiled);
-    private static readonly Regex BooleanName = new Regex(@"\bbool\s+(?<name>[A-Za-z_]\w*)\b", RegexOptions.Compiled);
+    private static readonly Regex BooleanName = new Regex(@"\b(?:bool(?:\s+const)?\s*&?\s+|(?:std::)?atomic(?:\s*<\s*bool\s*>|_bool)\s+)(?<name>[A-Za-z_]\w*)\b", RegexOptions.Compiled);
+    private static readonly Regex BooleanPrefix = new Regex(@"^(?:(?:m|s|g|k)_)?b[A-Z][A-Za-z0-9_]*$", RegexOptions.Compiled);
     private static readonly Regex Assignment = new Regex(@"\b(?<name>[A-Za-z_]\w*)\s*=(?!=)", RegexOptions.Compiled);
 
     private static string Mask(string text)
@@ -119,7 +120,15 @@ public static class CodeStyleIfConditions
         HashSet<int> violations = new HashSet<int>();
         foreach (Match assignment in Assignment.Matches(masked))
         {
-            bool booleanName = names.Contains(assignment.Groups["name"].Value);
+            string declarationPrefix = masked.Substring(0, assignment.Index);
+            Match reference = Regex.Match(declarationPrefix, @"\b(?<constant>const\s+)?bool\s*(?<trailingConst>const\s*)?&\s*$");
+            bool bindsMutableReference = reference.Success && !reference.Groups["constant"].Success && !reference.Groups["trailingConst"].Success;
+            if (bindsMutableReference)
+            {
+                continue;
+            }
+            string name = assignment.Groups["name"].Value;
+            bool booleanName = names.Contains(name) || BooleanPrefix.IsMatch(name);
             if (!booleanName)
             {
                 continue;
@@ -129,7 +138,8 @@ public static class CodeStyleIfConditions
             {
                 --previous;
             }
-            if (previous >= 0 && (masked[previous] == '.' || masked[previous] == '>' || masked[previous] == ':'))
+            bool qualified = previous >= 0 && (masked[previous] == '.' || masked[previous] == '>' || masked[previous] == ':');
+            if (qualified && !BooleanPrefix.IsMatch(name))
             {
                 continue;
             }
@@ -162,8 +172,7 @@ public static class CodeStyleIfConditions
         text = text.Replace("\r\n", "\n").Replace('\r', '\n');
         string masked = Mask(text);
         List<int> violations = new List<int>();
-        Regex declarations = new Regex(@"\b(?:bool\s+|(?:std::)?atomic\s*<\s*bool\s*>\s+)(?<name>[A-Za-z_]\w*)\b");
-        foreach (Match declaration in declarations.Matches(masked))
+        foreach (Match declaration in BooleanName.Matches(masked))
         {
             string name = declaration.Groups["name"].Value;
             int next = declaration.Index + declaration.Length;
@@ -172,11 +181,11 @@ public static class CodeStyleIfConditions
                 ++next;
             }
             bool qualifiedFunction = next + 1 < masked.Length && masked[next] == ':' && masked[next + 1] == ':';
-            if (name == "operator" || qualifiedFunction || (next < masked.Length && (masked[next] == '(' || masked[next] == '<')))
+            if (name == "operator" || name == "const" || name == "volatile" || qualifiedFunction || (next < masked.Length && (masked[next] == '(' || masked[next] == '<')))
             {
                 continue;
             }
-            if (Regex.IsMatch(name, @"^(?:(?:m|s|g|k)_)?b[A-Z][A-Za-z0-9_]*$"))
+            if (BooleanPrefix.IsMatch(name))
             {
                 continue;
             }

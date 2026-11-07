@@ -93,7 +93,9 @@ void FrameGraph::PrepareTextureHistory(const FrameGraphPlan& plan, TextureHistor
 			}
 
 			history.bUsedThisFrame = true;
-			history.bWrittenThisFrame = history.bWrittenThisFrame || (bUsesCurrent && WritesToUsage(declaration.usage));
+			const bool bCheckCurrentWrite = !history.bWrittenThisFrame && bUsesCurrent;
+			const bool bCurrentWritten = bCheckCurrentWrite && WritesToUsage(declaration.usage);
+			history.bWrittenThisFrame = history.bWrittenThisFrame || bCurrentWritten;
 			bRequiresRenderTarget = bRequiresRenderTarget || declaration.usage == ResourceUsage::RenderTarget;
 			bRequiresDepthStencil = bRequiresDepthStencil || declaration.usage == ResourceUsage::DepthWrite;
 			bRequiresUnorderedAccess = bRequiresUnorderedAccess || declaration.usage == ResourceUsage::UnorderedAccess;

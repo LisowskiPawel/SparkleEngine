@@ -47,7 +47,7 @@ namespace Files
 
 			m_file = CreateFileW(
 			    (root / ".publication-lock").c_str(),
-			    GENERIC_READ | (writing ? GENERIC_WRITE : 0),
+			    GENERIC_READ | (bWriting ? GENERIC_WRITE : 0),
 			    FILE_SHARE_READ | FILE_SHARE_WRITE,
 			    nullptr,
 			    bWriting ? OPEN_ALWAYS : OPEN_EXISTING,
@@ -57,7 +57,7 @@ namespace Files
 			if (m_file != INVALID_HANDLE_VALUE)
 			{
 				OVERLAPPED offset{};
-				if (LockFileEx(m_file, LOCKFILE_FAIL_IMMEDIATELY | (writing ? LOCKFILE_EXCLUSIVE_LOCK : 0), 0, 1, 0, &offset))
+				if (LockFileEx(m_file, LOCKFILE_FAIL_IMMEDIATELY | (bWriting ? LOCKFILE_EXCLUSIVE_LOCK : 0), 0, 1, 0, &offset))
 				{
 					return;
 				}

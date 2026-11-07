@@ -251,8 +251,10 @@ namespace SparkleLauncher
 
 		plan.PlannedEffects.push_back("Use graphics API: " + plan.Request.GraphicsApi + ".");
 
-		plan.bCanRun = plan.Readiness.bExecutableReady && plan.Readiness.bContentDirectoryReady && plan.Readiness.bCookedMeshesReady && plan.Readiness.bCookedTexturesReady
-		    && plan.Readiness.bCookedShadersReady;
+		const bool bProductReady = plan.Readiness.bExecutableReady && plan.Readiness.bContentDirectoryReady;
+		const bool bSceneAssetsReady = plan.Readiness.bCookedMeshesReady && plan.Readiness.bCookedTexturesReady;
+		const bool bCookedContentReady = bSceneAssetsReady && plan.Readiness.bCookedShadersReady;
+		plan.bCanRun = bProductReady && bCookedContentReady;
 
 		PopulateRunStep(plan);
 

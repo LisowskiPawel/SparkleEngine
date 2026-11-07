@@ -421,7 +421,7 @@ void SlangShaderBackend::ExtractSymbols(slang::IComponentType& program, ShaderDe
 		}
 	};
 
-	if (SLANG_FAILED(outputs->enumeratePathContents(".", select, &selection)) || selection.Failed || selection.Name.empty())
+	if (SLANG_FAILED(outputs->enumeratePathContents(".", select, &selection)) || selection.bFailed || selection.Name.empty())
 	{
 		throw Diagnostics::Error("Slang did not return one unambiguous full shader PDB.");
 	}

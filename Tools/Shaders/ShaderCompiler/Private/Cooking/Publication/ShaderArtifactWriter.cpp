@@ -215,7 +215,7 @@ namespace ShaderArtifactWriter
 	static void AppendEntry(const ArtifactEntry& source, ArtifactTables& tables, ShaderCookOutput& result)
 	{
 		const std::span<const std::uint8_t> bytecode(source.Code);
-		const auto [code, inserted] = tables.UniqueCode.try_emplace(source.CodeHash, bytecode);
+		const auto [code, bInserted] = tables.UniqueCode.try_emplace(source.CodeHash, bytecode);
 		if (!bInserted && !std::ranges::equal(code->second, bytecode))
 		{
 			throw Diagnostics::Error("Two shader code records collided on one code hash.");

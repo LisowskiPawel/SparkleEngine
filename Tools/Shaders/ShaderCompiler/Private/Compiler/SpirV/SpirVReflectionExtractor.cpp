@@ -229,9 +229,9 @@ static void ReflectDescriptorBindings(SpvReflectShaderModule& module, ShaderRefl
 				break;
 		}
 
-		binding.bIsReadOnly =
-		    (binding.Kind != CookedShaderResourceKind::RWTexture && binding.Kind != CookedShaderResourceKind::RWStructuredBuffer && binding.Kind != CookedShaderResourceKind::RWByteAddressBuffer
-		        && binding.Kind != CookedShaderResourceKind::RWTypedBuffer);
+		const bool bWritableImageOrStructured = binding.Kind == CookedShaderResourceKind::RWTexture || binding.Kind == CookedShaderResourceKind::RWStructuredBuffer;
+		const bool bWritableByteOrTyped = binding.Kind == CookedShaderResourceKind::RWByteAddressBuffer || binding.Kind == CookedShaderResourceKind::RWTypedBuffer;
+		binding.bIsReadOnly = !bWritableImageOrStructured && !bWritableByteOrTyped;
 
 		binding.Set = b->set;
 		binding.Slot = b->binding;

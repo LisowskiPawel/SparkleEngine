@@ -208,7 +208,8 @@ RayTracingPtlasPartitionPlan RayTracingPtlasPartitionPlanner::InitializePlan(con
 	const std::uint64_t gridPartitionCount = ComputeGridPartitionCount(config.PartitionsPerAxis);
 	const bool bRequiresGlobalPartition = RequiresGlobalPartition(config.PartitionUpdateMode);
 	const std::uint64_t maximumPartitionCount = (std::numeric_limits<std::uint32_t>::max)();
-	plan.Validation.bHasPartitionOverflow = gridPartitionCount > maximumPartitionCount || (bRequiresGlobalPartition && gridPartitionCount == maximumPartitionCount);
+	const bool bGlobalSlotUnavailable = bRequiresGlobalPartition && gridPartitionCount == maximumPartitionCount;
+	plan.Validation.bHasPartitionOverflow = gridPartitionCount > maximumPartitionCount || bGlobalSlotUnavailable;
 	if (plan.Validation.bHasPartitionOverflow)
 	{
 		return plan;

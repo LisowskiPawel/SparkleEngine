@@ -29,7 +29,8 @@ void StreamlineDlssFrameState::SetupFrame(const ImageProviderFrameInput& frameIn
 		m_frameInput.bResetHistory = true;
 	}
 
-	m_bFrameValid = m_resolvedRenderExtent.IsValid() && frameInput.OutputExtent == m_resolvedOutputExtent && frameInput.RenderExtent == m_resolvedRenderExtent;
+	const bool bOutputReady = m_resolvedRenderExtent.IsValid() && frameInput.OutputExtent == m_resolvedOutputExtent;
+	m_bFrameValid = bOutputReady && frameInput.RenderExtent == m_resolvedRenderExtent;
 }
 
 void StreamlineDlssFrameState::Reset() noexcept

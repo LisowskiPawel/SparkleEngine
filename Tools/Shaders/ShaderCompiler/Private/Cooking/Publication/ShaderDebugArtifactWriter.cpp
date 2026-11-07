@@ -67,7 +67,7 @@ std::string ShaderDebugArtifactWriter::WriteBytes(const std::filesystem::path& r
 	file.WriteString("sha256", hash);
 	file.WriteUInt64("bytes", contents.size());
 	const std::string receipt = file.Finish();
-	const auto [entry, inserted] = m_files.emplace(relativeName, receipt);
+	const auto [entry, bInserted] = m_files.emplace(relativeName, receipt);
 	if (!bInserted)
 	{
 		if (entry->second != receipt)

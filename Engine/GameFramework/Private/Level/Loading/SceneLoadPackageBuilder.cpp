@@ -40,7 +40,7 @@ namespace Assets
 		std::unordered_map<std::uint64_t, std::string_view> instanceIdentities;
 		for (const SceneAssetLoadWork& work : state.Assets)
 		{
-			const auto [existing, inserted] = instanceIdentities.emplace(work.Payload.authoredInstanceId, work.Id.value);
+			const auto [existing, bInserted] = instanceIdentities.emplace(work.Payload.authoredInstanceId, work.Id.value);
 			if (work.Payload.authoredInstanceId == 0 || (!bInserted && existing->second != work.Id.value))
 			{
 				throw Diagnostics::Error("Scene load package contains an invalid or colliding authored instance identity.");

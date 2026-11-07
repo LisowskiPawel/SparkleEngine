@@ -145,8 +145,9 @@ static void AddResourceBinding(slang::VariableLayoutReflection& variableLayout, 
 	binding.Kind = MapResourceKind(variableLayout.getTypeLayout(), category);
 	binding.Dimension = MapResourceDimension(variableLayout.getTypeLayout());
 
-	binding.bIsReadOnly = binding.Kind != CookedShaderResourceKind::RWTexture && binding.Kind != CookedShaderResourceKind::RWStructuredBuffer
-	    && binding.Kind != CookedShaderResourceKind::RWByteAddressBuffer && binding.Kind != CookedShaderResourceKind::RWTypedBuffer;
+	const bool bWritableImageOrStructured = binding.Kind == CookedShaderResourceKind::RWTexture || binding.Kind == CookedShaderResourceKind::RWStructuredBuffer;
+	const bool bWritableByteOrTyped = binding.Kind == CookedShaderResourceKind::RWByteAddressBuffer || binding.Kind == CookedShaderResourceKind::RWTypedBuffer;
+	binding.bIsReadOnly = !bWritableImageOrStructured && !bWritableByteOrTyped;
 
 	binding.Set = static_cast<std::uint32_t>(variableLayout.getBindingSpace(category));
 	binding.Slot = static_cast<std::uint32_t>(variableLayout.getOffset(category));

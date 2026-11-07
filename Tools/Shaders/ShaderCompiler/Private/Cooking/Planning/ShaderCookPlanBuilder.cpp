@@ -117,7 +117,7 @@ static void BuildDependencyManifest(ShaderCookPipelinePlan& plan)
 	std::unordered_map<ShaderTypeId, ShaderDependencyRecord> records;
 	for (const ShaderCompileJob& job : plan.jobs)
 	{
-		auto [record, inserted] = records.try_emplace(
+		auto [record, bInserted] = records.try_emplace(
 		    job.Request.ShaderType,
 		    ShaderDependencyRecord{.ShaderType = job.Request.ShaderType, .ShaderTypeName = job.Request.ShaderTypeName, .VirtualSourcePath = job.Request.VirtualSourcePath});
 

@@ -179,7 +179,7 @@ void GpuMeshCache::ActivateResidentMeshes() noexcept
 		}
 
 		const Mesh* const source = request.Source.GetResource().get();
-		const auto [active, inserted] = m_cache.emplace(request.Key, ActiveMesh{.Generation = request.Generation, .Source = source, .Mesh = std::move(request.Uploaded)});
+		const auto [active, bInserted] = m_cache.emplace(request.Key, ActiveMesh{.Generation = request.Generation, .Source = source, .Mesh = std::move(request.Uploaded)});
 		if (!bInserted)
 		{
 			Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh generation was activated twice.");

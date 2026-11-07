@@ -55,10 +55,13 @@ VulkanRayTracingFeatureStatus VulkanRayTracingFeatureQuery::Query(VkPhysicalDevi
 	status.bSupportsRayQueryFeature = rayQueryFeatures.rayQuery == VK_TRUE;
 	status.bSupportsPtlasFeature = ptlasFeatures.partitionedAccelerationStructure == VK_TRUE;
 
-	status.bEnabledAccelerationStructure = status.bSupportsAccelerationStructureExtension && status.bSupportsDeferredHostOperationsExtension && status.bSupportsBufferDeviceAddressFeature
-	    && status.bSupportsAccelerationStructureFeature;
+	const bool bAsExtensionsAvailable = status.bSupportsAccelerationStructureExtension && status.bSupportsDeferredHostOperationsExtension;
+	const bool bAsFeaturesAvailable = status.bSupportsBufferDeviceAddressFeature && status.bSupportsAccelerationStructureFeature;
+	status.bEnabledAccelerationStructure = bAsExtensionsAvailable && bAsFeaturesAvailable;
 
-	status.bEnabledInlineRayQuery = status.bEnabledAccelerationStructure && status.bSupportsRayQueryExtension && status.bSupportsRayQueryFeature;
-	status.bEnabledRayTracingPipeline = status.bEnabledAccelerationStructure && status.bSupportsRayTracingPipelineExtension && status.bSupportsRayTracingPipelineFeature;
+	const bool bRayQueryAvailable = status.bSupportsRayQueryExtension && status.bSupportsRayQueryFeature;
+	const bool bRayPipelineAvailable = status.bSupportsRayTracingPipelineExtension && status.bSupportsRayTracingPipelineFeature;
+	status.bEnabledInlineRayQuery = status.bEnabledAccelerationStructure && bRayQueryAvailable;
+	status.bEnabledRayTracingPipeline = status.bEnabledAccelerationStructure && bRayPipelineAvailable;
 	return status;
 }

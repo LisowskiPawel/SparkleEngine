@@ -50,7 +50,7 @@ std::optional<MeshDiagnosticMetadata> FindMeshDiagnosticMetadata(const MeshDiagn
 		return std::nullopt;
 	}
 	static std::unordered_map<std::uint64_t, std::optional<MeshDiagnosticMetadata>> metadataCache;
-	auto [metadataIt, inserted] = metadataCache.try_emplace(row.MeshAssetId);
+	auto [metadataIt, bInserted] = metadataCache.try_emplace(row.MeshAssetId);
 	if (bInserted)
 	{
 		metadataIt->second = CookedMeshMetadataReader::LoadCookedMeshMetadata(row.MeshAssetId);

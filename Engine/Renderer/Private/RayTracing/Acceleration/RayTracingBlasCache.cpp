@@ -66,7 +66,7 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureBlas(RenderCommandCon
 	++m_currentFrameStats.referencedMeshCount;
 
 	const RhiRayTracingGeometryDesc geometry = gpuMesh.GetRayTracingGeometry();
-	auto [it, inserted] = m_entries.try_emplace(gpuMesh.GetHandle());
+	auto [it, bInserted] = m_entries.try_emplace(gpuMesh.GetHandle());
 	Entry& entry = it->second;
 	entry.bTouchedThisFrame = true;
 
@@ -147,7 +147,7 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureSkinnedBlas(
 	++m_currentFrameStats.referencedMeshCount;
 
 	SkinnedEntryKey key{.Mesh = draw.Geometry.Mesh, .GpuSceneSlot = gpuSceneSlot};
-	auto [it, inserted] = m_skinnedEntries.try_emplace(key);
+	auto [it, bInserted] = m_skinnedEntries.try_emplace(key);
 	(void) bInserted;
 	Entry& entry = it->second;
 	entry.bTouchedThisFrame = true;

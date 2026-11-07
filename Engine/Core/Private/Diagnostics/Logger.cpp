@@ -147,7 +147,7 @@ namespace Logging
 		LoggerRegistry& registry = GetLoggerRegistry();
 		std::lock_guard<std::mutex> lock(registry.Mutex);
 		auto& namedLoggers = registry.NamedLoggers;
-		const auto [it, inserted] = namedLoggers.emplace(std::string(name), logger);
+		const auto [it, bInserted] = namedLoggers.emplace(std::string(name), logger);
 		if (!bInserted)
 		{
 			return it->second;

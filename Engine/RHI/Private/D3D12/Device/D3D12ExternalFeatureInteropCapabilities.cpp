@@ -63,7 +63,8 @@ RhiExternalFeatureInteropCapabilities BuildD3D12ExternalFeatureInteropCapabiliti
 	capabilities.bExposesNativeGraphicsCommandList = bHasGraphicsCommandList;
 	capabilities.bExposesNativeResources = true;
 	capabilities.bSupportsExplicitResourceStates = true;
-	capabilities.bSupportsExternalProviderEvaluation = capabilities.bExposesNativeDevice && capabilities.bExposesNativeGraphicsQueue && capabilities.bExposesNativeGraphicsCommandList;
+	const bool bNativeQueueAvailable = capabilities.bExposesNativeDevice && capabilities.bExposesNativeGraphicsQueue;
+	capabilities.bSupportsExternalProviderEvaluation = bNativeQueueAvailable && capabilities.bExposesNativeGraphicsCommandList;
 	capabilities.bSupportsRuntimeProviderChecks = capabilities.bSupportsExternalProviderEvaluation;
 	return capabilities;
 }

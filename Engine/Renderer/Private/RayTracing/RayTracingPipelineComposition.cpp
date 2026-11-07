@@ -36,9 +36,9 @@ namespace RayTracingCompositionValidation
 		    registration != nullptr && registration->Stage == expectedStage && !registration->ShaderName.empty() && !registration->EntryPoint.empty(),
 		    "Ray-tracing composition contains an invalid typed shader selection.");
 
-		const auto [shaderByType, insertedType] = shadersByType.emplace(shader, expectedStage);
+		const auto [shaderByType, bInsertedType] = shadersByType.emplace(shader, expectedStage);
 		Require(bInsertedType || shaderByType->second == expectedStage, "One ray-tracing shader type resolves to conflicting composition contracts.");
-		const auto [typeByExport, insertedExport] = shaderTypesByExport.emplace(std::string(registration->EntryPoint), shader);
+		const auto [typeByExport, bInsertedExport] = shaderTypesByExport.emplace(std::string(registration->EntryPoint), shader);
 		Require(bInsertedExport || typeByExport->second == shader, "One ray-tracing export name resolves to multiple shader types.");
 	}
 }

@@ -21,7 +21,7 @@ ShaderContractCatalog BuildShaderContractCatalog(ShaderContractSelectionKind sel
 	std::unordered_map<ShaderTypeId, std::string> shaderTypeNames;
 	for (const ShaderRegistrationDesc& registration : GlobalShaderRegistry::GetRegistrations())
 	{
-		const auto [existing, inserted] = shaderTypeNames.emplace(registration.TypeId, registration.ShaderName);
+		const auto [existing, bInserted] = shaderTypeNames.emplace(registration.TypeId, registration.ShaderName);
 		if (!bInserted && existing->second != registration.ShaderName)
 		{
 			throw Diagnostics::Error(std::format("Shader type id collision between '{}' and '{}'.", existing->second, registration.ShaderName));
