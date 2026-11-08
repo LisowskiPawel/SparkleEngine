@@ -68,6 +68,8 @@ Put stable cross-module requests, results, handles and interfaces in `Public`; k
 
 Core is the base dependency. GameFramework does not depend on Renderer or RHI; RHI does not depend on Renderer. Native types remain inside the backend or an explicit interop interface. Dependencies follow actual public use, not convenient transitive includes.
 
+For external libraries, use the existing [dependency workflow](ThirdPartyMigration.md#ownership-and-dependency-workflow) for source separation, pinning, Launcher sync and distribution metadata.
+
 Orchestration should show what happens and in what order. Put substantial algorithms and state in their owning capability. Keep cohesive algorithms/state machines together and split independently changing responsibilities. Avoid god classes, numbered fragments, forwarding-only collaborators, helper bags and service locators.
 
 Keep a feature's state and mechanism in one predictable location. Changes elsewhere need an integration reason and a check. A new cache, queue, layer, flag or API needs a current user and a reason simpler code is insufficient. Prefer direct code or a closed enum switch to speculative extensibility.
@@ -130,6 +132,12 @@ Cookers publish complete validated output. Core provides containment, locks, inc
 
 ## Writing documentation
 
-Use the existing guides for developer onboarding and planning. Start with purpose, then describe current behavior, targets, important choices and limits. Use descriptive headings, short paragraphs, tables for comparisons and expandable source detail.
+Write for people planning work or learning the engine. Start with purpose, then explain the behavior, targets, important choices and limits. Use descriptive headings, short paragraphs and tables for comparisons.
 
-Preserve goals, decisions, coding rules, numerical limits, open questions and primary references. Link to the owning guide instead of repeating it. Keep implementation detail only when it explains a contract, a failure or how to use the system. Remove copied prompts, requirement codes and obsolete procedures; retain archived role wording and its provenance. Check links/anchors, navigation, UTF-8, whitespace and `git diff --check`.
+Keep goals, scope, priorities, lasting decisions, coding rules, numerical limits and primary references in the main guides. Update them during implementation only when lasting behavior or guidance changes. Keep stage status, revision stamps, temporary baselines and delivery checklists out.
+
+Use one concise `Docs/Implementation/<Feature>.md` per active feature for its plan, copyable prompts, acceptance criteria, failure checks and current progress. Update that same file at each stage; keep raw logs and comparison artifacts in ignored output.
+
+At feature closure, fold only lasting guidance into the appropriate existing guide, delete the implementation file and remove the folder when empty. Do not archive plans or copy their progress history into the main guides.
+
+Link to the owning guide instead of repeating it. Preserve archived role wording and its provenance. Remove requirement codes and obsolete procedures. Check links/anchors, navigation, UTF-8, whitespace and `git diff --check`.
