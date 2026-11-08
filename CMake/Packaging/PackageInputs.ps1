@@ -28,7 +28,7 @@ function New-PackageManifest
     $manifest = [ordered]@{
         Version = $Version; Revision = $Revision; SourceInputsSha256 = $SourceInputsSha256
         Signing = 'UnsignedInternal'
-        Products = @($packagedProducts | Select-Object Component, Target, Configuration, Path)
+        Products = @($packagedProducts | Select-Object Component, Target, Configuration, Path, SourcePackages)
         SystemImports = @($Inputs.SystemImports)
         Files = @($Inputs.Files | Select-Object Path, Size, Sha256, Component, Role, Permission, Owner, Origin, License, Notice, Signature)
     }

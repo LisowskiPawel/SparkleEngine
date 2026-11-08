@@ -240,6 +240,21 @@ function Test-PackageMetadata
         if ([string]::IsNullOrWhiteSpace($component.name) -or [string]::IsNullOrWhiteSpace($component.versionInfo) -or
             $component.licenseDeclared -match '^(|NONE|NOASSERTION)$') { throw 'Unqualified SPDX software component.' }
     }
+    foreach ($product in $Manifest.Products)
+    {
+        foreach ($required in $product.SourcePackages)
+        {
+            $matches = @($sbom.packages | Where-Object name -ceq $required.name)
+            if ($matches.Count -ne 1) { throw "Missing/duplicate SPDX dependency: '$($required.name)'." }
+            foreach ($field in @('versionInfo','licenseDeclared','downloadLocation'))
+            {
+                if ($matches[0].$field -cne $required.$field)
+                {
+                    throw "SPDX dependency differs from configured source: '$($required.name).$field'."
+                }
+            }
+        }
+    }
     $provenance = Get-Content -LiteralPath (Join-Path $Stage 'manifests/sparkle-provenance.json') -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($provenance.Revision -cne $Manifest.Revision -or $provenance.SourceInputsSha256 -cne $Manifest.SourceInputsSha256 -or
         $provenance.Version -cne $Manifest.Version) { throw 'Provenance belongs to a different source candidate.' }

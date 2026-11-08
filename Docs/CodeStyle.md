@@ -51,6 +51,8 @@ Separate substantial I/O, decoding, allocation, setup, submission and UI work in
 
 Use `nullptr`, scoped enums, explicit constructors, domain values and designated initialization where clear. Use `final` for concrete classes and `noexcept` only for a real no-throw contract. Prefer direct typed code over unnecessary macros, reflection, type erasure or metaprogramming. Use a domain enum/value instead of boolean mode combinations. Classes/structs have at most one direct base.
 
+Prefer direct value bindings and named functions when they make callbacks easier to read. Use a lambda for a short local operation when it is clearer; give substantial validation, conversion and control flow a name.
+
 ### Enums
 
 Declare an explicit underlying type. Use `std::uint8_t` for bounded internal sets that fit. Wider storage needs a current flags, cooked, shader, native or serialized requirement; review callers/layouts and regenerate changed output. Do not rely on default `int` or hypothetical future values.

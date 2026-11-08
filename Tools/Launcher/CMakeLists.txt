@@ -18,6 +18,7 @@ include(${SPARKLE_REPOSITORY_ROOT}/CMake/SparkleHostTool.cmake)
 # and run SparkleLauncher. Optional workspace capabilities are detected by the
 # Launcher at runtime and are not prerequisites of the Launcher product itself.
 set(SPARKLE_SOURCE_DEPENDENCY_ALLOWLIST
+    cli11
     spdlog
     editor-icons
 )

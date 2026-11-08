@@ -1,351 +1,216 @@
 #include "Shell/LauncherShellArguments.h"
-#include "Core/Public/Strings/StringUtils.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
 
-#include <optional>
+#include <CLI/CLI.hpp>
+
+#include <algorithm>
+#include <functional>
+#include <map>
 #include <ostream>
 #include <string_view>
+#include <vector>
 
 namespace SparkleLauncher
 {
-	class LauncherShellArgumentParser final
+	static constexpr std::string_view UnrecognizedArgumentPrefix = "---";
+
+	static std::vector<std::string> GetBuildProfileNames(BuildProfileTarget target)
 	{
-	public:
-		LauncherShellArgumentParser(int argc, char** argv, LauncherShellArguments& outArguments, std::ostream& error) noexcept;
-
-		bool Parse();
-
-	private:
-		bool ParseCurrentArgument(std::string_view argument);
-		bool ParseGpuCrashOption(std::string_view argument);
-		bool ParseProfile(BuildProfileTarget target, std::string& outProfile);
-		bool ParseWorkspaceIde();
-		bool ParseWorkspaceCompiler();
-		bool ParseCleanScope();
-		std::optional<std::string_view> ReadRequiredValue(std::string_view missingValueMessage);
-
-		static bool IsProfileTarget(std::string_view profileName, BuildProfileTarget target);
-
-		int m_argumentCount = 0;
-		char** m_arguments = nullptr;
-		int m_index = 1;
-		bool m_bGpuCrashModeSelected = false;
-		bool m_bShaderExportSelected = false;
-		LauncherShellArguments* m_outArguments = nullptr;
-		std::ostream* m_error = nullptr;
-	};
-
-	LauncherShellArgumentParser::LauncherShellArgumentParser(int argc, char** argv, LauncherShellArguments& outArguments, std::ostream& error) noexcept :
-	    m_argumentCount(argc),
-	    m_arguments(argv),
-	    m_outArguments(&outArguments),
-	    m_error(&error)
-	{
-	}
-
-	bool LauncherShellArgumentParser::Parse()
-	{
-		for (; m_index < m_argumentCount; ++m_index)
+		std::vector<std::string> names;
+		for (const BuildProfile& profile : GetBuildProfileCatalog())
 		{
-			const std::string_view argument(m_arguments[m_index]);
-			if (!ParseCurrentArgument(argument))
+			if (profile.Target == target)
 			{
-				return false;
+				names.push_back(profile.Name);
 			}
 		}
-
-		if (!m_outArguments->DryRunOperationId.empty() && !m_outArguments->RunOperationId.empty())
-		{
-			*m_error << "SparkleLauncher: --dry-run and --run are mutually exclusive.\n";
-			return false;
-		}
-
-		const std::string& operationId = m_outArguments->RunOperationId.empty() ? m_outArguments->DryRunOperationId : m_outArguments->RunOperationId;
-		if (m_outArguments->bShaderSymbols && operationId != "cook.shaders" && operationId != "cook.all" && operationId != "cook.workspace")
-		{
-			*m_error << "SparkleLauncher: --shader-symbols requires cook.shaders, cook.all or cook.workspace.\n";
-			return false;
-		}
-		if (!m_outArguments->LevelId.empty() && !operationId.empty() && operationId != "levels.sync" && operationId != "levels.run")
-		{
-			*m_error << "SparkleLauncher: --level applies only to levels.sync and levels.run; it does not select cook scopes.\n";
-			return false;
-		}
-
-		return true;
+		return names;
 	}
 
-	bool LauncherShellArgumentParser::ParseCurrentArgument(std::string_view argument)
+	static void ParseWorkspaceIde(LauncherShellArguments& arguments, const std::string& value)
 	{
-		if (argument == "--help" || argument == "-h" || argument == "/?")
+		const bool bParsed = TryParseWorkspaceIde(value, arguments.WorkspaceIdePreference);
+		if (!bParsed)
 		{
-			m_outArguments->bShowHelp = true;
-			return true;
+			throw CLI::ValidationError("--ide", "unsupported IDE '" + value + "'");
+		}
+	}
+
+	static void ParseWorkspaceCompiler(LauncherShellArguments& arguments, const std::string& value)
+	{
+		const bool bParsed = TryParseWorkspaceCompiler(value, arguments.WorkspaceCompilerPreference);
+		if (!bParsed)
+		{
+			throw CLI::ValidationError("--compiler", "unsupported compiler '" + value + "'");
+		}
+	}
+
+	static void ParseCleanScope(LauncherShellArguments& arguments, const std::string& value)
+	{
+		const bool bParsed = TryParseCleanScope(value, arguments.RequestedCleanScope);
+		if (!bParsed)
+		{
+			throw CLI::ValidationError("--clean-scope", "unsupported clean scope '" + value + "'");
+		}
+	}
+
+	static std::string ValidateOperationId(const std::string& value)
+	{
+		return value.starts_with('-') ? "requires an operation id" : "";
+	}
+
+	static std::string ValidateSingleUseOption(const CLI::App& app, const CLI::Option* option, std::string&)
+	{
+		const auto occurrences = std::ranges::count(app.parse_order(), option);
+		return occurrences > 1 ? "duplicate GPU crash option" : "";
+	}
+
+	static void ConfigureLauncherOptions(CLI::App& app, LauncherShellArguments& arguments)
+	{
+		app.set_help_flag();
+		app.allow_extras()->prefix_command();
+		app.add_flag("--help,-h", arguments.bShowHelp, "Show help (also /?).");
+
+		app.option_defaults()->group("Workspace");
+		app.add_option("--root", arguments.StartPath, "Workspace root.")->type_name("PATH");
+
+		app.add_option("--editor-profile", arguments.EditorProfile, "Editor build profile.")->check(CLI::IsMember(GetBuildProfileNames(BuildProfileTarget::Editor)))->capture_default_str();
+
+		app.add_option("--game-profile", arguments.GameProfile, "Game build profile.")->check(CLI::IsMember(GetBuildProfileNames(BuildProfileTarget::Game)))->capture_default_str();
+
+		app.add_option_function<std::string>("--ide", std::bind_front(ParseWorkspaceIde, std::ref(arguments)), "Workspace IDE: visual-studio or rider.");
+
+		app.add_option_function<std::string>("--compiler", std::bind_front(ParseWorkspaceCompiler, std::ref(arguments)), "Workspace compiler: msvc or clang-cl.");
+
+		app.option_defaults()->group("Scene selection");
+		app.add_option("--level", arguments.LevelId, "Catalog level for levels.sync or levels.run.")->type_name("ID");
+
+		const std::map<std::string, LevelRunMode> products = {{"editor", LevelRunMode::Editor}, {"game", LevelRunMode::Game}};
+		app.add_option("--product", arguments.Product, "Application to launch.")->transform(CLI::CheckedTransformer(products))->type_name("editor|game");
+
+		app.add_option("--graphics-api", arguments.GraphicsApi, "Graphics API for scene launch: d3d12 or vulkan.")->capture_default_str();
+
+		app.option_defaults()->group("Operations");
+
+		app.add_option("--dry-run", arguments.DryRunOperationId, "Preview an operation; defaults to workspace.sync-code when its ID is omitted.")
+		    ->expected(0, 1)
+		    ->default_str("workspace.sync-code")
+		    ->type_name("ID");
+
+		app.add_option("--run", arguments.RunOperationId, "Execute an operation.")->check(CLI::Validator(ValidateOperationId, "ID"))->type_name("ID");
+
+		app.add_flag("--shader-symbols", arguments.bShaderSymbols, "Export symbols with cook.shaders, cook.all or cook.workspace.");
+
+		app.add_flag("--force-recook", "Request a complete recook.");
+
+		app.add_flag("--confirm-force-recook", arguments.bForceRecookConfirmed, "Confirm replacement of cooked output.");
+
+		app.option_defaults()->group("Cleanup");
+
+		app.add_option_function<std::string>(
+		    "--clean-scope",
+		    std::bind_front(ParseCleanScope, std::ref(arguments)),
+		    "Clean scope: cooked, build-tree, artifacts, workspace-state, deps, logs or clean-all.");
+
+		app.add_flag("--confirm-clean", arguments.bCleanConfirmed, "Confirm cleanup of the selected generated output.");
+
+		app.option_defaults()->group("GPU diagnostics");
+		const std::map<std::string, RhiGpuCrashMode> gpuCrashModes = {{"off", RhiGpuCrashMode::Off}, {"aftermath", RhiGpuCrashMode::Aftermath}};
+		CLI::Option* gpuCrash = app.add_option("--gpu-crash-debugging", arguments.GpuCrashMode, "GPU crash collection for scene launch.");
+		gpuCrash->transform(CLI::CheckedTransformer(gpuCrashModes))->type_name("off|aftermath");
+
+		CLI::Option* shaderExport = app.add_option("--shader-export", arguments.ShaderExportPath, "Absolute shader-export.json for GPU crash correlation.");
+		shaderExport->type_name("PATH");
+
+		for (CLI::Option* option : app.get_options())
+		{
+			option->trigger_on_parse()->take_last();
 		}
 
-		if (argument == "--root")
+		for (CLI::Option* option : {gpuCrash, shaderExport})
 		{
-			const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: --root requires a path.\n");
-			if (value.has_value())
+			const auto validateOnce = std::bind_front(ValidateSingleUseOption, std::cref(app), option);
+			option->check(CLI::Validator(validateOnce, "single occurrence"));
+		}
+	}
+
+	static std::vector<std::string> PrepareLauncherArguments(const CLI::App& app, int argc, char** argv)
+	{
+		std::vector<std::string> arguments;
+		for (int index = 1; index < argc; ++index)
+		{
+			const std::string argument = std::string_view(argv[index]) == "/?" ? "-h" : argv[index];
+			const CLI::Option* option = app.get_option_no_throw(argument);
+			if (option == nullptr)
 			{
-				m_outArguments->StartPath = Strings::ToWide(*value);
+				// Keep exact option spellings; CLI11 otherwise accepts assignments and short-option clusters.
+				arguments.push_back(std::string(UnrecognizedArgumentPrefix) + argument);
+				break;
 			}
-			return value.has_value();
-		}
-
-		if (argument == "--editor-profile")
-		{
-			return ParseProfile(BuildProfileTarget::Editor, m_outArguments->EditorProfile);
-		}
-
-		if (argument == "--game-profile")
-		{
-			return ParseProfile(BuildProfileTarget::Game, m_outArguments->GameProfile);
-		}
-
-		if (argument == "--level" || argument == "--graphics-api")
-		{
-			const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: selection requires a value.\n");
-			if (value.has_value())
+			arguments.push_back(argument);
+			const bool bRequiresValue = option->get_expected_min() > 0;
+			const bool bHasNextArgument = index + 1 < argc;
+			const bool bAcceptsValue = option->get_expected_max() > 0 && bHasNextArgument;
+			const bool bOptionalValue = bAcceptsValue && argv[index + 1][0] != '-';
+			if (bHasNextArgument && (bRequiresValue || bOptionalValue))
 			{
-				(argument == "--level" ? m_outArguments->LevelId : m_outArguments->GraphicsApi) = *value;
+				arguments.emplace_back(argv[++index]);
 			}
-			return value.has_value();
 		}
-
-		if (argument == "--gpu-crash-debugging" || argument == "--shader-export")
-		{
-			return ParseGpuCrashOption(argument);
-		}
-
-		if (argument == "--product")
-		{
-			const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: --product requires editor or game.\n");
-			if (!value.has_value())
-			{
-				return false;
-			}
-			if (*value != "editor" && *value != "game")
-			{
-				*m_error << "SparkleLauncher: --product requires editor or game.\n";
-				return false;
-			}
-			m_outArguments->Product = *value == "editor" ? LevelRunMode::Editor : LevelRunMode::Game;
-			return true;
-		}
-
-		if (argument == "--dry-run")
-		{
-			if (m_index + 1 < m_argumentCount && m_arguments[m_index + 1][0] != '-')
-			{
-				m_outArguments->DryRunOperationId = m_arguments[++m_index];
-			}
-			else
-			{
-				m_outArguments->DryRunOperationId = "workspace.sync-code";
-			}
-			return true;
-		}
-
-		if (argument == "--run")
-		{
-			if (m_index + 1 >= m_argumentCount || m_arguments[m_index + 1][0] == '-')
-			{
-				*m_error << "SparkleLauncher: --run requires an operation id.\n";
-				return false;
-			}
-			m_outArguments->RunOperationId = m_arguments[++m_index];
-			return true;
-		}
-
-		if (argument == "--ide")
-		{
-			return ParseWorkspaceIde();
-		}
-
-		if (argument == "--compiler")
-		{
-			return ParseWorkspaceCompiler();
-		}
-
-		if (argument == "--force-recook")
-		{
-			m_outArguments->RequestedCookMode = CookMode::Force;
-			return true;
-		}
-
-		if (argument == "--shader-symbols")
-		{
-			m_outArguments->bShaderSymbols = true;
-			return true;
-		}
-
-		if (argument == "--confirm-force-recook")
-		{
-			m_outArguments->bForceRecookConfirmed = true;
-			return true;
-		}
-
-		if (argument == "--clean-scope")
-		{
-			return ParseCleanScope();
-		}
-
-		if (argument == "--confirm-clean")
-		{
-			m_outArguments->bCleanConfirmed = true;
-			return true;
-		}
-
-		*m_error << "SparkleLauncher: unexpected argument '" << argument << "'.\n";
-		return false;
-	}
-
-	bool LauncherShellArgumentParser::ParseGpuCrashOption(std::string_view argument)
-	{
-		const auto value = ReadRequiredValue("SparkleLauncher: GPU crash option requires one value.\n");
-		bool& bSelected = argument == "--shader-export" ? m_bShaderExportSelected : m_bGpuCrashModeSelected;
-		if (!value || bSelected)
-		{
-			*m_error << "SparkleLauncher: missing or duplicate GPU crash option.\n";
-			return false;
-		}
-		bSelected = true;
-
-		if (argument == "--shader-export")
-		{
-			m_outArguments->ShaderExportPath = Strings::ToWide(*value);
-		}
-		else if (*value == "off" || *value == "aftermath")
-		{
-			m_outArguments->GpuCrashMode = *value == "off" ? RhiGpuCrashMode::Off : RhiGpuCrashMode::Aftermath;
-		}
-		else
-		{
-			*m_error << "SparkleLauncher: use --gpu-crash-debugging off|aftermath.\n";
-			return false;
-		}
-		return true;
-	}
-
-	bool LauncherShellArgumentParser::ParseProfile(BuildProfileTarget target, std::string& outProfile)
-	{
-		const std::string_view option = target == BuildProfileTarget::Editor ? "--editor-profile" : "--game-profile";
-		const std::string missingValueMessage = "SparkleLauncher: " + std::string(option) + " requires a profile.\n";
-		const std::optional<std::string_view> profile = ReadRequiredValue(missingValueMessage);
-		if (!profile.has_value())
-		{
-			return false;
-		}
-
-		if (!IsProfileTarget(*profile, target))
-		{
-			*m_error << "SparkleLauncher: unsupported " << (target == BuildProfileTarget::Editor ? "editor" : "game") << " profile '" << *profile << "'.\n";
-			return false;
-		}
-
-		outProfile = *profile;
-		return true;
-	}
-
-	bool LauncherShellArgumentParser::ParseWorkspaceIde()
-	{
-		const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: --ide requires visual-studio or rider.\n");
-		if (!value.has_value())
-		{
-			return false;
-		}
-
-		WorkspaceIde ide = WorkspaceIde::VisualStudio;
-		if (!TryParseWorkspaceIde(*value, ide))
-		{
-			*m_error << "SparkleLauncher: unsupported IDE '" << *value << "'.\n";
-			return false;
-		}
-
-		m_outArguments->WorkspaceIdePreference = ide;
-		return true;
-	}
-
-	bool LauncherShellArgumentParser::ParseWorkspaceCompiler()
-	{
-		const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: --compiler requires msvc or clang-cl.\n");
-		if (!value.has_value())
-		{
-			return false;
-		}
-
-		WorkspaceCompiler compiler = WorkspaceCompiler::Msvc;
-		if (!TryParseWorkspaceCompiler(*value, compiler))
-		{
-			*m_error << "SparkleLauncher: unsupported compiler '" << *value << "'.\n";
-			return false;
-		}
-
-		m_outArguments->WorkspaceCompilerPreference = compiler;
-		return true;
-	}
-
-	bool LauncherShellArgumentParser::ParseCleanScope()
-	{
-		const std::optional<std::string_view> value = ReadRequiredValue("SparkleLauncher: --clean-scope requires a scope.\n");
-		if (!value.has_value())
-		{
-			return false;
-		}
-
-		CleanScope scope = CleanScope::CookedOutputs;
-		if (!TryParseCleanScope(*value, scope))
-		{
-			*m_error << "SparkleLauncher: unsupported clean scope '" << *value << "'.\n";
-			return false;
-		}
-
-		m_outArguments->RequestedCleanScope = scope;
-		return true;
-	}
-
-	std::optional<std::string_view> LauncherShellArgumentParser::ReadRequiredValue(std::string_view missingValueMessage)
-	{
-		if (m_index + 1 >= m_argumentCount)
-		{
-			*m_error << missingValueMessage;
-			return std::nullopt;
-		}
-
-		return std::string_view(m_arguments[++m_index]);
-	}
-
-	bool LauncherShellArgumentParser::IsProfileTarget(std::string_view profileName, BuildProfileTarget target)
-	{
-		const std::optional<BuildProfile> profile = FindBuildProfile(profileName);
-		return profile.has_value() && profile->Target == target;
+		std::ranges::reverse(arguments);
+		return arguments;
 	}
 
 	bool ParseLauncherShellArguments(int argc, char** argv, LauncherShellArguments& outArguments, std::ostream& error)
 	{
-		LauncherShellArgumentParser parser(argc, argv, outArguments, error);
-		return parser.Parse();
+		CLI::App app("Build, cook and run Sparkle workspaces.", "SparkleLauncher");
+		ConfigureLauncherOptions(app, outArguments);
+		try
+		{
+			std::vector<std::string> arguments = PrepareLauncherArguments(app, argc, argv);
+			app.parse(arguments);
+		}
+		catch (const CLI::ParseError& failure)
+		{
+			error << "SparkleLauncher: " << failure.what() << '\n';
+			return false;
+		}
+		const std::vector<std::string> remaining = app.remaining();
+		if (!remaining.empty())
+		{
+			error << "SparkleLauncher: unexpected argument '" << remaining.front().substr(UnrecognizedArgumentPrefix.size()) << "'.\n";
+			return false;
+		}
+		if (app.count("--force-recook") > 0)
+		{
+			outArguments.RequestedCookMode = CookMode::Force;
+		}
+
+		if (!outArguments.DryRunOperationId.empty() && !outArguments.RunOperationId.empty())
+		{
+			error << "SparkleLauncher: --dry-run and --run are mutually exclusive.\n";
+			return false;
+		}
+		const std::string& operationId = outArguments.RunOperationId.empty() ? outArguments.DryRunOperationId : outArguments.RunOperationId;
+		if (outArguments.bShaderSymbols && operationId != "cook.shaders" && operationId != "cook.all" && operationId != "cook.workspace")
+		{
+			error << "SparkleLauncher: --shader-symbols requires cook.shaders, cook.all or cook.workspace.\n";
+			return false;
+		}
+		if (!outArguments.LevelId.empty() && !operationId.empty() && operationId != "levels.sync" && operationId != "levels.run")
+		{
+			error << "SparkleLauncher: --level applies only to levels.sync and levels.run; it does not select cook scopes.\n";
+			return false;
+		}
+		return true;
 	}
 
 	void PrintLauncherShellUsage(std::ostream& output)
 	{
-		output << "GPU crash launch: --gpu-crash-debugging off|aftermath --shader-export <absolute shader-export.json>\n";
-		output << "Usage:\n"
-		       << "  SparkleLauncher [--root <workspace-root>] [--editor-profile <profile>] [--game-profile <profile>] "
-		          "[--ide <visual-studio|rider>] [--compiler <msvc|clang-cl>] "
-		          "[--level <catalog-id>] [--product <editor|game>] [--graphics-api <d3d12|vulkan>] "
-		          "[--clean-scope <scope>] [--shader-symbols] "
-		          "[--confirm-clean] [--force-recook] [--confirm-force-recook] [--dry-run [operation-id]] [--run <operation-id>]\n"
-		       << "\n"
-		       << "Examples:\n"
-		       << "  SparkleLauncher --dry-run\n"
-		       << "  SparkleLauncher --level Empty --product game --graphics-api d3d12 --dry-run levels.run\n"
-		       << "  SparkleLauncher --game-profile DevelopmentGame --dry-run cook.shaders\n"
-		       << "  SparkleLauncher --shader-symbols --run cook.shaders\n"
-		       << "  SparkleLauncher --force-recook --dry-run cook.all\n"
-		       << "  SparkleLauncher --clean-scope cooked --dry-run workspace.clean\n"
-		       << "  SparkleLauncher --clean-scope clean-all --dry-run workspace.clean\n";
+		LauncherShellArguments arguments;
+		CLI::App app("Build, cook and run Sparkle workspaces.", "SparkleLauncher");
+		ConfigureLauncherOptions(app, arguments);
+		output << app.help();
 	}
 }

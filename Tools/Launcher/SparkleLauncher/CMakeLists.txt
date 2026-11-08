@@ -308,6 +308,7 @@ target_include_directories(SparkleLauncher
 
 target_link_libraries(SparkleLauncher
     PRIVATE
+        CLI11::CLI11
         SparkleLauncherCore
         SparkleCore
         SparkleTasks
@@ -316,6 +317,15 @@ target_link_libraries(SparkleLauncher
 )
 
 target_compile_features(SparkleLauncher PRIVATE cxx_std_20)
+target_compile_definitions(SparkleLauncher PRIVATE CLI11_ENABLE_EXTRA_VALIDATORS=0)
+
+if(MSVC)
+    # Argument parsing is cold code; avoid duplicating the header-only SDK through inlining.
+    set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellArguments.cpp
+        APPEND PROPERTY COMPILE_OPTIONS
+            "$<$<CONFIG:DevelopmentEditor,ShippingEditor>:/O1>"
+            "$<$<CONFIG:DevelopmentEditor,ShippingEditor>:/Ob0>")
+endif()
 
 set_target_properties(SparkleLauncher PROPERTIES
     AUTOMOC ON

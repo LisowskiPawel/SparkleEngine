@@ -14,6 +14,8 @@ Copy a stage prompt below to start the work. It refers back to this plan so acce
 
 For each stage, report changed/deleted code, exact commands and results, comparison artifacts and unresolved failures. Investigate failures and rerun affected checks. Missing prerequisites or unrun checks remain open with their reason; they cannot satisfy acceptance. Keep comparison records in ignored output and bind them to the actual source, executables and inputs.
 
+Before closing each stage, format and check every changed owned source file, then review paragraph spacing, names, evaluation order and ownership by hand. Prefer direct bindings and named functions over lambdas where they read better. Remove unnecessary helpers, state and indirection; passing the formatter alone does not complete this review.
+
 ## 1. Capture the current behavior
 
 ```text

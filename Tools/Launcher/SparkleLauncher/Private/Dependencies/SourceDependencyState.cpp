@@ -46,6 +46,14 @@ namespace SparkleLauncher
 		{
 			const WorkspaceFeatureSettings features = GetLauncherWorkspaceFeatureSettings();
 			return std::vector<SourceDependencyEntry>{
+			    {"cli11",
+			        "CLI11",
+			        "v2.7.2",
+			        "Command-line parsing, validation and generated help.",
+			        "cli11-src",
+			        {"CMakeLists.txt", "include/CLI/CLI.hpp", "include/CLI/App.hpp", "include/CLI/impl/App_inl.hpp", "LICENSE"},
+			        true,
+			        true},
 			    {"imgui", "Dear ImGui", "v1.92.5", "Immediate-mode UI core and Win32 platform backend.", "imgui-src", {"imgui.h", "imgui.cpp", "backends/imgui_impl_win32.cpp"}, true, true},
 			    {"spdlog", "spdlog", "v1.14.1", "Repo-wide logging backend.", "spdlog-src", {"include/spdlog/spdlog.h"}, true, true},
 			    {"editor-icons",

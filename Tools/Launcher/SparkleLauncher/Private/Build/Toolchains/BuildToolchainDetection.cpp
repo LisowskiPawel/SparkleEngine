@@ -183,7 +183,7 @@ namespace SparkleLauncher
 		status.Items.push_back(
 		    MakeToolStatus("shader-compiler-sdk", "Shader compiler SDK (DXC + Slang bundle)", false, shaderCompilerSdk.bAvailable, shaderCompilerSdk.Root, shaderCompilerSdk.Detail));
 #else
-		status.ConfigurePrerequisitesAvailable = true;
+		status.bConfigurePrerequisitesAvailable = true;
 #endif
 
 		const bool bVulkanSdkRequired = featureSettings.bNvidiaStreamlineEnabled;
