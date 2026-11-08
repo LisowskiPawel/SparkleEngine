@@ -107,7 +107,7 @@ namespace SparkleLauncher
 		    ->default_str("workspace.sync-code")
 		    ->type_name("ID");
 
-		app.add_option("--run", arguments.RunOperationId, "Execute an operation.")->check(CLI::Validator(ValidateOperationId, "ID"))->type_name("ID");
+		app.add_option("--run", arguments.RunOperationId, "Execute an operation.")->check(CLI::Validator(ValidateOperationId, ""))->type_name("ID");
 
 		app.add_flag("--shader-symbols", arguments.bShaderSymbols, "Export symbols with cook.shaders, cook.all or cook.workspace.");
 
@@ -126,20 +126,16 @@ namespace SparkleLauncher
 
 		app.option_defaults()->group("GPU diagnostics");
 		CLI::Option* gpuCrash = app.add_option_function<std::string>("--gpu-crash-debugging", std::bind_front(SelectGpuCrashMode, std::ref(arguments)), "GPU crash collection for scene launch.");
-		gpuCrash->check(CLI::IsMember({"off", "aftermath"}));
+		const auto validateGpuCrashUse = std::bind_front(ValidateSingleUseOption, std::cref(app), gpuCrash);
+		gpuCrash->check(CLI::Validator(validateGpuCrashUse, ""))->check(CLI::IsMember({"off", "aftermath"}));
 
 		CLI::Option* shaderExport = app.add_option("--shader-export", arguments.ShaderExportPath, "Absolute shader-export.json for GPU crash correlation.");
-		shaderExport->type_name("PATH");
+		const auto validateShaderExportUse = std::bind_front(ValidateSingleUseOption, std::cref(app), shaderExport);
+		shaderExport->check(CLI::Validator(validateShaderExportUse, ""))->type_name("PATH");
 
 		for (CLI::Option* option : app.get_options())
 		{
 			option->trigger_on_parse()->take_last();
-		}
-
-		for (CLI::Option* option : {gpuCrash, shaderExport})
-		{
-			const auto validateOnce = std::bind_front(ValidateSingleUseOption, std::cref(app), option);
-			option->check(CLI::Validator(validateOnce, "single occurrence"));
 		}
 	}
 
@@ -164,6 +160,11 @@ namespace SparkleLauncher
 			if (bHasNextArgument && (bRequiresValue || bOptionalValue))
 			{
 				arguments.emplace_back(argv[++index]);
+			}
+			else if (option->get_expected_max() > 0 && !bRequiresValue)
+			{
+				// CLI11 may consume an unknown option as an optional value. Resolve omission from its declaration.
+				arguments.push_back(option->get_default_str());
 			}
 		}
 		std::ranges::reverse(arguments);

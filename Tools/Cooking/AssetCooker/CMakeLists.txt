@@ -31,7 +31,6 @@ set(ASSET_COOKER_CORE_HEADERS
 )
 
 set(ASSET_COOKER_CLI_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/AssetCookerCli.cpp
 )
 
@@ -72,6 +71,7 @@ target_link_libraries(AssetCookerCore
 )
 
 add_executable(AssetCooker
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp
     ${ASSET_COOKER_CLI_SOURCES}
     ${ASSET_COOKER_CLI_HEADERS}
 )
@@ -86,8 +86,14 @@ target_include_directories(AssetCooker
 )
 
 target_compile_features(AssetCooker PRIVATE cxx_std_20)
+if(MSVC)
+    # Bound CLI11 parser/help code size without changing the cooking libraries.
+    target_compile_options(AssetCooker PRIVATE
+        "$<$<CONFIG:DevelopmentEditor,DevelopmentGame,ShippingEditor,ShippingGame>:/O1>")
+endif()
 target_link_libraries(AssetCooker
     PRIVATE
+        CLI11::CLI11
         AssetCookerCore
         ${ASSET_COOKER_COOKING_LINK_LIBRARIES}
 )
@@ -106,5 +112,5 @@ endif()
 source_group(
     TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private
     PREFIX "Private"
-    FILES ${ASSET_COOKER_CORE_SOURCES} ${ASSET_COOKER_CORE_HEADERS} ${ASSET_COOKER_CLI_HEADERS})
+    FILES ${ASSET_COOKER_CORE_SOURCES} ${ASSET_COOKER_CORE_HEADERS} ${ASSET_COOKER_CLI_SOURCES} ${ASSET_COOKER_CLI_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp)

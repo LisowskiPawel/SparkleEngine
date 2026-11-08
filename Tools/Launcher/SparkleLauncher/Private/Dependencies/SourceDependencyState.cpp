@@ -12,18 +12,13 @@ namespace SparkleLauncher
 	bool PathHasContent(const std::filesystem::path& path)
 	{
 		std::error_code errorCode;
-		if (!std::filesystem::exists(path, errorCode) || errorCode)
+		if (!std::filesystem::is_regular_file(path, errorCode) || errorCode)
 		{
 			return false;
 		}
 
-		if (std::filesystem::is_regular_file(path, errorCode))
-		{
-			const std::uintmax_t size = std::filesystem::file_size(path, errorCode);
-			return !errorCode && size > 0;
-		}
-
-		return true;
+		const std::uintmax_t size = std::filesystem::file_size(path, errorCode);
+		return !errorCode && size > 0;
 	}
 
 	std::string JoinPaths(const std::vector<std::string>& paths)
@@ -112,6 +107,7 @@ namespace SparkleLauncher
 		        false,
 		        features.bNvidiaStreamlineEnabled},
 		};
+
 		return dependencies;
 	}
 

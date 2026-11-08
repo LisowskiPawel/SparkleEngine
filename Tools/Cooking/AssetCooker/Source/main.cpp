@@ -19,6 +19,5 @@ int main(int argc, char** argv)
 	argc = static_cast<int>(arguments.size());
 	argv = argumentPointers.data();
 #endif
-	const AssetCookerCli cli;
-	return cli.Run(argc, argv);
+	return RunAssetCooker(argc, argv);
 }

@@ -81,14 +81,8 @@ static std::string BuildRayTracingFeatureList(const ShaderBackendCapabilities& c
 	return features;
 }
 
-int ListShaderBackends(std::span<const std::string_view> args)
+int ListBackends()
 {
-	if (!args.empty())
-	{
-		std::cerr << "ShaderCompiler: list-backends does not accept extra arguments\n";
-		return kExitCodeUsage;
-	}
-
 	const std::vector<ShaderBackendDescriptor> backends = ListShaderBackends();
 	std::cout << "ShaderCompiler: " << backends.size() << " backend(s) registered\n";
 	for (const ShaderBackendDescriptor& backend : backends)

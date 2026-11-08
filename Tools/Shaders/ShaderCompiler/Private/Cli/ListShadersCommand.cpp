@@ -10,15 +10,8 @@
 
 #include <iostream>
 
-int ListShaders(std::span<const std::string_view> args)
+int ListShaders(bool bValidateOnly)
 {
-	const bool bValidateOnly = args.size() == 1 && args[0] == "--validate";
-	if (!args.empty() && !bValidateOnly)
-	{
-		std::cerr << "ShaderCompiler: list-shaders accepts only optional --validate\n";
-		return kExitCodeUsage;
-	}
-
 	ShaderContractCatalog catalog;
 	try
 	{

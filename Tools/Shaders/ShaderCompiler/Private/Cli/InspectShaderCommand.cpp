@@ -11,17 +11,11 @@
 
 #include <iostream>
 
-int InspectShader(std::span<const std::string_view> args)
+int InspectShader(std::string_view shaderId)
 {
-	if (args.size() != 1)
-	{
-		std::cerr << "ShaderCompiler: inspect-shader requires <shader-id>\n";
-		return kExitCodeUsage;
-	}
-
 	try
 	{
-		const ShaderContractCatalog catalog = BuildShaderContractCatalog(ShaderContractSelectionKind::ShaderId, args[0]);
+		const ShaderContractCatalog catalog = BuildShaderContractCatalog(ShaderContractSelectionKind::ShaderId, shaderId);
 		const ShaderContract& shader = catalog.front();
 		const CookedShaderLibrary library = CookedShaderLibrary::Open(Filesystem::GetCookedShaderLibraryPath());
 		const GlobalShaderMap map = GlobalShaderMap::Open(Filesystem::GetGlobalShaderMapPath(), library);

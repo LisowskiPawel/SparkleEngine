@@ -6,7 +6,6 @@
 
 #include "Analysis/CookedShaderStatsPass.h"
 #include "RHI/Public/Shaders/ShaderTarget.h"
-#include "Cli/CookShadersArgumentParser.h"
 #include "Constants/ShaderCompilerConstants.h"
 #include "Cooking/GlobalShaderCooker.h"
 #include "Core/Public/Diagnostics/Error.h"
@@ -15,6 +14,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <span>
 #include <string>
 
 static void PrintSummary(const ShaderCookResult& result, const ShaderCookSettings& settings);
@@ -22,24 +22,8 @@ static int RunAnalysisPasses(const ShaderCookResult& result, const ShaderCookSet
 static std::string FormatTargets(std::span<const ShaderTarget> targets);
 static void RunCookedShaderStats(const ShaderCookResult& result);
 
-int CookShaders(std::span<const std::string_view> args)
+int CookShaders(const ShaderCookSettings& settings)
 {
-	if (args.size() == 1 && (args[0] == "--help" || args[0] == "-h"))
-	{
-		CookShadersArgumentParser::PrintHelp(std::cout);
-		return kExitCodeSuccess;
-	}
-
-	ShaderCookSettings settings;
-	try
-	{
-		settings = CookShadersArgumentParser::Parse(args);
-	}
-	catch (const Diagnostics::Error& error)
-	{
-		ToolConsole::Message(std::cerr, ToolConsoleSeverity::Error, "Invalid shader cook arguments", {ToolConsole::QuotedField("reason", error.what())});
-		return kExitCodeUsage;
-	}
 	ShaderCookResult cookResult;
 	ToolWorkProgressWriter progressOutput(std::cout);
 	try

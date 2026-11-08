@@ -4,127 +4,134 @@
 
 #include "ToolConsole.h"
 
+#include <CLI/CLI.hpp>
+
 #include <algorithm>
-#include <array>
 #include <iostream>
 #include <string>
 #include <string_view>
+#include <vector>
 
-struct AssetCookerCli::Arguments final
+struct AssetCookerRequest final
 {
-	std::string Command;
-	std::string ProjectName;
-	std::string Configuration = "DevelopmentGame";
-	std::string ToolProfile;
-	std::string WorkspaceRoot;
-	AssetCookerCategory Category = AssetCookerCategory::All;
+	std::string projectName;
+	std::string configuration = "DevelopmentGame";
+	std::string toolProfile;
+	std::string workspaceRoot;
+	AssetCookerCategory category = AssetCookerCategory::All;
 };
 
-bool AssetCookerCli::IsHelp(std::string_view argument) noexcept
+static std::string UnescapeArgument(std::string value)
 {
-	return argument == "--help" || argument == "-h" || argument == "/?" || argument == "/h";
+	return value.starts_with(' ') ? value.substr(1) : value;
 }
 
-bool AssetCookerCli::IsConfiguration(std::string_view argument) noexcept
+static void ConfigureCookOptions(CLI::App& command, AssetCookerRequest& request, bool bRequiresProject)
 {
-	static constexpr std::array<std::string_view, 6> Profiles = {"DebugEditor", "DebugGame", "DevelopmentEditor", "DevelopmentGame", "ShippingEditor", "ShippingGame"};
+	command.validate_positionals()->allow_extras(CLI::ExtrasMode::ErrorImmediately);
 
-	return std::ranges::find(Profiles, argument) != Profiles.end();
+	command.add_option("configuration", request.configuration, "Build configuration, in any position; repeated configurations use the last value.")
+	    ->check(CLI::IsMember({"DebugEditor", "DebugGame", "DevelopmentEditor", "DevelopmentGame", "ShippingEditor", "ShippingGame"}))
+	    ->expected(0, 1)
+	    ->allow_extra_args()
+	    ->capture_default_str();
+
+	command.add_option("ProjectName", request.projectName, "Project name (also ALL, All or all).")
+	    ->expected(0, 1)
+	    ->allow_extra_args()
+	    ->check(CLI::Validator([&request](std::string&) { return request.projectName.empty() ? "" : "project already selected"; }, ""))
+	    ->required(bRequiresProject);
+
+	command.add_option("--tool-profile", request.toolProfile, "Editor tool profile; defaults to the editor profile matching the configuration.")->type_name("EDITOR_PROFILE");
+	command.add_option("--root", request.workspaceRoot, "Workspace root; defaults to discovery from the current directory.")->type_name("PATH");
+
+	for (CLI::Option* option : command.get_options())
+	{
+		option->trigger_on_parse()->take_last()->transform(UnescapeArgument);
+	}
 }
 
-bool AssetCookerCli::ParseCommonArguments(int argc, char** argv, int startIndex, Arguments& arguments)
+static void ConfigureCookCommands(CLI::App& app, AssetCookerRequest& request)
 {
-	for (int index = startIndex; index < argc; ++index)
+	app.set_help_flag();
+	app.allow_windows_style_options(false);
+
+	CLI::App* project = app.add_subcommand("cook-project", "Cook all categories; omit the project or use ALL to cook every project.");
+	app.add_subcommand("cook-shaders", "Cook project shaders.")->callback([&request] { request.category = AssetCookerCategory::Shaders; });
+	app.add_subcommand("cook-textures", "Cook project textures.")->callback([&request] { request.category = AssetCookerCategory::Textures; });
+	app.add_subcommand("cook-assets", "Cook project scenes, meshes and materials.")->callback([&request] { request.category = AssetCookerCategory::SceneAssets; });
+
+	for (CLI::App* command : app.get_subcommands({}))
 	{
-		const std::string_view argument(argv[index]);
-		if (argument == "--root")
-		{
-			if (index + 1 >= argc)
-			{
-				std::cerr << "AssetCooker: --root requires a path.\n";
-				return false;
-			}
-
-			arguments.WorkspaceRoot = argv[++index];
-			continue;
-		}
-		if (argument == "--tool-profile")
-		{
-			if (index + 1 >= argc)
-			{
-				std::cerr << "AssetCooker: --tool-profile requires an editor profile.\n";
-				return false;
-			}
-
-			arguments.ToolProfile = argv[++index];
-			continue;
-		}
-
-		if (IsConfiguration(argument))
-		{
-			arguments.Configuration = argument;
-			continue;
-		}
-
-		if (arguments.ProjectName.empty())
-		{
-			arguments.ProjectName = argument;
-			continue;
-		}
-
-		std::cerr << "AssetCooker: unexpected argument '" << argument << "'.\n";
-		return false;
+		ConfigureCookOptions(*command, request, command != project);
 	}
-
-	return true;
 }
 
-bool AssetCookerCli::Parse(int argc, char** argv, Arguments& arguments)
+static std::vector<std::string> EscapeLiteralArguments(const CLI::App& command, int argc, char** argv)
 {
-	if (argc < 2 || IsHelp(argv[1]))
-	{
-		return false;
-	}
+	// Escape literal tokens independently. CLI11 alone consumes option values and selects positionals.
+	std::vector<std::string> arguments(argv + 2, argv + argc);
 
-	arguments.Command = argv[1];
-	if (arguments.Command == "cook-project")
-	{
-		arguments.Category = AssetCookerCategory::All;
-		return ParseCommonArguments(argc, argv, 2, arguments);
-	}
+	std::ranges::transform(
+	    arguments,
+	    arguments.begin(),
+	    [&command](const std::string& value)
+	    {
+		    const CLI::Option* option = command.get_option_no_throw(value);
+		    return option != nullptr && !option->get_positional() ? value : " " + value;
+	    });
 
-	if (arguments.Command == "cook-shaders")
-	{
-		arguments.Category = AssetCookerCategory::Shaders;
-	}
-	else if (arguments.Command == "cook-textures")
-	{
-		arguments.Category = AssetCookerCategory::Textures;
-	}
-	else if (arguments.Command == "cook-assets")
-	{
-		arguments.Category = AssetCookerCategory::SceneAssets;
-	}
-	else
+	std::ranges::reverse(arguments);
+	return arguments;
+}
+
+static bool ParseCookRequest(CLI::App& app, int argc, char** argv, AssetCookerRequest& request)
+{
+	CLI::App* command = argc > 1 ? app.get_subcommand_no_throw(argv[1]) : nullptr;
+	if (command == nullptr)
 	{
 		return false;
 	}
 
-	return ParseCommonArguments(argc, argv, 2, arguments) && !arguments.ProjectName.empty();
+	std::vector<std::string> arguments = EscapeLiteralArguments(*command, argc, argv);
+	try
+	{
+		command->parse(arguments);
+		const CLI::Option* project = command->get_option("ProjectName");
+		return !project->get_required() || !request.projectName.empty();
+	}
+	catch (const CLI::ArgumentMismatch& failure)
+	{
+		const std::string_view message = failure.what();
+		const CLI::Option* root = command->get_option("--root");
+		const bool bMissingRoot = message.starts_with(root->get_name());
+		std::cerr << "AssetCooker: " << (bMissingRoot ? "--root requires a path." : "--tool-profile requires an editor profile.") << '\n';
+	}
+	catch (const CLI::ExtrasError&)
+	{
+		std::cerr << "AssetCooker: unexpected argument '" << UnescapeArgument(arguments.back()) << "'.\n";
+	}
+	catch (const CLI::RequiredError&)
+	{
+	}
+
+	return false;
 }
 
-void AssetCookerCli::PrintUsage(std::ostream& output)
+static AssetCookerServiceResult CookProjectContent(const AssetCookerRequest& request)
 {
-	constexpr std::string_view profile = "[DebugEditor|DebugGame|DevelopmentEditor|DevelopmentGame|ShippingEditor|ShippingGame]";
+	const char* projectName = request.projectName.empty() ? nullptr : request.projectName.c_str();
 
-	output << "Usage:\n"
-	       << "  AssetCooker cook-project [ProjectName|ALL] " << profile << " [--tool-profile <EditorProfile>] [--root <workspace-root>]\n"
-	       << "  AssetCooker cook-shaders <ProjectName> " << profile << " [--tool-profile <EditorProfile>] [--root <workspace-root>]\n"
-	       << "  AssetCooker cook-textures <ProjectName> " << profile << " [--tool-profile <EditorProfile>] [--root <workspace-root>]\n"
-	       << "  AssetCooker cook-assets <ProjectName> " << profile << " [--tool-profile <EditorProfile>] [--root <workspace-root>]\n";
+	AssetCookerService service(
+	    request.workspaceRoot.empty() ? nullptr : request.workspaceRoot.c_str(),
+	    projectName,
+	    request.configuration.c_str(),
+	    request.toolProfile.empty() ? nullptr : request.toolProfile.c_str());
+
+	return service.Cook(projectName, request.configuration.c_str(), request.category);
 }
 
-void AssetCookerCli::PrintResult(const AssetCookerServiceResult& result)
+static void PrintCookResult(const AssetCookerServiceResult& result)
 {
 	for (const AssetCookerDiagnosticRecord& diagnostic : result.diagnostics)
 	{
@@ -143,23 +150,21 @@ void AssetCookerCli::PrintResult(const AssetCookerServiceResult& result)
 	}
 }
 
-int AssetCookerCli::Run(int argc, char** argv) const
+int RunAssetCooker(int argc, char** argv)
 {
-	Arguments arguments;
-	if (!Parse(argc, argv, arguments))
+	AssetCookerRequest request;
+	CLI::App app("Cook project content. Top-level help: --help, -h, /? or /h.", "AssetCooker");
+	ConfigureCookCommands(app, request);
+
+	const bool bParsed = ParseCookRequest(app, argc, argv, request);
+	if (!bParsed)
 	{
-		PrintUsage(std::cerr);
+		std::cerr << app.help("", CLI::AppFormatMode::All);
 		return 1;
 	}
 
-	AssetCookerService service(
-	    arguments.WorkspaceRoot.empty() ? nullptr : arguments.WorkspaceRoot.c_str(),
-	    arguments.ProjectName.empty() ? nullptr : arguments.ProjectName.c_str(),
-	    arguments.Configuration.c_str(),
-	    arguments.ToolProfile.empty() ? nullptr : arguments.ToolProfile.c_str());
+	const AssetCookerServiceResult result = CookProjectContent(request);
 
-	const AssetCookerServiceResult result = service.Cook(arguments.ProjectName.empty() ? nullptr : arguments.ProjectName.c_str(), arguments.Configuration.c_str(), arguments.Category);
-
-	PrintResult(result);
+	PrintCookResult(result);
 	return result.exitCode;
 }

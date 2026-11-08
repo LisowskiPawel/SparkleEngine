@@ -98,9 +98,25 @@ target_include_directories(ShaderCompiler
 target_compile_definitions(ShaderCompiler
     PRIVATE
         SPIRV_TOOLS_SHAREDLIB
+        CLI11_ENABLE_EXTRA_VALIDATORS=0
 )
 
 target_compile_features(ShaderCompiler PRIVATE cxx_std_20)
+
+set_source_files_properties(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCompilerCli.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCookOptions.cpp
+    PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+
+if(MSVC)
+    # Argument parsing is cold code; bound header-only CLI11 inlining without changing shader compilation.
+    set_property(SOURCE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCompilerCli.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCookOptions.cpp
+        APPEND PROPERTY COMPILE_OPTIONS
+            "$<$<CONFIG:DevelopmentEditor,DevelopmentGame,ShippingEditor,ShippingGame>:/O1>"
+            "$<$<CONFIG:DevelopmentEditor,DevelopmentGame,ShippingEditor,ShippingGame>:/Ob0>")
+endif()
 
 sparkle_target_precompile_headers(ShaderCompiler
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/PCH.h
@@ -109,6 +125,7 @@ sparkle_target_precompile_headers(ShaderCompiler
 target_link_libraries(ShaderCompiler
     PRIVATE
         ToolSupport
+        CLI11::CLI11
         ShaderContracts
         SparkleCore
         SparkleTasks

@@ -53,6 +53,8 @@ Use `nullptr`, scoped enums, explicit constructors, domain values and designated
 
 Prefer direct value bindings and named functions when they make callbacks easier to read. Use a lambda for a short local operation when it is clearer; give substantial validation, conversion and control flow a name.
 
+Keep cohesive initialization in its existing owner. Do not add a factory/getter pair or forwarding function merely to relocate the same code.
+
 ### Enums
 
 Declare an explicit underlying type. Use `std::uint8_t` for bounded internal sets that fit. Wider storage needs a current flags, cooked, shader, native or serialized requirement; review callers/layouts and regenerate changed output. Do not rely on default `int` or hypothetical future values.

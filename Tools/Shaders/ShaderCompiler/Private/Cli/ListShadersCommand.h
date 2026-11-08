@@ -1,6 +1,3 @@
 #pragma once
 
-#include <span>
-#include <string_view>
-
-int ListShaders(std::span<const std::string_view> args);
+int ListShaders(bool bValidateOnly);

@@ -4,7 +4,9 @@
 
 Temporary implementation plan. Delete this file when the feature closes.
 
-**Status:** stage 1 captured on 2026-11-08 in `DevelopmentEditor`, with production source unchanged at `10e171cd`. Stages 2–6 remain open.
+**Status:** stage 1 captured on 2026-11-08 in `DevelopmentEditor`, with production source unchanged at `10e171cd`. Stage 4 AssetCooker implementation and bounded request, cook and failure checks pass; records are in ignored `build/validation/cli11/assetcooker-20261108/report.md`. Temporary validation cleanup is blocked by automatic approval review. Delivery closure still depends on the recorded stage 2–3 cost/shared-host gaps and the remaining stages' acceptance. Stage 4 does not close those gates.
+
+Stage 5's ShaderCompiler conversion was implemented independently at the user's request on 2026-11-08. Its command/request comparisons, failure checks, debug/optimization export comparisons and existing `ShaderCompilerCliValidation` checks pass. Initial evidence and measurements are in ignored `build/validation/cli11/shader-20261108/report.md`; the current file ownership, source/executable identities and validation are in ignored `build/validation/cli11/shader-structure-20261108/report.md`. The cumulative three-tool parser rebuild exceeds the frozen build-time budget and remains an integration closure blocker. Stage 5 does not close the preceding stages or stage 6.
 
 The baseline report, cases, raw output, hashes and comparison budgets are in ignored `build/validation/cli11/baseline-20261108/report.md`. Use these records for the conversion. They cover command parsing, Launcher routing functions and bounded shell/shader execution; native GUI, successful asset cooking, game and package workflows still need delivery-stage checks.
 
@@ -69,6 +71,8 @@ Replace the private shell parser and manual usage text with CLI11 declarations. 
 **Failure checks:** exercise missing `--run` values, conflicting run/dry-run requests, duplicate GPU options, invalid profiles and mixed help/errors. Catch changed GUI/shell routing, lost confirmations or shadow handoff, execution after a parse error and renamed parsing machinery that still duplicates CLI11.
 
 ## 4. Convert AssetCooker
+
+The follow-up review keeps orchestration and implementation details with their CLI owner, exposes only `RunAssetCooker` to the entry point and aligns CMake membership/source groups. Current request, executable, cook, failure and structure checks are recorded in ignored `build/validation/cli11/assetcooker-structure-20261108/report.md`; preceding readability results remain in `build/validation/cli11/assetcooker-readability-20261108/report.md`.
 
 ```text
 Implement stage 4 of the CLI11 plan in Docs/Implementation/CLI11.md after the Launcher/dependency delivery passes.
