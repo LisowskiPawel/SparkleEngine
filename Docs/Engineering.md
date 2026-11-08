@@ -118,9 +118,9 @@ Inspect native captures separately from optimized timing runs. Match the frame, 
 
 ## Build and delivery
 
-Run consumes level definitions and cooked dependencies without requiring raw assets or source-selection flags. Game remains a rendering application; Editor retains its UI.
+Run loads level definitions and cooked dependencies without requiring raw assets or source-selection flags. Game presents the scene; Editor provides inspection and editing.
 
-Publisher Build/full Cook prepares the complete base. [ReleaseProducts.cmake](../CMake/Packaging/ReleaseProducts.cmake) defines staging, verification and archive membership. Matching source can import that base with [SyncProducts.ps1](../CMake/Packaging/SyncProducts.ps1), then rebuild/cook into the same outputs. Installer/updater, old-store migration and a freshness service are outside scope.
+Prepare the release base with a complete build and cook. [ReleaseProducts.cmake](../CMake/Packaging/ReleaseProducts.cmake) defines staging, verification and archive membership. Matching source can import that base with [SyncProducts.ps1](../CMake/Packaging/SyncProducts.ps1), then rebuild/cook into the same outputs. Installer/updater, old-store migration and a freshness service are outside scope.
 
 Scene selection does not grant redistribution rights. Preserve export restrictions on unqualified Classic/Modern Sponza derivatives and previews. Local acquisition, public archives and repository history are separate distribution cases. Keep [Qt notices](../CMake/Notices/Qt/README.md), [asset recipes](../Projects/Showcase/Assets/Meshes) and [thumbnail provenance](../Projects/Showcase/Launcher/Thumbnails/README.md).
 
@@ -130,6 +130,6 @@ Cookers publish complete validated output. Core provides containment, locks, inc
 
 ## Writing documentation
 
-Use the existing guides. Explain purpose, current behavior, important choices, limits and the next useful action. Keep related information together and link deeper sources.
+Use the existing guides for developer onboarding and planning. Start with purpose, then describe current behavior, targets, important choices and limits. Use descriptive headings, short paragraphs, tables for comparisons and expandable source detail.
 
-Preserve goals, decisions, numerical limits, open questions and primary references when editing. Remove repeated instructions, copied prompts, source inventories and obsolete procedures. Add a file only for a subject readers need independently. Check links/anchors, navigation, UTF-8, whitespace and `git diff --check`.
+Preserve goals, decisions, coding rules, numerical limits, open questions and primary references. Link to the owning guide instead of repeating it. Keep implementation detail only when it explains a contract, a failure or how to use the system. Remove copied prompts, requirement codes and obsolete procedures; retain archived role wording and its provenance. Check links/anchors, navigation, UTF-8, whitespace and `git diff --check`.

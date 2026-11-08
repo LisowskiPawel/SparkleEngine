@@ -24,6 +24,7 @@ set(SPARKLE_SOURCE_DEPENDENCY_ALLOWLIST
 include(${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/FetchDependencies.cmake NO_POLICY_SCOPE)
 
 add_subdirectory(${SPARKLE_REPOSITORY_ROOT}/Engine/Core ${CMAKE_BINARY_DIR}/Engine/Core)
+include(${SPARKLE_REPOSITORY_ROOT}/Engine/RHI/Contracts.cmake)
 add_subdirectory(${SPARKLE_REPOSITORY_ROOT}/Engine/Tasks ${CMAKE_BINARY_DIR}/Engine/Tasks)
 add_subdirectory(${SPARKLE_REPOSITORY_ROOT}/Tools/Support/ToolSupport ${CMAKE_BINARY_DIR}/Tools/Support/ToolSupport)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/SparkleLauncher ${CMAKE_BINARY_DIR}/SparkleLauncher)

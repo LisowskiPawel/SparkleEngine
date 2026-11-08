@@ -39,11 +39,15 @@ Base shading needs matching evaluation, sampling and probability densities (PDFs
 
 The current visibility path uses CPU frustum culling and batching with fixed residency budgets for opaque/alpha-tested surfaces. General streaming, occlusion/LOD and GPU-driven geometry are outside that path.
 
-### Lighting and reconstruction
+### Direct lighting
 
 Direct lighting needs analytic or exhaustive small-light comparisons, correct units, emitter identity, selection probabilities, measure conversion and visibility. Reservoir reuse must preserve the intended raw mean during motion, disocclusion and zero-support cases. Keep the estimator in Renderer and use RTXDI as a reference implementation.
 
+### Indirect lighting
+
 Indirect lighting needs a defined path domain, proposal density, shift/replay mapping, normalization, next-event estimation, multiple importance sampling (MIS), roulette and robust visibility. Replaying a random seed alone does not establish valid path reuse. Diffuse/rough-specular support does not imply transmission or caustics; an environment image is not a physical atmosphere.
+
+### Reconstruction
 
 Reconstruction depends on correct raw diffuse/specular signals and guides: albedo, normals, roughness, depth, motion, jitter and exposure. Check SDK formats/ranges, history resets, GPU lifetime and whole-frame cost. Super Resolution and Ray Reconstruction must produce one output without filtering or upscaling it twice.
 
@@ -77,7 +81,7 @@ Packed-10/PQ versus FP16/scRGB for Editor composition remains a platform decisio
 
 ## Reference renderer
 
-The immediate work is to recover Sponza radiance and validate raw output. Preserve the accepted design and delivered source work; numerical corrections still need independent execution checks.
+Reference accuracy still needs independent execution checks. See [Current priority](Roadmap.md#current-priority) for the Sponza repair.
 
 ### Transport domain
 
@@ -93,9 +97,9 @@ The full surface reference has no valid deterministic depth/distance cutoff. The
 
 Binary32 mean/variance accumulation and exact counts commit complete sample prefixes up to 1,048,576 samples per pixel. Non-finite values, overflow, safety-depth termination and mixed, stale or truncated output invalidate a reference result.
 
-Use one fixed Sponza camera and record source, content and settings. Compare Lit and Reference before and after display processing, then fix the first incorrect stage. Separately finish analytic-rectangle camera/BSDF/visibility intersections, emitter identity and matching PDFs. Perfect-mirror and competing/collinear-emitter examples must expose the defect.
+Finish analytic-rectangle camera/BSDF/visibility intersections, emitter identity and matching PDFs. Perfect-mirror and competing/collinear-emitter examples must expose the defect.
 
-Remaining checks cover independent references and uncertainty, rejection of invalid sample prefixes/files, identity changes, resets, cancellation, session preservation, inline/pipeline agreement, D3D12/Vulkan, GPU lifetime, ShippingEditor output and final scene/package reproduction. Reference controls/export in Game are excluded. Completed sampling or a sky-only image is insufficient. Retired validity instrumentation should stay removed.
+Remaining checks cover independent references and uncertainty, rejection of invalid sample prefixes/files, identity changes, resets, cancellation, session preservation, inline/pipeline agreement, D3D12/Vulkan, GPU lifetime, ShippingEditor output and final scene/package reproduction. Reference controls/export in Game are excluded. Completed sampling or a sky-only image is insufficient.
 
 ## Later rendering work
 
@@ -185,6 +189,6 @@ Application hosts the world and renderer. GameFramework publishes immutable inpu
 | [Application](../Engine/Application), [Editor](../Engine/Editor) | Hosting, settings, inspection and typed edits |
 | [Tools](../Tools) | Source import, cooking, compilation and Launcher |
 
-The showcase uses direct typed camera, animation, transform and extraction loops on Tasks. ECS keeps generational entity IDs and fixed typed component storage. Structural edits wait for workers; animation caches use the registry structure revision. Update commits finish before reading transform counts, and extraction finishes before immutable publication. World writers record changes once; animation-only work does not rebuild the Editor snapshot. Read views carry the hosting scene generation and a separate publication sequence, so ordinary updates preserve edit history and viewport navigation. This fixed path has no query planner, component-version tracker or separate gameplay scheduler.
+The showcase runs typed camera, animation, transform and extraction work through Tasks. ECS uses generational entity IDs and fixed typed component storage. Structural edits wait for workers; updates and extraction finish before immutable publication. Animation-only updates preserve the Editor snapshot, and read views distinguish scene changes from new publications so normal updates preserve edit history and viewport navigation.
 
 Shader compilation uses Launcher Cook or Editor **Recompile Shaders** / `CompileShaders [symbols]`. `ReloadShaders` reloads existing output. Dependency-directed Apply Changed is unfinished. See [References](References.md) for papers, SDK guides and earlier results.

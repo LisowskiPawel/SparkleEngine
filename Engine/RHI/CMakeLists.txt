@@ -5,13 +5,7 @@
 
 include(FetchContent)
 
-# Public vocabulary can be consumed without linking a device or native backend.
-add_library(SparkleRHIContracts INTERFACE)
-target_include_directories(SparkleRHIContracts INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/Public)
-target_link_libraries(SparkleRHIContracts INTERFACE SparkleCore)
-target_compile_features(SparkleRHIContracts INTERFACE cxx_std_20)
+include(${CMAKE_CURRENT_SOURCE_DIR}/Contracts.cmake)
 
 option(SPARKLE_RHI_WITH_D3D12 "Enable the D3D12 RHI backend" ON)
 option(SPARKLE_RHI_WITH_D3D12_NVAPI "Enable NVIDIA NVAPI integration inside the D3D12 RHI backend" ON)

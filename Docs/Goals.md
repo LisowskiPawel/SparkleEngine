@@ -10,7 +10,7 @@ The focus is real-time rendering and developer technology: explicit graphics API
 
 The long-term target is principal-level responsibility: choose consequential problems, set technical direction, carry uncertain work into production and help other engineers succeed. Build on the existing rendering and technical-art background. Use the [dated professional baseline](References.md#professional-baseline) when reviewing progress.
 
-The [role sources](References.md#role-sources) explain where this target came from. Rendering/developer technology is the main direction. Compiler engineering, driver development, research science and graphics tools are neighboring specialties with distinct requirements; choose depth deliberately rather than building a subsystem for every job-description term.
+The [role sources](References.md#role-sources) explain this choice. Compiler engineering, driver development, research science and graphics tools have distinct requirements; develop relevant depth without adding an engine subsystem for every role term.
 
 ## North Star
 
@@ -39,36 +39,47 @@ Keep supporting systems as small as the rendering and reproduction workflows all
 
 ## Technical development
 
-These capabilities combine the supplied role requirements with the public-engineer study. Several should be demonstrated by the same case. The [archived descriptions](References.md#role-sources) retain the individual responsibilities, required qualifications and differentiators.
+Demonstrate these capabilities through the same three cases where possible. The [role archive](References.md#role-sources) preserves the original responsibilities, required qualifications and differentiators.
 
 ### Rendering and GPU systems
 
 - **Light transport.** Derive and implement rasterization, ray queries and ray-tracing pipelines, global illumination, sampling, accumulation and path tracing within a real-time budget. Explain the actual estimator, proposal and target distributions, reuse assumptions and normalization. Demonstrate independent numerical/image controls, an invalid-history or sample counterexample, temporal behavior, quality, frame time and memory. Use Bistro for the flagship and San Miguel to test whether the result transfers to different content.
+
 - **Applied mathematics.** Use linear algebra, calculus, probability, statistics, Monte Carlo estimation, stochastic optimization, signal processing and numerical analysis to explain rendering and ML decisions. Retain definitions, units and assumptions, known values or a CPU reference, error/stability checks and a prediction that measurements can confirm or refute. Explain reference equivalence and uncertainty before comparing images or performance.
+
 - **Explicit APIs and shaders.** Understand D3D12/Vulkan devices, queues, commands, resources, descriptors, pipelines, barriers, memory, presentation and capabilities. Work fluently in HLSL/SM6 and reason about GLSL/Slang, DXIL/SPIR-V, reflection and host/shader layout. Follow one feature from source and compiler options through cooked bytecode, bindings and executed native commands. Demonstrate both backends, completion and deferred retirement, diagnostics and a bounded failure/fallback case.
+
 - **Hardware and concurrency.** Connect CPU caches, topology, SIMD, tasks and submission cost to GPU waves, caches, bandwidth, latency hiding, registers, occupancy, divergence, atomics and memory ordering. Use counters, traces or useful disassembly to test a specific mechanism. Retain a serial/reference control, scheduling or memory model, concurrency checks and a rejected alternative. Scope conclusions to the tested hardware, driver, compiler, API and workload.
 
 ### Software and analysis
 
 - **C++ and Python engineering.** Write cohesive modern C++ and useful Python automation with narrow public interfaces, explicit ownership and durable failure behavior. Debug lifetime errors, races, numerical errors and API misuse. Show a clean-checkout build, representative reviewed C++, one useful Python analysis/automation consumer, bounded input/cleanup and appropriate correctness or native-validation checks. Follow [Code style](CodeStyle.md); keep instructions consistent with the working product.
+
 - **Whole-system performance.** Study CPU preparation, GPU execution, queues, shader compilation, residency, streaming, memory, startup, frame pacing and input-to-present latency together. Retain complementary CPU, shader and resource-lifetime studies with fixed inputs, warm-up, repeats, p50/p95/p99, timelines and memory high-water. Join each predicted mechanism to a controlled experiment, quality-equivalent before/after result and regression threshold. Keep at least one rejected or inconclusive optimization.
+
 - **Difficult debugging.** Analyze how real D3D12/Vulkan workloads use queues, barriers, descriptors, memory, pipelines, shaders and presentation. Use PIX, RenderDoc, Nsight, native validation, compiler diagnostics or crash data to distinguish application, API, compiler, driver and hardware causes. Preserve one difficult incident: exact configuration, earliest incorrect result, capture/dump and markers, reduced reproduction, competing hypotheses, experiments, root cause, focused fix and regression check.
+
 - **Reproducible development.** Make the Windows, toolchain, D3D12 and Vulkan workflow repeatable through source control, build instructions, expected output and usable debugging/profiling steps. Demonstrate supported settings and capability limits. Windows Vulkan work establishes API experience; Linux development, another GPU architecture or driver implementation requires separate evidence. The selected engine scope remains Windows.
 
 ### Neural graphics
 
 - **Owned neural rendering.** Deliver one real trained model or neural operator path that improves a rendering result. Connect licensed data and labels, an identified model artifact, actual runtime inference, classical comparison/fallback and held-out evaluation. Report image and temporal quality, latency, memory, generalization, failures and supported capabilities. Keep personally owned data/model/kernel work distinct from vendor reconstruction, radiance-cache or texture-compression integration.
+
 - **Model-to-kernel work.** Read PyTorch/ONNX-style graphs and derive the operators, tensor shapes, layouts and computational cost. Translate a bounded model into HLSL/Slang or compute kernels; reason about precision, fusion, traffic and dispatch. Check every fixed operator and the full model against an FP32 reference on actual GPUs within a stated tolerance. Retain per-stage profiles and an optimization comparison that preserves numerical and product quality.
+
 - **Machine-learning fundamentals.** Understand automatic differentiation, computational graphs, tensor broadcasting, objectives, losses, metrics, optimization, quantization and deployment constraints. Keep training, validation and test data separate by scene; test leakage, overfitting and failure cases. Retain a reproducible experiment, model/data description, classical baseline and ablations. Independently check AI-assisted code, mathematics and claims.
+
 - **Training and deployment.** Treat data preparation/training and low-latency inference as different workloads. Profile batching, precision, layout, concurrency, memory, export and scheduling. Retain separate training and inference profiles, reproducible export, identified artifacts and the loading path. Attribute cold startup, latency tails and peak workspace; explain the deployment choice and its quality/performance tradeoff. Offline models and online adaptive caches need different reset and state-lifetime checks.
 
 ### Collaboration and direction
 
 - **Partner integration.** Discover another team's requirements and constraints; integrate into an existing system while coordinating research, hardware, drivers, compilers, content and production concerns. Retain the alternatives, integration and failure behavior, measured result, review feedback and reproduction/adoption record. Credit personal and team contributions separately. A partner-facing capability includes configuration, diagnostics, maintenance and enough explanation for another engineer to own it.
+
 - **Research productization and communication.** Turn a prototype into mature code, a useful tool/plugin or a justified negative result. Prioritize, package, document and review it. Present the three cases, one useful analysis consumer and a concise paper/talk/demo outline with working code, captures and reproduction links. Explain a decision to ship, simplify or remove something, including failed experiments. Write and present clearly in English.
+
 - **Technical direction.** Choose high-value problems from first principles and finish repeated substantial work under real constraints. Lead uncertain investigations, challenge designs, give constructive reviews, teach the reasoning and remove unnecessary complexity. Retain a consequential review/decision, second usage context, observed explanation exercise and feedback-driven revision/retest. Sustained influence also needs credible professional examples of shipped impact, mentoring, stewardship or partner trust.
 
-The selected rendering depth is path transport, direct/indirect estimators, base/anisotropic/coated materials, reconstruction and RELAX, bounded volumetrics, SHaRC before NRC, neural texture compression and supported PTLAS. [Rendering](Rendering.md) gives their targets and limits; [Roadmap](Roadmap.md#after-release) orders the work. These are local choices that develop the capabilities above.
+The [selected rendering work](Rendering.md#later-rendering-work) develops these capabilities through transport, materials, reconstruction, caches, texture compression, PTLAS and volumetrics. [Roadmap](Roadmap.md#after-release) sets the delivery order.
 
 ### Professional qualifications
 
@@ -95,17 +106,17 @@ The package contains one landing page, three case narratives, links to shareable
 
 ## Review and transfer
 
-A reviewer should be able to follow one rule from mathematics through source, cooked code and native output, recompute a comparison and inspect its uncertainty and failure case. Each technical requirement needs evidence or a stated limitation.
+A reviewer should be able to trace a claim from mathematics through source, cooked code and native output, reproduce its comparison and inspect uncertainty and failure cases. Each capability needs evidence or a stated limitation.
 
 Reproduce the documented build and result without undocumented repairs. Record who performed the run, prior involvement, environment, failed steps, assistance and output. Check hashes, prerequisites, settings and sharing rights before review. Distinguish assisted reproduction from an independent run.
 
-Use a separate technical review to challenge a meaningful assumption. Then apply the result in a second workflow, project, tool or explanation exercise with a stated constraint. Record the before/after task, feedback and revision/retest, or the evidence for leaving the design unchanged.
+Challenge a meaningful assumption in a separate technical review. Use the result in a second workflow or project and observe an explanation exercise. Record the task, feedback and revision/retest, or the evidence for leaving the design unchanged.
 
-Show repeated delivery, simplification and clear follow-up ownership. Credit self-review as self-review and external adoption only when it occurred. External participation is optional. An upstream contribution should address a real finding and follow the recipient's submission and disclosure requirements.
+Label self-review, assisted reproduction and external adoption accurately. External participation is optional. Upstream contributions need a real finding and must follow the recipient's submission and disclosure requirements.
 
 ## Reviewing progress
 
-Use the same capability descriptions when comparing past work, present evidence and the next investment. The [July 2026 CV snapshot](References.md#professional-baseline) is the historical starting point; update the assessment from actual work and permitted professional records.
+Compare past work, present evidence and the next investment against the capabilities above. Start from the [July 2026 CV snapshot](References.md#professional-baseline), then update the assessment from actual work and permitted professional records.
 
 | Review | Record |
 | --- | --- |
@@ -123,10 +134,10 @@ Describe the strength of evidence in ordinary words:
 | Verified | A reproducible result with reference/correctness checks, configuration, measurements and limitations. |
 | Transferred | Actual use, reproduction, shipment, publication or teaching with credible feedback beyond the original implementation. |
 
-Target verified evidence for every technical capability and transfer evidence for several productization, collaboration and communication requirements. A self-rehearsal can improve the package; record it as such. Neither a skill label nor repository size establishes principal-level responsibility.
+Target verified evidence for every technical capability and transfer evidence for several productization, collaboration and communication requirements.
 
-Progress from contributing a pass, to owning a complete feature, to explaining the rendering system and its measured behavior. The next step is choosing technical direction and transferring useful capabilities; the principal target is doing this repeatedly while developing other engineers. These describe growing responsibility, rather than employer job grades.
+Progress from contributing a pass, to owning a feature, to explaining a complete rendering system. Then develop technical direction, transfer capabilities and help other engineers do the same. These describe growing responsibility rather than employer job grades.
 
-When choosing work, prefer an unverified core capability, a stronger headline case, causal measurement or actual reproduction, and a result that simplifies the system. Start from a user-visible problem, data and lifetime ownership, frame/shader cost and adoption constraints. Keep a correct reference before optimizing. If another engineer cannot reproduce the result, observe the failed step, improve the product or instructions and retest.
+Choose work that closes an evidence gap, strengthens a headline case or simplifies a useful capability. If reproduction fails, observe the failed step, improve the product or instructions and retest.
 
-Revisit the target when new role evidence or professional feedback changes it. Preserve the source wording and date in [References](References.md#role-sources), then explain the change here. Keep feature tasks and delivery order in [Roadmap](Roadmap.md).
+Update the target when role evidence or professional feedback changes it; preserve the source and date in [References](References.md#role-sources). Keep tasks and delivery order in [Roadmap](Roadmap.md).
