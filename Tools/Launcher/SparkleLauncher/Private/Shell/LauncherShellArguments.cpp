@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <functional>
-#include <map>
 #include <ostream>
 #include <string_view>
 #include <vector>
@@ -60,6 +59,16 @@ namespace SparkleLauncher
 		return value.starts_with('-') ? "requires an operation id" : "";
 	}
 
+	static void SelectLaunchProduct(LauncherShellArguments& arguments, const std::string& value)
+	{
+		arguments.Product = value == "editor" ? LevelRunMode::Editor : LevelRunMode::Game;
+	}
+
+	static void SelectGpuCrashMode(LauncherShellArguments& arguments, const std::string& value)
+	{
+		arguments.GpuCrashMode = value == "off" ? RhiGpuCrashMode::Off : RhiGpuCrashMode::Aftermath;
+	}
+
 	static std::string ValidateSingleUseOption(const CLI::App& app, const CLI::Option* option, std::string&)
 	{
 		const auto occurrences = std::ranges::count(app.parse_order(), option);
@@ -69,6 +78,7 @@ namespace SparkleLauncher
 	static void ConfigureLauncherOptions(CLI::App& app, LauncherShellArguments& arguments)
 	{
 		app.set_help_flag();
+		app.allow_windows_style_options(false);
 		app.allow_extras()->prefix_command();
 		app.add_flag("--help,-h", arguments.bShowHelp, "Show help (also /?).");
 
@@ -86,8 +96,7 @@ namespace SparkleLauncher
 		app.option_defaults()->group("Scene selection");
 		app.add_option("--level", arguments.LevelId, "Catalog level for levels.sync or levels.run.")->type_name("ID");
 
-		const std::map<std::string, LevelRunMode> products = {{"editor", LevelRunMode::Editor}, {"game", LevelRunMode::Game}};
-		app.add_option("--product", arguments.Product, "Application to launch.")->transform(CLI::CheckedTransformer(products))->type_name("editor|game");
+		app.add_option_function<std::string>("--product", std::bind_front(SelectLaunchProduct, std::ref(arguments)), "Application to launch.")->check(CLI::IsMember({"editor", "game"}));
 
 		app.add_option("--graphics-api", arguments.GraphicsApi, "Graphics API for scene launch: d3d12 or vulkan.")->capture_default_str();
 
@@ -116,9 +125,8 @@ namespace SparkleLauncher
 		app.add_flag("--confirm-clean", arguments.bCleanConfirmed, "Confirm cleanup of the selected generated output.");
 
 		app.option_defaults()->group("GPU diagnostics");
-		const std::map<std::string, RhiGpuCrashMode> gpuCrashModes = {{"off", RhiGpuCrashMode::Off}, {"aftermath", RhiGpuCrashMode::Aftermath}};
-		CLI::Option* gpuCrash = app.add_option("--gpu-crash-debugging", arguments.GpuCrashMode, "GPU crash collection for scene launch.");
-		gpuCrash->transform(CLI::CheckedTransformer(gpuCrashModes))->type_name("off|aftermath");
+		CLI::Option* gpuCrash = app.add_option_function<std::string>("--gpu-crash-debugging", std::bind_front(SelectGpuCrashMode, std::ref(arguments)), "GPU crash collection for scene launch.");
+		gpuCrash->check(CLI::IsMember({"off", "aftermath"}));
 
 		CLI::Option* shaderExport = app.add_option("--shader-export", arguments.ShaderExportPath, "Absolute shader-export.json for GPU crash correlation.");
 		shaderExport->type_name("PATH");
