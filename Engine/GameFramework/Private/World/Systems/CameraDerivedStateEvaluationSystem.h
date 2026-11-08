@@ -5,9 +5,8 @@ namespace ECS
 	struct LocalTransform;
 	struct CameraDerivedState;
 
-	class CameraDerivedStateEvaluationSystem final
+	namespace CameraDerivedStateEvaluationSystem
 	{
-	public:
-		static void Evaluate(const LocalTransform& local, CameraDerivedState& derived) noexcept;
-	};
+		void Evaluate(const LocalTransform& local, CameraDerivedState& derived) noexcept;
+	}
 }

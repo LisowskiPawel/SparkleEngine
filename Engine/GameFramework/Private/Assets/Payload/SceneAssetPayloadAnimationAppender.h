@@ -7,9 +7,8 @@ namespace Assets
 {
 	class CookedAssetFileSet;
 
-	class SceneAssetPayloadAnimationAppender final
+	namespace SceneAssetPayloadAnimationAppender
 	{
-	public:
-		static void AppendAnimations(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload);
-	};
+		void AppendAnimations(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload);
+	}
 }

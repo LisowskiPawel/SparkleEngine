@@ -88,15 +88,16 @@ void ViewportToolbar::DrawFrameStats() const noexcept
 	}
 }
 
-void ViewportToolbar::Draw(std::string_view levelName, bool bDisableInteraction) noexcept
+std::optional<RenderViewMode> ViewportToolbar::Draw(std::string_view levelName, RenderViewMode viewMode, bool bDisableInteraction) noexcept
 {
 	if (!BeginToolbarWindow())
 	{
-		return;
+		return std::nullopt;
 	}
-	DrawToolbarContents(levelName, bDisableInteraction);
+	const auto selection = DrawToolbarContents(levelName, viewMode, bDisableInteraction);
 	DrawToolbarBorder();
 	EndToolbarWindow();
+	return selection;
 }
 
 bool ViewportToolbar::BeginToolbarWindow() noexcept
@@ -139,7 +140,7 @@ bool ViewportToolbar::BeginToolbarWindow() noexcept
 	return true;
 }
 
-void ViewportToolbar::DrawToolbarContents(std::string_view levelName, bool bDisableInteraction) noexcept
+std::optional<RenderViewMode> ViewportToolbar::DrawToolbarContents(std::string_view levelName, RenderViewMode viewMode, bool bDisableInteraction) noexcept
 {
 	const bool bCompactToolbar = m_widthPixels < 760.0f;
 
@@ -154,13 +155,14 @@ void ViewportToolbar::DrawToolbarContents(std::string_view levelName, bool bDisa
 	}
 	DrawCameraControls(bDisableInteraction, bCompactToolbar);
 	ImGui::SameLine();
-	DrawViewportViewModeMenu(m_viewportSession, bDisableInteraction, bCompactToolbar);
+	const auto selection = DrawViewportViewModeMenu(viewMode, bDisableInteraction, bCompactToolbar);
 	ImGui::SameLine();
 	DrawViewportShowMenu(&m_consoleVariables, bDisableInteraction, m_showControlError);
 	if (!bCompactToolbar)
 	{
 		DrawFrameStats();
 	}
+	return selection;
 }
 
 void ViewportToolbar::DrawToolbarBorder() const noexcept

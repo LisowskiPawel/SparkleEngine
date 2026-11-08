@@ -2,14 +2,12 @@
 
 #include "SimulationSystemExecution.h"
 
-#include "World/GameWorldState.h"
-
 namespace ECS
 {
-	SimulationSystemExecution::SimulationSystemExecution(GameWorldState& state, const CameraSimulationInput& cameraInput, const StructureFrozenEpoch& epoch) :
-	    m_state(state),
-	    m_cameraMovement(state.m_activeCamera, cameraInput),
-	    m_cameraQuery(state.m_registry, epoch)
+	SimulationSystemExecution::SimulationSystemExecution(CameraMovementQuery& query, EntityId activeCamera, const CameraSimulationInput& cameraInput, std::span<EntityId> changes) :
+	    m_cameraMovement(activeCamera, cameraInput),
+	    m_cameraQuery(query),
+	    m_changes(changes)
 	{
 		m_cameraQuery.PrepareWriteTraversal();
 	}
@@ -29,7 +27,7 @@ namespace ECS
 		        {
 			        if (m_cameraMovement.Apply(entity, camera, transform))
 			        {
-				        m_state.m_systemArena.CameraChanges[index] = entity;
+				        m_changes[index] = entity;
 			        }
 		        })
 		    .Succeeded();

@@ -195,6 +195,16 @@ function(sparkle_boundary_scan_file absolute_path)
                 "${_line}")
         endif()
 
+        if(_relative_path MATCHES "^Engine/Renderer/Private/(FrameGraph|Pipeline)/" AND
+           _line MATCHES "#include[^\n]*Scene/|RayTracingShaderTablePlan|RayTracingShaderTableHitGroup|ResolveSceneRecordGroups|RecordMaterialization")
+            sparkle_boundary_append_failure(
+                "RENDERER_GRAPH_RUNTIME_EXCLUDES_SCENE_POLICY"
+                "${_relative_path}"
+                "${_line_number}"
+                "Graph and pipeline infrastructure consume resolved shader-table records; scene/material mapping and scene metrics belong to the ray-material owner."
+                "${_line}")
+        endif()
+
         if(_relative_path STREQUAL "Engine/Renderer/Private/Passes/Scene/SceneRenderingPasses.cpp" AND
            _line MATCHES "#include[^\n]*Passes/(GBuffer|Lighting/RealTimeLighting|Lighting/Restir|Lighting/ReferencePathTracer/(ReferencePathTracerDisplay|ReferencePathTracerResources|ReferencePathTracerSession|ReferencePathTracerTransport))" AND
            NOT _line MATCHES "#include[^\n]*Passes/Lighting/(Restir/Reconstruction/RestirRayReconstruction|ReferencePathTracer/ReferencePathTracerSession)[.]h")
@@ -304,7 +314,7 @@ function(sparkle_boundary_scan_file absolute_path)
                 "${_line}")
         endif()
 
-        if(NOT _relative_path MATCHES "^Engine/Platform/Private/Window/(Window\\.cpp|SparkleApplication\\.manifest)$" AND
+        if(NOT _relative_path MATCHES "^Engine/Platform/Private/Window/(Window\\.cpp|WindowDisplay\\.cpp|SparkleApplication\\.manifest)$" AND
            _line MATCHES "${SPARKLE_BOUNDARY_NATIVE_DPI_POLICY_REGEX}")
             sparkle_boundary_append_failure(
                 "WINDOW_DPI_POLICY_REMAINS_PLATFORM_OWNED"

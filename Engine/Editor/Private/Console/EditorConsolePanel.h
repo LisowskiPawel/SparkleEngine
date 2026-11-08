@@ -14,14 +14,18 @@ class EditorConsolePanel final
 public:
 	explicit EditorConsolePanel(ConsoleSession& session) noexcept;
 
-	void SetOpen(bool bOpen) noexcept { m_bIsOpen = bOpen; }
-
-	bool IsOpen() const noexcept { return m_bIsOpen; }
+	void ToggleOpen() noexcept;
+	float GetDockHeight(float availableHeight) noexcept;
+	void BuildDockedUI(float left, float bottom, float width, float availableHeight, bool bDisableInteraction);
 
 	void RequestFocus() noexcept;
-	void BuildContent(bool bDisableInteraction);
 
 private:
+	void BuildContent(bool bDisableInteraction);
+	bool BeginDockWindow(float left, float bottom, float width, float availableHeight, float height);
+	void EndDockWindow();
+	void DrawDockHeader(bool bDisableInteraction);
+	void UpdateDockInteraction(float availableHeight, bool bDisableInteraction);
 	void Clear() noexcept;
 	static int HandleInputTextCallback(ImGuiInputTextCallbackData* data);
 	static std::size_t FindCompletionTokenStart(const std::string& input) noexcept;
@@ -38,12 +42,11 @@ private:
 	std::vector<std::string> GetCurrentCompletions() const;
 	std::string BuildCompletionList(const std::vector<std::string>& completions) const;
 
-	ConsoleSession* m_session = nullptr;
+	ConsoleSession& m_session;
 	std::string m_outputTextBuffer;
 	std::array<char, 512> m_inputBuffer{};
 	std::array<char, 128> m_filterBuffer{};
-	std::size_t m_seenConsoleOutputCount = 0;
+	float m_dockHeight = 300.0f;
 	bool m_bIsOpen = false;
-	bool m_bScrollToBottom = true;
 	bool m_bFocusInput = false;
 };

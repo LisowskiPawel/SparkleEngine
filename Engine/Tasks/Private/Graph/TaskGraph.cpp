@@ -8,6 +8,17 @@
 #include <limits>
 #include <utility>
 
+static void ReserveRelationSlot(std::vector<std::uint32_t>& relation)
+{
+	if (relation.size() < relation.capacity())
+	{
+		return;
+	}
+
+	const std::size_t capacity = std::max<std::size_t>(1, relation.capacity() * 2);
+	relation.reserve(capacity);
+}
+
 TaskNodeHandle::TaskNodeHandle() noexcept = default;
 
 TaskNodeHandle::TaskNodeHandle(std::uint64_t builderIdentity, std::uint32_t builderGeneration, std::uint32_t index) noexcept :
@@ -133,6 +144,10 @@ TaskNodeHandle TaskGraphBuilder::AddNested(TaskNodeHandle parent, TaskDesc desc,
 		return {};
 	}
 
+	// Reserve the parent relation before Add can publish the child node.
+	auto& children = m_state->Nodes[parentIndex].NestedChildren;
+	ReserveRelationSlot(children);
+
 	TaskNodeHandle child = Add(std::move(desc), std::move(function));
 	if (!child)
 	{
@@ -175,8 +190,13 @@ bool TaskGraphBuilder::DependsOn(TaskNodeHandle task, TaskNodeHandle prerequisit
 		return false;
 	}
 
+	// Both directions commit without allocation after either adjacency changes.
+	auto& dependents = m_state->Nodes[prerequisiteIndex].Dependents;
+	ReserveRelationSlot(prerequisites);
+	ReserveRelationSlot(dependents);
+
 	prerequisites.push_back(prerequisiteIndex);
-	m_state->Nodes[prerequisiteIndex].Dependents.push_back(taskIndex);
+	dependents.push_back(taskIndex);
 	++m_state->EdgeCount;
 	return true;
 }

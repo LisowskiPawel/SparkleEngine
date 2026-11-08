@@ -13,7 +13,9 @@ enum class InputEventType : std::uint8_t
 	Keyboard,
 	MouseButton,
 	MouseMove,
-	MouseWheel
+	MouseWheel,
+	FocusLost,
+	CaptureLost
 };
 
 struct InputBackendResult

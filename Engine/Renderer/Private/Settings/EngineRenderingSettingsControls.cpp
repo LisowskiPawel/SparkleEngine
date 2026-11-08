@@ -13,7 +13,7 @@
 #include "Renderer/Public/ExternalCapture/ExternalCaptureStartup.h"
 #include "RHI/Public/Diagnostics/RhiExternalCapture.h"
 
-EngineRenderingSettingsState EngineRenderingSettingsControls::Capture() noexcept
+EngineRenderingSettingsState CaptureEngineRenderingSettings() noexcept
 {
 	EngineRenderingSettingsState state;
 	state.bVSync = CVarVSync.Get();
@@ -50,7 +50,7 @@ EngineRenderingSettingsState EngineRenderingSettingsControls::Capture() noexcept
 	return state;
 }
 
-void EngineRenderingSettingsControls::Apply(const EngineRenderingSettingsState& state) noexcept
+void ApplyEngineRenderingSettings(const EngineRenderingSettingsState& state) noexcept
 {
 	const auto setCVarIfChanged = []<typename TCVar, typename TValue>(TCVar& cvar, const TValue& value) noexcept
 	{

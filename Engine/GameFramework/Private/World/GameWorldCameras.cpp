@@ -8,20 +8,16 @@
 
 #include <algorithm>
 
-class CameraComponentTranslation final
+static ECS::Camera ToCameraData(const CameraDesc& desc, float aspectRatio, bool bActive) noexcept
 {
-public:
-	static ECS::Camera ToCameraData(const CameraDesc& desc, float aspectRatio, bool bActive) noexcept
-	{
-		return ECS::Camera{
-		    .FovYDegrees = std::clamp(desc.fovYDegrees, 1.0f, 179.0f),
-		    .NearZ = desc.nearZ,
-		    .FarZ = desc.farZ,
-		    .AspectRatio = aspectRatio,
-		    .ProjectionKind = desc.projectionKind,
-		    .bActive = bActive};
-	}
-};
+	return ECS::Camera{
+	    .FovYDegrees = std::clamp(desc.fovYDegrees, 1.0f, 179.0f),
+	    .NearZ = desc.nearZ,
+	    .FarZ = desc.farZ,
+	    .AspectRatio = aspectRatio,
+	    .ProjectionKind = desc.projectionKind,
+	    .bActive = bActive};
+}
 
 namespace ECS
 {
@@ -37,7 +33,7 @@ namespace ECS
 		const LocalTransform local = WorldTransformConversion::ToLocal(transform);
 
 		const bool bTransformsAdded = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
-		const bool bCameraAdded = bTransformsAdded && (m_registry.Add(entity, CameraComponentTranslation::ToCameraData(entry.desc, 16.0f / 9.0f, bActive)));
+		const bool bCameraAdded = bTransformsAdded && (m_registry.Add(entity, ToCameraData(entry.desc, 16.0f / 9.0f, bActive)));
 		const bool bDerivedStateAdded = bCameraAdded && (m_registry.Add(entity, CameraDerivedState{}));
 		const bool bVisibilityAdded = bDerivedStateAdded && (m_registry.Add(entity, Visibility{}));
 		const bool bNameAdded = bVisibilityAdded && (m_registry.Add(entity, Name{std::move(entry.name)}));
@@ -134,52 +130,12 @@ namespace ECS
 			return false;
 		}
 		Transform transform(desc.position, {desc.pitchRadians, desc.yawRadians, 0.0f});
-		const bool bWritten = WriteTransform(entity, transform) && m_registry.Replace(entity, CameraComponentTranslation::ToCameraData(desc, existing->AspectRatio, existing->bActive));
+		const bool bWritten = WriteTransform(entity, transform) && m_registry.Replace(entity, ToCameraData(desc, existing->AspectRatio, existing->bActive));
 		if (bWritten)
 		{
 			RecordChange(entity);
 		}
 		return bWritten;
-	}
-
-	bool GameWorldState::WriteTransform(EntityId entity, const Transform& transform) noexcept
-	{
-		const bool bWritten = m_registry.Replace(entity, WorldTransformConversion::ToLocal(transform));
-		if (bWritten)
-		{
-			MarkTransformDirty(entity);
-			RecordChange(entity);
-		}
-		return bWritten;
-	}
-
-	Transform GameWorldState::ReadTransform(EntityId entity) const noexcept
-	{
-		const LocalTransform* local = m_registry.Get<LocalTransform>(entity);
-		return local == nullptr ? Transform{} : WorldTransformConversion::ToPublic(*local);
-	}
-
-	bool GameWorldState::WriteVisibility(EntityId entity, bool bVisible) noexcept
-	{
-		const Visibility* visibility = m_registry.Get<Visibility>(entity);
-		if (visibility == nullptr)
-		{
-			return false;
-		}
-		Visibility updated = *visibility;
-		updated.bVisible = bVisible;
-		const bool bWritten = m_registry.Replace(entity, updated);
-		if (bWritten)
-		{
-			RecordChange(entity);
-		}
-		return bWritten;
-	}
-
-	bool GameWorldState::ReadVisibility(EntityId entity) const noexcept
-	{
-		const Visibility* visibility = m_registry.Get<Visibility>(entity);
-		return visibility != nullptr && visibility->bVisible;
 	}
 
 }

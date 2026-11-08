@@ -12,7 +12,6 @@ class SceneInspectorPanel final
 {
 public:
 	SceneInspectorPanel(SceneObjectSelection& selection, EditorTransactionHistory& transactionHistory, float widthPixels = 560.0f) noexcept;
-	void SetWidth(float widthPixels) noexcept;
 
 	float GetWidth() const noexcept { return m_widthPixels; }
 

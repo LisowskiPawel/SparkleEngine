@@ -4,6 +4,7 @@
 #include "Assets/Cooked/LoadedSceneManifest.h"
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Core/Public/Files/FileSetPublication.h"
+#include "Tasks/Public/TaskTypes.h"
 
 #include <cstdint>
 #include <atomic>
@@ -11,8 +12,12 @@
 #include <memory>
 #include <vector>
 
+class TaskExecutionContext;
+
 namespace Assets
 {
+	class SceneAssetCatalog;
+
 	struct SceneAssetLoadWork final
 	{
 		SceneAssetLoadWork(const Files::FileSetReadScope& publication, CookedAssetAllocationBudget& budget, const SceneAssetId& id, std::filesystem::path manifestPath) :
@@ -36,6 +41,15 @@ namespace Assets
 		{
 		}
 
+		void PreparePackage(std::uint64_t requestId, std::uint64_t worldGeneration, std::uint64_t documentGeneration, LevelDesc level, const SceneAssetCatalog& catalog);
+		TaskResult ReadAsset(std::size_t index, TaskExecutionContext& context);
+		TaskResult DecodeAsset(std::size_t index, TaskExecutionContext& context);
+		TaskResult FinalizePackage(TaskExecutionContext& context);
+
+	private:
+		void ResolveAssets(const SceneAssetCatalog& catalog);
+
+	public:
 		Files::FileSetReadScope Publication;
 		CookedAssetAllocationBudget AllocationBudget;
 		std::unique_ptr<SceneLoadPackage> Package;

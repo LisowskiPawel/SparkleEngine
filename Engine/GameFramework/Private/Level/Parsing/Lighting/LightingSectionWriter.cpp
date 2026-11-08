@@ -11,19 +11,8 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_lightingSectionWriterLogger, "GameFramework
 
 namespace LevelParsing
 {
-	class LightingSectionSerialization final
-	{
-	public:
-		static void WriteDirectional(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SceneDirectionalLightDesc& value);
-		static void WritePoint(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const PointLightDesc& value);
-		static void WriteSpot(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SpotLightDesc& value);
-		static void WriteRect(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const RectLightDesc& value);
 
-	private:
-		static void WriteCommonFields(std::ostream& output, std::string_view prefix, const SceneLightCommonDesc& common);
-	};
-
-	void LightingSectionSerialization::WriteCommonFields(std::ostream& output, std::string_view prefix, const SceneLightCommonDesc& common)
+	static void WriteCommonFields(std::ostream& output, std::string_view prefix, const SceneLightCommonDesc& common)
 	{
 		if (!common.name.empty())
 		{
@@ -34,7 +23,7 @@ namespace LevelParsing
 		output << prefix << "Visible = " << (common.bVisible ? "true" : "false") << "\n";
 	}
 
-	void LightingSectionSerialization::WriteDirectional(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SceneDirectionalLightDesc& value)
+	static void WriteDirectional(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SceneDirectionalLightDesc& value)
 	{
 		WriteCommonFields(output, prefix, light.common);
 		output << prefix << "IlluminanceLux = " << value.illuminance << "\n";
@@ -43,7 +32,7 @@ namespace LevelParsing
 		output << prefix << "CastShadow = " << (value.bCastShadow ? "true" : "false") << "\n";
 	}
 
-	void LightingSectionSerialization::WritePoint(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const PointLightDesc& value)
+	static void WritePoint(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const PointLightDesc& value)
 	{
 		WriteCommonFields(output, prefix, light.common);
 		output << prefix << "LuminousIntensityCandela = " << value.luminousIntensity << "\n";
@@ -54,7 +43,7 @@ namespace LevelParsing
 		output << prefix << "CastShadow = " << (value.bCastShadow ? "true" : "false") << "\n";
 	}
 
-	void LightingSectionSerialization::WriteSpot(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SpotLightDesc& value)
+	static void WriteSpot(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const SpotLightDesc& value)
 	{
 		WriteCommonFields(output, prefix, light.common);
 		output << prefix << "LuminousIntensityCandela = " << value.luminousIntensity << "\n";
@@ -68,7 +57,7 @@ namespace LevelParsing
 		output << prefix << "CastShadow = " << (value.bCastShadow ? "true" : "false") << "\n";
 	}
 
-	void LightingSectionSerialization::WriteRect(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const RectLightDesc& value)
+	static void WriteRect(std::ostream& output, std::string_view prefix, const SceneLightDesc& light, const RectLightDesc& value)
 	{
 		WriteCommonFields(output, prefix, light.common);
 		output << prefix << "LuminanceCdPerM2 = " << value.luminance << "\n";
@@ -91,22 +80,22 @@ namespace LevelParsing
 		{
 			if (const SceneDirectionalLightDesc* value = light.GetDirectional())
 			{
-				LightingSectionSerialization::WriteDirectional(output, "DirectionalLight" + std::to_string(directionalIndex++), light, *value);
+				WriteDirectional(output, "DirectionalLight" + std::to_string(directionalIndex++), light, *value);
 				continue;
 			}
 			if (const PointLightDesc* value = light.GetPoint())
 			{
-				LightingSectionSerialization::WritePoint(output, "PointLight" + std::to_string(pointIndex++), light, *value);
+				WritePoint(output, "PointLight" + std::to_string(pointIndex++), light, *value);
 				continue;
 			}
 			if (const SpotLightDesc* value = light.GetSpot())
 			{
-				LightingSectionSerialization::WriteSpot(output, "SpotLight" + std::to_string(spotIndex++), light, *value);
+				WriteSpot(output, "SpotLight" + std::to_string(spotIndex++), light, *value);
 				continue;
 			}
 			if (const RectLightDesc* value = light.GetRect())
 			{
-				LightingSectionSerialization::WriteRect(output, "RectLight" + std::to_string(rectIndex++), light, *value);
+				WriteRect(output, "RectLight" + std::to_string(rectIndex++), light, *value);
 				continue;
 			}
 			Diagnostics::Fatal(g_lightingSectionWriterLogger, __FILE__, __LINE__, "Level contains an unsupported light payload.");

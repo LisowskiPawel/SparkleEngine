@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Public/CoreAPI.h"
+
 #include <cstdint>
 #include <filesystem>
 #include <optional>
@@ -15,45 +17,45 @@ namespace Filesystem
 	inline constexpr std::string_view kProjectMarker = ".sparkle-project";
 
 	// Process paths
-	const std::filesystem::path& GetWorkingDirectory();
-	std::filesystem::path GetExecutablePath();
-	std::filesystem::path GetExecutableDirectory();
+	SPARKLE_CORE_API const std::filesystem::path& GetWorkingDirectory();
+	SPARKLE_CORE_API std::filesystem::path GetExecutablePath();
+	SPARKLE_CORE_API std::filesystem::path GetExecutableDirectory();
 
 	// Stateless root discovery for early bootstrap code
-	std::filesystem::path ResolveWorkspaceRootPath();
-	std::filesystem::path ResolveArtifactRootPath(const std::filesystem::path& workspaceRoot);
+	SPARKLE_CORE_API std::filesystem::path ResolveWorkspaceRootPath();
+	SPARKLE_CORE_API std::filesystem::path ResolveArtifactRootPath(const std::filesystem::path& workspaceRoot);
 
 	// Cached workspace and content roots
-	const std::filesystem::path& GetWorkspaceRootPath();
-	const std::filesystem::path& GetProjectPath();
-	const std::filesystem::path& GetEnginePath();
-	void ConfigureProjectRoot(const std::filesystem::path& projectRoot);
+	SPARKLE_CORE_API const std::filesystem::path& GetWorkspaceRootPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetProjectPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetEnginePath();
+	SPARKLE_CORE_API void ConfigureProjectRoot(const std::filesystem::path& projectRoot);
 
 	// Cooked product paths
-	const std::filesystem::path& GetCookedAssetRootPath();
-	const std::filesystem::path& GetCookedShaderRootPath();
-	const std::filesystem::path& GetGlobalShaderMapPath();
-	const std::filesystem::path& GetCookedShaderLibraryPath();
-	const std::filesystem::path& GetCookedTextureRootPath();
-	const std::filesystem::path& GetCookedSceneManifestRootPath();
-	const std::filesystem::path& GetCookedMeshRootPath();
-	const std::filesystem::path& GetCookedMaterialRootPath();
-	const std::filesystem::path& GetCookedSkeletonRootPath();
-	const std::filesystem::path& GetCookedAnimationRootPath();
-	const std::filesystem::path& GetSceneAssetRegistryPath();
-	std::filesystem::path BuildGlobalShaderMapPath(const std::filesystem::path& cookedShaderRootPath);
-	std::filesystem::path BuildCookedShaderLibraryPath(const std::filesystem::path& cookedShaderRootPath);
+	SPARKLE_CORE_API const std::filesystem::path& GetCookedAssetRootPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetCookedShaderRootPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetGlobalShaderMapPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetCookedShaderLibraryPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetCookedTextureRootPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetCookedSceneManifestRootPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetCookedMeshRootPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetCookedMaterialRootPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetCookedSkeletonRootPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetCookedAnimationRootPath();
+	SPARKLE_CORE_API const std::filesystem::path& GetSceneAssetRegistryPath();
+	SPARKLE_CORE_API std::filesystem::path BuildGlobalShaderMapPath(const std::filesystem::path& cookedShaderRootPath);
+	SPARKLE_CORE_API std::filesystem::path BuildCookedShaderLibraryPath(const std::filesystem::path& cookedShaderRootPath);
 
 	// Marker-based workspace and content discovery
-	std::optional<std::filesystem::path> FindAncestorWithMarker(const std::filesystem::path& startDir, std::string_view markerFileName, uint32_t maxDepth = 32);
+	SPARKLE_CORE_API std::optional<std::filesystem::path> FindAncestorWithMarker(const std::filesystem::path& startDir, std::string_view markerFileName, uint32_t maxDepth = 32);
 
-	std::optional<std::filesystem::path> DiscoverWorkspaceRoot();
+	SPARKLE_CORE_API std::optional<std::filesystem::path> DiscoverWorkspaceRoot();
 
-	std::optional<std::filesystem::path> DiscoverEngineRoot();
+	SPARKLE_CORE_API std::optional<std::filesystem::path> DiscoverEngineRoot();
 
-	std::optional<std::filesystem::path> DiscoverProjectRoot();
+	SPARKLE_CORE_API std::optional<std::filesystem::path> DiscoverProjectRoot();
 
 	// Runtime texture lookup accepts .stex products only and never searches source assets.
-	std::optional<std::filesystem::path> ResolveCookedTexturePath(const std::filesystem::path& inputPath);
-	void AppendCookedTexturePaths(std::span<const std::filesystem::path> inputPaths, std::vector<std::filesystem::path>& destination);
+	SPARKLE_CORE_API std::optional<std::filesystem::path> ResolveCookedTexturePath(const std::filesystem::path& inputPath);
+	SPARKLE_CORE_API void AppendCookedTexturePaths(std::span<const std::filesystem::path> inputPaths, std::vector<std::filesystem::path>& destination);
 }

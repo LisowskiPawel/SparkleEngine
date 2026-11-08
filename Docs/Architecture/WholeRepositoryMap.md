@@ -72,7 +72,7 @@ The 2026-11-07 second ownership pass colocates shader registrations with their t
 | `Engine/RHI` | `SparkleRHICommon`, `SparkleRHIDiagnostics`, backend targets, `SparkleRHI` | public `SparkleCore`; private Platform and selected backends |
 | `Engine/GameFramework` | `SparkleGameFramework` | public Core and Tasks; no Renderer or Platform dependency |
 | `Engine/Renderer` | registration/provider targets and `SparkleRenderer` | public Core and RHI; private Platform, GameFramework, Tasks, providers, and ImGui |
-| `Engine/Editor` | `SparkleEditor` | public Core, RHI, Renderer, GameFramework, and Platform; private ImGui |
+| `Engine/Editor` | `SparkleEditor` | public Core, RHI, Renderer and GameFramework; private Platform and ImGui |
 | `Engine/Application` | `SparkleApplication`, `SparkleApplicationEditor` | game host publishes Renderer; editor host layers Editor over the game host |
 | `Projects/Showcase` | `ShowcaseEditor`, `ShowcaseGame` | explicit editor and game launch products |
 

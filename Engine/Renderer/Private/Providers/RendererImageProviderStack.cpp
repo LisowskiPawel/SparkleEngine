@@ -34,11 +34,18 @@ RendererImageProviderStack::~RendererImageProviderStack() noexcept
 
 void RendererImageProviderStack::Initialize()
 {
+	m_upscaler = CreateConfiguredUpscalerProvider();
+	m_rayReconstruction = CreateConfiguredRayReconstructionProvider();
+	InitializeUpscaler();
+	InitializeRayReconstruction();
+	m_bResetHistoryPending = true;
+}
+
+void RendererImageProviderStack::InitializeUpscaler()
+{
 	const RhiCapabilities& capabilities = m_renderHardwareInterface.GetCapabilities();
 	RhiInteropService& interop = m_renderHardwareInterface.GetInteropService();
 
-	m_upscaler = CreateConfiguredUpscalerProvider();
-	m_rayReconstruction = CreateConfiguredRayReconstructionProvider();
 	if (m_upscaler != nullptr)
 	{
 		const RhiNativeInteropRequest request{.Consumer = ERhiNativeInteropConsumer::ExternalProvider, .Reason = "Renderer upscaler provider initialization"};
@@ -54,6 +61,12 @@ void RendererImageProviderStack::Initialize()
 			    "supported provider or repair its prerequisites.");
 		}
 	}
+}
+
+void RendererImageProviderStack::InitializeRayReconstruction()
+{
+	const RhiCapabilities& capabilities = m_renderHardwareInterface.GetCapabilities();
+	RhiInteropService& interop = m_renderHardwareInterface.GetInteropService();
 
 	if (m_rayReconstruction != nullptr)
 	{
@@ -70,8 +83,6 @@ void RendererImageProviderStack::Initialize()
 			    "choose a supported provider or repair its prerequisites.");
 		}
 	}
-
-	m_bResetHistoryPending = true;
 }
 
 void RendererImageProviderStack::Shutdown() noexcept
@@ -145,16 +156,21 @@ void RendererImageProviderStack::ResetHistory() noexcept
 	m_bResetHistoryPending = true;
 }
 
-void RendererImageProviderStack::SetupFrame(const RenderView& view, const RenderFrameIdentity& identity)
+static ImageProviderFrameInput BuildImageProviderFrameInput(const RenderView& view, const RenderFrameIdentity& identity, bool bResetHistoryPending) noexcept
 {
-	ImageProviderFrameInput providerInput{
+	return ImageProviderFrameInput{
 	    .RenderExtent = view.renderExtent,
 	    .OutputExtent = view.outputExtent,
 	    .FrameId = identity.FrameId,
 	    .ProviderGeneration = identity.ImageProviderGeneration,
 	    .Camera = view.cameraUniform,
 	    .Temporal = view.temporalUniform,
-	    .bResetHistory = view.temporalUniform.HistoryValid == 0u || m_bResetHistoryPending};
+	    .bResetHistory = view.temporalUniform.HistoryValid == 0u || bResetHistoryPending};
+}
+
+void RendererImageProviderStack::SetupFrame(const RenderView& view, const RenderFrameIdentity& identity)
+{
+	ImageProviderFrameInput providerInput = BuildImageProviderFrameInput(view, identity, m_bResetHistoryPending);
 
 	m_bResetHistoryPending = false;
 
@@ -165,10 +181,15 @@ void RendererImageProviderStack::SetupFrame(const RenderView& view, const Render
 
 	if (ShouldUseRayReconstruction(view.viewMode))
 	{
-		providerInput.OutputExtent = providerInput.RenderExtent;
-		m_rayReconstruction->SetDenoisingExtent(providerInput.RenderExtent);
-		m_rayReconstruction->SetupFrame(providerInput);
+		SetupRayReconstructionFrame(providerInput);
 	}
+}
+
+void RendererImageProviderStack::SetupRayReconstructionFrame(ImageProviderFrameInput& input)
+{
+	input.OutputExtent = input.RenderExtent;
+	m_rayReconstruction->SetDenoisingExtent(input.RenderExtent);
+	m_rayReconstruction->SetupFrame(input);
 }
 
 RenderViewportExtent RendererImageProviderStack::ResolveRenderExtent(RenderViewportExtent outputExtent) noexcept

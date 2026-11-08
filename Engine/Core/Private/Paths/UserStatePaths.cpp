@@ -12,59 +12,13 @@
 
 #include <cctype>
 #include <cstdint>
-#include <cstdlib>
 #include <iomanip>
 #include <sstream>
-#include <stdexcept>
 #include <string>
-#include <system_error>
 
-#if defined(_WIN32)
-  #define WIN32_LEAN_AND_MEAN
-  #define NOMINMAX
-  #include <Windows.h>
-  #include <ShlObj.h>
-#endif
-
-namespace Filesystem::Private
+namespace Filesystem
 {
-	std::filesystem::path DiscoverPlatformLocalStateRoot()
-	{
-#if defined(_WIN32)
-		PWSTR knownFolderPath = nullptr;
-		if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &knownFolderPath)))
-		{
-			const std::filesystem::path result(knownFolderPath);
-			CoTaskMemFree(knownFolderPath);
-			return result;
-		}
-		throw std::runtime_error("Cannot resolve Windows LocalAppData for Sparkle per-user state.");
-#else
-		if (const char* stateHome = std::getenv("XDG_STATE_HOME"); stateHome != nullptr && *stateHome != '\0')
-		{
-			return std::filesystem::path(stateHome);
-		}
-		if (const char* home = std::getenv("HOME"); home != nullptr && *home != '\0')
-		{
-			return std::filesystem::path(home) / ".local" / "state";
-		}
-#endif
-		std::error_code errorCode;
-		const std::filesystem::path temporaryRoot = std::filesystem::temp_directory_path(errorCode);
-		if (!errorCode)
-		{
-			return temporaryRoot;
-		}
-		errorCode.clear();
-		return std::filesystem::current_path(errorCode);
-	}
-
-	std::filesystem::path ResolveSparkleUserStateRoot()
-	{
-		return DiscoverPlatformLocalStateRoot() / "SparkleEngine";
-	}
-
-	std::string MakeWorkspaceStateKey(const std::filesystem::path& workspaceRoot)
+	static std::string MakeWorkspaceStateKey(const std::filesystem::path& workspaceRoot)
 	{
 		const std::filesystem::path normalizedRoot = Paths::Normalize(workspaceRoot);
 		std::string pathKey = Strings::ToNarrow(normalizedRoot.generic_wstring());
@@ -87,7 +41,7 @@ namespace Filesystem::Private
 		return result.str();
 	}
 
-	std::string ResolveProductName(const std::filesystem::path& projectRoot)
+	static std::string ResolveProductName(const std::filesystem::path& projectRoot)
 	{
 		if (!projectRoot.empty())
 		{
@@ -97,7 +51,7 @@ namespace Filesystem::Private
 		return inferredName.empty() ? "Sparkle" : inferredName;
 	}
 
-	ProductUserStatePaths BuildProductUserStatePaths(const std::filesystem::path& root)
+	static ProductUserStatePaths BuildProductUserStatePaths(const std::filesystem::path& root)
 	{
 		const std::filesystem::path normalizedRoot = Paths::Normalize(root);
 
@@ -109,14 +63,11 @@ namespace Filesystem::Private
 		    .CrashesRoot = normalizedRoot / "Crashes",
 		    .CacheRoot = normalizedRoot / "Cache"};
 	}
-}
 
-namespace Filesystem
-{
 	WorkspaceUserStatePaths ResolveWorkspaceUserStatePaths(const std::filesystem::path& workspaceRoot)
 	{
-		const std::filesystem::path root = Private::ResolveSparkleUserStateRoot();
-		const std::string workspaceKey = Private::MakeWorkspaceStateKey(workspaceRoot);
+		const std::filesystem::path root = ResolveSparkleUserStateRoot();
+		const std::string workspaceKey = MakeWorkspaceStateKey(workspaceRoot);
 		return WorkspaceUserStatePaths{.DevelopmentProductsRoot = root / "Development" / workspaceKey, .LauncherRoot = root / "LauncherState" / workspaceKey};
 	}
 
@@ -128,13 +79,13 @@ namespace Filesystem
 			safeProductName = "Sparkle";
 		}
 		const WorkspaceUserStatePaths workspaceState = ResolveWorkspaceUserStatePaths(workspaceRoot);
-		return Private::BuildProductUserStatePaths(workspaceState.DevelopmentProductsRoot / safeProductName);
+		return BuildProductUserStatePaths(workspaceState.DevelopmentProductsRoot / safeProductName);
 	}
 
-	ProductUserStatePaths Private::ResolveCurrentProductUserStatePaths()
+	ProductUserStatePaths ResolveCurrentProductUserStatePaths()
 	{
 		const std::filesystem::path workspaceRoot = ResolveWorkspaceRootPath();
 		const auto projectRoot = DiscoverProjectRoot();
-		return ResolveDevelopmentProductUserStatePaths(workspaceRoot, Private::ResolveProductName(projectRoot.value_or(std::filesystem::path{})));
+		return ResolveDevelopmentProductUserStatePaths(workspaceRoot, ResolveProductName(projectRoot.value_or(std::filesystem::path{})));
 	}
 }

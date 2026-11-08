@@ -5,55 +5,6 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
-#include "Scene/RayTracing/RayTracingShaderTablePlan.h"
-
-std::vector<const RayTracingHitGroupComposition*> RayTracingPipelineRuntime::CollectRecordGroups(const RayTracingPipelineComposition& composition)
-{
-	std::vector<const RayTracingHitGroupComposition*> recordGroups;
-	recordGroups.reserve(composition.GetHitGroups().size());
-	for (const RayTracingHitGroupComposition& group : composition.GetHitGroups())
-	{
-		recordGroups.push_back(&group);
-	}
-	return recordGroups;
-}
-
-std::vector<const RayTracingHitGroupComposition*> RayTracingPipelineRuntime::ResolveSceneRecordGroups(const RayTracingPipelineComposition& composition, const RayTracingShaderTablePlan& plan)
-{
-	const RayTracingHitGroupComposition* opaqueGroup = nullptr;
-	const RayTracingHitGroupComposition* alphaTestedGroup = nullptr;
-	for (const RayTracingHitGroupComposition& group : composition.GetHitGroups())
-	{
-		if (group.AnyHit == 0u)
-		{
-			if (opaqueGroup != nullptr)
-			{
-				throw Diagnostics::Error("Scene shader-table composition contains multiple opaque hit groups.");
-			}
-			opaqueGroup = &group;
-		}
-		else
-		{
-			if (alphaTestedGroup != nullptr)
-			{
-				throw Diagnostics::Error("Scene shader-table composition contains multiple alpha-tested hit groups.");
-			}
-			alphaTestedGroup = &group;
-		}
-	}
-	if (opaqueGroup == nullptr || alphaTestedGroup == nullptr)
-	{
-		throw Diagnostics::Error("Scene shader-table materialization requires one opaque and one alpha-tested hit group.");
-	}
-
-	std::vector<const RayTracingHitGroupComposition*> recordGroups;
-	recordGroups.reserve(plan.GetRecords().size());
-	for (const RayTracingShaderTableRecordPlan& record : plan.GetRecords())
-	{
-		recordGroups.push_back(record.HitGroup == RayTracingShaderTableHitGroup::AlphaTested ? alphaTestedGroup : opaqueGroup);
-	}
-	return recordGroups;
-}
 
 std::vector<RhiRayTracingShaderRecord> RayTracingPipelineRuntime::BuildShaderRecords(std::span<const ShaderTypeId> shaderTypes)
 {

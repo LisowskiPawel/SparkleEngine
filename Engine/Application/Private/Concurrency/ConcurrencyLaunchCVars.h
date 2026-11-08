@@ -2,9 +2,12 @@
 
 #include <cstdint>
 
+class TaskExecutor;
+class TaskScope;
+struct RendererExecutionConfig;
+
 namespace ConcurrencyLaunchCVars
 {
 	void Register() noexcept;
-	bool UseThreadedRenderer() noexcept;
-	std::uint32_t ResolveRenderPipelineDepth() noexcept;
+	RendererExecutionConfig ResolveRendererExecution(bool bAllowThreaded, bool bEnableUiRenderPackets, TaskExecutor& executor, TaskScope& parentScope) noexcept;
 }

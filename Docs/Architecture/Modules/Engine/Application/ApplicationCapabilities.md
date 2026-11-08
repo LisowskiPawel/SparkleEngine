@@ -44,6 +44,32 @@ The module is a composition root. Its quality depends on preserving the boundari
 
 The Editor frame now acquires products and presentation texture once through Renderer.GetViewportPresentation and projects that bounded observation to UI. GameApplication no longer forwards an independent products getter. [Stage 0C publication handoff](../../../CrossModule/PerformanceDiagnostics/ExternalCapture/Discovery.md#stage-0c-implementation-handoff---2026-10-08) records serial/threaded runtime controls and retained evidence limits.
 
+## Host Responsibility Boundaries
+
+The 2026-11-08 orchestration refinement keeps lifecycle decisions visible while private capability functions own their mechanics:
+
+| Owner | Responsibility |
+| --- | --- |
+| `Application.cpp` | Initialize, pump and shut down the selected host, including exception unwind. |
+| `Startup/ApplicationProcessStartup.cpp` | Process crash-dialog policy and startup configuration order. |
+| `GameApplication.cpp` | Frame admission, lifecycle composition and ordered owner retirement. |
+| `GameApplicationFrame.cpp` | Camera-input adaptation, simulation-frame sequencing and immutable world-to-Renderer submission. |
+| `Input/CameraInputIntentCollector.cpp` | Convert admitted input to camera intent; consume Platform focus/capture state without native foreground-window polling. |
+| `Startup/GameApplicationStartup.cpp` | Construct and bind the concrete game dependencies. |
+| `Startup/ApplicationGpuCrashStartup.cpp` | Diagnostic launch parsing, sink preparation/rollback and readiness handoff. |
+| `EditorApplication.cpp` | Editor session lifetime and frame composition. |
+| `Editor/EditorHostComposition.cpp` | Construct Editor collaborators, bind UI services and implement restart, settings submission, camera preparation and explicit reload actions. |
+| `RenderingSettings/EngineRenderingSettingsPersistence.cpp` | One persisted-field catalog, typed parse-before-apply, section replacement and atomic publication. |
+| `Editor/Artifacts/ArtifactBundlePublication.cpp` | Validate bundle membership/budget, prepare the destination, verify writes and commit under one staging-directory lifetime. |
+
+Codecs, capture writers and artifact encoders expose direct namespace functions. Stateful capture slots, operation slots, task scopes and diagnostic sinks retain their real ownership and lifetime. Reference artifact coordination separates readback, pending-intent settlement, publication launch and result collection; its writer separates encoding, hashing and bundle assembly.
+
+Application selects Renderer execution policy and binds the task runtime. `RendererExecutionConfig::Validate` owns task-runtime presence, execution-mode validity and threaded pipeline-depth limits; `Renderer::Create` validates before external-runtime preparation. Invalid configurations are rejected through the existing launch error boundary. Application no longer contains a second renderer-validity rule.
+
+The [ITER-APP-ORCHESTRATION-01 record](../../../../../artifacts/validation/application-orchestration-20261108/control.json) owns the bounded source review, target builds and non-GPU controls for this refinement. These results preserve the inventory readiness and do not establish interactive, GPU, package or release acceptance.
+
+The second [module review and repair](../../../../../artifacts/validation/application-orchestration-review-02/control.json) closes three failure/publication gaps. Ordinary viewport-encoding exceptions now reach the existing task failure boundary. Reference admission errors, busy rejection and completed writes produce one consumable typed result; the existing action adapter reports it through the Editor console, including the successful destination, without cancelling an active capture on a busy request. Reference exports use one unversioned manifest/checkpoint layout; local artifacts are regenerated rather than migrated. These controls do not qualify interactive or GPU behavior.
+
 ## Product Split
 
 | ID | Capability | State | Exact current coverage and limit | Evidence |
@@ -59,7 +85,7 @@ The Editor frame now acquires products and presentation texture once through Ren
 | --- | --- | --- | --- | --- |
 | `APP-005` | Frame pump | Implemented path | Input begin -> window poll -> deferred input -> timer tick -> close/minimize decision -> pending level change -> simulation begin/update/end -> render submission -> render. Minimized/zero-size windows wait for an event and skip rendering. | `S` |
 | `APP-006` | Task ownership | Implemented path | Application owns the executor and root Application scope and passes them to GameWorld, level loads, Renderer asset work, editor/tool operations. Shutdown destroys consumers before task runtime. | `S` |
-| `APP-007` | Renderer execution selection | Capability-gated | `r.ThreadedRenderer` selects threaded Renderer ownership when options allow it; otherwise serial. `r.RenderPipelineDepth` accepts 0..2 and must remain below `r.MaximumFramesInFlight`, otherwise startup fatals. | `S` |
+| `APP-007` | Renderer execution selection | Capability-gated | `r.ThreadedRenderer` selects threaded Renderer ownership when options allow it; otherwise serial. Renderer validates threaded `r.RenderPipelineDepth` in 0..2 and below `r.MaximumFramesInFlight` before preparing its external runtime; the launch boundary reports rejected configuration. | `S` |
 | `APP-008` | Camera input bridge | Implemented path | Keyboard/mouse input becomes a `CameraInputIntent`; Game applies it to the active world camera. Editor supplies its viewport camera as view-only override without mutating world camera each frame. | `S` |
 | `APP-009` | Viewport request/products | Implemented path | Host forwards viewport extent/mode/exposure requests and returns Renderer products for ImGui presentation. Game uses the native rendering window without UI packets. | `S` |
 | `APP-010` | Ordered shutdown | Implemented path | Renderer -> LevelSession -> input collector -> GameWorld -> Tasks -> Input -> Window -> Timer are released in an explicit order. Repeated/device-loss shutdown remains unrun. | `S` |

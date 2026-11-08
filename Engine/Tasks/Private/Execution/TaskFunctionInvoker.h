@@ -4,4 +4,4 @@
 
 class TaskExecutionContext;
 
-TaskResult InvokeTaskFunction(const TaskGraphNode& node, TaskExecutionContext& context);
+TaskResult InvokeTaskFunction(const TaskGraphNode& node, TaskExecutionContext& context, bool bBlockedByDependency);

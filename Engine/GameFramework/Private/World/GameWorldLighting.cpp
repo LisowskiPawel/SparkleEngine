@@ -6,92 +6,88 @@
 #include "World/ECS/Components/TransformComponents.h"
 #include "World/WorldTransformConversion.h"
 
-class LightComponentTranslation final
+static ECS::Light ToLightComponent(const SceneLightDesc& desc) noexcept
 {
-public:
-	static ECS::Light ToLightComponent(const SceneLightDesc& desc) noexcept
+	ECS::Light light;
+	light.Kind = desc.GetKind();
+	light.Color = desc.common.color;
+	if (const SceneDirectionalLightDesc* directional = desc.GetDirectional())
 	{
-		ECS::Light light;
-		light.Kind = desc.GetKind();
-		light.Color = desc.common.color;
-		if (const SceneDirectionalLightDesc* directional = desc.GetDirectional())
-		{
-			light.Direction = directional->direction;
-			light.Illuminance = directional->illuminance;
-			light.AngularSizeRadians = directional->angularSizeRadians;
-			light.bCastShadow = directional->bCastShadow;
-		}
-		else if (const PointLightDesc* point = desc.GetPoint())
-		{
-			light.LuminousIntensity = point->luminousIntensity;
-			light.Range = point->range;
-			light.Radius = point->radius;
-			light.DistanceAttenuationCoefficients = point->distanceAttenuationCoefficients;
-			light.bCastShadow = point->bCastShadow;
-		}
-		else if (const SpotLightDesc* spot = desc.GetSpot())
-		{
-			light.Direction = spot->direction;
-			light.LuminousIntensity = spot->luminousIntensity;
-			light.Range = spot->range;
-			light.Radius = spot->radius;
-			light.DistanceAttenuationCoefficients = spot->distanceAttenuationCoefficients;
-			light.InnerAngleRadians = spot->innerAngleRadians;
-			light.OuterAngleRadians = spot->outerAngleRadians;
-			light.bCastShadow = spot->bCastShadow;
-		}
-		else if (const RectLightDesc* rect = desc.GetRect())
-		{
-			light.Direction = rect->direction;
-			light.Luminance = rect->luminance;
-			light.Tangent = rect->tangent;
-			light.AreaSize = {rect->width, rect->height};
-			light.bCastShadow = rect->bCastShadow;
-		}
-		return light;
+		light.Direction = directional->direction;
+		light.Illuminance = directional->illuminance;
+		light.AngularSizeRadians = directional->angularSizeRadians;
+		light.bCastShadow = directional->bCastShadow;
 	}
-
-	static SceneLightPayload ToLightPayload(const ECS::Light& light)
+	else if (const PointLightDesc* point = desc.GetPoint())
 	{
-		switch (light.Kind)
-		{
-			case SceneLightKind::Directional:
-				return SceneDirectionalLightDesc{.direction = light.Direction, .illuminance = light.Illuminance, .angularSizeRadians = light.AngularSizeRadians, .bCastShadow = light.bCastShadow};
-
-			case SceneLightKind::Point:
-				return PointLightDesc{
-				    .luminousIntensity = light.LuminousIntensity,
-				    .range = light.Range,
-				    .radius = light.Radius,
-				    .distanceAttenuationCoefficients = light.DistanceAttenuationCoefficients,
-				    .bCastShadow = light.bCastShadow};
-
-			case SceneLightKind::Spot:
-				return SpotLightDesc{
-				    .direction = light.Direction,
-				    .luminousIntensity = light.LuminousIntensity,
-				    .range = light.Range,
-				    .radius = light.Radius,
-				    .distanceAttenuationCoefficients = light.DistanceAttenuationCoefficients,
-				    .innerAngleRadians = light.InnerAngleRadians,
-				    .outerAngleRadians = light.OuterAngleRadians,
-				    .bCastShadow = light.bCastShadow};
-
-			case SceneLightKind::Rect:
-				return RectLightDesc{
-				    .direction = light.Direction,
-				    .luminance = light.Luminance,
-				    .width = light.AreaSize.x,
-				    .tangent = light.Tangent,
-				    .height = light.AreaSize.y,
-				    .bCastShadow = light.bCastShadow};
-
-			case SceneLightKind::Unknown:
-			default:
-				return std::monostate{};
-		}
+		light.LuminousIntensity = point->luminousIntensity;
+		light.Range = point->range;
+		light.Radius = point->radius;
+		light.DistanceAttenuationCoefficients = point->distanceAttenuationCoefficients;
+		light.bCastShadow = point->bCastShadow;
 	}
-};
+	else if (const SpotLightDesc* spot = desc.GetSpot())
+	{
+		light.Direction = spot->direction;
+		light.LuminousIntensity = spot->luminousIntensity;
+		light.Range = spot->range;
+		light.Radius = spot->radius;
+		light.DistanceAttenuationCoefficients = spot->distanceAttenuationCoefficients;
+		light.InnerAngleRadians = spot->innerAngleRadians;
+		light.OuterAngleRadians = spot->outerAngleRadians;
+		light.bCastShadow = spot->bCastShadow;
+	}
+	else if (const RectLightDesc* rect = desc.GetRect())
+	{
+		light.Direction = rect->direction;
+		light.Luminance = rect->luminance;
+		light.Tangent = rect->tangent;
+		light.AreaSize = {rect->width, rect->height};
+		light.bCastShadow = rect->bCastShadow;
+	}
+	return light;
+}
+
+static SceneLightPayload ToLightPayload(const ECS::Light& light)
+{
+	switch (light.Kind)
+	{
+		case SceneLightKind::Directional:
+			return SceneDirectionalLightDesc{.direction = light.Direction, .illuminance = light.Illuminance, .angularSizeRadians = light.AngularSizeRadians, .bCastShadow = light.bCastShadow};
+
+		case SceneLightKind::Point:
+			return PointLightDesc{
+			    .luminousIntensity = light.LuminousIntensity,
+			    .range = light.Range,
+			    .radius = light.Radius,
+			    .distanceAttenuationCoefficients = light.DistanceAttenuationCoefficients,
+			    .bCastShadow = light.bCastShadow};
+
+		case SceneLightKind::Spot:
+			return SpotLightDesc{
+			    .direction = light.Direction,
+			    .luminousIntensity = light.LuminousIntensity,
+			    .range = light.Range,
+			    .radius = light.Radius,
+			    .distanceAttenuationCoefficients = light.DistanceAttenuationCoefficients,
+			    .innerAngleRadians = light.InnerAngleRadians,
+			    .outerAngleRadians = light.OuterAngleRadians,
+			    .bCastShadow = light.bCastShadow};
+
+		case SceneLightKind::Rect:
+			return RectLightDesc{
+			    .direction = light.Direction,
+			    .luminance = light.Luminance,
+			    .width = light.AreaSize.x,
+			    .tangent = light.Tangent,
+			    .height = light.AreaSize.y,
+			    .bCastShadow = light.bCastShadow};
+
+		case SceneLightKind::Unknown:
+		default:
+			return std::monostate{};
+	}
+}
 
 namespace ECS
 {
@@ -106,7 +102,7 @@ namespace ECS
 		const LocalTransform local = WorldTransformConversion::ToLocal(transform);
 
 		const bool bTransformsAdded = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
-		const bool bLightAdded = bTransformsAdded && (m_registry.Add(entity, LightComponentTranslation::ToLightComponent(desc)));
+		const bool bLightAdded = bTransformsAdded && (m_registry.Add(entity, ToLightComponent(desc)));
 		const bool bVisibilityAdded = bLightAdded && (m_registry.Add(entity, Visibility{.bVisible = desc.common.bVisible}));
 		const bool bNameAdded = bVisibilityAdded && (m_registry.Add(entity, Name{std::move(desc.common.name)}));
 		const bool bIdentityAdded = bNameAdded && (m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextLightIdentity, .Kind = AuthoredObjectKind::Light}));
@@ -140,7 +136,7 @@ namespace ECS
 		}
 		desc.common.color = light->Color;
 		desc.common.bVisible = ReadVisibility(entity);
-		desc.payload = LightComponentTranslation::ToLightPayload(*light);
+		desc.payload = ToLightPayload(*light);
 		return desc;
 	}
 
@@ -152,7 +148,7 @@ namespace ECS
 		}
 		const Transform transform(DirectX::XMLoadFloat4x4(&desc.common.worldTransform));
 
-		const bool bLightWritten = WriteTransform(entity, transform) && m_registry.Replace(entity, LightComponentTranslation::ToLightComponent(desc));
+		const bool bLightWritten = WriteTransform(entity, transform) && m_registry.Replace(entity, ToLightComponent(desc));
 		const bool bNameWritten = bLightWritten && (m_registry.Replace(entity, Name{std::move(desc.common.name)}));
 		const bool bWritten = bNameWritten && (WriteVisibility(entity, desc.common.bVisible));
 

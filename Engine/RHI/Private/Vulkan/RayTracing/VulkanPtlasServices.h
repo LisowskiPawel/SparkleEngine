@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Resources/RhiResourceHandles.h"
-#include "RayTracing/RhiPtlasOperationLayout.h"
 #include "RayTracing/RhiPtlasService.h"
-#include "Vulkan/VulkanIncludes.h"
 
 #include <cstdint>
 #include <string_view>
@@ -22,11 +20,6 @@ public:
 	RhiPtlasOperationBufferLayout GetPtlasOperationBufferLayout(const RhiPtlasDesc& desc) const noexcept override;
 
 private:
-	static VkPartitionedAccelerationStructureInstanceFlagsNV ToVkPtlasInstanceFlags(RhiPtlasInstanceFlags flags) noexcept;
-	static VkPartitionedAccelerationStructureOpTypeNV ToVkPtlasOperationType(ERhiPtlasOperationType type) noexcept;
-	static RhiPtlasNativeOperationLayout GetNativeOperationLayout() noexcept;
-	RhiGpuVirtualAddress ResolvePtlasInstanceAccelerationStructureAddress(RhiGpuVirtualAddress accelerationStructure) const noexcept;
-
 	VulkanRhi* m_rhi = nullptr;
 	VulkanGpuMemoryAllocator* m_memoryAllocator = nullptr;
 };

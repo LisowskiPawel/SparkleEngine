@@ -98,10 +98,17 @@ void Window::ApplyTrackSizeConstraints(MINMAXINFO& minMaxInfo) const
 	minMaxInfo.ptMinTrackSize.x = MulDiv(kMinWindowWidth, static_cast<int>(dpi), USER_DEFAULT_SCREEN_DPI);
 	minMaxInfo.ptMinTrackSize.y = MulDiv(kMinWindowHeight, static_cast<int>(dpi), USER_DEFAULT_SCREEN_DPI);
 	const MONITORINFO mi = GetCurrentMonitorInfo();
-	minMaxInfo.ptMaxPosition.x = mi.rcWork.left - mi.rcMonitor.left;
-	minMaxInfo.ptMaxPosition.y = mi.rcWork.top - mi.rcMonitor.top;
-	minMaxInfo.ptMaxSize.x = mi.rcWork.right - mi.rcWork.left;
-	minMaxInfo.ptMaxSize.y = mi.rcWork.bottom - mi.rcWork.top;
+	const RECT& bounds = IsFullScreen() ? mi.rcMonitor : mi.rcWork;
+	minMaxInfo.ptMaxPosition.x = bounds.left - mi.rcMonitor.left;
+	minMaxInfo.ptMaxPosition.y = bounds.top - mi.rcMonitor.top;
+	minMaxInfo.ptMaxSize.x = bounds.right - bounds.left;
+	minMaxInfo.ptMaxSize.y = bounds.bottom - bounds.top;
+}
+
+LRESULT Window::HandleTrackSizeConstraints(LPARAM lParam) const
+{
+	ApplyTrackSizeConstraints(*reinterpret_cast<MINMAXINFO*>(lParam));
+	return 0;
 }
 
 int Window::GetResizeBorderThickness() const noexcept

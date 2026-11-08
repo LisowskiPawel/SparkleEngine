@@ -4,8 +4,7 @@
 
 #include <stop_token>
 
-class ReferencePathTracerArtifactWriter final
+namespace ReferencePathTracerArtifactWriter
 {
-public:
-	static ReferencePathTracerArtifactWriteResult Write(ReferencePathTracerArtifactWriteRequest request, std::stop_token cancellationToken) noexcept;
-};
+	ReferencePathTracerArtifactWriteResult Write(ReferencePathTracerArtifactWriteRequest request, std::stop_token cancellationToken) noexcept;
+}

@@ -4,25 +4,21 @@
 
 #include "GameFramework/Public/Scene/Animations/SkeletonTransformContract.h"
 
-class SkeletonTransformTranslation final
+static ECS::AnimationJointTransform DecomposeLocalTransform(const SkeletonResource& skeleton, std::size_t jointIndex) noexcept
 {
-public:
-	static ECS::AnimationJointTransform DecomposeLocalTransform(const SkeletonResource& skeleton, std::size_t jointIndex) noexcept
+	const DirectX::XMMATRIX local = DirectX::XMLoadFloat4x4(&skeleton.joints[jointIndex].bindLocalTransform);
+	DirectX::XMVECTOR scale;
+	DirectX::XMVECTOR rotation;
+	DirectX::XMVECTOR translation;
+	ECS::AnimationJointTransform result;
+	if (DirectX::XMMatrixDecompose(&scale, &rotation, &translation, local))
 	{
-		const DirectX::XMMATRIX local = DirectX::XMLoadFloat4x4(&skeleton.joints[jointIndex].bindLocalTransform);
-		DirectX::XMVECTOR scale;
-		DirectX::XMVECTOR rotation;
-		DirectX::XMVECTOR translation;
-		ECS::AnimationJointTransform result;
-		if (DirectX::XMMatrixDecompose(&scale, &rotation, &translation, local))
-		{
-			DirectX::XMStoreFloat3(&result.Translation, translation);
-			DirectX::XMStoreFloat4(&result.Rotation, DirectX::XMQuaternionNormalize(rotation));
-			DirectX::XMStoreFloat3(&result.Scale, scale);
-		}
-		return result;
+		DirectX::XMStoreFloat3(&result.Translation, translation);
+		DirectX::XMStoreFloat4(&result.Rotation, DirectX::XMQuaternionNormalize(rotation));
+		DirectX::XMStoreFloat3(&result.Scale, scale);
 	}
-};
+	return result;
+}
 
 void SkeletonResourceStore::Append(std::vector<SkeletonResource> skeletons)
 {
@@ -37,7 +33,7 @@ void SkeletonResourceStore::Append(std::vector<SkeletonResource> skeletons)
 		entry.BindLocalTransforms.reserve(skeleton.joints.size());
 		for (std::size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex)
 		{
-			entry.BindLocalTransforms.push_back(SkeletonTransformTranslation::DecomposeLocalTransform(skeleton, jointIndex));
+			entry.BindLocalTransforms.push_back(DecomposeLocalTransform(skeleton, jointIndex));
 		}
 		if (!SkeletonTransformContract::BuildEvaluationOrder(skeleton.joints, entry.EvaluationOrder))
 		{

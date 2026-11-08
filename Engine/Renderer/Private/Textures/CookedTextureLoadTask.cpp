@@ -8,11 +8,11 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_cookedTextureLoadTaskLogger, "Renderer.CookedTextureLoadTask");
 
-TaskExecution CookedTextureLoadTask::Launch(
+TaskExecution LaunchCookedTextureLoad(
     TaskExecutor& taskExecutor,
     TaskScope& taskScope,
     const std::filesystem::path& path,
-    const std::shared_ptr<Payload>& payload,
+    const std::shared_ptr<CookedTextureLoadPayload>& payload,
     std::uint64_t maximumDecodedBytes)
 {
 	if (payload == nullptr)
@@ -30,7 +30,7 @@ TaskExecution CookedTextureLoadTask::Launch(
 		    {
 			    return TaskResult::Cancelled("Texture read cancelled.");
 		    }
-		    payload->File = CookedTextureLoader::Read(path);
+		    payload->File = ReadCookedTexturePayload(path);
 		    return TaskResult::Success();
 	    });
 
@@ -44,7 +44,7 @@ TaskExecution CookedTextureLoadTask::Launch(
 			    payload->File = {};
 			    return TaskResult::Cancelled("Texture decode cancelled.");
 		    }
-		    payload->Texture = CookedTextureLoader::Decode(payload->File, maximumDecodedBytes);
+		    payload->Texture = DecodeCookedTexture(payload->File, maximumDecodedBytes);
 		    payload->File = {};
 		    return TaskResult::Success();
 	    });

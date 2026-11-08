@@ -1,129 +1,172 @@
 #include "PCH.h"
-
 #include "Assets/Loaders/MeshAssetLoader.h"
-
 #include "Assets/Cooked/CookedMeshAsset.h"
 #include "Assets/Loaders/CookedAssetByteReader.h"
 #include "Assets/Loaders/CookedAssetLoaderDiagnostics.h"
+#include "Core/Public/Strings/StringUtils.h"
+
+#include <span>
+#include <vector>
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <iterator>
 #include <utility>
 
 namespace Assets
 {
-	namespace MeshAssetLoaderDetail
+	template <typename T> static T ReadMeshRecord(std::span<const std::uint8_t> bytes, std::size_t index) noexcept
 	{
-		template <typename T> T ReadRecord(std::span<const std::uint8_t> bytes, std::size_t index) noexcept
-		{
-			T value;
-			std::memcpy(&value, bytes.data() + index * sizeof(T), sizeof(T));
-			return value;
-		}
+		T value;
+		std::memcpy(&value, bytes.data() + index * sizeof(T), sizeof(T));
+		return value;
 	}
 
-	LoadedMeshAsset MeshAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const
+	static void ValidateMeshHeader(const CookedMeshAssetHeader& header, const CookedAssetLoaderDiagnostics& diagnostics)
 	{
-		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedMeshAsset");
-
-		CookedAssetByteReader reader(bytes, budget);
-		const CookedMeshAssetHeader header = reader.Read<CookedMeshAssetHeader>();
-
-		const bool bMeshHeaderInvalidVertexStride = !header.fileHeader.HasMagic(kCookedMeshAssetMagic) || header.vertexStride != sizeof(CookedMeshVertex);
-		const bool bMeshHeaderInvalid = bMeshHeaderInvalidVertexStride || (header.indexStride != sizeof(std::uint32_t));
-
-		if (bMeshHeaderInvalid)
+		const bool bCurrentVertexLayout = header.fileHeader.HasMagic(kCookedMeshAssetMagic) && header.vertexStride == sizeof(CookedMeshVertex);
+		if (!bCurrentVertexLayout || header.indexStride != sizeof(std::uint32_t))
 		{
 			throw diagnostics.MakeError("header", "mesh magic and current vertex/index strides", "Invalid cooked mesh asset header; recook the asset");
 		}
-
-		const bool bHasSkinInfluences = (header.flags & static_cast<std::uint32_t>(CookedMeshAssetFlag::HasSkinInfluences)) != 0u;
-		const bool bHasMorphTargets = (header.flags & static_cast<std::uint32_t>(CookedMeshAssetFlag::HasMorphTargets)) != 0u;
-		const bool bIsSkeletal = header.assetKind == CookedMeshAssetKind::Skeletal;
 		if (header.assetKind != CookedMeshAssetKind::Static && header.assetKind != CookedMeshAssetKind::Skeletal)
 		{
 			throw diagnostics.MakeError("header.assetKind", "Static or Skeletal", "Invalid cooked mesh asset kind");
 		}
+	}
 
-		if ((bIsSkeletal && (!bHasSkinInfluences || header.skinInfluenceCount != header.vertexCount)) || (!bIsSkeletal && (bHasSkinInfluences || header.skinInfluenceCount != 0u))
-		    || header.skinInfluenceStride != sizeof(CookedMeshSkinInfluence))
+	static void ValidateSkinStream(const CookedMeshAssetHeader& header, const CookedAssetLoaderDiagnostics& diagnostics)
+	{
+		const bool bHasSkin = (header.flags & static_cast<std::uint32_t>(CookedMeshAssetFlag::HasSkinInfluences)) != 0u;
+		const bool bSkeletal = header.assetKind == CookedMeshAssetKind::Skeletal;
+		const auto expectedCount = bSkeletal ? header.vertexCount : 0u;
+		const bool bValidCount = bHasSkin == bSkeletal && header.skinInfluenceCount == expectedCount;
+		if (!bValidCount || header.skinInfluenceStride != sizeof(CookedMeshSkinInfluence))
 		{
 			throw diagnostics.MakeError("skinInfluences", "skeletal meshes have one influence record per vertex", "Invalid cooked mesh skin influence stream");
 		}
-		if ((!bIsSkeletal && bHasMorphTargets) || (bHasMorphTargets && (header.morphTargetCount == 0u || header.morphTargetDeltaCount == 0u))
-		    || (!bHasMorphTargets && (header.morphTargetCount != 0u || header.morphTargetDeltaCount != 0u)) || header.morphTargetRecordStride != sizeof(CookedMeshMorphTargetRecord)
-		    || header.morphTargetDeltaStride != sizeof(CookedMeshMorphTargetDelta))
-		{
-			throw diagnostics.MakeError("morphTargets", "skeletal morph target flags, counts, and strides are consistent", "Invalid cooked mesh morph target stream");
-		}
+	}
 
-		const std::span<const std::uint8_t> cookedVertices = reader.ReadArrayBytes<CookedMeshVertex>(header.vertexCount);
+	static void ValidateMorphStream(const CookedMeshAssetHeader& header, const CookedAssetLoaderDiagnostics& diagnostics)
+	{
+		const bool bHasMorph = (header.flags & static_cast<std::uint32_t>(CookedMeshAssetFlag::HasMorphTargets)) != 0u;
+		const bool bNonempty = header.morphTargetCount != 0u && header.morphTargetDeltaCount != 0u;
+		const bool bEmpty = header.morphTargetCount == 0u && header.morphTargetDeltaCount == 0u;
+		const bool bValidNonempty = bHasMorph && bNonempty;
+		const bool bValidEmpty = !bHasMorph && bEmpty;
+		const bool bValidCounts = bValidNonempty || bValidEmpty;
+		const bool bValidKind = !bHasMorph || header.assetKind == CookedMeshAssetKind::Skeletal;
+		const bool bValidLayout = header.morphTargetRecordStride == sizeof(CookedMeshMorphTargetRecord) && header.morphTargetDeltaStride == sizeof(CookedMeshMorphTargetDelta);
+		if (!bValidCounts || !bValidKind)
+		{
+			throw diagnostics.MakeError("morphTargets", "skeletal morph target flags and counts are consistent", "Invalid cooked mesh morph target stream");
+		}
+		if (!bValidLayout)
+		{
+			throw diagnostics.MakeError("morphTargets", "current morph record and delta strides", "Invalid cooked mesh morph target layout");
+		}
+	}
+
+	static MeshData DecodeGeometry(CookedAssetByteReader& reader, const CookedMeshAssetHeader& header, CookedAssetAllocationBudget& budget)
+	{
+		const auto vertices = reader.ReadArrayBytes<CookedMeshVertex>(header.vertexCount);
 		MeshData geometry;
 		budget.ReserveArray<VertexData>(header.vertexCount);
 		geometry.vertices.resize(header.vertexCount);
-		for (std::size_t vertexIndex = 0; vertexIndex < geometry.vertices.size(); ++vertexIndex)
+		for (std::size_t index = 0; index < geometry.vertices.size(); ++index)
 		{
-			const CookedMeshVertex cookedVertex = MeshAssetLoaderDetail::ReadRecord<CookedMeshVertex>(cookedVertices, vertexIndex);
-			geometry.vertices[vertexIndex] = VertexData(cookedVertex.position, cookedVertex.uv, cookedVertex.color, cookedVertex.normal, cookedVertex.tangent);
+			const auto vertex = ReadMeshRecord<CookedMeshVertex>(vertices, index);
+			geometry.vertices[index] = VertexData(vertex.position, vertex.uv, vertex.color, vertex.normal, vertex.tangent);
+		}
+		geometry.indices = reader.ReadArray<std::uint32_t>(header.indexCount);
+		return geometry;
+	}
+
+	static MeshMorphTarget DecodeMorphTarget(
+	    const CookedMeshMorphTargetRecord& record,
+	    std::span<const std::uint8_t> deltas,
+	    const CookedMeshAssetHeader& header,
+	    CookedAssetAllocationBudget& budget,
+	    const CookedAssetLoaderDiagnostics& diagnostics)
+	{
+		const bool bOffsetValid = record.firstDelta <= header.morphTargetDeltaCount;
+		const bool bRangeValid = bOffsetValid && record.deltaCount <= header.morphTargetDeltaCount - record.firstDelta;
+		if (!bRangeValid || record.deltaCount != header.vertexCount)
+		{
+			throw diagnostics.MakeError("morphTargets.deltaRange", "one delta per vertex in range", "Cooked mesh morph target references an invalid delta range");
+		}
+		if (!Strings::IsNullTerminated(std::span(record.name)) || !std::isfinite(record.defaultWeight))
+		{
+			throw diagnostics.MakeError("morphTargets", "a terminated name and finite default weight", "Cooked mesh morph target metadata is invalid");
 		}
 
-		geometry.indices = reader.ReadArray<std::uint32_t>(header.indexCount);
+		MeshMorphTarget target;
+		budget.Reserve(sizeof(record.name));
+		target.name = record.name;
+		target.defaultWeight = record.defaultWeight;
+		budget.ReserveArray<MeshMorphTargetDelta>(record.deltaCount);
+		target.deltas.resize(record.deltaCount);
+		for (std::uint32_t index = 0; index < record.deltaCount; ++index)
+		{
+			const auto delta = ReadMeshRecord<CookedMeshMorphTargetDelta>(deltas, record.firstDelta + index);
+			target.deltas[index] = MeshMorphTargetDelta{.position = delta.position, .normal = delta.normal, .tangent = delta.tangent};
+		}
+		return target;
+	}
 
-		const std::span<const std::uint8_t> cookedSkinInfluences = reader.ReadArrayBytes<CookedMeshSkinInfluence>(header.skinInfluenceCount);
-		const std::vector<CookedMeshMorphTargetRecord> cookedMorphTargets = reader.ReadArray<CookedMeshMorphTargetRecord>(header.morphTargetCount);
-		const std::span<const std::uint8_t> cookedMorphTargetDeltas = reader.ReadArrayBytes<CookedMeshMorphTargetDelta>(header.morphTargetDeltaCount);
+	static MeshMorphData DecodeMorphTargets(
+	    std::span<const CookedMeshMorphTargetRecord> records,
+	    std::span<const std::uint8_t> deltas,
+	    const CookedMeshAssetHeader& header,
+	    CookedAssetAllocationBudget& budget,
+	    const CookedAssetLoaderDiagnostics& diagnostics)
+	{
+		MeshMorphData targets;
+		budget.ReserveArray<MeshMorphTarget>(records.size());
+		targets.reserve(records.size());
+		for (const auto& record : records)
+		{
+			targets.push_back(DecodeMorphTarget(record, deltas, header, budget, diagnostics));
+		}
+		return targets;
+	}
 
+	static std::vector<VertexSkinInfluence> DecodeSkinInfluences(std::span<const std::uint8_t> records, std::uint32_t count, CookedAssetAllocationBudget& budget)
+	{
+		budget.ReserveArray<VertexSkinInfluence>(count);
+		std::vector<VertexSkinInfluence> influences(count);
+		for (std::size_t index = 0; index < influences.size(); ++index)
+		{
+			const auto record = ReadMeshRecord<CookedMeshSkinInfluence>(records, index);
+			std::copy(std::begin(record.jointIndices), std::end(record.jointIndices), std::begin(influences[index].jointIndices));
+			std::copy(std::begin(record.jointWeights), std::end(record.jointWeights), std::begin(influences[index].jointWeights));
+		}
+		return influences;
+	}
+
+	LoadedMeshAsset MeshAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget)
+	{
+		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedMeshAsset");
+		CookedAssetByteReader reader(bytes, budget);
+		const auto header = reader.Read<CookedMeshAssetHeader>();
+		ValidateMeshHeader(header, diagnostics);
+		ValidateSkinStream(header, diagnostics);
+		ValidateMorphStream(header, diagnostics);
+
+		MeshData geometry = DecodeGeometry(reader, header, budget);
+		const auto skin = reader.ReadArrayBytes<CookedMeshSkinInfluence>(header.skinInfluenceCount);
+		const auto morphRecords = reader.ReadArray<CookedMeshMorphTargetRecord>(header.morphTargetCount);
+		const auto morphDeltas = reader.ReadArrayBytes<CookedMeshMorphTargetDelta>(header.morphTargetDeltaCount);
 		if (reader.GetRemainingByteCount() != 0)
 		{
 			throw diagnostics.MakeError("payload", "no trailing bytes after declared mesh streams", "Cooked mesh asset contains unexpected trailing bytes");
 		}
 
-		MeshMorphData morphTargets;
-		budget.ReserveArray<MeshMorphTarget>(cookedMorphTargets.size());
-		morphTargets.reserve(cookedMorphTargets.size());
-		for (const CookedMeshMorphTargetRecord& cookedMorphTarget : cookedMorphTargets)
+		MeshMorphData morphs = DecodeMorphTargets(morphRecords, morphDeltas, header, budget, diagnostics);
+		if (header.assetKind == CookedMeshAssetKind::Skeletal)
 		{
-			if (cookedMorphTarget.firstDelta > header.morphTargetDeltaCount || cookedMorphTarget.deltaCount > header.morphTargetDeltaCount - cookedMorphTarget.firstDelta
-			    || cookedMorphTarget.deltaCount != header.vertexCount)
-			{
-				throw diagnostics.MakeError(
-				    "morphTargets.deltaRange",
-				    "each morph target references one delta range matching vertex count",
-				    "Cooked mesh morph target references an invalid delta range");
-			}
-
-			MeshMorphTarget morphTarget;
-			budget.Reserve(sizeof(cookedMorphTarget.name));
-			morphTarget.name = cookedMorphTarget.name;
-			morphTarget.defaultWeight = cookedMorphTarget.defaultWeight;
-			budget.ReserveArray<MeshMorphTargetDelta>(cookedMorphTarget.deltaCount);
-			morphTarget.deltas.resize(cookedMorphTarget.deltaCount);
-			for (std::uint32_t deltaIndex = 0; deltaIndex < cookedMorphTarget.deltaCount; ++deltaIndex)
-			{
-				const CookedMeshMorphTargetDelta cookedDelta = MeshAssetLoaderDetail::ReadRecord<CookedMeshMorphTargetDelta>(cookedMorphTargetDeltas, cookedMorphTarget.firstDelta + deltaIndex);
-				morphTarget.deltas[deltaIndex] = MeshMorphTargetDelta{.position = cookedDelta.position, .normal = cookedDelta.normal, .tangent = cookedDelta.tangent};
-			}
-			morphTargets.push_back(std::move(morphTarget));
+			return LoadedMeshAsset{.payload = SkeletalMeshData{std::move(geometry), std::move(morphs), DecodeSkinInfluences(skin, header.skinInfluenceCount, budget)}};
 		}
-		if (bIsSkeletal)
-		{
-			SkeletalMeshData loadedSkeletalMesh;
-			loadedSkeletalMesh.geometry = std::move(geometry);
-			loadedSkeletalMesh.morphTargets = std::move(morphTargets);
-			budget.ReserveArray<VertexSkinInfluence>(header.skinInfluenceCount);
-			loadedSkeletalMesh.skinInfluences.resize(header.skinInfluenceCount);
-			for (std::size_t influenceIndex = 0; influenceIndex < loadedSkeletalMesh.skinInfluences.size(); ++influenceIndex)
-			{
-				const CookedMeshSkinInfluence cookedInfluence = MeshAssetLoaderDetail::ReadRecord<CookedMeshSkinInfluence>(cookedSkinInfluences, influenceIndex);
-				VertexSkinInfluence& influence = loadedSkeletalMesh.skinInfluences[influenceIndex];
-				std::copy(std::begin(cookedInfluence.jointIndices), std::end(cookedInfluence.jointIndices), std::begin(influence.jointIndices));
-				std::copy(std::begin(cookedInfluence.jointWeights), std::end(cookedInfluence.jointWeights), std::begin(influence.jointWeights));
-			}
-			return LoadedMeshAsset{.payload = std::move(loadedSkeletalMesh)};
-		}
-
-		StaticMeshData loadedStaticMesh;
-		loadedStaticMesh = std::move(geometry);
-		return LoadedMeshAsset{.payload = std::move(loadedStaticMesh)};
+		return LoadedMeshAsset{.payload = std::move(geometry)};
 	}
 }

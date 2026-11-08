@@ -150,6 +150,56 @@ bool RenderCoordinator::TryTakeViewportCapture(ViewportCaptureId id, ViewportCap
 	return true;
 }
 
+void RenderCoordinator::CancelPendingControls() noexcept
+{
+	m_threadCommandQueue->Close();
+	for (RenderThreadCommand& command : m_threadCommandQueue->Drain())
+	{
+		RendererExecutionControl* control = std::get_if<RendererExecutionControl>(&command.Payload);
+		if (control == nullptr)
+		{
+			continue;
+		}
+
+		std::visit(
+		    [this](auto& pending)
+		    {
+			    if constexpr (requires { pending.Completion; })
+			    {
+				    pending.Completion->Cancel();
+			    }
+#if SPARKLE_WITH_EXTERNAL_CAPTURE
+			    else if constexpr (std::is_same_v<std::decay_t<decltype(pending)>, RenderExternalCaptureCommand>)
+			    {
+				    if (m_deviceLaunch.ExternalCapture)
+				    {
+					    m_deviceLaunch.ExternalCapture->Reject(pending.RequestId, "Render owner stopped before capture began.");
+				    }
+			    }
+#endif
+		    },
+		    *control);
+	}
+}
+
+void RenderCoordinator::FailOutstandingViewportCaptures() noexcept
+{
+	std::lock_guard lock(m_readStateMutex);
+	for (ViewportCaptureId id : m_outstandingViewportCaptures)
+	{
+		const bool bDuplicateCaptureCompletion = !id
+		    || std::any_of(m_publishedViewportCaptures.begin(), m_publishedViewportCaptures.end(), [id](const ViewportCaptureCompletion& completion) { return completion.Id.Value == id.Value; });
+
+		if (bDuplicateCaptureCompletion)
+		{
+			continue;
+		}
+
+		m_publishedViewportCaptures.push_back(
+		    ViewportCaptureCompletion{.Id = id, .Readback = {.Result = {.Status = ViewportCaptureStatus::Failed, .FailureReason = "Render owner stopped before viewport readback completed"}}});
+	}
+}
+
 void RenderCoordinator::PublishReadState()
 {
 	if (m_context == nullptr)

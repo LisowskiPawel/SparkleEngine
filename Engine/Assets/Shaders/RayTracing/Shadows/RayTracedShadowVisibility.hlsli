@@ -6,13 +6,13 @@
 
 #include "/Engine/RayTracing/Shadows/RayTracedShadowTrace.hlsli"
 
-ShadowVisibilitySample TraceDirectLightSample(float3 positionWorld, float3 normalWorld, LightSampling::DirectLightSample lightSample, bool bCastsShadow)
+ShadowVisibilitySample TraceDirectLightSample(RaytracingAccelerationStructure sceneTlas, float3 positionWorld, float3 normalWorld, LightSampling::DirectLightSample lightSample, bool bCastsShadow)
 {
 	RayTracedShadowRequest request;
 	ShadowVisibilitySample signal;
 	if (ShadowRays::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, bCastsShadow, request, signal))
 	{
-		return ShadowRays::TraceShadowRay(request);
+		return ShadowRays::TraceShadowRay(sceneTlas, request);
 	}
 
 	return signal;

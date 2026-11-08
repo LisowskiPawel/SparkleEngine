@@ -1,14 +1,21 @@
+#include "/Engine/RayTracing/RayTracingSceneTraceInline.hlsli"
+
 Texture2D<float4> CurrentReservoirSampleTexture;
 Texture2D<float4> CurrentReservoirWeightTexture;
 Texture2D SkyTexture;
 SamplerState SamplerLinearNoMipWrapClampClamp;
 
-#include "/Engine/Lighting/RestirIndirectReservoir.hlsli"
+#include "/Engine/Passes/Lighting/Restir/Indirect/GBufferPathSurface.hlsli"
+#include "/Engine/Resources/MeshInstanceShaderData.hlsli"
+
+RaytracingAccelerationStructure SceneTlas;
+
+#include "/Engine/Passes/Lighting/Restir/Indirect/RestirIndirectReservoir.hlsli"
 
 RWTexture2D<float4> IndirectDiffuse;
 RWTexture2D<float4> IndirectSpecular;
 
-#include "/Engine/Lighting/RayReconstructionGuides.hlsli"
+#include "/Engine/Passes/Lighting/Restir/Reconstruction/RayReconstructionGuides.hlsli"
 
 void StoreIndirectLighting(uint2 pixelCoord, GBufferPathSurface surface, PathLighting::Result path, float reservoirWeight)
 {
@@ -71,7 +78,7 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const PathLighting::Result path = IndirectReservoir::EvaluateCandidate(surface, reservoir.Selected, SkyTexture, SamplerLinearNoMipWrapClampClamp);
+	const PathLighting::Result path = IndirectReservoir::EvaluateCandidate(SceneTlas, surface, reservoir.Selected, SkyTexture, SamplerLinearNoMipWrapClampClamp);
 	const float reservoirWeight = IndirectReservoir::GetFinalWeight(reservoir);
 
 	StoreIndirectLighting(pixelCoord, surface, path, reservoirWeight);

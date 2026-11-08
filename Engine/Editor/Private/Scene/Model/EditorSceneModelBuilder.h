@@ -10,7 +10,6 @@
 struct EditorSceneSource final
 {
 	std::function<WorldReadView()> AcquireReadView;
-	std::function<std::uint64_t()> WorldGeneration;
 	std::function<WorldMaterialVariantView()> MaterialVariants;
 };
 

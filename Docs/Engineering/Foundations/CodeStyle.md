@@ -10,9 +10,9 @@
 
 Coding style has three layers:
 
-1. **Mechanical formatting** â€” owned by [`.clang-format`](../../../.clang-format).
-2. **Machine-checkable semantics** â€” owned by [`.clang-tidy`](../../../.clang-tidy), compiler warnings, and build gates.
-3. **Human design conventions** â€” owned by this document and its focused companions.
+1. **Mechanical formatting** — owned by [`.clang-format`](../../../.clang-format).
+2. **Machine-checkable semantics** — owned by [`.clang-tidy`](../../../.clang-tidy), compiler warnings, and build gates.
+3. **Human design conventions** — owned by this document and its focused companions.
 
 This document owns language conventions and physical source organization. Read it with:
 
@@ -51,7 +51,7 @@ These accepted source-format rules are outside clang-format alone and are enforc
 2. **HLSL attributes use their own line.** Place `[numthreads]`, `[loop]`, `[unroll]`, and equivalent shader attributes immediately above the declaration or statement they govern. clang-format 22.1.3 parses HLSL through its C++ fallback and can join these attributes to the governed construct; `CodeStyle.ps1` restores the accepted shader layout before writing or comparing canonical text.
 3. **Multiline statements form visual paragraphs.** The [paragraph-spacing helper](../../../CMake/CodeStyle/CodeStyleParagraphSpacing.cs) adds a blank line before and after a wrapped call, assignment, return, or aggregate initializer when adjacent code does not already supply a boundary. `Format` writes this canonical spacing and `Check` rejects missing boundaries for the selected files. The enclosing block's opening/closing brace, existing blank lines, labels, and preprocessor lines supply the relevant boundaries. A preceding completed block does not replace the gap before a new wrapped statement. Leading comments belong to the statement's paragraph: the gap goes before the comment, never between it and its statement. Parameter/argument continuations remain together; function signatures are excluded. `case`, `default`, access and ordinary statement labels start a new statement rather than becoming its continuation; a short case operation and its `break` stay cohesive. Scope-resolution and ternary colons are expressions, not label boundaries. The helper masks literals, comments, preprocessor continuations, and `clang-format off` regions before identifying statement boundaries; it changes whitespace only.
 
-Long call-bearing `if` conditions and boolean initializers/assignments exceeding two atomic checks are also rejected by the [decision checker](../../../CMake/CodeStyle/CodeStyleIfConditions.cs) in both `Check` and `Format` mode. It masks comments, string/character/raw literals and preprocessor logical lines, then checks balanced `if`/`if constexpr` heads for call syntax. C++ named casts, `sizeof`, `alignof`, `decltype` and `noexcept` are not calls. For boolean decisions it recognizes explicitly typed `bool`/atomic boolean names, plus the reserved `b` naming convention on inferred locals and qualified fields. Nested logical groups, boolean casts and conditional expressions contribute to the budget; predicate arguments and lambda bodies belong to their own operation, and variadic folds count as one typed producer operation. Initializing a mutable `bool&` binds a destination rather than calculating a boolean value; later assignments through it still follow the decision budget. The checker also rejects unprefixed explicitly typed boolean variables, parameters and fields while preserving existing scope prefixes. This lexical check does not resolve arbitrary inferred/cross-file types, structured bindings or alias semantics, or prove short-circuit/lifetime preservation; authors must review those. `Format` never extracts expressions or changes execution order to repair a violation.
+Long call-bearing `if` conditions and boolean initializers/assignments exceeding two atomic checks are also rejected by the [decision checker](../../../CMake/CodeStyle/CodeStyleDecisions.cs) in both `Check` and `Format` mode. It masks comments, string/character/raw literals and preprocessor logical lines, then checks balanced `if`/`if constexpr` heads for call syntax. C++ named casts, `sizeof`, `alignof`, `decltype` and `noexcept` are not calls. For boolean decisions it recognizes explicitly typed `bool`/atomic boolean names, including braced initializers, plus the reserved `b` naming convention on inferred locals and qualified fields. Commas inside recognized qualified/value templates or template calls do not end an initializer. Nested logical groups, boolean casts and conditional expressions contribute to the budget; predicate arguments and lambda bodies belong to their own operation, and variadic folds count as one typed producer operation. Initializing a mutable `bool&` binds a destination rather than calculating a boolean value; later assignments through it still follow the decision budget. The checker also rejects unprefixed explicitly typed boolean variables, parameters and fields while preserving existing scope prefixes. This lexical check does not resolve arbitrary inferred/cross-file types, structured bindings or alias semantics, or prove short-circuit/lifetime preservation; authors must review those. `Format` never extracts expressions or changes execution order to repair a violation.
 
 For C++, `Check` compares clang-format's XML replacements against the original UTF-8 bytes. clang-format 22.1.3 can report unchanged replacements with `SeparateDefinitionBlocks: Always`; these are ignored while actual formatting changes, incomplete formatting, and tool errors remain failures. Shader checks compare canonical formatted text as before.
 
@@ -118,7 +118,7 @@ Use **one blank line** for a paragraph boundary, **zero** inside a cohesive grou
 | --- | --- | --- |
 | Function/type definitions | One blank line between definition blocks. | clang-format `SeparateDefinitionBlocks: Always` |
 | Wrapped call, assignment, return, or aggregate initializer | Its own paragraph, separated from adjacent code. The enclosing block's braces already supply its outer boundary. Keep all continuation lines together. | Repository `Format`/`Check` paragraph helper |
-| Acquire inputs â†’ validate â†’ derive â†’ execute â†’ publish | One blank line when the purpose changes. Keep dependent preparation and its immediate use in one paragraph when they express one operation. | Author and review |
+| Acquire inputs → validate → derive → execute → publish | One blank line when the purpose changes. Keep dependent preparation and its immediate use in one paragraph when they express one operation. | Author and review |
 | Guard clauses | Group related entry checks; separate the validation group from the normal workflow. Separate an independent recovery/terminal block from subsequent work. Keep `else`, `catch`, and a trailing `do`/`while` attached to their construct. | Author and review; helper also separates a following wrapped statement |
 | Local declarations | Group declarations that prepare one operation; separate unrelated resource, state, or output preparation. Declare near use. Do not separate every scalar declaration. | Author and review |
 | Record initialization/mutation | Keep consecutive fields of one record together. A wrapped field expression still follows the wrapped-statement rule. | Author and review; helper for wrapped expressions |
@@ -159,7 +159,7 @@ The example separates validation, compilation, output assembly, and publication 
 - When a call initializer must wrap, keep the declaration, `=`, and call head through its opening `(` together, then put each argument on its own continuation line. Apply the same layout to assignment calls. The formatter strongly prefers this boundary; if the head itself exceeds 200 columns, shorten the expression or introduce a meaningful local rather than relying on assignment splitting.
 - Prefer named input variables at callsites. Compute, resolve, format, or validate meaningful inputs in preceding statements instead of nesting those operations inside another call's argument list. Names should explain the result's role; preserve evaluation order, short-circuit behavior, ownership, and temporary lifetimes. Simple member access, inexpensive accessors such as `data()`/`size()`, casts, and `std::move` may remain inline when clear. This is an authored code-review rule; clang-format must not introduce variables or restructure expressions.
 - Prefer `if` conditions that resolve meaningful local predicates, handles or scalar comparisons. Compute function-call inputs and results before the decision. A condition that contains a call and either spans lines or exceeds 120 characters after whitespace normalization MUST use named local results instead; this includes cheap accessors, constructors and macro-shaped API calls. The 120-character budget is specific to decisions; the formatter's general 200-column limit is unchanged. Short single predicates may remain inline when clear, but naming their result is preferred.
-- A boolean decision initializer or assignment contains at most **two atomic checks**, including nested boolean groups. Name intermediate facts and combine those names in subsequent steps; copying a long condition into one long local initializer does not satisfy this rule. Prefer small `const bool` expressions. Do not calculate a decision by initializing an evaluation flag and assigning it through `if`/`else` branches. Preserve short-circuiting with `&&`/`||` between named results when later operations must be skipped. A predicate invocation is one atomic check; a variadic fold is one typed producer operation. Boolean variables follow [Naming](Naming.md), including their existing scope prefix.
+- A boolean decision initializer or assignment contains at most **two atomic checks**, including nested boolean groups. Name intermediate facts and combine those names in subsequent steps; copying a long condition into one long local initializer does not satisfy this rule. Prefer small `const bool` expressions. Simplify the resulting dependency chain: remove repeated gates that add no condition, and group independent scalar observations when their lifetime and failure behavior permit it. Keep pointer/bounds guards and observable operations in their required order. Do not calculate a decision by initializing an evaluation flag and assigning it through `if`/`else` branches. Preserve short-circuiting with `&&`/`||` between named results when later operations must be skipped. A predicate invocation is one atomic check; a variadic fold is one typed producer operation. Boolean variables follow [Naming](Naming.md), including their existing scope prefix.
 - Split independent I/O, decoding, allocation, setup, submission and UI operations into named steps. Give compound validation predicates names for their actual invariant. Preserve evaluation order, short-circuiting, first errors, side effects, pointer guards and temporary lifetimes. Use guarded local steps or branch-local declarations when later work was previously skipped. Do not evaluate both sides eagerly, hide an unchanged operational chain in one long boolean initializer, introduce a wrapper just to satisfy the rule, or expand every scalar comparison into its own abstraction.
 - When a call or aggregate wraps, group elements by meaning; avoid stair-step fragmentation of simple access, casts, names, and ternaries.
 - Apply readability whitespace while changing the surrounding logic; do not create repository-wide whitespace churn. `.clang-format` remains authoritative and preserves at most one consecutive empty line.
@@ -293,10 +293,10 @@ CMake, scripts, and generated inputs follow their language tools and nearby owne
 
 Use these labels while the detailed style is being iterated:
 
-- **Binding** â€” required now and backed by prose, tool configuration, or both.
-- **Candidate** â€” evidence-backed proposal awaiting an explicit decision.
-- **Open** â€” intentionally undecided; follow strong local precedent without expanding inconsistency.
-- **Rejected** â€” considered and not adopted.
+- **Binding** — required now and backed by prose, tool configuration, or both.
+- **Candidate** — evidence-backed proposal awaiting an explicit decision.
+- **Open** — intentionally undecided; follow strong local precedent without expanding inconsistency.
+- **Rejected** — considered and not adopted.
 
 The following architecture lets the coding-style work proceed without inventing rules prematurely:
 
@@ -322,13 +322,13 @@ Do not convert a candidate or external precedent into review feedback as if it w
 
 When the coding-style iteration accepts a topic, document it with the same compact shape:
 
-1. **Status and scope** â€” binding/candidate/rejected and the source families it affects.
-2. **Rule** â€” one unambiguous requirement.
-3. **Rationale** â€” readability, correctness, portability, compile cost, runtime cost, or review stability.
-4. **Examples** â€” the smallest good/bad pair that resolves ambiguity; avoid building a tutorial.
-5. **Enforcement** â€” formatter, clang-tidy, compiler, repository check, or human review.
-6. **Exceptions** â€” narrow owner, evidence, and review/deletion gate.
-7. **Migration** â€” touched-code policy or bounded repository-wide conversion with validation.
+1. **Status and scope** — binding/candidate/rejected and the source families it affects.
+2. **Rule** — one unambiguous requirement.
+3. **Rationale** — readability, correctness, portability, compile cost, runtime cost, or review stability.
+4. **Examples** — the smallest good/bad pair that resolves ambiguity; avoid building a tutorial.
+5. **Enforcement** — formatter, clang-tidy, compiler, repository check, or human review.
+6. **Exceptions** — narrow owner, evidence, and review/deletion gate.
+7. **Migration** — touched-code policy or bounded repository-wide conversion with validation.
 
 If a rule cannot state its owner or enforcement path, keep it a candidate rather than adding subjective review folklore.
 

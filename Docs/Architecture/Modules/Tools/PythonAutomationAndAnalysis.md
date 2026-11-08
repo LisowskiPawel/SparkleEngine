@@ -10,6 +10,8 @@
 
 **Snapshot:** 2026-09-07; repository file inventory found exactly `ConvertLPSHead.py` and `ConvertCornellBox.py`, both under Showcase conversion assets; source evidence `S` only
 
+**Conversion layout reconciliation:** 2026-11-08; the same two commands now live with their focused implementation modules under `Projects/Showcase/AssetConversion`. The [Showcase ownership map](../Projects/Showcase/ShowcaseCapabilities.md#project-composition-and-asset-preparation) owns the current source layout and invocation. This scoped refactor does not refresh the broader dated capability inventory or admit reusable automation.
+
 **Strategy sources:** [`PGE-07`](../../../Strategy/Requirements.md), [Gap Assessment](../../../Strategy/Assessments/GapAssessment.md), and `NS-EVIDENCE`/`NS-SIMPLIFY` in the [Engineer Persona](../../../Strategy/EngineerPersona.md)
 
 **Current readiness:** **10/100** for reusable Python automation — two project conversion scripts exist, but no repository automation, analysis product, binding, or editor/game Python layer exists. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
@@ -18,8 +20,8 @@
 
 | Capability | Current state | Correct interpretation |
 | --- | --- | --- |
-| LPS Head conversion | one Showcase-owned script exists | a project content conversion, not reusable engine automation |
-| Cornell Box conversion | one Showcase-owned script exists | a project content conversion, not an analysis framework |
+| LPS Head conversion | one Showcase-owned command with focused implementation modules | a project content conversion, not reusable engine automation |
+| Cornell Box conversion | one Showcase-owned command with focused implementation modules | a project content conversion, not an analysis framework |
 | repository automation/result analysis | Not found | future tools need one named workflow, schema, owner, and consumer |
 | editor/game Python or public bindings | Not found and not promised | separate product capabilities, not implied by offline scripts |
 
@@ -36,7 +38,7 @@ Choose Python for one actual offline workflow. Runtime-asset preparation must sa
 
 ## Current Boundary
 
-The current tree contains two Showcase-oriented source-conversion scripts. They demonstrate bounded offline scripting, not a supported Python API, test harness, workload-analysis package, build orchestrator, bindings layer, or reusable asset/graphics automation product. No such broader capability should be inferred.
+The current tree provides two Showcase-oriented source-conversion commands with project-private OBJ, glTF, encoding, command-line and publication modules. They demonstrate bounded offline scripting, not a supported Python API, test harness, workload-analysis package, build orchestrator, bindings layer, or reusable asset/graphics automation product. No such broader capability should be inferred.
 
 ## Target Contract
 

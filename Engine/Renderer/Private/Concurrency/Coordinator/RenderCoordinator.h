@@ -77,9 +77,14 @@ private:
 	void ExecuteSerialFrame();
 	void SubmitThreadedFrame();
 	void RenderThreadMain();
+	void InitializeRenderThreadContext();
+	void ProcessRenderThreadCommands();
+	void FinishRenderThread(std::exception_ptr failure) noexcept;
 	void ProcessThreadedCommand(RenderThreadCommand command);
 	void ExecuteThreadedFrame(RenderFrameQueueTicket ticket);
 	void SettleAbandonedWork() noexcept;
+	void CancelPendingControls() noexcept;
+	void FailOutstandingViewportCaptures() noexcept;
 	void PublishReadState();
 	void DispatchControl(RendererExecutionControl control);
 	void SubmitThreadCommand(RenderThreadCommandPayload payload);

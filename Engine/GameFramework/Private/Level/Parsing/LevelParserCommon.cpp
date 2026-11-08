@@ -6,6 +6,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <array>
+#include <cmath>
 #include <format>
 #include <sstream>
 
@@ -23,7 +24,7 @@ namespace LevelParsing
 		{
 			std::size_t parsedLength = 0;
 			const float parsedValue = std::stof(trimmed, &parsedLength);
-			if (parsedLength != trimmed.size())
+			if (parsedLength != trimmed.size() || !std::isfinite(parsedValue))
 			{
 				return false;
 			}
@@ -49,7 +50,7 @@ namespace LevelParsing
 				return false;
 			}
 		}
-		if (std::getline(stream, segment, ','))
+		if (!stream.eof())
 		{
 			return false;
 		}

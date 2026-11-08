@@ -86,15 +86,13 @@ RhiGpuVirtualAddress VulkanRecordingUploadPage::AllocateAndCopy(const void* data
 
 	std::uint64_t alignedOffset = (m_offset + m_alignment - 1) & ~(m_alignment - 1);
 	const Page& current = *m_pages[m_pageIndex];
-	const bool bUploadPageExhaustedBuffer = current.Buffer != nullptr;
-	const bool bUploadPageExhaustedAllocations = bUploadPageExhaustedBuffer && (current.AllocationCount == current.Allocations.size());
-	const bool bUploadPageExhaustedGuardBuffer = bUploadPageExhaustedBuffer && !bUploadPageExhaustedAllocations;
-	const bool bOffsetExceedsBuffer = bUploadPageExhaustedGuardBuffer && (alignedOffset > current.Buffer->ResourceSizeInBytes);
-	const bool bMissingStorageOrOffset = bUploadPageExhaustedAllocations || bOffsetExceedsBuffer;
-	const bool bCheckRemainingSpace = bUploadPageExhaustedBuffer && !bMissingStorageOrOffset;
-	const bool bInsufficientSpace = bCheckRemainingSpace && (sizeInBytes > current.Buffer->ResourceSizeInBytes - alignedOffset);
-	const bool bPageExhausted = bMissingStorageOrOffset || bInsufficientSpace;
-	const bool bUploadPageExhausted = bUploadPageExhaustedBuffer && bPageExhausted;
+	const std::uint64_t capacity = current.Buffer != nullptr ? current.Buffer->ResourceSizeInBytes : 0;
+	const bool bSlotsFull = current.AllocationCount == current.Allocations.size();
+	const bool bOffsetInvalid = alignedOffset > capacity;
+	const bool bRangeTooLarge = !bOffsetInvalid && sizeInBytes > capacity - alignedOffset;
+	const bool bRangeInvalid = bOffsetInvalid || bRangeTooLarge;
+	const bool bPageFull = bSlotsFull || bRangeInvalid;
+	const bool bUploadPageExhausted = current.Buffer != nullptr && bPageFull;
 
 	if (bUploadPageExhausted)
 	{
@@ -139,7 +137,9 @@ bool VulkanRecordingUploadPage::Resolve(RhiGpuVirtualAddress address, VkBuffer& 
 		const Page& page = *m_pages[pageIndex];
 		const std::uintptr_t allocationBegin = reinterpret_cast<std::uintptr_t>(page.Allocations.data());
 		const std::uintptr_t allocationEnd = allocationBegin + page.AllocationCount * sizeof(Page::Allocation);
-		if (allocationAddress >= allocationBegin && allocationAddress < allocationEnd && (allocationAddress - allocationBegin) % sizeof(Page::Allocation) == 0)
+		const bool bWithinPage = allocationAddress >= allocationBegin && allocationAddress < allocationEnd;
+		const bool bAligned = bWithinPage && (allocationAddress - allocationBegin) % sizeof(Page::Allocation) == 0;
+		if (bAligned)
 		{
 			const Page::Allocation& allocation = page.Allocations[(allocationAddress - allocationBegin) / sizeof(Page::Allocation)];
 			buffer = page.Buffer->Buffer;

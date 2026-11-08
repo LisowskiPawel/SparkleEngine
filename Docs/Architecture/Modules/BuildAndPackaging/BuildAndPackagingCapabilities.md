@@ -59,6 +59,8 @@ The current build graph is useful engineering infrastructure, not yet a product-
 | Continuous integration, automated regression, and retained results | [Continuous Integration And Regression](#automation) |
 | Self-service recovery, local export/privacy, finite review and immutable replacement/withdrawal; no support service | [Adoption Support And Incident Response](PackagingAndInstallation.md#local-diagnostics-and-release-review) |
 
+**Dependency layout reconciliation (2026-11-08):** [FetchDependencies.cmake](../../../../CMake/Dependencies/FetchDependencies.cmake) retains pinned inputs, selection and ordering. [DependencyCache.cmake](../../../../CMake/Dependencies/DependencyCache.cmake) owns existing cache verification/download mechanics, and [CompressonatorTargets.cmake](../../../../CMake/Dependencies/CompressonatorTargets.cmake) owns its native encoder/ISA target construction. Source-sync early returns stay in the entry point; this source-layout update does not qualify dependency acquisition or a fresh build.
+
 ## Build Contract
 
 | ID | Capability | State | Exact current coverage and limit | Evidence |

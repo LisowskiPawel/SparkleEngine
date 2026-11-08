@@ -13,7 +13,7 @@
 #include <string_view>
 #include <system_error>
 
-namespace Paths::Private
+namespace Paths
 {
 	static std::filesystem::path DefaultLogDirectory(const std::filesystem::path& logsRoot, std::string_view executableStem)
 	{
@@ -23,7 +23,7 @@ namespace Paths::Private
 
 		if (bExecutableHasProductSuffix)
 		{
-			std::string projectName = Filesystem::Private::InferProjectNameFromExecutableStem(sanitizedExecutableStem);
+			std::string projectName = Filesystem::InferProjectNameFromExecutableStem(sanitizedExecutableStem);
 			if (projectName.empty())
 			{
 				projectName = sanitizedExecutableStem;
@@ -63,11 +63,11 @@ namespace Paths::Private
 
 	std::filesystem::path ResolveBootstrapLogFile(std::string_view configuredFile, LogParentDirectoryPolicy parentDirectoryPolicy)
 	{
-		const Filesystem::ProductUserStatePaths userState = Filesystem::Private::ResolveCurrentProductUserStatePaths();
+		const Filesystem::ProductUserStatePaths userState = Filesystem::ResolveCurrentProductUserStatePaths();
 		std::filesystem::path logPath = ResolveConfiguredLogFile(userState.LogsRoot, configuredFile);
 		if (logPath.empty())
 		{
-			const std::string executableStem = PathFormatting::SanitizePathSegment(Filesystem::Private::GetExecutableStem());
+			const std::string executableStem = PathFormatting::SanitizePathSegment(Filesystem::GetExecutableStem());
 			logPath = DefaultLogDirectory(userState.LogsRoot, executableStem) / PathFormatting::TimestampedFileName(executableStem, ".log");
 		}
 

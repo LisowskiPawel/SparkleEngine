@@ -30,10 +30,8 @@
 
 void UI::Implementation::InitializeSceneEditing(EditorHostServices& hostServices)
 {
-	m_sceneModelBuilder = std::make_unique<EditorSceneModelBuilder>(EditorSceneSource{
-	    .AcquireReadView = std::move(hostServices.AcquireWorldReadView),
-	    .WorldGeneration = std::move(hostServices.WorldGeneration),
-	    .MaterialVariants = std::move(hostServices.MaterialVariants)});
+	m_sceneModelBuilder = std::make_unique<EditorSceneModelBuilder>(
+	    EditorSceneSource{.AcquireReadView = std::move(hostServices.AcquireWorldReadView), .MaterialVariants = std::move(hostServices.MaterialVariants)});
 
 	m_transactionHistory = std::make_unique<EditorTransactionHistory>(std::move(hostServices.SubmitWorldEdit));
 }
@@ -52,9 +50,7 @@ void UI::Implementation::InitializeConsole(CVarControlExecutor&& consoleVariable
 
 	m_editorConsoleSystem = std::make_unique<EditorConsoleSystem>(ConsoleCommandActions{
 	    .Variables = m_consoleVariables,
-	    .CompileShaders = [this](bool bSymbols) { return m_shaderToolsPanel->RequestCompile(bSymbols); },
-	    .ReloadShaders =
-	        [this]()
+	    .ReloadShaders = [this]()
 	    {
 		    m_bShaderReloadRequested = true;
 		    return ConsoleCommandResult::Success("Shader reload requested.");
@@ -90,12 +86,8 @@ void UI::Implementation::InitializeViewport()
 void UI::Implementation::InitializeAssetPanels()
 {
 	m_shaderToolsPanel = std::make_unique<ShaderToolsPanel>();
-	m_shaderToolsPanel->SetDiagnosticsProvider(m_shaderDiagnosticsProvider);
 	m_usedMeshesPanel = std::make_unique<UsedMeshesPanel>();
-	m_usedMeshesPanel->SetDiagnosticsProvider(m_meshDiagnosticsProvider);
-	m_usedMeshesPanel->SetPreviewGeometryProvider(m_meshPreviewProvider);
 	m_usedTexturesPanel = std::make_unique<UsedTexturesPanel>();
-	m_usedTexturesPanel->SetDiagnosticsProvider(m_textureDiagnosticsProvider);
 	m_shaderToolsPanel->SetReloadHandler([this]() { m_bShaderReloadRequested = true; });
 }
 
@@ -184,6 +176,5 @@ void UI::Implementation::InitializeImGuiContext()
 
 void UI::Implementation::SubscribeToWindowEvents()
 {
-	m_imguiContext->SubscribeToWindowEvents(
-	    [this](std::uint32_t message, std::uintptr_t key, bool bWantsTextInput) { return m_editorConsoleSystem != nullptr && m_editorConsoleSystem->HandleShortcut(message, key, bWantsTextInput); });
+	m_imguiContext->SubscribeToWindowEvents([this](Key key) { return m_editorConsoleSystem != nullptr && m_editorConsoleSystem->HandleShortcut(key); });
 }

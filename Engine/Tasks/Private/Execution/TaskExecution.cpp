@@ -52,6 +52,12 @@ void TaskExecution::State::Publish(TaskExecutionCompletion completion)
 	}
 }
 
+void TaskExecution::State::WaitUntilSettled()
+{
+	std::unique_lock lock(Mutex);
+	Condition.wait(lock, [this] { return bSettled; });
+}
+
 TaskExecution::TaskExecution(std::shared_ptr<State> state) noexcept :
     m_state(std::move(state))
 {

@@ -2,19 +2,7 @@
 
 #include "Viewport/EditorViewportSession.h"
 
-#include <utility>
-
 EditorViewportSession::EditorViewportSession() = default;
-
-EditorViewportSession::EditorViewportSession(EditorViewportSettings settings) :
-    m_settings(std::move(settings))
-{
-}
-
-void EditorViewportSession::SetViewModeChangedHandler(std::function<void(RenderViewMode)> handler) noexcept
-{
-	m_viewModeChangedHandler = std::move(handler);
-}
 
 void EditorViewportSession::SynchronizeWorld(std::span<const WorldCameraReadData> cameras, std::uint64_t worldGeneration) noexcept
 {
@@ -100,16 +88,4 @@ void EditorViewportSession::SetOrthographicHeight(float heightMeters) noexcept
 void EditorViewportSession::SetExposureOverrides(ViewportExposureOverrides overrides) noexcept
 {
 	(void) m_settings.SetExposureOverrides(overrides);
-}
-
-void EditorViewportSession::SetViewMode(RenderViewMode viewMode) noexcept
-{
-	if (viewMode < RenderViewMode::Count)
-	{
-		m_viewMode = viewMode;
-		if (m_viewModeChangedHandler)
-		{
-			m_viewModeChangedHandler(viewMode);
-		}
-	}
 }

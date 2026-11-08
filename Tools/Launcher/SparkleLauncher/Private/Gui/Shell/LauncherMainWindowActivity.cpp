@@ -37,10 +37,10 @@ namespace SparkleLauncher
 		{
 			m_settings.SetShaderExportPath(result.ShaderExportPath);
 		}
-		const QString effectiveTitle = m_activityPanel->DisplayOperationFinished(runId, title, result);
+		m_activityPanel->DisplayOperationFinished(runId, title, result);
 		m_workflowPanel->setEnabled(!m_activityPanel->HasActiveRun());
 
-		const bool bSceneStatusHandled = m_sceneCatalog->CompleteOperation(runId, operationId, effectiveTitle, result);
+		const bool bSceneStatusHandled = m_sceneCatalog->CompleteOperation(runId, operationId);
 		const bool bSetupStatusHandled = m_workspaceSetup->CompleteOperation(runId);
 		if (bSceneStatusHandled || bSetupStatusHandled)
 		{

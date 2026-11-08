@@ -47,12 +47,9 @@ namespace Assets
 		std::size_t ReferenceCount = 1;
 	};
 
-	namespace CookedAssetFileSetDetail
+	static std::string FormatSystemError(unsigned long error)
 	{
-		std::string FormatSystemError(unsigned long error)
-		{
-			return std::system_category().message(static_cast<int>(error));
-		}
+		return std::system_category().message(static_cast<int>(error));
 	}
 
 	std::unique_ptr<CookedAssetFileSet::File> CookedAssetFileSet::Map(const std::filesystem::path& path)
@@ -62,7 +59,7 @@ namespace Assets
 		const HANDLE fileHandle = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
 		if (fileHandle == INVALID_HANDLE_VALUE)
 		{
-			throw Diagnostics::Error(std::format("Could not open cooked asset '{}': {}", path.generic_string(), CookedAssetFileSetDetail::FormatSystemError(GetLastError())));
+			throw Diagnostics::Error(std::format("Could not open cooked asset '{}': {}", path.generic_string(), FormatSystemError(GetLastError())));
 		}
 
 		LARGE_INTEGER fileSize{};
@@ -70,7 +67,7 @@ namespace Assets
 		{
 			const unsigned long error = GetLastError();
 			CloseHandle(fileHandle);
-			throw Diagnostics::Error(std::format("Could not determine the size of cooked asset '{}': {}", path.generic_string(), CookedAssetFileSetDetail::FormatSystemError(error)));
+			throw Diagnostics::Error(std::format("Could not determine the size of cooked asset '{}': {}", path.generic_string(), FormatSystemError(error)));
 		}
 		if (fileSize.QuadPart <= 0 || static_cast<unsigned long long>(fileSize.QuadPart) > (std::numeric_limits<std::size_t>::max)())
 		{
@@ -83,7 +80,7 @@ namespace Assets
 		{
 			const unsigned long error = GetLastError();
 			CloseHandle(fileHandle);
-			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), CookedAssetFileSetDetail::FormatSystemError(error)));
+			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), FormatSystemError(error)));
 		}
 
 		void* const data = MapViewOfFile(mappingHandle, FILE_MAP_READ, 0, 0, 0);
@@ -92,7 +89,7 @@ namespace Assets
 		CloseHandle(fileHandle);
 		if (data == nullptr)
 		{
-			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), CookedAssetFileSetDetail::FormatSystemError(mapError)));
+			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), FormatSystemError(mapError)));
 		}
 
 		mappedFile->Data = data;

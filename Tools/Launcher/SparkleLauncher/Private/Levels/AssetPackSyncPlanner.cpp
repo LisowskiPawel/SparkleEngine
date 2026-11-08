@@ -9,12 +9,27 @@
 
 namespace SparkleLauncher
 {
+	std::string FindAssetPackAcquisitionBlocker(const ProjectLevelCatalog& catalog, std::string_view packId)
+	{
+		while (!packId.empty())
+		{
+			const ProjectAssetPack& pack = catalog.assetPacks.find(packId)->second;
+			if (!pack.bDownloadSupported && !catalog.IsAssetPackPayloadPresent(pack))
+			{
+				return "Asset pack '" + pack.id + "' is required but has no supported acquisition path.";
+			}
+			packId = pack.parentPackId;
+		}
+		return {};
+	}
+
 	class AssetPackSyncPlanner final
 	{
 	public:
-		AssetPackSyncPlanner(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds) noexcept :
+		AssetPackSyncPlanner(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds, bool bRequireGameSupport) noexcept :
 		    m_catalog(catalog),
-		    m_requestedLevelIds(requestedLevelIds)
+		    m_requestedLevelIds(requestedLevelIds),
+		    m_bRequireGameSupport(bRequireGameSupport)
 		{
 		}
 
@@ -36,7 +51,7 @@ namespace SparkleLauncher
 					{
 						throw Diagnostics::Error("Requested level '" + levelId + "' is not present in the level catalog.");
 					}
-					AppendLevelPack(*level, false);
+					AppendLevelPack(*level, m_bRequireGameSupport);
 				}
 				return;
 			}
@@ -63,6 +78,11 @@ namespace SparkleLauncher
 			{
 				throw Diagnostics::Error("Selected level '" + level.id + "' requires game-unsupported asset pack '" + pack.id + "': " + pack.gameBlocker);
 			}
+			const std::string blocker = FindAssetPackAcquisitionBlocker(m_catalog, pack.id);
+			if (!blocker.empty())
+			{
+				throw Diagnostics::Error(blocker);
+			}
 			AppendPackAndParents(pack);
 		}
 
@@ -71,10 +91,6 @@ namespace SparkleLauncher
 			if (m_appendedIds.contains(pack.id))
 			{
 				return;
-			}
-			if (!pack.bDownloadSupported && !m_catalog.IsAssetPackPayloadPresent(pack))
-			{
-				throw Diagnostics::Error("Asset pack '" + pack.id + "' is required but has no supported acquisition path.");
 			}
 			if (!pack.parentPackId.empty())
 			{
@@ -87,12 +103,13 @@ namespace SparkleLauncher
 
 		const ProjectLevelCatalog& m_catalog;
 		std::span<const std::string> m_requestedLevelIds;
+		bool m_bRequireGameSupport;
 		std::set<std::string, std::less<>> m_appendedIds;
 		std::vector<std::string> m_packIds;
 	};
 
-	std::vector<std::string> BuildAssetPackSyncPlan(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds)
+	std::vector<std::string> BuildAssetPackSyncPlan(const ProjectLevelCatalog& catalog, std::span<const std::string> requestedLevelIds, bool bRequireGameSupport)
 	{
-		return AssetPackSyncPlanner(catalog, requestedLevelIds).Build();
+		return AssetPackSyncPlanner(catalog, requestedLevelIds, bRequireGameSupport).Build();
 	}
 }

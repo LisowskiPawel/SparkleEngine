@@ -9,6 +9,11 @@ ConsoleSession::ConsoleSession(ConsoleCommandActions actions) :
 {
 }
 
+void ConsoleSession::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler)
+{
+	m_actions.CompileShaders = std::move(handler);
+}
+
 void ConsoleSession::SubmitLine(std::string_view line)
 {
 	const std::string_view trimmedLine = Strings::TrimAsciiWhitespace(line);

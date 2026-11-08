@@ -2,7 +2,8 @@
 #include "World/Extraction/Resources/RenderResourcePublisher.h"
 
 #include "GameFramework/Public/World/SkyEnvironment.h"
-#include "World/Resources/GameWorldResourceStores.h"
+#include "World/Resources/MaterialResourceStore.h"
+#include "World/Resources/TextureResourceStore.h"
 #include "World/SceneMeshInstanceData.h"
 
 namespace ECS
@@ -19,7 +20,8 @@ namespace ECS
 	void RenderResourcePublisher::Publish(
 	    std::span<const SceneMeshInstanceGroupData> instanceGroups,
 	    const std::optional<SkyEnvironment>& sky,
-	    GameWorldResourceStores& resources,
+	    const MaterialResourceStore& materials,
+	    const TextureResourceStore& textures,
 	    RenderSceneDelta& delta)
 	{
 		PublishInstanceGroups(instanceGroups, delta);
@@ -30,7 +32,7 @@ namespace ECS
 		{
 			skyTexturePath.emplace(sky->skyTexture.texturePath);
 		}
-		PublishChangedTables(resources, skyTexturePath, delta);
+		PublishChangedTables(materials, textures, skyTexturePath, delta);
 	}
 
 	void RenderResourcePublisher::PublishInstanceGroups(std::span<const SceneMeshInstanceGroupData> instanceGroups, RenderSceneDelta& delta) const
@@ -59,25 +61,29 @@ namespace ECS
 		m_bSkyPublished = true;
 	}
 
-	void RenderResourcePublisher::PublishChangedTables(GameWorldResourceStores& resources, const std::optional<std::filesystem::path>& skyTexturePath, RenderSceneDelta& delta)
+	void RenderResourcePublisher::PublishChangedTables(
+	    const MaterialResourceStore& materials,
+	    const TextureResourceStore& textures,
+	    const std::optional<std::filesystem::path>& skyTexturePath,
+	    RenderSceneDelta& delta)
 	{
-		const std::uint64_t materialRevision = resources.Materials.GetContentRevision();
+		const std::uint64_t materialRevision = materials.GetContentRevision();
 		if (delta.bResetScene || materialRevision != m_materialRevision)
 		{
-			delta.Materials = resources.Materials.CaptureRenderTable();
+			delta.Materials = materials.CaptureRenderTable();
 			m_materialRevision = materialRevision;
 		}
 
-		const std::uint64_t textureRevision = resources.Textures.GetContentRevision();
+		const std::uint64_t textureRevision = textures.GetContentRevision();
 		if (delta.bResetScene || textureRevision != m_textureRevision || skyTexturePath != m_skyTexturePath)
 		{
 			if (skyTexturePath)
 			{
-				delta.Textures = resources.Textures.CaptureRenderTable(std::span<const std::filesystem::path>(&*skyTexturePath, 1));
+				delta.Textures = textures.CaptureRenderTable(std::span<const std::filesystem::path>(&*skyTexturePath, 1));
 			}
 			else
 			{
-				delta.Textures = resources.Textures.CaptureRenderTable();
+				delta.Textures = textures.CaptureRenderTable();
 			}
 			m_textureRevision = textureRevision;
 			m_skyTexturePath = skyTexturePath;

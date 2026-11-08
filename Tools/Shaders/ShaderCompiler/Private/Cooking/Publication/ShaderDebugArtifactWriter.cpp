@@ -131,18 +131,14 @@ void ShaderDebugArtifactWriter::RecordCompilerModule(const wchar_t* name)
 
 void ShaderDebugArtifactWriter::Write(const ShaderCompileRequest& request, const CookedStageBuild& compiledStage, const ShaderDebugArtifactSet& debugArtifacts)
 {
-	const bool bInputsIncompleteSourceFiles = !request.bEnableDebugInfo || request.SourceFiles.empty();
-	const bool bInputsIncompleteBytecode = bInputsIncompleteSourceFiles || (compiledStage.bytecode.empty());
-	const bool bInputsIncompleteCompileArguments = bInputsIncompleteBytecode || (debugArtifacts.CompileArguments.empty());
-	const bool bDiagnosticInputsIncompleteFormat = !bInputsIncompleteCompileArguments && (compiledStage.format == ShaderBinaryFormat::Dxil);
-	const bool bDiagnosticInputsIncompleteSymbols = bDiagnosticInputsIncompleteFormat && (debugArtifacts.Symbols.empty());
-	const bool bInputsIncompleteGuardSymbolName = bDiagnosticInputsIncompleteFormat && !bDiagnosticInputsIncompleteSymbols;
-	const bool bInputsIncompleteSymbolName = bInputsIncompleteGuardSymbolName && (debugArtifacts.SymbolName.empty());
-	const bool bSymbolsMissing = bDiagnosticInputsIncompleteSymbols || bInputsIncompleteSymbolName;
-	const bool bDxilInputsMissing = bDiagnosticInputsIncompleteFormat && bSymbolsMissing;
-	const bool bDiagnosticInputsIncomplete = bInputsIncompleteCompileArguments || bDxilInputsMissing;
+	const bool bSourceReady = request.bEnableDebugInfo && !request.SourceFiles.empty();
+	const bool bCodeReady = !compiledStage.bytecode.empty() && !debugArtifacts.CompileArguments.empty();
+	const bool bCoreReady = bSourceReady && bCodeReady;
+	const bool bSymbolsReady = !debugArtifacts.Symbols.empty() && !debugArtifacts.SymbolName.empty();
+	const bool bFormatReady = compiledStage.format != ShaderBinaryFormat::Dxil || bSymbolsReady;
+	const bool bInputsReady = bCoreReady && bFormatReady;
 
-	if (bDiagnosticInputsIncomplete)
+	if (!bInputsReady)
 	{
 		throw Diagnostics::Error("Shader debug export is missing requested code, source or compiler debug data.");
 	}
@@ -252,13 +248,13 @@ void ShaderDebugArtifactWriter::WriteCompiledJobs(
 		const auto& products = plan.shaderOutputs[job.ShaderIndex];
 		const auto product = std::ranges::find(products, job.Request.Target, &ShaderCookProduct::target);
 		const GlobalShaderMapEntry* entry = map.Find(job.Request.ShaderType, job.Request.Target);
-		const bool bDiagnosticProductMismatchEntry = product == products.end() || entry == nullptr;
-		const bool bProductMismatchInputHash = bDiagnosticProductMismatchEntry || (entry->CompileInputHash != job.InputHash);
-		const bool bInputHashMismatch = bProductMismatchInputHash || (result.InputHash != job.InputHash);
-		const bool bDiagnosticProductMismatchRequest = bInputHashMismatch || (result.ShaderType != job.Request.ShaderType);
-		const bool bDiagnosticProductMismatch = bDiagnosticProductMismatchRequest || (result.Target != job.Request.Target);
+		const bool bProductMissing = product == products.end() || entry == nullptr;
+		const bool bEntryMismatch = bProductMissing || (entry->CompileInputHash != job.InputHash);
+		const bool bCompileMismatch = bEntryMismatch || (result.InputHash != job.InputHash);
+		const bool bShaderMismatch = bCompileMismatch || (result.ShaderType != job.Request.ShaderType);
+		const bool bExportMismatch = bShaderMismatch || (result.Target != job.Request.Target);
 
-		if (bDiagnosticProductMismatch)
+		if (bExportMismatch)
 		{
 			throw Diagnostics::Error("Shader debug export does not match its staged runtime entry.");
 		}

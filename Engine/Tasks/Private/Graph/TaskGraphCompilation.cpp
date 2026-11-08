@@ -22,18 +22,21 @@ public:
 		}
 
 		const std::size_t taskCount = graph->Nodes.size();
-		std::vector<std::vector<std::uint32_t>> startAdjacency(taskCount);
-		std::vector<std::vector<std::uint32_t>> completionAdjacency(taskCount);
-		if (!BuildDependencyRelations(*graph, startAdjacency, completionAdjacency))
+		std::vector<std::vector<std::uint32_t>> adjacency(taskCount * 2u);
+		if (!BuildDependencyRelations(*graph, adjacency))
 		{
 			return graph;
 		}
 
-		RejectCycles(*graph, startAdjacency, completionAdjacency);
+		RejectCycles(*graph, adjacency);
 		return graph;
 	}
 
 private:
+	static std::uint32_t BodyEvent(std::uint32_t taskIndex) noexcept { return taskIndex * 2u; }
+
+	static std::uint32_t CompletionEvent(std::uint32_t taskIndex) noexcept { return BodyEvent(taskIndex) + 1u; }
+
 	static bool HasCycle(const std::vector<std::vector<std::uint32_t>>& adjacency)
 	{
 		std::vector<std::uint32_t> incoming(adjacency.size(), 0);
@@ -83,19 +86,20 @@ private:
 		graph.Nodes = m_builder.Nodes;
 	}
 
-	bool BuildDependencyRelations(TaskGraphStorage& graph, std::vector<std::vector<std::uint32_t>>& startAdjacency, std::vector<std::vector<std::uint32_t>>& completionAdjacency) const
+	bool BuildDependencyRelations(TaskGraphStorage& graph, std::vector<std::vector<std::uint32_t>>& adjacency) const
 	{
 		for (std::uint32_t taskIndex = 0; taskIndex < graph.Nodes.size(); ++taskIndex)
 		{
 			const TaskGraphNode& node = graph.Nodes[taskIndex];
+			// Body completion precedes logical completion, which also waits for nested children.
+			adjacency[BodyEvent(taskIndex)].push_back(CompletionEvent(taskIndex));
 			for (const std::uint32_t prerequisiteIndex : node.Prerequisites)
 			{
 				if (!ValidatePrerequisiteLane(graph, taskIndex, prerequisiteIndex))
 				{
 					return false;
 				}
-				startAdjacency[prerequisiteIndex].push_back(taskIndex);
-				completionAdjacency[prerequisiteIndex].push_back(taskIndex);
+				adjacency[CompletionEvent(prerequisiteIndex)].push_back(BodyEvent(taskIndex));
 			}
 
 			if (!ValidateNestedLane(graph, taskIndex))
@@ -104,8 +108,8 @@ private:
 			}
 			if (node.Parent.has_value())
 			{
-				startAdjacency[*node.Parent].push_back(taskIndex);
-				completionAdjacency[taskIndex].push_back(*node.Parent);
+				adjacency[BodyEvent(*node.Parent)].push_back(BodyEvent(taskIndex));
+				adjacency[CompletionEvent(taskIndex)].push_back(CompletionEvent(*node.Parent));
 			}
 		}
 		return true;
@@ -142,9 +146,9 @@ private:
 		return false;
 	}
 
-	void RejectCycles(TaskGraphStorage& graph, const std::vector<std::vector<std::uint32_t>>& startAdjacency, const std::vector<std::vector<std::uint32_t>>& completionAdjacency) const
+	void RejectCycles(TaskGraphStorage& graph, const std::vector<std::vector<std::uint32_t>>& adjacency) const
 	{
-		if (!HasCycle(startAdjacency) && !HasCycle(completionAdjacency))
+		if (!HasCycle(adjacency))
 		{
 			return;
 		}

@@ -93,6 +93,10 @@ public:
 	const RayTracingShaderTableMetrics& GetMetrics() const noexcept { return m_metrics; }
 
 private:
+	RayTracingShaderTableInvalidationReason ResolveInvalidationReason(
+	    std::span<const RayTracingShaderTableInstancePlan> instances,
+	    std::span<const RayTracingShaderTableRecordPlan> records) const noexcept;
+	void PublishMapping(std::vector<RayTracingShaderTableInstancePlan> instances, std::vector<RayTracingShaderTableRecordPlan> records, RayTracingShaderTableInvalidationReason reason) noexcept;
 	const RayTracingShaderTableInstancePlan* FindInstance(std::uint32_t gpuSceneSlot) const noexcept;
 
 	std::vector<RayTracingShaderTableInstancePlan> m_instances;

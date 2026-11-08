@@ -26,6 +26,7 @@ void ReferencePathTracerArtifactCoordinator::Request(
 {
 	if (!IsSettled())
 	{
+		m_lastResult = ReferencePathTracerArtifactWriteResult{.ErrorMessage = "A Reference artifact operation is already in progress."};
 		return;
 	}
 	if (products.GetProgress().State == ViewportRenderProgressState::Unavailable)
@@ -71,7 +72,7 @@ void ReferencePathTracerArtifactCoordinator::Begin(ReferencePathTracerArtifactKi
 	const std::string digest = Hash::Sha256ToHex(mean->SamplePrefix.RenderIdentitySha256);
 	const char* label = kind == ReferencePathTracerArtifactKind::Complete ? "Complete" : (kind == ReferencePathTracerArtifactKind::Checkpoint ? "Checkpoint" : "PartialPrefix");
 	m_publicationDirectory = m_outputRoot / digest / (Identifiers::CreateUuidV4String() + "-" + label + "-" + std::to_string(mean->SamplePrefix.SampleCount));
-	m_lastResult = {};
+	m_lastResult.reset();
 	m_mean.reset();
 	m_moment2.reset();
 	m_capturePrefix = mean->SamplePrefix;
@@ -131,8 +132,6 @@ void ReferencePathTracerArtifactCoordinator::PublishIfReady()
 		return;
 	}
 
-	std::string errorMessage;
-
 	ReferencePathTracerArtifactWriteRequest request{
 	    .Kind = m_kind,
 	    .AllowedRoot = m_outputRoot,
@@ -143,6 +142,12 @@ void ReferencePathTracerArtifactCoordinator::PublishIfReady()
 
 	m_mean.reset();
 	m_moment2.reset();
+	StartPublication(std::move(request));
+}
+
+void ReferencePathTracerArtifactCoordinator::StartPublication(ReferencePathTracerArtifactWriteRequest request)
+{
+	std::string errorMessage;
 	const TaskName taskName = TaskName("Publish Reference Path Tracer artifact");
 
 	auto operationTask = [request = std::move(request)](ReferencePathTracerArtifactWriteResult& result, TaskExecutionContext& context) mutable
@@ -169,7 +174,12 @@ void ReferencePathTracerArtifactCoordinator::Update(Renderer& renderer, const Vi
 	CollectReadback(renderer, m_meanCapture, m_mean);
 	CollectReadback(renderer, m_moment2Capture, m_moment2);
 	PublishIfReady();
+	BeginPendingCapture(renderer, products);
+	CollectPublicationResult();
+}
 
+void ReferencePathTracerArtifactCoordinator::BeginPendingCapture(Renderer& renderer, const ViewportRenderProducts& products)
+{
 	if (m_pendingKind)
 	{
 		const RenderProduct* mean = products.FindProduct(RenderOutputFlags::Radiance);
@@ -192,6 +202,10 @@ void ReferencePathTracerArtifactCoordinator::Update(Renderer& renderer, const Vi
 			Begin(kind, renderer, products, m_outputRoot);
 		}
 	}
+}
+
+void ReferencePathTracerArtifactCoordinator::CollectPublicationResult()
+{
 	ReferencePathTracerArtifactWriteResult result;
 	if (const std::optional<TaskResult> taskResult = m_writeOperation.TryConsume(result))
 	{
@@ -210,6 +224,11 @@ void ReferencePathTracerArtifactCoordinator::Update(Renderer& renderer, const Vi
 bool ReferencePathTracerArtifactCoordinator::IsSettled() const noexcept
 {
 	return !m_pendingKind && m_meanCapture.IsSettled() && m_moment2Capture.IsSettled() && !m_writeOperation.IsOccupied();
+}
+
+std::optional<ReferencePathTracerArtifactWriteResult> ReferencePathTracerArtifactCoordinator::TakeResult() noexcept
+{
+	return std::exchange(m_lastResult, std::nullopt);
 }
 
 void ReferencePathTracerArtifactCoordinator::Fail(std::string message)

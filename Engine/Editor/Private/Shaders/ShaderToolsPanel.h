@@ -17,16 +17,14 @@ public:
 
 	void SetOpen(bool bOpen) noexcept { m_bIsOpen = bOpen; }
 
-	bool IsOpen() const noexcept { return m_bIsOpen; }
-
 	void SetDiagnosticsProvider(RegisteredShaderListModel::DiagnosticsProvider provider);
 	void SetReloadHandler(CommandHandler handler);
 	void SetCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
 	void SetCompileStatus(bool bBusy, std::string_view message);
-	ConsoleCommandResult RequestCompile(bool bGenerateSymbols);
 	void BuildUI(bool bDisableInteraction);
 
 private:
+	ConsoleCommandResult RequestCompile(bool bGenerateSymbols);
 	static void DrawExportText(const char* childId, const std::string& text) noexcept;
 
 	void EnsureRows();

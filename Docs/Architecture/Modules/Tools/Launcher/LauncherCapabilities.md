@@ -87,6 +87,25 @@ The source and negative controls are recorded in [current FR-01 results](../../.
 
 The 2026-10-25 settings cleanup keeps Qt settings limited to controls with current callers. GUI cooking uses the operation core's incremental mode and shader defaults; explicit Force cooking and confirmation remain available through the shell/core contracts. Clean consent belongs to the individual request rather than persistent settings. Unused generic widget builders and the unconnected operation-preview signal path are removed. Unknown GUI-backend operation IDs return a typed failed operation result through the normal completion signal. A shell dry run with an unknown operation or missing planner reports the failure and exits nonzero; it never fabricates a preview. These are source changes; they do not establish GUI interaction or release acceptance.
 
+**Orchestration ownership, 2026-11-08:** Levels owns preparation eligibility for the
+complete asset-pack parent chain. The scene UI projects that result and submits
+Sync Available or Clean Level Content intent. The operation core acquires or
+cleans payloads, commits catalog selection, and only then reports success; a
+catalog-write failure is an operation failure. GUI completion callbacks refresh
+presentation and retain no pending catalog edits. Available-level selection is
+resolved in the core; explicit shell synchronization preserves selection.
+Maintenance separates intent/admission, target inspection and preview encoding,
+filesystem deletion, and level-pack retention. Unused maintenance toolchain and
+freshness snapshots are removed. Scene-card drawing stays with the card source.
+The asset-sync entry script sequences request/path admission, locking, restoration,
+payload staging, receipt validation and publication through scoped CMake functions
+with explicit payload inputs and results. Archive and loose-file mechanisms retain
+their pinned size/hash checks and publication rollback.
+
+Focused owner/consumer builds and bounded native controls are recorded in the
+[ownership-pass result](../../../../../artifacts/validation/tools-orchestration-20261108/result.json).
+They do not establish whole-content cook, interactive, GPU, package or release acceptance.
+
 ## Approved Prebuilt And Source-Rebuild Target
 
 **Current source, 2026-11-01; new-archive acceptance open:** preserve the current Launcher interface and existing operation owners. The release supplies precompiled products and a complete admitted cooked base; users may run it directly or obtain the matching source and optionally use that base before editing/rebuilding. [Packaging](../../BuildAndPackaging/PackagingAndInstallation.md#prebuilt-base-and-source-rebuild) owns composition, rights and exact distribution.
@@ -103,6 +122,29 @@ Fresh publisher build/cook is a release operation. Local source edits use ordina
 **Source cleanup:** the shared store, raw-source Run gate, binary-only importer and automatic prerequisite graph are removed. `SyncProducts.ps1` writes binaries/cooked files to canonical outputs; local Build/Cook replaces them. [Source checks](../../../../../artifacts/validation/release-owner-slim-20261101/completion.json) and [FR-06](../../../CrossModule/FirstRelease/ImplementationPlan.md#prebuilt-delivery-simplification) distinguish bounded proof from future exact-archive acceptance.
 
 **Preparation owner:** Launcher invokes existing build/cook tools. Editor no longer launches ShaderCompiler or watches source. Source and bundle share the ordinary root markers and complete `artifacts/dev` paths; root `LaunchSparkle.cmd` opens the shipped Launcher. Canonical executable paths bind discovery to their own root; a partial extraction cannot fall back to its enclosing checkout. Only the requested developer action checks actual source prerequisites (`CMakeLists.txt`/sync scripts). Engine has no package bootstrap API or installed-mode flag. [Current source result](../../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json) retains affected archive proof in FR-06.
+
+**Failure and policy revalidation, 2026-11-08 (second pass):**
+[cleanup execution](../../../../../Tools/Launcher/SparkleLauncher/Private/Maintenance/MaintenanceCleanExecution.cpp)
+propagates path inspection, directory enumeration and removal failures. Only native
+missing-file/path errors admit an absent Windows target as a successful no-op;
+invalid names cannot use the generic missing-file mapping to report success.
+Preserved paths and generated-file selection retain their existing owners.
+Sync Available rechecks current game-support policy when execution rebuilds its
+steps and again at selection commit after acquisition. Explicit acquisition keeps its existing selection
+and can acquire a game-unsupported pack. The
+[second-pass result](../../../../../artifacts/validation/tools-orchestration-iteration2-20261108/result.json)
+records native failure/preservation controls and affected builds, without advancing
+interactive, package or release acceptance.
+
+**Cook planning ownership, 2026-11-08 (second pass):**
+[the cook planner](../../../../../Tools/Launcher/SparkleLauncher/Private/Cook/CookOperationPlanner.cpp)
+composes input preparation, readiness, confirmation and preview publication.
+Operation definitions remain in `CookOperations.cpp`; private `CookPlanReadiness`
+owns input normalization, profile/tool resolution and admission, while
+`CookPlanPreview` owns input records, effects, visible steps and dry-run text.
+Disabled shader/content branches now update the actual support result. The
+[second-pass result](../../../../../artifacts/validation/tools-orchestration-iteration2-20261108/result.json)
+records unchanged enabled-feature plans and compilation of disabled combinations.
 
 ## At A Glance
 
@@ -255,8 +297,9 @@ travel together as `WorkspaceTargetOutputPaths` so the three destinations
 cannot drift through duplicated call-site logic.
 
 Maintenance scope IDs are defined and parsed by the public maintenance
-contract. The private maintenance planner expands each scope into one typed
-clean-action list; both preview/counting and execution project that same list.
+contract. Private `MaintenanceCleanSteps` expands each scope into typed clean
+actions consumed by preview/counting and execution. The maintenance executor
+performs filesystem work directly; its public entry takes only the clean plan.
 Cleanup mechanics receive the exact destructive and preserved paths and do not
 infer special directories from filenames such as `_deps`.
 
@@ -310,8 +353,8 @@ Candidate results belong in `FCR-PROD-03`; source presence does not pass these c
 
 If an operation says `Failed to launch child process` and the native text says application-control policy blocked the file, treat it as an **execution-trust failure**, not a cooking, shader, level, Renderer, or graphics-API failure. The executable may exist and the preceding build may have succeeded. On 2026-10-03, `cook.all` completed shader generation but stopped when Windows blocked unsigned `TextureCooker.exe`; a separate `levels.run` attempt was blocked at unsigned `ShowcaseEditor.exe`. Code Integrity enforcement events 3077/3033 named those exact files under the Smart App Control `VerifiedAndReputableDesktop` policy. This observation belongs to that machine and candidate, not to all installations.
 
-1. Open the failed operation's log and identify the exact child executable. Check that file's signature with `Get-AuthenticodeSignature -LiteralPath '<exact path>'`; inspect **Event Viewer â†’ Applications and Services Logs â†’ Microsoft â†’ Windows â†’ CodeIntegrity â†’ Operational** for a matching time/path and an enforcement event. A parent tool cannot classify a nested child rejection unless it publishes that typed result, so verify the named child rather than inferring it from the parent exit code.
-2. Choose an authorized development route: a machine or VM that permits local builds, or a trusted code-signing identity applied after build/deployment to every executable and binary Windows must load. On a personal development machine, the owner can instead choose **Windows Security â†’ App & browser control â†’ Smart App Control settings â†’ Off**. That is a machine-wide security change, not a per-app exception; check current Microsoft guidance before changing it. Do not silently change security policy from Launcher or a build script.
+1. Open the failed operation's log and identify the exact child executable. Check that file's signature with `Get-AuthenticodeSignature -LiteralPath '<exact path>'`; inspect **Event Viewer → Applications and Services Logs → Microsoft → Windows → CodeIntegrity → Operational** for a matching time/path and an enforcement event. A parent tool cannot classify a nested child rejection unless it publishes that typed result, so verify the named child rather than inferring it from the parent exit code.
+2. Choose an authorized development route: a machine or VM that permits local builds, or a trusted code-signing identity applied after build/deployment to every executable and binary Windows must load. On a personal development machine, the owner can instead choose **Windows Security → App & browser control → Smart App Control settings → Off**. That is a machine-wide security change, not a per-app exception; check current Microsoft guidance before changing it. Do not silently change security policy from Launcher or a build script.
 3. Verify that the same child now starts. Rerun the failed prerequisite and then the requested level. Rebuilding, recooking, changing D3D12/Vulkan, or choosing another shader compiler does not by itself change an unsigned binary's trust decision. If the child still fails, keep the exact event, path, signature status, and operation log; classify the new failure independently.
 
 Microsoft identifies the [`VerifiedAndReputableDesktop` policy](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/operations/inbox-appcontrol-policies), explains [Smart App Control's signed/reputable-file decision and lack of per-app exception](https://support.microsoft.com/en-us/windows/security/threat-malware-protection/smart-app-control-frequently-asked-questions), and documents [trusted code-signing options](https://learn.microsoft.com/en-us/windows/apps/develop/smart-app-control/code-signing-for-smart-app-control). The Launcher reports and plans operations; it does not own Windows security configuration or the currently absent release-signing pipeline.
@@ -322,7 +365,7 @@ Microsoft identifies the [`VerifiedAndReputableDesktop` policy](https://learn.mi
 - Level synchronization is catalog/CMake-script driven and Windows-workspace oriented; large downloads, resume, proxy, disk-full, hash failure, and interrupted extraction need evidence.
 - A successful initial Launcher process is not proof that a generated replacement or launched game/editor remained alive; handoff must follow the final child process and product log.
 - Source-built unsigned executables can be rejected by Smart App Control or another Windows application-control policy. A direct-child failure is typed by Launcher, while a nested cooker/tool failure remains limited by the parent tool's result protocol; use the [trust-failure route](#when-windows-blocks-a-development-tool) to identify the actual blocked file. Launcher cannot create a trusted signing identity; signed tool publication remains part of the absent packaging/signing capability.
-- â€śInstall Host Toolâ€ť is provider-bound; only tools with an implemented provider and `CanInstall` are installable.
+- “Install Host Tool” is provider-bound; only tools with an implemented provider and `CanInstall` are installable.
 - Destructive paths are planned and confirmed, but each scope still needs path-containment and preservation evidence on a disposable workspace.
 
 **Empty baseline readiness (2026-10-11):** the run planner accepts built-in `Empty` without imported cooked meshes, matching GameFramework's unconditional Empty registration. Texture and complete shader-generation readiness still apply. Other requested maps keep the cooked-mesh requirement. The catalog starts with no content selected; sync selections remain user-owned. Candidate results are recorded in Acceptance.

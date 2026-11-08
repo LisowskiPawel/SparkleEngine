@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TaskDispatch.h"
-#include "TaskExecutorRuntime.h"
+#include "TaskExecutorImplementation.h"
 
 #include <functional>
 #include <memory>
@@ -28,12 +28,15 @@ struct TaskDispatch::State final : std::enable_shared_from_this<TaskDispatch::St
 	bool Notify() noexcept;
 	void Close() noexcept;
 	void Execute() noexcept;
+	void BeginInvocation() noexcept;
+	TaskResult InvokeBody() noexcept;
+	bool CompleteInvocation(TaskResult& result) noexcept;
 	void Finish(TaskResult result) noexcept;
 	void ReleaseAdmission() noexcept;
 
 	// Gate -> lane injection -> lane wake. Workers unlink before acquiring Gate.
 	std::mutex Gate;
-	TaskExecutor::Implementation::Runtime* Owner = nullptr;
+	TaskExecutor::Implementation* Owner = nullptr;
 	TaskDesc Desc;
 	TaskFunction Function;
 	TaskExecutionContext Context;

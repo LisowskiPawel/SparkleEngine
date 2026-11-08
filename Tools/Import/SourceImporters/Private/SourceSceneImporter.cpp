@@ -41,6 +41,10 @@ SourceImportOutput ImportSourceScene(const std::filesystem::path& filePath)
 		if (format.Extension == extension)
 		{
 			SourceImportOutput output = format.Import(filePath);
+			if (!output.scene.HasSupportedContent())
+			{
+				throw Diagnostics::Error(std::format("{} produced incomplete mesh content or no supported scene content.", format.ImporterId));
+			}
 			output.provenance.importerId = format.ImporterId;
 			return output;
 		}

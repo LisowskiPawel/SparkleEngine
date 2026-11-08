@@ -1,19 +1,164 @@
 #include "PCH.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Widgets/UiDetailsWidgets.h"
+#include "Widgets/UiIconWidgets.h"
 
 #include "Style/SparkleUiPalette.h"
 
 #include <algorithm>
 #include <cfloat>
+#include <cmath>
 #include <vector>
 
 #include <imgui.h>
 
-#include "Widgets/UiWidgetPrimitives.h"
-
 namespace EditorWidgets
 {
+	static constexpr float DetailsLabelWidth = 132.0f;
+	static constexpr float DetailsAxisLabelWidth = 12.0f;
+	static constexpr float DetailsRowVerticalPadding = 1.0f;
+	static constexpr float DetailsUtilityColumnWidth = 24.0f;
+	static constexpr float DetailsResetButtonSize = 14.0f;
+	static constexpr float DetailsDirtyEpsilon = 0.0001f;
+
+	static ImVec4 DetailsGridLineColor() noexcept
+	{
+		ImVec4 color = ImGui::ColorConvertU32ToFloat4(SparkleUiPalette::PanelHeaderBorder());
+		color.w = 0.18f;
+		return color;
+	}
+
+	static ImU32 DetailsRowBackgroundColor() noexcept
+	{
+		return IM_COL32(24, 25, 28, 150);
+	}
+
+	static ImU32 AxisColor(int axisIndex) noexcept
+	{
+		switch (axisIndex)
+		{
+			case 0:
+				return IM_COL32(205, 82, 82, 210);
+			case 1:
+				return IM_COL32(82, 178, 104, 210);
+			case 2:
+				return IM_COL32(82, 122, 208, 210);
+			default:
+				return ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::TextMuted());
+		}
+	}
+
+	static bool IsDifferentFromDefault(float value, float defaultValue) noexcept
+	{
+		return std::fabs(value - defaultValue) > DetailsDirtyEpsilon;
+	}
+
+	static bool IsDifferentFromDefault(const float values[3], const float defaultValues[3]) noexcept
+	{
+		for (int axis = 0; axis < 3; ++axis)
+		{
+			if (IsDifferentFromDefault(values[axis], defaultValues[axis]))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	static bool BeginDetailsRow(const char* label, int valueColumnCount)
+	{
+		ImGui::PushID(label);
+		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(8.0f, DetailsRowVerticalPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6.0f, 2.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+		const ImVec4 gridLineColor = DetailsGridLineColor();
+		ImGui::PushStyleColor(ImGuiCol_TableBorderStrong, gridLineColor);
+		ImGui::PushStyleColor(ImGuiCol_TableBorderLight, gridLineColor);
+		ImGui::PushStyleColor(ImGuiCol_Separator, gridLineColor);
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.18f, 0.19f, 0.21f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.22f, 0.23f, 0.25f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.18f, 0.29f, 0.45f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_CheckMark, SparkleUiPalette::AccentStrong());
+
+		ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingStretchSame;
+		tableFlags |= ImGuiTableFlags_NoPadOuterX;
+		tableFlags |= ImGuiTableFlags_BordersInnerV;
+
+		if (!ImGui::BeginTable("##details_row", valueColumnCount + 2, tableFlags))
+		{
+			ImGui::PopStyleColor(7);
+			ImGui::PopStyleVar(5);
+			ImGui::PopID();
+			return false;
+		}
+
+		ImGui::TableSetupColumn("label", ImGuiTableColumnFlags_WidthFixed, DetailsLabelWidth);
+		for (int valueColumnIndex = 0; valueColumnIndex < valueColumnCount; ++valueColumnIndex)
+		{
+			ImGui::TableSetupColumn("value", ImGuiTableColumnFlags_WidthStretch);
+		}
+		ImGui::TableSetupColumn("utility", ImGuiTableColumnFlags_WidthFixed, DetailsUtilityColumnWidth);
+
+		ImGui::TableNextRow();
+		ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, DetailsRowBackgroundColor());
+		ImGui::TableSetColumnIndex(0);
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextDisabled("%s", label);
+		return true;
+	}
+
+	static bool DrawDetailsResetButton(int utilityColumnIndex, bool bDirty, const char* tooltip = "Reset to default")
+	{
+		ImGui::TableSetColumnIndex(utilityColumnIndex);
+		if (!bDirty)
+		{
+			ImGui::Dummy(ImVec2(DetailsUtilityColumnWidth, DetailsResetButtonSize));
+			return false;
+		}
+
+		ImGui::PushID("reset");
+		const ImVec2 start = ImGui::GetCursorScreenPos();
+		const ImVec2 size(DetailsResetButtonSize, DetailsResetButtonSize);
+		const bool bPressed = ImGui::InvisibleButton("##reset", size);
+		const bool bHovered = ImGui::IsItemHovered();
+		const bool bActive = ImGui::IsItemActive();
+
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		const ImVec2 end(start.x + size.x, start.y + size.y);
+		if (bHovered || bActive)
+		{
+			drawList->AddRectFilled(start, end, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::ButtonBackgroundHovered()), 3.0f);
+		}
+
+		const ImVec4 iconColor = bHovered ? SparkleUiPalette::TextPrimary() : SparkleUiPalette::WithAlpha(SparkleUiPalette::TextMuted(), 0.62f);
+		const ImU32 iconColorU32 = ImGui::ColorConvertFloat4ToU32(iconColor);
+		DrawCenteredGlyph(drawList, start, size, EditorIcons::GetEditorIconGlyph(EditorIcons::EditorIcon::Reset), iconColorU32);
+		if (tooltip != nullptr && tooltip[0] != '\0' && bHovered)
+		{
+			ImGui::SetTooltip("%s", tooltip);
+		}
+
+		ImGui::PopID();
+		return bPressed;
+	}
+
+	static void DrawDetailsEmptyUtility(int utilityColumnIndex)
+	{
+		ImGui::TableSetColumnIndex(utilityColumnIndex);
+		ImGui::Dummy(ImVec2(DetailsUtilityColumnWidth, EditorIconSize));
+	}
+
+	static void EndDetailsRow()
+	{
+		ImGui::EndTable();
+		ImGui::Separator();
+		ImGui::PopStyleColor(7);
+		ImGui::PopStyleVar(5);
+		ImGui::PopID();
+	}
+
 	bool DrawDetailsCategory(const char* title, bool bDefaultOpen)
 	{
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Framed;

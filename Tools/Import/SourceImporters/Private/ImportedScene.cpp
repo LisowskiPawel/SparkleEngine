@@ -20,3 +20,14 @@ std::pair<ImportedSkeletonIndex, std::uint32_t> ImportedScene::FindSkeletonJoint
 
 	return {(std::numeric_limits<std::uint32_t>::max)(), (std::numeric_limits<std::uint32_t>::max)()};
 }
+
+bool ImportedScene::HasSupportedContent() const noexcept
+{
+	if (meshPrimitives.empty() != meshInstances.empty())
+	{
+		return false;
+	}
+	const bool bGeometryOrCamera = !meshPrimitives.empty() || !cameras.empty();
+	const bool bLightOrAnimation = !lights.empty() || !animations.empty();
+	return bGeometryOrCamera || bLightOrAnimation;
+}

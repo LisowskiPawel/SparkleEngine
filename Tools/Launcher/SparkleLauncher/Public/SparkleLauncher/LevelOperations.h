@@ -25,6 +25,7 @@ namespace SparkleLauncher
 		std::filesystem::path WorkspaceRoot;
 		std::string ContentId = kDefaultContentId;
 		std::vector<std::string> RequestedLevelIds;
+		bool bSelectAvailableLevels = false;
 	};
 
 	struct LevelOperationStep

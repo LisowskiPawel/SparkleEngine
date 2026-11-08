@@ -8,7 +8,6 @@
 #include "Passes/Lighting/Sky/Sky.h"
 #include "Scene/Materials/MaterialHandleResolver.h"
 #include "Scene/Geometry/MeshRenderingControls.h"
-#include "Scene/Preparation/Deformation/RenderDeformationPreparation.h"
 #include "Scene/Preparation/RenderScenePreparationRun.h"
 #include "Scene/Preparation/Geometry/RenderMeshClassificationConversion.h"
 #include "Scene/RenderScene.h"
@@ -16,50 +15,13 @@
 #include "Textures/RendererTexture.h"
 #include "Textures/TextureCache.h"
 
-#include <algorithm>
-#include <span>
-#include <utility>
+#include <cstdint>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderPreparationInputResolverLogger, "Renderer.RenderScenePreparationInputResolver");
 
-RenderScenePreparationInputResolver::RenderScenePreparationInputResolver(GpuMeshCache& gpuMeshCache, TextureCache& textureCache) noexcept :
-    m_gpuMeshCache(&gpuMeshCache),
-    m_textureCache(&textureCache)
-{
-}
-
-void RenderScenePreparationInputResolver::Resolve(RenderScene& scene, RenderDeformationPreparation& deformationPreparation, RenderScenePreparationRun& run)
-{
-	run.Lights = scene.GetLights();
-	run.PreparedScene.structuralRevision = scene.GetStructuralRevision();
-	run.PreparedScene.materialRevision = scene.GetMaterialRevision();
-	scene.BuildMaterials(run.PreparedScene);
-
-	ResolveSky(scene, run.PreparedScene);
-	ResolvePrimitives(scene, run);
-	ResolveInstanceGroups(scene, run);
-
-	run.PreparedPrimitives.resize(run.ResolvedPrimitives.size());
-	run.PreparedLights.resize(scene.GetLights().size());
-	deformationPreparation.Prepare(scene, run.ResolvedPrimitives, run.Deformation);
-}
-
-void RenderScenePreparationInputResolver::ResolvePrimitives(const RenderScene& scene, RenderScenePreparationRun& run)
-{
-	run.ResolvedPrimitives.clear();
-	run.ResolvedPrimitives.reserve(scene.GetPrimitives().size());
-	for (const RenderPrimitive& primitive : scene.GetPrimitives())
-	{
-		if (!primitive.Dynamic.bVisible || !primitive.bGpuMeshResident || !IsMeshRenderingEnabled(primitive.Static.MeshKind))
-		{
-			continue;
-		}
-		run.ResolvedPrimitives.push_back(ResolvePrimitive(scene, primitive, scene.GetMaterials().Generation, run.PreparedScene));
-	}
-}
-
-ResolvedRenderPrimitive RenderScenePreparationInputResolver::ResolvePrimitive(
+static ResolvedRenderPrimitive ResolvePrimitive(
     const RenderScene& scene,
+    const GpuMeshCache& gpuMeshCache,
     const RenderPrimitive& primitive,
     std::uint32_t materialGeneration,
     PreparedRenderScene& preparedScene)
@@ -69,7 +31,7 @@ ResolvedRenderPrimitive RenderScenePreparationInputResolver::ResolvePrimitive(
 		Diagnostics::Fatal(g_renderPreparationInputResolverLogger, __FILE__, __LINE__, "Render scene primitive contains an invalid primitive or mesh identity.");
 	}
 
-	const GpuMesh* gpuMesh = m_gpuMeshCache->Resolve(primitive.GpuMesh);
+	const GpuMesh* gpuMesh = gpuMeshCache.Resolve(primitive.GpuMesh);
 	if (gpuMesh == nullptr || !gpuMesh->IsValid())
 	{
 		Diagnostics::Fatal(g_renderPreparationInputResolverLogger, __FILE__, __LINE__, "Resident render scene primitive has no GPU mesh.");
@@ -104,7 +66,21 @@ ResolvedRenderPrimitive RenderScenePreparationInputResolver::ResolvePrimitive(
 	    .MorphTargetVertexCount = gpuMesh->GetVertexCount()};
 }
 
-void RenderScenePreparationInputResolver::ResolveInstanceGroups(const RenderScene& scene, RenderScenePreparationRun& run) const
+static void ResolvePrimitives(const RenderScene& scene, const GpuMeshCache& gpuMeshCache, RenderScenePreparationRun& run)
+{
+	run.ResolvedPrimitives.clear();
+	run.ResolvedPrimitives.reserve(scene.GetPrimitives().size());
+	for (const RenderPrimitive& primitive : scene.GetPrimitives())
+	{
+		if (!primitive.Dynamic.bVisible || !primitive.bGpuMeshResident || !IsMeshRenderingEnabled(primitive.Static.MeshKind))
+		{
+			continue;
+		}
+		run.ResolvedPrimitives.push_back(ResolvePrimitive(scene, gpuMeshCache, primitive, scene.GetMaterials().Generation, run.PreparedScene));
+	}
+}
+
+static void ResolveInstanceGroups(const RenderScene& scene, RenderScenePreparationRun& run)
 {
 	run.PreparedScene.instanceGroups.clear();
 	run.PreparedScene.instanceGroups.reserve(scene.GetInstanceGroups().size());
@@ -115,13 +91,13 @@ void RenderScenePreparationInputResolver::ResolveInstanceGroups(const RenderScen
 	}
 }
 
-void RenderScenePreparationInputResolver::ResolveSky(const RenderScene& scene, PreparedRenderScene& preparedScene) const
+static void ResolveSky(const RenderScene& scene, const TextureCache& textureCache, PreparedRenderScene& preparedScene)
 {
 	const RendererTexture* skyTexture = nullptr;
 	const SceneSkyDesc* sky = scene.GetSky() ? &*scene.GetSky() : nullptr;
 	if (sky == nullptr)
 	{
-		skyTexture = m_textureCache->ResolveDefaultSkyTexture();
+		skyTexture = textureCache.ResolveDefaultSkyTexture();
 	}
 	else
 	{
@@ -130,11 +106,11 @@ void RenderScenePreparationInputResolver::ResolveSky(const RenderScene& scene, P
 		preparedScene.sky.brightness = sky->brightness;
 		if (!sky->skyTexture.IsValid())
 		{
-			skyTexture = m_textureCache->ResolveDefaultSkyTexture();
+			skyTexture = textureCache.ResolveDefaultSkyTexture();
 		}
 		else
 		{
-			skyTexture = m_textureCache->GetSceneTexture(sky->skyTexture.texturePath);
+			skyTexture = textureCache.GetSceneTexture(sky->skyTexture.texturePath);
 		}
 	}
 	if (skyTexture == nullptr || !*skyTexture)
@@ -143,4 +119,27 @@ void RenderScenePreparationInputResolver::ResolveSky(const RenderScene& scene, P
 	}
 	preparedScene.sky.texture = skyTexture;
 	preparedScene.sky.bEnabled = preparedScene.sky.bEnabled && CVarSkyEnabled.Get();
+}
+
+static void CaptureSceneInputs(RenderScene& scene, RenderScenePreparationRun& run)
+{
+	run.Lights = scene.GetLights();
+	run.PreparedScene.structuralRevision = scene.GetStructuralRevision();
+	run.PreparedScene.materialRevision = scene.GetMaterialRevision();
+	scene.BuildMaterials(run.PreparedScene);
+}
+
+static void SizePreparationOutputs(const RenderScene& scene, RenderScenePreparationRun& run)
+{
+	run.PreparedPrimitives.resize(run.ResolvedPrimitives.size());
+	run.PreparedLights.resize(scene.GetLights().size());
+}
+
+void ResolveRenderScenePreparationInputs(RenderScene& scene, const GpuMeshCache& gpuMeshCache, const TextureCache& textureCache, RenderScenePreparationRun& run)
+{
+	CaptureSceneInputs(scene, run);
+	ResolveSky(scene, textureCache, run.PreparedScene);
+	ResolvePrimitives(scene, gpuMeshCache, run);
+	ResolveInstanceGroups(scene, run);
+	SizePreparationOutputs(scene, run);
 }

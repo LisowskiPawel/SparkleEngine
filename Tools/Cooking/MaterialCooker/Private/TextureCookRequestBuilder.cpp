@@ -9,14 +9,33 @@
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Paths/PathUtils.h"
 
-std::string TextureCookRequestBuilder::BuildTextureSourceKeyForRoot(std::string_view rootName, const TextureCookRequest& request, const std::filesystem::path& relativePath)
+#include <optional>
+#include <string>
+
+static std::string BuildTextureSourceKeyForRoot(std::string_view rootName, const TextureCookRequest& request, const std::filesystem::path& relativePath);
+static std::optional<std::filesystem::path> BuildTextureOutputPathForRoot(
+    const std::filesystem::path& sourceTexturePath,
+    const std::filesystem::path& sourceRoot,
+    std::string_view cookedDirectory,
+    std::string_view variantSuffix);
+static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept;
+static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath, TextureGroup textureGroup) noexcept;
+static TextureMipFilter ResolveMipFilter(TextureGroup textureGroup) noexcept;
+static TextureColorProcessingPolicy ResolveColorProcessingPolicy(TextureGroup textureGroup) noexcept;
+static TextureDimension ResolveTextureDimension(TextureGroup textureGroup) noexcept;
+static std::filesystem::path NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath);
+static std::string BuildTextureSourceKey(const TextureCookRequest& request);
+static std::filesystem::path BuildTextureOutputPath(const TextureCookRequest& request);
+static std::string BuildTextureVariantSuffix(const TextureCookRequest& request);
+
+static std::string BuildTextureSourceKeyForRoot(std::string_view rootName, const TextureCookRequest& request, const std::filesystem::path& relativePath)
 {
 	return std::string(rootName) + ":" + GetTextureColorSpaceName(request.policy.colorSpace) + ":" + GetTextureMipPolicyName(request.policy.mipPolicy) + ":"
 	    + GetTextureMipFilterName(request.policy.mipFilter) + ":" + GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) + ":" + GetTextureGroupName(request.policy.textureGroup)
 	    + ":" + GetTextureDimensionName(request.policy.dimension) + ":" + GetTextureChannelMaskName(request.policy.channelMask) + ":" + relativePath.generic_string();
 }
 
-std::optional<std::filesystem::path> TextureCookRequestBuilder::BuildTextureOutputPathForRoot(
+static std::optional<std::filesystem::path> BuildTextureOutputPathForRoot(
     const std::filesystem::path& sourceTexturePath,
     const std::filesystem::path& sourceRoot,
     std::string_view cookedDirectory,
@@ -33,7 +52,7 @@ std::optional<std::filesystem::path> TextureCookRequestBuilder::BuildTextureOutp
 	return Filesystem::GetCookedTextureRootPath() / cookedRelativePath;
 }
 
-TextureCookRequest TextureCookRequestBuilder::Build(const std::filesystem::path& sourceTexturePath, TextureGroup textureGroup, TextureChannelMask channelMask)
+TextureCookRequest BuildTextureCookRequest(const std::filesystem::path& sourceTexturePath, TextureGroup textureGroup, TextureChannelMask channelMask)
 {
 	TextureCookRequest request;
 	request.sourcePath = NormalizeSourceTexturePath(sourceTexturePath);
@@ -49,7 +68,7 @@ TextureCookRequest TextureCookRequestBuilder::Build(const std::filesystem::path&
 	return request;
 }
 
-TextureColorSpace TextureCookRequestBuilder::ResolveColorSpace(TextureGroup textureGroup) noexcept
+static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept
 {
 	switch (textureGroup)
 	{
@@ -70,7 +89,7 @@ TextureColorSpace TextureCookRequestBuilder::ResolveColorSpace(TextureGroup text
 	}
 }
 
-TextureMipPolicy TextureCookRequestBuilder::ResolveMipPolicy(const std::filesystem::path& sourceTexturePath, TextureGroup textureGroup) noexcept
+static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath, TextureGroup textureGroup) noexcept
 {
 	(void) textureGroup;
 	if (Paths::GetLowercaseExtension(sourceTexturePath) == L".dds")
@@ -80,7 +99,7 @@ TextureMipPolicy TextureCookRequestBuilder::ResolveMipPolicy(const std::filesyst
 	return TextureMipPolicy::Generate;
 }
 
-TextureMipFilter TextureCookRequestBuilder::ResolveMipFilter(TextureGroup textureGroup) noexcept
+static TextureMipFilter ResolveMipFilter(TextureGroup textureGroup) noexcept
 {
 	switch (textureGroup)
 	{
@@ -103,18 +122,18 @@ TextureMipFilter TextureCookRequestBuilder::ResolveMipFilter(TextureGroup textur
 	}
 }
 
-TextureColorProcessingPolicy TextureCookRequestBuilder::ResolveColorProcessingPolicy(TextureGroup textureGroup) noexcept
+static TextureColorProcessingPolicy ResolveColorProcessingPolicy(TextureGroup textureGroup) noexcept
 {
 	return ResolveColorSpace(textureGroup) == TextureColorSpace::Srgb ? TextureColorProcessingPolicy::SrgbLinearize : TextureColorProcessingPolicy::Linear;
 }
 
-TextureDimension TextureCookRequestBuilder::ResolveTextureDimension(TextureGroup textureGroup) noexcept
+static TextureDimension ResolveTextureDimension(TextureGroup textureGroup) noexcept
 {
 	(void) textureGroup;
 	return TextureDimension::Texture2D;
 }
 
-std::filesystem::path TextureCookRequestBuilder::NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath)
+static std::filesystem::path NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath)
 {
 	{
 		const auto resolvedPath = SparkleTools::ResolveSourceAssetPath(sourceTexturePath, SparkleTools::SourceAssetType::Texture);
@@ -128,7 +147,7 @@ std::filesystem::path TextureCookRequestBuilder::NormalizeSourceTexturePath(cons
 	throw Diagnostics::Error("Unable to resolve source texture path '" + sourceTexturePath.string() + "'.");
 }
 
-std::string TextureCookRequestBuilder::BuildTextureSourceKey(const TextureCookRequest& request)
+static std::string BuildTextureSourceKey(const TextureCookRequest& request)
 {
 	const std::filesystem::path& projectRoot = Filesystem::GetProjectPath();
 	if (const auto relativePath = Paths::TryMakeRelativeUnderRoot(request.sourcePath, projectRoot))
@@ -154,7 +173,7 @@ std::string TextureCookRequestBuilder::BuildTextureSourceKey(const TextureCookRe
 	    + request.sourcePath.string() + "'.");
 }
 
-std::filesystem::path TextureCookRequestBuilder::BuildTextureOutputPath(const TextureCookRequest& request)
+static std::filesystem::path BuildTextureOutputPath(const TextureCookRequest& request)
 {
 	const std::string variantSuffix = BuildTextureVariantSuffix(request);
 	const std::filesystem::path& projectRoot = Filesystem::GetProjectPath();
@@ -184,7 +203,7 @@ std::filesystem::path TextureCookRequestBuilder::BuildTextureOutputPath(const Te
 	    + request.sourcePath.string() + "'.");
 }
 
-std::string TextureCookRequestBuilder::BuildTextureVariantSuffix(const TextureCookRequest& request)
+static std::string BuildTextureVariantSuffix(const TextureCookRequest& request)
 {
 	return "." + Formatting::FormatHexUInt64(request.assetId);
 }

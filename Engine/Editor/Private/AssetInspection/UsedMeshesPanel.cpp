@@ -16,9 +16,20 @@
 
 #include <imgui.h>
 
+void UsedMeshesPanel::SetOpen(bool bOpen) noexcept
+{
+	if (bOpen != m_bIsOpen)
+	{
+		m_metadata.Clear();
+	}
+	m_bIsOpen = bOpen;
+}
+
 void UsedMeshesPanel::SetDiagnosticsProvider(DiagnosticsProvider provider)
 {
 	m_diagnosticsProvider = std::move(provider);
+	m_snapshot = {};
+	m_metadata.Clear();
 }
 
 void UsedMeshesPanel::SetPreviewGeometryProvider(PreviewGeometryProvider provider)
@@ -73,6 +84,15 @@ void UsedMeshesPanel::RefreshSnapshot()
 	{
 		m_snapshot = m_diagnosticsProvider();
 	}
+	m_metadata.Update(m_snapshot.Rows);
+}
+
+void UsedMeshesPanel::RefreshInspection()
+{
+	m_metadata.Clear();
+	m_metadata.Update(m_snapshot.Rows);
+	m_previewGeometry = {};
+	m_previewGeometryMeshRuntimeId = 0;
 }
 
 void UsedMeshesPanel::RefreshPreviewGeometry(const MeshDiagnosticsRow& row)
@@ -88,6 +108,12 @@ void UsedMeshesPanel::RefreshPreviewGeometry(const MeshDiagnosticsRow& row)
 
 void UsedMeshesPanel::DrawToolbar()
 {
+	const bool bRefreshRequested = EditorWidgets::DrawEditorIconButton(EditorIcons::EditorIcon::Refresh, "##RefreshMeshInspection", "Refresh mesh inspection");
+	if (bRefreshRequested)
+	{
+		RefreshInspection();
+	}
+	ImGui::SameLine();
 	ImGui::SetNextItemWidth(300.0f);
 	const std::string filterHint = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Search, "Filter mesh/source/id/material");
 	ImGui::InputTextWithHint("##UsedMeshesFilter", filterHint.c_str(), m_filterBuffer.data(), m_filterBuffer.size());
@@ -153,7 +179,8 @@ void UsedMeshesPanel::DrawMeshTable(bool bDisableInteraction)
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
 		const bool bSelected = row.MeshRuntimeId == m_selectedMeshRuntimeId;
-		const std::string displayName = MeshDiagnosticsPresentation::FormatMeshDisplayName(row);
+		const MeshDiagnosticMetadata* metadata = m_metadata.Find(row.MeshAssetId);
+		const std::string displayName = MeshDiagnosticsPresentation::FormatMeshDisplayName(row, metadata);
 		if (ImGui::Selectable(displayName.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
 		{
 			m_selectedMeshRuntimeId = row.MeshRuntimeId;
@@ -161,7 +188,7 @@ void UsedMeshesPanel::DrawMeshTable(bool bDisableInteraction)
 			m_previewGeometry = {};
 		}
 		ImGui::TableNextColumn();
-		const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(row);
+		const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(row, metadata);
 		ImGui::TextUnformatted(sourcePath.c_str());
 		ImGui::TableNextColumn();
 		ImGui::TextUnformatted(row.bGpuResident ? "yes" : "no");
@@ -195,8 +222,9 @@ void UsedMeshesPanel::DrawSelectedMeshInspector(bool bDisableInteraction)
 	}
 
 	RefreshPreviewGeometry(*selectedRow);
-	const std::string displayName = MeshDiagnosticsPresentation::FormatMeshDisplayName(*selectedRow);
-	const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(*selectedRow);
+	const MeshDiagnosticMetadata* metadata = m_metadata.Find(selectedRow->MeshAssetId);
+	const std::string displayName = MeshDiagnosticsPresentation::FormatMeshDisplayName(*selectedRow, metadata);
+	const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(*selectedRow, metadata);
 	ImGui::TextUnformatted(displayName.c_str());
 	PanelDiagnosticsFormatting::DrawWrappedDisabledText(sourcePath);
 	ImGui::Separator();
@@ -247,9 +275,10 @@ void UsedMeshesPanel::DrawSelectedMeshDetails(const MeshDiagnosticsRow& row) con
 	const std::string boundsMax = row.Bounds.bIsValid ? MeshDiagnosticsPresentation::FormatBoundsPoint(row.Bounds.Max) : std::string("unknown");
 	const std::string boundsExtent = MeshDiagnosticsPresentation::FormatBoundsExtent(row.Bounds);
 
-	if (const std::optional<std::string> sourcePath = MeshDiagnosticsPresentation::FindAuthoredSourcePath(row))
+	const MeshDiagnosticMetadata* metadata = m_metadata.Find(row.MeshAssetId);
+	if (metadata != nullptr && !metadata->SourcePath.empty())
 	{
-		EditorWidgets::DrawKeyValueRow("Source", sourcePath->c_str());
+		EditorWidgets::DrawKeyValueRow("Source", metadata->SourcePath.c_str());
 	}
 	EditorWidgets::DrawKeyValueRow("CPU Loaded", row.bCpuLoaded ? "yes" : "no");
 	EditorWidgets::DrawKeyValueRow("GPU Resident", row.bGpuResident ? "yes" : "no");
@@ -291,11 +320,12 @@ bool UsedMeshesPanel::MatchesFilter(const MeshDiagnosticsRow& row) const
 		return true;
 	}
 
-	const std::string displayName = MeshDiagnosticsPresentation::FormatMeshDisplayName(row);
+	const MeshDiagnosticMetadata* metadata = m_metadata.Find(row.MeshAssetId);
+	const std::string displayName = MeshDiagnosticsPresentation::FormatMeshDisplayName(row, metadata);
 	const std::string meshRuntimeId = MeshDiagnosticsPresentation::FormatRuntimeId(row.MeshRuntimeId);
 	const std::string gpuRuntimeId = row.GpuMeshRuntimeId != 0 ? MeshDiagnosticsPresentation::FormatRuntimeId(row.GpuMeshRuntimeId) : std::string("none");
 	const std::string meshAssetId = row.MeshAssetId != 0 ? MeshDiagnosticsPresentation::FormatAssetId(row.MeshAssetId) : std::string("none");
-	const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(row);
+	const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(row, metadata);
 	const std::string material = MeshDiagnosticsPresentation::FormatMaterial(row);
 	const std::string memory = MeshDiagnosticsPresentation::FormatMemorySummary(row);
 

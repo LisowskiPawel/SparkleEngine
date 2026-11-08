@@ -1,5 +1,7 @@
 #pragma once
 
-class EditorViewportSession;
+#include "Renderer/Public/Viewport/RenderViewMode.h"
 
-void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool bDisableInteraction, bool bCompact) noexcept;
+#include <optional>
+
+std::optional<RenderViewMode> DrawViewportViewModeMenu(RenderViewMode currentViewMode, bool bDisableInteraction, bool bCompact) noexcept;

@@ -28,11 +28,10 @@ public:
 	bool SetProjectionKind(CameraProjectionKind projectionKind) noexcept;
 	bool SetOrthographicHeight(float heightMeters) noexcept;
 	bool SetExposureOverrides(ViewportExposureOverrides overrides) noexcept;
-	bool Reload() noexcept;
-
-	static std::filesystem::path GetDefaultPath();
 
 private:
+	bool Reload() noexcept;
+	static std::filesystem::path GetDefaultPath();
 	static void Sanitize(EditorViewportSettingsState& state) noexcept;
 	static void SanitizeExposure(ViewportExposureOverrides& exposure) noexcept;
 	bool Save() const noexcept;

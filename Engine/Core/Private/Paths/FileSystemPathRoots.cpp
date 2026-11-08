@@ -6,7 +6,7 @@
 #include "Core/Public/Paths/PathUtils.h"
 #include "Paths/UserStatePaths.h"
 
-namespace Filesystem::Private
+namespace Filesystem
 {
 	static void DiscoverWorkspaceAssetRoots(FileSystemPathState& state)
 	{

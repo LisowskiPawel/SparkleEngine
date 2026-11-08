@@ -4,10 +4,9 @@ namespace Assets
 {
 	struct LoadedSceneManifest;
 
-	class SceneManifestValidator final
+	namespace SceneManifestValidator
 	{
-	public:
-		static void ValidateHeader(const LoadedSceneManifest& manifest);
-		static void ValidateRecords(const LoadedSceneManifest& manifest);
-	};
+		void ValidateHeader(const LoadedSceneManifest& manifest);
+		void ValidateRecords(const LoadedSceneManifest& manifest);
+	}
 }

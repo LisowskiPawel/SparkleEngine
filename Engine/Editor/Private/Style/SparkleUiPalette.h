@@ -4,6 +4,7 @@
 
 namespace SparkleUiPalette
 {
+	ImVec4 WithAlpha(ImVec4 color, float alpha) noexcept;
 	ImU32 WithAlphaU32(ImVec4 color, float alpha) noexcept;
 
 	struct MenuColors final

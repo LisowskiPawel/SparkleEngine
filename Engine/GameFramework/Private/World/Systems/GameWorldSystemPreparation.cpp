@@ -15,13 +15,12 @@ namespace ECS
 	bool GameWorldState::PrepareSystemExecution(GameWorldResourceStores& resources)
 	{
 		const bool bAnimationPrepared = m_systemGraph && m_animationOutput.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation);
-		const bool bExtractionPrepared = bAnimationPrepared && m_extraction.Prepare(m_registry);
-
-		if (!bExtractionPrepared)
+		if (!bAnimationPrepared)
 		{
 			return false;
 		}
 
+		m_extraction.Prepare(GetMeshEntities().size());
 		PrepareSystemArena();
 		return true;
 	}

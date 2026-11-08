@@ -56,7 +56,7 @@ namespace SparkleLauncher
 		std::vector<LevelOperationProcessStep> steps;
 		const std::filesystem::path projectRoot = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
 		const ProjectLevelCatalog catalog = ProjectLevelCatalogFile::Load(projectRoot);
-		for (const std::string& packId : BuildAssetPackSyncPlan(catalog, plan.Request.RequestedLevelIds))
+		for (const std::string& packId : BuildAssetPackSyncPlan(catalog, plan.Request.RequestedLevelIds, plan.Request.bSelectAvailableLevels))
 		{
 			const ProjectAssetPack& pack = catalog.assetPacks.at(packId);
 			if (catalog.IsAssetPackPayloadPresent(pack))

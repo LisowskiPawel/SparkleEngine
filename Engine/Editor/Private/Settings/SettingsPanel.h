@@ -15,8 +15,6 @@ public:
 
 	void SetOpen(bool bOpen) noexcept;
 
-	bool IsOpen() const noexcept { return m_bIsOpen; }
-
 	void SetRenderingSettings(EngineRenderingSettingsController* renderingSettings) noexcept;
 	void SetRestartHandler(std::function<void()> restartHandler);
 	void BuildUI(bool bDisableInteraction);

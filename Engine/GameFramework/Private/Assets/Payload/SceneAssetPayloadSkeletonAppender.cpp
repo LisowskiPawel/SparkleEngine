@@ -16,13 +16,13 @@ namespace Assets
 {
 	void SceneAssetPayloadSkeletonAppender::AppendSkeletons(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload)
 	{
-		SkeletonAssetLoader skeletonAssetLoader;
+		files.GetAllocationBudget().ReserveArray<SkeletonResource>(sceneManifest.skeletonRefs.size());
 		sceneAssetPayload.skeletons.reserve(sceneAssetPayload.skeletons.size() + sceneManifest.skeletonRefs.size());
 
 		for (const CookedSceneSkeletonRef& skeletonRef : sceneManifest.skeletonRefs)
 		{
 			const std::filesystem::path skeletonAssetPath = Paths::CookedSkeletonAsset(skeletonRef.skeletonAssetId);
-			const LoadedSkeletonAsset skeletonAsset = skeletonAssetLoader.Decode(skeletonAssetPath, files.Get(skeletonAssetPath), files.GetAllocationBudget());
+			const LoadedSkeletonAsset skeletonAsset = SkeletonAssetLoader::Decode(skeletonAssetPath, files.Get(skeletonAssetPath), files.GetAllocationBudget());
 			files.GetAllocationBudget().ReserveArray<SkeletonJoint>(skeletonAsset.joints.size());
 			files.GetAllocationBudget().Reserve(skeletonAsset.joints.size(), sizeof(CookedSkeletonJointRecord{}.name));
 			sceneAssetPayload.skeletons.push_back(BuildSceneAssetSkeleton(skeletonAsset, skeletonRef.skeletonAssetId, skeletonRef.sourceSkinIndex));

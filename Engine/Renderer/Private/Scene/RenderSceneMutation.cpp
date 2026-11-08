@@ -63,22 +63,47 @@ void RenderScene::ApplyValidatedDelta(const RenderSceneDelta& delta)
 
 	if (delta.bResetScene)
 	{
-		m_renderGpuScene->Reset();
-		m_renderRayTracingScene->Clear();
-		for (const RenderPrimitive& primitive : m_primitives)
-		{
-			m_gpuSceneSlots->Retire(primitive.GpuSceneSlot);
-		}
-		m_primitives.clear();
-		ResetContinuity();
+		ResetSceneStorage();
 	}
-	const bool bTopologyChangedCreates = delta.bResetScene || !delta.Creates.empty();
-	const bool bTopologyChangedUpdates = bTopologyChangedCreates || (!delta.Updates.empty());
-	const bool bTopologyChangedDestroys = bTopologyChangedUpdates || (!delta.Destroys.empty());
-	const bool bTopologyChangedInstanceGroups = bTopologyChangedDestroys || (delta.InstanceGroups.bPublished);
-	const bool bTopologyChanged = bTopologyChangedInstanceGroups || (delta.Sky.bPublished);
+	UpdateSceneRevisions(delta);
+	ApplyDestroys(delta);
+	ApplyCreates(delta, createMeshes);
+	ApplyUpdates(delta, updateMeshes);
+	PublishResources(delta);
+	RetainReferencedGpuMeshes();
+	SynchronizeRayTracingScene(delta);
 
-	if (bTopologyChanged)
+	m_sceneGeneration = delta.SceneGeneration;
+	m_sequenceNumber = delta.SequenceNumber;
+}
+
+void RenderScene::SynchronizeRayTracingScene(const RenderSceneDelta& delta)
+{
+	if (delta.bResetScene || !delta.Creates.empty() || !delta.Updates.empty() || !delta.Destroys.empty() || delta.Materials)
+	{
+		m_renderRayTracingScene->SynchronizeShaderTablePlan(m_primitives, m_materials);
+	}
+}
+
+void RenderScene::ResetSceneStorage()
+{
+	m_renderGpuScene->Reset();
+	m_renderRayTracingScene->Clear();
+	for (const RenderPrimitive& primitive : m_primitives)
+	{
+		m_gpuSceneSlots->Retire(primitive.GpuSceneSlot);
+	}
+	m_primitives.clear();
+	ResetContinuity();
+}
+
+void RenderScene::UpdateSceneRevisions(const RenderSceneDelta& delta) noexcept
+{
+	const bool bPrimitiveSetChanged = !delta.Creates.empty() || !delta.Destroys.empty();
+	const bool bGeometryChanged = bPrimitiveSetChanged || !delta.Updates.empty();
+	const bool bEnvironmentChanged = delta.InstanceGroups.bPublished || delta.Sky.bPublished;
+	const bool bSceneContentChanged = bGeometryChanged || bEnvironmentChanged;
+	if (delta.bResetScene || bSceneContentChanged)
 	{
 		++m_structuralRevision;
 	}
@@ -86,18 +111,6 @@ void RenderScene::ApplyValidatedDelta(const RenderSceneDelta& delta)
 	{
 		++m_materialRevision;
 	}
-	ApplyDestroys(delta);
-	ApplyCreates(delta, createMeshes);
-	ApplyUpdates(delta, updateMeshes);
-	PublishResources(delta);
-	RetainReferencedGpuMeshes();
-	if (delta.bResetScene || !delta.Creates.empty() || !delta.Updates.empty() || !delta.Destroys.empty() || delta.Materials)
-	{
-		m_renderRayTracingScene->SynchronizeShaderTablePlan(m_primitives, m_materials);
-	}
-
-	m_sceneGeneration = delta.SceneGeneration;
-	m_sequenceNumber = delta.SequenceNumber;
 }
 
 void RenderScene::ApplyDynamic(RenderSceneDynamicData&& dynamic) noexcept

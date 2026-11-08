@@ -18,6 +18,7 @@ public:
 
 	CameraInputIntentCollector(const CameraInputIntentCollector&) = delete;
 	CameraInputIntentCollector& operator=(const CameraInputIntentCollector&) = delete;
+	CameraInputIntent Collect() noexcept;
 	CameraInputIntent Collect(float aspectRatio) noexcept;
 	void EndMouseLook() noexcept;
 

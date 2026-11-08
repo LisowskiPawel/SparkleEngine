@@ -25,6 +25,8 @@ struct ImportedScene
 	std::vector<ImportedMaterialVariantMapping> materialVariantMappings;
 	std::vector<ImportedSkeleton> skeletons;
 
+	bool HasSupportedContent() const noexcept;
+
 	std::pair<ImportedSkeletonIndex, std::uint32_t> FindSkeletonJointForNode(std::uint32_t sourceNodeIndex) const noexcept;
 
 	std::size_t GetMeshPrimitiveCount() const noexcept { return meshPrimitives.size(); }

@@ -30,7 +30,7 @@ TaskResult RenderScenePreparationTasks::CopyJointMatrices(std::uint32_t begin, s
 	const std::size_t rangeBegin = (std::min<std::size_t>) (begin, run.Deformation.JointMatrixCopyRanges.size());
 	const std::size_t rangeEnd = (std::min<std::size_t>) (end, run.Deformation.JointMatrixCopyRanges.size());
 
-	RenderDeformationPreparation::CopyJointMatrixRanges(
+	CopyRenderJointMatrixRanges(
 	    std::span<const RenderJointMatrixCopyRange>{run.Deformation.JointMatrixCopyRanges}.subspan(rangeBegin, rangeEnd - rangeBegin),
 	    run.Deformation.JointMatrices,
 	    run.Deformation.PreviousJointMatrices);
@@ -44,7 +44,7 @@ TaskResult RenderScenePreparationTasks::CopyMorphWeights(std::uint32_t begin, st
 	const std::size_t rangeBegin = (std::min<std::size_t>) (begin, run.Deformation.MorphWeightCopyRanges.size());
 	const std::size_t rangeEnd = (std::min<std::size_t>) (end, run.Deformation.MorphWeightCopyRanges.size());
 
-	RenderDeformationPreparation::CopyMorphWeightRanges(
+	CopyRenderMorphWeightRanges(
 	    std::span<const RenderMorphWeightCopyRange>{run.Deformation.MorphWeightCopyRanges}.subspan(rangeBegin, rangeEnd - rangeBegin),
 	    run.Deformation.MorphWeights,
 	    run.Deformation.PreviousMorphWeights);

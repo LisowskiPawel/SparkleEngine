@@ -6,10 +6,66 @@
 
 #include <imgui.h>
 
-#include "Widgets/UiWidgetPrimitives.h"
+#include <algorithm>
 
 namespace EditorWidgets
 {
+	static constexpr float PropertyLabelWidth = 78.0f;
+
+	static void PushFontIfAvailable(ImFont* font)
+	{
+		if (font != nullptr)
+		{
+			ImGui::PushFont(font);
+		}
+	}
+
+	static void PopFontIfAvailable(ImFont* font)
+	{
+		if (font != nullptr)
+		{
+			ImGui::PopFont();
+		}
+	}
+
+	static void DrawHeaderBar(const char* title, const char* trailingText, float height, ImU32 backgroundColor, ImU32 borderColor, ImFont* titleFont, ImFont* trailingFont, const ImVec2& padding)
+	{
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		const ImVec2 start = ImGui::GetCursorScreenPos();
+		const float width = ImGui::GetContentRegionAvail().x;
+		const ImVec2 end = ImVec2(start.x + width, start.y + height);
+
+		drawList->AddRectFilled(start, end, backgroundColor);
+		drawList->AddLine(ImVec2(start.x, end.y - 1.0f), ImVec2(end.x, end.y - 1.0f), borderColor, 1.0f);
+
+		ImGui::InvisibleButton("##header_bar", ImVec2(width, height));
+		ImGui::SetCursorScreenPos(ImVec2(start.x + padding.x, start.y + padding.y));
+		PushFontIfAvailable(titleFont);
+		ImGui::TextUnformatted(title);
+		PopFontIfAvailable(titleFont);
+
+		if (trailingText != nullptr && trailingText[0] != '\0')
+		{
+			const float trailingWidth = ImGui::CalcTextSize(trailingText).x;
+			const float trailingRightPadding = padding.x + ImGui::GetStyle().ScrollbarSize;
+			ImGui::SetCursorScreenPos(ImVec2(end.x - trailingRightPadding - trailingWidth, start.y + padding.y));
+			PushFontIfAvailable(trailingFont);
+			ImGui::TextDisabled("%s", trailingText);
+			PopFontIfAvailable(trailingFont);
+		}
+
+		ImGui::SetCursorScreenPos(ImVec2(start.x, end.y + 4.0f));
+	}
+
+	static void DrawRightAlignedText(const char* value)
+	{
+		const float valueWidth = ImGui::CalcTextSize(value).x;
+		const float currentX = ImGui::GetCursorPosX();
+		const float offset = (std::max) (0.0f, ImGui::GetContentRegionAvail().x - valueWidth);
+		ImGui::SetCursorPosX(currentX + offset);
+		ImGui::TextUnformatted(value);
+	}
+
 	void DrawPanelHeader(const char* title, const char* subtitle)
 	{
 		ImFont* headingFont = SparkleUiTheme::GetHeadingFont();

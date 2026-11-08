@@ -5,16 +5,16 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <optional>
 #include <string>
+
+struct MeshDiagnosticMetadata;
 
 namespace MeshDiagnosticsPresentation
 {
 	std::string FormatRuntimeId(std::uintptr_t id);
 	std::string FormatAssetId(std::uint64_t id);
-	std::string FormatMeshDisplayName(const MeshDiagnosticsRow& row);
-	std::string FormatMeshSourcePath(const MeshDiagnosticsRow& row);
-	std::optional<std::string> FindAuthoredSourcePath(const MeshDiagnosticsRow& row);
+	std::string FormatMeshDisplayName(const MeshDiagnosticsRow& row, const MeshDiagnosticMetadata* metadata);
+	std::string FormatMeshSourcePath(const MeshDiagnosticsRow& row, const MeshDiagnosticMetadata* metadata);
 	std::string FormatMemorySummary(const MeshDiagnosticsRow& row);
 	std::string FormatMaterial(const MeshDiagnosticsRow& row);
 	std::string FormatBoundsExtent(const MeshDiagnosticsBounds& bounds);

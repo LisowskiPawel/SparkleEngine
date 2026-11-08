@@ -1,11 +1,13 @@
 #include "PCH.h"
+#include "Assets/Loaders/CookedAssetAllocationBudget.h"
 
 #include "Assets/Payload/SceneAssetPayloadMeshBindings.h"
 
 namespace Assets
 {
-	std::vector<SceneAssetPayloadMeshBinding> BuildSceneAssetPayloadMeshBindings(const LoadedSceneManifest& sceneManifest)
+	std::vector<SceneAssetPayloadMeshBinding> BuildSceneAssetPayloadMeshBindings(const LoadedSceneManifest& sceneManifest, CookedAssetAllocationBudget& budget)
 	{
+		budget.ReserveArray<SceneAssetPayloadMeshBinding>(sceneManifest.meshAssetReferences.size());
 		std::vector<SceneAssetPayloadMeshBinding> bindings;
 		bindings.reserve(sceneManifest.meshAssetReferences.size());
 

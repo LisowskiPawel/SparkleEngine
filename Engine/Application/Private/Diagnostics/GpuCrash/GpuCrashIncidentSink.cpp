@@ -67,14 +67,13 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 bool GpuCrashIncidentSink::IsReadyPublished() const
 {
 	std::lock_guard lock(m_mutex);
-	const bool bCollectionIncompleteFinalizing = m_nativeFailure == 0 && !m_bFinalizing;
-	const bool bCollectionIncompleteState = bCollectionIncompleteFinalizing && (m_bIncomplete.load(std::memory_order_relaxed));
-	const bool bCollectionIncompleteGuardState = bCollectionIncompleteFinalizing && !bCollectionIncompleteState;
-	const bool bWriteFailed = bCollectionIncompleteGuardState && (m_bWriteFailed.load(std::memory_order_relaxed));
-	const bool bCollectionFailed = bCollectionIncompleteState || bWriteFailed;
-	const bool bCollectionIncomplete = bCollectionIncompleteFinalizing && bCollectionFailed;
+	const bool bCanInspect = m_nativeFailure == 0 && !m_bFinalizing;
+	const bool bIncomplete = bCanInspect && m_bIncomplete.load(std::memory_order_relaxed);
+	const bool bCheckWrite = bCanInspect && !bIncomplete;
+	const bool bWriteFailed = bCheckWrite && m_bWriteFailed.load(std::memory_order_relaxed);
+	const bool bCollectionFailed = bIncomplete || bWriteFailed;
 
-	if (bCollectionIncomplete)
+	if (bCollectionFailed)
 	{
 		throw Diagnostics::Error("GPU crash startup publication failed; this child cannot confirm diagnostic readiness.");
 	}
@@ -114,12 +113,12 @@ bool GpuCrashIncidentSink::Enqueue(RhiGpuCrashArtifactId id, std::span<const std
 	{
 		{
 			std::lock_guard lock(m_mutex);
-			const bool bAdmissionRejectedWriteFailedState = m_bFinalizing || m_bWriteFailed.load(std::memory_order_relaxed);
-			const bool bAdmissionRejectedBytesEmpty = bAdmissionRejectedWriteFailedState || (bytes.empty());
-			const bool bAdmissionRejectedOutstandingCount = bAdmissionRejectedBytesEmpty || (m_outstandingCount == MaximumPayloads);
-			const bool bPayloadAdmissionRejected = bAdmissionRejectedOutstandingCount || (bytes.size() > MaximumQueuedBytes - m_outstandingBytes);
+			const bool bWriterUnavailable = m_bFinalizing || m_bWriteFailed.load(std::memory_order_relaxed);
+			const bool bPayloadRejected = bWriterUnavailable || (bytes.empty());
+			const bool bQueueRejected = bPayloadRejected || (m_outstandingCount == MaximumPayloads);
+			const bool bAdmissionRejected = bQueueRejected || (bytes.size() > MaximumQueuedBytes - m_outstandingBytes);
 
-			if (bPayloadAdmissionRejected)
+			if (bAdmissionRejected)
 			{
 				MarkIncomplete();
 				return false;

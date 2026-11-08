@@ -89,7 +89,7 @@ static void AppendMaterialVariants(
 {
 	variants.Append(
 	    SceneMaterialVariantTranslator::BuildDescriptions(sceneAssetPayload),
-	    SceneMaterialVariantTranslator::BuildBindings(sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex, state));
+	    SceneMaterialVariantTranslator::BuildBindings(sceneAssetPayload, materialBaseHandle, state.GetMeshEntities().subspan(sceneMeshBaseIndex)));
 }
 
 static void AppendCameras(ECS::GameWorldState& state, SceneAssetPayload& sceneAssetPayload)
@@ -125,7 +125,7 @@ void CommitSceneAssetPayload(ECS::GameWorldState& state, GameWorldResourceStores
 
 	AppendAnimationResources(state, resources, sceneAssetPayload);
 	const MaterialHandle materialBaseHandle = AppendMaterials(resources, sceneAssetPayload);
-	const auto sceneMeshBaseIndex = static_cast<SceneMeshInstanceIndex>(state.GetMeshCount());
+	const auto sceneMeshBaseIndex = static_cast<SceneMeshInstanceIndex>(state.GetMeshEntities().size());
 	AppendMeshes(state, resources.Materials, sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex);
 	AppendMaterialVariants(state, resources.MaterialVariants, sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex);
 	AppendCameras(state, sceneAssetPayload);

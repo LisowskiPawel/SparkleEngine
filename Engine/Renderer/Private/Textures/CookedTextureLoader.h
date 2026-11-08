@@ -19,12 +19,5 @@ struct CookedTextureFilePayload final
 	std::vector<std::uint8_t> Bytes;
 };
 
-class CookedTextureLoader final
-{
-public:
-	static CookedTextureFilePayload Read(const std::filesystem::path& texturePath);
-	static LoadedTextureData Decode(const CookedTextureFilePayload& payload, std::uint64_t maximumDecodedBytes = std::numeric_limits<std::uint64_t>::max());
-
-	CookedTextureLoader() = delete;
-	~CookedTextureLoader() = delete;
-};
+CookedTextureFilePayload ReadCookedTexturePayload(const std::filesystem::path& texturePath);
+LoadedTextureData DecodeCookedTexture(const CookedTextureFilePayload& payload, std::uint64_t maximumDecodedBytes = std::numeric_limits<std::uint64_t>::max());

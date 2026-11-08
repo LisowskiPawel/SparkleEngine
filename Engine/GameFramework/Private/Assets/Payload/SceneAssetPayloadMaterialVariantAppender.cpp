@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Assets/Loaders/CookedAssetAllocationBudget.h"
 
 #include "Assets/Payload/SceneAssetPayloadMaterialVariantAppender.h"
 
@@ -10,8 +11,12 @@ namespace Assets
 	void SceneAssetPayloadMaterialVariantAppender::AppendMaterialVariants(
 	    const LoadedSceneManifest& sceneManifest,
 	    std::span<const SceneAssetPayloadMeshBinding> meshAssetBindings,
-	    SceneAssetPayload& sceneAssetPayload)
+	    SceneAssetPayload& sceneAssetPayload,
+	    CookedAssetAllocationBudget& budget)
 	{
+		budget.ReserveArray<SceneAssetPayload::MaterialVariant>(sceneManifest.materialVariants.size());
+		budget.ReserveArray<SceneAssetPayload::MaterialVariantMapping>(sceneManifest.materialVariantMappings.size());
+
 		const auto variantBaseIndex = static_cast<MaterialVariantIndex>(sceneAssetPayload.materialVariants.size());
 		sceneAssetPayload.materialVariants.reserve(sceneAssetPayload.materialVariants.size() + sceneManifest.materialVariants.size());
 		for (const CookedSceneMaterialVariantRecord& variantRecord : sceneManifest.materialVariants)

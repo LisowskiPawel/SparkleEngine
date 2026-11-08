@@ -15,7 +15,6 @@ namespace ECS
 {
 	class CompiledGameSystemGraph;
 	struct GameSystemDesc;
-	CompiledGameSystemGraph BuildGameWorldSystemGraph();
 
 	class GameWorldState;
 
@@ -45,6 +44,14 @@ namespace ECS
 		static GameSystemDesc DescribeMeshExtraction();
 		static GameSystemDesc DescribeExtractionCommit(std::uint32_t extractionIndex);
 
+		// Queries and their clients borrow the same frozen epoch and settle before it ends.
+		CameraMovementQuery m_cameraQuery;
+		PlaybackAdvanceQuery m_playbackQuery;
+		PoseEvaluationQuery m_poseQuery;
+		MorphEvaluationQuery m_morphQuery;
+		TransformEvaluationQuery m_transformQuery;
+		CameraDerivedStateQuery m_cameraDerivedQuery;
+		MeshExtractionQuery m_meshQuery;
 		SimulationSystemExecution m_simulation;
 		AnimationSystemExecution m_animation;
 		TransformSystemExecution m_transform;
@@ -52,5 +59,4 @@ namespace ECS
 		GameWorldState& m_state;
 	};
 
-	bool ExecuteGameWorldSystems(GameWorldState& state, const GameWorldSystemExecutionContext& context);
 }

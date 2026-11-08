@@ -97,11 +97,7 @@ private:
 	Window* m_window = nullptr;
 	InputSystem* m_inputSystem = nullptr;
 	SceneObjectSelection m_sceneSelection = SceneObjectSelection::None();
-	std::function<ShaderDiagnosticsSnapshot()> m_shaderDiagnosticsProvider;
-	std::function<MeshDiagnosticsSnapshot()> m_meshDiagnosticsProvider;
-	std::function<TextureDiagnosticsSnapshot()> m_textureDiagnosticsProvider;
 	std::function<RendererMemoryDiagnosticsSnapshot()> m_memoryDiagnosticsProvider;
-	std::function<MeshPreviewGeometry(std::uintptr_t)> m_meshPreviewProvider;
 	std::unique_ptr<class EditorSceneModelBuilder> m_sceneModelBuilder;
 	std::unique_ptr<class EditorTransactionHistory> m_transactionHistory;
 	std::shared_ptr<const class EditorSceneModel> m_sceneModel;

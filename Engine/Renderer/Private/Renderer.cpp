@@ -22,6 +22,7 @@ public:
 
 std::unique_ptr<Renderer> Renderer::Create(Timer& timer, Window& window, RendererGraphicsLaunch graphicsLaunch, RendererExecutionConfig config)
 {
+	config.Validate();
 	auto state = std::make_unique<RendererFacadeState>(graphicsLaunch);
 	window.PollEvents();
 	if (window.ShouldClose())

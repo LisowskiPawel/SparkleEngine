@@ -24,11 +24,6 @@ SceneOutlinerPanel::SceneOutlinerPanel(SceneObjectSelection& selection, EditorTr
 {
 }
 
-void SceneOutlinerPanel::SetWidth(float widthPixels) noexcept
-{
-	m_widthPixels = widthPixels;
-}
-
 void SceneOutlinerPanel::SetTopInset(float topInsetPixels) noexcept
 {
 	m_topInsetPixels = topInsetPixels;

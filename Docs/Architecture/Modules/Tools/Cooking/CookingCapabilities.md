@@ -16,6 +16,33 @@
 
 **Preparation/runtime separation, 2026-11-01:** Launcher and AssetCooker share the source/acquisition catalog in ToolSupport. Selection and source readiness gate explicit cooking only. GameFramework discovers ordinary `Levels/<id>.level` documents and loads the same cooked files regardless of origin; it does not read the preparation catalog. Shader cancellation-file polling from the retired Editor compiler is deleted; Launcher owns process cancellation and the existing incomplete-write guard protects interrupted output. [Source controls](../../../../../artifacts/validation/runtime-inputs-slim-20261101/completion.json) retain their exact bounds.
 
+**Scene-cook ownership, 2026-11-08:** `SceneCooker.cpp` contains feature composition.
+The existing `CookedSceneBuild` owns manifest reset and count finalization;
+`CookedSceneIdentity.cpp` owns source resolution and stable scene identity;
+`CookedSceneManifestWriter.cpp` owns manifest byte order and registry staging.
+The generation writer composes that private staging operation with the existing
+asset writers and file-set publisher. `SceneCooker` is a namespace of direct
+operations; the static pipeline class and publication friend access are removed.
+`CookedSceneSkeletonBuilder` also exposes a direct namespace operation, with
+asset identity and joint-name translation kept as source-local functions.
+Product layouts, IDs, stage order and publication lifetime remain unchanged.
+
+Focused owner/consumer builds and bounded native controls are recorded in the
+[ownership-pass result](../../../../../artifacts/validation/tools-orchestration-20261108/result.json).
+They do not establish whole-content cook, interactive, GPU, package or release acceptance.
+
+**Material-cook ownership, 2026-11-08 (second pass):**
+[material building](../../../../../Tools/Cooking/MaterialCooker/Private/CookedMaterialAssetBuilder.cpp)
+owns imported-material translation, stable identities and texture references;
+[material writing](../../../../../Tools/Cooking/MaterialCooker/Private/CookedMaterialAssetWriter.cpp)
+owns binary encoding and generation staging. The public `MaterialCooker` namespace
+exposes the existing direct operations. Texture-request construction is a private
+function; its path and format helpers stay in its implementation file. No static
+pipeline facade, duplicate output model or alternate writer remains.
+The [second-pass result](../../../../../artifacts/validation/tools-orchestration-iteration2-20261108/result.json)
+records bounded byte comparisons and affected consumer builds; whole-content cook
+and release acceptance retain their existing gates.
+
 ## At A Glance
 
 | Route | Input | Published product | Important limit |
@@ -92,8 +119,7 @@ writers build their own headers and pass their ordered arrays to ToolSupport's
 They retain staging-path selection and registration in the generation file set.
 [Scene generation publication](../../../../../Tools/Cooking/SceneCooker/Private/CookedSceneGenerationWriter.cpp)
 still owns the publisher lifetime, asset staging, manifest/registry staging,
-publication and failure cleanup. Its friend access to private manifest staging is
-retained. Material strings and texture mip alignment keep their distinct write
+publication and failure cleanup. Private manifest staging is called directly within SceneCooker. Material strings and texture mip alignment keep their distinct write
 protocols. The shared stream lifecycle does not change cooked layouts or establish
 transactional, runtime-consumption or full-cook acceptance.
 

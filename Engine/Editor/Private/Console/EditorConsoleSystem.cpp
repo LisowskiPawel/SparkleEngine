@@ -3,27 +3,11 @@
 #include "Console/EditorConsoleSystem.h"
 
 #include "Console/ConsoleCommands.h"
-#include "Core/Public/Console/ConsoleOutput.h"
 #include "Console/ConsoleSession.h"
 #include "Console/EditorConsolePanel.h"
-#include "Style/SparkleUiPalette.h"
-#include "Icons/EditorIcon.h"
-#include "Widgets/UiPanelWidgets.h"
+#include "Core/Public/Console/ConsoleOutput.h"
 
-#include <imgui.h>
-
-#include <algorithm>
 #include <utility>
-
-class EditorConsoleSystemConstants final
-{
-public:
-	static constexpr std::uint32_t kWindowsKeyDownMessage = 0x0100;
-
-	static constexpr std::uintptr_t kTildeKey = 0xC0;
-	static constexpr float kMinimumDockHeight = 160.0f;
-	static constexpr float kMinimumViewportHeight = 64.0f;
-};
 
 EditorConsoleSystem::EditorConsoleSystem(ConsoleCommandActions actions) :
     m_session(std::make_unique<ConsoleSession>(std::move(actions))),
@@ -38,115 +22,32 @@ void EditorConsoleSystem::AppendOutput(ConsoleOutputRecord record)
 	m_session->Append(std::move(record));
 }
 
+void EditorConsoleSystem::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler)
+{
+	m_session->SetShaderCompileHandler(std::move(handler));
+}
+
 void EditorConsoleSystem::OpenConsole() noexcept
 {
-	m_consolePanel->SetOpen(true);
 	m_consolePanel->RequestFocus();
 }
 
-bool EditorConsoleSystem::HandleShortcut(std::uint32_t message, std::uintptr_t key, bool bWantsTextInput) noexcept
+bool EditorConsoleSystem::HandleShortcut(Key key) noexcept
 {
-	if (message == EditorConsoleSystemConstants::kWindowsKeyDownMessage && key == EditorConsoleSystemConstants::kTildeKey && !bWantsTextInput)
+	if (key != Key::Grave)
 	{
-		if (m_consolePanel->IsOpen())
-		{
-			m_consolePanel->SetOpen(false);
-		}
-		else
-		{
-			OpenConsole();
-		}
-		return true;
+		return false;
 	}
-	return false;
+	m_consolePanel->ToggleOpen();
+	return true;
 }
 
 float EditorConsoleSystem::GetDockHeight(float availableHeight) noexcept
 {
-	const float maxDockHeight = (std::max) (0.0f, availableHeight - EditorConsoleSystemConstants::kMinimumViewportHeight);
-	if (!m_consolePanel->IsOpen())
-	{
-		return (std::min) (ImGui::GetFrameHeight() + 12.0f, maxDockHeight);
-	}
-	if (maxDockHeight <= 0.0f)
-	{
-		m_dockHeight = 0.0f;
-		return m_dockHeight;
-	}
-
-	const float minDockHeight = (std::min) (EditorConsoleSystemConstants::kMinimumDockHeight, maxDockHeight);
-	m_dockHeight = (std::clamp) (m_dockHeight, minDockHeight, maxDockHeight);
-	return m_dockHeight;
+	return m_consolePanel->GetDockHeight(availableHeight);
 }
 
 void EditorConsoleSystem::BuildDockedUI(float left, float bottom, float width, float availableHeight, bool bDisableInteraction)
 {
-	const float height = GetDockHeight(availableHeight);
-	if (width <= 0.0f || height <= 0.0f)
-	{
-		return;
-	}
-
-	const float top = bottom - height;
-	const float maxDockHeight = (std::max) (0.0f, availableHeight - EditorConsoleSystemConstants::kMinimumViewportHeight);
-	const float minDockHeight = (std::min) (EditorConsoleSystemConstants::kMinimumDockHeight, maxDockHeight);
-	ImGui::SetNextWindowPos(ImVec2(left, top), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
-	ImGui::SetNextWindowSizeConstraints(ImVec2(width, m_consolePanel->IsOpen() ? minDockHeight : height), ImVec2(width, m_consolePanel->IsOpen() ? maxDockHeight : height));
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 6.0f));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(6.0f, 4.0f));
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, SparkleUiPalette::WindowBackground());
-	ImGui::PushStyleColor(ImGuiCol_Tab, SparkleUiPalette::TabBackground());
-	ImGui::PushStyleColor(ImGuiCol_TabHovered, SparkleUiPalette::TabBackgroundHovered());
-	ImGui::PushStyleColor(ImGuiCol_TabActive, SparkleUiPalette::TabBackgroundActive());
-
-	const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings
-	    | (m_consolePanel->IsOpen() ? ImGuiWindowFlags_None : ImGuiWindowFlags_NoResize);
-
-	if (!ImGui::Begin("Viewport Console Dock", nullptr, windowFlags))
-	{
-		ImGui::End();
-		ImGui::PopStyleColor(4);
-		ImGui::PopStyleVar(2);
-		return;
-	}
-
-	ImGui::BeginDisabled(bDisableInteraction);
-	const bool bOpen = m_consolePanel->IsOpen();
-	const std::string consoleLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Console, "Console");
-	if (EditorWidgets::DrawFilterChip(consoleLabel.c_str(), bOpen))
-	{
-		if (bOpen)
-		{
-			m_consolePanel->SetOpen(false);
-		}
-		else
-		{
-			OpenConsole();
-		}
-	}
-	ImGui::SameLine();
-	ImGui::AlignTextToFramePadding();
-	ImGui::TextDisabled(bOpen ? "Esc to close" : "~ to open");
-	ImGui::EndDisabled();
-
-	if (bOpen)
-	{
-		ImGui::Separator();
-		m_consolePanel->BuildContent(bDisableInteraction);
-		m_dockHeight = ImGui::GetWindowHeight();
-		GetDockHeight(availableHeight);
-		const bool bCloseConsoleRequestedImGui = !bDisableInteraction && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-		const bool bNoPopup = bCloseConsoleRequestedImGui && (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId));
-		const bool bCloseConsoleRequested = bNoPopup && (ImGui::IsKeyPressed(ImGuiKey_Escape));
-
-		if (bCloseConsoleRequested)
-		{
-			m_consolePanel->SetOpen(false);
-		}
-	}
-
-	ImGui::End();
-	ImGui::PopStyleColor(4);
-	ImGui::PopStyleVar(2);
+	m_consolePanel->BuildDockedUI(left, bottom, width, availableHeight, bDisableInteraction);
 }

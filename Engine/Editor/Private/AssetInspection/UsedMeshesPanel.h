@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AssetInspection/MeshDiagnosticMetadataCatalog.h"
 #include "Renderer/Public/Meshes/MeshDiagnostics.h"
 #include "Renderer/Public/Diagnostics/MeshPreviewGeometry.h"
 
@@ -16,9 +17,7 @@ public:
 
 	using PreviewGeometryProvider = std::function<MeshPreviewGeometry(std::uintptr_t)>;
 
-	void SetOpen(bool bOpen) noexcept { m_bIsOpen = bOpen; }
-
-	bool IsOpen() const noexcept { return m_bIsOpen; }
+	void SetOpen(bool bOpen) noexcept;
 
 	void SetDiagnosticsProvider(DiagnosticsProvider provider);
 	void SetPreviewGeometryProvider(PreviewGeometryProvider provider);
@@ -26,6 +25,7 @@ public:
 
 private:
 	void RefreshSnapshot();
+	void RefreshInspection();
 	void RefreshPreviewGeometry(const MeshDiagnosticsRow& row);
 	void DrawToolbar();
 	void DrawMeshTable(bool bDisableInteraction);
@@ -38,6 +38,7 @@ private:
 	DiagnosticsProvider m_diagnosticsProvider;
 	PreviewGeometryProvider m_previewGeometryProvider;
 	MeshDiagnosticsSnapshot m_snapshot;
+	MeshDiagnosticMetadataCatalog m_metadata;
 	MeshPreviewGeometry m_previewGeometry;
 	std::array<char, 160> m_filterBuffer{};
 	std::uintptr_t m_selectedMeshRuntimeId = 0;

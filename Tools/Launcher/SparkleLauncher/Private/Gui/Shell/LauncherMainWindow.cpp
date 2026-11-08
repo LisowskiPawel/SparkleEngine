@@ -190,7 +190,6 @@ namespace SparkleLauncher
 		    *this);
 
 		connect(m_sceneCatalog, &LauncherSceneCatalog::FocusableWidgetCreated, this, &LauncherMainWindow::RegisterFocusable);
-		connect(m_sceneCatalog, &LauncherSceneCatalog::StateChanged, this, &LauncherMainWindow::UpdateRunAvailability);
 		connect(m_workspaceSetup, &LauncherWorkspaceSetup::FocusableWidgetCreated, this, &LauncherMainWindow::RegisterFocusable);
 		connect(m_workspaceSetup, &LauncherWorkspaceSetup::OperationSelected, this, &LauncherMainWindow::SetSelectedOperation);
 		connect(m_workspaceSetup, &LauncherWorkspaceSetup::CompilerSelected, this, &LauncherMainWindow::SelectWorkspaceCompiler);

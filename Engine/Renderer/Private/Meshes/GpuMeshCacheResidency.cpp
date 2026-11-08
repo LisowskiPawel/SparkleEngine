@@ -77,7 +77,7 @@ void GpuMeshCache::LaunchPendingPreparations()
 		{
 			continue;
 		}
-		const std::uint64_t decodedBytes = GpuMeshPreparation::CalculateDecodedByteSize(request.Source);
+		const std::uint64_t decodedBytes = CalculateGpuMeshDecodedByteSize(request.Source);
 		if (decodedBytes > m_residency.GetBudget().MaximumDecodedBytes)
 		{
 			Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh preparation exceeds the decoded-byte budget.");
@@ -107,7 +107,7 @@ void GpuMeshCache::LaunchPreparation(MeshRequest& request)
 			    return TaskResult::Cancelled("Mesh preparation cancelled.");
 		    }
 
-		    *prepared = GpuMeshPreparation::Build(mesh);
+		    *prepared = PrepareGpuMesh(mesh);
 		    return TaskResult::Success();
 	    });
 

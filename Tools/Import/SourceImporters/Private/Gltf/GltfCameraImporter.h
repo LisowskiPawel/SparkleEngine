@@ -4,8 +4,7 @@
 
 struct cgltf_data;
 
-class GltfCameraImporter final
+namespace GltfCameraImporter
 {
-public:
-	static void ImportCameras(const cgltf_data* data, SourceImportOutput& output);
-};
+	void ImportCameras(const cgltf_data* data, SourceImportOutput& output);
+}

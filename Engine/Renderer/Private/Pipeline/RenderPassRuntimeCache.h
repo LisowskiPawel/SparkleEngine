@@ -11,7 +11,6 @@
 
 class RenderDeviceServices;
 class RenderHardwareInterface;
-class RayTracingShaderTablePlan;
 
 class RenderPassRuntimeCache final
 {
@@ -106,15 +105,22 @@ public:
 		return RayTracingPassPipelineRuntime{.BindingLayout = runtime.GetBindingLayout(), .Pipeline = runtime.GetPipeline(), .Generation = runtime.GetGeneration()};
 	}
 
-	template <typename TRayGenerationShader> std::unique_ptr<RayTracingShaderTable> CreateRayTracingShaderTable(const RayTracingPipelineComposition& composition) const noexcept
+	template <typename TRayGenerationShader, typename TResolveHitGroups>
+	std::unique_ptr<RayTracingShaderTable> CreateRayTracingShaderTable(const RayTracingPipelineComposition& composition, TResolveHitGroups&& resolveHitGroups) const noexcept
 	{
-		return CreateRayTracingShaderTable<TRayGenerationShader>(composition, nullptr);
-	}
+		const auto& runtime = RequireRayTracingRuntime<TRayGenerationShader>(
+		    composition,
+		    "Ray-tracing shader-table creation preceded pipeline materialization.",
+		    "Ray-tracing shader-table creation has no exact pipeline composition.");
 
-	template <typename TRayGenerationShader>
-	std::unique_ptr<RayTracingShaderTable> CreateRayTracingShaderTable(const RayTracingPipelineComposition& composition, const RayTracingShaderTablePlan& plan) const noexcept
-	{
-		return CreateRayTracingShaderTable<TRayGenerationShader>(composition, &plan);
+		try
+		{
+			return runtime.CreateShaderTable(*m_renderHardwareInterface, composition, resolveHitGroups());
+		}
+		catch (const Diagnostics::Error& error)
+		{
+			HandleRuntimeCreationFailure(error.what());
+		}
 	}
 
 private:
@@ -161,21 +167,6 @@ private:
 		return *runtime;
 	}
 
-	template <typename TRayGenerationShader>
-	std::unique_ptr<RayTracingShaderTable> CreateRayTracingShaderTable(const RayTracingPipelineComposition& composition, const RayTracingShaderTablePlan* plan) const noexcept
-	{
-		const auto& runtime = RequireRayTracingRuntime<TRayGenerationShader>(
-		    composition,
-		    "Ray-tracing shader-table creation preceded pipeline materialization.",
-		    "Ray-tracing shader-table creation has no exact pipeline composition.");
-
-		return CreateRayTracingShaderTable(runtime, composition, plan);
-	}
-
-	std::unique_ptr<RayTracingShaderTable> CreateRayTracingShaderTable(
-	    const RayTracingPipelineRuntime& runtime,
-	    const RayTracingPipelineComposition& composition,
-	    const RayTracingShaderTablePlan* plan) const noexcept;
 	RhiSubmissionState CaptureLastSubmittedState() const noexcept;
 	std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> OpenGeneration(std::uint64_t generation) const;
 	std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> CreateReplacementGeneration(std::uint64_t generation) const;

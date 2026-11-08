@@ -10,61 +10,57 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_sceneAssetLightTranslatorLogger, "GameFrame
 
 namespace Assets
 {
-	class SceneAssetLightTranslation final
+	static SceneLightPayload BuildPayload(const CookedSceneLightRecord& lightRecord)
 	{
-	public:
-		static SceneLightPayload BuildPayload(const CookedSceneLightRecord& lightRecord)
+		switch (lightRecord.kind)
 		{
-			switch (lightRecord.kind)
+			case CookedSceneLightKind::Directional:
 			{
-				case CookedSceneLightKind::Directional:
-				{
-					SceneDirectionalLightDesc directional;
-					directional.direction = lightRecord.direction;
-					directional.illuminance = lightRecord.illuminance;
-					directional.angularSizeRadians = lightRecord.angularSizeRadians;
-					return directional;
-				}
-				case CookedSceneLightKind::Point:
-				{
-					PointLightDesc point;
-					point.luminousIntensity = lightRecord.luminousIntensity;
-					point.range = lightRecord.range;
-					point.radius = lightRecord.radius;
-					point.distanceAttenuationCoefficients = lightRecord.distanceAttenuationCoefficients;
-					point.bCastShadow = true;
-					return point;
-				}
-				case CookedSceneLightKind::Spot:
-				{
-					SpotLightDesc spot;
-					spot.direction = lightRecord.direction;
-					spot.luminousIntensity = lightRecord.luminousIntensity;
-					spot.range = lightRecord.range;
-					spot.radius = lightRecord.radius;
-					spot.distanceAttenuationCoefficients = lightRecord.distanceAttenuationCoefficients;
-					spot.innerAngleRadians = lightRecord.innerAngleRadians;
-					spot.outerAngleRadians = lightRecord.outerAngleRadians;
-					spot.bCastShadow = true;
-					return spot;
-				}
-				case CookedSceneLightKind::Rect:
-				{
-					RectLightDesc rect;
-					rect.direction = lightRecord.direction;
-					rect.luminance = lightRecord.luminance;
-					rect.tangent = lightRecord.tangent;
-					rect.width = lightRecord.width;
-					rect.height = lightRecord.height;
-					rect.bCastShadow = true;
-					return rect;
-				}
-				case CookedSceneLightKind::Unknown:
-				default:
-					Diagnostics::Fatal(g_sceneAssetLightTranslatorLogger, __FILE__, __LINE__, "Validated cooked scene contains an unsupported light kind.");
+				SceneDirectionalLightDesc directional;
+				directional.direction = lightRecord.direction;
+				directional.illuminance = lightRecord.illuminance;
+				directional.angularSizeRadians = lightRecord.angularSizeRadians;
+				return directional;
 			}
+			case CookedSceneLightKind::Point:
+			{
+				PointLightDesc point;
+				point.luminousIntensity = lightRecord.luminousIntensity;
+				point.range = lightRecord.range;
+				point.radius = lightRecord.radius;
+				point.distanceAttenuationCoefficients = lightRecord.distanceAttenuationCoefficients;
+				point.bCastShadow = true;
+				return point;
+			}
+			case CookedSceneLightKind::Spot:
+			{
+				SpotLightDesc spot;
+				spot.direction = lightRecord.direction;
+				spot.luminousIntensity = lightRecord.luminousIntensity;
+				spot.range = lightRecord.range;
+				spot.radius = lightRecord.radius;
+				spot.distanceAttenuationCoefficients = lightRecord.distanceAttenuationCoefficients;
+				spot.innerAngleRadians = lightRecord.innerAngleRadians;
+				spot.outerAngleRadians = lightRecord.outerAngleRadians;
+				spot.bCastShadow = true;
+				return spot;
+			}
+			case CookedSceneLightKind::Rect:
+			{
+				RectLightDesc rect;
+				rect.direction = lightRecord.direction;
+				rect.luminance = lightRecord.luminance;
+				rect.tangent = lightRecord.tangent;
+				rect.width = lightRecord.width;
+				rect.height = lightRecord.height;
+				rect.bCastShadow = true;
+				return rect;
+			}
+			case CookedSceneLightKind::Unknown:
+			default:
+				Diagnostics::Fatal(g_sceneAssetLightTranslatorLogger, __FILE__, __LINE__, "Validated cooked scene contains an unsupported light kind.");
 		}
-	};
+	}
 
 	SceneLightDesc BuildSceneAssetLight(const CookedSceneLightRecord& lightRecord)
 	{
@@ -73,7 +69,7 @@ namespace Assets
 		light.common.worldTransform = lightRecord.worldTransform;
 		light.common.color = lightRecord.color;
 		light.common.bVisible = (lightRecord.flags & 1u) != 0u;
-		light.payload = SceneAssetLightTranslation::BuildPayload(lightRecord);
+		light.payload = BuildPayload(lightRecord);
 		return light;
 	}
 }

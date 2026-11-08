@@ -17,13 +17,8 @@ struct ReferencePathTracerEncodedArtifact final
 	std::optional<std::vector<std::byte>> Checkpoint;
 };
 
-class ReferencePathTracerArtifactEncoding final
+namespace ReferencePathTracerArtifactEncoding
 {
-public:
-	static bool Encode(const ReferencePathTracerArtifactWriteRequest& request, ReferencePathTracerEncodedArtifact& artifact, std::string& errorMessage);
-	static std::string BuildManifest(
-	    const ReferencePathTracerArtifactWriteRequest& request,
-	    const ReferencePathTracerEncodedArtifact& artifact,
-	    std::string_view beautyHash,
-	    std::string_view checkpointHash);
-};
+	bool Encode(const ReferencePathTracerArtifactWriteRequest& request, ReferencePathTracerEncodedArtifact& artifact, std::string& errorMessage);
+	std::string BuildManifest(const ReferencePathTracerArtifactWriteRequest& request, const ReferencePathTracerEncodedArtifact& artifact, std::string_view beautyHash, std::string_view checkpointHash);
+}

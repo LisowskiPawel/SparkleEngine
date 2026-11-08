@@ -5,7 +5,6 @@
 #include <Windows.h>
 #include <atomic>
 #include <cstdint>
-#include <string>
 #include <string_view>
 
 struct SPARKLE_PLATFORM_API WindowMessageEvent
@@ -54,15 +53,15 @@ public:
 	float GetDpiScale() const noexcept;
 	bool HasValidSize() const noexcept;
 
-	State GetState() const noexcept { return m_state; }
+	State GetState() const noexcept;
 
 	bool ShouldClose() const noexcept { return m_bShouldClose; }
 
-	bool IsFullScreen() const noexcept { return m_state == State::FullScreen; }
+	bool IsFullScreen() const noexcept { return m_bFullScreen; }
 
 	bool IsMinimized() const noexcept { return m_state == State::Minimized; }
 
-	bool IsMaximized() const noexcept { return m_state == State::Maximized; }
+	bool IsMaximized() const noexcept { return GetState() == State::Maximized; }
 
 	void SetFullScreen(bool bFullScreen);
 	void ToggleFullScreen();
@@ -77,9 +76,12 @@ public:
 private:
 	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	void InitializeNativeWindow(std::string_view title);
+	void DestroyNativeWindow() noexcept;
 	void RegisterWindowClass();
-	void CreateWindowHandle(std::string_view title);
+	void CreateWindowHandle(const wchar_t* title);
 	void ApplyInitialWindowState();
+	void PumpNativeMessages() noexcept;
 	void EnterFullScreen();
 	void RestoreWindowedMode();
 	UINT GetDpi() const noexcept;
@@ -90,8 +92,10 @@ private:
 	LRESULT HandleNonClientSize(WPARAM wParam, LPARAM lParam) const;
 	LRESULT HandleResizeHitTest(WPARAM wParam, LPARAM lParam) const;
 	void ApplyTrackSizeConstraints(MINMAXINFO& minMaxInfo) const;
-	void HandleDpiChanged(UINT dpi, const RECT& suggestedWindowRect);
-	void OnSizeChanged(WPARAM sizeType, uint32_t width, uint32_t height);
+	LRESULT HandleTrackSizeConstraints(LPARAM lParam) const;
+	void HandleDpiChanged(WPARAM wParam, LPARAM lParam);
+	void OnSizeChanged(WPARAM sizeType, LPARAM dimensions);
+	bool HandleWindowShortcut(UINT message, WPARAM key, LPARAM flags);
 	void ApplyPendingShowCommand() noexcept;
 
 	static constexpr const wchar_t* kWindowClassName = L"SparkleEngineWindow";
@@ -105,10 +109,12 @@ private:
 	HWND m_hWnd = nullptr;
 	ATOM m_windowClassAtom = 0;
 
-	RECT m_windowedRect{};
+	WINDOWPLACEMENT m_windowedPlacement{sizeof(WINDOWPLACEMENT)};
 	std::atomic<uint32_t> m_clientWidth{0};
 	std::atomic<uint32_t> m_clientHeight{0};
 	State m_state = State::Normal;
+	// Display mode is independent of the native minimized/maximized state.
+	bool m_bFullScreen = false;
 	int m_pendingShowCommand = kNoShowCommand;
 	bool m_bShouldClose = false;
 };

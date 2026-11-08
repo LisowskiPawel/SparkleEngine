@@ -3,7 +3,7 @@
 
 #include "/Engine/Resources/ViewCameraUniformData.hlsli"
 
-#include "/Engine/Lighting/DirectLightReservoirData.hlsli"
+#include "/Engine/Passes/Lighting/Direct/DirectLightReservoirData.hlsli"
 #include "/Engine/Passes/GBuffer/GBufferUtils.hlsli"
 #include "/Engine/RayTracing/Shadows/RayTracedShadowSignalPacking.hlsli"
 #include "/Engine/RayTracing/Shadows/RayTracedShadowSemantics.hlsli"
@@ -35,7 +35,7 @@ bool PrepareDirectShadowSignal(uint2 pixelCoord, out RayTracedShadowRequest requ
 		return false;
 	}
 
-	const LightSampling::DirectLightSample lightSample = DirectReservoir::ReplayLightSample(reservoir, positionWorld);
+	const LightSampling::DirectLightSample lightSample = DirectReservoir::ReplayLightSample(reservoir.Candidate, reservoir.ShapeSample, positionWorld);
 	return ShadowRays::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, DirectLightSampling::CastsShadow(reservoir.Candidate.Light), request, immediateSignal);
 }
 
@@ -53,7 +53,7 @@ void TraceAndStoreDirectShadowSignal(uint2 pixelCoord)
 	ShadowVisibilitySample signal;
 	if (PrepareDirectShadowSignal(pixelCoord, request, signal))
 	{
-		signal = ShadowRays::TraceShadowRay(request);
+		signal = ShadowRays::TraceShadowRay(SceneTlas, request);
 	}
 
 	ShadowVisibilitySignal[pixelCoord] = PackShadowSignal(signal);

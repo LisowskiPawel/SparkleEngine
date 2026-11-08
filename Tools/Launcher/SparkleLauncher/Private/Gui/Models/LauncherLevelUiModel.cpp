@@ -2,6 +2,7 @@
 
 #include "Gui/Models/LauncherContentModel.h"
 #include "Cook/CookedContentReadiness.h"
+#include "Levels/LevelPreparation.h"
 #include "Workspace/LauncherProductPaths.h"
 
 #include "Core/Public/Diagnostics/Error.h"
@@ -58,24 +59,7 @@ namespace SparkleLauncher
 		{
 			const auto pack = level.assetPackId.empty() ? m_catalog.assetPacks.end() : m_catalog.assetPacks.find(level.assetPackId);
 			const ProjectAssetPack* assetPack = pack == m_catalog.assetPacks.end() ? nullptr : &pack->second;
-			std::error_code sourceError;
-			const bool bLevelSourceReady = std::filesystem::exists(level.sourcePath, sourceError) && !sourceError;
-			const bool bPackSourceReady = assetPack == nullptr || m_catalog.IsAssetPackSourceReady(assetPack->id);
-			const bool bGameSupported = assetPack == nullptr || assetPack->bGameSupported;
-			const bool bMeshesReady = level.id == "Empty" || cooked.bMeshesReady;
-			const bool bMeshSourceReady = bLevelSourceReady && bMeshesReady;
-			const bool bAssetsReady = bMeshSourceReady && cooked.bTexturesReady;
-			const bool bReady = bAssetsReady && cooked.Shaders == CookedShaderPublicationState::Ready;
-			const bool bAcquisitionSupported = assetPack != nullptr && assetPack->bDownloadSupported;
-			const bool bSourceReady = bLevelSourceReady && bPackSourceReady;
-			const bool bCanUseTools = bHasSourceTools && bLevelSourceReady;
-			const bool bPackAvailable = assetPack == nullptr || bPackSourceReady;
-			const bool bCanPreparePack = bPackAvailable || bAcquisitionSupported;
-			const bool bCanPrepareLevel = bCanUseTools && bCanPreparePack;
-			const bool bLevelAvailable = bReady || bCanPrepareLevel;
-			const bool bCanSelect = bGameSupported && bLevelAvailable;
-			const bool bCanAcquirePack = bCanUseTools && bAcquisitionSupported;
-			const bool bCanSync = bCanAcquirePack && !bPackSourceReady;
+			const LevelPreparation preparation = InspectLevelPreparation(m_catalog, level, cooked, bHasSourceTools);
 
 			LauncherLevelUiEntry entry{
 			    .Id = QString::fromStdString(level.id),
@@ -84,42 +68,18 @@ namespace SparkleLauncher
 			    .ThumbnailPath = QString::fromStdWString(level.thumbnailPath.wstring()),
 			    .Detail = BuildLevelDetail(level, assetPack),
 			    .SourcePageUrl = QString::fromStdString(level.sourcePageUrl.empty() && assetPack != nullptr ? assetPack->sourcePageUrl : level.sourcePageUrl),
-			    .UnsupportedReason = ResolveUnavailableReason(level, assetPack, bLevelSourceReady, bPackSourceReady, bCanSelect),
+			    .UnsupportedReason = QString::fromStdString(preparation.UnavailableReason),
 			    .bSelected = level.bSelected,
-			    .bSourceReady = bSourceReady,
-			    .bGameSupported = bGameSupported,
-			    .bReady = bReady,
-			    .bCanSelect = bCanSelect,
-			    .bCanSync = bCanSync};
+			    .bSourceReady = preparation.bSourceReady,
+			    .bGameSupported = preparation.bGameSupported,
+			    .bReady = preparation.bReady,
+			    .bCanSelect = preparation.bCanSelect,
+			    .bCanPrepare = preparation.bCanPrepare,
+			    .bCanSync = preparation.bCanSync};
 
 			entry.Status = ResolveLevelStatus(entry);
 			entry.State = ResolveLevelState(entry);
 			return entry;
-		}
-
-		QString ResolveUnavailableReason(const ProjectLevelCatalogEntry& level, const ProjectAssetPack* pack, bool bLevelSourceReady, bool bPackSourceReady, bool bCanSelect) const
-		{
-			if (bCanSelect)
-			{
-				return {};
-			}
-			if (!bLevelSourceReady)
-			{
-				return QStringLiteral("Level definition is missing: %1").arg(QString::fromStdString(level.sourcePath.string()));
-			}
-			if (pack == nullptr)
-			{
-				return QStringLiteral("This workspace map has no available source content.");
-			}
-			if (!bPackSourceReady && !pack->bDownloadSupported)
-			{
-				return QString::fromStdString(pack->downloadBlocker) + (pack->bGameSupported ? QString() : QStringLiteral("\n\n") + QString::fromStdString(pack->gameBlocker));
-			}
-			if (!pack->bGameSupported)
-			{
-				return QString::fromStdString(pack->gameBlocker);
-			}
-			return QString::fromStdString(pack->downloadBlocker);
 		}
 
 		QString BuildLevelDetail(const ProjectLevelCatalogEntry& level, const ProjectAssetPack* pack) const

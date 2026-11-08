@@ -37,11 +37,11 @@ namespace Json
 		{
 			return false;
 		}
-		const bool bUnquotedValueContinuesObjectText = cursor < objectText.size() && objectText[cursor] != ',';
-		const bool bInsideObject = bUnquotedValueContinuesObjectText && (objectText[cursor] != '}');
-		const bool bUnquotedValueContinues = bInsideObject && (!std::isspace(static_cast<unsigned char>(objectText[cursor])));
+		const bool bPastNumber = cursor < objectText.size() && objectText[cursor] != ',';
+		const bool bBeforeObjectEnd = bPastNumber && objectText[cursor] != '}';
+		const bool bInvalidSuffix = bBeforeObjectEnd && !std::isspace(static_cast<unsigned char>(objectText[cursor]));
 
-		if (bUnquotedValueContinues)
+		if (bInvalidSuffix)
 		{
 			return false;
 		}

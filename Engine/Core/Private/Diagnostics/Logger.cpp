@@ -39,7 +39,7 @@ namespace Logging
 		std::mutex Mutex;
 		LoggerMap NamedLoggers;
 		std::vector<spdlog::sink_ptr> SharedSinks;
-		std::atomic<int> Level{static_cast<int>(spdlog::level::info)};
+		spdlog::level::level_enum Level = spdlog::level::info;
 		std::atomic<bool> bInitialized{false};
 		std::optional<std::filesystem::path> ActiveLogFilePath;
 	};
@@ -50,22 +50,22 @@ namespace Logging
 		return registry;
 	}
 
-	static void ApplyLoggerSettings(const std::shared_ptr<spdlog::logger>& logger) noexcept
+	static void ApplyLoggerSettingsLocked(const std::shared_ptr<spdlog::logger>& logger) noexcept
 	{
 		if (!logger)
 		{
 			return;
 		}
 
-		logger->set_level(static_cast<spdlog::level::level_enum>(GetLoggerRegistry().Level.load(std::memory_order_relaxed)));
+		logger->set_level(GetLoggerRegistry().Level);
 		logger->flush_on(spdlog::level::err);
 	}
 
-	static std::shared_ptr<spdlog::logger> CreateLogger(std::string_view name)
+	static std::shared_ptr<spdlog::logger> CreateLoggerLocked(std::string_view name)
 	{
 		const std::vector<spdlog::sink_ptr>& sharedSinks = GetLoggerRegistry().SharedSinks;
 		auto logger = std::make_shared<spdlog::logger>(std::string(name), sharedSinks.begin(), sharedSinks.end());
-		ApplyLoggerSettings(logger);
+		ApplyLoggerSettingsLocked(logger);
 		return logger;
 	}
 
@@ -78,8 +78,8 @@ namespace Logging
 		}
 
 		registry.SharedSinks = CreateLoggerSinks(registry.ActiveLogFilePath);
-		registry.Level.store(static_cast<int>(ReadConfiguredLoggerLevel()), std::memory_order_relaxed);
-		auto coreLogger = CreateLogger(kCoreLoggerName);
+		registry.Level = ReadConfiguredLoggerLevel();
+		auto coreLogger = CreateLoggerLocked(kCoreLoggerName);
 		registry.NamedLoggers.emplace(std::string(kCoreLoggerName), coreLogger);
 		spdlog::set_default_logger(coreLogger);
 		registry.bInitialized.store(true, std::memory_order_release);
@@ -123,35 +123,27 @@ namespace Logging
 	{
 		Initialize();
 
+		LoggerRegistry& registry = GetLoggerRegistry();
+		// Failed bootstrap can retry sink construction; protect the borrowed sinks through creation and publication.
+		std::lock_guard<std::mutex> lock(registry.Mutex);
+		auto& namedLoggers = registry.NamedLoggers;
+		const auto existing = namedLoggers.find(std::string(name));
+		if (existing != namedLoggers.end())
 		{
-			LoggerRegistry& registry = GetLoggerRegistry();
-			std::lock_guard<std::mutex> lock(registry.Mutex);
-			auto& namedLoggers = registry.NamedLoggers;
-			const auto it = namedLoggers.find(std::string(name));
-			if (it != namedLoggers.end())
-			{
-				return it->second;
-			}
+			return existing->second;
 		}
 
 		std::shared_ptr<spdlog::logger> logger;
 		try
 		{
-			logger = CreateLogger(name);
+			logger = CreateLoggerLocked(name);
 		}
 		catch (...)
 		{
 			logger = spdlog::default_logger();
 		}
 
-		LoggerRegistry& registry = GetLoggerRegistry();
-		std::lock_guard<std::mutex> lock(registry.Mutex);
-		auto& namedLoggers = registry.NamedLoggers;
-		const auto [it, bInserted] = namedLoggers.emplace(std::string(name), logger);
-		if (!bInserted)
-		{
-			return it->second;
-		}
+		namedLoggers.emplace(std::string(name), logger);
 
 		if (logger)
 		{

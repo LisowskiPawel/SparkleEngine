@@ -46,14 +46,12 @@ static bool EncodeCheckpoint(const LinearRgbImage& mean, const LinearRgbImage& m
 
 	std::vector<std::uint8_t> bytes;
 	Files::BinaryBufferWriter writer(bytes);
-	const std::array<std::uint8_t, 8> magic = {'S', 'P', 'K', 'R', 'P', 'T', '0', '1'};
+	const std::array<std::uint8_t, 8> magic = {'S', 'P', 'K', 'R', 'P', 'T', 0, 0};
 	writer.WriteArray(std::span<const std::uint8_t>(magic));
 	const std::size_t schemaBytesOffset = bytes.size();
 	writer.WriteValue<std::uint32_t>(0u);
 	writer.WriteValue(mean.Width);
 	writer.WriteValue(mean.Height);
-	writer.WriteValue<std::uint32_t>(1u);
-	writer.WriteValue<std::uint32_t>(1u);
 	writer.WriteValue<std::uint64_t>(0u);
 	writer.WriteValue(source.SamplePrefix.SampleCount);
 	writer.WriteArray(std::span<const std::byte>(source.SamplePrefix.RenderIdentitySha256));
@@ -90,12 +88,38 @@ static bool EncodeCheckpoint(const LinearRgbImage& mean, const LinearRgbImage& m
 	return true;
 }
 
+static bool DecodeReadback(const ViewportCaptureReadback& readback, LinearRgbImage& image, std::string& errorMessage)
+{
+	const ImageBufferView source{.Pixels = readback.Pixels, .Width = readback.Width, .Height = readback.Height, .RowPitch = readback.RowPitch, .Format = readback.Format};
+	return ImageEncoding::DecodeLinearRgb(source, image, errorMessage);
+}
+
+static bool EncodeCheckpointArtifact(const ReferencePathTracerArtifactWriteRequest& request, const LinearRgbImage& mean, ReferencePathTracerEncodedArtifact& artifact, std::string& errorMessage)
+{
+	if (!request.Moment2)
+	{
+		errorMessage = "Checkpoint M2 readback is unavailable.";
+		return false;
+	}
+
+	LinearRgbImage moment2;
+	artifact.Checkpoint.emplace();
+	const bool bMomentDecoded = DecodeReadback(request.Moment2.value(), moment2, errorMessage);
+	const bool bCheckpointEncoded = bMomentDecoded && EncodeCheckpoint(mean, moment2, request.Mean.Result, *artifact.Checkpoint, errorMessage);
+
+	if (!bCheckpointEncoded)
+	{
+		artifact.Checkpoint.reset();
+		return false;
+	}
+	return true;
+}
+
 bool ReferencePathTracerArtifactEncoding::Encode(const ReferencePathTracerArtifactWriteRequest& request, ReferencePathTracerEncodedArtifact& artifact, std::string& errorMessage)
 {
 	artifact = {};
-	const ImageBufferView meanSource{.Pixels = request.Mean.Pixels, .Width = request.Mean.Width, .Height = request.Mean.Height, .RowPitch = request.Mean.RowPitch, .Format = request.Mean.Format};
 	LinearRgbImage mean;
-	if (!ImageEncoding::DecodeLinearRgb(meanSource, mean, errorMessage))
+	if (!DecodeReadback(request.Mean, mean, errorMessage))
 	{
 		return false;
 	}
@@ -105,34 +129,7 @@ bool ReferencePathTracerArtifactEncoding::Encode(const ReferencePathTracerArtifa
 	{
 		return false;
 	}
-	if (request.Kind != ReferencePathTracerArtifactKind::Checkpoint)
-	{
-		return true;
-	}
-	if (!request.Moment2)
-	{
-		errorMessage = "Checkpoint M2 readback is unavailable.";
-		return false;
-	}
-
-	const ImageBufferView moment2Source{
-	    .Pixels = request.Moment2->Pixels,
-	    .Width = request.Moment2->Width,
-	    .Height = request.Moment2->Height,
-	    .RowPitch = request.Moment2->RowPitch,
-	    .Format = request.Moment2->Format};
-
-	LinearRgbImage moment2;
-	artifact.Checkpoint.emplace();
-	const bool bMomentDecoded = ImageEncoding::DecodeLinearRgb(moment2Source, moment2, errorMessage);
-	const bool bCheckpointEncoded = bMomentDecoded && EncodeCheckpoint(mean, moment2, request.Mean.Result, *artifact.Checkpoint, errorMessage);
-
-	if (!bCheckpointEncoded)
-	{
-		artifact.Checkpoint.reset();
-		return false;
-	}
-	return true;
+	return request.Kind != ReferencePathTracerArtifactKind::Checkpoint || EncodeCheckpointArtifact(request, mean, artifact, errorMessage);
 }
 
 std::string ReferencePathTracerArtifactEncoding::BuildManifest(
@@ -155,7 +152,7 @@ std::string ReferencePathTracerArtifactEncoding::BuildManifest(
 	    {"providerGeneration", std::to_string(request.Mean.Result.ProviderGeneration)},
 	    {"rawProduct", Json::QuoteString("scene-linear RGB32F")},
 	    {"sceneGeneration", std::to_string(request.Mean.Result.SceneGeneration)},
-	    {"schema", Json::QuoteString("sparkle-reference-path-tracer-artifact-v1")},
+	    {"schema", Json::QuoteString("sparkle-reference-path-tracer-artifact")},
 	    {"sessionDigestSha256", Json::QuoteString(Hash::Sha256ToHex(request.Mean.Result.SamplePrefix.RenderIdentitySha256))},
 	    {"status", Json::QuoteString(status)},
 	    {"targetSpp", std::to_string(request.Mean.Result.SamplePrefix.TargetSampleCount)},

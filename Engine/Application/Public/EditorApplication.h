@@ -29,6 +29,9 @@ private:
 	void InitializeEditorOperations();
 	void InitializeUi();
 	void ConfigureUiDiagnostics(Renderer& renderer);
+	void Restart();
+	RenderViewCameraData UpdateViewportCamera();
+	void ReloadShaders(Renderer& renderer);
 	void UpdateEditorOperations(Renderer& renderer);
 	void RenderEditorFrame(Renderer& renderer);
 

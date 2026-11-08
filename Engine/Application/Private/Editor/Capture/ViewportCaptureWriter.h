@@ -5,8 +5,7 @@
 #include <filesystem>
 #include <stop_token>
 
-class ViewportCaptureWriter final
+namespace ViewportCaptureWriter
 {
-public:
-	static ViewportCaptureResult Write(ViewportCaptureReadback readback, const std::filesystem::path& outputPath, std::stop_token cancellationToken) noexcept;
-};
+	ViewportCaptureResult Write(ViewportCaptureReadback readback, const std::filesystem::path& outputPath, std::stop_token cancellationToken);
+}

@@ -34,7 +34,6 @@ struct EditorHostServices final
 	Timer& GameTimer;
 	LevelSession* Levels = nullptr;
 	std::function<WorldReadView()> AcquireWorldReadView;
-	std::function<std::uint64_t()> WorldGeneration;
 	std::function<WorldMaterialVariantView()> MaterialVariants;
 	std::function<WorldEditResult(WorldEditCommand, std::uint64_t)> SubmitWorldEdit;
 	EngineRenderingSettingsState RenderingSettings;

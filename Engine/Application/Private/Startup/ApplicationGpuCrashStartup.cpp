@@ -1,5 +1,13 @@
 #include "PCH.h"
 #include "Startup/ApplicationGpuCrashStartup.h"
+#include "GameApplication.h"
+#include "Core/Public/Process/ProcessReadiness.h"
+#include "Renderer/Public/ExternalCapture/RendererGraphicsLaunch.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Concurrency/ApplicationTaskRuntime.h"
+  #include "Diagnostics/GpuCrash/GpuCrashIncidentSink.h"
+  #include "Diagnostics/GpuCrash/GpuCrashInputs.h"
+#endif
 #include "Core/Public/Process/CommandLineUtils.h"
 
 #include "Core/Public/Diagnostics/Error.h"
@@ -65,3 +73,59 @@ GpuCrashStartup ResolveGpuCrashStartup()
 	throw Diagnostics::Error("GPU crash debugging requires the explicit diagnostic product variant.");
 #endif
 }
+
+void GameApplication::PrepareGpuCrashDiagnostics(RendererGraphicsLaunch& graphics)
+{
+	[[maybe_unused]] const GpuCrashStartup startup = ResolveGpuCrashStartup();
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (!startup.ShaderExport.empty())
+	{
+		graphics.GpuCrash.LibraryPath = ResolveAftermathLibraryPath();
+		m_gpuCrashSink = std::make_unique<GpuCrashIncidentSink>(*m_taskRuntime, startup, graphics.BackendApi);
+		graphics.GpuCrash.Mode = RhiGpuCrashMode::Aftermath;
+		graphics.GpuCrash.Sink = m_gpuCrashSink.get();
+	}
+#else
+	(void) graphics;
+#endif
+}
+
+void GameApplication::AbortGpuCrashDiagnostics() noexcept
+{
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (m_gpuCrashSink)
+	{
+		m_gpuCrashSink->AbortPreparation();
+		m_gpuCrashSink.reset();
+	}
+#endif
+}
+
+void GameApplication::SignalLevelReadiness(std::string_view level)
+{
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	if (m_gpuCrashSink)
+	{
+		m_pendingReadiness = level;
+		return;
+	}
+#endif
+	Process::SignalParentReadiness(level);
+}
+
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+
+void GameApplication::ReportReadiness()
+{
+	if (m_pendingReadiness.empty())
+	{
+		return;
+	}
+	if (m_gpuCrashSink && !m_gpuCrashSink->IsReadyPublished())
+	{
+		return;
+	}
+	Process::SignalParentReadiness(m_pendingReadiness);
+	m_pendingReadiness.clear();
+}
+#endif

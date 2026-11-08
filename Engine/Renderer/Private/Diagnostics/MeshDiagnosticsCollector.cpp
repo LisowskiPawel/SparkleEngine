@@ -16,7 +16,12 @@
 #include <limits>
 #include <unordered_map>
 
-MeshDiagnosticsSnapshot MeshDiagnosticsCollector::Capture(const RenderScene& scene, const GpuMeshCache* gpuMeshCache)
+static void CollectRows(const RenderScene& scene, const GpuMeshCache* gpuMeshCache, MeshDiagnosticsSnapshot& snapshot);
+static void SortRows(MeshDiagnosticsSnapshot& snapshot);
+static MeshGeometryInstancingDiagnostics CaptureGeometryInstancing(const RenderScene& scene, const GpuMeshCache* gpuMeshCache);
+static void PopulateMeshRow(MeshDiagnosticsRow& row, const Mesh& mesh, const GpuMeshCache* gpuMeshCache);
+
+MeshDiagnosticsSnapshot CollectMeshDiagnostics(const RenderScene& scene, const GpuMeshCache* gpuMeshCache)
 {
 	MeshDiagnosticsSnapshot snapshot;
 	CollectRows(scene, gpuMeshCache, snapshot);
@@ -25,7 +30,7 @@ MeshDiagnosticsSnapshot MeshDiagnosticsCollector::Capture(const RenderScene& sce
 	return snapshot;
 }
 
-void MeshDiagnosticsCollector::CollectRows(const RenderScene& scene, const GpuMeshCache* gpuMeshCache, MeshDiagnosticsSnapshot& snapshot)
+static void CollectRows(const RenderScene& scene, const GpuMeshCache* gpuMeshCache, MeshDiagnosticsSnapshot& snapshot)
 {
 	snapshot.Rows.reserve(scene.GetPrimitives().size());
 
@@ -72,7 +77,7 @@ void MeshDiagnosticsCollector::CollectRows(const RenderScene& scene, const GpuMe
 	}
 }
 
-void MeshDiagnosticsCollector::SortRows(MeshDiagnosticsSnapshot& snapshot)
+static void SortRows(MeshDiagnosticsSnapshot& snapshot)
 {
 	std::sort(
 	    snapshot.Rows.begin(),
@@ -95,7 +100,7 @@ void MeshDiagnosticsCollector::SortRows(MeshDiagnosticsSnapshot& snapshot)
 	    });
 }
 
-MeshGeometryInstancingDiagnostics MeshDiagnosticsCollector::CaptureGeometryInstancing(const RenderScene& scene, const GpuMeshCache* gpuMeshCache)
+static MeshGeometryInstancingDiagnostics CaptureGeometryInstancing(const RenderScene& scene, const GpuMeshCache* gpuMeshCache)
 {
 	std::vector<MeshRenderItem> renderItems;
 	renderItems.reserve(scene.GetPrimitives().size());
@@ -172,7 +177,7 @@ MeshGeometryInstancingDiagnostics MeshDiagnosticsCollector::CaptureGeometryInsta
 	return diagnostics;
 }
 
-MeshPreviewGeometry MeshDiagnosticsCollector::CapturePreview(const RenderScene& scene, std::uintptr_t meshRuntimeId)
+MeshPreviewGeometry CollectMeshPreviewGeometry(const RenderScene& scene, std::uintptr_t meshRuntimeId)
 {
 	MeshPreviewGeometry geometry;
 	if (meshRuntimeId == 0)
@@ -200,7 +205,7 @@ MeshPreviewGeometry MeshDiagnosticsCollector::CapturePreview(const RenderScene& 
 	return geometry;
 }
 
-void MeshDiagnosticsCollector::PopulateMeshRow(MeshDiagnosticsRow& row, const Mesh& mesh, const GpuMeshCache* gpuMeshCache)
+static void PopulateMeshRow(MeshDiagnosticsRow& row, const Mesh& mesh, const GpuMeshCache* gpuMeshCache)
 {
 	const MeshData& meshData = mesh.GetMeshData();
 	if (const CookedMesh* cookedMesh = dynamic_cast<const CookedMesh*>(&mesh))

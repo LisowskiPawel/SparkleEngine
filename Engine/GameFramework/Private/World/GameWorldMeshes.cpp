@@ -1,6 +1,7 @@
 #include "PCH.h"
 #include "World/GameWorldState.h"
 
+#include <utility>
 #include <algorithm>
 #include <iterator>
 
@@ -24,8 +25,28 @@ namespace ECS
 			m_meshResources.Remove(resource);
 			return entity;
 		}
-		const LocalTransform local = WorldTransformConversion::ToLocal(instance.LocalTransform);
 		const AnimationOutputSlotHandle morphState = instance.Kind == SceneMeshKind::Skeletal ? m_morphWeights.Add(instance.InitialMorphWeights) : AnimationOutputSlotHandle{};
+		const bool bComponentsAdded = AddMeshComponents(entity, instance, resource);
+		const bool bMeshAdded = bComponentsAdded && AddMeshDeformation(entity, instance, morphState);
+
+		if (!bMeshAdded)
+		{
+			m_registry.Destroy(entity);
+			m_meshResources.Remove(resource);
+			if (morphState.IsValid())
+			{
+				m_morphWeights.Remove(morphState);
+			}
+			return EntityId::Invalid();
+		}
+		MarkTransformDirty(entity);
+		RecordChange(entity);
+		return entity;
+	}
+
+	bool GameWorldState::AddMeshComponents(EntityId entity, const SceneMeshInstanceData& instance, MeshResourceHandle resource)
+	{
+		const LocalTransform local = WorldTransformConversion::ToLocal(instance.LocalTransform);
 
 		const MeshInstance mesh{
 		    .Resource = resource,
@@ -50,39 +71,26 @@ namespace ECS
 		            .SourceObjectId = static_cast<std::uint64_t>(instance.SourceNodeIndex),
 		            .Kind = AuthoredObjectKind::MeshInstance}));
 
-		bool bAdded = bIdentityAdded && (m_registry.Add(entity, EditorMetadata{}));
+		return bIdentityAdded && m_registry.Add(entity, EditorMetadata{});
+	}
 
-		const bool bSkeletalMesh = instance.Kind == SceneMeshKind::Skeletal;
-		const bool bMorphRequired = bAdded && bSkeletalMesh;
-		const bool bMorphValid = bMorphRequired && morphState.IsValid();
-		const bool bMorphStored = bMorphValid && m_registry.Add(entity, MorphState{.Weights = morphState});
-		const bool bSkinningStored = bMorphStored && m_registry.Add(entity, SkinningState{.SkeletonAssetId = instance.SkeletonAssetId});
-		const bool bSkinningComplete = !bSkeletalMesh || bSkinningStored;
-		const bool bMeshAdded = bAdded && bSkinningComplete;
-
-		if (!bMeshAdded)
+	bool GameWorldState::AddMeshDeformation(EntityId entity, const SceneMeshInstanceData& instance, AnimationOutputSlotHandle weights)
+	{
+		if (instance.Kind != SceneMeshKind::Skeletal)
 		{
-			m_registry.Destroy(entity);
-			m_meshResources.Remove(resource);
-			if (morphState.IsValid())
-			{
-				m_morphWeights.Remove(morphState);
-			}
-			return EntityId::Invalid();
+			return true;
 		}
-		MarkTransformDirty(entity);
-		RecordChange(entity);
-		return entity;
+		if (!weights.IsValid())
+		{
+			return false;
+		}
+		const bool bMorphAdded = m_registry.Add(entity, MorphState{.Weights = weights});
+		return bMorphAdded && m_registry.Add(entity, SkinningState{.SkeletonAssetId = instance.SkeletonAssetId});
 	}
 
-	std::size_t GameWorldState::GetMeshCount() const noexcept
+	std::span<const EntityId> GameWorldState::GetMeshEntities() const noexcept
 	{
-		return Count<MeshInstance>();
-	}
-
-	EntityId GameWorldState::GetMeshEntity(std::size_t index) const noexcept
-	{
-		return EntityAt<MeshInstance>(index);
+		return m_registry.GetStorage<MeshInstance>().GetEntities();
 	}
 
 	bool GameWorldState::WriteMeshMaterial(EntityId entity, MaterialHandle material) noexcept

@@ -106,46 +106,58 @@ void TaskDispatch::State::Close() noexcept
 
 void TaskDispatch::State::Execute() noexcept
 {
+	BeginInvocation();
+	TaskResult result = InvokeBody();
+	const bool bFinished = CompleteInvocation(result);
+	if (bFinished)
 	{
-		std::lock_guard lock(Gate);
-		CurrentPhase = Phase::Running;
+		Finish(std::move(result));
 	}
+}
 
-	TaskResult result;
+void TaskDispatch::State::BeginInvocation() noexcept
+{
+	std::lock_guard lock(Gate);
+	CurrentPhase = Phase::Running;
+}
+
+TaskResult TaskDispatch::State::InvokeBody() noexcept
+{
 	try
 	{
-		result = Execution->Cancellation.stop_requested() ? std::move(Cancelled) : Function(Context);
+		return Execution->Cancellation.stop_requested() ? std::move(Cancelled) : Function(Context);
 	}
 	catch (...)
 	{
-		result = std::move(AllocationFailure);
+		return std::move(AllocationFailure);
 	}
-	{
-		std::lock_guard lock(Gate);
-		if (Execution->Cancellation.stop_requested() && result.Succeeded())
-		{
-			result = std::move(Cancelled);
-		}
-		if (!result.Succeeded())
-		{
-			bClosed = true;
-			bRerun = false;
-		}
-		if (bRerun)
-		{
-			bRerun = false;
-			CurrentPhase = Phase::Queued;
-			Owner->EnqueueDispatch(*this);
-			return;
-		}
-		if (!bClosed)
-		{
-			CurrentPhase = Phase::Idle;
-			return;
-		}
-	}
+}
 
-	Finish(std::move(result));
+bool TaskDispatch::State::CompleteInvocation(TaskResult& result) noexcept
+{
+	std::lock_guard lock(Gate);
+	if (Execution->Cancellation.stop_requested() && result.Succeeded())
+	{
+		result = std::move(Cancelled);
+	}
+	if (!result.Succeeded())
+	{
+		bClosed = true;
+		bRerun = false;
+	}
+	if (bRerun)
+	{
+		bRerun = false;
+		CurrentPhase = Phase::Queued;
+		Owner->EnqueueDispatch(*this);
+		return false;
+	}
+	if (!bClosed)
+	{
+		CurrentPhase = Phase::Idle;
+		return false;
+	}
+	return true;
 }
 
 void TaskDispatch::State::Finish(TaskResult result) noexcept

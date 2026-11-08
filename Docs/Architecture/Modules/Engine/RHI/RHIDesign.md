@@ -110,6 +110,30 @@ RHI does not own:
 
 Public contracts live under `Engine/RHI/Public`. Common validation and neutral implementation live in non-backend `Engine/RHI/Private` paths. `Private/D3D12` and `Private/Vulkan` own real API differences. `Engine/RHI/CMakeLists.txt` remains executable membership authority.
 
+### Reading Orchestration And Mechanism
+
+Source responsibilities were reconciled on 2026-11-08 in the working tree starting at `7c94ab4581bd17b3aa12da4388bfc18e9f117eb2`. This is an ownership map, not native execution or backend acceptance.
+
+| Follow the workflow in | Read implementation details in |
+| --- | --- |
+| `Private/Device/RenderDeviceServices.cpp` and backend `Device/*RenderDeviceServices.cpp` | Backend resources, descriptors, command recording, swapchain and diagnostics owners; device services compose their lifetimes |
+| Vulkan `Device/VulkanDeviceBootstrap.cpp` | `Device/VulkanDeviceCreation.cpp` owns logical-device queue descriptions, enabled extensions, feature-chain storage and native creation; `VulkanDeviceExtensions` owns extension enumeration |
+| Vulkan device services' frame operations | `Commands/VulkanFrameSubmission` owns acquire-semaphore consumption and pending waits; the recording context and command queue retain slot retirement and native synchronization |
+| Backend `Pipeline/*RayTracingPipeline.cpp` | `Pipeline/*RayTracingPipelineCreation.cpp` owns temporary native shader/group/subobject assemblies through the synchronous creation call |
+| Backend `RayTracing/*PtlasServices.cpp` | Allocation/upload functions own resource construction; `RayTracing/*PtlasOperationPacking.cpp` owns native record layouts, flags, operation headers and argument encoding |
+| Vulkan descriptor allocation and binding operations | `Descriptors/VulkanDescriptorAllocator` owns identity, immutable recording views and registry retirement; `VulkanDescriptorWrites` consumes borrowed entries and owns native write validation, chunk packing and `vkUpdateDescriptorSets` |
+| Vulkan acceleration-structure command entry points | Command lists retain input validation, rendering-state boundaries and resource tracking; `RayTracing/VulkanAccelerationStructureCommands` owns native BLAS/TLAS/PTLAS descriptions and their existing barrier sequence |
+| Backend memory snapshot requests | `D3D12MemoryUsage` and `VulkanMemoryUsage` own native accounting algorithms; allocators retain record authority and lock the borrowed live-record spans |
+| Vulkan shader-table creation and adapter selection | Shader tables name native handle retrieval, region packing and upload; adapter selection names enumeration, eligibility and capability publication, with native probing in focused functions |
+| D3D12 crash-diagnostic collection | Focused DRED interface collectors own native queries; breadcrumb and page-fault functions own message construction, including the older native interface's existing behavior |
+| `Shaders/GlobalShaderMapLoading.cpp` | Record decoding stays in `ReadRecords`; `GlobalShaderMapValidation.cpp` owns key, provenance, ray-contract and reflected-metadata validation; `ShaderMap.cpp` owns feature-bit operations and validated map queries; `CookedShaderLibrary.cpp` owns code-index loading and hash validation; `ShaderMapRanges.cpp` owns their shared range predicates, declared in its private header |
+
+Temporary native assemblies own pointer targets rather than copies of device or pipeline authority. They cannot move while native structures refer into them. Allocation and descriptor registries retain their shared allocation, recording-reference and retirement invariants; stateless native write encoding and memory accounting have focused implementors. File length alone does not justify another owner. Backend capability folders remain the durable boundaries, without a directory per helper or a generic manager layer.
+
+The second 2026-11-08 pass (`ITER-RHI-SRP-02`, working tree based on `0758e939292f669bc3d743cfffd4e08617dba64e`) reviewed the complete owned RHI source inventory and refined these additional routes. Vulkan adapter candidates are local to bootstrap implementation, clear their query-chain pointers before storage, and move selected queue topology into the device owner. No public operation, persistent service, backend policy or serialized layout is added by this responsibility pass. Native execution and release acceptance remain separate.
+
+The external precedents are NVIDIA [NVRHI's common/backend build separation](https://github.com/NVIDIA-RTX/NVRHI/blob/bf0bbd9b666a7297492beb1999a4ddc0dfded143/CMakeLists.txt) and Epic's [subsystems with managed lifetimes](https://dev.epicgames.com/documentation/unreal-engine/programming-subsystems-in-unreal-engine), inspected 2026-11-08. The local adoption is focused capabilities and explicit composition lifetimes. It does not import Unreal reflection/automatic instancing or NVRHI's resource-state policy. The falsifiers are native details returning to workflow bodies, duplicated mutable authority, or referenced native storage expiring before creation returns.
+
 ## Design Decisions And Tradeoffs
 
 | Decision | Benefit | Cost or drawback |

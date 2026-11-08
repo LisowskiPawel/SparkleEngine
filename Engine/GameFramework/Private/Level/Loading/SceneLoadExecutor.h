@@ -11,6 +11,7 @@
 
 class TaskExecutor;
 class TaskScope;
+class CompiledTaskGraph;
 
 namespace Assets
 {
@@ -21,6 +22,7 @@ namespace Assets
 		LevelLoadOperationStage Stage = LevelLoadOperationStage::Idle;
 		std::string Diagnostic;
 	};
+	struct SceneLoadWorkState;
 
 	class SceneLoadExecutor final
 	{
@@ -38,6 +40,7 @@ namespace Assets
 		std::uint64_t GetCatalogGeneration() const noexcept;
 
 	private:
+		void Launch(std::shared_ptr<SceneLoadWorkState> shared, const CompiledTaskGraph& graph);
 		struct ControlState;
 		std::unique_ptr<ControlState> m_control;
 	};

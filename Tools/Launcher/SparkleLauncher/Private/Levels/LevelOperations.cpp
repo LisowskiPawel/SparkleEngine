@@ -1,6 +1,9 @@
 #include "SparkleLauncher/LevelOperations.h"
 
 #include "Levels/LevelOperationProcessRequests.h"
+#include "Levels/LevelPreparation.h"
+#include "Cook/CookedContentReadiness.h"
+#include "ProjectLevelCatalog.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
@@ -48,76 +51,80 @@ namespace SparkleLauncher
 		return found == definitions.end() ? std::nullopt : std::optional<LevelOperationDefinition>(*found);
 	}
 
-	LevelOperationPlan PlanLevelOperation(std::string_view operationId, const LevelOperationRequest& request)
+	static void ResolveAvailableLevels(LevelOperationPlan& plan)
 	{
-		LevelOperationPlan plan;
-		const std::optional<LevelOperationDefinition> definition = FindLevelOperationDefinition(operationId);
-		if (!definition.has_value())
+		if (!plan.Request.bSelectAvailableLevels)
 		{
-			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown level operation");
-			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown level operation id.", "Choose a registered level Sync operation, then retry.");
-			AddReadiness(plan, plan.Operation.Failure->Summary);
-			return plan;
+			return;
 		}
-
-		plan.Request = request;
-		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
-		plan.Operation.Inputs.push_back({"content", request.ContentId});
-		if (!request.RequestedLevelIds.empty())
+		const ProjectLevelCatalog catalog = ProjectLevelCatalogFile::Load(ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId));
+		plan.Request.RequestedLevelIds.clear();
+		for (const ProjectLevelCatalogEntry& level : catalog.levels)
 		{
-			std::vector<std::string_view> levelIds;
-			levelIds.reserve(request.RequestedLevelIds.size());
-			for (const std::string& levelId : request.RequestedLevelIds)
+			const LevelPreparation preparation = InspectLevelPreparation(catalog, level, CookedContentReadiness{}, true);
+			if (level.id != "Empty" && preparation.bGameSupported && preparation.bCanPrepare)
 			{
-				levelIds.push_back(levelId);
+				plan.Request.RequestedLevelIds.push_back(level.id);
 			}
-			plan.Operation.Inputs.push_back({"levels", Strings::Join(levelIds, ", ")});
 		}
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
+		if (plan.Request.RequestedLevelIds.empty())
+		{
+			throw Diagnostics::Error("No levels have a supported synchronization path.");
+		}
+	}
 
-		std::error_code sourceError;
-		const bool bAssetSyncScriptMissing = !std::filesystem::is_regular_file(request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", sourceError) || sourceError;
-
-		if (bAssetSyncScriptMissing)
+	static bool InspectLevelSyncTools(LevelOperationPlan& plan)
+	{
+		std::error_code error;
+		const bool bScriptPresent = std::filesystem::is_regular_file(plan.Request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", error);
+		if (!bScriptPresent || error)
 		{
 			AddReadiness(plan, "Asset sync requires the source acquisition script. Open the matching source checkout to use this developer tool.");
-			return plan;
+			return false;
 		}
 		const ToolResolveResult cmake = ResolveKnownTool(KnownTool::CMake);
-		if (cmake.bFound)
-		{
-			plan.CMakePath = cmake.Path;
-			AddReadiness(plan, "CMake is available for level asset acquisition.");
-		}
-		else
+		if (!cmake.bFound)
 		{
 			AddReadiness(plan, cmake.FailureReason);
+			return false;
 		}
-		if (request.ContentId.empty())
+		if (plan.Request.ContentId.empty())
 		{
 			AddReadiness(plan, "Workspace content is unavailable for level synchronization.");
+			return false;
 		}
+		plan.CMakePath = cmake.Path;
+		AddReadiness(plan, "CMake is available for level asset acquisition.");
+		return true;
+	}
 
-		plan.PlannedEffects.push_back(
-		    request.RequestedLevelIds.empty() ? "Acquire asset packs referenced by selected maps into gitignored content roots; unselected packs remain untouched."
-		                                      : "Acquire asset packs referenced by the requested maps into gitignored content roots; map selection and Game support "
-		                                        "remain unchanged.");
-
-		if (cmake.bFound && !request.ContentId.empty())
+	static void RecordLevelSyncInputs(LevelOperationPlan& plan)
+	{
+		plan.Operation.Inputs.push_back({"content", plan.Request.ContentId});
+		std::string levels;
+		for (const std::string& levelId : plan.Request.RequestedLevelIds)
 		{
-			try
+			if (!levels.empty())
 			{
-				PopulateLevelOperationSteps(plan);
-				plan.bCanRun = true;
+				levels += ", ";
 			}
-			catch (const Diagnostics::Error& error)
-			{
-				AddReadiness(plan, error.what());
-			}
+			levels += levelId;
 		}
+		if (!levels.empty())
+		{
+			plan.Operation.Inputs.push_back({"levels", std::move(levels)});
+		}
+	}
+
+	static void DescribeLevelSync(LevelOperationPlan& plan)
+	{
+		plan.PlannedEffects.push_back(
+		    plan.Request.bSelectAvailableLevels          ? "Acquire all available supported levels and select them only after acquisition succeeds."
+		        : plan.Request.RequestedLevelIds.empty() ? "Acquire asset packs referenced by selected maps; unselected packs remain untouched."
+		                                                 : "Acquire asset packs referenced by the requested maps; map selection and Game support remain unchanged.");
 
 		std::ostringstream dryRun;
-		dryRun << "Dry-run plan for " << definition->DisplayName << ":";
+		dryRun << "Dry-run plan for " << plan.Operation.DisplayName << ":";
 		for (const LevelOperationStep& step : plan.Steps)
 		{
 			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
@@ -128,6 +135,38 @@ namespace SparkleLauncher
 			dryRun << (plan.bCanRun ? "\n  All requested level asset packs are already present." : "\n  No acquisition step available until readiness issues are resolved.");
 		}
 		plan.Operation.DryRunText = dryRun.str();
+	}
+
+	LevelOperationPlan PlanLevelOperation(std::string_view operationId, const LevelOperationRequest& request)
+	{
+		LevelOperationPlan plan;
+		const auto definition = FindLevelOperationDefinition(operationId);
+		if (!definition.has_value())
+		{
+			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown level operation");
+			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown level operation id.", "Choose a registered level Sync operation, then retry.");
+			AddReadiness(plan, plan.Operation.Failure->Summary);
+			return plan;
+		}
+		plan.Request = request;
+		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
+		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
+		if (!InspectLevelSyncTools(plan))
+		{
+			return plan;
+		}
+		try
+		{
+			ResolveAvailableLevels(plan);
+			RecordLevelSyncInputs(plan);
+			PopulateLevelOperationSteps(plan);
+			plan.bCanRun = true;
+		}
+		catch (const Diagnostics::Error& error)
+		{
+			AddReadiness(plan, error.what());
+		}
+		DescribeLevelSync(plan);
 		return plan;
 	}
 }

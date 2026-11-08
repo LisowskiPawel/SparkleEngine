@@ -5,9 +5,8 @@ namespace ECS
 	struct LocalTransform;
 	struct WorldTransform;
 
-	class TransformEvaluationSystem final
+	namespace TransformEvaluationSystem
 	{
-	public:
-		static void Evaluate(const LocalTransform& local, WorldTransform& world) noexcept;
-	};
+		void Evaluate(const LocalTransform& local, WorldTransform& world) noexcept;
+	}
 }

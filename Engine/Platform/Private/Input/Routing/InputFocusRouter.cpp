@@ -5,13 +5,14 @@
 void InputFocusRouter::BeginFrame(bool bInteractionDisabled, bool bTextInputActive)
 {
 	m_targetRegions.clear();
-	m_bHasRoutingFrame = true;
 	m_bInteractionDisabled = bInteractionDisabled;
 	m_bTextInputActive = bTextInputActive;
-	if (m_bInteractionDisabled)
+	const bool bUiFocusRequested = m_bInteractionDisabled || m_bTextInputActive;
+	if (!m_bHasRoutingFrame || bUiFocusRequested)
 	{
 		m_activeTargetLayer = InputLayer::UI;
 	}
+	m_bHasRoutingFrame = true;
 }
 
 void InputFocusRouter::RegisterTargetRegion(float left, float top, float right, float bottom, InputLayer targetLayer)
@@ -28,11 +29,11 @@ void InputFocusRouter::RegisterTargetRegion(float left, float top, float right, 
 	}
 }
 
-InputLayer InputFocusRouter::ResolveTargetLayer(const InputBackendResult& result, InputLayer fallbackLayer) noexcept
+InputLayer InputFocusRouter::ResolveTargetLayer(const InputBackendResult& result) const noexcept
 {
 	if (!m_bHasRoutingFrame)
 	{
-		return fallbackLayer;
+		return m_activeTargetLayer;
 	}
 
 	if (m_bInteractionDisabled)
@@ -45,12 +46,7 @@ InputLayer InputFocusRouter::ResolveTargetLayer(const InputBackendResult& result
 		case InputEventType::MouseButton:
 			if (result.MouseButton.bPressed)
 			{
-				m_activeTargetLayer = ResolvePointTarget(result.MouseButton.Position);
-				if (m_activeTargetLayer == InputLayer::Gameplay)
-				{
-					m_bTextInputActive = false;
-				}
-				return m_activeTargetLayer;
+				return ResolvePointTarget(result.MouseButton.Position);
 			}
 			break;
 		case InputEventType::MouseMove:
@@ -67,27 +63,33 @@ InputLayer InputFocusRouter::ResolveTargetLayer(const InputBackendResult& result
 			break;
 	}
 
-	return GetActiveTargetLayer() != InputLayer::System ? GetActiveTargetLayer() : fallbackLayer;
+	return GetActiveTargetLayer();
 }
 
 InputLayer InputFocusRouter::GetActiveTargetLayer() const noexcept
 {
-	if (!m_bHasRoutingFrame)
-	{
-		return InputLayer::System;
-	}
-
-	if (m_bInteractionDisabled)
-	{
-		return InputLayer::UI;
-	}
-
 	return m_activeTargetLayer;
+}
+
+void InputFocusRouter::SetActiveTargetLayer(InputLayer layer) noexcept
+{
+	m_activeTargetLayer = layer;
+	if (layer == InputLayer::Gameplay)
+	{
+		m_bTextInputActive = false;
+	}
+}
+
+void InputFocusRouter::ResetFocus() noexcept
+{
+	m_activeTargetLayer = m_bHasRoutingFrame ? InputLayer::UI : InputLayer::Gameplay;
+	m_bTextInputActive = false;
 }
 
 bool InputFocusRouter::TargetRegion::IsValid() const noexcept
 {
-	return TargetLayer != InputLayer::System && Right > Left && Bottom > Top;
+	const bool bRoutedLayer = TargetLayer == InputLayer::Gameplay || TargetLayer == InputLayer::UI;
+	return bRoutedLayer && Right > Left && Bottom > Top;
 }
 
 bool InputFocusRouter::TargetRegion::Contains(MousePosition position) const noexcept

@@ -13,8 +13,6 @@ public:
 
 	void SetOpen(bool bOpen) noexcept { m_bIsOpen = bOpen; }
 
-	bool IsOpen() const noexcept { return m_bIsOpen; }
-
 	void SetDiagnosticsProvider(DiagnosticsProvider provider);
 	void BuildUI(bool bDisableInteraction);
 

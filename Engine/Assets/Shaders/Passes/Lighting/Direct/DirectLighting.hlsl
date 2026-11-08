@@ -1,4 +1,4 @@
-#include "/Engine/Lighting/DirectLightReservoir.hlsli"
+#include "/Engine/Passes/Lighting/Direct/DirectLightReservoir.hlsli"
 #include "/Engine/RayTracing/Shadows/RayTracedShadowSignalPacking.hlsli"
 
 RWTexture2D<float4> DirectDiffuse;

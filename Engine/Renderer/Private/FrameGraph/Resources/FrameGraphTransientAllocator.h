@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FrameGraph/Compiler/FrameGraphPlan.h"
+#include "FrameGraph/FrameGraphResourceResolver.h"
 #include "RHI/Public/Resources/RhiResourceHandles.h"
 #include "RHI/Public/Resources/RhiResourceView.h"
 
@@ -13,18 +14,6 @@ class RenderHardwareInterface;
 class FrameGraphTransientAllocator final
 {
 public:
-	struct AllocationRecord
-	{
-		FrameGraphResourceHandle handle = FrameGraphResourceHandle::Invalid();
-		FrameGraphResourceKind kind = FrameGraphResourceKind::ColorRenderTarget;
-		RhiResourceViewHandle renderTargetView = {};
-		RhiResourceViewHandle depthStencilView = {};
-		RhiResourceViewHandle shaderResourceView = {};
-		RhiResourceViewHandle unorderedAccessView = {};
-		RhiOwnedResourceHandle ownedResource = {};
-		RhiResourceHandle resource = {};
-	};
-
 	explicit FrameGraphTransientAllocator(RenderHardwareInterface& renderHardwareInterface) noexcept;
 	~FrameGraphTransientAllocator() = default;
 
@@ -36,10 +25,18 @@ public:
 	void Reset() noexcept;
 	// Returns true when replacing backing allocations; their native states restart.
 	bool Prepare(const FrameGraphTransientPlan& plan) noexcept;
-	AllocationRecord& Materialize(const FrameGraphTransientResourcePlan& transientPlan);
-	const AllocationRecord* FindAllocation(FrameGraphResourceHandle handle) const noexcept;
+	const FrameGraphResourceAccess& Materialize(const FrameGraphTransientResourcePlan& transientPlan);
 
 private:
+	struct AllocationRecord
+	{
+		FrameGraphResourceHandle handle = FrameGraphResourceHandle::Invalid();
+		FrameGraphResourceAccess Access;
+		RhiOwnedResourceHandle ownedResource = {};
+	};
+
+	const AllocationRecord* FindAllocation(FrameGraphResourceHandle handle) const noexcept;
+
 	struct PlanEntry
 	{
 		FrameGraphResourceHandle handle = FrameGraphResourceHandle::Invalid();

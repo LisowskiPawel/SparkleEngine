@@ -3,7 +3,7 @@
 #include "WorldEditCommandQueue.h"
 
 #include "World/GameWorldState.h"
-#include "World/Resources/GameWorldResourceStores.h"
+#include "World/Resources/MaterialVariantResourceStore.h"
 
 #include <type_traits>
 #include <utility>
@@ -13,7 +13,7 @@ WorldEditResult WorldEditCommandQueue::Submit(
     std::uint64_t expectedGeneration,
     std::uint64_t currentGeneration,
     const ECS::GameWorldState& state,
-    const GameWorldResourceStores& resources)
+    const MaterialVariantResourceStore& variants)
 {
 	WorldEditResult result{.RequestId = command.RequestId};
 	if (expectedGeneration != currentGeneration)
@@ -28,7 +28,7 @@ WorldEditResult WorldEditCommandQueue::Submit(
 		result.Message = "The bounded world-edit queue is full.";
 		return result;
 	}
-	if (!IsTargetAvailable(command.Payload, state, resources))
+	if (!IsTargetAvailable(command.Payload, state, variants))
 	{
 		result.Status = WorldEditResultStatus::Rejected;
 		result.Message = "The semantic edit target or value is unavailable.";
@@ -40,13 +40,13 @@ WorldEditResult WorldEditCommandQueue::Submit(
 	return result;
 }
 
-void WorldEditCommandQueue::Apply(std::uint64_t currentGeneration, ECS::GameWorldState& state, GameWorldResourceStores& resources)
+void WorldEditCommandQueue::Apply(std::uint64_t currentGeneration, ECS::GameWorldState& state, MaterialVariantResourceStore& variants)
 {
 	for (PendingEdit& pending : m_pendingEdits)
 	{
 		if (pending.ExpectedGeneration == currentGeneration)
 		{
-			ApplyPayload(pending.Command.Payload, state, resources);
+			ApplyPayload(pending.Command.Payload, state, variants);
 		}
 	}
 	Clear();
@@ -57,10 +57,10 @@ void WorldEditCommandQueue::Clear() noexcept
 	m_pendingEdits.clear();
 }
 
-bool WorldEditCommandQueue::IsTargetAvailable(const WorldEditPayload& payload, const ECS::GameWorldState& state, const GameWorldResourceStores& resources)
+bool WorldEditCommandQueue::IsTargetAvailable(const WorldEditPayload& payload, const ECS::GameWorldState& state, const MaterialVariantResourceStore& variants)
 {
 	return std::visit(
-	    [&state, &resources](const auto& command)
+	    [&state, &variants](const auto& command)
 	    {
 		    using T = std::decay_t<decltype(command)>;
 		    if constexpr (std::is_same_v<T, SetActiveCameraCommand> || std::is_same_v<T, SetCameraDescriptionCommand>)
@@ -77,7 +77,7 @@ bool WorldEditCommandQueue::IsTargetAvailable(const WorldEditPayload& payload, c
 		    }
 		    else if constexpr (std::is_same_v<T, SetMaterialVariantCommand>)
 		    {
-			    return command.Value < resources.MaterialVariants.GetCount();
+			    return command.Value < variants.GetCount();
 		    }
 		    else
 		    {
@@ -87,10 +87,10 @@ bool WorldEditCommandQueue::IsTargetAvailable(const WorldEditPayload& payload, c
 	    payload);
 }
 
-void WorldEditCommandQueue::ApplyPayload(WorldEditPayload& payload, ECS::GameWorldState& state, GameWorldResourceStores& resources)
+void WorldEditCommandQueue::ApplyPayload(WorldEditPayload& payload, ECS::GameWorldState& state, MaterialVariantResourceStore& variants)
 {
 	std::visit(
-	    [&state, &resources](auto& command)
+	    [&state, &variants](auto& command)
 	    {
 		    using T = std::decay_t<decltype(command)>;
 		    if constexpr (std::is_same_v<T, SetActiveCameraCommand>)
@@ -126,7 +126,7 @@ void WorldEditCommandQueue::ApplyPayload(WorldEditPayload& payload, ECS::GameWor
 		    }
 		    else if constexpr (std::is_same_v<T, SetMaterialVariantCommand>)
 		    {
-			    (void) resources.MaterialVariants.Apply(command.Value, state);
+			    (void) variants.Apply(command.Value, [&state](EntityId entity, MaterialHandle material) { return state.WriteMeshMaterial(entity, material); });
 		    }
 	    },
 	    payload);

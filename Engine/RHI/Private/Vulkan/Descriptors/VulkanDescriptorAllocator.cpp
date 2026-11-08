@@ -17,7 +17,7 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanDescriptorAllocatorLogger, "RHI.Vulka
 
 VulkanDescriptorAllocator::VulkanDescriptorAllocator(VulkanRhi& rhi) noexcept :
     m_rhi(rhi),
-    m_registeredDescriptors(std::make_shared<std::vector<DescriptorEntry>>())
+    m_registeredDescriptors(std::make_shared<std::vector<VulkanDescriptorEntry>>())
 {
 	PublishRecordingReadView();
 }
@@ -91,7 +91,7 @@ RhiDescriptorTableHandle VulkanDescriptorAllocator::AllocateDescriptorTable(ERhi
 
 	DescriptorTableRecord record{};
 	record.Type = descriptorType;
-	record.Entries = std::make_shared<std::vector<DescriptorEntry>>(descriptorCount, DescriptorEntry{});
+	record.Entries = std::make_shared<std::vector<VulkanDescriptorEntry>>(descriptorCount, VulkanDescriptorEntry{});
 	record.bAllocated = true;
 
 	if (!m_freeTableIndices.empty())
@@ -146,12 +146,12 @@ RhiGpuDescriptorHandle VulkanDescriptorAllocator::RegisterImageDescriptor(ERhiRe
 		return {};
 	}
 
-	DescriptorEntry entry{};
+	VulkanDescriptorEntry entry{};
 	entry.Kind = ToImageEntryKind(viewKind);
-	entry.Image = VkDescriptorImageInfo{.sampler = VK_NULL_HANDLE, .imageView = imageView, .imageLayout = ToImageLayout(entry.Kind)};
+	entry.Image = VkDescriptorImageInfo{.sampler = VK_NULL_HANDLE, .imageView = imageView, .imageLayout = VulkanDescriptorWrites::ToImageLayout(entry.Kind)};
 
 	std::scoped_lock lock(m_registryMutex);
-	std::vector<DescriptorEntry>& descriptors = EditRegisteredDescriptors();
+	std::vector<VulkanDescriptorEntry>& descriptors = EditRegisteredDescriptors();
 	if (!m_freeRegisteredDescriptorIndices.empty())
 	{
 		const std::uint32_t index = m_freeRegisteredDescriptorIndices.back();
@@ -171,12 +171,12 @@ RhiGpuDescriptorHandle VulkanDescriptorAllocator::RegisterBufferDescriptor(ERhiR
 		return {};
 	}
 
-	DescriptorEntry entry{};
+	VulkanDescriptorEntry entry{};
 	entry.Kind = ToBufferEntryKind(viewKind);
 	entry.Buffer = VkDescriptorBufferInfo{.buffer = buffer, .offset = offsetInBytes, .range = sizeInBytes};
 
 	std::scoped_lock lock(m_registryMutex);
-	std::vector<DescriptorEntry>& descriptors = EditRegisteredDescriptors();
+	std::vector<VulkanDescriptorEntry>& descriptors = EditRegisteredDescriptors();
 	if (!m_freeRegisteredDescriptorIndices.empty())
 	{
 		const std::uint32_t index = m_freeRegisteredDescriptorIndices.back();
@@ -198,16 +198,16 @@ void VulkanDescriptorAllocator::ReleaseRegisteredDescriptor(RhiGpuDescriptorHand
 	}
 
 	std::scoped_lock lock(m_registryMutex);
-	std::vector<DescriptorEntry>& descriptors = EditRegisteredDescriptors();
+	std::vector<VulkanDescriptorEntry>& descriptors = EditRegisteredDescriptors();
 	if (index >= descriptors.size())
 	{
 		return;
 	}
-	if (descriptors[index].Kind == EntryKind::Empty)
+	if (descriptors[index].Kind == VulkanDescriptorEntryKind::Empty)
 	{
 		return;
 	}
-	descriptors[index] = DescriptorEntry{};
+	descriptors[index] = VulkanDescriptorEntry{};
 	m_freeRegisteredDescriptorIndices.push_back(index);
 }
 
@@ -229,9 +229,9 @@ void VulkanDescriptorAllocator::WriteSamplerDescriptor(RhiCpuDescriptorHandle de
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan sampler write references an unavailable descriptor table entry.");
 	}
-	std::vector<DescriptorEntry>& entries = EditTableEntries(*record);
-	DescriptorEntry& entry = entries[descriptorIndex];
-	entry.Kind = EntryKind::Sampler;
+	std::vector<VulkanDescriptorEntry>& entries = EditTableEntries(*record);
+	VulkanDescriptorEntry& entry = entries[descriptorIndex];
+	entry.Kind = VulkanDescriptorEntryKind::Sampler;
 	entry.Image = VkDescriptorImageInfo{.sampler = sampler, .imageView = VK_NULL_HANDLE, .imageLayout = VK_IMAGE_LAYOUT_UNDEFINED};
 }
 
@@ -246,10 +246,10 @@ bool VulkanDescriptorAllocator::WriteRegisteredDescriptor(RhiCpuDescriptorHandle
 
 	std::scoped_lock lock(m_registryMutex);
 	DescriptorTableRecord* const table = FindTableRecord(tableHandle);
-	const DescriptorEntry* const sourceEntry = FindRegisteredEntry(source);
+	const VulkanDescriptorEntry* const sourceEntry = FindRegisteredEntry(source);
 	const bool bInvalidDescriptorCopyEntries = table == nullptr || table->Entries == nullptr;
 	const bool bInvalidDescriptorCopySourceEntry = bInvalidDescriptorCopyEntries || (sourceEntry == nullptr);
-	const bool bInvalidDescriptorCopyKind = bInvalidDescriptorCopySourceEntry || (sourceEntry->Kind == EntryKind::Empty);
+	const bool bInvalidDescriptorCopyKind = bInvalidDescriptorCopySourceEntry || (sourceEntry->Kind == VulkanDescriptorEntryKind::Empty);
 	const bool bInvalidDescriptorCopy = bInvalidDescriptorCopyKind || (descriptorIndex >= table->Entries->size());
 
 	if (bInvalidDescriptorCopy)
@@ -305,7 +305,7 @@ void VulkanDescriptorAllocator::WriteDescriptorTable(VkDescriptorSet descriptorS
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor table does not contain the binding's complete descriptor range.");
 	}
 	const std::size_t descriptorCount = std::min<std::size_t>(availableDescriptorCount, binding.DescriptorCount);
-	WriteEntries(descriptorSet, binding, std::span<const DescriptorEntry>(table.Entries->data() + tableBinding.DescriptorIndex, descriptorCount));
+	VulkanDescriptorWrites::Write(m_rhi.GetDevice(), descriptorSet, binding, std::span<const VulkanDescriptorEntry>(table.Entries->data() + tableBinding.DescriptorIndex, descriptorCount));
 }
 
 void VulkanDescriptorAllocator::WriteDescriptorHandle(VkDescriptorSet descriptorSet, const CompiledBinding& binding, RhiGpuDescriptorHandle handle) noexcept
@@ -326,13 +326,13 @@ void VulkanDescriptorAllocator::WriteDescriptorHandle(VkDescriptorSet descriptor
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor-handle binding cannot resolve its recording snapshot.");
 	}
 
-	const DescriptorEntry& entry = (*readView->RegisteredDescriptors)[descriptorIndex];
-	if (entry.Kind == EntryKind::Empty)
+	const VulkanDescriptorEntry& entry = (*readView->RegisteredDescriptors)[descriptorIndex];
+	if (entry.Kind == VulkanDescriptorEntryKind::Empty)
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor handle references a released entry.");
 	}
 
-	WriteEntries(descriptorSet, binding, std::span<const DescriptorEntry>(&entry, 1));
+	VulkanDescriptorWrites::Write(m_rhi.GetDevice(), descriptorSet, binding, std::span<const VulkanDescriptorEntry>(&entry, 1));
 }
 
 void VulkanDescriptorAllocator::WriteBufferDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkBuffer buffer, VkDeviceSize offset, VkDeviceSize range) noexcept
@@ -342,10 +342,10 @@ void VulkanDescriptorAllocator::WriteBufferDescriptor(VkDescriptorSet descriptor
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan buffer binding requires a descriptor set, resolved buffer, and non-zero range.");
 	}
 
-	DescriptorEntry entry{};
-	entry.Kind = binding.Type == CompiledBindingType::ConstantBuffer ? EntryKind::UniformBuffer : EntryKind::StorageBuffer;
+	VulkanDescriptorEntry entry{};
+	entry.Kind = binding.Type == CompiledBindingType::ConstantBuffer ? VulkanDescriptorEntryKind::UniformBuffer : VulkanDescriptorEntryKind::StorageBuffer;
 	entry.Buffer = VkDescriptorBufferInfo{.buffer = buffer, .offset = offset, .range = range};
-	WriteEntries(descriptorSet, binding, std::span<const DescriptorEntry>(&entry, 1));
+	VulkanDescriptorWrites::Write(m_rhi.GetDevice(), descriptorSet, binding, std::span<const VulkanDescriptorEntry>(&entry, 1));
 }
 
 void VulkanDescriptorAllocator::WriteAccelerationStructureDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkAccelerationStructureKHR accelerationStructure) noexcept
@@ -355,10 +355,10 @@ void VulkanDescriptorAllocator::WriteAccelerationStructureDescriptor(VkDescripto
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan acceleration-structure binding requires a descriptor set and resolved acceleration structure.");
 	}
 
-	DescriptorEntry entry{};
-	entry.Kind = EntryKind::AccelerationStructure;
+	VulkanDescriptorEntry entry{};
+	entry.Kind = VulkanDescriptorEntryKind::AccelerationStructure;
 	entry.AccelerationStructure = accelerationStructure;
-	WriteEntries(descriptorSet, binding, std::span<const DescriptorEntry>(&entry, 1));
+	VulkanDescriptorWrites::Write(m_rhi.GetDevice(), descriptorSet, binding, std::span<const VulkanDescriptorEntry>(&entry, 1));
 }
 
 void VulkanDescriptorAllocator::WritePtlasDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkDeviceAddress accelerationStructureAddress) noexcept
@@ -368,65 +368,36 @@ void VulkanDescriptorAllocator::WritePtlasDescriptor(VkDescriptorSet descriptorS
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan PTLAS binding requires a descriptor set and GPU address.");
 	}
 
-	DescriptorEntry entry{};
-	entry.Kind = EntryKind::Ptlas;
+	VulkanDescriptorEntry entry{};
+	entry.Kind = VulkanDescriptorEntryKind::Ptlas;
 	entry.PtlasAddress = accelerationStructureAddress;
-	WriteEntries(descriptorSet, binding, std::span<const DescriptorEntry>(&entry, 1));
+	VulkanDescriptorWrites::Write(m_rhi.GetDevice(), descriptorSet, binding, std::span<const VulkanDescriptorEntry>(&entry, 1));
 }
 
-VkDescriptorType VulkanDescriptorAllocator::ToDescriptorType(EntryKind kind) noexcept
-{
-	switch (kind)
-	{
-		case EntryKind::SampledImage:
-			return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-		case EntryKind::StorageImage:
-			return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-		case EntryKind::UniformBuffer:
-			return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		case EntryKind::StorageBuffer:
-			return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		case EntryKind::Sampler:
-			return VK_DESCRIPTOR_TYPE_SAMPLER;
-		case EntryKind::AccelerationStructure:
-			return VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-		case EntryKind::Ptlas:
-			return VK_DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV;
-		case EntryKind::Empty:
-		default:
-			return VK_DESCRIPTOR_TYPE_MAX_ENUM;
-	}
-}
-
-VulkanDescriptorAllocator::EntryKind VulkanDescriptorAllocator::ToImageEntryKind(ERhiResourceViewKind viewKind) noexcept
+VulkanDescriptorEntryKind VulkanDescriptorAllocator::ToImageEntryKind(ERhiResourceViewKind viewKind) noexcept
 {
 	switch (viewKind)
 	{
 		case ERhiResourceViewKind::TextureUnorderedAccess:
-			return EntryKind::StorageImage;
+			return VulkanDescriptorEntryKind::StorageImage;
 		case ERhiResourceViewKind::TextureShaderResource:
-			return EntryKind::SampledImage;
+			return VulkanDescriptorEntryKind::SampledImage;
 		default:
 			Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Unsupported Vulkan image descriptor kind.");
 	}
 }
 
-VulkanDescriptorAllocator::EntryKind VulkanDescriptorAllocator::ToBufferEntryKind(ERhiResourceViewKind viewKind) noexcept
+VulkanDescriptorEntryKind VulkanDescriptorAllocator::ToBufferEntryKind(ERhiResourceViewKind viewKind) noexcept
 {
 	switch (viewKind)
 	{
 		case ERhiResourceViewKind::BufferUnorderedAccess:
-			return EntryKind::StorageBuffer;
+			return VulkanDescriptorEntryKind::StorageBuffer;
 		case ERhiResourceViewKind::BufferShaderResource:
-			return EntryKind::StorageBuffer;
+			return VulkanDescriptorEntryKind::StorageBuffer;
 		default:
 			Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Unsupported Vulkan buffer descriptor kind.");
 	}
-}
-
-VkImageLayout VulkanDescriptorAllocator::ToImageLayout(EntryKind kind) noexcept
-{
-	return kind == EntryKind::StorageImage ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 }
 
 VulkanDescriptorAllocator::DescriptorTableRecord* VulkanDescriptorAllocator::FindTableRecord(RhiDescriptorTableHandle tableHandle) noexcept
@@ -447,29 +418,29 @@ const VulkanDescriptorAllocator::DescriptorTableRecord* VulkanDescriptorAllocato
 	return record.bAllocated && record.Generation == generation ? &record : nullptr;
 }
 
-std::vector<VulkanDescriptorAllocator::DescriptorEntry>& VulkanDescriptorAllocator::EditTableEntries(DescriptorTableRecord& record)
+std::vector<VulkanDescriptorEntry>& VulkanDescriptorAllocator::EditTableEntries(DescriptorTableRecord& record)
 {
 	if (record.Entries == nullptr)
 	{
-		record.Entries = std::make_shared<std::vector<DescriptorEntry>>();
+		record.Entries = std::make_shared<std::vector<VulkanDescriptorEntry>>();
 	}
 	else if (record.Entries.use_count() != 1)
 	{
-		record.Entries = std::make_shared<std::vector<DescriptorEntry>>(*record.Entries);
+		record.Entries = std::make_shared<std::vector<VulkanDescriptorEntry>>(*record.Entries);
 	}
 
 	return *record.Entries;
 }
 
-std::vector<VulkanDescriptorAllocator::DescriptorEntry>& VulkanDescriptorAllocator::EditRegisteredDescriptors()
+std::vector<VulkanDescriptorEntry>& VulkanDescriptorAllocator::EditRegisteredDescriptors()
 {
 	if (m_registeredDescriptors == nullptr)
 	{
-		m_registeredDescriptors = std::make_shared<std::vector<DescriptorEntry>>();
+		m_registeredDescriptors = std::make_shared<std::vector<VulkanDescriptorEntry>>();
 	}
 	else if (m_registeredDescriptors.use_count() != 1)
 	{
-		m_registeredDescriptors = std::make_shared<std::vector<DescriptorEntry>>(*m_registeredDescriptors);
+		m_registeredDescriptors = std::make_shared<std::vector<VulkanDescriptorEntry>>(*m_registeredDescriptors);
 	}
 
 	return *m_registeredDescriptors;
@@ -492,12 +463,12 @@ void VulkanDescriptorAllocator::RecycleTableRecord(std::uint32_t tableIndex) noe
 	m_freeTableIndices.push_back(tableIndex);
 }
 
-VulkanDescriptorAllocator::DescriptorEntry* VulkanDescriptorAllocator::FindRegisteredEntry(RhiGpuDescriptorHandle handle) noexcept
+VulkanDescriptorEntry* VulkanDescriptorAllocator::FindRegisteredEntry(RhiGpuDescriptorHandle handle) noexcept
 {
-	return const_cast<DescriptorEntry*>(std::as_const(*this).FindRegisteredEntry(handle));
+	return const_cast<VulkanDescriptorEntry*>(std::as_const(*this).FindRegisteredEntry(handle));
 }
 
-const VulkanDescriptorAllocator::DescriptorEntry* VulkanDescriptorAllocator::FindRegisteredEntry(RhiGpuDescriptorHandle handle) const noexcept
+const VulkanDescriptorEntry* VulkanDescriptorAllocator::FindRegisteredEntry(RhiGpuDescriptorHandle handle) const noexcept
 {
 	if (m_registeredDescriptors == nullptr)
 	{
@@ -515,156 +486,4 @@ const VulkanDescriptorAllocator::DescriptorEntry* VulkanDescriptorAllocator::Fin
 std::shared_ptr<const VulkanDescriptorAllocator::RecordingReadView> VulkanDescriptorAllocator::GetRecordingReadView() const noexcept
 {
 	return m_recordingReadView.load(std::memory_order_acquire);
-}
-
-bool VulkanDescriptorAllocator::EntryKindMatchesBinding(const CompiledBinding& binding, EntryKind entryKind) noexcept
-{
-	switch (binding.SemanticKind)
-	{
-		case ShaderParameterSemanticKind::ReadTexture:
-			return entryKind == EntryKind::SampledImage;
-		case ShaderParameterSemanticKind::ReadBuffer:
-		case ShaderParameterSemanticKind::RWBuffer:
-			return entryKind == EntryKind::StorageBuffer;
-		case ShaderParameterSemanticKind::RWTexture:
-			return entryKind == EntryKind::StorageImage;
-		case ShaderParameterSemanticKind::UniformData:
-			return entryKind == EntryKind::UniformBuffer;
-		case ShaderParameterSemanticKind::SamplerSet:
-			return entryKind == EntryKind::Sampler;
-		case ShaderParameterSemanticKind::AccelerationStructure:
-			return entryKind == EntryKind::AccelerationStructure || entryKind == EntryKind::Ptlas;
-		default:
-			return false;
-	}
-}
-
-bool VulkanDescriptorAllocator::BuildWriteChunk(std::span<const DescriptorEntry> entries, EntryKind entryKind, DescriptorWriteChunk& outChunk) noexcept
-{
-	if (entries.empty() || entries.size() > DescriptorWriteChunkCapacity)
-	{
-		return false;
-	}
-
-	outChunk.Count = static_cast<std::uint32_t>(entries.size());
-	for (std::size_t index = 0; index < entries.size(); ++index)
-	{
-		const DescriptorEntry& entry = entries[index];
-		if (entry.Kind != entryKind)
-		{
-			return false;
-		}
-
-		switch (entryKind)
-		{
-			case EntryKind::SampledImage:
-			case EntryKind::StorageImage:
-			case EntryKind::Sampler:
-				outChunk.ImageInfos[index] = entry.Image;
-				break;
-
-			case EntryKind::AccelerationStructure:
-				outChunk.AccelerationStructures[index] = entry.AccelerationStructure;
-				break;
-
-			case EntryKind::Ptlas:
-				outChunk.PtlasAddresses[index] = entry.PtlasAddress;
-				break;
-
-			case EntryKind::UniformBuffer:
-			case EntryKind::StorageBuffer:
-				outChunk.BufferInfos[index] = entry.Buffer;
-				break;
-			case EntryKind::Empty:
-			default:
-				return false;
-		}
-	}
-
-	return true;
-}
-
-void VulkanDescriptorAllocator::CommitWriteChunk(
-    VkDescriptorSet descriptorSet,
-    const CompiledBinding& binding,
-    EntryKind entryKind,
-    VkDescriptorType descriptorType,
-    std::uint32_t firstDescriptor,
-    const DescriptorWriteChunk& chunk) noexcept
-{
-	const VkWriteDescriptorSetAccelerationStructureKHR accelerationStructureWrite{
-	    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR,
-	    .pNext = nullptr,
-	    .accelerationStructureCount = chunk.Count,
-	    .pAccelerationStructures = chunk.AccelerationStructures.data()};
-
-	const VkWriteDescriptorSetPartitionedAccelerationStructureNV ptlasWrite{
-	    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_PARTITIONED_ACCELERATION_STRUCTURE_NV,
-	    .pNext = nullptr,
-	    .accelerationStructureCount = chunk.Count,
-	    .pAccelerationStructures = chunk.PtlasAddresses.data()};
-
-	const bool bWritesImagesEntryKind = entryKind == EntryKind::SampledImage || entryKind == EntryKind::StorageImage;
-	const bool bWritesImages = bWritesImagesEntryKind || (entryKind == EntryKind::Sampler);
-	const bool bWritesBuffers = entryKind == EntryKind::UniformBuffer || entryKind == EntryKind::StorageBuffer;
-
-	const VkWriteDescriptorSet write{
-	    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-	    .pNext = entryKind == EntryKind::AccelerationStructure ? static_cast<const void*>(&accelerationStructureWrite)
-	                                                           : (entryKind == EntryKind::Ptlas ? static_cast<const void*>(&ptlasWrite) : nullptr),
-	    .dstSet = descriptorSet,
-	    .dstBinding = binding.BindingPoint.Binding,
-	    .dstArrayElement = firstDescriptor,
-	    .descriptorCount = chunk.Count,
-	    .descriptorType = descriptorType,
-	    .pImageInfo = bWritesImages ? chunk.ImageInfos.data() : nullptr,
-	    .pBufferInfo = bWritesBuffers ? chunk.BufferInfos.data() : nullptr,
-	    .pTexelBufferView = nullptr};
-
-	vkUpdateDescriptorSets(m_rhi.GetDevice(), 1, &write, 0, nullptr);
-}
-
-void VulkanDescriptorAllocator::WriteEntries(VkDescriptorSet descriptorSet, const CompiledBinding& binding, std::span<const DescriptorEntry> entries) noexcept
-{
-	if (descriptorSet == VK_NULL_HANDLE || entries.empty())
-	{
-		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor write requires a descriptor set and at least one descriptor.");
-	}
-	const bool bDescriptorCountDescriptorCount = entries.size() > binding.DescriptorCount;
-	const bool bInvalidDescriptorCountBindless = !bDescriptorCountDescriptorCount && (!binding.Bindless.bBindlessEligible);
-	const bool bFixedCountMismatch = bInvalidDescriptorCountBindless && (entries.size() != binding.DescriptorCount);
-	const bool bInvalidDescriptorCount = bDescriptorCountDescriptorCount || bFixedCountMismatch;
-
-	if (bInvalidDescriptorCount)
-	{
-		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor write cardinality does not match the compiled shader binding.");
-	}
-
-	const EntryKind entryKind = entries.front().Kind;
-	const VkDescriptorType descriptorType = ToDescriptorType(entryKind);
-	if (descriptorType == VK_DESCRIPTOR_TYPE_MAX_ENUM)
-	{
-		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor write contains an empty entry.");
-	}
-
-	if (!EntryKindMatchesBinding(binding, entryKind))
-	{
-		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor entry kind does not match the compiled shader binding.");
-	}
-
-	std::size_t firstDescriptor = 0;
-	while (firstDescriptor < entries.size())
-	{
-		const std::size_t descriptorCount = std::min(DescriptorWriteChunkCapacity, entries.size() - firstDescriptor);
-		const std::span<const DescriptorEntry> entryChunk = entries.subspan(firstDescriptor, descriptorCount);
-
-		DescriptorWriteChunk chunk{};
-		if (!BuildWriteChunk(entryChunk, entryKind, chunk))
-		{
-			Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor array contains inconsistent or unsupported entries.");
-		}
-
-		CommitWriteChunk(descriptorSet, binding, entryKind, descriptorType, static_cast<std::uint32_t>(firstDescriptor), chunk);
-		firstDescriptor += chunk.Count;
-	}
 }

@@ -16,9 +16,8 @@ struct EditorCommandPair final
 
 // Pure translation from an immutable editor model and user intent to semantic world commands.
 // Panels own widget behavior only and never reconstruct domain mutation rules.
-class SceneObjectCommandFactory final
+namespace SceneObjectCommandFactory
 {
-public:
-	static std::optional<EditorCommandPair> SetVisibility(const EditorSceneModel& model, const SceneObjectSelection& selection, bool bVisible);
-	static std::optional<EditorCommandPair> SetActiveCamera(const EditorSceneModel& model, EntityId camera);
-};
+	std::optional<EditorCommandPair> SetVisibility(const EditorSceneModel& model, const SceneObjectSelection& selection, bool bVisible);
+	std::optional<EditorCommandPair> SetActiveCamera(const EditorSceneModel& model, EntityId camera);
+}

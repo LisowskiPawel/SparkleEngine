@@ -46,6 +46,57 @@ std::vector<std::byte> VulkanRayTracingShaderTable::CollectShaderIdentifiers(
 	return identifiers;
 }
 
+static std::vector<std::byte> QueryShaderGroupHandles(VulkanRhi& rhi, const VulkanRayTracingPipeline& pipeline, const RhiRayTracingCapabilities& capabilities)
+{
+	const std::uint64_t handleBytes = static_cast<std::uint64_t>(pipeline.GetShaderGroupCount()) * capabilities.ShaderGroupHandleSizeInBytes;
+	if (handleBytes == 0 || handleBytes > std::numeric_limits<std::size_t>::max())
+	{
+		throw Diagnostics::Error("Vulkan shader-group handle size is invalid.");
+	}
+	std::vector<std::byte> groupHandles(static_cast<std::size_t>(handleBytes));
+	const VkResult handleResult = rhi.GetRayTracingShaderGroupHandles()(rhi.GetDevice(), pipeline.GetPipeline(), 0, pipeline.GetShaderGroupCount(), groupHandles.size(), groupHandles.data());
+	if (!VulkanResult::Succeeded(handleResult))
+	{
+		throw Diagnostics::Error(VulkanResult::FormatFailure("vkGetRayTracingShaderGroupHandlesKHR", handleResult));
+	}
+
+	return groupHandles;
+}
+
+static std::unique_ptr<VulkanGpuAllocationRecord> UploadShaderTable(
+    VulkanGpuMemoryAllocator& memoryAllocator,
+    std::span<const std::byte> bytes,
+    const RhiRayTracingCapabilities& capabilities,
+    const wchar_t* debugName)
+{
+	const VkBufferCreateInfo bufferInfo{
+	    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+	    .pNext = nullptr,
+	    .flags = 0,
+	    .size = bytes.size(),
+	    .usage = VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+	    .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+	    .queueFamilyIndexCount = 0,
+	    .pQueueFamilyIndices = nullptr};
+
+	std::unique_ptr<VulkanGpuAllocationRecord> allocation = memoryAllocator.CreateBuffer(
+	    bufferInfo,
+	    RhiMemoryCategory::RayTracing,
+	    RhiMemoryResidencyClass::HostUpload,
+	    debugName != nullptr ? std::wstring_view(debugName) : std::wstring_view(L"RHI_RayTracingShaderTable"),
+	    capabilities.ShaderTableAlignmentInBytes);
+
+	const bool bTableBufferAvailableBuffer = allocation != nullptr && allocation->Buffer != VK_NULL_HANDLE;
+	const bool bTableBufferAvailable = bTableBufferAvailableBuffer && (allocation->BufferDeviceAddress != 0);
+	const bool bTableBytesWritten = bTableBufferAvailable && memoryAllocator.WriteAllocation(*allocation, bytes.data(), bytes.size());
+
+	if (!bTableBytesWritten)
+	{
+		throw Diagnostics::Error("Vulkan shader-table allocation or upload failed.");
+	}
+	return allocation;
+}
+
 VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator, const RayTracingShaderTableDesc& desc) :
     RayTracingShaderTable(desc.Generation, desc.Pipeline != nullptr ? desc.Pipeline->GetGeneration() : 0),
     m_memoryAllocator(&memoryAllocator)
@@ -57,17 +108,7 @@ VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanG
 	{
 		throw Diagnostics::Error("Vulkan shader-table creation requires a ready Vulkan pipeline.");
 	}
-	const std::uint64_t handleBytes = static_cast<std::uint64_t>(pipeline->GetShaderGroupCount()) * capabilities.ShaderGroupHandleSizeInBytes;
-	if (handleBytes == 0 || handleBytes > std::numeric_limits<std::size_t>::max())
-	{
-		throw Diagnostics::Error("Vulkan shader-group handle size is invalid.");
-	}
-	std::vector<std::byte> groupHandles(static_cast<std::size_t>(handleBytes));
-	const VkResult handleResult = rhi.GetRayTracingShaderGroupHandles()(rhi.GetDevice(), pipeline->GetPipeline(), 0, pipeline->GetShaderGroupCount(), groupHandles.size(), groupHandles.data());
-	if (!VulkanResult::Succeeded(handleResult))
-	{
-		throw Diagnostics::Error(VulkanResult::FormatFailure("vkGetRayTracingShaderGroupHandlesKHR", handleResult));
-	}
+	const std::vector<std::byte> groupHandles = QueryShaderGroupHandles(rhi, *pipeline, capabilities);
 
 	const RhiRayTracingShaderTablePackingRules packingRules{
 	    .IdentifierSizeInBytes = capabilities.ShaderGroupHandleSizeInBytes,
@@ -101,31 +142,7 @@ VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanG
 	    packingRules,
 	    bytes);
 
-	const VkBufferCreateInfo bufferInfo{
-	    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-	    .pNext = nullptr,
-	    .flags = 0,
-	    .size = bytes.size(),
-	    .usage = VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-	    .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-	    .queueFamilyIndexCount = 0,
-	    .pQueueFamilyIndices = nullptr};
-
-	m_allocation = memoryAllocator.CreateBuffer(
-	    bufferInfo,
-	    RhiMemoryCategory::RayTracing,
-	    RhiMemoryResidencyClass::HostUpload,
-	    desc.DebugName != nullptr ? std::wstring_view(desc.DebugName) : std::wstring_view(L"RHI_RayTracingShaderTable"),
-	    capabilities.ShaderTableAlignmentInBytes);
-
-	const bool bTableBufferAvailableBuffer = m_allocation != nullptr && m_allocation->Buffer != VK_NULL_HANDLE;
-	const bool bTableBufferAvailable = bTableBufferAvailableBuffer && (m_allocation->BufferDeviceAddress != 0);
-	const bool bTableBytesWritten = bTableBufferAvailable && memoryAllocator.WriteAllocation(*m_allocation, bytes.data(), bytes.size());
-
-	if (!bTableBytesWritten)
-	{
-		throw Diagnostics::Error("Vulkan shader-table allocation or upload failed.");
-	}
+	m_allocation = UploadShaderTable(memoryAllocator, bytes, capabilities, desc.DebugName);
 }
 
 VulkanRayTracingShaderTable::~VulkanRayTracingShaderTable() noexcept

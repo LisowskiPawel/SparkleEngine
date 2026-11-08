@@ -1,7 +1,6 @@
 #include "TaskExecutor.h"
 
 #include "TaskExecutorImplementation.h"
-#include "Execution/TaskExecutionState.h"
 
 #include <utility>
 
@@ -14,20 +13,13 @@ TaskExecutor::~TaskExecutor() = default;
 
 TaskExecution TaskExecutor::Submit(const CompiledTaskGraph& graph, TaskExecutionContext& context)
 {
-	auto state = m_implementation->Launch(graph, context, nullptr);
-	{
-		std::unique_lock lock(state->Mutex);
-		state->Condition.wait(lock, [&state] { return state->bSettled; });
-	}
-	return TaskExecution(std::move(state));
+	return TaskExecution(m_implementation->Submit(graph, context));
 }
 
 TaskExecution TaskExecutor::Submit(TaskDesc desc, TaskFunction function, TaskExecutionContext& context)
 {
-	const TaskExecutorConfig& config = m_implementation->GetConfig();
-	TaskGraphBuilder builder(TaskGraphLimits{.MaximumTasks = config.MaximumTasksPerExecution, .MaximumEdges = config.MaximumEdgesPerExecution});
-	builder.Add(std::move(desc), std::move(function));
-	return Submit(builder.Compile(), context);
+	const CompiledTaskGraph graph = m_implementation->CompileTask(std::move(desc), std::move(function));
+	return Submit(graph, context);
 }
 
 TaskExecution TaskExecutor::Launch(TaskScope& scope, const CompiledTaskGraph& graph, TaskExecutionContext context)
@@ -37,10 +29,8 @@ TaskExecution TaskExecutor::Launch(TaskScope& scope, const CompiledTaskGraph& gr
 
 TaskExecution TaskExecutor::Launch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)
 {
-	const TaskExecutorConfig& config = m_implementation->GetConfig();
-	TaskGraphBuilder builder(TaskGraphLimits{.MaximumTasks = config.MaximumTasksPerExecution, .MaximumEdges = config.MaximumEdgesPerExecution});
-	builder.Add(std::move(desc), std::move(function));
-	return Launch(scope, builder.Compile(), std::move(context));
+	const CompiledTaskGraph graph = m_implementation->CompileTask(std::move(desc), std::move(function));
+	return Launch(scope, graph, std::move(context));
 }
 
 TaskDispatch TaskExecutor::PrepareDispatch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)

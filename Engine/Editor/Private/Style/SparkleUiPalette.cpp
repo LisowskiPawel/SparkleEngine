@@ -3,6 +3,12 @@
 
 namespace SparkleUiPalette
 {
+	ImVec4 WithAlpha(ImVec4 color, float alpha) noexcept
+	{
+		color.w *= alpha;
+		return color;
+	}
+
 	const MenuColors& Menu() noexcept
 	{
 		static const MenuColors colors = {

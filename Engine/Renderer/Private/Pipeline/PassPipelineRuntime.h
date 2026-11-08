@@ -26,3 +26,9 @@ struct RayTracingPassPipelineRuntime
 	const RayTracingPipeline& Pipeline;
 	std::uint64_t Generation = 0;
 };
+
+struct RayTracingShaderTableMaterialization final
+{
+	std::uint64_t SizeInBytes = 0u;
+	std::uint64_t ElapsedMicroseconds = 0u;
+};

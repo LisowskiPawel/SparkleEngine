@@ -3,13 +3,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Pipeline/RasterPassRenderState.h"
-
-static bool StencilWrites(const RhiStencilState& stencil) noexcept
-{
-	return stencil.bStencilEnable && stencil.StencilWriteMask != 0
-	    && (stencil.FrontFaceStencilFailOp != RhiStencilOp::Keep || stencil.FrontFaceStencilDepthFailOp != RhiStencilOp::Keep || stencil.FrontFaceStencilPassOp != RhiStencilOp::Keep
-	        || stencil.BackFaceStencilFailOp != RhiStencilOp::Keep || stencil.BackFaceStencilDepthFailOp != RhiStencilOp::Keep || stencil.BackFaceStencilPassOp != RhiStencilOp::Keep);
-}
+#include "RHI/Public/Pipeline/RhiPipelineDesc.h"
 
 static const PassParameterTextureBindingData& ResolveRasterAttachmentBinding(const PassParameterSet& parameters, std::uint32_t parameterIndex)
 {
@@ -69,7 +63,8 @@ static FrameGraphRasterPass CollectRasterAttachments(const PassParameterLayout& 
 	for (std::uint32_t index = 0; index < layout.GetParameterCount(); ++index)
 	{
 		const PassParameterDesc& parameter = layout.GetParameters()[index];
-		if (parameter.Kind != ShaderParameterSemanticKind::RenderTarget && parameter.Kind != ShaderParameterSemanticKind::DepthTarget)
+		const bool bAttachment = parameter.Kind == ShaderParameterSemanticKind::RenderTarget || parameter.Kind == ShaderParameterSemanticKind::DepthTarget;
+		if (!bAttachment)
 		{
 			continue;
 		}
@@ -110,15 +105,16 @@ static void ResolveDepthStencilCompatibility(FrameGraphRasterPass& result, const
 		const FrameGraphTextureDesc& depthDesc = resources.GetMetadata(result.DepthStencil.Handle.GetResourceHandle()).textureDesc;
 		const bool bSampleCountMismatch = result.ColorCount != 0 && depthDesc.sampleCount != result.Compatibility.SampleCount;
 		const bool bReadOnlyAttachment = !bSampleCountMismatch && result.DepthStencil.DepthStencilAccess == FrameGraphDepthStencilAccess::ReadOnly;
-		const bool bDepthWrittenDepthStencil = bReadOnlyAttachment && (result.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear);
-		const bool bDepthWrittenGuardGetDepth = bReadOnlyAttachment && !bDepthWrittenDepthStencil;
-		const bool bDepthWrittenGetDepth = bDepthWrittenGuardGetDepth && (renderState.GetDepth().bDepthWriteEnable);
-		const bool bDepthOutputWritten = bDepthWrittenDepthStencil || bDepthWrittenGetDepth;
-		const bool bDepthWritten = bReadOnlyAttachment && bDepthOutputWritten;
-		const bool bStencilWrittenDepthWritten = bReadOnlyAttachment && !bDepthWritten;
-		const bool bStencilWritten = bStencilWrittenDepthWritten && (StencilWrites(renderState.GetStencil()));
+		const bool bDepthCleared = bReadOnlyAttachment && result.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear;
+		const bool bCheckDepthWrite = bReadOnlyAttachment && !bDepthCleared;
+		const bool bDepthWriteEnabled = bCheckDepthWrite && renderState.GetDepth().bDepthWriteEnable;
+		const bool bDepthWritten = bDepthCleared || bDepthWriteEnabled;
+		const bool bCheckStencilWrite = bReadOnlyAttachment && !bDepthWritten;
+		const bool bStencilWritten = bCheckStencilWrite && renderState.GetStencil().HasWrites();
+		const bool bDepthInvalid = bSampleCountMismatch || bDepthWritten;
+		const bool bAttachmentInvalid = bDepthInvalid || bStencilWritten;
 
-		if (bSampleCountMismatch || bDepthWritten || bStencilWritten)
+		if (bAttachmentInvalid)
 		{
 			throw Diagnostics::Error("Raster depth attachment is incompatible with pass depth, stencil, access, load, or sample state.");
 		}
@@ -132,11 +128,13 @@ static void ResolveDepthStencilCompatibility(FrameGraphRasterPass& result, const
 
 static void ValidateRasterPassState(const FrameGraphRasterPass& result, const RasterPassRenderState& renderState)
 {
-	if (!renderState.GetDepth().bDepthEnable && renderState.GetDepth().bDepthWriteEnable)
+	const bool bDepthValid = renderState.GetDepth().IsValid();
+	if (!bDepthValid)
 	{
 		throw Diagnostics::Error("Raster depth writes require depth testing to be enabled.");
 	}
-	if (result.Compatibility.SampleCount != 1 && result.Compatibility.SampleCount != 2 && result.Compatibility.SampleCount != 4 && result.Compatibility.SampleCount != 8)
+	const bool bSampleCountValid = GraphicsPipelineDesc::IsValidSampleCount(result.Compatibility.SampleCount);
+	if (!bSampleCountValid)
 	{
 		throw Diagnostics::Error("Raster pass attachments use an unsupported sample count.");
 	}

@@ -3,6 +3,7 @@
 #include "World/Systems/GameWorldSystems.h"
 
 #include "World/GameWorldState.h"
+#include "World/ECS/StructureFrozenEpoch.h"
 #include "World/Resources/GameWorldResourceStores.h"
 #include "World/Systems/GameSystemGraph.h"
 
@@ -10,10 +11,27 @@ namespace ECS
 {
 
 	GameWorldSystemExecution::GameWorldSystemExecution(GameWorldState& state, const GameWorldSystemExecutionContext& context, const StructureFrozenEpoch& epoch) :
-	    m_simulation(state, context.Camera, epoch),
-	    m_animation(state, context.Resources, context.Camera.DeltaSeconds, epoch),
-	    m_transform(state, epoch),
-	    m_extraction(state, context.Resources.Skeletons, epoch),
+	    m_cameraQuery(state.m_registry, epoch),
+	    m_playbackQuery(state.m_registry, epoch),
+	    m_poseQuery(state.m_registry, epoch),
+	    m_morphQuery(state.m_registry, epoch),
+	    m_transformQuery(state.m_registry, epoch),
+	    m_cameraDerivedQuery(state.m_registry, epoch),
+	    m_meshQuery(state.m_registry, epoch),
+	    m_simulation(m_cameraQuery, state.m_activeCamera, context.Camera, state.m_systemArena.CameraChanges),
+	    m_animation(
+	        m_playbackQuery,
+	        m_poseQuery,
+	        m_morphQuery,
+	        context.Resources.AnimationClips,
+	        context.Resources.Skeletons,
+	        state.m_animationOutput,
+	        state.m_morphWeights,
+	        state.m_systemArena.AnimationChanges,
+	        state.m_systemArena.MorphChanges,
+	        context.Camera.DeltaSeconds),
+	    m_transform(m_transformQuery, m_cameraDerivedQuery, state.m_systemArena.DirtyTransforms, state.m_systemArena.EvaluatedTransforms, state.m_systemArena.CameraDerivedChanges),
+	    m_extraction(m_meshQuery, state.m_meshResources, context.Resources.Skeletons, state.m_extraction.GetMeshSlots()),
 	    m_state(state)
 	{
 	}
@@ -35,30 +53,25 @@ namespace ECS
 		return graph.Compile();
 	}
 
-	CompiledGameSystemGraph BuildGameWorldSystemGraph()
+	bool GameWorldState::ExecuteSystems(const GameWorldSystemExecutionContext& context)
 	{
-		return GameWorldSystemExecution::BuildGraph();
-	}
-
-	bool ExecuteGameWorldSystems(GameWorldState& state, const GameWorldSystemExecutionContext& context)
-	{
-		if (!state.PrepareSystemExecution(context.Resources))
+		if (!PrepareSystemExecution(context.Resources))
 		{
 			return false;
 		}
 
-		StructureFrozenEpoch epoch = state.m_registry.FreezeStructure();
+		StructureFrozenEpoch epoch = m_registry.FreezeStructure();
 		if (!epoch.IsValid())
 		{
 			return false;
 		}
-		GameWorldSystemExecution systems(state, context, epoch);
+		GameWorldSystemExecution systems(*this, context, epoch);
 		GameSystemGraphError error;
-		const bool bExecuted = state.m_systemGraph.Execute(context.Executor, systems, error);
+		const bool bExecuted = m_systemGraph.Execute(context.Executor, systems, error);
 		if (bExecuted)
 		{
-			state.m_dirtyTransforms.clear();
-			state.m_bEvaluateAllTransforms = false;
+			m_dirtyTransforms.clear();
+			m_bEvaluateAllTransforms = false;
 		}
 		return bExecuted;
 	}

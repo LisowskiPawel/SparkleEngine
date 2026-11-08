@@ -31,6 +31,8 @@ namespace SparkleLauncher
 		QString BuildScopes;
 		QString CookScopes;
 		QString RequestedLevelIds;
+		bool bSelectAvailableLevels = false;
+		bool bCleanLevelContent = false;
 		QString SourceDependencyId;
 		QString HostToolId;
 		QString ShaderBackend;

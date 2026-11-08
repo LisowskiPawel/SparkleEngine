@@ -69,15 +69,14 @@ static void SelectNewestShaderExport(
 	for (std::size_t index = 0; index < diagnostics.Entries.size(); ++index)
 	{
 		const ShaderDiagnosticsEntry& active = diagnostics.Entries[index];
-		const bool bNewerMatchingExportInputHash = active.ShaderType == shader.ShaderType && active.CompileInputHash == shader.CompileInputHash;
-		const bool bNewerMatchingExportBackend = bNewerMatchingExportInputHash && (active.Backend == shader.Backend);
-		const bool bNewerMatchingExportSelected = bNewerMatchingExportBackend && (selected[index].empty());
-		const bool bMatchingExportGuardparentpath = bNewerMatchingExportBackend && !bNewerMatchingExportSelected;
-		const bool bNewerMatchingExportParentpath = bMatchingExportGuardparentpath && (request.parent_path().native() > selected[index].native());
-		const bool bExportChosen = bNewerMatchingExportSelected || bNewerMatchingExportParentpath;
-		const bool bNewerMatchingExport = bNewerMatchingExportBackend && bExportChosen;
+		const bool bSameCompile = active.ShaderType == shader.ShaderType && active.CompileInputHash == shader.CompileInputHash;
+		const bool bSameTarget = bSameCompile && active.Backend == shader.Backend;
+		const bool bFirstExport = bSameTarget && selected[index].empty();
+		const bool bCompareAge = bSameTarget && !bFirstExport;
+		const bool bNewerExport = bCompareAge && request.parent_path().native() > selected[index].native();
+		const bool bSelectExport = bFirstExport || bNewerExport;
 
-		if (bNewerMatchingExport)
+		if (bSelectExport)
 		{
 			selected[index] = request.parent_path();
 		}

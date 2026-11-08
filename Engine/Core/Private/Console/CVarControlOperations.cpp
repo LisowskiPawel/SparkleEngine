@@ -7,6 +7,15 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogCoreCVarControl, "Core.Console.Control");
 
+static bool MatchesCVarFilter(const ConsoleVariableBase& variable, std::string_view filter)
+{
+	if (filter.empty() || Strings::ContainsIgnoreCase(variable.GetName(), filter))
+	{
+		return true;
+	}
+	return Strings::ContainsIgnoreCase(variable.GetDescription(), filter);
+}
+
 static bool CollectFilteredCVars(ConsoleVariableRegistry& registry, const CVarControlRequest& request, std::vector<ConsoleVariableBase*>& variables, std::string& outError)
 {
 	if (!request.Entries.empty())
@@ -16,17 +25,7 @@ static bool CollectFilteredCVars(ConsoleVariableRegistry& registry, const CVarCo
 	}
 	for (ConsoleVariableBase* variable : registry.GetVariables())
 	{
-		const bool bCvarMatchesFilterVariable = variable != nullptr;
-		const bool bCvarMatchesFilterFilter = bCvarMatchesFilterVariable && (request.Filter.empty());
-		const bool bCvarMatchesFilterGuardFilter = bCvarMatchesFilterVariable && !bCvarMatchesFilterFilter;
-		const bool bNameMatches = bCvarMatchesFilterGuardFilter && (Strings::ContainsIgnoreCase(variable->GetName(), request.Filter));
-		const bool bNameOrNoFilter = bCvarMatchesFilterFilter || bNameMatches;
-		const bool bCheckDescription = bCvarMatchesFilterVariable && !bNameOrNoFilter;
-		const bool bDescriptionMatches = bCheckDescription && (Strings::ContainsIgnoreCase(variable->GetDescription(), request.Filter));
-		const bool bFilterMatched = bNameOrNoFilter || bDescriptionMatches;
-		const bool bCvarMatchesFilter = bCvarMatchesFilterVariable && bFilterMatched;
-
-		if (bCvarMatchesFilter)
+		if (variable != nullptr && MatchesCVarFilter(*variable, request.Filter))
 		{
 			variables.push_back(variable);
 		}

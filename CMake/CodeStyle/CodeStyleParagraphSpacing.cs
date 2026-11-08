@@ -172,9 +172,11 @@ public static class CodeStyleParagraphSpacing
                     else
                     {
                         string head = masked.Substring(start, position - start).Trim();
-                        bool isTypeOrNamespace = Regex.IsMatch(head, @"^(?:class|struct|enum|namespace|extern)\b");
-                        bool executable = !isTypeOrNamespace && (head.Contains(")") || (blocks.Count > 0 && blocks.Peek()));
-                        blocks.Push(executable);
+                        bool bIsTypeOrNamespace = Regex.IsMatch(head, @"^(?:class|struct|enum|namespace|extern)\b");
+                        bool bParentExecutable = blocks.Count > 0 && blocks.Peek();
+                        bool bExecutableHead = head.Contains(")") || bParentExecutable;
+                        bool bExecutable = !bIsTypeOrNamespace && bExecutableHead;
+                        blocks.Push(bExecutable);
                         start = -1;
                         conditionals = 0;
                     }
@@ -265,7 +267,7 @@ public static class CodeStyleParagraphSpacing
             (head.IndexOf('(') < 0 && Regex.IsMatch(head, @"\s+[A-Za-z_]\w*\s*(?:\[[^\]]*\])?$"));
     }
 
-    private static bool IsStatement(string statement, bool executableBlock)
+    private static bool IsStatement(string statement, bool bExecutableBlock)
     {
         if (ControlHead.IsMatch(statement))
         {
@@ -273,7 +275,7 @@ public static class CodeStyleParagraphSpacing
         }
 
         int brace = statement.IndexOf('{');
-        return (executableBlock && CallHead.IsMatch(statement)) || HasAssignment(statement) || Regex.IsMatch(statement, @"^(?:return|co_return|throw)\b") ||
+        return (bExecutableBlock && CallHead.IsMatch(statement)) || HasAssignment(statement) || Regex.IsMatch(statement, @"^(?:return|co_return|throw)\b") ||
             (brace >= 0 && IsInitializer(statement.Substring(0, brace)));
     }
 
@@ -290,11 +292,11 @@ public static class CodeStyleParagraphSpacing
         return line.Length == 0 || line.StartsWith("}") || line.StartsWith("#");
     }
 
-    private static void AddStatementBoundaries(string masked, int start, int end, string[] lines, int[] lineStarts, HashSet<int> boundaries, Dictionary<int, int> leadingComments, bool executableBlock)
+    private static void AddStatementBoundaries(string masked, int start, int end, string[] lines, int[] lineStarts, HashSet<int> boundaries, Dictionary<int, int> leadingComments, bool bExecutableBlock)
     {
         int firstLine = GetLine(lineStarts, start);
         int lastLine = GetLine(lineStarts, end);
-        if (firstLine == lastLine || !IsStatement(masked.Substring(start, end - start + 1).Trim(), executableBlock))
+        if (firstLine == lastLine || !IsStatement(masked.Substring(start, end - start + 1).Trim(), bExecutableBlock))
         {
             return;
         }

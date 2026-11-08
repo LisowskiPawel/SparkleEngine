@@ -14,6 +14,7 @@ class RenderHardwareInterface;
 class IUpscalerProvider;
 struct RenderFrameIdentity;
 struct RenderView;
+struct ImageProviderFrameInput;
 
 class RendererImageProviderStack final
 {
@@ -42,6 +43,9 @@ public:
 
 private:
 	void Initialize();
+	void InitializeUpscaler();
+	void InitializeRayReconstruction();
+	void SetupRayReconstructionFrame(ImageProviderFrameInput& input);
 	void Shutdown() noexcept;
 	static void ShutdownProviders(std::unique_ptr<IUpscalerProvider>& upscaler, std::unique_ptr<IRayReconstructionProvider>& rayReconstruction) noexcept;
 

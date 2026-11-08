@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <format>
 #include <string_view>
+#include <span>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -35,10 +36,10 @@ namespace Assets
 		work.Payload.authoredInstanceId = MakeAuthoredInstanceId(work.Id.value);
 	}
 
-	void FinalizeSceneLoadPackage(SceneLoadWorkState& state)
+	static void ValidateInstanceIdentities(std::span<const SceneAssetLoadWork> assets)
 	{
 		std::unordered_map<std::uint64_t, std::string_view> instanceIdentities;
-		for (const SceneAssetLoadWork& work : state.Assets)
+		for (const SceneAssetLoadWork& work : assets)
 		{
 			const auto [existing, bInserted] = instanceIdentities.emplace(work.Payload.authoredInstanceId, work.Id.value);
 			if (work.Payload.authoredInstanceId == 0 || (!bInserted && existing->second != work.Id.value))
@@ -46,15 +47,19 @@ namespace Assets
 				throw Diagnostics::Error("Scene load package contains an invalid or colliding authored instance identity.");
 			}
 		}
+	}
+
+	static void ValidateSkeletonBindings(std::span<const SceneAssetLoadWork> assets)
+	{
 		std::unordered_set<Assets::CookedAssetId> skeletonAssets;
-		for (const SceneAssetLoadWork& work : state.Assets)
+		for (const SceneAssetLoadWork& work : assets)
 		{
 			for (const SkeletonResource& skeleton : work.Payload.skeletons)
 			{
 				skeletonAssets.insert(skeleton.assetId);
 			}
 		}
-		for (const SceneAssetLoadWork& work : state.Assets)
+		for (const SceneAssetLoadWork& work : assets)
 		{
 			for (const SceneAssetPayload::SkeletalMeshInstance& mesh : work.Payload.skeletalMeshInstances)
 			{
@@ -64,6 +69,12 @@ namespace Assets
 				}
 			}
 		}
+	}
+
+	void FinalizeSceneLoadPackage(SceneLoadWorkState& state)
+	{
+		ValidateInstanceIdentities(state.Assets);
+		ValidateSkeletonBindings(state.Assets);
 
 		state.Package->AssetPayloads.reserve(state.Assets.size());
 		for (SceneAssetLoadWork& work : state.Assets)

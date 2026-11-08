@@ -60,7 +60,7 @@ Texture admission reserves the smaller decoded/upload limit before launching rea
 | Stage | Mesh path | Texture path | Shared invariant |
 | --- | --- | --- | --- |
 | identity/admission | asset ID + generation maps to stable `GpuMeshHandle`; an invalid handle is fatal, backlog exhaustion returns no handle | normalized cooked path + scene texture generation; invalid path/generation or failed residency admission is fatal | zero IDs/generations and older-than-known generations cannot enter as current |
-| CPU work | background `GpuMeshPreparation::Build` produces decoded/resident sizes and upload payload | background cooked file read plus strict header/mip/layout decode | task result and payload must both be valid before ReadyForUpload |
+| CPU work | background `PrepareGpuMesh` produces decoded/resident sizes and upload payload | background cooked file read plus strict header/mip/layout decode | task result and payload must both be valid before ReadyForUpload |
 | upload | `GpuMesh::Upload` records buffers/BLAS work | `RendererTextureFactory::Create` records texture upload and returns native resource identity | upload cannot start without pending/resident capacity |
 | activation | upload submission token completes, then handle/cache maps publish the mesh | token completes, then path/generation becomes active and binding revision increments | Uploaded is not Resident until completion is observed |
 | replacement | keyed generation prevents older mesh request from becoming active | newer texture generation replaces active path; older completion is released | latest wanted generation is authoritative |

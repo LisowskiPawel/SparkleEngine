@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Assets/Loaders/CookedAssetAllocationBudget.h"
 
 #include "Assets/Payload/SceneAssetPayloadMeshAppender.h"
 
@@ -48,14 +49,15 @@ namespace Assets
 
 	void SceneAssetPayloadMeshAppender::AppendMeshAssets(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload)
 	{
-		MeshAssetLoader meshAssetLoader;
+		files.GetAllocationBudget().ReserveArray<SceneAssetPayload::StaticMeshAsset>(sceneManifest.meshAssetReferences.size());
+		files.GetAllocationBudget().ReserveArray<SceneAssetPayload::SkeletalMeshAsset>(sceneManifest.meshAssetReferences.size());
 		sceneAssetPayload.staticMeshAssets.reserve(sceneAssetPayload.staticMeshAssets.size() + sceneManifest.meshAssetReferences.size());
 		sceneAssetPayload.skeletalMeshAssets.reserve(sceneAssetPayload.skeletalMeshAssets.size() + sceneManifest.meshAssetReferences.size());
 
 		for (const CookedSceneMeshAssetRef& meshReference : sceneManifest.meshAssetReferences)
 		{
 			const std::filesystem::path meshAssetPath = Paths::CookedMeshAsset(meshReference.meshAssetId);
-			LoadedMeshAsset loadedMesh = meshAssetLoader.Decode(meshAssetPath, files.Get(meshAssetPath), files.GetAllocationBudget());
+			LoadedMeshAsset loadedMesh = MeshAssetLoader::Decode(meshAssetPath, files.Get(meshAssetPath), files.GetAllocationBudget());
 
 			if (loadedMesh.GetAssetKind() != meshReference.meshAssetKind)
 			{
@@ -83,8 +85,16 @@ namespace Assets
 	void SceneAssetPayloadMeshAppender::AppendMeshInstances(
 	    const LoadedSceneManifest& sceneManifest,
 	    std::span<const SceneAssetPayloadMeshBinding> meshAssetBindings,
-	    SceneAssetPayload& sceneAssetPayload)
+	    SceneAssetPayload& sceneAssetPayload,
+	    CookedAssetAllocationBudget& budget)
 	{
+		budget.ReserveArray<SceneAssetPayload::StaticMeshInstance>(sceneManifest.instances.size());
+		budget.ReserveArray<SceneAssetPayload::SkeletalMeshInstance>(sceneManifest.instances.size());
+		for (const auto& instance : sceneManifest.instances)
+		{
+			budget.ReserveArray<float>(instance.morphWeightCount);
+		}
+
 		sceneAssetPayload.staticMeshInstances.reserve(sceneAssetPayload.staticMeshInstances.size() + sceneManifest.instances.size());
 		sceneAssetPayload.skeletalMeshInstances.reserve(sceneAssetPayload.skeletalMeshInstances.size() + sceneManifest.instances.size());
 
@@ -120,8 +130,11 @@ namespace Assets
 	void SceneAssetPayloadMeshAppender::AppendMeshInstanceGroups(
 	    const LoadedSceneManifest& sceneManifest,
 	    std::span<const SceneAssetPayloadMeshBinding> meshAssetBindings,
-	    SceneAssetPayload& sceneAssetPayload)
+	    SceneAssetPayload& sceneAssetPayload,
+	    CookedAssetAllocationBudget& budget)
 	{
+		budget.ReserveArray<SceneAssetPayload::MeshInstanceGroup>(sceneManifest.instanceGroups.size());
+
 		sceneAssetPayload.meshInstanceGroups.reserve(sceneAssetPayload.meshInstanceGroups.size() + sceneManifest.instanceGroups.size());
 
 		for (const CookedSceneInstanceGroupRecord& groupRecord : sceneManifest.instanceGroups)

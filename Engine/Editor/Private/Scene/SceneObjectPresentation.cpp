@@ -11,76 +11,11 @@
 
 namespace SceneObjectPresentation
 {
-	static std::string BuildSelectionTitle(const EditorSceneModel* model, const SceneObjectSelection* selection)
-	{
-		if (selection == nullptr)
-		{
-			return "No Selection";
-		}
-
-		switch (selection->type)
-		{
-			case SceneObjectType::Camera:
-				if (model)
-				{
-					const WorldCameraReadData* camera = model->FindCamera(selection->entity);
-					return camera && !camera->Name.empty() ? camera->Name : "Camera";
-				}
-				return "Scene Camera";
-			case SceneObjectType::Light:
-				if (model)
-				{
-					if (const WorldLightReadData* light = model->FindLight(selection->entity))
-					{
-						return SceneObjectPresentation::BuildLightLabel(light->Description, selection->entity.GetSlot());
-					}
-				}
-				return "Light";
-			case SceneObjectType::Sky:
-				return "Sky";
-			case SceneObjectType::Mesh:
-				return "Mesh " + std::to_string(selection->entity.GetSlot() + 1u);
-			case SceneObjectType::None:
-			default:
-				return "No Selection";
-		}
-	}
-
-	static const char* BuildSelectionSubtitle(const EditorSceneModel* model, const SceneObjectSelection* selection) noexcept
-	{
-		if (selection == nullptr)
-		{
-			return "Object";
-		}
-
-		switch (selection->type)
-		{
-			case SceneObjectType::Camera:
-				return "Camera";
-			case SceneObjectType::Light:
-				if (model)
-				{
-					if (const WorldLightReadData* light = model->FindLight(selection->entity))
-					{
-						return SceneObjectPresentation::GetLightTypeLabel(light->Description.GetKind());
-					}
-				}
-				return "Light";
-			case SceneObjectType::Sky:
-				return "Sky";
-			case SceneObjectType::Mesh:
-				return "Static Mesh";
-			case SceneObjectType::None:
-			default:
-				return "Object";
-		}
-	}
-
 	void DrawSelectionHeader(const EditorSceneModel* model, const SceneObjectSelection* selection) noexcept
 	{
-		const std::string title = BuildSelectionTitle(model, selection);
-		const char* subtitle = BuildSelectionSubtitle(model, selection);
 		const EditorSceneEntry* entry = model && selection ? model->FindEntry(*selection) : nullptr;
+		const char* title = entry != nullptr ? entry->Label.c_str() : "No Selection";
+		const char* subtitle = entry != nullptr ? entry->TypeLabel.c_str() : "Object";
 		const EditorIcons::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(selection, entry ? entry->LightKind : SceneLightKind::Unknown);
 
 		constexpr float kHeaderHeight = 30.0f;
@@ -100,7 +35,7 @@ namespace SceneObjectPresentation
 		ImGui::SetCursorScreenPos(ImVec2(start.x + kHeaderPaddingX + 10.0f, start.y + 7.0f));
 		ImGui::TextUnformatted(EditorIcons::GetEditorIconGlyph(icon));
 		ImGui::SameLine(0.0f, 8.0f);
-		ImGui::TextUnformatted(title.c_str());
+		ImGui::TextUnformatted(title);
 		ImGui::SameLine();
 		ImGui::TextDisabled("%s", subtitle);
 

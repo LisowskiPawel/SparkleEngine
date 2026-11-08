@@ -4,7 +4,7 @@
 
 **Status:** capability snapshot; current source corpus, not proof of cooked or packaged inclusion
 
-**Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; tracked `Engine/Assets` files and their known compiler/cooker/game consumers inspected; evidence `S` only
+**Snapshot:** 2026-11-08 ownership reconciliation from revision `0758e939` plus the owned working-tree changes; source structure and known compiler/cooker/game consumers inspected
 
 **Scope:** engine-owned shader source, default textures, sky environments, and small geometry fixtures
 
@@ -37,6 +37,31 @@ Every arrow is owned elsewhere. The corpus owns source bytes and licenses only; 
 
 ## Tracked Corpus
 
+Shader entry points own invocation admission, input acquisition, semantic calls and
+output publication. Shared `BRDF`, `Geometry`, `Material`, `Lighting` and
+`RayTracing` owners retain reusable mechanisms without importing pass-specific
+implementation. Feature shader code lives beneath its corresponding `Passes` owner:
+
+| Owner | Implementation |
+| --- | --- |
+| `Passes/Lighting/Direct` | direct reservoirs, candidate evaluation, surface projection and temporal/spatial reuse |
+| `Passes/Lighting/Restir/Indirect` | indirect reservoirs, optimized path/replay policy, GBuffer path input and secondary-hit lighting |
+| `Passes/Lighting/Restir/Reconstruction` | reconstruction guide evaluation, resource writes and surface-guide entry |
+| `Passes/Lighting/Restir/RestirReservoirCommon.hlsli` | the surface-compatibility and sampling rules shared by direct and indirect reuse |
+
+Direct candidate evaluation consumes a light candidate and shape sample rather
+than requiring fabricated reservoir weights or history. Each tracing frontend
+selects its implementation at shader composition; path and shadow operations
+receive the scene acceleration structure explicitly. Shader registrations and
+parameter layouts remain with their existing Renderer owners.
+
+The `ITER-ASSETS-SRP-01` check on 2026-11-08 covered all 143 shader files and
+compiled all 39 registered entries for DXIL and SPIR-V. All 78 reflected binding
+and layout contracts matched the frozen baseline, and the regenerated production
+map/library opened successfully for both targets of every entry. This establishes
+bounded source/compiler/cooked-product evidence; GPU images, timing and release
+package qualification retain their existing owners and open gates.
+
 **Shader responsibility boundaries, 2026-11-05:** raster and ray-traced materials
 share [texture-slot/flag semantics](../../../../../Engine/Assets/Shaders/Material/MaterialTextureSlots.hlsli).
 Raster filtering and bindless ray-tracing sampling retain their different owners.
@@ -52,8 +77,8 @@ temporary cooked-product round trips do not establish GPU images or timing.
 
 | ID | Family | Current content and purpose | Coverage boundary | Evidence |
 | --- | --- | --- | --- | --- |
-| `EASSET-001` | Shader entry sources | 29 `.hlsl` files implement registered compute, raster, ray-tracing, lighting, post, presentation, and debug entry points. Exact registrations are in the [Shader Program Catalog](../Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md). | An `.hlsl` file without a typed registration is not a runtime shader capability. | `S` |
-| `EASSET-002` | Shader includes/contracts | 91 `.hlsli` files cover BRDF, common math/color/random/sampling, geometry/skinning/morphing, light/reservoir logic, materials, GBuffer packing, ray traversal/hit semantics, and CPU/GPU uniform layouts. | Macro alternatives and unused includes are not advertised features. | `S` |
+| `EASSET-001` | Shader entry sources | 37 `.hlsl` files implement 39 registered compute, raster, ray-tracing, lighting, post, presentation, and debug entry points. Exact registrations are in the [Shader Program Catalog](../Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md). | An `.hlsl` file without a typed registration is not a runtime shader capability. | `S` |
+| `EASSET-002` | Shader includes/contracts | 106 `.hlsli` files cover BRDF, common math/color/random/sampling, geometry/skinning/morphing, light/reservoir logic, materials, GBuffer packing, ray traversal/hit semantics, and CPU/GPU uniform layouts. | Macro alternatives and unused includes are not advertised features. | `S` |
 | `EASSET-003` | Default textures | Eight PNGs: black, blue, checkerboard, cubemap, green, normal, red, and white. Asset cooking supplies fallback texture products and Renderer binds them when material slots are absent. | Fallback correctness and package presence require execution/package evidence. | `S` |
 | `EASSET-004` | Sky environments | Four 4K EXR panoramas: autumn hill, evening road, Goegap road, and red church. | Presence does not prove every level uses or packages them. | `S` |
 | `EASSET-005` | Cube fixtures | Cube `.gltf`, `.glb`, `.bin`, license, plus repeated-cube and `EXT_mesh_gpu_instancing` glTF fixtures. | These are compact import/instancing workloads, not a general sample library. | `S` |
@@ -65,8 +90,8 @@ temporary cooked-product round trips do not establish GPU images or timing.
 | BRDF | GGX distribution/specular sampling, Smith geometry, Schlick Fresnel, Burley diffuse, subsurface, occlusion, and shared shading data/config. |
 | Geometry | Vertex/pixel layouts, transforms, tangent basis, skinning, morphing, screen space, fullscreen triangle, and motion vectors. |
 | Material | Material uniform/texture roles, normal reconstruction, and the fixed ray/path material texture table. |
-| Lighting | Punctual/area/sky evaluation, direct-light sampling/reservoirs, ReSTIR indirect reservoirs/uniforms, visibility, reconstruction guides, and composite outputs. |
-| Ray tracing | Inline queries, native pipeline trace/SBT layout, surface/hit decoding, path sampling, debug modes, and shadow semantics/signals. |
+| Lighting | Shared punctual/area/sky evaluation, direct-light identity and sampling, environment proposals and surface response; pass-owned reservoirs, guides and composition remain in `Passes/Lighting`. |
+| Ray tracing | Shared inline/native scene trace contracts, SBT layout, surface/hit decoding, BSDF/light sampling, endpoint construction, accumulation and shadow semantics/signals. |
 | Display/debug | Exposure, tone mapping, output encoding, instance/debug view constants and visualization. |
 | ABI resources | Frame, camera, temporal view, scene lighting, mesh/object, light, and sampler layouts mirrored by Renderer registrations and RHI pipelines. |
 

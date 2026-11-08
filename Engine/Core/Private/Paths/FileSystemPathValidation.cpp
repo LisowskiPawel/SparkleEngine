@@ -7,7 +7,7 @@
 #include <string>
 #include <system_error>
 
-namespace Filesystem::Private
+namespace Filesystem
 {
 	static void ValidatePath(const std::shared_ptr<spdlog::logger>& logger, const char* label, const std::filesystem::path& path, bool bRequired)
 	{

@@ -54,6 +54,8 @@ namespace ECS
 
 		std::span<MorphSampleSlot> GetMorphSamples() noexcept { return m_morphSamples; }
 
+		std::span<const MorphSampleSlot> GetMorphSamples() const noexcept { return m_morphSamples; }
+
 		std::span<const EntityId> GetMorphEntities() const noexcept { return m_morphEntities; }
 
 		std::span<const MorphTargetBinding> GetMorphBindings() const noexcept { return m_morphBindings; }

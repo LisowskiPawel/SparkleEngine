@@ -1,8 +1,15 @@
 #pragma once
 
 #include "Viewport/ViewportOutputAction.h"
+#include "Renderer/Public/Viewport/ViewportContracts.h"
 
-struct ViewportRenderProgress;
-struct ViewportRenderRequest;
+#include <optional>
 
-void DrawReferencePathTracerOverlay(const ViewportRenderProgress& progress, ViewportRenderRequest& request, ViewportOutputAction& outputAction) noexcept;
+struct ReferencePathTracerOverlayActions final
+{
+	std::optional<RenderViewMode> ViewMode;
+	ViewportRenderAction RenderAction = ViewportRenderAction::None;
+	ViewportOutputAction OutputAction = ViewportOutputAction::None;
+};
+
+ReferencePathTracerOverlayActions DrawReferencePathTracerOverlay(const ViewportRenderProgress& progress) noexcept;

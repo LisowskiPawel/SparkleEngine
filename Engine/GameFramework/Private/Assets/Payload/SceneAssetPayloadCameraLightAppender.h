@@ -5,9 +5,10 @@
 
 namespace Assets
 {
-	class SceneAssetPayloadCameraLightAppender final
+	class CookedAssetAllocationBudget;
+
+	namespace SceneAssetPayloadCameraLightAppender
 	{
-	public:
-		static void Append(const LoadedSceneManifest& sceneManifest, SceneAssetPayload& sceneAssetPayload);
-	};
+		void Append(const LoadedSceneManifest& sceneManifest, SceneAssetPayload& sceneAssetPayload, CookedAssetAllocationBudget& budget);
+	}
 }

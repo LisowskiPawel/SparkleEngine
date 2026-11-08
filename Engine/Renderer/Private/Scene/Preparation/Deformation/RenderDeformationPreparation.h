@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Rendering/RenderObjectId.h"
-#include "Rendering/RenderSceneDynamicData.h"
 
 #include <DirectXMath.h>
 
@@ -39,29 +38,6 @@ struct RenderDeformationWork final
 	std::vector<float> PreviousMorphWeights;
 };
 
-class RenderDeformationPreparation final
-{
-public:
-	void Prepare(const RenderScene& scene, std::span<ResolvedRenderPrimitive> primitives, RenderDeformationWork& work);
-
-	static void CopyJointMatrixRanges(std::span<const RenderJointMatrixCopyRange> ranges, std::span<DirectX::XMFLOAT4X4> current, std::span<DirectX::XMFLOAT4X4> previous) noexcept;
-	static void CopyMorphWeightRanges(std::span<const RenderMorphWeightCopyRange> ranges, std::span<float> current, std::span<float> previous) noexcept;
-
-private:
-	static void ResetWork(RenderDeformationWork& work) noexcept;
-	static void ResetPrimitiveOutputs(std::span<ResolvedRenderPrimitive> primitives) noexcept;
-	void PrepareJointMatrices(
-	    const RenderScene& scene,
-	    std::span<const RenderJointMatrixRange> jointMatrixRanges,
-	    std::span<const DirectX::XMFLOAT4X4> jointMatrices,
-	    std::span<ResolvedRenderPrimitive> primitives,
-	    RenderDeformationWork& work);
-	void PrepareMorphWeights(
-	    const RenderScene& scene,
-	    std::span<const RenderMorphWeightRange> morphWeightRanges,
-	    std::span<const float> weights,
-	    std::span<ResolvedRenderPrimitive> primitives,
-	    RenderDeformationWork& work);
-	static bool AreAllZero(std::span<const float> weights) noexcept;
-	static void CopyMorphWeightSpan(std::span<const float> source, std::span<float> destination) noexcept;
-};
+void PrepareRenderDeformation(const RenderScene& scene, std::span<ResolvedRenderPrimitive> primitives, RenderDeformationWork& work);
+void CopyRenderJointMatrixRanges(std::span<const RenderJointMatrixCopyRange> ranges, std::span<DirectX::XMFLOAT4X4> current, std::span<DirectX::XMFLOAT4X4> previous) noexcept;
+void CopyRenderMorphWeightRanges(std::span<const RenderMorphWeightCopyRange> ranges, std::span<float> current, std::span<float> previous) noexcept;

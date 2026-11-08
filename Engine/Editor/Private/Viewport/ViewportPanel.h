@@ -1,6 +1,5 @@
 #pragma once
 
-#include "EditorAPI.h"
 #include "Viewport/ViewportOutputAction.h"
 #include "../../../Renderer/Public/Viewport/ViewportContracts.h"
 #include "../../../Renderer/Public/UI/UiTextureHandle.h"
@@ -12,7 +11,7 @@
 class EditorIconService;
 class ViewportOverlay;
 
-class SPARKLE_EDITOR_API ViewportPanel final
+class ViewportPanel final
 {
 public:
 	ViewportPanel(float leftInsetPixels = 320.0f, float rightInsetPixels = 456.0f) noexcept;
@@ -26,7 +25,6 @@ public:
 	void SetTopInset(float topInsetPixels) noexcept;
 	void SetBottomInset(float bottomInsetPixels) noexcept;
 	void SetSideInsets(float leftInsetPixels, float rightInsetPixels) noexcept;
-	void SetRequestedExtent(RenderViewportExtent extent) noexcept;
 	void SetViewMode(RenderViewMode viewMode) noexcept;
 	void SetExposureOverrides(const ViewportExposureOverrides& overrides) noexcept;
 	void SetRenderProducts(const ViewportRenderProducts& renderProducts) noexcept;
@@ -44,6 +42,7 @@ public:
 	void BuildUI(EditorIconService& icons, bool bDisableInteraction = false);
 
 private:
+	void SetRequestedExtent(RenderViewportExtent extent) noexcept;
 	void BeginViewportWindow() const;
 	void BeginViewportSurface();
 	void BuildViewportImage();

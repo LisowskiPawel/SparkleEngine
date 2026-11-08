@@ -92,7 +92,7 @@ void InitializeSceneLoadLevel(ECS::GameWorldState& state, const LevelDesc& desc)
 	AppendLevelLights(state, desc);
 }
 
-void PopulateStagedScene(ECS::GameWorldState& state, GameWorldResourceStores& resources, Assets::SceneLoadPackage& package)
+static std::size_t CountSceneEntities(const Assets::SceneLoadPackage& package)
 {
 	std::size_t expectedEntityCount = 1;
 
@@ -114,6 +114,13 @@ void PopulateStagedScene(ECS::GameWorldState& state, GameWorldResourceStores& re
 		add(payload.cameras.size());
 		add(payload.lights.size());
 	}
+
+	return expectedEntityCount;
+}
+
+void PopulateStagedScene(ECS::GameWorldState& state, GameWorldResourceStores& resources, Assets::SceneLoadPackage& package)
+{
+	const std::size_t expectedEntityCount = CountSceneEntities(package);
 
 	for (SceneAssetPayload& payload : package.AssetPayloads)
 	{

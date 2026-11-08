@@ -14,6 +14,15 @@
 
 **Current readiness:** **50/100** — shared console products have real tool consumers; script, Unicode/path, progress, failure, and compatibility evidence remains open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#foundation-world-content-shaders-and-tools).
 
+**Catalog validation ownership, 2026-11-08 (second pass):**
+[the existing validator](../../../../../Tools/Support/ToolSupport/Private/Projects/ProjectLevelCatalogValidator.cpp)
+composes identity, path, acquisition, support and provenance checks. Archive and
+loose-file payload checks are private operations in that same owner; parent-chain
+and extraction-root checks remain there. The schema and admitted metadata are
+unchanged. The
+[second-pass result](../../../../../artifacts/validation/tools-orchestration-iteration2-20261108/result.json)
+records positive and negative payload controls and the live catalog admission check.
+
 ## At A Glance
 
 | Facility | Current result | Deliberate non-claim |

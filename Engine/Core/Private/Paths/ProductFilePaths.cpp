@@ -15,8 +15,8 @@ namespace Paths
 {
 	std::filesystem::path LogFile(std::string_view configuredFile, bool bEnsureParentExists)
 	{
-		const Private::LogParentDirectoryPolicy parentDirectoryPolicy = bEnsureParentExists ? Private::LogParentDirectoryPolicy::EnsureExists : Private::LogParentDirectoryPolicy::Preserve;
-		return Private::ResolveBootstrapLogFile(configuredFile, parentDirectoryPolicy);
+		const LogParentDirectoryPolicy parentDirectoryPolicy = bEnsureParentExists ? LogParentDirectoryPolicy::EnsureExists : LogParentDirectoryPolicy::Preserve;
+		return ResolveBootstrapLogFile(configuredFile, parentDirectoryPolicy);
 	}
 
 	std::filesystem::path CookedSceneManifest(std::string_view sceneAssetId)

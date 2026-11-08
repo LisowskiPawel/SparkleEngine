@@ -62,6 +62,7 @@ bool TaskScope::State::RegisterChild(const std::shared_ptr<State>& child)
 		return false;
 	}
 
+	std::erase_if(Children, [](const auto& entry) { return entry.expired(); });
 	Children.emplace_back(child);
 	child->Parent = shared_from_this();
 	++OpenChildren;
@@ -190,7 +191,7 @@ TaskScope::~TaskScope()
 	{
 		m_state->CancelAndJoin();
 	}
-	assert(settledBeforeDestruction && "TaskScope owner must explicitly cancel/join or join before destruction.");
+	assert(bSettledBeforeDestruction && "TaskScope owner must explicitly cancel/join or join before destruction.");
 }
 
 void TaskScope::Cancel() noexcept

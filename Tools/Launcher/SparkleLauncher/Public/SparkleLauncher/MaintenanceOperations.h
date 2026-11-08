@@ -1,9 +1,7 @@
 #pragma once
 
-#include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "SparkleLauncher/LauncherContentDefaults.h"
 #include "SparkleLauncher/OperationModel.h"
-#include "SparkleLauncher/ProcessRunner.h"
 
 #include <cstdint>
 #include <filesystem>
@@ -14,11 +12,6 @@
 
 namespace SparkleLauncher
 {
-	enum class MaintenanceOperationKind : std::uint8_t
-	{
-		CleanWorkspace
-	};
-
 	enum class CleanScope : std::uint8_t
 	{
 		CookedOutputs,
@@ -32,7 +25,6 @@ namespace SparkleLauncher
 
 	struct MaintenanceOperationDefinition
 	{
-		MaintenanceOperationKind Kind = MaintenanceOperationKind::CleanWorkspace;
 		std::string Id;
 		std::string Group;
 		std::string DisplayName;
@@ -83,6 +75,7 @@ namespace SparkleLauncher
 		std::vector<CleanScope> RequestedCleanScopes;
 		std::vector<MaintenanceCleanPathSpec> RequestedCleanTargets;
 		std::vector<std::filesystem::path> PreservedPaths;
+		bool bCleanLevelContent = false;
 		bool bDestructiveActionConfirmed = false;
 	};
 
@@ -100,9 +93,6 @@ namespace SparkleLauncher
 	{
 		OperationRecord Operation;
 		MaintenanceOperationRequest Request;
-		MaintenanceOperationKind Kind = MaintenanceOperationKind::CleanWorkspace;
-		BuildToolchainStatus Toolchain;
-		BuildFilesFreshnessStatus Freshness;
 		std::vector<MaintenanceCleanTarget> CleanTargets;
 		std::vector<MaintenanceOperationStep> Steps;
 		std::vector<std::string> PlannedEffects;
@@ -110,7 +100,6 @@ namespace SparkleLauncher
 		bool bCanRun = false;
 	};
 
-	std::string ToString(MaintenanceOperationKind kind);
 	std::string ToString(CleanScope scope);
 	std::string_view CleanScopeId(CleanScope scope) noexcept;
 	bool CleanScopeRequiresContent(CleanScope scope) noexcept;
@@ -118,5 +107,5 @@ namespace SparkleLauncher
 	const std::vector<MaintenanceOperationDefinition>& GetMaintenanceOperationDefinitions();
 	std::optional<MaintenanceOperationDefinition> FindMaintenanceOperationDefinition(std::string_view operationId);
 	MaintenanceOperationPlan PlanMaintenanceOperation(std::string_view operationId, const MaintenanceOperationRequest& request);
-	OperationRecord RunMaintenanceOperationPlan(MaintenanceOperationPlan plan, IProcessRunner& processRunner);
+	OperationRecord RunMaintenanceOperationPlan(MaintenanceOperationPlan plan);
 }

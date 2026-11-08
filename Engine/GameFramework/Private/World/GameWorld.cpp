@@ -35,7 +35,7 @@ GameWorld::~GameWorld() noexcept = default;
 
 void GameWorld::Update(float deltaSeconds)
 {
-	m_editCommands->Apply(m_generation, *m_state, *m_resources);
+	m_editCommands->Apply(m_generation, *m_state, m_resources->MaterialVariants);
 	if (m_cameraInputIntent.SpeedStepCount != 0.0f)
 	{
 		m_cameraNavigationSettings.MoveSpeedMetersPerSecond = CameraNavigation::ApplySpeedSteps(
@@ -67,7 +67,7 @@ void GameWorld::Update(float deltaSeconds)
 
 WorldEditResult GameWorld::SubmitEdit(WorldEditCommand command, std::uint64_t expectedGeneration)
 {
-	return m_editCommands->Submit(std::move(command), expectedGeneration, m_generation, *m_state, *m_resources);
+	return m_editCommands->Submit(std::move(command), expectedGeneration, m_generation, *m_state, m_resources->MaterialVariants);
 }
 
 void GameWorld::PublishCameraInputIntent(const CameraInputIntent& intent) noexcept
@@ -104,12 +104,5 @@ WorldReadView GameWorld::AcquireReadView() const noexcept
 
 WorldMaterialVariantView GameWorld::CaptureMaterialVariants() const
 {
-	WorldMaterialVariantView view;
-	view.Active = m_resources->MaterialVariants.GetActive();
-	view.Names.reserve(m_resources->MaterialVariants.GetCount());
-	for (std::size_t index = 0; index < m_resources->MaterialVariants.GetCount(); ++index)
-	{
-		view.Names.emplace_back(m_resources->MaterialVariants.GetName(index));
-	}
-	return view;
+	return m_resources->MaterialVariants.CaptureView();
 }

@@ -22,6 +22,7 @@ class EditorApplication;
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 class GpuCrashIncidentSink;
 #endif
+struct RendererGraphicsLaunch;
 struct CameraInputIntent;
 struct RenderViewCameraData;
 
@@ -72,6 +73,8 @@ private:
 	void InitializeInput();
 	void InitializeGameWorld();
 	void InitializeRenderer();
+	void PrepareGpuCrashDiagnostics(RendererGraphicsLaunch& graphics);
+	void AbortGpuCrashDiagnostics() noexcept;
 	void SignalLevelReadiness(std::string_view level);
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	void ReportReadiness();

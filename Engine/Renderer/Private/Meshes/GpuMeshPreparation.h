@@ -30,16 +30,6 @@ struct GpuMeshPreparedData final
 	std::uint64_t GetResidentByteSize() const noexcept;
 };
 
-class GpuMeshPreparation final
-{
-public:
-	static std::uint64_t CalculateDecodedByteSize(const ImmutableRenderMeshHandle& source);
-	static GpuMeshPreparedData Build(const ImmutableRenderMeshHandle& source);
-	static VertexSkinInfluenceData ConvertSkinInfluence(const VertexSkinInfluence& influence) noexcept;
-
-private:
-	static void BuildBoundsAndRayTracing(GpuMeshPreparedData& output);
-	static void BuildSkinInfluences(GpuMeshPreparedData& output);
-	static void BuildMorphTargets(GpuMeshPreparedData& output);
-	static MorphTargetDeltaData ConvertMorphTargetDelta(const MeshMorphTargetDelta& delta) noexcept;
-};
+std::uint64_t CalculateGpuMeshDecodedByteSize(const ImmutableRenderMeshHandle& source);
+GpuMeshPreparedData PrepareGpuMesh(const ImmutableRenderMeshHandle& source);
+VertexSkinInfluenceData ConvertGpuMeshSkinInfluence(const VertexSkinInfluence& influence) noexcept;

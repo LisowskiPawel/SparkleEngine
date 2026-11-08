@@ -14,7 +14,7 @@
 namespace ECS
 {
 	GameWorldState::GameWorldState() :
-	    m_systemGraph(BuildGameWorldSystemGraph())
+	    m_systemGraph(GameWorldSystemExecution::BuildGraph())
 	{
 		if (!m_systemGraph)
 		{

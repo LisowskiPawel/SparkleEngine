@@ -2,9 +2,5 @@
 
 struct EngineRenderingSettingsState;
 
-class EngineRenderingSettingsControls final
-{
-public:
-	static EngineRenderingSettingsState Capture() noexcept;
-	static void Apply(const EngineRenderingSettingsState& state) noexcept;
-};
+EngineRenderingSettingsState CaptureEngineRenderingSettings() noexcept;
+void ApplyEngineRenderingSettings(const EngineRenderingSettingsState& state) noexcept;

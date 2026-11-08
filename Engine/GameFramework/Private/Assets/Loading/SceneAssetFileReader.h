@@ -9,9 +9,8 @@ namespace Assets
 	struct LoadedSceneManifest;
 	class CookedAssetFileSet;
 
-	class SceneAssetFileReader final
+	namespace SceneAssetFileReader
 	{
-	public:
-		static void Read(const SceneAssetId& sceneAssetId, const std::filesystem::path& manifestRelativePath, LoadedSceneManifest& manifest, CookedAssetFileSet& files);
-	};
+		void Read(const SceneAssetId& sceneAssetId, const std::filesystem::path& manifestRelativePath, LoadedSceneManifest& manifest, CookedAssetFileSet& files);
+	}
 }

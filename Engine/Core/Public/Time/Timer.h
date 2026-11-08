@@ -49,7 +49,7 @@ public:
 
 	TimeInfo GetTimeInfo() const noexcept { return m_timeInfo; }
 
-	uint64_t GetFrameCount() const noexcept { return m_frameCount; }
+	uint64_t GetFrameCount() const noexcept { return m_timeInfo.frameIndex; }
 
 	double GetDelta(TimeDomain domain, TimeUnit unit = TimeUnit::Milliseconds) const noexcept;
 	double GetTotalTime(TimeDomain domain, TimeUnit unit = TimeUnit::Milliseconds) const noexcept;
@@ -67,13 +67,9 @@ public:
 private:
 	static double ToUnit(Duration d, TimeUnit u) noexcept;
 
-	TimePoint m_start{};
 	TimePoint m_last{};
-	Duration m_unscaledDelta{1.0 / 60.0};
-	Duration m_unscaledTotal{Duration::zero()};
-	Duration m_scaledTotal{Duration::zero()};
+	// Controls apply on the next tick; the completed frame retains its own observation.
 	double m_timeScale{1.0};
 	bool m_bPaused{false};
-	uint64_t m_frameCount{0};
 	TimeInfo m_timeInfo{};
 };

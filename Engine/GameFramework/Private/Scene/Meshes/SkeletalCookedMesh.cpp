@@ -1,9 +1,9 @@
 #include "PCH.h"
 
 #include "Scene/Meshes/SkeletalCookedMesh.h"
+#include <utility>
 
 SkeletalCookedMesh::SkeletalCookedMesh(SkeletalMeshData&& meshData, Assets::CookedAssetId assetId) noexcept :
-    Mesh(meshData.geometry),
     m_skeletalData(std::move(meshData)),
     m_assetId(assetId)
 {

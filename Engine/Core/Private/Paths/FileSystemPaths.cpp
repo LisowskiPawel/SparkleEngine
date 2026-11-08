@@ -9,90 +9,90 @@ namespace Filesystem
 {
 	const std::filesystem::path& GetWorkingDirectory()
 	{
-		return Private::GetFileSystemPathState().workingDirectory;
+		return GetFileSystemPathState().workingDirectory;
 	}
 
 	const std::filesystem::path& GetWorkspaceRootPath()
 	{
-		return Private::GetFileSystemPathState().workspacePath;
+		return GetFileSystemPathState().workspacePath;
 	}
 
 	const ProductUserStatePaths& GetProductUserStatePaths()
 	{
-		return Private::GetFileSystemPathState().productUserStatePaths;
+		return GetFileSystemPathState().productUserStatePaths;
 	}
 
 	const std::filesystem::path& GetProjectPath()
 	{
-		return Private::GetFileSystemPathState().projectPath;
+		return GetFileSystemPathState().projectPath;
 	}
 
 	const std::filesystem::path& GetEnginePath()
 	{
-		return Private::GetFileSystemPathState().enginePath;
+		return GetFileSystemPathState().enginePath;
 	}
 
 	void ConfigureProjectRoot(const std::filesystem::path& projectRoot)
 	{
-		Private::FileSystemPathState& state = Private::GetFileSystemPathState();
+		FileSystemPathState& state = GetFileSystemPathState();
 		state.projectPath = Paths::Normalize(projectRoot);
 		state.projectAssetsPath = state.projectPath.empty() ? std::filesystem::path{} : Paths::Normalize(state.projectPath / "Assets");
-		Private::RebuildProjectPaths(state);
+		RebuildProjectPaths(state);
 	}
 
 	const std::filesystem::path& GetCookedAssetRootPath()
 	{
-		return Private::GetFileSystemPathState().cookedAssetRootPath;
+		return GetFileSystemPathState().cookedAssetRootPath;
 	}
 
 	const std::filesystem::path& GetCookedShaderRootPath()
 	{
-		return Private::GetFileSystemPathState().cookedShaderRootPath;
+		return GetFileSystemPathState().cookedShaderRootPath;
 	}
 
 	const std::filesystem::path& GetGlobalShaderMapPath()
 	{
-		return Private::GetFileSystemPathState().globalShaderMapPath;
+		return GetFileSystemPathState().globalShaderMapPath;
 	}
 
 	const std::filesystem::path& GetCookedShaderLibraryPath()
 	{
-		return Private::GetFileSystemPathState().cookedShaderLibraryPath;
+		return GetFileSystemPathState().cookedShaderLibraryPath;
 	}
 
 	const std::filesystem::path& GetCookedTextureRootPath()
 	{
-		return Private::GetFileSystemPathState().cookedTextureRootPath;
+		return GetFileSystemPathState().cookedTextureRootPath;
 	}
 
 	const std::filesystem::path& GetCookedSceneManifestRootPath()
 	{
-		return Private::GetFileSystemPathState().cookedSceneManifestRootPath;
+		return GetFileSystemPathState().cookedSceneManifestRootPath;
 	}
 
 	const std::filesystem::path& GetCookedMeshRootPath()
 	{
-		return Private::GetFileSystemPathState().cookedMeshRootPath;
+		return GetFileSystemPathState().cookedMeshRootPath;
 	}
 
 	const std::filesystem::path& GetCookedMaterialRootPath()
 	{
-		return Private::GetFileSystemPathState().cookedMaterialRootPath;
+		return GetFileSystemPathState().cookedMaterialRootPath;
 	}
 
 	const std::filesystem::path& GetCookedSkeletonRootPath()
 	{
-		return Private::GetFileSystemPathState().cookedSkeletonRootPath;
+		return GetFileSystemPathState().cookedSkeletonRootPath;
 	}
 
 	const std::filesystem::path& GetCookedAnimationRootPath()
 	{
-		return Private::GetFileSystemPathState().cookedAnimationRootPath;
+		return GetFileSystemPathState().cookedAnimationRootPath;
 	}
 
 	const std::filesystem::path& GetSceneAssetRegistryPath()
 	{
-		return Private::GetFileSystemPathState().sceneAssetRegistryPath;
+		return GetFileSystemPathState().sceneAssetRegistryPath;
 	}
 
 	std::filesystem::path BuildGlobalShaderMapPath(const std::filesystem::path& cookedShaderRootPath)

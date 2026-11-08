@@ -3,20 +3,25 @@
 #include "Scene/Preparation/Deformation/RenderDeformationPreparation.h"
 
 #include "Scene/RenderScene.h"
+#include "Rendering/RenderSceneDynamicData.h"
 #include "Scene/Preparation/Geometry/RenderPrimitivePreparation.h"
 #include "ShaderData/MeshInstanceShaderData.h"
 
 #include <algorithm>
 
-void RenderDeformationPreparation::Prepare(const RenderScene& scene, std::span<ResolvedRenderPrimitive> primitives, RenderDeformationWork& work)
+static bool AreAllZero(std::span<const float> weights) noexcept
 {
-	ResetWork(work);
-	ResetPrimitiveOutputs(primitives);
-	PrepareJointMatrices(scene, scene.GetJointMatrixRanges(), scene.GetJointMatrices(), primitives, work);
-	PrepareMorphWeights(scene, scene.GetMorphWeightRanges(), scene.GetMorphWeights(), primitives, work);
+	return std::all_of(weights.begin(), weights.end(), [](float weight) { return weight == 0.0f; });
 }
 
-void RenderDeformationPreparation::ResetWork(RenderDeformationWork& work) noexcept
+static void CopyMorphWeightSpan(std::span<const float> source, std::span<float> destination) noexcept
+{
+	std::fill(destination.begin(), destination.end(), 0.0f);
+	const std::size_t count = (std::min) (source.size(), destination.size());
+	std::copy_n(source.begin(), count, destination.begin());
+}
+
+static void ResetWork(RenderDeformationWork& work) noexcept
 {
 	work.JointMatrixCopyRanges.clear();
 	work.MorphWeightCopyRanges.clear();
@@ -26,7 +31,7 @@ void RenderDeformationPreparation::ResetWork(RenderDeformationWork& work) noexce
 	work.PreviousMorphWeights.clear();
 }
 
-void RenderDeformationPreparation::ResetPrimitiveOutputs(std::span<ResolvedRenderPrimitive> primitives) noexcept
+static void ResetPrimitiveOutputs(std::span<ResolvedRenderPrimitive> primitives) noexcept
 {
 	for (ResolvedRenderPrimitive& primitive : primitives)
 	{
@@ -35,7 +40,7 @@ void RenderDeformationPreparation::ResetPrimitiveOutputs(std::span<ResolvedRende
 	}
 }
 
-void RenderDeformationPreparation::PrepareJointMatrices(
+static void PrepareJointMatrices(
     const RenderScene& scene,
     std::span<const RenderJointMatrixRange> jointMatrixRanges,
     std::span<const DirectX::XMFLOAT4X4> jointMatrices,
@@ -81,7 +86,7 @@ void RenderDeformationPreparation::PrepareJointMatrices(
 	work.PreviousJointMatrices.resize(jointMatrixCount);
 }
 
-void RenderDeformationPreparation::PrepareMorphWeights(
+static void PrepareMorphWeights(
     const RenderScene& scene,
     std::span<const RenderMorphWeightRange> morphWeightRanges,
     std::span<const float> weights,
@@ -131,7 +136,7 @@ void RenderDeformationPreparation::PrepareMorphWeights(
 	work.PreviousMorphWeights.resize(morphWeightCount);
 }
 
-void RenderDeformationPreparation::CopyJointMatrixRanges(std::span<const RenderJointMatrixCopyRange> ranges, std::span<DirectX::XMFLOAT4X4> current, std::span<DirectX::XMFLOAT4X4> previous) noexcept
+void CopyRenderJointMatrixRanges(std::span<const RenderJointMatrixCopyRange> ranges, std::span<DirectX::XMFLOAT4X4> current, std::span<DirectX::XMFLOAT4X4> previous) noexcept
 {
 	for (const RenderJointMatrixCopyRange& range : ranges)
 	{
@@ -147,7 +152,7 @@ void RenderDeformationPreparation::CopyJointMatrixRanges(std::span<const RenderJ
 	}
 }
 
-void RenderDeformationPreparation::CopyMorphWeightRanges(std::span<const RenderMorphWeightCopyRange> ranges, std::span<float> current, std::span<float> previous) noexcept
+void CopyRenderMorphWeightRanges(std::span<const RenderMorphWeightCopyRange> ranges, std::span<float> current, std::span<float> previous) noexcept
 {
 	for (const RenderMorphWeightCopyRange& range : ranges)
 	{
@@ -162,14 +167,10 @@ void RenderDeformationPreparation::CopyMorphWeightRanges(std::span<const RenderM
 	}
 }
 
-bool RenderDeformationPreparation::AreAllZero(std::span<const float> weights) noexcept
+void PrepareRenderDeformation(const RenderScene& scene, std::span<ResolvedRenderPrimitive> primitives, RenderDeformationWork& work)
 {
-	return std::all_of(weights.begin(), weights.end(), [](float weight) { return weight == 0.0f; });
-}
-
-void RenderDeformationPreparation::CopyMorphWeightSpan(std::span<const float> source, std::span<float> destination) noexcept
-{
-	std::fill(destination.begin(), destination.end(), 0.0f);
-	const std::size_t count = (std::min) (source.size(), destination.size());
-	std::copy_n(source.begin(), count, destination.begin());
+	ResetWork(work);
+	ResetPrimitiveOutputs(primitives);
+	PrepareJointMatrices(scene, scene.GetJointMatrixRanges(), scene.GetJointMatrices(), primitives, work);
+	PrepareMorphWeights(scene, scene.GetMorphWeightRanges(), scene.GetMorphWeights(), primitives, work);
 }

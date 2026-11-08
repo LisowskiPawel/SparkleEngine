@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <filesystem>
 #include <span>
@@ -9,9 +9,8 @@ namespace Assets
 	class CookedAssetAllocationBudget;
 	struct LoadedMaterialAsset;
 
-	class MaterialAssetLoader final
+	namespace MaterialAssetLoader
 	{
-	public:
-		LoadedMaterialAsset Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const;
-	};
+		LoadedMaterialAsset Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
+	}
 }

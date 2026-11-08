@@ -30,6 +30,8 @@ using MouseButtonCallback = InputCallback<MouseButtonEvent>;
 using MouseMoveCallback = InputCallback<MouseMoveEvent>;
 using MouseWheelCallback = InputCallback<MouseWheelEvent>;
 
+// Operations and callbacks run on the creating thread. State is published before callbacks.
+// Cancellation delivers releases synchronously to both delivery modes on each affected layer.
 class SPARKLE_PLATFORM_API InputSystem
 {
 public:
@@ -49,18 +51,17 @@ public:
 
 	void SubscribeToWindow(Window& window);
 
-	void HandleWindowMessage(WindowMessageEvent& event);
+	// Observes input without consuming the native message. The subscribed Window outlives this binding.
+	void HandleWindowMessage(const WindowMessageEvent& event);
 
-	bool OnWindowMessage(uint32_t message, uintptr_t parameter1, intptr_t parameter2);
-
-	const InputState& GetState() const noexcept { return m_inputState; }
+	const InputState& GetState() const noexcept { return GetState(InputLayer::System); }
 
 	const InputState& GetState(InputLayer layer) const noexcept;
 
 	void BeginInputRoutingFrame(bool bInteractionDisabled, bool bTextInputActive);
 	void RegisterInputTargetRegion(float left, float top, float right, float bottom, InputLayer targetLayer);
 
-	void SetActiveLayer(InputLayer layer) noexcept;
+	void SetActiveLayer(InputLayer layer);
 	void SetLayerEnabled(InputLayer layer, bool bEnabled);
 
 	bool IsLayerEnabled(InputLayer layer) const noexcept;
@@ -97,15 +98,21 @@ private:
 	struct DispatchState;
 
 	static constexpr std::size_t LayerCount = static_cast<std::size_t>(InputLayer::Count);
+	static constexpr std::size_t RoutedLayerCount = LayerCount - 1;
 
 	InputLayer ResolveTargetLayer(const InputBackendResult& result);
+	InputState* FindLayerState(InputLayer layer) noexcept;
+	void AdvanceFrameState();
 	void UpdateMouseMoveDelta(MouseMoveEvent& event) noexcept;
-	bool DispatchInputEvent(const InputBackendResult& result, InputLayer targetLayer);
+	void DispatchInputEvent(const InputBackendResult& result, InputLayer targetLayer);
+	void CancelInput();
+	void CancelPointerInput();
 	void CancelLayer(InputLayer layer);
-	void ReleaseLayerKeys(InputState& state, InputLayer layer);
-	void ReleaseLayerMouseButtons(InputState& state, InputLayer layer);
+	static InputState TakePointerState(InputState& state) noexcept;
+	void ReleaseStateKeys(const InputState& state, InputLayer layer);
+	void ReleaseStateMouseButtons(const InputState& state, InputLayer layer);
 
-	template <typename TEvent> void ProcessEvent(const TEvent& event, InputLayer TargetLayer);
+	template <typename TEvent> void ProcessEvent(const TEvent& event, InputLayer targetLayer);
 
 	void UpdateStateFromEvent(InputState& state, const KeyboardEvent& event);
 	void UpdateStateFromEvent(InputState& state, const MouseButtonEvent& event);
@@ -115,17 +122,17 @@ private:
 	std::unique_ptr<DispatchState> m_dispatch;
 
 	InputState m_inputState;
-	std::array<InputState, LayerCount> m_layerStates{};
+	std::array<InputState, RoutedLayerCount> m_layerStates{};
 
 	Threading::OwnerThread m_ownerThread{"InputSystem registration and dispatch"};
 
 	std::array<bool, LayerCount> m_layerEnabled = {true, true, true};
-	InputLayer m_activeLayer = InputLayer::Gameplay;
 	InputLayer m_mouseCaptureLayer = InputLayer::System;
 
 	int32_t m_lastMouseX = 0;
 	int32_t m_lastMouseY = 0;
 	bool m_bHasLastMousePosition = false;
+	void* m_windowHandle = nullptr;
 
 	ScopedEventHandle m_windowMessageHandle;
 };

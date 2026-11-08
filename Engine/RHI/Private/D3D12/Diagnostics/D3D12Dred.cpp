@@ -224,6 +224,85 @@ namespace D3D12DredDiagnostics
 
 using namespace D3D12DredDiagnostics;
 
+static void AppendBreadcrumbMessages(std::deque<RhiDiagnosticMessage>& messages, const D3D12_AUTO_BREADCRUMB_NODE* node)
+{
+	const D3D12_AUTO_BREADCRUMB_NODE* currentNode = node;
+	std::size_t reportedNodes = 0;
+	for (; currentNode != nullptr && reportedNodes < kMaxBreadcrumbNodes; currentNode = currentNode->pNext, ++reportedNodes)
+	{
+		const UINT completedOperations = currentNode->pLastBreadcrumbValue != nullptr ? *currentNode->pLastBreadcrumbValue : 0u;
+		const UINT historyIndex = completedOperations > 0 && currentNode->BreadcrumbCount > 0 ? (std::min) (completedOperations, currentNode->BreadcrumbCount) - 1 : 0u;
+
+		const D3D12_AUTO_BREADCRUMB_OP lastOperation = currentNode->pCommandHistory != nullptr && currentNode->BreadcrumbCount > 0 ? currentNode->pCommandHistory[historyIndex]
+		                                                                                                                           : D3D12_AUTO_BREADCRUMB_OP_BEGINSUBMISSION;
+
+		AppendDiagnosticMessage(
+		    messages,
+		    ERhiDiagnosticMessageSeverity::Error,
+		    ERhiDiagnosticMessageCategory::Driver,
+		    std::format(
+		        "DRED breadcrumb queue='{}' commandList='{}' completedOps={}/{} lastOp='{}'",
+		        ResolveDebugName(currentNode->pCommandQueueDebugNameA, currentNode->pCommandQueueDebugNameW, "UnnamedCommandQueue"),
+		        ResolveDebugName(currentNode->pCommandListDebugNameA, currentNode->pCommandListDebugNameW, "UnnamedCommandList"),
+		        completedOperations,
+		        currentNode->BreadcrumbCount,
+		        GetBreadcrumbOperationName(lastOperation)));
+	}
+}
+
+template <typename TPageFaultOutput> static void AppendPageFaultMessages(std::deque<RhiDiagnosticMessage>& messages, const TPageFaultOutput& pageFaultOutput)
+{
+	AppendDiagnosticMessage(
+	    messages,
+	    ERhiDiagnosticMessageSeverity::Fatal,
+	    ERhiDiagnosticMessageCategory::Driver,
+	    std::format("DRED page fault at GPU VA {}", Formatting::FormatPrefixedHexUInt64(pageFaultOutput.PageFaultVA)));
+
+	AppendAllocationMessages(messages, pageFaultOutput.pHeadExistingAllocationNode, "existing");
+	AppendAllocationMessages(messages, pageFaultOutput.pHeadRecentFreedAllocationNode, "recent-freed");
+}
+
+static bool CollectDred1Messages(ID3D12Device* device, std::deque<RhiDiagnosticMessage>& messages)
+{
+	ComPtr<ID3D12DeviceRemovedExtendedData1> dred1;
+	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(dred1.ReleaseAndGetAddressOf()))))
+	{
+		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 autoBreadcrumbs{};
+		if (SUCCEEDED(dred1->GetAutoBreadcrumbsOutput1(&autoBreadcrumbs)))
+		{
+			AppendBreadcrumbMessages(messages, autoBreadcrumbs.pHeadAutoBreadcrumbNode);
+		}
+
+		D3D12_DRED_PAGE_FAULT_OUTPUT1 pageFaultOutput{};
+		if (SUCCEEDED(dred1->GetPageFaultAllocationOutput1(&pageFaultOutput)) && pageFaultOutput.PageFaultVA != 0)
+		{
+			AppendPageFaultMessages(messages, pageFaultOutput);
+		}
+		return true;
+	}
+
+	return false;
+}
+
+static void CollectDredMessages(ID3D12Device* device, std::deque<RhiDiagnosticMessage>& messages)
+{
+	ComPtr<ID3D12DeviceRemovedExtendedData> dred;
+	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(dred.ReleaseAndGetAddressOf()))))
+	{
+		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT autoBreadcrumbs{};
+		if (SUCCEEDED(dred->GetAutoBreadcrumbsOutput(&autoBreadcrumbs)) && autoBreadcrumbs.pHeadAutoBreadcrumbNode != nullptr)
+		{
+			AppendBreadcrumbMessages(messages, autoBreadcrumbs.pHeadAutoBreadcrumbNode);
+		}
+
+		D3D12_DRED_PAGE_FAULT_OUTPUT pageFaultOutput{};
+		if (SUCCEEDED(dred->GetPageFaultAllocationOutput(&pageFaultOutput)) && pageFaultOutput.PageFaultVA != 0)
+		{
+			AppendPageFaultMessages(messages, pageFaultOutput);
+		}
+	}
+}
+
 void D3D12DebugLayer::CollectCrashDiagnostics(ID3D12Device* device)
 {
 	if (device == nullptr || !m_bSupportsCrashDiagnostics)
@@ -245,72 +324,9 @@ void D3D12DebugLayer::CollectCrashDiagnostics(ID3D12Device* device)
 	    ERhiDiagnosticMessageCategory::Driver,
 	    std::format("D3D12 device removal detected with HRESULT {}", Formatting::FormatPrefixedHexUInt32(static_cast<std::uint32_t>(deviceRemovedReason))));
 
-	ComPtr<ID3D12DeviceRemovedExtendedData1> dred1;
-	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(dred1.ReleaseAndGetAddressOf()))))
+	if (!CollectDred1Messages(device, m_messages))
 	{
-		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 autoBreadcrumbs{};
-		if (SUCCEEDED(dred1->GetAutoBreadcrumbsOutput1(&autoBreadcrumbs)))
-		{
-			AppendBreadcrumbMessages(m_messages, autoBreadcrumbs.pHeadAutoBreadcrumbNode);
-		}
-
-		D3D12_DRED_PAGE_FAULT_OUTPUT1 pageFaultOutput{};
-		if (SUCCEEDED(dred1->GetPageFaultAllocationOutput1(&pageFaultOutput)) && pageFaultOutput.PageFaultVA != 0)
-		{
-			AppendDiagnosticMessage(
-			    m_messages,
-			    ERhiDiagnosticMessageSeverity::Fatal,
-			    ERhiDiagnosticMessageCategory::Driver,
-			    std::format("DRED page fault at GPU VA {}", Formatting::FormatPrefixedHexUInt64(pageFaultOutput.PageFaultVA)));
-
-			AppendAllocationMessages(m_messages, pageFaultOutput.pHeadExistingAllocationNode, "existing");
-			AppendAllocationMessages(m_messages, pageFaultOutput.pHeadRecentFreedAllocationNode, "recent-freed");
-		}
-		return;
-	}
-
-	ComPtr<ID3D12DeviceRemovedExtendedData> dred;
-	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(dred.ReleaseAndGetAddressOf()))))
-	{
-		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT autoBreadcrumbs{};
-		if (SUCCEEDED(dred->GetAutoBreadcrumbsOutput(&autoBreadcrumbs)) && autoBreadcrumbs.pHeadAutoBreadcrumbNode != nullptr)
-		{
-			const D3D12_AUTO_BREADCRUMB_NODE* currentNode = autoBreadcrumbs.pHeadAutoBreadcrumbNode;
-			std::size_t reportedNodes = 0;
-			for (; currentNode != nullptr && reportedNodes < kMaxBreadcrumbNodes; currentNode = currentNode->pNext, ++reportedNodes)
-			{
-				const UINT completedOperations = currentNode->pLastBreadcrumbValue != nullptr ? *currentNode->pLastBreadcrumbValue : 0u;
-				const UINT historyIndex = completedOperations > 0 && currentNode->BreadcrumbCount > 0 ? (std::min) (completedOperations, currentNode->BreadcrumbCount) - 1 : 0u;
-
-				const D3D12_AUTO_BREADCRUMB_OP lastOperation = currentNode->pCommandHistory != nullptr && currentNode->BreadcrumbCount > 0 ? currentNode->pCommandHistory[historyIndex]
-				                                                                                                                           : D3D12_AUTO_BREADCRUMB_OP_BEGINSUBMISSION;
-
-				AppendDiagnosticMessage(
-				    m_messages,
-				    ERhiDiagnosticMessageSeverity::Error,
-				    ERhiDiagnosticMessageCategory::Driver,
-				    std::format(
-				        "DRED breadcrumb queue='{}' commandList='{}' completedOps={}/{} lastOp='{}'",
-				        ResolveDebugName(currentNode->pCommandQueueDebugNameA, currentNode->pCommandQueueDebugNameW, "UnnamedCommandQueue"),
-				        ResolveDebugName(currentNode->pCommandListDebugNameA, currentNode->pCommandListDebugNameW, "UnnamedCommandList"),
-				        completedOperations,
-				        currentNode->BreadcrumbCount,
-				        GetBreadcrumbOperationName(lastOperation)));
-			}
-		}
-
-		D3D12_DRED_PAGE_FAULT_OUTPUT pageFaultOutput{};
-		if (SUCCEEDED(dred->GetPageFaultAllocationOutput(&pageFaultOutput)) && pageFaultOutput.PageFaultVA != 0)
-		{
-			AppendDiagnosticMessage(
-			    m_messages,
-			    ERhiDiagnosticMessageSeverity::Fatal,
-			    ERhiDiagnosticMessageCategory::Driver,
-			    std::format("DRED page fault at GPU VA {}", Formatting::FormatPrefixedHexUInt64(pageFaultOutput.PageFaultVA)));
-
-			AppendAllocationMessages(m_messages, pageFaultOutput.pHeadExistingAllocationNode, "existing");
-			AppendAllocationMessages(m_messages, pageFaultOutput.pHeadRecentFreedAllocationNode, "recent-freed");
-		}
+		CollectDredMessages(device, m_messages);
 	}
 }
 

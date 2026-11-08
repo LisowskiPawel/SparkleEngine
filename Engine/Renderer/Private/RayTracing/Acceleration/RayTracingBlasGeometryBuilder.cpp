@@ -11,24 +11,32 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_rayTracingBlasGeometryBuilderLogger, "Renderer.RayTracing.BlasGeometryBuilder");
 
-bool RayTracingBlasGeometryBuilder::GeometryEquals(const RhiRayTracingGeometryDesc& left, const RhiRayTracingGeometryDesc& right) noexcept
+static DirectX::XMFLOAT3 TransformSkinnedPosition(
+    const DirectX::XMFLOAT3& position,
+    const VertexSkinInfluence& influence,
+    std::uint32_t jointMatrixOffset,
+    const std::vector<DirectX::XMFLOAT4X4>& jointMatrices) noexcept;
+static void ValidateMorphInputs(const PreparedRenderScene& preparedScene, const MeshDraw& draw, const GpuMesh& mesh) noexcept;
+static DirectX::XMFLOAT3 ApplyMorphPosition(const DirectX::XMFLOAT3& position, std::size_t vertexIndex, const PreparedRenderScene& preparedScene, const MeshDraw& draw, const GpuMesh& mesh) noexcept;
+
+bool AreRayTracingBlasGeometriesEqual(const RhiRayTracingGeometryDesc& left, const RhiRayTracingGeometryDesc& right) noexcept
 {
 	return left.VertexBuffer.Resource.Value == right.VertexBuffer.Resource.Value && left.VertexBuffer.OffsetInBytes == right.VertexBuffer.OffsetInBytes
 	    && left.VertexStrideInBytes == right.VertexStrideInBytes && left.VertexCount == right.VertexCount && left.IndexBuffer.Resource.Value == right.IndexBuffer.Resource.Value
 	    && left.IndexBuffer.OffsetInBytes == right.IndexBuffer.OffsetInBytes && left.IndexCount == right.IndexCount && left.IndexFormat == right.IndexFormat && left.bOpaque == right.bOpaque;
 }
 
-std::uint64_t RayTracingBlasGeometryBuilder::AlignRayTracingBufferSize(std::uint64_t sizeInBytes, std::uint64_t alignment) noexcept
+std::uint64_t AlignRayTracingBlasBufferSize(std::uint64_t sizeInBytes, std::uint64_t alignment) noexcept
 {
 	return alignment > 0 ? MathUtils::AlignUp(sizeInBytes, alignment) : sizeInBytes;
 }
 
-bool RayTracingBlasGeometryBuilder::IsSkinnedDraw(const MeshDraw& draw) noexcept
+bool IsSkinnedRayTracingDraw(const MeshDraw& draw) noexcept
 {
 	return draw.Geometry.MeshKind == RenderMeshKind::Skeletal;
 }
 
-void RayTracingBlasGeometryBuilder::ComputeSkinnedPositions(const PreparedRenderScene& preparedScene, const MeshDraw& draw, const GpuMesh& mesh, std::vector<DirectX::XMFLOAT3>& outPositions) noexcept
+void ComputeRayTracingSkinnedPositions(const PreparedRenderScene& preparedScene, const MeshDraw& draw, const GpuMesh& mesh, std::vector<DirectX::XMFLOAT3>& outPositions) noexcept
 {
 	const bool bHitDataPresent = mesh.HasRayTracingHitData();
 	const bool bSkinInfluencesPresent = bHitDataPresent && mesh.HasSkinInfluences();
@@ -75,7 +83,7 @@ void RayTracingBlasGeometryBuilder::ComputeSkinnedPositions(const PreparedRender
 	}
 }
 
-DirectX::XMFLOAT3 RayTracingBlasGeometryBuilder::TransformSkinnedPosition(
+static DirectX::XMFLOAT3 TransformSkinnedPosition(
     const DirectX::XMFLOAT3& position,
     const VertexSkinInfluence& influence,
     std::uint32_t jointMatrixOffset,
@@ -109,7 +117,7 @@ DirectX::XMFLOAT3 RayTracingBlasGeometryBuilder::TransformSkinnedPosition(
 	return result;
 }
 
-void RayTracingBlasGeometryBuilder::ValidateMorphInputs(const PreparedRenderScene& preparedScene, const MeshDraw& draw, const GpuMesh& mesh) noexcept
+static void ValidateMorphInputs(const PreparedRenderScene& preparedScene, const MeshDraw& draw, const GpuMesh& mesh) noexcept
 {
 	if (draw.Morph.TargetCount == 0u)
 	{
@@ -128,12 +136,7 @@ void RayTracingBlasGeometryBuilder::ValidateMorphInputs(const PreparedRenderScen
 	}
 }
 
-DirectX::XMFLOAT3 RayTracingBlasGeometryBuilder::ApplyMorphPosition(
-    const DirectX::XMFLOAT3& position,
-    std::size_t vertexIndex,
-    const PreparedRenderScene& preparedScene,
-    const MeshDraw& draw,
-    const GpuMesh& mesh) noexcept
+static DirectX::XMFLOAT3 ApplyMorphPosition(const DirectX::XMFLOAT3& position, std::size_t vertexIndex, const PreparedRenderScene& preparedScene, const MeshDraw& draw, const GpuMesh& mesh) noexcept
 {
 	DirectX::XMFLOAT3 morphed = position;
 	if (draw.Morph.TargetCount == 0u)

@@ -5,29 +5,25 @@
 
 #include <algorithm>
 
-class EditorSceneModelLookup final
+template <typename T> static const T* FindByEntity(std::span<const T> values, EntityId entity) noexcept
 {
-public:
-	template <typename T> static const T* FindByEntity(std::span<const T> values, EntityId entity) noexcept
-	{
-		const auto iterator = std::lower_bound(values.begin(), values.end(), entity, [](const T& value, EntityId key) { return value.Entity < key; });
-		return iterator != values.end() && iterator->Entity == entity ? &*iterator : nullptr;
-	}
-};
+	const auto iterator = std::lower_bound(values.begin(), values.end(), entity, [](const T& value, EntityId key) { return value.Entity < key; });
+	return iterator != values.end() && iterator->Entity == entity ? &*iterator : nullptr;
+}
 
 const WorldCameraReadData* EditorSceneModel::FindCamera(EntityId entity) const noexcept
 {
-	return EditorSceneModelLookup::FindByEntity(GetCameras(), entity);
+	return FindByEntity(GetCameras(), entity);
 }
 
 const WorldLightReadData* EditorSceneModel::FindLight(EntityId entity) const noexcept
 {
-	return EditorSceneModelLookup::FindByEntity(GetLights(), entity);
+	return FindByEntity(GetLights(), entity);
 }
 
 const WorldMeshReadData* EditorSceneModel::FindMesh(EntityId entity) const noexcept
 {
-	return EditorSceneModelLookup::FindByEntity(GetMeshes(), entity);
+	return FindByEntity(GetMeshes(), entity);
 }
 
 bool EditorSceneModel::Contains(const SceneObjectSelection& selection) const noexcept

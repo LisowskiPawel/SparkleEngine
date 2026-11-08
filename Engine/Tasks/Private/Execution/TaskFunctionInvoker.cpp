@@ -7,8 +7,14 @@
 #include <exception>
 #include <format>
 
-TaskResult InvokeTaskFunction(const TaskGraphNode& node, TaskExecutionContext& context)
+TaskResult InvokeTaskFunction(const TaskGraphNode& node, TaskExecutionContext& context, bool bBlockedByDependency)
 {
+	const bool bBlocked = bBlockedByDependency || context.IsCancellationRequested();
+	if (bBlocked && node.Desc.CompletionPolicy == TaskCompletionPolicy::Normal)
+	{
+		return TaskResult::Cancelled("Task execution was cancelled or a prerequisite did not succeed.");
+	}
+
 	if (!node.Function)
 	{
 		return TaskResult::Success();

@@ -266,7 +266,7 @@ DeformedGeometry { current/previous position, normal, tangent }
 
 The renderer allocates a stable range for each active geometry-cache track in a deformed-vertex pool. Position is first and the stride is valid as a generic ray-tracing triangle vertex buffer. Static indices, UVs, tangent sign, and material sections remain in the immutable topology mesh. The deformed range contains only attributes that vary per sample plus current/previous positions needed by temporal consumers.
 
-`RenderDeformationPreparation` resolves the sample request, history/discontinuity state, and target range. One frame-graph compute pass interpolates and normalizes attributes into the range before any consumer. The frame graph declares the resource as unordered-access output followed by vertex/shader read and, when enabled, acceleration-structure build use.
+`PrepareRenderDeformation` resolves the sample request, history/discontinuity state, and target range. One frame-graph compute pass interpolates and normalizes attributes into the range before any consumer. The frame graph declares the resource as unordered-access output followed by vertex/shader read and, when enabled, acceleration-structure build use.
 
 The selected frame order becomes:
 

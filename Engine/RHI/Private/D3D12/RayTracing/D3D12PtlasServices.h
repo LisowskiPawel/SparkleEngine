@@ -1,6 +1,5 @@
 #pragma once
 
-#include "RayTracing/RhiPtlasOperationLayout.h"
 #include "RayTracing/RhiPtlasService.h"
 
 #include <cstdint>
@@ -21,10 +20,6 @@ public:
 	RhiPtlasOperationBufferLayout GetPtlasOperationBufferLayout(const RhiPtlasDesc& desc) const noexcept override;
 
 private:
-	static std::uint32_t ToNvapiPtlasInstanceFlags(RhiPtlasInstanceFlags flags) noexcept;
-	static std::uint32_t ToNvapiPtlasOperationType(ERhiPtlasOperationType type) noexcept;
-	static RhiPtlasNativeOperationLayout GetNativeOperationLayout() noexcept;
-
 	D3D12Rhi* m_rhi = nullptr;
 	D3D12GpuMemoryAllocator* m_memoryAllocator = nullptr;
 	D3D12NvapiRayTracingProvider* m_nvapiProvider = nullptr;

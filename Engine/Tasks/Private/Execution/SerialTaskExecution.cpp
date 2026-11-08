@@ -34,7 +34,14 @@ private:
 	void TrySchedule(std::uint32_t index);
 	void ExecuteReadyTasks();
 	void ExecuteTask(std::uint32_t index);
+	TaskResult ExecuteBody(std::uint32_t index);
+	void RecordTaskResult(std::uint32_t index, const TaskResult& result);
+	void ReleaseNestedTasks(std::uint32_t index, const TaskResult& result);
+	void ReleaseUnfinished(std::uint32_t index);
 	void CompleteTask(std::uint32_t index);
+	void RecordLogicalCompletion(std::uint32_t index);
+	void ReleaseDependents(std::uint32_t index);
+	void CompleteNestedParent(std::uint32_t index);
 	void PublishFinalStatus();
 
 	const TaskGraphStorage& m_graph;
@@ -120,38 +127,53 @@ void SerialTaskExecution::RunState::ExecuteReadyTasks()
 
 void SerialTaskExecution::RunState::ExecuteTask(std::uint32_t index)
 {
-	TaskState& task = m_tasks[index];
+	const TaskResult result = ExecuteBody(index);
+	RecordTaskResult(index, result);
+	ReleaseNestedTasks(index, result);
+	ReleaseUnfinished(index);
+}
+
+TaskResult SerialTaskExecution::RunState::ExecuteBody(std::uint32_t index)
+{
+	const TaskState& task = m_tasks[index];
 	const TaskGraphNode& node = m_graph.Nodes[index];
 	const TaskProfiler::TimePoint taskStart = TaskProfiler::Begin(node.Desc, m_generation, index, 0);
-
-	const bool bBlockedByParent = task.bBlockedByPrerequisite || task.bBlockedByParent;
-	const bool bBlocked = bBlockedByParent || (m_cancellation.stop_requested());
 	TaskExecutionContext taskContext = m_context;
 	taskContext.Bind(node.Desc.Lane, m_cancellation);
 
-	TaskResult bodyResult = bBlocked && node.Desc.CompletionPolicy == TaskCompletionPolicy::Normal ? TaskResult::Cancelled("A prerequisite or nested parent did not succeed.")
-	                                                                                               : InvokeTaskFunction(node, taskContext);
+	const bool bBlockedByDependency = task.bBlockedByPrerequisite || task.bBlockedByParent;
+	TaskResult result = InvokeTaskFunction(node, taskContext, bBlockedByDependency);
+	TaskProfiler::End(node.Desc, m_generation, index, 0, result, taskStart);
+	return result;
+}
 
-	TaskProfiler::End(node.Desc, m_generation, index, 0, bodyResult, taskStart);
-
+void SerialTaskExecution::RunState::RecordTaskResult(std::uint32_t index, const TaskResult& result)
+{
+	TaskState& task = m_tasks[index];
 	task.bBodyComplete = true;
-	task.AggregateResult = bodyResult;
-	if (bodyResult.Failed() && m_completion.FirstFailureTaskName.empty())
+	task.AggregateResult = result;
+	if (result.Failed() && m_completion.FirstFailureTaskName.empty())
 	{
-		m_completion.FirstFailureTaskName = std::string(node.Desc.Name.Get());
-		m_completion.Result = bodyResult;
+		m_completion.FirstFailureTaskName = std::string(m_graph.Nodes[index].Desc.Name.Get());
+		m_completion.Result = result;
 	}
-	m_bCancellationObserved |= bodyResult.WasCancelled();
+	m_bCancellationObserved |= result.WasCancelled();
+}
 
-	for (const std::uint32_t childIndex : node.NestedChildren)
+void SerialTaskExecution::RunState::ReleaseNestedTasks(std::uint32_t index, const TaskResult& result)
+{
+	for (const std::uint32_t childIndex : m_graph.Nodes[index].NestedChildren)
 	{
 		TaskState& child = m_tasks[childIndex];
 		child.bParentBodyComplete = true;
-		child.bBlockedByParent = !bodyResult.Succeeded();
+		child.bBlockedByParent = !result.Succeeded();
 		TrySchedule(childIndex);
 	}
+}
 
-	if (--task.UnfinishedCount == 0)
+void SerialTaskExecution::RunState::ReleaseUnfinished(std::uint32_t index)
+{
+	if (--m_tasks[index].UnfinishedCount == 0)
 	{
 		CompleteTask(index);
 	}
@@ -159,25 +181,39 @@ void SerialTaskExecution::RunState::ExecuteTask(std::uint32_t index)
 
 void SerialTaskExecution::RunState::CompleteTask(std::uint32_t index)
 {
-	TaskState& completed = m_tasks[index];
-	if (completed.bTerminal)
+	if (m_tasks[index].bTerminal)
 	{
 		return;
 	}
 
+	RecordLogicalCompletion(index);
+	ReleaseDependents(index);
+	CompleteNestedParent(index);
+}
+
+void SerialTaskExecution::RunState::RecordLogicalCompletion(std::uint32_t index)
+{
+	TaskState& completed = m_tasks[index];
 	completed.bTerminal = true;
 	m_completion.TaskResults[index] = completed.AggregateResult;
 	m_completion.Settled[index] = true;
 	++m_completion.SettledTaskCount;
+}
 
+void SerialTaskExecution::RunState::ReleaseDependents(std::uint32_t index)
+{
+	const TaskResult& result = m_tasks[index].AggregateResult;
 	for (const std::uint32_t dependentIndex : m_graph.Nodes[index].Dependents)
 	{
 		TaskState& dependent = m_tasks[dependentIndex];
-		dependent.bBlockedByPrerequisite |= !completed.AggregateResult.Succeeded();
+		dependent.bBlockedByPrerequisite |= !result.Succeeded();
 		--dependent.RemainingPrerequisites;
 		TrySchedule(dependentIndex);
 	}
+}
 
+void SerialTaskExecution::RunState::CompleteNestedParent(std::uint32_t index)
+{
 	if (!m_graph.Nodes[index].Parent.has_value())
 	{
 		return;
@@ -185,14 +221,13 @@ void SerialTaskExecution::RunState::CompleteTask(std::uint32_t index)
 
 	const std::uint32_t parentIndex = *m_graph.Nodes[index].Parent;
 	TaskState& parent = m_tasks[parentIndex];
-	if (!completed.AggregateResult.Succeeded() && parent.AggregateResult.Succeeded())
+	const TaskResult& result = m_tasks[index].AggregateResult;
+	if (!result.Succeeded() && parent.AggregateResult.Succeeded())
 	{
-		parent.AggregateResult = completed.AggregateResult;
+		parent.AggregateResult = result;
 	}
-	if (--parent.UnfinishedCount == 0)
-	{
-		CompleteTask(parentIndex);
-	}
+
+	ReleaseUnfinished(parentIndex);
 }
 
 void SerialTaskExecution::RunState::PublishFinalStatus()

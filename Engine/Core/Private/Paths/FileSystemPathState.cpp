@@ -2,7 +2,7 @@
 
 #include "FileSystemPathState.h"
 
-namespace Filesystem::Private
+namespace Filesystem
 {
 	static FileSystemPathState CreateFileSystemPathState()
 	{

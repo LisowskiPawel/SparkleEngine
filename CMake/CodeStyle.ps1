@@ -465,7 +465,7 @@ $ownedCppPaths = @($ownedSourcePaths | Where-Object { [IO.Path]::GetExtension($_
 $ownedShaderPaths = @($ownedSourcePaths | Where-Object { [IO.Path]::GetExtension($_) -in @(".hlsl", ".hlsli") })
 
 Add-Type -Path (Join-Path $PSScriptRoot "CodeStyle/CodeStyleParagraphSpacing.cs")
-Add-Type -Path (Join-Path $PSScriptRoot "CodeStyle/CodeStyleIfConditions.cs")
+Add-Type -Path (Join-Path $PSScriptRoot "CodeStyle/CodeStyleDecisions.cs")
 
 $formatFailed = $false
 $braceCheckStylePath = $null
@@ -609,15 +609,15 @@ foreach ($relativePath in $ownedSourcePaths)
 {
     $absolutePath = Join-Path $repositoryRoot ($relativePath -replace "/", [IO.Path]::DirectorySeparatorChar)
     $sourceText = [IO.File]::ReadAllText($absolutePath)
-    foreach ($lineNumber in [CodeStyleIfConditions]::FindViolations($sourceText))
+    foreach ($lineNumber in [CodeStyleDecisions]::FindIfViolations($sourceText))
     {
         Add-PolicyViolation $policyViolations $relativePath $lineNumber "long call-bearing if conditions must resolve named local results"
     }
-    foreach ($lineNumber in [CodeStyleIfConditions]::FindBooleanBudgetViolations($sourceText))
+    foreach ($lineNumber in [CodeStyleDecisions]::FindBooleanBudgetViolations($sourceText))
     {
         Add-PolicyViolation $policyViolations $relativePath $lineNumber "boolean decisions allow at most two atomic checks; use small named expressions"
     }
-    foreach ($lineNumber in [CodeStyleIfConditions]::FindBooleanNameViolations($sourceText))
+    foreach ($lineNumber in [CodeStyleDecisions]::FindBooleanNameViolations($sourceText))
     {
         Add-PolicyViolation $policyViolations $relativePath $lineNumber "boolean variables require bUpperCamelCase, after any existing scope prefix"
     }

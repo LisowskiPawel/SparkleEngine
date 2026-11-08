@@ -12,31 +12,51 @@
 
 namespace Assets
 {
+	static void ReadMeshFiles(const LoadedSceneManifest& manifest, CookedAssetFileSet& files)
+	{
+		for (const auto& reference : manifest.meshAssetReferences)
+		{
+			files.Read(Paths::CookedMeshAsset(reference.meshAssetId));
+		}
+	}
+
+	static void ReadMaterialFiles(const LoadedSceneManifest& manifest, CookedAssetFileSet& files)
+	{
+		for (const auto& reference : manifest.materialAssetReferences)
+		{
+			files.Read(Paths::CookedMaterialAsset(reference));
+		}
+	}
+
+	static void ReadSkeletonFiles(const LoadedSceneManifest& manifest, CookedAssetFileSet& files)
+	{
+		for (const auto& reference : manifest.skeletonRefs)
+		{
+			files.Read(Paths::CookedSkeletonAsset(reference.skeletonAssetId));
+		}
+	}
+
+	static void ReadAnimationFiles(const LoadedSceneManifest& manifest, CookedAssetFileSet& files)
+	{
+		for (const auto& reference : manifest.animationReferences)
+		{
+			files.Read(Paths::CookedAnimationAsset(reference.animationAssetId));
+		}
+	}
+
 	void SceneAssetFileReader::Read(const SceneAssetId& sceneAssetId, const std::filesystem::path& manifestRelativePath, LoadedSceneManifest& manifest, CookedAssetFileSet& files)
 	{
 		const std::filesystem::path manifestPath = Paths::CookedSceneManifestRelative(manifestRelativePath);
 		try
 		{
 			files.Read(manifestPath);
-			manifest = SceneManifestLoader{}.Decode(manifestPath, files.Get(manifestPath), files.GetAllocationBudget());
+			manifest = SceneManifestLoader::Decode(manifestPath, files.Get(manifestPath), files.GetAllocationBudget());
 			files.Release(manifestPath);
 
-			for (const CookedSceneMeshAssetRef& reference : manifest.meshAssetReferences)
-			{
-				files.Read(Paths::CookedMeshAsset(reference.meshAssetId));
-			}
-			for (const CookedSceneMaterialAssetRef& reference : manifest.materialAssetReferences)
-			{
-				files.Read(Paths::CookedMaterialAsset(reference));
-			}
-			for (const CookedSceneSkeletonRef& reference : manifest.skeletonRefs)
-			{
-				files.Read(Paths::CookedSkeletonAsset(reference.skeletonAssetId));
-			}
-			for (const CookedAnimationReference& reference : manifest.animationReferences)
-			{
-				files.Read(Paths::CookedAnimationAsset(reference.animationAssetId));
-			}
+			ReadMeshFiles(manifest, files);
+			ReadMaterialFiles(manifest, files);
+			ReadSkeletonFiles(manifest, files);
+			ReadAnimationFiles(manifest, files);
 		}
 		catch (const Diagnostics::Error& error)
 		{

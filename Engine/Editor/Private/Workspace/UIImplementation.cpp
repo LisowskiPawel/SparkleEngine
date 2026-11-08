@@ -99,26 +99,21 @@ void UI::Implementation::SetViewportFinalColorTexture(UiTextureHandle texture) n
 
 void UI::Implementation::SetDiagnosticsProviders(EditorDiagnosticsProviders providers)
 {
-	m_shaderDiagnosticsProvider = std::move(providers.Shaders);
-	m_meshDiagnosticsProvider = std::move(providers.MeshDiagnostics);
-	m_textureDiagnosticsProvider = std::move(providers.TextureDiagnostics);
 	m_memoryDiagnosticsProvider = std::move(providers.MemoryDiagnostics);
-	m_meshPreviewProvider = std::move(providers.MeshPreview);
 
 	if (m_shaderToolsPanel)
 	{
-		m_shaderToolsPanel->SetDiagnosticsProvider(m_shaderDiagnosticsProvider);
+		m_shaderToolsPanel->SetDiagnosticsProvider(std::move(providers.Shaders));
 	}
 	if (m_usedMeshesPanel)
 	{
-		m_usedMeshesPanel->SetDiagnosticsProvider(m_meshDiagnosticsProvider);
-		m_usedMeshesPanel->SetPreviewGeometryProvider(m_meshPreviewProvider);
+		m_usedMeshesPanel->SetDiagnosticsProvider(std::move(providers.MeshDiagnostics));
+		m_usedMeshesPanel->SetPreviewGeometryProvider(std::move(providers.MeshPreview));
 	}
 	if (m_usedTexturesPanel)
 	{
-		m_usedTexturesPanel->SetDiagnosticsProvider(m_textureDiagnosticsProvider);
+		m_usedTexturesPanel->SetDiagnosticsProvider(std::move(providers.TextureDiagnostics));
 	}
-	ConfigureMainMenuBarWindowActions();
 }
 
 RendererMemoryDiagnosticsSnapshot UI::Implementation::CaptureMemoryDiagnostics() const
@@ -135,7 +130,8 @@ bool UI::Implementation::ConsumeShaderReloadRequest() noexcept
 
 void UI::Implementation::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler)
 {
-	m_shaderToolsPanel->SetCompileHandler(std::move(handler));
+	m_shaderToolsPanel->SetCompileHandler(handler);
+	m_editorConsoleSystem->SetShaderCompileHandler(std::move(handler));
 }
 
 void UI::Implementation::SetShaderCompileStatus(bool bBusy, std::string_view message)
@@ -174,10 +170,6 @@ UI::Implementation::Implementation(EditorHostServices hostServices) :
 	}
 
 	InitializeWorkspace(std::move(hostServices.RequestRestart));
-	if (m_viewportSession && m_viewportPanel)
-	{
-		m_viewportSession->SetViewModeChangedHandler([this](RenderViewMode viewMode) { m_viewportPanel->SetViewMode(viewMode); });
-	}
 	SubscribeToWindowEvents();
 }
 

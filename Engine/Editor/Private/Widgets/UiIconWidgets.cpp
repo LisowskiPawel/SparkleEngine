@@ -11,10 +11,14 @@
 
 #include <imgui.h>
 
-#include "Widgets/UiWidgetPrimitives.h"
-
 namespace EditorWidgets
 {
+	void DrawCenteredGlyph(ImDrawList* drawList, const ImVec2& start, const ImVec2& size, const char* glyph, ImU32 color) noexcept
+	{
+		const ImVec2 textSize = ImGui::CalcTextSize(glyph);
+		const ImVec2 textPosition(start.x + ((size.x - textSize.x) * 0.5f), start.y + ((size.y - textSize.y) * 0.5f));
+		drawList->AddText(textPosition, color, glyph);
+	}
 
 	bool DrawEditorIconButton(EditorIcons::EditorIcon icon, const char* id, const char* tooltip)
 	{
@@ -89,7 +93,7 @@ namespace EditorWidgets
 			drawList->AddRectFilled(start, end, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::ButtonBackgroundHovered()), 3.0f);
 		}
 
-		const ImVec4 iconColor = bVisible ? WithAlpha(SparkleUiPalette::TextMuted(), 0.58f) : SparkleUiPalette::AccentStrong();
+		const ImVec4 iconColor = bVisible ? SparkleUiPalette::WithAlpha(SparkleUiPalette::TextMuted(), 0.58f) : SparkleUiPalette::AccentStrong();
 		const ImU32 iconColorU32 = ImGui::ColorConvertFloat4ToU32(iconColor);
 		DrawCenteredGlyph(drawList, start, size, EditorIcons::GetEditorIconGlyph(bVisible ? EditorIcons::EditorIcon::EyeVisible : EditorIcons::EditorIcon::EyeHidden), iconColorU32);
 

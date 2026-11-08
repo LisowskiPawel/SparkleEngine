@@ -1,6 +1,8 @@
 #include "SparkleLauncher/LevelOperations.h"
 
 #include "Levels/LevelOperationProcessRequests.h"
+#include "Levels/LevelSelectionCommit.h"
+#include "Workspace/LauncherProductPaths.h"
 #include "Operations/LauncherOperationProgress.h"
 
 #include "Core/Public/Diagnostics/Error.h"
@@ -34,11 +36,8 @@ namespace SparkleLauncher
 		        [](const LevelOperationStep& planned, const LevelOperationProcessStep& executable) { return MatchesPlannedStep(planned, executable); });
 	}
 
-	OperationRecord RunLevelOperationPlan(LevelOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback)
+	static bool PrepareLevelSyncExecution(const LevelOperationPlan& plan, OperationRecord& operation, std::vector<LevelOperationProcessStep>& processSteps)
 	{
-		OperationRecord operation = plan.Operation;
-		MarkOperationStarted(operation, operation.LogPath);
-
 		if (!plan.bCanRun)
 		{
 			SetOperationFailure(
@@ -48,10 +47,9 @@ namespace SparkleLauncher
 			    "Resolve the reported source or content prerequisite, then retry Sync.");
 
 			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
-			return operation;
+			return false;
 		}
 
-		std::vector<LevelOperationProcessStep> processSteps;
 		try
 		{
 			processSteps = BuildLevelOperationProcessSteps(plan);
@@ -65,15 +63,24 @@ namespace SparkleLauncher
 			    "Refresh the level workflow, review its preview, then retry.");
 
 			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
-			return operation;
+			return false;
 		}
 		if (!LevelOperationExecutionPlanMatches(plan, processSteps))
 		{
 			SetOperationFailure(operation, OperationProblemKind::Planning, "Level operation inputs changed after planning.", "Refresh the level workflow, review its updated preview, then retry.");
 			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
-			return operation;
+			return false;
 		}
 
+		return true;
+	}
+
+	static bool AcquireLevelPacks(
+	    std::vector<LevelOperationProcessStep>& processSteps,
+	    IProcessRunner& processRunner,
+	    const Process::ChildProcessOutputCallback& outputCallback,
+	    OperationRecord& operation)
+	{
 		for (std::size_t stepIndex = 0; stepIndex < processSteps.size(); ++stepIndex)
 		{
 			LevelOperationProcessStep& step = processSteps[stepIndex];
@@ -97,9 +104,34 @@ namespace SparkleLauncher
 					    "Correct the first asset acquisition error in the named log, then retry Sync.");
 				}
 				MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
-				return operation;
+				return false;
 			}
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, processSteps.size());
+		}
+
+		return true;
+	}
+
+	OperationRecord RunLevelOperationPlan(LevelOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback)
+	{
+		OperationRecord operation = plan.Operation;
+		MarkOperationStarted(operation, operation.LogPath);
+		std::vector<LevelOperationProcessStep> processSteps;
+		if (!PrepareLevelSyncExecution(plan, operation, processSteps))
+		{
+			return operation;
+		}
+		if (!AcquireLevelPacks(processSteps, processRunner, outputCallback, operation))
+		{
+			return operation;
+		}
+
+		const bool bSelectionCommitted = !plan.Request.bSelectAvailableLevels
+		    || CommitLevelSelection(ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId), plan.Request.RequestedLevelIds, true, operation);
+
+		if (!bSelectionCommitted)
+		{
+			return operation;
 		}
 
 		MarkOperationFinished(operation, OperationStatus::Succeeded, 0);

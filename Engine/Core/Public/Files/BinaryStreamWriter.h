@@ -9,42 +9,38 @@
 #include <type_traits>
 #include <vector>
 
-namespace Files
+namespace Files::BinaryStreamWriter
 {
-	class BinaryStreamWriter final
+	SPARKLE_CORE_API bool WriteBytes(std::ofstream& output, const void* bytes, std::size_t byteCount, std::string& outErrorMessage);
+
+	template <typename T> bool WriteValue(std::ofstream& output, const T& value, std::string& outErrorMessage)
 	{
-	public:
-		static SPARKLE_CORE_API bool WriteBytes(std::ofstream& output, const void* bytes, std::size_t byteCount, std::string& outErrorMessage);
-
-		template <typename T> static bool WriteValue(std::ofstream& output, const T& value, std::string& outErrorMessage)
+		static_assert(std::is_trivially_copyable_v<T>, "BinaryStreamWriter requires trivially-copyable values");
+		output.write(reinterpret_cast<const char*>(&value), sizeof(T));
+		if (output.good())
 		{
-			static_assert(std::is_trivially_copyable_v<T>, "BinaryStreamWriter requires trivially-copyable values");
-			output.write(reinterpret_cast<const char*>(&value), sizeof(T));
-			if (output.good())
-			{
-				return true;
-			}
-
-			outErrorMessage = "Failed to write binary value to output stream";
-			return false;
+			return true;
 		}
 
-		template <typename T> static bool WriteArray(std::ofstream& output, const std::vector<T>& values, std::string& outErrorMessage)
+		outErrorMessage = "Failed to write binary value to output stream";
+		return false;
+	}
+
+	template <typename T> bool WriteArray(std::ofstream& output, const std::vector<T>& values, std::string& outErrorMessage)
+	{
+		static_assert(std::is_trivially_copyable_v<T>, "BinaryStreamWriter requires trivially-copyable values");
+		if (values.empty())
 		{
-			static_assert(std::is_trivially_copyable_v<T>, "BinaryStreamWriter requires trivially-copyable values");
-			if (values.empty())
-			{
-				return true;
-			}
-
-			output.write(reinterpret_cast<const char*>(values.data()), static_cast<std::streamsize>(sizeof(T) * values.size()));
-			if (output.good())
-			{
-				return true;
-			}
-
-			outErrorMessage = "Failed to write binary array to output stream";
-			return false;
+			return true;
 		}
-	};
+
+		output.write(reinterpret_cast<const char*>(values.data()), static_cast<std::streamsize>(sizeof(T) * values.size()));
+		if (output.good())
+		{
+			return true;
+		}
+
+		outErrorMessage = "Failed to write binary array to output stream";
+		return false;
+	}
 }

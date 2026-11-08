@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Core/Public/Console/CVarControl.h"
+#include "Renderer/Public/Viewport/RenderViewMode.h"
 
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -23,14 +25,14 @@ public:
 	ViewportToolbar& operator=(ViewportToolbar&&) = delete;
 
 	void SetGeometry(float leftPixels, float topPixels, float widthPixels) noexcept;
-	void Draw(std::string_view levelName, bool bDisableInteraction = false) noexcept;
+	std::optional<RenderViewMode> Draw(std::string_view levelName, RenderViewMode viewMode, bool bDisableInteraction = false) noexcept;
 
 	float GetHeightPixels() const noexcept { return m_heightPixels; }
 
 private:
 	void DrawLevelName(std::string_view levelName, bool bCompact) const noexcept;
 	bool BeginToolbarWindow() noexcept;
-	void DrawToolbarContents(std::string_view levelName, bool bDisableInteraction) noexcept;
+	std::optional<RenderViewMode> DrawToolbarContents(std::string_view levelName, RenderViewMode viewMode, bool bDisableInteraction) noexcept;
 	void DrawToolbarBorder() const noexcept;
 	void EndToolbarWindow() const noexcept;
 	void DrawCameraControls(bool bDisableInteraction, bool bCompact) noexcept;

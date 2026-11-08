@@ -33,13 +33,6 @@ constexpr std::array ProgressReasonLabels = {
     "Required GPU ray tracing or accumulation support is unavailable",
     "Another viewport owns the reference accumulator"};
 
-static void RequestAction(ViewportRenderRequest& request, ViewportRenderAction action) noexcept
-{
-	request.RenderAction = action;
-	++request.RenderActionSequence;
-	++request.Generation;
-}
-
 static const char* GetStateLabel(ViewportRenderProgressState state) noexcept
 {
 	const std::size_t index = static_cast<std::size_t>(state);
@@ -67,7 +60,7 @@ static void BeginReferenceOverlay(const ViewportRenderProgress& progress) noexce
 	ImGui::TextUnformatted("Reference Path Tracer");
 }
 
-static void DrawUnavailableSession(const ViewportRenderProgress& progress, ViewportRenderRequest& request) noexcept
+static void DrawUnavailableSession(const ViewportRenderProgress& progress, ReferencePathTracerOverlayActions& actions) noexcept
 {
 	const char* reasonLabel = GetReasonLabel(progress.Reason);
 	ImGui::TextUnformatted("Unavailable");
@@ -77,13 +70,12 @@ static void DrawUnavailableSession(const ViewportRenderProgress& progress, Viewp
 		ImGui::Text("Owned by viewport %llu", static_cast<unsigned long long>(progress.OwnerViewportId));
 		if (ImGui::Button("Transfer"))
 		{
-			RequestAction(request, ViewportRenderAction::Transfer);
+			actions.RenderAction = ViewportRenderAction::Transfer;
 		}
 	}
 	else if (ImGui::Button("Use Lit"))
 	{
-		request.ViewMode = RenderViewMode::Lit;
-		++request.Generation;
+		actions.ViewMode = RenderViewMode::Lit;
 	}
 }
 
@@ -112,7 +104,7 @@ static void DrawAccumulationProgress(const ViewportRenderProgress& progress) noe
 	}
 }
 
-static void DrawPlaybackControls(const ViewportRenderProgress& progress, ViewportRenderRequest& request) noexcept
+static void DrawPlaybackControls(const ViewportRenderProgress& progress, ReferencePathTracerOverlayActions& actions) noexcept
 {
 	const bool bPaused = progress.State == ViewportRenderProgressState::Paused;
 	const bool bComplete = progress.State == ViewportRenderProgressState::Complete;
@@ -121,7 +113,7 @@ static void DrawPlaybackControls(const ViewportRenderProgress& progress, Viewpor
 	{
 		if (ImGui::Button("Resume"))
 		{
-			RequestAction(request, ViewportRenderAction::Resume);
+			actions.RenderAction = ViewportRenderAction::Resume;
 		}
 	}
 	else if (!bComplete)
@@ -129,7 +121,7 @@ static void DrawPlaybackControls(const ViewportRenderProgress& progress, Viewpor
 		ImGui::BeginDisabled(!progress.bRetentionAvailable);
 		if (ImGui::Button("Pause"))
 		{
-			RequestAction(request, ViewportRenderAction::Pause);
+			actions.RenderAction = ViewportRenderAction::Pause;
 		}
 		ImGui::EndDisabled();
 		if (!progress.bRetentionAvailable && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
@@ -144,11 +136,11 @@ static void DrawPlaybackControls(const ViewportRenderProgress& progress, Viewpor
 	}
 	if (ImGui::Button("Restart"))
 	{
-		RequestAction(request, ViewportRenderAction::Restart);
+		actions.RenderAction = ViewportRenderAction::Restart;
 	}
 }
 
-static void DrawOutputActions(const ViewportRenderProgress& progress, ViewportRenderRequest& request, ViewportOutputAction& outputAction) noexcept
+static void DrawOutputActions(const ViewportRenderProgress& progress, ReferencePathTracerOverlayActions& actions) noexcept
 {
 	const bool bUnavailable = progress.State == ViewportRenderProgressState::Unavailable;
 	const bool bComplete = progress.State == ViewportRenderProgressState::Complete;
@@ -156,28 +148,28 @@ static void DrawOutputActions(const ViewportRenderProgress& progress, ViewportRe
 	ImGui::BeginDisabled(!bHasPrefix || bComplete);
 	if (ImGui::Button("Save partial prefix"))
 	{
-		RequestAction(request, ViewportRenderAction::Pause);
-		outputAction = ViewportOutputAction::SaveCurrentPrefix;
+		actions.RenderAction = ViewportRenderAction::Pause;
+		actions.OutputAction = ViewportOutputAction::SaveCurrentPrefix;
 	}
 	ImGui::EndDisabled();
 	ImGui::SameLine();
 	ImGui::BeginDisabled(!bComplete);
 	if (ImGui::Button("Save complete"))
 	{
-		outputAction = ViewportOutputAction::SaveComplete;
+		actions.OutputAction = ViewportOutputAction::SaveComplete;
 	}
 	ImGui::EndDisabled();
 	ImGui::BeginDisabled(!bHasPrefix);
 	if (ImGui::Button("Save checkpoint"))
 	{
-		RequestAction(request, ViewportRenderAction::Pause);
-		outputAction = ViewportOutputAction::SaveCheckpoint;
+		actions.RenderAction = ViewportRenderAction::Pause;
+		actions.OutputAction = ViewportOutputAction::SaveCheckpoint;
 	}
 	ImGui::EndDisabled();
 	ImGui::TextDisabled("Scene-linear Reference radiance at the session extent; final viewport color is not exported.");
 }
 
-static void DrawDetails(const ViewportRenderProgress& progress, ViewportRenderRequest& request, ViewportOutputAction& outputAction) noexcept
+static void DrawDetails(const ViewportRenderProgress& progress, ReferencePathTracerOverlayActions& actions) noexcept
 {
 	const bool bUnavailable = progress.State == ViewportRenderProgressState::Unavailable;
 	if (!bUnavailable || progress.Reason == ViewportRenderProgressReason::SessionCapacity)
@@ -202,22 +194,24 @@ static void DrawDetails(const ViewportRenderProgress& progress, ViewportRenderRe
 	ImGui::TextUnformatted("Reference radiance: scene-linear HDR sample mean");
 	ImGui::TextUnformatted("Final color: viewport presentation derived from Reference radiance");
 	ImGui::SeparatorText("Evidence / Output");
-	DrawOutputActions(progress, request, outputAction);
+	DrawOutputActions(progress, actions);
 	ImGui::EndPopup();
 }
 
-void DrawReferencePathTracerOverlay(const ViewportRenderProgress& progress, ViewportRenderRequest& request, ViewportOutputAction& outputAction) noexcept
+ReferencePathTracerOverlayActions DrawReferencePathTracerOverlay(const ViewportRenderProgress& progress) noexcept
 {
+	ReferencePathTracerOverlayActions actions;
 	BeginReferenceOverlay(progress);
 	if (progress.State == ViewportRenderProgressState::Unavailable)
 	{
-		DrawUnavailableSession(progress, request);
+		DrawUnavailableSession(progress, actions);
 	}
 	else
 	{
 		DrawAccumulationProgress(progress);
-		DrawPlaybackControls(progress, request);
+		DrawPlaybackControls(progress, actions);
 	}
-	DrawDetails(progress, request, outputAction);
+	DrawDetails(progress, actions);
 	ImGui::EndChild();
+	return actions;
 }

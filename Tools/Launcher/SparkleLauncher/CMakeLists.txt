@@ -76,6 +76,9 @@ set(SPARKLE_LAUNCHER_CORE_LEVEL_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash/GpuCrashLaunch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash/GpuCrashLaunch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/AssetPackSyncPlanner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelPreparation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelCleanPaths.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelSelectionCommit.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperationExecutor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperationProcessRequests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperations.cpp
@@ -87,6 +90,8 @@ set(SPARKLE_LAUNCHER_CORE_LEVEL_SOURCES
 
 set(SPARKLE_LAUNCHER_CORE_LEVEL_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/AssetPackSyncPlanner.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelPreparation.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelSelectionCommit.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperationProcessRequests.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelRunOperationProcessRequests.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/ExternalCapture/ExternalCaptureDiscovery.h
@@ -97,22 +102,32 @@ set(SPARKLE_LAUNCHER_CORE_COOK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookOperationExecutor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookOperationProcessRequests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookOperations.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookOperationPlanner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookPlanReadiness.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookPlanPreview.cpp
 )
 
 set(SPARKLE_LAUNCHER_CORE_COOK_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookPlanReadiness.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookPlanPreview.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookedContentReadiness.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookOperationProcessRequests.h
 )
 
 set(SPARKLE_LAUNCHER_CORE_MAINTENANCE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceOperationExecutor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceOperationProcessRequests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceCleanSteps.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceOperations.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceOperationPlanner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceCleanPreview.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceCleanExecution.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/ActionCleanPaths.cpp
 )
 
 set(SPARKLE_LAUNCHER_CORE_MAINTENANCE_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceOperationProcessRequests.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceCleanSteps.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceCleanPreview.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Maintenance/MaintenanceCleanExecution.h
 )
 
 find_package(Qt6 6.11.1 EXACT REQUIRED COMPONENTS Widgets)

@@ -10,7 +10,12 @@
 #include <algorithm>
 #include <limits>
 
-std::uint64_t GpuMeshPreparation::CalculateDecodedByteSize(const ImmutableRenderMeshHandle& source)
+static void BuildBoundsAndRayTracing(GpuMeshPreparedData& output);
+static void BuildSkinInfluences(GpuMeshPreparedData& output);
+static void BuildMorphTargets(GpuMeshPreparedData& output);
+static MorphTargetDeltaData ConvertMorphTargetDelta(const MeshMorphTargetDelta& delta) noexcept;
+
+std::uint64_t CalculateGpuMeshDecodedByteSize(const ImmutableRenderMeshHandle& source)
 {
 	if (!source.IsValid())
 	{
@@ -62,7 +67,7 @@ std::uint64_t GpuMeshPreparedData::GetResidentByteSize() const noexcept
 	return GetDecodedByteSize() + meshData.GetVertexBufferSize() + meshData.GetIndexBufferSize() + (std::max<std::size_t>(MorphTargetDeltas.size(), 1u) * sizeof(MorphTargetDeltaData));
 }
 
-GpuMeshPreparedData GpuMeshPreparation::Build(const ImmutableRenderMeshHandle& source)
+GpuMeshPreparedData PrepareGpuMesh(const ImmutableRenderMeshHandle& source)
 {
 	if (!source.IsValid())
 	{
@@ -90,7 +95,7 @@ GpuMeshPreparedData GpuMeshPreparation::Build(const ImmutableRenderMeshHandle& s
 	return output;
 }
 
-void GpuMeshPreparation::BuildBoundsAndRayTracing(GpuMeshPreparedData& output)
+static void BuildBoundsAndRayTracing(GpuMeshPreparedData& output)
 {
 	const MeshData& meshData = output.Source.GetResource()->GetMeshData();
 	output.RayTracingVertices.reserve(meshData.vertices.size());
@@ -118,7 +123,7 @@ void GpuMeshPreparation::BuildBoundsAndRayTracing(GpuMeshPreparedData& output)
 	output.RayTracingIndices.assign(meshData.indices.begin(), meshData.indices.end());
 }
 
-void GpuMeshPreparation::BuildSkinInfluences(GpuMeshPreparedData& output)
+static void BuildSkinInfluences(GpuMeshPreparedData& output)
 {
 	const std::size_t vertexCount = output.RayTracingVertices.size();
 	output.GpuSkinInfluences.resize(vertexCount);
@@ -138,11 +143,11 @@ void GpuMeshPreparation::BuildSkinInfluences(GpuMeshPreparedData& output)
 	output.SkinInfluences = influences;
 	for (std::size_t index = 0u; index < influences.size(); ++index)
 	{
-		output.GpuSkinInfluences[index] = ConvertSkinInfluence(influences[index]);
+		output.GpuSkinInfluences[index] = ConvertGpuMeshSkinInfluence(influences[index]);
 	}
 }
 
-void GpuMeshPreparation::BuildMorphTargets(GpuMeshPreparedData& output)
+static void BuildMorphTargets(GpuMeshPreparedData& output)
 {
 	const auto* skeletalMesh = dynamic_cast<const SkeletalCookedMesh*>(output.Source.GetResource().get());
 	if (skeletalMesh == nullptr)
@@ -174,7 +179,7 @@ void GpuMeshPreparation::BuildMorphTargets(GpuMeshPreparedData& output)
 	output.MorphTargetCount = static_cast<std::uint32_t>(morphTargets.size());
 }
 
-VertexSkinInfluenceData GpuMeshPreparation::ConvertSkinInfluence(const VertexSkinInfluence& influence) noexcept
+VertexSkinInfluenceData ConvertGpuMeshSkinInfluence(const VertexSkinInfluence& influence) noexcept
 {
 	return VertexSkinInfluenceData{
 	    .JointIndices0 = {influence.jointIndices[0], influence.jointIndices[1], influence.jointIndices[2], influence.jointIndices[3]},
@@ -183,7 +188,7 @@ VertexSkinInfluenceData GpuMeshPreparation::ConvertSkinInfluence(const VertexSki
 	    .JointWeights1 = {influence.jointWeights[4], influence.jointWeights[5], influence.jointWeights[6], influence.jointWeights[7]}};
 }
 
-MorphTargetDeltaData GpuMeshPreparation::ConvertMorphTargetDelta(const MeshMorphTargetDelta& delta) noexcept
+static MorphTargetDeltaData ConvertMorphTargetDelta(const MeshMorphTargetDelta& delta) noexcept
 {
 	return MorphTargetDeltaData{
 	    .Position = {delta.position.x, delta.position.y, delta.position.z, 0.0f},

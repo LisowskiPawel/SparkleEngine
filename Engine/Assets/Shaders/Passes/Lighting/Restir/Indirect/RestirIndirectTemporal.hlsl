@@ -1,3 +1,4 @@
+#include "/Engine/RayTracing/RayTracingSceneTraceInline.hlsli"
 #include "/Engine/Resources/ViewTemporalUniformData.hlsli"
 
 #include "/Engine/Passes/GBuffer/MotionVector.hlsli"
@@ -11,7 +12,12 @@ Texture2D GBufferMotionVector;
 Texture2D SkyTexture;
 SamplerState SamplerLinearNoMipWrapClampClamp;
 
-#include "/Engine/Lighting/RestirIndirectReservoirReuse.hlsli"
+#include "/Engine/Passes/Lighting/Restir/Indirect/GBufferPathSurface.hlsli"
+#include "/Engine/Resources/MeshInstanceShaderData.hlsli"
+
+RaytracingAccelerationStructure SceneTlas;
+
+#include "/Engine/Passes/Lighting/Restir/Indirect/RestirIndirectReservoirReuse.hlsli"
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -26,11 +32,12 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	}
 
 	const GBufferPathSurface surface = LoadGBufferPathSurface(pixelCoord);
-	IndirectReservoir::Reservoir reservoir = IndirectReservoir::BuildInitialReservoir(surface, pixelCoord, SkyTexture, SamplerLinearNoMipWrapClampClamp);
+	IndirectReservoir::Reservoir reservoir = IndirectReservoir::BuildInitialReservoir(SceneTlas, surface, pixelCoord, SkyTexture, SamplerLinearNoMipWrapClampClamp);
 
 	if (surface.bValid && RestirIndirectTemporalReuse != 0u && HistoryValid != 0u)
 	{
-		IndirectReservoir::ReuseTemporal(pixelCoord,
+		IndirectReservoir::ReuseTemporal(SceneTlas,
+		                                 pixelCoord,
 		                                 uint2(width, height),
 		                                 surface,
 		                                 GBufferMotionVector,

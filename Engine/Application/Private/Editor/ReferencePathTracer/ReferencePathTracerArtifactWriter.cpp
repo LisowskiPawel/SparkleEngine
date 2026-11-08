@@ -7,56 +7,82 @@
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifactEncoding.h"
 
 #include <utility>
+#include <exception>
+
+namespace ReferencePathTracerArtifactWriter
+{
+	static bool HashArtifact(const ReferencePathTracerEncodedArtifact& artifact, std::string& beauty, std::string& checkpoint, std::string& error)
+	{
+		if (!Hash::TrySha256Hex(artifact.Beauty, beauty, error))
+		{
+			return false;
+		}
+		return !artifact.Checkpoint || Hash::TrySha256Hex(*artifact.Checkpoint, checkpoint, error);
+	}
+
+	static ArtifactBundlePublicationRequest BuildPublication(ReferencePathTracerArtifactWriteRequest& request, ReferencePathTracerEncodedArtifact& artifact, const std::string& manifest)
+	{
+		ArtifactBundlePublicationRequest publication{
+		    .AllowedRoot = std::move(request.AllowedRoot),
+		    .PublicationDirectory = std::move(request.PublicationDirectory),
+		    .CompletionFile = "manifest.json",
+		    .MaximumOutputBytes = request.MaximumOutputBytes};
+
+		publication.Files.push_back(ArtifactBundleFile{.RelativePath = "beauty.exr", .Bytes = std::move(artifact.Beauty)});
+		if (artifact.Checkpoint)
+		{
+			publication.Files.push_back(ArtifactBundleFile{.RelativePath = "checkpoint.bin", .Bytes = std::move(*artifact.Checkpoint)});
+		}
+
+		publication.Files.push_back(
+		    ArtifactBundleFile{
+		        .RelativePath = "manifest.json",
+		        .Bytes = std::vector<std::byte>(reinterpret_cast<const std::byte*>(manifest.data()), reinterpret_cast<const std::byte*>(manifest.data() + manifest.size()))});
+
+		return publication;
+	}
+}
 
 ReferencePathTracerArtifactWriteResult ReferencePathTracerArtifactWriter::Write(ReferencePathTracerArtifactWriteRequest request, std::stop_token cancellationToken) noexcept
 {
-	ReferencePathTracerArtifactWriteResult result{.PublicationDirectory = request.PublicationDirectory};
-	ReferencePathTracerEncodedArtifact artifact;
-	if (!ReferencePathTracerArtifactEncoding::Encode(request, artifact, result.ErrorMessage))
+	ReferencePathTracerArtifactWriteResult result;
+	try
 	{
-		return result;
+		result.PublicationDirectory = request.PublicationDirectory;
+		if (cancellationToken.stop_requested())
+		{
+			result.ErrorMessage = "Reference Path Tracer artifact publication was cancelled.";
+			return result;
+		}
+		ReferencePathTracerEncodedArtifact artifact;
+		if (!ReferencePathTracerArtifactEncoding::Encode(request, artifact, result.ErrorMessage))
+		{
+			return result;
+		}
+		std::string beautyHash;
+		std::string checkpointHash;
+		if (!HashArtifact(artifact, beautyHash, checkpointHash, result.ErrorMessage))
+		{
+			return result;
+		}
+		const std::string manifest = ReferencePathTracerArtifactEncoding::BuildManifest(request, artifact, beautyHash, checkpointHash);
+		ArtifactBundlePublicationRequest publication = BuildPublication(request, artifact, manifest);
+		ArtifactBundlePublicationResult published = ArtifactBundlePublication::Publish(std::move(publication), cancellationToken);
+		result.bSucceeded = published.bSucceeded;
+		result.PublicationDirectory = std::move(published.PublicationDirectory);
+		result.ErrorMessage = std::move(published.ErrorMessage);
+		if (result.bSucceeded && !published.Files.empty())
+		{
+			result.ManifestSha256 = std::move(published.Files.back().Sha256);
+		}
 	}
-
-	std::string beautyHash;
-	std::string checkpointHash;
-	const bool bBeautyHashed = Hash::TrySha256Hex(artifact.Beauty, beautyHash, result.ErrorMessage);
-	const bool bNoCheckpoint = bBeautyHashed && (!artifact.Checkpoint);
-	const bool bHashCheckpoint = bBeautyHashed && !bNoCheckpoint;
-	const bool bCheckpointDigestWritten = bHashCheckpoint && (Hash::TrySha256Hex(*artifact.Checkpoint, checkpointHash, result.ErrorMessage));
-	const bool bCheckpointHashAvailable = bNoCheckpoint || bCheckpointDigestWritten;
-	const bool bCheckpointHashed = bBeautyHashed && bCheckpointHashAvailable;
-
-	if (!bCheckpointHashed)
+	catch (const std::exception& error)
 	{
-		return result;
+		result.ErrorMessage = error.what();
 	}
-
-	const std::string manifest = ReferencePathTracerArtifactEncoding::BuildManifest(request, artifact, beautyHash, checkpointHash);
-
-	ArtifactBundlePublicationRequest publication{
-	    .AllowedRoot = std::move(request.AllowedRoot),
-	    .PublicationDirectory = std::move(request.PublicationDirectory),
-	    .CompletionFile = "manifest.json",
-	    .MaximumOutputBytes = request.MaximumOutputBytes};
-
-	publication.Files.push_back(ArtifactBundleFile{.RelativePath = "beauty.exr", .Bytes = std::move(artifact.Beauty)});
-	if (artifact.Checkpoint)
+	catch (...)
 	{
-		publication.Files.push_back(ArtifactBundleFile{.RelativePath = "checkpoint.bin", .Bytes = std::move(*artifact.Checkpoint)});
-	}
-
-	publication.Files.push_back(
-	    ArtifactBundleFile{
-	        .RelativePath = "manifest.json",
-	        .Bytes = std::vector<std::byte>(reinterpret_cast<const std::byte*>(manifest.data()), reinterpret_cast<const std::byte*>(manifest.data() + manifest.size()))});
-
-	ArtifactBundlePublicationResult publicationResult = ArtifactBundlePublication::Publish(std::move(publication), cancellationToken);
-	result.bSucceeded = publicationResult.bSucceeded;
-	result.PublicationDirectory = std::move(publicationResult.PublicationDirectory);
-	result.ErrorMessage = std::move(publicationResult.ErrorMessage);
-	if (result.bSucceeded && !publicationResult.Files.empty())
-	{
-		result.ManifestSha256 = std::move(publicationResult.Files.back().Sha256);
+		result.ErrorMessage = "Unknown Reference Path Tracer artifact failure.";
 	}
 	return result;
 }

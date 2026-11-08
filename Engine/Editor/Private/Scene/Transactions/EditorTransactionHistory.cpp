@@ -24,11 +24,7 @@ static bool AffectsSameTarget(const WorldEditPayload& left, const WorldEditPaylo
 	    left);
 }
 
-class EditorTransactionHistoryLimits final
-{
-public:
-	static constexpr std::size_t MaximumTransactions = 256;
-};
+static constexpr std::size_t MaximumTransactions = 256;
 
 WorldEditResult EditorTransactionHistory::Submit(WorldEditCommand command, std::uint64_t worldGeneration)
 {
@@ -77,7 +73,7 @@ WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, Worl
 	}
 	else
 	{
-		if (m_undo.size() == EditorTransactionHistoryLimits::MaximumTransactions)
+		if (m_undo.size() == MaximumTransactions)
 		{
 			m_undo.erase(m_undo.begin());
 		}

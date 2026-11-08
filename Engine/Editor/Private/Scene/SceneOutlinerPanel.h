@@ -24,7 +24,6 @@ class SceneOutlinerPanel final
 {
 public:
 	SceneOutlinerPanel(SceneObjectSelection& selection, EditorTransactionHistory& transactionHistory, float widthPixels = 320.0f) noexcept;
-	void SetWidth(float widthPixels) noexcept;
 
 	float GetWidth() const noexcept { return m_widthPixels; }
 

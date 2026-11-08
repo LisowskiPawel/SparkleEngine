@@ -89,60 +89,6 @@ namespace Strings
 		return lowered;
 	}
 
-	std::string EscapeCsvField(std::string_view str)
-	{
-		constexpr std::size_t surroundingQuoteCount = 2;
-		std::string result;
-		result.reserve(str.size() + surroundingQuoteCount);
-		result.push_back('"');
-		for (const char character : str)
-		{
-			if (character == '"')
-			{
-				result.push_back('"');
-			}
-			result.push_back(character);
-		}
-		result.push_back('"');
-		return result;
-	}
-
-	std::string EscapeJsonString(std::string_view str)
-	{
-		constexpr std::size_t escapeCapacitySlack = 8;
-		std::string result;
-		result.reserve(str.size() + escapeCapacitySlack);
-		for (const char character : str)
-		{
-			switch (character)
-			{
-				case '\\':
-					result += "\\\\";
-					break;
-
-				case '"':
-					result += "\\\"";
-					break;
-
-				case '\n':
-					result += "\\n";
-					break;
-
-				case '\r':
-					result += "\\r";
-					break;
-
-				case '\t':
-					result += "\\t";
-					break;
-				default:
-					result.push_back(character);
-					break;
-			}
-		}
-		return result;
-	}
-
 	bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs) noexcept
 	{
 		if (lhs.size() != rhs.size())

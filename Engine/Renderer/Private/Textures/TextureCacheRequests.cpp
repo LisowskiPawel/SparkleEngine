@@ -38,7 +38,7 @@ void TextureCache::LoadDefaultTextures(RenderCommandList& commandList, std::vect
 		LoadedTextureData decodedTexture;
 		try
 		{
-			decodedTexture = CookedTextureLoader::Decode(CookedTextureLoader::Read(source->Path));
+			decodedTexture = DecodeCookedTexture(ReadCookedTexturePayload(source->Path));
 		}
 		catch (const Diagnostics::Error& error)
 		{
@@ -91,7 +91,7 @@ void TextureCache::RequestTexture(const ResolvedTexturePath& source, std::uint32
 	TextureRequest request;
 	request.Source = source;
 	request.Generation = *handle;
-	request.Payload = std::make_shared<CookedTextureLoadTask::Payload>();
+	request.Payload = std::make_shared<CookedTextureLoadPayload>();
 	m_requests.push_back(std::move(request));
 	LaunchPendingRequests();
 }
@@ -171,7 +171,7 @@ void TextureCache::LaunchPendingRequests()
 		{
 			return;
 		}
-		request.Execution = CookedTextureLoadTask::Launch(m_taskExecutor, *m_taskScope, request.Source.Path, request.Payload, maximumDecodedBytes);
+		request.Execution = LaunchCookedTextureLoad(m_taskExecutor, *m_taskScope, request.Source.Path, request.Payload, maximumDecodedBytes);
 		request.bLoadStarted = true;
 		--availableSlots;
 	}

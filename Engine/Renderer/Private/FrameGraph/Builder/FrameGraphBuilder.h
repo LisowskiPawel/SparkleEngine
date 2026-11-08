@@ -5,14 +5,12 @@
 #include "Passes/Core/ShaderPass.h"
 #include "Pipeline/RenderPassRuntimeCache.h"
 #include "Pipeline/RasterPassRenderState.h"
-#include "Scene/RayTracing/RayTracingShaderTablePlan.h"
 
-#include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cstdint>
-#include <limits>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -118,49 +116,32 @@ public:
 			        0,
 			        nullptr,
 			        diagnosticLabel.c_str());
-			    assert(dispatched);
+			    assert(bDispatched);
 		    });
 	}
 
-	template <typename TRayGenerationShader> void TraceRays(
+	template <typename TRayGenerationShader, typename TResolveHitGroups> std::optional<RayTracingShaderTableMaterialization> TraceRays(
 	    std::string_view label,
 	    const RayTracingPipelineComposition& composition,
+	    std::uint64_t recordLayoutGeneration,
 	    TypedPassParameterInstance<typename TRayGenerationShader::Parameters>& parameters,
-	    const RayTracingDispatchDimensions& dimensions)
+	    const RayTracingDispatchDimensions& dimensions,
+	    TResolveHitGroups&& resolveHitGroups)
 	{
 		m_renderPassRuntimeCache.MaterializeRayTracingRuntime<TRayGenerationShader>(composition);
 		const RayTracingPassPipelineRuntime runtime = m_renderPassRuntimeCache.GetRayTracingRuntime<TRayGenerationShader>(composition);
-		const std::string tableKey = std::string(label) + "." + std::to_string(reinterpret_cast<std::uintptr_t>(&runtime.Pipeline)) + "." + std::to_string(runtime.Generation);
+		const std::string tableKey = BuildRayTracingShaderTableKey(label, runtime, recordLayoutGeneration);
 		auto& shaderTable = m_frameGraph.m_rayTracingShaderTables[tableKey];
+		std::optional<RayTracingShaderTableMaterialization> materialization;
 		if (shaderTable == nullptr)
 		{
-			shaderTable = m_renderPassRuntimeCache.CreateRayTracingShaderTable<TRayGenerationShader>(composition);
+			const auto start = std::chrono::steady_clock::now();
+			shaderTable = m_renderPassRuntimeCache.CreateRayTracingShaderTable<TRayGenerationShader>(composition, std::forward<TResolveHitGroups>(resolveHitGroups));
+			materialization = MeasureRayTracingShaderTableMaterialization(*shaderTable, start);
 		}
+
 		AddRayTracingPass<TRayGenerationShader>(label, tableKey, runtime, shaderTable, parameters, dimensions);
-	}
-
-	template <typename TRayGenerationShader> void TraceRays(
-	    std::string_view label,
-	    const RayTracingPipelineComposition& composition,
-	    RayTracingShaderTablePlan& shaderTablePlan,
-	    TypedPassParameterInstance<typename TRayGenerationShader::Parameters>& parameters,
-	    const RayTracingDispatchDimensions& dimensions)
-	{
-		m_renderPassRuntimeCache.MaterializeRayTracingRuntime<TRayGenerationShader>(composition);
-		const RayTracingPassPipelineRuntime runtime = m_renderPassRuntimeCache.GetRayTracingRuntime<TRayGenerationShader>(composition);
-
-		const std::string tableKey = std::string(label) + "." + std::to_string(reinterpret_cast<std::uintptr_t>(&runtime.Pipeline)) + "." + std::to_string(runtime.Generation) + "."
-		    + std::to_string(shaderTablePlan.GetGeneration());
-
-		auto& shaderTable = m_frameGraph.m_rayTracingShaderTables[tableKey];
-		if (shaderTable == nullptr)
-		{
-			const auto materializationStart = std::chrono::steady_clock::now();
-			shaderTable = m_renderPassRuntimeCache.CreateRayTracingShaderTable<TRayGenerationShader>(composition, shaderTablePlan);
-			const auto elapsed = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - materializationStart).count());
-			shaderTablePlan.RecordMaterialization(GetRayTracingShaderTableSize(*shaderTable), elapsed);
-		}
-		AddRayTracingPass<TRayGenerationShader>(label, tableKey, runtime, shaderTable, parameters, dimensions);
+		return materialization;
 	}
 
 	template <typename TShader> TypedPassParameterInstance<typename TShader::Parameters>& AllocParameters()
@@ -207,21 +188,9 @@ private:
 		TDrawCollaborator Draw;
 	};
 
-	static std::uint64_t GetRayTracingShaderTableSize(const RayTracingShaderTable& shaderTable)
-	{
-		const auto regionEnd = [](const RhiRayTracingShaderTableRegion& region)
-		{
-			if (region.OffsetInBytes > std::numeric_limits<std::uint64_t>::max() - region.SizeInBytes)
-			{
-				throw Diagnostics::Error("Ray-tracing shader-table region arithmetic overflowed before graph dispatch.");
-			}
-
-			return region.OffsetInBytes + region.SizeInBytes;
-		};
-
-		return std::max(
-		    {regionEnd(shaderTable.GetRayGenerationRegion()), regionEnd(shaderTable.GetMissRegion()), regionEnd(shaderTable.GetHitGroupRegion()), regionEnd(shaderTable.GetCallableRegion())});
-	}
+	static std::string BuildRayTracingShaderTableKey(std::string_view label, const RayTracingPassPipelineRuntime& runtime, std::uint64_t recordLayoutGeneration);
+	static std::uint64_t GetRayTracingShaderTableSize(const RayTracingShaderTable& shaderTable);
+	static RayTracingShaderTableMaterialization MeasureRayTracingShaderTableMaterialization(const RayTracingShaderTable& shaderTable, std::chrono::steady_clock::time_point start);
 
 	template <typename TRayGenerationShader> void AddRayTracingPass(
 	    std::string_view label,

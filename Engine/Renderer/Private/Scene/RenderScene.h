@@ -91,6 +91,9 @@ private:
 	bool ValidateDelta(const RenderSceneDelta& delta) const;
 	bool ValidateDynamic(const RenderSceneDynamicData& dynamic, const RenderSceneDelta& delta) const;
 	void ApplyValidatedDelta(const RenderSceneDelta& delta);
+	void ResetSceneStorage();
+	void SynchronizeRayTracingScene(const RenderSceneDelta& delta);
+	void UpdateSceneRevisions(const RenderSceneDelta& delta) noexcept;
 	void ApplyDynamic(RenderSceneDynamicData&& dynamic) noexcept;
 	void ApplyDestroys(const RenderSceneDelta& delta);
 	void ResolveGpuMeshes(const RenderSceneDelta& delta, std::vector<GpuMeshHandle>& createMeshes, std::vector<GpuMeshHandle>& updateMeshes);

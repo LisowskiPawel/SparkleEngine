@@ -13,8 +13,6 @@
 #include <cstdint>
 #include <span>
 
-class InputSystem;
-
 class SPARKLE_CORE_API InputState
 {
 public:
@@ -70,9 +68,7 @@ public:
 
 	bool IsCursorHidden() const noexcept;
 
-private:
-	friend class InputSystem;
-
+	// The acquisition owner updates state between observed frames; readers borrow const state.
 	void SetKeyState(Key InKey, ButtonState InState) noexcept;
 
 	void SetMouseButtonState(MouseButton InButton, ButtonState InState) noexcept;
@@ -92,6 +88,9 @@ private:
 	void SetCursorHidden(bool bHidden) noexcept;
 
 	void BeginFrame() noexcept;
+	void ResetPointerState() noexcept;
+
+private:
 	static void AdvanceButtonStates(std::span<ButtonState> states) noexcept;
 	void ResetFrameDeltas() noexcept;
 

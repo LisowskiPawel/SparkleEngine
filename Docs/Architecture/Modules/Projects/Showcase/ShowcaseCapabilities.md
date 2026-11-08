@@ -28,6 +28,27 @@
 
 The project should stay thin: it selects content and composes engine/application products, while engine modules and tools retain feature ownership. Scene-specific fixes belong in the owning importer, world, Renderer, or RHI contract unless the behavior is intentionally authored content.
 
+## Project Composition And Asset Preparation
+
+**Source reconciliation:** 2026-11-08; the initial layout refactor began at `7c94ab4581bd17b3aa12da4388bfc18e9f117eb2`, and the second ownership pass inspected the complete owned `Projects` folder at `0758e939292f669bc3d743cfffd4e08617dba64e` plus the scoped working tree. These layout updates do not refresh the dated catalog/readiness inventory below or qualify rendering, cooking, packaging or release behavior.
+
+`Src/EditorMain.cpp` and `Src/GameMain.cpp` remain the executable composition points. They call the Application launch contracts; the editor binds the optional Launcher shader action there. Project CMake declares target dependencies and delegates artifact/runtime staging to the existing build owners. The entry points contain no application loop, level loading, renderer mechanics or compiler command construction.
+
+Offline preparation for the two pinned OBJ sources lives in [AssetConversion](../../../../../Projects/Showcase/AssetConversion). Read either `Convert*.py` first: each command resolves its request, loads its source, builds the asset's GLB and publishes the completed result. Run from the repository root with `python -m Projects.Showcase.AssetConversion.ConvertCornellBox` or `python -m Projects.Showcase.AssetConversion.ConvertLPSHead`; `--source` and `--output` remain available. The former scripts beneath the asset directories are removed.
+
+| Owner | Responsibility and lifetime |
+| --- | --- |
+| `AssetConversion/CommandLine.py` | Parse and resolve one offline source/output request; reject a non-GLB output before conversion. |
+| `AssetConversion/ObjGeometry.py` | Resolve signed OBJ indices and compute unnormalized polygon normals for both source readers; asset-specific validation, degeneracy and shading policy stay with each reader. |
+| `AssetConversion/CornellBoxObj.py` | Read the pinned OBJ/MTL pair, enforce its source inventory and generate flat-shaded material primitives. |
+| `AssetConversion/LPSHeadObj.py` | Read the pinned OBJ, enforce its source inventory and build one smooth mesh. Its private mesh builder owns seam interning, source-position normal accumulation and triangle indices until the mesh is returned. |
+| `AssetConversion/CornellBoxGltf.py` and `LPSHeadGltf.py` | Apply each asset's glTF material, scene and attribution policy. |
+| `AssetConversion/Glb.py` | Own private accessor/view/binary storage and container metadata for one build. Asset writers append semantic streams and supply scene/attribution policy; this owner assembles and encodes the GLB 2.0 container. |
+| `AssetConversion/Publication.py` | Write and flush one complete artifact, atomically replace the destination, clean the temporary file and print the conversion receipt. |
+| `Assets/Meshes/<asset>/Conversion/README.md` | Retain the asset-specific regeneration instructions, provenance and expected output identity beside the authored content. |
+
+These are project-private offline operations with no CMake target or engine/runtime Python dependency. They share encoding and publication mechanics; each asset retains its source validation, normals and material policy. A failed parse or build publishes nothing; a failed write or replacement retains the prior artifact and removes its temporary output. Reproduction of the existing GLB bytes is separate from the native import, cook and content-to-pixel acceptance routes.
+
 ## Product Surface
 
 | ID | Capability | State | Exact current coverage and limit | Evidence |

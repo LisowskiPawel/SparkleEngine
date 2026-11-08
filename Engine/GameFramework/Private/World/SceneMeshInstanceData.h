@@ -16,7 +16,7 @@ namespace ECS
 {
 	struct SceneMeshInstanceData final
 	{
-		std::unique_ptr<Mesh> Resource;
+		std::shared_ptr<const Mesh> Resource;
 		Transform LocalTransform;
 		MaterialHandle Material = MaterialHandle::Invalid();
 		Assets::CookedAssetId MeshAssetId = Assets::InvalidCookedAssetId;

@@ -5,19 +5,11 @@
 #include "World/Resources/MaterialVariantResourceStore.h"
 
 #include <vector>
-
-namespace ECS
-{
-	class GameWorldState;
-}
+#include <span>
 
 namespace SceneMaterialVariantTranslator
 {
 	std::vector<MaterialVariantDesc> BuildDescriptions(const SceneAssetPayload& sceneAssetPayload);
 
-	std::vector<MaterialVariantBinding> BuildBindings(
-	    const SceneAssetPayload& sceneAssetPayload,
-	    MaterialHandle materialBaseHandle,
-	    SceneMeshInstanceIndex sceneMeshBaseIndex,
-	    const ECS::GameWorldState& world);
+	std::vector<MaterialVariantBinding> BuildBindings(const SceneAssetPayload& sceneAssetPayload, MaterialHandle materialBaseHandle, std::span<const EntityId> entities);
 }

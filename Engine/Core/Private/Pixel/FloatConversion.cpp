@@ -18,6 +18,12 @@ namespace Pixel
 		std::int32_t exponent = static_cast<std::int32_t>((f32bits >> 23) & 0xFF) - 127;
 		std::uint32_t mantissa = f32bits & 0x7FFFFF;
 
+		if (exponent == 128 && mantissa != 0)
+		{
+			const std::uint32_t nanPayload = (mantissa >> 13u) | 0x0200u;
+			return static_cast<std::uint16_t>((sign << 15u) | 0x7c00u | nanPayload);
+		}
+
 		// Out-of-range exponent maps to Inf/0
 		if (exponent > 15)
 		{

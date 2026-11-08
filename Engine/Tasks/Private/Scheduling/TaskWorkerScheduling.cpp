@@ -1,4 +1,4 @@
-#include "TaskExecutorRuntime.h"
+#include "TaskExecutorImplementation.h"
 
 #include "ScheduledTaskExecution.h"
 #include "TaskWorkerContext.h"
@@ -8,12 +8,12 @@
 
 #include <string>
 
-std::size_t TaskExecutor::Implementation::Runtime::LaneIndex(TaskLane lane) noexcept
+std::size_t TaskExecutor::Implementation::LaneIndex(TaskLane lane) noexcept
 {
 	return static_cast<std::size_t>(lane);
 }
 
-const char* TaskExecutor::Implementation::Runtime::LaneName(TaskLane lane) noexcept
+const char* TaskExecutor::Implementation::LaneName(TaskLane lane) noexcept
 {
 	switch (lane)
 	{
@@ -27,7 +27,7 @@ const char* TaskExecutor::Implementation::Runtime::LaneName(TaskLane lane) noexc
 	return "Invalid";
 }
 
-void TaskExecutor::Implementation::Runtime::AddWorkers(TaskLane lane, std::uint32_t count)
+void TaskExecutor::Implementation::AddWorkers(TaskLane lane, std::uint32_t count)
 {
 	TaskLaneState& laneState = m_lanes[LaneIndex(lane)];
 	laneState.Workers.reserve(count);
@@ -41,13 +41,13 @@ void TaskExecutor::Implementation::Runtime::AddWorkers(TaskLane lane, std::uint3
 	}
 }
 
-std::uint32_t TaskExecutor::Implementation::Runtime::GetWorkerCount(TaskLane lane) const noexcept
+std::uint32_t TaskExecutor::Implementation::GetWorkerCount(TaskLane lane) const noexcept
 {
 	const std::size_t index = LaneIndex(lane);
 	return index < TaskLaneCount ? static_cast<std::uint32_t>(m_lanes[index].Workers.size()) : 0;
 }
 
-void TaskExecutor::Implementation::Runtime::Enqueue(ReadyTask task, TaskWorker* preferredWorker, TaskLane lane)
+void TaskExecutor::Implementation::Enqueue(ReadyTask task, TaskWorker* preferredWorker, TaskLane lane)
 {
 	TaskLaneState& laneState = m_lanes[LaneIndex(lane)];
 	if (preferredWorker != nullptr)
@@ -68,7 +68,7 @@ void TaskExecutor::Implementation::Runtime::Enqueue(ReadyTask task, TaskWorker* 
 	laneState.WakeCondition.notify_one();
 }
 
-bool TaskExecutor::Implementation::Runtime::TryPopLocal(TaskWorker& worker, ReadyTask& task)
+bool TaskExecutor::Implementation::TryPopLocal(TaskWorker& worker, ReadyTask& task)
 {
 	std::lock_guard lock(worker.QueueMutex);
 	if (worker.ReadyQueue.empty())
@@ -81,7 +81,7 @@ bool TaskExecutor::Implementation::Runtime::TryPopLocal(TaskWorker& worker, Read
 	return true;
 }
 
-bool TaskExecutor::Implementation::Runtime::TryPopInjection(TaskLane lane, ReadyTask& task)
+bool TaskExecutor::Implementation::TryPopInjection(TaskLane lane, ReadyTask& task)
 {
 	TaskLaneState& laneState = m_lanes[LaneIndex(lane)];
 	std::lock_guard lock(laneState.InjectionMutex);
@@ -95,7 +95,7 @@ bool TaskExecutor::Implementation::Runtime::TryPopInjection(TaskLane lane, Ready
 	return true;
 }
 
-bool TaskExecutor::Implementation::Runtime::TrySteal(TaskWorker& worker, ReadyTask& task)
+bool TaskExecutor::Implementation::TrySteal(TaskWorker& worker, ReadyTask& task)
 {
 	const auto& laneWorkers = m_lanes[LaneIndex(worker.Lane)].Workers;
 	for (std::uint32_t offset = 1; offset < laneWorkers.size(); ++offset)
@@ -112,7 +112,7 @@ bool TaskExecutor::Implementation::Runtime::TrySteal(TaskWorker& worker, ReadyTa
 	return false;
 }
 
-bool TaskExecutor::Implementation::Runtime::TryTakeWork(TaskWorker& worker, ReadyTask& task)
+bool TaskExecutor::Implementation::TryTakeWork(TaskWorker& worker, ReadyTask& task)
 {
 	if (worker.bPreferDispatch && TryPopDispatch(worker.Lane, task))
 	{
@@ -127,7 +127,7 @@ bool TaskExecutor::Implementation::Runtime::TryTakeWork(TaskWorker& worker, Read
 	return TryPopDispatch(worker.Lane, task);
 }
 
-bool TaskExecutor::Implementation::Runtime::WaitForWork(TaskWorker& worker, ReadyTask& task)
+bool TaskExecutor::Implementation::WaitForWork(TaskWorker& worker, ReadyTask& task)
 {
 	TaskLaneState& laneState = m_lanes[LaneIndex(worker.Lane)];
 	for (;;)
@@ -149,7 +149,7 @@ bool TaskExecutor::Implementation::Runtime::WaitForWork(TaskWorker& worker, Read
 	}
 }
 
-void TaskExecutor::Implementation::Runtime::WorkerMain(TaskWorker& worker)
+void TaskExecutor::Implementation::WorkerMain(TaskWorker& worker)
 {
 	TaskWorkerContext::Enter(this);
 	Threading::SetCurrentThreadRole("Sparkle.Task." + std::string(LaneName(worker.Lane)) + "." + std::to_string(worker.LaneWorkerIndex));
@@ -172,7 +172,7 @@ void TaskExecutor::Implementation::Runtime::WorkerMain(TaskWorker& worker)
 	TaskWorkerContext::Leave();
 }
 
-void TaskExecutor::Implementation::Runtime::RequestWorkerStop() noexcept
+void TaskExecutor::Implementation::RequestWorkerStop() noexcept
 {
 	for (TaskLaneState& lane : m_lanes)
 	{
@@ -185,7 +185,7 @@ void TaskExecutor::Implementation::Runtime::RequestWorkerStop() noexcept
 	}
 }
 
-void TaskExecutor::Implementation::Runtime::JoinWorkers() noexcept
+void TaskExecutor::Implementation::JoinWorkers() noexcept
 {
 	for (const auto& worker : m_workers)
 	{
@@ -194,4 +194,73 @@ void TaskExecutor::Implementation::Runtime::JoinWorkers() noexcept
 			worker->Thread.join();
 		}
 	}
+}
+
+void TaskExecutor::Implementation::InitializeWorkers()
+{
+	const std::uint32_t totalWorkers = m_config.FrameCriticalWorkerCount + m_config.BackgroundWorkerCount + m_config.BlockingIoWorkerCount;
+	m_workers.reserve(totalWorkers);
+
+	AddWorkers(TaskLane::FrameCritical, m_config.FrameCriticalWorkerCount);
+	AddWorkers(TaskLane::Background, m_config.BackgroundWorkerCount);
+	AddWorkers(TaskLane::BlockingIo, m_config.BlockingIoWorkerCount);
+}
+
+void TaskExecutor::Implementation::StartWorkers()
+{
+	try
+	{
+		for (const auto& worker : m_workers)
+		{
+			worker->Thread = std::thread([this, worker = worker.get()] { WorkerMain(*worker); });
+		}
+	}
+	catch (...)
+	{
+		RequestWorkerStop();
+		JoinWorkers();
+		throw;
+	}
+}
+
+void TaskExecutor::Implementation::EnqueueDispatch(TaskDispatch::State& dispatch) noexcept
+{
+	TaskLaneState& lane = m_lanes[LaneIndex(dispatch.Desc.Lane)];
+	{
+		std::lock_guard lock(lane.InjectionMutex);
+		dispatch.ReadyNext = nullptr;
+		if (lane.DispatchTail != nullptr)
+		{
+			lane.DispatchTail->ReadyNext = &dispatch;
+		}
+		else
+		{
+			lane.DispatchHead = &dispatch;
+		}
+		lane.DispatchTail = &dispatch;
+	}
+	{
+		std::lock_guard lock(lane.WakeMutex);
+		++lane.WakeEpoch;
+	}
+	lane.WakeCondition.notify_one();
+}
+
+bool TaskExecutor::Implementation::TryPopDispatch(TaskLane laneType, ReadyTask& task)
+{
+	TaskLaneState& lane = m_lanes[LaneIndex(laneType)];
+	std::lock_guard lock(lane.InjectionMutex);
+	auto* dispatch = lane.DispatchHead;
+	if (dispatch == nullptr)
+	{
+		return false;
+	}
+	lane.DispatchHead = dispatch->ReadyNext;
+	if (lane.DispatchHead == nullptr)
+	{
+		lane.DispatchTail = nullptr;
+	}
+	dispatch->ReadyNext = nullptr;
+	task.Dispatch = dispatch->shared_from_this();
+	return true;
 }

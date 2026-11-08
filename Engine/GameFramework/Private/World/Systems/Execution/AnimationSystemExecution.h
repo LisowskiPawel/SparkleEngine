@@ -3,17 +3,30 @@
 #include "World/Systems/Descriptors/GameWorldSystemContract.h"
 
 #include <cstdint>
+#include <span>
 
-class GameWorldResourceStores;
+class SkeletonResourceStore;
 
 namespace ECS
 {
-	class GameWorldState;
+	class AnimationClipResourceStore;
+	class AnimationOutputStorage;
+	class MorphWeightStorage;
 
 	class AnimationSystemExecution final
 	{
 	public:
-		AnimationSystemExecution(GameWorldState& state, GameWorldResourceStores& resources, float deltaSeconds, const StructureFrozenEpoch& epoch);
+		AnimationSystemExecution(
+		    PlaybackAdvanceQuery& playback,
+		    PoseEvaluationQuery& poses,
+		    MorphEvaluationQuery& morphs,
+		    const AnimationClipResourceStore& clips,
+		    const SkeletonResourceStore& skeletons,
+		    AnimationOutputStorage& output,
+		    MorphWeightStorage& weights,
+		    std::span<EntityId> animationChanges,
+		    std::span<EntityId> morphChanges,
+		    float deltaSeconds);
 
 		std::uint32_t GetPlaybackCount() const noexcept;
 		std::uint32_t GetPoseCount() const noexcept;
@@ -26,11 +39,15 @@ namespace ECS
 		bool CommitMorphOutputs(std::uint32_t begin, std::uint32_t end);
 
 	private:
-		GameWorldState& m_state;
-		GameWorldResourceStores& m_resources;
+		const AnimationClipResourceStore& m_clips;
+		const SkeletonResourceStore& m_skeletons;
+		AnimationOutputStorage& m_output;
+		MorphWeightStorage& m_weights;
+		std::span<EntityId> m_animationChanges;
+		std::span<EntityId> m_morphChanges;
 		float m_deltaSeconds = 0.0f;
-		PlaybackAdvanceQuery m_playbackQuery;
-		PoseEvaluationQuery m_poseQuery;
-		MorphEvaluationQuery m_morphQuery;
+		PlaybackAdvanceQuery& m_playbackQuery;
+		PoseEvaluationQuery& m_poseQuery;
+		MorphEvaluationQuery& m_morphQuery;
 	};
 }

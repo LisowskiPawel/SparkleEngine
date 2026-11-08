@@ -62,8 +62,8 @@ binding without changing member or teardown lifetime. `MainMenuBarPanel` compose
 menus and delegates drag regions, window buttons and glyph geometry to private
 `Workspace/TitleBarWindowControls`. `ViewportToolbar::Draw` sequences window
 admission, controls, decoration and closure; private `ViewportViewModeMenu` owns
-the mode catalog, grouped rows and selection routing through the existing
-viewport session. Both toolbar exit paths restore the same window/style stack.
+the mode catalog and grouped rows; selection returns intent to the panel-owned
+viewport request. Both toolbar exit paths restore the same window/style stack.
 The floating console reuses its existing docked-content sequence, and scene-model
 entity patching remains a file-local operation on the builder's immutable-model
 publication path. These are source/build preservation boundaries, not new
@@ -71,15 +71,15 @@ interactive or visual acceptance evidence.
 
 The scene-panel pass on the same date keeps window geometry, outliner table setup
 and inspector tabs in focused private functions, leaving `BuildUI` to sequence
-the panel workflow. `SceneObjectPresentation` owns selection-header labels, icons
-and drawing; the inspector composes it with the search toolbar and typed object
-inspectors. Outliner rows and footer counts share one filter predicate. Section
+the panel workflow. `SceneObjectPresentation` draws the selection header from the immutable model
+entry's label and type, with shared icon presentation; the inspector composes it
+with the search toolbar and typed object inspectors. Outliner rows and footer counts share one filter predicate. Section
 drawing borrows model entries through `std::span`, including the single sky row,
 without a temporary vector or entry copy. Model ownership, selection, transaction
 generation checks and public Editor contracts remain unchanged. These boundaries
 have source/build evidence only.
 
-`EditorSceneModel` pins the existing immutable `WorldReadView`; camera, light, mesh and sky access borrows that publication for the model's lifetime. Editor owns only presentation rows and separately captured material-variant metadata. The builder reuses an unchanged world-generation/sequence pair and constructs one new model from the latest publication otherwise. It keeps no copied scene vectors, incremental row patcher, cursor or acknowledgement bridge. Publication bursts and accepted variant rebindings therefore reach the inspector together. Property inspection uses the active typed details editors, and rendering settings own their live row controls. Transaction generation checks and undo/redo remain on the existing world-edit path.
+`EditorSceneModel` pins the existing immutable `WorldReadView`; camera, light, mesh and sky access borrows that publication for the model's lifetime. Editor owns only presentation rows and separately captured material-variant metadata. The builder reads both world generation and sequence from that pinned view, reuses an unchanged pair and constructs one new model from the latest publication otherwise. The host supplies no parallel generation callback, and the model stores no copied epoch. It keeps no copied scene vectors, incremental row patcher, cursor or acknowledgement bridge. Publication bursts and accepted variant rebindings therefore reach the inspector together. Property inspection uses the active typed details editors, and rendering settings own their live row controls. Transaction generation checks and undo/redo remain on the existing world-edit path.
 
 The Console starts collapsed. Its footer button, `~` outside text input, or `Window > Console` opens and focuses it; focused `Esc` closes it without discarding scrollback/history. Registration, lookup, help and completion share one command-descriptor vector; lookup and duplicate rejection are case-insensitive. These are source contracts, not interactive, DPI or shutdown acceptance.
 
@@ -96,7 +96,11 @@ The 2026-11-05 Editor responsibility pass separates
 from the selected-artifact text cache. Discovery holds the publication read scope
 while it reads cook manifests, validates request paths and matches active shader
 identities. The registered-shader model consumes discovery directly;
-`ShaderExportInspection` owns only selected-directory text and invalidation.
+`ShaderExportInspection` owns the selected text observation and invalidation.
+It acquires a fresh publication read scope for path admission and all five text
+reads, then commits the owned strings together. Busy or interrupted publication
+produces no observation and remains retryable for the same selection; an optional
+missing artifact retains its explicit message.
 
 [`ConsoleInputParser`](../../../../../Engine/Editor/Private/Console/ConsoleInputParser.cpp)
 reads tokens directly into the command and arguments, retaining its own quoting,
@@ -152,6 +156,51 @@ retains path admission, semantic sanitization, mutation and save results.
 composes status, playback and details while focused functions retain widget and
 export-action mechanics. This changes no settings representation, CVar, viewport
 action or host lifetime and does not establish visual or interactive acceptance.
+
+### Capability Ownership Reconciliation
+
+**2026-11-08, source reconciliation:** the Editor ownership pass preserves the
+public host facade, world commands, rendering-settings authority and ImGui
+teardown order. Its focused build and local probe results are recorded under
+`build/private/validation/editor-ownership-20261108/`; the second complete module
+pass is recorded under `build/private/validation/editor-ownership-20261108-iteration2/`.
+Those checks do not establish packaged, GPU or visual acceptance.
+
+- `ViewportPanel` owns the only selected `RenderViewMode`, inside its
+  `ViewportRenderRequest`. The toolbar reads that value and returns optional
+  selection intent. The Reference overlay returns frame-local mode, render-action
+  and output intent; the panel applies it and owns request-generation and
+  action-sequence updates. `EditorViewportSession` owns navigation and persisted
+  camera settings without a mode mirror or synchronization callback.
+- Diagnostic provider callables move from host composition directly to the panel
+  or model that consumes them; UI retains only its own memory-diagnostics action.
+  Menu callbacks bind once during workspace composition. Private panel interfaces
+  expose consumed operations, while compile dispatch, viewport extent changes and
+  settings-file loading remain inside their implementation owners. Unused open
+  queries, width setters and the unused viewport-session setup overload are absent.
+- Console and Shader Tools each receive the Application-owned compile callable
+  directly. The console session executes its action without depending on the
+  shader panel; Application retains admission, cancellation, completion and reload.
+- `UsedMeshesPanel` owns `MeshDiagnosticMetadataCatalog`. Snapshot admission loads
+  metadata for new asset IDs and retires entries absent from the current rows.
+  Reopening the panel, rebinding its diagnostic provider or using Refresh starts a
+  new metadata observation, including retrying missing sidecars. Formatters borrow
+  metadata and perform no filesystem access or cache mutation.
+- Scene headers consume the model entry's existing label and type, preserving
+  skeletal/static classification and the outliner's unnamed-object numbering.
+  `SceneObjectSelection` and panel types remain private; stateless command
+  translation and sky inspection use namespace functions.
+- `EditorConsoleSystem` composes session and view lifetime. The private
+  [`console dock`](../../../../../Engine/Editor/Private/Console/EditorConsoleDock.cpp)
+  owns window admission, height limits, header interaction and focus/close
+  handling through focused view functions. The view borrows its required console
+  session by reference and keeps no duplicate output-count or unused scroll-request
+  state. The ImGui platform adapter decodes native shortcut input; composition and
+  Console receive the Core `Key` value.
+- Details-row mechanics live in `UiDetailsWidgets`, header/key-value mechanics in
+  `UiPanelWidgets`, glyph drawing and icon metrics in `UiIconWidgets`, and color
+  transforms in `SparkleUiPalette`. No shared widget-primitives umbrella or
+  unused scalar/float3 layout metrics remain.
 
 ## Workspace And Level Surface
 

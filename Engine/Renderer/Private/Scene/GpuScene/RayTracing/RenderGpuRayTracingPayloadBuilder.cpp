@@ -37,19 +37,18 @@ static RenderGpuMeshHitDataOffsets ResolveMeshOffsets(MeshHitDataOffsets& meshOf
 	const std::span<const VertexSkinInfluence> skinInfluences = mesh.GetSkinInfluences();
 	const std::span<const MorphTargetDeltaData> morphTargetDeltas = mesh.GetMorphTargetDeltas();
 	constexpr std::size_t maximumPayloadElementCount = (std::numeric_limits<std::uint32_t>::max)();
-	const bool bMeshDataValidMeshVerticesEmpty = mesh.HasRayTracingHitData() && !meshVertices.empty();
-	const bool bMeshDataValidMeshIndicesSize = bMeshDataValidMeshVerticesEmpty && (meshIndices.size() >= 3u);
-	const bool bMeshHitDataValid = bMeshDataValidMeshIndicesSize && (meshIndices.size() % 3u == 0u);
-	const bool bSkinInfluencesValidSkinInfluences = bMeshHitDataValid && (mesh.HasSkinInfluences());
-	const bool bInfluencesValidMeshVerticesSize = bSkinInfluencesValidSkinInfluences && (skinInfluences.size() != meshVertices.size());
-	const bool bCheckInfluenceRange = bMeshHitDataValid && !bInfluencesValidMeshVerticesSize;
-	const bool bSkinInfluencesValid = bMeshHitDataValid && bCheckInfluenceRange;
+	const bool bHitVerticesReady = mesh.HasRayTracingHitData() && !meshVertices.empty();
+	const bool bTriangleDataReady = bHitVerticesReady && (meshIndices.size() >= 3u);
+	const bool bHitDataReady = bTriangleDataReady && (meshIndices.size() % 3u == 0u);
+	const bool bCheckSkinInfluences = bHitDataReady && (mesh.HasSkinInfluences());
+	const bool bInfluenceCountMismatch = bCheckSkinInfluences && (skinInfluences.size() != meshVertices.size());
+	const bool bSkinningValid = bHitDataReady && !bInfluenceCountMismatch;
 
-	const bool bPayloadSizesValidVertices = bSkinInfluencesValid && payloads.Vertices.size() <= maximumPayloadElementCount;
-	const bool bPayloadSizesValidIndices = bPayloadSizesValidVertices && (payloads.Indices.size() <= maximumPayloadElementCount);
-	const bool bPayloadSizesValid = bPayloadSizesValidIndices && (payloads.MorphTargetDeltas.size() <= maximumPayloadElementCount);
+	const bool bVertexPayloadBounded = bSkinningValid && payloads.Vertices.size() <= maximumPayloadElementCount;
+	const bool bIndexPayloadBounded = bVertexPayloadBounded && (payloads.Indices.size() <= maximumPayloadElementCount);
+	const bool bPayloadsBounded = bIndexPayloadBounded && (payloads.MorphTargetDeltas.size() <= maximumPayloadElementCount);
 
-	const bool bVerticesFit = bPayloadSizesValid && meshVertices.size() <= maximumPayloadElementCount - payloads.Vertices.size();
+	const bool bVerticesFit = bPayloadsBounded && meshVertices.size() <= maximumPayloadElementCount - payloads.Vertices.size();
 	const bool bIndicesFit = bVerticesFit && meshIndices.size() <= maximumPayloadElementCount - payloads.Indices.size();
 	const bool bMorphTargetsFit = bIndicesFit && morphTargetDeltas.size() <= maximumPayloadElementCount - payloads.MorphTargetDeltas.size();
 
@@ -70,7 +69,7 @@ static RenderGpuMeshHitDataOffsets ResolveMeshOffsets(MeshHitDataOffsets& meshOf
 	{
 		for (const VertexSkinInfluence& influence : skinInfluences)
 		{
-			payloads.SkinInfluences.push_back(GpuMeshPreparation::ConvertSkinInfluence(influence));
+			payloads.SkinInfluences.push_back(ConvertGpuMeshSkinInfluence(influence));
 		}
 	}
 	else
@@ -218,15 +217,14 @@ static void AppendInstance(
 
 	const GpuMesh* gpuMesh = meshes.Resolve(draw.Geometry.Mesh);
 
-	const bool bMissingSkinningGeometry = draw.Geometry.MeshKind == RenderMeshKind::Skeletal;
-	const bool bMissingSkinningSkinning = bMissingSkinningGeometry && (draw.Skinning.JointMatrixOffset == kInvalidMeshInstanceJointMatrixOffset);
-	const bool bMissingSkinningGuardgpuMesh = bMissingSkinningGeometry && !bMissingSkinningSkinning;
-	const bool bMissingSkinningGpuMesh = bMissingSkinningGuardgpuMesh && (gpuMesh == nullptr);
-	const bool bSkinningStorageMissing = bMissingSkinningSkinning || bMissingSkinningGpuMesh;
-	const bool bMissingSkinningGuardInfluences = bMissingSkinningGeometry && !bSkinningStorageMissing;
-	const bool bMissingSkinningSkinInfluences = bMissingSkinningGuardInfluences && (!gpuMesh->HasSkinInfluences());
-	const bool bSkinInfluencesMissing = bSkinningStorageMissing || bMissingSkinningSkinInfluences;
-	const bool bMissingSkinning = bMissingSkinningGeometry && bSkinInfluencesMissing;
+	const bool bSkeletal = draw.Geometry.MeshKind == RenderMeshKind::Skeletal;
+	const bool bJointOffsetMissing = bSkeletal && draw.Skinning.JointMatrixOffset == kInvalidMeshInstanceJointMatrixOffset;
+	const bool bCheckMesh = bSkeletal && !bJointOffsetMissing;
+	const bool bMeshMissing = bCheckMesh && gpuMesh == nullptr;
+	const bool bStorageMissing = bJointOffsetMissing || bMeshMissing;
+	const bool bCheckInfluences = bSkeletal && !bStorageMissing;
+	const bool bInfluencesMissing = bCheckInfluences && !gpuMesh->HasSkinInfluences();
+	const bool bMissingSkinning = bStorageMissing || bInfluencesMissing;
 
 	if (gpuMesh == nullptr || bMissingSkinning)
 	{

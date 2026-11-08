@@ -2,6 +2,7 @@
 
 #include "GameFramework/Public/World/EntityId.h"
 
+#include <algorithm>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
@@ -134,7 +135,13 @@ namespace ECS
 
 		void PrepareCapacity(std::size_t denseCapacity, EntityId::Slot maximumSlot)
 		{
-			Reserve(denseCapacity);
+			const std::size_t capacity = (std::min) (m_entities.capacity(), m_components.capacity());
+			if (denseCapacity > capacity)
+			{
+				const std::size_t growth = (std::max) (std::size_t{1}, capacity / 2);
+				const std::size_t available = InvalidDenseIndex - capacity;
+				Reserve((std::max) (denseCapacity, capacity + (std::min) (growth, available)));
+			}
 			if (maximumSlot >= m_sparse.size())
 			{
 				m_sparse.resize(static_cast<std::size_t>(maximumSlot) + 1, InvalidDenseIndex);

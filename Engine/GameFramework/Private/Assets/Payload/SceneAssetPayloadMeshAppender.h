@@ -8,15 +8,23 @@
 
 namespace Assets
 {
+	class CookedAssetAllocationBudget;
 	class CookedAssetFileSet;
 
-	class SceneAssetPayloadMeshAppender final
+	namespace SceneAssetPayloadMeshAppender
 	{
-	public:
-		static void AppendMeshAssets(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload);
+		void AppendMeshAssets(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload);
 
-		static void AppendMeshInstances(const LoadedSceneManifest& sceneManifest, std::span<const SceneAssetPayloadMeshBinding> meshAssetBindings, SceneAssetPayload& sceneAssetPayload);
+		void AppendMeshInstances(
+		    const LoadedSceneManifest& sceneManifest,
+		    std::span<const SceneAssetPayloadMeshBinding> meshAssetBindings,
+		    SceneAssetPayload& sceneAssetPayload,
+		    CookedAssetAllocationBudget& budget);
 
-		static void AppendMeshInstanceGroups(const LoadedSceneManifest& sceneManifest, std::span<const SceneAssetPayloadMeshBinding> meshAssetBindings, SceneAssetPayload& sceneAssetPayload);
-	};
+		void AppendMeshInstanceGroups(
+		    const LoadedSceneManifest& sceneManifest,
+		    std::span<const SceneAssetPayloadMeshBinding> meshAssetBindings,
+		    SceneAssetPayload& sceneAssetPayload,
+		    CookedAssetAllocationBudget& budget);
+	}
 }

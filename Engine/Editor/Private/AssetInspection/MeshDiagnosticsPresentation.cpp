@@ -6,7 +6,6 @@
 #include "AssetInspection/MeshDiagnosticMetadataCatalog.h"
 
 #include <format>
-#include <optional>
 #include <string>
 
 namespace MeshDiagnosticsPresentation
@@ -21,35 +20,22 @@ namespace MeshDiagnosticsPresentation
 		return std::format("0x{:016X}", id);
 	}
 
-	std::string FormatMeshDisplayName(const MeshDiagnosticsRow& row)
+	std::string FormatMeshDisplayName(const MeshDiagnosticsRow& row, const MeshDiagnosticMetadata* metadata)
 	{
-		if (const std::optional<MeshDiagnosticMetadata> metadata = FindMeshDiagnosticMetadata(row))
+		if (metadata != nullptr && !metadata->DisplayName.empty())
 		{
-			if (!metadata->DisplayName.empty())
-			{
-				return metadata->DisplayName;
-			}
+			return metadata->DisplayName;
 		}
-
 		return std::format("Mesh {} verts / {} tris", row.VertexCount, row.TriangleCount);
 	}
 
-	std::string FormatMeshSourcePath(const MeshDiagnosticsRow& row)
+	std::string FormatMeshSourcePath(const MeshDiagnosticsRow& row, const MeshDiagnosticMetadata* metadata)
 	{
-		if (const std::optional<MeshDiagnosticMetadata> metadata = FindMeshDiagnosticMetadata(row))
+		if (metadata != nullptr && !metadata->SourcePath.empty())
 		{
-			if (!metadata->SourcePath.empty())
-			{
-				return metadata->SourcePath;
-			}
+			return metadata->SourcePath;
 		}
 		return row.MeshAssetId != 0 ? FormatAssetId(row.MeshAssetId) : std::string("unknown");
-	}
-
-	std::optional<std::string> FindAuthoredSourcePath(const MeshDiagnosticsRow& row)
-	{
-		const std::optional<MeshDiagnosticMetadata> metadata = FindMeshDiagnosticMetadata(row);
-		return metadata.has_value() && !metadata->SourcePath.empty() ? std::optional<std::string>(metadata->SourcePath) : std::nullopt;
 	}
 
 	std::string FormatMemorySummary(const MeshDiagnosticsRow& row)

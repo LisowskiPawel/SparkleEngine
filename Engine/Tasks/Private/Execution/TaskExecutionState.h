@@ -30,6 +30,7 @@ struct TaskExecution::State final
 	explicit State(std::uint64_t generation = 0);
 
 	void Publish(TaskExecutionCompletion completion);
+	void WaitUntilSettled();
 	void RequestCancellation() noexcept;
 
 	mutable std::mutex Mutex;

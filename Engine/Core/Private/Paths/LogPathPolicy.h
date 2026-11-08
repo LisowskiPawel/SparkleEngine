@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <string_view>
 
-namespace Paths::Private
+namespace Paths
 {
 	enum class LogParentDirectoryPolicy : std::uint8_t
 	{

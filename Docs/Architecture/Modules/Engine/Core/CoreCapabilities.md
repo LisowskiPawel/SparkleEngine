@@ -4,7 +4,7 @@
 
 **Status:** capability snapshot; current, but not release approval or runtime evidence
 
-**Snapshot:** 2026-09-06 at committed `master` revision `8414b5dc`; `Engine/Core` public/private source and CMake membership inspected in the live working tree; evidence `S` only
+**Snapshot:** Core follow-up verification on 2026-11-08 in the live working tree, continuing from `0758e939292f669bc3d743cfffd4e08617dba64e`; the [full-folder review, results and recorded source identity](../../../../../artifacts/validation/core-srp-03-20261108/result.md) distinguish source/build/native controls from capability-table evidence `S` and release acceptance. The later [changelist refinement](../../../../../build/private/changelist-refinement-20261108/result.md) records the subsequent private namespace cleanup and its own validation boundary.
 
 **Scope:** dependency-free engine foundations: diagnostics, console/configuration, events, files, paths, process execution, serialization helpers, input vocabulary, math, pixels, time, and thread ownership
 
@@ -31,11 +31,19 @@ Path ownership amendment (2026-11-01): package/installed discovery, manifest par
 
 Core keeps dependencies pointed downward by owning only reusable mechanisms. That reduces duplication, but it also means a higher-level feature must own every semantic policy, lifetime, capacity, and user-visible failure built from those mechanisms.
 
-**Publication ownership amendment, 2026-11-01:** `Files/FileUtils.h` and `FilePublication.cpp` provide single-file finalization; `Files/FileSetPublication.h` and `FileSetPublication.cpp` own the publication record and coordinated reader/writer transaction. The file-set owner sequences validation, incomplete markers, replacement, backup retirement and rollback. Cookers supply staged files; runtime consumers hold read scopes. Splitting these responsibilities preserves the existing locking, commit and failure order and adds no artifact format or recovery path. This is an ownership description, not new runtime acceptance.
+**Publication ownership, 2026-11-08:** `Files/FileUtils.h` and `FilePublication.cpp` provide single-file finalization. `Files/FileSetPublication.h` declares the file-set contract; `FileSetPublication.cpp` owns writer lifetime and transaction ordering. Private `FileSetCoordination` owns root admission, native locks, read scopes and incomplete markers; `FileSetReplacement` owns plan validation, replacement, backup retirement and rollback mechanics. Cookers supply staged files; runtime consumers hold read scopes. The public contract, locking order and commit boundary are preserved; no artifact format or recovery path is added.
+
+Core implementation collaborations use the `Files`, `Filesystem`, `Paths` and `Json` domain namespaces. Shared implementation declarations stay in private headers, while helpers used by one source retain internal linkage.
 
 ## Module Boundary
 
 `SparkleCore` is the base engine library. It has no other engine dependency; it publicly carries the header-only `spdlog` contract and links Windows `bcrypt`, `ole32` and `shell32` privately. It can be static or shared. Logging compile level is Trace in Debug, Info in Development, and Warning in Shipping profiles.
+
+Out-of-line public functions use `SPARKLE_CORE_API`, including file I/O, path
+discovery/formatting, signal primitives and pixel conversion. The same declarations
+serve static and DLL consumers. A focused production-Core DLL consumer now links
+all 64 formerly undecorated functions; this verifies that boundary rather than
+qualifying every engine module in shared mode.
 
 ## Capability Surface
 
@@ -54,7 +62,7 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 | `CORE-011` | Environment and command-line utilities | Implemented path | String/bool/UInt environment access and UTF-8/wide conversion support tool and host boundaries. One Windows argument encoder serves child execution, Launcher previews and shader-command text, including embedded quotes and trailing backslashes. | `S` |
 | `CORE-012` | Project level/acquisition catalog | Moved to ToolSupport | Preparation-only metadata/parser/editor are outside Core. Launcher and Cooker consume the same model; runtime discovers ordinary level documents and consumes cooked data. This retained ID describes the former ownership, not an Engine dependency. | `S` |
 | `CORE-013` | Input vocabulary/state | Implemented path | Key, mouse button, modifier, device, dispatch-layer/mode and typed events; pressed/released/held polling, per-frame pointer/wheel accumulation, modifiers, capture and cursor state. Polling helpers and pixel/normalized/NDC conversion helpers remain available. OS acquisition and layered routing belong to Platform. | `S` |
-| `CORE-014` | Math and coordinate helpers | Implemented path | DirectXMath-based transforms/normalization/frustum utilities, declared world-coordinate convention, and Bessel/sinc/Kaiser functions used by filtering. This is not a general numerics library. | `S` |
+| `CORE-014` | Math and coordinate helpers | Implemented path | DirectXMath-based transforms/normalization/frustum utilities, declared world-coordinate convention, and Bessel/sinc primitives used by filtering. TextureCooker owns its active windowed-sinc/Kaiser kernel; unused Core kernel/support entry points are removed. This is not a general numerics library. | `S` |
 | `CORE-015` | Pixel conversions | Implemented path | Float conversion plus linear/sRGB byte encode/decode helpers. RHI format support and texture cooking own storage-format decisions. | `S` |
 | `CORE-016` | Timer | Implemented path | Per-frame raw/scaled delta and total time, frame count, time scale, pause/resume, and seconds/milliseconds conversion. No fixed-step simulation scheduler exists here. | `S` |
 | `CORE-017` | Thread ownership assertions | Implemented path | Threads can receive diagnostic roles; `OwnerThread` captures an owner and asserts access. This detects contract violations in instrumented paths; it does not make objects thread-safe. | `S` |
@@ -64,29 +72,38 @@ Core keeps dependencies pointed downward by owning only reusable mechanisms. Tha
 
 ### Text and JSON decoding
 
-Responsibility cleanup, 2026-11-05: `Strings/StringEncoding.cpp` owns UTF-8
+Responsibility cleanup, 2026-11-08: `Strings/StringEncoding.cpp` owns UTF-8
 validation, scalar encoding and native-wide conversion. `StringUtils.cpp` keeps
-ordinary string operations under the existing public contract. JSON value
-dispatch delegates string escapes, member names and container traversal to
-focused private functions. Unicode, duplicate-key, complete-object and nesting
-rejection rules remain unchanged; this adds no DOM or schema system.
+ordinary string operations; `StringEscaping.cpp` owns serialized field escaping,
+including all JSON control bytes. `JsonReader.cpp` owns property queries and
+borrows private `JsonTokenReader` operations for string decoding and bounded value
+traversal. Unicode, duplicate-key, complete-object and nesting rejection rules
+remain unchanged; this adds no DOM or schema system.
 
-The FNV string overload and workspace-state key construction use the existing
-byte-hash implementation. ASCII suffix comparison borrows views rather than
-copying both operands. Workspace-key spelling and hash values remain unchanged.
+`Hash/FnvHash.cpp` owns streaming FNV values; `Sha256Hash.cpp` owns SHA-256 provider
+lifetime and digest operations. The replaced mixed `HashUtils.cpp` is deleted;
+the public hash contract is unchanged. The FNV string overload and workspace-state
+key construction use the byte-hash implementation. ASCII suffix comparison borrows
+views rather than copying both operands. Workspace-key spelling and hash values remain unchanged.
 The native before/after controls cover encoding boundaries, malformed documents,
 hash vectors and workspace keys; they do not qualify other platforms or package
 behavior.
 
 ### Transactional file publication
 
-Responsibility cleanup, 2026-11-05: replacement planning invokes separate path
-admission and filesystem-input checks before publication begins. Lock, marker,
-commit and rollback lifetime remain together in the existing publisher. Text
-and byte writes share one byte-writing path. Bounded native controls exercise
-exact file bytes, rejected plans, reader/writer exclusion, successful rollback
-and failed rollback retaining an incomplete marker. This is same-process Windows
-filesystem evidence, not power-loss, hostile-filesystem or release acceptance.
+Responsibility cleanup, 2026-11-08: the publisher sequences private coordination
+and replacement capabilities. Its root and lock lifetime encloses planning,
+marking, commit and rollback; replacement progress exists only for that call.
+Planning checks paths and filesystem inputs before mutation. Text and byte writes
+share one byte-writing path. [Bounded native controls](../../../../../artifacts/validation/core-srp-20261108/result.md)
+exercise exact file bytes, rejected plans, reader/writer exclusion, successful
+rollback and failed rollback retaining an incomplete marker. This is same-process
+Windows filesystem evidence, not power-loss, hostile-filesystem or release acceptance.
+
+Binary stream writing is a namespace of stateless operations, preserving its
+qualified call spelling without a class shell. Typed buffer writes delegate
+byte insertion to the existing writer operation. String-table consumers borrow
+a const byte vector; only `Add` mutates the builder's storage.
 
 Cooking declares the output directories and complete staged file set. Core provides fail-fast read/write scopes, containment checks and checked in-process rollback. Writers mark output incomplete before replacement and clear the marker only after successful publication or ordinary rollback. A killed publisher or failed cleanup leaves generated output unusable: clean it and regenerate it from source. There is no persisted transaction log, checksum parser, file-identity recovery or cross-directory recovery protocol.
 
@@ -105,6 +122,8 @@ validation, result formatting and live name completion. CVar requests still use
 the supplied `CVarControlExecutor`. Shared
 `ConsoleOutput` records/results stay in Core; command/session policy is described
 in the [Editor boundary](../Editor/EditorCapabilities.md#ui-implementation-boundary).
+List collection delegates case-insensitive name/description matching to one
+private predicate; filtering does not own registry state or batch mutation.
 
 ### Child-process execution
 
@@ -113,13 +132,20 @@ Process relaunch ownership reconciled on 2026-11-01: `Process::RelaunchCurrentPr
 `Process::RunChildProcess` is the direct process contract used by tool and host
 clients. `ChildProcess.cpp` selects the platform route and
 `ChildProcessWindows.cpp` selects captured completion or readiness. Private
-`ChildProcessWindowsLaunch.cpp` owns Windows handle lifetime, command/environment
-lowering, suspended launch and job ownership; `ChildProcessWindowsOutput.cpp`
-owns pipe setup and output draining; `ChildProcessWindowsReadiness.cpp` owns the
-durable readiness channel, validation and ownership transfer. The wait loops
+`ChildProcessWindowsLaunch.cpp` owns suspended launch and job admission.
+Its launch entry sequences suspended
+creation, job admission and resume through focused private operations.
+`ChildProcessWindowsArguments.cpp` owns argv/environment lowering,
+`ChildProcessWindowsDiagnostics.cpp` owns native error text, and
+`WindowsProcessHandle.cpp` owns handle lifetime. `ChildProcessWindowsOutput.cpp`
+owns captured completion ordering, wait selection and log finalization.
+`ChildProcessWindowsPipe.cpp` owns pipe setup, byte delivery and the reader's
+buffer, overlapped operation and event lifetime. Pending I/O is cancelled and
+settled before those resources are destroyed. `ChildProcessWindowsReadiness.cpp`
+owns the durable readiness channel, validation and ownership transfer. Wait loops
 remain cohesive state machines, with cancellation callbacks destroyed before
-their event handles. This 2026-10-26 source decomposition preserves the result
-contract and does not qualify package launch or clean-machine behavior.
+their event handles. The 2026-11-08 source refinement and bounded Windows controls
+preserve the result contract; they do not qualify package launch or clean-machine behavior.
 
 ### Logging category ownership
 
@@ -128,7 +154,12 @@ in its implementation file, or pairs `SPARKLE_DECLARE_LOG_CATEGORY` in a
 shared header with one `SPARKLE_DEFINE_LOG_CATEGORY` definition. Receivers log
 through that category and do not cache `shared_ptr<spdlog::logger>` instances or
 create registry entries. `SparkleCore` alone owns lazy category resolution,
-registry synchronization, sinks, levels, and logger lifetime. This keeps the
+registry synchronization, sinks, levels, and logger lifetime. The registry lock
+encloses lookup, borrowed-sink use, logger creation and publication; bootstrap retry
+cannot mutate those sinks while another category borrows them. Private
+`CreateLoggerLocked` and `ApplyLoggerSettingsLocked` state that lock precondition.
+Configured severity uses the same mutex; the externally queried bootstrap-status
+flag remains atomic. This keeps the
 frontend declarative while preserving one backend policy and one creation path.
 Logger initialization sequences private `LoggerBootstrap` operations for
 configured severity and sink construction before registering and publishing the
@@ -143,20 +174,50 @@ allows aggregate path initialization to report diagnostics without re-entering
 itself. These private boundaries were reconciled on 2026-10-26;
 `architecture_boundary_check` rejects dependency reversals.
 
+`Verify.cpp` sequences diagnostic output, debugger break and termination.
+`VerifyDiagnostics.cpp` owns record construction, native error suffixes and
+fallback output. The `CHECK` macro evaluates its expression once and uses an
+explicitly braced failure body.
+
 ### Input frame state
 
-Platform's `InputSystem` advances its system and layer states through
-`InputState::BeginFrame`. Core sequences keyboard advancement, mouse-button
+Platform's `InputSystem` uses Core's semantic input producer operations and
+advances its system and layer states through `InputState::BeginFrame`. Core has
+no friendship or dependency on that named host; another acquisition host uses
+the same contract, while normal consumers borrow const state. Core sequences keyboard advancement, mouse-button
 advancement and transient-delta reset; both device families use the same private
 button-transition operation over borrowed spans. Position, modifiers, capture
 and cursor state persist across this boundary. This 2026-10-26 decomposition
 adds no input policy or state ownership to Core.
 
+`InputState::ResetPointerState` clears button states, frame pointer/wheel deltas,
+capture and cursor flags while preserving keys, modifiers and pointer position.
+The acquisition owner uses this public operation for capture-loss cancellation;
+Core retains no Platform friendship. Platform owns cancellation notifications,
+native release and routing, as described in [Platform ownership](../Platform/PlatformCapabilities.md#current-ownership-and-message-flow).
+
+Modifier polling delegates to `HasAnyFlag` over the full `ModifierFlags` width,
+matching typed-event queries for Super keys and all lock flags. Platform owns
+native sampling; the [callback/modifier iteration](../Platform/PlatformCapabilities.md#callback-and-modifier-hardening)
+records the producer-to-polling controls without advancing product qualification.
+
+### Frame timing and pixel values
+
+`Timer` stores completed-frame timing once in `TimeInfo`. Live pause/scale controls
+apply at the next tick and remain distinct from that frame observation. Deltas,
+totals and frame count read that one authority; the nominal unscaled delta before
+the first tick is preserved. No persistent mirror of totals or frame index remains.
+
+Float-to-half conversion preserves NaN as NaN, alongside the existing finite
+truncation policy, signed zero, subnormals and infinity. Native controls cover
+every half encoding and explicit numeric boundaries; they do not qualify GPU
+formats or texture-cooking quality.
+
 ### Workspace-derived paths
 
 Executable/current directory and markers -> workspace/project discovery -> `ConfigureProjectRoot` publishes the active project -> typed getters derive Engine/Project/cooked paths -> runtime/tools open those products. This is a vital package risk because a successful workspace path does not prove operation outside the repository.
 
-Path ownership reconciled on 2026-11-01: public `Paths/FileSystemPaths.h` declares process/workspace/cooked path operations; `Paths/ProductFilePaths.h` builds product/log file paths. `FileSystemPathState.cpp` owns cached root/layout initialization. `FileSystemPathRoots.cpp` uses ordinary marker discovery, `CookedAssetPathLayout.cpp` composes the same cooked suffixes for every root, and loaders validate the products they consume. Discovery never materializes cooked output. `FileSystemDiscovery.cpp` and `UserStatePaths.cpp` remain stateless bootstrap owners. The package discovery/manifest/product-path files and compiler-specific symbol/signal getters are deleted. Host-tool `ToolOutputPaths` owns build/library/tool layout; Launcher owns source-action admission and executable selection. No Engine component depends on Launcher.
+Path ownership reconciled on 2026-11-08: public `Paths/FileSystemPaths.h` declares process/workspace/cooked path operations; `Paths/ProductFilePaths.h` builds product/log file paths. `FileSystemPathState.cpp` owns cached root/layout initialization. `FileSystemPathRoots.cpp` uses ordinary marker discovery, `CookedAssetPathLayout.cpp` composes the same cooked suffixes for every root, and loaders validate the products they consume. Discovery never materializes cooked output. Stateless `FileSystemDiscovery.cpp` selects root precedence; `ExecutablePaths.cpp` owns native executable lookup, `PathMarkerSearch.cpp` owns ancestor traversal, and `ProjectRootDiscovery.cpp` owns executable-name inference and workspace project matching. `UserStatePaths.cpp` composes workspace-keyed user-state paths without aggregate path state; `UserStateRoot.cpp` owns native per-user directory discovery. The package discovery/manifest/product-path files and compiler-specific symbol/signal getters are deleted. Host-tool `ToolOutputPaths` owns build/library/tool layout; Launcher owns source-action admission and executable selection. No Engine component depends on Launcher.
 
 ## Explicit Non-Capabilities And Risks
 

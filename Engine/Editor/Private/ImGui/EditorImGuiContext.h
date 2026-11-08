@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core/Public/Events/ScopedEventHandle.h"
+#include "Core/Public/Input/Keyboard/Key.h"
 
-#include <cstdint>
 #include <functional>
 #include <string>
 
@@ -13,7 +13,7 @@ struct ImGuiContext;
 class EditorImGuiContext final
 {
 public:
-	using ShortcutHandler = std::function<bool(std::uint32_t, std::uintptr_t, bool)>;
+	using ShortcutHandler = std::function<bool(Key)>;
 
 	explicit EditorImGuiContext(Window& window) noexcept;
 	~EditorImGuiContext() noexcept;

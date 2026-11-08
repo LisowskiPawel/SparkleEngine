@@ -13,39 +13,27 @@
 
 namespace Assets
 {
-	class SceneManifestValidation final
+	template <std::size_t Capacity> static bool HasTerminatedName(const char (&name)[Capacity]) noexcept
 	{
-	public:
-		template <std::size_t Capacity> static bool HasTerminatedName(const char (&name)[Capacity]) noexcept { return Strings::IsNullTerminated(std::span(name)); }
+		return Strings::IsNullTerminated(std::span(name));
+	}
 
-		template <std::size_t Capacity> static bool HasValidName(const char (&name)[Capacity]) noexcept { return name[0] != '\0' && HasTerminatedName(name); }
+	template <std::size_t Capacity> static bool HasValidName(const char (&name)[Capacity]) noexcept
+	{
+		return name[0] != '\0' && HasTerminatedName(name);
+	}
 
-		[[noreturn]] static void Invalid(const std::string& message) { throw Diagnostics::Error(message); }
+	[[noreturn]] static void Invalid(const std::string& message)
+	{
+		throw Diagnostics::Error(message);
+	}
 
-		static bool HasFeatureFlag(std::uint32_t flags, CookedSceneFeatureFlags feature) noexcept;
-		static void ValidateFeatures(const LoadedSceneManifest& manifest);
-		static void ValidateMeshReferences(const LoadedSceneManifest& manifest);
-		static void ValidateInstanceReferenceRanges(const LoadedSceneManifest& manifest, std::size_t instanceIndex);
-		static void ValidateInstanceMeshBinding(const LoadedSceneManifest& manifest, std::size_t instanceIndex);
-		static void ValidateInstances(const LoadedSceneManifest& manifest);
-		static void ValidateInstanceGroupReferences(const LoadedSceneManifest& manifest, std::size_t groupIndex);
-		static void ValidateInstanceGroupRange(const LoadedSceneManifest& manifest, std::size_t groupIndex);
-		static void ValidateInstanceGroupKind(const LoadedSceneManifest& manifest, std::size_t groupIndex);
-		static void ValidateInstanceGroups(const LoadedSceneManifest& manifest);
-		static void ValidateCameras(const LoadedSceneManifest& manifest);
-		static void ValidateLights(const LoadedSceneManifest& manifest);
-		static void ValidateSkeletonRefs(const LoadedSceneManifest& manifest);
-		static void ValidateAnimationRefs(const LoadedSceneManifest& manifest);
-		static void ValidateMetadata(const LoadedSceneManifest& manifest);
-		static void ValidateMaterialVariants(const LoadedSceneManifest& manifest);
-	};
-
-	bool SceneManifestValidation::HasFeatureFlag(std::uint32_t flags, CookedSceneFeatureFlags feature) noexcept
+	static bool HasFeatureFlag(std::uint32_t flags, CookedSceneFeatureFlags feature) noexcept
 	{
 		return (flags & ToCookedSceneFeatureFlagMask(feature)) != 0u;
 	}
 
-	void SceneManifestValidation::ValidateFeatures(const LoadedSceneManifest& manifest)
+	static void ValidateFeatures(const LoadedSceneManifest& manifest)
 	{
 		constexpr std::uint32_t knownFeatureFlags = ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Cameras) | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Lights)
 		    | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Skeletons) | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Animations)
@@ -88,7 +76,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateMeshReferences(const LoadedSceneManifest& manifest)
+	static void ValidateMeshReferences(const LoadedSceneManifest& manifest)
 	{
 		for (std::size_t meshReferenceIndex = 0; meshReferenceIndex < manifest.meshAssetReferences.size(); ++meshReferenceIndex)
 		{
@@ -104,7 +92,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateInstanceReferenceRanges(const LoadedSceneManifest& manifest, std::size_t instanceIndex)
+	static void ValidateInstanceReferenceRanges(const LoadedSceneManifest& manifest, std::size_t instanceIndex)
 	{
 		const CookedSceneInstanceRecord& instance = manifest.instances[instanceIndex];
 		if (instance.meshAssetIndex >= manifest.meshAssetReferences.size())
@@ -158,7 +146,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateInstanceMeshBinding(const LoadedSceneManifest& manifest, std::size_t instanceIndex)
+	static void ValidateInstanceMeshBinding(const LoadedSceneManifest& manifest, std::size_t instanceIndex)
 	{
 		const CookedSceneInstanceRecord& instance = manifest.instances[instanceIndex];
 		const CookedSceneMeshAssetRef& meshReference = manifest.meshAssetReferences[instance.meshAssetIndex];
@@ -172,7 +160,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateInstances(const LoadedSceneManifest& manifest)
+	static void ValidateInstances(const LoadedSceneManifest& manifest)
 	{
 		for (std::size_t instanceIndex = 0; instanceIndex < manifest.instances.size(); ++instanceIndex)
 		{
@@ -181,7 +169,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateInstanceGroupReferences(const LoadedSceneManifest& manifest, std::size_t groupIndex)
+	static void ValidateInstanceGroupReferences(const LoadedSceneManifest& manifest, std::size_t groupIndex)
 	{
 		const CookedSceneInstanceGroupRecord& group = manifest.instanceGroups[groupIndex];
 		if (group.meshAssetIndex >= manifest.meshAssetReferences.size())
@@ -202,7 +190,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateInstanceGroupRange(const LoadedSceneManifest& manifest, std::size_t groupIndex)
+	static void ValidateInstanceGroupRange(const LoadedSceneManifest& manifest, std::size_t groupIndex)
 	{
 		const CookedSceneInstanceGroupRecord& group = manifest.instanceGroups[groupIndex];
 		const bool bInvalidInstanceRangeInstances = group.instanceCount == 0 || group.firstInstance >= manifest.instances.size();
@@ -230,7 +218,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateInstanceGroupKind(const LoadedSceneManifest& manifest, std::size_t groupIndex)
+	static void ValidateInstanceGroupKind(const LoadedSceneManifest& manifest, std::size_t groupIndex)
 	{
 		const CookedSceneInstanceGroupRecord& group = manifest.instanceGroups[groupIndex];
 		if (group.groupKind != CookedSceneInstanceGroupKind::None && group.groupKind != CookedSceneInstanceGroupKind::SharedMeshReference
@@ -240,7 +228,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateInstanceGroups(const LoadedSceneManifest& manifest)
+	static void ValidateInstanceGroups(const LoadedSceneManifest& manifest)
 	{
 		for (std::size_t groupIndex = 0; groupIndex < manifest.instanceGroups.size(); ++groupIndex)
 		{
@@ -250,7 +238,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateCameras(const LoadedSceneManifest& manifest)
+	static void ValidateCameras(const LoadedSceneManifest& manifest)
 	{
 		for (std::size_t cameraIndex = 0; cameraIndex < manifest.cameras.size(); ++cameraIndex)
 		{
@@ -266,7 +254,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateLights(const LoadedSceneManifest& manifest)
+	static void ValidateLights(const LoadedSceneManifest& manifest)
 	{
 		for (std::size_t lightIndex = 0; lightIndex < manifest.lights.size(); ++lightIndex)
 		{
@@ -289,7 +277,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateSkeletonRefs(const LoadedSceneManifest& manifest)
+	static void ValidateSkeletonRefs(const LoadedSceneManifest& manifest)
 	{
 		for (std::size_t skeletonIndex = 0; skeletonIndex < manifest.skeletonRefs.size(); ++skeletonIndex)
 		{
@@ -300,7 +288,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateAnimationRefs(const LoadedSceneManifest& manifest)
+	static void ValidateAnimationRefs(const LoadedSceneManifest& manifest)
 	{
 		for (std::size_t animationIndex = 0; animationIndex < manifest.animationReferences.size(); ++animationIndex)
 		{
@@ -311,7 +299,7 @@ namespace Assets
 		}
 	}
 
-	void SceneManifestValidation::ValidateMetadata(const LoadedSceneManifest& manifest)
+	static void ValidateMetadata(const LoadedSceneManifest& manifest)
 	{
 		ValidateCameras(manifest);
 		ValidateLights(manifest);
@@ -319,7 +307,7 @@ namespace Assets
 		ValidateAnimationRefs(manifest);
 	}
 
-	void SceneManifestValidation::ValidateMaterialVariants(const LoadedSceneManifest& manifest)
+	static void ValidateMaterialVariants(const LoadedSceneManifest& manifest)
 	{
 		for (std::size_t variantIndex = 0; variantIndex < manifest.materialVariants.size(); ++variantIndex)
 		{
@@ -353,17 +341,17 @@ namespace Assets
 	{
 		if (!manifest.header.fileHeader.HasMagic(kCookedSceneManifestMagic))
 		{
-			SceneManifestValidation::Invalid("Invalid cooked scene manifest magic");
+			Invalid("Invalid cooked scene manifest magic");
 		}
 	}
 
 	void SceneManifestValidator::ValidateRecords(const LoadedSceneManifest& manifest)
 	{
-		SceneManifestValidation::ValidateFeatures(manifest);
-		SceneManifestValidation::ValidateMeshReferences(manifest);
-		SceneManifestValidation::ValidateInstances(manifest);
-		SceneManifestValidation::ValidateInstanceGroups(manifest);
-		SceneManifestValidation::ValidateMetadata(manifest);
-		SceneManifestValidation::ValidateMaterialVariants(manifest);
+		ValidateFeatures(manifest);
+		ValidateMeshReferences(manifest);
+		ValidateInstances(manifest);
+		ValidateInstanceGroups(manifest);
+		ValidateMetadata(manifest);
+		ValidateMaterialVariants(manifest);
 	}
 }

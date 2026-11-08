@@ -41,16 +41,21 @@ namespace ECS
 			}
 
 			BuildExecutionWaves();
+			PublishExecutionRecords();
+			return std::move(m_data);
+		}
+
+	private:
+		void PublishExecutionRecords()
+		{
 			m_data->Systems.reserve(m_systems.size());
 			for (GameSystemDesc& system : m_systems)
 			{
 				m_data->Systems.push_back(
 				    CompiledGameSystem{.Name = std::move(system.Name), .RangePolicy = system.RangePolicy, .GetItemCount = system.GetItemCount, .ExecuteRange = system.ExecuteRange});
 			}
-			return std::move(m_data);
 		}
 
-	private:
 		struct ResourcePhaseRange final
 		{
 			GameSystemPhase First;

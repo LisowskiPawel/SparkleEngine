@@ -1,5 +1,5 @@
 # SparklePlatform Module
-# OS abstraction: Window, Input system, File system
+# Native window and input ownership
 # Dependencies: SparkleCore
 
 file(GLOB_RECURSE SPARKLE_PLATFORM_PUBLIC_HEADERS

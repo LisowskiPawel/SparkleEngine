@@ -3,7 +3,6 @@
 
 #include "Concurrency/Coordinator/RendererExecutionContext.h"
 
-#include <algorithm>
 #include <exception>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderCoordinatorLogger, "Renderer.Coordinator");
@@ -74,19 +73,8 @@ void RenderCoordinator::RenderThreadMain()
 	std::exception_ptr failure;
 	try
 	{
-		m_context = std::make_unique<RendererExecutionContext>(*m_window, m_deviceLaunch, m_config);
-		{
-			std::lock_guard lock(m_startMutex);
-			m_bStartSucceeded = true;
-			m_bStarted = true;
-		}
-		m_startedCondition.notify_one();
-		PublishReadState();
-
-		while (std::optional<RenderThreadCommand> command = m_threadCommandQueue->WaitPop())
-		{
-			ProcessThreadedCommand(std::move(*command));
-		}
+		InitializeRenderThreadContext();
+		ProcessRenderThreadCommands();
 	}
 	catch (const std::exception& exception)
 	{
@@ -99,6 +87,31 @@ void RenderCoordinator::RenderThreadMain()
 		SPDLOG_ERROR("RenderThread terminated after an unknown exception.");
 	}
 
+	FinishRenderThread(std::move(failure));
+}
+
+void RenderCoordinator::InitializeRenderThreadContext()
+{
+	m_context = std::make_unique<RendererExecutionContext>(*m_window, m_deviceLaunch, m_config);
+	{
+		std::lock_guard lock(m_startMutex);
+		m_bStartSucceeded = true;
+		m_bStarted = true;
+	}
+	m_startedCondition.notify_one();
+	PublishReadState();
+}
+
+void RenderCoordinator::ProcessRenderThreadCommands()
+{
+	while (std::optional<RenderThreadCommand> command = m_threadCommandQueue->WaitPop())
+	{
+		ProcessThreadedCommand(std::move(*command));
+	}
+}
+
+void RenderCoordinator::FinishRenderThread(std::exception_ptr failure) noexcept
+{
 	{
 		std::lock_guard lock(m_startMutex);
 		if (!m_bStartSucceeded)
@@ -147,47 +160,7 @@ void RenderCoordinator::ExecuteThreadedFrame(RenderFrameQueueTicket ticket)
 
 void RenderCoordinator::SettleAbandonedWork() noexcept
 {
-	m_threadCommandQueue->Close();
-	for (RenderThreadCommand& command : m_threadCommandQueue->Drain())
-	{
-		RendererExecutionControl* control = std::get_if<RendererExecutionControl>(&command.Payload);
-		if (control == nullptr)
-		{
-			continue;
-		}
-
-		std::visit(
-		    [this](auto& pending)
-		    {
-			    if constexpr (requires { pending.Completion; })
-			    {
-				    pending.Completion->Cancel();
-			    }
-#if SPARKLE_WITH_EXTERNAL_CAPTURE
-			    else if constexpr (std::is_same_v<std::decay_t<decltype(pending)>, RenderExternalCaptureCommand>)
-			    {
-				    if (m_deviceLaunch.ExternalCapture)
-				    {
-					    m_deviceLaunch.ExternalCapture->Reject(pending.RequestId, "Render owner stopped before capture began.");
-				    }
-			    }
-#endif
-		    },
-		    *control);
-	}
+	CancelPendingControls();
 	m_frameQueue->SettleAll();
-	std::lock_guard lock(m_readStateMutex);
-	for (ViewportCaptureId id : m_outstandingViewportCaptures)
-	{
-		const bool bDuplicateCaptureCompletion = !id
-		    || std::any_of(m_publishedViewportCaptures.begin(), m_publishedViewportCaptures.end(), [id](const ViewportCaptureCompletion& completion) { return completion.Id.Value == id.Value; });
-
-		if (bDuplicateCaptureCompletion)
-		{
-			continue;
-		}
-
-		m_publishedViewportCaptures.push_back(
-		    ViewportCaptureCompletion{.Id = id, .Readback = {.Result = {.Status = ViewportCaptureStatus::Failed, .FailureReason = "Render owner stopped before viewport readback completed"}}});
-	}
+	FailOutstandingViewportCaptures();
 }

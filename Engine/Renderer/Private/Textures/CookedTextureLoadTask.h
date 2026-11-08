@@ -10,14 +10,15 @@
 class TaskExecutor;
 class TaskScope;
 
-class CookedTextureLoadTask final
+struct CookedTextureLoadPayload final
 {
-public:
-	struct Payload final
-	{
-		CookedTextureFilePayload File;
-		LoadedTextureData Texture;
-	};
-
-	static TaskExecution Launch(TaskExecutor& taskExecutor, TaskScope& taskScope, const std::filesystem::path& path, const std::shared_ptr<Payload>& payload, std::uint64_t maximumDecodedBytes);
+	CookedTextureFilePayload File;
+	LoadedTextureData Texture;
 };
+
+TaskExecution LaunchCookedTextureLoad(
+    TaskExecutor& taskExecutor,
+    TaskScope& taskScope,
+    const std::filesystem::path& path,
+    const std::shared_ptr<CookedTextureLoadPayload>& payload,
+    std::uint64_t maximumDecodedBytes);

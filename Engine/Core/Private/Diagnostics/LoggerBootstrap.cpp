@@ -74,7 +74,7 @@ namespace Logging
 		{
 			std::string configuredFile;
 			Environment::TryGetVariable("SPARKLE_LOG_FILE", configuredFile);
-			const std::filesystem::path logPath = Paths::Private::ResolveBootstrapLogFile(configuredFile, Paths::Private::LogParentDirectoryPolicy::EnsureExists);
+			const std::filesystem::path logPath = Paths::ResolveBootstrapLogFile(configuredFile, Paths::LogParentDirectoryPolicy::EnsureExists);
 
 			auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logPath.string(), 5 * 1024 * 1024, 2);
 			fileSink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] %s:%# %v");

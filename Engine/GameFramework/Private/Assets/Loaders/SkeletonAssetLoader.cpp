@@ -16,70 +16,77 @@
 
 namespace Assets
 {
-	LoadedSkeletonAsset SkeletonAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const
+	static void ValidateSkeletonHeader(const CookedSkeletonAssetHeader& header, const CookedAssetLoaderDiagnostics& diagnostics)
 	{
-		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedSkeletonAsset");
-
-		CookedAssetByteReader reader(bytes, budget);
-		LoadedSkeletonAsset skeletonAsset;
-		skeletonAsset.header = reader.Read<CookedSkeletonAssetHeader>();
-
-		const bool bSkeletonHeaderInvalid = !skeletonAsset.header.fileHeader.HasMagic(kCookedSkeletonAssetMagic) || skeletonAsset.header.jointStride != sizeof(CookedSkeletonJointRecord);
-
-		if (bSkeletonHeaderInvalid)
+		if (!header.fileHeader.HasMagic(kCookedSkeletonAssetMagic) || header.jointStride != sizeof(CookedSkeletonJointRecord))
 		{
 			throw diagnostics.MakeError("header", "skeleton magic and current joint stride", "Invalid cooked skeleton asset header; recook the asset");
 		}
+	}
 
-		skeletonAsset.joints = reader.ReadArray<CookedSkeletonJointRecord>(skeletonAsset.header.jointCount);
-
-		std::unordered_set<std::uint32_t> sourceNodeIndices;
-		for (std::size_t jointIndex = 0; jointIndex < skeletonAsset.joints.size(); ++jointIndex)
+	static void ValidateSkeletonJoint(std::span<const CookedSkeletonJointRecord> joints, std::size_t index, std::unordered_set<std::uint32_t>& nodes, const CookedAssetLoaderDiagnostics& diagnostics)
+	{
+		const auto& joint = joints[index];
+		const bool bValidName = Strings::IsNullTerminated(std::span(joint.name));
+		const bool bValidNode = joint.sourceNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
+		const bool bUniqueNode = nodes.insert(joint.sourceNodeIndex).second;
+		const bool bParentInRange = joint.parentJointIndex < joints.size() && joint.parentJointIndex != index;
+		const bool bValidParent = joint.parentJointIndex == kInvalidCookedSkeletonJointIndex || bParentInRange;
+		if (!bValidName || !bValidNode)
 		{
-			const CookedSkeletonJointRecord& joint = skeletonAsset.joints[jointIndex];
-			const DirectX::XMFLOAT4X4* parentBindModel = joint.parentJointIndex < skeletonAsset.joints.size() ? &skeletonAsset.joints[joint.parentJointIndex].bindModelTransform : nullptr;
-			const bool bNameTerminated = Strings::IsNullTerminated(std::span(joint.name));
-			const bool bSourceNodeValid = bNameTerminated && joint.sourceNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
-			const bool bSourceNodeUnique = bSourceNodeValid && sourceNodeIndices.insert(joint.sourceNodeIndex).second;
-
-			const bool bParentValidJointIndex = bSourceNodeUnique && (joint.parentJointIndex == kInvalidCookedSkeletonJointIndex);
-			const bool bParentValidGuardJointIndex = bSourceNodeUnique && !bParentValidJointIndex;
-			const bool bParentValidJoints = bParentValidGuardJointIndex && (joint.parentJointIndex < skeletonAsset.joints.size());
-			const bool bDistinctParent = bParentValidJoints && (joint.parentJointIndex != jointIndex);
-			const bool bParentAccepted = bParentValidJointIndex || bDistinctParent;
-			const bool bParentValid = bSourceNodeUnique && bParentAccepted;
-
-			const bool bInverseBindFinite = bParentValid && SkeletonTransformContract::IsFinite(joint.inverseBindMatrix);
-			const bool bLocalBindFinite = bInverseBindFinite && SkeletonTransformContract::IsFinite(joint.bindLocalTransform);
-			const bool bParentSpaceFinite = bLocalBindFinite && SkeletonTransformContract::IsFinite(joint.parentSpaceTransform);
-			const bool bModelBindFinite = bParentSpaceFinite && SkeletonTransformContract::IsFinite(joint.bindModelTransform);
-			const bool bInverseBindInvertible = bModelBindFinite && SkeletonTransformContract::IsInvertible(joint.inverseBindMatrix);
-			const bool bLocalBindInvertible = bInverseBindInvertible && SkeletonTransformContract::IsInvertible(joint.bindLocalTransform);
-			const bool bLocalBindDecomposable = bLocalBindInvertible && SkeletonTransformContract::IsTrsDecomposable(joint.bindLocalTransform);
-
-			const bool bBindInvariantSatisfied = bLocalBindDecomposable
-			    && SkeletonTransformContract::SatisfiesBindInvariant(joint.bindLocalTransform, joint.parentSpaceTransform, parentBindModel, joint.bindModelTransform);
-
-			if (!bBindInvariantSatisfied)
-			{
-				throw diagnostics.MakeError(
-				    "joints",
-				    "unique nodes, valid parents, finite invertible TRS, and the canonical bind invariant",
-				    "Cooked skeleton violates the current transform contract; recook the spatial asset");
-			}
+			throw diagnostics.MakeError("joints", "a terminated name and valid source node", "Cooked skeleton joint identity is invalid");
+		}
+		if (!bUniqueNode || !bValidParent)
+		{
+			throw diagnostics.MakeError("joints", "unique nodes and valid parents", "Cooked skeleton joint hierarchy is invalid");
 		}
 
-		std::vector<std::uint32_t> evaluationOrder;
-		if (skeletonAsset.joints.empty() || !SkeletonTransformContract::BuildEvaluationOrder(skeletonAsset.joints, evaluationOrder))
+		const bool bFiniteBind = SkeletonTransformContract::IsFinite(joint.inverseBindMatrix) && SkeletonTransformContract::IsFinite(joint.bindLocalTransform);
+		const bool bFiniteHierarchy = SkeletonTransformContract::IsFinite(joint.parentSpaceTransform) && SkeletonTransformContract::IsFinite(joint.bindModelTransform);
+		const bool bInvertible = SkeletonTransformContract::IsInvertible(joint.inverseBindMatrix) && SkeletonTransformContract::IsInvertible(joint.bindLocalTransform);
+		const auto* parent = bParentInRange ? &joints[joint.parentJointIndex].bindModelTransform : nullptr;
+		const bool bBindInvariant = SkeletonTransformContract::SatisfiesBindInvariant(joint.bindLocalTransform, joint.parentSpaceTransform, parent, joint.bindModelTransform);
+		if (!bFiniteBind || !bFiniteHierarchy)
+		{
+			throw diagnostics.MakeError("joints", "finite transforms", "Cooked skeleton contains non-finite transforms");
+		}
+		if (!bInvertible || !SkeletonTransformContract::IsTrsDecomposable(joint.bindLocalTransform))
+		{
+			throw diagnostics.MakeError("joints", "invertible TRS", "Cooked skeleton violates the current transform contract; recook the spatial asset");
+		}
+		if (!bBindInvariant)
+		{
+			throw diagnostics.MakeError("joints", "the canonical bind invariant", "Cooked skeleton violates the current bind invariant; recook the spatial asset");
+		}
+	}
+
+	static void ValidateSkeletonJoints(const LoadedSkeletonAsset& asset, const CookedAssetLoaderDiagnostics& diagnostics)
+	{
+		std::unordered_set<std::uint32_t> nodes;
+		for (std::size_t index = 0; index < asset.joints.size(); ++index)
+		{
+			ValidateSkeletonJoint(asset.joints, index, nodes, diagnostics);
+		}
+		std::vector<std::uint32_t> order;
+		if (asset.joints.empty() || !SkeletonTransformContract::BuildEvaluationOrder(asset.joints, order))
 		{
 			throw diagnostics.MakeError("joints", "one or more joints in an acyclic hierarchy", "Cooked skeleton has an empty or cyclic hierarchy; recook the spatial asset");
 		}
+	}
 
+	LoadedSkeletonAsset SkeletonAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget)
+	{
+		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedSkeletonAsset");
+		CookedAssetByteReader reader(bytes, budget);
+		LoadedSkeletonAsset asset;
+		asset.header = reader.Read<CookedSkeletonAssetHeader>();
+		ValidateSkeletonHeader(asset.header, diagnostics);
+		asset.joints = reader.ReadArray<CookedSkeletonJointRecord>(asset.header.jointCount);
+		ValidateSkeletonJoints(asset, diagnostics);
 		if (reader.GetRemainingByteCount() != 0)
 		{
 			throw diagnostics.MakeError("payload", "no trailing bytes after declared skeleton records", "Cooked skeleton asset contains unexpected trailing bytes");
 		}
-
-		return skeletonAsset;
+		return asset;
 	}
 }

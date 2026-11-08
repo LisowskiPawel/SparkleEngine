@@ -13,10 +13,6 @@ RenderCoordinator::RenderCoordinator(Timer& timer, Window& window, RendererExecu
     m_config(config),
     m_deviceLaunch(deviceLaunch)
 {
-	if (!m_config.HasAssetTaskRuntime())
-	{
-		Diagnostics::Fatal(g_renderCoordinatorLogger, __FILE__, __LINE__, "RendererExecutionConfig has no asset-task executor or parent scope.");
-	}
 	Initialize();
 	m_resizeHandle = ScopedEventHandle(window.OnResized, window.OnResized.Add([this] { SubmitResize(); }));
 }

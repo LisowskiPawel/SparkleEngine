@@ -25,12 +25,15 @@ public:
 
 	bool IsSettled() const noexcept;
 
-	const ReferencePathTracerArtifactWriteResult& GetLastResult() const noexcept { return m_lastResult; }
+	std::optional<ReferencePathTracerArtifactWriteResult> TakeResult() noexcept;
 
 private:
 	void Begin(ReferencePathTracerArtifactKind kind, Renderer& renderer, const ViewportRenderProducts& products, const std::filesystem::path& outputRoot);
 	void CollectReadback(Renderer& renderer, ViewportCaptureSlot& capture, std::optional<ViewportCaptureReadback>& destination);
 	void PublishIfReady();
+	void StartPublication(ReferencePathTracerArtifactWriteRequest request);
+	void BeginPendingCapture(Renderer& renderer, const ViewportRenderProducts& products);
+	void CollectPublicationResult();
 	void Fail(std::string message);
 	static std::filesystem::path DefaultOutputRoot();
 
@@ -44,7 +47,7 @@ private:
 	std::optional<ViewportCaptureReadback> m_mean;
 	std::optional<ViewportCaptureReadback> m_moment2;
 	std::optional<ReferencePathTracerArtifactKind> m_pendingKind;
-	ReferencePathTracerArtifactWriteResult m_lastResult;
+	std::optional<ReferencePathTracerArtifactWriteResult> m_lastResult;
 	RenderProductSamplePrefix m_pendingPrefix = {};
 	RenderProductSamplePrefix m_capturePrefix = {};
 };

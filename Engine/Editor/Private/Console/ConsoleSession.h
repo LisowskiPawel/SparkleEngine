@@ -14,6 +14,7 @@ class ConsoleSession final
 {
 public:
 	explicit ConsoleSession(ConsoleCommandActions actions);
+	void SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
 
 	ConsoleSession(const ConsoleSession&) = delete;
 	ConsoleSession& operator=(const ConsoleSession&) = delete;

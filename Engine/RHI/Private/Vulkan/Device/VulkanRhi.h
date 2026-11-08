@@ -116,17 +116,6 @@ public:
 	PFN_vkCmdTraceRaysKHR GetCmdTraceRays() const noexcept;
 
 private:
-	struct PhysicalDeviceCandidate final
-	{
-		VkPhysicalDevice Device = VK_NULL_HANDLE;
-		VkPhysicalDeviceProperties Properties = {};
-		VkPhysicalDeviceFeatures2 Features = {};
-		VkPhysicalDeviceVulkan12Features Features12 = {};
-		VkPhysicalDeviceVulkan13Features Features13 = {};
-		VulkanQueueTopology QueueTopology;
-		std::uint32_t Score = 0;
-	};
-
 	void CreateInstance() noexcept;
 	void CreateDebugMessenger() noexcept;
 	void SelectPhysicalDevice() noexcept;
@@ -142,8 +131,6 @@ private:
 
 	static bool IsLayerAvailable(const char* layerName) noexcept;
 	static bool IsInstanceExtensionAvailable(const char* extensionName) noexcept;
-	static bool AppendAvailableDeviceExtension(VkPhysicalDevice physicalDevice, std::vector<const char*>& extensions, const char* extensionName) noexcept;
-	static std::uint32_t ScorePhysicalDevice(const VkPhysicalDeviceProperties& properties) noexcept;
 	static VulkanAdapterInfo BuildAdapterInfo(const VkPhysicalDeviceProperties& properties);
 	static std::string FormatApiVersion(std::uint32_t version);
 	static std::string FormatDriverVersion(const VkPhysicalDeviceProperties& properties);
@@ -155,8 +142,6 @@ private:
 	    void* userData) noexcept;
 
 	static constexpr std::uint32_t NvidiaVendorId = 0x10DE;
-	static constexpr const char* NvidiaBinaryImportExtensionName = "VK_NVX_binary_import";
-	static constexpr const char* NvidiaImageViewHandleExtensionName = "VK_NVX_image_view_handle";
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VulkanDebugLayer m_debugLayer;

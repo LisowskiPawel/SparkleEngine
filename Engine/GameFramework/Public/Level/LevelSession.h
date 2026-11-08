@@ -17,6 +17,8 @@ class GameWorld;
 namespace Assets
 {
 	class SceneLoadExecutor;
+	struct SceneLoadCompletion;
+	struct SceneLoadPackage;
 }
 class TaskExecutor;
 class TaskScope;
@@ -57,10 +59,14 @@ public:
 	bool SaveActiveLevel() noexcept;
 
 private:
-	void CaptureSceneToLevel() noexcept;
 	void InitializeStartupLevel() noexcept;
 	void StartLevelChange(LevelAsset& requestedLevel) noexcept;
 	void CompleteLevelChange() noexcept;
+	LevelAsset& TakeLoadingLevel(std::uint64_t requestId) noexcept;
+	void RejectLevelLoad(LevelAsset& level, std::string diagnostic) noexcept;
+	void ActivateLoadedLevel(LevelAsset& level, Assets::SceneLoadPackage package) noexcept;
+	void NotifyLevelUnloading(const std::string& previousName, const std::string& requestedName);
+	void NotifyLevelChanged(const std::string& previousName, const std::string& activeName);
 
 	GameWorld* m_gameWorld = nullptr;
 	std::unique_ptr<LevelRegistry> m_levelRegistry;

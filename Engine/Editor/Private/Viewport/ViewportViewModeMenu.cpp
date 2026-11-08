@@ -5,7 +5,6 @@
 #include "Renderer/Public/Viewport/RenderViewMode.h"
 #include "Icons/EditorIcon.h"
 #include "Widgets/UiMenuWidgets.h"
-#include "Viewport/EditorViewportSession.h"
 
 #include <imgui.h>
 
@@ -51,13 +50,13 @@ static const ViewModePresentation& DescribeViewMode(RenderViewMode viewMode) noe
 	return found != viewModePresentations.end() ? *found : viewModePresentations.front();
 }
 
-static void DrawViewModeOption(EditorViewportSession& viewportSession, const ViewModePresentation& option, RenderViewMode currentViewMode) noexcept
+static void DrawViewModeOption(const ViewModePresentation& option, RenderViewMode currentViewMode, std::optional<RenderViewMode>& selection) noexcept
 {
 	const bool bSelected = option.Mode == currentViewMode;
 	const EditorWidgets::MenuCheckState checkState = bSelected ? EditorWidgets::MenuCheckState::Checked : EditorWidgets::MenuCheckState::Unchecked;
 	if (EditorWidgets::DrawMenuItem(option.Label, option.Icon, checkState))
 	{
-		viewportSession.SetViewMode(option.Mode);
+		selection = option.Mode;
 	}
 
 	if (bSelected)
@@ -66,13 +65,9 @@ static void DrawViewModeOption(EditorViewportSession& viewportSession, const Vie
 	}
 }
 
-void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool bDisableInteraction, bool bCompact) noexcept
+std::optional<RenderViewMode> DrawViewportViewModeMenu(RenderViewMode currentViewMode, bool bDisableInteraction, bool bCompact) noexcept
 {
-	RenderViewMode currentViewMode = viewportSession.GetViewMode();
-	if (currentViewMode >= RenderViewMode::Count)
-	{
-		currentViewMode = RenderViewMode::Lit;
-	}
+	std::optional<RenderViewMode> selection;
 
 	ImGui::BeginDisabled(bDisableInteraction);
 	const ViewModePresentation& currentPresentation = DescribeViewMode(currentViewMode);
@@ -86,7 +81,7 @@ void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool bDisa
 		{
 			if (std::string_view(option.Category).empty())
 			{
-				DrawViewModeOption(viewportSession, option, currentViewMode);
+				DrawViewModeOption(option, currentViewMode, selection);
 			}
 		}
 		EditorWidgets::DrawMenuSection("VISUALIZATIONS");
@@ -106,7 +101,7 @@ void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool bDisa
 				{
 					if (std::string_view(option.Category) == category)
 					{
-						DrawViewModeOption(viewportSession, option, currentViewMode);
+						DrawViewModeOption(option, currentViewMode, selection);
 					}
 				}
 				ImGui::EndMenu();
@@ -116,4 +111,5 @@ void DrawViewportViewModeMenu(EditorViewportSession& viewportSession, bool bDisa
 		ImGui::EndCombo();
 	}
 	ImGui::EndDisabled();
+	return selection;
 }

@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Assets/Loaders/CookedAssetAllocationBudget.h"
 
 #include "Assets/Payload/SceneAssetPayloadCameraLightAppender.h"
 
@@ -9,18 +10,31 @@
 
 namespace Assets
 {
-	void SceneAssetPayloadCameraLightAppender::Append(const LoadedSceneManifest& sceneManifest, SceneAssetPayload& sceneAssetPayload)
+	static void AppendCameras(const LoadedSceneManifest& manifest, SceneAssetPayload& payload, CookedAssetAllocationBudget& budget)
 	{
-		sceneAssetPayload.cameras.reserve(sceneAssetPayload.cameras.size() + sceneManifest.cameras.size());
-		for (std::size_t cameraIndex = 0; cameraIndex < sceneManifest.cameras.size(); ++cameraIndex)
+		budget.ReserveArray<SceneAssetPayload::Camera>(manifest.cameras.size());
+		budget.Reserve(manifest.cameras.size(), sizeof(CookedSceneCameraRecord));
+		payload.cameras.reserve(payload.cameras.size() + manifest.cameras.size());
+		for (const auto& camera : manifest.cameras)
 		{
-			sceneAssetPayload.cameras.push_back(BuildSceneAssetCamera(sceneManifest.cameras[cameraIndex]));
+			payload.cameras.push_back(BuildSceneAssetCamera(camera));
 		}
+	}
 
-		sceneAssetPayload.lights.reserve(sceneAssetPayload.lights.size() + sceneManifest.lights.size());
-		for (std::size_t lightIndex = 0; lightIndex < sceneManifest.lights.size(); ++lightIndex)
+	static void AppendLights(const LoadedSceneManifest& manifest, SceneAssetPayload& payload, CookedAssetAllocationBudget& budget)
+	{
+		budget.ReserveArray<SceneLightDesc>(manifest.lights.size());
+		budget.Reserve(manifest.lights.size(), sizeof(CookedSceneLightRecord));
+		payload.lights.reserve(payload.lights.size() + manifest.lights.size());
+		for (const auto& light : manifest.lights)
 		{
-			sceneAssetPayload.lights.push_back(BuildSceneAssetLight(sceneManifest.lights[lightIndex]));
+			payload.lights.push_back(BuildSceneAssetLight(light));
 		}
+	}
+
+	void SceneAssetPayloadCameraLightAppender::Append(const LoadedSceneManifest& manifest, SceneAssetPayload& payload, CookedAssetAllocationBudget& budget)
+	{
+		AppendCameras(manifest, payload, budget);
+		AppendLights(manifest, payload, budget);
 	}
 }

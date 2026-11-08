@@ -109,7 +109,11 @@ void UI::Implementation::BuildCenterWorkspace(bool bDisableInteraction, float ma
 	{
 		m_viewportToolbar->SetGeometry(outlinerWidth, mainMenuBarHeight, viewportWidth);
 		const LevelAsset* activeLevel = m_levelSession != nullptr ? m_levelSession->GetActiveLevel() : nullptr;
-		m_viewportToolbar->Draw(activeLevel != nullptr ? activeLevel->GetName() : "<None>", bDisableInteraction);
+		const auto selectedMode = m_viewportToolbar->Draw(activeLevel != nullptr ? activeLevel->GetName() : "<None>", GetViewportRenderRequest().ViewMode, bDisableInteraction);
+		if (selectedMode && m_viewportPanel)
+		{
+			m_viewportPanel->SetViewMode(*selectedMode);
+		}
 		viewportToolbarHeight = m_viewportToolbar->GetHeightPixels();
 	}
 

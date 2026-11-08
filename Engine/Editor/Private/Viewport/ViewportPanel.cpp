@@ -68,7 +68,7 @@ void ViewportPanel::SetRequestedExtent(RenderViewportExtent extent) noexcept
 
 void ViewportPanel::SetViewMode(RenderViewMode viewMode) noexcept
 {
-	if (m_renderRequest.ViewMode != viewMode)
+	if (viewMode < RenderViewMode::Count && m_renderRequest.ViewMode != viewMode)
 	{
 		m_renderRequest.ViewMode = viewMode;
 		++m_renderRequest.Generation;
@@ -142,7 +142,21 @@ void ViewportPanel::BuildProgressOverlay() noexcept
 
 	const ImVec2 viewportMin = ImGui::GetWindowPos();
 	ImGui::SetCursorScreenPos(ImVec2(viewportMin.x + 12.0f, viewportMin.y + 12.0f));
-	DrawReferencePathTracerOverlay(progress, m_renderRequest, m_outputAction);
+	const auto actions = DrawReferencePathTracerOverlay(progress);
+	if (actions.ViewMode)
+	{
+		SetViewMode(*actions.ViewMode);
+	}
+	if (actions.RenderAction != ViewportRenderAction::None)
+	{
+		m_renderRequest.RenderAction = actions.RenderAction;
+		++m_renderRequest.RenderActionSequence;
+		++m_renderRequest.Generation;
+	}
+	if (actions.OutputAction != ViewportOutputAction::None)
+	{
+		RequestOutputAction(actions.OutputAction);
+	}
 }
 
 void ViewportPanel::SetOverlay(std::unique_ptr<ViewportOverlay> overlay) noexcept

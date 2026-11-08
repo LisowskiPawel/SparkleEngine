@@ -67,6 +67,9 @@ struct CookedSceneBuild final
 	CookedSceneManifestBuildData manifest;
 	CookedSceneAssetOutputs outputs;
 
+	void ResetManifest();
+	void FinalizeManifestHeader() noexcept;
+
 	void ApplyMeshOutput(MeshCookOutput&& meshOutput);
 	void ApplyMaterialOutput(MaterialCookOutput&& materialOutput);
 };

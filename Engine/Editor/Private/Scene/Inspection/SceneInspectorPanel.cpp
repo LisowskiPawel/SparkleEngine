@@ -53,11 +53,6 @@ void SceneInspectorPanel::BuildDetailsToolbar() noexcept
 	ImGui::PopStyleVar(3);
 }
 
-void SceneInspectorPanel::SetWidth(float widthPixels) noexcept
-{
-	m_widthPixels = widthPixels;
-}
-
 void SceneInspectorPanel::SetTopInset(float topInsetPixels) noexcept
 {
 	m_topInsetPixels = topInsetPixels;

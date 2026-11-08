@@ -64,28 +64,28 @@ void FrameGraphTransientAllocator::ReleaseAllocations() noexcept
 
 	for (AllocationRecord& allocation : m_allocations)
 	{
-		if (allocation.renderTargetView)
+		if (allocation.Access.renderTargetView)
 		{
-			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.renderTargetView);
-			allocation.renderTargetView = {};
+			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.Access.renderTargetView);
+			allocation.Access.renderTargetView = {};
 		}
 
-		if (allocation.depthStencilView)
+		if (allocation.Access.depthStencilView)
 		{
-			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.depthStencilView);
-			allocation.depthStencilView = {};
+			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.Access.depthStencilView);
+			allocation.Access.depthStencilView = {};
 		}
 
-		if (allocation.shaderResourceView)
+		if (allocation.Access.shaderResourceView)
 		{
-			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.shaderResourceView);
-			allocation.shaderResourceView = {};
+			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.Access.shaderResourceView);
+			allocation.Access.shaderResourceView = {};
 		}
 
-		if (allocation.unorderedAccessView)
+		if (allocation.Access.unorderedAccessView)
 		{
-			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.unorderedAccessView);
-			allocation.unorderedAccessView = {};
+			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.Access.unorderedAccessView);
+			allocation.Access.unorderedAccessView = {};
 		}
 
 		if (allocation.ownedResource)
@@ -93,19 +93,19 @@ void FrameGraphTransientAllocator::ReleaseAllocations() noexcept
 			m_renderHardwareInterface->GetResourceService().ReleaseOwnedResource(allocation.ownedResource);
 			allocation.ownedResource = {};
 		}
-		allocation.resource = {};
+		allocation.Access.resource = {};
 	}
 }
 
-FrameGraphTransientAllocator::AllocationRecord& FrameGraphTransientAllocator::Materialize(const FrameGraphTransientResourcePlan& transientPlan)
+const FrameGraphResourceAccess& FrameGraphTransientAllocator::Materialize(const FrameGraphTransientResourcePlan& transientPlan)
 {
 	if (AllocationRecord* existingAllocation = const_cast<AllocationRecord*>(FindAllocation(transientPlan.handle)))
 	{
-		return *existingAllocation;
+		return existingAllocation->Access;
 	}
 
 	m_allocations.push_back(CreateAllocationRecord(transientPlan));
-	return m_allocations.back();
+	return m_allocations.back().Access;
 }
 
 const FrameGraphTransientAllocator::AllocationRecord* FrameGraphTransientAllocator::FindAllocation(FrameGraphResourceHandle handle) const noexcept
@@ -145,7 +145,6 @@ FrameGraphTransientAllocator::AllocationRecord FrameGraphTransientAllocator::Cre
 
 	AllocationRecord allocation;
 	allocation.handle = transientPlan.handle;
-	allocation.kind = transientPlan.kind;
 	const RhiOwnedMemoryBlockHandle memoryBlock = GetOrCreateMemoryBlock(transientPlan);
 
 	switch (transientPlan.kind)

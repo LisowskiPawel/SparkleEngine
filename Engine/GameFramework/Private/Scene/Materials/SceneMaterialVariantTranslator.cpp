@@ -2,7 +2,7 @@
 
 #include "Scene/Materials/SceneMaterialVariantTranslator.h"
 
-#include "World/GameWorldState.h"
+#include "Core/Public/Diagnostics/Error.h"
 
 #include <utility>
 
@@ -13,8 +13,7 @@ namespace SceneMaterialVariantTranslator
 	    const SceneAssetPayload& sceneAssetPayload,
 	    const SceneAssetPayload::MaterialVariantMapping& mapping,
 	    MaterialHandle materialBaseHandle,
-	    SceneMeshInstanceIndex sceneMeshBaseIndex,
-	    const ECS::GameWorldState& world,
+	    std::span<const EntityId> entities,
 	    std::vector<MaterialVariantBinding>& outBindings)
 	{
 		if (!mapping.material.IsValid() || !materialBaseHandle.IsValid())
@@ -30,8 +29,7 @@ namespace SceneMaterialVariantTranslator
 			{
 				if (meshInstance.meshAssetIndex == mapping.meshAssetIndex)
 				{
-					outBindings.push_back(
-					    MaterialVariantBinding{.Variant = mapping.variantIndex, .Entity = world.GetMeshEntity(sceneMeshBaseIndex + localMeshInstanceIndex), .Material = sceneMaterialHandle});
+					outBindings.push_back(MaterialVariantBinding{.Variant = mapping.variantIndex, .Entity = entities[localMeshInstanceIndex], .Material = sceneMaterialHandle});
 				}
 				++localMeshInstanceIndex;
 			}
@@ -43,8 +41,7 @@ namespace SceneMaterialVariantTranslator
 		{
 			if (meshInstance.meshAssetIndex == mapping.meshAssetIndex)
 			{
-				outBindings.push_back(
-				    MaterialVariantBinding{.Variant = mapping.variantIndex, .Entity = world.GetMeshEntity(sceneMeshBaseIndex + localMeshInstanceIndex), .Material = sceneMaterialHandle});
+				outBindings.push_back(MaterialVariantBinding{.Variant = mapping.variantIndex, .Entity = entities[localMeshInstanceIndex], .Material = sceneMaterialHandle});
 			}
 			++localMeshInstanceIndex;
 		}
@@ -64,17 +61,18 @@ namespace SceneMaterialVariantTranslator
 		return variants;
 	}
 
-	std::vector<MaterialVariantBinding> BuildBindings(
-	    const SceneAssetPayload& sceneAssetPayload,
-	    MaterialHandle materialBaseHandle,
-	    SceneMeshInstanceIndex sceneMeshBaseIndex,
-	    const ECS::GameWorldState& world)
+	std::vector<MaterialVariantBinding> BuildBindings(const SceneAssetPayload& sceneAssetPayload, MaterialHandle materialBaseHandle, std::span<const EntityId> entities)
 	{
+		const std::size_t expectedCount = sceneAssetPayload.staticMeshInstances.size() + sceneAssetPayload.skeletalMeshInstances.size();
+		if (entities.size() != expectedCount)
+		{
+			throw Diagnostics::Error("Material-variant bindings require the complete staged mesh entity range.");
+		}
 		std::vector<MaterialVariantBinding> bindings;
 		bindings.reserve(sceneAssetPayload.materialVariantMappings.size());
 		for (const SceneAssetPayload::MaterialVariantMapping& mapping : sceneAssetPayload.materialVariantMappings)
 		{
-			AppendBindingsForMeshAsset(sceneAssetPayload, mapping, materialBaseHandle, sceneMeshBaseIndex, world, bindings);
+			AppendBindingsForMeshAsset(sceneAssetPayload, mapping, materialBaseHandle, entities, bindings);
 		}
 		return bindings;
 	}

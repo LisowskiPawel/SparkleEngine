@@ -24,10 +24,9 @@ struct LinearRgbImage final
 	std::vector<float> Pixels;
 };
 
-class ImageEncoding final
+namespace ImageEncoding
 {
-public:
-	static bool DecodeLinearRgb(const ImageBufferView& source, LinearRgbImage& image, std::string& errorMessage);
-	static bool EncodeBmp(const ImageBufferView& image, std::vector<std::byte>& encodedBytes, std::string& errorMessage);
-	static bool EncodeExr(const LinearRgbImage& image, std::vector<std::byte>& encodedBytes, std::string& errorMessage);
-};
+	bool DecodeLinearRgb(const ImageBufferView& source, LinearRgbImage& image, std::string& errorMessage);
+	bool EncodeBmp(const ImageBufferView& image, std::vector<std::byte>& encodedBytes, std::string& errorMessage);
+	bool EncodeExr(const LinearRgbImage& image, std::vector<std::byte>& encodedBytes, std::string& errorMessage);
+}

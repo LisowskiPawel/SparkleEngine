@@ -3,11 +3,8 @@
 class Renderer;
 class UI;
 
-class EditorUiFrameRenderer final
+namespace EditorUiFrameRenderer
 {
-public:
-	static void Render(Renderer& renderer, UI& ui);
+	void Render(Renderer& renderer, UI& ui);
 
-private:
-	EditorUiFrameRenderer() = delete;
-};
+}

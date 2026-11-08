@@ -19,6 +19,9 @@ public:
 
 	Assets::CookedAssetId GetAssetId() const noexcept { return m_assetId; }
 
+	const MeshData& GetMeshData() const noexcept override { return m_meshData; }
+
 private:
+	MeshData m_meshData;
 	Assets::CookedAssetId m_assetId = Assets::InvalidCookedAssetId;
 };

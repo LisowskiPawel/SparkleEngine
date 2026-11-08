@@ -36,6 +36,7 @@ void EditorViewportOutputCoordinator::Update(UI& ui, Renderer& renderer)
 		ui.AppendConsoleOutput(std::move(*status), true);
 	}
 	m_state->ReferenceArtifacts.Update(renderer, renderer.GetViewportPresentation().Products);
+	ReportReferencePathTracerArtifactResult(ui, m_state->ReferenceArtifacts.TakeResult());
 }
 
 void EditorViewportOutputCoordinator::HandleAction(UI& ui, Renderer& renderer, std::uint64_t frameId)
@@ -50,4 +51,5 @@ void EditorViewportOutputCoordinator::HandleAction(UI& ui, Renderer& renderer, s
 		return;
 	}
 	ApplyReferencePathTracerArtifactAction(action, m_state->ReferenceArtifacts, renderer, renderer.GetViewportPresentation().Products);
+	ReportReferencePathTracerArtifactResult(ui, m_state->ReferenceArtifacts.TakeResult());
 }

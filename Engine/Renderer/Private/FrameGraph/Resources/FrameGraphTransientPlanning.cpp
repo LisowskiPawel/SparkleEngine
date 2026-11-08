@@ -170,52 +170,6 @@ void FrameGraph::EnsureTransientResourcesMaterialized(const FrameGraphPlan& plan
 
 	for (const FrameGraphTransientResourcePlan& transientPlan : plan.transients.resources)
 	{
-		const FrameGraphTransientAllocator::AllocationRecord& allocation = m_transientAllocator->Materialize(transientPlan);
-		FrameGraphResourceAccess access{};
-
-		switch (transientPlan.kind)
-		{
-			case FrameGraphResourceKind::DepthStencil:
-				access.resource = allocation.resource;
-
-				access.depthStencilView = allocation.depthStencilView;
-				if (allocation.shaderResourceView)
-				{
-					access.shaderResourceView = allocation.shaderResourceView;
-				}
-				break;
-
-			case FrameGraphResourceKind::ColorRenderTarget:
-				access.resource = allocation.resource;
-
-				access.renderTargetView = allocation.renderTargetView;
-				if (allocation.shaderResourceView)
-				{
-					access.shaderResourceView = allocation.shaderResourceView;
-				}
-				if (allocation.unorderedAccessView)
-				{
-					access.unorderedAccessView = allocation.unorderedAccessView;
-				}
-				break;
-
-			case FrameGraphResourceKind::Buffer:
-				access.resource = allocation.resource;
-
-				if (allocation.shaderResourceView)
-				{
-					access.shaderResourceView = allocation.shaderResourceView;
-				}
-				if (allocation.unorderedAccessView)
-				{
-					access.unorderedAccessView = allocation.unorderedAccessView;
-				}
-				break;
-			default:
-				assert(false);
-				break;
-		}
-
-		m_resourceResolver.SetResolvedAccess(transientPlan.handle, access);
+		m_resourceResolver.SetResolvedAccess(transientPlan.handle, m_transientAllocator->Materialize(transientPlan));
 	}
 }

@@ -25,6 +25,9 @@ public:
 	ShaderBytecode GetBytecode(const CookedShaderCodeRecord& record) const noexcept;
 
 private:
+	void ReadRecords(std::span<const std::uint8_t> fileBytes, const std::filesystem::path& path);
+	void ValidateCodeRecords() const;
+
 	CookedShaderLibraryHeader m_header = {};
 
 	std::vector<CookedShaderCodeRecord> m_records;
@@ -60,6 +63,10 @@ public:
 	std::span<const CookedShaderSpecializationConstantRecord> GetSpecializationConstants() const noexcept { return m_specializationConstants; }
 
 private:
+	void ReadRecords(std::span<const std::uint8_t> fileBytes, const std::filesystem::path& path, const CookedShaderLibrary& library);
+	void ValidateEntries(const CookedShaderLibrary& library) const;
+	void ValidateEntryMetadata(const GlobalShaderMapEntry& entry) const;
+
 	GlobalShaderMapHeader m_header = {};
 
 	std::vector<GlobalShaderMapEntry> m_entries;

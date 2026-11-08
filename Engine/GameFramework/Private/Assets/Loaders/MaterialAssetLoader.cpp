@@ -1,4 +1,4 @@
-﻿#include "PCH.h"
+#include "PCH.h"
 
 #include "Assets/Loaders/MaterialAssetLoader.h"
 
@@ -9,7 +9,7 @@
 
 namespace Assets
 {
-	LoadedMaterialAsset MaterialAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const
+	LoadedMaterialAsset MaterialAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget)
 	{
 		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedMaterialAsset");
 

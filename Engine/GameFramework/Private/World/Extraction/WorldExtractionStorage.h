@@ -3,7 +3,7 @@
 #include "GameFramework/Public/Rendering/RenderSceneDelta.h"
 #include "GameFramework/Public/World/EntityId.h"
 
-#include <cstdint>
+#include <cstddef>
 #include <DirectXMath.h>
 
 #include <span>
@@ -11,8 +11,6 @@
 
 namespace ECS
 {
-	class EntityRegistry;
-
 	class WorldExtractionStorage final
 	{
 	public:
@@ -31,7 +29,7 @@ namespace ECS
 			bool bIncluded = false;
 		};
 
-		bool Prepare(const EntityRegistry& registry);
+		void Prepare(std::size_t meshCount);
 
 		std::span<MeshSlot> GetMeshSlots() noexcept { return m_meshSlots; }
 
@@ -45,6 +43,5 @@ namespace ECS
 		std::vector<MeshSlot> m_meshSlots;
 		std::vector<MeshSlot> m_extractedMeshes;
 		std::vector<SceneMeshInstanceGroupData> m_meshGroups;
-		std::uint64_t m_structureVersion = 0;
 	};
 }

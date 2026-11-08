@@ -23,5 +23,6 @@ struct SPARKLE_RENDERER_API RendererExecutionConfig final
 
 	bool IsThreaded() const noexcept;
 	bool HasAssetTaskRuntime() const noexcept;
+	void Validate() const;
 	std::uint32_t GetFrameQueueCapacity() const noexcept;
 };

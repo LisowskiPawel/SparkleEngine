@@ -3,20 +3,24 @@
 
 #include <Windows.h>
 
-bool CaptureWin32ForegroundMouse()
+bool CaptureWin32Mouse(void* windowHandle)
 {
-	HWND hWnd = GetForegroundWindow();
-	if (hWnd)
+	HWND hWnd = static_cast<HWND>(windowHandle);
+	if (hWnd == nullptr || GetForegroundWindow() != hWnd)
 	{
-		SetCapture(hWnd);
-		return true;
+		return false;
 	}
-	return false;
+
+	SetCapture(hWnd);
+	return GetCapture() == hWnd;
 }
 
-void ReleaseWin32MouseCapture()
+void ReleaseWin32MouseCapture(void* windowHandle)
 {
-	ReleaseCapture();
+	if (windowHandle != nullptr && GetCapture() == static_cast<HWND>(windowHandle))
+	{
+		ReleaseCapture();
+	}
 }
 
 void HideWin32Cursor()

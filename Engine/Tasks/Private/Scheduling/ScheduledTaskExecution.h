@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graph/TaskGraphStorage.h"
-#include "TaskExecutorRuntime.h"
+#include "TaskExecutorImplementation.h"
 
 #include <cstdint>
 #include <atomic>
@@ -10,10 +10,10 @@
 #include <string>
 #include <vector>
 
-class TaskExecutor::Implementation::Runtime::ScheduledTaskExecution final : public std::enable_shared_from_this<ScheduledTaskExecution>
+class TaskExecutor::Implementation::ScheduledTaskExecution final : public std::enable_shared_from_this<ScheduledTaskExecution>
 {
 public:
-	ScheduledTaskExecution(Runtime& owner, std::shared_ptr<const TaskGraphStorage> graph, TaskExecutionContext context, std::shared_ptr<TaskExecution::State> execution);
+	ScheduledTaskExecution(Implementation& owner, std::shared_ptr<const TaskGraphStorage> graph, TaskExecutionContext context, std::shared_ptr<TaskExecution::State> execution);
 
 	void Start();
 	void Execute(std::uint32_t index, TaskWorker& worker);
@@ -32,15 +32,20 @@ private:
 	void InitializeTaskStates();
 	void RecordDependencies() const;
 	void ScheduleInitialTasks();
+	TaskResult ExecuteBody(std::uint32_t index, const TaskWorker& worker);
 	void RecordTaskResult(std::uint32_t index, const TaskGraphNode& node, const TaskResult& result);
 	void ReleaseNestedTasks(const TaskGraphNode& node, const TaskResult& result, TaskWorker& worker);
 	void TrySchedule(std::uint32_t index, TaskWorker* preferredWorker);
 	void ReleaseUnfinished(std::uint32_t index, TaskWorker* worker);
 	void SettleLogicalTask(std::uint32_t index, TaskWorker* worker);
+	TaskResult RecordLogicalCompletion(std::uint32_t index);
+	void ReleaseDependents(std::uint32_t index, const TaskResult& result, TaskWorker* worker);
+	void CompleteNestedParent(std::uint32_t index, const TaskResult& result, TaskWorker* worker);
+	void FinishIfAllTasksSettled();
 	TaskExecutionCompletion BuildCompletion();
 	void Finish();
 
-	Runtime& m_owner;
+	Implementation& m_owner;
 	std::shared_ptr<const TaskGraphStorage> m_graph;
 	TaskExecutionContext m_context;
 	std::shared_ptr<TaskExecution::State> m_execution;
@@ -51,6 +56,7 @@ private:
 	std::vector<bool> m_settled;
 	std::string m_firstFailureTaskName;
 	TaskResult m_firstFailure = TaskResult::Success();
+	// The last logical settler acquires prior settlements before moving results into terminal publication.
 	std::atomic_uint32_t m_settledTaskCount{0};
 	bool m_bCancellationObserved = false;
 };

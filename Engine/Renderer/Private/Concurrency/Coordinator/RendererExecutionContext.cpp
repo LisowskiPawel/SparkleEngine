@@ -70,7 +70,7 @@ void RendererExecutionContext::ExecuteControl(RendererExecutionControl control) 
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderSettingsChangedCommand>)
 		    {
-			    EngineRenderingSettingsControls::Apply(command.Settings);
+			    ApplyEngineRenderingSettings(command.Settings);
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderCVarCommand>)
 		    {
@@ -78,7 +78,7 @@ void RendererExecutionContext::ExecuteControl(RendererExecutionControl control) 
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderSettingsCaptureCommand>)
 		    {
-			    command.Completion->Complete(EngineRenderingSettingsControls::Capture());
+			    command.Completion->Complete(CaptureEngineRenderingSettings());
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderExternalCaptureCommand>)
 		    {

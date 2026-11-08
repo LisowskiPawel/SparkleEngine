@@ -97,6 +97,7 @@ A valid request selects one compiled backend, creates one device/adapter topolog
 - `RhiBackendSelection` owns parsing and availability; `RenderDeviceServices` owns the neutral service facade and active capability snapshot.
 - CMake owns whether D3D12 and Vulkan targets exist and which backend is the default. Runtime cannot activate a backend omitted from the build.
 - Private `VulkanDeviceExtensions` owns extension enumeration shared by device bootstrap and ray-tracing feature queries; neither caller keeps a second implementation.
+- Logical-device construction was reconciled on 2026-11-08: `VulkanDeviceBootstrap` selects and sequences device/queue creation; `VulkanDeviceCreation` owns native queue descriptions, extension selection and feature-chain assembly. Its immovable feature assembly and queue-priority vectors live through `vkCreateDevice`, including optional GPU-crash configuration. Supported/enabled feature facts remain in the existing `VulkanFeatureStatus`; no parallel capability snapshot is introduced. `VulkanDeviceExtensions::AppendIfAvailable` reuses the same enumeration authority as `IsAvailable`.
 - Device orchestration was reconciled on 2026-10-27 against the working tree based on `186f7a16`: `D3D12Rhi.cpp` retains device lifecycle and access, while `D3D12DeviceBootstrap.cpp`, `D3D12RhiQueues.cpp`, `D3D12RhiRayTracing.cpp`, `D3D12RhiInterop.cpp`, and `D3D12RhiDiagnostics.cpp` contain the corresponding native operations. Debug preparation precedes device creation; diagnostic binding follows it. Adapter eligibility is defined once for both enumeration routes, and queue composition invokes the focused interposer-queue operation. This source organization does not establish native device or capability acceptance.
 - D3D12 requests feature level 12_1; Vulkan selection requires Vulkan 1.3, scalar block layout and formatless storage-image reads/writes, then scores eligible physical devices. Scalar block layout is queried and enabled through Vulkan 1.2 features before services are published; supported/enabled facts appear in bootstrap diagnostics. This is the native legality requirement for the shared DirectX-layout shader buffer ABI, not Renderer lighting policy or a vendor exception. Missing support rejects the device rather than selecting a second record layout.
 
@@ -194,6 +195,8 @@ A complete neutral binding layout plus type-correct writes becomes backend descr
 | Retain descriptors by GPU completion | Prevents stale native references | Delayed work can retain heap/pool capacity and must remain bounded |
 
 Descriptor operation ownership was reconciled on 2026-10-25. Frame admission names descriptor allocation/table/view reclamation in the existing order. D3D12 view dispatch selects focused render-target, depth, texture SRV/UAV and buffer SRV/UAV writers; each owns its native descriptor fields and validation. Vulkan descriptor snapshots, table identity, pool capacity and retirement state remain under their existing owners.
+
+The second 2026-11-08 responsibility pass separates Vulkan registry lifetime from native descriptor writes. `VulkanDescriptorAllocator` resolves a retained recording view, validates table identity and supplies borrowed `VulkanDescriptorEntry` spans to `VulkanDescriptorWrites`. The writer owns semantic/cardinality checks, the existing 64-entry chunk bound, native extension payloads and synchronous updates. Recording views, copy-on-write arrays, generations, locks and retirement remain in the allocator; the writer retains no entry or owner state after the call.
 
 **Responsibility cleanup, 2026-11-05:** D3D12 sampler construction sequences table
 allocation, shared-sampler creation and readiness. Filtered slot selection uses
@@ -425,6 +428,8 @@ Synchronous-looking helper calls do not waive queue completion. Texture capture 
 | retirement | last queue consumer token | graph execution retirement token(s) | transfer completion plus result ownership |
 
 ### Capacity, Failure, And Non-Claims
+
+The second 2026-11-08 responsibility pass gives D3D12 the same accounting boundary: `D3D12MemoryUsage` owns native budget projection, allocation/heap aggregation and category output. `D3D12GpuMemoryAllocator` keeps its record registry, owner-thread checks and mutex; budget queries remain before the lock, live record spans are consumed under it, and category projection follows it. Allocation failure messages use Core's existing string conversion instead of an allocator-local conversion and temporary wide-string copy. Resource creation and retirement behavior are unchanged.
 
 **Memory responsibility cleanup, 2026-11-05:** `VulkanGpuMemoryAllocator` sequences
 native budget queries, locked live/pending accounting and category projection.

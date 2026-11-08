@@ -253,7 +253,7 @@ public:
 	void Reset() noexcept
 	{
 		m_value = {};
-		m_isBound = false;
+		m_bIsBound = false;
 	}
 
 private:

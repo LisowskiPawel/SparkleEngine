@@ -95,6 +95,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 		mapped.WorkspaceRoot = request.WorkspaceRoot;
 		mapped.ContentId = request.ContentId.toStdString();
 		mapped.RequestedLevelIds = SplitList(request.RequestedLevelIds);
+		mapped.bSelectAvailableLevels = request.bSelectAvailableLevels;
 		return mapped;
 	}
 
@@ -156,6 +157,7 @@ namespace SparkleLauncher::LauncherOperationRequestMapping
 			}
 		}
 		mapped.bDestructiveActionConfirmed = request.bConfirmClean;
+		mapped.bCleanLevelContent = request.bCleanLevelContent;
 		return mapped;
 	}
 }

@@ -92,7 +92,7 @@ private:
 		ResolvedTexturePath Source;
 		AssetGenerationHandle Generation;
 		TaskExecution Execution;
-		std::shared_ptr<CookedTextureLoadTask::Payload> Payload;
+		std::shared_ptr<CookedTextureLoadPayload> Payload;
 		std::optional<LoadedTextureData> Decoded;
 		std::optional<RendererTexture> Uploaded;
 		RhiResourceHandle UploadedResource;

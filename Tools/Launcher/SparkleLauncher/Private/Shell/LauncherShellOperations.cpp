@@ -295,7 +295,7 @@ namespace SparkleLauncher
 
 		if (FindMaintenanceOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunMaintenanceOperationPlan(PlanMaintenanceOperation(arguments.RunOperationId, BuildMaintenanceShellRequest(model, arguments)), processRunner);
+			const OperationRecord operation = RunMaintenanceOperationPlan(PlanMaintenanceOperation(arguments.RunOperationId, BuildMaintenanceShellRequest(model, arguments)));
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 

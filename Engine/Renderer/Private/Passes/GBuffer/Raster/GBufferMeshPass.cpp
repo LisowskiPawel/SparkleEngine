@@ -73,10 +73,10 @@ void GBufferMeshPass::BindMaterial(DrawParameterInstance& drawParameters, const 
 
 const GpuMesh* GBufferMeshPass::ResolveBatch(const RenderView& view, const MeshInstanceBatch& batch, const GpuMeshCache& meshes) noexcept
 {
-	const bool bInvalidMeshBatchPrimitiveIndices = batch.instanceCount == 0u || batch.firstInstance >= view.rasterPrimitiveIndices.size();
-	const bool bInvalidMeshBatch = bInvalidMeshBatchPrimitiveIndices || (batch.instanceCount > view.rasterPrimitiveIndices.size() - batch.firstInstance);
+	const bool bBatchStartInvalid = batch.instanceCount == 0u || batch.firstInstance >= view.rasterPrimitiveIndices.size();
+	const bool bBatchRangeInvalid = bBatchStartInvalid || (batch.instanceCount > view.rasterPrimitiveIndices.size() - batch.firstInstance);
 
-	if (bInvalidMeshBatch)
+	if (bBatchRangeInvalid)
 	{
 		return nullptr;
 	}
@@ -96,7 +96,10 @@ bool GBufferMeshPass::HasValidSkinning(const PreparedRenderScene& preparedScene,
 		}
 
 		const MeshDraw& draw = preparedScene.primitives[drawIndex].Draw;
-		if (draw.Geometry.MeshKind != RenderMeshKind::Skeletal || draw.Skinning.JointMatrixOffset == kInvalidMeshInstanceJointMatrixOffset)
+		const bool bSkeletal = draw.Geometry.MeshKind == RenderMeshKind::Skeletal;
+		const bool bJointOffsetValid = draw.Skinning.JointMatrixOffset != kInvalidMeshInstanceJointMatrixOffset;
+		const bool bSkinningReady = bSkeletal && bJointOffsetValid;
+		if (!bSkinningReady)
 		{
 			return false;
 		}
@@ -178,7 +181,10 @@ void GBufferMeshPass::MaterializePipelines(const RenderPassRuntimeCache& runtime
 
 	for (const MeshInstanceBatch& batch : view.meshInstanceBatches)
 	{
-		if (batch.materialClassification != RenderMaterialClassification::Opaque && batch.materialClassification != RenderMaterialClassification::AlphaTested)
+		const bool bOpaque = batch.materialClassification == RenderMaterialClassification::Opaque;
+		const bool bAlphaTested = batch.materialClassification == RenderMaterialClassification::AlphaTested;
+		const bool bRasterMaterial = bOpaque || bAlphaTested;
+		if (!bRasterMaterial)
 		{
 			continue;
 		}
@@ -188,19 +194,15 @@ void GBufferMeshPass::MaterializePipelines(const RenderPassRuntimeCache& runtime
 			continue;
 		}
 		const MaterialData& material = preparedScene.materials[batch.materialSlot];
-		const bool bMaterialGpuBindingsAvailable = material.gpuHandle && material.rasterTextureTable;
-		const bool bSkinningBuffersAvailableMeshKind = bMaterialGpuBindingsAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
-		const bool bBuffersAvailableGuardBuffers = bMaterialGpuBindingsAvailable && !bSkinningBuffersAvailableMeshKind;
-		const bool bBuffersAvailableSkinningBuffers = bBuffersAvailableGuardBuffers && (preparedScene.gpuBindings->Geometry.HasSkinningBuffers());
-		const bool bBuffersAccepted = bSkinningBuffersAvailableMeshKind || bBuffersAvailableSkinningBuffers;
-		const bool bSkinningBuffersAvailable = bMaterialGpuBindingsAvailable && bBuffersAccepted;
-		const bool bSkinningValidMeshKind = bSkinningBuffersAvailable && (batch.meshKind != RenderMeshKind::Skeletal);
-		const bool bSkinningValidGuardValidSkinning = bSkinningBuffersAvailable && !bSkinningValidMeshKind;
-		const bool bSkinningValidValidSkinning = bSkinningValidGuardValidSkinning && (HasValidSkinning(preparedScene, view, batch));
-		const bool bSkinningAccepted = bSkinningValidMeshKind || bSkinningValidValidSkinning;
-		const bool bSkinningValid = bSkinningBuffersAvailable && bSkinningAccepted;
+		const bool bMaterialReady = material.gpuHandle && material.rasterTextureTable;
+		const bool bSkeletal = batch.meshKind == RenderMeshKind::Skeletal;
+		const bool bCheckSkinning = bMaterialReady && bSkeletal;
+		const bool bSkinningBuffers = bCheckSkinning && preparedScene.gpuBindings->Geometry.HasSkinningBuffers();
+		const bool bSkinningReady = bSkinningBuffers && HasValidSkinning(preparedScene, view, batch);
+		const bool bRigidReady = bMaterialReady && !bSkeletal;
+		const bool bDrawReady = bRigidReady || bSkinningReady;
 
-		if (!bSkinningValid)
+		if (!bDrawReady)
 		{
 			continue;
 		}

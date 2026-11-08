@@ -1,6 +1,6 @@
 #include "/Engine/Resources/ViewTemporalUniformData.hlsli"
 
-#include "/Engine/Lighting/DirectLightReservoirReuse.hlsli"
+#include "/Engine/Passes/Lighting/Direct/DirectLightReservoirReuse.hlsli"
 
 RWTexture2D<float4> TemporalReservoirSample;
 RWTexture2D<float4> TemporalReservoirWeight;

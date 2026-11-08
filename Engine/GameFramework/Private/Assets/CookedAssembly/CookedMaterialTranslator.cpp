@@ -1,4 +1,4 @@
-﻿#include "PCH.h"
+#include "PCH.h"
 
 #include "Assets/CookedAssembly/CookedMaterialTranslator.h"
 
@@ -8,7 +8,22 @@
 
 namespace Assets
 {
-	MaterialDesc CookedMaterialTranslator::Translate(const LoadedMaterialAsset& materialAsset) const
+	static AlphaMode TranslateCookedAlphaMode(CookedAlphaMode alphaMode)
+	{
+		switch (alphaMode)
+		{
+			case CookedAlphaMode::Opaque:
+				return AlphaMode::Opaque;
+			case CookedAlphaMode::Mask:
+				return AlphaMode::Mask;
+			case CookedAlphaMode::Blend:
+				return AlphaMode::Blend;
+		}
+
+		throw Diagnostics::Error(std::format("Cooked material contains unknown alpha mode {}", static_cast<std::uint32_t>(alphaMode)));
+	}
+
+	MaterialDesc CookedMaterialTranslator::Translate(const LoadedMaterialAsset& materialAsset)
 	{
 		MaterialDesc materialDesc;
 		materialDesc.name = materialAsset.name;
@@ -19,7 +34,7 @@ namespace Assets
 		materialDesc.subsurfaceColor = materialAsset.header.subsurfaceColor;
 		materialDesc.subsurfaceStrength = materialAsset.header.subsurfaceStrength;
 		materialDesc.emissiveColor = materialAsset.header.emissiveColor;
-		materialDesc.alphaMode = TranslateAlphaMode(materialAsset.header.alphaMode);
+		materialDesc.alphaMode = TranslateCookedAlphaMode(materialAsset.header.alphaMode);
 		materialDesc.alphaCutoff = materialAsset.header.alphaCutoff;
 		materialDesc.bDoubleSided = materialAsset.header.doubleSided != 0;
 		materialDesc.textureReferences.reserve(materialAsset.textureReferences.size());
@@ -36,21 +51,6 @@ namespace Assets
 		}
 
 		return materialDesc;
-	}
-
-	AlphaMode CookedMaterialTranslator::TranslateAlphaMode(CookedAlphaMode alphaMode)
-	{
-		switch (alphaMode)
-		{
-			case CookedAlphaMode::Opaque:
-				return AlphaMode::Opaque;
-			case CookedAlphaMode::Mask:
-				return AlphaMode::Mask;
-			case CookedAlphaMode::Blend:
-				return AlphaMode::Blend;
-		}
-
-		throw Diagnostics::Error(std::format("Cooked material contains unknown alpha mode {}", static_cast<std::uint32_t>(alphaMode)));
 	}
 
 }

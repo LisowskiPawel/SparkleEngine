@@ -8,8 +8,7 @@
 
 class EditorTransactionHistory;
 
-class SceneSkyInspector final
+namespace SceneSkyInspector
 {
-public:
-	static void Build(const std::optional<SkyEnvironment>&, EditorTransactionHistory&, std::uint64_t, const std::string&) noexcept;
-};
+	void Build(const std::optional<SkyEnvironment>&, EditorTransactionHistory&, std::uint64_t, const std::string&) noexcept;
+}

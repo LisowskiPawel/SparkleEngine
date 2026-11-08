@@ -196,21 +196,6 @@ bool RenderPassRuntimeCache::IsComplete(const RhiSubmissionState& state) const n
 	return true;
 }
 
-std::unique_ptr<RayTracingShaderTable> RenderPassRuntimeCache::CreateRayTracingShaderTable(
-    const RayTracingPipelineRuntime& runtime,
-    const RayTracingPipelineComposition& composition,
-    const RayTracingShaderTablePlan* plan) const noexcept
-{
-	try
-	{
-		return plan != nullptr ? runtime.CreateShaderTable(*m_renderHardwareInterface, composition, *plan) : runtime.CreateShaderTable(*m_renderHardwareInterface, composition);
-	}
-	catch (const Diagnostics::Error& error)
-	{
-		HandleRuntimeCreationFailure(error.what());
-	}
-}
-
 [[noreturn]] void RenderPassRuntimeCache::HandleRuntimeCreationFailure(std::string_view errorMessage) const
 {
 	SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogRenderer, "Renderer");

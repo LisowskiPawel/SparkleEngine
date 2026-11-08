@@ -7,148 +7,98 @@
 #include <stdexcept>
 #include <utility>
 
-std::shared_ptr<TaskDispatch::State> TaskExecutor::Implementation::Runtime::PrepareDispatch(
-    const std::shared_ptr<TaskScope::State>& scope,
-    TaskDesc desc,
-    TaskFunction function,
-    TaskExecutionContext context)
+std::shared_ptr<TaskDispatch::State> TaskExecutor::Implementation::PrepareDispatch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)
 {
-	const bool bCallerIsHost = !TaskWorkerContext::IsWorker();
-	const bool bOwnerThreadMatches = bCallerIsHost && std::this_thread::get_id() == scope->OwnerThread;
-	const bool bTaskDescriptionValidName = bOwnerThreadMatches && desc.Name.IsValid();
-	const bool bTaskDescriptionValidFunction = bTaskDescriptionValidName && (function);
-	const bool bTaskDescriptionValid = bTaskDescriptionValidFunction && (desc.CompletionPolicy == TaskCompletionPolicy::Normal);
-	const bool bLaneAvailable = bTaskDescriptionValid && GetWorkerCount(desc.Lane) != 0;
-	const bool bUserDataOwnedUserData = bLaneAvailable && (!context.HasUserData());
-	const bool bUserDataOwnedGuardUserData = bLaneAvailable && !bUserDataOwnedUserData;
-	const bool bOwnedDataPresent = bUserDataOwnedGuardUserData && (context.HasOwnedUserData());
-	const bool bUserDataAccepted = bUserDataOwnedUserData || bOwnedDataPresent;
-	const bool bUserDataOwned = bLaneAvailable && bUserDataAccepted;
+	ValidateDispatchRequest(*scope.m_state, desc, function, context);
+	auto dispatch = CreateDispatch(scope.m_state, std::move(desc), std::move(function), std::move(context));
+	AdmitDispatch(scope.m_state, dispatch);
+	return dispatch;
+}
 
-	if (!bUserDataOwned)
+void TaskExecutor::Implementation::ValidateDispatchRequest(const TaskScope::State& scope, const TaskDesc& desc, const TaskFunction& function, const TaskExecutionContext& context) const
+{
+	const bool bCallerIsWorker = TaskWorkerContext::IsWorker();
+	const bool bOwnerThreadMatches = std::this_thread::get_id() == scope.OwnerThread;
+	if (bCallerIsWorker || !bOwnerThreadMatches)
 	{
-		throw std::invalid_argument("Prepared dispatch requires its scope owner, a callable, owned context and an asynchronous Normal lane.");
+		throw std::invalid_argument("Prepared dispatch requires its scope owner outside executor workers.");
 	}
 
+	const bool bDescriptionValid = desc.Name.IsValid() && function;
+	const bool bNormalCompletion = desc.CompletionPolicy == TaskCompletionPolicy::Normal;
+	if (!bDescriptionValid || !bNormalCompletion)
+	{
+		throw std::invalid_argument("Prepared dispatch requires a named callable with Normal completion policy.");
+	}
+
+	const bool bLaneAvailable = GetWorkerCount(desc.Lane) != 0;
+	const bool bBorrowedUserData = context.HasUserData() && !context.HasOwnedUserData();
+	if (!bLaneAvailable || bBorrowedUserData)
+	{
+		throw std::invalid_argument("Prepared dispatch requires owned context and a configured asynchronous lane.");
+	}
+}
+
+std::shared_ptr<TaskDispatch::State> TaskExecutor::Implementation::CreateDispatch(const std::shared_ptr<TaskScope::State>& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)
+{
 	const std::uint64_t generation = m_nextExecutionGeneration.fetch_add(1, std::memory_order_relaxed);
 	auto execution = CreateExecution(generation, scope);
-	auto dispatch = std::make_shared<TaskDispatch::State>(execution, std::move(desc), std::move(function), std::move(context));
-	dispatch->Cancellation.emplace(execution->Cancellation.get_token(), TaskDispatch::State::CancellationHook{dispatch});
+	auto dispatch = std::make_shared<TaskDispatch::State>(std::move(execution), std::move(desc), std::move(function), std::move(context));
+	dispatch->Cancellation.emplace(dispatch->Execution->Cancellation.get_token(), TaskDispatch::State::CancellationHook{dispatch});
+	return dispatch;
+}
+
+void TaskExecutor::Implementation::AdmitDispatch(const std::shared_ptr<TaskScope::State>& scope, const std::shared_ptr<TaskDispatch::State>& dispatch)
+{
 	std::lock_guard gate(dispatch->Gate);
 	std::lock_guard lifecycle(m_stateMutex);
-	if (m_lifecycle != LifecycleState::Accepting || m_activeExecutions >= m_config.MaximumActiveExecutions)
-	{
-		throw std::runtime_error("Task executor cannot admit a prepared dispatch.");
-	}
-	if (m_dispatches.empty())
-	{
-		m_dispatches.resize(m_config.MaximumActiveExecutions);
-	}
-	const auto available = std::ranges::find(m_dispatches, nullptr);
-	assert(available != m_dispatches.end());
+	const std::size_t slot = ReserveDispatchSlot();
 
-	std::erase_if(
-	    m_executions,
-	    [](const auto& item)
-	    {
-		    const auto state = item.lock();
-		    if (!state)
-		    {
-			    return true;
-		    }
-		    std::lock_guard lock(state->Mutex);
-		    return state->bSettled;
-	    });
-
-	// Reserve before scope admission. Nothing after RegisterExecution can allocate.
-	m_executions.reserve(m_executions.size() + 1);
-	if (!scope->RegisterExecution(execution))
+	// Scope registration is the ownership commit. Every later operation is non-allocating.
+	const bool bScopeRegistered = scope->RegisterExecution(dispatch->Execution);
+	if (!bScopeRegistered)
 	{
 		throw std::runtime_error("Prepared dispatch scope is closed or settled.");
 	}
 
+	CommitDispatchAdmission(dispatch, slot);
+}
+
+std::size_t TaskExecutor::Implementation::ReserveDispatchSlot()
+{
+	if (m_lifecycle != LifecycleState::Accepting || m_activeExecutions >= m_config.MaximumActiveExecutions)
+	{
+		throw std::runtime_error("Task executor cannot admit a prepared dispatch.");
+	}
+
+	if (m_dispatches.empty())
+	{
+		m_dispatches.resize(m_config.MaximumActiveExecutions);
+	}
+
+	const auto available = std::ranges::find(m_dispatches, nullptr);
+	assert(available != m_dispatches.end());
+	ReserveExecutionStorage();
+	return static_cast<std::size_t>(available - m_dispatches.begin());
+}
+
+void TaskExecutor::Implementation::CommitDispatchAdmission(const std::shared_ptr<TaskDispatch::State>& dispatch, std::size_t slot) noexcept
+{
+	const auto& execution = dispatch->Execution;
 	dispatch->ScopeSettled = std::move(execution->OnSettled);
 	execution->OnSettled = std::move(dispatch->PreparedSettlement);
-	dispatch->Slot = static_cast<std::size_t>(available - m_dispatches.begin());
-	*available = dispatch;
+	dispatch->Slot = slot;
+	m_dispatches[slot] = dispatch;
 	m_executions.emplace_back(execution);
 	++m_activeExecutions;
 	dispatch->Owner = this;
-	return dispatch;
 }
 
-std::shared_ptr<TaskDispatch::State> TaskExecutor::Implementation::PrepareDispatch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)
-{
-	return m_runtime->PrepareDispatch(scope.m_state, std::move(desc), std::move(function), std::move(context));
-}
-
-void TaskExecutor::Implementation::Runtime::EnqueueDispatch(TaskDispatch::State& dispatch) noexcept
-{
-	TaskLaneState& lane = m_lanes[LaneIndex(dispatch.Desc.Lane)];
-	{
-		std::lock_guard lock(lane.InjectionMutex);
-		dispatch.ReadyNext = nullptr;
-		if (lane.DispatchTail != nullptr)
-		{
-			lane.DispatchTail->ReadyNext = &dispatch;
-		}
-		else
-		{
-			lane.DispatchHead = &dispatch;
-		}
-		lane.DispatchTail = &dispatch;
-	}
-	{
-		std::lock_guard lock(lane.WakeMutex);
-		++lane.WakeEpoch;
-	}
-	lane.WakeCondition.notify_one();
-}
-
-bool TaskExecutor::Implementation::Runtime::TryPopDispatch(TaskLane laneType, ReadyTask& task)
-{
-	TaskLaneState& lane = m_lanes[LaneIndex(laneType)];
-	std::lock_guard lock(lane.InjectionMutex);
-	auto* dispatch = lane.DispatchHead;
-	if (dispatch == nullptr)
-	{
-		return false;
-	}
-	lane.DispatchHead = dispatch->ReadyNext;
-	if (lane.DispatchHead == nullptr)
-	{
-		lane.DispatchTail = nullptr;
-	}
-	dispatch->ReadyNext = nullptr;
-	task.Dispatch = dispatch->shared_from_this();
-	return true;
-}
-
-void TaskExecutor::Implementation::Runtime::ReleaseDispatch(TaskDispatch::State& dispatch) noexcept
+void TaskExecutor::Implementation::ReleaseDispatch(TaskDispatch::State& dispatch) noexcept
 {
 	std::lock_guard lock(m_stateMutex);
 	m_dispatches[dispatch.Slot].reset();
 	assert(m_activeExecutions != 0);
 	--m_activeExecutions;
 	m_stateCondition.notify_all();
-}
-
-void TaskExecutor::Implementation::Runtime::CloseDispatches() noexcept
-{
-	for (std::size_t index = 0;; ++index)
-	{
-		std::shared_ptr<TaskDispatch::State> dispatch;
-		{
-			std::lock_guard lock(m_stateMutex);
-			if (index >= m_dispatches.size())
-			{
-				return;
-			}
-			dispatch = m_dispatches[index];
-		}
-		if (dispatch)
-		{
-			dispatch->Close();
-		}
-	}
 }

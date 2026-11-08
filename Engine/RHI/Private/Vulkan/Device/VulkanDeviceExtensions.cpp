@@ -29,4 +29,18 @@ namespace VulkanDeviceExtensions
 		    extensions.end(),
 		    [extensionName](const VkExtensionProperties& extension) noexcept { return std::string_view(extension.extensionName) == extensionName; });
 	}
+
+	bool AppendIfAvailable(VkPhysicalDevice device, std::vector<const char*>& extensions, const char* extensionName) noexcept
+	{
+		const bool bAlreadyEnabled = extensionName == nullptr
+		    || std::any_of(extensions.begin(), extensions.end(), [extensionName](const char* enabled) noexcept { return std::string_view(enabled) == extensionName; });
+
+		if (bAlreadyEnabled || !IsAvailable(device, extensionName))
+		{
+			return false;
+		}
+		extensions.push_back(extensionName);
+		return true;
+	}
+
 }

@@ -89,17 +89,13 @@ namespace SparkleLauncher
 
 	void ProportionalCardFrame::keyPressEvent(QKeyEvent* event)
 	{
-		const bool bActivationKeyPressedEvent = m_activationButton != nullptr && event != nullptr;
-		const bool bActivationKeyPressedKey = bActivationKeyPressedEvent && (event->key() == Qt::Key_Return);
-		const bool bActivationKeyPressedGuardkey = bActivationKeyPressedEvent && !bActivationKeyPressedKey;
-		const bool bEnterPressed = bActivationKeyPressedGuardkey && (event->key() == Qt::Key_Enter);
-		const bool bReturnOrEnter = bActivationKeyPressedKey || bEnterPressed;
-		const bool bCheckSpace = bActivationKeyPressedEvent && !bReturnOrEnter;
-		const bool bSpacePressed = bCheckSpace && (event->key() == Qt::Key_Space);
-		const bool bActivationPressed = bReturnOrEnter || bSpacePressed;
-		const bool bActivationKeyPressed = bActivationKeyPressedEvent && bActivationPressed;
+		const bool bCanActivate = m_activationButton != nullptr && event != nullptr;
+		const int key = bCanActivate ? event->key() : Qt::Key_unknown;
+		const bool bConfirmKey = key == Qt::Key_Return || key == Qt::Key_Enter;
+		const bool bActivationKey = bConfirmKey || key == Qt::Key_Space;
+		const bool bActivate = bCanActivate && bActivationKey;
 
-		if (bActivationKeyPressed)
+		if (bActivate)
 		{
 			m_activationButton->click();
 			event->accept();

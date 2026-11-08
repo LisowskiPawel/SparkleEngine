@@ -22,8 +22,10 @@ public:
 	void BeginFrame(bool bInteractionDisabled, bool bTextInputActive);
 	void RegisterTargetRegion(float left, float top, float right, float bottom, InputLayer targetLayer);
 
-	InputLayer ResolveTargetLayer(const InputBackendResult& result, InputLayer fallbackLayer) noexcept;
+	InputLayer ResolveTargetLayer(const InputBackendResult& result) const noexcept;
 	InputLayer GetActiveTargetLayer() const noexcept;
+	void SetActiveTargetLayer(InputLayer layer) noexcept;
+	void ResetFocus() noexcept;
 
 private:
 	struct TargetRegion final
@@ -42,7 +44,7 @@ private:
 	InputLayer ResolveMouseMoveTarget(MousePosition position) const noexcept;
 
 	std::vector<TargetRegion> m_targetRegions;
-	InputLayer m_activeTargetLayer = InputLayer::UI;
+	InputLayer m_activeTargetLayer = InputLayer::Gameplay;
 	bool m_bHasRoutingFrame = false;
 	bool m_bInteractionDisabled = false;
 	bool m_bTextInputActive = false;

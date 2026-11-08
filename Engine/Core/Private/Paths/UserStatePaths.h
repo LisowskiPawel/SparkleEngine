@@ -2,7 +2,7 @@
 
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 
-namespace Filesystem::Private
+namespace Filesystem
 {
 	ProductUserStatePaths ResolveCurrentProductUserStatePaths();
 	std::filesystem::path ResolveSparkleUserStateRoot();

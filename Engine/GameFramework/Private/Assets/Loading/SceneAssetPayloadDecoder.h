@@ -7,9 +7,8 @@ namespace Assets
 	struct LoadedSceneManifest;
 	class CookedAssetFileSet;
 
-	class SceneAssetPayloadDecoder final
+	namespace SceneAssetPayloadDecoder
 	{
-	public:
-		static SceneAssetPayload Decode(const LoadedSceneManifest& manifest, CookedAssetFileSet& files);
-	};
+		SceneAssetPayload Decode(const LoadedSceneManifest& manifest, CookedAssetFileSet& files);
+	}
 }

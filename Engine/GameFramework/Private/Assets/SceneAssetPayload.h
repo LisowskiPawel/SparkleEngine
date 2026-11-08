@@ -29,8 +29,6 @@ struct SceneAssetPayload final
 	{
 		std::string name;
 		CameraDesc desc;
-
-		bool IsPerspective() const noexcept { return desc.projectionKind == CameraProjectionKind::Perspective; }
 	};
 
 	std::vector<StaticMeshAsset> staticMeshAssets;

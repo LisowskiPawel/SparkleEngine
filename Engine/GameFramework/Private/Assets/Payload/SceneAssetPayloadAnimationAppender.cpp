@@ -16,13 +16,13 @@ namespace Assets
 {
 	void SceneAssetPayloadAnimationAppender::AppendAnimations(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload)
 	{
-		AnimationAssetLoader animationAssetLoader;
+		files.GetAllocationBudget().ReserveArray<AnimationClipResource>(sceneManifest.animationReferences.size());
 		sceneAssetPayload.animations.reserve(sceneAssetPayload.animations.size() + sceneManifest.animationReferences.size());
 
 		for (const CookedAnimationReference& animationRef : sceneManifest.animationReferences)
 		{
 			const std::filesystem::path animationAssetPath = Paths::CookedAnimationAsset(animationRef.animationAssetId);
-			const LoadedAnimationAsset animationAsset = animationAssetLoader.Decode(animationAssetPath, files.Get(animationAssetPath), files.GetAllocationBudget());
+			const LoadedAnimationAsset animationAsset = AnimationAssetLoader::Decode(animationAssetPath, files.Get(animationAssetPath), files.GetAllocationBudget());
 			files.GetAllocationBudget().ReserveArray<AnimationChannel>(animationAsset.channels.size());
 			files.GetAllocationBudget().ReserveArray<AnimationKeyframe>(animationAsset.keyframes.size());
 			files.GetAllocationBudget().Reserve(sizeof(animationAsset.header.name));

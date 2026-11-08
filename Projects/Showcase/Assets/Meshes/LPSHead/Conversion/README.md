@@ -2,12 +2,12 @@
 
 The source is the `lpshead.zip` package from [Morgan McGuire's Computer Graphics Archive](https://casual-effects.com/g3d/data10/index.html). The Infinite Realities 3D head scan by Lee Perry-Smith is licensed under CC BY 3.0; the archive conversion was prepared by Morgan McGuire and Guedis Cardenas. The publisher archive remains immutable and external under `Publisher/`.
 
-`ConvertLPSHead.py` converts only `head.OBJ` geometry to one atomically published, tracked GLB 2.0 artifact. It validates the pinned source inventory, resolves OBJ indices, preserves position/UV seams deterministically, rejects zero-area faces, triangulates the remaining polygons in authored order, flips the OBJ V texture coordinate for glTF, generates area-weighted smooth normals, and maps the single `defaultMat` material to a dielectric metallic-roughness baseline. The GLB references the publisher's `Publisher/lambertian.jpg`. The source bump maps are retained in the external pack but are intentionally not treated as tangent-space normal maps.
+[The LPS Head command](../../../../AssetConversion/ConvertLPSHead.py) converts only `head.OBJ` geometry to one atomically published, tracked GLB 2.0 artifact. It validates the pinned source inventory, resolves OBJ indices, preserves position/UV seams deterministically, rejects zero-area faces, triangulates the remaining polygons in authored order, flips the OBJ V texture coordinate for glTF, generates area-weighted smooth normals, and maps the single `defaultMat` material to a dielectric metallic-roughness baseline. The GLB references the publisher's `Publisher/lambertian.jpg`. The source bump maps are retained in the external pack but are intentionally not treated as tangent-space normal maps. The [Showcase ownership map](../../../../../../Docs/Architecture/Modules/Projects/Showcase/ShowcaseCapabilities.md#project-composition-and-asset-preparation) identifies the command, OBJ, glTF and publication owners.
 
 Run from the repository root after syncing the LPS Head pack:
 
 ```powershell
-python Projects/Showcase/Assets/Meshes/LPSHead/Conversion/ConvertLPSHead.py
+python -m Projects.Showcase.AssetConversion.ConvertLPSHead
 ```
 
 Expected conversion inventory:

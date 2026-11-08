@@ -1,3 +1,5 @@
+#include "/Engine/RayTracing/RayTracingSceneTraceInline.hlsli"
+
 Texture2D<float4> TemporalReservoirSampleTexture;
 Texture2D<float4> TemporalReservoirWeightTexture;
 RWTexture2D<float4> CurrentReservoirSampleTexture;
@@ -6,7 +8,13 @@ RWTexture2D<float4> CurrentReservoirSurfaceTexture;
 Texture2D SkyTexture;
 SamplerState SamplerLinearNoMipWrapClampClamp;
 
-#include "/Engine/Lighting/RestirIndirectReservoirReuse.hlsli"
+#include "/Engine/Resources/FrameUniformData.hlsli"
+#include "/Engine/Passes/Lighting/Restir/Indirect/GBufferPathSurface.hlsli"
+#include "/Engine/Resources/MeshInstanceShaderData.hlsli"
+
+RaytracingAccelerationStructure SceneTlas;
+
+#include "/Engine/Passes/Lighting/Restir/Indirect/RestirIndirectReservoirReuse.hlsli"
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID)
@@ -26,7 +34,8 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 
 	if (surface.bValid && RestirIndirectSpatialReuse != 0u)
 	{
-		IndirectReservoir::ReuseSpatial(pixelCoord,
+		IndirectReservoir::ReuseSpatial(SceneTlas,
+		                                pixelCoord,
 		                                uint2(width, height),
 		                                surface,
 		                                TemporalReservoirSampleTexture,

@@ -18,7 +18,7 @@ namespace Files
 		{
 			static_assert(std::is_trivially_copyable_v<T>, "BinaryBufferWriter requires trivially-copyable values");
 			const auto* begin = reinterpret_cast<const std::uint8_t*>(&value);
-			m_bytes.insert(m_bytes.end(), begin, begin + sizeof(T));
+			WriteBytes({begin, sizeof(T)});
 		}
 
 		template <typename T> void WriteArray(std::span<const T> values)
@@ -30,7 +30,7 @@ namespace Files
 			}
 
 			const auto* begin = reinterpret_cast<const std::uint8_t*>(values.data());
-			m_bytes.insert(m_bytes.end(), begin, begin + sizeof(T) * values.size());
+			WriteBytes({begin, sizeof(T) * values.size()});
 		}
 
 		void WriteBytes(std::span<const std::uint8_t> values);

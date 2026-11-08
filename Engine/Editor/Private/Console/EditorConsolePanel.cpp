@@ -14,7 +14,7 @@
 #include <optional>
 
 EditorConsolePanel::EditorConsolePanel(ConsoleSession& session) noexcept :
-    m_session(&session)
+    m_session(session)
 {
 }
 
@@ -26,12 +26,7 @@ void EditorConsolePanel::RequestFocus() noexcept
 
 void EditorConsolePanel::Clear() noexcept
 {
-	if (m_session != nullptr)
-	{
-		m_session->ClearOutput();
-		m_seenConsoleOutputCount = 0;
-	}
-	m_bScrollToBottom = true;
+	m_session.ClearOutput();
 }
 
 void EditorConsolePanel::BuildContent(bool bDisableInteraction)
@@ -83,19 +78,14 @@ void EditorConsolePanel::ReplaceInputText(ImGuiInputTextCallbackData& data, cons
 
 int EditorConsolePanel::HandleHistoryCallback(ImGuiInputTextCallbackData& data)
 {
-	if (m_session == nullptr)
-	{
-		return 0;
-	}
-
 	std::optional<std::string> replacement;
 	if (data.EventKey == ImGuiKey_UpArrow)
 	{
-		replacement = m_session->NavigateHistoryPrevious(std::string_view(data.Buf, static_cast<std::size_t>(data.BufTextLen)));
+		replacement = m_session.NavigateHistoryPrevious(std::string_view(data.Buf, static_cast<std::size_t>(data.BufTextLen)));
 	}
 	else if (data.EventKey == ImGuiKey_DownArrow)
 	{
-		replacement = m_session->NavigateHistoryNext();
+		replacement = m_session.NavigateHistoryNext();
 	}
 
 	if (replacement)
@@ -107,13 +97,8 @@ int EditorConsolePanel::HandleHistoryCallback(ImGuiInputTextCallbackData& data)
 
 int EditorConsolePanel::HandleCompletionCallback(ImGuiInputTextCallbackData& data)
 {
-	if (m_session == nullptr)
-	{
-		return 0;
-	}
-
 	const std::string input(data.Buf, static_cast<std::size_t>(data.BufTextLen));
-	const std::vector<std::string> completions = m_session->CompleteLine(input);
+	const std::vector<std::string> completions = m_session.CompleteLine(input);
 	if (completions.empty())
 	{
 		return 0;
@@ -121,8 +106,7 @@ int EditorConsolePanel::HandleCompletionCallback(ImGuiInputTextCallbackData& dat
 
 	if (completions.size() > 1)
 	{
-		m_session->AddOutput(ConsoleCommandSeverity::Info, BuildCompletionList(completions));
-		m_bScrollToBottom = true;
+		m_session.AddOutput(ConsoleCommandSeverity::Info, BuildCompletionList(completions));
 		return 0;
 	}
 
@@ -138,16 +122,9 @@ int EditorConsolePanel::HandleCompletionCallback(ImGuiInputTextCallbackData& dat
 
 void EditorConsolePanel::SubmitInput()
 {
-	if (m_session == nullptr)
-	{
-		return;
-	}
-
 	const std::string_view input(m_inputBuffer.data());
-	m_session->SubmitLine(input);
+	m_session.SubmitLine(input);
 	m_inputBuffer[0] = '\0';
-	m_seenConsoleOutputCount = m_session->GetOutputRecords().size();
-	m_bScrollToBottom = true;
 	m_bFocusInput = true;
 }
 
@@ -165,10 +142,9 @@ void EditorConsolePanel::DrawToolbar(bool bDisableInteraction)
 
 		ImGui::TableSetColumnIndex(0);
 		const std::string helpLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Help, "Help");
-		if (ImGui::Button(helpLabel.c_str(), ImVec2(-1.0f, 0.0f)) && m_session != nullptr)
+		if (ImGui::Button(helpLabel.c_str(), ImVec2(-1.0f, 0.0f)))
 		{
-			m_session->SubmitLine("Help");
-			m_bScrollToBottom = true;
+			m_session.SubmitLine("Help");
 		}
 
 		ImGui::TableSetColumnIndex(1);
@@ -191,7 +167,7 @@ void EditorConsolePanel::DrawToolbar(bool bDisableInteraction)
 		ImGui::InputTextWithHint("##EditorConsoleFilter", "Filter output", m_filterBuffer.data(), m_filterBuffer.size());
 
 		ImGui::TableSetColumnIndex(4);
-		const std::size_t consoleRecordCount = m_session != nullptr ? m_session->GetOutputRecords().size() : 0;
+		const std::size_t consoleRecordCount = m_session.GetOutputRecords().size();
 		ImGui::TextDisabled("%zu records", consoleRecordCount);
 		ImGui::EndTable();
 	}
@@ -200,12 +176,6 @@ void EditorConsolePanel::DrawToolbar(bool bDisableInteraction)
 
 void EditorConsolePanel::DrawScrollback()
 {
-	if (m_session != nullptr && m_session->GetOutputRecords().size() != m_seenConsoleOutputCount)
-	{
-		m_seenConsoleOutputCount = m_session->GetOutputRecords().size();
-		m_bScrollToBottom = true;
-	}
-
 	const std::string_view filter(m_filterBuffer.data());
 	BuildOutputTextBuffer(filter);
 
@@ -227,15 +197,11 @@ void EditorConsolePanel::DrawScrollback()
 	{
 		ImGui::PopFont();
 	}
-	if (m_bScrollToBottom)
-	{
-		m_bScrollToBottom = false;
-	}
 }
 
 void EditorConsolePanel::DrawInputLine(bool bDisableInteraction)
 {
-	ImGui::BeginDisabled(bDisableInteraction || m_session == nullptr);
+	ImGui::BeginDisabled(bDisableInteraction);
 	if (m_bFocusInput)
 	{
 		ImGui::SetKeyboardFocusHere();
@@ -286,35 +252,27 @@ void EditorConsolePanel::DrawAutocompletePreview()
 void EditorConsolePanel::BuildOutputTextBuffer(std::string_view filter)
 {
 	m_outputTextBuffer.clear();
-	if (m_session != nullptr)
+	for (const ConsoleOutputRecord& record : m_session.GetOutputRecords())
 	{
-		for (const ConsoleOutputRecord& record : m_session->GetOutputRecords())
+		if (!filter.empty() && !Strings::ContainsIgnoreCase(record.Text, filter))
 		{
-			if (!filter.empty() && !Strings::ContainsIgnoreCase(record.Text, filter))
-			{
-				continue;
-			}
-
-			m_outputTextBuffer += record.Text;
-			m_outputTextBuffer += '\n';
+			continue;
 		}
+
+		m_outputTextBuffer += record.Text;
+		m_outputTextBuffer += '\n';
 	}
 
-	if (m_outputTextBuffer.empty())
-	{
-		m_outputTextBuffer.push_back('\0');
-		return;
-	}
 	m_outputTextBuffer.push_back('\0');
 }
 
 std::vector<std::string> EditorConsolePanel::GetCurrentCompletions() const
 {
-	if (m_session == nullptr || m_inputBuffer[0] == '\0')
+	if (m_inputBuffer[0] == '\0')
 	{
 		return {};
 	}
-	return m_session->CompleteLine(m_inputBuffer.data());
+	return m_session.CompleteLine(m_inputBuffer.data());
 }
 
 std::string EditorConsolePanel::BuildCompletionList(const std::vector<std::string>& completions) const

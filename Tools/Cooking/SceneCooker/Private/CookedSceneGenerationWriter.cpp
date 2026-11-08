@@ -11,7 +11,7 @@
 #include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
 #include "MaterialCooker.h"
-#include "SceneCooker.h"
+#include "CookedSceneManifestWriter.h"
 
 #include <vector>
 
@@ -29,7 +29,7 @@ void CookedSceneGenerationWriter::Publish(std::span<const CookedSceneBuild* cons
 	try
 	{
 		CookedSceneStaging::StageAssets(builds, publication);
-		SceneCooker::StageManifestsAndRegistry(builds, publication);
+		StageCookedSceneManifestsAndRegistry(builds, publication);
 		std::string errorMessage;
 		if (!publisher.Publish(publication, errorMessage))
 		{

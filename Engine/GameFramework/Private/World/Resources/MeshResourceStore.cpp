@@ -3,11 +3,12 @@
 
 #include "Scene/Meshes/Mesh.h"
 
+#include <utility>
 #include <limits>
 
 namespace ECS
 {
-	MeshResourceHandle MeshResourceStore::Add(std::unique_ptr<Mesh>&& mesh)
+	MeshResourceHandle MeshResourceStore::Add(std::shared_ptr<const Mesh> mesh)
 	{
 		if (!mesh)
 		{

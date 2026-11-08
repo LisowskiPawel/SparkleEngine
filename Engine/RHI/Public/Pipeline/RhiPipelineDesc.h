@@ -203,6 +203,8 @@ struct RhiDepthState
 	bool bDepthWriteEnable = true;
 	CompareOp DepthFunc = CompareOp::Less;
 
+	constexpr bool IsValid() const noexcept { return bDepthEnable || !bDepthWriteEnable; }
+
 	bool operator==(const RhiDepthState&) const noexcept = default;
 };
 
@@ -219,6 +221,17 @@ struct RhiStencilState
 	RhiStencilOp BackFaceStencilFailOp = RhiStencilOp::Keep;
 	RhiStencilOp BackFaceStencilDepthFailOp = RhiStencilOp::Keep;
 	RhiStencilOp BackFaceStencilPassOp = RhiStencilOp::Keep;
+
+	constexpr bool HasWrites() const noexcept
+	{
+		const bool bFrontFailures = FrontFaceStencilFailOp != RhiStencilOp::Keep || FrontFaceStencilDepthFailOp != RhiStencilOp::Keep;
+		const bool bFrontWrites = bFrontFailures || FrontFaceStencilPassOp != RhiStencilOp::Keep;
+		const bool bBackFailures = BackFaceStencilFailOp != RhiStencilOp::Keep || BackFaceStencilDepthFailOp != RhiStencilOp::Keep;
+		const bool bBackWrites = bBackFailures || BackFaceStencilPassOp != RhiStencilOp::Keep;
+		const bool bFacesWrite = bFrontWrites || bBackWrites;
+		const bool bWritesEnabled = bStencilEnable && StencilWriteMask != 0;
+		return bWritesEnabled && bFacesWrite;
+	}
 
 	bool operator==(const RhiStencilState&) const noexcept = default;
 };
@@ -304,6 +317,13 @@ struct GraphicsPipelineDesc
 	PixelFormat DepthStencilAttachmentFormat = PixelFormat::Unknown;
 	std::uint8_t SampleCount = 1;
 	const wchar_t* DebugName = L"RHI_GraphicsPipeline";
+
+	static constexpr bool IsValidSampleCount(std::uint8_t sampleCount) noexcept
+	{
+		const bool bSmallCount = sampleCount == 1 || sampleCount == 2;
+		const bool bLargeCount = sampleCount == 4 || sampleCount == 8;
+		return bSmallCount || bLargeCount;
+	}
 };
 
 struct ComputePipelineDesc

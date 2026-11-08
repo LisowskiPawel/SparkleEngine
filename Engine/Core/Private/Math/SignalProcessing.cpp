@@ -32,26 +32,4 @@ namespace MathUtils
 		return std::sin(px) / px;
 	}
 
-	float KaiserKernel(float x, float beta, void* reserved) noexcept
-	{
-		(void) reserved;
-
-		const float bx = beta * std::sqrt(1.0f - (x * x));
-		if (bx > 40.0f)
-		{
-			return 1.0f;
-		}
-		if (bx < -40.0f)
-		{
-			return 0.0f;
-		}
-
-		const float i0_beta = BesselI0(beta);
-		return i0_beta > 0.0f ? BesselI0(bx) / i0_beta : 1.0f;
-	}
-
-	float KaiserSupport(float beta) noexcept
-	{
-		return 1.0f;
-	}
 }

@@ -4,7 +4,7 @@
 
 #include <filesystem>
 
-namespace Filesystem::Private
+namespace Filesystem
 {
 	struct FileSystemPathState final
 	{

@@ -160,7 +160,7 @@ void FrameGraphCompiler::BuildPassSuccessorsAndInDegrees() noexcept
 		{
 			assert(dependency < m_plan.passes.size());
 			FrameGraphPassNode& dependencyPass = m_plan.passes[dependency];
-			assert(dependencyPass.alive);
+			assert(dependencyPass.bAlive);
 			dependencyPass.successors.push_back(passRecord.index);
 			++passRecord.inDegree;
 		}
@@ -230,7 +230,7 @@ void FrameGraphCompiler::ValidateExecutionOrder() const noexcept
 	for (const FrameGraphPassIndex passIndex : m_plan.executionOrder)
 	{
 		assert(passIndex < m_plan.passes.size());
-		assert(m_plan.passes[passIndex].alive);
+		assert(m_plan.passes[passIndex].bAlive);
 		assert(!visited[passIndex]);
 		visited[passIndex] = true;
 	}

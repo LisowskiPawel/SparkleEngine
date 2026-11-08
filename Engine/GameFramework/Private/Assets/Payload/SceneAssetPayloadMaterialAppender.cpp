@@ -17,16 +17,15 @@ namespace Assets
 {
 	void SceneAssetPayloadMaterialAppender::AppendMaterials(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload)
 	{
-		MaterialAssetLoader materialAssetLoader;
-		CookedMaterialTranslator materialTranslator;
+		files.GetAllocationBudget().ReserveArray<MaterialDesc>(sceneManifest.materialAssetReferences.size());
 		sceneAssetPayload.materials.reserve(sceneAssetPayload.materials.size() + sceneManifest.materialAssetReferences.size());
 
 		for (const CookedSceneMaterialAssetRef& materialReference : sceneManifest.materialAssetReferences)
 		{
 			const std::filesystem::path materialAssetPath = Paths::CookedMaterialAsset(materialReference);
-			const LoadedMaterialAsset materialAsset = materialAssetLoader.Decode(materialAssetPath, files.Get(materialAssetPath), files.GetAllocationBudget());
+			const LoadedMaterialAsset materialAsset = MaterialAssetLoader::Decode(materialAssetPath, files.Get(materialAssetPath), files.GetAllocationBudget());
 			files.GetAllocationBudget().Reserve(files.Get(materialAssetPath).size());
-			sceneAssetPayload.materials.push_back(materialTranslator.Translate(materialAsset));
+			sceneAssetPayload.materials.push_back(CookedMaterialTranslator::Translate(materialAsset));
 			files.Release(materialAssetPath);
 		}
 	}

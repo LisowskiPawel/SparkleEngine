@@ -97,7 +97,7 @@ namespace SparkleLauncher
 			    }
 			    else
 			    {
-				    return RunMaintenanceOperationPlan(std::move(typedPlan), taskProcessRunner);
+				    return RunMaintenanceOperationPlan(std::move(typedPlan));
 			    }
 		    },
 		    std::move(plan));

@@ -20,6 +20,8 @@ public:
 
 	const SkeletalMeshData& GetSkeletalMeshData() const noexcept { return m_skeletalData; }
 
+	const MeshData& GetMeshData() const noexcept override { return m_skeletalData.geometry; }
+
 private:
 	SkeletalMeshData m_skeletalData;
 	Assets::CookedAssetId m_assetId = Assets::InvalidCookedAssetId;

@@ -9,21 +9,30 @@
 
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_rayTracingShaderTablePlanLogger, "Renderer.RayTracing.ShaderTablePlan");
 
-void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> primitives, const RenderMaterialTable& materials) noexcept
+static bool IsShaderTablePrimitiveAdmitted(const RenderPrimitive& primitive, const RenderMaterialTable& materials) noexcept
+{
+	if (!primitive.bGpuMeshResident || !primitive.GpuMesh)
+	{
+		return false;
+	}
+	if (!primitive.Static.Material.IsValid() || primitive.Static.Material.GetGeneration() != materials.Generation)
+	{
+		return false;
+	}
+	return primitive.Static.Material.GetIndex() < materials.Values.size();
+}
+
+static std::vector<RayTracingShaderTableInstancePlan> CollectShaderTableInstances(std::span<const RenderPrimitive> primitives, const RenderMaterialTable& materials)
 {
 	std::vector<RayTracingShaderTableInstancePlan> instances;
 	instances.reserve(primitives.size());
 	for (const RenderPrimitive& primitive : primitives)
 	{
-		const bool bInvalidTracingMaterialGpuMesh = !primitive.bGpuMeshResident || !primitive.GpuMesh;
-		const bool bTracingMaterialMaterialValid = bInvalidTracingMaterialGpuMesh || (!primitive.Static.Material.IsValid());
-		const bool bInvalidTracingMaterialGeneration = bTracingMaterialMaterialValid || (primitive.Static.Material.GetGeneration() != materials.Generation);
-		const bool bInvalidRayTracingMaterial = bInvalidTracingMaterialGeneration || (primitive.Static.Material.GetIndex() >= materials.Values.size());
-
-		if (bInvalidRayTracingMaterial)
+		if (!IsShaderTablePrimitiveAdmitted(primitive, materials))
 		{
 			continue;
 		}
@@ -37,6 +46,11 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 	}
 	std::ranges::sort(instances, {}, &RayTracingShaderTableInstancePlan::GpuSceneSlot);
 
+	return instances;
+}
+
+static std::uint32_t AssignInstanceContributions(std::span<RayTracingShaderTableInstancePlan> instances) noexcept
+{
 	const std::uint32_t geometryMultiplier = static_cast<std::uint32_t>(RayTracingSceneRayType::Count);
 	std::uint64_t nextInstanceContribution = 0u;
 	for (RayTracingShaderTableInstancePlan& instance : instances)
@@ -53,8 +67,14 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 		Diagnostics::Fatal(g_rayTracingShaderTablePlanLogger, __FILE__, __LINE__, "Ray-tracing shader-table record count exceeds the Renderer/RHI index width.");
 	}
 
+	return static_cast<std::uint32_t>(nextInstanceContribution);
+}
+
+static std::vector<RayTracingShaderTableRecordPlan> BuildShaderTableRecords(std::span<const RayTracingShaderTableInstancePlan> instances, std::uint32_t recordCount)
+{
+	const std::uint32_t geometryMultiplier = static_cast<std::uint32_t>(RayTracingSceneRayType::Count);
 	std::vector<RayTracingShaderTableRecordPlan> records;
-	records.reserve(static_cast<std::size_t>(nextInstanceContribution));
+	records.reserve(static_cast<std::size_t>(recordCount));
 	for (const RayTracingShaderTableInstancePlan& instance : instances)
 	{
 		for (std::uint32_t geometryIndex = 0u; geometryIndex < instance.GeometryCount; ++geometryIndex)
@@ -63,12 +83,12 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 			{
 				std::uint32_t recordIndex = 0u;
 
-				const bool bRecordIndexComputed = ComputeCheckedRecordIndex(
+				const bool bRecordIndexComputed = RayTracingShaderTablePlan::ComputeCheckedRecordIndex(
 				    rayContribution,
 				    geometryMultiplier,
 				    geometryIndex,
 				    instance.InstanceContribution,
-				    static_cast<std::uint32_t>(nextInstanceContribution),
+				    static_cast<std::uint32_t>(recordCount),
 				    recordIndex);
 
 				if (!bRecordIndexComputed)
@@ -87,24 +107,54 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 		}
 	}
 
-	bool bGeometryChanged = instances.size() != m_instances.size();
-	bool bMaterialSemanticsChanged = false;
-	for (std::size_t index = 0u; !bGeometryChanged && index < instances.size(); ++index)
-	{
-		const RayTracingShaderTableInstancePlan& incoming = instances[index];
-		const RayTracingShaderTableInstancePlan& current = m_instances[index];
+	return records;
+}
 
-		const bool bBindingChanged = incoming.GpuSceneSlot != current.GpuSceneSlot || incoming.InstanceContribution != current.InstanceContribution;
-		const bool bShapeChanged = incoming.GeometryCount != current.GeometryCount || incoming.GeometryIdentity != current.GeometryIdentity;
-		bGeometryChanged = bBindingChanged || bShapeChanged;
-
-		bMaterialSemanticsChanged = bMaterialSemanticsChanged || incoming.HitGroup != current.HitGroup;
-	}
-	if (!bGeometryChanged && !bMaterialSemanticsChanged && records == m_records)
+void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> primitives, const RenderMaterialTable& materials) noexcept
+{
+	auto instances = CollectShaderTableInstances(primitives, materials);
+	const std::uint32_t recordCount = AssignInstanceContributions(instances);
+	auto records = BuildShaderTableRecords(instances, recordCount);
+	const RayTracingShaderTableInvalidationReason reason = ResolveInvalidationReason(instances, records);
+	if (reason == RayTracingShaderTableInvalidationReason::None)
 	{
 		return;
 	}
 
+	PublishMapping(std::move(instances), std::move(records), reason);
+}
+
+RayTracingShaderTableInvalidationReason RayTracingShaderTablePlan::ResolveInvalidationReason(
+    std::span<const RayTracingShaderTableInstancePlan> instances,
+    std::span<const RayTracingShaderTableRecordPlan> records) const noexcept
+{
+	if (instances.size() != m_instances.size())
+	{
+		return RayTracingShaderTableInvalidationReason::GeometryLayout;
+	}
+
+	bool bMaterialSemanticsChanged = false;
+	for (std::size_t index = 0u; index < instances.size(); ++index)
+	{
+		const RayTracingShaderTableInstancePlan& incoming = instances[index];
+		const RayTracingShaderTableInstancePlan& current = m_instances[index];
+		const bool bBindingChanged = incoming.GpuSceneSlot != current.GpuSceneSlot || incoming.InstanceContribution != current.InstanceContribution;
+		const bool bShapeChanged = incoming.GeometryCount != current.GeometryCount || incoming.GeometryIdentity != current.GeometryIdentity;
+		if (bBindingChanged || bShapeChanged)
+		{
+			return RayTracingShaderTableInvalidationReason::GeometryLayout;
+		}
+		bMaterialSemanticsChanged = bMaterialSemanticsChanged || incoming.HitGroup != current.HitGroup;
+	}
+
+	return bMaterialSemanticsChanged || !std::ranges::equal(records, m_records) ? RayTracingShaderTableInvalidationReason::MaterialSemantics : RayTracingShaderTableInvalidationReason::None;
+}
+
+void RayTracingShaderTablePlan::PublishMapping(
+    std::vector<RayTracingShaderTableInstancePlan> instances,
+    std::vector<RayTracingShaderTableRecordPlan> records,
+    RayTracingShaderTableInvalidationReason reason) noexcept
+{
 	m_instances = std::move(instances);
 	m_records = std::move(records);
 	++m_generation;
@@ -115,9 +165,7 @@ void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> pri
 	m_metrics.LastBuildTimeMicroseconds = 0u;
 	m_metrics.LastUpdateTimeMicroseconds = 0u;
 
-	m_metrics.InvalidationReason = m_generation == 1u ? RayTracingShaderTableInvalidationReason::RayTypeLayout
-	    : bGeometryChanged                            ? RayTracingShaderTableInvalidationReason::GeometryLayout
-	                                                  : RayTracingShaderTableInvalidationReason::MaterialSemantics;
+	m_metrics.InvalidationReason = m_generation == 1u ? RayTracingShaderTableInvalidationReason::RayTypeLayout : reason;
 
 	if (!Validate())
 	{

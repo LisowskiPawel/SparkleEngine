@@ -87,7 +87,7 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureBlas(
     std::uint32_t gpuSceneSlot,
     RayTracingPerformanceDiagnostics* diagnostics) noexcept
 {
-	if (RayTracingBlasGeometryBuilder::IsSkinnedDraw(draw))
+	if (IsSkinnedRayTracingDraw(draw))
 	{
 		return EnsureSkinnedBlas(commandContext, preparedScene, draw, gpuSceneSlot, diagnostics);
 	}
@@ -232,7 +232,7 @@ RhiRayTracingGeometryDesc RayTracingBlasCache::BuildSkinnedGeometry(const Prepar
 	}
 
 	const GpuMesh& gpuMesh = *resolvedMesh;
-	RayTracingBlasGeometryBuilder::ComputeSkinnedPositions(preparedScene, draw, gpuMesh, m_skinnedPositionScratch);
+	ComputeRayTracingSkinnedPositions(preparedScene, draw, gpuMesh, m_skinnedPositionScratch);
 	ReplaceDynamicVertexBuffer(m_skinnedPositionScratch, entry);
 	return BuildSkinnedGeometryDesc(gpuMesh, entry, static_cast<std::uint32_t>(m_skinnedPositionScratch.size()));
 }
@@ -299,16 +299,14 @@ void RayTracingBlasCache::EnsureEntryResources(const RhiRayTracingAccelerationSt
 
 	if (!entry.scratchBuffer)
 	{
-		const std::uint64_t alignedScratchSize = RayTracingBlasGeometryBuilder::AlignRayTracingBufferSize(
-		    prebuildInfo.ScratchDataSizeInBytes,
-		    m_renderHardwareInterface->GetCapabilities().RayTracing.ScratchBufferByteAlignment);
+		const std::uint64_t alignedScratchSize = AlignRayTracingBlasBufferSize(prebuildInfo.ScratchDataSizeInBytes, m_renderHardwareInterface->GetCapabilities().RayTracing.ScratchBufferByteAlignment);
 
 		entry.scratchBuffer = m_renderHardwareInterface->GetRayTracingService().CreateRayTracingScratchBuffer(alignedScratchSize, L"RayTracingBlasScratch");
 		entry.scratchBufferSizeInBytes = alignedScratchSize;
 	}
 	if (!entry.accelerationStructureBuffer)
 	{
-		const std::uint64_t alignedAccelerationStructureSize = RayTracingBlasGeometryBuilder::AlignRayTracingBufferSize(
+		const std::uint64_t alignedAccelerationStructureSize = AlignRayTracingBlasBufferSize(
 		    prebuildInfo.ResultDataMaxSizeInBytes,
 		    m_renderHardwareInterface->GetCapabilities().RayTracing.AccelerationStructureByteAlignment);
 
@@ -341,7 +339,7 @@ void RayTracingBlasCache::TrackBuildResources(RenderCommandContext& commandConte
 
 bool RayTracingBlasCache::GeometryMatches(const Entry& entry, const RhiRayTracingGeometryDesc& geometry) const noexcept
 {
-	return RayTracingBlasGeometryBuilder::GeometryEquals(entry.geometry, geometry);
+	return AreRayTracingBlasGeometriesEqual(entry.geometry, geometry);
 }
 
 RayTracingBlasCache::BlasHandle RayTracingBlasCache::BuildHandle(const Entry& entry) const noexcept

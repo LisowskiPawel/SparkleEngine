@@ -90,7 +90,7 @@ ModifierFlags InputState::GetModifiers() const noexcept
 
 bool InputState::HasModifier(ModifierFlags InModifier) const noexcept
 {
-	return (static_cast<uint8_t>(m_Modifiers) & static_cast<uint8_t>(InModifier)) != 0;
+	return HasAnyFlag(m_Modifiers, InModifier);
 }
 
 bool InputState::IsShiftDown() const noexcept
@@ -178,6 +178,14 @@ void InputState::BeginFrame() noexcept
 	AdvanceButtonStates(m_KeyStates);
 	AdvanceButtonStates(m_MouseButtonStates);
 	ResetFrameDeltas();
+}
+
+void InputState::ResetPointerState() noexcept
+{
+	m_MouseButtonStates.fill(ButtonState::Up);
+	ResetFrameDeltas();
+	m_bMouseCaptured = false;
+	m_bCursorHidden = false;
 }
 
 void InputState::AdvanceButtonStates(std::span<ButtonState> states) noexcept

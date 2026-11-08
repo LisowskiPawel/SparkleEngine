@@ -55,11 +55,11 @@ void RhiContract::ValidateGraphicsPipelineDesc(const GraphicsPipelineDesc& desc)
 	RhiPipelineDescValidation::Require(desc.VertexInput.BindingCount <= desc.VertexInput.Bindings.size(), "Graphics pipeline vertex binding count exceeds descriptor capacity.");
 	RhiPipelineDescValidation::Require(desc.VertexInput.ElementCount <= desc.VertexInput.Elements.size(), "Graphics pipeline vertex element count exceeds descriptor capacity.");
 
-	RhiPipelineDescValidation::Require(
-	    desc.SampleCount == 1 || desc.SampleCount == 2 || desc.SampleCount == 4 || desc.SampleCount == 8,
-	    "Graphics pipeline sample count is unsupported by the neutral RHI contract.");
+	const bool bSampleCountValid = GraphicsPipelineDesc::IsValidSampleCount(desc.SampleCount);
+	RhiPipelineDescValidation::Require(bSampleCountValid, "Graphics pipeline sample count is unsupported by the neutral RHI contract.");
 
-	RhiPipelineDescValidation::Require(desc.Depth.bDepthEnable || !desc.Depth.bDepthWriteEnable, "Graphics pipeline depth writes require depth testing.");
+	const bool bDepthValid = desc.Depth.IsValid();
+	RhiPipelineDescValidation::Require(bDepthValid, "Graphics pipeline depth writes require depth testing.");
 
 	for (std::uint32_t index = 0; index < desc.VertexInput.ElementCount; ++index)
 	{

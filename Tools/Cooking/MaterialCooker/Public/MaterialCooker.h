@@ -13,10 +13,9 @@ struct MaterialCookOutput;
 struct SourceImportOutput;
 struct TextureCookRequest;
 
-class MaterialCooker final
+namespace MaterialCooker
 {
-public:
-	static MaterialCookOutput BuildMaterialAssets(const SourceImportOutput& importOutput, std::string_view sceneAssetId);
-	static std::vector<TextureCookRequest> CollectTextureCookRequests(const SourceImportOutput& importOutput);
-	static void StageMaterialAssets(const std::vector<CookedMaterialAssetBuild>& materialAssets, std::vector<Files::FilePublication>& outPublication);
-};
+	MaterialCookOutput BuildMaterialAssets(const SourceImportOutput& importOutput, std::string_view sceneAssetId);
+	std::vector<TextureCookRequest> CollectTextureCookRequests(const SourceImportOutput& importOutput);
+	void StageMaterialAssets(const std::vector<CookedMaterialAssetBuild>& materialAssets, std::vector<Files::FilePublication>& outPublication);
+}

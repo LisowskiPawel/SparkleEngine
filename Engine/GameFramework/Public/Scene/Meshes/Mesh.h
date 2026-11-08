@@ -12,12 +12,8 @@ public:
 	Mesh(Mesh&&) noexcept;
 	Mesh& operator=(Mesh&&) noexcept;
 
-	const MeshData& GetMeshData() const noexcept;
+	virtual const MeshData& GetMeshData() const noexcept = 0;
 
 protected:
-	explicit Mesh(MeshData&& meshData) noexcept;
-	explicit Mesh(const MeshData& meshData);
-
-private:
-	MeshData m_meshData;
+	Mesh() = default;
 };

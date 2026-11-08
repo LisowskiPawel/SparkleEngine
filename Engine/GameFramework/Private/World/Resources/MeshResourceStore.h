@@ -12,14 +12,14 @@ namespace ECS
 	class MeshResourceStore final
 	{
 	public:
-		MeshResourceHandle Add(std::unique_ptr<Mesh>&& mesh);
+		MeshResourceHandle Add(std::shared_ptr<const Mesh> mesh);
 		std::shared_ptr<const Mesh> ResolveImmutable(MeshResourceHandle handle) const noexcept;
 		bool Remove(MeshResourceHandle handle) noexcept;
 
 	private:
 		struct Entry final
 		{
-			std::shared_ptr<Mesh> Resource;
+			std::shared_ptr<const Mesh> Resource;
 			std::uint32_t Generation = 1;
 		};
 

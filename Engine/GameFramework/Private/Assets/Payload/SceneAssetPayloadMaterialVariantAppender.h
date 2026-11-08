@@ -6,9 +6,14 @@
 
 namespace Assets
 {
-	class SceneAssetPayloadMaterialVariantAppender final
+	class CookedAssetAllocationBudget;
+
+	namespace SceneAssetPayloadMaterialVariantAppender
 	{
-	public:
-		static void AppendMaterialVariants(const LoadedSceneManifest& sceneManifest, std::span<const SceneAssetPayloadMeshBinding> meshAssetBindings, SceneAssetPayload& sceneAssetPayload);
-	};
+		void AppendMaterialVariants(
+		    const LoadedSceneManifest& sceneManifest,
+		    std::span<const SceneAssetPayloadMeshBinding> meshAssetBindings,
+		    SceneAssetPayload& sceneAssetPayload,
+		    CookedAssetAllocationBudget& budget);
+	}
 }

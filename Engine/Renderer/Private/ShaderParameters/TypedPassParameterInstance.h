@@ -40,7 +40,7 @@ public:
 
 	TParameters& operator*() noexcept
 	{
-		m_isDirty = true;
+		m_bIsDirty = true;
 		return m_fields;
 	}
 

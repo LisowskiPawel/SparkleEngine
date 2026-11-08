@@ -98,6 +98,25 @@ void EditorImGuiContext::UnsubscribeFromWindowEvents() noexcept
 	m_shortcutHandler = {};
 }
 
+static bool TryHandleEditorShortcut(const WindowMessageEvent& event, const EditorImGuiContext::ShortcutHandler& handler)
+{
+	if (!handler || ImGui::GetCurrentContext() == nullptr)
+	{
+		return false;
+	}
+	if (ImGui::GetIO().WantTextInput)
+	{
+		return false;
+	}
+	const bool bKeyPressed = event.msg == WM_KEYDOWN;
+	const bool bRepeated = (event.lParam & (LPARAM{1} << 30)) != 0;
+	if (!bKeyPressed || bRepeated)
+	{
+		return false;
+	}
+	return event.wParam == VK_OEM_3 && handler(Key::Grave);
+}
+
 void EditorImGuiContext::HandleWindowMessage(WindowMessageEvent& event)
 {
 	if (!m_bPlatformInitialized)
@@ -105,12 +124,7 @@ void EditorImGuiContext::HandleWindowMessage(WindowMessageEvent& event)
 		return;
 	}
 
-	const bool bShortcutAvailableImGui = m_shortcutHandler && ImGui::GetCurrentContext() != nullptr;
-	const bool bShortcutAvailable = bShortcutAvailableImGui && ((event.lParam & (LPARAM{1} << 30)) == 0);
-	const bool bWantsTextInput = bShortcutAvailable && ImGui::GetIO().WantTextInput;
-	const bool bShortcutHandled = bShortcutAvailable && m_shortcutHandler(static_cast<std::uint32_t>(event.msg), static_cast<std::uintptr_t>(event.wParam), bWantsTextInput);
-
-	if (bShortcutHandled)
+	if (TryHandleEditorShortcut(event, m_shortcutHandler))
 	{
 		event.bHandled = true;
 		return;

@@ -5,7 +5,6 @@
 #include "World/ECS/Components/AnimationComponents.h"
 #include "World/ECS/Components/EditorComponents.h"
 #include "World/Resources/GameWorldResourceStores.h"
-#include "World/Systems/GameWorldSystems.h"
 
 #include <utility>
 
@@ -55,12 +54,16 @@ namespace ECS
 
 	bool GameWorldState::PrepareSystemResources(GameWorldResourceStores& resources)
 	{
-		return resources.AnimationClips.ResolveTargets(resources.Skeletons, resources.Generation)
-		    && m_animationOutput.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation) && m_extraction.Prepare(m_registry);
+		const bool bAnimationPrepared = resources.AnimationClips.ResolveTargets(resources.Skeletons, resources.Generation)
+		    && m_animationOutput.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation);
+
+		if (!bAnimationPrepared)
+		{
+			return false;
+		}
+
+		m_extraction.Prepare(GetMeshEntities().size());
+		return true;
 	}
 
-	bool GameWorldState::ExecuteSystems(const GameWorldSystemExecutionContext& context)
-	{
-		return ExecuteGameWorldSystems(*this, context);
-	}
 }

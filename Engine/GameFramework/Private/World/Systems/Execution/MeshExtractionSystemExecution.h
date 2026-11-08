@@ -1,26 +1,29 @@
 #pragma once
 
 #include "World/Systems/Descriptors/GameWorldSystemContract.h"
+#include "World/Extraction/WorldExtractionStorage.h"
 
 #include <cstdint>
+#include <span>
 
 class SkeletonResourceStore;
 
 namespace ECS
 {
-	class GameWorldState;
+	class MeshResourceStore;
 
 	class MeshExtractionSystemExecution final
 	{
 	public:
-		MeshExtractionSystemExecution(GameWorldState& state, const SkeletonResourceStore& skeletons, const StructureFrozenEpoch& epoch);
+		MeshExtractionSystemExecution(MeshExtractionQuery& query, const MeshResourceStore& meshes, const SkeletonResourceStore& skeletons, std::span<WorldExtractionStorage::MeshSlot> slots);
 
 		std::uint32_t GetMeshCount() const noexcept;
 		bool Run(std::uint32_t begin, std::uint32_t end);
 
 	private:
-		GameWorldState& m_state;
+		MeshExtractionQuery& m_query;
+		const MeshResourceStore& m_meshes;
 		const SkeletonResourceStore& m_skeletons;
-		MeshExtractionQuery m_query;
+		std::span<WorldExtractionStorage::MeshSlot> m_slots;
 	};
 }

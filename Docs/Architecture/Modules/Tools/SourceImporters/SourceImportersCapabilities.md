@@ -18,6 +18,16 @@ Source ownership reconciled on 2026-10-06: `ImportedScene::FindSkeletonJointForN
 
 glTF texture mapping reconciled on 2026-10-11: `GltfMaterialTextureMapper::Apply` names the supported slots in import order. Source-local operations own validation, UV/sampler translation and reference assembly; packed roughness/metallic shares one resolved source while preserving green/blue channels. The per-group dispatch switch, optional-path insertion relay and stateless class shell are removed. Source URI text is borrowed during resolution; imported paths and mappings remain owned values. Format coverage and evidence labels are unchanged.
 
+**Imported-output admission, 2026-11-08:** `ImportedScene::HasSupportedContent`
+owns the shared mesh-pairing and supported-content predicate. The source-format
+dispatcher admits each translated output through that predicate before publishing
+provenance. FBX and glTF entry points retain format translation and no longer
+repeat the predicate. PLY retains its stricter triangle-geometry requirement.
+
+Focused owner/consumer builds and bounded native controls are recorded in the
+[ownership-pass result](../../../../../artifacts/validation/tools-orchestration-20261108/result.json).
+They do not establish whole-content cook, interactive, GPU, package or release acceptance.
+
 ## At A Glance
 
 **Private capability placement, 2026-11-07:** reconciled against `8cbd850c`
@@ -27,6 +37,9 @@ root. `Gltf/Geometry` owns primitive extraction, instances, tangent frames and
 morph targets; `Gltf/Materials` owns property/texture/variant mapping and primitive
 material resolution; `Gltf/Animation` owns animation sampling and skeleton import.
 They consume the existing imported values and stay in `SourceImporters`.
+Camera, skeleton and geometry extraction expose direct namespace operations;
+source-local naming, transform and attribute helpers retain internal linkage.
+Geometry attribute records stay in the implementation source.
 No parser, conversion, fidelity, output or failure contract changes.
 
 **Animation boundaries, 2026-11-05:** the [glTF animation importer](../../../../../Tools/Import/SourceImporters/Private/Gltf/Animation/GltfAnimationImporter.cpp)

@@ -119,12 +119,12 @@ std::vector<ViewportCaptureCompletion> FramePipeline::TakeCompletedViewportCaptu
 
 MeshDiagnosticsSnapshot FramePipeline::CaptureMeshDiagnostics() const
 {
-	return MeshDiagnosticsCollector::Capture(*m_renderScene, m_gpuMeshCache.get());
+	return CollectMeshDiagnostics(*m_renderScene, m_gpuMeshCache.get());
 }
 
 MeshPreviewGeometry FramePipeline::CaptureMeshPreview(std::uintptr_t meshRuntimeId) const
 {
-	return MeshDiagnosticsCollector::CapturePreview(*m_renderScene, meshRuntimeId);
+	return CollectMeshPreviewGeometry(*m_renderScene, meshRuntimeId);
 }
 
 TextureDiagnosticsSnapshot FramePipeline::CaptureTextureDiagnostics()

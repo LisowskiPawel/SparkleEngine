@@ -2,7 +2,6 @@
 
 #include "Animation/AnimationOutputStorage.h"
 #include "Animation/AnimationClipResource.h"
-#include "GameFramework/Public/Scene/Animations/AnimationOutput.h"
 #include "GameFramework/Public/Scene/Camera/CameraDesc.h"
 #include "GameFramework/Public/Scene/Camera/SceneCameraEntry.h"
 #include "GameFramework/Public/Scene/Lighting/SceneLightDesc.h"
@@ -31,12 +30,7 @@ class TaskExecutor;
 namespace ECS
 {
 	class RenderFrameSubmissionExtractor;
-	class RenderSceneDynamicDataExtractor;
-	class SimulationSystemExecution;
-	class AnimationSystemExecution;
-	class TransformSystemExecution;
-	class MeshExtractionSystemExecution;
-	class SystemChangeCommitter;
+	class GameWorldSystemExecution;
 	struct GameWorldSystemExecutionContext;
 
 	class GameWorldState final
@@ -64,8 +58,7 @@ namespace ECS
 		bool ReadVisibility(EntityId entity) const noexcept;
 
 		EntityId AddMesh(SceneMeshInstanceData&& instance);
-		std::size_t GetMeshCount() const noexcept;
-		EntityId GetMeshEntity(std::size_t index) const noexcept;
+		std::span<const EntityId> GetMeshEntities() const noexcept;
 		bool WriteMeshMaterial(EntityId entity, MaterialHandle material) noexcept;
 		void AppendMeshInstanceGroups(std::vector<SceneMeshInstanceGroupData> groups);
 
@@ -83,11 +76,7 @@ namespace ECS
 		bool PrepareSystemResources(GameWorldResourceStores& resources);
 		bool ExecuteSystems(const GameWorldSystemExecutionContext& context);
 
-		const AnimationOutput& GetAnimationOutput() const noexcept { return m_animationOutput.GetOutput(); }
-
 		std::optional<SkyEnvironment> ReadSkyEnvironment() const { return m_skyEnvironment; }
-
-		bool HasSkyEnvironment() const noexcept { return m_skyEnvironment.has_value(); }
 
 		void WriteSkyEnvironment(SkyEnvironment environment) noexcept;
 		void RemoveSkyEnvironment() noexcept;
@@ -100,13 +89,7 @@ namespace ECS
 		static constexpr std::size_t MaximumPendingChanges = 4096;
 
 		friend class RenderFrameSubmissionExtractor;
-		friend class RenderSceneDynamicDataExtractor;
-		friend class SimulationSystemExecution;
-		friend class AnimationSystemExecution;
-		friend class TransformSystemExecution;
-		friend class MeshExtractionSystemExecution;
-		friend class SystemChangeCommitter;
-		friend bool ExecuteGameWorldSystems(GameWorldState&, const GameWorldSystemExecutionContext&);
+		friend class GameWorldSystemExecution;
 
 		struct SystemExecutionArena final
 		{
@@ -119,8 +102,14 @@ namespace ECS
 		};
 
 		void MarkTransformDirty(EntityId entity) noexcept;
+		bool AddMeshComponents(EntityId entity, const SceneMeshInstanceData& instance, MeshResourceHandle resource);
+		bool AddMeshDeformation(EntityId entity, const SceneMeshInstanceData& instance, AnimationOutputSlotHandle weights);
 		bool PrepareSystemExecution(GameWorldResourceStores& resources);
 		void PrepareSystemArena();
+		bool CommitSystemOutputs();
+		bool CommitExtraction();
+		void RecordSystemChanges(std::vector<EntityId>& changes);
+		void RecordTransformChanges(std::vector<EntityId>& changes);
 		void RecordChange(EntityId entity) noexcept;
 		std::span<const EntityId> PrepareDirtyTransforms();
 		void CommitDirtyTransforms(std::span<const EntityId> entities);

@@ -23,6 +23,7 @@ namespace SparkleLauncher
 		bool bGameSupported = true;
 		bool bReady = false;
 		bool bCanSelect = true;
+		bool bCanPrepare = false;
 		bool bCanSync = false;
 	};
 

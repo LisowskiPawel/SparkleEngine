@@ -3,8 +3,7 @@
 #include "Concurrency/ConcurrencyLaunchCVars.h"
 
 #include "Core/Public/Console/CVar.h"
-
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogApplicationConcurrency, "Application.Concurrency");
+#include "Renderer/Public/Concurrency/RendererExecutionConfig.h"
 
 namespace ConcurrencyLaunchCVars
 {
@@ -15,18 +14,17 @@ namespace ConcurrencyLaunchCVars
 	{
 	}
 
-	bool UseThreadedRenderer() noexcept
+	RendererExecutionConfig ResolveRendererExecution(bool bAllowThreaded, bool bEnableUiRenderPackets, TaskExecutor& executor, TaskScope& parentScope) noexcept
 	{
-		return g_threadedRenderer.Get();
-	}
-
-	std::uint32_t ResolveRenderPipelineDepth() noexcept
-	{
-		const std::uint32_t renderPipelineDepth = g_renderPipelineDepth.Get();
-		if (renderPipelineDepth > 2u)
+		RendererExecutionConfig config;
+		if (bAllowThreaded && g_threadedRenderer.Get())
 		{
-			Diagnostics::Fatal(LogApplicationConcurrency, __FILE__, __LINE__, "r.RenderPipelineDepth is outside the supported range [0, 2].");
+			config.Mode = RendererExecutionMode::Threaded;
+			config.RenderPipelineDepth = g_renderPipelineDepth.Get();
 		}
-		return renderPipelineDepth;
+		config.bEnableUiRenderPackets = bEnableUiRenderPackets;
+		config.AssetTaskExecutor = &executor;
+		config.AssetTaskParentScope = &parentScope;
+		return config;
 	}
 }

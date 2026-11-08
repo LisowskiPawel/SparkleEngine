@@ -20,5 +20,7 @@ namespace Diagnostics
 	{                                                                      \
 		const std::int32_t _result = static_cast<std::int32_t>(hr);        \
 		if (_result < 0)                                                   \
+		{                                                                  \
 			::Diagnostics::CheckHResult(_result, #hr, __FILE__, __LINE__); \
+		}                                                                  \
 	} while (0)

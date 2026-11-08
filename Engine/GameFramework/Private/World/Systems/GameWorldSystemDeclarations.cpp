@@ -2,7 +2,7 @@
 #include "World/Systems/GameWorldSystems.h"
 
 #include "World/Systems/Descriptors/GameWorldSystemContract.h"
-#include "World/Systems/Execution/SystemChangeCommitter.h"
+#include "World/GameWorldState.h"
 #include "World/Systems/GameSystemGraph.h"
 
 namespace ECS
@@ -171,7 +171,7 @@ namespace ECS
 
 		outputCommit.ExecuteRange = [](GameWorldSystemExecution& self, std::uint32_t, std::uint32_t)
 		{
-			return SystemChangeCommitter::CommitSystemOutputs(self.m_state);
+			return self.m_state.CommitSystemOutputs();
 		};
 
 		return outputCommit;
@@ -267,7 +267,7 @@ namespace ECS
 
 		extractionCommit.ExecuteRange = [](GameWorldSystemExecution& self, std::uint32_t, std::uint32_t)
 		{
-			return SystemChangeCommitter::CommitExtraction(self.m_state);
+			return self.m_state.CommitExtraction();
 		};
 
 		return extractionCommit;

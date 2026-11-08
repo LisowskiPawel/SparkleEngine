@@ -37,17 +37,5 @@ SourceImportOutput ImportGltfScene(const std::filesystem::path& filePath)
 	GltfGeometryImporter::ImportGeometry(scene.data, output);
 	GltfAnimationImporter::ImportAnimations(scene.data, output);
 
-	const bool bOrInconsistentMeshInstancesEmpty = output.scene.meshPrimitives.empty() != output.scene.meshInstances.empty();
-	const bool bOrInconsistentMeshPrimitivesEmpty = !bOrInconsistentMeshInstancesEmpty && (output.scene.meshPrimitives.empty());
-	const bool bOrInconsistentCamerasEmpty = bOrInconsistentMeshPrimitivesEmpty && (output.scene.cameras.empty());
-	const bool bImportedOrInconsistentLightsEmpty = bOrInconsistentCamerasEmpty && (output.scene.lights.empty());
-	const bool bOrInconsistentAnimationsEmpty = bImportedOrInconsistentLightsEmpty && (output.scene.animations.empty());
-	const bool bInvalidScene = bOrInconsistentMeshInstancesEmpty || bOrInconsistentAnimationsEmpty;
-
-	if (bInvalidScene)
-	{
-		throw Diagnostics::Error("glTF import produced incomplete mesh content or no supported scene content.");
-	}
-
 	return output;
 }

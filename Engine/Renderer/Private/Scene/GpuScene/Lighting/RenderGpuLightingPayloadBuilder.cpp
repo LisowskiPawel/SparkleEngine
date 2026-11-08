@@ -18,39 +18,15 @@ static void ValidateLightCount(std::string_view lightKind, std::size_t count, st
 	}
 }
 
-void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, RenderGpuLightingPayloads& payloads)
+static void PackDirectionalLights(const RenderLightCollection<DirectionalLight>& lights, std::vector<DirectionalLightGpuData>& output)
 {
-	const std::size_t directionalLightCount = preparedScene.directionalLights.size();
-	const std::size_t pointLightCount = preparedScene.pointLights.size();
-	const std::size_t spotLightCount = preparedScene.spotLights.size();
-	const std::size_t rectLightCount = preparedScene.rectLights.size();
-
-	ValidateLightCount("directional", directionalLightCount, 2u);
-	ValidateLightCount("point", pointLightCount, 1024u);
-	ValidateLightCount("spot", spotLightCount, 1024u);
-	ValidateLightCount("rect", rectLightCount, 1024u);
-
-	payloads.DirectionalLights.clear();
-	payloads.PointLights.clear();
-	payloads.SpotLights.clear();
-	payloads.RectLights.clear();
-
-	payloads.Uniform = SceneLightingUniformData{
-	    .DirectionalLightCount = static_cast<std::uint32_t>(directionalLightCount),
-	    .PointLightCount = static_cast<std::uint32_t>(pointLightCount),
-	    .SpotLightCount = static_cast<std::uint32_t>(spotLightCount),
-	    .RectLightCount = static_cast<std::uint32_t>(rectLightCount)};
-
-	payloads.DirectionalLights.reserve(directionalLightCount);
-	payloads.PointLights.reserve(pointLightCount);
-	payloads.SpotLights.reserve(spotLightCount);
-	payloads.RectLights.reserve(rectLightCount);
-
-	for (std::size_t lightIndex = 0; lightIndex < directionalLightCount; ++lightIndex)
+	output.clear();
+	output.reserve(lights.size());
+	for (std::size_t lightIndex = 0; lightIndex < lights.size(); ++lightIndex)
 	{
-		const DirectionalLight& light = preparedScene.directionalLights[lightIndex];
+		const DirectionalLight& light = lights[lightIndex];
 
-		payloads.DirectionalLights.push_back(
+		output.push_back(
 		    DirectionalLightGpuData{
 		        .Direction = {light.direction.x, light.direction.y, light.direction.z},
 		        .Illuminance = light.illuminance,
@@ -58,12 +34,17 @@ void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, Re
 		        .AngularSizeRadians = light.angularSizeRadians,
 		        .CastShadow = light.bCastShadow ? 1u : 0u});
 	}
+}
 
-	for (std::size_t lightIndex = 0; lightIndex < pointLightCount; ++lightIndex)
+static void PackPointLights(const RenderLightCollection<PointLight>& lights, std::vector<PointLightGpuData>& output)
+{
+	output.clear();
+	output.reserve(lights.size());
+	for (std::size_t lightIndex = 0; lightIndex < lights.size(); ++lightIndex)
 	{
-		const PointLight& light = preparedScene.pointLights[lightIndex];
+		const PointLight& light = lights[lightIndex];
 
-		payloads.PointLights.push_back(
+		output.push_back(
 		    PointLightGpuData{
 		        .Position = {light.position.x, light.position.y, light.position.z},
 		        .Range = light.range,
@@ -73,12 +54,17 @@ void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, Re
 		        .Radius = light.radius,
 		        .CastShadow = light.bCastShadow ? 1u : 0u});
 	}
+}
 
-	for (std::size_t lightIndex = 0; lightIndex < spotLightCount; ++lightIndex)
+static void PackSpotLights(const RenderLightCollection<SpotLight>& lights, std::vector<SpotLightGpuData>& output)
+{
+	output.clear();
+	output.reserve(lights.size());
+	for (std::size_t lightIndex = 0; lightIndex < lights.size(); ++lightIndex)
 	{
-		const SpotLight& light = preparedScene.spotLights[lightIndex];
+		const SpotLight& light = lights[lightIndex];
 
-		payloads.SpotLights.push_back(
+		output.push_back(
 		    SpotLightGpuData{
 		        .Position = {light.position.x, light.position.y, light.position.z},
 		        .Range = light.range,
@@ -91,12 +77,17 @@ void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, Re
 		        .OuterAngleCosine = light.outerAngleCosine,
 		        .CastShadow = light.bCastShadow ? 1u : 0u});
 	}
+}
 
-	for (std::size_t lightIndex = 0; lightIndex < rectLightCount; ++lightIndex)
+static void PackRectLights(const RenderLightCollection<RectLight>& lights, std::vector<RectLightGpuData>& output)
+{
+	output.clear();
+	output.reserve(lights.size());
+	for (std::size_t lightIndex = 0; lightIndex < lights.size(); ++lightIndex)
 	{
-		const RectLight& light = preparedScene.rectLights[lightIndex];
+		const RectLight& light = lights[lightIndex];
 
-		payloads.RectLights.push_back(
+		output.push_back(
 		    RectLightGpuData{
 		        .Position = {light.position.x, light.position.y, light.position.z},
 		        .Width = light.width,
@@ -107,4 +98,38 @@ void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, Re
 		        .Color = {light.color.x, light.color.y, light.color.z},
 		        .CastShadow = light.bCastShadow ? 1u : 0u});
 	}
+}
+
+static void ValidateLightCounts(const PreparedRenderScene& preparedScene)
+{
+	const std::size_t directionalLightCount = preparedScene.directionalLights.size();
+	const std::size_t pointLightCount = preparedScene.pointLights.size();
+	const std::size_t spotLightCount = preparedScene.spotLights.size();
+	const std::size_t rectLightCount = preparedScene.rectLights.size();
+
+	ValidateLightCount("directional", directionalLightCount, 2u);
+	ValidateLightCount("point", pointLightCount, 1024u);
+	ValidateLightCount("spot", spotLightCount, 1024u);
+	ValidateLightCount("rect", rectLightCount, 1024u);
+}
+
+static SceneLightingUniformData BuildSceneLightingUniform(const PreparedRenderScene& preparedScene) noexcept
+{
+	return SceneLightingUniformData{
+	    .DirectionalLightCount = static_cast<std::uint32_t>(preparedScene.directionalLights.size()),
+	    .PointLightCount = static_cast<std::uint32_t>(preparedScene.pointLights.size()),
+	    .SpotLightCount = static_cast<std::uint32_t>(preparedScene.spotLights.size()),
+	    .RectLightCount = static_cast<std::uint32_t>(preparedScene.rectLights.size())};
+}
+
+void BuildRenderGpuLightingPayloads(const PreparedRenderScene& preparedScene, RenderGpuLightingPayloads& payloads)
+{
+	ValidateLightCounts(preparedScene);
+
+	PackDirectionalLights(preparedScene.directionalLights, payloads.DirectionalLights);
+	PackPointLights(preparedScene.pointLights, payloads.PointLights);
+	PackSpotLights(preparedScene.spotLights, payloads.SpotLights);
+	PackRectLights(preparedScene.rectLights, payloads.RectLights);
+
+	payloads.Uniform = BuildSceneLightingUniform(preparedScene);
 }

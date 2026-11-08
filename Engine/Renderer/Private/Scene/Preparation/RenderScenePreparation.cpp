@@ -30,8 +30,8 @@ private:
 	static void ReleaseInputViews(RenderScenePreparationRun& run) noexcept;
 
 	TaskExecutor* m_taskExecutor = nullptr;
-	RenderScenePreparationInputResolver m_inputResolver;
-	RenderDeformationPreparation m_deformationPreparation;
+	const GpuMeshCache* m_gpuMeshCache = nullptr;
+	const TextureCache* m_textureCache = nullptr;
 	RenderScenePreparationRun m_run;
 	CompiledTaskGraph m_graph;
 	RenderScenePreparationCapacity m_capacity;
@@ -39,14 +39,16 @@ private:
 
 RenderScenePreparation::Impl::Impl(TaskExecutor& taskExecutor, GpuMeshCache& gpuMeshCache, TextureCache& textureCache) noexcept :
     m_taskExecutor(&taskExecutor),
-    m_inputResolver(gpuMeshCache, textureCache)
+    m_gpuMeshCache(&gpuMeshCache),
+    m_textureCache(&textureCache)
 {
 }
 
 void RenderScenePreparation::Impl::Execute(RenderScene& scene, PreparedRenderScene& output)
 {
 	BeginRun(output);
-	m_inputResolver.Resolve(scene, m_deformationPreparation, m_run);
+	ResolveRenderScenePreparationInputs(scene, *m_gpuMeshCache, *m_textureCache, m_run);
+	PrepareRenderDeformation(scene, m_run.ResolvedPrimitives, m_run.Deformation);
 	EnsureGraph();
 
 	if (!ExecuteCompiledGraph())

@@ -2,28 +2,18 @@
 
 #include "World/Extraction/WorldExtractionStorage.h"
 
-#include "World/ECS/Components/RenderingComponents.h"
-#include "World/ECS/EntityRegistry.h"
-
 #include <algorithm>
 
 namespace ECS
 {
-	bool WorldExtractionStorage::Prepare(const EntityRegistry& registry)
+	void WorldExtractionStorage::Prepare(std::size_t meshCount)
 	{
-		const std::size_t meshCount = registry.GetStorage<MeshInstance>().GetEntities().size();
-		if (m_structureVersion != registry.GetStructureVersion() || m_meshSlots.size() != meshCount)
-		{
-			m_meshSlots.clear();
-			m_meshSlots.resize(meshCount);
-			m_extractedMeshes.reserve(meshCount);
-			m_structureVersion = registry.GetStructureVersion();
-		}
+		m_meshSlots.resize(meshCount);
+		m_extractedMeshes.reserve(meshCount);
 		for (MeshSlot& slot : m_meshSlots)
 		{
 			slot.bIncluded = false;
 		}
-		return true;
 	}
 
 	void WorldExtractionStorage::CommitMeshes(std::span<const SceneMeshInstanceGroupData> groups)

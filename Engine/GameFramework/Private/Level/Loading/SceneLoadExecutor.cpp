@@ -11,15 +11,9 @@
 #include "Tasks/Public/TaskExecutor.h"
 #include "Tasks/Public/TaskScope.h"
 
+#include <utility>
 #include <chrono>
 #include <format>
-#include <unordered_set>
-
-class SceneLoadLimits final
-{
-public:
-	static constexpr std::size_t kMaximumAssetsPerRequest = 256;
-};
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_sceneLoadExecutorLogger, "GameFramework.SceneLoadExecutor");
 
@@ -63,36 +57,9 @@ namespace Assets
 		{
 			Diagnostics::Fatal(g_sceneLoadExecutorLogger, __FILE__, __LINE__, "A scene-load task graph was started before the previous graph settled.");
 		}
-		if (level.sceneAssetIds.size() > SceneLoadLimits::kMaximumAssetsPerRequest)
-		{
-			throw Diagnostics::Error("Level exceeds the bounded scene-asset request capacity.");
-		}
-
 		auto shared = std::make_shared<SceneLoadWorkState>(Filesystem::GetCookedAssetRootPath());
 		m_control->Catalog = LoadSceneAssetCatalog(m_control->NextCatalogGeneration++);
-		shared->Package = std::make_unique<SceneLoadPackage>();
-		shared->Package->RequestId = requestId;
-		shared->Package->WorldGeneration = worldGeneration;
-		shared->Package->DocumentGeneration = documentGeneration;
-		shared->Package->CatalogGeneration = m_control->Catalog->GetGeneration();
-		shared->Package->Level = std::move(level);
-		shared->Assets.reserve(shared->Package->Level.sceneAssetIds.size());
-
-		std::unordered_set<std::string> identities;
-		for (const SceneAssetId& id : shared->Package->Level.sceneAssetIds)
-		{
-			if (id.IsEmpty() || !identities.insert(id.value).second)
-			{
-				throw Diagnostics::Error(id.IsEmpty() ? "Level contains an empty scene asset identity." : std::format("Level contains duplicate scene asset identity '{}'.", id.value));
-			}
-			const std::optional<std::filesystem::path> manifest = m_control->Catalog->Resolve(id.GetCatalogValue());
-			if (!manifest)
-			{
-				throw Diagnostics::Error(
-				    std::format("Scene asset catalog ID '{}' for instance '{}' is absent from catalog generation {}.", id.GetCatalogValue(), id.value, m_control->Catalog->GetGeneration()));
-			}
-			shared->Assets.emplace_back(shared->Publication, shared->AllocationBudget, id, *manifest);
-		}
+		shared->PreparePackage(requestId, worldGeneration, documentGeneration, std::move(level), *m_control->Catalog);
 
 		const CompiledTaskGraph graph = BuildSceneLoadTaskGraph(shared);
 		if (!graph)
@@ -100,8 +67,13 @@ namespace Assets
 			Diagnostics::Fatal(g_sceneLoadExecutorLogger, __FILE__, __LINE__, graph.GetError().Message);
 		}
 
+		Launch(std::move(shared), graph);
+	}
+
+	void SceneLoadExecutor::Launch(std::shared_ptr<SceneLoadWorkState> shared, const CompiledTaskGraph& graph)
+	{
 		m_control->Scope = std::make_unique<TaskScope>(TaskScopeDesc{TaskScopeKind::Document, std::format("Load level {}", shared->Package->Level.name)}, &m_control->ApplicationScope);
-		m_control->RequestId = requestId;
+		m_control->RequestId = shared->Package->RequestId;
 		m_control->Shared = shared;
 		m_control->Execution = m_control->Executor.Launch(*m_control->Scope, graph, TaskExecutionContext(shared));
 		if (!m_control->Execution.IsValid())

@@ -30,9 +30,16 @@ CameraInputIntentCollector::~CameraInputIntentCollector() noexcept
 	EndMouseLook();
 }
 
+CameraInputIntent CameraInputIntentCollector::Collect() noexcept
+{
+	const float width = static_cast<float>(m_window.GetWidth());
+	const float height = static_cast<float>(m_window.GetHeight());
+	return Collect(height > 0.0f ? width / height : 1.0f);
+}
+
 CameraInputIntent CameraInputIntentCollector::Collect(float aspectRatio) noexcept
 {
-	const bool bCameraInputBlocked = GetForegroundWindow() != m_window.GetHWND() || m_inputSystem.GetState(InputLayer::Gameplay).IsMouseButtonDown(MouseButton::Right) == false;
+	const bool bCameraInputBlocked = !m_inputSystem.GetState(InputLayer::Gameplay).IsMouseButtonDown(MouseButton::Right);
 
 	if (bCameraInputBlocked)
 	{
@@ -70,9 +77,12 @@ void CameraInputIntentCollector::OnMouseButton(const MouseButtonEvent& event) no
 	}
 	if (event.IsPressed() && !m_bMouseLookActive)
 	{
-		m_bMouseLookActive = true;
 		m_inputSystem.CaptureMouse();
-		m_inputSystem.SetCursorVisibility(false);
+		m_bMouseLookActive = m_inputSystem.IsMouseCaptured();
+		if (m_bMouseLookActive)
+		{
+			m_inputSystem.SetCursorVisibility(false);
+		}
 	}
 	else if (event.IsReleased() && m_bMouseLookActive)
 	{

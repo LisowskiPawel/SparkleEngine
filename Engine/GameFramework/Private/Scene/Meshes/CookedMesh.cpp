@@ -1,13 +1,14 @@
 #include "PCH.h"
 #include "Scene/Meshes/CookedMesh.h"
+#include <utility>
 
 CookedMesh::CookedMesh(MeshData&& meshData) noexcept :
-    Mesh(std::move(meshData))
+    m_meshData(std::move(meshData))
 {
 }
 
 CookedMesh::CookedMesh(MeshData&& meshData, Assets::CookedAssetId assetId) noexcept :
-    Mesh(std::move(meshData)),
+    m_meshData(std::move(meshData)),
     m_assetId(assetId)
 {
 }

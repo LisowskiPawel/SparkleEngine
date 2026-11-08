@@ -5,7 +5,7 @@
 #include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 
-namespace Filesystem::Private
+namespace Filesystem
 {
 	void RebuildCookedAssetPaths(FileSystemPathState& state)
 	{

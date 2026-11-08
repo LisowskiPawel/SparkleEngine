@@ -19,8 +19,27 @@ namespace ECS
 
 		const auto meshes = state.GetExtractedMeshes();
 		m_objectExtractor.Extract(meshes, m_identities, submission.Scene.Structural);
-		m_resourcePublisher.Publish(state.GetExtractedMeshGroups(), state.ReadSkyEnvironment(), resources, submission.Scene.Structural);
-		m_dynamicExtractor.Extract(state, resources, readView, meshes, m_objectExtractor, m_identities, submission.Scene.Dynamic);
+		m_resourcePublisher.Publish(state.GetExtractedMeshGroups(), state.ReadSkyEnvironment(), resources.Materials, resources.Textures, submission.Scene.Structural);
+		m_dynamicExtractor.ExtractObjects(meshes, m_objectExtractor, submission.Scene.Dynamic);
+
+		m_dynamicExtractor.ExtractSkinning(
+		    state.m_registry.GetStorage<SkinningState>(),
+		    state.m_registry.GetStorage<AnimationState>(),
+		    state.m_animationOutput,
+		    resources.Skeletons,
+		    meshes,
+		    m_objectExtractor,
+		    submission.Scene.Dynamic);
+
+		m_dynamicExtractor.ExtractMorphWeights(
+		    state.m_registry.GetStorage<MorphState>(),
+		    state.m_registry.GetStorage<AnimationState>(),
+		    state.m_animationOutput,
+		    state.m_morphWeights,
+		    m_objectExtractor,
+		    submission.Scene.Dynamic);
+
+		m_dynamicExtractor.ExtractLights(readView, m_identities, submission.Scene.Dynamic);
 		return submission;
 	}
 

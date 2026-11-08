@@ -62,17 +62,20 @@ and release evidence remain with their existing owners.
 
 The fixed world pipeline uses task-local typed outputs and world-owner commits. There is no generic structural command buffer, temporary-entity remapping, command conflict tracker, or hashed component-schema catalog. The unused private scaffolding and registry/storage bulk-add, component-removal and reset APIs were retired; scene activation, real world edits, frozen queries and render extraction retain their existing paths.
 
-Source ownership reconciled on 2026-10-27. `GameWorldSystems.cpp` composes the
-eleven-stage graph in execution order and owns the frozen-epoch execution flow.
-`GameWorldSystemDeclarations.cpp` constructs each stage through a focused private
-function, keeping query/resource access, phase, prerequisites, range policy, item
-count and body together. Prerequisites use indices returned by the same graph
-builder; there is no separate hashed system identity or per-frame binding
-registry. `GameWorldSystemPreparation.cpp` implements resource admission and
-scratch sizing on the existing `GameWorldState`; execution orchestration retains
-freeze, run and success-only dirty-state clearing. Helpers retain no new state,
-descriptor copies or epoch references. This is source/build preservation evidence,
-not runtime, determinism or performance acceptance.
+Source ownership reconciled on 2026-11-08. `GameWorldSystems.cpp` composes the
+eleven-stage graph and implements `GameWorldState::ExecuteSystems`: prepare,
+freeze structure, execute, and clear dirty inputs only after success.
+`GameWorldSystemDeclarations.cpp` keeps each stage's query/resource access, phase,
+prerequisites, range policy, count and body together. Prerequisites use indices
+returned by the same graph builder, without hashed identities or a binding
+registry. The frame execution object owns typed queries for the frozen epoch;
+simulation, animation, transform and mesh-extraction clients borrow only their
+queries, resource stores and output ranges. They retain no `GameWorldState`
+reference and have no world friendship. Dirty-transform counts remain live vector
+borrows because prerequisite commits can grow that work before its wave starts.
+`GameWorldSystemCommit.cpp` implements deterministic change merging and extraction
+publication as operations of the existing world authority. No parallel mutable
+world representation or generic command framework is introduced.
 
 Compilation retains phase/resource validation, write-hazard rejection, and cycle rejection, then records dependency waves. The host submits each wave through `SparkleTasks`, resolving item counts after prerequisite commits. Empty stages add no tasks; serial workloads add one task; larger stages use the shared `ParallelFor` implementation. The frozen structure epoch spans all waves and deterministic output commits. Failure stops subsequent waves and prevents successful world publication. Each wave retains one compiled Tasks graph and its item-count key; count changes replace it after the previous submission settles. Cached callbacks obtain the current frame execution owner from the typed Tasks context, never from a retained frame reference. Graph construction occurs on count changes, while host settlement remains a scheduling cost; fewer scheduled nodes alone do not establish a frame-time improvement.
 
@@ -80,12 +83,72 @@ System declarations and their phase, component/resource-access and prerequisite 
 
 `CompiledGameSystemGraph` exposes validity, errors and execution; it has no `GetSystems` inspection accessor. Its executable records remain in the private compiled-data header, consumed by the implementation, compiler and executor. [FCR-WORLD-01's FWC-3 result](../../../../Acceptance/FeatureCompletionReports.md#foundation-contract-progress) records the earlier accessor deletion and its source-only limits. Narrowing retained system records does not alter validation policy, wave topology, task ranges, world publication or extraction semantics; frame-time and GPU claims require their own evidence.
 
+### Orchestration And Capability Mechanics
+
+`LevelSession` sequences completion admission, cancellation/failure handling,
+activation and notifications. Event construction remains with that session;
+`LevelWorldProjection` converts a held world publication into authored level
+values for saving. `SceneLoadExecutor` owns request and task-scope lifetimes,
+while `SceneLoadWorkState` prepares packages and implements read, decode and
+finalization tasks. `SceneLoadTaskGraph` composes those operations with its
+existing two-asset read/decode throttle. The read scope still starts before fresh
+catalog resolution and lasts through worker settlement.
+
+`LevelParser` owns file opening and atomic persistence. `LevelDocumentFormat`
+owns the stream schema, section dispatch, validation and source-line diagnostics;
+the scalar reader rejects non-finite values before camera, sky or light fields
+consume them. Description vectors move from decoding into the level asset.
+
+`GameSystemGraphExecution` sequences dependency waves. `GameSystemWaveExecution`
+owns count-key refresh, task-plan construction, range execution and settlement;
+cached callbacks retain stable compiled records and obtain the current frame
+from the submission context. Empty work, serial thresholds, failure propagation
+and count resolution after prerequisite commits retain the same contracts.
+
+Extraction storage accepts mesh cardinality rather than registry access and
+resets inclusion for every frame, including equal-sized structural changes.
+Resource publication borrows only the immutable material and texture stores;
+world-edit dispatch receives only the material-variant store alongside its
+semantic world-edit target. The composition owners bind these dependencies.
+
+Dense ECS storage grows its entity/component arrays geometrically and reserves
+both before appending either row. Explicit preallocation remains available;
+ordinary insertion does not force a fresh allocation for each entity.
+
+Cooked mesh, animation and skeleton decoding expose header admission, record
+reading, semantic validation and conversion as focused operations. Allocation
+charges belong beside the payload allocation in each appender, including mesh
+binding construction, rather than a second schema in the payload orchestrator.
+Morph records require a terminated fixed-capacity name and finite default weight
+before string conversion. Stateless parsers, loaders, translators and evaluators
+are direct namespace functions; they do not create collaborator instances or
+static-only class shells. Shared entity transform/visibility operations live in
+`GameWorldEntityProperties`, outside the camera-specific implementation.
+
+Scene construction creates one immutable resource per payload mesh asset and
+moves its geometry once. Instances share `const Mesh` leases while their
+transforms, materials and deformation state remain independent. A resource-store
+entry retains a lease; rolling back one entry does not invalidate another
+instance's resource. `CookedMesh` owns static geometry, and `SkeletalCookedMesh`
+owns skeletal geometry once inside its deformation data. The polymorphic
+`Mesh::GetMeshData` contract borrows that authoritative geometry rather than
+requiring a duplicate base-class copy. Dynamic extraction receives typed stores
+and animation/deformation borrows from its composition owner, without direct
+access to private world state. Material-variant translation borrows the staged
+mesh entity span, and selection applies through a bounded material-write callable;
+neither capability depends on the complete world implementation.
+
+These are ownership and source contracts. Focused builds and temporary native
+checks support the change; they do not establish GPU, visual, package, frame-time
+or release acceptance, and the readiness and evidence classifications above are
+unchanged.
+
 ### Scene Activation And Read Publication
 
 Source ownership reconciled on 2026-11-03. `GameWorld::CommitSceneLoadPackage`
 orders isolated-world construction, level initialization, staged population and
 validation, and the accepted state/resource swap.
-Private `World/SceneLoadWorldStaging` owns entity-count validation, authored
+Private `World/Loading/SceneLoadWorldStaging` owns entity-count validation, authored
 camera/sky/light initialization, payload traversal, camera selection and final
 resource/entity checks. `GameWorldSceneAssetCommitter` is a file owner for the
 direct `CommitSceneAssetPayload` function; it retains no committer object or

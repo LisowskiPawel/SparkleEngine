@@ -3,15 +3,20 @@
 #include "MeshExtractionSystemExecution.h"
 
 #include "World/Extraction/WorldExtractionStorage.h"
-#include "World/GameWorldState.h"
+#include "World/Resources/MeshResourceStore.h"
 #include "World/Resources/SkeletonResourceStore.h"
 
 namespace ECS
 {
-	MeshExtractionSystemExecution::MeshExtractionSystemExecution(GameWorldState& state, const SkeletonResourceStore& skeletons, const StructureFrozenEpoch& epoch) :
-	    m_state(state),
+	MeshExtractionSystemExecution::MeshExtractionSystemExecution(
+	    MeshExtractionQuery& query,
+	    const MeshResourceStore& meshes,
+	    const SkeletonResourceStore& skeletons,
+	    std::span<WorldExtractionStorage::MeshSlot> slots) :
+	    m_query(query),
+	    m_meshes(meshes),
 	    m_skeletons(skeletons),
-	    m_query(state.m_registry, epoch)
+	    m_slots(slots)
 	{
 	}
 
@@ -22,17 +27,15 @@ namespace ECS
 
 	bool MeshExtractionSystemExecution::Run(std::uint32_t begin, std::uint32_t end)
 	{
-		std::span<WorldExtractionStorage::MeshSlot> slots = m_state.m_extraction.GetMeshSlots();
-
 		return m_query
 		    .ForEachRange(
 		        begin,
 		        end,
-		        [this, slots](std::size_t index, EntityId entity, const MeshInstance& mesh, const Visibility& visibility, const WorldTransform& world)
+		        [this](std::size_t index, EntityId entity, const MeshInstance& mesh, const Visibility& visibility, const WorldTransform& world)
 		        {
-			        WorldExtractionStorage::MeshSlot& slot = slots[index];
+			        WorldExtractionStorage::MeshSlot& slot = m_slots[index];
 			        slot.Entity = entity;
-			        const std::shared_ptr<const Mesh> resource = m_state.m_meshResources.ResolveImmutable(mesh.Resource);
+			        const std::shared_ptr<const Mesh> resource = m_meshes.ResolveImmutable(mesh.Resource);
 			        slot.bIncluded = resource != nullptr;
 			        if (!slot.bIncluded)
 			        {

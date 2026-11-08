@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Assets/Cooked/LoadedMeshAsset.h"
 
@@ -10,9 +10,8 @@ namespace Assets
 {
 	class CookedAssetAllocationBudget;
 
-	class MeshAssetLoader final
+	namespace MeshAssetLoader
 	{
-	public:
-		LoadedMeshAsset Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget) const;
-	};
+		LoadedMeshAsset Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
+	}
 }

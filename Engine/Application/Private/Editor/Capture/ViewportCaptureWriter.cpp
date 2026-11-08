@@ -5,7 +5,7 @@
 #include "Core/Public/Files/FileUtils.h"
 #include "Editor/Capture/ImageEncoding.h"
 
-ViewportCaptureResult ViewportCaptureWriter::Write(ViewportCaptureReadback readback, const std::filesystem::path& outputPath, std::stop_token cancellationToken) noexcept
+ViewportCaptureResult ViewportCaptureWriter::Write(ViewportCaptureReadback readback, const std::filesystem::path& outputPath, std::stop_token cancellationToken)
 {
 	ViewportCaptureResult result = readback.Result;
 	if (cancellationToken.stop_requested())

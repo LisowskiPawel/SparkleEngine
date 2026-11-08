@@ -2,7 +2,7 @@
 
 #include "World/Resources/MaterialVariantResourceStore.h"
 
-#include "World/GameWorldState.h"
+#include <utility>
 
 void MaterialVariantResourceStore::Append(std::vector<MaterialVariantDesc> variants, std::vector<MaterialVariantBinding> bindings)
 {
@@ -22,28 +22,14 @@ void MaterialVariantResourceStore::Append(std::vector<MaterialVariantDesc> varia
 	}
 }
 
-bool MaterialVariantResourceStore::Apply(MaterialVariantIndex index, ECS::GameWorldState& world)
+WorldMaterialVariantView MaterialVariantResourceStore::CaptureView() const
 {
-	if (index >= m_variants.size())
+	WorldMaterialVariantView view;
+	view.Active = m_active;
+	view.Names.reserve(m_variants.size());
+	for (const MaterialVariantDesc& variant : m_variants)
 	{
-		return false;
+		view.Names.push_back(variant.name);
 	}
-	bool bApplied = false;
-	for (const MaterialVariantBinding& binding : m_bindings)
-	{
-		if (binding.Variant == index)
-		{
-			bApplied = world.WriteMeshMaterial(binding.Entity, binding.Material) || bApplied;
-		}
-	}
-	if (bApplied)
-	{
-		m_active = index;
-	}
-	return bApplied;
-}
-
-std::string_view MaterialVariantResourceStore::GetName(std::size_t index) const noexcept
-{
-	return index < m_variants.size() ? std::string_view(m_variants[index].name) : std::string_view{};
+	return view;
 }

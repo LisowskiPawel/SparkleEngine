@@ -72,7 +72,7 @@ static TextureFormatIntent ResolveFormatIntent(std::uint32_t storedValue)
 	throw Diagnostics::Error(std::format("Cooked texture stores unknown format intent {}.", storedValue));
 }
 
-CookedTextureFilePayload CookedTextureLoader::Read(const std::filesystem::path& texturePath)
+CookedTextureFilePayload ReadCookedTexturePayload(const std::filesystem::path& texturePath)
 {
 	CookedTextureFilePayload payload;
 	const auto resolvedPath = Filesystem::ResolveCookedTexturePath(texturePath);
@@ -89,7 +89,7 @@ CookedTextureFilePayload CookedTextureLoader::Read(const std::filesystem::path& 
 	return payload;
 }
 
-LoadedTextureData CookedTextureLoader::Decode(const CookedTextureFilePayload& payload, std::uint64_t maximumDecodedBytes)
+LoadedTextureData DecodeCookedTexture(const CookedTextureFilePayload& payload, std::uint64_t maximumDecodedBytes)
 {
 	if (payload.ResolvedPath.empty() || payload.Bytes.empty())
 	{
