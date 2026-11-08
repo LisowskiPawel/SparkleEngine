@@ -163,7 +163,7 @@ Silent substitution is not support. A requested ray/provider/debug path that can
 - Occlusion, LOD, mesh/task shaders, GPU-driven indirect draws, stereo, and multiview are absent.
 - Deferred decals, color grading and HDR10 display output remain first-release targets without implementation. Chromatic aberration/vignette have connected basic passes with open semantic/native proof. Volumetric lighting and frame generation remain outside first-release scope; selected bounded volumetrics belong to later M5R work.
 - NVIDIA reconstruction/latency integrations are optional and do not imply Vulkan, non-NVIDIA, package, or quality support.
-- The Reference Path Tracer cannot be used as an acceptance oracle until its discovery/derivation/evidence gate passes.
+- Reference discovery is accepted and source is delivered; oracle use still requires the remaining numerical, native, artifact and candidate acceptance gates.
 - Source inspection does not establish visual quality, temporal stability, performance, memory bounds, native validation, or release readiness.
 
 ## Evidence And Reference
