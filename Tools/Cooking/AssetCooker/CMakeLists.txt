@@ -86,6 +86,7 @@ target_include_directories(AssetCooker
 )
 
 target_compile_features(AssetCooker PRIVATE cxx_std_20)
+sparkle_target_precompile_headers(AssetCooker <CLI/CLI.hpp>)
 if(MSVC)
     # Bound CLI11 parser/help code size without changing the cooking libraries.
     target_compile_options(AssetCooker PRIVATE

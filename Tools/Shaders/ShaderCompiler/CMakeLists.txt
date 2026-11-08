@@ -10,6 +10,11 @@ if(NOT SPARKLE_WITH_GPU_CRASH_DEBUGGING)
     list(FILTER SHADER_COMPILER_PRIVATE_SOURCES EXCLUDE REGEX "/Cooking/Publication/ShaderDebugSourceIdentity\\.cpp$")
 endif()
 
+set(SHADER_COMPILER_CLI_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCompilerCli.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCookOptions.cpp)
+list(REMOVE_ITEM SHADER_COMPILER_PRIVATE_SOURCES ${SHADER_COMPILER_CLI_SOURCES})
+
 add_executable(ShaderCompiler
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp
     ${SHADER_COMPILER_PRIVATE_SOURCES}
@@ -103,17 +108,20 @@ target_compile_definitions(ShaderCompiler
 
 target_compile_features(ShaderCompiler PRIVATE cxx_std_20)
 
-set_source_files_properties(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCompilerCli.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCookOptions.cpp
-    PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+add_library(ShaderCompilerCli OBJECT ${SHADER_COMPILER_CLI_SOURCES})
+target_include_directories(ShaderCompilerCli PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private
+    ${CMAKE_SOURCE_DIR}/Engine
+    ${CMAKE_SOURCE_DIR}/Engine/Core/Public/Diagnostics)
+target_link_libraries(ShaderCompilerCli PRIVATE CLI11::CLI11 SparkleCore ShaderContracts ToolSupport)
+target_compile_features(ShaderCompilerCli PRIVATE cxx_std_20)
+target_compile_definitions(ShaderCompilerCli PRIVATE CLI11_ENABLE_EXTRA_VALIDATORS=0)
+sparkle_target_precompile_headers(ShaderCompilerCli <CLI/CLI.hpp>)
+target_link_libraries(ShaderCompiler PRIVATE ShaderCompilerCli)
 
 if(MSVC)
     # Argument parsing is cold code; bound header-only CLI11 inlining without changing shader compilation.
-    set_property(SOURCE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCompilerCli.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/ShaderCookOptions.cpp
-        APPEND PROPERTY COMPILE_OPTIONS
+    target_compile_options(ShaderCompilerCli PRIVATE
             "$<$<CONFIG:DevelopmentEditor,DevelopmentGame,ShippingEditor,ShippingGame>:/O1>"
             "$<$<CONFIG:DevelopmentEditor,DevelopmentGame,ShippingEditor,ShippingGame>:/Ob0>")
 endif()
@@ -187,6 +195,6 @@ add_custom_target(ShaderCompilerCliValidation
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp)
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "" FILES ${SHADER_COMPILER_PRIVATE_SOURCES} ${SHADER_COMPILER_PRIVATE_HEADERS})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "" FILES ${SHADER_COMPILER_PRIVATE_SOURCES} ${SHADER_COMPILER_PRIVATE_HEADERS} ${SHADER_COMPILER_CLI_SOURCES})
 
 sparkle_configure_gpu_crash_artifacts(ShaderCompiler)

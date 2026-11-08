@@ -222,7 +222,6 @@ set(SPARKLE_LAUNCHER_GUI_HEADERS
 set(SPARKLE_LAUNCHER_PRIVATE_SOURCES
     ${SPARKLE_LAUNCHER_GUI_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Startup/LauncherShadowExecution.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellArguments.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShell.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellModel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellOperations.cpp
@@ -317,12 +316,19 @@ target_link_libraries(SparkleLauncher
 )
 
 target_compile_features(SparkleLauncher PRIVATE cxx_std_20)
-target_compile_definitions(SparkleLauncher PRIVATE CLI11_ENABLE_EXTRA_VALIDATORS=0)
+
+# Cache the header-only parser only for its owning compilation unit.
+add_library(SparkleLauncherCli OBJECT Private/Shell/LauncherShellArguments.cpp)
+target_include_directories(SparkleLauncherCli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Private)
+target_link_libraries(SparkleLauncherCli PRIVATE CLI11::CLI11 SparkleLauncherCore)
+target_compile_features(SparkleLauncherCli PRIVATE cxx_std_20)
+target_compile_definitions(SparkleLauncherCli PRIVATE CLI11_ENABLE_EXTRA_VALIDATORS=0)
+sparkle_target_precompile_headers(SparkleLauncherCli <CLI/CLI.hpp>)
+target_link_libraries(SparkleLauncher PRIVATE SparkleLauncherCli)
 
 if(MSVC)
     # Argument parsing is cold code; avoid duplicating the header-only SDK through inlining.
-    set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellArguments.cpp
-        APPEND PROPERTY COMPILE_OPTIONS
+    target_compile_options(SparkleLauncherCli PRIVATE
             "$<$<CONFIG:DevelopmentEditor,ShippingEditor>:/O1>"
             "$<$<CONFIG:DevelopmentEditor,ShippingEditor>:/Ob0>")
 endif()
