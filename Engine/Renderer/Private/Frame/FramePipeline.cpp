@@ -193,7 +193,6 @@ bool FramePipeline::AcceptFrameSubmission(RenderFrameSubmission& submission) noe
 	m_frameId = submission.FrameId;
 	if (bSceneReset)
 	{
-		m_textureCache->UnloadSceneTextures();
 		InvalidateViewHistory(RenderViewInvalidationReason::SceneGeneration);
 	}
 

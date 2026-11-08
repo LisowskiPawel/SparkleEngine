@@ -87,6 +87,7 @@ void RenderScene::SynchronizeRayTracingScene(const RenderSceneDelta& delta)
 
 void RenderScene::ResetSceneStorage()
 {
+	m_textureCache->UnloadSceneTextures();
 	m_renderGpuScene->Reset();
 	m_renderRayTracingScene->Clear();
 	for (const RenderPrimitive& primitive : m_primitives)

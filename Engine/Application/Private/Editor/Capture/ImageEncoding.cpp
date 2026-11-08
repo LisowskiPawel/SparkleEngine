@@ -10,13 +10,11 @@
 #include <cstdlib>
 #include <cstring>
 
-#if !SPARKLE_BUILD_SHIPPING
-  #define TINYEXR_USE_MINIZ 0
-  #define TINYEXR_USE_ZFP 0
-  #include <zlib.h>
-  #define TINYEXR_IMPLEMENTATION
-  #include <tinyexr.h>
-#endif
+#define TINYEXR_USE_MINIZ 0
+#define TINYEXR_USE_ZFP 0
+#include <zlib.h>
+#define TINYEXR_IMPLEMENTATION
+#include <tinyexr.h>
 
 enum class ImagePixelEncoding : std::uint8_t
 {
@@ -213,12 +211,6 @@ bool ImageEncoding::EncodeBmp(const ImageBufferView& image, std::vector<std::byt
 
 bool ImageEncoding::EncodeExr(const LinearRgbImage& image, std::vector<std::byte>& encodedBytes, std::string& errorMessage)
 {
-#if SPARKLE_BUILD_SHIPPING
-	(void) image;
-	(void) encodedBytes;
-	errorMessage = "EXR capture encoding is excluded from Shipping builds.";
-	return false;
-#else
 	const std::size_t pixelCount = static_cast<std::size_t>(image.Width) * image.Height;
 	std::array<std::vector<float>, 3> channels;
 	for (std::vector<float>& channel : channels)
@@ -277,5 +269,4 @@ bool ImageEncoding::EncodeExr(const LinearRgbImage& image, std::vector<std::byte
 	free(encoded);
 	errorMessage.clear();
 	return true;
-#endif
 }

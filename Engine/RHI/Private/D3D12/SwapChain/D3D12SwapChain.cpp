@@ -117,7 +117,7 @@ void D3D12SwapChain::Create()
 		const bool bNativeSwapChainResolved = bSwapChainUpgraded
 		    && m_rhi.TryResolveNativeInterface(ERhiInterposerInterfaceKind::PresentationSurface, m_externalSwapChain.Get(), IID_PPV_ARGS(m_swapChain.ReleaseAndGetAddressOf()));
 
-		if (!bNativeSwapChainResolved)
+		if (bNativeSwapChainResolved)
 		{
 			m_rhi.NotifyInterposerPresentationReady(true);
 			return;

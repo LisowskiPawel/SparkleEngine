@@ -146,8 +146,8 @@ target_link_libraries(SparkleApplicationEditor
         SparkleEditor
         SparkleTasks
         imgui
-        $<$<NOT:$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>>:tinyexr>
-        $<$<NOT:$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>>:ZLIB::ZLIB>
+        tinyexr
+        ZLIB::ZLIB
 )
 
 sparkle_configure_runtime_support_artifacts(SparkleApplication)

@@ -81,7 +81,7 @@ SparkleLauncher --level Empty --product game --game-profile ShippingGame --graph
 SparkleLauncher --level CornellBox --dry-run levels.sync
 ```
 
-The source and negative controls are recorded in [current FR-01 results](../../../../Acceptance/FirstRelease.md#current-fr-01-blockers); dry-run readiness is not runtime or release acceptance.
+The source and negative controls are recorded in [retained FR-01 results](../../../../Acceptance/FirstRelease.md#fr-01-source-requalification); dry-run readiness is not runtime or release acceptance.
 
 **Classic Sponza acquisition (2026-10-11):** selected sync uses a pinned 72-file manifest with verified lengths/hashes, preserving nested `glTF/` paths through the existing contained/transactional acquisition owner. The source stays under gitignored `Publisher/`; the level refers to the unmodified publisher glTF. Traversal, noncanonical paths, duplicates and digest mismatch reject publication. Acquisition does not certify bundled asset redistribution. [Recipe](../../../../../Projects/Showcase/Assets/Meshes/Sponza/README.md).
 

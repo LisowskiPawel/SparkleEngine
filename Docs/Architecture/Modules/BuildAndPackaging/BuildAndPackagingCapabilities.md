@@ -14,7 +14,7 @@
 
 **Current readiness:** **25/100** across build-to-release delivery — historical score; build/package and bounded CI routes now exist, while final package/adoption proof is open. This documentation pass does not rescore the module. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#product-build-and-delivery).
 
-**Identity amendment (2026-10-10):** [SparkleProductIdentity.cmake](../../../../CMake/SparkleProductIdentity.cmake) owns version `0.1.0`, publisher and copyright; root and standalone Launcher CMake entry points share it. Existing project-product and Launcher owners attach Windows version resources with public names Sparkle Editor, Sparkle Game and Sparkle Launcher. This adds executable identity, not a package/signing owner. [Current FR-01 report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) records validation and remaining blockers.
+**Identity amendment (2026-10-10):** [SparkleProductIdentity.cmake](../../../../CMake/SparkleProductIdentity.cmake) owns version `0.1.0`, publisher and copyright; root and standalone Launcher CMake entry points share it. Existing project-product and Launcher owners attach Windows version resources with public names Sparkle Editor, Sparkle Game and Sparkle Launcher. This adds executable identity, not a package/signing owner. [Retained FR-01 report](../../../Acceptance/FirstRelease.md#fr-01-source-requalification) records candidate-bound validation; [public rights and trust](../../../Acceptance/FirstRelease.md#public-rights-and-trust) remain FR-07 obligations.
 
 **Release inputs:** [First Release Inputs](PackagingAndInstallation.md#release-inputs) names product profiles, helper admission, acquisition-only Sponza/source-export boundaries, notices/SBOM, signing inputs and threat controls. Candidate results remain in Acceptance.
 
@@ -22,7 +22,7 @@
 
 **Public development setup (2026-10-11):** the [root README](../../../../README.md) uses the standalone Launcher entry; [Contributing](../../../../CONTRIBUTING.md) routes public review. A [bounded source workflow](#automation) is prepared; historical absence-of-CI rows below predate it. Hosted/build/GPU acceptance remains unproved.
 
-**Baseline owner checks:** after Launcher generates the canonical workspace, run `powershell -NoProfile -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor`. [RunBaselineChecks.ps1](../../../../CMake/RunBaselineChecks.ps1) records revision/dirty state and sequential results for `architecture_boundary_check`, `code_style_check` and `ShaderCompilerCliValidation`. Failed, timed-out, cancelled, skipped, unavailable or missing-artifact results prevent a pass. It adds no check semantics and does not certify fresh checkout, asset rights, full cook or runtime. Candidate/environment/artifact binding remains with the [acceptance report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers).
+**Baseline owner checks:** after Launcher generates the canonical workspace, run `powershell -NoProfile -File CMake/RunBaselineChecks.ps1 -Configuration ShippingEditor`. [RunBaselineChecks.ps1](../../../../CMake/RunBaselineChecks.ps1) records revision/dirty state and sequential results for `architecture_boundary_check`, `code_style_check` and `ShaderCompilerCliValidation`. Failed, timed-out, cancelled, skipped, unavailable or missing-artifact results prevent a pass. It adds no check semantics and does not certify fresh checkout, asset rights, full cook or runtime. Candidate/environment/artifact binding remains with the [acceptance report](../../../Acceptance/FirstRelease.md#fr-01-source-requalification).
 
 Use [build/profile rules](#build-contract), [generated-output layout](#canonical-generated-output-layout), [automation](#automation), or [packaging and diagnostics](PackagingAndInstallation.md).
 
@@ -268,7 +268,7 @@ CMake selects profile/options -> dependency owner resolves/fetches host and sour
 ## Explicit Non-Capabilities And Risks
 
 - The manifest-owned unsigned package and minimal repository-check workflow exist. Final public signing/rights, exact-archive and hosted-check evidence remain separate open results; no installer or general automated test service is selected.
-- As of `ITER-REL-01-03` (2026-10-10), declared Git refs use full commit hashes; Compressonator also validates cached revision, cleanliness and required paths. Cache overrides, archives, host SDKs and clean acquisition still require qualification. [Current FR-01 report](../../../Acceptance/FirstRelease.md#current-fr-01-blockers) owns the results.
+- As of `ITER-REL-01-03` (2026-10-10), declared Git refs use full commit hashes; Compressonator also validates cached revision, cleanliness and required paths. Cache overrides, archives, host SDKs and clean acquisition require candidate-bound qualification. [Retained FR-01 report](../../../Acceptance/FirstRelease.md#fr-01-source-requalification) owns its source results; changed-candidate reproduction belongs to FR-06.
 - Sanitizer options exist but the current Windows/MSVC product route does not make all sanitizer modes usable.
 - Development artifact staging can still rely on repository/project roots and does not prove redistributable clean-machine execution.
 - This inventory did not configure or build any target; current build health remains unknown in this pass.

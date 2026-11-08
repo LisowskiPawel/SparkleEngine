@@ -48,7 +48,7 @@ The [catalog](../../../Projects/Showcase/Levels.catalog) contains 20 levels and 
 | `ModernSponzaCandles`, `ModernSponzaKnight`, `JungleRuins`, `BistroExterior`, `BistroInteriorWine`, `SanMiguelHigh`, `SanMiguelLow`, `DamagedHelmet`, `StanfordBunnySubsurface`, `StanfordDragonSubsurface`, `AnisotropyBarnLamp`, `SheenCloth` | Excluded / twelve release examples; retained development/source workloads | Launcher/Showcase / PD-3 `CHK-PKG-01/02`: development/unavailable labelling and installed sync/run rejection, with no excluded recipe/content activation. |
 | `Bistro`, `StanfordBunny`, `StanfordDragon`, `AnisotropyBarnLamp`, `SheenCloth`, `SanMiguel`, `ModernSponzaIvy`, `ModernSponzaTrees`, `ModernSponzaCandles`, `ModernSponzaKnight`, `ModernSponzaFlood`, `ModernSponzaExplosion`, `JungleRuins`; optional `CornellBox` regeneration pack | Excluded / fourteen product acquisition packs; source definitions retained | Launcher/content / PD-3 `CHK-PKG-01/02`: no selected release-map closure reaches these packs. No missing importer, geometry-cache, volume or regeneration path is scheduled by this inventory. Moana remains deferred with no catalog entry. |
 
-Exact rights receipts and historical source/export rights remain FR-01 / `REL-01` and final FR-07 review. Selection, a license filename or a verified download does not grant redistribution or expand accepted PTD-00 transport.
+Exact rights receipts and historical source/export rights remain final FR-07 / `REL-01` review. Internal FR-01 is [complete for its recorded candidate](../FirstRelease.md#fr-01-source-requalification). Selection, a license filename or a verified download does not grant redistribution or expand accepted PTD-00 transport.
 
 ### Selector Gaps And Dispositions
 

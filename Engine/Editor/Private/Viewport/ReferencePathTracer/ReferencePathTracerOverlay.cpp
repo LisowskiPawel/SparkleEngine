@@ -29,7 +29,7 @@ constexpr std::array ProgressReasonLabels = {
     "Resumed retained prefix",
     "Retained prefix released by memory policy",
     "Perspective camera and a valid viewport are required",
-    "The scene contains unsupported material transport",
+    "The scene contains unsupported material or light transport",
     "Required GPU ray tracing or accumulation support is unavailable",
     "Another viewport owns the reference accumulator"};
 
