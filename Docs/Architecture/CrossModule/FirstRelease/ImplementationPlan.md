@@ -8,7 +8,7 @@ Remaining stages: [FR-03](#fr-03--feature-closure) / [FR-04](#fr-04--release-map
 
 **Purpose:** show the approved rendering well and make its results reproducible. Execute scene/pass/radiance, GPU correctness, quality and measured-cost work first. Supporting product/foundation changes are bounded repairs to a named rendering or reviewer-run blocker under [Roadmap scope protection](../../../Strategy/Roadmap.md#scope-protection); no subsystem-completeness program is selected. Keep the existing release gates and return to the rendered result after each supporting slice.
 
-Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for completed FR-00–02 internal scope and missing checks. [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) selects the next task; this page supplies only unfinished phase work. Recheck completed cells only when their admitted inputs change; final public rights/signing remain FR-07.
+FR-00 is complete; its [scope result and evidence](../../../Acceptance/FirstRelease.md#fr-00-reconciliation-result) remain in Acceptance. Start with [current progress](../../../Strategy/Roadmap.md#release-progress) for the remaining work and retained FR-01/02 results. [Roadmap](../../../Strategy/Roadmap.md#where-we-are-and-what-is-next) selects the next task; this page supplies only unfinished phase work. Final candidate scope/identity recheck belongs to FR-06; public rights/signing remain FR-07.
 
 [First Release Acceptance](../../../Acceptance/FirstRelease.md#release-gates) owns release verdicts. Feature-local Architecture checks and [candidate reports](../../../Acceptance/FeatureCompletionReports.md) own feature proof.
 

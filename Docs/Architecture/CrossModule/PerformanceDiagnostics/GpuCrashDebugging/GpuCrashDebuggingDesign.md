@@ -1,8 +1,8 @@
 # GPU Crash Debugging Design
 
-[Docs](../../../../README.md) / [Up](../PerformanceDiagnosticsDesign.md) / [Research and comparisons](Research.md) / [Delivery status](../../../../Strategy/Roadmap.md#release-progress)
+[Docs](../../../../README.md) / [Up](../PerformanceDiagnosticsDesign.md) / [Research and comparisons](Research.md) / [Qualification and limits](#acceptance-and-controlled-failures)
 
-**Status:** implemented and qualified for the recorded Windows x64 NVIDIA candidate. The completed GCD plan is retired; [product reports](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain separate archive-bound acceptance.
+**Status:** delivered and qualified for the recorded Windows x64 NVIDIA candidate. No GCD implementation work remains; the completed plan and roadmap entry are retired. [Product reports](../../../../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain separate archive-bound acceptance.
 
 **Qualified:** 2026-10-20, `2bab6c366cf0d8e73ab1bd71d2059f43fc755763` plus the retained candidate patch; RTX 5070 Ti Laptop, driver 610.47. Exact inputs, commands, PE/PDB/shader identities and limits belong to `ITER-GCD-04-06` under `artifacts/validation/releases/0.1.0/`. Earlier records retain their original identities.
 

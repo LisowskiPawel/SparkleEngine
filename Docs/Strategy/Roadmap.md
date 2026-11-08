@@ -34,9 +34,7 @@ The first release is a rendering showcase. Select work by the rendered scene, pa
 
 | Work | Delivered / recorded | Remaining |
 | --- | --- | --- |
-| Scope / FR-00 | [Six product choices and source-candidate scope](../Acceptance/FirstRelease.md#fr-00-reconciliation-result). | Recheck changed dispositions and final candidate identity at FR-06; public rights remain FR-07. |
 | Identity / FR-01 | [Internal source qualification](../Acceptance/FirstRelease.md#fr-01-source-requalification) retains candidate `accba4ea` and its bounded results. | Requalify affected changed inputs. Final notice-byte binding, public rights/provenance and trust remain FR-07. |
-| GPU crash tooling / GCD | [Qualified tooling candidate and limits](../Architecture/CrossModule/PerformanceDiagnostics/GpuCrashDebugging/GpuCrashDebuggingDesign.md#acceptance-and-controlled-failures). | Reuse for native failures within its scope; recheck affected changes. |
 | Product / PD-1-4 and internal FR-02 | [Five technical reports](../Acceptance/FeatureCompletionReports.md#product-delivery-progress) retain their unsigned `a0f34c8b...` candidate; source preparation/publication has since changed. | Replace the archive carrying `S1` / `ISSUE-3` and requalify affected product/source/symbol cells under FR-06. `FCR-PROD-06` remains blocked; package removal remains excluded. |
 | Rendering foundations / selected repairs | [Recorded cursor, Tasks, world-accessor and publication slices](../Acceptance/FeatureCompletionReports.md#foundation-contract-progress); [current module owners](../Architecture/WholeRepositoryMap.md#repository-at-a-glance) contain the subsequent ownership refactors. | Reuse applicable proof; no separate foundation implementation program remains. Selected content fidelity belongs to FR-04 and changed archive/product joins to FR-06. |
 | FR-03: Reference | [F05-C and earlier bounded controls](../Acceptance/FeatureCompletionReports.md#reference-correctness-progress) retain their original inputs. | Current Sponza radiance recovery, F01, and remaining identity/native/lifecycle/API, parity, Shipping output and raw-oracle proof. |
@@ -74,7 +72,6 @@ flowchart LR
 
 | Step | What you deliver | Open the remaining stage or retained result |
 | --- | --- | --- |
-| 0. Define | A finite product, map set, feature scope and supported presets. | [Recorded scope reconciliation](../Acceptance/FirstRelease.md#fr-00-reconciliation-result) — internal FR-00 complete; `REL-00` remains candidate-bound. |
 | 1. Establish trust | Clear asset/dependency rights, product identity and a reproducible source build. | [Recorded source qualification](../Acceptance/FirstRelease.md#fr-01-source-requalification) — internal FR-01 complete; final public rights/signing remain FR-07. |
 | 2. Package | Existing Launcher Build/Cook and inventory-owned stage/verify/archive route; [current package/source-rebuild contract](../Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#prebuilt-base-and-source-rebuild). | [Recorded FR-02 verification](../../artifacts/validation/releases/0.1.0/241ef037-product-20261025/fr02-final-20261031/completion.json) retains its unsigned candidate and removal exclusion. The replacement archive and affected product proof belong to FR-06. |
 | 3. Finish features | Required rendering and product behavior, including failures and resource lifetime. Follow the feature order below. | [Feature closure](../Architecture/CrossModule/FirstRelease/ImplementationPlan.md#fr-03--feature-closure) — `REL-04` |
