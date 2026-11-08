@@ -2,9 +2,17 @@
 #include "GameFramework/Public/World/WorldReadView.h"
 #include "World/Publication/WorldReadViewStorage.h"
 
+#include <utility>
+
+WorldReadView::WorldReadView(std::shared_ptr<const Storage> storage, std::uint64_t generation) noexcept :
+    m_storage(std::move(storage)),
+    m_generation(generation)
+{
+}
+
 std::uint64_t WorldReadView::GetGeneration() const noexcept
 {
-	return m_storage != nullptr ? m_storage->Generation : 0;
+	return m_generation;
 }
 
 WorldSequence WorldReadView::GetSequence() const noexcept

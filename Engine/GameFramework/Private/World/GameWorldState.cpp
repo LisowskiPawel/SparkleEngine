@@ -5,21 +5,14 @@
 #include "World/ECS/Components/TransformComponents.h"
 
 #include "World/Systems/CameraDerivedStateEvaluationSystem.h"
-#include "World/Systems/GameWorldSystems.h"
 #include "World/Systems/TransformEvaluationSystem.h"
 
 #include <algorithm>
-#include <stdexcept>
 
 namespace ECS
 {
-	GameWorldState::GameWorldState() :
-	    m_systemGraph(GameWorldSystemExecution::BuildGraph())
+	GameWorldState::GameWorldState()
 	{
-		if (!m_systemGraph)
-		{
-			throw std::runtime_error(m_systemGraph.GetError().Message);
-		}
 		m_dirtyTransforms.reserve(MaximumPendingChanges);
 		m_pendingChanges.reserve(MaximumPendingChanges);
 		CommitDerivedStateAndPublish();
@@ -43,7 +36,7 @@ namespace ECS
 
 	void GameWorldState::RecordChange(EntityId entity) noexcept
 	{
-		if (m_bChangesOverflowed)
+		if (m_bForceFullPublication)
 		{
 			return;
 		}
@@ -53,9 +46,7 @@ namespace ECS
 			return;
 		}
 		m_pendingChanges.clear();
-		m_pendingChanges.push_back(EntityId::Invalid());
 		m_bForceFullPublication = true;
-		m_bChangesOverflowed = true;
 	}
 
 	void GameWorldState::WriteSkyEnvironment(SkyEnvironment environment) noexcept
@@ -117,26 +108,26 @@ namespace ECS
 					m_registry.Replace(entity, derived);
 				}
 			}
-			RecordChange(entity);
 		}
 	}
 
 	void GameWorldState::PublishPendingChanges()
 	{
-		if (m_pendingChanges.empty() && m_publishedReadView.load(std::memory_order_acquire) != nullptr)
+		if (m_pendingChanges.empty() && !m_bForceFullPublication)
 		{
 			return;
 		}
-		m_readSequence += static_cast<WorldSequence>(m_pendingChanges.size());
-		PublishReadView(m_pendingChanges, m_readSequence, m_bForceFullPublication);
+		std::erase(m_pendingChanges, EntityId::Invalid());
+		std::sort(m_pendingChanges.begin(), m_pendingChanges.end());
+		m_pendingChanges.erase(std::unique(m_pendingChanges.begin(), m_pendingChanges.end()), m_pendingChanges.end());
+		PublishReadView(m_pendingChanges, m_bForceFullPublication);
 		m_pendingChanges.clear();
-		m_bChangesOverflowed = false;
 		m_bForceFullPublication = false;
 	}
 
-	WorldReadView GameWorldState::AcquireReadView() const noexcept
+	WorldReadView GameWorldState::AcquireReadView(std::uint64_t generation) const noexcept
 	{
-		return WorldReadView(m_publishedReadView.load(std::memory_order_acquire));
+		return WorldReadView(m_publishedReadView.load(std::memory_order_acquire), generation);
 	}
 
 }

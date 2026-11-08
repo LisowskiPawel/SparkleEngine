@@ -11,10 +11,8 @@
 #include "GameFramework/Public/World/SkyEnvironment.h"
 
 #include <cstdint>
-#include <utility>
 #include <DirectXMath.h>
 #include <memory>
-#include <limits>
 #include <optional>
 #include <span>
 #include <string>
@@ -32,7 +30,6 @@ struct WorldCameraReadData final
 	std::string Name;
 	CameraDesc Description;
 	Transform LocalTransform;
-	DirectX::XMFLOAT4X4 WorldMatrix{};
 	DirectX::XMFLOAT3 Direction{0.0f, 0.0f, 1.0f};
 	float AspectRatio = 1.0f;
 	bool bVisible = true;
@@ -49,12 +46,9 @@ struct WorldMeshReadData final
 {
 	EntityId Entity;
 	Transform LocalTransform;
-	DirectX::XMFLOAT4X4 WorldMatrix{};
 	MaterialHandle Material = MaterialHandle::Invalid();
 	Assets::CookedAssetId MeshAssetId = Assets::InvalidCookedAssetId;
-	Assets::CookedAssetId SkeletonAssetId = Assets::InvalidCookedAssetId;
 	SceneMeshKind Kind = SceneMeshKind::Static;
-	std::uint32_t SourceNodeIndex = (std::numeric_limits<std::uint32_t>::max)();
 	bool bVisible = true;
 };
 
@@ -76,10 +70,8 @@ private:
 	struct Storage;
 	friend class ECS::GameWorldState;
 
-	explicit WorldReadView(std::shared_ptr<const Storage> storage) noexcept :
-	    m_storage(std::move(storage))
-	{
-	}
+	WorldReadView(std::shared_ptr<const Storage> storage, std::uint64_t generation) noexcept;
 
 	std::shared_ptr<const Storage> m_storage;
+	std::uint64_t m_generation = 0;
 };

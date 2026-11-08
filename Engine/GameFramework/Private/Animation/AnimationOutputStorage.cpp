@@ -30,7 +30,6 @@ namespace ECS
 
 		ResetOutputs();
 		BuildAnimationWork(registry, clips, skeletons, targetGeneration);
-		BuildPoseWorkIndex();
 		BindMorphTargets(registry, morphWeights);
 		BindSkinningOutputs(registry, targetGeneration);
 
@@ -43,9 +42,7 @@ namespace ECS
 	{
 		m_poseWork.clear();
 		m_morphSamples.clear();
-		m_morphEntities.clear();
 		m_morphBindings.clear();
-		m_workIndexByEntitySlot.clear();
 		m_output.Reset();
 	}
 
@@ -112,24 +109,6 @@ namespace ECS
 			output.weights.resize(4);
 			m_output.morphWeights.push_back(std::move(output));
 			m_morphSamples.push_back(MorphSampleSlot{entity, clipHandle, sourceInstanceId, channelIndex, outputIndex});
-			m_morphEntities.push_back(entity);
-		}
-	}
-
-	void AnimationOutputStorage::BuildPoseWorkIndex()
-	{
-		EntityId::Slot largestSlot = 0;
-		for (const PoseWorkSlot& work : m_poseWork)
-		{
-			largestSlot = (std::max) (largestSlot, work.Entity.GetSlot());
-		}
-		if (!m_poseWork.empty())
-		{
-			m_workIndexByEntitySlot.resize(static_cast<std::size_t>(largestSlot) + 1u);
-		}
-		for (std::uint32_t index = 0; index < m_poseWork.size(); ++index)
-		{
-			m_workIndexByEntitySlot[m_poseWork[index].Entity.GetSlot()] = EntityWorkIndex{m_poseWork[index].Entity, index};
 		}
 	}
 
@@ -192,13 +171,4 @@ namespace ECS
 		}
 	}
 
-	AnimationOutputStorage::PoseWorkSlot* AnimationOutputStorage::FindPoseWork(EntityId entity) noexcept
-	{
-		if (!entity.IsValid() || entity.GetSlot() >= m_workIndexByEntitySlot.size())
-		{
-			return nullptr;
-		}
-		const EntityWorkIndex& mapping = m_workIndexByEntitySlot[entity.GetSlot()];
-		return mapping.Entity == entity && mapping.Index < m_poseWork.size() ? &m_poseWork[mapping.Index] : nullptr;
-	}
 }

@@ -2,7 +2,6 @@
 
 #include "GameFramework/Public/World/EntityId.h"
 #include "World/ECS/WorldComponentStores.h"
-#include "World/ECS/StructureFrozenEpoch.h"
 
 #include <cstdint>
 #include <cstddef>
@@ -11,7 +10,10 @@
 
 namespace ECS
 {
-	template <typename... AccessSpecs> class Query;
+	class AnimationSystemExecution;
+	class CameraMovementSystem;
+	class EntityIterationScope;
+	class TransformSystemExecution;
 
 	class EntityRegistry final
 	{
@@ -31,8 +33,6 @@ namespace ECS
 		std::uint64_t GetStructureVersion() const noexcept { return m_structureVersion; }
 
 		bool IsStructureFrozen() const noexcept { return m_bStructureFrozen; }
-
-		StructureFrozenEpoch FreezeStructure() noexcept;
 
 		template <ComponentStorageCompatible T> bool Add(EntityId entity, T component)
 		{
@@ -58,32 +58,28 @@ namespace ECS
 		template <ComponentStorageCompatible T> const ComponentStorage<T>& GetStorage() const noexcept { return std::get<ComponentStorage<T>>(m_components); }
 
 	private:
-		friend class StructureFrozenEpoch;
-		template <typename... AccessSpecs> friend class Query;
+		friend class AnimationSystemExecution;
+		friend class CameraMovementSystem;
+		friend class EntityIterationScope;
+		friend class TransformSystemExecution;
 
 		struct EntitySlot final
 		{
 			EntityId::Generation Generation = 1;
 			bool bAlive = false;
-			bool bRetired = false;
 		};
 
 		bool CanMutateStructure() const noexcept { return !m_bStructureFrozen; }
 
-		bool IsFrozenEpochCurrent(std::uint64_t generation) const noexcept { return m_bStructureFrozen && generation != 0 && m_frozenEpochGeneration == generation; }
-
-		void ReleaseFrozenEpoch(std::uint64_t generation) noexcept;
-
 		void AdvanceStructureVersion() noexcept { ++m_structureVersion; }
 
-		template <ComponentStorageCompatible T> ComponentStorage<T>& GetStorageForQuery() noexcept { return std::get<ComponentStorage<T>>(m_components); }
+		template <ComponentStorageCompatible T> T* GetMutable(EntityId entity) noexcept { return IsAlive(entity) ? std::get<ComponentStorage<T>>(m_components).GetMutable(entity) : nullptr; }
 
 		std::vector<EntitySlot> m_slots;
 		std::vector<EntityId::Slot> m_freeSlots;
 		WorldComponentStores m_components;
 		std::size_t m_liveCount = 0;
 		std::uint64_t m_structureVersion = 0;
-		std::uint64_t m_frozenEpochGeneration = 0;
 		bool m_bStructureFrozen = false;
 	};
 }

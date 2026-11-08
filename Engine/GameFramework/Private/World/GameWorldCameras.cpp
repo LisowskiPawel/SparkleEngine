@@ -38,9 +38,8 @@ namespace ECS
 		const bool bVisibilityAdded = bDerivedStateAdded && (m_registry.Add(entity, Visibility{}));
 		const bool bNameAdded = bVisibilityAdded && (m_registry.Add(entity, Name{std::move(entry.name)}));
 		const bool bIdentityAdded = bNameAdded && (m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextCameraIdentity, .Kind = AuthoredObjectKind::Camera}));
-		const bool bAdded = bIdentityAdded && (m_registry.Add(entity, EditorMetadata{}));
 
-		if (!bAdded)
+		if (!bIdentityAdded)
 		{
 			m_registry.Destroy(entity);
 			return EntityId::Invalid();

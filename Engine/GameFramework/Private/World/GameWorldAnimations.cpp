@@ -41,9 +41,7 @@ namespace ECS
 			        entity,
 			        AuthoredIdentity{.SourceAssetId = animationAssetId, .SourceInstanceId = sourceInstanceId, .SourceObjectId = sourceAnimationIndex, .Kind = AuthoredObjectKind::Animation}));
 
-			const bool bAdded = bIdentityAdded && (m_registry.Add(entity, EditorMetadata{}));
-
-			if (!bAdded)
+			if (!bIdentityAdded)
 			{
 				m_registry.Destroy(entity);
 				continue;

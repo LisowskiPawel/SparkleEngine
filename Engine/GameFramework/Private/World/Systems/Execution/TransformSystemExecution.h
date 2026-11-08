@@ -1,32 +1,25 @@
 #pragma once
 
-#include "World/Systems/Descriptors/GameWorldSystemContract.h"
+#include "GameFramework/Public/World/EntityId.h"
 
 #include <cstdint>
-#include <span>
 #include <vector>
 
 namespace ECS
 {
+	class EntityRegistry;
+
 	class TransformSystemExecution final
 	{
 	public:
-		TransformSystemExecution(
-		    TransformEvaluationQuery& transforms,
-		    CameraDerivedStateQuery& cameras,
-		    const std::vector<EntityId>& dirtyTransforms,
-		    std::span<EntityId> evaluated,
-		    std::span<EntityId> cameraChanges);
+		TransformSystemExecution(EntityRegistry& registry, const std::vector<EntityId>& dirtyTransforms);
 
 		std::uint32_t GetDirtyTransformCount() const noexcept;
 		bool RunTransforms(std::uint32_t begin, std::uint32_t end);
 		bool RunCameraDerivedState(std::uint32_t begin, std::uint32_t end);
 
 	private:
-		TransformEvaluationQuery& m_transformQuery;
-		CameraDerivedStateQuery& m_cameraDerivedQuery;
+		EntityRegistry& m_registry;
 		const std::vector<EntityId>& m_dirtyTransforms;
-		std::span<EntityId> m_evaluated;
-		std::span<EntityId> m_cameraChanges;
 	};
 }

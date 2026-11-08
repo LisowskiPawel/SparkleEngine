@@ -7,10 +7,15 @@
 #include "World/Publication/WorldReadViewStorage.h"
 
 #include <algorithm>
+#include <utility>
 
 template <typename T> static void EraseReadViewEntity(std::vector<T>& values, EntityId entity)
 {
-	std::erase_if(values, [entity](const T& value) { return value.Entity == entity; });
+	const auto position = std::lower_bound(values.begin(), values.end(), entity, [](const T& value, EntityId key) { return value.Entity < key; });
+	if (position != values.end() && position->Entity == entity)
+	{
+		values.erase(position);
+	}
 }
 
 template <typename T> static void UpsertReadViewEntity(std::vector<T>& values, T value)
@@ -38,10 +43,6 @@ namespace ECS
 			read.Description = entry->desc;
 		}
 		read.LocalTransform = ReadTransform(entity);
-		if (const WorldTransform* world = m_registry.Get<WorldTransform>(entity))
-		{
-			read.WorldMatrix = world->Matrix;
-		}
 		if (const CameraDerivedState* derived = m_registry.Get<CameraDerivedState>(entity))
 		{
 			read.Direction = derived->Direction;
@@ -71,17 +72,11 @@ namespace ECS
 		WorldMeshReadData read;
 		read.Entity = entity;
 		read.LocalTransform = ReadTransform(entity);
-		if (const WorldTransform* world = m_registry.Get<WorldTransform>(entity))
-		{
-			read.WorldMatrix = world->Matrix;
-		}
 		if (const MeshInstance* mesh = m_registry.Get<MeshInstance>(entity))
 		{
 			read.Material = mesh->Material;
 			read.MeshAssetId = mesh->MeshAssetId;
-			read.SkeletonAssetId = mesh->SkeletonAssetId;
 			read.Kind = mesh->Kind;
-			read.SourceNodeIndex = mesh->SourceNodeIndex;
 		}
 		read.bVisible = ReadVisibility(entity);
 		return read;
@@ -89,9 +84,6 @@ namespace ECS
 
 	void GameWorldState::BuildReadViewBaseline(WorldReadView::Storage& next) const
 	{
-		next.Cameras.clear();
-		next.Lights.clear();
-		next.Meshes.clear();
 		for (EntityId entity : m_registry.GetStorage<Camera>().GetEntities())
 		{
 			next.Cameras.push_back(BuildCameraReadData(entity));
@@ -111,47 +103,37 @@ namespace ECS
 
 	void GameWorldState::RefreshReadViewEntity(WorldReadView::Storage& next, EntityId entity) const
 	{
-		EraseReadViewEntity(next.Cameras, entity);
-		EraseReadViewEntity(next.Lights, entity);
-		EraseReadViewEntity(next.Meshes, entity);
 		if (m_registry.Get<Camera>(entity) != nullptr)
 		{
 			UpsertReadViewEntity(next.Cameras, BuildCameraReadData(entity));
+		}
+		else
+		{
+			EraseReadViewEntity(next.Cameras, entity);
 		}
 		if (m_registry.Get<Light>(entity) != nullptr)
 		{
 			UpsertReadViewEntity(next.Lights, BuildLightReadData(entity));
 		}
+		else
+		{
+			EraseReadViewEntity(next.Lights, entity);
+		}
 		if (m_registry.Get<MeshInstance>(entity) != nullptr)
 		{
 			UpsertReadViewEntity(next.Meshes, BuildMeshReadData(entity));
 		}
-	}
-
-	void GameWorldState::ApplyReadViewChanges(WorldReadView::Storage& next, std::span<const EntityId> changes) const
-	{
-		std::vector<EntityId> changedEntities;
-		for (EntityId entity : changes)
+		else
 		{
-			if (entity.IsValid())
-			{
-				changedEntities.push_back(entity);
-			}
-		}
-		std::sort(changedEntities.begin(), changedEntities.end());
-		changedEntities.erase(std::unique(changedEntities.begin(), changedEntities.end()), changedEntities.end());
-		for (EntityId entity : changedEntities)
-		{
-			RefreshReadViewEntity(next, entity);
+			EraseReadViewEntity(next.Meshes, entity);
 		}
 	}
 
-	void GameWorldState::PublishReadView(std::span<const EntityId> changes, WorldSequence sequence, bool bFullBaseline)
+	void GameWorldState::PublishReadView(std::span<const EntityId> changes, bool bFullBaseline)
 	{
 		const std::shared_ptr<const WorldReadView::Storage> previous = m_publishedReadView.load(std::memory_order_acquire);
 		auto next = previous != nullptr && !bFullBaseline ? std::make_shared<WorldReadView::Storage>(*previous) : std::make_shared<WorldReadView::Storage>();
-		next->Generation = ++m_readGeneration;
-		next->Sequence = sequence;
+		next->Sequence = previous != nullptr ? previous->Sequence + 1 : 1;
 
 		if (previous == nullptr || bFullBaseline)
 		{
@@ -159,9 +141,18 @@ namespace ECS
 		}
 		else
 		{
-			ApplyReadViewChanges(*next, changes);
+			for (EntityId entity : changes)
+			{
+				RefreshReadViewEntity(*next, entity);
+			}
 		}
 		next->Sky = m_skyEnvironment;
 		m_publishedReadView.store(std::move(next), std::memory_order_release);
+	}
+
+	void GameWorldState::CommitExtraction()
+	{
+		m_extraction.CommitMeshes(m_meshInstanceGroups);
+		PublishPendingChanges();
 	}
 }

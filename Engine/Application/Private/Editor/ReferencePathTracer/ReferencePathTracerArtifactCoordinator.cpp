@@ -214,7 +214,7 @@ void ReferencePathTracerArtifactCoordinator::CollectPublicationResult()
 			result.bSucceeded = false;
 			if (result.ErrorMessage.empty())
 			{
-				result.ErrorMessage = taskResult->GetMessage();
+				result.ErrorMessage = taskResult->GetDiagnostic();
 			}
 		}
 		m_lastResult = std::move(result);

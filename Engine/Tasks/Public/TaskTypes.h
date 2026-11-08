@@ -61,7 +61,7 @@ public:
 
 	TaskOutcome GetOutcome() const noexcept { return m_outcome; }
 
-	std::string_view GetMessage() const noexcept { return m_message; }
+	std::string_view GetDiagnostic() const noexcept { return m_message; }
 
 	bool Succeeded() const noexcept { return m_outcome == TaskOutcome::Succeeded; }
 

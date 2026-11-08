@@ -105,7 +105,7 @@ namespace Assets
 		completion.RequestId = m_control->RequestId;
 		const TaskResult result = m_control->Execution.GetResult();
 		completion.Stage = result.Succeeded() ? LevelLoadOperationStage::Ready : (result.WasCancelled() ? LevelLoadOperationStage::Cancelled : LevelLoadOperationStage::Failed);
-		completion.Diagnostic = std::string(result.GetMessage());
+		completion.Diagnostic = std::string(result.GetDiagnostic());
 		if (result.Succeeded())
 		{
 			if (!m_control->Shared || !m_control->Shared->Package)

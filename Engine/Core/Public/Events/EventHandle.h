@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Core/Public/CoreAPI.h"
-
 #include <cstdint>
 
-struct SPARKLE_CORE_API EventHandle
+struct EventHandle
 {
 	std::uint32_t Id = 0;
 
@@ -12,7 +10,5 @@ struct SPARKLE_CORE_API EventHandle
 
 	void Invalidate() noexcept { Id = 0; }
 
-	bool operator==(const EventHandle& Other) const noexcept { return Id == Other.Id; }
-
-	bool operator!=(const EventHandle& Other) const noexcept { return Id != Other.Id; }
+	bool operator==(const EventHandle&) const noexcept = default;
 };

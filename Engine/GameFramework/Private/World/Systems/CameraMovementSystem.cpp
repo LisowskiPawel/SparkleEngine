@@ -5,13 +5,15 @@
 #include "GameFramework/Public/Scene/Camera/CameraNavigation.h"
 #include "World/ECS/Components/RenderingComponents.h"
 #include "World/ECS/Components/TransformComponents.h"
+#include "World/ECS/EntityRegistry.h"
 
 #include <algorithm>
 #include <cmath>
 
 namespace ECS
 {
-	CameraMovementSystem::CameraMovementSystem(EntityId activeCamera, const CameraSimulationInput& input) noexcept :
+	CameraMovementSystem::CameraMovementSystem(EntityRegistry& registry, EntityId activeCamera, const CameraSimulationInput& input) noexcept :
+	    m_registry(registry),
 	    m_activeCamera(activeCamera),
 	    m_intent(input.Intent),
 	    m_navigationSettings(input.NavigationSettings),
@@ -19,9 +21,21 @@ namespace ECS
 	{
 	}
 
-	bool CameraMovementSystem::Apply(EntityId entity, Camera& camera, LocalTransform& transform) const noexcept
+	EntityId CameraMovementSystem::Update()
 	{
-		if (entity != m_activeCamera || !camera.bActive)
+		Camera* camera = m_registry.GetMutable<Camera>(m_activeCamera);
+		LocalTransform* transform = m_registry.GetMutable<LocalTransform>(m_activeCamera);
+		if (camera == nullptr || transform == nullptr)
+		{
+			return EntityId::Invalid();
+		}
+		const bool bChanged = Apply(*camera, *transform);
+		return bChanged ? m_activeCamera : EntityId::Invalid();
+	}
+
+	bool CameraMovementSystem::Apply(Camera& camera, LocalTransform& transform) const noexcept
+	{
+		if (!camera.bActive)
 		{
 			return false;
 		}

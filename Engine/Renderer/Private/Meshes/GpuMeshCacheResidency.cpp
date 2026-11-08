@@ -141,7 +141,7 @@ void GpuMeshCache::ConsumeCompletedPreparations() noexcept
 
 		if (status != TaskExecutionStatus::Succeeded)
 		{
-			Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, result.GetMessage().empty() ? "GPU mesh preparation task failed." : result.GetMessage());
+			Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, result.GetDiagnostic().empty() ? "GPU mesh preparation task failed." : result.GetDiagnostic());
 		}
 		if (request.Prepared == nullptr)
 		{

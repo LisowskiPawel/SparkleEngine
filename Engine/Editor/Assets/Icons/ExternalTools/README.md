@@ -19,7 +19,7 @@ Regeneration uses the same tool identities and extraction route, retains exact
 source/pixel hashes, and reviews the resulting native toolbar. Shipping/Game
 catalogs omit this collection, and capture action source is excluded. Full product/import/package
 erasure remains a separate acceptance claim. Native capture and package acceptance
-remain separate gates in the owning [dossier](../../../../../Docs/Architecture/CrossModule/PerformanceDiagnostics/ExternalCapture/ExternalCaptureDesign.md).
+remain separate gates in the owning [dossier](../../../../../Docs/References.md#tools-and-apis).
 
 For asset addition, lifetime and client usage, see the owning
-[Editor icon service](../../../../../Docs/Architecture/Modules/Engine/Editor/Icons.md).
+[Editor icon service](../../../../../Docs/Rendering.md#source-map).

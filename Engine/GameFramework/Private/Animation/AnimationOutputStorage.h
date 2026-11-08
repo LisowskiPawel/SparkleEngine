@@ -48,15 +48,11 @@ namespace ECS
 
 		bool Prepare(EntityRegistry& registry, const AnimationClipResourceStore& clips, const SkeletonResourceStore& skeletons, MorphWeightStorage& morphWeights, std::uint32_t targetGeneration);
 
-		PoseWorkSlot* FindPoseWork(EntityId entity) noexcept;
-
 		std::span<PoseWorkSlot> GetPoseWork() noexcept { return m_poseWork; }
 
 		std::span<MorphSampleSlot> GetMorphSamples() noexcept { return m_morphSamples; }
 
 		std::span<const MorphSampleSlot> GetMorphSamples() const noexcept { return m_morphSamples; }
-
-		std::span<const EntityId> GetMorphEntities() const noexcept { return m_morphEntities; }
 
 		std::span<const MorphTargetBinding> GetMorphBindings() const noexcept { return m_morphBindings; }
 
@@ -67,25 +63,16 @@ namespace ECS
 		std::uint32_t GetTargetGeneration() const noexcept { return m_targetGeneration; }
 
 	private:
-		struct EntityWorkIndex final
-		{
-			EntityId Entity;
-			std::uint32_t Index = (std::numeric_limits<std::uint32_t>::max)();
-		};
-
 		void ResetOutputs();
 		void BuildAnimationWork(const EntityRegistry& registry, const AnimationClipResourceStore& clips, const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration);
 		void AppendPoseWork(EntityId entity, AnimationResourceHandle clipHandle, const ResolvedAnimationClip& clip, const SkeletonResourceStore& skeletons, std::uint64_t sourceInstanceId);
 		void AppendMorphSamples(EntityId entity, AnimationResourceHandle clipHandle, const ResolvedAnimationClip& clip, std::uint64_t sourceInstanceId);
-		void BuildPoseWorkIndex();
 		void BindMorphTargets(const EntityRegistry& registry, MorphWeightStorage& morphWeights);
 		void BindSkinningOutputs(EntityRegistry& registry, std::uint32_t targetGeneration);
 
 		std::vector<PoseWorkSlot> m_poseWork;
 		std::vector<MorphSampleSlot> m_morphSamples;
-		std::vector<EntityId> m_morphEntities;
 		std::vector<MorphTargetBinding> m_morphBindings;
-		std::vector<EntityWorkIndex> m_workIndexByEntitySlot;
 		AnimationOutput m_output;
 		std::uint64_t m_structureVersion = 0;
 		std::uint32_t m_targetGeneration = 0;

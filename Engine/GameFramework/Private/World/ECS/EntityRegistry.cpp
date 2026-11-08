@@ -50,7 +50,6 @@ namespace ECS
 
 		if (entry.Generation == (std::numeric_limits<EntityId::Generation>::max)())
 		{
-			entry.bRetired = true;
 			return true;
 		}
 
@@ -66,25 +65,6 @@ namespace ECS
 			return false;
 		}
 		const EntitySlot& entry = m_slots[entity.GetSlot()];
-		return entry.bAlive && !entry.bRetired && entry.Generation == entity.GetGeneration();
-	}
-
-	StructureFrozenEpoch EntityRegistry::FreezeStructure() noexcept
-	{
-		if (m_bStructureFrozen || m_frozenEpochGeneration == (std::numeric_limits<std::uint64_t>::max)())
-		{
-			return {};
-		}
-		++m_frozenEpochGeneration;
-		m_bStructureFrozen = true;
-		return StructureFrozenEpoch(*this, m_frozenEpochGeneration);
-	}
-
-	void EntityRegistry::ReleaseFrozenEpoch(std::uint64_t generation) noexcept
-	{
-		if (IsFrozenEpochCurrent(generation))
-		{
-			m_bStructureFrozen = false;
-		}
+		return entry.bAlive && entry.Generation == entity.GetGeneration();
 	}
 }

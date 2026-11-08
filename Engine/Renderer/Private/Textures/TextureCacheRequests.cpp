@@ -201,7 +201,7 @@ void TextureCache::ConsumeCompletedRequests() noexcept
 			    g_textureCacheLogger,
 			    __FILE__,
 			    __LINE__,
-			    std::format("Texture generation {} for '{}' failed: {}", request.Generation.Generation, request.Source.Path.string(), executionResult.GetMessage()));
+			    std::format("Texture generation {} for '{}' failed: {}", request.Generation.Generation, request.Source.Path.string(), executionResult.GetDiagnostic()));
 		}
 		if (request.Payload == nullptr)
 		{

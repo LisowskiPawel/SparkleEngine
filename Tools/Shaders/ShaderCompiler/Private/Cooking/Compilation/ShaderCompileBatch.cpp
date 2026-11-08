@@ -169,11 +169,11 @@ static std::vector<ShaderCompileResult> CompileProducers(
 	}
 
 	const TaskResult result = execution.GetResult();
-	if (result.GetMessage().empty())
+	if (result.GetDiagnostic().empty())
 	{
 		throw Diagnostics::Error("Shader compile task failed without a diagnostic.");
 	}
-	throw Diagnostics::Error(std::string(result.GetMessage()));
+	throw Diagnostics::Error(std::string(result.GetDiagnostic()));
 }
 
 static std::vector<ShaderCompileResult> FanOutResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> producerResults, std::span<const std::size_t> producerForJob)

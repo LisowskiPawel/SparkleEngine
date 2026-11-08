@@ -150,7 +150,7 @@ namespace SparkleLauncher
 			const TaskExecution execution = m_implementation->m_executor.Launch(scope, graph.Compile());
 			if (execution.GetStatus() == TaskExecutionStatus::Rejected)
 			{
-				SetOperationFailure(*record, OperationProblemKind::Internal, std::string(execution.GetResult().GetMessage()), "Restart Sparkle Launcher before retrying.");
+				SetOperationFailure(*record, OperationProblemKind::Internal, std::string(execution.GetResult().GetDiagnostic()), "Restart Sparkle Launcher before retrying.");
 				MarkOperationFinished(*record, OperationStatus::Failed, std::nullopt);
 				scope.JoinFor(std::chrono::milliseconds::zero());
 				m_implementation->m_operationScopes.erase(runId);

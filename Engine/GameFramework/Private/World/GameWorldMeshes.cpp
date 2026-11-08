@@ -71,7 +71,7 @@ namespace ECS
 		            .SourceObjectId = static_cast<std::uint64_t>(instance.SourceNodeIndex),
 		            .Kind = AuthoredObjectKind::MeshInstance}));
 
-		return bIdentityAdded && m_registry.Add(entity, EditorMetadata{});
+		return bIdentityAdded;
 	}
 
 	bool GameWorldState::AddMeshDeformation(EntityId entity, const SceneMeshInstanceData& instance, AnimationOutputSlotHandle weights)

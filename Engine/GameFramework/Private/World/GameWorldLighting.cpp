@@ -106,9 +106,8 @@ namespace ECS
 		const bool bVisibilityAdded = bLightAdded && (m_registry.Add(entity, Visibility{.bVisible = desc.common.bVisible}));
 		const bool bNameAdded = bVisibilityAdded && (m_registry.Add(entity, Name{std::move(desc.common.name)}));
 		const bool bIdentityAdded = bNameAdded && (m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextLightIdentity, .Kind = AuthoredObjectKind::Light}));
-		const bool bAdded = bIdentityAdded && (m_registry.Add(entity, EditorMetadata{}));
 
-		if (!bAdded)
+		if (!bIdentityAdded)
 		{
 			m_registry.Destroy(entity);
 			return EntityId::Invalid();

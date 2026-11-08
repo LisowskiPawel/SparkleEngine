@@ -8,7 +8,6 @@
 
 struct WorldReadView::Storage final
 {
-	std::uint64_t Generation = 0;
 	WorldSequence Sequence = 0;
 	std::vector<WorldCameraReadData> Cameras;
 	std::vector<WorldLightReadData> Lights;

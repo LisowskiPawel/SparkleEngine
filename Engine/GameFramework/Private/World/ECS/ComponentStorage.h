@@ -15,15 +15,6 @@
 namespace ECS
 {
 	class EntityRegistry;
-	template <typename... AccessSpecs> class Query;
-
-	struct ComponentStorageVersion final
-	{
-		std::uint64_t Structure = 0;
-		std::uint64_t Content = 0;
-
-		constexpr auto operator<=>(const ComponentStorageVersion&) const noexcept = default;
-	};
 
 	template <typename T> concept ComponentStorageCompatible = std::copy_constructible<T> && std::is_copy_assignable_v<T> && std::is_nothrow_move_constructible_v<T>
 	    && std::is_nothrow_move_assignable_v<T>;
@@ -49,7 +40,6 @@ namespace ECS
 			m_entities.push_back(entity);
 			m_components.push_back(std::move(component));
 			m_sparse[entity.GetSlot()] = denseIndex;
-			AdvanceStructureVersion();
 			return true;
 		}
 
@@ -72,7 +62,6 @@ namespace ECS
 			m_sparse[entity.GetSlot()] = InvalidDenseIndex;
 			m_entities.pop_back();
 			m_components.pop_back();
-			AdvanceStructureVersion();
 		}
 
 		bool Replace(EntityId entity, T component)
@@ -83,11 +72,8 @@ namespace ECS
 				return false;
 			}
 			m_components[denseIndex] = std::move(component);
-			++m_version.Content;
 			return true;
 		}
-
-		bool Contains(EntityId entity) const noexcept { return FindDenseIndex(entity) != InvalidDenseIndex; }
 
 		const T* Get(EntityId entity) const noexcept
 		{
@@ -95,21 +81,12 @@ namespace ECS
 			return denseIndex == InvalidDenseIndex ? nullptr : &m_components[denseIndex];
 		}
 
-		void Reserve(std::size_t capacity)
-		{
-			m_entities.reserve(capacity);
-			m_components.reserve(capacity);
-		}
-
 		std::span<const EntityId> GetEntities() const noexcept { return m_entities; }
 
 		std::span<const T> GetComponents() const noexcept { return m_components; }
 
-		ComponentStorageVersion GetVersion() const noexcept { return m_version; }
-
 	private:
 		friend class EntityRegistry;
-		template <typename... AccessSpecs> friend class Query;
 
 		static constexpr std::uint32_t InvalidDenseIndex = (std::numeric_limits<std::uint32_t>::max)();
 
@@ -129,8 +106,6 @@ namespace ECS
 			return denseIndex == InvalidDenseIndex ? nullptr : &m_components[denseIndex];
 		}
 
-		void MarkContentChanged() noexcept { ++m_version.Content; }
-
 		bool IsSlotOccupied(EntityId::Slot slot) const noexcept { return slot < m_sparse.size() && m_sparse[slot] < m_entities.size(); }
 
 		void PrepareCapacity(std::size_t denseCapacity, EntityId::Slot maximumSlot)
@@ -140,7 +115,9 @@ namespace ECS
 			{
 				const std::size_t growth = (std::max) (std::size_t{1}, capacity / 2);
 				const std::size_t available = InvalidDenseIndex - capacity;
-				Reserve((std::max) (denseCapacity, capacity + (std::min) (growth, available)));
+				const std::size_t nextCapacity = (std::max) (denseCapacity, capacity + (std::min) (growth, available));
+				m_entities.reserve(nextCapacity);
+				m_components.reserve(nextCapacity);
 			}
 			if (maximumSlot >= m_sparse.size())
 			{
@@ -148,15 +125,8 @@ namespace ECS
 			}
 		}
 
-		void AdvanceStructureVersion() noexcept
-		{
-			++m_version.Structure;
-			++m_version.Content;
-		}
-
 		std::vector<std::uint32_t> m_sparse;
 		std::vector<EntityId> m_entities;
 		std::vector<T> m_components;
-		ComponentStorageVersion m_version;
 	};
 }

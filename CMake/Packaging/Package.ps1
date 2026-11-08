@@ -125,7 +125,7 @@ try
     [IO.File]::WriteAllText((Join-Path $transactionRoot 'source-inputs.json'), $sourceJson, [Text.UTF8Encoding]::new($false))
     if ([string]::IsNullOrWhiteSpace($InputsPath) -or !(Test-Path -LiteralPath $InputsPath -PathType Leaf))
     {
-        throw 'Missing reviewed release inputs. Prepare fresh products/content through Launcher, then supply their allowlist and final ShaderExport path. See Docs/Architecture/Modules/BuildAndPackaging/PackagingAndInstallation.md#reviewed-package-inputs.'
+        throw 'Missing reviewed release inputs. Prepare fresh products/content through Launcher, then supply their allowlist and final ShaderExport path. See Docs/Engineering.md#build-and-delivery.'
     }
     $inputSnapshot = Join-Path $transactionRoot 'release-inputs.json'
     [IO.File]::Copy([IO.Path]::GetFullPath($InputsPath), $inputSnapshot, $false)

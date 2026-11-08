@@ -1,60 +1,132 @@
 # Goals
 
-[Docs](README.md) · [Next work](Roadmap.md)
+[Documentation](README.md) | [Roadmap](Roadmap.md)
 
-Build a compact rendering demonstration that proves deep graphics engineering: take a problem from mathematics through C++, shaders and native APIs to a measured, reproducible result. Engine breadth serves that result.
+## Target persona
 
-## Product boundary
+Become a graphics systems engineer who can take a rendering or GPU-compute problem from first principles to a measured implementation that another engineer can use.
 
-- Windows showcase with Launcher, Editor and Game; D3D12 and Vulkan have separate proof obligations.
-- Launcher is the polished front door for scene selection, readiness, Build/Cook/Run, progress, cancellation and recovery.
-- Game presents rendering and camera input. Editor provides inspection, supported edits and developer controls.
-- Target distribution: one fresh prebuilt bundle with admitted cooked content. Matching source may reuse that base and replace it through the existing build/cook path. Public archive qualification and redistribution rights remain open.
-- Supporting Core, Tasks, world, content and tools work stops when its selected rendering or reproduction consumer works.
+The focus is real-time rendering and developer technology: explicit graphics APIs, shaders, CPU/GPU architecture, concurrency, debugging and neural graphics. SparkleEngine provides a place to develop that depth and demonstrate it through a small number of complete examples.
 
-The [level catalog](../Projects/Showcase/Levels.catalog) names release-supported entries: ModernSponza, Sponza, ABeautifulGame, LPSHead, CornellBox, DiffuseTransmissionPlant and CesiumMan, plus Empty. Catalog admission does not grant asset redistribution rights. [Build and delivery](Architecture/BuildAndRun.md#release-inputs) owns that distinction.
+The long-term target is principal-level responsibility: choose consequential problems, set technical direction, carry uncertain work into production and help other engineers succeed. Build on the existing rendering and technical-art background. Use the [dated professional baseline](References.md#professional-baseline) when reviewing progress.
 
-After release, Sponza remains the fast regression scene; Bistro exterior/interior is the flagship, with San Miguel 2.0 providing independent scene breadth. Sponza-only results cannot satisfy those later targets.
+The [role sources](References.md#role-sources) explain where this target came from. Rendering/developer technology is the main direction. Compiler engineering, driver development, research science and graphics tools are neighboring specialties with distinct requirements; choose depth deliberately rather than building a subsystem for every job-description term.
 
-## Engineering outcomes
+## North Star
 
-| Outcome | What a useful change demonstrates |
-| --- | --- |
-| `NS-REAL` | A current consumer receives the complete promised result. |
-| `NS-MATH-DATA` | Mathematics, units, data transformations and numerical assumptions are understood. |
-| `NS-EVIDENCE` | Claims have reproducible checks on the declared matrix. |
-| `NS-OWNERSHIP` | State, lifetime, publication, failure and retirement have explicit owners. |
-| `NS-ADOPTION` | Someone can discover, use and diagnose the result without private repair. |
-| `NS-SIMPLIFY` | Replaced code, duplicate truth and unnecessary maintenance disappear in the same change. |
+- **Deliver a real result.** Build the complete path needed by its user.
+- **Understand the mathematics and data.** Explain units, numerical assumptions, transformations and uncertainty.
+- **Prove the claim.** Make correctness, image quality, performance and failure behavior reproducible.
+- **Make ownership clear.** Identify who controls mutable state, publication, synchronization, recovery and destruction.
+- **Make the work usable.** Provide enough information to run, inspect, reproduce and maintain it.
+- **Leave less complexity.** Remove replaced code, duplicate state and unnecessary maintenance.
 
-## Capability targets
+## Product scope
 
-These stable `PGE-*` identifiers name professional goals, not awarded qualifications. Several targets should share one case study.
+Launcher selects scenes, reports readiness and runs build, cook and launch operations. Editor provides inspection, supported edits and developer controls. Game presents the rendered scene with camera input. All three target Windows, with separate D3D12 and Vulkan validation.
 
-| ID | Target and required evidence | Working reference |
+The release is a complete prebuilt bundle with approved cooked content. Matching source can reuse that bundle's outputs and replace them through the normal build/cook path. Public package validation and redistribution rights remain open.
+
+The first release uses English keyboard/mouse input on one windowed or borderless display. Check UI at 100%, 150% and 200% DPI. The user's display resolution is independent of the benchmark resolution. Controllers, exclusive fullscreen and VR are outside this release.
+
+Packaged use works offline after extraction, without accounts, telemetry, unattended downloads or crash uploads. Source and content acquisition are explicit. No ongoing support service or response deadline is promised.
+
+The [level catalog](../Projects/Showcase/Levels.catalog) lists ModernSponza, Sponza, ABeautifulGame, LPSHead, CornellBox, DiffuseTransmissionPlant and CesiumMan, plus Empty. Release selection does not grant asset rights; see [distribution requirements](Engineering.md#build-and-delivery).
+
+After release, Bistro exterior/interior becomes the flagship, with San Miguel 2.0 providing a second scene and Sponza remaining the short regression loop. Their [test roles](Rendering.md#test-scenes) are different.
+
+Keep supporting systems as small as the rendering and reproduction workflows allow. General gameplay, physics, networking, audio, scripting, plugin SDKs, installers/updaters, Linux, extra hardware campaigns, geometry caches, frame generation, GPU-driven geometry, atmosphere/clouds/imported volumes, broad authoring or diagnostics tools and general ML runtimes are outside the selected work.
+
+## Technical development
+
+These capabilities combine the supplied role requirements with the public-engineer study. Several should be demonstrated by the same case. The [archived descriptions](References.md#role-sources) retain the individual responsibilities, required qualifications and differentiators.
+
+### Rendering and GPU systems
+
+- **Light transport.** Derive and implement rasterization, ray queries and ray-tracing pipelines, global illumination, sampling, accumulation and path tracing within a real-time budget. Explain the actual estimator, proposal and target distributions, reuse assumptions and normalization. Demonstrate independent numerical/image controls, an invalid-history or sample counterexample, temporal behavior, quality, frame time and memory. Use Bistro for the flagship and San Miguel to test whether the result transfers to different content.
+- **Applied mathematics.** Use linear algebra, calculus, probability, statistics, Monte Carlo estimation, stochastic optimization, signal processing and numerical analysis to explain rendering and ML decisions. Retain definitions, units and assumptions, known values or a CPU reference, error/stability checks and a prediction that measurements can confirm or refute. Explain reference equivalence and uncertainty before comparing images or performance.
+- **Explicit APIs and shaders.** Understand D3D12/Vulkan devices, queues, commands, resources, descriptors, pipelines, barriers, memory, presentation and capabilities. Work fluently in HLSL/SM6 and reason about GLSL/Slang, DXIL/SPIR-V, reflection and host/shader layout. Follow one feature from source and compiler options through cooked bytecode, bindings and executed native commands. Demonstrate both backends, completion and deferred retirement, diagnostics and a bounded failure/fallback case.
+- **Hardware and concurrency.** Connect CPU caches, topology, SIMD, tasks and submission cost to GPU waves, caches, bandwidth, latency hiding, registers, occupancy, divergence, atomics and memory ordering. Use counters, traces or useful disassembly to test a specific mechanism. Retain a serial/reference control, scheduling or memory model, concurrency checks and a rejected alternative. Scope conclusions to the tested hardware, driver, compiler, API and workload.
+
+### Software and analysis
+
+- **C++ and Python engineering.** Write cohesive modern C++ and useful Python automation with narrow public interfaces, explicit ownership and durable failure behavior. Debug lifetime errors, races, numerical errors and API misuse. Show a clean-checkout build, representative reviewed C++, one useful Python analysis/automation consumer, bounded input/cleanup and appropriate correctness or native-validation checks. Follow [Code style](CodeStyle.md); keep instructions consistent with the working product.
+- **Whole-system performance.** Study CPU preparation, GPU execution, queues, shader compilation, residency, streaming, memory, startup, frame pacing and input-to-present latency together. Retain complementary CPU, shader and resource-lifetime studies with fixed inputs, warm-up, repeats, p50/p95/p99, timelines and memory high-water. Join each predicted mechanism to a controlled experiment, quality-equivalent before/after result and regression threshold. Keep at least one rejected or inconclusive optimization.
+- **Difficult debugging.** Analyze how real D3D12/Vulkan workloads use queues, barriers, descriptors, memory, pipelines, shaders and presentation. Use PIX, RenderDoc, Nsight, native validation, compiler diagnostics or crash data to distinguish application, API, compiler, driver and hardware causes. Preserve one difficult incident: exact configuration, earliest incorrect result, capture/dump and markers, reduced reproduction, competing hypotheses, experiments, root cause, focused fix and regression check.
+- **Reproducible development.** Make the Windows, toolchain, D3D12 and Vulkan workflow repeatable through source control, build instructions, expected output and usable debugging/profiling steps. Demonstrate supported settings and capability limits. Windows Vulkan work establishes API experience; Linux development, another GPU architecture or driver implementation requires separate evidence. The selected engine scope remains Windows.
+
+### Neural graphics
+
+- **Owned neural rendering.** Deliver one real trained model or neural operator path that improves a rendering result. Connect licensed data and labels, an identified model artifact, actual runtime inference, classical comparison/fallback and held-out evaluation. Report image and temporal quality, latency, memory, generalization, failures and supported capabilities. Keep personally owned data/model/kernel work distinct from vendor reconstruction, radiance-cache or texture-compression integration.
+- **Model-to-kernel work.** Read PyTorch/ONNX-style graphs and derive the operators, tensor shapes, layouts and computational cost. Translate a bounded model into HLSL/Slang or compute kernels; reason about precision, fusion, traffic and dispatch. Check every fixed operator and the full model against an FP32 reference on actual GPUs within a stated tolerance. Retain per-stage profiles and an optimization comparison that preserves numerical and product quality.
+- **Machine-learning fundamentals.** Understand automatic differentiation, computational graphs, tensor broadcasting, objectives, losses, metrics, optimization, quantization and deployment constraints. Keep training, validation and test data separate by scene; test leakage, overfitting and failure cases. Retain a reproducible experiment, model/data description, classical baseline and ablations. Independently check AI-assisted code, mathematics and claims.
+- **Training and deployment.** Treat data preparation/training and low-latency inference as different workloads. Profile batching, precision, layout, concurrency, memory, export and scheduling. Retain separate training and inference profiles, reproducible export, identified artifacts and the loading path. Attribute cold startup, latency tails and peak workspace; explain the deployment choice and its quality/performance tradeoff. Offline models and online adaptive caches need different reset and state-lifetime checks.
+
+### Collaboration and direction
+
+- **Partner integration.** Discover another team's requirements and constraints; integrate into an existing system while coordinating research, hardware, drivers, compilers, content and production concerns. Retain the alternatives, integration and failure behavior, measured result, review feedback and reproduction/adoption record. Credit personal and team contributions separately. A partner-facing capability includes configuration, diagnostics, maintenance and enough explanation for another engineer to own it.
+- **Research productization and communication.** Turn a prototype into mature code, a useful tool/plugin or a justified negative result. Prioritize, package, document and review it. Present the three cases, one useful analysis consumer and a concise paper/talk/demo outline with working code, captures and reproduction links. Explain a decision to ship, simplify or remove something, including failed experiments. Write and present clearly in English.
+- **Technical direction.** Choose high-value problems from first principles and finish repeated substantial work under real constraints. Lead uncertain investigations, challenge designs, give constructive reviews, teach the reasoning and remove unnecessary complexity. Retain a consequential review/decision, second usage context, observed explanation exercise and feedback-driven revision/retest. Sustained influence also needs credible professional examples of shipped impact, mentoring, stewardship or partner trust.
+
+The selected rendering depth is path transport, direct/indirect estimators, base/anisotropic/coated materials, reconstruction and RELAX, bounded volumetrics, SHaRC before NRC, neural texture compression and supported PTLAS. [Rendering](Rendering.md) gives their targets and limits; [Roadmap](Roadmap.md#after-release) orders the work. These are local choices that develop the capabilities above.
+
+### Professional qualifications
+
+The supplied principal role asks for a relevant master's degree or equivalent experience and **15 or more years of relevant work or research**. The research-productization role asks for **at least five full-time years of efficient HLSL SM6/GLSL/Slang and modern C++17 or newer**, with its own academic preferences. Other descriptions distinguish essentials from preferred experience; retain that distinction when assessing a role.
+
+Track degree subject/level, employment duration, shipped-product contribution, partner collaboration, review/mentoring impact, spoken English and willingness to travel through the CV, talks, recommendations and permitted professional examples. Some roles also ask for Linux, Windows/Linux driver development, HIP/CUDA/OpenCL or console/CPU/GPU ISA experience. Record those as role-specific requirements and evidence gaps without expanding the engine automatically. The repository complements this professional record.
+
+## The three cases
+
+1. **Content to correct pixel.** Follow an asset and material through cooking, shading and checked raw output. Include selected material and bounded volumetric work, with a defined reference domain and uncertainty.
+2. **One measured frame, two APIs.** Combine CPU preparation, shader and resource-lifetime studies with a difficult incident and whole-frame results. Include relevant lighting, reconstruction, cache and acceleration-structure comparisons, plus a rejected or inconclusive alternative.
+3. **Owned model to shader.** Connect reference labels, data, training, checked GPU operators, runtime behavior and held-out evaluation. Separate personally owned model work from vendor cache/texture integration.
+
+Start each case with the result, problem, constraints, personal contribution, baseline and measured configuration. Follow with mathematics/API choices, alternatives, failures, limitations, reproduction and simplification. Credit papers, libraries and collaborators.
+
+| Reader | Time | What they should find |
 | --- | --- | --- |
-| `PGE-01` | Integrate technology under another consumer's constraints; retain feedback, interventions and a reproduction/adoption result. | [Portfolio](Architecture/Portfolio.md) |
-| `PGE-02` | Explain and prove ray tracing, GI and path transport: independent references, temporal quality, cost, memory and paired APIs on Bistro/San Miguel. | [Lighting](Architecture/Lighting.md), [Reference](Architecture/ReferencePathTracer.md) |
-| `PGE-03` | Deliver one trained neural rendering feature with real inference, provenance, classical control and held-out quality/cost/failure evidence. | [Neural graphics](Architecture/NeuralGraphics.md) |
-| `PGE-04` | Translate a fixed model into checked GPU kernels; derive operators/layouts and measure a precision, layout or fusion choice. | [Neural graphics](Architecture/NeuralGraphics.md#model-and-numerical-contract) |
-| `PGE-05` | Measure whole-system performance: warm-up policy, p50/p95/p99, CPU/GPU timelines, memory high-water and causal before/after controls. | [Performance studies](Architecture/PerformanceStudies.md) |
-| `PGE-06` | Diagnose one difficult graphics incident with native artifacts, competing hypotheses, reduced reproduction, root cause and bounded fix. | [Diagnostics](Architecture/Diagnostics.md), [studies](Architecture/PerformanceStudies.md) |
-| `PGE-07` | Show cohesive modern C++, useful Python automation, narrow APIs, a clean build and proportionate correctness checks. | [Engineering](Engineering/README.md), [studies](Architecture/PerformanceStudies.md) |
-| `PGE-08` | Derive the actual estimator/model and units; compare known values or an independent numerical control with predicted behavior and uncertainty. | [Reference](Architecture/ReferencePathTracer.md), [studies](Architecture/PerformanceStudies.md) |
-| `PGE-09` | Trace source through compiler, reflection, cooked bytecode and native execution on both APIs; explain bindings, synchronization and failures. | [Shaders](Architecture/Shaders.md), [RHI](Architecture/RHI.md) |
-| `PGE-10` | Explain CPU/GPU scheduling, cache/bandwidth, occupancy or synchronization using counters/disassembly, a serial control and measured product effects. | [Performance studies](Architecture/PerformanceStudies.md) |
-| `PGE-11` | Own a reproducible ML experiment: separated data, loss/metric rationale, baseline, ablations, leakage and overfit controls. | [Neural graphics](Architecture/NeuralGraphics.md) |
-| `PGE-12` | Profile training and inference separately; identify export, precision/layout, startup, workspace and latency tails. | [Neural graphics](Architecture/NeuralGraphics.md) |
-| `PGE-13` | Communicate three concise cases with actual code/captures, one useful tool and a justified productization or deletion decision. | [Portfolio](Architecture/Portfolio.md) |
-| `PGE-14` | Reproduce the Windows/toolchain/paired-API workflow and explain its platform/hardware limits. Native Linux is outside this delivery program. | [Build and run](Architecture/BuildAndRun.md) |
-| `PGE-15` | Demonstrate repeated delivery, consequential direction, challenged decisions, second-context transfer and feedback-driven revision. | [Portfolio](Architecture/Portfolio.md#review-and-transfer) |
+| Recruiter | 60–90 seconds | Identity, actual role level, three relevant outcomes, demo, location/travel status and working links |
+| Hiring manager | 10 minutes | Three cases with constraints, personal contribution, measured results, code/capture links and limitations |
+| Graphics specialist | 45–60 minutes | Mathematics, code, native captures, experiments and failure cases |
+| Developer reproducing the work | 30 minutes plus build time | Supported setup, commands, expected output and troubleshooting |
 
-Evidence levels remain: `E0` absent, `E1` claimed/scaffolded, `E2` implemented, `E3` verified reproducibly, `E4` transferred through actual adoption/publication/review. Aim for E3 across technical core targets and E4 on several transfer/communication targets. Document volume, SDK integration and feature counts award no level. Employment, degrees, tenure and organizational leadership require their own truthful professional evidence.
+The package contains one landing page, three case narratives, links to shareable original files, commands and expected results, and a short paper/talk/demo outline.
 
-## Scope protection
+## Review and transfer
 
-Admit work only for a named result and consumer. Prefer an existing path, a bounded repair or deletion to a new framework. A target here is not permission to implement it ahead of the [roadmap](Roadmap.md).
+A reviewer should be able to follow one rule from mathematics through source, cooked code and native output, recompute a comparison and inspect its uncertainty and failure case. Each technical requirement needs evidence or a stated limitation.
 
-Selected later depth: raw direct/indirect transport; base, anisotropic and coated materials; SR/RR and one RELAX path; PTLAS; bounded volumetrics; SHaRC fully completed before NRC; NTC; one owned diffuse-indirect model. Preserve raw outputs, uncached transport, BCn and TLAS as necessary controls.
+Reproduce the documented build and result without undocumented repairs. Record who performed the run, prior involvement, environment, failed steps, assistance and output. Check hashes, prerequisites, settings and sharing rights before review. Distinguish assisted reproduction from an independent run.
 
-Unselected: general gameplay/physics/network/audio/scripting platforms, stable plugin SDK, installer/updater, native Linux, extra hardware campaigns, geometry-cache animation, frame generation, meshlets/DGC/SER, physical atmosphere/clouds/imported volumes, broad Editor/diagnostics dashboards and general ML runtimes. Reconsider one only for a specific consumer and measurable benefit.
+Use a separate technical review to challenge a meaningful assumption. Then apply the result in a second workflow, project, tool or explanation exercise with a stated constraint. Record the before/after task, feedback and revision/retest, or the evidence for leaving the design unchanged.
+
+Show repeated delivery, simplification and clear follow-up ownership. Credit self-review as self-review and external adoption only when it occurred. External participation is optional. An upstream contribution should address a real finding and follow the recipient's submission and disclosure requirements.
+
+## Reviewing progress
+
+Use the same capability descriptions when comparing past work, present evidence and the next investment. The [July 2026 CV snapshot](References.md#professional-baseline) is the historical starting point; update the assessment from actual work and permitted professional records.
+
+| Review | Record |
+| --- | --- |
+| Past | What was delivered, when, under which constraints and with what personal contribution? Link the original result or professional account. |
+| Now | What can be demonstrated and reproduced today? Identify the strongest artifact, its limits and any missing proof. |
+| Next | Which useful result closes the most important gap? State the baseline, expected improvement, evidence to retain and how the result will be reviewed. |
+
+Describe the strength of evidence in ordinary words:
+
+| Evidence | Meaning |
+| --- | --- |
+| Absent | No supported claim or artifact yet. |
+| Claimed | A CV statement, interface or unverified implementation. |
+| Implemented | Reviewable code or a completed professional example with incomplete reproduction evidence. |
+| Verified | A reproducible result with reference/correctness checks, configuration, measurements and limitations. |
+| Transferred | Actual use, reproduction, shipment, publication or teaching with credible feedback beyond the original implementation. |
+
+Target verified evidence for every technical capability and transfer evidence for several productization, collaboration and communication requirements. A self-rehearsal can improve the package; record it as such. Neither a skill label nor repository size establishes principal-level responsibility.
+
+Progress from contributing a pass, to owning a complete feature, to explaining the rendering system and its measured behavior. The next step is choosing technical direction and transferring useful capabilities; the principal target is doing this repeatedly while developing other engineers. These describe growing responsibility, rather than employer job grades.
+
+When choosing work, prefer an unverified core capability, a stronger headline case, causal measurement or actual reproduction, and a result that simplifies the system. Start from a user-visible problem, data and lifetime ownership, frame/shader cost and adoption constraints. Keep a correct reference before optimizing. If another engineer cannot reproduce the result, observe the failed step, improve the product or instructions and retest.
+
+Revisit the target when new role evidence or professional feedback changes it. Preserve the source wording and date in [References](References.md#role-sources), then explain the change here. Keep feature tasks and delivery order in [Roadmap](Roadmap.md).

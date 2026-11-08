@@ -39,7 +39,6 @@ namespace ECS
 
 	struct Visibility final
 	{
-		std::uint32_t LayerMask = (std::numeric_limits<std::uint32_t>::max)();
 		bool bVisible = true;
 	};
 

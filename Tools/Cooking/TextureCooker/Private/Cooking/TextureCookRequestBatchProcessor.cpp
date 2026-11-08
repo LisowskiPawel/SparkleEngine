@@ -94,7 +94,7 @@ std::size_t TextureCookRequestBatchProcessor::ReportFailures(const std::vector<T
 		    "Texture cook failed",
 		    {ToolConsole::Field("assetId", Formatting::FormatHexUInt64(requests[index].assetId)),
 		        ToolConsole::PathField("source", requests[index].sourcePath),
-		        ToolConsole::QuotedField("reason", result.CookResult.GetMessage())});
+		        ToolConsole::QuotedField("reason", result.CookResult.GetDiagnostic())});
 	}
 
 	return failureCount;

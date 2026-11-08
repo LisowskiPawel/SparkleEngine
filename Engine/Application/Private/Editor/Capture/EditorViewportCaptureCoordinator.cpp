@@ -71,7 +71,7 @@ std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Update(Rend
 	{
 		if (!taskResult->Succeeded())
 		{
-			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, std::format("Viewport capture {}: {}", taskResult->WasCancelled() ? "cancelled" : "failed", taskResult->GetMessage())};
+			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, std::format("Viewport capture {}: {}", taskResult->WasCancelled() ? "cancelled" : "failed", taskResult->GetDiagnostic())};
 		}
 		else
 		{

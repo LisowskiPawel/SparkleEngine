@@ -9,6 +9,7 @@
 #include "World/Resources/AnimationClipResourceStore.h"
 #include "World/Resources/SkeletonResourceStore.h"
 #include "World/Resources/MorphWeightStorage.h"
+#include "World/ECS/EntityRegistry.h"
 
 #include <algorithm>
 #include <cmath>
@@ -16,38 +17,29 @@
 namespace ECS
 {
 	AnimationSystemExecution::AnimationSystemExecution(
-	    PlaybackAdvanceQuery& playback,
-	    PoseEvaluationQuery& poses,
-	    MorphEvaluationQuery& morphs,
+	    EntityRegistry& registry,
 	    const AnimationClipResourceStore& clips,
 	    const SkeletonResourceStore& skeletons,
 	    AnimationOutputStorage& output,
 	    MorphWeightStorage& weights,
-	    std::span<EntityId> animationChanges,
-	    std::span<EntityId> morphChanges,
 	    float deltaSeconds) :
+	    m_registry(registry),
 	    m_clips(clips),
 	    m_skeletons(skeletons),
 	    m_output(output),
 	    m_weights(weights),
-	    m_animationChanges(animationChanges),
-	    m_morphChanges(morphChanges),
-	    m_deltaSeconds((std::max) (0.0f, deltaSeconds)),
-	    m_playbackQuery(playback),
-	    m_poseQuery(poses),
-	    m_morphQuery(morphs)
+	    m_deltaSeconds((std::max) (0.0f, deltaSeconds))
 	{
-		m_playbackQuery.PrepareWriteTraversal();
 	}
 
 	std::uint32_t AnimationSystemExecution::GetPlaybackCount() const noexcept
 	{
-		return static_cast<std::uint32_t>(m_playbackQuery.GetEstimatedEntityCount());
+		return static_cast<std::uint32_t>(m_registry.GetStorage<AnimationState>().GetEntities().size());
 	}
 
 	std::uint32_t AnimationSystemExecution::GetPoseCount() const noexcept
 	{
-		return static_cast<std::uint32_t>(m_poseQuery.GetEstimatedEntityCount());
+		return static_cast<std::uint32_t>(m_output.GetPoseWork().size());
 	}
 
 	std::uint32_t AnimationSystemExecution::GetMorphSampleCount() const noexcept
@@ -55,86 +47,90 @@ namespace ECS
 		return static_cast<std::uint32_t>(m_output.GetMorphSamples().size());
 	}
 
-	std::uint32_t AnimationSystemExecution::GetSkinningCount() const noexcept
-	{
-		return static_cast<std::uint32_t>(m_output.GetPoseWork().size());
-	}
-
 	bool AnimationSystemExecution::RunPlayback(std::uint32_t begin, std::uint32_t end)
 	{
-		return m_playbackQuery
-		    .ForEachRange(
-		        begin,
-		        end,
-		        [this](std::size_t index, EntityId entity, AnimationState& state)
-		        {
-			        const ResolvedAnimationClip clip = m_clips.Resolve(state.Resource);
-			        if (!clip.IsValid() || !state.bPlaying || clip.Resource->durationSeconds <= 0.0f)
-			        {
-				        return;
-			        }
-			        state.TimeSeconds += m_deltaSeconds * state.PlaybackRate;
-			        state.TimeSeconds = state.bLooping ? std::fmod(state.TimeSeconds, clip.Resource->durationSeconds) : (std::min) (state.TimeSeconds, clip.Resource->durationSeconds);
-			        m_animationChanges[index] = entity;
-		        })
-		    .Succeeded();
+		const auto entities = m_registry.GetStorage<AnimationState>().GetEntities();
+		if (begin > end || end > entities.size())
+		{
+			return false;
+		}
+		for (std::uint32_t index = begin; index < end; ++index)
+		{
+			const EntityId entity = entities[index];
+			AnimationState& state = *m_registry.GetMutable<AnimationState>(entity);
+			const ResolvedAnimationClip clip = m_clips.Resolve(state.Resource);
+			if (!clip.IsValid() || !state.bPlaying || clip.Resource->durationSeconds <= 0.0f)
+			{
+				continue;
+			}
+			state.TimeSeconds += m_deltaSeconds * state.PlaybackRate;
+			state.TimeSeconds = state.bLooping ? std::fmod(state.TimeSeconds, clip.Resource->durationSeconds) : (std::min) (state.TimeSeconds, clip.Resource->durationSeconds);
+		}
+		return true;
 	}
 
 	bool AnimationSystemExecution::RunPose(std::uint32_t begin, std::uint32_t end)
 	{
-		return m_poseQuery
-		    .ForEachRange(
-		        begin,
-		        end,
-		        [this](std::size_t, EntityId entity, const AnimationState& state)
-		        {
-			        AnimationOutputStorage::PoseWorkSlot* work = m_output.FindPoseWork(entity);
-			        if (work == nullptr || work->PoseOutputIndex >= m_output.GetMutableOutput().poses.size())
-			        {
-				        return;
-			        }
-
-			        const ResolvedAnimationClip clip = m_clips.Resolve(state.Resource);
-			        const SkeletonEvaluationData skeleton = m_skeletons.Resolve(work->Skeleton);
-			        const bool bClipAvailable = clip.IsValid();
-			        const bool bPoseEvaluated = bClipAvailable && AnimationPoseEvaluator::Evaluate(*clip.Resource, skeleton, state.TimeSeconds, work->LocalTransforms, work->ModelSpaceTransforms);
-
-			        if (!bPoseEvaluated)
-			        {
-				        return;
-			        }
-			        m_output.GetMutableOutput().poses[work->PoseOutputIndex].playbackTimeSeconds = state.TimeSeconds;
-		        })
-		    .Succeeded();
+		const auto work = m_output.GetPoseWork();
+		AnimationOutput& output = m_output.GetMutableOutput();
+		if (begin > end || end > work.size())
+		{
+			return false;
+		}
+		for (std::uint32_t index = begin; index < end; ++index)
+		{
+			AnimationOutputStorage::PoseWorkSlot& slot = work[index];
+			const AnimationState* state = m_registry.Get<AnimationState>(slot.Entity);
+			if (state == nullptr || slot.PoseOutputIndex >= output.poses.size())
+			{
+				continue;
+			}
+			const ResolvedAnimationClip clip = m_clips.Resolve(slot.Clip);
+			const SkeletonEvaluationData skeleton = m_skeletons.Resolve(slot.Skeleton);
+			const bool bClipAvailable = clip.IsValid();
+			const bool bPoseEvaluated = bClipAvailable && AnimationPoseEvaluator::Evaluate(*clip.Resource, skeleton, state->TimeSeconds, slot.LocalTransforms, slot.ModelSpaceTransforms);
+			if (bPoseEvaluated)
+			{
+				output.poses[slot.PoseOutputIndex].playbackTimeSeconds = state->TimeSeconds;
+			}
+		}
+		return true;
 	}
 
 	bool AnimationSystemExecution::RunMorphSamples(std::uint32_t begin, std::uint32_t end)
 	{
-		std::span<AnimationOutputStorage::MorphSampleSlot> samples = m_output.GetMorphSamples();
+		const auto samples = m_output.GetMorphSamples();
 		AnimationOutput& output = m_output.GetMutableOutput();
-
-		return m_morphQuery
-		    .ForEachEntityRange(
-		        m_output.GetMorphEntities(),
-		        begin,
-		        end,
-		        [this, samples, &output](std::size_t index, EntityId, const AnimationState& state)
-		        {
-			        const AnimationOutputStorage::MorphSampleSlot& sample = samples[index];
-			        const ResolvedAnimationClip clip = m_clips.Resolve(sample.Clip);
-			        if (!clip.IsValid() || sample.OutputIndex >= output.morphWeights.size())
-			        {
-				        return;
-			        }
-			        MorphWeightEvaluator::Evaluate(*clip.Resource, sample.ChannelIndex, state.TimeSeconds, output.morphWeights[sample.OutputIndex].weights);
-		        })
-		    .Succeeded();
+		if (begin > end || end > samples.size())
+		{
+			return false;
+		}
+		for (std::uint32_t index = begin; index < end; ++index)
+		{
+			const AnimationOutputStorage::MorphSampleSlot& sample = samples[index];
+			const AnimationState* state = m_registry.Get<AnimationState>(sample.AnimationEntity);
+			if (state == nullptr)
+			{
+				continue;
+			}
+			const ResolvedAnimationClip clip = m_clips.Resolve(sample.Clip);
+			if (!clip.IsValid() || sample.OutputIndex >= output.morphWeights.size())
+			{
+				continue;
+			}
+			MorphWeightEvaluator::Evaluate(*clip.Resource, sample.ChannelIndex, state->TimeSeconds, output.morphWeights[sample.OutputIndex].weights);
+		}
+		return true;
 	}
 
 	bool AnimationSystemExecution::RunSkinning(std::uint32_t begin, std::uint32_t end)
 	{
 		std::span<AnimationOutputStorage::PoseWorkSlot> work = m_output.GetPoseWork();
 		AnimationOutput& output = m_output.GetMutableOutput();
+		if (begin > end || end > work.size())
+		{
+			return false;
+		}
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
 			AnimationOutputStorage::PoseWorkSlot& slot = work[index];
@@ -154,7 +150,7 @@ namespace ECS
 		return true;
 	}
 
-	bool AnimationSystemExecution::CommitMorphOutputs(std::uint32_t, std::uint32_t)
+	bool AnimationSystemExecution::CommitMorphOutputs()
 	{
 		const auto bindings = m_output.GetMorphBindings();
 		const auto samples = m_output.GetMorphSamples();
@@ -175,7 +171,6 @@ namespace ECS
 			{
 				return false;
 			}
-			m_morphChanges[index] = binding.TargetEntity;
 		}
 		return true;
 	}

@@ -58,7 +58,7 @@ void GameWorld::Update(float deltaSeconds)
 
 	if (!m_state->ExecuteSystems(executionContext))
 	{
-		Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "Game-system graph execution failed.");
+		Diagnostics::Fatal(g_gameWorldLogger, __FILE__, __LINE__, "World update failed.");
 	}
 	m_cameraInputIntent.LookDeltaX = 0.0f;
 	m_cameraInputIntent.LookDeltaY = 0.0f;
@@ -99,7 +99,7 @@ void GameWorld::FinalizeSceneLoadCommit()
 
 WorldReadView GameWorld::AcquireReadView() const noexcept
 {
-	return m_state->AcquireReadView();
+	return m_state->AcquireReadView(m_generation);
 }
 
 WorldMaterialVariantView GameWorld::CaptureMaterialVariants() const

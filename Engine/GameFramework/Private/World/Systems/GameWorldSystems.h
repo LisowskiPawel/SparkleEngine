@@ -3,8 +3,9 @@
 #include "World/Systems/CameraSimulationInput.h"
 #include "World/Systems/Execution/AnimationSystemExecution.h"
 #include "World/Systems/Execution/MeshExtractionSystemExecution.h"
-#include "World/Systems/Execution/SimulationSystemExecution.h"
+#include "World/Systems/CameraMovementSystem.h"
 #include "World/Systems/Execution/TransformSystemExecution.h"
+#include "Tasks/Public/TaskGraph.h"
 
 #include <cstdint>
 
@@ -13,10 +14,26 @@ class TaskExecutor;
 
 namespace ECS
 {
-	class CompiledGameSystemGraph;
-	struct GameSystemDesc;
-
 	class GameWorldState;
+
+	struct GameWorldSystemTasks final
+	{
+		struct UpdateCounts final
+		{
+			std::uint32_t Playback = 0;
+			std::uint32_t Poses = 0;
+			std::uint32_t MorphSamples = 0;
+
+			bool operator==(const UpdateCounts&) const noexcept = default;
+		};
+
+		UpdateCounts Counts;
+		CompiledTaskGraph Update;
+		std::uint32_t DirtyTransformCount = 0;
+		CompiledTaskGraph Transforms;
+		std::uint32_t MeshCount = 0;
+		CompiledTaskGraph Extraction;
+	};
 
 	struct GameWorldSystemExecutionContext final
 	{
@@ -28,31 +45,16 @@ namespace ECS
 	class GameWorldSystemExecution final
 	{
 	public:
-		GameWorldSystemExecution(GameWorldState& state, const GameWorldSystemExecutionContext& context, const StructureFrozenEpoch& epoch);
-		static CompiledGameSystemGraph BuildGraph();
+		GameWorldSystemExecution(GameWorldState& state, const GameWorldSystemExecutionContext& context);
+		bool Execute(TaskExecutor& executor);
 
 	private:
-		static GameSystemDesc DescribeCameraMovement();
-		static GameSystemDesc DescribeAnimationPlayback();
-		static GameSystemDesc DescribeAnimationPoseEvaluation(std::uint32_t playbackIndex);
-		static GameSystemDesc DescribeMorphWeightEvaluation(std::uint32_t playbackIndex);
-		static GameSystemDesc DescribeSkinningEvaluation(std::uint32_t poseIndex);
-		static GameSystemDesc DescribeMorphOutputCommit(std::uint32_t morphIndex);
-		static GameSystemDesc DescribeSystemOutputCommit(std::uint32_t skinningIndex, std::uint32_t morphCommitIndex);
-		static GameSystemDesc DescribeTransformEvaluation();
-		static GameSystemDesc DescribeCameraDerivedState(std::uint32_t transformIndex);
-		static GameSystemDesc DescribeMeshExtraction();
-		static GameSystemDesc DescribeExtractionCommit(std::uint32_t extractionIndex);
+		static CompiledTaskGraph BuildUpdateTasks(const GameWorldSystemTasks::UpdateCounts& counts);
+		static CompiledTaskGraph BuildTransformTasks(std::uint32_t count);
+		static CompiledTaskGraph BuildExtractionTasks(std::uint32_t count);
 
-		// Queries and their clients borrow the same frozen epoch and settle before it ends.
-		CameraMovementQuery m_cameraQuery;
-		PlaybackAdvanceQuery m_playbackQuery;
-		PoseEvaluationQuery m_poseQuery;
-		MorphEvaluationQuery m_morphQuery;
-		TransformEvaluationQuery m_transformQuery;
-		CameraDerivedStateQuery m_cameraDerivedQuery;
-		MeshExtractionQuery m_meshQuery;
-		SimulationSystemExecution m_simulation;
+		// Component storage stays fixed until every submitted task settles.
+		CameraMovementSystem m_camera;
 		AnimationSystemExecution m_animation;
 		TransformSystemExecution m_transform;
 		MeshExtractionSystemExecution m_extraction;

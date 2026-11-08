@@ -50,7 +50,7 @@ void EditorShaderCompileOperation::Update(UI& ui, Renderer& renderer)
 	{
 		if (!task->Succeeded())
 		{
-			result = ConsoleCommandResult::Error(std::string(task->GetMessage()));
+			result = ConsoleCommandResult::Error(std::string(task->GetDiagnostic()));
 		}
 		else
 		{

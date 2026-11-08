@@ -28,11 +28,4 @@ namespace ECS
 	{
 		std::string Value;
 	};
-
-	struct EditorMetadata final
-	{
-		bool bSelectable = true;
-		bool bLocked = false;
-		bool bHiddenInHierarchy = false;
-	};
 }
