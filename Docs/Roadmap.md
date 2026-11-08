@@ -76,14 +76,9 @@ Build the [three portfolio cases](Goals.md#the-three-cases) from the completed t
 
 ## Supporting-system simplification
 
-Planned, not started. Reduce maintenance of non-rendering infrastructure through third-party components, in this order. Keep the current rendering priority; these replacements are supporting work, not additional first-release prerequisites.
+Planned, not started. [Third-party migration](ThirdPartyMigration.md) owns candidate research, sources, capability requirements and adoption decisions. Preserve existing workflows and retain the current implementation when no candidate transfers substantial ownership without a second complex local system. These replacements support the current rendering priority and add no first-release prerequisites.
 
-1. **JSON and level parsing.** Replace the handwritten JSON tokenizer, reader and writer with [nlohmann/json](https://github.com/nlohmann/json). Use structured level data to retire the indexed-key grammar. Preserve domain validation, duplicate-key rejection, numeric bounds and accepted-state preservation.
-2. **Task runtime.** Evaluate [enkiTS](https://github.com/dougbinks/enkiTS) as the primary replacement for worker queues, work stealing, wakeups and dependency dispatch; compare [Taskflow](https://github.com/taskflow/taskflow) if its graph integration is smaller. Choose one runtime. Preserve scoped cancellation, cleanup completion, settlement before destruction, the serial reference path and isolation of blocking I/O from frame work.
-3. **Texture cooking.** Replace custom DDS decoding with [DirectXTex](https://github.com/microsoft/DirectXTex), initially retaining the AMD encoder. Then evaluate [AMD's texture-level APIs](https://github.com/GPUOpen-Tools/compressonator/blob/master/docs/source/developer_sdk/cmp_framework/index.rst) or [NVIDIA NVTT 3](https://developer.nvidia.com/gpu-accelerated-texture-compression) for further consolidation. Preserve normal-map filtering, sRGB/HDR handling, alpha, mip behavior and compression quality.
-4. **Command-line parsing.** Replace handwritten option parsing, help generation and common validation in Launcher, AssetCooker and ShaderCompiler with [CLI11](https://github.com/CLIUtils/CLI11). Preserve supported commands/options, defaults, exit behavior and automation workflows. Keep Windows child-process argument quoting with process-launch code.
-
-For each replacement, pin the dependency, keep a narrow integration boundary, remove superseded machinery and verify affected consumers and failure behavior. Measure maintenance reduction and runtime/cook costs before marking it complete.
+Implement qualifying JSON and CLI parsing slices first. Investigate task execution and cooked metadata for larger gains, followed by the conditional texture and native window/input opportunities. Adopt only after the migration guide's capability, ownership, cost and delivery requirements are met; the remaining candidates stay deferred.
 
 ## Choosing the next task
 
