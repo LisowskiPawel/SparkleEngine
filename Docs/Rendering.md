@@ -191,4 +191,4 @@ Application hosts the world and renderer. GameFramework publishes immutable inpu
 
 The showcase runs typed camera, animation, transform and extraction work through Tasks. ECS uses generational entity IDs and fixed typed component storage. Structural edits wait for workers; updates and extraction finish before immutable publication. Animation-only updates preserve the Editor snapshot, and read views distinguish scene changes from new publications so normal updates preserve edit history and viewport navigation.
 
-Shader compilation uses Launcher Cook or Editor **Recompile Shaders** / `CompileShaders [symbols]`. `ReloadShaders` reloads existing output. Dependency-directed Apply Changed is unfinished. See [References](References.md) for papers, SDK guides and earlier results.
+Shader compilation uses Launcher Cook or Editor **Recompile Shaders** / `CompileShaders [symbols]`. `ReloadShaders` reloads existing output. Dependency-directed Apply Changed is unfinished. See [References](References.md) for papers and SDK guides.

@@ -9,7 +9,7 @@ Papers, SDK guides and examples used in the project. Pinned links identify the s
 - [Rendering research](#rendering-research), [scene sources](#scene-sources) and [production studies](#nvidia-production-studies)
 - [Tools and APIs](#tools-and-apis) and [code style](#code-style)
 - [Role sources](#role-sources), [employer study](#employer-role-study), [professional baseline](#professional-baseline) and [public work](#persona-and-portfolio)
-- [Documentation examples](#documentation-examples) and [earlier local results](#earlier-local-results)
+- [Documentation examples](#documentation-examples)
 
 ## Rendering research
 
@@ -406,22 +406,3 @@ The recurring lessons are research carried into a product, API/hardware reasonin
 - [SHaRC overview](https://github.com/NVIDIA-RTX/SHARC/blob/main/README.md) and [Integration](https://github.com/NVIDIA-RTX/SHARC/blob/main/docs/Integration.md): minimal introduction, actionable integration, focused technical detail.
 - [RTXDI README](https://github.com/NVIDIA-RTX/RTXDI/blob/main/README.md): direct build/run instructions, explicit known issues and a linked integration guide.
 - [NRD README](https://github.com/NVIDIA-RTX/NRD/blob/master/README.md): substantial technical knowledge can stay in one navigable guide.
-
-## Earlier local results
-
-These files describe older local builds and checks. Compare their inputs before reusing a result. They are ignored output and may be absent in another checkout.
-
-<details>
-<summary>Local validation records</summary>
-
-- [Earlier unsigned package checks](../artifacts/validation/releases/0.1.0/241ef037-product-20261025/fr02-final-20261031/completion.json).
-- [Release-owner source checks](../artifacts/validation/release-owner-slim-20261101/completion.json), [Launcher delivery](../artifacts/validation/launcher-owned-delivery-20261101/completion.json), [runtime input boundaries](../artifacts/validation/runtime-inputs-slim-20261101/completion.json).
-- [Tool ownership](../artifacts/validation/tools-orchestration-20261108/result.json) and [second pass](../artifacts/validation/tools-orchestration-iteration2-20261108/result.json).
-- [Naming reconciliation](../artifacts/validation/naming-reconciliation-20261101/completion.json).
-- [Application ownership](../artifacts/validation/application-orchestration-20261108/control.json) and [review](../artifacts/validation/application-orchestration-review-02/control.json).
-- [Core review](../artifacts/validation/core-srp-03-20261108/result.md) and [native controls](../artifacts/validation/core-srp-20261108/result.md).
-- [Submission checks](../artifacts/validation/changelist-submit-20261101/completion.json).
-- [Reference shader-identity checks](../artifacts/validation/fr03-f05-shader-identity-20261031/completion.json) and [historical probe cleanup limitation](../artifacts/validation/fr03-f05-20261031/probe-cleanup.json).
-- [GPU-crash mapping source review](../artifacts/validation/gpu-crash-debugging/20261019-gcd-4/mapping-source-review/gate-report.json) and [completion review](../artifacts/validation/gpu-crash-debugging/20261019-gcd-4/mapping-source-review/handoff-gate.json).
-
-</details>

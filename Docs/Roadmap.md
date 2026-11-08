@@ -19,7 +19,7 @@ Reuse earlier design decisions and shader-identity results when their inputs sti
 
 Create a needed scene export or unsigned test archive when its inputs are available. Feature testing can use it before publication approval; final package review must identify the actual tested files. Later RELAX and renderer extensions are not release prerequisites.
 
-The earlier unsigned package has a known scene-publication interruption defect. Source changes need focused checks and a newly tested archive. Package removal was excluded from the earlier result. Image, performance, native-API, reproduction and publication work remains open; [earlier records](References.md#earlier-local-results) describe their own builds.
+The earlier unsigned package has a known scene-publication interruption defect. Source changes need focused checks and a newly tested archive. Package removal was excluded from the earlier result. Image, performance, native-API, reproduction and publication work remains open.
 
 ## Release requirements
 
@@ -76,9 +76,7 @@ Build the [three portfolio cases](Goals.md#the-three-cases) from the completed t
 
 ## Supporting-system simplification
 
-Planned, not started. [Third-party migration](ThirdPartyMigration.md) owns candidate research, sources, capability requirements and adoption decisions. Preserve existing workflows and retain the current implementation when no candidate transfers substantial ownership without a second complex local system. These replacements support the current rendering priority and add no first-release prerequisites.
-
-Implement qualifying JSON and CLI parsing slices first. Investigate task execution and cooked metadata for larger gains, followed by the conditional texture and native window/input opportunities. Adopt only after the migration guide's capability, ownership, cost and delivery requirements are met; the remaining candidates stay deferred.
+These planned changes support rendering and add no first-release prerequisites. Start with JSON and command-line parsing, then investigate task execution and cooked metadata. Evaluate texture cooking and native window/input afterward. The [migration guide](ThirdPartyMigration.md) records the expected benefits, candidate decisions and requirements; other candidates remain deferred.
 
 ## Choosing the next task
 
