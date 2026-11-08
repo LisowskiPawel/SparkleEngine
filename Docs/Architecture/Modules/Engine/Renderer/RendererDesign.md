@@ -42,7 +42,7 @@ The 2026-10-27 review found the following source defects and proof gaps. Source 
 | F02: GGX peak clipping/cancellation | Shared stable GGX source; extreme-domain and backend checks remain open | [Material base qualification](Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) |
 | F03: delta reflection below geometry | Delta support guard corrected; depends on N03 at the real-time primary surface | [Material/GBuffer work](Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) |
 | F04: inconsistent light units | Real-time and reference analytic conversion now share one owner | [Direct-light proof](Features/Lighting/DirectLighting/ImplementationPlan.md#correctness-repair-follow-up) |
-| F05: invalid sample reaches completed prefix | **Open:** GPU validity must gate commit, Complete and raw export | [Reference failure bridge](Features/Lighting/ReferencePathTracer/ImplementationPlan.md#correctness-repair-follow-up) |
+| F05: invalid numerical result accepted as evidence | **Open:** qualify numerical products, completed-prefix identity and non-finite artifact refusal; Complete denotes finished work and the validity bridge is retired | [Reference numerical/publication proof](Features/Lighting/ReferencePathTracer/ImplementationPlan.md#f05-engine-qualification) |
 | F06: raster/ray material and coverage mismatch | **Open:** vertex RGBA, UV/address/strength and filtering contract | [Material lineage](Features/GeometryAndResources/ImplementationPlan.md#correctness-repair-follow-up) |
 | F07: unsupported reference light models admitted | Ideal-light and sampler-extent admission corrected; full exclusion matrix remains open | [Reference admission proof](Features/Lighting/ReferencePathTracer/ImplementationPlan.md#correctness-repair-follow-up) |
 | F08: lossy reservoir identity | Frame ID stored as exact 16-bit numeric fragments; one current payload | [Indirect identity proof](Features/Lighting/IndirectLighting/ImplementationPlan.md#correctness-repair-follow-up) |
@@ -161,7 +161,7 @@ Silent substitution is not support. A requested ray/provider/debug path that can
 - Current surface lighting has no shadow-map or other fully non-ray fallback.
 - Transparent blending and many advanced material lobes are outside the current GBuffer/material contract.
 - Occlusion, LOD, mesh/task shaders, GPU-driven indirect draws, stereo, and multiview are absent.
-- Deferred decals, color grading, chromatic aberration, and HDR10 display output are absent but first-release admitted; volumetric lighting and frame generation remain absent and excluded.
+- Deferred decals, color grading and HDR10 display output remain first-release targets without implementation. Chromatic aberration/vignette have connected basic passes with open semantic/native proof. Volumetric lighting and frame generation remain outside first-release scope; selected bounded volumetrics belong to later M5R work.
 - NVIDIA reconstruction/latency integrations are optional and do not imply Vulkan, non-NVIDIA, package, or quality support.
 - The Reference Path Tracer cannot be used as an acceptance oracle until its discovery/derivation/evidence gate passes.
 - Source inspection does not establish visual quality, temporal stability, performance, memory bounds, native validation, or release readiness.

@@ -16,7 +16,7 @@
 
 **Current readiness:** **50/100** — the source-integrated shader route is substantial; candidate compiler/backend/ABI, failure, performance, package, and adoption evidence remains absent. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#foundation-world-content-shaders-and-tools).
 
-**Preparation ownership amendment, 2026-11-01:** Launcher owns compilation/cooking through the existing tool executable. Editor offers explicit Recompile Shaders and private symbol export, invoking that same `cook.shaders` operation through a tooling action bound by Showcase. Application runs the action in its existing cancellable Editor operation scope and reloads the ordinary map/library only after success. Engine owns no tool paths, compiler flags or source selection. The former compiler process owner, source watcher, recook queue and `recook.signal` receipt protocol stay deleted; the compiler emits no signal. This explicit full-catalog frontend does not complete the target Apply Changed UX below. Generic multi-file safety and runtime map/library validation remain; historical evidence below retains its original candidate. [Current source checks](../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json).
+**Current preparation:** source-inspected at `6fc1f972` on 2026-11-08. Editor's Recompile Shaders action uses the Showcase-bound Launcher tooling action and existing `cook.shaders` operation, with optional private symbols. Application owns cancellation/result lifetime and reloads the ordinary map/library only after success. Tool paths, flags and source selection stay outside Engine. The full-catalog action does not complete the target Apply Changed UX. [Earlier bounded source checks](../../../../artifacts/validation/launcher-owned-delivery-20261101/completion.json) retain their original candidate.
 
 ## Read This Page
 
@@ -441,11 +441,11 @@ Idle -> ChangesReady -> Compiling -> Validating -> Active
 ```
 
 - One operation card owns progress, cancellation, queued/coalesced follow-up state, result, elapsed time, and the active-generation guarantee. Do not emit a dialog or toast per shader job.
-- Source watching may offer coalesced `Auto Apply Changed` as a development preference after debounce/cost measurement. The default interaction must always reveal what will compile; a widely included source or release-target expansion shows the estimated affected scope before expensive work starts.
+- If later admitted, Launcher-owned source watching may offer coalesced `Auto Apply Changed` after debounce/cost measurement. The default interaction must reveal what will compile; a widely included source or release-target expansion shows the estimated affected scope before expensive work starts. No Engine watcher is required.
 - The frontend chooses the named development/release preset and capabilities. An advanced override shows its difference from that preset, validates it before launch, persists only at the declared project/platform scope, and offers `Reset To Preset`.
 - A successful apply needs a short result, not raw cooker stdout. A failure leads with one actionable source diagnostic. All raw artifacts remain available without dominating the workflow.
 - Opening Shader Tools from a GPU marker, error, or pipeline event preserves that selection. The user never retypes a package, shader ID, hash, source path, or backend to continue the investigation.
-- The panel reads one immutable shader-operation/catalog model and submits typed requests to the shader-owned coordinator; it never scans artifact directories, invokes the compiler, mutates the active shader map, creates RHI objects, or enters another feature's operation owner. The coordinator may share the private Application task lifetime/slot mechanism, but shader request, execution, and result policy stay shader-owned.
+- The panel reads one immutable shader-operation/catalog model and submits its intent through the bound tooling action. Application owns operation/result lifetime; Launcher and ShaderCompiler own preparation policy and execution. The panel never scans artifacts, invokes the compiler, mutates the active map or creates RHI objects; no second shader scheduler or Engine tool-path owner is needed.
 
 Epic's current shader-development workflow similarly centers a saved edit plus `recompileshaders changed`, asynchronous compilation, direct source diagnostics, and retry. Sparkle adopts that intent and safe iteration loop while generating more of the target/dependency/publication detail, compiling every selected job, and retaining the previous valid generation. [Epic Shader Development](https://dev.epicgames.com/documentation/en-us/unreal-engine/shader-development-in-unreal-engine)
 
@@ -612,7 +612,8 @@ The recommended base path is intentionally conventional at the API boundary: off
 
 ## Current Implementation Snapshot
 
-The dated registration, cook, publication, runtime, and frame-consumption inventory lives in the [Shader Compilation Capability Inventory](../../Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md). Keep implementation counts and coverage there; this architecture owns only the enduring distinctions among declaration, cooking, materialization, selection, and exercised behavior.
+The [Shader Compilation Capability Inventory](../../Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md) owns compiler coverage; the [Renderer program catalog](../../Modules/Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md) owns exact registration and runtime-target membership. The current Editor frontend is Recompile Shaders plus Reload Cooked, with Application operation lifetime and Launcher-owned preparation as described above. Dependency-directed Apply Changed remains target UX; full-catalog recompilation does not pass its selection criteria.
+
 ## Runtime Residency and Deferred Delivery Taxonomy
 
 Compile inputs, cooked runtime data, live backend objects, and native driver acceleration have different owners and lifetimes. Sparkle persists no compiler result. The first four rows are unified-migration responsibilities; streaming, explicit native pipeline persistence, and prewarming remain deferred research.
@@ -805,7 +806,7 @@ There is no authored or generated `ShaderProgramDesc`, `ShaderProgramId`, `TShad
 
 ### 9. Dependency-Directed Apply Changed
 
-Persist forward and reverse virtual-source dependencies. Editor submits `Apply Changed`; Application snapshots changed virtual paths and routes one typed request; ShaderCompiler selects affected shader types, cooks, and publishes; Renderer validates and activates one replacement. Missing/corrupt dependency metadata fails with explicit `Rebuild All` guidance rather than silently broadening the normal operation. The Editor never scans artifact directories or mutates runtime state.
+This target remains undelivered by the current full-catalog action. Reuse persisted virtual-source dependencies: Editor submits `Apply Changed` through the bound tooling action; Launcher resolves the source-change request; ShaderCompiler derives affected shader types, cooks and publishes. Application requests Renderer reload only after successful completion; Renderer validates and activates one replacement. Missing/corrupt dependency metadata fails with explicit `Rebuild All` guidance rather than silently broadening the operation. Engine gains no watcher, compiler process policy or source-selection owner.
 
 ### 10. Bounded Diagnostics and Traceability
 
@@ -827,12 +828,13 @@ PSO precaching/prewarming, preload/residency/streaming controls, Vulkan pipeline
 
 | Owner | Owns | Must not own |
 | --- | --- | --- |
-| Core | generic paths, hashing, files, processes, tasks, diagnostics | shader source policy, renderer shader types, RHI compilation |
+| Core | generic paths, hashing, files, processes, diagnostics | shader source policy, renderer shader types, RHI compilation |
 | RHI public contract | shader stages/formats, backend-neutral cooked-record validation primitives, parameter metadata primitives, shader/pipeline descriptors, RHI handles | renderer pass catalog, project source discovery, compile orchestration, runtime map policy |
 | RHI backend | create/destroy backend shader and pipeline objects from validated data | source preprocessing, renderer shader/pass policy, package naming |
 | Renderer | concrete global shader classes and nested parameters, graph dispatch/draw use, shader-map references, runtime generation, lazy layout/pipeline materialization | filesystem source resolution, compiler backend selection, editor process UI, precache/preload policy in this migration |
 | ShaderCompiler tool | virtual source mounts, preprocessing/dependencies, compile requests/jobs, backend invocation, reflection validation, shader map/library cook and atomic publication | persisted compiler-result storage, renderer scheduling, live RHI ownership, editor workflow state |
-| Application | changed-path watching, typed operation dispatch, publication notification, and activation request routing | dependency resolution, compilation algorithms, catalog construction, shader-map mutation, editor presentation, direct RHI shader construction |
+| Launcher / tooling composition | tool paths/profiles, source-action admission, compiler process execution and bound Editor tooling action | live shader-map mutation, Renderer scheduling, Editor presentation |
+| Application | cancellable operation/result lifetime and post-success activation request | source watching/selection, tool paths, dependency resolution, compilation, catalog construction, shader-map mutation, Editor presentation, direct RHI shader construction |
 | Editor | immutable shader catalog/operation presentation, semantic selection, source navigation, cancellation intent, and contextual diagnostics | artifact-directory scanning, dependency calculation, compiler invocation, publication, shader-map mutation, cache policy, direct RHI shader construction |
 
 The generic shader authoring primitives may remain in RHI public code if they stay renderer-agnostic. Concrete shader classes and graph use stay Renderer-owned. The runtime shader map may be implemented in Renderer over generic cooked/RHI primitives; it must not cause RHI to depend on Renderer. The standalone compiler may link the registration object catalog, but no runtime module may depend on the tool.

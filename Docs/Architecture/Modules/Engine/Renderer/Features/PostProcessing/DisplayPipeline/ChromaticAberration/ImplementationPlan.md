@@ -4,13 +4,13 @@
 
 Stages: [Stage 0](#stage-0--close-chrd-00) / [Stage 1](#stage-1--freeze-the-first-lens-slice) / [Stage 2](#stage-2--implement-and-prove-the-lens-pass) / [Stage 3](#stage-3--complete-experience-and-integration) / [Stage 4](#stage-4--candidate-evidence-and-closure).
 
-Add a small lens effect with defined channel offsets, clamp behavior and a zero-cost neutral state.
+Finish and qualify the existing lens effect's channel offsets, filtering and zero-cost neutral state.
 
 **Status:** conditional implementation plan; Stage 0 is permitted, Stages 1-4 are blocked until `CHRD-00 PASS` and `DSP-6` prerequisites
 
 **Current source, 2026-10-31:** the dedicated `ChromaticAberration.cpp`/`.hlsl`, shader registration, `r.ChromaticAberration` and shared settings bridge already exist. Presentation composes tone mapping -> chromatic aberration -> vignette -> encoding. The shader uses fixed rounded integer red/blue offsets and clamped loads; this is not the accepted reference-height/bilinear/per-view contract or native proof. Freeze the exact delta against these owners, then repair and qualify it; do not create another lens pass. [Current capability](ChromaticAberrationDesign.md#current-capability) retains the source routes and limits.
 
-**Current readiness:** **0/100** — target only.
+**Dated readiness:** **0/100** in [Current Feature Readiness](../../../../../../../../Acceptance/CurrentReadiness.md#renderer); not rescored here. The connected basic pass exists; accepted formula/filtering/per-view, native and delivery proof remains open.
 
 ## Work This Plan
 

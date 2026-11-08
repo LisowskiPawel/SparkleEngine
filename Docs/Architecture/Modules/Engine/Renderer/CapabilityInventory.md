@@ -391,7 +391,7 @@ executable pixel, extent, backend, and capture evidence remains pending.
 - Persistent scene/view preparation: `Engine/Renderer/Private/Scene` and `Engine/Renderer/Private/View`.
 - Temporal sampling/history: `Engine/Renderer/Private/Temporal`, `Engine/Renderer/Private/View/RenderViewState.*`, `Engine/Renderer/Private/Resources/History`, and temporal shader/provider consumers.
 - Frame graph: `Engine/Renderer/Private/FrameGraph`.
-- Pipeline materialization/binding: `Engine/Renderer/Private/Pipeline`, `Engine/Renderer/Private/PipelineRuntime`, and `Engine/Renderer/Private/ShaderParameters`.
+- Pipeline materialization/binding: `Engine/Renderer/Private/Pipeline` and `Engine/Renderer/Private/ShaderParameters`.
 - Geometry/residency: `Engine/Renderer/Private/Meshes`, `Engine/Renderer/Private/Textures`, and `Engine/Renderer/Private/Scene/GpuScene`.
 - Raster/ray GBuffer: `Engine/Renderer/Private/Passes/GBuffer`.
 - Lighting: `Engine/Renderer/Private/Passes/Lighting` and `Engine/Assets/Shaders/Lighting`, `Engine/Assets/Shaders/BRDF`, and `Engine/Assets/Shaders/Passes/Lighting`.

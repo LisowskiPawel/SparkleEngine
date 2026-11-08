@@ -6,8 +6,6 @@ Choose the renderer work by the result you need: a valid frame, correct surfaces
 
 **Status:** Renderer release-plan index; routing and dependency order, not feature evidence
 
-**Snapshot:** 2026-09-08; Renderer portfolio projection **36/100**; 26 of 26 families are `Blocked`
-
 **Parent orchestrator:** [First Release Implementation Plan](../../../../CrossModule/FirstRelease/ImplementationPlan.md)
 
 **Architecture owner:** [Renderer](../RendererDesign.md), [Rendering A Sparkle Frame](../RenderingASparkleFrame.md), and [Renderer Feature Dossiers](../Features/RendererFeatureGuide.md)
@@ -18,7 +16,7 @@ Choose the renderer work by the result you need: a valid frame, correct surfaces
 | --- | --- | --- |
 | [Frame And Scene](FrameAndSceneImplementationPlan.md) | `FCR-REN-01`, `02`, `03` | immutable admission, Scene/View/GPU-scene preparation, graph compile/execute |
 | [Geometry And Ray Tracing](GeometryAndRayTracingImplementationPlan.md) | `FCR-REN-04`, `05`, `12`, `17`, `21`, `23` | resident visible geometry, raster/ray GBuffer, TLAS, traversal identity, and deferred decals |
-| [Lighting](LightingImplementationPlan.md) | `FCR-REN-06`, `07`, `08` | direct/indirect lighting and discovery-gated Reference Path Tracer closure |
+| [Lighting](LightingImplementationPlan.md) | `FCR-REN-06`, `07`, `08` | direct/indirect lighting and remaining Reference Path Tracer recovery/proof |
 | [Display And Reconstruction](DisplayAndReconstructionImplementationPlan.md) | `FCR-REN-09`, `10`, `14`, `15`, `18`, `22`, `24`–`26` | view-owned temporal/display state through grading, lens, SDR, and HDR10 output |
 | [Runtime And Diagnostics](RuntimeAndDiagnosticsImplementationPlan.md) | `FCR-REN-11`, `13`, `16`, `19`, `20` | shader binding, settings, debug/capture, UI composition, latency coordination |
 
@@ -26,20 +24,7 @@ Every Renderer FCR appears once as a primary work owner. Cross-plan dependencies
 
 ## Dependency Order
 
-```mermaid
-flowchart LR
-    SR[RD-1<br/>shader runtime] --> FS[Frame and Scene]
-    FS --> GR[Geometry and Ray]
-    GR --> LI[Lighting]
-    FS --> DR[Temporal and Display]
-    LI --> DR
-    DR --> UX[RD-2 through RD-5<br/>settings, diagnostics, UI, latency]
-    GR --> PTD[PTD-00 discovery]
-    DR --> PTD
-```
-
-The file boundaries group cohesive features; they do not force whole-file execution. Close `RD-1` before pipeline consumers, then Frame/Scene, Geometry/Ray, Lighting, Display, and the remaining runtime/diagnostic phases. A phase may move earlier only when its dependencies and candidate identity remain explicit.
-
+Admission and shader binding supply the selected Scene/View and graph inputs; geometry and material products feed transport, then reconstruction/display. These are product dependencies, not whole-plan prerequisites. Start with the [Roadmap-selected rendering result](../../../../../Strategy/Roadmap.md#where-we-are-and-what-is-next). Enter RD-1, FS or GR only for its demonstrated missing input or failed check; reuse delivered owners and applicable results. Accepted PTD-00 remains closed unless a specific decision changes. Final native, frame and candidate joins stay with their owning stages.
 
 ## Relationship To Existing Renderer Plans
 

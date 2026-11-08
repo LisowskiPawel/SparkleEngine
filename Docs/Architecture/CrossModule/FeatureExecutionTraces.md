@@ -4,7 +4,7 @@
 
 **Status:** capability snapshot; vertical producer-to-consumer traces; not runtime proof or release approval
 
-**Snapshot:** 2026-09-06 at committed `master` revision `c28b33bd`; current source and build membership inspected; executable Renderer source is unchanged from the earlier `8414b5dc` audit; evidence `S` only
+**Snapshot:** original inventory 2026-09-06 at `c28b33bd`; Reference selection/session, lens stages and shader-tool/publication handoffs rechecked 2026-11-08 at `6fc1f9725`. Other traces retain their dated source boundary; evidence `S` only.
 
 **Scope:** ownership, selection, data production, frame-graph scheduling, shader/RHI consumption, output, history, retirement, and failure behavior for the principal RHI/Renderer/shader-delivery paths
 
@@ -46,8 +46,8 @@ The source ownership rule is concrete: `RenderScene` owns persistent scene data,
 | Pipeline materialization | `GBufferMeshPass` -> runtime pass cache -> RHI | Typed `GBufferVS/GBufferPS`, binding layout, graphics PSO and material descriptors | Shader generation and material/pipeline keys control reuse |
 | Draw | Batch drawer -> graphics command list | Indexed triangle draws write the GBuffer | Alpha mask can discard; no blend pass follows |
 | Derived buffers | `SkyMotionVectorCS` and `SceneDepthCS` | Completes background motion and writes linear `R32_Float` scene depth | Runs after either raster or ray GBuffer frontend |
-| Lighting | ReSTIR lighting producers -> composite -> sky, or the feature-local Reference middle | Lit reads common GBuffer semantics and produces HDR `SceneColor`; the per-view Reference flag instead selects independent camera transport and accumulation | Raster GBuffer does not imply non-ray lighting, and the source-present Reference middle remains unbuilt/GPU-unproved and unavailable through the Editor menu until Stage 7 |
-| Post Processing | exposure -> optional render-resolution visualization -> optional lighting denoising -> presentation upscale -> tone map -> encode -> copy | Output extent/color format becomes back buffer or viewport product | Current debug views still pass through presentation semantics; color grading, chromatic aberration, and frame generation are absent |
+| Lighting | ReSTIR lighting producers -> composite -> sky, or the feature-local Reference middle | Lit reads common GBuffer semantics and produces HDR `SceneColor`; the per-view mode instead selects independent Reference camera transport and accumulation | Reference is selectable in Editor; delivered source and bounded controls do not qualify its raw oracle or full API/lifecycle matrix |
+| Post Processing | exposure -> optional visualization -> optional lighting denoising -> presentation upscale -> tone map -> chromatic aberration -> vignette -> encode -> copy | Output extent/color format becomes back buffer or viewport product | Debug modes control presentation bypass; basic lens passes exist, while grading and frame generation remain absent |
 
 Vertical completeness risk: importer/cooker fidelity for every material role remains a separate asset-pipeline audit. This trace proves the Renderer-side consumer path exists, not that every source format populates it correctly.
 
@@ -89,9 +89,9 @@ The [Direct Lighting package](../Modules/Engine/Renderer/Features/Lighting/Direc
 | Step | Operation | Exact contract | Boundary |
 | --- | --- | --- | --- |
 | UI selection | `RenderViewMode::ReferencePathTracer` | Renderer owns the execution semantic and ordered value `1`; Editor owns only its label, icon, menu placement, and interaction | No Editor mirror enum, preset translation, label, or icon enters View, frame graph, shader, or RHI contracts |
-| Renderer selection | `FramePipeline::BuildRenderFrameGraph` reads the accepted request flag | One direct branch selects Lit scheduling or the feature-local Reference owner | The original frame shell, prepared Scene/View, frame graph, RHI submission, viewport product, and presentation remain shared |
+| Renderer selection | `FramePipeline::AddSceneRenderingPasses` reads the accepted View's mode | One direct branch selects Lit scheduling or `AddReferencePathTracerPasses` | The original frame shell, prepared Scene/View, frame graph, RHI submission, viewport product and presentation remain shared |
 | Existing View boundary | `RenderViewBuilder` -> `RenderView` -> `FramePipeline` | Canonical View carries camera and view-owned rendering data; the builder freezes the one mode from the ordinary request | No UI presentation state, path-tracer camera copy, Scene/View deep copy, or mutable cross-thread reference |
-| Feature-local owner | `Passes/Lighting/ReferencePathTracer/ReferencePathTracer` | Session, resources, identity, passes, and transport stay in the feature capsule | Lit and Reference middle products are mutually exclusive; neither route consumes the other's estimator products |
+| Feature-local owner | `ReferencePathTracerSession` plus colocated pass/resource/identity owners | FramePipeline owns the session lifetime; the feature owns transport and accumulation | Lit and Reference middle products are mutually exclusive; neither route consumes the other's estimator products |
 | Observation | `ViewportRenderProducts.GetProgress()` -> `ViewportPanel` | Generic progress crosses the Renderer boundary; Editor decides whether its Reference UX displays it | Renderer does not carry UI labels, progress-widget visibility, or view-mode ordering |
 | Clean break | Renderer mode, frame composition, and capture contracts | Renderer owns one per-view `RenderViewMode`; RHI capture owns texture readback data only | No selector CVar, target/flag split, Editor mirror enum, recipe/factory hierarchy, GBuffer-seeded reference authority, or UI metadata remains in Renderer/RHI |
 
@@ -116,8 +116,9 @@ The [Direct Lighting package](../Modules/Engine/Renderer/Features/Lighting/Direc
 | Lighting denoising | current unqualified ReSTIR RR intermediate; [selected reconstruction plan](../Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ImplementationPlan.md) | current raw plus guides -> render-extent intermediate; target RR directly reconstructs output | REC-S1/DSP-3 removes RR-then-SR; no target completion inferred |
 | Upscaling | selected Linear or NVIDIA DLSS SR | selected raw/denoised render-extent scene color plus depth/motion/exposure -> output-extent `ResolvedSceneColor` | Exactly one output owner; selected initialization/evaluation failure is explicit with intent unchanged. REC-S1 skips this SR stage when RR owns output |
 | Tone mapping | exposure plus Reinhard, ACES approximation, or ACES fitted filmic | resolved scene-referred HDR -> display-linear `ToneMappedSceneColor` | No public None/bypass; fixed operators are not a color-grading system |
+| Lens effects | existing chromatic-aberration and vignette passes | display-linear color -> fixed radial channel offsets -> fixed edge attenuation | Current order is chromatic then vignette; disabled/diagnostic bypass schedules neither effect. Target formula/filter/order proof remains open under DSP-6 |
 | Output | Automatic/Linear/sRGB encoding, then copy or product publication | display-linear color -> encoded back buffer or `FinalColorLdr` | No PQ/scRGB/HDR10/display-nit contract |
-| Explicit absent stages | no graph owner | no color-grading/LUT transform, chromatic-aberration lens effect, or generated-frame synthesis occurs | Reflex/PCL latency coordination and temporal reconstruction are not frame generation |
+| Explicit absent stages | no graph owner | no color-grading/LUT transform or generated-frame synthesis occurs | Reflex/PCL latency coordination and temporal reconstruction are not frame generation |
 
 The [Post Processing family dossier](../Modules/Engine/Renderer/Features/PostProcessing/PostProcessingDesign.md) owns this order. Its child dossiers keep each supported or absent capability independently reviewable.
 
@@ -131,12 +132,13 @@ The [Post Processing family dossier](../Modules/Engine/Renderer/Features/PostPro
 | Compilation | DXC or Slang backend | Source + target + policy + binding remaps -> binary, reflection, diagnostics, hashes | Current game targets are DXIL SM6.6 and SPIR-V 1.6; Slang stage mapping is vertex/pixel/compute only |
 | ABI validation | Shared validators | Reflected resources/constants/stage/ray contract compared with typed C++ metadata | Mismatch prevents publication |
 | Staging | Publisher | Map, library and dependency data are written as a candidate file set | Staged map/library must open together and share publication identity |
-| Commit | Atomic publication | Candidate file set replaces current products | Cancellation/failure cleanup preserves prior valid generation by design; executable fault tests remain open |
-| Reload admission | Application recook coordinator | Fresh publication ID, active-authority paths, and file hashes are checked before Renderer reload | Missing, partial, outside-authority, stale, or hash-mismatched publication is rejected before active shaders change |
+| Commit | Core file-set publisher, consumed by ShaderCompiler | Candidate files replace the set under exclusive coordination; runtime readers hold a read scope | Pre-commit errors attempt rollback; interruption or failed recovery retains an incomplete marker and readers refuse until clean/regeneration. No journal replay is promised |
+| Compile action | Editor -> Application operation -> Showcase-bound Launcher action | Explicit Recompile Shaders invokes `cook.shaders`, optionally producing private symbols | Engine owns no compiler process, watcher or recook receipt. Full-catalog recompilation does not implement target Apply Changed selection |
+| Reload admission | Application after compile success, or explicit Reload Cooked -> Renderer | Load and validate ordinary cooked map/library before activating the complete replacement | Failed compilation/replacement does not activate partial shaders; Renderer owns ABI/target/generation checks |
 | Materialization | Renderer runtime pass cache | Complete registration set for the selected backend target -> RHI programs, layouts, graphics/compute/ray pipelines and shader tables | Missing target/registration/signature/composition prevents generation publication |
 | Swap/retire | Renderer | Whole validated generation becomes active; previous generation records queue last-use | Old pipelines/programs retire only after GPU completion |
 
-The exact 35-program registration set is listed in [Shader Program Catalog](../Modules/Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md).
+The [Shader Program Catalog](../Modules/Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md) owns exact registration and runtime-target membership.
 
 ## Trace 8: Viewport Product Capture
 

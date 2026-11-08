@@ -12,7 +12,7 @@
 
 **Responsibility:** explain the intent, ownership, data flow, stage order, branches, lifetime, failure boundaries, and tradeoffs of one Sparkle render frame; feature-specific algorithms and limits belong to the linked dossiers
 
-**Current readiness:** **36/100** across the tracked Renderer portfolio — the described source path is broad, four admitted first-release features are absent, and every candidate verification and delivery gate remains open. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#renderer).
+**Current readiness:** **36/100** across the tracked Renderer portfolio — the described source path is broad, lens passes are partial, and decals/grading/HDR plus whole-family verification and delivery remain open. The number is the dated portfolio baseline. See [Current Feature Readiness](../../../../Acceptance/CurrentReadiness.md#renderer).
 
 ## The Frame In One Sentence
 
@@ -90,7 +90,7 @@ The Reference Path Tracer is explicitly **one frame with an alternate middle rec
 | GBuffer | Rasterized; RayTracing | Raster uses vertex/pixel draws and depth attachment. Ray tracing resolves Inline or Pipeline and writes the same semantic outputs with color `R32_Float` device depth. |
 | Surface lighting | Lit uses the existing ReSTIR producer; per-view `RenderViewMode::ReferencePathTracer` selects a source-present independent GPU transport/accumulation middle in the same frame architecture | Ordinary lighting produces Direct and Indirect surface-lighting lobes and requires ray traversal. The Reference middle does not consume or lend authority to Lit output, and remains uncompiled/GPU-unproved rather than an accepted oracle. There is no non-ray deferred-lighting branch. |
 | Direct lighting | four analytic light kinds; Inline/Pipeline shadow visibility | Produces direct diffuse/specular/subsurface lobes. Shadow traversal resolves independently from GBuffer traversal. |
-| Indirect lighting | ReSTIR indirect; reference indirect | Produces indirect diffuse/specular lobes through inline secondary rays. Sky is an environment/background boundary, not broad IBL or atmosphere support. |
+| Indirect lighting | ReSTIR indirect in Lit; independent transport in Reference | Lit produces indirect diffuse/specular lobes through inline secondary rays. Reference traces its own camera paths in the alternate middle. Sky is an environment/background boundary. |
 | Volumetric lighting | none | No media/fog representation, scattering/transmittance integration, atmosphere/aerial-perspective pass, product, selector, or history enters the frame. |
 | Deferred decals | none | No decal data or post-GBuffer composition stage exists. The feature-local target architecture is mandatory first-release work, not current frame behavior. |
 | GBuffer/shadow traversal | Automatic | One engine-wide policy prefers a complete Pipeline route, otherwise selects complete Inline traversal, and rejects when neither is ready. |
@@ -99,11 +99,11 @@ The Reference Path Tracer is explicitly **one frame with an alternate middle rec
 | Upscaling | Linear; NVIDIA DLSS Super Resolution | Converts the selected raw or denoised render-resolution scene color into `ResolvedSceneColor` at output resolution. The GBuffer-backed Lit route may use configured DLSS SR because it supplies truthful depth and motion guides. Reference Path Tracer keeps that Lit configuration intact but uses a color-only Linear resolve at physical output extent; it neither feeds fabricated Lit guides to DLSS nor terminates graph construction because the configured Lit provider is inapplicable. External-provider initialization failure resets the configured Lit provider to Linear rather than claiming DLSS output. |
 | Resolution/sample policy | viewport/window output extent; provider-resolved Lit render extent; output-resolution Reference accumulation; active single-sample raster attachments and Halton jitter | Reference accumulation and its display derivative use the physical output extent independently of the configured Lit upscaler ratio. No Renderer MSAA, standalone TAA/FXAA/SMAA, or dynamic-resolution controller was found; RHI/sample vocabulary is not an active mode. |
 | Color grading | none | No grading parameters, transform/LUT asset path, pass, shader, selector, or editor workflow enters the frame. Tone-mapper selection is not grading. |
-| Chromatic aberration | none | No lens/channel distortion model, pass, selector, or viewport setting enters the frame. |
+| Chromatic aberration | connected basic pass; `r.ChromaticAberration` | Fixed radial red/blue offsets run after tone mapping and before vignette. Accepted units/filtering/per-view and native proof remains open under DSP-6. |
+| Vignette | connected basic pass; `r.Vignette` | Fixed edge attenuation runs after chromatic aberration and before encoding. Formula/parameters/order and native proof remains open under DSP-6. |
 | Frame generation | none | No generated-frame provider, identity, optical-flow input, pacing, UI policy, or extra presentation enters the frame. Reflex/PCL latency coordination is not synthesis. |
 | Presentation target | BackBuffer; ViewportProduct | Back-buffer frames add the copy into the imported presentable resource. Offscreen/editor viewports publish named products without owning swapchain presentation. |
-| Debug view | Lit, Wireframe, GBuffer, lighting, GPU-scene modes | One `RenderViewMode` selects the ordinary result, raster wireframe state, or one focused visualization family.Presentation then applies the scene - referred HDR
-    or display - linear exact route before common output encoding. |
+| Debug view | Lit, Wireframe, GBuffer, lighting, GPU-scene modes | One `RenderViewMode` selects the ordinary result, raster wireframe state or one focused visualization family. Presentation applies the scene-referred HDR or display-linear exact route before common output encoding. |
 
 ## Principal Resource Flow
 

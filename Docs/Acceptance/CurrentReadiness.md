@@ -26,9 +26,9 @@ Use this dated dashboard to find what exists and which proof is missing. For the
 | Portfolio | Tracked families | Readiness | What the number means now |
 | --- | ---: | ---: | --- |
 | Product, build, and delivery | 6 | **33/100** | Historical score; product/package routes and partial evidence now exist. Final archive/adoption remains open; a public support service is excluded. |
-| Foundation, world, and content | 11 | **49/100** | Broad source-integrated foundations exist; candidate correctness, stress, package, and adoption proof is absent. |
-| RHI and GPU execution | 6 | **45/100** | D3D12/Vulkan mechanisms are substantial in source; paired native execution, failure, and release evidence is absent. |
-| Renderer | 26 | **36/100** | Most established frame paths exist in source, while four admitted first-release features are absent and no candidate proof exists. |
+| Foundation, world, and content | 11 | **49/100** | Historical score; later bounded source/native reports exist, while whole-family correctness, stress and delivery acceptance remains open. |
+| RHI and GPU execution | 6 | **45/100** | Historical score; local native results retain their scope, while full paired-backend, failure and release acceptance remains open. |
+| Renderer | 26 | **36/100** | Dated baseline; established frame paths and partial lens passes are source-present. Decals, grading and HDR remain targets; whole-family proof remains open. |
 | **All tracked `FCR-*` families** | **49** | **40/100** | Historical baseline: **49 Blocked; 0 release-approved features.** Later partial reports exist; they do not close a whole family. |
 
 ```mermaid

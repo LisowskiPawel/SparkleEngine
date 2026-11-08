@@ -4,17 +4,15 @@
 
 **Status:** negative/target capability dossier; narrow project conversion scripts exist, but no repository-wide Python engineering layer was found
 
-**Scope:** distinguish the two project-local conversion scripts from absent reusable automation, analysis, bindings, editor scripting, and runtime Python capabilities
+**Scope:** distinguish two project-local conversion commands and their implementation modules from absent reusable automation, analysis, bindings, editor scripting, and runtime Python capabilities
 
 **Owner:** Tools for reusable automation; the producing module owns domain semantics and schemas
 
-**Snapshot:** 2026-09-07; repository file inventory found exactly `ConvertLPSHead.py` and `ConvertCornellBox.py`, both under Showcase conversion assets; source evidence `S` only
-
-**Conversion layout reconciliation:** 2026-11-08; the same two commands now live with their focused implementation modules under `Projects/Showcase/AssetConversion`. The [Showcase ownership map](../Projects/Showcase/ShowcaseCapabilities.md#project-composition-and-asset-preparation) owns the current source layout and invocation. This scoped refactor does not refresh the broader dated capability inventory or admit reusable automation.
+**Source snapshot:** conversion ownership inspected 2026-11-08 at `6fc1f9725`. `ConvertLPSHead.py` and `ConvertCornellBox.py` are the two command entry points; focused modules under `Projects/Showcase/AssetConversion` implement them. The [Showcase ownership map](../Projects/Showcase/ShowcaseCapabilities.md#project-composition-and-asset-preparation) owns invocation and layout. Broader negative capabilities retain the 2026-09-07 inventory boundary; source evidence `S` only.
 
 **Strategy sources:** [`PGE-07`](../../../Strategy/Requirements.md), [Gap Assessment](../../../Strategy/Assessments/GapAssessment.md), and `NS-EVIDENCE`/`NS-SIMPLIFY` in the [Engineer Persona](../../../Strategy/EngineerPersona.md)
 
-**Current readiness:** **10/100** for reusable Python automation — two project conversion scripts exist, but no repository automation, analysis product, binding, or editor/game Python layer exists. See [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities).
+**Dated readiness:** **10/100** for reusable Python automation in [Current Feature Readiness](../../../Acceptance/CurrentReadiness.md#explicit-missing-or-not-yet-admitted-capabilities). Project conversion commands and private modules do not establish a repository analysis product, binding, or editor/game Python layer.
 
 ## At A Glance
 

@@ -4,15 +4,9 @@
 
 **Status:** capability snapshot; exact registered-program ledger; not a successful cook, pipeline-creation record, or release approval
 
-**Snapshot:** 2026-09- 19 at source input revision `a884b6946802e933fafc9fe4c6cdfb93c4cde7e4` plus the current visualization / presentation worktree; all files in `Engine/Renderer/ShaderRegistrations` reconciled with their typed shader declarations and principal frame-graph consumers; evidence `S` only
-
-**Scoped update:** 2026-10-05 at `410d05ef` plus the current review repairs: composition, lighting visualization, direct evaluation and indirect resolve each have one `main` registration. Runtime uniforms control evaluation, primary-shadow sampling, view selection and reconstruction-guide writes. Fixed bindings retain real initialized render-extent targets; omitted families retain radiance initialization but omit reservoirs/history/evaluation. This update does not re-audit every older catalog row. Candidate-bound native results remain owned by [Bounded Show evidence](../../../../../../Acceptance/Renderer/DebugViews.md#earlier-execution-evidence).
-
-**Membership update:** 2026-10-07 exposure repair: three histogram programs replace the two obsolete parallel-reduction programs. Registration names, virtual paths, stages, and total membership are reconciled with current source; this is not a whole-program runtime acceptance result.
+**Source verified:** 2026-11-08 at `6fc1f9725`; registration names, virtual sources, entries and stages reconciled with capability-colocated declarations and the CMake runtime/cook descriptor source set; evidence `S` only
 
 **Scope:** the exact Renderer global-program membership linked into the shader-contract target, including source, entry point, stage, consumer, traversal model, game target expectation, and important binding boundary
-
-**Placement update:** 2026-11-07: registration translation units are colocated with their typed capability declarations under Renderer `Private`. The two CMake descriptor targets retain one shared source set; virtual shader paths and identities are unchanged. The September snapshot above records its historical folder layout.
 
 **Owners:** Renderer `Private/**/*ShaderRegistration*.cpp` files beside their typed declarations for registration membership, typed declarations and pass consumers in `Engine/Renderer`, and `Tools/Shaders` for compilation/publication
 
@@ -27,7 +21,7 @@
 
 ## Count And Meaning
 
-There are exactly 37 registrations: 29 Compute, one Vertex, one Pixel, three RayGeneration, one Miss, one ClosestHit, and one AnyHit. A row means the program is registered in current source and build membership. It does not mean its two runtime variants cooked successfully or that a driver created and executed its pipeline.
+There are exactly 39 registrations: 31 Compute, one Vertex, one Pixel, three RayGeneration, one Miss, one ClosestHit, and one AnyHit. A row means the program is registered in current source and build membership. It does not mean its two runtime variants cooked successfully or that a driver created and executed its pipeline. [Bounded Show evidence](../../../../../../Acceptance/Renderer/DebugViews.md#earlier-execution-evidence) retains its original candidate and narrower native claims.
 
 ## Utility, GBuffer, And Debug
 
@@ -116,6 +110,15 @@ DLSS Super Resolution and DLSS Ray Reconstruction are external provider evaluati
 
 See [Tone Mapping](../PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#tone-mapping) for the three operators and the presentation-owned exact-debugbypass boundary.
 
+## Lens Effects
+
+| Program | Virtual source | Entry | Stage | Game consumer and boundary |
+| --- | --- | --- | --- | --- |
+| `ChromaticAberrationCS` | `/Engine/Passes/Presentation/PostProcessing/ChromaticAberration.hlsl` | `main` | Compute | Display-linear radial red/blue offsets after tone mapping; current fixed integer/clamped sampling still needs its admitted semantic and native proof. |
+| `VignetteCS` | `/Engine/Passes/Presentation/PostProcessing/Vignette.hlsl` | `main` | Compute | Display-linear edge attenuation after chromatic aberration and before encoding; current formula/order still needs qualification. |
+
+Both passes return their input without scheduling work when disabled or bypassed by the View mode. Their [lens plans](../../FirstRelease/DisplayAndReconstructionImplementationPlan.md#dsp-6--chromatic-aberration-and-vignette) own the remaining contract repairs and proof; registration is not lens-family acceptance.
+
 ## Presentation And Output
 
 | Program | Virtual source | Entry | Stage | Game consumer and boundary |
@@ -127,14 +130,13 @@ See [Tone Mapping](../PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#to
 | Feature | Current program coverage | Owning dossier |
 | --- | --- | --- |
 | Color grading | No grading or LUT shader registration | [Color Grading](../PostProcessing/DisplayPipeline/ColorGrading/ColorGradingDesign.md) |
-| Chromatic aberration | No lens/channel-distortion shader registration | [Chromatic Aberration](../PostProcessing/DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md) |
 | Frame generation | No engine shader or external DLSS-G/frame-generation evaluation | [Frame Generation](../PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#frame-generation) |
 
 ## Registered Stage Coverage Versus Vocabulary
 
 | Stage | Registered programs | Current honest status |
 | --- | ---: | --- |
-| Compute | 29 | Broad engine workhorse; includes raster-adjacent, ray-query, lighting, history, debug, and presentation programs. |
+| Compute | 31 | Broad engine workhorse; includes raster-adjacent, ray-query, lighting, history, debug, and presentation programs. |
 | Vertex | 1 | Raster GBuffer only. |
 | Pixel | 1 | Raster GBuffer only. |
 | RayGeneration | 3 | Ray GBuffer, direct shadow, and Reference Path Tracer entry points. |
@@ -148,7 +150,7 @@ See [Tone Mapping](../PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#to
 
 ## Runtime Variant Closure
 
-Each one of the 37 logical registrations must have both `DxilSm66` and `SpirV16` cooked entries before the current paired-backend runtime publication is complete. That is 74 logical registration-target entries, subject to content-blob deduplication in `CookedShaderLibrary.slib`. Other tool targets are explicit compiler vocabulary, not required runtime variants.
+Each one of the 39 logical registrations must have both `DxilSm66` and `SpirV16` cooked entries before the current paired-backend runtime publication is complete. That is 78 logical registration-target entries, subject to content-blob deduplication in `CookedShaderLibrary.slib`. Other tool targets are explicit compiler vocabulary, not required runtime variants.
 
 For native ray compositions, registration count is not sufficient. Runtime materialization additionally checks compatible ray metadata, the global parameter owner, hit-group composition, recursion/payload/attribute limits, and shader-table records. Miss/hit programs do not own an independent pass or root parameter structure.
 

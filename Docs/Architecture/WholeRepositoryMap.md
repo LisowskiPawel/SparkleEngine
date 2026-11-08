@@ -53,14 +53,7 @@ its original paths.
 
 The top-level CMake project requires C++20, loads the Sparkle build profiles and artifact/project contracts, adds `Engine` and `Tools`, then discovers runnable projects through `Projects/*/.sparkle-project`. Optional content-pipeline, shader-compiler, KTX, NVIDIA Streamline, sanitizer, and strict-warning features are explicit CMake options.
 
-Private source capability placement was reconciled on 2026-11-07 against
-`8cbd850c` plus the scoped working tree. [Editor](Modules/Engine/Editor/EditorCapabilities.md#ui-implementation-boundary),
-[Launcher](Modules/Tools/Launcher/LauncherCapabilities.md#frontend-and-planning-model),
-[SourceImporters](Modules/Tools/SourceImporters/SourceImportersCapabilities.md#at-a-glance)
-and [ShaderCompiler](Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md#build-and-delivery-shape)
-own the current folder maps. Module targets and dependency direction are preserved.
-
-The 2026-11-07 second ownership pass colocates shader registrations with their typed capability declarations while preserving the runtime/cook descriptor targets. Renderer scene preparation separates Geometry, Lighting and Deformation implementors; GPU-scene state separates Geometry, Lighting and RayTracing lifetimes. GameFramework `World/Loading` owns staging and commit; Application `Startup` owns command-line, graphics and crash launch parsing; RHI backend selection lives with `Device`. Core, Tasks and Platform retain their cohesive capability owners. Public module surfaces, shader virtual paths and registration identities remain unchanged.
+Private ownership routes were checked at `6fc1f972` on 2026-11-08. Renderer registrations are colocated with typed capability declarations; its [shader catalog](Modules/Engine/Renderer/Features/ShaderRuntime/ShaderProgramCatalog.md) owns exact membership. [GameFramework](Modules/Engine/GameFramework/GameFrameworkCapabilities.md#world-system-scheduling) owns typed world systems, loading and extraction; [Core](Modules/Engine/Core/CoreCapabilities.md) owns the focused file/process/path contracts. [Editor](Modules/Engine/Editor/EditorCapabilities.md#ui-implementation-boundary), [Launcher](Modules/Tools/Launcher/LauncherCapabilities.md#frontend-and-planning-model), [SourceImporters](Modules/Tools/SourceImporters/SourceImportersCapabilities.md#at-a-glance) and [ShaderCompiler](Modules/Tools/ShaderCompiler/ShaderCompilerCapabilities.md#build-and-delivery-shape) own their current private folder maps. These are source ownership facts, not refreshed runtime or release results.
 
 ## Build And Module Boundaries
 
@@ -131,7 +124,7 @@ The current Renderer owner map is:
 | Frame lifetime, topology rebuild, graph construction/execution, and retired graph generations | `Private/Frame` |
 | Technique and product setup/recording | `Private/Passes` |
 | Generic graph handles/resources, dependency compilation, barriers, transients, and execution | `Private/FrameGraph` |
-| Compute/graphics/ray-tracing runtime materialization, shader-parameter construction, and binding | `Private/Pipeline`, `Private/PipelineRuntime`, and `Private/ShaderParameters` |
+| Compute/graphics/ray-tracing runtime materialization, shader-parameter construction, and binding | `Private/Pipeline` and `Private/ShaderParameters` |
 | BLAS/TLAS strategy, execution plans, shared RT composition, and RT diagnostics | `Private/RayTracing` |
 | Upscaling, ray reconstruction, and Streamline integration | `Private/Providers`, `Private/Upscaling`, `Private/RayReconstruction`, and `Private/Streamline` |
 
@@ -176,7 +169,7 @@ The `FrameGraph` object is rebuilt when output/topology, provider selection, lig
 | Chromatic aberration | Connected basic radial pass/shader and shared boolean controls exist; the frozen semantic/native/package contract remains open. [Current source and target](Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/ChromaticAberration/ChromaticAberrationDesign.md). |
 | Frame generation | No synthesis provider, DLSS-G registration, optical-flow input, generated-frame identity, pacing, UI, or present route exists; Reflex is latency infrastructure. [Negative capability dossier](Modules/Engine/Renderer/Features/PostProcessing/ReconstructionAndGeneration/ReconstructionAndGenerationDesign.md#frame-generation). |
 | Presentation/output | `Passes/Visualization` owns focused visualization families; `Passes/Presentation/Upscaling` resolves output extent; `Passes/Presentation/Display` owns tone mapping and encoding; the Presentation root composes and publishes the result. [Feature dossier](Modules/Engine/Renderer/Features/PostProcessing/DisplayPipeline/DisplayPipelineDesign.md#presentation-and-output). |
-| UI/viewport composition | `Private/UI` and `Private/Editor`; immutable packets, host overlay, editor viewport texture binding, and generation checks. [Feature dossier](Modules/Engine/Renderer/Features/ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md#ui-and-viewport-composition). |
+| UI/viewport composition | Renderer `Private/UI` consumes immutable Editor packets and owns viewport texture binding/generation checks; Application composes the Editor host. Game submits no ImGui UI. [Feature dossier](Modules/Engine/Renderer/Features/ViewportAndDiagnostics/ViewportAndDiagnosticsDesign.md#ui-and-viewport-composition). |
 | Persistent GPU scene | `Scene/GpuScene`; geometry, material, lighting, and ray-tracing bindings derived from `RenderScene` |
 | Ray-tracing scene | `Scene/RayTracing` plus `RayTracing/Acceleration`; TLAS and capability-gated PTLAS share scene identity |
 | Dual RT execution | GBuffer and direct-shadow effects have typed inline-query and native-pipeline source frontends selected before graph construction. [Feature dossier](Modules/Engine/Renderer/Features/RayTracing/RayTracingDesign.md). |

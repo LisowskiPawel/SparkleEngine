@@ -8,7 +8,7 @@
 
 **Authority boundary:** [Discovery](Discovery.md) freezes choices; [Execution Architecture](ExecutionArchitecture.md) maps them to execution; this page does not prove a shader conforms
 
-**Current readiness:** **0/100 — target only**.
+**Dated readiness:** **0/100** in [Current Feature Readiness](../../../../../../../../Acceptance/CurrentReadiness.md#renderer); not rescored here. These target semantics are not yet qualified by the connected basic pass.
 
 ## Claim Boundary
 

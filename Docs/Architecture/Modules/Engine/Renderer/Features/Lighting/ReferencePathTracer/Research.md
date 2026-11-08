@@ -368,4 +368,4 @@ Until `FCR-REN-08` eventually passes its candidate acceptance:
 
 Current discovery decision: **`PTD-00-R1 PASS`** at immutable dossier revision `d3152ec28f74cc1987f1d58fb52fa7ede10fd300`. R1 freezes the development domain against `RPTConformanceSet`, keeps release-map support non-inferred, and separates implementation authorization from later package/adoption proof. No runtime, image, performance, package, or release evidence was produced.
 
-`PTD-01-R2 PASS` has since closed the ordinary-selector/Private-capsule Stage 1 without changing the research freeze. Stage 2 is the next permitted implementation stage; release/content/support/package reconciliation remains mandatory before Stage 10, `FCR-REN-08` release closure, or `PTD-03` oracle adoption.
+The research freeze remains precedent. [Discovery](Discovery.md) retains accepted decisions; the [remaining plan](ImplementationPlan.md#required-execution-order) owns recovery and validation of delivered source through Stage 9. Release/content/package reconciliation still precedes Stage 10, `FCR-REN-08` release closure and `PTD-03` oracle adoption; this study selects no next implementation stage.
