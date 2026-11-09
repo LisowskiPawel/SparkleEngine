@@ -1,29 +1,27 @@
 #include "AssetCookerCli.h"
 
-#include "../Api/AssetCookerService.h"
+#include "../Api/CookProjectContent.h"
 
 #include "ToolConsole.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <CLI/CLI.hpp>
 
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <vector>
 
-struct AssetCookerRequest final
-{
-	std::string projectName;
-	std::string configuration = "DevelopmentGame";
-	std::string toolProfile;
-	std::string workspaceRoot;
-	AssetCookerCategory category = AssetCookerCategory::All;
-};
-
 static std::string UnescapeArgument(std::string value)
 {
 	return value.starts_with(' ') ? value.substr(1) : value;
+}
+
+static void ParseWorkspaceRoot(AssetCookerRequest& request, const std::string& value)
+{
+	request.workspaceRoot = Strings::ToWide(std::string_view(value));
 }
 
 static void ConfigureCookOptions(CLI::App& command, AssetCookerRequest& request, bool bRequiresProject)
@@ -43,7 +41,7 @@ static void ConfigureCookOptions(CLI::App& command, AssetCookerRequest& request,
 	    ->required(bRequiresProject);
 
 	command.add_option("--tool-profile", request.toolProfile, "Editor tool profile; defaults to the editor profile matching the configuration.")->type_name("EDITOR_PROFILE");
-	command.add_option("--root", request.workspaceRoot, "Workspace root; defaults to discovery from the current directory.")->type_name("PATH");
+	command.add_option_function<std::string>("--root", std::bind_front(ParseWorkspaceRoot, std::ref(request)), "Workspace root; defaults to discovery from the current directory.")->type_name("PATH");
 
 	for (CLI::Option* option : command.get_options())
 	{
@@ -118,20 +116,7 @@ static bool ParseCookRequest(CLI::App& app, int argc, char** argv, AssetCookerRe
 	return false;
 }
 
-static AssetCookerServiceResult CookProjectContent(const AssetCookerRequest& request)
-{
-	const char* projectName = request.projectName.empty() ? nullptr : request.projectName.c_str();
-
-	AssetCookerService service(
-	    request.workspaceRoot.empty() ? nullptr : request.workspaceRoot.c_str(),
-	    projectName,
-	    request.configuration.c_str(),
-	    request.toolProfile.empty() ? nullptr : request.toolProfile.c_str());
-
-	return service.Cook(projectName, request.configuration.c_str(), request.category);
-}
-
-static void PrintCookResult(const AssetCookerServiceResult& result)
+static void PrintCookResult(const AssetCookerResult& result)
 {
 	for (const AssetCookerDiagnosticRecord& diagnostic : result.diagnostics)
 	{
@@ -163,7 +148,7 @@ int RunAssetCooker(int argc, char** argv)
 		return 1;
 	}
 
-	const AssetCookerServiceResult result = CookProjectContent(request);
+	const AssetCookerResult result = CookProjectContent(request);
 
 	PrintCookResult(result);
 	return result.exitCode;

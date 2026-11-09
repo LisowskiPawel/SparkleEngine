@@ -182,6 +182,7 @@ if(_sparkle_fetch_cli11)
     sparkle_add_dependency_subdirectory(${cli11_SOURCE_DIR} ${cli11_BINARY_DIR})
     get_directory_property(_sparkle_cli11_version DIRECTORY "${cli11_SOURCE_DIR}" DEFINITION PROJECT_VERSION)
     set_target_properties(CLI11 PROPERTIES FOLDER "ThirdParty")
+    target_compile_definitions(CLI11 INTERFACE CLI11_ENABLE_EXTRA_VALIDATORS=0)
     set_property(TARGET CLI11 PROPERTY SPARKLE_SOURCE_PACKAGE
         "{\"name\":\"CLI11\",\"versionInfo\":\"${_sparkle_cli11_version}\",\"licenseDeclared\":\"BSD-3-Clause\",\"downloadLocation\":\"https://github.com/CLIUtils/CLI11/archive/${_sparkle_cli11_revision}.tar.gz\"}")
 endif()

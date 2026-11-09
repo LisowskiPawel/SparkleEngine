@@ -103,19 +103,18 @@ target_include_directories(ShaderCompiler
 target_compile_definitions(ShaderCompiler
     PRIVATE
         SPIRV_TOOLS_SHAREDLIB
-        CLI11_ENABLE_EXTRA_VALIDATORS=0
 )
 
 target_compile_features(ShaderCompiler PRIVATE cxx_std_20)
 
 add_library(ShaderCompilerCli OBJECT ${SHADER_COMPILER_CLI_SOURCES})
+sparkle_configure_host_tool_target(ShaderCompilerCli)
 target_include_directories(ShaderCompilerCli PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Private
     ${CMAKE_SOURCE_DIR}/Engine
     ${CMAKE_SOURCE_DIR}/Engine/Core/Public/Diagnostics)
 target_link_libraries(ShaderCompilerCli PRIVATE CLI11::CLI11 SparkleCore ShaderContracts ToolSupport)
 target_compile_features(ShaderCompilerCli PRIVATE cxx_std_20)
-target_compile_definitions(ShaderCompilerCli PRIVATE CLI11_ENABLE_EXTRA_VALIDATORS=0)
 sparkle_target_precompile_headers(ShaderCompilerCli <CLI/CLI.hpp>)
 target_link_libraries(ShaderCompiler PRIVATE ShaderCompilerCli)
 
@@ -133,7 +132,6 @@ sparkle_target_precompile_headers(ShaderCompiler
 target_link_libraries(ShaderCompiler
     PRIVATE
         ToolSupport
-        CLI11::CLI11
         ShaderContracts
         SparkleCore
         SparkleTasks

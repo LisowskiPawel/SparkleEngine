@@ -8,4 +8,3 @@ namespace CLI
 }
 
 void ConfigureShaderCookOptions(CLI::App& cook, ShaderCookSettings& settings);
-void ValidateShaderCookSelection(const ShaderCookSettings& settings);

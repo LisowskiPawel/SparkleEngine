@@ -307,7 +307,6 @@ target_include_directories(SparkleLauncher
 
 target_link_libraries(SparkleLauncher
     PRIVATE
-        CLI11::CLI11
         SparkleLauncherCore
         SparkleCore
         SparkleTasks
@@ -319,10 +318,10 @@ target_compile_features(SparkleLauncher PRIVATE cxx_std_20)
 
 # Cache the header-only parser only for its owning compilation unit.
 add_library(SparkleLauncherCli OBJECT Private/Shell/LauncherShellArguments.cpp)
+sparkle_configure_host_tool_target(SparkleLauncherCli)
 target_include_directories(SparkleLauncherCli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Private)
 target_link_libraries(SparkleLauncherCli PRIVATE CLI11::CLI11 SparkleLauncherCore)
 target_compile_features(SparkleLauncherCli PRIVATE cxx_std_20)
-target_compile_definitions(SparkleLauncherCli PRIVATE CLI11_ENABLE_EXTRA_VALIDATORS=0)
 sparkle_target_precompile_headers(SparkleLauncherCli <CLI/CLI.hpp>)
 target_link_libraries(SparkleLauncher PRIVATE SparkleLauncherCli)
 
@@ -404,3 +403,4 @@ endif()
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_LAUNCHER_CORE_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${SPARKLE_LAUNCHER_CORE_FOUNDATION_SOURCES} ${SPARKLE_LAUNCHER_CORE_BUILD_SOURCES} ${SPARKLE_LAUNCHER_CORE_BUILD_HEADERS} ${SPARKLE_LAUNCHER_CORE_LEVEL_SOURCES} ${SPARKLE_LAUNCHER_CORE_LEVEL_HEADERS} ${SPARKLE_LAUNCHER_CORE_COOK_SOURCES} ${SPARKLE_LAUNCHER_CORE_COOK_HEADERS} ${SPARKLE_LAUNCHER_CORE_MAINTENANCE_SOURCES} ${SPARKLE_LAUNCHER_CORE_MAINTENANCE_HEADERS} ${SPARKLE_LAUNCHER_PRIVATE_SOURCES} ${SPARKLE_LAUNCHER_PRIVATE_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellArguments.cpp)

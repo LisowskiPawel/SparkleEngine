@@ -8,8 +8,7 @@
 
 namespace SparkleLauncher
 {
-
-	bool PathHasContent(const std::filesystem::path& path)
+	static bool PathHasContent(const std::filesystem::path& path)
 	{
 		std::error_code errorCode;
 		if (!std::filesystem::is_regular_file(path, errorCode) || errorCode)
@@ -21,7 +20,7 @@ namespace SparkleLauncher
 		return !errorCode && size > 0;
 	}
 
-	std::string JoinPaths(const std::vector<std::string>& paths)
+	static std::string JoinPaths(const std::vector<std::string>& paths)
 	{
 		std::ostringstream stream;
 		for (std::size_t index = 0; index < paths.size(); ++index)

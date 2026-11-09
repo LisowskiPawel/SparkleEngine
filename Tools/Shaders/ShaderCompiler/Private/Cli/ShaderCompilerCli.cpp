@@ -56,7 +56,7 @@ static std::vector<std::string> NormalizeShaderArguments(const CLI::App& app, in
 	}
 
 	const auto options = command->get_options();
-	const bool bHasPositional = std::ranges::any_of(options, [](const CLI::Option* option) { return option->get_positional(); });
+	const bool bHasPositional = std::ranges::any_of(options, &CLI::Option::get_positional);
 	if (bHasPositional)
 	{
 		// Inspect IDs are literal, including option-like values and command names.
@@ -123,29 +123,19 @@ int RunShaderCompiler(int argc, char** argv)
 	app.set_help_flag("-h,--help", "Show help and exit; top level also accepts /?.");
 	app.require_subcommand(1, 1);
 	ShaderCookSettings settings;
-	int exitCode = kExitCodeSuccess;
 	CLI::App* cook = app.add_subcommand("cook", "Compile typed shader registrations into GlobalShaderMap.smap and CookedShaderLibrary.slib.");
 	ConfigureShaderCookOptions(*cook, settings);
 
-	cook->callback(
-	    [&]
-	    {
-		    ValidateShaderCookSelection(settings);
-		    exitCode = CookShaders(settings);
-	    });
-
-	app.add_subcommand("list-backends", "List compiler backends and their capabilities.")->callback([&] { exitCode = ListBackends(); });
-	app.add_subcommand("list-targets", "List shader codegen target names.")->callback([&] { exitCode = ListShaderTargets(); });
+	CLI::App* backends = app.add_subcommand("list-backends", "List compiler backends and their capabilities.");
+	CLI::App* targets = app.add_subcommand("list-targets", "List shader codegen target names.");
 
 	CLI::App* shaders = app.add_subcommand("list-shaders", "List typed shader registrations or validate their contracts.");
 	bool bValidateOnly = false;
 	shaders->add_flag("--validate", bValidateOnly, "Validate registered shader contracts without listing them.")->multi_option_policy(CLI::MultiOptionPolicy::Throw);
-	shaders->callback([&] { exitCode = ListShaders(bValidateOnly); });
 
 	CLI::App* inspect = app.add_subcommand("inspect-shader", "Inspect cooked map and library records for a registered shader.");
 	std::string shaderId;
 	inspect->add_option("shader-id", shaderId, "Registered shader ID.")->required();
-	inspect->callback([&] { exitCode = InspectShader(shaderId); });
 
 	const auto declaredCommands = app.get_subcommands({});
 	for (CLI::App* command : declaredCommands)
@@ -173,5 +163,21 @@ int RunShaderCompiler(int argc, char** argv)
 		PrintArgumentFailure(app, *cook, failure);
 		return kExitCodeUsage;
 	}
-	return exitCode;
+	if (cook->parsed())
+	{
+		return CookShaders(settings);
+	}
+	if (backends->parsed())
+	{
+		return ListBackends();
+	}
+	if (targets->parsed())
+	{
+		return ListShaderTargets();
+	}
+	if (shaders->parsed())
+	{
+		return ListShaders(bValidateOnly);
+	}
+	return InspectShader(shaderId);
 }

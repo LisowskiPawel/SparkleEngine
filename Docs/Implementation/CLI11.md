@@ -4,11 +4,11 @@
 
 Temporary implementation plan. Delete this file when the feature closes.
 
-**Status:** stage 1 captured on 2026-11-08 in `DevelopmentEditor`, with production source unchanged at `10e171cd`. Stage 4 AssetCooker implementation and bounded request, cook and failure checks pass; records are in ignored `build/validation/cli11/assetcooker-20261108/report.md`. Temporary validation cleanup is blocked by automatic approval review. Delivery closure still depends on the recorded stage 2–3 cost/shared-host gaps and the remaining stages' acceptance. Stage 4 does not close those gates.
+**Status:** all three conversions are implemented. Stage 6 remains open because D3D12 Game does not exit within 15 seconds of `WM_CLOSE` after activating Empty; the original Launcher reproduces the failure. Vulkan and the native Editor close normally. Resolve this runtime failure before closing the integration or deleting this plan.
 
-Stage 5's ShaderCompiler conversion was implemented independently at the user's request on 2026-11-08. Its command/request comparisons, failure checks, debug/optimization export comparisons and existing `ShaderCompilerCliValidation` checks pass. Initial evidence and measurements are in ignored `build/validation/cli11/shader-20261108/report.md`; the current file ownership, source/executable identities and validation are in ignored `build/validation/cli11/shader-structure-20261108/report.md`. The cumulative three-tool parser rebuild exceeds the frozen build-time budget and remains an integration closure blocker. Stage 5 does not close the preceding stages or stage 6.
+Temporary helper/fixture cleanup is also open: automatic approval review rejected both bulk deletion and a narrower helper-only cleanup with `blocked by policy`. Both isolated validation worktrees were removed successfully. The remaining helpers are ignored local files.
 
-The baseline report, cases, raw output, hashes and comparison budgets are in ignored `build/validation/cli11/baseline-20261108/report.md`. Use these records for the conversion. They cover command parsing, Launcher routing functions and bounded shell/shader execution; native GUI, successful asset cooking, game and package workflows still need delivery-stage checks.
+The final command, cook, native GUI, Editor recompile, cancellation, dependency, relocated/offline and matching-source checks are recorded in ignored `build/validation/cli11/integration-20261108/report.md`, with exact commands, identities and remaining work. Build time, startup and executable sizes pass the frozen budgets. Shared Debug Launcher help now passes after correcting SDK configuration mapping. The original baseline and budgets remain in `build/validation/cli11/baseline-20261108/report.md`; these workflow results do not establish rendering or release acceptance.
 
 The result is three tools using CLI11 directly for argument syntax, option relationships, common validation and generated help. Sparkle keeps typed requests, domain validation and command execution; Windows argument quoting stays with process-launch code. Each tool has one option definition used for parsing and help. Remove the handwritten parsing machinery without introducing a shared parser framework or changing the command interface.
 
@@ -72,15 +72,13 @@ Replace the private shell parser and manual usage text with CLI11 declarations. 
 
 ## 4. Convert AssetCooker
 
-The follow-up review keeps orchestration and implementation details with their CLI owner, exposes only `RunAssetCooker` to the entry point and aligns CMake membership/source groups. Current request, executable, cook, failure and structure checks are recorded in ignored `build/validation/cli11/assetcooker-structure-20261108/report.md`; preceding readability results remain in `build/validation/cli11/assetcooker-readability-20261108/report.md`.
-
 ```text
 Implement stage 4 of the CLI11 plan in Docs/Implementation/CLI11.md after the Launcher/dependency delivery passes.
-Follow Docs/Engineering.md and Docs/CodeStyle.md. Convert all four AssetCooker commands directly to CLI11 without changing service behavior.
+Follow Docs/Engineering.md and Docs/CodeStyle.md. Convert all four AssetCooker commands directly to CLI11 without changing cooking behavior.
 Run this stage's acceptance and failure checks and report request comparisons, real cook results and removed parsing/help code.
 ```
 
-Declare the four cook commands and their existing positional/option grammar. Map directly to the current project, configuration, tool profile, root and category used by `AssetCookerService`. Keep CLI11 private to the executable; the service and cooking libraries remain independent of it.
+Declare the four cook commands and their existing positional/option grammar. Bind project, configuration, tool profile, root and category to one `AssetCookerRequest`, then call `CookProjectContent`. Keep CLI11 private to the executable; the cook operation and cooking libraries remain independent of it.
 
 **Complete when:** all four commands preserve request selection, diagnostics and exit behavior; category commands still require a project; repeat/order cases pass; and the old argument loop, syntax helpers and manual usage table are removed.
 

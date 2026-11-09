@@ -105,7 +105,10 @@ sparkle_join_profile_options(SPARKLE_CLANG_DEBUG_COMPILE_OPTIONS SPARKLE_CLANG_D
 sparkle_join_profile_options(SPARKLE_CLANG_DEVELOPMENT_COMPILE_OPTIONS SPARKLE_CLANG_DEVELOPMENT_COMPILE_FLAGS)
 sparkle_join_profile_options(SPARKLE_CLANG_SHIPPING_COMPILE_OPTIONS SPARKLE_CLANG_SHIPPING_COMPILE_FLAGS)
 
+# SDKs use standard configuration names; the empty entry also admits a generic import.
 foreach(profile IN LISTS SPARKLE_DEBUG_CONFIGURATIONS)
+    string(TOUPPER "${profile}" profile_upper)
+    set(CMAKE_MAP_IMPORTED_CONFIG_${profile_upper} "Debug;Release;")
     if(MSVC)
         sparkle_set_profile_flags(
             ${profile}
@@ -122,6 +125,8 @@ foreach(profile IN LISTS SPARKLE_DEBUG_CONFIGURATIONS)
 endforeach()
 
 foreach(profile IN LISTS SPARKLE_DEVELOPMENT_CONFIGURATIONS)
+    string(TOUPPER "${profile}" profile_upper)
+    set(CMAKE_MAP_IMPORTED_CONFIG_${profile_upper} "RelWithDebInfo;Release;")
     if(MSVC)
         sparkle_set_profile_flags(
             ${profile}
@@ -138,6 +143,8 @@ foreach(profile IN LISTS SPARKLE_DEVELOPMENT_CONFIGURATIONS)
 endforeach()
 
 foreach(profile IN LISTS SPARKLE_SHIPPING_CONFIGURATIONS)
+    string(TOUPPER "${profile}" profile_upper)
+    set(CMAKE_MAP_IMPORTED_CONFIG_${profile_upper} "Release;")
     if(MSVC)
         sparkle_set_profile_flags(${profile} "${SPARKLE_MSVC_SHIPPING_COMPILE_FLAGS}" "${SPARKLE_MSVC_SHIPPING_COMPILE_FLAGS}"
             "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF"

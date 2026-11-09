@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <filesystem>
 #include <functional>
 #include <string>
 #include <string_view>
@@ -62,7 +61,7 @@ static std::string ValidateCompileCountSyntax(std::string& value)
 	return value.find_first_not_of("0123456789") == std::string::npos ? std::string{} : "requires an unsigned decimal count";
 }
 
-void ValidateShaderCookSelection(const ShaderCookSettings& settings)
+static void ValidateShaderCookSelection(const ShaderCookSettings& settings)
 {
 	if (!settings.shaderId.empty() && !settings.changedVirtualPaths.empty())
 	{
@@ -73,6 +72,7 @@ void ValidateShaderCookSelection(const ShaderCookSettings& settings)
 void ConfigureShaderCookOptions(CLI::App& cook, ShaderCookSettings& settings)
 {
 	cook.set_help_flag("-h,--help", "Show cook options and exit.");
+	cook.final_callback(std::bind_front(ValidateShaderCookSelection, std::cref(settings)));
 	cook.option_defaults()->take_last();
 	cook.option_defaults()->group("Selection");
 	cook.add_option("--shader-id", settings.shaderId, "Cook one registered shader entry by shader ID; excludes --changed.");
@@ -100,10 +100,7 @@ void ConfigureShaderCookOptions(CLI::App& cook, ShaderCookSettings& settings)
 
 	cook.add_option("--backend", settings.backendName, "Compiler backend name, or auto.")->capture_default_str();
 
-	cook.add_option_function<std::string>(
-	    "--debug-artifacts",
-	    [&settings](const std::string& directory) { settings.debugArtifactDirectory = std::filesystem::path(directory); },
-	    "Export exact code, full debug data and private source to a fresh cook directory.");
+	cook.add_option("--debug-artifacts", settings.debugArtifactDirectory, "Export exact code, full debug data and private source to a fresh cook directory.");
 
 	cook.add_option_function<std::string>(
 	    "--analysis",

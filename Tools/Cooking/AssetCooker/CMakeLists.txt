@@ -1,5 +1,5 @@
 set(ASSET_COOKER_CORE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Api/AssetCookerService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Api/CookProjectContent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/AssetCookerSceneBatch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/DefaultTextureCookRequestBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/ImportedSceneCooker.cpp
@@ -15,7 +15,7 @@ set(ASSET_COOKER_CORE_SOURCES
 )
 
 set(ASSET_COOKER_CORE_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Api/AssetCookerService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Api/CookProjectContent.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Api/AssetCookerTypes.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/AssetCookerSceneBatch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/DefaultTextureCookRequestBuilder.h
@@ -90,7 +90,8 @@ sparkle_target_precompile_headers(AssetCooker <CLI/CLI.hpp>)
 if(MSVC)
     # Bound CLI11 parser/help code size without changing the cooking libraries.
     target_compile_options(AssetCooker PRIVATE
-        "$<$<CONFIG:DevelopmentEditor,DevelopmentGame,ShippingEditor,ShippingGame>:/O1>")
+        "$<$<CONFIG:DevelopmentEditor,DevelopmentGame,ShippingEditor,ShippingGame>:/O1>"
+        "$<$<CONFIG:DevelopmentEditor,DevelopmentGame,ShippingEditor,ShippingGame>:/Ob0>")
 endif()
 target_link_libraries(AssetCooker
     PRIVATE
