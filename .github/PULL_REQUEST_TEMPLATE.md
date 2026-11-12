@@ -9,4 +9,4 @@ Record exact commands, configuration and results. List applicable checks that co
 ## Rights and scope
 
 Identify new dependencies/assets and their source, pinned identity and notices, if any. Note affected documentation and remaining risks. Do not include private diagnostics or credentials.
- 
+  
