@@ -1,25 +1,11 @@
 #include "Gui/App/LauncherGuiApp.h"
 #include "Shell/LauncherShell.h"
+#include "Startup/LauncherArguments.h"
 #include "Core/Public/Threading/ThreadOwnership.h"
 #include "Core/Public/Process/CommandLineUtils.h"
 #include <vector>
 
 #include <iostream>
-#include <string_view>
-
-static bool ShouldRunShell(int argc, char** argv) noexcept
-{
-	for (int index = 1; index < argc; ++index)
-	{
-		const std::string_view argument(argv[index]);
-		if (argument == "--level" || argument == "--product" || argument == "--graphics-api" || argument == "--gpu-crash-debugging" || argument == "--shader-export" || argument == "--dry-run"
-		    || argument == "--run" || argument == "--help" || argument == "-h" || argument == "/?")
-		{
-			return true;
-		}
-	}
-	return false;
-}
 
 int main(int argc, char** argv)
 {
@@ -38,7 +24,7 @@ int main(int argc, char** argv)
 #if !defined(_WIN32)
 	std::cerr << "SparkleLauncher GUI is currently implemented for Windows.\n";
 #endif
-	if (ShouldRunShell(argc, argv))
+	if (SparkleLauncher::ShouldRunLauncherShell(argc, argv))
 	{
 		const SparkleLauncher::LauncherShell shell;
 		return shell.Run(argc, argv, std::cout, std::cerr);

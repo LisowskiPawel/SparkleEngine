@@ -6,22 +6,20 @@
 #include "Workspace/LauncherRootResolver.h"
 #include "Gui/App/LauncherSettings.h"
 #include "Startup/LauncherShadowExecution.h"
+#include "Startup/LauncherArguments.h"
 #include "SparkleLauncher/WorkspaceLocator.h"
-#include "Core/Public/Strings/StringUtils.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
-#include <QtGui/QWindow>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMessageBox>
 
 #include <filesystem>
+#include <functional>
 #include <optional>
 #include <string>
-#include <string_view>
-#include <vector>
 
 #if defined(_WIN32)
   #define NOMINMAX
@@ -49,16 +47,20 @@ namespace SparkleLauncher
 #endif
 	}
 
-	static std::filesystem::path FindRequestedWorkspaceRoot(int argc, char** argv)
+	static void CreateLauncherWindow(const std::filesystem::path& workspaceRoot)
 	{
-		for (int index = 1; index + 1 < argc; ++index)
-		{
-			if (std::string_view(argv[index]) == "--root")
-			{
-				return Strings::ToWide(std::string_view(argv[index + 1]));
-			}
-		}
-		return {};
+		auto* settings = new LauncherSettings();
+		auto* contentModel = new LauncherContentModel();
+		auto* backend = new LauncherBackend();
+		auto* mainWindow = new LauncherMainWindow(workspaceRoot, *contentModel, *settings, *backend);
+		const auto showWindow = std::bind_front(ForceShowWindow, std::ref(*mainWindow));
+		showWindow();
+		QTimer::singleShot(0, mainWindow, showWindow);
+		QTimer::singleShot(250, mainWindow, showWindow);
+
+		QObject::connect(mainWindow, &QObject::destroyed, settings, &QObject::deleteLater);
+		QObject::connect(mainWindow, &QObject::destroyed, contentModel, &QObject::deleteLater);
+		QObject::connect(mainWindow, &QObject::destroyed, backend, &QObject::deleteLater);
 	}
 
 	int RunLauncherGui(int argc, char** argv)
@@ -70,7 +72,7 @@ namespace SparkleLauncher
 		std::string repositoryError;
 
 		const std::optional<std::filesystem::path> workspace = TryResolveLauncherRoot(
-		    FindRequestedWorkspaceRoot(argc, argv),
+		    ParseLauncherGuiRoot(argc, argv),
 		    std::filesystem::path(QCoreApplication::applicationDirPath().toStdWString()),
 		    repositoryError);
 
@@ -104,23 +106,7 @@ namespace SparkleLauncher
 			return 1;
 		}
 
-		QTimer::singleShot(
-		    0,
-		    &application,
-		    [workspaceRoot]()
-		    {
-			    auto* settings = new LauncherSettings();
-			    auto* contentModel = new LauncherContentModel();
-			    auto* backend = new LauncherBackend();
-			    auto* mainWindow = new LauncherMainWindow(workspaceRoot, *contentModel, *settings, *backend);
-			    ForceShowWindow(*mainWindow);
-			    QTimer::singleShot(0, mainWindow, [mainWindow]() { ForceShowWindow(*mainWindow); });
-			    QTimer::singleShot(250, mainWindow, [mainWindow]() { ForceShowWindow(*mainWindow); });
-
-			    QObject::connect(mainWindow, &QObject::destroyed, settings, &QObject::deleteLater);
-			    QObject::connect(mainWindow, &QObject::destroyed, contentModel, &QObject::deleteLater);
-			    QObject::connect(mainWindow, &QObject::destroyed, backend, &QObject::deleteLater);
-		    });
+		QTimer::singleShot(0, &application, std::bind_front(CreateLauncherWindow, workspaceRoot));
 
 		return QApplication::exec();
 	}

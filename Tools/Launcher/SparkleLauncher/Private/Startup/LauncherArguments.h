@@ -33,6 +33,9 @@ namespace SparkleLauncher
 		bool bShaderSymbols = false;
 	};
 
+	bool ShouldRunLauncherShell(int argc, char** argv);
+	std::filesystem::path ParseLauncherGuiRoot(int argc, char** argv);
+
 	bool ParseLauncherShellArguments(int argc, char** argv, LauncherShellArguments& outArguments, std::ostream& error);
 	void PrintLauncherShellUsage(std::ostream& output);
 }

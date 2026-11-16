@@ -1,6 +1,6 @@
 #include "Shell/LauncherShell.h"
 
-#include "Shell/LauncherShellArguments.h"
+#include "Startup/LauncherArguments.h"
 #include "Shell/LauncherShellModel.h"
 #include "Shell/LauncherShellOperations.h"
 #include "Shell/LauncherShellPresentation.h"

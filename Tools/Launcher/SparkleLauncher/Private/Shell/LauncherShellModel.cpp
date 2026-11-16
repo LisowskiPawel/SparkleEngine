@@ -1,6 +1,6 @@
 #include "Shell/LauncherShellModel.h"
 
-#include "Shell/LauncherShellArguments.h"
+#include "Startup/LauncherArguments.h"
 
 #include "SparkleLauncher/CookOperations.h"
 #include "SparkleLauncher/LevelOperations.h"

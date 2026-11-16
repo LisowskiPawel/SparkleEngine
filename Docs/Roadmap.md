@@ -76,7 +76,7 @@ Build the [three portfolio cases](Goals.md#the-three-cases) from the completed t
 
 ## Supporting-system simplification
 
-These planned changes support rendering and add no first-release prerequisites. Start with [CLI11](ThirdPartyMigration.md#candidates-and-expected-benefit), then JSON. Investigate task execution and cooked metadata next, followed by texture cooking and native window/input. The migration guide records candidate benefits and requirements; other candidates remain deferred.
+These changes support rendering and add no first-release prerequisites. Start with [JSON](ThirdPartyMigration.md#candidates-and-expected-benefit). Investigate task execution and cooked metadata next, followed by texture cooking and native window/input. The migration guide records candidate benefits and requirements; other candidates remain deferred.
 
 ## Choosing the next task
 
