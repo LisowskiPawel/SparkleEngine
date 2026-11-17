@@ -1,4 +1,5 @@
 #include "D3D12/D3D12PCH.h"
+#include "Commands/RenderCommandList.h"
 #include "D3D12/SwapChain/D3D12BackBufferPresentation.h"
 
 #include "D3D12/Device/D3D12Rhi.h"

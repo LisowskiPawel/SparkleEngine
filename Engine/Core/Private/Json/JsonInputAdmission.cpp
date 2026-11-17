@@ -12,10 +12,6 @@ namespace Json
 		{
 			throw Diagnostics::Error("JSON input exceeds its byte limit or contains a raw NUL.");
 		}
-		if (input.starts_with("\xef\xbb\xbf"))
-		{
-			throw Diagnostics::Error("JSON input must use UTF-8 without a byte order mark.");
-		}
 	}
 
 	void InputAdmission::CheckDepth(int depth) const

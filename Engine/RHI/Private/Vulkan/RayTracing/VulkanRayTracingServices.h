@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RHI/Public/RayTracing/RhiRayTracingDesc.h"
+
 #include "RayTracing/RhiRayTracingService.h"
 #include "Vulkan/RayTracing/VulkanTlasServices.h"
 #include "Vulkan/RayTracing/VulkanPtlasServices.h"

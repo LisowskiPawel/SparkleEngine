@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RHI/Public/Interop/ResourceState.h"
+
 #include "Descriptors/RhiDescriptorService.h"
 #include "Frame/RhiFrameConstants.h"
 #include "Interop/RhiNativeHandles.h"
