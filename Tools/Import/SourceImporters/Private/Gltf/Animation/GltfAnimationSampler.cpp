@@ -10,8 +10,6 @@
 #include <cmath>
 #include <format>
 #include <limits>
-#include <string>
-#include <utility>
 #include <vector>
 
 namespace GltfAnimationSampler

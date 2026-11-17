@@ -30,9 +30,16 @@ static nlohmann::json ReadExportDocument(std::string_view text, std::initializer
 		    using Event = nlohmann::json::parse_event_t;
 		    const bool bContainerStart = event == Event::object_start || event == Event::array_start;
 		    const bool bEntryStart = bContainerStart || event == Event::value;
-		    if (bJobs && depth == 2 && bEntryStart && ++jobCount > 65'536)
+		    if (bJobs && depth == 2 && bEntryStart)
 		    {
-			    throw Diagnostics::Error("Shader export exceeds its job limit.");
+			    if (event != Event::value || !value.is_string())
+			    {
+				    throw Diagnostics::Error("Shader export jobs require path strings.");
+			    }
+			    if (++jobCount > 65'536)
+			    {
+				    throw Diagnostics::Error("Shader export exceeds its job limit.");
+			    }
 		    }
 		    if (event == Event::object_start)
 		    {
@@ -45,11 +52,11 @@ static nlohmann::json ReadExportDocument(std::string_view text, std::initializer
 		    if (event == Event::key)
 		    {
 			    const auto& key = value.get_ref<const std::string&>();
+			    const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
 			    if (depth == 1)
 			    {
-				    bJobs = key == "jobs";
+				    bJobs = bConsumed && key == "jobs";
 			    }
-			    const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
 			    if (!bConsumed)
 			    {
 				    return false;
@@ -190,9 +197,7 @@ static void InspectPublishedCook(
 		for (const auto& job : jobs)
 		{
 			std::filesystem::path request;
-			const bool bString = job.is_string();
-			const bool bResolved = bString && ResolveExportRequest(cookDirectory, job.get_ref<const std::string&>(), request);
-			if (bResolved)
+			if (ResolveExportRequest(cookDirectory, job.get_ref<const std::string&>(), request))
 			{
 				InspectPublishedShaderRequest(request, publication, diagnostics, selected);
 			}

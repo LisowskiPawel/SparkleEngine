@@ -8,7 +8,6 @@
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <format>
-#include <utility>
 
 void GltfMeshTangentGenerator::GenerateTangents(ImportedMeshGeometry& geometry)
 {

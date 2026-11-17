@@ -11,7 +11,6 @@
 
 #include <filesystem>
 #include <format>
-#include <utility>
 
 namespace Assets
 {

@@ -91,6 +91,7 @@ Examples behind the project [coding conventions](CodeStyle.md):
 - [NVIDIA NRD formatter](https://github.com/NVIDIA-RTX/NRD/blob/fd33827618aea7cb8b17b74a4923b0c1afc2c319/.clang-format), [NRI](https://github.com/NVIDIA-RTX/NRI/blob/56e42c2f50351538609fef0d1a642e679a8c3458/.clang-format), [CCCL](https://github.com/NVIDIA/cccl/blob/4bd9aaa474d608d2b42548ac7dfadd0c34a9d3a1/.clang-format).
 - [C++ Core Guidelines whitespace](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rl-space), [Epic C++ standard](https://dev.epicgames.com/documentation/unreal-engine/epic-cplusplus-coding-standard-for-unreal-engine), [LLVM formatter options](https://clang.llvm.org/docs/ClangFormatStyleOptions.html).
 - [NVRHI build separation](https://github.com/NVIDIA-RTX/NVRHI/blob/bf0bbd9b666a7297492beb1999a4ddc0dfded143/CMakeLists.txt) and [NVIDIA engineering standards](https://docs.omniverse.nvidia.com/kit/docs/rtx_remix/latest/docs_dev/code-quality/engineering-standards.html): ownership and root-cause repair.
+- [Epic module organization](https://dev.epicgames.com/documentation/en-us/unreal-engine/unreal-engine-modules): public contracts, private implementation and explicit module dependencies; Sparkle's [file placement rules](Engineering.md#file-placement) adapt that separation to its CMake targets.
 
 ## Role sources
 

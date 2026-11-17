@@ -13,7 +13,8 @@ function Assert-PackageManifest
         {
             throw "Duplicate or reserved manifest path: '$($file.Path)'."
         }
-        if ($file.Path.StartsWith('Tools/Diagnostics/', [StringComparison]::OrdinalIgnoreCase) -or
+        if ($file.Path.StartsWith('CMake/Diagnostics/', [StringComparison]::OrdinalIgnoreCase) -or
+            $file.Path.StartsWith('artifacts/gpu-crash/', [StringComparison]::OrdinalIgnoreCase) -or
             $file.Path -match '(^|/)recook\.signal$' -or
             $file.Path -match '(^|/)\.publication-incomplete$' -or
             $file.Path -match '\.(pdb|ilk|obj|lib|exp|cpp|cxx|h|hpp)$' -or

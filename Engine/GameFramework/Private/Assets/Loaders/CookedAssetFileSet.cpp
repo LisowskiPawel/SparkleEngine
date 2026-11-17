@@ -11,7 +11,9 @@
 #include <string>
 #include <system_error>
 
-#if !defined(_WIN32)
+#if defined(_WIN32)
+  #include <Windows.h>
+#else
   #include <fcntl.h>
   #include <sys/mman.h>
   #include <sys/stat.h>

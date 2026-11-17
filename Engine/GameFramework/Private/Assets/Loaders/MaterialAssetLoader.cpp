@@ -6,7 +6,6 @@
 #include "Assets/Cooked/LoadedMaterialAsset.h"
 #include "Assets/Loaders/CookedAssetByteReader.h"
 #include "Assets/Loaders/CookedAssetLoaderDiagnostics.h"
-#include <utility>
 
 namespace Assets
 {

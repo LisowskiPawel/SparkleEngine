@@ -30,7 +30,6 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
-#include <cstdint>
 #include <filesystem>
 #include <system_error>
 #include <vector>

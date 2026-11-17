@@ -101,7 +101,8 @@ Keep Sparkle's distinctive work in rendering, GPU/API reasoning, scene/material 
 | Source selection and capability filtering | [FetchDependencies.cmake](../CMake/Dependencies/FetchDependencies.cmake) |
 | Per-library pins, required files and native target composition | [Dependency recipes](../CMake/Dependencies/Targets) |
 | Downloads, revision checks and cache protection | [DependencyCache.cmake](../CMake/Dependencies/DependencyCache.cmake) |
-| Upstream source and generated build files | Ignored `build/_deps`, shared by workspace and standalone Launcher builds |
+| Shared upstream source caches | Ignored `build/_deps`, shared by workspace and standalone Launcher builds |
+| Native dependency build files | `_deps` beneath each configured build tree; generated projects remain local to that build |
 | Launcher identity, display version, purpose, required files and availability | [SourceDependencyState.cpp](../Tools/Launcher/SparkleLauncher/Private/Dependencies/SourceDependencyState.cpp); GUI rows derive from this inventory |
 | Distribution identity and obligations | Existing [notices](../CMake/Notices/ThirdPartyNotices.txt), package inputs, SBOM and provenance under [Packaging](../CMake/Packaging) |
 

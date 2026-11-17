@@ -2,7 +2,6 @@
 
 #include "ToolOutputPaths.h"
 
-#include <string_view>
 #include <system_error>
 
 namespace SparkleLauncher

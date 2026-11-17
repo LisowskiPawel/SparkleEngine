@@ -15,7 +15,6 @@
 #include "World/Resources/GameWorldResourceStores.h"
 #include "World/Systems/GameWorldSystems.h"
 
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <utility>

@@ -7,8 +7,6 @@
 #include "Assets/Translators/SceneAssetCameraTranslator.h"
 #include "Assets/Translators/SceneAssetLightTranslator.h"
 
-#include <cstddef>
-
 namespace Assets
 {
 	static void AppendCameras(const LoadedSceneManifest& manifest, SceneAssetPayload& payload, CookedAssetAllocationBudget& budget)

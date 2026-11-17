@@ -86,6 +86,46 @@ Orchestration should show what happens and in what order. Put substantial algori
 
 Keep a feature's state and mechanism in one predictable location. Changes elsewhere need an integration reason and a check. A new cache, queue, layer, flag or API needs a current user and a reason simpler code is insufficient. Prefer direct code or a closed enum switch to speculative extensibility.
 
+### File placement
+
+Use the module as the ownership boundary, then group implementation by capability, lifetime or backend. This follows the interface/implementation separation in the [Epic module guide](References.md#code-style) and the backend separation in the referenced NVRHI build. Sparkle's contracts and dependencies determine the actual layout.
+
+| Location | Contents |
+| --- | --- |
+| `<module>/CMakeLists.txt` | Target composition, source membership and dependencies |
+| `<module>/Public/` | Contracts used across module or host boundaries; organize larger surfaces by capability |
+| `<module>/Private/` | Implementation, private headers, PCH and executable entry points |
+| `<module>/Private/<capability>/` | A cohesive algorithm, state machine or workflow and its supporting types |
+| `<module>/Private/<backend>/` | Native implementation of the module's contracts, with capability folders where useful |
+| `<module>/CMake/` | Target-specific SDK discovery, source selection, asset generation and deployment |
+| `<module>/Assets/` | Authored assets consumed by that module |
+
+Keep headers beside the implementation they describe; public contracts remain in `Public`. Use includes relative to the owning public or private root instead of reaching through `../Private`. Small cohesive surfaces may stay flat. Add a folder when it identifies a responsibility; avoid generic `Features`, `Helpers` or `Utils` levels and folders created only to hold one class. A large folder alone does not justify splitting a shared invariant or lifetime.
+
+The source owners are:
+
+| Module or source root | Responsibility and placement |
+| --- | --- |
+| `Engine/Core` | Product-independent contracts and mechanisms: files, paths, processes, input values, math, logging and time; native child-process internals live in `Private/Process/Windows` |
+| `Engine/Tasks` | Graph construction, execution, scheduling, scope lifetime and profiling; product scheduling policy stays with callers |
+| `Engine/Platform` | Native window/input implementation; Core owns the shared input values |
+| `Engine/RHI` | Device/resource/command contracts, common validation and separate D3D12/Vulkan implementations; SDK and backend build rules live in `CMake` |
+| `Engine/Renderer` | Scene/view preparation, GPU scene state, frame graphs, passes and image providers; vendor adapters remain separate from neutral orchestration |
+| `Engine/GameFramework` | Authored levels, cooked asset loading, animation and world state; ECS, editing, publication and render extraction stay private |
+| `Engine/Editor` | Inspection, editing controls and workspace/viewport presentation; icon generation lives in `CMake` |
+| `Engine/Application` | Runtime host composition and startup; Editor host workflows stay in `Private/Editor` and its separate target |
+| `Engine/Assets` | Shared shader source and default textures; pass-specific shaders stay under `Shaders/Passes`, shared mathematics and material rules under their subjects |
+| `Tools/Import/SourceImporters` | Source-format adapters and their imported scene contracts; source decoding stays outside runtime modules |
+| `Tools/Cooking/AssetCooker` | Cook discovery, planning and dispatch across the concrete cookers |
+| `Tools/Cooking/MeshCooker` | Mesh construction and staged mesh publication |
+| `Tools/Cooking/MaterialCooker` | Material construction, texture request production and staged material publication |
+| `Tools/Cooking/SceneCooker` | Scene assembly and generation publication; animation, camera, instance, light, material variant, metadata and skeleton builders stay beside their subjects |
+| `Tools/Cooking/TextureCooker` | Texture request contracts, source loading, processing and batch publication |
+| `Tools/Shaders/ShaderCompiler` | Compiler backends, source resolution, verification and cooked shader publication; in-memory compiler products live in `Private/Compiler/Output` |
+| `Tools/Support/ToolSupport` | Shared tool contracts and mechanisms; catalog parsing stays in `Private/Projects` |
+| `Tools/Launcher/SparkleLauncher` | Workspace/build/cook/run operations, shell and GUI; operation policy stays outside Engine |
+| `Projects/Showcase` | Thin Editor/Game entry points in `Private`, project assets, level definitions and project-specific offline conversion |
+
 ## Data and lifetime
 
 Borrow with references, views or handles, or move ownership, before copying. Extra storage needs a reason, an authoritative source, a lifetime and an invalidation rule. Publish complete immutable results; do not modify world state through derived Editor or Renderer data.
@@ -124,9 +164,11 @@ Permanent test-only additions require explicit project approval. Keep temporary 
 
 ### Script ownership
 
-PowerShell command scripts validate arguments and compose named operations with explicit inputs. Keep implementation beside its capability: `CMake/CodeStyle/` owns source selection, tool discovery, formatting and policy checks; `CMake/Validation/` owns baseline check execution. Under `CMake/Packaging/`, `Payload/` owns admission and identity checks, and `Publication/` owns staging, archives and reversible product replacement. `CMake/Diagnostics/` owns GPU crash receipts, inspection and [diagnostic export](../CMake/Diagnostics/ExportDiagnostics.ps1). Shared local artifact path, file and symbol identity belongs in `CMake/Artifacts/`; source provenance belongs in `CMake/SourceIdentity.ps1`.
+PowerShell command scripts validate arguments and compose named operations with explicit inputs. Keep implementation beside its capability: `CMake/CodeStyle/` owns source selection, tool discovery, formatting and policy checks; `CMake/Validation/` owns baseline check execution. Under `CMake/Packaging/`, `Payload/` owns admission and identity checks, and `Publication/` owns staging, archives and reversible product replacement. `CMake/Diagnostics/` owns GPU crash receipts, inspection and [diagnostic export](../CMake/Diagnostics/ExportDiagnostics.ps1). Shared local artifact paths, file/symbol identity and shader-export membership belong in `CMake/Artifacts/`; source provenance belongs in `CMake/SourceIdentity.ps1`.
 
 Dot-source the required capability from `$PSScriptRoot` and pass its inputs as parameters. Keep subprocess settlement and rollback state with the operation that owns their lifetime. Batch and command files stay small Windows entry points. Update script callers and package paths when moving an implementation; remove replaced paths instead of adding forwarding scripts. Check PowerShell syntax and exercise the affected success and failure paths with local fixtures.
+
+Qualification fixes the bytes admitted to later steps. Freezing or staging must reject changed qualified products rather than re-hash them as new accepted inputs. One transaction owns publication: complete private files first, then publish their containing directory. Baseline checks report launch failures and use a bounded wait after terminating their owned process tree.
 
 ### Performance and images
 
