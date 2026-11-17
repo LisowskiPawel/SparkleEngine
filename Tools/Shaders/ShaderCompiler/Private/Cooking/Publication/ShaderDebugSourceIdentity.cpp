@@ -34,7 +34,7 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 		bool bIdentityField = false;
 		bool bRecordField = false;
 
-		const auto document = nlohmann::json::parse(
+		auto document = nlohmann::json::parse(
 		    receipt.begin(),
 		    receipt.end(),
 		    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
@@ -120,7 +120,6 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 		{
 			throw Diagnostics::Error("Compiler source receipt has no bounded membership array.");
 		}
-		nlohmann::json identity = nlohmann::json::object();
 		for (const auto key : fields)
 		{
 			if (key == "sourceFiles")
@@ -132,16 +131,19 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 			{
 				throw Diagnostics::Error("Compiler source identity is incomplete.");
 			}
-			identity[std::string(key)] = value;
 		}
-		if (identity.at("executableSha256").get_ref<const std::string&>() != HashFile(Filesystem::GetExecutablePath()))
+		document.erase("sourceFiles");
+		if (document.at("executableSha256").get_ref<const std::string&>() != HashFile(Filesystem::GetExecutablePath()))
 		{
 			throw Diagnostics::Error("Compiler source receipt does not identify this executable.");
 		}
 
 		const auto& root = Filesystem::GetWorkspaceRootPath();
-		for (const auto& [relative, expected] : sourceFiles)
+		while (!sourceFiles.empty())
 		{
+			auto file = sourceFiles.extract(sourceFiles.begin());
+			const auto& relative = file.key();
+			const auto& expected = file.mapped();
 			const std::filesystem::path relativePath = Strings::ToWide(std::string_view{relative});
 			const auto source = root / relativePath;
 			const bool bInvalidRoot = relativePath.has_root_path() || relative.empty();
@@ -159,12 +161,12 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 				}
 				continue;
 			}
-			if (HashFile(source) != *expected || !m_sourceFileHashes.emplace(Paths::MakePathKey(source), *expected).second)
+			if (HashFile(source) != *expected || !m_sourceFileHashes.emplace(Paths::MakePathKey(source), std::move(*file.mapped())).second)
 			{
 				throw Diagnostics::Error("Source changed since the diagnostic compiler build; rebuild the candidate.");
 			}
 		}
-		WriteText("product-receipt.json", identity.dump());
+		WriteText("product-receipt.json", document.dump());
 	}
 	catch (const nlohmann::json::exception&)
 	{
