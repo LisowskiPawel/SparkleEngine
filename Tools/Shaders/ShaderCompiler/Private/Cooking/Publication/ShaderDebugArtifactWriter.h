@@ -7,6 +7,7 @@
 
 #include <string_view>
 #include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <string>
 #include <map>

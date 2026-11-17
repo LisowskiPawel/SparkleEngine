@@ -31,7 +31,6 @@ namespace TextureProcessing
 		return output;
 	}
 
-
 	std::vector<Image> SelectImages(const ScratchImage& texture, TextureMipPolicy policy)
 	{
 		const auto& metadata = texture.GetMetadata();
@@ -81,11 +80,15 @@ namespace TextureProcessing
 		return pixels;
 	}
 
-	void ApplySourcePolicy(ScratchImage& pixels, const TextureCookRequest& request, bool bWasFloat, std::stop_token cancellation)
+	void ApplySourcePolicy(ScratchImage& pixels, const TextureCookRequest& request, DXGI_FORMAT sourceFormat, bool bFloatValues, std::stop_token cancellation)
 	{
-		const bool bDecodeSrgb = !bWasFloat && request.policy.colorProcessingPolicy == TextureColorProcessingPolicy::SrgbLinearize;
+		const bool bDecodeSrgb = !bFloatValues && request.policy.colorProcessingPolicy == TextureColorProcessingPolicy::SrgbLinearize;
 		const bool bExtractChannel = request.policy.channelMask != TextureChannelMask::Rgba;
-		if (!bDecodeSrgb && !bExtractChannel)
+		const bool bBc5 = sourceFormat == DXGI_FORMAT_BC5_UNORM || sourceFormat == DXGI_FORMAT_BC5_SNORM;
+		const bool bNormalBc5 = bBc5 && request.policy.textureGroup == TextureGroup::NormalMap;
+		const bool bSignedBc5 = sourceFormat == DXGI_FORMAT_BC5_SNORM;
+		const bool bUnchangedChannels = !bDecodeSrgb && !bExtractChannel;
+		if (bUnchangedChannels && !bNormalBc5)
 		{
 			return;
 		}
@@ -99,17 +102,24 @@ namespace TextureProcessing
 		        images.data(),
 		        images.size(),
 		        metadata,
-		        [channel, bDecodeSrgb, bExtractChannel, cancellation](XMVECTOR* output, const XMVECTOR* input, std::size_t width, std::size_t)
+		        [channel, bDecodeSrgb, bExtractChannel, bNormalBc5, bSignedBc5, cancellation](XMVECTOR* output, const XMVECTOR* input, std::size_t width, std::size_t)
 		        {
 			        CheckTextureCancellation(cancellation);
 			        for (std::size_t x = 0; x < width; ++x)
 			        {
-				        const auto pixel = bDecodeSrgb ? XMColorSRGBToRGB(input[x]) : input[x];
+				        auto pixel = bDecodeSrgb ? XMColorSRGBToRGB(input[x]) : input[x];
+				        if (bNormalBc5)
+				        {
+					        const auto xy = bSignedBc5 ? pixel : XMVectorSubtract(XMVectorScale(pixel, 2.0f), g_XMOne);
+					        const auto z = XMVectorSqrt(XMVectorMax(XMVectorSubtract(g_XMOne, XMVector2LengthSq(xy)), g_XMZero));
+					        const auto normal = XMVectorSetZ(xy, XMVectorGetX(z));
+					        pixel = XMVectorSetW(XMVectorMultiplyAdd(normal, g_XMOneHalf, g_XMOneHalf), XMVectorGetW(input[x]));
+				        }
 				        output[x] = bExtractChannel ? XMVectorSetW(XMVectorReplicate(XMVectorGetByIndex(pixel, channel)), 1.0f) : pixel;
 			        }
 		        },
 		        extracted),
-		    "extract material channel");
+		    "apply source pixel semantics");
 
 		pixels = std::move(extracted);
 	}
@@ -208,9 +218,9 @@ namespace TextureProcessing
 		return properties;
 	}
 
-	DXGI_FORMAT SelectOutputFormat(const TextureCookRequest& request, bool bWasFloat, const PixelProperties& properties)
+	DXGI_FORMAT SelectOutputFormat(const TextureCookRequest& request, bool bFloatValues, const PixelProperties& properties)
 	{
-		const auto uncompressed = bWasFloat ? DXGI_FORMAT_R32G32B32A32_FLOAT : DXGI_FORMAT_R8G8B8A8_UNORM;
+		const auto uncompressed = bFloatValues ? DXGI_FORMAT_R32G32B32A32_FLOAT : DXGI_FORMAT_R8G8B8A8_UNORM;
 		DXGI_FORMAT format = uncompressed;
 		switch (request.policy.textureGroup)
 		{
@@ -226,7 +236,7 @@ namespace TextureProcessing
 			case TextureGroup::Diffuse:
 			case TextureGroup::Emissive:
 			case TextureGroup::SubsurfaceColor:
-				format = properties.bHasAlpha ? uncompressed : (bWasFloat ? DXGI_FORMAT_BC6H_UF16 : DXGI_FORMAT_BC1_UNORM);
+				format = properties.bHasAlpha ? uncompressed : (bFloatValues ? DXGI_FORMAT_BC6H_UF16 : DXGI_FORMAT_BC1_UNORM);
 				break;
 			case TextureGroup::HdrColor:
 				format = properties.bHasAlpha ? uncompressed : DXGI_FORMAT_BC6H_UF16;
@@ -256,29 +266,33 @@ bool CanPreserveTextureBlocks(const TextureCookRequest& request, DXGI_FORMAT for
 {
 	const bool bSuppliedMips = request.policy.mipPolicy != TextureMipPolicy::Generate;
 	const bool bUnchangedChannels = request.policy.channelMask == TextureChannelMask::Rgba;
-	return IsCompressed(format) && bSuppliedMips && bUnchangedChannels;
+	const bool bSignedNormal = request.policy.textureGroup == TextureGroup::NormalMap && format == DXGI_FORMAT_BC5_SNORM;
+	const bool bUnchangedEncoding = IsCompressed(format) && !bSignedNormal;
+	return bUnchangedEncoding && bSuppliedMips && bUnchangedChannels;
 }
 
 ScratchImage ProcessTexture(const TextureCookRequest& request, ScratchImage source, std::stop_token cancellation)
 {
 	CheckTextureCancellation(cancellation);
-	const auto& sourceMetadata = source.GetMetadata();
-	if (CanPreserveTextureBlocks(request, sourceMetadata.format))
+	const auto sourceFormat = source.GetMetadata().format;
+	if (CanPreserveTextureBlocks(request, sourceFormat))
 	{
-		source.OverrideFormat(ApplyOutputIntent(sourceMetadata.format, request));
+		source.OverrideFormat(ApplyOutputIntent(sourceFormat, request));
 		return std::move(source);
 	}
-	const bool bWasFloat = sourceMetadata.format == DXGI_FORMAT_R32G32B32A32_FLOAT || sourceMetadata.format == DXGI_FORMAT_BC6H_UF16;
+	const bool bNativeFloat = sourceFormat == DXGI_FORMAT_R32G32B32A32_FLOAT || sourceFormat == DXGI_FORMAT_BC6H_UF16;
+	const bool bSignedValues = sourceFormat == DXGI_FORMAT_BC4_SNORM || sourceFormat == DXGI_FORMAT_BC5_SNORM;
+	const bool bFloatValues = bNativeFloat || bSignedValues;
 	ScratchImage pixels = DecodeWorkingPixels(source, request);
-	if (bWasFloat)
+	if (bNativeFloat)
 	{
 		InspectPixels(pixels, request.policy.mipPolicy, cancellation);
 	}
-	ApplySourcePolicy(pixels, request, bWasFloat, cancellation);
+	ApplySourcePolicy(pixels, request, sourceFormat, bFloatValues, cancellation);
 	GenerateMips(pixels, request, cancellation);
 	const auto policy = request.policy.mipPolicy == TextureMipPolicy::NoMips ? TextureMipPolicy::NoMips : TextureMipPolicy::PreserveExisting;
 	const auto properties = InspectPixels(pixels, policy, cancellation);
-	const DXGI_FORMAT format = SelectOutputFormat(request, bWasFloat, properties);
+	const DXGI_FORMAT format = SelectOutputFormat(request, bFloatValues, properties);
 	if (format == DXGI_FORMAT_R32G32B32A32_FLOAT)
 	{
 		return pixels;

@@ -101,6 +101,7 @@ target_link_libraries(AssetCooker
 sparkle_declare_runtime_dll_owner(AssetCooker SparkleCore SparkleTasks SparkleGameFramework SparkleRHI SparklePlatform)
 
 if(TARGET assimp)
+    set_property(TARGET AssetCooker APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES "$<TARGET_FILE_NAME:assimp>")
     add_custom_command(TARGET AssetCooker POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<TARGET_FILE:assimp>"

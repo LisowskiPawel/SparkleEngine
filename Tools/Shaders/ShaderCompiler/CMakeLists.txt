@@ -22,73 +22,7 @@ add_executable(ShaderCompiler
 )
 sparkle_configure_host_tool_target(ShaderCompiler)
 
-set(DXC_SDK_ROOT "$ENV{VULKAN_SDK}" CACHE PATH "DXC SDK root")
-set(SLANG_SDK_ROOT "$ENV{VULKAN_SDK}" CACHE PATH "Slang SDK root")
-set(SPIRV_TOOLS_SDK_ROOT "$ENV{VULKAN_SDK}" CACHE PATH "SPIRV-Tools SDK root")
-if(SPARKLE_WITH_GPU_CRASH_DEBUGGING)
-    sparkle_verify_gpu_crash_inputs("${DXC_SDK_ROOT}" Dxc)
-    sparkle_verify_gpu_crash_inputs("${SLANG_SDK_ROOT}" Slang)
-    sparkle_verify_gpu_crash_inputs("${SPIRV_TOOLS_SDK_ROOT}" SpirvTools)
-    # A prior find_* cache must not bypass the verified roots.
-    foreach(_input IN ITEMS SPIRV_TOOLS_INCLUDE_DIR SPIRV_TOOLS_IMPORT_LIBRARY SPIRV_TOOLS_RUNTIME_LIBRARY
-            DXC_INCLUDE_DIR DXC_IMPORT_LIBRARY DXC_RUNTIME_LIBRARY
-            SLANG_INCLUDE_DIR SLANG_IMPORT_LIBRARY SLANG_RUNTIME_LIBRARY SLANG_COMPILER_RUNTIME_LIBRARY
-            SLANG_GLSL_MODULE_RUNTIME_LIBRARY SLANG_GLSLANG_RUNTIME_LIBRARY SLANG_RT_RUNTIME_LIBRARY SLANG_STANDARD_LIBRARY_FILE)
-        unset(${_input})
-        unset(${_input} CACHE)
-    endforeach()
-endif()
-find_path(SPIRV_TOOLS_INCLUDE_DIR NAMES spirv-tools/libspirv.hpp PATHS "${SPIRV_TOOLS_SDK_ROOT}/Include" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_library(SPIRV_TOOLS_IMPORT_LIBRARY NAMES SPIRV-Tools-shared PATHS "${SPIRV_TOOLS_SDK_ROOT}/Lib" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_file(SPIRV_TOOLS_RUNTIME_LIBRARY NAMES SPIRV-Tools-shared.dll PATHS "${SPIRV_TOOLS_SDK_ROOT}/Bin" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_path(DXC_INCLUDE_DIR NAMES dxcapi.h PATHS "${DXC_SDK_ROOT}/Include/dxc" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_library(DXC_IMPORT_LIBRARY NAMES dxcompiler PATHS "${DXC_SDK_ROOT}/Lib" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_file(DXC_RUNTIME_LIBRARY NAMES dxcompiler.dll PATHS "${DXC_SDK_ROOT}/Bin" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_path(SLANG_INCLUDE_DIR NAMES slang.h PATHS "${SLANG_SDK_ROOT}/Include/slang" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_library(SLANG_IMPORT_LIBRARY NAMES slang PATHS "${SLANG_SDK_ROOT}/Lib" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_file(SLANG_RUNTIME_LIBRARY NAMES slang.dll PATHS "${SLANG_SDK_ROOT}/Bin" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_file(SLANG_COMPILER_RUNTIME_LIBRARY NAMES slang-compiler.dll PATHS "${SLANG_SDK_ROOT}/Bin" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_file(SLANG_GLSL_MODULE_RUNTIME_LIBRARY NAMES slang-glsl-module.dll PATHS "${SLANG_SDK_ROOT}/Bin" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_file(SLANG_GLSLANG_RUNTIME_LIBRARY NAMES slang-glslang.dll PATHS "${SLANG_SDK_ROOT}/Bin" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_file(SLANG_RT_RUNTIME_LIBRARY NAMES slang-rt.dll PATHS "${SLANG_SDK_ROOT}/Bin" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_file(SLANG_STANDARD_LIBRARY_FILE NAMES slang.slang PATHS "${SLANG_SDK_ROOT}/Bin" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-file(GLOB SLANG_STANDARD_MODULE_DIRECTORIES LIST_DIRECTORIES true "${SLANG_SDK_ROOT}/Bin/slang-standard-module-*")
-list(SORT SLANG_STANDARD_MODULE_DIRECTORIES)
-list(LENGTH SLANG_STANDARD_MODULE_DIRECTORIES _slang_standard_module_count)
-if(SPARKLE_WITH_GPU_CRASH_DEBUGGING AND NOT _slang_standard_module_count EQUAL 1)
-    message(FATAL_ERROR "GPU crash debugging requires exactly the verified Slang standard module directory.")
-endif()
-if(NOT SLANG_STANDARD_MODULE_DIRECTORIES)
-    message(FATAL_ERROR "Slang standard modules were not found under ${SLANG_SDK_ROOT}/Bin.")
-endif()
-
-set(SLANG_RUNTIME_SUPPORT_FILES
-    "${SLANG_COMPILER_RUNTIME_LIBRARY}"
-    "${SLANG_GLSL_MODULE_RUNTIME_LIBRARY}"
-    "${SLANG_GLSLANG_RUNTIME_LIBRARY}"
-    "${SLANG_RT_RUNTIME_LIBRARY}"
-    "${SLANG_STANDARD_LIBRARY_FILE}")
-
-set(_shader_runtime_support)
-foreach(_support IN LISTS SLANG_RUNTIME_SUPPORT_FILES)
-    get_filename_component(_name "${_support}" NAME)
-    list(APPEND _shader_runtime_support "${_name}")
-endforeach()
-foreach(_module IN LISTS SLANG_STANDARD_MODULE_DIRECTORIES)
-    file(GLOB_RECURSE _module_files CONFIGURE_DEPENDS RELATIVE "${SLANG_SDK_ROOT}/Bin" "${_module}/*")
-    if(NOT _module_files)
-        message(FATAL_ERROR "Slang standard module is empty: ${_module}")
-    endif()
-    list(APPEND _shader_runtime_support ${_module_files})
-endforeach()
-set_property(TARGET ShaderCompiler PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES ${_shader_runtime_support})
-
-add_library(slang::slang SHARED IMPORTED GLOBAL)
-set_target_properties(slang::slang PROPERTIES
-    IMPORTED_IMPLIB "${SLANG_IMPORT_LIBRARY}"
-    IMPORTED_LOCATION "${SLANG_RUNTIME_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${SLANG_INCLUDE_DIR}"
-)
+include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/ShaderCompilerSdks.cmake")
 
 target_include_directories(ShaderCompiler
     PRIVATE
@@ -143,37 +77,7 @@ target_link_libraries(ShaderCompiler
         slang::slang
 )
 
-add_custom_command(TARGET ShaderCompiler POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${DXC_RUNTIME_LIBRARY}"
-        "$<TARGET_FILE_DIR:ShaderCompiler>/dxcompiler.dll"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${SLANG_RUNTIME_LIBRARY}"
-        "$<TARGET_FILE_DIR:ShaderCompiler>/slang.dll"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${SPIRV_TOOLS_RUNTIME_LIBRARY}"
-        "$<TARGET_FILE_DIR:ShaderCompiler>/SPIRV-Tools-shared.dll"
-)
-
-foreach(slang_runtime_support_file IN LISTS SLANG_RUNTIME_SUPPORT_FILES)
-    get_filename_component(slang_runtime_support_name "${slang_runtime_support_file}" NAME)
-    add_custom_command(TARGET ShaderCompiler POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${slang_runtime_support_file}"
-            "$<TARGET_FILE_DIR:ShaderCompiler>/${slang_runtime_support_name}"
-    )
-endforeach()
-
-foreach(slang_standard_module_directory IN LISTS SLANG_STANDARD_MODULE_DIRECTORIES)
-    get_filename_component(slang_standard_module_name "${slang_standard_module_directory}" NAME)
-    add_custom_command(TARGET ShaderCompiler POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E remove_directory
-            "$<TARGET_FILE_DIR:ShaderCompiler>/${slang_standard_module_name}"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${slang_standard_module_directory}"
-            "$<TARGET_FILE_DIR:ShaderCompiler>/${slang_standard_module_name}"
-    )
-endforeach()
+include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/ShaderCompilerRuntime.cmake")
 
 sparkle_configure_development_tool_artifacts(ShaderCompiler)
 sparkle_declare_runtime_dll_owner(ShaderCompiler SparkleCore)

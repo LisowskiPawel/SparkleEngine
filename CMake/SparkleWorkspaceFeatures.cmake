@@ -3,6 +3,8 @@ option(SPARKLE_ENABLE_SHADER_COMPILER "Build offline shader compiler tooling" ON
 option(SPARKLE_ENABLE_NVIDIA_STREAMLINE "Fetch and stage NVIDIA Streamline SDK runtime for DLSS providers" ON)
 option(SPARKLE_BUILD_SHARED "Build Sparkle modules as shared libraries (DLLs)" OFF)
 option(SPARKLE_WITH_GPU_CRASH_DEBUGGING "Build the opt-in NVIDIA GPU crash debugging variant" OFF)
+option(SPARKLE_RHI_WITH_EXTERNAL_CAPTURE "Enable development Editor native GPU capture integration" ON)
+option(SPARKLE_RHI_WITH_D3D12_PIX_EVENTS "Enable official PIX events for non-Shipping D3D12 builds" OFF)
 
 if(SPARKLE_WITH_GPU_CRASH_DEBUGGING)
     if(NOT WIN32 OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8 OR NOT CMAKE_CXX_COMPILER_ARCHITECTURE_ID STREQUAL "x64")
