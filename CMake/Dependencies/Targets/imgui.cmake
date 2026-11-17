@@ -10,8 +10,8 @@ if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
 endif()
 
 add_library(imgui STATIC
-    ${CMAKE_CURRENT_LIST_DIR}/../ImGui/SparkleImGuiConfig.h
-    ${CMAKE_CURRENT_LIST_DIR}/../ImGui/SparkleImGuiContext.cpp
+    ${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/ImGui/SparkleImGuiConfig.h
+    ${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/ImGui/SparkleImGuiContext.cpp
     ${imgui_SOURCE_DIR}/imgui.cpp
     ${imgui_SOURCE_DIR}/imgui_demo.cpp
     ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -22,7 +22,7 @@ add_library(imgui STATIC
 )
 
 target_include_directories(imgui PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/../ImGui
+    ${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/ImGui
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
 )

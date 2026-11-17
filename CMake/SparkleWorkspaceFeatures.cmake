@@ -1,4 +1,5 @@
 option(SPARKLE_ENABLE_CONTENT_PIPELINE "Build source import, conversion, and asset/texture cooking tools" ON)
+set(SPARKLE_SYNC_SOURCE_DEPENDENCY "" CACHE STRING "Populate exactly one source dependency cache and skip workspace generation")
 option(SPARKLE_ENABLE_SHADER_COMPILER "Build offline shader compiler tooling" ON)
 option(SPARKLE_ENABLE_NVIDIA_STREAMLINE "Fetch and stage NVIDIA Streamline SDK runtime for DLSS providers" ON)
 option(SPARKLE_BUILD_SHARED "Build Sparkle modules as shared libraries (DLLs)" OFF)

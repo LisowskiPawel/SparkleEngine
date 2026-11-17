@@ -1,21 +1,7 @@
 #pragma once
 
-#include "Viewport/ViewportPresentationSnapshot.h"
-
 #include "RendererAPI.h"
-#include "ExternalCapture/RendererGraphicsLaunch.h"
-#include "RHI/Public/Core/RhiBackendApi.h"
-#include "Diagnostics/RendererMemoryDiagnostics.h"
-#include "Diagnostics/ShaderDiagnostics.h"
-#include "Meshes/MeshDiagnostics.h"
-#include "Diagnostics/MeshPreviewGeometry.h"
-#include "Resources/Textures/TextureDiagnostics.h"
-#include "Viewport/ViewportContracts.h"
 #include "Concurrency/RendererExecutionConfig.h"
-#include "UI/UiRenderPacket.h"
-#include "UI/UiTextureHandle.h"
-#include "Settings/EngineRenderingSettings.h"
-#include "Core/Public/Console/CVarControl.h"
 
 #include <cstdint>
 #include <memory>
@@ -24,6 +10,24 @@ class Timer;
 class Window;
 class RendererFacadeState;
 struct RenderFrameSubmission;
+struct RendererGraphicsLaunch;
+struct ViewportRenderRequest;
+struct UiRenderPacket;
+struct EngineRenderingSettingsState;
+struct ViewportPresentationSnapshot;
+struct CVarControlRequest;
+struct CVarControlResult;
+struct ShaderDiagnosticsSnapshot;
+struct MeshDiagnosticsSnapshot;
+struct MeshPreviewGeometry;
+struct TextureDiagnosticsSnapshot;
+struct RendererMemoryDiagnosticsSnapshot;
+struct ViewportCaptureAdmission;
+struct ViewportCaptureRequest;
+struct ViewportCaptureId;
+struct ViewportCaptureReadback;
+struct ExternalCaptureSnapshot;
+struct ExternalCaptureAdmission;
 
 class SPARKLE_RENDERER_API Renderer final
 {

@@ -114,6 +114,12 @@ Record the revision/local changes, configuration, executable and input identity,
 
 Permanent test-only additions require explicit project approval. Keep temporary probes local and remove them before submission. Preserve existing tests unless their removal is agreed. Store shareable original results in ignored output and review generated code as carefully as other contributions.
 
+### Script ownership
+
+PowerShell command scripts validate arguments and compose named operations with explicit inputs. Keep implementation beside its capability: `CMake/CodeStyle/` owns source selection, tool discovery, formatting and policy checks; `CMake/Validation/` owns baseline check execution. Under `CMake/Packaging/`, `Payload/` owns admission and identity checks, and `Publication/` owns staging, archives and reversible product replacement. `CMake/Diagnostics/` owns GPU crash receipts, inspection and [diagnostic export](../CMake/Diagnostics/ExportDiagnostics.ps1). Shared local artifact path, file and symbol identity belongs in `CMake/Artifacts/`; source provenance belongs in `CMake/SourceIdentity.ps1`.
+
+Dot-source the required capability from `$PSScriptRoot` and pass its inputs as parameters. Keep subprocess settlement and rollback state with the operation that owns their lifetime. Batch and command files stay small Windows entry points. Update script callers and package paths when moving an implementation; remove replaced paths instead of adding forwarding scripts. Check PowerShell syntax and exercise the affected success and failure paths with local fixtures.
+
 ### Performance and images
 
 Fix the input, settings, warm-up, repeats, image domain and reference uncertainty before measuring. Report frame-time distributions, memory and measurement overhead. State whether cost improves, stays bounded, is unaffected or remains unmeasured. Remove unnecessary work before parallelizing.

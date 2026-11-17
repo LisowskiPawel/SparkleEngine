@@ -42,12 +42,7 @@ function(sparkle_add_dependency_subdirectory source_dir binary_dir)
         set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
     endif()
 
-    if(ARGC GREATER 2 AND "${ARGV2}" STREQUAL "EXCLUDE_FROM_ALL")
-        add_subdirectory(${source_dir} ${binary_dir} EXCLUDE_FROM_ALL)
-    else()
-        add_subdirectory(${source_dir} ${binary_dir})
-    endif()
-
+    add_subdirectory("${source_dir}" "${binary_dir}" ${ARGN})
 endfunction()
 
 # Locate Git once - used by FetchContent, cache verification, and sparse checkout.

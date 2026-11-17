@@ -1,0 +1,26 @@
+# Projects own their targets. Workspace discovery only admits marked project roots.
+file(GLOB _sparkle_project_markers CONFIGURE_DEPENDS "${SPARKLE_REPOSITORY_ROOT}/Projects/*/.sparkle-project")
+set(_sparkle_project_targets)
+foreach(_marker IN LISTS _sparkle_project_markers)
+    get_filename_component(_project_directory "${_marker}" DIRECTORY)
+    get_filename_component(_project_name "${_project_directory}" NAME)
+    if(_project_name STREQUAL "TemplateProject")
+        continue()
+    endif()
+    message(STATUS "Discovered project: ${_project_name}")
+    add_subdirectory("${_project_directory}")
+    list(APPEND _sparkle_project_targets "${_project_name}Editor" "${_project_name}Game" "${_project_name}")
+endforeach()
+
+if(NOT _sparkle_project_targets)
+    message(WARNING "No projects discovered. Add a runnable project under Projects/ with a .sparkle-project marker")
+endif()
+
+# Prefer Showcase Editor, then the first runnable project, then Launcher.
+foreach(_startup_target IN ITEMS ShowcaseEditor ${_sparkle_project_targets} SparkleLauncher)
+    if(TARGET "${_startup_target}")
+        set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT "${_startup_target}")
+        message(STATUS "VS startup project: ${_startup_target}")
+        break()
+    endif()
+endforeach()

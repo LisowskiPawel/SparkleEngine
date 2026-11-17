@@ -10,6 +10,9 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot 'SourceIdentity.ps1')
+. (Join-Path $PSScriptRoot 'Validation/BaselineChecks.ps1')
+
 $repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $revision = & git -C $repositoryRoot rev-parse HEAD
 if ($LASTEXITCODE -ne 0) { throw "Cannot identify the source revision." }
@@ -23,9 +26,8 @@ $OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
 if (Test-Path -LiteralPath $OutputDirectory) { throw "Choose a fresh baseline output directory." }
 [void] (New-Item -ItemType Directory -Path $OutputDirectory)
 $patchPath = Join-Path $OutputDirectory 'worktree.patch'
-$patch = @(& git -C $repositoryRoot diff --binary HEAD)
-if ($LASTEXITCODE -ne 0) { throw "Cannot retain the worktree patch." }
-[IO.File]::WriteAllText($patchPath, ($patch -join "`n"), [Text.UTF8Encoding]::new($false))
+$patch = Get-SourcePatch -RepositoryRoot $repositoryRoot
+[IO.File]::WriteAllText($patchPath, $patch, [Text.UTF8Encoding]::new($false))
 $build = Join-Path $repositoryRoot 'build'
 $cmake = Get-Command cmake -CommandType Application -ErrorAction SilentlyContinue
 $checks = @("architecture_boundary_check", "code_style_check", "ShaderCompilerCliValidation") | ForEach-Object {
@@ -39,66 +41,18 @@ try
     {
         if ($check.Target -in $SkipGate) { $check.Reason = 'Explicitly skipped'; continue }
         if ($cancelled) { $check.Reason = 'Cancelled before invocation'; continue }
-        if ($CancellationSignal -ne '' -and (Test-Path -LiteralPath $CancellationSignal))
+        $cmakePath = if ($null -eq $cmake) { '' } else { $cmake.Source }
+        Invoke-BaselineCheck $check $build $Configuration $cmakePath $OutputDirectory $TimeoutSeconds $CancellationSignal
+        $cancelled = $check.Status -eq 'CANCELLED'
+        if ($check.Status -eq 'PASS' -and $check.Target -eq 'ShaderCompilerCliValidation')
         {
-            $check.Status = 'CANCELLED'; $check.Reason = 'Cancellation requested'; $cancelled = $true; continue
-        }
-        if ($null -eq $cmake) { $check.Status = 'UNAVAILABLE'; $check.Reason = 'CMake is not installed'; continue }
-        if (!(Test-Path -LiteralPath (Join-Path $build 'CMakeCache.txt') -PathType Leaf))
-        {
-            $check.Status = 'MISSING_ARTIFACT'; $check.Reason = 'Configure the canonical workspace first'; continue
-        }
-        $process = $null
-        $timer = [Diagnostics.Stopwatch]::StartNew()
-        $check.Status = 'FAILED'; $check.Reason = 'Owner invocation did not complete'
-        try
-        {
-            Write-Host "Baseline owner check: $($check.Target) ($Configuration)"
-            $process = Start-Process -FilePath $cmake.Source -ArgumentList "--build `"$build`" --config $Configuration --target $($check.Target)" -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $OutputDirectory "$($check.Target).log") -RedirectStandardError (Join-Path $OutputDirectory "$($check.Target).error.log")
-            [void] $process.Handle
-            while ($true)
+            foreach ($artifact in @('GlobalShaderMap.smap', 'CookedShaderLibrary.slib'))
             {
-                $completed = $process.WaitForExit(100)
-                if ($completed) { break }
-                if ($CancellationSignal -ne '' -and (Test-Path -LiteralPath $CancellationSignal))
+                if (!(Test-Path -LiteralPath (Join-Path $repositoryRoot "artifacts/dev/Projects/Shared/Cooked/Shaders/$artifact") -PathType Leaf))
                 {
-                    $check.Status = 'CANCELLED'; $check.Reason = 'Cancellation requested'; $cancelled = $true; break
-                }
-                if ($timer.Elapsed.TotalSeconds -ge $TimeoutSeconds)
-                {
-                    $check.Status = 'TIMED_OUT'; $check.Reason = 'Per-check time limit reached'; break
+                    $check.Status = 'MISSING_ARTIFACT'; $check.Reason = "Missing owner output: $artifact"
                 }
             }
-            if ($completed)
-            {
-                $check.ExitCode = $process.ExitCode
-                $check.Status = if ($process.ExitCode -eq 0) { 'PASS' } else { 'FAILED' }
-                $check.Reason = 'Owner exit code'
-                if ($check.Status -eq 'PASS' -and $check.Target -eq 'ShaderCompilerCliValidation')
-                {
-                    foreach ($artifact in @('GlobalShaderMap.smap', 'CookedShaderLibrary.slib'))
-                    {
-                        if (!(Test-Path -LiteralPath (Join-Path $repositoryRoot "artifacts/dev/Projects/Shared/Cooked/Shaders/$artifact") -PathType Leaf))
-                        {
-                            $check.Status = 'MISSING_ARTIFACT'; $check.Reason = "Missing owner output: $artifact"
-                        }
-                    }
-                }
-            }
-        }
-        finally
-        {
-            if ($null -ne $process)
-            {
-                if (!$process.HasExited)
-                {
-                    & "$env:SystemRoot/System32/taskkill.exe" /PID $process.Id /T /F | Out-Null
-                    $process.WaitForExit()
-                    $check.ExitCode = $process.ExitCode
-                }
-                $process.Dispose()
-            }
-            $check.Seconds = [Math]::Round($timer.Elapsed.TotalSeconds, 3)
         }
     }
 }

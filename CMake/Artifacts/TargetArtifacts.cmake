@@ -13,7 +13,11 @@ function(_sparkle_set_target_artifact_directories target_name runtime_root symbo
         COMPILE_PDB_OUTPUT_DIRECTORY "${_sparkle_symbol_artifact_root}/${symbol_owner}/$<CONFIG>/obj"
     )
 
-    foreach(config_type IN LISTS CMAKE_CONFIGURATION_TYPES)
+    set(_sparkle_output_configurations ${CMAKE_CONFIGURATION_TYPES})
+    if(NOT _sparkle_output_configurations AND CMAKE_BUILD_TYPE)
+        set(_sparkle_output_configurations "${CMAKE_BUILD_TYPE}")
+    endif()
+    foreach(config_type IN LISTS _sparkle_output_configurations)
         string(TOUPPER "${config_type}" config_upper)
         set_target_properties(${target_name} PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${runtime_root}/${config_type}"
@@ -23,17 +27,6 @@ function(_sparkle_set_target_artifact_directories target_name runtime_root symbo
             COMPILE_PDB_OUTPUT_DIRECTORY_${config_upper} "${_sparkle_symbol_artifact_root}/${symbol_owner}/${config_type}/obj"
         )
     endforeach()
-
-    if(NOT CMAKE_CONFIGURATION_TYPES AND CMAKE_BUILD_TYPE)
-        string(TOUPPER "${CMAKE_BUILD_TYPE}" config_upper)
-        set_target_properties(${target_name} PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${runtime_root}/${CMAKE_BUILD_TYPE}"
-            LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${runtime_root}/${CMAKE_BUILD_TYPE}"
-            ARCHIVE_OUTPUT_DIRECTORY_${config_upper} "${_sparkle_library_artifact_root}/${symbol_owner}/${CMAKE_BUILD_TYPE}"
-            PDB_OUTPUT_DIRECTORY_${config_upper} "${_sparkle_symbol_artifact_root}/${symbol_owner}/${CMAKE_BUILD_TYPE}"
-            COMPILE_PDB_OUTPUT_DIRECTORY_${config_upper} "${_sparkle_symbol_artifact_root}/${symbol_owner}/${CMAKE_BUILD_TYPE}/obj"
-        )
-    endif()
 endfunction()
 
 function(sparkle_configure_launcher_artifacts target_name)

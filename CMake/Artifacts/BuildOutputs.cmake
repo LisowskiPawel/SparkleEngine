@@ -1,0 +1,16 @@
+# For multi-config generators (Visual Studio), set per-configuration output dirs.
+# For single-config generators (Ninja, Makefiles), the non-suffixed vars are used.
+if(CMAKE_CONFIGURATION_TYPES)
+    # Multi-config generator (Visual Studio, Xcode, Ninja Multi-Config)
+    foreach(CONFIG_TYPE ${CMAKE_CONFIGURATION_TYPES})
+        string(TOUPPER "${CONFIG_TYPE}" CONFIG_UPPER)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_BINARY_DIR}/private/runtime/${CONFIG_TYPE}")
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_BINARY_DIR}/private/lib/${CONFIG_TYPE}")
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_BINARY_DIR}/private/runtime/${CONFIG_TYPE}")
+    endforeach()
+else()
+    # Single-config generator (Ninja, Makefiles)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/private/runtime/${CMAKE_BUILD_TYPE}")
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/private/lib/${CMAKE_BUILD_TYPE}")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/private/runtime/${CMAKE_BUILD_TYPE}")
+endif()

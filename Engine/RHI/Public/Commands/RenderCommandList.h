@@ -1,15 +1,12 @@
 #pragma once
 
-#include "../Bindings/RenderBindingLayout.h"
 #include "../Core/RhiBackendApi.h"
 #include "RhiQueue.h"
 #include "../Descriptors/RhiDescriptorHandles.h"
 #include "../Diagnostics/RhiDiagnostics.h"
 #include "../Interop/ResourceState.h"
 #include "../Interop/RhiNativeHandles.h"
-#include "../Pipeline/RhiPipelineDesc.h"
 #include "../RayTracing/RhiRayTracingDesc.h"
-#include "../RayTracing/RhiRayTracingPipelineDesc.h"
 #include "../Resources/RhiResourceDesc.h"
 #include "../Resources/RhiResourceHandles.h"
 #include "../RHIAPI.h"
@@ -18,6 +15,11 @@
 #include <span>
 #include <string_view>
 #include <vector>
+
+class RenderBindingLayout;
+class RenderPipeline;
+class RayTracingPipeline;
+struct TraceRaysDesc;
 
 class SPARKLE_RHI_API RenderCommandList
 {

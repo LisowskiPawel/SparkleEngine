@@ -51,21 +51,11 @@ file(GLOB_RECURSE SPARKLE_APPLICATION_EDITOR_PRIVATE_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Editor/*.h
 )
 
-if(SPARKLE_BUILD_SHARED)
-    add_library(SparkleApplication SHARED
+sparkle_add_engine_module(SparkleApplication SPARKLE_APPLICATION_EXPORTS
         ${SPARKLE_APPLICATION_PUBLIC_HEADERS}
         ${SPARKLE_APPLICATION_GAME_PRIVATE_SOURCES}
         ${SPARKLE_APPLICATION_GAME_PRIVATE_HEADERS}
     )
-    target_compile_definitions(SparkleApplication PRIVATE SPARKLE_APPLICATION_EXPORTS)
-else()
-    add_library(SparkleApplication STATIC
-        ${SPARKLE_APPLICATION_PUBLIC_HEADERS}
-        ${SPARKLE_APPLICATION_GAME_PRIVATE_SOURCES}
-        ${SPARKLE_APPLICATION_GAME_PRIVATE_HEADERS}
-    )
-    target_compile_definitions(SparkleApplication PUBLIC SPARKLE_STATIC)
-endif()
 
 target_include_directories(SparkleApplication
     PUBLIC
@@ -93,21 +83,11 @@ target_link_libraries(SparkleApplication
         SparkleTasks
 )
 
-if(SPARKLE_BUILD_SHARED)
-    add_library(SparkleApplicationEditor SHARED
+sparkle_add_engine_module(SparkleApplicationEditor SPARKLE_APPLICATION_EDITOR_EXPORTS
         ${SPARKLE_APPLICATION_EDITOR_PUBLIC_HEADERS}
         ${SPARKLE_APPLICATION_EDITOR_PRIVATE_SOURCES}
         ${SPARKLE_APPLICATION_EDITOR_PRIVATE_HEADERS}
     )
-    target_compile_definitions(SparkleApplicationEditor PRIVATE SPARKLE_APPLICATION_EDITOR_EXPORTS)
-else()
-    add_library(SparkleApplicationEditor STATIC
-        ${SPARKLE_APPLICATION_EDITOR_PUBLIC_HEADERS}
-        ${SPARKLE_APPLICATION_EDITOR_PRIVATE_SOURCES}
-        ${SPARKLE_APPLICATION_EDITOR_PRIVATE_HEADERS}
-    )
-    target_compile_definitions(SparkleApplicationEditor PUBLIC SPARKLE_STATIC)
-endif()
 
 target_include_directories(SparkleApplicationEditor
     PUBLIC

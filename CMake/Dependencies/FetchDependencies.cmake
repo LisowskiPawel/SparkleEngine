@@ -1,5 +1,4 @@
 # Select source inputs; each recipe owns its pin, required files and native targets.
-set(SPARKLE_SYNC_SOURCE_DEPENDENCY "" CACHE STRING "Populate exactly one source dependency cache and skip workspace generation")
 set(_sparkle_source_dependencies
     cli11
     nlohmann_json

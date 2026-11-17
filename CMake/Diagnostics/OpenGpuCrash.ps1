@@ -18,7 +18,7 @@ try
         throw 'No terminal incident with a verified dump is available.'
     }
     [void] (Get-GpuCrashBundle $incident)
-    $tool = Get-IncidentFile $InspectorPath ([long]::MaxValue)
+    $tool = Get-LocalArtifactFile $InspectorPath ([long]::MaxValue)
     if ($tool.Extension -ine '.exe') { throw 'Configure an inspector executable explicitly.' }
     $directory = [IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($ManifestPath))
     Write-Output ('Open manually in the inspector: ' + (Join-Path $directory 'crash.nv-gpudmp'))

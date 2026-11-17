@@ -1,11 +1,9 @@
 #pragma once
 
-#include "../Core/RhiBackendSelection.h"
+#include "../Core/RhiBackendApi.h"
 #include "../Commands/RhiCommandSubmissionService.h"
 #include "../Formats/PixelFormat.h"
-#include "RhiDeviceLaunch.h"
 #include "../RHIAPI.h"
-#include "RenderHardwareInterface.h"
 
 #include <span>
 #include <cstdint>
@@ -13,8 +11,12 @@
 #include <string_view>
 
 class Window;
+class RenderHardwareInterface;
 class RhiImGuiRenderer;
 class RenderDeviceServicesState;
+class RhiExternalCapture;
+struct RhiCapabilities;
+struct RhiDeviceLaunch;
 struct RhiPresentationConfiguration;
 
 class SPARKLE_RHI_API RenderDeviceServices final : public RhiCommandSubmissionService

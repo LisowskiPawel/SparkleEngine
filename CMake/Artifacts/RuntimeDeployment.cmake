@@ -162,4 +162,4 @@ function(sparkle_stage_external_capture_notices product_target)
     endforeach()
 endfunction()
 
-include("${CMAKE_CURRENT_LIST_DIR}/Diagnostics/GpuCrashArtifacts.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../Diagnostics/GpuCrashArtifacts.cmake")

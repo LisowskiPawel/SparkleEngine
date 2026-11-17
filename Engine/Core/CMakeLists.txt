@@ -31,25 +31,11 @@ foreach(forbidden_logging_file IN LISTS SPARKLE_CORE_FORBIDDEN_LOGGING_FILES)
     endif()
 endforeach()
 
-# Create the library (SHARED for DLL, STATIC for static lib)
-# Use BUILD_SHARED_LIBS option or explicit SHARED/STATIC
-if(SPARKLE_BUILD_SHARED)
-    add_library(SparkleCore SHARED
+sparkle_add_engine_module(SparkleCore SPARKLE_CORE_EXPORTS
         ${SPARKLE_CORE_PUBLIC_HEADERS}
         ${SPARKLE_CORE_PRIVATE_SOURCES}
         ${SPARKLE_CORE_PRIVATE_HEADERS}
     )
-    # Define export macro for DLL builds
-    target_compile_definitions(SparkleCore PRIVATE SPARKLE_CORE_EXPORTS)
-else()
-    add_library(SparkleCore STATIC
-        ${SPARKLE_CORE_PUBLIC_HEADERS}
-        ${SPARKLE_CORE_PRIVATE_SOURCES}
-        ${SPARKLE_CORE_PRIVATE_HEADERS}
-    )
-    # Define static build macro
-    target_compile_definitions(SparkleCore PUBLIC SPARKLE_STATIC)
-endif()
 
 # Set include directories
 # PUBLIC: Headers that consumers of this module need

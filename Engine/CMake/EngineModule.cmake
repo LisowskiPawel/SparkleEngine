@@ -1,0 +1,10 @@
+# Engine modules share one linkage/export contract; each module owns its sources and dependencies.
+function(sparkle_add_engine_module target_name export_definition)
+    if(SPARKLE_BUILD_SHARED)
+        add_library(${target_name} SHARED ${ARGN})
+        target_compile_definitions(${target_name} PRIVATE ${export_definition})
+    else()
+        add_library(${target_name} STATIC ${ARGN})
+        target_compile_definitions(${target_name} PUBLIC SPARKLE_STATIC)
+    endif()
+endfunction()

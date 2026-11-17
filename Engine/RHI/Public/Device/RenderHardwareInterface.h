@@ -1,18 +1,19 @@
 #pragma once
 
-#include "../Capture/RhiCaptureService.h"
-#include "../Core/RhiCapabilities.h"
-#include "../Descriptors/RhiDescriptorService.h"
-#include "../Diagnostics/RhiDiagnostics.h"
-#include "../Interop/RhiInteropService.h"
-#include "../Pipeline/RhiPipelineService.h"
-#include "../Presentation/RhiPresentationService.h"
-#include "../RayTracing/RhiRayTracingService.h"
-#include "../Resources/RhiResourceService.h"
-#include "../Resources/RhiUploadService.h"
 #include "../RHIAPI.h"
 
 #include <cstdint>
+
+class RhiCaptureService;
+class RhiDescriptorService;
+class RenderDiagnostics;
+class RhiInteropService;
+class RhiPipelineService;
+class RhiPresentationService;
+class RhiRayTracingService;
+class RhiResourceService;
+class RhiUploadService;
+struct RhiCapabilities;
 
 class SPARKLE_RHI_API RenderHardwareInterface
 {

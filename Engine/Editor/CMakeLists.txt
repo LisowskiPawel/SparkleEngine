@@ -14,21 +14,11 @@ set(_sparkle_editor_capture_sources ${SPARKLE_EDITOR_PRIVATE_SOURCES})
 list(FILTER _sparkle_editor_capture_sources INCLUDE REGEX "/Private/Viewport/ExternalCapture/")
 list(FILTER SPARKLE_EDITOR_PRIVATE_SOURCES EXCLUDE REGEX "/Private/Viewport/ExternalCapture/")
 
-if(SPARKLE_BUILD_SHARED)
-    add_library(SparkleEditor SHARED
+sparkle_add_engine_module(SparkleEditor SPARKLE_EDITOR_EXPORTS
         ${SPARKLE_EDITOR_PUBLIC_HEADERS}
         ${SPARKLE_EDITOR_PRIVATE_SOURCES}
         ${SPARKLE_EDITOR_PRIVATE_HEADERS}
     )
-    target_compile_definitions(SparkleEditor PRIVATE SPARKLE_EDITOR_EXPORTS)
-else()
-    add_library(SparkleEditor STATIC
-        ${SPARKLE_EDITOR_PUBLIC_HEADERS}
-        ${SPARKLE_EDITOR_PRIVATE_SOURCES}
-        ${SPARKLE_EDITOR_PRIVATE_HEADERS}
-    )
-    target_compile_definitions(SparkleEditor PUBLIC SPARKLE_STATIC)
-endif()
 
 target_include_directories(SparkleEditor
     PUBLIC

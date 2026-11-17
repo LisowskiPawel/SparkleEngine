@@ -1,11 +1,20 @@
 ﻿#pragma once
 
 #include "Core/Public/CoreAPI.h"
-#include "Logger.h"
 
 #include <memory>
 #include <cstdint>
 #include <string_view>
+
+namespace spdlog
+{
+	class logger;
+}
+
+namespace Logging
+{
+	class LogCategory;
+}
 
 namespace Diagnostics
 {

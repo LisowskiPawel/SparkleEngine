@@ -144,19 +144,10 @@ if(SPARKLE_RHI_WITH_VULKAN)
     include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/Vulkan.cmake")
 endif()
 
-if(SPARKLE_BUILD_SHARED)
-    add_library(SparkleRHI SHARED
+sparkle_add_engine_module(SparkleRHI SPARKLE_RHI_EXPORTS
         ${SPARKLE_RHI_PUBLIC_HEADERS}
         $<TARGET_OBJECTS:SparkleRHICommon>
     )
-    target_compile_definitions(SparkleRHI PRIVATE SPARKLE_RHI_EXPORTS)
-else()
-    add_library(SparkleRHI STATIC
-        ${SPARKLE_RHI_PUBLIC_HEADERS}
-        $<TARGET_OBJECTS:SparkleRHICommon>
-    )
-    target_compile_definitions(SparkleRHI PUBLIC SPARKLE_STATIC)
-endif()
 
 target_include_directories(SparkleRHI
     PUBLIC

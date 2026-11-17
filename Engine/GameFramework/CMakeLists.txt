@@ -10,21 +10,11 @@ file(GLOB_RECURSE SPARKLE_GAMEFRAMEWORK_PRIVATE_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/*.h
 )
 
-if(SPARKLE_BUILD_SHARED)
-    add_library(SparkleGameFramework SHARED
+sparkle_add_engine_module(SparkleGameFramework SPARKLE_ENGINE_EXPORTS
         ${SPARKLE_GAMEFRAMEWORK_PUBLIC_HEADERS}
         ${SPARKLE_GAMEFRAMEWORK_PRIVATE_SOURCES}
         ${SPARKLE_GAMEFRAMEWORK_PRIVATE_HEADERS}
     )
-    target_compile_definitions(SparkleGameFramework PRIVATE SPARKLE_ENGINE_EXPORTS)
-else()
-    add_library(SparkleGameFramework STATIC
-        ${SPARKLE_GAMEFRAMEWORK_PUBLIC_HEADERS}
-        ${SPARKLE_GAMEFRAMEWORK_PRIVATE_SOURCES}
-        ${SPARKLE_GAMEFRAMEWORK_PRIVATE_HEADERS}
-    )
-    target_compile_definitions(SparkleGameFramework PUBLIC SPARKLE_STATIC)
-endif()
 
 target_include_directories(SparkleGameFramework
     PUBLIC

@@ -1,11 +1,13 @@
 Set-StrictMode -Version Latest
 
+. (Join-Path $PSScriptRoot 'PreparedProducts.ps1')
+
 function Get-PackageShaderExport
 {
     param([string] $RepositoryRoot, [string] $ShaderExport)
-    Assert-PackagePath $ShaderExport
+    Assert-ArtifactPath $ShaderExport
     $root = Join-Path $RepositoryRoot 'artifacts/symbols/shaders/Showcase'
-    $file = Get-IncidentFile (Join-Path $RepositoryRoot $ShaderExport) 16777216
+    $file = Get-LocalArtifactFile (Join-Path $RepositoryRoot $ShaderExport) 16777216
     if (!$file.FullName.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase))
     {
         throw 'Shader export escapes the configured symbol owner.'
@@ -19,7 +21,7 @@ function Get-PackageShaderExport
     foreach ($entry in $export.files)
     {
         if (!$paths.Add($entry.path)) { throw 'Duplicate shader export member.' }
-        [void] (Assert-PackageFile $file.DirectoryName $entry.path $entry.bytes $entry.sha256)
+        [void] (Assert-ArtifactFile $file.DirectoryName $entry.path $entry.bytes $entry.sha256)
     }
     foreach ($job in $export.jobs)
     {
@@ -66,9 +68,8 @@ function Update-PackageSbom
 
 function Freeze-PackageOutputs
 {
-    param([string] $RepositoryRoot, [string] $BuildDirectory, [string] $Version, [string] $TransactionRoot, $Products, $Inputs)
-    . (Join-Path $PSScriptRoot 'IncidentIdentity.ps1')
-    $prepared = @(Get-PreparedProductInputs $RepositoryRoot $BuildDirectory $Version)
+    param([string] $RepositoryRoot, [string] $TransactionRoot, $Products, $Inputs)
+    $prepared = @(Get-PreparedProductInputs $RepositoryRoot $Products)
     $shader = Get-PackageShaderExport $RepositoryRoot $Inputs.ShaderExport
     $compiler = @($prepared | Where-Object { $_.Component -ceq 'ShaderCompiler' })
     if ($compiler.Count -ne 1 -or $compiler[0].Binary.Sha256 -cne $shader.CompilerSha256)
@@ -86,11 +87,11 @@ function Freeze-PackageOutputs
         if ($generated.Contains($path) -or $cooked)
         {
             # Freeze prepared build/cook outputs once. External inputs stay pinned.
-            $output = Get-IncidentFile $path ([long]::MaxValue)
+            $output = Get-LocalArtifactFile $path ([long]::MaxValue)
             $file.Size = $output.Length
             $file.Sha256 = (Get-FileHash -LiteralPath $output.FullName).Hash.ToLowerInvariant()
         }
-        else { [void] (Assert-PackageFile $RepositoryRoot $file.Source $file.Size $file.Sha256) }
+        else { [void] (Assert-ArtifactFile $RepositoryRoot $file.Source $file.Size $file.Sha256) }
     }
 
     Update-PackageSbom $RepositoryRoot $TransactionRoot $Inputs

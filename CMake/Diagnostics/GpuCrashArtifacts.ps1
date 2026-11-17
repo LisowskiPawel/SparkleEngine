@@ -14,31 +14,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '../SourceIdentity.ps1')
-. (Join-Path $PSScriptRoot '../Packaging/IncidentIdentity.ps1')
-
-function Get-SourceCandidate
-{
-    $revision = & git -C $RepositoryRoot rev-parse HEAD
-    if ($LASTEXITCODE -ne 0 -or $revision -cnotmatch '^[a-f0-9]{40}$') { throw 'Source revision is unavailable.' }
-    $source = Get-ReleaseSourceInputs -SourceRoot $RepositoryRoot
-    $start = [Diagnostics.ProcessStartInfo]::new()
-    $start.FileName = (Get-Command git -CommandType Application | Select-Object -First 1).Source
-    $start.WorkingDirectory = $RepositoryRoot
-    $start.Arguments = 'diff --no-ext-diff --no-textconv --binary HEAD'
-    $start.UseShellExecute = $false; $start.CreateNoWindow = $true; $start.RedirectStandardOutput = $true
-    $start.StandardOutputEncoding = [Text.UTF8Encoding]::new($false)
-    $process = [Diagnostics.Process]::Start($start)
-    try
-    {
-        $patch = $process.StandardOutput.ReadToEnd()
-        $process.WaitForExit()
-        if ($process.ExitCode -ne 0) { throw 'Cannot bind the dirty Git patch.' }
-    }
-    finally { $process.Dispose() }
-    # Untracked bytes are independently covered by sourceInputsSha256.
-    return [ordered]@{ revision = $revision; sourceInputsSha256 = Get-ReleaseSourceHash $source
-        dirtyPatchSha256 = Get-ReleaseSourceHash $patch; sourceFiles = [object[]]($source | ConvertFrom-Json) }
-}
+. (Join-Path $PSScriptRoot '../Artifacts/NativeSymbols.ps1')
 
 function Write-Receipt
 {
@@ -70,27 +46,27 @@ try
         if ([IO.Path]::GetFileName($oldReceipt) -cne 'gpu-crash-product.json') { throw 'Unexpected diagnostic receipt output.' }
         if ([IO.File]::Exists($oldReceipt))
         {
-            [void] (Get-IncidentFile $oldReceipt 33554432)
+            [void] (Get-LocalArtifactFile $oldReceipt 33554432)
             [IO.File]::Delete($oldReceipt)
         }
-        $candidate = Get-SourceCandidate
+        $candidate = Get-SourceCandidate -RepositoryRoot $RepositoryRoot
         Write-Receipt $SnapshotPath $candidate
         exit 0
     }
-    $candidate = Get-SourceCandidate
+    $candidate = Get-SourceCandidate -RepositoryRoot $RepositoryRoot
     $before = Get-Content -LiteralPath $SnapshotPath -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($before.revision -cne $candidate.revision -or $before.sourceInputsSha256 -cne $candidate.sourceInputsSha256 -or $before.dirtyPatchSha256 -cne $candidate.dirtyPatchSha256)
     {
         throw 'Source changed during the build; rebuild before using diagnostic receipts.'
     }
-    $binary = Get-IncidentFile $ExecutablePath ([long]::MaxValue)
-    $symbols = Get-IncidentFile $PdbPath ([long]::MaxValue)
+    $binary = Get-LocalArtifactFile $ExecutablePath ([long]::MaxValue)
+    $symbols = Get-LocalArtifactFile $PdbPath ([long]::MaxValue)
     $peId = Get-NativeSymbolIdentity $binary.FullName
     $pdbId = Get-NativeSymbolIdentity $symbols.FullName
     if ($peId.Guid -cne $pdbId.Guid -or $peId.Age -ne $pdbId.Age) { throw 'PE/PDB identity mismatch.' }
     $runtime = @(foreach ($path in $RuntimeFiles.Split('|', [StringSplitOptions]::RemoveEmptyEntries))
     {
-        $file = Get-IncidentFile $path ([long]::MaxValue)
+        $file = Get-LocalArtifactFile $path ([long]::MaxValue)
         [ordered]@{ path = $file.Name; sha256 = (Get-FileHash -LiteralPath $file.FullName).Hash.ToLowerInvariant(); bytes = $file.Length }
     })
     $executableHash = (Get-FileHash -LiteralPath $binary.FullName).Hash.ToLowerInvariant()
@@ -100,12 +76,12 @@ try
     if (![IO.Path]::GetFullPath($SymbolRoot).StartsWith($symbolPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Symbol retention escapes the diagnostic namespace.' }
     if ([IO.Path]::GetFullPath($SymbolRoot).TrimEnd('\','/') -ine $expectedSymbols.Replace('/','\')) { throw 'Symbol retention escapes the artifact owner.' }
     $runtimeJson = ConvertTo-Json -InputObject $runtime -Depth 6 -Compress
-    $symbolId = Get-ReleaseSourceHash ($candidate.sourceInputsSha256 + "`n" + $executableHash + "`n" + $pdbHash + "`n" + $Profile + "`n" + $runtimeJson)
+    $symbolId = Get-TextSha256 ($candidate.sourceInputsSha256 + "`n" + $executableHash + "`n" + $pdbHash + "`n" + $Profile + "`n" + $runtimeJson)
     $retained = Join-Path $SymbolRoot $symbolId
     [void] [IO.Directory]::CreateDirectory($retained)
     $retainedPdb = Join-Path $retained $symbols.Name
     if (![IO.File]::Exists($retainedPdb)) { [IO.File]::Copy($symbols.FullName, $retainedPdb, $false) }
-    [void] (Get-IncidentFile $retainedPdb ([long]::MaxValue))
+    [void] (Get-LocalArtifactFile $retainedPdb ([long]::MaxValue))
     if ((Get-FileHash -LiteralPath $retainedPdb).Hash.ToLowerInvariant() -cne $pdbHash) { throw 'Retained CPU symbols changed.' }
     $retainedReceipt = Join-Path $retained 'gpu-crash-product.json'
     $receipt = [ordered]@{
@@ -118,7 +94,7 @@ try
     }
     if ([IO.File]::Exists($retainedReceipt))
     {
-        [void] (Get-IncidentFile $retainedReceipt 33554432)
+        [void] (Get-LocalArtifactFile $retainedReceipt 33554432)
         $expected = $receipt | ConvertTo-Json -Depth 12 -Compress
         if ([IO.File]::ReadAllText($retainedReceipt) -cne $expected) { throw 'Retained product receipt changed.' }
     }

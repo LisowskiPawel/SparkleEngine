@@ -74,8 +74,6 @@ target_include_directories(TextureCooker
         ${CMAKE_CURRENT_SOURCE_DIR}/Private
         ${CMAKE_SOURCE_DIR}/Engine
         ${CMAKE_SOURCE_DIR}/Engine/Core/Public/Diagnostics
-        ${stb_SOURCE_DIR}
-        ${tinyexr_SOURCE_DIR}
 )
 
 target_compile_features(TextureCooker PRIVATE cxx_std_20)

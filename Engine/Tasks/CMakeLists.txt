@@ -5,19 +5,10 @@ file(GLOB_RECURSE SPARKLE_TASKS_PRIVATE_SOURCES CONFIGURE_DEPENDS
 file(GLOB_RECURSE SPARKLE_TASKS_PRIVATE_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/*.h)
 
-if(SPARKLE_BUILD_SHARED)
-    add_library(SparkleTasks SHARED
+sparkle_add_engine_module(SparkleTasks SPARKLE_TASKS_EXPORTS
         ${SPARKLE_TASKS_PUBLIC_HEADERS}
         ${SPARKLE_TASKS_PRIVATE_SOURCES}
         ${SPARKLE_TASKS_PRIVATE_HEADERS})
-    target_compile_definitions(SparkleTasks PRIVATE SPARKLE_TASKS_EXPORTS)
-else()
-    add_library(SparkleTasks STATIC
-        ${SPARKLE_TASKS_PUBLIC_HEADERS}
-        ${SPARKLE_TASKS_PRIVATE_SOURCES}
-        ${SPARKLE_TASKS_PRIVATE_HEADERS})
-    target_compile_definitions(SparkleTasks PUBLIC SPARKLE_STATIC)
-endif()
 
 target_include_directories(SparkleTasks
     PUBLIC

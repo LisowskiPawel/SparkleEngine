@@ -14,21 +14,11 @@ file(GLOB_RECURSE SPARKLE_PLATFORM_PRIVATE_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/*.h
 )
 
-if(SPARKLE_BUILD_SHARED)
-    add_library(SparklePlatform SHARED
+sparkle_add_engine_module(SparklePlatform SPARKLE_PLATFORM_EXPORTS
         ${SPARKLE_PLATFORM_PUBLIC_HEADERS}
         ${SPARKLE_PLATFORM_PRIVATE_SOURCES}
         ${SPARKLE_PLATFORM_PRIVATE_HEADERS}
     )
-    target_compile_definitions(SparklePlatform PRIVATE SPARKLE_PLATFORM_EXPORTS)
-else()
-    add_library(SparklePlatform STATIC
-        ${SPARKLE_PLATFORM_PUBLIC_HEADERS}
-        ${SPARKLE_PLATFORM_PRIVATE_SOURCES}
-        ${SPARKLE_PLATFORM_PRIVATE_HEADERS}
-    )
-    target_compile_definitions(SparklePlatform PUBLIC SPARKLE_STATIC)
-endif()
 
 target_include_directories(SparklePlatform
     PUBLIC

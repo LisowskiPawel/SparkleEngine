@@ -8,10 +8,12 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 Add-Type -AssemblyName System.IO.Compression
-. (Join-Path $PSScriptRoot 'PackageVerification.ps1')
-. (Join-Path $PSScriptRoot 'PackageDependencies.ps1')
-. (Join-Path $PSScriptRoot 'PackageInputs.ps1')
-. (Join-Path $PSScriptRoot 'PackageOutputs.ps1')
+. (Join-Path $PSScriptRoot '../SourceIdentity.ps1')
+. (Join-Path $PSScriptRoot 'Payload/PackageInputs.ps1')
+. (Join-Path $PSScriptRoot 'Payload/PackageOutputs.ps1')
+. (Join-Path $PSScriptRoot 'Payload/PackageMetadata.ps1')
+. (Join-Path $PSScriptRoot 'Publication/PackageStage.ps1')
+. (Join-Path $PSScriptRoot 'Publication/PackageArchive.ps1')
 
 $repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 if ($BuildDirectory -eq '') { $BuildDirectory = Join-Path $repositoryRoot 'build' }
@@ -31,61 +33,16 @@ $phase = 'Inputs'
 $lock = $null
 $reportPath = Join-Path $transactionRoot 'report.json'
 
-. (Join-Path $PSScriptRoot '../SourceIdentity.ps1')
-
 function Assert-ReleaseCandidateUnchanged
 {
+    param([string] $RepositoryRoot, $Report)
+
     $currentRevision = & git -C $repositoryRoot rev-parse HEAD
     if ($LASTEXITCODE -ne 0 -or $currentRevision.Trim() -cne $report.Revision -or
-        (Get-ReleaseSourceHash (Get-ReleaseSourceInputs -SourceRoot $repositoryRoot)) -cne $report.SourceInputsSha256)
+        (Get-TextSha256 (Get-ReleaseSourceInputs -SourceRoot $repositoryRoot)) -cne $report.SourceInputsSha256)
     {
         throw 'Source revision or bytes changed during packaging; prepare and verify the changed outputs before retrying.'
     }
-}
-
-function New-PackageStage
-{
-    param([string] $RepositoryRoot, [string] $Stage, $Files, $Manifest)
-    [void] (New-Item -ItemType Directory -Path $Stage)
-    foreach ($file in $Files)
-    {
-        $source = Assert-PackageFile $RepositoryRoot $file.Source $file.Size $file.Sha256
-        $destination = Join-Path $Stage $file.Path
-        [void] (New-Item -ItemType Directory -Force -Path (Split-Path $destination))
-        [IO.File]::Copy($source, $destination, $false)
-        [IO.File]::SetAttributes($destination, [IO.FileAttributes]::ReadOnly)
-    }
-    [void] (New-Item -ItemType Directory -Force -Path (Join-Path $Stage 'manifests'))
-    $manifestPath = Join-Path $Stage 'manifests/sparkle-package-manifest.json'
-    $Manifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
-    [IO.File]::SetAttributes($manifestPath, [IO.FileAttributes]::ReadOnly)
-}
-
-function Write-PackageArchive
-{
-    param([string] $ArchivePath, [string] $Stage, $Manifest)
-    $zip = [IO.Compression.ZipFile]::Open($ArchivePath, [IO.Compression.ZipArchiveMode]::Create)
-    try
-    {
-        $paths = [string[]] (@($Manifest.Files.Path) + @('manifests/sparkle-package-manifest.json'))
-        [Array]::Sort($paths, [StringComparer]::Ordinal)
-        foreach ($path in $paths)
-        {
-            $entry = $zip.CreateEntry($path, [IO.Compression.CompressionLevel]::Optimal)
-            $entry.LastWriteTime = [DateTimeOffset]::new(1980,1,1,0,0,0,[TimeSpan]::Zero)
-            $entry.ExternalAttributes = 1
-            $reader = [IO.File]::OpenRead((Join-Path $Stage $path))
-            try
-            {
-                $writer = $entry.Open()
-                try { $reader.CopyTo($writer) }
-                finally { $writer.Dispose() }
-            }
-            finally { $reader.Dispose() }
-        }
-    }
-    finally { $zip.Dispose() }
-    [IO.File]::SetAttributes($ArchivePath, [IO.FileAttributes]::ReadOnly)
 }
 
 function Publish-Package
@@ -121,7 +78,7 @@ try
     if ($LASTEXITCODE -ne 0) { throw 'Cannot identify source revision.' }
     $report.Revision = $revision.Trim()
     $sourceJson = Get-ReleaseSourceInputs -SourceRoot $repositoryRoot
-    $report.SourceInputsSha256 = Get-ReleaseSourceHash $sourceJson
+    $report.SourceInputsSha256 = Get-TextSha256 $sourceJson
     [IO.File]::WriteAllText((Join-Path $transactionRoot 'source-inputs.json'), $sourceJson, [Text.UTF8Encoding]::new($false))
     if ([string]::IsNullOrWhiteSpace($InputsPath) -or !(Test-Path -LiteralPath $InputsPath -PathType Leaf))
     {
@@ -139,10 +96,10 @@ try
     $products = @(Get-PackageProducts $BuildDirectory $version)
     $report.Steps += @{ Name = 'Inputs'; Status = 'PASS' }
     $phase = 'Freeze'
-    Assert-ReleaseCandidateUnchanged
-    $report.Outputs = Freeze-PackageOutputs $repositoryRoot $BuildDirectory $version $transactionRoot $products $inputs
+    Assert-ReleaseCandidateUnchanged $repositoryRoot $report
+    $report.Outputs = Freeze-PackageOutputs $repositoryRoot $transactionRoot $products $inputs
     $manifest = New-PackageManifest $repositoryRoot $version $report.Revision $report.SourceInputsSha256 $products $inputs
-    $report.PayloadSha256 = Get-ReleaseSourceHash ($manifest | ConvertTo-Json -Depth 20 -Compress)
+    $report.PayloadSha256 = Get-TextSha256 ($manifest | ConvertTo-Json -Depth 20 -Compress)
     $inputs | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $transactionRoot 'frozen-inputs.json') -Encoding UTF8
     $report.Steps += @{ Name = 'Freeze'; Status = 'PASS' }
     $phase = 'Stage'
@@ -159,7 +116,7 @@ try
     $partial = Join-Path $transactionRoot 'archive.partial'
     Write-PackageArchive $partial $stage $manifest
     Test-PackageArchive $partial $stage $manifest
-    Assert-ReleaseCandidateUnchanged
+    Assert-ReleaseCandidateUnchanged $repositoryRoot $report
     $archiveHash = (Get-FileHash -LiteralPath $partial).Hash.ToLowerInvariant()
     $reportPath = Publish-Package $partial $transactionRoot $outputRoot $version $archiveHash $report
 }

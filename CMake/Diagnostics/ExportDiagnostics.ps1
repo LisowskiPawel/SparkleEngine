@@ -12,13 +12,13 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot '../Diagnostics/GpuCrashIncident.ps1')
+. (Join-Path $PSScriptRoot 'GpuCrashExport.ps1')
 
 try
 {
     $proposal = Get-GpuCrashExport $GpuCrashManifestPath $IncludeGpuDump.IsPresent $IncludeNvdbg.IsPresent $IncludeSource.IsPresent $IncludeSymbols.IsPresent
     $json = $proposal.Record | ConvertTo-Json -Depth 12
-    $digest = Get-IncidentPreviewSha256 $json
+    $digest = Get-TextSha256 $json
     if (!$Consent)
     {
         [ordered]@{ PreviewSha256 = $digest; Warning = 'Raw dumps, NVIDIA debug data and full source/symbols may contain private content and paths. Binary redaction is not provided.'

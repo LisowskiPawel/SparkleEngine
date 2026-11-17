@@ -1,5 +1,7 @@
 Set-StrictMode -Version Latest
 
+. (Join-Path $PSScriptRoot 'Artifacts/ArtifactIdentity.ps1')
+
 function Get-ReleaseSourceInputs
 {
     param([Parameter(Mandatory)][string] $SourceRoot)
@@ -22,11 +24,37 @@ function Get-ReleaseSourceInputs
     return ConvertTo-Json -InputObject $sourceInputs -Depth 5 -Compress
 }
 
-function Get-ReleaseSourceHash
+function Get-SourcePatch
 {
-    param([string] $Json)
-    $hash = [Security.Cryptography.SHA256]::Create()
-    try { return [BitConverter]::ToString($hash.ComputeHash([Text.Encoding]::UTF8.GetBytes($Json))).Replace('-','').ToLowerInvariant() }
-    finally { $hash.Dispose() }
+    param([string] $RepositoryRoot)
+
+    $start = [Diagnostics.ProcessStartInfo]::new()
+    $start.FileName = (Get-Command git -CommandType Application | Select-Object -First 1).Source
+    $start.WorkingDirectory = $RepositoryRoot
+    $start.Arguments = 'diff --no-ext-diff --no-textconv --binary HEAD'
+    $start.UseShellExecute = $false; $start.CreateNoWindow = $true; $start.RedirectStandardOutput = $true
+    $start.StandardOutputEncoding = [Text.UTF8Encoding]::new($false)
+    $process = [Diagnostics.Process]::Start($start)
+    try
+    {
+        $patch = $process.StandardOutput.ReadToEnd()
+        $process.WaitForExit()
+        if ($process.ExitCode -ne 0) { throw 'Cannot bind the dirty Git patch.' }
+    }
+    finally { $process.Dispose() }
+
+    return $patch
 }
 
+function Get-SourceCandidate
+{
+    param([string] $RepositoryRoot)
+
+    $revision = & git -C $RepositoryRoot rev-parse HEAD
+    if ($LASTEXITCODE -ne 0 -or $revision -cnotmatch '^[a-f0-9]{40}$') { throw 'Source revision is unavailable.' }
+    $source = Get-ReleaseSourceInputs -SourceRoot $RepositoryRoot
+    $patch = Get-SourcePatch -RepositoryRoot $RepositoryRoot
+    # Untracked bytes are independently covered by sourceInputsSha256.
+    return [ordered]@{ revision = $revision; sourceInputsSha256 = Get-TextSha256 $source
+        dirtyPatchSha256 = Get-TextSha256 $patch; sourceFiles = [object[]]($source | ConvertFrom-Json) }
+}
